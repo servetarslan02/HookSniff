@@ -101,6 +101,10 @@ export interface Endpoint {
   description?: string;
   is_active: boolean;
   created_at: string;
+  routing_strategy?: string;
+  fallback_url?: string;
+  avg_response_ms?: number;
+  failure_streak?: number;
 }
 
 export interface Delivery {
@@ -128,3 +132,48 @@ export interface StatsResponse {
   success_rate: number;
   endpoints_count: number;
 }
+
+// Analytics types
+export interface TimeBucket {
+  timestamp: string;
+  successful: number;
+  failed: number;
+  total: number;
+}
+
+export interface DeliveryTrendResponse {
+  range: string;
+  buckets: TimeBucket[];
+}
+
+export interface SuccessRateData {
+  range: string;
+  successful: number;
+  failed: number;
+  pending: number;
+  success_rate: number;
+}
+
+export interface LatencyBucket {
+  timestamp: string;
+  avg_ms: number;
+  p95_ms: number;
+}
+
+export interface LatencyTrendResponse {
+  range: string;
+  buckets: LatencyBucket[];
+  overall_avg_ms: number;
+}
+
+// Analytics API
+export const analyticsApi = {
+  deliveryTrend: (token: string, range: string = '24h') =>
+    apiFetch<DeliveryTrendResponse>(`/analytics/deliveries?range=${range}`, { token }),
+
+  successRate: (token: string, range: string = '24h') =>
+    apiFetch<SuccessRateData>(`/analytics/success-rate?range=${range}`, { token }),
+
+  latencyTrend: (token: string, range: string = '24h') =>
+    apiFetch<LatencyTrendResponse>(`/analytics/latency?range=${range}`, { token }),
+};
