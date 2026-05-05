@@ -1,147 +1,187 @@
-import Footer from '@/components/Footer';
-import Link from 'next/link';
+'use client';
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="border-b border-gray-200 dark:border-slate-700 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">🪝</div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">Hookrelay</span>
-          </Link>
-          <Link href="/" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white">← Back to Home</Link>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
+      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
+          <a href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 Hookrelay</a>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-600 dark:text-slate-400">Privacy Policy</span>
         </div>
       </nav>
+      <main className="max-w-4xl mx-auto px-6 py-16">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Privacy Policy</h1>
+        <p className="text-gray-500 dark:text-slate-400 mb-12">Last updated: May 6, 2026</p>
 
-      <article className="max-w-4xl mx-auto px-6 py-12 prose prose-gray max-w-none">
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Privacy Policy</h1>
-        <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: May 6, 2026</p>
+        <div className="prose dark:prose-invert max-w-none space-y-8 text-gray-700 dark:text-slate-300 leading-relaxed">
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">1. Introduction</h2>
+            <p>HookRelay ("we", "us", "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our webhook delivery service ("Service").</p>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">1. Introduction</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            Hookrelay (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our webhook delivery service.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">2. Information We Collect</h2>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">2. Information We Collect</h2>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-4">Account Information</h3>
-          <ul className="text-gray-600 dark:text-slate-400 space-y-2">
-            <li>Email address (for authentication and communication)</li>
-            <li>Name (optional, for personalization)</li>
-            <li>Billing information (processed by our payment provider, Stripe)</li>
-          </ul>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 mt-6">2.1 Account Information</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Email address</li>
+              <li>Name (optional)</li>
+              <li>Company name (optional)</li>
+              <li>Payment information (processed by Stripe, not stored by us)</li>
+            </ul>
 
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-4">Service Data</h3>
-          <ul className="text-gray-600 dark:text-slate-400 space-y-2">
-            <li>Endpoint URLs you register</li>
-            <li>Webhook delivery metadata (timestamps, status codes, attempt counts)</li>
-            <li>API request logs (for debugging, retained for 30 days)</li>
-          </ul>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 mt-6">2.2 Usage Data</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>API request logs (endpoint URLs, timestamps, response codes)</li>
+              <li>Webhook delivery logs (payloads, delivery attempts, status)</li>
+              <li>Dashboard activity (page views, feature usage)</li>
+              <li>IP addresses (for security and rate limiting)</li>
+            </ul>
 
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-4">Webhook Payloads</h3>
-          <p className="text-gray-600 dark:text-slate-400">
-            We process webhook payloads to deliver them to your endpoints. Payload data is held in memory during delivery and is not permanently stored. Failed deliveries are retained in our dead letter queue for up to 7 days for debugging purposes.
-          </p>
-        </section>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 mt-6">2.3 Technical Data</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Browser type and version</li>
+              <li>Operating system</li>
+              <li>Device information</li>
+              <li>Cookies and session tokens</li>
+            </ul>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">3. How We Use Your Information</h2>
-          <ul className="text-gray-600 dark:text-slate-400 space-y-2">
-            <li>To provide, maintain, and improve the Service</li>
-            <li>To process webhook deliveries and retries</li>
-            <li>To send service-related communications (delivery failures, account alerts)</li>
-            <li>To monitor usage for billing and rate limiting</li>
-            <li>To detect and prevent abuse or security incidents</li>
-          </ul>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">3. How We Use Your Information</h2>
+            <p className="mb-2">We use your information to:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Provide and maintain the Service</li>
+              <li>Process webhook deliveries and retries</li>
+              <li>Authenticate and authorize API requests</li>
+              <li>Send service-related notifications (delivery failures, billing alerts)</li>
+              <li>Improve the Service and fix bugs</li>
+              <li>Prevent fraud and abuse</li>
+              <li>Comply with legal obligations</li>
+            </ul>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">4. Data Sharing</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            We do not sell your personal information. We may share data with:
-          </p>
-          <ul className="text-gray-600 dark:text-slate-400 space-y-2">
-            <li><strong>Service providers:</strong> Infrastructure (AWS/GCP), payment processing (Stripe), email delivery</li>
-            <li><strong>Legal requirements:</strong> When required by law, subpoena, or government request</li>
-            <li><strong>Business transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
-          </ul>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">4. Webhook Payloads</h2>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>We process webhook payloads solely for delivery to your configured endpoints</li>
+              <li>Payloads are stored temporarily for delivery, retry, and logging purposes</li>
+              <li>Payloads are automatically deleted according to your plan's retention period</li>
+              <li>We do not inspect, analyze, mine, or sell your webhook data</li>
+              <li>We do not use your webhook data for advertising or profiling</li>
+            </ul>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">5. Cookies & Tracking</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            We use essential cookies for authentication and session management. We do not use third-party advertising cookies. The dashboard uses localStorage to store your authentication token and preferences.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">5. Data Sharing</h2>
+            <p className="mb-2">We do NOT sell your personal data. We may share information with:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Stripe:</strong> Payment processing (subject to Stripe's Privacy Policy)</li>
+              <li><strong>Infrastructure providers:</strong> Cloud hosting for Service operation</li>
+              <li><strong>Legal authorities:</strong> When required by law, court order, or to protect our rights</li>
+              <li><strong>Business transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+            </ul>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">6. Data Security</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            We implement industry-standard security measures including TLS encryption for data in transit, encryption at rest for sensitive data, and regular security audits. API keys are hashed before storage. However, no method of transmission over the Internet is 100% secure.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">6. Data Security</h2>
+            <p className="mb-2">We implement industry-standard security measures:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>All data transmitted over TLS/HTTPS</li>
+              <li>API keys are hashed before storage (SHA-256)</li>
+              <li>HMAC-SHA256 signatures for webhook verification</li>
+              <li>Regular security audits and updates</li>
+              <li>Access controls and authentication for all systems</li>
+            </ul>
+            <p className="mt-4">However, no method of transmission or storage is 100% secure. We cannot guarantee absolute security.</p>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">7. Your Rights (GDPR)</h2>
-          <p className="text-gray-600 dark:text-slate-400">If you are in the European Economic Area, you have the right to:</p>
-          <ul className="text-gray-600 dark:text-slate-400 space-y-2">
-            <li><strong>Access</strong> — request a copy of your personal data</li>
-            <li><strong>Rectification</strong> — correct inaccurate data</li>
-            <li><strong>Erasure</strong> — request deletion of your data</li>
-            <li><strong>Portability</strong> — receive your data in a machine-readable format</li>
-            <li><strong>Objection</strong> — object to processing of your data</li>
-            <li><strong>Restriction</strong> — request restricted processing</li>
-          </ul>
-          <p className="text-gray-600 dark:text-slate-400 mt-4">
-            To exercise these rights, contact us at{' '}
-            <a href="mailto:privacy@hookrelay.io" className="text-brand-600 dark:text-brand-400 hover:text-brand-700">privacy@hookrelay.io</a>.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">7. Data Retention</h2>
+            <div className="bg-gray-100 dark:bg-slate-800 rounded-xl p-4 my-4">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-slate-700">
+                    <th className="text-left py-2 font-semibold text-gray-900 dark:text-white">Data Type</th>
+                    <th className="text-left py-2 font-semibold text-gray-900 dark:text-white">Retention Period</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-200 dark:border-slate-700">
+                    <td className="py-2">Account data</td>
+                    <td className="py-2">While account is active + 30 days</td>
+                  </tr>
+                  <tr className="border-b border-gray-200 dark:border-slate-700">
+                    <td className="py-2">Webhook delivery logs</td>
+                    <td className="py-2">Per plan (7 / 30 / 90 days)</td>
+                  </tr>
+                  <tr className="border-b border-gray-200 dark:border-slate-700">
+                    <td className="py-2">API request logs</td>
+                    <td className="py-2">30 days</td>
+                  </tr>
+                  <tr className="border-b border-gray-200 dark:border-slate-700">
+                    <td className="py-2">Payment records</td>
+                    <td className="py-2">As required by law (typically 7 years)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2">Analytics data</td>
+                    <td className="py-2">12 months (aggregated, non-identifying)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">8. Data Retention</h2>
-          <ul className="text-gray-600 dark:text-slate-400 space-y-2">
-            <li>Account data: retained while your account is active</li>
-            <li>Delivery metadata: retained for 90 days (Pro/Business: 365 days)</li>
-            <li>API logs: retained for 30 days</li>
-            <li>Failed payloads (dead letter queue): retained for 7 days</li>
-          </ul>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">8. Your Rights</h2>
+            <p className="mb-2">Depending on your jurisdiction, you may have the right to:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Access</strong> your personal data</li>
+              <li><strong>Correct</strong> inaccurate data</li>
+              <li><strong>Delete</strong> your data ("right to be forgotten")</li>
+              <li><strong>Export</strong> your data in a portable format</li>
+              <li><strong>Object</strong> to certain processing</li>
+              <li><strong>Withdraw consent</strong> where applicable</li>
+            </ul>
+            <p className="mt-4">To exercise these rights, contact us at <a href="mailto:privacy@hookrelay.dev" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@hookrelay.dev</a>.</p>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">9. International Transfers</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            Your data may be processed in countries outside the EEA. We ensure appropriate safeguards are in place, including Standard Contractual Clauses where required.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">9. Cookies</h2>
+            <p className="mb-2">We use:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Essential cookies:</strong> Authentication, session management</li>
+              <li><strong>Analytics cookies:</strong> Usage statistics (optional, can be disabled)</li>
+            </ul>
+            <p className="mt-4">You can control cookies through your browser settings.</p>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">10. Children&apos;s Privacy</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            The Service is not intended for users under 16 years of age. We do not knowingly collect data from children.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">10. International Data Transfers</h2>
+            <p>Your data may be processed in countries outside your own. We ensure appropriate safeguards are in place for international transfers, including Standard Contractual Clauses where required.</p>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">11. Changes to This Policy</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            We may update this Privacy Policy from time to time. We will notify you of significant changes via email or a notice on the Service.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">11. Children's Privacy</h2>
+            <p>The Service is not intended for users under 18. We do not knowingly collect data from children.</p>
+          </section>
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">12. Contact Us</h2>
-          <p className="text-gray-600 dark:text-slate-400">
-            For privacy-related inquiries:<br />
-            Email: <a href="mailto:privacy@hookrelay.io" className="text-brand-600 dark:text-brand-400 hover:text-brand-700">privacy@hookrelay.io</a><br />
-            Data Protection Officer: <a href="mailto:dpo@hookrelay.io" className="text-brand-600 dark:text-brand-400 hover:text-brand-700">dpo@hookrelay.io</a>
-          </p>
-        </section>
-      </article>
-      <Footer />
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">12. Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of material changes via email or dashboard notification. The "Last updated" date at the top indicates when changes were made.</p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">13. Contact</h2>
+            <p>For privacy-related questions or requests:</p>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li>Email: <a href="mailto:privacy@hookrelay.dev" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@hookrelay.dev</a></li>
+              <li>Data Controller: HookRelay</li>
+            </ul>
+          </section>
+        </div>
+      </main>
     </div>
   );
 }

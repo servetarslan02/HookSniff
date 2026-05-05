@@ -1,3 +1,5 @@
+pub mod stripe;
+
 use serde::{Deserialize, Serialize};
 
 /// Subscription plan definitions with limits
@@ -84,7 +86,7 @@ impl Plan {
         match self {
             Plan::Free => 0,
             Plan::Pro => 4900,       // $49/mo
-            Plan::Business => 29900, // $299/mo
+            Plan::Business => 14900, // $149/mo
             Plan::Enterprise => 0,   // Custom pricing
         }
     }
