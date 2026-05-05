@@ -300,13 +300,16 @@ async fn schedule_retry(
         .await?;
 
     tracing::info!(
-        "⏰ Delivery {} scheduled for retry in {}s",
+        "⏰ Delivery {} scheduled for retry in {}s (next_retry_at={})",
         delivery_id,
-        delay
+        delay,
+        next_retry
     );
 
-    // Sleep then re-process (simplified; in production use Temporal)
-    tokio::time::sleep(std::time::Duration::from_secs(delay as u64)).await;
+    // FIX: Removed blocking tokio::time::sleep — the retry scheduler
+    // (a separate task that polls deliveries WHERE next_retry_at <= now())
+    // will pick this up and re-process it. This prevents the worker from
+    // being blocked on a single delivery for the entire backoff duration.
 
     Ok(())
 }

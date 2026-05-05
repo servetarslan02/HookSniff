@@ -8,6 +8,58 @@ use super::mimo::MiMoProvider;
 use super::openai::OpenAiProvider;
 use super::provider::{AiCapability, AiProvider, ProviderStatus};
 
+/// Simple sliding-window rate limiter for AI provider calls.
+/// Prevents burning through API quotas by limiting requests per provider
+/// within a rolling time window.
+///
+/// FIX: Added to prevent unbounded API usage that could exhaust quotas
+/// or trigger provider rate limits / bans.
+struct ProviderRateLimiter {
+    /// Maximum requests allowed per window per provider
+    max_per_window: u32,
+    /// Duration of the sliding window
+    window_duration: chrono::Duration,
+    /// Per-provider request timestamps
+    request_log: HashMap<String, Vec<chrono::DateTime<chrono::Utc>>>,
+}
+
+impl ProviderRateLimiter {
+    fn new(max_per_window: u32, window_duration: chrono::Duration) -> Self {
+        Self {
+            max_per_window,
+            window_duration,
+            request_log: HashMap::new(),
+        }
+    }
+
+    /// Attempt to consume a rate limit token for the given provider.
+    /// Returns `true` if allowed, `false` if rate limit exceeded.
+    fn try_acquire(&mut self, provider_name: &str) -> bool {
+        let now = chrono::Utc::now();
+        let cutoff = now - self.window_duration;
+
+        // Get or create log for this provider and prune old entries
+        let log = self
+            .request_log
+            .entry(provider_name.to_string())
+            .or_insert_with(Vec::new);
+        log.retain(|ts| *ts > cutoff);
+
+        if log.len() >= self.max_per_window as usize {
+            tracing::warn!(
+                "🚫 Rate limit exceeded for provider '{}': {}/{} requests in window",
+                provider_name,
+                log.len(),
+                self.max_per_window
+            );
+            return false;
+        }
+
+        log.push(now);
+        true
+    }
+}
+
 /// AI Orkestratör — Tüm AI'ları koordine eden "CEO"
 ///
 /// ## Nasıl Çalışır
@@ -43,6 +95,9 @@ use super::provider::{AiCapability, AiProvider, ProviderStatus};
 pub struct AiOrchestrator {
     providers: Arc<RwLock<Vec<Box<dyn AiProvider>>>>,
     task_history: Arc<RwLock<Vec<TaskRecord>>>,
+    // FIX: Rate limiter to prevent burning through AI provider API quotas.
+    // Default: 60 requests per provider per minute (configurable).
+    rate_limiter: Arc<RwLock<ProviderRateLimiter>>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -68,6 +123,23 @@ impl AiOrchestrator {
         Self {
             providers: Arc::new(RwLock::new(Vec::new())),
             task_history: Arc::new(RwLock::new(Vec::new())),
+            // FIX: Initialize rate limiter — 60 requests per provider per 1-minute window
+            rate_limiter: Arc::new(RwLock::new(ProviderRateLimiter::new(
+                60,
+                chrono::Duration::minutes(1),
+            ))),
+        }
+    }
+
+    /// Create an orchestrator with custom rate limit settings.
+    pub fn with_rate_limit(max_per_window: u32, window_seconds: i64) -> Self {
+        Self {
+            providers: Arc::new(RwLock::new(Vec::new())),
+            task_history: Arc::new(RwLock::new(Vec::new())),
+            rate_limiter: Arc::new(RwLock::new(ProviderRateLimiter::new(
+                max_per_window,
+                chrono::Duration::seconds(window_seconds),
+            ))),
         }
     }
 
@@ -125,6 +197,24 @@ impl AiOrchestrator {
         let mut fallback_used = false;
 
         for provider in &candidates {
+            // FIX: Check rate limit before calling the provider.
+            // Skip this provider if rate-limited, try the next one.
+            {
+                let mut limiter = self.rate_limiter.write().await;
+                if !limiter.try_acquire(provider.name()) {
+                    tracing::info!(
+                        "⏭️ Skipping rate-limited provider '{}', trying next",
+                        provider.name()
+                    );
+                    last_error = Some(anyhow::anyhow!(
+                        "Provider '{}' rate limited",
+                        provider.name()
+                    ));
+                    fallback_used = true;
+                    continue;
+                }
+            }
+
             let start = std::time::Instant::now();
             match task_fn(provider.as_ref()).await {
                 Ok(result) => {
