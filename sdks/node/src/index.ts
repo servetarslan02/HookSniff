@@ -29,6 +29,9 @@ import type {
   WebhookVerificationResult,
 } from "./types";
 
+export { WebhookVerifier, verifyWebhook } from "./verify";
+export type { VerificationResult } from "./verify";
+
 export type {
   HookRelayConfig,
   Endpoint,

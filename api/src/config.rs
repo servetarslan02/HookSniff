@@ -11,6 +11,10 @@ pub struct Config {
     pub jwt_secret: String,
     pub retention_days: i64,
     pub rust_log: String,
+    /// Event delivery format: "standard" or "cloudevents".
+    pub webhook_format: String,
+    /// Timestamp tolerance for replay protection in seconds.
+    pub webhook_timestamp_tolerance_secs: i64,
 }
 
 impl Config {
@@ -68,6 +72,12 @@ impl Config {
                 .parse()
                 .context("RETENTION_DAYS must be a number")?,
             rust_log,
+            webhook_format: std::env::var("WEBHOOK_FORMAT")
+                .unwrap_or_else(|_| "standard".into()),
+            webhook_timestamp_tolerance_secs: std::env::var("WEBHOOK_TIMESTAMP_TOLERANCE_SECS")
+                .unwrap_or_else(|_| "300".into())
+                .parse()
+                .context("WEBHOOK_TIMESTAMP_TOLERANCE_SECS must be a number")?,
         })
     }
 }
