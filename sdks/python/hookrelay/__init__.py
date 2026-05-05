@@ -31,6 +31,7 @@ from .exceptions import (
     PayloadTooLargeError,
 )
 from .utils import verify_signature, verify_webhook_signature, WebhookHandler
+from .verify import WebhookVerifier, verify_webhook
 
 __version__ = "0.3.0"
 __all__ = [
@@ -65,4 +66,7 @@ __all__ = [
     "verify_signature",
     "verify_webhook_signature",
     "WebhookHandler",
+    # Standard Webhooks verification
+    "WebhookVerifier",
+    "verify_webhook",
 ]

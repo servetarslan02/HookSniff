@@ -4,7 +4,53 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 
-// FIX: Track insertion order to enable LRU-style eviction
+// ──────────────────────────────────────────────────────────────
+// Plan-based rate limits
+// ──────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Plan {
+    Free,
+    Pro,
+    Business,
+    Enterprise,
+}
+
+impl Plan {
+    /// Requests per minute
+    pub fn requests_per_minute(&self) -> u32 {
+        match self {
+            Plan::Free => 100,
+            Plan::Pro => 1_000,
+            Plan::Business => 10_000,
+            Plan::Enterprise => u32::MAX, // Custom — no hard limit
+        }
+    }
+
+    /// Webhooks per day
+    pub fn webhooks_per_day(&self) -> u64 {
+        match self {
+            Plan::Free => 1_000,
+            Plan::Pro => 50_000,
+            Plan::Business => 500_000,
+            Plan::Enterprise => u64::MAX, // Custom — no hard limit
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        match s.to_lowercase().as_str() {
+            "pro" => Plan::Pro,
+            "business" => Plan::Business,
+            "enterprise" => Plan::Enterprise,
+            _ => Plan::Free,
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Rate limit entry with sliding window
+// ──────────────────────────────────────────────────────────────
+
 struct RateLimitEntry {
     count: u32,
     window_start: Instant,
@@ -16,7 +62,7 @@ pub struct RateLimiter {
     requests: Arc<Mutex<HashMap<String, RateLimitEntry>>>,
     max_requests: u32,
     window_duration: Duration,
-    max_entries: usize, // FIX: Maximum number of tracked keys to prevent unbounded growth
+    max_entries: usize,
 }
 
 impl RateLimiter {
@@ -25,12 +71,10 @@ impl RateLimiter {
             requests: Arc::new(Mutex::new(HashMap::new())),
             max_requests,
             window_duration,
-            // FIX: Cap the map at 10,000 entries to prevent memory leaks
             max_entries: 10_000,
         };
 
-        // FIX: More aggressive cleanup — runs every window/4 instead of every window
-        // This keeps the map smaller and catches stale entries faster
+        // Background cleanup task
         let requests = limiter.requests.clone();
         let window = window_duration;
         let max_entries = limiter.max_entries;
@@ -39,20 +83,14 @@ impl RateLimiter {
                 tokio::time::sleep(window / 4).await;
                 let mut map = requests.lock().await;
                 let now = Instant::now();
-
-                // Remove entries older than 2x window (was 2x, keeping same threshold)
                 map.retain(|_, entry| now.duration_since(entry.window_start) < window * 2);
 
-                // FIX: If still over limit after cleanup, evict oldest entries
                 if map.len() > max_entries {
-                    // Collect keys sorted by last_seen (oldest first)
                     let mut entries: Vec<(String, Instant)> = map
                         .iter()
                         .map(|(k, v)| (k.clone(), v.last_seen))
                         .collect();
                     entries.sort_by_key(|(_, ts)| *ts);
-
-                    // Remove oldest entries until we're under the limit
                     let to_remove = map.len() - max_entries;
                     for (key, _) in entries.iter().take(to_remove) {
                         map.remove(key);
@@ -69,11 +107,12 @@ impl RateLimiter {
         limiter
     }
 
-    pub async fn check(&self, key: &str) -> bool {
+    /// Check if the request is within rate limits.
+    /// Returns (allowed, remaining, limit, reset_seconds)
+    pub async fn check_with_headers(&self, key: &str, limit: u32) -> (bool, u32, u32, u64) {
         let mut map = self.requests.lock().await;
         let now = Instant::now();
 
-        // FIX: If map is at capacity and this is a new key, evict oldest entry first
         if !map.contains_key(key) && map.len() >= self.max_entries {
             if let Some(oldest_key) = map
                 .iter()
@@ -90,30 +129,39 @@ impl RateLimiter {
             last_seen: now,
         });
 
+        // Reset window if expired
         if now.duration_since(entry.window_start) >= self.window_duration {
             entry.count = 0;
             entry.window_start = now;
         }
 
-        entry.last_seen = now; // FIX: Track last access time for LRU eviction
+        entry.last_seen = now;
 
-        if entry.count >= self.max_requests {
-            return false;
+        let remaining = limit.saturating_sub(entry.count);
+        let reset_seconds = self
+            .window_duration
+            .saturating_sub(now.duration_since(entry.window_start))
+            .as_secs();
+
+        if entry.count >= limit {
+            return (false, 0, limit, reset_seconds);
         }
 
         entry.count += 1;
-        true
+        let remaining_after = limit.saturating_sub(entry.count);
+        (true, remaining_after, limit, reset_seconds)
+    }
+
+    /// Legacy check method (backwards compatible)
+    pub async fn check(&self, key: &str) -> bool {
+        let (allowed, _, _, _) = self.check_with_headers(key, self.max_requests).await;
+        allowed
     }
 }
 
-pub async fn rate_limit_middleware(
-    limiter: axum::extract::Extension<RateLimiter>,
-    req: Request,
-    next: Next,
-) -> Result<Response, StatusCode> {
-    // Use API key prefix or IP as rate limit key
-    let key = req
-        .headers()
+/// Extract the rate limit key from the request (API key prefix or IP)
+fn extract_key(req: &Request) -> String {
+    req.headers()
         .get("authorization")
         .and_then(|v| v.to_str().ok())
         .and_then(|v| v.strip_prefix("Bearer "))
@@ -124,11 +172,51 @@ pub async fn rate_limit_middleware(
                 .and_then(|v| v.to_str().ok())
                 .unwrap_or("unknown")
                 .to_string()
-        });
+        })
+}
 
-    if limiter.check(&key).await {
-        Ok(next.run(req).await)
+/// Axum middleware for plan-based rate limiting with proper headers
+pub async fn rate_limit_middleware(
+    limiter: axum::extract::Extension<RateLimiter>,
+    req: Request,
+    next: Next,
+) -> Result<Response, StatusCode> {
+    let key = extract_key(&req);
+
+    // TODO: Look up the customer's plan from the database/cache
+    // For now, use the default rate limit from the limiter config
+    let plan_limit = limiter.max_requests;
+
+    let (allowed, remaining, limit, reset_seconds) =
+        limiter.check_with_headers(&key, plan_limit).await;
+
+    if allowed {
+        let mut response = next.run(req).await;
+        let headers = response.headers_mut();
+        headers.insert("X-RateLimit-Limit", limit.to_string().parse().unwrap());
+        headers.insert(
+            "X-RateLimit-Remaining",
+            remaining.to_string().parse().unwrap(),
+        );
+        headers.insert(
+            "X-RateLimit-Reset",
+            reset_seconds.to_string().parse().unwrap(),
+        );
+        Ok(response)
     } else {
-        Err(StatusCode::TOO_MANY_REQUESTS)
+        let mut response = Response::new(axum::body::Body::empty());
+        *response.status_mut() = StatusCode::TOO_MANY_REQUESTS;
+        let headers = response.headers_mut();
+        headers.insert("X-RateLimit-Limit", limit.to_string().parse().unwrap());
+        headers.insert("X-RateLimit-Remaining", "0".parse().unwrap());
+        headers.insert(
+            "X-RateLimit-Reset",
+            reset_seconds.to_string().parse().unwrap(),
+        );
+        headers.insert(
+            "Retry-After",
+            reset_seconds.to_string().parse().unwrap(),
+        );
+        Ok(response)
     }
 }
