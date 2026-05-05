@@ -3,6 +3,8 @@ use tracing_subscriber::EnvFilter;
 
 mod config;
 mod db;
+mod defense;
+mod fix;
 mod monitor;
 mod risk;
 
@@ -35,13 +37,29 @@ async fn main() -> Result<()> {
             Err(e) => tracing::error!("❌ Sistem kontrolü hatası: {:?}", e),
         }
 
-        // 2. Webhook health check
+        // 2. Webhook health check + risk analysis + auto-fix
         match run_webhook_check(&pool, &cfg).await {
             Ok(_) => {}
             Err(e) => tracing::error!("❌ Webhook kontrolü hatası: {:?}", e),
         }
 
-        // 3. Clean expired blocklist entries
+        // 3. Defense: threat scanning
+        if cfg.defense_enabled {
+            match run_defense_scan(&pool).await {
+                Ok(_) => {}
+                Err(e) => tracing::error!("❌ Savunma taraması hatası: {:?}", e),
+            }
+        }
+
+        // 4. Auto-fix: circuit breaker checks
+        if cfg.auto_fix_enabled {
+            match run_auto_fix(&pool).await {
+                Ok(_) => {}
+                Err(e) => tracing::error!("❌ Otomatik fix hatası: {:?}", e),
+            }
+        }
+
+        // 5. Clean expired blocklist entries
         match clean_expired_blocklist(&pool).await {
             Ok(_) => {}
             Err(e) => tracing::error!("❌ Blocklist temizleme hatası: {:?}", e),
@@ -200,6 +218,109 @@ async fn clean_expired_blocklist(pool: &sqlx::PgPool) -> Result<()> {
             "🧹 {} süresi dolmuş blocklist kaydı temizlendi",
             result.rows_affected()
         );
+    }
+
+    Ok(())
+}
+
+async fn run_defense_scan(pool: &sqlx::PgPool) -> Result<()> {
+    let threats = defense::detector::scan_threats(pool).await?;
+
+    for threat in &threats {
+        match threat.severity.as_str() {
+            "high" | "critical" => {
+                tracing::error!(
+                    "🛡️ TEHDIT [{}]: {} — {}",
+                    threat.threat_type,
+                    threat.description,
+                    threat.recommended_action
+                );
+
+                sqlx::query(
+                    "INSERT INTO ai_events (event_type, severity, title, description, action_taken, metadata) VALUES ('defense', $1, $2, $3, $4, $5)"
+                )
+                .bind(&threat.severity)
+                .bind(format!("Tehdit tespit: {}", threat.threat_type))
+                .bind(&threat.description)
+                .bind(&threat.recommended_action)
+                .bind(serde_json::to_value(threat).ok())
+                .execute(pool)
+                .await?;
+            }
+            _ => {
+                tracing::warn!(
+                    "🛡️ Tehdit [{}]: {}",
+                    threat.threat_type,
+                    threat.description
+                );
+            }
+        }
+    }
+
+    Ok(())
+}
+
+async fn run_auto_fix(pool: &sqlx::PgPool) -> Result<()> {
+    // Check for endpoints that need circuit breaking
+    let failing_endpoints = sqlx::query_as::<_, (uuid::Uuid,)>(
+        r#"
+        SELECT DISTINCT d.endpoint_id
+        FROM deliveries d
+        WHERE d.created_at > now() - INTERVAL '15 minutes'
+        GROUP BY d.endpoint_id
+        HAVING COUNT(*) FILTER (WHERE d.status = 'failed')::FLOAT / COUNT(*)::FLOAT > 0.5
+           AND COUNT(*) >= 10
+        "#,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    for (endpoint_id,) in failing_endpoints {
+        // Check circuit state
+        let state = fix::circuit::get_circuit_state(pool, endpoint_id).await?;
+
+        match state {
+            fix::circuit::CircuitState::Closed => {
+                // Apply circuit break
+                fix::circuit::circuit_break(
+                    pool,
+                    endpoint_id,
+                    "Otomatik: >%50 hata oranı tespit edildi",
+                )
+                .await?;
+            }
+            fix::circuit::CircuitState::Open => {
+                // Check if we should test
+                // (handled by half-open transition in get_circuit_state)
+            }
+            fix::circuit::CircuitState::HalfOpen => {
+                // Test circuit
+                if fix::circuit::test_circuit(pool, endpoint_id).await? {
+                    tracing::info!("✅ Endpoint {} circuit test başarılı", endpoint_id);
+                }
+            }
+        }
+    }
+
+    // Auto-adjust retry policies for at-risk endpoints
+    let risk_scores = sqlx::query_as::<_, (uuid::Uuid, i32)>(
+        r#"
+        SELECT target_id, score
+        FROM risk_scores
+        WHERE target_type = 'endpoint'
+          AND created_at > now() - INTERVAL '5 minutes'
+          AND score > 30
+        ORDER BY score DESC
+        LIMIT 20
+        "#,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    for (endpoint_id, score) in risk_scores {
+        if let Some(action) = fix::retry::adjust_retry_policy(pool, endpoint_id, score).await? {
+            tracing::info!("🔧 {}", action);
+        }
     }
 
     Ok(())
