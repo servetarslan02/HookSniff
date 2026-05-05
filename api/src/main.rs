@@ -11,7 +11,7 @@ pub mod error;
 pub mod events;
 pub mod fifo;
 mod jobs;
-mod kafka;
+pub mod kafka; // PostgreSQL queue wrapper (Kafka removed)
 pub mod metrics;
 mod middleware;
 mod models;
@@ -34,7 +34,6 @@ fn init_tracing(cfg: &config::Config) {
     let otel_endpoint = std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT")
         .unwrap_or_else(|_| "http://localhost:4317".to_string());
 
-    // Only enable OTLP if explicitly configured
     let enable_otel = std::env::var("OTEL_ENABLED")
         .map(|v| v == "true" || v == "1")
         .unwrap_or(false);
@@ -53,10 +52,8 @@ fn init_tracing(cfg: &config::Config) {
         let tracer = provider.tracer("hookrelay-api");
         opentelemetry::global::set_tracer_provider(provider);
 
-        // Layer: tracing → OpenTelemetry
         let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
 
-        // Layer: structured JSON logging (or pretty for dev)
         let use_json = std::env::var("LOG_FORMAT")
             .map(|v| v == "json")
             .unwrap_or(false);
@@ -80,7 +77,6 @@ fn init_tracing(cfg: &config::Config) {
 
         tracing::info!("OpenTelemetry tracing enabled → {}", otel_endpoint);
     } else {
-        // No OpenTelemetry — just structured logging
         let use_json = std::env::var("LOG_FORMAT")
             .map(|v| v == "json")
             .unwrap_or(false);
@@ -112,7 +108,6 @@ async fn main() -> Result<()> {
     tracing::info!("Starting HookRelay API v{}", env!("CARGO_PKG_VERSION"));
 
     let pool = db::create_pool(&cfg.database_url).await?;
-    let kafka_producer = kafka::create_producer(&cfg.kafka_brokers)?;
 
     // Initialize Prometheus metrics
     let metrics = std::sync::Arc::new(metrics::Metrics::new());
@@ -139,7 +134,6 @@ async fn main() -> Result<()> {
         .route("/v1/openapi.yaml", get(routes::docs::openapi_spec))
         .nest("/v1", routes::api_router())
         .layer(axum::extract::Extension(pool))
-        .layer(axum::extract::Extension(kafka_producer))
         .layer(axum::extract::Extension(cfg.clone()))
         .layer(axum::extract::Extension(rate_limiter.clone()))
         .layer(axum::extract::Extension(metrics.clone()))
@@ -148,8 +142,6 @@ async fn main() -> Result<()> {
         .layer(axum::middleware::from_fn(middleware::request_id_middleware))
         .layer(axum::middleware::from_fn(metrics::metrics_middleware))
         .layer({
-            // In production, restrict CORS to known origins.
-            // In development, allow any origin.
             let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
             if env == "production" || env == "prod" {
                 let origins: Vec<axum::http::HeaderValue> = std::env::var("CORS_ORIGINS")

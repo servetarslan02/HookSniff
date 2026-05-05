@@ -1,36 +1,37 @@
+//! DEPRECATED: Kafka yerine PostgreSQL queue kullanılıyor.
+//! Bu dosya backward compatibility için tutulmuştur.
+//! Yeni kodda `db::publish_to_queue` kullanın.
+
 use anyhow::Result;
-use rdkafka::config::ClientConfig;
-use rdkafka::producer::{FutureProducer, FutureRecord};
-use std::time::Duration;
+use sqlx::PgPool;
+use uuid::Uuid;
 
-pub fn create_producer(brokers: &str) -> Result<FutureProducer> {
-    let producer: FutureProducer = ClientConfig::new()
-        .set("bootstrap.servers", brokers)
-        .set("message.timeout.ms", "5000")
-        .set("queue.buffering.max.messages", "100000")
-        .create()?;
-
-    tracing::info!("✅ Kafka producer connected to {}", brokers);
-    Ok(producer)
-}
-
-pub async fn publish_webhook(
-    producer: &FutureProducer,
-    topic: &str,
-    delivery_id: &str,
-    customer_id: &str,
+/// Webhook teslimatını PostgreSQL queue'ya ekle.
+/// (Eski Kafka publish_webhook fonksiyonunun yerini alır)
+pub async fn publish_to_queue(
+    pool: &PgPool,
+    delivery_id: Uuid,
+    endpoint_id: Uuid,
+    endpoint_url: &str,
+    signing_secret: &str,
     payload: &str,
+    custom_headers: Option<&serde_json::Value>,
 ) -> Result<()> {
-    producer
-        .send(
-            FutureRecord::to(topic)
-                .key(customer_id)
-                .payload(payload),
-            Duration::from_secs(5),
-        )
-        .await
-        .map_err(|(e, _)| anyhow::anyhow!("Kafka send failed: {}", e))?;
+    sqlx::query(
+        r#"
+        INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, signing_secret, payload, custom_headers)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        "#,
+    )
+    .bind(delivery_id)
+    .bind(endpoint_id)
+    .bind(endpoint_url)
+    .bind(signing_secret)
+    .bind(payload)
+    .bind(custom_headers)
+    .execute(pool)
+    .await?;
 
-    tracing::debug!("📤 Published webhook {} to Kafka", delivery_id);
+    tracing::debug!("📤 Webhook {} queued for delivery", delivery_id);
     Ok(())
 }

@@ -19,12 +19,14 @@
 ## 🔴 Yapılacak (Öncelik Sırasıyla)
 
 ### 1. Sadeleştirme (Bu Hafta)
-- [ ] CockroachDB → PostgreSQL geçiş (connection string + SQL)
-- [ ] Kafka → PostgreSQL queue (yeni tablo + worker polling)
-- [ ] Temporal → Basit retry loop (worker simplification)
-- [ ] docker-compose.local.yml (3 servis) ✅
-- [ ] Makefile: `make local`, `make fix`, `make reset`, `make status`
-- [ ] TROUBLESHOOTING.md
+- [x] CockroachDB → PostgreSQL geçiş ✅
+- [x] Kafka → PostgreSQL queue ✅ (webhook_queue tablosu)
+- [x] Temporal → Basit retry loop ✅ (worker polling)
+- [x] docker-compose.yml (4 servis: PostgreSQL + API + Worker + Dashboard) ✅
+- [x] Makefile: `make local`, `make fix`, `make reset`, `make status` ✅
+- [x] TROUBLESHOOTING.md ✅
+- [x] Eski Kafka/Temporal/CockroachDB kodları temizlendi ✅
+- [x] Dockerfile'lar sadeleştirildi ✅
 
 ### 2. Test ve Doğrulama (Bu Hafta)
 - [ ] `docker compose -f docker-compose.local.yml up` çalıştır

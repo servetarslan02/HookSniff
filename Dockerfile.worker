@@ -1,14 +1,8 @@
 # ── Stage 1: Builder ──
 FROM rust:1.82-bookworm AS builder
 
-# Install protoc — required by the Temporal Rust SDK for protobuf compilation
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends protobuf-compiler && \
-    rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
-COPY api/ api/
 COPY worker/ worker/
 
 # Build release binary
@@ -18,12 +12,10 @@ RUN cargo build --release -p hookrelay-worker && \
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
 
-# Install only runtime dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates curl && \
+    apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
 RUN groupadd -r hookrelay && useradd -r -g hookrelay -d /app -s /sbin/nologin hookrelay
 
 COPY --from=builder /app/target/release/hookrelay-worker /usr/local/bin/hookrelay-worker
