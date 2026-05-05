@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:latest
+    command: start-single-node --insecure --accept-sql-without-tls
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    volumes:
+      - cockroachdb-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "cockroach", "node", "status", "--insecure", "--host=cockroachdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redpanda:
+    image: docker.redpanda.com/vectorized/redpanda:latest
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:9092,OUTSIDE://localhost:9093
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "9644:9644"
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health", "--api-urls=localhost:9644"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=root
+      - POSTGRES_PWD=
+      - POSTGRES_SEEDS=cockroachdb
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+
+  temporal-ui:
+    image: temporalio/ui:latest
+    ports:
+      - "8081:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+
+  create-topics:
+    image: docker.redpanda.com/vectorized/redpanda:latest
+    command:
+      - rpk
+      - topic
+      - create
+      - webhook-deliveries
+      - --brokers=redpanda:9092
+      - --partitions=3
+      - --replicas=1
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+volumes:
+  cockroachdb-data:
