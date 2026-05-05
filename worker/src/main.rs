@@ -128,9 +128,6 @@ async fn main() -> Result<()> {
                         Ok(webhook) => {
                             tracing::info!("📥 Received delivery {}", webhook.delivery_id);
 
-                            // Start a Temporal workflow for this delivery.
-                            // The workflow will handle the actual HTTP delivery,
-                            // retries with exponential backoff, and dead-lettering.
                             match start_delivery_workflow(&cfg, &pool, &webhook).await {
                                 Ok(workflow_id) => {
                                     tracing::info!(
@@ -160,6 +157,66 @@ async fn main() -> Result<()> {
             }
         }
     }
+}
+
+/// Run the Temporal worker — registers workflows and activities, then
+/// polls the task queue indefinitely.
+///
+/// This runs as a background tokio task. The worker is the bridge between
+/// the Temporal server and our Rust activity implementations. When the
+/// server dispatches a workflow task, the worker replays the workflow
+/// deterministically. When it dispatches an activity task, the worker
+/// executes the corresponding Rust function.
+async fn run_temporal_worker(
+    cfg: config::WorkerConfig,
+    pool: sqlx::PgPool,
+    http_client: reqwest::Client,
+) -> Result<()> {
+    // Set the Temporal address for the SDK's envconfig loader.
+    // The SDK reads TEMPORAL_ADDRESS or falls back to localhost:7233.
+    std::env::set_var("TEMPORAL_ADDRESS", &cfg.temporal_url);
+
+    // Initialize the Core runtime — this manages the gRPC connection
+    // to the Temporal server and internal event loops.
+    let runtime = temporalio_sdk_core::CoreRuntime::new_assume_tokio(
+        temporalio_sdk_core::RuntimeOptions::builder().build()?,
+    )?;
+
+    // Load connection options from env/config (TEMPORAL_ADDRESS, etc.)
+    let (conn_options, client_options) = temporalio_client::ClientOptions::load_from_config(
+        temporalio_client::envconfig::LoadClientConfigProfileOptions::default(),
+    )?;
+
+    let connection = temporalio_client::Connection::connect(conn_options).await?;
+    let client = temporalio_client::Client::new(connection, client_options);
+
+    // Build the activities instance with shared state
+    let activities = HookRelayActivities {
+        http_client,
+        pool,
+    };
+
+    // Configure the worker:
+    // - Task queue: where workflows and activities are dispatched
+    // - Activities: the HTTP delivery, DB recording, dead-letter, Kafka publish
+    // - Workflows: the WebhookDeliveryWorkflow
+    let worker_options = temporalio_sdk::WorkerOptions::new(&cfg.temporal_task_queue)
+        .register_activities(activities)
+        .register_workflow::<WebhookDeliveryWorkflow>()
+        .build();
+
+    let worker = temporalio_sdk::Worker::new(&runtime, client, worker_options)?;
+
+    tracing::info!(
+        "⚙️ Temporal worker running on task queue '{}'",
+        cfg.temporal_task_queue
+    );
+
+    // Run the worker — this blocks until the worker is shut down.
+    // It polls the task queue and executes workflows/activities.
+    worker.run().await?;
+
+    Ok(())
 }
 
 /// Start a Temporal workflow for a webhook delivery.
@@ -198,14 +255,12 @@ async fn start_delivery_workflow(
         retry_policy,
     };
 
-    // Build a Temporal client to start the workflow
+    // Build a Temporal client to start the workflow.
+    // We create a separate client for starting workflows (the worker has its own).
     let runtime = temporalio_sdk_core::CoreRuntime::new_assume_tokio(
         temporalio_sdk_core::RuntimeOptions::builder().build()?,
     )?;
 
-    // Connect to the Temporal server using the configured URL.
-    // The envconfig module reads TEMPORAL_ADDRESS automatically, but we
-    // also set it explicitly for clarity.
     std::env::set_var("TEMPORAL_ADDRESS", &cfg.temporal_url);
 
     let (conn_options, client_options) = temporalio_client::ClientOptions::load_from_config(
@@ -217,8 +272,7 @@ async fn start_delivery_workflow(
 
     // Use the delivery ID as the workflow ID for idempotency.
     // If this workflow already exists (e.g., Kafka redelivery), Temporal
-    // will reject the start request with WorkflowExecutionAlreadyStarted,
-    // which we handle gracefully.
+    // will reject the start request gracefully.
     let workflow_id = format!("webhook-delivery-{}", webhook.delivery_id);
 
     match client
