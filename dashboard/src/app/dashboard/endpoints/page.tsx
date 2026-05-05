@@ -1,213 +1,165 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/store';
-import { useToast } from '@/components/Toast';
 import { endpointsApi, type Endpoint } from '@/lib/api';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import EmptyState from '@/components/EmptyState';
-import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
-  const { toast } = useToast();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [url, setUrl] = useState('');
-  const [description, setDescription] = useState('');
+  const [showCreate, setShowCreate] = useState(false);
+  const [newUrl, setNewUrl] = useState('');
+  const [newDesc, setNewDesc] = useState('');
   const [creating, setCreating] = useState(false);
-  const [search, setSearch] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<Endpoint | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [revealedSecrets, setRevealedSecrets] = useState<Set<string>>(new Set());
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [error, setError] = useState('');
 
-  const fetchEndpoints = useCallback(async () => {
+  useEffect(() => {
     if (!token) return;
-    try {
-      const data = await endpointsApi.list(token);
-      setEndpoints(data);
-    } catch (err: any) {
-      toast(err.message || 'Failed to load endpoints', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, toast]);
-
-  useEffect(() => { fetchEndpoints(); }, [fetchEndpoints]);
+    endpointsApi.list(token)
+      .then(setEndpoints)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [token]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
+    if (!token || !newUrl) return;
     setCreating(true);
+    setError('');
     try {
-      const ep = await endpointsApi.create(token, { url, description: description || undefined });
+      const ep = await endpointsApi.create(token, { url: newUrl, description: newDesc || undefined });
       setEndpoints((prev) => [ep, ...prev]);
-      setUrl('');
-      setDescription('');
-      toast('Endpoint created!', 'success');
+      setNewUrl('');
+      setNewDesc('');
+      setShowCreate(false);
     } catch (err: any) {
-      toast(err.message || 'Failed to create endpoint', 'error');
+      setError(err.message || 'Failed to create endpoint');
     } finally {
       setCreating(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteTarget || !token) return;
-    setDeleting(true);
+  const handleDelete = async (id: string) => {
+    if (!token || !confirm('Delete this endpoint?')) return;
     try {
-      await endpointsApi.delete(token, deleteTarget.id);
-      setEndpoints((prev) => prev.filter((e) => e.id !== deleteTarget.id));
-      toast('Endpoint deleted', 'success');
+      await endpointsApi.delete(token, id);
+      setEndpoints((prev) => prev.filter((ep) => ep.id !== id));
     } catch (err: any) {
-      toast(err.message || 'Failed to delete', 'error');
-    } finally {
-      setDeleting(false);
-      setDeleteTarget(null);
+      alert(err.message || 'Failed to delete');
     }
   };
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    toast('Copied to clipboard', 'success');
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const toggleSecret = (id: string) => {
-    setRevealedSecrets((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-
-  const filtered = endpoints.filter((ep) =>
-    ep.url.toLowerCase().includes(search.toLowerCase()) ||
-    ep.description?.toLowerCase().includes(search.toLowerCase())
-  );
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="glass-card p-6 animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-1/4 mb-3"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Endpoints</h1>
-        <div className="relative">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search endpoints..."
-            className="pl-8 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-          />
-          <span className="absolute left-2.5 top-2.5 text-gray-400 text-sm">🔍</span>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Endpoints</h2>
+          <p className="text-sm text-gray-500 mt-1">Manage your webhook endpoints</p>
         </div>
+        <button
+          onClick={() => setShowCreate(!showCreate)}
+          className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition"
+        >
+          + New Endpoint
+        </button>
       </div>
 
-      {/* Create Form */}
-      <form onSubmit={handleCreate} className="glass-card p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Add Endpoint</h2>
-        <div className="flex gap-4 items-end flex-wrap">
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Target URL</label>
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://myapp.com/webhook"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-            />
-          </div>
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Order notifications"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={creating}
-            className="bg-brand-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-700 transition disabled:opacity-60 flex items-center gap-2 whitespace-nowrap"
-          >
-            {creating ? <LoadingSpinner size="sm" /> : '+ Add'}
-          </button>
+      {showCreate && (
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Endpoint</h3>
+          {error && (
+            <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-200">{error}</div>
+          )}
+          <form onSubmit={handleCreate} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
+              <input
+                type="url"
+                value={newUrl}
+                onChange={(e) => setNewUrl(e.target.value)}
+                placeholder="https://myapp.com/webhook"
+                required
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <input
+                type="text"
+                value={newDesc}
+                onChange={(e) => setNewDesc(e.target.value)}
+                placeholder="Order notifications"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={creating}
+                className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-60"
+              >
+                {creating ? 'Creating...' : 'Create'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowCreate(false); setError(''); }}
+                className="bg-gray-100 text-gray-700 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      )}
 
-      {/* Endpoints List */}
-      {loading ? (
-        <div className="flex justify-center py-12"><LoadingSpinner /></div>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          icon="🔗"
-          title="No endpoints yet"
-          description="Add your first endpoint to start receiving webhooks."
-          action={{ label: '+ Add Endpoint', onClick: () => document.querySelector('input[type="url"]')?.(HTMLElement)?.focus() }}
-        />
+      {endpoints.length === 0 ? (
+        <div className="glass-card p-12 text-center text-gray-400">
+          No endpoints yet. Create one to start receiving webhooks.
+        </div>
       ) : (
-        <div className="space-y-4">
-          {filtered.map((ep) => (
+        <div className="grid gap-4">
+          {endpoints.map((ep) => (
             <div key={ep.id} className="glass-card p-6 hover-lift">
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-mono text-sm text-gray-900">{ep.url}</span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${ep.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {ep.is_active ? 'Active' : 'Inactive'}
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-mono text-sm text-brand-600 bg-brand-50 px-3 py-1 rounded-lg">
+                      {ep.id.slice(0, 12)}…
                     </span>
+                    <span className={`w-2 h-2 rounded-full ${ep.is_active ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                    <span className="text-xs text-gray-500">{ep.is_active ? 'Active' : 'Inactive'}</span>
                   </div>
-                  {ep.description && <p className="text-sm text-gray-500">{ep.description}</p>}
+                  <div className="text-sm font-mono text-gray-900 mb-1">{ep.url}</div>
+                  {ep.description && <div className="text-sm text-gray-500">{ep.description}</div>}
                 </div>
                 <button
-                  onClick={() => setDeleteTarget(ep)}
-                  className="text-red-400 hover:text-red-600 transition text-sm"
+                  onClick={() => handleDelete(ep.id)}
+                  className="text-gray-400 hover:text-red-600 transition p-2"
+                  title="Delete endpoint"
                 >
-                  Delete
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
                 </button>
-              </div>
-
-              <div className="flex items-center gap-4 text-xs text-gray-500">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">ID:</span>
-                  <code className="font-mono">{ep.id.slice(0, 16)}…</code>
-                  <button
-                    onClick={() => copyToClipboard(ep.id, `id-${ep.id}`)}
-                    className="text-brand-600 hover:text-brand-700"
-                  >
-                    {copiedId === `id-${ep.id}` ? '✓' : '📋'}
-                  </button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">Signing Secret:</span>
-                  <code className="font-mono">
-                    {revealedSecrets.has(ep.id) ? 'whsec_' + ep.id.replace(/-/g, '').slice(0, 16) : '••••••••••••'}
-                  </code>
-                  <button onClick={() => toggleSecret(ep.id)} className="text-brand-600 hover:text-brand-700">
-                    {revealedSecrets.has(ep.id) ? '🙈' : '👁️'}
-                  </button>
-                </div>
-                <span>Created {new Date(ep.created_at).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      <ConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Endpoint"
-        message={`Are you sure you want to delete ${deleteTarget?.url}? This cannot be undone.`}
-        confirmLabel="Delete"
-        variant="danger"
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
-        loading={deleting}
-      />
     </div>
   );
 }

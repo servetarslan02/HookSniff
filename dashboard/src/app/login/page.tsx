@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AuthProvider, useAuth } from '@/lib/store';
+import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 function LoginForm() {
@@ -129,9 +129,5 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
-  return (
-    <AuthProvider>
-      <LoginForm />
-    </AuthProvider>
-  );
+  return <LoginForm />;
 }

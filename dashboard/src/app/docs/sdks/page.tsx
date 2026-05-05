@@ -1,0 +1,196 @@
+export default function SdksPage() {
+  return (
+    <article className="prose prose-gray max-w-none">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-2">SDK Documentation</h1>
+      <p className="text-lg text-gray-600 mb-8">
+        Official SDKs for Python and Node.js. Install via your package manager and start sending webhooks in seconds.
+      </p>
+
+      {/* Python SDK */}
+      <section className="mb-12">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-3xl">🐍</span>
+          <h2 className="text-2xl font-bold text-gray-900">Python SDK</h2>
+        </div>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Installation</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
+{`pip install hookrelay`}
+        </pre>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Start</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
+{`import hookrelay
+import os
+
+# Initialize the client
+client = hookrelay.Client(api_key=os.environ["HOOKRELAY_KEY"])
+
+# Create an endpoint
+endpoint = client.endpoints.create(
+    url="https://myapp.com/webhook",
+    description="Production webhook"
+)
+print(f"Endpoint ID: {endpoint.id}")
+print(f"Signing Secret: {endpoint.signing_secret}")
+
+# Send a webhook
+delivery = client.webhooks.send(
+    endpoint_id=endpoint.id,
+    event="order.created",
+    data={
+        "order_id": "12345",
+        "total": 99.99,
+        "currency": "USD",
+    }
+)
+print(f"Delivery ID: {delivery.id}")
+print(f"Status: {delivery.status}")`}
+        </pre>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Verify Signatures (Flask)</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
+{`from flask import Flask, request, abort
+import hookrelay
+
+app = Flask(__name__)
+
+@app.route("/webhook", methods=["POST"])
+def handle_webhook():
+    signature = request.headers.get("X-Hookrelay-Signature")
+    if not hookrelay.verify_signature(
+        payload=request.data,
+        signature=signature,
+        secret="whsec_your_signing_secret"
+    ):
+        abort(401)
+
+    event = request.json
+    print(f"Received: {event['event']}")
+    return "", 200`}
+        </pre>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Error Handling</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
+{`import hookrelay
+
+try:
+    delivery = client.webhooks.send(
+        endpoint_id="ep_abc123",
+        event="test.event",
+        data={"test": True}
+    )
+except hookrelay.RateLimitError as e:
+    print(f"Rate limited. Retry after {e.retry_after}s")
+except hookrelay.AuthenticationError:
+    print("Invalid API key")
+except hookrelay.HookRelayError as e:
+    print(f"Error: {e.message}")`}
+        </pre>
+      </section>
+
+      {/* Node.js SDK */}
+      <section className="mb-12">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-3xl">📦</span>
+          <h2 className="text-2xl font-bold text-gray-900">Node.js SDK</h2>
+        </div>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Installation</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
+{`npm install @hookrelay/sdk`}
+        </pre>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Start</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
+{`import { HookRelay } from '@hookrelay/sdk';
+
+const hr = new HookRelay({ apiKey: process.env.HOOKRELAY_KEY! });
+
+// Create an endpoint
+const endpoint = await hr.endpoints.create({
+  url: 'https://myapp.com/webhook',
+  description: 'Production webhook',
+});
+console.log('Endpoint:', endpoint.id);
+console.log('Secret:', endpoint.signing_secret);
+
+// Send a webhook
+const delivery = await hr.webhooks.send({
+  endpointId: endpoint.id,
+  event: 'order.created',
+  data: {
+    order_id: '12345',
+    total: 99.99,
+    currency: 'USD',
+  },
+});
+console.log('Delivery:', delivery.id, delivery.status);`}
+        </pre>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Verify Signatures (Express)</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
+{`import express from 'express';
+import { verifySignature } from '@hookrelay/sdk';
+
+const app = express();
+
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const signature = req.headers['x-hookrelay-signature'] as string;
+
+  if (!verifySignature(req.body, signature, 'whsec_your_secret')) {
+    return res.status(401).send('Invalid signature');
+  }
+
+  const event = JSON.parse(req.body);
+  console.log('Received:', event.event);
+  res.status(200).send('OK');
+});`}
+        </pre>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">TypeScript Support</h3>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
+{`import type { Endpoint, Delivery, WebhookEvent } from '@hookrelay/sdk';
+
+// Full type safety for all API responses
+const endpoints: Endpoint[] = await hr.endpoints.list();
+const delivery: Delivery = await hr.webhooks.send({
+  endpointId: 'ep_abc123',
+  event: 'user.created',
+  data: { email: 'user@example.com' } satisfies WebhookEvent,
+});`}
+        </pre>
+      </section>
+
+      {/* Community SDKs */}
+      <section>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Community SDKs</h2>
+        <p className="text-gray-600 mb-4">
+          Community-maintained SDKs are available for other languages. These are not officially supported but are actively maintained.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            { lang: 'Go', pkg: 'github.com/hookrelay/hookrelay-go', status: 'Stable' },
+            { lang: 'Ruby', pkg: 'gem install hookrelay', status: 'Beta' },
+            { lang: 'PHP', pkg: 'composer require hookrelay/hookrelay-php', status: 'Beta' },
+            { lang: 'Rust', pkg: 'cargo add hookrelay', status: 'Alpha' },
+          ].map((sdk) => (
+            <div key={sdk.lang} className="p-4 border border-gray-200 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-gray-900">{sdk.lang}</span>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                  sdk.status === 'Stable' ? 'bg-green-50 text-green-700' :
+                  sdk.status === 'Beta' ? 'bg-yellow-50 text-yellow-700' :
+                  'bg-gray-100 text-gray-600'
+                }`}>
+                  {sdk.status}
+                </span>
+              </div>
+              <code className="text-xs font-mono text-gray-600">{sdk.pkg}</code>
+            </div>
+          ))}
+        </div>
+      </section>
+    </article>
+  );
+}

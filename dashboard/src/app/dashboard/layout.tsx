@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { clsx } from 'clsx';
-import { AuthProvider, useAuth } from '@/lib/store';
+import { useAuth } from '@/lib/store';
+import { AuthGuard } from '@/components/AuthGuard';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: '📊' },
@@ -16,23 +16,7 @@ const navigation = [
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, token, isLoading, logout } = useAuth();
-
-  useEffect(() => {
-    if (!isLoading && !token) {
-      router.push('/login');
-    }
-  }, [isLoading, token, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!token) return null;
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,8 +88,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthProvider>
+    <AuthGuard>
       <DashboardShell>{children}</DashboardShell>
-    </AuthProvider>
+    </AuthGuard>
   );
 }
