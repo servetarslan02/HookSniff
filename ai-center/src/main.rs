@@ -1,0 +1,206 @@
+use anyhow::Result;
+use tracing_subscriber::EnvFilter;
+
+mod config;
+mod db;
+mod monitor;
+mod risk;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            EnvFilter::from_default_env().add_directive("info".parse()?),
+        )
+        .init();
+
+    let cfg = config::AiConfig::from_env()?;
+    let pool = db::create_pool(&cfg.database_url).await?;
+
+    tracing::info!("🧠 AI Merkezi başlatılıyor...");
+    tracing::info!("   İzleme aralığı: {}s", cfg.check_interval_secs);
+    tracing::info!("   Risk uyarı eşiği: {}", cfg.risk_threshold_warning);
+    tracing::info!("   Risk kritik eşiği: {}", cfg.risk_threshold_critical);
+    tracing::info!("   Otomatik fix: {}", cfg.auto_fix_enabled);
+    tracing::info!("   Savunma: {}", cfg.defense_enabled);
+
+    let mut system_monitor = monitor::system::SystemMonitor::new();
+
+    loop {
+        tracing::debug!("🔄 Kontrol döngüsü başlıyor...");
+
+        // 1. System health check
+        match run_system_check(&mut system_monitor, &pool).await {
+            Ok(_) => {}
+            Err(e) => tracing::error!("❌ Sistem kontrolü hatası: {:?}", e),
+        }
+
+        // 2. Webhook health check
+        match run_webhook_check(&pool, &cfg).await {
+            Ok(_) => {}
+            Err(e) => tracing::error!("❌ Webhook kontrolü hatası: {:?}", e),
+        }
+
+        // 3. Clean expired blocklist entries
+        match clean_expired_blocklist(&pool).await {
+            Ok(_) => {}
+            Err(e) => tracing::error!("❌ Blocklist temizleme hatası: {:?}", e),
+        }
+
+        tracing::debug!("✅ Kontrol döngüsü tamamlandı");
+
+        tokio::time::sleep(std::time::Duration::from_secs(cfg.check_interval_secs)).await;
+    }
+}
+
+async fn run_system_check(
+    monitor: &mut monitor::system::SystemMonitor,
+    pool: &sqlx::PgPool,
+) -> Result<()> {
+    let metrics = monitor.collect();
+    let issues = monitor.check_health();
+
+    if !issues.is_empty() {
+        for issue in &issues {
+            tracing::warn!("{}", issue);
+
+            // Log to ai_events
+            sqlx::query(
+                "INSERT INTO ai_events (event_type, severity, title, description, target_type) VALUES ('system', 'warning', $1, $2, 'system')",
+            )
+            .bind(issue)
+            .bind(serde_json::to_string(&metrics).ok())
+            .execute(pool)
+            .await?;
+        }
+    } else {
+        tracing::debug!(
+            "📊 Sistem: CPU {:.1}% | RAM {:.1}% | Disk {:.1}%",
+            metrics.cpu_usage_percent,
+            metrics.memory_usage_percent,
+            metrics.disk_usage_percent
+        );
+    }
+
+    Ok(())
+}
+
+async fn run_webhook_check(
+    pool: &sqlx::PgPool,
+    cfg: &config::AiConfig,
+) -> Result<()> {
+    let health = monitor::webhooks::collect_webhook_health(pool).await?;
+
+    // Log summary
+    tracing::info!(
+        "📡 Webhook: {} teslimat | {:.1}% başarı | {} hata | {} dead letter",
+        health.total_deliveries_1h,
+        health.success_rate_1h,
+        health.failed_1h,
+        health.dead_letters_1h,
+    );
+
+    // Check for failing endpoints
+    if !health.failing_endpoints.is_empty() {
+        for ep in &health.failing_endpoints {
+            tracing::warn!(
+                "⚠️ Endpoint başarısız: {} — {} hata / {} toplam (%{:.1})",
+                ep.url,
+                ep.failed,
+                ep.total,
+                ep.failure_rate
+            );
+        }
+    }
+
+    // Check for slow endpoints
+    if !health.slow_endpoints.is_empty() {
+        for ep in &health.slow_endpoints {
+            tracing::warn!(
+                "🐌 Endpoint yavaş: {} — ortalama {:.0}ms",
+                ep.url,
+                ep.avg_response_ms
+            );
+        }
+    }
+
+    // Calculate risk scores
+    let risks = risk::scorer::calculate_all_risks(pool, &health).await?;
+
+    for risk in &risks {
+        let emoji = risk::scorer::risk_emoji(risk.score);
+        let level = risk::scorer::risk_level(risk.score);
+
+        if risk.score >= cfg.risk_threshold_critical {
+            tracing::error!(
+                "{} KRİTİK RİSK [{}]: Endpoint {} — skor: {}",
+                emoji,
+                level,
+                risk.target_id,
+                risk.score
+            );
+
+            // Log critical event
+            sqlx::query(
+                "INSERT INTO ai_events (event_type, severity, title, description, target_type, target_id, metadata) VALUES ('risk', 'critical', $1, $2, 'endpoint', $3, $4)",
+            )
+            .bind(format!("Kritik risk skoru: {}", risk.score))
+            .bind(format!("Faktörler: {:?}", risk.factors))
+            .bind(risk.target_id)
+            .bind(serde_json::to_value(&risk.factors).ok())
+            .execute(pool)
+            .await?;
+        } else if risk.score >= cfg.risk_threshold_warning {
+            tracing::warn!(
+                "{} YÜKSEK RİSK [{}]: Endpoint {} — skor: {}",
+                emoji,
+                level,
+                risk.target_id,
+                risk.score
+            );
+        } else if risk.score > 30 {
+            tracing::info!(
+                "{} RİSK [{}]: Endpoint {} — skor: {}",
+                emoji,
+                level,
+                risk.target_id,
+                risk.score
+            );
+        }
+    }
+
+    // Check overall success rate
+    if health.success_rate_1h < 90.0 && health.total_deliveries_1h >= 10 {
+        tracing::error!(
+            "🔴 Genel başarı oranı kritik: %{:.1} (son 1 saat)",
+            health.success_rate_1h
+        );
+
+        sqlx::query(
+            "INSERT INTO ai_events (event_type, severity, title, description) VALUES ('risk', 'critical', 'Genel başarı oranı kritik', $1)",
+        )
+        .bind(format!(
+            "Son 1 saatte başarı oranı %{:.1}, {} teslimat",
+            health.success_rate_1h, health.total_deliveries_1h
+        ))
+        .execute(pool)
+        .await?;
+    }
+
+    Ok(())
+}
+
+async fn clean_expired_blocklist(pool: &sqlx::PgPool) -> Result<()> {
+    let result = sqlx::query("DELETE FROM ai_blocklist WHERE expires_at IS NOT NULL AND expires_at < now()")
+        .execute(pool)
+        .await?;
+
+    if result.rows_affected() > 0 {
+        tracing::info!(
+            "🧹 {} süresi dolmuş blocklist kaydı temizlendi",
+            result.rows_affected()
+        );
+    }
+
+    Ok(())
+}
