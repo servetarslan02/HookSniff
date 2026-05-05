@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { ThemeToggle } from '@/components/ThemeProvider';
 import dynamic from 'next/dynamic';
 
 // Lazy load ThemeToggle
