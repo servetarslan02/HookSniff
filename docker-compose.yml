@@ -1,4 +1,5 @@
 services:
+  # ── Infrastructure ──
   cockroachdb:
     image: cockroachdb/cockroach:latest
     command: start-single-node --insecure --accept-sql-without-tls
@@ -79,6 +80,75 @@ services:
     depends_on:
       redpanda:
         condition: service_healthy
+
+  # ── HookRelay API ──
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "3000:3000"
+    environment:
+      - APP_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable
+      - KAFKA_BROKERS=redpanda:9092
+      - KAFKA_TOPIC=webhook-deliveries
+      - HMAC_SECRET=${HMAC_SECRET:-change-me-in-production}
+      - JWT_SECRET=${JWT_SECRET:-change-me-jwt-secret}
+      - RUST_LOG=info,hookrelay=debug
+      - TEMPORAL_URL=http://temporal:7233
+      - TEMPORAL_TASK_QUEUE=hookrelay-deliveries
+      - MAX_PAYLOAD_BYTES=1048576
+      - RETENTION_DAYS=30
+      - WEBHOOK_FORMAT=standard
+      - WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - APP_URL=http://localhost:3001
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+    restart: unless-stopped
+
+  # ── HookRelay Worker ──
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    command: ["hookrelay-api"]  # Same binary, different entrypoint
+    environment:
+      - APP_ENV=production
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable
+      - KAFKA_BROKERS=redpanda:9092
+      - KAFKA_TOPIC=webhook-deliveries
+      - KAFKA_CONSUMER_GROUP=hookrelay-worker
+      - HMAC_SECRET=${HMAC_SECRET:-change-me-in-production}
+      - JWT_SECRET=${JWT_SECRET:-change-me-jwt-secret}
+      - RUST_LOG=info,hookrelay=debug
+      - TEMPORAL_URL=http://temporal:7233
+      - TEMPORAL_TASK_QUEUE=hookrelay-deliveries
+      - MAX_ATTEMPTS=3
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # ── HookRelay Dashboard ──
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    ports:
+      - "3001:3001"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/v1
+    depends_on:
+      - api
+    restart: unless-stopped
 
 volumes:
   cockroachdb-data:
