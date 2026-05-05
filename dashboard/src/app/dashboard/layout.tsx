@@ -8,6 +8,7 @@ import { AuthGuard } from '@/components/AuthGuard';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: '📊' },
+  { name: 'AI Merkezi', href: '/dashboard/ai-center', icon: '🧠' },
   { name: 'Endpoints', href: '/dashboard/endpoints', icon: '🔗' },
   { name: 'Deliveries', href: '/dashboard/deliveries', icon: '📦' },
   { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
