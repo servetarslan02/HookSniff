@@ -27,6 +27,7 @@ import {
   Area,
   Legend,
 } from 'recharts';
+import { Onboarding } from '@/components/Onboarding';
 
 // ─── Time Range Selector ───
 type TimeRange = '24h' | '7d' | '30d';
@@ -482,6 +483,7 @@ export default function DashboardOverview() {
 
   return (
     <div className="space-y-8">
+      <Onboarding />
       {/* Time Range Selector */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
