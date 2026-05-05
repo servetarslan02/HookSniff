@@ -7,6 +7,8 @@ mod config;
 mod db;
 mod defense;
 mod fix;
+mod http;
+pub mod marketplace;
 mod monitor;
 mod notify;
 mod risk;
@@ -74,6 +76,40 @@ async fn main() -> Result<()> {
     } else if let Some(email) = notify::email::EmailNotifier::from_env() {
         notify_mgr.add_notifier(Box::new(email));
     }
+
+    // Agent Orkestratör — webhook olaylarını analiz eden AI agent sistemi
+    let agent_orchestrator = agents::orchestrator::AgentOrchestrator::new(pool.clone());
+    agent_orchestrator.register_builtins().await;
+    let agent_count = agent_orchestrator.list_agents().await.len();
+    tracing::info!("🤖 {} AI agent yüklendi", agent_count);
+
+    // HTTP sunucusu — worker'dan gelen agent tetikleme isteklerini işler
+    let http_pool = pool.clone();
+    let http_orchestrator = agents::orchestrator::AgentOrchestrator::new(pool.clone());
+    http_orchestrator.register_builtins().await;
+
+    let http_port = std::env::var("AI_CENTER_PORT")
+        .unwrap_or_else(|_| "8081".to_string())
+        .parse::<u16>()
+        .unwrap_or(8081);
+
+    tokio::spawn(async move {
+        let app = http::router()
+            .layer(axum::extract::Extension(http_orchestrator))
+            .layer(axum::extract::Extension(http_pool));
+
+        let addr = std::net::SocketAddr::from(([0, 0, 0, 0], http_port));
+        tracing::info!("🌐 AI Center HTTP sunucusu: http://{}", addr);
+
+        if let Err(e) = axum::serve(
+            tokio::net::TcpListener::bind(addr).await.unwrap(),
+            app,
+        )
+        .await
+        {
+            tracing::error!("❌ HTTP sunucu hatası: {:?}", e);
+        }
+    });
 
     loop {
         tracing::debug!("🔄 Kontrol döngüsü başlıyor...");
