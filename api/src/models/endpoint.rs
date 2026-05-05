@@ -17,6 +17,38 @@ pub struct Endpoint {
     pub custom_headers: Option<serde_json::Value>,
     pub old_signing_secret: Option<String>,
     pub secret_rotated_at: Option<DateTime<Utc>>,
+    // Smart routing fields
+    pub routing_strategy: String,
+    pub fallback_url: Option<String>,
+    pub avg_response_ms: i32,
+    pub failure_streak: i32,
+    pub last_failure_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum RoutingStrategy {
+    RoundRobin,
+    Latency,
+    Failover,
+}
+
+impl RoutingStrategy {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::RoundRobin => "round-robin",
+            Self::Latency => "latency",
+            Self::Failover => "failover",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "latency" => Self::Latency,
+            "failover" => Self::Failover,
+            _ => Self::RoundRobin,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -68,6 +100,8 @@ pub struct CreateEndpointRequest {
     pub event_filter: Option<Vec<String>>,
     pub custom_headers: Option<serde_json::Value>,
     pub retry_policy: Option<RetryPolicy>,
+    pub routing_strategy: Option<String>,
+    pub fallback_url: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -81,6 +115,10 @@ pub struct EndpointResponse {
     pub allowed_ips: Option<serde_json::Value>,
     pub event_filter: Option<Vec<String>>,
     pub custom_headers: Option<serde_json::Value>,
+    pub routing_strategy: String,
+    pub fallback_url: Option<String>,
+    pub avg_response_ms: i32,
+    pub failure_streak: i32,
 }
 
 impl Endpoint {
@@ -95,6 +133,10 @@ impl Endpoint {
             allowed_ips: self.allowed_ips,
             event_filter: self.event_filter,
             custom_headers: self.custom_headers,
+            routing_strategy: self.routing_strategy,
+            fallback_url: self.fallback_url,
+            avg_response_ms: self.avg_response_ms,
+            failure_streak: self.failure_streak,
         }
     }
 
@@ -131,6 +173,52 @@ impl Endpoint {
         };
 
         filters.iter().any(|pattern| matches_wildcard(pattern, event_type))
+    }
+
+    /// Determine the target URL for delivery based on routing strategy.
+    /// Returns (url, used_fallback).
+    pub fn resolve_target_url(&self) -> (String, bool) {
+        let strategy = RoutingStrategy::from_str(&self.routing_strategy);
+
+        match strategy {
+            RoutingStrategy::Failover => {
+                // Use fallback if failure streak >= 3 and fallback is configured
+                if self.failure_streak >= 3 {
+                    if let Some(ref fallback) = self.fallback_url {
+                        return (fallback.clone(), true);
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::Latency => {
+                // If primary is healthy (failure streak < 3), use it
+                // Otherwise prefer fallback if available
+                if self.failure_streak >= 3 {
+                    if let Some(ref fallback) = self.fallback_url {
+                        return (fallback.clone(), true);
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::RoundRobin => {
+                (self.url.clone(), false)
+            }
+        }
+    }
+
+    /// Check if endpoint is healthy for routing (not recently failing).
+    /// Returns true if the endpoint hasn't failed 3+ times in the last 5 minutes.
+    pub fn is_healthy(&self) -> bool {
+        if self.failure_streak < 3 {
+            return true;
+        }
+        // Check if the last failure was more than 5 minutes ago
+        if let Some(last_failure) = self.last_failure_at {
+            let elapsed = chrono::Utc::now() - last_failure;
+            elapsed.num_minutes() >= 5
+        } else {
+            true
+        }
     }
 }
 
@@ -233,6 +321,11 @@ mod tests {
             custom_headers: None,
             old_signing_secret: None,
             secret_rotated_at: None,
+            routing_strategy: "round-robin".into(),
+            fallback_url: None,
+            avg_response_ms: 0,
+            failure_streak: 0,
+            last_failure_at: None,
         };
 
         assert!(ep.is_ip_allowed("192.168.1.1"));
@@ -259,6 +352,11 @@ mod tests {
             custom_headers: None,
             old_signing_secret: None,
             secret_rotated_at: None,
+            routing_strategy: "round-robin".into(),
+            fallback_url: None,
+            avg_response_ms: 0,
+            failure_streak: 0,
+            last_failure_at: None,
         };
 
         assert!(ep.matches_event_filter("order.created"));
@@ -287,5 +385,78 @@ mod tests {
         assert_eq!(rp.delay_for_attempt(2), 20);
         assert_eq!(rp.delay_for_attempt(3), 40);
         assert_eq!(rp.delay_for_attempt(4), 80);
+    }
+
+    fn make_endpoint(routing: &str, fallback: Option<&str>, streak: i32) -> Endpoint {
+        Endpoint {
+            id: uuid::Uuid::new_v4(),
+            customer_id: uuid::Uuid::new_v4(),
+            url: "https://primary.com".into(),
+            description: None,
+            is_active: true,
+            signing_secret: "test".into(),
+            retry_policy: None,
+            created_at: chrono::Utc::now(),
+            allowed_ips: None,
+            event_filter: None,
+            custom_headers: None,
+            old_signing_secret: None,
+            secret_rotated_at: None,
+            routing_strategy: routing.into(),
+            fallback_url: fallback.map(|s| s.into()),
+            avg_response_ms: 100,
+            failure_streak: streak,
+            last_failure_at: if streak > 0 { Some(chrono::Utc::now()) } else { None },
+        }
+    }
+
+    #[test]
+    fn test_routing_failover_healthy() {
+        let ep = make_endpoint("failover", Some("https://fallback.com"), 2);
+        let (url, fallback) = ep.resolve_target_url();
+        assert_eq!(url, "https://primary.com");
+        assert!(!fallback);
+    }
+
+    #[test]
+    fn test_routing_failover_tripped() {
+        let ep = make_endpoint("failover", Some("https://fallback.com"), 3);
+        let (url, fallback) = ep.resolve_target_url();
+        assert_eq!(url, "https://fallback.com");
+        assert!(fallback);
+    }
+
+    #[test]
+    fn test_routing_failover_no_fallback() {
+        let ep = make_endpoint("failover", None, 5);
+        let (url, fallback) = ep.resolve_target_url();
+        assert_eq!(url, "https://primary.com");
+        assert!(!fallback);
+    }
+
+    #[test]
+    fn test_routing_latency_healthy() {
+        let ep = make_endpoint("latency", Some("https://fast.com"), 0);
+        let (url, _) = ep.resolve_target_url();
+        assert_eq!(url, "https://primary.com");
+    }
+
+    #[test]
+    fn test_routing_round_robin() {
+        let ep = make_endpoint("round-robin", None, 0);
+        let (url, _) = ep.resolve_target_url();
+        assert_eq!(url, "https://primary.com");
+    }
+
+    #[test]
+    fn test_is_healthy_no_failures() {
+        let ep = make_endpoint("round-robin", None, 0);
+        assert!(ep.is_healthy());
+    }
+
+    #[test]
+    fn test_is_healthy_below_threshold() {
+        let ep = make_endpoint("round-robin", None, 2);
+        assert!(ep.is_healthy());
     }
 }
