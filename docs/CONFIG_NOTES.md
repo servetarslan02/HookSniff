@@ -154,7 +154,32 @@ DELETE /v1/ai/blocklist/{id}
 
 ---
 
-## 8. Gelecek Planlar (Henüz Eklenmedi)
+## 8. Bildirim Kanalları (Opsiyonel)
+
+### Slack
+- **Ne için:** Kritik olaylar, uyarılar
+- **Nereden alınır:** Slack → Apps → Incoming Webhooks
+- **Ortam değişkeni:** `SLACK_WEBHOOK_URL`
+
+### Email (SendGrid)
+- **Ne için:** Email bildirimleri
+- **Nereden alınır:** https://sendgrid.com
+- **Ortam değişkenleri:** `SENDGRID_API_KEY`, `NOTIFY_EMAIL`
+
+### Email (SMTP)
+- **Ne için:** SendGrid alternatifi
+- **Ortam değişkenleri:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `NOTIFY_EMAIL`
+
+### Bildirim Davranışı
+| Seviye | Gönderilir mi? |
+|--------|---------------|
+| ℹ️ Info | ❌ (sadece log) |
+| ⚠️ Warning | ✅ Slack + Email |
+| 🔴 Critical | ✅ Slack + Email |
+
+---
+
+## 9. Gelecek Planlar (Henüz Eklenmedi)
 
 - [ ] ML tabanlı anomali tespiti (scikit-learn, TensorFlow)
 - [ ] Webhook trafik tahmini (time series forecasting)
