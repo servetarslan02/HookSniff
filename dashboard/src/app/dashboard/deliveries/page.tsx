@@ -64,7 +64,7 @@ export default function DeliveriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Deliveries</h2>
           <p className="text-sm text-gray-500 mt-1">Track all webhook deliveries and their status</p>
@@ -74,12 +74,12 @@ export default function DeliveriesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by event or ID..."
-          className="pl-3 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className="pl-3 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto"
         />
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {['all', 'delivered', 'failed', 'pending'].map((f) => (
           <button
             key={f}
@@ -114,14 +114,15 @@ export default function DeliveriesPage() {
           <div className="p-12 text-center text-gray-400">No deliveries found.</div>
         ) : (
           <>
+            <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50">
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attempts</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Response</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Attempts</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Response</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
                   <th className="px-6 py-3" />
                 </tr>
@@ -138,8 +139,8 @@ export default function DeliveriesPage() {
                     <td className="px-6 py-4">
                       <StatusBadge status={d.status} />
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{d.attempt_count}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">{d.attempt_count}</td>
+                    <td className="px-6 py-4 hidden md:table-cell">
                       {d.response_status ? (
                         <span className={`text-sm font-mono ${d.response_status < 400 ? 'text-green-600' : 'text-red-600'}`}>
                           {d.response_status}
@@ -165,6 +166,7 @@ export default function DeliveriesPage() {
                 ))}
               </tbody>
             </table>
+            </div>
 
             {/* Pagination */}
             {total > perPage && (
