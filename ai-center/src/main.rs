@@ -42,12 +42,18 @@ async fn main() -> Result<()> {
     }
 
     // Yeni AI sağlayıcıları buraya ekle:
-    // if let Some(gemini) = ai_engine::gemini::GeminiProvider::from_env() {
-    //     orchestrator.add_provider(Box::new(gemini)).await;
-    // }
-    // if let Some(claude) = ai_engine::claude::ClaudeProvider::from_env() {
-    //     orchestrator.add_provider(Box::new(claude)).await;
-    // }
+    if let Some(gemini) = ai_engine::gemini::GeminiProvider::from_env() {
+        orchestrator.add_provider(Box::new(gemini)).await;
+    }
+    if let Some(groq) = ai_engine::groq::groq_from_env() {
+        orchestrator.add_provider(Box::new(groq)).await;
+    }
+    if let Some(cerebras) = ai_engine::cerebras::cerebras_from_env() {
+        orchestrator.add_provider(Box::new(cerebras)).await;
+    }
+    if let Some(openrouter) = ai_engine::openrouter::openrouter_from_env() {
+        orchestrator.add_provider(Box::new(openrouter)).await;
+    }
 
     let provider_count = orchestrator.all_status().await.len();
     tracing::info!("🤖 {} AI sağlayıcı aktif", provider_count);

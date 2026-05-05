@@ -2,11 +2,13 @@ use anyhow::Result;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::config::ClientConfig;
 use rdkafka::message::Message;
+use rdkafka::producer::FutureProducer;
 use serde::{Deserialize, Serialize};
 use tracing_subscriber::EnvFilter;
 
 mod config;
 mod delivery;
+mod retry_scheduler;
 mod signing;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -45,6 +47,20 @@ async fn main() -> Result<()> {
         .create()?;
 
     consumer.subscribe(&[&cfg.kafka_topic])?;
+
+    // Create a Kafka producer for the retry scheduler to re-publish messages
+    let retry_producer: FutureProducer = ClientConfig::new()
+        .set("bootstrap.servers", &cfg.kafka_brokers)
+        .set("message.timeout.ms", "5000")
+        .set("queue.buffering.max.messages", "100000")
+        .create()?;
+
+    // Spawn retry scheduler as a background task
+    let retry_pool = pool.clone();
+    let retry_cfg = cfg.clone();
+    tokio::spawn(async move {
+        retry_scheduler::run_retry_scheduler(retry_pool, retry_producer, retry_cfg).await;
+    });
 
     tracing::info!("🔄 Hookrelay Worker started, listening on {}", cfg.kafka_brokers);
 
