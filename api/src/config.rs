@@ -15,6 +15,12 @@ pub struct Config {
     pub webhook_format: String,
     /// Timestamp tolerance for replay protection in seconds.
     pub webhook_timestamp_tolerance_secs: i64,
+    /// Stripe secret key (optional — billing disabled if not set)
+    pub stripe_secret_key: Option<String>,
+    /// Stripe webhook secret for signature verification
+    pub stripe_webhook_secret: Option<String>,
+    /// Base URL of the dashboard (for Stripe redirect URLs)
+    pub app_url: Option<String>,
 }
 
 impl Config {
@@ -78,6 +84,9 @@ impl Config {
                 .unwrap_or_else(|_| "300".into())
                 .parse()
                 .context("WEBHOOK_TIMESTAMP_TOLERANCE_SECS must be a number")?,
+            stripe_secret_key: std::env::var("STRIPE_SECRET_KEY").ok(),
+            stripe_webhook_secret: std::env::var("STRIPE_WEBHOOK_SECRET").ok(),
+            app_url: std::env::var("APP_URL").ok(),
         })
     }
 }
