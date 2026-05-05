@@ -83,5 +83,58 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     .await?;
 
     tracing::info!("✅ AI Center migrations completed");
+
+    // Run agent orchestrator migration
+    run_agent_migration(pool).await?;
+
+    Ok(())
+}
+
+async fn run_agent_migration(pool: &PgPool) -> Result<()> {
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS ai_agents (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name STRING NOT NULL UNIQUE,
+            description STRING,
+            enabled BOOL DEFAULT true,
+            config JSONB,
+            created_at TIMESTAMPTZ DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS ai_agent_executions (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            agent_id UUID REFERENCES ai_agents(id),
+            delivery_id UUID,
+            customer_id UUID,
+            trigger_reason STRING,
+            actions_taken JSONB,
+            confidence_score FLOAT,
+            ai_provider STRING,
+            latency_ms INT,
+            created_at TIMESTAMPTZ DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS ai_agent_configs (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL,
+            agent_id UUID REFERENCES ai_agents(id),
+            enabled BOOL DEFAULT true,
+            config JSONB,
+            UNIQUE(customer_id, agent_id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_agent_executions_agent ON ai_agent_executions(agent_id);
+        CREATE INDEX IF NOT EXISTS idx_agent_executions_delivery ON ai_agent_executions(delivery_id);
+        CREATE INDEX IF NOT EXISTS idx_agent_executions_customer ON ai_agent_executions(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_agent_executions_created ON ai_agent_executions(created_at);
+        CREATE INDEX IF NOT EXISTS idx_agent_configs_customer ON ai_agent_configs(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_agent_configs_agent ON ai_agent_configs(agent_id);
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    tracing::info!("✅ Agent orchestrator migrations completed");
     Ok(())
 }

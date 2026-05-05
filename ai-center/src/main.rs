@@ -1,6 +1,7 @@
 use anyhow::Result;
 use tracing_subscriber::EnvFilter;
 
+mod agents;
 mod ai_engine;
 mod config;
 mod db;
