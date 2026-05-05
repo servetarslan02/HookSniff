@@ -74,9 +74,13 @@ async fn create_endpoint(
     let allowed_ips_json: Option<serde_json::Value> =
         req.allowed_ips.map(|ips| serde_json::json!(ips));
 
+    // Convert retry_policy to JSON
+    let retry_policy_json: Option<serde_json::Value> =
+        req.retry_policy.and_then(|rp| serde_json::to_value(rp).ok());
+
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers)
-           VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *"#,
+        r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers, retry_policy)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"#,
     )
     .bind(customer.id)
     .bind(&req.url)
@@ -85,6 +89,7 @@ async fn create_endpoint(
     .bind(&allowed_ips_json)
     .bind(&req.event_filter)
     .bind(&req.custom_headers)
+    .bind(&retry_policy_json)
     .fetch_one(&pool)
     .await?;
 
