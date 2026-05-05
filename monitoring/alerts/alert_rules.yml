@@ -1,0 +1,113 @@
+# HookRelay Alert Rules
+# Loaded by Prometheus via rule_files
+
+groups:
+  - name: hookrelay_critical
+    rules:
+      # ── High error rate (>5% of requests return 5xx) ──
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "More than 5% of HTTP requests are returning 5xx errors (current: {{ $value | humanizePercentage }})"
+
+      # ── High latency (p99 > 2 seconds) ──
+      - alert: HighLatencyP99
+        expr: |
+          histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 2
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p99 latency"
+          description: "99th percentile latency is above 2 seconds (current: {{ $value }}s)"
+
+      # ── Delivery failure rate ──
+      - alert: HighDeliveryFailureRate
+        expr: |
+          (
+            sum(rate(webhook_deliveries_total{status="failed"}[5m]))
+            /
+            sum(rate(webhook_deliveries_total[5m]))
+          ) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High webhook delivery failure rate"
+          description: "More than 10% of webhook deliveries are failing (current: {{ $value | humanizePercentage }})"
+
+      # ── API service down ──
+      - alert: APIServiceDown
+        expr: up{job="hookrelay-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HookRelay API is down"
+          description: "The HookRelay API instance has been unreachable for more than 1 minute."
+
+      # ── Worker service down ──
+      - alert: WorkerServiceDown
+        expr: up{job="hookrelay-worker"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HookRelay Worker is down"
+          description: "The HookRelay Worker instance has been unreachable for more than 1 minute."
+
+  - name: hookrelay_warning
+    rules:
+      # ── High Kafka publish latency ──
+      - alert: HighKafkaLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(kafka_publish_latency_seconds_bucket[5m])) by (le)) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Kafka publish latency"
+          description: "95th percentile Kafka publish latency is above 500ms"
+
+      # ── High database latency ──
+      - alert: HighDatabaseLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket[5m])) by (le)) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database query latency"
+          description: "95th percentile DB query latency is above 500ms"
+
+      # ── High memory usage ──
+      - alert: HighMemoryUsage
+        expr: |
+          (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)
+          / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage (>90%)"
+          description: "Memory usage is above 90% on {{ $labels.instance }}"
+
+      # ── Disk space low ──
+      - alert: DiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space below 15%"
+          description: "Available disk space is below 15% on {{ $labels.instance }}"

@@ -1,0 +1,37 @@
+# Prometheus configuration for HookRelay monitoring
+
+global:
+  scrape_interval: 15s       # Default scrape interval
+  evaluation_interval: 15s   # Rule evaluation interval
+  scrape_timeout: 10s
+
+# Alert rules
+rule_files:
+  - "alert_rules.yml"
+
+# Scrape targets
+scrape_configs:
+  # ── Prometheus self-monitoring ──
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # ── HookRelay API ──
+  - job_name: "hookrelay-api"
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["api:9090"]
+        labels:
+          service: "hookrelay-api"
+          environment: "production"
+
+  # ── HookRelay Worker ──
+  - job_name: "hookrelay-worker"
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["worker:9090"]
+        labels:
+          service: "hookrelay-worker"
+          environment: "production"
