@@ -5,8 +5,11 @@ pub mod auth;
 pub mod docs;
 pub mod endpoints;
 pub mod health;
+pub mod marketplace;
 pub mod routing;
+pub mod schemas;
 pub mod stats;
+pub mod templates;
 pub mod webhooks;
 
 use axum::middleware as axum_middleware;
@@ -21,6 +24,8 @@ pub fn api_router() -> Router {
         .nest("/agents", agents::router())
         .nest("/routing", routing::router())
         .nest("/analytics", analytics::router())
+        .nest("/templates", templates::router())
+        .nest("/marketplace/agents", marketplace::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Dashboard routes use JWT auth (separate from API key auth)
