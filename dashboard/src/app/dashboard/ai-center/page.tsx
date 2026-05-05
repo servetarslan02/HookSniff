@@ -278,13 +278,14 @@ export default function AiCenterPage() {
 
       {activeTab === 'events' && (
         <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Seviye</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tür</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Başlık</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Açıklama</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Açıklama</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tarih</th>
               </tr>
             </thead>
@@ -298,24 +299,26 @@ export default function AiCenterPage() {
                   </td>
                   <td className="px-4 py-3 text-sm">{event.event_type}</td>
                   <td className="px-4 py-3 text-sm font-medium">{event.title}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">{event.description}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate hidden md:table-cell">{event.description}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{new Date(event.created_at).toLocaleString('tr-TR')}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'risks' && (
         <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Risk</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Hedef</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Skor</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tarih</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Tarih</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -331,23 +334,25 @@ export default function AiCenterPage() {
                       {risk.score}/100
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{new Date(risk.created_at).toLocaleString('tr-TR')}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{new Date(risk.created_at).toLocaleString('tr-TR')}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'actions' && (
         <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tür</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Açıklama</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Durum</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Risk</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Risk</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">İşlem</th>
               </tr>
             </thead>
@@ -366,7 +371,7 @@ export default function AiCenterPage() {
                       {action.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm">{action.risk_level}</td>
+                  <td className="px-4 py-3 text-sm hidden md:table-cell">{action.risk_level}</td>
                   <td className="px-4 py-3">
                     {action.status === 'pending' && (
                       <div className="flex gap-2">
@@ -382,17 +387,19 @@ export default function AiCenterPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'blocklist' && (
         <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tür</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Değer</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Sebep</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Sebep</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Bitiş</th>
               </tr>
             </thead>
@@ -401,7 +408,7 @@ export default function AiCenterPage() {
                 <tr key={entry.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-medium">{entry.block_type}</td>
                   <td className="px-4 py-3 text-sm font-mono">{entry.block_value}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{entry.reason || '-'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{entry.reason || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {entry.expires_at ? new Date(entry.expires_at).toLocaleString('tr-TR') : 'Kalıcı'}
                   </td>
@@ -409,6 +416,7 @@ export default function AiCenterPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

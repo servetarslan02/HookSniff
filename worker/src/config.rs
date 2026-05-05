@@ -8,6 +8,10 @@ pub struct WorkerConfig {
     pub database_url: String,
     pub max_attempts: i32,
     pub retry_delays_secs: Vec<u64>,
+    /// Temporal server address (default: http://localhost:7233)
+    pub temporal_url: String,
+    /// Temporal task queue name (default: hookrelay-deliveries)
+    pub temporal_task_queue: String,
 }
 
 impl WorkerConfig {
@@ -27,6 +31,10 @@ impl WorkerConfig {
                 .unwrap_or_else(|_| "3".into())
                 .parse()?,
             retry_delays_secs: vec![30, 300, 1800], // 30s, 5min, 30min
+            temporal_url: std::env::var("TEMPORAL_URL")
+                .unwrap_or_else(|_| "http://localhost:7233".into()),
+            temporal_task_queue: std::env::var("TEMPORAL_TASK_QUEUE")
+                .unwrap_or_else(|_| "hookrelay-deliveries".into()),
         })
     }
 }

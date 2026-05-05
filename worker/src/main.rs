@@ -6,11 +6,17 @@ use rdkafka::producer::FutureProducer;
 use serde::{Deserialize, Serialize};
 use tracing_subscriber::EnvFilter;
 
+mod activities;
 mod config;
 mod delivery;
 mod retry_scheduler;
 mod signing;
+mod workflows;
 
+use activities::HookRelayActivities;
+use workflows::{RetryPolicy, WebhookDeliveryInput, WebhookDeliveryWorkflow};
+
+/// Message format coming from the Kafka topic.
 #[derive(Debug, Deserialize, Serialize)]
 struct WebhookMessage {
     delivery_id: String,
@@ -30,15 +36,25 @@ async fn main() -> Result<()> {
         .init();
 
     let cfg = config::WorkerConfig::from_env()?;
-    let http_client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(30))
-        .build()?;
 
+    // -----------------------------------------------------------------------
+    // Database pool (shared between activities and retry scheduler)
+    // -----------------------------------------------------------------------
     let pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(10)
         .connect(&cfg.database_url)
         .await?;
 
+    // -----------------------------------------------------------------------
+    // HTTP client (shared with activities)
+    // -----------------------------------------------------------------------
+    let http_client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()?;
+
+    // -----------------------------------------------------------------------
+    // Kafka consumer — receives new webhook delivery messages
+    // -----------------------------------------------------------------------
     let consumer: StreamConsumer = ClientConfig::new()
         .set("bootstrap.servers", &cfg.kafka_brokers)
         .set("group.id", &cfg.consumer_group)
@@ -48,42 +64,92 @@ async fn main() -> Result<()> {
 
     consumer.subscribe(&[&cfg.kafka_topic])?;
 
-    // Create a Kafka producer for the retry scheduler to re-publish messages
+    // -----------------------------------------------------------------------
+    // Kafka producer — for retry scheduler (backward compat)
+    // -----------------------------------------------------------------------
     let retry_producer: FutureProducer = ClientConfig::new()
         .set("bootstrap.servers", &cfg.kafka_brokers)
         .set("message.timeout.ms", "5000")
         .set("queue.buffering.max.messages", "100000")
         .create()?;
 
-    // Spawn retry scheduler as a background task
+    // -----------------------------------------------------------------------
+    // Spawn retry scheduler as a background task (backward compat)
+    // -----------------------------------------------------------------------
     let retry_pool = pool.clone();
     let retry_cfg = cfg.clone();
     tokio::spawn(async move {
         retry_scheduler::run_retry_scheduler(retry_pool, retry_producer, retry_cfg).await;
     });
 
-    tracing::info!("🔄 Hookrelay Worker started, listening on {}", cfg.kafka_brokers);
+    // -----------------------------------------------------------------------
+    // Temporal Worker
+    //
+    // The Temporal worker polls the task queue for workflow and activity tasks.
+    // It runs in the background alongside the Kafka consumer.
+    //
+    // Architecture:
+    //   Kafka consumer → receives webhook messages → starts Temporal workflow
+    //   Temporal worker → executes activities (HTTP delivery, DB updates, Kafka)
+    // -----------------------------------------------------------------------
+    tracing::info!("🔧 Initializing Temporal worker at {}", cfg.temporal_url);
 
+    let temporal_handle = {
+        let cfg_clone = cfg.clone();
+        let pool_clone = pool.clone();
+        let http_client_clone = http_client.clone();
+
+        tokio::spawn(async move {
+            if let Err(e) = run_temporal_worker(cfg_clone, pool_clone, http_client_clone).await {
+                tracing::error!("❌ Temporal worker failed: {:?}", e);
+            }
+        })
+    };
+
+    tracing::info!(
+        "🔄 HookRelay Worker started — Kafka: {} | Temporal: {} (queue: {})",
+        cfg.kafka_brokers,
+        cfg.temporal_url,
+        cfg.temporal_task_queue
+    );
+
+    // -----------------------------------------------------------------------
+    // Main Kafka consumer loop
+    //
+    // Instead of processing webhooks directly (the old approach), we now
+    // start a Temporal workflow for each incoming message. The workflow
+    // handles delivery, retries, backoff, and dead-letter logic.
+    // -----------------------------------------------------------------------
     loop {
         match consumer.recv().await {
             Ok(msg) => {
                 if let Some(payload) = msg.payload_view::<str>().unwrap_or(None) {
                     match serde_json::from_str::<WebhookMessage>(payload) {
                         Ok(webhook) => {
-                            tracing::info!("📥 Processing delivery {}", webhook.delivery_id);
-                            if let Err(e) =
-                                delivery::process_delivery(&http_client, &cfg, &webhook, &pool)
-                                    .await
-                            {
-                                tracing::error!(
-                                    "❌ Failed to process delivery {}: {:?}",
-                                    webhook.delivery_id,
-                                    e
-                                );
+                            tracing::info!("📥 Received delivery {}", webhook.delivery_id);
+
+                            // Start a Temporal workflow for this delivery.
+                            // The workflow will handle the actual HTTP delivery,
+                            // retries with exponential backoff, and dead-lettering.
+                            match start_delivery_workflow(&cfg, &pool, &webhook).await {
+                                Ok(workflow_id) => {
+                                    tracing::info!(
+                                        "🚀 Started workflow {} for delivery {}",
+                                        workflow_id,
+                                        webhook.delivery_id
+                                    );
+                                }
+                                Err(e) => {
+                                    tracing::error!(
+                                        "❌ Failed to start workflow for delivery {}: {:?}",
+                                        webhook.delivery_id,
+                                        e
+                                    );
+                                }
                             }
                         }
                         Err(e) => {
-                            tracing::error!("❌ Failed to parse message: {:?}", e);
+                            tracing::error!("❌ Failed to parse Kafka message: {:?}", e);
                         }
                     }
                 }
@@ -91,6 +157,92 @@ async fn main() -> Result<()> {
             Err(e) => {
                 tracing::error!("❌ Kafka error: {:?}", e);
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            }
+        }
+    }
+}
+
+/// Start a Temporal workflow for a webhook delivery.
+///
+/// Constructs the workflow input from the Kafka message and endpoint
+/// configuration, then signals the Temporal server to begin execution.
+///
+/// The workflow ID is derived from the delivery ID to ensure idempotency —
+/// if the same Kafka message is processed twice (e.g., after a restart),
+/// the second attempt will be a no-op because the workflow already exists.
+async fn start_delivery_workflow(
+    cfg: &config::WorkerConfig,
+    pool: &sqlx::PgPool,
+    webhook: &WebhookMessage,
+) -> Result<String> {
+    // Fetch the retry policy from the endpoint configuration
+    let endpoint_info: (Option<serde_json::Value>,) =
+        sqlx::query_as("SELECT retry_policy FROM endpoints WHERE id = $1")
+            .bind(&webhook.endpoint_id)
+            .fetch_one(pool)
+            .await?;
+
+    let retry_policy = endpoint_info
+        .0
+        .as_ref()
+        .and_then(|v| serde_json::from_value::<RetryPolicy>(v.clone()).ok())
+        .unwrap_or_default();
+
+    let workflow_input = WebhookDeliveryInput {
+        delivery_id: webhook.delivery_id.clone(),
+        endpoint_id: webhook.endpoint_id.clone(),
+        endpoint_url: webhook.endpoint_url.clone(),
+        signing_secret: webhook.signing_secret.clone(),
+        payload: webhook.payload.clone(),
+        custom_headers: webhook.custom_headers.clone(),
+        retry_policy,
+    };
+
+    // Build a Temporal client to start the workflow
+    let runtime = temporalio_sdk_core::CoreRuntime::new_assume_tokio(
+        temporalio_sdk_core::RuntimeOptions::builder().build()?,
+    )?;
+
+    // Connect to the Temporal server using the configured URL.
+    // The envconfig module reads TEMPORAL_ADDRESS automatically, but we
+    // also set it explicitly for clarity.
+    std::env::set_var("TEMPORAL_ADDRESS", &cfg.temporal_url);
+
+    let (conn_options, client_options) = temporalio_client::ClientOptions::load_from_config(
+        temporalio_client::envconfig::LoadClientConfigProfileOptions::default(),
+    )?;
+
+    let connection = temporalio_client::Connection::connect(conn_options).await?;
+    let client = temporalio_client::Client::new(connection, client_options);
+
+    // Use the delivery ID as the workflow ID for idempotency.
+    // If this workflow already exists (e.g., Kafka redelivery), Temporal
+    // will reject the start request with WorkflowExecutionAlreadyStarted,
+    // which we handle gracefully.
+    let workflow_id = format!("webhook-delivery-{}", webhook.delivery_id);
+
+    match client
+        .start_workflow(
+            workflow_input,
+            cfg.temporal_task_queue.clone(),
+            workflow_id.clone(),
+            "WebhookDeliveryWorkflow".to_string(),
+            None, // use default workflow options
+        )
+        .await
+    {
+        Ok(_) => Ok(workflow_id),
+        Err(e) => {
+            let err_str = e.to_string();
+            if err_str.contains("ALREADY_EXISTS") || err_str.contains("already started") {
+                // Workflow already running — this is fine, Kafka redelivered
+                tracing::debug!(
+                    "Workflow {} already exists, skipping (Kafka redelivery)",
+                    workflow_id
+                );
+                Ok(workflow_id)
+            } else {
+                Err(anyhow::anyhow!("Failed to start workflow: {}", e))
             }
         }
     }

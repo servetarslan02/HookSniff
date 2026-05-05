@@ -1,6 +1,11 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function Home() {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-brand-50">
       {/* Navigation */}
@@ -12,7 +17,8 @@ export default function Home() {
             </div>
             <span className="text-xl font-bold text-gray-900">Hookrelay</span>
           </div>
-          <div className="flex items-center gap-4">
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-4">
             <a href="#features" className="text-sm text-gray-600 hover:text-gray-900 transition">Features</a>
             <a href="#pricing" className="text-sm text-gray-600 hover:text-gray-900 transition">Pricing</a>
             <Link href="/docs" className="text-sm text-gray-600 hover:text-gray-900 transition">Docs</Link>
@@ -23,7 +29,36 @@ export default function Home() {
               Dashboard →
             </Link>
           </div>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            className="md:hidden p-2 -mr-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+            aria-label="Toggle navigation"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileNavOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+        {/* Mobile nav dropdown */}
+        {mobileNavOpen && (
+          <div className="md:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-xl px-6 py-4 space-y-3">
+            <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 hover:text-gray-900 transition">Features</a>
+            <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 hover:text-gray-900 transition">Pricing</a>
+            <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 hover:text-gray-900 transition">Docs</Link>
+            <Link
+              href="/dashboard"
+              onClick={() => setMobileNavOpen(false)}
+              className="block bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition text-center"
+            >
+              Dashboard →
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
@@ -33,7 +68,7 @@ export default function Home() {
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             99.99% delivery uptime
           </div>
-          <h1 className="text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
             Webhooks that
             <br />
             <span className="gradient-text">actually deliver</span>
@@ -42,7 +77,7 @@ export default function Home() {
             Send webhooks with confidence. Automatic retries, HMAC signatures,
             real-time monitoring. Built for developers who need reliability.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/dashboard"
               className="bg-gray-900 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 transition shadow-lg shadow-gray-900/20"
