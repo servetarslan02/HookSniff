@@ -1,0 +1,44 @@
+# OpenTelemetry Collector configuration for HookRelay
+# Receives traces via OTLP and exports to Jaeger
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  # Batch spans before exporting to reduce network calls
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+  # Filter out health check traces to reduce noise
+  filter:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.target"] == "/health"'
+        - 'attributes["http.target"] == "/metrics"'
+
+exporters:
+  # Export to Jaeger
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Debug exporter for troubleshooting (remove in production)
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [filter, batch]
+      exporters: [otlp/jaeger, debug]
+
+  extensions: []
