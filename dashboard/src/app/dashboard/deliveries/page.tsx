@@ -66,15 +66,15 @@ export default function DeliveriesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Deliveries</h2>
-          <p className="text-sm text-gray-500 mt-1">Track all webhook deliveries and their status</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Deliveries</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Track all webhook deliveries and their status</p>
         </div>
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by event or ID..."
-          className="pl-3 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto"
+          className="pl-3 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto"
         />
       </div>
 
@@ -87,7 +87,7 @@ export default function DeliveriesPage() {
             className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
               filter === f
                 ? 'bg-gray-900 text-white'
-                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
             }`}
           >
             {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -99,8 +99,8 @@ export default function DeliveriesPage() {
       {error && (
         <div className="glass-card p-6 text-center">
           <div className="text-4xl mb-3">⚠️</div>
-          <p className="text-sm text-gray-600 mb-4">{error}</p>
-          <button onClick={fetchData} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition">
+          <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
+          <button onClick={fetchData} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
             Retry
           </button>
         </div>
@@ -109,54 +109,54 @@ export default function DeliveriesPage() {
       {/* Table */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-gray-400 animate-pulse">Loading deliveries...</div>
+          <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">Loading deliveries...</div>
         ) : filtered.length === 0 ? (
-          <div className="p-12 text-center text-gray-400">No deliveries found.</div>
+          <div className="p-12 text-center text-gray-400 dark:text-slate-500">No deliveries found.</div>
         ) : (
           <>
             <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Attempts</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Response</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Event</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Attempts</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Response</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Time</th>
                   <th className="px-6 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50">
                 {filtered.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50/50 transition cursor-pointer" onClick={() => setSelected(d)}>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-600">{d.id.slice(0, 12)}…</td>
+                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" onClick={() => setSelected(d)}>
+                    <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 text-xs font-mono text-gray-700">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
                         {d.event || '—'}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <StatusBadge status={d.status} />
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">{d.attempt_count}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 hidden md:table-cell">{d.attempt_count}</td>
                     <td className="px-6 py-4 hidden md:table-cell">
                       {d.response_status ? (
                         <span className={`text-sm font-mono ${d.response_status < 400 ? 'text-green-600' : 'text-red-600'}`}>
                           {d.response_status}
                         </span>
                       ) : (
-                        <span className="text-sm text-gray-400">—</span>
+                        <span className="text-sm text-gray-400 dark:text-slate-500">—</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
                       {new Date(d.created_at).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
                       {d.status === 'failed' && (
                         <button
                           onClick={(e) => { e.stopPropagation(); setReplayTarget(d); }}
-                          className="text-brand-600 hover:text-brand-700 text-sm font-medium"
+                          className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
                         >
                           Replay
                         </button>
@@ -170,23 +170,23 @@ export default function DeliveriesPage() {
 
             {/* Pagination */}
             {total > perPage && (
-              <div className="px-6 py-4 border-t border-gray-200/50 flex items-center justify-between">
-                <span className="text-sm text-gray-500">
+              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
+                <span className="text-sm text-gray-500 dark:text-slate-400">
                   Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition"
+                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
                   >
                     Previous
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600">Page {page} of {totalPages}</span>
+                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">Page {page} of {totalPages}</span>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition"
+                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
                   >
                     Next
                   </button>
@@ -201,10 +201,10 @@ export default function DeliveriesPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelected(null)} />
-          <div className="relative bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Delivery Details</h3>
-              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delivery Details</h3>
+              <button onClick={() => setSelected(null)} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label="ID" value={selected.id} mono />
@@ -217,14 +217,14 @@ export default function DeliveriesPage() {
 
               {/* Attempts Timeline */}
               <div className="pt-4 border-t border-gray-100">
-                <h4 className="text-sm font-semibold text-gray-900 mb-3">Delivery Attempts</h4>
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Delivery Attempts</h4>
                 <div className="space-y-3">
                   {Array.from({ length: selected.attempt_count }).map((_, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="mt-1 w-2 h-2 rounded-full bg-brand-500 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Attempt {i + 1}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Attempt {i + 1}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">
                           {i === selected.attempt_count - 1
                             ? selected.status === 'delivered' ? 'Delivered successfully' : 'Failed — will retry'
                             : 'Retried with exponential backoff'}
@@ -255,17 +255,17 @@ export default function DeliveriesPage() {
 function DetailRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className={`text-sm text-gray-900 ${mono ? 'font-mono' : ''}`}>{value}</span>
+      <span className="text-sm text-gray-500 dark:text-slate-400">{label}</span>
+      <span className={`text-sm text-gray-900 dark:text-white ${mono ? 'font-mono' : ''}`}>{value}</span>
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    delivered: 'bg-green-50 text-green-700 ring-green-600/20',
-    failed: 'bg-red-50 text-red-700 ring-red-600/20',
-    pending: 'bg-yellow-50 text-yellow-700 ring-yellow-600/20',
+    delivered: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20',
+    failed: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20',
+    pending: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20',
   };
 
   return (

@@ -137,7 +137,7 @@ export default function AiCenterPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">🧠 AI Merkezi</h1>
-        <span className="text-sm text-gray-500">Otonom yönetim sistemi</span>
+        <span className="text-sm text-gray-500 dark:text-slate-400">Otonom yönetim sistemi</span>
       </div>
 
       {/* Status Cards */}
@@ -147,7 +147,7 @@ export default function AiCenterPage() {
             label="Aktif Olaylar"
             value={status.active_events}
             icon="📊"
-            color={status.active_events > 10 ? 'text-red-600' : 'text-gray-900'}
+            color={status.active_events > 10 ? 'text-red-600' : 'text-gray-900 dark:text-white'}
           />
           <StatusCard
             label="Kritik Olaylar"
@@ -159,13 +159,13 @@ export default function AiCenterPage() {
             label="Bekleyen Aksiyon"
             value={status.pending_actions}
             icon="⏳"
-            color={status.pending_actions > 5 ? 'text-yellow-600' : 'text-gray-900'}
+            color={status.pending_actions > 5 ? 'text-yellow-600' : 'text-gray-900 dark:text-white'}
           />
           <StatusCard
             label="Engelli"
             value={status.blocked_items}
             icon="🚫"
-            color="text-gray-900"
+            color="text-gray-900 dark:text-white"
           />
           <StatusCard
             label="Ort. Risk"
@@ -183,7 +183,7 @@ export default function AiCenterPage() {
       )}
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-200 dark:border-slate-700">
         <nav className="-mb-px flex space-x-8">
           {(['overview', 'events', 'risks', 'actions', 'blocklist'] as const).map((tab) => (
             <button
@@ -192,7 +192,7 @@ export default function AiCenterPage() {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab
                   ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
               }`}
             >
               {tab === 'overview' && '📊 Genel Bakış'}
@@ -209,23 +209,23 @@ export default function AiCenterPage() {
       {activeTab === 'overview' && (
         <div className="grid md:grid-cols-2 gap-6">
           {/* Recent Critical Events */}
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-4">
             <h3 className="font-semibold mb-3">🔴 Son Kritik Olaylar</h3>
             <div className="space-y-2">
               {events.filter(e => e.severity === 'critical').slice(0, 5).map(event => (
                 <div key={event.id} className="text-sm border-l-4 border-red-400 pl-3 py-1">
                   <div className="font-medium">{event.title}</div>
-                  <div className="text-gray-500 text-xs">{new Date(event.created_at).toLocaleString('tr-TR')}</div>
+                  <div className="text-gray-500 dark:text-slate-400 text-xs">{new Date(event.created_at).toLocaleString('tr-TR')}</div>
                 </div>
               ))}
               {events.filter(e => e.severity === 'critical').length === 0 && (
-                <div className="text-sm text-gray-500">Kritik olay yok ✅</div>
+                <div className="text-sm text-gray-500 dark:text-slate-400">Kritik olay yok ✅</div>
               )}
             </div>
           </div>
 
           {/* Top Risk Endpoints */}
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-4">
             <h3 className="font-semibold mb-3">🎯 En Yüksek Risk Endpointler</h3>
             <div className="space-y-2">
               {risks.sort((a, b) => b.score - a.score).slice(0, 5).map(risk => (
@@ -237,13 +237,13 @@ export default function AiCenterPage() {
                 </div>
               ))}
               {risks.length === 0 && (
-                <div className="text-sm text-gray-500">Risk endpoint yok ✅</div>
+                <div className="text-sm text-gray-500 dark:text-slate-400">Risk endpoint yok ✅</div>
               )}
             </div>
           </div>
 
           {/* Pending Actions */}
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-4">
             <h3 className="font-semibold mb-3">⏳ Onay Bekleyen Aksiyonlar</h3>
             <div className="space-y-2">
               {actions.filter(a => a.status === 'pending').slice(0, 5).map(action => (
@@ -256,19 +256,19 @@ export default function AiCenterPage() {
                 </div>
               ))}
               {actions.filter(a => a.status === 'pending').length === 0 && (
-                <div className="text-sm text-gray-500">Bekleyen aksiyon yok ✅</div>
+                <div className="text-sm text-gray-500 dark:text-slate-400">Bekleyen aksiyon yok ✅</div>
               )}
             </div>
           </div>
 
           {/* Recent Auto-Actions */}
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-4">
             <h3 className="font-semibold mb-3">🤖 Son Otomatik Aksiyonlar</h3>
             <div className="space-y-2">
               {actions.filter(a => a.auto_approved).slice(0, 5).map(action => (
                 <div key={action.id} className="text-sm border-l-4 border-blue-400 pl-3 py-1">
                   <div className="font-medium">{action.description}</div>
-                  <div className="text-gray-500 text-xs">{new Date(action.created_at).toLocaleString('tr-TR')}</div>
+                  <div className="text-gray-500 dark:text-slate-400 text-xs">{new Date(action.created_at).toLocaleString('tr-TR')}</div>
                 </div>
               ))}
             </div>
@@ -277,21 +277,21 @@ export default function AiCenterPage() {
       )}
 
       {activeTab === 'events' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Seviye</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tür</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Başlık</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Açıklama</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tarih</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Seviye</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Tür</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Başlık</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 hidden md:table-cell">Açıklama</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Tarih</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {events.map(event => (
-                <tr key={event.id} className="hover:bg-gray-50">
+                <tr key={event.id} className="hover:bg-gray-50 dark:hover:bg-slate-800">
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${severityColors[event.severity] || 'bg-gray-100'}`}>
                       {event.severity}
@@ -299,8 +299,8 @@ export default function AiCenterPage() {
                   </td>
                   <td className="px-4 py-3 text-sm">{event.event_type}</td>
                   <td className="px-4 py-3 text-sm font-medium">{event.title}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate hidden md:table-cell">{event.description}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{new Date(event.created_at).toLocaleString('tr-TR')}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate hidden md:table-cell">{event.description}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">{new Date(event.created_at).toLocaleString('tr-TR')}</td>
                 </tr>
               ))}
             </tbody>
@@ -310,31 +310,31 @@ export default function AiCenterPage() {
       )}
 
       {activeTab === 'risks' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Risk</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Hedef</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Skor</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Tarih</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Risk</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Hedef</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Skor</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 hidden md:table-cell">Tarih</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {risks.sort((a, b) => b.score - a.score).map(risk => (
-                <tr key={risk.id} className="hover:bg-gray-50">
+                <tr key={risk.id} className="hover:bg-gray-50 dark:hover:bg-slate-800">
                   <td className="px-4 py-3 text-lg">{riskEmoji(risk.score)}</td>
                   <td className="px-4 py-3 text-sm">
                     <div className="font-mono text-xs">{risk.target_id}</div>
-                    <div className="text-gray-500 text-xs">{risk.target_type}</div>
+                    <div className="text-gray-500 dark:text-slate-400 text-xs">{risk.target_type}</div>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-3 py-1 rounded-full text-sm font-bold ${riskColors(risk.score)}`}>
                       {risk.score}/100
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{new Date(risk.created_at).toLocaleString('tr-TR')}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400 hidden md:table-cell">{new Date(risk.created_at).toLocaleString('tr-TR')}</td>
                 </tr>
               ))}
             </tbody>
@@ -344,21 +344,21 @@ export default function AiCenterPage() {
       )}
 
       {activeTab === 'actions' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tür</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Açıklama</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Durum</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Risk</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">İşlem</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Tür</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Açıklama</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Durum</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 hidden md:table-cell">Risk</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">İşlem</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {actions.map(action => (
-                <tr key={action.id} className="hover:bg-gray-50">
+                <tr key={action.id} className="hover:bg-gray-50 dark:hover:bg-slate-800">
                   <td className="px-4 py-3 text-sm">{action.action_type}</td>
                   <td className="px-4 py-3 text-sm max-w-md truncate">{action.description}</td>
                   <td className="px-4 py-3">
@@ -366,7 +366,7 @@ export default function AiCenterPage() {
                       action.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                       action.status === 'executed' ? 'bg-green-100 text-green-800' :
                       action.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
+                      'bg-gray-100 dark:bg-slate-800 text-gray-800'
                     }`}>
                       {action.status}
                     </span>
@@ -392,24 +392,24 @@ export default function AiCenterPage() {
       )}
 
       {activeTab === 'blocklist' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Tür</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Değer</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">Sebep</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Bitiş</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Tür</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Değer</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 hidden md:table-cell">Sebep</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">Bitiş</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {blocklist.map(entry => (
-                <tr key={entry.id} className="hover:bg-gray-50">
+                <tr key={entry.id} className="hover:bg-gray-50 dark:hover:bg-slate-800">
                   <td className="px-4 py-3 text-sm font-medium">{entry.block_type}</td>
                   <td className="px-4 py-3 text-sm font-mono">{entry.block_value}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{entry.reason || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400 hidden md:table-cell">{entry.reason || '-'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">
                     {entry.expires_at ? new Date(entry.expires_at).toLocaleString('tr-TR') : 'Kalıcı'}
                   </td>
                 </tr>
@@ -425,12 +425,12 @@ export default function AiCenterPage() {
 
 function StatusCard({ label, value, icon, color }: { label: string; value: number; icon: string; color: string }) {
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-4">
       <div className="flex items-center justify-between">
         <span className="text-2xl">{icon}</span>
         <span className={`text-2xl font-bold ${color}`}>{value}</span>
       </div>
-      <div className="text-sm text-gray-500 mt-1">{label}</div>
+      <div className="text-sm text-gray-500 dark:text-slate-400 mt-1">{label}</div>
     </div>
   );
 }
