@@ -8,6 +8,8 @@ pub struct Config {
     pub kafka_topic: String,
     pub hmac_secret: String,
     pub max_webhook_payload_bytes: usize,
+    pub jwt_secret: String,
+    pub retention_days: i64,
 }
 
 impl Config {
@@ -20,7 +22,9 @@ impl Config {
                 .parse()
                 .context("PORT must be a number")?,
             database_url: std::env::var("DATABASE_URL")
-                .unwrap_or_else(|_| "postgresql://root@localhost:26257/hookrelay?sslmode=disable".into()),
+                .unwrap_or_else(|_| {
+                    "postgresql://root@localhost:26257/hookrelay?sslmode=disable".into()
+                }),
             kafka_brokers: std::env::var("KAFKA_BROKERS")
                 .unwrap_or_else(|_| "localhost:9092".into()),
             kafka_topic: std::env::var("KAFKA_TOPIC")
@@ -31,6 +35,12 @@ impl Config {
                 .unwrap_or_else(|_| "1048576".into()) // 1MB
                 .parse()
                 .context("MAX_PAYLOAD_BYTES must be a number")?,
+            jwt_secret: std::env::var("JWT_SECRET")
+                .unwrap_or_else(|_| "change-me-jwt-secret-in-production".into()),
+            retention_days: std::env::var("RETENTION_DAYS")
+                .unwrap_or_else(|_| "30".into())
+                .parse()
+                .context("RETENTION_DAYS must be a number")?,
         })
     }
 }

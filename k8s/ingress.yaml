@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hookrelay-ingress
+  namespace: hookrelay
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.hookrelay.io
+        - dashboard.hookrelay.io
+      secretName: hookrelay-tls
+  rules:
+    - host: api.hookrelay.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hookrelay-api
+                port:
+                  number: 3000
+    - host: dashboard.hookrelay.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hookrelay-dashboard
+                port:
+                  number: 3001
