@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: '📊' },
@@ -22,7 +23,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -34,17 +35,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={clsx(
-          'fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-40 transition-transform duration-200 md:translate-x-0',
+          'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 z-40 transition-transform duration-200 md:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200">
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-800">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
             🪝
           </div>
           <div>
-            <div className="font-bold text-gray-900">Hookrelay</div>
-            <div className="text-xs text-gray-500">Webhook Dashboard</div>
+            <div className="font-bold text-gray-900 dark:text-white">Hookrelay</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Webhook Dashboard</div>
           </div>
         </div>
         <nav className="px-3 py-4 space-y-1">
@@ -58,8 +59,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
                   isActive
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400'
+                    : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                 )}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -68,34 +69,37 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+        <div className="absolute bottom-4 left-0 right-0 px-6">
+          <ThemeToggle className="w-full" />
+        </div>
       </aside>
 
       {/* Main content */}
       <div className="md:pl-64">
         {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
           <div className="flex items-center gap-3">
             {/* Mobile hamburger */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+              className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
               aria-label="Open sidebar"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-gray-900">
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
               {navigation.find((n) => n.href === pathname)?.name || 'Dashboard'}
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-500 hidden sm:block">
+            <div className="text-sm text-gray-500 dark:text-slate-400 hidden sm:block">
               {user?.email || 'User'}
             </div>
             <button
               onClick={() => { logout(); router.push('/login'); }}
-              className="text-sm text-gray-400 hover:text-red-600 transition"
+              className="text-sm text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
             >
               Logout
             </button>
@@ -103,7 +107,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="p-4 md:p-8">{children}</main>
+        <main className="p-4 md:p-8 page-enter">{children}</main>
       </div>
     </div>
   );
