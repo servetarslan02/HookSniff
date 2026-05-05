@@ -17,12 +17,12 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         r#"
         CREATE TABLE IF NOT EXISTS ai_events (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            event_type STRING NOT NULL,
-            severity STRING NOT NULL,
-            title STRING NOT NULL,
-            description STRING,
-            action_taken STRING,
-            target_type STRING,
+            event_type TEXT NOT NULL,
+            severity TEXT NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT,
+            action_taken TEXT,
+            target_type TEXT,
             target_id UUID,
             metadata JSONB,
             resolved BOOL DEFAULT false,
@@ -31,7 +31,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
 
         CREATE TABLE IF NOT EXISTS risk_scores (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            target_type STRING NOT NULL,
+            target_type TEXT NOT NULL,
             target_id UUID NOT NULL,
             score INT NOT NULL,
             factors JSONB,
@@ -40,31 +40,31 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
 
         CREATE TABLE IF NOT EXISTS ai_actions (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            action_type STRING NOT NULL,
-            description STRING NOT NULL,
-            target_type STRING,
+            action_type TEXT NOT NULL,
+            description TEXT NOT NULL,
+            target_type TEXT,
             target_id UUID,
-            status STRING NOT NULL DEFAULT 'pending',
-            risk_level STRING NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            risk_level TEXT NOT NULL,
             auto_approved BOOL DEFAULT false,
             executed_at TIMESTAMPTZ,
             rolled_back_at TIMESTAMPTZ,
-            created_by STRING DEFAULT 'ai',
+            created_by TEXT DEFAULT 'ai',
             metadata JSONB,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 
         CREATE TABLE IF NOT EXISTS ai_blocklist (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            block_type STRING NOT NULL,
-            block_value STRING NOT NULL,
-            reason STRING,
+            block_type TEXT NOT NULL,
+            block_value TEXT NOT NULL,
+            reason TEXT,
             expires_at TIMESTAMPTZ,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 
         CREATE TABLE IF NOT EXISTS ai_config (
-            key STRING PRIMARY KEY,
+            key TEXT PRIMARY KEY,
             value JSONB NOT NULL,
             updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
@@ -95,8 +95,8 @@ async fn run_agent_migration(pool: &PgPool) -> Result<()> {
         r#"
         CREATE TABLE IF NOT EXISTS ai_agents (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            name STRING NOT NULL UNIQUE,
-            description STRING,
+            name TEXT NOT NULL UNIQUE,
+            description TEXT,
             enabled BOOL DEFAULT true,
             config JSONB,
             created_at TIMESTAMPTZ DEFAULT now()
@@ -107,10 +107,10 @@ async fn run_agent_migration(pool: &PgPool) -> Result<()> {
             agent_id UUID REFERENCES ai_agents(id),
             delivery_id UUID,
             customer_id UUID,
-            trigger_reason STRING,
+            trigger_reason TEXT,
             actions_taken JSONB,
             confidence_score FLOAT,
-            ai_provider STRING,
+            ai_provider TEXT,
             latency_ms INT,
             created_at TIMESTAMPTZ DEFAULT now()
         );

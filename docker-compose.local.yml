@@ -1,0 +1,67 @@
+# HookRelay — Local Development (Basitleştirilmiş)
+# Kullanım: docker compose -f docker-compose.local.yml up
+#
+# 3 servis: PostgreSQL + API + Dashboard
+# Kafka, Temporal, CockroachDB yok — sade ve basit
+
+services:
+  # ── PostgreSQL (Veritabanı) ──
+  postgres:
+    image: postgres:16-alpine
+    container_name: hookrelay-db
+    environment:
+      POSTGRES_USER: hookrelay
+      POSTGRES_PASSWORD: hookrelay_local
+      POSTGRES_DB: hookrelay
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hookrelay -d hookrelay"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # ── HookRelay API ──
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: hookrelay-api
+    ports:
+      - "3000:3000"
+    environment:
+      APP_ENV: development
+      PORT: "3000"
+      DATABASE_URL: "postgresql://hookrelay:hookrelay_local@postgres:5432/hookrelay?sslmode=disable"
+      HMAC_SECRET: "local-dev-hmac-secret-not-for-production"
+      JWT_SECRET: "local-dev-jwt-secret-not-for-production"
+      RUST_LOG: "info,hookrelay=debug"
+      MAX_PAYLOAD_BYTES: "1048576"
+      RETENTION_DAYS: "30"
+      WEBHOOK_FORMAT: "standard"
+      WEBHOOK_TIMESTAMP_TOLERANCE_SECS: "300"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Dashboard (Next.js) ──
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: hookrelay-dashboard
+    ports:
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:3000/v1"
+      PORT: "3001"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  pgdata:

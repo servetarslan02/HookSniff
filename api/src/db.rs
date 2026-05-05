@@ -17,7 +17,7 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
 async fn ensure_migrations_table(pool: &PgPool) -> Result<()> {
     sqlx::query(
         "CREATE TABLE IF NOT EXISTS _migrations (
-            name STRING PRIMARY KEY,
+            name TEXT PRIMARY KEY,
             applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
         )",
     )
@@ -69,10 +69,10 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         r#"
         CREATE TABLE IF NOT EXISTS customers (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            email STRING NOT NULL UNIQUE,
-            api_key_hash STRING NOT NULL,
-            api_key_prefix STRING NOT NULL,
-            plan STRING NOT NULL DEFAULT 'free',
+            email TEXT NOT NULL UNIQUE,
+            api_key_hash TEXT NOT NULL,
+            api_key_prefix TEXT NOT NULL,
+            plan TEXT NOT NULL DEFAULT 'free',
             webhook_limit INT NOT NULL DEFAULT 1000,
             webhook_count INT NOT NULL DEFAULT 0,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -81,10 +81,10 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         CREATE TABLE IF NOT EXISTS endpoints (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-            url STRING NOT NULL,
-            description STRING,
+            url TEXT NOT NULL,
+            description TEXT,
             is_active BOOL NOT NULL DEFAULT true,
-            signing_secret STRING NOT NULL,
+            signing_secret TEXT NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 
@@ -93,13 +93,13 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
             endpoint_id UUID NOT NULL REFERENCES endpoints(id) ON DELETE CASCADE,
             customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
             payload JSONB NOT NULL,
-            event_type STRING,
-            status STRING NOT NULL DEFAULT 'pending',
+            event_type TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
             attempt_count INT NOT NULL DEFAULT 0,
             max_attempts INT NOT NULL DEFAULT 3,
             last_attempt_at TIMESTAMPTZ,
             response_status INT,
-            response_body STRING,
+            response_body TEXT,
             next_retry_at TIMESTAMPTZ,
             replay_count INT NOT NULL DEFAULT 0,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -110,9 +110,9 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
             delivery_id UUID NOT NULL REFERENCES deliveries(id) ON DELETE CASCADE,
             attempt_number INT NOT NULL,
             status_code INT,
-            response_body STRING,
+            response_body TEXT,
             duration_ms INT,
-            error_message STRING,
+            error_message TEXT,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 
@@ -124,13 +124,13 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
             endpoint_id UUID NOT NULL REFERENCES endpoints(id),
             customer_id UUID NOT NULL REFERENCES customers(id),
             payload JSONB NOT NULL,
-            reason STRING,
+            reason TEXT,
             attempts INT NOT NULL DEFAULT 0,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 
         CREATE TABLE IF NOT EXISTS idempotency_keys (
-            key STRING PRIMARY KEY,
+            key TEXT PRIMARY KEY,
             customer_id UUID NOT NULL REFERENCES customers(id),
             response_body JSONB NOT NULL,
             status_code INT NOT NULL,
@@ -191,7 +191,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         pool,
         "006_routing",
         r#"
-        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS routing_strategy STRING NOT NULL DEFAULT 'round-robin';
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS routing_strategy TEXT NOT NULL DEFAULT 'round-robin';
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fallback_url STRING;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS avg_response_ms INT NOT NULL DEFAULT 0;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS failure_streak INT NOT NULL DEFAULT 0;
@@ -226,7 +226,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         r#"
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS throttle_rate INT;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS throttle_period_secs INT DEFAULT 60;
-        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS throttle_strategy STRING DEFAULT 'sliding_window';
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS throttle_strategy TEXT DEFAULT 'sliding_window';
         "#,
     )
     .await?;
