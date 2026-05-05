@@ -1,7 +1,9 @@
 //! HTTP webhook delivery — the original and default delivery method.
 //!
-//! Delivers events via HTTP POST with HMAC-SHA256 signature, custom headers,
-//! and standard HookRelay headers.
+//! Delivers events via HTTP POST with Standard Webhooks headers
+//! (webhook-id, webhook-timestamp, webhook-signature) and HMAC-SHA256
+//! signature. Falls back to legacy `X-Hookrelay-Signature` header for
+//! backward compatibility.
 
 use anyhow::Result;
 use reqwest::Client;
@@ -15,21 +17,38 @@ use super::DeliveryResult;
 
 /// Deliver a webhook via HTTP POST.
 ///
-/// Generates an HMAC signature, attaches standard HookRelay headers,
-/// and sends the request. Returns a `DeliveryResult` with the HTTP
-/// status code, response body, and timing information.
+/// Generates a Standard Webhooks HMAC-SHA256 signature, attaches
+/// standard headers (`webhook-id`, `webhook-timestamp`,
+/// `webhook-signature`), and sends the request. Also attaches
+/// legacy `X-Hookrelay-Signature` for backward compatibility.
 pub async fn deliver_http(
     http_client: &Client,
     webhook: &WebhookMessage,
 ) -> Result<DeliveryResult> {
-    let signature = signing::compute_hmac(&webhook.signing_secret, &webhook.payload);
+    let timestamp = chrono::Utc::now().timestamp().to_string();
+
+    // Standard Webhooks signature: v1,<base64(hmac)>
+    let standard_sig = signing::compute_standard_signature(
+        &webhook.signing_secret,
+        &webhook.delivery_id,
+        &timestamp,
+        &webhook.payload,
+    );
+
+    // Legacy hex signature for backward compat
+    let legacy_sig = signing::compute_hmac(&webhook.signing_secret, &webhook.payload);
 
     let start = std::time::Instant::now();
 
     let mut req_builder = http_client
         .post(&webhook.endpoint_url)
         .header("Content-Type", "application/json")
-        .header("X-Hookrelay-Signature", format!("sha256={}", signature))
+        // Standard Webhooks headers
+        .header("webhook-id", &webhook.delivery_id)
+        .header("webhook-timestamp", &timestamp)
+        .header("webhook-signature", &standard_sig)
+        // Legacy headers (backward compat)
+        .header("X-Hookrelay-Signature", format!("sha256={}", legacy_sig))
         .header("X-Hookrelay-Delivery-Id", &webhook.delivery_id)
         .header("X-Hookrelay-Attempt", "1")
         .body(webhook.payload.clone());

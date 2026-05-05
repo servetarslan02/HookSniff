@@ -230,7 +230,7 @@ async fn list_executions(
 }
 
 /// Test an agent with a sample payload.
-/// This doesn't persist results — it's a dry run.
+/// Proxies the request to the AI center's HTTP API.
 async fn test_agent(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -247,70 +247,99 @@ async fn test_agent(
 
     let agent_name = agent_row.0;
 
-    // Build a test context from the request
-    let payload_str = serde_json::to_string(&req.payload).unwrap_or_default();
-    let context = crate::agents::context::WebhookContext {
-        delivery_id: Uuid::new_v4(),
-        endpoint_id: Uuid::new_v4(),
-        endpoint_url: req
-            .endpoint_url
-            .unwrap_or_else(|| "https://test.example.com/webhook".to_string()),
-        customer_id: customer.id,
-        method: "POST".to_string(),
-        status_code: 200,
-        response_body: None,
-        duration_ms: 100,
-        payload: payload_str,
-        payload_json: Some(req.payload),
-        event_type: req.event_type,
-        attempt_number: 1,
-        recent_deliveries: Vec::new(),
-        customer_metadata: None,
-        created_at: chrono::Utc::now(),
-    };
+    // Get the AI center URL
+    let ai_center_url = std::env::var("AI_CENTER_URL")
+        .unwrap_or_else(|_| "http://localhost:8081".to_string());
 
-    // Build the appropriate agent and run it
-    let agent: Box<dyn crate::agents::WebhookAgent> = match agent_name.as_str() {
-        "churn_detector" => Box::new(crate::agents::builtin::churn_detector::ChurnDetector::new()),
-        "fraud_detector" => Box::new(crate::agents::builtin::fraud_detector::FraudDetector::new()),
-        "inventory_optimizer" => {
-            Box::new(crate::agents::builtin::inventory_optimizer::InventoryOptimizer::new())
+    // Build the test payload to send to the AI center
+    let test_payload = serde_json::json!({
+        "delivery_id": Uuid::new_v4().to_string(),
+        "endpoint_id": Uuid::new_v4().to_string(),
+        "endpoint_url": req.endpoint_url.unwrap_or_else(|| "https://test.example.com/webhook".to_string()),
+        "customer_id": customer.id.to_string(),
+        "payload": serde_json::to_string(&req.payload).unwrap_or_default(),
+        "event_type": req.event_type,
+        "status_code": 200,
+        "response_body": null,
+        "duration_ms": 100,
+        "attempt_number": 1,
+    });
+
+    // Call the AI center's trigger endpoint
+    let client = reqwest::Client::new();
+    let url = format!("{}/v1/agents/trigger", ai_center_url);
+
+    match client
+        .post(&url)
+        .json(&test_payload)
+        .timeout(std::time::Duration::from_secs(30))
+        .send()
+        .await
+    {
+        Ok(response) => {
+            if response.status().is_success() {
+                let body: serde_json::Value = response.json().await.unwrap_or_default();
+
+                // Find the result for the requested agent
+                let results = body
+                    .get("results")
+                    .and_then(|v| v.as_array())
+                    .cloned()
+                    .unwrap_or_default();
+
+                let agent_result = results
+                    .iter()
+                    .find(|r| r.get("agent_name").and_then(|v| v.as_str()) == Some(&agent_name));
+
+                if let Some(result) = agent_result {
+                    Ok(Json(TestAgentResponse {
+                        agent_name: result
+                            .get("agent_name")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or(&agent_name)
+                            .to_string(),
+                        triggered: true,
+                        actions: result
+                            .get("actions")
+                            .and_then(|v| v.as_array())
+                            .cloned()
+                            .unwrap_or_default(),
+                        confidence_score: result
+                            .get("confidence_score")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(0.0),
+                        summary: result
+                            .get("summary")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("No summary")
+                            .to_string(),
+                        latency_ms: result
+                            .get("latency_ms")
+                            .and_then(|v| v.as_u64())
+                            .unwrap_or(0),
+                    }))
+                } else {
+                    Ok(Json(TestAgentResponse {
+                        agent_name,
+                        triggered: false,
+                        actions: Vec::new(),
+                        confidence_score: 0.0,
+                        summary: "Agent not triggered by this event type".to_string(),
+                        latency_ms: 0,
+                    }))
+                }
+            } else {
+                Err(AppError::Internal(anyhow::anyhow!(
+                    "AI center returned HTTP {}",
+                    response.status()
+                )))
+            }
         }
-        "customer_segmenter" => {
-            Box::new(crate::agents::builtin::customer_segmenter::CustomerSegmenter::new())
-        }
-        _ => {
-            return Err(AppError::BadRequest(format!(
-                "Agent '{}' does not support test mode",
-                agent_name
-            )));
-        }
-    };
-
-    let triggered = agent.should_trigger(&context);
-    let result = if triggered {
-        agent.execute(&context).await.map_err(AppError::Internal)?
-    } else {
-        crate::agents::result::AgentResult::no_action(
-            &agent_name,
-            "Agent not triggered by this event type",
-        )
-    };
-
-    let actions_json: Vec<serde_json::Value> = result
-        .actions
-        .iter()
-        .map(|a| serde_json::to_value(a).unwrap_or_default())
-        .collect();
-
-    Ok(Json(TestAgentResponse {
-        agent_name: result.agent_name,
-        triggered,
-        actions: actions_json,
-        confidence_score: result.confidence_score,
-        summary: result.summary,
-        latency_ms: result.latency_ms,
-    }))
+        Err(e) => Err(AppError::Internal(anyhow::anyhow!(
+            "Failed to reach AI center: {}",
+            e
+        ))),
+    }
 }
 
 /// Update agent configuration for a specific customer.

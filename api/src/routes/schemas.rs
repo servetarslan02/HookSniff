@@ -16,12 +16,13 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::models::customer::Customer;
 use crate::schemas::registry::SchemaRegistry;
 use crate::schemas::{RegisterSchemaRequest, ValidateEventRequest};
 
 pub fn router() -> Router {
     Router::new()
-        .route("/", post(register_schema).list(list_schemas))
+        .route("/", get(list_schemas).post(register_schema))
         .route("/{id}", get(get_schema))
         .route("/{id}/validate", post(validate_event))
 }
@@ -29,7 +30,7 @@ pub fn router() -> Router {
 /// POST /v1/schemas — Register a new schema.
 async fn register_schema(
     Extension(pool): Extension<PgPool>,
-    Extension(customer_id): Extension<Uuid>,
+    Extension(customer): Extension<Customer>,
     Json(request): Json<RegisterSchemaRequest>,
 ) -> Result<Json<Value>, AppError> {
     let registry = SchemaRegistry::new(pool);
@@ -39,7 +40,7 @@ async fn register_schema(
     }
 
     let schema = registry
-        .register(customer_id, request)
+        .register(customer.id, request)
         .await
         .map_err(|e| AppError::BadRequest(e.to_string()))?;
 
@@ -55,11 +56,11 @@ async fn register_schema(
 /// GET /v1/schemas — List all schemas for the customer.
 async fn list_schemas(
     Extension(pool): Extension<PgPool>,
-    Extension(customer_id): Extension<Uuid>,
+    Extension(customer): Extension<Customer>,
 ) -> Result<Json<Value>, AppError> {
     let registry = SchemaRegistry::new(pool);
 
-    let schemas = registry.list(customer_id).await?;
+    let schemas = registry.list(customer.id).await?;
 
     let items: Vec<Value> = schemas
         .into_iter()
