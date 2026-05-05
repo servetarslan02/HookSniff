@@ -17,6 +17,16 @@ import type {
   RiskScore,
   AiAction,
   AiProvider,
+  WebhookPayload,
+  OrderCreatedPayload,
+  OrderCompletedPayload,
+  PaymentFailedPayload,
+  PaymentSucceededPayload,
+  UserRegisteredPayload,
+  UserUpdatedPayload,
+  InvoiceCreatedPayload,
+  WebhookHandlerOptions,
+  WebhookVerificationResult,
 } from "./types";
 
 export type {
@@ -36,6 +46,16 @@ export type {
   RiskScore,
   AiAction,
   AiProvider,
+  WebhookPayload,
+  OrderCreatedPayload,
+  OrderCompletedPayload,
+  PaymentFailedPayload,
+  PaymentSucceededPayload,
+  UserRegisteredPayload,
+  UserUpdatedPayload,
+  InvoiceCreatedPayload,
+  WebhookHandlerOptions,
+  WebhookVerificationResult,
 };
 
 class HookRelayError extends Error {
@@ -538,4 +558,155 @@ export class HookRelay {
       endpointsCount: resp.endpoints_count,
     };
   }
+}
+
+/**
+ * Verify a webhook signature from an incoming request.
+ *
+ * This is a higher-level convenience wrapper around `verifySignature` that
+ * handles common edge cases and returns a structured result.
+ *
+ * @param payload - The raw request body as a string
+ * @param signature - The signature header value (e.g., "sha256=abc123...")
+ * @param secret - The endpoint's signing secret (starts with "whsec_")
+ * @returns A WebhookVerificationResult with valid flag and parsed payload
+ *
+ * @example
+ * ```typescript
+ * import { verifyWebhookSignature } from '@hookrelay/sdk';
+ *
+ * app.post('/webhook', express.raw({ type: '*/*' }), (req, res) => {
+ *   const result = verifyWebhookSignature(
+ *     req.body.toString(),
+ *     req.headers['x-hookrelay-signature'],
+ *     'whsec_...'
+ *   );
+ *
+ *   if (!result.valid) {
+ *     return res.status(401).json({ error: result.error });
+ *   }
+ *
+ *   console.log('Event:', result.payload.event);
+ *   res.status(200).json({ received: true });
+ * });
+ * ```
+ */
+export function verifyWebhookSignature(
+  payload: string,
+  signature: string | undefined,
+  secret: string
+): WebhookVerificationResult {
+  if (!signature) {
+    return { valid: false, error: "Missing signature header" };
+  }
+
+  if (!secret) {
+    return { valid: false, error: "Missing signing secret" };
+  }
+
+  if (!payload) {
+    return { valid: false, error: "Missing request body" };
+  }
+
+  const isValid = verifySignature(payload, signature, secret);
+  if (!isValid) {
+    return { valid: false, error: "Invalid signature" };
+  }
+
+  try {
+    const parsed = JSON.parse(payload) as WebhookPayload;
+    return { valid: true, payload: parsed };
+  } catch {
+    return { valid: false, error: "Invalid JSON payload" };
+  }
+}
+
+/**
+ * Create a webhook handler middleware for Express, Fastify, or generic HTTP servers.
+ *
+ * Handles signature verification, event routing, and error handling.
+ *
+ * @param options - Configuration for the webhook handler
+ * @returns A request handler function
+ *
+ * @example
+ * ```typescript
+ * import express from 'express';
+ * import { createWebhookHandler } from '@hookrelay/sdk';
+ *
+ * const app = express();
+ *
+ * // Use raw body for signature verification
+ * app.post('/webhooks', express.raw({ type: '*/*' }), createWebhookHandler({
+ *   secret: 'whsec_...',
+ *   handlers: {
+ *     'order.created': async (payload) => {
+ *       console.log('New order:', payload.data);
+ *     },
+ *     'payment.failed': async (payload) => {
+ *       console.log('Payment failed:', payload.data);
+ *     },
+ *   },
+ *   onEvent: async (payload) => {
+ *     console.log('Unhandled event:', payload.event);
+ *   },
+ * }));
+ * ```
+ */
+export function createWebhookHandler(options: WebhookHandlerOptions) {
+  const {
+    secret,
+    handlers = {},
+    onEvent,
+    signatureHeader = "x-hookrelay-signature",
+  } = options;
+
+  return async function webhookHandler(
+    req: { body: string | Buffer; headers: Record<string, string | undefined> },
+    res: {
+      status: (code: number) => { json: (body: unknown) => void };
+    },
+    next?: (err?: Error) => void
+  ) {
+    try {
+      const body =
+        typeof req.body === "string" ? req.body : req.body.toString("utf-8");
+      const signature = req.headers[signatureHeader.toLowerCase()];
+
+      const result = verifyWebhookSignature(body, signature, secret);
+
+      if (!result.valid) {
+        res.status(401).json({
+          error: {
+            code: "INVALID_SIGNATURE",
+            message: result.error || "Webhook signature verification failed",
+          },
+        });
+        return;
+      }
+
+      const payload = result.payload!;
+
+      // Route to specific handler
+      const handler = handlers[payload.event];
+      if (handler) {
+        await handler(payload);
+      } else if (onEvent) {
+        await onEvent(payload);
+      }
+
+      res.status(200).json({ received: true });
+    } catch (err) {
+      if (next) {
+        next(err instanceof Error ? err : new Error(String(err)));
+      } else {
+        res.status(500).json({
+          error: {
+            code: "HANDLER_ERROR",
+            message: "Internal webhook handler error",
+          },
+        });
+      }
+    }
+  };
 }
