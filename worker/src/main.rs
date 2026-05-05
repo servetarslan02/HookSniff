@@ -9,6 +9,7 @@ use tracing_subscriber::EnvFilter;
 pub(crate) mod activities;
 pub(crate) mod config;
 pub mod delivery;
+pub mod fanout;
 pub(crate) mod retry_scheduler;
 pub(crate) mod signing;
 pub(crate) mod workflows;
