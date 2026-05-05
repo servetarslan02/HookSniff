@@ -6,19 +6,19 @@ use rdkafka::producer::FutureProducer;
 use serde::{Deserialize, Serialize};
 use tracing_subscriber::EnvFilter;
 
-mod activities;
-mod config;
-mod delivery;
-mod retry_scheduler;
-mod signing;
-mod workflows;
+pub(crate) mod activities;
+pub(crate) mod config;
+pub mod delivery;
+pub(crate) mod retry_scheduler;
+pub(crate) mod signing;
+pub(crate) mod workflows;
 
 use activities::HookRelayActivities;
 use workflows::{RetryPolicy, WebhookDeliveryInput, WebhookDeliveryWorkflow};
 
 /// Message format coming from the Kafka topic.
 #[derive(Debug, Deserialize, Serialize)]
-struct WebhookMessage {
+pub struct WebhookMessage {
     delivery_id: String,
     endpoint_id: String,
     endpoint_url: String,

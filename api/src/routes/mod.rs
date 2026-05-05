@@ -1,4 +1,5 @@
 pub mod ai_center;
+pub mod analytics;
 pub mod auth;
 pub mod docs;
 pub mod endpoints;
@@ -17,6 +18,7 @@ pub fn api_router() -> Router {
         .nest("/stats", stats::router())
         .nest("/ai", ai_center::router())
         .nest("/routing", routing::router())
+        .nest("/analytics", analytics::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Dashboard routes use JWT auth (separate from API key auth)
