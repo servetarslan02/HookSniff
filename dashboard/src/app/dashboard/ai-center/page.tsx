@@ -92,11 +92,11 @@ export default function AiCenterPage() {
   async function loadData() {
     try {
       const [statusRes, eventsRes, risksRes, actionsRes, blockRes] = await Promise.all([
-        api.get('/ai/status'),
-        api.get('/ai/events?limit=100'),
-        api.get('/ai/risks'),
-        api.get('/ai/actions'),
-        api.get('/ai/blocklist'),
+        api.get<AiStatus>('/ai/status'),
+        api.get<AiEvent[]>('/ai/events?limit=100'),
+        api.get<RiskScore[]>('/ai/risks'),
+        api.get<AiAction[]>('/ai/actions'),
+        api.get<BlocklistEntry[]>('/ai/blocklist'),
       ]);
       setStatus(statusRes.data);
       setEvents(eventsRes.data);
