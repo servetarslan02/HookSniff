@@ -201,6 +201,36 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 8: Migration 007 — FIFO ordering
+    run_migration(
+        pool,
+        "007_fifo_ordering",
+        r#"
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fifo_enabled BOOL DEFAULT false;
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fifo_sequence BIGINT DEFAULT 0;
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fifo_group_by_customer BOOL DEFAULT false;
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fifo_max_wait_secs INT DEFAULT 300;
+        ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS sequence_num BIGINT;
+        ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS fifo_group_id STRING;
+        CREATE INDEX IF NOT EXISTS idx_deliveries_fifo
+            ON deliveries(endpoint_id, sequence_num)
+            WHERE status = 'pending' AND sequence_num IS NOT NULL;
+        "#,
+    )
+    .await?;
+
+    // Step 9: Migration 008 — per-endpoint throttling
+    run_migration(
+        pool,
+        "008_endpoint_throttling",
+        r#"
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS throttle_rate INT;
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS throttle_period_secs INT DEFAULT 60;
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS throttle_strategy STRING DEFAULT 'sliding_window';
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }

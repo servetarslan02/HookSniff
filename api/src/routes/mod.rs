@@ -5,6 +5,7 @@ pub mod analytics;
 pub mod api_keys;
 pub mod auth;
 pub mod billing;
+pub mod customer_portal;
 pub mod delivery_details;
 pub mod docs;
 pub mod endpoints;
@@ -41,6 +42,7 @@ pub fn api_router() -> Router {
         .nest("/marketplace/agents", marketplace::router())
         .nest("/schemas", schemas::router())
         .nest("/billing", billing::router())
+        .nest("/portal", customer_portal::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     Router::new()
