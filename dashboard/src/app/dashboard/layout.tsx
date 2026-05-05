@@ -10,9 +10,16 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: '📊' },
-  { name: 'AI Merkezi', href: '/dashboard/ai-center', icon: '🧠' },
   { name: 'Endpoints', href: '/dashboard/endpoints', icon: '🔗' },
   { name: 'Deliveries', href: '/dashboard/deliveries', icon: '📦' },
+  { name: 'Search', href: '/dashboard/search', icon: '🔍' },
+  { name: 'Health', href: '/dashboard/health', icon: '💓' },
+  { name: 'Alerts', href: '/dashboard/alerts', icon: '🔔' },
+  { name: 'API Keys', href: '/dashboard/api-keys', icon: '🔑' },
+  { name: 'Playground', href: '/dashboard/playground', icon: '🧪' },
+  { name: 'Analytics', href: '/dashboard/analytics', icon: '📈' },
+  { name: 'AI Center', href: '/dashboard/ai-center', icon: '🧠' },
+  { name: 'Billing', href: '/dashboard/billing', icon: '💳' },
   { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
 ];
 

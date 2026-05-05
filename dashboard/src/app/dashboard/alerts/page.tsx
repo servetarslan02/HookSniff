@@ -1,0 +1,249 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/lib/store';
+
+interface AlertRule {
+  id: string;
+  name: string;
+  condition: string;
+  threshold: number;
+  channels: string[];
+  is_active: boolean;
+  created_at: string;
+}
+
+const CONDITION_LABELS: Record<string, string> = {
+  failure_rate: 'Failure Rate >',
+  latency: 'Avg Latency >',
+  consecutive_failures: 'Consecutive Failures >',
+};
+
+const CHANNEL_ICONS: Record<string, string> = {
+  slack: '💬',
+  email: '📧',
+  webhook: '🔗',
+};
+
+export default function AlertsPage() {
+  const { token } = useAuth();
+  const [alerts, setAlerts] = useState<AlertRule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    condition: 'failure_rate',
+    threshold: 10,
+    channels: ['email'] as string[],
+  });
+
+  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+
+  const fetchAlerts = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/alerts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setAlerts(await res.json());
+    } catch (e) {
+      console.error('Failed to fetch alerts:', e);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, API]);
+
+  useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
+
+  const createAlert = async () => {
+    setCreating(true);
+    try {
+      const res = await fetch(`${API}/alerts`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setShowCreate(false);
+        setForm({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] });
+        fetchAlerts();
+      }
+    } catch (e) {
+      console.error('Failed to create alert:', e);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const deleteAlert = async (id: string) => {
+    if (!confirm('Delete this alert rule?')) return;
+    try {
+      await fetch(`${API}/alerts/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchAlerts();
+    } catch (e) {
+      console.error('Failed to delete alert:', e);
+    }
+  };
+
+  const testAlert = async (id: string) => {
+    try {
+      await fetch(`${API}/alerts/${id}/test`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert('Test notification sent! Check your channels.');
+    } catch (e) {
+      console.error('Failed to test alert:', e);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Alert Rules</h1>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">
+            Get notified when webhooks fail or endpoints have issues.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowCreate(!showCreate)}
+          className="px-4 py-2 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition"
+        >
+          {showCreate ? 'Cancel' : '+ New Alert'}
+        </button>
+      </div>
+
+      {/* Create Form */}
+      {showCreate && (
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create Alert</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g., High failure rate alert"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Condition</label>
+              <select
+                value={form.condition}
+                onChange={(e) => setForm({ ...form, condition: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+              >
+                <option value="failure_rate">Failure Rate (%)</option>
+                <option value="latency">Avg Latency (ms)</option>
+                <option value="consecutive_failures">Consecutive Failures</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Threshold</label>
+              <input
+                type="number"
+                value={form.threshold}
+                onChange={(e) => setForm({ ...form, threshold: parseInt(e.target.value) || 0 })}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Channels</label>
+              <div className="flex gap-2">
+                {['slack', 'email', 'webhook'].map((ch) => (
+                  <button
+                    key={ch}
+                    onClick={() => {
+                      setForm({
+                        ...form,
+                        channels: form.channels.includes(ch)
+                          ? form.channels.filter((c) => c !== ch)
+                          : [...form.channels, ch],
+                      });
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                      form.channels.includes(ch)
+                        ? 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 border border-brand-300 dark:border-brand-500/30'
+                        : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-300 dark:border-slate-600'
+                    }`}
+                  >
+                    {CHANNEL_ICONS[ch]} {ch}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={createAlert}
+              disabled={creating || !form.name}
+              className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
+            >
+              {creating ? 'Creating...' : 'Create Alert'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Alert List */}
+      <div className="glass-card overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center text-gray-400 dark:text-slate-500">Loading...</div>
+        ) : alerts.length === 0 ? (
+          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
+            No alert rules yet. Create one to get notified about webhook failures.
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100 dark:divide-slate-800">
+            {alerts.map((alert) => (
+              <div key={alert.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{alert.name}</h3>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      alert.is_active
+                        ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
+                        : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'
+                    }`}>
+                      {alert.is_active ? 'Active' : 'Paused'}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                    {CONDITION_LABELS[alert.condition] || alert.condition} {alert.threshold}
+                    {alert.condition === 'failure_rate' && '%'}
+                    {alert.condition === 'latency' && 'ms'}
+                    {' · '}
+                    {alert.channels.map((ch) => CHANNEL_ICONS[ch] || ch).join(' ')}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => testAlert(alert.id)}
+                    className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition"
+                  >
+                    Test
+                  </button>
+                  <button
+                    onClick={() => deleteAlert(alert.id)}
+                    className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/30 rounded-lg transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
