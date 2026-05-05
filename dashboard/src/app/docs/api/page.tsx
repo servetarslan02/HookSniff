@@ -1,14 +1,14 @@
 export default function ApiReferencePage() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-2">API Reference</h1>
-      <p className="text-lg text-gray-600 mb-8">
-        Complete reference for the Hookrelay REST API. Base URL: <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm">https://api.hookrelay.io/v1</code>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">API Reference</h1>
+      <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
+        Complete reference for the Hookrelay REST API. Base URL: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">https://api.hookrelay.io/v1</code>
       </p>
 
       {/* Endpoints API */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Endpoints</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Endpoints</h2>
 
         <ApiMethod
           method="GET"
@@ -53,7 +53,7 @@ export default function ApiReferencePage() {
 
       {/* Webhooks API */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Webhooks</h2>
 
         <ApiMethod
           method="POST"
@@ -126,7 +126,7 @@ export default function ApiReferencePage() {
 
       {/* Stats API */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Stats</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Stats</h2>
 
         <ApiMethod
           method="GET"
@@ -145,14 +145,14 @@ export default function ApiReferencePage() {
 
       {/* Error Codes */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Error Codes</h2>
-        <div className="overflow-hidden rounded-xl border border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Error Codes</h2>
+        <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700">Code</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700">Meaning</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Code</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Meaning</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Description</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -166,9 +166,9 @@ export default function ApiReferencePage() {
           </table>
         </div>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Error Response Format</h3>
-          <pre className="text-sm font-mono text-gray-700">
+        <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-950 rounded-xl">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Error Response Format</h3>
+          <pre className="text-sm font-mono text-gray-700 dark:text-slate-300">
 {`{
   "error": {
     "code": "rate_limited",
@@ -203,24 +203,24 @@ function ApiMethod({
   };
 
   return (
-    <div className="mb-8 p-6 border border-gray-200 rounded-xl">
+    <div className="mb-8 p-6 border border-gray-200 dark:border-slate-700 rounded-xl">
       <div className="flex items-center gap-3 mb-3">
         <span className={`px-2 py-0.5 rounded text-xs font-bold ${methodColors[method] || ''}`}>
           {method}
         </span>
-        <code className="font-mono text-sm text-gray-900">{path}</code>
+        <code className="font-mono text-sm text-gray-900 dark:text-white">{path}</code>
       </div>
-      <p className="text-sm text-gray-600 mb-4">{description}</p>
+      <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{description}</p>
       {request && (
         <div className="mb-3">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Request</h4>
+          <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">Request</h4>
           <pre className="bg-gray-900 text-green-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">
             {request}
           </pre>
         </div>
       )}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Response</h4>
+        <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">Response</h4>
         <pre className="bg-gray-900 text-green-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">
           {response}
         </pre>

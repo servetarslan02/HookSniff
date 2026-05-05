@@ -1,8 +1,8 @@
 export default function SdksPage() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-2">SDK Documentation</h1>
-      <p className="text-lg text-gray-600 mb-8">
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">SDK Documentation</h1>
+      <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Official SDKs for Python and Node.js. Install via your package manager and start sending webhooks in seconds.
       </p>
 
@@ -10,15 +10,15 @@ export default function SdksPage() {
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-3xl">🐍</span>
-          <h2 className="text-2xl font-bold text-gray-900">Python SDK</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Python SDK</h2>
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Installation</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Installation</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
 {`pip install hookrelay`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Start</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Start</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import hookrelay
 import os
@@ -48,7 +48,7 @@ print(f"Delivery ID: {delivery.id}")
 print(f"Status: {delivery.status}")`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Verify Signatures (Flask)</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Verify Signatures (Flask)</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`from flask import Flask, request, abort
 import hookrelay
@@ -70,7 +70,7 @@ def handle_webhook():
     return "", 200`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Error Handling</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Error Handling</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
 {`import hookrelay
 
@@ -93,15 +93,15 @@ except hookrelay.HookRelayError as e:
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-3xl">📦</span>
-          <h2 className="text-2xl font-bold text-gray-900">Node.js SDK</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Node.js SDK</h2>
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Installation</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Installation</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
 {`npm install @hookrelay/sdk`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Start</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Start</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import { HookRelay } from '@hookrelay/sdk';
 
@@ -128,7 +128,7 @@ const delivery = await hr.webhooks.send({
 console.log('Delivery:', delivery.id, delivery.status);`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Verify Signatures (Express)</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Verify Signatures (Express)</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import express from 'express';
 import { verifySignature } from '@hookrelay/sdk';
@@ -148,7 +148,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 });`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">TypeScript Support</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">TypeScript Support</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
 {`import type { Endpoint, Delivery, WebhookEvent } from '@hookrelay/sdk';
 
@@ -164,8 +164,8 @@ const delivery: Delivery = await hr.webhooks.send({
 
       {/* Community SDKs */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Community SDKs</h2>
-        <p className="text-gray-600 mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Community SDKs</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">
           Community-maintained SDKs are available for other languages. These are not officially supported but are actively maintained.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -175,18 +175,18 @@ const delivery: Delivery = await hr.webhooks.send({
             { lang: 'PHP', pkg: 'composer require hookrelay/hookrelay-php', status: 'Beta' },
             { lang: 'Rust', pkg: 'cargo add hookrelay', status: 'Alpha' },
           ].map((sdk) => (
-            <div key={sdk.lang} className="p-4 border border-gray-200 rounded-xl">
+            <div key={sdk.lang} className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-gray-900">{sdk.lang}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{sdk.lang}</span>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                   sdk.status === 'Stable' ? 'bg-green-50 text-green-700' :
                   sdk.status === 'Beta' ? 'bg-yellow-50 text-yellow-700' :
-                  'bg-gray-100 text-gray-600'
+                  'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400'
                 }`}>
                   {sdk.status}
                 </span>
               </div>
-              <code className="text-xs font-mono text-gray-600">{sdk.pkg}</code>
+              <code className="text-xs font-mono text-gray-600 dark:text-slate-400">{sdk.pkg}</code>
             </div>
           ))}
         </div>

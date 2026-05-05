@@ -88,18 +88,18 @@ export default function BillingPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-gray-900">Billing</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Billing</h1>
 
       {/* Current Usage */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Current Usage</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Usage</h2>
         <div className="flex items-center gap-6">
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600">Webhooks this month</span>
+              <span className="text-gray-600 dark:text-slate-400">Webhooks this month</span>
               <span className="font-medium">{usageCount.toLocaleString()} / {usageLimit.toLocaleString()}</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
               <div
                 className={clsx(
                   'h-3 rounded-full transition-all',
@@ -110,21 +110,21 @@ export default function BillingPage() {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-gray-900">{usagePercent}%</div>
-            <div className="text-sm text-gray-500">used</div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">{usagePercent}%</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400">used</div>
           </div>
         </div>
       </div>
 
       {/* Monthly Chart */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Monthly Usage</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Monthly Usage</h2>
         <UsageChart data={monthlyUsage} />
       </div>
 
       {/* Plans */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Plans</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((plan) => {
             const isCurrent = plan.name.toLowerCase() === currentPlan;
@@ -137,25 +137,25 @@ export default function BillingPage() {
                 )}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 text-white px-3 py-0.5 rounded-full text-xs font-medium">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-3 py-0.5 rounded-full text-xs font-medium">
                     Most Popular
                   </div>
                 )}
-                <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
                 <div className="mt-2 mb-4">
-                  <span className="text-3xl font-bold text-gray-900">${plan.price}</span>
-                  <span className="text-gray-500 text-sm">{plan.period}</span>
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
+                  <span className="text-gray-500 dark:text-slate-400 text-sm">{plan.period}</span>
                 </div>
-                <p className="text-sm text-gray-500 mb-4">{plan.limit}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{plan.limit}</p>
                 <ul className="space-y-2 mb-6">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
+                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
                       <span className="text-green-500">✓</span> {f}
                     </li>
                   ))}
                 </ul>
                 {isCurrent ? (
-                  <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-100 text-gray-500">
+                  <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
                     Current Plan
                   </div>
                 ) : (
@@ -164,8 +164,8 @@ export default function BillingPage() {
                     className={clsx(
                       'w-full py-2.5 rounded-xl text-sm font-medium transition',
                       plan.popular
-                        ? 'bg-brand-600 text-white hover:bg-brand-700'
-                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                        ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600'
+                        : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:bg-slate-700'
                     )}
                   >
                     {plan.price > 0 ? 'Upgrade' : 'Downgrade'}

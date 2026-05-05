@@ -55,8 +55,8 @@ export default function EndpointsPage() {
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="glass-card p-6 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-3"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4 mb-3"></div>
+            <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
           </div>
         ))}
       </div>
@@ -67,12 +67,12 @@ export default function EndpointsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Endpoints</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage your webhook endpoints</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Endpoints</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Manage your webhook endpoints</p>
         </div>
         <button
           onClick={() => setShowCreate(!showCreate)}
-          className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition"
+          className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
         >
           + New Endpoint
         </button>
@@ -80,44 +80,44 @@ export default function EndpointsPage() {
 
       {showCreate && (
         <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Endpoint</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create Endpoint</h3>
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-200">{error}</div>
+            <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm border border-red-200">{error}</div>
           )}
           <form onSubmit={handleCreate} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">URL</label>
               <input
                 type="url"
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
                 placeholder="https://myapp.com/webhook"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Description</label>
               <input
                 type="text"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
                 placeholder="Order notifications"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
               />
             </div>
             <div className="flex gap-3">
               <button
                 type="submit"
                 disabled={creating}
-                className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-60"
+                className="bg-brand-600 dark:bg-brand-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition disabled:opacity-60"
               >
                 {creating ? 'Creating...' : 'Create'}
               </button>
               <button
                 type="button"
                 onClick={() => { setShowCreate(false); setError(''); }}
-                className="bg-gray-100 text-gray-700 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 transition"
+                className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:bg-slate-700 transition"
               >
                 Cancel
               </button>
@@ -127,7 +127,7 @@ export default function EndpointsPage() {
       )}
 
       {endpoints.length === 0 ? (
-        <div className="glass-card p-12 text-center text-gray-400">
+        <div className="glass-card p-12 text-center text-gray-400 dark:text-slate-500">
           No endpoints yet. Create one to start receiving webhooks.
         </div>
       ) : (
@@ -137,18 +137,18 @@ export default function EndpointsPage() {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="font-mono text-sm text-brand-600 bg-brand-50 px-3 py-1 rounded-lg">
+                    <span className="font-mono text-sm text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-3 py-1 rounded-lg">
                       {ep.id.slice(0, 12)}…
                     </span>
                     <span className={`w-2 h-2 rounded-full ${ep.is_active ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                    <span className="text-xs text-gray-500">{ep.is_active ? 'Active' : 'Inactive'}</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-400">{ep.is_active ? 'Active' : 'Inactive'}</span>
                   </div>
-                  <div className="text-sm font-mono text-gray-900 mb-1">{ep.url}</div>
-                  {ep.description && <div className="text-sm text-gray-500">{ep.description}</div>}
+                  <div className="text-sm font-mono text-gray-900 dark:text-white mb-1">{ep.url}</div>
+                  {ep.description && <div className="text-sm text-gray-500 dark:text-slate-400">{ep.description}</div>}
                 </div>
                 <button
                   onClick={() => handleDelete(ep.id)}
-                  className="text-gray-400 hover:text-red-600 transition p-2"
+                  className="text-gray-400 dark:text-slate-500 hover:text-red-600 transition p-2"
                   title="Delete endpoint"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
