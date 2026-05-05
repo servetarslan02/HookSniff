@@ -1,0 +1,660 @@
+openapi: "3.0.3"
+info:
+  title: HookRelay API
+  description: Enterprise webhook delivery service with reliable delivery, retry policies, and monitoring.
+  version: "0.1.0"
+  contact:
+    name: HookRelay Support
+    email: support@hookrelay.dev
+  license:
+    name: MIT
+
+servers:
+  - url: https://api.hookrelay.dev/v1
+    description: Production
+  - url: http://localhost:3000/v1
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Auth
+    description: Customer registration and authentication
+  - name: Endpoints
+    description: Manage webhook endpoints
+  - name: Webhooks
+    description: Send and manage webhook deliveries
+  - name: Stats
+    description: Delivery statistics and analytics
+
+paths:
+  /auth:
+    post:
+      tags: [Auth]
+      summary: Register a new customer
+      operationId: registerCustomer
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+      responses:
+        "200":
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+
+  /endpoints:
+    get:
+      tags: [Endpoints]
+      summary: List all endpoints
+      operationId: listEndpoints
+      responses:
+        "200":
+          description: List of endpoints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EndpointResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Endpoints]
+      summary: Create a new endpoint
+      operationId: createEndpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEndpointRequest"
+      responses:
+        "200":
+          description: Endpoint created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EndpointResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /endpoints/{id}:
+    get:
+      tags: [Endpoints]
+      summary: Get endpoint by ID
+      operationId: getEndpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Endpoint details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EndpointResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Endpoints]
+      summary: Delete an endpoint
+      operationId: deleteEndpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Endpoint deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /webhooks:
+    get:
+      tags: [Webhooks]
+      summary: List webhook deliveries
+      operationId: listDeliveries
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, delivered, failed]
+      responses:
+        "200":
+          description: Paginated list of deliveries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Webhooks]
+      summary: Send a webhook
+      operationId: sendWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWebhookRequest"
+      responses:
+        "200":
+          description: Webhook queued for delivery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+
+  /webhooks/batch:
+    post:
+      tags: [Webhooks]
+      summary: Send multiple webhooks in a batch
+      operationId: batchWebhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchWebhookRequest"
+      responses:
+        "200":
+          description: Batch results (partial failure possible)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+
+  /webhooks/export:
+    get:
+      tags: [Webhooks]
+      summary: Export webhook logs
+      operationId: exportDeliveries
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv]
+            default: json
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, delivered, failed]
+        - name: date_from
+          in: query
+          description: "Start date (ISO 8601 or YYYY-MM-DD)"
+          schema:
+            type: string
+        - name: date_to
+          in: query
+          description: "End date (ISO 8601 or YYYY-MM-DD)"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Exported webhook logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExportDelivery"
+            text/csv:
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /webhooks/{id}:
+    get:
+      tags: [Webhooks]
+      summary: Get webhook delivery by ID
+      operationId: getDelivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Delivery details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /webhooks/{id}/replay:
+    post:
+      tags: [Webhooks]
+      summary: Replay a webhook delivery
+      operationId: replayWebhook
+      description: Re-queues a failed or delivered webhook for re-delivery. Creates a new delivery record preserving the original payload.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Replay queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /webhooks/{id}/attempts:
+    get:
+      tags: [Webhooks]
+      summary: Get delivery attempts for a webhook
+      operationId: getDeliveryAttempts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: List of delivery attempts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeliveryAttempt"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /stats:
+    get:
+      tags: [Stats]
+      summary: Get delivery statistics
+      operationId: getStats
+      responses:
+        "200":
+          description: Delivery statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /health:
+    get:
+      tags: [System]
+      summary: Health check
+      operationId: healthCheck
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: hookrelay-api
+                  version:
+                    type: string
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: "API key starting with `hr_live_`"
+
+  schemas:
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        api_key:
+          type: string
+          description: Only returned on creation
+        plan:
+          type: string
+        webhook_limit:
+          type: integer
+        webhook_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    RetryPolicy:
+      type: object
+      properties:
+        max_attempts:
+          type: integer
+          default: 3
+          description: Maximum number of delivery attempts
+        backoff:
+          type: string
+          enum: [exponential, linear, fixed]
+          default: exponential
+        initial_delay_secs:
+          type: integer
+          default: 10
+          description: Initial delay before first retry in seconds
+        max_delay_secs:
+          type: integer
+          default: 3600
+          description: Maximum delay between retries in seconds
+
+    CreateEndpointRequest:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          example: "https://myapp.com/webhook"
+        description:
+          type: string
+          example: "Order notifications"
+        retry_policy:
+          $ref: "#/components/schemas/RetryPolicy"
+
+    EndpointResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+        description:
+          type: string
+        is_active:
+          type: boolean
+        retry_policy:
+          $ref: "#/components/schemas/RetryPolicy"
+        created_at:
+          type: string
+          format: date-time
+
+    CreateWebhookRequest:
+      type: object
+      required: [endpoint_id, data]
+      properties:
+        endpoint_id:
+          type: string
+          format: uuid
+        event:
+          type: string
+          example: "order.created"
+        data:
+          type: object
+          description: The webhook payload data
+
+    BatchWebhookRequest:
+      type: object
+      required: [webhooks]
+      properties:
+        webhooks:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/CreateWebhookRequest"
+
+    DeliveryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        endpoint_id:
+          type: string
+          format: uuid
+        event:
+          type: string
+        status:
+          type: string
+          enum: [pending, delivered, failed]
+        attempt_count:
+          type: integer
+        response_status:
+          type: integer
+          nullable: true
+        replay_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    DeliveryListResponse:
+      type: object
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryResponse"
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+
+    BatchResponse:
+      type: object
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryResponse"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/BatchError"
+
+    BatchError:
+      type: object
+      properties:
+        index:
+          type: integer
+          description: Index of the failed webhook in the batch
+        error:
+          type: string
+
+    DeliveryAttempt:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        attempt_number:
+          type: integer
+        status_code:
+          type: integer
+          nullable: true
+        response_body:
+          type: string
+          nullable: true
+          description: Truncated response body (max 1000 chars)
+        duration_ms:
+          type: integer
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    ExportDelivery:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event:
+          type: string
+        endpoint_url:
+          type: string
+        status:
+          type: string
+        attempt_count:
+          type: integer
+        response_status:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    StatsResponse:
+      type: object
+      properties:
+        total_deliveries:
+          type: integer
+        delivered:
+          type: integer
+        failed:
+          type: integer
+        pending:
+          type: integer
+        success_rate:
+          type: number
+          format: double
+        endpoints_count:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Unauthorized - missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"

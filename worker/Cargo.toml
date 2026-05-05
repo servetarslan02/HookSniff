@@ -14,8 +14,6 @@ anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
-temporal-sdk-core = "0.1"
-temporal-sdk = "0.1"
 reqwest = { version = "0.12", features = ["json"] }
 rdkafka = { version = "0.36", features = ["cmake-build"] }
 sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid"] }

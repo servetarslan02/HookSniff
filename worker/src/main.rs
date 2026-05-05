@@ -15,6 +15,9 @@ struct WebhookMessage {
     endpoint_id: String,
     endpoint_url: String,
     signing_secret: String,
+    old_signing_secret: Option<String>,
+    secret_rotated_at: Option<String>,
+    custom_headers: Option<serde_json::Value>,
     payload: String,
 }
 
@@ -52,8 +55,15 @@ async fn main() -> Result<()> {
                     match serde_json::from_str::<WebhookMessage>(payload) {
                         Ok(webhook) => {
                             tracing::info!("📥 Processing delivery {}", webhook.delivery_id);
-                            if let Err(e) = delivery::process_delivery(&http_client, &cfg, &webhook, &pool).await {
-                                tracing::error!("❌ Failed to process delivery {}: {:?}", webhook.delivery_id, e);
+                            if let Err(e) =
+                                delivery::process_delivery(&http_client, &cfg, &webhook, &pool)
+                                    .await
+                            {
+                                tracing::error!(
+                                    "❌ Failed to process delivery {}: {:?}",
+                                    webhook.delivery_id,
+                                    e
+                                );
                             }
                         }
                         Err(e) => {
