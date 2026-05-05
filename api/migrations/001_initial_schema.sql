@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS endpoints (
     allowed_ips JSONB,
     event_filter STRING[],
     custom_headers JSONB,
+    retry_policy JSONB,
     old_signing_secret STRING,
     secret_rotated_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()

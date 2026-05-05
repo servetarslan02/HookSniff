@@ -58,12 +58,32 @@ export const webhooksApi = {
 
   get: (token: string, id: string) =>
     apiFetch<Delivery>(`/webhooks/${id}`, { token }),
+
+  replay: (token: string, id: string) =>
+    apiFetch<Delivery>(`/webhooks/${id}/replay`, { method: 'POST', token }),
+
+  batch: (token: string, data: { webhooks: Array<{ endpoint_id: string; event?: string; data: unknown }> }) =>
+    apiFetch<{ deliveries: Delivery[] }>('/webhooks/batch', { method: 'POST', body: data, token }),
 };
 
 // Stats API
 export const statsApi = {
   get: (token: string) =>
     apiFetch<StatsResponse>("/stats", { token }),
+};
+
+// Auth API
+export const authApi = {
+  login: (email: string, password: string) =>
+    apiFetch<{ token: string; user: { id: string; email: string; name?: string; plan: string }; api_key: string }>('/auth/login', {
+      method: 'POST',
+      body: { email, password },
+    }),
+  register: (email: string, password: string, name?: string) =>
+    apiFetch<{ token: string; user: { id: string; email: string; name?: string; plan: string }; api_key: string }>('/auth/register', {
+      method: 'POST',
+      body: { email, password, name },
+    }),
 };
 
 // Types

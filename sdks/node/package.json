@@ -1,0 +1,24 @@
+{
+  "name": "@hookrelay/sdk",
+  "version": "0.1.0",
+  "description": "Official Node.js client for HookRelay webhook delivery service",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["webhooks", "hookrelay", "sdk", "delivery"],
+  "author": "HookRelay",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

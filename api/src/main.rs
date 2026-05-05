@@ -42,6 +42,8 @@ async fn main() -> Result<()> {
 
     let app = Router::new()
         .route("/health", get(routes::health::health_check))
+        .route("/docs", get(routes::docs::swagger_ui))
+        .route("/v1/openapi.yaml", get(routes::docs::openapi_spec))
         .nest("/v1", routes::api_router())
         .layer(axum::extract::Extension(pool))
         .layer(axum::extract::Extension(kafka_producer))

@@ -15,7 +15,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <a href="#features" className="text-sm text-gray-600 hover:text-gray-900 transition">Features</a>
             <a href="#pricing" className="text-sm text-gray-600 hover:text-gray-900 transition">Pricing</a>
-            <a href="#docs" className="text-sm text-gray-600 hover:text-gray-900 transition">Docs</a>
+            <Link href="/docs" className="text-sm text-gray-600 hover:text-gray-900 transition">Docs</Link>
             <Link
               href="/dashboard"
               className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition"
@@ -49,12 +49,12 @@ export default function Home() {
             >
               Get started free
             </Link>
-            <a
-              href="#docs"
+            <Link
+              href="/docs"
               className="border border-gray-300 text-gray-700 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 transition"
             >
               Read the docs
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -200,10 +200,12 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
               <span className="font-semibold text-gray-900">Hookrelay</span>
             </div>
             <div className="flex gap-6 text-sm text-gray-500">
-              <a href="#" className="hover:text-gray-900 transition">GitHub</a>
-              <a href="#" className="hover:text-gray-900 transition">Docs</a>
+              <a href="https://github.com/hookrelay" className="hover:text-gray-900 transition">GitHub</a>
+              <Link href="/docs" className="hover:text-gray-900 transition">Docs</Link>
               <a href="#" className="hover:text-gray-900 transition">Status</a>
               <a href="#" className="hover:text-gray-900 transition">Blog</a>
+              <Link href="/terms" className="hover:text-gray-900 transition">Terms</Link>
+              <Link href="/privacy" className="hover:text-gray-900 transition">Privacy</Link>
             </div>
             <p className="text-sm text-gray-400">© 2026 Hookrelay. All rights reserved.</p>
           </div>

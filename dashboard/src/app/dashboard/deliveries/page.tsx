@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { clsx } from 'clsx';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { webhooksApi, endpointsApi, type Delivery, type Endpoint } from '@/lib/api';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import EmptyState from '@/components/EmptyState';
+import { webhooksApi, type Delivery } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function DeliveriesPage() {
@@ -16,7 +13,8 @@ export default function DeliveriesPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [replayTarget, setReplayTarget] = useState<Delivery | null>(null);
@@ -26,19 +24,20 @@ export default function DeliveriesPage() {
   const fetchData = useCallback(async () => {
     if (!token) return;
     setLoading(true);
+    setError('');
     try {
       const data = await webhooksApi.list(token, {
         page,
-        status: statusFilter || undefined,
+        status: filter === 'all' ? undefined : filter,
       });
       setDeliveries(data.deliveries);
       setTotal(data.total);
     } catch (err: any) {
-      toast(err.message || 'Failed to load deliveries', 'error');
+      setError(err.message || 'Failed to load deliveries');
     } finally {
       setLoading(false);
     }
-  }, [token, page, statusFilter, toast]);
+  }, [token, page, filter]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -46,11 +45,7 @@ export default function DeliveriesPage() {
     if (!replayTarget || !token) return;
     setReplaying(true);
     try {
-      await webhooksApi.create(token, {
-        endpoint_id: replayTarget.endpoint_id,
-        event: replayTarget.event,
-        data: { replay: true, original_id: replayTarget.id },
-      });
+      await webhooksApi.replay(token, replayTarget.id);
       toast('Webhook replayed!', 'success');
       fetchData();
     } catch (err: any) {
@@ -68,70 +63,94 @@ export default function DeliveriesPage() {
   const totalPages = Math.ceil(total / perPage);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Deliveries</h1>
-        <div className="flex gap-3 items-center">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by event or ID..."
-            className="pl-3 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-          />
-          <select
-            value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500"
-          >
-            <option value="">All Status</option>
-            <option value="delivered">Delivered</option>
-            <option value="pending">Pending</option>
-            <option value="failed">Failed</option>
-          </select>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Deliveries</h2>
+          <p className="text-sm text-gray-500 mt-1">Track all webhook deliveries and their status</p>
         </div>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by event or ID..."
+          className="pl-3 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+        />
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12"><LoadingSpinner /></div>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          icon="📦"
-          title="No deliveries"
-          description="Deliveries will appear here once you start sending webhooks."
-        />
-      ) : (
-        <>
-          <div className="glass-card overflow-hidden">
+      {/* Filters */}
+      <div className="flex gap-2">
+        {['all', 'delivered', 'failed', 'pending'].map((f) => (
+          <button
+            key={f}
+            onClick={() => { setFilter(f); setPage(1); }}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+              filter === f
+                ? 'bg-gray-900 text-white'
+                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {f.charAt(0).toUpperCase() + f.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Error state */}
+      {error && (
+        <div className="glass-card p-6 text-center">
+          <div className="text-4xl mb-3">⚠️</div>
+          <p className="text-sm text-gray-600 mb-4">{error}</p>
+          <button onClick={fetchData} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition">
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="glass-card overflow-hidden">
+        {loading ? (
+          <div className="p-12 text-center text-gray-400 animate-pulse">Loading deliveries...</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-12 text-center text-gray-400">No deliveries found.</div>
+        ) : (
+          <>
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  {['ID', 'Event', 'Endpoint', 'Status', 'Attempts', 'HTTP', 'Created'].map((h) => (
-                    <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{h}</th>
-                  ))}
+              <thead>
+                <tr className="bg-gray-50/50">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attempts</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Response</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
                   <th className="px-6 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200/50">
                 {filtered.map((d) => (
-                  <tr
-                    key={d.id}
-                    className="hover:bg-gray-50/50 transition cursor-pointer"
-                    onClick={() => setSelected(d)}
-                  >
-                    <td className="px-6 py-4 text-sm font-mono text-gray-600">{d.id.slice(0, 10)}…</td>
+                  <tr key={d.id} className="hover:bg-gray-50/50 transition cursor-pointer" onClick={() => setSelected(d)}>
+                    <td className="px-6 py-4 text-sm font-mono text-gray-600">{d.id.slice(0, 12)}…</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 text-xs font-mono text-gray-700">
                         {d.event || '—'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-600">{d.endpoint_id.slice(0, 10)}…</td>
                     <td className="px-6 py-4">
                       <StatusBadge status={d.status} />
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{d.attempt_count}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{d.response_status || '—'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{new Date(d.created_at).toLocaleString()}</td>
+                    <td className="px-6 py-4">
+                      {d.response_status ? (
+                        <span className={`text-sm font-mono ${d.response_status < 400 ? 'text-green-600' : 'text-red-600'}`}>
+                          {d.response_status}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {new Date(d.created_at).toLocaleString()}
+                    </td>
                     <td className="px-6 py-4">
                       {d.status === 'failed' && (
                         <button
@@ -146,30 +165,35 @@ export default function DeliveriesPage() {
                 ))}
               </tbody>
             </table>
-          </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-4">
-            <span className="text-sm text-gray-500">Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm disabled:opacity-40 hover:bg-gray-50 transition"
-              >
-                ← Prev
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm disabled:opacity-40 hover:bg-gray-50 transition"
-              >
-                Next →
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+            {/* Pagination */}
+            {total > perPage && (
+              <div className="px-6 py-4 border-t border-gray-200/50 flex items-center justify-between">
+                <span className="text-sm text-gray-500">
+                  Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition"
+                  >
+                    Previous
+                  </button>
+                  <span className="px-3 py-1.5 text-sm text-gray-600">Page {page} of {totalPages}</span>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages}
+                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Detail Modal */}
       {selected && (
@@ -230,7 +254,7 @@ function DetailRow({ label, value, mono }: { label: string; value: string; mono?
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-gray-500">{label}</span>
-      <span className={clsx('text-sm text-gray-900', mono && 'font-mono')}>{value}</span>
+      <span className={`text-sm text-gray-900 ${mono ? 'font-mono' : ''}`}>{value}</span>
     </div>
   );
 }
@@ -241,6 +265,7 @@ function StatusBadge({ status }: { status: string }) {
     failed: 'bg-red-50 text-red-700 ring-red-600/20',
     pending: 'bg-yellow-50 text-yellow-700 ring-yellow-600/20',
   };
+
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset ${styles[status] || styles.pending}`}>
       {status}
