@@ -1,30 +1,278 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/ThemeProvider';
+import dynamic from 'next/dynamic';
 
+// Lazy load ThemeToggle
+const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m => m.ThemeToggle), { ssr: false });
+
+/* ─── Typewriter Effect ─── */
+const phrases = ['actually deliver', 'never fail', 'always retry', 'scale infinitely', 'just work'];
+
+function TypewriterText() {
+  const [text, setText] = useState('');
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const phrase = phrases[phraseIdx];
+    let timeout: NodeJS.Timeout;
+
+    if (!isDeleting && charIdx < phrase.length) {
+      timeout = setTimeout(() => {
+        setText(phrase.slice(0, charIdx + 1));
+        setCharIdx(c => c + 1);
+      }, 80);
+    } else if (!isDeleting && charIdx === phrase.length) {
+      timeout = setTimeout(() => setIsDeleting(true), 2000);
+    } else if (isDeleting && charIdx > 0) {
+      timeout = setTimeout(() => {
+        setText(phrase.slice(0, charIdx - 1));
+        setCharIdx(c => c - 1);
+      }, 40);
+    } else if (isDeleting && charIdx === 0) {
+      setIsDeleting(false);
+      setPhraseIdx(i => (i + 1) % phrases.length);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [charIdx, isDeleting, phraseIdx]);
+
+  return (
+    <span className="typewriter-cursor gradient-text">{text}</span>
+  );
+}
+
+/* ─── Floating Particles ─── */
+function FloatingParticles() {
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 4 + 2,
+    duration: Math.random() * 4 + 4,
+    delay: Math.random() * 4,
+    opacity: Math.random() * 0.15 + 0.05,
+  }));
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="particle bg-brand-400 dark:bg-brand-500"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            opacity: p.opacity,
+            '--duration': `${p.duration}s`,
+            '--delay': `${p.delay}s`,
+          } as React.CSSProperties}
+        />
+      ))}
+      {/* Connecting lines (decorative SVG) */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.04] dark:opacity-[0.06]" aria-hidden="true">
+        <line x1="20%" y1="30%" x2="45%" y2="60%" stroke="currentColor" strokeWidth="1" className="text-brand-500" />
+        <line x1="60%" y1="20%" x2="80%" y2="50%" stroke="currentColor" strokeWidth="1" className="text-purple-500" />
+        <line x1="35%" y1="70%" x2="70%" y2="40%" stroke="currentColor" strokeWidth="1" className="text-brand-400" />
+      </svg>
+    </div>
+  );
+}
+
+/* ─── Custom SVG Icons ─── */
+const icons = {
+  webhook: (
+    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 16h6m12 0h6M16 4v6m0 12v6" />
+      <circle cx="16" cy="16" r="6" />
+      <path d="M10 10l2 2m8 8l2 2M22 10l-2 2M10 22l2-2" />
+    </svg>
+  ),
+  retry: (
+    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 16a12 12 0 0121.2-7.8" />
+      <path d="M28 16a12 12 0 01-21.2 7.8" />
+      <polyline points="24,2 24,8 18,8" />
+      <polyline points="8,30 8,24 14,24" />
+    </svg>
+  ),
+  shield: (
+    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 2L4 8v8c0 7.2 5.1 13.3 12 14 6.9-.7 12-6.8 12-14V8L16 2z" />
+      <polyline points="11,16 14,19 21,12" />
+    </svg>
+  ),
+  chart: (
+    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="4" width="24" height="24" rx="3" />
+      <line x1="8" y1="22" x2="8" y2="16" />
+      <line x1="13" y1="22" x2="13" y2="12" />
+      <line x1="18" y1="22" x2="18" y2="18" />
+      <line x1="23" y1="22" x2="23" y2="10" />
+      <path d="M8 14l5-2 5 4 6-6" />
+    </svg>
+  ),
+  bolt: (
+    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="18,2 6,18 15,18 14,30 26,14 17,14" />
+    </svg>
+  ),
+  queue: (
+    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="6" width="24" height="6" rx="2" />
+      <rect x="4" y="14" width="24" height="6" rx="2" />
+      <rect x="4" y="22" width="24" height="6" rx="2" />
+      <circle cx="9" cy="9" r="1.5" fill="currentColor" />
+      <circle cx="9" cy="17" r="1.5" fill="currentColor" />
+      <circle cx="9" cy="25" r="1.5" fill="currentColor" />
+    </svg>
+  ),
+  globe: (
+    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="16" cy="16" r="12" />
+      <ellipse cx="16" cy="16" rx="5" ry="12" />
+      <line x1="4" y1="16" x2="28" y2="16" />
+      <path d="M6 8h20M6 24h20" />
+    </svg>
+  ),
+  send: (
+    <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M35 5L18 22" />
+      <path d="M35 5L24 35L18 22L5 16L35 5z" />
+    </svg>
+  ),
+  deliver: (
+    <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="6" y="10" width="28" height="20" rx="3" />
+      <polyline points="14,20 18,24 26,16" />
+      <path d="M6 14l14 9 14-9" />
+    </svg>
+  ),
+  monitor: (
+    <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="6" width="32" height="22" rx="3" />
+      <line x1="16" y1="28" x2="16" y2="34" />
+      <line x1="24" y1="28" x2="24" y2="34" />
+      <line x1="12" y1="34" x2="28" y2="34" />
+      <path d="M10 18l4-4 4 3 4-6 4 4" />
+    </svg>
+  ),
+};
+
+/* ─── Dashboard Preview Mockup ─── */
+function DashboardPreview() {
+  return (
+    <div className="relative max-w-3xl mx-auto mt-12">
+      <div className="absolute -inset-4 bg-gradient-to-r from-brand-500/20 to-purple-500/20 rounded-3xl blur-2xl" />
+      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-brand-500/10 border border-gray-200 dark:border-slate-700 overflow-hidden">
+        {/* Browser chrome */}
+        <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-400" />
+            <div className="w-3 h-3 rounded-full bg-yellow-400" />
+            <div className="w-3 h-3 rounded-full bg-green-400" />
+          </div>
+          <div className="flex-1 mx-4">
+            <div className="bg-white dark:bg-slate-700 rounded-md px-3 py-1 text-xs text-gray-500 dark:text-slate-400 font-mono">
+              dashboard.hookrelay.io
+            </div>
+          </div>
+        </div>
+        {/* Mock dashboard content */}
+        <div className="p-6 space-y-4">
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: 'Deliveries', value: '24,891', color: 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400' },
+              { label: 'Success Rate', value: '99.97%', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
+              { label: 'Avg Latency', value: '45ms', color: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' },
+            ].map(s => (
+              <div key={s.label} className={`rounded-xl p-4 ${s.color}`}>
+                <div className="text-2xl font-bold">{s.value}</div>
+                <div className="text-xs opacity-75">{s.label}</div>
+              </div>
+            ))}
+          </div>
+          {/* Fake chart */}
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 h-32 flex items-end gap-1">
+            {[40, 55, 35, 65, 50, 70, 60, 80, 55, 75, 85, 90, 70, 85, 95, 80, 90, 88, 92, 95].map((h, i) => (
+              <div
+                key={i}
+                className="flex-1 bg-brand-400 dark:bg-brand-500 rounded-t opacity-70"
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── How It Works Section ─── */
+function HowItWorks() {
+  const steps = [
+    { icon: icons.send, title: 'Send', desc: 'POST a webhook to our API. We handle the rest.' },
+    { icon: icons.deliver, title: 'Deliver', desc: 'We deliver with retries, signatures, and monitoring.' },
+    { icon: icons.monitor, title: 'Monitor', desc: 'Track every delivery in real-time on your dashboard.' },
+  ];
+
+  return (
+    <section className="py-24">
+      <div className="text-center mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">How it works</h2>
+        <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">Three simple steps to reliable webhook delivery.</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+        {/* Connecting line */}
+        <div className="hidden md:block absolute top-12 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-600 dark:via-purple-600 dark:to-brand-600" />
+        {steps.map((step, i) => (
+          <div key={i} className="relative flex flex-col items-center text-center">
+            <div className="w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-6 relative z-10 border border-brand-100 dark:border-brand-500/20">
+              {step.icon}
+              <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-brand-600 dark:bg-brand-500 text-white text-sm font-bold flex items-center justify-center">
+                {i + 1}
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{step.title}</h3>
+            <p className="text-gray-600 dark:text-slate-400 max-w-xs">{step.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ─── Landing Page ─── */
 export default function Home() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-brand-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Navigation */}
-      <nav className="border-b border-gray-200/50 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">
               🪝
             </div>
-            <span className="text-xl font-bold text-gray-900">Hookrelay</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Hookrelay</span>
           </div>
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="#features" className="text-sm text-gray-600 hover:text-gray-900 transition">Features</a>
-            <a href="#pricing" className="text-sm text-gray-600 hover:text-gray-900 transition">Pricing</a>
-            <Link href="/docs" className="text-sm text-gray-600 hover:text-gray-900 transition">Docs</Link>
+            <a href="#features" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Features</a>
+            <a href="#pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Pricing</a>
+            <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
+            <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Status</Link>
+            <ThemeToggleBtn />
             <Link
               href="/dashboard"
-              className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition"
+              className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow"
             >
               Dashboard →
             </Link>
@@ -32,7 +280,7 @@ export default function Home() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="md:hidden p-2 -mr-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+            className="md:hidden p-2 -mr-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
             aria-label="Toggle navigation"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,14 +294,18 @@ export default function Home() {
         </div>
         {/* Mobile nav dropdown */}
         {mobileNavOpen && (
-          <div className="md:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-xl px-6 py-4 space-y-3">
-            <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 hover:text-gray-900 transition">Features</a>
-            <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 hover:text-gray-900 transition">Pricing</a>
-            <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 hover:text-gray-900 transition">Docs</Link>
+          <div className="md:hidden border-t border-gray-200/50 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-6 py-4 space-y-3">
+            <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Features</a>
+            <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Pricing</a>
+            <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
+            <Link href="/status" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Status</Link>
+            <div className="pt-2">
+              <ThemeToggleBtn />
+            </div>
             <Link
               href="/dashboard"
               onClick={() => setMobileNavOpen(false)}
-              className="block bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition text-center"
+              className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center"
             >
               Dashboard →
             </Link>
@@ -62,48 +314,55 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <main className="max-w-7xl mx-auto px-6">
-        <div className="pt-24 pb-16 text-center">
-          <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full text-sm font-medium mb-8">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            99.99% delivery uptime
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
-            Webhooks that
-            <br />
-            <span className="gradient-text">actually deliver</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Send webhooks with confidence. Automatic retries, HMAC signatures,
-            real-time monitoring. Built for developers who need reliability.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/dashboard"
-              className="bg-gray-900 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 transition shadow-lg shadow-gray-900/20"
-            >
-              Get started free
-            </Link>
-            <Link
-              href="/docs"
-              className="border border-gray-300 text-gray-700 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 transition"
-            >
-              Read the docs
-            </Link>
-          </div>
-        </div>
-
-        {/* Code Example */}
-        <div className="max-w-3xl mx-auto mb-24">
-          <div className="glass-card overflow-hidden">
-            <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-200/50 bg-gray-50/50">
-              <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-              <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              <span className="ml-4 text-sm text-gray-500 font-mono">send-webhook.sh</span>
+      <section className="relative hero-gradient">
+        <FloatingParticles />
+        <main className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="pt-24 pb-8 text-center">
+            <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-4 py-2 rounded-full text-sm font-medium mb-8 border border-brand-100 dark:border-brand-500/20">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              99.99% delivery uptime
             </div>
-            <pre className="p-6 text-sm font-mono text-gray-800 overflow-x-auto">
-              <code>{`# Create an endpoint
+            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
+              Webhooks that
+              <br />
+              <TypewriterText />
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+              Send webhooks with confidence. Automatic retries, HMAC signatures,
+              real-time monitoring. Built for developers who need reliability.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/dashboard"
+                className="bg-gray-900 dark:bg-brand-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow"
+              >
+                Get started free
+              </Link>
+              <Link
+                href="/docs"
+                className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple"
+              >
+                Read the docs
+              </Link>
+            </div>
+          </div>
+
+          {/* Dashboard Preview */}
+          <DashboardPreview />
+        </main>
+      </section>
+
+      {/* Code Example */}
+      <div className="max-w-3xl mx-auto px-6 mb-24">
+        <div className="glass-card overflow-hidden">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/50">
+            <div className="w-3 h-3 rounded-full bg-red-400"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+            <div className="w-3 h-3 rounded-full bg-green-400"></div>
+            <span className="ml-4 text-sm text-gray-500 dark:text-slate-400 font-mono">send-webhook.sh</span>
+          </div>
+          <pre className="p-6 text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-900">
+            <code>{`# Create an endpoint
 curl -X POST https://api.hookrelay.io/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
@@ -114,54 +373,40 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"endpoint_id": "ep_abc123", "event": "order.created", "data": {"order_id": "12345"}}'`}</code>
-            </pre>
-          </div>
+          </pre>
         </div>
+      </div>
 
-        {/* Features */}
-        <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+      {/* Features */}
+      <div id="features" className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {[
-            {
-              icon: '🔄',
-              title: 'Automatic Retries',
-              desc: 'Exponential backoff with configurable max attempts. Failed deliveries are retried automatically.',
-            },
-            {
-              icon: '🔐',
-              title: 'HMAC Signatures',
-              desc: 'Every webhook is signed with SHA256. Verify authenticity with a single function call.',
-            },
-            {
-              icon: '📊',
-              title: 'Real-time Dashboard',
-              desc: 'Monitor deliveries, track success rates, debug failures. Everything in one place.',
-            },
-            {
-              icon: '⚡',
-              title: 'Low Latency',
-              desc: 'Built on Rust for speed. Sub-millisecond overhead on webhook delivery.',
-            },
-            {
-              icon: '🪦',
-              title: 'Dead Letter Queue',
-              desc: 'Failed deliveries are preserved for debugging. Nothing gets lost.',
-            },
-            {
-              icon: '🌍',
-              title: 'Global Infrastructure',
-              desc: 'Deploy worldwide for low-latency webhook delivery to any endpoint.',
-            },
+            { icon: icons.retry, title: 'Automatic Retries', desc: 'Exponential backoff with configurable max attempts. Failed deliveries are retried automatically.' },
+            { icon: icons.shield, title: 'HMAC Signatures', desc: 'Every webhook is signed with SHA256. Verify authenticity with a single function call.' },
+            { icon: icons.chart, title: 'Real-time Dashboard', desc: 'Monitor deliveries, track success rates, debug failures. Everything in one place.' },
+            { icon: icons.bolt, title: 'Low Latency', desc: 'Built on Rust for speed. Sub-millisecond overhead on webhook delivery.' },
+            { icon: icons.queue, title: 'Dead Letter Queue', desc: 'Failed deliveries are preserved for debugging. Nothing gets lost.' },
+            { icon: icons.globe, title: 'Global Infrastructure', desc: 'Deploy worldwide for low-latency webhook delivery to any endpoint.' },
           ].map((feature, i) => (
-            <div key={i} className="glass-card p-8 hover-lift">
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
+            <div key={i} className="glass-card p-8 hover-lift card-tilt group">
+              <div className="w-14 h-14 rounded-xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 border border-brand-100 dark:border-brand-500/20">
+                {feature.icon}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
+              <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{feature.desc}</p>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Pricing */}
-        <div id="pricing" className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+      {/* How It Works */}
+      <div className="max-w-7xl mx-auto px-6">
+        <HowItWorks />
+      </div>
+
+      {/* Pricing */}
+      <div id="pricing" className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {[
             {
               name: 'Free',
@@ -190,23 +435,23 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
           ].map((plan, i) => (
             <div
               key={i}
-              className={`glass-card p-8 hover-lift relative ${
-                plan.popular ? 'ring-2 ring-brand-500' : ''
+              className={`glass-card p-8 hover-lift card-tilt relative ${
+                plan.popular ? 'ring-2 ring-brand-500 dark:ring-brand-400' : ''
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-4 py-1 rounded-full text-sm font-medium">
                   Most Popular
                 </div>
               )}
-              <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
               <div className="mt-4 mb-6">
-                <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                <span className="text-gray-500">{plan.period}</span>
+                <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
+                <span className="text-gray-500 dark:text-slate-400">{plan.period}</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {plan.features.map((f, j) => (
-                  <li key={j} className="flex items-center gap-2 text-gray-600">
+                  <li key={j} className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
                     <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -215,10 +460,10 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
                 ))}
               </ul>
               <button
-                className={`w-full py-3 rounded-xl font-medium transition ${
+                className={`w-full py-3 rounded-xl font-medium transition btn-ripple ${
                   plan.popular
-                    ? 'bg-brand-600 text-white hover:bg-brand-700'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600'
+                    : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'
                 }`}
               >
                 {plan.cta}
@@ -226,26 +471,26 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Footer */}
-        <footer className="border-t border-gray-200 py-12 mb-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🪝</span>
-              <span className="font-semibold text-gray-900">Hookrelay</span>
-            </div>
-            <div className="flex gap-6 text-sm text-gray-500">
-              <a href="https://github.com/hookrelay" className="hover:text-gray-900 transition">GitHub</a>
-              <Link href="/docs" className="hover:text-gray-900 transition">Docs</Link>
-              <a href="#" className="hover:text-gray-900 transition">Status</a>
-              <a href="#" className="hover:text-gray-900 transition">Blog</a>
-              <Link href="/terms" className="hover:text-gray-900 transition">Terms</Link>
-              <Link href="/privacy" className="hover:text-gray-900 transition">Privacy</Link>
-            </div>
-            <p className="text-sm text-gray-400">© 2026 Hookrelay. All rights reserved.</p>
+      {/* Footer */}
+      <footer className="max-w-7xl mx-auto px-6 border-t border-gray-200 dark:border-slate-800 py-12 mb-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🪝</span>
+            <span className="font-semibold text-gray-900 dark:text-white">Hookrelay</span>
           </div>
-        </footer>
-      </main>
+          <div className="flex gap-6 text-sm text-gray-500 dark:text-slate-400">
+            <a href="https://github.com/hookrelay" className="hover:text-gray-900 dark:hover:text-white transition">GitHub</a>
+            <Link href="/docs" className="hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
+            <Link href="/status" className="hover:text-gray-900 dark:hover:text-white transition">Status</Link>
+            <a href="#" className="hover:text-gray-900 dark:hover:text-white transition">Blog</a>
+            <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition">Terms</Link>
+            <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition">Privacy</Link>
+          </div>
+          <p className="text-sm text-gray-400 dark:text-slate-500">© 2026 Hookrelay. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 }
