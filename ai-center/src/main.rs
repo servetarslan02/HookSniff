@@ -7,6 +7,7 @@ mod db;
 mod defense;
 mod fix;
 mod monitor;
+mod notify;
 mod risk;
 
 #[tokio::main]
@@ -53,6 +54,18 @@ async fn main() -> Result<()> {
 
     if provider_count == 0 {
         tracing::warn!("⚠️ Hiç AI API key tanımlanmamış — kural tabanlı analiz kullanılacak");
+    }
+
+    // Bildirim yöneticisi
+    let mut notify_mgr = notify::NotifyManager::new();
+
+    if let Some(slack) = notify::slack::SlackNotifier::from_env() {
+        notify_mgr.add_notifier(Box::new(slack));
+    }
+    if let Some(sendgrid) = notify::email::SendGridNotifier::from_env() {
+        notify_mgr.add_notifier(Box::new(sendgrid));
+    } else if let Some(email) = notify::email::EmailNotifier::from_env() {
+        notify_mgr.add_notifier(Box::new(email));
     }
 
     loop {

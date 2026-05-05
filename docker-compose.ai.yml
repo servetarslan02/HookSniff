@@ -22,6 +22,15 @@ services:
       # - CLAUDE_API_KEY=${CLAUDE_API_KEY:-}
       # - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
       # - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      # Bildirim Kanalları
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - NOTIFY_EMAIL=${NOTIFY_EMAIL:-}
+      - NOTIFY_EMAIL_FROM=${NOTIFY_EMAIL_FROM:-ai@hookrelay.dev}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
     depends_on:
       - cockroachdb
     restart: unless-stopped
