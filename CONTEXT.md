@@ -5,7 +5,7 @@
 
 ---
 
-## 📅 Son Güncelleme: 2026-05-06
+## 📅 Son Güncelleme: 2026-05-06 06:29
 
 ## 👤 Hakkında
 
@@ -14,67 +14,80 @@
 - **Hedef:** HookRelay'ı bireysel olarak satmak, şirket kurmadan başlamak
 - **Gelir hedefi:** $500/ay gelir gördüğünde şirket kur
 - **Çalışma durumu:** Bireysel / Part-time
+- **Deneyim:** Bu işe ilk defa giriyor, bilgisi sınırlı
 
 ## 🪝 HookRelay Nedir?
 
 Webhook delivery servisi. Geliştiricilere yönelik.
 - Gönder, teslim edelim. Başarısız olursa tekrar deneyelim. Basit.
-- Rakipler: Svix ($490/ay), Hookdeck ($39/ay), Convoy (kapandı)
+- Rakipler: Svix ($490/ay), Hookdeck ($39/ay), Convoy (kapandı), Hook0 (açık kaynak)
+- ⚠️ hookrelay.dev zaten var! İsim çakışması — alternatif isim düşünülmeli
 
-## ✅ Yapılan İşler
+## ✅ Yapılan İşler (2026-05-06)
 
-### 2026-05-06 — İlk Gün
+### Altyapı & Konfigürasyon
 - [x] GitHub repo private yapıldı
-- [x] Repo kodları incelendi (Rust/Axum + CockroachDB + Redpanda + Temporal)
-- [x] Rakip analizi ve yol haritası çıkarıldı
-- [x] Fiyat stratejisi belirlendi: Free/$49/$149
-- [x] Landing page oluşturuldu (dark theme, code snippet, pricing, waitlist form)
-- [x] Landing page GitHub'a push edildi
-- [x] ToS + Privacy Policy yazıldı (gerçek içerikli React sayfaları)
-- [x] Stripe entegrasyonu yazıldı (checkout, portal, webhook handler)
-- [x] Integration testler yazıldı (15+ test: signing, billing, auth, validation)
-- [x] README güncellendi
+- [x] docker-compose.yml: full stack (API + Worker + Dashboard + Infra)
+- [x] Makefile: 20+ komut (dev, stop, clean, logs, test, status)
+- [x] QUICKSTART.md: 5 dakika kurulum rehberi
 - [x] .env.example güncellendi (Stripe config eklendi)
-- [x] Fiyat düzeltmesi: Business $299 → $149 (PLAN.md ile tutarlı)
+- [x] README güncellendi
 
-### Mevcut Kod Yapısı (Repo'da Var)
-- [x] API: Rust/Axum — webhook CRUD, batch, replay, export
-- [x] Worker: Temporal workflow — retry, exponential backoff, dead letter queue
-- [x] Dashboard: Next.js 15 — endpoints, deliveries, analytics, billing, settings
-- [x] Auth: JWT + API key + Argon2 password hashing
-- [x] Standard Webhooks HMAC-SHA256 imzalama
-- [x] SSRF koruması (internal IP engelleme)
-- [x] Rate limiting, idempotency keys
-- [x] Kafka/Redpanda entegrasyonu
-- [x] OpenTelemetry + Prometheus metrics
-- [x] Docker Compose + K8s manifestleri
-- [x] Node.js + Python SDK'lar
-- [x] Monitoring: Grafana + Prometheus
-- [x] CI/CD GitHub Actions
-- [x] Login/Register sayfası (frontend)
+### Backend (Rust/Axum)
+- [x] Stripe entegrasyonu (checkout, portal, webhook handler)
+- [x] 15+ integration test
+- [x] 6 yeni API route:
+  - api_keys.rs: API key CRUD + rotate
+  - playground.rs: Webhook tester + sample payloads
+  - delivery_details.rs: Teslimat detay + attempt inspection
+  - alerts.rs: Alarm kuralları CRUD + test notification
+  - search.rs: Webhook log arama
+  - health_endpoints.rs: Endpoint sağlık izleme
+
+### Frontend (Next.js)
+- [x] Landing page (dark theme, code snippet, pricing, waitlist)
+- [x] ToS + Privacy Policy (gerçek içerikli React sayfaları)
+- [x] 4 yeni dashboard sayfası:
+  - api-keys/page.tsx: API key yönetimi
+  - alerts/page.tsx: Alarm kuralları
+  - health/page.tsx: Endpoint sağlık durumu
+  - search/page.tsx: Webhook arama
+- [x] Dashboard sidebar güncellendi (5 → 12 sayfa)
+
+### SDK & CLI
+- [x] CLI tool (cli/index.js): auth, endpoints, webhooks, listen komutları
+- [x] Go SDK (sdks/go/): Endpoints + Webhooks servisleri
+
+### Dokümantasyon
+- [x] CONTEXT.md: AI hafıza dosyası
+- [x] FEATURES.md: 40 feature tracking
+- [x] Rakip analizi (Svix, Hookdeck, Hook0, Hostedhooks, Webhook Relay)
 
 ## ❌ Yapılmayan / Eksik İşler
 
 | İş | Öncelik | Not |
 |----|---------|-----|
-| Domain al (hookrelay.com) | 🔴 Yüksek | $12, Cloudflare'den alınacak |
+| Domain al | 🔴 Yüksek | $12, hookrelay.com veya alternatifi |
 | Stripe hesabı aç | 🔴 Yüksek | Dashboard'dan ödeme almak için |
 | Production deploy | 🔴 Yüksek | Oracle Cloud Free Tier veya Railway |
 | Beta kullanıcı bul | 🟡 Orta | Reddit/HN/ProductHunt paylaşım |
 | İlk ücretli müşteri | 🟡 Orta | $49 hedef |
-| ToS/Privacy → gerçek sayfalar | 🟢 Düşük | React component olarak yazıldı, ama içerik placeholder olabilir |
-| AI Center scope küçültme | 🟢 Düşük | MVP sonrası için ayrılabilir |
-| Integration testlerin CI'da çalıştırılması | 🟢 Düşük | Testler yazıldı ama CI config güncellenmeli |
+| Embeddable portal | 🟡 Orta | Müşteri dashboard'una eklenebilir UI |
+| Ruby SDK | 🟢 Düşük | Referans: svix-webhooks |
+| Java SDK | 🟢 Düşük | Referans: svix-webhooks |
+| Self-hosted Docker image | 🟢 Düşük | Tek komutla kurulabilir |
+| Webhook transformations | 🟢 Düşük | Filter, map, enrich |
 
 ## 🗺️ Plan / Yol Haritası
 
 | Zaman | Hedef |
 |-------|-------|
-| Şimdi | Domain al, Stripe hesabı aç, local test |
-| 1. ay | Deploy et, beta kullanıcı bul (10-20 kişi) |
-| 2-3. ay | Geri bildirim al, düzelt, ilk ücretli müşteri ($49) |
+| Şimdi | Local test, hataları düzelt |
+| 1. hafta | Deploy et, domain al |
+| 2. hafta | Beta kullanıcı bul (10-20 kişi) |
+| 1. ay | Geri bildirim al, düzelt |
+| 2-3. ay | İlk ücretli müşteri ($49) |
 | 6. ay | $500/ay gelir → şirket kur |
-| 12. ay | $2K+/ay → SOC2 düşün |
 
 ## 💰 Fiyatlandırma
 
@@ -86,7 +99,7 @@ Webhook delivery servisi. Geliştiricilere yönelik.
 
 ## 🔧 Teknik Notlar
 
-- **Dil:** Rust (API + Worker), TypeScript (Dashboard)
+- **Dil:** Rust (API + Worker), TypeScript (Dashboard), Node.js (CLI), Go (SDK)
 - **Framework:** Axum (API), Next.js 15 (Dashboard)
 - **DB:** CockroachDB (PostgreSQL uyumlu)
 - **Queue:** Kafka/Redpanda
@@ -101,14 +114,17 @@ Webhook delivery servisi. Geliştiricilere yönelik.
 2. HookRelay iş planı paylaşıldı
 3. GitHub repo private yapıldı
 4. Repo kodları incelendi — teknik yapı değerlendirildi
-5. Rakip analizi (Svix, Hookdeck, Convoy)
-6. Yasallık konuşuldu:
+5. Rakip analizi (Svix, Hookdeck, Convoy, Hook0, Hostedhooks)
+6. ⚠️ hookrelay.dev zaten var — isim çakışması tespit edildi
+7. 40 eksik feature listelendi ve kategorize edildi
+8. Yasallık konuşuldu:
    - Türkiye'de bireysel satış < 150K TL → basit usul mükellef
    - Stripe bireysel kullanım
    - ToS/Privacy Policy gerekli
    - SLA verme, "best effort" yeterli
-7. Full-time mı part-time mı sorusu soruldu (cevaplanmadı)
-8. 6 iş paralel yapılacakken sırayla yapıldı (düzeltilecek)
+9. Full-time mı part-time mı sorusu soruldu (cevaplanmadı)
+10. GitHub yardımcı repolar araştırıldı (svix-webhooks, standard-webhooks, hook0)
+11. Servet bu işe ilk defa giriyor, bilgisi sınırlı — yönlendirme lazım
 
 ## ⚠️ Güvenlik Uyarıları
 
@@ -121,6 +137,14 @@ Webhook delivery servisi. Geliştiricilere yönelik.
 - **GitHub:** https://github.com/servetarslan02/hookrelay
 - **Plan dosyası:** projects/hookrelay/PLAN.md
 - **Yol haritası:** projects/hookrelay/ROADMAP.md
+- **Feature tracking:** FEATURES.md
+
+## 📚 Yardımcı Repolar
+
+- svix/svix-webhooks: SDK referans, embeddable portal, CLI
+- standard-webhooks/standard-webhooks: İmzalama standardı
+- hook0/hook0: Self-hosted setup, retry pattern
+- frain-dev/convoy: API design referans (kapandı ama kod duruyor)
 
 ---
 
