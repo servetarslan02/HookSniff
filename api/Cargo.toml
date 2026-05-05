@@ -1,0 +1,23 @@
+[package]
+name = "hookrelay-api"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+workspace = { path = ".." }
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace", "limit"] }
+sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid"] }
+rdkafka = { version = "0.36", features = ["cmake-build"] }
+dotenvy = "0.15"
+thiserror = "1"

@@ -1,0 +1,25 @@
+[package]
+name = "hookrelay-worker"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+workspace = { path = ".." }
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+temporal-sdk-core = "0.1"
+temporal-sdk = "0.1"
+reqwest = { version = "0.12", features = ["json"] }
+rdkafka = { version = "0.36", features = ["cmake-build"] }
+sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid"] }
+dotenvy = "0.15"
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
