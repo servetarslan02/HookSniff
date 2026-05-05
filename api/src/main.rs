@@ -9,6 +9,7 @@ mod config;
 mod db;
 pub mod error;
 pub mod events;
+pub mod fifo;
 mod jobs;
 mod kafka;
 pub mod metrics;
@@ -20,6 +21,7 @@ mod routes;
 pub mod schemas;
 pub mod signing;
 pub mod templates;
+pub mod throttle;
 pub mod transform;
 mod validation;
 pub mod ws;
@@ -116,6 +118,7 @@ async fn main() -> Result<()> {
     let metrics = std::sync::Arc::new(metrics::Metrics::new());
 
     let rate_limiter = rate_limit::RateLimiter::new(100, std::time::Duration::from_secs(60));
+    let throttle_manager = throttle::ThrottleManager::new();
 
     // Spawn retention background job (runs every 24 hours)
     let retention_pool = pool.clone();
@@ -140,6 +143,7 @@ async fn main() -> Result<()> {
         .layer(axum::extract::Extension(cfg.clone()))
         .layer(axum::extract::Extension(rate_limiter.clone()))
         .layer(axum::extract::Extension(metrics.clone()))
+        .layer(axum::extract::Extension(throttle_manager))
         .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
         .layer(axum::middleware::from_fn(middleware::request_id_middleware))
         .layer(axum::middleware::from_fn(metrics::metrics_middleware))
