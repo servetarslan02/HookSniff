@@ -26,6 +26,7 @@ pub fn api_router() -> Router {
         .nest("/analytics", analytics::router())
         .nest("/templates", templates::router())
         .nest("/marketplace/agents", marketplace::router())
+        .nest("/schemas", schemas::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Dashboard routes use JWT auth (separate from API key auth)

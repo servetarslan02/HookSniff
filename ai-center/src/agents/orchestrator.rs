@@ -23,6 +23,7 @@ const MAX_AGENTS_PER_WEBHOOK: usize = 10;
 /// 3. The orchestrator checks which agents match the event
 /// 4. Matching agents execute in parallel (up to MAX_AGENTS_PER_WEBHOOK)
 /// 5. Results are collected, actions aggregated, and everything is persisted
+#[derive(Clone)]
 pub struct AgentOrchestrator {
     /// Registered agents
     agents: Arc<RwLock<Vec<Box<dyn WebhookAgent>>>>,

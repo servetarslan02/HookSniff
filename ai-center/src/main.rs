@@ -85,8 +85,6 @@ async fn main() -> Result<()> {
 
     // HTTP sunucusu — worker'dan gelen agent tetikleme isteklerini işler
     let http_pool = pool.clone();
-    let http_orchestrator = agents::orchestrator::AgentOrchestrator::new(pool.clone());
-    http_orchestrator.register_builtins().await;
 
     let http_port = std::env::var("AI_CENTER_PORT")
         .unwrap_or_else(|_| "8081".to_string())
@@ -95,7 +93,7 @@ async fn main() -> Result<()> {
 
     tokio::spawn(async move {
         let app = http::router()
-            .layer(axum::extract::Extension(http_orchestrator))
+            .layer(axum::extract::Extension(agent_orchestrator))
             .layer(axum::extract::Extension(http_pool));
 
         let addr = std::net::SocketAddr::from(([0, 0, 0, 0], http_port));
