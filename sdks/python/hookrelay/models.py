@@ -287,3 +287,197 @@ class AiAction:
             executed_at=_parse_datetime(data.get("executed_at")),
             created_at=_parse_datetime(data.get("created_at")),
         )
+
+
+# --- Webhook Payload Types ---
+
+
+@dataclass
+class OrderItem:
+    """An item in an order."""
+
+    sku: str
+    name: str
+    quantity: int
+    unit_price: float
+
+
+@dataclass
+class OrderCustomer:
+    """Customer info in an order event."""
+
+    id: str
+    email: str
+    name: str
+
+
+@dataclass
+class OrderCreatedPayload:
+    """Payload for order.created events."""
+
+    order_id: str
+    customer: OrderCustomer
+    items: List[OrderItem]
+    total: float
+    currency: str
+    shipping_method: str
+    created_at: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "OrderCreatedPayload":
+        return cls(
+            order_id=data["order_id"],
+            customer=OrderCustomer(**data["customer"]),
+            items=[OrderItem(**item) for item in data.get("items", [])],
+            total=data["total"],
+            currency=data.get("currency", "USD"),
+            shipping_method=data.get("shipping_method", "standard"),
+            created_at=data.get("created_at"),
+        )
+
+
+@dataclass
+class OrderCompletedPayload:
+    """Payload for order.completed events."""
+
+    order_id: str
+    status: str
+    completed_at: Optional[str] = None
+    total_charged: float = 0.0
+    payment_method: str = ""
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "OrderCompletedPayload":
+        return cls(
+            order_id=data["order_id"],
+            status=data.get("status", "completed"),
+            completed_at=data.get("completed_at"),
+            total_charged=data.get("total_charged", 0.0),
+            payment_method=data.get("payment_method", ""),
+        )
+
+
+@dataclass
+class PaymentError:
+    """Error details in a failed payment."""
+
+    code: str
+    message: str
+    decline_code: Optional[str] = None
+
+
+@dataclass
+class PaymentFailedPayload:
+    """Payload for payment.failed events."""
+
+    payment_id: str
+    order_id: str
+    amount: float
+    currency: str
+    error: PaymentError
+    customer_id: str
+    attempted_at: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "PaymentFailedPayload":
+        return cls(
+            payment_id=data["payment_id"],
+            order_id=data["order_id"],
+            amount=data["amount"],
+            currency=data.get("currency", "USD"),
+            error=PaymentError(**data["error"]),
+            customer_id=data["customer_id"],
+            attempted_at=data.get("attempted_at"),
+        )
+
+
+@dataclass
+class PaymentSucceededPayload:
+    """Payload for payment.succeeded events."""
+
+    payment_id: str
+    amount: float
+    currency: str
+    method: str
+    card_brand: str
+    card_last4: str
+    receipt_url: Optional[str] = None
+    paid_at: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "PaymentSucceededPayload":
+        return cls(
+            payment_id=data["payment_id"],
+            amount=data["amount"],
+            currency=data.get("currency", "USD"),
+            method=data.get("method", "card"),
+            card_brand=data.get("card_brand", ""),
+            card_last4=data.get("card_last4", ""),
+            receipt_url=data.get("receipt_url"),
+            paid_at=data.get("paid_at"),
+        )
+
+
+@dataclass
+class UserRegisteredPayload:
+    """Payload for user.registered events."""
+
+    user_id: str
+    email: str
+    name: str
+    plan: str
+    source: str
+    registered_at: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "UserRegisteredPayload":
+        return cls(
+            user_id=data["user_id"],
+            email=data["email"],
+            name=data["name"],
+            plan=data.get("plan", "free"),
+            source=data.get("source", "organic"),
+            registered_at=data.get("registered_at"),
+        )
+
+
+@dataclass
+class UserUpdatedPayload:
+    """Payload for user.updated events."""
+
+    user_id: str
+    changes: Dict[str, Dict[str, Any]]
+    updated_at: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "UserUpdatedPayload":
+        return cls(
+            user_id=data["user_id"],
+            changes=data.get("changes", {}),
+            updated_at=data.get("updated_at"),
+        )
+
+
+@dataclass
+class InvoiceCreatedPayload:
+    """Payload for invoice.created events."""
+
+    invoice_id: str
+    customer_id: str
+    amount_due: float
+    currency: str
+    status: str
+    period_start: Optional[str] = None
+    period_end: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "InvoiceCreatedPayload":
+        return cls(
+            invoice_id=data["invoice_id"],
+            customer_id=data["customer_id"],
+            amount_due=data["amount_due"],
+            currency=data.get("currency", "USD"),
+            status=data.get("status", "open"),
+            period_start=data.get("period_start"),
+            period_end=data.get("period_end"),
+        )

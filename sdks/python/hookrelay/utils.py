@@ -2,6 +2,8 @@
 
 import hashlib
 import hmac
+import json
+from typing import Any, Callable, Dict, Optional
 
 
 def verify_signature(payload: str, signature: str, secret: str) -> bool:
@@ -39,3 +41,169 @@ def verify_signature(payload: str, signature: str, secret: str) -> bool:
 
     # Constant-time comparison
     return hmac.compare_digest(computed, expected_hex)
+
+
+def verify_webhook_signature(
+    payload: str,
+    signature: Optional[str],
+    secret: str,
+) -> Dict[str, Any]:
+    """
+    Verify a webhook signature and parse the payload.
+
+    Higher-level convenience function that handles common edge cases
+    and returns a structured result.
+
+    Args:
+        payload: The raw request body as a string.
+        signature: The signature header value (e.g., "sha256=abc123...").
+        secret: The endpoint's signing secret (starts with "whsec_").
+
+    Returns:
+        A dict with 'valid' bool and either 'payload' (parsed JSON) or 'error' (str).
+
+    Example:
+        >>> from hookrelay import verify_webhook_signature
+        >>> result = verify_webhook_signature(
+        ...     request.body.decode(),
+        ...     request.headers.get("X-Hookrelay-Signature"),
+        ...     "whsec_..."
+        ... )
+        >>> if result["valid"]:
+        ...     print(result["payload"]["event"])
+    """
+    if not signature:
+        return {"valid": False, "error": "Missing signature header"}
+
+    if not secret:
+        return {"valid": False, "error": "Missing signing secret"}
+
+    if not payload:
+        return {"valid": False, "error": "Missing request body"}
+
+    is_valid = verify_signature(payload, signature, secret)
+    if not is_valid:
+        return {"valid": False, "error": "Invalid signature"}
+
+    try:
+        parsed = json.loads(payload)
+        return {"valid": True, "payload": parsed}
+    except json.JSONDecodeError:
+        return {"valid": False, "error": "Invalid JSON payload"}
+
+
+class WebhookHandler:
+    """
+    Webhook handler for Flask and FastAPI integration.
+
+    Handles signature verification, event routing, and error handling.
+
+    Example (Flask):
+        from flask import Flask, request
+        from hookrelay import WebhookHandler
+
+        app = Flask(__name__)
+        handler = WebhookHandler(
+            secret="whsec_...",
+            handlers={
+                "order.created": lambda p: print(f"New order: {p['data']}"),
+            },
+        )
+
+        @app.route("/webhook", methods=["POST"])
+        def webhook():
+            return handler.handle(
+                body=request.data.decode(),
+                signature=request.headers.get("X-Hookrelay-Signature"),
+            )
+
+    Example (FastAPI):
+        from fastapi import FastAPI, Request, Response
+        from hookrelay import WebhookHandler
+
+        app = FastAPI()
+        handler = WebhookHandler(secret="whsec_...")
+
+        @app.post("/webhook")
+        async def webhook(request: Request):
+            body = (await request.body()).decode()
+            sig = request.headers.get("X-Hookrelay-Signature")
+            return handler.handle(body=body, signature=sig)
+    """
+
+    def __init__(
+        self,
+        secret: str,
+        handlers: Optional[Dict[str, Callable]] = None,
+        on_event: Optional[Callable] = None,
+        signature_header: str = "X-Hookrelay-Signature",
+    ):
+        self.secret = secret
+        self.handlers = handlers or {}
+        self.on_event = on_event
+        self.signature_header = signature_header
+
+    def handle(
+        self,
+        body: str,
+        signature: Optional[str] = None,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Process an incoming webhook request.
+
+        Args:
+            body: The raw request body as a string.
+            signature: The signature value. If None, tries to extract from headers.
+            headers: Optional dict of request headers (for auto-extracting signature).
+
+        Returns:
+            A dict with 'status_code' and 'body' for the HTTP response.
+        """
+        # Auto-extract signature from headers if not provided
+        if signature is None and headers:
+            # Try common header names
+            for header_name in [
+                self.signature_header,
+                self.signature_header.lower(),
+                "x-hookrelay-signature",
+            ]:
+                if header_name in headers:
+                    signature = headers[header_name]
+                    break
+
+        result = verify_webhook_signature(body, signature, self.secret)
+
+        if not result["valid"]:
+            return {
+                "status_code": 401,
+                "body": {
+                    "error": {
+                        "code": "INVALID_SIGNATURE",
+                        "message": result.get("error", "Signature verification failed"),
+                    }
+                },
+            }
+
+        payload = result["payload"]
+
+        try:
+            # Route to specific handler
+            event = payload.get("event", "")
+            handler = self.handlers.get(event)
+            if handler:
+                handler(payload)
+            elif self.on_event:
+                self.on_event(payload)
+
+            return {"status_code": 200, "body": {"received": True}}
+        except Exception as e:
+            return {
+                "status_code": 500,
+                "body": {
+                    "error": {
+                        "code": "HANDLER_ERROR",
+                        "message": f"Internal webhook handler error: {str(e)}",
+                    }
+                },
+            }

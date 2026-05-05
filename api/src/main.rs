@@ -14,7 +14,10 @@ mod middleware;
 mod models;
 mod rate_limit;
 mod routes;
+pub mod schemas;
+pub mod transform;
 mod validation;
+pub mod ws;
 
 #[tokio::main]
 async fn main() -> Result<()> {
