@@ -141,3 +141,27 @@ jobs:
         with:
           name: dashboard-build
           path: dashboard/.next
+
+  # ──────────────────────────────────────────────
+  # AI Center (Rust)
+  # ──────────────────────────────────────────────
+  build-ai-center:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/cache@v4
+        with:
+          path: target/
+          key: ${{ runner.os }}-cargo-release-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-release-
+
+      - name: Build AI Center
+        run: cargo build --release -p hookrelay-ai-center
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-center-binary
+          path: target/release/hookrelay-ai-center

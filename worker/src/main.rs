@@ -95,13 +95,20 @@ async fn main() -> Result<()> {
     // -----------------------------------------------------------------------
     tracing::info!("🔧 Initializing Temporal worker at {}", cfg.temporal_url);
 
+    // Create a shared Kafka producer for activities (used by publish_to_kafka)
+    let shared_kafka_producer: FutureProducer = ClientConfig::new()
+        .set("bootstrap.servers", &cfg.kafka_brokers)
+        .set("message.timeout.ms", "5000")
+        .set("queue.buffering.max.messages", "100000")
+        .create()?;
+
     let temporal_handle = {
         let cfg_clone = cfg.clone();
         let pool_clone = pool.clone();
         let http_client_clone = http_client.clone();
 
         tokio::spawn(async move {
-            if let Err(e) = run_temporal_worker(cfg_clone, pool_clone, http_client_clone).await {
+            if let Err(e) = run_temporal_worker(cfg_clone, pool_clone, http_client_clone, Some(shared_kafka_producer)).await {
                 tracing::error!("❌ Temporal worker failed: {:?}", e);
             }
         })
@@ -172,6 +179,7 @@ async fn run_temporal_worker(
     cfg: config::WorkerConfig,
     pool: sqlx::PgPool,
     http_client: reqwest::Client,
+    kafka_producer: Option<FutureProducer>,
 ) -> Result<()> {
     // Set the Temporal address for the SDK's envconfig loader.
     // The SDK reads TEMPORAL_ADDRESS or falls back to localhost:7233.
@@ -195,6 +203,7 @@ async fn run_temporal_worker(
     let activities = HookRelayActivities {
         http_client,
         pool,
+        kafka_producer,
     };
 
     // Configure the worker:

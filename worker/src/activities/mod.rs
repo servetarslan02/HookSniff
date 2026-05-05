@@ -34,6 +34,9 @@ use crate::signing;
 pub struct HookRelayActivities {
     pub http_client: Client,
     pub pool: PgPool,
+    /// Shared Kafka producer for publishing delivery results.
+    /// Created once at startup and reused across all activity invocations.
+    pub kafka_producer: Option<rdkafka::producer::FutureProducer>,
 }
 
 // ---------------------------------------------------------------------------
@@ -311,16 +314,24 @@ impl HookRelayActivities {
         _ctx: ActivityContext,
         input: PublishKafkaInput,
     ) -> Result<(), ActivityError> {
-        use rdkafka::producer::{FutureProducer, FutureRecord};
+        use rdkafka::producer::FutureRecord;
         use std::time::Duration;
 
-        let producer: FutureProducer = rdkafka::config::ClientConfig::new()
-            .set("bootstrap.servers", &crate::config::WorkerConfig::from_env()
-                .map_err(|e| ActivityError::from(anyhow::anyhow!("Config error: {}", e)))?
-                .kafka_brokers)
-            .set("message.timeout.ms", "5000")
-            .create()
-            .map_err(|e| ActivityError::from(anyhow::anyhow!("Kafka producer error: {}", e)))?;
+        // Use the shared producer if available, otherwise create a new one
+        let producer = if let Some(ref p) = self.kafka_producer {
+            p.clone()
+        } else {
+            let cfg = crate::config::WorkerConfig::from_env()
+                .map_err(|e| ActivityError::from(anyhow::anyhow!("Config error: {}", e)))?;
+            rdkafka::config::ClientConfig::new()
+                .set("bootstrap.servers", &cfg.kafka_brokers)
+                .set("message.timeout.ms", "5000")
+                .create()
+                .map_err(|e| ActivityError::from(anyhow::anyhow!("Kafka producer error: {}", e)))?
+        };
+
+        let cfg = crate::config::WorkerConfig::from_env()
+            .map_err(|e| ActivityError::from(anyhow::anyhow!("Config error: {}", e)))?;
 
         let msg = serde_json::json!({
             "delivery_id": input.delivery_id,
@@ -331,13 +342,9 @@ impl HookRelayActivities {
             "timestamp": Utc::now().to_rfc3339(),
         });
 
-        let topic = crate::config::WorkerConfig::from_env()
-            .map_err(|e| ActivityError::from(anyhow::anyhow!("Config error: {}", e)))?
-            .kafka_topic;
-
         producer
             .send(
-                FutureRecord::to(&topic)
+                FutureRecord::to(&cfg.kafka_topic)
                     .key(&input.delivery_id)
                     .payload(&msg.to_string()),
                 Duration::from_secs(5),

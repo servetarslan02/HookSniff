@@ -11,8 +11,18 @@ use crate::agents::orchestrator::AgentOrchestrator;
 /// Build the HTTP router for the AI center agent API.
 pub fn router() -> Router {
     Router::new()
+        .route("/health", get(health_check))
         .route("/v1/agents", get(list_agents))
         .route("/v1/agents/trigger", post(trigger_agents))
+}
+
+/// Health check endpoint for liveness probes.
+async fn health_check() -> Json<serde_json::Value> {
+    Json(serde_json::json!({
+        "status": "ok",
+        "service": "ai-center",
+        "timestamp": chrono::Utc::now().to_rfc3339(),
+    }))
 }
 
 /// Request body from the worker to trigger agents after a delivery.

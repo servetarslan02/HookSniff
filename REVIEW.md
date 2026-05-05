@@ -6,6 +6,27 @@
 
 ---
 
+## ✅ DÜZELTMELER UYGULANDI (2026-05-06)
+
+| # | Sorun | Durum | Yapılan |
+|---|-------|-------|---------|
+| 🔴1 | Worker yanlış Dockerfile | ✅ Düzeltildi | `docker-compose.yml` → `Dockerfile.worker` kullanıyor artık |
+| 🔴2 | Rate limiter aktif değil | ✅ Düzeltildi | `rate_limit_middleware` router'a eklendi |
+| 🔴4 | CORS Any origin | ✅ Düzeltildi | Production'da `CORS_ORIGINS` env ile限制, dev'de Any |
+| 🔴5 | Production varsayılan secret'lar | ✅ Düzeltildi | Config `bail!` ile启动 reddediyor artık |
+| 🟡7 | AI Center eski Rust | ✅ Düzeltildi | `rust:1.82-bookworm` olarak güncellendi |
+| 🟡10 | Cargo.lock eksik | ⚠️ Manuel gerekli | `cargo generate-lockfile` çalıştırılmalı |
+| 🟡11 | .dockerignore eksik | ✅ Oluşturuldu | Proje kök dizininde `.dockerignore` |
+| 🟡12 | Dashboard public/ eksik | ✅ Oluşturuldu | `dashboard/public/.gitkeep` |
+| 🟡13 | Tekrarlanan Plan enum'u | ✅ Düzeltildi | `rate_limit.rs` artık `billing::Plan` import ediyor |
+| 🟡14 | Go SDK go.mod eksik | ✅ Oluşturuldu | `sdks/go/go.mod` |
+| 🟡17 | Her activity'de yeni Kafka producer | ✅ Düzeltildi | Shared producer artık `HookRelayActivities`'te |
+| 🟡19 | Python SDK versiyon tutarsızlığı | ✅ Düzeltildi | `setup.py` → `0.3.0` |
+| 🟢3 | AI Center health endpoint | ✅ Eklendi | `/health` endpoint'i eklendi |
+| 🟢 | CORS_ORIGINS env | ✅ Eklendi | `.env.example`'a eklendi |
+
+---
+
 ## 📊 Genel Değerlendirme
 
 | Kategori | Durum |
