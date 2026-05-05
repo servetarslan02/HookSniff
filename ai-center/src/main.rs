@@ -28,11 +28,32 @@ async fn main() -> Result<()> {
     tracing::info!("   Savunma: {}", cfg.defense_enabled);
 
     let mut system_monitor = monitor::system::SystemMonitor::new();
-    let ai_analyzer = ai_engine::analyzer::AiAnalyzer::from_env();
 
-    let (mimo_status, openai_status) = ai_analyzer.status();
-    tracing::info!("   MiMo AI: {}", mimo_status);
-    tracing::info!("   OpenAI: {}", openai_status);
+    // AI Orkestratör — tüm AI'ları koordine eden sistem
+    let orchestrator = ai_engine::orchestrator::AiOrchestrator::new();
+
+    // Mevcut AI sağlayıcıları otomatik ekle
+    if let Some(mimo) = ai_engine::mimo::MiMoProvider::from_env() {
+        orchestrator.add_provider(Box::new(mimo)).await;
+    }
+    if let Some(openai) = ai_engine::openai::OpenAiProvider::from_env() {
+        orchestrator.add_provider(Box::new(openai)).await;
+    }
+
+    // Yeni AI sağlayıcıları buraya ekle:
+    // if let Some(gemini) = ai_engine::gemini::GeminiProvider::from_env() {
+    //     orchestrator.add_provider(Box::new(gemini)).await;
+    // }
+    // if let Some(claude) = ai_engine::claude::ClaudeProvider::from_env() {
+    //     orchestrator.add_provider(Box::new(claude)).await;
+    // }
+
+    let provider_count = orchestrator.all_status().await.len();
+    tracing::info!("🤖 {} AI sağlayıcı aktif", provider_count);
+
+    if provider_count == 0 {
+        tracing::warn!("⚠️ Hiç AI API key tanımlanmamış — kural tabanlı analiz kullanılacak");
+    }
 
     loop {
         tracing::debug!("🔄 Kontrol döngüsü başlıyor...");
