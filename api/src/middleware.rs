@@ -53,3 +53,22 @@ pub fn generate_api_key() -> String {
     use uuid::Uuid;
     format!("hr_live_{}", Uuid::new_v4().to_string().replace('-', ""))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_api_key_generation() {
+        let key = generate_api_key();
+        assert!(key.starts_with("hr_live_"));
+    }
+
+    #[test]
+    fn test_api_key_hashing() {
+        let key = "hr_live_test123";
+        let hash1 = hash_api_key(key);
+        let hash2 = hash_api_key(key);
+        assert_eq!(hash1, hash2);
+    }
+}

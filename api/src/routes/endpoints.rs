@@ -97,6 +97,88 @@ async fn delete_endpoint(
 }
 
 fn is_internal_url(url: &str) -> bool {
-    let blocked = ["localhost", "127.0.0.1", "0.0.0.0", "10.", "172.16.", "192.168.", "169.254."];
-    blocked.iter().any(|b| url.contains(b))
+    let parsed = match url::Url::parse(url) {
+        Ok(u) => u,
+        Err(_) => return true, // Invalid URL = block
+    };
+
+    let host = match parsed.host_str() {
+        Some(h) => h,
+        None => return true,
+    };
+
+    // Block common internal hostnames
+    let blocked_hosts = ["localhost", "localhost.localdomain", "ip6-localhost"];
+    if blocked_hosts.iter().any(|&b| host.eq_ignore_ascii_case(b)) {
+        return true;
+    }
+
+    // Block .local, .internal, .localhost TLDs
+    if host.ends_with(".local") || host.ends_with(".internal") || host.ends_with(".localhost") {
+        return true;
+    }
+
+    // Try to parse as IP
+    if let Ok(ip) = host.parse::<std::net::IpAddr>() {
+        return is_private_ip(ip);
+    }
+
+    // Block IP-like patterns in hostname (hex, octal, decimal)
+    if host.starts_with("0x") || host.starts_with("0X") {
+        return true;
+    }
+
+    // Check for numeric patterns like 127.0.0.1.nip.io
+    let parts: Vec<&str> = host.split('.').collect();
+    if parts.len() >= 4 {
+        if parts[0].parse::<u8>().is_ok() && parts[1].parse::<u8>().is_ok() {
+            return true; // Looks like an IP in a hostname
+        }
+    }
+
+    false
+}
+
+fn is_private_ip(ip: std::net::IpAddr) -> bool {
+    match ip {
+        std::net::IpAddr::V4(v4) => {
+            v4.is_loopback()
+                || v4.is_private()
+                || v4.is_link_local()
+                || v4.is_broadcast()
+                || v4.is_unspecified()
+                || v4.octets()[0] == 100 && (v4.octets()[1] & 0xC0) == 64 // 100.64.0.0/10
+                || v4.octets()[0] == 169 && v4.octets()[1] == 254 // 169.254.0.0/16
+                || v4.octets()[0] == 192 && v4.octets()[1] == 168 // 192.168.0.0/16
+                || v4.octets()[0] == 172 && (v4.octets()[1] & 0xF0) == 16 // 172.16.0.0/12
+        }
+        std::net::IpAddr::V6(v6) => {
+            v6.is_loopback()
+                || v6.is_unspecified()
+                || {
+                    let segments = v6.segments();
+                    segments[0] == 0xfe80 // link-local
+                        || segments[0] == 0xfc00 || segments[0] == 0xfd00 // unique local
+                }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_internal_url_detection() {
+        assert!(is_internal_url("http://localhost:3000"));
+        assert!(is_internal_url("http://127.0.0.1/"));
+        assert!(is_internal_url("http://192.168.1.1/"));
+        assert!(is_internal_url("http://10.0.0.1/"));
+        assert!(is_internal_url("http://172.16.0.1/"));
+        assert!(is_internal_url("http://0.0.0.0/"));
+        assert!(is_internal_url("http://169.254.1.1/"));
+        assert!(is_internal_url("http://[::1]/"));
+        assert!(!is_internal_url("https://example.com"));
+        assert!(!is_internal_url("https://myapp.com/webhook"));
+    }
 }

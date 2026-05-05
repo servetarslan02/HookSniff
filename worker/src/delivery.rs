@@ -1,6 +1,5 @@
 use anyhow::Result;
 use reqwest::Client;
-use sqlx::postgres::PgPoolOptions;
 
 use crate::config::WorkerConfig;
 use crate::signing;
@@ -10,12 +9,8 @@ pub async fn process_delivery(
     http_client: &Client,
     cfg: &WorkerConfig,
     webhook: &WebhookMessage,
+    pool: &sqlx::PgPool,
 ) -> Result<()> {
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&cfg.database_url)
-        .await?;
-
     // Get current attempt count
     let delivery: (i32,) = sqlx::query_as(
         "SELECT attempt_count FROM deliveries WHERE id = $1"

@@ -29,6 +29,11 @@ async fn main() -> Result<()> {
         .timeout(std::time::Duration::from_secs(30))
         .build()?;
 
+    let pool = sqlx::postgres::PgPoolOptions::new()
+        .max_connections(10)
+        .connect(&cfg.database_url)
+        .await?;
+
     let consumer: StreamConsumer = ClientConfig::new()
         .set("bootstrap.servers", &cfg.kafka_brokers)
         .set("group.id", &cfg.consumer_group)
@@ -47,7 +52,7 @@ async fn main() -> Result<()> {
                     match serde_json::from_str::<WebhookMessage>(payload) {
                         Ok(webhook) => {
                             tracing::info!("📥 Processing delivery {}", webhook.delivery_id);
-                            if let Err(e) = delivery::process_delivery(&http_client, &cfg, &webhook).await {
+                            if let Err(e) = delivery::process_delivery(&http_client, &cfg, &webhook, &pool).await {
                                 tracing::error!("❌ Failed to process delivery {}: {:?}", webhook.delivery_id, e);
                             }
                         }

@@ -91,6 +91,12 @@ async fn create_webhook(
     Extension(cfg): Extension<Config>,
     Json(req): Json<CreateWebhookRequest>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
+    // Check payload size
+    let payload_size = serde_json::to_string(&req.data).map(|s| s.len()).unwrap_or(0);
+    if payload_size > cfg.max_webhook_payload_bytes {
+        return Err(AppError::PayloadTooLarge);
+    }
+
     // Check rate limit
     if customer.webhook_count >= customer.webhook_limit {
         return Err(AppError::RateLimitExceeded);

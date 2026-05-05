@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable
+      - KAFKA_BROKERS=redpanda:9092
+      - KAFKA_TOPIC=webhook-deliveries
+      - RUST_LOG=info
+      - HMAC_SECRET=${HMAC_SECRET:-change-me}
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable
+      - KAFKA_BROKERS=redpanda:9092
+      - KAFKA_TOPIC=webhook-deliveries
+      - RUST_LOG=info
+      - HMAC_SECRET=${HMAC_SECRET:-change-me}
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    ports:
+      - "3001:3001"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:3000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  cockroachdb:
+    image: cockroachdb/cockroach:latest
+    command: start-single-node --insecure --accept-sql-without-tls
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    volumes:
+      - cockroachdb-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "cockroach", "node", "status", "--insecure", "--host=cockroachdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redpanda:
+    image: docker.redpanda.com/vectorized/redpanda:latest
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:9092,OUTSIDE://localhost:9093
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "9644:9644"
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health", "--api-urls=localhost:9644"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  create-topics:
+    image: docker.redpanda.com/vectorized/redpanda:latest
+    command:
+      - rpk
+      - topic
+      - create
+      - webhook-deliveries
+      - --brokers=redpanda:9092
+      - --partitions=3
+      - --replicas=1
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  cockroachdb-data:

@@ -1,73 +1,73 @@
-"use client";
-
-import { useState } from "react";
+'use client';
 
 export default function SettingsPage() {
-  const [apiKey, setApiKey] = useState("hr_live_••••••••••••••••");
-  const [copied, setCopied] = useState(false);
-
-  const copyKey = () => {
-    navigator.clipboard.writeText(apiKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
-
-      {/* API Key */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">API Key</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Use this key to authenticate API requests. Pass it as a Bearer token in the Authorization header.
-        </p>
-        <div className="flex gap-2">
-          <code className="flex-1 bg-gray-100 px-4 py-2 rounded-lg text-sm font-mono">
-            {apiKey}
-          </code>
-          <button
-            onClick={copyKey}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition"
-          >
-            {copied ? "✓ Copied" : "Copy"}
-          </button>
-        </div>
-        <p className="text-xs text-gray-400 mt-2">
-          Rotate your key if compromised. Old key will stop working immediately.
-        </p>
+    <div className="space-y-8 max-w-2xl">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+        <p className="text-sm text-gray-500 mt-1">Manage your account and API configuration</p>
       </div>
 
-      {/* Plan */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Plan</h2>
-        <div className="flex items-center justify-between">
+      {/* API Key Section */}
+      <div className="glass-card p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">API Key</h3>
+        <div className="space-y-4">
           <div>
-            <span className="inline-block bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded-full">
-              Free
-            </span>
-            <p className="text-sm text-gray-500 mt-1">
-              1,000 webhooks/month · 1 endpoint · 3 retries
-            </p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Your API Key</label>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value="hr_live_••••••••••••••••••••"
+                readOnly
+                className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono text-sm"
+              />
+              <button className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-gray-800 transition">
+                Copy
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Keep this secret. Do not share it in client-side code.</p>
           </div>
-          <button className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition">
-            Upgrade to Pro →
+          <button className="text-sm text-red-600 hover:text-red-700 font-medium transition">
+            Regenerate API Key
           </button>
         </div>
       </div>
 
-      {/* Usage */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Usage</h2>
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600">Webhooks this month</span>
-              <span className="font-medium">0 / 1,000</span>
+      {/* Webhook Config */}
+      <div className="glass-card p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Webhook Configuration</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Max Retry Attempts</label>
+            <select className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+              <option>3</option>
+              <option>5</option>
+              <option>10</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Timeout (seconds)</label>
+            <input
+              type="number"
+              defaultValue={30}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="glass-card p-6 border-red-200">
+        <h3 className="text-lg font-semibold text-red-700 mb-4">Danger Zone</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl">
+            <div>
+              <div className="font-medium text-gray-900">Delete Account</div>
+              <div className="text-sm text-gray-500">Permanently delete your account and all data</div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-brand-500 h-2 rounded-full" style={{ width: "0%" }} />
-            </div>
+            <button className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-700 transition">
+              Delete
+            </button>
           </div>
         </div>
       </div>
