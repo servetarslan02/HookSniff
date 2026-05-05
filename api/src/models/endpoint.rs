@@ -23,6 +23,8 @@ pub struct Endpoint {
     pub avg_response_ms: i32,
     pub failure_streak: i32,
     pub last_failure_at: Option<DateTime<Utc>>,
+    /// Event delivery format: "standard" or "cloudevents".
+    pub format: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -92,6 +94,38 @@ impl RetryPolicy {
     }
 }
 
+/// The event delivery format.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum DeliveryFormat {
+    /// Standard HookRelay format (default).
+    Standard,
+    /// CloudEvents v1.0 envelope format.
+    CloudEvents,
+}
+
+impl Default for DeliveryFormat {
+    fn default() -> Self {
+        Self::Standard
+    }
+}
+
+impl DeliveryFormat {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Standard => "standard",
+            Self::CloudEvents => "cloudevents",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "cloudevents" => Self::CloudEvents,
+            _ => Self::Standard,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct CreateEndpointRequest {
     pub url: String,
@@ -102,6 +136,8 @@ pub struct CreateEndpointRequest {
     pub retry_policy: Option<RetryPolicy>,
     pub routing_strategy: Option<String>,
     pub fallback_url: Option<String>,
+    /// Event delivery format: "standard" (default) or "cloudevents".
+    pub format: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -119,6 +155,8 @@ pub struct EndpointResponse {
     pub fallback_url: Option<String>,
     pub avg_response_ms: i32,
     pub failure_streak: i32,
+    /// Event delivery format: "standard" or "cloudevents".
+    pub format: String,
 }
 
 impl Endpoint {
@@ -137,6 +175,7 @@ impl Endpoint {
             fallback_url: self.fallback_url,
             avg_response_ms: self.avg_response_ms,
             failure_streak: self.failure_streak,
+            format: self.format,
         }
     }
 
@@ -326,6 +365,7 @@ mod tests {
             avg_response_ms: 0,
             failure_streak: 0,
             last_failure_at: None,
+            format: "standard".into(),
         };
 
         assert!(ep.is_ip_allowed("192.168.1.1"));
@@ -357,6 +397,7 @@ mod tests {
             avg_response_ms: 0,
             failure_streak: 0,
             last_failure_at: None,
+            format: "standard".into(),
         };
 
         assert!(ep.matches_event_filter("order.created"));
@@ -407,6 +448,7 @@ mod tests {
             avg_response_ms: 100,
             failure_streak: streak,
             last_failure_at: if streak > 0 { Some(chrono::Utc::now()) } else { None },
+            format: "standard".into(),
         }
     }
 
