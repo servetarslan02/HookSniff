@@ -1,118 +1,54 @@
+# HookRelay — Full Stack (Development)
+# Kullanım: docker compose up
+#
+# Servisler:
+#   - PostgreSQL (veritabanı)
+#   - Rust API (backend)
+#   - Rust Worker (webhook teslimatı)
+#   - Next.js Dashboard (frontend)
+
 services:
-  # ── Infrastructure ──
-  cockroachdb:
-    image: cockroachdb/cockroach:latest
-    command: start-single-node --insecure --accept-sql-without-tls
+  # ── PostgreSQL ──
+  postgres:
+    image: postgres:16-alpine
+    container_name: hookrelay-db
+    environment:
+      POSTGRES_USER: hookrelay
+      POSTGRES_PASSWORD: hookrelay_local
+      POSTGRES_DB: hookrelay
     ports:
-      - "26257:26257"
-      - "8080:8080"
+      - "5432:5432"
     volumes:
-      - cockroachdb-data:/cockroach/cockroach-data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "cockroach", "node", "status", "--insecure", "--host=cockroachdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redpanda:
-    image: docker.redpanda.com/redpandadata/redpanda:latest
-    command:
-      - redpanda
-      - start
-      - --overprovisioned
-      - --smp
-      - "1"
-      - --memory
-      - 512M
-      - --reserve-memory
-      - 0M
-      - --node-id
-      - "0"
-      - --check=false
-      - --kafka-addr
-      - PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
-      - --advertise-kafka-addr
-      - PLAINTEXT://redpanda:9092,OUTSIDE://localhost:9093
-    ports:
-      - "9092:9092"
-      - "9093:9093"
-      - "9644:9644"
-    healthcheck:
-      test: ["CMD", "rpk", "cluster", "health", "--api-urls=localhost:9644"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  temporal:
-    image: temporalio/auto-setup:latest
-    ports:
-      - "7233:7233"
-    environment:
-      - DB=postgres12
-      - DB_PORT=5432
-      - POSTGRES_USER=root
-      - POSTGRES_PWD=
-      - POSTGRES_SEEDS=cockroachdb
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
-    depends_on:
-      cockroachdb:
-        condition: service_healthy
-
-  temporal-ui:
-    image: temporalio/ui:latest
-    ports:
-      - "8081:8080"
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-    depends_on:
-      - temporal
-
-  create-topics:
-    image: docker.redpanda.com/redpandadata/redpanda:latest
-    command:
-      - rpk
-      - topic
-      - create
-      - webhook-deliveries
-      - --brokers=redpanda:9092
-      - --partitions=3
-      - --replicas=1
-    depends_on:
-      redpanda:
-        condition: service_healthy
+      test: ["CMD-SHELL", "pg_isready -U hookrelay -d hookrelay"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
 
   # ── HookRelay API ──
   api:
     build:
       context: .
       dockerfile: Dockerfile.api
+    container_name: hookrelay-api
     ports:
       - "3000:3000"
     environment:
-      - APP_ENV=production
-      - PORT=3000
-      - DATABASE_URL=postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable
-      - KAFKA_BROKERS=redpanda:9092
-      - KAFKA_TOPIC=webhook-deliveries
-      - HMAC_SECRET=${HMAC_SECRET:-change-me-in-production}
-      - JWT_SECRET=${JWT_SECRET:-change-me-jwt-secret}
-      - RUST_LOG=info,hookrelay=debug
-      - TEMPORAL_URL=http://temporal:7233
-      - TEMPORAL_TASK_QUEUE=hookrelay-deliveries
-      - MAX_PAYLOAD_BYTES=1048576
-      - RETENTION_DAYS=30
-      - WEBHOOK_FORMAT=standard
-      - WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
-      - APP_URL=http://localhost:3001
+      APP_ENV: development
+      PORT: "3000"
+      DATABASE_URL: "postgresql://hookrelay:hookrelay_local@postgres:5432/hookrelay?sslmode=disable"
+      HMAC_SECRET: "local-dev-hmac-secret-not-for-production"
+      JWT_SECRET: "local-dev-jwt-secret-not-for-production"
+      RUST_LOG: "info,hookrelay=debug"
+      MAX_PAYLOAD_BYTES: "1048576"
+      RETENTION_DAYS: "30"
+      WEBHOOK_FORMAT: "standard"
+      WEBHOOK_TIMESTAMP_TOLERANCE_SECS: "300"
     depends_on:
-      cockroachdb:
+      postgres:
         condition: service_healthy
-      redpanda:
-        condition: service_healthy
-      temporal:
-        condition: service_started
     restart: unless-stopped
 
   # ── HookRelay Worker ──
@@ -120,34 +56,30 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker
+    container_name: hookrelay-worker
     environment:
-      - APP_ENV=production
-      - DATABASE_URL=postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable
-      - KAFKA_BROKERS=redpanda:9092
-      - KAFKA_TOPIC=webhook-deliveries
-      - KAFKA_CONSUMER_GROUP=hookrelay-worker
-      - HMAC_SECRET=${HMAC_SECRET:-change-me-in-production}
-      - JWT_SECRET=${JWT_SECRET:-change-me-jwt-secret}
-      - RUST_LOG=info,hookrelay=debug
-      - TEMPORAL_URL=http://temporal:7233
-      - TEMPORAL_TASK_QUEUE=hookrelay-deliveries
-      - MAX_ATTEMPTS=3
+      DATABASE_URL: "postgresql://hookrelay:hookrelay_local@postgres:5432/hookrelay?sslmode=disable"
+      RUST_LOG: "info,hookrelay=debug"
+      MAX_ATTEMPTS: "3"
     depends_on:
-      - api
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
-  # ── HookRelay Dashboard ──
+  # ── Dashboard ──
   dashboard:
     build:
       context: .
       dockerfile: Dockerfile.dashboard
+    container_name: hookrelay-dashboard
     ports:
       - "3001:3001"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:3000/v1
+      NEXT_PUBLIC_API_URL: "http://localhost:3000/v1"
+      PORT: "3001"
     depends_on:
       - api
     restart: unless-stopped
 
 volumes:
-  cockroachdb-data:
+  pgdata:

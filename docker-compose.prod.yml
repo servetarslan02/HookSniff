@@ -1,10 +1,8 @@
-# HookRelay Production Docker Compose
-# Usage: docker compose -f docker-compose.prod.yml up -d
+# HookRelay — Production Docker Compose
+# Kullanım: docker compose -f docker-compose.prod.yml up -d
 
 services:
-  # ──────────────────────────────────────────────
-  # API Server
-  # ──────────────────────────────────────────────
+  # ── API Server ──
   api:
     build:
       context: .
@@ -13,9 +11,7 @@ services:
       - "3000:3000"
     env_file: .env.production
     depends_on:
-      cockroachdb:
-        condition: service_healthy
-      redpanda:
+      postgres:
         condition: service_healthy
     restart: always
     deploy:
@@ -23,15 +19,11 @@ services:
         limits:
           cpus: '2.0'
           memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 256M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 15s
       timeout: 5s
       retries: 3
-      start_period: 10s
     logging:
       driver: json-file
       options:
@@ -40,20 +32,14 @@ services:
     networks:
       - hookrelay
 
-  # ──────────────────────────────────────────────
-  # Worker (Temporal-based delivery worker)
-  # ──────────────────────────────────────────────
+  # ── Worker ──
   worker:
     build:
       context: .
       dockerfile: Dockerfile.worker
     env_file: .env.production
     depends_on:
-      cockroachdb:
-        condition: service_healthy
-      redpanda:
-        condition: service_healthy
-      temporal:
+      postgres:
         condition: service_healthy
     restart: always
     deploy:
@@ -61,9 +47,6 @@ services:
         limits:
           cpus: '2.0'
           memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 256M
     logging:
       driver: json-file
       options:
@@ -72,9 +55,7 @@ services:
     networks:
       - hookrelay
 
-  # ──────────────────────────────────────────────
-  # Dashboard (Next.js)
-  # ──────────────────────────────────────────────
+  # ── Dashboard ──
   dashboard:
     build:
       context: .
@@ -91,9 +72,6 @@ services:
         limits:
           cpus: '1.0'
           memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/"]
       interval: 15s
@@ -107,32 +85,26 @@ services:
     networks:
       - hookrelay
 
-  # ──────────────────────────────────────────────
-  # CockroachDB
-  # ──────────────────────────────────────────────
-  cockroachdb:
-    image: cockroachdb/cockroach:latest
-    command: start-single-node --insecure --accept-sql-without-tls --cache=25% --max-sql-memory=25%
-    ports:
-      - "26257:26257"
-      - "8080:8080"
+  # ── PostgreSQL ──
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hookrelay
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hookrelay}
+      POSTGRES_DB: hookrelay
     volumes:
-      - cockroachdb-data:/cockroach/cockroach-data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "cockroach", "node", "status", "--insecure", "--host=cockroachdb"]
+      test: ["CMD-SHELL", "pg_isready -U hookrelay -d hookrelay"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
     restart: always
     deploy:
       resources:
         limits:
           cpus: '2.0'
           memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
     logging:
       driver: json-file
       options:
@@ -141,128 +113,8 @@ services:
     networks:
       - hookrelay
 
-  # ──────────────────────────────────────────────
-  # Redpanda (Kafka-compatible)
-  # ──────────────────────────────────────────────
-  redpanda:
-    image: docker.redpanda.com/redpandadata/redpanda:latest
-    command:
-      - redpanda
-      - start
-      - --overprovisioned
-      - --smp
-      - "2"
-      - --memory
-      - 1G
-      - --reserve-memory
-      - 128M
-      - --node-id
-      - "0"
-      - --check=false
-      - --kafka-addr
-      - PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
-      - --advertise-kafka-addr
-      - PLAINTEXT://redpanda:9092,OUTSIDE://localhost:9093
-    ports:
-      - "9092:9092"
-      - "9093:9093"
-      - "9644:9644"
-    volumes:
-      - redpanda-data:/var/lib/redpanda/data
-    healthcheck:
-      test: ["CMD", "rpk", "cluster", "health", "--api-urls=localhost:9644"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "3"
-    networks:
-      - hookrelay
-
-  # ──────────────────────────────────────────────
-  # Temporal (workflow orchestration)
-  # ──────────────────────────────────────────────
-  temporal:
-    image: temporalio/auto-setup:latest
-    ports:
-      - "7233:7233"
-    environment:
-      - DB=postgres12
-      - DB_PORT=5432
-      - POSTGRES_USER=root
-      - POSTGRES_PWD=
-      - POSTGRES_SEEDS=cockroachdb
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
-    depends_on:
-      cockroachdb:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "tctl", "--address", "temporal:7233", "cluster", "health"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 512M
-    networks:
-      - hookrelay
-
-  # ──────────────────────────────────────────────
-  # Temporal UI
-  # ──────────────────────────────────────────────
-  temporal-ui:
-    image: temporalio/ui:latest
-    ports:
-      - "8081:8080"
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-    depends_on:
-      - temporal
-    restart: always
-    networks:
-      - hookrelay
-
-  # ──────────────────────────────────────────────
-  # Kafka topic bootstrap
-  # ──────────────────────────────────────────────
-  create-topics:
-    image: docker.redpanda.com/redpandadata/redpanda:latest
-    command:
-      - rpk
-      - topic
-      - create
-      - webhook-deliveries
-      - --brokers=redpanda:9092
-      - --partitions=6
-      - --replicas=1
-    depends_on:
-      redpanda:
-        condition: service_healthy
-    restart: "no"
-    networks:
-      - hookrelay
-
 volumes:
-  cockroachdb-data:
-    driver: local
-  redpanda-data:
+  pgdata:
     driver: local
 
 networks:

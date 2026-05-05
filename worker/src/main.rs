@@ -1,33 +1,43 @@
+//! HookRelay Worker — Webhook Teslimatı
+//!
+//! Kafka ve Temporal yok. Sadece PostgreSQL polling.
+//!
+//! ## Nasıl Çalışır
+//!
+//! 1. Her saniye `webhook_queue` tablosunu kontrol et
+//! 2. Pending olanları al
+//! 3. HTTP POST ile endpoint'e gönder
+//! 4. Başarılı → delivered, başarısız → retry veya dead letter
+//!
+//! ## Basit, güvenilir, bakımı kolay.
+
 use anyhow::Result;
-use rdkafka::consumer::{Consumer, StreamConsumer};
-use rdkafka::config::ClientConfig;
-use rdkafka::message::Message;
-use rdkafka::producer::FutureProducer;
 use serde::{Deserialize, Serialize};
+use sqlx::postgres::PgPoolOptions;
+use sqlx::PgPool;
 use tracing_subscriber::EnvFilter;
 
-pub(crate) mod activities;
-pub(crate) mod config;
+mod activities;
+mod config;
 pub mod delivery;
-pub mod fanout;
-pub(crate) mod retry_scheduler;
-pub(crate) mod signing;
-pub(crate) mod workflows;
+mod fanout;
+mod retry_scheduler;
+mod signing;
+mod workflows;
 
-use activities::HookRelayActivities;
-use workflows::{RetryPolicy, WebhookDeliveryInput, WebhookDeliveryWorkflow};
-
-/// Message format coming from the Kafka topic.
-#[derive(Debug, Deserialize, Serialize)]
-pub struct WebhookMessage {
-    delivery_id: String,
-    endpoint_id: String,
-    endpoint_url: String,
-    signing_secret: String,
-    old_signing_secret: Option<String>,
-    secret_rotated_at: Option<String>,
-    custom_headers: Option<serde_json::Value>,
-    payload: String,
+/// Webhook queue'dan gelen mesaj formatı
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
+pub struct WebhookQueueItem {
+    pub id: uuid::Uuid,
+    pub delivery_id: uuid::Uuid,
+    pub endpoint_id: uuid::Uuid,
+    pub endpoint_url: String,
+    pub signing_secret: String,
+    pub payload: String,
+    pub custom_headers: Option<serde_json::Value>,
+    pub attempt_count: i32,
+    pub max_attempts: i32,
+    pub next_retry_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[tokio::main]
@@ -38,276 +48,348 @@ async fn main() -> Result<()> {
 
     let cfg = config::WorkerConfig::from_env()?;
 
-    // -----------------------------------------------------------------------
-    // Database pool (shared between activities and retry scheduler)
-    // -----------------------------------------------------------------------
-    let pool = sqlx::postgres::PgPoolOptions::new()
+    tracing::info!("🔧 HookRelay Worker starting...");
+    tracing::info!("   Database: {}", &cfg.database_url[..30.min(cfg.database_url.len())]);
+
+    // Database pool
+    let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&cfg.database_url)
         .await?;
 
-    // -----------------------------------------------------------------------
-    // HTTP client (shared with activities)
-    // -----------------------------------------------------------------------
+    // HTTP client (shared, connection pooling)
     let http_client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(30))
+        .pool_max_idle_per_host(10)
         .build()?;
 
-    // -----------------------------------------------------------------------
-    // Kafka consumer — receives new webhook delivery messages
-    // -----------------------------------------------------------------------
-    let consumer: StreamConsumer = ClientConfig::new()
-        .set("bootstrap.servers", &cfg.kafka_brokers)
-        .set("group.id", &cfg.consumer_group)
-        .set("auto.offset.reset", "earliest")
-        .set("enable.auto.commit", "true")
-        .create()?;
+    // Ensure webhook_queue table exists
+    ensure_queue_table(&pool).await?;
 
-    consumer.subscribe(&[&cfg.kafka_topic])?;
+    tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s");
 
-    // -----------------------------------------------------------------------
-    // Kafka producer — for retry scheduler (backward compat)
-    // -----------------------------------------------------------------------
-    let retry_producer: FutureProducer = ClientConfig::new()
-        .set("bootstrap.servers", &cfg.kafka_brokers)
-        .set("message.timeout.ms", "5000")
-        .set("queue.buffering.max.messages", "100000")
-        .create()?;
-
-    // -----------------------------------------------------------------------
-    // Spawn retry scheduler as a background task (backward compat)
-    // -----------------------------------------------------------------------
-    let retry_pool = pool.clone();
-    let retry_cfg = cfg.clone();
-    tokio::spawn(async move {
-        retry_scheduler::run_retry_scheduler(retry_pool, retry_producer, retry_cfg).await;
-    });
-
-    // -----------------------------------------------------------------------
-    // Temporal Worker
-    //
-    // The Temporal worker polls the task queue for workflow and activity tasks.
-    // It runs in the background alongside the Kafka consumer.
-    //
-    // Architecture:
-    //   Kafka consumer → receives webhook messages → starts Temporal workflow
-    //   Temporal worker → executes activities (HTTP delivery, DB updates, Kafka)
-    // -----------------------------------------------------------------------
-    tracing::info!("🔧 Initializing Temporal worker at {}", cfg.temporal_url);
-
-    // Create a shared Kafka producer for activities (used by publish_to_kafka)
-    let shared_kafka_producer: FutureProducer = ClientConfig::new()
-        .set("bootstrap.servers", &cfg.kafka_brokers)
-        .set("message.timeout.ms", "5000")
-        .set("queue.buffering.max.messages", "100000")
-        .create()?;
-
-    let temporal_handle = {
-        let cfg_clone = cfg.clone();
-        let pool_clone = pool.clone();
-        let http_client_clone = http_client.clone();
-
-        tokio::spawn(async move {
-            if let Err(e) = run_temporal_worker(cfg_clone, pool_clone, http_client_clone, Some(shared_kafka_producer)).await {
-                tracing::error!("❌ Temporal worker failed: {:?}", e);
-            }
-        })
-    };
-
-    tracing::info!(
-        "🔄 HookRelay Worker started — Kafka: {} | Temporal: {} (queue: {})",
-        cfg.kafka_brokers,
-        cfg.temporal_url,
-        cfg.temporal_task_queue
-    );
-
-    // -----------------------------------------------------------------------
-    // Main Kafka consumer loop
-    //
-    // Instead of processing webhooks directly (the old approach), we now
-    // start a Temporal workflow for each incoming message. The workflow
-    // handles delivery, retries, backoff, and dead-letter logic.
-    // -----------------------------------------------------------------------
+    // Main loop: poll PostgreSQL queue
     loop {
-        match consumer.recv().await {
-            Ok(msg) => {
-                if let Some(payload) = msg.payload_view::<str>().unwrap_or(None) {
-                    match serde_json::from_str::<WebhookMessage>(payload) {
-                        Ok(webhook) => {
-                            tracing::info!("📥 Received delivery {}", webhook.delivery_id);
-
-                            match start_delivery_workflow(&cfg, &pool, &webhook).await {
-                                Ok(workflow_id) => {
-                                    tracing::info!(
-                                        "🚀 Started workflow {} for delivery {}",
-                                        workflow_id,
-                                        webhook.delivery_id
-                                    );
-                                }
-                                Err(e) => {
-                                    tracing::error!(
-                                        "❌ Failed to start workflow for delivery {}: {:?}",
-                                        webhook.delivery_id,
-                                        e
-                                    );
-                                }
-                            }
-                        }
-                        Err(e) => {
-                            tracing::error!("❌ Failed to parse Kafka message: {:?}", e);
-                        }
-                    }
+        match process_pending(&pool, &http_client, &cfg).await {
+            Ok(processed) => {
+                if processed > 0 {
+                    tracing::debug!("✅ Processed {} deliveries", processed);
                 }
             }
             Err(e) => {
-                tracing::error!("❌ Kafka error: {:?}", e);
-                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                tracing::error!("❌ Queue processing error: {:?}", e);
             }
         }
+
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     }
 }
 
-/// Run the Temporal worker — registers workflows and activities, then
-/// polls the task queue indefinitely.
-///
-/// This runs as a background tokio task. The worker is the bridge between
-/// the Temporal server and our Rust activity implementations. When the
-/// server dispatches a workflow task, the worker replays the workflow
-/// deterministically. When it dispatches an activity task, the worker
-/// executes the corresponding Rust function.
-async fn run_temporal_worker(
-    cfg: config::WorkerConfig,
-    pool: sqlx::PgPool,
-    http_client: reqwest::Client,
-    kafka_producer: Option<FutureProducer>,
+/// Ensure the webhook_queue table exists
+async fn ensure_queue_table(pool: &PgPool) -> Result<()> {
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS webhook_queue (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            delivery_id UUID NOT NULL,
+            endpoint_id UUID NOT NULL,
+            endpoint_url TEXT NOT NULL,
+            signing_secret TEXT NOT NULL,
+            payload TEXT NOT NULL,
+            custom_headers JSONB,
+            attempt_count INT NOT NULL DEFAULT 0,
+            max_attempts INT NOT NULL DEFAULT 3,
+            next_retry_at TIMESTAMPTZ,
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            processed_at TIMESTAMPTZ
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_webhook_queue_pending
+            ON webhook_queue(status, next_retry_at)
+            WHERE status = 'pending';
+
+        CREATE INDEX IF NOT EXISTS idx_webhook_queue_delivery
+            ON webhook_queue(delivery_id);
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    tracing::info!("✅ webhook_queue table ready");
+    Ok(())
+}
+
+/// Process all pending items in the queue
+async fn process_pending(
+    pool: &PgPool,
+    http_client: &reqwest::Client,
+    cfg: &config::WorkerConfig,
+) -> Result<usize> {
+    // Fetch pending items (with FOR UPDATE SKIP LOCKED for concurrency)
+    let items: Vec<WebhookQueueItem> = sqlx::query_as::<_, WebhookQueueItem>(
+        r#"
+        UPDATE webhook_queue
+        SET status = 'processing'
+        WHERE id IN (
+            SELECT id FROM webhook_queue
+            WHERE status = 'pending'
+              AND (next_retry_at IS NULL OR next_retry_at <= now())
+            ORDER BY created_at
+            LIMIT 50
+            FOR UPDATE SKIP LOCKED
+        )
+        RETURNING *
+        "#,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    let count = items.len();
+
+    for item in items {
+        let delivery_id = item.delivery_id;
+        let attempt = item.attempt_count + 1;
+
+        tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
+
+        // Generate HMAC signature
+        let signature = signing::compute_hmac(&item.signing_secret, &item.payload);
+
+        // Build request
+        let mut req_builder = http_client
+            .post(&item.endpoint_url)
+            .header("Content-Type", "application/json")
+            .header("X-Hookrelay-Signature", format!("sha256={}", signature))
+            .header("X-Hookrelay-Delivery-Id", delivery_id.to_string())
+            .header("X-Hookrelay-Attempt", attempt.to_string())
+            .body(item.payload.clone());
+
+        // Add custom headers
+        if let Some(ref headers) = item.custom_headers {
+            if let Some(obj) = headers.as_object() {
+                for (key, value) in obj {
+                    if let Some(val) = value.as_str() {
+                        req_builder = req_builder.header(key.as_str(), val);
+                    }
+                }
+            }
+        }
+
+        // Send webhook
+        let start = std::time::Instant::now();
+        let result = req_builder.send().await;
+        let duration_ms = start.elapsed().as_millis() as i32;
+
+        match result {
+            Ok(response) => {
+                let status_code = response.status().as_u16() as i32;
+                let body = response.text().await.unwrap_or_default();
+                let response_body = truncate(&body, 1000);
+                let success = (200..300).contains(&status_code);
+
+                if success {
+                    // ✅ Başarılı
+                    tracing::info!("✅ Delivery {} → HTTP {} ({}ms)", delivery_id, status_code, duration_ms);
+
+                    sqlx::query(
+                        r#"
+                        UPDATE webhook_queue
+                        SET status = 'delivered', processed_at = now(), attempt_count = $1
+                        WHERE id = $2
+                        "#,
+                    )
+                    .bind(attempt)
+                    .bind(item.id)
+                    .execute(pool)
+                    .await?;
+
+                    // Update deliveries table
+                    sqlx::query(
+                        r#"
+                        UPDATE deliveries
+                        SET status = 'delivered', attempt_count = $1, response_status = $2,
+                            response_body = $3, last_attempt_at = now()
+                        WHERE id = $4
+                        "#,
+                    )
+                    .bind(attempt)
+                    .bind(status_code)
+                    .bind(&response_body)
+                    .bind(delivery_id)
+                    .execute(pool)
+                    .await?;
+
+                    // Record attempt
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, None).await?;
+
+                } else if attempt >= item.max_attempts {
+                    // ❌ Max deneme aşıldı → dead letter
+                    tracing::error!("❌ Delivery {} → HTTP {} — max attempts, moving to dead letter", delivery_id, status_code);
+
+                    sqlx::query(
+                        r#"
+                        UPDATE webhook_queue
+                        SET status = 'dead_letter', processed_at = now(), attempt_count = $1
+                        WHERE id = $2
+                        "#,
+                    )
+                    .bind(attempt)
+                    .bind(item.id)
+                    .execute(pool)
+                    .await?;
+
+                    // Move to dead_letters
+                    sqlx::query(
+                        r#"
+                        INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                        SELECT id, endpoint_id, customer_id, payload, $2, $3
+                        FROM deliveries WHERE id = $1
+                        "#,
+                    )
+                    .bind(delivery_id)
+                    .bind(format!("HTTP {}", status_code))
+                    .bind(attempt)
+                    .execute(pool)
+                    .await?;
+
+                    // Update delivery status
+                    sqlx::query("UPDATE deliveries SET status = 'failed' WHERE id = $1")
+                        .bind(delivery_id)
+                        .execute(pool)
+                        .await?;
+
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {}", status_code))).await?;
+
+                } else {
+                    // 🔄 Retry — exponential backoff
+                    let delay = calculate_backoff(attempt);
+                    let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
+
+                    tracing::warn!("⚠️ Delivery {} → HTTP {} — retrying in {}s (attempt {}/{})", delivery_id, status_code, delay, attempt, item.max_attempts);
+
+                    sqlx::query(
+                        r#"
+                        UPDATE webhook_queue
+                        SET status = 'pending', attempt_count = $1, next_retry_at = $2
+                        WHERE id = $3
+                        "#,
+                    )
+                    .bind(attempt)
+                    .bind(next_retry)
+                    .bind(item.id)
+                    .execute(pool)
+                    .await?;
+
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {} — retry scheduled", status_code))).await?;
+                }
+            }
+            Err(e) => {
+                // 🌐 Network hatası
+                let error_msg = e.to_string();
+                tracing::error!("❌ Delivery {} network error: {} (attempt {})", delivery_id, error_msg, attempt);
+
+                if attempt >= item.max_attempts {
+                    // Dead letter
+                    sqlx::query(
+                        r#"
+                        UPDATE webhook_queue
+                        SET status = 'dead_letter', processed_at = now(), attempt_count = $1
+                        WHERE id = $2
+                        "#,
+                    )
+                    .bind(attempt)
+                    .bind(item.id)
+                    .execute(pool)
+                    .await?;
+
+                    sqlx::query(
+                        r#"
+                        INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                        SELECT id, endpoint_id, customer_id, payload, $2, $3
+                        FROM deliveries WHERE id = $1
+                        "#,
+                    )
+                    .bind(delivery_id)
+                    .bind(&error_msg)
+                    .bind(attempt)
+                    .execute(pool)
+                    .await?;
+
+                    sqlx::query("UPDATE deliveries SET status = 'failed' WHERE id = $1")
+                        .bind(delivery_id)
+                        .execute(pool)
+                        .await?;
+
+                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg)).await?;
+
+                } else {
+                    // Retry
+                    let delay = calculate_backoff(attempt);
+                    let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
+
+                    sqlx::query(
+                        r#"
+                        UPDATE webhook_queue
+                        SET status = 'pending', attempt_count = $1, next_retry_at = $2
+                        WHERE id = $3
+                        "#,
+                    )
+                    .bind(attempt)
+                    .bind(next_retry)
+                    .bind(item.id)
+                    .execute(pool)
+                    .await?;
+
+                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg)).await?;
+                }
+            }
+        }
+    }
+
+    Ok(count)
+}
+
+/// Record a delivery attempt
+async fn record_attempt(
+    pool: &PgPool,
+    delivery_id: uuid::Uuid,
+    attempt_number: i32,
+    status_code: Option<i32>,
+    response_body: Option<&str>,
+    duration_ms: i32,
+    error_message: Option<&str>,
 ) -> Result<()> {
-    // Set the Temporal address for the SDK's envconfig loader.
-    // The SDK reads TEMPORAL_ADDRESS or falls back to localhost:7233.
-    std::env::set_var("TEMPORAL_ADDRESS", &cfg.temporal_url);
-
-    // Initialize the Core runtime — this manages the gRPC connection
-    // to the Temporal server and internal event loops.
-    let runtime = temporalio_sdk_core::CoreRuntime::new_assume_tokio(
-        temporalio_sdk_core::RuntimeOptions::builder().build()?,
-    )?;
-
-    // Load connection options from env/config (TEMPORAL_ADDRESS, etc.)
-    let (conn_options, client_options) = temporalio_client::ClientOptions::load_from_config(
-        temporalio_client::envconfig::LoadClientConfigProfileOptions::default(),
-    )?;
-
-    let connection = temporalio_client::Connection::connect(conn_options).await?;
-    let client = temporalio_client::Client::new(connection, client_options);
-
-    // Build the activities instance with shared state
-    let activities = HookRelayActivities {
-        http_client,
-        pool,
-        kafka_producer,
-    };
-
-    // Configure the worker:
-    // - Task queue: where workflows and activities are dispatched
-    // - Activities: the HTTP delivery, DB recording, dead-letter, Kafka publish
-    // - Workflows: the WebhookDeliveryWorkflow
-    let worker_options = temporalio_sdk::WorkerOptions::new(&cfg.temporal_task_queue)
-        .register_activities(activities)
-        .register_workflow::<WebhookDeliveryWorkflow>()
-        .build();
-
-    let worker = temporalio_sdk::Worker::new(&runtime, client, worker_options)?;
-
-    tracing::info!(
-        "⚙️ Temporal worker running on task queue '{}'",
-        cfg.temporal_task_queue
-    );
-
-    // Run the worker — this blocks until the worker is shut down.
-    // It polls the task queue and executes workflows/activities.
-    worker.run().await?;
+    sqlx::query(
+        r#"
+        INSERT INTO delivery_attempts (delivery_id, attempt_number, status_code, response_body, duration_ms, error_message)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        "#,
+    )
+    .bind(delivery_id)
+    .bind(attempt_number)
+    .bind(status_code)
+    .bind(response_body)
+    .bind(duration_ms)
+    .bind(error_message)
+    .execute(pool)
+    .await?;
 
     Ok(())
 }
 
-/// Start a Temporal workflow for a webhook delivery.
-///
-/// Constructs the workflow input from the Kafka message and endpoint
-/// configuration, then signals the Temporal server to begin execution.
-///
-/// The workflow ID is derived from the delivery ID to ensure idempotency —
-/// if the same Kafka message is processed twice (e.g., after a restart),
-/// the second attempt will be a no-op because the workflow already exists.
-async fn start_delivery_workflow(
-    cfg: &config::WorkerConfig,
-    pool: &sqlx::PgPool,
-    webhook: &WebhookMessage,
-) -> Result<String> {
-    // Fetch the retry policy from the endpoint configuration
-    let endpoint_info: (Option<serde_json::Value>,) =
-        sqlx::query_as("SELECT retry_policy FROM endpoints WHERE id = $1")
-            .bind(&webhook.endpoint_id)
-            .fetch_one(pool)
-            .await?;
+/// Exponential backoff: 30s, 60s, 120s, 300s, 600s, 1800s
+fn calculate_backoff(attempt: i32) -> i64 {
+    let base = 30_i64;
+    let delay = base * 2_i64.pow((attempt - 1).max(0) as u32);
+    delay.min(1800) // Max 30 dakika
+}
 
-    let retry_policy = endpoint_info
-        .0
-        .as_ref()
-        .and_then(|v| serde_json::from_value::<RetryPolicy>(v.clone()).ok())
-        .unwrap_or_default();
-
-    let workflow_input = WebhookDeliveryInput {
-        delivery_id: webhook.delivery_id.clone(),
-        endpoint_id: webhook.endpoint_id.clone(),
-        endpoint_url: webhook.endpoint_url.clone(),
-        signing_secret: webhook.signing_secret.clone(),
-        payload: webhook.payload.clone(),
-        custom_headers: webhook.custom_headers.clone(),
-        retry_policy,
-    };
-
-    // Build a Temporal client to start the workflow.
-    // We create a separate client for starting workflows (the worker has its own).
-    let runtime = temporalio_sdk_core::CoreRuntime::new_assume_tokio(
-        temporalio_sdk_core::RuntimeOptions::builder().build()?,
-    )?;
-
-    std::env::set_var("TEMPORAL_ADDRESS", &cfg.temporal_url);
-
-    let (conn_options, client_options) = temporalio_client::ClientOptions::load_from_config(
-        temporalio_client::envconfig::LoadClientConfigProfileOptions::default(),
-    )?;
-
-    let connection = temporalio_client::Connection::connect(conn_options).await?;
-    let client = temporalio_client::Client::new(connection, client_options);
-
-    // Use the delivery ID as the workflow ID for idempotency.
-    // If this workflow already exists (e.g., Kafka redelivery), Temporal
-    // will reject the start request gracefully.
-    let workflow_id = format!("webhook-delivery-{}", webhook.delivery_id);
-
-    match client
-        .start_workflow(
-            workflow_input,
-            cfg.temporal_task_queue.clone(),
-            workflow_id.clone(),
-            "WebhookDeliveryWorkflow".to_string(),
-            None, // use default workflow options
-        )
-        .await
-    {
-        Ok(_) => Ok(workflow_id),
-        Err(e) => {
-            let err_str = e.to_string();
-            if err_str.contains("ALREADY_EXISTS") || err_str.contains("already started") {
-                // Workflow already running — this is fine, Kafka redelivered
-                tracing::debug!(
-                    "Workflow {} already exists, skipping (Kafka redelivery)",
-                    workflow_id
-                );
-                Ok(workflow_id)
-            } else {
-                Err(anyhow::anyhow!("Failed to start workflow: {}", e))
-            }
-        }
+/// Truncate string to max length
+fn truncate(s: &str, max_len: usize) -> String {
+    if s.len() <= max_len {
+        s.to_string()
+    } else {
+        format!("{}...", &s[..max_len])
     }
 }
