@@ -106,3 +106,57 @@ export interface ApiError {
     message: string;
   };
 }
+
+// --- AI Center Types ---
+
+export interface AiStatus {
+  activeEvents: number;
+  criticalEvents: number;
+  pendingActions: number;
+  blockedItems: number;
+  avgRiskScore: number;
+  highRiskEndpoints: number;
+}
+
+export interface AiEvent {
+  id: string;
+  eventType: string;
+  severity: "info" | "warning" | "critical";
+  title: string;
+  description?: string;
+  actionTaken?: string;
+  targetType?: string;
+  targetId?: string;
+  resolved: boolean;
+  createdAt: string;
+}
+
+export interface RiskScore {
+  id: string;
+  targetType: string;
+  targetId: string;
+  score: number;
+  factors?: Record<string, number>;
+  createdAt: string;
+}
+
+export interface AiAction {
+  id: string;
+  actionType: string;
+  description: string;
+  targetType?: string;
+  targetId?: string;
+  status: "pending" | "approved" | "executed" | "rejected" | "rolled_back";
+  riskLevel: "low" | "medium" | "high" | "critical";
+  autoApproved: boolean;
+  executedAt?: string;
+  createdAt: string;
+}
+
+export interface AiProvider {
+  name: string;
+  enabled: boolean;
+  capabilities: string[];
+  apiKeyEnv: string;
+  docs: string;
+}

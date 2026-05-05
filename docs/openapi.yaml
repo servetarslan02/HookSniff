@@ -27,6 +27,8 @@ tags:
     description: Send and manage webhook deliveries
   - name: Stats
     description: Delivery statistics and analytics
+  - name: AI Center
+    description: AI-powered autonomous management system
 
 paths:
   /auth:
@@ -392,6 +394,187 @@ paths:
                   version:
                     type: string
 
+  /ai/status:
+    get:
+      tags: [AI Center]
+      summary: Get AI center status
+      operationId: getAiStatus
+      responses:
+        "200":
+          description: AI center status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiStatus"
+
+  /ai/events:
+    get:
+      tags: [AI Center]
+      summary: List AI events
+      operationId: listAiEvents
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [info, warning, critical]
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: List of AI events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiEvent"
+
+  /ai/risks:
+    get:
+      tags: [AI Center]
+      summary: Get current risk scores
+      operationId: getAiRisks
+      responses:
+        "200":
+          description: Risk scores for endpoints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiskScore"
+
+  /ai/actions:
+    get:
+      tags: [AI Center]
+      summary: List AI actions
+      operationId: listAiActions
+      responses:
+        "200":
+          description: List of AI actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiAction"
+
+  /ai/actions/{id}/approve:
+    post:
+      tags: [AI Center]
+      summary: Approve an AI action
+      operationId: approveAiAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Action approved
+
+  /ai/actions/{id}/reject:
+    post:
+      tags: [AI Center]
+      summary: Reject an AI action
+      operationId: rejectAiAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Action rejected
+
+  /ai/blocklist:
+    get:
+      tags: [AI Center]
+      summary: List blocked items
+      operationId: listBlocklist
+      responses:
+        "200":
+          description: Blocklist entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlocklistEntry"
+    post:
+      tags: [AI Center]
+      summary: Add block entry
+      operationId: addBlock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                block_type:
+                  type: string
+                  enum: [ip, customer, endpoint]
+                block_value:
+                  type: string
+                reason:
+                  type: string
+                duration_minutes:
+                  type: integer
+      responses:
+        "200":
+          description: Block added
+
+  /ai/providers:
+    get:
+      tags: [AI Center]
+      summary: List AI providers and their status
+      operationId: listAiProviders
+      responses:
+        "200":
+          description: AI provider status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        enabled:
+                          type: boolean
+                        capabilities:
+                          type: array
+                          items:
+                            type: string
+                  total_active:
+                    type: integer
+
+  /ai/stats:
+    get:
+      tags: [AI Center]
+      summary: Get AI center statistics
+      operationId: getAiStats
+      responses:
+        "200":
+          description: AI statistics
+
 components:
   securitySchemes:
     BearerAuth:
@@ -632,6 +815,120 @@ components:
               type: string
             message:
               type: string
+
+    AiStatus:
+      type: object
+      properties:
+        active_events:
+          type: integer
+        critical_events:
+          type: integer
+        pending_actions:
+          type: integer
+        blocked_items:
+          type: integer
+        avg_risk_score:
+          type: number
+        high_risk_endpoints:
+          type: integer
+
+    AiEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+        severity:
+          type: string
+          enum: [info, warning, critical]
+        title:
+          type: string
+        description:
+          type: string
+        action_taken:
+          type: string
+        target_type:
+          type: string
+        target_id:
+          type: string
+          format: uuid
+        resolved:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    RiskScore:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        target_type:
+          type: string
+        target_id:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          description: "Risk score 0-100"
+        factors:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    AiAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        action_type:
+          type: string
+        description:
+          type: string
+        target_type:
+          type: string
+        target_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, approved, executed, rejected, rolled_back]
+        risk_level:
+          type: string
+          enum: [low, medium, high, critical]
+        auto_approved:
+          type: boolean
+        executed_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    BlocklistEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        block_type:
+          type: string
+          enum: [ip, customer, endpoint]
+        block_value:
+          type: string
+        reason:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
 
   responses:
     BadRequest:

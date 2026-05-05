@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  ai-center:
+    build:
+      context: .
+      dockerfile: Dockerfile.ai-center
+    container_name: hookrelay-ai-center
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable}
+      - AI_CHECK_INTERVAL_SECS=${AI_CHECK_INTERVAL_SECS:-30}
+      - AI_RISK_THRESHOLD_WARNING=${AI_RISK_THRESHOLD_WARNING:-60}
+      - AI_RISK_THRESHOLD_CRITICAL=${AI_RISK_THRESHOLD_CRITICAL:-80}
+      - AI_AUTO_FIX_ENABLED=${AI_AUTO_FIX_ENABLED:-true}
+      - AI_DEFENSE_ENABLED=${AI_DEFENSE_ENABLED:-true}
+      - AI_MAX_AUTO_ACTIONS_PER_HOUR=${AI_MAX_AUTO_ACTIONS_PER_HOUR:-20}
+      # AI API Keys (opsiyonel — biri veya ikisi de olabilir)
+      - MIMO_API_KEY=${MIMO_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Yeni AI'lar buraya eklenebilir:
+      # - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      # - CLAUDE_API_KEY=${CLAUDE_API_KEY:-}
+      # - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+      # - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+    depends_on:
+      - cockroachdb
+    restart: unless-stopped
+    networks:
+      - hookrelay
+
+networks:
+  hookrelay:
+    external: true
