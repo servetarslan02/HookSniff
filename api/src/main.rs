@@ -2,7 +2,7 @@ use anyhow::Result;
 use axum::{routing::get, Router};
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
-use tracing_subscriber::EnvFilter;
+
 
 mod auth;
 mod config;
@@ -18,11 +18,14 @@ mod validation;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env().add_directive("info".parse()?))
-        .init();
-
     let cfg = config::Config::from_env()?;
+
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log)),
+        )
+        .init();
     let pool = db::create_pool(&cfg.database_url).await?;
     let kafka_producer = kafka::create_producer(&cfg.kafka_brokers)?;
 
