@@ -5,8 +5,8 @@ import { ReactNode } from 'react';
 interface StatCardProps {
   /** The label/title of the stat */
   label: string;
-  /** The main numeric value */
-  value: string | number;
+  /** The main value (string, number, or JSX element) */
+  value: ReactNode;
   /** Icon element to display */
   icon: ReactNode;
   /** Optional trend indicator (positive or negative change) */

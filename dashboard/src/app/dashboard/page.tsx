@@ -28,6 +28,7 @@ import {
   Legend,
 } from 'recharts';
 import { Onboarding } from '@/components/Onboarding';
+import { StatCard, ChartCard, StatusBadge } from '@/components/tremor';
 
 // ─── Time Range Selector ───
 type TimeRange = '24h' | '7d' | '30d';
@@ -111,8 +112,7 @@ function DeliveryTrendChart({
   })) || [];
 
   return (
-    <div className="glass-card p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Delivery Trend</h3>
+    <ChartCard title="Delivery Trend">
       <div className="h-72">
         {loading ? (
           <div className="h-full flex items-center justify-center">
@@ -180,7 +180,7 @@ function DeliveryTrendChart({
           </ResponsiveContainer>
         )}
       </div>
-    </div>
+    </ChartCard>
   );
 }
 
@@ -201,8 +201,7 @@ function SuccessRateDonut({
   const COLORS = ['#10b981', '#ef4444', '#f59e0b'];
 
   return (
-    <div className="glass-card p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Success Rate</h3>
+    <ChartCard title="Success Rate">
       <div className="h-72 flex items-center justify-center">
         {loading ? (
           <div className="animate-pulse text-gray-400 dark:text-slate-500">Loading...</div>
@@ -236,7 +235,7 @@ function SuccessRateDonut({
           </div>
         )}
       </div>
-    </div>
+    </ChartCard>
   );
 }
 
@@ -319,28 +318,6 @@ function StatusDot({ status }: { status: string }) {
   return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || colors.pending}`} />;
 }
 
-/* ─── Status Badge ─── */
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    delivered:
-      'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20 dark:ring-green-500/30',
-    failed:
-      'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20 dark:ring-red-500/30',
-    pending:
-      'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20 dark:ring-yellow-500/30',
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset ${
-        styles[status] || styles.pending
-      }`}
-    >
-      {status}
-    </span>
-  );
-}
-
 /* ─── Main Dashboard ─── */
 export default function DashboardOverview() {
   const { token } = useAuth();
@@ -417,8 +394,9 @@ export default function DashboardOverview() {
 
   const statCards = [
     {
-      name: 'Total Deliveries',
-      rawValue: stats?.total_deliveries ?? 0,
+      label: 'Total Deliveries',
+      value: stats?.total_deliveries ?? 0,
+      color: 'blue' as const,
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="2" y="7" width="20" height="14" rx="2" />
@@ -428,8 +406,9 @@ export default function DashboardOverview() {
       ),
     },
     {
-      name: 'Delivered',
-      rawValue: stats?.delivered ?? 0,
+      label: 'Delivered',
+      value: stats?.delivered ?? 0,
+      color: 'emerald' as const,
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="12" cy="12" r="10" />
@@ -438,8 +417,9 @@ export default function DashboardOverview() {
       ),
     },
     {
-      name: 'Failed',
-      rawValue: stats?.failed ?? 0,
+      label: 'Failed',
+      value: stats?.failed ?? 0,
+      color: 'red' as const,
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="12" cy="12" r="10" />
@@ -449,8 +429,9 @@ export default function DashboardOverview() {
       ),
     },
     {
-      name: 'Success Rate',
-      rawValue: stats?.success_rate ?? 0,
+      label: 'Success Rate',
+      value: stats?.success_rate ?? 0,
+      color: 'violet' as const,
       isPercent: true,
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -460,8 +441,9 @@ export default function DashboardOverview() {
       ),
     },
     {
-      name: 'Pending',
-      rawValue: stats?.pending ?? 0,
+      label: 'Pending',
+      value: stats?.pending ?? 0,
+      color: 'amber' as const,
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="12" cy="12" r="10" />
@@ -470,8 +452,9 @@ export default function DashboardOverview() {
       ),
     },
     {
-      name: 'Endpoints',
-      rawValue: stats?.endpoints_count ?? 0,
+      label: 'Endpoints',
+      value: stats?.endpoints_count ?? 0,
+      color: 'slate' as const,
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
@@ -493,21 +476,14 @@ export default function DashboardOverview() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat) => (
-          <div key={stat.name} className="glass-card p-6 hover-lift card-tilt group">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-11 h-11 rounded-xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-brand-100 dark:border-brand-500/20">
-                {stat.icon}
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {stat.isPercent ? (
-                <>{stat.rawValue}%</>
-              ) : (
-                <AnimatedCounter value={stat.rawValue} />
-              )}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-slate-400">{stat.name}</div>
-          </div>
+          <StatCard
+            key={stat.label}
+            label={stat.label}
+            value={stat.isPercent ? `${stat.value}` : <AnimatedCounter value={stat.value} />}
+            icon={stat.icon}
+            color={stat.color}
+            isPercent={stat.isPercent}
+          />
         ))}
       </div>
 
