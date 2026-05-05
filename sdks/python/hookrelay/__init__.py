@@ -10,6 +10,10 @@ from .models import (
     DeliveryList,
     BatchResult,
     Stats,
+    AiStatus,
+    AiEvent,
+    RiskScore,
+    AiAction,
 )
 from .exceptions import (
     HookRelayError,
@@ -21,7 +25,7 @@ from .exceptions import (
 )
 from .utils import verify_signature
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "HookRelayClient",
     "Endpoint",
@@ -30,6 +34,10 @@ __all__ = [
     "DeliveryList",
     "BatchResult",
     "Stats",
+    "AiStatus",
+    "AiEvent",
+    "RiskScore",
+    "AiAction",
     "HookRelayError",
     "AuthenticationError",
     "NotFoundError",

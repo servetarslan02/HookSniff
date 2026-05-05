@@ -14,12 +14,16 @@ from .exceptions import (
     ValidationError,
 )
 from .models import (
+    AiAction,
+    AiEvent,
+    AiStatus,
     BatchResult,
     Delivery,
     DeliveryAttempt,
     DeliveryList,
     Endpoint,
     RetryPolicy,
+    RiskScore,
     Stats,
 )
 
@@ -138,6 +142,93 @@ class _WebhooksResource:
         return resp
 
 
+class _AiCenterResource:
+    """AI Center operations."""
+
+    def __init__(self, client: "HookRelayClient"):
+        self._client = client
+
+    def status(self) -> AiStatus:
+        """Get AI center status."""
+        resp = self._client._request("GET", "/ai/status")
+        return AiStatus.from_dict(resp)
+
+    def events(
+        self,
+        severity: Optional[str] = None,
+        event_type: Optional[str] = None,
+        limit: int = 50,
+    ) -> List[AiEvent]:
+        """List AI events."""
+        params: Dict[str, Any] = {"limit": limit}
+        if severity:
+            params["severity"] = severity
+        if event_type:
+            params["event_type"] = event_type
+        resp = self._client._request("GET", "/ai/events", params=params)
+        return [AiEvent.from_dict(e) for e in resp]
+
+    def risks(self) -> List[RiskScore]:
+        """Get current risk scores."""
+        resp = self._client._request("GET", "/ai/risks")
+        return [RiskScore.from_dict(r) for r in resp]
+
+    def actions(self) -> List[AiAction]:
+        """List AI actions."""
+        resp = self._client._request("GET", "/ai/actions")
+        return [AiAction.from_dict(a) for a in resp]
+
+    def approve_action(self, action_id: str) -> bool:
+        """Approve a pending AI action."""
+        resp = self._client._request("POST", f"/ai/actions/{action_id}/approve")
+        return resp.get("approved", False)
+
+    def reject_action(self, action_id: str) -> bool:
+        """Reject a pending AI action."""
+        resp = self._client._request("POST", f"/ai/actions/{action_id}/reject")
+        return resp.get("rejected", False)
+
+    def rollback_action(self, action_id: str) -> bool:
+        """Rollback an executed AI action."""
+        resp = self._client._request("POST", f"/ai/actions/{action_id}/rollback")
+        return resp.get("rolled_back", False)
+
+    def blocklist(self) -> List[Dict[str, Any]]:
+        """List blocked items."""
+        return self._client._request("GET", "/ai/blocklist")
+
+    def add_block(
+        self,
+        block_type: str,
+        block_value: str,
+        reason: Optional[str] = None,
+        duration_minutes: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Add a block entry."""
+        data: Dict[str, Any] = {
+            "block_type": block_type,
+            "block_value": block_value,
+        }
+        if reason:
+            data["reason"] = reason
+        if duration_minutes:
+            data["duration_minutes"] = duration_minutes
+        return self._client._request("POST", "/ai/blocklist", json=data)
+
+    def remove_block(self, block_id: str) -> bool:
+        """Remove a block entry."""
+        resp = self._client._request("DELETE", f"/ai/blocklist/{block_id}")
+        return resp.get("removed", False)
+
+    def providers(self) -> Dict[str, Any]:
+        """Get AI provider status."""
+        return self._client._request("GET", "/ai/providers")
+
+    def stats(self) -> Dict[str, Any]:
+        """Get AI center statistics."""
+        return self._client._request("GET", "/ai/stats")
+
+
 class HookRelayClient:
     """
     HookRelay API client.
@@ -156,6 +247,11 @@ class HookRelayClient:
             event="order.created",
             data={"order_id": "12345"}
         )
+
+        # AI Center
+        status = client.ai.status()
+        events = client.ai.events(severity="critical")
+        risks = client.ai.risks()
     """
 
     def __init__(
@@ -172,12 +268,13 @@ class HookRelayClient:
             {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "User-Agent": "hookrelay-python/0.1.0",
+                "User-Agent": "hookrelay-python/0.2.0",
             }
         )
 
         self.endpoints = _EndpointsResource(self)
         self.webhooks = _WebhooksResource(self)
+        self.ai = _AiCenterResource(self)
 
     def _request(
         self,
