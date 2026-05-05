@@ -14,6 +14,10 @@ pub fn api_router() -> Router {
         .nest("/stats", stats::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
+    // Dashboard routes use JWT auth (separate from API key auth)
+    // For now, dashboard routes share the same endpoints but could be
+    // split into a separate /dashboard prefix if needed.
+
     Router::new()
         .nest("/auth", auth::router())
         .merge(protected)

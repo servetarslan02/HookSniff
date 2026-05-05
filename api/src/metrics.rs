@@ -1,0 +1,137 @@
+use prometheus::{
+    Encoder, Gauge, Histogram, HistogramOpts, IntCounterVec, Opts, Registry, TextEncoder,
+};
+use std::sync::Arc;
+
+#[derive(Clone)]
+pub struct Metrics {
+    pub registry: Registry,
+    pub http_requests_total: IntCounterVec,
+    pub http_request_duration_seconds: Histogram,
+    pub active_connections: Gauge,
+    pub webhook_deliveries_total: IntCounterVec,
+    pub kafka_publish_latency_seconds: Histogram,
+    pub db_query_duration_seconds: Histogram,
+}
+
+impl Metrics {
+    pub fn new() -> Self {
+        let registry = Registry::new();
+
+        let http_requests_total = IntCounterVec::new(
+            Opts::new("http_requests_total", "Total number of HTTP requests"),
+            &["method", "path", "status"],
+        )
+        .unwrap();
+
+        let http_request_duration_seconds = Histogram::with_opts(
+            HistogramOpts::new(
+                "http_request_duration_seconds",
+                "HTTP request duration in seconds",
+            )
+            .buckets(vec![
+                0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0,
+            ]),
+        )
+        .unwrap();
+
+        let active_connections = Gauge::with_opts(Opts::new(
+            "active_connections",
+            "Number of active connections",
+        ))
+        .unwrap();
+
+        let webhook_deliveries_total = IntCounterVec::new(
+            Opts::new(
+                "webhook_deliveries_total",
+                "Total webhook deliveries by status",
+            ),
+            &["status"],
+        )
+        .unwrap();
+
+        let kafka_publish_latency_seconds = Histogram::with_opts(
+            HistogramOpts::new(
+                "kafka_publish_latency_seconds",
+                "Kafka publish latency in seconds",
+            )
+            .buckets(vec![
+                0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0,
+            ]),
+        )
+        .unwrap();
+
+        let db_query_duration_seconds = Histogram::with_opts(
+            HistogramOpts::new(
+                "db_query_duration_seconds",
+                "Database query duration in seconds",
+            )
+            .buckets(vec![
+                0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0,
+            ]),
+        )
+        .unwrap();
+
+        registry.register(Box::new(http_requests_total.clone())).unwrap();
+        registry.register(Box::new(http_request_duration_seconds.clone())).unwrap();
+        registry.register(Box::new(active_connections.clone())).unwrap();
+        registry.register(Box::new(webhook_deliveries_total.clone())).unwrap();
+        registry.register(Box::new(kafka_publish_latency_seconds.clone())).unwrap();
+        registry.register(Box::new(db_query_duration_seconds.clone())).unwrap();
+
+        Self {
+            registry,
+            http_requests_total,
+            http_request_duration_seconds,
+            active_connections,
+            webhook_deliveries_total,
+            kafka_publish_latency_seconds,
+            db_query_duration_seconds,
+        }
+    }
+
+    pub fn render(&self) -> String {
+        let encoder = TextEncoder::new();
+        let metric_families = self.registry.gather();
+        let mut buffer = Vec::new();
+        encoder.encode(&metric_families, &mut buffer).unwrap();
+        String::from_utf8(buffer).unwrap()
+    }
+}
+
+/// Axum middleware that records HTTP request metrics
+pub async fn metrics_middleware(
+    axum::extract::Extension(metrics): axum::extract::Extension<Arc<Metrics>>,
+    req: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> axum::response::Response {
+    let start = std::time::Instant::now();
+    let method = req.method().to_string();
+    let path = req.uri().path().to_string();
+
+    metrics.active_connections.inc();
+
+    let response = next.run(req).await;
+
+    metrics.active_connections.dec();
+
+    let duration = start.elapsed().as_secs_f64();
+    let status = response.status().as_u16().to_string();
+
+    metrics
+        .http_requests_total
+        .with_label_values(&[&method, &path, &status])
+        .inc();
+    metrics
+        .http_request_duration_seconds
+        .observe(duration);
+
+    response
+}
+
+/// GET /metrics endpoint handler
+pub async fn metrics_handler(
+    axum::extract::Extension(metrics): axum::extract::Extension<Arc<Metrics>>,
+) -> String {
+    metrics.render()
+}

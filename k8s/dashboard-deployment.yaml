@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hookrelay-dashboard
+  namespace: hookrelay
+  labels:
+    app: hookrelay-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hookrelay-dashboard
+  template:
+    metadata:
+      labels:
+        app: hookrelay-dashboard
+    spec:
+      containers:
+        - name: dashboard
+          image: ghcr.io/hookrelay/hookrelay-dashboard:latest
+          ports:
+            - containerPort: 3001
+              name: http
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "https://api.hookrelay.io"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
