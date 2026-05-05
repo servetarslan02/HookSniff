@@ -7,7 +7,6 @@
 
 use anyhow::Result;
 use reqwest::Client;
-use serde_json;
 use tracing::{info, warn};
 
 use crate::signing;

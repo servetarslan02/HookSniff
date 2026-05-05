@@ -25,8 +25,8 @@ const MAX_AGENTS_PER_WEBHOOK: usize = 10;
 /// 5. Results are collected, actions aggregated, and everything is persisted
 #[derive(Clone)]
 pub struct AgentOrchestrator {
-    /// Registered agents
-    agents: Arc<RwLock<Vec<Box<dyn WebhookAgent>>>>,
+    /// Registered agents (wrapped in Arc for cheap cloning)
+    agents: Arc<RwLock<Vec<Arc<dyn WebhookAgent>>>>,
     /// Database pool for persisting execution results
     pool: PgPool,
 }
@@ -40,17 +40,24 @@ impl AgentOrchestrator {
     }
 
     /// Register an agent with the orchestrator.
-    pub async fn register(&self, agent: Box<dyn WebhookAgent>) {
+    pub async fn register(&self, agent: impl WebhookAgent + 'static) {
         let name = agent.name().to_string();
         tracing::info!("🤖 Agent registered: {}", name);
-        self.agents.write().await.push(agent);
+        self.agents.write().await.push(Arc::new(agent));
     }
 
     /// Register all built-in agents.
     pub async fn register_builtins(&self) {
         for agent in super::builtin::all_builtin_agents() {
-            self.register(agent).await;
+            self.register_boxed(agent).await;
         }
+    }
+
+    /// Register a boxed agent.
+    async fn register_boxed(&self, agent: Box<dyn WebhookAgent>) {
+        let name = agent.name().to_string();
+        tracing::info!("🤖 Agent registered: {}", name);
+        self.agents.write().await.push(Arc::from(agent));
     }
 
     /// Get list of all registered agent names and descriptions.
@@ -72,14 +79,16 @@ impl AgentOrchestrator {
     /// This is the main entry point called after a successful delivery.
     /// It runs matching agents in parallel and persists all results.
     pub async fn trigger_agents(&self, context: &WebhookContext) -> Result<Vec<AgentResult>> {
-        let agents = self.agents.read().await;
-
-        // Find agents that match this event
-        let matching: Vec<&Box<dyn WebhookAgent>> = agents
-            .iter()
-            .filter(|a| a.should_trigger(context))
-            .take(MAX_AGENTS_PER_WEBHOOK)
-            .collect();
+        // Collect matching agent Arc clones (cheap, no lock held during execution)
+        let matching: Vec<Arc<dyn WebhookAgent>> = {
+            let agents = self.agents.read().await;
+            agents
+                .iter()
+                .filter(|a| a.should_trigger(context))
+                .take(MAX_AGENTS_PER_WEBHOOK)
+                .cloned()
+                .collect()
+        };
 
         if matching.is_empty() {
             tracing::debug!(
@@ -99,11 +108,11 @@ impl AgentOrchestrator {
 
         // Execute all matching agents in parallel
         let futures: Vec<_> = matching
-            .iter()
+            .into_iter()
             .map(|agent| {
                 let ctx = context.clone();
-                let agent_name = agent.name().to_string();
                 async move {
+                    let agent_name = agent.name().to_string();
                     let start = std::time::Instant::now();
                     match agent.execute(&ctx).await {
                         Ok(result) => {
