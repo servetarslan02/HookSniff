@@ -98,6 +98,33 @@ pub struct PublishKafkaInput {
     pub error: String,
 }
 
+/// Input for the `trigger_agents` activity.
+///
+/// Called after a successful webhook delivery to trigger AI agent analysis.
+/// Runs asynchronously — does not block the delivery workflow.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TriggerAgentsInput {
+    pub delivery_id: String,
+    pub endpoint_id: String,
+    pub endpoint_url: String,
+    pub customer_id: String,
+    pub payload: String,
+    pub event_type: Option<String>,
+    pub status_code: i32,
+    pub response_body: Option<String>,
+    pub duration_ms: i32,
+    pub attempt_number: i32,
+}
+
+/// Result of the `trigger_agents` activity.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TriggerAgentsOutput {
+    pub agents_triggered: i32,
+    pub actions_count: i32,
+    pub success: bool,
+    pub error: Option<String>,
+}
+
 // ---------------------------------------------------------------------------
 // Activity implementations
 // ---------------------------------------------------------------------------
@@ -319,6 +346,102 @@ impl HookRelayActivities {
             .map_err(|(e, _)| ActivityError::from(anyhow::anyhow!("Kafka publish failed: {}", e)))?;
 
         Ok(())
+    }
+
+    /// Trigger AI agent analysis after a successful webhook delivery.
+    ///
+    /// This activity calls the AI center's agent orchestrator to run
+    /// matching agents. It runs asynchronously and doesn't block the
+    /// delivery workflow — failures here are logged but don't affect
+    /// the delivery status.
+    ///
+    /// The AI center URL is configured via `AI_CENTER_URL` env var.
+    /// If not configured, this activity is a no-op.
+    #[activity]
+    pub async fn trigger_agents(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        input: TriggerAgentsInput,
+    ) -> Result<TriggerAgentsOutput, ActivityError> {
+        let ai_center_url = std::env::var("AI_CENTER_URL")
+            .unwrap_or_else(|_| "http://localhost:8081".to_string());
+
+        // Build the context payload to send to the AI center
+        let context_payload = serde_json::json!({
+            "delivery_id": input.delivery_id,
+            "endpoint_id": input.endpoint_id,
+            "endpoint_url": input.endpoint_url,
+            "customer_id": input.customer_id,
+            "payload": input.payload,
+            "event_type": input.event_type,
+            "status_code": input.status_code,
+            "response_body": input.response_body,
+            "duration_ms": input.duration_ms,
+            "attempt_number": input.attempt_number,
+        });
+
+        let url = format!("{}/v1/agents/trigger", ai_center_url);
+
+        match self
+            .http_client
+            .post(&url)
+            .json(&context_payload)
+            .timeout(std::time::Duration::from_secs(30))
+            .send()
+            .await
+        {
+            Ok(response) => {
+                if response.status().is_success() {
+                    let body: serde_json::Value = response.json().await.unwrap_or_default();
+                    let agents_triggered =
+                        body.get("agents_triggered").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+                    let actions_count =
+                        body.get("actions_count").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+
+                    tracing::info!(
+                        "🤖 Agents triggered for delivery {}: {} agents, {} actions",
+                        input.delivery_id,
+                        agents_triggered,
+                        actions_count
+                    );
+
+                    Ok(TriggerAgentsOutput {
+                        agents_triggered,
+                        actions_count,
+                        success: true,
+                        error: None,
+                    })
+                } else {
+                    let status = response.status();
+                    let body = response.text().await.unwrap_or_default();
+                    tracing::warn!(
+                        "⚠️ Agent trigger failed for delivery {}: HTTP {} — {}",
+                        input.delivery_id,
+                        status,
+                        body
+                    );
+                    Ok(TriggerAgentsOutput {
+                        agents_triggered: 0,
+                        actions_count: 0,
+                        success: false,
+                        error: Some(format!("HTTP {}: {}", status, body)),
+                    })
+                }
+            }
+            Err(e) => {
+                tracing::warn!(
+                    "⚠️ Agent trigger error for delivery {}: {:?}",
+                    input.delivery_id,
+                    e
+                );
+                Ok(TriggerAgentsOutput {
+                    agents_triggered: 0,
+                    actions_count: 0,
+                    success: false,
+                    error: Some(e.to_string()),
+                })
+            }
+        }
     }
 }
 

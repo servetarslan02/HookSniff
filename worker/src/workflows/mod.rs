@@ -29,7 +29,7 @@ use temporalio_sdk::{WorkflowContext, WorkflowResult};
 
 use crate::activities::{
     DeadLetterInput, DeliverWebhookInput, DeliverWebhookOutput, HookRelayActivities,
-    PublishKafkaInput, RecordAttemptInput,
+    PublishKafkaInput, RecordAttemptInput, TriggerAgentsInput,
 };
 
 // ---------------------------------------------------------------------------
