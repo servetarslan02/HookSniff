@@ -19,6 +19,8 @@ pub fn router() -> Router {
         .route("/blocklist", get(list_blocklist).post(add_block))
         .route("/blocklist/{id}", axum::routing::delete(remove_block))
         .route("/status", get(ai_status))
+        .route("/providers", get(list_providers))
+        .route("/stats", get(ai_stats))
 }
 
 #[derive(Debug, Deserialize)]
@@ -386,4 +388,77 @@ async fn ai_status(
         avg_risk_score: avg_risk.0.unwrap_or(0.0),
         high_risk_endpoints: high_risk.0,
     }))
+}
+
+async fn list_providers(
+    Extension(_pool): Extension<PgPool>,
+    Extension(_customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Return info about configured AI providers
+    let mimo_configured = std::env::var("MIMO_API_KEY")
+        .ok()
+        .filter(|k| !k.is_empty() && k != "your-mimo-api-key-here")
+        .is_some();
+
+    let openai_configured = std::env::var("OPENAI_API_KEY")
+        .ok()
+        .filter(|k| !k.is_empty() && k != "your-openai-api-key-here")
+        .is_some();
+
+    Ok(Json(serde_json::json!({
+        "providers": [
+            {
+                "name": "mimo",
+                "enabled": mimo_configured,
+                "capabilities": ["log_analysis", "anomaly_detection", "threat_analysis", "report_generation"],
+                "api_key_env": "MIMO_API_KEY",
+                "docs": "https://mimo.xiaomi.com"
+            },
+            {
+                "name": "openai",
+                "enabled": openai_configured,
+                "capabilities": ["code_review", "code_generation", "command_interpretation", "report_generation", "log_analysis"],
+                "api_key_env": "OPENAI_API_KEY",
+                "docs": "https://platform.openai.com/api-keys"
+            }
+        ],
+        "total_active": [mimo_configured, openai_configured].iter().filter(|&&x| x).count(),
+        "note": "Yeni AI eklemek için .env dosyasına API key ekleyin ve provider modülü oluşturun"
+    })))
+}
+
+async fn ai_stats(
+    Extension(pool): Extension<PgPool>,
+    Extension(_customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Task stats from last 24h
+    let events_by_type: Vec<(String, i64)> = sqlx::query_as(
+        r#"
+        SELECT event_type, COUNT(*) as cnt
+        FROM ai_events
+        WHERE created_at > now() - INTERVAL '24 hours'
+        GROUP BY event_type
+        ORDER BY cnt DESC
+        "#
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    let actions_by_status: Vec<(String, i64)> = sqlx::query_as(
+        r#"
+        SELECT status, COUNT(*) as cnt
+        FROM ai_actions
+        WHERE created_at > now() - INTERVAL '24 hours'
+        GROUP BY status
+        ORDER BY cnt DESC
+        "#
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({
+        "events_24h": events_by_type.into_iter().map(|(t, c)| serde_json::json!({"type": t, "count": c})).collect::<Vec<_>>(),
+        "actions_24h": actions_by_status.into_iter().map(|(s, c)| serde_json::json!({"status": s, "count": c})).collect::<Vec<_>>(),
+        "providers_note": "GET /v1/ai/providers ile AI sağlayıcı durumlarını görebilirsiniz"
+    })))
 }

@@ -1,18 +1,22 @@
 use anyhow::Result;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-/// MiMo AI API entegrasyonu
-/// Log analizi, anomali tespiti, ses/görsel analiz için kullanılır
+use super::provider::{AiCapability, AiProvider, ProviderStatus};
+
+/// MiMo AI Provider
+/// Log analizi, anomali tespiti, güvenlik analizi için optimize edilmiş
 ///
-/// ## API Key Ayarı
+/// ## API Key
 /// Ortam değişkeni: `MIMO_API_KEY`
-/// MiMo konsolundan alabilirsin: https://mimo.xiaomi.com
+/// https://mimo.xiaomi.com
 
 #[derive(Debug, Clone)]
-pub struct MiMoClient {
+pub struct MiMoProvider {
     api_key: String,
     base_url: String,
     http_client: reqwest::Client,
+    enabled: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -39,16 +43,56 @@ struct MiMoChoice {
     message: MiMoMessage,
 }
 
-impl MiMoClient {
+impl MiMoProvider {
     pub fn new(api_key: String) -> Self {
         Self {
             api_key,
             base_url: "https://api.mimo.xiaomi.com/v1".to_string(),
             http_client: reqwest::Client::new(),
+            enabled: true,
         }
     }
 
-    /// MiMo API'ye istek gönder
+    pub fn from_env() -> Option<Self> {
+        std::env::var("MIMO_API_KEY")
+            .ok()
+            .filter(|k| !k.is_empty() && k != "your-mimo-api-key-here")
+            .map(Self::new)
+    }
+}
+
+#[async_trait]
+impl AiProvider for MiMoProvider {
+    fn name(&self) -> &str {
+        "mimo"
+    }
+
+    fn capabilities(&self) -> Vec<AiCapability> {
+        vec![
+            AiCapability::LogAnalysis,
+            AiCapability::AnomalyDetection,
+            AiCapability::ThreatAnalysis,
+            AiCapability::ReportGeneration,
+            AiCapability::General,
+        ]
+    }
+
+    fn is_available(&self) -> bool {
+        self.enabled
+    }
+
+    fn status(&self) -> ProviderStatus {
+        ProviderStatus {
+            name: "mimo".to_string(),
+            enabled: self.enabled,
+            capabilities: self.capabilities(),
+            requests_today: 0, // TODO: track
+            avg_latency_ms: 0,
+            error_rate: 0.0,
+            last_error: None,
+        }
+    }
+
     async fn chat(&self, system_prompt: &str, user_prompt: &str) -> Result<String> {
         let request = MiMoRequest {
             model: "mimo-v2.5-pro".to_string(),
@@ -89,8 +133,7 @@ impl MiMoClient {
             .unwrap_or_default())
     }
 
-    /// Log analizi yap — hata paternlerini tespit et
-    pub async fn analyze_logs(&self, logs: &str) -> Result<String> {
+    async fn analyze_logs(&self, logs: &str) -> Result<String> {
         let system = r#"Sen HookRelay webhook servisi için bir log analiz uzmanısın.
 Verilen logları analiz et ve şunları belirle:
 1. Hata paternleri (tekrarlayan hatalar)
@@ -99,57 +142,47 @@ Verilen logları analiz et ve şunları belirle:
 4. Güvenlik tehditleri
 5. Önerilen aksiyonlar
 
-JSON formatında yanıt ver:"#;
+JSON formatında yanıt ver:
+{
+  "issues": [{"type": "...", "severity": "...", "description": "...", "count": N}],
+  "overall_severity": "low|medium|high|critical",
+  "recommendations": ["..."],
+  "patterns_found": ["..."]
+}"#;
 
         self.chat(system, logs).await
     }
 
-    /// Anomali tespiti yap
-    pub async fn detect_anomaly(&self, metrics: &str) -> Result<String> {
+    async fn detect_anomaly(&self, metrics: &str) -> Result<String> {
         let system = r#"Sen bir anomali tespit uzmanısın.
 Verilen metrikleri analiz et ve anormal durumları tespit et.
 Normal aralık dışı değerleri, trend değişimlerini ve spike'ları belirle.
-JSON formatında yanıt ver:"#;
+
+JSON formatında yanıt ver:
+{
+  "anomalies": [{"metric": "...", "value": N, "expected_range": [N, N], "severity": "..."}],
+  "trend_changes": ["..."],
+  "spikes_detected": ["..."]
+}"#;
 
         self.chat(system, metrics).await
     }
 
-    /// Hata düzeltme önerisi ver
-    pub async fn suggest_fix(&self, error_description: &str) -> Result<String> {
-        let system = r#"Sen HookRelay webhook servisi için bir hata düzeltme uzmanısın.
-Verilen hata için somut düzeltme önerileri sun.
-Her öneri için:
-- Ne yapılmalı
-- Neden yapılmalı
-- Risk seviyesi (düşük/orta/yüksek)
-JSON formatında yanıt ver:"#;
-
-        self.chat(system, error_description).await
-    }
-
-    /// Güvenlik tehdidi analizi yap
-    pub async fn analyze_threat(&self, traffic_data: &str) -> Result<String> {
+    async fn analyze_threat(&self, traffic: &str) -> Result<String> {
         let system = r#"Sen bir siber güvenlik uzmanısın.
 Verilen trafik verisini analiz et ve potansiyel tehditleri tespit et:
 - DDoS saldırıları
 - Injection denemeleri
 - Anormal trafik paternleri
 - Brute force denemeleri
-JSON formatında yanıt ver:"#;
 
-        self.chat(system, traffic_data).await
-    }
+JSON formatında yanıt ver:
+{
+  "threats": [{"type": "...", "severity": "...", "source": "...", "description": "..."}],
+  "recommended_actions": ["..."],
+  "overall_risk": "low|medium|high|critical"
+}"#;
 
-    /// Webhook sağlık raporu oluştur
-    pub async fn health_report(&self, stats: &str) -> Result<String> {
-        let system = r#"Sen HookRelay için bir sistem sağlık analistisin.
-Verilen istatistikleri analiz et ve bir sağlık raporu oluştur:
-- Genel durum (iyi/uyarı/kritik)
-- Sorunlu alanlar
-- İyileştirme önerileri
-- Tahmini kapasite kullanımı
-JSON formatında yanıt ver:"#;
-
-        self.chat(system, stats).await
+        self.chat(system, traffic).await
     }
 }
