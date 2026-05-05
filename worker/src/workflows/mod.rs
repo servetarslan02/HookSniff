@@ -234,7 +234,7 @@ impl WebhookDeliveryWorkflow {
             .await?;
 
             if delivery_result.success {
-                // --- Success path: publish to Kafka and finish ---
+                // --- Success path: publish to Kafka, trigger AI agents, and finish ---
                 tracing::info!(
                     "✅ Workflow: delivery {} succeeded on attempt {}",
                     ctx.state(|s| s.input.delivery_id.clone()),
@@ -255,6 +255,40 @@ impl WebhookDeliveryWorkflow {
                     ActivityOptions::start_to_close_timeout(Duration::from_secs(10)),
                 )?
                 .await?;
+
+                // --- Trigger AI agents asynchronously ---
+                // This is fire-and-forget from the workflow's perspective.
+                // Agent failures don't affect delivery status.
+                let trigger_input = ctx.state(|s| TriggerAgentsInput {
+                    delivery_id: s.input.delivery_id.clone(),
+                    endpoint_id: s.input.endpoint_id.clone(),
+                    endpoint_url: s.input.endpoint_url.clone(),
+                    customer_id: String::new(), // Will be resolved by AI center from delivery_id
+                    payload: s.input.payload.clone(),
+                    event_type: None, // Will be extracted from payload by AI center
+                    status_code: delivery_result.status_code,
+                    response_body: Some(delivery_result.response_body.clone()),
+                    duration_ms: delivery_result.duration_ms,
+                    attempt_number: attempt,
+                });
+
+                // Fire and forget — don't block the workflow on agent execution
+                match ctx.start_activity(
+                    HookRelayActivities::trigger_agents,
+                    trigger_input,
+                    ActivityOptions::start_to_close_timeout(Duration::from_secs(30)),
+                ) {
+                    Ok(future) => {
+                        // Await but don't fail the workflow if agents fail
+                        let _ = future.await;
+                    }
+                    Err(e) => {
+                        tracing::warn!(
+                            "⚠️ Failed to start trigger_agents activity: {:?}",
+                            e
+                        );
+                    }
+                }
 
                 return Ok(());
             }
