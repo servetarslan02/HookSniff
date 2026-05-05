@@ -69,7 +69,7 @@ impl Config {
                 .context("PORT must be a number")?,
             database_url: std::env::var("DATABASE_URL")
                 .unwrap_or_else(|_| {
-                    "postgresql://root@localhost:26257/hookrelay?sslmode=disable".into()
+                    "postgresql://hookrelay:hookrelay_local@localhost:5432/hookrelay?sslmode=disable".into()
                 }),
             kafka_brokers: std::env::var("KAFKA_BROKERS")
                 .unwrap_or_else(|_| "localhost:9092".into()),

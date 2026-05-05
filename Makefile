@@ -1,124 +1,96 @@
-.PHONY: help infra api worker dashboard dev stop clean logs test
+.PHONY: help local stop restart reset fix status logs logs-api logs-db clean build
 
 # Default target
 help: ## Show this help
-	@echo "🪝 HookRelay — Development Commands"
+	@echo "🪝 HookRelay — Komutlar"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""
-	@echo "Quick start: make dev"
 
-# ── Full Stack ──
+# ── Ana Komutlar ──
 
-dev: ## Start everything (API + Worker + Dashboard + Infra)
-	@echo "🚀 Starting HookRelay..."
-	docker compose up -d
+local: ## Her şeyi localde başlat (3 servis: PostgreSQL + API + Dashboard)
+	@echo "🚀 HookRelay local ortam başlatılıyor..."
+	docker compose -f docker-compose.local.yml up -d --build
 	@echo ""
-	@echo "✅ HookRelay is starting up!"
-	@echo "   API:       http://localhost:3000"
+	@echo "✅ Başlatılıyor! İlk açılış 5-10 dakika sürebilir."
+	@echo ""
 	@echo "   Dashboard: http://localhost:3001"
-	@echo "   Temporal:  http://localhost:8081"
+	@echo "   API:       http://localhost:3000/health"
 	@echo ""
-	@echo "   Run 'make logs' to see output"
+	@echo "   Loglar:    make logs"
 
-stop: ## Stop all services
-	docker compose down
+stop: ## Tüm servisleri durdur
+	docker compose -f docker-compose.local.yml down
+	@echo "⏹️  Durduruldu"
 
-clean: ## Stop and remove all data
-	docker compose down -v
-	@echo "🧹 All data removed"
+restart: ## Yeniden başlat
+	docker compose -f docker-compose.local.yml restart
+	@echo "🔄 Yeniden başlatıldı"
 
-restart: ## Restart all services
-	docker compose restart
+reset: ## Sıfırla (veritabanı dahil, her şey silinir)
+	@echo "⚠️  Tüm veriler silinecek! 5 saniye içinde Ctrl+C ile iptal edebilirsin."
+	@sleep 5
+	docker compose -f docker-compose.local.yml down -v
+	docker compose -f docker-compose.local.yml up -d --build
+	@echo "🧹 Sıfırlandı ve yeniden başlatıldı"
 
-logs: ## Show logs (all services)
-	docker compose logs -f
+fix: ## Sorunları otomatik çöz
+	@echo "🔧 Sorun çözücü çalışıyor..."
+	@echo ""
+	@echo "1/4 Servisler durduruluyor..."
+	@docker compose -f docker-compose.local.yml down 2>/dev/null || true
+	@echo "2/4 Cache temizleniyor..."
+	@docker system prune -f 2>/dev/null || true
+	@echo "3/4 Servisler başlatılıyor..."
+	@docker compose -f docker-compose.local.yml up -d --build
+	@echo "4/4 Sağlık kontrolü..."
+	@sleep 10
+	@docker compose -f docker-compose.local.yml ps
+	@echo ""
+	@echo "✅ Tamamlandı! http://localhost:3001 adresini kontrol et"
 
-logs-api: ## Show API logs
-	docker compose logs -f api
+status: ## Ne durumda göster
+	@echo "🪝 HookRelay Durum"
+	@echo ""
+	@docker compose -f docker-compose.local.yml ps 2>/dev/null || echo "❌ Servisler çalışmıyor. 'make local' ile başlat."
+	@echo ""
+	@echo "Dashboard: $$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3001 2>/dev/null || echo 'kapalı')"
+	@echo "API:       $$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/health 2>/dev/null || echo 'kapalı')"
 
-logs-worker: ## Show Worker logs
-	docker compose logs -f worker
+# ── Loglar ──
 
-logs-dashboard: ## Show Dashboard logs
-	docker compose logs -f dashboard
+logs: ## Tüm log'ları göster
+	docker compose -f docker-compose.local.yml logs -f
 
-# ── Infrastructure Only ──
+logs-api: ## API log'ları
+	docker compose -f docker-compose.local.yml logs -f api
 
-infra: ## Start only infrastructure (DB + Queue + Temporal)
-	docker compose up -d cockroachdb redpanda temporal temporal-ui create-topics
-	@echo "✅ Infrastructure started"
-
-# ── Individual Services (for development) ──
-
-api: ## Run API locally (requires infra)
-	cd api && cargo run
-
-worker: ## Run Worker locally (requires infra)
-	cd worker && cargo run
-
-dashboard: ## Run Dashboard locally
-	cd dashboard && npm run dev
+logs-db: ## Veritabanı log'ları
+	docker compose -f docker-compose.local.yml logs -f postgres
 
 # ── Build ──
 
-build: ## Build all Docker images
-	docker compose build
+build: ## Docker image'larını build et
+	docker compose -f docker-compose.local.yml build
 
-build-api: ## Build API image
-	docker compose build api
+clean: ## Her şeyi temizle (image'lar dahil)
+	docker compose -f docker-compose.local.yml down -v --rmi all
+	@echo "🧹 Her şey temizlendi"
 
-build-dashboard: ## Build Dashboard image
-	docker compose build dashboard
+# ── Eski Komutlar (Full Stack) ──
 
-# ── Database ──
+dev: ## Full stack başlat (Kafka + Temporal dahil)
+	@echo "⚠️  Bu komut Kafka ve Temporal gerektirir. 'make local' daha basit."
+	docker compose up -d --build
 
-db-shell: ## Open CockroachDB shell
-	docker compose exec cockroachdb cockroach sql --insecure
-
-db-migrate: ## Run database migrations
-	@echo "Running migrations..."
-	@for f in migrations/*.sql; do \
-		echo "  → $$f"; \
-		docker compose exec -T cockroachdb cockroach sql --insecure -d hookrelay < $$f 2>/dev/null || true; \
-	done
-	@echo "✅ Migrations complete"
-
-# ── Testing ──
-
-test: ## Run all tests
-	cd api && cargo test
-
-test-integration: ## Run integration tests
-	cd api && cargo test --test integration
-
-# ── Status ──
-
-status: ## Check service status
-	@echo "🪝 HookRelay Status"
-	@echo ""
-	@echo "API:"
-	@curl -s http://localhost:3000/health 2>/dev/null && echo " ✅ Running" || echo " ❌ Not running"
-	@echo ""
-	@echo "Dashboard:"
-	@curl -s http://localhost:3001 2>/dev/null > /dev/null && echo " ✅ Running" || echo " ❌ Not running"
-	@echo ""
-	@echo "Database:"
-	@docker compose exec -T cockroachdb cockroach node status --insecure --host=cockroachdb 2>/dev/null | head -2 || echo " ❌ Not running"
-	@echo ""
-	@echo "Queue:"
-	@docker compose exec -T redpanda rpk cluster health --api-urls=localhost:9644 2>/dev/null | head -2 || echo " ❌ Not running"
-
-# ── Production ──
-
-prod: ## Start in production mode
-	docker compose -f docker-compose.yml up -d --build
-	@echo "🚀 Production mode started"
+prod: ## Production modu
+	docker compose -f docker-compose.prod.yml up -d --build
 
 # ── Utilities ──
 
-generate-secret: ## Generate a random secret
+generate-secret: ## Rastgele secret oluştur
 	@openssl rand -hex 32
 
-generate-api-key: ## Generate a sample API key
+generate-api-key: ## Örnek API key oluştur
 	@echo "hr_live_$(openssl rand -hex 16)"

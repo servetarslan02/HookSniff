@@ -18,7 +18,7 @@ impl AiConfig {
         Ok(Self {
             database_url: std::env::var("DATABASE_URL")
                 .unwrap_or_else(|_| {
-                    "postgresql://root@localhost:26257/hookrelay?sslmode=disable".into()
+                    "postgresql://hookrelay:hookrelay_local@localhost:5432/hookrelay?sslmode=disable".into()
                 }),
             check_interval_secs: std::env::var("AI_CHECK_INTERVAL_SECS")
                 .unwrap_or_else(|_| "30".into())
