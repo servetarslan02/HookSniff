@@ -125,6 +125,12 @@ Webhook delivery servisi. Geliştiricilere yönelik.
 9. Full-time mı part-time mı sorusu soruldu (cevaplanmadı)
 10. GitHub yardımcı repolar araştırıldı (svix-webhooks, standard-webhooks, hook0)
 11. Servet bu işe ilk defa giriyor, bilgisi sınırlı — yönlendirme lazım
+12. Kapsamlı rekabet analizi yapıldı → COMPETITIVE_ANALYSIS.md
+13. Detaylı kod incelemesi yapıldı → REVIEW.md (sub-agent tarafından)
+14. hookrelay.dev isim çakışması — alternatif isim önerileri hazırlandı
+15. Yasal uyumluluk eksiklikleri tespit edildi (SOC2, GDPR, PCI-DSS yok)
+16. Standard Webhooks uyumluluğu kontrol edilecek
+17. Customer portal ve embeddable portal eksik
 
 ## ⚠️ Güvenlik Uyarıları
 
