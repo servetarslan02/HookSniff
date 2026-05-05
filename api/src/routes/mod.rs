@@ -2,6 +2,7 @@ pub mod agents;
 pub mod ai_center;
 pub mod analytics;
 pub mod auth;
+pub mod billing;
 pub mod docs;
 pub mod endpoints;
 pub mod health;
@@ -27,6 +28,7 @@ pub fn api_router() -> Router {
         .nest("/templates", templates::router())
         .nest("/marketplace/agents", marketplace::router())
         .nest("/schemas", schemas::router())
+        .nest("/billing", billing::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Dashboard routes use JWT auth (separate from API key auth)
