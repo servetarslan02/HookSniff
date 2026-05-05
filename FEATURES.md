@@ -8,11 +8,11 @@
 
 | # | Feature | Backend | Frontend | Test | Durum |
 |---|---------|---------|----------|------|-------|
-| 1 | API Key Management | ✅ `routes/api_keys.rs` | ❌ | ❌ | Backend hazır |
+| 1 | API Key Management | ✅ `routes/api_keys.rs` | ✅ `api-keys/page.tsx` | ❌ | ✅ Tamamlandı |
 | 2 | Customer Self-Service | ⚠️ Mevcut | ⚠️ Mevcut | ❌ | Kısmen hazır |
-| 3 | Webhook Playground | ✅ `routes/playground.rs` | ❌ | ❌ | Backend hazır |
-| 4 | Delivery Attempt Details | ✅ `routes/delivery_details.rs` | ❌ | ❌ | Backend hazır |
-| 5 | Webhook Logs Search | ✅ `routes/search.rs` | ❌ | ❌ | Backend hazır |
+| 3 | Webhook Playground | ✅ `routes/playground.rs` | ⚠️ Mevcut (güncellenmeli) | ❌ | Backend hazır |
+| 4 | Delivery Attempt Details | ✅ `routes/delivery_details.rs` | ⚠️ Mevcut (güncellenmeli) | ❌ | Backend hazır |
+| 5 | Webhook Logs Search | ✅ `routes/search.rs` | ✅ `search/page.tsx` | ❌ | ✅ Tamamlandı |
 
 ## 🟡 Hafta 3-4: Rekabet Avantajı
 
@@ -20,9 +20,9 @@
 |---|---------|---------|----------|------|-------|
 | 6 | Embeddable Portal | ❌ | ❌ | ❌ | Başlanmadı |
 | 7 | CLI Tool | ❌ | N/A | ❌ | Başlanmadı |
-| 8 | Webhook Alerting | ✅ `routes/alerts.rs` | ❌ | ❌ | Backend hazır |
+| 8 | Webhook Alerting | ✅ `routes/alerts.rs` | ✅ `alerts/page.tsx` | ❌ | ✅ Tamamlandı |
 | 9 | Custom Retry Schedules | ⚠️ Mevcut | ❌ | ❌ | Retry policy var, UI yok |
-| 10 | Endpoint Health Monitoring | ✅ `routes/health_endpoints.rs` | ❌ | ❌ | Backend hazır |
+| 10 | Endpoint Health Monitoring | ✅ `routes/health_endpoints.rs` | ✅ `health/page.tsx` | ❌ | ✅ Tamamlandı |
 
 ## 🟢 Hafta 5-6: Fark Yaratma
 
