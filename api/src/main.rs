@@ -138,34 +138,68 @@ async fn main() -> Result<()> {
         .layer(axum::extract::Extension(pool))
         .layer(axum::extract::Extension(kafka_producer))
         .layer(axum::extract::Extension(cfg.clone()))
-        .layer(axum::extract::Extension(rate_limiter))
+        .layer(axum::extract::Extension(rate_limiter.clone()))
         .layer(axum::extract::Extension(metrics.clone()))
+        .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
         .layer(axum::middleware::from_fn(middleware::request_id_middleware))
         .layer(axum::middleware::from_fn(metrics::metrics_middleware))
-        .layer(
-            CorsLayer::new()
-                .allow_origin(Any)
-                .allow_methods([
-                    axum::http::Method::GET,
-                    axum::http::Method::POST,
-                    axum::http::Method::DELETE,
-                    axum::http::Method::OPTIONS,
-                ])
-                .allow_headers([
-                    axum::http::header::AUTHORIZATION,
-                    axum::http::header::CONTENT_TYPE,
-                    "Idempotency-Key".parse().unwrap(),
-                    "X-Request-ID".parse().unwrap(),
-                    "X-Trace-ID".parse().unwrap(),
-                ])
-                .expose_headers([
-                    "X-Request-ID".parse().unwrap(),
-                    "X-RateLimit-Limit".parse().unwrap(),
-                    "X-RateLimit-Remaining".parse().unwrap(),
-                    "X-RateLimit-Reset".parse().unwrap(),
-                ])
-                .max_age(std::time::Duration::from_secs(3600)),
-        )
+        .layer({
+            // In production, restrict CORS to known origins.
+            // In development, allow any origin.
+            let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
+            if env == "production" || env == "prod" {
+                let origins: Vec<axum::http::HeaderValue> = std::env::var("CORS_ORIGINS")
+                    .unwrap_or_else(|_| "https://dashboard.hookrelay.io,https://hookrelay.io".into())
+                    .split(',')
+                    .filter_map(|s| s.trim().parse().ok())
+                    .collect();
+                CorsLayer::new()
+                    .allow_origin(tower_http::cors::AllowOrigin::list(origins))
+                    .allow_methods([
+                        axum::http::Method::GET,
+                        axum::http::Method::POST,
+                        axum::http::Method::DELETE,
+                        axum::http::Method::OPTIONS,
+                    ])
+                    .allow_headers([
+                        axum::http::header::AUTHORIZATION,
+                        axum::http::header::CONTENT_TYPE,
+                        "Idempotency-Key".parse().unwrap(),
+                        "X-Request-ID".parse().unwrap(),
+                        "X-Trace-ID".parse().unwrap(),
+                    ])
+                    .expose_headers([
+                        "X-Request-ID".parse().unwrap(),
+                        "X-RateLimit-Limit".parse().unwrap(),
+                        "X-RateLimit-Remaining".parse().unwrap(),
+                        "X-RateLimit-Reset".parse().unwrap(),
+                    ])
+                    .max_age(std::time::Duration::from_secs(3600))
+            } else {
+                CorsLayer::new()
+                    .allow_origin(Any)
+                    .allow_methods([
+                        axum::http::Method::GET,
+                        axum::http::Method::POST,
+                        axum::http::Method::DELETE,
+                        axum::http::Method::OPTIONS,
+                    ])
+                    .allow_headers([
+                        axum::http::header::AUTHORIZATION,
+                        axum::http::header::CONTENT_TYPE,
+                        "Idempotency-Key".parse().unwrap(),
+                        "X-Request-ID".parse().unwrap(),
+                        "X-Trace-ID".parse().unwrap(),
+                    ])
+                    .expose_headers([
+                        "X-Request-ID".parse().unwrap(),
+                        "X-RateLimit-Limit".parse().unwrap(),
+                        "X-RateLimit-Remaining".parse().unwrap(),
+                        "X-RateLimit-Reset".parse().unwrap(),
+                    ])
+                    .max_age(std::time::Duration::from_secs(3600))
+            }
+        })
         .layer(TraceLayer::new_for_http());
 
     let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{}", cfg.port)).await?;

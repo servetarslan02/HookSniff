@@ -38,18 +38,26 @@ impl Config {
         let env = std::env::var("APP_ENV")
             .unwrap_or_else(|_| "development".into());
 
-        // Warn if running in production with default secrets
+        // In production, reject default/placeholder secrets
         if env == "production" || env == "prod" {
-            if hmac_secret == "change-me-in-production" {
-                tracing::warn!(
-                    "⚠️ HMAC_SECRET is using the default value! \
-                     Set a unique secret before deploying to production."
+            if hmac_secret == "change-me-in-production"
+                || hmac_secret == "CHANGE_ME_TO_RANDOM_64_CHAR_STRING"
+                || hmac_secret.starts_with("CHANGE_ME")
+            {
+                anyhow::bail!(
+                    "🚫 HMAC_SECRET is using a default/placeholder value! \
+                     Set a unique secret before deploying to production. \
+                     Generate one with: openssl rand -hex 32"
                 );
             }
-            if jwt_secret == "change-me-jwt-secret-in-production" {
-                tracing::warn!(
-                    "⚠️ JWT_SECRET is using the default value! \
-                     Set a unique secret before deploying to production."
+            if jwt_secret == "change-me-jwt-secret-in-production"
+                || jwt_secret == "CHANGE_ME_TO_RANDOM_64_CHAR_STRING"
+                || jwt_secret.starts_with("CHANGE_ME")
+            {
+                anyhow::bail!(
+                    "🚫 JWT_SECRET is using a default/placeholder value! \
+                     Set a unique secret before deploying to production. \
+                     Generate one with: openssl rand -hex 32"
                 );
             }
         }

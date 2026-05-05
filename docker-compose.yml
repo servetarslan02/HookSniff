@@ -119,8 +119,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: Dockerfile.api
-    command: ["hookrelay-api"]  # Same binary, different entrypoint
+      dockerfile: Dockerfile.worker
     environment:
       - APP_ENV=production
       - DATABASE_URL=postgresql://root@cockroachdb:26257/hookrelay?sslmode=disable

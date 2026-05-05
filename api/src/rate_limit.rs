@@ -4,49 +4,10 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 
+use crate::billing::Plan;
+
 // ──────────────────────────────────────────────────────────────
-// Plan-based rate limits
-// ──────────────────────────────────────────────────────────────
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Plan {
-    Free,
-    Pro,
-    Business,
-    Enterprise,
-}
-
-impl Plan {
-    /// Requests per minute
-    pub fn requests_per_minute(&self) -> u32 {
-        match self {
-            Plan::Free => 100,
-            Plan::Pro => 1_000,
-            Plan::Business => 10_000,
-            Plan::Enterprise => u32::MAX, // Custom — no hard limit
-        }
-    }
-
-    /// Webhooks per day
-    pub fn webhooks_per_day(&self) -> u64 {
-        match self {
-            Plan::Free => 1_000,
-            Plan::Pro => 50_000,
-            Plan::Business => 500_000,
-            Plan::Enterprise => u64::MAX, // Custom — no hard limit
-        }
-    }
-
-    pub fn from_str(s: &str) -> Self {
-        match s.to_lowercase().as_str() {
-            "pro" => Plan::Pro,
-            "business" => Plan::Business,
-            "enterprise" => Plan::Enterprise,
-            _ => Plan::Free,
-        }
-    }
-}
-
+// Rate limit entry with sliding window
 // ──────────────────────────────────────────────────────────────
 // Rate limit entry with sliding window
 // ──────────────────────────────────────────────────────────────
