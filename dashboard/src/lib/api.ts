@@ -86,6 +86,14 @@ export const authApi = {
     }),
 };
 
+// Generic API client (axios-style wrapper — returns { data } for compatibility)
+export const api = {
+  get: async <T = unknown>(path: string) => ({ data: await apiFetch<T>(path) }),
+  post: async <T = unknown>(path: string, body?: unknown) => ({ data: await apiFetch<T>(path, { method: 'POST', body }) }),
+  put: async <T = unknown>(path: string, body?: unknown) => ({ data: await apiFetch<T>(path, { method: 'PUT', body }) }),
+  delete: async <T = unknown>(path: string) => ({ data: await apiFetch<T>(path, { method: 'DELETE' }) }),
+};
+
 // Types
 export interface Endpoint {
   id: string;
