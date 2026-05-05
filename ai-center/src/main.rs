@@ -1,6 +1,7 @@
 use anyhow::Result;
 use tracing_subscriber::EnvFilter;
 
+mod ai_engine;
 mod config;
 mod db;
 mod defense;
@@ -27,6 +28,11 @@ async fn main() -> Result<()> {
     tracing::info!("   Savunma: {}", cfg.defense_enabled);
 
     let mut system_monitor = monitor::system::SystemMonitor::new();
+    let ai_analyzer = ai_engine::analyzer::AiAnalyzer::from_env();
+
+    let (mimo_status, openai_status) = ai_analyzer.status();
+    tracing::info!("   MiMo AI: {}", mimo_status);
+    tracing::info!("   OpenAI: {}", openai_status);
 
     loop {
         tracing::debug!("🔄 Kontrol döngüsü başlıyor...");
