@@ -31,7 +31,7 @@ tags:
     description: AI-powered autonomous management system
 
 paths:
-  /auth:
+  /auth/register:
     post:
       tags: [Auth]
       summary: Register a new customer
@@ -43,23 +43,61 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email]
+              required: [email, password]
               properties:
                 email:
                   type: string
                   format: email
                   example: "user@example.com"
+                password:
+                  type: string
+                  minLength: 8
+                  description: Account password (minimum 8 characters)
+                  example: "SecurePass123!"
       responses:
         "200":
-          description: Customer created successfully
+          description: Customer created successfully. Returns JWT token and customer info with API key.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CustomerResponse"
+                $ref: "#/components/schemas/AuthResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email and password
+      operationId: loginCustomer
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "SecurePass123!"
+      responses:
+        "200":
+          description: Login successful. Returns JWT token and customer info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /endpoints:
     get:
@@ -537,6 +575,49 @@ paths:
         "200":
           description: Block added
 
+  /ai/blocklist/{id}:
+    delete:
+      tags: [AI Center]
+      summary: Remove a block entry
+      operationId: removeBlock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Block removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  removed:
+                    type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /ai/actions/{id}/rollback:
+    post:
+      tags: [AI Center]
+      summary: Rollback an executed AI action
+      operationId: rollbackAiAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Action rolled back
+
   /ai/providers:
     get:
       tags: [AI Center]
@@ -583,6 +664,15 @@ components:
       description: "API key starting with `hr_live_`"
 
   schemas:
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token for authenticated requests
+        customer:
+          $ref: "#/components/schemas/CustomerResponse"
+
     CustomerResponse:
       type: object
       properties:
@@ -594,7 +684,7 @@ components:
           format: email
         api_key:
           type: string
-          description: Only returned on creation
+          description: Only returned on registration (not on login)
         plan:
           type: string
         webhook_limit:
