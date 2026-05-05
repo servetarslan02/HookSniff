@@ -1,0 +1,17 @@
+{
+  "name": "hookrelay-cli",
+  "version": "0.1.0",
+  "description": "🪝 HookRelay CLI — Manage webhooks from your terminal",
+  "main": "index.js",
+  "bin": {
+    "hookrelay": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["webhook", "hookrelay", "cli"],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0"
+  }
+}
