@@ -8,7 +8,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 // ─── Types ───
 interface ComponentStatus {
   name: string;
-  status: 'healthy' | 'degraded' | 'down' | 'unhealthy';
+  status: 'healthy' | 'degraded' | 'down' | 'unhealthy' | 'unknown';
   latency_ms: number | null;
   description: string;
   last_checked: string;
@@ -54,8 +54,14 @@ function StatusBadge({ status }: { status: string }) {
       dot: 'bg-red-500',
       label: 'Down',
     },
+    unknown: {
+      bg: 'bg-gray-50 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20',
+      text: 'text-gray-500 dark:text-gray-400',
+      dot: 'bg-gray-400',
+      label: 'Unknown',
+    },
   };
-  const style = styles[status] || styles.healthy;
+  const style = styles[status] || styles.unknown;
 
   return (
     <span
@@ -70,9 +76,6 @@ function StatusBadge({ status }: { status: string }) {
 // ─── Uptime Bar ───
 function UptimeBar({ uptime }: { uptime: number }) {
   const t = useTranslations('status');
-  // Generate 30 bars based on the uptime percentage.
-  // When uptime tracking is implemented server-side, this should fetch per-day data.
-  // For now, use a single value for all days.
   const days = Array.from({ length: 30 }, () => uptime);
 
   return (
@@ -103,31 +106,66 @@ function UptimeBar({ uptime }: { uptime: number }) {
   );
 }
 
+// ─── Fallback when API is unreachable ───
+function unreachableData(): StatusData {
+  return {
+    overall_status: 'down',
+    uptime_30d: 0,
+    components: [
+      {
+        name: 'API',
+        status: 'unknown',
+        latency_ms: null,
+        description: 'Cannot reach API server',
+        last_checked: new Date().toISOString(),
+      },
+      {
+        name: 'Database',
+        status: 'unknown',
+        latency_ms: null,
+        description: 'Cannot verify — API unreachable',
+        last_checked: new Date().toISOString(),
+      },
+      {
+        name: 'Worker',
+        status: 'unknown',
+        latency_ms: null,
+        description: 'Cannot verify — API unreachable',
+        last_checked: new Date().toISOString(),
+      },
+    ],
+    checked_at: new Date().toISOString(),
+  };
+}
+
 // ─── Main Status Page ───
 export default function StatusPage() {
   const t = useTranslations('status');
-  const [data, setData] = useState<StatusData | null>(null);
+  const [data, setData] = useState<StatusData>(unreachableData());
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [apiReachable, setApiReachable] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.hooksniff.is-a.dev/v1';
 
   const loadData = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/status`);
-      if (!res.ok) {
-        throw new Error(`Status API returned ${res.status}`);
-      }
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
+      const res = await fetch(`${API}/status`, {
+        signal: controller.signal,
+        mode: 'cors',
+      });
+      clearTimeout(timeout);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json: StatusData = await res.json();
       setData(json);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load status');
-      // If we had previous data, keep showing it
-      if (!data) {
-        setData(null);
-      }
+      setApiReachable(true);
+    } catch {
+      setData(unreachableData());
+      setApiReachable(false);
     } finally {
       setLoading(false);
       setLastRefresh(new Date());
@@ -136,39 +174,9 @@ export default function StatusPage() {
 
   useEffect(() => {
     loadData();
-    // Auto-refresh every 30 seconds
     const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);
   }, [loadData]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-400 dark:text-slate-500">{t('loadingStatus')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-3xl mb-3">⚠️</div>
-          <p className="text-gray-600 dark:text-slate-400 font-medium">Unable to load status</p>
-          <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">{error}</p>
-          <button
-            onClick={loadData}
-            className="mt-4 px-4 py-2 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-          >
-            Try again
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -187,6 +195,27 @@ export default function StatusPage() {
             Auto-refreshes every 30s • Last updated: {lastRefresh.toLocaleTimeString()}
           </p>
         </div>
+
+        {/* API unreachable banner */}
+        {!apiReachable && !loading && (
+          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <span className="text-lg">⚠️</span>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                API server unreachable
+              </p>
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                Cannot connect to {API} — status data may be outdated
+              </p>
+            </div>
+            <button
+              onClick={loadData}
+              className="text-xs font-medium text-amber-700 dark:text-amber-300 hover:underline"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Overall Status */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
