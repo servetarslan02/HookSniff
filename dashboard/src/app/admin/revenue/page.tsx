@@ -1,0 +1,192 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/lib/store';
+import { adminApi, type RevenueResponse } from '@/lib/api';
+import { StatCard } from '@/components/tremor/StatCard';
+import { ChartCard } from '@/components/tremor/ChartCard';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
+const PLAN_COLORS: Record<string, string> = {
+  free: '#94a3b8',
+  pro: '#4c6ef5',
+  business: '#8b5cf6',
+};
+
+export default function AdminRevenuePage() {
+  const { token } = useAuth();
+  const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRevenue = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const data = await adminApi.getRevenue(token);
+      setRevenue(data);
+    } catch (err) {
+      console.error('Failed to fetch revenue:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchRevenue();
+  }, [fetchRevenue]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Revenue Dashboard</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const monthlyData = revenue?.monthly_revenue || [];
+  const planData = revenue?.revenue_by_plan?.map((item) => ({
+    name: item.plan.charAt(0).toUpperCase() + item.plan.slice(1),
+    value: item.revenue,
+    count: item.count,
+  })) || [];
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Revenue Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+          Financial metrics and revenue breakdown
+        </p>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard
+          label="Monthly Recurring Revenue"
+          value={`$${(revenue?.mrr || 0).toLocaleString()}`}
+          icon={<span className="text-lg">💰</span>}
+          color="violet"
+        />
+        <StatCard
+          label="Total Revenue"
+          value={`$${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`}
+          icon={<span className="text-lg">📈</span>}
+          color="emerald"
+        />
+        <StatCard
+          label="Churn Rate"
+          value={revenue?.churn_rate?.toFixed(1) || '0'}
+          icon={<span className="text-lg">📉</span>}
+          color="red"
+          isPercent
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Monthly Revenue Chart */}
+        <div className="lg:col-span-2">
+          <ChartCard title="Monthly Revenue" subtitle="Revenue over time">
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 12 }}
+                    className="text-gray-500 dark:text-slate-400"
+                  />
+                  <YAxis
+                    tick={{ fontSize: 12 }}
+                    className="text-gray-500 dark:text-slate-400"
+                    tickFormatter={(v) => `$${v}`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgb(15 23 42)',
+                      border: 'none',
+                      borderRadius: '12px',
+                      color: 'white',
+                    }}
+                    formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                  />
+                  <Bar
+                    dataKey="revenue"
+                    fill="#8b5cf6"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={48}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </ChartCard>
+        </div>
+
+        {/* Revenue by Plan */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Revenue by Plan</h3>
+          {planData.length > 0 ? (
+            <>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={planData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={35}
+                      outerRadius={65}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {planData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={PLAN_COLORS[entry.name.toLowerCase()] || '#94a3b8'}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgb(15 23 42)',
+                        border: 'none',
+                        borderRadius: '12px',
+                        color: 'white',
+                      }}
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="space-y-3 mt-4">
+                {planData.map((entry) => (
+                  <div key={entry.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: PLAN_COLORS[entry.name.toLowerCase()] || '#94a3b8' }}
+                      />
+                      <span className="text-sm text-gray-600 dark:text-slate-400">{entry.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        ${entry.value.toLocaleString()}
+                      </span>
+                      <span className="text-xs text-gray-400 dark:text-slate-500 ml-1">
+                        ({entry.count} users)
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="text-gray-400 dark:text-slate-500 text-sm">No revenue data</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

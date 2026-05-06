@@ -15,12 +15,20 @@ pub struct Customer {
     pub password_hash: Option<String>,
     pub stripe_customer_id: Option<String>,
     pub stripe_subscription_id: Option<String>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub is_active: bool,
+    #[serde(default)]
+    pub is_admin: bool,
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct CreateCustomerRequest {
     pub email: String,
     pub password: Option<String>,
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -29,14 +37,28 @@ pub struct LoginRequest {
     pub password: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UpdateProfileRequest {
+    pub name: String,
+    pub email: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ChangePasswordRequest {
+    pub current_password: String,
+    pub new_password: String,
+}
+
 #[derive(Debug, Serialize)]
 pub struct CustomerResponse {
     pub id: Uuid,
     pub email: String,
+    pub name: Option<String>,
     pub api_key: Option<String>, // Only returned on creation
     pub plan: String,
     pub webhook_limit: i32,
     pub webhook_count: i32,
+    pub is_admin: bool,
     pub created_at: DateTime<Utc>,
 }
 
@@ -51,10 +73,12 @@ impl Customer {
         CustomerResponse {
             id: self.id,
             email: self.email,
+            name: self.name,
             api_key,
             plan: self.plan,
             webhook_limit: self.webhook_limit,
             webhook_count: self.webhook_count,
+            is_admin: self.is_admin,
             created_at: self.created_at,
         }
     }

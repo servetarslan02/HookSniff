@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { webhooksApi, type Delivery } from '@/lib/api';
+import { StatusBadge } from '@/components/StatusBadge';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
@@ -382,31 +383,6 @@ export default function LogsPage() {
 }
 
 /* ─── Helpers ─── */
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    delivered: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20',
-    failed: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20',
-    pending: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20',
-  };
-
-  const icons: Record<string, string> = {
-    delivered: '✓',
-    failed: '✕',
-    pending: '…',
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset ${
-        styles[status] || styles.pending
-      }`}
-    >
-      <span className="text-[10px]">{icons[status] || '…'}</span>
-      {status}
-    </span>
-  );
-}
 
 function DetailRow({ label, value, mono }: { label: string; value: React.ReactNode; mono?: boolean }) {
   return (

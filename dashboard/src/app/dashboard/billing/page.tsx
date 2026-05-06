@@ -138,8 +138,6 @@ export default function BillingPage() {
   const [showUpgradeModal, setShowUpgradeModal] = useState<string | null>(null);
   const [upgrading, setUpgrading] = useState(false);
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-
   const handleUpgrade = (planName: string) => {
     setShowUpgradeModal(planName);
   };

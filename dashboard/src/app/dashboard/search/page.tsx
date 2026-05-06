@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
+import { StatusBadge } from '@/components/StatusBadge';
 
 interface SearchResult {
   id: string;
@@ -20,13 +21,6 @@ interface SearchResponse {
   per_page: number;
   query: string;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  delivered: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
-  failed: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',
-  pending: 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400',
-  filtered: 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400',
-};
 
 export default function SearchPage() {
   const { token } = useAuth();
@@ -155,9 +149,7 @@ export default function SearchPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[d.status] || ''}`}>
-                          {d.status}
-                        </span>
+                        <StatusBadge status={d.status} />
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 font-mono max-w-[200px] truncate">
                         {d.endpoint_url}
