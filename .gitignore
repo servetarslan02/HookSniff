@@ -1,7 +1,6 @@
 # Rust
 target/
 **/*.rs.bk
-Cargo.lock
 
 # Node
 node_modules/
@@ -10,7 +9,7 @@ out/
 *.tsbuildinfo
 
 # Environment
-.env
+.env.
 .env.local
 .env.*.local
 
