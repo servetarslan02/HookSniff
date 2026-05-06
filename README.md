@@ -10,14 +10,14 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 
 - **Reliable delivery** — Automatic retries with exponential backoff
 - **HMAC signatures** — Verify webhooks are from HookSniff (Standard Webhooks compliant)
-- **Dashboard** — Monitor deliveries in real-time
+- **Dashboard** — Monitor deliveries in real-time (Next.js 15)
 - **Simple API** — 4 endpoints, that's it
-- **Stripe billing** — Plan management with Stripe Checkout
-- **User auth** — JWT + API key authentication
+- **Multi-provider billing** — Polar.sh (global) + iyzico (Turkey)
+- **User auth** — JWT + API key authentication (Argon2)
 - **Multiple delivery methods** — HTTP, WebSocket, gRPC, SQS
 - **Dead letter queue** — Failed deliveries preserved for debugging
-- **OpenTelemetry** — Distributed tracing and structured logging
-- **Free-tier friendly** — Runs entirely on free services (see below)
+- **OpenTelemetry** — Distributed tracing and structured logging (Grafana Cloud)
+- **Free-tier friendly** — Runs entirely on free services ($0/month)
 
 ## Tech Stack
 
@@ -26,13 +26,13 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 | API | Rust (Axum) | Oracle Cloud Always Free (ARM) | $0 |
 | Worker | Rust | Oracle Cloud Always Free (ARM) | $0 |
 | Database | PostgreSQL | Neon (serverless) | $0 (0.5 GB) |
-| Queue | PostgreSQL + Redis | Upstash (serverless) | $0 (256 MB) |
+| Cache / Queue | PostgreSQL + Redis | Upstash (serverless) | $0 (256 MB) |
 | Dashboard | Next.js 15 | Vercel | $0 |
 | CDN/DNS | Cloudflare | Cloudflare Free | $0 |
 | Monitoring | Grafana + OpenTelemetry | Grafana Cloud | $0 |
 | Storage | Cloudflare R2 | Cloudflare R2 | $0 (10 GB) |
 | Email | Resend | Resend | $0 (3K/mo) |
-| Billing | Stripe | Stripe | Pay per transaction |
+| Billing | Polar.sh + iyzico | Polar.sh / iyzico | Pay per transaction |
 
 ## Quick Start
 
@@ -40,8 +40,8 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 
 ```bash
 # Clone
-git clone https://github.com/servetarslan02/hooksniff.git
-cd hooksniff
+git clone https://github.com/servetarslan02/HookSniff.git
+cd HookSniff
 
 # Copy environment config
 cp .env.example .env
@@ -81,16 +81,24 @@ curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \
 ## Project Structure
 
 ```
-hooksniff/
+HookSniff/
 ├── api/               # Rust Axum API server
+│   ├── src/
+│   │   ├── routes/    # API endpoints (auth, webhooks, billing, etc.)
+│   │   ├── billing/   # Polar.sh, iyzico, Stripe integrations
+│   │   ├── fifo/      # FIFO ordered delivery
+│   │   ├── throttle/  # Per-endpoint throttling
+│   │   ├── ws/        # WebSocket handler
+│   │   └── ...
+│   └── migrations/    # PostgreSQL migration scripts
 ├── worker/            # Background worker (retry + delivery)
-├── dashboard/         # Next.js dashboard + landing page
-├── sdks/              # Node.js, Python & Go SDKs
-├── docs/              # API documentation
+├── dashboard/         # Next.js 15 dashboard + landing page
+├── sdks/              # SDKs (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
+├── cli/               # CLI tool
+├── portal/            # Embeddable portal widget
+├── docs/              # API documentation (OpenAPI)
 ├── monitoring/        # Grafana + OpenTelemetry config
-├── k8s/               # Kubernetes manifests
-├── migrations/        # PostgreSQL migration scripts
-├── scripts/           # Deployment & utility scripts
+├── tests/             # Integration + load tests (k6)
 ├── docker-compose.yml
 ├── FREE_TIER_SETUP.md # Free-tier deployment guide
 └── Makefile
@@ -108,9 +116,9 @@ hooksniff/
 | GET | `/v1/webhooks` | List deliveries |
 | GET | `/v1/webhooks/:id` | Get delivery |
 | POST | `/v1/webhooks/:id/replay` | Replay webhook |
-| POST | `/v1/billing/upgrade` | Upgrade plan (Stripe Checkout) |
+| POST | `/v1/billing/upgrade` | Upgrade plan |
 | POST | `/v1/billing/portal` | Open customer portal |
-| GET | `/v1/outbound-ips` | List outbound IPs (for firewall whitelisting) |
+| GET | `/v1/outbound-ips` | List outbound IPs |
 
 ## Pricing
 
@@ -120,7 +128,23 @@ hooksniff/
 | Pro | $49/mo | 50,000 | 50 | 30 days |
 | Business | $149/mo | 500,000 | 500 | 90 days |
 
-**Hosting cost:** $0/month on free-tier services (Oracle Cloud, Neon, Vercel, Upstash, Grafana Cloud, Cloudflare, Resend).
+**Hosting cost:** $0/month on free-tier services.
+
+## SDKs
+
+| Language | Package | Status |
+|----------|---------|--------|
+| Node.js | `@hooksniff/sdk` | ✅ Ready |
+| Python | `hooksniff` | ✅ Ready |
+| Go | `hooksniff-go` | ✅ Ready |
+| Rust | `hooksniff` | ✅ Ready |
+| Ruby | `hooksniff` | ✅ Ready |
+| Java | `com.hooksniff` | ✅ Ready |
+| Kotlin | `com.hooksniff` | ✅ Ready |
+| PHP | `hooksniff/hooksniff` | ✅ Ready |
+| C# | `HookRelay` | ✅ Ready |
+| Elixir | `hooksniff` | ✅ Ready |
+| Swift | `HookSniff` | ✅ Ready |
 
 ## Testing
 
@@ -142,13 +166,10 @@ k6 run tests/load/k6_load_test.js
 - [Architecture](docs/ARCHITECTURE.md)
 - [Deployment](docs/DEPLOYMENT.md)
 - [Free Tier Setup](FREE_TIER_SETUP.md)
-- [Outbound IPs & Firewall Whitelisting](docs/OUTBOUND_IPS.md)
 
 ## Enterprise: IP Whitelisting
 
-Enterprise customers can whitelist HookSniff's static outbound IPs in their firewall/WAF to ensure webhook delivery. See **[docs/OUTBOUND_IPS.md](docs/OUTBOUND_IPS.md)** for the full list of IPs and setup instructions.
-
-Programmatically fetch current IPs:
+Enterprise customers can whitelist HookSniff's static outbound IPs in their firewall/WAF. See **[docs/OUTBOUND_IPS.md](docs/OUTBOUND_IPS.md)** for the full list.
 
 ```bash
 curl https://api.hooksniff.is-a.dev/v1/outbound-ips
