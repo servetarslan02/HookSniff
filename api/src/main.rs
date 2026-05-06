@@ -21,6 +21,7 @@ pub mod retry_policy;
 mod routes;
 pub mod schemas;
 pub mod signing;
+pub mod ssrf;
 pub mod templates;
 pub mod throttle;
 pub mod transform;
