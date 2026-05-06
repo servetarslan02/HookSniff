@@ -20,3 +20,9 @@ hmac = "0.12"
 sha2 = "0.10"
 hex = "0.4"
 base64 = "0.22"
+
+# OpenTelemetry integration
+opentelemetry = "0.24"
+opentelemetry_sdk = { version = "0.24", features = ["rt-tokio"] }
+opentelemetry-otlp = "0.17"
+tracing-opentelemetry = "0.25"

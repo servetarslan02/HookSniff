@@ -82,7 +82,10 @@ export const webhooksApi = {
     apiFetch<Delivery>("/webhooks", { method: "POST", body: data, token }),
 
   get: (token: string, id: string) =>
-    apiFetch<Delivery>(`/webhooks/${id}`, { token }),
+    apiFetch<DeliveryDetail>(`/webhooks/${id}`, { token }),
+
+  getAttempts: (token: string, id: string) =>
+    apiFetch<DeliveryAttempt[]>(`/webhooks/${id}/attempts`, { token }),
 
   replay: (token: string, id: string) =>
     apiFetch<Delivery>(`/webhooks/${id}/replay`, { method: 'POST', token }),
@@ -139,6 +142,27 @@ export interface Delivery {
   status: "pending" | "delivered" | "failed";
   attempt_count: number;
   response_status?: number;
+  created_at: string;
+}
+
+export interface DeliveryDetail extends Delivery {
+  request_headers?: Record<string, string>;
+  request_body?: unknown;
+  endpoint_url?: string;
+  updated_at?: string;
+  error_message?: string;
+}
+
+export interface DeliveryAttempt {
+  id: string;
+  delivery_id: string;
+  attempt_number: number;
+  status: 'delivered' | 'failed';
+  response_status?: number;
+  response_headers?: Record<string, string>;
+  response_body?: string;
+  error_message?: string;
+  duration_ms?: number;
   created_at: string;
 }
 

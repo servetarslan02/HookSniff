@@ -110,6 +110,7 @@ hookrelay/
 | POST | `/v1/webhooks/:id/replay` | Replay webhook |
 | POST | `/v1/billing/upgrade` | Upgrade plan (Stripe Checkout) |
 | POST | `/v1/billing/portal` | Open customer portal |
+| GET | `/v1/outbound-ips` | List outbound IPs (for firewall whitelisting) |
 
 ## Pricing
 
@@ -141,6 +142,18 @@ k6 run tests/load/k6_load_test.js
 - [Architecture](docs/ARCHITECTURE.md)
 - [Deployment](docs/DEPLOYMENT.md)
 - [Free Tier Setup](FREE_TIER_SETUP.md)
+- [Outbound IPs & Firewall Whitelisting](docs/OUTBOUND_IPS.md)
+
+## Enterprise: IP Whitelisting
+
+Enterprise customers can whitelist HookRelay's static outbound IPs in their firewall/WAF to ensure webhook delivery. See **[docs/OUTBOUND_IPS.md](docs/OUTBOUND_IPS.md)** for the full list of IPs and setup instructions.
+
+Programmatically fetch current IPs:
+
+```bash
+curl https://api.hookrelay.io/v1/outbound-ips
+# → { "ips": ["..."], "updated_at": "..." }
+```
 
 ## License
 

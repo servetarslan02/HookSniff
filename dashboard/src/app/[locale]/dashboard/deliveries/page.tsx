@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi, type Delivery } from '@/lib/api';
@@ -11,6 +12,7 @@ import { useTranslations } from 'next-intl';
 export default function DeliveriesPage() {
   const { token } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -133,7 +135,7 @@ export default function DeliveriesPage() {
               </thead>
               <tbody className="divide-y divide-gray-200/50">
                 {filtered.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" onClick={() => setSelected(d)}>
+                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" onClick={() => router.push(`/dashboard/deliveries/${d.id}`)}>
                     <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
@@ -157,14 +159,12 @@ export default function DeliveriesPage() {
                       {new Date(d.created_at).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      {d.status === 'failed' && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setReplayTarget(d); }}
-                          className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
-                        >
-                          Replay
-                        </button>
-                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/deliveries/${d.id}`); }}
+                        className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
+                      >
+                        View Details
+                      </button>
                     </td>
                   </tr>
                 ))}
