@@ -242,7 +242,6 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
             delivery_id UUID NOT NULL,
             endpoint_id UUID NOT NULL,
             endpoint_url TEXT NOT NULL,
-            signing_secret TEXT NOT NULL,
             payload TEXT NOT NULL,
             custom_headers JSONB,
             attempt_count INT NOT NULL DEFAULT 0,
@@ -741,6 +740,15 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 32: Migration 031 — remove signing_secret from webhook_queue
+    // signing_secret is fetched from endpoints table at delivery time instead
+    run_migration(
+        pool,
+        "031_remove_signing_secret_from_queue",
+        "ALTER TABLE webhook_queue DROP COLUMN IF EXISTS signing_secret",
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
@@ -752,7 +760,6 @@ pub async fn publish_to_queue(
     delivery_id: uuid::Uuid,
     endpoint_id: uuid::Uuid,
     endpoint_url: &str,
-    signing_secret: &str,
     payload: &str,
     custom_headers: Option<&serde_json::Value>,
 ) -> Result<()> {
@@ -761,14 +768,13 @@ pub async fn publish_to_queue(
 
     sqlx::query(
         r#"
-        INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, signing_secret, payload, custom_headers, trace_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, payload, custom_headers, trace_id)
+        VALUES ($1, $2, $3, $4, $5, $6)
         "#,
     )
     .bind(delivery_id)
     .bind(endpoint_id)
     .bind(endpoint_url)
-    .bind(signing_secret)
     .bind(payload)
     .bind(custom_headers)
     .bind(trace_id)
