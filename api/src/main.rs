@@ -8,26 +8,26 @@ mod billing;
 mod config;
 mod db;
 pub mod error;
-pub mod events;
-pub mod fifo;
+mod events;
+mod fifo;
 mod jobs;
 pub mod metrics;
 mod middleware;
 mod models;
 pub mod industry;
 mod rate_limit;
-pub mod retry_policy;
+mod retry_policy;
 mod routes;
-pub mod schemas;
-pub mod signing;
-pub mod ssrf;
-pub mod templates;
-pub mod throttle;
-pub mod transform;
+mod schemas;
+mod signing;
+mod ssrf;
+mod templates;
+mod throttle;
+mod transform;
 mod validation;
-pub mod ws;
+mod ws;
 
-/// Initialize tracing with structured logging
+/// Initialize tracing with OpenTelemetry + structured logging
 fn init_tracing(cfg: &config::Config) {
     use tracing_subscriber::prelude::*;
 
@@ -38,7 +38,62 @@ fn init_tracing(cfg: &config::Config) {
     let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
 
-    if use_json {
+    // OpenTelemetry tracing (only in production when OTEL_ENABLED=true)
+    let otel_enabled = std::env::var("OTEL_ENABLED")
+        .map(|v| v == "true")
+        .unwrap_or(false);
+
+    if otel_enabled {
+        use opentelemetry::global;
+        use opentelemetry_sdk::trace::TracerProvider;
+        use opentelemetry_otlp::WithExportConfig;
+
+        let otlp_endpoint = std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT")
+            .unwrap_or_else(|_| "http://localhost:4317".into());
+
+        let otlp_headers = std::env::var("OTEL_EXPORTER_OTLP_HEADERS")
+            .unwrap_or_default();
+
+        // Parse headers from "Key=Value" format
+        let mut header_map = std::collections::HashMap::new();
+        for header in otlp_headers.split(',') {
+            if let Some((key, value)) = header.trim().split_once('=') {
+                header_map.insert(key.trim().to_string(), value.trim().to_string());
+            }
+        }
+
+        let exporter = opentelemetry_otlp::new_exporter()
+            .http()
+            .with_endpoint(&otlp_endpoint)
+            .with_headers(header_map)
+            .build_span_exporter()
+            .expect("Failed to build OTLP exporter");
+
+        let provider = TracerProvider::builder()
+            .with_simple_exporter(exporter)
+            .build();
+
+        global::set_tracer_provider(provider.clone());
+        let tracer = provider.tracer("hookrelay");
+
+        let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
+
+        if use_json {
+            let _ = tracing_subscriber::registry()
+                .with(env_filter)
+                .with(tracing_subscriber::fmt::layer().json())
+                .with(otel_layer)
+                .init();
+        } else {
+            let _ = tracing_subscriber::registry()
+                .with(env_filter)
+                .with(tracing_subscriber::fmt::layer())
+                .with(otel_layer)
+                .init();
+        }
+
+        tracing::info!("OpenTelemetry enabled, endpoint: {}", otlp_endpoint);
+    } else if use_json {
         tracing::info!("Logging format: JSON (env={})", env);
         let _ = tracing_subscriber::registry()
             .with(env_filter)
@@ -82,100 +137,44 @@ async fn main() -> Result<()> {
         }
     });
 
-    let app = Router::new()
-        .route("/health", get(routes::health::health_check))
-        .route("/metrics", get(metrics::metrics_handler))
-        .route("/docs", get(routes::docs::swagger_ui))
-        .route("/v1/openapi.yaml", get(routes::docs::openapi_spec))
-        .nest("/v1", routes::api_router())
-        .layer(axum::extract::Extension(pool))
-        .layer(axum::extract::Extension(cfg.clone()))
-        .layer(axum::extract::Extension(rate_limiter.clone()))
-        .layer(axum::extract::Extension(metrics.clone()))
-        .layer(axum::extract::Extension(throttle_manager))
-        .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
-        .layer(axum::middleware::from_fn(middleware::request_id_middleware))
-        .layer(axum::middleware::from_fn(metrics::metrics_middleware))
-        .layer({
-            let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
-            if env == "production" || env == "prod" {
-                let origins: Vec<axum::http::HeaderValue> = std::env::var("CORS_ORIGINS")
-                    .unwrap_or_else(|_| "https://dashboard.hookrelay.io,https://hookrelay.io".into())
-                    .split(',')
-                    .filter_map(|s| s.trim().parse().ok())
-                    .collect();
-                CorsLayer::new()
-                    .allow_origin(tower_http::cors::AllowOrigin::list(origins))
-                    .allow_methods([
-                        axum::http::Method::GET,
-                        axum::http::Method::POST,
-                        axum::http::Method::PUT,
-                        axum::http::Method::DELETE,
-                        axum::http::Method::OPTIONS,
-                    ])
-                    .allow_headers([
-                        axum::http::header::AUTHORIZATION,
-                        axum::http::header::CONTENT_TYPE,
-                        "Idempotency-Key".parse().unwrap(),
-                        "X-Request-ID".parse().unwrap(),
-                        "X-Trace-ID".parse().unwrap(),
-                    ])
-                    .expose_headers([
-                        "X-Request-ID".parse().unwrap(),
-                        "X-RateLimit-Limit".parse().unwrap(),
-                        "X-RateLimit-Remaining".parse().unwrap(),
-                        "X-RateLimit-Reset".parse().unwrap(),
-                    ])
-                    .max_age(std::time::Duration::from_secs(3600))
-            } else {
-                // Development / staging: allow specific local origins
-                let dev_origins: Vec<axum::http::HeaderValue> = [
-                    "http://localhost:3001",
-                    "http://localhost:3000",
-                    "http://127.0.0.1:3001",
-                    "http://127.0.0.1:3000",
-                ]
-                .iter()
-                .filter_map(|s| s.parse().ok())
-                .collect();
-                CorsLayer::new()
-                    .allow_origin(tower_http::cors::AllowOrigin::list(dev_origins))
-                    .allow_methods([
-                        axum::http::Method::GET,
-                        axum::http::Method::POST,
-                        axum::http::Method::PUT,
-                        axum::http::Method::DELETE,
-                        axum::http::Method::OPTIONS,
-                    ])
-                    .allow_headers([
-                        axum::http::header::AUTHORIZATION,
-                        axum::http::header::CONTENT_TYPE,
-                        "Idempotency-Key".parse().unwrap(),
-                        "X-Request-ID".parse().unwrap(),
-                        "X-Trace-ID".parse().unwrap(),
-                    ])
-                    .expose_headers([
-                        "X-Request-ID".parse().unwrap(),
-                        "X-RateLimit-Limit".parse().unwrap(),
-                        "X-RateLimit-Remaining".parse().unwrap(),
-                        "X-RateLimit-Reset".parse().unwrap(),
-                    ])
-                    .max_age(std::time::Duration::from_secs(3600))
+    // Spawn monthly webhook_count reset job
+    let reset_pool = pool.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
+            if let Err(e) = jobs::retention::reset_monthly_counts(&reset_pool).await {
+                tracing::error!("❌ Monthly count reset failed: {:?}", e);
             }
-        })
+        }
+    });
+
+    let app = Router::new()
+        // Health check
+        .route("/health", get(routes::health::health_check))
+        // Metrics (Prometheus)
+        .route("/metrics", get(routes::health::metrics))
+        // API v1
+        .nest("/v1", routes::create_routes(pool.clone(), rate_limiter, throttle_manager, metrics.clone()))
+        // Middleware
+        .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http());
 
-    let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{}", cfg.port)).await?;
+    let addr = format!("0.0.0.0:{}", cfg.port);
     tracing::info!("🚀 HookRelay API running on port {}", cfg.port);
+
+    let listener = tokio::net::TcpListener::bind(&addr).await?;
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
 
     tracing::info!("👋 HookRelay API shut down gracefully");
+
+    // Flush OpenTelemetry traces before exit
+    opentelemetry::global::shutdown_tracer_provider();
+
     Ok(())
 }
 
-/// Wait for SIGTERM or SIGINT signal for graceful shutdown
 async fn shutdown_signal() {
     let ctrl_c = async {
         tokio::signal::ctrl_c()
