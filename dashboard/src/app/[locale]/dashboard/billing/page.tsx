@@ -36,28 +36,24 @@ const plans = [
 
 
 
-const monthlyUsage = [
-  { month: 'Jan', count: 420 },
-  { month: 'Feb', count: 580 },
-  { month: 'Mar', count: 720 },
-  { month: 'Apr', count: 890 },
-  { month: 'May', count: 650 },
-  { month: 'Jun', count: 980 },
-];
+interface UsageChartData {
+  month: string;
+  count: number;
+}
 
-function UsageChart({ data }: { data: typeof monthlyUsage }) {
-  const max = Math.max(...data.map((d) => d.count));
-  const barWidth = 40;
-  const gap = 20;
+function UsageChart({ data }: { data: UsageChartData[] }) {
+  if (data.length === 0) return null;
+
+  const max = Math.max(...data.map((d) => d.count), 1); // min 1 to avoid div/0
+  const barWidth = data.length === 1 ? 80 : 40;
+  const gap = data.length === 1 ? 0 : 20;
   const w = data.length * (barWidth + gap);
   const h = 160;
 
-  const t = useTranslations('billing');
-  const tc = useTranslations('common');
   return (
     <svg width={w} height={h + 30} className="overflow-visible">
       {data.map((d, i) => {
-        const barH = (d.count / max) * h;
+        const barH = Math.max((d.count / max) * h, 2); // min 2px so bar is visible
         const x = i * (barWidth + gap);
         return (
           <g key={d.month}>
@@ -72,6 +68,9 @@ function UsageChart({ data }: { data: typeof monthlyUsage }) {
             />
             <text x={x + barWidth / 2} y={h + 20} textAnchor="middle" className="text-xs fill-gray-500 dark:fill-slate-400">
               {d.month}
+            </text>
+            <text x={x + barWidth / 2} y={h - barH - 6} textAnchor="middle" className="text-[10px] font-medium fill-gray-600 dark:fill-slate-300">
+              {d.count.toLocaleString()}
             </text>
           </g>
         );
@@ -102,6 +101,7 @@ export default function BillingPage() {
   const currentPlan = user?.plan || 'free';
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit, setUsageLimit] = useState(1000);
+  const [chartData, setChartData] = useState<UsageChartData[]>([]);
   const [loadingUsage, setLoadingUsage] = useState(true);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loadingInvoices, setLoadingInvoices] = useState(true);
@@ -116,8 +116,17 @@ export default function BillingPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setUsageCount(data.webhooks?.used ?? 0);
-        setUsageLimit(data.webhooks?.limit ?? 1000);
+        const used = data.webhooks?.used ?? 0;
+        const limit = data.webhooks?.limit ?? 1000;
+        setUsageCount(used);
+        setUsageLimit(limit);
+
+        // Build chart data from real usage.
+        // The API returns current period only, so show this month as a single bar.
+        // When monthly history endpoints are added, expand this to multi-month.
+        const now = new Date();
+        const monthLabel = now.toLocaleString('en', { month: 'short' });
+        setChartData([{ month: monthLabel, count: used }]);
       })
       .catch(() => {
         // fallback to defaults
@@ -247,9 +256,19 @@ export default function BillingPage() {
       {/* Monthly Chart */}
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usage')}</h2>
-        <div className="overflow-x-auto">
-          <UsageChart data={monthlyUsage} />
-        </div>
+        {loadingUsage ? (
+          <div className="flex items-center justify-center py-10">
+            <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : chartData.length > 0 ? (
+          <div className="overflow-x-auto">
+            <UsageChart data={chartData} />
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400 dark:text-slate-500 py-6 text-center">
+            No usage data yet
+          </p>
+        )}
       </div>
 
       {/* Plans */}

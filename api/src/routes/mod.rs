@@ -62,6 +62,7 @@ pub fn api_router() -> Router {
     Router::new()
         .nest("/auth", auth::router())
         .nest("/outbound-ips", outbound_ips::router())
+        .route("/status", axum::routing::get(health::system_status))
         .merge(protected)
         .merge(admin_routes)
 }
