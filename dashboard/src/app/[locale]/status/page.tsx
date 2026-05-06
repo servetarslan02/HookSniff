@@ -39,8 +39,6 @@ interface StatusData {
 // ─── Simulated status data (in production, fetch from /health or status API) ───
 function getStatusData(): StatusData {
   const now = new Date().toISOString();
-  const t = useTranslations('status');
-  const tc = useTranslations('common');
   return {
     overall_status: 'operational',
     uptime_30d: 99.97,
@@ -248,6 +246,7 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 // ─── Uptime Bar ───
 function UptimeBar({ uptime }: { uptime: number }) {
+  const t = useTranslations('status');
   const days = Array.from({ length: 30 }, (_, i) => {
     if (i >= 28) return 100;
     if (i === 15) return 99.2;
@@ -285,6 +284,7 @@ function UptimeBar({ uptime }: { uptime: number }) {
 
 // ─── Incident Timeline ───
 function IncidentTimeline({ incidents }: { incidents: Incident[] }) {
+  const t = useTranslations('status');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (incidents.length === 0) {
@@ -379,6 +379,7 @@ function IncidentTimeline({ incidents }: { incidents: Incident[] }) {
 
 // ─── Main Status Page ───
 export default function StatusPage() {
+  const t = useTranslations('status');
   const [data, setData] = useState<StatusData | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState(new Date());
