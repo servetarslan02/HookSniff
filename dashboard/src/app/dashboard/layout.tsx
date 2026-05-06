@@ -12,6 +12,7 @@ const navigation = [
   { name: 'Overview', href: '/dashboard', icon: '📊' },
   { name: 'Endpoints', href: '/dashboard/endpoints', icon: '🔗' },
   { name: 'Deliveries', href: '/dashboard/deliveries', icon: '📦' },
+  { name: 'Logs', href: '/dashboard/logs', icon: '📋' },
   { name: 'Search', href: '/dashboard/search', icon: '🔍' },
   { name: 'Health', href: '/dashboard/health', icon: '💓' },
   { name: 'Alerts', href: '/dashboard/alerts', icon: '🔔' },

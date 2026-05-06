@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface ApiKey {
   id: string;
+  name: string | null;
   prefix: string;
   created_at: string;
   last_used_at: string | null;
@@ -21,6 +21,9 @@ export default function ApiKeysPage() {
   const [keyName, setKeyName] = useState('');
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [rotateTarget, setRotateTarget] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
@@ -51,7 +54,10 @@ export default function ApiKeysPage() {
         },
         body: JSON.stringify({ name: keyName || undefined }),
       });
-      if (!res.ok) throw new Error('Failed to create key');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error?.message || 'Failed to create key');
+      }
       const data = await res.json();
       setNewKey(data.key);
       setKeyName('');
@@ -64,30 +70,38 @@ export default function ApiKeysPage() {
   };
 
   const deleteKey = async (id: string) => {
-    if (!confirm('Delete this API key? This cannot be undone.')) return;
+    setActionLoading(id);
     try {
-      await fetch(`${API}/api-keys/${id}`, {
+      const res = await fetch(`${API}/api-keys/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchKeys();
-    } catch (e) {
-      console.error('Failed to delete key:', e);
+      if (!res.ok) throw new Error('Failed to delete key');
+      setKeys((prev) => prev.filter((k) => k.id !== id));
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setActionLoading(null);
+      setDeleteTarget(null);
     }
   };
 
   const rotateKey = async (id: string) => {
-    if (!confirm('Rotate this key? The old key will stop working immediately.')) return;
+    setActionLoading(id);
     try {
       const res = await fetch(`${API}/api-keys/${id}/rotate`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) throw new Error('Failed to rotate key');
       const data = await res.json();
       setNewKey(data.key);
       fetchKeys();
-    } catch (e) {
-      console.error('Failed to rotate key:', e);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setActionLoading(null);
+      setRotateTarget(null);
     }
   };
 
@@ -101,6 +115,7 @@ export default function ApiKeysPage() {
 
   return (
     <div className="space-y-8">
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">API Keys</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
@@ -108,22 +123,33 @@ export default function ApiKeysPage() {
         </p>
       </div>
 
+      {/* Error Banner */}
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 flex items-center justify-between">
+          <span className="text-sm text-red-700 dark:text-red-400">{error}</span>
+          <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 transition">✕</button>
+        </div>
+      )}
+
       {/* New Key Alert */}
       {newKey && (
         <div className="glass-card p-6 border-l-4 border-green-500 bg-green-50/50 dark:bg-green-500/10">
-          <h3 className="text-lg font-semibold text-green-800 dark:text-green-400 mb-2">
-            🔑 New API Key Created
-          </h3>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-2xl">🔑</span>
+            <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
+              New API Key Created
+            </h3>
+          </div>
           <p className="text-sm text-green-700 dark:text-green-300 mb-3">
-            Save this key now — it won't be shown again.
+            Save this key now — it won&apos;t be shown again.
           </p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 p-3 bg-white dark:bg-slate-800 rounded-lg text-sm font-mono break-all border border-green-200 dark:border-green-500/30">
+            <code className="flex-1 p-3 bg-white dark:bg-slate-800 rounded-lg text-sm font-mono break-all border border-green-200 dark:border-green-500/30 text-gray-900 dark:text-white">
               {newKey}
             </code>
             <button
               onClick={copyKey}
-              className="px-4 py-3 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition"
+              className="px-4 py-3 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition whitespace-nowrap"
             >
               {copied ? '✓ Copied' : 'Copy'}
             </button>
@@ -140,74 +166,101 @@ export default function ApiKeysPage() {
       {/* Create Key */}
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create New Key</h2>
-        {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm">
-            {error}
-          </div>
-        )}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             value={keyName}
             onChange={(e) => setKeyName(e.target.value)}
-            placeholder="Key name (optional)"
-            className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition"
+            placeholder="Key name (optional) — e.g., Production, Staging"
+            className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
           />
           <button
             onClick={createKey}
             disabled={creating}
-            className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
+            className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60 whitespace-nowrap"
           >
-            {creating ? 'Creating...' : 'Create Key'}
+            {creating ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Creating...
+              </span>
+            ) : (
+              'Create Key'
+            )}
           </button>
         </div>
       </div>
 
       {/* Key List */}
       <div className="glass-card overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+        <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Keys</h2>
+          <span className="text-sm text-gray-400 dark:text-slate-500">{keys.length} key{keys.length !== 1 ? 's' : ''}</span>
         </div>
         {loading ? (
-          <div className="p-8 text-center text-gray-400 dark:text-slate-500">Loading...</div>
+          <div className="p-12 text-center">
+            <div className="inline-flex items-center gap-2 text-gray-400 dark:text-slate-500">
+              <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Loading keys...
+            </div>
+          </div>
         ) : keys.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
-            No API keys yet. Create one above.
+          <div className="p-12 text-center">
+            <div className="text-4xl mb-3">🔐</div>
+            <p className="text-gray-400 dark:text-slate-500">No API keys yet. Create one above to get started.</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
             {keys.map((key) => (
-              <div key={key.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <code className="text-sm font-mono text-gray-700 dark:text-slate-300">
-                      {key.prefix}...
+              <div
+                key={key.id}
+                className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {key.name && (
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{key.name}</span>
+                    )}
+                    <code className="text-sm font-mono text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                      {key.prefix}…
                     </code>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      key.is_active
-                        ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
-                        : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        key.is_active
+                          ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
+                          : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'
+                      }`}
+                    >
                       {key.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-400 dark:text-slate-500 mt-1">
-                    Created {new Date(key.created_at).toLocaleDateString()}
-                    {key.last_used_at && ` · Last used ${new Date(key.last_used_at).toLocaleDateString()}`}
+                  <div className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">
+                    Created {new Date(key.created_at).toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {key.last_used_at && (
+                      <> · Last used {new Date(key.last_used_at).toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' })}</>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => rotateKey(key.id)}
-                    className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition"
+                    onClick={() => setRotateTarget(key.id)}
+                    disabled={actionLoading === key.id}
+                    className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
                   >
-                    Rotate
+                    🔄 Rotate
                   </button>
                   <button
-                    onClick={() => deleteKey(key.id)}
-                    className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/30 rounded-lg transition"
+                    onClick={() => setDeleteTarget(key.id)}
+                    disabled={actionLoading === key.id}
+                    className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 border border-red-300 dark:border-red-500/30 rounded-lg transition disabled:opacity-50"
                   >
-                    Delete
+                    🗑 Delete
                   </button>
                 </div>
               </div>
@@ -215,6 +268,62 @@ export default function ApiKeysPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete API Key?</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+              This action cannot be undone. Any services using this key will immediately lose access.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteKey(deleteTarget)}
+                disabled={actionLoading === deleteTarget}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-60"
+              >
+                {actionLoading === deleteTarget ? 'Deleting...' : 'Delete Key'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rotate Confirmation Modal */}
+      {rotateTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setRotateTarget(null)} />
+          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Rotate API Key?</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+              The old key will stop working immediately. You&apos;ll receive a new key to replace it.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setRotateTarget(null)}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => rotateKey(rotateTarget)}
+                disabled={actionLoading === rotateTarget}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition disabled:opacity-60"
+              >
+                {actionLoading === rotateTarget ? 'Rotating...' : 'Rotate Key'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
