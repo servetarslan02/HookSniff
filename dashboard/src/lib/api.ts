@@ -147,7 +147,7 @@ export interface Delivery {
 
 export interface DeliveryDetail extends Delivery {
   request_headers?: Record<string, string>;
-  request_body?: unknown;
+  request_body?: string | Record<string, unknown>;
   endpoint_url?: string;
   updated_at?: string;
   error_message?: string;

@@ -129,8 +129,6 @@ const HISTORY_KEY = 'hookrelay_playground_history';
 const MAX_HISTORY = 10;
 
 function loadHistory(): PlaygroundRequest[] {
-  const t = useTranslations('playground');
-  const tc = useTranslations('common');
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
@@ -156,6 +154,7 @@ function ResponseInspector({
   headers: Record<string, string>;
   duration: number | null;
 }) {
+  const t = useTranslations('playground');
   const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
 
   if (!response && !status) {
@@ -232,6 +231,7 @@ function HistoryPanel({
   onSelect: (req: PlaygroundRequest) => void;
   onClear: () => void;
 }) {
+  const t = useTranslations('playground');
   if (history.length === 0) {
     return (
       <div className="glass-card p-6">
@@ -306,6 +306,7 @@ function LiveRequestViewer({
   endpoints: Endpoint[];
   token: string;
 }) {
+  const t = useTranslations('playground');
   const [liveDeliveries, setLiveDeliveries] = useState<
     Array<{ id: string; event: string; status: string; time: string }>
   >([]);
@@ -409,6 +410,7 @@ function LiveRequestViewer({
 export default function PlaygroundPage() {
   const { token, apiKey } = useAuth();
   const { toast } = useToast();
+  const t = useTranslations('playground');
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [method, setMethod] = useState<string>('POST');
   const [path, setPath] = useState('/webhooks');

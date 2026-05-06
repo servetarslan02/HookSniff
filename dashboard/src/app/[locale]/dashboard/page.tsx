@@ -109,6 +109,7 @@ function DeliveryTrendChart({
   data: DeliveryTrendResponse | null;
   loading: boolean;
 }) {
+  const t = useTranslations("dashboard");
   const tc = useTranslations("common");
   const chartData = data?.buckets.map((b) => ({
     date: new Date(b.timestamp).toLocaleDateString(undefined, {
@@ -252,6 +253,7 @@ function SuccessRateDonut({
 
 /* ─── Activity Feed with auto-refresh ─── */
 function ActivityFeed({ token }: { token: string }) {
+  const t = useTranslations("dashboard");
   const tc = useTranslations("common");
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
@@ -333,6 +335,8 @@ function StatusDot({ status }: { status: string }) {
 /* ─── Main Dashboard ─── */
 export default function DashboardOverview() {
   const { token } = useAuth();
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
