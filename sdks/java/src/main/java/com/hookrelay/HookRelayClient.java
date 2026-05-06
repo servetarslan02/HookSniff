@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class HookRelayClient {
 
-    private static final String DEFAULT_BASE_URL = "http://localhost:3000/v1";
+    private static final String DEFAULT_BASE_URL = "https://api.hookrelay.io/v1";
     private static final int DEFAULT_TIMEOUT = 30000;
 
     private final String apiKey;
@@ -115,10 +115,23 @@ public class HookRelayClient {
             return mapEndpoint(resp);
         }
 
-        /** List all endpoints. */
-        public List<Endpoint> list() {
-            JsonArray resp = requestArray("GET", "/endpoints", null);
-            return gson.fromJson(resp, new TypeToken<List<Endpoint>>(){}.getType());
+        /** List all endpoints with pagination. */
+        public EndpointList list(int page, int perPage) {
+            JsonObject resp = request("GET", "/endpoints?page=" + page + "&per_page=" + perPage, null);
+            EndpointList list = new EndpointList();
+            if (resp.has("endpoints")) {
+                list.setEndpoints(gson.fromJson(resp.getAsJsonArray("endpoints"),
+                        new TypeToken<List<Endpoint>>(){}.getType()));
+            }
+            if (resp.has("total")) list.setTotal(resp.get("total").getAsInt());
+            if (resp.has("page")) list.setPage(resp.get("page").getAsInt());
+            if (resp.has("per_page")) list.setPerPage(resp.get("per_page").getAsInt());
+            return list;
+        }
+
+        /** Rotate the signing secret for an endpoint. */
+        public JsonObject rotateSecret(String endpointId) {
+            return request("POST", "/endpoints/" + endpointId + "/rotate-secret", null);
         }
 
         /** Delete an endpoint. */
@@ -248,7 +261,7 @@ public class HookRelayClient {
             conn.setRequestMethod(method);
             conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("User-Agent", "hookrelay-java/0.1.0");
+            conn.setRequestProperty("User-Agent", "hookrelay-java/0.2.0");
             conn.setConnectTimeout(timeout);
             conn.setReadTimeout(timeout);
 
@@ -299,7 +312,7 @@ public class HookRelayClient {
             conn.setRequestMethod(method);
             conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("User-Agent", "hookrelay-java/0.1.0");
+            conn.setRequestProperty("User-Agent", "hookrelay-java/0.2.0");
             conn.setConnectTimeout(timeout);
             conn.setReadTimeout(timeout);
 

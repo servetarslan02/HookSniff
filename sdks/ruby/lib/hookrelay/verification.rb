@@ -17,7 +17,7 @@ module HookRelay
     computed = OpenSSL::HMAC.hexdigest("SHA256", secret, payload)
 
     # Constant-time comparison to prevent timing attacks
-    Rack::Utils.secure_compare(computed, expected_hex)
+    secure_compare(computed, expected_hex)
   rescue
     false
   end
@@ -61,8 +61,7 @@ module HookRelay
     verified = signatures.any? do |sig|
       sig_stripped = sig.strip
       next unless sig_stripped.start_with?("v1,")
-      # Use Rack's constant-time comparison (or built-in fallback)
-      Rack::Utils.secure_compare(sig_stripped, expected_full)
+      secure_compare(sig_stripped, expected_full)
     end
 
     unless verified
@@ -85,29 +84,13 @@ module HookRelay
     secret.bytes.pack("C*")
   end
 
-  # Constant-time string comparison (inline implementation if Rack not available)
-  module ConstantTimeCompare
-    def self.secure_compare(a, b)
-      return false if a.nil? || b.nil?
-      return false if a.bytesize != b.bytesize
+  # Constant-time string comparison
+  def self.secure_compare(a, b)
+    return false if a.nil? || b.nil?
+    return false if a.bytesize != b.bytesize
 
-      result = 0
-      a.bytes.zip(b.bytes) { |x, y| result |= x ^ y }
-      result == 0
-    end
-  end
-
-  # Use Rack's secure_compare if available, otherwise use our own
-  begin
-    require "rack/utils"
-  rescue LoadError
-    # Define our own secure_compare fallback
-    module Rack
-      module Utils
-        def self.secure_compare(a, b)
-          ConstantTimeCompare.secure_compare(a, b)
-        end
-      end
-    end
+    result = 0
+    a.bytes.zip(b.bytes) { |x, y| result |= x ^ y }
+    result == 0
   end
 end

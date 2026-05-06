@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HookRelay;
 
+use HookRelay\Models;
+
 /**
  * Official PHP client for the HookRelay webhook delivery service.
  *
@@ -21,7 +23,7 @@ namespace HookRelay;
  */
 class HookRelayClient
 {
-    private const DEFAULT_BASE_URL = 'http://localhost:3000/v1';
+    private const DEFAULT_BASE_URL = 'https://api.hookrelay.io/v1';
     private const DEFAULT_TIMEOUT = 30;
 
     private string $apiKey;
@@ -53,17 +55,10 @@ class HookRelayClient
     /**
      * Get platform statistics.
      */
-    public function getStats(): array
+    public function getStats(): Models\Stats
     {
         $resp = $this->request('GET', '/stats');
-        return [
-            'total_deliveries' => $resp['total_deliveries'],
-            'delivered' => $resp['delivered'],
-            'failed' => $resp['failed'],
-            'pending' => $resp['pending'],
-            'success_rate' => $resp['success_rate'],
-            'endpoints_count' => $resp['endpoints_count'],
-        ];
+        return Models\Stats::fromArray($resp);
     }
 
     /**
@@ -83,7 +78,7 @@ class HookRelayClient
             CURLOPT_HTTPHEADER => [
                 'Authorization: Bearer ' . $this->apiKey,
                 'Content-Type: application/json',
-                'User-Agent: hookrelay-php/0.1.0',
+                'User-Agent: hookrelay-php/0.2.0',
             ],
         ]);
 
@@ -135,7 +130,7 @@ class EndpointsResource
     /**
      * Create a new endpoint.
      */
-    public function create(string $url, ?string $description = null, ?array $retryPolicy = null): array
+    public function create(string $url, ?string $description = null, ?array $retryPolicy = null): Models\Endpoint
     {
         $body = ['url' => $url];
         if ($description !== null) $body['description'] = $description;
@@ -149,25 +144,33 @@ class EndpointsResource
         }
 
         $resp = $this->client->request('POST', '/endpoints', $body);
-        return $this->mapEndpoint($resp);
+        return Models\Endpoint::fromArray($resp);
     }
 
     /**
      * Get an endpoint by ID.
      */
-    public function get(string $endpointId): array
+    public function get(string $endpointId): Models\Endpoint
     {
         $resp = $this->client->request('GET', "/endpoints/{$endpointId}");
-        return $this->mapEndpoint($resp);
+        return Models\Endpoint::fromArray($resp);
     }
 
     /**
-     * List all endpoints.
+     * List all endpoints with pagination.
+     *
+     * @return array{endpoints: Models\Endpoint[], total: int, page: int, per_page: int}
      */
-    public function list(): array
+    public function list(int $page = 1, int $perPage = 20): array
     {
-        $resp = $this->client->request('GET', '/endpoints');
-        return array_map([$this, 'mapEndpoint'], $resp);
+        $params = http_build_query(['page' => $page, 'per_page' => $perPage]);
+        $resp = $this->client->request('GET', "/endpoints?{$params}");
+        return [
+            'endpoints' => array_map(fn($e) => Models\Endpoint::fromArray($e), $resp['endpoints'] ?? $resp),
+            'total' => $resp['total'] ?? 0,
+            'page' => $resp['page'] ?? $page,
+            'per_page' => $resp['per_page'] ?? $perPage,
+        ];
     }
 
     /**
@@ -179,22 +182,12 @@ class EndpointsResource
         return $resp['deleted'] ?? true;
     }
 
-    private function mapEndpoint(array $data): array
+    /**
+     * Rotate the signing secret for an endpoint.
+     */
+    public function rotateSecret(string $endpointId): array
     {
-        $rp = $data['retry_policy'] ?? null;
-        return [
-            'id' => $data['id'],
-            'url' => $data['url'],
-            'description' => $data['description'] ?? null,
-            'is_active' => $data['is_active'] ?? false,
-            'retry_policy' => $rp ? [
-                'max_attempts' => $rp['max_attempts'] ?? null,
-                'backoff' => $rp['backoff'] ?? null,
-                'initial_delay_secs' => $rp['initial_delay_secs'] ?? null,
-                'max_delay_secs' => $rp['max_delay_secs'] ?? null,
-            ] : null,
-            'created_at' => $data['created_at'] ?? null,
-        ];
+        return $this->client->request('POST', "/endpoints/{$endpointId}/rotate-secret");
     }
 }
 
@@ -208,27 +201,27 @@ class WebhooksResource
     /**
      * Send a webhook.
      */
-    public function send(string $endpointId, array $data, ?string $event = null): array
+    public function send(string $endpointId, array $data, ?string $event = null): Models\Delivery
     {
         $body = ['endpoint_id' => $endpointId, 'data' => $data];
         if ($event !== null) $body['event'] = $event;
         $resp = $this->client->request('POST', '/webhooks', $body);
-        return $this->mapDelivery($resp);
+        return Models\Delivery::fromArray($resp);
     }
 
     /**
      * Get a delivery by ID.
      */
-    public function get(string $deliveryId): array
+    public function get(string $deliveryId): Models\Delivery
     {
         $resp = $this->client->request('GET', "/webhooks/{$deliveryId}");
-        return $this->mapDelivery($resp);
+        return Models\Delivery::fromArray($resp);
     }
 
     /**
      * List deliveries with optional filters.
      */
-    public function list(?string $status = null, int $page = 1, int $perPage = 20): array
+    public function list(?string $status = null, int $page = 1, int $perPage = 20): Models\DeliveryList
     {
         $params = http_build_query([
             'page' => $page,
@@ -236,27 +229,22 @@ class WebhooksResource
             'status' => $status,
         ]);
         $resp = $this->client->request('GET', "/webhooks?{$params}");
-        return [
-            'deliveries' => array_map([$this, 'mapDelivery'], $resp['deliveries'] ?? []),
-            'total' => $resp['total'] ?? 0,
-            'page' => $resp['page'] ?? $page,
-            'per_page' => $resp['per_page'] ?? $perPage,
-        ];
+        return Models\DeliveryList::fromArray($resp);
     }
 
     /**
      * Replay a delivery.
      */
-    public function replay(string $deliveryId): array
+    public function replay(string $deliveryId): Models\Delivery
     {
         $resp = $this->client->request('POST', "/webhooks/{$deliveryId}/replay");
-        return $this->mapDelivery($resp);
+        return Models\Delivery::fromArray($resp);
     }
 
     /**
      * Send multiple webhooks in a batch.
      */
-    public function batch(array $webhooks): array
+    public function batch(array $webhooks): Models\BatchResult
     {
         $body = ['webhooks' => array_map(function ($w) {
             $item = ['endpoint_id' => $w['endpoint_id'], 'data' => $w['data']];
@@ -265,19 +253,18 @@ class WebhooksResource
         }, $webhooks)];
 
         $resp = $this->client->request('POST', '/webhooks/batch', $body);
-        return [
-            'deliveries' => array_map([$this, 'mapDelivery'], $resp['deliveries'] ?? []),
-            'errors' => $resp['errors'] ?? [],
-        ];
+        return Models\BatchResult::fromArray($resp);
     }
 
     /**
      * Get delivery attempts.
+     *
+     * @return Models\DeliveryAttempt[]
      */
     public function attempts(string $deliveryId): array
     {
         $resp = $this->client->request('GET', "/webhooks/{$deliveryId}/attempts");
-        return array_map([$this, 'mapAttempt'], $resp);
+        return array_map(fn($a) => Models\DeliveryAttempt::fromArray($a), $resp);
     }
 
     /**
@@ -296,33 +283,6 @@ class WebhooksResource
         $resp = $this->client->request('GET', "/webhooks/export?{$query}");
 
         if ($format === 'csv') return $resp;
-        return array_map([$this, 'mapDelivery'], $resp);
-    }
-
-    private function mapDelivery(array $data): array
-    {
-        return [
-            'id' => $data['id'],
-            'endpoint_id' => $data['endpoint_id'] ?? null,
-            'event' => $data['event'] ?? null,
-            'status' => $data['status'] ?? null,
-            'attempt_count' => $data['attempt_count'] ?? 0,
-            'response_status' => $data['response_status'] ?? null,
-            'replay_count' => $data['replay_count'] ?? 0,
-            'created_at' => $data['created_at'] ?? null,
-        ];
-    }
-
-    private function mapAttempt(array $data): array
-    {
-        return [
-            'id' => $data['id'],
-            'attempt_number' => $data['attempt_number'] ?? 0,
-            'status_code' => $data['status_code'] ?? null,
-            'response_body' => $data['response_body'] ?? null,
-            'duration_ms' => $data['duration_ms'] ?? null,
-            'error_message' => $data['error_message'] ?? null,
-            'created_at' => $data['created_at'] ?? null,
-        ];
+        return array_map(fn($d) => Models\Delivery::fromArray($d), $resp);
     }
 }

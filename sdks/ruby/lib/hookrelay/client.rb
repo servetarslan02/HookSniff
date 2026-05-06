@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "models"
+
 module HookRelay
   class Client
     attr_reader :endpoints, :webhooks
@@ -15,14 +17,7 @@ module HookRelay
     # Get platform statistics
     def stats
       resp = request(:get, "/stats")
-      {
-        total_deliveries: resp["total_deliveries"],
-        delivered: resp["delivered"],
-        failed: resp["failed"],
-        pending: resp["pending"],
-        success_rate: resp["success_rate"],
-        endpoints_count: resp["endpoints_count"]
-      }
+      Models::Stats.new(resp)
     end
 
     # @api internal
@@ -103,17 +98,24 @@ module HookRelay
       end
 
       resp = @client.request(:post, "/endpoints", body: body)
-      map_endpoint(resp)
+      Models::Endpoint.new(resp)
     end
 
     def get(endpoint_id)
       resp = @client.request(:get, "/endpoints/#{endpoint_id}")
-      map_endpoint(resp)
+      Models::Endpoint.new(resp)
     end
 
-    def list
-      resp = @client.request(:get, "/endpoints")
-      resp.map { |ep| map_endpoint(ep) }
+    def list(page: 1, per_page: 20)
+      params = { page: page.to_s, per_page: per_page.to_s }
+      query = URI.encode_www_form(params)
+      resp = @client.request(:get, "/endpoints?#{query}")
+      {
+        endpoints: (resp["endpoints"] || resp).map { |ep| Models::Endpoint.new(ep) },
+        total: resp["total"] || 0,
+        page: resp["page"] || page,
+        per_page: resp["per_page"] || per_page
+      }
     end
 
     def delete(endpoint_id)
@@ -121,24 +123,11 @@ module HookRelay
       resp["deleted"] != false
     end
 
-    private
-
-    def map_endpoint(data)
-      rp = data["retry_policy"]
-      {
-        id: data["id"],
-        url: data["url"],
-        description: data["description"],
-        is_active: data["is_active"],
-        retry_policy: rp ? {
-          max_attempts: rp["max_attempts"],
-          backoff: rp["backoff"],
-          initial_delay_secs: rp["initial_delay_secs"],
-          max_delay_secs: rp["max_delay_secs"]
-        } : nil,
-        created_at: data["created_at"]
-      }
+    def rotate_secret(endpoint_id)
+      @client.request(:post, "/endpoints/#{endpoint_id}/rotate-secret")
     end
+
+    private
   end
 
   class WebhooksResource
@@ -151,13 +140,13 @@ module HookRelay
       body = { endpoint_id: endpoint_id, data: data }
       body[:event] = event if event
       resp = @client.request(:post, "/webhooks", body: body)
-      map_delivery(resp)
+      Models::Delivery.new(resp)
     end
 
     # Get a delivery by ID
     def get(delivery_id)
       resp = @client.request(:get, "/webhooks/#{delivery_id}")
-      map_delivery(resp)
+      Models::Delivery.new(resp)
     end
 
     # List deliveries with optional filters
@@ -166,18 +155,13 @@ module HookRelay
       params[:status] = status if status
       query = URI.encode_www_form(params)
       resp = @client.request(:get, "/webhooks?#{query}")
-      {
-        deliveries: (resp["deliveries"] || []).map { |d| map_delivery(d) },
-        total: resp["total"],
-        page: resp["page"],
-        per_page: resp["per_page"]
-      }
+      Models::DeliveryList.new(resp)
     end
 
     # Replay a delivery
     def replay(delivery_id)
       resp = @client.request(:post, "/webhooks/#{delivery_id}/replay")
-      map_delivery(resp)
+      Models::Delivery.new(resp)
     end
 
     # Send multiple webhooks in a batch
@@ -190,16 +174,13 @@ module HookRelay
         end
       }
       resp = @client.request(:post, "/webhooks/batch", body: body)
-      {
-        deliveries: (resp["deliveries"] || []).map { |d| map_delivery(d) },
-        errors: resp["errors"] || []
-      }
+      Models::BatchResult.new(resp)
     end
 
     # Get delivery attempts
     def attempts(delivery_id)
       resp = @client.request(:get, "/webhooks/#{delivery_id}/attempts")
-      resp.map { |a| map_attempt(a) }
+      resp.map { |a| Models::DeliveryAttempt.new(a) }
     end
 
     # Export deliveries
@@ -215,34 +196,7 @@ module HookRelay
       resp = @client.request(:get, "/webhooks/export#{query}")
       return resp if format == "csv"
 
-      resp.map { |d| map_delivery(d) }
-    end
-
-    private
-
-    def map_delivery(data)
-      {
-        id: data["id"],
-        endpoint_id: data["endpoint_id"],
-        event: data["event"],
-        status: data["status"],
-        attempt_count: data["attempt_count"],
-        response_status: data["response_status"],
-        replay_count: data["replay_count"] || 0,
-        created_at: data["created_at"]
-      }
-    end
-
-    def map_attempt(data)
-      {
-        id: data["id"],
-        attempt_number: data["attempt_number"],
-        status_code: data["status_code"],
-        response_body: data["response_body"],
-        duration_ms: data["duration_ms"],
-        error_message: data["error_message"],
-        created_at: data["created_at"]
-      }
+      resp.map { |d| Models::Delivery.new(d) }
     end
   end
 end
