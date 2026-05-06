@@ -110,13 +110,12 @@ class WebhookVerification
         }
 
         $now = time();
-        $age = abs($now - $ts);
 
-        if ($age > $toleranceSecs) {
-            return [
-                'valid' => false,
-                'error' => sprintf('Webhook timestamp expired: %ds old (tolerance: %ds)', $age, $toleranceSecs),
-            ];
+        if ($now - $ts > $toleranceSecs) {
+            return ['valid' => false, 'error' => 'Message timestamp too old'];
+        }
+        if ($ts > $now + $toleranceSecs) {
+            return ['valid' => false, 'error' => 'Message timestamp too new'];
         }
 
         // Compute expected signature
@@ -163,6 +162,10 @@ class WebhookVerification
         $stripped = str_starts_with($secret, 'whsec_')
             ? substr($secret, 6)
             : $secret;
+
+        // Add padding in case secret is unpadded base64
+        $padding = (4 - strlen($stripped) % 4) % 4;
+        $stripped .= str_repeat('=', $padding);
 
         $decoded = base64_decode($stripped, true);
         return $decoded !== false ? $decoded : $secret;

@@ -94,12 +94,16 @@ export class WebhookVerifier {
     }
 
     const now = Math.floor(Date.now() / 1000);
-    const age = Math.abs(now - ts);
-
-    if (age > this.toleranceSecs) {
+    if (now - ts > this.toleranceSecs) {
       return {
         valid: false,
-        error: `Webhook timestamp expired: ${age}s old (tolerance: ${this.toleranceSecs}s)`,
+        error: "Message timestamp too old",
+      };
+    }
+    if (ts > now + this.toleranceSecs) {
+      return {
+        valid: false,
+        error: "Message timestamp too new",
       };
     }
 

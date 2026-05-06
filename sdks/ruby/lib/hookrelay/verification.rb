@@ -76,10 +76,12 @@ module HookRelay
     return { valid: false, error: "Invalid webhook timestamp" } if ts == 0
 
     now = Time.now.to_i
-    age = (now - ts).abs
 
-    if age > tolerance_secs
-      return { valid: false, error: "Webhook timestamp expired: #{age}s old (tolerance: #{tolerance_secs}s)" }
+    if now - ts > tolerance_secs
+      return { valid: false, error: "Message timestamp too old" }
+    end
+    if ts > now + tolerance_secs
+      return { valid: false, error: "Message timestamp too new" }
     end
 
     # Compute expected signature
@@ -114,7 +116,8 @@ module HookRelay
 
   private_class_method def self.decode_secret(secret)
     stripped = secret.start_with?("whsec_") ? secret[6..] : secret
-    Base64.strict_decode64(stripped)
+    # Add padding in case secret is unpadded base64
+    Base64.strict_decode64(stripped + "==")
   rescue ArgumentError
     secret.bytes.pack("C*")
   end

@@ -339,10 +339,11 @@ public class WebhookVerifier {
         }
 
         let now = Int(Date().timeIntervalSince1970)
-        let age = abs(now - ts)
-
-        if age > toleranceSecs {
-            return VerificationResult(valid: false, payload: nil, error: "Webhook timestamp expired: \(age)s old (tolerance: \(toleranceSecs)s)")
+        if now - ts > toleranceSecs {
+            return VerificationResult(valid: false, payload: nil, error: "Message timestamp too old")
+        }
+        if ts > now + toleranceSecs {
+            return VerificationResult(valid: false, payload: nil, error: "Message timestamp too new")
         }
 
         // Compute expected signature

@@ -104,11 +104,11 @@ namespace HookRelay
                 return HookRelayVerificationResult.Invalid("Invalid webhook timestamp");
 
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            var age = Math.Abs(now - ts);
 
-            if (age > toleranceSecs)
-                return HookRelayVerificationResult.Invalid(
-                    $"Webhook timestamp expired: {age}s old (tolerance: {toleranceSecs}s)");
+            if (now - ts > toleranceSecs)
+                return HookRelayVerificationResult.Invalid("Message timestamp too old");
+            if (ts > now + toleranceSecs)
+                return HookRelayVerificationResult.Invalid("Message timestamp too new");
 
             // Compute expected signature
             var signedContent = $"{msgId}.{timestamp}.{payload}";
@@ -163,6 +163,9 @@ namespace HookRelay
         private static byte[] DecodeSecret(string secret)
         {
             var stripped = secret.StartsWith("whsec_") ? secret[6..] : secret;
+            // Add padding in case secret is unpadded base64
+            var padding = (4 - stripped.Length % 4) % 4;
+            stripped += new string('=', padding);
             try
             {
                 return Convert.FromBase64String(stripped);
