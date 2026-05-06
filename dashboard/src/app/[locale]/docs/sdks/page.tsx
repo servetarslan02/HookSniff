@@ -1,7 +1,9 @@
 export default function SdksPage() {
+  const t = useTranslations('docs');
+  const tc = useTranslations('common');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">SDK Documentation</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('sdks')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Official SDKs for Python and Node.js. Install via your package manager and start sending webhooks in seconds.
       </p>
@@ -13,12 +15,12 @@ export default function SdksPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Python SDK</h2>
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Installation</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('installation')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
 {`pip install hookrelay`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Start</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('quickStartSdk')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import hookrelay
 import os
@@ -48,7 +50,7 @@ print(f"Delivery ID: {delivery.id}")
 print(f"Status: {delivery.status}")`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Verify Signatures (Flask)</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('verifySignatures')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`from flask import Flask, request, abort
 import hookrelay
@@ -70,7 +72,7 @@ def handle_webhook():
     return "", 200`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Error Handling</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('errorHandling')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
 {`import hookrelay
 
@@ -128,10 +130,11 @@ const delivery = await hr.webhooks.send({
 console.log('Delivery:', delivery.id, delivery.status);`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Verify Signatures (Express)</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('verifySignatures')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import express from 'express';
 import { verifySignature } from '@hookrelay/sdk';
+import { useTranslations } from 'next-intl';
 
 const app = express();
 
@@ -148,7 +151,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 });`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">TypeScript Support</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('typescriptSupport')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
 {`import type { Endpoint, Delivery, WebhookEvent } from '@hookrelay/sdk';
 
@@ -164,7 +167,7 @@ const delivery: Delivery = await hr.webhooks.send({
 
       {/* Community SDKs */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Community SDKs</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('communitySdks')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Community-maintained SDKs are available for other languages. These are not officially supported but are actively maintained.
         </p>

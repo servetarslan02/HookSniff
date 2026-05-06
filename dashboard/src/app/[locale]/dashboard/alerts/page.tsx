@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
+import { useTranslations } from 'next-intl';
 
 interface AlertRule {
   id: string;
@@ -26,6 +27,8 @@ const CHANNEL_ICONS: Record<string, string> = {
 };
 
 export default function AlertsPage() {
+  const t = useTranslations('alerts');
+  const tc = useTranslations('common');
   const { token } = useAuth();
   const [alerts, setAlerts] = useState<AlertRule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +82,7 @@ export default function AlertsPage() {
   };
 
   const deleteAlert = async (id: string) => {
-    if (!confirm('Delete this alert rule?')) return;
+    if (!confirm(t('deleteConfirm'))) return;
     try {
       await fetch(`${API}/alerts/${id}`, {
         method: 'DELETE',
@@ -97,7 +100,7 @@ export default function AlertsPage() {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert('Test notification sent! Check your channels.');
+      alert(t('testSent'));
     } catch (e) {
       console.error('Failed to test alert:', e);
     }
@@ -107,7 +110,7 @@ export default function AlertsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Alert Rules</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-gray-500 dark:text-slate-400 mt-1">
             Get notified when webhooks fail or endpoints have issues.
           </p>
@@ -116,14 +119,14 @@ export default function AlertsPage() {
           onClick={() => setShowCreate(!showCreate)}
           className="px-4 py-2 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition"
         >
-          {showCreate ? 'Cancel' : '+ New Alert'}
+          {showCreate ? t('cancel') : t('newAlert')}
         </button>
       </div>
 
       {/* Create Form */}
       {showCreate && (
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create Alert</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name</label>
@@ -131,7 +134,7 @@ export default function AlertsPage() {
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g., High failure rate alert"
+                placeholder={t('namePlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
               />
             </div>
@@ -142,9 +145,9 @@ export default function AlertsPage() {
                 onChange={(e) => setForm({ ...form, condition: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
               >
-                <option value="failure_rate">Failure Rate (%)</option>
-                <option value="latency">Avg Latency (ms)</option>
-                <option value="consecutive_failures">Consecutive Failures</option>
+                <option value="failure_rate">{t('conditions.failureRate')}</option>
+                <option value="latency">{t('conditions.latency')}</option>
+                <option value="consecutive_failures">{t('conditions.consecutiveFailures')}</option>
               </select>
             </div>
             <div>
@@ -188,7 +191,7 @@ export default function AlertsPage() {
               disabled={creating || !form.name}
               className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
             >
-              {creating ? 'Creating...' : 'Create Alert'}
+              {creating ? tc('creating') : t('create')}
             </button>
           </div>
         </div>
@@ -197,7 +200,7 @@ export default function AlertsPage() {
       {/* Alert List */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-400 dark:text-slate-500">Loading...</div>
+          <div className="p-8 text-center text-gray-400 dark:text-slate-500">{tc('loading')}</div>
         ) : alerts.length === 0 ? (
           <div className="p-12 text-center text-gray-400 dark:text-slate-500">
             No alert rules yet. Create one to get notified about webhook failures.
@@ -214,7 +217,7 @@ export default function AlertsPage() {
                         ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
                         : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'
                     }`}>
-                      {alert.is_active ? 'Active' : 'Paused'}
+                      {alert.is_active ? t('active') : t('paused')}
                     </span>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">

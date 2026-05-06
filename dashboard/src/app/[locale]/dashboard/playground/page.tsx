@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, type Endpoint } from '@/lib/api';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useTranslations } from 'next-intl';
 
 const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] as const;
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
@@ -128,6 +129,8 @@ const HISTORY_KEY = 'hookrelay_playground_history';
 const MAX_HISTORY = 10;
 
 function loadHistory(): PlaygroundRequest[] {
+  const t = useTranslations('playground');
+  const tc = useTranslations('common');
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
@@ -159,7 +162,7 @@ function ResponseInspector({
     return (
       <div className="text-center text-gray-400 dark:text-slate-500 py-16">
         <div className="text-4xl mb-3">🧪</div>
-        <p>Send a request to inspect the response</p>
+        <p>{t('sendToInspect')}</p>
       </div>
     );
   }
@@ -213,7 +216,7 @@ function ResponseInspector({
           ? JSON.stringify(response, null, 2)
           : Object.entries(headers)
               .map(([k, v]) => `${k}: ${v}`)
-              .join('\n') || 'No response headers captured'}
+              .join('\n') || t('noHeaders')}
       </pre>
     </div>
   );
@@ -232,8 +235,8 @@ function HistoryPanel({
   if (history.length === 0) {
     return (
       <div className="glass-card p-6">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Request History</h3>
-        <p className="text-xs text-gray-400 dark:text-slate-500">No requests yet</p>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('requestHistory')}</h3>
+        <p className="text-xs text-gray-400 dark:text-slate-500">{t('noRequests')}</p>
       </div>
     );
   }
@@ -352,7 +355,7 @@ function LiveRequestViewer({
   return (
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Live Request Viewer</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('liveViewer')}</h3>
         <button
           onClick={isLive ? stopLive : startLive}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
@@ -361,13 +364,13 @@ function LiveRequestViewer({
               : 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400'
           }`}
         >
-          {isLive ? '⏹ Stop' : '▶ Start Live'}
+          {isLive ? t('stop') : t('startLive')}
         </button>
       </div>
       {isLive && (
         <div className="flex items-center gap-2 mb-3">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-xs text-green-600 dark:text-green-400">Watching for new deliveries...</span>
+          <span className="text-xs text-green-600 dark:text-green-400">{t('watchingDeliveries')}</span>
         </div>
       )}
       {liveDeliveries.length > 0 ? (
@@ -395,7 +398,7 @@ function LiveRequestViewer({
         </div>
       ) : (
         <p className="text-xs text-gray-400 dark:text-slate-500">
-          {isLive ? 'Waiting for new requests...' : 'Click Start to watch for incoming webhooks'}
+          {isLive ? t('waitingRequests') : t('clickStart')}
         </p>
       )}
     </div>
@@ -528,7 +531,7 @@ ${Object.entries(headers)
 
   const copyCurl = () => {
     navigator.clipboard.writeText(curlCommand);
-    toast('cURL command copied!', 'success');
+    toast(t('curlCopied'), 'success');
   };
 
   const selectFromHistory = (req: PlaygroundRequest) => {
@@ -544,20 +547,20 @@ ${Object.entries(headers)
   const clearHistory = () => {
     setHistory([]);
     localStorage.removeItem(HISTORY_KEY);
-    toast('History cleared', 'info');
+    toast(t('historyCleared'), 'info');
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">API Playground</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Request */}
         <div className="space-y-4">
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Request</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('request')}</h2>
 
             {/* AI Payload Generator */}
             <div className="mb-4">
@@ -579,7 +582,7 @@ ${Object.entries(headers)
 
             {/* Presets */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Quick Presets</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('quickPresets')}</label>
               <div className="flex flex-wrap gap-2">
                 {Object.keys(ENDPOINT_PATHS).map((preset) => (
                   <button
@@ -632,7 +635,7 @@ ${Object.entries(headers)
             {/* Body */}
             {method !== 'GET' && (
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Request Body</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('requestBody')}</label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
@@ -654,7 +657,7 @@ ${Object.entries(headers)
                   <LoadingSpinner size="sm" /> Sending...
                 </>
               ) : (
-                '🚀 Send Request'
+                t('sendRequest')
               )}
             </button>
           </div>
@@ -662,7 +665,7 @@ ${Object.entries(headers)
           {/* cURL Generator */}
           <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">cURL Command</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('curlCommand')}</h3>
               <button
                 onClick={copyCurl}
                 className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
@@ -682,7 +685,7 @@ ${Object.entries(headers)
         {/* Response + History */}
         <div className="space-y-4">
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Response Inspector</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('responseInspector')}</h2>
             <ResponseInspector
               response={response}
               status={responseStatus}

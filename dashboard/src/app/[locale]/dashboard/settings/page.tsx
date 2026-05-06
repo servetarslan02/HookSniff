@@ -2,10 +2,13 @@
 
 import { useAuth } from '@/lib/store';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 export default function SettingsPage() {
   const { user, token, apiKey, logout } = useAuth();
   const [copied, setCopied] = useState(false);
+  const t = useTranslations('settings');
+  const tc = useTranslations('common');
 
   // Profile form state
   const [profileName, setProfileName] = useState(user?.name || '');
@@ -55,7 +58,7 @@ export default function SettingsPage() {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error?.message || 'Failed to update profile');
       }
-      setProfileSuccess('Profile updated successfully');
+      setProfileSuccess(tc('success'));
       setTimeout(() => setProfileSuccess(''), 3000);
     } catch (e: any) {
       setProfileError(e.message);
@@ -92,7 +95,7 @@ export default function SettingsPage() {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error?.message || 'Failed to change password');
       }
-      setPasswordSuccess('Password changed successfully');
+      setPasswordSuccess(tc('success'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -107,7 +110,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
           Manage your account, security, and notification preferences
         </p>
@@ -115,8 +118,8 @@ export default function SettingsPage() {
 
       {/* Profile Section */}
       <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Profile</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Your personal information</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('profile')}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('profile')}</p>
 
         {profileSuccess && (
           <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400">
@@ -172,7 +175,7 @@ export default function SettingsPage() {
               disabled={profileSaving}
               className="px-6 py-2.5 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
             >
-              {profileSaving ? 'Saving...' : 'Save Changes'}
+              {profileSaving ? tc('saving') : tc('save')}
             </button>
           </div>
         </form>
@@ -180,8 +183,8 @@ export default function SettingsPage() {
 
       {/* Password Section */}
       <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Change Password</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Update your account password</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('changePassword')}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('changePassword')}</p>
 
         {passwordSuccess && (
           <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400">
@@ -239,7 +242,7 @@ export default function SettingsPage() {
               disabled={passwordSaving}
               className="px-6 py-2.5 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
             >
-              {passwordSaving ? 'Updating...' : 'Update Password'}
+              {passwordSaving ? tc('saving') : t('changePassword')}
             </button>
           </div>
         </form>
@@ -247,13 +250,13 @@ export default function SettingsPage() {
 
       {/* API Key Section */}
       <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">API Key</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Your primary API authentication key</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('api')}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('api')}</p>
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
-              value={apiKey || 'No API key — register to get one'}
+              value={apiKey || t('noApiKey')}
               readOnly
               className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 font-mono text-sm text-gray-700 dark:text-slate-300"
             />
@@ -276,8 +279,8 @@ export default function SettingsPage() {
 
       {/* Notifications */}
       <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Notifications</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Control how you receive alerts and updates</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('notifications')}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('notifications')}</p>
         <div className="space-y-4">
           <ToggleRow
             label="Email notifications"
@@ -302,7 +305,7 @@ export default function SettingsPage() {
 
       {/* Danger Zone */}
       <div className="glass-card p-6 border-red-200 dark:border-red-500/20">
-        <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">Danger Zone</h3>
+        <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">{t('dangerZone')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-500/10 rounded-xl">
             <div>
@@ -318,8 +321,8 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-500/10 rounded-xl">
             <div>
-              <div className="font-medium text-gray-900 dark:text-white">Delete Account</div>
-              <div className="text-sm text-gray-500 dark:text-slate-400">Permanently delete your account and all data</div>
+              <div className="font-medium text-gray-900 dark:text-white">{t('deleteAccount')}</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400">{t('deleteAccountDesc')}</div>
             </div>
             <button
               className="border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-600 hover:text-white transition"

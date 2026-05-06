@@ -21,6 +21,7 @@ import {
   Cell,
 } from 'recharts';
 import { ChartCard, StatCard, StatusBadge } from '@/components/tremor';
+import { useTranslations } from 'next-intl';
 
 type TimeRange = '24h' | '7d' | '30d';
 
@@ -30,6 +31,8 @@ export default function AnalyticsPage() {
   const [trendData, setTrendData] = useState<DeliveryTrendResponse | null>(null);
   const [successRateData, setSuccessRateData] = useState<SuccessRateData | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('analytics');
+  const tc = useTranslations('common');
 
   const loadData = useCallback(async () => {
     if (!token) return;
@@ -53,7 +56,7 @@ export default function AnalyticsPage() {
   }, [loadData]);
 
   const chartData = trendData?.buckets.map((b) => ({
-    date: new Date(b.timestamp).toLocaleDateString('en', {
+    date: new Date(b.timestamp).toLocaleString(undefined, {
       month: 'short',
       day: 'numeric',
       ...(trendData.range === '24h' ? { hour: '2-digit', minute: '2-digit' } : {}),
@@ -74,7 +77,7 @@ export default function AnalyticsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Delivery trends, success rates, and performance metrics
           </p>
@@ -124,8 +127,8 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ChartCard
-            title="Delivery Trend"
-            subtitle="Successful vs failed deliveries over time"
+            title={t('deliveryTrends')}
+            subtitle={t('deliveryTrends')}
             showTimeRange
             timeRange={timeRange}
             onTimeRangeChange={setTimeRange}
@@ -133,11 +136,11 @@ export default function AnalyticsPage() {
             <div className="h-80">
               {loading ? (
                 <div className="h-full flex items-center justify-center">
-                  <div className="animate-pulse text-gray-400 dark:text-slate-500">Loading...</div>
+                  <div className="animate-pulse text-gray-400 dark:text-slate-500">{tc('loading')}</div>
                 </div>
               ) : chartData.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-gray-400 dark:text-slate-500">
-                  No data for this time range
+                  {tc('noResults')}
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
@@ -173,10 +176,10 @@ export default function AnalyticsPage() {
           </ChartCard>
         </div>
 
-        <ChartCard title="Success Rate" subtitle="Distribution of delivery outcomes">
+        <ChartCard title={t('successRateOverTime')} subtitle={t('successRateOverTime')}>
           <div className="h-80 flex items-center justify-center">
             {loading ? (
-              <div className="animate-pulse text-gray-400 dark:text-slate-500">Loading...</div>
+              <div className="animate-pulse text-gray-400 dark:text-slate-500">{tc('loading')}</div>
             ) : (
               <div className="relative">
                 <ResponsiveContainer width={220} height={220}>

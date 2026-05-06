@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { useTranslations } from 'next-intl';
 
 const plans = [
   {
@@ -65,6 +66,8 @@ function UsageChart({ data }: { data: typeof monthlyUsage }) {
   const w = data.length * (barWidth + gap);
   const h = 160;
 
+  const t = useTranslations('billing');
+  const tc = useTranslations('common');
   return (
     <svg width={w} height={h + 30} className="overflow-visible">
       {data.map((d, i) => {
@@ -177,7 +180,7 @@ export default function BillingPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Billing</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
           Manage your subscription, usage, and payment history
         </p>
@@ -187,13 +190,13 @@ export default function BillingPage() {
       <div className="glass-card p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Current Plan</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('currentPlan')}</h2>
             <div className="flex items-center gap-3 mt-2">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 ring-1 ring-inset ring-brand-600/20">
                 {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
               </span>
               <span className="text-sm text-gray-500 dark:text-slate-400">
-                Next billing: {new Date(nextBillingDate).toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
+                Next billing: {new Date(nextBillingDate).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -240,7 +243,7 @@ export default function BillingPage() {
 
       {/* Monthly Chart */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Monthly Usage</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usage')}</h2>
         <div className="overflow-x-auto">
           <UsageChart data={monthlyUsage} />
         </div>
@@ -248,7 +251,7 @@ export default function BillingPage() {
 
       {/* Plans */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Plans</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('currentPlan')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((plan) => {
             const isCurrent = plan.name.toLowerCase() === currentPlan;
@@ -293,7 +296,7 @@ export default function BillingPage() {
                         : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'
                     )}
                   >
-                    {isDowngrade ? 'Downgrade' : 'Upgrade'} to {plan.name}
+                    {t('upgradeTo', { action: isDowngrade ? t('downgrade') : t('upgrade'), plan: plan.name })}
                   </button>
                 )}
               </div>
@@ -305,7 +308,7 @@ export default function BillingPage() {
       {/* Invoice History */}
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Invoice History</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('invoiceHistory')}</h2>
           <span className="text-sm text-gray-400 dark:text-slate-500">{mockInvoices.length} invoices</span>
         </div>
         <div className="overflow-x-auto">
@@ -337,7 +340,7 @@ export default function BillingPage() {
                     {inv.id}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
-                    {new Date(inv.date).toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {new Date(inv.date).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm font-medium text-gray-900 dark:text-white">{inv.plan}</span>
@@ -366,15 +369,17 @@ export default function BillingPage() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowUpgradeModal(null)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {plans.findIndex((p) => p.name.toLowerCase() === currentPlan) > plans.findIndex((p) => p.name === showUpgradeModal)
-                ? 'Downgrade'
-                : 'Upgrade'}{' '}
-              to {showUpgradeModal}?
+              {t('upgradeTo', {
+                action: plans.findIndex((p) => p.name.toLowerCase() === currentPlan) > plans.findIndex((p) => p.name === showUpgradeModal)
+                  ? t('downgrade')
+                  : t('upgrade'),
+                plan: showUpgradeModal
+              })}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
               {plans.findIndex((p) => p.name.toLowerCase() === currentPlan) > plans.findIndex((p) => p.name === showUpgradeModal)
-                ? 'Your new limits will take effect immediately. You\'ll receive a prorated credit.'
-                : 'You\'ll be charged the difference immediately. New limits take effect right away.'}
+                ? t('downgradeDesc')
+                : t('upgradeDesc')}
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -388,7 +393,7 @@ export default function BillingPage() {
                 disabled={upgrading}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"
               >
-                {upgrading ? 'Redirecting...' : 'Confirm'}
+                {upgrading ? t('redirecting') : tc('confirm')}
               </button>
             </div>
           </div>
@@ -400,7 +405,7 @@ export default function BillingPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCancelModal(false)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Cancel Subscription?</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('cancel')}?</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
               Your plan will remain active until the end of the current billing period. After that, you&apos;ll be moved to the Free plan.
             </p>
@@ -414,7 +419,7 @@ export default function BillingPage() {
               <button
                 onClick={() => {
                   setShowCancelModal(false);
-                  toast('Subscription cancelled. You\'ll keep access until the end of the billing period.', 'info');
+                  toast(t('cancelledMsg'), 'info');
                 }}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition"
               >

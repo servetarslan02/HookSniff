@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/store';
 import { adminApi, type AdminStatsResponse } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { useTranslations } from 'next-intl';
 
 const PLAN_COLORS: Record<string, string> = {
   free: '#94a3b8',
@@ -16,6 +17,8 @@ export default function AdminOverviewPage() {
   const { token } = useAuth();
   const [stats, setStats] = useState<AdminStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('admin');
+  const tc = useTranslations('common');
 
   const fetchStats = useCallback(async () => {
     if (!token) return;
@@ -38,8 +41,8 @@ export default function AdminOverviewPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Overview</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Loading dashboard...</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('overview')}</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('loadingDashboard')}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
@@ -70,25 +73,25 @@ export default function AdminOverviewPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Total Users"
+          label={t('totalUsers')}
           value={stats?.total_users?.toLocaleString() || '0'}
           icon={<span className="text-lg">👥</span>}
           color="blue"
         />
         <StatCard
-          label="Total Deliveries"
+          label={t('totalDeliveries')}
           value={stats?.total_deliveries?.toLocaleString() || '0'}
           icon={<span className="text-lg">📦</span>}
           color="emerald"
         />
         <StatCard
-          label="Total Revenue"
+          label={t('totalRevenue')}
           value={`$${(stats?.total_revenue || 0).toLocaleString()}`}
           icon={<span className="text-lg">💰</span>}
           color="violet"
         />
         <StatCard
-          label="Active Users Today"
+          label={t('activeUsersToday')}
           value={stats?.active_users_today?.toLocaleString() || '0'}
           icon={<span className="text-lg">🔥</span>}
           color="amber"
@@ -98,7 +101,7 @@ export default function AdminOverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Users by Plan Chart */}
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Users by Plan</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usersByPlan')}</h2>
           {pieData.length > 0 ? (
             <div className="flex items-center gap-6">
               <div className="w-48 h-48">
@@ -145,14 +148,14 @@ export default function AdminOverviewPage() {
               </div>
             </div>
           ) : (
-            <p className="text-gray-400 dark:text-slate-500 text-sm">No data available</p>
+            <p className="text-gray-400 dark:text-slate-500 text-sm">{t('noData')}</p>
           )}
         </div>
 
         {/* Recent Signups */}
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Signups</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recentSignups')}</h2>
           </div>
           <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
             {stats?.recent_signups?.length ? (

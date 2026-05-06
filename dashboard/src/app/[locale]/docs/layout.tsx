@@ -2,16 +2,19 @@
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { clsx } from 'clsx';
+import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
-
-const sidebarNav = [
-  { name: 'Getting Started', href: '/docs' },
-  { name: 'API Reference', href: '/docs/api' },
-  { name: 'SDKs', href: '/docs/sdks' },
-];
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const t = useTranslations('docs');
+  const tc = useTranslations('common');
+
+  const sidebarNav = [
+    { name: t('gettingStarted'), href: '/docs' },
+    { name: t('apiReference'), href: '/docs/api' },
+    { name: 'SDKs', href: '/docs/sdks' },
+  ];
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
@@ -27,10 +30,10 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
-              Dashboard
+              {tc('nav.dashboard')}
             </Link>
             <Link href="/" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
-              Home
+              {t('home')}
             </Link>
           </div>
         </div>

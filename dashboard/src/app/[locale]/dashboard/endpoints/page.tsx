@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { endpointsApi, type Endpoint } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
@@ -13,6 +14,8 @@ export default function EndpointsPage() {
   const [newDesc, setNewDesc] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const t = useTranslations('endpoints');
+  const tc = useTranslations('common');
 
   useEffect(() => {
     if (!token) return;
@@ -41,7 +44,7 @@ export default function EndpointsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm('Delete this endpoint?')) return;
+    if (!token || !confirm(t('deleteConfirm'))) return;
     try {
       await endpointsApi.delete(token, id);
       setEndpoints((prev) => prev.filter((ep) => ep.id !== id));
@@ -67,8 +70,8 @@ export default function EndpointsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Endpoints</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Manage your webhook endpoints</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <button
           onClick={() => setShowCreate(!showCreate)}
@@ -80,7 +83,7 @@ export default function EndpointsPage() {
 
       {showCreate && (
         <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create Endpoint</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('create')}</h3>
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm border border-red-200">{error}</div>
           )}
@@ -91,7 +94,7 @@ export default function EndpointsPage() {
                 type="url"
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
-                placeholder="https://myapp.com/webhook"
+                placeholder={t('form.urlPlaceholder')}
                 required
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
               />
@@ -102,7 +105,7 @@ export default function EndpointsPage() {
                 type="text"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
-                placeholder="Order notifications"
+                placeholder={t('form.descriptionPlaceholder')}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
               />
             </div>
@@ -112,7 +115,7 @@ export default function EndpointsPage() {
                 disabled={creating}
                 className="bg-brand-600 dark:bg-brand-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition disabled:opacity-60"
               >
-                {creating ? 'Creating...' : 'Create'}
+                {creating ? tc('creating') : tc('create')}
               </button>
               <button
                 type="button"
@@ -141,7 +144,7 @@ export default function EndpointsPage() {
                       {ep.id.slice(0, 12)}…
                     </span>
                     <span className={`w-2 h-2 rounded-full ${ep.is_active ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                    <span className="text-xs text-gray-500 dark:text-slate-400">{ep.is_active ? 'Active' : 'Inactive'}</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-400">{ep.is_active ? t('active') : t('inactive')}</span>
                   </div>
                   <div className="text-sm font-mono text-gray-900 dark:text-white mb-1">{ep.url}</div>
                   {ep.description && <div className="text-sm text-gray-500 dark:text-slate-400">{ep.description}</div>}
@@ -149,7 +152,7 @@ export default function EndpointsPage() {
                 <button
                   onClick={() => handleDelete(ep.id)}
                   className="text-gray-400 dark:text-slate-500 hover:text-red-600 transition p-2"
-                  title="Delete endpoint"
+                  title={t('deleteTitle')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

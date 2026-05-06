@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, type AdminUser } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
+import { useTranslations } from 'next-intl';
 
 const PLAN_OPTIONS = ['free', 'pro', 'business'];
 
@@ -21,6 +22,8 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [planChangeTarget, setPlanChangeTarget] = useState<AdminUser | null>(null);
   const [newPlan, setNewPlan] = useState('');
+  const t = useTranslations('admin');
+  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchUsers = useCallback(async () => {
@@ -36,7 +39,7 @@ export default function AdminUsersPage() {
       setUsers(data.users || []);
       setTotal(data.total || 0);
     } catch {
-      toast('Failed to load users', 'error');
+      toast(tc('error'), 'error');
     } finally {
       setLoading(false);
     }
@@ -60,7 +63,7 @@ export default function AdminUsersPage() {
       setPlanChangeTarget(null);
       fetchUsers();
     } catch {
-      toast('Failed to update plan', 'error');
+      toast(tc('error'), 'error');
     }
   };
 
@@ -72,7 +75,7 @@ export default function AdminUsersPage() {
       toast(`User ${newStatus === 'banned' ? 'banned' : 'activated'}`, 'success');
       fetchUsers();
     } catch {
-      toast('Failed to update status', 'error');
+      toast(tc('error'), 'error');
     }
   };
 
@@ -81,7 +84,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('userManagement')}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
           Manage users, plans, and account status
         </p>
@@ -95,7 +98,7 @@ export default function AdminUsersPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by email or name..."
+              placeholder={t('searchByEmail')}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 transition text-sm"
             />
           </div>
@@ -105,7 +108,7 @@ export default function AdminUsersPage() {
               onChange={(e) => { setPlanFilter(e.target.value); setPage(1); }}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
             >
-              <option value="">All plans</option>
+              <option value="">{t('allPlans')}</option>
               {PLAN_OPTIONS.map((p) => (
                 <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
               ))}
@@ -117,9 +120,9 @@ export default function AdminUsersPage() {
               onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
             >
-              <option value="">All statuses</option>
-              <option value="active">Active</option>
-              <option value="banned">Banned</option>
+              <option value="">{t('allStatuses')}</option>
+              <option value="active">{t('active')}</option>
+              <option value="banned">{t('banned')}</option>
             </select>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { webhooksApi, type Delivery } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
+import { useTranslations } from 'next-intl';
 
 export default function DeliveriesPage() {
   const { token } = useAuth();
@@ -20,6 +21,8 @@ export default function DeliveriesPage() {
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [replayTarget, setReplayTarget] = useState<Delivery | null>(null);
   const [replaying, setReplaying] = useState(false);
+  const t = useTranslations('deliveries');
+  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchData = useCallback(async () => {
@@ -47,7 +50,7 @@ export default function DeliveriesPage() {
     setReplaying(true);
     try {
       await webhooksApi.replay(token, replayTarget.id);
-      toast('Webhook replayed!', 'success');
+      toast(t('replaySuccess'), 'success');
       fetchData();
     } catch (err: any) {
       toast(err.message || 'Replay failed', 'error');
@@ -67,14 +70,14 @@ export default function DeliveriesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Deliveries</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Track all webhook deliveries and their status</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by event or ID..."
+          placeholder={t('searchPlaceholder')}
           className="pl-3 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto"
         />
       </div>
@@ -110,9 +113,9 @@ export default function DeliveriesPage() {
       {/* Table */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">Loading deliveries...</div>
+          <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">{t('loadingDeliveries')}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">No deliveries found.</div>
+          <div className="p-12 text-center text-gray-400 dark:text-slate-500">{t('empty')}</div>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -204,7 +207,7 @@ export default function DeliveriesPage() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelected(null)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delivery Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('details')}</h3>
               <button onClick={() => setSelected(null)} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
             </div>
             <div className="p-6 space-y-4">
@@ -218,7 +221,7 @@ export default function DeliveriesPage() {
 
               {/* Attempts Timeline */}
               <div className="pt-4 border-t border-gray-100">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Delivery Attempts</h4>
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('deliveryAttempts')}</h4>
                 <div className="space-y-3">
                   {Array.from({ length: selected.attempt_count }).map((_, i) => (
                     <div key={i} className="flex items-start gap-3">
@@ -227,8 +230,8 @@ export default function DeliveriesPage() {
                         <p className="text-sm font-medium text-gray-900 dark:text-white">Attempt {i + 1}</p>
                         <p className="text-xs text-gray-500 dark:text-slate-400">
                           {i === selected.attempt_count - 1
-                            ? selected.status === 'delivered' ? 'Delivered successfully' : 'Failed — will retry'
-                            : 'Retried with exponential backoff'}
+                            ? selected.status === 'delivered' ? t('deliveredSuccessfully') : t('failedWillRetry')
+                            : t('retriedBackoff')}
                         </p>
                       </div>
                     </div>
@@ -242,9 +245,9 @@ export default function DeliveriesPage() {
 
       <ConfirmDialog
         open={!!replayTarget}
-        title="Replay Webhook"
+        title={t('replayTitle')}
         message={`Replay delivery ${replayTarget?.id.slice(0, 10)}… to the same endpoint?`}
-        confirmLabel="Replay"
+        confirmLabel={t('replay')}
         onConfirm={handleReplay}
         onCancel={() => setReplayTarget(null)}
         loading={replaying}

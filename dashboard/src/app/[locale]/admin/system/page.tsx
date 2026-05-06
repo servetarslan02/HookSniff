@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
+import { useTranslations } from 'next-intl';
 
 interface SystemHealth {
   database: { status: string; latency_ms: number };
@@ -14,6 +15,8 @@ export default function AdminSystemPage() {
   const { token } = useAuth();
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('admin');
+  const tc = useTranslations('common');
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
   const fetchHealth = useCallback(async () => {
@@ -109,7 +112,7 @@ export default function AdminSystemPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Health</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
           Monitor infrastructure services and system status
         </p>
@@ -127,10 +130,10 @@ export default function AdminSystemPage() {
           }`} />
           <span className="text-lg font-semibold text-gray-900 dark:text-white">
             {services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok')
-              ? 'All Systems Operational'
+              ? t('allOperational')
               : services.some(s => s.status === 'degraded' || s.status === 'slow')
-                ? 'Partial Degradation'
-                : 'System Issues Detected'}
+                ? t('partialDegradation')
+                : t('systemIssues')}
           </span>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400">
@@ -182,7 +185,7 @@ export default function AdminSystemPage() {
 
       {/* Infrastructure Info */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Infrastructure</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('infrastructure')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             { label: 'API Server', value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },

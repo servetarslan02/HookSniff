@@ -1,18 +1,22 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 export default function PrivacyPage() {
+  const t = useTranslations('privacy');
+  const tc = useTranslations('common');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
           <a href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 Hookrelay</a>
           <span className="text-gray-400">/</span>
-          <span className="text-gray-600 dark:text-slate-400">Privacy Policy</span>
+          <span className="text-gray-600 dark:text-slate-400">{t('nav')}</span>
         </div>
       </nav>
       <main className="max-w-4xl mx-auto px-6 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Privacy Policy</h1>
-        <p className="text-gray-500 dark:text-slate-400 mb-12">Last updated: May 6, 2026</p>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
+        <p className="text-gray-500 dark:text-slate-400 mb-12">{t('lastUpdated')}</p>
 
         <div className="prose dark:prose-invert max-w-none space-y-8 text-gray-700 dark:text-slate-300 leading-relaxed">
           <section>
