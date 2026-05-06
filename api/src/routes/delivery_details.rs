@@ -28,10 +28,12 @@ struct DeliveryDetails {
     payload: serde_json::Value,
     request_headers: Option<serde_json::Value>,
     created_at: String,
+    updated_at: Option<String>,
     last_attempt_at: Option<String>,
     next_retry_at: Option<String>,
     response_status: Option<i32>,
     response_body: Option<String>,
+    error_message: Option<String>,
     attempts: Vec<AttemptDetail>,
     signature_info: SignatureInfo,
 }
@@ -65,8 +67,8 @@ async fn get_delivery_details(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<DeliveryDetails>, AppError> {
     // Get delivery with endpoint info
-    let delivery = sqlx::query_as::<_, (Uuid, Uuid, serde_json::Value, Option<String>, String, i32, i32, Option<chrono::DateTime<chrono::Utc>>, Option<i32>, Option<String>, Option<chrono::DateTime<chrono::Utc>>, chrono::DateTime<chrono::Utc>, Option<serde_json::Value>)>(
-        "SELECT d.id, d.endpoint_id, d.payload, d.event_type, d.status, d.attempt_count, d.max_attempts, d.last_attempt_at, d.response_status, d.response_body, d.next_retry_at, d.created_at, d.request_headers FROM deliveries d WHERE d.id = $1 AND d.customer_id = $2"
+    let delivery = sqlx::query_as::<_, (Uuid, Uuid, serde_json::Value, Option<String>, String, i32, i32, Option<chrono::DateTime<chrono::Utc>>, Option<i32>, Option<String>, Option<chrono::DateTime<chrono::Utc>>, chrono::DateTime<chrono::Utc>, Option<serde_json::Value>, Option<chrono::DateTime<chrono::Utc>>, Option<String>)>(
+        "SELECT d.id, d.endpoint_id, d.payload, d.event_type, d.status, d.attempt_count, d.max_attempts, d.last_attempt_at, d.response_status, d.response_body, d.next_retry_at, d.created_at, d.request_headers, d.updated_at, d.error_message FROM deliveries d WHERE d.id = $1 AND d.customer_id = $2"
     )
     .bind(id)
     .bind(customer.id)
@@ -99,10 +101,12 @@ async fn get_delivery_details(
         payload: delivery.2,
         request_headers: delivery.12,
         created_at: delivery.11.to_rfc3339(),
+        updated_at: delivery.13.map(|t| t.to_rfc3339()),
         last_attempt_at: delivery.7.map(|t| t.to_rfc3339()),
         next_retry_at: delivery.10.map(|t| t.to_rfc3339()),
         response_status: delivery.8,
         response_body: delivery.9,
+        error_message: delivery.14,
         attempts: attempts.into_iter().map(|(id, num, status, body, dur, err, created, resp_headers)| {
             let derived_status = match status {
                 Some(code) if (200..300).contains(&code) => "delivered".to_string(),
