@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -11,7 +11,7 @@ const plans = [
     price: 0,
     period: '/month',
     limit: '1,000 webhooks/month',
-    features: ['100 requests/min', '3 retry attempts', 'Community support', '1 endpoint'],
+    features: ['100 requests/min', '3 retry attempts', 'Community support', '5 endpoints', '7-day retention'],
     popular: false,
   },
   {
@@ -19,15 +19,15 @@ const plans = [
     price: 49,
     period: '/month',
     limit: '50,000 webhooks/month',
-    features: ['1,000 requests/min', '5 retry attempts', 'Priority support', 'Custom domains', '10 endpoints'],
+    features: ['1,000 requests/min', '5 retry attempts', 'Priority support', '50 endpoints', '30-day retention'],
     popular: true,
   },
   {
     name: 'Business',
-    price: 199,
+    price: 149,
     period: '/month',
     limit: '500,000 webhooks/month',
-    features: ['10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', 'Unlimited endpoints', 'Custom integrations'],
+    features: ['10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', '500 endpoints', '90-day retention'],
     popular: false,
   },
 ];
@@ -106,23 +106,72 @@ function InvoiceStatusBadge({ status }: { status: string }) {
 }
 
 export default function BillingPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { toast } = useToast();
   const currentPlan = user?.plan || 'free';
-  const usageCount = 650;
-  const usageLimit = currentPlan === 'free' ? 1000 : currentPlan === 'pro' ? 50000 : 500000;
-  const usagePercent = Math.round((usageCount / usageLimit) * 100);
+  const [usageCount, setUsageCount] = useState(0);
+  const [usageLimit, setUsageLimit] = useState(1000);
+  const [loadingUsage, setLoadingUsage] = useState(true);
+
+  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+
+  // Fetch real usage data
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${API}/billing/usage`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUsageCount(data.webhooks?.used ?? 0);
+        setUsageLimit(data.webhooks?.limit ?? 1000);
+      })
+      .catch(() => {
+        // fallback to defaults
+      })
+      .finally(() => setLoadingUsage(false));
+  }, [token, API]);
+
+  const usagePercent = usageLimit > 0 ? Math.round((usageCount / usageLimit) * 100) : 0;
 
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState<string | null>(null);
+  const [upgrading, setUpgrading] = useState(false);
+
+  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
   const handleUpgrade = (planName: string) => {
     setShowUpgradeModal(planName);
   };
 
-  const confirmUpgrade = () => {
-    toast(`Upgrade to ${showUpgradeModal} — Stripe integration coming soon!`, 'info');
-    setShowUpgradeModal(null);
+  const confirmUpgrade = async () => {
+    if (!showUpgradeModal || !token) return;
+    setUpgrading(true);
+    try {
+      const res = await fetch(`${API}/billing/upgrade`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ plan: showUpgradeModal.toLowerCase() }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || 'Upgrade failed');
+      }
+      const data = await res.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        toast(data.message || 'Upgrade initiated', 'success');
+      }
+    } catch (err: any) {
+      toast(err.message || 'Upgrade failed', 'error');
+    } finally {
+      setUpgrading(false);
+      setShowUpgradeModal(null);
+    }
   };
 
   const nextBillingDate = '2026-06-01';
@@ -338,9 +387,10 @@ export default function BillingPage() {
               </button>
               <button
                 onClick={confirmUpgrade}
-                className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition"
+                disabled={upgrading}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"
               >
-                Confirm
+                {upgrading ? 'Redirecting...' : 'Confirm'}
               </button>
             </div>
           </div>

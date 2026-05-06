@@ -3,7 +3,6 @@ use anyhow::Result;
 #[derive(Debug, Clone)]
 pub struct WorkerConfig {
     pub database_url: String,
-    pub max_attempts: i32,
 }
 
 impl WorkerConfig {
@@ -15,9 +14,6 @@ impl WorkerConfig {
                 .unwrap_or_else(|_| {
                     "postgresql://hookrelay:hookrelay_local@localhost:5432/hookrelay?sslmode=disable".into()
                 }),
-            max_attempts: std::env::var("MAX_ATTEMPTS")
-                .unwrap_or_else(|_| "3".into())
-                .parse()?,
         })
     }
 }

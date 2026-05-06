@@ -24,9 +24,10 @@ pub fn sanitize_description(desc: &str) -> String {
         Lazy::new(|| Regex::new(r"<[^>]*>").expect("invalid regex"));
 
     let cleaned = HTML_RE.replace_all(desc, "");
-    // Truncate to 500 chars
-    if cleaned.len() > 500 {
-        cleaned[..500].to_string()
+    // Truncate to 500 chars (UTF-8 safe)
+    let char_count = cleaned.chars().count();
+    if char_count > 500 {
+        cleaned.chars().take(500).collect()
     } else {
         cleaned.to_string()
     }

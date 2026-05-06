@@ -38,8 +38,14 @@ pub async fn request_id_middleware(mut req: Request, next: Next) -> Response {
     response
 }
 
+/// Authenticate requests via API key (hr_live_*) or JWT token.
+///
+/// Supports two authentication methods:
+/// 1. API key: `Authorization: Bearer hr_live_...` — looks up `api_key_hash` in customers table
+/// 2. JWT token: `Authorization: Bearer eyJ...` — verifies JWT and loads customer by `sub` claim
 pub async fn auth_middleware(
     pool: axum::extract::Extension<PgPool>,
+    cfg: axum::extract::Extension<crate::config::Config>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
@@ -49,23 +55,31 @@ pub async fn auth_middleware(
         .and_then(|v| v.to_str().ok())
         .ok_or(AppError::Unauthorized)?;
 
-    let api_key = auth_header
+    let token = auth_header
         .strip_prefix("Bearer ")
         .ok_or(AppError::Unauthorized)?;
 
-    if !api_key.starts_with("hr_live_") {
-        return Err(AppError::Unauthorized);
-    }
-
-    let key_hash = hash_api_key(api_key);
-
-    let customer = sqlx::query_as::<_, Customer>(
-        "SELECT * FROM customers WHERE api_key_hash = $1",
-    )
-    .bind(&key_hash)
-    .fetch_optional(&*pool)
-    .await?
-    .ok_or(AppError::Unauthorized)?;
+    let customer = if token.starts_with("hr_live_") {
+        // API key authentication
+        let key_hash = hash_api_key(token);
+        sqlx::query_as::<_, Customer>(
+            "SELECT * FROM customers WHERE api_key_hash = $1",
+        )
+        .bind(&key_hash)
+        .fetch_optional(&*pool)
+        .await?
+        .ok_or(AppError::Unauthorized)?
+    } else {
+        // JWT token authentication
+        let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
+        sqlx::query_as::<_, Customer>(
+            "SELECT * FROM customers WHERE id = $1",
+        )
+        .bind(claims.sub)
+        .fetch_optional(&*pool)
+        .await?
+        .ok_or(AppError::Unauthorized)?
+    };
 
     req.extensions_mut().insert(customer);
     Ok(next.run(req).await)
