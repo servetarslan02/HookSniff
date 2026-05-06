@@ -31,6 +31,27 @@ from typing import Any, Callable, Dict, Optional, Union
 DEFAULT_TOLERANCE_SECS = 300  # 5 minutes
 
 
+def _decode_secret(secret: str) -> bytes:
+    """Decode a Standard Webhooks secret.
+
+    Handles two formats:
+    - ``whsec_`` prefixed: base64-decodes the part after the prefix.
+    - Raw string: encodes as UTF-8 bytes.
+
+    Args:
+        secret: The signing secret string.
+
+    Returns:
+        The decoded secret as bytes.
+    """
+    stripped = secret[6:] if secret.startswith("whsec_") else secret
+    try:
+        # Add padding in case secret is unpadded base64
+        return base64.b64decode(stripped + "==")
+    except Exception:
+        return secret.encode("utf-8")
+
+
 @dataclass
 class WebhookEvent:
     """
@@ -153,13 +174,13 @@ class WebhookVerifier:
 
     @staticmethod
     def _decode_secret(secret: str) -> bytes:
-        """Decode a Standard Webhooks secret."""
-        stripped = secret[6:] if secret.startswith("whsec_") else secret
-        try:
-            # Add padding in case secret is unpadded base64
-            return base64.b64decode(stripped + "==")
-        except Exception:
-            return secret.encode("utf-8")
+        """Decode a Standard Webhooks secret.
+
+        .. deprecated::
+            Use the module-level :func:`_decode_secret` instead.
+            This method delegates to it for backward compatibility.
+        """
+        return _decode_secret(secret)
 
 
 def verify_signature(payload: str, signature: str, secret: str) -> bool:
@@ -186,7 +207,7 @@ def verify_signature(payload: str, signature: str, secret: str) -> bool:
 
     # Standard Webhooks format: v1,<base64>
     if signature.startswith("v1,"):
-        secret_bytes = WebhookVerifier._decode_secret(secret)
+        secret_bytes = _decode_secret(secret)
         expected_hmac = hmac.new(
             secret_bytes,
             payload.encode("utf-8"),

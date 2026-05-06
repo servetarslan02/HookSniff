@@ -302,6 +302,12 @@ async fn process_pending(
             Ok(response) => {
                 let _resp_span = tracing::info_span!("response-processing", status = tracing::field::Empty, duration_ms = duration_ms).entered();
                 let status_code = response.status().as_u16() as i32;
+                let resp_headers: serde_json::Value = serde_json::json!(
+                    response.headers()
+                        .iter()
+                        .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
+                        .collect::<std::collections::HashMap<String, String>>()
+                );
                 let body = response.text().await.unwrap_or_default();
                 let response_body = truncate(&body, 1000);
                 let success = (200..300).contains(&status_code);
@@ -339,7 +345,7 @@ async fn process_pending(
                     .await?;
 
                     // Record attempt
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, None, trace_id.as_deref()).await?;
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, None, trace_id.as_deref(), Some(&resp_headers)).await?;
 
                 } else if attempt >= item.max_attempts {
                     // ❌ Max deneme aşıldı → dead letter
@@ -377,7 +383,7 @@ async fn process_pending(
                         .execute(pool)
                         .await?;
 
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {}", status_code)), trace_id.as_deref()).await?;
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {}", status_code)), trace_id.as_deref(), Some(&resp_headers)).await?;
 
                 } else {
                     // 🔄 Retry — exponential backoff
@@ -399,7 +405,7 @@ async fn process_pending(
                     .execute(pool)
                     .await?;
 
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {} — retry scheduled", status_code)), trace_id.as_deref()).await?;
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {} — retry scheduled", status_code)), trace_id.as_deref(), Some(&resp_headers)).await?;
                 }
             }
             Err(e) => {
@@ -439,7 +445,7 @@ async fn process_pending(
                         .execute(pool)
                         .await?;
 
-                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref()).await?;
+                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref(), None).await?;
 
                 } else {
                     // Retry
@@ -459,7 +465,7 @@ async fn process_pending(
                     .execute(pool)
                     .await?;
 
-                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref()).await?;
+                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref(), None).await?;
                 }
             }
         }
@@ -522,11 +528,12 @@ async fn record_attempt(
     duration_ms: i32,
     error_message: Option<&str>,
     trace_id: Option<&str>,
+    response_headers: Option<&serde_json::Value>,
 ) -> Result<()> {
     sqlx::query::<sqlx::Postgres>(
         r#"
-        INSERT INTO delivery_attempts (delivery_id, attempt_number, status_code, response_body, duration_ms, error_message, trace_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO delivery_attempts (delivery_id, attempt_number, status_code, response_body, duration_ms, error_message, trace_id, response_headers)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         "#,
     )
     .bind(delivery_id)
@@ -536,6 +543,7 @@ async fn record_attempt(
     .bind(duration_ms)
     .bind(error_message)
     .bind(trace_id)
+    .bind(response_headers)
     .execute(pool)
     .await?;
 
