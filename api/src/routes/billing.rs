@@ -19,6 +19,7 @@ pub fn router() -> Router {
         .route("/upgrade", post(upgrade_plan))
         .route("/portal", post(open_portal))
         .route("/usage", get(get_usage))
+        .route("/invoices", get(get_invoices))
         .route("/webhook", post(handle_stripe_webhook))
         .route("/webhook/polar", post(handle_polar_webhook))
         .route("/webhook/iyzico", post(handle_iyzico_webhook))
@@ -302,6 +303,49 @@ async fn get_usage(
 }
 
 // ──────────────────────────────────────────────────────────────
+// GET /v1/billing/invoices — Invoice history
+// ──────────────────────────────────────────────────────────────
+
+#[derive(Serialize)]
+struct InvoiceResponse {
+    id: String,
+    date: String,
+    amount: f64,
+    status: String,
+    plan: String,
+}
+
+async fn get_invoices(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<Vec<InvoiceResponse>>, AppError> {
+    let rows: Vec<(uuid::Uuid, i32, String, String, String, Option<chrono::DateTime<chrono::Utc>>, chrono::DateTime<chrono::Utc>)> =
+        sqlx::query_as(
+            "SELECT id, amount_cents, currency, status, plan, paid_at, created_at \
+             FROM invoices WHERE customer_id = $1 ORDER BY created_at DESC",
+        )
+        .bind(customer.id)
+        .fetch_all(&pool)
+        .await?;
+
+    let invoices: Vec<InvoiceResponse> = rows
+        .into_iter()
+        .map(|(id, amount_cents, _currency, status, plan, paid_at, created_at)| {
+            let date = paid_at.unwrap_or(created_at);
+            InvoiceResponse {
+                id: id.to_string(),
+                date: date.format("%Y-%m-%d").to_string(),
+                amount: amount_cents as f64 / 100.0,
+                status,
+                plan,
+            }
+        })
+        .collect();
+
+    Ok(Json(invoices))
+}
+
+// ──────────────────────────────────────────────────────────────
 // Webhook handlers for each provider
 // ──────────────────────────────────────────────────────────────
 
@@ -495,19 +539,47 @@ async fn process_webhook_result(
             amount_cents,
             currency,
         } => {
-            sqlx::query(
-                "INSERT INTO payment_transactions \
-                 (customer_id, provider, provider_tx_id, amount_cents, currency, status) \
-                 VALUES ((SELECT id FROM customers WHERE polar_subscription_id IS NOT NULL \
-                          OR iyzico_subscription_id IS NOT NULL LIMIT 1), \
-                         $1, $2, $3, $4, 'completed')"
+            // Look up customer by provider subscription IDs
+            let customer_row: Option<(uuid::Uuid, String)> = sqlx::query_as(
+                "SELECT id, plan FROM customers WHERE \
+                 (polar_subscription_id IS NOT NULL AND $1 = 'polar') OR \
+                 (iyzico_subscription_id IS NOT NULL AND $1 = 'iyzico') \
+                 LIMIT 1"
             )
             .bind(provider)
-            .bind(provider_tx_id)
-            .bind(*amount_cents as i64)
-            .bind(currency)
-            .execute(pool)
+            .fetch_optional(pool)
             .await?;
+
+            if let Some((customer_id, plan)) = customer_row {
+                // Record in payment_transactions
+                sqlx::query(
+                    "INSERT INTO payment_transactions \
+                     (customer_id, provider, provider_tx_id, amount_cents, currency, status) \
+                     VALUES ($1, $2, $3, $4, $5, 'completed')"
+                )
+                .bind(customer_id)
+                .bind(provider)
+                .bind(provider_tx_id)
+                .bind(*amount_cents as i64)
+                .bind(currency)
+                .execute(pool)
+                .await?;
+
+                // Record invoice
+                sqlx::query(
+                    "INSERT INTO invoices \
+                     (customer_id, amount_cents, currency, plan, status, provider, provider_invoice_id, paid_at) \
+                     VALUES ($1, $2, $3, $4, 'paid', $5, $6, now())"
+                )
+                .bind(customer_id)
+                .bind(*amount_cents as i32)
+                .bind(currency)
+                .bind(&plan)
+                .bind(provider)
+                .bind(provider_tx_id)
+                .execute(pool)
+                .await?;
+            }
 
             tracing::info!(
                 "✅ {} payment succeeded: {} ({} {})",
