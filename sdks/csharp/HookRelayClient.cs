@@ -15,7 +15,7 @@ namespace HookRelay
     public class HookRelayConfig
     {
         public string ApiKey { get; set; } = "";
-        public string BaseUrl { get; set; } = "http://localhost:3000/v1";
+        public string BaseUrl { get; set; } = "https://api.hookrelay.io/v1";
         public int Timeout { get; set; } = 30;
     }
 
@@ -187,7 +187,7 @@ namespace HookRelay
         public HookRelayClient(HookRelayConfig config)
         {
             _apiKey = config.ApiKey ?? throw new ArgumentNullException(nameof(config.ApiKey));
-            _baseUrl = (config.BaseUrl ?? "http://localhost:3000/v1").TrimEnd('/');
+            _baseUrl = (config.BaseUrl ?? "https://api.hookrelay.io/v1").TrimEnd('/');
 
             _httpClient = new HttpClient
             {
@@ -241,7 +241,7 @@ namespace HookRelay
             var url = $"{_baseUrl}{path}";
             var request = new HttpRequestMessage(new HttpMethod(method), url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-            request.Headers.Add("User-Agent", "hookrelay-csharp/0.1.0");
+            request.Headers.Add("User-Agent", "hookrelay-csharp/0.2.0");
 
             if (body != null && (method == "POST" || method == "PUT" || method == "PATCH"))
             {
@@ -335,6 +335,14 @@ namespace HookRelay
         {
             var result = await _client.RequestAsync<Dictionary<string, JsonElement>>("DELETE", $"/endpoints/{endpointId}");
             return !result.ContainsKey("deleted") || result["deleted"].GetBoolean();
+        }
+
+        /// <summary>
+        /// Rotate the signing secret for an endpoint.
+        /// </summary>
+        public async Task<Dictionary<string, JsonElement>> RotateSecretAsync(string endpointId)
+        {
+            return await _client.RequestAsync<Dictionary<string, JsonElement>>("POST", $"/endpoints/{endpointId}/rotate-secret");
         }
     }
 
