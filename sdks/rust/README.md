@@ -1,6 +1,6 @@
-# HookRelay Rust SDK
+# HookSniff Rust SDK
 
-Official Rust client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official Rust client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -14,11 +14,11 @@ hooksniff = "0.2.0"
 ## Usage
 
 ```rust
-use hooksniff::HookRelayClient;
+use hooksniff::HookSniffClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = HookRelayClient::new("hr_live_...");
+    let client = HookSniffClient::new("hr_live_...");
 
     // Create endpoint
     let endpoint = client.endpoints()
@@ -63,13 +63,13 @@ if result.valid {
 ## Error Handling
 
 ```rust
-use hooksniff::HookRelayError;
+use hooksniff::HookSniffError;
 
 match client.endpoints().create("https://myapp.com/webhook", None, None).await {
     Ok(endpoint) => println!("Created: {}", endpoint.id),
-    Err(HookRelayError::Validation { message, .. }) => eprintln!("Validation: {}", message),
-    Err(HookRelayError::Authentication { .. }) => eprintln!("Auth failed"),
-    Err(HookRelayError::RateLimit { .. }) => eprintln!("Rate limited"),
+    Err(HookSniffError::Validation { message, .. }) => eprintln!("Validation: {}", message),
+    Err(HookSniffError::Authentication { .. }) => eprintln!("Auth failed"),
+    Err(HookSniffError::RateLimit { .. }) => eprintln!("Rate limited"),
     Err(e) => eprintln!("Error: {}", e),
 }
 ```

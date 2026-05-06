@@ -1,4 +1,4 @@
-# HookRelay — Full Stack (Development)
+# HookSniff — Full Stack (Development)
 # Kullanım: docker compose up
 #
 # Servisler:
@@ -27,7 +27,7 @@ services:
       retries: 10
     restart: unless-stopped
 
-  # ── HookRelay API ──
+  # ── HookSniff API ──
   api:
     build:
       context: .
@@ -51,7 +51,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # ── HookRelay Worker ──
+  # ── HookSniff Worker ──
   worker:
     build:
       context: .

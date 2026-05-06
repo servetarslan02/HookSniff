@@ -1,15 +1,15 @@
-//! # HookRelay Rust SDK
+//! # HookSniff Rust SDK
 //!
-//! Official Rust client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+//! Official Rust client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 //!
 //! ## Usage
 //!
 //! ```rust,no_run
-//! use hooksniff::HookRelayClient;
+//! use hooksniff::HookSniffClient;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let client = HookRelayClient::new("hr_live_...");
+//!     let client = HookSniffClient::new("hr_live_...");
 //!
 //!     // Create endpoint
 //!     let endpoint = client.endpoints()
@@ -37,9 +37,9 @@ type HmacSha256 = Hmac<Sha256>;
 
 // ==================== Error Types ====================
 
-/// HookRelay API error.
+/// HookSniff API error.
 #[derive(Error, Debug)]
-pub enum HookRelayError {
+pub enum HookSniffError {
     #[error("Authentication error: {message}")]
     Authentication { status: u16, message: String },
 
@@ -145,15 +145,15 @@ const DEFAULT_BASE_URL: &str = "https://api.hooksniff.is-a.dev/v1";
 const DEFAULT_TIMEOUT: u64 = 30;
 const USER_AGENT: &str = "hooksniff-rust/0.2.0";
 
-/// HookRelay API client.
-pub struct HookRelayClient {
+/// HookSniff API client.
+pub struct HookSniffClient {
     api_key: String,
     base_url: String,
     http: Client,
 }
 
-impl HookRelayClient {
-    /// Create a new HookRelay client.
+impl HookSniffClient {
+    /// Create a new HookSniff client.
     pub fn new(api_key: &str) -> Self {
         Self {
             api_key: api_key.to_string(),
@@ -183,7 +183,7 @@ impl HookRelayClient {
     }
 
     /// Get platform statistics.
-    pub async fn get_stats(&self) -> Result<Stats, HookRelayError> {
+    pub async fn get_stats(&self) -> Result<Stats, HookSniffError> {
         self.request(reqwest::Method::GET, "/stats", None).await
     }
 
@@ -192,7 +192,7 @@ impl HookRelayClient {
         method: reqwest::Method,
         path: &str,
         body: Option<serde_json::Value>,
-    ) -> Result<T, HookRelayError> {
+    ) -> Result<T, HookSniffError> {
         let url = format!("{}{}", self.base_url, path);
         let mut req = self
             .http
@@ -216,12 +216,12 @@ impl HookRelayClient {
                 .unwrap_or_else(|| format!("HTTP {}", status));
 
             return Err(match status {
-                400 => HookRelayError::Validation { status, message },
-                401 => HookRelayError::Authentication { status, message },
-                404 => HookRelayError::NotFound { status, message },
-                413 => HookRelayError::PayloadTooLarge { status, message },
-                429 => HookRelayError::RateLimit { status, message },
-                _ => HookRelayError::Api { status, message },
+                400 => HookSniffError::Validation { status, message },
+                401 => HookSniffError::Authentication { status, message },
+                404 => HookSniffError::NotFound { status, message },
+                413 => HookSniffError::PayloadTooLarge { status, message },
+                429 => HookSniffError::RateLimit { status, message },
+                _ => HookSniffError::Api { status, message },
             });
         }
 
@@ -234,7 +234,7 @@ impl HookRelayClient {
 
 /// Endpoints CRUD operations.
 pub struct EndpointsResource<'a> {
-    client: &'a HookRelayClient,
+    client: &'a HookSniffClient,
 }
 
 impl<'a> EndpointsResource<'a> {
@@ -244,7 +244,7 @@ impl<'a> EndpointsResource<'a> {
         url: &str,
         description: Option<&str>,
         retry_policy: Option<serde_json::Value>,
-    ) -> Result<Endpoint, HookRelayError> {
+    ) -> Result<Endpoint, HookSniffError> {
         let mut body = serde_json::json!({ "url": url });
         if let Some(desc) = description {
             body["description"] = serde_json::json!(desc);
@@ -258,14 +258,14 @@ impl<'a> EndpointsResource<'a> {
     }
 
     /// Get an endpoint by ID.
-    pub async fn get(&self, endpoint_id: &str) -> Result<Endpoint, HookRelayError> {
+    pub async fn get(&self, endpoint_id: &str) -> Result<Endpoint, HookSniffError> {
         self.client
             .request(reqwest::Method::GET, &format!("/endpoints/{}", endpoint_id), None)
             .await
     }
 
     /// List all endpoints.
-    pub async fn list(&self, page: i32, per_page: i32) -> Result<Vec<Endpoint>, HookRelayError> {
+    pub async fn list(&self, page: i32, per_page: i32) -> Result<Vec<Endpoint>, HookSniffError> {
         self.client
             .request(
                 reqwest::Method::GET,
@@ -276,7 +276,7 @@ impl<'a> EndpointsResource<'a> {
     }
 
     /// Delete an endpoint.
-    pub async fn delete(&self, endpoint_id: &str) -> Result<bool, HookRelayError> {
+    pub async fn delete(&self, endpoint_id: &str) -> Result<bool, HookSniffError> {
         let result: serde_json::Value = self
             .client
             .request(
@@ -292,7 +292,7 @@ impl<'a> EndpointsResource<'a> {
     pub async fn rotate_secret(
         &self,
         endpoint_id: &str,
-    ) -> Result<serde_json::Value, HookRelayError> {
+    ) -> Result<serde_json::Value, HookSniffError> {
         self.client
             .request(
                 reqwest::Method::POST,
@@ -307,7 +307,7 @@ impl<'a> EndpointsResource<'a> {
 
 /// Webhooks operations.
 pub struct WebhooksResource<'a> {
-    client: &'a HookRelayClient,
+    client: &'a HookSniffClient,
 }
 
 impl<'a> WebhooksResource<'a> {
@@ -317,7 +317,7 @@ impl<'a> WebhooksResource<'a> {
         endpoint_id: &str,
         event: &str,
         data: serde_json::Value,
-    ) -> Result<Delivery, HookRelayError> {
+    ) -> Result<Delivery, HookSniffError> {
         let body = serde_json::json!({
             "endpoint_id": endpoint_id,
             "event": event,
@@ -329,7 +329,7 @@ impl<'a> WebhooksResource<'a> {
     }
 
     /// Get a delivery by ID.
-    pub async fn get(&self, delivery_id: &str) -> Result<Delivery, HookRelayError> {
+    pub async fn get(&self, delivery_id: &str) -> Result<Delivery, HookSniffError> {
         self.client
             .request(reqwest::Method::GET, &format!("/webhooks/{}", delivery_id), None)
             .await
@@ -341,7 +341,7 @@ impl<'a> WebhooksResource<'a> {
         status: Option<&str>,
         page: i32,
         per_page: i32,
-    ) -> Result<DeliveryList, HookRelayError> {
+    ) -> Result<DeliveryList, HookSniffError> {
         let mut params = format!("page={}&per_page={}", page, per_page);
         if let Some(s) = status {
             params.push_str(&format!("&status={}", s));
@@ -352,7 +352,7 @@ impl<'a> WebhooksResource<'a> {
     }
 
     /// Replay a delivery.
-    pub async fn replay(&self, delivery_id: &str) -> Result<Delivery, HookRelayError> {
+    pub async fn replay(&self, delivery_id: &str) -> Result<Delivery, HookSniffError> {
         self.client
             .request(
                 reqwest::Method::POST,
@@ -366,7 +366,7 @@ impl<'a> WebhooksResource<'a> {
     pub async fn batch(
         &self,
         webhooks: Vec<serde_json::Value>,
-    ) -> Result<BatchResult, HookRelayError> {
+    ) -> Result<BatchResult, HookSniffError> {
         let body = serde_json::json!({ "webhooks": webhooks });
         self.client
             .request(reqwest::Method::POST, "/webhooks/batch", Some(body))
@@ -374,7 +374,7 @@ impl<'a> WebhooksResource<'a> {
     }
 
     /// Get delivery attempts.
-    pub async fn attempts(&self, delivery_id: &str) -> Result<Vec<DeliveryAttempt>, HookRelayError> {
+    pub async fn attempts(&self, delivery_id: &str) -> Result<Vec<DeliveryAttempt>, HookSniffError> {
         self.client
             .request(
                 reqwest::Method::GET,

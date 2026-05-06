@@ -1,12 +1,12 @@
-# HookRelay Load Tests
+# HookSniff Load Tests
 
-k6-based load testing suite for HookRelay's API, webhook delivery pipeline, and worker throughput.
+k6-based load testing suite for HookSniff's API, webhook delivery pipeline, and worker throughput.
 
 ## Prerequisites
 
 - [k6](https://k6.io/docs/getting-started/installation/) installed
 - Node.js (for the test receiver)
-- HookRelay API running (local or remote)
+- HookSniff API running (local or remote)
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ API_KEY=hr_live_YOUR_KEY k6 run tests/load/k6_worker_throughput.js
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `BASE_URL` | `http://localhost:3000` | HookRelay API base URL |
+| `BASE_URL` | `http://localhost:3000` | HookSniff API base URL |
 | `API_KEY` | _(none)_ | Your `hr_live_*` API key |
 | `RECEIVER_URL` | `http://localhost:8090` | Test webhook receiver URL |
 | `TOTAL_WEBHOOKS` | `10000` | Number of webhooks for throughput test |
@@ -90,7 +90,7 @@ Pre-populates the queue with webhooks, then monitors how fast the worker drains 
 
 ### 4. Test Receiver (`webhook_receiver.js`)
 
-A minimal Node.js HTTP server that accepts webhook POSTs and returns 200. Use this instead of a real endpoint to isolate HookRelay performance from downstream latency.
+A minimal Node.js HTTP server that accepts webhook POSTs and returns 200. Use this instead of a real endpoint to isolate HookSniff performance from downstream latency.
 
 ```bash
 # Start it

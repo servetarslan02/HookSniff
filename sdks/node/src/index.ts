@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 import type {
-  HookRelayConfig,
+  HookSniffConfig,
   Endpoint,
   CreateEndpointRequest,
   Delivery,
@@ -33,7 +33,7 @@ export { WebhookVerifier, verifyWebhook } from "./verify";
 export type { VerificationResult } from "./verify";
 
 export type {
-  HookRelayConfig,
+  HookSniffConfig,
   Endpoint,
   CreateEndpointRequest,
   Delivery,
@@ -61,47 +61,47 @@ export type {
   WebhookVerificationResult,
 };
 
-class HookRelayError extends Error {
+class HookSniffError extends Error {
   public statusCode?: number;
   public errorCode?: string;
 
   constructor(message: string, statusCode?: number, errorCode?: string) {
     super(message);
-    this.name = "HookRelayError";
+    this.name = "HookSniffError";
     this.statusCode = statusCode;
     this.errorCode = errorCode;
   }
 }
 
-export class AuthenticationError extends HookRelayError {
+export class AuthenticationError extends HookSniffError {
   constructor(message = "Unauthorized: invalid or missing API key") {
     super(message, 401, "UNAUTHORIZED");
     this.name = "AuthenticationError";
   }
 }
 
-export class NotFoundError extends HookRelayError {
+export class NotFoundError extends HookSniffError {
   constructor(message = "Resource not found") {
     super(message, 404, "NOT_FOUND");
     this.name = "NotFoundError";
   }
 }
 
-export class RateLimitError extends HookRelayError {
+export class RateLimitError extends HookSniffError {
   constructor(message = "Rate limit exceeded") {
     super(message, 429, "RATE_LIMIT_EXCEEDED");
     this.name = "RateLimitError";
   }
 }
 
-export class ValidationError extends HookRelayError {
+export class ValidationError extends HookSniffError {
   constructor(message = "Bad request") {
     super(message, 400, "BAD_REQUEST");
     this.name = "ValidationError";
   }
 }
 
-export class PayloadTooLargeError extends HookRelayError {
+export class PayloadTooLargeError extends HookSniffError {
   constructor(message = "Payload too large") {
     super(message, 413, "PAYLOAD_TOO_LARGE");
     this.name = "PayloadTooLargeError";
@@ -188,7 +188,7 @@ function mapAttempt(data: any): DeliveryAttempt {
 }
 
 class EndpointsResource {
-  constructor(private client: HookRelay) {}
+  constructor(private client: HookSniff) {}
 
   async create(req: CreateEndpointRequest): Promise<Endpoint> {
     const body: any = { url: req.url };
@@ -237,7 +237,7 @@ class EndpointsResource {
 }
 
 class WebhooksResource {
-  constructor(private client: HookRelay) {}
+  constructor(private client: HookSniff) {}
 
   async send(req: SendWebhookRequest): Promise<Delivery> {
     const body: any = {
@@ -330,13 +330,13 @@ class WebhooksResource {
 }
 
 /**
- * HookRelay API client.
+ * HookSniff API client.
  *
  * @example
  * ```typescript
- * import { HookRelay } from '@hooksniff/sdk';
+ * import { HookSniff } from '@hooksniff/sdk';
  *
- * const client = new HookRelay({ apiKey: 'hr_live_...' });
+ * const client = new HookSniff({ apiKey: 'hr_live_...' });
  *
  * const endpoint = await client.endpoints.create({
  *   url: 'https://myapp.com/webhook',
@@ -351,7 +351,7 @@ class WebhooksResource {
  * ```
  */
 class AiCenterResource {
-  constructor(private client: HookRelay) {}
+  constructor(private client: HookSniff) {}
 
   async status(): Promise<AiStatus> {
     const resp = (await this.client._request("GET", "/ai/status")) as any;
@@ -485,7 +485,7 @@ class AiCenterResource {
   }
 }
 
-export class HookRelay {
+export class HookSniff {
   private apiKey: string;
   private baseUrl: string;
   private timeout: number;
@@ -494,7 +494,7 @@ export class HookRelay {
   public webhooks: WebhooksResource;
   public ai: AiCenterResource;
 
-  constructor(config: HookRelayConfig) {
+  constructor(config: HookSniffConfig) {
     this.apiKey = config.apiKey;
     this.baseUrl = (config.baseUrl || "https://api.hooksniff.is-a.dev/v1").replace(
       /\/$/,
@@ -559,7 +559,7 @@ export class HookRelay {
         case 429:
           throw new RateLimitError(message);
         default:
-          throw new HookRelayError(message, resp.status);
+          throw new HookSniffError(message, resp.status);
       }
     } finally {
       clearTimeout(timeoutId);

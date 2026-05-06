@@ -1,4 +1,4 @@
-# Contributing to HookRelay
+# Contributing to HookSniff
 
 ## Development Setup
 

@@ -1,6 +1,6 @@
-# HookRelay Swift SDK
+# HookSniff Swift SDK
 
-Official Swift client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official Swift client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -19,9 +19,9 @@ Or in Xcode: File → Add Package Dependencies → Enter the repo URL.
 ## Usage
 
 ```swift
-import HookRelay
+import HookSniff
 
-let client = HookRelay(apiKey: "hr_live_...")
+let client = HookSniff(apiKey: "hr_live_...")
 
 // Create endpoint
 let endpoint = try await client.endpoints.create(
@@ -72,7 +72,7 @@ if result.valid {
 ```swift
 do {
     let endpoint = try await client.endpoints.create(url: "https://myapp.com/webhook")
-} catch let error as HookRelayError {
+} catch let error as HookSniffError {
     print("Error \(error.statusCode ?? 0): \(error.message)")
 }
 ```

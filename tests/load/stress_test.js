@@ -1,5 +1,5 @@
 /**
- * HookRelay Load Test — Stress Test
+ * HookSniff Load Test — Stress Test
  * ===================================
  * Yüksek trafik. Sistem limitlerini bulmak için.
  * 500 VUs, 2 dakika süre.

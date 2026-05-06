@@ -1,4 +1,4 @@
-# HookRelay — Deployment Guide
+# HookSniff — Deployment Guide
 
 ## Table of Contents
 
@@ -396,11 +396,11 @@ fly ips list
 
 In the Stripe Dashboard:
 
-1. **Product: HookRelay Pro**
+1. **Product: HookSniff Pro**
    - Price: $49/month recurring
    - Note the Price ID: `price_xxxxx`
 
-2. **Product: HookRelay Business**
+2. **Product: HookSniff Business**
    - Price: $149/month recurring
    - Note the Price ID: `price_yyyyy`
 
@@ -492,7 +492,7 @@ fly dashboard metrics
 
 ### Fly.io Auto-scaling
 
-HookRelay uses Fly.io's auto-scaling:
+HookSniff uses Fly.io's auto-scaling:
 
 ```toml
 [http_service]

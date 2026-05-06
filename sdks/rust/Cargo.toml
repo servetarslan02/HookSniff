@@ -2,7 +2,7 @@
 name = "hooksniff"
 version = "0.2.0"
 edition = "2021"
-description = "Official Rust client for the HookRelay webhook delivery service"
+description = "Official Rust client for the HookSniff webhook delivery service"
 license = "MIT"
 repository = "https://github.com/servetarslan02/hooksniff"
 homepage = "https://hooksniff.is-a.dev"

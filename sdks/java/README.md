@@ -1,6 +1,6 @@
-# HookRelay Java SDK
+# HookSniff Java SDK
 
-Official Java client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official Java client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -27,7 +27,7 @@ import com.hooksniff.*;
 import java.util.*;
 
 // Initialize client
-HookRelayClient client = new HookRelayClient("hr_live_your_api_key_here");
+HookSniffClient client = new HookSniffClient("hr_live_your_api_key_here");
 
 // Create a webhook endpoint
 Endpoint endpoint = client.endpoints().create(
@@ -164,31 +164,31 @@ if (!result.isValid()) {
 ## Error Handling
 
 ```java
-import com.hooksniff.HookRelayException.*;
+import com.hooksniff.HookSniffException.*;
 
 try {
     Delivery delivery = client.webhooks().send("nonexistent", null, Map.of("test", true));
-} catch (HookRelayException.AuthenticationException e) {
+} catch (HookSniffException.AuthenticationException e) {
     System.out.println("Invalid API key");
-} catch (HookRelayException.NotFoundException e) {
+} catch (HookSniffException.NotFoundException e) {
     System.out.println("Endpoint not found");
-} catch (HookRelayException.RateLimitException e) {
+} catch (HookSniffException.RateLimitException e) {
     System.out.println("Rate limit exceeded - try again later");
-} catch (HookRelayException.ValidationException e) {
+} catch (HookSniffException.ValidationException e) {
     System.out.println("Invalid request: " + e.getMessage());
-} catch (HookRelayException.PayloadTooLargeException e) {
+} catch (HookSniffException.PayloadTooLargeException e) {
     System.out.println("Payload exceeds maximum size");
 }
 ```
 
 ## API Reference
 
-### `new HookRelayClient(apiKey)`
+### `new HookSniffClient(apiKey)`
 
 | Constructor | Description |
 |-------------|-------------|
-| `HookRelayClient(String apiKey)` | Default config |
-| `HookRelayClient(String apiKey, String baseUrl, int timeout)` | Custom config |
+| `HookSniffClient(String apiKey)` | Default config |
+| `HookSniffClient(String apiKey, String baseUrl, int timeout)` | Custom config |
 
 ### `client.endpoints()`
 

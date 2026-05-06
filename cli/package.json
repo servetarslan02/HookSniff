@@ -1,7 +1,7 @@
 {
   "name": "hooksniff-cli",
   "version": "0.1.0",
-  "description": "🪝 HookRelay CLI — Manage webhooks from your terminal",
+  "description": "🪝 HookSniff CLI — Manage webhooks from your terminal",
   "main": "index.js",
   "bin": {
     "hooksniff": "./index.js"

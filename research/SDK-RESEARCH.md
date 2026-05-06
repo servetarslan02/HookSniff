@@ -1,4 +1,4 @@
-# 🔍 HookRelay SDK Araştırma Raporu
+# 🔍 HookSniff SDK Araştırma Raporu
 
 > **Tarih:** 2026-05-06
 > **Amaç:** GitHub'daki webhook SDK'larını derinlemesine incelemek, kullanılabilecek kaynakları belirlemek ve entegrasyon planı oluşturmak.
@@ -78,7 +78,7 @@
 
 ---
 
-## 📋 Mevcut HookRelay SDK Durumu
+## 📋 Mevcut HookSniff SDK Durumu
 
 | Dil | API Client | Webhook Verification | Standard Webhooks Uyumlu | Model Sınıfları | Durum |
 |-----|-----------|---------------------|------------------------|----------------|-------|
@@ -98,10 +98,10 @@
 PHP SDK'sında webhook imza doğrulama fonksiyonu yok. Diğer tüm dillerde var.
 
 ### 2. Standard Webhooks Header Uyumsuzluğu
-HookRelay SDK'ları `X-HookSniff-Signature` header'ını kullanıyor ama Standard Webhooks standardı `webhook-id`, `webhook-signature`, `webhook-timestamp` header'larını gerektiriyor. Svix SDK'ları her ikisini de destekliyor (svix-* + webhook-* fallback).
+HookSniff SDK'ları `X-HookSniff-Signature` header'ını kullanıyor ama Standard Webhooks standardı `webhook-id`, `webhook-signature`, `webhook-timestamp` header'larını gerektiriyor. Svix SDK'ları her ikisini de destekliyor (svix-* + webhook-* fallback).
 
 ### 3. Eksik Diller
-| Dil | Svix'te Var | Standard Webhooks'ta Var | HookRelay'de |
+| Dil | Svix'te Var | Standard Webhooks'ta Var | HookSniff'de |
 |-----|------------|------------------------|-------------|
 | **Elixir** | ❌ | ✅ | ❌ |
 | **Swift** | ❌ | ✅ | ❌ |
@@ -112,11 +112,11 @@ HookRelay SDK'ları `X-HookSniff-Signature` header'ını kullanıyor ama Standar
 ### 4. Secret Format Tutarsızlığı
 - Svix: `whsec_` prefix + base64
 - Standard Webhooks: `whsec_` prefix + base64
-- HookRelay: Bazı dillerde `whsec_` desteği var, bazılarında yok
+- HookSniff: Bazı dillerde `whsec_` desteği var, bazılarında yok
 
 ### 5. SDK Feature Karşılaştırması
 
-| Feature | Svix | Standard Webhooks | HookRelay |
+| Feature | Svix | Standard Webhooks | HookSniff |
 |---------|------|------------------|-----------|
 | API Client | ✅ | ❌ | ✅ |
 | Webhook Verification | ✅ | ✅ | ✅ (PHP eksik) |
@@ -149,7 +149,7 @@ HookRelay SDK'ları `X-HookSniff-Signature` header'ını kullanıyor ama Standar
 
 1. **MIT Lisansı**: Kodu kopyalayabilir, değiştirebilir ve ticari olarak kullanabilirsiniz. Lisans metnini korumanız yeterli.
 2. **Apache 2.0**: MIT'e benzer ama patent hakları da sağlar. NOTICES dosyası eklenmeli.
-3. **Svix Kodu Kopyalama**: Svix'in verification kodunu doğrudan kopyalamak yerine, Standard Webhooks spec'ine uygun kendi implementasyonumuzu yazmalıyız. Bu hem yasal riski azaltır hem de HookRelay'e özel optimizasyonlara izin verir.
+3. **Svix Kodu Kopyalama**: Svix'in verification kodunu doğrudan kopyalamak yerine, Standard Webhooks spec'ine uygun kendi implementasyonumuzu yazmalıyız. Bu hem yasal riski azaltır hem de HookSniff'e özel optimizasyonlara izin verir.
 4. **Standard Webhooks Spec**: Bu bir spesifikasyon, kod değil. Spec'e uygun implementasyon yazmak serbest.
 
 ### Önerilen Yaklaşım
@@ -276,4 +276,4 @@ func (e *Endpoint) Delete(ctx, id) error
 
 ---
 
-> 💡 Bu rapor, HookRelay SDK'larının endüstri standartlarına uyumunu sağlamak için bir yol haritası sunmaktadır.
+> 💡 Bu rapor, HookSniff SDK'larının endüstri standartlarına uyumunu sağlamak için bir yol haritası sunmaktadır.

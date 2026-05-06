@@ -66,14 +66,14 @@ let event = Event::builder()
     .build()?;
 ```
 
-## 🔄 HookRelay Entegrasyonu
+## 🔄 HookSniff Entegrasyonu
 
 ### Mevcut Durum
-HookRelay'in `events/cloudevents.rs` dosyası var — muhtemelen kısmi implementasyon.
+HookSniff'in `events/cloudevents.rs` dosyası var — muhtemelen kısmi implementasyon.
 
 ### Karşılaştırma
 
-| Özellik | CloudEvents SDK | HookRelay Mevcut |
+| Özellik | CloudEvents SDK | HookSniff Mevcut |
 |---------|----------------|-----------------|
 | specversion | ✅ v1.0 + v0.3 | ❓ Kontrol et |
 | id | ✅ UUID default | ✅ Var |
@@ -84,7 +84,7 @@ HookRelay'in `events/cloudevents.rs` dosyası var — muhtemelen kısmi implemen
 | Binary content mode | ✅ | ❓ |
 
 ### Tavsiye
-**CloudEvents SDK'yı doğrudan kullanma** — fazla karmaşık ve HookRelay'in scope'u dışında. Bunun yerine:
+**CloudEvents SDK'yı doğrudan kullanma** — fazla karmaşık ve HookSniff'in scope'u dışında. Bunun yerine:
 
 1. CloudEvents **format standardını** takip et (specversion, id, type, source, time)
 2. Mevcut `events/cloudevents.rs`'i bu standarda uygun hale getir

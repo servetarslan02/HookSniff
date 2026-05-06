@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * webhook_receiver.js — Lightweight HTTP server that acts as a webhook endpoint
- * for load testing HookRelay. Accepts POST requests and returns 200.
+ * for load testing HookSniff. Accepts POST requests and returns 200.
  *
  * Usage:
  *   node tests/load/webhook_receiver.js           # default port 8090

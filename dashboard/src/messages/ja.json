@@ -395,7 +395,7 @@
     "noAccount": "アカウントをお持ちでないですか？",
     "hasAccount": "すでにアカウントをお持ちですか？",
     "loginTitle": "おかえりなさい",
-    "loginSubtitle": "HookRelayダッシュボードにログイン",
+    "loginSubtitle": "HookSniffダッシュボードにログイン",
     "signupTitle": "アカウントを作成",
     "signupSubtitle": "Webhookの確実な配信を開始",
     "signIn": "Sign in",
@@ -459,7 +459,7 @@
     "home": "Home"
   },
   "status": {
-    "title": "HookRelay Status",
+    "title": "HookSniff Status",
     "subtitle": "Real-time service health monitoring",
     "autoRefresh": "Auto-refreshes every 30s",
     "lastUpdated": "Last updated: {time}",

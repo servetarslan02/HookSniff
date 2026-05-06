@@ -1,4 +1,4 @@
-//! WebSocket connection handler for HookRelay's real-time gateway.
+//! WebSocket connection handler for HookSniff's real-time gateway.
 //!
 //! Manages individual WebSocket connections: authentication, subscription
 //! filtering, message serialization, heartbeat, and rate limiting.

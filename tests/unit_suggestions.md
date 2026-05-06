@@ -1,6 +1,6 @@
-# HookRelay Unit Test Önerileri
+# HookSniff Unit Test Önerileri
 
-Bu doküman, HookRelay projesinde unit test yazılması gereken modülleri ve spesifik test senaryolarını listeler.
+Bu doküman, HookSniff projesinde unit test yazılması gereken modülleri ve spesifik test senaryolarını listeler.
 
 ---
 

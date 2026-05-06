@@ -1,4 +1,4 @@
-export interface HookRelayConfig {
+export interface HookSniffConfig {
   apiKey: string;
   baseUrl?: string;
   timeout?: number;

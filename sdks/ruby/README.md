@@ -1,6 +1,6 @@
-# HookRelay Ruby SDK
+# HookSniff Ruby SDK
 
-Official Ruby client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official Ruby client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -22,7 +22,7 @@ gem install hooksniff
 require "hooksniff"
 
 # Initialize client
-client = HookRelay::Client.new(api_key: "hr_live_your_api_key_here")
+client = HookSniff::Client.new(api_key: "hr_live_your_api_key_here")
 
 # Create a webhook endpoint
 endpoint = client.endpoints.create(
@@ -127,7 +127,7 @@ post "/webhook" do
   signature = request.env["HTTP_X_HOOKRELAY_SIGNATURE"]
   secret = "whsec_your_endpoint_signing_secret"
 
-  unless HookRelay.verify_signature(payload, signature, secret)
+  unless HookSniff.verify_signature(payload, signature, secret)
     halt 401, { error: "Invalid signature" }.to_json
   end
 
@@ -143,7 +143,7 @@ end
 For Standard Webhooks compatible verification:
 
 ```ruby
-result = HookRelay.verify_webhook(
+result = HookSniff.verify_webhook(
   payload: request.body.read,
   msg_id: request.env["HTTP_WEBHOOK_ID"],
   timestamp: request.env["HTTP_WEBHOOK_TIMESTAMP"],
@@ -167,26 +167,26 @@ begin
     event: "test.event",
     data: { test: true }
   )
-rescue HookRelay::AuthenticationError => e
+rescue HookSniff::AuthenticationError => e
   puts "Invalid API key"
-rescue HookRelay::NotFoundError => e
+rescue HookSniff::NotFoundError => e
   puts "Endpoint not found"
-rescue HookRelay::RateLimitError => e
+rescue HookSniff::RateLimitError => e
   puts "Rate limit exceeded - try again later"
-rescue HookRelay::ValidationError => e
+rescue HookSniff::ValidationError => e
   puts "Invalid request: #{e.message}"
-rescue HookRelay::PayloadTooLargeError => e
+rescue HookSniff::PayloadTooLargeError => e
   puts "Payload exceeds maximum size"
 end
 ```
 
 ## API Reference
 
-### `HookRelay::Client.new(api_key:, base_url: nil, timeout: nil)`
+### `HookSniff::Client.new(api_key:, base_url: nil, timeout: nil)`
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `api_key` | `String` | required | Your HookRelay API key |
+| `api_key` | `String` | required | Your HookSniff API key |
 | `base_url` | `String` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `timeout` | `Integer` | `30` | Request timeout in seconds |
 
@@ -207,11 +207,11 @@ end
 - `.attempts(delivery_id)` → `Array<Hash>`
 - `.export(format: nil, status: nil, date_from: nil, date_to: nil)` → `Array<Hash> | String`
 
-### `HookRelay.verify_signature(payload, signature, secret)` → `Boolean`
+### `HookSniff.verify_signature(payload, signature, secret)` → `Boolean`
 
 Verify a webhook signature using HMAC-SHA256.
 
-### `HookRelay.verify_webhook(payload:, msg_id:, timestamp:, signature_header:, secret:, tolerance_secs: 300)` → `Hash`
+### `HookSniff.verify_webhook(payload:, msg_id:, timestamp:, signature_header:, secret:, tolerance_secs: 300)` → `Hash`
 
 Verify a webhook using Standard Webheaders headers.
 

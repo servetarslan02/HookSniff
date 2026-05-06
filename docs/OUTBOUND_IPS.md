@@ -1,6 +1,6 @@
 # Outbound IP Addresses
 
-HookRelay workers send webhook deliveries from **static IP addresses**. If your infrastructure uses a firewall, WAF, or IP allowlist, you must whitelist these IPs to receive webhooks from HookRelay.
+HookSniff workers send webhook deliveries from **static IP addresses**. If your infrastructure uses a firewall, WAF, or IP allowlist, you must whitelist these IPs to receive webhooks from HookSniff.
 
 ## Static IPs
 
@@ -35,7 +35,7 @@ Add the IPs above to your inbound firewall rules for the ports your webhook rece
 
 ### WAF (Cloudflare, AWS WAF, etc.)
 
-Create an IP access rule or custom WAF rule to allow traffic from HookRelay's outbound IPs.
+Create an IP access rule or custom WAF rule to allow traffic from HookSniff's outbound IPs.
 
 ### Cloud Provider Security Groups
 
@@ -45,9 +45,9 @@ Create an IP access rule or custom WAF rule to allow traffic from HookRelay's ou
 
 ## How to Verify
 
-To confirm that a webhook request came from HookRelay's infrastructure:
+To confirm that a webhook request came from HookSniff's infrastructure:
 
-1. **Check the source IP** — Inspect the `X-Forwarded-For` or remote address of incoming requests from HookRelay.
+1. **Check the source IP** — Inspect the `X-Forwarded-For` or remote address of incoming requests from HookSniff.
 2. **Verify the HMAC signature** — Every webhook includes a `Webhook-Signature` header. Validate it using your endpoint's signing secret (see [Signature Verification](#signature-verification)).
 3. **Call the API** — Query `GET /v1/outbound-ips` to get the current list and compare against incoming traffic.
 
