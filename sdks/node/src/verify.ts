@@ -204,9 +204,15 @@ export function verifyWebhook(
   toleranceSecs?: number
 ): VerificationResult {
   const getHeader = (name: string): string | undefined => {
-    const val = headers[name] || headers[name.toLowerCase()];
-    if (Array.isArray(val)) return val[0];
-    return val;
+    const lower = name.toLowerCase();
+    for (const key of Object.keys(headers)) {
+      if (key.toLowerCase() === lower) {
+        const val = headers[key];
+        if (Array.isArray(val)) return val[0];
+        return val;
+      }
+    }
+    return undefined;
   };
 
   // Try Standard Webhooks headers first, then Svix headers

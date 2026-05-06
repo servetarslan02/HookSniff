@@ -8,6 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -154,14 +155,20 @@ public class WebhookVerification {
      */
     public static VerificationResult verifyWebhookFromHeaders(String payload, Map<String, String> headers,
                                                                String secret, int toleranceSecs) {
-        String msgId = headers.get("webhook-id");
-        String timestamp = headers.get("webhook-timestamp");
-        String signatureHeader = headers.get("webhook-signature");
+        // Normalize header keys to lowercase for case-insensitive lookup
+        Map<String, String> normalized = new HashMap<>();
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            normalized.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
+
+        String msgId = normalized.get("webhook-id");
+        String timestamp = normalized.get("webhook-timestamp");
+        String signatureHeader = normalized.get("webhook-signature");
 
         if (msgId == null || timestamp == null || signatureHeader == null) {
-            msgId = msgId != null ? msgId : headers.get("svix-id");
-            timestamp = timestamp != null ? timestamp : headers.get("svix-timestamp");
-            signatureHeader = signatureHeader != null ? signatureHeader : headers.get("svix-signature");
+            msgId = msgId != null ? msgId : normalized.get("svix-id");
+            timestamp = timestamp != null ? timestamp : normalized.get("svix-timestamp");
+            signatureHeader = signatureHeader != null ? signatureHeader : normalized.get("svix-signature");
         }
 
         return verifyWebhook(payload, msgId, timestamp, signatureHeader, secret, toleranceSecs);
