@@ -1,8 +1,8 @@
 openapi: "3.0.3"
 info:
-  title: HookRelay API
+  title: HookSniff API
   description: |
-    Enterprise webhook delivery service with reliable delivery, retry policies, and monitoring.
+    Reliable webhook delivery service for developers. Send webhooks. We deliver them. Failed? We retry. Simple.
 
     ## Authentication
     All authenticated endpoints require an API key passed as a Bearer token:
@@ -21,13 +21,13 @@ info:
     Replaying a request with the same key within 24 hours returns the cached response.
   version: "0.1.0"
   contact:
-    name: HookRelay Support
-    email: support@hookrelay.is-a.dev
+    name: HookSniff Support
+    email: support@hooksniff.is-a.dev
   license:
     name: MIT
 
 servers:
-  - url: https://api.hookrelay.is-a.dev/v1
+  - url: https://api.hooksniff.is-a.dev/v1
     description: Production
   - url: http://localhost:3000/v1
     description: Local development
@@ -1003,7 +1003,7 @@ paths:
                     example: "ok"
                   service:
                     type: string
-                    example: "hookrelay-api"
+                    example: "hooksniff-api"
                   version:
                     type: string
                     example: "0.1.0"

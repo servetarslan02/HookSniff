@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="hookrelay",
+    name="hooksniff",
     version="0.4.0",
-    description="Official Python client for HookRelay webhook delivery service",
+    description="Official Python client for HookSniff webhook delivery service",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    author="HookRelay",
-    author_email="support@hookrelay.io",
-    url="https://github.com/hookrelay/hookrelay",
+    author="HookSniff",
+    author_email="support@hooksniff.io",
+    url="https://github.com/hooksniff/hooksniff",
     license="MIT",
     packages=find_packages(),
     python_requires=">=3.8",

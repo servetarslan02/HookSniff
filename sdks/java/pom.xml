@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.hookrelay</groupId>
-    <artifactId>hookrelay-sdk</artifactId>
+    <groupId>com.hooksniff</groupId>
+    <artifactId>hooksniff-sdk</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
 
-    <name>HookRelay Java SDK</name>
-    <description>Official Java client for HookRelay webhook delivery service</description>
-    <url>https://github.com/hookrelay/hookrelay-java</url>
+    <name>HookSniff Java SDK</name>
+    <description>Official Java client for HookSniff webhook delivery service</description>
+    <url>https://github.com/hooksniff/hooksniff-java</url>
 
     <licenses>
         <license>
