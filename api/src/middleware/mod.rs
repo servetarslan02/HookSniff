@@ -182,10 +182,10 @@ mod tests {
     }
 
     #[test]
-    fn test_api_key_hashing() {
+    fn test_api_key_hashing_and_verification() {
         let key = "hr_live_test123";
-        let hash1 = hash_api_key(key);
-        let hash2 = hash_api_key(key);
-        assert_eq!(hash1, hash2);
+        let hash = hash_api_key(key);
+        assert!(verify_api_key(key, &hash));
+        assert!(!verify_api_key("hr_live_wrong", &hash));
     }
 }
