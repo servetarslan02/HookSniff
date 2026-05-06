@@ -496,7 +496,7 @@ export class HookRelay {
 
   constructor(config: HookRelayConfig) {
     this.apiKey = config.apiKey;
-    this.baseUrl = (config.baseUrl || "https://api.hookrelay.io/v1").replace(
+    this.baseUrl = (config.baseUrl || "https://api.hookrelay.is-a.dev/v1").replace(
       /\/$/,
       ""
     );

@@ -61,18 +61,18 @@ See **[FREE_TIER_SETUP.md](FREE_TIER_SETUP.md)** for a complete guide to deployi
 
 ```bash
 # Register
-curl -X POST https://api.hookrelay.io/v1/auth/register \
+curl -X POST https://api.hookrelay.is-a.dev/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email": "you@example.com", "password": "your-password"}'
 
 # Create endpoint
-curl -X POST https://api.hookrelay.io/v1/endpoints \
+curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://your-app.com/webhook"}'
 
 # Send webhook
-curl -X POST https://api.hookrelay.io/v1/webhooks \
+curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"endpoint_id": "YOUR_ENDPOINT_ID", "event": "order.created", "data": {"order_id": "12345"}}'
@@ -151,7 +151,7 @@ Enterprise customers can whitelist HookRelay's static outbound IPs in their fire
 Programmatically fetch current IPs:
 
 ```bash
-curl https://api.hookrelay.io/v1/outbound-ips
+curl https://api.hookrelay.is-a.dev/v1/outbound-ips
 # → { "ips": ["..."], "updated_at": "..." }
 ```
 

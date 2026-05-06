@@ -173,7 +173,7 @@ function DashboardPreview() {
           </div>
           <div className="flex-1 mx-4">
             <div className="bg-white dark:bg-slate-700 rounded-md px-3 py-1 text-xs text-gray-500 dark:text-slate-400 font-mono">
-              dashboard.hookrelay.io
+              hookrelay.is-a.dev
             </div>
           </div>
         </div>
@@ -340,13 +340,13 @@ export default function Home() {
           </div>
           <pre className="p-6 text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-900">
             <code>{`# Create an endpoint
-curl -X POST https://api.hookrelay.io/v1/endpoints \\
+curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"url": "https://myapp.com/webhook"}'
 
 # Send a webhook
-curl -X POST https://api.hookrelay.io/v1/webhooks \\
+curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"endpoint_id": "ep_abc123", "event": "order.created", "data": {"order_id": "12345"}}'`}</code>

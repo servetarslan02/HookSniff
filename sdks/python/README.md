@@ -1,6 +1,6 @@
 # HookRelay Python SDK
 
-Official Python client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+Official Python client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -180,7 +180,7 @@ except PayloadTooLargeError:
 
 ## API Reference
 
-### `HookRelayClient(api_key, base_url="https://api.hookrelay.io/v1", timeout=30)`
+### `HookRelayClient(api_key, base_url="https://api.hookrelay.is-a.dev/v1", timeout=30)`
 
 Main client class.
 

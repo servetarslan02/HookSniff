@@ -23,7 +23,7 @@ pub struct CloudEvent {
     pub event_type: String,
 
     /// Event source — identifies the context in which the event originated.
-    /// Example: `https://api.hookrelay.dev`
+    /// Example: `https://api.hookrelay.is-a.dev`
     pub source: String,
 
     /// Unique event ID.
@@ -89,7 +89,7 @@ impl CloudEvent {
     ) -> Self {
         let mut ce = Self::new(
             event_type,
-            "https://api.hookrelay.dev",
+            "https://api.hookrelay.is-a.dev",
             Some(payload),
         );
         ce.id = delivery_id.to_string();
@@ -172,13 +172,13 @@ mod tests {
     fn test_cloud_event_creation() {
         let ce = CloudEvent::new(
             "com.hookrelay.delivery.completed",
-            "https://api.hookrelay.dev",
+            "https://api.hookrelay.is-a.dev",
             Some(serde_json::json!({"delivery_id": "del_123"})),
         );
 
         assert_eq!(ce.specversion, "1.0");
         assert_eq!(ce.event_type, "com.hookrelay.delivery.completed");
-        assert_eq!(ce.source, "https://api.hookrelay.dev");
+        assert_eq!(ce.source, "https://api.hookrelay.is-a.dev");
         assert!(!ce.id.is_empty());
         assert!(!ce.time.is_empty());
         assert!(ce.validate().is_ok());
@@ -204,7 +204,7 @@ mod tests {
     fn test_cloud_event_json_roundtrip() {
         let ce = CloudEvent::new(
             "com.hookrelay.endpoint.created",
-            "https://api.hookrelay.dev",
+            "https://api.hookrelay.is-a.dev",
             Some(serde_json::json!({"url": "https://example.com/hook"})),
         );
 

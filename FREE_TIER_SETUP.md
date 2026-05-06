@@ -255,14 +255,14 @@ REDIS_URL=rediss://default:...@xxx.upstash.io:6379
    - Framework: `Next.js` (auto-detected)
    - Root Directory: `dashboard`
 4. **Configure environment variables:**
-   - `NEXT_PUBLIC_API_URL` = `https://api.hookrelay.io/v1` (your Oracle Cloud API URL)
+   - `NEXT_PUBLIC_API_URL` = `https://api.hookrelay.is-a.dev/v1` (your Oracle Cloud API URL)
 5. **Deploy:** Click **Deploy** — Vercel builds and deploys automatically on every push to `main`
 
 ### Environment Variables
 
 ```env
 # Set in Vercel Dashboard → Settings → Environment Variables
-NEXT_PUBLIC_API_URL=https://api.hookrelay.io/v1
+NEXT_PUBLIC_API_URL=https://api.hookrelay.is-a.dev/v1
 ```
 
 ### Gotchas
@@ -399,7 +399,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
    - Copy the key (starts with `re_`)
 4. **Add your domain** (optional but recommended):
    - Go to **Domains** → **Add Domain**
-   - Enter your domain (e.g., `hookrelay.io`)
+   - Enter your domain (e.g., `hookrelay.is-a.dev`)
    - Add the DNS records (SPF, DKIM, DMARC) to your Cloudflare DNS
    - Wait for verification (~5 minutes)
 5. **Test:**
@@ -407,7 +407,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
    curl -X POST https://api.resend.com/emails \
      -H "Authorization: Bearer re_YOUR_API_KEY" \
      -H "Content-Type: application/json" \
-     -d '{"from": "noreply@hookrelay.io", "to": "you@example.com", "subject": "Test", "html": "<p>Hello!</p>"}'
+     -d '{"from": "noreply@hookrelay.is-a.dev", "to": "you@example.com", "subject": "Test", "html": "<p>Hello!</p>"}'
    ```
 
 ### Environment Variables
@@ -415,7 +415,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 ```env
 RESEND_API_KEY=re_YOUR_API_KEY
 NOTIFY_EMAIL=admin@example.com
-NOTIFY_EMAIL_FROM=noreply@hookrelay.io
+NOTIFY_EMAIL_FROM=noreply@hookrelay.is-a.dev
 ```
 
 ### Gotchas
@@ -459,14 +459,14 @@ NOTIFY_EMAIL_FROM=noreply@hookrelay.io
    - Go to **SSL/TLS** → **Origin Server** → **Create Certificate**
    - Install the certificate on your Oracle Cloud VM (Nginx/Caddy)
 8. **Page Rules** (optional):
-   - Cache everything for dashboard: `dashboard.hookrelay.io/*` → Cache Level: Cache Everything
+   - Cache everything for dashboard: `hookrelay.is-a.dev/*` → Cache Level: Cache Everything
 
 ### Environment Variables
 
 ```env
 # Set in .env on Oracle Cloud
-CORS_ORIGINS=https://dashboard.hookrelay.io,https://hookrelay.io
-APP_URL=https://dashboard.hookrelay.io
+CORS_ORIGINS=https://hookrelay.is-a.dev,https://hookrelay.is-a.dev
+APP_URL=https://hookrelay.is-a.dev
 ```
 
 ### Gotchas
@@ -475,7 +475,7 @@ APP_URL=https://dashboard.hookrelay.io
 - **Full (Strict) SSL** requires an origin certificate on your VM. Without it, use "Full" (not strict).
 - **Free plan** includes DDoS protection — no need to upgrade for security.
 - **Orange cloud** (proxied) vs **Grey cloud** (DNS only): Keep API and dashboard proxied for SSL and caching.
-- **API caching:** Be careful with Cloudflare's default caching. API responses shouldn't be cached — add a Page Rule for `api.hookrelay.io/*` with Cache Level: Bypass.
+- **API caching:** Be careful with Cloudflare's default caching. API responses shouldn't be cached — add a Page Rule for `api.hookrelay.is-a.dev/*` with Cache Level: Bypass.
 
 ---
 
@@ -510,10 +510,10 @@ MAX_PAYLOAD_BYTES=1048576
 RETENTION_DAYS=7
 
 # ── CORS ──
-CORS_ORIGINS=https://dashboard.hookrelay.io
+CORS_ORIGINS=https://hookrelay.is-a.dev
 
 # ── App URL (for Stripe redirects) ──
-APP_URL=https://dashboard.hookrelay.io
+APP_URL=https://hookrelay.is-a.dev
 
 # ── Stripe (optional) ──
 STRIPE_SECRET_KEY=sk_live_...
@@ -524,7 +524,7 @@ STRIPE_PRICE_BUSINESS=price_...
 # ── Email (Resend) ──
 RESEND_API_KEY=re_...
 NOTIFY_EMAIL=admin@example.com
-NOTIFY_EMAIL_FROM=noreply@hookrelay.io
+NOTIFY_EMAIL_FROM=noreply@hookrelay.is-a.dev
 
 # ── Storage (Cloudflare R2) ──
 R2_ACCOUNT_ID=your_cf_account_id

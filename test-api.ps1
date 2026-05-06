@@ -25,7 +25,7 @@ Write-Host ""
 Write-Host "2️⃣  Test kullanıcısı oluşturuluyor..." -ForegroundColor Yellow
 try {
     $register = Invoke-RestMethod -Uri "$BASE/auth/register" -Method POST -Headers $HEADERS -Body (@{
-        email = "test@hookrelay.dev"
+        email = "test@hookrelay.is-a.dev"
         password = "Test1234!"
     } | ConvertTo-Json)
     $TOKEN = $register.token
@@ -35,7 +35,7 @@ try {
     Write-Host "   ⚠️  Kayıt hatası (zaten var olabilir), login deneniyor..." -ForegroundColor Yellow
     try {
         $login = Invoke-RestMethod -Uri "$BASE/auth/login" -Method POST -Headers $HEADERS -Body (@{
-            email = "test@hookrelay.dev"
+            email = "test@hookrelay.is-a.dev"
             password = "Test1234!"
         } | ConvertTo-Json)
         $TOKEN = $login.token

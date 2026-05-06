@@ -1,6 +1,6 @@
 # HookRelay Rust SDK
 
-Official Rust client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+Official Rust client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 
 ## Installation
 

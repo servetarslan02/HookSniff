@@ -1,11 +1,11 @@
 /**
  * HookRelay Embeddable Portal Widget
  * 
- * Usage: <script src="embed.js" data-api-key="YOUR_API_KEY" data-api-url="https://api.hookrelay.com" data-theme="dark"></script>
+ * Usage: <script src="embed.js" data-api-key="YOUR_API_KEY" data-api-url="https://api.hookrelay.is-a.dev" data-theme="dark"></script>
  * 
  * Attributes:
  *   data-api-key   (required) — Customer API key
- *   data-api-url   (optional) — API base URL (default: https://api.hookrelay.com)
+ *   data-api-url   (optional) — API base URL (default: https://api.hookrelay.is-a.dev)
  *   data-theme     (optional) — "dark" or "light" (default: "dark")
  *   data-height    (optional) — Widget height (default: "600px")
  *   data-width     (optional) — Widget width  (default: "100%")
@@ -20,7 +20,7 @@
   })();
 
   var API_KEY  = SCRIPT_TAG.getAttribute("data-api-key");
-  var API_URL  = SCRIPT_TAG.getAttribute("data-api-url") || "https://api.hookrelay.com";
+  var API_URL  = SCRIPT_TAG.getAttribute("data-api-url") || "https://api.hookrelay.is-a.dev";
   var THEME    = SCRIPT_TAG.getAttribute("data-theme")    || "dark";
   var HEIGHT   = SCRIPT_TAG.getAttribute("data-height")   || "600px";
   var WIDTH    = SCRIPT_TAG.getAttribute("data-width")    || "100%";

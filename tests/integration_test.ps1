@@ -18,7 +18,7 @@
 # ---------------------------------------------------------------------------
 $BaseUrl = $env:HOOKRELAY_BASE_URL ?? "http://localhost:3000"
 $ApiBase = "$BaseUrl/v1"
-$TestEmail = "integration-test-$(Get-Date -UFormat '%s')@hookrelay.dev"
+$TestEmail = "integration-test-$(Get-Date -UFormat '%s')@hookrelay.is-a.dev"
 $TestPassword = "TestPass1234!"
 
 # Test counters

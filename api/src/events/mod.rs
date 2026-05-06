@@ -107,7 +107,7 @@ pub fn endpoint_event(
     endpoint_id: &str,
     data: serde_json::Value,
 ) -> CloudEvent {
-    let mut ce = CloudEvent::new(event_type, "https://api.hookrelay.dev", Some(data));
+    let mut ce = CloudEvent::new(event_type, "https://api.hookrelay.is-a.dev", Some(data));
     ce.subject = Some(endpoint_id.to_string());
     ce
 }
@@ -117,7 +117,7 @@ pub fn security_event(
     event_type: &str,
     data: serde_json::Value,
 ) -> CloudEvent {
-    CloudEvent::new(event_type, "https://api.hookrelay.dev/security", Some(data))
+    CloudEvent::new(event_type, "https://api.hookrelay.is-a.dev/security", Some(data))
 }
 
 #[cfg(test)]

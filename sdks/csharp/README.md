@@ -1,6 +1,6 @@
 # HookRelay C# SDK
 
-Official C# client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+Official C# client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -201,7 +201,7 @@ catch (PayloadTooLargeException)
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `ApiKey` | `string` | required | Your HookRelay API key |
-| `BaseUrl` | `string` | `https://api.hookrelay.io/v1` | API base URL |
+| `BaseUrl` | `string` | `https://api.hookrelay.is-a.dev/v1` | API base URL |
 | `Timeout` | `int` | `30` | Request timeout in seconds |
 
 ### `client.Endpoints`
