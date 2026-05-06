@@ -36,6 +36,15 @@
 - [ ] .env.production güncelle (tüm credentials)
 - [ ] End-to-end test (webhook gönder → teslim et)
 
+### 2. Ödeme Sistemi (Bu Hafta)
+- [x] Polar.sh hesap açıldı (bireysel, Türkiye) ✅
+- [x] Pro plan oluşturuldu ($49/ay) ✅
+- [x] Business plan oluşturuldu ($149/ay) ✅
+- [x] Polar.sh webhook URL kaydedildi ✅
+- [ ] iyzico hesabı aç (merchant.iyzipay.com)
+- [ ] Wise Business hesabı aç (para çekme için)
+- [ ] Polar.sh + iyzico webhook test et
+
 ### 2. Test ve Doğrulama (Bu Hafta)
 - [ ] Production'da webhook gönderme test et
 - [ ] Dashboard açılıyor mu kontrol et (Vercel URL)
