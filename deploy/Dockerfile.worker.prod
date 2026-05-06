@@ -15,22 +15,18 @@ WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
-COPY ai-center/ ai-center/
 
 # Dependency cache oluştur
 RUN mkdir -p api/src && \
     echo "fn main() {}" > api/src/main.rs && \
     mkdir -p worker/src && \
     echo "fn main() {}" > worker/src/main.rs && \
-    mkdir -p ai-center/src && \
-    echo "fn main() {}" > ai-center/src/main.rs && \
     cargo build --release -p hookrelay-worker 2>/dev/null || true && \
-    rm -rf api/src worker/src ai-center/src
+    rm -rf api/src worker/src
 
 # Asıl kaynak kodlarını kopyala ve derle
 COPY api/src/ api/src/
 COPY worker/src/ worker/src/
-COPY ai-center/src/ ai-center/src/
 
 # Release build
 RUN cargo build --release -p hookrelay-worker && \

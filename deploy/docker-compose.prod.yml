@@ -11,8 +11,8 @@ services:
   # Webhook alımı, yönetim API'si, sağlık kontrolü
   api:
     build:
-      context: .
-      dockerfile: Dockerfile.api.prod
+      context: ..
+      dockerfile: deploy/Dockerfile.api.prod
     container_name: hookrelay-api
     ports:
       - "3000:3000"
@@ -49,8 +49,8 @@ services:
   # Webhook teslimatı, retry mekanizması, fan-out
   worker:
     build:
-      context: .
-      dockerfile: Dockerfile.worker.prod
+      context: ..
+      dockerfile: deploy/Dockerfile.worker.prod
     container_name: hookrelay-worker
     env_file:
       - .env

@@ -315,7 +315,6 @@ migrations/
 ├── 001_init.sql           # Core tables (customers, endpoints, deliveries)
 ├── 002_api_keys.sql       # API keys table
 ├── 003_delivery_attempts.sql  # Delivery attempt tracking
-├── 004_ai_center.sql      # AI center tables
 └── 005_alerts.sql         # Alert rules
 ```
 

@@ -95,7 +95,6 @@ kubectl apply -f k8s/
 ## 5. Dashboard
 
 ### AI Merkezi Paneli
-- URL: `http://localhost:3001/dashboard/ai-center`
 - Özellikler:
   - Durum kartları (aktif olaylar, kritik, risk skoru)
   - Olay tablosu (tüm AI olayları)
@@ -195,7 +194,6 @@ DELETE /v1/ai/blocklist/{id}
 ### AI Center çalışmıyor
 ```bash
 # Logları kontrol et
-docker logs hookrelay-ai-center
 
 # Veritabanı bağlantısını test et
 psql $DATABASE_URL -c "SELECT 1"

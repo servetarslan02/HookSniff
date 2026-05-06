@@ -82,7 +82,6 @@
 | `/billing/*` | `billing.rs` | Stripe integration, usage, portal |
 | `/endpoint-health/*` | `health_endpoints.rs` | Health monitoring |
 | `/stats` | `stats.rs` | Delivery statistics |
-| `/ai/*` | `ai_center.rs` | AI anomaly detection, actions, blocklist |
 | `/alerts/*` | `alerts.rs` | Alert rules CRUD |
 | `/search` | `search.rs` | Webhook log search |
 
@@ -136,7 +135,6 @@ worker/src/delivery/
 - AI Center (anomaly detection, actions, blocklist)
 - Playground (webhook tester)
 
-### AI Center (`ai-center/`)
 
 Autonomous management system for anomaly detection and automated remediation.
 
