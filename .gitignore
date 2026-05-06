@@ -28,3 +28,4 @@ Thumbs.db
 
 # Production secrets
 .env.production
+.vercel

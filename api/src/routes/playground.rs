@@ -7,6 +7,7 @@ use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
+use uuid::Uuid;
 
 pub fn router() -> Router {
     Router::new()
@@ -117,12 +118,29 @@ async fn test_webhook(
         "source": "hooksniff-playground"
     });
 
+    let payload_str = serde_json::to_string(&payload).unwrap_or_default();
+    let msg_id = Uuid::new_v4().to_string();
+    let timestamp = chrono::Utc::now().timestamp().to_string();
+
+    // Compute Standard Webhooks signature
+    let signature = crate::signing::compute_standard_signature(
+        &endpoint.signing_secret,
+        &msg_id,
+        &timestamp,
+        &payload_str,
+    );
+
     let start = std::time::Instant::now();
     let result = client
         .post(&endpoint.url)
         .header("Content-Type", "application/json")
+        // Standard Webhooks headers
+        .header("webhook-id", &msg_id)
+        .header("webhook-timestamp", &timestamp)
+        .header("webhook-signature", &signature)
+        // Test marker
         .header("X-HookSniff-Test", "true")
-        .json(&payload)
+        .body(payload_str)
         .send()
         .await;
 

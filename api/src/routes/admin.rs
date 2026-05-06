@@ -197,7 +197,12 @@ async fn list_users(
     let mut count_query = sqlx::query_as::<_, (i64,)>(&count_query);
 
     if let Some(ref search) = params.search {
-        let pattern = format!("%{}%", search);
+        // Escape ILIKE special characters (%, _, \)
+        let escaped = search
+            .replace('\\', "\\\\")
+            .replace('%', "\\%")
+            .replace('_', "\\_");
+        let pattern = format!("%{}%", escaped);
         users_query = users_query.bind(&pattern);
         count_query = count_query.bind(&pattern);
     }
@@ -324,7 +329,7 @@ async fn change_plan(
     };
 
     let result = sqlx::query(
-        "UPDATE customers SET plan = $1, webhook_limit = $2 WHERE id = $3",
+        "UPDATE customers SET plan = $1, webhook_limit = $2, webhook_count = 0 WHERE id = $3",
     )
     .bind(&req.plan)
     .bind(limit)

@@ -67,7 +67,7 @@ async fn register(
     let password_hash = jwt::hash_password(&password)?;
 
     let customer = sqlx::query_as::<_, Customer>(
-        "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash, name) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash, name, is_active) VALUES ($1, $2, $3, $4, $5, true) RETURNING *",
     )
     .bind(&req.email)
     .bind(&api_key_hash)
