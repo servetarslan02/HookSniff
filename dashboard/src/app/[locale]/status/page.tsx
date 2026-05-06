@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 // ─── Types ───
 interface ComponentStatus {
@@ -408,6 +409,9 @@ export default function StatusPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-10">

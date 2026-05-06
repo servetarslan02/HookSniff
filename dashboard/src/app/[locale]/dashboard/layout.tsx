@@ -128,6 +128,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             </h1>
           </div>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher />
             <NotificationCenter />
             <div className="text-sm text-gray-500 dark:text-slate-400 hidden sm:block">
               {user?.email || 'User'}

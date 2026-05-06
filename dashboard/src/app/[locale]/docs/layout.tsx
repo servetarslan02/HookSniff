@@ -3,6 +3,7 @@
 import { Link, usePathname } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import Footer from '@/components/Footer';
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
@@ -29,6 +30,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <span className="text-sm text-gray-400 dark:text-slate-500 ml-2">Docs</span>
           </Link>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher />
             <Link href="/dashboard" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
               {tc('nav.dashboard')}
             </Link>
