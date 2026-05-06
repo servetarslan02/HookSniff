@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: "HookRelay"
+  - name: "HookSniff"
     orgId: 1
-    folder: "HookRelay"
+    folder: "HookSniff"
     type: file
     disableDeletion: false
     updateIntervalSeconds: 30

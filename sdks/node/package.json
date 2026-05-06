@@ -1,7 +1,7 @@
 {
   "name": "@hooksniff/sdk",
   "version": "0.2.0",
-  "description": "Official Node.js client for HookRelay webhook delivery service",
+  "description": "Official Node.js client for HookSniff webhook delivery service",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": ["webhooks", "hooksniff", "sdk", "delivery"],
-  "author": "HookRelay",
+  "author": "HookSniff",
   "license": "MIT",
   "engines": {
     "node": ">=16"

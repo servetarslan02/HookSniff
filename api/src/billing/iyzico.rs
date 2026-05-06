@@ -1,4 +1,4 @@
-//! iyzico billing integration for HookRelay.
+//! iyzico billing integration for HookSniff.
 //!
 //! iyzico is a Turkish payment provider with:
 //! - 3D Secure credit/debit card payments
@@ -340,7 +340,7 @@ impl PaymentProviderImpl for IyzicoProvider {
             },
             basket_items: vec![BasketItem {
                 id: format!("plan-{}", plan.as_str()),
-                name: format!("HookRelay {} Plan", plan.as_str().to_uppercase()),
+                name: format!("HookSniff {} Plan", plan.as_str().to_uppercase()),
                 category1: "Software".to_string(),
                 item_type: "VIRTUAL".to_string(),
                 price: price_str,
@@ -439,7 +439,7 @@ impl PaymentProviderImpl for IyzicoProvider {
         // iyzico doesn't have a customer portal.
         // We redirect to our own billing dashboard.
         Err(AppError::BadRequest(
-            "iyzico does not have a customer portal. Manage your subscription from the HookRelay dashboard.".into()
+            "iyzico does not have a customer portal. Manage your subscription from the HookSniff dashboard.".into()
         ))
     }
 

@@ -1,4 +1,4 @@
-//! Delivery router for HookRelay.
+//! Delivery router for HookSniff.
 //!
 //! Routes webhook events to the appropriate delivery mechanism.
 //! Currently supports HTTP delivery only.

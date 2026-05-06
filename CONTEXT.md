@@ -1,4 +1,4 @@
-# 🧠 HookRelay — Development Context
+# 🧠 HookSniff — Development Context
 
 > Bu dosya AI助手 için sürekli güncellenen bir hafıza dosyasıdır.
 > Yeni oturumda bu dosyayı okuyarak projenin durumunu ve konuşulanları hatırlayabilirsin.
@@ -11,12 +11,12 @@
 
 - **Geliştirici:** Servet
 - **Konum:** Türkiye
-- **Hedef:** HookRelay'ı bireysel olarak satmak, şirket kurmadan başlamak
+- **Hedef:** HookSniff'ı bireysel olarak satmak, şirket kurmadan başlamak
 - **Gelir hedefi:** $500/ay gelir gördüğünde şirket kur
 - **Çalışma durumu:** Bireysel / Part-time
 - **Deneyim:** Bu işe ilk defa giriyor, bilgisi sınırlı
 
-## 🪝 HookRelay Nedir?
+## 🪝 HookSniff Nedir?
 
 Webhook delivery servisi. Geliştiricilere yönelik.
 - Gönder, teslim edelim. Başarısız olursa tekrar deneyelim. Basit.
@@ -25,7 +25,7 @@ Webhook delivery servisi. Geliştiricilere yönelik.
 
 ## 🆓 Free-Tier Altyapı Migrasyonu (2026-05-06)
 
-HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
+HookSniff artık tamamen ücretsiz servisler üzerinde çalışıyor:
 
 | Servis | Amaç | Free Tier |
 |--------|------|-----------|
@@ -195,7 +195,7 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 ## 📝 Konuşulan Konular (2026-05-06)
 
 1. Tanışma ve proje tanıtımı
-2. HookRelay iş planı paylaşıldı
+2. HookSniff iş planı paylaşıldı
 3. GitHub repo private yapıldı
 4. Repo kodları incelendi — teknik yapı değerlendirildi
 5. Rakip analizi (Svix, Hookdeck, Convoy, Hook0, Hostedhooks)

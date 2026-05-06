@@ -1,4 +1,4 @@
-# HookRelay Monitoring Stack
+# HookSniff Monitoring Stack
 # Usage: docker compose -f docker-compose.monitoring.yml up -d
 
 services:

@@ -25,7 +25,7 @@ docker pull grafana/k6
 ### Against local development
 
 ```bash
-# Make sure HookRelay is running locally first
+# Make sure HookSniff is running locally first
 cd /root/.openclaw/workspace/hooksniff
 k6 run tests/load/k6_load_test.js
 ```

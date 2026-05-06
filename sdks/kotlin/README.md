@@ -1,6 +1,6 @@
-# HookRelay Kotlin SDK
+# HookSniff Kotlin SDK
 
-Official Kotlin client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official Kotlin client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -36,7 +36,7 @@ dependencies {
 import com.hooksniff.*
 
 fun main() {
-    val client = HookRelayClient("hr_live_...")
+    val client = HookSniffClient("hr_live_...")
 
     // Create endpoint
     val endpoint = client.endpoints().create(

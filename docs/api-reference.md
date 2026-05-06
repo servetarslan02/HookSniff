@@ -1,4 +1,4 @@
-# HookRelay API Reference
+# HookSniff API Reference
 
 **Base URL:** `https://api.hooksniff.is-a.dev/v1`
 **Local:** `http://localhost:3000/v1`
@@ -735,7 +735,7 @@ The AI Center provides anomaly detection, risk scoring, and automated remediatio
 
 ## Webhook Delivery Format
 
-When HookRelay delivers a webhook to your endpoint:
+When HookSniff delivers a webhook to your endpoint:
 
 ```http
 POST https://myapp.com/webhook HTTP/1.1
@@ -794,7 +794,7 @@ func verifySignature(payload []byte, signature, secret string) bool {
 
 ### Your Endpoint Should
 
-1. Return `2xx` for success (HookRelay marks as `delivered`)
+1. Return `2xx` for success (HookSniff marks as `delivered`)
 2. Return `4xx`/`5xx` or timeout → retry with exponential backoff
 3. Verify the signature before processing
 4. Respond within 30 seconds (default timeout)

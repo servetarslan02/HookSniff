@@ -1,7 +1,7 @@
-# HookRelay — Repo Analiz Özeti
+# HookSniff — Repo Analiz Özeti
 
 ## 📅 Tarih: 2026-05-06
-## 🎯 Amaç: Açık kaynak repolardan HookRelay'e entegre edilebilecek kod/pattern'leri belirleme
+## 🎯 Amaç: Açık kaynak repolardan HookSniff'e entegre edilebilecek kod/pattern'leri belirleme
 
 ---
 
@@ -21,7 +21,7 @@
 ## 🔍 Analiz Sonuçları
 
 ### 1. signing.rs — Zaten Uyumlu! ✅
-HookRelay'in `signing.rs` dosyası **Standard Webhooks spesifikasyonuna tam uyumlu**:
+HookSniff'in `signing.rs` dosyası **Standard Webhooks spesifikasyonuna tam uyumlu**:
 - ✅ `whsec_` prefix ile secret
 - ✅ `msg_id.timestamp.payload` formatı
 - ✅ HMAC-SHA256 + base64
@@ -40,7 +40,7 @@ HookRelay'in `signing.rs` dosyası **Standard Webhooks spesifikasyonuna tam uyum
 - CloudEvents SDK'yı doğrudan kullanma — fazla karmaşık
 
 ### 3. Outpost — Mimari Referans
-- Multi-tenant pattern → HookRelay'de zaten var (customer_id)
+- Multi-tenant pattern → HookSniff'de zaten var (customer_id)
 - Redis RSMQ retry queue → PostgreSQL queue'dan daha performanslı (gelecekte düşünülebilir)
 - User portal → Henüz yok, önemli bir eksik
 - SSRF protection → Henüz yok, acil eklenmeli
@@ -85,7 +85,7 @@ hooksniff/research/
 
 ## 💡 Kritik Bulgu
 
-**HookRelay'in signing.rs'i zaten Standard Webhooks uyumlu!** Bu büyük bir avantaj — Svix veya herhangi bir external library eklemeye gerek yok. Mevcut kod production-ready.
+**HookSniff'in signing.rs'i zaten Standard Webhooks uyumlu!** Bu büyük bir avantaj — Svix veya herhangi bir external library eklemeye gerek yok. Mevcut kod production-ready.
 
 Asıl eksiklikler:
 1. SSRF koruması (güvenlik)

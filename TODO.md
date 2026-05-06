@@ -1,4 +1,4 @@
-# 🪝 HookRelay — Yapılacaklar Listesi
+# 🪝 HookSniff — Yapılacaklar Listesi
 
 > Son güncelleme: 2026-05-06
 > Bu dosya GitHub'da takip edilir. Her tamamlanan iş ✅ yapılır.

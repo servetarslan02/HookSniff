@@ -42,10 +42,10 @@ Svix iki header seti destekler:
 ### Constant-Time Comparison
 - `fold(0, |acc, (a, b)| acc | (a ^ b))` ile timing-attack koruması
 
-## 🦀 HookRelay Entegrasyonu
+## 🦀 HookSniff Entegrasyonu
 
 ### Mevcut Durum
-HookRelay'in `signing.rs` dosyası var — henüz okumadım ama muhtemelen benzer bir şey yapıyor.
+HookSniff'in `signing.rs` dosyası var — henüz okumadım ama muhtemelen benzer bir şey yapıyor.
 
 ### Önerilen Entegrasyon
 

@@ -1,4 +1,4 @@
-//! HookRelay Worker — Webhook Teslimatı
+//! HookSniff Worker — Webhook Teslimatı
 //!
 //! Kafka ve Temporal yok. PostgreSQL polling + LISTEN/NOTIFY.
 //!
@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
         cfg.otel_exporter_otlp_headers.as_deref(),
     );
 
-    tracing::info!("🔧 HookRelay Worker starting...");
+    tracing::info!("🔧 HookSniff Worker starting...");
     tracing::info!("   Database: {}", &cfg.database_url[..30.min(cfg.database_url.len())]);
 
     // Database pool
@@ -170,7 +170,7 @@ async fn main() -> Result<()> {
         }
     }
 
-    tracing::info!("👋 HookRelay Worker shut down gracefully");
+    tracing::info!("👋 HookSniff Worker shut down gracefully");
 
     // Flush OpenTelemetry traces before exit
     opentelemetry::global::shutdown_tracer_provider();
