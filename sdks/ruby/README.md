@@ -164,6 +164,7 @@ puts "Event: #{result[:payload]['event']}"
 begin
   delivery = client.webhooks.send(
     endpoint_id: "nonexistent",
+    event: "test.event",
     data: { test: true }
   )
 rescue HookRelay::AuthenticationError => e

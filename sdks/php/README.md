@@ -168,7 +168,7 @@ use HookRelay\ValidationException;
 use HookRelay\PayloadTooLargeException;
 
 try {
-    $delivery = $client->webhooks()->send('nonexistent', ['test' => true]);
+    $delivery = $client->webhooks()->send('nonexistent', 'test.event', ['test' => true]);
 } catch (AuthenticationException $e) {
     echo "Invalid API key\n";
 } catch (NotFoundException $e) {
@@ -201,7 +201,7 @@ try {
 
 ### `$client->webhooks()`
 
-- `->send(endpointId, data, event?)` → `array`
+- `->send(endpointId, event?, data?)` → `Delivery`
 - `->get(deliveryId)` → `array`
 - `->list(status?, page?, perPage?)` → `array`
 - `->replay(deliveryId)` → `array`

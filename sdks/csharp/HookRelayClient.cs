@@ -372,12 +372,12 @@ namespace HookRelay
         /// <summary>
         /// Send a webhook.
         /// </summary>
-        public async Task<Delivery> SendAsync(string endpointId, Dictionary<string, object> data, string? @event = null)
+        public async Task<Delivery> SendAsync(string endpointId, string? @event = null, Dictionary<string, object>? data = null)
         {
             var body = new Dictionary<string, object?>
             {
                 ["endpoint_id"] = endpointId,
-                ["data"] = data
+                ["data"] = data ?? new Dictionary<string, object>()
             };
             if (@event != null) body["event"] = @event;
 
