@@ -9,10 +9,44 @@ namespace HookRelay;
  *
  * Supports both simple HMAC-SHA256 verification and Standard Webheaders
  * (Svix-compatible) verification with timestamp tolerance.
+ * Also supports Svix headers (svix-id, svix-signature, svix-timestamp) as fallback.
  */
 class WebhookVerification
 {
     private const DEFAULT_TOLERANCE_SECS = 300;
+
+    /**
+     * Verify a webhook from headers with automatic header detection.
+     * Supports both Standard Webhooks and Svix headers.
+     *
+     * @param string $payload The raw request body
+     * @param array  $headers The request headers (lowercase keys)
+     * @param string $secret  The endpoint's signing secret
+     * @param int    $toleranceSecs Max age in seconds (default: 300)
+     * @return array{valid: bool, payload?: mixed, error?: string}
+     */
+    public static function verifyWebhookFromHeaders(
+        string $payload,
+        array $headers,
+        string $secret,
+        int $toleranceSecs = self::DEFAULT_TOLERANCE_SECS
+    ): array {
+        // Normalize header keys to lowercase
+        $normalized = array_change_key_case($headers, CASE_LOWER);
+
+        $msgId = $normalized['webhook-id'] ?? null;
+        $timestamp = $normalized['webhook-timestamp'] ?? null;
+        $signatureHeader = $normalized['webhook-signature'] ?? null;
+
+        // Fallback to Svix headers
+        if (!$msgId || !$timestamp || !$signatureHeader) {
+            $msgId = $msgId ?? $normalized['svix-id'] ?? null;
+            $timestamp = $timestamp ?? $normalized['svix-timestamp'] ?? null;
+            $signatureHeader = $signatureHeader ?? $normalized['svix-signature'] ?? null;
+        }
+
+        return self::verifyWebhook($payload, $msgId, $timestamp, $signatureHeader, $secret, $toleranceSecs);
+    }
 
     /**
      * Verify a webhook signature using HMAC-SHA256.

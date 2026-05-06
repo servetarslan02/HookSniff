@@ -399,6 +399,23 @@ func VerifyWebhook(body, msgID, timestamp, signatureHeader, secret string, toler
 	return VerificationResult{Valid: true, Payload: parsed}
 }
 
+// VerifyWebhookFromHeaders verifies a webhook from HTTP headers.
+// Supports both Standard Webhooks headers (webhook-id, webhook-signature, webhook-timestamp)
+// and Svix headers (svix-id, svix-signature, svix-timestamp) as fallback.
+func VerifyWebhookFromHeaders(body string, headers http.Header, secret string, toleranceSecs int) VerificationResult {
+	msgID := headers.Get("webhook-id")
+	msgSignature := headers.Get("webhook-signature")
+	msgTimestamp := headers.Get("webhook-timestamp")
+
+	if msgID == "" || msgSignature == "" || msgTimestamp == "" {
+		msgID = headers.Get("svix-id")
+		msgSignature = headers.Get("svix-signature")
+		msgTimestamp = headers.Get("svix-timestamp")
+	}
+
+	return VerifyWebhook(body, msgID, msgTimestamp, msgSignature, secret, toleranceSecs)
+}
+
 func decodeSecret(secret string) []byte {
 	stripped := secret
 	if strings.HasPrefix(secret, "whsec_") {

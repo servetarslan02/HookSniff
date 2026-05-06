@@ -22,6 +22,41 @@ module HookRelay
     false
   end
 
+  # Verify a webhook signature from an incoming request (Standard Webhooks + Svix compatible).
+  #
+  # Supports both Standard Webheaders headers (webhook-id, webhook-signature, webhook-timestamp)
+  # and Svix headers (svix-id, svix-signature, svix-timestamp) as fallback.
+  #
+  # @param payload [String] The raw request body
+  # @param headers [Hash] The request headers (symbol or string keys)
+  # @param secret [String] The endpoint's signing secret
+  # @param tolerance_secs [Integer] Max age in seconds (default: 300)
+  # @return [Hash] { valid: bool, payload: parsed_data, error: string }
+  def self.verify_webhook_from_headers(payload:, headers:, secret:, tolerance_secs: 300)
+    # Normalize header keys to lowercase strings
+    normalized = headers.transform_keys { |k| k.to_s.downcase }
+
+    msg_id = normalized["webhook-id"]
+    timestamp = normalized["webhook-timestamp"]
+    signature_header = normalized["webhook-signature"]
+
+    # Fallback to Svix headers
+    unless msg_id && timestamp && signature_header
+      msg_id ||= normalized["svix-id"]
+      timestamp ||= normalized["svix-timestamp"]
+      signature_header ||= normalized["svix-signature"]
+    end
+
+    verify_webhook(
+      payload: payload,
+      msg_id: msg_id,
+      timestamp: timestamp,
+      signature_header: signature_header,
+      secret: secret,
+      tolerance_secs: tolerance_secs,
+    )
+  end
+
   # Verify a webhook signature from an incoming request (Standard Webhooks compatible).
   #
   # @param payload [String] The raw request body

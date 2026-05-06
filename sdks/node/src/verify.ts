@@ -205,12 +205,18 @@ export function verifyWebhook(
     return val;
   };
 
+  // Try Standard Webhooks headers first, then Svix headers
+  let msgId = getHeader("webhook-id");
+  let timestamp = getHeader("webhook-timestamp");
+  let signatureHeader = getHeader("webhook-signature");
+
+  if (!msgId || !timestamp || !signatureHeader) {
+    msgId = msgId || getHeader("svix-id");
+    timestamp = timestamp || getHeader("svix-timestamp");
+    signatureHeader = signatureHeader || getHeader("svix-signature");
+  }
+
   const verifier = new WebhookVerifier(secret, toleranceSecs);
 
-  return verifier.verify(
-    body,
-    getHeader("webhook-id"),
-    getHeader("webhook-timestamp"),
-    getHeader("webhook-signature")
-  );
+  return verifier.verify(body, msgId, timestamp, signatureHeader);
 }

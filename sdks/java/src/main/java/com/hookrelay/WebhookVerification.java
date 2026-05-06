@@ -133,6 +133,39 @@ public class WebhookVerification {
         }
     }
 
+    /**
+     * Verify a webhook from a headers map with automatic header detection.
+     * Supports both Standard Webhooks headers (webhook-id, webhook-signature, webhook-timestamp)
+     * and Svix headers (svix-id, svix-signature, svix-timestamp) as fallback.
+     *
+     * @param payload The raw request body
+     * @param headers Map of header name to header value
+     * @param secret  The endpoint's signing secret
+     * @return VerificationResult with valid flag and parsed payload
+     */
+    public static VerificationResult verifyWebhookFromHeaders(String payload, Map<String, String> headers,
+                                                               String secret) {
+        return verifyWebhookFromHeaders(payload, headers, secret, DEFAULT_TOLERANCE_SECS);
+    }
+
+    /**
+     * Verify a webhook from a headers map with custom tolerance.
+     */
+    public static VerificationResult verifyWebhookFromHeaders(String payload, Map<String, String> headers,
+                                                               String secret, int toleranceSecs) {
+        String msgId = headers.get("webhook-id");
+        String timestamp = headers.get("webhook-timestamp");
+        String signatureHeader = headers.get("webhook-signature");
+
+        if (msgId == null || timestamp == null || signatureHeader == null) {
+            msgId = msgId != null ? msgId : headers.get("svix-id");
+            timestamp = timestamp != null ? timestamp : headers.get("svix-timestamp");
+            signatureHeader = signatureHeader != null ? signatureHeader : headers.get("svix-signature");
+        }
+
+        return verifyWebhook(payload, msgId, timestamp, signatureHeader, secret, toleranceSecs);
+    }
+
     // ==================== Helpers ====================
 
     private static String hmacSha256Hex(String key, String data) throws Exception {
