@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('hooksniff_auth');
+    const stored = localStorage.getItem('hooksniff_auth');
     if (stored) {
       try {
         const { token: t, user: u, apiKey: k } = JSON.parse(stored);
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(u);
         setApiKeyState(k);
       } catch {
-        sessionStorage.removeItem('hooksniff_auth');
+        localStorage.removeItem('hooksniff_auth');
       }
     }
     setIsLoading(false);
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(t);
     setUser(u);
     if (k) setApiKeyState(k);
-    sessionStorage.setItem('hooksniff_auth', JSON.stringify({ token: t, user: u, apiKey: k || null }));
+    localStorage.setItem('hooksniff_auth', JSON.stringify({ token: t, user: u, apiKey: k || null }));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -87,16 +87,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
     setApiKeyState(null);
-    sessionStorage.removeItem('hooksniff_auth');
+    localStorage.removeItem('hooksniff_auth');
   }, []);
 
   const setApiKey = useCallback((key: string) => {
     setApiKeyState(key);
-    const stored = sessionStorage.getItem('hooksniff_auth');
+    const stored = localStorage.getItem('hooksniff_auth');
     if (stored) {
       const data = JSON.parse(stored);
       data.apiKey = key;
-      sessionStorage.setItem('hooksniff_auth', JSON.stringify(data));
+      localStorage.setItem('hooksniff_auth', JSON.stringify(data));
     }
   }, []);
 

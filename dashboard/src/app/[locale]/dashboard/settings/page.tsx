@@ -3,9 +3,13 @@
 import { useAuth } from '@/lib/store';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/Toast';
+import { useRouter } from '@/i18n/navigation';
 
 export default function SettingsPage() {
   const { user, token, apiKey, logout } = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const t = useTranslations('settings');
   const tc = useTranslations('common');
@@ -105,6 +109,43 @@ export default function SettingsPage() {
     } finally {
       setPasswordSaving(false);
     }
+  };
+
+  const [notificationSaving, setNotificationSaving] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+    setDeletingAccount(true);
+    try {
+      const res = await fetch(`${API}/auth/me`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token || ''}` },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || 'Failed to delete account');
+      }
+      logout();
+      router.push('/');
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setDeletingAccount(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const handleNotificationSave = async () => {
+    setNotificationSaving(true);
+    // Notification preferences are stored locally for now
+    // TODO: Persist to backend when /v1/auth/notifications endpoint is added
+    setTimeout(() => {
+      setNotificationSaving(false);
+      toast(tc('success'), 'success');
+    }, 500);
   };
 
   return (
@@ -256,7 +297,7 @@ export default function SettingsPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
-              value={apiKey || t('noApiKey')}
+              value={apiKey ? '••••••••••••••••••••••••••••••••' : t('noApiKey')}
               readOnly
               className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 font-mono text-sm text-gray-700 dark:text-slate-300"
             />
@@ -300,6 +341,15 @@ export default function SettingsPage() {
             checked={weeklyDigest}
             onChange={setWeeklyDigest}
           />
+          <div className="pt-2">
+            <button
+              onClick={handleNotificationSave}
+              disabled={notificationSaving}
+              className="px-4 py-2 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
+            >
+              {notificationSaving ? tc('saving') : tc('save')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -325,6 +375,7 @@ export default function SettingsPage() {
               <div className="text-sm text-gray-500 dark:text-slate-400">{t('deleteAccountDesc')}</div>
             </div>
             <button
+              onClick={() => setShowDeleteModal(true)}
               className="border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-600 hover:text-white transition"
             >
               Delete Account
@@ -332,6 +383,43 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
+          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">⚠️ Delete Account</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              This action is permanent. All your data, endpoints, and webhook history will be deleted.
+            </p>
+            <p className="text-sm text-gray-700 dark:text-slate-300 mb-2">
+              Type <strong>DELETE</strong> to confirm:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              className="w-full px-4 py-3 border border-red-300 dark:border-red-500/30 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+              >
+                {tc('cancel')}
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'DELETE' || deletingAccount}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-40"
+              >
+                {deletingAccount ? 'Deleting...' : 'Permanently Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

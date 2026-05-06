@@ -153,6 +153,31 @@ export default function BillingPage() {
   const [showUpgradeModal, setShowUpgradeModal] = useState<string | null>(null);
   const [upgrading, setUpgrading] = useState(false);
 
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancel = async () => {
+    if (!token) return;
+    setCancelling(true);
+    try {
+      const res = await fetch(`${API}/billing/subscription`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || 'Cancel failed');
+      }
+      toast(t('cancelledMsg'), 'info');
+      setShowCancelModal(false);
+      // Refresh page to show updated plan
+      window.location.reload();
+    } catch (err: any) {
+      toast(err.message || 'Cancel failed', 'error');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   const handleUpgrade = (planName: string) => {
     setShowUpgradeModal(planName);
   };
@@ -187,7 +212,10 @@ export default function BillingPage() {
     }
   };
 
-  const nextBillingDate = '2026-06-01';
+  // Calculate next billing date dynamically (1st of next month)
+  const now = new Date();
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const nextBillingDate = nextMonth.toISOString().split('T')[0];
 
   return (
     <div className="space-y-8">
@@ -444,13 +472,11 @@ export default function BillingPage() {
                 Keep Plan
               </button>
               <button
-                onClick={() => {
-                  setShowCancelModal(false);
-                  toast(t('cancelledMsg'), 'info');
-                }}
-                className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition"
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-60"
               >
-                Cancel Subscription
+                {cancelling ? t('redirecting') : 'Cancel Subscription'}
               </button>
             </div>
           </div>
