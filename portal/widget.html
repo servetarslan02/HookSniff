@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HookRelay — Webhook Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <svg class="logo" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </svg>
+      <h1>HookRelay</h1>
+    </div>
+    <div class="header-right">
+      <span class="status-badge" id="connectionStatus">Connecting…</span>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Filter by event type…" autocomplete="off">
+    </div>
+    <div class="toolbar-right">
+      <select id="statusFilter">
+        <option value="all">All statuses</option>
+        <option value="delivered">Delivered</option>
+        <option value="failed">Failed</option>
+        <option value="pending">Pending</option>
+      </select>
+      <button class="btn-refresh" id="refreshBtn" title="Refresh">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Webhook List -->
+  <div class="webhook-list" id="webhookList">
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading webhooks…</p>
+    </div>
+  </div>
+
+  <!-- Detail Panel (slides in) -->
+  <div class="detail-overlay" id="detailOverlay"></div>
+  <aside class="detail-panel" id="detailPanel">
+    <div class="detail-header">
+      <h2 id="detailTitle">Webhook Details</h2>
+      <button class="btn-close" id="detailClose">&times;</button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </aside>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ── Config from URL params ──
+    var params   = new URLSearchParams(window.location.search);
+    var API_KEY  = params.get("api_key") || "";
+    var API_URL  = params.get("api_url") || "https://api.hookrelay.com";
+    var THEME    = params.get("theme")   || "dark";
+
+    // ── DOM refs ──
+    var $list         = document.getElementById("webhookList");
+    var $loading      = document.getElementById("loadingState");
+    var $statusBadge  = document.getElementById("connectionStatus");
+    var $searchInput  = document.getElementById("searchInput");
+    var $statusFilter = document.getElementById("statusFilter");
+    var $refreshBtn   = document.getElementById("refreshBtn");
+    var $themeToggle  = document.getElementById("themeToggle");
+    var $detailPanel  = document.getElementById("detailPanel");
+    var $detailOverlay= document.getElementById("detailOverlay");
+    var $detailBody   = document.getElementById("detailBody");
+    var $detailTitle  = document.getElementById("detailTitle");
+    var $detailClose  = document.getElementById("detailClose");
+    var $toastBox     = document.getElementById("toastContainer");
+
+    var webhooks = [];
+    var currentTheme = THEME;
+
+    // ── Theme ──
+    function applyTheme(t) {
+      currentTheme = t;
+      document.documentElement.setAttribute("data-theme", t);
+      try { localStorage.setItem("hr-theme", t); } catch(e) {}
+    }
+
+    (function initTheme() {
+      var saved;
+      try { saved = localStorage.getItem("hr-theme"); } catch(e) {}
+      applyTheme(saved || THEME);
+    })();
+
+    $themeToggle.addEventListener("click", function () {
+      applyTheme(currentTheme === "dark" ? "light" : "dark");
+    });
+
+    // ── Toast ──
+    function toast(msg, type) {
+      var el = document.createElement("div");
+      el.className = "toast toast-" + (type || "info");
+      el.textContent = msg;
+      $toastBox.appendChild(el);
+      setTimeout(function () { el.classList.add("toast-out"); }, 2600);
+      setTimeout(function () { el.remove(); }, 3000);
+    }
+
+    // ── API ──
+    function api(path) {
+      return fetch(API_URL + path, {
+        headers: {
+          "Authorization": "Bearer " + API_KEY,
+          "Accept": "application/json"
+        }
+      }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      });
+    }
+
+    // ── Load webhooks ──
+    function loadWebhooks() {
+      $loading.style.display = "flex";
+      $statusBadge.textContent = "Connecting…";
+      $statusBadge.className = "status-badge status-pending";
+
+      api("/api/v1/webhooks?limit=50")
+        .then(function (data) {
+          webhooks = (data && data.webhooks) ? data.webhooks : (Array.isArray(data) ? data : []);
+          $statusBadge.textContent = "Live";
+          $statusBadge.className = "status-badge status-delivered";
+          renderList();
+        })
+        .catch(function (err) {
+          console.error("[HookRelay]", err);
+          $statusBadge.textContent = "Error";
+          $statusBadge.className = "status-badge status-failed";
+          toast("Failed to load webhooks: " + err.message, "error");
+          webhooks = [];
+          renderList();
+        });
+    }
+
+    // ── Render list ──
+    function renderList() {
+      $loading.style.display = "none";
+
+      var query  = ($searchInput.value || "").toLowerCase();
+      var status = $statusFilter.value;
+
+      var filtered = webhooks.filter(function (w) {
+        var matchSearch = !query || (w.event_type || "").toLowerCase().indexOf(query) !== -1;
+        var matchStatus = status === "all" || (w.status || "").toLowerCase() === status;
+        return matchSearch && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        $list.innerHTML =
+          '<div class="empty-state">' +
+            '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>' +
+            '<p>No webhooks found</p>' +
+          '</div>';
+        return;
+      }
+
+      var html = "";
+      filtered.forEach(function (w, i) {
+        var status = (w.status || "pending").toLowerCase();
+        var time   = w.created_at ? new Date(w.created_at).toLocaleString() : "—";
+        var event  = w.event_type || "unknown";
+        var url    = w.endpoint_url || w.url || "—";
+
+        html +=
+          '<div class="webhook-row" data-index="' + i + '" data-id="' + (w.id || "") + '">' +
+            '<div class="row-left">' +
+              '<span class="status-dot status-' + status + '"></span>' +
+              '<div class="row-info">' +
+                '<span class="event-type">' + escHtml(event) + '</span>' +
+                '<span class="endpoint-url">' + escHtml(truncate(url, 60)) + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="row-right">' +
+              '<span class="webhook-time">' + escHtml(time) + '</span>' +
+              '<span class="status-label status-' + status + '">' + status + '</span>' +
+            '</div>' +
+          '</div>';
+      });
+
+      $list.innerHTML = html;
+
+      // Attach click handlers
+      $list.querySelectorAll(".webhook-row").forEach(function (row) {
+        row.addEventListener("click", function () {
+          var idx = parseInt(row.getAttribute("data-index"), 10);
+          openDetail(filtered[idx]);
+        });
+      });
+    }
+
+    // ── Detail panel ──
+    function openDetail(w) {
+      if (!w) return;
+      var status = (w.status || "pending").toLowerCase();
+      var time   = w.created_at ? new Date(w.created_at).toLocaleString() : "—";
+
+      $detailTitle.textContent = w.event_type || "Webhook";
+
+      var attemptsHtml = "";
+      if (w.attempts && w.attempts.length) {
+        attemptsHtml = '<h3>Delivery Attempts</h3><div class="attempts">';
+        w.attempts.forEach(function (a, i) {
+          var aStatus = (a.status || "").toLowerCase();
+          attemptsHtml +=
+            '<div class="attempt">' +
+              '<span class="attempt-num">#' + (i + 1) + '</span>' +
+              '<span class="status-label status-' + aStatus + '">' + (a.status || "—") + '</span>' +
+              '<span class="attempt-time">' + (a.timestamp ? new Date(a.timestamp).toLocaleString() : "—") + '</span>' +
+              (a.response_code ? '<span class="attempt-code">HTTP ' + a.response_code + '</span>' : '') +
+            '</div>';
+        });
+        attemptsHtml += '</div>';
+      }
+
+      $detailBody.innerHTML =
+        '<div class="detail-grid">' +
+          '<div class="detail-item"><label>Status</label><span class="status-label status-' + status + '">' + status + '</span></div>' +
+          '<div class="detail-item"><label>Timestamp</label><span>' + escHtml(time) + '</span></div>' +
+          '<div class="detail-item"><label>Event Type</label><span>' + escHtml(w.event_type || "—") + '</span></div>' +
+          '<div class="detail-item"><label>Endpoint</label><span class="mono">' + escHtml(w.endpoint_url || w.url || "—") + '</span></div>' +
+          (w.id ? '<div class="detail-item"><label>ID</label><span class="mono">' + escHtml(w.id) + '</span></div>' : '') +
+        '</div>' +
+        (w.headers ? '<h3>Request Headers</h3><pre class="code-block">' + escHtml(typeof w.headers === "string" ? w.headers : JSON.stringify(w.headers, null, 2)) + '</pre>' : '') +
+        (w.payload ? '<h3>Payload</h3><pre class="code-block">' + escHtml(typeof w.payload === "string" ? w.payload : JSON.stringify(w.payload, null, 2)) + '</pre>' : '') +
+        attemptsHtml;
+
+      $detailPanel.classList.add("open");
+      $detailOverlay.classList.add("open");
+    }
+
+    function closeDetail() {
+      $detailPanel.classList.remove("open");
+      $detailOverlay.classList.remove("open");
+    }
+
+    $detailClose.addEventListener("click", closeDetail);
+    $detailOverlay.addEventListener("click", closeDetail);
+
+    // ── Filters ──
+    var searchTimer;
+    $searchInput.addEventListener("input", function () {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(renderList, 200);
+    });
+    $statusFilter.addEventListener("change", renderList);
+    $refreshBtn.addEventListener("click", loadWebhooks);
+
+    // ── Helpers ──
+    function escHtml(s) {
+      var d = document.createElement("div");
+      d.appendChild(document.createTextNode(s));
+      return d.innerHTML;
+    }
+    function truncate(s, n) {
+      return s && s.length > n ? s.slice(0, n) + "…" : s;
+    }
+
+    // ── Init ──
+    if (!API_KEY) {
+      $loading.innerHTML = '<p style="color:var(--color-error)">Missing API key. Add <code>data-api-key</code> to the embed script.</p>';
+      return;
+    }
+    loadWebhooks();
+  })();
+  </script>
+</body>
+</html>
