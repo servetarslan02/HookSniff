@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace HookRelay;
+namespace HookSniff;
 
 /**
- * Webhook signature verification for HookRelay.
+ * Webhook signature verification for HookSniff.
  *
  * Supports both simple HMAC-SHA256 verification and Standard Webheaders
  * (Svix-compatible) verification with timestamp tolerance.

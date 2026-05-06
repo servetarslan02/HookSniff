@@ -1,20 +1,20 @@
-defmodule HookRelay.MixProject do
+defmodule HookSniff.MixProject do
   use Mix.Project
 
   @version "0.2.0"
-  @source_url "https://github.com/servetarslan02/hookrelay"
+  @source_url "https://github.com/servetarslan02/hooksniff"
 
   def project do
     [
-      app: :hookrelay,
+      app: :hooksniff,
       version: @version,
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      name: "HookRelay",
-      description: "Official Elixir client for the HookRelay webhook delivery service",
+      name: "HookSniff",
+      description: "Official Elixir client for the HookSniff webhook delivery service",
       source_url: @source_url,
-      homepage_url: "https://hookrelay.io",
+      homepage_url: "https://hooksniff.io",
       package: package(),
       docs: docs()
     ]
@@ -36,7 +36,7 @@ defmodule HookRelay.MixProject do
 
   defp package do
     [
-      name: "hookrelay",
+      name: "hooksniff",
       licenses: ["MIT"],
       links: %{"GitHub" => @source_url}
     ]
@@ -44,7 +44,7 @@ defmodule HookRelay.MixProject do
 
   defp docs do
     [
-      main: "HookRelay",
+      main: "HookSniff",
       source_ref: "v#{@version}"
     ]
   end

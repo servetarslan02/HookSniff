@@ -1,3 +1,3 @@
-module github.com/hookrelay/hookrelay-go
+module github.com/hooksniff/hooksniff-go
 
 go 1.21
