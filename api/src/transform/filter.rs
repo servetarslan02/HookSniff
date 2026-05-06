@@ -114,11 +114,11 @@ fn evaluate_condition(condition: &Condition, event: &Value) -> Result<bool> {
     match condition {
         Condition::Equals { field, value } => {
             let field_value = resolve_json_path(event, field);
-            Ok(field_value.as_ref() == Some(value))
+            Ok(field_value.as_ref() == Some(&value))
         }
         Condition::NotEquals { field, value } => {
             let field_value = resolve_json_path(event, field);
-            Ok(field_value.as_ref() != Some(value))
+            Ok(field_value.as_ref() != Some(&value))
         }
         Condition::Contains { field, value } => {
             let field_value = resolve_json_path(event, field);
@@ -171,11 +171,11 @@ fn evaluate_condition(condition: &Condition, event: &Value) -> Result<bool> {
         }
         Condition::Exists { field } => {
             let field_value = resolve_json_path(event, field);
-            Ok(field_value.is_some() && field_value.as_ref() != Some(&Value::Null))
+            Ok(field_value.is_some() && field_value.as_ref() != Some(&&Value::Null))
         }
         Condition::NotExists { field } => {
             let field_value = resolve_json_path(event, field);
-            Ok(field_value.is_none() || field_value.as_ref() == Some(&Value::Null))
+            Ok(field_value.is_none() || field_value.as_ref() == Some(&&Value::Null))
         }
         Condition::And { conditions } => {
             for c in conditions {

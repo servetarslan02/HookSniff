@@ -95,7 +95,7 @@ async fn get_delivery_details(
         payload: delivery.2,
         created_at: delivery.11.to_rfc3339(),
         last_attempt_at: delivery.7.map(|t| t.to_rfc3339()),
-        next_retry_at: delivery.9.map(|t| t.to_rfc3339()),
+        next_retry_at: delivery.10.map(|t| t.to_rfc3339()),
         response_status: delivery.8,
         response_body: delivery.9,
         attempts: attempts.into_iter().map(|(id, num, status, body, dur, err, created)| AttemptDetail {

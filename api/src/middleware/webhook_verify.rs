@@ -122,6 +122,18 @@ pub async fn webhook_verify_middleware(
                     )
                         .into_response())
                 }
+                Err(signing::VerificationError::MissingHeader(name)) => {
+                    Err((
+                        StatusCode::BAD_REQUEST,
+                        axum::Json(json!({
+                            "error": {
+                                "code": "MISSING_HEADER",
+                                "message": format!("Missing required header: {}", name)
+                            }
+                        })),
+                    )
+                        .into_response())
+                }
             }
         } else {
             // No signing secret available, pass through

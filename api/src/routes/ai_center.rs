@@ -2,7 +2,7 @@ use axum::extract::{Extension, Path, Query};
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
 use crate::error::AppError;
@@ -405,6 +405,8 @@ async fn list_providers(
         .filter(|k| !k.is_empty() && k != "your-openai-api-key-here")
         .is_some();
 
+    let total_active = [mimo_configured, openai_configured].iter().filter(|&&x| x).count();
+
     Ok(Json(serde_json::json!({
         "providers": [
             {
@@ -422,7 +424,7 @@ async fn list_providers(
                 "docs": "https://platform.openai.com/api-keys"
             }
         ],
-        "total_active": [mimo_configured, openai_configured].iter().filter(|&&x| x).count(),
+        "total_active": total_active,
         "note": "Yeni AI eklemek için .env dosyasına API key ekleyin ve provider modülü oluşturun"
     })))
 }

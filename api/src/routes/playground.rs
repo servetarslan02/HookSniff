@@ -1,5 +1,5 @@
 use axum::extract::Extension;
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::Serialize;
 use sqlx::PgPool;

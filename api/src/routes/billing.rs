@@ -192,11 +192,7 @@ async fn get_usage(
             requests_per_minute: plan.max_requests_per_minute(),
         },
         period: PeriodInfo {
-            start: chrono::Utc::now()
-                .with_day(1)
-                .unwrap_or_else(|| chrono::Utc::now())
-                .format("%Y-%m-%d")
-                .to_string(),
+            start: chrono::Utc::now().format("%Y-%m-01").to_string(),
             end: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         },
     }))

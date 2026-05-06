@@ -5,7 +5,6 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
-use rdkafka::producer::FutureProducer;
 use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -105,7 +104,6 @@ async fn list_deliveries(
 
 async fn create_webhook(
     Extension(pool): Extension<PgPool>,
-    Extension(producer): Extension<FutureProducer>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
     headers: axum::http::header::HeaderMap,
@@ -136,11 +134,11 @@ async fn create_webhook(
 
     // Validate event_type if provided
     if let Some(ref event) = req.event {
-        validation::validate_event_type(event)?;
+        validation::validate_event_type(event).map_err(AppError::BadRequest)?;
     }
 
     // Validate JSON payload depth
-    validation::validate_json_depth(&req.data)?;
+    validation::validate_json_depth(&req.data).map_err(AppError::BadRequest)?;
 
     // Check payload size
     let payload_size = serde_json::to_string(&req.data)
@@ -226,26 +224,18 @@ async fn create_webhook(
         .execute(&pool)
         .await?;
 
-    kafka::publish_webhook(
-        &producer,
-        &cfg.kafka_topic,
-        &delivery.id.to_string(),
-        &customer.id.to_string(),
-        &serde_json::json!({
-            "delivery_id": delivery.id,
-            "endpoint_id": endpoint.id,
-            "endpoint_url": endpoint.url,
-            "signing_secret": endpoint.signing_secret,
-            "old_signing_secret": endpoint.old_signing_secret,
-            "secret_rotated_at": endpoint.secret_rotated_at.map(|t| t.to_rfc3339()),
-            "custom_headers": endpoint.custom_headers,
-            "payload": payload_str,
-        })
-        .to_string(),
+    kafka::publish_to_queue(
+        &pool,
+        delivery.id,
+        endpoint.id,
+        &endpoint.url,
+        &endpoint.signing_secret,
+        &payload_str,
+        endpoint.custom_headers.as_ref(),
     )
     .await
     .map_err(|e| {
-        tracing::error!("Failed to publish to Kafka: {:?}", e);
+        tracing::error!("Failed to publish to queue: {:?}", e);
         AppError::Internal(e)
     })?;
 
@@ -265,7 +255,6 @@ async fn create_webhook(
 
 async fn batch_webhooks(
     Extension(pool): Extension<PgPool>,
-    Extension(producer): Extension<FutureProducer>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
     Json(req): Json<BatchWebhookRequest>,
@@ -353,16 +342,18 @@ async fn batch_webhooks(
                     "payload": payload_str,
                 });
 
-                if let Err(e) = kafka::publish_webhook(
-                    &producer,
-                    &cfg.kafka_topic,
-                    &delivery.id.to_string(),
-                    &customer.id.to_string(),
-                    &webhook_message.to_string(),
+                if let Err(e) = kafka::publish_to_queue(
+                    &pool,
+                    delivery.id,
+                    endpoint.id,
+                    &endpoint.url,
+                    &endpoint.signing_secret,
+                    &payload_str,
+                    endpoint.custom_headers.as_ref(),
                 )
                 .await
                 {
-                    tracing::error!("Failed to publish to Kafka for batch item {}: {:?}", i, e);
+                    tracing::error!("Failed to publish to queue for batch item {}: {:?}", i, e);
                     errors.push(BatchError { index: i, error: "Failed to publish message".to_string() });
                     continue;
                 }
@@ -389,7 +380,6 @@ async fn batch_webhooks(
 
 async fn replay_webhook(
     Extension(pool): Extension<PgPool>,
-    Extension(producer): Extension<FutureProducer>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
     Path(id): Path<Uuid>,
@@ -444,16 +434,18 @@ async fn replay_webhook(
         "payload": payload_str,
     });
 
-    kafka::publish_webhook(
-        &producer,
-        &cfg.kafka_topic,
-        &new_delivery.id.to_string(),
-        &customer.id.to_string(),
-        &webhook_message.to_string(),
+    kafka::publish_to_queue(
+        &pool,
+        new_delivery.id,
+        endpoint.id,
+        &endpoint.url,
+        &endpoint.signing_secret,
+        &payload_str,
+        endpoint.custom_headers.as_ref(),
     )
     .await
     .map_err(|e| {
-        tracing::error!("Failed to publish replay to Kafka: {:?}", e);
+        tracing::error!("Failed to publish replay to queue: {:?}", e);
         AppError::Internal(e)
     })?;
 

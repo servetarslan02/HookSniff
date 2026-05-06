@@ -26,75 +26,27 @@ pub mod transform;
 mod validation;
 pub mod ws;
 
-/// Initialize OpenTelemetry tracing with OTLP exporter
+/// Initialize tracing with structured logging
 fn init_tracing(cfg: &config::Config) {
-    use opentelemetry::trace::TracerProvider;
-    use opentelemetry_sdk::trace::SdkTracerProvider;
+    use tracing_subscriber::prelude::*;
 
-    let otel_endpoint = std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT")
-        .unwrap_or_else(|_| "http://localhost:4317".to_string());
-
-    let enable_otel = std::env::var("OTEL_ENABLED")
-        .map(|v| v == "true" || v == "1")
+    let use_json = std::env::var("LOG_FORMAT")
+        .map(|v| v == "json")
         .unwrap_or(false);
 
-    if enable_otel {
-        let exporter = opentelemetry_otlp::SpanExporter::builder()
-            .with_tonic()
-            .with_endpoint(&otel_endpoint)
-            .build()
-            .expect("Failed to create OTLP exporter");
+    let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
 
-        let provider = SdkTracerProvider::builder()
-            .with_simple_exporter(exporter)
-            .build();
-
-        let tracer = provider.tracer("hookrelay-api");
-        opentelemetry::global::set_tracer_provider(provider);
-
-        let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
-
-        let use_json = std::env::var("LOG_FORMAT")
-            .map(|v| v == "json")
-            .unwrap_or(false);
-
-        let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
-            .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
-
-        if use_json {
-            tracing_subscriber::registry()
-                .with(env_filter)
-                .with(tracing_subscriber::fmt::layer().json())
-                .with(otel_layer)
-                .init();
-        } else {
-            tracing_subscriber::registry()
-                .with(env_filter)
-                .with(tracing_subscriber::fmt::layer())
-                .with(otel_layer)
-                .init();
-        }
-
-        tracing::info!("OpenTelemetry tracing enabled → {}", otel_endpoint);
+    if use_json {
+        let _ = tracing_subscriber::registry()
+            .with(env_filter)
+            .with(tracing_subscriber::fmt::layer().json())
+            .init();
     } else {
-        let use_json = std::env::var("LOG_FORMAT")
-            .map(|v| v == "json")
-            .unwrap_or(false);
-
-        let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
-            .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
-
-        if use_json {
-            tracing_subscriber::registry()
-                .with(env_filter)
-                .with(tracing_subscriber::fmt::layer().json())
-                .init();
-        } else {
-            tracing_subscriber::registry()
-                .with(env_filter)
-                .with(tracing_subscriber::fmt::layer())
-                .init();
-        }
+        let _ = tracing_subscriber::registry()
+            .with(env_filter)
+            .with(tracing_subscriber::fmt::layer())
+            .init();
     }
 }
 

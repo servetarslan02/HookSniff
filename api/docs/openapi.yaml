@@ -1,0 +1,1047 @@
+openapi: "3.0.3"
+info:
+  title: HookRelay API
+  description: Enterprise webhook delivery service with reliable delivery, retry policies, and monitoring.
+  version: "0.1.0"
+  contact:
+    name: HookRelay Support
+    email: support@hookrelay.dev
+  license:
+    name: MIT
+
+servers:
+  - url: https://api.hookrelay.dev/v1
+    description: Production
+  - url: http://localhost:3000/v1
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Auth
+    description: Customer registration and authentication
+  - name: Endpoints
+    description: Manage webhook endpoints
+  - name: Webhooks
+    description: Send and manage webhook deliveries
+  - name: Stats
+    description: Delivery statistics and analytics
+  - name: AI Center
+    description: AI-powered autonomous management system
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new customer
+      operationId: registerCustomer
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  minLength: 8
+                  description: Account password (minimum 8 characters)
+                  example: "SecurePass123!"
+      responses:
+        "200":
+          description: Customer created successfully. Returns JWT token and customer info with API key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email and password
+      operationId: loginCustomer
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "SecurePass123!"
+      responses:
+        "200":
+          description: Login successful. Returns JWT token and customer info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /endpoints:
+    get:
+      tags: [Endpoints]
+      summary: List all endpoints
+      operationId: listEndpoints
+      responses:
+        "200":
+          description: List of endpoints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EndpointResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Endpoints]
+      summary: Create a new endpoint
+      operationId: createEndpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEndpointRequest"
+      responses:
+        "200":
+          description: Endpoint created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EndpointResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /endpoints/{id}:
+    get:
+      tags: [Endpoints]
+      summary: Get endpoint by ID
+      operationId: getEndpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Endpoint details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EndpointResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Endpoints]
+      summary: Delete an endpoint
+      operationId: deleteEndpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Endpoint deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /webhooks:
+    get:
+      tags: [Webhooks]
+      summary: List webhook deliveries
+      operationId: listDeliveries
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, delivered, failed]
+      responses:
+        "200":
+          description: Paginated list of deliveries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Webhooks]
+      summary: Send a webhook
+      operationId: sendWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWebhookRequest"
+      responses:
+        "200":
+          description: Webhook queued for delivery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+
+  /webhooks/batch:
+    post:
+      tags: [Webhooks]
+      summary: Send multiple webhooks in a batch
+      operationId: batchWebhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchWebhookRequest"
+      responses:
+        "200":
+          description: Batch results (partial failure possible)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+
+  /webhooks/export:
+    get:
+      tags: [Webhooks]
+      summary: Export webhook logs
+      operationId: exportDeliveries
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv]
+            default: json
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, delivered, failed]
+        - name: date_from
+          in: query
+          description: "Start date (ISO 8601 or YYYY-MM-DD)"
+          schema:
+            type: string
+        - name: date_to
+          in: query
+          description: "End date (ISO 8601 or YYYY-MM-DD)"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Exported webhook logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExportDelivery"
+            text/csv:
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /webhooks/{id}:
+    get:
+      tags: [Webhooks]
+      summary: Get webhook delivery by ID
+      operationId: getDelivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Delivery details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /webhooks/{id}/replay:
+    post:
+      tags: [Webhooks]
+      summary: Replay a webhook delivery
+      operationId: replayWebhook
+      description: Re-queues a failed or delivered webhook for re-delivery. Creates a new delivery record preserving the original payload.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Replay queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /webhooks/{id}/attempts:
+    get:
+      tags: [Webhooks]
+      summary: Get delivery attempts for a webhook
+      operationId: getDeliveryAttempts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: List of delivery attempts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeliveryAttempt"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /stats:
+    get:
+      tags: [Stats]
+      summary: Get delivery statistics
+      operationId: getStats
+      responses:
+        "200":
+          description: Delivery statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /health:
+    get:
+      tags: [System]
+      summary: Health check
+      operationId: healthCheck
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: hookrelay-api
+                  version:
+                    type: string
+
+  /ai/status:
+    get:
+      tags: [AI Center]
+      summary: Get AI center status
+      operationId: getAiStatus
+      responses:
+        "200":
+          description: AI center status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiStatus"
+
+  /ai/events:
+    get:
+      tags: [AI Center]
+      summary: List AI events
+      operationId: listAiEvents
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [info, warning, critical]
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: List of AI events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiEvent"
+
+  /ai/risks:
+    get:
+      tags: [AI Center]
+      summary: Get current risk scores
+      operationId: getAiRisks
+      responses:
+        "200":
+          description: Risk scores for endpoints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiskScore"
+
+  /ai/actions:
+    get:
+      tags: [AI Center]
+      summary: List AI actions
+      operationId: listAiActions
+      responses:
+        "200":
+          description: List of AI actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiAction"
+
+  /ai/actions/{id}/approve:
+    post:
+      tags: [AI Center]
+      summary: Approve an AI action
+      operationId: approveAiAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Action approved
+
+  /ai/actions/{id}/reject:
+    post:
+      tags: [AI Center]
+      summary: Reject an AI action
+      operationId: rejectAiAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Action rejected
+
+  /ai/blocklist:
+    get:
+      tags: [AI Center]
+      summary: List blocked items
+      operationId: listBlocklist
+      responses:
+        "200":
+          description: Blocklist entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlocklistEntry"
+    post:
+      tags: [AI Center]
+      summary: Add block entry
+      operationId: addBlock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                block_type:
+                  type: string
+                  enum: [ip, customer, endpoint]
+                block_value:
+                  type: string
+                reason:
+                  type: string
+                duration_minutes:
+                  type: integer
+      responses:
+        "200":
+          description: Block added
+
+  /ai/blocklist/{id}:
+    delete:
+      tags: [AI Center]
+      summary: Remove a block entry
+      operationId: removeBlock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Block removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  removed:
+                    type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /ai/actions/{id}/rollback:
+    post:
+      tags: [AI Center]
+      summary: Rollback an executed AI action
+      operationId: rollbackAiAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Action rolled back
+
+  /ai/providers:
+    get:
+      tags: [AI Center]
+      summary: List AI providers and their status
+      operationId: listAiProviders
+      responses:
+        "200":
+          description: AI provider status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        enabled:
+                          type: boolean
+                        capabilities:
+                          type: array
+                          items:
+                            type: string
+                  total_active:
+                    type: integer
+
+  /ai/stats:
+    get:
+      tags: [AI Center]
+      summary: Get AI center statistics
+      operationId: getAiStats
+      responses:
+        "200":
+          description: AI statistics
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: "API key starting with `hr_live_`"
+
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token for authenticated requests
+        customer:
+          $ref: "#/components/schemas/CustomerResponse"
+
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        api_key:
+          type: string
+          description: Only returned on registration (not on login)
+        plan:
+          type: string
+        webhook_limit:
+          type: integer
+        webhook_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    RetryPolicy:
+      type: object
+      properties:
+        max_attempts:
+          type: integer
+          default: 3
+          description: Maximum number of delivery attempts
+        backoff:
+          type: string
+          enum: [exponential, linear, fixed]
+          default: exponential
+        initial_delay_secs:
+          type: integer
+          default: 10
+          description: Initial delay before first retry in seconds
+        max_delay_secs:
+          type: integer
+          default: 3600
+          description: Maximum delay between retries in seconds
+
+    CreateEndpointRequest:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          example: "https://myapp.com/webhook"
+        description:
+          type: string
+          example: "Order notifications"
+        retry_policy:
+          $ref: "#/components/schemas/RetryPolicy"
+
+    EndpointResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+        description:
+          type: string
+        is_active:
+          type: boolean
+        retry_policy:
+          $ref: "#/components/schemas/RetryPolicy"
+        created_at:
+          type: string
+          format: date-time
+
+    CreateWebhookRequest:
+      type: object
+      required: [endpoint_id, data]
+      properties:
+        endpoint_id:
+          type: string
+          format: uuid
+        event:
+          type: string
+          example: "order.created"
+        data:
+          type: object
+          description: The webhook payload data
+
+    BatchWebhookRequest:
+      type: object
+      required: [webhooks]
+      properties:
+        webhooks:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/CreateWebhookRequest"
+
+    DeliveryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        endpoint_id:
+          type: string
+          format: uuid
+        event:
+          type: string
+        status:
+          type: string
+          enum: [pending, delivered, failed]
+        attempt_count:
+          type: integer
+        response_status:
+          type: integer
+          nullable: true
+        replay_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    DeliveryListResponse:
+      type: object
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryResponse"
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+
+    BatchResponse:
+      type: object
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryResponse"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/BatchError"
+
+    BatchError:
+      type: object
+      properties:
+        index:
+          type: integer
+          description: Index of the failed webhook in the batch
+        error:
+          type: string
+
+    DeliveryAttempt:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        attempt_number:
+          type: integer
+        status_code:
+          type: integer
+          nullable: true
+        response_body:
+          type: string
+          nullable: true
+          description: Truncated response body (max 1000 chars)
+        duration_ms:
+          type: integer
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    ExportDelivery:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event:
+          type: string
+        endpoint_url:
+          type: string
+        status:
+          type: string
+        attempt_count:
+          type: integer
+        response_status:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    StatsResponse:
+      type: object
+      properties:
+        total_deliveries:
+          type: integer
+        delivered:
+          type: integer
+        failed:
+          type: integer
+        pending:
+          type: integer
+        success_rate:
+          type: number
+          format: double
+        endpoints_count:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+    AiStatus:
+      type: object
+      properties:
+        active_events:
+          type: integer
+        critical_events:
+          type: integer
+        pending_actions:
+          type: integer
+        blocked_items:
+          type: integer
+        avg_risk_score:
+          type: number
+        high_risk_endpoints:
+          type: integer
+
+    AiEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+        severity:
+          type: string
+          enum: [info, warning, critical]
+        title:
+          type: string
+        description:
+          type: string
+        action_taken:
+          type: string
+        target_type:
+          type: string
+        target_id:
+          type: string
+          format: uuid
+        resolved:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    RiskScore:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        target_type:
+          type: string
+        target_id:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          description: "Risk score 0-100"
+        factors:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    AiAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        action_type:
+          type: string
+        description:
+          type: string
+        target_type:
+          type: string
+        target_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, approved, executed, rejected, rolled_back]
+        risk_level:
+          type: string
+          enum: [low, medium, high, critical]
+        auto_approved:
+          type: boolean
+        executed_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    BlocklistEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        block_type:
+          type: string
+          enum: [ip, customer, endpoint]
+        block_value:
+          type: string
+        reason:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Unauthorized - missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"

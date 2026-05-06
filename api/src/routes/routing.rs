@@ -130,8 +130,8 @@ async fn update_routing(
 
     Ok(Json(RoutingInfo {
         endpoint_id: endpoint.id,
-        routing_strategy: endpoint.routing_strategy,
-        fallback_url: endpoint.fallback_url,
+        routing_strategy: endpoint.routing_strategy.clone(),
+        fallback_url: endpoint.fallback_url.clone(),
         avg_response_ms: endpoint.avg_response_ms,
         failure_streak: endpoint.failure_streak,
         is_healthy: endpoint.is_healthy(),
