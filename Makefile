@@ -1,10 +1,10 @@
-.PHONY: help local stop restart reset fix status logs logs-api logs-worker logs-db clean build
+.PHONY: help local stop restart reset fix status logs logs-api logs-worker logs-db clean build deploy-build deploy-test deploy-push
 
 # Default target
 help: ## Show this help
 	@echo "🪝 HookRelay — Komutlar"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
 # ── Ana Komutlar ──
@@ -74,7 +74,7 @@ logs-db: ## Veritabanı log'ları
 
 # ── Build ──
 
-build: ## Docker image'larını build et
+build: ## Docker image'larını build et (dev)
 	docker compose build
 
 clean: ## Her şeyi temizle
@@ -91,3 +91,69 @@ generate-api-key: ## Örnek API key oluştur
 
 db-shell: ## PostgreSQL kabuğu aç
 	docker compose exec postgres psql -U hookrelay -d hookrelay
+
+# ═══════════════════════════════════════════════════════════════════
+# Deployment Komutları (Production)
+# ═══════════════════════════════════════════════════════════════════
+
+deploy-build: ## Production image'ları build et (ARM64)
+	@echo "🔨 Production image'lar build ediliyor..."
+	docker build -f deploy/Dockerfile.api.prod -t hookrelay-api:latest .
+	docker build -f deploy/Dockerfile.worker.prod -t hookrelay-worker:latest .
+	@echo ""
+	@echo "✅ Build tamamlandı!"
+	@echo "   hookrelay-api:latest    $$(docker images hookrelay-api:latest --format '{{.Size}}')"
+	@echo "   hookrelay-worker:latest $$(docker images hookrelay-worker:latest --format '{{.Size}}')"
+
+deploy-test: ## Production build'i localde test et
+	@echo "🧪 Production build test ediliyor..."
+	@echo ""
+	@if [ ! -f deploy/env.production.example ]; then \
+		echo "❌ deploy/env.production.example bulunamadı!"; \
+		exit 1; \
+	fi
+	@if [ ! -f .env ]; then \
+		echo "⚠️  .env dosyası yok, production env example'dan oluşturuluyor..."; \
+		cp deploy/env.production.example .env; \
+	fi
+	@echo "📦 Image'lar build ediliyor..."
+	docker build -f deploy/Dockerfile.api.prod -t hookrelay-api:test .
+	docker build -f deploy/Dockerfile.worker.prod -t hookrelay-worker:test .
+	@echo ""
+	@echo "🚀 Servisler başlatılıyor (docker-compose.prod.yml)..."
+	docker compose -f deploy/docker-compose.prod.yml up -d
+	@echo ""
+	@echo "⏳ Sağlık kontrolü bekleniyor (15 saniye)..."
+	@sleep 15
+	@echo ""
+	@echo "📊 Servis durumları:"
+	@docker compose -f deploy/docker-compose.prod.yml ps
+	@echo ""
+	@echo "💚 API sağlık kontrolü:"
+	@curl -sf http://localhost:3000/health 2>/dev/null && echo " ✅" || echo " ❌ Başarısız"
+	@echo ""
+	@echo "📝 Loglar: docker compose -f deploy/docker-compose.prod.yml logs -f"
+	@echo "⏹️  Durdur: docker compose -f deploy/docker-compose.prod.yml down"
+
+deploy-push: ## Image'ları registry'ye push et
+	@echo "📤 Image'lar push ediliyor..."
+	@if [ -z "$(REGISTRY)" ]; then \
+		echo "❌ REGISTRY değişkeni tanımlı değil!"; \
+		echo "   Kullanım: make deploy-push REGISTRY=ghcr.io/your-org"; \
+		exit 1; \
+	fi
+	@echo "Tag: $(REGISTRY)/hookrelay-api:latest"
+	docker tag hookrelay-api:latest $(REGISTRY)/hookrelay-api:latest
+	docker tag hookrelay-worker:latest $(REGISTRY)/hookrelay-worker:latest
+	docker push $(REGISTRY)/hookrelay-api:latest
+	docker push $(REGISTRY)/hookrelay-worker:latest
+	@echo "✅ Push tamamlandı!"
+
+deploy-compose: ## Production compose ile başlat (local test)
+	@echo "🚀 Production compose başlatılıyor..."
+	docker compose -f deploy/docker-compose.prod.yml up -d --build
+	@echo "✅ Başlatıldı! Loglar: docker compose -f deploy/docker-compose.prod.yml logs -f"
+
+deploy-stop: ## Production compose durdur
+	docker compose -f deploy/docker-compose.prod.yml down
+	@echo "⏹️  Production servisleri durduruldu."

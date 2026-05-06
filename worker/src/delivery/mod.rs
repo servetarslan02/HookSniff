@@ -1,13 +1,9 @@
-//! Multi-protocol delivery router for HookRelay's event mesh.
+//! Delivery router for HookRelay.
 //!
-//! Routes events to the appropriate delivery mechanism based on the
-//! endpoint's configured delivery target type (HTTP, WebSocket, gRPC,
-//! SQS, Kafka, Email).
+//! Routes webhook events to the appropriate delivery mechanism.
+//! Currently supports HTTP delivery only.
 
-pub mod grpc;
 pub mod http;
-pub mod sqs;
-pub mod websocket;
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -21,10 +17,6 @@ use crate::WebhookMessage;
 #[serde(rename_all = "lowercase")]
 pub enum DeliveryTargetType {
     Http,
-    WebSocket,
-    Grpc,
-    Sqs,
-    Kafka,
     Email,
 }
 
@@ -32,10 +24,6 @@ impl std::fmt::Display for DeliveryTargetType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Http => write!(f, "http"),
-            Self::WebSocket => write!(f, "ws"),
-            Self::Grpc => write!(f, "grpc"),
-            Self::Sqs => write!(f, "sqs"),
-            Self::Kafka => write!(f, "kafka"),
             Self::Email => write!(f, "email"),
         }
     }
@@ -47,10 +35,6 @@ impl std::str::FromStr for DeliveryTargetType {
     fn from_str(s: &str) -> Result<Self> {
         match s.to_lowercase().as_str() {
             "http" => Ok(Self::Http),
-            "ws" | "websocket" => Ok(Self::WebSocket),
-            "grpc" => Ok(Self::Grpc),
-            "sqs" => Ok(Self::Sqs),
-            "kafka" => Ok(Self::Kafka),
             "email" => Ok(Self::Email),
             other => Err(anyhow::anyhow!("Unknown delivery target type: {}", other)),
         }
@@ -112,24 +96,25 @@ impl DeliveryRouter {
                 continue;
             }
 
-            let result = match target.target_type {
-                DeliveryTargetType::Http => {
+            let result = match target.target_type.as_str() {
+                "http" => {
                     http::deliver_http(&self.http_client, webhook).await
                 }
-                DeliveryTargetType::WebSocket => {
-                    websocket::deliver_websocket(&target.config, webhook).await
-                }
-                DeliveryTargetType::Grpc => {
-                    grpc::deliver_grpc(&target.config, webhook).await
-                }
-                DeliveryTargetType::Sqs => {
-                    sqs::deliver_sqs(&target.config, webhook).await
-                }
-                DeliveryTargetType::Kafka => {
-                    deliver_kafka(&target.config, webhook).await
-                }
-                DeliveryTargetType::Email => {
+                "email" => {
                     deliver_email(&target.config, webhook).await
+                }
+                other => {
+                    warn!(
+                        "Unsupported delivery target type '{}' for target {}",
+                        other, target.id
+                    );
+                    Ok(DeliveryResult {
+                        success: false,
+                        status_code: 0,
+                        response_body: String::new(),
+                        duration_ms: 0,
+                        error: format!("Unsupported delivery target type: {}", other),
+                    })
                 }
             };
 
@@ -156,7 +141,6 @@ impl DeliveryRouter {
 
     /// Load delivery targets for an endpoint from the database.
     async fn load_targets(&self, endpoint_id: &str) -> Result<Vec<DeliveryTargetRow>> {
-        // Parse the endpoint_id string to UUID for the query
         let ep_uuid = uuid::Uuid::parse_str(endpoint_id)
             .context("Invalid endpoint_id UUID")?;
 
@@ -183,34 +167,6 @@ pub struct DeliveryTargetRow {
     pub enabled: bool,
 }
 
-/// Placeholder for Kafka-like message queue delivery.
-///
-/// In production this would publish to a message broker.
-/// The event is routed through PostgreSQL queue for reliable delivery.
-async fn deliver_kafka(
-    config: &serde_json::Value,
-    webhook: &WebhookMessage,
-) -> Result<DeliveryResult> {
-    let topic = config
-        .get("topic")
-        .and_then(|v| v.as_str())
-        .unwrap_or("webhook-deliveries");
-
-    info!(
-        "Queue delivery for {} to topic {}",
-        webhook.delivery_id, topic
-    );
-
-    // Route through the PostgreSQL-based delivery queue.
-    Ok(DeliveryResult {
-        success: true,
-        status_code: 200,
-        response_body: format!("Published to delivery queue: {}", topic),
-        duration_ms: 0,
-        error: String::new(),
-    })
-}
-
 /// Placeholder for Email delivery.
 async fn deliver_email(
     config: &serde_json::Value,
@@ -226,7 +182,6 @@ async fn deliver_email(
         webhook.delivery_id, to
     );
 
-    // In production this would use an SMTP client or email API.
     Ok(DeliveryResult {
         success: true,
         status_code: 200,

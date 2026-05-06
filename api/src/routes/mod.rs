@@ -1,5 +1,4 @@
 pub mod agents;
-pub mod ai_center;
 pub mod alerts;
 pub mod analytics;
 pub mod api_keys;
@@ -34,7 +33,6 @@ pub fn api_router() -> Router {
         .nest("/playground", playground::router())
         .nest("/endpoint-health", health_endpoints::router())
         .nest("/stats", stats::router())
-        .nest("/ai", ai_center::router())
         .nest("/agents", agents::router())
         .nest("/routing", routing::router())
         .nest("/analytics", analytics::router())

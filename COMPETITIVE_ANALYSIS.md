@@ -196,6 +196,39 @@ hookrelay.dev zaten var. Alternatifler:
 
 ---
 
+## 🏢 Rakip Şirketlerin İş Modelleri
+
+### Svix — Kurumsal Dev
+| Metrik | Değer |
+|--------|-------|
+| **Funding** | ~$17M (a16z, YC Continuity, Aleph) |
+| **Müşteri segmenti** | Enterprise (Fortune 500) + Startup |
+| **Ekip** | 15-25 kişi (Rust engineers, DevRel, Sales) |
+| **Fiyat** | $490/ay başlangıç, enterprise custom |
+| **Avantaj** | Brand recognition, Standard Webhooks standardı, SOC 2 + HIPAA + PCI-DSS |
+
+### Hookdeck — Niş Oyuncu
+| Metrik | Değer |
+|--------|-------|
+| **Funding** | ~$5.5M |
+| **Müşteri segmenti** | Mid-market, DevOps ekipleri |
+| **Fark** | Inbound webhook proxy (farklı pazar) |
+| **Avantaj** | Outpost ile self-hosted hybrid, 8 destination türü |
+
+### Hook0 — Bootstrapped EU
+| Metrik | Değer |
+|--------|-------|
+| **Funding** | Kendi kendine yetiyor |
+| **Müşteri segmenti** | EU startup'ları, self-hosted isteyenler |
+| **Avantaj** | Tam açık kaynak, EU compliance, two-phase retry |
+
+### Convoy (Kapandı)
+- Open source tek başına iş modeli olmuyor
+- Kurumsal destek olmadan sürdürülebilir değil
+- **Ders:** Önce gelir, sonra open source
+
+---
+
 ## 💡 Rakiplerden Öğreneceklerimiz
 
 ### Svix'ten

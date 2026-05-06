@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 use crate::config::Config;
 use crate::error::AppError;
-use crate::kafka;
+use crate::db;
 use crate::middleware::idempotency;
 use crate::models::customer::Customer;
 use crate::models::delivery::{
@@ -227,7 +227,7 @@ async fn create_webhook(
     .fetch_one(&pool)
     .await?;
 
-    kafka::publish_to_queue(
+    db::publish_to_queue(
         &pool,
         delivery.id,
         endpoint.id,
@@ -380,7 +380,7 @@ async fn batch_webhooks(
 
     // Batch publish all queued messages
     for (delivery, endpoint, payload_str) in &queue_messages {
-        if let Err(e) = kafka::publish_to_queue(
+        if let Err(e) = db::publish_to_queue(
             &pool,
             delivery.id,
             endpoint.id,
@@ -466,7 +466,7 @@ async fn replay_webhook(
         "payload": payload_str,
     });
 
-    kafka::publish_to_queue(
+    db::publish_to_queue(
         &pool,
         new_delivery.id,
         endpoint.id,
