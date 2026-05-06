@@ -23,6 +23,8 @@ pub struct PaginationParams {
     pub page: Option<i64>,
     pub per_page: Option<i64>,
     pub search: Option<String>,
+    pub plan: Option<String>,
+    pub status: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -39,9 +41,30 @@ pub struct UserSummary {
     pub email: String,
     pub name: Option<String>,
     pub plan: String,
-    pub is_active: bool,
+    #[sqlx(rename = "is_active")]
+    #[serde(rename = "status", serialize_with = "serialize_status")]
+    is_active: bool,
     pub is_admin: bool,
     pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+fn serialize_status<S: serde::Serializer>(is_active: &bool, s: S) -> Result<S::Ok, S::Error> {
+    s.serialize_str(if *is_active { "active" } else { "banned" })
+}
+
+#[derive(Debug, Serialize)]
+pub struct UserDetailResponse {
+    pub user: UserSummary,
+    pub endpoints: Vec<EndpointSummary>,
+    pub recent_deliveries: Vec<DeliverySummary>,
+    pub usage_stats: UsageStats,
+}
+
+#[derive(Debug, Serialize)]
+pub struct UsageStats {
+    pub total_deliveries: i64,
+    pub success_rate: f64,
+    pub endpoints_count: i64,
 }
 
 #[derive(Debug, Serialize)]
@@ -92,6 +115,23 @@ pub struct SystemStats {
     pub total_deliveries: i64,
     pub total_revenue: f64,
     pub active_users_today: i64,
+    pub users_by_plan: Vec<PlanCount>,
+    pub recent_signups: Vec<RecentSignup>,
+}
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct PlanCount {
+    pub plan: String,
+    pub count: i64,
+}
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct RecentSignup {
+    pub id: Uuid,
+    pub email: String,
+    pub name: Option<String>,
+    pub plan: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -111,7 +151,7 @@ fn require_admin(customer: &Customer) -> Result<(), AppError> {
     Ok(())
 }
 
-/// GET /v1/admin/users — List all customers with pagination
+/// GET /v1/admin/users — List all customers with pagination and filters
 async fn list_users(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -123,43 +163,61 @@ async fn list_users(
     let per_page = params.per_page.unwrap_or(20).clamp(1, 100);
     let offset = (page - 1) * per_page;
 
-    let (users, total) = if let Some(ref search) = params.search {
-        let search_pattern = format!("%{}%", search);
-        let users = sqlx::query_as::<_, UserSummary>(
-            "SELECT id, email, name, plan, is_active, is_admin, created_at \
-             FROM customers WHERE email ILIKE $1 OR name ILIKE $1 \
-             ORDER BY created_at DESC LIMIT $2 OFFSET $3",
-        )
-        .bind(&search_pattern)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?;
+    // Build dynamic WHERE clauses
+    let mut conditions: Vec<String> = Vec::new();
+    let mut bind_idx = 1;
 
-        let total: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM customers WHERE email ILIKE $1 OR name ILIKE $1",
-        )
-        .bind(&search_pattern)
-        .fetch_one(&pool)
-        .await?;
+    if params.search.is_some() {
+        conditions.push(format!("(email ILIKE ${} OR name ILIKE ${})", bind_idx));
+        bind_idx += 1;
+    }
+    if params.plan.is_some() {
+        conditions.push(format!("plan = ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.status.is_some() {
+        conditions.push(format!("is_active = ${}", bind_idx));
+        bind_idx += 1;
+    }
 
-        (users, total.0)
+    let where_clause = if conditions.is_empty() {
+        String::new()
     } else {
-        let users = sqlx::query_as::<_, UserSummary>(
-            "SELECT id, email, name, plan, is_active, is_admin, created_at \
-             FROM customers ORDER BY created_at DESC LIMIT $1 OFFSET $2",
-        )
+        format!("WHERE {}", conditions.join(" AND "))
+    };
+
+    let base_query = format!(
+        "SELECT id, email, name, plan, is_active, is_admin, created_at FROM customers {} ORDER BY created_at DESC",
+        where_clause
+    );
+    let count_query = format!("SELECT COUNT(*) FROM customers {}", where_clause);
+
+    // Bind parameters to both queries
+    let mut users_query = sqlx::query_as::<_, UserSummary>(&base_query);
+    let mut count_query = sqlx::query_as::<_, (i64,)>(&count_query);
+
+    if let Some(ref search) = params.search {
+        let pattern = format!("%{}%", search);
+        users_query = users_query.bind(&pattern);
+        count_query = count_query.bind(&pattern);
+    }
+    if let Some(ref plan) = params.plan {
+        users_query = users_query.bind(plan);
+        count_query = count_query.bind(plan);
+    }
+    if let Some(ref status) = params.status {
+        let is_active = status == "active";
+        users_query = users_query.bind(is_active);
+        count_query = count_query.bind(is_active);
+    }
+
+    let users = users_query
         .bind(per_page)
         .bind(offset)
         .fetch_all(&pool)
         .await?;
 
-        let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM customers")
-            .fetch_one(&pool)
-            .await?;
-
-        (users, total.0)
-    };
+    let total = count_query.fetch_one(&pool).await?.0;
 
     Ok(Json(PaginatedUsers {
         users,
@@ -174,7 +232,7 @@ async fn get_user_detail(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
-) -> Result<Json<UserDetail>, AppError> {
+) -> Result<Json<UserDetailResponse>, AppError> {
     require_admin(&customer)?;
 
     let user = sqlx::query_as::<_, UserSummary>(
@@ -200,26 +258,43 @@ async fn get_user_detail(
     .fetch_all(&pool)
     .await?;
 
-    // Get webhook counts
-    let counts: (i32, i32) = sqlx::query_as(
-        "SELECT webhook_limit, webhook_count FROM customers WHERE id = $1",
+    // Usage stats
+    let total_deliveries: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1",
     )
     .bind(id)
     .fetch_one(&pool)
     .await?;
 
-    Ok(Json(UserDetail {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        plan: user.plan,
-        is_active: user.is_active,
-        is_admin: user.is_admin,
-        webhook_limit: counts.0,
-        webhook_count: counts.1,
-        created_at: user.created_at,
+    let successful: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = 'delivered'",
+    )
+    .bind(id)
+    .fetch_one(&pool)
+    .await?;
+
+    let endpoints_count: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1",
+    )
+    .bind(id)
+    .fetch_one(&pool)
+    .await?;
+
+    let success_rate = if total_deliveries.0 > 0 {
+        (successful.0 as f64 / total_deliveries.0 as f64) * 100.0
+    } else {
+        0.0
+    };
+
+    Ok(Json(UserDetailResponse {
+        user,
         endpoints,
         recent_deliveries,
+        usage_stats: UsageStats {
+            total_deliveries: total_deliveries.0,
+            success_rate,
+            endpoints_count: endpoints_count.0,
+        },
     }))
 }
 
@@ -340,11 +415,27 @@ async fn system_stats(
     .fetch_one(&pool)
     .await?;
 
+    // Users grouped by plan
+    let users_by_plan = sqlx::query_as::<_, PlanCount>(
+        "SELECT plan, COUNT(*) as count FROM customers GROUP BY plan ORDER BY count DESC",
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    // Recent signups (last 10)
+    let recent_signups = sqlx::query_as::<_, RecentSignup>(
+        "SELECT id, email, name, plan, created_at FROM customers ORDER BY created_at DESC LIMIT 10",
+    )
+    .fetch_all(&pool)
+    .await?;
+
     Ok(Json(SystemStats {
         total_users: total_users.0,
         total_deliveries: total_deliveries.0,
         total_revenue: revenue.0.unwrap_or(0.0),
         active_users_today: active_today.0,
+        users_by_plan,
+        recent_signups,
     }))
 }
 
