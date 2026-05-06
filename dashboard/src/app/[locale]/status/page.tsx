@@ -111,11 +111,9 @@ export default function StatusPage() {
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-
   const loadData = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/status`);
+      const res = await fetch('/api/status');
       if (!res.ok) {
         throw new Error(`Status API returned ${res.status}`);
       }
