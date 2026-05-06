@@ -75,6 +75,28 @@ pub async fn health_check(
     };
     checks.insert("queue".to_string(), queue_status);
 
+    // Last successful delivery check
+    let last_delivery_status = match sqlx::query_scalar::<_, Option<chrono::DateTime<chrono::Utc>>>(
+        "SELECT MAX(processed_at) FROM webhook_queue WHERE status = 'delivered'"
+    )
+    .fetch_one(&pool)
+    .await
+    {
+        Ok(last_at) => {
+            json!({
+                "status": "healthy",
+                "last_delivered_at": last_at.map(|t| t.to_rfc3339())
+            })
+        }
+        Err(e) => {
+            json!({
+                "status": "degraded",
+                "error": e.to_string()
+            })
+        }
+    };
+    checks.insert("last_delivery".to_string(), last_delivery_status);
+
     let status_code = if overall_healthy {
         StatusCode::OK
     } else {
