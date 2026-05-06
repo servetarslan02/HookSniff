@@ -2,13 +2,13 @@
 FROM rust:latest AS builder
 
 WORKDIR /app
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml ./
 COPY api/ api/
 COPY worker/ worker/
 
 # Build release binary
-RUN cargo build --release -p hookrelay-worker && \
-    strip /app/target/release/hookrelay-worker
+RUN cargo build --release -p hooksniff-worker && \
+    strip /app/target/release/hooksniff-worker
 
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
@@ -17,13 +17,13 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r hookrelay && useradd -r -g hookrelay -d /app -s /sbin/nologin hookrelay
+RUN groupadd -r hooksniff && useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff
 
-COPY --from=builder /app/target/release/hookrelay-worker /usr/local/bin/hookrelay-worker
+COPY --from=builder /app/target/release/hooksniff-worker /usr/local/bin/hooksniff-worker
 
-RUN chown -R hookrelay:hookrelay /app
+RUN chown -R hooksniff:hooksniff /app
 
-USER hookrelay
+USER hooksniff
 WORKDIR /app
 
-CMD ["hookrelay-worker"]
+CMD ["hooksniff-worker"]
