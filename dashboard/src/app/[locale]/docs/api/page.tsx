@@ -199,6 +199,7 @@ function ApiMethod({
   request?: string;
   response: string;
 }) {
+  const t = useTranslations('docs');
   const methodColors: Record<string, string> = {
     GET: 'bg-green-100 text-green-800',
     POST: 'bg-blue-100 text-blue-800',

@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 export default function SdksPage() {
   const t = useTranslations('docs');
   const tc = useTranslations('common');
