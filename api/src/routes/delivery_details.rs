@@ -38,6 +38,7 @@ struct DeliveryDetails {
 struct AttemptDetail {
     id: Uuid,
     attempt_number: i32,
+    status: String,
     status_code: Option<i32>,
     response_body: Option<String>,
     request_headers: Option<serde_json::Value>,
@@ -98,16 +99,23 @@ async fn get_delivery_details(
         next_retry_at: delivery.10.map(|t| t.to_rfc3339()),
         response_status: delivery.8,
         response_body: delivery.9,
-        attempts: attempts.into_iter().map(|(id, num, status, body, dur, err, created)| AttemptDetail {
-            id,
-            attempt_number: num,
-            status_code: status,
-            response_body: body,
-            request_headers: None,
-            response_headers: None,
-            duration_ms: dur,
-            error_message: err,
-            created_at: created.to_rfc3339(),
+        attempts: attempts.into_iter().map(|(id, num, status, body, dur, err, created)| {
+            let derived_status = match status {
+                Some(code) if (200..300).contains(&code) => "delivered".to_string(),
+                _ => "failed".to_string(),
+            };
+            AttemptDetail {
+                id,
+                attempt_number: num,
+                status: derived_status,
+                status_code: status,
+                response_body: body,
+                request_headers: None,
+                response_headers: None,
+                duration_ms: dur,
+                error_message: err,
+                created_at: created.to_rfc3339(),
+            }
         }).collect(),
         signature_info: SignatureInfo {
             algorithm: "HMAC-SHA256".to_string(),
@@ -140,9 +148,15 @@ async fn get_attempt_detail(
     .await?
     .ok_or(AppError::NotFound)?;
 
+    let derived_status = match attempt.2 {
+        Some(code) if (200..300).contains(&code) => "delivered".to_string(),
+        _ => "failed".to_string(),
+    };
+
     Ok(Json(AttemptDetail {
         id: attempt.0,
         attempt_number: attempt.1,
+        status: derived_status,
         status_code: attempt.2,
         response_body: attempt.3,
         request_headers: None,
