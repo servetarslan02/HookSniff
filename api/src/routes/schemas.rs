@@ -1,4 +1,4 @@
-//! Schema registry API routes for HookRelay.
+//! Schema registry API routes for HookSniff.
 //!
 //! Provides CRUD endpoints for managing event schemas:
 //! - POST /v1/schemas — Register schema

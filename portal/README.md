@@ -1,4 +1,4 @@
-# HookRelay — Embeddable Webhook Portal Widget
+# HookSniff — Embeddable Webhook Portal Widget
 
 Müşterilerinizin kendi sitelerine tek satır kod ile ekleyebileceği, iframe tabanlı webhook portal widget'ı.
 

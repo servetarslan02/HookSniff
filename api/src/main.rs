@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
     // Initialize tracing (OpenTelemetry + structured logging)
     telemetry::init(&cfg);
 
-    tracing::info!("Starting HookRelay API v{}", env!("CARGO_PKG_VERSION"));
+    tracing::info!("Starting HookSniff API v{}", env!("CARGO_PKG_VERSION"));
 
     let pool = db::create_pool(&cfg.database_url).await?;
 
@@ -101,14 +101,14 @@ async fn main() -> Result<()> {
         .layer(axum::middleware::from_fn(telemetry::trace_id_middleware));
 
     let addr = format!("0.0.0.0:{}", cfg.port);
-    tracing::info!("🚀 HookRelay API running on port {}", cfg.port);
+    tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
 
-    tracing::info!("👋 HookRelay API shut down gracefully");
+    tracing::info!("👋 HookSniff API shut down gracefully");
 
     // Flush OpenTelemetry traces before exit
     opentelemetry::global::shutdown_tracer_provider();

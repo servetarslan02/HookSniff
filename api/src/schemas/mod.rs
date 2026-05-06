@@ -1,4 +1,4 @@
-//! Event Schema Registry for HookRelay's event mesh.
+//! Event Schema Registry for HookSniff's event mesh.
 //!
 //! Provides schema management for event types, including auto-detection,
 //! versioning, backward-compatible evolution, and validation.

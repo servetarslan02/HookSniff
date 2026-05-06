@@ -1,6 +1,6 @@
-# HookRelay PHP SDK
+# HookSniff PHP SDK
 
-Official PHP client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official PHP client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -15,10 +15,10 @@ composer require hooksniff/hooksniff-php
 
 require 'vendor/autoload.php';
 
-use HookRelay\HookRelayClient;
+use HookSniff\HookSniffClient;
 
 // Initialize client
-$client = new HookRelayClient('hr_live_your_api_key_here');
+$client = new HookSniffClient('hr_live_your_api_key_here');
 
 // Create a webhook endpoint
 $endpoint = $client->endpoints()->create(
@@ -119,7 +119,7 @@ Verify incoming webhook signatures in your handler:
 ```php
 <?php
 
-use HookRelay\WebhookVerification;
+use HookSniff\WebhookVerification;
 
 $payload = file_get_contents('php://input');
 $signature = $_SERVER['HTTP_X_HOOKRELAY_SIGNATURE'] ?? '';
@@ -139,7 +139,7 @@ echo json_encode(['received' => true]);
 ### Standard Webhooks Verification
 
 ```php
-use HookRelay\WebhookVerification;
+use HookSniff\WebhookVerification;
 
 $result = WebhookVerification::verifyWebhook(
     $payload,
@@ -161,11 +161,11 @@ echo "Event: {$result['payload']['event']}\n";
 ## Error Handling
 
 ```php
-use HookRelay\AuthenticationException;
-use HookRelay\NotFoundException;
-use HookRelay\RateLimitException;
-use HookRelay\ValidationException;
-use HookRelay\PayloadTooLargeException;
+use HookSniff\AuthenticationException;
+use HookSniff\NotFoundException;
+use HookSniff\RateLimitException;
+use HookSniff\ValidationException;
+use HookSniff\PayloadTooLargeException;
 
 try {
     $delivery = $client->webhooks()->send('nonexistent', 'test.event', ['test' => true]);
@@ -184,11 +184,11 @@ try {
 
 ## API Reference
 
-### `new HookRelayClient(apiKey, baseUrl = null, timeout = 0)`
+### `new HookSniffClient(apiKey, baseUrl = null, timeout = 0)`
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `apiKey` | `string` | required | Your HookRelay API key |
+| `apiKey` | `string` | required | Your HookSniff API key |
 | `baseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `timeout` | `int` | `30` | Request timeout in seconds |
 

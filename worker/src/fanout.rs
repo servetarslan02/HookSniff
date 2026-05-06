@@ -1,4 +1,4 @@
-//! Event fan-out for HookRelay's event mesh.
+//! Event fan-out for HookSniff's event mesh.
 //!
 //! Routes a single event to multiple destinations based on fan-out rules.
 //! Supports pattern matching on event type, conditional routing, and

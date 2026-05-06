@@ -1,4 +1,4 @@
-//! CloudEvents v1.0 implementation for HookRelay.
+//! CloudEvents v1.0 implementation for HookSniff.
 //!
 //! Follows the CloudEvents spec: https://cloudevents.io/
 //!

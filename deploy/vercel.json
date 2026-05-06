@@ -25,7 +25,7 @@
   ],
   "env": {
     "NEXT_PUBLIC_API_URL": "https://api.hooksniff.is-a.dev/v1",
-    "NEXT_PUBLIC_APP_NAME": "HookRelay",
+    "NEXT_PUBLIC_APP_NAME": "HookSniff",
     "NEXT_PUBLIC_APP_URL": "https://hooksniff.is-a.dev"
   }
 }

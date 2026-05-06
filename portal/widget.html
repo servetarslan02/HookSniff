@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HookRelay — Webhook Portal</title>
+  <title>HookSniff — Webhook Portal</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
         <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
       </svg>
-      <h1>HookRelay</h1>
+      <h1>HookSniff</h1>
     </div>
     <div class="header-right">
       <span class="status-badge" id="connectionStatus">Connecting…</span>
@@ -148,7 +148,7 @@
           renderList();
         })
         .catch(function (err) {
-          console.error("[HookRelay]", err);
+          console.error("[HookSniff]", err);
           $statusBadge.textContent = "Error";
           $statusBadge.className = "status-badge status-failed";
           toast("Failed to load webhooks: " + err.message, "error");

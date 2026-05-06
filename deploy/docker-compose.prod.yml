@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════
-# HookRelay — Production Docker Compose
+# HookSniff — Production Docker Compose
 # ═══════════════════════════════════════════════════════════════════
 # Oracle Cloud Always Free (ARM64) için optimize edilmiş.
 # PostgreSQL ve Redis cloud servisleri kullanılır (Neon, Upstash).
@@ -7,7 +7,7 @@
 # ═══════════════════════════════════════════════════════════════════
 
 services:
-  # ── HookRelay API ──
+  # ── HookSniff API ──
   # Webhook alımı, yönetim API'si, sağlık kontrolü
   api:
     build:
@@ -45,7 +45,7 @@ services:
     networks:
       - hooksniff
 
-  # ── HookRelay Worker ──
+  # ── HookSniff Worker ──
   # Webhook teslimatı, retry mekanizması, fan-out
   worker:
     build:

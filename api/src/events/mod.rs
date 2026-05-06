@@ -1,4 +1,4 @@
-//! CloudEvents module for HookRelay.
+//! CloudEvents module for HookSniff.
 //!
 //! Provides CloudEvents v1.0 support and an event type registry
 //! with the naming convention: `com.hooksniff.<category>.<action>`
@@ -9,7 +9,7 @@ pub use cloudevents::CloudEvent;
 
 /// Event type registry with naming convention: `com.hooksniff.<category>.<action>`
 ///
-/// All HookRelay internal events follow this convention for consistency
+/// All HookSniff internal events follow this convention for consistency
 /// and interoperability with CloudEvents-compatible systems.
 pub mod event_types {
     // ── Delivery events ────────────────────────────────────────────────
@@ -71,19 +71,19 @@ pub mod event_types {
         ]
     }
 
-    /// Check if an event type follows the HookRelay naming convention.
+    /// Check if an event type follows the HookSniff naming convention.
     pub fn is_valid_hooksniff_event(event_type: &str) -> bool {
         event_type.starts_with("com.hooksniff.")
     }
 
-    /// Extract the category from a HookRelay event type.
+    /// Extract the category from a HookSniff event type.
     /// Returns `None` if the event doesn't follow the convention.
     pub fn category(event_type: &str) -> Option<&str> {
         let rest = event_type.strip_prefix("com.hooksniff.")?;
         rest.split('.').next()
     }
 
-    /// Extract the action from a HookRelay event type.
+    /// Extract the action from a HookSniff event type.
     /// Returns `None` if the event doesn't follow the convention.
     pub fn action(event_type: &str) -> Option<&str> {
         let rest = event_type.strip_prefix("com.hooksniff.")?;

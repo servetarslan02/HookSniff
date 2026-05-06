@@ -1,6 +1,6 @@
-# HookRelay Elixir SDK
+# HookSniff Elixir SDK
 
-Official Elixir client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official Elixir client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -18,26 +18,26 @@ end
 
 ```elixir
 # Create client
-client = HookRelay.new("hr_live_...")
+client = HookSniff.new("hr_live_...")
 
 # Create endpoint
-{:ok, endpoint} = HookRelay.Endpoints.create(client, %{
+{:ok, endpoint} = HookSniff.Endpoints.create(client, %{
   url: "https://myapp.com/webhook",
   description: "Orders"
 })
 
 # Send webhook
-{:ok, delivery} = HookRelay.Webhooks.send(client, %{
+{:ok, delivery} = HookSniff.Webhooks.send(client, %{
   endpoint_id: endpoint["id"],
   event: "order.created",
   data: %{order_id: "12345", amount: 99.99}
 })
 
 # List deliveries
-{:ok, result} = HookRelay.Webhooks.list(client, status: "delivered", page: 1)
+{:ok, result} = HookSniff.Webhooks.list(client, status: "delivered", page: 1)
 
 # Get delivery attempts
-{:ok, attempts} = HookRelay.Webhooks.attempts(client, delivery["id"])
+{:ok, attempts} = HookSniff.Webhooks.attempts(client, delivery["id"])
 ```
 
 ## Webhook Verification
@@ -46,7 +46,7 @@ Verify incoming webhooks using Standard Webhooks headers:
 
 ```elixir
 # From Plug/Phoenix conn
-result = HookRelay.WebhookVerification.verify_webhook_from_headers(
+result = HookSniff.WebhookVerification.verify_webhook_from_headers(
   payload: conn.assigns[:raw_body],
   headers: conn.req_headers |> Map.new(),
   secret: "whsec_..."
@@ -66,10 +66,10 @@ end
 ## Error Handling
 
 ```elixir
-case HookRelay.Endpoints.create(client, %{url: "invalid"}) do
+case HookSniff.Endpoints.create(client, %{url: "invalid"}) do
   {:ok, endpoint} -> # Success
-  {:error, %HookRelay.Error{code: :validation_error, message: msg}} -> # 400
-  {:error, %HookRelay.Error{code: :rate_limit_error}} -> # 429
+  {:error, %HookSniff.Error{code: :validation_error, message: msg}} -> # 400
+  {:error, %HookSniff.Error{code: :rate_limit_error}} -> # 429
   {:error, error} -> # Other error
 end
 ```

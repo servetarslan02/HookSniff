@@ -459,7 +459,7 @@
     "home": "Ana Sayfa"
   },
   "status": {
-    "title": "HookRelay Durumu",
+    "title": "HookSniff Durumu",
     "subtitle": "Gerçek zamanlı servis sağlık izleme",
     "autoRefresh": "Her 30 saniyede bir otomatik yenilenir",
     "lastUpdated": "Son güncelleme: {time}",

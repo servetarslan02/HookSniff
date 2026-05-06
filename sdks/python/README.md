@@ -1,6 +1,6 @@
-# HookRelay Python SDK
+# HookSniff Python SDK
 
-Official Python client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official Python client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -18,10 +18,10 @@ pip install -e .
 ## Quick Start
 
 ```python
-from hooksniff import HookRelayClient
+from hooksniff import HookSniffClient
 
 # Initialize client
-client = HookRelayClient(api_key="hr_live_your_api_key_here")
+client = HookSniffClient(api_key="hr_live_your_api_key_here")
 
 # Create a webhook endpoint
 endpoint = client.endpoints.create(
@@ -81,10 +81,10 @@ for err in results.errors:
 Configure custom retry behavior when creating endpoints:
 
 ```python
-from hooksniff import HookRelayClient
+from hooksniff import HookSniffClient
 from hooksniff.models import RetryPolicy
 
-client = HookRelayClient(api_key="hr_live_...")
+client = HookSniffClient(api_key="hr_live_...")
 
 endpoint = client.endpoints.create(
     url="https://myapp.com/webhook",
@@ -151,7 +151,7 @@ def handle_webhook(request):
 
 ```python
 from hooksniff import (
-    HookRelayClient,
+    HookSniffClient,
     AuthenticationError,
     NotFoundError,
     RateLimitError,
@@ -159,7 +159,7 @@ from hooksniff import (
     PayloadTooLargeError,
 )
 
-client = HookRelayClient(api_key="hr_live_...")
+client = HookSniffClient(api_key="hr_live_...")
 
 try:
     delivery = client.webhooks.send(
@@ -180,7 +180,7 @@ except PayloadTooLargeError:
 
 ## API Reference
 
-### `HookRelayClient(api_key, base_url="https://api.hooksniff.is-a.dev/v1", timeout=30)`
+### `HookSniffClient(api_key, base_url="https://api.hooksniff.is-a.dev/v1", timeout=30)`
 
 Main client class.
 

@@ -1,5 +1,5 @@
 /**
- * HookRelay Load Test — Load Test
+ * HookSniff Load Test — Load Test
  * ================================
  * Orta düzey trafik simülasyonu. Gerçekçi production yükü.
  * 100 VUs, 5 dakika süre.

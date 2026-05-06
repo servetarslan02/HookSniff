@@ -1,4 +1,4 @@
-//! Polar.sh billing integration for HookRelay.
+//! Polar.sh billing integration for HookSniff.
 //!
 //! Polar.sh is a Merchant of Record (MoR) that handles:
 //! - Payment processing (credit card, Apple Pay, Google Pay)

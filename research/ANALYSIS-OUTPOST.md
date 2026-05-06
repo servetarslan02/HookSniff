@@ -102,7 +102,7 @@ type RetryTask struct {
 - Customer notification (email vb.)
 - Automatic endpoint disable (uzun süreli failure)
 
-## 🔄 HookRelay'e Uygulanabilirlik
+## 🔄 HookSniff'e Uygulanabilirlik
 
 ### Hemen Uygulanabilir
 1. **RetryTask pattern** — Minimal retry task modeli, event data'sını DB'den çek
@@ -114,9 +114,9 @@ type RetryTask struct {
 5. **User portal** — Customer dashboard'u
 6. **Partition key** — Tenant bazlı message routing
 
-### HookRelay'in Mevcut Yapısıyla Karşılaştırma
+### HookSniff'in Mevcut Yapısıyla Karşılaştırma
 
-| Özellik | Outpost | HookRelay |
+| Özellik | Outpost | HookSniff |
 |---------|---------|-----------|
 | Multi-tenant | ✅ | ✅ (customer_id) |
 | Retry queue | Redis RSMQ | PostgreSQL queue |
@@ -126,7 +126,7 @@ type RetryTask struct {
 | Alerts | ✅ | ❌ Henüz yok |
 | SSRF protection | ✅ (smokescreen) | ❌ Henüz yok |
 
-## ✅ HookRelay İçin Öneriler
+## ✅ HookSniff İçin Öneriler
 
 ### Kısa Vadeli (Hemen)
 1. SSRF koruması ekle (IP filtering)

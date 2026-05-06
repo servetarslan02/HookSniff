@@ -66,7 +66,7 @@ pub fn router() -> Router {
 
 /// GET /v1/outbound-ips
 ///
-/// Returns the list of static IP addresses that HookRelay uses to deliver webhooks.
+/// Returns the list of static IP addresses that HookSniff uses to deliver webhooks.
 /// Enterprise customers use this endpoint to configure firewall/WAF allowlists.
 async fn get_outbound_ips() -> Json<OutboundIpsResponse> {
     Json(get_cached_response())

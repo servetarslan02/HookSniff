@@ -1,5 +1,5 @@
 /**
- * Standard Webhooks verification for HookRelay.
+ * Standard Webhooks verification for HookSniff.
  *
  * Compatible with the Standard Webhooks spec (https://www.standardwebhooks.com/)
  * and Svix's verification flow.

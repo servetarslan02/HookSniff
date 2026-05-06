@@ -25,12 +25,12 @@ export default function TermsPage() {
         <div className="prose dark:prose-invert max-w-none space-y-8 text-gray-700 dark:text-slate-300 leading-relaxed">
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">1. Acceptance of Terms</h2>
-            <p>By accessing or using HookRelay ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service.</p>
+            <p>By accessing or using HookSniff ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service.</p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">2. Description of Service</h2>
-            <p>HookRelay provides webhook delivery infrastructure for developers. The Service includes webhook delivery, retry logic, signature verification, monitoring dashboard, and related APIs.</p>
+            <p>HookSniff provides webhook delivery infrastructure for developers. The Service includes webhook delivery, retry logic, signature verification, monitoring dashboard, and related APIs.</p>
           </section>
 
           <section>

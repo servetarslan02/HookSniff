@@ -1,4 +1,4 @@
-# HookRelay Alert Rules
+# HookSniff Alert Rules
 # Loaded by Prometheus via rule_files
 
 groups:
@@ -52,8 +52,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "HookRelay API is down"
-          description: "The HookRelay API instance has been unreachable for more than 1 minute."
+          summary: "HookSniff API is down"
+          description: "The HookSniff API instance has been unreachable for more than 1 minute."
 
       # ── Worker service down ──
       - alert: WorkerServiceDown
@@ -62,8 +62,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "HookRelay Worker is down"
-          description: "The HookRelay Worker instance has been unreachable for more than 1 minute."
+          summary: "HookSniff Worker is down"
+          description: "The HookSniff Worker instance has been unreachable for more than 1 minute."
 
   - name: hooksniff_warning
     rules:

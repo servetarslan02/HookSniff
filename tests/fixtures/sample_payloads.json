@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "HookRelay test fixtures — sample webhook payloads",
+    "description": "HookSniff test fixtures — sample webhook payloads",
     "version": "1.0.0",
     "sizes": {
       "small": "< 1KB",

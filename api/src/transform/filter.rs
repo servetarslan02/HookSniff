@@ -1,4 +1,4 @@
-//! Event filtering for HookRelay's event mesh.
+//! Event filtering for HookSniff's event mesh.
 //!
 //! Provides conditional filtering based on JSON path evaluation,
 //! comparison operators, and logical operators (AND, OR, NOT).

@@ -1,4 +1,4 @@
-# HookRelay — Architecture
+# HookSniff — Architecture
 
 ## System Overview
 
@@ -231,7 +231,7 @@ Retry Scheduler (background task, every 30s)
 
 ### Backoff Strategy
 
-HookRelay uses **exponential backoff with jitter** by default. Configurable per endpoint.
+HookSniff uses **exponential backoff with jitter** by default. Configurable per endpoint.
 
 | Attempt | Default Delay | Cumulative |
 |---------|--------------|------------|

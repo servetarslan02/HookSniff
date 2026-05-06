@@ -1,6 +1,6 @@
-# HookRelay Go SDK
+# HookSniff Go SDK
 
-Go client library for the [HookRelay](https://github.com/servetarslan02/hooksniff) webhook delivery API.
+Go client library for the [HookSniff](https://github.com/servetarslan02/hooksniff) webhook delivery API.
 
 ## Installation
 

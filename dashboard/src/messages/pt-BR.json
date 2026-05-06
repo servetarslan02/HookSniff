@@ -395,7 +395,7 @@
     "noAccount": "Não tem uma conta?",
     "hasAccount": "Já tem uma conta?",
     "loginTitle": "Bem-vindo de volta",
-    "loginSubtitle": "Entre no seu painel HookRelay",
+    "loginSubtitle": "Entre no seu painel HookSniff",
     "signupTitle": "Crie sua conta",
     "signupSubtitle": "Comece a entregar webhooks de forma confiável",
     "signIn": "Sign in",
@@ -459,7 +459,7 @@
     "home": "Home"
   },
   "status": {
-    "title": "HookRelay Status",
+    "title": "HookSniff Status",
     "subtitle": "Real-time service health monitoring",
     "autoRefresh": "Auto-refreshes every 30s",
     "lastUpdated": "Last updated: {time}",
