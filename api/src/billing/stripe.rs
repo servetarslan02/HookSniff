@@ -6,12 +6,20 @@
 //! - Managing subscription lifecycle (create, upgrade, cancel, renew)
 //! - Customer portal for self-service billing
 
+use base64::Engine;
+use hmac::{Hmac, Mac};
 use serde::{Deserialize, Serialize};
+use sha2::Sha256;
 use uuid::Uuid;
 
 use crate::billing::{Plan, Subscription, SubscriptionStatus};
 use crate::config::Config;
 use crate::error::AppError;
+
+type HmacSha256 = Hmac<Sha256>;
+
+/// Maximum age of a webhook event before it's rejected (5 minutes).
+const WEBHOOK_TIMESTAMP_TOLERANCE_SECS: i64 = 300;
 
 /// Stripe price IDs for each plan (set in environment)
 #[derive(Debug, Clone)]
@@ -197,20 +205,17 @@ pub async fn create_customer_portal(
 
 /// Verify and process a Stripe webhook event.
 ///
-/// Verifies the webhook signature, then processes the event based on type.
+/// Verifies the webhook signature using HMAC-SHA256, then processes the event.
 pub async fn handle_webhook_event(
     pool: &sqlx::PgPool,
     payload: &str,
     signature: &str,
     webhook_secret: &str,
 ) -> Result<(), AppError> {
-    // Verify webhook signature (simplified — in production use stripe-rs signature verification)
-    let _event: StripeWebhookEvent =
-        serde_json::from_str(payload).map_err(|e| AppError::BadRequest(format!("Invalid webhook payload: {}", e)))?;
+    // Step 1: Verify the Stripe webhook signature
+    verify_webhook_signature(payload, signature, webhook_secret)?;
 
-    // TODO: Implement proper Stripe signature verification using webhook_secret
-    // For now, we trust the payload if it parses correctly
-
+    // Step 2: Parse and process the event
     let event: StripeWebhookEvent = serde_json::from_str(payload)
         .map_err(|e| AppError::BadRequest(format!("Invalid event: {}", e)))?;
 
@@ -404,4 +409,212 @@ fn checkout_to_form(session: &CreateCheckoutSession) -> Vec<(String, String)> {
     }
 
     fields
+}
+
+/// Parse a Stripe `stripe-signature` header value.
+///
+/// Returns `(timestamp, v1_signature_hex)` on success.
+///
+/// Stripe signature header format:
+///   `t=<unix_timestamp>,v1=<hex_signature>[,v1=<hex_signature>...]`
+///
+/// We accept the first `v1` element. Stripe may include multiple during key
+/// rotation, but we only verify against the webhook secret we have.
+fn parse_stripe_signature(header: &str) -> Result<(i64, &str), AppError> {
+    let mut timestamp: Option<i64> = None;
+    let mut v1_sig: Option<&str> = None;
+
+    for part in header.split(',') {
+        let Some((key, value)) = part.split_once('=') else {
+            continue;
+        };
+        let key = key.trim();
+        let value = value.trim();
+
+        match key {
+            "t" => {
+                timestamp = Some(
+                    value
+                        .parse::<i64>()
+                        .map_err(|_| AppError::BadRequest("Invalid timestamp in signature header".into()))?,
+                );
+            }
+            "v1" => {
+                // Accept the first v1 signature we see
+                if v1_sig.is_none() {
+                    v1_sig = Some(value);
+                }
+            }
+            _ => {} // Ignore unknown fields (future-proofing)
+        }
+    }
+
+    let ts = timestamp.ok_or_else(|| AppError::BadRequest("Missing timestamp in signature header".into()))?;
+    let sig = v1_sig.ok_or_else(|| AppError::BadRequest("Missing v1 signature in header".into()))?;
+
+    Ok((ts, sig))
+}
+
+/// Verify the Stripe webhook signature.
+///
+/// Stripe signs webhooks by computing:
+///   HMAC-SHA256(webhook_secret, "{timestamp}.{payload}")
+///
+/// The webhook secret starts with `whsec_`; the actual key is the base64-
+/// encoded portion after the prefix.
+///
+/// Returns `Ok(())` if the signature is valid, `Err` otherwise.
+fn verify_webhook_signature(
+    payload: &str,
+    signature_header: &str,
+    webhook_secret: &str,
+) -> Result<(), AppError> {
+    // 1. Parse the signature header
+    let (timestamp, expected_sig_hex) = parse_stripe_signature(signature_header)?;
+
+    // 2. Check timestamp freshness (replay protection)
+    let now = chrono::Utc::now().timestamp();
+    let age = (now - timestamp).abs();
+    if age > WEBHOOK_TIMESTAMP_TOLERANCE_SECS {
+        tracing::warn!(
+            "Stripe webhook timestamp too old: {}s (max {}s)",
+            age,
+            WEBHOOK_TIMESTAMP_TOLERANCE_SECS
+        );
+        return Err(AppError::BadRequest("Webhook timestamp too old".into()));
+    }
+
+    // 3. Extract the signing key (strip `whsec_` prefix, base64-decode)
+    let key_b64 = webhook_secret
+        .strip_prefix("whsec_")
+        .unwrap_or(webhook_secret);
+    let key = base64::engine::general_purpose::STANDARD
+        .decode(key_b64)
+        .map_err(|_| AppError::BadRequest("Invalid webhook secret format".into()))?;
+
+    // 4. Compute HMAC-SHA256 over "{timestamp}.{payload}"
+    let signed_payload = format!("{}.{}", timestamp, payload);
+    let mut mac = HmacSha256::new_from_slice(&key)
+        .map_err(|_| AppError::Internal(anyhow::anyhow!("HMAC key error")))?;
+    mac.update(signed_payload.as_bytes());
+
+    // 5. Decode the expected signature from hex and verify (constant-time)
+    let expected_sig = hex::decode(expected_sig_hex)
+        .map_err(|_| AppError::BadRequest("Invalid signature hex encoding".into()))?;
+
+    mac.verify_slice(&expected_sig)
+        .map_err(|_| AppError::Unauthorized)?;
+
+    tracing::debug!("Stripe webhook signature verified (ts={})", timestamp);
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Helper: compute a valid Stripe-style webhook signature for testing.
+    fn make_signature(payload: &str, secret: &str, timestamp: i64) -> String {
+        // Stripe uses the raw secret bytes (after stripping whsec_ prefix and base64-decoding)
+        let key_b64 = secret.strip_prefix("whsec_").unwrap_or(secret);
+        let key = base64::engine::general_purpose::STANDARD
+            .decode(key_b64)
+            .unwrap();
+
+        let signed_payload = format!("{}.{}", timestamp, payload);
+        let mut mac = HmacSha256::new_from_slice(&key).unwrap();
+        mac.update(signed_payload.as_bytes());
+        let sig = hex::encode(mac.finalize().into_bytes());
+        format!("t={},v1={}", timestamp, sig)
+    }
+
+    #[test]
+    fn test_parse_stripe_signature_valid() {
+        let header = "t=1234567890,v1=abcdef1234567890";
+        let (ts, sig) = parse_stripe_signature(header).unwrap();
+        assert_eq!(ts, 1234567890);
+        assert_eq!(sig, "abcdef1234567890");
+    }
+
+    #[test]
+    fn test_parse_stripe_signature_multiple_v1() {
+        // Stripe may include multiple v1 values during key rotation
+        let header = "t=999,v1=first_sig,v1=second_sig";
+        let (ts, sig) = parse_stripe_signature(header).unwrap();
+        assert_eq!(ts, 999);
+        assert_eq!(sig, "first_sig"); // First one wins
+    }
+
+    #[test]
+    fn test_parse_stripe_signature_missing_timestamp() {
+        let header = "v1=abcdef";
+        assert!(parse_stripe_signature(header).is_err());
+    }
+
+    #[test]
+    fn test_parse_stripe_signature_missing_v1() {
+        let header = "t=1234567890";
+        assert!(parse_stripe_signature(header).is_err());
+    }
+
+    #[test]
+    fn test_verify_signature_valid() {
+        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let payload = r#"{"id":"evt_123","type":"checkout.session.completed"}"#;
+        let now = chrono::Utc::now().timestamp();
+        let header = make_signature(payload, secret, now);
+
+        assert!(verify_webhook_signature(payload, &header, secret).is_ok());
+    }
+
+    #[test]
+    fn test_verify_signature_tampered_payload() {
+        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let payload = r#"{"id":"evt_123","type":"checkout.session.completed"}"#;
+        let now = chrono::Utc::now().timestamp();
+        let header = make_signature(payload, secret, now);
+
+        let tampered = r#"{"id":"evt_123","type":"payment_intent.succeeded"}"#;
+        assert!(verify_webhook_signature(tampered, &header, secret).is_err());
+    }
+
+    #[test]
+    fn test_verify_signature_wrong_secret() {
+        let secret_a = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let secret_b = "whsec_different_secret_for_testing_purposes__!!";
+        let payload = r#"{"id":"evt_456"}"#;
+        let now = chrono::Utc::now().timestamp();
+        let header = make_signature(payload, secret_a, now);
+
+        assert!(verify_webhook_signature(payload, &header, secret_b).is_err());
+    }
+
+    #[test]
+    fn test_verify_signature_expired_timestamp() {
+        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let payload = r#"{"id":"evt_789"}"#;
+        // 10 minutes ago — beyond 5-minute tolerance
+        let old_ts = chrono::Utc::now().timestamp() - 600;
+        let header = make_signature(payload, secret, old_ts);
+
+        assert!(verify_webhook_signature(payload, &header, secret).is_err());
+    }
+
+    #[test]
+    fn test_verify_signature_future_timestamp() {
+        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let payload = r#"{"id":"evt_future"}"#;
+        // 10 minutes in the future — beyond tolerance
+        let future_ts = chrono::Utc::now().timestamp() + 600;
+        let header = make_signature(payload, secret, future_ts);
+
+        assert!(verify_webhook_signature(payload, &header, secret).is_err());
+    }
+
+    #[test]
+    fn test_verify_signature_malformed_header() {
+        let secret = "whsec_test";
+        assert!(verify_webhook_signature("{}", "garbage", secret).is_err());
+        assert!(verify_webhook_signature("{}", "", secret).is_err());
+    }
 }
