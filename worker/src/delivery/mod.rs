@@ -55,6 +55,7 @@ pub struct DeliveryResult {
     pub success: bool,
     pub status_code: i32,
     pub response_body: String,
+    pub response_headers: serde_json::Value,
     pub duration_ms: i32,
     pub error: String,
 }
@@ -85,7 +86,7 @@ impl DeliveryRouter {
                 "No custom delivery targets for endpoint {}, using default HTTP",
                 webhook.endpoint_id
             );
-            let result = http::deliver_http(&self.http_client, webhook).await?;
+            let result = http::deliver_http(&self.http_client, webhook, 1).await?;
             return Ok(vec![result]);
         }
 
@@ -98,7 +99,7 @@ impl DeliveryRouter {
 
             let result = match target.target_type.as_str() {
                 "http" => {
-                    http::deliver_http(&self.http_client, webhook).await
+                    http::deliver_http(&self.http_client, webhook, 1).await
                 }
                 "email" => {
                     deliver_email(&target.config, webhook).await
@@ -112,6 +113,7 @@ impl DeliveryRouter {
                         success: false,
                         status_code: 0,
                         response_body: String::new(),
+                        response_headers: serde_json::json!({}),
                         duration_ms: 0,
                         error: format!("Unsupported delivery target type: {}", other),
                     })
@@ -129,6 +131,7 @@ impl DeliveryRouter {
                         success: false,
                         status_code: 0,
                         response_body: String::new(),
+                        response_headers: serde_json::json!({}),
                         duration_ms: 0,
                         error: e.to_string(),
                     });
@@ -186,6 +189,7 @@ async fn deliver_email(
         success: true,
         status_code: 200,
         response_body: format!("Email sent to: {}", to),
+        response_headers: serde_json::json!({}),
         duration_ms: 0,
         error: String::new(),
     })
