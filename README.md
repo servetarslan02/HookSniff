@@ -1,4 +1,4 @@
-# 🪝 HookRelay
+# 🪝 HookSniff
 
 **Reliable webhook delivery for developers.**
 
@@ -9,7 +9,7 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 ## Features
 
 - **Reliable delivery** — Automatic retries with exponential backoff
-- **HMAC signatures** — Verify webhooks are from HookRelay (Standard Webhooks compliant)
+- **HMAC signatures** — Verify webhooks are from HookSniff (Standard Webhooks compliant)
 - **Dashboard** — Monitor deliveries in real-time
 - **Simple API** — 4 endpoints, that's it
 - **Stripe billing** — Plan management with Stripe Checkout
@@ -55,7 +55,7 @@ Dashboard runs on `http://localhost:3001`
 
 ### Production Deployment (Free Tier)
 
-See **[FREE_TIER_SETUP.md](FREE_TIER_SETUP.md)** for a complete guide to deploying HookRelay on free-tier services (Oracle Cloud, Neon, Vercel, Upstash, Grafana Cloud, Cloudflare R2, Resend).
+See **[FREE_TIER_SETUP.md](FREE_TIER_SETUP.md)** for a complete guide to deploying HookSniff on free-tier services (Oracle Cloud, Neon, Vercel, Upstash, Grafana Cloud, Cloudflare R2, Resend).
 
 ## API Usage
 
@@ -146,7 +146,7 @@ k6 run tests/load/k6_load_test.js
 
 ## Enterprise: IP Whitelisting
 
-Enterprise customers can whitelist HookRelay's static outbound IPs in their firewall/WAF to ensure webhook delivery. See **[docs/OUTBOUND_IPS.md](docs/OUTBOUND_IPS.md)** for the full list of IPs and setup instructions.
+Enterprise customers can whitelist HookSniff's static outbound IPs in their firewall/WAF to ensure webhook delivery. See **[docs/OUTBOUND_IPS.md](docs/OUTBOUND_IPS.md)** for the full list of IPs and setup instructions.
 
 Programmatically fetch current IPs:
 
