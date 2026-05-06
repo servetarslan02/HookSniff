@@ -313,7 +313,7 @@ export const adminApi = {
     apiFetch<{ success: boolean }>(`/admin/users/${id}/plan`, { method: 'PUT', body: { plan }, token }),
 
   updateUserStatus: (token: string, id: string, status: 'active' | 'banned') =>
-    apiFetch<{ success: boolean }>(`/admin/users/${id}/status`, { method: 'PUT', body: { status }, token }),
+    apiFetch<{ success: boolean }>(`/admin/users/${id}/status`, { method: 'PUT', body: { is_active: status === 'active' }, token }),
 
   getRevenue: (token: string) =>
     apiFetch<RevenueResponse>('/admin/revenue', { token }),
