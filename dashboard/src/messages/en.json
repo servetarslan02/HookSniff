@@ -174,30 +174,98 @@
     "signupSubtitle": "Start delivering webhooks reliably"
   },
   "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "docs": "Docs",
+      "status": "Status",
+      "dashboard": "Dashboard →"
+    },
     "hero": {
-      "title": "Reliable webhook delivery for developers",
-      "subtitle": "Monitor, retry, and manage your webhooks with real-time analytics and intelligent routing.",
-      "cta": "Get Started Free",
-      "ctaSecondary": "View Documentation"
+      "uptime": "99.99% delivery uptime",
+      "title": "Webhooks that",
+      "typewriter": [
+        "actually deliver",
+        "never fail",
+        "always retry",
+        "scale infinitely",
+        "just work"
+      ],
+      "subtitle": "Send webhooks with confidence. Automatic retries, HMAC signatures, real-time monitoring. Built for developers who need reliability.",
+      "cta": "Get started free",
+      "ctaSecondary": "Read the docs"
+    },
+    "code": {
+      "filename": "send-webhook.sh",
+      "comment1": "# Create an endpoint",
+      "comment2": "# Send a webhook"
     },
     "features": {
       "title": "Everything you need for webhooks",
-      "smartRetries": "Smart Retries",
-      "smartRetriesDesc": "Exponential backoff with jitter for optimal delivery",
-      "monitoring": "Real-time Monitoring",
-      "monitoringDesc": "Track every delivery with detailed analytics",
-      "security": "Built-in Security",
-      "securityDesc": "HMAC signature verification and secret rotation",
-      "routing": "Intelligent Routing",
-      "routingDesc": "Route webhooks to multiple endpoints with filtering"
+      "subtitle": "Powerful features built for developers who need reliable webhook delivery.",
+      "smartRetries": "Automatic Retries",
+      "smartRetriesDesc": "Exponential backoff with configurable max attempts. Failed deliveries are retried automatically.",
+      "hmacSignatures": "HMAC Signatures",
+      "hmacSignaturesDesc": "Every webhook is signed with SHA256. Verify authenticity with a single function call.",
+      "dashboard": "Real-time Dashboard",
+      "dashboardDesc": "Monitor deliveries, track success rates, debug failures. Everything in one place.",
+      "lowLatency": "Low Latency",
+      "lowLatencyDesc": "Built on Rust for speed. Sub-millisecond overhead on webhook delivery.",
+      "dlq": "Dead Letter Queue",
+      "dlqDesc": "Failed deliveries are preserved for debugging. Nothing gets lost.",
+      "global": "Global Infrastructure",
+      "globalDesc": "Deploy worldwide for low-latency webhook delivery to any endpoint."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "subtitle": "Three simple steps to reliable webhook delivery.",
+      "send": "Send",
+      "sendDesc": "POST a webhook to our API. We handle the rest.",
+      "deliver": "Deliver",
+      "deliverDesc": "We deliver with retries, signatures, and monitoring.",
+      "monitor": "Monitor",
+      "monitorDesc": "Track every delivery in real-time on your dashboard."
     },
     "pricing": {
       "title": "Simple, transparent pricing",
+      "mostPopular": "Most Popular",
       "free": "Free",
       "pro": "Pro",
       "business": "Business",
       "month": "/month",
-      "getStarted": "Get Started"
+      "getStarted": "Get started",
+      "startTrial": "Start free trial",
+      "contactSales": "Contact sales",
+      "freeFeatures": [
+        "1,000 webhooks/month",
+        "100 requests/min",
+        "3 retry attempts",
+        "Community support"
+      ],
+      "proFeatures": [
+        "50,000 webhooks/month",
+        "1,000 requests/min",
+        "5 retry attempts",
+        "Priority support",
+        "Custom domains"
+      ],
+      "businessFeatures": [
+        "500,000 webhooks/month",
+        "10,000 requests/min",
+        "10 retry attempts",
+        "Dedicated support",
+        "SLA guarantee",
+        "Custom integrations"
+      ]
+    },
+    "footer": {
+      "github": "GitHub",
+      "docs": "Docs",
+      "status": "Status",
+      "blog": "Blog",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "copyright": "© 2026 Hookrelay. All rights reserved."
     }
   }
 }

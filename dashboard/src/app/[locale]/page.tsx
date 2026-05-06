@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 // Lazy load ThemeToggle
 const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m => m.ThemeToggle), { ssr: false });
@@ -10,9 +11,9 @@ const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m =
 const LanguageSwitcherBtn = dynamic(() => import('@/components/LanguageSwitcher').then(m => m.LanguageSwitcher), { ssr: false });
 
 /* ─── Typewriter Effect ─── */
-const phrases = ['actually deliver', 'never fail', 'always retry', 'scale infinitely', 'just work'];
-
 function TypewriterText() {
+  const t = useTranslations('landing.hero');
+  const phrases: string[] = t.raw('typewriter');
   const [text, setText] = useState('');
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
@@ -40,7 +41,7 @@ function TypewriterText() {
     }
 
     return () => clearTimeout(timeout);
-  }, [charIdx, isDeleting, phraseIdx]);
+  }, [charIdx, isDeleting, phraseIdx, phrases]);
 
   return (
     <span className="typewriter-cursor gradient-text">{text}</span>
@@ -76,7 +77,6 @@ function FloatingParticles() {
           } as React.CSSProperties}
         />
       ))}
-      {/* Connecting lines (decorative SVG) */}
       <svg className="absolute inset-0 w-full h-full opacity-[0.04] dark:opacity-[0.06]" aria-hidden="true">
         <line x1="20%" y1="30%" x2="45%" y2="60%" stroke="currentColor" strokeWidth="1" className="text-brand-500" />
         <line x1="60%" y1="20%" x2="80%" y2="50%" stroke="currentColor" strokeWidth="1" className="text-purple-500" />
@@ -88,13 +88,6 @@ function FloatingParticles() {
 
 /* ─── Custom SVG Icons ─── */
 const icons = {
-  webhook: (
-    <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 16h6m12 0h6M16 4v6m0 12v6" />
-      <circle cx="16" cy="16" r="6" />
-      <path d="M10 10l2 2m8 8l2 2M22 10l-2 2M10 22l2-2" />
-    </svg>
-  ),
   retry: (
     <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 16a12 12 0 0121.2-7.8" />
@@ -172,7 +165,6 @@ function DashboardPreview() {
     <div className="relative max-w-3xl mx-auto mt-12">
       <div className="absolute -inset-4 bg-gradient-to-r from-brand-500/20 to-purple-500/20 rounded-3xl blur-2xl" />
       <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-brand-500/10 border border-gray-200 dark:border-slate-700 overflow-hidden">
-        {/* Browser chrome */}
         <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -185,7 +177,6 @@ function DashboardPreview() {
             </div>
           </div>
         </div>
-        {/* Mock dashboard content */}
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {[
@@ -199,14 +190,9 @@ function DashboardPreview() {
               </div>
             ))}
           </div>
-          {/* Fake chart */}
           <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 h-32 flex items-end gap-1">
             {[40, 55, 35, 65, 50, 70, 60, 80, 55, 75, 85, 90, 70, 85, 95, 80, 90, 88, 92, 95].map((h, i) => (
-              <div
-                key={i}
-                className="flex-1 bg-brand-400 dark:bg-brand-500 rounded-t opacity-70"
-                style={{ height: `${h}%` }}
-              />
+              <div key={i} className="flex-1 bg-brand-400 dark:bg-brand-500 rounded-t opacity-70" style={{ height: `${h}%` }} />
             ))}
           </div>
         </div>
@@ -217,20 +203,20 @@ function DashboardPreview() {
 
 /* ─── How It Works Section ─── */
 function HowItWorks() {
+  const t = useTranslations('landing.howItWorks');
   const steps = [
-    { icon: icons.send, title: 'Send', desc: 'POST a webhook to our API. We handle the rest.' },
-    { icon: icons.deliver, title: 'Deliver', desc: 'We deliver with retries, signatures, and monitoring.' },
-    { icon: icons.monitor, title: 'Monitor', desc: 'Track every delivery in real-time on your dashboard.' },
+    { icon: icons.send, title: t('send'), desc: t('sendDesc') },
+    { icon: icons.deliver, title: t('deliver'), desc: t('deliverDesc') },
+    { icon: icons.monitor, title: t('monitor'), desc: t('monitorDesc') },
   ];
 
   return (
     <section className="py-24">
       <div className="text-center mb-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">How it works</h2>
-        <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">Three simple steps to reliable webhook delivery.</p>
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('title')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{t('subtitle')}</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-        {/* Connecting line */}
         <div className="hidden md:block absolute top-12 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-600 dark:via-purple-600 dark:to-brand-600" />
         {steps.map((step, i) => (
           <div key={i} className="relative flex flex-col items-center text-center">
@@ -252,6 +238,20 @@ function HowItWorks() {
 /* ─── Landing Page ─── */
 export default function Home() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const tNav = useTranslations('landing.nav');
+  const tHero = useTranslations('landing.hero');
+  const tFeatures = useTranslations('landing.features');
+  const tPricing = useTranslations('landing.pricing');
+  const tFooter = useTranslations('landing.footer');
+
+  const featureKeys = ['smartRetries', 'hmacSignatures', 'dashboard', 'lowLatency', 'dlq', 'global'] as const;
+  const featureIcons = [icons.retry, icons.shield, icons.chart, icons.bolt, icons.queue, icons.globe];
+
+  const plans = [
+    { name: tPricing('free'), price: '$0', period: tPricing('month'), features: tPricing.raw('freeFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('pro'), price: '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('startTrial'), popular: true },
+    { name: tPricing('business'), price: '$149', period: tPricing('month'), features: tPricing.raw('businessFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
@@ -259,58 +259,41 @@ export default function Home() {
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">
-              🪝
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">🪝</div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">Hookrelay</span>
           </div>
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="#features" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Features</a>
-            <a href="#pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Pricing</a>
-            <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
-            <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Status</Link>
+            <a href="#features" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
+            <a href="#pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
+            <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
+            <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <LanguageSwitcherBtn />
             <ThemeToggleBtn />
-            <Link
-              href="/dashboard"
-              className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow"
-            >
-              Dashboard →
+            <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow">
+              {tNav('dashboard')}
             </Link>
           </div>
           {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="md:hidden p-2 -mr-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
-            aria-label="Toggle navigation"
-          >
+          <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="md:hidden p-2 -mr-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition" aria-label="Toggle navigation">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {mobileNavOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
+              {mobileNavOpen ? (<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />) : (<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />)}
             </svg>
           </button>
         </div>
         {/* Mobile nav dropdown */}
         {mobileNavOpen && (
           <div className="md:hidden border-t border-gray-200/50 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-6 py-4 space-y-3">
-            <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Features</a>
-            <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Pricing</a>
-            <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
-            <Link href="/status" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Status</Link>
+            <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
+            <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
+            <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
+            <Link href="/status" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <div className="flex items-center gap-2 pt-2">
               <LanguageSwitcherBtn />
               <ThemeToggleBtn />
             </div>
-            <Link
-              href="/dashboard"
-              onClick={() => setMobileNavOpen(false)}
-              className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center"
-            >
-              Dashboard →
+            <Link href="/dashboard" onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
+              {tNav('dashboard')}
             </Link>
           </div>
         )}
@@ -323,34 +306,25 @@ export default function Home() {
           <div className="pt-24 pb-8 text-center">
             <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-4 py-2 rounded-full text-sm font-medium mb-8 border border-brand-100 dark:border-brand-500/20">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              99.99% delivery uptime
+              {tHero('uptime')}
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
-              Webhooks that
+              {tHero('title')}
               <br />
               <TypewriterText />
             </h1>
             <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Send webhooks with confidence. Automatic retries, HMAC signatures,
-              real-time monitoring. Built for developers who need reliability.
+              {tHero('subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/dashboard"
-                className="bg-gray-900 dark:bg-brand-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow"
-              >
-                Get started free
+              <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
+                {tHero('cta')}
               </Link>
-              <Link
-                href="/docs"
-                className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple"
-              >
-                Read the docs
+              <Link href="/docs" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple">
+                {tHero('ctaSecondary')}
               </Link>
             </div>
           </div>
-
-          {/* Dashboard Preview */}
           <DashboardPreview />
         </main>
       </section>
@@ -382,21 +356,18 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
 
       {/* Features */}
       <div id="features" className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{tFeatures('title')}</h2>
+          <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{tFeatures('subtitle')}</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-          {[
-            { icon: icons.retry, title: 'Automatic Retries', desc: 'Exponential backoff with configurable max attempts. Failed deliveries are retried automatically.' },
-            { icon: icons.shield, title: 'HMAC Signatures', desc: 'Every webhook is signed with SHA256. Verify authenticity with a single function call.' },
-            { icon: icons.chart, title: 'Real-time Dashboard', desc: 'Monitor deliveries, track success rates, debug failures. Everything in one place.' },
-            { icon: icons.bolt, title: 'Low Latency', desc: 'Built on Rust for speed. Sub-millisecond overhead on webhook delivery.' },
-            { icon: icons.queue, title: 'Dead Letter Queue', desc: 'Failed deliveries are preserved for debugging. Nothing gets lost.' },
-            { icon: icons.globe, title: 'Global Infrastructure', desc: 'Deploy worldwide for low-latency webhook delivery to any endpoint.' },
-          ].map((feature, i) => (
-            <div key={i} className="glass-card p-8 hover-lift card-tilt group">
+          {featureKeys.map((key, i) => (
+            <div key={key} className="glass-card p-8 hover-lift card-tilt group">
               <div className="w-14 h-14 rounded-xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 border border-brand-100 dark:border-brand-500/20">
-                {feature.icon}
+                {featureIcons[i]}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
-              <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{feature.desc}</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{tFeatures(key)}</h3>
+              <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{tFeatures(`${key}Desc`)}</p>
             </div>
           ))}
         </div>
@@ -409,42 +380,15 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
 
       {/* Pricing */}
       <div id="pricing" className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{tPricing('title')}</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-          {[
-            {
-              name: 'Free',
-              price: '$0',
-              period: '/month',
-              features: ['1,000 webhooks/month', '100 requests/min', '3 retry attempts', 'Community support'],
-              cta: 'Get started',
-              popular: false,
-            },
-            {
-              name: 'Pro',
-              price: '$49',
-              period: '/month',
-              features: ['50,000 webhooks/month', '1,000 requests/min', '5 retry attempts', 'Priority support', 'Custom domains'],
-              cta: 'Start free trial',
-              popular: true,
-            },
-            {
-              name: 'Business',
-              price: '$149',
-              period: '/month',
-              features: ['500,000 webhooks/month', '10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', 'Custom integrations'],
-              cta: 'Contact sales',
-              popular: false,
-            },
-          ].map((plan, i) => (
-            <div
-              key={i}
-              className={`glass-card p-8 hover-lift card-tilt relative ${
-                plan.popular ? 'ring-2 ring-brand-500 dark:ring-brand-400' : ''
-              }`}
-            >
+          {plans.map((plan, i) => (
+            <div key={i} className={`glass-card p-8 hover-lift card-tilt relative ${plan.popular ? 'ring-2 ring-brand-500 dark:ring-brand-400' : ''}`}>
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                  Most Popular
+                  {tPricing('mostPopular')}
                 </div>
               )}
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
@@ -462,13 +406,7 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
                   </li>
                 ))}
               </ul>
-              <button
-                className={`w-full py-3 rounded-xl font-medium transition btn-ripple ${
-                  plan.popular
-                    ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600'
-                    : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'
-                }`}
-              >
+              <button className={`w-full py-3 rounded-xl font-medium transition btn-ripple ${plan.popular ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'}`}>
                 {plan.cta}
               </button>
             </div>
@@ -484,14 +422,14 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
             <span className="font-semibold text-gray-900 dark:text-white">Hookrelay</span>
           </div>
           <div className="flex gap-6 text-sm text-gray-500 dark:text-slate-400">
-            <a href="https://github.com/hookrelay" className="hover:text-gray-900 dark:hover:text-white transition">GitHub</a>
-            <Link href="/docs" className="hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
-            <Link href="/status" className="hover:text-gray-900 dark:hover:text-white transition">Status</Link>
-            <a href="#" className="hover:text-gray-900 dark:hover:text-white transition">Blog</a>
-            <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition">Terms</Link>
-            <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition">Privacy</Link>
+            <a href="https://github.com/hookrelay" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('github')}</a>
+            <Link href="/docs" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('docs')}</Link>
+            <Link href="/status" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('status')}</Link>
+            <a href="#" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('blog')}</a>
+            <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('terms')}</Link>
+            <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('privacy')}</Link>
           </div>
-          <p className="text-sm text-gray-400 dark:text-slate-500">© 2026 Hookrelay. All rights reserved.</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500">{tFooter('copyright')}</p>
         </div>
       </footer>
     </div>

@@ -174,30 +174,98 @@
     "signupSubtitle": "Webhookの確実な配信を開始"
   },
   "landing": {
+    "nav": {
+      "features": "機能",
+      "pricing": "料金",
+      "docs": "ドキュメント",
+      "status": "ステータス",
+      "dashboard": "ダッシュボード →"
+    },
     "hero": {
-      "title": "開発者のための信頼性の高いWebhook配信",
-      "subtitle": "リアルタイム分析とインテリジェントルーティングでWebhookを監視、リトライ、管理します。",
+      "uptime": "99.99%配信稼働率",
+      "title": "Webhookが",
+      "typewriter": [
+        "実際に配信する",
+        "決して失敗しない",
+        "常に再試行する",
+        "無限にスケールする",
+        "ただ動く"
+      ],
+      "subtitle": "Webhookを自信を持って送信。自動リトライ、HMAC署名、リアルタイム監視。信頼性を必要とする開発者のために。",
       "cta": "無料で始める",
-      "ctaSecondary": "ドキュメントを見る"
+      "ctaSecondary": "ドキュメントを読む"
+    },
+    "code": {
+      "filename": "webhook-送信.sh",
+      "comment1": "# エンドポイントを作成",
+      "comment2": "# Webhookを送信"
     },
     "features": {
       "title": "Webhookに必要なすべて",
-      "smartRetries": "スマートリトライ",
-      "smartRetriesDesc": "最適な配信のための指数バックオフとジッター",
-      "monitoring": "リアルタイム監視",
-      "monitoringDesc": "詳細な分析ですべての配信を追跡",
-      "security": "内蔵セキュリティ",
-      "securityDesc": "HMAC署名検証とシークレットローテーション",
-      "routing": "インテリジェントルーティング",
-      "routingDesc": "フィルタリングで複数のエンドポイントにWebhookをルーティング"
+      "subtitle": "信頼性の高いWebhook配信を必要とする開発者のための強力な機能。",
+      "smartRetries": "自動リトライ",
+      "smartRetriesDesc": "設定可能な最大試行回数による指数バックオフ。失敗した配信は自動的に再試行されます。",
+      "hmacSignatures": "HMAC署名",
+      "hmacSignaturesDesc": "すべてのWebhookはSHA256で署名されます。1つの関数呼び出しで真正性を確認。",
+      "dashboard": "リアルタイムダッシュボード",
+      "dashboardDesc": "配信を監視、成功率を追跡、障害をデバッグ。すべて一箇所で。",
+      "lowLatency": "低レイテンシ",
+      "lowLatencyDesc": "Rustで構築された高速設計。Webhook配信でサブミリ秒のオーバーヘッド。",
+      "dlq": "デッドレターキュー",
+      "dlqDesc": "失敗した配信はデバッグ用に保存されます。何も失われません。",
+      "global": "グローバルインフラ",
+      "globalDesc": "低レイテンシのWebhook配信のために世界中にデプロイ。"
+    },
+    "howItWorks": {
+      "title": "仕組み",
+      "subtitle": "信頼性の高いWebhook配信のための3つの簡単なステップ。",
+      "send": "送信",
+      "sendDesc": "我们的APIにWebhookをPOSTします。残りは私たちが処理します。",
+      "deliver": "配信",
+      "deliverDesc": "リトライ、署名、監視で配信します。",
+      "monitor": "監視",
+      "monitorDesc": "ダッシュボードで各配信をリアルタイムで追跡。"
     },
     "pricing": {
-      "title": "シンプルで透明な価格設定",
+      "title": "シンプルで透明な料金",
+      "mostPopular": "最も人気",
       "free": "無料",
       "pro": "プロ",
       "business": "ビジネス",
       "month": "/月",
-      "getStarted": "始める"
+      "getStarted": "始める",
+      "startTrial": "無料で試す",
+      "contactSales": "営業に連絡",
+      "freeFeatures": [
+        "1,000 Webhook/月",
+        "100リクエスト/分",
+        "3回のリトライ",
+        "コミュニティサポート"
+      ],
+      "proFeatures": [
+        "50,000 Webhook/月",
+        "1,000リクエスト/分",
+        "5回のリトライ",
+        "優先サポート",
+        "カスタムドメイン"
+      ],
+      "businessFeatures": [
+        "500,000 Webhook/月",
+        "10,000リクエスト/分",
+        "10回のリトライ",
+        "専用サポート",
+        "SLA保証",
+        "カスタム統合"
+      ]
+    },
+    "footer": {
+      "github": "GitHub",
+      "docs": "ドキュメント",
+      "status": "ステータス",
+      "blog": "ブログ",
+      "terms": "利用規約",
+      "privacy": "プライバシー",
+      "copyright": "© 2026 Hookrelay. 全著作権所有。"
     }
   }
 }

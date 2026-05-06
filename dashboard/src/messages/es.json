@@ -174,30 +174,98 @@
     "signupSubtitle": "Comienza a entregar webhooks de forma confiable"
   },
   "landing": {
+    "nav": {
+      "features": "Características",
+      "pricing": "Precios",
+      "docs": "Documentación",
+      "status": "Estado",
+      "dashboard": "Panel →"
+    },
     "hero": {
-      "title": "Entrega de webhooks confiable para desarrolladores",
-      "subtitle": "Monitorea, reintenta y gestiona tus webhooks con análisis en tiempo real y enrutamiento inteligente.",
-      "cta": "Comenzar Gratis",
-      "ctaSecondary": "Ver Documentación"
+      "uptime": "99.99% de disponibilidad",
+      "title": "Webhooks que",
+      "typewriter": [
+        "realmente entregan",
+        "nunca fallan",
+        "siempre reintentan",
+        "escalan infinitamente",
+        "simplemente funcionan"
+      ],
+      "subtitle": "Envía webhooks con confianza. Reintentos automáticos, firmas HMAC, monitoreo en tiempo real. Para desarrolladores que necesitan fiabilidad.",
+      "cta": "Comienza gratis",
+      "ctaSecondary": "Leer documentación"
+    },
+    "code": {
+      "filename": "enviar-webhook.sh",
+      "comment1": "# Crear un endpoint",
+      "comment2": "# Enviar un webhook"
     },
     "features": {
       "title": "Todo lo que necesitas para webhooks",
-      "smartRetries": "Reintentos Inteligentes",
-      "smartRetriesDesc": "Backoff exponencial con jitter para entrega óptima",
-      "monitoring": "Monitoreo en Tiempo Real",
-      "monitoringDesc": "Rastrea cada entrega con análisis detallados",
-      "security": "Seguridad Integrada",
-      "securityDesc": "Verificación de firma HMAC y rotación de secretos",
-      "routing": "Enrutamiento Inteligente",
-      "routingDesc": "Encamina webhooks a múltiples endpoints con filtrado"
+      "subtitle": "Características potentes para desarrolladores que necesitan entrega fiable de webhooks.",
+      "smartRetries": "Reintentos Automáticos",
+      "smartRetriesDesc": "Retroceso exponencial con intentos máximos configurables. Las entregas fallidas se reintentan automáticamente.",
+      "hmacSignatures": "Firmas HMAC",
+      "hmacSignaturesDesc": "Cada webhook está firmado con SHA256. Verifica la autenticidad con una sola llamada a función.",
+      "dashboard": "Panel en Tiempo Real",
+      "dashboardDesc": "Monitorea entregas, rastrea tasas de éxito, depura errores. Todo en un lugar.",
+      "lowLatency": "Baja Latencia",
+      "lowLatencyDesc": "Construido en Rust por velocidad. Sobrecarga sub-milisegundo en entrega de webhooks.",
+      "dlq": "Cola de Cartas Muertas",
+      "dlqDesc": "Las entregas fallidas se conservan para depuración. Nada se pierde.",
+      "global": "Infraestructura Global",
+      "globalDesc": "Despliega en todo el mundo para entrega de webhooks de baja latencia."
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "subtitle": "Tres simples pasos para entrega fiable de webhooks.",
+      "send": "Enviar",
+      "sendDesc": "Envía un webhook a nuestra API. Nosotros nos encargamos del resto.",
+      "deliver": "Entregar",
+      "deliverDesc": "Entregamos con reintentos, firmas y monitoreo.",
+      "monitor": "Monitorear",
+      "monitorDesc": "Rastrea cada entrega en tiempo real en tu panel."
     },
     "pricing": {
       "title": "Precios simples y transparentes",
+      "mostPopular": "Más Popular",
       "free": "Gratis",
       "pro": "Pro",
-      "business": "Business",
+      "business": "Negocios",
       "month": "/mes",
-      "getStarted": "Comenzar"
+      "getStarted": "Comenzar",
+      "startTrial": "Prueba gratis",
+      "contactSales": "Contactar ventas",
+      "freeFeatures": [
+        "1,000 webhooks/mes",
+        "100 solicitudes/min",
+        "3 reintentos",
+        "Soporte comunitario"
+      ],
+      "proFeatures": [
+        "50,000 webhooks/mes",
+        "1,000 solicitudes/min",
+        "5 reintentos",
+        "Soporte prioritario",
+        "Dominios personalizados"
+      ],
+      "businessFeatures": [
+        "500,000 webhooks/mes",
+        "10,000 solicitudes/min",
+        "10 reintentos",
+        "Soporte dedicado",
+        "Garantía SLA",
+        "Integraciones personalizadas"
+      ]
+    },
+    "footer": {
+      "github": "GitHub",
+      "docs": "Documentación",
+      "status": "Estado",
+      "blog": "Blog",
+      "terms": "Términos",
+      "privacy": "Privacidad",
+      "copyright": "© 2026 Hookrelay. Todos los derechos reservados."
     }
   }
 }

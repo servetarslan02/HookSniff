@@ -174,30 +174,98 @@
     "signupSubtitle": "Commencez à livrer des webhooks de manière fiable"
   },
   "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "docs": "Documentation",
+      "status": "Statut",
+      "dashboard": "Tableau de bord →"
+    },
     "hero": {
-      "title": "Livraison de webhooks fiable pour les développeurs",
-      "subtitle": "Surveillez, réessayez et gérez vos webhooks avec une analytique en temps réel et un routage intelligent.",
-      "cta": "Commencer Gratuitement",
-      "ctaSecondary": "Voir la Documentation"
+      "uptime": "99,99% de disponibilité",
+      "title": "Des webhooks qui",
+      "typewriter": [
+        "livrent vraiment",
+        "ne tombent jamais en panne",
+        "réessaient toujours",
+        "scalent à l'infini",
+        "fonctionnent simplement"
+      ],
+      "subtitle": "Envoyez des webhooks en toute confiance. Réessais automatiques, signatures HMAC, surveillance en temps réel. Pour les développeurs qui ont besoin de fiabilité.",
+      "cta": "Commencer gratuitement",
+      "ctaSecondary": "Lire la documentation"
+    },
+    "code": {
+      "filename": "envoyer-webhook.sh",
+      "comment1": "# Créer un endpoint",
+      "comment2": "# Envoyer un webhook"
     },
     "features": {
       "title": "Tout ce dont vous avez besoin pour les webhooks",
-      "smartRetries": "Tentatives intelligentes",
-      "smartRetriesDesc": "Backoff exponentiel avec jitter pour une livraison optimale",
-      "monitoring": "Surveillance en temps réel",
-      "monitoringDesc": "Suivez chaque livraison avec une analytique détaillée",
-      "security": "Sécurité intégrée",
-      "securityDesc": "Vérification de signature HMAC et rotation des secrets",
-      "routing": "Routage intelligent",
-      "routingDesc": "Routez les webhooks vers plusieurs points avec filtrage"
+      "subtitle": "Fonctionnalités puissantes pour les développeurs qui ont besoin d'une livraison fiable de webhooks.",
+      "smartRetries": "Réessais Automatiques",
+      "smartRetriesDesc": "Backoff exponentiel avec tentatives max configurables. Les livraisons échouées sont automatiquement réessayées.",
+      "hmacSignatures": "Signatures HMAC",
+      "hmacSignaturesDesc": "Chaque webhook est signé avec SHA256. Vérifiez l'authenticité en un seul appel de fonction.",
+      "dashboard": "Tableau de Bord Temps Réel",
+      "dashboardDesc": "Surveillez les livraisons, suivez les taux de succès, déboguez les erreurs. Tout au même endroit.",
+      "lowLatency": "Faible Latence",
+      "lowLatencyDesc": "Construit en Rust pour la vitesse. Surcharge sub-milliseconde sur la livraison de webhooks.",
+      "dlq": "File de Lettres Mortes",
+      "dlqDesc": "Les livraisons échouées sont conservées pour le débogage. Rien ne se perd.",
+      "global": "Infrastructure Globale",
+      "globalDesc": "Déployez dans le monde entier pour une livraison de webhooks à faible latence."
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "subtitle": "Trois étapes simples pour une livraison fiable de webhooks.",
+      "send": "Envoyer",
+      "sendDesc": "Envoyez un webhook à notre API. Nous nous occupons du reste.",
+      "deliver": "Livrer",
+      "deliverDesc": "Nous livrons avec réessais, signatures et surveillance.",
+      "monitor": "Surveiller",
+      "monitorDesc": "Suivez chaque livraison en temps réel sur votre tableau de bord."
     },
     "pricing": {
-      "title": "Tarification simple et transparente",
+      "title": "Tarifs simples et transparents",
+      "mostPopular": "Le Plus Populaire",
       "free": "Gratuit",
       "pro": "Pro",
-      "business": "Business",
+      "business": "Entreprise",
       "month": "/mois",
-      "getStarted": "Commencer"
+      "getStarted": "Commencer",
+      "startTrial": "Essai gratuit",
+      "contactSales": "Contacter les ventes",
+      "freeFeatures": [
+        "1 000 webhooks/mois",
+        "100 requêtes/min",
+        "3 tentatives de réessai",
+        "Support communautaire"
+      ],
+      "proFeatures": [
+        "50 000 webhooks/mois",
+        "1 000 requêtes/min",
+        "5 tentatives de réessai",
+        "Support prioritaire",
+        "Domaines personnalisés"
+      ],
+      "businessFeatures": [
+        "500 000 webhooks/mois",
+        "10 000 requêtes/min",
+        "10 tentatives de réessai",
+        "Support dédié",
+        "Garantie SLA",
+        "Intégrations personnalisées"
+      ]
+    },
+    "footer": {
+      "github": "GitHub",
+      "docs": "Documentation",
+      "status": "Statut",
+      "blog": "Blog",
+      "terms": "Conditions",
+      "privacy": "Confidentialité",
+      "copyright": "© 2026 Hookrelay. Tous droits réservés."
     }
   }
 }
