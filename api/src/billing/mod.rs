@@ -1,4 +1,7 @@
+pub mod provider;
 pub mod stripe;
+pub mod paddle;
+pub mod iyzico;
 
 use serde::{Deserialize, Serialize};
 
@@ -81,13 +84,45 @@ impl Plan {
         }
     }
 
-    /// Monthly price in cents (USD)
+    /// Monthly price in cents (USD) — used for Stripe
     pub fn monthly_price_cents(&self) -> u64 {
         match self {
             Plan::Free => 0,
             Plan::Pro => 4900,       // $49/mo
             Plan::Business => 14900, // $149/mo
             Plan::Enterprise => 0,   // Custom pricing
+        }
+    }
+
+    /// Monthly price in kuruş (TRY) — used for iyzico
+    pub fn monthly_price_kurus(&self) -> i64 {
+        match self {
+            Plan::Free => 0,
+            Plan::Pro => 14900,      // ₺149.00
+            Plan::Business => 44900, // ₺449.00
+            Plan::Enterprise => 0,
+        }
+    }
+}
+
+/// Resolve the active payment provider for a given provider name.
+///
+/// Returns the appropriate provider implementation, or falls back to Stripe.
+pub fn resolve_provider(
+    provider_name: &str,
+) -> Option<Box<dyn provider::PaymentProviderImpl>> {
+    match provider_name.to_lowercase().as_str() {
+        "paddle" => {
+            let config = paddle::PaddleConfig::from_env()?;
+            Some(Box::new(paddle::PaddleProvider::new(config)))
+        }
+        "iyzico" => {
+            let config = iyzico::IyzicoConfig::from_env()?;
+            Some(Box::new(iyzico::IyzicoProvider::new(config)))
+        }
+        _ => {
+            // Stripe is always available (already in config)
+            None // Caller should use the existing Stripe logic
         }
     }
 }
@@ -133,6 +168,9 @@ pub struct Subscription {
     pub plan: Plan,
     pub status: SubscriptionStatus,
     pub stripe_subscription_id: Option<String>,
+    pub paddle_subscription_id: Option<String>,
+    pub iyzico_subscription_id: Option<String>,
+    pub payment_provider: String,
     pub current_period_start: String,
     pub current_period_end: String,
     pub cancel_at_period_end: bool,
@@ -160,6 +198,8 @@ pub struct Invoice {
     pub period_end: String,
     pub paid_at: Option<String>,
     pub stripe_invoice_id: Option<String>,
+    pub paddle_invoice_id: Option<String>,
+    pub iyzico_invoice_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

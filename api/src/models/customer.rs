@@ -15,6 +15,21 @@ pub struct Customer {
     pub password_hash: Option<String>,
     pub stripe_customer_id: Option<String>,
     pub stripe_subscription_id: Option<String>,
+    /// Payment provider: "stripe", "paddle", or "iyzico"
+    #[serde(default = "default_payment_provider")]
+    pub payment_provider: String,
+    /// Paddle customer ID
+    #[serde(default)]
+    pub paddle_customer_id: Option<String>,
+    /// Paddle subscription ID
+    #[serde(default)]
+    pub paddle_subscription_id: Option<String>,
+    /// iyzico customer ID
+    #[serde(default)]
+    pub iyzico_customer_id: Option<String>,
+    /// iyzico subscription ID
+    #[serde(default)]
+    pub iyzico_subscription_id: Option<String>,
     #[serde(default)]
     pub name: Option<String>,
     #[serde(default)]
@@ -22,6 +37,10 @@ pub struct Customer {
     #[serde(default)]
     pub is_admin: bool,
     pub updated_at: DateTime<Utc>,
+}
+
+fn default_payment_provider() -> String {
+    "stripe".to_string()
 }
 
 #[derive(Debug, Deserialize)]
