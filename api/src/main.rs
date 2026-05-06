@@ -1,6 +1,6 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 
 mod auth;
@@ -126,8 +126,18 @@ async fn main() -> Result<()> {
                     ])
                     .max_age(std::time::Duration::from_secs(3600))
             } else {
+                // Development / staging: allow specific local origins
+                let dev_origins: Vec<axum::http::HeaderValue> = [
+                    "http://localhost:3001",
+                    "http://localhost:3000",
+                    "http://127.0.0.1:3001",
+                    "http://127.0.0.1:3000",
+                ]
+                .iter()
+                .filter_map(|s| s.parse().ok())
+                .collect();
                 CorsLayer::new()
-                    .allow_origin(Any)
+                    .allow_origin(tower_http::cors::AllowOrigin::list(dev_origins))
                     .allow_methods([
                         axum::http::Method::GET,
                         axum::http::Method::POST,
@@ -154,7 +164,39 @@ async fn main() -> Result<()> {
 
     let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{}", cfg.port)).await?;
     tracing::info!("🚀 HookRelay API running on port {}", cfg.port);
-    axum::serve(listener, app).await?;
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
 
+    tracing::info!("👋 HookRelay API shut down gracefully");
     Ok(())
+}
+
+/// Wait for SIGTERM or SIGINT signal for graceful shutdown
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {
+            tracing::info!("Received SIGINT (Ctrl+C), starting graceful shutdown...");
+        }
+        _ = terminate => {
+            tracing::info!("Received SIGTERM, starting graceful shutdown...");
+        }
+    }
 }
