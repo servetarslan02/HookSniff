@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 
 const links = [
   { name: 'GitHub', href: 'https://github.com/hookrelay' },

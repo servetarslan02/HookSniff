@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { useState, useRef, useEffect } from 'react';
 
 const languages = [
@@ -35,20 +35,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   }, []);
 
   function switchLocale(code: string) {
-    // Remove current locale prefix from pathname
-    let newPath = pathname;
-    for (const lang of languages) {
-      if (pathname.startsWith(`/${lang.code}/`) || pathname === `/${lang.code}`) {
-        newPath = pathname.slice(`/${lang.code}`.length) || '/';
-        break;
-      }
-    }
-    // For default locale (en), no prefix needed with 'as-needed'
-    if (code === 'en') {
-      router.push(newPath);
-    } else {
-      router.push(`/${code}${newPath}`);
-    }
+    router.push(pathname, { locale: code });
     setOpen(false);
   }
 
