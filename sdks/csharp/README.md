@@ -1,13 +1,13 @@
-# HookRelay C# SDK
+# HookSniff C# SDK
 
-Official C# client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official C# client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
 ### NuGet
 
 ```bash
-dotnet add package HookRelay
+dotnet add package HookSniff
 ```
 
 ### From source
@@ -20,10 +20,10 @@ dotnet build
 ## Quick Start
 
 ```csharp
-using HookRelay;
+using HookSniff;
 
 // Initialize client
-var client = new HookRelayClient("hr_live_your_api_key_here");
+var client = new HookSniffClient("hr_live_your_api_key_here");
 
 // Create a webhook endpoint
 var endpoint = await client.Endpoints.CreateAsync(
@@ -126,7 +126,7 @@ foreach (var attempt in attempts)
 Verify incoming webhook signatures in your handler:
 
 ```csharp
-using HookRelay;
+using HookSniff;
 
 // Simple verification
 var payload = await new StreamReader(request.Body).ReadToEndAsync();
@@ -165,7 +165,7 @@ if (!result.Valid)
 ## Error Handling
 
 ```csharp
-using HookRelay;
+using HookSniff;
 
 try
 {
@@ -196,11 +196,11 @@ catch (PayloadTooLargeException)
 
 ## API Reference
 
-### `new HookRelayClient(apiKey)` / `new HookRelayClient(config)`
+### `new HookSniffClient(apiKey)` / `new HookSniffClient(config)`
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `ApiKey` | `string` | required | Your HookRelay API key |
+| `ApiKey` | `string` | required | Your HookSniff API key |
 | `BaseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `Timeout` | `int` | `30` | Request timeout in seconds |
 
@@ -223,7 +223,7 @@ catch (PayloadTooLargeException)
 
 ### `WebhookVerification.VerifySignature(payload, signature, secret)` → `bool`
 
-### `WebhookVerification.VerifyWebhook(...)` → `HookRelayVerificationResult`
+### `WebhookVerification.VerifyWebhook(...)` → `HookSniffVerificationResult`
 
 ## License
 

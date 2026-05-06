@@ -98,7 +98,7 @@ impl RetryPolicy {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum DeliveryFormat {
-    /// Standard HookRelay format (default).
+    /// Standard HookSniff format (default).
     Standard,
     /// CloudEvents v1.0 envelope format.
     CloudEvents,

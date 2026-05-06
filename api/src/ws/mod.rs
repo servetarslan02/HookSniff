@@ -1,4 +1,4 @@
-//! WebSocket real-time event streaming gateway for HookRelay.
+//! WebSocket real-time event streaming gateway for HookSniff.
 //!
 //! Provides a WebSocket server that allows clients to subscribe to
 //! event types and receive events in real-time. Supports JWT auth,

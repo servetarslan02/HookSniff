@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         <div className="prose dark:prose-invert max-w-none space-y-8 text-gray-700 dark:text-slate-300 leading-relaxed">
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">1. Introduction</h2>
-            <p>HookRelay ("we", "us", "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our webhook delivery service ("Service").</p>
+            <p>HookSniff ("we", "us", "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our webhook delivery service ("Service").</p>
           </section>
 
           <section>
@@ -185,7 +185,7 @@ export default function PrivacyPage() {
             <p>For privacy-related questions or requests:</p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
               <li>Email: <a href="mailto:privacy@hooksniff.is-a.dev" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@hooksniff.is-a.dev</a></li>
-              <li>Data Controller: HookRelay</li>
+              <li>Data Controller: HookSniff</li>
             </ul>
           </section>
         </div>

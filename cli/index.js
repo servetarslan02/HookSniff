@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * HookRelay CLI — Manage webhooks from your terminal.
+ * HookSniff CLI — Manage webhooks from your terminal.
  *
  * Usage:
  *   hooksniff auth login          # Login with API key
@@ -114,7 +114,7 @@ program
       console.log(`   Key: ${apiKey.slice(0, 15)}...`);
     } catch (e) {
       console.error(`❌ Cannot reach API at ${apiUrl}`);
-      console.error('   Make sure HookRelay is running: make dev');
+      console.error('   Make sure HookSniff is running: make dev');
       process.exit(1);
     }
   });
@@ -284,7 +284,7 @@ program
     });
 
     server.listen(port, () => {
-      console.log(`🪝 HookRelay CLI — Listening for webhooks`);
+      console.log(`🪝 HookSniff CLI — Listening for webhooks`);
       console.log(`   URL: http://localhost:${port}${urlPath}`);
       console.log(`   Press Ctrl+C to stop\n`);
     });
@@ -364,7 +364,7 @@ program
 // ── Parse ──
 program
   .name('hooksniff')
-  .description('🪝 HookRelay CLI — Manage webhooks from your terminal')
+  .description('🪝 HookSniff CLI — Manage webhooks from your terminal')
   .version('0.1.0');
 
 program.parse();

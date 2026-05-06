@@ -187,6 +187,6 @@
   "tags": ["hooksniff", "webhooks"],
   "templating": { "list": [] },
   "time": { "from": "now-1h", "to": "now" },
-  "title": "HookRelay Overview",
+  "title": "HookSniff Overview",
   "uid": "hooksniff-overview"
 }

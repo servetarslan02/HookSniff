@@ -66,10 +66,10 @@ webhook-signature: v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=
 4. **Timestamp tolerance** — replay attack koruması (5 dakika)
 5. **Idempotency** — webhook-id'yi idempotency key olarak kullan
 
-## 🔄 HookRelay Uyumluluk Kontrolü
+## 🔄 HookSniff Uyumluluk Kontrolü
 
 ### Mevcut Durum
-- HookRelay'in `signing.rs` dosyası var
+- HookSniff'in `signing.rs` dosyası var
 - `events/cloudevents.rs` var (CloudEvents formatı)
 
 ### Eksik Olanlar
@@ -103,4 +103,4 @@ wh.verify(payload_bytes, &headers)?;
 ```
 
 ## 🎯 Tavsiye
-HookRelay **Standard Webhooks uyumlu** olmalı. Bu, müşteri SDK'larımızın evrensel olmasını sağlar. Svix library veya Standard Webhooks library'sinden birini kullan — ikisi de aynı standardı implemente ediyor.
+HookSniff **Standard Webhooks uyumlu** olmalı. Bu, müşteri SDK'larımızın evrensel olmasını sağlar. Svix library veya Standard Webhooks library'sinden birini kullan — ikisi de aynı standardı implemente ediyor.

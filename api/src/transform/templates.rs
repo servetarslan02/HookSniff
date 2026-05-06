@@ -1,4 +1,4 @@
-//! Event transformation templates for HookRelay.
+//! Event transformation templates for HookSniff.
 //!
 //! Provides field mapping, field filtering, value transformation,
 //! and JSON template transformers.

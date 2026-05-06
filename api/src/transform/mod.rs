@@ -1,4 +1,4 @@
-//! Payload Transformation Pipeline for HookRelay
+//! Payload Transformation Pipeline for HookSniff
 //!
 //! Webhook payload'ları endpoint'e gönderilmeden önce dönüştürülebilir.
 //! Bu modül, gelen payload üzerinde filtreleme, eşleme ve zenginleştirme

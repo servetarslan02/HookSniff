@@ -1,4 +1,4 @@
-# OpenTelemetry Collector configuration for HookRelay
+# OpenTelemetry Collector configuration for HookSniff
 # Receives traces via OTLP and exports to Jaeger
 
 receivers:

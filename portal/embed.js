@@ -1,5 +1,5 @@
 /**
- * HookRelay Embeddable Portal Widget
+ * HookSniff Embeddable Portal Widget
  * 
  * Usage: <script src="embed.js" data-api-key="YOUR_API_KEY" data-api-url="https://api.hooksniff.is-a.dev" data-theme="dark"></script>
  * 
@@ -27,7 +27,7 @@
   var TARGET   = SCRIPT_TAG.getAttribute("data-target");
 
   if (!API_KEY) {
-    console.error("[HookRelay] data-api-key attribute is required.");
+    console.error("[HookSniff] data-api-key attribute is required.");
     return;
   }
 
@@ -49,7 +49,7 @@
   iframe.style.overflow   = "hidden";
   iframe.style.display    = "block";
   iframe.style.boxShadow  = "0 4px 24px rgba(0,0,0,0.12)";
-  iframe.setAttribute("title", "HookRelay Webhook Portal");
+  iframe.setAttribute("title", "HookSniff Webhook Portal");
   iframe.setAttribute("loading", "lazy");
   iframe.setAttribute("allow", "clipboard-read; clipboard-write");
 
@@ -59,7 +59,7 @@
     if (container) {
       container.appendChild(iframe);
     } else {
-      console.warn("[HookRelay] Target container '" + TARGET + "' not found. Falling back to script position.");
+      console.warn("[HookSniff] Target container '" + TARGET + "' not found. Falling back to script position.");
       SCRIPT_TAG.parentNode.insertBefore(iframe, SCRIPT_TAG.nextSibling);
     }
   } else {

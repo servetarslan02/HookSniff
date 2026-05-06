@@ -1,4 +1,4 @@
-# 🪝 HookRelay — Rekabet Analizi ve Eksikler Raporu
+# 🪝 HookSniff — Rekabet Analizi ve Eksikler Raporu
 
 > **Tarih:** 2026-05-06
 > **Hazırlayan:** Mamo (AI)
@@ -12,7 +12,7 @@ Webhook delivery pazarı 2026'da olgunlaşıyor. Büyük oyuncular var ama hala 
 
 ### Rakip Karşılaştırma Tablosu
 
-| Özellik | **Svix** | **Hookdeck** | **Hook0** | **Convoy** | **HookRelay (Biz)** |
+| Özellik | **Svix** | **Hookdeck** | **Hook0** | **Convoy** | **HookSniff (Biz)** |
 |---------|----------|-------------|-----------|------------|-------------------|
 | **Fiyat** | $490/ay | $39/ay | €59/ay | Ücretsiz (açık kaynak) | $49/ay |
 | **Lisans** | MIT (açık kaynak) | Apache 2.0 (Outpost) | SSPL v1 | Elastic License v2.0 | MIT |

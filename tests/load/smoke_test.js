@@ -1,5 +1,5 @@
 /**
- * HookRelay Load Test — Smoke Test
+ * HookSniff Load Test — Smoke Test
  * =================================
  * Minimal load to verify the system works under light traffic.
  * 10 VUs, 1 dakika süre.

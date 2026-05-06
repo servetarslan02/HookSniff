@@ -1,6 +1,6 @@
-# HookRelay Node.js SDK
+# HookSniff Node.js SDK
 
-Official TypeScript/Node.js client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
+Official TypeScript/Node.js client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -19,10 +19,10 @@ npm run build
 ## Quick Start
 
 ```typescript
-import { HookRelay } from '@hooksniff/sdk';
+import { HookSniff } from '@hooksniff/sdk';
 
 // Initialize client
-const client = new HookRelay({ apiKey: 'hr_live_your_api_key_here' });
+const client = new HookSniff({ apiKey: 'hr_live_your_api_key_here' });
 
 // Create a webhook endpoint
 const endpoint = await client.endpoints.create({
@@ -158,7 +158,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 
 ```typescript
 import {
-  HookRelay,
+  HookSniff,
   AuthenticationError,
   NotFoundError,
   RateLimitError,
@@ -166,7 +166,7 @@ import {
   PayloadTooLargeError,
 } from '@hooksniff/sdk';
 
-const client = new HookRelay({ apiKey: 'hr_live_...' });
+const client = new HookSniff({ apiKey: 'hr_live_...' });
 
 try {
   const delivery = await client.webhooks.send({
@@ -190,11 +190,11 @@ try {
 
 ## API Reference
 
-### `new HookRelay(config)`
+### `new HookSniff(config)`
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `apiKey` | `string` | required | Your HookRelay API key |
+| `apiKey` | `string` | required | Your HookSniff API key |
 | `baseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `timeout` | `number` | `30000` | Request timeout in ms |
 

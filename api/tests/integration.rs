@@ -1,4 +1,4 @@
-//! Integration tests for the HookRelay API.
+//! Integration tests for the HookSniff API.
 //!
 //! These tests verify the API endpoints work correctly without
 //! requiring a running database or Kafka instance. They test

@@ -1,6 +1,6 @@
-# 🆓 HookRelay — Free Tier Deployment Guide
+# 🆓 HookSniff — Free Tier Deployment Guide
 
-Deploy HookRelay to production for **$0/month** using free-tier services.
+Deploy HookSniff to production for **$0/month** using free-tier services.
 
 This guide walks you through setting up every service, getting credentials, and configuring your environment.
 
@@ -42,7 +42,7 @@ This guide walks you through setting up every service, getting credentials, and 
 
 ## 1. Neon — PostgreSQL Database
 
-**What it does:** Hosts the main PostgreSQL database for HookRelay (users, endpoints, webhooks, delivery logs, queue).
+**What it does:** Hosts the main PostgreSQL database for HookSniff (users, endpoints, webhooks, delivery logs, queue).
 
 ### Free Tier Limits
 
@@ -174,7 +174,7 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
    # Verify
    docker --version
    ```
-7. **Deploy HookRelay:**
+7. **Deploy HookSniff:**
    ```bash
    # Clone the repo
    git clone https://github.com/servetarslan02/hooksniff.git
@@ -191,7 +191,7 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
    ```bash
    sudo tee /etc/systemd/system/hooksniff.service <<EOF
    [Unit]
-   Description=HookRelay API + Worker
+   Description=HookSniff API + Worker
    After=docker.service
    Requires=docker.service
 
@@ -277,7 +277,7 @@ NEXT_PUBLIC_API_URL=https://api.hooksniff.is-a.dev/v1
 
 ## 5. Grafana Cloud — Monitoring
 
-**What it does:** Provides metrics dashboards, log aggregation, and distributed tracing for HookRelay.
+**What it does:** Provides metrics dashboards, log aggregation, and distributed tracing for HookSniff.
 
 ### Free Tier Limits
 
@@ -302,7 +302,7 @@ NEXT_PUBLIC_API_URL=https://api.hooksniff.is-a.dev/v1
    - Go to **Security** → **API Keys**
    - Create a key with **Admin** role
    - Copy the key (you'll only see it once)
-5. **Configure OpenTelemetry in HookRelay:**
+5. **Configure OpenTelemetry in HookSniff:**
    - Set `OTEL_ENABLED=true` in your `.env`
    - Set the OTLP endpoint and credentials
 
@@ -485,7 +485,7 @@ Here's a complete `.env` template for production deployment:
 
 ```env
 # ═══════════════════════════════════════
-#  HookRelay — Production Configuration
+#  HookSniff — Production Configuration
 # ═══════════════════════════════════════
 
 # ── Application ──

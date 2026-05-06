@@ -88,7 +88,7 @@ except hooksniff.RateLimitError as e:
     print(f"Rate limited. Retry after {e.retry_after}s")
 except hooksniff.AuthenticationError:
     print("Invalid API key")
-except hooksniff.HookRelayError as e:
+except hooksniff.HookSniffError as e:
     print(f"Error: {e.message}")`}
         </pre>
       </section>
@@ -107,9 +107,9 @@ except hooksniff.HookRelayError as e:
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Start</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
-{`import { HookRelay } from '@hooksniff/sdk';
+{`import { HookSniff } from '@hooksniff/sdk';
 
-const hr = new HookRelay({ apiKey: process.env.HOOKRELAY_KEY! });
+const hr = new HookSniff({ apiKey: process.env.HOOKRELAY_KEY! });
 
 // Create an endpoint
 const endpoint = await hr.endpoints.create({

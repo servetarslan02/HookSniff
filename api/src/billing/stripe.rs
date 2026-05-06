@@ -1,4 +1,4 @@
-//! Stripe billing integration for HookRelay.
+//! Stripe billing integration for HookSniff.
 //!
 //! Handles:
 //! - Creating Stripe Checkout sessions for plan upgrades
