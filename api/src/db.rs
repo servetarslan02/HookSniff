@@ -834,6 +834,19 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 36: Migration 035 — add missing columns to customers
+    // is_active, is_admin, name were used in code but never added to the table!
+    run_migration(
+        pool,
+        "035_customer_missing_columns",
+        r#"
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS is_active BOOL NOT NULL DEFAULT true;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS is_admin BOOL NOT NULL DEFAULT false;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS name TEXT;
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
