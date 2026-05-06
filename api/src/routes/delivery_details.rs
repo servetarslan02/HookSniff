@@ -24,7 +24,9 @@ struct DeliveryDetails {
     status: String,
     attempt_count: i32,
     max_attempts: i32,
+    #[serde(rename = "request_body")]
     payload: serde_json::Value,
+    request_headers: Option<serde_json::Value>,
     created_at: String,
     last_attempt_at: Option<String>,
     next_retry_at: Option<String>,
@@ -39,6 +41,7 @@ struct AttemptDetail {
     id: Uuid,
     attempt_number: i32,
     status: String,
+    #[serde(rename = "response_status")]
     status_code: Option<i32>,
     response_body: Option<String>,
     request_headers: Option<serde_json::Value>,
@@ -62,8 +65,8 @@ async fn get_delivery_details(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<DeliveryDetails>, AppError> {
     // Get delivery with endpoint info
-    let delivery = sqlx::query_as::<_, (Uuid, Uuid, serde_json::Value, Option<String>, String, i32, i32, Option<chrono::DateTime<chrono::Utc>>, Option<i32>, Option<String>, Option<chrono::DateTime<chrono::Utc>>, chrono::DateTime<chrono::Utc>)>(
-        "SELECT d.id, d.endpoint_id, d.payload, d.event_type, d.status, d.attempt_count, d.max_attempts, d.last_attempt_at, d.response_status, d.response_body, d.next_retry_at, d.created_at FROM deliveries d WHERE d.id = $1 AND d.customer_id = $2"
+    let delivery = sqlx::query_as::<_, (Uuid, Uuid, serde_json::Value, Option<String>, String, i32, i32, Option<chrono::DateTime<chrono::Utc>>, Option<i32>, Option<String>, Option<chrono::DateTime<chrono::Utc>>, chrono::DateTime<chrono::Utc>, Option<serde_json::Value>)>(
+        "SELECT d.id, d.endpoint_id, d.payload, d.event_type, d.status, d.attempt_count, d.max_attempts, d.last_attempt_at, d.response_status, d.response_body, d.next_retry_at, d.created_at, d.request_headers FROM deliveries d WHERE d.id = $1 AND d.customer_id = $2"
     )
     .bind(id)
     .bind(customer.id)
@@ -94,6 +97,7 @@ async fn get_delivery_details(
         attempt_count: delivery.5,
         max_attempts: delivery.6,
         payload: delivery.2,
+        request_headers: delivery.12,
         created_at: delivery.11.to_rfc3339(),
         last_attempt_at: delivery.7.map(|t| t.to_rfc3339()),
         next_retry_at: delivery.10.map(|t| t.to_rfc3339()),
