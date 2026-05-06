@@ -59,9 +59,6 @@ async fn main() -> Result<()> {
         .pool_max_idle_per_host(10)
         .build()?;
 
-    // Ensure webhook_queue table exists
-    ensure_queue_table(&pool).await?;
-
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s");
 
     // Main loop: poll PostgreSQL queue
@@ -79,41 +76,6 @@ async fn main() -> Result<()> {
 
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     }
-}
-
-/// Ensure the webhook_queue table exists
-async fn ensure_queue_table(pool: &PgPool) -> Result<()> {
-    sqlx::query::<sqlx::Postgres>(
-        r#"
-        CREATE TABLE IF NOT EXISTS webhook_queue (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            delivery_id UUID NOT NULL,
-            endpoint_id UUID NOT NULL,
-            endpoint_url TEXT NOT NULL,
-            signing_secret TEXT NOT NULL,
-            payload TEXT NOT NULL,
-            custom_headers JSONB,
-            attempt_count INT NOT NULL DEFAULT 0,
-            max_attempts INT NOT NULL DEFAULT 3,
-            next_retry_at TIMESTAMPTZ,
-            status TEXT NOT NULL DEFAULT 'pending',
-            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-            processed_at TIMESTAMPTZ
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_webhook_queue_pending
-            ON webhook_queue(status, next_retry_at)
-            WHERE status = 'pending';
-
-        CREATE INDEX IF NOT EXISTS idx_webhook_queue_delivery
-            ON webhook_queue(delivery_id);
-        "#,
-    )
-    .execute(pool)
-    .await?;
-
-    tracing::info!("✅ webhook_queue table ready");
-    Ok(())
 }
 
 /// Process all pending items in the queue

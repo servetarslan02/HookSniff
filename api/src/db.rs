@@ -231,6 +231,45 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 10: Migration 009 — webhook queue table (shared between API and worker)
+    run_migration(
+        pool,
+        "009_webhook_queue",
+        r#"
+        CREATE TABLE IF NOT EXISTS webhook_queue (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            delivery_id UUID NOT NULL,
+            endpoint_id UUID NOT NULL,
+            endpoint_url TEXT NOT NULL,
+            signing_secret TEXT NOT NULL,
+            payload TEXT NOT NULL,
+            custom_headers JSONB,
+            attempt_count INT NOT NULL DEFAULT 0,
+            max_attempts INT NOT NULL DEFAULT 3,
+            next_retry_at TIMESTAMPTZ,
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            processed_at TIMESTAMPTZ
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_webhook_queue_pending
+            ON webhook_queue(status, next_retry_at)
+            WHERE status = 'pending';
+
+        CREATE INDEX IF NOT EXISTS idx_webhook_queue_delivery
+            ON webhook_queue(delivery_id);
+        "#,
+    )
+    .await?;
+
+    // Step 11: Migration 010 — add format column to endpoints
+    run_migration(
+        pool,
+        "010_add_endpoint_format",
+        "ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS format TEXT NOT NULL DEFAULT 'standard'",
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
