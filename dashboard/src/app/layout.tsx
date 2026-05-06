@@ -5,8 +5,31 @@ import { ToastProvider } from '@/components/Toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
-  title: 'Hookrelay — Webhook Delivery Service',
-  description: 'Reliable webhook delivery for developers',
+  title: {
+    default: 'Hookrelay — Webhook Delivery Service',
+    template: '%s | Hookrelay',
+  },
+  description: 'Reliable webhook delivery for developers. Monitor, retry, and manage webhooks with real-time analytics and intelligent routing.',
+  openGraph: {
+    title: 'Hookrelay — Webhook Delivery Service',
+    description: 'Reliable webhook delivery for developers. Monitor, retry, and manage webhooks with real-time analytics and intelligent routing.',
+    url: 'https://hookrelay.dev',
+    siteName: 'Hookrelay',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hookrelay — Webhook Delivery Service',
+    description: 'Reliable webhook delivery for developers. Monitor, retry, and manage webhooks with real-time analytics and intelligent routing.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://hookrelay.dev'
+  ),
 };
 
 export default function RootLayout({

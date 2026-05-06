@@ -4,14 +4,17 @@ if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
   console.warn('⚠️ NEXT_PUBLIC_API_URL not set in production!');
 }
 
+const REQUEST_TIMEOUT_MS = 30_000;
+
 export interface ApiOptions {
   method?: string;
   body?: unknown;
   token?: string;
+  signal?: AbortSignal;
 }
 
 export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
-  const { method = "GET", body, token } = options;
+  const { method = "GET", body, token, signal } = options;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -21,18 +24,36 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: "Unknown error" }));
-    throw new Error(error.error?.message || `API error: ${res.status}`);
+  // If caller provided an external signal, forward its abort
+  if (signal) {
+    signal.addEventListener('abort', () => controller.abort(), { once: true });
   }
 
-  return res.json();
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ message: "Unknown error" }));
+      throw new Error(error.error?.message || `API error: ${res.status}`);
+    }
+
+    return res.json();
+  } catch (err: unknown) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 // Endpoint API

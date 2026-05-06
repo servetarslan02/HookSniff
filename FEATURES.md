@@ -19,7 +19,7 @@
 | # | Feature | Backend | Frontend | Test | Durum |
 |---|---------|---------|----------|------|-------|
 | 6 | Embeddable Portal | ❌ | ❌ | ❌ | Başlanmadı |
-| 7 | CLI Tool | ❌ | N/A | ❌ | Başlanmadı |
+| 7 | CLI Tool | ⚠️ Mevcut (cli/index.js) | N/A | ❌ | Kısmen hazır |
 | 8 | Webhook Alerting | ✅ `routes/alerts.rs` | ✅ `alerts/page.tsx` | ❌ | ✅ Tamamlandı |
 | 9 | Custom Retry Schedules | ⚠️ Mevcut | ❌ | ❌ | Retry policy var, UI yok |
 | 10 | Endpoint Health Monitoring | ✅ `routes/health_endpoints.rs` | ✅ `health/page.tsx` | ❌ | ✅ Tamamlandı |
@@ -29,22 +29,21 @@
 | # | Feature | Backend | Frontend | Test | Durum |
 |---|---------|---------|----------|------|-------|
 | 11 | Webhook Transformations | ❌ | ❌ | ❌ | Başlanmadı |
-| 12 | Self-Hosted Option | ❌ | N/A | ❌ | Başlanmadı |
-| 13 | AI Anomaly Detection | ⚠️ Mevcut (ai-center) | ⚠️ Mevcut | ❌ | Kısmen hazır |
-| 14 | Webhook Analytics Dashboard | ⚠️ Mevcut | ⚠️ Mevcut | ❌ | Kısmen hazır |
+| 12 | Self-Hosted Option | ⚠️ docker-compose mevcut | N/A | ❌ | Kısmen hazır |
+| 13 | Webhook Analytics Dashboard | ⚠️ Mevcut | ⚠️ Mevcut | ❌ | Kısmen hazır |
 
 ## 🔵 Ek Özellikler
 
 | # | Feature | Backend | Frontend | Test | Durum |
 |---|---------|---------|----------|------|-------|
-| 15 | SDK: Go | ❌ | N/A | ❌ | Başlanmadı |
-| 16 | SDK: Ruby | ❌ | N/A | ❌ | Başlanmadı |
-| 17 | SDK: Java | ❌ | N/A | ❌ | Başlanmadı |
-| 18 | Event Schema Validation | ❌ | ❌ | ❌ | Başlanmadı |
-| 19 | Rate Limit Dashboard | ⚠️ Mevcut | ❌ | ❌ | Backend var, UI yok |
-| 20 | Bulk Operations | ❌ | ❌ | ❌ | Başlanmadı |
-| 21 | Webhook Signature Rotation UI | ⚠️ Mevcut | ❌ | ❌ | Backend var, UI yok |
-| 22 | WebSocket Real-time Updates | ❌ | ❌ | ❌ | Başlanmadı |
+| 14 | SDK: Go | ❌ | N/A | ❌ | Başlanmadı |
+| 15 | SDK: Ruby | ❌ | N/A | ❌ | Başlanmadı |
+| 16 | SDK: Java | ❌ | N/A | ❌ | Başlanmadı |
+| 17 | Event Schema Validation | ❌ | ❌ | ❌ | Başlanmadı |
+| 18 | Rate Limit Dashboard | ⚠️ Mevcut | ❌ | ❌ | Backend var, UI yok |
+| 19 | Bulk Operations | ❌ | ❌ | ❌ | Başlanmadı |
+| 20 | Webhook Signature Rotation UI | ⚠️ Mevcut | ❌ | ❌ | Backend var, UI yok |
+| 21 | WebSocket Real-time Updates | ❌ | ❌ | ❌ | Başlanmadı |
 
 ---
 
@@ -64,14 +63,13 @@ api/src/routes/
 
 ```
 dashboard/src/app/dashboard/
-├── api-keys/page.tsx        # API key management sayfası
-├── playground/page.tsx      # Webhook tester sayfası (mevcut, güncellenmeli)
-├── alerts/page.tsx          # Alert rules sayfası
-├── health/page.tsx          # Endpoint health sayfası
-├── search/page.tsx          # Webhook search sayfası
+├── api-keys/page.tsx        # API key management sayfası ✅
+├── playground/page.tsx      # Webhook tester sayfası (güncellenmeli)
+├── alerts/page.tsx          # Alert rules sayfası ✅
+├── health/page.tsx          # Endpoint health sayfası ✅
+├── search/page.tsx          # Webhook search sayfası ✅
 ```
 
 ---
 
 > 💡 Her backend route tamamlandığında ilgili frontend sayfası da yapılmalı.
-> Frontend sayfaları oluşturulduğunda bu dosya güncellenmeli.

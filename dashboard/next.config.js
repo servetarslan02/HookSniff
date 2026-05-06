@@ -2,6 +2,12 @@
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+    ],
+  },
   async headers() {
     return [{
       source: '/(.*)',
@@ -14,7 +20,10 @@ const nextConfig = {
       ],
     }];
   },
+  // Proxy /api/* to the backend only during local development.
+  // In production the dashboard talks to NEXT_PUBLIC_API_URL directly.
   async rewrites() {
+    if (process.env.NODE_ENV === 'production') return [];
     return [
       {
         source: '/api/:path*',

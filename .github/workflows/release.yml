@@ -13,7 +13,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        service: [api, worker, dashboard, ai-center]
+        service: [api, worker, dashboard]
     steps:
       - uses: actions/checkout@v4
 

@@ -1,0 +1,71 @@
+# ═══════════════════════════════════════════════════════════════════
+# HookRelay API — Production Dockerfile (ARM64 Optimized)
+# ═══════════════════════════════════════════════════════════════════
+# Multi-stage build: Rust builder → minimal Debian runtime
+# Hedef: Oracle Cloud Always Free ARM Ampere (aarch64)
+# Final image boyutu: ~30-50 MB
+# ═══════════════════════════════════════════════════════════════════
+
+# ── Stage 1: Builder ──
+# Rust image'ı kullanarak release binary derle
+FROM rust:1.82-bookworm AS builder
+
+WORKDIR /app
+
+# Bağımlılıkları önce kopyala (cache optimizasyonu)
+COPY Cargo.toml Cargo.lock ./
+COPY api/ api/
+COPY worker/ worker/
+COPY ai-center/ ai-center/
+
+# Dependency cache oluştur (sadece Cargo.toml değişirse yeniden derlenir)
+RUN mkdir -p api/src && \
+    echo "fn main() {}" > api/src/main.rs && \
+    mkdir -p worker/src && \
+    echo "fn main() {}" > worker/src/main.rs && \
+    mkdir -p ai-center/src && \
+    echo "fn main() {}" > ai-center/src/main.rs && \
+    cargo build --release -p hookrelay-api 2>/dev/null || true && \
+    rm -rf api/src worker/src ai-center/src
+
+# Asıl kaynak kodlarını kopyala ve derle
+COPY api/src/ api/src/
+COPY worker/src/ worker/src/
+COPY ai-center/src/ ai-center/src/
+
+# Release build (ARM64 native, optimizasyonlu)
+RUN cargo build --release -p hookrelay-api && \
+    strip /app/target/release/hookrelay-api
+
+# ── Stage 2: Runtime ──
+# Minimal Debian image (sadece gerekli kütüphaneler)
+FROM debian:bookworm-slim
+
+# Sadece runtime bağımlılıkları
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Non-root kullanıcı oluştur
+RUN groupadd -r hookrelay && \
+    useradd -r -g hookrelay -d /app -s /sbin/nologin hookrelay
+
+# Binary'yi kopyala
+COPY --from=builder /app/target/release/hookrelay-api /usr/local/bin/hookrelay-api
+
+# Dizin izinlerini ayarla
+RUN mkdir -p /app && chown -R hookrelay:hookrelay /app
+
+USER hookrelay
+WORKDIR /app
+
+EXPOSE 3000
+
+# Sağlık kontrolü (production-ready)
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -sf http://localhost:3000/health || exit 1
+
+CMD ["hookrelay-api"]

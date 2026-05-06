@@ -151,64 +151,18 @@ pub async fn move_to_dead_letter(
     Ok(())
 }
 
-/// Trigger AI agent analysis via HTTP call to AI center.
+/// Trigger AI agent analysis.
+/// NOTE: AI center is not part of the MVP. This is a no-op that returns
+/// a successful empty result. Re-enable when ai-center service is added.
 pub async fn trigger_agents(
-    http_client: &reqwest::Client,
-    input: &TriggerAgentsInput,
+    _http_client: &reqwest::Client,
+    _input: &TriggerAgentsInput,
 ) -> TriggerAgentsOutput {
-    let ai_center_url = std::env::var("AI_CENTER_URL")
-        .unwrap_or_else(|_| "http://localhost:8081".to_string());
-
-    let context_payload = serde_json::json!({
-        "delivery_id": input.delivery_id,
-        "endpoint_id": input.endpoint_id,
-        "endpoint_url": input.endpoint_url,
-        "customer_id": input.customer_id,
-        "payload": input.payload,
-        "event_type": input.event_type,
-        "status_code": input.status_code,
-        "response_body": input.response_body,
-        "duration_ms": input.duration_ms,
-        "attempt_number": input.attempt_number,
-    });
-
-    let url = format!("{}/v1/agents/trigger", ai_center_url);
-
-    match http_client
-        .post(&url)
-        .json(&context_payload)
-        .timeout(std::time::Duration::from_secs(30))
-        .send()
-        .await
-    {
-        Ok(response) if response.status().is_success() => {
-            let body: serde_json::Value = response.json().await.unwrap_or_default();
-            TriggerAgentsOutput {
-                agents_triggered: body.get("agents_triggered").and_then(|v| v.as_i64()).unwrap_or(0) as i32,
-                actions_count: body.get("actions_count").and_then(|v| v.as_i64()).unwrap_or(0) as i32,
-                success: true,
-                error: None,
-            }
-        }
-        Ok(response) => {
-            let status = response.status();
-            let body = response.text().await.unwrap_or_default();
-            tracing::warn!("⚠️ Agent trigger failed: HTTP {} — {}", status, body);
-            TriggerAgentsOutput {
-                agents_triggered: 0,
-                actions_count: 0,
-                success: false,
-                error: Some(format!("HTTP {}: {}", status, body)),
-            }
-        }
-        Err(e) => {
-            tracing::warn!("⚠️ Agent trigger error: {:?}", e);
-            TriggerAgentsOutput {
-                agents_triggered: 0,
-                actions_count: 0,
-                success: false,
-                error: Some(e.to_string()),
-            }
-        }
+    tracing::debug!("⏭️ AI agent trigger skipped (ai-center not available)");
+    TriggerAgentsOutput {
+        agents_triggered: 0,
+        actions_count: 0,
+        success: true,
+        error: None,
     }
 }

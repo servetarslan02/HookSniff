@@ -1,0 +1,81 @@
+# ═══════════════════════════════════════════════════════════════════
+# HookRelay — Production Docker Compose
+# ═══════════════════════════════════════════════════════════════════
+# Oracle Cloud Always Free (ARM64) için optimize edilmiş.
+# PostgreSQL ve Redis cloud servisleri kullanılır (Neon, Upstash).
+# Dashboard Vercel'de deploy edilir.
+# ═══════════════════════════════════════════════════════════════════
+
+services:
+  # ── HookRelay API ──
+  # Webhook alımı, yönetim API'si, sağlık kontrolü
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api.prod
+    container_name: hookrelay-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      PORT: "3000"
+      RUST_LOG: "info,hookrelay=info"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - hookrelay
+
+  # ── HookRelay Worker ──
+  # Webhook teslimatı, retry mekanizması, fan-out
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker.prod
+    container_name: hookrelay-worker
+    env_file:
+      - .env
+    environment:
+      RUST_LOG: "info,hookrelay=info"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+          cpus: "0.1"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - hookrelay
+    depends_on:
+      api:
+        condition: service_healthy
+
+networks:
+  hookrelay:
+    driver: bridge

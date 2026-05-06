@@ -11,7 +11,6 @@ pub mod error;
 pub mod events;
 pub mod fifo;
 mod jobs;
-pub mod kafka; // PostgreSQL queue wrapper (Kafka removed)
 pub mod metrics;
 mod middleware;
 mod models;
