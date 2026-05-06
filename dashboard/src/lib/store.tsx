@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('hookrelay_auth');
+    const stored = sessionStorage.getItem('hookrelay_auth');
     if (stored) {
       try {
         const { token: t, user: u, apiKey: k } = JSON.parse(stored);
@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(u);
         setApiKeyState(k);
       } catch {
-        localStorage.removeItem('hookrelay_auth');
+        sessionStorage.removeItem('hookrelay_auth');
       }
     }
     setIsLoading(false);
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(t);
     setUser(u);
     if (k) setApiKeyState(k);
-    localStorage.setItem('hookrelay_auth', JSON.stringify({ token: t, user: u, apiKey: k || null }));
+    sessionStorage.setItem('hookrelay_auth', JSON.stringify({ token: t, user: u, apiKey: k || null }));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -86,16 +86,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
     setApiKeyState(null);
-    localStorage.removeItem('hookrelay_auth');
+    sessionStorage.removeItem('hookrelay_auth');
   }, []);
 
   const setApiKey = useCallback((key: string) => {
     setApiKeyState(key);
-    const stored = localStorage.getItem('hookrelay_auth');
+    const stored = sessionStorage.getItem('hookrelay_auth');
     if (stored) {
       const data = JSON.parse(stored);
       data.apiKey = key;
-      localStorage.setItem('hookrelay_auth', JSON.stringify(data));
+      sessionStorage.setItem('hookrelay_auth', JSON.stringify(data));
     }
   }, []);
 
