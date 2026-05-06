@@ -11,6 +11,7 @@ pub mod endpoints;
 pub mod health;
 pub mod health_endpoints;
 pub mod notifications;
+pub mod outbound_ips;
 pub mod playground;
 pub mod routing;
 pub mod schemas;
@@ -22,6 +23,15 @@ pub mod webhooks;
 
 use axum::middleware as axum_middleware;
 use axum::Router;
+
+pub fn create_routes(
+    _pool: sqlx::PgPool,
+    _rate_limiter: crate::rate_limit::RateLimiter,
+    _throttle_manager: crate::throttle::ThrottleManager,
+    _metrics: std::sync::Arc<crate::metrics::Metrics>,
+) -> Router {
+    api_router()
+}
 
 pub fn api_router() -> Router {
     let protected = Router::new()
@@ -51,6 +61,7 @@ pub fn api_router() -> Router {
 
     Router::new()
         .nest("/auth", auth::router())
+        .nest("/outbound-ips", outbound_ips::router())
         .merge(protected)
         .merge(admin_routes)
 }

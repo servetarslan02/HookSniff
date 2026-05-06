@@ -1,26 +1,28 @@
 //! HookRelay Worker — Webhook Teslimatı
 //!
-//! Kafka ve Temporal yok. Sadece PostgreSQL polling.
+//! Kafka ve Temporal yok. PostgreSQL polling + LISTEN/NOTIFY.
 //!
 //! ## Nasıl Çalışır
 //!
-//! 1. Her saniye `webhook_queue` tablosunu kontrol et
-//! 2. Pending olanları al
+//! 1. `webhook_queue` tablosunu dinle (PostgreSQL LISTEN/NOTIFY)
+//! 2. NOTIFY geldiğinde veya 1s fallback poll'da pending olanları al
 //! 3. HTTP POST ile endpoint'e gönder
 //! 4. Başarılı → delivered, başarısız → retry veya dead letter
+//!
+//! NOTIFY anlık tetikleme sağlar (< 10ms gecikme).
+//! 1s poll fallback, NOTIFY kaçırılsa bile güvenilirliği garanti eder.
 //!
 //! ## Basit, güvenilir, bakımı kolay.
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgPoolOptions;
+use sqlx::postgres::{PgListener, PgPoolOptions};
 use sqlx::PgPool;
-use tracing_subscriber::prelude::*;
-use tracing_subscriber::EnvFilter;
 
 mod config;
 pub mod delivery;
 mod signing;
+pub mod telemetry;
 
 /// Webhook message format used by delivery modules.
 /// Bridges the queue item format with the delivery router.
@@ -47,33 +49,18 @@ pub struct WebhookQueueItem {
     pub attempt_count: i32,
     pub max_attempts: i32,
     pub next_retry_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub trace_id: Option<String>,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Structured logging: auto JSON in production, text in development
-    let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
-    let use_json = env == "production" || env == "prod"
-        || std::env::var("LOG_FORMAT").map(|v| v == "json").unwrap_or(false);
-
-    let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("info"));
-
-    if use_json {
-        let _ = tracing_subscriber::registry()
-            .with(env_filter)
-            .with(tracing_subscriber::fmt::layer().json())
-            .init();
-        tracing::info!("Logging format: JSON (env={})", env);
-    } else {
-        let _ = tracing_subscriber::registry()
-            .with(env_filter)
-            .with(tracing_subscriber::fmt::layer())
-            .init();
-        tracing::info!("Logging format: text (env={})", env);
-    }
-
+    // Initialize tracing (OpenTelemetry + structured logging)
     let cfg = config::WorkerConfig::from_env()?;
+    telemetry::init(
+        cfg.otel_enabled,
+        cfg.otel_exporter_otlp_endpoint.as_deref(),
+        cfg.otel_exporter_otlp_headers.as_deref(),
+    );
 
     tracing::info!("🔧 HookRelay Worker starting...");
     tracing::info!("   Database: {}", &cfg.database_url[..30.min(cfg.database_url.len())]);
@@ -90,21 +77,60 @@ async fn main() -> Result<()> {
         .pool_max_idle_per_host(10)
         .build()?;
 
-    tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s");
+    tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
 
     // Graceful shutdown: listen for SIGTERM/SIGINT
     let shutdown = shutdown_signal();
 
     tokio::pin!(shutdown);
 
-    // Main loop: poll PostgreSQL queue with graceful shutdown support
+    // Create a dedicated PgListener connection for NOTIFY
+    let mut listener = PgListener::connect(&cfg.database_url).await?;
+    listener.listen("new_webhook").await?;
+    tracing::info!("🔔 Listening on 'new_webhook' channel for instant wake-up");
+
+    // Zombie reaper: recover stuck "processing" records every 30s
+    let mut reaper_interval = tokio::time::interval(std::time::Duration::from_secs(30));
+    reaper_interval.tick().await; // first tick completes immediately, skip it
+
+    // Main loop: poll PostgreSQL queue with NOTIFY-based wake-up
+    //
+    // Flow: poll → if items found → process & loop immediately
+    //                if empty     → LISTEN with 1s timeout → notification or timeout → poll
+    // 1s poll fallback ensures reliability even if NOTIFY is missed
     loop {
         tokio::select! {
             _ = &mut shutdown => {
                 tracing::info!("🛑 Shutdown signal received, waiting for in-flight deliveries...");
                 break;
             }
-            _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
+            result = listener.recv() => {
+                // NOTIFY received — wake up immediately
+                match result {
+                    Ok(notification) => {
+                        tracing::debug!("🔔 NOTIFY received on '{}' — processing now", notification.channel());
+                    }
+                    Err(e) => {
+                        tracing::warn!("⚠️ PgListener error, reconnecting: {:?}", e);
+                        // Reconnect listener on error
+                        match PgListener::connect(&cfg.database_url).await {
+                            Ok(mut new_listener) => {
+                                if new_listener.listen("new_webhook").await.is_ok() {
+                                    listener = new_listener;
+                                    tracing::info!("🔔 PgListener reconnected");
+                                } else {
+                                    tracing::error!("❌ Failed to re-listen on 'new_webhook'");
+                                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                                }
+                            }
+                            Err(conn_err) => {
+                                tracing::error!("❌ Failed to reconnect PgListener: {:?}", conn_err);
+                                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                            }
+                        }
+                    }
+                }
+                // Process immediately on NOTIFY (or after reconnect attempt)
                 match process_pending(&pool, &http_client, &cfg).await {
                     Ok(processed) => {
                         if processed > 0 {
@@ -116,10 +142,39 @@ async fn main() -> Result<()> {
                     }
                 }
             }
+            _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
+                // Fallback 1s poll — catches anything NOTIFY might have missed
+                match process_pending(&pool, &http_client, &cfg).await {
+                    Ok(processed) => {
+                        if processed > 0 {
+                            tracing::debug!("✅ Processed {} deliveries (poll fallback)", processed);
+                        }
+                    }
+                    Err(e) => {
+                        tracing::error!("❌ Queue processing error: {:?}", e);
+                    }
+                }
+            }
+            _ = reaper_interval.tick() => {
+                match reap_zombies(&pool).await {
+                    Ok(reaped) => {
+                        if reaped > 0 {
+                            tracing::warn!("🧟 Zombie reaper recovered {} stuck records", reaped);
+                        }
+                    }
+                    Err(e) => {
+                        tracing::error!("❌ Zombie reaper error: {:?}", e);
+                    }
+                }
+            }
         }
     }
 
     tracing::info!("👋 HookRelay Worker shut down gracefully");
+
+    // Flush OpenTelemetry traces before exit
+    opentelemetry::global::shutdown_tracer_provider();
+
     Ok(())
 }
 
@@ -159,7 +214,9 @@ async fn process_pending(
     cfg: &config::WorkerConfig,
 ) -> Result<usize> {
     // Fetch pending items (with FOR UPDATE SKIP LOCKED for concurrency)
-    let items: Vec<WebhookQueueItem> = sqlx::query_as::<_, WebhookQueueItem>(
+    let items: Vec<WebhookQueueItem> = {
+        let _poll_guard = tracing::info_span!("queue-poll", batch_size = 50).entered();
+        sqlx::query_as::<_, WebhookQueueItem>(
         r#"
         UPDATE webhook_queue
         SET status = 'processing'
@@ -175,7 +232,8 @@ async fn process_pending(
         "#,
     )
     .fetch_all(pool)
-    .await?;
+    .await?
+    };
 
     let count = items.len();
 
@@ -183,14 +241,18 @@ async fn process_pending(
         let delivery_id = item.delivery_id;
         let attempt = item.attempt_count + 1;
 
-        // Each delivery is processed inside a structured span
+        // Each delivery is processed inside a structured span (OTel-aware)
         let span = tracing::info_span!(
-            "delivery",
+            "delivery-attempt",
             delivery_id = %delivery_id,
             endpoint_id = %item.endpoint_id,
-            attempt = attempt
+            attempt = attempt,
+            endpoint_url = %item.endpoint_url
         );
         let _guard = span.enter();
+
+        // Capture the trace_id for this span so we can store it in the DB
+        let trace_id = telemetry::current_trace_id();
 
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
 
@@ -238,6 +300,7 @@ async fn process_pending(
 
         match result {
             Ok(response) => {
+                let _resp_span = tracing::info_span!("response-processing", status = tracing::field::Empty, duration_ms = duration_ms).entered();
                 let status_code = response.status().as_u16() as i32;
                 let body = response.text().await.unwrap_or_default();
                 let response_body = truncate(&body, 1000);
@@ -276,7 +339,7 @@ async fn process_pending(
                     .await?;
 
                     // Record attempt
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, None).await?;
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, None, trace_id.as_deref()).await?;
 
                 } else if attempt >= item.max_attempts {
                     // ❌ Max deneme aşıldı → dead letter
@@ -314,7 +377,7 @@ async fn process_pending(
                         .execute(pool)
                         .await?;
 
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {}", status_code))).await?;
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {}", status_code)), trace_id.as_deref()).await?;
 
                 } else {
                     // 🔄 Retry — exponential backoff
@@ -336,7 +399,7 @@ async fn process_pending(
                     .execute(pool)
                     .await?;
 
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {} — retry scheduled", status_code))).await?;
+                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {} — retry scheduled", status_code)), trace_id.as_deref()).await?;
                 }
             }
             Err(e) => {
@@ -376,7 +439,7 @@ async fn process_pending(
                         .execute(pool)
                         .await?;
 
-                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg)).await?;
+                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref()).await?;
 
                 } else {
                     // Retry
@@ -396,13 +459,57 @@ async fn process_pending(
                     .execute(pool)
                     .await?;
 
-                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg)).await?;
+                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref()).await?;
                 }
             }
         }
     }
 
     Ok(count)
+}
+
+/// Recover webhook_queue records stuck in "processing" for more than 5 minutes.
+///
+/// When the worker crashes mid-delivery, records stay in "processing" forever.
+/// This reaper resets them to "pending" so another worker can pick them up.
+async fn reap_zombies(pool: &PgPool) -> Result<usize> {
+    // Find stuck records first so we can log each one
+    let stuck: Vec<(uuid::Uuid, uuid::Uuid, i32)> = sqlx::query_as(
+        r#"
+        SELECT id, delivery_id, attempt_count
+        FROM webhook_queue
+        WHERE status = 'processing'
+          AND updated_at < now() - interval '5 minutes'
+        "#,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    if stuck.is_empty() {
+        return Ok(0);
+    }
+
+    // Reset them back to pending with incremented attempt count
+    for (id, delivery_id, attempt) in &stuck {
+        sqlx::query::<sqlx::Postgres>(
+            r#"
+            UPDATE webhook_queue
+            SET status = 'pending',
+                attempt_count = attempt_count + 1
+            WHERE id = $1
+            "#,
+        )
+        .bind(id)
+        .execute(pool)
+        .await?;
+
+        tracing::warn!(
+            "🧟 Recovered zombie: queue_id={} delivery_id={} next_attempt={}",
+            id, delivery_id, attempt + 1
+        );
+    }
+
+    Ok(stuck.len())
 }
 
 /// Record a delivery attempt
@@ -414,11 +521,12 @@ async fn record_attempt(
     response_body: Option<&str>,
     duration_ms: i32,
     error_message: Option<&str>,
+    trace_id: Option<&str>,
 ) -> Result<()> {
     sqlx::query::<sqlx::Postgres>(
         r#"
-        INSERT INTO delivery_attempts (delivery_id, attempt_number, status_code, response_body, duration_ms, error_message)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO delivery_attempts (delivery_id, attempt_number, status_code, response_body, duration_ms, error_message, trace_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         "#,
     )
     .bind(delivery_id)
@@ -427,6 +535,7 @@ async fn record_attempt(
     .bind(response_body)
     .bind(duration_ms)
     .bind(error_message)
+    .bind(trace_id)
     .execute(pool)
     .await?;
 

@@ -437,6 +437,176 @@ func decodeSecret(secret string) []byte {
 	return decoded
 }
 
+// ── WebhookEvent & HTTP Request Verification ──
+
+// WebhookEvent represents a verified incoming webhook event.
+type WebhookEvent struct {
+	// ID is the webhook-id header value.
+	ID string
+	// Timestamp is the unix timestamp from the webhook-timestamp header.
+	Timestamp string
+	// Event is the event type extracted from the payload (e.g. "order.created").
+	// Empty if the payload has no "event" field.
+	Event string
+	// Data is the parsed JSON payload, or the raw body string if not JSON.
+	Data interface{}
+	// RawBody is the original request body.
+	RawBody string
+}
+
+// VerifyHTTPRequest reads and verifies a webhook HTTP request.
+// It supports both Standard Webhooks headers (webhook-id, webhook-timestamp,
+// webhook-signature) and legacy headers (X-Hookrelay-Signature).
+//
+// For Standard Webhooks, it returns a fully populated WebhookEvent.
+// For legacy headers, only Data and RawBody are populated.
+//
+// Example:
+//
+//	func handleWebhook(w http.ResponseWriter, r *http.Request) {
+//	    event, err := hookrelay.VerifyHTTPRequest(r, "whsec_...")
+//	    if err != nil {
+//	        http.Error(w, err.Error(), http.StatusUnauthorized)
+//	        return
+//	    }
+//	    log.Printf("Event: %s, Data: %v", event.Event, event.Data)
+//	}
+func VerifyHTTPRequest(r *http.Request, secret string) (*WebhookEvent, error) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return nil, fmt.Errorf("hookrelay: read body: %w", err)
+	}
+	defer r.Body.Close()
+	bodyStr := string(body)
+
+	// Try Standard Webhooks headers first
+	msgID := r.Header.Get("webhook-id")
+	msgTimestamp := r.Header.Get("webhook-timestamp")
+	msgSignature := r.Header.Get("webhook-signature")
+
+	// Fall back to Svix headers
+	if msgID == "" {
+		msgID = r.Header.Get("svix-id")
+	}
+	if msgTimestamp == "" {
+		msgTimestamp = r.Header.Get("svix-timestamp")
+	}
+	if msgSignature == "" {
+		msgSignature = r.Header.Get("svix-signature")
+	}
+
+	// Standard Webhooks path
+	if msgID != "" && msgTimestamp != "" && msgSignature != "" {
+		result := VerifyWebhook(bodyStr, msgID, msgTimestamp, msgSignature, secret, 0)
+		if !result.Valid {
+			return nil, fmt.Errorf("hookrelay: %s", result.Error)
+		}
+
+		event := &WebhookEvent{
+			ID:        msgID,
+			Timestamp: msgTimestamp,
+			RawBody:   bodyStr,
+			Data:      result.Payload,
+		}
+
+		// Extract event type from payload
+		if m, ok := result.Payload.(map[string]interface{}); ok {
+			if e, ok := m["event"].(string); ok {
+				event.Event = e
+			}
+		}
+
+		return event, nil
+	}
+
+	// Legacy path: X-Hookrelay-Signature
+	legacySig := r.Header.Get("X-Hookrelay-Signature")
+	if legacySig == "" {
+		legacySig = r.Header.Get("x-hookrelay-signature")
+	}
+
+	if legacySig != "" {
+		if !VerifySignature(bodyStr, legacySig, secret) {
+			return nil, fmt.Errorf("hookrelay: invalid legacy signature")
+		}
+
+		event := &WebhookEvent{RawBody: bodyStr}
+
+		var parsed interface{}
+		if err := json.Unmarshal(body, &parsed); err == nil {
+			event.Data = parsed
+			if m, ok := parsed.(map[string]interface{}); ok {
+				if e, ok := m["event"].(string); ok {
+					event.Event = e
+				}
+			}
+		} else {
+			event.Data = bodyStr
+		}
+
+		return event, nil
+	}
+
+	return nil, fmt.Errorf("hookrelay: no webhook signature headers found")
+}
+
+// WebhookHandler is an http.Handler that verifies incoming webhooks
+// and routes them to registered event handlers.
+//
+// Example:
+//
+//	handler := hookrelay.NewWebhookHandler("whsec_...", map[string]func(hookrelay.WebhookEvent){
+//	    "order.created":  handleOrderCreated,
+//	    "payment.failed": handlePaymentFailed,
+//	})
+//	http.Handle("/webhook", handler)
+type WebhookHandler struct {
+	secret   string
+	handlers map[string]func(WebhookEvent)
+	onEvent  func(WebhookEvent)
+}
+
+// NewWebhookHandler creates a new webhook handler with the given secret and event handlers.
+func NewWebhookHandler(secret string, handlers map[string]func(WebhookEvent)) *WebhookHandler {
+	return &WebhookHandler{
+		secret:   secret,
+		handlers: handlers,
+	}
+}
+
+// WithCatchAll sets a fallback handler for events without a specific handler.
+func (h *WebhookHandler) WithCatchAll(handler func(WebhookEvent)) *WebhookHandler {
+	h.onEvent = handler
+	return h
+}
+
+// ServeHTTP implements http.Handler.
+func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, `{"error":{"code":"METHOD_NOT_ALLOWED","message":"Only POST is allowed"}}`, http.StatusMethodNotAllowed)
+		return
+	}
+
+	event, err := VerifyHTTPRequest(r, h.secret)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprintf(w, `{"error":{"code":"INVALID_SIGNATURE","message":"%s"}}`, err.Error())
+		return
+	}
+
+	// Route to specific handler
+	if handler, ok := h.handlers[event.Event]; ok {
+		handler(*event)
+	} else if h.onEvent != nil {
+		h.onEvent(*event)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"received":true}`))
+}
+
 func (c *Client) do(ctx context.Context, method, path string, body interface{}, result interface{}) error {
 	fullURL := c.BaseURL + path
 

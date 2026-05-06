@@ -32,7 +32,12 @@ from .exceptions import (
     PayloadTooLargeError,
 )
 from .utils import verify_signature, verify_webhook_signature, WebhookHandler
-from .verify import WebhookVerifier, verify_webhook
+from .verify import (
+    WebhookEvent,
+    WebhookVerifier,
+    verify_webhook,
+    verify_webhook_request,
+)
 
 __version__ = "0.3.0"
 __all__ = [
@@ -63,11 +68,13 @@ __all__ = [
     "RateLimitError",
     "ValidationError",
     "PayloadTooLargeError",
-    # Utilities
+    # Legacy webhook verification (utils)
     "verify_signature",
     "verify_webhook_signature",
     "WebhookHandler",
-    # Standard Webhooks verification
+    # Standard Webhooks verification (verify)
+    "WebhookEvent",
     "WebhookVerifier",
     "verify_webhook",
+    "verify_webhook_request",
 ]

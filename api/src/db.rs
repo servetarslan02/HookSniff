@@ -113,6 +113,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
             response_body TEXT,
             duration_ms INT,
             error_message TEXT,
+            trace_id VARCHAR(64),
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 
@@ -248,6 +249,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
             max_attempts INT NOT NULL DEFAULT 3,
             next_retry_at TIMESTAMPTZ,
             status TEXT NOT NULL DEFAULT 'pending',
+            trace_id VARCHAR(64),
             created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
             processed_at TIMESTAMPTZ
         );
@@ -258,6 +260,9 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
 
         CREATE INDEX IF NOT EXISTS idx_webhook_queue_delivery
             ON webhook_queue(delivery_id);
+
+        CREATE INDEX IF NOT EXISTS idx_webhook_queue_trace_id
+            ON webhook_queue(trace_id) WHERE trace_id IS NOT NULL;
         "#,
     )
     .await?;
@@ -586,6 +591,44 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 24: Migration 023 — LISTEN/NOTIFY trigger for webhook_queue
+    run_migration(
+        pool,
+        "023_listen_notify",
+        r#"
+        CREATE OR REPLACE FUNCTION notify_new_webhook()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            IF NEW.status = 'pending' THEN
+                PERFORM pg_notify('new_webhook', NEW.id::text);
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        DROP TRIGGER IF EXISTS trg_notify_new_webhook ON webhook_queue;
+
+        CREATE TRIGGER trg_notify_new_webhook
+            AFTER INSERT ON webhook_queue
+            FOR EACH ROW
+            EXECUTE FUNCTION notify_new_webhook();
+        "#,
+    )
+    .await?;
+
+    // Step 25: Migration 024 — trace_id columns for OpenTelemetry distributed tracing
+    run_migration(
+        pool,
+        "024_trace_id",
+        r#"
+        ALTER TABLE webhook_queue ADD COLUMN IF NOT EXISTS trace_id VARCHAR(64);
+        ALTER TABLE delivery_attempts ADD COLUMN IF NOT EXISTS trace_id VARCHAR(64);
+        CREATE INDEX IF NOT EXISTS idx_webhook_queue_trace_id
+            ON webhook_queue(trace_id) WHERE trace_id IS NOT NULL;
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
@@ -601,10 +644,13 @@ pub async fn publish_to_queue(
     payload: &str,
     custom_headers: Option<&serde_json::Value>,
 ) -> Result<()> {
+    // Capture the current OpenTelemetry trace-id (if active)
+    let trace_id = crate::telemetry::current_trace_id();
+
     sqlx::query(
         r#"
-        INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, signing_secret, payload, custom_headers)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, signing_secret, payload, custom_headers, trace_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         "#,
     )
     .bind(delivery_id)
@@ -613,6 +659,7 @@ pub async fn publish_to_queue(
     .bind(signing_secret)
     .bind(payload)
     .bind(custom_headers)
+    .bind(trace_id)
     .execute(pool)
     .await?;
 
