@@ -372,20 +372,147 @@ async fn handle_subscription_deleted(
 }
 
 async fn handle_invoice_paid(
-    _pool: &sqlx::PgPool,
-    _invoice: &serde_json::Value,
+    pool: &sqlx::PgPool,
+    invoice: &serde_json::Value,
 ) -> Result<(), AppError> {
-    // TODO: Record invoice in database
-    tracing::info!("✅ Invoice payment succeeded");
+    let provider_invoice_id = invoice
+        .get("id")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default()
+        .to_string();
+
+    let stripe_customer_id = invoice
+        .get("customer")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+
+    let amount_cents = invoice
+        .get("amount_paid")
+        .and_then(|v| v.as_i64())
+        .or_else(|| invoice.get("amount_due").and_then(|v| v.as_i64()))
+        .unwrap_or(0) as i32;
+
+    let currency = invoice
+        .get("currency")
+        .and_then(|v| v.as_str())
+        .unwrap_or("usd")
+        .to_string();
+
+    // Determine plan from line items or metadata
+    let plan = invoice
+        .get("lines")
+        .and_then(|lines| lines.get("data"))
+        .and_then(|data| data.as_array())
+        .and_then(|arr| arr.first())
+        .and_then(|item| item.get("price"))
+        .and_then(|price| price.get("id"))
+        .and_then(|v| v.as_str())
+        .map(|price_id| {
+            let prices = StripePrices::from_env();
+            if price_id == prices.business_monthly {
+                "business".to_string()
+            } else if price_id == prices.pro_monthly {
+                "pro".to_string()
+            } else {
+                "pro".to_string()
+            }
+        })
+        .unwrap_or_else(|| "pro".to_string());
+
+    let paid_at = invoice
+        .get("status_transitions")
+        .and_then(|st| st.get("paid_at"))
+        .and_then(|v| v.as_i64())
+        .map(|ts| chrono::DateTime::from_timestamp(ts, 0))
+        .flatten();
+
+    // Look up internal customer_id from stripe_customer_id
+    let customer_row: Option<(uuid::Uuid,)> = sqlx::query_as(
+        "SELECT id FROM customers WHERE stripe_customer_id = $1",
+    )
+    .bind(stripe_customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if let Some((customer_id,)) = customer_row {
+        sqlx::query(
+            "INSERT INTO invoices (customer_id, amount_cents, currency, plan, status, provider, provider_invoice_id, paid_at) \
+             VALUES ($1, $2, $3, $4, 'paid', 'stripe', $5, $6)",
+        )
+        .bind(customer_id)
+        .bind(amount_cents)
+        .bind(&currency)
+        .bind(&plan)
+        .bind(&provider_invoice_id)
+        .bind(paid_at)
+        .execute(pool)
+        .await?;
+
+        tracing::info!(
+            "✅ Invoice recorded: {} (${} {})",
+            provider_invoice_id,
+            amount_cents as f64 / 100.0,
+            currency
+        );
+    } else {
+        tracing::warn!(
+            "⚠️ Invoice {} paid but no customer found for stripe_customer_id={}",
+            provider_invoice_id,
+            stripe_customer_id
+        );
+    }
+
     Ok(())
 }
 
 async fn handle_invoice_failed(
-    _pool: &sqlx::PgPool,
-    _invoice: &serde_json::Value,
+    pool: &sqlx::PgPool,
+    invoice: &serde_json::Value,
 ) -> Result<(), AppError> {
-    // TODO: Send notification to customer, mark as past_due
-    tracing::warn!("⚠️ Invoice payment failed");
+    let provider_invoice_id = invoice
+        .get("id")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+
+    let stripe_customer_id = invoice
+        .get("customer")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+
+    let amount_cents = invoice
+        .get("amount_due")
+        .and_then(|v| v.as_i64())
+        .unwrap_or(0) as i32;
+
+    let currency = invoice
+        .get("currency")
+        .and_then(|v| v.as_str())
+        .unwrap_or("usd")
+        .to_string();
+
+    // Look up internal customer_id
+    let customer_row: Option<(uuid::Uuid,)> = sqlx::query_as(
+        "SELECT id FROM customers WHERE stripe_customer_id = $1",
+    )
+    .bind(stripe_customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if let Some((customer_id,)) = customer_row {
+        // Record the failed invoice
+        sqlx::query(
+            "INSERT INTO invoices (customer_id, amount_cents, currency, plan, status, provider, provider_invoice_id) \
+             VALUES ($1, $2, $3, (SELECT plan FROM customers WHERE id = $1), 'failed', 'stripe', $4)",
+        )
+        .bind(customer_id)
+        .bind(amount_cents)
+        .bind(&currency)
+        .bind(provider_invoice_id)
+        .execute(pool)
+        .await?;
+    }
+
+    tracing::warn!("⚠️ Invoice payment failed: {}", provider_invoice_id);
     Ok(())
 }
 

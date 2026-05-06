@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
+import { billingApi, type Invoice } from '@/lib/api';
 
 const plans = [
   {
@@ -33,22 +34,7 @@ const plans = [
   },
 ];
 
-interface Invoice {
-  id: string;
-  date: string;
-  amount: number;
-  status: 'paid' | 'pending' | 'failed';
-  plan: string;
-}
 
-const mockInvoices: Invoice[] = [
-  { id: 'inv_2026_05', date: '2026-05-01', amount: 49, status: 'paid', plan: 'Pro' },
-  { id: 'inv_2026_04', date: '2026-04-01', amount: 49, status: 'paid', plan: 'Pro' },
-  { id: 'inv_2026_03', date: '2026-03-01', amount: 49, status: 'paid', plan: 'Pro' },
-  { id: 'inv_2026_02', date: '2026-02-01', amount: 0, status: 'paid', plan: 'Free' },
-  { id: 'inv_2026_01', date: '2026-01-01', amount: 0, status: 'paid', plan: 'Free' },
-  { id: 'inv_2025_12', date: '2025-12-01', amount: 0, status: 'paid', plan: 'Free' },
-];
 
 const monthlyUsage = [
   { month: 'Jan', count: 420 },
@@ -115,6 +101,8 @@ export default function BillingPage() {
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit, setUsageLimit] = useState(1000);
   const [loadingUsage, setLoadingUsage] = useState(true);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(true);
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
@@ -134,6 +122,19 @@ export default function BillingPage() {
       })
       .finally(() => setLoadingUsage(false));
   }, [token, API]);
+
+  // Fetch real invoice data
+  useEffect(() => {
+    if (!token) return;
+    setLoadingInvoices(true);
+    billingApi
+      .getInvoices(token)
+      .then((data) => setInvoices(data))
+      .catch(() => {
+        // fallback to empty list
+      })
+      .finally(() => setLoadingInvoices(false));
+  }, [token]);
 
   const usagePercent = usageLimit > 0 ? Math.round((usageCount / usageLimit) * 100) : 0;
 
@@ -309,58 +310,63 @@ export default function BillingPage() {
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('invoiceHistory')}</h2>
-          <span className="text-sm text-gray-400 dark:text-slate-500">{mockInvoices.length} invoices</span>
+          <span className="text-sm text-gray-400 dark:text-slate-500">{invoices.length} invoices</span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                  Invoice
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                  Plan
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-              {mockInvoices.map((inv) => (
-                <tr key={inv.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
-                  <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
-                    {inv.id}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
-                    {new Date(inv.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{inv.plan}</span>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                    ${inv.amount.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <InvoiceStatusBadge status={inv.status} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium transition">
-                      Download
-                    </button>
-                  </td>
+        {loadingInvoices ? (
+          <div className="px-6 py-12 text-center">
+            <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+            <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">Loading invoices…</p>
+          </div>
+        ) : invoices.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <p className="text-sm text-gray-500 dark:text-slate-400">No invoices yet.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    Invoice
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    Plan
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    Status
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+                {invoices.map((inv) => (
+                  <tr key={inv.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
+                    <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
+                      {inv.id.slice(0, 8)}…
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
+                      {new Date(inv.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{inv.plan}</span>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                      ${inv.amount.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <InvoiceStatusBadge status={inv.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Upgrade Confirmation Modal */}

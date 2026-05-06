@@ -367,6 +367,21 @@ export const notificationsApi = {
     apiFetch<{ success: boolean }>(`/notifications/${id}`, { method: 'DELETE', token }),
 };
 
+// Billing types
+export interface Invoice {
+  id: string;
+  date: string;
+  amount: number;
+  status: 'paid' | 'pending' | 'failed';
+  plan: string;
+}
+
+// Billing API
+export const billingApi = {
+  getInvoices: (token: string) =>
+    apiFetch<Invoice[]>('/billing/invoices', { token }),
+};
+
 // Analytics API
 export const analyticsApi = {
   deliveryTrend: (token: string, range: string = '24h') =>
