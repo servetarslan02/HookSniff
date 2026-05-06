@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
 
-const intlMiddleware = createMiddleware(routing);
+const locales = ['en', 'tr', 'de', 'ja', 'pt-BR', 'es', 'fr', 'ko'];
+const defaultLocale = 'en';
+
+function getLocaleFromPath(pathname: string): string | null {
+  for (const loc of locales) {
+    if (pathname === `/${loc}` || pathname.startsWith(`/${loc}/`)) {
+      return loc;
+    }
+  }
+  return null;
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,19 +20,22 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/_vercel') ||
-    pathname.includes('.')
+    pathname.match(/\.\w+$/)
   ) {
     return NextResponse.next();
   }
 
-  // Root → redirect to /en
-  if (pathname === '/') {
+  const localeInPath = getLocaleFromPath(pathname);
+
+  // Root or path without locale → redirect to /en/...
+  if (pathname === '/' || !localeInPath) {
     const url = request.nextUrl.clone();
-    url.pathname = '/en';
+    url.pathname = pathname === '/' ? `/${defaultLocale}` : `/${defaultLocale}${pathname}`;
     return NextResponse.redirect(url);
   }
 
-  return intlMiddleware(request);
+  // Already has valid locale → continue
+  return NextResponse.next();
 }
 
 export const config = {
