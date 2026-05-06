@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic';
 
 // Lazy load ThemeToggle
 const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m => m.ThemeToggle), { ssr: false });
+// Lazy load LanguageSwitcher
+const LanguageSwitcherBtn = dynamic(() => import('@/components/LanguageSwitcher').then(m => m.LanguageSwitcher), { ssr: false });
 
 /* ─── Typewriter Effect ─── */
 const phrases = ['actually deliver', 'never fail', 'always retry', 'scale infinitely', 'just work'];
@@ -268,6 +270,7 @@ export default function Home() {
             <a href="#pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Pricing</a>
             <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
             <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Status</Link>
+            <LanguageSwitcherBtn />
             <ThemeToggleBtn />
             <Link
               href="/dashboard"
@@ -298,7 +301,8 @@ export default function Home() {
             <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Pricing</a>
             <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Docs</Link>
             <Link href="/status" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Status</Link>
-            <div className="pt-2">
+            <div className="flex items-center gap-2 pt-2">
+              <LanguageSwitcherBtn />
               <ThemeToggleBtn />
             </div>
             <Link
