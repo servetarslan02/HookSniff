@@ -174,30 +174,98 @@
     "signupSubtitle": "안정적인 Webhook 배달을 시작하세요"
   },
   "landing": {
+    "nav": {
+      "features": "기능",
+      "pricing": "가격",
+      "docs": "문서",
+      "status": "상태",
+      "dashboard": "대시보드 →"
+    },
     "hero": {
-      "title": "개발자를 위한 안정적인 Webhook 배달",
-      "subtitle": "실시간 분석과 지능형 라우팅으로 Webhook을 모니터링, 재시도, 관리하세요.",
-      "cta": "무료로 시작하기",
-      "ctaSecondary": "문서 보기"
+      "uptime": "99.99% 배송 가동률",
+      "title": "웹훅이",
+      "typewriter": [
+        "실제로 전달됩니다",
+        "절대 실패하지 않습니다",
+        "항상 재시도합니다",
+        "무한히 확장됩니다",
+        "그냥 작동합니다"
+      ],
+      "subtitle": "자신있게 웹훅을 보내세요. 자동 재시도, HMAC 서명, 실시간 모니터링. 신뢰성이 필요한 개발자를 위해.",
+      "cta": "무료로 시작",
+      "ctaSecondary": "문서 읽기"
+    },
+    "code": {
+      "filename": "웹훅-발송.sh",
+      "comment1": "# 엔드포인트 생성",
+      "comment2": "# 웹훅 발송"
     },
     "features": {
-      "title": "Webhook에 필요한 모든 것",
-      "smartRetries": "스마트 재시도",
-      "smartRetriesDesc": "최적 배달을 위한 지수 백오프와 지터",
-      "monitoring": "실시간 모니터링",
-      "monitoringDesc": "상세한 분석으로 모든 배달을 추적",
-      "security": "내장 보안",
-      "securityDesc": "HMAC 서명 검증 및 시크릿 로테이션",
-      "routing": "지능형 라우팅",
-      "routingDesc": "필터링으로 여러 엔드포인트에 Webhook 라우팅"
+      "title": "웹훅에 필요한 모든 것",
+      "subtitle": "신뢰할 수 있는 웹훅 배송이 필요한 개발자를 위한 강력한 기능.",
+      "smartRetries": "자동 재시도",
+      "smartRetriesDesc": "구성 가능한 최대 시도 횟수의 지수 백오프. 실패한 배송은 자동으로 재시도됩니다.",
+      "hmacSignatures": "HMAC 서명",
+      "hmacSignaturesDesc": "모든 웹훅은 SHA256으로 서명됩니다. 단일 함수 호출로 진위를 확인하세요.",
+      "dashboard": "실시간 대시보드",
+      "dashboardDesc": "배송을 모니터링하고, 성공률을 추적하고, 오류를 디버깅하세요. 모든 것이 한 곳에.",
+      "lowLatency": "낮은 지연 시간",
+      "lowLatencyDesc": "속도를 위해 Rust로 구축. 웹훅 배송에서 서브밀리초 오버헤드.",
+      "dlq": "데드 레터 큐",
+      "dlqDesc": "실패한 배송은 디버깅을 위해 보존됩니다. 아무것도 손실되지 않습니다.",
+      "global": "글로벌 인프라",
+      "globalDesc": "저지연 웹훅 배송을 위해 전 세계에 배포하세요."
+    },
+    "howItWorks": {
+      "title": "작동 방식",
+      "subtitle": "신뢰할 수 있는 웹훅 배송을 위한 세 가지 간단한 단계.",
+      "send": "발송",
+      "sendDesc": "API에 웹훅을 POST하세요. 나머지는 저희가 처리합니다.",
+      "deliver": "배송",
+      "deliverDesc": "재시도, 서명, 모니터링으로 배송합니다.",
+      "monitor": "모니터링",
+      "monitorDesc": "대시보드에서 각 배송을 실시간으로 추적하세요."
     },
     "pricing": {
       "title": "간단하고 투명한 가격",
+      "mostPopular": "가장 인기",
       "free": "무료",
       "pro": "프로",
       "business": "비즈니스",
       "month": "/월",
-      "getStarted": "시작하기"
+      "getStarted": "시작하기",
+      "startTrial": "무료 체험",
+      "contactSales": "영업 문의",
+      "freeFeatures": [
+        "1,000 웹훅/월",
+        "100 요청/분",
+        "3회 재시도",
+        "커뮤니티 지원"
+      ],
+      "proFeatures": [
+        "50,000 웹훅/월",
+        "1,000 요청/분",
+        "5회 재시도",
+        "우선 지원",
+        "사용자 정의 도메인"
+      ],
+      "businessFeatures": [
+        "500,000 웹훅/월",
+        "10,000 요청/분",
+        "10회 재시도",
+        "전담 지원",
+        "SLA 보장",
+        "사용자 정의 통합"
+      ]
+    },
+    "footer": {
+      "github": "GitHub",
+      "docs": "문서",
+      "status": "상태",
+      "blog": "블로그",
+      "terms": "약관",
+      "privacy": "개인정보",
+      "copyright": "© 2026 Hookrelay. 모든 권리 보유."
     }
   }
 }

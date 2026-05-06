@@ -174,30 +174,98 @@
     "signupSubtitle": "Webhook'ları güvenilir şekilde teslim etmeye başlayın"
   },
   "landing": {
+    "nav": {
+      "features": "Özellikler",
+      "pricing": "Fiyatlandırma",
+      "docs": "Dokümanlar",
+      "status": "Durum",
+      "dashboard": "Panel →"
+    },
     "hero": {
-      "title": "Geliştiriciler için güvenilir webhook teslimatı",
-      "subtitle": "Webhook'larınızı gerçek zamanlı analitik ve akıllı yönlendirme ile izleyin, tekrar deneyin ve yönetin.",
-      "cta": "Ücretsiz Başlayın",
-      "ctaSecondary": "Dokümantasyonu Görüntüle"
+      "uptime": "%99.99 teslimat uptime",
+      "title": "Webhooklar ki",
+      "typewriter": [
+        "gerçekten teslim eder",
+        "asla başarısız olmaz",
+        "hepsi tekrar dener",
+        "sonsuz ölçeklenir",
+        "sadece çalışır"
+      ],
+      "subtitle": "Webhooklarınızı güvenle gönderin. Otomatik tekrar denemeler, HMAC imzaları, gerçek zamanlı izleme. Güvenilirliğe ihtiyaç duyan geliştiriciler için.",
+      "cta": "Ücretsiz başlayın",
+      "ctaSecondary": "Dokümanları okuyun"
+    },
+    "code": {
+      "filename": "webhook-gonder.sh",
+      "comment1": "# Endpoint oluştur",
+      "comment2": "# Webhook gönder"
     },
     "features": {
       "title": "Webhook için ihtiyacınız olan her şey",
-      "smartRetries": "Akıllı Tekrarlar",
-      "smartRetriesDesc": "Optimal teslimat için üssel geri çekilme ve rastgeleleştirme",
-      "monitoring": "Gerçek Zamanlı İzleme",
-      "monitoringDesc": "Her teslimatı ayrıntılı analitikle takip edin",
-      "security": "Dahili Güvenlik",
-      "securityDesc": "HMAC imza doğrulama ve gizli anahtar rotasyonu",
-      "routing": "Akıllı Yönlendirme",
-      "routingDesc": "Webhook'ları filtreleme ile birden fazla endpoint'e yönlendirin"
+      "subtitle": "Güvenilir webhook teslimatına ihtiyaç duyan geliştiriciler için güçlü özellikler.",
+      "smartRetries": "Otomatik Tekrar Denemeler",
+      "smartRetriesDesc": "Yapılandırılabilir maksimum deneme sayısı ile üstel geri çekilme. Başarısız teslimatlar otomatik olarak tekrar denenir.",
+      "hmacSignatures": "HMAC İmzaları",
+      "hmacSignaturesDesc": "Her webhook SHA256 ile imzalanır. Tek bir fonksiyon çağrısıyla doğrulayın.",
+      "dashboard": "Gerçek Zamanlı Panel",
+      "dashboardDesc": "Teslimatları izleyin, başarı oranlarını takip edin, hataları ayıklayın. Her şey tek bir yerde.",
+      "lowLatency": "Düşük Gecikme",
+      "lowLatencyDesc": "Hız için Rust ile inşa edildi. Webhook teslimatında alt milisaniye overhead.",
+      "dlq": "Ölü Mektup Kuyruğu",
+      "dlqDesc": "Başarısız teslimatlar hata ayıklama için korunur. Hiçbir şey kaybolmaz.",
+      "global": "Küresel Altyapı",
+      "globalDesc": "Düşük gecikmeli webhook teslimatı için dünya çapında dağıtın."
+    },
+    "howItWorks": {
+      "title": "Nasıl çalışır",
+      "subtitle": "Güvenilir webhook teslimatı için üç basit adım.",
+      "send": "Gönder",
+      "sendDesc": "APIimize bir webhook POST edin. Gerisini biz hallederiz.",
+      "deliver": "Teslim Et",
+      "deliverDesc": "Tekrar denemeler, imzalar ve izleme ile teslim ediyoruz.",
+      "monitor": "İzle",
+      "monitorDesc": "Her teslimatı panelinizde gerçek zamanlı olarak takip edin."
     },
     "pricing": {
       "title": "Basit, şeffaf fiyatlandırma",
+      "mostPopular": "En Popüler",
       "free": "Ücretsiz",
       "pro": "Pro",
       "business": "İş",
       "month": "/ay",
-      "getStarted": "Başlayın"
+      "getStarted": "Başlayın",
+      "startTrial": "Ücretsiz deneyin",
+      "contactSales": "Satışla iletişime geçin",
+      "freeFeatures": [
+        "1.000 webhook/ay",
+        "100 istek/dakika",
+        "3 tekrar denemesi",
+        "Topluluk desteği"
+      ],
+      "proFeatures": [
+        "50.000 webhook/ay",
+        "1.000 istek/dakika",
+        "5 tekrar denemesi",
+        "Öncelikli destek",
+        "Özel alan adları"
+      ],
+      "businessFeatures": [
+        "500.000 webhook/ay",
+        "10.000 istek/dakika",
+        "10 tekrar denemesi",
+        "Özel destek",
+        "SLA garantisi",
+        "Özel entegrasyonlar"
+      ]
+    },
+    "footer": {
+      "github": "GitHub",
+      "docs": "Dokümanlar",
+      "status": "Durum",
+      "blog": "Blog",
+      "terms": "Şartlar",
+      "privacy": "Gizlilik",
+      "copyright": "© 2026 Hookrelay. Tüm hakları saklıdır."
     }
   }
 }
