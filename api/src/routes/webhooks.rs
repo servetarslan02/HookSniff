@@ -455,17 +455,6 @@ async fn replay_webhook(
     .fetch_one(&pool)
     .await?;
 
-    let webhook_message = serde_json::json!({
-        "delivery_id": new_delivery.id,
-        "endpoint_id": endpoint.id,
-        "endpoint_url": endpoint.url,
-        "signing_secret": endpoint.signing_secret,
-        "old_signing_secret": endpoint.old_signing_secret,
-        "secret_rotated_at": endpoint.secret_rotated_at.map(|t| t.to_rfc3339()),
-        "custom_headers": endpoint.custom_headers,
-        "payload": payload_str,
-    });
-
     db::publish_to_queue(
         &pool,
         new_delivery.id,

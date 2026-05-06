@@ -60,15 +60,20 @@ pub async fn auth_middleware(
         .ok_or(AppError::Unauthorized)?;
 
     let customer = if token.starts_with("hr_live_") {
-        // API key authentication
-        let key_hash = hash_api_key(token);
-        sqlx::query_as::<_, Customer>(
-            "SELECT * FROM customers WHERE api_key_hash = $1",
+        // API key authentication — lookup by prefix, then verify full key against Argon2 hash
+        let prefix = &token[..15.min(token.len())];
+        let customer = sqlx::query_as::<_, Customer>(
+            "SELECT * FROM customers WHERE api_key_prefix = $1",
         )
-        .bind(&key_hash)
+        .bind(prefix)
         .fetch_optional(&*pool)
         .await?
-        .ok_or(AppError::Unauthorized)?
+        .ok_or(AppError::Unauthorized)?;
+
+        if !verify_api_key(token, &customer.api_key_hash) {
+            return Err(AppError::Unauthorized);
+        }
+        customer
     } else {
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
@@ -134,11 +139,31 @@ pub async fn admin_middleware(
     Ok(next.run(req).await)
 }
 
+/// Hash an API key using Argon2id with a random salt.
+/// The salt is embedded in the returned hash string (PHC format).
 pub fn hash_api_key(key: &str) -> String {
-    use sha2::{Digest, Sha256};
-    let mut hasher = Sha256::new();
-    hasher.update(key.as_bytes());
-    format!("{:x}", hasher.finalize())
+    use argon2::password_hash::SaltString;
+    use argon2::{Argon2, PasswordHasher};
+    use rand::rngs::OsRng;
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+    argon2
+        .hash_password(key.as_bytes(), &salt)
+        .expect("Argon2 hashing failed")
+        .to_string()
+}
+
+/// Verify an API key against a stored Argon2id hash.
+pub fn verify_api_key(key: &str, hash: &str) -> bool {
+    use argon2::password_hash::PasswordHash;
+    use argon2::{Argon2, PasswordVerifier};
+    let parsed_hash = match PasswordHash::new(hash) {
+        Ok(h) => h,
+        Err(_) => return false,
+    };
+    Argon2::default()
+        .verify_password(key.as_bytes(), &parsed_hash)
+        .is_ok()
 }
 
 pub fn generate_api_key() -> String {
