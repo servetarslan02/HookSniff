@@ -1,0 +1,203 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "loading": "Chargement...",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "noResults": "Aucun résultat trouvé",
+    "actions": "Actions",
+    "status": "Statut",
+    "name": "Nom",
+    "description": "Description",
+    "url": "URL",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "copyToClipboard": "Copier dans le presse-papiers",
+    "copied": "Copié !",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "endpoints": "Points de terminaison",
+    "deliveries": "Livraisons",
+    "logs": "Journaux",
+    "search": "Rechercher",
+    "health": "Santé",
+    "alerts": "Alertes",
+    "apiKeys": "Clés API",
+    "playground": "Bac à sable",
+    "analytics": "Analytique",
+    "team": "Équipe",
+    "notifications": "Notifications",
+    "billing": "Facturation",
+    "settings": "Paramètres",
+    "adminPanel": "Panneau d'admin",
+    "docs": "Documentation",
+    "logout": "Déconnexion"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "liveActivity": "Activité en direct",
+    "recentDeliveries": "Livraisons récentes",
+    "noData": "Pas encore de données de livraison",
+    "noActivity": "Aucune activité récente",
+    "stats": {
+      "totalDeliveries": "Total des livraisons",
+      "successRate": "Taux de réussite",
+      "avgLatency": "Latence moyenne",
+      "activeEndpoints": "Points de terminaison actifs",
+      "failedDeliveries": "Livraisons échouées",
+      "pendingRetries": "Tentatives en attente"
+    },
+    "timeRange": {
+      "24h": "24 Heures",
+      "7d": "7 Jours",
+      "30d": "30 Jours"
+    }
+  },
+  "endpoints": {
+    "title": "Points de terminaison",
+    "subtitle": "Gérez vos points de terminaison webhook",
+    "create": "Créer un point",
+    "empty": "Aucun point de terminaison",
+    "emptyDesc": "Créez votre premier point pour commencer à recevoir des webhooks",
+    "form": {
+      "url": "URL du point",
+      "urlPlaceholder": "https://votre-app.com/webhooks",
+      "description": "Description",
+      "descriptionPlaceholder": "À quoi sert ce point ?",
+      "secret": "Secret de signature",
+      "secretDesc": "Utilisé pour vérifier les signatures webhook",
+      "events": "Types d'événement",
+      "rateLimit": "Limite de débit",
+      "active": "Actif"
+    },
+    "status": {
+      "active": "Actif",
+      "paused": "En pause",
+      "disabled": "Désactivé"
+    }
+  },
+  "deliveries": {
+    "title": "Livraisons",
+    "subtitle": "Voir l'historique des livraisons webhook",
+    "empty": "Aucune livraison",
+    "event": "Événement",
+    "endpoint": "Point de terminaison",
+    "attempts": "Tentatives",
+    "time": "Heure",
+    "latency": "Latence",
+    "payload": "Charge utile",
+    "response": "Réponse",
+    "headers": "En-têtes",
+    "statusCode": "Code de statut",
+    "retry": "Réessayer",
+    "retrying": "Nouvelle tentative..."
+  },
+  "analytics": {
+    "title": "Analytique",
+    "subtitle": "Aperçu des livraisons webhook",
+    "deliveryTrends": "Tendances de livraison",
+    "successRateOverTime": "Taux de réussite dans le temps",
+    "topEndpoints": "Top points de terminaison",
+    "errorBreakdown": "Répartition des erreurs",
+    "latencyDistribution": "Distribution de latence"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez votre compte et vos préférences",
+    "profile": "Profil",
+    "security": "Sécurité",
+    "api": "Configuration API",
+    "notifications": "Préférences de notification",
+    "dangerZone": "Zone de danger",
+    "deleteAccount": "Supprimer le compte",
+    "deleteAccountDesc": "Supprimez définitivement votre compte et toutes les données",
+    "changePassword": "Changer le mot de passe",
+    "twoFactor": "Authentification à deux facteurs",
+    "language": "Langue",
+    "theme": "Thème",
+    "timezone": "Fuseau horaire"
+  },
+  "billing": {
+    "title": "Facturation",
+    "subtitle": "Gérez votre abonnement et vos paiements",
+    "currentPlan": "Plan actuel",
+    "upgrade": "Mettre à niveau",
+    "downgrade": "Rétrograder",
+    "cancel": "Annuler l'abonnement",
+    "invoices": "Factures",
+    "paymentMethod": "Mode de paiement",
+    "usage": "Utilisation",
+    "plans": {
+      "free": "Gratuit",
+      "pro": "Pro",
+      "business": "Business",
+      "enterprise": "Enterprise"
+    },
+    "features": {
+      "deliveries": "{count} livraisons/mois",
+      "endpoints": "{count} points de terminaison",
+      "retention": "{days} jours de rétention",
+      "support": "Support prioritaire",
+      "customDomain": "Domaine personnalisé",
+      "sla": "Garantie SLA"
+    }
+  },
+  "auth": {
+    "login": "Se connecter",
+    "signup": "S'inscrire",
+    "logout": "Se déconnecter",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "loginTitle": "Bon retour",
+    "loginSubtitle": "Connectez-vous à votre tableau de bord HookRelay",
+    "signupTitle": "Créez votre compte",
+    "signupSubtitle": "Commencez à livrer des webhooks de manière fiable"
+  },
+  "landing": {
+    "hero": {
+      "title": "Livraison de webhooks fiable pour les développeurs",
+      "subtitle": "Surveillez, réessayez et gérez vos webhooks avec une analytique en temps réel et un routage intelligent.",
+      "cta": "Commencer Gratuitement",
+      "ctaSecondary": "Voir la Documentation"
+    },
+    "features": {
+      "title": "Tout ce dont vous avez besoin pour les webhooks",
+      "smartRetries": "Tentatives intelligentes",
+      "smartRetriesDesc": "Backoff exponentiel avec jitter pour une livraison optimale",
+      "monitoring": "Surveillance en temps réel",
+      "monitoringDesc": "Suivez chaque livraison avec une analytique détaillée",
+      "security": "Sécurité intégrée",
+      "securityDesc": "Vérification de signature HMAC et rotation des secrets",
+      "routing": "Routage intelligent",
+      "routingDesc": "Routez les webhooks vers plusieurs points avec filtrage"
+    },
+    "pricing": {
+      "title": "Tarification simple et transparente",
+      "free": "Gratuit",
+      "pro": "Pro",
+      "business": "Business",
+      "month": "/mois",
+      "getStarted": "Commencer"
+    }
+  }
+}

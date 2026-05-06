@@ -1,0 +1,203 @@
+{
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "update": "Güncelle",
+    "close": "Kapat",
+    "confirm": "Onayla",
+    "back": "Geri",
+    "next": "İleri",
+    "loading": "Yükleniyor...",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "noResults": "Sonuç bulunamadı",
+    "actions": "İşlemler",
+    "status": "Durum",
+    "name": "İsim",
+    "description": "Açıklama",
+    "url": "URL",
+    "created": "Oluşturulma",
+    "updated": "Güncellenme",
+    "copyToClipboard": "Panoya kopyala",
+    "copied": "Kopyalandı!",
+    "error": "Hata",
+    "success": "Başarılı",
+    "warning": "Uyarı",
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+  "nav": {
+    "dashboard": "Kontrol Paneli",
+    "endpoints": "Endpoint'ler",
+    "deliveries": "Teslimatlar",
+    "logs": "Loglar",
+    "search": "Arama",
+    "health": "Sağlık",
+    "alerts": "Uyarılar",
+    "apiKeys": "API Anahtarları",
+    "playground": "Oyun Alanı",
+    "analytics": "Analitik",
+    "team": "Ekip",
+    "notifications": "Bildirimler",
+    "billing": "Faturalandırma",
+    "settings": "Ayarlar",
+    "adminPanel": "Yönetici Paneli",
+    "docs": "Dokümantasyon",
+    "logout": "Çıkış"
+  },
+  "dashboard": {
+    "title": "Kontrol Paneli",
+    "overview": "Genel Bakış",
+    "liveActivity": "Canlı Aktivite",
+    "recentDeliveries": "Son Teslimatlar",
+    "noData": "Henüz teslimat verisi yok",
+    "noActivity": "Son aktivite yok",
+    "stats": {
+      "totalDeliveries": "Toplam Teslimat",
+      "successRate": "Başarı Oranı",
+      "avgLatency": "Ort. Gecikme",
+      "activeEndpoints": "Aktif Endpoint",
+      "failedDeliveries": "Başarısız Teslimat",
+      "pendingRetries": "Bekleyen Tekrar"
+    },
+    "timeRange": {
+      "24h": "24 Saat",
+      "7d": "7 Gün",
+      "30d": "30 Gün"
+    }
+  },
+  "endpoints": {
+    "title": "Endpoint'ler",
+    "subtitle": "Webhook endpoint'lerinizi yönetin",
+    "create": "Endpoint Oluştur",
+    "empty": "Henüz endpoint yok",
+    "emptyDesc": "Webhook almaya başlamak için ilk endpoint'inizi oluşturun",
+    "form": {
+      "url": "Endpoint URL'si",
+      "urlPlaceholder": "https://uygulamaniz.com/webhooks",
+      "description": "Açıklama",
+      "descriptionPlaceholder": "Bu endpoint ne için?",
+      "secret": "İmza Gizli Anahtarı",
+      "secretDesc": "Webhook imzalarını doğrulamak için kullanılır",
+      "events": "Olay Türleri",
+      "rateLimit": "Hız Sınırı",
+      "active": "Aktif"
+    },
+    "status": {
+      "active": "Aktif",
+      "paused": "Duraklatılmış",
+      "disabled": "Devre Dışı"
+    }
+  },
+  "deliveries": {
+    "title": "Teslimatlar",
+    "subtitle": "Webhook teslimat geçmişini görüntüleyin",
+    "empty": "Henüz teslimat yok",
+    "event": "Olay",
+    "endpoint": "Endpoint",
+    "attempts": "Deneme",
+    "time": "Zaman",
+    "latency": "Gecikme",
+    "payload": "Veri",
+    "response": "Yanıt",
+    "headers": "Başlıklar",
+    "statusCode": "Durum Kodu",
+    "retry": "Tekrar Dene",
+    "retrying": "Tekrar deneniyor..."
+  },
+  "analytics": {
+    "title": "Analitik",
+    "subtitle": "Webhook teslimat istatistikleri",
+    "deliveryTrends": "Teslimat Trendleri",
+    "successRateOverTime": "Başarı Oranı Zaman Çizelgesi",
+    "topEndpoints": "En Çok Kullanılan Endpoint'ler",
+    "errorBreakdown": "Hata Dağılımı",
+    "latencyDistribution": "Gecikme Dağılımı"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "subtitle": "Hesabınızı ve tercihlerinizi yönetin",
+    "profile": "Profil",
+    "security": "Güvenlik",
+    "api": "API Yapılandırması",
+    "notifications": "Bildirim Tercihleri",
+    "dangerZone": "Tehlikeli Bölge",
+    "deleteAccount": "Hesabı Sil",
+    "deleteAccountDesc": "Hesabınızı ve tüm verilerinizi kalıcı olarak silin",
+    "changePassword": "Şifre Değiştir",
+    "twoFactor": "İki Faktörlü Doğrulama",
+    "language": "Dil",
+    "theme": "Tema",
+    "timezone": "Saat Dilimi"
+  },
+  "billing": {
+    "title": "Faturalandırma",
+    "subtitle": "Aboneliğinizi ve ödemelerinizi yönetin",
+    "currentPlan": "Mevcut Plan",
+    "upgrade": "Yükselt",
+    "downgrade": "Düşür",
+    "cancel": "Aboneliği İptal Et",
+    "invoices": "Faturalar",
+    "paymentMethod": "Ödeme Yöntemi",
+    "usage": "Kullanım",
+    "plans": {
+      "free": "Ücretsiz",
+      "pro": "Pro",
+      "business": "İş",
+      "enterprise": "Kurumsal"
+    },
+    "features": {
+      "deliveries": "Ayda {count} teslimat",
+      "endpoints": "{count} endpoint",
+      "retention": "{days} gün saklama",
+      "support": "Öncelikli destek",
+      "customDomain": "Özel alan adı",
+      "sla": "SLA garantisi"
+    }
+  },
+  "auth": {
+    "login": "Giriş Yap",
+    "signup": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifreyi Onayla",
+    "forgotPassword": "Şifreni mi unuttun?",
+    "noAccount": "Hesabın yok mu?",
+    "hasAccount": "Zaten hesabın var mı?",
+    "loginTitle": "Tekrar hoş geldin",
+    "loginSubtitle": "HookRelay kontrol panelinize giriş yapın",
+    "signupTitle": "Hesabınızı oluşturun",
+    "signupSubtitle": "Webhook'ları güvenilir şekilde teslim etmeye başlayın"
+  },
+  "landing": {
+    "hero": {
+      "title": "Geliştiriciler için güvenilir webhook teslimatı",
+      "subtitle": "Webhook'larınızı gerçek zamanlı analitik ve akıllı yönlendirme ile izleyin, tekrar deneyin ve yönetin.",
+      "cta": "Ücretsiz Başlayın",
+      "ctaSecondary": "Dokümantasyonu Görüntüle"
+    },
+    "features": {
+      "title": "Webhook için ihtiyacınız olan her şey",
+      "smartRetries": "Akıllı Tekrarlar",
+      "smartRetriesDesc": "Optimal teslimat için üssel geri çekilme ve rastgeleleştirme",
+      "monitoring": "Gerçek Zamanlı İzleme",
+      "monitoringDesc": "Her teslimatı ayrıntılı analitikle takip edin",
+      "security": "Dahili Güvenlik",
+      "securityDesc": "HMAC imza doğrulama ve gizli anahtar rotasyonu",
+      "routing": "Akıllı Yönlendirme",
+      "routingDesc": "Webhook'ları filtreleme ile birden fazla endpoint'e yönlendirin"
+    },
+    "pricing": {
+      "title": "Basit, şeffaf fiyatlandırma",
+      "free": "Ücretsiz",
+      "pro": "Pro",
+      "business": "İş",
+      "month": "/ay",
+      "getStarted": "Başlayın"
+    }
+  }
+}

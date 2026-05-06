@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+const createNextIntlPlugin = require('next-intl/plugin');
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -19,8 +23,6 @@ const nextConfig = {
       ],
     }];
   },
-  // Proxy /api/* to the backend only during local development.
-  // In production the dashboard talks to NEXT_PUBLIC_API_URL directly.
   async rewrites() {
     if (process.env.NODE_ENV === 'production') return [];
     return [
@@ -32,4 +34,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withNextIntl(nextConfig);
