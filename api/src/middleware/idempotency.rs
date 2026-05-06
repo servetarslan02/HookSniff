@@ -27,45 +27,73 @@ pub struct IdempotencyKey {
 }
 
 /// Check if an idempotency key exists and return cached response if so.
-/// Returns None if key doesn't exist or has expired.
+/// Returns None if key doesn't exist, has expired, or body hash doesn't match.
 pub async fn check_idempotency(
     pool: &sqlx::PgPool,
     key: &str,
     customer_id: Uuid,
+    body_hash: Option<&str>,
 ) -> Option<IdempotencyKey> {
-    sqlx::query_as::<_, IdempotencyKey>(
-        "SELECT * FROM idempotency_keys WHERE key = $1 AND customer_id = $2 AND expires_at > now()",
-    )
-    .bind(key)
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await
-    .ok()
-    .flatten()
+    if let Some(hash) = body_hash {
+        // Check with body hash — must match both key and body
+        sqlx::query_as::<_, IdempotencyKey>(
+            "SELECT * FROM idempotency_keys WHERE key = $1 AND customer_id = $2 AND expires_at > now() AND (body_hash = $3 OR body_hash IS NULL)",
+        )
+        .bind(key)
+        .bind(customer_id)
+        .bind(hash)
+        .fetch_optional(pool)
+        .await
+        .ok()
+        .flatten()
+    } else {
+        // Legacy check without body hash
+        sqlx::query_as::<_, IdempotencyKey>(
+            "SELECT * FROM idempotency_keys WHERE key = $1 AND customer_id = $2 AND expires_at > now()",
+        )
+        .bind(key)
+        .bind(customer_id)
+        .fetch_optional(pool)
+        .await
+        .ok()
+        .flatten()
+    }
 }
 
 /// Store an idempotency key with its response for 24 hours.
+/// Optionally stores body hash for request body validation.
 pub async fn store_idempotency(
     pool: &sqlx::PgPool,
     key: &str,
     customer_id: Uuid,
     response_body: serde_json::Value,
     status_code: i32,
+    body_hash: Option<&str>,
 ) -> Result<(), sqlx::Error> {
     let expires_at = Utc::now() + chrono::Duration::hours(24);
 
     sqlx::query(
-        "INSERT INTO idempotency_keys (key, customer_id, response_body, status_code, expires_at) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (key) DO NOTHING",
+        "INSERT INTO idempotency_keys (key, customer_id, response_body, status_code, expires_at, body_hash) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (key) DO NOTHING",
     )
     .bind(key)
     .bind(customer_id)
     .bind(&response_body)
     .bind(status_code)
     .bind(expires_at)
+    .bind(body_hash)
     .execute(pool)
     .await?;
 
     Ok(())
+}
+
+/// Compute a hash of the request body for idempotency validation.
+pub fn compute_body_hash(body: &serde_json::Value) -> String {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    let mut hasher = DefaultHasher::new();
+    body.to_string().hash(&mut hasher);
+    format!("{:016x}", hasher.finish())
 }
 
 // ── Replay Protection ──────────────────────────────────────────────────

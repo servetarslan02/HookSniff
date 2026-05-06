@@ -114,8 +114,11 @@ async fn create_webhook(
         .get("Idempotency-Key")
         .and_then(|v| v.to_str().ok());
 
+    // Compute body hash for idempotency validation
+    let body_hash = idempotency_key.map(|_| idempotency::compute_body_hash(&req.data));
+
     if let Some(key) = idempotency_key {
-        if let Some(cached) = idempotency::check_idempotency(&pool, key, customer.id).await {
+        if let Some(cached) = idempotency::check_idempotency(&pool, key, customer.id, body_hash.as_deref()).await {
             tracing::info!("♻️ Returning cached response for idempotency key: {}", key);
             return Ok(Json(serde_json::from_value(cached.response_body).unwrap_or_else(|_| {
                 DeliveryResponse {
@@ -246,7 +249,7 @@ async fn create_webhook(
         let response_body = serde_json::to_value(&delivery.to_response())
             .unwrap_or(serde_json::Value::Null);
         if let Err(e) =
-            idempotency::store_idempotency(&pool, key, customer.id, response_body, 200).await
+            idempotency::store_idempotency(&pool, key, customer.id, response_body, 200, body_hash.as_deref()).await
         {
             tracing::warn!("Failed to store idempotency key: {:?}", e);
         }
