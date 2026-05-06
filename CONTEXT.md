@@ -5,7 +5,7 @@
 
 ---
 
-## 📅 Son Güncelleme: 2026-05-06 19:38
+## 📅 Son Güncelleme: 2026-05-06 22:49
 
 ## 👤 Hakkında
 
@@ -47,6 +47,18 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 - ~~Self-hosted infra~~ → Free-tier managed servisler ✅
 
 ## ✅ Yapılan İşler (2026-05-06)
+
+### Ödeme Sistemi (2026-05-06)
+- [x] **Polar.sh entegrasyonu** — checkout, webhook, subscription lifecycle
+- [x] **iyzico entegrasyonu** — 3D Secure, TRY, webhook doğrulama
+- [x] **Payment provider abstraction** — tek interface, 3 provider
+- [x] **Polar.sh hesap açıldı** — bireysel, Türkiye
+- [x] **Pro plan ürünü** — $49/ay, ID: 79fee3f9-04a2-46c1-804e-8ca7542b8119
+- [x] **Business plan ürünü** — $149/ay, ID: e5b7d88a-7606-4963-a070-4102ca6405e2
+- [x] **Polar.sh webhook** — URL: /v1/billing/webhook/polar
+- [x] **Migration 009** — payment_providers tablosu + alanları
+- [ ] **iyzico hesap** — merchant.iyzipay.com'dan açılacak
+- [ ] **Wise Business** — para çekme için
 
 ### Bug Fixes (2026-05-06 17:50)
 - [x] **Auth middleware JWT desteği** — `auth_middleware` artık hem API key (`hr_live_*`) hem JWT token destekliyor.
@@ -95,9 +107,10 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 
 | İş | Öncelik | Not |
 |----|---------|-----|
+| iyzico hesabı aç | 🔴 Yüksek | Türk müşteriler için |
+| Wise Business hesabı aç | 🔴 Yüksek | Polar.sh para çekme için |
 | Production deploy (Oracle Cloud) | 🔴 Yüksek | FREE_TIER_SETUP.md rehberini takip et |
 | Domain al | 🔴 Yüksek | $12, hookrelay.com veya alternatifi |
-| Stripe hesabı aç | 🔴 Yüksek | Dashboard'dan ödeme almak için |
 | Neon + Upstash kurulumu | 🔴 Yüksek | .env.production güncelle |
 | Grafana Cloud kurulumu | 🟡 Orta | Monitoring dashboard'ları |
 | Beta kullanıcı bul | 🟡 Orta | Reddit/HN/ProductHunt paylaşım |
@@ -126,7 +139,24 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 | 2-3. ay | İlk ücretli müşteri ($49) |
 | 6. ay | $500/ay gelir → şirket kur |
 
-## 💰 Fiyatlandırma
+## 💰 Fiyatlandırma & Ödeme Sistemi
+
+### Ödeme Sağlayıcıları (Multi-Provider)
+
+| Sağlayıcı | Komisyon | Kullanıcı | Durum |
+|-----------|----------|-----------|-------|
+| **Polar.sh** | %4 | Global müşteriler | ✅ Kuruldu |
+| **iyzico** | %1.5 | Türk müşteriler | ⏳ Hesap açılacak |
+| **Stripe** | %2.9 | Legacy | ✅ Kodda var |
+
+### Polar.sh Ürünleri
+- **Pro Plan:** `79fee3f9-04a2-46c1-804e-8ca7542b8119` — $49/ay
+- **Business Plan:** `e5b7d88a-7606-4963-a070-4102ca6405e2` — $149/ay
+- **Access Token:** `.env.production`'da kayıtlı
+- **Webhook Secret:** `.env.production`'da kayıtlı
+- **Webhook URL:** `https://api.hookrelay.io/v1/billing/webhook/polar`
+
+### Plan Fiyatları
 
 | Plan | Fiyat | Webhooks/ay | Endpoint | Retention |
 |------|-------|-------------|----------|-----------|
@@ -177,6 +207,15 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 11. hookrelay.dev isim çakışması — alternatif isim önerileri
 12. Free-tier altyapı planı oluşturuldu (Oracle Cloud, Neon, Upstash, Vercel, Grafana, R2, Resend)
 13. Dokümantasyon güncellendi
+14. **Ödeme sistemi araştırması** — Stripe vs Paddle vs Polar.sh vs iyzico vs PayTR karşılaştırması
+15. **Polar.sh seçildi** — Türkiye'den kolay açılır, %4 komisyon, MoR
+16. **Paddle çıkarıldı** — Türkiye'den onay zor, R10.net'te "imkansız" deniyor
+17. **Polar.sh + iyzico hybrid model** — Global: Polar.sh (%4), Türk: iyzico (%1.5)
+18. **Polar.sh hesap açıldı** — bireysel, "hookrelay" slug
+19. **Pro plan** — $49/ay, ID: 79fee3f9-04a2-46c1-804e-8ca7542b8119
+20. **Business plan** — $149/ay, ID: e5b7d88a-7606-4963-a070-4102ca6405e2
+21. **Webhook URL** — /v1/billing/webhook/polar
+22. **.env.production** — Polar credentials kaydedildi
 
 ## 🔗 Linkler
 
