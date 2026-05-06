@@ -30,6 +30,7 @@ k8s/
 - `kubectl` configured
 - `cert-manager` installed (for TLS)
 - `nginx-ingress-controller` installed
+- PostgreSQL database (e.g., Neon, Supabase, or self-hosted)
 
 ### Deploy
 
@@ -106,18 +107,21 @@ global load balancer (e.g., Cloudflare, AWS Global Accelerator, GCP Global LB).
    ```
 
 2. **Configure region-specific values** in `configmap.yaml`:
-   - `KAFKA_BROKERS` → point to regional Kafka/Redpanda
-   - `DATABASE_URL` → point to regional CockroachDB node
+   - `DATABASE_URL` → point to regional PostgreSQL instance
 
 3. **Set up global DNS** with latency-based or geo-based routing:
    - `api.hookrelay.io` → routes to nearest region
    - Each region gets its own TLS certificate
 
-4. **Database replication** (CockroachDB multi-region):
+4. **Database replication** (PostgreSQL logical replication):
    ```sql
-   -- Add regions to CockroachDB
-   ALTER DATABASE hookrelay SET PRIMARY REGION "us-east1";
-   ALTER DATABASE hookrelay ADD REGION "eu-west1";
+   -- Set up publication on primary
+   CREATE PUBLICATION hookrelay_pub FOR ALL TABLES;
+   
+   -- Set up subscription on replica
+   CREATE SUBSCRIPTION hookrelay_sub
+     CONNECTION 'host=primary-host dbname=hookrelay'
+     PUBLICATION hookrelay_pub;
    ```
 
 ## Scaling Recommendations
@@ -135,24 +139,23 @@ Current HPA config: 2–10 replicas, CPU target 70%.
 
 ### Worker
 
-Workers scale based on Kafka consumer lag:
+Workers scale based on pending webhook queue depth:
 
 ```bash
-# Check consumer lag
-kubectl exec -n hookrelay deploy/hookrelay-worker -- \
-  rpk group describe hookrelay-worker --brokers redpanda:9092
+# Check pending deliveries in the queue
+kubectl exec -n hookrelay deploy/hookrelay-api -- \
+  psql "$DATABASE_URL" -c "SELECT count(*) FROM webhook_queue WHERE status = 'pending';"
 ```
 
-Scale up when lag exceeds 10,000 messages.
+Scale up when pending count exceeds 10,000.
 
 ### Database
 
-CockroachDB scales horizontally:
-
-```bash
-# Add a node to the cluster
-kubectl scale statefulset cockroachdb --replicas=3 -n hookrelay
-```
+PostgreSQL scaling options:
+- **Vertical:** Increase CPU/memory on the database instance
+- **Read replicas:** Add read replicas for read-heavy workloads
+- **Connection pooling:** Use PgBouncer for high-concurrency workloads
+- **Managed services:** Use Neon, Supabase, or AWS RDS for automatic scaling
 
 ## Monitoring Integration
 
@@ -193,4 +196,8 @@ kubectl exec -it -n hookrelay deploy/hookrelay-api -- /bin/sh
 
 # Check ingress
 kubectl describe ingress -n hookrelay hookrelay-ingress
+
+# Check database connectivity
+kubectl exec -it -n hookrelay deploy/hookrelay-api -- \
+  psql "$DATABASE_URL" -c "SELECT 1;"
 ```

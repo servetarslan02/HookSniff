@@ -101,9 +101,9 @@ Webhook delivery servisi. Geliştiricilere yönelik.
 
 - **Dil:** Rust (API + Worker), TypeScript (Dashboard), Node.js (CLI), Go (SDK)
 - **Framework:** Axum (API), Next.js 15 (Dashboard)
-- **DB:** CockroachDB (PostgreSQL uyumlu)
-- **Queue:** Kafka/Redpanda
-- **Workflow:** Temporal
+- **DB:** PostgreSQL (Neon)
+- **Queue:** PostgreSQL (webhook_queue tablosu)
+- **Workflow:** Basit retry loop (PostgreSQL polling)
 - **Auth:** JWT + API key (hr_live_ prefix) + Argon2
 - **Signing:** Standard Webhooks HMAC-SHA256
 - **Billing:** Stripe Checkout + Customer Portal + Webhook handler

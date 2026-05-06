@@ -50,7 +50,7 @@ export default function DocsPage() {
 {`import hmac, hashlib
 
 def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
-    expected = hmac.new(
+    expected = hmac.HMAC(
         secret.encode(), payload, hashlib.sha256
     ).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)`}

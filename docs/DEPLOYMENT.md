@@ -236,7 +236,7 @@ fly secrets set STRIPE_WEBHOOK_SECRET="whsec_..."
 fly secrets set STRIPE_PRO_PRICE_ID="price_..."
 fly secrets set STRIPE_BUSINESS_PRICE_ID="price_..."
 
-# Kafka (if using external Kafka/Redpanda)
+# PostgreSQL queue configuration
 fly secrets set KAFKA_BROKERS="broker1:9092,broker2:9092"
 fly secrets set KAFKA_TOPIC="webhook-deliveries"
 ```
@@ -367,8 +367,8 @@ fly ips list
 | `APP_ENV` | `development` | Environment name |
 | `PORT` | `3000` | API server port |
 | `RUST_LOG` | `info` | Log level (`debug`, `info`, `warn`, `error`) |
-| `KAFKA_BROKERS` | — | Kafka/Redpanda broker addresses |
-| `KAFKA_TOPIC` | `webhook-deliveries` | Kafka topic name |
+| `DATABASE_URL` | — | PostgreSQL connection string |
+| `MAX_ATTEMPTS` | `3` | Max delivery attempts |
 | `MAX_PAYLOAD_BYTES` | `1048576` | Max webhook payload size (1 MB) |
 | `RETENTION_DAYS` | `30` | Days to keep delivery logs |
 | `WEBHOOK_FORMAT` | `standard` | Webhook format (`standard` for Standard Webhooks) |
@@ -594,7 +594,7 @@ curl -H "Authorization: Bearer hr_live_..." \
 # Common issues:
 # 1. Endpoint URL unreachable
 # 2. Endpoint returning 4xx/5xx
-# 3. Kafka/Redpanda down
+# 3. PostgreSQL down
 ```
 
 ### Stripe webhook issues

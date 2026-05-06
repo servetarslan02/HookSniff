@@ -151,7 +151,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     run_migration(
         pool,
         "002_add_password_hash",
-        "ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_hash STRING",
+        "ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_hash TEXT",
     )
     .await?;
 
@@ -161,7 +161,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         "003_add_endpoint_security_columns",
         r#"
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS allowed_ips JSONB;
-        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS event_filter STRING[];
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS event_filter TEXT[];
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS custom_headers JSONB;
         "#,
     )
@@ -172,7 +172,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         pool,
         "004_add_secret_rotation",
         r#"
-        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS old_signing_secret STRING;
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS old_signing_secret TEXT;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS secret_rotated_at TIMESTAMPTZ;
         "#,
     )
@@ -192,7 +192,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         "006_routing",
         r#"
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS routing_strategy TEXT NOT NULL DEFAULT 'round-robin';
-        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fallback_url STRING;
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fallback_url TEXT;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS avg_response_ms INT NOT NULL DEFAULT 0;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS failure_streak INT NOT NULL DEFAULT 0;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS last_failure_at TIMESTAMPTZ;
@@ -211,7 +211,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fifo_group_by_customer BOOL DEFAULT false;
         ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fifo_max_wait_secs INT DEFAULT 300;
         ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS sequence_num BIGINT;
-        ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS fifo_group_id STRING;
+        ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS fifo_group_id TEXT;
         CREATE INDEX IF NOT EXISTS idx_deliveries_fifo
             ON deliveries(endpoint_id, sequence_num)
             WHERE status = 'pending' AND sequence_num IS NOT NULL;
@@ -267,6 +267,322 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         pool,
         "010_add_endpoint_format",
         "ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS format TEXT NOT NULL DEFAULT 'standard'",
+    )
+    .await?;
+
+    // Step 12: Migration 011 — seen_webhooks table for replay protection
+    run_migration(
+        pool,
+        "011_seen_webhooks",
+        r#"
+        CREATE TABLE IF NOT EXISTS seen_webhooks (
+            webhook_id TEXT PRIMARY KEY,
+            seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            expires_at TIMESTAMPTZ NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_seen_webhooks_expires
+            ON seen_webhooks (expires_at);
+        "#,
+    )
+    .await?;
+
+    // Step 13: Migration 012 — retry policies table
+    run_migration(
+        pool,
+        "012_retry_policies",
+        r#"
+        CREATE TABLE IF NOT EXISTS retry_policies (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            endpoint_id UUID NOT NULL UNIQUE REFERENCES endpoints(id) ON DELETE CASCADE,
+            max_attempts INT NOT NULL DEFAULT 5,
+            base_delay_ms BIGINT NOT NULL DEFAULT 1000,
+            max_delay_ms BIGINT NOT NULL DEFAULT 3600000,
+            multiplier DOUBLE PRECISION NOT NULL DEFAULT 2.0,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_retry_policies_endpoint
+            ON retry_policies(endpoint_id);
+        "#,
+    )
+    .await?;
+
+    // Step 14: Migration 013 — transform rules table
+    run_migration(
+        pool,
+        "013_transform_rules",
+        r#"
+        CREATE TABLE IF NOT EXISTS transform_rules (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            endpoint_id UUID NOT NULL REFERENCES endpoints(id) ON DELETE CASCADE,
+            rule_json JSONB NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_transform_rules_endpoint
+            ON transform_rules(endpoint_id);
+        "#,
+    )
+    .await?;
+
+    // Step 15: Migration 014 — event schemas table
+    run_migration(
+        pool,
+        "014_event_schemas",
+        r#"
+        CREATE TABLE IF NOT EXISTS event_schemas (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            version INT NOT NULL DEFAULT 1,
+            schema JSONB NOT NULL,
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_event_schemas_customer
+            ON event_schemas(customer_id, name);
+        "#,
+    )
+    .await?;
+
+    // Step 16: Migration 015 — api_keys table
+    run_migration(
+        pool,
+        "015_api_keys",
+        r#"
+        CREATE TABLE IF NOT EXISTS api_keys (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            api_key_hash TEXT NOT NULL,
+            api_key_prefix TEXT NOT NULL,
+            name TEXT NOT NULL DEFAULT 'Default',
+            is_active BOOL NOT NULL DEFAULT true,
+            last_used_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_api_keys_customer
+            ON api_keys(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_api_keys_hash
+            ON api_keys(api_key_hash);
+        "#,
+    )
+    .await?;
+
+    // Step 17: Migration 016 — alert_rules table
+    run_migration(
+        pool,
+        "016_alert_rules",
+        r#"
+        CREATE TABLE IF NOT EXISTS alert_rules (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            condition TEXT NOT NULL,
+            threshold INT NOT NULL DEFAULT 0,
+            channels JSONB NOT NULL DEFAULT '[]',
+            is_active BOOL NOT NULL DEFAULT true,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_alert_rules_customer
+            ON alert_rules(customer_id);
+        "#,
+    )
+    .await?;
+
+    // Step 18: Migration 017 — ai_center tables
+    run_migration(
+        pool,
+        "017_ai_center",
+        r#"
+        CREATE TABLE IF NOT EXISTS ai_events (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            event_type TEXT NOT NULL,
+            severity TEXT NOT NULL DEFAULT 'info',
+            title TEXT NOT NULL,
+            description TEXT,
+            action_taken TEXT,
+            target_type TEXT,
+            target_id UUID,
+            resolved BOOL NOT NULL DEFAULT false,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_ai_events_created
+            ON ai_events(created_at DESC);
+
+        CREATE TABLE IF NOT EXISTS risk_scores (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            target_type TEXT NOT NULL,
+            target_id UUID NOT NULL,
+            score INT NOT NULL DEFAULT 0,
+            factors JSONB,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_risk_scores_target
+            ON risk_scores(target_id, created_at DESC);
+
+        CREATE TABLE IF NOT EXISTS ai_actions (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            action_type TEXT NOT NULL,
+            description TEXT NOT NULL,
+            target_type TEXT,
+            target_id UUID,
+            status TEXT NOT NULL DEFAULT 'pending',
+            risk_level TEXT NOT NULL DEFAULT 'low',
+            auto_approved BOOL NOT NULL DEFAULT false,
+            executed_at TIMESTAMPTZ,
+            rolled_back_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_ai_actions_status
+            ON ai_actions(status);
+
+        CREATE TABLE IF NOT EXISTS ai_blocklist (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            block_type TEXT NOT NULL,
+            block_value TEXT NOT NULL,
+            reason TEXT,
+            expires_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_ai_blocklist_expires
+            ON ai_blocklist(expires_at) WHERE expires_at IS NOT NULL;
+        "#,
+    )
+    .await?;
+
+    // Step 19: Migration 018 — ai agents tables
+    run_migration(
+        pool,
+        "018_ai_agents",
+        r#"
+        CREATE TABLE IF NOT EXISTS ai_agents (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL UNIQUE,
+            description TEXT,
+            enabled BOOL NOT NULL DEFAULT true,
+            config JSONB,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS ai_agent_executions (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            agent_id UUID NOT NULL REFERENCES ai_agents(id) ON DELETE CASCADE,
+            delivery_id UUID,
+            customer_id UUID,
+            trigger_reason TEXT,
+            actions_taken JSONB,
+            confidence_score DOUBLE PRECISION,
+            ai_provider TEXT,
+            latency_ms INT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_ai_agent_executions_agent
+            ON ai_agent_executions(agent_id);
+        CREATE INDEX IF NOT EXISTS idx_ai_agent_executions_customer
+            ON ai_agent_executions(customer_id);
+
+        CREATE TABLE IF NOT EXISTS ai_agent_configs (
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            agent_id UUID NOT NULL REFERENCES ai_agents(id) ON DELETE CASCADE,
+            enabled BOOL NOT NULL DEFAULT true,
+            config JSONB,
+            PRIMARY KEY (customer_id, agent_id)
+        );
+        "#,
+    )
+    .await?;
+
+    // Step 20: Migration 019 — marketplace tables
+    run_migration(
+        pool,
+        "019_marketplace",
+        r#"
+        CREATE TABLE IF NOT EXISTS marketplace_agents (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            description TEXT NOT NULL DEFAULT '',
+            author TEXT NOT NULL DEFAULT 'unknown',
+            version TEXT NOT NULL DEFAULT '1.0.0',
+            config JSONB NOT NULL DEFAULT '{}',
+            downloads INT NOT NULL DEFAULT 0,
+            rating DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS installed_agents (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            agent_id UUID NOT NULL REFERENCES marketplace_agents(id) ON DELETE CASCADE,
+            enabled BOOL NOT NULL DEFAULT true,
+            config JSONB,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            UNIQUE(customer_id, agent_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_installed_agents_customer
+            ON installed_agents(customer_id);
+        "#,
+    )
+    .await?;
+
+    // Step 21: Migration 020 — fifo_queue table
+    run_migration(
+        pool,
+        "020_fifo_queue",
+        r#"
+        CREATE TABLE IF NOT EXISTS fifo_queue (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            endpoint_id UUID NOT NULL REFERENCES endpoints(id) ON DELETE CASCADE,
+            event_type TEXT NOT NULL,
+            payload JSONB NOT NULL,
+            sequence_num BIGINT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_fifo_queue_endpoint_seq
+            ON fifo_queue(endpoint_id, sequence_num);
+        CREATE INDEX IF NOT EXISTS idx_fifo_queue_status
+            ON fifo_queue(status) WHERE status = 'pending';
+        "#,
+    )
+    .await?;
+
+    // Step 22: Migration 021 — delivery_targets and fanout_rules tables
+    run_migration(
+        pool,
+        "021_delivery_targets",
+        r#"
+        CREATE TABLE IF NOT EXISTS delivery_targets (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            endpoint_id UUID NOT NULL REFERENCES endpoints(id) ON DELETE CASCADE,
+            target_type TEXT NOT NULL DEFAULT 'http',
+            config JSONB NOT NULL DEFAULT '{}',
+            enabled BOOL NOT NULL DEFAULT true,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_delivery_targets_endpoint
+            ON delivery_targets(endpoint_id);
+
+        CREATE TABLE IF NOT EXISTS fanout_rules (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            event_pattern TEXT NOT NULL,
+            conditions JSONB,
+            target_ids UUID[] NOT NULL DEFAULT '{}',
+            dead_letter_endpoint_id UUID,
+            enabled BOOL NOT NULL DEFAULT true,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_fanout_rules_customer
+            ON fanout_rules(customer_id);
+        "#,
+    )
+    .await?;
+
+    // Step 23: Migration 022 — stripe columns on customers
+    run_migration(
+        pool,
+        "022_stripe_columns",
+        r#"
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
+        "#,
     )
     .await?;
 

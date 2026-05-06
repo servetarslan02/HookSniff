@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/store';
 import { useState } from 'react';
 
 export default function SettingsPage() {
-  const { user, apiKey, logout } = useAuth();
+  const { user, token, apiKey, logout } = useAuth();
   const [copied, setCopied] = useState(false);
 
   // Profile form state
@@ -47,7 +47,7 @@ export default function SettingsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${useAuth.getState?.() || ''}`,
+          Authorization: `Bearer ${token || ''}`,
         },
         body: JSON.stringify({ name: profileName, email: profileEmail }),
       });
@@ -84,7 +84,7 @@ export default function SettingsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${useAuth.getState?.() || ''}`,
+          Authorization: `Bearer ${token || ''}`,
         },
         body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
       });

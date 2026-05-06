@@ -290,6 +290,77 @@ program
     });
   });
 
+// ── API Keys Commands ──
+const apiKeys = program.command('api-keys').description('Manage API keys');
+
+apiKeys
+  .command('list')
+  .description('List API keys')
+  .action(async () => {
+    const data = await apiRequest('GET', '/api-keys');
+    if (data.length === 0) {
+      console.log('No API keys found.');
+      return;
+    }
+    console.log(`\n🔑 API Keys (${data.length}):\n`);
+    data.forEach((k, i) => {
+      console.log(`  ${i + 1}. ${k.prefix}...`);
+      console.log(`     ID: ${k.id}`);
+      console.log(`     Status: ${k.is_active ? '✅ Active' : '❌ Inactive'}`);
+      console.log(`     Created: ${k.created_at}`);
+      console.log('');
+    });
+  });
+
+apiKeys
+  .command('create')
+  .description('Create a new API key')
+  .option('--name <name>', 'Key name')
+  .action(async (opts) => {
+    const body = {};
+    if (opts.name) body.name = opts.name;
+    const data = await apiRequest('POST', '/api-keys', body);
+    console.log('✅ API key created:');
+    console.log(`   ID:  ${data.id}`);
+    console.log(`   Key: ${data.key}`);
+    console.log(`   ⚠️  Save this key — it won't be shown again.`);
+  });
+
+apiKeys
+  .command('delete <id>')
+  .description('Delete an API key')
+  .action(async (id) => {
+    await apiRequest('DELETE', `/api-keys/${id}`);
+    console.log('✅ API key deleted');
+  });
+
+apiKeys
+  .command('rotate <id>')
+  .description('Rotate an API key')
+  .action(async (id) => {
+    const data = await apiRequest('POST', `/api-keys/${id}/rotate`);
+    console.log('✅ API key rotated:');
+    console.log(`   ID:  ${data.id}`);
+    console.log(`   Key: ${data.key}`);
+    console.log(`   ⚠️  Save the new key — it won't be shown again.`);
+  });
+
+// ── Stats Command ──
+program
+  .command('stats')
+  .description('Show delivery statistics')
+  .action(async () => {
+    const data = await apiRequest('GET', '/stats');
+    console.log('\n📊 Delivery Statistics:\n');
+    console.log(`  Total deliveries: ${data.total_deliveries}`);
+    console.log(`  ✅ Delivered:     ${data.delivered}`);
+    console.log(`  ❌ Failed:        ${data.failed}`);
+    console.log(`  ⏳ Pending:       ${data.pending}`);
+    console.log(`  Success rate:     ${data.success_rate.toFixed(1)}%`);
+    console.log(`  Endpoints:        ${data.endpoints_count}`);
+    console.log('');
+  });
+
 // ── Parse ──
 program
   .name('hookrelay')

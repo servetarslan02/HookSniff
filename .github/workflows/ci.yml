@@ -42,13 +42,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      cockroachdb:
-        image: cockroachdb/cockroach:latest
-        ports: ['26257:26257']
-        options: --cmd "start-single-node --insecure"
-        # Wait for CockroachDB to accept connections
+      postgres:
+        image: postgres:16-alpine
+        ports: ['5432:5432']
         env:
-          COCKROACH_DATABASE: hookrelay
+          POSTGRES_USER: hookrelay
+          POSTGRES_PASSWORD: hookrelay_test
+          POSTGRES_DB: hookrelay
+        options: >-
+          --health-cmd="pg_isready -U hookrelay -d hookrelay"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -62,7 +67,7 @@ jobs:
       - name: Run tests
         run: cargo test --workspace
         env:
-          DATABASE_URL: postgresql://root@localhost:26257/hookrelay?sslmode=disable
+          DATABASE_URL: postgresql://hookrelay:hookrelay_test@localhost:5432/hookrelay?sslmode=disable
 
   # ──────────────────────────────────────────────
   # Build Rust binaries

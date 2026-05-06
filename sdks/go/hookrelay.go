@@ -20,15 +20,21 @@ package hookrelay
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 )
 
 const (
-	defaultBaseURL = "http://localhost:3000/v1"
+	defaultBaseURL = "https://api.hookrelay.dev/v1"
 	userAgent      = "hookrelay-go/0.1.0"
 )
 
@@ -200,7 +206,152 @@ func (s *WebhooksService) Replay(ctx context.Context, id string) (*Delivery, err
 	return &d, err
 }
 
-// ── Internal HTTP Client ──
+// DeliveryAttempt represents a single delivery attempt.
+type DeliveryAttempt struct {
+	ID            string `json:"id"`
+	AttemptNumber int    `json:"attempt_number"`
+	StatusCode    *int   `json:"status_code,omitempty"`
+	ResponseBody  *string `json:"response_body,omitempty"`
+	DurationMs    *int64  `json:"duration_ms,omitempty"`
+	ErrorMessage  *string `json:"error_message,omitempty"`
+	CreatedAt     string  `json:"created_at"`
+}
+
+// Attempts returns delivery attempts for a webhook.
+func (s *WebhooksService) Attempts(ctx context.Context, deliveryID string) ([]DeliveryAttempt, error) {
+	var attempts []DeliveryAttempt
+	err := s.client.do(ctx, "GET", fmt.Sprintf("/webhooks/%s/attempts", deliveryID), nil, &attempts)
+	return attempts, err
+}
+
+// ExportDeliveries exports deliveries with optional filters.
+func (s *WebhooksService) ExportDeliveries(ctx context.Context, format, status, dateFrom, dateTo string) ([]Delivery, error) {
+	params := "/webhooks/export?"
+	if format != "" {
+		params += "format=" + format + "&"
+	}
+	if status != "" {
+		params += "status=" + status + "&"
+	}
+	if dateFrom != "" {
+		params += "date_from=" + dateFrom + "&"
+	}
+	if dateTo != "" {
+		params += "date_to=" + dateTo + "&"
+	}
+	var deliveries []Delivery
+	err := s.client.do(ctx, "GET", params, nil, &deliveries)
+	return deliveries, err
+}
+
+// ── Webhook Verification ──
+
+// VerificationResult is the result of webhook verification.
+type VerificationResult struct {
+	Valid   bool
+	Payload interface{}
+	Error   string
+}
+
+const defaultToleranceSecs = 300
+
+// VerifySignature verifies a webhook signature using HMAC-SHA256 (legacy format: sha256=<hex>).
+func VerifySignature(payload, signature, secret string) bool {
+	if payload == "" || signature == "" || secret == "" {
+		return false
+	}
+
+	expectedHex := signature
+	if strings.HasPrefix(signature, "sha256=") {
+		expectedHex = signature[7:]
+	}
+
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(payload))
+	computed := hex.EncodeToString(mac.Sum(nil))
+
+	return hmac.Equal([]byte(computed), []byte(expectedHex))
+}
+
+// VerifyWebhook verifies a webhook using Standard Webheaders headers (Svix-compatible).
+func VerifyWebhook(body, msgID, timestamp, signatureHeader, secret string, toleranceSecs int) VerificationResult {
+	if toleranceSecs <= 0 {
+		toleranceSecs = defaultToleranceSecs
+	}
+
+	if msgID == "" {
+		return VerificationResult{Valid: false, Error: "Missing webhook-id header"}
+	}
+	if timestamp == "" {
+		return VerificationResult{Valid: false, Error: "Missing webhook-timestamp header"}
+	}
+	if signatureHeader == "" {
+		return VerificationResult{Valid: false, Error: "Missing webhook-signature header"}
+	}
+	if body == "" {
+		return VerificationResult{Valid: false, Error: "Missing request body"}
+	}
+
+	ts, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		return VerificationResult{Valid: false, Error: "Invalid webhook timestamp"}
+	}
+
+	now := time.Now().Unix()
+	age := now - ts
+	if age < 0 {
+		age = -age
+	}
+	if age > int64(toleranceSecs) {
+		return VerificationResult{Valid: false, Error: fmt.Sprintf("Webhook timestamp expired: %ds old (tolerance: %ds)", age, toleranceSecs)}
+	}
+
+	// Compute expected signature
+	signedContent := msgID + "." + timestamp + "." + body
+	secretBytes := decodeSecret(secret)
+
+	mac := hmac.New(sha256.New, secretBytes)
+	mac.Write([]byte(signedContent))
+	expectedSig := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	expectedFull := "v1," + expectedSig
+
+	// Check each signature in the header (space-separated)
+	signatures := strings.Split(signatureHeader, " ")
+	verified := false
+	for _, sig := range signatures {
+		sig = strings.TrimSpace(sig)
+		if !strings.HasPrefix(sig, "v1,") {
+			continue
+		}
+		if hmac.Equal([]byte(sig), []byte(expectedFull)) {
+			verified = true
+			break
+		}
+	}
+
+	if !verified {
+		return VerificationResult{Valid: false, Error: "Invalid webhook signature"}
+	}
+
+	// Parse payload
+	var parsed interface{}
+	if err := json.Unmarshal([]byte(body), &parsed); err != nil {
+		return VerificationResult{Valid: true, Payload: body}
+	}
+	return VerificationResult{Valid: true, Payload: parsed}
+}
+
+func decodeSecret(secret string) []byte {
+	stripped := secret
+	if strings.HasPrefix(secret, "whsec_") {
+		stripped = secret[6:]
+	}
+	decoded, err := base64.StdEncoding.DecodeString(stripped)
+	if err != nil {
+		return []byte(secret)
+	}
+	return decoded
+}
 
 func (c *Client) do(ctx context.Context, method, path string, body interface{}, result interface{}) error {
 	url := c.BaseURL + path

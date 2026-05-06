@@ -1,14 +1,14 @@
--- AI Center Database Schema
+-- AI Center Database Schema (PostgreSQL)
 
 -- AI event log
 CREATE TABLE IF NOT EXISTS ai_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    event_type STRING NOT NULL,      -- 'risk', 'defense', 'fix', 'optimization', 'system'
-    severity STRING NOT NULL,         -- 'info', 'warning', 'critical'
-    title STRING NOT NULL,
-    description STRING,
-    action_taken STRING,              -- What the AI did
-    target_type STRING,               -- 'endpoint', 'customer', 'delivery', 'system'
+    event_type TEXT NOT NULL,      -- 'risk', 'defense', 'fix', 'optimization', 'system'
+    severity TEXT NOT NULL,         -- 'info', 'warning', 'critical'
+    title TEXT NOT NULL,
+    description TEXT,
+    action_taken TEXT,              -- What the AI did
+    target_type TEXT,               -- 'endpoint', 'customer', 'delivery', 'system'
     target_id UUID,
     metadata JSONB,
     resolved BOOL DEFAULT false,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS ai_events (
 -- Risk score history
 CREATE TABLE IF NOT EXISTS risk_scores (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    target_type STRING NOT NULL,      -- 'endpoint' or 'customer'
+    target_type TEXT NOT NULL,      -- 'endpoint' or 'customer'
     target_id UUID NOT NULL,
     score INT NOT NULL,               -- 0-100
     factors JSONB,                    -- Which factors contributed
@@ -28,16 +28,16 @@ CREATE TABLE IF NOT EXISTS risk_scores (
 -- AI action log
 CREATE TABLE IF NOT EXISTS ai_actions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    action_type STRING NOT NULL,      -- 'fix', 'defense', 'optimization', 'monitoring'
-    description STRING NOT NULL,
-    target_type STRING,
+    action_type TEXT NOT NULL,      -- 'fix', 'defense', 'optimization', 'monitoring'
+    description TEXT NOT NULL,
+    target_type TEXT,
     target_id UUID,
-    status STRING NOT NULL DEFAULT 'pending',  -- 'pending', 'approved', 'executed', 'rejected', 'rolled_back'
-    risk_level STRING NOT NULL,       -- 'low', 'medium', 'high', 'critical'
+    status TEXT NOT NULL DEFAULT 'pending',  -- 'pending', 'approved', 'executed', 'rejected', 'rolled_back'
+    risk_level TEXT NOT NULL,       -- 'low', 'medium', 'high', 'critical'
     auto_approved BOOL DEFAULT false,
     executed_at TIMESTAMPTZ,
     rolled_back_at TIMESTAMPTZ,
-    created_by STRING DEFAULT 'ai',
+    created_by TEXT DEFAULT 'ai',
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -45,16 +45,16 @@ CREATE TABLE IF NOT EXISTS ai_actions (
 -- Blocklist (IP, customer, endpoint)
 CREATE TABLE IF NOT EXISTS ai_blocklist (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    block_type STRING NOT NULL,       -- 'ip', 'customer', 'endpoint'
-    block_value STRING NOT NULL,
-    reason STRING,
+    block_type TEXT NOT NULL,       -- 'ip', 'customer', 'endpoint'
+    block_value TEXT NOT NULL,
+    reason TEXT,
     expires_at TIMESTAMPTZ,           -- NULL = permanent
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- AI configuration
 CREATE TABLE IF NOT EXISTS ai_config (
-    key STRING PRIMARY KEY,
+    key TEXT PRIMARY KEY,
     value JSONB NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

@@ -4,8 +4,8 @@
 -- Registered AI agents
 CREATE TABLE IF NOT EXISTS ai_agents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name STRING NOT NULL UNIQUE,
-    description STRING,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT,
     enabled BOOL DEFAULT true,
     config JSONB,
     created_at TIMESTAMPTZ DEFAULT now()
@@ -17,10 +17,10 @@ CREATE TABLE IF NOT EXISTS ai_agent_executions (
     agent_id UUID REFERENCES ai_agents(id),
     delivery_id UUID,
     customer_id UUID,
-    trigger_reason STRING,
+    trigger_reason TEXT,
     actions_taken JSONB,
     confidence_score FLOAT,
-    ai_provider STRING,
+    ai_provider TEXT,
     latency_ms INT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
