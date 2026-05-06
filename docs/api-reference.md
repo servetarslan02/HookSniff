@@ -19,7 +19,6 @@ Authorization: Bearer hr_live_YOUR_API_KEY
 - [Billing](#billing)
 - [Stats](#stats)
 - [Endpoint Health](#endpoint-health)
-- [AI Center](#ai-center)
 - [Webhook Delivery Format](#webhook-delivery-format)
 - [Error Handling](#error-handling)
 - [Rate Limits](#rate-limits)

@@ -1,4 +1,3 @@
-pub mod agents;
 pub mod alerts;
 pub mod analytics;
 pub mod api_keys;
@@ -10,7 +9,6 @@ pub mod docs;
 pub mod endpoints;
 pub mod health;
 pub mod health_endpoints;
-pub mod marketplace;
 pub mod playground;
 pub mod routing;
 pub mod schemas;
@@ -33,11 +31,9 @@ pub fn api_router() -> Router {
         .nest("/playground", playground::router())
         .nest("/endpoint-health", health_endpoints::router())
         .nest("/stats", stats::router())
-        .nest("/agents", agents::router())
         .nest("/routing", routing::router())
         .nest("/analytics", analytics::router())
         .nest("/templates", templates::router())
-        .nest("/marketplace/agents", marketplace::router())
         .nest("/schemas", schemas::router())
         .nest("/billing", billing::router())
         .nest("/portal", customer_portal::router())

@@ -19,7 +19,6 @@ const navigation = [
   { name: 'API Keys', href: '/dashboard/api-keys', icon: '🔑' },
   { name: 'Playground', href: '/dashboard/playground', icon: '🧪' },
   { name: 'Analytics', href: '/dashboard/analytics', icon: '📈' },
-  { name: 'AI Center', href: '/dashboard/ai-center', icon: '🧠' },
   { name: 'Billing', href: '/dashboard/billing', icon: '💳' },
   { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
 ];
