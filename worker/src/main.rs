@@ -15,6 +15,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
+use tracing_subscriber::prelude::*;
 use tracing_subscriber::EnvFilter;
 
 mod config;
@@ -38,9 +39,27 @@ pub struct WebhookQueueItem {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env().add_directive("info".parse()?))
-        .init();
+    // Structured logging: auto JSON in production, text in development
+    let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
+    let use_json = env == "production" || env == "prod"
+        || std::env::var("LOG_FORMAT").map(|v| v == "json").unwrap_or(false);
+
+    let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| EnvFilter::new("info"));
+
+    if use_json {
+        let _ = tracing_subscriber::registry()
+            .with(env_filter)
+            .with(tracing_subscriber::fmt::layer().json())
+            .init();
+        tracing::info!("Logging format: JSON (env={})", env);
+    } else {
+        let _ = tracing_subscriber::registry()
+            .with(env_filter)
+            .with(tracing_subscriber::fmt::layer())
+            .init();
+        tracing::info!("Logging format: text (env={})", env);
+    }
 
     let cfg = config::WorkerConfig::from_env()?;
 
@@ -151,6 +170,15 @@ async fn process_pending(
     for item in items {
         let delivery_id = item.delivery_id;
         let attempt = item.attempt_count + 1;
+
+        // Each delivery is processed inside a structured span
+        let span = tracing::info_span!(
+            "delivery",
+            delivery_id = %delivery_id,
+            endpoint_id = %item.endpoint_id,
+            attempt = attempt
+        );
+        let _guard = span.enter();
 
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
 

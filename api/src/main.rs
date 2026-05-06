@@ -32,19 +32,21 @@ pub mod ws;
 fn init_tracing(cfg: &config::Config) {
     use tracing_subscriber::prelude::*;
 
-    let use_json = std::env::var("LOG_FORMAT")
-        .map(|v| v == "json")
-        .unwrap_or(false);
+    let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
+    let use_json = env == "production" || env == "prod"
+        || std::env::var("LOG_FORMAT").map(|v| v == "json").unwrap_or(false);
 
     let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
 
     if use_json {
+        tracing::info!("Logging format: JSON (env={})", env);
         let _ = tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer().json())
             .init();
     } else {
+        tracing::info!("Logging format: text (env={})", env);
         let _ = tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer())
