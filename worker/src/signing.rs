@@ -141,9 +141,34 @@ pub fn compute_hmac(secret: &str, payload: &str) -> String {
 }
 
 /// Verify legacy HMAC-SHA256 signature (hex-encoded).
+///
+/// Uses constant-time comparison to prevent timing attacks.
+/// The hex-encoded signature is decoded to bytes and compared
+/// via `CtOutput` from the `hmac` crate.
 pub fn verify_hmac(secret: &str, payload: &str, expected_signature: &str) -> bool {
-    let computed = compute_hmac(secret, payload);
-    computed == expected_signature
+    // Decode expected signature from hex to raw bytes
+    let expected_bytes = match hex::decode(expected_signature) {
+        Ok(b) => b,
+        Err(_) => return false,
+    };
+
+    // Compute HMAC as raw bytes (constant-time compare requires byte-level access)
+    let mut mac =
+        HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take key of any size");
+    mac.update(payload.as_bytes());
+    let computed_bytes = mac.finalize().into_bytes();
+
+    // Length check is not timing-sensitive (length is not secret)
+    if expected_bytes.len() != computed_bytes.len() {
+        return false;
+    }
+
+    // Constant-time comparison via CtOutput
+    hmac::digest::CtOutput::<HmacSha256>::new(
+        hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
+    ) == hmac::digest::CtOutput::<HmacSha256>::new(
+        hmac::digest::Output::<HmacSha256>::clone_from_slice(&computed_bytes),
+    )
 }
 
 /// Verify signature against both current and old signing secrets.

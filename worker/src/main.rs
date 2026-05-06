@@ -111,14 +111,28 @@ async fn process_pending(
 
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
 
-        // Generate HMAC signature
-        let signature = signing::compute_hmac(&item.signing_secret, &item.payload);
+        // Generate Standard Webhooks signature
+        let timestamp = chrono::Utc::now().timestamp().to_string();
+        let standard_sig = signing::compute_standard_signature(
+            &item.signing_secret,
+            &delivery_id.to_string(),
+            &timestamp,
+            &item.payload,
+        );
 
-        // Build request
+        // Legacy hex signature for backward compat
+        let legacy_sig = signing::compute_hmac(&item.signing_secret, &item.payload);
+
+        // Build request with Standard Webhooks + legacy headers
         let mut req_builder = http_client
             .post(&item.endpoint_url)
             .header("Content-Type", "application/json")
-            .header("X-Hookrelay-Signature", format!("sha256={}", signature))
+            // Standard Webhooks headers
+            .header("webhook-id", delivery_id.to_string())
+            .header("webhook-timestamp", &timestamp)
+            .header("webhook-signature", &standard_sig)
+            // Legacy headers (backward compat)
+            .header("X-Hookrelay-Signature", format!("sha256={}", legacy_sig))
             .header("X-Hookrelay-Delivery-Id", delivery_id.to_string())
             .header("X-Hookrelay-Attempt", attempt.to_string())
             .body(item.payload.clone());
