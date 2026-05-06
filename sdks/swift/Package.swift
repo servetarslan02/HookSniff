@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "HookRelay",
+    name: "HookSniff",
     platforms: [
         .macOS(.v12),
         .iOS(.v15),
@@ -10,16 +10,16 @@ let package = Package(
         .watchOS(.v8)
     ],
     products: [
-        .library(name: "HookRelay", targets: ["HookRelay"])
+        .library(name: "HookSniff", targets: ["HookSniff"])
     ],
     targets: [
         .target(
-            name: "HookRelay",
+            name: "HookSniff",
             dependencies: []
         ),
         .testTarget(
-            name: "HookRelayTests",
-            dependencies: ["HookRelay"]
+            name: "HookSniffTests",
+            dependencies: ["HookSniff"]
         )
     ]
 )

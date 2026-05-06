@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.hookrelay"
+group = "com.hooksniff"
 version = "0.2.0"
 
 repositories {
@@ -33,8 +33,8 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            groupId = "com.hookrelay"
-            artifactId = "hookrelay"
+            groupId = "com.hooksniff"
+            artifactId = "hooksniff"
             version = "0.2.0"
         }
     }

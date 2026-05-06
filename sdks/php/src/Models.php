@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HookRelay\Models;
+namespace HookSniff\Models;
 
 class Endpoint
 {

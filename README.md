@@ -142,7 +142,7 @@ HookSniff/
 | Java | `com.hooksniff` | ✅ Ready |
 | Kotlin | `com.hooksniff` | ✅ Ready |
 | PHP | `hooksniff/hooksniff` | ✅ Ready |
-| C# | `HookRelay` | ✅ Ready |
+| C# | `HookSniff` | ✅ Ready |
 | Elixir | `hooksniff` | ✅ Ready |
 | Swift | `HookSniff` | ✅ Ready |
 
