@@ -61,20 +61,63 @@ async fn main() -> Result<()> {
 
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s");
 
-    // Main loop: poll PostgreSQL queue
+    // Graceful shutdown: listen for SIGTERM/SIGINT
+    let shutdown = shutdown_signal();
+
+    tokio::pin!(shutdown);
+
+    // Main loop: poll PostgreSQL queue with graceful shutdown support
     loop {
-        match process_pending(&pool, &http_client, &cfg).await {
-            Ok(processed) => {
-                if processed > 0 {
-                    tracing::debug!("✅ Processed {} deliveries", processed);
+        tokio::select! {
+            _ = &mut shutdown => {
+                tracing::info!("🛑 Shutdown signal received, waiting for in-flight deliveries...");
+                break;
+            }
+            _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
+                match process_pending(&pool, &http_client, &cfg).await {
+                    Ok(processed) => {
+                        if processed > 0 {
+                            tracing::debug!("✅ Processed {} deliveries", processed);
+                        }
+                    }
+                    Err(e) => {
+                        tracing::error!("❌ Queue processing error: {:?}", e);
+                    }
                 }
             }
-            Err(e) => {
-                tracing::error!("❌ Queue processing error: {:?}", e);
-            }
         }
+    }
 
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    tracing::info!("👋 HookRelay Worker shut down gracefully");
+    Ok(())
+}
+
+/// Wait for SIGTERM or SIGINT signal for graceful shutdown
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {
+            tracing::info!("Received SIGINT (Ctrl+C), starting graceful shutdown...");
+        }
+        _ = terminate => {
+            tracing::info!("Received SIGTERM, starting graceful shutdown...");
+        }
     }
 }
 
