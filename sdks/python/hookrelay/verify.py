@@ -153,7 +153,9 @@ def verify_webhook(
     Standalone verification function (Svix-compatible).
 
     Convenience wrapper that extracts Standard Webhooks headers
-    from a headers dict and verifies the request.
+    from a headers dict and verifies the request. Supports both
+    Standard Webhooks headers (webhook-id, webhook-signature, webhook-timestamp)
+    and Svix headers (svix-id, svix-signature, svix-timestamp) as fallback.
 
     Args:
         secret: The endpoint's signing secret.
@@ -183,6 +185,16 @@ def verify_webhook(
                 return value
         return None
 
+    # Try Standard Webhooks headers first, then Svix headers
+    msg_id = get_header("webhook-id")
+    timestamp = get_header("webhook-timestamp")
+    signature_header = get_header("webhook-signature")
+
+    if not msg_id or not timestamp or not signature_header:
+        msg_id = msg_id or get_header("svix-id")
+        timestamp = timestamp or get_header("svix-timestamp")
+        signature_header = signature_header or get_header("svix-signature")
+
     kwargs = {}
     if tolerance_secs is not None:
         kwargs["tolerance_secs"] = tolerance_secs
@@ -191,7 +203,7 @@ def verify_webhook(
 
     return verifier.verify(
         body=body,
-        msg_id=get_header("webhook-id"),
-        timestamp=get_header("webhook-timestamp"),
-        signature_header=get_header("webhook-signature"),
+        msg_id=msg_id,
+        timestamp=timestamp,
+        signature_header=signature_header,
     )

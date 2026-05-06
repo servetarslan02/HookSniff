@@ -26,10 +26,32 @@ namespace HookRelay
     ///
     /// Supports both simple HMAC-SHA256 verification and Standard Webheaders
     /// (Svix-compatible) verification with timestamp tolerance.
+    /// Also supports Svix headers (svix-id, svix-signature, svix-timestamp) as fallback.
     /// </summary>
     public static class WebhookVerification
     {
         private const int DefaultToleranceSecs = 300;
+
+        /// <summary>
+        /// Verify a webhook from HTTP headers with automatic header detection.
+        /// Supports both Standard Webhooks and Svix headers.
+        /// </summary>
+        public static VerificationResult VerifyWebhookFromHeaders(
+            string payload, System.Net.WebHeaderCollection headers, string secret, int toleranceSecs = DefaultToleranceSecs)
+        {
+            var msgId = headers["webhook-id"];
+            var timestamp = headers["webhook-timestamp"];
+            var signatureHeader = headers["webhook-signature"];
+
+            if (string.IsNullOrEmpty(msgId) || string.IsNullOrEmpty(timestamp) || string.IsNullOrEmpty(signatureHeader))
+            {
+                msgId = msgId ?? headers["svix-id"];
+                timestamp = timestamp ?? headers["svix-timestamp"];
+                signatureHeader = signatureHeader ?? headers["svix-signature"];
+            }
+
+            return VerifyWebhook(payload, msgId, timestamp, signatureHeader, secret, toleranceSecs);
+        }
 
         /// <summary>
         /// Verify a webhook signature using HMAC-SHA256.
