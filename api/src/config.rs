@@ -21,43 +21,77 @@ pub struct Config {
     pub app_url: Option<String>,
 }
 
+/// Patterns that look like placeholder / throwaway secrets (case-insensitive).
+const PLACEHOLDER_PATTERNS: &[&str] = &[
+    "change", "secret", "test-", "test_", "example", "default",
+    "placeholder", "dummy", "your-", "todo", "fixme", "xxx",
+];
+
+/// Validate that a secret is production-ready.
+///
+/// - Must be at least 32 characters.
+/// - Must not contain common placeholder patterns.
+fn validate_secret(value: &str, name: &str) -> Result<()> {
+    if value.len() < 32 {
+        anyhow::bail!(
+            "🚫 {name} must be at least 32 characters (got {}). \
+             Generate one with: openssl rand -hex 32",
+            value.len()
+        );
+    }
+
+    let lower = value.to_lowercase();
+    for pattern in PLACEHOLDER_PATTERNS {
+        if lower.contains(&pattern.to_lowercase()) {
+            anyhow::bail!(
+                "🚫 {name} contains a placeholder pattern ('{pattern}'). \
+                 Set a unique secret before deploying to production. \
+                 Generate one with: openssl rand -hex 32"
+            );
+        }
+    }
+
+    Ok(())
+}
+
 impl Config {
+    /// Returns true when APP_ENV indicates a production environment.
+    pub fn is_production(&self) -> bool {
+        matches!(
+            std::env::var("APP_ENV").as_deref(),
+            Ok("production" | "prod")
+        )
+    }
+
     pub fn from_env() -> Result<Self> {
         dotenvy::dotenv().ok();
 
         let rust_log = std::env::var("RUST_LOG")
             .unwrap_or_else(|_| "info".into());
 
-        let hmac_secret = std::env::var("HMAC_SECRET")
-            .unwrap_or_else(|_| "change-me-in-production".into());
-        let jwt_secret = std::env::var("JWT_SECRET")
-            .unwrap_or_else(|_| "change-me-jwt-secret-in-production".into());
+        let hmac_secret = std::env::var("HMAC_SECRET").unwrap_or_else(|| {
+            let random = format!("dev-{}", uuid::Uuid::new_v4());
+            tracing::warn!(
+                "⚠️ HMAC_SECRET not set, using random secret (will change on restart!)"
+            );
+            random
+        });
+
+        let jwt_secret = std::env::var("JWT_SECRET").unwrap_or_else(|| {
+            let random = format!("dev-{}", uuid::Uuid::new_v4());
+            tracing::warn!(
+                "⚠️ JWT_SECRET not set, using random secret (will change on restart!)"
+            );
+            random
+        });
 
         let env = std::env::var("APP_ENV")
             .unwrap_or_else(|_| "development".into());
 
         // In production, reject default/placeholder secrets
         if env == "production" || env == "prod" {
-            if hmac_secret == "change-me-in-production"
-                || hmac_secret == "CHANGE_ME_TO_RANDOM_64_CHAR_STRING"
-                || hmac_secret.starts_with("CHANGE_ME")
-            {
-                anyhow::bail!(
-                    "🚫 HMAC_SECRET is using a default/placeholder value! \
-                     Set a unique secret before deploying to production. \
-                     Generate one with: openssl rand -hex 32"
-                );
-            }
-            if jwt_secret == "change-me-jwt-secret-in-production"
-                || jwt_secret == "CHANGE_ME_TO_RANDOM_64_CHAR_STRING"
-                || jwt_secret.starts_with("CHANGE_ME")
-            {
-                anyhow::bail!(
-                    "🚫 JWT_SECRET is using a default/placeholder value! \
-                     Set a unique secret before deploying to production. \
-                     Generate one with: openssl rand -hex 32"
-                );
-            }
+            validate_secret(&hmac_secret, "HMAC_SECRET")?;
+            validate_secret(&jwt_secret, "JWT_SECRET")?;
         }
 
         Ok(Self {
