@@ -2,13 +2,13 @@
 FROM rust:latest AS builder
 
 WORKDIR /app
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml ./
 COPY api/ api/
 COPY worker/ worker/
 
 # Build release binary
-RUN cargo build --release -p hookrelay-api && \
-    strip /app/target/release/hookrelay-api
+RUN cargo build --release -p hooksniff-api && \
+    strip /app/target/release/hooksniff-api
 
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
@@ -19,13 +19,13 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN groupadd -r hookrelay && useradd -r -g hookrelay -d /app -s /sbin/nologin hookrelay
+RUN groupadd -r hooksniff && useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff
 
-COPY --from=builder /app/target/release/hookrelay-api /usr/local/bin/hookrelay-api
+COPY --from=builder /app/target/release/hooksniff-api /usr/local/bin/hooksniff-api
 
-RUN chown -R hookrelay:hookrelay /app
+RUN chown -R hooksniff:hooksniff /app
 
-USER hookrelay
+USER hooksniff
 WORKDIR /app
 
 EXPOSE 3000
@@ -33,4 +33,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 
-CMD ["hookrelay-api"]
+CMD ["hooksniff-api"]
