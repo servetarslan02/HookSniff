@@ -1,0 +1,7 @@
+{
+  "name": "hookrelay",
+  "private": true,
+  "dependencies": {
+    "next": "^15.5.15"
+  }
+}
