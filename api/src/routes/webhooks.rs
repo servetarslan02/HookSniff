@@ -267,31 +267,49 @@ async fn batch_webhooks(
         return Err(AppError::RateLimitExceeded);
     }
 
+    // Collect unique endpoint IDs and fetch all in one query (eliminates N+1)
+    let endpoint_ids: Vec<Uuid> = req
+        .webhooks
+        .iter()
+        .map(|w| w.endpoint_id)
+        .collect::<std::collections::HashSet<_>>()
+        .into_iter()
+        .collect();
+
+    let endpoints: Vec<Endpoint> = sqlx::query_as::<_, Endpoint>(
+        "SELECT * FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
+    )
+    .bind(&endpoint_ids)
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?;
+
+    let endpoint_map: std::collections::HashMap<Uuid, Endpoint> =
+        endpoints.into_iter().map(|e| (e.id, e)).collect();
+
     let mut deliveries = Vec::new();
     let mut errors = Vec::new();
+    let mut queue_messages: Vec<(Delivery, Endpoint, String)> = Vec::new();
 
     for (i, webhook_req) in req.webhooks.iter().enumerate() {
-        let payload_size = serde_json::to_string(&webhook_req.data).map(|s| s.len()).unwrap_or(0);
+        let payload_size = serde_json::to_string(&webhook_req.data)
+            .map(|s| s.len())
+            .unwrap_or(0);
         if payload_size > cfg.max_webhook_payload_bytes {
-            errors.push(BatchError { index: i, error: "Payload too large".to_string() });
+            errors.push(BatchError {
+                index: i,
+                error: "Payload too large".to_string(),
+            });
             continue;
         }
 
-        let endpoint = match sqlx::query_as::<_, Endpoint>(
-            "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
-        )
-        .bind(webhook_req.endpoint_id)
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await
-        {
-            Ok(Some(ep)) => ep,
-            Ok(None) => {
-                errors.push(BatchError { index: i, error: "Endpoint not found or inactive".to_string() });
-                continue;
-            }
-            Err(e) => {
-                errors.push(BatchError { index: i, error: format!("Database error: {}", e) });
+        let endpoint = match endpoint_map.get(&webhook_req.endpoint_id) {
+            Some(ep) => ep.clone(),
+            None => {
+                errors.push(BatchError {
+                    index: i,
+                    error: "Endpoint not found or inactive".to_string(),
+                });
                 continue;
             }
         };
@@ -312,7 +330,10 @@ async fn batch_webhooks(
         let payload_str = match serde_json::to_string(&payload) {
             Ok(s) => s,
             Err(e) => {
-                errors.push(BatchError { index: i, error: format!("Serialization error: {}", e) });
+                errors.push(BatchError {
+                    index: i,
+                    error: format!("Serialization error: {}", e),
+                });
                 continue;
             }
         };
@@ -331,48 +352,48 @@ async fn batch_webhooks(
         .await
         {
             Ok(delivery) => {
-                let webhook_message = serde_json::json!({
-                    "delivery_id": delivery.id,
-                    "endpoint_id": endpoint.id,
-                    "endpoint_url": endpoint.url,
-                    "signing_secret": endpoint.signing_secret,
-                    "old_signing_secret": endpoint.old_signing_secret,
-                    "secret_rotated_at": endpoint.secret_rotated_at.map(|t| t.to_rfc3339()),
-                    "custom_headers": endpoint.custom_headers,
-                    "payload": payload_str,
-                });
-
-                if let Err(e) = kafka::publish_to_queue(
-                    &pool,
-                    delivery.id,
-                    endpoint.id,
-                    &endpoint.url,
-                    &endpoint.signing_secret,
-                    &payload_str,
-                    endpoint.custom_headers.as_ref(),
-                )
-                .await
-                {
-                    tracing::error!("Failed to publish to queue for batch item {}: {:?}", i, e);
-                    errors.push(BatchError { index: i, error: "Failed to publish message".to_string() });
-                    continue;
-                }
-
+                queue_messages.push((delivery.clone(), endpoint, payload_str));
                 deliveries.push(delivery.to_response());
             }
             Err(e) => {
-                errors.push(BatchError { index: i, error: format!("Failed to create delivery: {}", e) });
+                errors.push(BatchError {
+                    index: i,
+                    error: format!("Failed to create delivery: {}", e),
+                });
             }
+        }
+    }
+
+    // Batch publish all queued messages
+    for (delivery, endpoint, payload_str) in &queue_messages {
+        if let Err(e) = kafka::publish_to_queue(
+            &pool,
+            delivery.id,
+            endpoint.id,
+            &endpoint.url,
+            &endpoint.signing_secret,
+            payload_str,
+            endpoint.custom_headers.as_ref(),
+        )
+        .await
+        {
+            tracing::error!(
+                "Failed to publish to queue for delivery {}: {:?}",
+                delivery.id,
+                e
+            );
         }
     }
 
     let success_count = deliveries.len() as i32;
     if success_count > 0 {
-        let _ = sqlx::query("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2")
-            .bind(success_count)
-            .bind(customer.id)
-            .execute(&pool)
-            .await;
+        let _ = sqlx::query(
+            "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2",
+        )
+        .bind(success_count)
+        .bind(customer.id)
+        .execute(&pool)
+        .await;
     }
 
     Ok(Json(BatchResponse { deliveries, errors }))
@@ -452,6 +473,39 @@ async fn replay_webhook(
     Ok(Json(new_delivery.to_response()))
 }
 
+/// Escape a value for safe CSV output.
+///
+/// - Wraps in double quotes if the value contains commas, quotes, or newlines.
+/// - Escapes internal double quotes by doubling them.
+/// - Prefixes with a single quote if the first character is a formula-injection
+///   vector (`=`, `+`, `-`, `@`, `\t`, `\r`).
+fn escape_csv_cell(value: &str) -> String {
+    let needs_prefix = matches!(
+        value.as_bytes().first(),
+        Some(b'=') | Some(b'+') | Some(b'-') | Some(b'@') | Some(b'\t') | Some(b'\r')
+    );
+    let needs_quote = value.contains(|c: char| c == ',' || c == '"' || c == '\n');
+
+    let mut out = String::new();
+    if needs_prefix {
+        out.push('\'');
+    }
+    if needs_quote {
+        out.push('"');
+        for ch in value.chars() {
+            if ch == '"' {
+                out.push_str("\"\"");
+            } else {
+                out.push(ch);
+            }
+        }
+        out.push('"');
+    } else {
+        out.push_str(value);
+    }
+    out
+}
+
 fn parse_date_from_str(s: &str) -> Option<DateTime<Utc>> {
     if let Ok(dt) = NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S") {
         Some(DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc))
@@ -525,13 +579,13 @@ async fn export_deliveries(
             for d in &filtered {
                 csv.push_str(&format!(
                     "{},{},{},{},{},{},{}\n",
-                    d.id,
-                    d.event.as_deref().unwrap_or(""),
-                    d.endpoint_url,
-                    d.status,
-                    d.attempt_count,
-                    d.response_status.map(|s| s.to_string()).unwrap_or_default(),
-                    d.created_at.to_rfc3339()
+                    escape_csv_cell(&d.id.to_string()),
+                    escape_csv_cell(d.event.as_deref().unwrap_or("")),
+                    escape_csv_cell(&d.endpoint_url),
+                    escape_csv_cell(&d.status),
+                    escape_csv_cell(&d.attempt_count.to_string()),
+                    escape_csv_cell(&d.response_status.map(|s| s.to_string()).unwrap_or_default()),
+                    escape_csv_cell(&d.created_at.to_rfc3339())
                 ));
             }
 
