@@ -227,7 +227,8 @@ async fn process_pending(
             LIMIT 50
             FOR UPDATE SKIP LOCKED
         )
-        RETURNING *
+        RETURNING id, delivery_id, endpoint_id, endpoint_url, payload, custom_headers,
+                  attempt_count, max_attempts, next_retry_at, trace_id
         "#,
     )
     .fetch_all(pool)
@@ -255,6 +256,24 @@ async fn process_pending(
 
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
 
+        // Fetch signing_secret from endpoints table (not stored in queue)
+        let signing_secret: (String,) = sqlx::query_as(
+            "SELECT signing_secret FROM endpoints WHERE id = $1"
+        )
+        .bind(item.endpoint_id)
+        .fetch_one(pool)
+        .await?;
+
+        // Build WebhookMessage and delegate HTTP delivery to the delivery module
+        let webhook_msg = WebhookMessage {
+            delivery_id: delivery_id.to_string(),
+            endpoint_id: item.endpoint_id.to_string(),
+            endpoint_url: item.endpoint_url.clone(),
+            signing_secret: signing_secret.0,
+            payload: item.payload.clone(),
+            custom_headers: item.custom_headers.clone(),
+        };
+
         let result = delivery::deliver_http(&http_client, &webhook_msg, attempt).await?;
 
         let status_code = result.status_code;
@@ -277,6 +296,8 @@ async fn process_pending(
             // ✅ Başarılı
             tracing::info!("✅ Delivery {} → HTTP {} ({}ms)", delivery_id, status_code, duration_ms);
 
+            let mut tx = pool.begin().await?;
+
             sqlx::query::<sqlx::Postgres>(
                 r#"
                 UPDATE webhook_queue
@@ -286,7 +307,7 @@ async fn process_pending(
             )
             .bind(attempt)
             .bind(item.id)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
             // Update deliveries table
@@ -302,15 +323,19 @@ async fn process_pending(
             .bind(status_code)
             .bind(response_body)
             .bind(delivery_id)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
             // Record attempt
-            record_attempt(pool, delivery_id, attempt, attempt_status, attempt_body, duration_ms, None, trace_id.as_deref(), attempt_headers).await?;
+            record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, None, trace_id.as_deref(), attempt_headers).await?;
+
+            tx.commit().await?;
 
         } else if attempt >= item.max_attempts {
             // ❌ Max deneme aşıldı → dead letter
             tracing::error!("❌ Delivery {} → {} — max attempts, moving to dead letter", delivery_id, error_msg);
+
+            let mut tx = pool.begin().await?;
 
             sqlx::query::<sqlx::Postgres>(
                 r#"
@@ -321,7 +346,7 @@ async fn process_pending(
             )
             .bind(attempt)
             .bind(item.id)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
             // Move to dead_letters
@@ -335,17 +360,19 @@ async fn process_pending(
             .bind(delivery_id)
             .bind(&error_msg)
             .bind(attempt)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
             // Update delivery status
             sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1")
                 .bind(delivery_id)
                 .bind(&error_msg)
-                .execute(pool)
+                .execute(&mut *tx)
                 .await?;
 
-            record_attempt(pool, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&error_msg), trace_id.as_deref(), attempt_headers).await?;
+            record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&error_msg), trace_id.as_deref(), attempt_headers).await?;
+
+            tx.commit().await?;
 
         } else {
             // 🔄 Retry — exponential backoff
@@ -353,6 +380,8 @@ async fn process_pending(
             let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
 
             tracing::warn!("⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})", delivery_id, error_msg, delay, attempt, item.max_attempts);
+
+            let mut tx = pool.begin().await?;
 
             sqlx::query::<sqlx::Postgres>(
                 r#"
@@ -364,10 +393,12 @@ async fn process_pending(
             .bind(attempt)
             .bind(next_retry)
             .bind(item.id)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
-            record_attempt(pool, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&format!("{} — retry scheduled", error_msg)), trace_id.as_deref(), attempt_headers).await?;
+            record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&format!("{} — retry scheduled", error_msg)), trace_id.as_deref(), attempt_headers).await?;
+
+            tx.commit().await?;
         }
     }
 
@@ -377,12 +408,14 @@ async fn process_pending(
 /// Recover webhook_queue records stuck in "processing" for more than 5 minutes.
 ///
 /// When the worker crashes mid-delivery, records stay in "processing" forever.
-/// This reaper resets them to "pending" so another worker can pick them up.
+/// This reaper checks max_attempts:
+///   - If attempt_count >= max_attempts → dead letter (don't retry forever)
+///   - If attempt_count < max_attempts → reset to pending for retry
 async fn reap_zombies(pool: &PgPool) -> Result<usize> {
-    // Find stuck records first so we can log each one
-    let stuck: Vec<(uuid::Uuid, uuid::Uuid, i32)> = sqlx::query_as(
+    // Find stuck records with their max_attempts
+    let stuck: Vec<(uuid::Uuid, uuid::Uuid, uuid::Uuid, i32, i32)> = sqlx::query_as(
         r#"
-        SELECT id, delivery_id, attempt_count
+        SELECT id, delivery_id, endpoint_id, attempt_count, max_attempts
         FROM webhook_queue
         WHERE status = 'processing'
           AND updated_at < now() - interval '5 minutes'
@@ -395,24 +428,66 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
         return Ok(0);
     }
 
-    // Reset them back to pending with incremented attempt count
-    for (id, delivery_id, attempt) in &stuck {
-        sqlx::query::<sqlx::Postgres>(
-            r#"
-            UPDATE webhook_queue
-            SET status = 'pending',
-                attempt_count = attempt_count + 1
-            WHERE id = $1
-            "#,
-        )
-        .bind(id)
-        .execute(pool)
-        .await?;
+    for (id, delivery_id, endpoint_id, attempt, max_attempts) in &stuck {
+        if *attempt >= *max_attempts {
+            // Max attempts exceeded → dead letter
+            tracing::error!(
+                "🧟 Zombie exceeded max attempts: queue_id={} delivery_id={} attempts={}/{} → dead_letter",
+                id, delivery_id, attempt, max_attempts
+            );
 
-        tracing::warn!(
-            "🧟 Recovered zombie: queue_id={} delivery_id={} next_attempt={}",
-            id, delivery_id, attempt + 1
-        );
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                UPDATE webhook_queue
+                SET status = 'dead_letter', attempt_count = attempt_count + 1
+                WHERE id = $1
+                "#,
+            )
+            .bind(id)
+            .execute(pool)
+            .await?;
+
+            // Insert into dead_letters table
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                SELECT id, endpoint_id, customer_id, payload, $2, $3
+                FROM deliveries WHERE id = $1
+                "#,
+            )
+            .bind(delivery_id)
+            .bind("zombie reaper: max attempts exceeded")
+            .bind(attempt + 1)
+            .execute(pool)
+            .await?;
+
+            // Update delivery status to failed
+            sqlx::query::<sqlx::Postgres>(
+                "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1"
+            )
+            .bind(delivery_id)
+            .bind("zombie reaper: max attempts exceeded")
+            .execute(pool)
+            .await?;
+        } else {
+            // Reset to pending for retry
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                UPDATE webhook_queue
+                SET status = 'pending',
+                    attempt_count = attempt_count + 1
+                WHERE id = $1
+                "#,
+            )
+            .bind(id)
+            .execute(pool)
+            .await?;
+
+            tracing::warn!(
+                "🧟 Recovered zombie: queue_id={} delivery_id={} next_attempt={}",
+                id, delivery_id, attempt + 1
+            );
+        }
     }
 
     Ok(stuck.len())
@@ -420,7 +495,7 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
 
 /// Record a delivery attempt
 async fn record_attempt(
-    pool: &PgPool,
+    conn: &mut sqlx::PgConnection,
     delivery_id: uuid::Uuid,
     attempt_number: i32,
     status_code: Option<i32>,
@@ -444,7 +519,7 @@ async fn record_attempt(
     .bind(error_message)
     .bind(trace_id)
     .bind(response_headers)
-    .execute(pool)
+    .execute(conn)
     .await?;
 
     Ok(())
