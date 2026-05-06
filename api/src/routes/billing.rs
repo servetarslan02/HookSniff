@@ -191,9 +191,15 @@ async fn get_usage(
         rate_limit: RateLimitInfo {
             requests_per_minute: plan.max_requests_per_minute(),
         },
-        period: PeriodInfo {
-            start: chrono::Utc::now().format("%Y-%m-01").to_string(),
-            end: chrono::Utc::now().format("%Y-%m-%d").to_string(),
+        period: {
+            let now = chrono::Utc::now();
+            let start = now.format("%Y-%m-01").to_string();
+            let end = if now.month() == 12 {
+                format!("{}-01-01", now.year() + 1)
+            } else {
+                format!("{:04}-{:02}-01", now.year(), now.month() + 1)
+            };
+            PeriodInfo { start, end }
         },
     }))
 }

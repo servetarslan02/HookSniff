@@ -148,11 +148,6 @@ async fn create_webhook(
         return Err(AppError::PayloadTooLarge);
     }
 
-    // Check rate limit
-    if customer.webhook_count >= customer.webhook_limit {
-        return Err(AppError::RateLimitExceeded);
-    }
-
     // Verify endpoint exists and belongs to customer
     let endpoint = sqlx::query_as::<_, Endpoint>(
         "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
@@ -208,6 +203,19 @@ async fn create_webhook(
     // Get retry policy from endpoint, or use defaults
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
+    // Atomic check-and-increment: reserve webhook slot before creating delivery
+    let updated: Option<Customer> = sqlx::query_as(
+        "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
+    )
+    .bind(customer.id)
+    .bind(customer.webhook_limit as i64)
+    .fetch_optional(&pool)
+    .await?;
+
+    if updated.is_none() {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     let delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES ($1, $2, $3, $4, 'pending', $5) RETURNING *",
     )
@@ -218,11 +226,6 @@ async fn create_webhook(
     .bind(retry_policy.max_attempts)
     .fetch_one(&pool)
     .await?;
-
-    sqlx::query("UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1")
-        .bind(customer.id)
-        .execute(&pool)
-        .await?;
 
     kafka::publish_to_queue(
         &pool,
@@ -263,7 +266,18 @@ async fn batch_webhooks(
         return Err(AppError::BadRequest("Batch size cannot exceed 100".into()));
     }
 
-    if customer.webhook_count >= customer.webhook_limit {
+    // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
+    let batch_count = req.webhooks.len() as i64;
+    let updated: Option<Customer> = sqlx::query_as(
+        "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING *",
+    )
+    .bind(batch_count)
+    .bind(customer.id)
+    .bind(customer.webhook_limit as i64)
+    .fetch_optional(&pool)
+    .await?;
+
+    if updated.is_none() {
         return Err(AppError::RateLimitExceeded);
     }
 
@@ -385,17 +399,6 @@ async fn batch_webhooks(
         }
     }
 
-    let success_count = deliveries.len() as i32;
-    if success_count > 0 {
-        let _ = sqlx::query(
-            "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2",
-        )
-        .bind(success_count)
-        .bind(customer.id)
-        .execute(&pool)
-        .await;
-    }
-
     Ok(Json(BatchResponse { deliveries, errors }))
 }
 
@@ -428,6 +431,19 @@ async fn replay_webhook(
     let payload_str = serde_json::to_string(&original.payload)
         .map_err(|e| AppError::Internal(e.into()))?;
 
+    // Atomic check-and-increment: reserve webhook slot before creating replay delivery
+    let updated: Option<Customer> = sqlx::query_as(
+        "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
+    )
+    .bind(customer.id)
+    .bind(customer.webhook_limit as i64)
+    .fetch_optional(&pool)
+    .await?;
+
+    if updated.is_none() {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     let new_delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, replay_count) VALUES ($1, $2, $3, $4, 'pending', $5, 1) RETURNING *",
     )
@@ -438,11 +454,6 @@ async fn replay_webhook(
     .bind(retry_policy.max_attempts)
     .fetch_one(&pool)
     .await?;
-
-    sqlx::query("UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1")
-        .bind(customer.id)
-        .execute(&pool)
-        .await?;
 
     let webhook_message = serde_json::json!({
         "delivery_id": new_delivery.id,
