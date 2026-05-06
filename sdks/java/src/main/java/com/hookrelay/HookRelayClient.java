@@ -226,6 +226,17 @@ public class HookRelayClient {
             return gson.fromJson(resp, new TypeToken<List<DeliveryAttempt>>(){}.getType());
         }
 
+        /** Export deliveries as JSON or CSV. */
+        public String exportRaw(String format, String status, String dateFrom, String dateTo) {
+            StringBuilder path = new StringBuilder("/webhooks/export?");
+            if (format != null) path.append("format=").append(format).append("&");
+            if (status != null) path.append("status=").append(status).append("&");
+            if (dateFrom != null) path.append("date_from=").append(dateFrom).append("&");
+            if (dateTo != null) path.append("date_to=").append(dateTo).append("&");
+            JsonObject resp = request("GET", path.toString(), null);
+            return resp != null ? resp.toString() : "";
+        }
+
         /** Export deliveries as JSON. */
         public List<Delivery> export(String format, String status, String dateFrom, String dateTo) {
             StringBuilder path = new StringBuilder("/webhooks/export?");
@@ -233,6 +244,9 @@ public class HookRelayClient {
             if (status != null) path.append("status=").append(status).append("&");
             if (dateFrom != null) path.append("date_from=").append(dateFrom).append("&");
             if (dateTo != null) path.append("date_to=").append(dateTo).append("&");
+            if ("csv".equals(format)) {
+                throw new UnsupportedOperationException("Use exportRaw() for CSV format");
+            }
             JsonArray resp = requestArray("GET", path.toString(), null);
             return gson.fromJson(resp, new TypeToken<List<Delivery>>(){}.getType());
         }

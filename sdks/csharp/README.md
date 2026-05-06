@@ -35,12 +35,12 @@ Console.WriteLine($"Endpoint created: {endpoint.Id}");
 // Send a webhook
 var delivery = await client.Webhooks.SendAsync(
     endpoint.Id,
+    "order.created",
     new Dictionary<string, object>
     {
         ["orderId"] = "12345",
         ["amount"] = 99.99
-    },
-    "order.created"
+    }
 );
 Console.WriteLine($"Delivery queued: {delivery.Id}, status: {delivery.Status}");
 
@@ -170,7 +170,7 @@ using HookRelay;
 try
 {
     var delivery = await client.Webhooks.SendAsync("nonexistent",
-        new Dictionary<string, object> { ["test"] = true });
+        "test.event", new Dictionary<string, object> { ["test"] = true });
 }
 catch (AuthenticationException)
 {
@@ -213,7 +213,7 @@ catch (PayloadTooLargeException)
 
 ### `client.Webhooks`
 
-- `SendAsync(endpointId, data, event?)` → `Task<Delivery>`
+- `SendAsync(endpointId, event?, data?)` → `Task<Delivery>`
 - `GetAsync(deliveryId)` → `Task<Delivery>`
 - `ListAsync(status?, page?, perPage?)` → `Task<DeliveryList>`
 - `ReplayAsync(deliveryId)` → `Task<Delivery>`
@@ -223,7 +223,7 @@ catch (PayloadTooLargeException)
 
 ### `WebhookVerification.VerifySignature(payload, signature, secret)` → `bool`
 
-### `WebhookVerification.VerifyWebhook(...)` → `VerificationResult`
+### `WebhookVerification.VerifyWebhook(...)` → `HookRelayVerificationResult`
 
 ## License
 

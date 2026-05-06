@@ -136,7 +136,7 @@ module HookRelay
     end
 
     # Send a webhook
-    def send(endpoint_id:, data:, event: nil)
+    def send(endpoint_id:, event: nil, data:)
       body = { endpoint_id: endpoint_id, data: data }
       body[:event] = event if event
       resp = @client.request(:post, "/webhooks", body: body)

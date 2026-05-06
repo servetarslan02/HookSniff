@@ -201,9 +201,10 @@ class WebhooksResource
     /**
      * Send a webhook.
      */
-    public function send(string $endpointId, array $data, ?string $event = null): Models\Delivery
+    public function send(string $endpointId, ?string $event = null, array $data = []): Models\Delivery
     {
         $body = ['endpoint_id' => $endpointId, 'data' => $data];
+        if ($event !== null) $body['event'] = $event;> $data];
         if ($event !== null) $body['event'] = $event;
         $resp = $this->client->request('POST', '/webhooks', $body);
         return Models\Delivery::fromArray($resp);

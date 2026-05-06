@@ -8,17 +8,17 @@ namespace HookRelay
     /// <summary>
     /// Result of webhook verification.
     /// </summary>
-    public class VerificationResult
+    public class HookRelayVerificationResult
     {
         public bool Valid { get; set; }
         public object? Payload { get; set; }
         public string? Error { get; set; }
 
-        public static VerificationResult Invalid(string error) =>
-            new VerificationResult { Valid = false, Error = error };
+        public static HookRelayVerificationResult Invalid(string error) =>
+            new HookRelayVerificationResult { Valid = false, Error = error };
 
-        public static VerificationResult ValidResult(object payload) =>
-            new VerificationResult { Valid = true, Payload = payload };
+        public static HookRelayVerificationResult ValidResult(object payload) =>
+            new HookRelayVerificationResult { Valid = true, Payload = payload };
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ namespace HookRelay
         /// Verify a webhook from HTTP headers with automatic header detection.
         /// Supports both Standard Webhooks and Svix headers.
         /// </summary>
-        public static VerificationResult VerifyWebhookFromHeaders(
+        public static HookRelayVerificationResult VerifyWebhookFromHeaders(
             string payload, System.Net.WebHeaderCollection headers, string secret, int toleranceSecs = DefaultToleranceSecs)
         {
             var msgId = headers["webhook-id"];
@@ -86,28 +86,28 @@ namespace HookRelay
         /// <summary>
         /// Verify a webhook using Standard Webheaders headers (Svix-compatible).
         /// </summary>
-        public static VerificationResult VerifyWebhook(
+        public static HookRelayVerificationResult VerifyWebhook(
             string payload, string? msgId, string? timestamp,
             string? signatureHeader, string secret, int toleranceSecs = DefaultToleranceSecs)
         {
             if (string.IsNullOrEmpty(msgId))
-                return VerificationResult.Invalid("Missing webhook-id header");
+                return HookRelayVerificationResult.Invalid("Missing webhook-id header");
             if (string.IsNullOrEmpty(timestamp))
-                return VerificationResult.Invalid("Missing webhook-timestamp header");
+                return HookRelayVerificationResult.Invalid("Missing webhook-timestamp header");
             if (string.IsNullOrEmpty(signatureHeader))
-                return VerificationResult.Invalid("Missing webhook-signature header");
+                return HookRelayVerificationResult.Invalid("Missing webhook-signature header");
             if (string.IsNullOrEmpty(payload))
-                return VerificationResult.Invalid("Missing request body");
+                return HookRelayVerificationResult.Invalid("Missing request body");
 
             // Validate timestamp
             if (!long.TryParse(timestamp, out var ts))
-                return VerificationResult.Invalid("Invalid webhook timestamp");
+                return HookRelayVerificationResult.Invalid("Invalid webhook timestamp");
 
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var age = Math.Abs(now - ts);
 
             if (age > toleranceSecs)
-                return VerificationResult.Invalid(
+                return HookRelayVerificationResult.Invalid(
                     $"Webhook timestamp expired: {age}s old (tolerance: {toleranceSecs}s)");
 
             // Compute expected signature
@@ -141,22 +141,22 @@ namespace HookRelay
                 }
 
                 if (!verified)
-                    return VerificationResult.Invalid("Invalid webhook signature");
+                    return HookRelayVerificationResult.Invalid("Invalid webhook signature");
             }
             catch
             {
-                return VerificationResult.Invalid("Signature computation failed");
+                return HookRelayVerificationResult.Invalid("Signature computation failed");
             }
 
             // Parse payload
             try
             {
                 var parsed = JsonSerializer.Deserialize<JsonElement>(payload);
-                return VerificationResult.ValidResult(parsed);
+                return HookRelayVerificationResult.ValidResult(parsed);
             }
             catch
             {
-                return VerificationResult.ValidResult(payload);
+                return HookRelayVerificationResult.ValidResult(payload);
             }
         }
 
