@@ -43,7 +43,6 @@ pub struct WebhookQueueItem {
     pub delivery_id: uuid::Uuid,
     pub endpoint_id: uuid::Uuid,
     pub endpoint_url: String,
-    pub signing_secret: String,
     pub payload: String,
     pub custom_headers: Option<serde_json::Value>,
     pub attempt_count: i32,
@@ -255,16 +254,6 @@ async fn process_pending(
         let trace_id = telemetry::current_trace_id();
 
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
-
-        // Build WebhookMessage and delegate HTTP delivery to the delivery module
-        let webhook_msg = WebhookMessage {
-            delivery_id: delivery_id.to_string(),
-            endpoint_id: item.endpoint_id.to_string(),
-            endpoint_url: item.endpoint_url.clone(),
-            signing_secret: item.signing_secret.clone(),
-            payload: item.payload.clone(),
-            custom_headers: item.custom_headers.clone(),
-        };
 
         let result = delivery::deliver_http(&http_client, &webhook_msg, attempt).await?;
 
