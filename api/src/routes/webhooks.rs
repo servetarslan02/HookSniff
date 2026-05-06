@@ -232,7 +232,6 @@ async fn create_webhook(
         delivery.id,
         endpoint.id,
         &endpoint.url,
-        &endpoint.signing_secret,
         &payload_str,
         endpoint.custom_headers.as_ref(),
     )
@@ -385,7 +384,6 @@ async fn batch_webhooks(
             delivery.id,
             endpoint.id,
             &endpoint.url,
-            &endpoint.signing_secret,
             payload_str,
             endpoint.custom_headers.as_ref(),
         )
@@ -460,7 +458,6 @@ async fn replay_webhook(
         new_delivery.id,
         endpoint.id,
         &endpoint.url,
-        &endpoint.signing_secret,
         &payload_str,
         endpoint.custom_headers.as_ref(),
     )
