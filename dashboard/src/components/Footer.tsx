@@ -1,7 +1,7 @@
 import { Link } from '@/i18n/navigation';
 
 const links = [
-  { name: 'GitHub', href: 'https://github.com/hookrelay' },
+  { name: 'GitHub', href: 'https://github.com/hooksniff' },
   { name: 'Docs', href: '/docs' },
   { name: 'Status', href: '/status' },
   { name: 'Blog', href: '#' },
@@ -15,7 +15,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <span className="text-xl">🪝</span>
-          <span className="font-semibold text-gray-900 dark:text-white">Hookrelay</span>
+          <span className="font-semibold text-gray-900 dark:text-white">HookSniff</span>
         </div>
         <div className="flex flex-wrap gap-6 text-sm text-gray-500 dark:text-slate-400">
           {links.map((link) => (
@@ -24,7 +24,7 @@ export default function Footer() {
             </Link>
           ))}
         </div>
-        <p className="text-sm text-gray-400 dark:text-slate-500">© {new Date().getFullYear()} Hookrelay. All rights reserved.</p>
+        <p className="text-sm text-gray-400 dark:text-slate-500">© {new Date().getFullYear()} HookSniff. All rights reserved.</p>
       </div>
     </footer>
   );

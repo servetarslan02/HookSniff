@@ -40,8 +40,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/servetarslan02/hookrelay.git
-cd hookrelay
+git clone https://github.com/servetarslan02/hooksniff.git
+cd hooksniff
 
 # Copy environment file
 cp .env.example .env
@@ -53,7 +53,7 @@ make local
 This starts:
 | Service | Port | URL |
 |---------|------|-----|
-| PostgreSQL | 5432 | `postgresql://hookrelay:hookrelay_local@localhost:5432/hookrelay` |
+| PostgreSQL | 5432 | `postgresql://hooksniff:hooksniff_local@localhost:5432/hooksniff` |
 | API Server | 3000 | http://localhost:3000/health |
 | Dashboard | 3001 | http://localhost:3001 |
 | Worker | — | (background) |
@@ -94,9 +94,9 @@ curl http://localhost:3000/v1/endpoints \
 ```
 docker-compose.yml (development)
 ├── postgres:16-alpine     — Database (port 5432)
-├── hookrelay-api          — API server (port 3000)
-├── hookrelay-worker       — Background worker
-└── hookrelay-dashboard    — Next.js UI (port 3001)
+├── hooksniff-api          — API server (port 3000)
+├── hooksniff-worker       — Background worker
+└── hooksniff-dashboard    — Next.js UI (port 3001)
 ```
 
 ---
@@ -110,14 +110,14 @@ docker-compose.yml (development)
 **Step 1: Create a Neon project**
 
 1. Go to [console.neon.tech](https://console.neon.tech)
-2. Create a new project: `hookrelay-prod`
+2. Create a new project: `hooksniff-prod`
 3. Choose region closest to your Fly.io deployment (e.g., `us-east-1`)
 4. Note the connection string
 
 **Step 2: Get connection string**
 
 ```
-postgresql://username:password@ep-cool-rain-123456.us-east-2.aws.neon.tech/hookrelay?sslmode=require
+postgresql://username:password@ep-cool-rain-123456.us-east-2.aws.neon.tech/hooksniff?sslmode=require
 ```
 
 > ⚠️ Always use `sslmode=require` for Neon connections.
@@ -126,7 +126,7 @@ postgresql://username:password@ep-cool-rain-123456.us-east-2.aws.neon.tech/hookr
 
 ```bash
 # Connect and run schema
-psql "postgresql://username:password@ep-xxx.neon.tech/hookrelay?sslmode=require" \
+psql "postgresql://username:password@ep-xxx.neon.tech/hooksniff?sslmode=require" \
   -f migrations/001_init.sql
 ```
 
@@ -136,7 +136,7 @@ Or use the Neon SQL editor in the dashboard.
 
 Neon supports connection pooling via a pooled connection string:
 ```
-postgresql://username:password@ep-xxx-pooler.neon.tech/hookrelay?sslmode=require
+postgresql://username:password@ep-xxx-pooler.neon.tech/hooksniff?sslmode=require
 ```
 
 Use the pooled string for the API server (high connection churn) and the direct string for migrations.
@@ -161,10 +161,10 @@ fly auth login
 **Step 2: Create the app**
 
 ```bash
-cd hookrelay
+cd hooksniff
 
 # Create app (choose a unique name)
-fly launch --no-deploy --name hookrelay-api
+fly launch --no-deploy --name hooksniff-api
 
 # This creates fly.toml — we'll edit it next
 ```
@@ -172,7 +172,7 @@ fly launch --no-deploy --name hookrelay-api
 **Step 3: Configure `fly.toml`**
 
 ```toml
-app = "hookrelay-api"
+app = "hooksniff-api"
 primary_region = "iad"
 
 [build]
@@ -224,7 +224,7 @@ Set secrets in Fly.io:
 
 ```bash
 # Database
-fly secrets set DATABASE_URL="postgresql://user:pass@ep-xxx.neon.tech/hookrelay?sslmode=require"
+fly secrets set DATABASE_URL="postgresql://user:pass@ep-xxx.neon.tech/hooksniff?sslmode=require"
 
 # Auth
 fly secrets set JWT_SECRET="$(openssl rand -hex 32)"
@@ -260,7 +260,7 @@ fly deploy
 
 ```bash
 # Create a separate app for the worker
-fly launch --no-deploy --name hookrelay-worker --dockerfile Dockerfile.worker
+fly launch --no-deploy --name hooksniff-worker --dockerfile Dockerfile.worker
 
 # Copy the same secrets
 fly secrets set \
@@ -279,10 +279,10 @@ fly deploy
 
 Option A: Fly.io
 ```bash
-fly launch --no-deploy --name hookrelay-dashboard --dockerfile Dockerfile.dashboard
+fly launch --no-deploy --name hooksniff-dashboard --dockerfile Dockerfile.dashboard
 
 fly secrets set \
-  NEXT_PUBLIC_API_URL="https://hookrelay-api.fly.dev/v1"
+  NEXT_PUBLIC_API_URL="https://hooksniff-api.fly.dev/v1"
 
 fly deploy
 ```
@@ -324,14 +324,14 @@ migrations/
 
 ```bash
 # Add domain to API app
-fly certs add api.hookrelay.is-a.dev
+fly certs add api.hooksniff.is-a.dev
 
 # Add domain to Dashboard
-fly certs add dashboard.hookrelay.is-a.dev
+fly certs add dashboard.hooksniff.is-a.dev
 
 # Check certificate status
 fly certs list
-fly certs show api.hookrelay.is-a.dev
+fly certs show api.hooksniff.is-a.dev
 ```
 
 **DNS records to add:**
@@ -340,7 +340,7 @@ fly certs show api.hookrelay.is-a.dev
 |------|------|-------|
 | A | `api` | `<fly.io IP>` |
 | AAAA | `api` | `<fly.io IPv6>` |
-| CNAME | `dashboard` | `hookrelay-dashboard.fly.dev` |
+| CNAME | `dashboard` | `hooksniff-dashboard.fly.dev` |
 
 Get IPs:
 ```bash
@@ -386,7 +386,7 @@ fly ips list
 
 | Variable | Description |
 |----------|-------------|
-| `NEXT_PUBLIC_API_URL` | API base URL (e.g., `https://api.hookrelay.is-a.dev/v1`) |
+| `NEXT_PUBLIC_API_URL` | API base URL (e.g., `https://api.hooksniff.is-a.dev/v1`) |
 
 ---
 
@@ -408,7 +408,7 @@ In the Stripe Dashboard:
 
 In Stripe Dashboard → Developers → Webhooks:
 
-- **Endpoint URL:** `https://api.hookrelay.is-a.dev/v1/billing/webhook`
+- **Endpoint URL:** `https://api.hooksniff.is-a.dev/v1/billing/webhook`
 - **Events:**
   - `checkout.session.completed`
   - `customer.subscription.created`
@@ -447,13 +447,13 @@ stripe listen --forward-to localhost:3000/v1/billing/webhook
 ### Health Check
 
 ```bash
-curl https://api.hookrelay.is-a.dev/v1/health
+curl https://api.hooksniff.is-a.dev/v1/health
 ```
 
 ```json
 {
   "status": "ok",
-  "service": "hookrelay-api",
+  "service": "hooksniff-api",
   "version": "0.1.0"
 }
 ```
@@ -470,7 +470,7 @@ docker compose -f monitoring/docker-compose.monitoring.yml up -d
 
 # Access Grafana
 open http://localhost:3002
-# Default: admin / hookrelay_grafana_change_me
+# Default: admin / hooksniff_grafana_change_me
 ```
 
 ### Fly.io Monitoring
@@ -510,13 +510,13 @@ HookRelay uses Fly.io's auto-scaling:
 
 ```bash
 # Scale API to 2 machines
-fly scale count 2 --app hookrelay-api
+fly scale count 2 --app hooksniff-api
 
 # Scale worker to 2 machines
-fly scale count 2 --app hookrelay-worker
+fly scale count 2 --app hooksniff-worker
 
 # Increase memory
-fly scale memory 1024 --app hookrelay-api
+fly scale memory 1024 --app hooksniff-api
 ```
 
 ### Database Scaling (Neon)
@@ -541,17 +541,17 @@ Neon provides automatic backups:
 
 ```bash
 # Full database dump
-pg_dump "$DATABASE_URL" --format=custom --file=hookrelay-backup-$(date +%Y%m%d).dump
+pg_dump "$DATABASE_URL" --format=custom --file=hooksniff-backup-$(date +%Y%m%d).dump
 
 # Restore
-pg_restore --clean --if-exists -d "$DATABASE_URL" hookrelay-backup-20260506.dump
+pg_restore --clean --if-exists -d "$DATABASE_URL" hooksniff-backup-20260506.dump
 ```
 
 ### Automated Backups (Cron)
 
 ```bash
 # Add to crontab
-0 3 * * * pg_dump "$DATABASE_URL" --format=custom --file="/backups/hookrelay-$(date +\%Y\%m\%d).dump"
+0 3 * * * pg_dump "$DATABASE_URL" --format=custom --file="/backups/hooksniff-$(date +\%Y\%m\%d).dump"
 ```
 
 ---
@@ -562,7 +562,7 @@ pg_restore --clean --if-exists -d "$DATABASE_URL" hookrelay-backup-20260506.dump
 
 ```bash
 # Check logs
-fly logs --app hookrelay-api
+fly logs --app hooksniff-api
 
 # Common issues:
 # 1. DATABASE_URL not set → fly secrets list
@@ -584,11 +584,11 @@ psql "$DATABASE_URL" -c "SELECT 1;"
 
 ```bash
 # Check worker logs
-fly logs --app hookrelay-worker
+fly logs --app hooksniff-worker
 
 # Check endpoint health
 curl -H "Authorization: Bearer hr_live_..." \
-  https://api.hookrelay.is-a.dev/v1/endpoint-health
+  https://api.hooksniff.is-a.dev/v1/endpoint-health
 
 # Common issues:
 # 1. Endpoint URL unreachable
@@ -600,7 +600,7 @@ curl -H "Authorization: Bearer hr_live_..." \
 
 ```bash
 # Test webhook endpoint
-curl -X POST https://api.hookrelay.is-a.dev/v1/billing/webhook \
+curl -X POST https://api.hooksniff.is-a.dev/v1/billing/webhook \
   -H "Content-Type: application/json" \
   -d '{"type": "ping"}'
 
@@ -626,10 +626,10 @@ If hitting limits:
 
 ```bash
 # Check machine resources
-fly machine list --app hookrelay-api
+fly machine list --app hooksniff-api
 
 # Increase memory
-fly scale memory 1024 --app hookrelay-api
+fly scale memory 1024 --app hooksniff-api
 
 # Or update fly.toml
 # [[vm]]

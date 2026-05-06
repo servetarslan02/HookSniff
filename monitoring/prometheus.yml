@@ -17,21 +17,21 @@ scrape_configs:
       - targets: ["localhost:9090"]
 
   # ── HookRelay API ──
-  - job_name: "hookrelay-api"
+  - job_name: "hooksniff-api"
     metrics_path: "/metrics"
     scrape_interval: 10s
     static_configs:
       - targets: ["api:9090"]
         labels:
-          service: "hookrelay-api"
+          service: "hooksniff-api"
           environment: "production"
 
   # ── HookRelay Worker ──
-  - job_name: "hookrelay-worker"
+  - job_name: "hooksniff-worker"
     metrics_path: "/metrics"
     scrape_interval: 10s
     static_configs:
       - targets: ["worker:9090"]
         labels:
-          service: "hookrelay-worker"
+          service: "hooksniff-worker"
           environment: "production"

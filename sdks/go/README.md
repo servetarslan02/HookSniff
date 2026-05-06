@@ -1,11 +1,11 @@
 # HookRelay Go SDK
 
-Go client library for the [HookRelay](https://github.com/servetarslan02/hookrelay) webhook delivery API.
+Go client library for the [HookRelay](https://github.com/servetarslan02/hooksniff) webhook delivery API.
 
 ## Installation
 
 ```bash
-go get github.com/servetarslan02/hookrelay/sdks/go
+go get github.com/servetarslan02/hooksniff/sdks/go
 ```
 
 ## Quick Start
@@ -18,14 +18,14 @@ import (
     "fmt"
     "log"
 
-    hookrelay "github.com/servetarslan02/hookrelay/sdks/go"
+    hooksniff "github.com/servetarslan02/hooksniff/sdks/go"
 )
 
 func main() {
-    client := hookrelay.New("hr_live_YOUR_API_KEY")
+    client := hooksniff.New("hr_live_YOUR_API_KEY")
 
     // Create an endpoint
-    ep, err := client.Endpoints.Create(context.Background(), &hookrelay.CreateEndpointRequest{
+    ep, err := client.Endpoints.Create(context.Background(), &hooksniff.CreateEndpointRequest{
         URL:         "https://myapp.com/webhook",
         Description: "My app webhook",
     })
@@ -35,7 +35,7 @@ func main() {
     fmt.Printf("Endpoint: %s\n", ep.ID)
 
     // Send a webhook
-    delivery, err := client.Webhooks.Send(context.Background(), &hookrelay.SendWebhookRequest{
+    delivery, err := client.Webhooks.Send(context.Background(), &hooksniff.SendWebhookRequest{
         EndpointID: ep.ID,
         Event:      "order.created",
         Data: map[string]interface{}{
@@ -59,7 +59,7 @@ func main() {
 endpoints, err := client.Endpoints.List(ctx)
 
 // Create endpoint
-ep, err := client.Endpoints.Create(ctx, &hookrelay.CreateEndpointRequest{
+ep, err := client.Endpoints.Create(ctx, &hooksniff.CreateEndpointRequest{
     URL:              "https://myapp.com/webhook",
     Description:      "My webhook endpoint",
     RoutingStrategy:  "failover",
@@ -81,14 +81,14 @@ result, err := client.Endpoints.RotateSecret(ctx, "ep_abc123")
 
 ```go
 // Send webhook
-delivery, err := client.Webhooks.Send(ctx, &hookrelay.SendWebhookRequest{
+delivery, err := client.Webhooks.Send(ctx, &hooksniff.SendWebhookRequest{
     EndpointID: "ep_abc123",
     Event:      "order.created",
     Data:       map[string]interface{}{"order_id": "12345"},
 })
 
 // Send batch
-deliveries, errors, err := client.Webhooks.SendBatch(ctx, []*hookrelay.SendWebhookRequest{
+deliveries, errors, err := client.Webhooks.SendBatch(ctx, []*hooksniff.SendWebhookRequest{
     {EndpointID: "ep_1", Event: "order.created", Data: map[string]interface{}{"id": "1"}},
     {EndpointID: "ep_2", Event: "user.signup", Data: map[string]interface{}{"id": "2"}},
 })
@@ -106,7 +106,7 @@ delivery, err := client.Webhooks.Replay(ctx, "wh_abc123")
 ### Custom API URL
 
 ```go
-client := hookrelay.NewWithBaseURL("hr_live_YOUR_KEY", "https://api.hookrelay.is-a.dev/v1")
+client := hooksniff.NewWithBaseURL("hr_live_YOUR_KEY", "https://api.hooksniff.is-a.dev/v1")
 ```
 
 ## License

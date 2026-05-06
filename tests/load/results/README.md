@@ -26,7 +26,7 @@ docker pull grafana/k6
 
 ```bash
 # Make sure HookRelay is running locally first
-cd /root/.openclaw/workspace/hookrelay
+cd /root/.openclaw/workspace/hooksniff
 k6 run tests/load/k6_load_test.js
 ```
 
@@ -34,7 +34,7 @@ k6 run tests/load/k6_load_test.js
 
 ```bash
 k6 run \
-  -e BASE_URL=https://api-staging.hookrelay.is-a.dev \
+  -e BASE_URL=https://api-staging.hooksniff.is-a.dev \
   -e API_KEY=hr_live_your_staging_key \
   tests/load/k6_load_test.js
 ```

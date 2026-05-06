@@ -7,7 +7,7 @@
 //!
 //! Run with: cargo test --test integration
 
-use hookrelay_api::signing;
+use hooksniff_api::signing;
 
 // ──────────────────────────────────────────────────────────────
 // Signing tests (Standard Webhooks)
@@ -129,7 +129,7 @@ fn test_config_stripe_fields_optional() {
 
 #[test]
 fn test_plan_limits() {
-    use hookrelay_api::billing::Plan;
+    use hooksniff_api::billing::Plan;
 
     // Free plan limits
     let free = Plan::Free;
@@ -158,7 +158,7 @@ fn test_plan_limits() {
 
 #[test]
 fn test_plan_from_str() {
-    use hookrelay_api::billing::Plan;
+    use hooksniff_api::billing::Plan;
 
     assert_eq!(Plan::from_str("free"), Plan::Free);
     assert_eq!(Plan::from_str("FREE"), Plan::Free);
@@ -170,7 +170,7 @@ fn test_plan_from_str() {
 
 #[test]
 fn test_usage_calculations() {
-    use hookrelay_api::billing::{Plan, Usage};
+    use hooksniff_api::billing::{Plan, Usage};
 
     let usage = Usage {
         customer_id: "test".to_string(),
@@ -190,7 +190,7 @@ fn test_usage_calculations() {
 
 #[test]
 fn test_usage_limit_exceeded() {
-    use hookrelay_api::billing::{Plan, Usage};
+    use hooksniff_api::billing::{Plan, Usage};
 
     let usage = Usage {
         customer_id: "test".to_string(),
@@ -214,7 +214,7 @@ fn test_usage_limit_exceeded() {
 
 #[test]
 fn test_verification_error_display() {
-    use hookrelay_api::signing::VerificationError;
+    use hooksniff_api::signing::VerificationError;
 
     let err = VerificationError::InvalidTimestamp;
     assert_eq!(format!("{}", err), "Invalid webhook timestamp");
@@ -237,7 +237,7 @@ fn test_verification_error_display() {
 
 #[test]
 fn test_api_key_generation() {
-    use hookrelay_api::middleware;
+    use hooksniff_api::middleware;
 
     let key = middleware::generate_api_key();
     assert!(key.starts_with("hr_live_"), "API key should start with hr_live_");
@@ -250,7 +250,7 @@ fn test_api_key_generation() {
 
 #[test]
 fn test_api_key_hashing() {
-    use hookrelay_api::middleware;
+    use hooksniff_api::middleware;
 
     let key = "hr_live_test_key_123";
     let hash1 = middleware::hash_api_key(key);
@@ -274,7 +274,7 @@ fn test_api_key_hashing() {
 
 #[test]
 fn test_event_type_validation() {
-    use hookrelay_api::validation;
+    use hooksniff_api::validation;
 
     // Valid event types
     assert!(validation::validate_event_type("order.created").is_ok());
@@ -362,7 +362,7 @@ fn test_ssrf_url_detection() {
 
 #[test]
 fn test_api_key_format() {
-    use hookrelay_api::middleware;
+    use hooksniff_api::middleware;
 
     // Generate 100 keys and verify format
     for _ in 0..100 {
@@ -383,7 +383,7 @@ fn test_api_key_format() {
 
 #[test]
 fn test_plan_serialization() {
-    use hookrelay_api::billing::Plan;
+    use hooksniff_api::billing::Plan;
 
     assert_eq!(serde_json::to_string(&Plan::Free).unwrap(), "\"free\"");
     assert_eq!(serde_json::to_string(&Plan::Pro).unwrap(), "\"pro\"");
@@ -393,7 +393,7 @@ fn test_plan_serialization() {
 
 #[test]
 fn test_subscription_status_serialization() {
-    use hookrelay_api::billing::SubscriptionStatus;
+    use hooksniff_api::billing::SubscriptionStatus;
 
     assert_eq!(serde_json::to_string(&SubscriptionStatus::Active).unwrap(), "\"active\"");
     assert_eq!(serde_json::to_string(&SubscriptionStatus::Trialing).unwrap(), "\"trialing\"");

@@ -1,11 +1,11 @@
 //! # HookRelay Rust SDK
 //!
-//! Official Rust client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+//! Official Rust client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 //!
 //! ## Usage
 //!
 //! ```rust,no_run
-//! use hookrelay::HookRelayClient;
+//! use hooksniff::HookRelayClient;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -141,9 +141,9 @@ pub struct Stats {
 
 // ==================== Client ====================
 
-const DEFAULT_BASE_URL: &str = "https://api.hookrelay.is-a.dev/v1";
+const DEFAULT_BASE_URL: &str = "https://api.hooksniff.is-a.dev/v1";
 const DEFAULT_TIMEOUT: u64 = 30;
-const USER_AGENT: &str = "hookrelay-rust/0.2.0";
+const USER_AGENT: &str = "hooksniff-rust/0.2.0";
 
 /// HookRelay API client.
 pub struct HookRelayClient {

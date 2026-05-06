@@ -1,6 +1,6 @@
 # HookRelay Rust SDK
 
-Official Rust client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official Rust client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -8,13 +8,13 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-hookrelay = "0.2.0"
+hooksniff = "0.2.0"
 ```
 
 ## Usage
 
 ```rust
-use hookrelay::HookRelayClient;
+use hooksniff::HookRelayClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -41,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Webhook Verification
 
 ```rust
-use hookrelay::WebhookVerifier;
+use hooksniff::WebhookVerifier;
 
 let verifier = WebhookVerifier::new("whsec_...");
 
@@ -63,7 +63,7 @@ if result.valid {
 ## Error Handling
 
 ```rust
-use hookrelay::HookRelayError;
+use hooksniff::HookRelayError;
 
 match client.endpoints().create("https://myapp.com/webhook", None, None).await {
     Ok(endpoint) => println!("Created: {}", endpoint.id),

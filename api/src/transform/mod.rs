@@ -115,7 +115,7 @@ pub struct FieldMapping {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnrichConfig {
     /// Eklenecek static alanlar
-    /// Örn: `{"source": "hookrelay", "version": "1.0"}`
+    /// Örn: `{"source": "hooksniff", "version": "1.0"}`
     pub fields: std::collections::HashMap<String, Value>,
 }
 
@@ -705,7 +705,7 @@ mod tests {
         });
 
         let mut fields = std::collections::HashMap::new();
-        fields.insert("source".to_string(), json!("hookrelay"));
+        fields.insert("source".to_string(), json!("hooksniff"));
         fields.insert("version".to_string(), json!("1.0"));
         fields.insert("processed_at".to_string(), json!("2024-01-01T00:00:00Z"));
 
@@ -716,7 +716,7 @@ mod tests {
         };
 
         let output = TransformEngine::apply(&input, &config).unwrap();
-        assert_eq!(output["source"], "hookrelay");
+        assert_eq!(output["source"], "hooksniff");
         assert_eq!(output["version"], "1.0");
         assert_eq!(output["processed_at"], "2024-01-01T00:00:00Z");
         // Orijinal veri korunmalı
@@ -756,7 +756,7 @@ mod tests {
             ]),
             enrich: Some({
                 let mut fields = std::collections::HashMap::new();
-                fields.insert("source".to_string(), json!("hookrelay"));
+                fields.insert("source".to_string(), json!("hooksniff"));
                 EnrichConfig { fields }
             }),
         };
@@ -766,7 +766,7 @@ mod tests {
         // Filter: sadece include edilenler
         // Map: field mapping uygulanır
         // Enrich: static field eklenir
-        assert_eq!(output["source"], "hookrelay");
+        assert_eq!(output["source"], "hooksniff");
     }
 
     #[test]

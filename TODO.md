@@ -28,7 +28,7 @@
 - [ ] Oracle Cloud Always Free ARM VM oluştur
 - [ ] VM'de Docker kur ve container'ları deploy et
 - [ ] Vercel'de dashboard deploy et
-- [ ] Domain al ($12) — hookrelay.is-a.dev veya alternatifi
+- [ ] Domain al ($12) — hooksniff.is-a.dev veya alternatifi
 - [ ] Cloudflare ile DNS/SSL ayarla
 - [ ] Grafana Cloud kur (monitoring)
 - [ ] Cloudflare R2 kur (storage)
@@ -53,8 +53,8 @@
 - [ ] Monitoring dashboard'larını kontrol et
 
 ### 3. SDK Publish (Gelecek Hafta)
-- [ ] Node SDK → npm publish (`@hookrelay/sdk`)
-- [ ] Python SDK → pypi publish (`hookrelay`)
+- [ ] Node SDK → npm publish (`@hooksniff/sdk`)
+- [ ] Python SDK → pypi publish (`hooksniff`)
 - [ ] README'leri güncelle
 
 ### 4. Dokümantasyon (Gelecek Hafta)

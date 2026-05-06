@@ -9,7 +9,7 @@ interface EmailOptions {
   from?: string;
 }
 
-const DEFAULT_FROM = 'Hookrelay <noreply@hookrelay.is-a.dev>';
+const DEFAULT_FROM = 'HookSniff <noreply@hooksniff.is-a.dev>';
 
 export async function sendEmail({ to, subject, html, from = DEFAULT_FROM }: EmailOptions) {
   try {
@@ -42,7 +42,7 @@ export function verificationEmail(code: string) {
         <h1 style="color: #111827; font-size: 20px; margin-top: 8px;">Email Doğrulama</h1>
       </div>
       <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
-        Hookrelay hesabını doğrulamak için aşağıdaki kodu kullan:
+        HookSniff hesabını doğrulamak için aşağıdaki kodu kullan:
       </p>
       <div style="background: #f3f4f6; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
         <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #111827; font-family: monospace;">${code}</span>
@@ -94,7 +94,7 @@ export function deliveryFailedEmail(event: string, endpoint: string, attempts: n
         Webhook endpoint'inize teslimat yapılamadı. Lütfen endpoint durumunu kontrol edin.
       </p>
       <div style="text-align: center; margin: 24px 0;">
-        <a href="https://hookrelay.is-a.dev/dashboard/deliveries" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="https://hooksniff.is-a.dev/dashboard/deliveries" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Teslimatları Görüntüle
         </a>
       </div>
@@ -107,14 +107,14 @@ export function welcomeEmail(name: string) {
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
         <span style="font-size: 32px;">🪝</span>
-        <h1 style="color: #111827; font-size: 20px; margin-top: 8px;">Hookrelay'e Hoş Geldin!</h1>
+        <h1 style="color: #111827; font-size: 20px; margin-top: 8px;">HookSniff'e Hoş Geldin!</h1>
       </div>
       <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
         Merhaba ${name},<br/><br/>
-        Hookrelay'e kayıt olduğun için teşekkürler! Webhook teslimatlarını güvenilir bir şekilde yönetmeye hemen başlayabilirsin.
+        HookSniff'e kayıt olduğun için teşekkürler! Webhook teslimatlarını güvenilir bir şekilde yönetmeye hemen başlayabilirsin.
       </p>
       <div style="text-align: center; margin: 24px 0;">
-        <a href="https://hookrelay.is-a.dev/dashboard" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="https://hooksniff.is-a.dev/dashboard" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Dashboard'a Git
         </a>
       </div>

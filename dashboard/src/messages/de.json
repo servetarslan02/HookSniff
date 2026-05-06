@@ -408,15 +408,15 @@
   },
   "docs": {
     "gettingStarted": "Getting Started",
-    "gettingStartedDesc": "Send your first webhook in under 5 minutes. Hookrelay handles delivery, retries, and monitoring so you can focus on building.",
+    "gettingStartedDesc": "Send your first webhook in under 5 minutes. HookSniff handles delivery, retries, and monitoring so you can focus on building.",
     "quickStart": "Quick Start",
     "getApiKey": "1. Get your API key",
-    "getApiKeyDesc": "Sign up at hookrelay.is-a.dev and grab your API key from the dashboard settings.",
+    "getApiKeyDesc": "Sign up at hooksniff.is-a.dev and grab your API key from the dashboard settings.",
     "createEndpoint": "2. Create an endpoint",
     "createEndpointDesc": "Register the URL where you want webhooks delivered:",
     "sendWebhook": "3. Send a webhook",
     "verifySignature": "4. Verify the signature",
-    "verifySignatureDesc": "Every webhook includes an HMAC-SHA256 signature in the X-Hookrelay-Signature header:",
+    "verifySignatureDesc": "Every webhook includes an HMAC-SHA256 signature in the X-HookSniff-Signature header:",
     "authentication": "Authentication",
     "authDesc": "All API requests require authentication via a Bearer token in the Authorization header:",
     "keepSecret": "Keep your API key secret. Never expose it in client-side code, public repos, or browser requests. Use environment variables.",
@@ -425,7 +425,7 @@
     "requestsPerMin": "Requests/min",
     "webhooksPerMonth": "Webhooks/month",
     "apiReference": "API Reference",
-    "apiReferenceDesc": "Complete reference for the Hookrelay REST API.",
+    "apiReferenceDesc": "Complete reference for the HookSniff REST API.",
     "baseUrl": "Base URL",
     "endpointsApi": "Endpoints",
     "webhooksApi": "Webhooks",
@@ -660,7 +660,7 @@
       "blog": "Blog",
       "terms": "AGB",
       "privacy": "Datenschutz",
-      "copyright": "© 2026 Hookrelay. Alle Rechte vorbehalten."
+      "copyright": "© 2026 HookSniff. Alle Rechte vorbehalten."
     }
   },
   "apiKeys": {

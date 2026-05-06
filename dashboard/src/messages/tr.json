@@ -411,12 +411,12 @@
     "gettingStartedDesc": "İlk webhook'unuzu 5 dakikadan kısa sürede gönderin.",
     "quickStart": "Hızlı Başlangıç",
     "getApiKey": "1. API anahtarınızı alın",
-    "getApiKeyDesc": "hookrelay.is-a.dev'da kaydolun ve API anahtarınızı panel ayarlarından alın.",
+    "getApiKeyDesc": "hooksniff.is-a.dev'da kaydolun ve API anahtarınızı panel ayarlarından alın.",
     "createEndpoint": "2. Bir endpoint oluşturun",
     "createEndpointDesc": "Webhook'ların teslim edilmesini istediğiniz URL'yi kaydedin:",
     "sendWebhook": "3. Bir webhook gönderin",
     "verifySignature": "4. İmzayı doğrulayın",
-    "verifySignatureDesc": "Her webhook, X-Hookrelay-Signature başlığında bir HMAC-SHA256 imzası içerir:",
+    "verifySignatureDesc": "Her webhook, X-HookSniff-Signature başlığında bir HMAC-SHA256 imzası içerir:",
     "authentication": "Kimlik Doğrulama",
     "authDesc": "Tüm API istekleri, Authorization başlığında Bearer token ile kimlik doğrulaması gerektirir.",
     "keepSecret": "API anahtarınızı gizli tutun. İstemci tarafı kodu, herkese açık depolar veya tarayıcı isteklerinde asla ifşa etmeyin.",
@@ -425,7 +425,7 @@
     "requestsPerMin": "İstek/dakika",
     "webhooksPerMonth": "Webhook/ay",
     "apiReference": "API Referansı",
-    "apiReferenceDesc": "Hookrelay REST API'nin eksiksiz referansı.",
+    "apiReferenceDesc": "HookSniff REST API'nin eksiksiz referansı.",
     "baseUrl": "Temel URL",
     "endpointsApi": "Endpoint'ler",
     "webhooksApi": "Webhook'lar",
@@ -660,7 +660,7 @@
       "blog": "Blog",
       "terms": "Şartlar",
       "privacy": "Gizlilik",
-      "copyright": "© 2026 Hookrelay. Tüm hakları saklıdır."
+      "copyright": "© 2026 HookSniff. Tüm hakları saklıdır."
     }
   },
   "apiKeys": {

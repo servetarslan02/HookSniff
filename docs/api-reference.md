@@ -1,6 +1,6 @@
 # HookRelay API Reference
 
-**Base URL:** `https://api.hookrelay.is-a.dev/v1`
+**Base URL:** `https://api.hooksniff.is-a.dev/v1`
 **Local:** `http://localhost:3000/v1`
 
 **Authentication:** All endpoints (except `/auth/*` and `/health`) require:
@@ -740,9 +740,9 @@ When HookRelay delivers a webhook to your endpoint:
 ```http
 POST https://myapp.com/webhook HTTP/1.1
 Content-Type: application/json
-X-Hookrelay-Signature: sha256=abc123def456...
-X-Hookrelay-Delivery-Id: wh_xyz789
-X-Hookrelay-Attempt: 1
+X-HookSniff-Signature: sha256=abc123def456...
+X-HookSniff-Delivery-Id: wh_xyz789
+X-HookSniff-Attempt: 1
 
 {
   "event": "order.created",
@@ -756,7 +756,7 @@ X-Hookrelay-Attempt: 1
 
 ### Signature Verification
 
-Verify the `X-Hookrelay-Signature` header using HMAC-SHA256:
+Verify the `X-HookSniff-Signature` header using HMAC-SHA256:
 
 ```javascript
 const crypto = require('crypto');
@@ -871,7 +871,7 @@ No authentication required.
 ```json
 {
   "status": "ok",
-  "service": "hookrelay-api",
+  "service": "hooksniff-api",
   "version": "0.1.0"
 }
 ```
