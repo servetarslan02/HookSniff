@@ -701,6 +701,46 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 30: Migration 029 — payment_transactions table
+    // Required by billing webhook handlers (polar.rs, iyzico.rs, stripe.rs)
+    run_migration(
+        pool,
+        "029_payment_transactions",
+        r#"
+        CREATE TABLE IF NOT EXISTS payment_transactions (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            provider TEXT NOT NULL DEFAULT 'stripe',
+            provider_tx_id TEXT,
+            amount_cents BIGINT NOT NULL DEFAULT 0,
+            currency TEXT NOT NULL DEFAULT 'USD',
+            status TEXT NOT NULL DEFAULT 'completed',
+            plan TEXT NOT NULL DEFAULT 'free',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_payment_transactions_customer ON payment_transactions(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_payment_transactions_provider ON payment_transactions(provider, provider_tx_id);
+        "#,
+    )
+    .await?;
+
+    // Step 31: Migration 030 — ensure customer payment columns exist
+    // Some columns may be missing from older schemas
+    run_migration(
+        pool,
+        "030_customer_payment_columns",
+        r#"
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS payment_provider TEXT NOT NULL DEFAULT 'stripe';
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_customer_id TEXT;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_subscription_id TEXT;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_customer_id TEXT;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_subscription_id TEXT;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
