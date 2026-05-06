@@ -591,10 +591,34 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
-    // Step 24: Migration 023 — LISTEN/NOTIFY trigger for webhook_queue
+    // Step 24: Migration 023 — updated_at column on webhook_queue (for zombie reaper)
     run_migration(
         pool,
-        "023_listen_notify",
+        "023_updated_at_webhook_queue",
+        r#"
+        ALTER TABLE webhook_queue ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+        CREATE OR REPLACE FUNCTION update_updated_at_column()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.updated_at = now();
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        DROP TRIGGER IF EXISTS trg_webhook_queue_updated_at ON webhook_queue;
+        CREATE TRIGGER trg_webhook_queue_updated_at
+            BEFORE UPDATE ON webhook_queue
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+        "#,
+    )
+    .await?;
+
+    // Step 25: Migration 024 — LISTEN/NOTIFY trigger for webhook_queue
+    run_migration(
+        pool,
+        "024_listen_notify",
         r#"
         CREATE OR REPLACE FUNCTION notify_new_webhook()
         RETURNS TRIGGER AS $$
@@ -616,10 +640,10 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
-    // Step 25: Migration 024 — trace_id columns for OpenTelemetry distributed tracing
+    // Step 26: Migration 025 — trace_id columns for OpenTelemetry distributed tracing
     run_migration(
         pool,
-        "024_trace_id",
+        "025_trace_id",
         r#"
         ALTER TABLE webhook_queue ADD COLUMN IF NOT EXISTS trace_id VARCHAR(64);
         ALTER TABLE delivery_attempts ADD COLUMN IF NOT EXISTS trace_id VARCHAR(64);
