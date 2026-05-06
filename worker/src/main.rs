@@ -378,8 +378,9 @@ async fn process_pending(
                     .await?;
 
                     // Update delivery status
-                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed' WHERE id = $1")
+                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1")
                         .bind(delivery_id)
+                        .bind(format!("HTTP {}", status_code))
                         .execute(pool)
                         .await?;
 
@@ -440,8 +441,9 @@ async fn process_pending(
                     .execute(pool)
                     .await?;
 
-                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed' WHERE id = $1")
+                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1")
                         .bind(delivery_id)
+                        .bind(&error_msg)
                         .execute(pool)
                         .await?;
 
