@@ -425,7 +425,7 @@ curl -X POST https://api.hookrelay.io/v1/webhooks \\
             },
             {
               name: 'Business',
-              price: '$199',
+              price: '$149',
               period: '/month',
               features: ['500,000 webhooks/month', '10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', 'Custom integrations'],
               cta: 'Contact sales',

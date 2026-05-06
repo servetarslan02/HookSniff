@@ -7,6 +7,7 @@ interface User {
   email: string;
   name?: string;
   plan: 'free' | 'pro' | 'business';
+  is_admin?: boolean;
 }
 
 interface AuthContextType {
@@ -62,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(err.error?.message || 'Login failed');
     }
     const data = await res.json();
-    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan };
+    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
     persistAuth(data.token, u, data.customer.api_key);
   }, [persistAuth]);
 
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(err.error?.message || 'Registration failed');
     }
     const data = await res.json();
-    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan };
+    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
     persistAuth(data.token, u, data.customer.api_key);
   }, [persistAuth]);
 

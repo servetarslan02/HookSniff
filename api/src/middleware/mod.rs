@@ -116,6 +116,24 @@ pub async fn jwt_auth_middleware(
     Ok(next.run(req).await)
 }
 
+/// Admin-only middleware — must be layered AFTER auth_middleware.
+/// Checks that the authenticated customer has `is_admin: true`.
+pub async fn admin_middleware(
+    req: Request,
+    next: Next,
+) -> Result<Response, AppError> {
+    let customer = req
+        .extensions()
+        .get::<Customer>()
+        .ok_or(AppError::Unauthorized)?;
+
+    if !customer.is_admin {
+        return Err(AppError::Forbidden("Admin access required".into()));
+    }
+
+    Ok(next.run(req).await)
+}
+
 pub fn hash_api_key(key: &str) -> String {
     use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();

@@ -109,6 +109,7 @@ async fn main() -> Result<()> {
                     .allow_methods([
                         axum::http::Method::GET,
                         axum::http::Method::POST,
+                        axum::http::Method::PUT,
                         axum::http::Method::DELETE,
                         axum::http::Method::OPTIONS,
                     ])
@@ -142,6 +143,7 @@ async fn main() -> Result<()> {
                     .allow_methods([
                         axum::http::Method::GET,
                         axum::http::Method::POST,
+                        axum::http::Method::PUT,
                         axum::http::Method::DELETE,
                         axum::http::Method::OPTIONS,
                     ])

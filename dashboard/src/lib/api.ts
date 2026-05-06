@@ -158,6 +158,82 @@ export interface StatsResponse {
   endpoints_count: number;
 }
 
+// Admin types
+export interface AdminStatsResponse {
+  total_users: number;
+  total_deliveries: number;
+  total_revenue: number;
+  active_users_today: number;
+  users_by_plan: { plan: string; count: number }[];
+  recent_signups: { id: string; email: string; name?: string; plan: string; created_at: string }[];
+}
+
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  name?: string;
+  plan: string;
+  status: 'active' | 'banned';
+  created_at: string;
+}
+
+export interface AdminUserDetail {
+  user: AdminUser;
+  endpoints: { id: string; url: string; is_active: boolean; created_at: string }[];
+  recent_deliveries: Delivery[];
+  usage_stats: { total_deliveries: number; success_rate: number; endpoints_count: number };
+}
+
+export interface RevenueResponse {
+  monthly_revenue: { month: string; revenue: number }[];
+  revenue_by_plan: { plan: string; revenue: number; count: number }[];
+  mrr: number;
+  churn_rate: number;
+}
+
+// Team types
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  created_at: string;
+  member_count?: number;
+}
+
+export interface TeamMember {
+  id: string;
+  user_id: string;
+  email: string;
+  name?: string;
+  role: 'owner' | 'admin' | 'member';
+  joined_at: string;
+}
+
+// Notification types
+export interface Notification {
+  id: string;
+  type: 'webhook_failed' | 'alert' | 'system' | 'billing';
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+  link?: string;
+}
+
+export interface NotificationListResponse {
+  notifications: Notification[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
 // Analytics types
 export interface TimeBucket {
   timestamp: string;
@@ -190,6 +266,82 @@ export interface LatencyTrendResponse {
   buckets: LatencyBucket[];
   overall_avg_ms: number;
 }
+
+// Admin API
+export const adminApi = {
+  getStats: (token: string) =>
+    apiFetch<AdminStatsResponse>('/admin/stats', { token }),
+
+  listUsers: (token: string, params?: { page?: number; search?: string; plan?: string; status?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    if (params?.plan) searchParams.set('plan', params.plan);
+    if (params?.status) searchParams.set('status', params.status);
+    const qs = searchParams.toString();
+    return apiFetch<AdminUsersResponse>(`/admin/users${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  getUserDetail: (token: string, id: string) =>
+    apiFetch<AdminUserDetail>(`/admin/users/${id}`, { token }),
+
+  updateUserPlan: (token: string, id: string, plan: string) =>
+    apiFetch<{ success: boolean }>(`/admin/users/${id}/plan`, { method: 'PUT', body: { plan }, token }),
+
+  updateUserStatus: (token: string, id: string, status: 'active' | 'banned') =>
+    apiFetch<{ success: boolean }>(`/admin/users/${id}/status`, { method: 'PUT', body: { status }, token }),
+
+  getRevenue: (token: string) =>
+    apiFetch<RevenueResponse>('/admin/revenue', { token }),
+};
+
+// Team API
+export const teamsApi = {
+  list: (token: string) =>
+    apiFetch<Team[]>('/teams', { token }),
+
+  create: (token: string, data: { name: string; description?: string }) =>
+    apiFetch<Team>('/teams', { method: 'POST', body: data, token }),
+
+  get: (token: string, id: string) =>
+    apiFetch<Team>(`/teams/${id}`, { token }),
+
+  listMembers: (token: string, teamId: string) =>
+    apiFetch<TeamMember[]>(`/teams/${teamId}/members`, { token }),
+
+  inviteMember: (token: string, teamId: string, data: { email: string; role: string }) =>
+    apiFetch<{ success: boolean }>(`/teams/${teamId}/members`, { method: 'POST', body: data, token }),
+
+  removeMember: (token: string, teamId: string, memberId: string) =>
+    apiFetch<{ success: boolean }>(`/teams/${teamId}/members/${memberId}`, { method: 'DELETE', token }),
+
+  updateRole: (token: string, teamId: string, memberId: string, role: string) =>
+    apiFetch<{ success: boolean }>(`/teams/${teamId}/members/${memberId}/role`, { method: 'PUT', body: { role }, token }),
+};
+
+// Notification API
+export const notificationsApi = {
+  list: (token: string, params?: { page?: number; type?: string; read?: boolean }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.type) searchParams.set('type', params.type);
+    if (params?.read !== undefined) searchParams.set('read', params.read.toString());
+    const qs = searchParams.toString();
+    return apiFetch<NotificationListResponse>(`/notifications${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  getUnreadCount: (token: string) =>
+    apiFetch<{ count: number }>('/notifications/unread-count', { token }),
+
+  markAsRead: (token: string, id: string) =>
+    apiFetch<{ success: boolean }>(`/notifications/${id}/read`, { method: 'PUT', token }),
+
+  markAllAsRead: (token: string) =>
+    apiFetch<{ success: boolean }>('/notifications/read-all', { method: 'PUT', token }),
+
+  deleteNotification: (token: string, id: string) =>
+    apiFetch<{ success: boolean }>(`/notifications/${id}`, { method: 'DELETE', token }),
+};
 
 // Analytics API
 export const analyticsApi = {

@@ -1,36 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
-import { AuthGuard } from '@/components/AuthGuard';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { NotificationCenter } from '@/components/NotificationCenter';
 
-const navigation = [
-  { name: 'Overview', href: '/dashboard', icon: '📊' },
-  { name: 'Endpoints', href: '/dashboard/endpoints', icon: '🔗' },
-  { name: 'Deliveries', href: '/dashboard/deliveries', icon: '📦' },
-  { name: 'Logs', href: '/dashboard/logs', icon: '📋' },
-  { name: 'Search', href: '/dashboard/search', icon: '🔍' },
-  { name: 'Health', href: '/dashboard/health', icon: '💓' },
-  { name: 'Alerts', href: '/dashboard/alerts', icon: '🔔' },
-  { name: 'API Keys', href: '/dashboard/api-keys', icon: '🔑' },
-  { name: 'Playground', href: '/dashboard/playground', icon: '🧪' },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: '📈' },
-  { name: 'Team', href: '/dashboard/team', icon: '👥' },
-  { name: 'Notifications', href: '/dashboard/notifications', icon: '🔔' },
-  { name: 'Billing', href: '/dashboard/billing', icon: '💳' },
-  { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
+const adminNavigation = [
+  { name: 'Overview', href: '/admin', icon: '📊' },
+  { name: 'Users', href: '/admin/users', icon: '👥' },
+  { name: 'Revenue', href: '/admin/revenue', icon: '💰' },
+  { name: 'System', href: '/admin/system', icon: '🖥️' },
+  { name: 'Settings', href: '/admin/settings', icon: '⚙️' },
 ];
 
-function DashboardShell({ children }: { children: React.ReactNode }) {
+function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Admin auth guard
+  useEffect(() => {
+    if (user && !user.is_admin) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  if (!user?.is_admin) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Access Denied</h2>
+          <p className="text-gray-500 dark:text-slate-400 mb-4">You don&apos;t have admin privileges.</p>
+          <Link
+            href="/dashboard"
+            className="inline-flex px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition"
+          >
+            Back to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
@@ -50,17 +64,20 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-800">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
-            🪝
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-purple-600 flex items-center justify-center text-white text-lg">
+            ⚡
           </div>
           <div>
-            <div className="font-bold text-gray-900 dark:text-white">Hookrelay</div>
-            <div className="text-xs text-gray-500 dark:text-slate-400">Webhook Dashboard</div>
+            <div className="font-bold text-gray-900 dark:text-white">Admin Panel</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">HookRelay Management</div>
           </div>
         </div>
         <nav className="px-3 py-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href;
+          {adminNavigation.map((item) => {
+            const isActive =
+              item.href === '/admin'
+                ? pathname === '/admin'
+                : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.name}
@@ -69,7 +86,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
                   isActive
-                    ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400'
+                    ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
                     : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                 )}
               >
@@ -78,17 +95,16 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-          {user?.is_admin && (
-            <Link
-              href="/admin"
-              onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
-            >
-              <span className="text-lg">⚡</span>
-              Admin Panel
-            </Link>
-          )}
         </nav>
+        <div className="border-t border-gray-200 dark:border-slate-800 mx-3 mt-2 pt-3">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
+          >
+            <span className="text-lg">←</span>
+            Back to Dashboard
+          </Link>
+        </div>
         <div className="absolute bottom-4 left-0 right-0 px-6">
           <ThemeToggle className="w-full" />
         </div>
@@ -99,7 +115,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Top bar */}
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
           <div className="flex items-center gap-3">
-            {/* Mobile hamburger */}
             <button
               onClick={() => setSidebarOpen(true)}
               className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
@@ -109,14 +124,18 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {navigation.find((n) => n.href === pathname)?.name || 'Dashboard'}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {adminNavigation.find((n) => n.href === pathname)?.name || 'Admin'}
+              </h1>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">
+                Admin
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
-            <NotificationCenter />
             <div className="text-sm text-gray-500 dark:text-slate-400 hidden sm:block">
-              {user?.email || 'User'}
+              {user?.email || 'Admin'}
             </div>
             <button
               onClick={() => { logout(); router.push('/login'); }}
@@ -134,14 +153,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <AuthGuard>
-      <DashboardShell>{children}</DashboardShell>
-    </AuthGuard>
-  );
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return <AdminShell>{children}</AdminShell>;
 }
