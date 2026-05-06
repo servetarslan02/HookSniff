@@ -1,5 +1,5 @@
 {
-    "name": "hookrelay/hookrelay-php",
+    "name": "hooksniff/hooksniff-php",
     "description": "Official PHP client for HookRelay webhook delivery service",
     "type": "library",
     "version": "0.2.0",
@@ -7,7 +7,7 @@
     "authors": [
         {
             "name": "HookRelay",
-            "email": "support@hookrelay.is-a.dev"
+            "email": "support@hooksniff.is-a.dev"
         }
     ],
     "require": {
@@ -21,6 +21,6 @@
             "HookRelay\\": "src/"
         }
     },
-    "keywords": ["webhooks", "hookrelay", "sdk", "delivery"],
-    "homepage": "https://github.com/hookrelay/hookrelay-php"
+    "keywords": ["webhooks", "hooksniff", "sdk", "delivery"],
+    "homepage": "https://github.com/hooksniff/hooksniff-php"
 }

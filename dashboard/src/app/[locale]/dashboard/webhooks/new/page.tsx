@@ -13,7 +13,7 @@ export default function SendWebhookPage() {
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [endpointId, setEndpointId] = useState('');
   const [eventType, setEventType] = useState('');
-  const [payload, setPayload] = useState('{\n  "message": "Hello from Hookrelay!"\n}');
+  const [payload, setPayload] = useState('{\n  "message": "Hello from HookSniff!"\n}');
   const [sending, setSending] = useState(false);
   const [response, setResponse] = useState<any>(null);
   const [jsonError, setJsonError] = useState('');

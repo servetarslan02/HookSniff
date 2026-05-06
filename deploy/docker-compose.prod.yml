@@ -13,7 +13,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.api.prod
-    container_name: hookrelay-api
+    container_name: hooksniff-api
     ports:
       - "3000:3000"
     env_file:
@@ -21,7 +21,7 @@ services:
     environment:
       APP_ENV: production
       PORT: "3000"
-      RUST_LOG: "info,hookrelay=info"
+      RUST_LOG: "info,hooksniff=info"
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:3000/health"]
       interval: 15s
@@ -43,7 +43,7 @@ services:
         max-size: "10m"
         max-file: "3"
     networks:
-      - hookrelay
+      - hooksniff
 
   # ── HookRelay Worker ──
   # Webhook teslimatı, retry mekanizması, fan-out
@@ -51,11 +51,11 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.worker.prod
-    container_name: hookrelay-worker
+    container_name: hooksniff-worker
     env_file:
       - .env
     environment:
-      RUST_LOG: "info,hookrelay=info"
+      RUST_LOG: "info,hooksniff=info"
     restart: unless-stopped
     deploy:
       resources:
@@ -71,11 +71,11 @@ services:
         max-size: "10m"
         max-file: "3"
     networks:
-      - hookrelay
+      - hooksniff
     depends_on:
       api:
         condition: service_healthy
 
 networks:
-  hookrelay:
+  hooksniff:
     driver: bridge

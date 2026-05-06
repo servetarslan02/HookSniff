@@ -124,7 +124,7 @@ impl Config {
                 .context("PORT must be a number")?,
             database_url: std::env::var("DATABASE_URL")
                 .unwrap_or_else(|_| {
-                    "postgresql://hookrelay:hookrelay_local@localhost:5432/hookrelay?sslmode=disable".into()
+                    "postgresql://hooksniff:hooksniff_local@localhost:5432/hooksniff?sslmode=disable".into()
                 }),
             hmac_secret,
             max_webhook_payload_bytes: std::env::var("MAX_PAYLOAD_BYTES")

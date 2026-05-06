@@ -1,11 +1,11 @@
 # HookRelay Python SDK
 
-Official Python client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official Python client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
 ```bash
-pip install hookrelay
+pip install hooksniff
 ```
 
 Or install from source:
@@ -18,7 +18,7 @@ pip install -e .
 ## Quick Start
 
 ```python
-from hookrelay import HookRelayClient
+from hooksniff import HookRelayClient
 
 # Initialize client
 client = HookRelayClient(api_key="hr_live_your_api_key_here")
@@ -81,8 +81,8 @@ for err in results.errors:
 Configure custom retry behavior when creating endpoints:
 
 ```python
-from hookrelay import HookRelayClient
-from hookrelay.models import RetryPolicy
+from hooksniff import HookRelayClient
+from hooksniff.models import RetryPolicy
 
 client = HookRelayClient(api_key="hr_live_...")
 
@@ -130,12 +130,12 @@ with open("webhooks.csv", "w") as f:
 Verify incoming webhook signatures in your handler:
 
 ```python
-from hookrelay import verify_signature
+from hooksniff import verify_signature
 
 # In your webhook handler
 def handle_webhook(request):
     payload = request.body.decode("utf-8")
-    signature = request.headers.get("X-Hookrelay-Signature", "")
+    signature = request.headers.get("X-HookSniff-Signature", "")
     secret = "whsec_your_endpoint_signing_secret"
 
     if not verify_signature(payload, signature, secret):
@@ -150,7 +150,7 @@ def handle_webhook(request):
 ## Error Handling
 
 ```python
-from hookrelay import (
+from hooksniff import (
     HookRelayClient,
     AuthenticationError,
     NotFoundError,
@@ -180,7 +180,7 @@ except PayloadTooLargeError:
 
 ## API Reference
 
-### `HookRelayClient(api_key, base_url="https://api.hookrelay.is-a.dev/v1", timeout=30)`
+### `HookRelayClient(api_key, base_url="https://api.hooksniff.is-a.dev/v1", timeout=30)`
 
 Main client class.
 

@@ -11,17 +11,17 @@ services:
   # ── PostgreSQL ──
   postgres:
     image: postgres:16-alpine
-    container_name: hookrelay-db
+    container_name: hooksniff-db
     environment:
-      POSTGRES_USER: hookrelay
-      POSTGRES_PASSWORD: hookrelay_local
-      POSTGRES_DB: hookrelay
+      POSTGRES_USER: hooksniff
+      POSTGRES_PASSWORD: hooksniff_local
+      POSTGRES_DB: hooksniff
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hookrelay -d hookrelay"]
+      test: ["CMD-SHELL", "pg_isready -U hooksniff -d hooksniff"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -32,16 +32,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    container_name: hookrelay-api
+    container_name: hooksniff-api
     ports:
       - "3000:3000"
     environment:
       APP_ENV: development
       PORT: "3000"
-      DATABASE_URL: "postgresql://hookrelay:hookrelay_local@postgres:5432/hookrelay?sslmode=disable"
+      DATABASE_URL: "postgresql://hooksniff:hooksniff_local@postgres:5432/hooksniff?sslmode=disable"
       HMAC_SECRET: "local-dev-hmac-secret-not-for-production"
       JWT_SECRET: "local-dev-jwt-secret-not-for-production"
-      RUST_LOG: "info,hookrelay=debug"
+      RUST_LOG: "info,hooksniff=debug"
       MAX_PAYLOAD_BYTES: "1048576"
       RETENTION_DAYS: "30"
       WEBHOOK_FORMAT: "standard"
@@ -56,10 +56,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker
-    container_name: hookrelay-worker
+    container_name: hooksniff-worker
     environment:
-      DATABASE_URL: "postgresql://hookrelay:hookrelay_local@postgres:5432/hookrelay?sslmode=disable"
-      RUST_LOG: "info,hookrelay=debug"
+      DATABASE_URL: "postgresql://hooksniff:hooksniff_local@postgres:5432/hooksniff?sslmode=disable"
+      RUST_LOG: "info,hooksniff=debug"
       MAX_ATTEMPTS: "3"
     depends_on:
       postgres:
@@ -71,7 +71,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dashboard
-    container_name: hookrelay-dashboard
+    container_name: hooksniff-dashboard
     ports:
       - "3001:3001"
     environment:

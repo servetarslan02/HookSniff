@@ -1,15 +1,15 @@
 # HookRelay Elixir SDK
 
-Official Elixir client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official Elixir client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
-Add `hookrelay` to your list of dependencies in `mix.exs`:
+Add `hooksniff` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:hookrelay, "~> 0.2.0"}
+    {:hooksniff, "~> 0.2.0"}
   ]
 end
 ```

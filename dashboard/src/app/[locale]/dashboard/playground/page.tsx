@@ -125,7 +125,7 @@ interface PlaygroundRequest {
   headers?: Record<string, string>;
 }
 
-const HISTORY_KEY = 'hookrelay_playground_history';
+const HISTORY_KEY = 'hooksniff_playground_history';
 const MAX_HISTORY = 10;
 
 function loadHistory(): PlaygroundRequest[] {

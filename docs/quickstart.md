@@ -2,7 +2,7 @@
 
 ## 1. Get Your API Key
 
-Sign up at [hookrelay.is-a.dev](https://hookrelay.is-a.dev) and get your API key.
+Sign up at [hooksniff.is-a.dev](https://hooksniff.is-a.dev) and get your API key.
 
 ```bash
 export HOOKRELAY_KEY="hr_live_your_key_here"
@@ -11,7 +11,7 @@ export HOOKRELAY_KEY="hr_live_your_key_here"
 ## 2. Create an Endpoint
 
 ```bash
-curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \
+curl -X POST https://api.hooksniff.is-a.dev/v1/endpoints \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://myapp.com/webhook"}'
@@ -22,7 +22,7 @@ Save the returned `id`.
 ## 3. Send a Webhook
 
 ```bash
-curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \
+curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -35,19 +35,19 @@ curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \
 ## 4. Check Status
 
 ```bash
-curl https://api.hookrelay.is-a.dev/v1/webhooks/YOUR_DELIVERY_ID \
+curl https://api.hooksniff.is-a.dev/v1/webhooks/YOUR_DELIVERY_ID \
   -H "Authorization: Bearer $HOOKRELAY_KEY"
 ```
 
 ## 5. Verify Signatures (Recommended)
 
-In your webhook handler, verify the `X-Hookrelay-Signature` header:
+In your webhook handler, verify the `X-HookSniff-Signature` header:
 
 ```javascript
 const crypto = require('crypto');
 
 app.post('/webhook', (req, res) => {
-  const signature = req.headers['x-hookrelay-signature'];
+  const signature = req.headers['x-hooksniff-signature'];
   const secret = 'whsec_your_endpoint_secret';
 
   const expected = 'sha256=' + crypto

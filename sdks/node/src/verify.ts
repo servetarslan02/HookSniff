@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { WebhookVerifier } from '@hookrelay/sdk/verify';
+ * import { WebhookVerifier } from '@hooksniff/sdk/verify';
  *
  * const verifier = new WebhookVerifier('whsec_...');
  *
@@ -185,7 +185,7 @@ export class WebhookVerifier {
  *
  * @example
  * ```typescript
- * import { verifyWebhook } from '@hookrelay/sdk/verify';
+ * import { verifyWebhook } from '@hooksniff/sdk/verify';
  *
  * app.post('/webhook', (req, res) => {
  *   const result = verifyWebhook('whsec_...', req.body, req.headers);

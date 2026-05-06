@@ -24,7 +24,7 @@ impl WorkerConfig {
         Ok(Self {
             database_url: std::env::var("DATABASE_URL")
                 .unwrap_or_else(|_| {
-                    "postgresql://hookrelay:hookrelay_local@localhost:5432/hookrelay?sslmode=disable".into()
+                    "postgresql://hooksniff:hooksniff_local@localhost:5432/hooksniff?sslmode=disable".into()
                 }),
             otel_enabled,
             otel_exporter_otlp_endpoint,

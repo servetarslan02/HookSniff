@@ -24,13 +24,13 @@ jobs:
         include:
           - service: api
             dockerfile: Dockerfile.api
-            image: hookrelay-api
+            image: hooksniff-api
           - service: worker
             dockerfile: Dockerfile.worker
-            image: hookrelay-worker
+            image: hooksniff-worker
           - service: dashboard
             dockerfile: Dockerfile.dashboard
-            image: hookrelay-dashboard
+            image: hooksniff-dashboard
     steps:
       - uses: actions/checkout@v4
 
@@ -81,14 +81,14 @@ jobs:
     #     run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
     #   - name: Deploy to cluster
     #     run: |
-    #       kubectl set image deployment/hookrelay-api \
-    #         api=${{ env.IMAGE_PREFIX }}/hookrelay-api:sha-${GITHUB_SHA::7} \
-    #         -n hookrelay
-    #       kubectl set image deployment/hookrelay-worker \
-    #         worker=${{ env.IMAGE_PREFIX }}/hookrelay-worker:sha-${GITHUB_SHA::7} \
-    #         -n hookrelay
-    #       kubectl rollout status deployment/hookrelay-api -n hookrelay
-    #       kubectl rollout status deployment/hookrelay-worker -n hookrelay
+    #       kubectl set image deployment/hooksniff-api \
+    #         api=${{ env.IMAGE_PREFIX }}/hooksniff-api:sha-${GITHUB_SHA::7} \
+    #         -n hooksniff
+    #       kubectl set image deployment/hooksniff-worker \
+    #         worker=${{ env.IMAGE_PREFIX }}/hooksniff-worker:sha-${GITHUB_SHA::7} \
+    #         -n hooksniff
+    #       kubectl rollout status deployment/hooksniff-api -n hooksniff
+    #       kubectl rollout status deployment/hooksniff-worker -n hooksniff
     #
     # Example: Docker Compose on VPS
     # steps:
@@ -99,7 +99,7 @@ jobs:
     #       username: ${{ secrets.DEPLOY_USER }}
     #       key: ${{ secrets.DEPLOY_KEY }}
     #       script: |
-    #         cd /opt/hookrelay
+    #         cd /opt/hooksniff
     #         docker compose -f docker-compose.prod.yml pull
     #         docker compose -f docker-compose.prod.yml up -d
     steps:
@@ -107,4 +107,4 @@ jobs:
         run: |
           echo "⚠️  Configure your deployment target in this workflow."
           echo "See comments above for Kubernetes and Docker Compose examples."
-          echo "Images pushed: ghcr.io/${{ github.repository_owner }}/hookrelay-{api,worker,dashboard}"
+          echo "Images pushed: ghcr.io/${{ github.repository_owner }}/hooksniff-{api,worker,dashboard}"

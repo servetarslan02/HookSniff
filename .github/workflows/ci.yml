@@ -46,11 +46,11 @@ jobs:
         image: postgres:16-alpine
         ports: ['5432:5432']
         env:
-          POSTGRES_USER: hookrelay
-          POSTGRES_PASSWORD: hookrelay_test
-          POSTGRES_DB: hookrelay
+          POSTGRES_USER: hooksniff
+          POSTGRES_PASSWORD: hooksniff_test
+          POSTGRES_DB: hooksniff
         options: >-
-          --health-cmd="pg_isready -U hookrelay -d hookrelay"
+          --health-cmd="pg_isready -U hooksniff -d hooksniff"
           --health-interval=5s
           --health-timeout=3s
           --health-retries=10
@@ -67,7 +67,7 @@ jobs:
       - name: Run tests
         run: cargo test --workspace
         env:
-          DATABASE_URL: postgresql://hookrelay:hookrelay_test@localhost:5432/hookrelay?sslmode=disable
+          DATABASE_URL: postgresql://hooksniff:hooksniff_test@localhost:5432/hooksniff?sslmode=disable
 
   # ──────────────────────────────────────────────
   # Build Rust binaries
@@ -86,12 +86,12 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-release-
 
       - name: Build API
-        run: cargo build --release -p hookrelay-api
+        run: cargo build --release -p hooksniff-api
 
       - uses: actions/upload-artifact@v4
         with:
           name: api-binary
-          path: target/release/hookrelay-api
+          path: target/release/hooksniff-api
 
   build-worker:
     runs-on: ubuntu-latest
@@ -107,12 +107,12 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-release-
 
       - name: Build Worker
-        run: cargo build --release -p hookrelay-worker
+        run: cargo build --release -p hooksniff-worker
 
       - uses: actions/upload-artifact@v4
         with:
           name: worker-binary
-          path: target/release/hookrelay-worker
+          path: target/release/hooksniff-worker
 
   # ──────────────────────────────────────────────
   # Dashboard (Next.js)

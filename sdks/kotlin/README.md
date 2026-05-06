@@ -1,6 +1,6 @@
 # HookRelay Kotlin SDK
 
-Official Kotlin client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official Kotlin client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -8,7 +8,7 @@ Official Kotlin client for the [HookRelay](https://hookrelay.is-a.dev) webhook d
 
 ```kotlin
 dependencies {
-    implementation("com.hookrelay:hookrelay:0.2.0")
+    implementation("com.hooksniff:hooksniff:0.2.0")
 }
 ```
 
@@ -16,7 +16,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'com.hookrelay:hookrelay:0.2.0'
+    implementation 'com.hooksniff:hooksniff:0.2.0'
 }
 ```
 
@@ -24,8 +24,8 @@ dependencies {
 
 ```xml
 <dependency>
-    <groupId>com.hookrelay</groupId>
-    <artifactId>hookrelay</artifactId>
+    <groupId>com.hooksniff</groupId>
+    <artifactId>hooksniff</artifactId>
     <version>0.2.0</version>
 </dependency>
 ```
@@ -33,7 +33,7 @@ dependencies {
 ## Usage
 
 ```kotlin
-import com.hookrelay.*
+import com.hooksniff.*
 
 fun main() {
     val client = HookRelayClient("hr_live_...")

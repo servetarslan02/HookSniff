@@ -1,5 +1,5 @@
 [package]
-name = "hookrelay-worker"
+name = "hooksniff-worker"
 version.workspace = true
 edition.workspace = true
 

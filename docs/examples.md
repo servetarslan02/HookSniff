@@ -6,14 +6,14 @@ Forward Stripe payment events to Slack.
 
 ```bash
 # 1. Create endpoint pointing to Slack incoming webhook
-curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \
+curl -X POST https://api.hooksniff.is-a.dev/v1/endpoints \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK", "description": "Stripe → Slack"}'
 
-# 2. In your Stripe webhook handler, forward to Hookrelay
-# (Your app receives Stripe webhook, then sends to Hookrelay)
-curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \
+# 2. In your Stripe webhook handler, forward to HookSniff
+# (Your app receives Stripe webhook, then sends to HookSniff)
+curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -29,12 +29,12 @@ Trigger deployments on push events.
 
 ```bash
 # 1. Create endpoint for your deploy service
-curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \
+curl -X POST https://api.hooksniff.is-a.dev/v1/endpoints \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://deploy.myapp.com/api/trigger", "description": "GitHub push → Deploy"}'
 
-# 2. GitHub webhook sends to Hookrelay → Hookrelay delivers to your deploy service
+# 2. GitHub webhook sends to HookSniff → HookSniff delivers to your deploy service
 ```
 
 ## Node.js Handler
@@ -49,7 +49,7 @@ app.use(express.json());
 const WEBHOOK_SECRET = 'whsec_your_endpoint_secret';
 
 function verifySignature(req) {
-  const signature = req.headers['x-hookrelay-signature'];
+  const signature = req.headers['x-hooksniff-signature'];
   if (!signature) return false;
 
   const expected = 'sha256=' + crypto
@@ -109,7 +109,7 @@ def verify_signature(payload: str, signature: str) -> bool:
 
 @app.route('/webhook', methods=['POST'])
 def handle_webhook():
-    signature = request.headers.get('X-Hookrelay-Signature', '')
+    signature = request.headers.get('X-HookSniff-Signature', '')
     if not verify_signature(request.get_data(as_text=True), signature):
         return jsonify({'error': 'Invalid signature'}), 401
 

@@ -173,7 +173,7 @@ function DashboardPreview() {
           </div>
           <div className="flex-1 mx-4">
             <div className="bg-white dark:bg-slate-700 rounded-md px-3 py-1 text-xs text-gray-500 dark:text-slate-400 font-mono">
-              hookrelay.is-a.dev
+              hooksniff.is-a.dev
             </div>
           </div>
         </div>
@@ -260,7 +260,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">🪝</div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Hookrelay</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </div>
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-4">
@@ -340,13 +340,13 @@ export default function Home() {
           </div>
           <pre className="p-6 text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-900">
             <code>{`# Create an endpoint
-curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \\
+curl -X POST https://api.hooksniff.is-a.dev/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"url": "https://myapp.com/webhook"}'
 
 # Send a webhook
-curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \\
+curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"endpoint_id": "ep_abc123", "event": "order.created", "data": {"order_id": "12345"}}'`}</code>
@@ -419,10 +419,10 @@ curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \\
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xl">🪝</span>
-            <span className="font-semibold text-gray-900 dark:text-white">Hookrelay</span>
+            <span className="font-semibold text-gray-900 dark:text-white">HookSniff</span>
           </div>
           <div className="flex gap-6 text-sm text-gray-500 dark:text-slate-400">
-            <a href="https://github.com/hookrelay" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('github')}</a>
+            <a href="https://github.com/hooksniff" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('github')}</a>
             <Link href="/docs" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('docs')}</Link>
             <Link href="/status" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('status')}</Link>
             <a href="#" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('blog')}</a>

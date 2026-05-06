@@ -10,7 +10,7 @@ interface Step {
   ctaAction?: () => void;
 }
 
-const STORAGE_KEY = 'hookrelay_onboarding_completed';
+const STORAGE_KEY = 'hooksniff_onboarding_completed';
 
 function CheckIcon() {
   return (
@@ -90,7 +90,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
 
   const steps: Step[] = [
     {
-      title: 'Welcome to Hookrelay! 🪝',
+      title: 'Welcome to HookSniff! 🪝',
       description: 'You\'re all set up. Let\'s walk through the basics so you can start sending webhooks in minutes.',
       illustration: <WelcomeIllustration />,
       cta: 'Get started',

@@ -1,6 +1,6 @@
 # HookRelay Swift SDK
 
-Official Swift client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official Swift client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/servetarslan02/hookrelay", from: "0.2.0")
+    .package(url: "https://github.com/servetarslan02/hooksniff", from: "0.2.0")
 ]
 ```
 
