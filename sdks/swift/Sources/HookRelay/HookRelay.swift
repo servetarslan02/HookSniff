@@ -358,7 +358,9 @@ public class WebhookVerifier {
         for sig in signatures {
             let trimmed = sig.trimmingCharacters(in: .whitespaces)
             guard trimmed.hasPrefix("v1,") else { continue }
-            if trimmed == expectedSig {
+            // Constant-time comparison (XOR-based)
+            let sigPart = String(trimmed.dropFirst(3))
+            if constantTimeCompare(sigPart, expectedSig) {
                 verified = true
                 break
             }
@@ -392,6 +394,17 @@ public class WebhookVerifier {
         }
 
         return verify(body: body, msgId: msgId, timestamp: timestamp, signatureHeader: signatureHeader)
+    }
+
+    private func constantTimeCompare(_ a: String, _ b: String) -> Bool {
+        let aBytes = Array(a.utf8)
+        let bBytes = Array(b.utf8)
+        guard aBytes.count == bBytes.count else { return false }
+        var result: UInt8 = 0
+        for i in 0..<aBytes.count {
+            result |= aBytes[i] ^ bBytes[i]
+        }
+        return result == 0
     }
 
     private func hmacSHA256(key: Data, data: Data) -> Data {

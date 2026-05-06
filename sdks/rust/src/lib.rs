@@ -473,12 +473,25 @@ impl WebhookVerifier {
         mac.update(signed_content.as_bytes());
         let expected_sig = format!("v1,{}", BASE64.encode(mac.finalize().into_bytes()));
 
-        // Check each signature
+        // Check each signature (constant-time comparison)
         let verified = signature_header
             .split(' ')
             .any(|sig| {
                 let trimmed = sig.trim();
-                trimmed.starts_with("v1,") && trimmed == expected_sig
+                if !trimmed.starts_with("v1,") {
+                    return false;
+                }
+                let sig_bytes = &trimmed.as_bytes()[3..]; // skip "v1,"
+                let exp_bytes = expected_sig.as_bytes();
+                if sig_bytes.len() != exp_bytes.len() {
+                    return false;
+                }
+                // Constant-time comparison (XOR-based)
+                let mut result = 0u8;
+                for (a, b) in sig_bytes.iter().zip(exp_bytes.iter()) {
+                    result |= a ^ b;
+                }
+                result == 0
             });
 
         if !verified {
