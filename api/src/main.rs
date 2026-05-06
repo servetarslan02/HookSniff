@@ -1,6 +1,6 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
-use tower_http::cors::CorsLayer;
+use tower_http::cors::{AllowOrigin, Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 
 mod auth;
@@ -156,7 +156,27 @@ async fn main() -> Result<()> {
         // API v1
         .nest("/v1", routes::create_routes(pool.clone(), rate_limiter, throttle_manager, metrics.clone()))
         // Middleware
-        .layer(CorsLayer::permissive())
+        // CORS: restrict origins in production
+        .layer({
+            let origins: Vec<http::HeaderValue> = cfg.cors_origins.iter()
+                .filter_map(|o| o.parse().ok())
+                .collect();
+            if cfg.is_production() && origins.is_empty() {
+                // Production with no CORS origins = no cross-origin allowed
+                CorsLayer::new()
+                    .allow_origin(AllowOrigin::none())
+                    .allow_methods(Any)
+                    .allow_headers(Any)
+            } else if origins.is_empty() {
+                // Development with no CORS origins = allow all
+                CorsLayer::permissive()
+            } else {
+                CorsLayer::new()
+                    .allow_origin(AllowOrigin::list(origins))
+                    .allow_methods(Any)
+                    .allow_headers(Any)
+            }
+        })
         .layer(TraceLayer::new_for_http());
 
     let addr = format!("0.0.0.0:{}", cfg.port);

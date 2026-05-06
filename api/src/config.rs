@@ -33,6 +33,8 @@ pub struct Config {
     pub iyzico_api_key: Option<String>,
     /// iyzico secret key for signature verification
     pub iyzico_secret_key: Option<String>,
+    /// CORS allowed origins (comma-separated). Empty = allow all in dev, deny in prod.
+    pub cors_origins: Vec<String>,
 }
 
 /// Patterns that look like placeholder / throwaway secrets (case-insensitive).
@@ -151,6 +153,12 @@ impl Config {
             polar_webhook_secret: std::env::var("POLAR_WEBHOOK_SECRET").ok(),
             iyzico_api_key: std::env::var("IYZICO_API_KEY").ok(),
             iyzico_secret_key: std::env::var("IYZICO_SECRET_KEY").ok(),
+            cors_origins: std::env::var("CORS_ORIGINS")
+                .unwrap_or_default()
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect(),
         })
     }
 }
