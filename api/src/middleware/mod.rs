@@ -62,18 +62,52 @@ pub async fn auth_middleware(
     let customer = if token.starts_with("hr_live_") {
         // API key authentication — lookup by prefix, then verify full key against Argon2 hash
         let prefix = &token[..15.min(token.len())];
-        let customer = sqlx::query_as::<_, Customer>(
+        let candidates = sqlx::query_as::<_, Customer>(
             "SELECT * FROM customers WHERE api_key_prefix = $1",
         )
         .bind(prefix)
-        .fetch_optional(&*pool)
-        .await?
-        .ok_or(AppError::Unauthorized)?;
+        .fetch_all(&*pool)
+        .await?;
 
-        if !verify_api_key(token, &customer.api_key_hash) {
-            return Err(AppError::Unauthorized);
+        // Also check api_keys table for additional keys
+        let api_key_candidates: Vec<(String,)> = sqlx::query_as(
+            "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
+        )
+        .bind(prefix)
+        .fetch_all(&*pool)
+        .await?;
+
+        // Try customers table first (legacy primary key)
+        let mut found: Option<Customer> = None;
+        for c in &candidates {
+            if verify_api_key(token, &c.api_key_hash) {
+                found = Some(c.clone());
+                break;
+            }
         }
-        customer
+
+        // If not found in customers, try api_keys table
+        if found.is_none() {
+            for (hash,) in &api_key_candidates {
+                if verify_api_key(token, hash) {
+                    // Found in api_keys — load the owning customer
+                    // We need the customer_id from the api_keys table
+                    let owner: Option<Customer> = sqlx::query_as(
+                        "SELECT c.* FROM customers c INNER JOIN api_keys ak ON ak.customer_id = c.id WHERE ak.api_key_prefix = $1 AND ak.api_key_hash = $2"
+                    )
+                    .bind(prefix)
+                    .bind(hash)
+                    .fetch_optional(&*pool)
+                    .await?;
+                    if let Some(c) = owner {
+                        found = Some(c);
+                    }
+                    break;
+                }
+            }
+        }
+
+        found.ok_or(AppError::Unauthorized)?
     } else {
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
@@ -167,8 +201,10 @@ pub fn verify_api_key(key: &str, hash: &str) -> bool {
 }
 
 pub fn generate_api_key() -> String {
-    use uuid::Uuid;
-    format!("hr_live_{}", Uuid::new_v4().to_string().replace('-', ""))
+    use rand::RngCore;
+    let mut bytes = [0u8; 32];
+    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    format!("hr_live_{}", hex::encode(bytes))
 }
 
 #[cfg(test)]

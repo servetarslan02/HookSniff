@@ -56,7 +56,7 @@ async fn get_subscription(
         stripe_subscription_id: customer.stripe_subscription_id.clone(),
         polar_subscription_id: customer.polar_subscription_id.clone(),
         iyzico_subscription_id: customer.iyzico_subscription_id.clone(),
-        webhook_limit: plan.max_webhooks_per_day(),
+        webhook_limit: plan.max_webhooks_per_month(),
         endpoint_limit: plan.max_endpoints(),
         retention_days: plan.retention_days(),
         monthly_price_cents: plan.monthly_price_cents(),
@@ -278,8 +278,8 @@ async fn get_usage(
         payment_provider: customer.payment_provider.clone(),
         webhooks: UsageCounter {
             used: customer.webhook_count as u64,
-            limit: plan.max_webhooks_per_day(),
-            remaining: plan.max_webhooks_per_day().saturating_sub(customer.webhook_count as u64),
+            limit: plan.max_webhooks_per_month(),
+            remaining: plan.max_webhooks_per_month().saturating_sub(customer.webhook_count as u64),
         },
         endpoints: UsageCounter {
             used: endpoint_count.0 as u64,
@@ -424,27 +424,30 @@ async fn process_webhook_result(
             provider_customer_id,
             provider_subscription_id,
         } => {
+            let webhook_limit = plan.max_webhooks_per_month() as i32;
             let update_query = match provider {
                 "polar" => {
                     sqlx::query(
                         "UPDATE customers SET plan = $1, payment_provider = $2, \
-                         polar_customer_id = $3, polar_subscription_id = $4 WHERE id = $5"
+                         polar_customer_id = $3, polar_subscription_id = $4, webhook_limit = $5 WHERE id = $6"
                     )
                     .bind(plan.as_str())
                     .bind(provider)
                     .bind(provider_customer_id)
                     .bind(provider_subscription_id)
+                    .bind(webhook_limit)
                     .bind(customer_id)
                 }
                 "iyzico" => {
                     sqlx::query(
                         "UPDATE customers SET plan = $1, payment_provider = $2, \
-                         iyzico_customer_id = $3, iyzico_subscription_id = $4 WHERE id = $5"
+                         iyzico_customer_id = $3, iyzico_subscription_id = $4, webhook_limit = $5 WHERE id = $6"
                     )
                     .bind(plan.as_str())
                     .bind(provider)
                     .bind(provider_customer_id)
                     .bind(provider_subscription_id)
+                    .bind(webhook_limit)
                     .bind(customer_id)
                 }
                 _ => return Ok(()),
@@ -477,19 +480,22 @@ async fn process_webhook_result(
             plan,
             status,
         } => {
+            let webhook_limit = plan.max_webhooks_per_month() as i32;
             let query = match provider {
                 "polar" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = $1 WHERE polar_subscription_id = $2"
+                        "UPDATE customers SET plan = $1, webhook_limit = $2 WHERE polar_subscription_id = $3"
                     )
                     .bind(plan.as_str())
+                    .bind(webhook_limit)
                     .bind(provider_subscription_id)
                 }
                 "iyzico" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = $1 WHERE iyzico_subscription_id = $2"
+                        "UPDATE customers SET plan = $1, webhook_limit = $2 WHERE iyzico_subscription_id = $3"
                     )
                     .bind(plan.as_str())
+                    .bind(webhook_limit)
                     .bind(provider_subscription_id)
                 }
                 _ => return Ok(()),
@@ -508,20 +514,23 @@ async fn process_webhook_result(
         WebhookResult::SubscriptionCanceled {
             provider_subscription_id,
         } => {
+            let free_limit = Plan::Free.max_webhooks_per_month() as i32;
             let query = match provider {
                 "polar" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = 'free', polar_subscription_id = NULL \
+                        "UPDATE customers SET plan = 'free', polar_subscription_id = NULL, webhook_limit = $2 \
                          WHERE polar_subscription_id = $1"
                     )
                     .bind(provider_subscription_id)
+                    .bind(free_limit)
                 }
                 "iyzico" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = 'free', iyzico_subscription_id = NULL \
+                        "UPDATE customers SET plan = 'free', iyzico_subscription_id = NULL, webhook_limit = $2 \
                          WHERE iyzico_subscription_id = $1"
                     )
                     .bind(provider_subscription_id)
+                    .bind(free_limit)
                 }
                 _ => return Ok(()),
             };

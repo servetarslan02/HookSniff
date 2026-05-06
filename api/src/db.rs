@@ -749,6 +749,91 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 33: Migration 032 — teams and team_members tables
+    // Required by routes/teams.rs
+    run_migration(
+        pool,
+        "032_teams",
+        r#"
+        CREATE TABLE IF NOT EXISTS teams (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            owner_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_teams_owner ON teams(owner_id);
+
+        CREATE TABLE IF NOT EXISTS team_members (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            role TEXT NOT NULL DEFAULT 'viewer',
+            invited_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            joined_at TIMESTAMPTZ,
+            UNIQUE(team_id, customer_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_team_members_team ON team_members(team_id);
+        CREATE INDEX IF NOT EXISTS idx_team_members_customer ON team_members(customer_id);
+
+        CREATE TABLE IF NOT EXISTS team_invites (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+            email TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'viewer',
+            token TEXT NOT NULL UNIQUE,
+            expires_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_team_invites_team ON team_invites(team_id);
+        CREATE INDEX IF NOT EXISTS idx_team_invites_token ON team_invites(token);
+
+        DROP TRIGGER IF EXISTS trg_teams_updated_at ON teams;
+        CREATE TRIGGER trg_teams_updated_at
+            BEFORE UPDATE ON teams
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+        "#,
+    )
+    .await?;
+
+    // Step 34: Migration 033 — notifications table
+    // Required by routes/notifications.rs
+    run_migration(
+        pool,
+        "033_notifications",
+        r#"
+        CREATE TABLE IF NOT EXISTS notifications (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            type TEXT NOT NULL DEFAULT 'system',
+            title TEXT NOT NULL,
+            message TEXT,
+            is_read BOOL NOT NULL DEFAULT false,
+            link TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_notifications_customer
+            ON notifications(customer_id, created_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_notifications_unread
+            ON notifications(customer_id, is_read) WHERE is_read = FALSE;
+        "#,
+    )
+    .await?;
+
+    // Step 35: Migration 034 — body_hash column on idempotency_keys
+    // Prevents different payloads from returning cached responses with the same key
+    run_migration(
+        pool,
+        "034_idempotency_body_hash",
+        r#"
+        ALTER TABLE idempotency_keys ADD COLUMN IF NOT EXISTS body_hash TEXT;
+        CREATE INDEX IF NOT EXISTS idx_idempotency_key_hash
+            ON idempotency_keys(key, customer_id, body_hash);
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }

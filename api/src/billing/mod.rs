@@ -34,8 +34,8 @@ impl Plan {
         }
     }
 
-    /// Max webhook deliveries per day
-    pub fn max_webhooks_per_day(&self) -> u64 {
+    /// Max webhook deliveries per month
+    pub fn max_webhooks_per_month(&self) -> u64 {
         match self {
             Plan::Free => 1_000,
             Plan::Pro => 50_000,
@@ -142,7 +142,7 @@ pub struct Usage {
 impl Usage {
     /// Check if the customer has exceeded their daily webhook limit
     pub fn is_webhook_limit_exceeded(&self) -> bool {
-        self.webhooks_today >= self.plan.max_webhooks_per_day()
+        self.webhooks_today >= self.plan.max_webhooks_per_month()
     }
 
     /// Check if the customer has exceeded their endpoint limit
@@ -152,7 +152,7 @@ impl Usage {
 
     /// Get remaining webhook deliveries for today
     pub fn remaining_webhooks(&self) -> u64 {
-        self.plan.max_webhooks_per_day().saturating_sub(self.webhooks_today)
+        self.plan.max_webhooks_per_month().saturating_sub(self.webhooks_today)
     }
 
     /// Get remaining endpoints

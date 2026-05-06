@@ -237,6 +237,20 @@ async fn process_pending(
 
     let count = items.len();
 
+    // Batch-fetch signing secrets to avoid N+1 queries
+    let endpoint_ids: Vec<uuid::Uuid> = items.iter().map(|i| i.endpoint_id).collect();
+    let unique_ids: std::collections::HashSet<uuid::Uuid> = endpoint_ids.iter().cloned().collect();
+    let unique_vec: Vec<uuid::Uuid> = unique_ids.into_iter().collect();
+
+    let secret_rows: Vec<(uuid::Uuid, String)> = sqlx::query_as(
+        "SELECT id, signing_secret FROM endpoints WHERE id = ANY($1)"
+    )
+    .bind(&unique_vec)
+    .fetch_all(pool)
+    .await?;
+
+    let secret_map: std::collections::HashMap<uuid::Uuid, String> = secret_rows.into_iter().collect();
+
     for item in items {
         let delivery_id = item.delivery_id;
         let attempt = item.attempt_count + 1;
@@ -256,20 +270,21 @@ async fn process_pending(
 
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
 
-        // Fetch signing_secret from endpoints table (not stored in queue)
-        let signing_secret: (String,) = sqlx::query_as(
-            "SELECT signing_secret FROM endpoints WHERE id = $1"
-        )
-        .bind(item.endpoint_id)
-        .fetch_one(pool)
-        .await?;
+        // Get signing secret from batch-fetched map
+        let signing_secret = secret_map
+            .get(&item.endpoint_id)
+            .cloned()
+            .unwrap_or_else(|| {
+                tracing::warn!("⚠️ No signing_secret found for endpoint {}", item.endpoint_id);
+                String::new()
+            });
 
         // Build WebhookMessage and delegate HTTP delivery to the delivery module
         let webhook_msg = WebhookMessage {
             delivery_id: delivery_id.to_string(),
             endpoint_id: item.endpoint_id.to_string(),
             endpoint_url: item.endpoint_url.clone(),
-            signing_secret: signing_secret.0,
+            signing_secret,
             payload: item.payload.clone(),
             custom_headers: item.custom_headers.clone(),
         };
@@ -329,6 +344,15 @@ async fn process_pending(
             // Record attempt
             record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, None, trace_id.as_deref(), attempt_headers).await?;
 
+            // Reset endpoint failure streak on success
+            sqlx::query::<sqlx::Postgres>(
+                "UPDATE endpoints SET failure_streak = 0, avg_response_ms = $2 WHERE id = $1"
+            )
+            .bind(item.endpoint_id)
+            .bind(duration_ms)
+            .execute(&mut *tx)
+            .await?;
+
             tx.commit().await?;
 
         } else if attempt >= item.max_attempts {
@@ -371,6 +395,14 @@ async fn process_pending(
                 .await?;
 
             record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&error_msg), trace_id.as_deref(), attempt_headers).await?;
+
+            // Increment endpoint failure streak on dead letter
+            sqlx::query::<sqlx::Postgres>(
+                "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1"
+            )
+            .bind(item.endpoint_id)
+            .execute(&mut *tx)
+            .await?;
 
             tx.commit().await?;
 
