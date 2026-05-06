@@ -207,7 +207,7 @@ class HookRelayClient(
     // ==================== Webhooks Resource ====================
 
     inner class WebhooksResource {
-        fun send(endpointId: String, data: Map<String, Any>, event: String? = null): Delivery {
+        fun send(endpointId: String, event: String? = null, data: Map<String, Any>): Delivery {
             val body = mutableMapOf<String, Any>("endpoint_id" to endpointId, "data" to data)
             event?.let { body["event"] = it }
             return request("POST", "/webhooks", body)

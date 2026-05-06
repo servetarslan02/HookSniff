@@ -29,6 +29,7 @@ defmodule HookRelay.MixProject do
   defp deps do
     [
       {:jason, "~> 1.4"},
+      {:plug_crypto, "~> 1.2"},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end

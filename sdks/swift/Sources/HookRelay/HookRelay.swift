@@ -191,7 +191,7 @@ public class HookRelay: @unchecked Sendable {
         return try decoder.decode(T.self, from: data)
     }
 
-    func requestRaw(_ method: String, path: String, body: [String: Any]? = nil) async throws -> Any {
+    func requestData(_ method: String, path: String, body: [String: Any]? = nil) async throws -> Data {
         let url = URL(string: baseUrl + path)!
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -218,6 +218,11 @@ public class HookRelay: @unchecked Sendable {
             throw HookRelayError(statusCode: httpResponse.statusCode, code: nil, message: message)
         }
 
+        return data
+    }
+
+    func requestRaw(_ method: String, path: String, body: [String: Any]? = nil) async throws -> Any {
+        let data = try await requestData(method, path: path, body: body)
         return try JSONSerialization.jsonObject(with: data)
     }
 }
@@ -250,7 +255,8 @@ public class EndpointsResource: @unchecked Sendable {
     }
 
     public func rotateSecret(_ endpointId: String) async throws -> [String: Any] {
-        return try await client.requestRaw("POST", path: "/endpoints/\(endpointId)/rotate-secret") as! [String: Any]
+        let data = try await client.requestData("POST", path: "/endpoints/\(endpointId)/rotate-secret")
+        return (try JSONSerialization.jsonObject(with: data) as? [String: Any]) ?? [:]
     }
 }
 
