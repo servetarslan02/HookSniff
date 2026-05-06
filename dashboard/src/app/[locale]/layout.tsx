@@ -19,21 +19,21 @@ export async function generateMetadata({
 
   return {
     title: {
-      default: 'Hookrelay — Webhook Delivery Service',
-      template: '%s | Hookrelay',
+      default: 'HookSniff — Webhook Delivery Service',
+      template: '%s | HookSniff',
     },
     description: t('hero.subtitle'),
     openGraph: {
-      title: 'Hookrelay — Webhook Delivery Service',
+      title: 'HookSniff — Webhook Delivery Service',
       description: t('hero.subtitle'),
-      url: 'https://hookrelay.is-a.dev',
-      siteName: 'Hookrelay',
+      url: 'https://hooksniff.is-a.dev',
+      siteName: 'HookSniff',
       type: 'website',
       locale: locale === 'pt-BR' ? 'pt_BR' : `${locale}_${locale.toUpperCase()}`,
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Hookrelay — Webhook Delivery Service',
+      title: 'HookSniff — Webhook Delivery Service',
       description: t('hero.subtitle'),
     },
     robots: {
@@ -41,7 +41,7 @@ export async function generateMetadata({
       follow: true,
     },
     metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL || 'https://hookrelay.is-a.dev'
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.is-a.dev'
     ),
   };
 }
@@ -75,7 +75,7 @@ export default async function LocaleLayout({
             __html: `
               (function() {
                 try {
-                  var t = localStorage.getItem('hookrelay-theme');
+                  var t = localStorage.getItem('hooksniff-theme');
                   if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                   }

@@ -19,16 +19,16 @@ export default function SdksPage() {
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('installation')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
-{`pip install hookrelay`}
+{`pip install hooksniff`}
         </pre>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('quickStartSdk')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
-{`import hookrelay
+{`import hooksniff
 import os
 
 # Initialize the client
-client = hookrelay.Client(api_key=os.environ["HOOKRELAY_KEY"])
+client = hooksniff.Client(api_key=os.environ["HOOKRELAY_KEY"])
 
 # Create an endpoint
 endpoint = client.endpoints.create(
@@ -55,14 +55,14 @@ print(f"Status: {delivery.status}")`}
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('verifySignatures')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`from flask import Flask, request, abort
-import hookrelay
+import hooksniff
 
 app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def handle_webhook():
-    signature = request.headers.get("X-Hookrelay-Signature")
-    if not hookrelay.verify_signature(
+    signature = request.headers.get("X-HookSniff-Signature")
+    if not hooksniff.verify_signature(
         payload=request.data,
         signature=signature,
         secret="whsec_your_signing_secret"
@@ -76,7 +76,7 @@ def handle_webhook():
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('errorHandling')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`import hookrelay
+{`import hooksniff
 
 try:
     delivery = client.webhooks.send(
@@ -84,11 +84,11 @@ try:
         event="test.event",
         data={"test": True}
     )
-except hookrelay.RateLimitError as e:
+except hooksniff.RateLimitError as e:
     print(f"Rate limited. Retry after {e.retry_after}s")
-except hookrelay.AuthenticationError:
+except hooksniff.AuthenticationError:
     print("Invalid API key")
-except hookrelay.HookRelayError as e:
+except hooksniff.HookRelayError as e:
     print(f"Error: {e.message}")`}
         </pre>
       </section>
@@ -102,12 +102,12 @@ except hookrelay.HookRelayError as e:
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Installation</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
-{`npm install @hookrelay/sdk`}
+{`npm install @hooksniff/sdk`}
         </pre>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Start</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
-{`import { HookRelay } from '@hookrelay/sdk';
+{`import { HookRelay } from '@hooksniff/sdk';
 
 const hr = new HookRelay({ apiKey: process.env.HOOKRELAY_KEY! });
 
@@ -135,13 +135,13 @@ console.log('Delivery:', delivery.id, delivery.status);`}
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('verifySignatures')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import express from 'express';
-import { verifySignature } from '@hookrelay/sdk';
+import { verifySignature } from '@hooksniff/sdk';
 import { useTranslations } from 'next-intl';
 
 const app = express();
 
 app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-hookrelay-signature'] as string;
+  const signature = req.headers['x-hooksniff-signature'] as string;
 
   if (!verifySignature(req.body, signature, 'whsec_your_secret')) {
     return res.status(401).send('Invalid signature');
@@ -155,7 +155,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('typescriptSupport')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`import type { Endpoint, Delivery, WebhookEvent } from '@hookrelay/sdk';
+{`import type { Endpoint, Delivery, WebhookEvent } from '@hooksniff/sdk';
 
 // Full type safety for all API responses
 const endpoints: Endpoint[] = await hr.endpoints.list();
@@ -175,10 +175,10 @@ const delivery: Delivery = await hr.webhooks.send({
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { lang: 'Go', pkg: 'github.com/hookrelay/hookrelay-go', status: 'Stable' },
-            { lang: 'Ruby', pkg: 'gem install hookrelay', status: 'Beta' },
-            { lang: 'PHP', pkg: 'composer require hookrelay/hookrelay-php', status: 'Beta' },
-            { lang: 'Rust', pkg: 'cargo add hookrelay', status: 'Alpha' },
+            { lang: 'Go', pkg: 'github.com/hooksniff/hooksniff-go', status: 'Stable' },
+            { lang: 'Ruby', pkg: 'gem install hooksniff', status: 'Beta' },
+            { lang: 'PHP', pkg: 'composer require hooksniff/hooksniff-php', status: 'Beta' },
+            { lang: 'Rust', pkg: 'cargo add hooksniff', status: 'Alpha' },
           ].map((sdk) => (
             <div key={sdk.lang} className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <div className="flex items-center justify-between mb-2">

@@ -133,11 +133,11 @@ Her handler için önerilen testler:
 - ✅ 5xx yanıtı → success=false
 - ✅ Timeout → error mesajı doğru
 - ✅ Connection refused → error mesajı doğru
-- ✅ HMAC signature header'ı doğru mu (`X-Hookrelay-Signature`)
+- ✅ HMAC signature header'ı doğru mu (`X-HookSniff-Signature`)
 - ✅ Custom header'lar ekleniyor mu
 - ✅ Large response body truncate ediliyor mu (1000 char)
-- ✅ `X-Hookrelay-Delivery-Id` header'ı doğru mu
-- ✅ `X-Hookrelay-Attempt` header'ı doğru mu
+- ✅ `X-HookSniff-Delivery-Id` header'ı doğru mu
+- ✅ `X-HookSniff-Attempt` header'ı doğru mu
 
 ### `record_delivery_attempt` Activity
 - ✅ Attempt kaydı insert ediliyor
@@ -271,9 +271,9 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: hookrelay
-          POSTGRES_PASSWORD: hookrelay_local
-          POSTGRES_DB: hookrelay
+          POSTGRES_USER: hooksniff
+          POSTGRES_PASSWORD: hooksniff_local
+          POSTGRES_DB: hooksniff
         ports: ['5432:5432']
         options: >-
           --health-cmd pg_isready

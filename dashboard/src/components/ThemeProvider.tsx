@@ -12,7 +12,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('hookrelay-theme') as Theme | null;
+    const stored = localStorage.getItem('hooksniff-theme') as Theme | null;
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initial = stored ?? (prefersDark ? 'dark' : 'light');
     setTheme(initial);
@@ -27,7 +27,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('hookrelay-theme', theme);
+    localStorage.setItem('hooksniff-theme', theme);
   }, [theme, mounted]);
 
   const toggle = () => setTheme(t => t === 'dark' ? 'light' : 'dark');

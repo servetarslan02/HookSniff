@@ -112,7 +112,7 @@ export class PayloadTooLargeError extends HookRelayError {
  * Verify a webhook signature using HMAC-SHA256.
  *
  * @param payload - The raw request body as a string
- * @param signature - The signature from the X-Hookrelay-Signature header
+ * @param signature - The signature from the X-HookSniff-Signature header
  * @param secret - The endpoint's signing secret (starts with "whsec_")
  * @returns True if the signature is valid
  */
@@ -334,7 +334,7 @@ class WebhooksResource {
  *
  * @example
  * ```typescript
- * import { HookRelay } from '@hookrelay/sdk';
+ * import { HookRelay } from '@hooksniff/sdk';
  *
  * const client = new HookRelay({ apiKey: 'hr_live_...' });
  *
@@ -496,7 +496,7 @@ export class HookRelay {
 
   constructor(config: HookRelayConfig) {
     this.apiKey = config.apiKey;
-    this.baseUrl = (config.baseUrl || "https://api.hookrelay.is-a.dev/v1").replace(
+    this.baseUrl = (config.baseUrl || "https://api.hooksniff.is-a.dev/v1").replace(
       /\/$/,
       ""
     );
@@ -517,7 +517,7 @@ export class HookRelay {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.apiKey}`,
       "Content-Type": "application/json",
-      "User-Agent": "hookrelay-node/0.2.0",
+      "User-Agent": "hooksniff-node/0.2.0",
     };
 
     const controller = new AbortController();
@@ -592,12 +592,12 @@ export class HookRelay {
  *
  * @example
  * ```typescript
- * import { verifyWebhookSignature } from '@hookrelay/sdk';
+ * import { verifyWebhookSignature } from '@hooksniff/sdk';
  *
  * app.post('/webhook', express.raw({ type: '*/*' }), (req, res) => {
  *   const result = verifyWebhookSignature(
  *     req.body.toString(),
- *     req.headers['x-hookrelay-signature'],
+ *     req.headers['x-hooksniff-signature'],
  *     'whsec_...'
  *   );
  *
@@ -651,7 +651,7 @@ export function verifyWebhookSignature(
  * @example
  * ```typescript
  * import express from 'express';
- * import { createWebhookHandler } from '@hookrelay/sdk';
+ * import { createWebhookHandler } from '@hooksniff/sdk';
  *
  * const app = express();
  *
@@ -677,7 +677,7 @@ export function createWebhookHandler(options: WebhookHandlerOptions) {
     secret,
     handlers = {},
     onEvent,
-    signatureHeader = "x-hookrelay-signature",
+    signatureHeader = "x-hooksniff-signature",
   } = options;
 
   return async function webhookHandler(

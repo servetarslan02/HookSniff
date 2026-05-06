@@ -56,7 +56,7 @@ fn init_otel(
         .build();
 
     global::set_tracer_provider(provider.clone());
-    let tracer = provider.tracer("hookrelay");
+    let tracer = provider.tracer("hooksniff");
 
     let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
 

@@ -15,7 +15,7 @@ HookRelay workers send webhook deliveries from **static IP addresses**. If your 
 You can programmatically fetch the current outbound IPs:
 
 ```bash
-curl https://api.hookrelay.is-a.dev/v1/outbound-ips
+curl https://api.hooksniff.is-a.dev/v1/outbound-ips
 ```
 
 Response:
@@ -71,8 +71,8 @@ Outbound IPs **rarely change**. If they do (e.g., infrastructure migration), we 
 2. Send email notifications to all active customers **at least 30 days** in advance
 3. Publish the new IPs alongside the old ones during a transition period
 
-Subscribe to [status.hookrelay.is-a.dev](https://status.hookrelay.is-a.dev) for infrastructure updates.
+Subscribe to [status.hooksniff.is-a.dev](https://status.hooksniff.is-a.dev) for infrastructure updates.
 
 ## Support
 
-Questions about IP whitelisting? Contact support@hookrelay.is-a.dev.
+Questions about IP whitelisting? Contact support@hooksniff.is-a.dev.

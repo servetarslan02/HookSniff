@@ -305,7 +305,7 @@ impl PaymentProviderImpl for IyzicoProvider {
             price: price_str.clone(),
             paid_price: price_str,
             currency: "TRY".to_string(),
-            basket_id: format!("hookrelay-{}-{}", customer_id, plan.as_str()),
+            basket_id: format!("hooksniff-{}-{}", customer_id, plan.as_str()),
             payment_group: "SUBSCRIPTION".to_string(),
             payment_card: PaymentCard {
                 card_holder_name: "".to_string(),

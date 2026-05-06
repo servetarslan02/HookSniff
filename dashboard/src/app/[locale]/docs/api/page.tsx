@@ -7,7 +7,7 @@ export default function ApiReferencePage() {
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('apiReference')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Complete reference for the Hookrelay REST API. Base URL: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">https://api.hookrelay.is-a.dev/v1</code>
+        Complete reference for the HookSniff REST API. Base URL: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">https://api.hooksniff.is-a.dev/v1</code>
       </p>
 
       {/* Endpoints API */}

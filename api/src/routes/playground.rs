@@ -114,14 +114,14 @@ async fn test_webhook(
     let payload = serde_json::json!({
         "event": "test.ping",
         "data": {"test": true, "timestamp": chrono::Utc::now().to_rfc3339()},
-        "source": "hookrelay-playground"
+        "source": "hooksniff-playground"
     });
 
     let start = std::time::Instant::now();
     let result = client
         .post(&endpoint.url)
         .header("Content-Type", "application/json")
-        .header("X-Hookrelay-Test", "true")
+        .header("X-HookSniff-Test", "true")
         .json(&payload)
         .send()
         .await;

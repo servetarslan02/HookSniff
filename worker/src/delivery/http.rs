@@ -2,7 +2,7 @@
 //!
 //! Delivers events via HTTP POST with Standard Webhooks headers
 //! (webhook-id, webhook-timestamp, webhook-signature) and HMAC-SHA256
-//! signature. Falls back to legacy `X-Hookrelay-Signature` header for
+//! signature. Falls back to legacy `X-HookSniff-Signature` header for
 //! backward compatibility.
 
 use anyhow::Result;
@@ -19,7 +19,7 @@ use super::DeliveryResult;
 /// Generates a Standard Webhooks HMAC-SHA256 signature, attaches
 /// standard headers (`webhook-id`, `webhook-timestamp`,
 /// `webhook-signature`), and sends the request. Also attaches
-/// legacy `X-Hookrelay-Signature` for backward compatibility.
+/// legacy `X-HookSniff-Signature` for backward compatibility.
 pub async fn deliver_http(
     http_client: &Client,
     webhook: &WebhookMessage,
@@ -47,9 +47,9 @@ pub async fn deliver_http(
         .header("webhook-timestamp", &timestamp)
         .header("webhook-signature", &standard_sig)
         // Legacy headers (backward compat)
-        .header("X-Hookrelay-Signature", format!("sha256={}", legacy_sig))
-        .header("X-Hookrelay-Delivery-Id", &webhook.delivery_id)
-        .header("X-Hookrelay-Attempt", "1")
+        .header("X-HookSniff-Signature", format!("sha256={}", legacy_sig))
+        .header("X-HookSniff-Delivery-Id", &webhook.delivery_id)
+        .header("X-HookSniff-Attempt", "1")
         .body(webhook.payload.clone());
 
     // Attach custom headers if configured

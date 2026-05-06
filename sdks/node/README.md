@@ -1,11 +1,11 @@
 # HookRelay Node.js SDK
 
-Official TypeScript/Node.js client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official TypeScript/Node.js client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
 ```bash
-npm install @hookrelay/sdk
+npm install @hooksniff/sdk
 ```
 
 Or install from source:
@@ -19,7 +19,7 @@ npm run build
 ## Quick Start
 
 ```typescript
-import { HookRelay } from '@hookrelay/sdk';
+import { HookRelay } from '@hooksniff/sdk';
 
 // Initialize client
 const client = new HookRelay({ apiKey: 'hr_live_your_api_key_here' });
@@ -134,14 +134,14 @@ fs.writeFileSync('webhooks.csv', csvData as string);
 Verify incoming webhook signatures in your handler:
 
 ```typescript
-import { verifySignature } from '@hookrelay/sdk';
+import { verifySignature } from '@hooksniff/sdk';
 import express from 'express';
 
 const app = express();
 
 app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   const payload = req.body.toString();
-  const signature = req.headers['x-hookrelay-signature'] as string;
+  const signature = req.headers['x-hooksniff-signature'] as string;
   const secret = 'whsec_your_endpoint_signing_secret';
 
   if (!verifySignature(payload, signature, secret)) {
@@ -164,7 +164,7 @@ import {
   RateLimitError,
   ValidationError,
   PayloadTooLargeError,
-} from '@hookrelay/sdk';
+} from '@hooksniff/sdk';
 
 const client = new HookRelay({ apiKey: 'hr_live_...' });
 
@@ -195,7 +195,7 @@ try {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `apiKey` | `string` | required | Your HookRelay API key |
-| `baseUrl` | `string` | `https://api.hookrelay.is-a.dev/v1` | API base URL |
+| `baseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `timeout` | `number` | `30000` | Request timeout in ms |
 
 ### `client.endpoints`

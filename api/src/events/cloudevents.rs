@@ -18,12 +18,12 @@ pub struct CloudEvent {
     pub specversion: String,
 
     /// Event type in reverse-domain notation.
-    /// Example: `com.hookrelay.delivery.completed`
+    /// Example: `com.hooksniff.delivery.completed`
     #[serde(rename = "type")]
     pub event_type: String,
 
     /// Event source — identifies the context in which the event originated.
-    /// Example: `https://api.hookrelay.is-a.dev`
+    /// Example: `https://api.hooksniff.is-a.dev`
     pub source: String,
 
     /// Unique event ID.
@@ -89,7 +89,7 @@ impl CloudEvent {
     ) -> Self {
         let mut ce = Self::new(
             event_type,
-            "https://api.hookrelay.is-a.dev",
+            "https://api.hooksniff.is-a.dev",
             Some(payload),
         );
         ce.id = delivery_id.to_string();
@@ -171,14 +171,14 @@ mod tests {
     #[test]
     fn test_cloud_event_creation() {
         let ce = CloudEvent::new(
-            "com.hookrelay.delivery.completed",
-            "https://api.hookrelay.is-a.dev",
+            "com.hooksniff.delivery.completed",
+            "https://api.hooksniff.is-a.dev",
             Some(serde_json::json!({"delivery_id": "del_123"})),
         );
 
         assert_eq!(ce.specversion, "1.0");
-        assert_eq!(ce.event_type, "com.hookrelay.delivery.completed");
-        assert_eq!(ce.source, "https://api.hookrelay.is-a.dev");
+        assert_eq!(ce.event_type, "com.hooksniff.delivery.completed");
+        assert_eq!(ce.source, "https://api.hooksniff.is-a.dev");
         assert!(!ce.id.is_empty());
         assert!(!ce.time.is_empty());
         assert!(ce.validate().is_ok());
@@ -188,7 +188,7 @@ mod tests {
     fn test_cloud_event_from_delivery() {
         let payload = serde_json::json!({"order_id": "ord_456", "amount": 99.99});
         let ce = CloudEvent::from_delivery(
-            "com.hookrelay.delivery.completed",
+            "com.hooksniff.delivery.completed",
             "del_789",
             "ep_012",
             payload,
@@ -203,8 +203,8 @@ mod tests {
     #[test]
     fn test_cloud_event_json_roundtrip() {
         let ce = CloudEvent::new(
-            "com.hookrelay.endpoint.created",
-            "https://api.hookrelay.is-a.dev",
+            "com.hooksniff.endpoint.created",
+            "https://api.hooksniff.is-a.dev",
             Some(serde_json::json!({"url": "https://example.com/hook"})),
         );
 

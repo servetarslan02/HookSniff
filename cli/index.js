@@ -4,14 +4,14 @@
  * HookRelay CLI — Manage webhooks from your terminal.
  *
  * Usage:
- *   hookrelay auth login          # Login with API key
- *   hookrelay endpoints list      # List endpoints
- *   hookrelay endpoints create    # Create endpoint
- *   hookrelay send <event> <data> # Send a webhook
- *   hookrelay deliveries list     # List recent deliveries
- *   hookrelay deliveries get <id> # Get delivery details
- *   hookrelay deliveries replay <id> # Replay a delivery
- *   hookrelay listen <endpoint>   # Listen for incoming webhooks
+ *   hooksniff auth login          # Login with API key
+ *   hooksniff endpoints list      # List endpoints
+ *   hooksniff endpoints create    # Create endpoint
+ *   hooksniff send <event> <data> # Send a webhook
+ *   hooksniff deliveries list     # List recent deliveries
+ *   hooksniff deliveries get <id> # Get delivery details
+ *   hooksniff deliveries replay <id> # Replay a delivery
+ *   hooksniff listen <endpoint>   # Listen for incoming webhooks
  */
 
 const { program } = require('commander');
@@ -21,7 +21,7 @@ const os = require('os');
 const http = require('http');
 
 // ── Config ──
-const CONFIG_DIR = path.join(os.homedir(), '.hookrelay');
+const CONFIG_DIR = path.join(os.homedir(), '.hooksniff');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 
 function loadConfig() {
@@ -46,7 +46,7 @@ function getApiKey() {
   const config = loadConfig();
   const key = config.api_key || process.env.HOOKRELAY_API_KEY;
   if (!key) {
-    console.error('❌ Not authenticated. Run: hookrelay auth login');
+    console.error('❌ Not authenticated. Run: hooksniff auth login');
     process.exit(1);
   }
   return key;
@@ -91,7 +91,7 @@ program
     const apiUrl = opts.apiUrl || process.env.HOOKRELAY_API_URL || 'http://localhost:3000/v1';
 
     if (!apiKey) {
-      console.log('Usage: hookrelay auth login --api-key hr_live_YOUR_KEY');
+      console.log('Usage: hooksniff auth login --api-key hr_live_YOUR_KEY');
       console.log('');
       console.log('Get your API key from: http://localhost:3001/dashboard/api-keys');
       return;
@@ -128,7 +128,7 @@ endpoints
   .action(async () => {
     const data = await apiRequest('GET', '/endpoints');
     if (data.length === 0) {
-      console.log('No endpoints. Create one with: hookrelay endpoints create');
+      console.log('No endpoints. Create one with: hooksniff endpoints create');
       return;
     }
     console.log(`\n🔗 Endpoints (${data.length}):\n`);
@@ -262,7 +262,7 @@ program
           console.log(`\n📩 ${timestamp} ${req.method} ${req.url}`);
           console.log(`   Headers:`);
           Object.entries(req.headers).forEach(([k, v]) => {
-            if (k.startsWith('x-hookrelay') || k.startsWith('webhook-')) {
+            if (k.startsWith('x-hooksniff') || k.startsWith('webhook-')) {
               console.log(`     ${k}: ${v}`);
             }
           });
@@ -363,7 +363,7 @@ program
 
 // ── Parse ──
 program
-  .name('hookrelay')
+  .name('hooksniff')
   .description('🪝 HookRelay CLI — Manage webhooks from your terminal')
   .version('0.1.0');
 

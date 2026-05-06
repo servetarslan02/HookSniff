@@ -1,11 +1,11 @@
 # HookRelay PHP SDK
 
-Official PHP client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official PHP client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
 ```bash
-composer require hookrelay/hookrelay-php
+composer require hooksniff/hooksniff-php
 ```
 
 ## Quick Start
@@ -189,7 +189,7 @@ try {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `apiKey` | `string` | required | Your HookRelay API key |
-| `baseUrl` | `string` | `https://api.hookrelay.is-a.dev/v1` | API base URL |
+| `baseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `timeout` | `int` | `30` | Request timeout in seconds |
 
 ### `$client->endpoints()`

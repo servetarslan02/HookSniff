@@ -57,7 +57,7 @@ This guide walks you through setting up every service, getting credentials, and 
 1. **Go to** [neon.tech](https://neon.tech)
 2. **Sign up** with GitHub or email
 3. **Create a project:**
-   - Name: `hookrelay-prod`
+   - Name: `hooksniff-prod`
    - Region: Choose closest to your users (e.g., `US East` or `EU Frankfurt`)
 4. **Copy the connection string** from the dashboard:
    ```
@@ -65,7 +65,7 @@ This guide walks you through setting up every service, getting credentials, and 
    ```
 5. **Create the database schema:**
    ```bash
-   # From the hookrelay project directory
+   # From the hooksniff project directory
    psql "YOUR_CONNECTION_STRING" -f migrations/001_initial.sql
    ```
 
@@ -101,7 +101,7 @@ DATABASE_URL=postgresql://neondb_owner:YOUR_PASSWORD@ep-cool-bird-123456.us-east
 1. **Go to** [upstash.com](https://upstash.com)
 2. **Sign up** with GitHub or email
 3. **Create a Redis database:**
-   - Name: `hookrelay-redis`
+   - Name: `hooksniff-redis`
    - Region: Choose closest to your Oracle Cloud VM (e.g., `us-east-1`)
    - Type: `Regional` (not Global — lower latency)
 4. **Copy the credentials:**
@@ -177,8 +177,8 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
 7. **Deploy HookRelay:**
    ```bash
    # Clone the repo
-   git clone https://github.com/servetarslan02/hookrelay.git
-   cd hookrelay
+   git clone https://github.com/servetarslan02/hooksniff.git
+   cd hooksniff
 
    # Create .env with production values
    cp .env.example .env
@@ -189,7 +189,7 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
    ```
 8. **Set up a systemd service** (auto-restart on reboot):
    ```bash
-   sudo tee /etc/systemd/system/hookrelay.service <<EOF
+   sudo tee /etc/systemd/system/hooksniff.service <<EOF
    [Unit]
    Description=HookRelay API + Worker
    After=docker.service
@@ -198,7 +198,7 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
    [Service]
    Type=oneshot
    RemainAfterExit=yes
-   WorkingDirectory=/home/ubuntu/hookrelay
+   WorkingDirectory=/home/ubuntu/hooksniff
    ExecStart=/usr/bin/docker compose -f docker-compose.prod.yml up -d
    ExecStop=/usr/bin/docker compose -f docker-compose.prod.yml down
 
@@ -206,8 +206,8 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
    WantedBy=multi-user.target
    EOF
 
-   sudo systemctl enable hookrelay
-   sudo systemctl start hookrelay
+   sudo systemctl enable hooksniff
+   sudo systemctl start hooksniff
    ```
 
 ### Environment Variables
@@ -251,18 +251,18 @@ REDIS_URL=rediss://default:...@xxx.upstash.io:6379
 2. **Sign up** with GitHub
 3. **Import your repo:**
    - Click **Add New** → **Project**
-   - Select your `hookrelay` repo
+   - Select your `hooksniff` repo
    - Framework: `Next.js` (auto-detected)
    - Root Directory: `dashboard`
 4. **Configure environment variables:**
-   - `NEXT_PUBLIC_API_URL` = `https://api.hookrelay.is-a.dev/v1` (your Oracle Cloud API URL)
+   - `NEXT_PUBLIC_API_URL` = `https://api.hooksniff.is-a.dev/v1` (your Oracle Cloud API URL)
 5. **Deploy:** Click **Deploy** — Vercel builds and deploys automatically on every push to `main`
 
 ### Environment Variables
 
 ```env
 # Set in Vercel Dashboard → Settings → Environment Variables
-NEXT_PUBLIC_API_URL=https://api.hookrelay.is-a.dev/v1
+NEXT_PUBLIC_API_URL=https://api.hooksniff.is-a.dev/v1
 ```
 
 ### Gotchas
@@ -348,13 +348,13 @@ echo -n "YOUR_GRAFANA_CLOUD_INSTANCE_ID:YOUR_API_KEY" | base64
 3. **Enable R2:**
    - Left sidebar → **R2 Object Storage**
    - Click **Create Bucket**
-   - Name: `hookrelay-storage`
+   - Name: `hooksniff-storage`
    - Location: `Automatic` (or choose closest region)
 4. **Create API credentials:**
    - Click **Manage R2 API Tokens**
    - Click **Create API Token**
    - Permissions: `Object Read & Write`
-   - Apply to: `hookrelay-storage` bucket
+   - Apply to: `hooksniff-storage` bucket
    - Copy the **Access Key ID** and **Secret Access Key**
 
 ### Environment Variables
@@ -363,7 +363,7 @@ echo -n "YOUR_GRAFANA_CLOUD_INSTANCE_ID:YOUR_API_KEY" | base64
 R2_ACCOUNT_ID=YOUR_CLOUDFLARE_ACCOUNT_ID
 R2_ACCESS_KEY_ID=YOUR_ACCESS_KEY_ID
 R2_SECRET_ACCESS_KEY=YOUR_SECRET_ACCESS_KEY
-R2_BUCKET_NAME=hookrelay-storage
+R2_BUCKET_NAME=hooksniff-storage
 R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 ```
 
@@ -395,11 +395,11 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 3. **Get your API key:**
    - Go to **API Keys** in the dashboard
    - Click **Create API Key**
-   - Name: `hookrelay-prod`
+   - Name: `hooksniff-prod`
    - Copy the key (starts with `re_`)
 4. **Add your domain** (optional but recommended):
    - Go to **Domains** → **Add Domain**
-   - Enter your domain (e.g., `hookrelay.is-a.dev`)
+   - Enter your domain (e.g., `hooksniff.is-a.dev`)
    - Add the DNS records (SPF, DKIM, DMARC) to your Cloudflare DNS
    - Wait for verification (~5 minutes)
 5. **Test:**
@@ -407,7 +407,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
    curl -X POST https://api.resend.com/emails \
      -H "Authorization: Bearer re_YOUR_API_KEY" \
      -H "Content-Type: application/json" \
-     -d '{"from": "noreply@hookrelay.is-a.dev", "to": "you@example.com", "subject": "Test", "html": "<p>Hello!</p>"}'
+     -d '{"from": "noreply@hooksniff.is-a.dev", "to": "you@example.com", "subject": "Test", "html": "<p>Hello!</p>"}'
    ```
 
 ### Environment Variables
@@ -415,7 +415,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 ```env
 RESEND_API_KEY=re_YOUR_API_KEY
 NOTIFY_EMAIL=admin@example.com
-NOTIFY_EMAIL_FROM=noreply@hookrelay.is-a.dev
+NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
 ```
 
 ### Gotchas
@@ -459,14 +459,14 @@ NOTIFY_EMAIL_FROM=noreply@hookrelay.is-a.dev
    - Go to **SSL/TLS** → **Origin Server** → **Create Certificate**
    - Install the certificate on your Oracle Cloud VM (Nginx/Caddy)
 8. **Page Rules** (optional):
-   - Cache everything for dashboard: `hookrelay.is-a.dev/*` → Cache Level: Cache Everything
+   - Cache everything for dashboard: `hooksniff.is-a.dev/*` → Cache Level: Cache Everything
 
 ### Environment Variables
 
 ```env
 # Set in .env on Oracle Cloud
-CORS_ORIGINS=https://hookrelay.is-a.dev,https://hookrelay.is-a.dev
-APP_URL=https://hookrelay.is-a.dev
+CORS_ORIGINS=https://hooksniff.is-a.dev,https://hooksniff.is-a.dev
+APP_URL=https://hooksniff.is-a.dev
 ```
 
 ### Gotchas
@@ -475,7 +475,7 @@ APP_URL=https://hookrelay.is-a.dev
 - **Full (Strict) SSL** requires an origin certificate on your VM. Without it, use "Full" (not strict).
 - **Free plan** includes DDoS protection — no need to upgrade for security.
 - **Orange cloud** (proxied) vs **Grey cloud** (DNS only): Keep API and dashboard proxied for SSL and caching.
-- **API caching:** Be careful with Cloudflare's default caching. API responses shouldn't be cached — add a Page Rule for `api.hookrelay.is-a.dev/*` with Cache Level: Bypass.
+- **API caching:** Be careful with Cloudflare's default caching. API responses shouldn't be cached — add a Page Rule for `api.hooksniff.is-a.dev/*` with Cache Level: Bypass.
 
 ---
 
@@ -491,7 +491,7 @@ Here's a complete `.env` template for production deployment:
 # ── Application ──
 APP_ENV=production
 PORT=3000
-RUST_LOG=info,hookrelay=debug
+RUST_LOG=info,hooksniff=debug
 
 # ── Database (Neon) ──
 DATABASE_URL=postgresql://neondb_owner:YOUR_PASSWORD@ep-xxx.neon.tech/neondb?sslmode=require
@@ -510,10 +510,10 @@ MAX_PAYLOAD_BYTES=1048576
 RETENTION_DAYS=7
 
 # ── CORS ──
-CORS_ORIGINS=https://hookrelay.is-a.dev
+CORS_ORIGINS=https://hooksniff.is-a.dev
 
 # ── App URL (for Stripe redirects) ──
-APP_URL=https://hookrelay.is-a.dev
+APP_URL=https://hooksniff.is-a.dev
 
 # ── Stripe (optional) ──
 STRIPE_SECRET_KEY=sk_live_...
@@ -524,13 +524,13 @@ STRIPE_PRICE_BUSINESS=price_...
 # ── Email (Resend) ──
 RESEND_API_KEY=re_...
 NOTIFY_EMAIL=admin@example.com
-NOTIFY_EMAIL_FROM=noreply@hookrelay.is-a.dev
+NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
 
 # ── Storage (Cloudflare R2) ──
 R2_ACCOUNT_ID=your_cf_account_id
 R2_ACCESS_KEY_ID=your_access_key
 R2_SECRET_ACCESS_KEY=your_secret_key
-R2_BUCKET_NAME=hookrelay-storage
+R2_BUCKET_NAME=hooksniff-storage
 R2_ENDPOINT=https://your_account_id.r2.cloudflarestorage.com
 
 # ── Monitoring (Grafana Cloud) ──
