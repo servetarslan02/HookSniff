@@ -1,12 +1,12 @@
--- Migration 009: Add multi-provider payment support (Paddle + iyzico)
+-- Migration 009: Add multi-provider payment support (Polar.sh + iyzico)
 -- Adds payment_provider field and provider-specific IDs to customers table.
 
 -- Add payment provider column
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS payment_provider STRING NOT NULL DEFAULT 'stripe';
 
--- Paddle fields
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS paddle_customer_id STRING;
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS paddle_subscription_id STRING;
+-- Polar.sh fields
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_customer_id STRING;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_subscription_id STRING;
 
 -- iyzico fields
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_customer_id STRING;
@@ -14,14 +14,14 @@ ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_subscription_id STRING;
 
 -- Index for provider lookups
 CREATE INDEX IF NOT EXISTS idx_customers_payment_provider ON customers(payment_provider);
-CREATE INDEX IF NOT EXISTS idx_customers_paddle_id ON customers(paddle_customer_id) WHERE paddle_customer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_customers_polar_id ON customers(polar_customer_id) WHERE polar_customer_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_customers_iyzico_id ON customers(iyzico_customer_id) WHERE iyzico_customer_id IS NOT NULL;
 
 -- Payment transactions log table
 CREATE TABLE IF NOT EXISTS payment_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    provider STRING NOT NULL,          -- 'stripe' | 'paddle' | 'iyzico'
+    provider STRING NOT NULL,          -- 'stripe' | 'polar' | 'iyzico'
     provider_tx_id STRING,             -- External transaction ID
     amount_cents INT NOT NULL,
     currency STRING NOT NULL DEFAULT 'USD',

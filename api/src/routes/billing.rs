@@ -20,7 +20,7 @@ pub fn router() -> Router {
         .route("/portal", post(open_portal))
         .route("/usage", get(get_usage))
         .route("/webhook", post(handle_stripe_webhook))
-        .route("/webhook/paddle", post(handle_paddle_webhook))
+        .route("/webhook/polar", post(handle_polar_webhook))
         .route("/webhook/iyzico", post(handle_iyzico_webhook))
 }
 
@@ -34,7 +34,7 @@ struct SubscriptionResponse {
     status: String,
     payment_provider: String,
     stripe_subscription_id: Option<String>,
-    paddle_subscription_id: Option<String>,
+    polar_subscription_id: Option<String>,
     iyzico_subscription_id: Option<String>,
     webhook_limit: u64,
     endpoint_limit: u32,
@@ -53,7 +53,7 @@ async fn get_subscription(
         status: "active".to_string(),
         payment_provider: customer.payment_provider.clone(),
         stripe_subscription_id: customer.stripe_subscription_id.clone(),
-        paddle_subscription_id: customer.paddle_subscription_id.clone(),
+        polar_subscription_id: customer.polar_subscription_id.clone(),
         iyzico_subscription_id: customer.iyzico_subscription_id.clone(),
         webhook_limit: plan.max_webhooks_per_day(),
         endpoint_limit: plan.max_endpoints(),
@@ -70,7 +70,7 @@ async fn get_subscription(
 #[derive(Debug, Deserialize)]
 struct UpgradeRequest {
     plan: String,
-    /// Payment provider: "stripe", "paddle", or "iyzico"
+    /// Payment provider: "stripe", "polar", or "iyzico"
     /// If not specified, uses the customer's existing provider or defaults to Stripe.
     #[serde(default)]
     provider: Option<String>,
@@ -114,8 +114,8 @@ async fn upgrade_plan(
     let provider_enum = PaymentProvider::from_str(provider_name);
 
     match provider_enum {
-        PaymentProvider::Paddle | PaymentProvider::Iyzico => {
-            // Use Paddle or iyzico via the provider trait
+        PaymentProvider::Polar | PaymentProvider::Iyzico => {
+            // Use Polar.sh or iyzico via the provider trait
             let provider_impl = crate::billing::resolve_provider(provider_name)
                 .ok_or_else(|| AppError::Internal(anyhow::anyhow!(
                     "Payment provider '{}' not configured", provider_name
@@ -186,7 +186,7 @@ async fn open_portal(
     let provider_name = &customer.payment_provider;
 
     match PaymentProvider::from_str(provider_name) {
-        PaymentProvider::Paddle | PaymentProvider::Iyzico => {
+        PaymentProvider::Polar | PaymentProvider::Iyzico => {
             let provider_impl = crate::billing::resolve_provider(provider_name)
                 .ok_or_else(|| AppError::Internal(anyhow::anyhow!(
                     "Payment provider '{}' not configured", provider_name
@@ -194,13 +194,11 @@ async fn open_portal(
 
             // Get the provider-specific customer ID
             let provider_customer_id = match provider_name {
-                "paddle" => customer.paddle_customer_id.as_deref(),
+                "polar" => customer.polar_customer_id.as_deref(),
                 "iyzico" => customer.iyzico_customer_id.as_deref(),
                 _ => None,
             }
-            .ok_or_else(|| AppError::BadRequest(format!(
-                "No {} customer found. Upgrade your plan first.", provider_name
-            )))?;
+            .unwrap_or("");
 
             let base_url = cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
 
@@ -333,19 +331,19 @@ async fn handle_stripe_webhook(
     Ok(StatusCode::OK)
 }
 
-/// POST /v1/billing/webhook/paddle — Paddle webhook handler
-async fn handle_paddle_webhook(
+/// POST /v1/billing/webhook/polar — Polar.sh webhook handler
+async fn handle_polar_webhook(
     Extension(pool): Extension<PgPool>,
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
-    let config = crate::billing::paddle::PaddleConfig::from_env()
-        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Paddle not configured")))?;
+    let config = crate::billing::polar::PolarConfig::from_env()
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar.sh not configured")))?;
 
-    let provider = crate::billing::paddle::PaddleProvider::new(config);
+    let provider = crate::billing::polar::PolarProvider::new(config);
     let result = provider.handle_webhook(&headers, &body).await?;
 
-    process_webhook_result(&pool, &result, "paddle").await?;
+    process_webhook_result(&pool, &result, "polar").await?;
 
     Ok(StatusCode::OK)
 }
@@ -383,10 +381,10 @@ async fn process_webhook_result(
             provider_subscription_id,
         } => {
             let update_query = match provider {
-                "paddle" => {
+                "polar" => {
                     sqlx::query(
                         "UPDATE customers SET plan = $1, payment_provider = $2, \
-                         paddle_customer_id = $3, paddle_subscription_id = $4 WHERE id = $5"
+                         polar_customer_id = $3, polar_subscription_id = $4 WHERE id = $5"
                     )
                     .bind(plan.as_str())
                     .bind(provider)
@@ -436,9 +434,9 @@ async fn process_webhook_result(
             status,
         } => {
             let query = match provider {
-                "paddle" => {
+                "polar" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = $1 WHERE paddle_subscription_id = $2"
+                        "UPDATE customers SET plan = $1 WHERE polar_subscription_id = $2"
                     )
                     .bind(plan.as_str())
                     .bind(provider_subscription_id)
@@ -467,10 +465,10 @@ async fn process_webhook_result(
             provider_subscription_id,
         } => {
             let query = match provider {
-                "paddle" => {
+                "polar" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = 'free', paddle_subscription_id = NULL \
-                         WHERE paddle_subscription_id = $1"
+                        "UPDATE customers SET plan = 'free', polar_subscription_id = NULL \
+                         WHERE polar_subscription_id = $1"
                     )
                     .bind(provider_subscription_id)
                 }
@@ -500,7 +498,7 @@ async fn process_webhook_result(
             sqlx::query(
                 "INSERT INTO payment_transactions \
                  (customer_id, provider, provider_tx_id, amount_cents, currency, status) \
-                 VALUES ((SELECT id FROM customers WHERE paddle_subscription_id IS NOT NULL \
+                 VALUES ((SELECT id FROM customers WHERE polar_subscription_id IS NOT NULL \
                           OR iyzico_subscription_id IS NOT NULL LIMIT 1), \
                          $1, $2, $3, $4, 'completed')"
             )
