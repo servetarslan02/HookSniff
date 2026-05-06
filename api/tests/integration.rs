@@ -133,7 +133,7 @@ fn test_plan_limits() {
 
     // Free plan limits
     let free = Plan::Free;
-    assert_eq!(free.max_webhooks_per_day(), 1_000);
+    assert_eq!(free.max_webhooks_per_month(), 1_000);
     assert_eq!(free.max_endpoints(), 5);
     assert_eq!(free.max_requests_per_minute(), 100);
     assert_eq!(free.retention_days(), 7);
@@ -141,7 +141,7 @@ fn test_plan_limits() {
 
     // Pro plan limits
     let pro = Plan::Pro;
-    assert_eq!(pro.max_webhooks_per_day(), 50_000);
+    assert_eq!(pro.max_webhooks_per_month(), 50_000);
     assert_eq!(pro.max_endpoints(), 50);
     assert_eq!(pro.max_requests_per_minute(), 1_000);
     assert_eq!(pro.retention_days(), 30);
@@ -149,7 +149,7 @@ fn test_plan_limits() {
 
     // Business plan limits
     let biz = Plan::Business;
-    assert_eq!(biz.max_webhooks_per_day(), 500_000);
+    assert_eq!(biz.max_webhooks_per_month(), 500_000);
     assert_eq!(biz.max_endpoints(), 500);
     assert_eq!(biz.max_requests_per_minute(), 10_000);
     assert_eq!(biz.retention_days(), 90);
