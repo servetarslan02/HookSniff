@@ -247,6 +247,86 @@ pub enum VerificationError {
     MissingHeader(&'static str),
 }
 
+/// Webhook verifier — wraps secret for repeated verification.
+///
+/// Secret is redacted in Debug output for security.
+pub struct WebhookVerifier {
+    secret: String,
+}
+
+impl WebhookVerifier {
+    /// Create a new verifier with the given secret.
+    pub fn new(secret: impl Into<String>) -> Self {
+        Self { secret: secret.into() }
+    }
+
+    /// Verify a webhook signature.
+    pub fn verify(
+        &self,
+        msg_id: &str,
+        timestamp: &str,
+        signature_header: &str,
+        body: &str,
+        tolerance_secs: Option<i64>,
+    ) -> Result<(), VerificationError> {
+        verify_standard_signature(&self.secret, msg_id, timestamp, signature_header, body, tolerance_secs)
+    }
+
+    /// Verify using a specific timestamp (for testing).
+    pub fn verify_with_timestamp(
+        &self,
+        msg_id: &str,
+        timestamp: &str,
+        signature_header: &str,
+        body: &str,
+    ) -> Result<(), VerificationError> {
+        // Skip timestamp tolerance check
+        let secret_bytes = decode_secret(&self.secret);
+        let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
+
+        let mut mac = HmacSha256::new_from_slice(&secret_bytes)
+            .expect("HMAC can take key of any size");
+        mac.update(signed_content.as_bytes());
+        let expected_bytes = mac.finalize().into_bytes();
+
+        for sig_part in signature_header.split(' ') {
+            let sig_part = sig_part.trim();
+            if sig_part.is_empty() { continue; }
+
+            let encoded = match sig_part.strip_prefix(&format!("{},", SIGNATURE_VERSION)) {
+                Some(e) => e,
+                None => continue,
+            };
+
+            let sig_bytes = match BASE64.decode(encoded) {
+                Ok(b) => b,
+                Err(_) => continue,
+            };
+
+            if sig_bytes.len() == expected_bytes.len() {
+                let diff: u8 = sig_bytes.iter()
+                    .zip(expected_bytes.iter())
+                    .fold(0u8, |acc, (a, b)| acc | (a ^ b));
+                if diff == 0 { return Ok(()); }
+            }
+        }
+
+        Err(VerificationError::SignatureMismatch)
+    }
+
+    /// Compute a signature for the given message.
+    pub fn sign(&self, msg_id: &str, timestamp: &str, body: &str) -> String {
+        compute_standard_signature(&self.secret, msg_id, timestamp, body)
+    }
+}
+
+/// Debug implementation redacts the secret for security.
+impl std::fmt::Debug for WebhookVerifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("WebhookVerifier { secret: [REDACTED] }")
+    }
+}
+
 impl std::fmt::Display for VerificationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -357,5 +437,36 @@ mod tests {
         assert!(
             verify_standard_signature(secret, msg_id, timestamp, &combined, body, None).is_ok()
         );
+    }
+
+    #[test]
+    fn test_webhook_verifier_roundtrip() {
+        let verifier = WebhookVerifier::new("whsec_test123");
+        let msg_id = "msg_v01";
+        let timestamp = &chrono::Utc::now().timestamp().to_string();
+        let body = r#"{"event":"test"}"#;
+
+        let sig = verifier.sign(msg_id, timestamp, body);
+        assert!(verifier.verify(msg_id, timestamp, &sig, body, None).is_ok());
+    }
+
+    #[test]
+    fn test_webhook_verifier_with_timestamp() {
+        let verifier = WebhookVerifier::new("whsec_test123");
+        let msg_id = "msg_v02";
+        let timestamp = "1649367553";
+        let body = r#"{"event":"test"}"#;
+
+        let sig = verifier.sign(msg_id, timestamp, body);
+        // verify_with_timestamp skips tolerance check
+        assert!(verifier.verify_with_timestamp(msg_id, timestamp, &sig, body).is_ok());
+    }
+
+    #[test]
+    fn test_webhook_verifier_debug_redaction() {
+        let verifier = WebhookVerifier::new("whsec_super_secret_key");
+        let debug = format!("{:?}", verifier);
+        assert!(debug.contains("REDACTED"));
+        assert!(!debug.contains("super_secret"));
     }
 }
