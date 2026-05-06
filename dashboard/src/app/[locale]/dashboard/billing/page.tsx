@@ -97,6 +97,8 @@ function InvoiceStatusBadge({ status }: { status: string }) {
 export default function BillingPage() {
   const { user, token } = useAuth();
   const { toast } = useToast();
+  const t = useTranslations('billing');
+  const tc = useTranslations('common');
   const currentPlan = user?.plan || 'free';
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit, setUsageLimit] = useState(1000);
