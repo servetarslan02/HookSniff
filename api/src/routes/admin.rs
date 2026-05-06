@@ -395,12 +395,12 @@ async fn system_stats(
         .fetch_one(&pool)
         .await?;
 
-    // Revenue: assume $0 for free, $49 for pro, $199 for business (monthly)
+    // Revenue: assume $0 for free, $49 for pro, $149 for business (monthly)
     let revenue: (Option<f64>,) = sqlx::query_as(
         r#"SELECT COALESCE(SUM(
             CASE plan
                 WHEN 'pro' THEN 49.0
-                WHEN 'business' THEN 199.0
+                WHEN 'business' THEN 149.0
                 ELSE 0.0
             END
         ), 0.0) as revenue FROM customers WHERE is_active = TRUE"#,
@@ -453,7 +453,7 @@ async fn revenue_by_month(
                 (SELECT SUM(
                     CASE plan
                         WHEN 'pro' THEN 49.0
-                        WHEN 'business' THEN 199.0
+                        WHEN 'business' THEN 149.0
                         ELSE 0.0
                     END
                 )
