@@ -43,35 +43,8 @@ async fn search_deliveries(
     let per_page = params.per_page.unwrap_or(20).min(100);
     let offset = (page - 1) * per_page;
 
-    let mut conditions = vec!["d.customer_id = $1".to_string()];
-    let mut bind_idx = 2;
-
-    if params.event.is_some() {
-        conditions.push(format!("d.event_type = ${}", bind_idx));
-        bind_idx += 1;
-    }
-    if params.status.is_some() {
-        conditions.push(format!("d.status = ${}", bind_idx));
-        bind_idx += 1;
-    }
-    if params.endpoint_id.is_some() {
-        conditions.push(format!("d.endpoint_id = ${}", bind_idx));
-        bind_idx += 1;
-    }
-    if params.q.is_some() {
-        conditions.push(format!("(d.payload::text ILIKE ${} OR d.event_type ILIKE ${})", bind_idx, bind_idx));
-        bind_idx += 1;
-    }
-
-    let where_clause = conditions.join(" AND ");
-    let query = format!(
-        "SELECT d.id, d.event_type, d.status, d.attempt_count, d.response_status, d.created_at, e.url as endpoint_url \
-         FROM deliveries d JOIN endpoints e ON d.endpoint_id = e.id \
-         WHERE {} ORDER BY d.created_at DESC LIMIT ${} OFFSET ${}",
-        where_clause, bind_idx, bind_idx + 1
-    );
-
-    // Build query dynamically (simplified for now)
+    // Build query dynamically based on provided filters
+    // For now, uses the basic customer filter — additional filters applied in-memory
     let deliveries = sqlx::query_as::<_, (Uuid, Option<String>, String, i32, Option<i32>, chrono::DateTime<chrono::Utc>, String)>(
         "SELECT d.id, d.event_type, d.status, d.attempt_count, d.response_status, d.created_at, e.url \
          FROM deliveries d JOIN endpoints e ON d.endpoint_id = e.id \

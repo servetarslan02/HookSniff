@@ -268,7 +268,7 @@ class HookRelayClient:
             {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "User-Agent": "hookrelay-python/0.2.0",
+                "User-Agent": "hookrelay-python/0.3.0",
             }
         )
 

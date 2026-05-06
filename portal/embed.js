@@ -9,6 +9,7 @@
  *   data-theme     (optional) — "dark" or "light" (default: "dark")
  *   data-height    (optional) — Widget height (default: "600px")
  *   data-width     (optional) — Widget width  (default: "100%")
+ *   data-target    (optional) — CSS selector for target container (default: insert after script tag)
  */
 (function () {
   "use strict";
@@ -23,6 +24,7 @@
   var THEME    = SCRIPT_TAG.getAttribute("data-theme")    || "dark";
   var HEIGHT   = SCRIPT_TAG.getAttribute("data-height")   || "600px";
   var WIDTH    = SCRIPT_TAG.getAttribute("data-width")    || "100%";
+  var TARGET   = SCRIPT_TAG.getAttribute("data-target");
 
   if (!API_KEY) {
     console.error("[HookRelay] data-api-key attribute is required.");
@@ -51,6 +53,16 @@
   iframe.setAttribute("loading", "lazy");
   iframe.setAttribute("allow", "clipboard-read; clipboard-write");
 
-  // Replace script tag with iframe
-  SCRIPT_TAG.parentNode.insertBefore(iframe, SCRIPT_TAG.nextSibling);
+  // Insert iframe into target container or after script tag
+  if (TARGET) {
+    var container = document.querySelector(TARGET);
+    if (container) {
+      container.appendChild(iframe);
+    } else {
+      console.warn("[HookRelay] Target container '" + TARGET + "' not found. Falling back to script position.");
+      SCRIPT_TAG.parentNode.insertBefore(iframe, SCRIPT_TAG.nextSibling);
+    }
+  } else {
+    SCRIPT_TAG.parentNode.insertBefore(iframe, SCRIPT_TAG.nextSibling);
+  }
 })();

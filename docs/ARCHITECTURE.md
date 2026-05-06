@@ -25,10 +25,11 @@
               │  │  └───────────────┼────► PostgreSQL (Neon)
               │  │                  │         sslmode=require
               │  │                  │
-              │  └──────────────────┼────► Redis (optional cache)
+              │  └──────────────────┼────► PostgreSQL (Neon)
+              │                     │         sslmode=require
               │                     │
-              └─────────────────────┼────► Kafka / Redpanda
-                                    │         (webhook delivery queue)
+              └─────────────────────┼────► PostgreSQL Queue
+                                    │         (webhook_queue table)
                                     │
                                     ▼
                               ┌───────────┐
@@ -58,13 +59,13 @@
 | Framework | Axum (async Rust) |
 | Port | 3000 |
 | Database | PostgreSQL via SQLx (Neon in production) |
-| Queue | Kafka/Redpanda via rdkafka |
+| Queue | PostgreSQL (`webhook_queue` table) |
 
 **Responsibilities:**
 - REST API endpoints (`/v1/*`)
 - Authentication: API keys (`hr_live_*`) for programmatic access, JWT for dashboard
 - Rate limiting per plan (sliding window)
-- Webhook ingestion → Kafka queue
+- Webhook ingestion → PostgreSQL queue
 - Idempotency key support (`Idempotency-Key` header)
 - SSRF protection (blocks internal/private IPs)
 - Payload validation (size, JSON depth, event type format)
@@ -90,11 +91,11 @@
 | Property | Value |
 |----------|-------|
 | Framework | Rust + Tokio |
-| Queue Consumer | Kafka/Redpanda (rdkafka) |
+| Queue | PostgreSQL polling (`webhook_queue`) |
 
 **Responsibilities:**
-- Consumes webhook delivery messages from Kafka
-- Executes delivery workflows with retry logic
+- Polls `webhook_queue` table for pending deliveries
+- Executes webhook delivery with retry logic
 - Signs payloads with HMAC-SHA256 (`X-Hookrelay-Signature`)
 - Supports multiple delivery backends:
   - **HTTP** — Standard webhook delivery (primary)
@@ -173,7 +174,7 @@ POST /v1/webhooks
   │
   ├─► INSERT INTO deliveries (status: 'pending')
   ├─► UPDATE customers SET webhook_count++
-  ├─► Publish to Kafka (webhook-deliveries topic)
+  ├─► Insert into PostgreSQL queue (webhook_queue table)
   ├─► Store idempotency key (if provided)
   │
   ▼
@@ -183,7 +184,7 @@ Return 200 (delivery ID + status: 'pending')
 ### 2. Webhook Delivery (Worker → Endpoint)
 
 ```
-Kafka Consumer (Worker)
+PostgreSQL Queue Poller (Worker)
   │
   ├─► Read message from topic
   ├─► Look up endpoint URL + signing secret
@@ -223,7 +224,7 @@ Retry Scheduler (background task, every 30s)
   │     LIMIT 50
   │
   └─► For each delivery:
-        └─► Re-publish to Kafka for worker processing
+        └─► Re-insert into PostgreSQL queue for retry
 ```
 
 ---
@@ -359,7 +360,7 @@ The API blocks webhook delivery to internal/private networks:
 
 - All services communicate over Fly.io private network (6PN)
 - No public ports except API (3000) and Dashboard (3001)
-- Internal services (Kafka, Redis) are not publicly accessible
+- Internal services (PostgreSQL) are not publicly accessible
 - Health checks on all services
 
 ---
@@ -448,11 +449,11 @@ api_keys (
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| API | Rust, Axum, SQLx, rdkafka | Async REST API |
-| Worker | Rust, Tokio, rdkafka | Webhook delivery engine |
+| API | Rust, Axum, SQLx | Async REST API |
+| Worker | Rust, Tokio | Webhook delivery engine |
 | Dashboard | TypeScript, Next.js 14, Tailwind CSS | Web UI |
 | Database | PostgreSQL (Neon) | Persistent storage |
-| Queue | Kafka / Redpanda | Async message delivery |
+| Queue | PostgreSQL (webhook_queue) | Async message delivery |
 | Auth | JWT + Argon2 + HMAC-SHA256 | Multi-layer auth |
 | Billing | Stripe (Checkout + Portal + Webhooks) | Payments |
 | Monitoring | Prometheus + Grafana | Metrics & dashboards |

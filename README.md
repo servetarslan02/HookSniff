@@ -23,9 +23,8 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 | Component | Technology |
 |---|---|
 | API | Rust (Axum) |
-| Queue | Kafka / Redpanda |
-| Workflow | Temporal |
-| Database | CockroachDB |
+| Queue | PostgreSQL (webhook_queue table) |
+| Database | PostgreSQL |
 | Dashboard | Next.js 15 |
 | Billing | Stripe |
 | Monitoring | Grafana + Prometheus + OpenTelemetry |
@@ -40,17 +39,8 @@ cd hookrelay
 # Copy environment config
 cp .env.example .env
 
-# Start infrastructure (CockroachDB + Redpanda + Temporal)
-make infra
-
-# Run API
-make api
-
-# Run worker (in another terminal)
-make worker
-
-# Run dashboard (in another terminal)
-make dashboard
+# Start everything (PostgreSQL + API + Worker + Dashboard)
+make local
 ```
 
 API runs on `http://localhost:3000`
@@ -82,7 +72,7 @@ curl -X POST http://localhost:3000/v1/webhooks \
 ```
 hookrelay/
 ├── api/               # Rust Axum API server
-├── worker/            # Temporal worker (retry logic)
+├── worker/            # Background worker (retry + delivery)
 ├── dashboard/         # Next.js dashboard + landing page
 ├── ai-center/         # AI-powered monitoring (optional)
 ├── sdks/              # Node.js & Python SDKs

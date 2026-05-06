@@ -1,27 +1,33 @@
+//! Retry Scheduler — Re-queues failed deliveries for retry.
+//!
+//! Polls the `webhook_queue` table every 30 seconds for deliveries
+//! with `next_retry_at <= now()` and `status = 'pending'`, then
+//! marks them as available for the main processing loop.
+//!
+//! NOTE: This module is not currently wired into main.rs.
+//! The main loop already handles retries via `next_retry_at` filtering.
+//! This module exists for potential future use as a standalone scheduler.
+
 use anyhow::Result;
-use rdkafka::producer::{FutureProducer, FutureRecord};
-use serde_json::json;
-use std::time::Duration;
 
-use crate::config::WorkerConfig;
-
-/// Background task that polls the database every 30 seconds for deliveries
-/// with `next_retry_at <= now()` and `status = 'pending'`, then re-publishes
-/// them to Kafka for the worker to process.
-pub async fn run_retry_scheduler(
-    pool: sqlx::PgPool,
-    producer: FutureProducer,
-    cfg: WorkerConfig,
-) {
+/// Background task that ensures retry-eligible deliveries are picked up.
+///
+/// In the current architecture, the main polling loop in `process_pending`
+/// already filters by `next_retry_at <= now()`, so this is a safety net
+/// that can be enabled if needed.
+pub async fn run_retry_scheduler(pool: sqlx::PgPool) {
     tracing::info!("⏰ Retry scheduler started — polling every 30s");
 
     loop {
-        tokio::time::sleep(Duration::from_secs(30)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(30)).await;
 
-        match poll_and_requeue(&pool, &producer, &cfg).await {
+        match reset_stale_processing(&pool).await {
             Ok(count) => {
                 if count > 0 {
-                    tracing::info!("🔄 Retry scheduler: re-queued {} deliveries", count);
+                    tracing::info!(
+                        "🔄 Retry scheduler: reset {} stale 'processing' items back to 'pending'",
+                        count
+                    );
                 }
             }
             Err(e) => {
@@ -31,73 +37,21 @@ pub async fn run_retry_scheduler(
     }
 }
 
-/// Find deliveries that are ready for retry and re-publish them to Kafka.
-async fn poll_and_requeue(
-    pool: &sqlx::PgPool,
-    producer: &FutureProducer,
-    cfg: &WorkerConfig,
-) -> Result<usize> {
-    // Find deliveries with next_retry_at <= now() and status = 'pending'
-    let pending: Vec<(String, String, String, String, String, Option<serde_json::Value>, Option<String>, Option<String>)> = sqlx::query_as(
+/// Reset items stuck in 'processing' for too long back to 'pending'.
+///
+/// If a worker crashes mid-delivery, items can get stuck in 'processing'.
+/// This resets them after 5 minutes so they can be retried.
+async fn reset_stale_processing(pool: &sqlx::PgPool) -> Result<usize> {
+    let result = sqlx::query(
         r#"
-        SELECT
-            d.id,
-            d.endpoint_id,
-            e.url,
-            e.signing_secret,
-            d.payload::STRING,
-            e.custom_headers,
-            e.old_signing_secret,
-            e.secret_rotated_at::STRING
-        FROM deliveries d
-        JOIN endpoints e ON d.endpoint_id = e.id
-        WHERE d.status = 'pending'
-          AND d.next_retry_at IS NOT NULL
-          AND d.next_retry_at <= now()
-        ORDER BY d.next_retry_at ASC
-        LIMIT 50
+        UPDATE webhook_queue
+        SET status = 'pending'
+        WHERE status = 'processing'
+          AND processed_at < now() - INTERVAL '5 minutes'
         "#,
     )
-    .fetch_all(pool)
+    .execute(pool)
     .await?;
 
-    let count = pending.len();
-
-    for (delivery_id, endpoint_id, url, signing_secret, payload, custom_headers, old_signing_secret, secret_rotated_at) in pending {
-        let webhook_msg = json!({
-            "delivery_id": delivery_id,
-            "endpoint_id": endpoint_id,
-            "endpoint_url": url,
-            "signing_secret": signing_secret,
-            "old_signing_secret": old_signing_secret,
-            "secret_rotated_at": secret_rotated_at,
-            "custom_headers": custom_headers,
-            "payload": payload,
-        });
-
-        let msg_str = serde_json::to_string(&webhook_msg)?;
-
-        match producer
-            .send(
-                FutureRecord::to(&cfg.kafka_topic)
-                    .key(&delivery_id)
-                    .payload(&msg_str),
-                Duration::from_secs(5),
-            )
-            .await
-        {
-            Ok(_) => {
-                tracing::debug!("📤 Re-queued delivery {} for retry", delivery_id);
-            }
-            Err((e, _)) => {
-                tracing::error!(
-                    "❌ Failed to re-queue delivery {}: {}",
-                    delivery_id,
-                    e
-                );
-            }
-        }
-    }
-
-    Ok(count)
+    Ok(result.rows_affected() as usize)
 }

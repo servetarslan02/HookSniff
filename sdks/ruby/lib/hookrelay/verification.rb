@@ -59,7 +59,10 @@ module HookRelay
     # Check each signature in the header (space-separated)
     signatures = signature_header.split(" ")
     verified = signatures.any? do |sig|
-      sig.strip == expected_full
+      sig_stripped = sig.strip
+      next unless sig_stripped.start_with?("v1,")
+      # Use Rack's constant-time comparison (or built-in fallback)
+      Rack::Utils.secure_compare(sig_stripped, expected_full)
     end
 
     unless verified

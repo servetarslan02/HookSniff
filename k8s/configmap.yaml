@@ -5,7 +5,12 @@ metadata:
   namespace: hookrelay
 data:
   PORT: "3000"
-  KAFKA_BROKERS: "redpanda.hookrelay.svc.cluster.local:9092"
-  KAFKA_TOPIC: "webhook-deliveries"
+  APP_ENV: "production"
   RUST_LOG: "info"
   MAX_PAYLOAD_BYTES: "1048576"
+  MAX_ATTEMPTS: "3"
+  RETENTION_DAYS: "30"
+  WEBHOOK_FORMAT: "standard"
+  WEBHOOK_TIMESTAMP_TOLERANCE_SECS: "300"
+  # Queue: PostgreSQL-based (uses webhook_queue table)
+  # No external queue service needed

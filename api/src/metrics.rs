@@ -17,7 +17,7 @@ pub struct Metrics {
     pub error_count: IntCounterVec,
     pub active_endpoints: Gauge,
     // ── Infrastructure metrics ──
-    pub kafka_publish_latency_seconds: Histogram,
+    pub queue_publish_latency_seconds: Histogram,
     pub db_query_duration_seconds: Histogram,
 }
 
@@ -93,10 +93,10 @@ impl Metrics {
         ))
         .unwrap();
 
-        let kafka_publish_latency_seconds = Histogram::with_opts(
+        let queue_publish_latency_seconds = Histogram::with_opts(
             HistogramOpts::new(
-                "kafka_publish_latency_seconds",
-                "Kafka publish latency in seconds",
+                "queue_publish_latency_seconds",
+                "Queue publish latency in seconds",
             )
             .buckets(vec![
                 0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0,
@@ -123,7 +123,7 @@ impl Metrics {
         registry.register(Box::new(delivery_latency_seconds.clone())).unwrap();
         registry.register(Box::new(error_count.clone())).unwrap();
         registry.register(Box::new(active_endpoints.clone())).unwrap();
-        registry.register(Box::new(kafka_publish_latency_seconds.clone())).unwrap();
+        registry.register(Box::new(queue_publish_latency_seconds.clone())).unwrap();
         registry.register(Box::new(db_query_duration_seconds.clone())).unwrap();
 
         Self {
@@ -136,7 +136,7 @@ impl Metrics {
             delivery_latency_seconds,
             error_count,
             active_endpoints,
-            kafka_publish_latency_seconds,
+            queue_publish_latency_seconds,
             db_query_duration_seconds,
         }
     }

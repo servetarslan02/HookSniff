@@ -63,10 +63,7 @@ curl http://localhost:3000/v1/webhooks/YOUR_WEBHOOK_ID \
 |---------|------|-------------|
 | API | 3000 | Rust Axum server |
 | Dashboard | 3001 | Next.js web UI |
-| CockroachDB | 26257 | Database |
-| Redpanda | 9092 | Message queue |
-| Temporal | 7233 | Workflow engine |
-| Temporal UI | 8081 | Workflow dashboard |
+| PostgreSQL | 5432 | Database + queue |
 
 ## Stop
 
@@ -92,7 +89,7 @@ docker compose down && docker compose up -d
 **Database not ready?**
 ```bash
 # Wait 30 seconds, then:
-docker compose exec cockroachdb cockroach sql --insecure -e "SELECT 1"
+docker compose exec postgres psql -U hookrelay -d hookrelay -c "SELECT 1"
 ```
 
 **Port conflict?**

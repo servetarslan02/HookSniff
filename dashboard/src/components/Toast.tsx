@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from 'react';
 import { clsx } from 'clsx';
 
 interface Toast {
@@ -17,10 +17,10 @@ const ToastContext = createContext<ToastContextType | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  let nextId = 0;
+  const nextIdRef = useRef(0);
 
   const addToast = useCallback((message: string, type: Toast['type'] = 'info') => {
-    const id = ++nextId;
+    const id = ++nextIdRef.current;
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));

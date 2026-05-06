@@ -65,12 +65,16 @@ function TimeRangeSelector({
 /* ─── Animated Counter ─── */
 function AnimatedCounter({ value, duration = 1200 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
-  const ref = useRef<number>(0);
+  const prevRef = useRef<number>(0);
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
-    const start = ref.current;
+    const start = prevRef.current;
     const diff = value - start;
-    if (diff === 0) return;
+    if (diff === 0) {
+      setDisplay(value);
+      return;
+    }
     const startTime = performance.now();
 
     function animate(now: number) {
@@ -81,13 +85,14 @@ function AnimatedCounter({ value, duration = 1200 }: { value: number; duration?:
       setDisplay(current);
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        rafRef.current = requestAnimationFrame(animate);
       } else {
-        ref.current = value;
+        prevRef.current = value;
       }
     }
 
-    requestAnimationFrame(animate);
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
   }, [value, duration]);
 
   return <>{display.toLocaleString()}</>;

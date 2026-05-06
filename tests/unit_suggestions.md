@@ -65,7 +65,7 @@ Her handler için önerilen testler:
 
 ### `health.rs` — Sağlık Kontrolü
 - `health` — 200 döndürüyor
-- `health` — Bağımlılıklar (DB, Kafka) durumu
+- `health` — Bağımlılıklar (DB) durumu
 
 ### `search.rs` — Arama
 - `search` — Anahtar kelime ile arama
@@ -268,9 +268,18 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     services:
-      cockroachdb:
-        image: cockroachdb/cockroach:latest
-        ports: ['26257:26257', '8080:8080']
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: hookrelay
+          POSTGRES_PASSWORD: hookrelay_local
+          POSTGRES_DB: hookrelay
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - run: cargo test --workspace

@@ -7,7 +7,7 @@
 - [Rust](https://rustup.rs/) 1.82+
 - [Node.js](https://nodejs.org/) 20+
 - [Docker](https://docker.com/) & Docker Compose
-- [protobuf-compiler](https://grpc.io/docs/protoc-installation/) (for Temporal SDK)
+- [protobuf-compiler (for gRPC delivery))
 
 ### Getting Started
 
@@ -19,7 +19,7 @@ cd hookrelay
 # Copy environment config
 cp .env.example .env
 
-# Start infrastructure (CockroachDB, Redpanda, Temporal)
+# Start infrastructure (PostgreSQL)
 make infra
 
 # Run the API server
@@ -43,11 +43,11 @@ hookrelay/
 │       ├── middleware/      # Auth, rate limiting
 │       ├── models/         # Database models
 │       └── ...
-├── worker/                 # Rust delivery worker (Temporal)
+├── worker/                 # Rust delivery worker (PostgreSQL polling)
 │   └── src/
 │       ├── main.rs         # Worker entry point
-│       ├── workflows/      # Temporal workflow definitions
-│       ├── activities/     # Temporal activities
+│       ├── workflows/      # Delivery workflow logic (placeholder)
+│       ├── activities/     # Delivery activities (placeholder)
 │       └── delivery/       # Delivery backends (HTTP, gRPC, SQS)
 ├── dashboard/              # Next.js dashboard
 │   └── src/
@@ -179,7 +179,7 @@ See `tests/load/results/README.md` for detailed instructions.
    ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS signing_secret TEXT;
    ```
 
-3. Test locally against CockroachDB.
+3. Test locally against PostgreSQL.
 
 4. Include the migration in your PR.
 

@@ -1,5 +1,6 @@
 use anyhow::Result;
 use sqlx::PgPool;
+use sqlx::Row;
 use uuid::Uuid;
 
 use super::*;
@@ -274,8 +275,11 @@ impl MarketplaceRegistry {
 
     /// Get all enabled agents for a customer (used during webhook processing)
     pub async fn get_enabled_agents(&self, customer_id: Uuid) -> Result<Vec<(InstalledAgent, MarketplaceAgent)>> {
-        let rows = sqlx::query_as::<_, (InstalledAgent, MarketplaceAgent)>(
-            "SELECT ia.*, ma.* FROM installed_agents ia \
+        let rows = sqlx::query(
+            "SELECT \
+                ia.id, ia.customer_id, ia.agent_id, ia.enabled, ia.config as install_config, ia.installed_at, \
+                ma.id as ma_id, ma.name, ma.description, ma.author, ma.version, ma.config as ma_config, ma.downloads, ma.rating, ma.created_at \
+             FROM installed_agents ia \
              JOIN marketplace_agents ma ON ia.agent_id = ma.id \
              WHERE ia.customer_id = $1 AND ia.enabled = true",
         )
@@ -283,7 +287,31 @@ impl MarketplaceRegistry {
         .fetch_all(&self.pool)
         .await?;
 
-        Ok(rows)
+        let mut result = Vec::new();
+        for row in rows {
+            let installed = InstalledAgent {
+                id: row.get("id"),
+                customer_id: row.get("customer_id"),
+                agent_id: row.get("agent_id"),
+                enabled: row.get("enabled"),
+                config: row.get("install_config"),
+                installed_at: row.get("installed_at"),
+            };
+            let agent = MarketplaceAgent {
+                id: row.get("ma_id"),
+                name: row.get("name"),
+                description: row.get("description"),
+                author: row.get("author"),
+                version: row.get("version"),
+                config: row.get("ma_config"),
+                downloads: row.get("downloads"),
+                rating: row.get("rating"),
+                created_at: row.get("created_at"),
+            };
+            result.push((installed, agent));
+        }
+
+        Ok(result)
     }
 
     /// Resolve agent dependencies — check if all required agents are installed

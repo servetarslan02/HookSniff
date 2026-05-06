@@ -33,7 +33,7 @@ HookRelay platformunun **kendi kendini yöneten, koruyan ve optimize eden** oton
 ### 1.1 Sistem Sağlık İzleme
 - **CPU / RAM / Disk** kullanımı (eşik: %80 uyarı, %95 kritik)
 - **API yanıt süreleri** (p50, p95, p99)
-- **Kafka lag** (consumer gecikmesi)
+- **Queue depth** (consumer gecikmesi)
 - **DB bağlantı havuzu** durumu
 - **Aktif bağlantı sayısı**
 
@@ -150,7 +150,7 @@ Her **endpoint** ve **müşteri** için sürekli risk puanı hesapla:
 | Endpoint %100 hata | Geçici devre dışı bırak, müşteriye bildir | 🟡 |
 | Dead letter dolu | Eski kayıtları temizle, rapor oluştur | 🟢 |
 | Retry fırtınası | Backoff stratejisini değiştir | 🟡 |
-| Kafka lag yüksek | Consumer sayısını artır | 🟢 |
+| Queue depth yüksek | Worker sayısını artır | 🟢 |
 
 #### Sistem Düzeltmeleri
 | Sorun | Çözüm | Risk |

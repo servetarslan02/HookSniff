@@ -22,6 +22,7 @@ Bu kadar. Sayfanıza bir webhook portalı eklenecek.
 | `data-theme` | ❌ | `dark` | Tema: `dark` veya `light` |
 | `data-height` | ❌ | `600px` | Widget yüksekliği |
 | `data-width` | ❌ | `100%` | Widget genişliği |
+| `data-target` | ❌ | _(script tag sonrası)_ | Hedef container CSS seçici |
 
 ## Örnekler
 

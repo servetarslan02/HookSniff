@@ -22,6 +22,18 @@ mod config;
 pub mod delivery;
 mod signing;
 
+/// Webhook message format used by delivery modules.
+/// Bridges the queue item format with the delivery router.
+#[derive(Debug, Clone)]
+pub struct WebhookMessage {
+    pub delivery_id: String,
+    pub endpoint_id: String,
+    pub endpoint_url: String,
+    pub signing_secret: String,
+    pub payload: String,
+    pub custom_headers: Option<serde_json::Value>,
+}
+
 /// Webhook queue'dan gelen mesaj formatı
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
 pub struct WebhookQueueItem {

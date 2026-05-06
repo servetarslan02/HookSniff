@@ -40,6 +40,7 @@ export default function SearchPage() {
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
   const search = useCallback(async (p = 1) => {
+    if (!token) return;
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -50,7 +51,7 @@ export default function SearchPage() {
       params.set('per_page', '20');
 
       const res = await fetch(`${API}/search?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token || ''}` },
       });
       if (res.ok) setResults(await res.json());
     } catch (e) {

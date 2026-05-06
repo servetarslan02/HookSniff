@@ -47,7 +47,7 @@ Bu dosya sistemi aktif hale getirmek için yapman gerekenleri listeler.
 | Servis | Port | Durum |
 |--------|------|-------|
 | API (Axum) | 3000 | ✅ Çalışıyor |
-| Worker (Kafka consumer) | - | ✅ Çalışıyor |
+| Worker (PostgreSQL polling) | - | ✅ Çalışıyor |
 | Dashboard (Next.js) | 3001 | ✅ Çalışıyor |
 
 ### Yeni Eklenen

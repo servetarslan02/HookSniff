@@ -87,6 +87,9 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     // Run agent orchestrator migration
     run_agent_migration(pool).await?;
 
+    // Run marketplace migration
+    run_marketplace_migration(pool).await?;
+
     Ok(())
 }
 
@@ -136,5 +139,43 @@ async fn run_agent_migration(pool: &PgPool) -> Result<()> {
     .await?;
 
     tracing::info!("✅ Agent orchestrator migrations completed");
+    Ok(())
+}
+
+async fn run_marketplace_migration(pool: &PgPool) -> Result<()> {
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS marketplace_agents (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            description TEXT,
+            author TEXT NOT NULL,
+            version TEXT NOT NULL DEFAULT '1.0.0',
+            config JSONB NOT NULL DEFAULT '{}',
+            downloads INT NOT NULL DEFAULT 0,
+            rating FLOAT NOT NULL DEFAULT 0.0,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS installed_agents (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL,
+            agent_id UUID NOT NULL REFERENCES marketplace_agents(id),
+            enabled BOOL NOT NULL DEFAULT true,
+            config JSONB,
+            installed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_marketplace_agents_name ON marketplace_agents(name);
+        CREATE INDEX IF NOT EXISTS idx_marketplace_agents_author ON marketplace_agents(author);
+        CREATE INDEX IF NOT EXISTS idx_installed_agents_customer ON installed_agents(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_installed_agents_agent ON installed_agents(agent_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_installed_agents_unique ON installed_agents(customer_id, agent_id);
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    tracing::info!("✅ Marketplace migrations completed");
     Ok(())
 }

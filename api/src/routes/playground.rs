@@ -91,8 +91,6 @@ async fn get_playground(
     }))
 }
 
-use axum::response::IntoResponse;
-
 async fn test_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,

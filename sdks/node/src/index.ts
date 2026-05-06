@@ -132,11 +132,15 @@ export function verifySignature(
     .update(payload)
     .digest("hex");
 
-  // Constant-time comparison
-  return crypto.timingSafeEqual(
-    Buffer.from(computed, "utf-8"),
-    Buffer.from(expectedHex, "utf-8")
-  );
+  // Constant-time comparison (decode hex to raw bytes for correct comparison)
+  const computedBuf = Buffer.from(computed, "hex");
+  const expectedBuf = Buffer.from(expectedHex, "hex");
+
+  if (computedBuf.length !== expectedBuf.length || computedBuf.length === 0) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(computedBuf, expectedBuf);
 }
 
 // Map snake_case API responses to camelCase
