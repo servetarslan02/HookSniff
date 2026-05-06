@@ -323,7 +323,7 @@ export default function DeliveryDetailPage() {
                     ? formatJson(delivery.request_body)
                     : 'No payload captured'}
                 </pre>
-                {delivery.request_body && (
+                {delivery.request_body != null && (
                   <button
                     onClick={() => copyToClipboard(formatJson(delivery.request_body), 'req-body')}
                     className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"

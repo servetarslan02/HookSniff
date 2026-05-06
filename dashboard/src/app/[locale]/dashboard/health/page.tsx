@@ -21,10 +21,10 @@ interface EndpointHealth {
   uptime_24h: number;
 }
 
-const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
-  healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20' },
-  degraded: { color: 'text-yellow-700 dark:text-yellow-400', bg: 'bg-yellow-100 dark:bg-yellow-500/20' },
-  unhealthy: { color: 'text-red-700 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-500/20' },
+const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: string }> = {
+  healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', labelKey: 'healthy' },
+  degraded: { color: 'text-yellow-700 dark:text-yellow-400', bg: 'bg-yellow-100 dark:bg-yellow-500/20', labelKey: 'degraded' },
+  unhealthy: { color: 'text-red-700 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-500/20', labelKey: 'unhealthy' },
 };
 
 export default function EndpointHealthPage() {
@@ -104,15 +104,14 @@ export default function EndpointHealthPage() {
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
             {endpoints.map((ep) => {
-              const statusColors = STATUS_COLORS[ep.health_status] || STATUS_COLORS.healthy;
-              const statusLabel = t(ep.health_status as 'healthy' | 'degraded' | 'unhealthy') || ep.health_status;
+              const status = STATUS_CONFIG[ep.health_status] || STATUS_CONFIG.healthy;
               return (
                 <div key={ep.id} className="px-6 py-5 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-3">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors.bg} ${statusColors.color}`}>
-                          {statusLabel}
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.bg} ${status.color}`}>
+                          {t(status.labelKey)}
                         </span>
                         <code className="text-sm font-mono text-gray-700 dark:text-slate-300">
                           {ep.url}

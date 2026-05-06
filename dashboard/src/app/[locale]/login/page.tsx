@@ -68,7 +68,7 @@ function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'register' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
                 <input
                   type="text"
                   value={name}
@@ -79,7 +79,7 @@ function LoginForm() {
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('email')}</label>
               <input
                 type="email"
                 value={email}
@@ -90,7 +90,7 @@ function LoginForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Password</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('password')}</label>
               <input
                 type="password"
                 value={password}
@@ -114,16 +114,16 @@ function LoginForm() {
           <div className="mt-6 text-center text-sm text-gray-500 dark:text-slate-400">
             {mode === 'login' ? (
               <>
-                Don&apos;t have an account?{' '}
+                {t('noAccount')}{' '}
                 <button onClick={() => setMode('register')} className="text-brand-600 dark:text-brand-400 font-medium hover:text-brand-700 dark:hover:text-brand-300">
-                  Sign up
+                  {t('signUp')}
                 </button>
               </>
             ) : (
               <>
-                t('hasAccount'){' '}
+                {t('hasAccount')}{' '}
                 <button onClick={() => setMode('login')} className="text-brand-600 dark:text-brand-400 font-medium hover:text-brand-700 dark:hover:text-brand-300">
-                  Sign in
+                  {t('signIn')}
                 </button>
               </>
             )}

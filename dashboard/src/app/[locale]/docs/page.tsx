@@ -106,7 +106,6 @@ console.log('Delivery ID:', result.id);`}
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import requests
 import os
-import { useTranslations } from 'next-intl';
 
 response = requests.post(
     'https://api.hookrelay.io/v1/webhooks',
