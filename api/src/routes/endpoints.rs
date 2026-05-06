@@ -5,6 +5,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::billing::Plan;
 use crate::models::customer::Customer;
 use crate::models::endpoint::{CreateEndpointRequest, Endpoint, EndpointResponse};
 
@@ -34,6 +35,23 @@ async fn create_endpoint(
     Extension(customer): Extension<Customer>,
     Json(req): Json<CreateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
+    // Check endpoint limit based on plan
+    let plan = Plan::from_str(&customer.plan);
+    let endpoint_count: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    if endpoint_count.0 as u32 >= plan.max_endpoints() {
+        return Err(AppError::BadRequest(format!(
+            "Endpoint limit reached ({}/{}). Upgrade your plan for more endpoints.",
+            endpoint_count.0,
+            plan.max_endpoints()
+        )));
+    }
+
     // Validate URL
     if !req.url.starts_with("https://") && !req.url.starts_with("http://") {
         return Err(AppError::BadRequest(
@@ -175,91 +193,7 @@ async fn rotate_secret(
     })))
 }
 
-fn is_internal_url(url: &str) -> bool {
-    let parsed = match url::Url::parse(url) {
-        Ok(u) => u,
-        Err(_) => return true,
-    };
-
-    let host = match parsed.host_str() {
-        Some(h) => h,
-        None => return true,
-    };
-
-    let blocked_hosts = ["localhost", "localhost.localdomain", "ip6-localhost"];
-    if blocked_hosts
-        .iter()
-        .any(|&b| host.eq_ignore_ascii_case(b))
-    {
-        return true;
-    }
-
-    if host.ends_with(".local")
-        || host.ends_with(".internal")
-        || host.ends_with(".localhost")
-    {
-        return true;
-    }
-
-    if let Ok(ip) = host.parse::<std::net::IpAddr>() {
-        return is_private_ip(ip);
-    }
-
-    if host.starts_with("0x") || host.starts_with("0X") {
-        return true;
-    }
-
-    let parts: Vec<&str> = host.split('.').collect();
-    if parts.len() >= 4 {
-        if parts[0].parse::<u8>().is_ok() && parts[1].parse::<u8>().is_ok() {
-            return true;
-        }
-    }
-
-    false
-}
-
-fn is_private_ip(ip: std::net::IpAddr) -> bool {
-    match ip {
-        std::net::IpAddr::V4(v4) => {
-            v4.is_loopback()
-                || v4.is_private()
-                || v4.is_link_local()
-                || v4.is_broadcast()
-                || v4.is_unspecified()
-                || v4.octets()[0] == 100 && (v4.octets()[1] & 0xC0) == 64
-                || v4.octets()[0] == 169 && v4.octets()[1] == 254
-                || v4.octets()[0] == 192 && v4.octets()[1] == 168
-                || v4.octets()[0] == 172 && (v4.octets()[1] & 0xF0) == 16
-        }
-        std::net::IpAddr::V6(v6) => {
-            v6.is_loopback()
-                || v6.is_unspecified()
-                || {
-                    let segments = v6.segments();
-                    segments[0] == 0xfe80
-                        || segments[0] == 0xfc00
-                        || segments[0] == 0xfd00
-                }
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::*;
-
-    #[test]
-    fn test_internal_url_detection() {
-        assert!(is_internal_url("http://localhost:3000"));
-        assert!(is_internal_url("http://127.0.0.1/"));
-        assert!(is_internal_url("http://192.168.1.1/"));
-        assert!(is_internal_url("http://10.0.0.1/"));
-        assert!(is_internal_url("http://172.16.0.1/"));
-        assert!(is_internal_url("http://0.0.0.0/"));
-        assert!(is_internal_url("http://169.254.1.1/"));
-        assert!(is_internal_url("http://[::1]/"));
-        assert!(!is_internal_url("https://example.com"));
-        assert!(!is_internal_url("https://myapp.com/webhook"));
-    }
+    // Tests moved to ssrf.rs — endpoint creation uses crate::ssrf::validate_url
 }
