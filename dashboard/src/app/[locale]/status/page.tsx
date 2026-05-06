@@ -111,9 +111,11 @@ export default function StatusPage() {
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
+  const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.hooksniff.is-a.dev/v1';
+
   const loadData = useCallback(async () => {
     try {
-      const res = await fetch('/api/status');
+      const res = await fetch(`${API}/status`);
       if (!res.ok) {
         throw new Error(`Status API returned ${res.status}`);
       }

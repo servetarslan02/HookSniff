@@ -5,6 +5,16 @@ use serde_json::{json, Value};
 use std::sync::OnceLock;
 use std::time::Instant;
 
+/// OPTIONS /v1/status — CORS preflight for public status endpoint.
+pub async fn status_options() -> (StatusCode, axum::http::HeaderMap, &'static str) {
+    let mut headers = axum::http::HeaderMap::new();
+    headers.insert("Access-Control-Allow-Origin", "*".parse().unwrap());
+    headers.insert("Access-Control-Allow-Methods", "GET, OPTIONS".parse().unwrap());
+    headers.insert("Access-Control-Allow-Headers", "Content-Type".parse().unwrap());
+    headers.insert("Access-Control-Max-Age", "86400".parse().unwrap());
+    (StatusCode::NO_CONTENT, headers, "")
+}
+
 /// Application start time — set once at boot for uptime reporting.
 static START_TIME: OnceLock<Instant> = OnceLock::new();
 
@@ -33,9 +43,15 @@ pub struct ComponentStatus {
 ///
 /// Public endpoint — returns real system health status.
 /// No authentication required so customers can check service status.
+/// Includes permissive CORS headers since this is a public status page.
 pub async fn system_status(
     axum::extract::Extension(pool): axum::extract::Extension<sqlx::PgPool>,
-) -> (StatusCode, Json<SystemStatus>) {
+) -> (StatusCode, axum::http::HeaderMap, Json<SystemStatus>) {
+    let mut headers = axum::http::HeaderMap::new();
+    headers.insert("Access-Control-Allow-Origin", "*".parse().unwrap());
+    headers.insert("Access-Control-Allow-Methods", "GET, OPTIONS".parse().unwrap());
+    headers.insert("Access-Control-Allow-Headers", "Content-Type".parse().unwrap());
+
     let now = chrono::Utc::now().to_rfc3339();
     let mut components = Vec::new();
 
@@ -182,6 +198,7 @@ pub async fn system_status(
 
     (
         status_code,
+        headers,
         Json(SystemStatus {
             overall_status,
             uptime_30d: 100.0, // placeholder — no historical uptime tracking yet
