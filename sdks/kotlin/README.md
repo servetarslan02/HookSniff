@@ -1,6 +1,6 @@
 # HookRelay Kotlin SDK
 
-Official Kotlin client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+Official Kotlin client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 
 ## Installation
 

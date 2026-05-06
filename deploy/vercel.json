@@ -20,12 +20,12 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://api.hookrelay.io/v1/:path*"
+      "destination": "https://api.hookrelay.is-a.dev/v1/:path*"
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://api.hookrelay.io/v1",
+    "NEXT_PUBLIC_API_URL": "https://api.hookrelay.is-a.dev/v1",
     "NEXT_PUBLIC_APP_NAME": "HookRelay",
-    "NEXT_PUBLIC_APP_URL": "https://hookrelay.io"
+    "NEXT_PUBLIC_APP_URL": "https://hookrelay.is-a.dev"
   }
 }

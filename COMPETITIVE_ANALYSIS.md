@@ -36,7 +36,7 @@ Webhook delivery pazarı 2026'da olgunlaşıyor. Büyük oyuncular var ama hala 
 ## 🔴 Kritik Eksiklikler
 
 ### 1. Domain ve Marka
-- **hookrelay.dev zaten var!** — İsim çakışması
+- **hookrelay.is-a.dev zaten var!** — İsim çakışması
 - Henüz domain alınmamış
 - **Yapılacak:** Alternatif isim düşün (bkz. isim önerileri aşağıda)
 
@@ -161,7 +161,7 @@ Rakiplerde 10+ SDK var, bizde 3:
 
 ## 🎯 Önerilen İsim Alternatifleri
 
-hookrelay.dev zaten var. Alternatifler:
+hookrelay.is-a.dev zaten var. Alternatifler:
 
 | İsim | Domain Uygunluğu | Not |
 |------|------------------|-----|

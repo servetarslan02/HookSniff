@@ -21,7 +21,7 @@
 Webhook delivery servisi. Geliştiricilere yönelik.
 - Gönder, teslim edelim. Başarısız olursa tekrar deneyelim. Basit.
 - Rakipler: Svix ($490/ay), Hookdeck ($39/ay), Convoy (kapandı), Hook0 (açık kaynak)
-- ⚠️ hookrelay.dev zaten var! İsim çakışması — alternatif isim düşünülmeli
+- ✅ hookrelay.is-a.dev — domain aktif (ücretsiz, is-a.dev servisi)
 
 ## 🆓 Free-Tier Altyapı Migrasyonu (2026-05-06)
 
@@ -110,7 +110,7 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 | iyzico hesabı aç | 🔴 Yüksek | Türk müşteriler için |
 | Wise Business hesabı aç | 🔴 Yüksek | Polar.sh para çekme için |
 | Production deploy (Oracle Cloud) | 🔴 Yüksek | FREE_TIER_SETUP.md rehberini takip et |
-| Domain al | 🔴 Yüksek | $12, hookrelay.com veya alternatifi |
+| Domain al | ✅ Tamamlandı | hookrelay.is-a.dev (ücretsiz) |
 | Neon + Upstash kurulumu | 🔴 Yüksek | .env.production güncelle |
 | Grafana Cloud kurulumu | 🟡 Orta | Monitoring dashboard'ları |
 | Beta kullanıcı bul | 🟡 Orta | Reddit/HN/ProductHunt paylaşım |
@@ -154,7 +154,7 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 - **Business Plan:** `e5b7d88a-7606-4963-a070-4102ca6405e2` — $149/ay
 - **Access Token:** `.env.production`'da kayıtlı
 - **Webhook Secret:** `.env.production`'da kayıtlı
-- **Webhook URL:** `https://api.hookrelay.io/v1/billing/webhook/polar`
+- **Webhook URL:** `https://api.hookrelay.is-a.dev/v1/billing/webhook/polar`
 
 ### Plan Fiyatları
 
@@ -199,12 +199,12 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 3. GitHub repo private yapıldı
 4. Repo kodları incelendi — teknik yapı değerlendirildi
 5. Rakip analizi (Svix, Hookdeck, Convoy, Hook0, Hostedhooks)
-6. ⚠️ hookrelay.dev zaten var — isim çakışması tespit edildi
+6. ⚠️ hookrelay.is-a.dev domain aktif edildi
 7. 40 eksik feature listelendi ve kategorize edildi
 8. Yasallık konuşuldu (bireysel satış, Stripe, ToS/Privacy Policy)
 9. Kapsamlı rekabet analizi yapıldı
 10. Detaylı kod incelemesi yapıldı
-11. hookrelay.dev isim çakışması — alternatif isim önerileri
+11. hookrelay.is-a.dev domain seçildi ve kodda güncellendi
 12. Free-tier altyapı planı oluşturuldu (Oracle Cloud, Neon, Upstash, Vercel, Grafana, R2, Resend)
 13. Dokümantasyon güncellendi
 14. **Ödeme sistemi araştırması** — Stripe vs Paddle vs Polar.sh vs iyzico vs PayTR karşılaştırması

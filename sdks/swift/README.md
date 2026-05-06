@@ -1,6 +1,6 @@
 # HookRelay Swift SDK
 
-Official Swift client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+Official Swift client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 
 ## Installation
 

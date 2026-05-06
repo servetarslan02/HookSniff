@@ -106,7 +106,7 @@ delivery, err := client.Webhooks.Replay(ctx, "wh_abc123")
 ### Custom API URL
 
 ```go
-client := hookrelay.NewWithBaseURL("hr_live_YOUR_KEY", "https://api.hookrelay.io/v1")
+client := hookrelay.NewWithBaseURL("hr_live_YOUR_KEY", "https://api.hookrelay.is-a.dev/v1")
 ```
 
 ## License

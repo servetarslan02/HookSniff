@@ -109,7 +109,7 @@
         "audit_trail": [
           {"action": "created", "by": "system", "at": "2026-05-06T08:00:00Z"},
           {"action": "approved", "by": "jane.doe@bigcorp.com", "at": "2026-05-06T09:30:00Z"},
-          {"action": "submitted", "by": "sales@hookrelay.io", "at": "2026-05-06T10:00:00Z"}
+          {"action": "submitted", "by": "sales@hookrelay.is-a.dev", "at": "2026-05-06T10:00:00Z"}
         ]
       }
     }
@@ -442,7 +442,7 @@
           "deal_id": "DEAL-2026-Q2-22",
           "onboarding_status": "pending",
           "onboarding_call_scheduled": "2026-05-08T15:00:00Z",
-          "assigned_csm": "csm.john@hookrelay.io",
+          "assigned_csm": "csm.john@hookrelay.is-a.dev",
           "tags": ["enterprise", "partner_referral", "high_value", "sso"],
           "custom_attributes": {
             "department": "Platform Engineering",

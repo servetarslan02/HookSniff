@@ -1,6 +1,6 @@
 # HookRelay Elixir SDK
 
-Official Elixir client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+Official Elixir client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 
 ## Installation
 

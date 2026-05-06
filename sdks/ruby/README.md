@@ -1,6 +1,6 @@
 # HookRelay Ruby SDK
 
-Official Ruby client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+Official Ruby client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -187,7 +187,7 @@ end
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `api_key` | `String` | required | Your HookRelay API key |
-| `base_url` | `String` | `https://api.hookrelay.io/v1` | API base URL |
+| `base_url` | `String` | `https://api.hookrelay.is-a.dev/v1` | API base URL |
 | `timeout` | `Integer` | `30` | Request timeout in seconds |
 
 ### `client.endpoints`

@@ -1,6 +1,6 @@
 # HookRelay API Reference
 
-**Base URL:** `https://api.hookrelay.dev/v1`
+**Base URL:** `https://api.hookrelay.is-a.dev/v1`
 **Local:** `http://localhost:3000/v1`
 
 **Authentication:** All endpoints (except `/auth/*` and `/health`) require:

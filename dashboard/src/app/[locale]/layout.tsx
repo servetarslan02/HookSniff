@@ -26,7 +26,7 @@ export async function generateMetadata({
     openGraph: {
       title: 'Hookrelay — Webhook Delivery Service',
       description: t('hero.subtitle'),
-      url: 'https://hookrelay.dev',
+      url: 'https://hookrelay.is-a.dev',
       siteName: 'Hookrelay',
       type: 'website',
       locale: locale === 'pt-BR' ? 'pt_BR' : `${locale}_${locale.toUpperCase()}`,
@@ -41,7 +41,7 @@ export async function generateMetadata({
       follow: true,
     },
     metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL || 'https://hookrelay.dev'
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://hookrelay.is-a.dev'
     ),
   };
 }

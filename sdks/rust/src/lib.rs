@@ -1,6 +1,6 @@
 //! # HookRelay Rust SDK
 //!
-//! Official Rust client for the [HookRelay](https://hookrelay.io) webhook delivery service.
+//! Official Rust client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
 //!
 //! ## Usage
 //!
@@ -141,7 +141,7 @@ pub struct Stats {
 
 // ==================== Client ====================
 
-const DEFAULT_BASE_URL: &str = "https://api.hookrelay.io/v1";
+const DEFAULT_BASE_URL: &str = "https://api.hookrelay.is-a.dev/v1";
 const DEFAULT_TIMEOUT: u64 = 30;
 const USER_AGENT: &str = "hookrelay-rust/0.2.0";
 

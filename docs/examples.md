@@ -6,14 +6,14 @@ Forward Stripe payment events to Slack.
 
 ```bash
 # 1. Create endpoint pointing to Slack incoming webhook
-curl -X POST https://api.hookrelay.io/v1/endpoints \
+curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK", "description": "Stripe → Slack"}'
 
 # 2. In your Stripe webhook handler, forward to Hookrelay
 # (Your app receives Stripe webhook, then sends to Hookrelay)
-curl -X POST https://api.hookrelay.io/v1/webhooks \
+curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -29,7 +29,7 @@ Trigger deployments on push events.
 
 ```bash
 # 1. Create endpoint for your deploy service
-curl -X POST https://api.hookrelay.io/v1/endpoints \
+curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://deploy.myapp.com/api/trigger", "description": "GitHub push → Deploy"}'

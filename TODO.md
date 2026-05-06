@@ -28,7 +28,7 @@
 - [ ] Oracle Cloud Always Free ARM VM oluştur
 - [ ] VM'de Docker kur ve container'ları deploy et
 - [ ] Vercel'de dashboard deploy et
-- [ ] Domain al ($12) — hookrelay.com veya alternatifi
+- [ ] Domain al ($12) — hookrelay.is-a.dev veya alternatifi
 - [ ] Cloudflare ile DNS/SSL ayarla
 - [ ] Grafana Cloud kur (monitoring)
 - [ ] Cloudflare R2 kur (storage)

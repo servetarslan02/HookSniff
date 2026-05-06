@@ -22,12 +22,12 @@ info:
   version: "0.1.0"
   contact:
     name: HookRelay Support
-    email: support@hookrelay.dev
+    email: support@hookrelay.is-a.dev
   license:
     name: MIT
 
 servers:
-  - url: https://api.hookrelay.dev/v1
+  - url: https://api.hookrelay.is-a.dev/v1
     description: Production
   - url: http://localhost:3000/v1
     description: Local development

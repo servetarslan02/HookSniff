@@ -34,7 +34,7 @@ k6 run tests/load/k6_load_test.js
 
 ```bash
 k6 run \
-  -e BASE_URL=https://api-staging.hookrelay.io \
+  -e BASE_URL=https://api-staging.hookrelay.is-a.dev \
   -e API_KEY=hr_live_your_staging_key \
   tests/load/k6_load_test.js
 ```
