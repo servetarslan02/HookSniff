@@ -408,7 +408,12 @@ impl WebhookVerifier {
     /// Create a new verifier with a secret.
     pub fn new(secret: &str) -> Self {
         let stripped = secret.strip_prefix("whsec_").unwrap_or(secret);
-        let key = BASE64.decode(stripped).unwrap_or_else(|_| secret.as_bytes().to_vec());
+        // Add padding in case secret is unpadded base64
+        let padded = match stripped.len() % 4 {
+            0 => stripped.to_string(),
+            n => format!("{}{}", stripped, "=".repeat(4 - n)),
+        };
+        let key = BASE64.decode(&padded).unwrap_or_else(|_| secret.as_bytes().to_vec());
         Self {
             key,
             tolerance_secs: 300,
@@ -454,14 +459,12 @@ impl WebhookVerifier {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_secs() as i64;
-        let age = (now - ts).abs();
 
-        if age > self.tolerance_secs as i64 {
-            return VerificationResult {
-                valid: false,
-                payload: None,
-                error: Some(format!("Webhook timestamp expired: {}s old (tolerance: {}s)", age, self.tolerance_secs)),
-            };
+        if now - ts > self.tolerance_secs as i64 {
+            return VerificationResult { valid: false, payload: None, error: Some("Message timestamp too old".into()) };
+        }
+        if ts > now + self.tolerance_secs as i64 {
+            return VerificationResult { valid: false, payload: None, error: Some("Message timestamp too new".into()) };
         }
 
         // Compute expected signature

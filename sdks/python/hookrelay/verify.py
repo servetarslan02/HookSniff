@@ -89,13 +89,10 @@ class WebhookVerifier:
             return {"valid": False, "error": "Invalid webhook timestamp"}
 
         now = int(time.time())
-        age = abs(now - ts)
-
-        if age > self.tolerance_secs:
-            return {
-                "valid": False,
-                "error": f"Webhook timestamp expired: {age}s old (tolerance: {self.tolerance_secs}s)",
-            }
+        if now - ts > self.tolerance_secs:
+            return {"valid": False, "error": "Message timestamp too old"}
+        if ts > now + self.tolerance_secs:
+            return {"valid": False, "error": "Message timestamp too new"}
 
         # Compute expected signature
         signed_content = f"{msg_id}.{timestamp}.{body}"
@@ -138,7 +135,8 @@ class WebhookVerifier:
         """Decode a Standard Webhooks secret."""
         stripped = secret[6:] if secret.startswith("whsec_") else secret
         try:
-            return base64.b64decode(stripped)
+            # Add padding in case secret is unpadded base64
+            return base64.b64decode(stripped + "==")
         except Exception:
             return secret.encode("utf-8")
 

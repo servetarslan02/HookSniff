@@ -262,7 +262,9 @@ class WebhookVerifier(
 
     private val key: ByteArray = run {
         val stripped = if (secret.startsWith("whsec_")) secret.substring(6) else secret
-        try { Base64.getDecoder().decode(stripped) } catch (_: Exception) { secret.toByteArray() }
+        // Add padding in case secret is unpadded base64
+        val padded = stripped + "=".repeat((4 - stripped.length % 4) % 4)
+        try { Base64.getDecoder().decode(padded) } catch (_: Exception) { secret.toByteArray() }
     }
 
     /**
@@ -276,10 +278,11 @@ class WebhookVerifier(
 
         val ts = timestamp.toLongOrNull() ?: return VerificationResult(valid = false, error = "Invalid webhook timestamp")
         val now = System.currentTimeMillis() / 1000
-        val age = Math.abs(now - ts)
-
-        if (age > toleranceSecs) {
-            return VerificationResult(valid = false, error = "Webhook timestamp expired: ${age}s old (tolerance: ${toleranceSecs}s)")
+        if (now - ts > toleranceSecs) {
+            return VerificationResult(valid = false, error = "Message timestamp too old")
+        }
+        if (ts > now + toleranceSecs) {
+            return VerificationResult(valid = false, error = "Message timestamp too new")
         }
 
         // Compute expected signature

@@ -119,12 +119,15 @@ defmodule HookRelay.WebhookVerification do
     case Integer.parse(timestamp) do
       {ts, ""} ->
         now = System.system_time(:second)
-        age = abs(now - ts)
 
-        if age > tolerance_secs do
-          {:error, "Webhook timestamp expired: #{age}s old (tolerance: #{tolerance_secs}s)"}
+        if now - ts > tolerance_secs do
+          {:error, "Message timestamp too old"}
         else
-          do_verify_signature(payload, msg_id, timestamp, signature_header, secret)
+          if ts > now + tolerance_secs do
+            {:error, "Message timestamp too new"}
+          else
+            do_verify_signature(payload, msg_id, timestamp, signature_header, secret)
+          end
         end
 
       _ ->
@@ -166,7 +169,8 @@ defmodule HookRelay.WebhookVerification do
         do: String.slice(secret, 6..-1//1),
         else: secret
 
-    case Base.decode64(stripped) do
+    # Add padding in case secret is unpadded base64
+    case Base.decode64(stripped <> "==") do
       {:ok, decoded} -> decoded
       :error -> secret
     end

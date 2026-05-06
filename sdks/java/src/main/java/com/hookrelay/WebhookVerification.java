@@ -88,11 +88,12 @@ public class WebhookVerification {
         }
 
         long now = System.currentTimeMillis() / 1000;
-        long age = Math.abs(now - ts);
 
-        if (age > toleranceSecs) {
-            return VerificationResult.invalid(
-                String.format("Webhook timestamp expired: %ds old (tolerance: %ds)", age, toleranceSecs));
+        if (now - ts > toleranceSecs) {
+            return VerificationResult.invalid("Message timestamp too old");
+        }
+        if (ts > now + toleranceSecs) {
+            return VerificationResult.invalid("Message timestamp too new");
         }
 
         // Compute expected signature
@@ -199,6 +200,9 @@ public class WebhookVerification {
 
     private static byte[] decodeSecret(String secret) {
         String stripped = secret.startsWith("whsec_") ? secret.substring(6) : secret;
+        // Add padding in case secret is unpadded base64
+        int padding = (4 - stripped.length() % 4) % 4;
+        stripped = stripped + "=".repeat(padding);
         try {
             return Base64.getDecoder().decode(stripped);
         } catch (IllegalArgumentException e) {

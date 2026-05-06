@@ -356,12 +356,11 @@ func VerifyWebhook(body, msgID, timestamp, signatureHeader, secret string, toler
 	}
 
 	now := time.Now().Unix()
-	age := now - ts
-	if age < 0 {
-		age = -age
+	if now-ts > int64(toleranceSecs) {
+		return VerificationResult{Valid: false, Error: "Message timestamp too old"}
 	}
-	if age > int64(toleranceSecs) {
-		return VerificationResult{Valid: false, Error: fmt.Sprintf("Webhook timestamp expired: %ds old (tolerance: %ds)", age, toleranceSecs)}
+	if ts > now+int64(toleranceSecs) {
+		return VerificationResult{Valid: false, Error: "Message timestamp too new"}
 	}
 
 	// Compute expected signature
@@ -381,7 +380,13 @@ func VerifyWebhook(body, msgID, timestamp, signatureHeader, secret string, toler
 		if !strings.HasPrefix(sig, "v1,") {
 			continue
 		}
-		if hmac.Equal([]byte(sig), []byte(expectedFull)) {
+		// Decode both signatures to bytes for comparison (matches reference implementation)
+		sigBytes, err1 := base64.StdEncoding.DecodeString(sig[3:])
+		expBytes, err2 := base64.StdEncoding.DecodeString(expectedSig)
+		if err1 != nil || err2 != nil {
+			continue
+		}
+		if hmac.Equal(sigBytes, expBytes) {
 			verified = true
 			break
 		}
@@ -420,6 +425,10 @@ func decodeSecret(secret string) []byte {
 	stripped := secret
 	if strings.HasPrefix(secret, "whsec_") {
 		stripped = secret[6:]
+	}
+	// Add padding in case secret is unpadded base64
+	if m := len(stripped) % 4; m != 0 {
+		stripped += strings.Repeat("=", 4-m)
 	}
 	decoded, err := base64.StdEncoding.DecodeString(stripped)
 	if err != nil {
