@@ -440,11 +440,16 @@ fn calculate_backoff(attempt: i32) -> i64 {
     delay.min(1800) // Max 30 dakika
 }
 
-/// Truncate string to max length
+/// Truncate string to max length (UTF-8 safe — rounds down to char boundary)
 fn truncate(s: &str, max_len: usize) -> String {
     if s.len() <= max_len {
         s.to_string()
     } else {
-        format!("{}...", &s[..max_len])
+        // Find the nearest char boundary at or before max_len
+        let mut end = max_len;
+        while end > 0 && !s.is_char_boundary(end) {
+            end -= 1;
+        }
+        format!("{}...", &s[..end])
     }
 }

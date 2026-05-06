@@ -53,6 +53,57 @@ async fn cleanup_idempotency_keys(pool: &PgPool) -> Result<u64> {
     Ok(result.rows_affected())
 }
 
+/// Clean up processed webhook_queue items older than 7 days.
+async fn cleanup_webhook_queue(pool: &PgPool) -> Result<u64> {
+    let result = sqlx::query(
+        r#"DELETE FROM webhook_queue
+           WHERE status IN ('delivered', 'dead_letter')
+             AND processed_at < now() - INTERVAL '7 days'"#,
+    )
+    .execute(pool)
+    .await?;
+
+    if result.rows_affected() > 0 {
+        tracing::info!("🧹 Cleaned up {} processed queue items", result.rows_affected());
+    }
+    Ok(result.rows_affected())
+}
+
+/// Reset monthly webhook counters for all customers.
+///
+/// Runs on the 1st of each month. Uses a marker to avoid running twice.
+async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
+    let now = Utc::now();
+    // Only reset on the 1st of the month, within the first 24 hours
+    if now.day() != 1 {
+        return Ok(());
+    }
+
+    let result = sqlx::query("UPDATE customers SET webhook_count = 0 WHERE webhook_count > 0")
+        .execute(pool)
+        .await?;
+
+    if result.rows_affected() > 0 {
+        tracing::info!(
+            "🔄 Reset monthly webhook counters for {} customers",
+            result.rows_affected()
+        );
+    }
+    Ok(())
+}
+
+/// Clean up expired seen_webhooks entries.
+async fn cleanup_seen_webhooks(pool: &PgPool) -> Result<u64> {
+    let result = sqlx::query("DELETE FROM seen_webhooks WHERE expires_at < now()")
+        .execute(pool)
+        .await?;
+
+    if result.rows_affected() > 0 {
+        tracing::info!("🧹 Cleaned up {} expired seen webhooks", result.rows_affected());
+    }
+    Ok(result.rows_affected())
+}
+
 /// Run the retention job. Call this periodically (e.g., daily).
 pub async fn run_retention(pool: &PgPool, retention_days: i64) -> Result<()> {
     tracing::info!("🔄 Running retention job (retention_days={})", retention_days);
@@ -61,6 +112,9 @@ pub async fn run_retention(pool: &PgPool, retention_days: i64) -> Result<()> {
 
     archive_deliveries(pool, cutoff).await?;
     cleanup_idempotency_keys(pool).await?;
+    cleanup_webhook_queue(pool).await?;
+    cleanup_seen_webhooks(pool).await?;
+    reset_monthly_webhook_counts(pool).await?;
 
     tracing::info!("✅ Retention job completed");
     Ok(())

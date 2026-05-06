@@ -5,7 +5,7 @@
 
 ---
 
-## 📅 Son Güncelleme: 2026-05-06 06:29
+## 📅 Son Güncelleme: 2026-05-06 17:50
 
 ## 👤 Hakkında
 
@@ -24,6 +24,18 @@ Webhook delivery servisi. Geliştiricilere yönelik.
 - ⚠️ hookrelay.dev zaten var! İsim çakışması — alternatif isim düşünülmeli
 
 ## ✅ Yapılan İşler (2026-05-06)
+
+### Bug Fixes (2026-05-06 17:50)
+- [x] **Auth middleware JWT desteği** — `auth_middleware` artık hem API key (`hr_live_*`) hem JWT token destekliyor. Dashboard artık API'ye erişebilir.
+- [x] **Search endpoint filtreleri** — `search_deliveries` artık `q`, `event`, `status`, `endpoint_id`, `date_from`, `date_to` parametrelerini uyguluyor.
+- [x] **Billing fiyat düzeltmesi** — Business planı $199'dan $149'a düzeltildi (backend ile uyumlu).
+- [x] **Billing feature sayıları** — Free: 5 endpoint, Pro: 50 endpoint, retention günleri eklendi.
+- [x] **Stripe Checkout entegrasyonu** — Upgrade butonu artık gerçek Stripe Checkout API'sini çağırıyor.
+- [x] **Aylık webhook_count sıfırlama** — Retention job'ı artık her ayın 1'inde webhook_count'u sıfırlıyor.
+- [x] **UTF-8 güvenli truncation** — `truncate()` ve `sanitize_description()` artık multi-byte karakterlerde panic yapmıyor.
+- [x] **Worker config temizliği** — Kullanılmayan `max_attempts` kaldırıldı (per-endpoint retry_policy kullanılıyor).
+- [x] **Billing gerçek kullanım verisi** — Artık hardcoded 650 yerine `/v1/billing/usage` endpoint'inden gerçek veri çekiyor.
+- [x] **Queue cleanup** — Retention job'ı artık işlenmiş `webhook_queue` ve `seen_webhooks` kayıtlarını temizliyor.
 
 ### Altyapı & Konfigürasyon
 - [x] GitHub repo private yapıldı
