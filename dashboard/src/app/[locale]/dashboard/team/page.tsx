@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { teamsApi, type Team, type TeamMember } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 const ROLE_OPTIONS = ['owner', 'admin', 'member'];
 
@@ -22,6 +23,8 @@ export default function TeamPage() {
   const [inviteRole, setInviteRole] = useState('member');
   const [creating, setCreating] = useState(false);
   const [inviting, setInviting] = useState(false);
+  const t = useTranslations('team');
+  const tc = useTranslations('common');
 
   const fetchTeams = useCallback(async () => {
     if (!token) return;
@@ -59,7 +62,7 @@ export default function TeamPage() {
     setCreating(true);
     try {
       await teamsApi.create(token, { name: createName.trim(), description: createDesc || undefined });
-      toast('Team created!', 'success');
+      toast(t('teamCreated'), 'success');
       setShowCreateModal(false);
       setCreateName('');
       setCreateDesc('');
@@ -76,7 +79,7 @@ export default function TeamPage() {
     setInviting(true);
     try {
       await teamsApi.inviteMember(token, selectedTeam.id, { email: inviteEmail.trim(), role: inviteRole });
-      toast('Invitation sent!', 'success');
+      toast(t('invitationSent'), 'success');
       setShowInviteModal(false);
       setInviteEmail('');
       setInviteRole('member');
@@ -92,7 +95,7 @@ export default function TeamPage() {
     if (!token || !selectedTeam) return;
     try {
       await teamsApi.removeMember(token, selectedTeam.id, memberId);
-      toast('Member removed', 'success');
+      toast(t('memberRemoved'), 'success');
       fetchMembers(selectedTeam.id);
     } catch {
       toast('Failed to remove member', 'error');
@@ -103,7 +106,7 @@ export default function TeamPage() {
     if (!token || !selectedTeam) return;
     try {
       await teamsApi.updateRole(token, selectedTeam.id, memberId, newRole);
-      toast('Role updated', 'success');
+      toast(t('roleUpdated'), 'success');
       fetchMembers(selectedTeam.id);
     } catch {
       toast('Failed to update role', 'error');
@@ -115,7 +118,7 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Team Management</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Manage your teams and collaborate with others
           </p>
@@ -132,7 +135,7 @@ export default function TeamPage() {
         {/* Team List */}
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Your Teams</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('yourTeams')}</h3>
           </div>
           {loading ? (
             <div className="p-6 text-center text-gray-400 dark:text-slate-500 animate-pulse text-sm">
@@ -141,7 +144,7 @@ export default function TeamPage() {
           ) : teams.length === 0 ? (
             <div className="p-6 text-center">
               <div className="text-3xl mb-2">👥</div>
-              <p className="text-sm text-gray-400 dark:text-slate-500">No teams yet</p>
+              <p className="text-sm text-gray-400 dark:text-slate-500">{t('noTeams')}</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -241,7 +244,7 @@ export default function TeamPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateModal(false)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create Team</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Team Name</label>
@@ -249,7 +252,7 @@ export default function TeamPage() {
                   type="text"
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
-                  placeholder="My Team"
+                  placeholder={t('teamNamePlaceholder')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition"
                 />
               </div>
@@ -259,7 +262,7 @@ export default function TeamPage() {
                   type="text"
                   value={createDesc}
                   onChange={(e) => setCreateDesc(e.target.value)}
-                  placeholder="What's this team about?"
+                  placeholder={t('descPlaceholder')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition"
                 />
               </div>
@@ -276,7 +279,7 @@ export default function TeamPage() {
                 disabled={!createName.trim() || creating}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"
               >
-                {creating ? 'Creating...' : 'Create Team'}
+                {creating ? tc('creating') : t('createTeamBtn')}
               </button>
             </div>
           </div>
@@ -288,7 +291,7 @@ export default function TeamPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowInviteModal(false)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Invite Member</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('inviteTitle')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Email</label>
@@ -296,7 +299,7 @@ export default function TeamPage() {
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="colleague@example.com"
+                  placeholder={t('emailPlaceholder')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition"
                 />
               </div>
@@ -325,7 +328,7 @@ export default function TeamPage() {
                 disabled={!inviteEmail.trim() || inviting}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"
               >
-                {inviting ? 'Sending...' : 'Send Invite'}
+                {inviting ? tc('sending') : t('sendInvite')}
               </button>
             </div>
           </div>

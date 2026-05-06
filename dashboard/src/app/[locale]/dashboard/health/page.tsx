@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
+import { useTranslations } from 'next-intl';
 
 interface EndpointHealth {
   id: string;
@@ -21,15 +22,17 @@ interface EndpointHealth {
 }
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
-  healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', label: 'Healthy' },
-  degraded: { color: 'text-yellow-700 dark:text-yellow-400', bg: 'bg-yellow-100 dark:bg-yellow-500/20', label: 'Degraded' },
-  unhealthy: { color: 'text-red-700 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-500/20', label: 'Unhealthy' },
+  healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', label: t('healthy') },
+  degraded: { color: 'text-yellow-700 dark:text-yellow-400', bg: 'bg-yellow-100 dark:bg-yellow-500/20', label: t('degraded') },
+  unhealthy: { color: 'text-red-700 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-500/20', label: t('unhealthy') },
 };
 
 export default function EndpointHealthPage() {
   const { token } = useAuth();
   const [endpoints, setEndpoints] = useState<EndpointHealth[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('health');
+  const tc = useTranslations('common');
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
@@ -55,7 +58,7 @@ export default function EndpointHealthPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Endpoint Health</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
           Monitor the health and performance of your webhook endpoints.
         </p>
@@ -93,7 +96,7 @@ export default function EndpointHealthPage() {
       {/* Endpoint List */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-400 dark:text-slate-500">Loading...</div>
+          <div className="p-8 text-center text-gray-400 dark:text-slate-500">{tc('loading')}</div>
         ) : endpoints.length === 0 ? (
           <div className="p-12 text-center text-gray-400 dark:text-slate-500">
             No endpoints yet. Create one to start monitoring health.
@@ -122,18 +125,18 @@ export default function EndpointHealthPage() {
                       <div className="text-2xl font-bold text-gray-900 dark:text-white">
                         {ep.success_rate.toFixed(1)}%
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-slate-400">success rate</div>
+                      <div className="text-xs text-gray-500 dark:text-slate-400">{t('successRate')}</div>
                     </div>
                   </div>
 
                   {/* Stats Row */}
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-3">
                     {[
-                      { label: 'Total', value: ep.total_deliveries.toLocaleString() },
-                      { label: 'Successful', value: ep.successful.toLocaleString() },
-                      { label: 'Failed', value: ep.failed.toLocaleString() },
-                      { label: 'Avg Latency', value: `${ep.avg_response_ms}ms` },
-                      { label: 'P95 Latency', value: `${ep.p95_response_ms}ms` },
+                      { label: t('total'), value: ep.total_deliveries.toLocaleString() },
+                      { label: t('successful'), value: ep.successful.toLocaleString() },
+                      { label: t('failed'), value: ep.failed.toLocaleString() },
+                      { label: t('avgLatency'), value: `${ep.avg_response_ms}ms` },
+                      { label: t('p95Latency'), value: `${ep.p95_response_ms}ms` },
                     ].map((stat) => (
                       <div key={stat.label}>
                         <div className="text-sm font-semibold text-gray-900 dark:text-white">{stat.value}</div>

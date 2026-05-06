@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { useTranslations } from 'next-intl';
 
 interface PlatformSettings {
   default_plan: string;
@@ -39,6 +40,8 @@ export default function AdminSettingsPage() {
   const { toast } = useToast();
   const [settings, setSettings] = useState<PlatformSettings>(defaultSettings);
   const [saving, setSaving] = useState(false);
+  const t = useTranslations('admin');
+  const tc = useTranslations('common');
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
@@ -53,8 +56,8 @@ export default function AdminSettingsPage() {
         },
         body: JSON.stringify(settings),
       });
-      if (!res.ok) throw new Error('Failed to save settings');
-      toast('Settings saved successfully', 'success');
+      if (!res.ok) throw new Error(tc('error'));
+      toast(t('settingsSaved'), 'success');
     } catch {
       toast('Failed to save settings', 'error');
     } finally {
@@ -69,7 +72,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Platform Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('platformSettings')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
           Configure platform-wide defaults and limits
         </p>
@@ -77,12 +80,12 @@ export default function AdminSettingsPage() {
 
       {/* General */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">General</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('general')}</h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between py-2">
             <div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">Maintenance Mode</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400">Disable all API endpoints temporarily</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('maintenanceMode')}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">{t('maintenanceDesc')}</div>
             </div>
             <button
               onClick={() => update('maintenance_mode', !settings.maintenance_mode)}
@@ -97,8 +100,8 @@ export default function AdminSettingsPage() {
           </div>
           <div className="flex items-center justify-between py-2">
             <div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">Signups Enabled</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400">Allow new user registrations</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('signupsEnabled')}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">{t('signupsDesc')}</div>
             </div>
             <button
               onClick={() => update('signup_enabled', !settings.signup_enabled)}
@@ -127,10 +130,10 @@ export default function AdminSettingsPage() {
 
       {/* Plan Limits */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Plan Limits</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('planLimits')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">Free Plan</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('freePlan')}</h3>
             <div className="space-y-3">
               <div>
                 <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Max Endpoints</label>
@@ -171,7 +174,7 @@ export default function AdminSettingsPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">Pro Plan</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('proPlan')}</h3>
             <div className="space-y-3">
               <div>
                 <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Max Endpoints</label>
@@ -216,7 +219,7 @@ export default function AdminSettingsPage() {
 
       {/* Retry Settings */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Retry Settings</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Max Retry Attempts</label>
           <input
@@ -227,7 +230,7 @@ export default function AdminSettingsPage() {
             max={10}
             className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
           />
-          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Number of times to retry failed webhook deliveries (0-10)</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('retryDesc')}</p>
         </div>
       </div>
 
@@ -238,7 +241,7 @@ export default function AdminSettingsPage() {
           disabled={saving}
           className="px-6 py-3 bg-gray-900 dark:bg-red-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-red-700 transition disabled:opacity-60"
         >
-          {saving ? 'Saving...' : 'Save Settings'}
+          {saving ? tc('saving') : t('saveSettings')}
         </button>
       </div>
     </div>

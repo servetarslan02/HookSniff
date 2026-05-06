@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { StatusBadge } from '@/components/StatusBadge';
+import { useTranslations } from 'next-intl';
 
 interface SearchResult {
   id: string;
@@ -30,6 +31,8 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const t = useTranslations('search');
+  const tc = useTranslations('common');
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 
@@ -68,7 +71,7 @@ export default function SearchPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Webhook Search</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
           Search and filter your webhook delivery logs.
         </p>
@@ -82,7 +85,7 @@ export default function SearchPage() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by event type, payload content, or ID..."
+              placeholder={t('searchPlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition"
             />
           </div>
@@ -92,10 +95,10 @@ export default function SearchPage() {
               onChange={(e) => setStatus(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
             >
-              <option value="">All statuses</option>
-              <option value="delivered">Delivered</option>
-              <option value="failed">Failed</option>
-              <option value="pending">Pending</option>
+              <option value="">{t('allStatuses')}</option>
+              <option value="delivered">{t('delivered')}</option>
+              <option value="failed">{t('failed')}</option>
+              <option value="pending">{t('pending')}</option>
             </select>
           </div>
           <div>
@@ -112,10 +115,10 @@ export default function SearchPage() {
       {/* Results */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-400 dark:text-slate-500">Searching...</div>
+          <div className="p-8 text-center text-gray-400 dark:text-slate-500">{t('searching')}</div>
         ) : !results || results.deliveries.length === 0 ? (
           <div className="p-12 text-center text-gray-400 dark:text-slate-500">
-            {query ? 'No results found.' : 'Enter a search query to find webhooks.'}
+            {query ? t('noResultsQuery') : t('enterQuery')}
           </div>
         ) : (
           <>

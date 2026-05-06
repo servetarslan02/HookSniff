@@ -6,6 +6,7 @@ import { adminApi, type RevenueResponse } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useTranslations } from 'next-intl';
 
 const PLAN_COLORS: Record<string, string> = {
   free: '#94a3b8',
@@ -17,6 +18,8 @@ export default function AdminRevenuePage() {
   const { token } = useAuth();
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('admin');
+  const tc = useTranslations('common');
 
   const fetchRevenue = useCallback(async () => {
     if (!token) return;
@@ -39,8 +42,8 @@ export default function AdminRevenuePage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Revenue Dashboard</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Loading...</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('revenue')}</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{tc('loading')}</p>
         </div>
       </div>
     );
@@ -65,19 +68,19 @@ export default function AdminRevenuePage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
-          label="Monthly Recurring Revenue"
+          label={t('mrr')}
           value={`$${(revenue?.mrr || 0).toLocaleString()}`}
           icon={<span className="text-lg">💰</span>}
           color="violet"
         />
         <StatCard
-          label="Total Revenue"
+          label={t('totalRevenueLabel')}
           value={`$${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`}
           icon={<span className="text-lg">📈</span>}
           color="emerald"
         />
         <StatCard
-          label="Churn Rate"
+          label={t('churnRate')}
           value={revenue?.churn_rate?.toFixed(1) || '0'}
           icon={<span className="text-lg">📉</span>}
           color="red"
@@ -88,7 +91,7 @@ export default function AdminRevenuePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Monthly Revenue Chart */}
         <div className="lg:col-span-2">
-          <ChartCard title="Monthly Revenue" subtitle="Revenue over time">
+          <ChartCard title={t('monthlyRevenue')} subtitle={t('revenueOverTime')}>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData}>
@@ -126,7 +129,7 @@ export default function AdminRevenuePage() {
 
         {/* Revenue by Plan */}
         <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Revenue by Plan</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('revenueByPlan')}</h3>
           {planData.length > 0 ? (
             <>
               <div className="h-48">
@@ -183,7 +186,7 @@ export default function AdminRevenuePage() {
               </div>
             </>
           ) : (
-            <p className="text-gray-400 dark:text-slate-500 text-sm">No revenue data</p>
+            <p className="text-gray-400 dark:text-slate-500 text-sm">{t('noRevenue')}</p>
           )}
         </div>
       </div>

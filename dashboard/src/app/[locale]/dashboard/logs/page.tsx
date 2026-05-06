@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { webhooksApi, type Delivery } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
+import { useTranslations } from 'next-intl';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
@@ -18,6 +19,8 @@ export default function LogsPage() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const t = useTranslations('logs');
+  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchData = useCallback(async () => {
@@ -69,7 +72,7 @@ export default function LogsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Webhook Logs</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Full delivery history with status and response details
           </p>
@@ -84,7 +87,7 @@ export default function LogsPage() {
             }`}
           >
             <div className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
-            {autoRefresh ? 'Live' : 'Auto-refresh'}
+            {autoRefresh ? tc('live') : tc('autoRefresh')}
           </button>
           <button
             onClick={fetchData}
@@ -105,7 +108,7 @@ export default function LogsPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by event, ID, or endpoint..."
+            placeholder={t('searchPlaceholder')}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
           />
         </div>
@@ -177,7 +180,7 @@ export default function LogsPage() {
           <div className="p-12 text-center">
             <div className="text-4xl mb-3">📭</div>
             <p className="text-gray-400 dark:text-slate-500">
-              {search ? 'No logs match your search.' : 'No webhook logs yet.'}
+              {search ? t('noLogsSearch') : t('noLogs')}
             </p>
           </div>
         ) : (
@@ -258,7 +261,7 @@ export default function LogsPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
-                        {new Date(d.created_at).toLocaleString('en', {
+                        {new Date(d.created_at).toLocaleString(undefined, {
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',
@@ -308,7 +311,7 @@ export default function LogsPage() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelected(null)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delivery Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deliveryDetails')}</h3>
               <button
                 onClick={() => setSelected(null)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
@@ -317,7 +320,7 @@ export default function LogsPage() {
               </button>
             </div>
             <div className="p-6 space-y-4">
-              <DetailRow label="Delivery ID" value={selected.id} mono />
+              <DetailRow label={t('deliveryId')} value={selected.id} mono />
               <DetailRow label="Event" value={selected.event || '—'} />
               <DetailRow label="Endpoint" value={selected.endpoint_id} mono />
               <DetailRow
@@ -327,12 +330,12 @@ export default function LogsPage() {
                 }
               />
               <DetailRow label="Attempts" value={String(selected.attempt_count)} />
-              <DetailRow label="HTTP Response" value={String(selected.response_status || '—')} mono />
+              <DetailRow label={t('httpResponse')} value={String(selected.response_status || '—')} mono />
               <DetailRow label="Created" value={new Date(selected.created_at).toLocaleString()} />
 
               {/* Attempts Timeline */}
               <div className="pt-4 border-t border-gray-100 dark:border-slate-800">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Delivery Attempts</h4>
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('deliveryDetails')}</h4>
                 <div className="space-y-3">
                   {Array.from({ length: selected.attempt_count }).map((_, i) => {
                     const isLast = i === selected.attempt_count - 1;
@@ -356,9 +359,9 @@ export default function LogsPage() {
                           <p className="text-xs text-gray-500 dark:text-slate-400">
                             {isLast
                               ? isSuccess
-                                ? 'Delivered successfully'
-                                : 'Failed — will retry with backoff'
-                              : 'Retried with exponential backoff'}
+                                ? t('deliveredSuccessfully')
+                                : t('failedWillRetryBackoff')
+                              : t('retriedBackoff')}
                           </p>
                         </div>
                       </div>

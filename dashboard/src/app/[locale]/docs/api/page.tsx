@@ -1,19 +1,23 @@
+import { useTranslations } from 'next-intl';
+
 export default function ApiReferencePage() {
+  const t = useTranslations('docs');
+  const tc = useTranslations('common');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">API Reference</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('apiReference')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Complete reference for the Hookrelay REST API. Base URL: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">https://api.hookrelay.io/v1</code>
       </p>
 
       {/* Endpoints API */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Endpoints</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('endpointsApi')}</h2>
 
         <ApiMethod
           method="GET"
           path="/endpoints"
-          description="List all endpoints for the authenticated account."
+          description={t('listEndpoints')}
           response={`[
   {
     "id": "ep_abc123",
@@ -28,7 +32,7 @@ export default function ApiReferencePage() {
         <ApiMethod
           method="POST"
           path="/endpoints"
-          description="Create a new endpoint."
+          description={t('createEndpointApi')}
           request={`{
   "url": "https://myapp.com/webhook",
   "description": "Order notifications"  // optional
@@ -46,19 +50,19 @@ export default function ApiReferencePage() {
         <ApiMethod
           method="DELETE"
           path="/endpoints/:id"
-          description="Delete an endpoint. All pending deliveries to this endpoint will be cancelled."
+          description={t('deleteEndpointApi')}
           response={`{ "deleted": true }`}
         />
       </section>
 
       {/* Webhooks API */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('webhooksApi')}</h2>
 
         <ApiMethod
           method="POST"
           path="/webhooks"
-          description="Send a webhook to an endpoint. The webhook will be delivered asynchronously with automatic retries on failure."
+          description={t('sendWebhookApi')}
           request={`{
   "endpoint_id": "ep_abc123",
   "event": "order.created",       // optional
@@ -80,7 +84,7 @@ export default function ApiReferencePage() {
         <ApiMethod
           method="GET"
           path="/webhooks"
-          description="List webhook deliveries with optional filtering and pagination."
+          description={t('listWebhooksApi')}
           request={`// Query Parameters:
 // ?page=1          — page number
 // ?per_page=20     — results per page
@@ -107,7 +111,7 @@ export default function ApiReferencePage() {
         <ApiMethod
           method="GET"
           path="/webhooks/:id"
-          description="Get details of a specific webhook delivery including attempt history."
+          description={t('getWebhookApi')}
           response={`{
   "id": "wh_xyz789",
   "endpoint_id": "ep_abc123",
@@ -126,12 +130,12 @@ export default function ApiReferencePage() {
 
       {/* Stats API */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Stats</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('statsApi')}</h2>
 
         <ApiMethod
           method="GET"
           path="/stats"
-          description="Get aggregate delivery statistics for the authenticated account."
+          description={t('getStatsApi')}
           response={`{
   "total_deliveries": 12847,
   "delivered": 12453,
@@ -145,7 +149,7 @@ export default function ApiReferencePage() {
 
       {/* Error Codes */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Error Codes</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('errorCodes')}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
@@ -167,7 +171,7 @@ export default function ApiReferencePage() {
         </div>
 
         <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-950 rounded-xl">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Error Response Format</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{t('errorFormat')}</h3>
           <pre className="text-sm font-mono text-gray-700 dark:text-slate-300">
 {`{
   "error": {
@@ -213,14 +217,14 @@ function ApiMethod({
       <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{description}</p>
       {request && (
         <div className="mb-3">
-          <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">Request</h4>
+          <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">{t('request')}</h4>
           <pre className="bg-gray-900 text-green-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">
             {request}
           </pre>
         </div>
       )}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">Response</h4>
+        <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">{t('response')}</h4>
         <pre className="bg-gray-900 text-green-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">
           {response}
         </pre>

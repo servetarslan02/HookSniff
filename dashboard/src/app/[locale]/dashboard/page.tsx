@@ -29,11 +29,14 @@ import {
 } from 'recharts';
 import { Onboarding } from '@/components/Onboarding';
 import { StatCard, ChartCard, StatusBadge } from '@/components/tremor';
+import { useTranslations } from 'next-intl';
 
 // ─── Time Range Selector ───
 type TimeRange = '24h' | '7d' | '30d';
 
 function TimeRangeSelector({
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   value,
   onChange,
 }: {
@@ -41,7 +44,7 @@ function TimeRangeSelector({
   onChange: (range: TimeRange) => void;
 }) {
   const ranges: TimeRange[] = ['24h', '7d', '30d'];
-  const labels: Record<TimeRange, string> = { '24h': '24 Hours', '7d': '7 Days', '30d': '30 Days' };
+  const labels: Record<TimeRange, string> = { '24h': t('timeRange.24h'), '7d': t('timeRange.7d'), '30d': t('timeRange.30d') };
 
   return (
     <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl">
@@ -106,8 +109,9 @@ function DeliveryTrendChart({
   data: DeliveryTrendResponse | null;
   loading: boolean;
 }) {
+  const tc = useTranslations("common");
   const chartData = data?.buckets.map((b) => ({
-    date: new Date(b.timestamp).toLocaleDateString('en', {
+    date: new Date(b.timestamp).toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
       ...(data.range === '24h' ? { hour: '2-digit', minute: '2-digit' } : {}),
@@ -117,11 +121,11 @@ function DeliveryTrendChart({
   })) || [];
 
   return (
-    <ChartCard title="Delivery Trend">
+    <ChartCard title={t('deliveryTrend')}>
       <div className="h-72">
         {loading ? (
           <div className="h-full flex items-center justify-center">
-            <div className="animate-pulse text-gray-400 dark:text-slate-500">Loading chart data...</div>
+            <div className="animate-pulse text-gray-400 dark:text-slate-500">{t('loadingChart')}</div>
           </div>
         ) : chartData.length === 0 ? (
           <div className="h-full flex items-center justify-center text-gray-400 dark:text-slate-500">
@@ -170,7 +174,7 @@ function DeliveryTrendChart({
                 fillOpacity={1}
                 fill="url(#colorSuccess)"
                 strokeWidth={2}
-                name="Successful"
+                name={t('successful')}
               />
               <Area
                 type="monotone"
@@ -179,7 +183,7 @@ function DeliveryTrendChart({
                 fillOpacity={1}
                 fill="url(#colorFailed)"
                 strokeWidth={2}
-                name="Failed"
+                name={t('failed')}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -197,19 +201,21 @@ function SuccessRateDonut({
   data: SuccessRateData | null;
   loading: boolean;
 }) {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const rate = data?.success_rate ?? 0;
   const chartData = [
-    { name: 'Success', value: data?.successful ?? 0 },
-    { name: 'Failed', value: data?.failed ?? 0 },
-    { name: 'Pending', value: data?.pending ?? 0 },
+    { name: tc('success'), value: data?.successful ?? 0 },
+    { name: tc('failed') || 'Failed', value: data?.failed ?? 0 },
+    { name: tc('pending') || 'Pending', value: data?.pending ?? 0 },
   ];
   const COLORS = ['#10b981', '#ef4444', '#f59e0b'];
 
   return (
-    <ChartCard title="Success Rate">
+    <ChartCard title={t('successRate')}>
       <div className="h-72 flex items-center justify-center">
         {loading ? (
-          <div className="animate-pulse text-gray-400 dark:text-slate-500">Loading...</div>
+          <div className="animate-pulse text-gray-400 dark:text-slate-500">{tc('loading')}</div>
         ) : (
           <div className="relative">
             <ResponsiveContainer width={220} height={220}>
@@ -234,7 +240,7 @@ function SuccessRateDonut({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">{rate.toFixed(1)}%</div>
-                <div className="text-xs text-gray-500 dark:text-slate-400">success</div>
+                <div className="text-xs text-gray-500 dark:text-slate-400">{t('success')}</div>
               </div>
             </div>
           </div>
@@ -246,6 +252,7 @@ function SuccessRateDonut({
 
 /* ─── Activity Feed with auto-refresh ─── */
 function ActivityFeed({ token }: { token: string }) {
+  const tc = useTranslations("common");
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -271,12 +278,12 @@ function ActivityFeed({ token }: { token: string }) {
       <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Live Activity</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('liveActivity')}</h3>
         </div>
-        <span className="text-xs text-gray-400 dark:text-slate-500">auto-refresh 5s</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">{t('autoRefresh5s')}</span>
       </div>
       {loading ? (
-        <div className="p-8 text-center text-gray-400 dark:text-slate-500 animate-pulse">Loading...</div>
+        <div className="p-8 text-center text-gray-400 dark:text-slate-500 animate-pulse">{tc('loading')}</div>
       ) : deliveries.length === 0 ? (
         <div className="p-8 text-center text-gray-400 dark:text-slate-500">No recent activity</div>
       ) : (
@@ -399,7 +406,7 @@ export default function DashboardOverview() {
 
   const statCards = [
     {
-      label: 'Total Deliveries',
+      label: t('stats.totalDeliveries'),
       value: stats?.total_deliveries ?? 0,
       color: 'blue' as const,
       icon: (
@@ -411,7 +418,7 @@ export default function DashboardOverview() {
       ),
     },
     {
-      label: 'Delivered',
+      label: t('delivered'),
       value: stats?.delivered ?? 0,
       color: 'emerald' as const,
       icon: (
@@ -422,7 +429,7 @@ export default function DashboardOverview() {
       ),
     },
     {
-      label: 'Failed',
+      label: t('failed'),
       value: stats?.failed ?? 0,
       color: 'red' as const,
       icon: (
@@ -434,7 +441,7 @@ export default function DashboardOverview() {
       ),
     },
     {
-      label: 'Success Rate',
+      label: t('stats.successRate'),
       value: stats?.success_rate ?? 0,
       color: 'violet' as const,
       isPercent: true,
@@ -446,7 +453,7 @@ export default function DashboardOverview() {
       ),
     },
     {
-      label: 'Pending',
+      label: t('pending'),
       value: stats?.pending ?? 0,
       color: 'amber' as const,
       icon: (
@@ -457,7 +464,7 @@ export default function DashboardOverview() {
       ),
     },
     {
-      label: 'Endpoints',
+      label: t('endpoints'),
       value: stats?.endpoints_count ?? 0,
       color: 'slate' as const,
       icon: (
@@ -474,7 +481,7 @@ export default function DashboardOverview() {
       <Onboarding />
       {/* Time Range Selector */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
         <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
       </div>
 
@@ -507,7 +514,7 @@ export default function DashboardOverview() {
         {/* Recent Deliveries Table */}
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Deliveries</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recentDeliveries')}</h2>
             <a
               href="/dashboard/deliveries"
               className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"

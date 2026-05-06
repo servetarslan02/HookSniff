@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { notificationsApi, type Notification } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 type NotifType = 'all' | 'webhook_failed' | 'alert' | 'system' | 'billing';
 
@@ -31,6 +32,8 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<NotifType>('all');
   const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('all');
+  const t = useTranslations('notifications');
+  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchNotifications = useCallback(async () => {
@@ -70,7 +73,7 @@ export default function NotificationsPage() {
     try {
       await notificationsApi.markAllAsRead(token);
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      toast('All notifications marked as read', 'success');
+      toast(t('allReadSuccess'), 'success');
     } catch {
       toast('Failed to mark all as read', 'error');
     }
@@ -95,7 +98,7 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Notifications</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Stay updated on webhook events, alerts, and system messages
           </p>
@@ -157,7 +160,7 @@ export default function NotificationsPage() {
         ) : notifications.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-4xl mb-3">🔔</div>
-            <p className="text-gray-400 dark:text-slate-500">No notifications found.</p>
+            <p className="text-gray-400 dark:text-slate-500">{t('noNotifications')}</p>
           </div>
         ) : (
           <>

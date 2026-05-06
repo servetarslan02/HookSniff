@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 // ─── Types ───
 interface ComponentStatus {
@@ -37,6 +38,8 @@ interface StatusData {
 // ─── Simulated status data (in production, fetch from /health or status API) ───
 function getStatusData(): StatusData {
   const now = new Date().toISOString();
+  const t = useTranslations('status');
+  const tc = useTranslations('common');
   return {
     overall_status: 'operational',
     uptime_30d: 99.97,
@@ -254,7 +257,7 @@ function UptimeBar({ uptime }: { uptime: number }) {
   return (
     <div className="mt-6">
       <div className="flex items-baseline justify-between mb-2">
-        <span className="text-sm text-gray-500 dark:text-slate-400">Last 30 days</span>
+        <span className="text-sm text-gray-500 dark:text-slate-400">{t('last30Days')}</span>
         <span className="text-2xl font-bold text-gray-900 dark:text-white">{uptime}%</span>
       </div>
       <div className="flex gap-0.5 h-8">
@@ -272,8 +275,8 @@ function UptimeBar({ uptime }: { uptime: number }) {
         })}
       </div>
       <div className="flex justify-between mt-1">
-        <span className="text-xs text-gray-400 dark:text-slate-500">30 days ago</span>
-        <span className="text-xs text-gray-400 dark:text-slate-500">Today</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">{t('daysAgo')}</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">{t('today')}</span>
       </div>
     </div>
   );
@@ -287,7 +290,7 @@ function IncidentTimeline({ incidents }: { incidents: Incident[] }) {
     return (
       <div className="text-center py-8 text-gray-400 dark:text-slate-500">
         <div className="text-3xl mb-2">🎉</div>
-        <p>No incidents in the last 30 days</p>
+        <p>{t('noIncidents')}</p>
       </div>
     );
   }
@@ -312,7 +315,7 @@ function IncidentTimeline({ incidents }: { incidents: Incident[] }) {
                 <div className="text-xs text-gray-500 dark:text-slate-400">
                   {new Date(incident.created_at).toLocaleDateString()} •{' '}
                   {incident.resolved_at
-                    ? `Resolved in ${Math.round((new Date(incident.resolved_at).getTime() - new Date(incident.created_at).getTime()) / 60000)} min`
+                    ? `${t('resolvedIn', { minutes: Math.round((new Date(incident.resolved_at).getTime() - new Date(incident.created_at).getTime()) / 60000) })}`
                     : 'Ongoing'}
                 </div>
               </div>
@@ -396,7 +399,7 @@ export default function StatusPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400 dark:text-slate-500">Loading status...</div>
+        <div className="animate-pulse text-gray-400 dark:text-slate-500">{t('loadingStatus')}</div>
       </div>
     );
   }
@@ -410,9 +413,9 @@ export default function StatusPage() {
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-3xl">🪝</span>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">HookRelay Status</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           </div>
-          <p className="text-gray-500 dark:text-slate-400">Real-time service health monitoring</p>
+          <p className="text-gray-500 dark:text-slate-400">{t('subtitle')}</p>
           <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
             Auto-refreshes every 30s • Last updated: {lastRefresh.toLocaleTimeString()}
           </p>
@@ -421,7 +424,7 @@ export default function StatusPage() {
         {/* Overall Status */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Current Status</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('currentStatus')}</h2>
             <StatusBadge status={data.overall_status} />
           </div>
           <UptimeBar uptime={data.uptime_30d} />
@@ -429,7 +432,7 @@ export default function StatusPage() {
 
         {/* Components */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Components</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('components')}</h2>
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
             {data.components.map((component) => (
               <div key={component.name} className="py-4 first:pt-0 last:pb-0">
