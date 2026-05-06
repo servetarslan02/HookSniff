@@ -1,6 +1,6 @@
 # HookRelay Node.js SDK
 
-Official TypeScript/Node.js client for the [HookRelay](https://hookrelay.dev) webhook delivery service.
+Official TypeScript/Node.js client for the [HookRelay](https://hookrelay.io) webhook delivery service.
 
 ## Installation
 
@@ -195,7 +195,7 @@ try {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `apiKey` | `string` | required | Your HookRelay API key |
-| `baseUrl` | `string` | `https://api.hookrelay.dev/v1` | API base URL |
+| `baseUrl` | `string` | `https://api.hookrelay.io/v1` | API base URL |
 | `timeout` | `number` | `30000` | Request timeout in ms |
 
 ### `client.endpoints`

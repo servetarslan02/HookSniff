@@ -55,15 +55,25 @@ class _EndpointsResource:
         resp = self._client._request("GET", f"/endpoints/{endpoint_id}")
         return Endpoint.from_dict(resp)
 
-    def list(self) -> List[Endpoint]:
-        """List all endpoints."""
-        resp = self._client._request("GET", "/endpoints")
-        return [Endpoint.from_dict(e) for e in resp]
+    def list(self, page: int = 1, per_page: int = 20) -> Dict[str, Any]:
+        """List endpoints with pagination."""
+        params = {"page": page, "per_page": per_page}
+        resp = self._client._request("GET", "/endpoints", params=params)
+        return {
+            "endpoints": [Endpoint.from_dict(e) for e in (resp.get("endpoints", resp) if isinstance(resp, dict) else resp)],
+            "total": resp.get("total", 0) if isinstance(resp, dict) else len(resp),
+            "page": resp.get("page", page) if isinstance(resp, dict) else page,
+            "per_page": resp.get("per_page", per_page) if isinstance(resp, dict) else per_page,
+        }
 
     def delete(self, endpoint_id: str) -> bool:
         """Delete an endpoint."""
         resp = self._client._request("DELETE", f"/endpoints/{endpoint_id}")
         return resp.get("deleted", False)
+
+    def rotate_secret(self, endpoint_id: str) -> Dict[str, Any]:
+        """Rotate the signing secret for an endpoint."""
+        return self._client._request("POST", f"/endpoints/{endpoint_id}/rotate-secret")
 
 
 class _WebhooksResource:
@@ -257,7 +267,7 @@ class HookRelayClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.hookrelay.dev/v1",
+        base_url: str = "https://api.hookrelay.io/v1",
         timeout: int = 30,
     ):
         self._api_key = api_key
@@ -268,7 +278,7 @@ class HookRelayClient:
             {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "User-Agent": "hookrelay-python/0.3.0",
+                "User-Agent": "hookrelay-python/0.4.0",
             }
         )
 

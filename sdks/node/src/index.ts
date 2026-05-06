@@ -210,9 +210,16 @@ class EndpointsResource {
     return mapEndpoint(resp);
   }
 
-  async list(): Promise<Endpoint[]> {
-    const resp = await this.client._request("GET", "/endpoints");
-    return (resp as any[]).map(mapEndpoint);
+  async list(page = 1, perPage = 20): Promise<{ endpoints: Endpoint[]; total: number; page: number; perPage: number }> {
+    const params = new URLSearchParams({ page: String(page), per_page: String(perPage) });
+    const resp = await this.client._request("GET", `/endpoints?${params.toString()}`);
+    const data = resp as any;
+    return {
+      endpoints: (data.endpoints || (Array.isArray(data) ? data : [])).map(mapEndpoint),
+      total: data.total ?? (Array.isArray(data) ? data.length : 0),
+      page: data.page ?? page,
+      perPage: data.per_page ?? perPage,
+    };
   }
 
   async delete(endpointId: string): Promise<boolean> {
@@ -221,6 +228,11 @@ class EndpointsResource {
       `/endpoints/${endpointId}`
     );
     return (resp as any).deleted ?? true;
+  }
+
+  async rotateSecret(endpointId: string): Promise<{ secret: string }> {
+    const resp = await this.client._request("POST", `/endpoints/${endpointId}/rotate-secret`);
+    return resp as { secret: string };
   }
 }
 
@@ -484,7 +496,7 @@ export class HookRelay {
 
   constructor(config: HookRelayConfig) {
     this.apiKey = config.apiKey;
-    this.baseUrl = (config.baseUrl || "https://api.hookrelay.dev/v1").replace(
+    this.baseUrl = (config.baseUrl || "https://api.hookrelay.io/v1").replace(
       /\/$/,
       ""
     );
@@ -505,7 +517,7 @@ export class HookRelay {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.apiKey}`,
       "Content-Type": "application/json",
-      "User-Agent": "hookrelay-node/0.1.0",
+      "User-Agent": "hookrelay-node/0.2.0",
     };
 
     const controller = new AbortController();

@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="hookrelay",
-    version="0.3.0",
+    version="0.4.0",
     description="Official Python client for HookRelay webhook delivery service",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="HookRelay",
-    author_email="support@hookrelay.dev",
+    author_email="support@hookrelay.io",
     url="https://github.com/hookrelay/hookrelay",
     license="MIT",
     packages=find_packages(),

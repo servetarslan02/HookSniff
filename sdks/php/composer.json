@@ -2,12 +2,12 @@
     "name": "hookrelay/hookrelay-php",
     "description": "Official PHP client for HookRelay webhook delivery service",
     "type": "library",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "license": "MIT",
     "authors": [
         {
             "name": "HookRelay",
-            "email": "support@hookrelay.dev"
+            "email": "support@hookrelay.io"
         }
     ],
     "require": {

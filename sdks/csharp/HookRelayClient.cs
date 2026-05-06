@@ -79,6 +79,18 @@ namespace HookRelay
         public int PerPage { get; set; }
     }
 
+    public class EndpointList
+    {
+        [JsonPropertyName("endpoints")]
+        public List<Endpoint> Endpoints { get; set; } = new();
+        [JsonPropertyName("total")]
+        public int Total { get; set; }
+        [JsonPropertyName("page")]
+        public int Page { get; set; }
+        [JsonPropertyName("per_page")]
+        public int PerPage { get; set; }
+    }
+
     public class DeliveryAttempt
     {
         [JsonPropertyName("id")]
@@ -321,11 +333,11 @@ namespace HookRelay
         }
 
         /// <summary>
-        /// List all endpoints.
+        /// List all endpoints with pagination.
         /// </summary>
-        public async Task<List<Endpoint>> ListAsync()
+        public async Task<EndpointList> ListAsync(int page = 1, int perPage = 20)
         {
-            return await _client.RequestAsync<List<Endpoint>>("GET", "/endpoints");
+            return await _client.RequestAsync<EndpointList>("GET", $"/endpoints?page={page}&per_page={perPage}");
         }
 
         /// <summary>

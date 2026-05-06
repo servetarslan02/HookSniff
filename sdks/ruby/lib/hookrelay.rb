@@ -12,7 +12,7 @@ require_relative "hookrelay/verification"
 
 module HookRelay
   # Default API base URL
-  DEFAULT_BASE_URL = "http://localhost:3000/v1"
+  DEFAULT_BASE_URL = "https://api.hookrelay.io/v1"
 
   # Default request timeout in seconds
   DEFAULT_TIMEOUT = 30

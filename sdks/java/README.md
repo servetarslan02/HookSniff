@@ -1,6 +1,6 @@
 # HookRelay Java SDK
 
-Official Java client for the [HookRelay](https://hookrelay.dev) webhook delivery service.
+Official Java client for the [HookRelay](https://hookrelay.io) webhook delivery service.
 
 ## Installation
 

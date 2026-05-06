@@ -28,15 +28,55 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
 )
 
 const (
-	defaultBaseURL = "https://api.hookrelay.dev/v1"
-	userAgent      = "hookrelay-go/0.1.0"
+	defaultBaseURL = "https://api.hookrelay.io/v1"
+	userAgent      = "hookrelay-go/0.2.0"
 )
+
+// Error types for structured error handling.
+type APIError struct {
+	StatusCode int
+	Code       string
+	Message    string
+}
+
+func (e *APIError) Error() string {
+	return fmt.Sprintf("hookrelay: %s (HTTP %d)", e.Message, e.StatusCode)
+}
+
+func IsAuthenticationError(err error) bool {
+	if apiErr, ok := err.(*APIError); ok {
+		return apiErr.StatusCode == 401
+	}
+	return false
+}
+
+func IsValidationError(err error) bool {
+	if apiErr, ok := err.(*APIError); ok {
+		return apiErr.StatusCode == 400
+	}
+	return false
+}
+
+func IsNotFoundError(err error) bool {
+	if apiErr, ok := err.(*APIError); ok {
+		return apiErr.StatusCode == 404
+	}
+	return false
+}
+
+func IsRateLimitError(err error) bool {
+	if apiErr, ok := err.(*APIError); ok {
+		return apiErr.StatusCode == 429
+	}
+	return false
+}
 
 // Client is the HookRelay API client.
 type Client struct {
@@ -101,10 +141,16 @@ type CreateEndpointRequest struct {
 }
 
 // List returns all endpoints.
-func (s *EndpointsService) List(ctx context.Context) ([]Endpoint, error) {
-	var endpoints []Endpoint
-	err := s.client.do(ctx, "GET", "/endpoints", nil, &endpoints)
-	return endpoints, err
+func (s *EndpointsService) List(ctx context.Context, page, perPage int) (*EndpointListResponse, error) {
+	if page <= 0 {
+		page = 1
+	}
+	if perPage <= 0 {
+		perPage = 20
+	}
+	var resp EndpointListResponse
+	err := s.client.do(ctx, "GET", fmt.Sprintf("/endpoints?page=%d&per_page=%d", page, perPage), nil, &resp)
+	return &resp, err
 }
 
 // Create creates a new endpoint.
@@ -167,6 +213,14 @@ type DeliveryListResponse struct {
 	PerPage    int64      `json:"per_page"`
 }
 
+// EndpointListResponse is the response from listing endpoints.
+type EndpointListResponse struct {
+	Endpoints []Endpoint `json:"endpoints"`
+	Total     int64      `json:"total"`
+	Page      int64      `json:"page"`
+	PerPage   int64      `json:"per_page"`
+}
+
 // Send sends a webhook.
 func (s *WebhooksService) Send(ctx context.Context, req *SendWebhookRequest) (*Delivery, error) {
 	var d Delivery
@@ -226,21 +280,25 @@ func (s *WebhooksService) Attempts(ctx context.Context, deliveryID string) ([]De
 
 // ExportDeliveries exports deliveries with optional filters.
 func (s *WebhooksService) ExportDeliveries(ctx context.Context, format, status, dateFrom, dateTo string) ([]Delivery, error) {
-	params := "/webhooks/export?"
+	params := url.Values{}
 	if format != "" {
-		params += "format=" + format + "&"
+		params.Set("format", format)
 	}
 	if status != "" {
-		params += "status=" + status + "&"
+		params.Set("status", status)
 	}
 	if dateFrom != "" {
-		params += "date_from=" + dateFrom + "&"
+		params.Set("date_from", dateFrom)
 	}
 	if dateTo != "" {
-		params += "date_to=" + dateTo + "&"
+		params.Set("date_to", dateTo)
+	}
+	query := ""
+	if len(params) > 0 {
+		query = "?" + params.Encode()
 	}
 	var deliveries []Delivery
-	err := s.client.do(ctx, "GET", params, nil, &deliveries)
+	err := s.client.do(ctx, "GET", "/webhooks/export"+query, nil, &deliveries)
 	return deliveries, err
 }
 
@@ -354,7 +412,7 @@ func decodeSecret(secret string) []byte {
 }
 
 func (c *Client) do(ctx context.Context, method, path string, body interface{}, result interface{}) error {
-	url := c.BaseURL + path
+	fullURL := c.BaseURL + path
 
 	var bodyReader io.Reader
 	if body != nil {
@@ -365,7 +423,7 @@ func (c *Client) do(ctx context.Context, method, path string, body interface{}, 
 		bodyReader = bytes.NewReader(jsonBody)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
+	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
 	if err != nil {
 		return fmt.Errorf("create request: %w", err)
 	}
@@ -383,11 +441,16 @@ func (c *Client) do(ctx context.Context, method, path string, body interface{}, 
 	if resp.StatusCode >= 400 {
 		var errResp struct {
 			Error struct {
+				Code    string `json:"code"`
 				Message string `json:"message"`
 			} `json:"error"`
 		}
 		json.NewDecoder(resp.Body).Decode(&errResp)
-		return fmt.Errorf("API error %d: %s", resp.StatusCode, errResp.Error.Message)
+		return &APIError{
+			StatusCode: resp.StatusCode,
+			Code:       errResp.Error.Code,
+			Message:    errResp.Error.Message,
+		}
 	}
 
 	if result != nil {
