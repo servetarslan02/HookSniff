@@ -35,14 +35,14 @@ import { useTranslations } from 'next-intl';
 type TimeRange = '24h' | '7d' | '30d';
 
 function TimeRangeSelector({
-  const t = useTranslations('dashboard');
-  const tc = useTranslations('common');
   value,
   onChange,
 }: {
   value: TimeRange;
   onChange: (range: TimeRange) => void;
 }) {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const ranges: TimeRange[] = ['24h', '7d', '30d'];
   const labels: Record<TimeRange, string> = { '24h': t('timeRange.24h'), '7d': t('timeRange.7d'), '30d': t('timeRange.30d') };
 
