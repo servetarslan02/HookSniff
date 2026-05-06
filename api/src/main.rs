@@ -66,7 +66,7 @@ async fn main() -> Result<()> {
     // Initialize Prometheus metrics
     let metrics = std::sync::Arc::new(metrics::Metrics::new());
 
-    let rate_limiter = rate_limit::RateLimiter::new(100, std::time::Duration::from_secs(60));
+    let rate_limiter = rate_limit::create_rate_limiter().await;
     let throttle_manager = throttle::ThrottleManager::new();
 
     // Spawn retention background job (runs every 24 hours)
