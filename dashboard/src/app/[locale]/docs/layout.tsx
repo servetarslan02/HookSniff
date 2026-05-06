@@ -26,7 +26,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
               🪝
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">Hookrelay</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-white">HookSniff</span>
             <span className="text-sm text-gray-400 dark:text-slate-500 ml-2">Docs</span>
           </Link>
           <div className="flex items-center gap-4">

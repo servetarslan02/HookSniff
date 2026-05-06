@@ -1,54 +1,54 @@
 //! CloudEvents module for HookRelay.
 //!
 //! Provides CloudEvents v1.0 support and an event type registry
-//! with the naming convention: `com.hookrelay.<category>.<action>`
+//! with the naming convention: `com.hooksniff.<category>.<action>`
 
 pub mod cloudevents;
 
 pub use cloudevents::CloudEvent;
 
-/// Event type registry with naming convention: `com.hookrelay.<category>.<action>`
+/// Event type registry with naming convention: `com.hooksniff.<category>.<action>`
 ///
 /// All HookRelay internal events follow this convention for consistency
 /// and interoperability with CloudEvents-compatible systems.
 pub mod event_types {
     // ── Delivery events ────────────────────────────────────────────────
     /// A webhook delivery was completed successfully.
-    pub const DELIVERY_COMPLETED: &str = "com.hookrelay.delivery.completed";
+    pub const DELIVERY_COMPLETED: &str = "com.hooksniff.delivery.completed";
     /// A webhook delivery failed.
-    pub const DELIVERY_FAILED: &str = "com.hookrelay.delivery.failed";
+    pub const DELIVERY_FAILED: &str = "com.hooksniff.delivery.failed";
     /// A webhook delivery is pending.
-    pub const DELIVERY_PENDING: &str = "com.hookrelay.delivery.pending";
+    pub const DELIVERY_PENDING: &str = "com.hooksniff.delivery.pending";
     /// A webhook delivery was retried.
-    pub const DELIVERY_RETRIED: &str = "com.hookrelay.delivery.retried";
+    pub const DELIVERY_RETRIED: &str = "com.hooksniff.delivery.retried";
     /// A webhook delivery was sent to dead letter queue.
-    pub const DELIVERY_DEADLETTERED: &str = "com.hookrelay.delivery.deadlettered";
+    pub const DELIVERY_DEADLETTERED: &str = "com.hooksniff.delivery.deadlettered";
 
     // ── Endpoint events ────────────────────────────────────────────────
     /// An endpoint was created.
-    pub const ENDPOINT_CREATED: &str = "com.hookrelay.endpoint.created";
+    pub const ENDPOINT_CREATED: &str = "com.hooksniff.endpoint.created";
     /// An endpoint was updated.
-    pub const ENDPOINT_UPDATED: &str = "com.hookrelay.endpoint.updated";
+    pub const ENDPOINT_UPDATED: &str = "com.hooksniff.endpoint.updated";
     /// An endpoint was deleted.
-    pub const ENDPOINT_DELETED: &str = "com.hookrelay.endpoint.deleted";
+    pub const ENDPOINT_DELETED: &str = "com.hooksniff.endpoint.deleted";
     /// An endpoint was enabled.
-    pub const ENDPOINT_ENABLED: &str = "com.hookrelay.endpoint.enabled";
+    pub const ENDPOINT_ENABLED: &str = "com.hooksniff.endpoint.enabled";
     /// An endpoint was disabled.
-    pub const ENDPOINT_DISABLED: &str = "com.hookrelay.endpoint.disabled";
+    pub const ENDPOINT_DISABLED: &str = "com.hooksniff.endpoint.disabled";
 
     // ── Security events ────────────────────────────────────────────────
     /// A signature verification failed.
-    pub const SECURITY_SIGNATURE_FAILED: &str = "com.hookrelay.security.signature_failed";
+    pub const SECURITY_SIGNATURE_FAILED: &str = "com.hooksniff.security.signature_failed";
     /// A replay attack was detected.
-    pub const SECURITY_REPLAY_DETECTED: &str = "com.hookrelay.security.replay_detected";
+    pub const SECURITY_REPLAY_DETECTED: &str = "com.hooksniff.security.replay_detected";
     /// An IP was blocked.
-    pub const SECURITY_IP_BLOCKED: &str = "com.hookrelay.security.ip_blocked";
+    pub const SECURITY_IP_BLOCKED: &str = "com.hooksniff.security.ip_blocked";
 
     // ── System events ──────────────────────────────────────────────────
     /// System health check completed.
-    pub const SYSTEM_HEALTH_CHECK: &str = "com.hookrelay.system.health_check";
+    pub const SYSTEM_HEALTH_CHECK: &str = "com.hooksniff.system.health_check";
     /// Rate limit was exceeded.
-    pub const SYSTEM_RATE_LIMITED: &str = "com.hookrelay.system.rate_limited";
+    pub const SYSTEM_RATE_LIMITED: &str = "com.hooksniff.system.rate_limited";
 
     /// Get all registered event types.
     pub fn all() -> Vec<&'static str> {
@@ -72,21 +72,21 @@ pub mod event_types {
     }
 
     /// Check if an event type follows the HookRelay naming convention.
-    pub fn is_valid_hookrelay_event(event_type: &str) -> bool {
-        event_type.starts_with("com.hookrelay.")
+    pub fn is_valid_hooksniff_event(event_type: &str) -> bool {
+        event_type.starts_with("com.hooksniff.")
     }
 
     /// Extract the category from a HookRelay event type.
     /// Returns `None` if the event doesn't follow the convention.
     pub fn category(event_type: &str) -> Option<&str> {
-        let rest = event_type.strip_prefix("com.hookrelay.")?;
+        let rest = event_type.strip_prefix("com.hooksniff.")?;
         rest.split('.').next()
     }
 
     /// Extract the action from a HookRelay event type.
     /// Returns `None` if the event doesn't follow the convention.
     pub fn action(event_type: &str) -> Option<&str> {
-        let rest = event_type.strip_prefix("com.hookrelay.")?;
+        let rest = event_type.strip_prefix("com.hooksniff.")?;
         rest.split('.').nth(1)
     }
 }
@@ -107,7 +107,7 @@ pub fn endpoint_event(
     endpoint_id: &str,
     data: serde_json::Value,
 ) -> CloudEvent {
-    let mut ce = CloudEvent::new(event_type, "https://api.hookrelay.is-a.dev", Some(data));
+    let mut ce = CloudEvent::new(event_type, "https://api.hooksniff.is-a.dev", Some(data));
     ce.subject = Some(endpoint_id.to_string());
     ce
 }
@@ -117,7 +117,7 @@ pub fn security_event(
     event_type: &str,
     data: serde_json::Value,
 ) -> CloudEvent {
-    CloudEvent::new(event_type, "https://api.hookrelay.is-a.dev/security", Some(data))
+    CloudEvent::new(event_type, "https://api.hooksniff.is-a.dev/security", Some(data))
 }
 
 #[cfg(test)]
@@ -129,25 +129,25 @@ mod tests {
         let all = event_types::all();
         assert!(!all.is_empty());
         for et in &all {
-            assert!(et.starts_with("com.hookrelay."));
+            assert!(et.starts_with("com.hooksniff."));
         }
     }
 
     #[test]
     fn test_event_type_naming_convention() {
-        assert!(event_types::is_valid_hookrelay_event("com.hookrelay.delivery.completed"));
-        assert!(!event_types::is_valid_hookrelay_event("delivery.completed"));
-        assert!(!event_types::is_valid_hookrelay_event("com.other.event"));
+        assert!(event_types::is_valid_hooksniff_event("com.hooksniff.delivery.completed"));
+        assert!(!event_types::is_valid_hooksniff_event("delivery.completed"));
+        assert!(!event_types::is_valid_hooksniff_event("com.other.event"));
     }
 
     #[test]
     fn test_event_type_category() {
         assert_eq!(
-            event_types::category("com.hookrelay.delivery.completed"),
+            event_types::category("com.hooksniff.delivery.completed"),
             Some("delivery")
         );
         assert_eq!(
-            event_types::category("com.hookrelay.endpoint.created"),
+            event_types::category("com.hooksniff.endpoint.created"),
             Some("endpoint")
         );
         assert_eq!(event_types::category("random.event"), None);
@@ -156,11 +156,11 @@ mod tests {
     #[test]
     fn test_event_type_action() {
         assert_eq!(
-            event_types::action("com.hookrelay.delivery.completed"),
+            event_types::action("com.hooksniff.delivery.completed"),
             Some("completed")
         );
         assert_eq!(
-            event_types::action("com.hookrelay.endpoint.created"),
+            event_types::action("com.hooksniff.endpoint.created"),
             Some("created")
         );
     }

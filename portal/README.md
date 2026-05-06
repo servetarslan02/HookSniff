@@ -6,7 +6,7 @@ Müşterilerinizin kendi sitelerine tek satır kod ile ekleyebileceği, iframe t
 
 ```html
 <script
-  src="https://cdn.hookrelay.is-a.dev/portal/embed.js"
+  src="https://cdn.hooksniff.is-a.dev/portal/embed.js"
   data-api-key="YOUR_API_KEY"
 ></script>
 ```
@@ -18,7 +18,7 @@ Bu kadar. Sayfanıza bir webhook portalı eklenecek.
 | Parametre | Zorunlu | Varsayılan | Açıklama |
 |-----------|---------|------------|----------|
 | `data-api-key` | ✅ | — | Müşteri API anahtarı |
-| `data-api-url` | ❌ | `https://api.hookrelay.is-a.dev` | API base URL |
+| `data-api-url` | ❌ | `https://api.hooksniff.is-a.dev` | API base URL |
 | `data-theme` | ❌ | `dark` | Tema: `dark` veya `light` |
 | `data-height` | ❌ | `600px` | Widget yüksekliği |
 | `data-width` | ❌ | `100%` | Widget genişliği |
@@ -30,7 +30,7 @@ Bu kadar. Sayfanıza bir webhook portalı eklenecek.
 
 ```html
 <script
-  src="https://cdn.hookrelay.is-a.dev/portal/embed.js"
+  src="https://cdn.hooksniff.is-a.dev/portal/embed.js"
   data-api-key="hrk_abc123"
   data-theme="light"
   data-height="500px"
@@ -42,7 +42,7 @@ Bu kadar. Sayfanıza bir webhook portalı eklenecek.
 
 ```html
 <script
-  src="https://cdn.hookrelay.is-a.dev/portal/embed.js"
+  src="https://cdn.hooksniff.is-a.dev/portal/embed.js"
   data-api-key="hrk_abc123"
   data-api-url="https://hooks.mysite.com"
 ></script>

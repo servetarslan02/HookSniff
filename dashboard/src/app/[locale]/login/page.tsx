@@ -48,7 +48,7 @@ function LoginForm() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl">
               🪝
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">Hookrelay</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </Link>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {mode === 'login' ? t('loginTitle') : t('signupTitle')}

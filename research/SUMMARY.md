@@ -69,7 +69,7 @@ HookRelay'in `signing.rs` dosyası **Standard Webhooks spesifikasyonuna tam uyum
 ## 📁 Oluşturulan Dosyalar
 
 ```
-hookrelay/research/
+hooksniff/research/
 ├── ANALYSIS-SVIX.md              # Svix Rust SDK analizi
 ├── ANALYSIS-STANDARD-WEBHOOKS.md # Standard Webhooks spesifikasyonu
 ├── ANALYSIS-CLOUDEVENTS.md       # CloudEvents SDK analizi

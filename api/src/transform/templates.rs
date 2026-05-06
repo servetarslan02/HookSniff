@@ -231,7 +231,7 @@ impl EventTransformer for ValueTransformer {
 ///     },
 ///     "event_id": "{{id}}",
 ///     "metadata": {
-///       "source": "hookrelay",
+///       "source": "hooksniff",
 ///       "processed_at": "{{timestamp}}"
 ///     }
 ///   }
@@ -390,12 +390,12 @@ mod tests {
         let template = JsonTemplate {
             template: json!({
                 "user_name": "{{name}}",
-                "source": "hookrelay"
+                "source": "hooksniff"
             }),
         };
         let input = json!({"name": "Alice", "age": 30});
         let output = template.transform(&input).unwrap();
         assert_eq!(output["user_name"], "Alice");
-        assert_eq!(output["source"], "hookrelay");
+        assert_eq!(output["source"], "hooksniff");
     }
 }

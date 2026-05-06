@@ -98,7 +98,7 @@
 PHP SDK'sında webhook imza doğrulama fonksiyonu yok. Diğer tüm dillerde var.
 
 ### 2. Standard Webhooks Header Uyumsuzluğu
-HookRelay SDK'ları `X-Hookrelay-Signature` header'ını kullanıyor ama Standard Webhooks standardı `webhook-id`, `webhook-signature`, `webhook-timestamp` header'larını gerektiriyor. Svix SDK'ları her ikisini de destekliyor (svix-* + webhook-* fallback).
+HookRelay SDK'ları `X-HookSniff-Signature` header'ını kullanıyor ama Standard Webhooks standardı `webhook-id`, `webhook-signature`, `webhook-timestamp` header'larını gerektiriyor. Svix SDK'ları her ikisini de destekliyor (svix-* + webhook-* fallback).
 
 ### 3. Eksik Diller
 | Dil | Svix'te Var | Standard Webhooks'ta Var | HookRelay'de |
@@ -193,7 +193,7 @@ Her SDK'ya eklenecekler:
 ### Aşama 4: Ekstra Feature'lar (Öncelik: Düşük)
 
 - [ ] Terraform provider
-- [ ] CLI tool (npx hookrelay-cli)
+- [ ] CLI tool (npx hooksniff-cli)
 - [ ] OpenAPI spec generation
 - [ ] SDK auto-generation pipeline
 

@@ -277,9 +277,9 @@ async fn process_pending(
             .header("webhook-timestamp", &timestamp)
             .header("webhook-signature", &standard_sig)
             // Legacy headers (backward compat)
-            .header("X-Hookrelay-Signature", format!("sha256={}", legacy_sig))
-            .header("X-Hookrelay-Delivery-Id", delivery_id.to_string())
-            .header("X-Hookrelay-Attempt", attempt.to_string())
+            .header("X-HookSniff-Signature", format!("sha256={}", legacy_sig))
+            .header("X-HookSniff-Delivery-Id", delivery_id.to_string())
+            .header("X-HookSniff-Attempt", attempt.to_string())
             .body(item.payload.clone());
 
         // Add custom headers

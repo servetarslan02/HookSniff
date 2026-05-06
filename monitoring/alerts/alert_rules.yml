@@ -2,7 +2,7 @@
 # Loaded by Prometheus via rule_files
 
 groups:
-  - name: hookrelay_critical
+  - name: hooksniff_critical
     rules:
       # ── High error rate (>5% of requests return 5xx) ──
       - alert: HighErrorRate
@@ -47,7 +47,7 @@ groups:
 
       # ── API service down ──
       - alert: APIServiceDown
-        expr: up{job="hookrelay-api"} == 0
+        expr: up{job="hooksniff-api"} == 0
         for: 1m
         labels:
           severity: critical
@@ -57,7 +57,7 @@ groups:
 
       # ── Worker service down ──
       - alert: WorkerServiceDown
-        expr: up{job="hookrelay-worker"} == 0
+        expr: up{job="hooksniff-worker"} == 0
         for: 1m
         labels:
           severity: critical
@@ -65,7 +65,7 @@ groups:
           summary: "HookRelay Worker is down"
           description: "The HookRelay Worker instance has been unreachable for more than 1 minute."
 
-  - name: hookrelay_warning
+  - name: hooksniff_warning
     rules:
       # ── High queue publish latency (PostgreSQL-based) ──
       - alert: HighQueueLatency

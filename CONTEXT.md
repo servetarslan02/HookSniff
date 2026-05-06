@@ -21,7 +21,7 @@
 Webhook delivery servisi. Geliştiricilere yönelik.
 - Gönder, teslim edelim. Başarısız olursa tekrar deneyelim. Basit.
 - Rakipler: Svix ($490/ay), Hookdeck ($39/ay), Convoy (kapandı), Hook0 (açık kaynak)
-- ✅ hookrelay.is-a.dev — domain aktif (ücretsiz, is-a.dev servisi)
+- ✅ hooksniff.is-a.dev — domain aktif (ücretsiz, is-a.dev servisi)
 
 ## 🆓 Free-Tier Altyapı Migrasyonu (2026-05-06)
 
@@ -110,7 +110,7 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 | iyzico hesabı aç | 🔴 Yüksek | Türk müşteriler için |
 | Wise Business hesabı aç | 🔴 Yüksek | Polar.sh para çekme için |
 | Production deploy (Oracle Cloud) | 🔴 Yüksek | FREE_TIER_SETUP.md rehberini takip et |
-| Domain al | ✅ Tamamlandı | hookrelay.is-a.dev (ücretsiz) |
+| Domain al | ✅ Tamamlandı | hooksniff.is-a.dev (ücretsiz) |
 | Neon + Upstash kurulumu | 🔴 Yüksek | .env.production güncelle |
 | Grafana Cloud kurulumu | 🟡 Orta | Monitoring dashboard'ları |
 | Beta kullanıcı bul | 🟡 Orta | Reddit/HN/ProductHunt paylaşım |
@@ -154,7 +154,7 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 - **Business Plan:** `e5b7d88a-7606-4963-a070-4102ca6405e2` — $149/ay
 - **Access Token:** `.env.production`'da kayıtlı
 - **Webhook Secret:** `.env.production`'da kayıtlı
-- **Webhook URL:** `https://api.hookrelay.is-a.dev/v1/billing/webhook/polar`
+- **Webhook URL:** `https://api.hooksniff.is-a.dev/v1/billing/webhook/polar`
 
 ### Plan Fiyatları
 
@@ -199,19 +199,19 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 3. GitHub repo private yapıldı
 4. Repo kodları incelendi — teknik yapı değerlendirildi
 5. Rakip analizi (Svix, Hookdeck, Convoy, Hook0, Hostedhooks)
-6. ⚠️ hookrelay.is-a.dev domain aktif edildi
+6. ⚠️ hooksniff.is-a.dev domain aktif edildi
 7. 40 eksik feature listelendi ve kategorize edildi
 8. Yasallık konuşuldu (bireysel satış, Stripe, ToS/Privacy Policy)
 9. Kapsamlı rekabet analizi yapıldı
 10. Detaylı kod incelemesi yapıldı
-11. hookrelay.is-a.dev domain seçildi ve kodda güncellendi
+11. hooksniff.is-a.dev domain seçildi ve kodda güncellendi
 12. Free-tier altyapı planı oluşturuldu (Oracle Cloud, Neon, Upstash, Vercel, Grafana, R2, Resend)
 13. Dokümantasyon güncellendi
 14. **Ödeme sistemi araştırması** — Stripe vs Paddle vs Polar.sh vs iyzico vs PayTR karşılaştırması
 15. **Polar.sh seçildi** — Türkiye'den kolay açılır, %4 komisyon, MoR
 16. **Paddle çıkarıldı** — Türkiye'den onay zor, R10.net'te "imkansız" deniyor
 17. **Polar.sh + iyzico hybrid model** — Global: Polar.sh (%4), Türk: iyzico (%1.5)
-18. **Polar.sh hesap açıldı** — bireysel, "hookrelay" slug
+18. **Polar.sh hesap açıldı** — bireysel, "hooksniff" slug
 19. **Pro plan** — $49/ay, ID: 79fee3f9-04a2-46c1-804e-8ca7542b8119
 20. **Business plan** — $149/ay, ID: e5b7d88a-7606-4963-a070-4102ca6405e2
 21. **Webhook URL** — /v1/billing/webhook/polar
@@ -219,7 +219,7 @@ HookRelay artık tamamen ücretsiz servisler üzerinde çalışıyor:
 
 ## 🔗 Linkler
 
-- **GitHub:** https://github.com/servetarslan02/hookrelay
+- **GitHub:** https://github.com/servetarslan02/hooksniff
 - **Feature tracking:** FEATURES.md
 - **Free-tier kurulum:** FREE_TIER_SETUP.md
 - **Rakip analizi:** COMPETITIVE_ANALYSIS.md

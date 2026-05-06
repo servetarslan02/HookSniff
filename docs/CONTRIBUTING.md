@@ -13,8 +13,8 @@
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-org/hookrelay.git
-cd hookrelay
+git clone https://github.com/your-org/hooksniff.git
+cd hooksniff
 
 # Copy environment config
 cp .env.example .env
@@ -35,7 +35,7 @@ make dashboard
 ### Project Structure
 
 ```
-hookrelay/
+hooksniff/
 ├── api/                    # Rust API server (Axum)
 │   └── src/
 │       ├── main.rs         # Entry point, router setup

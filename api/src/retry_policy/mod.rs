@@ -27,7 +27,7 @@
 //! ## Kullanım
 //!
 //! ```rust,ignore
-//! use hookrelay_api::retry_policy;
+//! use hooksniff_api::retry_policy;
 //!
 //! // Politikayı yükle
 //! let policy = retry_policy::load_policy(&pool, endpoint_id).await?;

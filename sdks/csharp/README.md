@@ -1,6 +1,6 @@
 # HookRelay C# SDK
 
-Official C# client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official C# client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -130,7 +130,7 @@ using HookRelay;
 
 // Simple verification
 var payload = await new StreamReader(request.Body).ReadToEndAsync();
-var signature = request.Headers["X-Hookrelay-Signature"].ToString();
+var signature = request.Headers["X-HookSniff-Signature"].ToString();
 var secret = "whsec_your_endpoint_signing_secret";
 
 if (!WebhookVerification.VerifySignature(payload, signature, secret))
@@ -201,7 +201,7 @@ catch (PayloadTooLargeException)
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `ApiKey` | `string` | required | Your HookRelay API key |
-| `BaseUrl` | `string` | `https://api.hookrelay.is-a.dev/v1` | API base URL |
+| `BaseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `Timeout` | `int` | `30` | Request timeout in seconds |
 
 ### `client.Endpoints`

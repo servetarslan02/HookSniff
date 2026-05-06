@@ -1,5 +1,5 @@
 {
-  "name": "@hookrelay/sdk",
+  "name": "@hooksniff/sdk",
   "version": "0.2.0",
   "description": "Official Node.js client for HookRelay webhook delivery service",
   "main": "dist/index.js",
@@ -8,7 +8,7 @@
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["webhooks", "hookrelay", "sdk", "delivery"],
+  "keywords": ["webhooks", "hooksniff", "sdk", "delivery"],
   "author": "HookRelay",
   "license": "MIT",
   "engines": {

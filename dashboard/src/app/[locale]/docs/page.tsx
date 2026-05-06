@@ -7,7 +7,7 @@ export default function DocsPage() {
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('gettingStarted')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Send your first webhook in under 5 minutes. Hookrelay handles delivery, retries, and monitoring so you can focus on building.
+        Send your first webhook in under 5 minutes. HookSniff handles delivery, retries, and monitoring so you can focus on building.
       </p>
 
       {/* Quick Start */}
@@ -18,7 +18,7 @@ export default function DocsPage() {
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('getApiKey')}</h3>
             <p className="text-gray-600 dark:text-slate-400 mb-3">
-              Sign up at <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hookrelay.is-a.dev</code> and grab your API key from the dashboard settings.
+              Sign up at <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hooksniff.is-a.dev</code> and grab your API key from the dashboard settings.
             </p>
           </div>
 
@@ -26,7 +26,7 @@ export default function DocsPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('createEndpoint')}</h3>
             <p className="text-gray-600 dark:text-slate-400 mb-3">{t('createEndpointDesc')}</p>
             <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`curl -X POST https://api.hookrelay.is-a.dev/v1/endpoints \\
+{`curl -X POST https://api.hooksniff.is-a.dev/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"url": "https://myapp.com/webhook"}'`}
@@ -36,7 +36,7 @@ export default function DocsPage() {
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('sendWebhook')}</h3>
             <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`curl -X POST https://api.hookrelay.is-a.dev/v1/webhooks \\
+{`curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -49,7 +49,7 @@ export default function DocsPage() {
 
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('verifySignature')}</h3>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">Every webhook includes an HMAC-SHA256 signature in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-Hookrelay-Signature</code> header:</p>
+            <p className="text-gray-600 dark:text-slate-400 mb-3">Every webhook includes an HMAC-SHA256 signature in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Signature</code> header:</p>
             <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
 {`import hmac, hashlib
 
@@ -85,7 +85,7 @@ def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Node.js</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
-{`const response = await fetch('https://api.hookrelay.is-a.dev/v1/webhooks', {
+{`const response = await fetch('https://api.hooksniff.is-a.dev/v1/webhooks', {
   method: 'POST',
   headers: {
     'Authorization': \`Bearer \${process.env.HOOKRELAY_KEY}\`,
@@ -108,7 +108,7 @@ console.log('Delivery ID:', result.id);`}
 import os
 
 response = requests.post(
-    'https://api.hookrelay.is-a.dev/v1/webhooks',
+    'https://api.hooksniff.is-a.dev/v1/webhooks',
     headers={
         'Authorization': f'Bearer {os.environ["HOOKRELAY_KEY"]}',
         'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ print('Delivery ID:', response.json()['id'])`}
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Go</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
 {`body := \`{"endpoint_id":"ep_abc123","event":"order.shipped","data":{"tracking":"1Z999"}}\`
-req, _ := http.NewRequest("POST", "https://api.hookrelay.is-a.dev/v1/webhooks", strings.NewReader(body))
+req, _ := http.NewRequest("POST", "https://api.hooksniff.is-a.dev/v1/webhooks", strings.NewReader(body))
 req.Header.Set("Authorization", "Bearer "+os.Getenv("HOOKRELAY_KEY"))
 req.Header.Set("Content-Type", "application/json")
 

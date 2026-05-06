@@ -95,7 +95,7 @@
 **Responsibilities:**
 - Polls `webhook_queue` table for pending deliveries
 - Executes webhook delivery with retry logic
-- Signs payloads with HMAC-SHA256 (`X-Hookrelay-Signature`)
+- Signs payloads with HMAC-SHA256 (`X-HookSniff-Signature`)
 - Supports multiple delivery backends:
   - **HTTP** — Standard webhook delivery (primary)
   - **gRPC** — For gRPC-capable endpoints
@@ -189,9 +189,9 @@ PostgreSQL Queue Poller (Worker)
   ├─► Build HTTP request:
   │     POST {endpoint_url}
   │     Content-Type: application/json
-  │     X-Hookrelay-Signature: sha256={hmac}
-  │     X-Hookrelay-Delivery-Id: {id}
-  │     X-Hookrelay-Attempt: {n}
+  │     X-HookSniff-Signature: sha256={hmac}
+  │     X-HookSniff-Delivery-Id: {id}
+  │     X-HookSniff-Attempt: {n}
   │     Body: {event, data, timestamp}
   │
   ├─► Send with timeout (30s default)
@@ -321,7 +321,7 @@ Every delivered webhook is signed with HMAC-SHA256:
 Signature = "sha256=" + HMAC-SHA256(signing_secret, request_body)
 ```
 
-- **Header:** `X-Hookrelay-Signature`
+- **Header:** `X-HookSniff-Signature`
 - **Algorithm:** HMAC-SHA256
 - **Format:** Standard Webhooks compatible
 - **Rotation:** Endpoint secret can be rotated; old secret valid for 24 hours

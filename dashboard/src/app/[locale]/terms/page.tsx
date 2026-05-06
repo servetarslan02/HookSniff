@@ -11,7 +11,7 @@ export default function TermsPage() {
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 Hookrelay</a>
+            <a href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</a>
             <span className="text-gray-400">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t('nav')}</span>
           </div>
@@ -163,7 +163,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">16. Contact</h2>
-            <p>For questions about these Terms, contact: <a href="mailto:legal@hookrelay.is-a.dev" className="text-brand-600 dark:text-brand-400 hover:underline">legal@hookrelay.is-a.dev</a></p>
+            <p>For questions about these Terms, contact: <a href="mailto:legal@hooksniff.is-a.dev" className="text-brand-600 dark:text-brand-400 hover:underline">legal@hooksniff.is-a.dev</a></p>
           </section>
         </div>
       </main>

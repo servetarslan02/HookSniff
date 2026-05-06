@@ -1,25 +1,25 @@
 # HookRelay Ruby SDK
 
-Official Ruby client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official Ruby client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
 Add to your Gemfile:
 
 ```ruby
-gem "hookrelay"
+gem "hooksniff"
 ```
 
 Or install directly:
 
 ```bash
-gem install hookrelay
+gem install hooksniff
 ```
 
 ## Quick Start
 
 ```ruby
-require "hookrelay"
+require "hooksniff"
 
 # Initialize client
 client = HookRelay::Client.new(api_key: "hr_live_your_api_key_here")
@@ -119,7 +119,7 @@ File.write("webhooks.csv", csv_data)
 Verify incoming webhook signatures in your handler:
 
 ```ruby
-require "hookrelay"
+require "hooksniff"
 require "sinatra"
 
 post "/webhook" do
@@ -187,7 +187,7 @@ end
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `api_key` | `String` | required | Your HookRelay API key |
-| `base_url` | `String` | `https://api.hookrelay.is-a.dev/v1` | API base URL |
+| `base_url` | `String` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
 | `timeout` | `Integer` | `30` | Request timeout in seconds |
 
 ### `client.endpoints`

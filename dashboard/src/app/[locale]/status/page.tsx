@@ -238,7 +238,7 @@ export default function StatusPage() {
           <p>
             Version {process.env.NEXT_PUBLIC_VERSION || '0.1.0'} •{' '}
             <Link href="/" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">
-              hookrelay.is-a.dev
+              hooksniff.is-a.dev
             </Link>{' '}
             •{' '}
             <Link href="/docs" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">

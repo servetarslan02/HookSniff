@@ -1,11 +1,11 @@
 [package]
-name = "hookrelay"
+name = "hooksniff"
 version = "0.2.0"
 edition = "2021"
 description = "Official Rust client for the HookRelay webhook delivery service"
 license = "MIT"
-repository = "https://github.com/servetarslan02/hookrelay"
-homepage = "https://hookrelay.is-a.dev"
+repository = "https://github.com/servetarslan02/hooksniff"
+homepage = "https://hooksniff.is-a.dev"
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }

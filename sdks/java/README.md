@@ -1,6 +1,6 @@
 # HookRelay Java SDK
 
-Official Java client for the [HookRelay](https://hookrelay.is-a.dev) webhook delivery service.
+Official Java client for the [HookRelay](https://hooksniff.is-a.dev) webhook delivery service.
 
 ## Installation
 
@@ -8,8 +8,8 @@ Official Java client for the [HookRelay](https://hookrelay.is-a.dev) webhook del
 
 ```xml
 <dependency>
-    <groupId>com.hookrelay</groupId>
-    <artifactId>hookrelay-sdk</artifactId>
+    <groupId>com.hooksniff</groupId>
+    <artifactId>hooksniff-sdk</artifactId>
     <version>0.1.0</version>
 </dependency>
 ```
@@ -17,13 +17,13 @@ Official Java client for the [HookRelay](https://hookrelay.is-a.dev) webhook del
 ### Gradle
 
 ```groovy
-implementation 'com.hookrelay:hookrelay-sdk:0.1.0'
+implementation 'com.hooksniff:hooksniff-sdk:0.1.0'
 ```
 
 ## Quick Start
 
 ```java
-import com.hookrelay.*;
+import com.hooksniff.*;
 import java.util.*;
 
 // Initialize client
@@ -125,12 +125,12 @@ for (DeliveryAttempt attempt : attempts) {
 Verify incoming webhook signatures in your handler:
 
 ```java
-import com.hookrelay.WebhookVerification;
+import com.hooksniff.WebhookVerification;
 
 // Simple verification
 boolean valid = WebhookVerification.verifySignature(
     payload,
-    request.getHeader("X-Hookrelay-Signature"),
+    request.getHeader("X-HookSniff-Signature"),
     "whsec_your_endpoint_signing_secret"
 );
 
@@ -164,7 +164,7 @@ if (!result.isValid()) {
 ## Error Handling
 
 ```java
-import com.hookrelay.HookRelayException.*;
+import com.hooksniff.HookRelayException.*;
 
 try {
     Delivery delivery = client.webhooks().send("nonexistent", null, Map.of("test", true));
