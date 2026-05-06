@@ -256,220 +256,129 @@ async fn process_pending(
 
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
 
-        // Generate Standard Webhooks signature
-        let timestamp = chrono::Utc::now().timestamp().to_string();
-        let standard_sig = signing::compute_standard_signature(
-            &item.signing_secret,
-            &delivery_id.to_string(),
-            &timestamp,
-            &item.payload,
-        );
+        // Build WebhookMessage and delegate HTTP delivery to the delivery module
+        let webhook_msg = WebhookMessage {
+            delivery_id: delivery_id.to_string(),
+            endpoint_id: item.endpoint_id.to_string(),
+            endpoint_url: item.endpoint_url.clone(),
+            signing_secret: item.signing_secret.clone(),
+            payload: item.payload.clone(),
+            custom_headers: item.custom_headers.clone(),
+        };
 
-        // Legacy hex signature for backward compat
-        let legacy_sig = signing::compute_hmac(&item.signing_secret, &item.payload);
+        let result = delivery::deliver_http(&http_client, &webhook_msg, attempt).await?;
 
-        // Build request with Standard Webhooks + legacy headers
-        let mut req_builder = http_client
-            .post(&item.endpoint_url)
-            .header("Content-Type", "application/json")
-            // Standard Webhooks headers
-            .header("webhook-id", delivery_id.to_string())
-            .header("webhook-timestamp", &timestamp)
-            .header("webhook-signature", &standard_sig)
-            // Legacy headers (backward compat)
-            .header("X-HookSniff-Signature", format!("sha256={}", legacy_sig))
-            .header("X-HookSniff-Delivery-Id", delivery_id.to_string())
-            .header("X-HookSniff-Attempt", attempt.to_string())
-            .body(item.payload.clone());
+        let status_code = result.status_code;
+        let response_body = &result.response_body;
+        let duration_ms = result.duration_ms;
+        let resp_headers = &result.response_headers;
+        let is_network_error = !result.error.is_empty();
 
-        // Add custom headers
-        if let Some(ref headers) = item.custom_headers {
-            if let Some(obj) = headers.as_object() {
-                for (key, value) in obj {
-                    if let Some(val) = value.as_str() {
-                        req_builder = req_builder.header(key.as_str(), val);
-                    }
-                }
-            }
-        }
+        // Derive error message and optional fields for record_attempt
+        let error_msg = if is_network_error {
+            result.error.clone()
+        } else {
+            format!("HTTP {}", status_code)
+        };
+        let attempt_status = if is_network_error { None } else { Some(status_code) };
+        let attempt_body = if is_network_error { None } else { Some(response_body.as_str()) };
+        let attempt_headers = if is_network_error { None } else { Some(resp_headers) };
 
-        // Send webhook
-        let start = std::time::Instant::now();
-        let result = req_builder.send().await;
-        let duration_ms = start.elapsed().as_millis() as i32;
+        if result.success {
+            // ✅ Başarılı
+            tracing::info!("✅ Delivery {} → HTTP {} ({}ms)", delivery_id, status_code, duration_ms);
 
-        match result {
-            Ok(response) => {
-                let _resp_span = tracing::info_span!("response-processing", status = tracing::field::Empty, duration_ms = duration_ms).entered();
-                let status_code = response.status().as_u16() as i32;
-                let resp_headers: serde_json::Value = serde_json::json!(
-                    response.headers()
-                        .iter()
-                        .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
-                        .collect::<std::collections::HashMap<String, String>>()
-                );
-                let body = response.text().await.unwrap_or_default();
-                let response_body = truncate(&body, 1000);
-                let success = (200..300).contains(&status_code);
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                UPDATE webhook_queue
+                SET status = 'delivered', processed_at = now(), attempt_count = $1
+                WHERE id = $2
+                "#,
+            )
+            .bind(attempt)
+            .bind(item.id)
+            .execute(pool)
+            .await?;
 
-                if success {
-                    // ✅ Başarılı
-                    tracing::info!("✅ Delivery {} → HTTP {} ({}ms)", delivery_id, status_code, duration_ms);
+            // Update deliveries table
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                UPDATE deliveries
+                SET status = 'delivered', attempt_count = $1, response_status = $2,
+                    response_body = $3, last_attempt_at = now()
+                WHERE id = $4
+                "#,
+            )
+            .bind(attempt)
+            .bind(status_code)
+            .bind(response_body)
+            .bind(delivery_id)
+            .execute(pool)
+            .await?;
 
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        UPDATE webhook_queue
-                        SET status = 'delivered', processed_at = now(), attempt_count = $1
-                        WHERE id = $2
-                        "#,
-                    )
-                    .bind(attempt)
-                    .bind(item.id)
-                    .execute(pool)
-                    .await?;
+            // Record attempt
+            record_attempt(pool, delivery_id, attempt, attempt_status, attempt_body, duration_ms, None, trace_id.as_deref(), attempt_headers).await?;
 
-                    // Update deliveries table
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        UPDATE deliveries
-                        SET status = 'delivered', attempt_count = $1, response_status = $2,
-                            response_body = $3, last_attempt_at = now()
-                        WHERE id = $4
-                        "#,
-                    )
-                    .bind(attempt)
-                    .bind(status_code)
-                    .bind(&response_body)
-                    .bind(delivery_id)
-                    .execute(pool)
-                    .await?;
+        } else if attempt >= item.max_attempts {
+            // ❌ Max deneme aşıldı → dead letter
+            tracing::error!("❌ Delivery {} → {} — max attempts, moving to dead letter", delivery_id, error_msg);
 
-                    // Record attempt
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, None, trace_id.as_deref(), Some(&resp_headers)).await?;
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                UPDATE webhook_queue
+                SET status = 'dead_letter', processed_at = now(), attempt_count = $1
+                WHERE id = $2
+                "#,
+            )
+            .bind(attempt)
+            .bind(item.id)
+            .execute(pool)
+            .await?;
 
-                } else if attempt >= item.max_attempts {
-                    // ❌ Max deneme aşıldı → dead letter
-                    tracing::error!("❌ Delivery {} → HTTP {} — max attempts, moving to dead letter", delivery_id, status_code);
+            // Move to dead_letters
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                SELECT id, endpoint_id, customer_id, payload, $2, $3
+                FROM deliveries WHERE id = $1
+                "#,
+            )
+            .bind(delivery_id)
+            .bind(&error_msg)
+            .bind(attempt)
+            .execute(pool)
+            .await?;
 
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        UPDATE webhook_queue
-                        SET status = 'dead_letter', processed_at = now(), attempt_count = $1
-                        WHERE id = $2
-                        "#,
-                    )
-                    .bind(attempt)
-                    .bind(item.id)
-                    .execute(pool)
-                    .await?;
+            // Update delivery status
+            sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1")
+                .bind(delivery_id)
+                .bind(&error_msg)
+                .execute(pool)
+                .await?;
 
-                    // Move to dead_letters
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
-                        SELECT id, endpoint_id, customer_id, payload, $2, $3
-                        FROM deliveries WHERE id = $1
-                        "#,
-                    )
-                    .bind(delivery_id)
-                    .bind(format!("HTTP {}", status_code))
-                    .bind(attempt)
-                    .execute(pool)
-                    .await?;
+            record_attempt(pool, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&error_msg), trace_id.as_deref(), attempt_headers).await?;
 
-                    // Update delivery status
-                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1")
-                        .bind(delivery_id)
-                        .bind(format!("HTTP {}", status_code))
-                        .execute(pool)
-                        .await?;
+        } else {
+            // 🔄 Retry — exponential backoff
+            let delay = calculate_backoff(attempt);
+            let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
 
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {}", status_code)), trace_id.as_deref(), Some(&resp_headers)).await?;
+            tracing::warn!("⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})", delivery_id, error_msg, delay, attempt, item.max_attempts);
 
-                } else {
-                    // 🔄 Retry — exponential backoff
-                    let delay = calculate_backoff(attempt);
-                    let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
+            sqlx::query::<sqlx::Postgres>(
+                r#"
+                UPDATE webhook_queue
+                SET status = 'pending', attempt_count = $1, next_retry_at = $2
+                WHERE id = $3
+                "#,
+            )
+            .bind(attempt)
+            .bind(next_retry)
+            .bind(item.id)
+            .execute(pool)
+            .await?;
 
-                    tracing::warn!("⚠️ Delivery {} → HTTP {} — retrying in {}s (attempt {}/{})", delivery_id, status_code, delay, attempt, item.max_attempts);
-
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        UPDATE webhook_queue
-                        SET status = 'pending', attempt_count = $1, next_retry_at = $2
-                        WHERE id = $3
-                        "#,
-                    )
-                    .bind(attempt)
-                    .bind(next_retry)
-                    .bind(item.id)
-                    .execute(pool)
-                    .await?;
-
-                    record_attempt(pool, delivery_id, attempt, Some(status_code), Some(&response_body), duration_ms, Some(&format!("HTTP {} — retry scheduled", status_code)), trace_id.as_deref(), Some(&resp_headers)).await?;
-                }
-            }
-            Err(e) => {
-                // 🌐 Network hatası
-                let error_msg = e.to_string();
-                tracing::error!("❌ Delivery {} network error: {} (attempt {})", delivery_id, error_msg, attempt);
-
-                if attempt >= item.max_attempts {
-                    // Dead letter
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        UPDATE webhook_queue
-                        SET status = 'dead_letter', processed_at = now(), attempt_count = $1
-                        WHERE id = $2
-                        "#,
-                    )
-                    .bind(attempt)
-                    .bind(item.id)
-                    .execute(pool)
-                    .await?;
-
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
-                        SELECT id, endpoint_id, customer_id, payload, $2, $3
-                        FROM deliveries WHERE id = $1
-                        "#,
-                    )
-                    .bind(delivery_id)
-                    .bind(&error_msg)
-                    .bind(attempt)
-                    .execute(pool)
-                    .await?;
-
-                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1")
-                        .bind(delivery_id)
-                        .bind(&error_msg)
-                        .execute(pool)
-                        .await?;
-
-                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref(), None).await?;
-
-                } else {
-                    // Retry
-                    let delay = calculate_backoff(attempt);
-                    let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
-
-                    sqlx::query::<sqlx::Postgres>(
-                        r#"
-                        UPDATE webhook_queue
-                        SET status = 'pending', attempt_count = $1, next_retry_at = $2
-                        WHERE id = $3
-                        "#,
-                    )
-                    .bind(attempt)
-                    .bind(next_retry)
-                    .bind(item.id)
-                    .execute(pool)
-                    .await?;
-
-                    record_attempt(pool, delivery_id, attempt, None, None, duration_ms, Some(&error_msg), trace_id.as_deref(), None).await?;
-                }
-            }
+            record_attempt(pool, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&format!("{} — retry scheduled", error_msg)), trace_id.as_deref(), attempt_headers).await?;
         }
     }
 

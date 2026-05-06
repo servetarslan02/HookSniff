@@ -23,6 +23,7 @@ use super::DeliveryResult;
 pub async fn deliver_http(
     http_client: &Client,
     webhook: &WebhookMessage,
+    attempt: i32,
 ) -> Result<DeliveryResult> {
     let timestamp = chrono::Utc::now().timestamp().to_string();
 
@@ -49,7 +50,7 @@ pub async fn deliver_http(
         // Legacy headers (backward compat)
         .header("X-HookSniff-Signature", format!("sha256={}", legacy_sig))
         .header("X-HookSniff-Delivery-Id", &webhook.delivery_id)
-        .header("X-HookSniff-Attempt", "1")
+        .header("X-HookSniff-Attempt", attempt.to_string())
         .body(webhook.payload.clone());
 
     // Attach custom headers if configured
@@ -69,6 +70,12 @@ pub async fn deliver_http(
     match result {
         Ok(response) => {
             let status_code = response.status().as_u16() as i32;
+            let resp_headers: serde_json::Value = serde_json::json!(
+                response.headers()
+                    .iter()
+                    .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
+                    .collect::<std::collections::HashMap<String, String>>()
+            );
             let body = response.text().await.unwrap_or_default();
             let response_body = truncate_str(&body, 1000);
             let success = (200..300).contains(&status_code);
@@ -86,6 +93,7 @@ pub async fn deliver_http(
                 success,
                 status_code,
                 response_body,
+                response_headers: resp_headers,
                 duration_ms,
                 error: String::new(),
             })
@@ -99,6 +107,7 @@ pub async fn deliver_http(
                 success: false,
                 status_code: 0,
                 response_body: String::new(),
+                response_headers: serde_json::json!({}),
                 duration_ms,
                 error: e.to_string(),
             })
