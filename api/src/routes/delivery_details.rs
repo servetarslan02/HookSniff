@@ -78,8 +78,8 @@ async fn get_delivery_details(
         .await?;
 
     // Get all attempts
-    let attempts = sqlx::query_as::<_, (Uuid, i32, Option<i32>, Option<String>, Option<i32>, Option<String>, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, attempt_number, status_code, response_body, duration_ms, error_message, created_at FROM delivery_attempts WHERE delivery_id = $1 ORDER BY attempt_number ASC"
+    let attempts = sqlx::query_as::<_, (Uuid, i32, Option<i32>, Option<String>, Option<i32>, Option<String>, chrono::DateTime<chrono::Utc>, Option<serde_json::Value>)>(
+        "SELECT id, attempt_number, status_code, response_body, duration_ms, error_message, created_at, response_headers FROM delivery_attempts WHERE delivery_id = $1 ORDER BY attempt_number ASC"
     )
     .bind(id)
     .fetch_all(&pool)
@@ -99,7 +99,7 @@ async fn get_delivery_details(
         next_retry_at: delivery.10.map(|t| t.to_rfc3339()),
         response_status: delivery.8,
         response_body: delivery.9,
-        attempts: attempts.into_iter().map(|(id, num, status, body, dur, err, created)| {
+        attempts: attempts.into_iter().map(|(id, num, status, body, dur, err, created, resp_headers)| {
             let derived_status = match status {
                 Some(code) if (200..300).contains(&code) => "delivered".to_string(),
                 _ => "failed".to_string(),
@@ -111,7 +111,7 @@ async fn get_delivery_details(
                 status_code: status,
                 response_body: body,
                 request_headers: None,
-                response_headers: None,
+                response_headers: resp_headers,
                 duration_ms: dur,
                 error_message: err,
                 created_at: created.to_rfc3339(),
@@ -139,8 +139,8 @@ async fn get_attempt_detail(
         .await?
         .ok_or(AppError::NotFound)?;
 
-    let attempt = sqlx::query_as::<_, (Uuid, i32, Option<i32>, Option<String>, Option<i32>, Option<String>, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, attempt_number, status_code, response_body, duration_ms, error_message, created_at FROM delivery_attempts WHERE id = $1 AND delivery_id = $2"
+    let attempt = sqlx::query_as::<_, (Uuid, i32, Option<i32>, Option<String>, Option<i32>, Option<String>, chrono::DateTime<chrono::Utc>, Option<serde_json::Value>)>(
+        "SELECT id, attempt_number, status_code, response_body, duration_ms, error_message, created_at, response_headers FROM delivery_attempts WHERE id = $1 AND delivery_id = $2"
     )
     .bind(attempt_id)
     .bind(delivery_id)
@@ -160,7 +160,7 @@ async fn get_attempt_detail(
         status_code: attempt.2,
         response_body: attempt.3,
         request_headers: None,
-        response_headers: None,
+        response_headers: attempt.7,
         duration_ms: attempt.4,
         error_message: attempt.5,
         created_at: attempt.6.to_rfc3339(),

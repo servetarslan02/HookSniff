@@ -653,6 +653,14 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 27: Migration 026 — response_headers column on delivery_attempts
+    run_migration(
+        pool,
+        "026_response_headers",
+        "ALTER TABLE delivery_attempts ADD COLUMN IF NOT EXISTS response_headers JSONB",
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
