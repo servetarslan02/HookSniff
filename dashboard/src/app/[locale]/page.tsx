@@ -422,7 +422,7 @@ curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \\
             <span className="font-semibold text-gray-900 dark:text-white">HookSniff</span>
           </div>
           <div className="flex gap-6 text-sm text-gray-500 dark:text-slate-400">
-            <a href="https://github.com/hooksniff" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('github')}</a>
+            <a href="https://github.com/servetarslan02/HookSniff" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('github')}</a>
             <Link href="/docs" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('docs')}</Link>
             <Link href="/status" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('status')}</Link>
             <a href="#" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('blog')}</a>
