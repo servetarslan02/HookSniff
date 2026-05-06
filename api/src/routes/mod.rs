@@ -25,12 +25,17 @@ use axum::middleware as axum_middleware;
 use axum::Router;
 
 pub fn create_routes(
-    _pool: sqlx::PgPool,
-    _rate_limiter: crate::rate_limit::RateLimiter,
-    _throttle_manager: crate::throttle::ThrottleManager,
-    _metrics: std::sync::Arc<crate::metrics::Metrics>,
+    pool: sqlx::PgPool,
+    rate_limiter: crate::rate_limit::RateLimiter,
+    throttle_manager: crate::throttle::ThrottleManager,
+    metrics: std::sync::Arc<crate::metrics::Metrics>,
 ) -> Router {
     api_router()
+        .layer(axum::Extension(pool))
+        .layer(axum::Extension(rate_limiter))
+        .layer(axum::Extension(throttle_manager))
+        .layer(axum::Extension(metrics))
+        .layer(axum_middleware::from_fn(crate::rate_limit::rate_limit_middleware))
 }
 
 pub fn api_router() -> Router {
