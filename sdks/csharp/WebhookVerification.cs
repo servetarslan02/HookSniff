@@ -3,28 +3,28 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace HookRelay
+namespace HookSniff
 {
     /// <summary>
     /// Result of webhook verification.
     /// </summary>
-    public class HookRelayVerificationResult
+    public class HookSniffVerificationResult
     {
         public bool Valid { get; set; }
         public object? Payload { get; set; }
         public string? Error { get; set; }
 
-        public static HookRelayVerificationResult Invalid(string error) =>
-            new HookRelayVerificationResult { Valid = false, Error = error };
+        public static HookSniffVerificationResult Invalid(string error) =>
+            new HookSniffVerificationResult { Valid = false, Error = error };
 
-        public static HookRelayVerificationResult ValidResult(object payload) =>
-            new HookRelayVerificationResult { Valid = true, Payload = payload };
+        public static HookSniffVerificationResult ValidResult(object payload) =>
+            new HookSniffVerificationResult { Valid = true, Payload = payload };
     }
 
     /// <summary>
-    /// Webhook signature verification for HookRelay.
+    /// Webhook signature verification for HookSniff.
     ///
-    /// Supports both simple HMAC-SHA256 verification and Standard Webheaders
+    /// Supports both simple HMAC-SHA256 verification and Standard Webhooks
     /// (Svix-compatible) verification with timestamp tolerance.
     /// Also supports Svix headers (svix-id, svix-signature, svix-timestamp) as fallback.
     /// </summary>
@@ -36,7 +36,7 @@ namespace HookRelay
         /// Verify a webhook from HTTP headers with automatic header detection.
         /// Supports both Standard Webhooks and Svix headers.
         /// </summary>
-        public static HookRelayVerificationResult VerifyWebhookFromHeaders(
+        public static HookSniffVerificationResult VerifyWebhookFromHeaders(
             string payload, System.Net.WebHeaderCollection headers, string secret, int toleranceSecs = DefaultToleranceSecs)
         {
             var msgId = headers["webhook-id"];
@@ -57,7 +57,7 @@ namespace HookRelay
         /// Verify a webhook signature using HMAC-SHA256.
         /// </summary>
         /// <param name="payload">The raw request body</param>
-        /// <param name="signature">The signature from the X-Hookrelay-Signature header</param>
+        /// <param name="signature">The signature from the X-HookSniff-Signature header</param>
         /// <param name="secret">The endpoint's signing secret (starts with "whsec_")</param>
         /// <returns>true if the signature is valid</returns>
         public static bool VerifySignature(string payload, string signature, string secret)
@@ -84,31 +84,31 @@ namespace HookRelay
         }
 
         /// <summary>
-        /// Verify a webhook using Standard Webheaders headers (Svix-compatible).
+        /// Verify a webhook using Standard Webhooks headers (Svix-compatible).
         /// </summary>
-        public static HookRelayVerificationResult VerifyWebhook(
+        public static HookSniffVerificationResult VerifyWebhook(
             string payload, string? msgId, string? timestamp,
             string? signatureHeader, string secret, int toleranceSecs = DefaultToleranceSecs)
         {
             if (string.IsNullOrEmpty(msgId))
-                return HookRelayVerificationResult.Invalid("Missing webhook-id header");
+                return HookSniffVerificationResult.Invalid("Missing webhook-id header");
             if (string.IsNullOrEmpty(timestamp))
-                return HookRelayVerificationResult.Invalid("Missing webhook-timestamp header");
+                return HookSniffVerificationResult.Invalid("Missing webhook-timestamp header");
             if (string.IsNullOrEmpty(signatureHeader))
-                return HookRelayVerificationResult.Invalid("Missing webhook-signature header");
+                return HookSniffVerificationResult.Invalid("Missing webhook-signature header");
             if (string.IsNullOrEmpty(payload))
-                return HookRelayVerificationResult.Invalid("Missing request body");
+                return HookSniffVerificationResult.Invalid("Missing request body");
 
             // Validate timestamp
             if (!long.TryParse(timestamp, out var ts))
-                return HookRelayVerificationResult.Invalid("Invalid webhook timestamp");
+                return HookSniffVerificationResult.Invalid("Invalid webhook timestamp");
 
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             if (now - ts > toleranceSecs)
-                return HookRelayVerificationResult.Invalid("Message timestamp too old");
+                return HookSniffVerificationResult.Invalid("Message timestamp too old");
             if (ts > now + toleranceSecs)
-                return HookRelayVerificationResult.Invalid("Message timestamp too new");
+                return HookSniffVerificationResult.Invalid("Message timestamp too new");
 
             // Compute expected signature
             var signedContent = $"{msgId}.{timestamp}.{payload}";
@@ -141,22 +141,22 @@ namespace HookRelay
                 }
 
                 if (!verified)
-                    return HookRelayVerificationResult.Invalid("Invalid webhook signature");
+                    return HookSniffVerificationResult.Invalid("Invalid webhook signature");
             }
             catch
             {
-                return HookRelayVerificationResult.Invalid("Signature computation failed");
+                return HookSniffVerificationResult.Invalid("Signature computation failed");
             }
 
             // Parse payload
             try
             {
                 var parsed = JsonSerializer.Deserialize<JsonElement>(payload);
-                return HookRelayVerificationResult.ValidResult(parsed);
+                return HookSniffVerificationResult.ValidResult(parsed);
             }
             catch
             {
-                return HookRelayVerificationResult.ValidResult(payload);
+                return HookSniffVerificationResult.ValidResult(payload);
             }
         }
 
