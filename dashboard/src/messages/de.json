@@ -1,0 +1,203 @@
+{
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "update": "Aktualisieren",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "loading": "Laden...",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "noResults": "Keine Ergebnisse gefunden",
+    "actions": "Aktionen",
+    "status": "Status",
+    "name": "Name",
+    "description": "Beschreibung",
+    "url": "URL",
+    "created": "Erstellt",
+    "updated": "Aktualisiert",
+    "copyToClipboard": "In Zwischenablage kopieren",
+    "copied": "Kopiert!",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "warning": "Warnung",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "endpoints": "Endpunkte",
+    "deliveries": "Zustellungen",
+    "logs": "Protokolle",
+    "search": "Suche",
+    "health": "Gesundheit",
+    "alerts": "Warnmeldungen",
+    "apiKeys": "API-Schlüssel",
+    "playground": "Spielwiese",
+    "analytics": "Analytik",
+    "team": "Team",
+    "notifications": "Benachrichtigungen",
+    "billing": "Abrechnung",
+    "settings": "Einstellungen",
+    "adminPanel": "Admin-Panel",
+    "docs": "Dokumentation",
+    "logout": "Abmelden"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Übersicht",
+    "liveActivity": "Live-Aktivität",
+    "recentDeliveries": "Letzte Zustellungen",
+    "noData": "Noch keine Zustellungsdaten",
+    "noActivity": "Keine aktuelle Aktivität",
+    "stats": {
+      "totalDeliveries": "Gesamte Zustellungen",
+      "successRate": "Erfolgsrate",
+      "avgLatency": "Durchschn. Latenz",
+      "activeEndpoints": "Aktive Endpunkte",
+      "failedDeliveries": "Fehlgeschlagene Zustellungen",
+      "pendingRetries": "Ausstehende Wiederholungen"
+    },
+    "timeRange": {
+      "24h": "24 Stunden",
+      "7d": "7 Tage",
+      "30d": "30 Tage"
+    }
+  },
+  "endpoints": {
+    "title": "Endpunkte",
+    "subtitle": "Verwalten Sie Ihre Webhook-Endpunkte",
+    "create": "Endpunkt erstellen",
+    "empty": "Noch keine Endpunkte",
+    "emptyDesc": "Erstellen Sie Ihren ersten Endpunkt, um Webhooks zu empfangen",
+    "form": {
+      "url": "Endpunkt-URL",
+      "urlPlaceholder": "https://ihre-app.de/webhooks",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Wofür ist dieser Endpunkt?",
+      "secret": "Signaturgeheimnis",
+      "secretDesc": "Zur Überprüfung von Webhook-Signaturen verwendet",
+      "events": "Ereignistypen",
+      "rateLimit": "Ratenbegrenzung",
+      "active": "Aktiv"
+    },
+    "status": {
+      "active": "Aktiv",
+      "paused": "Pausiert",
+      "disabled": "Deaktiviert"
+    }
+  },
+  "deliveries": {
+    "title": "Zustellungen",
+    "subtitle": "Webhook-Zustellungsverlauf anzeigen",
+    "empty": "Noch keine Zustellungen",
+    "event": "Ereignis",
+    "endpoint": "Endpunkt",
+    "attempts": "Versuche",
+    "time": "Zeit",
+    "latency": "Latenz",
+    "payload": "Nutzdaten",
+    "response": "Antwort",
+    "headers": "Header",
+    "statusCode": "Statuscode",
+    "retry": "Wiederholen",
+    "retrying": "Wird wiederholt..."
+  },
+  "analytics": {
+    "title": "Analytik",
+    "subtitle": "Webhook-Zustellungseinblicke",
+    "deliveryTrends": "Zustelltrends",
+    "successRateOverTime": "Erfolgsrate im Zeitverlauf",
+    "topEndpoints": "Top-Endpunkte",
+    "errorBreakdown": "Fehleraufschlüsselung",
+    "latencyDistribution": "Latenzverteilung"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalten Sie Ihr Konto und Ihre Präferenzen",
+    "profile": "Profil",
+    "security": "Sicherheit",
+    "api": "API-Konfiguration",
+    "notifications": "Benachrichtigungseinstellungen",
+    "dangerZone": "Gefahrenzone",
+    "deleteAccount": "Konto löschen",
+    "deleteAccountDesc": "Löschen Sie Ihr Konto und alle Daten dauerhaft",
+    "changePassword": "Passwort ändern",
+    "twoFactor": "Zwei-Faktor-Authentifizierung",
+    "language": "Sprache",
+    "theme": "Design",
+    "timezone": "Zeitzone"
+  },
+  "billing": {
+    "title": "Abrechnung",
+    "subtitle": "Verwalten Sie Ihr Abonnement und Zahlungen",
+    "currentPlan": "Aktueller Plan",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "cancel": "Abonnement kündigen",
+    "invoices": "Rechnungen",
+    "paymentMethod": "Zahlungsmethode",
+    "usage": "Nutzung",
+    "plans": {
+      "free": "Kostenlos",
+      "pro": "Pro",
+      "business": "Business",
+      "enterprise": "Enterprise"
+    },
+    "features": {
+      "deliveries": "{count} Zustellungen/Monat",
+      "endpoints": "{count} Endpunkte",
+      "retention": "{days} Tage Aufbewahrung",
+      "support": "Prioritäts-Support",
+      "customDomain": "Eigene Domain",
+      "sla": "SLA-Garantie"
+    }
+  },
+  "auth": {
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "logout": "Abmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "forgotPassword": "Passwort vergessen?",
+    "noAccount": "Noch kein Konto?",
+    "hasAccount": "Bereits ein Konto?",
+    "loginTitle": "Willkommen zurück",
+    "loginSubtitle": "Melden Sie sich bei Ihrem HookRelay-Dashboard an",
+    "signupTitle": "Erstellen Sie Ihr Konto",
+    "signupSubtitle": "Beginnen Sie mit der zuverlässigen Zustellung von Webhooks"
+  },
+  "landing": {
+    "hero": {
+      "title": "Zuverlässige Webhook-Zustellung für Entwickler",
+      "subtitle": "Überwachen, wiederholen und verwalten Sie Ihre Webhooks mit Echtzeit-Analytik und intelligentem Routing.",
+      "cta": "Kostenlos starten",
+      "ctaSecondary": "Dokumentation anzeigen"
+    },
+    "features": {
+      "title": "Alles was Sie für Webhooks brauchen",
+      "smartRetries": "Intelligente Wiederholungen",
+      "smartRetriesDesc": "Exponentielles Backoff mit Jitter für optimale Zustellung",
+      "monitoring": "Echtzeit-Überwachung",
+      "monitoringDesc": "Verfolgen Sie jede Zustellung mit detaillierter Analytik",
+      "security": "Integrierte Sicherheit",
+      "securityDesc": "HMAC-Signaturverifizierung und Schlüsselrotation",
+      "routing": "Intelligentes Routing",
+      "routingDesc": "Webhooks mit Filterung an mehrere Endpunkte weiterleiten"
+    },
+    "pricing": {
+      "title": "Einfache, transparente Preisgestaltung",
+      "free": "Kostenlos",
+      "pro": "Pro",
+      "business": "Business",
+      "month": "/Monat",
+      "getStarted": "Jetzt starten"
+    }
+  }
+}

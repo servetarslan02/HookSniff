@@ -4,33 +4,48 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationCenter } from '@/components/NotificationCenter';
-
-const navigation = [
-  { name: 'Overview', href: '/dashboard', icon: '📊' },
-  { name: 'Endpoints', href: '/dashboard/endpoints', icon: '🔗' },
-  { name: 'Deliveries', href: '/dashboard/deliveries', icon: '📦' },
-  { name: 'Logs', href: '/dashboard/logs', icon: '📋' },
-  { name: 'Search', href: '/dashboard/search', icon: '🔍' },
-  { name: 'Health', href: '/dashboard/health', icon: '💓' },
-  { name: 'Alerts', href: '/dashboard/alerts', icon: '🔔' },
-  { name: 'API Keys', href: '/dashboard/api-keys', icon: '🔑' },
-  { name: 'Playground', href: '/dashboard/playground', icon: '🧪' },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: '📈' },
-  { name: 'Team', href: '/dashboard/team', icon: '👥' },
-  { name: 'Notifications', href: '/dashboard/notifications', icon: '🔔' },
-  { name: 'Billing', href: '/dashboard/billing', icon: '💳' },
-  { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
-];
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const t = useTranslations('nav');
+
+  // Strip locale prefix from pathname for navigation matching
+  const localePrefix = pathname.match(/^\/(tr|de|ja|pt-BR|es|fr|ko)(\/|$)/);
+  const cleanPath = localePrefix ? pathname.slice(localePrefix[1].length + 1) || '/' : pathname;
+
+  const navigation = [
+    { name: t('dashboard'), href: '/dashboard', icon: '📊' },
+    { name: t('endpoints'), href: '/dashboard/endpoints', icon: '🔗' },
+    { name: t('deliveries'), href: '/dashboard/deliveries', icon: '📦' },
+    { name: t('logs'), href: '/dashboard/logs', icon: '📋' },
+    { name: t('search'), href: '/dashboard/search', icon: '🔍' },
+    { name: t('health'), href: '/dashboard/health', icon: '💓' },
+    { name: t('alerts'), href: '/dashboard/alerts', icon: '🔔' },
+    { name: t('apiKeys'), href: '/dashboard/api-keys', icon: '🔑' },
+    { name: t('playground'), href: '/dashboard/playground', icon: '🧪' },
+    { name: t('analytics'), href: '/dashboard/analytics', icon: '📈' },
+    { name: t('team'), href: '/dashboard/team', icon: '👥' },
+    { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
+    { name: t('billing'), href: '/dashboard/billing', icon: '💳' },
+    { name: t('settings'), href: '/dashboard/settings', icon: '⚙️' },
+  ];
+
+  // Helper to get locale-aware href
+  function getLocalizedHref(href: string) {
+    if (localePrefix) {
+      return `/${localePrefix[1]}${href}`;
+    }
+    return href;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
@@ -60,11 +75,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
         <nav className="px-3 py-4 space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = cleanPath === item.href;
             return (
               <Link
-                key={item.name}
-                href={item.href}
+                key={item.href}
+                href={getLocalizedHref(item.href)}
                 onClick={() => setSidebarOpen(false)}
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
@@ -80,16 +95,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           })}
           {user?.is_admin && (
             <Link
-              href="/admin"
+              href={getLocalizedHref('/admin')}
               onClick={() => setSidebarOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
             >
               <span className="text-lg">⚡</span>
-              Admin Panel
+              {t('adminPanel')}
             </Link>
           )}
         </nav>
-        <div className="absolute bottom-4 left-0 right-0 px-6">
+        <div className="absolute bottom-4 left-0 right-0 px-6 flex flex-col gap-2">
+          <LanguageSwitcher className="w-full" />
           <ThemeToggle className="w-full" />
         </div>
       </aside>
@@ -99,7 +115,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Top bar */}
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
           <div className="flex items-center gap-3">
-            {/* Mobile hamburger */}
             <button
               onClick={() => setSidebarOpen(true)}
               className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
@@ -110,7 +125,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               </svg>
             </button>
             <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {navigation.find((n) => n.href === pathname)?.name || 'Dashboard'}
+              {navigation.find((n) => n.href === cleanPath)?.name || t('dashboard')}
             </h1>
           </div>
           <div className="flex items-center gap-4">
@@ -119,10 +134,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               {user?.email || 'User'}
             </div>
             <button
-              onClick={() => { logout(); router.push('/login'); }}
+              onClick={() => { logout(); router.push(getLocalizedHref('/login')); }}
               className="text-sm text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
             >
-              Logout
+              {t('logout')}
             </button>
           </div>
         </header>

@@ -1,0 +1,203 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "loading": "Cargando...",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "noResults": "No se encontraron resultados",
+    "actions": "Acciones",
+    "status": "Estado",
+    "name": "Nombre",
+    "description": "Descripción",
+    "url": "URL",
+    "created": "Creado",
+    "updated": "Actualizado",
+    "copyToClipboard": "Copiar al portapapeles",
+    "copied": "¡Copiado!",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "endpoints": "Endpoints",
+    "deliveries": "Entregas",
+    "logs": "Registros",
+    "search": "Buscar",
+    "health": "Salud",
+    "alerts": "Alertas",
+    "apiKeys": "Claves API",
+    "playground": "Playground",
+    "analytics": "Analíticas",
+    "team": "Equipo",
+    "notifications": "Notificaciones",
+    "billing": "Facturación",
+    "settings": "Configuración",
+    "adminPanel": "Panel de Admin",
+    "docs": "Documentación",
+    "logout": "Cerrar sesión"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "overview": "Resumen",
+    "liveActivity": "Actividad en Vivo",
+    "recentDeliveries": "Entregas Recientes",
+    "noData": "Aún no hay datos de entrega",
+    "noActivity": "Sin actividad reciente",
+    "stats": {
+      "totalDeliveries": "Total de Entregas",
+      "successRate": "Tasa de Éxito",
+      "avgLatency": "Latencia Promedio",
+      "activeEndpoints": "Endpoints Activos",
+      "failedDeliveries": "Entregas Fallidas",
+      "pendingRetries": "Reintentos Pendientes"
+    },
+    "timeRange": {
+      "24h": "24 Horas",
+      "7d": "7 Días",
+      "30d": "30 Días"
+    }
+  },
+  "endpoints": {
+    "title": "Endpoints",
+    "subtitle": "Gestiona tus endpoints de webhook",
+    "create": "Crear Endpoint",
+    "empty": "Aún no hay endpoints",
+    "emptyDesc": "Crea tu primer endpoint para empezar a recibir webhooks",
+    "form": {
+      "url": "URL del Endpoint",
+      "urlPlaceholder": "https://tu-app.com/webhooks",
+      "description": "Descripción",
+      "descriptionPlaceholder": "¿Para qué es este endpoint?",
+      "secret": "Secreto de Firma",
+      "secretDesc": "Usado para verificar firmas de webhook",
+      "events": "Tipos de Evento",
+      "rateLimit": "Límite de Tasa",
+      "active": "Activo"
+    },
+    "status": {
+      "active": "Activo",
+      "paused": "Pausado",
+      "disabled": "Deshabilitado"
+    }
+  },
+  "deliveries": {
+    "title": "Entregas",
+    "subtitle": "Ver historial de entregas de webhook",
+    "empty": "Aún no hay entregas",
+    "event": "Evento",
+    "endpoint": "Endpoint",
+    "attempts": "Intentos",
+    "time": "Hora",
+    "latency": "Latencia",
+    "payload": "Payload",
+    "response": "Respuesta",
+    "headers": "Encabezados",
+    "statusCode": "Código de Estado",
+    "retry": "Reintentar",
+    "retrying": "Reintentando..."
+  },
+  "analytics": {
+    "title": "Analíticas",
+    "subtitle": "Información de entregas de webhook",
+    "deliveryTrends": "Tendencias de Entrega",
+    "successRateOverTime": "Tasa de Éxito en el Tiempo",
+    "topEndpoints": "Principales Endpoints",
+    "errorBreakdown": "Desglose de Errores",
+    "latencyDistribution": "Distribución de Latencia"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona tu cuenta y preferencias",
+    "profile": "Perfil",
+    "security": "Seguridad",
+    "api": "Configuración API",
+    "notifications": "Preferencias de Notificación",
+    "dangerZone": "Zona de Peligro",
+    "deleteAccount": "Eliminar Cuenta",
+    "deleteAccountDesc": "Elimina permanentemente tu cuenta y todos los datos",
+    "changePassword": "Cambiar Contraseña",
+    "twoFactor": "Autenticación de Dos Factores",
+    "language": "Idioma",
+    "theme": "Tema",
+    "timezone": "Zona Horaria"
+  },
+  "billing": {
+    "title": "Facturación",
+    "subtitle": "Gestiona tu suscripción y pagos",
+    "currentPlan": "Plan Actual",
+    "upgrade": "Mejorar",
+    "downgrade": "Degradar",
+    "cancel": "Cancelar Suscripción",
+    "invoices": "Facturas",
+    "paymentMethod": "Método de Pago",
+    "usage": "Uso",
+    "plans": {
+      "free": "Gratis",
+      "pro": "Pro",
+      "business": "Business",
+      "enterprise": "Enterprise"
+    },
+    "features": {
+      "deliveries": "{count} entregas/mes",
+      "endpoints": "{count} endpoints",
+      "retention": "{days} días de retención",
+      "support": "Soporte prioritario",
+      "customDomain": "Dominio personalizado",
+      "sla": "Garantía SLA"
+    }
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "email": "Correo",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "loginTitle": "Bienvenido de nuevo",
+    "loginSubtitle": "Entra en tu panel de HookRelay",
+    "signupTitle": "Crea tu cuenta",
+    "signupSubtitle": "Comienza a entregar webhooks de forma confiable"
+  },
+  "landing": {
+    "hero": {
+      "title": "Entrega de webhooks confiable para desarrolladores",
+      "subtitle": "Monitorea, reintenta y gestiona tus webhooks con análisis en tiempo real y enrutamiento inteligente.",
+      "cta": "Comenzar Gratis",
+      "ctaSecondary": "Ver Documentación"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para webhooks",
+      "smartRetries": "Reintentos Inteligentes",
+      "smartRetriesDesc": "Backoff exponencial con jitter para entrega óptima",
+      "monitoring": "Monitoreo en Tiempo Real",
+      "monitoringDesc": "Rastrea cada entrega con análisis detallados",
+      "security": "Seguridad Integrada",
+      "securityDesc": "Verificación de firma HMAC y rotación de secretos",
+      "routing": "Enrutamiento Inteligente",
+      "routingDesc": "Encamina webhooks a múltiples endpoints con filtrado"
+    },
+    "pricing": {
+      "title": "Precios simples y transparentes",
+      "free": "Gratis",
+      "pro": "Pro",
+      "business": "Business",
+      "month": "/mes",
+      "getStarted": "Comenzar"
+    }
+  }
+}

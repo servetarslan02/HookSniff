@@ -1,0 +1,203 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "update": "更新",
+    "close": "閉じる",
+    "confirm": "確認",
+    "back": "戻る",
+    "next": "次へ",
+    "loading": "読み込み中...",
+    "search": "検索",
+    "filter": "フィルター",
+    "noResults": "結果が見つかりません",
+    "actions": "アクション",
+    "status": "ステータス",
+    "name": "名前",
+    "description": "説明",
+    "url": "URL",
+    "created": "作成日",
+    "updated": "更新日",
+    "copyToClipboard": "クリップボードにコピー",
+    "copied": "コピーしました！",
+    "error": "エラー",
+    "success": "成功",
+    "warning": "警告",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "endpoints": "エンドポイント",
+    "deliveries": "配信",
+    "logs": "ログ",
+    "search": "検索",
+    "health": "ヘルス",
+    "alerts": "アラート",
+    "apiKeys": "APIキー",
+    "playground": "プレイグラウンド",
+    "analytics": "アナリティクス",
+    "team": "チーム",
+    "notifications": "通知",
+    "billing": "請求",
+    "settings": "設定",
+    "adminPanel": "管理パネル",
+    "docs": "ドキュメント",
+    "logout": "ログアウト"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "overview": "概要",
+    "liveActivity": "ライブアクティビティ",
+    "recentDeliveries": "最近の配信",
+    "noData": "配信データがまだありません",
+    "noActivity": "最近のアクティビティがありません",
+    "stats": {
+      "totalDeliveries": "総配信数",
+      "successRate": "成功率",
+      "avgLatency": "平均レイテンシ",
+      "activeEndpoints": "アクティブエンドポイント",
+      "failedDeliveries": "失敗した配信",
+      "pendingRetries": "保留中のリトライ"
+    },
+    "timeRange": {
+      "24h": "24時間",
+      "7d": "7日間",
+      "30d": "30日間"
+    }
+  },
+  "endpoints": {
+    "title": "エンドポイント",
+    "subtitle": "Webhookエンドポイントを管理",
+    "create": "エンドポイント作成",
+    "empty": "エンドポイントがまだありません",
+    "emptyDesc": "Webhookの受信を開始するには、最初のエンドポイントを作成してください",
+    "form": {
+      "url": "エンドポイントURL",
+      "urlPlaceholder": "https://your-app.com/webhooks",
+      "description": "説明",
+      "descriptionPlaceholder": "このエンドポイントの用途は？",
+      "secret": "署名シークレット",
+      "secretDesc": "Webhook署名の検証に使用",
+      "events": "イベントタイプ",
+      "rateLimit": "レート制限",
+      "active": "アクティブ"
+    },
+    "status": {
+      "active": "アクティブ",
+      "paused": "一時停止",
+      "disabled": "無効"
+    }
+  },
+  "deliveries": {
+    "title": "配信",
+    "subtitle": "Webhook配信履歴を表示",
+    "empty": "配信がまだありません",
+    "event": "イベント",
+    "endpoint": "エンドポイント",
+    "attempts": "試行回数",
+    "time": "時刻",
+    "latency": "レイテンシ",
+    "payload": "ペイロード",
+    "response": "レスポンス",
+    "headers": "ヘッダー",
+    "statusCode": "ステータスコード",
+    "retry": "リトライ",
+    "retrying": "リトライ中..."
+  },
+  "analytics": {
+    "title": "アナリティクス",
+    "subtitle": "Webhook配信のインサイト",
+    "deliveryTrends": "配信トレンド",
+    "successRateOverTime": "成功率の推移",
+    "topEndpoints": "トップエンドポイント",
+    "errorBreakdown": "エラー内訳",
+    "latencyDistribution": "レイテンシ分布"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "アカウントと設定を管理",
+    "profile": "プロフィール",
+    "security": "セキュリティ",
+    "api": "API設定",
+    "notifications": "通知設定",
+    "dangerZone": "危険ゾーン",
+    "deleteAccount": "アカウント削除",
+    "deleteAccountDesc": "アカウントとすべてのデータを完全に削除",
+    "changePassword": "パスワード変更",
+    "twoFactor": "二要素認証",
+    "language": "言語",
+    "theme": "テーマ",
+    "timezone": "タイムゾーン"
+  },
+  "billing": {
+    "title": "請求",
+    "subtitle": "サブスクリプションと支払いを管理",
+    "currentPlan": "現在のプラン",
+    "upgrade": "アップグレード",
+    "downgrade": "ダウングレード",
+    "cancel": "サブスクリプション解約",
+    "invoices": "請求書",
+    "paymentMethod": "支払い方法",
+    "usage": "使用量",
+    "plans": {
+      "free": "無料",
+      "pro": "プロ",
+      "business": "ビジネス",
+      "enterprise": "エンタープライズ"
+    },
+    "features": {
+      "deliveries": "月間{count}件の配信",
+      "endpoints": "{count}エンドポイント",
+      "retention": "{days}日間の保持",
+      "support": "優先サポート",
+      "customDomain": "カスタムドメイン",
+      "sla": "SLA保証"
+    }
+  },
+  "auth": {
+    "login": "ログイン",
+    "signup": "サインアップ",
+    "logout": "ログアウト",
+    "email": "メール",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "hasAccount": "すでにアカウントをお持ちですか？",
+    "loginTitle": "おかえりなさい",
+    "loginSubtitle": "HookRelayダッシュボードにログイン",
+    "signupTitle": "アカウントを作成",
+    "signupSubtitle": "Webhookの確実な配信を開始"
+  },
+  "landing": {
+    "hero": {
+      "title": "開発者のための信頼性の高いWebhook配信",
+      "subtitle": "リアルタイム分析とインテリジェントルーティングでWebhookを監視、リトライ、管理します。",
+      "cta": "無料で始める",
+      "ctaSecondary": "ドキュメントを見る"
+    },
+    "features": {
+      "title": "Webhookに必要なすべて",
+      "smartRetries": "スマートリトライ",
+      "smartRetriesDesc": "最適な配信のための指数バックオフとジッター",
+      "monitoring": "リアルタイム監視",
+      "monitoringDesc": "詳細な分析ですべての配信を追跡",
+      "security": "内蔵セキュリティ",
+      "securityDesc": "HMAC署名検証とシークレットローテーション",
+      "routing": "インテリジェントルーティング",
+      "routingDesc": "フィルタリングで複数のエンドポイントにWebhookをルーティング"
+    },
+    "pricing": {
+      "title": "シンプルで透明な価格設定",
+      "free": "無料",
+      "pro": "プロ",
+      "business": "ビジネス",
+      "month": "/月",
+      "getStarted": "始める"
+    }
+  }
+}
