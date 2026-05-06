@@ -5,7 +5,6 @@ WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
-COPY ai-center/ ai-center/
 
 # Build release binary
 RUN cargo build --release -p hookrelay-worker && \
