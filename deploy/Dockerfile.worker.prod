@@ -21,7 +21,7 @@ RUN mkdir -p api/src && \
     echo "fn main() {}" > api/src/main.rs && \
     mkdir -p worker/src && \
     echo "fn main() {}" > worker/src/main.rs && \
-    cargo build --release -p hookrelay-worker 2>/dev/null || true && \
+    cargo build --release -p hooksniff-worker 2>/dev/null || true && \
     rm -rf api/src worker/src
 
 # Asıl kaynak kodlarını kopyala ve derle
@@ -29,8 +29,8 @@ COPY api/src/ api/src/
 COPY worker/src/ worker/src/
 
 # Release build
-RUN cargo build --release -p hookrelay-worker && \
-    strip /app/target/release/hookrelay-worker
+RUN cargo build --release -p hooksniff-worker && \
+    strip /app/target/release/hooksniff-worker
 
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
@@ -43,14 +43,14 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Non-root kullanıcı
-RUN groupadd -r hookrelay && \
-    useradd -r -g hookrelay -d /app -s /sbin/nologin hookrelay
+RUN groupadd -r hooksniff && \
+    useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff
 
-COPY --from=builder /app/target/release/hookrelay-worker /usr/local/bin/hookrelay-worker
+COPY --from=builder /app/target/release/hooksniff-worker /usr/local/bin/hooksniff-worker
 
-RUN mkdir -p /app && chown -R hookrelay:hookrelay /app
+RUN mkdir -p /app && chown -R hooksniff:hooksniff /app
 
-USER hookrelay
+USER hooksniff
 WORKDIR /app
 
 # Worker'ın portu yok, sadece background process
@@ -58,4 +58,4 @@ WORKDIR /app
 # Ancak graceful shutdown için sinyal yakalama önemli
 STOPSIGNAL SIGTERM
 
-CMD ["hookrelay-worker"]
+CMD ["hooksniff-worker"]

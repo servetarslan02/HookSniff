@@ -1,0 +1,62 @@
+# render.yaml — HookSniff Render Blueprint
+# Deploy: https://dashboard.render.com/blueprints
+
+services:
+  # ── API Server ──
+  - type: web
+    name: hooksniff-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile.api
+    plan: free
+    region: frankfurt
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: RUST_LOG
+        value: info,hooksniff=debug
+      - key: DATABASE_URL
+        sync: false
+      - key: HMAC_SECRET
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RETENTION_DAYS
+        value: "7"
+      - key: CORS_ORIGINS
+        value: https://hooksniff.is-a.dev
+      - key: APP_URL
+        value: https://hooksniff.is-a.dev
+      - key: POLAR_ACCESS_TOKEN
+        sync: false
+      - key: POLAR_WEBHOOK_SECRET
+        sync: false
+      - key: POLAR_PRODUCT_PRO
+        value: 79fee3f9-04a2-46c1-804e-8ca7542b8119
+      - key: POLAR_PRODUCT_BUSINESS
+        value: e5b7d88a-7606-4963-a070-4102ca6405e2
+      - key: POLAR_ENV
+        value: production
+      - key: RATE_LIMIT_STORE
+        value: memory
+      - key: LOG_FORMAT
+        value: json
+    autoDeploy: true
+
+  # ── Background Worker ──
+  - type: worker
+    name: hooksniff-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile.worker
+    plan: free
+    region: frankfurt
+    branch: main
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: RUST_LOG
+        value: info,hooksniff=debug
+    autoDeploy: true
