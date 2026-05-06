@@ -25,10 +25,10 @@ pub struct Config {
     pub otel_exporter_otlp_endpoint: Option<String>,
     /// OpenTelemetry: OTLP headers (comma-separated key=value pairs)
     pub otel_exporter_otlp_headers: Option<String>,
-    /// Paddle API key (optional — billing disabled if not set)
-    pub paddle_api_key: Option<String>,
-    /// Paddle webhook secret for signature verification
-    pub paddle_webhook_secret: Option<String>,
+    /// Polar.sh access token (optional — billing disabled if not set)
+    pub polar_access_token: Option<String>,
+    /// Polar.sh webhook secret for signature verification
+    pub polar_webhook_secret: Option<String>,
     /// iyzico API key (optional — billing disabled if not set)
     pub iyzico_api_key: Option<String>,
     /// iyzico secret key for signature verification
@@ -147,8 +147,8 @@ impl Config {
             otel_enabled,
             otel_exporter_otlp_endpoint,
             otel_exporter_otlp_headers,
-            paddle_api_key: std::env::var("PADDLE_API_KEY").ok(),
-            paddle_webhook_secret: std::env::var("PADDLE_WEBHOOK_SECRET").ok(),
+            polar_access_token: std::env::var("POLAR_ACCESS_TOKEN").ok(),
+            polar_webhook_secret: std::env::var("POLAR_WEBHOOK_SECRET").ok(),
             iyzico_api_key: std::env::var("IYZICO_API_KEY").ok(),
             iyzico_secret_key: std::env::var("IYZICO_SECRET_KEY").ok(),
         })

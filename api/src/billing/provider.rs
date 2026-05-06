@@ -1,6 +1,6 @@
 //! Payment provider abstraction layer.
 //!
-//! Provides a unified interface for all payment providers (Stripe, Paddle, iyzico).
+//! Provides a unified interface for all payment providers (Stripe, Polar.sh, iyzico).
 //! Each provider implements the `PaymentProvider` trait.
 
 use async_trait::async_trait;
@@ -15,14 +15,14 @@ use crate::error::AppError;
 #[serde(rename_all = "lowercase")]
 pub enum PaymentProvider {
     Stripe,
-    Paddle,
+    Polar,
     Iyzico,
 }
 
 impl PaymentProvider {
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
-            "paddle" => Self::Paddle,
+            "polar" => Self::Polar,
             "iyzico" => Self::Iyzico,
             _ => Self::Stripe,
         }
@@ -31,7 +31,7 @@ impl PaymentProvider {
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Stripe => "stripe",
-            Self::Paddle => "paddle",
+            Self::Polar => "polar",
             Self::Iyzico => "iyzico",
         }
     }
@@ -82,7 +82,7 @@ pub enum WebhookResult {
 
 /// Unified payment provider trait.
 ///
-/// All payment providers (Stripe, Paddle, iyzico) implement this trait
+/// All payment providers (Stripe, Polar.sh, iyzico) implement this trait
 /// so the billing routes can work with any provider uniformly.
 #[async_trait]
 pub trait PaymentProviderImpl: Send + Sync {

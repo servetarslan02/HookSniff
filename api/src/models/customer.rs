@@ -15,15 +15,15 @@ pub struct Customer {
     pub password_hash: Option<String>,
     pub stripe_customer_id: Option<String>,
     pub stripe_subscription_id: Option<String>,
-    /// Payment provider: "stripe", "paddle", or "iyzico"
+    /// Payment provider: "stripe", "polar", or "iyzico"
     #[serde(default = "default_payment_provider")]
     pub payment_provider: String,
-    /// Paddle customer ID
+    /// Polar.sh customer ID
     #[serde(default)]
-    pub paddle_customer_id: Option<String>,
-    /// Paddle subscription ID
+    pub polar_customer_id: Option<String>,
+    /// Polar.sh subscription ID
     #[serde(default)]
-    pub paddle_subscription_id: Option<String>,
+    pub polar_subscription_id: Option<String>,
     /// iyzico customer ID
     #[serde(default)]
     pub iyzico_customer_id: Option<String>,

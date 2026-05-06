@@ -1,6 +1,6 @@
 pub mod provider;
 pub mod stripe;
-pub mod paddle;
+pub mod polar;
 pub mod iyzico;
 
 use serde::{Deserialize, Serialize};
@@ -84,7 +84,7 @@ impl Plan {
         }
     }
 
-    /// Monthly price in cents (USD) — used for Stripe
+    /// Monthly price in cents (USD) — used for Stripe and Polar.sh
     pub fn monthly_price_cents(&self) -> u64 {
         match self {
             Plan::Free => 0,
@@ -112,9 +112,9 @@ pub fn resolve_provider(
     provider_name: &str,
 ) -> Option<Box<dyn provider::PaymentProviderImpl>> {
     match provider_name.to_lowercase().as_str() {
-        "paddle" => {
-            let config = paddle::PaddleConfig::from_env()?;
-            Some(Box::new(paddle::PaddleProvider::new(config)))
+        "polar" => {
+            let config = polar::PolarConfig::from_env()?;
+            Some(Box::new(polar::PolarProvider::new(config)))
         }
         "iyzico" => {
             let config = iyzico::IyzicoConfig::from_env()?;
@@ -168,7 +168,7 @@ pub struct Subscription {
     pub plan: Plan,
     pub status: SubscriptionStatus,
     pub stripe_subscription_id: Option<String>,
-    pub paddle_subscription_id: Option<String>,
+    pub polar_subscription_id: Option<String>,
     pub iyzico_subscription_id: Option<String>,
     pub payment_provider: String,
     pub current_period_start: String,
@@ -198,7 +198,7 @@ pub struct Invoice {
     pub period_end: String,
     pub paid_at: Option<String>,
     pub stripe_invoice_id: Option<String>,
-    pub paddle_invoice_id: Option<String>,
+    pub polar_invoice_id: Option<String>,
     pub iyzico_invoice_id: Option<String>,
 }
 
