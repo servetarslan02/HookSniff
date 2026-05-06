@@ -17,6 +17,7 @@ mod middleware;
 mod models;
 pub mod industry;
 mod rate_limit;
+pub mod retry_policy;
 mod routes;
 pub mod schemas;
 pub mod signing;
