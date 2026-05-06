@@ -13,6 +13,8 @@ pub struct Customer {
     pub webhook_count: i32,
     pub created_at: DateTime<Utc>,
     pub password_hash: Option<String>,
+    pub stripe_customer_id: Option<String>,
+    pub stripe_subscription_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

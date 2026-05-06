@@ -101,8 +101,8 @@ async fn apply_template(
     Ok(Json(ApplyTemplateResponse {
         template_id: template.id,
         endpoint_id: endpoint.id,
-        event_subscriptions: template.event_types,
-        agents_enabled,
+        event_subscriptions: template.event_types.clone(),
+        agents_enabled: agents_enabled.clone(),
         message: format!(
             "Template '{}' applied successfully. Endpoint created with {} event subscriptions and {} agents enabled.",
             template.name,

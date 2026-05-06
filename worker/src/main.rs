@@ -17,13 +17,9 @@ use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use tracing_subscriber::EnvFilter;
 
-mod activities;
 mod config;
 pub mod delivery;
-mod fanout;
-mod retry_scheduler;
 mod signing;
-mod workflows;
 
 /// Webhook queue'dan gelen mesaj formatı
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
@@ -87,7 +83,7 @@ async fn main() -> Result<()> {
 
 /// Ensure the webhook_queue table exists
 async fn ensure_queue_table(pool: &PgPool) -> Result<()> {
-    sqlx::query(
+    sqlx::query::<sqlx::Postgres>(
         r#"
         CREATE TABLE IF NOT EXISTS webhook_queue (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -192,7 +188,7 @@ async fn process_pending(
                     // ✅ Başarılı
                     tracing::info!("✅ Delivery {} → HTTP {} ({}ms)", delivery_id, status_code, duration_ms);
 
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         UPDATE webhook_queue
                         SET status = 'delivered', processed_at = now(), attempt_count = $1
@@ -205,7 +201,7 @@ async fn process_pending(
                     .await?;
 
                     // Update deliveries table
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         UPDATE deliveries
                         SET status = 'delivered', attempt_count = $1, response_status = $2,
@@ -227,7 +223,7 @@ async fn process_pending(
                     // ❌ Max deneme aşıldı → dead letter
                     tracing::error!("❌ Delivery {} → HTTP {} — max attempts, moving to dead letter", delivery_id, status_code);
 
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         UPDATE webhook_queue
                         SET status = 'dead_letter', processed_at = now(), attempt_count = $1
@@ -240,7 +236,7 @@ async fn process_pending(
                     .await?;
 
                     // Move to dead_letters
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
                         SELECT id, endpoint_id, customer_id, payload, $2, $3
@@ -254,7 +250,7 @@ async fn process_pending(
                     .await?;
 
                     // Update delivery status
-                    sqlx::query("UPDATE deliveries SET status = 'failed' WHERE id = $1")
+                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed' WHERE id = $1")
                         .bind(delivery_id)
                         .execute(pool)
                         .await?;
@@ -268,7 +264,7 @@ async fn process_pending(
 
                     tracing::warn!("⚠️ Delivery {} → HTTP {} — retrying in {}s (attempt {}/{})", delivery_id, status_code, delay, attempt, item.max_attempts);
 
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         UPDATE webhook_queue
                         SET status = 'pending', attempt_count = $1, next_retry_at = $2
@@ -291,7 +287,7 @@ async fn process_pending(
 
                 if attempt >= item.max_attempts {
                     // Dead letter
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         UPDATE webhook_queue
                         SET status = 'dead_letter', processed_at = now(), attempt_count = $1
@@ -303,7 +299,7 @@ async fn process_pending(
                     .execute(pool)
                     .await?;
 
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
                         SELECT id, endpoint_id, customer_id, payload, $2, $3
@@ -316,7 +312,7 @@ async fn process_pending(
                     .execute(pool)
                     .await?;
 
-                    sqlx::query("UPDATE deliveries SET status = 'failed' WHERE id = $1")
+                    sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed' WHERE id = $1")
                         .bind(delivery_id)
                         .execute(pool)
                         .await?;
@@ -328,7 +324,7 @@ async fn process_pending(
                     let delay = calculate_backoff(attempt);
                     let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
 
-                    sqlx::query(
+                    sqlx::query::<sqlx::Postgres>(
                         r#"
                         UPDATE webhook_queue
                         SET status = 'pending', attempt_count = $1, next_retry_at = $2
@@ -360,7 +356,7 @@ async fn record_attempt(
     duration_ms: i32,
     error_message: Option<&str>,
 ) -> Result<()> {
-    sqlx::query(
+    sqlx::query::<sqlx::Postgres>(
         r#"
         INSERT INTO delivery_attempts (delivery_id, attempt_number, status_code, response_body, duration_ms, error_message)
         VALUES ($1, $2, $3, $4, $5, $6)

@@ -13,7 +13,6 @@ tests/
 scripts/
 landing/
 k8s/
-docs/
 *.ps1
 *.sh
 .gitignore

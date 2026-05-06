@@ -105,13 +105,12 @@ pub async fn should_deliver_now(
     }
 
     // Bu teslimatın sıra numarasını al
-    let delivery_seq: Option<i64> = sqlx::query_as(
+    let delivery_seq: Option<i64> = sqlx::query_scalar(
         "SELECT sequence_num FROM deliveries WHERE id = $1"
     )
     .bind(delivery_id)
     .fetch_one(pool)
-    .await?
-    .0;
+    .await?;
 
     let seq = match delivery_seq {
         Some(s) => s,

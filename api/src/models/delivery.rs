@@ -32,7 +32,7 @@ pub struct BatchWebhookRequest {
     pub webhooks: Vec<CreateWebhookRequest>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DeliveryResponse {
     pub id: Uuid,
     pub endpoint_id: Uuid,
@@ -87,7 +87,7 @@ pub struct DeliveryAttemptResponse {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct ExportDelivery {
     pub id: Uuid,
     pub event: Option<String>,
@@ -99,12 +99,12 @@ pub struct ExportDelivery {
 }
 
 impl Delivery {
-    pub fn to_response(self) -> DeliveryResponse {
+    pub fn to_response(&self) -> DeliveryResponse {
         DeliveryResponse {
             id: self.id,
             endpoint_id: self.endpoint_id,
-            event: self.event_type,
-            status: self.status,
+            event: self.event_type.clone(),
+            status: self.status.clone(),
             attempt_count: self.attempt_count,
             response_status: self.response_status,
             replay_count: Some(self.replay_count),

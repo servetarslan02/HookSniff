@@ -1,9 +1,12 @@
 # ── Stage 1: Builder ──
-FROM rust:1.82-bookworm AS builder
+FROM rust:latest AS builder
 
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY api/ api/
+COPY worker/ worker/
+COPY ai-center/ ai-center/
+COPY docs/ docs/
 
 # Build release binary
 RUN cargo build --release -p hookrelay-api && \

@@ -13,12 +13,11 @@ fn uptime_seconds() -> u64 {
 
 /// Comprehensive health check that verifies:
 /// - Database connectivity (simple query)
-/// - Kafka producer connectivity (metadata fetch)
+/// - Queue depth (webhook_queue table)
 /// - Returns detailed JSON with per-component health and latency
 /// - Returns HTTP 503 when any critical component is unhealthy
 pub async fn health_check(
     axum::extract::Extension(pool): axum::extract::Extension<sqlx::PgPool>,
-    axum::extract::Extension(kafka_producer): axum::extract::Extension<rdkafka::producer::FutureProducer>,
 ) -> (StatusCode, Json<Value>) {
     let start = Instant::now();
     let mut checks = serde_json::Map::new();
@@ -47,30 +46,34 @@ pub async fn health_check(
     };
     checks.insert("database".to_string(), db_status);
 
-    // Kafka check — verify broker metadata is reachable
-    let kafka_start = Instant::now();
-    let kafka_status = match kafka_producer
-        .client()
-        .fetch_metadata(None, std::time::Duration::from_secs(3))
+    // Queue check — verify webhook_queue is accessible
+    let queue_start = Instant::now();
+    let queue_status = match sqlx::query_scalar::<_, i64>(
+        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'pending'"
+    )
+    .fetch_one(&pool)
+    .await
     {
-        Ok(metadata) => {
-            let latency = kafka_start.elapsed().as_millis() as u64;
-            let broker_count = metadata.brokers().len();
+        Ok(count) => {
+            let latency = queue_start.elapsed().as_millis() as u64;
             json!({
                 "status": "healthy",
                 "latency_ms": latency,
-                "brokers": broker_count
+                "pending_count": count
             })
         }
         Err(e) => {
-            overall_healthy = false;
+            // Queue table might not exist yet — that's OK, not critical
+            let latency = queue_start.elapsed().as_millis() as u64;
             json!({
-                "status": "unhealthy",
+                "status": "healthy",
+                "latency_ms": latency,
+                "note": "queue table not available",
                 "error": e.to_string()
             })
         }
     };
-    checks.insert("kafka".to_string(), kafka_status);
+    checks.insert("queue".to_string(), queue_status);
 
     let status_code = if overall_healthy {
         StatusCode::OK

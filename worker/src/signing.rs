@@ -104,9 +104,9 @@ pub fn verify_standard_signature(
         };
 
         if sig_bytes.len() == expected_bytes.len()
-            && hmac::digest::CtOutput::new(
+            && hmac::digest::CtOutput::<HmacSha256>::new(
                 hmac::digest::Output::<HmacSha256>::clone_from_slice(&sig_bytes),
-            ) == hmac::digest::CtOutput::new(
+            ) == hmac::digest::CtOutput::<HmacSha256>::new(
                 hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
             )
         {
