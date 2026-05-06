@@ -1,0 +1,458 @@
+{
+  "_meta": {
+    "description": "HookRelay test fixtures — sample webhook payloads",
+    "version": "1.0.0",
+    "sizes": {
+      "small": "< 1KB",
+      "medium": "1-50KB",
+      "large": "50-500KB"
+    }
+  },
+
+  "order.created": {
+    "small": {
+      "event": "order.created",
+      "data": {
+        "order_id": "ORD-001",
+        "amount": 49.99,
+        "currency": "USD",
+        "customer_email": "alice@example.com"
+      }
+    },
+    "medium": {
+      "event": "order.created",
+      "data": {
+        "order_id": "ORD-002",
+        "amount": 299.95,
+        "currency": "EUR",
+        "customer_email": "bob@example.com",
+        "customer_name": "Bob Smith",
+        "shipping_address": {
+          "street": "123 Main Street",
+          "city": "Berlin",
+          "state": "BE",
+          "zip": "10115",
+          "country": "DE"
+        },
+        "items": [
+          {"sku": "WIDGET-A", "name": "Widget Alpha", "qty": 2, "price": 29.99},
+          {"sku": "WIDGET-B", "name": "Widget Beta", "qty": 1, "price": 49.99},
+          {"sku": "GADGET-X", "name": "Gadget X", "qty": 3, "price": 59.99},
+          {"sku": "THING-C", "name": "Thing Charlie", "qty": 1, "price": 19.99},
+          {"sku": "PART-D", "name": "Part Delta", "qty": 5, "price": 9.99}
+        ],
+        "metadata": {
+          "source": "web",
+          "session_id": "sess_abc123",
+          "utm_source": "google",
+          "utm_campaign": "spring_sale_2026",
+          "referrer": "https://google.com/search?q=widgets"
+        }
+      }
+    },
+    "large": {
+      "event": "order.created",
+      "data": {
+        "order_id": "ORD-003",
+        "amount": 15999.99,
+        "currency": "USD",
+        "customer_email": "enterprise@bigcorp.com",
+        "customer_name": "Enterprise Customer",
+        "company": "BigCorp Industries",
+        "tax_id": "DE123456789",
+        "shipping_address": {
+          "street": "456 Corporate Blvd, Suite 2000",
+          "city": "San Francisco",
+          "state": "CA",
+          "zip": "94105",
+          "country": "US"
+        },
+        "billing_address": {
+          "street": "456 Corporate Blvd, Finance Dept",
+          "city": "San Francisco",
+          "state": "CA",
+          "zip": "94105",
+          "country": "US"
+        },
+        "items": [
+          {"sku": "ENTERPRISE-LICENSE", "name": "Enterprise License (Annual)", "qty": 1, "price": 9999.99, "discount": 0.1, "tax_rate": 0.0875},
+          {"sku": "PREMIUM-SUPPORT", "name": "Premium Support Package", "qty": 1, "price": 2999.99, "discount": 0.05, "tax_rate": 0.0875},
+          {"sku": "TRAINING-SEAT", "name": "Training Seat (per user)", "qty": 50, "price": 49.99, "discount": 0.2, "tax_rate": 0.0875},
+          {"sku": "API-CREDITS-10K", "name": "API Credits (10,000)", "qty": 3, "price": 299.99, "discount": 0, "tax_rate": 0.0875},
+          {"sku": "CUSTOM-INTEGRATION", "name": "Custom Integration Service", "qty": 1, "price": 5000.00, "discount": 0, "tax_rate": 0.0875},
+          {"sku": "DEDICATED-INFRA", "name": "Dedicated Infrastructure", "qty": 1, "price": 1500.00, "discount": 0.15, "tax_rate": 0.0875},
+          {"sku": "SECURITY-AUDIT", "name": "Annual Security Audit", "qty": 1, "price": 3500.00, "discount": 0, "tax_rate": 0.0875},
+          {"sku": "COMPLIANCE-PACK", "name": "SOC2 Compliance Package", "qty": 1, "price": 2000.00, "discount": 0.1, "tax_rate": 0.0875}
+        ],
+        "payment": {
+          "method": "invoice",
+          "terms": "NET30",
+          "purchase_order": "PO-2026-0042",
+          "approver": "jane.doe@bigcorp.com"
+        },
+        "metadata": {
+          "source": "sales_rep",
+          "rep_id": "REP-007",
+          "deal_id": "DEAL-2026-Q2-15",
+          "pipeline_stage": "closed_won",
+          "session_id": "sess_xyz789",
+          "tags": ["enterprise", "annual", "upsell", "q2-2026"],
+          "notes": "Customer requested expedited onboarding. VIP account.",
+          "custom_fields": {
+            "department": "Engineering",
+            "use_case": "microservices-orchestration",
+            "expected_volume": "1M webhooks/month",
+            "integration_type": "REST + WebSocket",
+            "sla_tier": "99.99%"
+          }
+        },
+        "audit_trail": [
+          {"action": "created", "by": "system", "at": "2026-05-06T08:00:00Z"},
+          {"action": "approved", "by": "jane.doe@bigcorp.com", "at": "2026-05-06T09:30:00Z"},
+          {"action": "submitted", "by": "sales@hookrelay.io", "at": "2026-05-06T10:00:00Z"}
+        ]
+      }
+    }
+  },
+
+  "order.paid": {
+    "small": {
+      "event": "order.paid",
+      "data": {
+        "order_id": "ORD-001",
+        "payment_id": "PAY-001",
+        "status": "succeeded"
+      }
+    },
+    "medium": {
+      "event": "order.paid",
+      "data": {
+        "order_id": "ORD-002",
+        "payment_id": "PAY-002",
+        "status": "succeeded",
+        "amount": 299.95,
+        "currency": "EUR",
+        "method": "card",
+        "card_brand": "visa",
+        "card_last4": "4242",
+        "receipt_url": "https://pay.stripe.com/receipts/abc123",
+        "paid_at": "2026-05-06T10:15:30Z",
+        "processor_response": {
+          "code": "00",
+          "message": "Approved",
+          "avs_result": "Y",
+          "cvv_result": "M"
+        },
+        "metadata": {
+          "order_ref": "ORD-002",
+          "customer_id": "CUST-456",
+          "invoice_id": "INV-2026-0789"
+        }
+      }
+    },
+    "large": {
+      "event": "order.paid",
+      "data": {
+        "order_id": "ORD-003",
+        "payment_id": "PAY-003",
+        "status": "succeeded",
+        "amount": 15999.99,
+        "currency": "USD",
+        "method": "bank_transfer",
+        "bank_name": "Chase",
+        "account_last4": "9876",
+        "routing_number_last4": "1234",
+        "transfer_ref": "ACH-20260506-001",
+        "paid_at": "2026-05-06T14:00:00Z",
+        "cleared_at": "2026-05-08T09:00:00Z",
+        "processor_response": {
+          "code": "000",
+          "message": "Transfer completed",
+          "trace_id": "TR-2026-05-0001"
+        },
+        "invoice": {
+          "id": "INV-2026-0042",
+          "number": "INV-2026-0042",
+          "date": "2026-05-06",
+          "due_date": "2026-06-05",
+          "subtotal": 15999.99,
+          "tax": 1400.00,
+          "total": 17399.99,
+          "line_items": [
+            {"description": "Enterprise License", "amount": 9999.99},
+            {"description": "Premium Support", "amount": 2999.99},
+            {"description": "Training (50 seats)", "amount": 2499.50},
+            {"description": "API Credits (30K)", "amount": 899.97},
+            {"description": "Custom Integration", "amount": 5000.00},
+            {"description": "Dedicated Infra", "amount": 1275.00},
+            {"description": "Security Audit", "amount": 3500.00},
+            {"description": "SOC2 Compliance", "amount": 1800.00}
+          ]
+        },
+        "metadata": {
+          "source": "sales_rep",
+          "rep_id": "REP-007",
+          "deal_id": "DEAL-2026-Q2-15",
+          "purchase_order": "PO-2026-0042",
+          "reconciliation_id": "REC-2026-0506-001",
+          "accounting_code": "REV-SW-ENT",
+          "cost_center": "CC-ENG-001"
+        },
+        "audit_trail": [
+          {"action": "payment_initiated", "by": "system", "at": "2026-05-06T13:50:00Z"},
+          {"action": "payment_processing", "by": "stripe", "at": "2026-05-06T13:55:00Z"},
+          {"action": "payment_completed", "by": "stripe", "at": "2026-05-06T14:00:00Z"},
+          {"action": "receipt_sent", "by": "system", "at": "2026-05-06T14:01:00Z"},
+          {"action": "invoice_marked_paid", "by": "system", "at": "2026-05-06T14:01:00Z"}
+        ]
+      }
+    }
+  },
+
+  "payment.failed": {
+    "small": {
+      "event": "payment.failed",
+      "data": {
+        "order_id": "ORD-004",
+        "payment_id": "PAY-004",
+        "status": "failed",
+        "error": "card_declined"
+      }
+    },
+    "medium": {
+      "event": "payment.failed",
+      "data": {
+        "order_id": "ORD-005",
+        "payment_id": "PAY-005",
+        "status": "failed",
+        "error": "insufficient_funds",
+        "amount": 599.99,
+        "currency": "USD",
+        "method": "card",
+        "card_brand": "mastercard",
+        "card_last4": "5555",
+        "attempt": 1,
+        "max_attempts": 3,
+        "next_retry_at": "2026-05-07T10:00:00Z",
+        "processor_response": {
+          "code": "51",
+          "message": "Insufficient funds",
+          "decline_code": "insufficient_funds"
+        },
+        "customer": {
+          "id": "CUST-789",
+          "email": "retry@example.com",
+          "previous_payments": 5,
+          "account_age_days": 120
+        }
+      }
+    },
+    "large": {
+      "event": "payment.failed",
+      "data": {
+        "order_id": "ORD-006",
+        "payment_id": "PAY-006",
+        "status": "failed",
+        "error": "fraud_detected",
+        "amount": 4999.99,
+        "currency": "USD",
+        "method": "card",
+        "card_brand": "amex",
+        "card_last4": "1234",
+        "attempt": 1,
+        "max_attempts": 0,
+        "next_retry_at": null,
+        "blocked": true,
+        "block_reason": "fraud_score_exceeded",
+        "processor_response": {
+          "code": "05",
+          "message": "Do not honor",
+          "decline_code": "do_not_honor",
+          "risk_score": 87,
+          "risk_level": "high"
+        },
+        "fraud_signals": {
+          "velocity_check": {
+            "cards_last_24h": 4,
+            "ip_changes_last_1h": 3,
+            "failed_attempts_last_1h": 6
+          },
+          "device_fingerprint": {
+            "device_id": "DEV-SUSPICIOUS-001",
+            "first_seen": "2026-05-06T07:00:00Z",
+            "known_fraud": true
+          },
+          "geo_analysis": {
+            "ip_country": "NG",
+            "billing_country": "US",
+            "mismatch": true,
+            "vpn_detected": true
+          },
+          "behavioral": {
+            "time_on_site_seconds": 12,
+            "pages_visited": 1,
+            "form_fill_time_seconds": 3,
+            "copy_paste_detected": true
+          }
+        },
+        "customer": {
+          "id": "CUST-SUSPECT-001",
+          "email": "temp-abc123@mailinator.com",
+          "created_at": "2026-05-06T06:55:00Z",
+          "account_age_minutes": 5,
+          "previous_payments": 0,
+          "flagged": true
+        },
+        "actions_taken": [
+          {"action": "payment_blocked", "by": "fraud_engine", "at": "2026-05-06T08:00:00Z"},
+          {"action": "customer_flagged", "by": "fraud_engine", "at": "2026-05-06T08:00:00Z"},
+          {"action": "card_blocked", "by": "fraud_engine", "at": "2026-05-06T08:00:01Z"},
+          {"action": "alert_sent", "by": "system", "at": "2026-05-06T08:00:02Z"},
+          {"action": "case_created", "by": "system", "at": "2026-05-06T08:00:05Z"}
+        ],
+        "metadata": {
+          "risk_engine_version": "3.2.1",
+          "model_confidence": 0.92,
+          "false_positive_probability": 0.03,
+          "similar_cases_last_30d": 23,
+          "investigation_priority": "high"
+        }
+      }
+    }
+  },
+
+  "user.registered": {
+    "small": {
+      "event": "user.registered",
+      "data": {
+        "user_id": "USR-001",
+        "email": "newuser@example.com"
+      }
+    },
+    "medium": {
+      "event": "user.registered",
+      "data": {
+        "user_id": "USR-002",
+        "email": "premium@example.com",
+        "name": "Charlie Brown",
+        "plan": "pro",
+        "registered_at": "2026-05-06T11:00:00Z",
+        "source": "organic",
+        "utm": {
+          "source": "twitter",
+          "medium": "social",
+          "campaign": "launch_2026"
+        },
+        "preferences": {
+          "language": "en",
+          "timezone": "America/New_York",
+          "notifications": {
+            "email": true,
+            "push": true,
+            "sms": false
+          }
+        },
+        "company": {
+          "name": "Peanuts Inc.",
+          "size": "50-200",
+          "industry": "Technology"
+        }
+      }
+    },
+    "large": {
+      "event": "user.registered",
+      "data": {
+        "user_id": "USR-003",
+        "email": "enterprise-user@megacorp.com",
+        "name": "Diana Prince",
+        "first_name": "Diana",
+        "last_name": "Prince",
+        "title": "VP of Engineering",
+        "phone": "+1-555-0199",
+        "plan": "enterprise",
+        "registered_at": "2026-05-06T12:00:00Z",
+        "email_verified": true,
+        "phone_verified": false,
+        "mfa_enabled": true,
+        "mfa_method": "totp",
+        "source": "referral",
+        "referrer_id": "USR-001",
+        "utm": {
+          "source": "partner_program",
+          "medium": "referral",
+          "campaign": "enterprise_referral_q2",
+          "term": "engineering",
+          "content": "partner_link"
+        },
+        "preferences": {
+          "language": "en",
+          "timezone": "America/Los_Angeles",
+          "date_format": "YYYY-MM-DD",
+          "currency": "USD",
+          "notifications": {
+            "email": true,
+            "push": true,
+            "sms": true,
+            "slack": true,
+            "webhook": true
+          },
+          "dashboard": {
+            "default_view": "analytics",
+            "theme": "dark",
+            "sidebar_collapsed": false
+          }
+        },
+        "company": {
+          "name": "MegaCorp International",
+          "legal_name": "MegaCorp International, LLC",
+          "size": "1000+",
+          "industry": "Technology",
+          "website": "https://megacorp.com",
+          "hq_country": "US",
+          "hq_state": "CA",
+          "employee_count": 15000,
+          "annual_revenue": "1B+"
+        },
+        "billing": {
+          "plan": "enterprise",
+          "billing_cycle": "annual",
+          "payment_method": "invoice",
+          "tax_exempt": true,
+          "tax_id": "US-12-3456789",
+          "po_required": true
+        },
+        "security": {
+          "sso_enabled": true,
+          "sso_provider": "okta",
+          "sso_domain": "megacorp.com",
+          "ip_whitelist": ["10.0.0.0/8", "172.16.0.0/12"],
+          "session_timeout_minutes": 60,
+          "password_policy": "strong",
+          "audit_log_enabled": true
+        },
+        "api": {
+          "rate_limit_tier": "enterprise",
+          "rate_limit_per_minute": 10000,
+          "webhook_signing_enabled": true,
+          "allowed_ips": ["10.0.0.0/8"],
+          "scopes": ["read", "write", "admin", "billing"]
+        },
+        "metadata": {
+          "sales_rep": "REP-003",
+          "deal_id": "DEAL-2026-Q2-22",
+          "onboarding_status": "pending",
+          "onboarding_call_scheduled": "2026-05-08T15:00:00Z",
+          "assigned_csm": "csm.john@hookrelay.io",
+          "tags": ["enterprise", "partner_referral", "high_value", "sso"],
+          "custom_attributes": {
+            "department": "Platform Engineering",
+            "team_size": 45,
+            "use_cases": ["ci-cd", "monitoring", "alerting", "data-pipeline"],
+            "expected_monthly_volume": "5M+",
+            "integration_stack": ["kubernetes", "terraform", "datadog", "pagerduty"]
+          }
+        }
+      }
+    }
+  }
+}
