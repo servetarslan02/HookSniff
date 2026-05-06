@@ -615,7 +615,7 @@
       "title": "仕組み",
       "subtitle": "信頼性の高いWebhook配信のための3つの簡単なステップ。",
       "send": "送信",
-      "sendDesc": "我们的APIにWebhookをPOSTします。残りは私たちが処理します。",
+      "sendDesc": "APIにWebhookをPOSTします。残りは私たちが処理します。",
       "deliver": "配信",
       "deliverDesc": "リトライ、署名、監視で配信します。",
       "monitor": "監視",
