@@ -19,6 +19,12 @@ pub struct Config {
     pub stripe_webhook_secret: Option<String>,
     /// Base URL of the dashboard (for Stripe redirect URLs)
     pub app_url: Option<String>,
+    /// OpenTelemetry: enable OTLP exporter
+    pub otel_enabled: bool,
+    /// OpenTelemetry: OTLP collector endpoint (e.g. http://localhost:4317)
+    pub otel_exporter_otlp_endpoint: Option<String>,
+    /// OpenTelemetry: OTLP headers (comma-separated key=value pairs)
+    pub otel_exporter_otlp_headers: Option<String>,
 }
 
 /// Patterns that look like placeholder / throwaway secrets (case-insensitive).
@@ -94,6 +100,13 @@ impl Config {
             validate_secret(&jwt_secret, "JWT_SECRET")?;
         }
 
+        // OpenTelemetry configuration
+        let otel_enabled = std::env::var("OTEL_ENABLED")
+            .map(|v| v == "true" || v == "1")
+            .unwrap_or(false);
+        let otel_exporter_otlp_endpoint = std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT").ok();
+        let otel_exporter_otlp_headers = std::env::var("OTEL_EXPORTER_OTLP_HEADERS").ok();
+
         Ok(Self {
             port: std::env::var("PORT")
                 .unwrap_or_else(|_| "3000".into())
@@ -123,6 +136,9 @@ impl Config {
             stripe_secret_key: std::env::var("STRIPE_SECRET_KEY").ok(),
             stripe_webhook_secret: std::env::var("STRIPE_WEBHOOK_SECRET").ok(),
             app_url: std::env::var("APP_URL").ok(),
+            otel_enabled,
+            otel_exporter_otlp_endpoint,
+            otel_exporter_otlp_headers,
         })
     }
 }
