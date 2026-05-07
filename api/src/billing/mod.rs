@@ -37,7 +37,7 @@ impl Plan {
     /// Max webhook deliveries per month
     pub fn max_webhooks_per_month(&self) -> u64 {
         match self {
-            Plan::Free => 1_000,
+            Plan::Free => 10_000,
             Plan::Pro => 50_000,
             Plan::Business => 500_000,
             Plan::Enterprise => u64::MAX,
