@@ -10,16 +10,17 @@
 
 1. **GitHub hafıza sistemi kuruldu** → HookSniff repo'sunda MEMORY.md, STATUS.md, TODO.md, SESSION_NOTES.md
 2. **Cron job kuruldu** → Her 6-7 dakikada bir GitHub'a otomatik push
+3. **Vercel rewrite sorunu tespit edildi** → /api/health 404, iki vercel.json çakışması
 
 ## ⏳ Bekleyen
 
-- İlk cron job tetiklenmesi
+- Vercel rewrite düzeltmesi (tek vercel.json veya proje ayarı)
 - Servet'in yeni istekleri
 
 ## 🔴 Sıradaki
 
-1. Servet'in proje isteklerini dinle
-2. Gerekirse kod değişiklikleri yap
+1. Vercel rewrite sorununu çöz
+2. Servet'in proje isteklerini dinle
 3. Hafıza dosyalarını güncelle
 
 ---
