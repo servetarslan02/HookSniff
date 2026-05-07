@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Agent Hafızası
 
-## Son Güncelleme: 2026-05-08 03:55
+## Son Güncelleme: 2026-05-08 04:00
 
 ## Hakkımda
 - Kullanıcı: **Servet Arslan** (servetarslan02)
@@ -30,6 +30,7 @@
   - API: https://hooksniff-api-sdjufmaqka-ew.a.run.app
   - Worker: https://hooksniff-worker-sdjufmaqka-ew.a.run.app
   - Health check'ler çalışıyor
+  - Database: 35+ tablo, tüm migration'lar başarılı
 - 🔴 Custom domain mapping yapılmadı (is-a.dev DNS kontrolü gerekli)
 - 🔴 iyzico hesabı açılacak
 - 🔴 Credential revokasyonu gerekli (token'lar ifşa oldu)
@@ -39,4 +40,4 @@
 2. Resend domain doğrulama
 3. Credential yenileme
 4. Render servislerini kapat
-5. Database migration (tabloları oluştur)
+5. Dashboard'u GCP URL'e bağla
