@@ -2,52 +2,58 @@
 
 > Bu dosya AI助手 tarafından oturum kapanmadan önce yazıldı.
 
-## ✅ Bugün Yapılanlar
+## ✅ Bu Oturumda Yapılanlar
 
-### Oturum 1 (02:27 - )
-1. **GitHub hafıza sistemi kuruldu** — her 7 dk'da otomatik push cron job
+1. **GitHub hafıza sistemi kuruldu** — her 8 dk'da otomatik push cron job
 2. **OpenSSL hatası düzeltildi** — reqwest ve redis rustls-tls'ye geçirildi
    - `api/Cargo.toml`: reqwest → `default-features = false, features = ["json", "rustls-tls"]`
    - `worker/Cargo.toml`: reqwest → aynı değişiklik
    - `api/Cargo.toml`: redis → `default-features = false, features = ["tokio-comp", "connection-manager", "tls-rustls"]`
    - Dockerfile.api ve Dockerfile.worker: `libssl-dev` kaldırıldı
-3. **MEMORY.md güncellendi** — proje durumu, son gelişmeler
-4. **USER.md güncellendi** — Servet profil bilgileri
+3. **Deploy Dockerfile'ları güncellendi** — prod Dockerfile'lardan da libssl3 kaldırıldı
+4. **Oracle Cloud → Google Cloud Run** — tüm dosyalarda güncellendi
+   - MEMORY.md, CONTEXT.md, TODO.md, FREE_TIER_SETUP.md
+   - deploy/gcp-deploy.sh zaten hazırdı
+5. **MEMORY.md güncellendi** — proje durumu, token bilgileri, hosting planı
 
-### Önceki Oturum (2026-05-06)
-1. Vercel build düzeltildi — 17+ failed deploy'dan sonra ilk başarılı deploy
-2. Tüm sayfalar çalışıyor (/en, /en/about, /en/faq, /en/contact, /en/login, /en/privacy, /en/terms, /en/dashboard)
-3. Contact form email — Resend entegrasyonu
-4. render.yaml — Render one-click deploy blueprint
-5. DEPLOY_GUIDE.md — Adım adım deploy rehberi
-6. 9 commit push edildi
+## 🔑 Tüm Token ve Servis Bilgileri
 
-## 🔴 Kritik Sorunlar
+GitHub'da kayıtlı: `.ai-context/EXTERNAL_TOKENS.md`
+- Neon PostgreSQL: ✅ connection string mevcut
+- Upstash Redis: ✅ connection string mevcut
+- Vercel: ✅ Deploy çalışıyor
+- Polar.sh: ✅ Hesap açıldı, planlar oluşturuldu
+- Cloudflare R2: ✅ Token oluşturuldu
+- Grafana Cloud: ✅ OTEL headers mevcut
+- Resend: ✅ API key mevcut (domain doğrulanmadı)
+- Render: ✅ API key mevcut
 
-### 1. Render Docker Build — Düzeltildi (Test Edilmeli)
-OpenSSL hatası çözüldü, rustls-tls'ye geçildi. Render'da yeniden deploy edilmeli.
+## 🔴 Sıradaki İşler (Öncelik Sırasıyla)
 
-### 2. Production Deploy — Henüz Yapılmadı
-- Neon PostgreSQL hesabı açılacak
-- Upstash Redis hesabı açılacak
-- Oracle Cloud VM kurulacak
-- .env.production güncellenecek
+### 1. Google Cloud Run Deploy 🔴
+- `deploy/gcp-deploy.sh` scripti hazır
+- Servet'in GCloud CLI'ı kurup çalıştırması gerekiyor
+- Veya Cloud Build ile GitHub'dan otomatik deploy
 
-## ❌ Yapılmayan İşler
+### 2. Render'da Opsiyonel Yeniden Deploy 🟡
+- Docker build düzeltmesi sonrası denenebilir
+- Ama GCP'ye geçiyorsak Render'a gerek kalmayabilir
 
-| İş | Öncelik |
-|----|---------|
-| Render'da yeniden deploy et | 🔴 |
-| Neon hesabı aç | 🔴 |
-| Upstash hesabı aç | 🔴 |
-| Oracle Cloud VM kur | 🔴 |
-| Cloudflare DNS (api CNAME) | 🔴 API deploy'dan sonra |
-| Resend domain doğrulama | 🟡 |
-| iyzico hesap açma | 🟢 |
-| Wise Business hesabı aç | 🟢 |
+### 3. Cloudflare DNS 🔴
+- API deploy olduktan sonra:
+  - Type: CNAME, Name: api, Content: [GCP Cloud Run URL], Proxy: ✅
+
+### 4. Resend Domain Doğrulama 🟡
+- Resend Dashboard → Domains → Add Domain → hooksniff.is-a.dev
+- DNS TXT + MX kayıtları Cloudflare'a eklenecek
+
+### 5. Credential Revokasyonu 🔴
+- Tüm token'lar chat geçmişinde ifşa oldu
+- Deploy sonrası yenilenmeli
 
 ## 🔗 Önemli Linkler
 - GitHub: https://github.com/servetarslan02/HookSniff
 - Vercel: https://hooksniff.vercel.app
-- Render API: https://dashboard.render.com/web/srv-d7trc4pkh4rs7387rr7g
-- Render Worker: https://dashboard.render.com/web/srv-d7trcd3tqb8s73f1vrpg
+- GCP Deploy: deploy/gcp-deploy.sh
+- Neon: https://console.neon.tech
+- Upstash: https://console.upstash.com
