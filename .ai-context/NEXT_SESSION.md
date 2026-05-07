@@ -1,76 +1,18 @@
-# NEXT_SESSION.md — Sonraki Oturum İçin Notlar
+# NEXT_SESSION.md — Sonraki Oturum
 
-> Bu dosya 2026-05-08 03:55'te güncellendi.
+> 2026-05-08 04:28
 
-## 🎯 Hemen Yapılacaklar (Öncelik Sırasıyla)
+## Hemen Kontrol Et
+1. Vercel deploy durumu: `curl -s "https://api.vercel.com/v6/deployments?projectId=prj_NQgFly8h06oH5DTzClj7vyq3hqSO&limit=1" -H "Authorization: Bearer vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW"`
+2. Rewrite test: `curl -s https://hooksniff.vercel.app/api/v1/health`
+3. Tüm servisler çalışıyor mu kontrol et
 
-### 1. Worker Deploy Durumunu Doğrula 🔴
-- Cloud Build tetiklendi (`gcloud builds submit --config=cloudbuild.yaml`)
-- Worker'a health check HTTP server eklendi (PORT=8080)
-- Build tamamlanınca Cloud Run'da worker'ın çalıştığını doğrula
-- `gcloud run services describe hooksniff-worker --region=europe-west1` ile kontrol et
+## Sıradaki İşler
+1. Vercel rewrite doğrula
+2. Resend domain doğrulama
+3. Credential yenileme (token'lar ifşa)
+4. Monitoring (Grafana) kur
 
-### 2. Cloudflare DNS Ayarla 🔴
-API deploy olduktan sonra:
-- Cloudflare Dashboard → DNS → Add Record
-- Type: CNAME, Name: api, Content: hooksniff-api-sdjufmaqka-ew.a.run.app, Proxy: ✅
-
-### 3. Resend Domain Doğrulama 🟡
-- Resend Dashboard → Domains → Add Domain → hooksniff.is-a.dev
-- DNS kayıtlarını Cloudflare'a ekle (TXT + MX)
-- Verify butonuna bas
-
-### 4. is-a.dev Domain PR Durumu 🟡
-- PR #37726: https://github.com/is-a-dev/register/pull/37726
-- Review durumunu kontrol et
-
-### 5. Credential Revokasyonu 🔴
-Tüm token'lar chat'te ifşa oldu. Hepsini yenile:
-- GitHub PAT → Settings → Developer Settings → Personal Access Tokens
-- Vercel → Settings → Tokens
-- Neon → Settings → Reset Password
-- Upstash → Redis → REST API → Rotate
-- Polar → Settings → Tokens
-- Resend → API Keys
-- Render → API Keys
-- Cloudflare → My Profile → API Tokens
-- Grafana → API Keys
-
-## 📊 Güncel Durum Özeti
-
-| Bileşen | Durum | URL |
-|---------|-------|-----|
-| Vercel Dashboard | ✅ Çalışıyor | https://hooksniff.vercel.app |
-| GCP Frontend | ✅ Çalışıyor | https://hooksniff-sdjufmaqka-ew.a.run.app |
-| GCP API | ✅ Çalışıyor | https://hooksniff-api-sdjufmaqka-ew.a.run.app |
-| GCP Worker | 🔄 Build bekleniyor | — |
-| GitHub Repo | ✅ Güncel | 10+ commit |
-| Cloudflare DNS | ❌ Yapılmadı | — |
-| Resend Domain | ❌ Yapılmadı | — |
-| is-a.dev PR | 🔄 Beklemede | #37726 |
-
-## 🔧 Teknik Detaylar
-
-### GCP Cloud Run Servisleri
-- Project: hooksniff-app
-- Region: europe-west1
-- Service account: hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com
-- Artifact Registry: europe-west1-docker.pkg.dev/hooksniff-app/hooksniff
-
-### Worker Health Check (yeni eklendi)
-- `axum` dependency eklendi
-- `start_health_server()` fonksiyonu — PORT env'den okur (default 8080)
-- Routes: `/` → "HookSniff Worker 🐝", `/health` → "ok"
-- `tokio::spawn` ile ana worker loop'tan bağımsız çalışır
-
-### Docker Build Sorunları (geçmiş)
-- OpenSSL hatası → rustls-tls ile çözüldü
-- Redis TLS → native-tls ile denendi, sorun devam ediyor
-- Worker'ın Cloud Run'da çalışmama sebebi: PORT dinlemiyordu → düzeltildi
-
----
-
-**Bu dosyayı okuduysan, Cloud Build durumunu kontrol et:**
-```
-gcloud builds list --limit=1 --project=hooksniff-app
-```
+## Domain Planı
+- Şimdilik: hooksniff.vercel.app (tek URL)
+- İlk kazançta: hooksniff.com ($12/yıl)
