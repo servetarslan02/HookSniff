@@ -55,6 +55,11 @@ PYPI_TOKEN=pypi-AgEIcHlwaS5vcmcCJGUwNGMzOWM5LTBiZmItNDFhZS04ZDk0LTg5ZmVkNzgzNjQz
 # crates.io
 CARGO_REGISTRY_TOKEN=cio2FnCRfPQI3ejDDjWpzdYwZiVR1AuSbAN
 
+# Google Cloud Platform (GCP)
+# Service account JSON: .ai-context/gcp-service-account.json
+# Project: hooksniff-app
+# Bölge: europe-west1
+
 # HashiCorp Cloud Platform
 HCP_CLIENT_ID=hooksniff-243241@d462de5c-6702-4737-86eb-5f97378fd4ad
 
