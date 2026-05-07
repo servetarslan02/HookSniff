@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Agent Hafızası
 
-## Son Güncelleme: 2026-05-08 04:28
+## Son Güncelleme: 2026-05-08 04:32
 
 ## Hakkımda
 - Kullanıcı: **Servet Arslan** (servetarslan02)
@@ -33,24 +33,20 @@
 - Git author "HookSniff AI Agent" → "Servet Arslan" olarak düzeltildi
 - Deploy tetiklendi, BUILDING durumunda
 
-## Son Yapılan İşler (Oturum 3)
-1. gcloud CLI kuruldu + GCP auth yapıldı
-2. Worker health check eklendi (axum HTTP server)
-3. Cloud Build ile worker image rebuild edildi
-4. Worker Cloud Run'a deploy edildi ✅
-5. is-a.dev PR reddedildi (ticari kullanım)
-6. Domain araştırması yapıldı → Vercel Rewrite kararı
-7. Vercel rewrite + api.ts güncellendi
-8. Git author düzeltildi (COMMIT_AUTHOR_REQUIRED hatası)
-9. STATUS.md oluşturuldu
+## Son Yapılan İşler (Oturum 4 - 2026-05-08)
+0. GitHub hafıza sistemi yeniden kuruldu
+1. Cron job kuruldu - her 6-7 dk'da GitHub'a otomatik push
+2. Servet ile yeni oturum başladı
 
 ## Sıradaki İşler
-1. Vercel deploy durumunu doğrula
-2. API rewrite'ın çalıştığını test et
-3. Resend domain doğrulama (şimdilik Vercel domain ile)
-4. Credential yenileme (tüm token'lar ifşa oldu)
-5. İlk kazanç → hooksniff.com al
+1. Servet'in proje isteklerini bekle
+2. Vercel deploy durumunu doğrula
+3. API rewrite'ın çalıştığını test et
+4. Resend domain doğrulama (şimdilik Vercel domain ile)
+5. Credential yenileme (tüm token'lar ifşa oldu)
+6. İlk kazanç → hooksniff.com al
 
 ## Hafıza Sistemi
-- GitHub'da MEMORY.md, TODO.md, SESSION_NOTES.md, .ai-context/ dosyaları tutuluyor
-- Cron job her 10 dk'da bir otomatik push yapıyor
+- GitHub'da MEMORY.md, TODO.md, SESSION_NOTES.md dosyaları tutuluyor
+- Cron job her 6-7 dk'da bir otomatik push yapıyor
+- Workspace: /root/.openclaw/workspace/HookSniff
