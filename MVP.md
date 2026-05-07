@@ -13,15 +13,15 @@
 | 2 | Standard Webhooks header'ları ekle (`webhook-id`, `webhook-timestamp`, `webhook-signature`) | 45dk | ✅ |
 | 3 | Playground UI tamamla | 20dk | ✅ |
 | 4 | Delivery Details UI tamamla | 20dk | ✅ |
-| 5 | Custom Retry Policy UI ekle | 25dk | ❌ |
-| 6 | Signature Rotation UI ekle | 20dk | ❌ |
-| 7 | Rate Limit Dashboard ekle | 20dk | ❌ |
-| 8 | Customer Self-Service sayfası | 25dk | ❌ |
-| 9 | Event hierarchy filtering kontrol/düzelt (`user.*` → `user.created`+`user.updated`) | 30dk | ❌ |
-| 10 | Timestamp tolerans docs (±5dk replay protection) | 20dk | ❌ |
-| 11 | Alerting test et | 15dk | ❌ |
-| 12 | Health Monitoring test et | 15dk | ❌ |
-| 13 | Grafana OTEL test et | 30dk | ❌ |
+| 5 | Custom Retry Policy UI ekle | 25dk | ✅ |
+| 6 | Signature Rotation UI ekle | 20dk | ✅ |
+| 7 | Rate Limit Dashboard ekle | 20dk | ✅ |
+| 8 | Customer Self-Service sayfası | 25dk | ✅ |
+| 9 | Event hierarchy filtering kontrol/düzelt (`user.*` → `user.created`+`user.updated`) | 30dk | ✅ |
+| 10 | Timestamp tolerans docs (±5dk replay protection) | 20dk | ✅ |
+| 11 | Alerting test et | 15dk | ✅ |
+| 12 | Health Monitoring test et | 15dk | ✅ |
+| 13 | Grafana OTEL test et | 30dk | ✅ |
 
 ---
 
