@@ -38,7 +38,10 @@ fn init_otel(
     let mut header_map = HashMap::new();
     if let Some(ref headers) = cfg.otel_exporter_otlp_headers {
         for header in headers.split(',') {
-            if let Some((key, value)) = header.trim().split_once('=') {
+            let h = header.trim();
+            // Support both "key=value" and "key: value" formats
+            // (Grafana Cloud uses "Authorization: Bearer <token>" with colon)
+            if let Some((key, value)) = h.split_once(':').or_else(|| h.split_once('=')) {
                 header_map.insert(key.trim().to_string(), value.trim().to_string());
             }
         }
