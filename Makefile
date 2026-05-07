@@ -93,6 +93,63 @@ db-shell: ## PostgreSQL kabuğu aç
 	docker compose exec postgres psql -U hookrelay -d hookrelay
 
 # ═══════════════════════════════════════════════════════════════════
+# Self-Host — Tek komutla kendi sunucunuzda çalıştırın
+# ═══════════════════════════════════════════════════════════════════
+
+self-host: ## Tek komutla self-host kurulum
+	@echo "🪝 HookSniff Self-Host Kurulumu"
+	@echo ""
+	@echo "1/5 Ortam değişkenleri kontrol ediliyor..."
+	@if [ ! -f .env ]; then \
+		echo "   ⚠️  .env dosyası yok, .env.example'dan oluşturuluyor..."; \
+		cp .env.example .env; \
+		echo "   📝 .env dosyasını düzenleyin: nano .env"; \
+	fi
+	@echo "2/5 Docker image'lar build ediliyor..."
+	@docker compose build --quiet 2>/dev/null || docker compose build
+	@echo "3/5 Servisler başlatılıyor..."
+	@docker compose up -d
+	@echo "4/5 Sağlık kontrolü bekleniyor (20 saniye)..."
+	@sleep 20
+	@echo "5/5 Durum kontrolü..."
+	@docker compose ps
+	@echo ""
+	@echo "✅ HookSniff Self-Host Hazır!"
+	@echo ""
+	@echo "   Dashboard: http://localhost:3001"
+	@echo "   API:       http://localhost:3000/health"
+	@echo ""
+	@echo "   İlk kullanıcı: POST http://localhost:3000/v1/auth/register"
+	@echo "   Loglar:        make logs"
+	@echo "   Durdur:        make stop"
+
+self-host-status: ## Self-host durumunu göster
+	@echo "🪝 HookSniff Self-Host Durum"
+	@echo ""
+	@docker compose ps 2>/dev/null || echo "❌ Servisler çalışmıyor. 'make self-host' ile başlat."
+	@echo ""
+	@echo "Dashboard: $$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3001 2>/dev/null || echo 'kapalı')"
+	@echo "API:       $$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/health 2>/dev/null || echo 'kapalı')"
+	@echo ""
+	@echo "Veritabanı:"
+	@docker compose exec -T postgres psql -U hookrelay -d hookrelay -c "SELECT COUNT(*) as customers FROM customers;" 2>/dev/null || echo "  Bağlanılamadı"
+	@docker compose exec -T postgres psql -U hookrelay -d hookrelay -c "SELECT COUNT(*) as endpoints FROM endpoints;" 2>/dev/null || true
+	@docker compose exec -T postgres psql -U hookrelay -d hookrelay -c "SELECT COUNT(*) as deliveries FROM deliveries;" 2>/dev/null || true
+
+self-host-backup: ## Veritabanını yedekle
+	@echo "📦 Veritabanı yedekleniyor..."
+	@mkdir -p backups
+	@docker compose exec -T postgres pg_dump -U hookrelay -d hookrelay > backups/hooksniff_$$(date +%Y%m%d_%H%M%S).sql
+	@echo "✅ Yedeklendi: backups/hooksniff_$$(date +%Y%m%d_%H%M%S).sql"
+
+self-host-update: ## Self-host güncellemesi (git pull + rebuild)
+	@echo "🔄 Güncelleniyor..."
+	@git pull origin main
+	@docker compose build --quiet
+	@docker compose up -d
+	@echo "✅ Güncellendi ve yeniden başlatıldı"
+
+# ═══════════════════════════════════════════════════════════════════
 # Deployment Komutları (Production)
 # ═══════════════════════════════════════════════════════════════════
 
