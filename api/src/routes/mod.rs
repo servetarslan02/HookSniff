@@ -20,6 +20,7 @@ pub mod search;
 pub mod stats;
 pub mod teams;
 pub mod templates;
+pub mod stream;
 pub mod transforms;
 pub mod webhooks;
 
@@ -44,6 +45,7 @@ pub fn api_router() -> Router {
     let protected = Router::new()
         .nest("/endpoints", endpoints::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
+        .nest("/stream", stream::router())
         .nest("/webhooks", webhooks::router())
         .nest("/webhooks", delivery_details::router())
         .nest("/search", search::router())
