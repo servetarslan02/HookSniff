@@ -153,14 +153,14 @@ export default function SettingsPage() {
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-          Manage your account, security, and notification preferences
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Profile Section */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('profile')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Update your display name and email address</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('profileDesc')}</p>
 
         {profileSuccess && (
           <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400">
@@ -189,23 +189,23 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Display Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('displayName')}</label>
             <input
               type="text"
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
-              placeholder="Your name"
+              placeholder={t('namePlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('emailAddress')}</label>
             <input
               type="email"
               value={profileEmail}
               onChange={(e) => setProfileEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder={t('emailPlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
@@ -225,7 +225,7 @@ export default function SettingsPage() {
       {/* Password Section */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('changePassword')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Ensure your account stays secure with a strong password</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('changePasswordDesc')}</p>
 
         {passwordSuccess && (
           <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400">
@@ -240,7 +240,7 @@ export default function SettingsPage() {
 
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Current Password</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('currentPassword')}</label>
             <input
               type="password"
               value={currentPassword}
@@ -252,7 +252,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">New Password</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('newPassword')}</label>
             <input
               type="password"
               value={newPassword}
@@ -262,11 +262,11 @@ export default function SettingsPage() {
               minLength={8}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">Must be at least 8 characters</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">{t('passwordMinLength')}</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Confirm New Password</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('confirmNewPassword')}</label>
             <input
               type="password"
               value={confirmPassword}
@@ -292,7 +292,7 @@ export default function SettingsPage() {
       {/* API Key Section */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('api')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Your secret API key for authenticating requests</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('apiDesc')}</p>
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row gap-3">
             <input
@@ -310,9 +310,9 @@ export default function SettingsPage() {
             </button>
           </div>
           <p className="text-xs text-gray-500 dark:text-slate-400">
-            Keep this secret. Do not share it in client-side code.{' '}
+            {t('keepSecret')}{' '}
             <a href="/dashboard/api-keys" className="text-brand-600 dark:text-brand-400 hover:underline">
-              Manage API keys →
+              {t('manageApiKeys')} →
             </a>
           </p>
         </div>
@@ -321,23 +321,23 @@ export default function SettingsPage() {
       {/* Notifications */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('notifications')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Choose what notifications you want to receive</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('notificationsDesc')}</p>
         <div className="space-y-4">
           <ToggleRow
-            label="Email notifications"
-            description="Receive important account updates via email"
+            label={t('emailNotifications')}
+            description={t('emailNotificationsDesc')}
             checked={emailNotifs}
             onChange={setEmailNotifs}
           />
           <ToggleRow
-            label="Failure alerts"
-            description="Get notified when webhook deliveries fail"
+            label={t('failureAlerts')}
+            description={t('failureAlertsDesc')}
             checked={failureAlerts}
             onChange={setFailureAlerts}
           />
           <ToggleRow
-            label="Weekly digest"
-            description="Receive a weekly summary of your webhook activity"
+            label={t('weeklyDigest')}
+            description={t('weeklyDigestDesc')}
             checked={weeklyDigest}
             onChange={setWeeklyDigest}
           />
@@ -359,8 +359,8 @@ export default function SettingsPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-500/10 rounded-xl">
             <div>
-              <div className="font-medium text-gray-900 dark:text-white">Sign Out</div>
-              <div className="text-sm text-gray-500 dark:text-slate-400">Sign out of your account on this device</div>
+              <div className="font-medium text-gray-900 dark:text-white">{t('signOut')}</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400">{t('signOutDesc')}</div>
             </div>
             <button
               onClick={logout}
@@ -378,7 +378,7 @@ export default function SettingsPage() {
               onClick={() => setShowDeleteModal(true)}
               className="border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-600 hover:text-white transition"
             >
-              Delete Account
+              {t('deleteAccount')}
             </button>
           </div>
         </div>
@@ -388,12 +388,12 @@ export default function SettingsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">⚠️ Delete Account</h3>
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">⚠️ {t('deleteAccount')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              This action is permanent. All your data, endpoints, and webhook history will be deleted.
+              {t('deleteAccountWarning')}
             </p>
             <p className="text-sm text-gray-700 dark:text-slate-300 mb-2">
-              Type <strong>DELETE</strong> to confirm:
+              {t('typeDeleteToConfirm')}
             </p>
             <input
               type="text"
@@ -414,7 +414,7 @@ export default function SettingsPage() {
                 disabled={deleteConfirmText !== 'DELETE' || deletingAccount}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-40"
               >
-                {deletingAccount ? 'Deleting...' : 'Permanently Delete'}
+                {deletingAccount ? tc('deleting') : t('permanentlyDelete')}
               </button>
             </div>
           </div>
