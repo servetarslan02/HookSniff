@@ -9,7 +9,7 @@
 
 | # | Görev | Süre | Durum |
 |---|-------|------|-------|
-| 1 | Free tier limit: 1,000 → 10,000/ay | 5dk | ❌ |
+| 1 | Free tier limit: 1,000 → 10,000/ay | 5dk | ✅ |
 | 2 | Standard Webhooks header'ları ekle (`webhook-id`, `webhook-timestamp`, `webhook-signature`) | 45dk | ❌ |
 | 3 | Playground UI tamamla | 20dk | ❌ |
 | 4 | Delivery Details UI tamamla | 20dk | ❌ |
