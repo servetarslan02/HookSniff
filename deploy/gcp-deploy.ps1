@@ -70,20 +70,24 @@ function Create-Secret($name, $value) {
         return
     }
     $tmpFile = [System.IO.Path]::GetTempFileName()
-    try {
-        [System.IO.File]::WriteAllText($tmpFile, $value)
-        gcloud secrets create $name --data-file=$tmpFile --replication-policy="automatic" --quiet 2>$null
-        Write-Host "  Secret '$name' olusturuldu" -ForegroundColor Gray
-    } catch {
-        try {
-            gcloud secrets versions add $name --data-file=$tmpFile --quiet 2>$null
+    [System.IO.File]::WriteAllText($tmpFile, $value)
+    
+    # Try to create (will fail if already exists)
+    gcloud secrets create $name --data-file=$tmpFile --replication-policy="automatic" --quiet 2>$null
+    
+    # If create failed (already exists), add new version
+    if ($LASTEXITCODE -ne 0) {
+        gcloud secrets versions add $name --data-file=$tmpFile --quiet
+        if ($LASTEXITCODE -eq 0) {
             Write-Host "  Secret '$name' guncellendi" -ForegroundColor Gray
-        } catch {
+        } else {
             Write-Host "UYARI: Secret '$name' guncellenemedi" -ForegroundColor Yellow
         }
-    } finally {
-        Remove-Item $tmpFile -ErrorAction SilentlyContinue
+    } else {
+        Write-Host "  Secret '$name' olusturuldu" -ForegroundColor Gray
     }
+    
+    Remove-Item $tmpFile -ErrorAction SilentlyContinue
 }
 
 Create-Secret "hooksniff-hmac-secret" $envVars["HMAC_SECRET"]
