@@ -1,9 +1,9 @@
 # ── Stage 1: Builder ──
 FROM rust:slim AS builder
 
-# Install build dependencies
+# Install build dependencies (no OpenSSL needed — using rustls)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends pkg-config libssl-dev && \
+    apt-get install -y --no-install-recommends pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
