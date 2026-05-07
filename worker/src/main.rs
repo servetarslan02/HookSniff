@@ -271,13 +271,43 @@ async fn process_pending(
         tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
 
         // Get signing secret from batch-fetched map
-        let signing_secret = secret_map
-            .get(&item.endpoint_id)
-            .cloned()
-            .unwrap_or_else(|| {
-                tracing::warn!("⚠️ No signing_secret found for endpoint {}", item.endpoint_id);
-                String::new()
-            });
+        let signing_secret = match secret_map.get(&item.endpoint_id) {
+            Some(s) if !s.is_empty() => s.clone(),
+            _ => {
+                tracing::error!(
+                    "❌ No signing_secret for endpoint {} — delivery {} will fail verification",
+                    item.endpoint_id, delivery_id
+                );
+                // Mark as dead letter since we can't sign the request
+                let mut tx = pool.begin().await?;
+                sqlx::query::<sqlx::Postgres>(
+                    "UPDATE webhook_queue SET status = 'dead_letter', processed_at = now() WHERE id = $1"
+                )
+                .bind(item.id)
+                .execute(&mut *tx)
+                .await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    "UPDATE deliveries SET status = 'failed', error_message = 'Endpoint signing secret missing' WHERE id = $1"
+                )
+                .bind(delivery_id)
+                .execute(&mut *tx)
+                .await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    r#"INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                       SELECT id, endpoint_id, customer_id, payload, 'Endpoint signing secret missing', $2
+                       FROM deliveries WHERE id = $1"#
+                )
+                .bind(delivery_id)
+                .bind(attempt)
+                .execute(&mut *tx)
+                .await?;
+
+                tx.commit().await?;
+                continue;
+            }
+        };
 
         // Build WebhookMessage and delegate HTTP delivery to the delivery module
         let webhook_msg = WebhookMessage {

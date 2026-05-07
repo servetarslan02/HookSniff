@@ -35,6 +35,12 @@ pub struct Config {
     pub iyzico_secret_key: Option<String>,
     /// CORS allowed origins (comma-separated). Empty = allow all in dev, deny in prod.
     pub cors_origins: Vec<String>,
+    /// Resend API key for transactional emails (optional — emails disabled if not set)
+    pub resend_api_key: Option<String>,
+    /// Sender email address for notifications
+    pub notify_from_email: String,
+    /// Admin notification email address (optional)
+    pub notify_email: Option<String>,
 }
 
 /// Patterns that look like placeholder / throwaway secrets (case-insensitive).
@@ -159,6 +165,10 @@ impl Config {
                 .map(|s| s.trim().to_string())
                 .filter(|s| !s.is_empty())
                 .collect(),
+            resend_api_key: std::env::var("RESEND_API_KEY").ok(),
+            notify_from_email: std::env::var("NOTIFY_FROM_EMAIL")
+                .unwrap_or_else(|_| "noreply@hooksniff.is-a.dev".into()),
+            notify_email: std::env::var("NOTIFY_EMAIL").ok(),
         })
     }
 }

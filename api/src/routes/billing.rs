@@ -548,50 +548,11 @@ async fn process_webhook_result(
             amount_cents,
             currency,
         } => {
-            // Look up customer by provider subscription IDs
-            let customer_row: Option<(uuid::Uuid, String)> = sqlx::query_as(
-                "SELECT id, plan FROM customers WHERE \
-                 (polar_subscription_id IS NOT NULL AND $1 = 'polar') OR \
-                 (iyzico_subscription_id IS NOT NULL AND $1 = 'iyzico') \
-                 LIMIT 1"
-            )
-            .bind(provider)
-            .fetch_optional(pool)
-            .await?;
-
-            if let Some((customer_id, plan)) = customer_row {
-                // Record in payment_transactions
-                sqlx::query(
-                    "INSERT INTO payment_transactions \
-                     (customer_id, provider, provider_tx_id, amount_cents, currency, status) \
-                     VALUES ($1, $2, $3, $4, $5, 'completed')"
-                )
-                .bind(customer_id)
-                .bind(provider)
-                .bind(provider_tx_id)
-                .bind(*amount_cents as i64)
-                .bind(currency)
-                .execute(pool)
-                .await?;
-
-                // Record invoice
-                sqlx::query(
-                    "INSERT INTO invoices \
-                     (customer_id, amount_cents, currency, plan, status, provider, provider_invoice_id, paid_at) \
-                     VALUES ($1, $2, $3, $4, 'paid', $5, $6, now())"
-                )
-                .bind(customer_id)
-                .bind(*amount_cents as i32)
-                .bind(currency)
-                .bind(&plan)
-                .bind(provider)
-                .bind(provider_tx_id)
-                .execute(pool)
-                .await?;
-            }
-
+            // PaymentSucceeded doesn't include subscription/customer IDs directly.
+            // Log the payment for audit purposes. The subscription lifecycle events
+            // (created/updated) handle customer plan updates.
             tracing::info!(
-                "✅ {} payment succeeded: {} ({} {})",
+                "✅ {} payment succeeded: {} ({} {}) — customer association handled by subscription events",
                 provider,
                 provider_tx_id,
                 *amount_cents as f64 / 100.0,

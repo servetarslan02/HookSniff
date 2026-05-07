@@ -44,6 +44,18 @@ services:
         value: memory
       - key: LOG_FORMAT
         value: json
+      - key: RESEND_API_KEY
+        sync: false
+      - key: NOTIFY_FROM_EMAIL
+        value: noreply@hooksniff.is-a.dev
+      - key: NOTIFY_EMAIL
+        sync: false
+      - key: OTEL_ENABLED
+        value: "false"
+      - key: OTEL_EXPORTER_OTLP_ENDPOINT
+        sync: false
+      - key: OTEL_EXPORTER_OTLP_HEADERS
+        sync: false
     autoDeploy: true
 
   # ── Background Worker ──
@@ -58,5 +70,15 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: RUST_LOG
-        value: info,hooksniff=debug
+        value: info,hooksniff=info
+      - key: RESEND_API_KEY
+        sync: false
+      - key: NOTIFY_FROM_EMAIL
+        value: noreply@hooksniff.is-a.dev
+      - key: OTEL_ENABLED
+        value: "false"
+      - key: OTEL_EXPORTER_OTLP_ENDPOINT
+        sync: false
+      - key: OTEL_EXPORTER_OTLP_HEADERS
+        sync: false
     autoDeploy: true
