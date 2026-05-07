@@ -29,3 +29,4 @@ Thumbs.db
 # Production secrets
 .env.production
 .vercel
+deploy/gcp-service-account.json
