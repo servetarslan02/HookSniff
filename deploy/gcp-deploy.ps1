@@ -69,16 +69,20 @@ function Create-Secret($name, $value) {
         Write-Host "UYARI: Secret '$name' bos, atlaniyor" -ForegroundColor Yellow
         return
     }
+    $tmpFile = [System.IO.Path]::GetTempFileName()
     try {
-        $value | gcloud secrets create $name --data-file=- --replication-policy="automatic" --quiet 2>$null
+        [System.IO.File]::WriteAllText($tmpFile, $value)
+        gcloud secrets create $name --data-file=$tmpFile --replication-policy="automatic" --quiet 2>$null
         Write-Host "  Secret '$name' olusturuldu" -ForegroundColor Gray
     } catch {
         try {
-            $value | gcloud secrets versions add $name --data-file=- --quiet 2>$null
+            gcloud secrets versions add $name --data-file=$tmpFile --quiet 2>$null
             Write-Host "  Secret '$name' guncellendi" -ForegroundColor Gray
         } catch {
             Write-Host "UYARI: Secret '$name' guncellenemedi" -ForegroundColor Yellow
         }
+    } finally {
+        Remove-Item $tmpFile -ErrorAction SilentlyContinue
     }
 }
 
