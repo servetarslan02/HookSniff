@@ -12,13 +12,14 @@
 - GitHub: https://github.com/servetarslan02/HookSniff
 - Domain: hooksniff.is-a.dev (ücretsiz, is-a.dev)
 - Tech stack: Rust (Axum) + Next.js 15 + PostgreSQL (Neon) + Redis (Upstash)
-- Hosting planı: Oracle Cloud Always Free + Vercel ($0/ay)
+- Hosting planı: Google Cloud Run + Vercel ($0/ay free tier)
 
 ## Hafıza Sistemi
-- GitHub'da MEMORY.md, CONTEXT.md, TODO.md, SESSION_NOTES.md dosyaları tutuluyor
-- Cron job her 30 dk'da bir otomatik push yapıyor
+- GitHub'da MEMORY.md, CONTEXT.md, TODO.md, SESSION_NOTES.md, .ai-context/ dosyaları tutuluyor
+- Cron job her 8 dk'da bir otomatik push yapıyor
 - Her oturum başında GitHub'dan pull yapılmalı
 - Yerel dosyalar 1 saat sonra siliniyor → GitHub kalıcı
+- Tüm token'lar .ai-context/EXTERNAL_TOKENS.md'de kayıtlı
 
 ## Son Durum (2026-05-08)
 - Önceki agent "Mamo" ile 2026-05-06'da kapsamlı çalışma yapılmış
@@ -30,11 +31,14 @@
 - Production deploy henüz yapılmadı → sırada
 
 ## Yapılacak Sıradaki İşler
-1. Render'da yeniden deploy et (Docker build düzeltmesi sonrası)
-2. Neon PostgreSQL hesabı aç
-3. Upstash Redis hesabı aç
-4. Oracle Cloud VM kur
-5. .env.production güncelle
+1. ✅ Render Docker build hatası düzeltildi (OpenSSL → rustls-tls)
+2. Render'da yeniden deploy et
+3. Neon PostgreSQL → zaten kurulur (connection string mevcut)
+4. Upstash Redis → zaten kurulur (connection string mevcut)
+5. Google Cloud Run deploy et (gcp-deploy.sh)
+6. .env.production oluştur (token'lar EXTERNAL_TOKENS.md'de)
+7. Cloudflare DNS ayarla (api CNAME)
+8. Resend domain doğrulama
 
 ## Önemli Notlar
 - Token'lar chat geçmişinde ifşa oldu → deploy sonrası yenilenmeli
