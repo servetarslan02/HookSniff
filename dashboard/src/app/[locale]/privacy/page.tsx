@@ -85,7 +85,8 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">5. Data Sharing</h2>
             <p className="mb-2">We do NOT sell your personal data. We may share information with:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Stripe:</strong> Payment processing (subject to Stripe's Privacy Policy)</li>
+              <li><strong>Polar.sh:</strong> Payment processing (subject to Polar.sh&apos;s Privacy Policy)</li>
+              <li><strong>iyzico:</strong> Payment processing for Turkish customers (subject to iyzico&apos;s Privacy Policy)</li>
               <li><strong>Infrastructure providers:</strong> Cloud hosting for Service operation</li>
               <li><strong>Legal authorities:</strong> When required by law, court order, or to protect our rights</li>
               <li><strong>Business transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
