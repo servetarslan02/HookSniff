@@ -88,7 +88,7 @@ pub struct TeamDetailResponse {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct MemberResponse {
     pub id: Uuid,
     pub customer_id: Uuid,
@@ -99,7 +99,7 @@ pub struct MemberResponse {
     pub joined_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct InviteResponse {
     pub id: Uuid,
     pub email: String,
