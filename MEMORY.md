@@ -24,10 +24,17 @@
 - Önceki agent "Mamo" ile 2026-05-06'da kapsamlı çalışma yapılmış
 - Kod incelemesi, rakip analizi, ödeme sistemi entegrasyonu tamamlanmış
 - Vercel deploy başarılı (dashboard)
-- Render Docker build başarısız (OpenSSL hatası) — çözülmedi
+- ✅ Render Docker build hatası düzeltildi (OpenSSL → rustls-tls)
 - Polar.sh hesap açıldı, planlar oluşturuldu
 - iyzico hesabı açılacak
-- Production deploy henüz yapılmadı
+- Production deploy henüz yapılmadı → sırada
+
+## Yapılacak Sıradaki İşler
+1. Render'da yeniden deploy et (Docker build düzeltmesi sonrası)
+2. Neon PostgreSQL hesabı aç
+3. Upstash Redis hesabı aç
+4. Oracle Cloud VM kur
+5. .env.production güncelle
 
 ## Önemli Notlar
 - Token'lar chat geçmişinde ifşa oldu → deploy sonrası yenilenmeli
