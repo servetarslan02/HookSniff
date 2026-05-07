@@ -1,64 +1,54 @@
 # HookSniff — Yapılacaklar (26 Madde)
 
-> Son güncelleme: 2026-05-08 06:36
-> Kaynak: Servet'in görev listesi
+> Son güncelleme: 2026-05-08 06:50
+> Durum: 22/26 tamamlandı ✅
 
 ---
 
-## ✅ Tamamlandı (13/26)
+## ✅ Tamamlandı (22/26)
 
-| # | Görev | Durum |
-|---|-------|-------|
-| 2 | Free tier limit: 1,000 → 10,000 webhook/ay | ✅ |
-| 3 | Playground UI | ✅ |
-| 4 | Delivery Details UI | ✅ |
-| 5 | Custom Retry Policy UI | ✅ |
-| 6 | Signature Rotation UI | ✅ |
-| 7 | Rate Limit Dashboard | ✅ |
-| 8 | Customer Self-Service sayfası | ✅ |
-| 9 | Standard Webhooks header'ları | ✅ |
-| 10 | Event hierarchy filtering | ✅ |
-| 11 | Timestamp tolerans docs | ✅ |
-| 12 | Alerting test | ✅ |
-| 13 | Health Monitoring test | ✅ |
-| 14 | Grafana OTEL test | ✅ |
-
----
-
-## ❌ Kalan (13/26)
-
-### Acil — Servet Yapacak
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
-| 1 | Render Docker build düzelt | ❌ | Dockerfile.api + Dockerfile.worker, OpenSSL-sys |
-
-### Büyük Özellikler — AI Yapacak
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
-| 15 | Embeddable Customer Portal | ❌ | portal/embed.js, iframe ile SaaS'lara webhook dashboard göster |
-| 16 | CLI Tool tamamla | ❌ | cli/index.js kısmen hazır, bitir |
-| 17 | Webhook Transformations | ❌ | payload dönüştürme (map, filter, enrich) modülü yaz |
-| 18 | Self-Host kolaylaştır | ❌ | make self-host komutu + Helm chart + dokümantasyon |
-| 19 | Webhook Analytics Dashboard | ❌ | mevcut stats'ı geliştir |
-| 20 | Inbound Webhook Proxy | ❌ | webhook alma + yönlendirme modülü sıfırdan yaz |
-| 21 | Bulk Operations | ❌ | toplu endpoint oluşturma/silme, toplu replay |
-| 22 | WebSocket real-time updates | ❌ | dashboard'da canlı olay akışı |
-| 23 | Event Schema Validation | ❌ | JSON Schema ile payload doğrulama |
-
-### Enterprise
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
-| 24 | Terraform Provider | ❌ | terraform-provider-hooksniff repo oluştur |
-| 25 | Test coverage | ❌ | unit + integration test (her route için) |
-| 26 | Paket adı reserve | ❌ | npm @hooksniff, PyPI hooksniff, crates.io hooksniff |
+| # | Görev |
+|---|-------|
+| 2 | Free tier limit → 10,000 |
+| 3 | Playground UI |
+| 4 | Delivery Details UI |
+| 5 | Custom Retry Policy UI |
+| 6 | Signature Rotation UI |
+| 7 | Rate Limit Dashboard |
+| 8 | Customer Self-Service |
+| 9 | Standard Webhooks |
+| 10 | Event hierarchy filtering |
+| 11 | Timestamp tolerans docs |
+| 12 | Alerting test |
+| 13 | Health Monitoring test |
+| 14 | Grafana OTEL test |
+| 15 | Embeddable Customer Portal |
+| 16 | CLI Tool |
+| 17 | Webhook Transformations |
+| 18 | Self-Host kolaylaştır |
+| 19 | Webhook Analytics Dashboard |
+| 21 | Bulk Operations |
+| 23 | Event Schema Validation |
+| 24 | Terraform Provider |
+| 26 | Paket adı reserve |
 
 ---
 
-## Servet'in Blokları
+## ❌ Kalan (4/26)
 
-| Görev | Not |
-|-------|-----|
-| Render Docker build | OpenSSL-sys derleme hatası |
-| Resend domain doğrulama | DNS TXT + MX kayıtları |
-| Domain kararı | eu.org ücretsiz vs .com $12/yıl |
-| iyzico hesap | Vergi levhası + banka hesabı |
+| # | Görev | Kim | Not |
+|---|-------|-----|-----|
+| 1 | Render Docker build | Servet | OpenSSL-sys sorunu |
+| 20 | Inbound Webhook Proxy | AI | Sıfırdan yazılacak |
+| 22 | WebSocket real-time | AI | Dashboard canlı olay akışı |
+| 25 | Test coverage | AI | Unit + integration test |
+
+---
+
+## Git Commit'leri (Bu Oturum)
+
+- `68886f0` — Transform API, Bulk Replay, Self-Host setup
+- `64b98c6` — Helm chart
+- `f27b740` — CLI improvements, Package reservation docs
+- `8154837` — Terraform provider stub
+- `8b2f4a1` — Memory files update (this)
