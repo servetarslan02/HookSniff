@@ -47,7 +47,6 @@ pub fn api_router() -> Router {
         .nest("/endpoints", endpoints::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())
-        .nest("/inbound", inbound::router())
         .nest("/webhooks", webhooks::router())
         .nest("/webhooks", delivery_details::router())
         .nest("/search", search::router())
@@ -66,6 +65,11 @@ pub fn api_router() -> Router {
         .nest("/notifications", notifications::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
+    // Inbound webhooks — uses API key auth (not JWT), so external services can call it
+    let inbound_routes = Router::new()
+        .nest("/inbound", inbound::router())
+        .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
+
     let admin_routes = Router::new()
         .nest("/admin", admin::router())
         .layer(axum_middleware::from_fn(crate::middleware::admin_middleware))
@@ -77,5 +81,6 @@ pub fn api_router() -> Router {
         .nest("/outbound-ips", outbound_ips::router())
         .route("/status", axum::routing::get(health::system_status).options(health::status_options))
         .merge(protected)
+        .merge(inbound_routes)
         .merge(admin_routes)
 }

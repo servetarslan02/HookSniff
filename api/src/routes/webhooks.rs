@@ -595,9 +595,6 @@ async fn batch_replay(
             &endpoint.url,
             &payload_str,
             endpoint.custom_headers.as_ref(),
-            &endpoint.signing_secret,
-            original.event_type.as_deref(),
-            &cfg.redis_url,
         )
         .await?;
 
