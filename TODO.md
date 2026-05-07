@@ -12,7 +12,7 @@
 - **Cache:** Redis (Upstash — serverless, ücretsiz)
 - **Queue:** PostgreSQL tablo (webhook_queue) + Redis (rate limiting)
 - **Workflow:** Basit retry loop (worker polling)
-- **Hosting:** Oracle Cloud Always Free (API + Worker) + Vercel (Dashboard)
+- **Hosting:** Google Cloud Run (API + Worker) + Vercel (Dashboard)
 - **Monitoring:** Grafana Cloud (ücretsiz tier)
 - **Storage:** Cloudflare R2 (ücretsiz tier)
 - **Email:** Resend (ücretsiz tier)
@@ -25,7 +25,7 @@
 ### 1. Production Deploy (Bu Hafta)
 - [ ] Neon hesabı aç ve PostgreSQL projesi oluştur
 - [ ] Upstash hesabı aç ve Redis oluştur
-- [ ] Oracle Cloud Always Free ARM VM oluştur
+- [ ] Google Cloud Run servislerini deploy et
 - [ ] VM'de Docker kur ve container'ları deploy et
 - [ ] Vercel'de dashboard deploy et
 - [ ] Domain al ($12) — hooksniff.is-a.dev veya alternatifi
@@ -127,7 +127,7 @@
 ### Neden Free-Tier?
 - Sıfır maliyet ile başla
 - Gelir olmadan harcama yapma
-- Oracle Cloud Always Free → süresiz ücretsiz
+- Google Cloud Run → 2M istek/ay ücretsiz
 - Neon/Upstash/Vercel/Grafana/R2/Resend → cömert ücretsiz tier
 - Büyüyünce ücretli planlara geç
 

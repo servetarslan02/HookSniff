@@ -11,7 +11,7 @@ This guide walks you through setting up every service, getting credentials, and 
 1. [Overview](#overview)
 2. [Neon — Database](#1-neon--postgresql-database)
 3. [Upstash — Redis Queue](#2-upstash--redis)
-4. [Oracle Cloud — API + Worker Hosting](#3-oracle-cloud--api--worker)
+4. [Google Cloud Run — API + Worker Hosting](#3-oracle-cloud--api--worker)
 5. [Vercel — Dashboard Hosting](#4-vercel--dashboard)
 6. [Grafana Cloud — Monitoring](#5-grafana-cloud--monitoring)
 7. [Cloudflare R2 — Storage](#6-cloudflare-r2--storage)
@@ -29,7 +29,7 @@ This guide walks you through setting up every service, getting credentials, and 
 |---------|---------|-----------|-----------------|
 | Neon | PostgreSQL database | 0.5 GB, 100 CU-hrs, 10 projects | $19/mo (Scale) |
 | Upstash Redis | Rate limiting + caching | 256 MB, 500K cmds/mo | $120/mo (Pro) |
-| Oracle Cloud | API + Worker hosting | 4 OCPU ARM, 24 GB RAM (forever) | Pay-as-you-go |
+| Google Cloud Run | API + Worker hosting | 2M istek, 360K vCPU-saniye (Free Tier) | Pay-as-you-go |
 | Vercel | Dashboard hosting | 100 GB BW, unlimited sites | $20/mo (Pro) |
 | Grafana Cloud | Monitoring + tracing | 10K metrics, 50 GB logs, 50 GB traces | Pay-as-you-go |
 | Cloudflare R2 | Webhook payload storage | 10 GB, egress free | $0.015/GB-mo |
@@ -94,7 +94,7 @@ DATABASE_URL=postgresql://neondb_owner:YOUR_PASSWORD@ep-cool-bird-123456.us-east
 - **Commands:** 500,000/month
 - **Bandwidth:** Unlimited
 - **Max connections:** 100 concurrent
-- **Regions:** Single region (choose closest to your Oracle Cloud VM)
+- **Regions:** Single region (choose closest to your Google Cloud Run VM)
 
 ### Step-by-Step Setup
 
@@ -102,7 +102,7 @@ DATABASE_URL=postgresql://neondb_owner:YOUR_PASSWORD@ep-cool-bird-123456.us-east
 2. **Sign up** with GitHub or email
 3. **Create a Redis database:**
    - Name: `hooksniff-redis`
-   - Region: Choose closest to your Oracle Cloud VM (e.g., `us-east-1`)
+   - Region: Choose closest to your Google Cloud Run VM (e.g., `us-east-1`)
    - Type: `Regional` (not Global — lower latency)
 4. **Copy the credentials:**
    - Go to **Details** → **REST API**
@@ -120,15 +120,15 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
 ### Gotchas
 
 - **500K commands/month** = ~16K/day. At 1,000 webhooks/month (free plan), you'll use ~30K commands/month for rate limiting. Plenty of headroom.
-- **Choose Regional** (not Global) for lower latency with your Oracle Cloud VM.
+- **Choose Regional** (not Global) for lower latency with your Google Cloud Run VM.
 - **No Lua scripts** on free tier — use pipelining for atomic operations.
 - **Connection pooling:** Upstash handles this automatically via REST API.
 
 ---
 
-## 3. Oracle Cloud — API + Worker Hosting
+## 3. Google Cloud Run — API + Worker Hosting
 
-**What it does:** Hosts the Rust API server and background worker. Oracle Cloud's "Always Free" tier provides permanent ARM VMs at no cost.
+**What it does:** Hosts the Rust API server and background worker. Google Cloud Run's "Always Free" tier provides permanent ARM VMs at no cost.
 
 ### Free Tier Limits (Always Free — No Expiration)
 
@@ -213,7 +213,7 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
 ### Environment Variables
 
 ```env
-# Set in .env on the Oracle Cloud VM
+# Set in .env on the Google Cloud Run VM
 APP_ENV=production
 PORT=3000
 DATABASE_URL=postgresql://neondb_owner:...@ep-xxx.neon.tech/neondb?sslmode=require
@@ -255,7 +255,7 @@ REDIS_URL=rediss://default:...@xxx.upstash.io:6379
    - Framework: `Next.js` (auto-detected)
    - Root Directory: `dashboard`
 4. **Configure environment variables:**
-   - `NEXT_PUBLIC_API_URL` = `https://api.hooksniff.is-a.dev/v1` (your Oracle Cloud API URL)
+   - `NEXT_PUBLIC_API_URL` = `https://api.hooksniff.is-a.dev/v1` (your Google Cloud Run API URL)
 5. **Deploy:** Click **Deploy** — Vercel builds and deploys automatically on every push to `main`
 
 ### Environment Variables
@@ -267,7 +267,7 @@ NEXT_PUBLIC_API_URL=https://api.hooksniff.is-a.dev/v1
 
 ### Gotchas
 
-- **Serverless functions** run on the edge. They can't connect to your Oracle Cloud VM directly via internal network — use the public URL.
+- **Serverless functions** run on the edge. They can't connect to your Google Cloud Run VM directly via internal network — use the public URL.
 - **`NEXT_PUBLIC_API_URL`** is embedded at build time. Changing it requires a redeploy.
 - **100 GB bandwidth** is generous for a dashboard. You'll hit limits only with heavy traffic.
 - **Preview deployments** get their own URL — useful for testing but costs build minutes.
@@ -457,21 +457,21 @@ NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
    - This ensures end-to-end encryption between Cloudflare and your origin server
 7. **Set up origin certificates** (optional but recommended):
    - Go to **SSL/TLS** → **Origin Server** → **Create Certificate**
-   - Install the certificate on your Oracle Cloud VM (Nginx/Caddy)
+   - Install the certificate on your Google Cloud Run VM (Nginx/Caddy)
 8. **Page Rules** (optional):
    - Cache everything for dashboard: `hooksniff.is-a.dev/*` → Cache Level: Cache Everything
 
 ### Environment Variables
 
 ```env
-# Set in .env on Oracle Cloud
+# Set in .env on Google Cloud Run
 CORS_ORIGINS=https://hooksniff.is-a.dev,https://hooksniff.is-a.dev
 APP_URL=https://hooksniff.is-a.dev
 ```
 
 ### Gotchas
 
-- **"Proxied"** means Cloudflare hides your Oracle VM's IP. This is good for security and DDoS protection.
+- **"Proxied"** means Cloudflare hides your Cloud Run servisi's IP. This is good for security and DDoS protection.
 - **Full (Strict) SSL** requires an origin certificate on your VM. Without it, use "Full" (not strict).
 - **Free plan** includes DDoS protection — no need to upgrade for security.
 - **Orange cloud** (proxied) vs **Grey cloud** (DNS only): Keep API and dashboard proxied for SSL and caching.
@@ -551,7 +551,7 @@ SLACK_WEBHOOK_URL=
 
 - [ ] **Neon:** Create project, copy connection string, run migrations
 - [ ] **Upstash:** Create Redis database, copy URL + token
-- [ ] **Oracle Cloud:** Create ARM VM, install Docker, deploy containers
+- [ ] **Google Cloud Run:** Create ARM VM, install Docker, deploy containers
 - [ ] **Vercel:** Import dashboard repo, set `NEXT_PUBLIC_API_URL`
 - [ ] **Grafana Cloud:** Create stack, get OTLP endpoint + API key
 - [ ] **Cloudflare R2:** Create bucket, get S3 credentials
@@ -580,7 +580,7 @@ SLACK_WEBHOOK_URL=
 
 ### Performance
 
-- **Oracle Cloud ARM** performs well for Rust workloads. Expect ~1-5ms API response times for simple operations.
+- **Google Cloud Run ARM** performs well for Rust workloads. Expect ~1-5ms API response times for simple operations.
 - **Neon cold start** adds ~1-2 seconds after 5 minutes of idle. Use connection pooling to minimize impact.
 - **Cloudflare** adds ~10-30ms of latency but provides global CDN and DDoS protection.
 
@@ -588,8 +588,8 @@ SLACK_WEBHOOK_URL=
 
 - **Always use `sslmode=require`** for Neon connections.
 - **Generate strong secrets** — never use placeholder values in production.
-- **Restrict SSH access** to your Oracle Cloud VM to your IP address.
-- **Use Cloudflare** to hide your Oracle VM's IP address.
+- **Restrict SSH access** to your Google Cloud Run VM to your IP address.
+- **Use Cloudflare** to hide your Cloud Run servisi's IP address.
 
 ### Scaling Path
 

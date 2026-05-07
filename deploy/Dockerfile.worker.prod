@@ -1,9 +1,8 @@
 # ═══════════════════════════════════════════════════════════════════
-# HookRelay Worker — Production Dockerfile (ARM64 Optimized)
+# HookSniff Worker — Production Dockerfile (Google Cloud Run)
 # ═══════════════════════════════════════════════════════════════════
 # Multi-stage build: Rust builder → minimal Debian runtime
-# Hedef: Oracle Cloud Always Free ARM Ampere (aarch64)
-# Final image boyutu: ~25-40 MB
+# TLS: rustls (pure Rust, no OpenSSL dependency)
 # ═══════════════════════════════════════════════════════════════════
 
 # ── Stage 1: Builder ──
@@ -11,12 +10,11 @@ FROM rust:1.82-bookworm AS builder
 
 WORKDIR /app
 
-# Bağımlılıkları önce kopyala (cache optimizasyonu)
 COPY Cargo.toml Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
 
-# Dependency cache oluştur
+# Dependency cache
 RUN mkdir -p api/src && \
     echo "fn main() {}" > api/src/main.rs && \
     mkdir -p worker/src && \
@@ -24,38 +22,30 @@ RUN mkdir -p api/src && \
     cargo build --release -p hooksniff-worker 2>/dev/null || true && \
     rm -rf api/src worker/src
 
-# Asıl kaynak kodlarını kopyala ve derle
 COPY api/src/ api/src/
 COPY worker/src/ worker/src/
 
-# Release build
 RUN cargo build --release -p hooksniff-worker && \
     strip /app/target/release/hooksniff-worker
 
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
 
-# Runtime bağımlılıkları (worker için curl gerekmez, sadece TLS)
+# Runtime deps — no libssl3 needed (rustls is pure Rust)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        ca-certificates \
-        libssl3 \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-# Non-root kullanıcı
 RUN groupadd -r hooksniff && \
-    useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff
+    useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff && \
+    mkdir -p /app
 
 COPY --from=builder /app/target/release/hooksniff-worker /usr/local/bin/hooksniff-worker
-
-RUN mkdir -p /app && chown -R hooksniff:hooksniff /app
+RUN chown -R hooksniff:hooksniff /app
 
 USER hooksniff
 WORKDIR /app
 
-# Worker'ın portu yok, sadece background process
-# Sağlık kontrolü yok (worker HTTP sunmaz)
-# Ancak graceful shutdown için sinyal yakalama önemli
 STOPSIGNAL SIGTERM
 
 CMD ["hooksniff-worker"]
