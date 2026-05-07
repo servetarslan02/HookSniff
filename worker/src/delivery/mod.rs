@@ -5,6 +5,9 @@
 
 pub mod http;
 
+// Re-export commonly used items so callers can use `delivery::deliver_http` etc.
+pub use http::{deliver_http, truncate_str};
+
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
