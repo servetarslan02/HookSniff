@@ -682,7 +682,9 @@
       "github": "GitHub",
       "docs": "Docs",
       "status": "Status",
-      "blog": "Blog",
+      "about": "About",
+      "faq": "FAQ",
+      "contact": "Contact",
       "terms": "Terms",
       "privacy": "Privacy",
       "copyright": "© 2026 HookSniff. All rights reserved."
