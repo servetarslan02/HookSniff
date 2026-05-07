@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::error::AppError;
 
 /// Resend email client wrapper.
+#[derive(Clone)]
 pub struct ResendClient {
     api_key: String,
     from_email: String,
