@@ -29,7 +29,7 @@ HookSniff artık tamamen ücretsiz servisler üzerinde çalışıyor:
 
 | Servis | Amaç | Free Tier |
 |--------|------|-----------|
-| **Oracle Cloud** | API + Worker hosting | 4 OCPU ARM, 24 GB RAM (Always Free) |
+| **Google Cloud Run** | API + Worker hosting | 2M istek, 360K vCPU-saniye (Free Tier) |
 | **Neon** | PostgreSQL veritabanı | 0.5 GB, 100 CU-hours |
 | **Upstash** | Redis (rate limiting, cache) | 256 MB, 500K komut/ay |
 | **Vercel** | Dashboard hosting | 100 GB bandwidth |
@@ -38,7 +38,7 @@ HookSniff artık tamamen ücretsiz servisler üzerinde çalışıyor:
 | **Resend** | Email bildirimleri | 3,000/ay, 100/gün |
 | **Cloudflare** | CDN, DNS, SSL, DDoS | Ücretsiz plan |
 
-**Toplam maliyet: $0/ay** — Taahhüt yok, kredi kartı sadece Oracle Cloud'da kimlik doğrulama için.
+**Toplam maliyet: $0/ay** — Taahhüt yok, kredi kartı sadece Google Cloud Run'da kimlik doğrulama için.
 
 ### Eski Teknolojilerden Uzaklaşma
 - ~~Kafka~~ → PostgreSQL queue (`webhook_queue` tablosu) ✅
@@ -109,7 +109,7 @@ HookSniff artık tamamen ücretsiz servisler üzerinde çalışıyor:
 |----|---------|-----|
 | iyzico hesabı aç | 🔴 Yüksek | Türk müşteriler için |
 | Wise Business hesabı aç | 🔴 Yüksek | Polar.sh para çekme için |
-| Production deploy (Oracle Cloud) | 🔴 Yüksek | FREE_TIER_SETUP.md rehberini takip et |
+| Production deploy (Google Cloud Run) | 🔴 Yüksek | FREE_TIER_SETUP.md rehberini takip et |
 | Domain al | ✅ Tamamlandı | hooksniff.is-a.dev (ücretsiz) |
 | Neon + Upstash kurulumu | 🔴 Yüksek | .env.production güncelle |
 | Grafana Cloud kurulumu | 🟡 Orta | Monitoring dashboard'ları |
@@ -125,14 +125,14 @@ HookSniff artık tamamen ücretsiz servisler üzerinde çalışıyor:
 
 - `.env.production` hala placeholder secrets içeriyor → deploy önce değiştirilmeli
 - Stripe webhook secret configure edilmeli
-- Oracle Cloud VM'de SSH erişimi kısıtlanmalı (sadece kendi IP)
+- Google Cloud Run VM'de SSH erişimi kısıtlanmalı (sadece kendi IP)
 - Cloudflare ile SSL Full (Strict) modu kullanılmalı
 
 ## 🗺️ Plan / Yol Haritası
 
 | Zaman | Hedef |
 |-------|-------|
-| Şimdi | Free-tier servisleri kur (Neon, Upstash, Oracle Cloud) |
+| Şimdi | Free-tier servisleri kur (Neon, Upstash, Google Cloud Run) |
 | 1. hafta | Production deploy, domain al |
 | 2. hafta | Beta kullanıcı bul (10-20 kişi) |
 | 1. ay | Geri bildirim al, düzelt |
@@ -171,7 +171,7 @@ HookSniff artık tamamen ücretsiz servisler üzerinde çalışıyor:
 - **DB:** PostgreSQL (Neon — serverless, ücretsiz)
 - **Cache:** Redis (Upstash — serverless, ücretsiz)
 - **Queue:** PostgreSQL (webhook_queue tablosu) + Redis (rate limiting)
-- **Hosting:** Oracle Cloud Always Free (API + Worker), Vercel (Dashboard)
+- **Hosting:** Google Cloud Run Always Free (API + Worker), Vercel (Dashboard)
 - **Auth:** JWT + API key (hr_live_ prefix) + Argon2
 - **Signing:** Standard Webhooks HMAC-SHA256
 - **Billing:** Stripe Checkout + Customer Portal + Webhook handler
@@ -205,7 +205,7 @@ HookSniff artık tamamen ücretsiz servisler üzerinde çalışıyor:
 9. Kapsamlı rekabet analizi yapıldı
 10. Detaylı kod incelemesi yapıldı
 11. hooksniff.is-a.dev domain seçildi ve kodda güncellendi
-12. Free-tier altyapı planı oluşturuldu (Oracle Cloud, Neon, Upstash, Vercel, Grafana, R2, Resend)
+12. Free-tier altyapı planı oluşturuldu (Google Cloud Run, Neon, Upstash, Vercel, Grafana, R2, Resend)
 13. Dokümantasyon güncellendi
 14. **Ödeme sistemi araştırması** — Stripe vs Paddle vs Polar.sh vs iyzico vs PayTR karşılaştırması
 15. **Polar.sh seçildi** — Türkiye'den kolay açılır, %4 komisyon, MoR
