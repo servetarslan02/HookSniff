@@ -27,17 +27,11 @@
 - 🔄 Vercel Rewrite kuruldu — tek URL: hooksniff.vercel.app (dashboard + API)
 - ⏳ Vercel deploy BUILDING durumunda (commit author düzeltildi)
 
-## Vercel Durumu (2026-05-08 05:04)
-- ❌ hooksniff-dashboard projesi — TÜM deploy'lar ERROR (rootDirectory sorunu)
-- 🔄 hooksniff-app yeni proje oluşturuldu (prj_Kw7HSjYokr03K6mGidHLWwxtgDCt)
-- 🔄 rootDirectory kaldırıldı, vercel-build script eklendi
-- 🔄 Son deploy deneniyor
-- ⚠️ Dashboard şu an erişilemez — eski deployment cache'den çalışıyor olabilir
-
-## Vercel Rewrite Durumu (2026-05-08 04:42)
-- ❌ Rewrite çalışmıyordu — /api/health 404 dönüyordu
-- ✅ next.config.js'ye rewrite'lar geri eklendi
-- Dashboard ✅ (eski deployment), API ✅ (doğrudan Cloud Run URL)
+## Vercel Durumu (2026-05-08 05:26) ✅
+- ✅ hooksniff-dash yeni proje (prj_cSIVYHpCoAtoihRp8xlXIun1KVSR)
+- ✅ Dashboard: https://hooksniff.vercel.app
+- ✅ API rewrite: /api/* → Cloud Run çalışıyor
+- ❌ Eski projeler silinebilir: hooksniff-dashboard (prj_NQgFly8h06oH5DTzClj7vyq3hqSO), hooksniff-app (prj_Kw7HSjYokr03K6mGidHLWwxtgDCt)
 
 ## Son Yapılan İşler (Oturum 4 - 2026-05-08)
 0. GitHub hafıza sistemi yeniden kuruldu
