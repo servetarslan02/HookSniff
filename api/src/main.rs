@@ -46,6 +46,9 @@ async fn main() -> Result<()> {
     let rate_limiter = rate_limit::create_rate_limiter().await;
     let throttle_manager = throttle::ThrottleManager::new();
 
+    // Initialize Resend email client (None if RESEND_API_KEY not set)
+    let resend_client = email::ResendClient::from_config(&cfg);
+
     // Spawn retention background job (runs every 24 hours)
     let retention_pool = pool.clone();
     let retention_days = cfg.retention_days;
@@ -80,6 +83,7 @@ async fn main() -> Result<()> {
         // CORS: restrict origins in production
         .layer(axum::Extension(pool.clone()))
         .layer(axum::Extension(metrics.clone()))
+        .layer(axum::Extension(resend_client))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg.cors_origins.iter()
                 .filter_map(|o| o.parse().ok())
