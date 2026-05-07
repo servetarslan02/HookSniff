@@ -1,0 +1,27 @@
+steps:
+  # Build API image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile.api', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest', '.']
+    id: 'build-api'
+
+  # Build Worker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile.worker', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest', '.']
+    id: 'build-worker'
+
+  # Push both images
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest']
+    waitFor: ['build-api']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest']
+    waitFor: ['build-worker']
+
+images:
+  - 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest'
+  - 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
