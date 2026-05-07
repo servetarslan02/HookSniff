@@ -1,44 +1,44 @@
 # 🪝 HookSniff — Durum Özeti
 
-> Son güncelleme: 2026-05-08 04:15
+> Son güncelleme: 2026-05-08 06:00
 
 ---
 
-## 🌐 URL'ler
+## URL'ler
 
-### Şimdilik Kullanılabilir (Ücretsiz)
 | Servis | URL | Durum |
 |--------|-----|-------|
-| **Dashboard** | https://hooksniff.vercel.app | ✅ Çalışıyor |
-| **API** | https://hooksniff-api-sdjufmaqka-ew.a.run.app | ✅ Çalışıyor |
-| **Worker** | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Çalışıyor |
+| Dashboard | https://hooksniff.vercel.app | ✅ Çalışıyor |
+| API | GCP Cloud Run | ✅ Çalışıyor |
+| Worker | GCP Cloud Run | ✅ Çalışıyor |
 
-### Hedef (Domain Alınca)
+### Domain Alınca
 | Servis | Hedef URL | Yönlendirme |
 |--------|-----------|-------------|
-| **Dashboard** | `hooksniff.eu.org` | Vercel |
-| **API** | `api.hooksniff.eu.org` | Cloud Run |
-| **Worker** | — | Sadece dahili (müşteri görmez) |
+| Dashboard | `hooksniff.eu.org` veya `hooksniff.com` | Vercel |
+| API | `api.hooksniff.eu.org` veya `api.hooksniff.com` | Cloud Run |
 
 ---
 
-## 🏗️ Altyapı
+## Altyapı
 
 | Bileşen | Servis | Durum | Not |
 |---------|--------|-------|-----|
-| **Frontend** | Vercel | ✅ | Next.js dashboard |
-| **API** | Google Cloud Run | ✅ | Rust (Axum) |
-| **Worker** | Google Cloud Run | ✅ | Webhook delivery |
-| **Database** | Neon PostgreSQL | ✅ | Serverless, ücretsiz |
-| **Cache** | Upstash Redis | ✅ | Serverless, ücretsiz |
-| **Email** | Resend | ⏳ | Domain doğrulama bekliyor |
-| **Monitoring** | Grafana Cloud | ⏳ | OTEL headers hazır |
-| **Storage** | Cloudflare R2 | ⏳ | Token hazır |
-| **CDN** | Cloudflare | ⏳ | Domain bekliyor |
+| Frontend | Vercel | ✅ | Next.js dashboard |
+| API | Google Cloud Run | ✅ | Rust (Axum) |
+| Worker | Google Cloud Run | ✅ | Webhook delivery |
+| Database | Neon PostgreSQL | ✅ | Serverless, ücretsiz |
+| Cache | Upstash Redis | ✅ | Serverless, ücretsiz |
+| Email | Resend | ⏳ | Domain doğrulama bekliyor |
+| Monitoring | Grafana Cloud | ⏳ | OTEL headers hazır |
+| Storage | Cloudflare R2 | ✅ | Token hazır |
+| CDN | Cloudflare | ⏳ | Domain bekliyor |
+| Ödeme (Global) | Polar.sh | ✅ | Pro $49 / Business $149 |
+| Ödeme (TR) | iyzico | ❌ | Hesap açılacak |
 
 ---
 
-## 💰 Maliyet (Şimdilik $0/ay)
+## Maliyet ($0/ay)
 
 | Servis | Free Tier | Limit |
 |--------|-----------|-------|
@@ -52,9 +52,9 @@
 
 ---
 
-## 🔑 Domain Planı
+## Domain Planı
 
-### Seçenek A: eu.org (Ücretsiz, Tavsiye Edilen)
+### Seçenek A: eu.org (Ücretsiz)
 - [ ] https://nic.eu.org/arf/en/ adresinden kayıt ol
 - [ ] `hooksniff.eu.org` için başvur
 - [ ] Nameserver: `ns1.cloudflare.com` / `ns2.cloudflare.com`
@@ -69,48 +69,22 @@
 
 ---
 
-## 📋 Yapılacaklar (Öncelik Sırasıyla)
+## Rakip Fiyat Karşılaştırması
 
-### 🔴 Acil
-- [ ] Domain başvurusu (eu.org veya .com)
-- [ ] Resend domain doğrulama (domain gelince)
-- [ ] Credential yenileme (tüm token'lar ifşa oldu)
-
-### 🟡 Orta
-- [ ] Cloudflare DNS kurulumu (domain gelince)
-- [ ] Cloud Run custom domain mapping
-- [ ] Resend email template'leri
-- [ ] Grafana monitoring dashboard
-
-### 🟢 Sonra
-- [ ] SDK publish (Node.js, Python)
-- [ ] API dokümantasyonu (OpenAPI)
-- [ ] Beta kullanıcı bul
+| Servis | Free Tier | Başlangıç | Orta Plan |
+|--------|-----------|-----------|-----------|
+| **Svix** | 50/sn, 30 gün ret. | $490/ay | Enterprise özel |
+| **Hookdeck** | 10K olay/ay, 3 gün ret. | $39/ay | $499/ay |
+| **Convoy** | Self-host ücretsiz | Cloud belirsiz | — |
+| **Hook0** | Self-host ücretsiz | Cloud free tier | — |
+| **HookSniff** | 1K olay/ay, 7 gün ret. | $49/ay | $149/ay |
 
 ---
 
-## 🔗 Önemli Linkler
+## Önemli Linkler
 
-- **GitHub:** https://github.com/servetarslan02/HookSniff
-- **Vercel Dashboard:** https://hooksniff.vercel.app
-- **GCP Console:** https://console.cloud.google.com/run?project=hooksniff-app
-- **is-a.dev PR:** #37726 (kapatıldı — ticari kullanıma uygun değil)
-
----
-
-## 📁 Dosya Yapısı
-
-```
-HookSniff/
-├── api/                    # Rust API (Axum)
-├── worker/                 # Webhook delivery worker
-├── dashboard/              # Next.js frontend
-├── sdks/                   # SDK'lar (Node, Python, Go)
-├── deploy/                 # Deploy scriptleri
-├── .ai-context/            # AI agent hafıza dosyaları
-├── MEMORY.md               # Uzun vadeli hafıza
-├── TODO.md                 # Yapılacaklar
-├── SESSION_NOTES.md        # Oturum notları
-├── CONTEXT.md              # Proje bağlamı
-└── STATUS.md               # ← BU DOSYA (genel durum)
-```
+- GitHub: https://github.com/servetarslan02/HookSniff
+- Vercel Dashboard: https://hooksniff.vercel.app
+- GCP Console: https://console.cloud.google.com/run?project=hooksniff-app
+- Neon Console: https://console.neon.tech
+- Polar.sh: https://polar.sh (slug: hooksniff)
