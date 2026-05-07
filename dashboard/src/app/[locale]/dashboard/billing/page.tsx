@@ -222,7 +222,7 @@ export default function BillingPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Manage your subscription, usage, and payment history
+          {t('subtitle')}
         </p>
       </div>
 
@@ -236,7 +236,7 @@ export default function BillingPage() {
                 {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
               </span>
               <span className="text-sm text-gray-500 dark:text-slate-400">
-                Next billing: {new Date(nextBillingDate).toLocaleDateString()}
+                {t('nextBilling')}: {new Date(nextBillingDate).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -254,7 +254,7 @@ export default function BillingPage() {
         <div className="flex items-center gap-6">
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600 dark:text-slate-400">Webhooks this month</span>
+              <span className="text-gray-600 dark:text-slate-400">{t('webhooksThisMonth')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {usageCount.toLocaleString()} / {usageLimit.toLocaleString()}
               </span>
@@ -270,13 +270,13 @@ export default function BillingPage() {
             </div>
             {usagePercent > 80 && (
               <p className="text-xs text-red-600 dark:text-red-400 mt-1.5">
-                ⚠️ You&apos;re approaching your plan limit. Consider upgrading.
+                ⚠️ {t('approachingLimit')}
               </p>
             )}
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold text-gray-900 dark:text-white">{usagePercent}%</div>
-            <div className="text-sm text-gray-500 dark:text-slate-400">used</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400">{t('used')}</div>
           </div>
         </div>
       </div>
@@ -294,7 +294,7 @@ export default function BillingPage() {
           </div>
         ) : (
           <p className="text-sm text-gray-400 dark:text-slate-500 py-6 text-center">
-            No usage data yet
+            {t('noUsageData')}
           </p>
         )}
       </div>
@@ -316,7 +316,7 @@ export default function BillingPage() {
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-3 py-0.5 rounded-full text-xs font-medium">
-                    Most Popular
+                    {t('mostPopular')}
                   </div>
                 )}
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
@@ -334,7 +334,7 @@ export default function BillingPage() {
                 </ul>
                 {isCurrent ? (
                   <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
-                    Current Plan
+                    {t('currentPlanLabel')}
                   </div>
                 ) : (
                   <button
@@ -359,7 +359,7 @@ export default function BillingPage() {
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('invoiceHistory')}</h2>
-          <span className="text-sm text-gray-400 dark:text-slate-500">{invoices.length} invoices</span>
+          <span className="text-sm text-gray-400 dark:text-slate-500">{invoices.length} {t('invoices')}</span>
         </div>
         {loadingInvoices ? (
           <div className="px-6 py-12 text-center">
