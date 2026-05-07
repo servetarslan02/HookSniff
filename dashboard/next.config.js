@@ -25,7 +25,18 @@ const nextConfig = {
     }];
   },
   async rewrites() {
-    if (process.env.NODE_ENV === 'production') return [];
+    if (process.env.NODE_ENV === 'production') {
+      return [
+        {
+          source: '/api/health',
+          destination: 'https://hooksniff-api-sdjufmaqka-ew.a.run.app/health',
+        },
+        {
+          source: '/api/:path*',
+          destination: 'https://hooksniff-api-sdjufmaqka-ew.a.run.app/v1/:path*',
+        },
+      ];
+    }
     return [
       {
         source: '/api/:path*',
