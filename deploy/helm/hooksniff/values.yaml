@@ -1,0 +1,100 @@
+# HookSniff Helm Chart — Default Values
+
+replicaCount: 1
+
+# ── API ──
+api:
+  image:
+    repository: hooksniff-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  port: 3000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── Worker ──
+worker:
+  image:
+    repository: hooksniff-worker
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── Dashboard ──
+dashboard:
+  image:
+    repository: hooksniff-dashboard
+    tag: latest
+    pullPolicy: IfNotPresent
+  port: 3001
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# ── PostgreSQL ──
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: hooksniff
+    database: hooksniff
+  primary:
+    persistence:
+      enabled: true
+      size: 5Gi
+
+# ── Redis ──
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 1Gi
+
+# ── Environment ──
+env:
+  JWT_SECRET: "change-me-in-production"
+  HMAC_SECRET: "change-me-in-production"
+  API_BASE_URL: "http://localhost:3000"
+  DASHBOARD_URL: "http://localhost:3001"
+
+# ── Ingress ──
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: hooksniff.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: dashboard
+        - path: /v1
+          pathType: Prefix
+          service: api
+  tls: []
+
+# ── Service ──
+service:
+  api:
+    type: ClusterIP
+    port: 3000
+  dashboard:
+    type: ClusterIP
+    port: 3001
