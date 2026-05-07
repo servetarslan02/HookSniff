@@ -1,5 +1,5 @@
 use anyhow::Result;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -72,7 +72,7 @@ async fn cleanup_webhook_queue(pool: &PgPool) -> Result<u64> {
 /// Reset monthly webhook counters for all customers.
 ///
 /// Runs on the 1st of each month. Uses a marker to avoid running twice.
-async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
+pub async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
     let now = Utc::now();
     // Only reset on the 1st of the month, within the first 24 hours
     if now.day() != 1 {

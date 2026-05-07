@@ -3,6 +3,7 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -194,7 +195,7 @@ async fn open_portal(
                 )))?;
 
             // Get the provider-specific customer ID
-            let provider_customer_id = match provider_name {
+            let provider_customer_id = match provider_name.as_str() {
                 "polar" => customer.polar_customer_id.as_deref(),
                 "iyzico" => customer.iyzico_customer_id.as_deref(),
                 _ => None,

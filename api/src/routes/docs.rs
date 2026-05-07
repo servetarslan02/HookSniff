@@ -34,7 +34,7 @@ const SWAGGER_UI_HTML: &str = r#"<!DOCTYPE html>
 </body>
 </html>"#;
 
-const OPENAPI_SPEC: &str = include_str!("../../docs/openapi.yaml");
+const OPENAPI_SPEC: &str = include_str!("../../../docs/openapi.yaml");
 
 pub async fn swagger_ui() -> Html<&'static str> {
     Html(SWAGGER_UI_HTML)

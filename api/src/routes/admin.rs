@@ -168,7 +168,7 @@ async fn list_users(
     let mut bind_idx = 1;
 
     if params.search.is_some() {
-        conditions.push(format!("(email ILIKE ${} OR name ILIKE ${})", bind_idx));
+        conditions.push(format!("(email ILIKE ${0} OR name ILIKE ${0})", bind_idx));
         bind_idx += 1;
     }
     if params.plan.is_some() {
@@ -196,15 +196,16 @@ async fn list_users(
     let mut users_query = sqlx::query_as::<_, UserSummary>(&base_query);
     let mut count_query = sqlx::query_as::<_, (i64,)>(&count_query);
 
-    if let Some(ref search) = params.search {
-        // Escape ILIKE special characters (%, _, \)
-        let escaped = search
+    let search_pattern = params.search.as_ref().map(|s| {
+        let escaped = s
             .replace('\\', "\\\\")
             .replace('%', "\\%")
             .replace('_', "\\_");
-        let pattern = format!("%{}%", escaped);
-        users_query = users_query.bind(&pattern);
-        count_query = count_query.bind(&pattern);
+        format!("%{}%", escaped)
+    });
+    if let Some(ref pattern) = search_pattern {
+        users_query = users_query.bind(pattern);
+        count_query = count_query.bind(pattern);
     }
     if let Some(ref plan) = params.plan {
         users_query = users_query.bind(plan);
