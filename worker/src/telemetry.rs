@@ -28,6 +28,7 @@ fn init_otel(
     headers: Option<&str>,
 ) {
     use opentelemetry::global;
+    use opentelemetry::trace::TracerProvider as _;
     use opentelemetry_sdk::trace::TracerProvider;
     use opentelemetry_otlp::WithExportConfig;
 
@@ -36,14 +37,15 @@ fn init_otel(
     let mut header_map = HashMap::new();
     if let Some(hdrs) = headers {
         for header in hdrs.split(',') {
-            if let Some((key, value)) = header.trim().split_once('=') {
+            if let Some((key, value)) = header.trim().split_once(':') {
+                header_map.insert(key.trim().to_string(), value.trim().to_string());
+            } else if let Some((key, value)) = header.trim().split_once('=') {
                 header_map.insert(key.trim().to_string(), value.trim().to_string());
             }
         }
     }
 
     let exporter = opentelemetry_otlp::new_exporter()
-        .http()
         .with_endpoint(otlp_endpoint)
         .with_headers(header_map)
         .build_span_exporter()
