@@ -24,6 +24,31 @@ pub mod delivery;
 mod signing;
 pub mod telemetry;
 
+/// Start a minimal HTTP health check server for Cloud Run.
+/// Cloud Run requires containers to listen on PORT=8080.
+async fn start_health_server(port: u16) {
+    use axum::{routing::get, Router};
+
+    let app = Router::new()
+        .route("/health", get(|| async { "ok" }))
+        .route("/", get(|| async { "HookSniff Worker 🐝" }));
+
+    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
+    tracing::info!("🏥 Health check server on :{}", port);
+
+    let listener = match tokio::net::TcpListener::bind(addr).await {
+        Ok(l) => l,
+        Err(e) => {
+            tracing::error!("❌ Failed to bind health server on port {}: {}", port, e);
+            return;
+        }
+    };
+
+    if let Err(e) = axum::serve(listener, app).await {
+        tracing::error!("❌ Health server error: {}", e);
+    }
+}
+
 /// Webhook message format used by delivery modules.
 /// Bridges the queue item format with the delivery router.
 #[derive(Debug, Clone)]
@@ -63,6 +88,13 @@ async fn main() -> Result<()> {
 
     tracing::info!("🔧 HookSniff Worker starting...");
     tracing::info!("   Database: {}", &cfg.database_url[..30.min(cfg.database_url.len())]);
+
+    // Start health check HTTP server for Cloud Run (PORT env or 8080)
+    let health_port: u16 = std::env::var("PORT")
+        .unwrap_or_else(|_| "8080".to_string())
+        .parse()
+        .unwrap_or(8080);
+    tokio::spawn(start_health_server(health_port));
 
     // Database pool
     let pool = PgPoolOptions::new()
