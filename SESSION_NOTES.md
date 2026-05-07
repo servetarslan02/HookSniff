@@ -57,3 +57,10 @@ GitHub'da kayıtlı: `.ai-context/EXTERNAL_TOKENS.md`
 - GCP Deploy: deploy/gcp-deploy.sh
 - Neon: https://console.neon.tech
 - Upstash: https://console.upstash.com
+
+## 🔧 Devam Eden İş — GCP Deploy (02:43)
+- gcloud CLI kuruldu (/opt/google-cloud-sdk/)
+- Docker kuruldu ve çalışıyor (v29.4.3)
+- Servet'ten GCP Service Account key bekleniyor
+- gcloud auth activate-service-account ile giriş yapılacak
+- Sonra: Docker build → Artifact Registry push → Cloud Run deploy
