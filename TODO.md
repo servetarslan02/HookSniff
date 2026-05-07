@@ -1,149 +1,90 @@
-# 🪝 HookSniff — Yapılacaklar Listesi
+# HookSniff — Yapılacaklar (Birleştirilmiş)
 
-> Son güncelleme: 2026-05-06
-> Bu dosya GitHub'da takip edilir. Her tamamlanan iş ✅ yapılır.
-
----
-
-## 📋 Teknoloji Kararı (2026-05-06)
-- **Backend:** Rust (Axum) — mevcut kod
-- **Frontend:** Next.js (React) — mevcut kod
-- **Database:** PostgreSQL (Neon — serverless, ücretsiz)
-- **Cache:** Redis (Upstash — serverless, ücretsiz)
-- **Queue:** PostgreSQL tablo (webhook_queue) + Redis (rate limiting)
-- **Workflow:** Basit retry loop (worker polling)
-- **Hosting:** Google Cloud Run (API + Worker) + Vercel (Dashboard)
-- **Monitoring:** Grafana Cloud (ücretsiz tier)
-- **Storage:** Cloudflare R2 (ücretsiz tier)
-- **Email:** Resend (ücretsiz tier)
-- **CDN:** Cloudflare (ücretsiz plan)
+> Son güncelleme: 2026-05-08
+> Kaynaklar: FEATURES.md, MEMORY.md, rekabet analizi
 
 ---
 
-## 🔴 Yapılacak (Öncelik Sırasıyla)
+## 🔴 Acil — Blocking
 
-### 1. Production Deploy (Bu Hafta)
-- [ ] Neon hesabı aç ve PostgreSQL projesi oluştur
-- [ ] Upstash hesabı aç ve Redis oluştur
-- [ ] Google Cloud Run servislerini deploy et
-- [ ] VM'de Docker kur ve container'ları deploy et
-- [ ] Vercel'de dashboard deploy et
-- [ ] Domain al ($12) — hooksniff.is-a.dev veya alternatifi
-- [ ] Cloudflare ile DNS/SSL ayarla
-- [ ] Grafana Cloud kur (monitoring)
-- [ ] Cloudflare R2 kur (storage)
-- [ ] Resend kur (email)
-- [ ] .env.production güncelle (tüm credentials)
-- [ ] End-to-end test (webhook gönder → teslim et)
-
-### 2. Ödeme Sistemi (Bu Hafta)
-- [x] Polar.sh hesap açıldı (bireysel, Türkiye) ✅
-- [x] Pro plan oluşturuldu ($49/ay) ✅
-- [x] Business plan oluşturuldu ($149/ay) ✅
-- [x] Polar.sh webhook URL kaydedildi ✅
-- [ ] iyzico hesabı aç (merchant.iyzipay.com)
-- [ ] Wise Business hesabı aç (para çekme için)
-- [ ] Polar.sh + iyzico webhook test et
-
-### 2. Test ve Doğrulama (Bu Hafta)
-- [ ] Production'da webhook gönderme test et
-- [ ] Dashboard açılıyor mu kontrol et (Vercel URL)
-- [ ] API health check kontrol et
-- [ ] SDK test et (Node.js)
-- [ ] Monitoring dashboard'larını kontrol et
-
-### 3. SDK Publish (Gelecek Hafta)
-- [ ] Node SDK → npm publish (`@hooksniff/sdk`)
-- [ ] Python SDK → pypi publish (`hooksniff`)
-- [ ] README'leri güncelle
-
-### 4. Dokümantasyon (Gelecek Hafta)
-- [ ] API Reference (OpenAPI)
-- [ ] SDK Kullanım Kılavuzu
-- [ ] Self-hosted kurulum rehberi
-
-### 5. Büyüme (Hazır Olunca)
-- [ ] Beta kullanıcı bul (Reddit/HN/ProductHunt)
-- [ ] İlk ücretli müşteri ($49)
-- [ ] Embeddable portal
-- [ ] Webhook transformations
+1. Render Docker build hatasını düzelt — API + Worker deploy olmuyor
+2. Resend domain doğrulama — DNS TXT + MX kayıtları ekle
 
 ---
 
-## ✅ Tamamlanan İşler (2026-05-06)
+## Satılabilir Ürün — Hafta 1-2
 
-### Kod İncelemesi
-- [x] Kapsamlı kod incelemesi yapıldı
-- [x] 6 kritik sorun düzeltildi
-- [x] 8 orta sorun düzeltildi
-- [x] Rate limiter aktif edildi
-- [x] CORS kısıtlandı
-- [x] Production secret validation
-
-### Rekabet Analizi
-- [x] Rakip analizi (COMPETITIVE_ANALYSIS.md)
-- [x] Svix, Hookdeck, Hook0 karşılaştırma
-
-### Yeni Feature'lar
-- [x] FIFO sıralı teslimat (api/src/fifo/)
-- [x] Per-endpoint throttling (api/src/throttle/)
-- [x] Embeddable portal widget (portal/embed.js)
-- [x] Customer self-service API (routes/customer_portal.rs)
-- [x] Standard Webhooks tam uyumluluk (signing.rs)
-
-### Altyapı
-- [x] .dockerignore oluşturuldu
-- [x] Go SDK go.mod oluşturuldu
-- [x] Python SDK versiyon同步
-- [x] k8s secrets template
-- [x] Free-tier altyapı planı oluşturuldu
-- [x] FREE_TIER_SETUP.md yazıldı
-
-### Sadeleştirme
-- [x] ~~Kafka~~ → PostgreSQL queue ✅
-- [x] ~~Temporal~~ → Basit retry loop ✅
-- [x] ~~CockroachDB~~ → PostgreSQL (Neon) ✅
-- [x] Eski Kafka/Temporal/CockroachDB kodları temizlendi ✅
-- [x] Dockerfile'lar sadeleştirildi ✅
-- [x] docker-compose.yml güncellendi (4 servis) ✅
-- [x] Makefile güncellendi ✅
-
-### Dokümantasyon Temizliği
-- [x] REVIEW.md silindi (kapsamlı ama güncel değil)
-- [x] USEFUL_REPOS.md silindi (COMPETITIVE_ANALYSIS.md ile birleştirildi)
-- [x] QUICKSTART.md silindi (FREE_TIER_SETUP.md ile değiştirildi)
-- [x] TROUBLESHOOTING.md silindi (FREE_TIER_SETUP.md'ye taşındı)
-- [x] COMPETITIVE_DEEP_DIVE.md silindi (COMPETITIVE_ANALYSIS.md ile birleştirildi)
-- [x] RISKS.md silindi (CONTEXT.md'ye taşındı)
-- [x] BUGS.md silindi (sorunlar düzeltildi)
-- [x] FEATURES.md güncellendi (AI Center kaldırıldı)
-- [x] README.md güncellendi (free-tier tech stack)
-- [x] CONTEXT.md güncellendi
+3. Customer Self-Service sayfasını tamamla — backend kısmen hazır, frontend'i bitir
+4. Webhook Playground UI güncelle — backend hazır (`routes/playground.rs`), frontend güncellemesi gerek
+5. Delivery Attempt Details UI güncelle — backend hazır (`routes/delivery_details.rs`), frontend güncellemesi gerek
+6. Custom Retry Policy UI ekle — backend hazır (retry_policy JSONB), dashboard'da ayar paneli yok
+7. Signature Rotation UI ekle — backend var (old_signing_secret), dashboard'da buton yok
+8. Rate Limit Dashboard ekle — backend var, UI yok
 
 ---
 
-## 📝 Notlar
+## Rekabet Avantajı — Hafta 3-4
 
-### Neden Free-Tier?
-- Sıfır maliyet ile başla
-- Gelir olmadan harcama yapma
-- Google Cloud Run → 2M istek/ay ücretsiz
-- Neon/Upstash/Vercel/Grafana/R2/Resend → cömert ücretsiz tier
-- Büyüyünce ücretli planlara geç
-
-### Hosting Planı
-- Şimdi: Free-tier servisler ($0)
-- 100 kullanıcı: Free-tier yeterli
-- 1000 kullanıcı: Neon Scale ($19) + Vercel Pro ($20)
-- 10000+ kullanıcı: Dedicated infra ($100+)
-
-### Ölçeklenme Adımları
-```
-Şimdi:     PostgreSQL queue (10K event/dk)
-1. adım:   Redis queue (100K event/dk)
-2. adım:   Ayrı message queue (1M+ event/dk)
-```
+9. Embeddable Customer Portal tamamla — `portal/embed.js` var ama başlanmamış, iframe ile SaaS'lara kendi müşterilerine webhook dashboard gösterme
+10. CLI Tool'u tamamla — `cli/index.js` kısmen hazır, bitir
+11. Webhook Alerting test et — backend + frontend hazır
+12. Endpoint Health Monitoring test et — backend + frontend hazır
+13. Standard Webhooks header'larını ekle — şu an `X-HookSniff-Signature` kullanıyorsun, Standard Webhooks spec'e tam uyum için `webhook-id`, `webhook-timestamp`, `webhook-signature` header'larını da ekle (veya mevcut formatı standard formata çevir: `v1,` prefix + base64)
+14. Free tier limitini artır — şu an 1,000 webhook/ay, rakipler 10k+ veriyor. En az 10,000/ay yap
+15. iyzico hesabını aç — Türk müşteriler için ödeme
 
 ---
 
-> 💡 Her hafta bu dosyayı güncelle. Tamamlanan işleri ✅ yap, yeni işler ekle.
+## Fark Yaratma — Hafta 5-6
+
+16. Webhook Transformations ekle — payload'ı teslimattan önce dönüştürme (map, filter, enrich)
+17. Self-Hosted kurulumu kolaylaştır — docker-compose var ama tek komutla çalışan `make self-host` veya Helm chart hazırla, dokümantasyon yaz
+18. Webhook Analytics Dashboard tamamla — backend ve frontend kısmen hazır, tamamla
+19. Inbound Webhook Proxy ekle — şu an sadece outbound var. Hookdeck'in tek güçlü yanı bu. Webhook alma + yönlendirme desteği ile rakiplerden ayrış
+20. Event type hierarchy filtering — `event_filter` sütunu var ama dot-notation hiyerarşik eşleşme destekleniyor mu? (örn: `user.*` ile `user.created` + `user.updated` hepsini yakala). Kontrol et, eksikse ekle
+21. Timestamp toleransı (replay protection) — Standard Webhooks ±5dk tolerans öneriyor. Alıcı tarafında timestamp doğrulama rehberi/docs ekle
+
+---
+
+## Ek Özellikler
+
+22. Bulk Operations — toplu endpoint oluşturma/silme, toplu replay
+23. WebSocket real-time updates — dashboard'da canlı olay akışı (SSE veya WS)
+24. Event Schema Validation — her event type için JSON Schema tanımlama ve gelen payload'ı doğrulama
+25. Terraform Provider — IaC kullanıcıları için
+26. Unit + integration test yaz — FEATURES.md'de her yerde "Test ❌"
+27. Grafana OTEL test et — Grafana Cloud hesabı var ama doğrulanmamış
+
+---
+
+## Durum Takibi
+
+| # | Görev | Durum |
+|---|-------|-------|
+| 1 | Render Docker build | ❌ |
+| 2 | Resend domain | ❌ |
+| 3 | Customer Self-Service | ⚠️ Kısmen |
+| 4 | Playground UI | ⚠️ Backend hazır |
+| 5 | Delivery Details UI | ⚠️ Backend hazır |
+| 6 | Custom Retry Policy UI | ⚠️ Backend hazır |
+| 7 | Signature Rotation UI | ⚠️ Backend hazır |
+| 8 | Rate Limit Dashboard | ⚠️ Backend hazır |
+| 9 | Embeddable Portal | ❌ |
+| 10 | CLI Tool | ⚠️ Kısmen |
+| 11 | Alerting test | ✅ Hazır |
+| 12 | Health Monitoring test | ✅ Hazır |
+| 13 | Standard Webhooks headers | ❌ |
+| 14 | Free tier artır | ❌ |
+| 15 | iyzico hesabı | ❌ |
+| 16 | Transformations | ❌ |
+| 17 | Self-Host kolaylaştırma | ⚠️ docker-compose var |
+| 18 | Analytics Dashboard | ⚠️ Kısmen |
+| 19 | Inbound Webhook Proxy | ❌ |
+| 20 | Event hierarchy filtering | ❌ Kontrol et |
+| 21 | Timestamp tolerans docs | ❌ |
+| 22 | Bulk Operations | ❌ |
+| 23 | WebSocket real-time | ❌ |
+| 24 | Event Schema Validation | ❌ |
+| 25 | Terraform Provider | ❌ |
+| 26 | Test coverage | ❌ |
+| 27 | Grafana OTEL test | ⚠️ Hesap var |
