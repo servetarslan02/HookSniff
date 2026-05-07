@@ -24,6 +24,18 @@ const nextConfig = {
       ],
     }];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/health',
+        destination: 'https://hooksniff-api-sdjufmaqka-ew.a.run.app/health',
+      },
+      {
+        source: '/api/:path*',
+        destination: 'https://hooksniff-api-sdjufmaqka-ew.a.run.app/v1/:path*',
+      },
+    ];
+  },
 };
 
 module.exports = withNextIntl(nextConfig);
