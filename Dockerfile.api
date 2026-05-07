@@ -3,8 +3,10 @@ FROM rust:latest AS builder
 
 WORKDIR /app
 COPY Cargo.toml ./
+COPY Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
+COPY docs/ docs/
 
 # Build release binary
 RUN cargo build --release -p hooksniff-api && \
@@ -18,8 +20,10 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
-RUN groupadd -r hooksniff && useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff
+# Create non-root user and app directory
+RUN groupadd -r hooksniff && \
+    useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff && \
+    mkdir -p /app
 
 COPY --from=builder /app/target/release/hooksniff-api /usr/local/bin/hooksniff-api
 
