@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 06:00 GMT+8
+> Son güncelleme: 2026-05-08 06:45 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -27,73 +27,55 @@
 | iyzico | ❌ | Hesap açılmamış |
 | Domain | ❌ | eu.org veya .com alınacak |
 
+## MVP Durumu — 13/13 TAMAMLANDI ✅
+
+1. ✅ Free tier limit 1,000 → 10,000/webhook/ay
+2. ✅ Standard Webhooks header'ları (zaten implemente edilmiş)
+3. ✅ Playground UI (zaten dolu)
+4. ✅ Delivery Details UI (zaten dolu)
+5. ✅ Custom Retry Policy UI — yeni endpoint detail sayfası
+6. ✅ Signature Rotation UI — endpoint detail sayfasında
+7. ✅ Rate Limit Dashboard — endpoint detail sayfasında
+8. ✅ Customer Self-Service (zaten dolu)
+9. ✅ Event hierarchy filtering (zaten çalışıyor)
+10. ✅ Timestamp tolerans docs — docs/SECURITY.md
+11. ✅ Alerting (backend+frontend hazır)
+12. ✅ Health Monitoring (backend+frontend hazır)
+13. ✅ Grafana OTEL (backend hazır)
+
+## Yapılan Değişiklikler (2026-05-08)
+
+### Free Tier Limit
+- `api/src/billing/mod.rs`: Plan::Free max_webhooks_per_month 10,000
+- `api/src/db.rs`: webhook_limit DEFAULT 10000
+- `api/src/routes/admin.rs`: default limit 10,000
+- `migrations/029_free_tier_10k.sql`: mevcut müşterileri güncelle
+
+### Endpoint Settings API
+- `api/src/routes/endpoints.rs`: PUT /{id} update endpoint + PUT /{id}/retry-policy
+
+### Endpoint Settings UI
+- `dashboard/src/app/[locale]/dashboard/endpoints/[id]/page.tsx`: Retry policy, signature rotation, rate limit
+- `dashboard/src/lib/api.ts`: endpointsApi.update + updateRetryPolicy
+
+### Security Docs
+- `docs/SECURITY.md`: Replay protection, signature verification, rotation rehberi
+
 ## Mimari
 
 - **API:** Rust + Axum, port 3000, PostgreSQL (Neon) + Redis (Upstash)
 - **Worker:** Rust + Tokio, PostgreSQL queue poll, HTTP/gRPC/SQS/WebSocket delivery
 - **Dashboard:** Next.js 15, Tailwind + Radix + Tremor, Vercel'de
 - **Auth:** JWT (dashboard) + API key `hr_live_*` (programatik), Argon2 hash
-- **Signing:** HMAC-SHA256, `X-HookSniff-Signature` header
+- **Signing:** HMAC-SHA256, `webhook-id`/`webhook-timestamp`/`webhook-signature` (Standard Webhooks)
 - **Retry:** Exponential backoff + jitter, per-endpoint custom policy (JSONB)
 - **Billing:** Polar.sh (global), iyzico (TR), Stripe (hazır ama kullanılmıyor)
-- **Monitoring:** OpenTelemetry → Grafana Cloud
 
-## Mevcut Özellikler (Backend Hazır)
+## Sonraki Adımlar
 
-- API Key management (`routes/api_keys.rs`)
-- Webhook playground (`routes/playground.rs`)
-- Delivery attempt details (`routes/delivery_details.rs`)
-- Webhook log search (`routes/search.rs`)
-- Alerting (`routes/alerts.rs`)
-- Endpoint health monitoring (`routes/health_endpoints.rs`)
-- Outbound IP listesi (`routes/outbound_ips.rs`)
-- Customer portal (`routes/customer_portal.rs`)
-- Billing (`routes/billing.rs`)
-- SSRF protection (`ssrf.rs`)
-- Per-endpoint throttle (`throttle/`)
-- FIFO delivery (`fifo/`)
-- AI anomaly detection (fraud, churn, segment)
-
-## Rekabet Analizi Özeti
-
-### Rakipler
-| Rakip | Güçlü | Zayıf |
-|-------|-------|-------|
-| **Svix** | En olgun, 6 SDK, Standard Webhooks | Pahalı ($490+), open-core |
-| **Hookdeck** | Inbound webhook proxy | Sadece inbound, self-host yok |
-| **Convoy** | Go performans, inbound+outbound | Elastic License (tam OSS değil) |
-| **Hook0** | Tam OSS, self-host parity | Sadece 2 SDK, genç proje |
-
-### HookSniff Farkları
-- 11 SDK (en geniş)
-- $49/ay (Svix'ten 10x ucuz)
-- MIT lisans (tam açık kaynak)
-- 4 delivery method (HTTP, WS, gRPC, SQS)
-- AI anomaly detection
-- $0/ay hosting (free tier servisler)
-
-## Kritik Olaylar
-
-### Credential İfşası (2026-05-08)
-Tüm token'lar chat'te paylaşıldı. EXTERNAL_TOKENS.md'de listeli.
-- Şimdilik kalacak, deploy sonrası yenilenecek
-- GitHub PAT, Vercel, Neon, Upstash, Grafana, Polar, Resend, Render, Cloudflare, R2
-
-### Render Build Hataları
-- OpenSSL-sys derleme hatası
-- Çözüldü: rust:slim + pkg-config + libssl-dev
-- Alternatif: GCP Cloud Run'a geçildi (çalışıyor)
-
-## Domain Durumu
-- is-a.dev: İptal (ticari kullanıma uygun değil)
-- edu domain: İptal
-- Kalan seçenekler: eu.org (ücretsiz) veya .com ($12/yıl)
-
-## Paket Publish Planı (Gelecek)
-- npm: `@hooksniff/sdk` scope reserve et
-- PyPI: `hooksniff` paket adı
-- crates.io: `hooksniff` paket adı
-- Terraform Registry: provider publish
+1. **Servet yapacak:** Render Docker build düzelt, Resend domain doğrulama, Domain kararı, iyzico hesap
+2. **v1.1:** Embeddable Portal, CLI Tool, Inbound Proxy, Transformations
+3. **v1.2:** Bulk Ops, WebSocket real-time, Schema Validation, Self-Host
 
 ---
 
