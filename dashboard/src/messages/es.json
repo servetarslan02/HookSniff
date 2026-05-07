@@ -686,5 +686,26 @@
     "rotateDesc": "The old key will stop working immediately. You’ll receive a new key to replace it.",
     "deleteTitle": "Delete API Key?",
     "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access."
+  },
+  "onboarding": {
+    "welcome": "¡Bienvenido a HookSniff! 🪝",
+    "welcomeDesc": "Todo está listo. Repasemos los conceptos básicos para que puedas empezar a enviar webhooks en minutos.",
+    "getStarted": "Empezar",
+    "skipTour": "Saltar tour",
+    "back": "Atrás",
+    "createEndpoint": "Crea tu primer endpoint",
+    "createEndpointDesc": "Un endpoint es una URL donde entregaremos tus webhooks. Añade la URL de tu servidor.",
+    "createEndpointCta": "Crear endpoint",
+    "sendWebhook": "Envía tu primer webhook",
+    "sendWebhookDesc": "Usa nuestra API o dashboard para enviar un webhook de prueba a tu endpoint.",
+    "sendWebhookCta": "Enviar webhook",
+    "monitorDeliveries": "Monitorea entregas",
+    "monitorDeliveriesDesc": "Rastrea cada entrega de webhook en tiempo real. Ve tasas de éxito, depura fallos.",
+    "monitorDeliveriesCta": "Ir al dashboard"
+  },
+  "chart": {
+    "hours24": "24 Horas",
+    "days7": "7 Días",
+    "days30": "30 Días"
   }
 }
