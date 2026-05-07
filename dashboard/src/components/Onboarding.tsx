@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Step {
   title: string;
@@ -66,6 +67,7 @@ function MonitorIllustration() {
 export function Onboarding({ onComplete }: { onComplete?: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [visible, setVisible] = useState(false);
+  const t = useTranslations('onboarding');
 
   useEffect(() => {
     const completed = localStorage.getItem(STORAGE_KEY);
@@ -90,30 +92,30 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
 
   const steps: Step[] = [
     {
-      title: 'Welcome to HookSniff! 🪝',
-      description: 'You\'re all set up. Let\'s walk through the basics so you can start sending webhooks in minutes.',
+      title: t('welcome'),
+      description: t('welcomeDesc'),
       illustration: <WelcomeIllustration />,
-      cta: 'Get started',
+      cta: t('getStarted'),
     },
     {
-      title: 'Create your first endpoint',
-      description: 'An endpoint is a URL where we\'ll deliver your webhooks. Add your server URL and we\'ll start sending.',
+      title: t('createEndpoint'),
+      description: t('createEndpointDesc'),
       illustration: <EndpointIllustration />,
-      cta: 'Create endpoint',
+      cta: t('createEndpointCta'),
       ctaAction: () => window.location.href = '/dashboard/endpoints',
     },
     {
-      title: 'Send your first webhook',
-      description: 'Use our API or dashboard to send a test webhook to your endpoint. We\'ll handle retries and signing.',
+      title: t('sendWebhook'),
+      description: t('sendWebhookDesc'),
       illustration: <WebhookIllustration />,
-      cta: 'Send webhook',
+      cta: t('sendWebhookCta'),
       ctaAction: () => window.location.href = '/dashboard/playground',
     },
     {
-      title: 'Monitor deliveries',
-      description: 'Track every webhook delivery in real-time. See success rates, debug failures, and monitor performance.',
+      title: t('monitorDeliveries'),
+      description: t('monitorDeliveriesDesc'),
       illustration: <MonitorIllustration />,
-      cta: 'Go to dashboard',
+      cta: t('monitorDeliveriesCta'),
     },
   ];
 
@@ -167,7 +169,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
               onClick={dismiss}
               className="text-sm text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
             >
-              Skip tour
+              {t('skipTour')}
             </button>
             <div className="flex gap-3">
               {currentStep > 0 && (
@@ -175,7 +177,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
                   onClick={() => setCurrentStep(s => s - 1)}
                   className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition"
                 >
-                  Back
+                  {t('back')}
                 </button>
               )}
               <button

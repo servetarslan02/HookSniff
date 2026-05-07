@@ -686,5 +686,26 @@
     "rotateDesc": "The old key will stop working immediately. You’ll receive a new key to replace it.",
     "deleteTitle": "Delete API Key?",
     "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access."
+  },
+  "onboarding": {
+    "welcome": "HookSniff에 오신 것을 환영합니다! 🪝",
+    "welcomeDesc": "설정이 완료되었습니다. 몇 분 안에 웹훅을 보낼 수 있도록 기본 사항을 안내해 드리겠습니다.",
+    "getStarted": "시작하기",
+    "skipTour": "투어 건너뛰기",
+    "back": "뒤로",
+    "createEndpoint": "첫 번째 엔드포인트 만들기",
+    "createEndpointDesc": "엔드포인트는 웹훅을 전달할 URL입니다. 서버 URL을 추가하세요.",
+    "createEndpointCta": "엔드포인트 만들기",
+    "sendWebhook": "첫 번째 웹훅 보내기",
+    "sendWebhookDesc": "API 또는 대시보드를 사용하여 테스트 웹훅을 보내세요.",
+    "sendWebhookCta": "웹훅 보내기",
+    "monitorDeliveries": "전송 모니터링",
+    "monitorDeliveriesDesc": "각 웹훅 전송을 실시간으로 추적. 성공률 확인, 장애 디버깅.",
+    "monitorDeliveriesCta": "대시보드로 이동"
+  },
+  "chart": {
+    "hours24": "24시간",
+    "days7": "7일",
+    "days30": "30일"
   }
 }
