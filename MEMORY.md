@@ -28,15 +28,17 @@
 - ⏳ Vercel deploy BUILDING durumunda (commit author düzeltildi)
 
 ## Vercel Durumu (2026-05-08 05:26) ✅
-- ✅ hooksniff-dash yeni proje (prj_cSIVYHpCoAtoihRp8xlXIun1KVSR)
+- ✅ hooksniff-dash projesi aktif (prj_cSIVYHpCoAtoihRp8xlXIun1KVSR)
 - ✅ Dashboard: https://hooksniff.vercel.app
 - ✅ API rewrite: /api/* → Cloud Run çalışıyor
-- ❌ Eski projeler silinebilir: hooksniff-dashboard (prj_NQgFly8h06oH5DTzClj7vyq3hqSO), hooksniff-app (prj_Kw7HSjYokr03K6mGidHLWwxtgDCt)
+- 🗑️ Eski projeler silindi: hooksniff-dashboard, hooksniff-app, vercel-test
 
 ## Son Yapılan İşler (Oturum 4 - 2026-05-08)
 0. GitHub hafıza sistemi yeniden kuruldu
 1. Cron job kuruldu - her 6-7 dk'da GitHub'a otomatik push
-2. Servet ile yeni oturum başladı
+2. Vercel deploy sorunu çözüldü (yeni proje oluşturuldu, domain aktarıldı)
+3. API rewrite çalışıyor (/api/* → Cloud Run)
+4. Eski Vercel projeleri temizlendi
 
 ## Sıradaki İşler
 1. Servet'in proje isteklerini bekle
