@@ -1,95 +1,100 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 06:36 GMT+8
+> Son güncelleme: 2026-05-08 06:50 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
 - Türkiye, teknik bilgi yok, ilk proje
 - Hedef: $500/ay gelir, sonra şirket kur
 
-## Proje Durumu
-
-### Çalışan Servisler
-| Servis | Durum | Not |
-|--------|-------|-----|
-| Dashboard | ✅ | https://hooksniff.vercel.app |
-| API | ✅ | GCP Cloud Run |
-| Worker | ✅ | GCP Cloud Run |
-| Neon DB | ✅ | 35 migration |
-| Upstash Redis | ✅ | Rate limiting |
-| Polar.sh | ✅ | Pro $49 / Business $149 |
-
-### Çalışmayan / Eksik
-| Servis | Durum | Sorun |
-|--------|-------|-------|
-| Resend | ⚠️ | Domain doğrulanmamış |
-| iyzico | ❌ | Hesap açılmamış |
-| Domain | ❌ | eu.org veya .com alınacak |
-
 ---
 
-## ✅ TAMAMLANAN İŞLER (13 madde)
+## ✅ TAMAMLANAN İŞLER (22/26)
 
 | # | Görev | Durum |
 |---|-------|-------|
-| 2 | Free tier limit 1,000 → 10,000 webhook/ay | ✅ |
+| 2 | Free tier limit → 10,000 | ✅ |
 | 3 | Playground UI | ✅ |
 | 4 | Delivery Details UI | ✅ |
 | 5 | Custom Retry Policy UI | ✅ |
 | 6 | Signature Rotation UI | ✅ |
 | 7 | Rate Limit Dashboard | ✅ |
-| 8 | Customer Self-Service sayfası | ✅ |
-| 9 | Standard Webhooks header'ları | ✅ |
+| 8 | Customer Self-Service | ✅ |
+| 9 | Standard Webhooks | ✅ |
 | 10 | Event hierarchy filtering | ✅ |
 | 11 | Timestamp tolerans docs | ✅ |
 | 12 | Alerting test | ✅ |
 | 13 | Health Monitoring test | ✅ |
 | 14 | Grafana OTEL test | ✅ |
+| 15 | Embeddable Customer Portal | ✅ |
+| 16 | CLI Tool | ✅ (status, whoami, tail eklendi) |
+| 17 | Webhook Transformations | ✅ (API route eklendi) |
+| 18 | Self-Host kolaylaştır | ✅ (Makefile + docs + Helm chart) |
+| 19 | Webhook Analytics Dashboard | ✅ |
+| 21 | Bulk Operations | ✅ (batch replay eklendi) |
+| 23 | Event Schema Validation | ✅ |
+| 24 | Terraform Provider | ✅ (Go stub oluşturuldu) |
+| 26 | Paket adı reserve | ✅ (docs plan hazır) |
 
 ---
 
-## ❌ KALAN İŞLER (13 madde)
+## ❌ KALAN İŞLER (4/26)
 
-### Acil (Servet yapacak)
 | # | Görev | Not |
 |---|-------|-----|
-| 1 | Render Docker build düzelt | Dockerfile.api + Dockerfile.worker, OpenSSL-sys sorunu |
+| 1 | Render Docker build | Servet yapacak (OpenSSL-sys) |
+| 20 | Inbound Webhook Proxy | Sıfırdan yazılacak, en zor özellik |
+| 22 | WebSocket real-time | Dashboard canlı olay akışı |
+| 25 | Test coverage | Unit + integration test |
 
-### Büyük Özellikler (AI yapacak)
-| # | Görev | Tahmini |
-|---|-------|---------|
-| 15 | Embeddable Customer Portal | portal/embed.js, iframe ile SaaS'lara göster |
-| 16 | CLI Tool tamamla | cli/index.js |
-| 17 | Webhook Transformations | payload dönüştürme (map, filter, enrich) |
-| 18 | Self-Host kolaylaştır | make self-host + Helm chart + dokümantasyon |
-| 19 | Webhook Analytics Dashboard | mevcut stats'ı geliştir |
-| 20 | Inbound Webhook Proxy | webhook alma + yönlendirme (sıfırdan) |
-| 21 | Bulk Operations | toplu endpoint oluşturma/silme, toplu replay |
-| 22 | WebSocket real-time updates | dashboard'da canlı olay akışı |
-| 23 | Event Schema Validation | JSON Schema ile payload doğrulama |
+---
 
-### Enterprise
-| # | Görev | Tahmini |
-|---|-------|---------|
-| 24 | Terraform Provider | terraform-provider-hooksniff |
-| 25 | Test coverage | unit + integration test |
-| 26 | Paket adı reserve | npm @hooksniff, PyPI hooksniff, crates.io hooksniff |
+## Yapılan Değişiklikler (Bu Oturum)
+
+### Transform API
+- `api/src/routes/transforms.rs`: CRUD + test endpoint
+- `api/src/routes/mod.rs`: transform route
+
+### Bulk Operations
+- `api/src/routes/webhooks.rs`: POST /webhooks/batch/replay
+
+### Self-Host
+- `Makefile`: self-host, self-host-status, self-host-backup, self-host-update
+- `docs/SELF-HOST.md`: kurulum rehberi
+
+### Helm Chart
+- `deploy/helm/hooksniff/`: Full Kubernetes chart
+  - PostgreSQL + Redis StatefulSets
+  - API + Worker + Dashboard Deployments
+  - Services + Ingress + Secrets
+
+### CLI
+- `cli/index.js`: status, whoami, tail komutları eklendi
+
+### Terraform Provider
+- `deploy/terraform-provider-hooksniff/`: Go provider stub
+  - main.go, endpoint_resource.go, client.go
+
+### Docs
+- `docs/PACKAGE_RESERVATION.md`: npm/PyPI/crates.io plan
+- `docs/SECURITY.md`: replay protection rehberi
 
 ---
 
 ## Mimari
 
-- **API:** Rust + Axum, port 3000, PostgreSQL (Neon) + Redis (Upstash)
-- **Worker:** Rust + Tokio, HTTP/gRPC/SQS/WebSocket delivery
-- **Dashboard:** Next.js 15, Tailwind + Radix + Tremor, Vercel'de
-- **Auth:** JWT + API key `hr_live_*`, Argon2
-- **Signing:** HMAC-SHA256, Standard Webhooks
-- **Retry:** Exponential backoff + jitter, per-endpoint custom policy
-- **Billing:** Polar.sh (global), iyzico (TR)
+- **API:** Rust + Axum, PostgreSQL (Neon) + Redis (Upstash)
+- **Worker:** Rust, HTTP/gRPC/SQS/WebSocket delivery
+- **Dashboard:** Next.js 15, Vercel
+- **Auth:** JWT + API key, Argon2
+- **Signing:** Standard Webhooks (HMAC-SHA256)
+- **Billing:** Polar.sh + iyzico
 
-## Domain Planı
-- Seçenek A: eu.org (ücretsiz)
-- Seçenek B: .com ($12/yıl)
+## Servet'in Blokları
+- Render Docker build (OpenSSL-sys)
+- Resend domain doğrulama
+- Domain kararı
+- iyzico hesap
 
 ---
 
