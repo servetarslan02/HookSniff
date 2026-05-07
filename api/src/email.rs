@@ -69,6 +69,16 @@ impl ResendClient {
         Ok(())
     }
 
+    /// Send a generic contact/admin email (used by contact form handler).
+    pub async fn send_contact_email(
+        &self,
+        to: &str,
+        subject: &str,
+        html: &str,
+    ) -> Result<(), AppError> {
+        self.send(to, subject, html).await
+    }
+
     /// Send a welcome email to a newly registered user.
     pub async fn send_welcome_email(&self, to: &str, name: Option<&str>) -> Result<(), AppError> {
         let display_name = name.unwrap_or("there");
