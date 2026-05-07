@@ -1,0 +1,16 @@
+apiVersion: v2
+name: hooksniff
+description: HookSniff - Reliable webhook delivery for developers
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - webhook
+  - hooksniff
+  - delivery
+home: https://github.com/servetarslan02/HookSniff
+sources:
+  - https://github.com/servetarslan02/HookSniff
+maintainers:
+  - name: HookSniff
+    url: https://github.com/servetarslan02/HookSniff
