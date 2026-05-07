@@ -53,12 +53,25 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
 }
 
 // Endpoint API
+export interface RetryPolicyConfig {
+  max_attempts: number;
+  backoff: 'exponential' | 'linear' | 'fixed';
+  initial_delay_secs: number;
+  max_delay_secs: number;
+}
+
 export const endpointsApi = {
   list: (token: string) =>
     apiFetch<Endpoint[]>("/endpoints", { token }),
 
   create: (token: string, data: { url: string; description?: string }) =>
     apiFetch<Endpoint>("/endpoints", { method: "POST", body: data, token }),
+
+  update: (token: string, id: string, data: Partial<Endpoint> & { retry_policy?: RetryPolicyConfig }) =>
+    apiFetch<Endpoint>(`/endpoints/${id}`, { method: "PUT", body: data, token }),
+
+  updateRetryPolicy: (token: string, id: string, policy: RetryPolicyConfig) =>
+    apiFetch<Endpoint>(`/endpoints/${id}/retry-policy`, { method: "PUT", body: policy, token }),
 
   delete: (token: string, id: string) =>
     apiFetch<{ deleted: boolean }>(`/endpoints/${id}`, { method: "DELETE", token }),
@@ -129,6 +142,10 @@ export interface Endpoint {
   fallback_url?: string;
   avg_response_ms?: number;
   failure_streak?: number;
+  retry_policy?: RetryPolicyConfig;
+  signing_secret?: string;
+  event_filter?: string[];
+  custom_headers?: Record<string, string>;
 }
 
 export interface Delivery {
