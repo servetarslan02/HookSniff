@@ -686,5 +686,26 @@
     "rotateDesc": "The old key will stop working immediately. You’ll receive a new key to replace it.",
     "deleteTitle": "Delete API Key?",
     "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access."
+  },
+  "onboarding": {
+    "welcome": "HookSniffへようこそ！🪝",
+    "welcomeDesc": "セットアップ完了です。基本を確認して、数分でWebhookの送信を始めましょう。",
+    "getStarted": "始める",
+    "skipTour": "ツアーをスキップ",
+    "back": "戻る",
+    "createEndpoint": "最初のエンドポイントを作成",
+    "createEndpointDesc": "エンドポイントはWebhookの配信先URLです。サーバーURLを追加してください。",
+    "createEndpointCta": "エンドポイント作成",
+    "sendWebhook": "最初のWebhookを送信",
+    "sendWebhookDesc": "APIまたはダッシュボードを使用して、テストWebhookを送信します。",
+    "sendWebhookCta": "Webhook送信",
+    "monitorDeliveries": "配信を監視",
+    "monitorDeliveriesDesc": "各Webhook配信をリアルタイムで追跡。成功率の確認、障害のデバッグ。",
+    "monitorDeliveriesCta": "ダッシュボードへ"
+  },
+  "chart": {
+    "hours24": "24時間",
+    "days7": "7日",
+    "days30": "30日"
   }
 }

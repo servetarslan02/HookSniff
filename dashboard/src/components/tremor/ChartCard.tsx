@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 type TimeRange = '24h' | '7d' | '30d';
 
@@ -23,12 +24,6 @@ interface ChartCardProps {
   className?: string;
 }
 
-const TIME_RANGES: { value: TimeRange; label: string }[] = [
-  { value: '24h', label: '24 Hours' },
-  { value: '7d', label: '7 Days' },
-  { value: '30d', label: '30 Days' },
-];
-
 /**
  * Tremor-style ChartCard wrapper component.
  *
@@ -45,6 +40,14 @@ export function ChartCard({
   action,
   className = '',
 }: ChartCardProps) {
+  const t = useTranslations('chart');
+
+  const timeRanges: { value: TimeRange; label: string }[] = [
+    { value: '24h', label: t('hours24') },
+    { value: '7d', label: t('days7') },
+    { value: '30d', label: t('days30') },
+  ];
+
   return (
     <div className={`glass-card p-6 ${className}`}>
       <div className="flex items-center justify-between mb-4">
@@ -61,7 +64,7 @@ export function ChartCard({
         <div className="flex items-center gap-3">
           {showTimeRange && onTimeRangeChange && (
             <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl">
-              {TIME_RANGES.map(({ value, label }) => (
+              {timeRanges.map(({ value, label }) => (
                 <button
                   key={value}
                   onClick={() => onTimeRangeChange(value)}

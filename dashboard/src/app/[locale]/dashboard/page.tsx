@@ -131,7 +131,7 @@ function DeliveryTrendChart({
           </div>
         ) : chartData.length === 0 ? (
           <div className="h-full flex items-center justify-center text-gray-400 dark:text-slate-500">
-            No delivery data yet
+            {t('noData')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -288,7 +288,7 @@ function ActivityFeed({ token }: { token: string }) {
       {loading ? (
         <div className="p-8 text-center text-gray-400 dark:text-slate-500 animate-pulse">{tc('loading')}</div>
       ) : deliveries.length === 0 ? (
-        <div className="p-8 text-center text-gray-400 dark:text-slate-500">No recent activity</div>
+        <div className="p-8 text-center text-gray-400 dark:text-slate-500">{t('noActivity')}</div>
       ) : (
         <div className="divide-y divide-gray-100 dark:divide-slate-800">
           {deliveries.map((d, i) => (
@@ -524,12 +524,12 @@ export default function DashboardOverview() {
               href="/dashboard/deliveries"
               className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
             >
-              View all →
+              {t('viewAll')}
             </Link>
           </div>
           {recentDeliveries.length === 0 ? (
             <div className="p-12 text-center text-gray-400 dark:text-slate-500">
-              No deliveries yet. Send your first webhook!
+              {t('noDeliveries')}
             </div>
           ) : (
             <div className="overflow-x-auto">
