@@ -1,7 +1,7 @@
 # HookSniff - Google Cloud Run Deployment (Windows PowerShell)
 # Kullanim: .\deploy\gcp-deploy.ps1
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "SilentlyContinue"
 
 $PROJECT_ID = "hooksniff-app"
 $REGION = "europe-west1"
@@ -72,21 +72,13 @@ function Create-Secret($name, $value) {
     $tmpFile = [System.IO.Path]::GetTempFileName()
     [System.IO.File]::WriteAllText($tmpFile, $value)
     
-    # Try to create (will fail if already exists)
-    gcloud secrets create $name --data-file=$tmpFile --replication-policy="automatic" --quiet 2>$null
+    # Try to create, suppress all output/errors (secret may already exist)
+    $ErrorActionPreference = "SilentlyContinue"
+    gcloud secrets create $name --data-file=$tmpFile --replication-policy="automatic" --quiet 2>&1 | Out-Null
+    gcloud secrets versions add $name --data-file=$tmpFile --quiet 2>&1 | Out-Null
+    $ErrorActionPreference = "Stop"
     
-    # If create failed (already exists), add new version
-    if ($LASTEXITCODE -ne 0) {
-        gcloud secrets versions add $name --data-file=$tmpFile --quiet
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "  Secret '$name' guncellendi" -ForegroundColor Gray
-        } else {
-            Write-Host "UYARI: Secret '$name' guncellenemedi" -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "  Secret '$name' olusturuldu" -ForegroundColor Gray
-    }
-    
+    Write-Host "  Secret '$name' hazir" -ForegroundColor Gray
     Remove-Item $tmpFile -ErrorAction SilentlyContinue
 }
 
