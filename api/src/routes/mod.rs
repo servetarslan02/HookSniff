@@ -4,6 +4,7 @@ pub mod analytics;
 pub mod api_keys;
 pub mod auth;
 pub mod billing;
+pub mod contact;
 pub mod customer_portal;
 pub mod delivery_details;
 pub mod docs;
@@ -66,6 +67,7 @@ pub fn api_router() -> Router {
 
     Router::new()
         .nest("/auth", auth::router())
+        .nest("/contact", contact::router())
         .nest("/outbound-ips", outbound_ips::router())
         .route("/status", axum::routing::get(health::system_status).options(health::status_options))
         .merge(protected)
