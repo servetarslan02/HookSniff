@@ -361,6 +361,78 @@ program
     console.log('');
   });
 
+// ── Status Command ──
+program
+  .command('status')
+  .description('Show HookSniff service status')
+  .action(async () => {
+    const url = getApiBase().replace('/v1', '') + '/status';
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log('\n🪝 HookSniff Status:\n');
+      console.log(`  Status:    ${data.status || 'unknown'}`);
+      console.log(`  Version:   ${data.version || 'unknown'}`);
+      console.log(`  Uptime:    ${data.uptime || 'unknown'}`);
+      console.log(`  Database:  ${data.database || 'unknown'}`);
+      console.log(`  Redis:     ${data.redis || 'unknown'}`);
+      console.log('');
+    } catch {
+      console.error('❌ Cannot reach HookSniff API');
+      console.error(`   URL: ${url}`);
+    }
+  });
+
+// ── Whoami Command ──
+program
+  .command('whoami')
+  .description('Show current authenticated user')
+  .action(async () => {
+    const data = await apiRequest('GET', '/auth/me').catch(() => null);
+    if (data) {
+      console.log('\n👤 Current User:\n');
+      console.log(`  Email: ${data.email}`);
+      console.log(`  Plan:  ${data.plan}`);
+      console.log(`  ID:    ${data.id}`);
+      console.log('');
+    } else {
+      console.log('Not authenticated. Run: hooksniff auth login --api-key YOUR_KEY');
+    }
+  });
+
+// ── Tail Command (live delivery stream) ──
+program
+  .command('tail')
+  .description('Watch deliveries in real-time (polls every 3s)')
+  .option('--status <s>', 'Filter by status')
+  .action(async (opts) => {
+    console.log('🪝 Tailing deliveries... (Ctrl+C to stop)\n');
+    let lastId = null;
+
+    const poll = async () => {
+      try {
+        const params = new URLSearchParams({ page: '1' });
+        if (opts.status) params.set('status', opts.status);
+        const data = await apiRequest('GET', `/webhooks?${params}`);
+        const deliveries = data.deliveries || [];
+
+        for (const d of deliveries) {
+          if (d.id === lastId) break;
+          const status = d.status === 'delivered' ? '✅' : d.status === 'failed' ? '❌' : '⏳';
+          const time = new Date(d.created_at).toLocaleTimeString();
+          console.log(`${status} ${time}  ${d.event || '—'}  ${d.id.slice(0, 10)}…  → ${d.endpoint_id?.slice(0, 8)}…`);
+        }
+
+        if (deliveries.length > 0) lastId = deliveries[0].id;
+      } catch {
+        // ignore poll errors
+      }
+    };
+
+    await poll();
+    setInterval(poll, 3000);
+  });
+
 // ── Parse ──
 program
   .name('hooksniff')
