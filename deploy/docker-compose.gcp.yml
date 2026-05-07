@@ -1,0 +1,33 @@
+# ═══════════════════════════════════════════════════════════════════
+# HookSniff — Google Cloud Run Deployment
+# ═══════════════════════════════════════════════════════════════════
+# Google Cloud Run ile deployment için Docker Compose alternatifi.
+# Cloud Run serverless container platformu kullanır.
+# Free Tier: 2 milyon istek/ay, 360K vCPU-saniye/ay
+# ═══════════════════════════════════════════════════════════════════
+
+# ── HookSniff API ──
+# Cloud Run servisi olarak deploy edilir
+api:
+  build:
+    context: .
+    dockerfile: Dockerfile.api
+  ports:
+    - "3000:3000"
+  env_file:
+    - .env.production
+  environment:
+    APP_ENV: production
+    PORT: "3000"
+    RUST_LOG: "info,hooksniff=info"
+
+# ── HookSniff Worker ──
+# Cloud Run Jobs veya ayrı servis olarak deploy edilir
+worker:
+  build:
+    context: .
+    dockerfile: Dockerfile.worker
+  env_file:
+    - .env.production
+  environment:
+    RUST_LOG: "info,hooksniff=info"
