@@ -1,17 +1,18 @@
 # NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 04:28
+> 2026-05-08 05:33
 
 ## Hemen Kontrol Et
-1. Vercel deploy durumu: `curl -s "https://api.vercel.com/v6/deployments?projectId=prj_NQgFly8h06oH5DTzClj7vyq3hqSO&limit=1" -H "Authorization: Bearer vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW"`
-2. Rewrite test: `curl -s https://hooksniff.vercel.app/api/v1/health`
-3. Tüm servisler çalışıyor mu kontrol et
+1. Vercel deploy durumu
+2. API health check: `curl -s https://hooksniff.vercel.app/api/v1/health`
+3. Tüm servisler çalışıyor mu
 
 ## Sıradaki İşler
-1. Vercel rewrite doğrula
-2. Resend domain doğrulama
-3. Credential yenileme (token'lar ifşa)
-4. Monitoring (Grafana) kur
+1. Servet'in proje isteklerini bekle
+2. Vercel rewrite doğrula
+3. Resend domain doğrulama
+4. Credential yenileme (token'lar ifşa)
+5. Monitoring (Grafana) kur
 
 ## Domain Planı
 - Şimdilik: hooksniff.vercel.app (tek URL)
