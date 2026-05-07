@@ -170,7 +170,10 @@ pub struct DeliveryTargetRow {
     pub enabled: bool,
 }
 
-/// Placeholder for Email delivery.
+/// Deliver a webhook payload via email using Resend API.
+///
+/// Requires RESEND_API_KEY environment variable to be set.
+/// Config should include "to" (recipient email) and optionally "subject".
 async fn deliver_email(
     config: &serde_json::Value,
     webhook: &WebhookMessage,
@@ -180,17 +183,82 @@ async fn deliver_email(
         .and_then(|v| v.as_str())
         .unwrap_or("unknown@example.com");
 
-    info!(
-        "Email delivery for {} to {}",
-        webhook.delivery_id, to
-    );
+    let subject = config
+        .get("subject")
+        .and_then(|v| v.as_str())
+        .unwrap_or("Webhook Delivery Notification");
 
-    Ok(DeliveryResult {
-        success: true,
-        status_code: 200,
-        response_body: format!("Email sent to: {}", to),
-        response_headers: serde_json::json!({}),
-        duration_ms: 0,
-        error: String::new(),
-    })
+    let api_key = match std::env::var("RESEND_API_KEY") {
+        Ok(key) => key,
+        Err(_) => {
+            warn!("RESEND_API_KEY not set — email delivery unavailable");
+            return Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms: 0,
+                error: "RESEND_API_KEY not configured".to_string(),
+            });
+        }
+    };
+
+    let from_email = std::env::var("NOTIFY_FROM_EMAIL")
+        .unwrap_or_else(|_| "noreply@hooksniff.is-a.dev".to_string());
+
+    let start = std::time::Instant::now();
+
+    let body = serde_json::json!({
+        "from": from_email,
+        "to": [to],
+        "subject": subject,
+        "html": format!(
+            "<h2>Webhook Delivery</h2><p><strong>Event:</strong> {}</p><p><strong>Endpoint:</strong> {}</p><pre>{}</pre>",
+            webhook.delivery_id, webhook.endpoint_url, webhook.payload
+        )
+    });
+
+    let client = reqwest::Client::new();
+    let result = client
+        .post("https://api.resend.com/emails")
+        .bearer_auth(&api_key)
+        .json(&body)
+        .send()
+        .await;
+
+    let duration_ms = start.elapsed().as_millis() as i32;
+
+    match result {
+        Ok(resp) => {
+            let status_code = resp.status().as_u16() as i32;
+            let resp_body = resp.text().await.unwrap_or_default();
+            let success = (200..300).contains(&status_code);
+
+            if success {
+                info!("✅ Email delivered to {} for {}", to, webhook.delivery_id);
+            } else {
+                warn!("⚠️ Email delivery got status {}: {}", status_code, resp_body);
+            }
+
+            Ok(DeliveryResult {
+                success,
+                status_code,
+                response_body: truncate_str(&resp_body, 1000),
+                response_headers: serde_json::json!({}),
+                duration_ms,
+                error: if success { String::new() } else { format!("HTTP {}", status_code) },
+            })
+        }
+        Err(e) => {
+            warn!("❌ Email delivery failed for {}: {:?}", webhook.delivery_id, e);
+            Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms,
+                error: e.to_string(),
+            })
+        }
+    }
 }
