@@ -326,7 +326,7 @@ async fn change_plan(
     let limit = match req.plan.as_str() {
         "pro" => 50_000,
         "business" => 500_000,
-        _ => 1_000,
+        _ => 10_000,
     };
 
     let result = sqlx::query(
