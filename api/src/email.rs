@@ -84,7 +84,7 @@ impl ResendClient {
 </body>
 </html>"#
         );
-        self.send(to, subject, &html).await
+        self.send(to, &subject, &html).await
     }
 
     /// Send a verification email with a token/link.
@@ -115,7 +115,7 @@ impl ResendClient {
 </body>
 </html>"#
         );
-        self.send(to, subject, &html).await
+        self.send(to, &subject, &html).await
     }
 
     /// Send a password reset email with a token/link.
@@ -146,7 +146,7 @@ impl ResendClient {
 </body>
 </html>"#
         );
-        self.send(to, subject, &html).await
+        self.send(to, &subject, &html).await
     }
 
     /// Notify the admin about a failed webhook delivery.
@@ -172,6 +172,6 @@ impl ResendClient {
 </body>
 </html>"#
         );
-        self.send(to, subject, &html).await
+        self.send(to, &subject, &html).await
     }
 }

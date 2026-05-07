@@ -428,7 +428,7 @@ fn set_json_path(output: &mut Value, path: &str, value: Value) {
         if i == parts.len() - 1 {
             // Son parça: değeri yaz
             if let Some(obj) = current.as_object_mut() {
-                obj.insert(part.to_string(), value);
+                obj.insert(part.to_string(), value.clone());
             }
         } else {
             // Orta parça: child objeyi bul veya oluştur
