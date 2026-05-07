@@ -1,34 +1,37 @@
-# NEXT_SESSION.md — Sıradaki İşler
+# NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 06:00
+> 2026-05-08 06:25
 
-## Hemen Kontrol Et
-1. API sağlık: `curl -s https://hooksniff-api-sdjufmaqka-ew.a.run.app/v1/health`
-2. Dashboard: https://hooksniff.vercel.app açılıyor mu
-3. Neon DB bağlantısı çalışıyor mu
+## Yeni Oturumda Ne Söyle
 
-## Acil Yapılacaklar
-1. Domain kararı ver — eu.org (ücretsiz, 1-2 gün onay) mi .com ($12/yıl) mi?
-2. Resend domain doğrulama — domain gelince DNS'e TXT + MX ekle
-3. iyzico hesabı aç — Türk müşteriler için ödeme
-4. Grafana OTEL test et — monitoring çalışıyorsa dashboard'a ekle
+Şunu de:
 
-## Ürün Yapılacaklar
-Detaylı liste: `TODO.md` (root, 27 madde)
+> "MVP'yi satılabilir hale getir. MVP.md dosyasındaki 13 maddeyi tamamla. TODO.md'deki büyük işlere (inbound proxy, transformations, Terraform, bulk ops, websocket, tests) şimdilik dokunma. Sadece MVP'yi bitir. Kod tabanını incele, hangi dosyaları değiştireceğini bul, sırayla yap."
 
-Öncelik sırası:
-1. UI'sı eksik backend'leri tamamla (playground, delivery details, retry policy, signature rotation, rate limit)
-2. Free tier limitini 1,000 → 10,000'e artır
-3. Standard Webhooks header'larını ekle
-4. Embeddable portal'ı bitir
-5. Test coverage yaz
+## MVP Dosyaları
+- `MVP.md` — ne yapılacağı, süre tahminleri
+- `TODO.md` — tüm yapılacaklar (MVP + sonrası)
+- `FEATURES.md` — feature tracker
 
-## Domain Planı (Tekrar)
-- eu.org: https://nic.eu.org/arf/en/ → `hooksniff.eu.org` başvur, NS: Cloudflare
-- .com: Cloudflare Registrar → `hooksniff.com` ($12/yıl)
-- Domain gelince: Cloudflare DNS → Cloud Run custom domain → Resend doğrulama
+## Sıralama (Öneri)
+1. Free tier limit artır (1 dakika)
+2. Standard Webhooks header'ları (signing.rs)
+3. UI'ları tamamla (playground, delivery details, retry policy, signature rotation, rate limit, self-service)
+4. Event hierarchy filtering kontrol
+5. Timestamp tolerans docs
+6. Test et (alerting, health, grafana)
 
-## SDK Publish Planı (İleride)
-- npm'de `@hooksniff` scope'unu reserve et (başkası almasın)
-- PyPI'de `hooksniff` adını reserve et
-- crates.io'da `hooksniff` adını reserve et
+## Dosya Referansları
+- Signing: `worker/src/signing.rs`
+- Retry policy: `api/src/routes/endpoints.rs` (retry_policy JSONB)
+- Playground: `api/src/routes/playground.rs` + dashboard frontend
+- Delivery details: `api/src/routes/delivery_details.rs` + dashboard frontend
+- Rate limit: `api/src/throttle/mod.rs`
+- Customer portal: `api/src/routes/customer_portal.rs`
+- Dashboard sayfaları: `dashboard/src/app/[locale]/dashboard/`
+
+## Bloklar (Kullanıcı yapacak)
+- Render Docker build düzelt
+- Resend domain doğrulama
+- Domain kararı
+- iyzico hesap
