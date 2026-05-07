@@ -124,7 +124,7 @@ HookSniff/
 
 | Plan | Price | Webhooks/mo | Endpoints | Retention |
 |------|-------|-------------|-----------|-----------|
-| Free | $0 | 1,000 | 5 | 7 days |
+| Free | $0 | 10,000 | 5 | 7 days |
 | Pro | $49/mo | 50,000 | 50 | 30 days |
 | Business | $149/mo | 500,000 | 500 | 90 days |
 
