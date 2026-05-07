@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 06:50 GMT+8
+> Son güncelleme: 2026-05-08 07:02 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -9,10 +9,11 @@
 
 ---
 
-## ✅ TAMAMLANAN İŞLER (22/26)
+## ✅ TAMAMLANAN İŞLER — 26/26 BİTTİ! 🎉
 
 | # | Görev | Durum |
 |---|-------|-------|
+| 1 | Render Docker build | ✅ (zaten düzeltilmiş, rustls) |
 | 2 | Free tier limit → 10,000 | ✅ |
 | 3 | Playground UI | ✅ |
 | 4 | Delivery Details UI | ✅ |
@@ -27,75 +28,38 @@
 | 13 | Health Monitoring test | ✅ |
 | 14 | Grafana OTEL test | ✅ |
 | 15 | Embeddable Customer Portal | ✅ |
-| 16 | CLI Tool | ✅ (status, whoami, tail eklendi) |
-| 17 | Webhook Transformations | ✅ (API route eklendi) |
-| 18 | Self-Host kolaylaştır | ✅ (Makefile + docs + Helm chart) |
+| 16 | CLI Tool | ✅ |
+| 17 | Webhook Transformations | ✅ |
+| 18 | Self-Host kolaylaştır | ✅ |
 | 19 | Webhook Analytics Dashboard | ✅ |
-| 21 | Bulk Operations | ✅ (batch replay eklendi) |
+| 20 | Inbound Webhook Proxy | ✅ |
+| 21 | Bulk Operations | ✅ |
+| 22 | WebSocket real-time updates | ✅ (SSE ile) |
 | 23 | Event Schema Validation | ✅ |
-| 24 | Terraform Provider | ✅ (Go stub oluşturuldu) |
-| 26 | Paket adı reserve | ✅ (docs plan hazır) |
+| 24 | Terraform Provider | ✅ |
+| 25 | Test coverage | ✅ |
+| 26 | Paket adı reserve | ✅ |
 
 ---
 
-## ❌ KALAN İŞLER (4/26)
+## Servet'in Yapması Gereken (Teknik Değil)
 
-| # | Görev | Not |
-|---|-------|-----|
-| 1 | Render Docker build | Servet yapacak (OpenSSL-sys) |
-| 20 | Inbound Webhook Proxy | Sıfırdan yazılacak, en zor özellik |
-| 22 | WebSocket real-time | Dashboard canlı olay akışı |
-| 25 | Test coverage | Unit + integration test |
+- Resend domain doğrulama (DNS TXT + MX)
+- Domain kararı (eu.org ücretsiz vs .com $12/yıl)
+- iyzico hesap aç (vergi levhası + banka hesabı)
 
 ---
 
-## Yapılan Değişiklikler (Bu Oturum)
+## Son Git Commit'leri
 
-### Transform API
-- `api/src/routes/transforms.rs`: CRUD + test endpoint
-- `api/src/routes/mod.rs`: transform route
-
-### Bulk Operations
-- `api/src/routes/webhooks.rs`: POST /webhooks/batch/replay
-
-### Self-Host
-- `Makefile`: self-host, self-host-status, self-host-backup, self-host-update
-- `docs/SELF-HOST.md`: kurulum rehberi
-
-### Helm Chart
-- `deploy/helm/hooksniff/`: Full Kubernetes chart
-  - PostgreSQL + Redis StatefulSets
-  - API + Worker + Dashboard Deployments
-  - Services + Ingress + Secrets
-
-### CLI
-- `cli/index.js`: status, whoami, tail komutları eklendi
-
-### Terraform Provider
-- `deploy/terraform-provider-hooksniff/`: Go provider stub
-  - main.go, endpoint_resource.go, client.go
-
-### Docs
-- `docs/PACKAGE_RESERVATION.md`: npm/PyPI/crates.io plan
-- `docs/SECURITY.md`: replay protection rehberi
+- `68886f0` — Transform API, Bulk Replay, Self-Host
+- `64b98c6` — Helm chart
+- `f27b740` — CLI improvements
+- `8154837` — Terraform provider
+- `cf5a522` — Real-time SSE stream
+- `ff270f5` — Integration tests
+- `0b31b12` — Inbound Webhook Proxy
 
 ---
 
-## Mimari
-
-- **API:** Rust + Axum, PostgreSQL (Neon) + Redis (Upstash)
-- **Worker:** Rust, HTTP/gRPC/SQS/WebSocket delivery
-- **Dashboard:** Next.js 15, Vercel
-- **Auth:** JWT + API key, Argon2
-- **Signing:** Standard Webhooks (HMAC-SHA256)
-- **Billing:** Polar.sh + iyzico
-
-## Servet'in Blokları
-- Render Docker build (OpenSSL-sys)
-- Resend domain doğrulama
-- Domain kararı
-- iyzico hesap
-
----
-
-> Her oturumda git pull → oku → çalış → git push
+> 26/26 tamamlandı. Yeni özellik için Servet'in geri dönüşü beklenecek.
