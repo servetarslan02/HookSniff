@@ -1,0 +1,5 @@
+APP_ENV: "production"
+RUST_LOG: "info,hooksniff=info"
+NOTIFY_FROM_EMAIL: "noreply@hooksniff.is-a.dev"
+OTEL_ENABLED: "true"
+OTEL_EXPORTER_OTLP_ENDPOINT: "https://otlp-gateway-prod-us-east-0.grafana.net/otlp"
