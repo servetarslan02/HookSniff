@@ -1,37 +1,32 @@
 # NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 06:45
-
-## MVP Tamamlandı! 🎉
-
-13/13 madde tamamlandı. Artık v1.1'e geçebiliriz.
+> 2026-05-08 06:36
 
 ## Yeni Oturumda Ne Söyle
 
 Şunu de:
 
-> "MVP bitti, v1.1'e geçiyoruz. TODO.md'deki v1.1 maddelerine bak: Embeddable Customer Portal, CLI Tool, Inbound Webhook Proxy, Webhook Transformations. Hangisinden başlayalım?"
+> "26 maddelik liste var, 13'ü tamamlandı. Kalan 13 maddeye devam edelim. Büyük özelliklerden başlayalım: CLI Tool (#16), Embeddable Portal (#15), Transformations (#17). Sırayla gidelim."
 
-## v1.1 Öncelik Sırası (Öneri)
-1. **CLI Tool** — `cli/index.js` kısmen hazır, bitir
-2. **Embeddable Customer Portal** — `portal/embed.js` var ama başlanmamış
-3. **Webhook Transformations** — payload dönüştürme (map, filter, enrich)
-4. **Inbound Webhook Proxy** — en büyük rekabet avantajı ama en zor
+## Sıralama (Öneri)
+1. **#16 CLI Tool** — `cli/index.js` kısmen hazır, bitir
+2. **#15 Embeddable Customer Portal** — `portal/embed.js` başlanmamış
+3. **#17 Webhook Transformations** — `api/src/transform/` modülü
+4. **#19 Analytics Dashboard** — mevcut stats geliştir
+5. **#21 Bulk Operations** — toplu endpoint/replay
+6. **#22 WebSocket real-time** — canlı olay akışı
+7. **#23 Schema Validation** — JSON Schema doğrulama
+8. **#18 Self-Host** — make self-host + Helm
+9. **#20 Inbound Proxy** — en zor, sıfırdan
+10. **#24 Terraform Provider**
+11. **#25 Test Coverage**
+12. **#26 Paket Reserve**
 
-## Kullanıcı Yapacak (Bloklar)
-- Render Docker build düzelt
-- Resend domain doğrulama
-- Domain kararı (eu.org vs .com)
-- iyzico hesap aç
+## Servet Yapacak
+- #1 Render Docker build düzelt (OpenSSL-sys)
 
 ## Dosya Referansları
 - CLI: `cli/index.js`
 - Portal: `portal/embed.js`
 - Transformations: `api/src/transform/`
 - TODO: `TODO.md` (root)
-- MVP: `MVP.md` (root, tamamlandı)
-
-## Hatırlatmalar
-- Hafıza dosyaları `.ai-context/` klasöründe
-- Her oturum başında `git pull origin main`
-- Her önemli değişiklikten sonra `git push origin main`

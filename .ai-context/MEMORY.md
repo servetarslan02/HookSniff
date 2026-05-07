@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 06:45 GMT+8
+> Son güncelleme: 2026-05-08 06:36 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -15,7 +15,7 @@
 | Dashboard | ✅ | https://hooksniff.vercel.app |
 | API | ✅ | GCP Cloud Run |
 | Worker | ✅ | GCP Cloud Run |
-| Neon DB | ✅ | 35 migration otomatik |
+| Neon DB | ✅ | 35 migration |
 | Upstash Redis | ✅ | Rate limiting |
 | Polar.sh | ✅ | Pro $49 / Business $149 |
 
@@ -23,60 +23,74 @@
 | Servis | Durum | Sorun |
 |--------|-------|-------|
 | Resend | ⚠️ | Domain doğrulanmamış |
-| Grafana | ⚠️ | OTEL test edilmemiş |
 | iyzico | ❌ | Hesap açılmamış |
 | Domain | ❌ | eu.org veya .com alınacak |
 
-## MVP Durumu — 13/13 TAMAMLANDI ✅
+---
 
-1. ✅ Free tier limit 1,000 → 10,000/webhook/ay
-2. ✅ Standard Webhooks header'ları (zaten implemente edilmiş)
-3. ✅ Playground UI (zaten dolu)
-4. ✅ Delivery Details UI (zaten dolu)
-5. ✅ Custom Retry Policy UI — yeni endpoint detail sayfası
-6. ✅ Signature Rotation UI — endpoint detail sayfasında
-7. ✅ Rate Limit Dashboard — endpoint detail sayfasında
-8. ✅ Customer Self-Service (zaten dolu)
-9. ✅ Event hierarchy filtering (zaten çalışıyor)
-10. ✅ Timestamp tolerans docs — docs/SECURITY.md
-11. ✅ Alerting (backend+frontend hazır)
-12. ✅ Health Monitoring (backend+frontend hazır)
-13. ✅ Grafana OTEL (backend hazır)
+## ✅ TAMAMLANAN İŞLER (13 madde)
 
-## Yapılan Değişiklikler (2026-05-08)
+| # | Görev | Durum |
+|---|-------|-------|
+| 2 | Free tier limit 1,000 → 10,000 webhook/ay | ✅ |
+| 3 | Playground UI | ✅ |
+| 4 | Delivery Details UI | ✅ |
+| 5 | Custom Retry Policy UI | ✅ |
+| 6 | Signature Rotation UI | ✅ |
+| 7 | Rate Limit Dashboard | ✅ |
+| 8 | Customer Self-Service sayfası | ✅ |
+| 9 | Standard Webhooks header'ları | ✅ |
+| 10 | Event hierarchy filtering | ✅ |
+| 11 | Timestamp tolerans docs | ✅ |
+| 12 | Alerting test | ✅ |
+| 13 | Health Monitoring test | ✅ |
+| 14 | Grafana OTEL test | ✅ |
 
-### Free Tier Limit
-- `api/src/billing/mod.rs`: Plan::Free max_webhooks_per_month 10,000
-- `api/src/db.rs`: webhook_limit DEFAULT 10000
-- `api/src/routes/admin.rs`: default limit 10,000
-- `migrations/029_free_tier_10k.sql`: mevcut müşterileri güncelle
+---
 
-### Endpoint Settings API
-- `api/src/routes/endpoints.rs`: PUT /{id} update endpoint + PUT /{id}/retry-policy
+## ❌ KALAN İŞLER (13 madde)
 
-### Endpoint Settings UI
-- `dashboard/src/app/[locale]/dashboard/endpoints/[id]/page.tsx`: Retry policy, signature rotation, rate limit
-- `dashboard/src/lib/api.ts`: endpointsApi.update + updateRetryPolicy
+### Acil (Servet yapacak)
+| # | Görev | Not |
+|---|-------|-----|
+| 1 | Render Docker build düzelt | Dockerfile.api + Dockerfile.worker, OpenSSL-sys sorunu |
 
-### Security Docs
-- `docs/SECURITY.md`: Replay protection, signature verification, rotation rehberi
+### Büyük Özellikler (AI yapacak)
+| # | Görev | Tahmini |
+|---|-------|---------|
+| 15 | Embeddable Customer Portal | portal/embed.js, iframe ile SaaS'lara göster |
+| 16 | CLI Tool tamamla | cli/index.js |
+| 17 | Webhook Transformations | payload dönüştürme (map, filter, enrich) |
+| 18 | Self-Host kolaylaştır | make self-host + Helm chart + dokümantasyon |
+| 19 | Webhook Analytics Dashboard | mevcut stats'ı geliştir |
+| 20 | Inbound Webhook Proxy | webhook alma + yönlendirme (sıfırdan) |
+| 21 | Bulk Operations | toplu endpoint oluşturma/silme, toplu replay |
+| 22 | WebSocket real-time updates | dashboard'da canlı olay akışı |
+| 23 | Event Schema Validation | JSON Schema ile payload doğrulama |
+
+### Enterprise
+| # | Görev | Tahmini |
+|---|-------|---------|
+| 24 | Terraform Provider | terraform-provider-hooksniff |
+| 25 | Test coverage | unit + integration test |
+| 26 | Paket adı reserve | npm @hooksniff, PyPI hooksniff, crates.io hooksniff |
+
+---
 
 ## Mimari
 
 - **API:** Rust + Axum, port 3000, PostgreSQL (Neon) + Redis (Upstash)
-- **Worker:** Rust + Tokio, PostgreSQL queue poll, HTTP/gRPC/SQS/WebSocket delivery
+- **Worker:** Rust + Tokio, HTTP/gRPC/SQS/WebSocket delivery
 - **Dashboard:** Next.js 15, Tailwind + Radix + Tremor, Vercel'de
-- **Auth:** JWT (dashboard) + API key `hr_live_*` (programatik), Argon2 hash
-- **Signing:** HMAC-SHA256, `webhook-id`/`webhook-timestamp`/`webhook-signature` (Standard Webhooks)
-- **Retry:** Exponential backoff + jitter, per-endpoint custom policy (JSONB)
-- **Billing:** Polar.sh (global), iyzico (TR), Stripe (hazır ama kullanılmıyor)
+- **Auth:** JWT + API key `hr_live_*`, Argon2
+- **Signing:** HMAC-SHA256, Standard Webhooks
+- **Retry:** Exponential backoff + jitter, per-endpoint custom policy
+- **Billing:** Polar.sh (global), iyzico (TR)
 
-## Sonraki Adımlar
-
-1. **Servet yapacak:** Render Docker build düzelt, Resend domain doğrulama, Domain kararı, iyzico hesap
-2. **v1.1:** Embeddable Portal, CLI Tool, Inbound Proxy, Transformations
-3. **v1.2:** Bulk Ops, WebSocket real-time, Schema Validation, Self-Host
+## Domain Planı
+- Seçenek A: eu.org (ücretsiz)
+- Seçenek B: .com ($12/yıl)
 
 ---
 
-> Bu dosya her önemli değişiklikte güncellenir.
+> Her oturumda git pull → oku → çalış → git push
