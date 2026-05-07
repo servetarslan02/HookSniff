@@ -1,139 +1,100 @@
-# MEMORY.md — HookSniff Project Context
+# MEMORY.md — HookSniff Proje Hafızası
 
-## 📅 Last Updated: 2026-05-08 02:19 GMT+8
+> Son güncelleme: 2026-05-08 06:00 GMT+8
 
-## 👤 User: Servet Arslan
-- GitHub: servetarslan02
-- Location: Turkey
-- Experience: Non-technical, first project
-- Goal: Sell HookSniff individually, $500/mo revenue → open company
+## Kullanıcı
+- **Servet Arslan** — servetarslan02 (GitHub)
+- Türkiye, teknik bilgi yok, ilk proje
+- Hedef: $500/ay gelir, sonra şirket kur
 
-## 🪝 HookSniff — Webhook Delivery Service
-- **Stack:** Rust (API + Worker), Next.js 15 (Dashboard), PostgreSQL (Neon), Redis (Upstash)
-- **Domain:** hooksniff.is-a.dev (free subdomain, PR pending in is-a-dev/register)
-- **Live Dashboard:** https://hooksniff.vercel.app ✅ WORKING
-- **API:** https://hooksniff-api.onrender.com ❌ BUILD FAILING (Rust Docker build)
-- **Worker:** https://hooksniff-worker.onrender.com ❌ BUILD FAILING
-- **GitHub:** https://github.com/servetarslan02/HookSniff (private repo)
+## Proje Durumu
 
-## 🔑 External Services Status
+### Çalışan Servisler
+| Servis | Durum | Not |
+|--------|-------|-----|
+| Dashboard | ✅ | https://hooksniff.vercel.app |
+| API | ✅ | GCP Cloud Run |
+| Worker | ✅ | GCP Cloud Run |
+| Neon DB | ✅ | 35 migration otomatik |
+| Upstash Redis | ✅ | Rate limiting |
+| Polar.sh | ✅ | Pro $49 / Business $149 |
 
-| Service | Status | Notes |
-|---------|--------|-------|
-| **Vercel** | ✅ WORKING | Dashboard deployed, all pages working |
-| **Neon DB** | ✅ Created | PostgreSQL, auto-migrations (35 migrations) |
-| **Upstash Redis** | ✅ Created | PONG confirmed |
-| **Polar.sh** | ✅ Products | Pro $49: 79fee3f9, Business $149: e5b7d88a |
-| **Cloudflare R2** | ✅ Token created | Bucket: hooksniff-storage |
-| **Resend** | ⚠️ API key exists | Domain NOT verified |
-| **Grafana Cloud** | ⚠️ Account exists | OTEL configured but not tested |
-| **Render (API)** | ❌ BUILD FAILING | Docker build error — see below |
-| **Render (Worker)** | ❌ BUILD FAILING | Same Docker build issue |
-| **is-a.dev domain** | ❌ PR pending | hooksniff.is-a.dev not approved |
-| **Cloudflare DNS** | ❌ Not configured | api CNAME missing |
-| **iyzico** | ❌ Account not opened | Turkish payments pending |
+### Çalışmayan / Eksik
+| Servis | Durum | Sorun |
+|--------|-------|-------|
+| Resend | ⚠️ | Domain doğrulanmamış |
+| Grafana | ⚠️ | OTEL test edilmemiş |
+| iyzico | ❌ | Hesap açılmamış |
+| Domain | ❌ | eu.org veya .com alınacak |
 
-## 🔴 CRITICAL: Render Docker Build Failure
+## Mimari
 
-The API and Worker Docker builds keep failing on Render. The issue is likely:
-- OpenSSL dev libraries not found during Rust compilation
-- `openssl-sys` crate requires `pkg-config` + `libssl-dev`
+- **API:** Rust + Axum, port 3000, PostgreSQL (Neon) + Redis (Upstash)
+- **Worker:** Rust + Tokio, PostgreSQL queue poll, HTTP/gRPC/SQS/WebSocket delivery
+- **Dashboard:** Next.js 15, Tailwind + Radix + Tremor, Vercel'de
+- **Auth:** JWT (dashboard) + API key `hr_live_*` (programatik), Argon2 hash
+- **Signing:** HMAC-SHA256, `X-HookSniff-Signature` header
+- **Retry:** Exponential backoff + jitter, per-endpoint custom policy (JSONB)
+- **Billing:** Polar.sh (global), iyzico (TR), Stripe (hazır ama kullanılmıyor)
+- **Monitoring:** OpenTelemetry → Grafana Cloud
 
-### What was tried:
-1. ✅ Pinned Rust version (1.82-slim) → still failed
-2. ✅ Added pkg-config + libssl-dev to Dockerfile → still failed
-3. ✅ Changed to rust:slim (latest) → waiting for result
-4. ✅ Verified code builds locally (after installing deps)
+## Mevcut Özellikler (Backend Hazır)
 
-### Next steps to try:
-1. Check if rust:slim build succeeds (latest deploy was queued)
-2. If still fails, check Render build logs at: https://dashboard.render.com/web/srv-d7trc4pkh4rs7387rr7g
-3. Alternative: Try `rust:1.85-bookworm` (not slim — has more packages pre-installed)
-4. Alternative: Add `OPENSSL_STATIC=1` env var
-5. Nuclear option: Deploy to Railway/Fly.io instead
+- API Key management (`routes/api_keys.rs`)
+- Webhook playground (`routes/playground.rs`)
+- Delivery attempt details (`routes/delivery_details.rs`)
+- Webhook log search (`routes/search.rs`)
+- Alerting (`routes/alerts.rs`)
+- Endpoint health monitoring (`routes/health_endpoints.rs`)
+- Outbound IP listesi (`routes/outbound_ips.rs`)
+- Customer portal (`routes/customer_portal.rs`)
+- Billing (`routes/billing.rs`)
+- SSRF protection (`ssrf.rs`)
+- Per-endpoint throttle (`throttle/`)
+- FIFO delivery (`fifo/`)
+- AI anomaly detection (fraud, churn, segment)
 
-## 🏗️ Architecture (Key Files)
+## Rekabet Analizi Özeti
 
-### API (Rust/Axum) — Port 3000
-- `api/src/config.rs` — All env vars
-- `api/src/db.rs` — Auto-migrations (35 migrations, runs on startup)
-- `api/src/routes/mod.rs` — All API routes
-- `api/src/billing/` — Polar.sh, iyzico, Stripe
-- `api/src/email.rs` — Resend email client (with contact form support)
-- `api/src/routes/contact.rs` — Contact form (sends emails via Resend)
+### Rakipler
+| Rakip | Güçlü | Zayıf |
+|-------|-------|-------|
+| **Svix** | En olgun, 6 SDK, Standard Webhooks | Pahalı ($490+), open-core |
+| **Hookdeck** | Inbound webhook proxy | Sadece inbound, self-host yok |
+| **Convoy** | Go performans, inbound+outbound | Elastic License (tam OSS değil) |
+| **Hook0** | Tam OSS, self-host parity | Sadece 2 SDK, genç proje |
 
-### Dashboard (Next.js 15) — Vercel
-- `dashboard/src/lib/api.ts` — API client
-- `dashboard/src/app/[locale]/` — All pages (about, faq, contact, dashboard/*, admin/*, etc.)
-- `dashboard/vercel.json` — Vercel config (in dashboard/ dir)
+### HookSniff Farkları
+- 11 SDK (en geniş)
+- $49/ay (Svix'ten 10x ucuz)
+- MIT lisans (tam açık kaynak)
+- 4 delivery method (HTTP, WS, gRPC, SQS)
+- AI anomaly detection
+- $0/ay hosting (free tier servisler)
 
-### Worker — Separate service
-- `worker/src/main.rs` — Webhook delivery (PostgreSQL LISTEN/NOTIFY + poll)
+## Kritik Olaylar
 
-### Deploy
-- `Dockerfile.api` — API Docker build
-- `Dockerfile.worker` — Worker Docker build
-- `render.yaml` — Render blueprint
-- `DEPLOY_GUIDE.md` — Step-by-step deploy guide
+### Credential İfşası (2026-05-08)
+Tüm token'lar chat'te paylaşıldı. EXTERNAL_TOKENS.md'de listeli.
+- Şimdilik kalacak, deploy sonrası yenilenecek
+- GitHub PAT, Vercel, Neon, Upstash, Grafana, Polar, Resend, Render, Cloudflare, R2
 
-## ⚠️ CRITICAL: Credential Exposure
+### Render Build Hataları
+- OpenSSL-sys derleme hatası
+- Çözüldü: rust:slim + pkg-config + libssl-dev
+- Alternatif: GCP Cloud Run'a geçildi (çalışıyor)
 
-ALL credentials were shared in chat on 2026-05-08. These need to be REVOKED:
-- GitHub PAT: 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
-- Vercel token: vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW
-- Neon DB password: REDACTED_PASSWORD
-- Upstash REST token: gQAAAAAAAYCPAAIgcD...
-- Grafana API key: glc_eyJvIjoiMTc1NzMz...
-- Polar.sh tokens: polar_oat_MG9p6..., polar_whs_bjhi...
-- Resend API key: re_BGbQVTfq_...
-- Render API key: rnd_mBsut7XMR...
-- Cloudflare tokens: cfat_1tT40u..., cfat_Z3eK9w..., cfut_96XTq5...
-- R2 Access Key: 07599418fc50e85c...
-- R2 Secret Key: 3187074762093363...
+## Domain Durumu
+- is-a.dev: İptal (ticari kullanıma uygun değil)
+- edu domain: İptal
+- Kalan seçenekler: eu.org (ücretsiz) veya .com ($12/yıl)
 
-## ✅ What Was Done (2026-05-08 Session)
+## Paket Publish Planı (Gelecek)
+- npm: `@hooksniff/sdk` scope reserve et
+- PyPI: `hooksniff` paket adı
+- crates.io: `hooksniff` paket adı
+- Terraform Registry: provider publish
 
-1. ✅ Cloned repo, analyzed entire codebase
-2. ✅ Fixed Vercel build: removed root vercel.json + package.json, set rootDirectory="dashboard", Node.js 20.x
-3. ✅ All dashboard pages now working: /en, /en/about, /en/faq, /en/contact, /en/login, etc.
-4. ✅ Created .env.production with all secrets (gitignored)
-5. ✅ Fixed contact form to send emails via Resend
-6. ✅ Created render.yaml (Render blueprint)
-7. ✅ Created DEPLOY_GUIDE.md (step-by-step instructions)
-8. ✅ Created MEMORY.md (this file)
-9. ✅ Updated Dockerfiles (rust:slim, pkg-config, libssl-dev)
-10. ✅ 9 commits pushed to GitHub
+---
 
-## ❌ What's Still Pending
-
-### Must Do (Blocking)
-1. 🔴 **Fix Render Docker build** — API + Worker won't deploy
-2. 🔴 **Cloudflare DNS** — api.hooksniff.is-a.dev CNAME → hooksniff-api.onrender.com
-3. 🔴 **Resend domain verification** — DNS TXT + MX records
-4. 🔴 **is-a.dev domain approval** — PR pending
-
-### Should Do
-5. 🟡 **Revoke all exposed credentials** (see list above)
-6. 🟡 **iyzico account** — Turkish payments
-7. 🟡 **Grafana OTEL testing** — monitoring
-
-### Nice to Have
-8. 🟢 **Contact form polish** — better styling
-9. 🟢 **Beta users** — Reddit/HN/ProductHunt
-10. 🟢 **First paying customer** — $49 target
-
-## 🔗 Important Links
-- GitHub: https://github.com/servetarslan02/HookSniff
-- Vercel: https://vercel.com (hooksniff-dashboard project)
-- Render API: https://dashboard.render.com/web/srv-d7trc4pkh4rs7387rr7g
-- Render Worker: https://dashboard.render.com/web/srv-d7trcd3tqb8s73f1vrpg
-- Neon: https://console.neon.tech
-- Polar.sh: https://polar.sh (slug: hooksniff)
-- is-a-dev PR: https://github.com/is-a-dev/register (check for hooksniff)
-
-## 💡 Lessons Learned
-- Root vercel.json conflicts with Vercel project settings — use project settings instead
-- Rust builds need OpenSSL dev libs (pkg-config + libssl-dev) in Docker
-- Always push to GitHub frequently — session can crash anytime
-- Never share credentials in chat — use files or env vars
-- Render auto-deploys on GitHub push when connected
+> Bu dosya her önemli değişiklikte güncellenir.
