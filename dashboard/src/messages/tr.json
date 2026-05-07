@@ -578,13 +578,13 @@
     },
     "hero": {
       "uptime": "%99.99 teslimat uptime",
-      "title": "Webhooklar ki",
+      "title": "Asla başarısız olmayan",
       "typewriter": [
-        "gerçekten teslim eder",
-        "asla başarısız olmaz",
-        "hepsi tekrar dener",
-        "sonsuz ölçeklenir",
-        "sadece çalışır"
+        "webhook'lar",
+        "teslimat sistemi",
+        "güvenilir altyapı",
+        "ölçeklenebilir çözüm",
+        "gerçek zamanlı izleme"
       ],
       "subtitle": "Webhooklarınızı güvenle gönderin. Otomatik tekrar denemeler, HMAC imzaları, gerçek zamanlı izleme.",
       "cta": "Ücretsiz başlayın",
@@ -686,5 +686,26 @@
     "rotateDesc": "Eski anahtar hemen çalışmayı durduracak. Yerine yeni bir anahtar alacaksınız.",
     "deleteTitle": "API Anahtarı Silinsin mi?",
     "deleteDesc": "Bu işlem geri alınamaz. Bu anahtarı kullanan tüm hizmetler erişimini hemen kaybedecek."
+  },
+  "onboarding": {
+    "welcome": "HookSniff'e Hoş Geldiniz! 🪝",
+    "welcomeDesc": "Her şey hazır. Webhook göndermeye dakikalar içinde başlamak için temel bilgileri gözden geçirelim.",
+    "getStarted": "Başlayın",
+    "skipTour": "Tur'u atla",
+    "back": "Geri",
+    "createEndpoint": "İlk endpoint'inizi oluşturun",
+    "createEndpointDesc": "Endpoint, webhook'larınızın teslim edileceği URL'dir. Sunucu URL'nizi ekleyin, göndermeye başlayalım.",
+    "createEndpointCta": "Endpoint oluştur",
+    "sendWebhook": "İlk webhook'unuzu gönderin",
+    "sendWebhookDesc": "API'mizi veya panelimizi kullanarak endpoint'inize test webhook'u gönderin. Tekrar denemeleri ve imzaları biz hallederiz.",
+    "sendWebhookCta": "Webhook gönder",
+    "monitorDeliveries": "Teslimatları izleyin",
+    "monitorDeliveriesDesc": "Her webhook teslimatını gerçek zamanlı olarak takip edin. Başarı oranlarını görün, hataları ayıklayın, performansı izleyin.",
+    "monitorDeliveriesCta": "Panel'e git"
+  },
+  "chart": {
+    "hours24": "24 Saat",
+    "days7": "7 Gün",
+    "days30": "30 Gün"
   }
 }
