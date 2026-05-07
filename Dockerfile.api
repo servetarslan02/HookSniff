@@ -1,9 +1,9 @@
 # ── Stage 1: Builder ──
 FROM rust:slim AS builder
 
-# Install build dependencies
+# Install build dependencies (no OpenSSL needed — using rustls)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends pkg-config libssl-dev && \
+    apt-get install -y --no-install-recommends pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -11,6 +11,7 @@ COPY Cargo.toml ./
 COPY Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
+COPY docs/ docs/
 
 # Build release binary
 RUN cargo build --release -p hooksniff-api && \
@@ -19,9 +20,9 @@ RUN cargo build --release -p hooksniff-api && \
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
 
-# Install runtime dependencies
+# Install only runtime dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates curl libssl3 && \
+    apt-get install -y --no-install-recommends ca-certificates curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user and app directory
