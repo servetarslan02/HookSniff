@@ -97,6 +97,16 @@ Write-Host "OK: Secret'lar yuklendi" -ForegroundColor Green
 $API_IMAGE = "$REGION-docker.pkg.dev/$PROJECT_ID/$REPO/api:latest"
 $WORKER_IMAGE = "$REGION-docker.pkg.dev/$PROJECT_ID/$REPO/worker:latest"
 
+# Check if Docker is running
+Write-Host "[7/9] Docker kontrol ediliyor..." -ForegroundColor Blue
+try {
+    docker info 2>$null | Out-Null
+    Write-Host "OK: Docker calisiyor" -ForegroundColor Green
+} catch {
+    Write-Host "HATA: Docker Desktop calismiyor! Lutfen Docker Desktop'i acin ve tekrar deneyin." -ForegroundColor Red
+    exit 1
+}
+
 Write-Host "[7/9] API image build ediliyor..." -ForegroundColor Blue
 docker build -f Dockerfile.api -t $API_IMAGE .
 docker push $API_IMAGE
@@ -110,11 +120,16 @@ Write-Host "OK: Worker image push edildi" -ForegroundColor Green
 # Step 8: Cloud Run API servisi deploy
 Write-Host "[9/9] API Cloud Run'a deploy ediliyor..." -ForegroundColor Blue
 
-$envVarsStr = "APP_ENV=production,PORT=3000,RUST_LOG=info,hooksniff=info,LOG_FORMAT=json,CORS_ORIGINS=https://hooksniff.is-a.dev,APP_URL=https://hooksniff.is-a.dev,POLAR_PRODUCT_PRO=79fee3f9-04a2-46c1-804e-8ca7542b8119,POLAR_PRODUCT_BUSINESS=e5b7d88a-7606-4963-a070-4102ca6405e2,POLAR_ENV=production,RATE_LIMIT_STORE=redis,RETENTION_DAYS=7,WEBHOOK_FORMAT=standard,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp,MAX_PAYLOAD_BYTES=1048576,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300"
+$envVarsStr = "APP_ENV=production,RUST_LOG=info,hooksniff=info,LOG_FORMAT=json,CORS_ORIGINS=https://hooksniff.is-a.dev,APP_URL=https://hooksniff.is-a.dev,POLAR_PRODUCT_PRO=79fee3f9-04a2-46c1-804e-8ca7542b8119,POLAR_PRODUCT_BUSINESS=e5b7d88a-7606-4963-a070-4102ca6405e2,POLAR_ENV=production,RATE_LIMIT_STORE=redis,RETENTION_DAYS=7,WEBHOOK_FORMAT=standard,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp,MAX_PAYLOAD_BYTES=1048576,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300"
 
 $secretsStr = "HMAC_SECRET=hooksniff-hmac-secret:latest,JWT_SECRET=hooksniff-jwt-secret:latest,DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest"
 
-gcloud run deploy $API_SERVICE --image=$API_IMAGE --region=$REGION --platform=managed --allow-unauthenticated --port=3000 --memory=512Mi --cpu=1 --min-instances=0 --max-instances=3 --set-env-vars=$envVarsStr --set-secrets=$secretsStr --quiet
+gcloud run deploy $API_SERVICE --image=$API_IMAGE --region=$REGION --platform=managed --allow-unauthenticated --memory=512Mi --cpu=1 --min-instances=0 --max-instances=3 --set-env-vars=$envVarsStr --set-secrets=$secretsStr --quiet
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "HATA: API deploy basarisiz!" -ForegroundColor Red
+    exit 1
+}
 
 $API_URL = gcloud run services describe $API_SERVICE --region=$REGION --format="value(status.url)"
 Write-Host "OK: API deploy edildi: $API_URL" -ForegroundColor Green
