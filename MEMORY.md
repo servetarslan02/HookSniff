@@ -27,11 +27,11 @@
 - 🔄 Vercel Rewrite kuruldu — tek URL: hooksniff.vercel.app (dashboard + API)
 - ⏳ Vercel deploy BUILDING durumunda (commit author düzeltildi)
 
-## Vercel Rewrite Planı
-- vercel.json'a rewrite eklendi: /api/* → Cloud Run API
-- api.ts'de API_BASE production'da "/api" olarak değiştirildi
-- Git author "HookSniff AI Agent" → "Servet Arslan" olarak düzeltildi
-- Deploy tetiklendi, BUILDING durumunda
+## Vercel Rewrite Durumu (2026-05-08 04:42)
+- ❌ Rewrite çalışmıyor — /api/health 404 dönüyor
+- Dashboard ✅, API ✅ (doğrudan Cloud Run URL)
+- İki vercel.json var (deploy/ ve dashboard/) — çakışma olabilir
+- Çözüm bekleniyor: ya tek vercel.json ya da Vercel proje ayarlarını düzelt
 
 ## Son Yapılan İşler (Oturum 4 - 2026-05-08)
 0. GitHub hafıza sistemi yeniden kuruldu
