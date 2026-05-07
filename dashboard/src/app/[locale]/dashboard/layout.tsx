@@ -32,6 +32,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('apiKeys'), href: '/dashboard/api-keys', icon: '🔑' },
     { name: t('playground'), href: '/dashboard/playground', icon: '🧪' },
     { name: t('analytics'), href: '/dashboard/analytics', icon: '📈' },
+    { name: 'Transforms', href: '/dashboard/transforms', icon: '🔄' },
+    { name: 'Inbound', href: '/dashboard/inbound', icon: '📨' },
     { name: t('team'), href: '/dashboard/team', icon: '👥' },
     { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
     { name: t('billing'), href: '/dashboard/billing', icon: '💳' },
