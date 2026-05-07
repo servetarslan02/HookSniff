@@ -847,6 +847,27 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 37: Migration 036 — inbound webhook configs table
+    run_one(
+        pool,
+        "036_inbound_configs",
+        r#"
+        CREATE TABLE IF NOT EXISTS inbound_configs (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            provider TEXT NOT NULL,
+            secret TEXT NOT NULL DEFAULT '',
+            endpoint_id UUID REFERENCES endpoints(id) ON DELETE SET NULL,
+            enabled BOOLEAN NOT NULL DEFAULT true,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            UNIQUE(customer_id, provider)
+        );
+        CREATE INDEX IF NOT EXISTS idx_inbound_configs_customer
+            ON inbound_configs(customer_id);
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
