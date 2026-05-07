@@ -21,6 +21,7 @@ mod routes;
 mod schemas;
 mod signing;
 mod ssrf;
+pub mod email;
 pub mod telemetry;
 mod templates;
 mod throttle;

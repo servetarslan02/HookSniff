@@ -82,6 +82,20 @@ async fn register(
 
     tracing::info!("✅ New customer registered: {}", req.email);
 
+    // Send welcome email (fire-and-forget, don't fail registration on email errors)
+    if let Some(email_client) = crate::email::ResendClient::from_config(&cfg) {
+        let to = req.email.clone();
+        let name = req.name.clone();
+        tokio::spawn(async move {
+            if let Err(e) = email_client
+                .send_welcome_email(&to, name.as_deref())
+                .await
+            {
+                tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
+            }
+        });
+    }
+
     Ok(Json(AuthResponse {
         token,
         customer: customer.to_response(Some(api_key)),

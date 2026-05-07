@@ -247,6 +247,7 @@ impl IyzicoProvider {
     /// Verify iyzico webhook signature.
     ///
     /// iyzico signs: `random_string + uri + body`
+    /// The random string is provided in the `x-iyzi-rnd` header.
     fn verify_webhook_signature(
         &self,
         body: &str,
@@ -261,18 +262,26 @@ impl IyzicoProvider {
             return Err(AppError::BadRequest("Missing iyzico signature".into()));
         }
 
-        // iyzico webhook signature format: base64(HMAC-SHA256(secret, random + uri + body))
-        // The random string and uri are included in the body for webhook notifications
-        let expected = {
-            let uri = "/v1/billing/webhook/iyzico"; // Fixed URI for webhooks
-            let payload = format!("{}{}{}", "", uri, body); // No random for webhooks
-            let mut mac = HmacSha256::new_from_slice(self.config.secret_key.as_bytes())
-                .map_err(|_| AppError::Internal(anyhow::anyhow!("HMAC key error")))?;
-            mac.update(payload.as_bytes());
-            base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes())
-        };
+        // iyzico sends the random string in x-iyzi-rnd header
+        let random_string = headers
+            .get("x-iyzi-rnd")
+            .and_then(|v| v.to_str().ok())
+            .unwrap_or("");
+
+        // iyzico webhook signature: base64(HMAC-SHA256(secret, random + uri + body))
+        let uri = "/v1/billing/webhook/iyzico";
+        let payload = format!("{}{}{}", random_string, uri, body);
+        let mut mac = HmacSha256::new_from_slice(self.config.secret_key.as_bytes())
+            .map_err(|_| AppError::Internal(anyhow::anyhow!("HMAC key error")))?;
+        mac.update(payload.as_bytes());
+        let expected = base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
 
         if signature != expected {
+            tracing::warn!(
+                "iyzico webhook signature mismatch (rnd_len={}, uri={})",
+                random_string.len(),
+                uri
+            );
             return Err(AppError::Unauthorized);
         }
 
