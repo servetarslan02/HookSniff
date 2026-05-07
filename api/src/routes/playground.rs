@@ -7,7 +7,6 @@ use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
-use uuid::Uuid;
 
 pub fn router() -> Router {
     Router::new()
