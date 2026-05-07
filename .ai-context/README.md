@@ -1,17 +1,34 @@
 # .ai-context — AI Session Memory
 
 Bu klasör AI助手 tarafından oturum bilgilerini korumak için kullanılır.
-Her yeni oturumda bu dosyaları okuyarak kaldığı yerden devam edebilir.
+Tüm dosyalar GitHub'da saklanır — workspace silinse bile korunur.
 
-## Dosyalar
+## Yeni Oturumda İlk Okunacak
 
-- `MEMORY.md` — Proje durumu, servisler, credential referansı
-- `NEXT_SESSION.md` — Öncelikli yapılacaklar listesi
-- `YYYY-MM-DD.md` — Günlük detaylı log
+1. **`ONBOARDING.md`** — Genel rehber, proje yapısı, kurallar
+2. **`EXTERNAL_TOKENS.md`** — Tüm API token'ları
+3. **`MEMORY.md`** — Proje durumu, servisler
+4. **`NEXT_SESSION.md`** — Öncelikli yapılacaklar
 
-## Kullanım
+## Tüm Dosyalar
 
-Yeni oturumda ilk olarak şunu söyle:
-> ".ai-context/MEMORY.md ve .ai-context/NEXT_SESSION.md dosyalarını oku"
+| Dosya | Amaç |
+|-------|------|
+| `ONBOARDING.md` | Yeni oturum rehberi (burası) |
+| `EXTERNAL_TOKENS.md` | Tüm API token ve secret'lar |
+| `MEMORY.md` | Proje durumu, credential referansı |
+| `NEXT_SESSION.md` | Sonraki oturum yapılacaklar |
+| `YYYY-MM-DD.md` | Günlük detaylı log |
 
-Bu dosyalar GitHub'da saklandığı için workspace silinse bile korunur.
+## Hafıza Akışı
+
+```
+Oturum başı:
+  git pull → ONBOARDING.md oku → EXTERNAL_TOKENS.md oku → devam et
+
+Oturum sırasında:
+  Değişiklik yap → MEMORY.md/SESSION_NOTES.md güncelle
+
+Her 8 dk:
+  Cron job → otomatik commit + push (hafıza dosyaları)
+```
