@@ -52,7 +52,7 @@ async fn run_migration(pool: &PgPool, name: &str, sql: &str) -> Result<()> {
         return Ok(());
     }
     tracing::info!("🔄 Running migration: {}", name);
-    sqlx::query(sql).execute(pool).await?;
+    sqlx::raw_sql(sql).execute(pool).await?;
     record_migration(pool, name).await?;
     tracing::info!("✅ Migration '{}' completed", name);
     Ok(())
