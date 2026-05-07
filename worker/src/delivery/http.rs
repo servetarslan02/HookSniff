@@ -115,7 +115,7 @@ pub async fn deliver_http(
     }
 }
 
-fn truncate_str(s: &str, max_len: usize) -> String {
+pub fn truncate_str(s: &str, max_len: usize) -> String {
     if s.len() <= max_len {
         s.to_string()
     } else {
