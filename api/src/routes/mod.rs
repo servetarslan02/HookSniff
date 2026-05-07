@@ -20,6 +20,7 @@ pub mod search;
 pub mod stats;
 pub mod teams;
 pub mod templates;
+pub mod transforms;
 pub mod webhooks;
 
 use axum::middleware as axum_middleware;
@@ -42,6 +43,7 @@ pub fn create_routes(
 pub fn api_router() -> Router {
     let protected = Router::new()
         .nest("/endpoints", endpoints::router())
+        .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/webhooks", webhooks::router())
         .nest("/webhooks", delivery_details::router())
         .nest("/search", search::router())
