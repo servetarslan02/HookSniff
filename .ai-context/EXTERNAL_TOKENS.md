@@ -1,0 +1,48 @@
+# EXTERNAL_TOKENS.md — Dış Servis Token Referansı
+# ⚠️ Bu dosya sadece AI hafızası içindir, GitHub'da saklanır
+# ⚠️ Token'lar compromize — yeni oturumda yenilemeniz gerekebilir
+
+# Render
+RENDER_API_KEY=rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m
+RENDER_API_SERVICE=srv-d7trc4pkh4rs7387rr7g
+RENDER_WORKER_SERVICE=srv-d7trcd3tqb8s73f1vrpg
+
+# Vercel
+VERCEL_TOKEN=vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW
+VERCEL_PROJECT_ID=prj_NQgFly8h06oH5DTzClj7vyq3hqSO
+VERCEL_DEPLOY_HOOK=https://api.vercel.com/v1/integrations/deploy/prj_NQgFly8h06oH5DTzClj7vyq3hqSO/uBpn0GrAqw
+
+# GitHub
+GITHUB_PAT=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
+GITHUB_REPO=servetarslan02/HookSniff
+
+# Neon DB
+NEON_CONNECTION_STRING=postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require
+
+# Upstash Redis
+UPSTASH_REDIS_REST_URL=https://integral-ostrich-98447.upstash.io
+UPSTASH_REDIS_REST_TOKEN=gQAAAAAAAYCPAAIgcDI1ZGFhYWUxZGRhZjM0YjhhYTQ1OGFjOGEzZTg1OTMzNg
+REDIS_URL=rediss://default:gQAAAAAAAYCPAAIgcDI1ZGFhYWUxZGRhZjM0YjhhYTQ1OGFjOGEzZTg1OTMzNg@integral-ostrich-98447.upstash.io:6379
+
+# Polar.sh
+POLAR_ACCESS_TOKEN=polar_oat_MG9p6TbzA7YjRWtFruRB8YUPa1CG2tkwVAJXI32Zw9F
+POLAR_WEBHOOK_SECRET=polar_whs_bjhiDZvCoWIoGvrgBBVm49ZhMIKmX7hSekMt92hxmnB
+POLAR_PRODUCT_PRO=79fee3f9-04a2-46c1-804e-8ca7542b8119
+POLAR_PRODUCT_BUSINESS=e5b7d88a-7606-4963-a070-4102ca6405e2
+
+# Resend
+RESEND_API_KEY=re_BGbQVTfq_NyahSBBbiS4GERnctr7DN8Xu
+
+# Grafana
+GRAFANA_OTEL_HEADERS=Authorization=Bearer 1757335:glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rcmVsYXktaG9va3JlbGF5IiwiayI6IlRRYjc5MkxvNWhZNlZFODdBUlI3eDU2ZyIsIm0iOnsiciI6InVzIn19
+
+# Cloudflare
+CF_ACCOUNT_ID=2a7ee86912c49fd36cff048204c37f70
+CF_API_TOKEN=cfat_1tT40u7CwzgC8TfHfTtzfqZTGU6o7dt3j2Hpgkgh4bfc2231
+CF_R2_ACCESS_KEY=07599418fc50e85caef693da129f874b
+CF_R2_SECRET_KEY=3187074762093363aa0222164f4a92c57c87c7d48c8e2d08c17146bc073ab2e9
+CF_R2_ENDPOINT=https://2a7ee86912c49fd36cff048204c37f70.r2.cloudflarestorage.com
+
+# Security (generated)
+HMAC_SECRET=f84f1ae48ab662b246babc05c110af01ca7fc1eb42eecc3d1b89c6754ba1b5d5
+JWT_SECRET=24b2b3f3e0e47f131a9a0b2cda6a40b2e3ee0875f22fb2af1bf5b2c48ec83814
