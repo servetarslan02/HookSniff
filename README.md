@@ -23,7 +23,7 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 
 | Component | Technology | Hosting | Cost |
 |---|---|---|---|
-| API | Rust (Axum) | Oracle Cloud Always Free (ARM) | $0 |
+| API | Rust (Axum) | Google Cloud Run (Free Tier) | $0 |
 | Worker | Rust | Oracle Cloud Always Free (ARM) | $0 |
 | Database | PostgreSQL | Neon (serverless) | $0 (0.5 GB) |
 | Cache / Queue | PostgreSQL + Redis | Upstash (serverless) | $0 (256 MB) |
