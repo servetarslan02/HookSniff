@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Agent Hafızası
 
-## Son Güncelleme: 2026-05-08 05:04
+## Son Güncelleme: 2026-05-08 05:30
 
 ## Hakkımda
 - Kullanıcı: **Servet Arslan** (servetarslan02)
@@ -33,8 +33,13 @@
 - ✅ API rewrite: /api/* → Cloud Run çalışıyor
 - 🗑️ Eski projeler silindi: hooksniff-dashboard, hooksniff-app, vercel-test
 
-## Son Yapılan İşler (Oturum 4 - 2026-05-08)
+## Son Yapılan İşler (Oturum 5 - 2026-05-08)
 0. GitHub hafıza sistemi yeniden kuruldu
+1. Repo workspace'e klonlandı (/root/.openclaw/workspace/HookSniff)
+2. Memory sync scripti oluşturuldu (scripts/github-memory-sync.sh)
+3. Cron job kuruldu - otomatik GitHub push
+
+## Önceki İşler (Oturum 4 - 2026-05-08)
 1. Cron job kuruldu - her 6-7 dk'da GitHub'a otomatik push
 2. Vercel deploy sorunu çözüldü (yeni proje oluşturuldu, domain aktarıldı)
 3. API rewrite çalışıyor (/api/* → Cloud Run)
