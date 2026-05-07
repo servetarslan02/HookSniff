@@ -848,7 +848,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     .await?;
 
     // Step 37: Migration 036 — inbound webhook configs table
-    run_one(
+    run_migration(
         pool,
         "036_inbound_configs",
         r#"

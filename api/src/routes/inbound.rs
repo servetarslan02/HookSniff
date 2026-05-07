@@ -16,7 +16,7 @@
 //! - Shopify (HMAC-SHA256)
 //! - Generic (custom header + HMAC)
 
-use axum::body::Body;
+use axum::body::{Body, Bytes};
 use axum::extract::{Extension, Path, Request};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
@@ -397,8 +397,6 @@ async fn handle_inbound_to_endpoint(
         "event": event_type,
     })))
 }
-
-use axum::body::Bytes;
 
 /// Migration SQL for inbound configs
 pub const INBOUND_MIGRATION_SQL: &str = r#"
