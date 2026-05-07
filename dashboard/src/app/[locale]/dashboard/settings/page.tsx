@@ -160,7 +160,7 @@ export default function SettingsPage() {
       {/* Profile Section */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('profile')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('profile')}</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Update your display name and email address</p>
 
         {profileSuccess && (
           <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400">
@@ -225,7 +225,7 @@ export default function SettingsPage() {
       {/* Password Section */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('changePassword')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('changePassword')}</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Ensure your account stays secure with a strong password</p>
 
         {passwordSuccess && (
           <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400">
@@ -292,7 +292,7 @@ export default function SettingsPage() {
       {/* API Key Section */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('api')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('api')}</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Your secret API key for authenticating requests</p>
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row gap-3">
             <input
@@ -321,7 +321,7 @@ export default function SettingsPage() {
       {/* Notifications */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('notifications')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('notifications')}</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Choose what notifications you want to receive</p>
         <div className="space-y-4">
           <ToggleRow
             label="Email notifications"

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import {
   statsApi,
@@ -519,12 +520,12 @@ export default function DashboardOverview() {
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recentDeliveries')}</h2>
-            <a
+            <Link
               href="/dashboard/deliveries"
               className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
             >
               View all →
-            </a>
+            </Link>
           </div>
           {recentDeliveries.length === 0 ? (
             <div className="p-12 text-center text-gray-400 dark:text-slate-500">
