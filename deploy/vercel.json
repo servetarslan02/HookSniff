@@ -19,13 +19,17 @@
   ],
   "rewrites": [
     {
+      "source": "/api/health",
+      "destination": "https://hooksniff-api-sdjufmaqka-ew.a.run.app/health"
+    },
+    {
       "source": "/api/:path*",
-      "destination": "https://api.hooksniff.is-a.dev/v1/:path*"
+      "destination": "https://hooksniff-api-sdjufmaqka-ew.a.run.app/v1/:path*"
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://api.hooksniff.is-a.dev/v1",
+    "NEXT_PUBLIC_API_URL": "/api",
     "NEXT_PUBLIC_APP_NAME": "HookSniff",
-    "NEXT_PUBLIC_APP_URL": "https://hooksniff.is-a.dev"
+    "NEXT_PUBLIC_APP_URL": "https://hooksniff.vercel.app"
   }
 }
