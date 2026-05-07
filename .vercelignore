@@ -1,0 +1,13 @@
+Cargo.toml
+Cargo.lock
+api/
+worker/
+cli/
+Dockerfile.*
+docker-compose.yml
+Makefile
+deploy/
+monitoring/
+tests/
+scripts/
+*.rs
