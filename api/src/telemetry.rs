@@ -27,6 +27,7 @@ fn init_otel(
     cfg: &crate::config::Config,
 ) {
     use opentelemetry::global;
+    use opentelemetry::trace::TracerProvider as _;
     use opentelemetry_sdk::trace::TracerProvider;
     use opentelemetry_otlp::WithExportConfig;
 
@@ -35,22 +36,25 @@ fn init_otel(
         .as_deref()
         .unwrap_or("http://localhost:4317");
 
-    let mut header_map = HashMap::new();
+    let mut metadata = tonic::metadata::MetadataMap::new();
     if let Some(ref headers) = cfg.otel_exporter_otlp_headers {
         for header in headers.split(',') {
             let h = header.trim();
-            // Support both "key=value" and "key: value" formats
-            // (Grafana Cloud uses "Authorization: Bearer <token>" with colon)
             if let Some((key, value)) = h.split_once(':').or_else(|| h.split_once('=')) {
-                header_map.insert(key.trim().to_string(), value.trim().to_string());
+                if let (Ok(name), Ok(val)) = (
+                    tonic::metadata::MetadataKey::from_bytes(key.trim().to_lowercase().as_bytes()),
+                    tonic::metadata::MetadataValue::try_from(value.trim()),
+                ) {
+                    metadata.insert(name, val);
+                }
             }
         }
     }
 
     let exporter = opentelemetry_otlp::new_exporter()
-        .http()
+        .tonic()
         .with_endpoint(otlp_endpoint)
-        .with_headers(header_map)
+        .with_metadata(metadata)
         .build_span_exporter()
         .expect("Failed to build OTLP exporter");
 
@@ -59,17 +63,18 @@ fn init_otel(
         .build();
 
     global::set_tracer_provider(provider.clone());
-    let tracer = provider.tracer("hooksniff");
-
-    let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
 
     if use_json {
+        let tracer = provider.tracer("hooksniff");
+        let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
         let _ = tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer().json())
             .with(otel_layer)
             .init();
     } else {
+        let tracer = provider.tracer("hooksniff");
+        let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
         let _ = tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer())

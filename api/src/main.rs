@@ -63,7 +63,7 @@ async fn main() -> Result<()> {
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
-            if let Err(e) = jobs::retention::reset_monthly_counts(&reset_pool).await {
+            if let Err(e) = jobs::retention::reset_monthly_webhook_counts(&reset_pool).await {
                 tracing::error!("❌ Monthly count reset failed: {:?}", e);
             }
         }
@@ -73,19 +73,19 @@ async fn main() -> Result<()> {
         // Health check
         .route("/health", get(routes::health::health_check))
         // Metrics (Prometheus)
-        .route("/metrics", get(routes::health::metrics))
+        .route("/metrics", get(metrics::metrics_handler))
         // API v1
         .nest("/v1", routes::create_routes(pool.clone(), rate_limiter, throttle_manager, metrics.clone()))
         // Middleware
         // CORS: restrict origins in production
         .layer({
-            let origins: Vec<http::HeaderValue> = cfg.cors_origins.iter()
+            let origins: Vec<axum::http::HeaderValue> = cfg.cors_origins.iter()
                 .filter_map(|o| o.parse().ok())
                 .collect();
             if cfg.is_production() && origins.is_empty() {
                 // Production with no CORS origins = no cross-origin allowed
                 CorsLayer::new()
-                    .allow_origin(AllowOrigin::none())
+                    .allow_origin(AllowOrigin::list(std::iter::empty()))
                     .allow_methods(Any)
                     .allow_headers(Any)
             } else if origins.is_empty() {

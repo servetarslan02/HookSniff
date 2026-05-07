@@ -91,7 +91,7 @@ impl Config {
         let rust_log = std::env::var("RUST_LOG")
             .unwrap_or_else(|_| "info".into());
 
-        let hmac_secret = std::env::var("HMAC_SECRET").unwrap_or_else(|| {
+        let hmac_secret = std::env::var("HMAC_SECRET").unwrap_or_else(|_| {
             let random = format!("dev-{}", uuid::Uuid::new_v4());
             tracing::warn!(
                 "⚠️ HMAC_SECRET not set, using random secret (will change on restart!)"
@@ -99,7 +99,7 @@ impl Config {
             random
         });
 
-        let jwt_secret = std::env::var("JWT_SECRET").unwrap_or_else(|| {
+        let jwt_secret = std::env::var("JWT_SECRET").unwrap_or_else(|_| {
             let random = format!("dev-{}", uuid::Uuid::new_v4());
             tracing::warn!(
                 "⚠️ JWT_SECRET not set, using random secret (will change on restart!)"

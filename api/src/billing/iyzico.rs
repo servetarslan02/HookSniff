@@ -312,7 +312,7 @@ impl PaymentProviderImpl for IyzicoProvider {
             locale: "tr".to_string(),
             conversation_id: customer_id.to_string(),
             price: price_str.clone(),
-            paid_price: price_str,
+            paid_price: price_str.clone(),
             currency: "TRY".to_string(),
             basket_id: format!("hooksniff-{}-{}", customer_id, plan.as_str()),
             payment_group: "SUBSCRIPTION".to_string(),

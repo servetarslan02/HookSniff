@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use tracing_subscriber::prelude::*;
 
 /// Initialize the global tracing subscriber with OpenTelemetry + structured logging.
@@ -34,20 +33,24 @@ fn init_otel(
 
     let otlp_endpoint = endpoint.unwrap_or("http://localhost:4317");
 
-    let mut header_map = HashMap::new();
+    let mut metadata = tonic::metadata::MetadataMap::new();
     if let Some(hdrs) = headers {
         for header in hdrs.split(',') {
-            if let Some((key, value)) = header.trim().split_once(':') {
-                header_map.insert(key.trim().to_string(), value.trim().to_string());
-            } else if let Some((key, value)) = header.trim().split_once('=') {
-                header_map.insert(key.trim().to_string(), value.trim().to_string());
+            if let Some((key, value)) = header.trim().split_once(':').or_else(|| header.trim().split_once('=')) {
+                if let (Ok(name), Ok(val)) = (
+                    tonic::metadata::MetadataKey::from_bytes(key.trim().to_lowercase().as_bytes()),
+                    tonic::metadata::MetadataValue::try_from(value.trim()),
+                ) {
+                    metadata.insert(name, val);
+                }
             }
         }
     }
 
     let exporter = opentelemetry_otlp::new_exporter()
+        .tonic()
         .with_endpoint(otlp_endpoint)
-        .with_headers(header_map)
+        .with_metadata(metadata)
         .build_span_exporter()
         .expect("Failed to build OTLP exporter");
 
@@ -56,17 +59,18 @@ fn init_otel(
         .build();
 
     global::set_tracer_provider(provider.clone());
-    let tracer = provider.tracer("hooksniff-worker");
-
-    let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
 
     if use_json {
+        let tracer = provider.tracer("hooksniff-worker");
+        let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
         let _ = tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer().json())
             .with(otel_layer)
             .init();
     } else {
+        let tracer = provider.tracer("hooksniff-worker");
+        let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
         let _ = tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer())

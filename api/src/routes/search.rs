@@ -92,15 +92,17 @@ async fn search_deliveries(
         .bind(customer.id);
 
     // Bind filter parameters in the same order
-    if let Some(ref q) = params.q {
-        // Escape ILIKE special characters (%, _, \)
+    // pattern must live until queries are executed
+    let search_pattern = params.q.as_ref().map(|q| {
         let escaped = q
             .replace('\\', "\\\\")
             .replace('%', "\\%")
             .replace('_', "\\_");
-        let pattern = format!("%{}%", escaped);
-        query = query.bind(&pattern);
-        count_query = count_query.bind(&pattern);
+        format!("%{}%", escaped)
+    });
+    if let Some(ref pattern) = search_pattern {
+        query = query.bind(pattern);
+        count_query = count_query.bind(pattern);
     }
     if let Some(ref event) = params.event {
         query = query.bind(event);
