@@ -24,7 +24,6 @@ const nextConfig = {
       ],
     }];
   },
-  // Rewrites vercel.json'da yönetiliyor — burada tutma
 };
 
 module.exports = withNextIntl(nextConfig);
