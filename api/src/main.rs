@@ -78,6 +78,8 @@ async fn main() -> Result<()> {
         .nest("/v1", routes::create_routes(pool.clone(), rate_limiter, throttle_manager, metrics.clone()))
         // Middleware
         // CORS: restrict origins in production
+        .layer(axum::Extension(pool.clone()))
+        .layer(axum::Extension(metrics.clone()))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg.cors_origins.iter()
                 .filter_map(|o| o.parse().ok())

@@ -3,6 +3,7 @@ FROM rust:latest AS builder
 
 WORKDIR /app
 COPY Cargo.toml ./
+COPY Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
 
@@ -17,7 +18,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r hooksniff && useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff
+RUN groupadd -r hooksniff && \
+    useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff && \
+    mkdir -p /app
 
 COPY --from=builder /app/target/release/hooksniff-worker /usr/local/bin/hooksniff-worker
 
