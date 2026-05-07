@@ -310,9 +310,6 @@ async fn handle_inbound(
         &endpoint.url,
         &payload_str,
         endpoint.custom_headers.as_ref(),
-        &endpoint.signing_secret,
-        Some(&event_type),
-        &crate::config::Config::from_env().redis_url,
     )
     .await?;
 
