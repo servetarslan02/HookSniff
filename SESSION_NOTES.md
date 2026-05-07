@@ -1,18 +1,13 @@
-# 📋 Session Notes — 2026-05-08 (Oturum 4)
+# 📋 Session Notes — 2026-05-08 (Oturum 5)
 
-> Oturum: 04:30 - 05:26
+> Oturum: 05:30 - devam ediyor
 
 ## ✅ Yapılanlar
 
-1. GitHub hafıza sistemi kuruldu
-2. Cron job kuruldu (her 6-7 dk otomatik push)
-3. Vercel deploy sorunu çözüldü:
-   - Eski projelerde rootDirectory çakışması → hepsi ERROR
-   - Yeni proje `hooksniff-dash` oluşturuldu
-   - Domain `hooksniff.vercel.app` aktarıldı
-   - `/api/*` rewrite Cloud Run'a çalışıyor
-4. `.vercelignore` eklendi (Rust dosyaları hariç)
-5. `vercel-build` script eklendi
+1. GitHub hafıza sistemi yeniden kuruldu
+2. Repo workspace'e klonlandı
+3. Memory sync scripti oluşturuldu
+4. Cron job kuruldu (otomatik GitHub push)
 
 ## 🔗 Önemli Linkler
 
@@ -22,8 +17,9 @@
 
 ## 📝 Notlar
 
-- Eski Vercel projeleri (hooksniff-dashboard, hooksniff-app) silinebilir
-- Vercel deploy hook yeni projeye güncellenmeli
+- Servet ile yeni oturum başladı
+- Hafıza dosyaları GitHub'a düzenli push edilecek
+- Token ifşa oldu → credential yenileme gerekli
 
 ---
-> Son güncelleme: 2026-05-08 05:26
+> Son güncelleme: 2026-05-08 05:30
