@@ -10,9 +10,9 @@
 | # | Görev | Süre | Durum |
 |---|-------|------|-------|
 | 1 | Free tier limit: 1,000 → 10,000/ay | 5dk | ✅ |
-| 2 | Standard Webhooks header'ları ekle (`webhook-id`, `webhook-timestamp`, `webhook-signature`) | 45dk | ❌ |
-| 3 | Playground UI tamamla | 20dk | ❌ |
-| 4 | Delivery Details UI tamamla | 20dk | ❌ |
+| 2 | Standard Webhooks header'ları ekle (`webhook-id`, `webhook-timestamp`, `webhook-signature`) | 45dk | ✅ |
+| 3 | Playground UI tamamla | 20dk | ✅ |
+| 4 | Delivery Details UI tamamla | 20dk | ✅ |
 | 5 | Custom Retry Policy UI ekle | 25dk | ❌ |
 | 6 | Signature Rotation UI ekle | 20dk | ❌ |
 | 7 | Rate Limit Dashboard ekle | 20dk | ❌ |
