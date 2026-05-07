@@ -13,7 +13,7 @@ anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
-reqwest = { version = "0.12", features = ["json"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid", "postgres", "json"] }
 dotenvy = "0.15"
 hmac = "0.12"
