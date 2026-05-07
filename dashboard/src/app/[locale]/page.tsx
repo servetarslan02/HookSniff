@@ -48,16 +48,25 @@ function TypewriterText() {
   );
 }
 
-/* ─── Floating Particles ─── */
+/* ─── Floating Particles (seeded to avoid SSR hydration mismatch) ─── */
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
 function FloatingParticles() {
+  const rng = seededRandom(42);
   const particles = Array.from({ length: 20 }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 4 + 2,
-    duration: Math.random() * 4 + 4,
-    delay: Math.random() * 4,
-    opacity: Math.random() * 0.15 + 0.05,
+    x: rng() * 100,
+    y: rng() * 100,
+    size: rng() * 4 + 2,
+    duration: rng() * 4 + 4,
+    delay: rng() * 4,
+    opacity: rng() * 0.15 + 0.05,
   }));
 
   return (

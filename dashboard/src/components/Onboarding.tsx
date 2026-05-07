@@ -179,7 +179,14 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
                 </button>
               )}
               <button
-                onClick={step.ctaAction || nextStep}
+                onClick={() => {
+                  if (step.ctaAction) {
+                    dismiss();
+                    step.ctaAction();
+                  } else {
+                    nextStep();
+                  }
+                }}
                 className="px-6 py-2.5 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition btn-ripple"
               >
                 {step.cta}
