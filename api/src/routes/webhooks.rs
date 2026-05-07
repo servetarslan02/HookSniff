@@ -25,6 +25,7 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(list_deliveries).post(create_webhook))
         .route("/batch", post(batch_webhooks))
+        .route("/batch/replay", post(batch_replay))
         .route("/export", get(export_deliveries))
         .route("/{id}", get(get_delivery))
         .route("/{id}/replay", post(replay_webhook))
@@ -504,6 +505,115 @@ fn escape_csv_cell(value: &str) -> String {
         out.push_str(value);
     }
     out
+}
+
+// ── Batch Replay ──
+
+#[derive(Deserialize)]
+struct BatchReplayRequest {
+    delivery_ids: Vec<Uuid>,
+}
+
+async fn batch_replay(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Extension(cfg): Extension<Config>,
+    Json(req): Json<BatchReplayRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    if req.delivery_ids.is_empty() {
+        return Err(AppError::BadRequest("delivery_ids cannot be empty".into()));
+    }
+    if req.delivery_ids.len() > 100 {
+        return Err(AppError::BadRequest("Max 100 deliveries per batch replay".into()));
+    }
+
+    let mut replayed = Vec::new();
+    let mut errors = Vec::new();
+
+    for id in &req.delivery_ids {
+        // Get original delivery
+        let original = sqlx::query_as::<_, Delivery>(
+            "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+        )
+        .bind(id)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?;
+
+        let Some(original) = original else {
+            errors.push(serde_json::json!({ "id": id, "error": "Not found" }));
+            continue;
+        };
+
+        // Get endpoint
+        let endpoint = sqlx::query_as::<_, Endpoint>(
+            "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        )
+        .bind(original.endpoint_id)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?;
+
+        let Some(endpoint) = endpoint else {
+            errors.push(serde_json::json!({ "id": id, "error": "Endpoint inactive" }));
+            continue;
+        };
+
+        // Rate limit check
+        let updated: Option<Customer> = sqlx::query_as(
+            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
+        )
+        .bind(customer.id)
+        .bind(customer.webhook_limit as i64)
+        .fetch_optional(&pool)
+        .await?;
+
+        if updated.is_none() {
+            errors.push(serde_json::json!({ "id": id, "error": "Rate limit exceeded" }));
+            continue;
+        }
+
+        let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
+        let payload_str = serde_json::to_string(&original.payload)
+            .map_err(|e| AppError::Internal(e.into()))?;
+
+        let new_delivery = sqlx::query_as::<_, Delivery>(
+            "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, replay_count) VALUES ($1, $2, $3, $4, 'pending', $5, 1) RETURNING *",
+        )
+        .bind(original.endpoint_id)
+        .bind(customer.id)
+        .bind(&original.payload)
+        .bind(&original.event_type)
+        .bind(retry_policy.max_attempts)
+        .fetch_one(&pool)
+        .await?;
+
+        db::publish_to_queue(
+            &pool,
+            new_delivery.id,
+            endpoint.id,
+            &endpoint.url,
+            &payload_str,
+            endpoint.custom_headers.as_ref(),
+            &endpoint.signing_secret,
+            original.event_type.as_deref(),
+            &cfg.redis_url,
+        )
+        .await?;
+
+        replayed.push(serde_json::json!({
+            "original_id": original.id,
+            "new_id": new_delivery.id,
+            "status": "pending"
+        }));
+    }
+
+    Ok(Json(serde_json::json!({
+        "replayed": replayed.len(),
+        "errors": errors.len(),
+        "results": replayed,
+        "failures": errors,
+    })))
 }
 
 fn parse_date_from_str(s: &str) -> Option<DateTime<Utc>> {
