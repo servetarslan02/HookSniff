@@ -10,6 +10,7 @@
 |---------|------|----------|
 | Hata düzeltme, fix, refactor | `servetarslan02/HookSniff` | Orijinal repo, main branch |
 | Yeni özellik geliştirme | `servetarslan02/hooksniff-lab` | Lab repo, test → onay → merge |
+| Mobil uygulama | `servetarslan02/hooksniff-mobile` | Ayrı repo, main branch |
 | AI Agent katmanı | `servetarslan02/hooksniff-lab` | Lab repo, Servet onayı beklemede |
 
 **Kural:** Yeni özellikler lab repo'da geliştirilir, test edilir, Servet onay verirse ana repo'ya merge edilir.
@@ -54,7 +55,12 @@ Tüm hafıza `.ai-context/` klasöründe tutuluyor.
   PRODUCT_IMPROVEMENTS.md → Ürün iyileştirme önerileri (7 madde)
   CODEBASE_AUDIT.md      → Kapsamlı kod denetim raporu (10 madde)
   FULL_SYSTEM_AUDIT.md   → Tam sistem denetimi (kritik güvenlik + 10 madde)
-  2026-05-08.md        → Oturum logları
+  MOBILE_MASTER_PLAN.md → Mobil uygulama master plan
+  MOBILE_APP_AUDIT.md   → Mobil eksiklik analizi
+  MOBILE_DECISIONS.md   → Mobil plan kararları
+  MOBILE_PERFORMANCE.md → Mobil performans raporu
+  MOBILE_RESOURCES.md   → Mobil kaynaklar
+  2026-05-08.md         → Oturum logları
   README.md            → Klasör açıklaması
 
 TODO.md                → Yapılacaklar listesi (root, birleştirilmiş)
@@ -75,7 +81,7 @@ STATUS.md              → Genel durum özeti (root)
 | CDN | Cloudflare |
 | Monitoring | Grafana Cloud (OpenTelemetry) |
 | Ödeme | Polar.sh (global) + iyzico (TR) |
-| Email | Resend |
+| Email | GCloud Gmail API |
 
 ## Servis Durumları
 
@@ -87,7 +93,7 @@ STATUS.md              → Genel durum özeti (root)
 | Neon DB | ✅ Aktif | Serverless PostgreSQL |
 | Upstash Redis | ✅ Aktif | Serverless Redis |
 | Polar.sh | ✅ Aktif | Pro $49, Business $149 |
-| Resend | ⚠️ Domain doğrulanacak | API key var |
+| Gmail API | ✅ Aktif | Service account |
 | Grafana Cloud | ⚠️ Test edilecek | Hesap var |
 | Cloudflare R2 | ✅ Hazır | 10GB depolama |
 | iyzico | ❌ Hesap açılacak | TR ödemeler |
@@ -138,4 +144,4 @@ HookSniff/
 
 ---
 
-> Son güncelleme: 2026-05-08
+> Son güncelleme: 2026-05-08 23:38 GMT+8

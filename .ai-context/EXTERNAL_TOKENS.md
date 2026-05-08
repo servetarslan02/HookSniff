@@ -1,6 +1,9 @@
 # EXTERNAL_TOKENS.md — Dış Servis Token Referansı
 # ⚠️ Bu dosya sadece AI hafızası içindir, GitHub'da saklanır
 # ⚠️ Token'lar compromize — yeni oturumda yenilemeniz gerekebilir
+# ⚠️ REPO PUBLIC UYARISI: Repo public yapıldığında bu dosya görünür olur!
+#    CI çalıştırıldıktan sonra hemen private yapın.
+#    Uzun vadede: bu dosyayı .gitignore'a ekle veya sadece GCP Secret Manager kullan.
 
 # Render
 RENDER_API_KEY=rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m
