@@ -69,19 +69,17 @@ for r in json.load(sys.stdin).get('workflow_runs',[]):
 
 ## ❌ KALAN SORUNLAR
 
-### Integration Test Hataları (5 test)
-Bu testler lib testlerinden ayrı, `api/tests/integration.rs` dosyasında:
+**Tüm testler temiz — 156/156 passed ✅**
 
-1. `test_api_key_generation` — Argon2 hash sabit değerle karşılaştırma
-2. `test_api_key_hashing` — Aynı sorun
-3. `test_plan_limits` — Plan limit mantığı
-4. `test_usage_calculations` — Usage hesaplama (9500 vs 500 bekleniyor)
-5. `test_usage_limit_exceeded` — Limit aşma kontrolü
+Bu oturumda çözülenler:
+- 7 lib test hatası (Stripe base64, JSON depth, FieldMapper)
+- 5 integration test hatası (plan limits, usage, API key format/hash)
+- Toplam 12 düzeltme, hepsi kesin kök neden analiziyle çözüldü.
 
-**Önceki oturumda çözülen 7 test hatası ✅:**
-- Stripe signature (5): test secret base64 değildi
-- validate_json_depth: başlangıç depth değeri yanlıştı
-- FieldMapper: kaynak anahtar silinmiyordu
+### Bir Sonraki Oturumda Yapılabilecekler
+1. CI workflow'unu kontrol et — bu commit'ler CI'ı yeşil yapmalı
+2. Production deploy test
+3. Servet'in dış servis görevleri (Polar.sh, Resend, iyzico)
 
 ---
 
