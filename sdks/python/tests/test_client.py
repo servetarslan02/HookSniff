@@ -4,7 +4,8 @@ import hmac
 import json
 import pytest
 from hooksniff import HookSniffClient
-from hooksniff.verify import verify_signature, verify_webhook_signature
+from hooksniff.verify import verify_signature
+from hooksniff.utils import verify_webhook_signature
 
 
 class TestVerifySignature:

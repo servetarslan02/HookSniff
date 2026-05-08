@@ -176,7 +176,7 @@ async fn list_users(
     if params.status.is_some() {
         conditions.push(format!("is_active = ${}", bind_idx));
         bind_idx += 1;
-    let _ = bind_idx; // suppress unused assignment warning
+        let _ = bind_idx; // suppress unused assignment warning
     }
 
     let where_clause = if conditions.is_empty() {
