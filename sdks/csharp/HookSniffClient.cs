@@ -442,5 +442,23 @@ namespace HookSniff
             var query = queryParams.Count > 0 ? "?" + string.Join("&", queryParams) : "";
             return await _client.RequestAsync<List<Delivery>>("GET", $"/webhooks/export{query}");
         }
+
+        /// <summary>
+        /// Search deliveries with filters.
+        /// </summary>
+        public async Task<object> SearchAsync(string? query = null, string? @event = null,
+            string? status = null, string? endpointId = null, int page = 1, int perPage = 20)
+        {
+            var queryParams = new List<string>();
+            if (query != null) queryParams.Add($"q={query}");
+            if (@event != null) queryParams.Add($"event={@event}");
+            if (status != null) queryParams.Add($"status={status}");
+            if (endpointId != null) queryParams.Add($"endpoint_id={endpointId}");
+            queryParams.Add($"page={page}");
+            queryParams.Add($"per_page={perPage}");
+
+            var qs = "?" + string.Join("&", queryParams);
+            return await _client.RequestAsync<object>("GET", $"/search{qs}");
+        }
     }
 }

@@ -198,5 +198,16 @@ module HookSniff
 
       resp.map { |d| Models::Delivery.new(d) }
     end
+
+    # Search deliveries with filters
+    def search(query: nil, event: nil, status: nil, endpoint_id: nil, page: 1, per_page: 20)
+      params = { page: page.to_s, per_page: per_page.to_s }
+      params[:q] = query if query
+      params[:event] = event if event
+      params[:status] = status if status
+      params[:endpoint_id] = endpoint_id if endpoint_id
+      query_str = URI.encode_www_form(params)
+      @client.request(:get, "/search?#{query_str}")
+    end
   end
 end
