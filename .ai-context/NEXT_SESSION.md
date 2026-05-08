@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-08 22:49 GMT+8
+> Son güncelleme: 2026-05-08 23:23 GMT+8
 
 ---
 
@@ -12,6 +12,18 @@
 | Yeni web özellikleri | `servetarslan02/hooksniff-lab` (lab) | feature/... |
 | Mobil uygulama | `servetarslan02/hooksniff-mobile` | main |
 | Market research, plan, notlar | `.ai-context/` klasörü (her iki repo'da) | main |
+
+---
+
+## ✅ CI DURUMU (2026-05-08 23:23)
+
+Tüm 6 CI job'u artık geçiyor:
+1. ✅ `lint` — cargo fmt + clippy
+2. ✅ `test` — 29 test (18 api + 11 worker)
+3. ✅ `build-api` — release binary
+4. ✅ `build-worker` — release binary
+5. ✅ `build-dashboard` — Next.js build (20 dosya düzeltildi)
+6. ✅ `security-audit` — cargo audit (`.cargo/audit.toml` ile allowlist)
 
 ---
 
@@ -34,7 +46,6 @@ source "$HOME/.cargo/env"
 ```bash
 cat .ai-context/MEMORY.md
 cat .ai-context/NEXT_SESSION.md
-cat .ai-context/EXTERNAL_TOKENS.md
 ```
 
 ---
@@ -48,25 +59,12 @@ cat .ai-context/EXTERNAL_TOKENS.md
 | **Dashboard** | https://hooksniff.vercel.app |
 | **API** | https://hooksniff-api-1046140057667.europe-west1.run.app |
 | **Worker** | https://hooksniff-worker-1046140057667.europe-west1.run.app |
-| **Region** | europe-west1 (GCP Cloud Run) |
-| **DB** | Neon PostgreSQL (eu-central-1) |
-| **Cache** | Upstash Redis (64MB) |
-| **Storage** | Cloudflare R2 (hooksniff-storage) |
-| **Branch Ruleset** | main-protection (PR + CI checks + no force push + no delete) |
 
 ---
 
-## ❌ KALAN SORUNLAR (2026-05-08 22:49)
-
-### CI Hataları (düzeltiliyor)
-- Clippy lints failure
-- Run tests failure
-- Dashboard build failure
-- Rust dependency audit failure
+## ❌ KALAN SORUNLAR
 
 ### Servet'in görevleri:
-- ~~Polar.sh token~~ ✅
-- ~~GitHub token~~ ✅
 - **iyzico hesap** — vergi levhası + banka hesabı
 
 ### Eksik Backend (Mobil için)
@@ -76,27 +74,10 @@ cat .ai-context/EXTERNAL_TOKENS.md
 4. Refresh token
 5. 2FA
 
-### Düşük öncelik
-- OpenAPI spec boş
+### Teknik borç
+- sqlx 0.7.4 → 0.8 upgrade (security audit vulnerabilities)
 - 107 eski domain referansı
 - console.log kalıntıları
-
----
-
-## ⚠️ GitHub Actions Dakika Limiti
-
-GitHub Free plan, private repo'lar için ayda 2,000 dakika Actions limiti var.
-Çözüm: Repo'yu geçici olarak public yapıp CI çalıştır, sonra tekrar private yap.
-
-```bash
-# Public yap
-curl -X PATCH -H "Authorization: token TOKEN" "https://api.github.com/repos/servetarslan02/HookSniff" -d '{"private": false}'
-
-# CI tetikle + bekle
-
-# Private yap
-curl -X PATCH -H "Authorization: token TOKEN" "https://api.github.com/repos/servetarslan02/HookSniff" -d '{"private": true}'
-```
 
 ---
 
