@@ -246,7 +246,9 @@ async fn deliver_email(
 
     let client_email = sa_key["client_email"].as_str().unwrap_or("");
     let private_key = sa_key["private_key"].as_str().unwrap_or("");
-    let token_uri = sa_key["token_uri"].as_str().unwrap_or("https://oauth2.googleapis.com/token");
+    let token_uri = sa_key["token_uri"]
+        .as_str()
+        .unwrap_or("https://oauth2.googleapis.com/token");
 
     let header = jsonwebtoken::Header::new(jsonwebtoken::Algorithm::RS256);
     let claims = serde_json::json!({
@@ -300,15 +302,17 @@ async fn deliver_email(
 
     let access_token = match token_result {
         Ok(resp) if resp.status().is_success() => {
-            let body: serde_json::Value = resp.text().await
-                .and_then(|t| serde_json::from_str(&t).map_err(|e| reqwest::Error::from(e)))
-                .unwrap_or_default();
+            let text = resp.text().await.unwrap_or_default();
+            let body: serde_json::Value = serde_json::from_str(&text).unwrap_or_default();
             body["access_token"].as_str().unwrap_or("").to_string()
         }
         Ok(resp) => {
             let status = resp.status().as_u16() as i32;
             let text = resp.text().await.unwrap_or_default();
-            warn!("GCloud token exchange failed: status={}, body={}", status, text);
+            warn!(
+                "GCloud token exchange failed: status={}, body={}",
+                status, text
+            );
             return Ok(DeliveryResult {
                 success: false,
                 status_code: status,

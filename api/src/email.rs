@@ -146,7 +146,11 @@ impl GCloudEmailClient {
         if !resp.status().is_success() {
             let status = resp.status();
             let text = resp.text().await.unwrap_or_default();
-            tracing::error!("GCloud token exchange error: status={}, body={}", status, text);
+            tracing::error!(
+                "GCloud token exchange error: status={}, body={}",
+                status,
+                text
+            );
             return Err(AppError::Internal(anyhow::anyhow!(
                 "GCloud token exchange returned {}: {}",
                 status,
