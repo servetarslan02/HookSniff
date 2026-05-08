@@ -146,7 +146,7 @@ fn test_plan_limits() {
 
     // Free plan limits
     let free = Plan::Free;
-    assert_eq!(free.max_webhooks_per_month(), 1_000);
+    assert_eq!(free.max_webhooks_per_month(), 10_000);
     assert_eq!(free.max_endpoints(), 5);
     assert_eq!(free.max_requests_per_minute(), 100);
     assert_eq!(free.retention_days(), 7);
@@ -166,7 +166,7 @@ fn test_plan_limits() {
     assert_eq!(biz.max_endpoints(), 500);
     assert_eq!(biz.max_requests_per_minute(), 10_000);
     assert_eq!(biz.retention_days(), 90);
-    assert_eq!(biz.monthly_price_cents(), 29900);
+    assert_eq!(biz.monthly_price_cents(), 14900);
 }
 
 #[test]
@@ -188,7 +188,7 @@ fn test_usage_calculations() {
     let usage = Usage {
         customer_id: "test".to_string(),
         plan: Plan::Free,
-        webhooks_today: 500,
+        webhooks_today: 5_000,
         api_calls_today: 100,
         endpoints_count: 3,
         period_start: "2026-05-01".to_string(),
@@ -196,7 +196,7 @@ fn test_usage_calculations() {
     };
 
     assert!(!usage.is_webhook_limit_exceeded());
-    assert_eq!(usage.remaining_webhooks(), 500);
+    assert_eq!(usage.remaining_webhooks(), 5_000);
     assert!(!usage.is_endpoint_limit_exceeded());
     assert_eq!(usage.remaining_endpoints(), 2);
 }
@@ -208,7 +208,7 @@ fn test_usage_limit_exceeded() {
     let usage = Usage {
         customer_id: "test".to_string(),
         plan: Plan::Free,
-        webhooks_today: 1_000,
+        webhooks_today: 10_000,
         api_calls_today: 100,
         endpoints_count: 5,
         period_start: "2026-05-01".to_string(),
@@ -257,10 +257,11 @@ fn test_api_key_generation() {
         key.starts_with("hr_live_"),
         "API key should start with hr_live_"
     );
+    // hr_live_ (8) + 64 hex chars = 72
     assert_eq!(
         key.len(),
-        44,
-        "API key should be 44 chars (hr_live_ + 36 UUID)"
+        72,
+        "API key should be 72 chars (hr_live_ + 64 hex)"
     );
 
     // Each key should be unique
@@ -276,16 +277,15 @@ fn test_api_key_hashing() {
     let hash1 = middleware::hash_api_key(key);
     let hash2 = middleware::hash_api_key(key);
 
-    // Deterministic
-    assert_eq!(hash1, hash2);
+    // Different keys should produce different hashes (random salt)
+    // But same key should produce different hashes too (Argon2 uses random salt)
+    // So we just verify the hash is valid Argon2 PHC format
+    assert!(hash1.starts_with("$argon2id"), "Should use Argon2id");
+    assert!(hash1.len() > 50, "Argon2 hash should be > 50 chars");
 
-    // Different key → different hash
+    // Different key → different hash (extremely unlikely to collide)
     let hash3 = middleware::hash_api_key("hr_live_different_key");
     assert_ne!(hash1, hash3);
-
-    // Should be hex-encoded SHA-256 (64 chars)
-    assert_eq!(hash1.len(), 64);
-    assert!(hash1.chars().all(|c| c.is_ascii_hexdigit()));
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -399,9 +399,12 @@ fn test_api_key_format() {
         // Must start with hr_live_
         assert!(key.starts_with("hr_live_"));
 
-        // Must be alphanumeric after prefix (UUID chars + hyphens removed)
+        // Must be 72 chars total
+        assert_eq!(key.len(), 72);
+
+        // Must be hex after prefix
         let suffix = &key[8..];
-        assert!(suffix.chars().all(|c| c.is_ascii_alphanumeric()));
+        assert!(suffix.chars().all(|c| c.is_ascii_hexdigit()));
     }
 }
 
