@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 const AUTH_COOKIE_NAME: &str = "hooksniff_token";
+const REFRESH_COOKIE_NAME: &str = "hooksniff_refresh";
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -48,19 +49,30 @@ pub async fn request_id_middleware(mut req: Request, next: Next) -> Response {
 ///
 /// Test keys (hr_test_*) are marked and can be checked downstream to skip real delivery.
 /// Extract token from request: first try Authorization header, then try cookie.
+/// Skips non-token Authorization values (e.g. "Bearer cookie" from frontend cookie mode).
 fn extract_token(req: &Request) -> Option<String> {
-    // Try Authorization header first
-    if let Some(auth_header) = req.headers().get(AUTHORIZATION).and_then(|v| v.to_str().ok()) {
+    // Try Authorization header first — but only if it looks like a real token
+    if let Some(auth_header) = req
+        .headers()
+        .get(AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+    {
         if let Some(token) = auth_header.strip_prefix("Bearer ") {
-            return Some(token.to_string());
+            let token = token.trim();
+            // Skip placeholder values like "cookie", "null", "undefined"
+            if !token.is_empty() && token != "cookie" && token != "null" && token != "undefined" {
+                return Some(token.to_string());
+            }
         }
     }
-    // Try cookie
+    // Try cookie (HttpOnly auth cookie)
     if let Some(cookie_header) = req.headers().get("cookie").and_then(|v| v.to_str().ok()) {
         for cookie in cookie_header.split(';') {
             let cookie = cookie.trim();
             if let Some(value) = cookie.strip_prefix(&format!("{}=", AUTH_COOKIE_NAME)) {
-                return Some(value.to_string());
+                if !value.is_empty() {
+                    return Some(value.to_string());
+                }
             }
         }
     }
@@ -96,7 +108,7 @@ pub async fn auth_middleware(
         // Try customers table first (legacy primary key)
         let mut found: Option<Customer> = None;
         for c in &candidates {
-            if verify_api_key(token, &c.api_key_hash) {
+            if verify_api_key(&token, &c.api_key_hash) {
                 found = Some(c.clone());
                 break;
             }
@@ -105,7 +117,7 @@ pub async fn auth_middleware(
         // If not found in customers, try api_keys table
         if found.is_none() {
             for (hash,) in &api_key_candidates {
-                if verify_api_key(token, hash) {
+                if verify_api_key(&token, hash) {
                     // Found in api_keys — load the owning customer
                     // We need the customer_id from the api_keys table
                     let owner: Option<Customer> = sqlx::query_as(
@@ -126,7 +138,7 @@ pub async fn auth_middleware(
         found.ok_or(AppError::Unauthorized)?
     } else {
         // JWT token authentication
-        let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
+        let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
         sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
             .bind(claims.sub)
             .fetch_optional(&*pool)
@@ -148,7 +160,7 @@ pub async fn jwt_auth_middleware(
 ) -> Result<Response, AppError> {
     let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
 
-    let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
+    let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
 
     let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
         .bind(claims.sub)
@@ -258,4 +270,34 @@ pub fn clear_auth_cookie() -> String {
         "{}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
         AUTH_COOKIE_NAME
     )
+}
+
+/// Create a Set-Cookie header value for the refresh token.
+/// HttpOnly, Secure, SameSite=None, 30-day expiry.
+pub fn create_refresh_token_cookie(token: &str, max_age_secs: i64) -> String {
+    format!(
+        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        REFRESH_COOKIE_NAME, token, max_age_secs
+    )
+}
+
+/// Create a Set-Cookie header value to clear the refresh token cookie.
+pub fn clear_refresh_token_cookie() -> String {
+    format!(
+        "{}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
+        REFRESH_COOKIE_NAME
+    )
+}
+
+/// Extract refresh token from cookie header.
+pub fn extract_refresh_token(req: &axum::extract::Request) -> Option<String> {
+    if let Some(cookie_header) = req.headers().get("cookie").and_then(|v| v.to_str().ok()) {
+        for cookie in cookie_header.split(';') {
+            let cookie = cookie.trim();
+            if let Some(value) = cookie.strip_prefix(&format!("{}=", REFRESH_COOKIE_NAME)) {
+                return Some(value.to_string());
+            }
+        }
+    }
+    None
 }
