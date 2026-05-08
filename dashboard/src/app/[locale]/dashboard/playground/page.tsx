@@ -300,10 +300,10 @@ function HistoryPanel({
 
 // ─── Live Request Viewer ───
 function LiveRequestViewer({
-  endpoints,
+
   token,
 }: {
-  endpoints: Endpoint[];
+
   token: string;
 }) {
   const t = useTranslations('playground');
@@ -408,10 +408,10 @@ function LiveRequestViewer({
 
 // ─── Main Playground Page ───
 export default function PlaygroundPage() {
-  const { token, apiKey } = useAuth();
+  const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('playground');
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const [_endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [method, setMethod] = useState<string>('POST');
   const [path, setPath] = useState('/webhooks');
   const [body, setBody] = useState('');
@@ -422,7 +422,7 @@ export default function PlaygroundPage() {
   const [loading, setLoading] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState('');
   const [history, setHistory] = useState<PlaygroundRequest[]>([]);
-  const [showAiGenerator, setShowAiGenerator] = useState(false);
+  const [_showAiGenerator, setShowAiGenerator] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -681,7 +681,7 @@ ${Object.entries(headers)
           </div>
 
           {/* Live Request Viewer */}
-          <LiveRequestViewer endpoints={endpoints} token={token || ''} />
+          <LiveRequestViewer token={token || ''} />
         </div>
 
         {/* Response + History */}

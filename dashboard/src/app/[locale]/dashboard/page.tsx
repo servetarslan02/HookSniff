@@ -11,11 +11,8 @@ import {
   type Delivery,
   type DeliveryTrendResponse,
   type SuccessRateData,
-  type TimeBucket,
 } from '@/lib/api';
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -43,7 +40,6 @@ function TimeRangeSelector({
   onChange: (range: TimeRange) => void;
 }) {
   const t = useTranslations('dashboard');
-  const tc = useTranslations('common');
   const ranges: TimeRange[] = ['24h', '7d', '30d'];
   const labels: Record<TimeRange, string> = { '24h': t('timeRange.24h'), '7d': t('timeRange.7d'), '30d': t('timeRange.30d') };
 
@@ -111,7 +107,6 @@ function DeliveryTrendChart({
   loading: boolean;
 }) {
   const t = useTranslations("dashboard");
-  const tc = useTranslations("common");
   const chartData = data?.buckets.map((b) => ({
     date: new Date(b.timestamp).toLocaleDateString(undefined, {
       month: 'short',
@@ -204,7 +199,7 @@ function SuccessRateDonut({
   loading: boolean;
 }) {
   const t = useTranslations('dashboard');
-  const tc = useTranslations('common');
+  const tc = useTranslations("common");
   const rate = data?.success_rate ?? 0;
   const chartData = [
     { name: tc('success'), value: data?.successful ?? 0 },
@@ -337,7 +332,6 @@ function StatusDot({ status }: { status: string }) {
 export default function DashboardOverview() {
   const { token } = useAuth();
   const t = useTranslations('dashboard');
-  const tc = useTranslations('common');
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);

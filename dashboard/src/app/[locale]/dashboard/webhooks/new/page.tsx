@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi, endpointsApi, type Endpoint } from '@/lib/api';
@@ -18,7 +18,6 @@ export default function SendWebhookPage() {
   const [response, setResponse] = useState<any>(null);
   const [jsonError, setJsonError] = useState('');
   const t = useTranslations('webhooks');
-  const tc = useTranslations('common');
 
   useEffect(() => {
     if (!token) return;
