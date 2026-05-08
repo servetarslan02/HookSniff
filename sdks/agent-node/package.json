@@ -1,0 +1,16 @@
+{
+  "name": "@hooksniff/agent-sdk",
+  "version": "0.1.0",
+  "description": "HookSniff AI Agent SDK — Agent'lar arası event iletişimi",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node test.js"
+  },
+  "keywords": ["hooksniff", "agent", "webhook", "event", "ai"],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
