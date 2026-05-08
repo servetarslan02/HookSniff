@@ -130,8 +130,7 @@ class HookSniffClient(
         httpClient.connectionPool.evictAll()
     }
 
-    @PublishedApi
-    internal inline fun <reified T> request(method: String, path: String, body: Any? = null): T {
+    internal fun <T> request(method: String, path: String, body: Any? = null): T {
         val url = "$baseUrl$path"
         val mediaType = "application/json".toMediaType()
 
