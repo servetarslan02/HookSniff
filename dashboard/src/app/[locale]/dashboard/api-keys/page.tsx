@@ -39,7 +39,7 @@ export default function ApiKeysPage() {
       });
       if (res.ok) setKeys(await res.json());
     } catch (e) {
-      console.error('Failed to fetch API keys:', e);
+      // Error handled silently
     } finally {
       setLoading(false);
     }
