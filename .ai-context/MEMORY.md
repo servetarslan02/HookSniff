@@ -96,12 +96,18 @@
 
 ## ❌ KALAN SORUNLAR
 
-**Tüm testler temiz (156/156) ✅**
+### Test Hataları (3 adet — düzeltilecek)
+1. `validate_json_depth` — derlik sayacı 1'den başlıyor, 0'dan başlamalı
+2. Stripe signature testleri (5 test) — timestamp tolerance sorunlu
+3. Transform pipeline testi — name field silinmiyor ama test silinmesini bekliyor
 
-Bir sonraki oturumda yapılabilecekler:
-- CI/CD deploy workflow'unu kontrol et
-- 5 integration test düzeltmesini CI'a yansıt
-- Production deploy test
+### SDK Hataları (2026-05-08 tespit edildi — detay: .ai-context/SDK_AUDIT.md)
+1. PHP SDK `send()` duplicate satır — kod çalışmaz
+2. Tüm SDK'lar yanlış base URL (api.hooksniff.io → GCP Cloud Run)
+3. Java Gson 2.10.1 eski (güncel: 2.11.0)
+4. Go 1.21 eski (güncel: 1.22)
+5. Versiyon tutarsızlığı (0.1.0 ~ 0.4.0 arası)
+6. Hiçbir SDK'da test, CI, publish yok
 
 ---
 

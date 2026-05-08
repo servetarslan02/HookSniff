@@ -37,6 +37,7 @@ Tüm hafıza `.ai-context/` klasöründe tutuluyor.
   NEXT_SESSION.md      → Sıradaki işler
   EXTERNAL_TOKENS.md   → Tüm API token'ları
   SDK_STRATEGY.md      → SDK bakım ve güvenlik planı (6 aktif, 5 pasif)
+  SDK_AUDIT.md         → SDK denetim raporu (5 hata + eksikler)
   2026-05-08.md        → Oturum logları
   README.md            → Klasör açıklaması
 
