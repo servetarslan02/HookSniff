@@ -9,6 +9,8 @@ import type {
   BatchResult,
   DeliveryAttempt,
   ExportOptions,
+  SearchOptions,
+  SearchResult,
   Stats,
   Customer,
   ApiError,
@@ -37,6 +39,8 @@ export type {
   BatchResult,
   DeliveryAttempt,
   ExportOptions,
+  SearchOptions,
+  SearchResult,
   Stats,
   Customer,
   WebhookPayload,
@@ -316,6 +320,27 @@ class WebhooksResource {
 
     if (options.format === "csv") return resp as string;
     return (resp as any[]).map(mapDelivery);
+  }
+
+  async search(options: SearchOptions = {}): Promise<SearchResult> {
+    const params = new URLSearchParams();
+    if (options.query) params.set("q", options.query);
+    if (options.event) params.set("event", options.event);
+    if (options.status) params.set("status", options.status);
+    if (options.endpointId) params.set("endpoint_id", options.endpointId);
+    params.set("page", String(options.page || 1));
+    params.set("per_page", String(options.perPage || 20));
+
+    const resp = (await this.client._request(
+      "GET",
+      `/search?${params.toString()}`
+    )) as any;
+    return {
+      results: (resp.results || []).map(mapDelivery),
+      total: resp.total || 0,
+      page: resp.page || 1,
+      perPage: resp.per_page || 20,
+    };
   }
 }
 
