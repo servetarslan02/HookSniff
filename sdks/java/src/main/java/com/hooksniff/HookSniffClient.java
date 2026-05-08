@@ -275,7 +275,7 @@ public class HookSniffClient {
             conn.setRequestMethod(method);
             conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("User-Agent", "hooksniff-java/0.2.0");
+            conn.setRequestProperty("User-Agent", "hooksniff-java/0.1.0");
             conn.setConnectTimeout(timeout);
             conn.setReadTimeout(timeout);
 
@@ -326,7 +326,7 @@ public class HookSniffClient {
             conn.setRequestMethod(method);
             conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("User-Agent", "hooksniff-java/0.2.0");
+            conn.setRequestProperty("User-Agent", "hooksniff-java/0.1.0");
             conn.setConnectTimeout(timeout);
             conn.setReadTimeout(timeout);
 

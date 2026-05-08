@@ -19,8 +19,7 @@
     "next-intl": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "recharts": "^2.15.0",
-    "resend": "^6.12.3"
+    "recharts": "^2.15.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^15.0.0",
