@@ -33,10 +33,10 @@ pub struct Config {
     pub iyzico_api_key: Option<String>,
     /// iyzico secret key for signature verification
     pub iyzico_secret_key: Option<String>,
+    /// GCP service account JSON path for Gmail API email sending
+    pub gcp_service_account_path: Option<String>,
     /// CORS allowed origins (comma-separated). Empty = allow all in dev, deny in prod.
     pub cors_origins: Vec<String>,
-    /// Resend API key for transactional emails (optional — emails disabled if not set)
-    pub resend_api_key: Option<String>,
     /// Sender email address for notifications
     pub notify_from_email: String,
     /// Admin notification email address (optional)
@@ -163,13 +163,13 @@ impl Config {
             polar_webhook_secret: std::env::var("POLAR_WEBHOOK_SECRET").ok(),
             iyzico_api_key: std::env::var("IYZICO_API_KEY").ok(),
             iyzico_secret_key: std::env::var("IYZICO_SECRET_KEY").ok(),
+            gcp_service_account_path: std::env::var("GCP_SERVICE_ACCOUNT_PATH").ok(),
             cors_origins: std::env::var("CORS_ORIGINS")
                 .unwrap_or_default()
                 .split(',')
                 .map(|s| s.trim().to_string())
                 .filter(|s| !s.is_empty())
                 .collect(),
-            resend_api_key: std::env::var("RESEND_API_KEY").ok(),
             notify_from_email: std::env::var("NOTIFY_FROM_EMAIL")
                 .unwrap_or_else(|_| "noreply@hooksniff.is-a.dev".into()),
             notify_email: std::env::var("NOTIFY_EMAIL").ok(),

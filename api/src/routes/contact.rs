@@ -1,7 +1,7 @@
 use axum::{http::StatusCode, Extension, Json, Router};
 use serde::{Deserialize, Serialize};
 
-use crate::email::ResendClient;
+use crate::email::GCloudEmailClient;
 
 #[derive(Deserialize)]
 pub struct ContactRequest {
@@ -19,7 +19,7 @@ pub struct ContactResponse {
 
 /// POST /v1/contact — Send a contact form message
 pub async fn handle_contact(
-    Extension(resend): Extension<Option<ResendClient>>,
+    Extension(email_client): Extension<Option<GCloudEmailClient>>,
     Json(body): Json<ContactRequest>,
 ) -> Result<Json<ContactResponse>, StatusCode> {
     // Validate input
@@ -46,8 +46,8 @@ pub async fn handle_contact(
         "Contact form submission"
     );
 
-    // Send email via Resend if configured
-    if let Some(client) = &resend {
+    // Send email via GCloud Gmail API if configured
+    if let Some(client) = &email_client {
         // Notify admin about the contact form submission
         let admin_html = format!(
             r#"<!DOCTYPE html>
@@ -102,7 +102,7 @@ pub async fn handle_contact(
             )
             .await;
     } else {
-        tracing::warn!("Resend not configured — contact form logged but no email sent");
+        tracing::warn!("GCloud email not configured — contact form logged but no email sent");
     }
 
     Ok(Json(ContactResponse {
