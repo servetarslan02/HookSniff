@@ -71,15 +71,16 @@ PR merge: admin override ile CI bypass.
 ### ~~5. Vercel Deploy Hook Düzelt~~ ✅ TAMAMLANDI (Oturum 16)
 - `prj_NQgFly8h...` → `prj_cSIVYHpCoAtoihRp8xlXIun1KVSR` ile eşleştirildi
 
-### 6. Servis Doğrulama (⚠️ Kısmen Test Edildi)
-- Neon DB TCP ✅ — psql/node.pg modülü gerektirir
-- Grafana OTEL: `OTEL_ENABLED=false` — production'da açılmalı
+### 6. Servis Doğrulama ✅ TAMAMLANDI (Oturum 16)
+- Neon DB ✅ — PostgreSQL 17.8, 43 public tablo
+- Grafana OTEL ❌ — 401, token süresi dolmuş → Servet Grafana'dan yeni token almalı
 - GCP Service Account ✅ — hooksniff-app, hooksniff-deploy@...
 
-### 7. Dependency Temizliği (⏳ Beklemede)
-- `cargo-udeps` ile kullanılmayan Rust dependency'leri tespit edilmeli
-- Ortamda Rust kurulmalı: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`
-- API: ~40, Worker: ~25 dependency (tümü kullanımda görünüyor, cargo-udeps ile doğrulanmalı)
+### 7. Dependency Temizliği ✅ TAMAMLANDI (Oturum 16)
+- cargo-udeps derlenemedi (nightly uyumsuzluğu), manuel analiz yapıldı
+- API: ~40 dependency — tümü kullanımda ✅
+- Worker: ~25 dependency — tümü kullanımda ✅
+- Gereksiz dependency bulunamadı
 
 ---
 
