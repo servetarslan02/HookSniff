@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 01:37 GMT+8
+> Son güncelleme: 2026-05-09 02:38 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -127,12 +127,13 @@ cd dashboard && npm install && npm run build
 - ~~Hardcoded DB credentials (run-migrations.js)~~ → script silinmiş
 - ~~truncate duplicate (main.rs)~~ → sadece delivery/http.rs'de kalmış
 
-### ❌ HALA DÜZELTİLMEMİŞ (0 adet)
-1. ~~OpenAPI spec boş~~ → ✅ Tam OpenAPI 3.0.3 spec yazıldı (Oturum 16)
-2. ~~`.env.production.example` eksik~~ → ✅ Güncellendi (Oturum 16)
-3. ~~console.log kalıntıları~~ → ✅ SDK code example'larında, kalıntı değil (Oturum 16)
-4. ~~TODO kalıntıları~~ → ✅ Bulunamadı, zaten temiz (Oturum 16)
-5. ~~Vercel deploy hook URL~~ → ✅ Project ID düzeltildi (Oturum 16)
+### ❌ HALA DÜZELTİLMEMİŞ (1 adet)
+1. **Grafana OTEL token** — tüm token'lar 401 döndü, Servet'ten yeni API Key bekleniyor (Oturum 16)
+2. ~~OpenAPI spec boş~~ → ✅ Tam OpenAPI 3.0.3 spec yazıldı (Oturum 16)
+3. ~~`.env.production.example` eksik~~ → ✅ Güncellendi (Oturum 16)
+4. ~~console.log kalıntıları~~ → ✅ SDK code example'larında, kalıntı değil (Oturum 16)
+5. ~~TODO kalıntıları~~ → ✅ Bulunamadı, zaten temiz (Oturum 16)
+6. ~~Vercel deploy hook URL~~ → ✅ Project ID düzeltildi (Oturum 16)
 
 ### ⚠️ DOĞRULANMADI (test edilmeli)
 - Neon DB bağlantı testi
