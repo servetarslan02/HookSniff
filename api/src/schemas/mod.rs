@@ -185,8 +185,8 @@ fn validate_value(schema: &Value, value: &Value, path: &str, errors: &mut Vec<Va
                 }
             }
         }
-        "string" => {
-            if !value.is_string() {
+        "string"
+            if !value.is_string() => {
                 errors.push(ValidationError {
                     path: path.to_string(),
                     message: format!("Expected string, got {}", value_type_name(value)),
@@ -194,9 +194,8 @@ fn validate_value(schema: &Value, value: &Value, path: &str, errors: &mut Vec<Va
                     actual: Some(value_type_name(value).into()),
                 });
             }
-        }
-        "integer" => {
-            if !value.is_i64() && !value.is_u64() {
+        "integer"
+            if !value.is_i64() && !value.is_u64() => {
                 errors.push(ValidationError {
                     path: path.to_string(),
                     message: format!("Expected integer, got {}", value_type_name(value)),
@@ -204,9 +203,8 @@ fn validate_value(schema: &Value, value: &Value, path: &str, errors: &mut Vec<Va
                     actual: Some(value_type_name(value).into()),
                 });
             }
-        }
-        "number" => {
-            if !value.is_number() {
+        "number"
+            if !value.is_number() => {
                 errors.push(ValidationError {
                     path: path.to_string(),
                     message: format!("Expected number, got {}", value_type_name(value)),
@@ -214,9 +212,8 @@ fn validate_value(schema: &Value, value: &Value, path: &str, errors: &mut Vec<Va
                     actual: Some(value_type_name(value).into()),
                 });
             }
-        }
-        "boolean" => {
-            if !value.is_boolean() {
+        "boolean"
+            if !value.is_boolean() => {
                 errors.push(ValidationError {
                     path: path.to_string(),
                     message: format!("Expected boolean, got {}", value_type_name(value)),
@@ -224,9 +221,8 @@ fn validate_value(schema: &Value, value: &Value, path: &str, errors: &mut Vec<Va
                     actual: Some(value_type_name(value).into()),
                 });
             }
-        }
-        "null" => {
-            if !value.is_null() {
+        "null"
+            if !value.is_null() => {
                 errors.push(ValidationError {
                     path: path.to_string(),
                     message: format!("Expected null, got {}", value_type_name(value)),
@@ -234,7 +230,6 @@ fn validate_value(schema: &Value, value: &Value, path: &str, errors: &mut Vec<Va
                     actual: Some(value_type_name(value).into()),
                 });
             }
-        }
         _ => {}
     }
 }

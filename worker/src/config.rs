@@ -1,6 +1,7 @@
 use anyhow::Result;
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct WorkerConfig {
     pub database_url: String,
     /// OpenTelemetry: enable OTLP exporter

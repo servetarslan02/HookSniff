@@ -333,6 +333,12 @@ impl EventTransformer for JsonTemplate {
 /// No-op transformer that passes events through unchanged.
 pub struct PassThrough;
 
+impl Default for PassThrough {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PassThrough {
     pub fn new() -> Self {
         Self

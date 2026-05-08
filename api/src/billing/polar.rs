@@ -179,11 +179,10 @@ impl PolarProvider {
                         AppError::BadRequest("Invalid Polar signature timestamp".into())
                     })?);
                 }
-                "v1" => {
-                    if v1_sig.is_none() {
+                "v1"
+                    if v1_sig.is_none() => {
                         v1_sig = Some(value.trim());
                     }
-                }
                 _ => {}
             }
         }

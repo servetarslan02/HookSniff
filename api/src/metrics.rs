@@ -21,6 +21,12 @@ pub struct Metrics {
     pub db_query_duration_seconds: Histogram,
 }
 
+impl Default for Metrics {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Metrics {
     pub fn new() -> Self {
         let registry = Registry::new();

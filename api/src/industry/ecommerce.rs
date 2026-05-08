@@ -3,6 +3,12 @@ use super::*;
 /// E-commerce industry package — online stores, marketplaces, fulfillment
 pub struct EcommercePackage;
 
+impl Default for EcommercePackage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EcommercePackage {
     pub fn new() -> Self {
         Self

@@ -275,7 +275,7 @@ fn test_api_key_hashing() {
 
     let key = "hr_live_test_key_123";
     let hash1 = middleware::hash_api_key(key);
-    let hash2 = middleware::hash_api_key(key);
+    let _hash2 = middleware::hash_api_key(key);
 
     // Different keys should produce different hashes (random salt)
     // But same key should produce different hashes too (Argon2 uses random salt)

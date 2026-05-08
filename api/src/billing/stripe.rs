@@ -399,8 +399,6 @@ async fn handle_invoice_paid(
             let prices = StripePrices::from_env();
             if price_id == prices.business_monthly {
                 "business".to_string()
-            } else if price_id == prices.pro_monthly {
-                "pro".to_string()
             } else {
                 "pro".to_string()
             }
@@ -411,8 +409,7 @@ async fn handle_invoice_paid(
         .get("status_transitions")
         .and_then(|st| st.get("paid_at"))
         .and_then(|v| v.as_i64())
-        .map(|ts| chrono::DateTime::from_timestamp(ts, 0))
-        .flatten();
+        .and_then(|ts| chrono::DateTime::from_timestamp(ts, 0));
 
     // Look up internal customer_id from stripe_customer_id
     let customer_row: Option<(uuid::Uuid,)> =
@@ -559,12 +556,11 @@ fn parse_stripe_signature(header: &str) -> Result<(i64, &str), AppError> {
                     AppError::BadRequest("Invalid timestamp in signature header".into())
                 })?);
             }
-            "v1" => {
+            "v1"
                 // Accept the first v1 signature we see
-                if v1_sig.is_none() {
+                if v1_sig.is_none() => {
                     v1_sig = Some(value);
                 }
-            }
             _ => {} // Ignore unknown fields (future-proofing)
         }
     }
