@@ -26,7 +26,7 @@
 | Cache | Upstash Redis | ✅ | PONG, 64MB |
 | Storage | Cloudflare R2 | ✅ | hooksniff-storage |
 | CDN | Cloudflare | ✅ | Hesap aktif |
-| Email | Resend | ❌ | Domain not_started (is-a.dev iptal) |
+| Email | GCloud Gmail API | ✅ | Service account configured |
 | Monitoring | Grafana Cloud | ⏳ | OTEL headers hazır |
 | Ödeme (Global) | Polar.sh | ❌ | Token expired |
 | Ödeme (TR) | iyzico | ❌ | Hesap açılacak |
@@ -49,7 +49,7 @@
 ## Servet'in Yapması Gereken
 
 1. **Polar.sh yeni token** — polar.sh dashboard'dan
-2. **Resend yeni domain** — is-a.dev iptal, yeni domain gerekli
+2. ~~Resend yeni domain~~ → GCloud Gmail API'ya taşındı
 3. **GitHub token yenile** — güvenlik riski
 4. **Domain kararı** — şimdilik hooksniff.vercel.app yeterli
 
