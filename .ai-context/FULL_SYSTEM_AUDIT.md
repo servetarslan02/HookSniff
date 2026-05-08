@@ -124,3 +124,4 @@
 | 23 | Gson 2.10.1 → 2.11.0 güncelle (Java SDK) | 🟢 Düşük | 5 dk |
 | 24 | Go 1.21 → 1.22 güncelle | 🟢 Düşük | 5 dk |
 | 25 | SDK versiyon senkronizasyonu (0.1.0 ~ 0.4.0 → tek versiyon) | 🟢 Düşük | 10 dk |
+| 26 | run-migrations.js + fix-migrations.js: hardcoded DB credentials → process.env.DATABASE_URL | 🟡 Orta | 10 dk |

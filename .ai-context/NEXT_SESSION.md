@@ -92,6 +92,7 @@ Bu oturumda çözülenler:
 - #12-17: Feature parity, quickstart, simulator, npm/pypi publish, changelog, TS tipleri
 - #18-19: CI ekle (clippy, audit, lint)
 - #20-25: console.log, TODO, dependency temizliği, Gson, Go, versiyon senkronizasyonu
+- #26: run-migrations.js + fix-migrations.js hardcoded DB credentials → process.env.DATABASE_URL
 
 ---
 
