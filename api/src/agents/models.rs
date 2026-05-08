@@ -84,23 +84,6 @@ pub struct EmitEventRequest {
     pub target_agent_id: Option<Uuid>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct SubscribeRequest {
-    pub event_type: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct AgentEventResponse {
-    pub id: Uuid,
-    pub agent_id: Uuid,
-    pub event_type: String,
-    pub payload: serde_json::Value,
-    pub direction: String,
-    pub status: String,
-    pub target_agent_id: Option<Uuid>,
-    pub created_at: DateTime<Utc>,
-}
-
 // ============ Agent Route ============
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]

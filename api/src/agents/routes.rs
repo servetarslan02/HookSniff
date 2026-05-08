@@ -103,6 +103,16 @@ async fn create_agent(
     .execute(&pool)
     .await;
 
+    // Audit log
+    let _ = super::security::log_action(
+        &pool,
+        agent.id,
+        customer.id,
+        "agent.created",
+        serde_json::json!({"name": req.name}),
+        None,
+    ).await;
+
     Ok((StatusCode::CREATED, Json(serde_json::json!({
         "agent": AgentResponse::from(agent),
         "message": "Agent created. Save the agent_key — it won't be shown again."
@@ -178,6 +188,17 @@ async fn delete_agent(
     if result.rows_affected() == 0 {
         return Err(StatusCode::NOT_FOUND);
     }
+
+    // Audit log
+    let _ = super::security::log_action(
+        &pool,
+        agent_id,
+        customer.id,
+        "agent.deleted",
+        serde_json::json!({}),
+        None,
+    ).await;
+
     Ok(Json(serde_json::json!({ "message": "Agent deleted" })))
 }
 
@@ -295,6 +316,19 @@ async fn emit_event(
             delivered_to.push(target);
         }
     }
+
+    // Audit log kaydet
+    let _ = super::security::log_action(
+        &pool,
+        agent_id,
+        customer.id,
+        "event.emit",
+        serde_json::json!({
+            "event_type": req.event_type,
+            "target_count": delivered_to.len(),
+        }),
+        None,
+    ).await;
 
     Ok(Json(serde_json::json!({
         "event_id": event.id,
