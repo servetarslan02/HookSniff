@@ -59,7 +59,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     search(page);
-  }, [page]);
+  }, [page, search]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

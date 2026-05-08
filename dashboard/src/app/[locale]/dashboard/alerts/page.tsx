@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 interface AlertRule {
   id: string;
@@ -34,6 +35,7 @@ export default function AlertsPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '',
     condition: 'failure_rate',
@@ -81,16 +83,22 @@ export default function AlertsPage() {
     }
   };
 
-  const deleteAlert = async (id: string) => {
-    if (!confirm(t('deleteConfirm'))) return;
+  const deleteAlert = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDeleteAlert = async () => {
+    if (!deleteId) return;
     try {
-      await fetch(`${API}/alerts/${id}`, {
+      await fetch(`${API}/alerts/${deleteId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchAlerts();
     } catch (e) {
       console.error('Failed to delete alert:', e);
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -247,6 +255,15 @@ export default function AlertsPage() {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={!!deleteId}
+        title={t('deleteTitle')}
+        message={t('deleteConfirm')}
+        confirmLabel={t('delete')}
+        variant="danger"
+        onConfirm={confirmDeleteAlert}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   );
 }

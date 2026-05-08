@@ -5,6 +5,7 @@ import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { endpointsApi, type Endpoint } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
@@ -16,6 +17,7 @@ export default function EndpointsPage() {
   const [newDesc, setNewDesc] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const t = useTranslations('endpoints');
   const tc = useTranslations('common');
 
@@ -46,12 +48,19 @@ export default function EndpointsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm(t('deleteConfirm'))) return;
+    if (!token) return;
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!token || !deleteId) return;
     try {
-      await endpointsApi.delete(token, id);
-      setEndpoints((prev) => prev.filter((ep) => ep.id !== id));
+      await endpointsApi.delete(token, deleteId);
+      setEndpoints((prev) => prev.filter((ep) => ep.id !== deleteId));
     } catch (err: any) {
       alert(err.message || 'Failed to delete');
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -177,6 +186,15 @@ export default function EndpointsPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={!!deleteId}
+        title={t('deleteTitle')}
+        message={t('deleteConfirm')}
+        confirmLabel={t('delete')}
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   );
 }
