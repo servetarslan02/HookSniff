@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-08 22:49 GMT+8
+> Son güncelleme: 2026-05-08 23:25 GMT+8
 
 ---
 
@@ -10,8 +10,44 @@
 |---------|------|--------|
 | Hata düzeltme, fix, refactor | `servetarslan02/HookSniff` (orijinal) | main |
 | Yeni web özellikleri | `servetarslan02/hooksniff-lab` (lab) | feature/... |
+| **AI Agent katmanı** | `servetarslan02/HookSniff` | `ai-agent-layer` |
 | Mobil uygulama | `servetarslan02/hooksniff-mobile` | main |
-| Market research, plan, notlar | `.ai-context/` klasörü (her iki repo'da) | main |
+
+---
+
+## 🤖 AI AGENT KATMANI — DURUM
+
+### Tamamlanan (Oturum 14 — 2026-05-08 23:25)
+- ✅ Katman 1: DB Migration (030_ai_agents.sql)
+  - agents, agent_events, agent_routes, agent_rate_limits tablolari
+- ✅ Katman 2: API Routes
+  - Agent CRUD: create, list, get, update, delete
+  - Event API: emit, list events
+  - Routing: create, list, delete routes
+  - Rate limit: get, update per agent
+  - Auth: X-Agent-Key header + Argon2id
+- ✅ Dashboard sayfalari
+  - Agent listesi (/dashboard/agents)
+  - Agent detay (/dashboard/agents/[id])
+  - Sidebar'da AI Agents linki
+- ✅ 18/18 test gecti, Clippy temiz
+- ✅ GitHub'a push edildi: `ai-agent-layer` branch
+
+### Sıradaki (Bir sonraki oturum)
+- ⏳ Katman 3: Dashboard gelistirme
+  - Agent monitoring sayfasi
+  - Routing gorsel editor
+  - Event timeline
+- ⏳ Katman 4: Guvenlik + Monitoring
+  - Agent davranis profili
+  - Anomaly detection
+  - Audit log
+- ⏳ Deploy: Cloud Run'a deploy
+
+### Branch
+```
+git checkout ai-agent-layer
+```
 
 ---
 
@@ -22,6 +58,7 @@
 cd /root/.openclaw/workspace
 git clone https://x-access-token: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@github.com/servetarslan02/HookSniff.git
 cd HookSniff
+git checkout ai-agent-layer
 ```
 
 ### 2. Adım: Rust Kur (eğer yoksa)
@@ -34,7 +71,6 @@ source "$HOME/.cargo/env"
 ```bash
 cat .ai-context/MEMORY.md
 cat .ai-context/NEXT_SESSION.md
-cat .ai-context/EXTERNAL_TOKENS.md
 ```
 
 ---
@@ -52,21 +88,19 @@ cat .ai-context/EXTERNAL_TOKENS.md
 | **DB** | Neon PostgreSQL (eu-central-1) |
 | **Cache** | Upstash Redis (64MB) |
 | **Storage** | Cloudflare R2 (hooksniff-storage) |
-| **Branch Ruleset** | main-protection (PR + CI checks + no force push + no delete) |
+| **AI Agent Branch** | `ai-agent-layer` |
 
 ---
 
-## ❌ KALAN SORUNLAR (2026-05-08 22:49)
+## ❌ KALAN SORUNLAR
 
-### CI Hataları (düzeltiliyor)
+### CI Hataları (ana repo — main branch)
 - Clippy lints failure
 - Run tests failure
 - Dashboard build failure
 - Rust dependency audit failure
 
 ### Servet'in görevleri:
-- ~~Polar.sh token~~ ✅
-- ~~GitHub token~~ ✅
 - **iyzico hesap** — vergi levhası + banka hesabı
 
 ### Eksik Backend (Mobil için)
@@ -76,28 +110,6 @@ cat .ai-context/EXTERNAL_TOKENS.md
 4. Refresh token
 5. 2FA
 
-### Düşük öncelik
-- OpenAPI spec boş
-- 107 eski domain referansı
-- console.log kalıntıları
-
----
-
-## ⚠️ GitHub Actions Dakika Limiti
-
-GitHub Free plan, private repo'lar için ayda 2,000 dakika Actions limiti var.
-Çözüm: Repo'yu geçici olarak public yapıp CI çalıştır, sonra tekrar private yap.
-
-```bash
-# Public yap
-curl -X PATCH -H "Authorization: token TOKEN" "https://api.github.com/repos/servetarslan02/HookSniff" -d '{"private": false}'
-
-# CI tetikle + bekle
-
-# Private yap
-curl -X PATCH -H "Authorization: token TOKEN" "https://api.github.com/repos/servetarslan02/HookSniff" -d '{"private": true}'
-```
-
 ---
 
 ## 🔄 Hafıza Kuralları
@@ -105,4 +117,4 @@ curl -X PATCH -H "Authorization: token TOKEN" "https://api.github.com/repos/serv
 Her oturum sonunda:
 1. `.ai-context/MEMORY.md` güncelle
 2. `.ai-context/NEXT_SESSION.md` güncelle
-3. `git add -A && git commit && git push origin main`
+3. `git add -A && git commit && git push origin ai-agent-layer`
