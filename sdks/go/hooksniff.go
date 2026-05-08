@@ -302,6 +302,44 @@ func (s *WebhooksService) ExportDeliveries(ctx context.Context, format, status, 
 	return deliveries, err
 }
 
+// SearchResult represents search results.
+type SearchResult struct {
+	Results  []Delivery `json:"results"`
+	Total    int        `json:"total"`
+	Page     int        `json:"page"`
+	PerPage  int        `json:"per_page"`
+}
+
+// Search searches deliveries with filters.
+func (s *WebhooksService) Search(ctx context.Context, query, event, status, endpointID string, page, perPage int) (*SearchResult, error) {
+	params := url.Values{}
+	if query != "" {
+		params.Set("q", query)
+	}
+	if event != "" {
+		params.Set("event", event)
+	}
+	if status != "" {
+		params.Set("status", status)
+	}
+	if endpointID != "" {
+		params.Set("endpoint_id", endpointID)
+	}
+	if page > 0 {
+		params.Set("page", strconv.Itoa(page))
+	}
+	if perPage > 0 {
+		params.Set("per_page", strconv.Itoa(perPage))
+	}
+	queryStr := ""
+	if len(params) > 0 {
+		queryStr = "?" + params.Encode()
+	}
+	var result SearchResult
+	err := s.client.do(ctx, "GET", "/search"+queryStr, nil, &result)
+	return &result, err
+}
+
 // ── Webhook Verification ──
 
 // VerificationResult is the result of webhook verification.

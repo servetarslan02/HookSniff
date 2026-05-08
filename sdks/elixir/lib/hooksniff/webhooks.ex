@@ -84,4 +84,26 @@ defmodule HookSniff.Webhooks do
     path = if params != "", do: "/webhooks/export?#{params}", else: "/webhooks/export"
     HookSniff.request(client, :get, path)
   end
+
+  @doc """
+  Search deliveries with filters.
+
+  ## Options
+    - `:q` - Search query
+    - `:event` - Event type filter
+    - `:status` - Status filter
+    - `:endpoint_id` - Endpoint ID filter
+    - `:page` - Page number (default: 1)
+    - `:per_page` - Results per page (default: 20)
+  """
+  def search(client, opts \\ []) do
+    params =
+      opts
+      |> Enum.filter(fn {_k, v} -> v != nil end)
+      |> Enum.map(fn {k, v} -> "#{k}=#{v}" end)
+      |> Enum.join("&")
+
+    path = if params != "", do: "/search?#{params}", else: "/search"
+    HookSniff.request(client, :get, path)
+  end
 end

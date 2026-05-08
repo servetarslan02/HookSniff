@@ -251,6 +251,19 @@ public class HookSniffClient {
             return gson.fromJson(resp, new TypeToken<List<Delivery>>(){}.getType());
         }
 
+        /** Search deliveries with filters. */
+        public String search(String query, String event, String status, String endpointId, int page, int perPage) {
+            StringBuilder path = new StringBuilder("/search?");
+            if (query != null) path.append("q=").append(query).append("&");
+            if (event != null) path.append("event=").append(event).append("&");
+            if (status != null) path.append("status=").append(status).append("&");
+            if (endpointId != null) path.append("endpoint_id=").append(endpointId).append("&");
+            path.append("page=").append(page).append("&");
+            path.append("per_page=").append(perPage);
+            JsonObject resp = request("GET", path.toString(), null);
+            return resp != null ? resp.toString() : "{}";
+        }
+
         private Delivery mapDelivery(JsonObject data) {
             Delivery d = new Delivery();
             d.setId(data.get("id").getAsString());

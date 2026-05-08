@@ -285,4 +285,23 @@ class WebhooksResource
         if ($format === 'csv') return $resp;
         return array_map(fn($d) => Models\Delivery::fromArray($d), $resp);
     }
+
+    /**
+     * Search deliveries with filters.
+     */
+    public function search(?string $query = null, ?string $event = null,
+                           ?string $status = null, ?string $endpointId = null,
+                           int $page = 1, int $perPage = 20): array
+    {
+        $params = array_filter([
+            'q' => $query,
+            'event' => $event,
+            'status' => $status,
+            'endpoint_id' => $endpointId,
+            'page' => $page,
+            'per_page' => $perPage,
+        ], fn($v) => $v !== null);
+        $queryStr = http_build_query($params);
+        return $this->client->request('GET', "/search?{$queryStr}");
+    }
 }
