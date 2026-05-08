@@ -1,7 +1,8 @@
 use axum::extract::Extension;
-use axum::http::HeaderMap;
+use axum::http::{HeaderMap, HeaderValue};
+use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
-use axum::{Json, Router};
+use axum::Json;
 use chrono::{Duration, Utc};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -9,7 +10,7 @@ use uuid::Uuid;
 use crate::auth::jwt;
 use crate::config::Config;
 use crate::error::AppError;
-use crate::middleware::{generate_api_key, hash_api_key};
+use crate::middleware::{create_auth_cookie, clear_auth_cookie, generate_api_key, hash_api_key};
 use crate::models::customer::{
     AuthResponse, ChangePasswordRequest, Confirm2faRequest, CreateCustomerRequest, Customer,
     CustomerResponse, Disable2faRequest, Enable2faRequest, ForgotPasswordRequest, LoginRequest,
@@ -22,6 +23,20 @@ const LOGIN_RATE_LIMIT: u32 = 10;
 
 /// Maximum registration attempts per IP per hour.
 const REGISTER_RATE_LIMIT: u32 = 5;
+
+/// JWT token max age in seconds (24 hours).
+const TOKEN_MAX_AGE: i64 = 86400;
+
+/// Create an auth response with HttpOnly cookie set.
+fn auth_response_with_cookie(body: AuthResponse) -> impl IntoResponse {
+    let cookie = create_auth_cookie(&body.token, TOKEN_MAX_AGE);
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        "set-cookie",
+        HeaderValue::from_str(&cookie).unwrap_or_else(|_| HeaderValue::from_static("")),
+    );
+    (headers, Json(body))
+}
 
 /// Maximum password reset attempts per IP per hour.
 const RESET_RATE_LIMIT: u32 = 5;
@@ -57,6 +72,7 @@ pub fn router() -> Router {
         .route("/me", get(get_me))
         .route("/profile", put(update_profile))
         .route("/password", put(change_password))
+        .route("/logout", post(logout))
         .route("/2fa/enable", post(enable_2fa))
         .route("/2fa/confirm", post(confirm_2fa))
         .route("/2fa/disable", post(disable_2fa))
@@ -156,7 +172,7 @@ async fn register(
     // Auto-send verification email
     send_verification_email_for_customer(&pool, &cfg, customer.id, &req.email).await;
 
-    Ok(Json(AuthResponse {
+    Ok(auth_response_with_cookie(AuthResponse {
         token,
         customer: customer.to_response(Some(api_key)),
         refresh_token: Some(refresh_token_value),
@@ -171,7 +187,7 @@ async fn login(
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: HeaderMap,
     Json(req): Json<LoginRequest>,
-) -> Result<Json<serde_json::Value>, AppError> {
+) -> Result<impl IntoResponse, AppError> {
     // Rate limit: 10 login attempts per IP per 15 minutes
     let client_ip = extract_client_ip(&headers);
     let rl_key = format!("login:{}", client_ip);
@@ -230,11 +246,11 @@ async fn login(
 
     tracing::info!("✅ Customer logged in: {}", req.email);
 
-    Ok(Json(serde_json::json!(AuthResponse {
+    Ok(auth_response_with_cookie(AuthResponse {
         token,
         customer: customer.to_response(None),
         refresh_token: Some(refresh_token_value),
-    })))
+    }))
 }
 
 // ── 2FA Verify During Login ─────────────────────────────────
@@ -277,7 +293,7 @@ async fn verify_2fa_login(
 
     tracing::info!("✅ 2FA verified for customer: {}", customer.email);
 
-    Ok(Json(AuthResponse {
+    Ok(auth_response_with_cookie(AuthResponse {
         token,
         customer: customer.to_response(None),
         refresh_token: Some(refresh_token_value),
@@ -526,11 +542,22 @@ async fn refresh_token(
     )?;
     let new_refresh = create_refresh_token(&pool, customer.id).await?;
 
-    Ok(Json(AuthResponse {
+    Ok(auth_response_with_cookie(AuthResponse {
         token: new_access,
         customer: customer.to_response(None),
         refresh_token: Some(new_refresh),
     }))
+}
+
+// ── Logout ──────────────────────────────────────────────────
+
+async fn logout() -> impl IntoResponse {
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        "set-cookie",
+        HeaderValue::from_str(&clear_auth_cookie()).unwrap_or_else(|_| HeaderValue::from_static("")),
+    );
+    (headers, Json(serde_json::json!({ "ok": true })))
 }
 
 // ── 2FA Endpoints ───────────────────────────────────────────
