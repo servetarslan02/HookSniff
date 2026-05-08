@@ -13,5 +13,46 @@ pub fn format_agent_event_for_sse(
     event_type: &str,
     direction: &str,
 ) -> String {
-    format!("agent.{}.{}", direction, event_type)
+    format!("agent.{}.{}.{}", agent_id, direction, event_type)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_agent_event_for_sse() {
+        let agent_id = Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap();
+        let result = format_agent_event_for_sse(agent_id, "order.created", "emit");
+        assert_eq!(
+            result,
+            "agent.550e8400-e29b-41d4-a716-446655440000.emit.order.created"
+        );
+    }
+
+    #[test]
+    fn test_format_agent_event_receive() {
+        let agent_id = Uuid::new_v4();
+        let result = format_agent_event_for_sse(agent_id, "payment.received", "receive");
+        assert!(result.contains("receive"));
+        assert!(result.contains("payment.received"));
+        assert!(result.contains(&agent_id.to_string()));
+    }
+
+    #[test]
+    fn test_format_agent_event_different_types() {
+        let agent_id = Uuid::new_v4();
+
+        let emit = format_agent_event_for_sse(agent_id, "test.event", "emit");
+        let receive = format_agent_event_for_sse(agent_id, "test.event", "receive");
+
+        assert_ne!(emit, receive, "Emit ve receive formatlari farkli olmali");
+    }
+
+    #[test]
+    fn test_format_agent_event_dotted_type() {
+        let agent_id = Uuid::new_v4();
+        let result = format_agent_event_for_sse(agent_id, "deeply.nested.event.type", "emit");
+        assert!(result.contains("deeply.nested.event.type"));
+    }
 }

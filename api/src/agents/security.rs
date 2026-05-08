@@ -34,7 +34,7 @@ pub async fn log_action(
 ) -> Result<(), sqlx::Error> {
     sqlx::query(
         r#"INSERT INTO agent_audit_log (agent_id, customer_id, action, details, ip_address)
-           VALUES ($1, $2, $3, $4, $5)"#
+           VALUES ($1, $2, $3, $4, $5)"#,
     )
     .bind(agent_id)
     .bind(customer_id)
@@ -55,26 +55,29 @@ pub async fn check_anomaly(
 
     // Son 1 dakikadaki event sayısı
     let count: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 minute'"
+        "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 minute'",
     )
     .bind(agent_id)
     .fetch_one(pool)
     .await?;
 
     if count.0 > 100 {
-        warnings.push(format!("⚠️ Son 1 dakikada {} event — anormal trafik", count.0));
+        warnings.push(format!(
+            "⚠️ Son 1 dakikada {} event — anormal trafik",
+            count.0
+        ));
     }
 
     // Son 1 saatteki hata oranı
     let total: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 hour'"
+        "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 hour'",
     )
     .bind(agent_id)
     .fetch_one(pool)
     .await?;
 
     let failed: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND status = 'failed' AND created_at > now() - INTERVAL '1 hour'"
+        "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND status = 'failed' AND created_at > now() - INTERVAL '1 hour'",
     )
     .bind(agent_id)
     .fetch_one(pool)
@@ -91,7 +94,7 @@ pub async fn check_anomaly(
 
     // Agent son görülme kontrolü — 24 saatten fazla sessiz
     let agent = sqlx::query_as::<_, crate::agents::models::Agent>(
-        "SELECT * FROM agents WHERE id = $1"
+        "SELECT * FROM agents WHERE id = $1",
     )
     .bind(agent_id)
     .fetch_optional(pool)
@@ -117,7 +120,7 @@ pub async fn check_rate_limit(
     agent_id: Uuid,
 ) -> Result<RateLimitStatus, sqlx::Error> {
     let rl = sqlx::query_as::<_, crate::agents::models::AgentRateLimit>(
-        "SELECT * FROM agent_rate_limits WHERE agent_id = $1"
+        "SELECT * FROM agent_rate_limits WHERE agent_id = $1",
     )
     .bind(agent_id)
     .fetch_optional(pool)
@@ -126,14 +129,14 @@ pub async fn check_rate_limit(
     match rl {
         Some(limit) => {
             let minute_count: (i64,) = sqlx::query_as(
-                "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 minute'"
+                "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 minute'",
             )
             .bind(agent_id)
             .fetch_one(pool)
             .await?;
 
             let hour_count: (i64,) = sqlx::query_as(
-                "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 hour'"
+                "SELECT COUNT(*) FROM agent_events WHERE agent_id = $1 AND created_at > now() - INTERVAL '1 hour'",
             )
             .bind(agent_id)
             .fetch_one(pool)
@@ -170,4 +173,76 @@ pub struct RateLimitStatus {
     pub hour_limit: i32,
     pub minute_remaining: i32,
     pub hour_remaining: i32,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rate_limit_status_serialization() {
+        let status = RateLimitStatus {
+            agent_id: Uuid::new_v4(),
+            minute_used: 30,
+            minute_limit: 60,
+            hour_used: 500,
+            hour_limit: 1000,
+            minute_remaining: 30,
+            hour_remaining: 500,
+        };
+
+        let json = serde_json::to_string(&status).unwrap();
+        assert!(json.contains("\"minute_used\":30"));
+        assert!(json.contains("\"minute_limit\":60"));
+        assert!(json.contains("\"hour_remaining\":500"));
+    }
+
+    #[test]
+    fn test_rate_limit_status_zero_remaining() {
+        let status = RateLimitStatus {
+            agent_id: Uuid::new_v4(),
+            minute_used: 60,
+            minute_limit: 60,
+            hour_used: 1000,
+            hour_limit: 1000,
+            minute_remaining: 0,
+            hour_remaining: 0,
+        };
+
+        let json = serde_json::to_string(&status).unwrap();
+        assert!(json.contains("\"minute_remaining\":0"));
+    }
+
+    #[test]
+    fn test_audit_log_serialization() {
+        let log = AuditLog {
+            id: Uuid::new_v4(),
+            agent_id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            action: "agent.created".to_string(),
+            details: serde_json::json!({"name": "Test Agent"}),
+            ip_address: Some("127.0.0.1".to_string()),
+            created_at: Utc::now(),
+        };
+
+        let json = serde_json::to_string(&log).unwrap();
+        assert!(json.contains("\"action\":\"agent.created\""));
+        assert!(json.contains("\"ip_address\":\"127.0.0.1\""));
+    }
+
+    #[test]
+    fn test_audit_log_no_ip() {
+        let log = AuditLog {
+            id: Uuid::new_v4(),
+            agent_id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            action: "event.emit".to_string(),
+            details: serde_json::json!({}),
+            ip_address: None,
+            created_at: Utc::now(),
+        };
+
+        let json = serde_json::to_string(&log).unwrap();
+        assert!(json.contains("\"ip_address\":null"));
+    }
 }
