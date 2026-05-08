@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 23:23 GMT+8
+> Son güncelleme: 2026-05-09 00:42 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -81,6 +81,22 @@
    - Tümü sqlx 0.7.4 kaynaklı, sqlx 0.8'e upgrade ayrı iş
 5. **Push edildi** — `7ff7c94` commit, main branch
 
+### Bu Oturum (15) — 2026-05-08 23:50-00:42 GMT+8:
+
+**Mobil uygulama için eksik backend feature'ları eklendi.**
+
+1. **CI düzeltmeleri** — PR #29 (cache key reset) + PR #30 (ubuntu-latest) merge edildi
+2. **Repo public/private toggle** — dakika limiti sıfırlandı, CI geçti
+3. **5 yeni backend feature** — sub-agent ile kodlandı, `cargo check` temiz:
+   - Şifre sıfırlama (forgot-password + reset-password)
+   - Email doğrulama (verify-email + resend-verification)
+   - Refresh token (15dk access + 30 gün refresh, rotasyonlu)
+   - 2FA/TOTP (enable/confirm/disable/verify)
+   - Push notification (FCM client + device token CRUD)
+4. **5 yeni migration** — 030-034 (password_reset_tokens, email_verification, refresh_tokens, totp_2fa, device_tokens)
+5. **PR #31 açıldı** — 15 dosya, +1036 satır, merge bekliyor
+6. **Yeni env var'lar** — `EMAIL_BASE_URL`, `FCM_SERVER_KEY` (deploy'da eklenecek)
+
 ---
 
 ## ❌ KALAN SORUNLAR (Güncel — 2026-05-08 22:49)
@@ -102,12 +118,14 @@
 - **GitHub Actions dakika limiti** — repo public/private toggle ile çözüldü
 - **iyzico hesap** — vergi levhası + banka hesabı
 
-### Eksik Backend Özellikleri (Mobil uygulama için)
-1. Push notification (FCM/APNs) — yok
-2. Şifre sıfırlama API'si — route yok
-3. Email doğrulama API'si — route yok
-4. Refresh token — yok
-5. 2FA — yok
+### Eksik Backend Özellikleri (Mobil uygulama için) — ✅ TAMAMLANDI (Oturum 15)
+1. ~~Push notification (FCM/APNs)~~ ✅ FCM client + device token CRUD
+2. ~~Şifre sıfırlama API'si~~ ✅ forgot-password + reset-password
+3. ~~Email doğrulama API'si~~ ✅ verify-email + resend-verification
+4. ~~Refresh token~~ ✅ 15dk access + 30 gün refresh, rotasyonlu
+5. ~~2FA~~ ✅ TOTP: enable/confirm/disable/verify
+
+PR #31: https://github.com/servetarslan02/HookSniff/pull/31
 
 ## 📋 YENİ ÖZELLİK PLANI (2026-05-08 — Hafıza Kaydı)
 
@@ -188,12 +206,14 @@ Kararlar: `.ai-context/MOBILE_DECISIONS.md`
 - **GitHub Actions dakika limiti** — repo public/private toggle ile çözüldü
 - **iyzico hesap** — vergi levhası + banka hesabı
 
-### Eksik Backend Özellikleri (Mobil uygulama için)
-1. Push notification (FCM/APNs) — yok
-2. Şifre sıfırlama API'si — route yok
-3. Email doğrulama API'si — route yok
-4. Refresh token — yok
-5. 2FA — yok
+### Eksik Backend Özellikleri (Mobil uygulama için) — ✅ TAMAMLANDI (Oturum 15)
+1. ~~Push notification (FCM/APNs)~~ ✅ FCM client + device token CRUD
+2. ~~Şifre sıfırlama API'si~~ ✅ forgot-password + reset-password
+3. ~~Email doğrulama API'si~~ ✅ verify-email + resend-verification
+4. ~~Refresh token~~ ✅ 15dk access + 30 gün refresh, rotasyonlu
+5. ~~2FA~~ ✅ TOTP: enable/confirm/disable/verify
+
+PR #31: https://github.com/servetarslan02/HookSniff/pull/31
 
 ---
 
