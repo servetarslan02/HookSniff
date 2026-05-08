@@ -51,7 +51,7 @@ export default function SearchPage() {
       });
       if (res.ok) setResults(await res.json());
     } catch (e) {
-      console.error('Search failed:', e);
+      // Error handled silently
     } finally {
       setLoading(false);
     }

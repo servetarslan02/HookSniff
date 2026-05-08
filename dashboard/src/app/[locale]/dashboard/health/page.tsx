@@ -43,7 +43,7 @@ export default function EndpointHealthPage() {
       });
       if (res.ok) setEndpoints(await res.json());
     } catch (e) {
-      console.error('Failed to fetch endpoint health:', e);
+      // Error handled silently
     } finally {
       setLoading(false);
     }

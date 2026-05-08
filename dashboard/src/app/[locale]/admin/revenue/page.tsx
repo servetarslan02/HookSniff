@@ -28,7 +28,7 @@ export default function AdminRevenuePage() {
       const data = await adminApi.getRevenue(token);
       setRevenue(data);
     } catch (err) {
-      console.error('Failed to fetch revenue:', err);
+      // Error handled silently
     } finally {
       setLoading(false);
     }

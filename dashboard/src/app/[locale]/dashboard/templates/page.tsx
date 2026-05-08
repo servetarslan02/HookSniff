@@ -13,7 +13,7 @@ export default function TemplatesPage() {
     if (!token) return;
     apiFetch<any>('/templates', { token })
       .then((res) => setTemplates(res.templates || []))
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [token]);
 

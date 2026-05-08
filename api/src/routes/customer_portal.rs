@@ -230,7 +230,8 @@ async fn get_plan(Extension(customer): Extension<Customer>) -> Json<serde_json::
 
 /// Bildirim tercihleri
 async fn get_notifications(Extension(_customer): Extension<Customer>) -> Json<serde_json::Value> {
-    // FIXME: Bildirim tercihleri veritabanından okunacak (şimdilik hardcoded)
+    // TODO: Requires notification_preferences table migration.
+    // Default preferences returned until migration is applied.
     Json(serde_json::json!({
         "email_on_failure": true,
         "email_on_dead_letter": true,
@@ -243,7 +244,8 @@ async fn update_notifications(
     Extension(_customer): Extension<Customer>,
     Json(req): Json<serde_json::Value>,
 ) -> Json<serde_json::Value> {
-    // FIXME: Bildirim tercihleri veritabanına kaydedilecek (şimdilik no-op)
+    // TODO: Requires notification_preferences table migration.
+    // Acknowledges update but does not persist until migration is applied.
     Json(serde_json::json!({
         "updated": true,
         "preferences": req,

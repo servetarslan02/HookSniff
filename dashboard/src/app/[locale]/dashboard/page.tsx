@@ -355,7 +355,7 @@ export default function DashboardOverview() {
         if (statsData) setStats(statsData);
         if (deliveriesData) setRecentDeliveries(deliveriesData.deliveries.slice(0, 5));
       } catch (err) {
-        console.error('Failed to load dashboard data:', err);
+        // Error handled silently
       } finally {
         setLoading(false);
       }

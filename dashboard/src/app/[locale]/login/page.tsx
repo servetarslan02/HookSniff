@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import { useState } from 'react';
 import { useRouter, Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
@@ -45,8 +47,8 @@ function LoginForm() {
         await register(email, password, name || undefined);
       }
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || tc('error'));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err) || tc('error'));
     } finally {
       setLoading(false);
     }

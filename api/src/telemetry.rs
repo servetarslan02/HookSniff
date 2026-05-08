@@ -119,7 +119,7 @@ pub async fn trace_id_middleware(request: Request, next: Next) -> impl IntoRespo
         "X-Trace-Id",
         trace_id
             .parse()
-            .unwrap_or_else(|_| "unknown".parse().unwrap()),
+            .unwrap_or_else(|_| "unknown".parse().expect("valid header value")),
     );
     response
 }
