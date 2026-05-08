@@ -39,6 +39,7 @@ export async function generateMetadata({
     icons: {
       icon: '/favicon.svg',
       shortcut: '/favicon.svg',
+      apple: '/apple-touch-icon.png',
     },
     openGraph: {
       title: 'HookSniff — Webhook Delivery Service',
