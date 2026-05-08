@@ -244,8 +244,7 @@ pub async fn create_rule(
     endpoint_id: Uuid,
     config: &TransformRuleConfig,
 ) -> Result<TransformRule> {
-    let rule_json = serde_json::to_value(config)
-        .context("Failed to serialize transform rule")?;
+    let rule_json = serde_json::to_value(config).context("Failed to serialize transform rule")?;
 
     let rule: TransformRule = sqlx::query_as(
         r#"
@@ -270,10 +269,7 @@ pub async fn create_rule(
 }
 
 /// Endpoint için transform kurallarını listele
-pub async fn list_rules(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<Vec<TransformRule>> {
+pub async fn list_rules(pool: &PgPool, endpoint_id: Uuid) -> Result<Vec<TransformRule>> {
     let rules: Vec<TransformRule> = sqlx::query_as(
         r#"
         SELECT id, endpoint_id, rule_json, created_at
@@ -291,33 +287,23 @@ pub async fn list_rules(
 }
 
 /// Transform kuralını sil
-pub async fn delete_rule(
-    pool: &PgPool,
-    rule_id: Uuid,
-) -> Result<bool> {
-    let result = sqlx::query(
-        "DELETE FROM transform_rules WHERE id = $1",
-    )
-    .bind(rule_id)
-    .execute(pool)
-    .await
-    .context("Failed to delete transform rule")?;
+pub async fn delete_rule(pool: &PgPool, rule_id: Uuid) -> Result<bool> {
+    let result = sqlx::query("DELETE FROM transform_rules WHERE id = $1")
+        .bind(rule_id)
+        .execute(pool)
+        .await
+        .context("Failed to delete transform rule")?;
 
     Ok(result.rows_affected() > 0)
 }
 
 /// Endpoint için tüm transform kurallarını sil
-pub async fn delete_all_rules(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<u64> {
-    let result = sqlx::query(
-        "DELETE FROM transform_rules WHERE endpoint_id = $1",
-    )
-    .bind(endpoint_id)
-    .execute(pool)
-    .await
-    .context("Failed to delete transform rules")?;
+pub async fn delete_all_rules(pool: &PgPool, endpoint_id: Uuid) -> Result<u64> {
+    let result = sqlx::query("DELETE FROM transform_rules WHERE endpoint_id = $1")
+        .bind(endpoint_id)
+        .execute(pool)
+        .await
+        .context("Failed to delete transform rules")?;
 
     Ok(result.rows_affected())
 }
@@ -328,8 +314,7 @@ pub async fn update_rule(
     rule_id: Uuid,
     config: &TransformRuleConfig,
 ) -> Result<TransformRule> {
-    let rule_json = serde_json::to_value(config)
-        .context("Failed to serialize transform rule")?;
+    let rule_json = serde_json::to_value(config).context("Failed to serialize transform rule")?;
 
     let rule: TransformRule = sqlx::query_as(
         r#"
@@ -355,11 +340,7 @@ pub async fn update_rule(
 /// Endpoint'in tüm transform kurallarını yükle ve payload'ı dönüştür
 ///
 /// Veritabanından kuralları çeker, pipeline'ı oluşturur ve uygular.
-pub async fn transform_payload(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-    input: &Value,
-) -> Result<Value> {
+pub async fn transform_payload(pool: &PgPool, endpoint_id: Uuid, input: &Value) -> Result<Value> {
     let rules = list_rules(pool, endpoint_id).await?;
 
     if rules.is_empty() {
@@ -592,21 +573,13 @@ fn create_legacy_transformer(
     config: &Value,
 ) -> Result<Box<dyn EventTransformer>> {
     match transform_type {
-        TransformType::FieldMapping => {
-            Ok(Box::new(templates::FieldMapper::from_config(config)?))
-        }
-        TransformType::FieldFilter => {
-            Ok(Box::new(templates::FieldFilter::from_config(config)?))
-        }
+        TransformType::FieldMapping => Ok(Box::new(templates::FieldMapper::from_config(config)?)),
+        TransformType::FieldFilter => Ok(Box::new(templates::FieldFilter::from_config(config)?)),
         TransformType::ValueTransform => {
             Ok(Box::new(templates::ValueTransformer::from_config(config)?))
         }
-        TransformType::ConditionalFilter => {
-            Ok(Box::new(templates::PassThrough::new()))
-        }
-        TransformType::JsonTemplate => {
-            Ok(Box::new(templates::JsonTemplate::from_config(config)?))
-        }
+        TransformType::ConditionalFilter => Ok(Box::new(templates::PassThrough::new())),
+        TransformType::JsonTemplate => Ok(Box::new(templates::JsonTemplate::from_config(config)?)),
     }
 }
 
@@ -682,12 +655,10 @@ mod tests {
 
         let config = TransformRuleConfig {
             filter: None,
-            mappings: Some(vec![
-                FieldMapping {
-                    source: "data.order.id".into(),
-                    target: "order_id".into(),
-                },
-            ]),
+            mappings: Some(vec![FieldMapping {
+                source: "data.order.id".into(),
+                target: "order_id".into(),
+            }]),
             enrich: None,
         };
 
@@ -812,7 +783,10 @@ mod tests {
     #[test]
     fn test_resolve_json_path_nested() {
         let input = json!({"data": {"order": {"id": "123"}}});
-        assert_eq!(resolve_json_path(&input, "data.order.id"), Some(&json!("123")));
+        assert_eq!(
+            resolve_json_path(&input, "data.order.id"),
+            Some(&json!("123"))
+        );
     }
 
     #[test]

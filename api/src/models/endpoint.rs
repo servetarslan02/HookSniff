@@ -220,7 +220,9 @@ impl Endpoint {
             _ => return true, // No filter, accept all
         };
 
-        filters.iter().any(|pattern| matches_wildcard(pattern, event_type))
+        filters
+            .iter()
+            .any(|pattern| matches_wildcard(pattern, event_type))
     }
 
     /// Determine the target URL for delivery based on routing strategy.
@@ -248,9 +250,7 @@ impl Endpoint {
                 }
                 (self.url.clone(), false)
             }
-            RoutingStrategy::RoundRobin => {
-                (self.url.clone(), false)
-            }
+            RoutingStrategy::RoundRobin => (self.url.clone(), false),
         }
     }
 
@@ -284,7 +284,9 @@ fn matches_wildcard(pattern: &str, value: &str) -> bool {
     if parts.len() == 2 {
         let prefix = parts[0];
         let suffix = parts[1];
-        value.starts_with(prefix) && value.ends_with(suffix) && value.len() >= prefix.len() + suffix.len()
+        value.starts_with(prefix)
+            && value.ends_with(suffix)
+            && value.len() >= prefix.len() + suffix.len()
     } else {
         let first = parts[0];
         let last = parts[parts.len() - 1];
@@ -470,7 +472,11 @@ mod tests {
             fallback_url: fallback.map(|s| s.into()),
             avg_response_ms: 100,
             failure_streak: streak,
-            last_failure_at: if streak > 0 { Some(chrono::Utc::now()) } else { None },
+            last_failure_at: if streak > 0 {
+                Some(chrono::Utc::now())
+            } else {
+                None
+            },
             format: "standard".into(),
             fifo_enabled: None,
             fifo_sequence: None,

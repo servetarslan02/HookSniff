@@ -107,24 +107,27 @@ async fn get_delivery_details(
         response_status: delivery.8,
         response_body: delivery.9,
         error_message: delivery.14,
-        attempts: attempts.into_iter().map(|(id, num, status, body, dur, err, created, resp_headers)| {
-            let derived_status = match status {
-                Some(code) if (200..300).contains(&code) => "delivered".to_string(),
-                _ => "failed".to_string(),
-            };
-            AttemptDetail {
-                id,
-                attempt_number: num,
-                status: derived_status,
-                status_code: status,
-                response_body: body,
-                request_headers: None,
-                response_headers: resp_headers,
-                duration_ms: dur,
-                error_message: err,
-                created_at: created.to_rfc3339(),
-            }
-        }).collect(),
+        attempts: attempts
+            .into_iter()
+            .map(|(id, num, status, body, dur, err, created, resp_headers)| {
+                let derived_status = match status {
+                    Some(code) if (200..300).contains(&code) => "delivered".to_string(),
+                    _ => "failed".to_string(),
+                };
+                AttemptDetail {
+                    id,
+                    attempt_number: num,
+                    status: derived_status,
+                    status_code: status,
+                    response_body: body,
+                    request_headers: None,
+                    response_headers: resp_headers,
+                    duration_ms: dur,
+                    error_message: err,
+                    created_at: created.to_rfc3339(),
+                }
+            })
+            .collect(),
         signature_info: SignatureInfo {
             algorithm: "HMAC-SHA256".to_string(),
             header_name: "webhook-signature".to_string(),
@@ -140,12 +143,13 @@ async fn get_attempt_detail(
     axum::extract::Path((delivery_id, attempt_id)): axum::extract::Path<(Uuid, Uuid)>,
 ) -> Result<Json<AttemptDetail>, AppError> {
     // Verify delivery belongs to customer
-    let _delivery: (Uuid,) = sqlx::query_as("SELECT id FROM deliveries WHERE id = $1 AND customer_id = $2")
-        .bind(delivery_id)
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await?
-        .ok_or(AppError::NotFound)?;
+    let _delivery: (Uuid,) =
+        sqlx::query_as("SELECT id FROM deliveries WHERE id = $1 AND customer_id = $2")
+            .bind(delivery_id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let attempt = sqlx::query_as::<_, (Uuid, i32, Option<i32>, Option<String>, Option<i32>, Option<String>, chrono::DateTime<chrono::Utc>, Option<serde_json::Value>)>(
         "SELECT id, attempt_number, status_code, response_body, duration_ms, error_message, created_at, response_headers FROM delivery_attempts WHERE id = $1 AND delivery_id = $2"

@@ -144,9 +144,7 @@ pub struct RevenueRow {
 /// Returns 403 if the customer is not an admin.
 fn require_admin(customer: &Customer) -> Result<(), AppError> {
     if !customer.is_admin {
-        return Err(AppError::Forbidden(
-            "Admin access required".into(),
-        ));
+        return Err(AppError::Forbidden("Admin access required".into()));
     }
     Ok(())
 }
@@ -265,12 +263,11 @@ async fn get_user_detail(
     .await?;
 
     // Usage stats
-    let total_deliveries: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1",
-    )
-    .bind(id)
-    .fetch_one(&pool)
-    .await?;
+    let total_deliveries: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE customer_id = $1")
+            .bind(id)
+            .fetch_one(&pool)
+            .await?;
 
     let successful: (i64,) = sqlx::query_as(
         "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = 'delivered'",
@@ -279,12 +276,11 @@ async fn get_user_detail(
     .fetch_one(&pool)
     .await?;
 
-    let endpoints_count: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1",
-    )
-    .bind(id)
-    .fetch_one(&pool)
-    .await?;
+    let endpoints_count: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE customer_id = $1")
+            .bind(id)
+            .fetch_one(&pool)
+            .await?;
 
     let success_rate = if total_deliveries.0 > 0 {
         (successful.0 as f64 / total_deliveries.0 as f64) * 100.0
@@ -330,13 +326,14 @@ async fn change_plan(
     };
 
     // Only reset webhook_count on upgrade (not downgrade) to prevent exceeding new limit
-    let current_plan: Option<(String,)> = sqlx::query_as("SELECT plan FROM customers WHERE id = $1")
-        .bind(id)
-        .fetch_optional(&pool)
-        .await?;
+    let current_plan: Option<(String,)> =
+        sqlx::query_as("SELECT plan FROM customers WHERE id = $1")
+            .bind(id)
+            .fetch_optional(&pool)
+            .await?;
 
-    let should_reset = if let Some((ref old_plan)) = current_plan {
-        let old_limit = match old_plan.as_str() {
+    let should_reset = if let Some(ref old_plan) = current_plan {
+        let old_limit = match old_plan.0.as_str() {
             "pro" => 50_000,
             "business" => 500_000,
             _ => 10_000,
@@ -406,7 +403,11 @@ async fn change_status(
         return Err(AppError::NotFound);
     }
 
-    let status = if req.is_active { "activated" } else { "deactivated" };
+    let status = if req.is_active {
+        "activated"
+    } else {
+        "deactivated"
+    };
     tracing::info!("✅ Admin {} user {}", status, id);
 
     Ok(Json(serde_json::json!({

@@ -1,12 +1,7 @@
 pub mod idempotency;
 pub mod webhook_verify;
 
-use axum::{
-    extract::Request,
-    http::header::AUTHORIZATION,
-    middleware::Next,
-    response::Response,
-};
+use axum::{extract::Request, http::header::AUTHORIZATION, middleware::Next, response::Response};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -62,12 +57,11 @@ pub async fn auth_middleware(
     let customer = if token.starts_with("hr_live_") {
         // API key authentication — lookup by prefix, then verify full key against Argon2 hash
         let prefix = &token[..15.min(token.len())];
-        let candidates = sqlx::query_as::<_, Customer>(
-            "SELECT * FROM customers WHERE api_key_prefix = $1",
-        )
-        .bind(prefix)
-        .fetch_all(&*pool)
-        .await?;
+        let candidates =
+            sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+                .bind(prefix)
+                .fetch_all(&*pool)
+                .await?;
 
         // Also check api_keys table for additional keys
         let api_key_candidates: Vec<(String,)> = sqlx::query_as(
@@ -111,13 +105,11 @@ pub async fn auth_middleware(
     } else {
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
-        sqlx::query_as::<_, Customer>(
-            "SELECT * FROM customers WHERE id = $1",
-        )
-        .bind(claims.sub)
-        .fetch_optional(&*pool)
-        .await?
-        .ok_or(AppError::Unauthorized)?
+        sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+            .bind(claims.sub)
+            .fetch_optional(&*pool)
+            .await?
+            .ok_or(AppError::Unauthorized)?
     };
 
     req.extensions_mut().insert(customer);
@@ -143,13 +135,11 @@ pub async fn jwt_auth_middleware(
 
     let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
 
-    let customer = sqlx::query_as::<_, Customer>(
-        "SELECT * FROM customers WHERE id = $1",
-    )
-    .bind(claims.sub)
-    .fetch_optional(&*pool)
-    .await?
-    .ok_or(AppError::Unauthorized)?;
+    let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+        .bind(claims.sub)
+        .fetch_optional(&*pool)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
 
     req.extensions_mut().insert(customer);
     Ok(next.run(req).await)
@@ -157,10 +147,7 @@ pub async fn jwt_auth_middleware(
 
 /// Admin-only middleware — must be layered AFTER auth_middleware.
 /// Checks that the authenticated customer has `is_admin: true`.
-pub async fn admin_middleware(
-    req: Request,
-    next: Next,
-) -> Result<Response, AppError> {
+pub async fn admin_middleware(req: Request, next: Next) -> Result<Response, AppError> {
     let customer = req
         .extensions()
         .get::<Customer>()

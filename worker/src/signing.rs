@@ -33,8 +33,7 @@ pub fn compute_standard_signature(
     // with a `whsec_` prefix.
     let secret_bytes = decode_secret(secret);
 
-    let mut mac =
-        HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
+    let mut mac = HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
     mac.update(signed_content.as_bytes());
     let result = mac.finalize();
     let signature = BASE64.encode(result.into_bytes());
@@ -80,8 +79,7 @@ pub fn verify_standard_signature(
     let secret_bytes = decode_secret(secret);
     let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
 
-    let mut mac =
-        HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
+    let mut mac = HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
     mac.update(signed_content.as_bytes());
     let expected_bytes = mac.finalize().into_bytes();
 
@@ -128,7 +126,9 @@ pub fn verify_standard_signature(
 /// If decoding fails, returns the raw bytes (for backward compat with plain secrets).
 fn decode_secret(secret: &str) -> Vec<u8> {
     let stripped = secret.strip_prefix("whsec_").unwrap_or(secret);
-    BASE64.decode(stripped).unwrap_or_else(|_| secret.as_bytes().to_vec())
+    BASE64
+        .decode(stripped)
+        .unwrap_or_else(|_| secret.as_bytes().to_vec())
 }
 
 /// Compute legacy HMAC-SHA256 signature (hex-encoded, for backward compat).
@@ -164,9 +164,9 @@ pub fn verify_hmac(secret: &str, payload: &str, expected_signature: &str) -> boo
     }
 
     // Constant-time comparison via CtOutput
-    hmac::digest::CtOutput::<HmacSha256>::new(
-        hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
-    ) == hmac::digest::CtOutput::<HmacSha256>::new(
+    hmac::digest::CtOutput::<HmacSha256>::new(hmac::digest::Output::<HmacSha256>::clone_from_slice(
+        &expected_bytes,
+    )) == hmac::digest::CtOutput::<HmacSha256>::new(
         hmac::digest::Output::<HmacSha256>::clone_from_slice(&computed_bytes),
     )
 }
@@ -260,9 +260,11 @@ mod tests {
 
         let sig = compute_standard_signature(secret, msg_id, &old_timestamp, body);
 
-        let result =
-            verify_standard_signature(secret, msg_id, &old_timestamp, &sig, body, None);
-        assert!(matches!(result, Err(VerificationError::TimestampExpired { .. })));
+        let result = verify_standard_signature(secret, msg_id, &old_timestamp, &sig, body, None);
+        assert!(matches!(
+            result,
+            Err(VerificationError::TimestampExpired { .. })
+        ));
     }
 
     #[test]
@@ -273,8 +275,7 @@ mod tests {
 
         let sig = compute_standard_signature("whsec_correct", msg_id, timestamp, body);
 
-        let result =
-            verify_standard_signature("whsec_wrong", msg_id, timestamp, &sig, body, None);
+        let result = verify_standard_signature("whsec_wrong", msg_id, timestamp, &sig, body, None);
         assert_eq!(result, Err(VerificationError::SignatureMismatch));
     }
 
@@ -288,9 +289,7 @@ mod tests {
         let valid_sig = compute_standard_signature(secret, msg_id, timestamp, body);
         let header = format!("v1,invalidbase64 {}", valid_sig);
 
-        assert!(
-            verify_standard_signature(secret, msg_id, timestamp, &header, body, None).is_ok()
-        );
+        assert!(verify_standard_signature(secret, msg_id, timestamp, &header, body, None).is_ok());
     }
 
     #[test]
@@ -355,7 +354,9 @@ mod tests {
         ));
 
         // No old secret
-        assert!(!verify_with_rotation(current, None, payload, &sig_old, None,));
+        assert!(!verify_with_rotation(
+            current, None, payload, &sig_old, None,
+        ));
     }
 
     #[test]

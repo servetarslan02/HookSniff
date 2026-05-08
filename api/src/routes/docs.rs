@@ -40,11 +40,7 @@ pub async fn swagger_ui() -> Html<&'static str> {
     Html(SWAGGER_UI_HTML)
 }
 
-pub async fn openapi_spec() -> (
-    axum::http::StatusCode,
-    axum::http::HeaderMap,
-    &'static str,
-) {
+pub async fn openapi_spec() -> (axum::http::StatusCode, axum::http::HeaderMap, &'static str) {
     let mut headers = axum::http::HeaderMap::new();
     headers.insert(
         axum::http::header::CONTENT_TYPE,

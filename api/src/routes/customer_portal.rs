@@ -8,7 +8,7 @@
 
 use axum::{
     extract::{Extension, Path},
-    routing::{get, post, put, delete},
+    routing::{delete, get, post, put},
     Json, Router,
 };
 use sqlx::PgPool;
@@ -45,9 +45,7 @@ struct ProfileResponse {
     created_at: String,
 }
 
-async fn get_profile(
-    Extension(customer): Extension<Customer>,
-) -> Json<ProfileResponse> {
+async fn get_profile(Extension(customer): Extension<Customer>) -> Json<ProfileResponse> {
     Json(ProfileResponse {
         id: customer.id,
         email: customer.email.clone(),
@@ -106,7 +104,7 @@ async fn list_api_keys(
 ) -> Json<Vec<ApiKeyInfo>> {
     // API key'leri göster (sadece prefix, tam key gösterilmez)
     let keys = sqlx::query_as::<_, (String, String, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, api_key_prefix, created_at FROM customers WHERE id = $1"
+        "SELECT id, api_key_prefix, created_at FROM customers WHERE id = $1",
     )
     .bind(customer.id)
     .fetch_one(&pool)
@@ -192,12 +190,11 @@ async fn get_usage(
     .fetch_one(&pool)
     .await?;
 
-    let endpoint_count: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1"
-    )
-    .bind(customer.id)
-    .fetch_one(&pool)
-    .await?;
+    let endpoint_count: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE customer_id = $1")
+            .bind(customer.id)
+            .fetch_one(&pool)
+            .await?;
 
     let success_count: (i64,) = sqlx::query_as(
         "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = 'delivered' AND created_at > now() - interval '24 hours'"
@@ -219,9 +216,7 @@ async fn get_usage(
 }
 
 /// Plan bilgisi
-async fn get_plan(
-    Extension(customer): Extension<Customer>,
-) -> Json<serde_json::Value> {
+async fn get_plan(Extension(customer): Extension<Customer>) -> Json<serde_json::Value> {
     let plan = crate::billing::Plan::from_str(&customer.plan);
     Json(serde_json::json!({
         "plan": customer.plan,
@@ -234,9 +229,7 @@ async fn get_plan(
 }
 
 /// Bildirim tercihleri
-async fn get_notifications(
-    Extension(customer): Extension<Customer>,
-) -> Json<serde_json::Value> {
+async fn get_notifications(Extension(customer): Extension<Customer>) -> Json<serde_json::Value> {
     // TODO: Bildirim tercihlerini veritabanından al
     Json(serde_json::json!({
         "email_on_failure": true,

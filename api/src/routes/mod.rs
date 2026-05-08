@@ -19,9 +19,9 @@ pub mod routing;
 pub mod schemas;
 pub mod search;
 pub mod stats;
+pub mod stream;
 pub mod teams;
 pub mod templates;
-pub mod stream;
 pub mod transforms;
 pub mod webhooks;
 
@@ -39,7 +39,9 @@ pub fn create_routes(
         .layer(axum::Extension(rate_limiter))
         .layer(axum::Extension(throttle_manager))
         .layer(axum::Extension(metrics))
-        .layer(axum_middleware::from_fn(crate::rate_limit::rate_limit_middleware))
+        .layer(axum_middleware::from_fn(
+            crate::rate_limit::rate_limit_middleware,
+        ))
 }
 
 pub fn api_router() -> Router {
@@ -72,14 +74,19 @@ pub fn api_router() -> Router {
 
     let admin_routes = Router::new()
         .nest("/admin", admin::router())
-        .layer(axum_middleware::from_fn(crate::middleware::admin_middleware))
+        .layer(axum_middleware::from_fn(
+            crate::middleware::admin_middleware,
+        ))
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     Router::new()
         .nest("/auth", auth::router())
         .nest("/contact", contact::router())
         .nest("/outbound-ips", outbound_ips::router())
-        .route("/status", axum::routing::get(health::system_status).options(health::status_options))
+        .route(
+            "/status",
+            axum::routing::get(health::system_status).options(health::status_options),
+        )
         .merge(protected)
         .merge(inbound_routes)
         .merge(admin_routes)

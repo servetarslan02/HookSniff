@@ -10,8 +10,7 @@ use crate::error::AppError;
 use crate::models::customer::Customer;
 
 pub fn router() -> Router {
-    Router::new()
-        .route("/", get(search_deliveries))
+    Router::new().route("/", get(search_deliveries))
 }
 
 #[derive(Deserialize)]
@@ -49,7 +48,10 @@ async fn search_deliveries(
     let mut param_idx: i32 = 2;
 
     if params.q.is_some() {
-        conditions.push(format!("(d.event_type ILIKE ${} OR d.id::text ILIKE ${} OR e.url ILIKE ${})", param_idx, param_idx, param_idx));
+        conditions.push(format!(
+            "(d.event_type ILIKE ${} OR d.id::text ILIKE ${} OR e.url ILIKE ${})",
+            param_idx, param_idx, param_idx
+        ));
         param_idx += 1;
     }
     if params.event.is_some() {
@@ -86,10 +88,20 @@ async fn search_deliveries(
     );
 
     // Build queries dynamically
-    let mut query = sqlx::query_as::<_, (Uuid, Option<String>, String, i32, Option<i32>, chrono::DateTime<chrono::Utc>, String)>(&query_sql)
-        .bind(customer.id);
-    let mut count_query = sqlx::query_as::<_, (i64,)>(&count_sql)
-        .bind(customer.id);
+    let mut query = sqlx::query_as::<
+        _,
+        (
+            Uuid,
+            Option<String>,
+            String,
+            i32,
+            Option<i32>,
+            chrono::DateTime<chrono::Utc>,
+            String,
+        ),
+    >(&query_sql)
+    .bind(customer.id);
+    let mut count_query = sqlx::query_as::<_, (i64,)>(&count_sql).bind(customer.id);
 
     // Bind filter parameters in the same order
     // pattern must live until queries are executed
@@ -133,17 +145,20 @@ async fn search_deliveries(
     let total = count_query.fetch_one(&pool).await?;
 
     Ok(Json(SearchResult {
-        deliveries: deliveries.into_iter().map(|(id, event, status, attempts, resp_status, created, url)| {
-            serde_json::json!({
-                "id": id,
-                "event": event,
-                "status": status,
-                "attempt_count": attempts,
-                "response_status": resp_status,
-                "created_at": created.to_rfc3339(),
-                "endpoint_url": url
+        deliveries: deliveries
+            .into_iter()
+            .map(|(id, event, status, attempts, resp_status, created, url)| {
+                serde_json::json!({
+                    "id": id,
+                    "event": event,
+                    "status": status,
+                    "attempt_count": attempts,
+                    "response_status": resp_status,
+                    "created_at": created.to_rfc3339(),
+                    "endpoint_url": url
+                })
             })
-        }).collect(),
+            .collect(),
         total: total.0,
         page,
         per_page,

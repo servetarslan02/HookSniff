@@ -178,18 +178,25 @@ impl EventTransformer for ValueTransformer {
         let mut output = input.clone();
 
         for op in &self.operations {
-            if let Some(field_value) = output.get(&op.field).and_then(|v| v.as_str()).map(String::from) {
+            if let Some(field_value) = output
+                .get(&op.field)
+                .and_then(|v| v.as_str())
+                .map(String::from)
+            {
                 let transformed = match &op.op {
                     ValueOp::Uppercase => Value::String(field_value.to_uppercase()),
                     ValueOp::Lowercase => Value::String(field_value.to_lowercase()),
                     ValueOp::Trim => Value::String(field_value.trim().to_string()),
                     ValueOp::ToString => Value::String(field_value),
-                    ValueOp::ToNumber => {
-                        field_value
-                            .parse::<f64>()
-                            .map(|n| Value::Number(serde_json::Number::from_f64(n).unwrap_or(serde_json::Number::from(0))))
-                            .unwrap_or(Value::String(field_value))
-                    }
+                    ValueOp::ToNumber => field_value
+                        .parse::<f64>()
+                        .map(|n| {
+                            Value::Number(
+                                serde_json::Number::from_f64(n)
+                                    .unwrap_or(serde_json::Number::from(0)),
+                            )
+                        })
+                        .unwrap_or(Value::String(field_value)),
                     ValueOp::DateFormat => {
                         // Parse ISO 8601 and reformat
                         if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(&field_value) {
@@ -262,9 +269,7 @@ impl JsonTemplate {
                 } else if s.contains("{{") {
                     // Mixed string with embedded variables
                     let mut result = s.clone();
-                    while let (Some(start), Some(end)) =
-                        (result.find("{{"), result.find("}}"))
-                    {
+                    while let (Some(start), Some(end)) = (result.find("{{"), result.find("}}")) {
                         if start < end {
                             let field = &result[start + 2..end].to_string();
                             let value = input
@@ -289,8 +294,10 @@ impl JsonTemplate {
                 Ok(Value::Object(resolved))
             }
             Value::Array(arr) => {
-                let resolved: Result<Vec<Value>> =
-                    arr.iter().map(|v| self.resolve_template(v, input)).collect();
+                let resolved: Result<Vec<Value>> = arr
+                    .iter()
+                    .map(|v| self.resolve_template(v, input))
+                    .collect();
                 Ok(Value::Array(resolved?))
             }
             _ => Ok(template.clone()),

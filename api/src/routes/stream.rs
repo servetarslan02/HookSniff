@@ -18,8 +18,7 @@ use uuid::Uuid;
 use crate::models::customer::Customer;
 
 pub fn router() -> Router {
-    Router::new()
-        .route("/deliveries", get(delivery_stream))
+    Router::new().route("/deliveries", get(delivery_stream))
 }
 
 #[derive(Deserialize)]

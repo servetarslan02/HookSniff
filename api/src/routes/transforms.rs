@@ -8,9 +8,7 @@ use uuid::Uuid;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 use crate::models::endpoint::Endpoint;
-use crate::transform::{
-    self, CreateTransformRuleRequest, TransformRule, TransformRuleConfig,
-};
+use crate::transform::{self, CreateTransformRuleRequest, TransformRule, TransformRuleConfig};
 
 pub fn router() -> Router {
     Router::new()
@@ -25,14 +23,13 @@ async fn list_rules(
     Path(endpoint_id): Path<Uuid>,
 ) -> Result<Json<Vec<TransformRule>>, AppError> {
     // Verify endpoint ownership
-    let _ = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(endpoint_id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let _ =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(endpoint_id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let rules = transform::list_rules(&pool, endpoint_id).await?;
     Ok(Json(rules))
@@ -45,14 +42,13 @@ async fn create_rule(
     Json(req): Json<CreateTransformRuleRequest>,
 ) -> Result<Json<TransformRule>, AppError> {
     // Verify endpoint ownership
-    let _ = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(endpoint_id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let _ =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(endpoint_id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let rule = transform::create_rule(&pool, endpoint_id, &req.rule).await?;
     Ok(Json(rule))
@@ -65,14 +61,13 @@ async fn update_rule(
     Json(config): Json<TransformRuleConfig>,
 ) -> Result<Json<TransformRule>, AppError> {
     // Verify endpoint ownership
-    let _ = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(endpoint_id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let _ =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(endpoint_id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let rule = transform::update_rule(&pool, rule_id, &config).await?;
     Ok(Json(rule))
@@ -84,14 +79,13 @@ async fn delete_rule(
     Path((endpoint_id, rule_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Verify endpoint ownership
-    let _ = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(endpoint_id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let _ =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(endpoint_id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let deleted = transform::delete_rule(&pool, rule_id).await?;
     Ok(Json(serde_json::json!({ "deleted": deleted })))

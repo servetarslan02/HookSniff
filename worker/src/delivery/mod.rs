@@ -101,12 +101,8 @@ impl DeliveryRouter {
             }
 
             let result = match target.target_type.as_str() {
-                "http" => {
-                    http::deliver_http(&self.http_client, webhook, 1).await
-                }
-                "email" => {
-                    deliver_email(&target.config, webhook).await
-                }
+                "http" => http::deliver_http(&self.http_client, webhook, 1).await,
+                "email" => deliver_email(&target.config, webhook).await,
                 other => {
                     warn!(
                         "Unsupported delivery target type '{}' for target {}",
@@ -147,8 +143,7 @@ impl DeliveryRouter {
 
     /// Load delivery targets for an endpoint from the database.
     async fn load_targets(&self, endpoint_id: &str) -> Result<Vec<DeliveryTargetRow>> {
-        let ep_uuid = uuid::Uuid::parse_str(endpoint_id)
-            .context("Invalid endpoint_id UUID")?;
+        let ep_uuid = uuid::Uuid::parse_str(endpoint_id).context("Invalid endpoint_id UUID")?;
 
         let rows: Vec<DeliveryTargetRow> = sqlx::query_as(
             "SELECT id, endpoint_id, target_type, config, enabled \
@@ -240,7 +235,10 @@ async fn deliver_email(
             if success {
                 info!("✅ Email delivered to {} for {}", to, webhook.delivery_id);
             } else {
-                warn!("⚠️ Email delivery got status {}: {}", status_code, resp_body);
+                warn!(
+                    "⚠️ Email delivery got status {}: {}",
+                    status_code, resp_body
+                );
             }
 
             Ok(DeliveryResult {
@@ -249,11 +247,18 @@ async fn deliver_email(
                 response_body: truncate_str(&resp_body, 1000),
                 response_headers: serde_json::json!({}),
                 duration_ms,
-                error: if success { String::new() } else { format!("HTTP {}", status_code) },
+                error: if success {
+                    String::new()
+                } else {
+                    format!("HTTP {}", status_code)
+                },
             })
         }
         Err(e) => {
-            warn!("❌ Email delivery failed for {}: {:?}", webhook.delivery_id, e);
+            warn!(
+                "❌ Email delivery failed for {}: {:?}",
+                webhook.delivery_id, e
+            );
             Ok(DeliveryResult {
                 success: false,
                 status_code: 0,

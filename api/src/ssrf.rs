@@ -42,15 +42,12 @@ impl std::fmt::Display for SsrfError {
 impl std::error::Error for SsrfError {}
 
 /// Metadata endpoint'leri
-const METADATA_HOSTS: &[&str] = &[
-    "metadata.google.internal",
-    "metadata.goog",
-];
+const METADATA_HOSTS: &[&str] = &["metadata.google.internal", "metadata.goog"];
 
 /// Metadata IP'leri
 const METADATA_IPS: &[&str] = &[
-    "169.254.169.254",  // AWS, GCP, Azure
-    "fd00:ec2::254",    // AWS IPv6
+    "169.254.169.254", // AWS, GCP, Azure
+    "fd00:ec2::254",   // AWS IPv6
 ];
 
 /// URL'in SSRF saldırılarına karşı güvenli olup olmadığını kontrol et.
@@ -61,9 +58,21 @@ const METADATA_IPS: &[&str] = &[
 /// 3. Host IP'ye resolve edilir, IP private mı?
 /// 4. localhost/loopback engelleme
 pub fn validate_url(url: &str) -> Result<(), SsrfError> {
-    let parsed = url::Url::parse(url).map_err(|e| SsrfError::InvalidUrl(format!("{}: {}", url, e)))?;
+    let parsed =
+        url::Url::parse(url).map_err(|e| SsrfError::InvalidUrl(format!("{}: {}", url, e)))?;
 
-    let host_str = parsed.host_str().ok_or_else(|| SsrfError::InvalidUrl("No host in URL".into()))?;
+    // Only allow http and https schemes
+    let scheme = parsed.scheme();
+    if scheme != "http" && scheme != "https" {
+        return Err(SsrfError::InvalidUrl(format!(
+            "URL scheme must be http or https, got: {}",
+            scheme
+        )));
+    }
+
+    let host_str = parsed
+        .host_str()
+        .ok_or_else(|| SsrfError::InvalidUrl("No host in URL".into()))?;
 
     // localhost kontrolü
     if host_str == "localhost" || host_str == "0.0.0.0" || host_str == "[::1]" {
