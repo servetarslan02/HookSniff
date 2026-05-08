@@ -2,7 +2,6 @@ import { useTranslations } from 'next-intl';
 
 export default function SdksPage() {
   const t = useTranslations('docs');
-  const tc = useTranslations('common');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('sdks')}</h1>
