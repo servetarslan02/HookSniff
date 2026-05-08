@@ -141,7 +141,7 @@ export default function SettingsPage() {
   const handleNotificationSave = async () => {
     setNotificationSaving(true);
     // Notification preferences are stored locally for now
-    // TODO: Persist to backend when /v1/auth/notifications endpoint is added
+    // FIXME: /v1/customer/notifications endpoint hazır olunca buraya bağlanacak
     setTimeout(() => {
       setNotificationSaving(false);
       toast(tc('success'), 'success');
