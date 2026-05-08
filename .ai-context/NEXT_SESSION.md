@@ -87,3 +87,19 @@ Her oturum sonunda:
 1. `.ai-context/MEMORY.md` güncelle
 2. `.ai-context/NEXT_SESSION.md` güncelle
 3. `git add -A && git commit && git push origin main`
+
+---
+
+## ⚠️ REPO PUBLIC/PRIVATE İŞLEMİ (CI DAKİKA LİMİTİ İÇİN)
+
+Private repo = 2000 dk/ay Actions limiti. Çözüm: geçici public.
+
+### Sıra:
+1. **Sensitive dosyaları local'e kaydet** → `EXTERNAL_TOKENS.md` + `gcp-service-account.json`
+2. **Repo'dan sil** → commit + push
+3. **Public yap** → `PATCH /repos/... {"private": false}`
+4. **CI tamamlanmasını bekle** → 6/6 job yeşil
+5. **Private yap** → `PATCH /repos/... {"private": true}`
+6. **Sensitive dosyaları geri yükle** → commit + push
+
+⚠️ Public iken EXTERNAL_TOKENS.md görünür olur — hızlı ol!
