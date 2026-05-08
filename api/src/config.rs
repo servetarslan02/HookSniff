@@ -171,7 +171,7 @@ impl Config {
                 .filter(|s| !s.is_empty())
                 .collect(),
             notify_from_email: std::env::var("NOTIFY_FROM_EMAIL")
-                .unwrap_or_else(|_| "noreply@hooksniff.is-a.dev".into()),
+                .unwrap_or_else(|_| "noreply@hooksniff.vercel.app".into()),
             notify_email: std::env::var("NOTIFY_EMAIL").ok(),
         })
     }

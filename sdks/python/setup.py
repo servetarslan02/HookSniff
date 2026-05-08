@@ -7,7 +7,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="HookSniff",
-    author_email="support@hooksniff.io",
+    author_email="support@hooksniff.dev",
     url="https://github.com/hooksniff/hooksniff",
     license="MIT",
     packages=find_packages(),

@@ -1,6 +1,6 @@
 # HookSniff Swift SDK
 
-Official Swift client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official Swift client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 

@@ -1,6 +1,6 @@
 # HookSniff Ruby SDK
 
-Official Ruby client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official Ruby client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 
@@ -187,7 +187,7 @@ end
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `api_key` | `String` | required | Your HookSniff API key |
-| `base_url` | `String` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
+| `base_url` | `String` | `https://hooksniff-api-1046140057667.europe-west1.run.app/v1` | API base URL |
 | `timeout` | `Integer` | `30` | Request timeout in seconds |
 
 ### `client.endpoints`

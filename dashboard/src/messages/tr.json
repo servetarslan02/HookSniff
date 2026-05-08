@@ -436,7 +436,7 @@
     "gettingStartedDesc": "İlk webhook'unuzu 5 dakikadan kısa sürede gönderin.",
     "quickStart": "Hızlı Başlangıç",
     "getApiKey": "1. API anahtarınızı alın",
-    "getApiKeyDesc": "hooksniff.is-a.dev'da kaydolun ve API anahtarınızı panel ayarlarından alın.",
+    "getApiKeyDesc": "hooksniff.vercel.app'da kaydolun ve API anahtarınızı panel ayarlarından alın.",
     "createEndpoint": "2. Bir endpoint oluşturun",
     "createEndpointDesc": "Webhook'ların teslim edilmesini istediğiniz URL'yi kaydedin:",
     "sendWebhook": "3. Bir webhook gönderin",

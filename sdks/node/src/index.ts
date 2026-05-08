@@ -12,11 +12,6 @@ import type {
   Stats,
   Customer,
   ApiError,
-  AiStatus,
-  AiEvent,
-  RiskScore,
-  AiAction,
-  AiProvider,
   WebhookPayload,
   OrderCreatedPayload,
   OrderCompletedPayload,
@@ -44,11 +39,6 @@ export type {
   ExportOptions,
   Stats,
   Customer,
-  AiStatus,
-  AiEvent,
-  RiskScore,
-  AiAction,
-  AiProvider,
   WebhookPayload,
   OrderCreatedPayload,
   OrderCompletedPayload,
@@ -350,138 +340,6 @@ class WebhooksResource {
  * });
  * ```
  */
-class AiCenterResource {
-  constructor(private client: HookSniff) {}
-
-  async status(): Promise<AiStatus> {
-    const resp = (await this.client._request("GET", "/ai/status")) as any;
-    return {
-      activeEvents: resp.active_events,
-      criticalEvents: resp.critical_events,
-      pendingActions: resp.pending_actions,
-      blockedItems: resp.blocked_items,
-      avgRiskScore: resp.avg_risk_score,
-      highRiskEndpoints: resp.high_risk_endpoints,
-    };
-  }
-
-  async events(
-    severity?: string,
-    eventType?: string,
-    limit = 50
-  ): Promise<AiEvent[]> {
-    const params = new URLSearchParams({ limit: String(limit) });
-    if (severity) params.set("severity", severity);
-    if (eventType) params.set("event_type", eventType);
-    const resp = (await this.client._request(
-      "GET",
-      `/ai/events?${params.toString()}`
-    )) as any[];
-    return resp.map((e: any) => ({
-      id: e.id,
-      eventType: e.event_type,
-      severity: e.severity,
-      title: e.title,
-      description: e.description,
-      actionTaken: e.action_taken,
-      targetType: e.target_type,
-      targetId: e.target_id,
-      resolved: e.resolved,
-      createdAt: e.created_at,
-    }));
-  }
-
-  async risks(): Promise<RiskScore[]> {
-    const resp = (await this.client._request("GET", "/ai/risks")) as any[];
-    return resp.map((r: any) => ({
-      id: r.id,
-      targetType: r.target_type,
-      targetId: r.target_id,
-      score: r.score,
-      factors: r.factors,
-      createdAt: r.created_at,
-    }));
-  }
-
-  async actions(): Promise<AiAction[]> {
-    const resp = (await this.client._request("GET", "/ai/actions")) as any[];
-    return resp.map((a: any) => ({
-      id: a.id,
-      actionType: a.action_type,
-      description: a.description,
-      targetType: a.target_type,
-      targetId: a.target_id,
-      status: a.status,
-      riskLevel: a.risk_level,
-      autoApproved: a.auto_approved,
-      executedAt: a.executed_at,
-      createdAt: a.created_at,
-    }));
-  }
-
-  async approveAction(actionId: string): Promise<boolean> {
-    const resp = (await this.client._request(
-      "POST",
-      `/ai/actions/${actionId}/approve`
-    )) as any;
-    return resp.approved ?? true;
-  }
-
-  async rejectAction(actionId: string): Promise<boolean> {
-    const resp = (await this.client._request(
-      "POST",
-      `/ai/actions/${actionId}/reject`
-    )) as any;
-    return resp.rejected ?? true;
-  }
-
-  async rollbackAction(actionId: string): Promise<boolean> {
-    const resp = (await this.client._request(
-      "POST",
-      `/ai/actions/${actionId}/rollback`
-    )) as any;
-    return resp.rolled_back ?? true;
-  }
-
-  async blocklist(): Promise<any[]> {
-    return this.client._request("GET", "/ai/blocklist") as Promise<any[]>;
-  }
-
-  async addBlock(block: {
-    blockType: string;
-    blockValue: string;
-    reason?: string;
-    durationMinutes?: number;
-  }): Promise<any> {
-    return this.client._request("POST", "/ai/blocklist", {
-      block_type: block.blockType,
-      block_value: block.blockValue,
-      reason: block.reason,
-      duration_minutes: block.durationMinutes,
-    });
-  }
-
-  async removeBlock(blockId: string): Promise<boolean> {
-    const resp = (await this.client._request(
-      "DELETE",
-      `/ai/blocklist/${blockId}`
-    )) as any;
-    return resp.removed ?? true;
-  }
-
-  async providers(): Promise<AiProvider[]> {
-    const resp = (await this.client._request("GET", "/ai/providers")) as any;
-    return resp.providers.map((p: any) => ({
-      name: p.name,
-      enabled: p.enabled,
-      capabilities: p.capabilities,
-      apiKeyEnv: p.api_key_env,
-      docs: p.docs,
-    }));
-  }
-
-  async stats(): Promise<any> {
-    return this.client._request("GET", "/ai/stats");
   }
 }
 
@@ -492,11 +350,10 @@ export class HookSniff {
 
   public endpoints: EndpointsResource;
   public webhooks: WebhooksResource;
-  public ai: AiCenterResource;
 
   constructor(config: HookSniffConfig) {
     this.apiKey = config.apiKey;
-    this.baseUrl = (config.baseUrl || "https://api.hooksniff.is-a.dev/v1").replace(
+    this.baseUrl = (config.baseUrl || "https://hooksniff-api-1046140057667.europe-west1.run.app/v1").replace(
       /\/$/,
       ""
     );
@@ -504,7 +361,6 @@ export class HookSniff {
 
     this.endpoints = new EndpointsResource(this);
     this.webhooks = new WebhooksResource(this);
-    this.ai = new AiCenterResource(this);
   }
 
   /** @internal */
