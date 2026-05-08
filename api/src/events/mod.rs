@@ -103,7 +103,11 @@ pub fn delivery_event(
 
 /// Create a CloudEvent for an endpoint event.
 pub fn endpoint_event(event_type: &str, endpoint_id: &str, data: serde_json::Value) -> CloudEvent {
-    let mut ce = CloudEvent::new(event_type, "https://api.hooksniff.is-a.dev", Some(data));
+    let mut ce = CloudEvent::new(
+        event_type,
+        "https://hooksniff-api-1046140057667.europe-west1.run.app",
+        Some(data),
+    );
     ce.subject = Some(endpoint_id.to_string());
     ce
 }
@@ -112,7 +116,7 @@ pub fn endpoint_event(event_type: &str, endpoint_id: &str, data: serde_json::Val
 pub fn security_event(event_type: &str, data: serde_json::Value) -> CloudEvent {
     CloudEvent::new(
         event_type,
-        "https://api.hooksniff.is-a.dev/security",
+        "https://hooksniff-api-1046140057667.europe-west1.run.app/security",
         Some(data),
     )
 }

@@ -163,7 +163,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">16. Contact</h2>
-            <p>For questions about these Terms, contact: <a href="mailto:legal@hooksniff.is-a.dev" className="text-brand-600 dark:text-brand-400 hover:underline">legal@hooksniff.is-a.dev</a></p>
+            <p>For questions about these Terms, contact: <a href="mailto:legal@hooksniff.vercel.app" className="text-brand-600 dark:text-brand-400 hover:underline">legal@hooksniff.vercel.app</a></p>
           </section>
         </div>
       </main>

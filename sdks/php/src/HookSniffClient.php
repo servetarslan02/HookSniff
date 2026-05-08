@@ -23,7 +23,7 @@ use HookSniff\Models;
  */
 class HookSniffClient
 {
-    private const DEFAULT_BASE_URL = 'https://api.hooksniff.io/v1';
+    private const DEFAULT_BASE_URL = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
     private const DEFAULT_TIMEOUT = 30;
 
     private string $apiKey;
@@ -204,7 +204,6 @@ class WebhooksResource
     public function send(string $endpointId, ?string $event = null, array $data = []): Models\Delivery
     {
         $body = ['endpoint_id' => $endpointId, 'data' => $data];
-        if ($event !== null) $body['event'] = $event;> $data];
         if ($event !== null) $body['event'] = $event;
         $resp = $this->client->request('POST', '/webhooks', $body);
         return Models\Delivery::fromArray($resp);

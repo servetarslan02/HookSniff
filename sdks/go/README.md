@@ -106,7 +106,7 @@ delivery, err := client.Webhooks.Replay(ctx, "wh_abc123")
 ### Custom API URL
 
 ```go
-client := hooksniff.NewWithBaseURL("hr_live_YOUR_KEY", "https://api.hooksniff.is-a.dev/v1")
+client := hooksniff.NewWithBaseURL("hr_live_YOUR_KEY", "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
 ```
 
 ## License

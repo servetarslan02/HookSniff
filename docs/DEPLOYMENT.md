@@ -324,14 +324,14 @@ migrations/
 
 ```bash
 # Add domain to API app
-fly certs add api.hooksniff.is-a.dev
+fly certs add hooksniff-api-1046140057667.europe-west1.run.app
 
 # Add domain to Dashboard
-fly certs add dashboard.hooksniff.is-a.dev
+fly certs add dashboard.hooksniff.vercel.app
 
 # Check certificate status
 fly certs list
-fly certs show api.hooksniff.is-a.dev
+fly certs show hooksniff-api-1046140057667.europe-west1.run.app
 ```
 
 **DNS records to add:**
@@ -386,7 +386,7 @@ fly ips list
 
 | Variable | Description |
 |----------|-------------|
-| `NEXT_PUBLIC_API_URL` | API base URL (e.g., `https://api.hooksniff.is-a.dev/v1`) |
+| `NEXT_PUBLIC_API_URL` | API base URL (e.g., `https://hooksniff-api-1046140057667.europe-west1.run.app/v1`) |
 
 ---
 
@@ -408,7 +408,7 @@ In the Stripe Dashboard:
 
 In Stripe Dashboard → Developers → Webhooks:
 
-- **Endpoint URL:** `https://api.hooksniff.is-a.dev/v1/billing/webhook`
+- **Endpoint URL:** `https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook`
 - **Events:**
   - `checkout.session.completed`
   - `customer.subscription.created`
@@ -447,7 +447,7 @@ stripe listen --forward-to localhost:3000/v1/billing/webhook
 ### Health Check
 
 ```bash
-curl https://api.hooksniff.is-a.dev/v1/health
+curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/health
 ```
 
 ```json
@@ -588,7 +588,7 @@ fly logs --app hooksniff-worker
 
 # Check endpoint health
 curl -H "Authorization: Bearer hr_live_..." \
-  https://api.hooksniff.is-a.dev/v1/endpoint-health
+  https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoint-health
 
 # Common issues:
 # 1. Endpoint URL unreachable
@@ -600,7 +600,7 @@ curl -H "Authorization: Bearer hr_live_..." \
 
 ```bash
 # Test webhook endpoint
-curl -X POST https://api.hooksniff.is-a.dev/v1/billing/webhook \
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook \
   -H "Content-Type: application/json" \
   -d '{"type": "ping"}'
 
