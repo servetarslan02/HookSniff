@@ -410,7 +410,7 @@ export const analyticsApi = {
 // AI Agent API
 export const agentsApi = {
   list: (token: string, page = 1) =>
-    apiFetch<{ agents: any[] }>(`/agents?page=${page}`, { token }),
+    apiFetch<{ agents: any[]; pagination: any }>(`/agents?page=${page}`, { token }),
 
   get: (token: string, id: string) =>
     apiFetch<{ agent: any }>(`/agents/${id}`, { token }),
@@ -443,7 +443,7 @@ export const agentsApi = {
     }),
 
   listEvents: (token: string, agentId: string, page = 1) =>
-    apiFetch<{ events: any[] }>(`/agents/${agentId}/events?page=${page}`, { token }),
+    apiFetch<{ events: any[]; pagination: any }>(`/agents/${agentId}/events?page=${page}`, { token }),
 
   listRoutes: (token: string) =>
     apiFetch<{ routes: any[] }>('/agents/routes', { token }),

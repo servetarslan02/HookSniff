@@ -333,7 +333,7 @@ export class HookSniffAgent {
       processStream().catch(() => {
         this.connected = false;
         if (this.autoReconnect) {
-          setTimeout(() => this.connectSSEWithToken(filter), this.reconnectInterval);
+          setTimeout(() => this.connectSSEWithToken(jwtToken, filter), this.reconnectInterval);
         }
       });
     } catch (error) {

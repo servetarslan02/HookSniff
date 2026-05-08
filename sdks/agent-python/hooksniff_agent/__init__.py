@@ -43,6 +43,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from typing import Callable, Optional
+from urllib.parse import urlencode
 
 import requests
 import websocket
@@ -224,7 +225,7 @@ class HookSniffAgent:
             if event_filter.get("until"):
                 params["until"] = event_filter["until"]
 
-        qs = "&".join(f"{k}={v}" for k, v in params.items())
+        qs = urlencode(params)
         response = self._request("GET", f"/agents/{self._agent_id}/events?{qs}")
         return response
 
@@ -320,7 +321,7 @@ class HookSniffAgent:
         if direction:
             params["direction"] = direction
 
-        qs = "&".join(f"{k}={v}" for k, v in params.items())
+        qs = urlencode(params)
         url = f"{self.base_url}/agents/{self._agent_id}/stream"
         if qs:
             url += f"?{qs}"
@@ -358,7 +359,7 @@ class HookSniffAgent:
             self._connected = False
             if self.auto_reconnect:
                 time.sleep(self.reconnect_interval)
-                self.connect_sse(event_type, direction)
+                self.connect_sse(event_type, direction, jwt_token)
             else:
                 raise HookSniffError(f"SSE connection failed: {e}")
 
