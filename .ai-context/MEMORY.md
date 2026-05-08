@@ -65,32 +65,29 @@
 15. cargo fmt --all uygulandı (70 dosya)
 16. Unused import'lar temizlendi
 
-### Bu Oturum (9) — 2026-05-08 19:14-19:35 GMT+8:
+### Bu Oturum (9) — 2026-05-08 19:14-19:47 GMT+8:
 1. **12 test hatası düzeltildi** (Stripe base64, JSON depth, FieldMapper, plan limits, usage, API key)
 2. **37+ Clippy hatası düzeltildi** → cargo clippy --fix + manuel düzeltmeler
-3. **#[allow] ile bastırılanlar** (düzeltilecek):
-   - `from_str` × 6 → `parse_str` olarak yeniden adlandırılacak
-   - `dead_code` × 5 → worker'da kullanılmayan fonksiyonlar silinecek
-   - `too_many_arguments` × 1 → refactor edilecek
+3. **#[allow] sorunları tamamen çözüldü**:
+   - `from_str` × 6 → `parse_str` olarak yeniden adlandırıldı + tüm call site'ları güncellendi
+   - `dead_code`: kullanılmayan `truncate` fonksiyonu silindi
+   - `dead_code`: kullanılmayan config field'ları silindi (resend_api_key, notify_from_email)
+   - `dead_code`: verify fonksiyonları `#[cfg(test)]` modülüne taşındı
+   - `too_many_arguments`: `AttemptRecord` struct ile refactor edildi
 4. **Cron job düzeltildi** — MEMORY.md path hatası giderildi
-5. **CI yeşil olmalı** — son push ile clippy+test temiz
+5. **CI yeşil** — 0 Clippy hatası, 156/156 test geçti
 
 ---
 
-## ❌ KALAN SORUNLAR — ACİL DÜZELTILECEK
+## ❌ KALAN SORUNLAR
 
-**Tüm testler temiz (156/156) ✅ | Clippy temiz ✅ (#[allow] ile)**
+**Tüm testler temiz (156/156) ✅ | Clippy temiz ✅ (0 #[allow])**
 
-### #[allow] ile bastırılanlar — GERÇEK DÜZELTME GEREKİYOR:
-
-| Sorun | Dosya | Durum | Çözüm |
-|-------|-------|-------|-------|
-| `from_str` isim çakışması | billing/mod.rs, billing/provider.rs, fifo/mod.rs, models/endpoint.rs ×2, routes/inbound.rs | ⚠️ Bastırıldı | `parse_str` olarak yeniden adlandır + tüm call site'ları güncelle |
-| dead_code: `truncate` | worker/src/main.rs:779 | ⚠️ Bastırıldı | Kullanılmıyorsa sil |
-| dead_code: `resend_api_key`, `notify_from_email` | worker/src/config.rs | ⚠️ Bastırıldı | Kullanılmıyorsa struct'tan çıkar |
-| dead_code: `DEFAULT_TIMESTAMP_TOLERANCE_SECS` | worker/src/signing.rs | ⚠️ Bastırıldı | Kullanılmıyorsa sil |
-| dead_code: `verify_standard_signature`, `verify_hmac`, `verify_with_rotation`, `VerificationError` | worker/src/signing.rs | ⚠️ Bastırıldı | Kullanılmıyorsa sil veya worker'da signature verification ekle |
-| too_many_arguments: `record_attempt` | worker/src/main.rs:739 | ⚠️ Bastırıldı | Struct'a refactor et (AttemptRecord) |
+### Servet'in dış servis görevleri:
+- Polar.sh token yenile
+- Resend yeni domain
+- GitHub token yenile
+- iyzico hesap aç
 
 ---
 
