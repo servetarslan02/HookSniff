@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 20:59 GMT+8
+> Son güncelleme: 2026-05-08 22:49 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -30,94 +30,62 @@
 
 ---
 
-## ✅ SERVİS DURUMU (2026-05-08 19:00)
+## ✅ SERVİS DURUMU (2026-05-08 22:49)
 
 | Servis | URL | Durum |
 |--------|-----|-------|
 | Dashboard | https://hooksniff.vercel.app | ✅ Live |
 | API | https://hooksniff-api-1046140057667.europe-west1.run.app | ✅ Healthy |
 | Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Deployed |
-| CI/CD | GitHub Actions | ⏳ Test hataları var |
+| CI/CD | GitHub Actions | ⏳ 4 job hatalı (düzeltiliyor) |
 | Neon DB | eu-central-1 | ✅ Çalışıyor |
 | Upstash Redis | 64MB | ✅ PONG |
 | R2 Storage | hooksniff-storage | ✅ Bucket var |
 | Cloudflare | Hesap aktif | ✅ |
-| Polar.sh | ✅ Token aktif (yeni OAT) | ✅ | Pro plan: ec5826ad |
-| ~~Resend~~ | ~~hooksniff.is-a.dev iptal~~ → GCloud Gmail API'ya taşındı | ✅ |
+| Polar.sh | ✅ Token aktif | ✅ |
+| Email | GCloud Gmail API | ✅ |
 
 ---
 
-## ✅ YAPILAN DÜZELTMELER (2026-05-08 — Oturum 1 + 2)
+### Bu Oturum (13) — 2026-05-08 22:02-22:49 GMT+8:
 
-### Önceki Oturumlar (1-7):
-1. `main.rs` mod çakışması düzeltildi
-2. OpenClaw workspace dosyaları temizlendi
-3. Dashboard ESLint hataları düzeltildi
-4. Vercel Root Directory `dashboard/` ayarlandı
-5. Cloudflare R2 bucket oluşturuldu
-6. CI/CD pipeline açıldı
+**Servet ile yeni oturum başladı. Token yenilendi, tüm hafıza dosyaları incelendi.**
 
-### Bu Oturum (8) — 16 Düzeltme:
-1. CI `continue-on-error` kaldırıldı — bozuk kod artık deploy'u engelliyor
-2. Dashboard API token wrapper düzeltildi
-3. Login rate limit eklendi (10/15dk, 5/saat register)
-4. `seen_webhooks` cleanup job eklendi (6 saatte bir)
-5. `idempotency_keys` cleanup job eklendi (6 saatte bir)
-6. Admin plan değişikliğinde webhook_count yönetimi (upgrade→sıfırla, downgrade→cap)
-7. Duplicate `truncate` fonksiyonu birleştirildi
-8. Duplicate `validate_url` ssrf.rs'e yönlendirildi
-9. Zombie reaper + orphaned delivery kurtarma eklendi
-10. `#[allow(dead_code)]` kaldırıldı
-11. Invoice oluşturma eklendi (SubscriptionCreated + SubscriptionUpdated)
-12. CORS fallback (production'da dashboard izni)
-13. Replay protection race condition düzeltildi (atomic INSERT)
-14. validate_url http/https şeması kontrolü eklendi
-15. cargo fmt --all uygulandı (70 dosya)
-16. Unused import'lar temizlendi
-
-### Bu Oturum (9) — 2026-05-08 19:14-19:47 GMT+8:
-1. **12 test hatası düzeltildi** (Stripe base64, JSON depth, FieldMapper, plan limits, usage, API key)
-2. **37+ Clippy hatası düzeltildi** → cargo clippy --fix + manuel düzeltmeler
-3. **#[allow] sorunları tamamen çözüldü**:
-   - `from_str` × 6 → `parse_str` olarak yeniden adlandırıldı + tüm call site'ları güncellendi
-   - `dead_code`: kullanılmayan `truncate` fonksiyonu silindi
-   - `dead_code`: kullanılmayan config field'ları silindi (resend_api_key, notify_from_email)
-   - `dead_code`: verify fonksiyonları `#[cfg(test)]` modülüne taşındı
-   - `too_many_arguments`: `AttemptRecord` struct ile refactor edildi
-4. **Cron job düzeltildi** — MEMORY.md path hatası giderildi
-5. **CI yeşil** — 0 Clippy hatası, 156/156 test geçti
+1. **GitHub token yenilendi** — eski `ghp_ogQ...` → yeni `ghp_qvOk...`
+2. **Polar.sh durumu güncellendi** — MEMORY.md + STATUS.md "expired" → "aktif"
+3. **Tüm .ai-context/ dosyaları detaylı incelendi** (19 dosya)
+4. **3 denetim raporu güncellendi** — AUDIT_REPORT.md, CODEBASE_AUDIT.md, FULL_SYSTEM_AUDIT.md
+5. **Python SDK AI Center import'ları temizlendi** — `AiStatus`, `AiEvent`, `RiskScore`, `AiAction` import'ları silindi
+6. **6 SDK versiyonu 0.1.0'a standardize edildi** — Node, Python, Go, Java, PHP, Ruby
+7. **Dashboard Resend → Gmail API** — `resend` dependency kaldırıldı, `email.ts` Gmail API'ye çevrildi
+8. **CI sorunu tespit edildi** — GitHub Actions dakika limiti bitmiş (private repo, 2000 dk/ay)
+9. **Repo public/private toggle** — dakika limiti sıfırlandı, CI tekrar çalışıyor
+10. **main-protection ruleset oluşturuldu** — PR zorunlu, CI checks zorunlu, force push yasak, deletion yasak
+11. **CI hataları tespit edildi** — Clippy, test, build-dashboard, security-audit başarısız (düzeltiliyor)
+12. **CI workflow düzeltmeleri** — ubuntu-22.04 pinned, permissions eklendi, concurrency group eklendi
 
 ---
 
-## ❌ KALAN SORUNLAR
+## ❌ KALAN SORUNLAR (Güncel — 2026-05-08 22:49)
 
-**Tüm testler temiz (156/156) ✅ | Clippy temiz ✅ (0 #[allow])**
+### CI Hataları (düzeltiliyor — agent çalışıyor)
+1. Clippy lints failure
+2. Run tests failure
+3. Dashboard build failure
+4. Rust dependency audit failure
 
 ### Servet'in dış servis görevleri:
-- Polar.sh token yenile
-- ~~Resend yeni domain~~ → GCloud Gmail API'ya taşındı ✅
-- GitHub token yenile
-- iyzico hesap aç
+- ~~Polar.sh token~~ ✅ yenilendi
+- ~~GitHub token~~ ✅ yenilendi
+- **GitHub Actions dakika limiti** — repo public/private toggle ile çözüldü
+- **iyzico hesap** — vergi levhası + banka hesabı
 
----
-
-### Bu Oturum (10) — 2026-05-08 20:06-20:59 GMT+8:
-1. **Resend → GCloud Gmail API tamamen kaldırıldı:**
-   - `api/src/email.rs`: `ResendClient` → `GCloudEmailClient` (service account JWT → Gmail API)
-   - `api/src/config.rs`: `resend_api_key` kaldırıldı, `gcp_service_account_path` eklendi
-   - `api/src/main.rs`: `resend_client` → `gcloud_email` init
-   - `api/src/routes/contact.rs`: yeni client'a taşındı
-   - `api/src/routes/auth.rs`: `ResendClient` → `GCloudEmailClient`
-   - `worker/src/delivery/mod.rs`: Resend API → Gmail API (service account auth)
-   - `worker/Cargo.toml`: `jsonwebtoken` dependency eklendi
-   - `.github/workflows/deploy.yml`: `RESEND_API_KEY` kaldırıldı, `GCP_SA_JSON` eklendi (API + Worker)
-   - `.ai-context/EXTERNAL_TOKENS.md`: Resend section kaldırıldı, GCloud email notu eklendi
-   - `DEPLOY_GUIDE.md`, `FREE_TIER_SETUP.md`, `STATUS.md`, `README.md`: dokümantasyon güncellendi
-2. **GCP Secret Manager:**
-   - `gcp-sa-json` secret'ı oluşturuldu (version 1)
-   - Cloud Run servis hesabına `secretAccessor` izni verildi
-3. **cargo fmt + clippy + test:** 29/29 test geçti, 0 Clippy hatası
-4. **CI yeşil** — Deploy tetiklendi
+### Eksik Backend Özellikleri (Mobil uygulama için)
+1. Push notification (FCM/APNs) — yok
+2. Şifre sıfırlama API'si — route yok
+3. Email doğrulama API'si — route yok
+4. Refresh token — yok
+5. 2FA — yok
 
 ## 📋 YENİ ÖZELLİK PLANI (2026-05-08 — Hafıza Kaydı)
 
@@ -179,45 +147,26 @@ Kararlar: `.ai-context/MOBILE_DECISIONS.md`
 
 ---
 
-## ❌ KALAN SORUNLAR
+## ❌ KALAN SORUNLAR (Güncel — 2026-05-08 22:49)
 
-### Test Hataları (3 adet — düzeltilecek)
-1. `validate_json_depth` — derlik sayacı 1'den başlıyor, 0'dan başlamalı
-2. Stripe signature testleri (5 test) — timestamp tolerance sorunlu
-3. Transform pipeline testi — name field silinmiyor ama test silinmesini bekliyor
+### CI Hataları (düzeltiliyor — agent çalışıyor)
+1. Clippy lints failure
+2. Run tests failure
+3. Dashboard build failure
+4. Rust dependency audit failure
 
-### SDK Hataları (2026-05-08 tespit edildi — detay: .ai-context/SDK_AUDIT.md)
-1. **🔴 AI Center backend'de yok** — SDK'da kod var ama endpoint'ler tanımlanmamış. SDK'dan kaldırılacak.
-2. PHP SDK `send()` duplicate satır — kod çalışmaz
-3. Tüm SDK'lar yanlış base URL (api.hooksniff.io → GCP Cloud Run)
-4. Java Gson 2.10.1 eski (güncel: 2.11.0)
-5. Go 1.21 eski (güncel: 1.22)
-6. Versiyon tutarsızlığı (0.1.0 ~ 0.4.0 arası)
-7. Hiçbir SDK'da test, CI, publish yok
+### Servet'in dış servis görevleri:
+- ~~Polar.sh token~~ ✅ yenilendi
+- ~~GitHub token~~ ✅ yenilendi
+- **GitHub Actions dakika limiti** — repo public/private toggle ile çözüldü
+- **iyzico hesap** — vergi levhası + banka hesabı
 
-### Kod Kalitesi Sorunları (2026-05-08 tespit edildi — detay: .ai-context/CODEBASE_AUDIT.md)
-1. 107 tane eski domain referansı (`is-a.dev`) — domain kararı sonrası temizlenecek
-2. 8 tane `#[allow(dead_code)]` — worker/signing.rs'te 5 tanesi
-3. Duplicate fonksiyonlar (`validate_url` 2 yerde, `truncate` 2 yerde)
-4. API'de 38 dependency — bazıları gereksiz olabilir
-5. Dashboard'da console.log kalıntıları (docs sayfalarında)
-6. 3 tane TODO kalıntısı (customer_portal.rs + settings)
-7. CI'da otomatik tarama araçları yok (clippy, audit, lint)
-
-### 🔴 KRİTİK GÜVENLİK (2026-05-08 tespit edildi — detay: .ai-context/FULL_SYSTEM_AUDIT.md)
-1. OpenAPI spec boş (1 satır) — SDK üretimi yapılamaz
-2. Dependabot kurulmamış — güvenlik taraması yok
-3. Migration numara boşluğu (013-025 arası 13 eksik)
-4. .env.production.example'de 3 eksik env var + eski domain
-
----
-
-## ⚠️ SERVET'İN YAPMASI GEREKEN
-
-2. ~~Resend yeni domain~~ → ✅ GCloud Gmail API'ya taşındı
-3. **GitHub token yenile** — eski token açık paylaşıldı, güvenlik riski
-4. **Domain kararı** — şimdilik `hooksniff.vercel.app` yeterli
-5. **iyzico hesap** — vergi levhası + banka hesabı
+### Eksik Backend Özellikleri (Mobil uygulama için)
+1. Push notification (FCM/APNs) — yok
+2. Şifre sıfırlama API'si — route yok
+3. Email doğrulama API'si — route yok
+4. Refresh token — yok
+5. 2FA — yok
 
 ---
 
