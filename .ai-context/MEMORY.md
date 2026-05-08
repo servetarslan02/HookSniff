@@ -187,6 +187,37 @@ Kararlar: `.ai-context/MOBILE_DECISIONS.md`
 
 ---
 
+
+## Bu Oturum (15) — 2026-05-09 00:50-01:20 GMT+8:
+
+**PR #31 merge edildi, CI politikası değişti.**
+
+1. **PR #31 merge edildi** — feat/mobile-backend-features → main (squash merge)
+   - 5 backend feature: password reset, email verification, refresh token, 2FA, push notifications
+   - 17 dosya, +1098/-53 satır
+   - Local CI ile doğrulandı: 29/29 test, clippy, fmt, build — hepsi geçti
+   - `cargo fmt` ile 2 dosyada format düzeltildi (auth.rs, devices.rs)
+2. **CI politikası değişti** — GitHub Actions dakika/billing sorunları nedeniyle CI devre dışı
+   - Artık local CI çalıştırılacak (cargo fmt, clippy, test, build)
+   - main-protection ruleset'ten required_status_checks kaldırıldı
+   - PR merge için admin override kullanılacak
+3. **Hassas dosyalar yönetildi** — public/private toggle sırasında EXTERNAL_TOKENS.md + gcp-service-account.json local'e kaydedildi, geri yüklendi
+4. **GitHub token yenilendi** — eski token → yeni `ghp_***`
+5. **Rust kuruldu** — local CI için rustup + cargo ortamı hazır
+
+### GitHub Actions Billing Sorunu
+- Hesapta $12 ödenmemiş fatura var
+- CI job'ları "recent account payments have failed" hatası ile başlamıyor
+- Çözüm: GitHub billing sayfasından ödeme yapmak veya Free plan'a geçmek
+- Servet kararını verdi: CI kullanılmayacak, local test yeterli
+
+### CI Yeni Politika (Servet Kararı)
+- ❌ GitHub Actions CI kullanılmayacak
+- ✅ Local CI: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`, `cargo build --release`, `dashboard: npm run build`
+- ✅ PR merge: admin override ile CI bypass
+- ✅ main-protection ruleset: sadece PR zorunlu, CI check yok
+
+
 ## ❌ KALAN SORUNLAR (Güncel — 2026-05-08 22:49)
 
 ### CI Hataları — ✅ DÜZELTİLDİ (Oturum 14)
