@@ -1,5 +1,6 @@
 [workspace]
 members = ["api", "worker"]
+exclude = ["sdks/rust"]
 resolver = "2"
 
 [workspace.package]
