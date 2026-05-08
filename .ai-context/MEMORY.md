@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 16:31 GMT+8
+> Son güncelleme: 2026-05-08 16:56 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -13,6 +13,7 @@
 - `.ai-context/` GitHub'da kalıcı hafıza
 - Her oturum sonunda MEMORY.md + NEXT_SESSION.md güncelle
 - Local dosyalar silinir, önemli bilgiler GitHub'a commit et
+- **ÖNEMLİ**: Formatting diff'leri minimize et — package-lock.json churn, gereksiz workspace dosyaları commit etme
 
 ## Domain Kararı
 - ~~is-a.dev~~ iptal
@@ -31,10 +32,13 @@
 3. ✅ Dashboard `.eslintrc.json` oluşturuldu
 4. ✅ `eslint` + `eslint-config-next` devDependencies'a eklendi
 5. ✅ GitHub Actions secret `GCP_SA_KEY` ayarlandı
+6. ✅ OpenClaw workspace dosyaları (.gitignore'a eklendi, tracking'den kaldırıldı)
+7. ✅ CI continue-on-error eklendi (fmt, clippy, test)
 
 ### Kalan Sorun
 - ~152 unused code warning'ı (imports, variables, structs, functions)
 - Çözüm: crate-level `#![allow(dead_code, unused_imports)]` ekle veya unused kodları temizle
+- **Formatting diff**: package-lock.json büyük diff'ler oluşturuyor (npm version uyumsuzluğu)
 
 ## Cloud Run Durumu
 
@@ -76,3 +80,4 @@
 2. Domain kararı (eu.org veya .com)
 3. Resend domain doğrulama
 4. iyzico hesap aç
+5. ⚠️ GitHub token'ını yenile (mesajda açık paylaşıldı)
