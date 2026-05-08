@@ -144,10 +144,40 @@ landing.footer.contact
 | 39 | **docs/layout.tsx** | 23 | Nav arka planı farklı: `bg-white/80` + `dark:border-slate-700` (diğer sayfalarda `bg-white/70 dark:bg-slate-900/70` + `dark:border-slate-800`) |
 | 40 | **status/page.tsx** | - | Nav bar yok — sadece LanguageSwitcher, diğer sayfalarla tutarsız |
 | 41 | **docs/layout.tsx** | 35 | `tc('nav.dashboard')` → `common.nav.dashboard` eksik → başlık olarak görünüyor (build error) |
+| 42 | **Status page** | - | Nav bar yok — sadece LanguageSwitcher, diğer sayfalarla tutarsız |
+| 43 | **Login page** | - | Nav bar yok — geri dönüş linki yok |
+| 44 | **About page** | 49-50 | `'Delivery Rate'`, `'Avg Latency'` hardcoded İngilizce |
+| 45 | **FAQ page** | 15-55 | Tüm FAQ soruları/kategorileri hardcoded İngilizce (t() kullanmıyor) |
+| 46 | **Contact page** | 157 | `'Sending...'`, `'Send Message'` hardcoded İngilizce |
+| 47 | **About/Contact/Privacy/Terms** | - | `<a href="/">` kullanıyor (plain link), FAQ/Status/Docs `<Link href="/">` kullanıyor — tutarsız |
+| 48 | **Notifications page** | - | Empty state yok (boş liste gösterimi eksik) |
+| 49 | **API-Keys page** | - | Empty state yok |
+| 50 | **FAQ page** | - | Kategori filtreleme yok (General, Getting Started, Billing, Technical karışık) |
+| 51 | **Landing page** | 229 | How It Works çizgi: dark mode'da `brand-600` çok belirgin, light mode'da `brand-300` soluk |
+| 52 | **Endpoint create form** | - | URL validation feedback yok (sadece `required`) |
+| 53 | **Dashboard sidebar** | 73 | Logo tıklanabilir değil, ana sayfaya dönüş yok |
+| 54 | **Dashboard sidebar** | - | "Home" / "Ana Sayfa" menü öğesi yok |
 
-### ✅ DÜZELTİLMİŞ (rm -rf .next sonrası)
+---
 
-- ~~500 errors on status/about/faq/contact/privacy/terms/login~~ → 200 (cache temizlendi)
+## 📊 SAYFA SAYFA DEĞERLENDİRME
+
+### ✅ İYİ YAPILANLAR
+- Tüm dashboard sayfalarında loading state var (7/7)
+- Çoğu sayfada empty state var (5/6)
+- Dark mode desteği tutarlı (tüm sayfalarda `dark:` class'ları var)
+- Mobile hamburger menu landing page'de var
+- Dashboard sidebar responsive (mobile overlay)
+- Form validation contact sayfasında var (required)
+- Status badge renk kodlaması tutarlı
+
+### ❌ SORUNLU SAYFALAR
+- **Status**: Nav bar yok
+- **Login**: Nav bar yok, geri dönüş yok
+- **FAQ**: Tüm içerik hardcoded İngilizce
+- **About**: Bazı metinler hardcoded İngilizce
+- **Contact**: Buton metinleri hardcoded İngilizce
+- **Footer**: Tüm linkler hardcoded İngilizce + Blog linki boş
 
 ---
 
