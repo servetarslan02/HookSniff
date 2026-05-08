@@ -13,7 +13,7 @@ RENDER_WORKER_SERVICE=srv-d7trcd3tqb8s73f1vrpg
 # Vercel
 VERCEL_TOKEN=vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW
 VERCEL_PROJECT_ID=prj_cSIVYHpCoAtoihRp8xlXIun1KVSR
-VERCEL_DEPLOY_HOOK=https://api.vercel.com/v1/integrations/deploy/prj_NQgFly8h06oH5DTzClj7vyq3hqSO/uBpn0GrAqw
+VERCEL_DEPLOY_HOOK=https://api.vercel.com/v1/integrations/deploy/prj_cSIVYHpCoAtoihRp8xlXIun1KVSR/uBpn0GrAqw
 
 # GitHub
 GITHUB_PAT=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
