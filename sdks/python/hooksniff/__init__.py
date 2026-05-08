@@ -10,10 +10,6 @@ from .models import (
     DeliveryList,
     BatchResult,
     Stats,
-    AiStatus,
-    AiEvent,
-    RiskScore,
-    AiAction,
     RetryPolicy,
     OrderCreatedPayload,
     OrderCompletedPayload,
@@ -39,7 +35,7 @@ from .verify import (
     verify_webhook_request,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.1.0"
 __all__ = [
     "HookSniffClient",
     # Models
@@ -49,10 +45,6 @@ __all__ = [
     "DeliveryList",
     "BatchResult",
     "Stats",
-    "AiStatus",
-    "AiEvent",
-    "RiskScore",
-    "AiAction",
     # Webhook payload types
     "OrderCreatedPayload",
     "OrderCompletedPayload",

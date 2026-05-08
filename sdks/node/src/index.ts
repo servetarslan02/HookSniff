@@ -373,7 +373,7 @@ export class HookSniff {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.apiKey}`,
       "Content-Type": "application/json",
-      "User-Agent": "hooksniff-node/0.2.0",
+      "User-Agent": "hooksniff-node/0.1.0",
     };
 
     const controller = new AbortController();
