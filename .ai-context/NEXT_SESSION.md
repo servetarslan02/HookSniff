@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 07:26
+> 2026-05-08 13:47
 
 ## Yeni Oturumda Ne Söyle
 
@@ -15,89 +15,49 @@ HookSniff projesi üzerinde çalışacaksın. 50 dakika süren var.
 Repo: https://github.com/servetarslan02/HookSniff
 GitHub PAT: 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
 
-Önce repo'yu klonla:
-```
-git clone https://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@github.com/servetarslan02/HookSniff.git
-```
+Önce `.ai-context/MEMORY.md` ve `.ai-context/NEXT_SESSION.md` dosyalarını oku — tüm hafıza orada.
 
-Sonra `.ai-context/` klasörünü oku — tüm hafıza orada.
+## MEVCUT DURUM
 
-## GÖREVİN: Hata Analizi + Bug Fix + Test
+Tüm 26 teknik görev tamamlandı. Proje stabil.
 
-### 1. Render API Build Hatası (KRİTİK)
-Render'da API build_failed durumunda. Build loglarını kontrol et:
-- Render API key: `rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m`
-- API service: `srv-d7trc4pkh4rs7387rr7g`
-- `curl -s "https://api.render.com/v1/services/srv-d7trc4pkh4rs7387rr7g/deploys?limit=1" -H "Authorization: Bearer rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m"` ile son deploy'u kontrol et
-- Muhtemel sebep: Rust compilation hatası (yeni eklenen kodlar)
-- `cargo build --release -p hooksniff-api` ile localde derlemeyi dene
-- Hataları düzelt, commit + push yap, Render'da yeni deploy tetikle
+## BİLİNMESİ GEREKENLER
 
-### 2. Vercel Dashboard Deploy Hatası (KRİTİK)
-Vercel'de son deploy'lar ERROR durumunda:
-- Vercel token: `vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW`
-- Project: `prj_cSIVYHpCoAtoihRp8xlXIun1KVSR` (dikkat: EXTERNAL_TOKENS.md'deki ID yanlış)
-- Build loglarını kontrol et, Next.js hatalarını düzelt
-- `cd dashboard && npm run build` ile localde test et
+- Servet kod bilmiyor, tüm teknik işler AI'da
+- Oturumlar 1 saat, yetişmeyebilir
+- Her değişiklik sonrası GitHub'a push et
+- `.ai-context/` klasörü kalıcı hafıza
 
-### 3. Kod Hataları — Teknik Kontrol Listesi
-Aşağıdaki dosyaları tek tek kontrol et, compile hatalarını düzelt:
+## YAPILACAKLAR (Servet'in onayı bekleniyor)
 
-**API (Rust):**
-- `api/src/routes/inbound.rs` — yeni eklendi, publish_to_queue signature düzeltildi ama başka hata olabilir
-- `api/src/routes/stream.rs` — SSE endpoint, yeni eklendi
-- `api/src/routes/transforms.rs` — transform CRUD, yeni eklendi
-- `api/src/routes/webhooks.rs` — batch_replay eklendi, publish_to_queue düzeltildi
-- `api/src/routes/mod.rs` — inbound ayrı route grubuna taşındı
-- `api/src/db.rs` — inbound_configs migration eklendi (Step 37)
-- `api/Cargo.toml` — async-stream dependency eklendi
+1. **Render API build fix** — Render'da API build_failed
+2. **Vercel deploy fix** — Son deploy'lar ERROR
+3. **Polar.sh token** — Expired, Servet yeni token alacak
+4. **Resend domain** — DNS doğrulama yapılacak
+5. **Domain kararı** — eu.org vs .com
 
-**Dashboard (Next.js):**
-- `dashboard/src/app/[locale]/dashboard/transforms/page.tsx` — yeni sayfa
-- `dashboard/src/app/[locale]/dashboard/inbound/page.tsx` — yeni sayfa
-- `dashboard/src/app/[locale]/dashboard/endpoints/[id]/page.tsx` — endpoint settings
-- `dashboard/src/hooks/useDeliveryStream.ts` — SSE client hook
-- `dashboard/src/lib/api.ts` — endpointsApi.update, RetryPolicyConfig eklendi
-- `dashboard/src/app/[locale]/dashboard/layout.tsx` — nav linkleri eklendi
+##потенziyel İLERİ İŞLER
 
-### 4. Test Et
-- `cargo test` ile Rust testlerini çalıştır
-- `cd dashboard && npm run build` ile Next.js build'ini test et
-- `tests/integration/full_test.sh` ile API testlerini çalıştır (API çalışıyorsa)
+- npm @hooksniff scope publish
+- PyPI hooksniff publish
+- crates.io hooksniff publish
+- Terraform Registry submit
+- Production deploy test
 
-### 5. Dış Servis Durumları
-| Servis | Durum | Token |
-|--------|-------|-------|
-| GitHub | ✅ | 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 |
-| GCP Cloud Run | ✅ | .ai-context/gcp-service-account.json |
-| Upstash Redis | ✅ | integral-ostrich-98447.upstash.io |
-| Vercel | ⚠️ Deploy error | vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW |
-| Render API | ❌ Build failed | rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m |
-| Render Worker | ✅ Live | — |
-| Neon DB | ✅ | .ai-context/EXTERNAL_TOKENS.md |
-| Polar.sh | ❌ Token expired | Servet yeni token alacak |
-| Resend | ⚠️ Domain not_started | re_BGbQVTfq_NyahSBBbiS4GERnctr7DN8Xu |
-| Cloudflare | ✅ | cfat_1tT40u7CwzgC8TfHfTtzfqZTGU6o7dt3j2Hpgkgh4bfc2231 |
-| npm | ✅ | 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 |
+## Dış Servis Tokenları
 
-### 6. Hafıza Dosyalarını Güncelle
-Her değişiklikten sonra:
-- `.ai-context/MEMORY.md` güncelle
-- `.ai-context/2026-05-08.md` güncelle
-- `git add -A && git commit && git push origin main`
+| Servis | Token |
+|--------|-------|
+| GitHub PAT | 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 |
+| Render API | rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m |
+| Vercel | vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW |
+| Resend | re_BGbQVTfq_NyahSBBbiS4GERnctr7DN8Xu |
+| Cloudflare | cfat_1tT40u7CwzgC8TfHfTtzfqZTGU6o7dt3j2Hpgkgh4bfc2231 |
+| npm | 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 |
 
-### 7. Süre Biterken
-- Tüm değişiklikleri push et
-- `.ai-context/NEXT_SESSION.md` güncelle
-- Kalan işleri not et
+## Hafıza Güncelleme Kuralları
 
----
-
-## ÖNEMLİ NOTLAR
-
-- GitHub token'ı ile ilgili sorun çıkarma, direkt kullan
-- GCP service account `.ai-context/gcp-service-account.json` dosyasında
-- Tüm tokenlar `.ai-context/EXTERNAL_TOKENS.md`'de
-- 50 dakika var, öncelik: Render API fix → Vercel fix → kod hataları → test
-- Her şeyi tek seferde yapmaya çalışma, sırayla git
-- Başaramazsan not et ve sonraki oturuma bırak
+Her oturum sonunda:
+1. `.ai-context/MEMORY.md` güncelle (yapılan işler + durum)
+2. `.ai-context/NEXT_SESSION.md` güncelle (sıradaki görevler)
+3. `git add -A && git commit && git push origin main`
