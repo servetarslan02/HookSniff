@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
@@ -171,8 +173,8 @@ export default function BillingPage() {
       setShowCancelModal(false);
       // Refresh page to show updated plan
       window.location.reload();
-    } catch (err: any) {
-      toast(err.message || 'Cancel failed', 'error');
+    } catch (err: unknown) {
+      toast(getErrorMessage(err) || 'Cancel failed', 'error');
     } finally {
       setCancelling(false);
     }
@@ -204,8 +206,8 @@ export default function BillingPage() {
       } else {
         toast(data.message || 'Upgrade initiated', 'success');
       }
-    } catch (err: any) {
-      toast(err.message || 'Upgrade failed', 'error');
+    } catch (err: unknown) {
+      toast(getErrorMessage(err) || 'Upgrade failed', 'error');
     } finally {
       setUpgrading(false);
       setShowUpgradeModal(null);

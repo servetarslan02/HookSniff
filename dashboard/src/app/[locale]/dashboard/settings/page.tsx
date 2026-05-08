@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import { useAuth } from '@/lib/store';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -64,8 +66,8 @@ export default function SettingsPage() {
       }
       setProfileSuccess(tc('success'));
       setTimeout(() => setProfileSuccess(''), 3000);
-    } catch (e: any) {
-      setProfileError(e.message);
+    } catch (e: unknown) {
+      setProfileError(getErrorMessage(e));
     } finally {
       setProfileSaving(false);
     }
@@ -104,8 +106,8 @@ export default function SettingsPage() {
       setNewPassword('');
       setConfirmPassword('');
       setTimeout(() => setPasswordSuccess(''), 3000);
-    } catch (e: any) {
-      setPasswordError(e.message);
+    } catch (e: unknown) {
+      setPasswordError(getErrorMessage(e));
     } finally {
       setPasswordSaving(false);
     }
@@ -130,8 +132,8 @@ export default function SettingsPage() {
       }
       logout();
       router.push('/');
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      alert(getErrorMessage(e));
     } finally {
       setDeletingAccount(false);
       setShowDeleteModal(false);

@@ -26,7 +26,7 @@ export default function RoutingPage() {
     if (!token) return;
     apiFetch<RoutingInfo[]>('/endpoints', { token })
       .then(setEndpoints)
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [token]);
 

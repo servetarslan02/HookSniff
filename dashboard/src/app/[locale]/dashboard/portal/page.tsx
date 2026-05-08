@@ -4,20 +4,40 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
+interface PortalProfile {
+  id: string;
+  email: string;
+  name?: string;
+  plan: string;
+  webhook_limit?: number;
+  webhook_count?: number;
+  created_at: string;
+}
+
+interface PortalUsage {
+  webhooks_used?: number;
+  api_calls_today?: number;
+  total_deliveries: number;
+  delivered: number;
+  failed: number;
+  success_rate: number;
+  endpoints_count: number;
+}
+
 export default function PortalPage() {
   const { token } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
-  const [usage, setUsage] = useState<any>(null);
+  const [profile, setProfile] = useState<PortalProfile | null>(null);
+  const [usage, setUsage] = useState<PortalUsage | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!token) return;
     Promise.all([
-      apiFetch<any>('/portal/me', { token }),
-      apiFetch<any>('/portal/usage', { token }),
+      apiFetch<PortalProfile>('/portal/me', { token }),
+      apiFetch<PortalUsage>('/portal/usage', { token }),
     ])
       .then(([p, u]) => { setProfile(p); setUsage(u); })
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [token]);
 

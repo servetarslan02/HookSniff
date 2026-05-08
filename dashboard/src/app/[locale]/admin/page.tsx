@@ -27,7 +27,7 @@ export default function AdminOverviewPage() {
       const data = await adminApi.getStats(token);
       setStats(data);
     } catch (err) {
-      console.error('Failed to fetch admin stats:', err);
+      // Error handled silently
     } finally {
       setLoading(false);
     }
