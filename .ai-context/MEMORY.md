@@ -98,7 +98,9 @@ cd dashboard && npm install && npm run build
 6. EXTERNAL_TOKENS.md güncellendi — yeni token + stack bilgileri
 7. .env.production.example güncellendi — OTEL endpoint + headers
 8. otel-collector-config.yml güncellendi — Grafana Cloud exporter eklendi
-9. 3 dosya değiştirildi, push bekleniyor
+9. **KOD HATASI BULUNDU**: `opentelemetry-otlp` crate `tonic` (gRPC) feature kullanıyordu, Grafana HTTP istiyor
+10. `tonic` → `http-proto` feature değişikliği + `telemetry.rs` HTTP exporter'a geçiş
+11. 5 dosya değiştirildi, push edildi `1260a09` + devam commit'leri
 
 ### Bu Oturum (16) — 2026-05-09 01:41-01:55 GMT+8:
 
