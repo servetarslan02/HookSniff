@@ -3,6 +3,12 @@ use super::*;
 /// Healthcare industry package — hospitals, labs, pharmacies, EHR systems
 pub struct HealthcarePackage;
 
+impl Default for HealthcarePackage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HealthcarePackage {
     pub fn new() -> Self {
         Self

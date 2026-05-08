@@ -31,20 +31,17 @@ use uuid::Uuid;
 /// Throttling stratejisi
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[derive(Default)]
 pub enum ThrottleStrategy {
     /// Sabit pencere: N istek / M saniye
     FixedWindow,
     /// Kayan pencere: daha smooth rate limiting
+    #[default]
     SlidingWindow,
     /// Token bucket: burst + sustained rate
     TokenBucket,
 }
 
-impl Default for ThrottleStrategy {
-    fn default() -> Self {
-        Self::SlidingWindow
-    }
-}
 
 /// Endpoint throttling yapılandırması
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -83,6 +80,12 @@ struct ThrottleState {
 pub struct ThrottleManager {
     states: Arc<Mutex<HashMap<Uuid, ThrottleState>>>,
     cleanup_interval: Duration,
+}
+
+impl Default for ThrottleManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ThrottleManager {

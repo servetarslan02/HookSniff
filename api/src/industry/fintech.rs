@@ -3,6 +3,12 @@ use super::*;
 /// Fintech industry package — payment processors, banks, financial services
 pub struct FintechPackage;
 
+impl Default for FintechPackage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FintechPackage {
     pub fn new() -> Self {
         Self

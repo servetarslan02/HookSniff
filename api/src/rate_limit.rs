@@ -50,6 +50,12 @@ pub struct InMemoryRateLimiter {
     max_entries: usize,
 }
 
+impl Default for InMemoryRateLimiter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl InMemoryRateLimiter {
     pub fn new() -> Self {
         let limiter = Self {
