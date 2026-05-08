@@ -160,7 +160,68 @@ landing.footer.contact
 
 ---
 
-## 📊 SAYFA SAYFA DEĞERLENDİRME
+## 🔴🔴🔴 MANTIKSAL HATALAR (İnsan Perspektifi)
+
+### A. PRICING TUTARSIZLIĞI — Kullanıcı Güveni Sarsılır
+
+| Sayfa | Free Plan | Pro Plan | Business Plan |
+|-------|-----------|----------|---------------|
+| **Landing page** | 1,000 webhooks/month | 50,000 webhooks/month | 500,000 webhooks/month |
+| **Billing page** | ❌ Webhook sayısı YOK | ❌ Webhook sayısı YOK | ❌ Webhook sayısı YOK |
+| **Billing page** | 100 requests/min | 1,000 requests/min | 10,000 requests/min |
+| **FAQ page** | 1,000 webhooks/month | - | - |
+| **API code** | **10,000 webhooks/month** | - | - |
+
+**Sorun:** 
+- Landing page "1,000 webhooks/month" diyor ama API code'da `Plan::Free => 10_000` 
+- Billing page'de webhook sayısı hiç yok, sadece "requests/min" var
+- Kullanıcı hangisine inanacak?
+
+### B. FAKE DATA — Güvenilirlik Düşer
+
+| Sayfa | Fake Veri | Sorun |
+|-------|-----------|-------|
+| **Landing hero** | `'24,891'` deliveries | Hardcoded fake sayı |
+| **Landing hero** | `'99.97%'` success rate | Hardcoded fake yüzde |
+| **Landing hero** | `'45ms'` avg latency | Hardcoded fake ms |
+| **Landing hero** | Bar chart `[40,55,35,65...]` | Hardcoded fake grafik |
+| **About page** | `'99.97%'` delivery rate | Hardcoded fake |
+| **About page** | `'<50ms'` avg latency | Hardcoded fake |
+
+**Sorun:** Ürün yeni, gerçek veri yok. Ama bu kadar fake veri koymak profesyonel görünmüyor. Ya gerçek API'den çekilmeli ya da daha az fake konulmalı.
+
+### C. FAQ YANLIŞ BİLGİ
+
+| Soru | Cevap | Gerçek |
+|------|-------|--------|
+| "Is there a free plan?" | "1,000 webhooks/month, 5 endpoints" | API'de 10,000 webhooks |
+| "How is HookSniff different?" | "starts at $0/month vs $49+/month" | Svix $490, Hookdeck $39 |
+
+**Sorun:** Kullanıcı free plan'ı 1,000 sanıp 10,000 alacak mı? Veya tersi mi?
+
+### D. NAV TUTARSIZLIĞI — SPA Deneyimi Bozulur
+
+| Sayfa | Link Tipi | Sorun |
+|-------|-----------|-------|
+| About | `<a href="/">` | Full page reload |
+| Contact | `<a href="/">` | Full page reload |
+| Privacy | `<a href="/">` | Full page reload |
+| Terms | `<a href="/">` | Full page reload |
+| FAQ | `<Link href="/">` | SPA navigation ✅ |
+| Status | `<Link href="/">` | SPA navigation ✅ |
+| Docs | `<Link href="/">` | SPA navigation ✅ |
+
+**Sorun:** 4 sayfada `<a>` kullanılıyor → tıklayınca tüm sayfa yeniden yükleniyor. Diğer 3 sayfada `<Link>` → sorunsuz SPA geçişi. Kullanıcı bunu hisseder.
+
+### E. SIDEBAR AKTİF DURUM
+
+Sidebar'da aktif sayfa vurgulanıyor mu? → `isActive = cleanPath === item.href` → EVET vurgulanıyor ✅
+
+Ama `cleanPath` hesaplaması locale prefix'i kaldırıyor → doğru çalışıyor.
+
+---
+
+> **Not:** Bu dosya her inceleme sonrası güncellenir.
 
 ### ✅ İYİ YAPILANLAR
 - Tüm dashboard sayfalarında loading state var (7/7)
