@@ -4,6 +4,19 @@
 
 ---
 
+## ⚠️ KRİTİK KURAL: REPO AYRIMI
+
+| İş Türü | Repo | Açıklama |
+|---------|------|----------|
+| Hata düzeltme, fix, refactor | `servetarslan02/HookSniff` | Orijinal repo, main branch |
+| Yeni özellik geliştirme | `servetarslan02/hooksniff-lab` | Lab repo, test → onay → merge |
+| AI Agent katmanı | `servetarslan02/hooksniff-lab` | Lab repo, Servet onayı beklemede |
+
+**Kural:** Yeni özellikler lab repo'da geliştirilir, test edilir, Servet onay verirse ana repo'ya merge edilir.
+Ana repo'nun main branch'i bozulmaz. Hata fixleri doğrudan ana repo'da yapılır.
+
+---
+
 ## Biz Kimiz?
 
 - **Servet Arslan** — Proje sahibi, kod bilmiyor, Türkiye
