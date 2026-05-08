@@ -1,3 +1,5 @@
+#![allow(dead_code, unused_imports, unused_variables, unused_mut, unused_assignments)]
+
 use anyhow::Result;
 use axum::{routing::get, Router};
 use tower_http::cors::{AllowOrigin, Any, CorsLayer};
