@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-08 23:23 GMT+8
+> Son güncelleme: 2026-05-09 00:42 GMT+8
 
 ---
 
@@ -12,18 +12,6 @@
 | Yeni web özellikleri | `servetarslan02/hooksniff-lab` (lab) | feature/... |
 | Mobil uygulama | `servetarslan02/hooksniff-mobile` | main |
 | Market research, plan, notlar | `.ai-context/` klasörü (her iki repo'da) | main |
-
----
-
-## ✅ CI DURUMU (2026-05-08 23:23)
-
-Tüm 6 CI job'u artık geçiyor:
-1. ✅ `lint` — cargo fmt + clippy
-2. ✅ `test` — 29 test (18 api + 11 worker)
-3. ✅ `build-api` — release binary
-4. ✅ `build-worker` — release binary
-5. ✅ `build-dashboard` — Next.js build (20 dosya düzeltildi)
-6. ✅ `security-audit` — cargo audit (`.cargo/audit.toml` ile allowlist)
 
 ---
 
@@ -62,22 +50,41 @@ cat .ai-context/NEXT_SESSION.md
 
 ---
 
-## ❌ KALAN SORUNLAR
+## ⏳ BEKLEYEN İŞLER
+
+### PR #31 — Merge Bekliyor
+- **Branch:** `feat/mobile-backend-features`
+- **İçerik:** 5 backend feature (password reset, email verification, refresh token, 2FA, push notifications)
+- **Durum:** `cargo check` temiz, CI private repo'da çalışmadı (dakika limiti)
+- **Merge için:** Repo public yap → CI geçsin → merge → private yap
+- **Link:** https://github.com/servetarslan02/HookSniff/pull/31
 
 ### Servet'in görevleri:
 - **iyzico hesap** — vergi levhası + banka hesabı
 
-### Eksik Backend (Mobil için)
-1. Push notification (FCM/APNs)
-2. Şifre sıfırlama API'si
-3. Email doğrulama API'si
-4. Refresh token
-5. 2FA
+### Deploy Sonrası Eklenecek Env Var'lar
+- `EMAIL_BASE_URL` — dashboard URL (örn: `https://hooksniff.vercel.app`)
+- `FCM_SERVER_KEY` — Firebase Cloud Messaging server key
 
-### Teknik borç
+### Teknik Borç
 - sqlx 0.7.4 → 0.8 upgrade (security audit vulnerabilities)
 - 107 eski domain referansı
 - console.log kalıntıları
+
+---
+
+## ✅ TAMAMLANAN (Oturum 15 — 2026-05-09)
+
+1. CI düzeltmeleri — PR #29 (cache key reset) + PR #30 (ubuntu-latest) merge
+2. Repo public/private toggle — dakika limiti sıfırlandı
+3. 5 yeni backend feature (sub-agent ile kodlandı):
+   - `POST /v1/auth/forgot-password` + `POST /v1/auth/reset-password`
+   - `POST /v1/auth/verify-email` + `POST /v1/auth/resend-verification`
+   - `POST /v1/auth/refresh` (15dk access + 30 gün refresh)
+   - `POST /v1/auth/2fa/enable` + `confirm` + `disable` + `verify`
+   - `POST /v1/devices` + `GET /v1/devices` + `DELETE /v1/devices/{token}`
+4. 5 yeni migration (030-034)
+5. PR #31 açıldı
 
 ---
 
@@ -96,7 +103,7 @@ Private repo = 2000 dk/ay Actions limiti. Çözüm: geçici public.
 
 ### Sıra:
 1. **Sensitive dosyaları local'e kaydet** → `EXTERNAL_TOKENS.md` + `gcp-service-account.json`
-2. **Repo'dan sil** → commit + push
+2. **Repo'dan sil** → commit + push (veya PR'dan önce branch'te sil)
 3. **Public yap** → `PATCH /repos/... {"private": false}`
 4. **CI tamamlanmasını bekle** → 6/6 job yeşil
 5. **Private yap** → `PATCH /repos/... {"private": true}`
