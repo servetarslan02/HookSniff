@@ -34,7 +34,10 @@ Her özellik tek tek tamamlanacak:
 | `sdks/agent-node/src/index.ts` | 263 | ⏳ Aşama 4 |
 | `sdks/agent-python/__init__.py` | 232 | ⏳ Aşama 4 |
 
-### Aşama 1 Yapılan Değişiklikler (2026-05-09)
+### Aşama 2 Yapılan Değişiklikler (2026-05-09)
+1. **routes.rs**: `GET /{agent_id}/stream` — SSE stream (2sn polling, event_type/direction filtresi, heartbeat), `GET /{agent_id}/stats` — detaylı event istatistikleri (toplam, emit/receive, 24h aktivite, top 10 event type), `GET /{agent_id}/events` — gelişmiş filtreleme (event_type, direction, status, since/until ISO 8601, dinamik SQL)
+2. **event_bridge.rs**: `broadcast_agent_event()` — WS gateway entegrasyonu, agent event'leri mevcut WS stream'e broadcast
+3. **models.rs**: `EventStats` struct eklendi
 1. **validation.rs**: `validate_agent_status`, `validate_optional_*` fonksiyonları, event type dot check, 30+ unit test
 2. **routes.rs**: `update_agent` → validation + audit log + duplicate name check, `list_agents` → total count pagination, `create_agent` → duplicate name check + rate limit error handling, `create_route` → target/source agent existence check + duplicate route check, `emit_event` → inactive agent check + target validation, `get_rate_limit`/`update_rate_limit` → customer ownership check + range validation, `get_audit_log` → total count pagination, `list_agent_events` → agent existence check + total count
 3. **models.rs**: Request/response deserialization/serialization testleri
@@ -97,11 +100,11 @@ Her özellik tek tek tamamlanacak:
 3. [ ] Rate limit testleri yap
 4. [ ] Input validation testleri yap
 
-### Aşama 2: Event Sistemi (1-2 gün)
-1. [ ] Event emit/subscribe'ı tamamla
-2. [ ] Routing sistemini tamamla
-3. [ ] Real-time SSE entegrasyonunu tamamla
-4. [ ] Event geçmişi ve filtreleme
+### Aşama 2: Event Sistemi ✅ (2026-05-09 tamamlandı)
+1. [x] Event emit/subscribe'ı tamamla — SSE stream endpoint
+2. [x] Routing sistemini tamamla — Aşama 1'de tamamlandı
+3. [x] Real-time SSE entegrasyonunu tamamla — /agents/{id}/stream
+4. [x] Event geçmişi ve filtreleme — event_type, direction, status, since/until
 
 ### Aşama 3: Dashboard (1-2 gün)
 1. [ ] Agent listesi sayfasını tamamla
