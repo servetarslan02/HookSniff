@@ -130,14 +130,14 @@
 
 ---
 
-### 7. 📱 "Anlık Bildirim Botu" (Notification Bot)
+### 7. 📱 "Telegram Bildirim Botu" (Telegram Bot)
 **Mevcut:** Email bildirim var
-**Eksik:** Mobil anlık bildirim yok
+**Eksik:** Anlık bildirim yok
 
 **Eklenecekler:**
 - **Telegram bot:** Kritik hatalarda mesaj gönder
-- **Discord webhook:** Alert kanalı
-- **Slack webhook:** Alert kanalı
+- **Discord webhook:** Alert kanalı (opsiyonel)
+- **Slack webhook:** Alert kanalı (opsiyonel)
 - Dashboard'da "Bildirim Ayarları" sayfası
 - Her alert kuralı için ayrı kanal seçimi
 
@@ -231,7 +231,7 @@
 | # | Özellik | Süre | Öncelik |
 |---|---------|------|---------|
 | 1 | Akıllı Alarm Sistemi | 1 hafta | 🔴 Yüksek |
-| 2 | Telegram/Discord Bot | 2-3 gün | 🔴 Yüksek |
+| 2 | Telegram Bot | 2-3 gün | 🔴 Yüksek |
 | 3 | Test Modu | 1 hafta | 🔴 Yüksek |
 
 ### Faz 2 — Developer Experience (2 hafta)
@@ -287,3 +287,84 @@
 - Test edilir → Servet onay verirse → main'e birleştir
 - $0 maliyet (free tier yeterli)
 - Sıra Servet'in onayına göre belirlenecek
+
+---
+
+## 📱 EN SON: Mobil Uygulama Planı
+
+> ⚠️ Bu EN SON yapılacak iş. Tüm web özellikleri bittikten sonra başlanacak.
+> Servet onayı beklemede.
+
+### Ne Yapılacak?
+HookSniff mobil uygulaması — webhook'ları telefondan izle ve yönet.
+
+### Özellikler
+| # | Özellik | Açıklama |
+|---|---------|----------|
+| 1 | Dashboard | Event sayısı, başarı oranı, grafik |
+| 2 | Bildirimler | Kritik hatalarda push notification |
+| 3 | Event Listesi | Son event'leri filtrele, ara |
+| 4 | Endpoint Yönetimi | Endpoint ekle/düzenle/durdur |
+| 5 | Hızlı Aksiyon | Tek tıkla retry, disable, test |
+
+### Teknoloji Seçenekleri
+
+| Seçenek | Teknoloji | Avantaj | Dezavantaj |
+|---------|-----------|---------|------------|
+| A | **React Native** | Tek kodbase, iOS + Android | Performans |
+| B | **Flutter** | Güzel UI, performans | Dart dili |
+| C | **PWA** (Progressive Web App) | En hızlı, app store gerekmez | Sınırlı bildirim |
+| D | **Expo** (React Native) | Hızlı geliştirme, kolay deploy | Bağımlılık |
+
+### Tavsiyem: Önce PWA, Sonra Native
+
+**Faz 1 — PWA (2 hafta)**
+- Mevcut Next.js dashboard'u PWA'ya çevir
+- Service worker → offline çalışma
+- Web push notification → anlık bildirim
+- App store'a gerek yok, tarayıcıdan kurulur
+- $0 maliyet
+
+**Faz 2 — React Native / Expo (4-6 hafta)**
+- PWA yetersiz kalırsa native'e geç
+- Expo ile hızlı geliştirme
+- App Store + Google Play
+- Push notification (native)
+
+### PWA Avantajları
+- ✅ App store onayı gerekmez
+- ✅ Anında güncelleme (kullanıcı bir şey yapmaz)
+- ✅ iOS + Android + Desktop
+- ✅ $0 maliyet
+- ✅ Mevcut dashboard kodu kullanılır
+
+### Native Avantajları
+- ✅ Daha iyi performans
+- ✅ Native push notification
+- ✅ Offline çalışma
+- ✅ App store'da görünürlik
+
+### Plan
+
+| Faz | Ne | Süre | Öncelik |
+|-----|-----|------|---------|
+| PWA | Dashboard'u PWA yap | 2 hafta | 🟡 Orta |
+| Push Notification | Web push ekle | 3 gün | 🟡 Orta |
+| Offline | Service worker | 1 hafta | 🟢 Düşük |
+| Native (gerekirse) | React Native/Expo | 4-6 hafta | 🟢 Düşük |
+
+### Maliyet
+
+| Kalem | Maliyet |
+|-------|---------|
+| PWA | $0 |
+| Web Push (Firebase) | $0 (free tier) |
+| App Store | $99/yıl (Apple) |
+| Google Play | $25 (tek seferlik) |
+| Expo EAS Build | $0 (free tier) |
+
+### Notlar
+- PWA ile başla, native'e geçme zorunlu değil
+- Müşteri feedback'ine göre karar ver
+- App Store'a koymak istersen Apple Developer hesabı lazım ($99/yıl)
+- Google Play daha ucuz ($25 tek seferlik)
