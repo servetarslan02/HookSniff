@@ -106,13 +106,16 @@ pub async fn notify_customer(
             match fcm.send(&token_clone, &title, &body, data).await {
                 Ok(()) => {
                     // Update last_used_at
-                    let _ = sqlx::query(
+                    if let Err(e) = sqlx::query(
                         "UPDATE device_tokens SET last_used_at = NOW() WHERE customer_id = $1 AND token = $2",
                     )
                     .bind(customer_id_clone)
                     .bind(&token_clone)
                     .execute(&pool_clone)
-                    .await;
+                    .await
+                    {
+                        tracing::warn!("Failed to update device token last_used: {:?}", e);
+                    }
                 }
                 Err(e) => {
                     tracing::warn!("Failed to send push to {}: {:?}", token_clone, e);

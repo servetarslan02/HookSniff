@@ -740,7 +740,7 @@ async fn export_deliveries(
                     "attachment; filename=\"webhook_logs.csv\"",
                 )
                 .body(Body::from(csv))
-                .unwrap())
+                .map_err(|e| AppError::Internal(e.into()))?)
         }
         _ => {
             let body =
@@ -750,7 +750,7 @@ async fn export_deliveries(
                 .status(StatusCode::OK)
                 .header(header::CONTENT_TYPE, "application/json")
                 .body(Body::from(body))
-                .unwrap())
+                .map_err(|e| AppError::Internal(e.into()))?)
         }
     }
 }
