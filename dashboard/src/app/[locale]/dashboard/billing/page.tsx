@@ -112,7 +112,7 @@ export default function BillingPage() {
   useEffect(() => {
     if (!token) return;
     fetch(`${API}/billing/usage`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {}, credentials: 'include' as const,
     })
       .then((res) => res.json())
       .then((data) => {
@@ -161,7 +161,7 @@ export default function BillingPage() {
     try {
       const res = await fetch(`${API}/billing/subscription`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -190,7 +190,7 @@ export default function BillingPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          credentials: 'include' as const,
         },
         body: JSON.stringify({ plan: showUpgradeModal.toLowerCase() }),
       });

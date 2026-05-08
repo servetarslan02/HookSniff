@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useRouter } from '@/i18n/navigation';
 
 export default function SettingsPage() {
-  const { user, token, apiKey, logout } = useAuth();
+  const { user, apiKey, logout } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -54,7 +54,7 @@ export default function SettingsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token || ''}`,
+          credentials: 'include' as const,
         },
         body: JSON.stringify({ name: profileName, email: profileEmail }),
       });
@@ -91,7 +91,7 @@ export default function SettingsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token || ''}`,
+          credentials: 'include' as const,
         },
         body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
       });
@@ -122,7 +122,7 @@ export default function SettingsPage() {
     try {
       const res = await fetch(`${API}/auth/me`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token || ''}` },
+        credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));

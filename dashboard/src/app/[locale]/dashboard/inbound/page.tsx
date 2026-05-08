@@ -41,7 +41,7 @@ export default function InboundPage() {
     if (!token) return;
     Promise.all([
       endpointsApi.list(token).catch(() => []),
-      fetch(`${API}/inbound/configs`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(`${API}/inbound/configs`, { headers: {}, credentials: 'include' as const }).then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([eps, cfgs]) => {
       setEndpoints(eps);
       setConfigs(cfgs);
@@ -53,7 +53,7 @@ export default function InboundPage() {
     try {
       const res = await fetch(`${API}/inbound/configs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' }, credentials: 'include' as const,
         body: JSON.stringify({
           provider: selectedProvider,
           endpoint_id: selectedEndpoint || null,
@@ -64,7 +64,7 @@ export default function InboundPage() {
         toast(t('configCreated'), 'success');
         setShowCreate(false);
         // Reload
-        const cfgs = await fetch(`${API}/inbound/configs`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).catch(() => []);
+        const cfgs = await fetch(`${API}/inbound/configs`, { headers: {}, credentials: 'include' as const }).then(r => r.json()).catch(() => []);
         setConfigs(cfgs);
       } else {
         toast(t('configFailed'), 'error');
