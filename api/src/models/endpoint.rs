@@ -25,6 +25,15 @@ pub struct Endpoint {
     pub last_failure_at: Option<DateTime<Utc>>,
     /// Event delivery format: "standard" or "cloudevents".
     pub format: String,
+    // FIFO ordering fields (migration 007)
+    pub fifo_enabled: Option<bool>,
+    pub fifo_sequence: Option<i64>,
+    pub fifo_group_by_customer: Option<bool>,
+    pub fifo_max_wait_secs: Option<i32>,
+    // Throttle fields (migration 008)
+    pub throttle_rate: Option<i32>,
+    pub throttle_period_secs: Option<i32>,
+    pub throttle_strategy: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -366,6 +375,13 @@ mod tests {
             failure_streak: 0,
             last_failure_at: None,
             format: "standard".into(),
+            fifo_enabled: None,
+            fifo_sequence: None,
+            fifo_group_by_customer: None,
+            fifo_max_wait_secs: None,
+            throttle_rate: None,
+            throttle_period_secs: None,
+            throttle_strategy: None,
         };
 
         assert!(ep.is_ip_allowed("192.168.1.1"));
@@ -398,6 +414,13 @@ mod tests {
             failure_streak: 0,
             last_failure_at: None,
             format: "standard".into(),
+            fifo_enabled: None,
+            fifo_sequence: None,
+            fifo_group_by_customer: None,
+            fifo_max_wait_secs: None,
+            throttle_rate: None,
+            throttle_period_secs: None,
+            throttle_strategy: None,
         };
 
         assert!(ep.matches_event_filter("order.created"));
@@ -449,6 +472,13 @@ mod tests {
             failure_streak: streak,
             last_failure_at: if streak > 0 { Some(chrono::Utc::now()) } else { None },
             format: "standard".into(),
+            fifo_enabled: None,
+            fifo_sequence: None,
+            fifo_group_by_customer: None,
+            fifo_max_wait_secs: None,
+            throttle_rate: None,
+            throttle_period_secs: None,
+            throttle_strategy: None,
         }
     }
 
