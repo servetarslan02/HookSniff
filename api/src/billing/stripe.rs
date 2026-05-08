@@ -681,7 +681,8 @@ mod tests {
 
     #[test]
     fn test_verify_signature_valid() {
-        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        // Use a proper base64-encoded 32-byte key
+        let secret = "whsec_dGVzdF9zZWNyZXRfYmFzZTY0X2tleV9oZXJlXzMyYg==";
         let payload = r#"{"id":"evt_123","type":"checkout.session.completed"}"#;
         let now = chrono::Utc::now().timestamp();
         let header = make_signature(payload, secret, now);
@@ -691,7 +692,7 @@ mod tests {
 
     #[test]
     fn test_verify_signature_tampered_payload() {
-        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let secret = "whsec_dGVzdF9zZWNyZXRfYmFzZTY0X2tleV9oZXJlXzMyYg==";
         let payload = r#"{"id":"evt_123","type":"checkout.session.completed"}"#;
         let now = chrono::Utc::now().timestamp();
         let header = make_signature(payload, secret, now);
@@ -702,8 +703,8 @@ mod tests {
 
     #[test]
     fn test_verify_signature_wrong_secret() {
-        let secret_a = "whsec_test_secret_base64_encoded_key_here_32b!";
-        let secret_b = "whsec_different_secret_for_testing_purposes__!!";
+        let secret_a = "whsec_dGVzdF9zZWNyZXRfYmFzZTY0X2tleV9oZXJlXzMyYg==";
+        let secret_b = "whsec_ZGlmZmVyZW50X3NlY3JldF9mb3JfdGVzdGluZ19wdXJwb3Nlcw==";
         let payload = r#"{"id":"evt_456"}"#;
         let now = chrono::Utc::now().timestamp();
         let header = make_signature(payload, secret_a, now);
@@ -713,7 +714,7 @@ mod tests {
 
     #[test]
     fn test_verify_signature_expired_timestamp() {
-        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let secret = "whsec_dGVzdF9zZWNyZXRfYmFzZTY0X2tleV9oZXJlXzMyYg==";
         let payload = r#"{"id":"evt_789"}"#;
         // 10 minutes ago — beyond 5-minute tolerance
         let old_ts = chrono::Utc::now().timestamp() - 600;
@@ -724,7 +725,7 @@ mod tests {
 
     #[test]
     fn test_verify_signature_future_timestamp() {
-        let secret = "whsec_test_secret_base64_encoded_key_here_32b!";
+        let secret = "whsec_dGVzdF9zZWNyZXRfYmFzZTY0X2tleV9oZXJlXzMyYg==";
         let payload = r#"{"id":"evt_future"}"#;
         // 10 minutes in the future — beyond tolerance
         let future_ts = chrono::Utc::now().timestamp() + 600;
