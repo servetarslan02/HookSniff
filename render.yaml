@@ -53,7 +53,7 @@ services:
       - key: POLAR_WEBHOOK_SECRET
         sync: false
       - key: POLAR_PRODUCT_PRO
-        value: 79fee3f9-04a2-46c1-804e-8ca7542b8119
+        value: ec5826ad-4a01-4146-b2d0-3b99eaf150a5
       - key: POLAR_PRODUCT_BUSINESS
         value: e5b7d88a-7606-4963-a070-4102ca6405e2
       - key: POLAR_ENV
