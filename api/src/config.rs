@@ -41,6 +41,10 @@ pub struct Config {
     pub notify_from_email: String,
     /// Admin notification email address (optional)
     pub notify_email: Option<String>,
+    /// FCM server key for push notifications (optional)
+    pub fcm_server_key: Option<String>,
+    /// Base URL for email links (password reset, verification)
+    pub email_base_url: String,
 }
 
 /// Patterns that look like placeholder / throwaway secrets (case-insensitive).
@@ -173,6 +177,9 @@ impl Config {
             notify_from_email: std::env::var("NOTIFY_FROM_EMAIL")
                 .unwrap_or_else(|_| "noreply@hooksniff.vercel.app".into()),
             notify_email: std::env::var("NOTIFY_EMAIL").ok(),
+            fcm_server_key: std::env::var("FCM_SERVER_KEY").ok(),
+            email_base_url: std::env::var("EMAIL_BASE_URL")
+                .unwrap_or_else(|_| "https://hooksniff.vercel.app".into()),
         })
     }
 }
