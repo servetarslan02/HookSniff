@@ -2,7 +2,7 @@
 
 > Bu dosya, AI asistanın oturumlar arası hafızasıdır.
 > Her oturum başında bu dosya okunur, oturum sonunda güncellenir.
-> Son güncelleme: 2026-05-08 18:35 GMT+8
+> Son güncelleme: 2026-05-08 18:56 GMT+8
 
 ---
 
@@ -92,16 +92,26 @@ Detaylı rapor: `BUG_REPORT.md`
 
 ---
 
+## ❌ Kalan İşler (Yeni Oturum)
+
+1. `validate_json_depth` test hatası — check_depth başlangıç değeri sorunu
+2. Stripe signature testleri (5 adet) — timestamp/tolerance sorunu
+3. Transform pipeline test hatası — name field işlemi
+4. Servet'in yapması gerekenler: Polar.sh token, Resend domain, iyzico hesap
+
+Detay: `HANDOFF.md` dosyasında
+
+---
+
 ## 📝 Oturum Geçmişi
 
 ### Oturum 1 — 2026-05-08
-- İlk tanışma
-- GitHub repo bağlantısı kuruldu
+- İlk tanışma, GitHub repo bağlantısı kuruldu
 - Hafıza dosyası oluşturuldu
-- Mevcut proje durumu incelendi
-- Tüm servisler kontrol edildi (API ✅, Dashboard ✅, Worker ✅)
-- Kapsamlı kod incelemesi yapıldı — 15 sorun tespit edildi
-- BUG_REPORT.md GitHub'a yüklendi
+- Kapsamlı kod incelemesi — 15 sorun tespit edildi
+- 13 sorun düzeltildi, cargo fmt uygulandı
+- 7 önceden var olan test hatası kaldı (yeni oturumda düzeltilecek)
+- HANDOFF.md oluşturuldu (el değiştirme dokümanı)
 
 ---
 
