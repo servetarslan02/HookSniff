@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 13:47
+> 2026-05-08 13:53
 
 ## Yeni Oturumda Ne Söyle
 
@@ -19,25 +19,39 @@ GitHub PAT: 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
 
 ## MEVCUT DURUM
 
-Tüm 26 teknik görev tamamlandı. Proje stabil.
+Tüm 26 teknik görev tamamlandı. Dış servislerde sorunlar var.
 
-## BİLİNMESİ GEREKENLER
+## KRİTİK SORUNLAR
 
-- Servet kod bilmiyor, tüm teknik işler AI'da
-- Oturumlar 1 saat, yetişmeyebilir
-- Her değişiklik sonrası GitHub'a push et
-- `.ai-context/` klasörü kalıcı hafıza
+### 1. Render API — Build Failed ❌
+- Servet son deploy'larda build_failed alıyor
+- `cargo build --release -p hooksniff-api` ile localde derlemeyi dene
+- Hataları düzelt, commit + push yap
 
-## YAPILACAKLAR (Servet'in onayı bekleniyor)
+### 2. Vercel — Proje ID Bulunamıyor ⚠️
+- Token çalışıyor ama `prj_NQgFly8h06oH5DTzClj7vyq3hqSO` bulunamıyor
+- Servet doğru ID'yi Vercel dashboard'dan bulacak
+- ID gelince: `dashboard/` klasörünü kontrol et, Next.js build hatası var mı bak
 
-1. **Render API build fix** — Render'da API build_failed
-2. **Vercel deploy fix** — Son deploy'lar ERROR
-3. **Polar.sh token** — Expired, Servet yeni token alacak
-4. **Resend domain** — DNS doğrulama yapılacak
-5. **Domain kararı** — eu.org vs .com
+### 3. Polar.sh — Token Expired ❌
+- Servet yeni token alacak
+- Token gelince: ödeme sistemi test et
 
-##потенziyel İLERİ İŞLER
+### 4. Resend — Domain Değişikliği ❌
+- is-a.dev iptal edildi
+- Yeni domain ile Resend'de doğrulama yapılacak
+- Servet domain seçmeli (eu.org veya .com)
 
+### 5. Cloudflare R2 — Bucket Yok ❌
+- R2 bucket hiç oluşturulmamış
+- İstersen oluştur: bucket adı `hooksniff-storage`
+
+## DOMAIN KARARI
+- ~~is-a.dev~~ iptal
+- **Şimdilik**: Vercel ücretsiz domain (`hooksniff.vercel.app`)
+- **İleride**: eu.org (ücretsiz) veya .com ($12/yıl)
+
+##потенциyel İLERİ İŞLER
 - npm @hooksniff scope publish
 - PyPI hooksniff publish
 - crates.io hooksniff publish
