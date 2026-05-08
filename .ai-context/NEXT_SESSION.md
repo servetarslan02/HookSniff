@@ -1,91 +1,66 @@
 # NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 15:12 GMT+8
+> Son güncelleme: 2026-05-08 16:56 GMT+8
 
 ## Yeni Oturumda Ne Söyle
 
-HookSniff projesinde API ve Worker Cloud Run'a taşındı. Her iki servis de çalışıyor. Detaylar bu dosyada.
+HookSniff projesi Cloud Run'da çalışıyor. API healthy. Şimdi kalite ve temizlik zamanı.
 
 ---
 
-## ✅ DURUM: Cloud Run Taşıma Tamamlandı!
+## Öncelik 1: CI/CD Temizliği
 
-### Deploy Edilen Servisler
+### Unused Code Temizliği
+~152 unused warning var. İki seçenek:
+- **Hızlı**: Her crate'in `lib.rs` veya `main.rs`'ine `#![allow(dead_code, unused_imports, unused_variables)]` ekle
+- **Temiz**: Gerçekten kullanılmayan kodları sil
 
-| Servis | URL | Durum |
-|--------|-----|-------|
-| API | https://hooksniff-api-1046140057667.europe-west1.run.app | ✅ Live |
-| Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Live |
+### Formatting Diff Azaltma
+- `dashboard/package-lock.json` büyük diff'ler oluşturuyor
+- Çözüm: `npm install` sonrası lockfile'ı commit et, sonra `.gitattributes` ile binary marker ekle
+- VEYA: lockfile'ı gitignore'a ekle (tavsiye edilmez, reproducible build için gerekli)
 
-### Health Check
-```json
-{
-  "status": "healthy",
-  "checks": {
-    "database": {"status": "healthy", "latency_ms": 34},
-    "queue": {"status": "healthy", "latency_ms": 34},
-    "last_delivery": {"status": "healthy"}
-  }
-}
-```
+## Öncelik 2: Servet'in Yapması Gereken
 
-## Servet'in Yapması Gereken
+1. **GitHub token yenile** — eski token mesajda açık paylaşıldı
+2. **Polar.sh yeni token** — ödeme sistemi için
+3. **Domain kararı** — eu.org veya .com
+4. **Resend domain doğrulama**
+5. **iyzico hesap**
 
-### 1. GitHub Secrets Ayarla (ACİL)
-Deploy workflow'u GitHub Actions'tan çalışabilmesi için:
+## Öncelik 3: Feature Eksikleri
 
-**Repo → Settings → Secrets → Actions → New repository secret:**
+- Dashboard'da gerçek veri gösterimi (API'ye bağla)
+- WebSocket real-time delivery
+- Billing entegrasyonu (Polar.sh + iyzico)
+- Email bildirimleri (Resend)
+- R2 bucket oluştur + storage entegrasyonu
+- Grafana monitoring kurulumu
 
-| Secret | Değer |
-|--------|-------|
-| `GCP_SA_KEY` | `.ai-context/gcp-service-account.json` dosyasının tam JSON içeriği |
+---
 
-### 2. Dashboard API URL'ini Güncelle
-Vercel dashboard'ında environment variable olarak:
-```
-NEXT_PUBLIC_API_URL=https://hooksniff-api-1046140057667.europe-west1.run.app
-```
+## Teknik Notlar
 
-### 3. Render API Servisini Kapat/Suspend Et
-Artık Cloud Run'da çalıştığı için Render'daki API servisi gereksiz.
+### Cloud Run
+- API: `europe-west1`, 2GB RAM, 1 CPU
+- Worker: `europe-west1`, 1GB RAM, 1 CPU
+- Secret Manager'da 10 secret var
 
-### 4. CORS Ayarları
-API'nin CORS_ORIGINS env var'ı şu an `https://hooksniff.vercel.app` olarak ayarlı.
-Eğer farklı domain kullanacaksan güncellenmeli.
+### Veritabanı
+- Neon PostgreSQL, eu-central-1
+- Migration'lar: `api/migrations/` klasöründe
 
-## Yapılan İşler (Bu Oturum)
+### GitHub Actions
+- CI: fmt + clippy + test (hepsi continue-on-error)
+- Deploy: Cloud Run'a Docker image push
+- `GCP_SA_KEY` secret'ı ayarlı
 
-1. ✅ gcloud CLI kuruldu
-2. ✅ Docker kuruldu (apt.docker.io)
-3. ✅ GCP auth yapıldı (service account ile)
-4. ✅ Artifact Registry repo onaylandı (zaten vardı)
-5. ✅ 10 Secret Manager secret'ı oluşturuldu
-6. ✅ API Docker image build edildi (compile hatası düzeltildi: serde_json::Error → AppError)
-7. ✅ API Artifact Registry'ye push edildi
-8. ✅ API Cloud Run'a deploy edildi → Health check başarılı
-9. ✅ Worker Docker image build edildi
-10. ✅ Worker Artifact Registry'ye push edildi
-11. ✅ Worker Cloud Run'a deploy edildi
-12. ✅ Deploy workflow düzeltildi (PORT reserved hatası)
-13. ✅ GitHub'a push edildi
-
-## GCP Secret Manager Secretları
-
-| Secret Name | İçerik |
-|-------------|--------|
-| neon-db-url | Neon DB connection string |
-| upstash-redis-url | Redis URL |
-| jwt-secret | JWT secret |
-| hmac-secret | HMAC secret |
-| polar-token | Polar access token |
-| polar-webhook | Polar webhook secret |
-| polar-pro | Polar product pro ID |
-| polar-business | Polar product business ID |
-| resend-key | Resend API key |
-| otel-headers | Grafana OTEL headers |
+---
 
 ## Hafıza Kuralları
 Her oturum sonunda:
 1. `.ai-context/MEMORY.md` güncelle
 2. `.ai-context/NEXT_SESSION.md` güncelle
-3. `git add -A && git commit && git push origin main`
+3. `STATUS.md` güncelle
+4. `git add -A && git commit && git push origin main`
+5. **Gereksiz dosyaları commit etme** — sadece proje dosyaları

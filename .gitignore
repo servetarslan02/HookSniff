@@ -30,3 +30,15 @@ Thumbs.db
 .env.production
 .vercel
 deploy/gcp-service-account.json
+
+# OpenClaw workspace files (should NOT be in this repo)
+AGENTS.md
+BOOTSTRAP.md
+SOUL.md
+TOOLS.md
+IDENTITY.md
+USER.md
+HEARTBEAT.md
+.openclaw/
+memory/
+.env.example
