@@ -31,7 +31,7 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 | CDN/DNS | Cloudflare | Cloudflare Free | $0 |
 | Monitoring | Grafana + OpenTelemetry | Grafana Cloud | $0 |
 | Storage | Cloudflare R2 | Cloudflare R2 | $0 (10 GB) |
-| Email | Resend | Resend | $0 (3K/mo) |
+| Email | GCloud Gmail API | Service Account | $0 (2K/day) |
 | Billing | Polar.sh + iyzico | Polar.sh / iyzico | Pay per transaction |
 
 ## Quick Start

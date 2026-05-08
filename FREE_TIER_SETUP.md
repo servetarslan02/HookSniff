@@ -15,7 +15,7 @@ This guide walks you through setting up every service, getting credentials, and 
 5. [Vercel — Dashboard Hosting](#4-vercel--dashboard)
 6. [Grafana Cloud — Monitoring](#5-grafana-cloud--monitoring)
 7. [Cloudflare R2 — Storage](#6-cloudflare-r2--storage)
-8. [Resend — Email](#7-resend--email)
+8. [GCloud Gmail — Email](#7-google-cloud-gmail-api--email)
 9. [Cloudflare — CDN/DNS](#8-cloudflare--cdndns)
 10. [Environment Variables](#environment-variables)
 11. [Deployment Checklist](#deployment-checklist)
@@ -33,7 +33,7 @@ This guide walks you through setting up every service, getting credentials, and 
 | Vercel | Dashboard hosting | 100 GB BW, unlimited sites | $20/mo (Pro) |
 | Grafana Cloud | Monitoring + tracing | 10K metrics, 50 GB logs, 50 GB traces | Pay-as-you-go |
 | Cloudflare R2 | Webhook payload storage | 10 GB, egress free | $0.015/GB-mo |
-| Resend | Email notifications | 3,000/mo, 100/day | $20/mo (50K) |
+| GCloud Gmail API | Email notifications | 2,000/day (Workspace) | Free with service account |
 | Cloudflare | CDN, DNS, SSL, DDoS | Unlimited (free plan) | $20/mo (Pro) |
 
 **Total monthly cost: $0**
@@ -376,7 +376,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 
 ---
 
-## 7. Resend — Email
+## 7. Google Cloud Gmail API — Email
 
 **What it does:** Sends transactional emails (account verification, alert notifications, billing receipts).
 
@@ -390,7 +390,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 
 ### Step-by-Step Setup
 
-1. **Go to** [resend.com](https://resend.com)
+1. **GCP Console** → IAM & Admin → Service Accounts
 2. **Sign up** with GitHub or email
 3. **Get your API key:**
    - Go to **API Keys** in the dashboard
@@ -404,7 +404,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
    - Wait for verification (~5 minutes)
 5. **Test:**
    ```bash
-   curl -X POST https://api.resend.com/emails \
+   curl -X POST https://gmail.googleapis.com/gmail/v1/users/me/messages/send \
      -H "Authorization: Bearer re_YOUR_API_KEY" \
      -H "Content-Type: application/json" \
      -d '{"from": "noreply@hooksniff.is-a.dev", "to": "you@example.com", "subject": "Test", "html": "<p>Hello!</p>"}'
@@ -413,7 +413,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 ### Environment Variables
 
 ```env
-RESEND_API_KEY=re_YOUR_API_KEY
+GCP_SA_JSON={"type":"service_account",...}
 NOTIFY_EMAIL=admin@example.com
 NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
 ```
@@ -421,8 +421,8 @@ NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
 ### Gotchas
 
 - **100/day** = 3,000/month. If you need more, upgrade to the $20/mo plan (50K emails).
-- **Custom domain** improves deliverability. Without it, emails come from `onresend.com` which may hit spam filters.
-- **No SMTP** — Resend uses REST API only. If your code uses SMTP, you'll need an adapter.
+- **Domain-wide delegation** required for Gmail API. Configure in Google Workspace Admin Console.
+- **No SMTP** — Gmail API uses REST. Service account handles authentication via JWT.
 - **Rate limiting:** 10 emails/second. Batch sends accordingly.
 
 ---
@@ -521,8 +521,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_PRICE_PRO=price_...
 STRIPE_PRICE_BUSINESS=price_...
 
-# ── Email (Resend) ──
-RESEND_API_KEY=re_...
+# ── Email (GCloud Gmail) ──
+GCP_SA_JSON={"type":"service_account",...}
 NOTIFY_EMAIL=admin@example.com
 NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
 
@@ -555,7 +555,7 @@ SLACK_WEBHOOK_URL=
 - [ ] **Vercel:** Import dashboard repo, set `NEXT_PUBLIC_API_URL`
 - [ ] **Grafana Cloud:** Create stack, get OTLP endpoint + API key
 - [ ] **Cloudflare R2:** Create bucket, get S3 credentials
-- [ ] **Resend:** Get API key, add custom domain (optional)
+- [ ] **GCloud Gmail:** Set up service account with domain-wide delegation
 - [ ] **Cloudflare CDN:** Add domain, configure DNS records, set SSL to Full (Strict)
 - [ ] **Generate secrets:** `HMAC_SECRET` and `JWT_SECRET` (openssl rand -hex 32)
 - [ ] **Test:** Send a test webhook end-to-end
@@ -576,7 +576,7 @@ SLACK_WEBHOOK_URL=
   - Vercel: > 100 GB bandwidth/month
   - Grafana: > 10K metric series
   - R2: > 10 GB storage
-  - Resend: > 3K emails/month
+  - GCloud Gmail: > 2K emails/day
 
 ### Performance
 
@@ -603,7 +603,7 @@ When you outgrow free tiers:
 | Vercel bandwidth > 100 GB | Vercel Pro | $20/mo |
 | Need more logs/metrics | Grafana Cloud paid | Pay-as-you-go |
 | R2 storage > 10 GB | R2 paid | $0.015/GB-mo |
-| Email > 3K/month | Resend Starter | $20/mo |
+| Email > 2K/day | Google Workspace | $7/user/mo |
 
 ---
 
