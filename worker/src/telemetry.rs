@@ -36,7 +36,11 @@ fn init_otel(
     let mut metadata = tonic::metadata::MetadataMap::new();
     if let Some(hdrs) = headers {
         for header in hdrs.split(',') {
-            if let Some((key, value)) = header.trim().split_once(':').or_else(|| header.trim().split_once('=')) {
+            if let Some((key, value)) = header
+                .trim()
+                .split_once(':')
+                .or_else(|| header.trim().split_once('='))
+            {
                 if let (Ok(name), Ok(val)) = (
                     tonic::metadata::MetadataKey::from_bytes(key.trim().to_lowercase().as_bytes()),
                     tonic::metadata::MetadataValue::try_from(value.trim()),
@@ -82,11 +86,7 @@ fn init_otel(
 }
 
 /// Plain structured logging (no OTel).
-fn init_plain(
-    env_filter: tracing_subscriber::EnvFilter,
-    use_json: bool,
-    env: &str,
-) {
+fn init_plain(env_filter: tracing_subscriber::EnvFilter, use_json: bool, env: &str) {
     if use_json {
         let _ = tracing_subscriber::registry()
             .with(env_filter)
