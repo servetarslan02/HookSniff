@@ -88,6 +88,37 @@ Bir sonraki oturumda yapılabilecekler:
 
 ---
 
+## 📦 SDK STRATEJİSİ (2026-05-08 Oturum 9 — Karar)
+
+### Aktif Bakım Yapılacak SDK'lar (6 adet)
+| # | Dil | Registry | Bağımlılık | Bakım Zorluğu |
+|---|-----|----------|------------|----------------|
+| 1 | **Node.js/TypeScript** | npm (`@hooksniff/sdk`) | 0 (fetch) | Düşük |
+| 2 | **Python** | PyPI (`hooksniff`) | 1 (requests) | Düşük |
+| 3 | **Go** | Go modules | 0 (net/http) | Çok düşük |
+| 4 | **Java** | Maven Central | 0 (java.net.http) | Düşük |
+| 5 | **PHP** | Packagist | 0 (curl) | Düşük |
+| 6 | **Ruby** | RubyGems | 0 (net/http) | Düşük |
+
+### Community Katkısına Açık (Aktif Bakım Yok)
+- C#, Kotlin, Elixir, Swift, Rust
+- PR gelirse merge edilir, ama aktif bakım yapılmaz
+- README'de "community maintained" olarak işaretlenecek
+
+### SDK Güvenlik ve Bakım Planı
+1. **Dependabot** kurulacak → açık bulunduğunda otomatik PR açar
+2. **Her SDK'ya minimal test** eklenecek → CI'da otomatik çalışır
+3. **Güvenlik açığı durumunda:** AI agent (OpenClaw) düzeltmeyi yapar, Servet sadece onaylar
+4. **Yeni dil sürümü çıktığında:** Genellikle bir şey bozulmaz. Bozulursa AI düzeltir.
+5. **OpenAPI spec** gelecekte kurulacak → SDK'lar otomatik üretilir
+
+### Kritik Kural
+- SDK'lar minimal bağımlılık kullanmalı (mümkünse 0)
+- Ne kadar az bağımlılık = o kadar az güvenlik riski
+- SDK'lar sadece API wrapper'ı, karmaşık iş mantığı yok
+
+---
+
 ## Teknik Notlar
 
 ### main.rs / lib.rs Yapısı

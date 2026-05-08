@@ -154,6 +154,30 @@ HookSniff/
 
 ---
 
+## 📦 SDK Bakım Planı (Oturum 9 — Karar)
+
+### Aktif SDK'lar (6 adet)
+Node.js, Python, Go, Java, PHP, Ruby → Aktif bakım yapılacak
+
+### Pasif SDK'lar (5 adet)
+C#, Kotlin, Elixir, Swift, Rust → Community katkısına açık, "community maintained" olarak işaretle
+
+### Yapılacaklar (Bir sonraki oturum)
+1. **Dependabot kur** → `.github/dependabot.yml` oluştur (sdk dizinleri + Cargo.toml + package.json)
+2. **Pasif SDK README'lerine** "Community Maintained" ekle
+3. **Aktif SDK'lara minimal CI test** ekle (en azından import + instantiation)
+4. **OpenAPI spec** gelecekte → SDK'lar otomatik üretilir
+
+### Güvenlik Senaryoları
+| Durum | Ne Yapılır |
+|-------|-----------|
+| Bağımlılıkta açık | Dependabot PR açar → AI agent inceler, düzeltir → Servet onaylar |
+| SDK'da açık | Issue açılır → AI agent düzeltir → Servet onaylar |
+| Yeni dil sürümü | Genellikle bozulmaz. Bozulursa AI düzeltir |
+| Yeni API endpoint | OpenAPI spec güncellenir → SDK'lar otomatik üretilir (gelecekte) |
+
+---
+
 ## 🔄 Hafıza Kuralları
 
 Her oturum sonunda:
