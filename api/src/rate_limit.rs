@@ -432,15 +432,27 @@ pub async fn rate_limit_middleware(
         let headers = response.headers_mut();
         headers.insert(
             "X-RateLimit-Limit",
-            result.limit.to_string().parse().unwrap(),
+            result
+                .limit
+                .to_string()
+                .parse()
+                .expect("valid header value"),
         );
         headers.insert(
             "X-RateLimit-Remaining",
-            result.remaining.to_string().parse().unwrap(),
+            result
+                .remaining
+                .to_string()
+                .parse()
+                .expect("valid header value"),
         );
         headers.insert(
             "X-RateLimit-Reset",
-            result.reset_seconds.to_string().parse().unwrap(),
+            result
+                .reset_seconds
+                .to_string()
+                .parse()
+                .expect("valid header value"),
         );
         Ok(response)
     } else {
@@ -449,16 +461,31 @@ pub async fn rate_limit_middleware(
         let headers = response.headers_mut();
         headers.insert(
             "X-RateLimit-Limit",
-            result.limit.to_string().parse().unwrap(),
+            result
+                .limit
+                .to_string()
+                .parse()
+                .expect("valid header value"),
         );
-        headers.insert("X-RateLimit-Remaining", "0".parse().unwrap());
+        headers.insert(
+            "X-RateLimit-Remaining",
+            "0".parse().expect("valid header value"),
+        );
         headers.insert(
             "X-RateLimit-Reset",
-            result.reset_seconds.to_string().parse().unwrap(),
+            result
+                .reset_seconds
+                .to_string()
+                .parse()
+                .expect("valid header value"),
         );
         headers.insert(
             "Retry-After",
-            result.reset_seconds.to_string().parse().unwrap(),
+            result
+                .reset_seconds
+                .to_string()
+                .parse()
+                .expect("valid header value"),
         );
         Ok(response)
     }

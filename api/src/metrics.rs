@@ -168,7 +168,7 @@ impl Metrics {
         encoder
             .encode(&metric_families, &mut buffer)
             .expect("valid metric definition");
-        String::from_utf8(buffer).unwrap()
+        String::from_utf8(buffer).expect("prometheus output is valid UTF-8")
     }
 }
 
