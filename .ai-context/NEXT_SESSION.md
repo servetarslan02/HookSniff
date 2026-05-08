@@ -1,96 +1,88 @@
 # NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 14:50 GMT+8
+> 2026-05-08 15:12 GMT+8
 
 ## Yeni Oturumda Ne Söyle
 
-HookSniff projesinde API'yi Cloud Run'a taşıdık. GitHub Actions workflow hazır ama Servet'in GitHub Secrets ayarlaması gerekiyor. Detaylar bu dosyada.
+HookSniff projesinde API ve Worker Cloud Run'a taşındı. Her iki servis de çalışıyor. Detaylar bu dosyada.
 
 ---
 
-## 🔴 DURUM: Deploy Workflow Hazır, GitHub Secrets Eksik
+## ✅ DURUM: Cloud Run Taşıma Tamamlandı!
 
-Deploy workflow'u (`deploy.yml`) Cloud Run'a güncellendi. Push edildi (commit `0055753`).
-Şimdi Servet'in GitHub Secrets ayarlaması gerekiyor — yoksa workflow çalışmaz.
+### Deploy Edilen Servisler
 
-## Servet'in Yapması Gereken (ACİL)
+| Servis | URL | Durum |
+|--------|-----|-------|
+| API | https://hooksniff-api-1046140057667.europe-west1.run.app | ✅ Live |
+| Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Live |
 
-### 1. GitHub Secrets Ayarla
-Repo → Settings → Secrets and variables → Actions → New repository secret
-
-**Gerekli secretlar:**
-
-| Secret Adı | Değer | Açıklama |
-|------------|-------|----------|
-| `GCP_SA_KEY` | `.ai-context/gcp-service-account.json` dosyasının **tam içeriği** | GCP auth için |
-
-**Environment variables (Cloud Run'a set edilecek):**
-Aşağıdakiler Secret Manager'da saklanacak, workflow `--set-secrets` ile çekiyor:
-
-| Secret Manager Key | Değer |
-|--------------------|-------|
-| `neon-db-url` | Neon connection string |
-| `upstash-redis-url` | Redis URL |
-| `jwt-secret` | JWT secret |
-| `hmac-secret` | HMAC secret |
-| `polar-token` | Polar access token |
-| `polar-webhook` | Polar webhook secret |
-| `polar-pro` | Polar product pro ID |
-| `polar-business` | Polar product business ID |
-| `resend-key` | Resend API key |
-| `otel-headers` | Grafana OTEL headers |
-
-### 2. GCP Secret Manager'a Secret Erişimi Ver
-Service account (`hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com`) Secret Manager erişimi olmalı:
-
-```bash
-# GCP Console'dan veya gcloud ile:
-gcloud projects add-iam-policy-binding hooksniff-app \
-  --member="serviceAccount:hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
+### Health Check
+```json
+{
+  "status": "healthy",
+  "checks": {
+    "database": {"status": "healthy", "latency_ms": 34},
+    "queue": {"status": "healthy", "latency_ms": 34},
+    "last_delivery": {"status": "healthy"}
+  }
+}
 ```
 
-### 3. Artifact Registry Repo Oluştur
-```bash
-gcloud artifacts repositories create hooksniff \
-  --repository-format=docker \
-  --location=europe-west1 \
-  --project=hooksniff-app
+## Servet'in Yapması Gereken
+
+### 1. GitHub Secrets Ayarla (ACİL)
+Deploy workflow'u GitHub Actions'tan çalışabilmesi için:
+
+**Repo → Settings → Secrets → Actions → New repository secret:**
+
+| Secret | Değer |
+|--------|-------|
+| `GCP_SA_KEY` | `.ai-context/gcp-service-account.json` dosyasının tam JSON içeriği |
+
+### 2. Dashboard API URL'ini Güncelle
+Vercel dashboard'ında environment variable olarak:
+```
+NEXT_PUBLIC_API_URL=https://hooksniff-api-1046140057667.europe-west1.run.app
 ```
 
-### 4. Secret Manager'da Secret Oluştur
-Her bir secret için:
-```bash
-echo -n "DEGER" | gcloud secrets create SECRET_NAME \
-  --data-file=- \
-  --project=hooksniff-app
-```
+### 3. Render API Servisini Kapat/Suspend Et
+Artık Cloud Run'da çalıştığı için Render'daki API servisi gereksiz.
 
-### 5. CI Workflow Secret'ı
-CI workflow'u da `GCP_SA_KEY` secret'ını kullanıyor mu? Hayır, sadece deploy kullanıyor.
-Ama CI'nin çalışması için başka secret gerekmez (sadece GITHUB_TOKEN, o otomatik).
+### 4. CORS Ayarları
+API'nin CORS_ORIGINS env var'ı şu an `https://hooksniff.vercel.app` olarak ayarlı.
+Eğer farklı domain kullanacaksan güncellenmeli.
 
-## Workflow Özeti
+## Yapılan İşler (Bu Oturum)
 
-```
-push main → CI (lint + test + build) → Deploy workflow trigger
-                                         ↓
-                              GCP auth (GCP_SA_KEY)
-                                         ↓
-                              Docker build API + Worker
-                                         ↓
-                              Push to Artifact Registry
-                                         ↓
-                              Deploy to Cloud Run
-                              API: hooksniff-api (public)
-                              Worker: hooksniff-worker (private)
-```
+1. ✅ gcloud CLI kuruldu
+2. ✅ Docker kuruldu (apt.docker.io)
+3. ✅ GCP auth yapıldı (service account ile)
+4. ✅ Artifact Registry repo onaylandı (zaten vardı)
+5. ✅ 10 Secret Manager secret'ı oluşturuldu
+6. ✅ API Docker image build edildi (compile hatası düzeltildi: serde_json::Error → AppError)
+7. ✅ API Artifact Registry'ye push edildi
+8. ✅ API Cloud Run'a deploy edildi → Health check başarılı
+9. ✅ Worker Docker image build edildi
+10. ✅ Worker Artifact Registry'ye push edildi
+11. ✅ Worker Cloud Run'a deploy edildi
+12. ✅ Deploy workflow düzeltildi (PORT reserved hatası)
+13. ✅ GitHub'a push edildi
 
-## Sonraki Adımlar (Servet Sonra Yapabilir)
-- Render API servisini suspend/et
-- Worker'ı da Cloud Run'a taşı (zaten deploy workflow'da var)
-- Grafana OTEL endpoint'ini Cloud Run'a bağla
-- Custom domain ayarla (eu.org veya .com)
+## GCP Secret Manager Secretları
+
+| Secret Name | İçerik |
+|-------------|--------|
+| neon-db-url | Neon DB connection string |
+| upstash-redis-url | Redis URL |
+| jwt-secret | JWT secret |
+| hmac-secret | HMAC secret |
+| polar-token | Polar access token |
+| polar-webhook | Polar webhook secret |
+| polar-pro | Polar product pro ID |
+| polar-business | Polar product business ID |
+| resend-key | Resend API key |
+| otel-headers | Grafana OTEL headers |
 
 ## Hafıza Kuralları
 Her oturum sonunda:

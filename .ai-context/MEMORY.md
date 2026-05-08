@@ -18,14 +18,14 @@
 - ~~is-a.dev~~ iptal
 - Şimdilik: `hooksniff.vercel.app` (Vercel ücretsiz)
 
-## KRİTİK GÖREV: API Taşıma (TAMAMLANDI)
-- **Render API build_failed** — Rust compile hataları düzeltilemedi
-- **Çözüm**: API'yi Google Cloud Run'a taşı → Deploy workflow güncellendi
-- Deploy workflow push edildi: commit `0055753`
-- Servet'in GitHub Secrets ayarlaması gerekiyor (GCP_SA_KEY + Secret Manager secretları)
-- GCP service account: `hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com`
-- Proje: hooksniff-app, Bölge: europe-west1
-- Artifact Registry: `europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/`
+## KRİTİK GÖREV: API Taşıma (TAMAMLANDI ✅)
+- **Render API build_failed** → Cloud Run'a taşındı
+- **API**: https://hooksniff-api-1046140057667.europe-west1.run.app ✅ Live
+- **Worker**: https://hooksniff-worker-1046140057667.europe-west1.run.app ✅ Live
+- Health check: database ✅ queue ✅
+- GCP secret manager'da 10 secret oluşturuldu
+- Deploy workflow güncellendi, GitHub push edildi
+- Compile hatası düzeltildi: serde_json::Error → AppError conversion eklendi
 
 ## ✅ Tamamlanan İşler (26/26 + düzeltmeler)
 - 26/26 teknik görev tamamlandı
@@ -37,8 +37,10 @@
 | Servis | Durum | Not |
 |--------|-------|-----|
 | GitHub | ✅ | Private repo |
-| Render Worker | ✅ | Live |
-| Render API | ❌ | Build failed → Cloud Run'a taşınacak |
+| Cloud Run API | ✅ | hooksniff-api-1046140057667.europe-west1.run.app |
+| Cloud Run Worker | ✅ | hooksniff-worker-1046140057667.europe-west1.run.app |
+| Render API | ❌ | Artık kullanılmıyor → Cloud Run'a taşındı |
+| Render Worker | ❌ | Artık kullanılmıyor → Cloud Run'a taşındı |
 | Vercel | ✅ | prj_cSIVYHpCoAtoihRp8xlXIun1KVSR |
 | Neon DB | ✅ | eu-central-1 |
 | Upstash Redis | ✅ | 64MB |
