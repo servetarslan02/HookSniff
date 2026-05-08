@@ -33,31 +33,27 @@ fn init_otel(
     use opentelemetry::trace::TracerProvider as _;
     use opentelemetry_otlp::WithExportConfig;
     use opentelemetry_sdk::trace::TracerProvider;
+    use std::collections::HashMap;
 
     let otlp_endpoint = cfg
         .otel_exporter_otlp_endpoint
         .as_deref()
-        .unwrap_or("http://localhost:4317");
+        .unwrap_or("http://localhost:4318");
 
-    let mut metadata = tonic::metadata::MetadataMap::new();
-    if let Some(ref headers) = cfg.otel_exporter_otlp_headers {
-        for header in headers.split(',') {
+    let mut headers = HashMap::new();
+    if let Some(ref hdrs) = cfg.otel_exporter_otlp_headers {
+        for header in hdrs.split(',') {
             let h = header.trim();
-            if let Some((key, value)) = h.split_once(':').or_else(|| h.split_once('=')) {
-                if let (Ok(name), Ok(val)) = (
-                    tonic::metadata::MetadataKey::from_bytes(key.trim().to_lowercase().as_bytes()),
-                    tonic::metadata::MetadataValue::try_from(value.trim()),
-                ) {
-                    metadata.insert(name, val);
-                }
+            if let Some((key, value)) = h.split_once('=').or_else(|| h.split_once(':')) {
+                headers.insert(key.trim().to_string(), value.trim().to_string());
             }
         }
     }
 
     let exporter = opentelemetry_otlp::new_exporter()
-        .tonic()
+        .http()
         .with_endpoint(otlp_endpoint)
-        .with_metadata(metadata)
+        .with_headers(headers)
         .build_span_exporter()
         .expect("Failed to build OTLP exporter");
 
