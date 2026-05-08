@@ -170,15 +170,15 @@ fn test_plan_limits() {
 }
 
 #[test]
-fn test_plan_from_str() {
+fn test_plan_parse_str() {
     use hooksniff_api::billing::Plan;
 
-    assert_eq!(Plan::from_str("free"), Plan::Free);
-    assert_eq!(Plan::from_str("FREE"), Plan::Free);
-    assert_eq!(Plan::from_str("pro"), Plan::Pro);
-    assert_eq!(Plan::from_str("PRO"), Plan::Pro);
-    assert_eq!(Plan::from_str("business"), Plan::Business);
-    assert_eq!(Plan::from_str("unknown"), Plan::Free); // default to free
+    assert_eq!(Plan::parse_str("free"), Plan::Free);
+    assert_eq!(Plan::parse_str("FREE"), Plan::Free);
+    assert_eq!(Plan::parse_str("pro"), Plan::Pro);
+    assert_eq!(Plan::parse_str("PRO"), Plan::Pro);
+    assert_eq!(Plan::parse_str("business"), Plan::Business);
+    assert_eq!(Plan::parse_str("unknown"), Plan::Free); // default to free
 }
 
 #[test]

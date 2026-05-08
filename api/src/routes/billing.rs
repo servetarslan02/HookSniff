@@ -48,7 +48,7 @@ struct SubscriptionResponse {
 async fn get_subscription(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<SubscriptionResponse>, AppError> {
-    let plan = Plan::from_str(&customer.plan);
+    let plan = Plan::parse_str(&customer.plan);
 
     Ok(Json(SubscriptionResponse {
         plan: plan.as_str().to_string(),
@@ -91,7 +91,7 @@ async fn upgrade_plan(
     Extension(customer): Extension<Customer>,
     Json(req): Json<UpgradeRequest>,
 ) -> Result<Json<UpgradeResponse>, AppError> {
-    let new_plan = Plan::from_str(&req.plan);
+    let new_plan = Plan::parse_str(&req.plan);
 
     match new_plan {
         Plan::Free => {
@@ -113,7 +113,7 @@ async fn upgrade_plan(
         .as_deref()
         .unwrap_or(&customer.payment_provider);
 
-    let provider_enum = PaymentProvider::from_str(provider_name);
+    let provider_enum = PaymentProvider::parse_str(provider_name);
 
     match provider_enum {
         PaymentProvider::Polar | PaymentProvider::Iyzico => {
@@ -184,7 +184,7 @@ async fn open_portal(
 ) -> Result<Json<PortalResponse>, AppError> {
     let provider_name = &customer.payment_provider;
 
-    match PaymentProvider::from_str(provider_name) {
+    match PaymentProvider::parse_str(provider_name) {
         PaymentProvider::Polar | PaymentProvider::Iyzico => {
             let provider_impl =
                 crate::billing::resolve_provider(provider_name).ok_or_else(|| {
@@ -264,7 +264,7 @@ async fn get_usage(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<UsageResponse>, AppError> {
-    let plan = Plan::from_str(&customer.plan);
+    let plan = Plan::parse_str(&customer.plan);
 
     // Count endpoints
     let endpoint_count: (i64,) =
