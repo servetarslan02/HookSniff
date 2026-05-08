@@ -1,0 +1,13 @@
+# HookSniff v0.2.0 - API Reference
+
+## Modules
+
+- [HookSniff](HookSniff.md): Official Elixir client for the HookSniff webhook delivery service.
+- [HookSniff.Endpoints](HookSniff.Endpoints.md): Endpoints resource — CRUD operations for webhook endpoints.
+
+- [HookSniff.WebhookVerification](HookSniff.WebhookVerification.md): Webhook signature verification for HookSniff.
+- [HookSniff.Webhooks](HookSniff.Webhooks.md): Webhooks resource — send, list, replay, batch, and inspect webhooks.
+
+- Exceptions
+  - [HookSniff.Error](HookSniff.Error.md)
+
