@@ -69,13 +69,16 @@ pub async fn handle_contact(
         );
 
         // Send to admin
-        let _ = client
+        if let Err(e) = client
             .send_contact_email(
                 "support@hooksniff.vercel.app",
                 &format!("Contact: {} — {}", body.subject, body.name),
                 &admin_html,
             )
-            .await;
+            .await
+        {
+            tracing::warn!("Failed to send contact email to admin: {:?}", e);
+        }
 
         // Send confirmation to user
         let user_html = format!(
@@ -94,13 +97,20 @@ pub async fn handle_contact(
             body.name, body.subject
         );
 
-        let _ = client
+        if let Err(e) = client
             .send_contact_email(
                 &body.email,
                 "We received your message — HookSniff",
                 &user_html,
             )
-            .await;
+            .await
+        {
+            tracing::warn!(
+                "Failed to send contact confirmation to {}: {:?}",
+                body.email,
+                e
+            );
+        }
     } else {
         tracing::warn!("GCloud email not configured — contact form logged but no email sent");
         return Ok(Json(ContactResponse {

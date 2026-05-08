@@ -552,7 +552,7 @@ async fn process_webhook_result(
                 _ => None,
             };
             if let Some((cid,)) = customer_id {
-                let _ = sqlx::query(
+                if let Err(e) = sqlx::query(
                     "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
                      VALUES ($1, $2, $3, 'paid', $4)",
                 )
@@ -561,7 +561,10 @@ async fn process_webhook_result(
                 .bind(currency)
                 .bind(plan.as_str())
                 .execute(pool)
-                .await;
+                .await
+                {
+                    tracing::warn!("Failed to insert invoice for customer {}: {:?}", cid, e);
+                }
             }
 
             tracing::info!(
