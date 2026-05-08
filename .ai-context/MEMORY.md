@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 02:38 GMT+8
+> Son güncelleme: 2026-05-09 06:40 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -312,3 +312,19 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 | Ruby | ⏳ | `gem push hooksniff-0.1.0.gem` |
 | PHP | ✅ | `hooksniff/hooksniff-php` Packagist'de yayında |
 | Elixir | ⏳ | `mix hex.publish` |
+
+### Bu Oturum (27) — 2026-05-09 06:26-06:40 GMT+8:
+
+1. **OpenClaw webchat'ten bağlantı** — Servet yeni oturum başlattı
+2. **Repo klonlandı** — `HookSniff/` tüm `.ai-context/` dosyaları okundu
+3. **OG image → PNG** — `og-image.svg` → `og-image.png` (59KB, 1200x630) ✅
+4. **GDPR Privacy Policy** — Zaten mevcut (13 madde, 8 dilde sayfa) ✅
+5. **HttpOnly Cookie iyileştirmesi** — Refresh token artık HttpOnly cookie'de dönüyor (response body'de yok)
+6. **CORS allow_credentials** — Cookie tabanlı auth için `allow_credentials(true)` eklendi
+7. **extract_token fix** — Placeholder değerler ('cookie', 'null') atlanıp cookie'ye fallback ediyor
+8. **GDPR endpoints eklendi**:
+   - `GET /v1/auth/export` — Article 15 (Right of Access)
+   - `DELETE /v1/auth/account` — Article 17 (Right to Erasure)
+9. **Rust kuruldu** — Bu sunucuda rustup ile Rust 1.95.0 kuruldu
+10. **Local CI doğrulandı** — cargo fmt ✅, clippy ✅ (0 uyarı), 161/161 test ✅, dashboard build ✅
+11. **GitHub push** — Commit `d51d875` main'e push edildi
