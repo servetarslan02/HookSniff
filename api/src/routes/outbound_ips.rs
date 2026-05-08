@@ -1,8 +1,8 @@
 use axum::routing::get;
 use axum::{Json, Router};
+use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::sync::OnceLock;
-use chrono::{DateTime, Utc};
 
 /// Cached outbound IPs response, refreshed every hour.
 static CACHED_RESPONSE: OnceLock<CachedOutboundIps> = OnceLock::new();
@@ -20,9 +20,7 @@ struct OutboundIpsResponse {
 
 /// Default outbound IPs used when the OUTBOUND_IPS env var is not set.
 /// These are placeholders — replace with real IPs once the Oracle Cloud VM is provisioned.
-const DEFAULT_IPS: &[&str] = &[
-    "TBD",
-];
+const DEFAULT_IPS: &[&str] = &["TBD"];
 
 fn load_outbound_ips() -> OutboundIpsResponse {
     let ips: Vec<String> = match std::env::var("OUTBOUND_IPS") {

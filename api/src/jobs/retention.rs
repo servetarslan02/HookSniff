@@ -24,7 +24,10 @@ async fn archive_deliveries(pool: &PgPool, before: DateTime<Utc>) -> Result<u64>
     .execute(pool)
     .await?;
 
-    tracing::info!("📦 Archived {} deliveries to dead_letters", result.rows_affected());
+    tracing::info!(
+        "📦 Archived {} deliveries to dead_letters",
+        result.rows_affected()
+    );
 
     // Now delete the archived deliveries
     let deleted = sqlx::query(
@@ -49,7 +52,10 @@ async fn cleanup_idempotency_keys(pool: &PgPool) -> Result<u64> {
         .execute(pool)
         .await?;
 
-    tracing::info!("🧹 Cleaned up {} expired idempotency keys", result.rows_affected());
+    tracing::info!(
+        "🧹 Cleaned up {} expired idempotency keys",
+        result.rows_affected()
+    );
     Ok(result.rows_affected())
 }
 
@@ -64,7 +70,10 @@ async fn cleanup_webhook_queue(pool: &PgPool) -> Result<u64> {
     .await?;
 
     if result.rows_affected() > 0 {
-        tracing::info!("🧹 Cleaned up {} processed queue items", result.rows_affected());
+        tracing::info!(
+            "🧹 Cleaned up {} processed queue items",
+            result.rows_affected()
+        );
     }
     Ok(result.rows_affected())
 }
@@ -99,14 +108,20 @@ async fn cleanup_seen_webhooks(pool: &PgPool) -> Result<u64> {
         .await?;
 
     if result.rows_affected() > 0 {
-        tracing::info!("🧹 Cleaned up {} expired seen webhooks", result.rows_affected());
+        tracing::info!(
+            "🧹 Cleaned up {} expired seen webhooks",
+            result.rows_affected()
+        );
     }
     Ok(result.rows_affected())
 }
 
 /// Run the retention job. Call this periodically (e.g., daily).
 pub async fn run_retention(pool: &PgPool, retention_days: i64) -> Result<()> {
-    tracing::info!("🔄 Running retention job (retention_days={})", retention_days);
+    tracing::info!(
+        "🔄 Running retention job (retention_days={})",
+        retention_days
+    );
 
     let cutoff = Utc::now() - chrono::Duration::days(retention_days);
 

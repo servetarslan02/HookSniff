@@ -73,9 +73,7 @@ impl Metrics {
                 "delivery_latency_seconds",
                 "Webhook delivery latency in seconds",
             )
-            .buckets(vec![
-                0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0,
-            ]),
+            .buckets(vec![0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0]),
         )
         .unwrap();
 
@@ -98,9 +96,7 @@ impl Metrics {
                 "queue_publish_latency_seconds",
                 "Queue publish latency in seconds",
             )
-            .buckets(vec![
-                0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0,
-            ]),
+            .buckets(vec![0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0]),
         )
         .unwrap();
 
@@ -109,22 +105,36 @@ impl Metrics {
                 "db_query_duration_seconds",
                 "Database query duration in seconds",
             )
-            .buckets(vec![
-                0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0,
-            ]),
+            .buckets(vec![0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0]),
         )
         .unwrap();
 
-        registry.register(Box::new(http_requests_total.clone())).unwrap();
-        registry.register(Box::new(http_request_duration_seconds.clone())).unwrap();
-        registry.register(Box::new(active_connections.clone())).unwrap();
-        registry.register(Box::new(webhook_deliveries_total.clone())).unwrap();
+        registry
+            .register(Box::new(http_requests_total.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(http_request_duration_seconds.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(active_connections.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(webhook_deliveries_total.clone()))
+            .unwrap();
         registry.register(Box::new(delivery_count.clone())).unwrap();
-        registry.register(Box::new(delivery_latency_seconds.clone())).unwrap();
+        registry
+            .register(Box::new(delivery_latency_seconds.clone()))
+            .unwrap();
         registry.register(Box::new(error_count.clone())).unwrap();
-        registry.register(Box::new(active_endpoints.clone())).unwrap();
-        registry.register(Box::new(queue_publish_latency_seconds.clone())).unwrap();
-        registry.register(Box::new(db_query_duration_seconds.clone())).unwrap();
+        registry
+            .register(Box::new(active_endpoints.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(queue_publish_latency_seconds.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(db_query_duration_seconds.clone()))
+            .unwrap();
 
         Self {
             registry,
@@ -173,9 +183,7 @@ pub async fn metrics_middleware(
         .http_requests_total
         .with_label_values(&[&method, &path, &status])
         .inc();
-    metrics
-        .http_request_duration_seconds
-        .observe(duration);
+    metrics.http_request_duration_seconds.observe(duration);
 
     response
 }

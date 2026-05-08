@@ -70,12 +70,11 @@ pub async fn deliver_http(
     match result {
         Ok(response) => {
             let status_code = response.status().as_u16() as i32;
-            let resp_headers: serde_json::Value = serde_json::json!(
-                response.headers()
-                    .iter()
-                    .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
-                    .collect::<std::collections::HashMap<String, String>>()
-            );
+            let resp_headers: serde_json::Value = serde_json::json!(response
+                .headers()
+                .iter()
+                .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
+                .collect::<std::collections::HashMap<String, String>>());
             let body = response.text().await.unwrap_or_default();
             let response_body = truncate_str(&body, 1000);
             let success = (200..300).contains(&status_code);
@@ -99,10 +98,7 @@ pub async fn deliver_http(
             })
         }
         Err(e) => {
-            warn!(
-                "❌ HTTP delivery {} failed: {:?}",
-                webhook.delivery_id, e
-            );
+            warn!("❌ HTTP delivery {} failed: {:?}", webhook.delivery_id, e);
             Ok(DeliveryResult {
                 success: false,
                 status_code: 0,

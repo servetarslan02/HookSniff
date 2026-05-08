@@ -136,7 +136,10 @@ impl PackageManager {
 
     /// Get a package by name
     pub fn get(&self, name: &str) -> Option<&dyn IndustryPackage> {
-        self.packages.iter().find(|p| p.name() == name).map(|p| p.as_ref())
+        self.packages
+            .iter()
+            .find(|p| p.name() == name)
+            .map(|p| p.as_ref())
     }
 
     /// Get all event types across all packages
@@ -159,9 +162,11 @@ impl PackageManager {
             for comp in pkg.compliance_requirements() {
                 for rule in &comp.masking_rules {
                     // If the rule's field_path is relevant to this event type's package
-                    if pkg.event_types().iter().any(|et| {
-                        et == &event_type || et.ends_with(".*")
-                    }) {
+                    if pkg
+                        .event_types()
+                        .iter()
+                        .any(|et| et == &event_type || et.ends_with(".*"))
+                    {
                         rules.push(rule.clone());
                     }
                 }
@@ -171,7 +176,11 @@ impl PackageManager {
     }
 
     /// Apply data masking to a payload based on all applicable rules
-    pub fn apply_masking(&self, event_type: &str, payload: &serde_json::Value) -> serde_json::Value {
+    pub fn apply_masking(
+        &self,
+        event_type: &str,
+        payload: &serde_json::Value,
+    ) -> serde_json::Value {
         let rules = self.masking_rules_for_event(event_type);
         if rules.is_empty() {
             return payload.clone();
@@ -212,7 +221,10 @@ fn apply_masking_recursive(value: &mut serde_json::Value, path: &[&str], rule: &
 
 fn mask_value(value: &str, rule: &DataMaskingRule) -> String {
     match rule.strategy.as_str() {
-        "full" => rule.replacement.clone().unwrap_or_else(|| "****".to_string()),
+        "full" => rule
+            .replacement
+            .clone()
+            .unwrap_or_else(|| "****".to_string()),
         "partial" => {
             // Show first 4 and last 4, mask the middle
             if value.len() > 8 {

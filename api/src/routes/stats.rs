@@ -39,12 +39,11 @@ async fn get_stats(
     .fetch_one(&pool)
     .await?;
 
-    let endpoints_count: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1"
-    )
-    .bind(customer.id)
-    .fetch_one(&pool)
-    .await?;
+    let endpoints_count: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE customer_id = $1")
+            .bind(customer.id)
+            .fetch_one(&pool)
+            .await?;
 
     let success_rate = if stats.0 > 0 {
         (stats.1 as f64 / stats.0 as f64) * 100.0

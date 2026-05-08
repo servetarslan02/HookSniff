@@ -20,7 +20,7 @@ struct EndpointHealth {
     url: String,
     description: Option<String>,
     is_active: bool,
-    health_status: String,  // "healthy", "degraded", "unhealthy"
+    health_status: String, // "healthy", "degraded", "unhealthy"
     success_rate: f64,
     avg_response_ms: i32,
     p95_response_ms: i32,
@@ -40,7 +40,7 @@ async fn list_endpoint_health(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<EndpointHealth>>, AppError> {
     let endpoints = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC"
+        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC",
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -62,7 +62,11 @@ async fn list_endpoint_health(
         let total = stats.0;
         let successful = stats.1;
         let failed = stats.2;
-        let success_rate = if total > 0 { (successful as f64 / total as f64) * 100.0 } else { 100.0 };
+        let success_rate = if total > 0 {
+            (successful as f64 / total as f64) * 100.0
+        } else {
+            100.0
+        };
 
         let health_status = if ep.failure_streak >= 5 {
             "unhealthy"
@@ -102,7 +106,7 @@ async fn get_endpoint_health(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<EndpointHealth>, AppError> {
     let ep = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2"
+        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
@@ -122,7 +126,11 @@ async fn get_endpoint_health(
     let total = stats.0;
     let successful = stats.1;
     let failed = stats.2;
-    let success_rate = if total > 0 { (successful as f64 / total as f64) * 100.0 } else { 100.0 };
+    let success_rate = if total > 0 {
+        (successful as f64 / total as f64) * 100.0
+    } else {
+        100.0
+    };
 
     let health_status = if ep.failure_streak >= 5 {
         "unhealthy"

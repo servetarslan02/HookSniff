@@ -134,11 +134,7 @@ impl RateLimitStore for InMemoryRateLimiter {
         let reset_seconds = entry
             .timestamps
             .first()
-            .map(|oldest| {
-                window
-                    .saturating_sub(now.duration_since(*oldest))
-                    .as_secs()
-            })
+            .map(|oldest| window.saturating_sub(now.duration_since(*oldest)).as_secs())
             .unwrap_or(window_secs);
 
         if current_count >= limit {
@@ -318,11 +314,7 @@ impl RateLimiter {
     }
 
     /// Check rate limit with a specific plan limit.
-    pub async fn check_with_headers(
-        &self,
-        key: &str,
-        limit: u32,
-    ) -> RateLimitResult {
+    pub async fn check_with_headers(&self, key: &str, limit: u32) -> RateLimitResult {
         self.store.check(key, limit, 60).await
     }
 
@@ -358,27 +350,26 @@ impl RateLimiter {
 ///
 /// Falls back to in-memory if Redis is unavailable.
 pub async fn create_rate_limiter() -> RateLimiter {
-    let store: Arc<dyn RateLimitStore> =
-        match std::env::var("RATE_LIMIT_STORE").as_deref() {
-            Ok("redis") => match std::env::var("REDIS_URL") {
-                Ok(url) => match RedisRateLimiter::new(&url).await {
-                    Ok(rl) => Arc::new(rl),
-                    Err(e) => {
-                        tracing::warn!(
-                            "Failed to connect to Redis ({e}), falling back to in-memory rate limiter"
-                        );
-                        Arc::new(InMemoryRateLimiter::new())
-                    }
-                },
-                Err(_) => {
+    let store: Arc<dyn RateLimitStore> = match std::env::var("RATE_LIMIT_STORE").as_deref() {
+        Ok("redis") => match std::env::var("REDIS_URL") {
+            Ok(url) => match RedisRateLimiter::new(&url).await {
+                Ok(rl) => Arc::new(rl),
+                Err(e) => {
                     tracing::warn!(
-                        "RATE_LIMIT_STORE=redis but REDIS_URL not set, falling back to in-memory rate limiter"
+                        "Failed to connect to Redis ({e}), falling back to in-memory rate limiter"
                     );
                     Arc::new(InMemoryRateLimiter::new())
                 }
             },
-            _ => Arc::new(InMemoryRateLimiter::new()),
-        };
+            Err(_) => {
+                tracing::warn!(
+                        "RATE_LIMIT_STORE=redis but REDIS_URL not set, falling back to in-memory rate limiter"
+                    );
+                Arc::new(InMemoryRateLimiter::new())
+            }
+        },
+        _ => Arc::new(InMemoryRateLimiter::new()),
+    };
 
     RateLimiter::new(store)
 }

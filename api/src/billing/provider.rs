@@ -63,9 +63,7 @@ pub enum WebhookResult {
         status: String,
     },
     /// Subscription canceled.
-    SubscriptionCanceled {
-        provider_subscription_id: String,
-    },
+    SubscriptionCanceled { provider_subscription_id: String },
     /// Payment succeeded.
     PaymentSucceeded {
         provider_tx_id: String,
@@ -73,9 +71,7 @@ pub enum WebhookResult {
         currency: String,
     },
     /// Payment failed.
-    PaymentFailed {
-        provider_tx_id: String,
-    },
+    PaymentFailed { provider_tx_id: String },
     /// Event acknowledged but no action needed.
     Ignored,
 }
@@ -113,8 +109,5 @@ pub trait PaymentProviderImpl: Send + Sync {
     ) -> Result<String, AppError>;
 
     /// Cancel a subscription.
-    async fn cancel_subscription(
-        &self,
-        provider_subscription_id: &str,
-    ) -> Result<(), AppError>;
+    async fn cancel_subscription(&self, provider_subscription_id: &str) -> Result<(), AppError>;
 }

@@ -138,10 +138,7 @@ pub async fn handle_connection(
         }
     }
 
-    let mut rate_limiter = ConnectionRateLimiter::new(
-        config.rate_limit_per_minute,
-        60,
-    );
+    let mut rate_limiter = ConnectionRateLimiter::new(config.rate_limit_per_minute, 60);
 
     let conn_id_for_recv = connection_id.clone();
     let gw_for_recv = gateway.clone();
@@ -153,10 +150,7 @@ pub async fn handle_connection(
         while let Some(msg) = rx.recv().await {
             // Rate limiting
             if !rate_limiter.allow() {
-                warn!(
-                    "Rate limit exceeded for connection {}",
-                    conn_id_for_fwd
-                );
+                warn!("Rate limit exceeded for connection {}", conn_id_for_fwd);
                 continue;
             }
 
@@ -180,12 +174,7 @@ pub async fn handle_connection(
         while let Some(result) = ws_receiver.next().await {
             match result {
                 Ok(Message::Text(text)) => {
-                    handle_client_message(
-                        &text,
-                        &conn_id_for_recv,
-                        &gw_for_recv,
-                    )
-                    .await;
+                    handle_client_message(&text, &conn_id_for_recv, &gw_for_recv).await;
                 }
                 Ok(Message::Ping(_)) => {
                     gw_for_recv.heartbeat(&conn_id_for_recv).await;
@@ -218,14 +207,13 @@ pub async fn handle_connection(
 }
 
 /// Handle a message from a WebSocket client.
-async fn handle_client_message(
-    text: &str,
-    connection_id: &str,
-    gateway: &Arc<WsGateway>,
-) {
+async fn handle_client_message(text: &str, connection_id: &str, gateway: &Arc<WsGateway>) {
     // Try to parse as a client message
     let Ok(msg) = serde_json::from_str::<ClientMessage>(text) else {
-        warn!("Invalid message from connection {}: {}", connection_id, text);
+        warn!(
+            "Invalid message from connection {}: {}",
+            connection_id, text
+        );
         return;
     };
 
@@ -257,9 +245,7 @@ async fn handle_client_message(
                     .cloned()
                     .collect();
                 drop(connections);
-                let _ = gateway
-                    .update_subscriptions(connection_id, filters)
-                    .await;
+                let _ = gateway.update_subscriptions(connection_id, filters).await;
             }
         }
         ClientMessage::Ping => {
@@ -297,8 +283,8 @@ pub fn authenticate_ws_token(token: &str, jwt_secret: &str) -> Result<Uuid> {
     )
     .context("Invalid JWT token")?;
 
-    let customer_id = Uuid::parse_str(&token_data.claims.sub)
-        .context("Invalid customer ID in token")?;
+    let customer_id =
+        Uuid::parse_str(&token_data.claims.sub).context("Invalid customer ID in token")?;
 
     Ok(customer_id)
 }

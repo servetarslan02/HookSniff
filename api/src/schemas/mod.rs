@@ -116,12 +116,7 @@ pub fn validate_event(schema: &Value, event: &Value) -> ValidationResult {
 }
 
 /// Recursively validate a value against a schema.
-fn validate_value(
-    schema: &Value,
-    value: &Value,
-    path: &str,
-    errors: &mut Vec<ValidationError>,
-) {
+fn validate_value(schema: &Value, value: &Value, path: &str, errors: &mut Vec<ValidationError>) {
     let Some(schema_type) = schema.get("type").and_then(|v| v.as_str()) else {
         return;
     };
@@ -343,10 +338,7 @@ fn check_schema_compatible(
                 if let Some(new_prop_schema) = new_props.get(key) {
                     check_schema_compatible(old_prop_schema, new_prop_schema, &field_path, issues);
                 } else if old_required.contains(key) {
-                    issues.push(format!(
-                        "Required field '{}' removed from '{}'",
-                        key, path
-                    ));
+                    issues.push(format!("Required field '{}' removed from '{}'", key, path));
                 }
             }
         }

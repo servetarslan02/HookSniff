@@ -7,9 +7,9 @@ use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::billing::{Plan, Subscription, SubscriptionStatus};
-use crate::billing::stripe;
 use crate::billing::provider::{PaymentProvider, PaymentProviderImpl};
+use crate::billing::stripe;
+use crate::billing::{Plan, Subscription, SubscriptionStatus};
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -118,10 +118,13 @@ async fn upgrade_plan(
     match provider_enum {
         PaymentProvider::Polar | PaymentProvider::Iyzico => {
             // Use Polar.sh or iyzico via the provider trait
-            let provider_impl = crate::billing::resolve_provider(provider_name)
-                .ok_or_else(|| AppError::Internal(anyhow::anyhow!(
-                    "Payment provider '{}' not configured", provider_name
-                )))?;
+            let provider_impl =
+                crate::billing::resolve_provider(provider_name).ok_or_else(|| {
+                    AppError::Internal(anyhow::anyhow!(
+                        "Payment provider '{}' not configured",
+                        provider_name
+                    ))
+                })?;
 
             let base_url = cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
 
@@ -130,13 +133,11 @@ async fn upgrade_plan(
                 .await?;
 
             // Update customer's payment provider
-            sqlx::query(
-                "UPDATE customers SET payment_provider = $1 WHERE id = $2"
-            )
-            .bind(provider_name)
-            .bind(customer.id)
-            .execute(&pool)
-            .await?;
+            sqlx::query("UPDATE customers SET payment_provider = $1 WHERE id = $2")
+                .bind(provider_name)
+                .bind(customer.id)
+                .execute(&pool)
+                .await?;
 
             Ok(Json(UpgradeResponse {
                 checkout_url: Some(result.checkout_url),
@@ -150,13 +151,9 @@ async fn upgrade_plan(
         }
         PaymentProvider::Stripe => {
             // Use existing Stripe integration
-            let session = stripe::create_checkout_session(
-                &cfg,
-                customer.id,
-                &customer.email,
-                &new_plan,
-            )
-            .await?;
+            let session =
+                stripe::create_checkout_session(&cfg, customer.id, &customer.email, &new_plan)
+                    .await?;
 
             Ok(Json(UpgradeResponse {
                 checkout_url: session.url,
@@ -189,10 +186,13 @@ async fn open_portal(
 
     match PaymentProvider::from_str(provider_name) {
         PaymentProvider::Polar | PaymentProvider::Iyzico => {
-            let provider_impl = crate::billing::resolve_provider(provider_name)
-                .ok_or_else(|| AppError::Internal(anyhow::anyhow!(
-                    "Payment provider '{}' not configured", provider_name
-                )))?;
+            let provider_impl =
+                crate::billing::resolve_provider(provider_name).ok_or_else(|| {
+                    AppError::Internal(anyhow::anyhow!(
+                        "Payment provider '{}' not configured",
+                        provider_name
+                    ))
+                })?;
 
             // Get the provider-specific customer ID
             let provider_customer_id = match provider_name.as_str() {
@@ -214,10 +214,9 @@ async fn open_portal(
             }))
         }
         PaymentProvider::Stripe => {
-            let stripe_customer_id = customer
-                .stripe_customer_id
-                .as_ref()
-                .ok_or_else(|| AppError::BadRequest("No Stripe customer found. Upgrade your plan first.".into()))?;
+            let stripe_customer_id = customer.stripe_customer_id.as_ref().ok_or_else(|| {
+                AppError::BadRequest("No Stripe customer found. Upgrade your plan first.".into())
+            })?;
 
             let url = stripe::create_customer_portal(&cfg, stripe_customer_id).await?;
 
@@ -280,7 +279,9 @@ async fn get_usage(
         webhooks: UsageCounter {
             used: customer.webhook_count as u64,
             limit: plan.max_webhooks_per_month(),
-            remaining: plan.max_webhooks_per_month().saturating_sub(customer.webhook_count as u64),
+            remaining: plan
+                .max_webhooks_per_month()
+                .saturating_sub(customer.webhook_count as u64),
         },
         endpoints: UsageCounter {
             used: endpoint_count.0 as u64,
@@ -320,27 +321,36 @@ async fn get_invoices(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<InvoiceResponse>>, AppError> {
-    let rows: Vec<(uuid::Uuid, i32, String, String, String, Option<chrono::DateTime<chrono::Utc>>, chrono::DateTime<chrono::Utc>)> =
-        sqlx::query_as(
-            "SELECT id, amount_cents, currency, status, plan, paid_at, created_at \
+    let rows: Vec<(
+        uuid::Uuid,
+        i32,
+        String,
+        String,
+        String,
+        Option<chrono::DateTime<chrono::Utc>>,
+        chrono::DateTime<chrono::Utc>,
+    )> = sqlx::query_as(
+        "SELECT id, amount_cents, currency, status, plan, paid_at, created_at \
              FROM invoices WHERE customer_id = $1 ORDER BY created_at DESC",
-        )
-        .bind(customer.id)
-        .fetch_all(&pool)
-        .await?;
+    )
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?;
 
     let invoices: Vec<InvoiceResponse> = rows
         .into_iter()
-        .map(|(id, amount_cents, _currency, status, plan, paid_at, created_at)| {
-            let date = paid_at.unwrap_or(created_at);
-            InvoiceResponse {
-                id: id.to_string(),
-                date: date.format("%Y-%m-%d").to_string(),
-                amount: amount_cents as f64 / 100.0,
-                status,
-                plan,
-            }
-        })
+        .map(
+            |(id, amount_cents, _currency, status, plan, paid_at, created_at)| {
+                let date = paid_at.unwrap_or(created_at);
+                InvoiceResponse {
+                    id: id.to_string(),
+                    date: date.format("%Y-%m-%d").to_string(),
+                    amount: amount_cents as f64 / 100.0,
+                    status,
+                    plan,
+                }
+            },
+        )
         .collect();
 
     Ok(Json(invoices))
@@ -362,10 +372,7 @@ async fn handle_stripe_webhook(
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
 
-    let webhook_secret = cfg
-        .stripe_webhook_secret
-        .as_deref()
-        .unwrap_or("");
+    let webhook_secret = cfg.stripe_webhook_secret.as_deref().unwrap_or("");
 
     if webhook_secret.is_empty() {
         tracing::warn!("Stripe webhook secret not configured, skipping verification");
@@ -460,7 +467,7 @@ async fn process_webhook_result(
             sqlx::query(
                 "INSERT INTO payment_transactions \
                  (customer_id, provider, status, plan, currency) \
-                 VALUES ($1, $2, 'completed', $3, $4)"
+                 VALUES ($1, $2, 'completed', $3, $4)",
             )
             .bind(customer_id)
             .bind(provider)
@@ -474,7 +481,7 @@ async fn process_webhook_result(
             let currency = if provider == "iyzico" { "TRY" } else { "USD" };
             sqlx::query(
                 "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
-                 VALUES ($1, $2, $3, 'paid', $4)"
+                 VALUES ($1, $2, $3, 'paid', $4)",
             )
             .bind(customer_id)
             .bind(amount_cents)
@@ -522,18 +529,24 @@ async fn process_webhook_result(
             let amount_cents = plan.monthly_price_cents() as i32;
             let currency = if provider == "iyzico" { "TRY" } else { "USD" };
             let customer_id: Option<(uuid::Uuid,)> = match provider {
-                "polar" => sqlx::query_as(
-                    "SELECT id FROM customers WHERE polar_subscription_id = $1"
-                ).bind(provider_subscription_id).fetch_optional(pool).await?,
-                "iyzico" => sqlx::query_as(
-                    "SELECT id FROM customers WHERE iyzico_subscription_id = $1"
-                ).bind(provider_subscription_id).fetch_optional(pool).await?,
+                "polar" => {
+                    sqlx::query_as("SELECT id FROM customers WHERE polar_subscription_id = $1")
+                        .bind(provider_subscription_id)
+                        .fetch_optional(pool)
+                        .await?
+                }
+                "iyzico" => {
+                    sqlx::query_as("SELECT id FROM customers WHERE iyzico_subscription_id = $1")
+                        .bind(provider_subscription_id)
+                        .fetch_optional(pool)
+                        .await?
+                }
                 _ => None,
             };
             if let Some((cid,)) = customer_id {
                 let _ = sqlx::query(
                     "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
-                     VALUES ($1, $2, $3, 'paid', $4)"
+                     VALUES ($1, $2, $3, 'paid', $4)",
                 )
                 .bind(cid)
                 .bind(amount_cents)

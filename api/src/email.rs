@@ -54,11 +54,7 @@ impl ResendClient {
         if !resp.status().is_success() {
             let status = resp.status();
             let text = resp.text().await.unwrap_or_default();
-            tracing::error!(
-                "Resend API error: status={}, body={}",
-                status,
-                text
-            );
+            tracing::error!("Resend API error: status={}, body={}", status, text);
             return Err(AppError::Internal(anyhow::anyhow!(
                 "Resend API returned {}: {}",
                 status,
