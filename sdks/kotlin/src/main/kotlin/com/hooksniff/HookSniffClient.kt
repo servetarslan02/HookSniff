@@ -104,7 +104,7 @@ class HookSniffClient(
 ) : Closeable {
 
     companion object {
-        private const val DEFAULT_BASE_URL = "https://api.hooksniff.io/v1"
+        private const val DEFAULT_BASE_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
         private const val DEFAULT_TIMEOUT = 30L
     }
 
