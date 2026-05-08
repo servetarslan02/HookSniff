@@ -5,6 +5,8 @@ use axum::{extract::Request, http::header::AUTHORIZATION, middleware::Next, resp
 use sqlx::PgPool;
 use uuid::Uuid;
 
+const AUTH_COOKIE_NAME: &str = "hooksniff_token";
+
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
@@ -45,21 +47,33 @@ pub async fn request_id_middleware(mut req: Request, next: Next) -> Response {
 /// 2. JWT token: `Authorization: Bearer eyJ...` — verifies JWT and loads customer by `sub` claim
 ///
 /// Test keys (hr_test_*) are marked and can be checked downstream to skip real delivery.
+/// Extract token from request: first try Authorization header, then try cookie.
+fn extract_token(req: &Request) -> Option<String> {
+    // Try Authorization header first
+    if let Some(auth_header) = req.headers().get(AUTHORIZATION).and_then(|v| v.to_str().ok()) {
+        if let Some(token) = auth_header.strip_prefix("Bearer ") {
+            return Some(token.to_string());
+        }
+    }
+    // Try cookie
+    if let Some(cookie_header) = req.headers().get("cookie").and_then(|v| v.to_str().ok()) {
+        for cookie in cookie_header.split(';') {
+            let cookie = cookie.trim();
+            if let Some(value) = cookie.strip_prefix(&format!("{}=", AUTH_COOKIE_NAME)) {
+                return Some(value.to_string());
+            }
+        }
+    }
+    None
+}
+
 pub async fn auth_middleware(
     pool: axum::extract::Extension<PgPool>,
     cfg: axum::extract::Extension<crate::config::Config>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
-    let auth_header = req
-        .headers()
-        .get(AUTHORIZATION)
-        .and_then(|v| v.to_str().ok())
-        .ok_or(AppError::Unauthorized)?;
-
-    let token = auth_header
-        .strip_prefix("Bearer ")
-        .ok_or(AppError::Unauthorized)?;
+    let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
 
     let is_test = token.starts_with("hr_test_");
     let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
@@ -132,15 +146,7 @@ pub async fn jwt_auth_middleware(
     mut req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
-    let auth_header = req
-        .headers()
-        .get(AUTHORIZATION)
-        .and_then(|v| v.to_str().ok())
-        .ok_or(AppError::Unauthorized)?;
-
-    let token = auth_header
-        .strip_prefix("Bearer ")
-        .ok_or(AppError::Unauthorized)?;
+    let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
 
     let claims = crate::auth::jwt::verify_token(token, &cfg.jwt_secret)?;
 
@@ -235,4 +241,21 @@ mod tests {
         assert!(verify_api_key(key, &hash));
         assert!(!verify_api_key("hr_live_wrong", &hash));
     }
+}
+
+/// Create a Set-Cookie header value for the auth token.
+/// HttpOnly, Secure, SameSite=None for cross-origin support.
+pub fn create_auth_cookie(token: &str, max_age_secs: i64) -> String {
+    format!(
+        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        AUTH_COOKIE_NAME, token, max_age_secs
+    )
+}
+
+/// Create a Set-Cookie header value to clear the auth cookie.
+pub fn clear_auth_cookie() -> String {
+    format!(
+        "{}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
+        AUTH_COOKIE_NAME
+    )
 }
