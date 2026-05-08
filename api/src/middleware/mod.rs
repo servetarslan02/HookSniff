@@ -33,11 +33,13 @@ pub async fn request_id_middleware(mut req: Request, next: Next) -> Response {
     response
 }
 
-/// Authenticate requests via API key (hr_live_*) or JWT token.
+/// Authenticate requests via API key (hr_live_* or hr_test_*) or JWT token.
 ///
 /// Supports two authentication methods:
-/// 1. API key: `Authorization: Bearer hr_live_...` — looks up `api_key_hash` in customers table
+/// 1. API key: `Authorization: Bearer hr_live_...` or `hr_test_...` — looks up `api_key_hash` in customers table
 /// 2. JWT token: `Authorization: Bearer eyJ...` — verifies JWT and loads customer by `sub` claim
+///
+/// Test keys (hr_test_*) are marked and can be checked downstream to skip real delivery.
 pub async fn auth_middleware(
     pool: axum::extract::Extension<PgPool>,
     cfg: axum::extract::Extension<crate::config::Config>,
@@ -54,7 +56,7 @@ pub async fn auth_middleware(
         .strip_prefix("Bearer ")
         .ok_or(AppError::Unauthorized)?;
 
-    let customer = if token.starts_with("hr_live_") {
+    let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
         // API key authentication — lookup by prefix, then verify full key against Argon2 hash
         let prefix = &token[..15.min(token.len())];
         let candidates =
@@ -194,6 +196,15 @@ pub fn generate_api_key() -> String {
     format!("hr_live_{}", hex::encode(bytes))
 }
 
+/// Generate a test-mode API key (hr_test_*).
+/// Test keys deliver to a mock endpoint instead of real URLs.
+pub fn generate_test_api_key() -> String {
+    use rand::RngCore;
+    let mut bytes = [0u8; 32];
+    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    format!("hr_test_{}", hex::encode(bytes))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -202,6 +213,12 @@ mod tests {
     fn test_api_key_generation() {
         let key = generate_api_key();
         assert!(key.starts_with("hr_live_"));
+    }
+
+    #[test]
+    fn test_test_api_key_generation() {
+        let key = generate_test_api_key();
+        assert!(key.starts_with("hr_test_"));
     }
 
     #[test]
