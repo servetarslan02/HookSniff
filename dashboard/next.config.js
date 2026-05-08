@@ -27,11 +27,11 @@ const nextConfig = {
     return [
       {
         source: '/api/health',
-        destination: 'https://hooksniff-api-sdjufmaqka-ew.a.run.app/health',
+        destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/health',
       },
       {
         source: '/api/:path*',
-        destination: 'https://hooksniff-api-sdjufmaqka-ew.a.run.app/v1/:path*',
+        destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/:path*',
       },
     ];
   },
