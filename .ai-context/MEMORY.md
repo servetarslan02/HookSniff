@@ -67,11 +67,15 @@
 
 ---
 
-## ❌ KALAN SORUNLAR (3 test hatası)
+## ❌ KALAN SORUNLAR (5 integration test)
 
-1. `validate_json_depth` test — check_depth başlangıç değeri sorunu
-2. Stripe signature testleri (5 adet) — timestamp/tolerance sorunu
-3. Transform pipeline test — name field işlemi
+1. `test_api_key_generation` — Argon2 hash karşılaştırma
+2. `test_api_key_hashing` — Aynı sorun
+3. `test_plan_limits` — Plan limit mantığı
+4. `test_usage_calculations` — Usage hesaplama
+5. `test_usage_limit_exceeded` — Limit aşma
+
+**Not:** 7 lib test hatası bu oturumda çözüldü (127/127 geçti). Integration testler ayrı sorun.
 
 ---
 
