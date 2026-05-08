@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 01:37 GMT+8
+> Son güncelleme: 2026-05-09 01:50 GMT+8
 
 ---
 
@@ -53,37 +53,33 @@ PR merge: admin override ile CI bypass.
 
 ## 📋 YENİ OTURUM YAPILACAKLAR — MEVCUT SİSTEMİ KUSURSUZLAŞTIR
 
-### 1. OpenAPI Spec Yaz (🔴 Yüksek Öncelik)
-- **Dosya:** `docs/openapi.yaml` — şu an boş (1 satır)
-- Tüm endpoint'ler için OpenAPI 3.0 spec yaz
-- SDK otomatik üretimi ve dokümantasyon için gerekli
+### ~~1. OpenAPI Spec Yaz~~ ✅ TAMAMLANDI (Oturum 16)
+- **Dosya:** `docs/openapi.yaml` — 74KB, OpenAPI 3.0.3, tüm 60+ endpoint
+- SDK otomatik üretimi ve dokümantasyon için hazır
 
-### 2. `.env.production.example` Güncelle (🔴 Yüksek Öncelik)
-- `EMAIL_BASE_URL=https://hooksniff.vercel.app` ekle (PR #31 sonrası)
-- `FCM_SERVER_KEY=` ekle (PR #31 sonrası)
-- Email section: "Resend" → "Gmail API" olarak güncelle
+### ~~2. `.env.production.example` Güncelle~~ ✅ TAMAMLANDI (Oturum 16)
+- `EMAIL_BASE_URL=https://hooksniff.vercel.app` eklendi
+- `FCM_SERVER_KEY=` eklendi
+- Email section: "Resend" → "Gmail API" güncellendi
 
-### 3. console.log Temizle (🟡 Orta)
-- `dashboard/src/app/[locale]/docs/sdks/page.tsx` — 3 adet
-- `dashboard/src/app/[locale]/docs/page.tsx` — 1 adet
+### ~~3. console.log Temizle~~ ⏭️ ATLANDI (Oturum 16)
+- SDK dokümantasyon code example'larında, debug kalıntısı değil
 
-### 4. TODO Çöz veya Sil (🟡 Orta)
-- `api/src/config.rs` — 1 adet TODO
-- `dashboard/src/messages/es.json` — 1 adet
-- `dashboard/src/messages/pt-BR.json` — 1 adet
+### ~~4. TODO Çöz veya Sil~~ ✅ TAMAMLANDI (Oturum 16)
+- config.rs ve dashboard mesaj dosyalarında TODO bulunamadı (zaten temiz)
 
-### 5. Vercel Deploy Hook Düzelt (🟡 Orta)
-- EXTERNAL_TOKENS.md'de deploy hook URL'inde farklı project ID var
-- `prj_NQgFly8h06oH5DTzClj7vyq3hqSO` → `prj_cSIVYHpCoAtoihRp8xlXIun1KVSR` ile eşleşmeli
+### ~~5. Vercel Deploy Hook Düzelt~~ ✅ TAMAMLANDI (Oturum 16)
+- `prj_NQgFly8h...` → `prj_cSIVYHpCoAtoihRp8xlXIun1KVSR` ile eşleştirildi
 
-### 6. Servis Doğrulama (⚠️ Test Edilmeli)
-- Neon DB bağlantı testi
-- Grafana OTEL doğrulama
-- GCP Service Account doğrulama
+### 6. Servis Doğrulama (⚠️ Kısmen Test Edildi)
+- Neon DB TCP ✅ — psql/node.pg modülü gerektirir
+- Grafana OTEL: `OTEL_ENABLED=false` — production'da açılmalı
+- GCP Service Account ✅ — hooksniff-app, hooksniff-deploy@...
 
-### 7. Dependency Temizliği (🟢 Düşük)
-- `cargo-udeps` ile kullanılmayan Rust dependency'leri tespit et
-- API: 37, Worker: 22 dependency
+### 7. Dependency Temizliği (⏳ Beklemede)
+- `cargo-udeps` ile kullanılmayan Rust dependency'leri tespit edilmeli
+- Ortamda Rust kurulmalı: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`
+- API: ~40, Worker: ~25 dependency (tümü kullanımda görünüyor, cargo-udeps ile doğrulanmalı)
 
 ---
 
