@@ -17,7 +17,7 @@ defmodule HookSniff do
       })
   """
 
-  @default_base_url "https://api.hooksniff.io/v1"
+  @default_base_url "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
   @default_timeout 30_000
   @user_agent "hooksniff-elixir/0.2.0"
 

@@ -1,10 +1,5 @@
-#![allow(
-    dead_code,
-    unused_imports,
-    unused_variables,
-    unused_mut,
-    unused_assignments
-)]
+// Per-module allows removed — fix unused code instead of suppressing warnings.
+// If a specific module genuinely needs an allow, add it there with a reason.
 
 pub mod auth;
 pub mod billing;
