@@ -1,11 +1,18 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 07:02 GMT+8
+> Son güncelleme: 2026-05-08 13:47 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
 - Türkiye, teknik bilgi yok, ilk proje
 - Hedef: $500/ay gelir, sonra şirket kur
+- Dil: Türkçe konuşuyor, kod bilmiyor
+
+## Çalışma Kuralları
+- Oturumlar 1 saat sürüyor, her zaman yetişmeyebilir
+- `.ai-context/` klasörü GitHub'da kalıcı hafıza olarak kullanılır
+- Her oturum sonunda MEMORY.md ve NEXT_SESSION.md güncellenmeli
+- Local dosyalar 1 saat sonra siliniyor, önemli bilgiler GitHub'a commit edilmeli
 
 ---
 
@@ -50,16 +57,37 @@
 
 ---
 
-## Son Git Commit'leri
+## Dış Servis Durumları
 
-- `68886f0` — Transform API, Bulk Replay, Self-Host
-- `64b98c6` — Helm chart
-- `f27b740` — CLI improvements
-- `8154837` — Terraform provider
-- `cf5a522` — Real-time SSE stream
-- `ff270f5` — Integration tests
-- `0b31b12` — Inbound Webhook Proxy
+| Servis | Durum | Not |
+|--------|-------|-----|
+| GitHub | ✅ | Private repo, PAT ile erişim |
+| Vercel Dashboard | ✅ | https://hooksniff.vercel.app |
+| GCP Cloud Run (API) | ✅ | Rust Axum |
+| GCP Cloud Run (Worker) | ✅ | Webhook delivery |
+| Neon PostgreSQL | ✅ | Serverless DB |
+| Upstash Redis | ✅ | Cache/Queue |
+| Render API | ❌ | Build failed |
+| Polar.sh | ❌ | Token expired |
+| Resend | ⚠️ | Domain doğrulama bekliyor |
+| Grafana Cloud | ⏳ | OTEL headers hazır |
+| Cloudflare R2 | ✅ | Storage |
 
 ---
 
-> 26/26 tamamlandı. Yeni özellik için Servet'in geri dönüşü beklenecek.
+## Oturum Geçmişi
+
+### 2026-05-08 — Oturum 1 (06:00)
+- 26/26 teknik görev tamamlandı
+- Tüm SDK'lar yazıldı (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
+- Terraform provider oluşturuldu
+- CLI tool tamamlandı
+- Inbound webhook proxy eklendi
+- SSE real-time stream eklendi
+- Bulk operations eklendi
+
+### 2026-05-08 — Oturum 2 (13:47)
+- Yeni oturum başladı
+- Servet ile tanışma
+- GitHub hafıza dosyası güncelleme mekanizması kuruldu
+- Görev: Ne üzerinde çalışılacağı belirlenecek
