@@ -2,7 +2,7 @@
 
 > Bu dosya, AI asistanın oturumlar arası hafızasıdır.
 > Her oturum başında bu dosya okunur, oturum sonunda güncellenir.
-> Son güncelleme: 2026-05-08 18:05 GMT+8
+> Son güncelleme: 2026-05-08 18:20 GMT+8
 
 ---
 
@@ -67,6 +67,28 @@
 
 ---
 
+## 🐛 Tespit Edilen Hatalar (2026-05-08)
+
+### KRİTİK:
+1. Dashboard `api.get/post/put/delete` wrapper'ları token geçirmiyor → korumalı sayfalar çalışmaz
+2. CI pipeline'da `continue-on-error: true` → bozuk kod deploy'a geçebilir
+3. Login/register endpoint'lerinde rate limit yok → brute-force riski
+
+### ORTA:
+4. `seen_webhooks` cleanup fonksiyonu tanımlı ama çağrılmıyor → DB şişer
+5. `idempotency_keys` cleanup job'ı yok → DB şişer
+6. Billing webhook'ta `webhook_limit` güncellenmiyor (SubscriptionUpdated)
+7. Admin plan değişikliği `webhook_count` sıfırlıyor (tutarsızlık)
+
+### DÜŞÜK:
+8. `truncate` ve `validate_url` fonksiyonları ikişer yerde tanımlanmış
+9. Invoice oluşturma eksik (PaymentSucceeded)
+10. Zombie reaper sadece webhook_queue'yu temizliyor, deliveries'ı değil
+
+Detaylı rapor: `BUG_REPORT.md`
+
+---
+
 ## 📝 Oturum Geçmişi
 
 ### Oturum 1 — 2026-05-08
@@ -74,6 +96,9 @@
 - GitHub repo bağlantısı kuruldu
 - Hafıza dosyası oluşturuldu
 - Mevcut proje durumu incelendi
+- Tüm servisler kontrol edildi (API ✅, Dashboard ✅, Worker ✅)
+- Kapsamlı kod incelemesi yapıldı — 15 sorun tespit edildi
+- BUG_REPORT.md GitHub'a yüklendi
 
 ---
 
