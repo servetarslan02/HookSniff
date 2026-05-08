@@ -539,7 +539,9 @@ async fn notify_sdk_update(
     require_admin(&customer)?;
 
     if req.updates.is_empty() {
-        return Ok(Json(serde_json::json!({ "message": "No updates to notify" })));
+        return Ok(Json(
+            serde_json::json!({ "message": "No updates to notify" }),
+        ));
     }
 
     // Build notification title and message

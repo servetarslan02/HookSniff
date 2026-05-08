@@ -231,31 +231,6 @@ pub fn generate_test_api_key() -> String {
     format!("hr_test_{}", hex::encode(bytes))
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_api_key_generation() {
-        let key = generate_api_key();
-        assert!(key.starts_with("hr_live_"));
-    }
-
-    #[test]
-    fn test_test_api_key_generation() {
-        let key = generate_test_api_key();
-        assert!(key.starts_with("hr_test_"));
-    }
-
-    #[test]
-    fn test_api_key_hashing_and_verification() {
-        let key = "hr_live_test123";
-        let hash = hash_api_key(key);
-        assert!(verify_api_key(key, &hash));
-        assert!(!verify_api_key("hr_live_wrong", &hash));
-    }
-}
-
 /// Create a Set-Cookie header value for the auth token.
 /// HttpOnly, Secure, SameSite=None for cross-origin support.
 pub fn create_auth_cookie(token: &str, max_age_secs: i64) -> String {
@@ -301,4 +276,29 @@ pub fn extract_refresh_token(req: &axum::extract::Request) -> Option<String> {
         }
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_api_key_generation() {
+        let key = generate_api_key();
+        assert!(key.starts_with("hr_live_"));
+    }
+
+    #[test]
+    fn test_test_api_key_generation() {
+        let key = generate_test_api_key();
+        assert!(key.starts_with("hr_test_"));
+    }
+
+    #[test]
+    fn test_api_key_hashing_and_verification() {
+        let key = "hr_live_test123";
+        let hash = hash_api_key(key);
+        assert!(verify_api_key(key, &hash));
+        assert!(!verify_api_key("hr_live_wrong", &hash));
+    }
 }
