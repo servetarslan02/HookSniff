@@ -2,7 +2,7 @@
 
 > Bu dosya, AI asistanın oturumlar arası hafızasıdır.
 > Her oturum başında bu dosya okunur, oturum sonunda güncellenir.
-> Son güncelleme: 2026-05-08 18:29 GMT+8
+> Son güncelleme: 2026-05-08 18:35 GMT+8
 
 ---
 
@@ -69,23 +69,24 @@
 
 ## 🐛 Tespit Edilen ve Düzeltilen Hatalar (2026-05-08)
 
-### Tümü Düzeltildi ✅
-1. ✅ CI `continue-on-error` kaldırıldı — bozuk kod artık deploy'a geçemez
+### Tüm 15 Madde İşlendi ✅
+1. ✅ CI `continue-on-error` kaldırıldı
 2. ✅ Dashboard API wrapper token desteği eklendi
 3. ✅ Login/register rate limit eklendi (10/15dk login, 5/saat register)
 4. ✅ `seen_webhooks` cleanup job eklendi (6 saatte bir)
 5. ✅ `idempotency_keys` cleanup job eklendi (6 saatte bir)
-6. ✅ Billing `webhook_limit` zaten doğru çalışıyormuş (yanlış tespit düzeltildi)
+6. ✅ Billing `webhook_limit` zaten doğru çalışıyormuş (yanlış tespit)
 7. ✅ Admin plan değişikliği: upgrade'de sıfırla, downgrade'de cap
 8. ✅ Duplicate `truncate` fonksiyonu birleştirildi
 9. ✅ Duplicate `validate_url` fonksiyonu ssrf.rs'e yönlendirildi
 10. ✅ Zombie reaper artık orphaned delivery'leri de kurtarıyor
-11. ✅ `#[allow(dead_code)]` kaldırıldı — development uyarıları artık görünür
+11. ✅ `#[allow(dead_code)]` kaldırıldı
 12. ✅ Invoice oluşturma eklendi (SubscriptionCreated + SubscriptionUpdated)
+13. ✅ CORS fallback: production'da origin yoksa dashboard'a izin ver
+14. ✅ OTEL headers aslında doğru işleniyormuş (yanlış tespit)
+15. ✅ Replay protection race condition düzeltildi (atomic INSERT)
 
-### NOT: Bug #6 (Billing webhook_limit) aslında doğru çalışıyormuş, düzeltme gerekmedi.
-
-Değişen dosyalar: ci.yml, main.rs (api), admin.rs, auth.rs, billing.rs, validation.ts, api.ts, main.rs (worker)
+Değişen dosyalar: ci.yml, main.rs (api), admin.rs, auth.rs, billing.rs, validation.ts, api.ts, main.rs (worker), idempotency.rs
 
 Detaylı rapor: `BUG_REPORT.md`
 
