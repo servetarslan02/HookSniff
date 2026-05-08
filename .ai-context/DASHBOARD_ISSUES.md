@@ -1,8 +1,8 @@
 # 🐛 HOOKSNIFF DASHBOARD — SORUN LİSTESİ
 
-> **Son güncelleme:** 2026-05-09 06:15 GMT+8
-> **Durum:** 31/31 düzeltildi (%100) ✅
-> **Son commit:** `68716c2`
+> **Son güncelleme:** 2026-05-09 06:48 GMT+8
+> **Durum:** 31/31 düzeltildi (%100) ✅ + ek tamamlananlar
+> **Son commit:** `9c8b040`
 
 ---
 
@@ -66,6 +66,6 @@
 
 ## 📝 SONRAKİ ADIMLAR
 - Rust backend deploy edilmeli (HttpOnly cookie desteği için)
-- OG image SVG → PNG'ye çevrilmeli (1200×630)
-- Favicon SVG → PNG fallback eklenebilir
-- FAQ çevirileri: DE, ES, FR, PT-BR, JA, KO → profesyonel çeviri yapılmalı
+- ~~OG image SVG → PNG'ye çevrilmeli (1200×630)~~ ✅ Yapıldı
+- ~~Favicon SVG → PNG fallback eklenebilir~~ ✅ Yapıldı (5 boyut: 16, 32, 180, 192, 512)
+- ~~FAQ çevirileri: DE, ES, FR, PT-BR, JA, KO → profesyonel çeviri yapılmalı~~ ✅ 6 dilde 37'şer key çevrildi
