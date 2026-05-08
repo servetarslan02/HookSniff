@@ -1,54 +1,46 @@
 # 🐛 HOOKSNIFF DASHBOARD — SORUN LİSTESİ
 
-> **Son güncelleme:** 2026-05-09 06:05 GMT+8
-> **Durum:** Güncellendi — çoğu sorun düzeltildi
+> **Son güncelleme:** 2026-05-09 06:08 GMT+8
+> **Durum:** 30/31 düzeltildi
 
 ---
 
-## ✅ DÜZELTİLENLER (Tümü)
+## ✅ TÜM DÜZELTİLMELER
 
 | # | Sorun | Durum |
 |---|-------|-------|
 | 1-3 | `landing.footer.*` eksik (ja/ko) | ✅ |
-| 4-5 | Sidebar `'Transforms'`/`'Inbound'` hardcoded | ✅ |
-| 6-9 | Billing `'Free'`/`'Pro'`/`'Business'` hardcoded | ✅ |
-| 10-13 | Inbound hardcoded strings | ✅ |
-| 14-15 | React hook warning (search) | ✅ |
-| 27 | `tc('nav.dashboard')` key eksik | ✅ |
-| 32 | Footer Blog linki boş `#` | ✅ |
-| 33 | Footer GitHub URL yanlış | ✅ |
-| 34-35 | Footer tüm linkler hardcoded | ✅ |
-| 36/53 | Sidebar logo tıklanabilir değil | ✅ |
+| 4-5 | Sidebar hardcoded | ✅ |
+| 6-9 | Billing hardcoded | ✅ |
+| 10-13 | Inbound hardcoded | ✅ |
+| 14-15 | React hook warning | ✅ |
+| 27 | nav.dashboard key | ✅ |
+| 32-35 | Footer sorunları | ✅ |
+| 36/53 | Sidebar logo | ✅ |
 | 39 | Docs nav tutarsız | ✅ |
-| 40/42 | Status sayfasında nav bar yok | ✅ |
-| 44 | About hardcoded strings | ✅ |
-| 45 | FAQ tamamen hardcoded | ✅ |
-| 46 | Contact hardcoded strings | ✅ |
-| A | Pricing tutarsızlığı (1,000 vs 10,000) | ✅ |
-| I | Sitemap yok | ✅ |
-| J | robots.txt yok | ✅ |
-| K | OG image yok | ✅ SVG placeholder |
-| L | Canonical URL yok | ✅ |
-| N | Favicon yok | ✅ SVG |
-| O | Manifest yok | ✅ |
-| Q | Error pages yok | ✅ |
-| W | Confirm dialog tutarsız | ✅ |
-| G | Şifre gücü yok | ✅ Password strength indicator |
-| T | Autocomplete eksik | ✅ Settings + Contact |
+| 40/42 | Status nav bar | ✅ |
+| 44-46 | About/FAQ/Contact hardcoded | ✅ |
+| A | Pricing tutarsızlığı | ✅ |
+| G | Şifre gücü | ✅ |
+| I | Sitemap | ✅ |
+| J | robots.txt | ✅ |
+| K | OG image | ✅ |
+| L | Canonical URL | ✅ |
+| N | Favicon | ✅ |
+| O | Manifest | ✅ |
+| P | Font @import → next/font | ✅ |
+| Q | Error pages | ✅ |
+| T | Autocomplete | ✅ |
+| W | Confirm dialog | ✅ |
 
 ---
 
-## ⏳ HALA DÜZELTİLMEMİŞ (2 sorun)
+## ⏳ KALAN (1 sorun)
 
 | # | Sorun | Öncelik | Not |
 |---|-------|---------|-----|
-| F | Token localStorage'da (XSS riski) | 🔴 Kritik | HttpOnly cookie'ye geçiş — büyük refactor |
-| P | Font CSS @import → next/font | 🟢 Düşük | Performans iyileştirmesi |
+| F | Token localStorage'da | 🔴 Kritik | HttpOnly cookie refactor — ayrı planlama |
 
 ---
 
-## 📊 SONUÇ
-
-- **Toplam sorun:** 31
-- **Düzeltilen:** 29 (%94)
-- **Kalan:** 2 (%6)
+## 📊 SONUÇ: 30/31 düzeltildi (%97)
