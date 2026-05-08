@@ -329,14 +329,43 @@ async fn change_plan(
         _ => 10_000,
     };
 
-    let result = sqlx::query(
-        "UPDATE customers SET plan = $1, webhook_limit = $2, webhook_count = 0 WHERE id = $3",
-    )
-    .bind(&req.plan)
-    .bind(limit)
-    .bind(id)
-    .execute(&pool)
-    .await?;
+    // Only reset webhook_count on upgrade (not downgrade) to prevent exceeding new limit
+    let current_plan: Option<(String,)> = sqlx::query_as("SELECT plan FROM customers WHERE id = $1")
+        .bind(id)
+        .fetch_optional(&pool)
+        .await?;
+
+    let should_reset = if let Some((ref old_plan)) = current_plan {
+        let old_limit = match old_plan.as_str() {
+            "pro" => 50_000,
+            "business" => 500_000,
+            _ => 10_000,
+        };
+        limit > old_limit // Reset only on upgrade
+    } else {
+        true
+    };
+
+    let result = if should_reset {
+        sqlx::query(
+            "UPDATE customers SET plan = $1, webhook_limit = $2, webhook_count = 0 WHERE id = $3",
+        )
+        .bind(&req.plan)
+        .bind(limit)
+        .bind(id)
+        .execute(&pool)
+        .await?
+    } else {
+        // On downgrade, cap webhook_count to new limit
+        sqlx::query(
+            "UPDATE customers SET plan = $1, webhook_limit = $2, webhook_count = LEAST(webhook_count, $2) WHERE id = $3",
+        )
+        .bind(&req.plan)
+        .bind(limit)
+        .bind(id)
+        .execute(&pool)
+        .await?
+    };
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);

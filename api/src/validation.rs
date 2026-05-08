@@ -33,34 +33,10 @@ pub fn sanitize_description(desc: &str) -> String {
     }
 }
 
-/// Validate URL format strictly: must be https:// or http://, valid host, no internal IPs
+/// Validate URL format strictly: must be https:// or http://, valid host, no internal IPs.
+/// Delegates to the comprehensive SSRF protection module.
 pub fn validate_url(url: &str) -> Result<(), String> {
-    if !url.starts_with("https://") && !url.starts_with("http://") {
-        return Err("URL must start with http:// or https://".into());
-    }
-
-    let parsed = url::Url::parse(url).map_err(|_| "Invalid URL format")?;
-
-    let host = parsed.host_str().ok_or("URL must have a host")?;
-
-    if host.is_empty() {
-        return Err("URL host cannot be empty".into());
-    }
-
-    // Block common internal hostnames
-    let blocked_hosts = ["localhost", "localhost.localdomain", "ip6-localhost"];
-    if blocked_hosts.iter().any(|&b| host.eq_ignore_ascii_case(b)) {
-        return Err("Internal URLs are not allowed".into());
-    }
-
-    if host.ends_with(".local")
-        || host.ends_with(".internal")
-        || host.ends_with(".localhost")
-    {
-        return Err("Internal URLs are not allowed".into());
-    }
-
-    Ok(())
+    crate::ssrf::validate_url(url).map_err(|e| e.to_string())
 }
 
 /// Validate JSON nesting depth. Returns error if depth exceeds MAX_JSON_DEPTH.
