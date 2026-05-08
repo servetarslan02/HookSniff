@@ -88,16 +88,19 @@ cd dashboard && npm install && npm run build
 1. Clippy ✅, Test ✅ (29), Dashboard build ✅, Security audit ✅
 2. Push edildi — `7ff7c94` commit
 
-### Bu Oturum (16) — 2026-05-09 01:41 GMT+8:
+### Bu Oturum (16) — 2026-05-09 01:41-01:55 GMT+8:
 
 1. **OpenAPI spec yazıldı** — `docs/openapi.yaml` (74KB, tüm 60+ endpoint, OpenAPI 3.0.3)
-2. **`.env.production.example` güncellendi** — `EMAIL_BASE_URL`, `FCM_SERVER_KEY` eklendi, email "Resend" → "Gmail API"
+2. **`.env.production.example` güncellendi** — `EMAIL_BASE_URL`, `FCM_SERVER_KEY` eklendi, email "Resend" → "Gmail API", `OTEL_ENABLED=true`
 3. **console.log** — SDK dokümantasyon code example'larında, debug kalıntısı değil (atlandı)
 4. **TODO** — config.rs ve dashboard mesaj dosyalarında TODO bulunamadı (zaten temiz)
 5. **Vercel deploy hook düzeltildi** — `prj_NQgFly8h...` → `prj_cSIVYHpCoAtoihRp8xlXIun1KVSR`
-6. **Servis doğrulama** — Neon DB TCP ✅, GCP SA valid (hooksniff-app), Grafana OTEL: disabled
-7. **Dependency temizliği** — Tüm Rust dependency'leri kullanımda, cargo-udeps gerektirir (ortamda Rust yok)
-8. Commit `24419de` push edildi
+6. **Servis doğrulama tamamlandı**:
+   - Neon DB ✅ — PostgreSQL 17.8, 43 public tablo
+   - GCP SA ✅ — hooksniff-app, hooksniff-deploy@...
+   - Grafana OTEL ❌ — 401, token süresi dolmuş (Servet yenilemeli)
+7. **Dependency temizliği** — Rust kuruldu, cargo-udeps derlenemedi (nightly uyumsuz), manuel analiz: API ve Worker'da gereksiz dependency yok
+8. Commit `24419de` + `41d4956` + `80504cb` push edildi
 
 ### Bu Oturum (15) — 2026-05-08 23:50-01:37 GMT+8:
 
