@@ -29,5 +29,6 @@ pub mod telemetry;
 pub mod templates;
 pub mod throttle;
 pub mod transform;
+pub mod agents;
 pub mod validation;
 pub mod ws;

@@ -406,3 +406,68 @@ export const analyticsApi = {
   latencyTrend: (token: string, range: string = '24h') =>
     apiFetch<LatencyTrendResponse>(`/analytics/latency?range=${range}`, { token }),
 };
+
+// AI Agent API
+export const agentsApi = {
+  list: (token: string, page = 1) =>
+    apiFetch<{ agents: any[] }>(`/agents?page=${page}`, { token }),
+
+  get: (token: string, id: string) =>
+    apiFetch<{ agent: any }>(`/agents/${id}`, { token }),
+
+  create: (token: string, data: { name: string; description?: string }) =>
+    apiFetch<{ agent: any; message: string }>('/agents', {
+      token,
+      method: 'POST',
+      body: data,
+    }),
+
+  update: (token: string, id: string, data: { name?: string; description?: string; status?: string }) =>
+    apiFetch<{ agent: any }>(`/agents/${id}`, {
+      token,
+      method: 'PUT',
+      body: data,
+    }),
+
+  delete: (token: string, id: string) =>
+    apiFetch<{ message: string }>(`/agents/${id}`, {
+      token,
+      method: 'DELETE',
+    }),
+
+  emitEvent: (token: string, agentId: string, data: { event_type: string; payload: any; target_agent_id?: string }) =>
+    apiFetch<{ event_id: string; status: string; delivered_to: string[] }>(`/agents/${agentId}/emit`, {
+      token,
+      method: 'POST',
+      body: data,
+    }),
+
+  listEvents: (token: string, agentId: string, page = 1) =>
+    apiFetch<{ events: any[] }>(`/agents/${agentId}/events?page=${page}`, { token }),
+
+  listRoutes: (token: string) =>
+    apiFetch<{ routes: any[] }>('/agents/routes', { token }),
+
+  createRoute: (token: string, data: { event_type: string; source_agent_id?: string; target_agent_id: string }) =>
+    apiFetch<{ route: any }>('/agents/routes', {
+      token,
+      method: 'POST',
+      body: data,
+    }),
+
+  deleteRoute: (token: string, routeId: string) =>
+    apiFetch<{ message: string }>(`/agents/routes/${routeId}`, {
+      token,
+      method: 'DELETE',
+    }),
+
+  getRateLimit: (token: string, agentId: string) =>
+    apiFetch<{ rate_limit: any }>(`/agents/${agentId}/rate-limit`, { token }),
+
+  updateRateLimit: (token: string, agentId: string, data: { max_events_per_minute?: number; max_events_per_hour?: number }) =>
+    apiFetch<{ rate_limit: any }>(`/agents/${agentId}/rate-limit`, {
+      token,
+      method: 'PUT',
+      body: data,
+    }),
+};
