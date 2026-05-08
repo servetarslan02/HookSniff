@@ -8,6 +8,11 @@ use uuid::Uuid;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
+/// Indicates whether the current request was made with a test API key (hr_test_*).
+/// Handlers can check this to mark deliveries as test and skip real delivery.
+#[derive(Debug, Clone, Copy)]
+pub struct IsTestKey(pub bool);
+
 /// Middleware that assigns a unique request ID to every request and adds it to tracing context
 pub async fn request_id_middleware(mut req: Request, next: Next) -> Response {
     let request_id = req
@@ -56,6 +61,7 @@ pub async fn auth_middleware(
         .strip_prefix("Bearer ")
         .ok_or(AppError::Unauthorized)?;
 
+    let is_test = token.starts_with("hr_test_");
     let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
         // API key authentication — lookup by prefix, then verify full key against Argon2 hash
         let prefix = &token[..15.min(token.len())];
@@ -115,6 +121,7 @@ pub async fn auth_middleware(
     };
 
     req.extensions_mut().insert(customer);
+    req.extensions_mut().insert(IsTestKey(is_test));
     Ok(next.run(req).await)
 }
 
