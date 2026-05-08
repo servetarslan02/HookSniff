@@ -23,6 +23,10 @@ export async function generateMetadata({
       template: '%s | HookSniff',
     },
     description: t('hero.subtitle'),
+    icons: {
+      icon: '/favicon.svg',
+      shortcut: '/favicon.svg',
+    },
     openGraph: {
       title: 'HookSniff — Webhook Delivery Service',
       description: t('hero.subtitle'),
@@ -30,15 +34,33 @@ export async function generateMetadata({
       siteName: 'HookSniff',
       type: 'website',
       locale: locale === 'pt-BR' ? 'pt_BR' : `${locale}_${locale.toUpperCase()}`,
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'HookSniff — Webhook Delivery Service',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'HookSniff — Webhook Delivery Service',
       description: t('hero.subtitle'),
+      images: ['/og-image.png'],
     },
     robots: {
       index: true,
       follow: true,
+    },
+    alternates: {
+      canonical: `https://hooksniff.vercel.app/${locale}`,
+      languages: Object.fromEntries(
+        ['en', 'tr', 'de', 'es', 'fr', 'pt-BR', 'ja', 'ko'].map((l) => [
+          l,
+          `https://hooksniff.vercel.app/${l}`,
+        ])
+      ),
     },
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.vercel.app'

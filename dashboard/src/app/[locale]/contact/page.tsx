@@ -107,6 +107,7 @@ export default function ContactPage() {
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
                   placeholder="Your name"
+                  autoComplete="name"
                   required
                 />
               </div>
@@ -118,6 +119,7 @@ export default function ContactPage() {
                   onChange={e => setForm({ ...form, email: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
                   placeholder="you@example.com"
+                  autoComplete="email"
                   required
                 />
               </div>
