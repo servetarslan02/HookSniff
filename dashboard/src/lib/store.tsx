@@ -23,39 +23,69 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const STORAGE_KEY = 'hooksniff_user';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [apiKey, setApiKeyState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // On mount: restore user info from localStorage, then verify session with backend
   useEffect(() => {
-    const stored = localStorage.getItem('hooksniff_auth');
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        const { token: t, user: u, apiKey: k } = JSON.parse(stored);
-        setToken(t);
+        const { user: u, apiKey: k } = JSON.parse(stored);
         setUser(u);
         setApiKeyState(k);
       } catch {
-        localStorage.removeItem('hooksniff_auth');
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
-    setIsLoading(false);
+    // Verify session by calling /auth/me (cookie is sent automatically)
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error('Not authenticated');
+      })
+      .then((data) => {
+        const u: User = {
+          id: data.id,
+          email: data.email,
+          name: data.name,
+          plan: data.plan,
+          is_admin: data.is_admin ?? false,
+        };
+        setUser(u);
+        setApiKeyState(data.api_key || null);
+        setToken('cookie'); // Indicates session is active via cookie
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u, apiKey: data.api_key || null }));
+      })
+      .catch(() => {
+        // Not authenticated — clear stale data
+        setUser(null);
+        setToken(null);
+        setApiKeyState(null);
+        localStorage.removeItem(STORAGE_KEY);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const persistAuth = useCallback((t: string, u: User, k?: string) => {
-    setToken(t);
+  const persistAuth = useCallback((u: User, k?: string) => {
     setUser(u);
-    if (k) setApiKeyState(k);
-    localStorage.setItem('hooksniff_auth', JSON.stringify({ token: t, user: u, apiKey: k || null }));
+    setApiKeyState(k || null);
+    setToken('cookie'); // Token is in HttpOnly cookie
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u, apiKey: k || null }));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
     if (!res.ok) {
@@ -64,14 +94,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const data = await res.json();
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
-    persistAuth(data.token, u, data.customer.api_key);
+    persistAuth(u, data.customer.api_key);
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email, password, name }),
     });
     if (!res.ok) {
@@ -80,23 +111,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const data = await res.json();
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
-    persistAuth(data.token, u, data.customer.api_key);
+    persistAuth(u, data.customer.api_key);
   }, [persistAuth]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    // Call backend logout to clear HttpOnly cookie
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    }).catch(() => {}); // Ignore errors
     setToken(null);
     setUser(null);
     setApiKeyState(null);
-    localStorage.removeItem('hooksniff_auth');
+    localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   const setApiKey = useCallback((key: string) => {
     setApiKeyState(key);
-    const stored = localStorage.getItem('hooksniff_auth');
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const data = JSON.parse(stored);
       data.apiKey = key;
-      localStorage.setItem('hooksniff_auth', JSON.stringify(data));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
   }, []);
 
