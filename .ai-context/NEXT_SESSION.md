@@ -32,7 +32,7 @@ Tüm 6 CI job'u artık geçiyor:
 ### 1. Adım: Projeyi Klonla
 ```bash
 cd /root/.openclaw/workspace
-git clone https://x-access-token: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@github.com/servetarslan02/HookSniff.git
+git clone https://github.com/servetarslan02/HookSniff.git
 cd HookSniff
 ```
 
@@ -55,7 +55,7 @@ cat .ai-context/NEXT_SESSION.md
 | Bilgi | Değer |
 |-------|-------|
 | **Repo** | https://github.com/servetarslan02/HookSniff |
-| **GitHub Token** | `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` |
+| **GitHub Token** | Environment değişkeni `GITHUB_TOKEN` olarak ayarlanacak |
 | **Dashboard** | https://hooksniff.vercel.app |
 | **API** | https://hooksniff-api-1046140057667.europe-west1.run.app |
 | **Worker** | https://hooksniff-worker-1046140057667.europe-west1.run.app |
