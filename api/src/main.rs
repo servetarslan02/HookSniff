@@ -124,9 +124,19 @@ async fn main() -> Result<()> {
                 .filter_map(|o| o.parse().ok())
                 .collect();
             if cfg.is_production() && origins.is_empty() {
-                // Production with no CORS origins = no cross-origin allowed
+                // Production with no CORS origins configured — allow dashboard by default
+                let default_origins: Vec<axum::http::HeaderValue> = [
+                    "https://hooksniff.vercel.app",
+                    "https://www.hooksniff.vercel.app",
+                ]
+                .iter()
+                .filter_map(|o| o.parse().ok())
+                .collect();
+                tracing::warn!(
+                    "⚠️ CORS_ORIGINS not set in production — defaulting to dashboard origins"
+                );
                 CorsLayer::new()
-                    .allow_origin(AllowOrigin::list(std::iter::empty()))
+                    .allow_origin(AllowOrigin::list(default_origins))
                     .allow_methods(Any)
                     .allow_headers(Any)
             } else if origins.is_empty() {
