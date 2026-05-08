@@ -332,7 +332,10 @@ async fn forgot_password(
         if let Some(email_client) = crate::email::GCloudEmailClient::from_config(&cfg) {
             let to = email.clone();
             tokio::spawn(async move {
-                if let Err(e) = email_client.send_password_reset_email(&to, &reset_url).await {
+                if let Err(e) = email_client
+                    .send_password_reset_email(&to, &reset_url)
+                    .await
+                {
                     tracing::warn!("Failed to send password reset email to {}: {:?}", to, e);
                 }
             });
@@ -562,13 +565,11 @@ async fn enable_2fa(
     );
 
     // Store the secret (not yet enabled — requires confirmation)
-    sqlx::query(
-        "UPDATE customers SET totp_secret = $1, updated_at = NOW() WHERE id = $2",
-    )
-    .bind(&secret)
-    .bind(customer.id)
-    .execute(&pool)
-    .await?;
+    sqlx::query("UPDATE customers SET totp_secret = $1, updated_at = NOW() WHERE id = $2")
+        .bind(&secret)
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
 
     Ok(Json(serde_json::json!({
         "secret": secret,
@@ -582,21 +583,18 @@ async fn confirm_2fa(
     Extension(customer): Extension<Customer>,
     Json(req): Json<Confirm2faRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let secret = customer
-        .totp_secret
-        .as_ref()
-        .ok_or(AppError::BadRequest("2FA setup not initiated. Call /2fa/enable first.".into()))?;
+    let secret = customer.totp_secret.as_ref().ok_or(AppError::BadRequest(
+        "2FA setup not initiated. Call /2fa/enable first.".into(),
+    ))?;
 
     if !verify_totp_code(secret, &req.code) {
         return Err(AppError::BadRequest("Invalid TOTP code".into()));
     }
 
-    sqlx::query(
-        "UPDATE customers SET totp_enabled = true, updated_at = NOW() WHERE id = $1",
-    )
-    .bind(customer.id)
-    .execute(&pool)
-    .await?;
+    sqlx::query("UPDATE customers SET totp_enabled = true, updated_at = NOW() WHERE id = $1")
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
 
     tracing::info!("✅ 2FA enabled for customer {}", customer.id);
 
@@ -795,10 +793,11 @@ fn generate_totp_secret() -> String {
 /// Verify a TOTP code against a base32-encoded secret.
 fn verify_totp_code(secret_b32: &str, code: &str) -> bool {
     use totp_rs::{Algorithm, TOTP};
-    let secret_bytes = match base32::decode(base32::Alphabet::Rfc4648 { padding: false }, secret_b32) {
-        Some(b) => b,
-        None => return false,
-    };
+    let secret_bytes =
+        match base32::decode(base32::Alphabet::Rfc4648 { padding: false }, secret_b32) {
+            Some(b) => b,
+            None => return false,
+        };
     let totp = match TOTP::new(
         Algorithm::SHA1,
         6,

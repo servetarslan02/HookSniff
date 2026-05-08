@@ -95,13 +95,11 @@ async fn remove_device(
     Extension(customer): Extension<Customer>,
     Path(token): Path<String>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let result = sqlx::query(
-        "DELETE FROM device_tokens WHERE customer_id = $1 AND token = $2",
-    )
-    .bind(customer.id)
-    .bind(&token)
-    .execute(&pool)
-    .await?;
+    let result = sqlx::query("DELETE FROM device_tokens WHERE customer_id = $1 AND token = $2")
+        .bind(customer.id)
+        .bind(&token)
+        .execute(&pool)
+        .await?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
