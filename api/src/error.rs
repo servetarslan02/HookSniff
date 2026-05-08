@@ -29,6 +29,9 @@ pub enum AppError {
 
     #[error("Database error: {0}")]
     Database(#[from] sqlx::Error),
+
+    #[error("Serialization error: {0}")]
+    Serialization(#[from] serde_json::Error),
 }
 
 impl IntoResponse for AppError {
@@ -47,6 +50,10 @@ impl IntoResponse for AppError {
             AppError::Database(e) => {
                 tracing::error!("Database error: {:?}", e);
                 (StatusCode::INTERNAL_SERVER_ERROR, "DATABASE_ERROR", "Internal server error".into())
+            }
+            AppError::Serialization(e) => {
+                tracing::error!("Serialization error: {:?}", e);
+                (StatusCode::BAD_REQUEST, "SERIALIZATION_ERROR", format!("Serialization error: {}", e))
             }
         };
 
