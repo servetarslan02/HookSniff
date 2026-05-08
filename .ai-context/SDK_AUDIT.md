@@ -21,6 +21,15 @@
 
 ## 🐛 Tespit Edilen Hatalar (Düzeltilecek)
 
+### 0. 🔴 KRİTİK — AI Center Backend'de Yok
+**Sorun:** Node ve Python SDK'larında `client.ai.*` modülü var ama backend'de `/ai/*` endpoint'leri hiç tanımlanmamış. 404 döner.
+**Karar:** SDK'lardan AI Center kodu çıkarılacak (yayından önce).
+**Etkilenen dosyalar:**
+- `sdks/node/src/index.ts` → `AiCenterResource` sınıfı
+- `sdks/node/src/types.ts` → AI tipleri
+- `sdks/python/hooksniff/client.py` → `_AiCenterResource` sınıfı
+- `sdks/python/hooksniff/models.py` → AI modelleri
+
 ### 1. PHP SDK — `send()` metodunda duplicate satır
 **Dosya:** `sdks/php/src/HookSniffClient.php`
 **Sorun:** `send()` metodunda fazla satır var:
