@@ -49,3 +49,5 @@ sdks/python/hooksniff.egg-info/
 sdks/node/package-lock.json
 sdks/csharp/bin/
 sdks/csharp/obj/
+sdks/kotlin/.gradle/
+sdks/kotlin/build/

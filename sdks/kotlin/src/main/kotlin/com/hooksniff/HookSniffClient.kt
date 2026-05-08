@@ -15,7 +15,7 @@ import java.util.Base64
 
 // ==================== Error Types ====================
 
-class HookSniffException(
+open class HookSniffException(
     val statusCode: Int? = null,
     val code: String? = null,
     override val message: String
@@ -364,4 +364,5 @@ class WebhookVerifier(
 
         return verify(body, msgId, timestamp, signatureHeader)
     }
+}
 }
