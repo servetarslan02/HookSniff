@@ -14,14 +14,35 @@ pub struct Claims {
     pub exp: usize,
 }
 
+/// Generate a long-lived JWT (24h) — used for legacy/backwards compatibility.
 pub fn generate_token(
     customer_id: Uuid,
     email: &str,
     plan: &str,
     secret: &str,
 ) -> Result<String, AppError> {
+    generate_token_with_duration(customer_id, email, plan, secret, Duration::hours(24))
+}
+
+/// Generate a short-lived JWT (15 min) — used with refresh token flow.
+pub fn generate_access_token(
+    customer_id: Uuid,
+    email: &str,
+    plan: &str,
+    secret: &str,
+) -> Result<String, AppError> {
+    generate_token_with_duration(customer_id, email, plan, secret, Duration::minutes(15))
+}
+
+pub fn generate_token_with_duration(
+    customer_id: Uuid,
+    email: &str,
+    plan: &str,
+    secret: &str,
+    duration: Duration,
+) -> Result<String, AppError> {
     let expiration = Utc::now()
-        .checked_add_signed(Duration::hours(24))
+        .checked_add_signed(duration)
         .expect("valid timestamp")
         .timestamp() as usize;
 
@@ -38,6 +59,22 @@ pub fn generate_token(
         &EncodingKey::from_secret(secret.as_bytes()),
     )
     .map_err(|e| AppError::Internal(e.into()))
+}
+
+/// Generate a random token string (for reset/verification/refresh).
+pub fn generate_random_token() -> String {
+    use rand::RngCore;
+    let mut bytes = [0u8; 32];
+    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    hex::encode(bytes)
+}
+
+/// SHA256 hash a token for storage.
+pub fn hash_token(token: &str) -> String {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    hasher.update(token.as_bytes());
+    hex::encode(hasher.finalize())
 }
 
 pub fn verify_token(token: &str, secret: &str) -> Result<Claims, AppError> {
