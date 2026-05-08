@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, type Endpoint } from '@/lib/api';
-import { useTranslations } from 'next-intl';
 
 interface TransformRule {
   id: string;
@@ -20,7 +19,6 @@ interface TransformRule {
 export default function TransformsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const t = useTranslations('transforms');
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
   const [rules, setRules] = useState<TransformRule[]>([]);

@@ -33,7 +33,6 @@ export default function NotificationsPage() {
   const [typeFilter, setTypeFilter] = useState<NotifType>('all');
   const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('all');
   const t = useTranslations('notifications');
-  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchNotifications = useCallback(async () => {
