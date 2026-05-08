@@ -214,6 +214,10 @@ impl TransformEngine {
             if let Some(value) = resolve_json_path(input, &mapping.source) {
                 // Flat veya nested hedefe yaz
                 set_json_path(&mut output, &mapping.target, value.clone());
+                // Kaynak alanı sil (source != target ise)
+                if mapping.source != mapping.target {
+                    remove_json_path(&mut output, &mapping.source);
+                }
             }
         }
 
