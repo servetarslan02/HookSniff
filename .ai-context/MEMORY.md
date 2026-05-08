@@ -33,7 +33,7 @@
 | R2 Storage | hooksniff-storage | ✅ Bucket var |
 | Cloudflare | Hesap aktif | ✅ |
 | Polar.sh | Token expired | ❌ Yeni token lazım |
-| Resend | hooksniff.is-a.dev not_started | ❌ Yeni domain lazım |
+| Resend | hooksniff.is-a.dev iptal → GCloud'a taşınacak | ❌ |
 
 ---
 
