@@ -1,6 +1,6 @@
 # 📱 HookSniff Mobil Uygulama — Master Plan
 
-> Son güncelleme: 2026-05-08 22:00 GMT+8
+> Son güncelleme: 2026-05-08 22:21 GMT+8
 > Karar: Servet onayı ile netleştirildi
 
 ---
@@ -10,13 +10,20 @@
 | Konu | Karar |
 |------|-------|
 | **Platform** | Android (sadece) |
-| **Teknoloji** | React Native + Expo |
+| **Teknoloji** | React Native + Expo (SDK 53+) |
 | **Dağıtım** | Siteden APK indirme (Google Play YOK) |
 | **Güncelleme** | OTA (Expo Updates) + APK güncelleme |
 | **Tasarım** | Premium, native his, dark mode varsayılan |
 | **Dil** | Türkçe varsayılan, İngilizce destek |
-| **Maliyet** | $0 (Apple Developer $99/yıl ileride) |
+| **Maliyet** | $0 |
 | **Süre** | 6-8 hafta |
+| **Performans** | 60fps, <2sn cold start, <130MB bellek, <40MB APK |
+| **Motor** | Hermes (React Native optimize JS motoru) |
+| **Liste** | FlashList (Shopify) — FlatList'ten %30-50 hızlı |
+| **Animasyon** | Reanimated 3 (UI thread, 60fps) |
+| **Cache** | TanStack Query (stale-while-revalidate) |
+| **Hata takibi** | Sentry (5K error/ay ücretsiz) |
+| **Büyük şirketler** | Aynı teknoloji: Instagram, Discord, Shopify, Microsoft, Amazon |
 
 ---
 
@@ -26,17 +33,24 @@
 
 | Araç | Ne İşe Yarar | Versiyon |
 |------|-------------|----------|
-| **Expo SDK 53** | React Native framework | Son stable |
+| **Expo SDK 53+** | React Native framework | Son stable |
 | **Expo Router** | Sayfa navigasyonu (file-based) | v4 |
 | **Expo Updates** | OTA güncelleme (kodsal) | Built-in |
 | **Expo Secure Store** | Token saklama (güvenli) | Built-in |
 | **Expo Local Auth** | Parmak izi / yüz tanıma | Built-in |
 | **Expo Notifications** | Push notification (FCM/APNs) | Built-in |
+| **Hermes** | Optimize JS motoru (%50 hızlı cold start) | Built-in |
 | **NativeWind** | Tailwind CSS (React Native) | v4 |
-| **React Native Recharts** | Grafikler | - |
+| **FlashList** | Shopify liste bileşeni (FlatList'ten %30-50 hızlı) | v2 |
+| **Reanimated 3** | Animasyonlar (UI thread, 60fps) | v3 |
+| **TanStack Query** | API cache + offline + stale-while-revalidate | v5 |
+| **Sentry** | Hata raporlama (5K error/ay ücretsiz) | Son |
+| **Victory Native** | Grafikler (dashboard) | Son |
 | **React Native Paper** | Material Design bileşenleri | v5 |
-| **Zustand** | State management | - |
-| **Axios** | HTTP istemcisi | - |
+| **Zustand** | State management | v5 |
+| **Axios** | HTTP istemcisi | v1 |
+| **i18next** | Çoklu dil (Türkçe + İngilizce) | Son |
+| **Lottie** | Animasyonlar (splash, loading) | Son |
 
 ### Proje Yapısı
 
