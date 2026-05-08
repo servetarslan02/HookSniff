@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 01:50 GMT+8
+> Son güncelleme: 2026-05-09 02:38 GMT+8
 
 ---
 
@@ -51,7 +51,38 @@ PR merge: admin override ile CI bypass.
 
 ---
 
-## 📋 YENİ OTURUM YAPILACAKLAR — MEVCUT SİSTEMİ KUSURSUZLAŞTIR
+## 🔴 KRİTİK: GRAFANA OTEL TOKEN (Oturum 16'da çözülemedi)
+
+### Sorun
+- Mevcut `glc_` token'lar 401 döndü (tüm region'lar denendi: eu-west-2, us-central-0, us-east-0)
+- `glsa_` token da "legacy auth cannot be upgraded" hatası verdi
+- Grafana Cloud UI'da JS hatası (`removeChild`) — plugin bug
+
+### Çözüm (yeni oturumda yapılacak)
+1. Servet'ten Grafana Cloud **API Key** (glsa_ değil, doğrudan API Key) iste
+2. Grafana Cloud → profil → **API Keys** → **Add API Key** → Role: `Editor`
+3. Alternatif: `https://grafana.com/orgs/hooksniff/api-keys` adresinden doğrudan oluştur
+4. Token geldiğinde test et:
+```bash
+curl -X POST https://otlp-gateway-prod-eu-west-2.grafana.net/otlp/v1/traces \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <INSTANCE_ID>:<TOKEN>" \
+  -d '{"resourceSpans":[]}'
+```
+5. EXTERNAL_TOKENS.md'de `GRAFANA_OTEL_HEADERS` güncelle
+6. `.env.production.example`'deki `OTEL_EXPORTER_OTLP_ENDPOINT` ve `OTEL_EXPORTER_OTLP_HEADERS` de güncellenmeli
+7. Push et
+
+### Mevcut EXTERNAL_TOKENS.md'deki bilgiler
+- Stack ID: `1757335`
+- Stack name: `hooksniff-hooksniff2` (yeni) / `grafana-irm-app` (eski)
+- Region: `prod-eu-west-2` (muhtemel)
+- Eski token (çalışmıyor): `glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmMiIsImsiOiJmR2Y1Mzk3SVk3WU00WDN2azIyaWlDNG4iLCJtIjp7InIiOiJ1cyJ9fQ==`
+- Yeni denenen token (çalışmıyor): `glsa_cYOXJb0z8708txX4T1JVCKXCOdUVxHH0_b85ebf39`
+
+---
+
+## 📋 ÖNCEKI GÖREVLER (Tümü tamamlandı ✅)
 
 ### ~~1. OpenAPI Spec Yaz~~ ✅ TAMAMLANDI (Oturum 16)
 - **Dosya:** `docs/openapi.yaml` — 74KB, OpenAPI 3.0.3, tüm 60+ endpoint
