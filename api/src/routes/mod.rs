@@ -7,6 +7,7 @@ pub mod billing;
 pub mod contact;
 pub mod customer_portal;
 pub mod delivery_details;
+pub mod devices;
 pub mod docs;
 pub mod endpoints;
 pub mod health;
@@ -65,6 +66,7 @@ pub fn api_router() -> Router {
         .nest("/portal", customer_portal::router())
         .nest("/teams", teams::router())
         .nest("/notifications", notifications::router())
+        .nest("/devices", devices::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Inbound webhooks — uses API key auth (not JWT), so external services can call it
