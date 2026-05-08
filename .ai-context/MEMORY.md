@@ -159,7 +159,7 @@ cd dashboard && npm install && npm run build
 - **GitHub billing** — $12 ödenmemiş fatura (opsiyonel, CI artık local)
 
 ### Teknik Borç
-- sqlx 0.8.4 → 0.8 upgrade (security audit vulnerabilities)
+- sqlx 0.7.4 → 0.8.6 upgrade — ✅ TAMAMLANDI
 - Dependency temizliği — cargo-udeps ile kontrol (API: 37, Worker: 22)
 
 ---
