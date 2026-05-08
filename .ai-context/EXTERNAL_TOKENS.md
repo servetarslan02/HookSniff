@@ -33,8 +33,16 @@ POLAR_WEBHOOK_SECRET=polar_whs_bjhiDZvCoWIoGvrgBBVm49ZhMIKmX7hSekMt92hxmnB
 POLAR_PRODUCT_PRO=ec5826ad-4a01-4146-b2d0-3b99eaf150a5
 POLAR_PRODUCT_BUSINESS=e5b7d88a-7606-4963-a070-4102ca6405e2
 
-# Grafana
-GRAFANA_OTEL_HEADERS=Authorization=Bearer 1757335:glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmMiIsImsiOiJmR2Y1Mzk3SVk3WU00WDN2azIyaWlDNG4iLCJtIjp7InIiOiJ1cyJ9fQ==
+# Grafana Cloud OTEL
+# Stack: hookrelay (ID: 1625476), Region: prod-eu-west-2
+# OTLP Endpoint: https://otlp-gateway-prod-eu-west-2.grafana.net
+# Auth: Basic base64(1625476:<glc_token>)
+# Token yenileme: https://grafana.com/orgs/hookrelay → Security → Cloud Access Policies → hooksniff
+GRAFANA_STACK_ID=1625476
+GRAFANA_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net
+GRAFANA_OTEL_TOKEN=glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJzdGFjay0xNjI1NDc2LWFsbG95LWhvb2tyZWxheSIsImsiOiI1NVlRaDFDSjEyOWs2QzNFV1E2N3F2SVUiLCJtIjp7InIiOiJwcm9kLWV1LXdlc3QtMiJ9fQ==
+GRAFANA_OTEL_AUTH_BASIC=MTYyNTQ3NjpnbGNfZXlKdklqb2lNVGMxTnpNek5TSXNJbTRpT2lKb2IyOXJjMjVwWm1ZdGFHOXZhM0psYkdGNUlpd2lheUk2SWpoQk1FTllOVE54YUdOME56WlBNVXhGVURnNWFVUXhRaUlzSW0waU9uc2ljaUk2SW5WekluMTk=
+GRAFANA_OTEL_HEADERS=Authorization=Basic MTYyNTQ3NjpnbGNfZXlKdklqb2lNVGMxTnpNek5TSXNJbTRpT2lKb2IyOXJjMjVwWm1ZdGFHOXZhM0psYkdGNUlpd2lheUk2SWpoQk1FTllOVE54YUdOME56WlBNVXhGVURnNWFVUXhRaUlzSW0waU9uc2ljaUk2SW5WekluMTk=
 
 # Cloudflare
 CF_ACCOUNT_ID=2a7ee86912c49fd36cff048204c37f70
