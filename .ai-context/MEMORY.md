@@ -102,12 +102,13 @@
 3. Transform pipeline testi — name field silinmiyor ama test silinmesini bekliyor
 
 ### SDK Hataları (2026-05-08 tespit edildi — detay: .ai-context/SDK_AUDIT.md)
-1. PHP SDK `send()` duplicate satır — kod çalışmaz
-2. Tüm SDK'lar yanlış base URL (api.hooksniff.io → GCP Cloud Run)
-3. Java Gson 2.10.1 eski (güncel: 2.11.0)
-4. Go 1.21 eski (güncel: 1.22)
-5. Versiyon tutarsızlığı (0.1.0 ~ 0.4.0 arası)
-6. Hiçbir SDK'da test, CI, publish yok
+1. **🔴 AI Center backend'de yok** — SDK'da kod var ama endpoint'ler tanımlanmamış. SDK'dan kaldırılacak.
+2. PHP SDK `send()` duplicate satır — kod çalışmaz
+3. Tüm SDK'lar yanlış base URL (api.hooksniff.io → GCP Cloud Run)
+4. Java Gson 2.10.1 eski (güncel: 2.11.0)
+5. Go 1.21 eski (güncel: 1.22)
+6. Versiyon tutarsızlığı (0.1.0 ~ 0.4.0 arası)
+7. Hiçbir SDK'da test, CI, publish yok
 
 ---
 
