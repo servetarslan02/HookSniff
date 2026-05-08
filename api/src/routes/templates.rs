@@ -7,7 +7,9 @@ use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
-use crate::templates::{ApplyTemplateRequest, ApplyTemplateResponse, TemplateListResponse, WebhookTemplate};
+use crate::templates::{
+    ApplyTemplateRequest, ApplyTemplateResponse, TemplateListResponse, WebhookTemplate,
+};
 
 pub fn router() -> Router {
     Router::new()
@@ -39,9 +41,7 @@ async fn list_templates(
 }
 
 /// GET /v1/templates/{id} — Get template details
-async fn get_template(
-    Path(id): Path<String>,
-) -> Result<Json<WebhookTemplate>, AppError> {
+async fn get_template(Path(id): Path<String>) -> Result<Json<WebhookTemplate>, AppError> {
     WebhookTemplate::find_by_id(&id)
         .map(Json)
         .ok_or(AppError::NotFound)
@@ -61,8 +61,7 @@ async fn apply_template(
         .custom_headers
         .or(Some(template.endpoint_config.custom_headers.clone()));
 
-    let event_filter: Option<Vec<String>> =
-        Some(template.endpoint_config.event_filter.clone());
+    let event_filter: Option<Vec<String>> = Some(template.endpoint_config.event_filter.clone());
 
     let endpoint = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
         "INSERT INTO endpoints (customer_id, url, description, event_filter, custom_headers) VALUES ($1, $2, $3, $4, $5) RETURNING *",

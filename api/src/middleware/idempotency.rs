@@ -138,7 +138,10 @@ impl std::error::Error for ReplayError {}
 /// Check if a webhook timestamp is within the tolerance window.
 ///
 /// Returns `Ok(())` if the timestamp is fresh enough, `Err(ReplayError)` otherwise.
-pub fn check_timestamp(webhook_timestamp: i64, tolerance_secs: Option<i64>) -> Result<(), ReplayError> {
+pub fn check_timestamp(
+    webhook_timestamp: i64,
+    tolerance_secs: Option<i64>,
+) -> Result<(), ReplayError> {
     let tolerance = tolerance_secs.unwrap_or(DEFAULT_TIMESTAMP_TOLERANCE_SECS);
     let now = Utc::now().timestamp();
     let age = (now - webhook_timestamp).abs();
@@ -295,16 +298,13 @@ mod tests {
     fn test_check_timestamp_expired() {
         let old = Utc::now().timestamp() - 600; // 10 min ago
         let result = check_timestamp(old, None);
-        assert!(matches!(
-            result,
-            Err(ReplayError::TimestampExpired { .. })
-        ));
+        assert!(matches!(result, Err(ReplayError::TimestampExpired { .. })));
     }
 
     #[test]
     fn test_check_timestamp_custom_tolerance() {
         let old = Utc::now().timestamp() - 600; // 10 min ago
-        // With 15 minute tolerance, should pass
+                                                // With 15 minute tolerance, should pass
         assert!(check_timestamp(old, Some(900)).is_ok());
         // With 5 minute tolerance, should fail
         assert!(check_timestamp(old, Some(300)).is_err());

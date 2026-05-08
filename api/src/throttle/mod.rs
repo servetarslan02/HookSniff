@@ -60,8 +60,8 @@ pub struct ThrottleConfig {
 impl Default for ThrottleConfig {
     fn default() -> Self {
         Self {
-            rate: None,         // Sınır yok
-            period_secs: 60,    // 1 dakika
+            rate: None,      // Sınır yok
+            period_secs: 60, // 1 dakika
             strategy: ThrottleStrategy::SlidingWindow,
         }
     }
@@ -97,12 +97,7 @@ impl ThrottleManager {
     ///
     /// `true` = teslimat yapılabilir
     /// `false` = rate limit aşıldı, ertelenmeli
-    pub async fn check(
-        &self,
-        endpoint_id: Uuid,
-        rate: u32,
-        period: Duration,
-    ) -> bool {
+    pub async fn check(&self, endpoint_id: Uuid, rate: u32, period: Duration) -> bool {
         let mut states = self.states.lock().await;
         let now = Instant::now();
 
@@ -113,7 +108,9 @@ impl ThrottleManager {
 
         // Eski zaman damgalarını temizle
         if now.duration_since(state.last_cleanup) > self.cleanup_interval {
-            state.timestamps.retain(|ts| now.duration_since(*ts) < period);
+            state
+                .timestamps
+                .retain(|ts| now.duration_since(*ts) < period);
             state.last_cleanup = now;
         }
 
@@ -131,12 +128,7 @@ impl ThrottleManager {
     }
 
     /// Rate limit aşıldığında ne kadar beklenmeli (saniye)
-    pub async fn retry_after(
-        &self,
-        endpoint_id: Uuid,
-        rate: u32,
-        period: Duration,
-    ) -> u64 {
+    pub async fn retry_after(&self, endpoint_id: Uuid, rate: u32, period: Duration) -> u64 {
         let states = self.states.lock().await;
         let now = Instant::now();
 

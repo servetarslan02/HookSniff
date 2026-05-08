@@ -43,8 +43,7 @@ pub fn compute_standard_signature(
     let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
     let secret_bytes = decode_secret(secret);
 
-    let mut mac =
-        HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
+    let mut mac = HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
     mac.update(signed_content.as_bytes());
     let result = mac.finalize();
     let signature = BASE64.encode(result.into_bytes());
@@ -87,8 +86,7 @@ pub fn verify_standard_signature(
     let secret_bytes = decode_secret(secret);
     let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
 
-    let mut mac =
-        HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
+    let mut mac = HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
     mac.update(signed_content.as_bytes());
     let expected_bytes = mac.finalize().into_bytes();
 
@@ -155,7 +153,14 @@ pub fn verify_from_headers(
         .or_else(|| get_header(headers, HEADER_SVIX_TIMESTAMP))
         .ok_or(VerificationError::MissingHeader("webhook-timestamp"))?;
 
-    verify_standard_signature(secret, msg_id, msg_timestamp, msg_signature, body, tolerance_secs)
+    verify_standard_signature(
+        secret,
+        msg_id,
+        msg_timestamp,
+        msg_signature,
+        body,
+        tolerance_secs,
+    )
 }
 
 /// Verify signature ignoring timestamp (for testing only).
@@ -173,8 +178,7 @@ pub fn verify_ignoring_timestamp(
     let timestamp = "0";
     let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
 
-    let mut mac =
-        HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
+    let mut mac = HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
     mac.update(signed_content.as_bytes());
     let expected_bytes = mac.finalize().into_bytes();
 
@@ -257,7 +261,9 @@ pub struct WebhookVerifier {
 impl WebhookVerifier {
     /// Create a new verifier with the given secret.
     pub fn new(secret: impl Into<String>) -> Self {
-        Self { secret: secret.into() }
+        Self {
+            secret: secret.into(),
+        }
     }
 
     /// Verify a webhook signature.
@@ -269,7 +275,14 @@ impl WebhookVerifier {
         body: &str,
         tolerance_secs: Option<i64>,
     ) -> Result<(), VerificationError> {
-        verify_standard_signature(&self.secret, msg_id, timestamp, signature_header, body, tolerance_secs)
+        verify_standard_signature(
+            &self.secret,
+            msg_id,
+            timestamp,
+            signature_header,
+            body,
+            tolerance_secs,
+        )
     }
 
     /// Verify using a specific timestamp (for testing).
@@ -284,14 +297,16 @@ impl WebhookVerifier {
         let secret_bytes = decode_secret(&self.secret);
         let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
 
-        let mut mac = HmacSha256::new_from_slice(&secret_bytes)
-            .expect("HMAC can take key of any size");
+        let mut mac =
+            HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
         mac.update(signed_content.as_bytes());
         let expected_bytes = mac.finalize().into_bytes();
 
         for sig_part in signature_header.split(' ') {
             let sig_part = sig_part.trim();
-            if sig_part.is_empty() { continue; }
+            if sig_part.is_empty() {
+                continue;
+            }
 
             let encoded = match sig_part.strip_prefix(&format!("{},", SIGNATURE_VERSION)) {
                 Some(e) => e,
@@ -304,10 +319,13 @@ impl WebhookVerifier {
             };
 
             if sig_bytes.len() == expected_bytes.len() {
-                let diff: u8 = sig_bytes.iter()
+                let diff: u8 = sig_bytes
+                    .iter()
                     .zip(expected_bytes.iter())
                     .fold(0u8, |acc, (a, b)| acc | (a ^ b));
-                if diff == 0 { return Ok(()); }
+                if diff == 0 {
+                    return Ok(());
+                }
             }
         }
 
@@ -371,7 +389,10 @@ mod tests {
 
         let sig = compute_standard_signature(secret, msg_id, &old_ts, body);
         let result = verify_standard_signature(secret, msg_id, &old_ts, &sig, body, None);
-        assert!(matches!(result, Err(VerificationError::TimestampExpired { .. })));
+        assert!(matches!(
+            result,
+            Err(VerificationError::TimestampExpired { .. })
+        ));
     }
 
     #[test]
@@ -381,8 +402,7 @@ mod tests {
         let body = r#"{"event":"test"}"#;
 
         let sig = compute_standard_signature("whsec_correct", msg_id, timestamp, body);
-        let result =
-            verify_standard_signature("whsec_wrong", msg_id, timestamp, &sig, body, None);
+        let result = verify_standard_signature("whsec_wrong", msg_id, timestamp, &sig, body, None);
         assert_eq!(result, Err(VerificationError::SignatureMismatch));
     }
 
@@ -405,10 +425,7 @@ mod tests {
         let body = r#"{"email":"test@example.com","username":"test_user"}"#;
 
         let sig = compute_standard_signature(wh_secret, msg_id, &timestamp.to_string(), body);
-        assert_eq!(
-            sig,
-            "v1,tZ1I4/hDygAJgO5TYxiSd6Sd0kDW6hPenDe+bTa3Kkw="
-        );
+        assert_eq!(sig, "v1,tZ1I4/hDygAJgO5TYxiSd6Sd0kDW6hPenDe+bTa3Kkw=");
     }
 
     #[test]
@@ -459,7 +476,9 @@ mod tests {
 
         let sig = verifier.sign(msg_id, timestamp, body);
         // verify_with_timestamp skips tolerance check
-        assert!(verifier.verify_with_timestamp(msg_id, timestamp, &sig, body).is_ok());
+        assert!(verifier
+            .verify_with_timestamp(msg_id, timestamp, &sig, body)
+            .is_ok());
     }
 
     #[test]

@@ -34,8 +34,8 @@ impl AnalyticsQuery {
     fn bucket_size_hours(&self) -> i64 {
         match self.range.as_deref() {
             Some("30d") => 24, // daily buckets
-            Some("7d") => 6, // 6-hour buckets
-            _ => 1, // hourly buckets for 24h
+            Some("7d") => 6,   // 6-hour buckets
+            _ => 1,            // hourly buckets for 24h
         }
     }
 }

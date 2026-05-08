@@ -88,10 +88,7 @@ async fn get_schema(
 ) -> Result<Json<Value>, AppError> {
     let registry = SchemaRegistry::new(pool);
 
-    let schema = registry
-        .get(id)
-        .await?
-        .ok_or(AppError::NotFound)?;
+    let schema = registry.get(id).await?.ok_or(AppError::NotFound)?;
 
     Ok(Json(json!({
         "id": schema.id,

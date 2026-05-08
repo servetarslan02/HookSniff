@@ -142,14 +142,15 @@ impl IndustryPackage for FintechPackage {
                     "fraud.detected".to_string(),
                     "transaction.anomaly".to_string(),
                 ],
-                description: "Every completed payment triggers fraud analysis and anomaly detection".to_string(),
+                description:
+                    "Every completed payment triggers fraud analysis and anomaly detection"
+                        .to_string(),
             },
             WebhookChain {
                 trigger_event: "fraud.detected".to_string(),
-                downstream_events: vec![
-                    "account.frozen".to_string(),
-                ],
-                description: "High-confidence fraud detection triggers automatic account freeze".to_string(),
+                downstream_events: vec!["account.frozen".to_string()],
+                description: "High-confidence fraud detection triggers automatic account freeze"
+                    .to_string(),
             },
         ]
     }

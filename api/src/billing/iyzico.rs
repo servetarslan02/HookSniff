@@ -20,8 +20,8 @@ use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
 
-use crate::billing::Plan;
 use crate::billing::provider::{CheckoutResult, PaymentProviderImpl, WebhookResult};
+use crate::billing::Plan;
 use crate::error::AppError;
 
 type HmacSha256 = Hmac<Sha256>;
@@ -32,7 +32,7 @@ pub struct IyzicoConfig {
     pub api_key: String,
     pub secret_key: String,
     pub base_url: String,
-    pub price_pro_kurus: i64,      // Price in kuruş (₺1 = 100 kuruş)
+    pub price_pro_kurus: i64, // Price in kuruş (₺1 = 100 kuruş)
     pub price_business_kurus: i64,
 }
 
@@ -231,10 +231,11 @@ impl IyzicoProvider {
 
         let signature_payload = format!("{}{}{}", random_string, uri, body);
 
-        let mut mac = HmacSha256::new_from_slice(self.config.secret_key.as_bytes())
-            .expect("HMAC key error");
+        let mut mac =
+            HmacSha256::new_from_slice(self.config.secret_key.as_bytes()).expect("HMAC key error");
         mac.update(signature_payload.as_bytes());
-        let signature = base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
+        let signature =
+            base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
 
         IyzicoAuth {
             api_key: self.config.api_key.clone(),
@@ -274,7 +275,8 @@ impl IyzicoProvider {
         let mut mac = HmacSha256::new_from_slice(self.config.secret_key.as_bytes())
             .map_err(|_| AppError::Internal(anyhow::anyhow!("HMAC key error")))?;
         mac.update(payload.as_bytes());
-        let expected = base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
+        let expected =
+            base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
 
         if signature != expected {
             tracing::warn!(
@@ -378,10 +380,9 @@ impl PaymentProviderImpl for IyzicoProvider {
             )));
         }
 
-        let init_resp: PaymentInitResponse = resp
-            .json()
-            .await
-            .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse iyzico response: {}", e)))?;
+        let init_resp: PaymentInitResponse = resp.json().await.map_err(|e| {
+            AppError::Internal(anyhow::anyhow!("Failed to parse iyzico response: {}", e))
+        })?;
 
         if init_resp.status != "success" {
             return Err(AppError::Internal(anyhow::anyhow!(
@@ -452,10 +453,7 @@ impl PaymentProviderImpl for IyzicoProvider {
         ))
     }
 
-    async fn cancel_subscription(
-        &self,
-        _iyzico_subscription_id: &str,
-    ) -> Result<(), AppError> {
+    async fn cancel_subscription(&self, _iyzico_subscription_id: &str) -> Result<(), AppError> {
         // iyzico doesn't have native subscriptions.
         // We handle cancellation on our side by marking the subscription as canceled.
         tracing::info!("iyzico subscription canceled (handled server-side)");

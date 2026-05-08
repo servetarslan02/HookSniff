@@ -4,11 +4,11 @@
 //! Checks `webhook-id`, `webhook-timestamp`, and `webhook-signature` headers.
 
 use axum::{
+    body::Body,
     extract::Request,
     http::StatusCode,
     middleware::Next,
     response::{IntoResponse, Response},
-    body::Body,
 };
 use serde_json::json;
 
@@ -23,10 +23,7 @@ use crate::signing;
 ///
 /// The signing secret is expected to be available in request extensions
 /// (set by the endpoint resolution logic upstream).
-pub async fn webhook_verify_middleware(
-    mut req: Request,
-    next: Next,
-) -> Result<Response, Response> {
+pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<Response, Response> {
     // Extract Standard Webhooks headers
     let msg_id = req
         .headers()
@@ -86,54 +83,46 @@ pub async fn webhook_verify_middleware(
                     *req.body_mut() = Body::from(body_bytes);
                     Ok(next.run(req).await)
                 }
-                Err(signing::VerificationError::TimestampExpired { age_secs, .. }) => {
-                    Err((
-                        StatusCode::BAD_REQUEST,
-                        axum::Json(json!({
-                            "error": {
-                                "code": "TIMESTAMP_EXPIRED",
-                                "message": format!("Webhook timestamp expired ({}s old)", age_secs)
-                            }
-                        })),
-                    )
-                        .into_response())
-                }
-                Err(signing::VerificationError::SignatureMismatch) => {
-                    Err((
-                        StatusCode::UNAUTHORIZED,
-                        axum::Json(json!({
-                            "error": {
-                                "code": "INVALID_SIGNATURE",
-                                "message": "Webhook signature verification failed"
-                            }
-                        })),
-                    )
-                        .into_response())
-                }
-                Err(signing::VerificationError::InvalidTimestamp) => {
-                    Err((
-                        StatusCode::BAD_REQUEST,
-                        axum::Json(json!({
-                            "error": {
-                                "code": "INVALID_TIMESTAMP",
-                                "message": "Invalid webhook timestamp header"
-                            }
-                        })),
-                    )
-                        .into_response())
-                }
-                Err(signing::VerificationError::MissingHeader(name)) => {
-                    Err((
-                        StatusCode::BAD_REQUEST,
-                        axum::Json(json!({
-                            "error": {
-                                "code": "MISSING_HEADER",
-                                "message": format!("Missing required header: {}", name)
-                            }
-                        })),
-                    )
-                        .into_response())
-                }
+                Err(signing::VerificationError::TimestampExpired { age_secs, .. }) => Err((
+                    StatusCode::BAD_REQUEST,
+                    axum::Json(json!({
+                        "error": {
+                            "code": "TIMESTAMP_EXPIRED",
+                            "message": format!("Webhook timestamp expired ({}s old)", age_secs)
+                        }
+                    })),
+                )
+                    .into_response()),
+                Err(signing::VerificationError::SignatureMismatch) => Err((
+                    StatusCode::UNAUTHORIZED,
+                    axum::Json(json!({
+                        "error": {
+                            "code": "INVALID_SIGNATURE",
+                            "message": "Webhook signature verification failed"
+                        }
+                    })),
+                )
+                    .into_response()),
+                Err(signing::VerificationError::InvalidTimestamp) => Err((
+                    StatusCode::BAD_REQUEST,
+                    axum::Json(json!({
+                        "error": {
+                            "code": "INVALID_TIMESTAMP",
+                            "message": "Invalid webhook timestamp header"
+                        }
+                    })),
+                )
+                    .into_response()),
+                Err(signing::VerificationError::MissingHeader(name)) => Err((
+                    StatusCode::BAD_REQUEST,
+                    axum::Json(json!({
+                        "error": {
+                            "code": "MISSING_HEADER",
+                            "message": format!("Missing required header: {}", name)
+                        }
+                    })),
+                )
+                    .into_response()),
             }
         } else {
             // No signing secret available, pass through

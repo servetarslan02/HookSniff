@@ -104,10 +104,7 @@ pub async fn create_checkout_session(
         .as_ref()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Stripe not configured")))?;
 
-    let base_url = cfg
-        .app_url
-        .as_deref()
-        .unwrap_or("http://localhost:3001");
+    let base_url = cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
 
     let session = CreateCheckoutSession {
         customer: None, // Will be created by Stripe if not exists
@@ -145,10 +142,9 @@ pub async fn create_checkout_session(
         )));
     }
 
-    let session: CheckoutSessionResponse = resp
-        .json()
-        .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse Stripe response: {}", e)))?;
+    let session: CheckoutSessionResponse = resp.json().await.map_err(|e| {
+        AppError::Internal(anyhow::anyhow!("Failed to parse Stripe response: {}", e))
+    })?;
 
     Ok(session)
 }
@@ -165,10 +161,7 @@ pub async fn create_customer_portal(
         .as_ref()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Stripe not configured")))?;
 
-    let base_url = cfg
-        .app_url
-        .as_deref()
-        .unwrap_or("http://localhost:3001");
+    let base_url = cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
 
     let client = reqwest::Client::new();
     let resp = client
@@ -185,9 +178,7 @@ pub async fn create_customer_portal(
     if !resp.status().is_success() {
         let body = resp.text().await.unwrap_or_default();
         tracing::error!("Stripe portal creation failed: {}", body);
-        return Err(AppError::Internal(anyhow::anyhow!(
-            "Stripe portal failed"
-        )));
+        return Err(AppError::Internal(anyhow::anyhow!("Stripe portal failed")));
     }
 
     #[derive(Deserialize)]
@@ -195,10 +186,9 @@ pub async fn create_customer_portal(
         url: String,
     }
 
-    let portal: PortalResponse = resp
-        .json()
-        .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse portal response: {}", e)))?;
+    let portal: PortalResponse = resp.json().await.map_err(|e| {
+        AppError::Internal(anyhow::anyhow!("Failed to parse portal response: {}", e))
+    })?;
 
     Ok(portal.url)
 }
@@ -328,13 +318,11 @@ async fn handle_subscription_updated(
         _ => "free",
     };
 
-    sqlx::query(
-        "UPDATE customers SET plan = $1 WHERE stripe_subscription_id = $2"
-    )
-    .bind(plan)
-    .bind(stripe_subscription_id)
-    .execute(pool)
-    .await?;
+    sqlx::query("UPDATE customers SET plan = $1 WHERE stripe_subscription_id = $2")
+        .bind(plan)
+        .bind(stripe_subscription_id)
+        .execute(pool)
+        .await?;
 
     tracing::info!(
         "✅ Subscription {} updated: status={}, plan={}",
@@ -427,12 +415,11 @@ async fn handle_invoice_paid(
         .flatten();
 
     // Look up internal customer_id from stripe_customer_id
-    let customer_row: Option<(uuid::Uuid,)> = sqlx::query_as(
-        "SELECT id FROM customers WHERE stripe_customer_id = $1",
-    )
-    .bind(stripe_customer_id)
-    .fetch_optional(pool)
-    .await?;
+    let customer_row: Option<(uuid::Uuid,)> =
+        sqlx::query_as("SELECT id FROM customers WHERE stripe_customer_id = $1")
+            .bind(stripe_customer_id)
+            .fetch_optional(pool)
+            .await?;
 
     if let Some((customer_id,)) = customer_row {
         sqlx::query(
@@ -491,12 +478,11 @@ async fn handle_invoice_failed(
         .to_string();
 
     // Look up internal customer_id
-    let customer_row: Option<(uuid::Uuid,)> = sqlx::query_as(
-        "SELECT id FROM customers WHERE stripe_customer_id = $1",
-    )
-    .bind(stripe_customer_id)
-    .fetch_optional(pool)
-    .await?;
+    let customer_row: Option<(uuid::Uuid,)> =
+        sqlx::query_as("SELECT id FROM customers WHERE stripe_customer_id = $1")
+            .bind(stripe_customer_id)
+            .fetch_optional(pool)
+            .await?;
 
     if let Some((customer_id,)) = customer_row {
         // Record the failed invoice
@@ -519,12 +505,21 @@ async fn handle_invoice_failed(
 /// Helper: convert CheckoutSession to form-encoded fields for Stripe API
 fn checkout_to_form(session: &CreateCheckoutSession) -> Vec<(String, String)> {
     let mut fields = vec![
-        ("client_reference_id".to_string(), session.client_reference_id.clone()),
+        (
+            "client_reference_id".to_string(),
+            session.client_reference_id.clone(),
+        ),
         ("success_url".to_string(), session.success_url.clone()),
         ("cancel_url".to_string(), session.cancel_url.clone()),
         ("mode".to_string(), session.mode.clone()),
-        ("line_items[0][price]".to_string(), session.line_items[0].price.clone()),
-        ("line_items[0][quantity]".to_string(), session.line_items[0].quantity.to_string()),
+        (
+            "line_items[0][price]".to_string(),
+            session.line_items[0].price.clone(),
+        ),
+        (
+            "line_items[0][quantity]".to_string(),
+            session.line_items[0].quantity.to_string(),
+        ),
     ];
 
     if let Some(ref customer) = session.customer {
@@ -560,11 +555,9 @@ fn parse_stripe_signature(header: &str) -> Result<(i64, &str), AppError> {
 
         match key {
             "t" => {
-                timestamp = Some(
-                    value
-                        .parse::<i64>()
-                        .map_err(|_| AppError::BadRequest("Invalid timestamp in signature header".into()))?,
-                );
+                timestamp = Some(value.parse::<i64>().map_err(|_| {
+                    AppError::BadRequest("Invalid timestamp in signature header".into())
+                })?);
             }
             "v1" => {
                 // Accept the first v1 signature we see
@@ -576,8 +569,10 @@ fn parse_stripe_signature(header: &str) -> Result<(i64, &str), AppError> {
         }
     }
 
-    let ts = timestamp.ok_or_else(|| AppError::BadRequest("Missing timestamp in signature header".into()))?;
-    let sig = v1_sig.ok_or_else(|| AppError::BadRequest("Missing v1 signature in header".into()))?;
+    let ts = timestamp
+        .ok_or_else(|| AppError::BadRequest("Missing timestamp in signature header".into()))?;
+    let sig =
+        v1_sig.ok_or_else(|| AppError::BadRequest("Missing v1 signature in header".into()))?;
 
     Ok((ts, sig))
 }

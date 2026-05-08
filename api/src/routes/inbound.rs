@@ -26,11 +26,11 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::db;
 use crate::error::AppError;
 use crate::models::customer::Customer;
-use crate::models::endpoint::Endpoint;
 use crate::models::delivery::Delivery;
-use crate::db;
+use crate::models::endpoint::Endpoint;
 
 pub fn router() -> Router {
     Router::new()
@@ -105,12 +105,11 @@ impl Provider {
                 // GitHub uses X-GitHub-Event header, not in body
                 None
             }
-            Provider::Shopify => {
-                json.get("topic")
-                    .or_else(|| json.get("event"))
-                    .and_then(|v| v.as_str())
-                    .map(String::from)
-            }
+            Provider::Shopify => json
+                .get("topic")
+                .or_else(|| json.get("event"))
+                .and_then(|v| v.as_str())
+                .map(String::from),
             Provider::Generic => json.get("event").and_then(|v| v.as_str()).map(String::from),
         }
     }
@@ -288,18 +287,20 @@ async fn handle_inbound(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?
-    .ok_or(AppError::BadRequest("Target endpoint not found or inactive".into()))?;
+    .ok_or(AppError::BadRequest(
+        "Target endpoint not found or inactive".into(),
+    ))?;
 
     // Create delivery
     let event_type = provider
         .extract_event_type(&body)
         .unwrap_or_else(|| format!("inbound.{}", provider));
 
-    let payload: serde_json::Value = serde_json::from_slice(&body).unwrap_or_else(|_| {
-        serde_json::json!({"raw": String::from_utf8_lossy(&body).to_string()})
-    });
+    let payload: serde_json::Value = serde_json::from_slice(&body)
+        .unwrap_or_else(|_| serde_json::json!({"raw": String::from_utf8_lossy(&body).to_string()}));
 
-    let retry_policy = crate::models::endpoint::RetryPolicy::from_value(endpoint.retry_policy.as_ref());
+    let retry_policy =
+        crate::models::endpoint::RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
     let delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES ($1, $2, $3, $4, 'pending', $5) RETURNING *",
@@ -350,13 +351,12 @@ async fn handle_inbound_to_endpoint(
         .ok_or(AppError::BadRequest("Missing API key".into()))?;
 
     // Find customer
-    let customer = sqlx::query_as::<_, Customer>(
-        "SELECT * FROM customers WHERE api_key_prefix = $1",
-    )
-    .bind(&api_key[..20.min(api_key.len())])
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::Unauthorized)?;
+    let customer =
+        sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+            .bind(&api_key[..20.min(api_key.len())])
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::Unauthorized)?;
 
     // Find endpoint
     let endpoint = sqlx::query_as::<_, Endpoint>(
@@ -385,11 +385,11 @@ async fn handle_inbound_to_endpoint(
         .extract_event_type(&body)
         .unwrap_or_else(|| format!("inbound.{}", provider));
 
-    let payload: serde_json::Value = serde_json::from_slice(&body).unwrap_or_else(|_| {
-        serde_json::json!({"raw": String::from_utf8_lossy(&body).to_string()})
-    });
+    let payload: serde_json::Value = serde_json::from_slice(&body)
+        .unwrap_or_else(|_| serde_json::json!({"raw": String::from_utf8_lossy(&body).to_string()}));
 
-    let retry_policy = crate::models::endpoint::RetryPolicy::from_value(endpoint.retry_policy.as_ref());
+    let retry_policy =
+        crate::models::endpoint::RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
     let delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES ($1, $2, $3, $4, 'pending', $5) RETURNING *",

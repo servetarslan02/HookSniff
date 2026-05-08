@@ -9,8 +9,14 @@ use std::time::Instant;
 pub async fn status_options() -> (StatusCode, axum::http::HeaderMap, &'static str) {
     let mut headers = axum::http::HeaderMap::new();
     headers.insert("Access-Control-Allow-Origin", "*".parse().unwrap());
-    headers.insert("Access-Control-Allow-Methods", "GET, OPTIONS".parse().unwrap());
-    headers.insert("Access-Control-Allow-Headers", "Content-Type".parse().unwrap());
+    headers.insert(
+        "Access-Control-Allow-Methods",
+        "GET, OPTIONS".parse().unwrap(),
+    );
+    headers.insert(
+        "Access-Control-Allow-Headers",
+        "Content-Type".parse().unwrap(),
+    );
     headers.insert("Access-Control-Max-Age", "86400".parse().unwrap());
     (StatusCode::NO_CONTENT, headers, "")
 }
@@ -49,8 +55,14 @@ pub async fn system_status(
 ) -> (StatusCode, axum::http::HeaderMap, Json<SystemStatus>) {
     let mut headers = axum::http::HeaderMap::new();
     headers.insert("Access-Control-Allow-Origin", "*".parse().unwrap());
-    headers.insert("Access-Control-Allow-Methods", "GET, OPTIONS".parse().unwrap());
-    headers.insert("Access-Control-Allow-Headers", "Content-Type".parse().unwrap());
+    headers.insert(
+        "Access-Control-Allow-Methods",
+        "GET, OPTIONS".parse().unwrap(),
+    );
+    headers.insert(
+        "Access-Control-Allow-Headers",
+        "Content-Type".parse().unwrap(),
+    );
 
     let now = chrono::Utc::now().to_rfc3339();
     let mut components = Vec::new();
@@ -246,7 +258,7 @@ pub async fn health_check(
     // Queue check — verify webhook_queue is accessible
     let queue_start = Instant::now();
     let queue_status = match sqlx::query_scalar::<_, i64>(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'pending'"
+        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'pending'",
     )
     .fetch_one(&pool)
     .await
@@ -274,7 +286,7 @@ pub async fn health_check(
 
     // Last successful delivery check
     let last_delivery_status = match sqlx::query_scalar::<_, Option<chrono::DateTime<chrono::Utc>>>(
-        "SELECT MAX(processed_at) FROM webhook_queue WHERE status = 'delivered'"
+        "SELECT MAX(processed_at) FROM webhook_queue WHERE status = 'delivered'",
     )
     .fetch_one(&pool)
     .await
@@ -300,7 +312,11 @@ pub async fn health_check(
         StatusCode::SERVICE_UNAVAILABLE
     };
 
-    let status_str = if overall_healthy { "healthy" } else { "degraded" };
+    let status_str = if overall_healthy {
+        "healthy"
+    } else {
+        "degraded"
+    };
 
     (
         status_code,

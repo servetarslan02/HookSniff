@@ -33,60 +33,29 @@ pub struct ConditionalFilter {
 #[serde(tag = "op", rename_all = "snake_case")]
 pub enum Condition {
     /// Comparison: field equals value
-    Equals {
-        field: String,
-        value: Value,
-    },
+    Equals { field: String, value: Value },
     /// Comparison: field does not equal value
-    NotEquals {
-        field: String,
-        value: Value,
-    },
+    NotEquals { field: String, value: Value },
     /// Comparison: field contains substring (for strings) or element (for arrays)
-    Contains {
-        field: String,
-        value: Value,
-    },
+    Contains { field: String, value: Value },
     /// Comparison: field starts with prefix
-    StartsWith {
-        field: String,
-        value: String,
-    },
+    StartsWith { field: String, value: String },
     /// Comparison: field matches regex pattern
-    Regex {
-        field: String,
-        pattern: String,
-    },
+    Regex { field: String, pattern: String },
     /// Comparison: numeric field greater than value
-    GreaterThan {
-        field: String,
-        value: f64,
-    },
+    GreaterThan { field: String, value: f64 },
     /// Comparison: numeric field less than value
-    LessThan {
-        field: String,
-        value: f64,
-    },
+    LessThan { field: String, value: f64 },
     /// Comparison: field exists (is not null)
-    Exists {
-        field: String,
-    },
+    Exists { field: String },
     /// Comparison: field is null or missing
-    NotExists {
-        field: String,
-    },
+    NotExists { field: String },
     /// Logical: all conditions must match
-    And {
-        conditions: Vec<Condition>,
-    },
+    And { conditions: Vec<Condition> },
     /// Logical: any condition must match
-    Or {
-        conditions: Vec<Condition>,
-    },
+    Or { conditions: Vec<Condition> },
     /// Logical: condition must not match
-    Not {
-        condition: Box<Condition>,
-    },
+    Not { condition: Box<Condition> },
 }
 
 impl ConditionalFilter {
@@ -193,9 +162,7 @@ fn evaluate_condition(condition: &Condition, event: &Value) -> Result<bool> {
             }
             Ok(false)
         }
-        Condition::Not { condition } => {
-            Ok(!evaluate_condition(condition, event)?)
-        }
+        Condition::Not { condition } => Ok(!evaluate_condition(condition, event)?),
     }
 }
 
@@ -272,9 +239,15 @@ mod tests {
                 ],
             },
         };
-        assert!(filter.matches(&json!({"amount": 1500, "currency": "USD"})).unwrap());
-        assert!(!filter.matches(&json!({"amount": 1500, "currency": "EUR"})).unwrap());
-        assert!(!filter.matches(&json!({"amount": 500, "currency": "USD"})).unwrap());
+        assert!(filter
+            .matches(&json!({"amount": 1500, "currency": "USD"}))
+            .unwrap());
+        assert!(!filter
+            .matches(&json!({"amount": 1500, "currency": "EUR"}))
+            .unwrap());
+        assert!(!filter
+            .matches(&json!({"amount": 500, "currency": "USD"}))
+            .unwrap());
     }
 
     #[test]
@@ -336,8 +309,12 @@ mod tests {
                 value: json!("@example.com"),
             },
         };
-        assert!(filter.matches(&json!({"email": "alice@example.com"})).unwrap());
-        assert!(!filter.matches(&json!({"email": "alice@other.com"})).unwrap());
+        assert!(filter
+            .matches(&json!({"email": "alice@example.com"}))
+            .unwrap());
+        assert!(!filter
+            .matches(&json!({"email": "alice@other.com"}))
+            .unwrap());
     }
 
     #[test]

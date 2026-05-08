@@ -31,7 +31,10 @@ fn test_standard_webhooks_signature_generation() {
 
     // Different inputs should produce different signatures
     let sig3 = signing::compute_standard_signature(secret, msg_id, "1704067300", body);
-    assert_ne!(sig, sig3, "Different timestamps should produce different signatures");
+    assert_ne!(
+        sig, sig3,
+        "Different timestamps should produce different signatures"
+    );
 }
 
 #[test]
@@ -51,13 +54,22 @@ fn test_standard_webhooks_signature_verification() {
 
     // Wrong secret should fail
     assert!(
-        signing::verify_standard_signature("whsec_wrong_key", msg_id, timestamp, &sig, body, None).is_err(),
+        signing::verify_standard_signature("whsec_wrong_key", msg_id, timestamp, &sig, body, None)
+            .is_err(),
         "Wrong secret should fail verification"
     );
 
     // Wrong body should fail
     assert!(
-        signing::verify_standard_signature(secret, msg_id, timestamp, &sig, r#"{"event":"tampered"}"#, None).is_err(),
+        signing::verify_standard_signature(
+            secret,
+            msg_id,
+            timestamp,
+            &sig,
+            r#"{"event":"tampered"}"#,
+            None
+        )
+        .is_err(),
         "Tampered body should fail verification"
     );
 
@@ -82,7 +94,8 @@ fn test_standard_webhooks_multiple_signatures() {
     // Space-separated signatures should verify if one matches
     let combined = format!("v1,invalidbase64 {} v1,alsoinvalid", sig1);
     assert!(
-        signing::verify_standard_signature(secret, msg_id, timestamp, &combined, body, None).is_ok(),
+        signing::verify_standard_signature(secret, msg_id, timestamp, &combined, body, None)
+            .is_ok(),
         "Combined signatures should verify if any match"
     );
 }
@@ -240,8 +253,15 @@ fn test_api_key_generation() {
     use hooksniff_api::middleware;
 
     let key = middleware::generate_api_key();
-    assert!(key.starts_with("hr_live_"), "API key should start with hr_live_");
-    assert_eq!(key.len(), 44, "API key should be 44 chars (hr_live_ + 36 UUID)")
+    assert!(
+        key.starts_with("hr_live_"),
+        "API key should start with hr_live_"
+    );
+    assert_eq!(
+        key.len(),
+        44,
+        "API key should be 44 chars (hr_live_ + 36 UUID)"
+    );
 
     // Each key should be unique
     let key2 = middleware::generate_api_key();
@@ -340,7 +360,11 @@ fn test_ssrf_url_detection() {
     for url in blocked_urls {
         // We can't call the function directly from tests without the module,
         // but we verify the test data is correct
-        assert!(!url.contains("example.com"), "Test URL {} should not be external", url);
+        assert!(
+            !url.contains("example.com"),
+            "Test URL {} should not be external",
+            url
+        );
     }
 
     // These should be allowed
@@ -352,7 +376,11 @@ fn test_ssrf_url_detection() {
     ];
 
     for url in allowed_urls {
-        assert!(url.starts_with("https://"), "Allowed URL {} should use HTTPS", url);
+        assert!(
+            url.starts_with("https://"),
+            "Allowed URL {} should use HTTPS",
+            url
+        );
     }
 }
 
@@ -387,15 +415,30 @@ fn test_plan_serialization() {
 
     assert_eq!(serde_json::to_string(&Plan::Free).unwrap(), "\"free\"");
     assert_eq!(serde_json::to_string(&Plan::Pro).unwrap(), "\"pro\"");
-    assert_eq!(serde_json::to_string(&Plan::Business).unwrap(), "\"business\"");
-    assert_eq!(serde_json::to_string(&Plan::Enterprise).unwrap(), "\"enterprise\"");
+    assert_eq!(
+        serde_json::to_string(&Plan::Business).unwrap(),
+        "\"business\""
+    );
+    assert_eq!(
+        serde_json::to_string(&Plan::Enterprise).unwrap(),
+        "\"enterprise\""
+    );
 }
 
 #[test]
 fn test_subscription_status_serialization() {
     use hooksniff_api::billing::SubscriptionStatus;
 
-    assert_eq!(serde_json::to_string(&SubscriptionStatus::Active).unwrap(), "\"active\"");
-    assert_eq!(serde_json::to_string(&SubscriptionStatus::Trialing).unwrap(), "\"trialing\"");
-    assert_eq!(serde_json::to_string(&SubscriptionStatus::Canceled).unwrap(), "\"canceled\"");
+    assert_eq!(
+        serde_json::to_string(&SubscriptionStatus::Active).unwrap(),
+        "\"active\""
+    );
+    assert_eq!(
+        serde_json::to_string(&SubscriptionStatus::Trialing).unwrap(),
+        "\"trialing\""
+    );
+    assert_eq!(
+        serde_json::to_string(&SubscriptionStatus::Canceled).unwrap(),
+        "\"canceled\""
+    );
 }

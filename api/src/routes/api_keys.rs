@@ -44,15 +44,19 @@ async fn list_api_keys(
     .fetch_all(&pool)
     .await?;
 
-    Ok(Json(keys.into_iter().map(|(id, prefix, is_active, created_at, last_used)| {
-        ApiKeyInfo {
-            id,
-            prefix: format!("{}...", &prefix),
-            created_at: created_at.to_rfc3339(),
-            last_used_at: last_used.map(|t| t.to_rfc3339()),
-            is_active,
-        }
-    }).collect()))
+    Ok(Json(
+        keys.into_iter()
+            .map(
+                |(id, prefix, is_active, created_at, last_used)| ApiKeyInfo {
+                    id,
+                    prefix: format!("{}...", &prefix),
+                    created_at: created_at.to_rfc3339(),
+                    last_used_at: last_used.map(|t| t.to_rfc3339()),
+                    is_active,
+                },
+            )
+            .collect(),
+    ))
 }
 
 async fn create_api_key(
@@ -110,11 +114,12 @@ async fn rotate_api_key(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<CreateApiKeyResponse>, AppError> {
     // Verify ownership
-    let existing: Option<(Uuid,)> = sqlx::query_as("SELECT id FROM api_keys WHERE id = $1 AND customer_id = $2")
-        .bind(id)
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await?;
+    let existing: Option<(Uuid,)> =
+        sqlx::query_as("SELECT id FROM api_keys WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?;
 
     if existing.is_none() {
         return Err(AppError::NotFound);

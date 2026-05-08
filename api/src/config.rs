@@ -45,8 +45,18 @@ pub struct Config {
 
 /// Patterns that look like placeholder / throwaway secrets (case-insensitive).
 const PLACEHOLDER_PATTERNS: &[&str] = &[
-    "change", "secret", "test-", "test_", "example", "default",
-    "placeholder", "dummy", "your-", "todo", "fixme", "xxx",
+    "change",
+    "secret",
+    "test-",
+    "test_",
+    "example",
+    "default",
+    "placeholder",
+    "dummy",
+    "your-",
+    "todo",
+    "fixme",
+    "xxx",
 ];
 
 /// Validate that a secret is production-ready.
@@ -88,27 +98,21 @@ impl Config {
     pub fn from_env() -> Result<Self> {
         dotenvy::dotenv().ok();
 
-        let rust_log = std::env::var("RUST_LOG")
-            .unwrap_or_else(|_| "info".into());
+        let rust_log = std::env::var("RUST_LOG").unwrap_or_else(|_| "info".into());
 
         let hmac_secret = std::env::var("HMAC_SECRET").unwrap_or_else(|_| {
             let random = format!("dev-{}", uuid::Uuid::new_v4());
-            tracing::warn!(
-                "⚠️ HMAC_SECRET not set, using random secret (will change on restart!)"
-            );
+            tracing::warn!("⚠️ HMAC_SECRET not set, using random secret (will change on restart!)");
             random
         });
 
         let jwt_secret = std::env::var("JWT_SECRET").unwrap_or_else(|_| {
             let random = format!("dev-{}", uuid::Uuid::new_v4());
-            tracing::warn!(
-                "⚠️ JWT_SECRET not set, using random secret (will change on restart!)"
-            );
+            tracing::warn!("⚠️ JWT_SECRET not set, using random secret (will change on restart!)");
             random
         });
 
-        let env = std::env::var("APP_ENV")
-            .unwrap_or_else(|_| "development".into());
+        let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
 
         // In production, reject default/placeholder secrets
         if env == "production" || env == "prod" {

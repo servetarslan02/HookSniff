@@ -11,8 +11,8 @@ use tracing::{debug, info, warn};
 use uuid::Uuid;
 
 use super::{
-    auto_detect_schema, check_compatibility, validate_event, EventSchema,
-    RegisterSchemaRequest, ValidateEventRequest, ValidationResult,
+    auto_detect_schema, check_compatibility, validate_event, EventSchema, RegisterSchemaRequest,
+    ValidateEventRequest, ValidationResult,
 };
 
 /// Schema registry for managing event schemas.
@@ -35,9 +35,7 @@ impl SchemaRegistry {
         request: RegisterSchemaRequest,
     ) -> Result<EventSchema> {
         // Check if schema already exists
-        let existing = self
-            .get_latest_by_name(customer_id, &request.name)
-            .await?;
+        let existing = self.get_latest_by_name(customer_id, &request.name).await?;
 
         let schema = if request.auto_detect {
             // Auto-detect is only valid for the first version
@@ -59,7 +57,9 @@ impl SchemaRegistry {
             if !compat.compatible {
                 warn!(
                     "Schema '{}' v{} is not backward-compatible: {:?}",
-                    request.name, existing_schema.version + 1, compat.issues
+                    request.name,
+                    existing_schema.version + 1,
+                    compat.issues
                 );
                 return Err(anyhow::anyhow!(
                     "Schema is not backward-compatible: {}",
@@ -155,10 +155,7 @@ impl SchemaRegistry {
         schema_id: Uuid,
         request: ValidateEventRequest,
     ) -> Result<ValidationResult> {
-        let schema = self
-            .get(schema_id)
-            .await?
-            .context("Schema not found")?;
+        let schema = self.get(schema_id).await?.context("Schema not found")?;
 
         Ok(validate_event(&schema.schema, &request.event))
     }
@@ -167,21 +164,15 @@ impl SchemaRegistry {
     ///
     /// Used when a schema was registered with `auto_detect: true`
     /// and the first event arrives.
-    pub async fn update_from_event(
-        &self,
-        schema_id: Uuid,
-        event: &Value,
-    ) -> Result<EventSchema> {
+    pub async fn update_from_event(&self, schema_id: Uuid, event: &Value) -> Result<EventSchema> {
         let detected = auto_detect_schema(event);
 
-        sqlx::query(
-            "UPDATE event_schemas SET schema = $1 WHERE id = $2",
-        )
-        .bind(&detected)
-        .bind(schema_id)
-        .execute(&self.pool)
-        .await
-        .context("Failed to update schema from event")?;
+        sqlx::query("UPDATE event_schemas SET schema = $1 WHERE id = $2")
+            .bind(&detected)
+            .bind(schema_id)
+            .execute(&self.pool)
+            .await
+            .context("Failed to update schema from event")?;
 
         info!("📝 Auto-detected schema for {}", schema_id);
 
