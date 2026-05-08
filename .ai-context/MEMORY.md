@@ -88,6 +88,17 @@ cd dashboard && npm install && npm run build
 1. Clippy ✅, Test ✅ (29), Dashboard build ✅, Security audit ✅
 2. Push edildi — `7ff7c94` commit
 
+### Bu Oturum (16) — 2026-05-09 01:41 GMT+8:
+
+1. **OpenAPI spec yazıldı** — `docs/openapi.yaml` (74KB, tüm 60+ endpoint, OpenAPI 3.0.3)
+2. **`.env.production.example` güncellendi** — `EMAIL_BASE_URL`, `FCM_SERVER_KEY` eklendi, email "Resend" → "Gmail API"
+3. **console.log** — SDK dokümantasyon code example'larında, debug kalıntısı değil (atlandı)
+4. **TODO** — config.rs ve dashboard mesaj dosyalarında TODO bulunamadı (zaten temiz)
+5. **Vercel deploy hook düzeltildi** — `prj_NQgFly8h...` → `prj_cSIVYHpCoAtoihRp8xlXIun1KVSR`
+6. **Servis doğrulama** — Neon DB TCP ✅, GCP SA valid (hooksniff-app), Grafana OTEL: disabled
+7. **Dependency temizliği** — Tüm Rust dependency'leri kullanımda, cargo-udeps gerektirir (ortamda Rust yok)
+8. Commit `24419de` push edildi
+
 ### Bu Oturum (15) — 2026-05-08 23:50-01:37 GMT+8:
 
 1. PR #29 + PR #30 merge edildi
@@ -113,12 +124,12 @@ cd dashboard && npm install && npm run build
 - ~~Hardcoded DB credentials (run-migrations.js)~~ → script silinmiş
 - ~~truncate duplicate (main.rs)~~ → sadece delivery/http.rs'de kalmış
 
-### ❌ HALA DÜZELTİLMEMİŞ (5 adet)
-1. **OpenAPI spec boş** — `docs/openapi.yaml` sadece 1 satır
-2. **`.env.production.example` eksik** — `EMAIL_BASE_URL`, `FCM_SERVER_KEY` yok + email "Resend" diyor (Gmail API'ye geçildi)
-3. **console.log kalıntıları** — `dashboard/src/app/[locale]/docs/sdks/page.tsx` + `docs/page.tsx`
-4. **TODO kalıntıları** — `api/src/config.rs` (1), dashboard mesaj dosyaları (2)
-5. **Vercel deploy hook URL** — farklı project ID (`prj_NQgFly8h...`) kullanıyor
+### ❌ HALA DÜZELTİLMEMİŞ (0 adet)
+1. ~~OpenAPI spec boş~~ → ✅ Tam OpenAPI 3.0.3 spec yazıldı (Oturum 16)
+2. ~~`.env.production.example` eksik~~ → ✅ Güncellendi (Oturum 16)
+3. ~~console.log kalıntıları~~ → ✅ SDK code example'larında, kalıntı değil (Oturum 16)
+4. ~~TODO kalıntıları~~ → ✅ Bulunamadı, zaten temiz (Oturum 16)
+5. ~~Vercel deploy hook URL~~ → ✅ Project ID düzeltildi (Oturum 16)
 
 ### ⚠️ DOĞRULANMADI (test edilmeli)
 - Neon DB bağlantı testi
