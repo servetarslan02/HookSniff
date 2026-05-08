@@ -131,10 +131,7 @@ impl CircuitBreaker {
     /// Get the current state of an endpoint's circuit.
     pub async fn get_state(&self, endpoint_id: Uuid) -> EndpointCircuit {
         let circuits = self.circuits.read().await;
-        circuits
-            .get(&endpoint_id)
-            .cloned()
-            .unwrap_or_default()
+        circuits.get(&endpoint_id).cloned().unwrap_or_default()
     }
 
     /// Get all circuit states (for monitoring/dashboard).

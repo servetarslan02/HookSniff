@@ -1,4 +1,4 @@
-use axum::extract::{Extension};
+use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::routing::{get, post};
 use axum::{Json, Router};
@@ -8,7 +8,7 @@ use sqlx::PgPool;
 
 use crate::billing::provider::{PaymentProvider, PaymentProviderImpl};
 use crate::billing::stripe;
-use crate::billing::{Plan};
+use crate::billing::Plan;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;

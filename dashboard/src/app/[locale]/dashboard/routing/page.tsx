@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
-import { useTranslations } from 'next-intl';
 
 interface RoutingInfo {
+  id: string;
+  url: string;
   endpoint_id: string;
   routing_strategy: string;
   fallback_url: string | null;
@@ -17,14 +18,13 @@ interface RoutingInfo {
 }
 
 export default function RoutingPage() {
-  const t = useTranslations('dashboard');
   const { token } = useAuth();
-  const [endpoints, setEndpoints] = useState<any[]>([]);
+  const [endpoints, setEndpoints] = useState<RoutingInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!token) return;
-    apiFetch<any[]>('/endpoints', { token })
+    apiFetch<RoutingInfo[]>('/endpoints', { token })
       .then(setEndpoints)
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -39,7 +39,7 @@ export default function RoutingPage() {
         Configure how webhooks are routed to your endpoints. Choose between round-robin, latency-based, or failover strategies.
       </p>
       <div className="space-y-4">
-        {endpoints.map((ep: any) => (
+        {endpoints.map((ep) => (
           <div key={ep.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
