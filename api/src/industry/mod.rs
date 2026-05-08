@@ -106,6 +106,12 @@ pub struct PackageManager {
     packages: Vec<Box<dyn IndustryPackage>>,
 }
 
+impl Default for PackageManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PackageManager {
     pub fn new() -> Self {
         Self {

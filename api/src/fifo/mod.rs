@@ -82,6 +82,7 @@ impl FifoStatus {
         }
     }
 
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
             "processing" => Self::Processing,

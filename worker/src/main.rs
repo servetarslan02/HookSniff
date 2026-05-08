@@ -256,7 +256,7 @@ async fn shutdown_signal() {
 async fn process_pending(
     pool: &PgPool,
     http_client: &reqwest::Client,
-    cfg: &config::WorkerConfig,
+    _cfg: &config::WorkerConfig,
 ) -> Result<usize> {
     // Fetch pending items (with FOR UPDATE SKIP LOCKED for concurrency)
     let items: Vec<WebhookQueueItem> = {
@@ -371,7 +371,7 @@ async fn process_pending(
             custom_headers: item.custom_headers.clone(),
         };
 
-        let result = delivery::deliver_http(&http_client, &webhook_msg, attempt).await?;
+        let result = delivery::deliver_http(http_client, &webhook_msg, attempt).await?;
 
         let status_code = result.status_code;
         let response_body = &result.response_body;
@@ -442,7 +442,7 @@ async fn process_pending(
 
             // Record attempt
             record_attempt(
-                &mut *tx,
+                &mut tx,
                 delivery_id,
                 attempt,
                 attempt_status,
@@ -510,7 +510,7 @@ async fn process_pending(
             .await?;
 
             record_attempt(
-                &mut *tx,
+                &mut tx,
                 delivery_id,
                 attempt,
                 attempt_status,
@@ -561,7 +561,7 @@ async fn process_pending(
             .await?;
 
             record_attempt(
-                &mut *tx,
+                &mut tx,
                 delivery_id,
                 attempt,
                 attempt_status,
@@ -736,6 +736,7 @@ async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
 }
 
 /// Record a delivery attempt
+#[allow(clippy::too_many_arguments)]
 async fn record_attempt(
     conn: &mut sqlx::PgConnection,
     delivery_id: uuid::Uuid,
@@ -776,6 +777,7 @@ fn calculate_backoff(attempt: i32) -> i64 {
 
 /// Truncate string to max length (UTF-8 safe — rounds down to char boundary)
 /// Delegates to delivery::truncate_str for consistency.
+#[allow(dead_code)]
 fn truncate(s: &str, max_len: usize) -> String {
     delivery::truncate_str(s, max_len)
 }
