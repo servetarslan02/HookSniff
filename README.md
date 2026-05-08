@@ -1,5 +1,11 @@
 # 🪝 HookSniff
 
+[![CI](https://github.com/servetarslan02/HookSniff/actions/workflows/ci.yml/badge.svg)](https://github.com/servetarslan02/HookSniff/actions/workflows/ci.yml)
+[![Deploy](https://github.com/servetarslan02/HookSniff/actions/workflows/deploy.yml/badge.svg)](https://github.com/servetarslan02/HookSniff/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-1.82+-orange.svg)](https://www.rust-lang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+
 **Reliable webhook delivery for developers.**
 
 Send webhooks. We deliver them. If they fail, we retry. Simple.
@@ -176,6 +182,22 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips
 # → { "ips": ["..."], "updated_at": "..." }
 ```
 
+## Support
+
+- 📖 [Documentation](docs/)
+- 🐛 [Report a Bug](https://github.com/servetarslan02/HookSniff/issues/new?template=bug_report.md)
+- 💡 [Request a Feature](https://github.com/servetarslan02/HookSniff/issues/new?template=feature_request.md)
+- 💬 [GitHub Discussions](https://github.com/servetarslan02/HookSniff/discussions)
+- 🔒 [Security Policy](SECURITY.md)
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a PR.
+
+## Security
+
+For security vulnerabilities, please see our [Security Policy](SECURITY.md). **Do not open public issues for security bugs.**
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE) for details.
