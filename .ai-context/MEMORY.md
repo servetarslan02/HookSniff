@@ -106,25 +106,21 @@ Lab repo'da geliştirilecek → test → onay → ana repo'ya merge.
 
 Detay: `.ai-context/NEXT_SESSION.md`
 Branch: `ai-agent-layer`
+README: `.ai-context/AI_AGENT_README.md`
+Test: `.ai-context/AI_AGENT_TEST.md`
 
-**5 katman tamamlandı:**
-1. ✅ DB Migration — 5 tablo (agents, events, routes, rate_limits, audit_log)
-2. ✅ API Routes — CRUD, Event emit/subscribe, Routing, Rate limit, Audit, Anomaly
-3. ✅ Dashboard — Agent listesi, detay (3 sekme), monitoring sayfasi
-4. ✅ Guvenlik — Audit log, anomaly detection, rate limit kontrolu
-5. ✅ SDK'lar — Node.js + Python Agent SDK (WebSocket real-time)
+**6 katman tamamlandı:**
+1. ✅ DB Migration — 5 tablo + 12 index
+2. ✅ API Routes — 14 endpoint + AppError + validation
+3. ✅ Dashboard — 3 sayfa (list, detail, monitoring)
+4. ✅ Guvenlik — Audit log, anomaly detection, rate limit
+5. ✅ SDK'lar — Node.js + Python (WebSocket real-time)
+6. ✅ Dokümantasyon — README + test senaryoları
 
-**Dosyalar:**
-- `api/src/agents/` — 6 Rust dosyasi (mod, models, routes, auth, security, event_bridge)
-- `sdks/agent-node/` — Node.js SDK (TypeScript)
-- `sdks/agent-python/` — Python SDK
-- `dashboard/.../agents/` — 3 sayfa (list, detail, monitoring)
-- `migrations/030_ai_agents.sql` — 5 tablo + index'ler
-
-**18/18 test gecti, Clippy temiz. 4 commit push edildi.**
+**145/145 test gecti, Clippy temiz. 8 commit push edildi.**
 
 **Sıradaki:**
-- Deploy: Cloud Run + DB migration
+- Deploy: Cloud Run + DB migration (Servet onayi ile)
 - main branch'e merge (Servet onayi ile)
 
 ## 📱 MOBİL UYGULAMA (2026-05-08 — Servet Onayı İle Netleştirildi)
