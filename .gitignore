@@ -43,3 +43,7 @@ HEARTBEAT.md
 memory/
 .env.example
 __pycache__
+sdks/node/dist/
+sdks/python/dist/
+sdks/python/hooksniff.egg-info/
+sdks/node/package-lock.json
