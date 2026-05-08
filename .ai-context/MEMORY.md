@@ -37,7 +37,7 @@
 | Dashboard | https://hooksniff.vercel.app | ✅ Live |
 | API | https://hooksniff-api-1046140057667.europe-west1.run.app | ✅ Healthy |
 | Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Deployed |
-| CI/CD | GitHub Actions | ⏳ 4 job hatalı (düzeltiliyor) |
+| CI/CD | GitHub Actions | ✅ 6/6 job geçiyor |
 | Neon DB | eu-central-1 | ✅ Çalışıyor |
 | Upstash Redis | 64MB | ✅ PONG |
 | R2 Storage | hooksniff-storage | ✅ Bucket var |

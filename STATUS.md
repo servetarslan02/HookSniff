@@ -1,6 +1,6 @@
 # 🪝 HookSniff — Durum Özeti
 
-> Son güncelleme: 2026-05-08 17:44 GMT+8
+> Son güncelleme: 2026-05-08 23:38 GMT+8
 
 ---
 
@@ -11,7 +11,7 @@
 | Dashboard | https://hooksniff.vercel.app | ✅ Live |
 | API | https://hooksniff-api-1046140057667.europe-west1.run.app | ✅ Healthy |
 | Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Deployed |
-| CI/CD | GitHub Actions | ✅ Başarılı |
+| CI/CD | GitHub Actions | ✅ 6/6 job geçiyor |
 
 ---
 
@@ -26,7 +26,7 @@
 | Cache | Upstash Redis | ✅ | PONG, 64MB |
 | Storage | Cloudflare R2 | ✅ | hooksniff-storage |
 | CDN | Cloudflare | ✅ | Hesap aktif |
-| Email | GCloud Gmail API | ✅ | Service account configured |
+| Email | GCloud Gmail API | ✅ | Service account + Gmail API |
 | Monitoring | Grafana Cloud | ⏳ | OTEL headers hazır |
 | Ödeme (Global) | Polar.sh | ✅ | Token yenilendi, Pro plan aktif |
 | Ödeme (TR) | iyzico | ❌ | Hesap açılacak |
@@ -37,8 +37,8 @@
 
 | Kontrol | Durum |
 |---------|-------|
-| cargo fmt | ✅ continue-on-error |
-| cargo clippy | ✅ continue-on-error |
+| cargo fmt | ✅ strict (zorunlu) |
+| cargo clippy | ✅ strict (-D warnings) |
 | cargo test | ✅ success |
 | Dashboard ESLint | ✅ success |
 | Dashboard Build | ✅ success |
@@ -48,10 +48,11 @@
 
 ## Servet'in Yapması Gereken
 
-1. **GitHub token yenile** — güvenlik riski
-2. ~~Resend yeni domain~~ → GCloud Gmail API'ya taşındı ✅
-3. ~~Polar.sh token~~ → ✅ Yenilendi
-4. **Domain kararı** — şimdilik hooksniff.vercel.app yeterli
+1. ~~GitHub token yenile~~ → ✅ Yenilendi (Oturum 13)
+2. ~~Resend → Gmail API~~ → ✅ Taşındı (Oturum 10)
+3. ~~Polar.sh token~~ → ✅ Yenilendi (Oturum 11)
+4. **iyzico hesap** — vergi levhası + banka hesabı
+5. **Domain kararı** — şimdilik hooksniff.vercel.app yeterli
 
 ---
 
