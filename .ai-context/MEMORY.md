@@ -203,3 +203,15 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 - Rate Limiting: Login 10/15dk, Register 5/saat, Genel plan bazlı
 - Cleanup Jobs: 6 saatte bir (seen_webhooks, idempotency_keys)
 - Zombie Reaper: 30 saniyede bir (5dk+ processing kayıtları)
+
+### Bu Oturum (18) — 2026-05-09 04:00-04:12 GMT+8:
+
+1. **Grafana OTEL token güncellendi** — yeni `glc_` cloud access policy token
+2. `.env.production.example` → OTEL_HEADERS güncellendi
+3. `monitoring/otel-collector-config.yml` → authorization header güncellendi
+4. `.ai-context/EXTERNAL_TOKENS.md` → GRAFANA_* ve GITHUB_PAT güncellendi
+5. **Neon DB doğrulandı** — API health check: 35ms latency ✅
+6. **GCP SA doğrulandı** — hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com ✅
+7. **Grafana Tempo doğrulandı** — hooksniff-api trace'leri akıyor ✅
+8. **API durumu** — healthy, uptime OK, queue boş
+9. Commit `9a0c81d` push edildi
