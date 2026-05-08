@@ -103,6 +103,10 @@ pub async fn handle_contact(
             .await;
     } else {
         tracing::warn!("GCloud email not configured — contact form logged but no email sent");
+        return Ok(Json(ContactResponse {
+            success: true,
+            message: "Message received. Email delivery is currently unavailable — we'll still get back to you soon!".to_string(),
+        }));
     }
 
     Ok(Json(ContactResponse {

@@ -19,8 +19,8 @@ struct OutboundIpsResponse {
 }
 
 /// Default outbound IPs used when the OUTBOUND_IPS env var is not set.
-/// These are placeholders — replace with real IPs once the Oracle Cloud VM is provisioned.
-const DEFAULT_IPS: &[&str] = &["TBD"];
+/// TODO: Replace with real IPs from the production infrastructure.
+const DEFAULT_IPS: &[&str] = &[];
 
 fn load_outbound_ips() -> OutboundIpsResponse {
     let ips: Vec<String> = match std::env::var("OUTBOUND_IPS") {
@@ -29,7 +29,10 @@ fn load_outbound_ips() -> OutboundIpsResponse {
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty())
             .collect(),
-        _ => DEFAULT_IPS.iter().map(|s| s.to_string()).collect(),
+        _ => {
+            tracing::warn!("⚠️ OUTBOUND_IPS not configured — returning empty list");
+            DEFAULT_IPS.iter().map(|s| s.to_string()).collect()
+        }
     };
 
     let now = Utc::now();
@@ -79,7 +82,7 @@ mod tests {
         // Clear the env var for test
         std::env::remove_var("OUTBOUND_IPS");
         let resp = load_outbound_ips();
-        assert_eq!(resp.ips, vec!["TBD"]);
+        assert!(resp.ips.is_empty(), "Default IPs should be empty until OUTBOUND_IPS is configured");
         assert!(!resp.updated_at.is_empty());
     }
 
@@ -95,7 +98,7 @@ mod tests {
     fn test_empty_env_falls_back_to_default() {
         std::env::set_var("OUTBOUND_IPS", "");
         let resp = load_outbound_ips();
-        assert_eq!(resp.ips, vec!["TBD"]);
+        assert!(resp.ips.is_empty());
         std::env::remove_var("OUTBOUND_IPS");
     }
 }

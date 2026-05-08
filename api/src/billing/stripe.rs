@@ -18,8 +18,9 @@ use crate::error::AppError;
 
 type HmacSha256 = Hmac<Sha256>;
 
-/// Maximum age of a webhook event before it's rejected (5 minutes).
-const WEBHOOK_TIMESTAMP_TOLERANCE_SECS: i64 = 300;
+/// Default maximum age of a webhook event before it's rejected (5 minutes).
+/// Overridden by config.webhook_timestamp_tolerance_secs when available.
+const DEFAULT_WEBHOOK_TIMESTAMP_TOLERANCE_SECS: i64 = 300;
 
 /// Stripe price IDs for each plan (set in environment)
 #[derive(Debug, Clone)]
@@ -201,9 +202,10 @@ pub async fn handle_webhook_event(
     payload: &str,
     signature: &str,
     webhook_secret: &str,
+    tolerance_secs: i64,
 ) -> Result<(), AppError> {
     // Step 1: Verify the Stripe webhook signature
-    verify_webhook_signature(payload, signature, webhook_secret)?;
+    verify_webhook_signature(payload, signature, webhook_secret, tolerance_secs)?;
 
     // Step 2: Parse and process the event
     let event: StripeWebhookEvent = serde_json::from_str(payload)
@@ -586,6 +588,7 @@ fn verify_webhook_signature(
     payload: &str,
     signature_header: &str,
     webhook_secret: &str,
+    tolerance_secs: i64,
 ) -> Result<(), AppError> {
     // 1. Parse the signature header
     let (timestamp, expected_sig_hex) = parse_stripe_signature(signature_header)?;
@@ -593,11 +596,11 @@ fn verify_webhook_signature(
     // 2. Check timestamp freshness (replay protection)
     let now = chrono::Utc::now().timestamp();
     let age = (now - timestamp).abs();
-    if age > WEBHOOK_TIMESTAMP_TOLERANCE_SECS {
+    if age > tolerance_secs {
         tracing::warn!(
             "Stripe webhook timestamp too old: {}s (max {}s)",
             age,
-            WEBHOOK_TIMESTAMP_TOLERANCE_SECS
+            tolerance_secs
         );
         return Err(AppError::BadRequest("Webhook timestamp too old".into()));
     }
@@ -683,7 +686,7 @@ mod tests {
         let now = chrono::Utc::now().timestamp();
         let header = make_signature(payload, secret, now);
 
-        assert!(verify_webhook_signature(payload, &header, secret).is_ok());
+        assert!(verify_webhook_signature(payload, &header, secret, 300).is_ok());
     }
 
     #[test]
@@ -694,7 +697,7 @@ mod tests {
         let header = make_signature(payload, secret, now);
 
         let tampered = r#"{"id":"evt_123","type":"payment_intent.succeeded"}"#;
-        assert!(verify_webhook_signature(tampered, &header, secret).is_err());
+        assert!(verify_webhook_signature(tampered, &header, secret, 300).is_err());
     }
 
     #[test]
@@ -705,7 +708,7 @@ mod tests {
         let now = chrono::Utc::now().timestamp();
         let header = make_signature(payload, secret_a, now);
 
-        assert!(verify_webhook_signature(payload, &header, secret_b).is_err());
+        assert!(verify_webhook_signature(payload, &header, secret_b, 300).is_err());
     }
 
     #[test]
@@ -716,7 +719,7 @@ mod tests {
         let old_ts = chrono::Utc::now().timestamp() - 600;
         let header = make_signature(payload, secret, old_ts);
 
-        assert!(verify_webhook_signature(payload, &header, secret).is_err());
+        assert!(verify_webhook_signature(payload, &header, secret, 300).is_err());
     }
 
     #[test]
@@ -727,13 +730,13 @@ mod tests {
         let future_ts = chrono::Utc::now().timestamp() + 600;
         let header = make_signature(payload, secret, future_ts);
 
-        assert!(verify_webhook_signature(payload, &header, secret).is_err());
+        assert!(verify_webhook_signature(payload, &header, secret, 300).is_err());
     }
 
     #[test]
     fn test_verify_signature_malformed_header() {
         let secret = "whsec_test";
-        assert!(verify_webhook_signature("{}", "garbage", secret).is_err());
-        assert!(verify_webhook_signature("{}", "", secret).is_err());
+        assert!(verify_webhook_signature("{}", "garbage", secret, 300).is_err());
+        assert!(verify_webhook_signature("{}", "", secret, 300).is_err());
     }
 }

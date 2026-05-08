@@ -20,7 +20,7 @@ struct EndpointHealth {
     url: String,
     description: Option<String>,
     is_active: bool,
-    health_status: String, // "healthy", "degraded", "unhealthy"
+    health_status: String,
     success_rate: f64,
     avg_response_ms: i32,
     p95_response_ms: i32,
@@ -35,6 +35,15 @@ struct EndpointHealth {
     uptime_7d: f64,
 }
 
+/// Single query to get delivery stats for all endpoints of a customer (last 24h).
+#[derive(sqlx::FromRow)]
+struct EndpointStatsRow {
+    endpoint_id: Uuid,
+    total: i64,
+    successful: i64,
+    failed: i64,
+}
+
 async fn list_endpoint_health(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -46,56 +55,71 @@ async fn list_endpoint_health(
     .fetch_all(&pool)
     .await?;
 
-    let mut health_list = Vec::new();
+    // Batch-fetch all delivery stats in one query instead of N+1
+    let endpoint_ids: Vec<Uuid> = endpoints.iter().map(|ep| ep.id).collect();
 
-    for ep in endpoints {
-        // Get delivery stats for this endpoint (last 24h)
-        let stats: (i64, i64, i64) = sqlx::query_as(
-            "SELECT COUNT(*), COUNT(*) FILTER (WHERE status = 'delivered'), COUNT(*) FILTER (WHERE status = 'failed') \
-             FROM deliveries WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '24 hours'"
+    let stats_rows: Vec<EndpointStatsRow> = if endpoint_ids.is_empty() {
+        Vec::new()
+    } else {
+        sqlx::query_as::<_, EndpointStatsRow>(
+            "SELECT endpoint_id, \
+             COUNT(*) as total, \
+             COUNT(*) FILTER (WHERE status = 'delivered') as successful, \
+             COUNT(*) FILTER (WHERE status = 'failed') as failed \
+             FROM deliveries \
+             WHERE endpoint_id = ANY($1) AND created_at > NOW() - INTERVAL '24 hours' \
+             GROUP BY endpoint_id",
         )
-        .bind(ep.id)
-        .fetch_one(&pool)
+        .bind(&endpoint_ids)
+        .fetch_all(&pool)
         .await
-        .unwrap_or((0, 0, 0));
+        .unwrap_or_default()
+    };
 
-        let total = stats.0;
-        let successful = stats.1;
-        let failed = stats.2;
-        let success_rate = if total > 0 {
-            (successful as f64 / total as f64) * 100.0
-        } else {
-            100.0
-        };
+    // Build a lookup map for O(1) access
+    let stats_map: std::collections::HashMap<Uuid, (i64, i64, i64)> = stats_rows
+        .into_iter()
+        .map(|r| (r.endpoint_id, (r.total, r.successful, r.failed)))
+        .collect();
 
-        let health_status = if ep.failure_streak >= 5 {
-            "unhealthy"
-        } else if ep.failure_streak >= 3 || success_rate < 95.0 {
-            "degraded"
-        } else {
-            "healthy"
-        };
-
-        health_list.push(EndpointHealth {
-            id: ep.id,
-            url: ep.url,
-            description: ep.description,
-            is_active: ep.is_active,
-            health_status: health_status.to_string(),
-            success_rate,
-            avg_response_ms: ep.avg_response_ms,
-            p95_response_ms: ep.avg_response_ms * 2, // Approximation
-            p99_response_ms: ep.avg_response_ms * 3,
-            total_deliveries: total,
-            successful,
-            failed,
-            consecutive_failures: ep.failure_streak,
-            last_success_at: None,
-            last_failure_at: ep.last_failure_at.map(|t| t.to_rfc3339()),
-            uptime_24h: success_rate,
-            uptime_7d: success_rate, // Simplified
-        });
-    }
+    let health_list: Vec<EndpointHealth> = endpoints
+        .into_iter()
+        .map(|ep| {
+            let (total, successful, failed) =
+                stats_map.get(&ep.id).copied().unwrap_or((0, 0, 0));
+            let success_rate = if total > 0 {
+                (successful as f64 / total as f64) * 100.0
+            } else {
+                100.0
+            };
+            let health_status = if ep.failure_streak >= 5 {
+                "unhealthy"
+            } else if ep.failure_streak >= 3 || success_rate < 95.0 {
+                "degraded"
+            } else {
+                "healthy"
+            };
+            EndpointHealth {
+                id: ep.id,
+                url: ep.url,
+                description: ep.description,
+                is_active: ep.is_active,
+                health_status: health_status.to_string(),
+                success_rate,
+                avg_response_ms: ep.avg_response_ms,
+                p95_response_ms: ep.avg_response_ms * 2,
+                p99_response_ms: ep.avg_response_ms * 3,
+                total_deliveries: total,
+                successful,
+                failed,
+                consecutive_failures: ep.failure_streak,
+                last_success_at: None,
+                last_failure_at: ep.last_failure_at.map(|t| t.to_rfc3339()),
+                uptime_24h: success_rate,
+                uptime_7d: success_rate,
+            }
+        })
+        .collect();
 
     Ok(Json(health_list))
 }
@@ -116,7 +140,7 @@ async fn get_endpoint_health(
 
     let stats: (i64, i64, i64) = sqlx::query_as(
         "SELECT COUNT(*), COUNT(*) FILTER (WHERE status = 'delivered'), COUNT(*) FILTER (WHERE status = 'failed') \
-         FROM deliveries WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '24 hours'"
+         FROM deliveries WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '24 hours'",
     )
     .bind(ep.id)
     .fetch_one(&pool)

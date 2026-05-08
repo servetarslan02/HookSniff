@@ -380,7 +380,7 @@ async fn handle_stripe_webhook(
         tracing::warn!("Stripe webhook secret not configured, skipping verification");
     }
 
-    stripe::handle_webhook_event(&pool, &body, signature, webhook_secret).await?;
+    stripe::handle_webhook_event(&pool, &body, signature, webhook_secret, cfg.webhook_timestamp_tolerance_secs).await?;
 
     Ok(StatusCode::OK)
 }
