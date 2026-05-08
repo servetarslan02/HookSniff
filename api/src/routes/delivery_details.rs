@@ -11,8 +11,8 @@ use crate::models::delivery::DeliveryAttempt;
 
 pub fn router() -> Router {
     Router::new()
-        .route("/{id}/details", get(get_delivery_details))
-        .route("/{id}/attempts/{attempt_id}", get(get_attempt_detail))
+        .route("/:id/details", get(get_delivery_details))
+        .route("/:id/attempts/:attempt_id", get(get_attempt_detail))
 }
 
 #[derive(Serialize)]

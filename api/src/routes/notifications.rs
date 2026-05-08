@@ -14,8 +14,8 @@ pub fn router() -> Router {
         .route("/", get(list_notifications))
         .route("/unread-count", get(unread_count))
         .route("/read-all", put(mark_all_read))
-        .route("/{id}/read", put(mark_read))
-        .route("/{id}", delete(delete_notification))
+        .route("/:id/read", put(mark_read))
+        .route("/:id", delete(delete_notification))
 }
 
 #[derive(Debug, Serialize, Deserialize)]

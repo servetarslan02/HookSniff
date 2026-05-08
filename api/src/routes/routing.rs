@@ -14,8 +14,8 @@ use crate::models::endpoint::{Endpoint, RoutingStrategy};
 
 pub fn router() -> Router {
     Router::new()
-        .route("/{id}/routing", get(get_routing).put(update_routing))
-        .route("/{id}/health", get(get_health))
+        .route("/:id/routing", get(get_routing).put(update_routing))
+        .route("/:id/health", get(get_health))
 }
 
 #[derive(Debug, Serialize)]

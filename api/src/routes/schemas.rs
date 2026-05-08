@@ -23,8 +23,8 @@ use crate::schemas::{RegisterSchemaRequest, ValidateEventRequest};
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_schemas).post(register_schema))
-        .route("/{id}", get(get_schema))
-        .route("/{id}/validate", post(validate_event))
+        .route("/:id", get(get_schema))
+        .route("/:id/validate", post(validate_event))
 }
 
 /// POST /v1/schemas — Register a new schema.

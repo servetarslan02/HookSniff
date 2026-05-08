@@ -49,24 +49,24 @@ pub fn router() -> Router {
         // Agent CRUD
         .route("/", get(list_agents).post(create_agent))
         .route(
-            "/{agent_id}",
+            "/:agent_id",
             get(get_agent).put(update_agent).delete(delete_agent),
         )
         // Agent Event API
-        .route("/{agent_id}/emit", post(emit_event))
-        .route("/{agent_id}/events", get(list_agent_events))
-        .route("/{agent_id}/stream", get(agent_event_stream))
+        .route("/:agent_id/emit", post(emit_event))
+        .route("/:agent_id/events", get(list_agent_events))
+        .route("/:agent_id/stream", get(agent_event_stream))
         // Routing kurallari
         .route("/routes", get(list_routes).post(create_route))
-        .route("/routes/{route_id}", delete(delete_route))
+        .route("/routes/:route_id", delete(delete_route))
         // Rate limit
         .route(
-            "/{agent_id}/rate-limit",
+            "/:agent_id/rate-limit",
             get(get_rate_limit).put(update_rate_limit),
         )
         .route("/audit", get(get_audit_log))
-        .route("/{agent_id}/anomaly", get(get_anomaly_status))
-        .route("/{agent_id}/stats", get(get_event_stats))
+        .route("/:agent_id/anomaly", get(get_anomaly_status))
+        .route("/:agent_id/stats", get(get_event_stats))
 }
 
 // ============ Agent CRUD ============

@@ -12,11 +12,11 @@ use crate::models::customer::Customer;
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_teams).post(create_team))
-        .route("/{id}", get(get_team))
-        .route("/{id}/invite", post(invite_member))
-        .route("/{id}/members", get(list_members))
-        .route("/{id}/members/{uid}", delete(remove_member))
-        .route("/{id}/members/{uid}/role", put(change_role))
+        .route("/:id", get(get_team))
+        .route("/:id/invite", post(invite_member))
+        .route("/:id/members", get(list_members))
+        .route("/:id/members/:uid", delete(remove_member))
+        .route("/:id/members/:uid/role", put(change_role))
 }
 
 // ── Models ───────────────────────────────────────────────────────────────────

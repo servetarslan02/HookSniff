@@ -38,6 +38,7 @@ pub fn create_routes(
     // Layer order matters: last .layer() = outermost middleware (runs first).
     // from_fn middleware must be INNERMOST so Extension layers inject values
     // into request extensions BEFORE the middleware tries to extract them.
+    //
     api_router()
         .layer(axum_middleware::from_fn(
             crate::rate_limit::rate_limit_middleware,
@@ -51,7 +52,7 @@ pub fn create_routes(
 pub fn api_router() -> Router {
     let protected = Router::new()
         .nest("/endpoints", endpoints::router())
-        .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
+        .nest("/endpoints/:endpoint_id/transforms", transforms::router())
         .nest("/stream", stream::router())
         .nest("/webhooks", webhooks::router())
         .nest("/webhooks", delivery_details::router())

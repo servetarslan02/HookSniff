@@ -12,8 +12,8 @@ use crate::models::customer::Customer;
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_api_keys).post(create_api_key))
-        .route("/{id}", delete(delete_api_key))
-        .route("/{id}/rotate", post(rotate_api_key))
+        .route("/:id", delete(delete_api_key))
+        .route("/:id/rotate", post(rotate_api_key))
 }
 
 #[derive(Serialize)]

@@ -11,8 +11,8 @@ use crate::models::customer::Customer;
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_alerts).post(create_alert))
-        .route("/{id}", get(get_alert).delete(delete_alert))
-        .route("/{id}/test", post(test_alert))
+        .route("/:id", get(get_alert).delete(delete_alert))
+        .route("/:id/test", post(test_alert))
 }
 
 #[derive(Serialize)]

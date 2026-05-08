@@ -27,9 +27,9 @@ pub fn router() -> Router {
         .route("/batch", post(batch_webhooks))
         .route("/batch/replay", post(batch_replay))
         .route("/export", get(export_deliveries))
-        .route("/{id}", get(get_delivery))
-        .route("/{id}/replay", post(replay_webhook))
-        .route("/{id}/attempts", get(get_delivery_attempts))
+        .route("/:id", get(get_delivery))
+        .route("/:id/replay", post(replay_webhook))
+        .route("/:id/attempts", get(get_delivery_attempts))
 }
 
 #[derive(Debug, Deserialize)]

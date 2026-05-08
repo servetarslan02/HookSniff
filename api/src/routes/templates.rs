@@ -14,8 +14,8 @@ use crate::templates::{
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_templates))
-        .route("/{id}", get(get_template))
-        .route("/{id}/apply", post(apply_template))
+        .route("/:id", get(get_template))
+        .route("/:id/apply", post(apply_template))
 }
 
 #[derive(Debug, Deserialize)]

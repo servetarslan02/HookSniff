@@ -25,7 +25,7 @@ pub fn router() -> Router {
         // API keys
         .route("/api-keys", get(list_api_keys))
         .route("/api-keys", post(create_api_key))
-        .route("/api-keys/{key_id}", delete(revoke_api_key))
+        .route("/api-keys/:key_id", delete(revoke_api_key))
         // Usage & limits
         .route("/usage", get(get_usage))
         .route("/plan", get(get_plan))

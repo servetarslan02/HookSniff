@@ -11,7 +11,7 @@ use crate::models::customer::Customer;
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_endpoint_health))
-        .route("/{id}", get(get_endpoint_health))
+        .route("/:id", get(get_endpoint_health))
 }
 
 #[derive(Serialize)]

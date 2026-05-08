@@ -11,9 +11,9 @@ use crate::models::customer::Customer;
 pub fn router() -> Router {
     Router::new()
         .route("/users", get(list_users))
-        .route("/users/{id}", get(get_user_detail))
-        .route("/users/{id}/plan", put(change_plan))
-        .route("/users/{id}/status", put(change_status))
+        .route("/users/:id", get(get_user_detail))
+        .route("/users/:id/plan", put(change_plan))
+        .route("/users/:id/status", put(change_status))
         .route("/stats", get(system_stats))
         .route("/revenue", get(revenue_by_month))
 }

@@ -14,13 +14,13 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(list_endpoints).post(create_endpoint))
         .route(
-            "/{id}",
+            "/:id",
             get(get_endpoint)
                 .put(update_endpoint)
                 .delete(delete_endpoint),
         )
-        .route("/{id}/rotate-secret", post(rotate_secret))
-        .route("/{id}/retry-policy", put(update_retry_policy))
+        .route("/:id/rotate-secret", post(rotate_secret))
+        .route("/:id/retry-policy", put(update_retry_policy))
 }
 
 async fn list_endpoints(

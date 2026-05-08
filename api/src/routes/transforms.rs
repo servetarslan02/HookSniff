@@ -13,7 +13,7 @@ use crate::transform::{self, CreateTransformRuleRequest, TransformRule, Transfor
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_rules).post(create_rule))
-        .route("/{id}", put(update_rule).delete(delete_rule))
+        .route("/:id", put(update_rule).delete(delete_rule))
         .route("/test", post(test_transform))
 }
 
