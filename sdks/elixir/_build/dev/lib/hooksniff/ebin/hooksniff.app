@@ -1,0 +1,11 @@
+{application,hooksniff,
+             [{optional_applications,[]},
+              {applications,[kernel,stdlib,elixir,logger,inets,ssl,jason,
+                             plug_crypto]},
+              {description,"Official Elixir client for the HookSniff webhook delivery service"},
+              {modules,['Elixir.HookSniff','Elixir.HookSniff.Endpoints',
+                        'Elixir.HookSniff.Error',
+                        'Elixir.HookSniff.WebhookVerification',
+                        'Elixir.HookSniff.Webhooks']},
+              {registered,[]},
+              {vsn,"0.2.0"}]}.
