@@ -110,3 +110,32 @@ Private repo = 2000 dk/ay Actions limiti. Çözüm: geçici public.
 6. **Sensitive dosyaları geri yükle** → commit + push
 
 ⚠️ Public iken EXTERNAL_TOKENS.md görünür olur — hızlı ol!
+
+
+---
+
+## ✅ CI DURUMU (2026-05-09 01:20) — LOCAL CI
+
+GitHub Actions devre dışı (billing sorunu). Local CI kullanılacak:
+
+### Local CI Komutları
+```bash
+source "$HOME/.cargo/env"
+cd hooksniff-pr-test  # veya clone edilen repo
+
+cargo fmt --check
+cargo clippy -- -D warnings
+cargo test
+cargo build --release
+cd dashboard && npm install && npm run build
+```
+
+### PR Merge İşlemi
+1. Local CI çalıştır → hepsi geçsin
+2. Format düzeltmesi varsa: `cargo fmt` → API ile push
+3. GitHub API ile squash merge (admin override)
+4. main-protection ruleset: CI check yok, sadece PR zorunlu
+
+### ⚠️ GitHub Billing
+- Hesapta $12 ödenmemiş fatura var
+- Servet kararı: CI kullanılmayacak, local test yeterli
