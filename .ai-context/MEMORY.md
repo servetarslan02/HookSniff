@@ -215,7 +215,7 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 6. **GCP SA doğrulandı** — hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com ✅
 7. **Grafana Tempo doğrulandı** — hooksniff-api trace'leri akıyor ✅
 8. **API durumu** — healthy, uptime OK, queue boş
-9. **sqlx 0.8.4 → 0.8.6 upgrade** — RUSTSEC-2024-0374 güvenlik açığı kapatıldı
+9. **sqlx 0.7.4 → 0.8.6 upgrade** — RUSTSEC-2024-0374 güvenlik açığı kapatıldı
    - `fifo/mod.rs` Encode trait return type düzeltildi
    - 29/29 test ✅, clippy ✅, fmt ✅
 10. Commit `d0df105` push edildi
