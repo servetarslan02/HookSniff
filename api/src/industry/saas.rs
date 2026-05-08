@@ -3,6 +3,12 @@ use super::*;
 /// SaaS industry package — multi-tenant software platforms
 pub struct SaaSvPackage;
 
+impl Default for SaaSvPackage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SaaSvPackage {
     pub fn new() -> Self {
         Self

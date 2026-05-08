@@ -14,6 +14,7 @@ use sha2::Sha256;
 type HmacSha256 = Hmac<Sha256>;
 
 /// Default timestamp tolerance in seconds (5 minutes).
+#[allow(dead_code)]
 pub const DEFAULT_TIMESTAMP_TOLERANCE_SECS: i64 = 300;
 
 /// Compute Standard Webhooks HMAC-SHA256 signature.
@@ -49,6 +50,7 @@ pub fn compute_standard_signature(
 /// 3. Timestamp is within tolerance (default 5 minutes)
 ///
 /// Returns `Ok(())` on success, `Err(VerificationError)` on failure.
+#[allow(dead_code)]
 pub fn verify_standard_signature(
     secret: &str,
     msg_id: &str,
@@ -145,6 +147,7 @@ pub fn compute_hmac(secret: &str, payload: &str) -> String {
 /// Uses constant-time comparison to prevent timing attacks.
 /// The hex-encoded signature is decoded to bytes and compared
 /// via `CtOutput` from the `hmac` crate.
+#[allow(dead_code)]
 pub fn verify_hmac(secret: &str, payload: &str, expected_signature: &str) -> bool {
     // Decode expected signature from hex to raw bytes
     let expected_bytes = match hex::decode(expected_signature) {
@@ -173,6 +176,7 @@ pub fn verify_hmac(secret: &str, payload: &str, expected_signature: &str) -> boo
 
 /// Verify signature against both current and old signing secrets.
 /// Returns true if either matches.
+#[allow(dead_code)]
 pub fn verify_with_rotation(
     current_secret: &str,
     old_secret: Option<&str>,
@@ -198,6 +202,7 @@ pub fn verify_with_rotation(
 
 /// Errors that can occur during Standard Webhooks signature verification.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum VerificationError {
     /// The timestamp header is not a valid integer.
     InvalidTimestamp,

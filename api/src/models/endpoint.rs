@@ -53,6 +53,7 @@ impl RoutingStrategy {
         }
     }
 
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
             "latency" => Self::Latency,
@@ -106,18 +107,15 @@ impl RetryPolicy {
 /// The event delivery format.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
+#[derive(Default)]
 pub enum DeliveryFormat {
     /// Standard HookSniff format (default).
+    #[default]
     Standard,
     /// CloudEvents v1.0 envelope format.
     CloudEvents,
 }
 
-impl Default for DeliveryFormat {
-    fn default() -> Self {
-        Self::Standard
-    }
-}
 
 impl DeliveryFormat {
     pub fn as_str(&self) -> &'static str {
@@ -127,6 +125,7 @@ impl DeliveryFormat {
         }
     }
 
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
             "cloudevents" => Self::CloudEvents,
