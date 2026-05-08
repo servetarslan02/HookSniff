@@ -1,4 +1,4 @@
-use axum::{Extension, http::StatusCode, Json, Router};
+use axum::{http::StatusCode, Extension, Json, Router};
 use serde::{Deserialize, Serialize};
 
 use crate::email::ResendClient;
@@ -23,7 +23,8 @@ pub async fn handle_contact(
     Json(body): Json<ContactRequest>,
 ) -> Result<Json<ContactResponse>, StatusCode> {
     // Validate input
-    if body.name.trim().is_empty() || body.email.trim().is_empty() || body.message.trim().is_empty() {
+    if body.name.trim().is_empty() || body.email.trim().is_empty() || body.message.trim().is_empty()
+    {
         return Err(StatusCode::BAD_REQUEST);
     }
 
@@ -68,11 +69,13 @@ pub async fn handle_contact(
         );
 
         // Send to admin
-        let _ = client.send_contact_email(
-            "support@hooksniff.is-a.dev",
-            &format!("Contact: {} — {}", body.subject, body.name),
-            &admin_html,
-        ).await;
+        let _ = client
+            .send_contact_email(
+                "support@hooksniff.is-a.dev",
+                &format!("Contact: {} — {}", body.subject, body.name),
+                &admin_html,
+            )
+            .await;
 
         // Send confirmation to user
         let user_html = format!(
@@ -91,11 +94,13 @@ pub async fn handle_contact(
             body.name, body.subject
         );
 
-        let _ = client.send_contact_email(
-            &body.email,
-            "We received your message — HookSniff",
-            &user_html,
-        ).await;
+        let _ = client
+            .send_contact_email(
+                &body.email,
+                "We received your message — HookSniff",
+                &user_html,
+            )
+            .await;
     } else {
         tracing::warn!("Resend not configured — contact form logged but no email sent");
     }

@@ -87,7 +87,10 @@ async fn main() -> Result<()> {
     );
 
     tracing::info!("🔧 HookSniff Worker starting...");
-    tracing::info!("   Database: {}", &cfg.database_url[..30.min(cfg.database_url.len())]);
+    tracing::info!(
+        "   Database: {}",
+        &cfg.database_url[..30.min(cfg.database_url.len())]
+    );
 
     // Start health check HTTP server for Cloud Run (PORT env or 8080)
     let health_port: u16 = std::env::var("PORT")
@@ -259,7 +262,7 @@ async fn process_pending(
     let items: Vec<WebhookQueueItem> = {
         let _poll_guard = tracing::info_span!("queue-poll", batch_size = 50).entered();
         sqlx::query_as::<_, WebhookQueueItem>(
-        r#"
+            r#"
         UPDATE webhook_queue
         SET status = 'processing'
         WHERE id IN (
@@ -273,9 +276,9 @@ async fn process_pending(
         RETURNING id, delivery_id, endpoint_id, endpoint_url, payload, custom_headers,
                   attempt_count, max_attempts, next_retry_at, trace_id
         "#,
-    )
-    .fetch_all(pool)
-    .await?
+        )
+        .fetch_all(pool)
+        .await?
     };
 
     let count = items.len();
@@ -285,14 +288,14 @@ async fn process_pending(
     let unique_ids: std::collections::HashSet<uuid::Uuid> = endpoint_ids.iter().cloned().collect();
     let unique_vec: Vec<uuid::Uuid> = unique_ids.into_iter().collect();
 
-    let secret_rows: Vec<(uuid::Uuid, String)> = sqlx::query_as(
-        "SELECT id, signing_secret FROM endpoints WHERE id = ANY($1)"
-    )
-    .bind(&unique_vec)
-    .fetch_all(pool)
-    .await?;
+    let secret_rows: Vec<(uuid::Uuid, String)> =
+        sqlx::query_as("SELECT id, signing_secret FROM endpoints WHERE id = ANY($1)")
+            .bind(&unique_vec)
+            .fetch_all(pool)
+            .await?;
 
-    let secret_map: std::collections::HashMap<uuid::Uuid, String> = secret_rows.into_iter().collect();
+    let secret_map: std::collections::HashMap<uuid::Uuid, String> =
+        secret_rows.into_iter().collect();
 
     for item in items {
         let delivery_id = item.delivery_id;
@@ -311,7 +314,12 @@ async fn process_pending(
         // Capture the trace_id for this span so we can store it in the DB
         let trace_id = telemetry::current_trace_id();
 
-        tracing::info!("📤 Delivery {} (attempt {}/{})", delivery_id, attempt, item.max_attempts);
+        tracing::info!(
+            "📤 Delivery {} (attempt {}/{})",
+            delivery_id,
+            attempt,
+            item.max_attempts
+        );
 
         // Get signing secret from batch-fetched map
         let signing_secret = match secret_map.get(&item.endpoint_id) {
@@ -319,7 +327,8 @@ async fn process_pending(
             _ => {
                 tracing::error!(
                     "❌ No signing_secret for endpoint {} — delivery {} will fail verification",
-                    item.endpoint_id, delivery_id
+                    item.endpoint_id,
+                    delivery_id
                 );
                 // Mark as dead letter since we can't sign the request
                 let mut tx = pool.begin().await?;
@@ -376,13 +385,30 @@ async fn process_pending(
         } else {
             format!("HTTP {}", status_code)
         };
-        let attempt_status = if is_network_error { None } else { Some(status_code) };
-        let attempt_body = if is_network_error { None } else { Some(response_body.as_str()) };
-        let attempt_headers = if is_network_error { None } else { Some(resp_headers) };
+        let attempt_status = if is_network_error {
+            None
+        } else {
+            Some(status_code)
+        };
+        let attempt_body = if is_network_error {
+            None
+        } else {
+            Some(response_body.as_str())
+        };
+        let attempt_headers = if is_network_error {
+            None
+        } else {
+            Some(resp_headers)
+        };
 
         if result.success {
             // ✅ Başarılı
-            tracing::info!("✅ Delivery {} → HTTP {} ({}ms)", delivery_id, status_code, duration_ms);
+            tracing::info!(
+                "✅ Delivery {} → HTTP {} ({}ms)",
+                delivery_id,
+                status_code,
+                duration_ms
+            );
 
             let mut tx = pool.begin().await?;
 
@@ -415,11 +441,22 @@ async fn process_pending(
             .await?;
 
             // Record attempt
-            record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, None, trace_id.as_deref(), attempt_headers).await?;
+            record_attempt(
+                &mut *tx,
+                delivery_id,
+                attempt,
+                attempt_status,
+                attempt_body,
+                duration_ms,
+                None,
+                trace_id.as_deref(),
+                attempt_headers,
+            )
+            .await?;
 
             // Reset endpoint failure streak on success
             sqlx::query::<sqlx::Postgres>(
-                "UPDATE endpoints SET failure_streak = 0, avg_response_ms = $2 WHERE id = $1"
+                "UPDATE endpoints SET failure_streak = 0, avg_response_ms = $2 WHERE id = $1",
             )
             .bind(item.endpoint_id)
             .bind(duration_ms)
@@ -427,10 +464,13 @@ async fn process_pending(
             .await?;
 
             tx.commit().await?;
-
         } else if attempt >= item.max_attempts {
             // ❌ Max deneme aşıldı → dead letter
-            tracing::error!("❌ Delivery {} → {} — max attempts, moving to dead letter", delivery_id, error_msg);
+            tracing::error!(
+                "❌ Delivery {} → {} — max attempts, moving to dead letter",
+                delivery_id,
+                error_msg
+            );
 
             let mut tx = pool.begin().await?;
 
@@ -461,13 +501,26 @@ async fn process_pending(
             .await?;
 
             // Update delivery status
-            sqlx::query::<sqlx::Postgres>("UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1")
-                .bind(delivery_id)
-                .bind(&error_msg)
-                .execute(&mut *tx)
-                .await?;
+            sqlx::query::<sqlx::Postgres>(
+                "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
+            )
+            .bind(delivery_id)
+            .bind(&error_msg)
+            .execute(&mut *tx)
+            .await?;
 
-            record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&error_msg), trace_id.as_deref(), attempt_headers).await?;
+            record_attempt(
+                &mut *tx,
+                delivery_id,
+                attempt,
+                attempt_status,
+                attempt_body,
+                duration_ms,
+                Some(&error_msg),
+                trace_id.as_deref(),
+                attempt_headers,
+            )
+            .await?;
 
             // Increment endpoint failure streak on dead letter
             sqlx::query::<sqlx::Postgres>(
@@ -478,13 +531,19 @@ async fn process_pending(
             .await?;
 
             tx.commit().await?;
-
         } else {
             // 🔄 Retry — exponential backoff
             let delay = calculate_backoff(attempt);
             let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
 
-            tracing::warn!("⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})", delivery_id, error_msg, delay, attempt, item.max_attempts);
+            tracing::warn!(
+                "⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})",
+                delivery_id,
+                error_msg,
+                delay,
+                attempt,
+                item.max_attempts
+            );
 
             let mut tx = pool.begin().await?;
 
@@ -501,7 +560,18 @@ async fn process_pending(
             .execute(&mut *tx)
             .await?;
 
-            record_attempt(&mut *tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&format!("{} — retry scheduled", error_msg)), trace_id.as_deref(), attempt_headers).await?;
+            record_attempt(
+                &mut *tx,
+                delivery_id,
+                attempt,
+                attempt_status,
+                attempt_body,
+                duration_ms,
+                Some(&format!("{} — retry scheduled", error_msg)),
+                trace_id.as_deref(),
+                attempt_headers,
+            )
+            .await?;
 
             tx.commit().await?;
         }
@@ -533,7 +603,7 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
         return Ok(0);
     }
 
-    for (id, delivery_id, endpoint_id, attempt, max_attempts) in &stuck {
+    for (id, delivery_id, _endpoint_id, attempt, max_attempts) in &stuck {
         if *attempt >= *max_attempts {
             // Max attempts exceeded → dead letter
             tracing::error!(
@@ -568,7 +638,7 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
 
             // Update delivery status to failed
             sqlx::query::<sqlx::Postgres>(
-                "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1"
+                "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
             )
             .bind(delivery_id)
             .bind("zombie reaper: max attempts exceeded")
@@ -590,7 +660,9 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
 
             tracing::warn!(
                 "🧟 Recovered zombie: queue_id={} delivery_id={} next_attempt={}",
-                id, delivery_id, attempt + 1
+                id,
+                delivery_id,
+                attempt + 1
             );
         }
     }
@@ -630,13 +702,12 @@ async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
             .fetch_optional(pool)
             .await?;
 
-        if let Some((id, endpoint_id, customer_id, payload, custom_headers)) = delivery {
-            let endpoint_url: Option<(String,)> = sqlx::query_as(
-                "SELECT url FROM endpoints WHERE id = $1"
-            )
-            .bind(endpoint_id)
-            .fetch_optional(pool)
-            .await?;
+        if let Some((id, endpoint_id, _customer_id, payload, custom_headers)) = delivery {
+            let endpoint_url: Option<(String,)> =
+                sqlx::query_as("SELECT url FROM endpoints WHERE id = $1")
+                    .bind(endpoint_id)
+                    .fetch_optional(pool)
+                    .await?;
 
             if let Some((url,)) = endpoint_url {
                 sqlx::query::<sqlx::Postgres>(
@@ -654,7 +725,8 @@ async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
 
                 tracing::warn!(
                     "🧟 Re-queued orphaned delivery: {} (endpoint={})",
-                    id, endpoint_id
+                    id,
+                    endpoint_id
                 );
             }
         }

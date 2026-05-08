@@ -112,8 +112,8 @@ impl RetryPolicy {
             id: Uuid::nil(),
             endpoint_id,
             max_attempts: 5,
-            base_delay_ms: 1_000,       // 1 saniye
-            max_delay_ms: 3_600_000,    // 1 saat
+            base_delay_ms: 1_000,    // 1 saniye
+            max_delay_ms: 3_600_000, // 1 saat
             multiplier: 2.0,
             created_at: Utc::now(),
         }
@@ -155,11 +155,7 @@ impl RetryPolicy {
     ///
     /// Bir teslimat denemesi başarısız olduğunda çağrılır.
     /// Sonraki retry zamanlamasını döner.
-    pub fn evaluate_attempt(
-        &self,
-        current_attempt: i32,
-        success: bool,
-    ) -> RetryDecision {
+    pub fn evaluate_attempt(&self, current_attempt: i32, success: bool) -> RetryDecision {
         if success {
             return RetryDecision::Success;
         }
@@ -185,13 +181,12 @@ impl RetryPolicy {
     pub fn compute_schedule(&self) -> Vec<RetryScheduleEntry> {
         (1..=self.max_attempts)
             .filter_map(|attempt| {
-                self.next_retry_delay(attempt).map(|delay_ms| {
-                    RetryScheduleEntry {
+                self.next_retry_delay(attempt)
+                    .map(|delay_ms| RetryScheduleEntry {
                         attempt,
                         delay_ms,
                         delay_human: format_duration(delay_ms),
-                    }
-                })
+                    })
             })
             .collect()
     }
@@ -227,9 +222,7 @@ pub enum RetryDecision {
         retry_at: DateTime<Utc>,
     },
     /// Max deneme sayısı aşıldı — dead letter'a taşı
-    Exhausted {
-        total_attempts: i32,
-    },
+    Exhausted { total_attempts: i32 },
 }
 
 // ---------------------------------------------------------------------------
@@ -239,10 +232,7 @@ pub enum RetryDecision {
 /// Endpoint için retry politikasını yükle
 ///
 /// Politika tanımlanmamışsa varsayılan politika döner.
-pub async fn load_policy(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<RetryPolicy> {
+pub async fn load_policy(pool: &PgPool, endpoint_id: Uuid) -> Result<RetryPolicy> {
     let policy: Option<RetryPolicy> = sqlx::query_as(
         r#"
         SELECT id, endpoint_id, max_attempts, base_delay_ms, max_delay_ms, multiplier, created_at
@@ -337,25 +327,18 @@ pub async fn upsert_policy(
 }
 
 /// Endpoint için retry politikasını sil
-pub async fn delete_policy(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<bool> {
-    let result = sqlx::query(
-        "DELETE FROM retry_policies WHERE endpoint_id = $1",
-    )
-    .bind(endpoint_id)
-    .execute(pool)
-    .await
-    .context("Failed to delete retry policy")?;
+pub async fn delete_policy(pool: &PgPool, endpoint_id: Uuid) -> Result<bool> {
+    let result = sqlx::query("DELETE FROM retry_policies WHERE endpoint_id = $1")
+        .bind(endpoint_id)
+        .execute(pool)
+        .await
+        .context("Failed to delete retry policy")?;
 
     Ok(result.rows_affected() > 0)
 }
 
 /// Tüm retry politikalarını listele
-pub async fn list_policies(
-    pool: &PgPool,
-) -> Result<Vec<RetryPolicy>> {
+pub async fn list_policies(pool: &PgPool) -> Result<Vec<RetryPolicy>> {
     let policies: Vec<RetryPolicy> = sqlx::query_as(
         r#"
         SELECT id, endpoint_id, max_attempts, base_delay_ms, max_delay_ms, multiplier, created_at
@@ -553,7 +536,9 @@ mod tests {
         let p = test_policy();
         let decision = p.evaluate_attempt(2, false);
         match decision {
-            RetryDecision::Retry { attempt, delay_ms, .. } => {
+            RetryDecision::Retry {
+                attempt, delay_ms, ..
+            } => {
                 assert_eq!(attempt, 3);
                 assert!(delay_ms >= 4_000);
             }
@@ -610,7 +595,11 @@ mod tests {
         // Birden fazla çağrı yaparak jitter'in 0.0-0.25 aralığında olduğunu doğrula
         for _ in 0..100 {
             let jitter = random_jitter_factor();
-            assert!(jitter >= 0.0 && jitter <= 0.25, "jitter out of range: {}", jitter);
+            assert!(
+                jitter >= 0.0 && jitter <= 0.25,
+                "jitter out of range: {}",
+                jitter
+            );
         }
     }
 

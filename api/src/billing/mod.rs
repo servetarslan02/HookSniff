@@ -1,7 +1,7 @@
+pub mod iyzico;
+pub mod polar;
 pub mod provider;
 pub mod stripe;
-pub mod polar;
-pub mod iyzico;
 
 use serde::{Deserialize, Serialize};
 
@@ -67,9 +67,9 @@ impl Plan {
     /// Max payload size in bytes
     pub fn max_payload_bytes(&self) -> usize {
         match self {
-            Plan::Free => 256 * 1024,        // 256 KB
-            Plan::Pro => 1024 * 1024,         // 1 MB
-            Plan::Business => 5 * 1024 * 1024, // 5 MB
+            Plan::Free => 256 * 1024,             // 256 KB
+            Plan::Pro => 1024 * 1024,             // 1 MB
+            Plan::Business => 5 * 1024 * 1024,    // 5 MB
             Plan::Enterprise => 10 * 1024 * 1024, // 10 MB
         }
     }
@@ -108,9 +108,7 @@ impl Plan {
 /// Resolve the active payment provider for a given provider name.
 ///
 /// Returns the appropriate provider implementation, or falls back to Stripe.
-pub fn resolve_provider(
-    provider_name: &str,
-) -> Option<Box<dyn provider::PaymentProviderImpl>> {
+pub fn resolve_provider(provider_name: &str) -> Option<Box<dyn provider::PaymentProviderImpl>> {
     match provider_name.to_lowercase().as_str() {
         "polar" => {
             let config = polar::PolarConfig::from_env()?;
@@ -135,7 +133,7 @@ pub struct Usage {
     pub webhooks_today: u64,
     pub api_calls_today: u64,
     pub endpoints_count: u32,
-    pub period_start: String,  // ISO 8601 date
+    pub period_start: String, // ISO 8601 date
     pub period_end: String,
 }
 
@@ -152,12 +150,16 @@ impl Usage {
 
     /// Get remaining webhook deliveries for today
     pub fn remaining_webhooks(&self) -> u64 {
-        self.plan.max_webhooks_per_month().saturating_sub(self.webhooks_today)
+        self.plan
+            .max_webhooks_per_month()
+            .saturating_sub(self.webhooks_today)
     }
 
     /// Get remaining endpoints
     pub fn remaining_endpoints(&self) -> u32 {
-        self.plan.max_endpoints().saturating_sub(self.endpoints_count)
+        self.plan
+            .max_endpoints()
+            .saturating_sub(self.endpoints_count)
     }
 }
 

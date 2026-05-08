@@ -10,13 +10,13 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::config::Config;
-use crate::error::AppError;
 use crate::db;
+use crate::error::AppError;
 use crate::middleware::idempotency;
 use crate::models::customer::Customer;
 use crate::models::delivery::{
-    BatchError, BatchResponse, BatchWebhookRequest, CreateWebhookRequest, Delivery, DeliveryAttempt,
-    DeliveryListResponse, DeliveryResponse, ExportDelivery,
+    BatchError, BatchResponse, BatchWebhookRequest, CreateWebhookRequest, Delivery,
+    DeliveryAttempt, DeliveryListResponse, DeliveryResponse, ExportDelivery,
 };
 use crate::models::endpoint::{Endpoint, RetryPolicy};
 use crate::validation;
@@ -111,18 +111,18 @@ async fn create_webhook(
     Json(req): Json<CreateWebhookRequest>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     // Check idempotency key
-    let idempotency_key = headers
-        .get("Idempotency-Key")
-        .and_then(|v| v.to_str().ok());
+    let idempotency_key = headers.get("Idempotency-Key").and_then(|v| v.to_str().ok());
 
     // Compute body hash for idempotency validation
     let body_hash = idempotency_key.map(|_| idempotency::compute_body_hash(&req.data));
 
     if let Some(key) = idempotency_key {
-        if let Some(cached) = idempotency::check_idempotency(&pool, key, customer.id, body_hash.as_deref()).await {
+        if let Some(cached) =
+            idempotency::check_idempotency(&pool, key, customer.id, body_hash.as_deref()).await
+        {
             tracing::info!("♻️ Returning cached response for idempotency key: {}", key);
-            return Ok(Json(serde_json::from_value(cached.response_body).unwrap_or_else(|_| {
-                DeliveryResponse {
+            return Ok(Json(
+                serde_json::from_value(cached.response_body).unwrap_or_else(|_| DeliveryResponse {
                     id: Uuid::nil(),
                     endpoint_id: Uuid::nil(),
                     event: None,
@@ -131,8 +131,8 @@ async fn create_webhook(
                     response_status: Some(cached.status_code),
                     replay_count: Some(0),
                     created_at: cached.created_at,
-                }
-            })));
+                }),
+            ));
         }
     }
 
@@ -180,8 +180,8 @@ async fn create_webhook(
                 "replay_count": 0,
                 "created_at": Utc::now().to_rfc3339(),
             });
-            return Ok(Json(serde_json::from_value(response).unwrap_or_else(|_| {
-                DeliveryResponse {
+            return Ok(Json(serde_json::from_value(response).unwrap_or_else(
+                |_| DeliveryResponse {
                     id: Uuid::nil(),
                     endpoint_id: endpoint.id,
                     event: Some(event.clone()),
@@ -190,8 +190,8 @@ async fn create_webhook(
                     response_status: None,
                     replay_count: Some(0),
                     created_at: Utc::now(),
-                }
-            })));
+                },
+            )));
         }
     }
 
@@ -201,8 +201,7 @@ async fn create_webhook(
         "timestamp": Utc::now().to_rfc3339(),
     });
 
-    let payload_str =
-        serde_json::to_string(&payload).map_err(|e| AppError::Internal(e.into()))?;
+    let payload_str = serde_json::to_string(&payload).map_err(|e| AppError::Internal(e.into()))?;
 
     // Get retry policy from endpoint, or use defaults
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
@@ -247,10 +246,17 @@ async fn create_webhook(
 
     // Store idempotency key if provided
     if let Some(key) = idempotency_key {
-        let response_body = serde_json::to_value(&delivery.to_response())
-            .unwrap_or(serde_json::Value::Null);
-        if let Err(e) =
-            idempotency::store_idempotency(&pool, key, customer.id, response_body, 200, body_hash.as_deref()).await
+        let response_body =
+            serde_json::to_value(&delivery.to_response()).unwrap_or(serde_json::Value::Null);
+        if let Err(e) = idempotency::store_idempotency(
+            &pool,
+            key,
+            customer.id,
+            response_body,
+            200,
+            body_hash.as_deref(),
+        )
+        .await
         {
             tracing::warn!("Failed to store idempotency key: {:?}", e);
         }
@@ -430,8 +436,8 @@ async fn replay_webhook(
 
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
-    let payload_str = serde_json::to_string(&original.payload)
-        .map_err(|e| AppError::Internal(e.into()))?;
+    let payload_str =
+        serde_json::to_string(&original.payload).map_err(|e| AppError::Internal(e.into()))?;
 
     // Atomic check-and-increment: reserve webhook slot before creating replay delivery
     let updated: Option<Customer> = sqlx::query_as(
@@ -524,7 +530,9 @@ async fn batch_replay(
         return Err(AppError::BadRequest("delivery_ids cannot be empty".into()));
     }
     if req.delivery_ids.len() > 100 {
-        return Err(AppError::BadRequest("Max 100 deliveries per batch replay".into()));
+        return Err(AppError::BadRequest(
+            "Max 100 deliveries per batch replay".into(),
+        ));
     }
 
     let mut replayed = Vec::new();
@@ -574,8 +582,8 @@ async fn batch_replay(
         }
 
         let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
-        let payload_str = serde_json::to_string(&original.payload)
-            .map_err(|e| AppError::Internal(e.into()))?;
+        let payload_str =
+            serde_json::to_string(&original.payload).map_err(|e| AppError::Internal(e.into()))?;
 
         let new_delivery = sqlx::query_as::<_, Delivery>(
             "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, replay_count) VALUES ($1, $2, $3, $4, 'pending', $5, 1) RETURNING *",
@@ -682,7 +690,9 @@ async fn export_deliveries(
 
     match format.as_str() {
         "csv" => {
-            let mut csv = String::from("id,event,endpoint_url,status,attempt_count,response_status,created_at\n");
+            let mut csv = String::from(
+                "id,event,endpoint_url,status,attempt_count,response_status,created_at\n",
+            );
             for d in &filtered {
                 csv.push_str(&format!(
                     "{},{},{},{},{},{},{}\n",

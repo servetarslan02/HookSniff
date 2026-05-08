@@ -1,19 +1,24 @@
-use serde::{Deserialize, Serialize};
 use axum::extract::{Extension, Path};
 use axum::routing::{delete, get, post, put};
 use axum::{Json, Router};
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::error::AppError;
 use crate::billing::Plan;
+use crate::error::AppError;
 use crate::models::customer::Customer;
 use crate::models::endpoint::{CreateEndpointRequest, Endpoint, EndpointResponse, RetryPolicy};
 
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_endpoints).post(create_endpoint))
-        .route("/{id}", get(get_endpoint).put(update_endpoint).delete(delete_endpoint))
+        .route(
+            "/{id}",
+            get(get_endpoint)
+                .put(update_endpoint)
+                .delete(delete_endpoint),
+        )
         .route("/{id}/rotate-secret", post(rotate_secret))
         .route("/{id}/retry-policy", put(update_retry_policy))
 }
@@ -29,7 +34,9 @@ async fn list_endpoints(
     .fetch_all(&pool)
     .await?;
 
-    Ok(Json(endpoints.into_iter().map(|e| e.to_response()).collect()))
+    Ok(Json(
+        endpoints.into_iter().map(|e| e.to_response()).collect(),
+    ))
 }
 
 async fn create_endpoint(
@@ -39,12 +46,11 @@ async fn create_endpoint(
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Check endpoint limit based on plan
     let plan = Plan::from_str(&customer.plan);
-    let endpoint_count: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1"
-    )
-    .bind(customer.id)
-    .fetch_one(&pool)
-    .await?;
+    let endpoint_count: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE customer_id = $1")
+            .bind(customer.id)
+            .fetch_one(&pool)
+            .await?;
 
     if endpoint_count.0 as u32 >= plan.max_endpoints() {
         return Err(AppError::BadRequest(format!(
@@ -63,7 +69,10 @@ async fn create_endpoint(
 
     // SSRF protection: block internal IPs (with DNS resolution)
     if let Err(e) = crate::ssrf::validate_url(&req.url) {
-        return Err(AppError::Forbidden(format!("Internal URLs are not allowed: {}", e)));
+        return Err(AppError::Forbidden(format!(
+            "Internal URLs are not allowed: {}",
+            e
+        )));
     }
 
     // Validate custom headers if provided
@@ -95,8 +104,9 @@ async fn create_endpoint(
         req.allowed_ips.map(|ips| serde_json::json!(ips));
 
     // Convert retry_policy to JSON
-    let retry_policy_json: Option<serde_json::Value> =
-        req.retry_policy.and_then(|rp| serde_json::to_value(rp).ok());
+    let retry_policy_json: Option<serde_json::Value> = req
+        .retry_policy
+        .and_then(|rp| serde_json::to_value(rp).ok());
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
         r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers, retry_policy, routing_strategy, fallback_url)
@@ -123,14 +133,13 @@ async fn get_endpoint(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<EndpointResponse>, AppError> {
-    let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let endpoint =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     Ok(Json(endpoint.to_response()))
 }
@@ -175,22 +184,26 @@ async fn update_endpoint(
     Json(req): Json<UpdateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Verify ownership
-    let existing = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let existing =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     // Validate URL if provided
     if let Some(ref url) = req.url {
         if !url.starts_with("https://") && !url.starts_with("http://") {
-            return Err(AppError::BadRequest("URL must start with http:// or https://".into()));
+            return Err(AppError::BadRequest(
+                "URL must start with http:// or https://".into(),
+            ));
         }
         if let Err(e) = crate::ssrf::validate_url(url) {
-            return Err(AppError::Forbidden(format!("Internal URLs are not allowed: {}", e)));
+            return Err(AppError::Forbidden(format!(
+                "Internal URLs are not allowed: {}",
+                e
+            )));
         }
     }
 
@@ -199,19 +212,26 @@ async fn update_endpoint(
         if let Some(obj) = headers.as_object() {
             for (key, value) in obj {
                 if !key.starts_with("X-") {
-                    return Err(AppError::BadRequest("Custom header names must start with 'X-'".into()));
+                    return Err(AppError::BadRequest(
+                        "Custom header names must start with 'X-'".into(),
+                    ));
                 }
                 if !value.is_string() {
-                    return Err(AppError::BadRequest("Custom header values must be strings".into()));
+                    return Err(AppError::BadRequest(
+                        "Custom header values must be strings".into(),
+                    ));
                 }
             }
         } else {
-            return Err(AppError::BadRequest("custom_headers must be a JSON object".into()));
+            return Err(AppError::BadRequest(
+                "custom_headers must be a JSON object".into(),
+            ));
         }
     }
 
-    let retry_policy_json: Option<serde_json::Value> =
-        req.retry_policy.and_then(|rp| serde_json::to_value(rp).ok());
+    let retry_policy_json: Option<serde_json::Value> = req
+        .retry_policy
+        .and_then(|rp| serde_json::to_value(rp).ok());
 
     let allowed_ips_json: Option<serde_json::Value> =
         req.allowed_ips.map(|ips| serde_json::json!(ips));
@@ -257,14 +277,13 @@ async fn update_retry_policy(
     Json(policy): Json<RetryPolicy>,
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Verify ownership
-    let _ = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let _ =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let policy_json = serde_json::to_value(&policy)?;
 
@@ -288,14 +307,13 @@ async fn rotate_secret(
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Get current endpoint
-    let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let endpoint =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let new_secret = format!("whsec_{}", Uuid::new_v4().to_string().replace('-', ""));
 

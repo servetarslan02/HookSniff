@@ -110,14 +110,8 @@ impl<'r> sqlx::Decode<'r, sqlx::Postgres> for FifoStatus {
 }
 
 impl sqlx::Encode<'_, sqlx::Postgres> for FifoStatus {
-    fn encode_by_ref(
-        &self,
-        buf: &mut sqlx::postgres::PgArgumentBuffer,
-    ) -> sqlx::encode::IsNull {
-        <String as sqlx::Encode<sqlx::Postgres>>::encode_by_ref(
-            &self.as_str().to_string(),
-            buf,
-        )
+    fn encode_by_ref(&self, buf: &mut sqlx::postgres::PgArgumentBuffer) -> sqlx::encode::IsNull {
+        <String as sqlx::Encode<sqlx::Postgres>>::encode_by_ref(&self.as_str().to_string(), buf)
     }
 }
 
@@ -155,10 +149,7 @@ pub struct EnqueueResult {
 // ---------------------------------------------------------------------------
 
 /// Endpoint için sonraki sıra numarasını üret (atomik artış)
-pub async fn next_sequence_num(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<i64> {
+pub async fn next_sequence_num(pool: &PgPool, endpoint_id: Uuid) -> Result<i64> {
     let row: (i64,) = sqlx::query_as(
         r#"
         UPDATE endpoints
@@ -226,11 +217,7 @@ pub async fn enqueue(
 /// 1. Bu öğe kuyruğun başındaysa (en küçük pending sequence_num)
 /// 2. Bir önceki öğe delivered/timed_out/dead_lettered ise
 /// 3. FIFO timeout aşılmamışsa
-async fn can_deliver_head(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-    sequence_num: i64,
-) -> Result<bool> {
+async fn can_deliver_head(pool: &PgPool, endpoint_id: Uuid, sequence_num: i64) -> Result<bool> {
     // İlk öğe her zaman teslim edilebilir
     if sequence_num <= 1 {
         return Ok(true);
@@ -263,10 +250,7 @@ async fn can_deliver_head(
 ///
 /// endpoint_id'ye ait, pending durumunda, en küçük sequence_num'a sahip
 /// ve bir önceki öğesi tamamlanmış öğeyi döner.
-pub async fn dequeue_next(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<Option<FifoQueueItem>> {
+pub async fn dequeue_next(pool: &PgPool, endpoint_id: Uuid) -> Result<Option<FifoQueueItem>> {
     // Kuyruğun başındaki pending öğeyi bul
     let head: Option<FifoQueueItem> = sqlx::query_as(
         r#"
@@ -290,13 +274,11 @@ pub async fn dequeue_next(
     // Bir önceki tamamlanmış mı kontrol et
     if can_deliver_head(pool, endpoint_id, item.sequence_num).await? {
         // Processing durumuna geçir
-        sqlx::query(
-            "UPDATE fifo_queue SET status = 'processing' WHERE id = $1",
-        )
-        .bind(item.id)
-        .execute(pool)
-        .await
-        .context("Failed to update FIFO item to processing")?;
+        sqlx::query("UPDATE fifo_queue SET status = 'processing' WHERE id = $1")
+            .bind(item.id)
+            .execute(pool)
+            .await
+            .context("Failed to update FIFO item to processing")?;
 
         let mut item = item;
         item.status = FifoStatus::Processing;
@@ -309,17 +291,12 @@ pub async fn dequeue_next(
 /// FIFO öğesinin teslimatını başarılı olarak işaretle
 ///
 /// Sıradaki öğelerin teslim edilebilmesini sağlar.
-pub async fn mark_delivered(
-    pool: &PgPool,
-    item_id: Uuid,
-) -> Result<()> {
-    sqlx::query(
-        "UPDATE fifo_queue SET status = 'delivered' WHERE id = $1",
-    )
-    .bind(item_id)
-    .execute(pool)
-    .await
-    .context("Failed to mark FIFO item as delivered")?;
+pub async fn mark_delivered(pool: &PgPool, item_id: Uuid) -> Result<()> {
+    sqlx::query("UPDATE fifo_queue SET status = 'delivered' WHERE id = $1")
+        .bind(item_id)
+        .execute(pool)
+        .await
+        .context("Failed to mark FIFO item as delivered")?;
 
     tracing::debug!(item_id = %item_id, "FIFO item marked as delivered");
     Ok(())
@@ -329,34 +306,24 @@ pub async fn mark_delivered(
 ///
 /// Sıradaki öğelerin beklemesini sağlar.
 /// Retry mekanizması bu öğeyi tekrar deneyecektir.
-pub async fn mark_failed(
-    pool: &PgPool,
-    item_id: Uuid,
-) -> Result<()> {
-    sqlx::query(
-        "UPDATE fifo_queue SET status = 'failed' WHERE id = $1",
-    )
-    .bind(item_id)
-    .execute(pool)
-    .await
-    .context("Failed to mark FIFO item as failed")?;
+pub async fn mark_failed(pool: &PgPool, item_id: Uuid) -> Result<()> {
+    sqlx::query("UPDATE fifo_queue SET status = 'failed' WHERE id = $1")
+        .bind(item_id)
+        .execute(pool)
+        .await
+        .context("Failed to mark FIFO item as failed")?;
 
     tracing::warn!(item_id = %item_id, "FIFO item marked as failed — blocking subsequent items");
     Ok(())
 }
 
 /// FIFO öğesini dead letter olarak işaretle (max retry aşıldı)
-pub async fn mark_dead_lettered(
-    pool: &PgPool,
-    item_id: Uuid,
-) -> Result<()> {
-    sqlx::query(
-        "UPDATE fifo_queue SET status = 'dead_lettered' WHERE id = $1",
-    )
-    .bind(item_id)
-    .execute(pool)
-    .await
-    .context("Failed to mark FIFO item as dead-lettered")?;
+pub async fn mark_dead_lettered(pool: &PgPool, item_id: Uuid) -> Result<()> {
+    sqlx::query("UPDATE fifo_queue SET status = 'dead_lettered' WHERE id = $1")
+        .bind(item_id)
+        .execute(pool)
+        .await
+        .context("Failed to mark FIFO item as dead-lettered")?;
 
     tracing::error!(item_id = %item_id, "FIFO item dead-lettered — breaking FIFO chain");
     Ok(())
@@ -370,9 +337,7 @@ pub async fn mark_dead_lettered(
 ///
 /// Bu, sonsuz blokajı önler. Bir öğe çok uzun süredir bekliyorsa
 /// (örneğin bir önceki öğe hiç tamamlanamıyorsa), timeout ile zincir kırılır.
-pub async fn check_timeouts(
-    pool: &PgPool,
-) -> Result<u64> {
+pub async fn check_timeouts(pool: &PgPool) -> Result<u64> {
     let result = sqlx::query(
         r#"
         UPDATE fifo_queue fq
@@ -398,30 +363,23 @@ pub async fn check_timeouts(
 ///
 /// Retry mekanizması tarafından çağrılır. Exponential backoff
 /// süresi dolmuş failed öğeleri tekrar deneme için hazırlar.
-pub async fn reset_failed_for_retry(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-    item_id: Uuid,
-) -> Result<()> {
+pub async fn reset_failed_for_retry(pool: &PgPool, endpoint_id: Uuid, item_id: Uuid) -> Result<()> {
     // Sadece bu endpoint'in failed öğelerini kontrol et
-    let status: Option<String> = sqlx::query_scalar(
-        "SELECT status FROM fifo_queue WHERE id = $1 AND endpoint_id = $2",
-    )
-    .bind(item_id)
-    .bind(endpoint_id)
-    .fetch_optional(pool)
-    .await
-    .context("Failed to check FIFO item for retry")?;
+    let status: Option<String> =
+        sqlx::query_scalar("SELECT status FROM fifo_queue WHERE id = $1 AND endpoint_id = $2")
+            .bind(item_id)
+            .bind(endpoint_id)
+            .fetch_optional(pool)
+            .await
+            .context("Failed to check FIFO item for retry")?;
 
     match status.as_deref() {
         Some("failed") => {
-            sqlx::query(
-                "UPDATE fifo_queue SET status = 'pending' WHERE id = $1",
-            )
-            .bind(item_id)
-            .execute(pool)
-            .await
-            .context("Failed to reset FIFO item for retry")?;
+            sqlx::query("UPDATE fifo_queue SET status = 'pending' WHERE id = $1")
+                .bind(item_id)
+                .execute(pool)
+                .await
+                .context("Failed to reset FIFO item for retry")?;
 
             tracing::debug!(item_id = %item_id, "FIFO item reset to pending for retry");
             Ok(())
@@ -442,10 +400,7 @@ pub async fn reset_failed_for_retry(
 // ---------------------------------------------------------------------------
 
 /// Endpoint'in FIFO kuyruk istatistiklerini al
-pub async fn get_queue_stats(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<FifoQueueStats> {
+pub async fn get_queue_stats(pool: &PgPool, endpoint_id: Uuid) -> Result<FifoQueueStats> {
     let stats: (i64, i64, i64, i64, i64, i64) = sqlx::query_as(
         r#"
         SELECT
@@ -534,10 +489,7 @@ pub async fn list_queue_items(
 /// Endpoint'in FIFO kuyruğundaki bloke olmuş öğeleri bul
 ///
 /// Bir önceki öğe failed/timed_out olduğu için bekleyen öğeleri döner.
-pub async fn find_blocked_items(
-    pool: &PgPool,
-    endpoint_id: Uuid,
-) -> Result<Vec<FifoQueueItem>> {
+pub async fn find_blocked_items(pool: &PgPool, endpoint_id: Uuid) -> Result<Vec<FifoQueueItem>> {
     let items: Vec<FifoQueueItem> = sqlx::query_as(
         r#"
         SELECT fq.id, fq.endpoint_id, fq.event_type, fq.payload,
@@ -599,13 +551,12 @@ pub async fn should_deliver_now(
     sequence_num: Option<i64>,
 ) -> Result<bool> {
     // Endpoint'in FIFO yapılandırmasını kontrol et
-    let fifo_enabled: bool = sqlx::query_scalar(
-        "SELECT COALESCE(fifo_enabled, false) FROM endpoints WHERE id = $1",
-    )
-    .bind(endpoint_id)
-    .fetch_one(pool)
-    .await
-    .context("Failed to check FIFO config")?;
+    let fifo_enabled: bool =
+        sqlx::query_scalar("SELECT COALESCE(fifo_enabled, false) FROM endpoints WHERE id = $1")
+            .bind(endpoint_id)
+            .fetch_one(pool)
+            .await
+            .context("Failed to check FIFO config")?;
 
     if !fifo_enabled {
         return Ok(true); // FIFO devre dışı, hemen teslim et

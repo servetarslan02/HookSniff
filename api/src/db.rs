@@ -28,11 +28,10 @@ async fn ensure_migrations_table(pool: &PgPool) -> Result<()> {
 
 /// Check if a migration has already been applied.
 async fn is_migration_applied(pool: &PgPool, name: &str) -> Result<bool> {
-    let row: Option<(String,)> =
-        sqlx::query_as("SELECT name FROM _migrations WHERE name = $1")
-            .bind(name)
-            .fetch_optional(pool)
-            .await?;
+    let row: Option<(String,)> = sqlx::query_as("SELECT name FROM _migrations WHERE name = $1")
+        .bind(name)
+        .fetch_optional(pool)
+        .await?;
     Ok(row.is_some())
 }
 

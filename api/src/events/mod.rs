@@ -102,22 +102,19 @@ pub fn delivery_event(
 }
 
 /// Create a CloudEvent for an endpoint event.
-pub fn endpoint_event(
-    event_type: &str,
-    endpoint_id: &str,
-    data: serde_json::Value,
-) -> CloudEvent {
+pub fn endpoint_event(event_type: &str, endpoint_id: &str, data: serde_json::Value) -> CloudEvent {
     let mut ce = CloudEvent::new(event_type, "https://api.hooksniff.is-a.dev", Some(data));
     ce.subject = Some(endpoint_id.to_string());
     ce
 }
 
 /// Create a CloudEvent for a security event.
-pub fn security_event(
-    event_type: &str,
-    data: serde_json::Value,
-) -> CloudEvent {
-    CloudEvent::new(event_type, "https://api.hooksniff.is-a.dev/security", Some(data))
+pub fn security_event(event_type: &str, data: serde_json::Value) -> CloudEvent {
+    CloudEvent::new(
+        event_type,
+        "https://api.hooksniff.is-a.dev/security",
+        Some(data),
+    )
 }
 
 #[cfg(test)]
@@ -135,7 +132,9 @@ mod tests {
 
     #[test]
     fn test_event_type_naming_convention() {
-        assert!(event_types::is_valid_hooksniff_event("com.hooksniff.delivery.completed"));
+        assert!(event_types::is_valid_hooksniff_event(
+            "com.hooksniff.delivery.completed"
+        ));
         assert!(!event_types::is_valid_hooksniff_event("delivery.completed"));
         assert!(!event_types::is_valid_hooksniff_event("com.other.event"));
     }

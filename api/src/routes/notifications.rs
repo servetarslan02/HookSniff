@@ -110,12 +110,11 @@ async fn list_notifications(
         .fetch_all(&pool)
         .await?;
 
-        let total: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM notifications WHERE customer_id = $1",
-        )
-        .bind(customer.id)
-        .fetch_one(&pool)
-        .await?;
+        let total: (i64,) =
+            sqlx::query_as("SELECT COUNT(*) FROM notifications WHERE customer_id = $1")
+                .bind(customer.id)
+                .fetch_one(&pool)
+                .await?;
 
         (notifs, total.0)
     };
@@ -157,13 +156,12 @@ async fn mark_read(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let result = sqlx::query(
-        "UPDATE notifications SET is_read = TRUE WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .execute(&pool)
-    .await?;
+    let result =
+        sqlx::query("UPDATE notifications SET is_read = TRUE WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .execute(&pool)
+            .await?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
@@ -195,13 +193,11 @@ async fn delete_notification(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let result = sqlx::query(
-        "DELETE FROM notifications WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .execute(&pool)
-    .await?;
+    let result = sqlx::query("DELETE FROM notifications WHERE id = $1 AND customer_id = $2")
+        .bind(id)
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
