@@ -143,3 +143,27 @@ jobs:
         with:
           name: dashboard-build
           path: dashboard/.next
+
+  # ──────────────────────────────────────────────
+  # Security audit (Rust + Node)
+  # ──────────────────────────────────────────────
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Rust dependency audit
+        run: cargo audit
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Node dependency audit
+        working-directory: dashboard
+        run: npm audit --audit-level=high
+        continue-on-error: true

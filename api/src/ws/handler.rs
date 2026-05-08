@@ -272,7 +272,6 @@ pub fn authenticate_ws_token(token: &str, jwt_secret: &str) -> Result<Uuid> {
     #[derive(Debug, Deserialize)]
     struct Claims {
         sub: String,
-        #[allow(dead_code)]
         exp: usize,
     }
 
