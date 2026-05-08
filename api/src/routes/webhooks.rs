@@ -107,6 +107,7 @@ async fn create_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
+    Extension(is_test): Extension<crate::middleware::IsTestKey>,
     headers: axum::http::header::HeaderMap,
     Json(req): Json<CreateWebhookRequest>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
@@ -131,6 +132,7 @@ async fn create_webhook(
                     response_status: Some(cached.status_code),
                     replay_count: Some(0),
                     created_at: cached.created_at,
+                    is_test: None,
                 }),
             ));
         }
@@ -190,6 +192,7 @@ async fn create_webhook(
                     response_status: None,
                     replay_count: Some(0),
                     created_at: Utc::now(),
+                    is_test: None,
                 },
             )));
         }
@@ -220,15 +223,34 @@ async fn create_webhook(
     }
 
     let delivery = sqlx::query_as::<_, Delivery>(
-        "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES ($1, $2, $3, $4, 'pending', $5) RETURNING *",
+        "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *",
     )
     .bind(endpoint.id)
     .bind(customer.id)
     .bind(&payload)
     .bind(&req.event)
     .bind(retry_policy.max_attempts)
+    .bind(is_test.0)
     .fetch_one(&pool)
     .await?;
+
+    // Test mode: mark as delivered immediately, skip real delivery
+    if is_test.0 {
+        sqlx::query(
+            "UPDATE deliveries SET status = 'delivered', attempt_count = 0, response_status = 200, response_body = '{\"test\": true}' WHERE id = $1",
+        )
+        .bind(delivery.id)
+        .execute(&pool)
+        .await?;
+
+        tracing::info!("🧪 Test delivery {} created with hr_test_ key — marked as delivered (no real HTTP)", delivery.id);
+
+        // Return the test delivery
+        let mut resp = delivery.to_response();
+        resp.status = "delivered".to_string();
+        resp.response_status = Some(200);
+        return Ok(Json(resp));
+    }
 
     db::publish_to_queue(
         &pool,

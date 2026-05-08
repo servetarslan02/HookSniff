@@ -23,6 +23,9 @@ pub struct Delivery {
     pub fifo_group_id: Option<String>,
     pub updated_at: DateTime<Utc>,
     pub error_message: Option<String>,
+    /// True if this delivery was created with a test API key (hr_test_*).
+    #[sqlx(default)]
+    pub is_test: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -47,6 +50,9 @@ pub struct DeliveryResponse {
     pub response_status: Option<i32>,
     pub replay_count: Option<i32>,
     pub created_at: DateTime<Utc>,
+    /// True if this was a test delivery.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_test: Option<bool>,
 }
 
 #[derive(Debug, Serialize)]
@@ -116,6 +122,7 @@ impl Delivery {
             response_status: self.response_status,
             replay_count: Some(self.replay_count),
             created_at: self.created_at,
+            is_test: Some(self.is_test),
         }
     }
 }
