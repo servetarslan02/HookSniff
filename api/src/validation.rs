@@ -62,7 +62,7 @@ pub fn validate_json_depth(value: &serde_json::Value) -> Result<(), String> {
         }
         Ok(())
     }
-    check_depth(value, 1)
+    check_depth(value, 0)
 }
 
 #[cfg(test)]
