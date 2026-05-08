@@ -23,6 +23,7 @@ struct EventsParams {
     since: Option<String>,
     status: Option<String>,
     endpoint_id: Option<Uuid>,
+    #[allow(dead_code)]
     event: Option<String>,
     page: Option<i64>,
     per_page: Option<i64>,
@@ -103,11 +104,10 @@ async fn list_events(
     };
 
     // Get total count
-    let total: (i64,) =
-        sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE customer_id = $1")
-            .bind(customer.id)
-            .fetch_one(&pool)
-            .await?;
+    let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE customer_id = $1")
+        .bind(customer.id)
+        .fetch_one(&pool)
+        .await?;
 
     let events: Vec<EventItem> = deliveries
         .into_iter()

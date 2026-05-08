@@ -243,7 +243,10 @@ async fn create_webhook(
         .execute(&pool)
         .await?;
 
-        tracing::info!("🧪 Test delivery {} created with hr_test_ key — marked as delivered (no real HTTP)", delivery.id);
+        tracing::info!(
+            "🧪 Test delivery {} created with hr_test_ key — marked as delivered (no real HTTP)",
+            delivery.id
+        );
 
         // Return the test delivery
         let mut resp = delivery.to_response();
