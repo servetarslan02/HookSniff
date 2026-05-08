@@ -182,6 +182,11 @@ impl HookSniffClient {
         WebhooksResource { client: self }
     }
 
+    /// Access search resource.
+    pub fn search(&self) -> SearchResource<'_> {
+        SearchResource { client: self }
+    }
+
     /// Get platform statistics.
     pub async fn get_stats(&self) -> Result<Stats, HookSniffError> {
         self.request(reqwest::Method::GET, "/stats", None).await
@@ -379,6 +384,88 @@ impl<'a> WebhooksResource<'a> {
             .request(
                 reqwest::Method::GET,
                 &format!("/webhooks/{}/attempts", delivery_id),
+                None,
+            )
+            .await
+    }
+
+    /// Export deliveries as JSON or CSV.
+    pub async fn export(
+        &self,
+        format: Option<&str>,
+        status: Option<&str>,
+        date_from: Option<&str>,
+        date_to: Option<&str>,
+    ) -> Result<serde_json::Value, HookSniffError> {
+        let mut params = Vec::new();
+        if let Some(f) = format {
+            params.push(format!("format={}", f));
+        }
+        if let Some(s) = status {
+            params.push(format!("status={}", s));
+        }
+        if let Some(df) = date_from {
+            params.push(format!("date_from={}", df));
+        }
+        if let Some(dt) = date_to {
+            params.push(format!("date_to={}", dt));
+        }
+        let qs = if params.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", params.join("&"))
+        };
+        self.client
+            .request(
+                reqwest::Method::GET,
+                &format!("/webhooks/export{}", qs),
+                None,
+            )
+            .await
+    }
+}
+
+/// Search resource for querying deliveries.
+pub struct SearchResource<'a> {
+    client: &'a HookSniffClient,
+}
+
+impl<'a> SearchResource<'a> {
+    pub fn new(client: &'a HookSniffClient) -> Self {
+        Self { client }
+    }
+
+    /// Search deliveries with filters.
+    pub async fn search(
+        &self,
+        query: Option<&str>,
+        event: Option<&str>,
+        status: Option<&str>,
+        endpoint_id: Option<&str>,
+        page: i32,
+        per_page: i32,
+    ) -> Result<serde_json::Value, HookSniffError> {
+        let mut params = vec![
+            format!("page={}", page),
+            format!("per_page={}", per_page),
+        ];
+        if let Some(q) = query {
+            params.push(format!("q={}", q));
+        }
+        if let Some(e) = event {
+            params.push(format!("event={}", e));
+        }
+        if let Some(s) = status {
+            params.push(format!("status={}", s));
+        }
+        if let Some(eid) = endpoint_id {
+            params.push(format!("endpoint_id={}", eid));
+        }
+        let qs = params.join("&");
+        self.client
+            .request(
+                reqwest::Method::GET,
+                &format!("/search?{}", qs),
                 None,
             )
             .await
