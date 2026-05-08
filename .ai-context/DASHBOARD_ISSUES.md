@@ -140,6 +140,10 @@ landing.footer.contact
 | 35 | **Footer.tsx** | - | `© {new Date().getFullYear()} HookSniff` hardcoded |
 | 36 | **Dashboard layout.tsx** | 73 | Sidebar logo `HookSniff` link değil (sadece `<div>`), ana sayfaya dönüş yok |
 | 37 | **Dashboard layout.tsx** | - | Sidebar'da "Home" / "Ana Sayfa" menü öğesi yok |
+| 38 | **Landing page.tsx** | 229 | How It Works mavi çizgi: dark mode'da `brand-600` (çok belirgin), light mode'da `brand-300` (soluk) → farklı görünüm |
+| 39 | **docs/layout.tsx** | 23 | Nav arka planı farklı: `bg-white/80` + `dark:border-slate-700` (diğer sayfalarda `bg-white/70 dark:bg-slate-900/70` + `dark:border-slate-800`) |
+| 40 | **status/page.tsx** | - | Nav bar yok — sadece LanguageSwitcher, diğer sayfalarla tutarsız |
+| 41 | **docs/layout.tsx** | 35 | `tc('nav.dashboard')` → `common.nav.dashboard` eksik → başlık olarak görünüyor (build error) |
 
 ### ✅ DÜZELTİLMİŞ (rm -rf .next sonrası)
 
