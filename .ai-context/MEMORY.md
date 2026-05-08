@@ -88,6 +88,18 @@ cd dashboard && npm install && npm run build
 1. Clippy ✅, Test ✅ (29), Dashboard build ✅, Security audit ✅
 2. Push edildi — `7ff7c94` commit
 
+### Bu Oturum (17) — 2026-05-09 02:40-03:17 GMT+8:
+
+1. **Grafana OTEL token sorunu çözüldü** — çoklu token denemeleri, endpoint keşfi
+2. Stack ID'nin 1625476 (1757335 değil) olduğu tespit edildi
+3. Auth formatı: `Basic base64(1625476:glc_token)` (Bearer değil!)
+4. Region: prod-eu-west-2 (us değil!)
+5. `otlp-gateway-prod-eu-west-2.grafana.net` → HTTP 200 ✅
+6. EXTERNAL_TOKENS.md güncellendi — yeni token + stack bilgileri
+7. .env.production.example güncellendi — OTEL endpoint + headers
+8. otel-collector-config.yml güncellendi — Grafana Cloud exporter eklendi
+9. 3 dosya değiştirildi, push bekleniyor
+
 ### Bu Oturum (16) — 2026-05-09 01:41-01:55 GMT+8:
 
 1. **OpenAPI spec yazıldı** — `docs/openapi.yaml` (74KB, tüm 60+ endpoint, OpenAPI 3.0.3)
@@ -128,7 +140,7 @@ cd dashboard && npm install && npm run build
 - ~~truncate duplicate (main.rs)~~ → sadece delivery/http.rs'de kalmış
 
 ### ❌ HALA DÜZELTİLMEMİŞ (1 adet)
-1. **Grafana OTEL token** — tüm token'lar 401 döndü, Servet'ten yeni API Key bekleniyor (Oturum 16)
+1. **Grafana OTEL token** — ✅ DÜZELTİLDİ (Oturum 17). Stack ID: 1625476, Auth: Basic, Region: eu-west-2
 2. ~~OpenAPI spec boş~~ → ✅ Tam OpenAPI 3.0.3 spec yazıldı (Oturum 16)
 3. ~~`.env.production.example` eksik~~ → ✅ Güncellendi (Oturum 16)
 4. ~~console.log kalıntıları~~ → ✅ SDK code example'larında, kalıntı değil (Oturum 16)
