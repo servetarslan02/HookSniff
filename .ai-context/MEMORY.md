@@ -256,3 +256,10 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 5. **Sonuç:** M2 tamamlanması için Servet'in 2 şey yapması lazım:
    - npm: Granular token + "Allow 2FA bypass"
    - crates.io: Email doğrula
+
+### Bu Oturum (23) — 2026-05-09 05:29 GMT+8:
+
+1. **npm publish** — ✅ Başarılı! `hooksniff-sdk@0.1.0` npm'de yayında
+   - `@hooksniff` scope'u yok → `hooksniff-sdk` olarak publish edildi
+   - Yeni token ile 2FA bypass sorun çözüldü
+2. **crates.io** — hala email doğrulama bekliyor
