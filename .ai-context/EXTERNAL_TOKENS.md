@@ -16,7 +16,7 @@ VERCEL_PROJECT_ID=prj_cSIVYHpCoAtoihRp8xlXIun1KVSR
 VERCEL_DEPLOY_HOOK=https://api.vercel.com/v1/integrations/deploy/prj_cSIVYHpCoAtoihRp8xlXIun1KVSR/uBpn0GrAqw
 
 # GitHub
-GITHUB_PAT=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
+GITHUB_PAT=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
 GITHUB_REPO=servetarslan02/HookSniff
 
 # Neon DB
