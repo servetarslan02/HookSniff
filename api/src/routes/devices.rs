@@ -1,8 +1,7 @@
 use axum::extract::{Extension, Path};
-use axum::routing::{delete, get, post};
+use axum::routing::{delete, post};
 use axum::{Json, Router};
 use chrono::{DateTime, Utc};
-use serde::Serialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -18,11 +17,11 @@ pub fn router() -> Router {
 #[derive(Debug, sqlx::FromRow)]
 struct DeviceTokenRow {
     id: Uuid,
-    customer_id: Uuid,
+    _customer_id: Uuid,
     token: String,
     platform: String,
     created_at: DateTime<Utc>,
-    last_used_at: DateTime<Utc>,
+    _last_used_at: DateTime<Utc>,
 }
 
 /// POST /v1/devices — Register a device token for push notifications

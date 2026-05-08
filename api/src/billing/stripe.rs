@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
 
-use crate::billing::{Plan, Subscription, SubscriptionStatus};
+use crate::billing::Plan;
 use crate::config::Config;
 use crate::error::AppError;
 
@@ -20,8 +20,6 @@ type HmacSha256 = Hmac<Sha256>;
 
 /// Default maximum age of a webhook event before it's rejected (5 minutes).
 /// Overridden by config.webhook_timestamp_tolerance_secs when available.
-const DEFAULT_WEBHOOK_TIMESTAMP_TOLERANCE_SECS: i64 = 300;
-
 /// Stripe price IDs for each plan (set in environment)
 #[derive(Debug, Clone)]
 pub struct StripePrices {
@@ -525,7 +523,7 @@ fn checkout_to_form(session: &CreateCheckoutSession) -> Vec<(String, String)> {
         fields.push(("customer".to_string(), customer.clone()));
     }
 
-    for (i, (key, value)) in session.metadata.iter().enumerate() {
+    for (key, value) in session.metadata.iter() {
         fields.push((format!("metadata[{}]", key), value.clone()));
     }
 
