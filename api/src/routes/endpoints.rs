@@ -1,7 +1,7 @@
 use axum::extract::{Extension, Path};
-use axum::routing::{delete, get, post, put};
+use axum::routing::{get, post, put};
 use axum::{Json, Router};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -184,7 +184,7 @@ async fn update_endpoint(
     Json(req): Json<UpdateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Verify ownership
-    let existing =
+    let _existing =
         sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)

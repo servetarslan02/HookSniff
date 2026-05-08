@@ -169,7 +169,7 @@ async fn test_webhook(
                 endpoint_url: endpoint.url,
             }))
         }
-        Err(e) => Ok(Json(TestWebhookResponse {
+        Err(_e) => Ok(Json(TestWebhookResponse {
             success: false,
             status_code: 0,
             response_body: String::new(),

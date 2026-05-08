@@ -180,11 +180,11 @@ struct PaymentInitResponse {
     #[serde(rename = "errorMessage")]
     error_message: Option<String>,
     #[serde(rename = "threeDSHtmlContent")]
-    three_ds_html: Option<String>,
+    _three_ds_html: Option<String>,
     #[serde(rename = "paymentId")]
     payment_id: Option<String>,
     #[serde(rename = "conversationId")]
-    conversation_id: Option<String>,
+    _conversation_id: Option<String>,
 }
 
 /// iyzico webhook notification.

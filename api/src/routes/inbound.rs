@@ -16,10 +16,10 @@
 //! - Shopify (HMAC-SHA256)
 //! - Generic (custom header + HMAC)
 
-use axum::body::{Body, Bytes};
-use axum::extract::{Extension, Path, Request};
-use axum::http::{HeaderMap, StatusCode};
-use axum::response::{IntoResponse, Response};
+use axum::body::{Bytes};
+use axum::extract::{Extension, Path};
+use axum::http::{HeaderMap};
+use axum::response::{IntoResponse};
 use axum::routing::post;
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};

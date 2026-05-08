@@ -82,7 +82,10 @@ mod tests {
         // Clear the env var for test
         std::env::remove_var("OUTBOUND_IPS");
         let resp = load_outbound_ips();
-        assert!(resp.ips.is_empty(), "Default IPs should be empty until OUTBOUND_IPS is configured");
+        assert!(
+            resp.ips.is_empty(),
+            "Default IPs should be empty until OUTBOUND_IPS is configured"
+        );
         assert!(!resp.updated_at.is_empty());
     }
 

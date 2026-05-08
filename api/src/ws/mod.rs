@@ -226,7 +226,6 @@ fn pattern_matches(pattern: &str, text: &str) -> bool {
 
     let parts: Vec<&str> = pattern.split('*').collect();
     let mut text_pos = 0;
-    let text_bytes = text.as_bytes();
 
     for (i, part) in parts.iter().enumerate() {
         if part.is_empty() {

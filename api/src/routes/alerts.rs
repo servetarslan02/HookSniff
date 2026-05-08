@@ -32,7 +32,7 @@ struct CreateAlertRequest {
     condition: String, // "failure_rate", "latency", "consecutive_failures"
     threshold: i32,
     channels: Vec<String>, // "slack", "email", "webhook"
-    endpoint_id: Option<Uuid>,
+    _endpoint_id: Option<Uuid>,
 }
 
 async fn list_alerts(

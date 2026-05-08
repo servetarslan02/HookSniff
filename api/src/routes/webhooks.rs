@@ -1,7 +1,7 @@
 use axum::body::Body;
 use axum::extract::{Extension, Path, Query};
 use axum::http::{header, StatusCode};
-use axum::response::{IntoResponse, Response};
+use axum::response::Response;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
@@ -413,7 +413,7 @@ async fn batch_webhooks(
 async fn replay_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-    Extension(cfg): Extension<Config>,
+    Extension(_cfg): Extension<Config>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     let original = sqlx::query_as::<_, Delivery>(
@@ -523,7 +523,7 @@ struct BatchReplayRequest {
 async fn batch_replay(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-    Extension(cfg): Extension<Config>,
+    Extension(_cfg): Extension<Config>,
     Json(req): Json<BatchReplayRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     if req.delivery_ids.is_empty() {

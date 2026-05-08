@@ -1,6 +1,5 @@
-use axum::extract::{Extension, Path};
+use axum::extract::{Extension};
 use axum::http::StatusCode;
-use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use chrono::Datelike;
@@ -9,7 +8,7 @@ use sqlx::PgPool;
 
 use crate::billing::provider::{PaymentProvider, PaymentProviderImpl};
 use crate::billing::stripe;
-use crate::billing::{Plan, Subscription, SubscriptionStatus};
+use crate::billing::{Plan};
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -380,7 +379,14 @@ async fn handle_stripe_webhook(
         tracing::warn!("Stripe webhook secret not configured, skipping verification");
     }
 
-    stripe::handle_webhook_event(&pool, &body, signature, webhook_secret, cfg.webhook_timestamp_tolerance_secs).await?;
+    stripe::handle_webhook_event(
+        &pool,
+        &body,
+        signature,
+        webhook_secret,
+        cfg.webhook_timestamp_tolerance_secs,
+    )
+    .await?;
 
     Ok(StatusCode::OK)
 }

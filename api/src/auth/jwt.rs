@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::error::AppError;
-use crate::models::customer::Customer;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {

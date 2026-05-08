@@ -229,7 +229,7 @@ async fn get_plan(Extension(customer): Extension<Customer>) -> Json<serde_json::
 }
 
 /// Bildirim tercihleri
-async fn get_notifications(Extension(customer): Extension<Customer>) -> Json<serde_json::Value> {
+async fn get_notifications(Extension(_customer): Extension<Customer>) -> Json<serde_json::Value> {
     // FIXME: Bildirim tercihleri veritabanından okunacak (şimdilik hardcoded)
     Json(serde_json::json!({
         "email_on_failure": true,
