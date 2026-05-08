@@ -144,6 +144,9 @@ Lab repo'da geliştirilecek.
 
 Detay: `.ai-context/MOBILE_MASTER_PLAN.md` ← TEK KAYNAK DÖKÜMAN
 Eksiklik analizi: `.ai-context/MOBILE_APP_AUDIT.md`
+Performans: `.ai-context/MOBILE_PERFORMANCE.md`
+Kaynaklar: `.ai-context/MOBILE_RESOURCES.md`
+Kararlar: `.ai-context/MOBILE_DECISIONS.md`
 
 **Kararlar:**
 - Platform: Android (sadece, iOS yok)
