@@ -27,6 +27,19 @@ Ayrıca Java, PHP, Ruby'ye Webhook Handler pattern ekle.
 
 ## 💡 Ürün Önerileri
 
+### ⚠️ KRİTİK: AI Center SDK'dan Kaldırılacak
+**Sorun:** Node ve Python SDK'larında `client.ai.*` modülü var ama backend'de `/ai/*` endpoint'leri hiç tanımlanmıs değil. 404 döner.
+**Karar:** SDK'lardan AI Center kodu çıkarılacak. Olmayan özelliği sunuyormuş gibi görünmek güven kaybettirir.
+**Dosyalar:**
+- `sdks/node/src/index.ts` → `AiCenterResource` sınıfı + `this.ai` satırı kaldırılacak
+- `sdks/node/src/types.ts` → `AiStatus`, `AiEvent`, `RiskScore`, `AiAction`, `AiProvider` tipleri kaldırılacak
+- `sdks/python/hooksniff/client.py` → `_AiCenterResource` sınıfı + `self.ai` satırı kaldırılacak
+- `sdks/python/hooksniff/models.py` → `AiStatus`, `AiEvent`, `RiskScore`, `AiAction` modelleri kaldırılacak
+**Not:** Go, Java, PHP, Ruby SDK'larında zaten yok. Sadece Node ve Python'dan çıkarılacak.
+**Öncelik:** Yayından önce yapılmalı.
+
+---
+
 ### 1. 🏆 "Try It" Butonu — Svix Play Benzeri
 **Ne:** Dashboard'da tek tıkla geçici webhook endpoint oluşturup test etme.
 **Neden:** Svix'in en popüler özelliği. HookSniff'te yok.
