@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-08 19:03 GMT+8
+> Son güncelleme: 2026-05-08 20:59 GMT+8
 
 ---
 
@@ -127,7 +127,7 @@ git push origin main
 | Görev | Nasıl Yapılır | Durum |
 |-------|---------------|-------|
 | Polar.sh token | polar.sh → Settings → Access Tokens → Yeni token oluştur | ❌ |
-| Resend domain | resend.com → Domains → Yeni domain ekle → DNS kayıtları | ❌ |
+| ~~Resend domain~~ | ✅ GCloud Gmail API'ya taşındı | ✅ |
 | GitHub token | github.com → Settings → Developer settings → Tokens → Yeni PAT | ❌ |
 | iyzico hesap | iyzico.com → Başvuru → Vergi levhası + banka hesabı | ❌ |
 
