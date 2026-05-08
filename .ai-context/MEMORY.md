@@ -16,7 +16,8 @@
 
 ### ⚠️ REPO AYRIMI KURALI (2026-05-08 — Servet Kararı)
 - **Hata düzeltme, fix, refactor** → Orijinal repo `servetarslan02/HookSniff` (main branch)
-- **Yeni özellik geliştirme** → Ayrı lab repo `servetarslan02/hooksniff-lab`
+- **Mobil uygulama** → Ayrı repo `servetarslan02/hooksniff-mobile` (main branch)
+- **Yeni web özellikleri** → Lab repo `servetarslan02/hooksniff-lab`
   - Lab repo'da test edilir, kusursuz çalışınca Servet onayı ile ana repo'ya merge edilir
   - Ana repo'nun main branch'i bozulmaz
   - Her özellik ayrı branch'te geliştirilir
