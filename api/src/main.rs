@@ -82,6 +82,7 @@ async fn main() -> Result<()> {
         // Middleware
         // CORS: restrict origins in production
         .layer(axum::Extension(pool.clone()))
+        .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(metrics.clone()))
         .layer(axum::Extension(resend_client))
         .layer({
