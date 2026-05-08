@@ -340,8 +340,6 @@ class WebhooksResource {
  * });
  * ```
  */
-  }
-}
 
 export class HookSniff {
   private apiKey: string;
@@ -450,7 +448,7 @@ export class HookSniff {
  * ```typescript
  * import { verifyWebhookSignature } from '@hooksniff/sdk';
  *
- * app.post('/webhook', express.raw({ type: '*/*' }), (req, res) => {
+ * app.post('/webhook', express.raw({ type: "*\/*" }), (req, res) => {
  *   const result = verifyWebhookSignature(
  *     req.body.toString(),
  *     req.headers['x-hooksniff-signature'],
@@ -512,7 +510,7 @@ export function verifyWebhookSignature(
  * const app = express();
  *
  * // Use raw body for signature verification
- * app.post('/webhooks', express.raw({ type: '*/*' }), createWebhookHandler({
+ * app.post('/webhooks', express.raw({ type: "*\/*" }), createWebhookHandler({
  *   secret: 'whsec_...',
  *   handlers: {
  *     'order.created': async (payload) => {
