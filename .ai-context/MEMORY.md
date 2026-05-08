@@ -107,6 +107,15 @@
 6. Versiyon tutarsızlığı (0.1.0 ~ 0.4.0 arası)
 7. Hiçbir SDK'da test, CI, publish yok
 
+### Kod Kalitesi Sorunları (2026-05-08 tespit edildi — detay: .ai-context/CODEBASE_AUDIT.md)
+1. 107 tane eski domain referansı (`is-a.dev`) — domain kararı sonrası temizlenecek
+2. 8 tane `#[allow(dead_code)]` — worker/signing.rs'te 5 tanesi
+3. Duplicate fonksiyonlar (`validate_url` 2 yerde, `truncate` 2 yerde)
+4. API'de 38 dependency — bazıları gereksiz olabilir
+5. Dashboard'da console.log kalıntıları (docs sayfalarında)
+6. 3 tane TODO kalıntısı (customer_portal.rs + settings)
+7. CI'da otomatik tarama araçları yok (clippy, audit, lint)
+
 ---
 
 ## ⚠️ SERVET'İN YAPMASI GEREKEN
