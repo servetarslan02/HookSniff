@@ -72,8 +72,7 @@ impl std::fmt::Display for Provider {
 }
 
 impl Provider {
-    #[allow(clippy::should_implement_trait)]
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "stripe" => Self::Stripe,
             "github" => Self::GitHub,
@@ -236,7 +235,7 @@ async fn handle_inbound(
     headers: HeaderMap,
     body: Bytes,
 ) -> Result<impl IntoResponse, AppError> {
-    let provider = Provider::from_str(&provider);
+    let provider = Provider::parse_str(&provider);
 
     // Extract API key from query param or header
     let api_key = headers
@@ -341,7 +340,7 @@ async fn handle_inbound_to_endpoint(
     headers: HeaderMap,
     body: Bytes,
 ) -> Result<impl IntoResponse, AppError> {
-    let provider = Provider::from_str(&provider);
+    let provider = Provider::parse_str(&provider);
 
     // Extract API key
     let api_key = headers

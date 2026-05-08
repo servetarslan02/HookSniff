@@ -53,8 +53,7 @@ impl RoutingStrategy {
         }
     }
 
-    #[allow(clippy::should_implement_trait)]
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_str(s: &str) -> Self {
         match s {
             "latency" => Self::Latency,
             "failover" => Self::Failover,
@@ -125,8 +124,7 @@ impl DeliveryFormat {
         }
     }
 
-    #[allow(clippy::should_implement_trait)]
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_str(s: &str) -> Self {
         match s {
             "cloudevents" => Self::CloudEvents,
             _ => Self::Standard,
@@ -227,7 +225,7 @@ impl Endpoint {
     /// Determine the target URL for delivery based on routing strategy.
     /// Returns (url, used_fallback).
     pub fn resolve_target_url(&self) -> (String, bool) {
-        let strategy = RoutingStrategy::from_str(&self.routing_strategy);
+        let strategy = RoutingStrategy::parse_str(&self.routing_strategy);
 
         match strategy {
             RoutingStrategy::Failover => {
