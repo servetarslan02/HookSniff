@@ -36,7 +36,7 @@ import (
 
 const (
 	defaultBaseURL = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
-	userAgent      = "hooksniff-go/0.2.0"
+	userAgent      = "hooksniff-go/0.1.0"
 )
 
 // Error types for structured error handling.
