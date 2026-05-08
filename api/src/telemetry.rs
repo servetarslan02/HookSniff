@@ -7,8 +7,11 @@ use tracing_subscriber::prelude::*;
 /// otherwise only structured logging is configured.
 pub fn init(cfg: &crate::config::Config) {
     let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
-    let use_json = env == "production" || env == "prod"
-        || std::env::var("LOG_FORMAT").map(|v| v == "json").unwrap_or(false);
+    let use_json = env == "production"
+        || env == "prod"
+        || std::env::var("LOG_FORMAT")
+            .map(|v| v == "json")
+            .unwrap_or(false);
 
     let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
@@ -28,8 +31,8 @@ fn init_otel(
 ) {
     use opentelemetry::global;
     use opentelemetry::trace::TracerProvider as _;
-    use opentelemetry_sdk::trace::TracerProvider;
     use opentelemetry_otlp::WithExportConfig;
+    use opentelemetry_sdk::trace::TracerProvider;
 
     let otlp_endpoint = cfg
         .otel_exporter_otlp_endpoint
@@ -86,11 +89,7 @@ fn init_otel(
 }
 
 /// Plain structured logging (no OTel).
-fn init_plain(
-    env_filter: tracing_subscriber::EnvFilter,
-    use_json: bool,
-    env: &str,
-) {
+fn init_plain(env_filter: tracing_subscriber::EnvFilter, use_json: bool, env: &str) {
     if use_json {
         let _ = tracing_subscriber::registry()
             .with(env_filter)
@@ -123,7 +122,9 @@ pub async fn trace_id_middleware(request: Request, next: Next) -> impl IntoRespo
     let mut response = next.run(request).await;
     response.headers_mut().insert(
         "X-Trace-Id",
-        trace_id.parse().unwrap_or_else(|_| "unknown".parse().unwrap()),
+        trace_id
+            .parse()
+            .unwrap_or_else(|_| "unknown".parse().unwrap()),
     );
     response
 }

@@ -29,9 +29,9 @@ struct AlertRule {
 #[derive(Deserialize)]
 struct CreateAlertRequest {
     name: String,
-    condition: String,  // "failure_rate", "latency", "consecutive_failures"
+    condition: String, // "failure_rate", "latency", "consecutive_failures"
     threshold: i32,
-    channels: Vec<String>,  // "slack", "email", "webhook"
+    channels: Vec<String>, // "slack", "email", "webhook"
     endpoint_id: Option<Uuid>,
 }
 
@@ -46,15 +46,32 @@ async fn list_alerts(
     .fetch_all(&pool)
     .await?;
 
-    Ok(Json(alerts.into_iter().map(|(id, name, condition, threshold, channels, active, created)| {
-        let channel_list: Vec<String> = channels.as_array()
-            .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
-            .unwrap_or_default();
-        AlertRule {
-            id, name, condition, threshold, channels: channel_list, is_active: active,
-            created_at: created.to_rfc3339(),
-        }
-    }).collect()))
+    Ok(Json(
+        alerts
+            .into_iter()
+            .map(
+                |(id, name, condition, threshold, channels, active, created)| {
+                    let channel_list: Vec<String> = channels
+                        .as_array()
+                        .map(|arr| {
+                            arr.iter()
+                                .filter_map(|v| v.as_str().map(String::from))
+                                .collect()
+                        })
+                        .unwrap_or_default();
+                    AlertRule {
+                        id,
+                        name,
+                        condition,
+                        threshold,
+                        channels: channel_list,
+                        is_active: active,
+                        created_at: created.to_rfc3339(),
+                    }
+                },
+            )
+            .collect(),
+    ))
 }
 
 async fn create_alert(
@@ -75,7 +92,11 @@ async fn create_alert(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("🔔 Alert rule created: {} for customer {}", req.name, customer.id);
+    tracing::info!(
+        "🔔 Alert rule created: {} for customer {}",
+        req.name,
+        customer.id
+    );
 
     Ok(Json(AlertRule {
         id: alert.0,
@@ -102,13 +123,24 @@ async fn get_alert(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    let channels: Vec<String> = alert.4.as_array()
-        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+    let channels: Vec<String> = alert
+        .4
+        .as_array()
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect()
+        })
         .unwrap_or_default();
 
     Ok(Json(AlertRule {
-        id: alert.0, name: alert.1, condition: alert.2, threshold: alert.3,
-        channels, is_active: alert.5, created_at: alert.6.to_rfc3339(),
+        id: alert.0,
+        name: alert.1,
+        condition: alert.2,
+        threshold: alert.3,
+        channels,
+        is_active: alert.5,
+        created_at: alert.6.to_rfc3339(),
     }))
 }
 
@@ -136,12 +168,13 @@ async fn test_alert(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Verify ownership
-    let _alert: (Uuid,) = sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND customer_id = $2")
-        .bind(id)
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await?
-        .ok_or(AppError::NotFound)?;
+    let _alert: (Uuid,) =
+        sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     // Send test notification
     Ok(Json(serde_json::json!({

@@ -87,11 +87,7 @@ impl CloudEvent {
         endpoint_id: &str,
         payload: serde_json::Value,
     ) -> Self {
-        let mut ce = Self::new(
-            event_type,
-            "https://api.hooksniff.is-a.dev",
-            Some(payload),
-        );
+        let mut ce = Self::new(event_type, "https://api.hooksniff.is-a.dev", Some(payload));
         ce.id = delivery_id.to_string();
         ce.subject = Some(endpoint_id.to_string());
         ce
@@ -236,7 +232,11 @@ mod tests {
 
     #[test]
     fn test_cloud_event_json_structure() {
-        let ce = CloudEvent::new("test.event", "source", Some(serde_json::json!({"key": "value"})));
+        let ce = CloudEvent::new(
+            "test.event",
+            "source",
+            Some(serde_json::json!({"key": "value"})),
+        );
         let json_str = ce.to_json().unwrap();
         let json: serde_json::Value = serde_json::from_str(&json_str).unwrap();
 

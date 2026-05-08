@@ -3,31 +3,15 @@ use axum::{routing::get, Router};
 use tower_http::cors::{AllowOrigin, Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 
-use hooksniff_api::auth;
-use hooksniff_api::billing;
 use hooksniff_api::config;
 use hooksniff_api::db;
-use hooksniff_api::error;
-use hooksniff_api::events;
-use hooksniff_api::fifo;
+use hooksniff_api::email;
 use hooksniff_api::jobs;
 use hooksniff_api::metrics;
-use hooksniff_api::middleware;
-use hooksniff_api::models;
-use hooksniff_api::industry;
 use hooksniff_api::rate_limit;
-use hooksniff_api::retry_policy;
 use hooksniff_api::routes;
-use hooksniff_api::schemas;
-use hooksniff_api::signing;
-use hooksniff_api::ssrf;
-use hooksniff_api::email;
 use hooksniff_api::telemetry;
-use hooksniff_api::templates;
 use hooksniff_api::throttle;
-use hooksniff_api::transform;
-use hooksniff_api::validation;
-use hooksniff_api::ws;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -112,7 +96,15 @@ async fn main() -> Result<()> {
         // Metrics (Prometheus)
         .route("/metrics", get(metrics::metrics_handler))
         // API v1
-        .nest("/v1", routes::create_routes(pool.clone(), rate_limiter, throttle_manager, metrics.clone()))
+        .nest(
+            "/v1",
+            routes::create_routes(
+                pool.clone(),
+                rate_limiter,
+                throttle_manager,
+                metrics.clone(),
+            ),
+        )
         // Middleware
         // CORS: restrict origins in production
         .layer(axum::Extension(pool.clone()))
@@ -120,7 +112,9 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(metrics.clone()))
         .layer(axum::Extension(resend_client))
         .layer({
-            let origins: Vec<axum::http::HeaderValue> = cfg.cors_origins.iter()
+            let origins: Vec<axum::http::HeaderValue> = cfg
+                .cors_origins
+                .iter()
                 .filter_map(|o| o.parse().ok())
                 .collect();
             if cfg.is_production() && origins.is_empty() {

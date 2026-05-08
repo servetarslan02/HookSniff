@@ -8,7 +8,7 @@ use crate::models::customer::Customer;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub sub: Uuid,        // customer_id
+    pub sub: Uuid, // customer_id
     pub email: String,
     pub plan: String,
     pub exp: usize,
@@ -70,8 +70,8 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool, AppError> {
     use argon2::password_hash::PasswordHash;
     use argon2::{Argon2, PasswordVerifier};
 
-    let parsed_hash =
-        PasswordHash::new(hash).map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid hash: {}", e)))?;
+    let parsed_hash = PasswordHash::new(hash)
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid hash: {}", e)))?;
 
     Ok(Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)

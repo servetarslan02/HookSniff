@@ -47,7 +47,9 @@ pub fn router() -> Router {
         .route("/me", get(get_me))
         .route("/profile", put(update_profile))
         .route("/password", put(change_password))
-        .layer(axum::middleware::from_fn(crate::middleware::auth_middleware));
+        .layer(axum::middleware::from_fn(
+            crate::middleware::auth_middleware,
+        ));
 
     public.merge(protected)
 }
@@ -62,7 +64,9 @@ async fn register(
     // Rate limit: 5 registrations per IP per hour
     let client_ip = extract_client_ip(&headers);
     let rl_key = format!("register:{}", client_ip);
-    let rl_result = rate_limiter.check_with_headers(&rl_key, REGISTER_RATE_LIMIT).await;
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, REGISTER_RATE_LIMIT)
+        .await;
     if !rl_result.allowed {
         return Err(AppError::RateLimitExceeded);
     }
@@ -113,7 +117,12 @@ async fn register(
     .await?;
 
     // Generate JWT token
-    let token = jwt::generate_token(customer.id, &customer.email, &customer.plan, &cfg.jwt_secret)?;
+    let token = jwt::generate_token(
+        customer.id,
+        &customer.email,
+        &customer.plan,
+        &cfg.jwt_secret,
+    )?;
 
     tracing::info!("✅ New customer registered: {}", req.email);
 
@@ -122,10 +131,7 @@ async fn register(
         let to = req.email.clone();
         let name = req.name.clone();
         tokio::spawn(async move {
-            if let Err(e) = email_client
-                .send_welcome_email(&to, name.as_deref())
-                .await
-            {
+            if let Err(e) = email_client.send_welcome_email(&to, name.as_deref()).await {
                 tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
             }
         });
@@ -147,7 +153,9 @@ async fn login(
     // Rate limit: 10 login attempts per IP per 15 minutes
     let client_ip = extract_client_ip(&headers);
     let rl_key = format!("login:{}", client_ip);
-    let rl_result = rate_limiter.check_with_headers(&rl_key, LOGIN_RATE_LIMIT).await;
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, LOGIN_RATE_LIMIT)
+        .await;
     if !rl_result.allowed {
         tracing::warn!("⚠️ Login rate limit exceeded for IP: {}", client_ip);
         return Err(AppError::RateLimitExceeded);
@@ -165,19 +173,21 @@ async fn login(
     }
 
     // Verify password
-    let hash = customer
-        .password_hash
-        .as_ref()
-        .ok_or(AppError::BadRequest(
-            "Password login not set up for this account. Use API key auth.".into(),
-        ))?;
+    let hash = customer.password_hash.as_ref().ok_or(AppError::BadRequest(
+        "Password login not set up for this account. Use API key auth.".into(),
+    ))?;
 
     if !jwt::verify_password(&req.password, hash)? {
         return Err(AppError::Unauthorized);
     }
 
     // Generate JWT token
-    let token = jwt::generate_token(customer.id, &customer.email, &customer.plan, &cfg.jwt_secret)?;
+    let token = jwt::generate_token(
+        customer.id,
+        &customer.email,
+        &customer.plan,
+        &cfg.jwt_secret,
+    )?;
 
     tracing::info!("✅ Customer logged in: {}", req.email);
 
@@ -188,7 +198,9 @@ async fn login(
 }
 
 /// GET /v1/auth/me — Return current user info
-async fn get_me(Extension(customer): Extension<Customer>) -> Result<Json<CustomerResponse>, AppError> {
+async fn get_me(
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<CustomerResponse>, AppError> {
     Ok(Json(customer.to_response(None)))
 }
 
@@ -244,12 +256,9 @@ async fn change_password(
         ));
     }
 
-    let hash = customer
-        .password_hash
-        .as_ref()
-        .ok_or(AppError::BadRequest(
-            "Password login not set up for this account".into(),
-        ))?;
+    let hash = customer.password_hash.as_ref().ok_or(AppError::BadRequest(
+        "Password login not set up for this account".into(),
+    ))?;
 
     if !jwt::verify_password(&req.current_password, hash)? {
         return Err(AppError::BadRequest("Current password is incorrect".into()));
@@ -265,5 +274,7 @@ async fn change_password(
 
     tracing::info!("✅ Password changed for customer {}", customer.id);
 
-    Ok(Json(serde_json::json!({"message": "Password updated successfully"})))
+    Ok(Json(
+        serde_json::json!({"message": "Password updated successfully"}),
+    ))
 }

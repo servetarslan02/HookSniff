@@ -180,13 +180,12 @@ async fn create_team(
 
     let mut tx = pool.begin().await?;
 
-    let team = sqlx::query_as::<_, Team>(
-        "INSERT INTO teams (name, owner_id) VALUES ($1, $2) RETURNING *",
-    )
-    .bind(&req.name)
-    .bind(customer.id)
-    .fetch_one(&mut *tx)
-    .await?;
+    let team =
+        sqlx::query_as::<_, Team>("INSERT INTO teams (name, owner_id) VALUES ($1, $2) RETURNING *")
+            .bind(&req.name)
+            .bind(customer.id)
+            .fetch_one(&mut *tx)
+            .await?;
 
     // Add owner as admin member
     sqlx::query(
@@ -220,12 +219,10 @@ async fn list_teams(
 
     let mut result = Vec::with_capacity(teams.len());
     for team in teams {
-        let count: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM team_members WHERE team_id = $1",
-        )
-        .bind(team.id)
-        .fetch_one(&pool)
-        .await?;
+        let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM team_members WHERE team_id = $1")
+            .bind(team.id)
+            .fetch_one(&pool)
+            .await?;
 
         result.push(TeamResponse {
             id: team.id,
@@ -312,13 +309,12 @@ async fn invite_member(
             .await?;
 
     if let Some((cust_id,)) = existing_customer {
-        let already_member: Option<(Uuid,)> = sqlx::query_as(
-            "SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2",
-        )
-        .bind(id)
-        .bind(cust_id)
-        .fetch_optional(&pool)
-        .await?;
+        let already_member: Option<(Uuid,)> =
+            sqlx::query_as("SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2")
+                .bind(id)
+                .bind(cust_id)
+                .fetch_optional(&pool)
+                .await?;
 
         if already_member.is_some() {
             return Err(AppError::BadRequest(
@@ -406,18 +402,14 @@ async fn remove_member(
         .ok_or(AppError::NotFound)?;
 
     if uid == team.owner_id {
-        return Err(AppError::BadRequest(
-            "Cannot remove the team owner".into(),
-        ));
+        return Err(AppError::BadRequest("Cannot remove the team owner".into()));
     }
 
-    let result = sqlx::query(
-        "DELETE FROM team_members WHERE team_id = $1 AND customer_id = $2",
-    )
-    .bind(team_id)
-    .bind(uid)
-    .execute(&pool)
-    .await?;
+    let result = sqlx::query("DELETE FROM team_members WHERE team_id = $1 AND customer_id = $2")
+        .bind(team_id)
+        .bind(uid)
+        .execute(&pool)
+        .await?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
@@ -450,14 +442,13 @@ async fn change_role(
         ));
     }
 
-    let result = sqlx::query(
-        "UPDATE team_members SET role = $1 WHERE team_id = $2 AND customer_id = $3",
-    )
-    .bind(&req.role)
-    .bind(team_id)
-    .bind(uid)
-    .execute(&pool)
-    .await?;
+    let result =
+        sqlx::query("UPDATE team_members SET role = $1 WHERE team_id = $2 AND customer_id = $3")
+            .bind(&req.role)
+            .bind(team_id)
+            .bind(uid)
+            .execute(&pool)
+            .await?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
@@ -465,7 +456,9 @@ async fn change_role(
 
     tracing::info!(
         "✅ Role changed to '{}' for member {} in team {}",
-        req.role, uid, team_id
+        req.role,
+        uid,
+        team_id
     );
 
     Ok(Json(serde_json::json!({

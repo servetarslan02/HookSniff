@@ -6,8 +6,11 @@ use tracing_subscriber::prelude::*;
 /// from the environment (via `WorkerConfig` or directly).
 pub fn init(otel_enabled: bool, endpoint: Option<&str>, headers: Option<&str>) {
     let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
-    let use_json = env == "production" || env == "prod"
-        || std::env::var("LOG_FORMAT").map(|v| v == "json").unwrap_or(false);
+    let use_json = env == "production"
+        || env == "prod"
+        || std::env::var("LOG_FORMAT")
+            .map(|v| v == "json")
+            .unwrap_or(false);
 
     let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info"));

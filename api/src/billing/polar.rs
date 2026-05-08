@@ -19,8 +19,8 @@ use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
 
-use crate::billing::Plan;
 use crate::billing::provider::{CheckoutResult, PaymentProviderImpl, WebhookResult};
+use crate::billing::Plan;
 use crate::error::AppError;
 
 type HmacSha256 = Hmac<Sha256>;
@@ -175,12 +175,9 @@ impl PolarProvider {
             };
             match key.trim() {
                 "t" => {
-                    timestamp = Some(
-                        value
-                            .trim()
-                            .parse::<i64>()
-                            .map_err(|_| AppError::BadRequest("Invalid Polar signature timestamp".into()))?,
-                    );
+                    timestamp = Some(value.trim().parse::<i64>().map_err(|_| {
+                        AppError::BadRequest("Invalid Polar signature timestamp".into())
+                    })?);
                 }
                 "v1" => {
                     if v1_sig.is_none() {
@@ -191,16 +188,18 @@ impl PolarProvider {
             }
         }
 
-        let ts = timestamp
-            .ok_or_else(|| AppError::BadRequest("Missing t in Polar signature".into()))?;
-        let sig = v1_sig
-            .ok_or_else(|| AppError::BadRequest("Missing v1 in Polar signature".into()))?;
+        let ts =
+            timestamp.ok_or_else(|| AppError::BadRequest("Missing t in Polar signature".into()))?;
+        let sig =
+            v1_sig.ok_or_else(|| AppError::BadRequest("Missing v1 in Polar signature".into()))?;
 
         // Check timestamp freshness (5 minutes)
         let now = chrono::Utc::now().timestamp();
         let age = (now - ts).abs();
         if age > 300 {
-            return Err(AppError::BadRequest("Polar webhook timestamp too old".into()));
+            return Err(AppError::BadRequest(
+                "Polar webhook timestamp too old".into(),
+            ));
         }
 
         // Compute HMAC-SHA256
@@ -249,7 +248,10 @@ impl PaymentProviderImpl for PolarProvider {
         let resp = self
             .client
             .post(format!("{}/v1/checkouts/", self.config.base_url))
-            .header("Authorization", format!("Bearer {}", self.config.access_token))
+            .header(
+                "Authorization",
+                format!("Bearer {}", self.config.access_token),
+            )
             .header("Content-Type", "application/json")
             .json(&req_body)
             .send()
@@ -259,15 +261,12 @@ impl PaymentProviderImpl for PolarProvider {
         if !resp.status().is_success() {
             let body = resp.text().await.unwrap_or_default();
             tracing::error!("Polar checkout creation failed: {}", body);
-            return Err(AppError::Internal(anyhow::anyhow!(
-                "Polar checkout failed"
-            )));
+            return Err(AppError::Internal(anyhow::anyhow!("Polar checkout failed")));
         }
 
-        let session: CheckoutSession = resp
-            .json()
-            .await
-            .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse Polar response: {}", e)))?;
+        let session: CheckoutSession = resp.json().await.map_err(|e| {
+            AppError::Internal(anyhow::anyhow!("Failed to parse Polar response: {}", e))
+        })?;
 
         Ok(CheckoutResult {
             checkout_url: session.url,
@@ -287,7 +286,9 @@ impl PaymentProviderImpl for PolarProvider {
             .unwrap_or("");
 
         if sig_header.is_empty() {
-            return Err(AppError::BadRequest("Missing Polar signature header".into()));
+            return Err(AppError::BadRequest(
+                "Missing Polar signature header".into(),
+            ));
         }
 
         Self::verify_signature(body, sig_header, &self.config.webhook_secret)?;
@@ -300,15 +301,19 @@ impl PaymentProviderImpl for PolarProvider {
 
         match event.event_type.as_str() {
             "subscription.created" => {
-                let sub: PolarSubscription = serde_json::from_value(event.data.clone())
-                    .map_err(|e| AppError::BadRequest(format!("Invalid subscription data: {}", e)))?;
+                let sub: PolarSubscription =
+                    serde_json::from_value(event.data.clone()).map_err(|e| {
+                        AppError::BadRequest(format!("Invalid subscription data: {}", e))
+                    })?;
 
                 let customer_id = sub
                     .external_customer_id
                     .as_deref()
                     .or(sub.customer_id.as_deref())
                     .and_then(|s| Uuid::parse_str(s).ok())
-                    .ok_or_else(|| AppError::BadRequest("Missing customer_id in Polar event".into()))?;
+                    .ok_or_else(|| {
+                        AppError::BadRequest("Missing customer_id in Polar event".into())
+                    })?;
 
                 let plan = sub
                     .product_id
@@ -324,8 +329,10 @@ impl PaymentProviderImpl for PolarProvider {
                 })
             }
             "subscription.updated" => {
-                let sub: PolarSubscription = serde_json::from_value(event.data.clone())
-                    .map_err(|e| AppError::BadRequest(format!("Invalid subscription data: {}", e)))?;
+                let sub: PolarSubscription =
+                    serde_json::from_value(event.data.clone()).map_err(|e| {
+                        AppError::BadRequest(format!("Invalid subscription data: {}", e))
+                    })?;
 
                 let sub_id = sub.id.unwrap_or_default();
                 let status = sub.status.unwrap_or_else(|| "active".to_string());
@@ -342,8 +349,10 @@ impl PaymentProviderImpl for PolarProvider {
                 })
             }
             "subscription.canceled" | "subscription.revoked" => {
-                let sub: PolarSubscription = serde_json::from_value(event.data.clone())
-                    .map_err(|e| AppError::BadRequest(format!("Invalid subscription data: {}", e)))?;
+                let sub: PolarSubscription =
+                    serde_json::from_value(event.data.clone()).map_err(|e| {
+                        AppError::BadRequest(format!("Invalid subscription data: {}", e))
+                    })?;
 
                 Ok(WebhookResult::SubscriptionCanceled {
                     provider_subscription_id: sub.id.unwrap_or_default(),
@@ -358,10 +367,7 @@ impl PaymentProviderImpl for PolarProvider {
                     .unwrap_or_default()
                     .to_string();
 
-                let amount = order
-                    .get("amount")
-                    .and_then(|v| v.as_i64())
-                    .unwrap_or(0) as u64;
+                let amount = order.get("amount").and_then(|v| v.as_i64()).unwrap_or(0) as u64;
 
                 let currency = order
                     .get("currency")
@@ -396,17 +402,17 @@ impl PaymentProviderImpl for PolarProvider {
         Ok(format!("{}/dashboard/billing", app_url))
     }
 
-    async fn cancel_subscription(
-        &self,
-        polar_subscription_id: &str,
-    ) -> Result<(), AppError> {
+    async fn cancel_subscription(&self, polar_subscription_id: &str) -> Result<(), AppError> {
         let resp = self
             .client
             .delete(format!(
                 "{}/v1/subscriptions/{}",
                 self.config.base_url, polar_subscription_id
             ))
-            .header("Authorization", format!("Bearer {}", self.config.access_token))
+            .header(
+                "Authorization",
+                format!("Bearer {}", self.config.access_token),
+            )
             .send()
             .await
             .map_err(|e| AppError::Internal(anyhow::anyhow!("Polar cancel failed: {}", e)))?;

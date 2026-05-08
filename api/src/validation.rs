@@ -20,8 +20,7 @@ pub fn validate_event_type(event: &str) -> Result<(), String> {
 /// Validate description: max 500 chars, strip HTML tags
 pub fn sanitize_description(desc: &str) -> String {
     // Strip HTML tags
-    static HTML_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r"<[^>]*>").expect("invalid regex"));
+    static HTML_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"<[^>]*>").expect("invalid regex"));
 
     let cleaned = HTML_RE.replace_all(desc, "");
     // Truncate to 500 chars (UTF-8 safe)
@@ -84,10 +83,7 @@ mod tests {
 
     #[test]
     fn test_sanitize_description() {
-        assert_eq!(
-            sanitize_description("Hello <b>world</b>"),
-            "Hello world"
-        );
+        assert_eq!(sanitize_description("Hello <b>world</b>"), "Hello world");
         assert_eq!(
             sanitize_description("<script>alert('xss')</script>Safe text"),
             "alert('xss')Safe text"

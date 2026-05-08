@@ -54,14 +54,13 @@ async fn get_routing(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<RoutingInfo>, AppError> {
-    let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let endpoint =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let (resolved_url, using_fallback) = endpoint.resolve_target_url();
 
@@ -98,14 +97,13 @@ async fn update_routing(
         }
     }
 
-    let mut endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let mut endpoint =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     // Update fields if provided
     if let Some(strategy) = req.routing_strategy {
@@ -146,14 +144,13 @@ async fn get_health(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<EndpointHealth>, AppError> {
-    let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
-    )
-    .bind(id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    let endpoint =
+        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
 
     let (resolved_url, using_fallback) = endpoint.resolve_target_url();
 

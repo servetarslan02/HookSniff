@@ -65,12 +65,24 @@ async fn get_playground(
     .await?;
 
     Ok(Json(PlaygroundResponse {
-        endpoints: endpoints.into_iter().map(|(id, url, desc, active)| EndpointInfo {
-            id, url, description: desc, is_active: active,
-        }).collect(),
-        recent_deliveries: deliveries.into_iter().map(|(id, event, status, created)| DeliveryPreview {
-            id, event, status, created_at: created.to_rfc3339(),
-        }).collect(),
+        endpoints: endpoints
+            .into_iter()
+            .map(|(id, url, desc, active)| EndpointInfo {
+                id,
+                url,
+                description: desc,
+                is_active: active,
+            })
+            .collect(),
+        recent_deliveries: deliveries
+            .into_iter()
+            .map(|(id, event, status, created)| DeliveryPreview {
+                id,
+                event,
+                status,
+                created_at: created.to_rfc3339(),
+            })
+            .collect(),
         sample_payloads: vec![
             SamplePayload {
                 name: "Order Created".to_string(),
@@ -98,7 +110,7 @@ async fn test_webhook(
 ) -> Result<Json<TestWebhookResponse>, AppError> {
     // Send a test webhook to the specified endpoint
     let endpoint = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true"
+        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(req.endpoint_id)
     .bind(customer.id)
