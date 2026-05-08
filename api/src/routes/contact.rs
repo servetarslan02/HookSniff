@@ -71,7 +71,7 @@ pub async fn handle_contact(
         // Send to admin
         let _ = client
             .send_contact_email(
-                "support@hooksniff.is-a.dev",
+                "support@hooksniff.vercel.app",
                 &format!("Contact: {} — {}", body.subject, body.name),
                 &admin_html,
             )

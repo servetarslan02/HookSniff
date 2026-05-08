@@ -43,9 +43,9 @@ services:
       - key: RETENTION_DAYS
         value: "7"
       - key: CORS_ORIGINS
-        value: https://hooksniff.vercel.app,https://hooksniff.is-a.dev
+        value: https://hooksniff.vercel.app,https://hooksniff.vercel.app
       - key: APP_URL
-        value: https://hooksniff.is-a.dev
+        value: https://hooksniff.vercel.app
       - key: RATE_LIMIT_STORE
         value: redis
       - key: POLAR_ACCESS_TOKEN
@@ -58,12 +58,11 @@ services:
         value: e5b7d88a-7606-4963-a070-4102ca6405e2
       - key: POLAR_ENV
         value: production
-      - key: RESEND_API_KEY
         sync: false
       - key: NOTIFY_FROM_EMAIL
-        value: noreply@hooksniff.is-a.dev
+        value: noreply@hooksniff.vercel.app
       - key: NOTIFY_EMAIL
-        value: support@hooksniff.is-a.dev
+        value: support@hooksniff.vercel.app
       - key: WEBHOOK_FORMAT
         value: standard
       - key: WEBHOOK_TIMESTAMP_TOLERANCE_SECS
@@ -93,8 +92,7 @@ services:
       - key: REDIS_URL
         sync: false
       - key: NOTIFY_FROM_EMAIL
-        value: noreply@hooksniff.is-a.dev
-      - key: RESEND_API_KEY
+        value: noreply@hooksniff.vercel.app
         sync: false
       - key: OTEL_ENABLED
         value: "false"

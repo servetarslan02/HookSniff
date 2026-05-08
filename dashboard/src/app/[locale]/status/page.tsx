@@ -146,7 +146,7 @@ export default function StatusPage() {
   const [apiReachable, setApiReachable] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.hooksniff.is-a.dev/v1';
+  const API = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
 
   const loadData = useCallback(async () => {
     try {
@@ -267,7 +267,7 @@ export default function StatusPage() {
           <p>
             Version {process.env.NEXT_PUBLIC_VERSION || '0.1.0'} •{' '}
             <Link href="/" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">
-              hooksniff.is-a.dev
+              hooksniff.vercel.app
             </Link>{' '}
             •{' '}
             <Link href="/docs" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">

@@ -34,7 +34,7 @@
 1. **Settings** → **Environment Variables**
 2. Şu değişkenin tanımlı olduğundan emin ol:
    ```
-   NEXT_PUBLIC_API_URL = https://api.hooksniff.is-a.dev/v1
+   NEXT_PUBLIC_API_URL = https://hooksniff-api-1046140057667.europe-west1.run.app/v1
    ```
 
 ---
@@ -74,7 +74,7 @@ Render Dashboard'da her servis için:
 ### 2.4 Custom Domain Ekle
 1. **hooksniff-api** servisine tıkla
 2. **Settings** → **Custom Domains**
-3. **"Add Custom Domain"** → `api.hooksniff.is-a.dev` yaz
+3. **"Add Custom Domain"** → `hooksniff-api-1046140057667.europe-west1.run.app` yaz
 4. Render sana bir DNS record verecek (CNAME)
 
 ### 2.5 Health Check
@@ -106,7 +106,7 @@ Deploy tamamlandıktan sonra:
 ### 4.1 Gmail API (Service Account)
 1. GCP Console → IAM → Service Accounts → hooksniff-deploy
 2. **Domains** → **Add Domain**
-3. `hooksniff.is-a.dev` ekle
+3. `hooksniff.vercel.app` ekle
 
 ### 4.2 DNS Kayıtları
 Gmail API DNS kayıtları gerekmez. Service account domain-wide delegation ile çalışır:
@@ -118,7 +118,7 @@ Gmail API DNS kayıtları gerekmez. Service account domain-wide delegation ile �
 
 ### 4.3 Doğrulama
 1. Service account'a domain-wide delegation ekle (Google Workspace Admin Console)
-2. Doğrulanınca `noreply@hooksniff.is-a.dev` çalışacak
+2. Doğrulanınca `noreply@hooksniff.vercel.app` çalışacak
 
 ---
 
@@ -126,7 +126,7 @@ Gmail API DNS kayıtları gerekmez. Service account domain-wide delegation ile �
 
 ### 5.1 API Health Check
 ```bash
-curl https://api.hooksniff.is-a.dev/health
+curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
 ```
 Beklenen: `{"status":"ok"}`
 

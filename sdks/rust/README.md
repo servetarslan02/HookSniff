@@ -1,6 +1,6 @@
 # HookSniff Rust SDK
 
-Official Rust client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official Rust client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 

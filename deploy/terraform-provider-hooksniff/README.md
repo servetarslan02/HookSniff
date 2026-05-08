@@ -20,7 +20,7 @@ terraform {
 }
 
 provider "hooksniff" {
-  api_url = "https://api.hooksniff.is-a.dev"
+  api_url = "https://hooksniff-api-1046140057667.europe-west1.run.app"
   api_key = var.hooksniff_api_key
 }
 

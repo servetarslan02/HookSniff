@@ -411,7 +411,7 @@
     "gettingStartedDesc": "Send your first webhook in under 5 minutes. HookSniff handles delivery, retries, and monitoring so you can focus on building.",
     "quickStart": "Quick Start",
     "getApiKey": "1. Get your API key",
-    "getApiKeyDesc": "Sign up at hooksniff.is-a.dev and grab your API key from the dashboard settings.",
+    "getApiKeyDesc": "Sign up at hooksniff.vercel.app and grab your API key from the dashboard settings.",
     "createEndpoint": "2. Create an endpoint",
     "createEndpointDesc": "Register the URL where you want webhooks delivered:",
     "sendWebhook": "3. Send a webhook",

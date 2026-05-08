@@ -1,6 +1,6 @@
 # HookSniff Python SDK
 
-Official Python client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official Python client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 
@@ -180,7 +180,7 @@ except PayloadTooLargeError:
 
 ## API Reference
 
-### `HookSniffClient(api_key, base_url="https://api.hooksniff.is-a.dev/v1", timeout=30)`
+### `HookSniffClient(api_key, base_url="https://hooksniff-api-1046140057667.europe-west1.run.app/v1", timeout=30)`
 
 Main client class.
 
