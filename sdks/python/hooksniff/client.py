@@ -147,6 +147,27 @@ class _WebhooksResource:
         resp = self._client._request("GET", "/webhooks/export", params=params)
         return resp
 
+    def search(
+        self,
+        query: Optional[str] = None,
+        event: Optional[str] = None,
+        status: Optional[str] = None,
+        endpoint_id: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+    ) -> Dict[str, Any]:
+        """Search deliveries with filters."""
+        params: Dict[str, Any] = {"page": page, "per_page": per_page}
+        if query is not None:
+            params["q"] = query
+        if event is not None:
+            params["event"] = event
+        if status is not None:
+            params["status"] = status
+        if endpoint_id is not None:
+            params["endpoint_id"] = endpoint_id
+
+        return self._client._request("GET", "/search", params=params)
 
 
 class HookSniffClient:

@@ -81,6 +81,22 @@ export interface ExportOptions {
   dateTo?: string;
 }
 
+export interface SearchOptions {
+  query?: string;
+  event?: string;
+  status?: string;
+  endpointId?: string;
+  page?: number;
+  perPage?: number;
+}
+
+export interface SearchResult {
+  results: Delivery[];
+  total: number;
+  page: number;
+  perPage: number;
+}
+
 export interface Stats {
   totalDeliveries: number;
   delivered: number;
