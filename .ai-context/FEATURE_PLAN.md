@@ -297,31 +297,210 @@
 
 ### Ne Yapılacak?
 HookSniff mobil uygulaması — admin ve müşterilerin webhook'ları telefondan yönetmesi.
+Sadece izleme değil, tam yönetim: oluştur, düzenle, durdur, test et, fatura öde.
 
-### Kim Kullanacak?
-- **Müşteri:** Kendi webhook'larını izler, alert'leri yönetir, endpoint açar/kapatır
-- **Admin:** Tüm müşterileri izler, sistem durumunu kontrol eder, destek verir
+---
 
-### Müşteri Özellikleri
-| # | Özellik | Açıklama |
-|---|---------|----------|
-| 1 | Dashboard | Event sayısı, başarı oranı, grafik |
-| 2 | Bildirimler | Kritik hatalarda push notification |
-| 3 | Event Listesi | Son event'leri filtrele, ara |
-| 4 | Endpoint Yönetimi | Endpoint ekle/düzenle/durdur |
-| 5 | Alert Ayarları | Alarm kuralları oluştur/düzenle |
-| 6 | Bildirim Tercihleri | Telegram/Email/Discord seçimi |
-| 7 | Hızlı Aksiyon | Tek tıkla retry, disable, test |
+### 👤 MÜŞTERİ SAYFALARI (17 Sayfa)
 
-### Admin Özellikleri
-| # | Özellik | Açıklama |
-|---|---------|----------|
-| 1 | Müşteri Listesi | Tüm müşterileri gör |
-| 2 | Sistem Durumu | API, DB, Redis, Worker sağlık |
-| 3 | Kullanım İstatistikleri | Toplam event, aktif müşteri, gelir |
-| 4 | Müşteri Detayı | Müşterinin endpoint'lerini, event'lerini gör |
-| 5 | Destek | Müşteriye mesaj gönder, sorun çöz |
-| 6 | Plan Yönetimi | Müşteri planını değiştir |
+#### Ana Ekran
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 1 | **Dashboard** | Bugünkü event sayısı, başarı oranı, grafik, son 5 hata | — |
+| 2 | **Hızlı Durum** | Tüm endpoint'lerin anlık durumu (yeşil/sarı/kırmızı) | Tek tıkla durdur/aktifleştir |
+
+#### Event Yönetimi
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 3 | **Event Listesi** | Tüm event'ler, filtre (tarih, durum, etiket, endpoint) | Detay gör, tekrar gönder |
+| 4 | **Event Detayı** | Payload, header, timeline, response kodu | Kopyala, tekrar gönder, şikayet et |
+| 5 | **Event Arama** | ID, payload içeriği, header ile ara | — |
+
+#### Endpoint Yönetimi
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 6 | **Endpoint Listesi** | Tüm endpoint'ler, durum, başarı oranı | Ekle, düzenle, sil, durdur |
+| 7 | **Endpoint Detayı** | URL, secret, retry politika, rate limit, etiketler | Düzenle, test gönder |
+| 8 | **Yeni Endpoint** | URL, secret, retry seçimi, etiketler | Oluştur |
+| 9 | **Endpoint Test** | Test payload'ı yaz, gönder, yanıtı gör | Gönder, kaydet |
+
+#### Alarm & Bildirim
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 10 | **Alarm Listesi** | Tüm alarm kuralları, durum | Ekle, düzenle, sil, durdur |
+| 11 | **Alarm Detayı** | Koşul, eşik, kanal, sıklık | Düzenle, test et |
+| 12 | **Yeni Alarm** | Koşul seç, eşik belirle, kanal seç | Oluştur |
+| 13 | **Bildirim Geçmişi** | Gelen tüm bildirimler, okundu/okunmadı | Okundu işaretle, sil |
+
+#### Ayarlar & Fatura
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 14 | **Profil** | İsim, email, şirket, dil, saat dilimi | Düzenle |
+| 15 | **Bildirim Tercihleri** | Telegram, email, Discord, Slack seçimi | Değiştir |
+| 16 | **API Key Yönetimi** | Mevcut key'ler, yenisi oluştur | Oluştur, sil, yenile |
+| 17 | **Fatura & Plan** | Mevcut plan, kullanım, son fatura, upgrade | Plan değiştir, fatura indir |
+
+---
+
+### 👑 ADMIN SAYFALARI (12 Sayfa)
+
+#### Sistem Yönetimi
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 1 | **Admin Dashboard** | Toplam müşteri, aktif, gelir, sistem durumu | — |
+| 2 | **Sistem Sağlık** | API, DB, Redis, Worker, Queue durumu | Restart, log gör |
+| 3 | **Performans Grafikleri** | Request/sn, latency, error rate, queue depth | Tarih seç, export |
+
+#### Müşteri Yönetimi
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 4 | **Müşteri Listesi** | Tüm müşteriler, plan, durum, kayıt tarihi | Filtrele, ara |
+| 5 | **Müşteri Detayı** | Endpoint'leri, event'leri, faturası, kullanımı | Düzenle, plan değiştir |
+| 6 | **Müşteri Endpoint'leri** | Müşterinin tüm endpoint'leri, durum | Durdur, sil |
+| 7 | **Müşteri Event'leri** | Müşterinin son event'leri | Filtrele, detay gör |
+
+#### Gelir & Fatura
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 8 | **Gelir Dashboard** | Aylık gelir, MRR, churn, LTV | Grafik, export |
+| 9 | **Fatura Listesi** | Tüm faturalar, durum | İncele, manuel fatura oluştur |
+| 10 | **Plan Yönetimi** | Tüm planlar, fiyat, özellik | Plan oluştur/düzenle |
+
+#### Destek & Log
+| # | Sayfa | İçerik | Aksiyonlar |
+|---|-------|--------|-----------|
+| 11 | **Destek Talepleri** | Müşteri mesajları, durum | Yanıtla, kapat |
+| 12 | **Sistem Logları** | Hata logları, audit trail | Filtrele, export |
+
+---
+
+### 🔔 BİLDİRİM SİSTEMİ (Mobil)
+
+#### Müşteri Bildirimleri
+| Tetikleyici | Kanal | İçerik |
+|------------|-------|--------|
+| Endpoint düştü | Push + Telegram | "⚠️ endpoint.xyz durdu — son 5 dk'da %100 hata" |
+| Başarı oranı düştü | Push + Telegram | "🔴 %85 başarı oranı — normal %99" |
+| Yeni hata | Push | "❌ 500 hatası — order.created event'i" |
+| Retry başarılı | Push | "✅ 3. denemede başarılı — payment event" |
+| Fatura kesildi | Push + Email | "💳 $49 fatura kesildi" |
+| Plan değişikliği | Push + Email | "📦 Pro plan'a geçtiniz" |
+
+#### Admin Bildirimleri
+| Tetikleyici | Kanal | İçerik |
+|------------|-------|--------|
+| Yeni müşteri | Push | "🎉 Yeni müşteri: abc@example.com" |
+| Sistem hatası | Push + Telegram | "🔴 API hatası — 5xx oranı %5'i geçti" |
+| Kullanım limiti | Push | "⚠️ Müşteri X limitinin %90'ını kullandı" |
+| Ödeme hatası | Push + Email | "💳 Müşteri Y ödemesi başarısız" |
+| Destek talebi | Push | "📩 Yeni destek talebi: Z müşterisi" |
+
+---
+
+### 📊 EKRAN AKIŞLARI (Müşteri Yolculuğu)
+
+```
+Uygulamayı Aç
+    │
+    ├── Dashboard (ana ekran)
+    │   ├── Bugünkü event sayısı: 1.247
+    │   ├── Başarı oranı: %99.2
+    │   ├── Son 5 hata listesi
+    │   └── [Hızlı Durum] → tüm endpoint'ler yeşil/sarı/kırmızı
+    │
+    ├── Event'ler
+    │   ├── Filtre: tarih, endpoint, durum, etiket
+    │   ├── Liste → tıkla → detay
+    │   └── Detay: payload, header, timeline, response
+    │       └── [Tekrar Gönder] → anında retry
+    │
+    ├── Endpoint'ler
+    │   ├── Liste → tıkla → detay
+    │   ├── Detay: URL, secret, retry, rate limit
+    │   │   └── [Test Gönder] → test payload → sonuç
+    │   └── [Yeni Endpoint] → form → oluştur
+    │
+    ├── Alarmlar
+    │   ├── Liste → tıkla → detay
+    │   └── [Yeni Alarm] → koşul + eşik + kanal → oluştur
+    │
+    ├── Bildirimler
+    │   ├── Liste (okundu/okunmadı)
+    │   └── Tıkla → ilgili sayfaya git
+    │
+    └── Ayarlar
+        ├── Profil düzenle
+        ├── Bildirim tercihleri (Telegram/Email/Discord)
+        ├── API key yönetimi
+        └── Fatura & plan
+```
+
+---
+
+### 📊 EKRAN AKIŞLARI (Admin Yolculuğu)
+
+```
+Uygulamayı Aç (admin girişi)
+    │
+    ├── Admin Dashboard
+    │   ├── Toplam müşteri: 47
+    │   ├── Aktif: 42, Pasif: 5
+    │   ├── Aylık gelir: $2.107
+    │   ├── Sistem durumu: API ✅ DB ✅ Redis ✅
+    │   └── [Hızlı Aksiyonlar]
+    │
+    ├── Müşteriler
+    │   ├── Liste (plan, durum, tarih)
+    │   ├── Tıkla → müşteri detayı
+    │   │   ├── Endpoint'leri
+    │   │   ├── Son event'leri
+    │   │   ├── Kullanım grafiği
+    │   │   ├── Fatura geçmişi
+    │   │   └── [Plan Değiştir] [Durdur] [Sil]
+    │   └── [Yeni Müşteri] → form → oluştur
+    │
+    ├── Gelir
+    │   ├── MRR grafiği
+    │   ├── Churn oranı
+    │   ├── Plan dağılımı (pasta grafik)
+    │   └── [Export CSV]
+    │
+    ├── Destek
+    │   ├── Talep listesi (açık/kapalı)
+    │   ├── Tıkla → mesaj geçmişi
+    │   └── [Yanıtla] [Kapat]
+    │
+    └── Sistem
+        ├── Sağlık durumu (API, DB, Redis, Worker)
+        ├── Performans grafikleri
+        ├── Son hatalar
+        └── [Log Export]
+```
+
+---
+
+### 🔐 GÜVENLİK
+
+| Özellik | Açıklama |
+|---------|----------|
+| **Biometrik giriş** | Parmak izi / yüz tanıma |
+| **2FA** | SMS veya authenticator |
+| **Oturum yönetimi** | Aktif oturumları gör, uzaktan kapat |
+| **Role-based access** | Admin / Müşteri / Readonly |
+| **Audit log** | Kim ne yaptı, ne zaman |
+| **IP whitelist** | Sadece belirli IP'lerden giriş |
+
+---
+
+### 📱 SAYFA ÖZETİ
+
+| Kategori | Sayfa Sayısı |
+|----------|-------------|
+| Müşteri sayfaları | 17 |
+| Admin sayfaları | 12 |
+| **Toplam** | **29 sayfa** |
+
+---
 
 ### Teknoloji Seçenekleri
 
@@ -334,18 +513,20 @@ HookSniff mobil uygulaması — admin ve müşterilerin webhook'ları telefondan
 
 ### Tavsiyem: Önce PWA, Sonra Native
 
-**Faz 1 — PWA (2 hafta)**
+**Faz 1 — PWA (3 hafta)**
 - Mevcut Next.js dashboard'u PWA'ya çevir
 - Service worker → offline çalışma
 - Web push notification → anlık bildirim
 - App store'a gerek yok, tarayıcıdan kurulur
 - $0 maliyet
+- 29 sayfa (responsive)
 
-**Faz 2 — React Native / Expo (4-6 hafta)**
+**Faz 2 — React Native / Expo (6-8 hafta)**
 - PWA yetersiz kalırsa native'e geç
 - Expo ile hızlı geliştirme
 - App Store + Google Play
 - Push notification (native)
+- Biometrik giriş
 
 ### PWA Avantajları
 - ✅ App store onayı gerekmez
@@ -359,15 +540,16 @@ HookSniff mobil uygulaması — admin ve müşterilerin webhook'ları telefondan
 - ✅ Native push notification
 - ✅ Offline çalışma
 - ✅ App store'da görünürlik
+- ✅ Biometrik giriş
 
 ### Plan
 
 | Faz | Ne | Süre | Öncelik |
 |-----|-----|------|---------|
-| PWA | Dashboard'u PWA yap | 2 hafta | 🟡 Orta |
-| Push Notification | Web push ekle | 3 gün | 🟡 Orta |
-| Offline | Service worker | 1 hafta | 🟢 Düşük |
-| Native (gerekirse) | React Native/Expo | 4-6 hafta | 🟢 Düşük |
+| PWA | Dashboard'u PWA yap + 29 sayfa | 3 hafta | 🟡 Orta |
+| Push Notification | Web push ekle + Telegram entegrasyon | 1 hafta | 🟡 Orta |
+| Offline | Service worker + cache | 1 hafta | 🟢 Düşük |
+| Native (gerekirse) | React Native/Expo | 6-8 hafta | 🟢 Düşük |
 
 ### Maliyet
 
@@ -384,3 +566,5 @@ HookSniff mobil uygulaması — admin ve müşterilerin webhook'ları telefondan
 - Müşteri feedback'ine göre karar ver
 - App Store'a koymak istersen Apple Developer hesabı lazım ($99/yıl)
 - Google Play daha ucuz ($25 tek seferlik)
+- 29 sayfa fazla gibi görünüyor ama çoğu sayfa benzer yapıda (liste → detay → form)
+- Admin sayfaları gizli, sadece admin girişiyle erişilir
