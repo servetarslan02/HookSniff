@@ -10,6 +10,7 @@ pub mod delivery_details;
 pub mod devices;
 pub mod docs;
 pub mod endpoints;
+pub mod events;
 pub mod health;
 pub mod health_endpoints;
 pub mod inbound;
@@ -50,6 +51,7 @@ pub fn api_router() -> Router {
         .nest("/endpoints", endpoints::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())
+        .nest("/events", events::router())
         .nest("/webhooks", webhooks::router())
         .nest("/webhooks", delivery_details::router())
         .nest("/search", search::router())
