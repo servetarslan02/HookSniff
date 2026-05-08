@@ -60,6 +60,17 @@ pub enum Provider {
     Generic,
 }
 
+impl std::fmt::Display for Provider {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Provider::Stripe => write!(f, "stripe"),
+            Provider::GitHub => write!(f, "github"),
+            Provider::Shopify => write!(f, "shopify"),
+            Provider::Generic => write!(f, "generic"),
+        }
+    }
+}
+
 impl Provider {
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
