@@ -85,7 +85,7 @@ async fn list_agents(
         .bind(customer.id)
         .fetch_one(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?;
+        .map_err(AppError::Database)?;
 
     let agents = sqlx::query_as::<_, Agent>(
         "SELECT * FROM agents WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
@@ -95,7 +95,7 @@ async fn list_agents(
     .bind(offset)
     .fetch_all(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     let responses: Vec<AgentResponse> = agents.into_iter().map(AgentResponse::from).collect();
 
@@ -129,7 +129,7 @@ async fn create_agent(
     .bind(&req.name)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if existing.is_some() {
         return Err(AppError::BadRequest(
@@ -218,7 +218,7 @@ async fn get_agent(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     match agent {
         Some(a) => Ok(Json(serde_json::json!({ "agent": AgentResponse::from(a) }))),
@@ -245,7 +245,7 @@ async fn update_agent(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     let _existing = match existing {
         Some(a) => a,
@@ -263,7 +263,7 @@ async fn update_agent(
             .bind(agent_id)
             .fetch_optional(&pool)
             .await
-            .map_err(|e| AppError::Database(e))?;
+            .map_err(AppError::Database)?;
 
             if duplicate.is_some() {
                 return Err(AppError::BadRequest(
@@ -291,7 +291,7 @@ async fn update_agent(
     .bind(&req.metadata)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     match agent {
         Some(a) => {
@@ -339,7 +339,7 @@ async fn delete_agent(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     let agent = match existing {
         Some(a) => a,
@@ -363,7 +363,7 @@ async fn delete_agent(
         .bind(customer.id)
         .execute(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?;
+        .map_err(AppError::Database)?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
@@ -395,7 +395,7 @@ async fn emit_event(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     let _agent = match agent {
         Some(a) => a,
@@ -408,7 +408,7 @@ async fn emit_event(
             .bind(customer.id)
             .fetch_optional(&pool)
             .await
-            .map_err(|e| AppError::Database(e))?;
+            .map_err(AppError::Database)?;
 
             if any_agent.is_some() {
                 return Err(AppError::Forbidden(
@@ -426,7 +426,7 @@ async fn emit_event(
     .bind(agent_id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if let Some(rl) = rate_limit {
         let count: (i64,) = sqlx::query_as(
@@ -435,7 +435,7 @@ async fn emit_event(
         .bind(agent_id)
         .fetch_one(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?;
+        .map_err(AppError::Database)?;
 
         if count.0 >= rl.max_events_per_minute as i64 {
             return Err(AppError::RateLimitExceeded);
@@ -455,7 +455,7 @@ async fn emit_event(
     .bind(req.target_agent_id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Routing kurallarini uygula
     let routes = sqlx::query_as::<_, AgentRoute>(
@@ -511,7 +511,7 @@ async fn emit_event(
             .bind(customer.id)
             .fetch_optional(&pool)
             .await
-            .map_err(|e| AppError::Database(e))?;
+            .map_err(AppError::Database)?;
 
             if target_agent.is_none() {
                 return Err(AppError::BadRequest(
@@ -582,7 +582,7 @@ async fn list_agent_events(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if agent_exists.is_none() {
         return Err(AppError::NotFound);
@@ -675,7 +675,7 @@ async fn list_agent_events(
         count_query = count_query.bind(until);
     }
 
-    let total = count_query.fetch_one(&pool).await.map_err(|e| AppError::Database(e))?;
+    let total = count_query.fetch_one(&pool).await.map_err(AppError::Database)?;
 
     // Event'leri getir — ayni parametre sirasi
     let data_sql = format!(
@@ -704,7 +704,7 @@ async fn list_agent_events(
     }
     data_query = data_query.bind(per_page).bind(offset);
 
-    let events = data_query.fetch_all(&pool).await.map_err(|e| AppError::Database(e))?;
+    let events = data_query.fetch_all(&pool).await.map_err(AppError::Database)?;
 
     Ok(Json(serde_json::json!({
         "events": events,
@@ -744,7 +744,7 @@ async fn agent_event_stream(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if agent.is_none() {
         return Err(AppError::NotFound);
@@ -883,7 +883,7 @@ async fn list_routes(
     .bind(customer.id)
     .fetch_all(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     Ok(Json(serde_json::json!({ "routes": routes })))
 }
@@ -904,7 +904,7 @@ async fn create_route(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if target.is_none() {
         return Err(AppError::BadRequest(
@@ -921,7 +921,7 @@ async fn create_route(
         .bind(customer.id)
         .fetch_optional(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?;
+        .map_err(AppError::Database)?;
 
         if source.is_none() {
             return Err(AppError::BadRequest(
@@ -940,7 +940,7 @@ async fn create_route(
     .bind(req.source_agent_id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if duplicate.is_some() {
         return Err(AppError::BadRequest(
@@ -960,7 +960,7 @@ async fn create_route(
     .bind(req.filter_expression)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     Ok((
         StatusCode::CREATED,
@@ -978,7 +978,7 @@ async fn delete_route(
         .bind(customer.id)
         .execute(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?;
+        .map_err(AppError::Database)?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
@@ -1001,7 +1001,7 @@ async fn get_rate_limit(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if agent.is_none() {
         return Err(AppError::NotFound);
@@ -1013,7 +1013,7 @@ async fn get_rate_limit(
     .bind(agent_id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     match rl {
         Some(r) => Ok(Json(serde_json::json!({ "rate_limit": r }))),
@@ -1035,7 +1035,7 @@ async fn update_rate_limit(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if agent.is_none() {
         return Err(AppError::NotFound);
@@ -1043,14 +1043,14 @@ async fn update_rate_limit(
 
     // Deger kontrolu
     if let Some(minute) = req.max_events_per_minute {
-        if minute < 1 || minute > 10000 {
+        if !(1..=10000).contains(&minute) {
             return Err(AppError::BadRequest(
                 "Dakika limiti 1-10000 arasinda olmalidir".to_string(),
             ));
         }
     }
     if let Some(hour) = req.max_events_per_hour {
-        if hour < 1 || hour > 100000 {
+        if !(1..=100000).contains(&hour) {
             return Err(AppError::BadRequest(
                 "Saat limiti 1-100000 arasinda olmalidir".to_string(),
             ));
@@ -1070,7 +1070,7 @@ async fn update_rate_limit(
     .bind(req.max_events_per_hour)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     match rl {
         Some(r) => Ok(Json(serde_json::json!({ "rate_limit": r }))),
@@ -1098,13 +1098,13 @@ async fn get_audit_log(
         .bind(customer.id)
         .fetch_one(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?
+        .map_err(AppError::Database)?
     } else {
         sqlx::query_as("SELECT COUNT(*) FROM agent_audit_log WHERE customer_id = $1")
             .bind(customer.id)
             .fetch_one(&pool)
             .await
-            .map_err(|e| AppError::Database(e))?
+            .map_err(AppError::Database)?
     };
 
     let logs = if let Some(agent_id) = query.agent_id {
@@ -1117,7 +1117,7 @@ async fn get_audit_log(
         .bind(offset)
         .fetch_all(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?
+        .map_err(AppError::Database)?
     } else {
         sqlx::query_as::<_, super::security::AuditLog>(
             "SELECT * FROM agent_audit_log WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
@@ -1127,7 +1127,7 @@ async fn get_audit_log(
         .bind(offset)
         .fetch_all(&pool)
         .await
-        .map_err(|e| AppError::Database(e))?
+        .map_err(AppError::Database)?
     };
 
     Ok(Json(serde_json::json!({
@@ -1154,7 +1154,7 @@ async fn get_anomaly_status(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     let _ = match agent {
         Some(a) => a,
@@ -1192,7 +1192,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     if agent.is_none() {
         return Err(AppError::NotFound);
@@ -1206,7 +1206,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Emit sayisi
     let emit: (i64,) = sqlx::query_as(
@@ -1216,7 +1216,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Receive sayisi
     let receive: (i64,) = sqlx::query_as(
@@ -1226,7 +1226,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Delivered sayisi
     let delivered: (i64,) = sqlx::query_as(
@@ -1236,7 +1236,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Failed sayisi
     let failed: (i64,) = sqlx::query_as(
@@ -1246,7 +1246,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Unique event type sayisi
     let unique_types: (i64,) = sqlx::query_as(
@@ -1256,7 +1256,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Son event zamani
     let last_event: (Option<chrono::DateTime<chrono::Utc>>,) = sqlx::query_as(
@@ -1266,7 +1266,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // Son 24 saatteki event sayisi
     let last_24h: (i64,) = sqlx::query_as(
@@ -1276,7 +1276,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     // En populer event type'lar
     let top_types: Vec<(String, i64)> = sqlx::query_as(
@@ -1286,7 +1286,7 @@ async fn get_event_stats(
     .bind(customer.id)
     .fetch_all(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(AppError::Database)?;
 
     let top_types_json: Vec<serde_json::Value> = top_types
         .iter()
