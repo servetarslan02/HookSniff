@@ -1,5 +1,5 @@
 use axum::extract::{Extension, Path, Query};
-use axum::routing::{get, put};
+use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -16,6 +16,7 @@ pub fn router() -> Router {
         .route("/users/{id}/status", put(change_status))
         .route("/stats", get(system_stats))
         .route("/revenue", get(revenue_by_month))
+        .route("/sdk-update", post(notify_sdk_update))
 }
 
 #[derive(Debug, Deserialize)]
@@ -510,4 +511,74 @@ async fn revenue_by_month(
     .await?;
 
     Ok(Json(rows))
+}
+
+// ─────────────────────────────────────────────────────────
+// SDK Update Notifications
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct SdkUpdateRequest {
+    pub updates: Vec<SdkUpdateItem>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SdkUpdateItem {
+    pub sdk: String,
+    pub local_version: String,
+    pub published_version: String,
+}
+
+/// POST /v1/admin/sdk-update — Create SDK update notifications for all admin users.
+/// Called by the automated SDK version checker (cron job).
+async fn notify_sdk_update(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<SdkUpdateRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    if req.updates.is_empty() {
+        return Ok(Json(serde_json::json!({ "message": "No updates to notify" })));
+    }
+
+    // Build notification title and message
+    let title = format!("🚀 {} SDK güncellemesi mevcut", req.updates.len());
+    let details: Vec<String> = req
+        .updates
+        .iter()
+        .map(|u| format!("• {} {} → {}", u.sdk, u.local_version, u.published_version))
+        .collect();
+    let message = format!(
+        "Aşağıdaki SDK'lar için yeni versiyon yayınlandı:\n{}\n\nGüncellemek için \"güncelle\" yazın.",
+        details.join("\n")
+    );
+
+    // Find all admin users
+    let admins: Vec<(Uuid,)> =
+        sqlx::query_as("SELECT id FROM customers WHERE is_admin = TRUE AND is_active = TRUE")
+            .fetch_all(&pool)
+            .await?;
+
+    let mut count = 0;
+    for (admin_id,) in &admins {
+        sqlx::query(
+            r#"INSERT INTO notifications (customer_id, type, title, message, is_read, link)
+               VALUES ($1, 'system', $2, $3, FALSE, '/admin')"#,
+        )
+        .bind(admin_id)
+        .bind(&title)
+        .bind(&message)
+        .execute(&pool)
+        .await?;
+        count += 1;
+    }
+
+    tracing::info!("📢 SDK update notification sent to {} admins", count);
+
+    Ok(Json(serde_json::json!({
+        "message": format!("Notification sent to {} admin(s)", count),
+        "title": title,
+        "updates_count": req.updates.len(),
+    })))
 }
