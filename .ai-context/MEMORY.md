@@ -144,6 +144,7 @@ Lab repo'da geliştirilecek.
 
 Detay: `.ai-context/FEATURE_PLAN.md` (son bölüm)
 ⚠️ Servet onayı BEKLENİYOR. Tüm web özellikleri bittikten sonra.
+Admin & müşteri yönetim paneli — webhook'ları telefondan yönetme.
 Önce PWA (2 hafta, $0), gerekirse React Native/Expo (4-6 hafta).
 WhatsApp bot İPTAL — sadece Telegram bot kullanılacak.
 
