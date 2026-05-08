@@ -51,7 +51,7 @@
 
 **Servet ile yeni oturum başladı. Token yenilendi, tüm hafıza dosyaları incelendi.**
 
-1. **GitHub token yenilendi** — eski `ghp_ogQ...` → yeni `ghp_qvOk...`
+1. **GitHub token yenilendi** — eski `ghp_ogQ...` → yeni `ghp_***.`
 2. **Polar.sh durumu güncellendi** — MEMORY.md + STATUS.md "expired" → "aktif"
 3. **Tüm .ai-context/ dosyaları detaylı incelendi** (19 dosya)
 4. **3 denetim raporu güncellendi** — AUDIT_REPORT.md, CODEBASE_AUDIT.md, FULL_SYSTEM_AUDIT.md
