@@ -42,3 +42,4 @@ HEARTBEAT.md
 .openclaw/
 memory/
 .env.example
+__pycache__

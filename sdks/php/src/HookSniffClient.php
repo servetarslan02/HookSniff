@@ -78,7 +78,7 @@ class HookSniffClient
             CURLOPT_HTTPHEADER => [
                 'Authorization: Bearer ' . $this->apiKey,
                 'Content-Type: application/json',
-                'User-Agent: hooksniff-php/0.2.0',
+                'User-Agent: hooksniff-php/0.1.0',
             ],
         ]);
 

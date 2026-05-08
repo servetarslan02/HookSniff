@@ -1,6 +1,6 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+// ─── Gmail API Email Client ───
+// Uses GCP Service Account (GCP_SA_JSON env var) for authentication via JWT.
+// Compatible with Next.js Edge Runtime (Web Crypto API only, no Node.js deps).
 
 interface EmailOptions {
   to: string;
@@ -9,22 +9,181 @@ interface EmailOptions {
   from?: string;
 }
 
-const DEFAULT_FROM = 'HookSniff <noreply@hooksniff.vercel.app>';
+interface ServiceAccountKey {
+  type: string;
+  project_id: string;
+  private_key_id: string;
+  private_key: string;
+  client_email: string;
+  client_id: string;
+  auth_uri: string;
+  token_uri: string;
+}
 
-export async function sendEmail({ to, subject, html, from = DEFAULT_FROM }: EmailOptions) {
+const DEFAULT_FROM = process.env.GCP_SENDER_EMAIL || 'noreply@hooksniff.vercel.app';
+const GMAIL_API_URL = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send';
+const TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const SCOPES = 'https://www.googleapis.com/auth/gmail.send';
+
+// ─── Helpers ───
+
+function base64urlEncode(data: string | ArrayBuffer): string {
+  const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : new Uint8Array(data);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64urlDecode(str: string): ArrayBuffer {
+  const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64 + '==='.slice((base64.length + 3) % 4);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+/**
+ * Parse PKCS#8 PEM private key for Web Crypto importKey.
+ * Handles both PKCS#8 and PKCS#1 (traditional RSA) PEM formats.
+ */
+function pemToArrayBuffer(pem: string): ArrayBuffer {
+  // Strip PEM headers/footers and newlines
+  const base64 = pem
+    .replace(/-----BEGIN [A-Z ]+-----/, '')
+    .replace(/-----END [A-Z ]+-----/, '')
+    .replace(/\s+/g, '');
+  return base64urlDecode(base64.replace(/-/g, '+').replace(/_/g, '/'));
+}
+
+async function importRsaPrivateKey(pem: string): Promise<CryptoKey> {
+  const keyData = pemToArrayBuffer(pem);
+  return crypto.subtle.importKey(
+    'pkcs8',
+    keyData,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+}
+
+async function signJwt(privateKey: CryptoKey, header: object, payload: object): Promise<string> {
+  const headerB64 = base64urlEncode(JSON.stringify(header));
+  const payloadB64 = base64urlEncode(JSON.stringify(payload));
+  const data = `${headerB64}.${payloadB64}`;
+  const signature = await crypto.subtle.sign(
+    'RSASSA-PKCS1-v1_5',
+    privateKey,
+    new TextEncoder().encode(data)
+  );
+  return `${data}.${base64urlEncode(signature)}`;
+}
+
+// ─── Token Cache ───
+
+let cachedToken: { token: string; expiresAt: number } | null = null;
+
+async function getServiceAccount(): Promise<ServiceAccountKey> {
+  const saJson = process.env.GCP_SA_JSON;
+  if (!saJson) {
+    throw new Error('GCP_SA_JSON environment variable is not set');
+  }
+  return JSON.parse(saJson) as ServiceAccountKey;
+}
+
+async function getAccessToken(): Promise<string> {
+  // Return cached token if still valid (with 5-min buffer)
+  if (cachedToken && cachedToken.expiresAt > Date.now() + 300_000) {
+    return cachedToken.token;
+  }
+
+  const sa = await getServiceAccount();
+  const now = Math.floor(Date.now() / 1000);
+
+  const privateKey = await importRsaPrivateKey(sa.private_key);
+
+  const jwt = await signJwt(
+    privateKey,
+    { alg: 'RS256', typ: 'JWT' },
+    {
+      iss: sa.client_email,
+      scope: SCOPES,
+      aud: TOKEN_URL,
+      exp: now + 3600,
+      iat: now,
+    }
+  );
+
+  // Exchange JWT for access token
+  const resp = await fetch(TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Token exchange failed (${resp.status}): ${text}`);
+  }
+
+  const data = (await resp.json()) as { access_token: string; expires_in: number };
+  cachedToken = {
+    token: data.access_token,
+    expiresAt: Date.now() + data.expires_in * 1000,
+  };
+
+  return data.access_token;
+}
+
+// ─── Core Send ───
+
+function buildRawMime(to: string, from: string, subject: string, html: string): string {
+  const boundary = 'boundary_hooksniff_email';
+  const mime = [
+    `From: ${from}`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/html; charset=UTF-8',
+    '',
+    html,
+    `--${boundary}--`,
+  ].join('\r\n');
+
+  return base64urlEncode(mime);
+}
+
+export async function sendEmail({ to, subject, html, from }: EmailOptions) {
+  const senderEmail = from || DEFAULT_FROM;
+
   try {
-    const { data, error } = await resend.emails.send({
-      from,
-      to,
-      subject,
-      html,
+    const accessToken = await getAccessToken();
+    const raw = buildRawMime(to, senderEmail, subject, html);
+
+    const resp = await fetch(GMAIL_API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ raw }),
     });
 
-    if (error) {
-      console.error('Resend error:', error);
-      return { success: false, error };
+    if (!resp.ok) {
+      const text = await resp.text();
+      console.error('Gmail API error:', resp.status, text);
+      return { success: false, error: `Gmail API returned ${resp.status}: ${text}` };
     }
 
+    const data = await resp.json();
     return { success: true, data };
   } catch (err) {
     console.error('Email send failed:', err);

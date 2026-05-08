@@ -14,16 +14,12 @@ from .exceptions import (
     ValidationError,
 )
 from .models import (
-    AiAction,
-    AiEvent,
-    AiStatus,
     BatchResult,
     Delivery,
     DeliveryAttempt,
     DeliveryList,
     Endpoint,
     RetryPolicy,
-    RiskScore,
     Stats,
 )
 
@@ -171,11 +167,6 @@ class HookSniffClient:
             event="order.created",
             data={"order_id": "12345"}
         )
-
-        # AI Center
-        status = client.ai.status()
-        events = client.ai.events(severity="critical")
-        risks = client.ai.risks()
     """
 
     def __init__(
@@ -192,7 +183,7 @@ class HookSniffClient:
             {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "User-Agent": "hooksniff-python/0.4.0",
+                "User-Agent": "hooksniff-python/0.1.0",
             }
         )
 
