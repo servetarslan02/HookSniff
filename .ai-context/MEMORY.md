@@ -147,18 +147,25 @@ Eksiklik analizi: `.ai-context/MOBILE_APP_AUDIT.md`
 
 **Kararlar:**
 - Platform: Android (sadece, iOS yok)
-- Teknoloji: React Native + Expo (SDK 53)
+- Teknoloji: React Native + Expo (SDK 53+)
 - Dağıtım: Siteden APK indirme (Google Play YOK)
 - Güncelleme: OTA (Expo Updates) + APK güncelleme
 - Tasarım: Premium, native his, dark mode varsayılan, 29 sayfa
 - Dil: Türkçe varsayılan, İngilizce destek
 - Maliyet: $0
 - Süre: 6-8 hafta
+- Performans: 60fps, <2sn cold start, <130MB bellek, <40MB APK
+- Motor: Hermes (%50 hızlı cold start)
+- Liste: FlashList (Shopify, FlatList'ten %30-50 hızlı)
+- Animasyon: Reanimated 3 (UI thread, 60fps)
+- Cache: TanStack Query (stale-while-revalidate)
+- Hata takibi: Sentry (5K error/ay ücretsiz)
+- New Architecture: Interop Layer ile eski kütüphane uyumluluğu garantili
+- ARM64-only build ile APK <40MB
+- Aynı teknoloji: Instagram, Discord, Shopify, Microsoft, Amazon kullanıyor
 - Backend %90 hazır, sadece push notification + şifre sıfırlama + refresh token eksik
 - Ek kararlar: `.ai-context/MOBILE_DECISIONS.md`
   - Offline: AsyncStorage + TanStack Query cache
-  - Hata raporlama: Sentry
-  - Analitik: Sentry Performance
   - Deep link: `hooksniff://screen/id`
   - Dil: Türkçe + İngilizce (i18next)
   - Arama: Global search
