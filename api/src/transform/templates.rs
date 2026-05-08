@@ -45,10 +45,21 @@ impl EventTransformer for FieldMapper {
         let mut output = input.clone();
 
         if let Some(obj) = output.as_object_mut() {
+            // Collect source keys to remove after iteration
+            let mut keys_to_remove: Vec<String> = Vec::new();
+
             for (new_key, old_key) in &self.mappings {
                 if let Some(value) = input.get(old_key) {
                     obj.insert(new_key.clone(), value.clone());
+                    // Remove the original key (only if source != target)
+                    if new_key != old_key {
+                        keys_to_remove.push(old_key.clone());
+                    }
                 }
+            }
+
+            for key in keys_to_remove {
+                obj.remove(&key);
             }
         }
 
