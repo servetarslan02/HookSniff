@@ -82,20 +82,16 @@ Bu oturumda çözülenler:
 3. Servet'in dış servis görevleri (Polar.sh, Resend, iyzico)
 
 ### Kapsamlı Denetim Bulguları (Oturum 9 — tam liste: FULL_SYSTEM_AUDIT.md)
-**Servet yapacak (güvenlik):**
-- GCP key yenile + GitHub'dan sil
-- GitHub token yenile + .ai-context dosyalarından sil
-
 **AI agent yapacak (25 madde):**
-- #3: OpenAPI spec yaz (2-3 saat)
-- #4: Dependabot kur (10 dk)
-- #5: Migration gap açıklaması (5 dk)
-- #6: .env.production.example güncelle (10 dk)
-- #7-11: Dashboard license, TS strict, dead code, domain, env vars
-- #12-13: PHP SDK fix, AI Center çıkar
-- #14-19: Feature parity, quickstart, simulator, npm/pypi publish, changelog, TS tipleri
-- #20-21: CI ekle (clippy, audit, lint)
-- #22-27: console.log, TODO, dependency temizliği, Gson, Go, versiyon senkronizasyonu
+- #1: OpenAPI spec yaz (2-3 saat)
+- #2: Dependabot kur (10 dk)
+- #3: Migration gap açıklaması (5 dk)
+- #4: .env.production.example güncelle (10 dk)
+- #5-9: Dashboard license, TS strict, dead code, domain, env vars
+- #10-11: PHP SDK fix, AI Center çıkar
+- #12-17: Feature parity, quickstart, simulator, npm/pypi publish, changelog, TS tipleri
+- #18-19: CI ekle (clippy, audit, lint)
+- #20-25: console.log, TODO, dependency temizliği, Gson, Go, versiyon senkronizasyonu
 
 ---
 
