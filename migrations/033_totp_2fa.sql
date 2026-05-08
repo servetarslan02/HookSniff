@@ -1,0 +1,3 @@
+-- Two-factor authentication (TOTP)
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS totp_secret TEXT;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN NOT NULL DEFAULT false;

@@ -37,6 +37,12 @@ pub struct Customer {
     #[serde(default)]
     pub is_admin: bool,
     pub updated_at: DateTime<Utc>,
+    #[serde(default)]
+    pub email_verified: bool,
+    #[serde(skip_serializing)]
+    pub totp_secret: Option<String>,
+    #[serde(default)]
+    pub totp_enabled: bool,
 }
 
 fn default_payment_provider() -> String {
@@ -68,6 +74,72 @@ pub struct ChangePasswordRequest {
     pub new_password: String,
 }
 
+// ── Password Reset ──────────────────────────────────────────
+#[derive(Debug, Deserialize)]
+pub struct ForgotPasswordRequest {
+    pub email: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ResetPasswordRequest {
+    pub token: String,
+    pub new_password: String,
+}
+
+// ── Email Verification ─────────────────────────────────────
+#[derive(Debug, Deserialize)]
+pub struct VerifyEmailRequest {
+    pub token: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ResendVerificationRequest {
+    pub email: String,
+}
+
+// ── Refresh Token ───────────────────────────────────────────
+#[derive(Debug, Deserialize)]
+pub struct RefreshTokenRequest {
+    pub refresh_token: String,
+}
+
+// ── Two-Factor Auth (TOTP) ─────────────────────────────────
+#[derive(Debug, Deserialize)]
+pub struct Enable2faRequest {
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Confirm2faRequest {
+    pub code: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Disable2faRequest {
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Verify2faRequest {
+    pub temp_token: String,
+    pub code: String,
+}
+
+// ── Push Notifications (Device Tokens) ─────────────────────
+#[derive(Debug, Deserialize)]
+pub struct RegisterDeviceRequest {
+    pub token: String,
+    pub platform: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct DeviceTokenResponse {
+    pub id: Uuid,
+    pub token: String,
+    pub platform: String,
+    pub created_at: DateTime<Utc>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct CustomerResponse {
     pub id: Uuid,
@@ -85,6 +157,16 @@ pub struct CustomerResponse {
 pub struct AuthResponse {
     pub token: String,
     pub customer: CustomerResponse,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub refresh_token: Option<String>,
+}
+
+/// Response when 2FA is required (partial auth — no full token yet).
+#[derive(Debug, Serialize)]
+pub struct TwoFactorRequiredResponse {
+    pub requires_2fa: bool,
+    pub temp_token: String,
+    pub message: String,
 }
 
 impl Customer {
