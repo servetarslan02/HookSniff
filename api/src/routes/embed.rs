@@ -5,7 +5,6 @@
 //! status, recent deliveries, and a mini dashboard.
 
 use axum::extract::Extension;
-use axum::http::StatusCode;
 use axum::response::Html;
 use axum::routing::get;
 use axum::Router;

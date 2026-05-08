@@ -46,7 +46,6 @@ struct TokenResponse {
     expires_in: u64,
 }
 
-
 impl GCloudEmailClient {
     /// Create a new GCloudEmailClient from config.
     /// Reads service account JSON from GCP_SA_JSON env var or GCP_SERVICE_ACCOUNT_PATH file.

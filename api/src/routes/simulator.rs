@@ -8,7 +8,6 @@ use axum::extract::Extension;
 use axum::routing::post;
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -67,8 +66,7 @@ async fn simulate_webhook(
         "simulator": true,
     });
 
-    let payload_str = serde_json::to_string(&payload)
-        .map_err(|e| AppError::Internal(e.into()))?;
+    let payload_str = serde_json::to_string(&payload).map_err(|e| AppError::Internal(e.into()))?;
 
     // Generate a test signature
     let test_secret = "whsec_simulator_test_key";
