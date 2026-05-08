@@ -136,3 +136,32 @@ Her oturum sonunda:
 2. `.ai-context/NEXT_SESSION.md` güncelle
 3. `.ai-context/2026-05-09.md` günlük log güncelle
 4. GitHub API ile push et
+
+---
+
+## 🚀 DEPLOY DURUMU (2026-05-09 07:24 GMT+8)
+
+### GCP Service Account
+- ✅ Yeni key alındı (key_id: 38c1ec8c7b24)
+- ✅ Python ile token alınabiliyor
+- ⚠️ `gcloud` CLI bu key ile çalışmıyor (OpenSSL uyumsuzluk)
+- ✅ REST API ile deploy_possible
+
+### Deploy Adımları (Yeni Oturumda)
+1. Token al: Python ile JWT → OAuth2 access token
+2. Docker build: `docker build -f Dockerfile.api -t IMAGE .`
+3. Docker push: Artifact Registry'a push
+4. Cloud Run deploy: REST API ile `gcloud run deploy`
+
+### Alternatif: GitHub Actions
+- CI workflow'u aktif edilirse otomatik deploy olur
+- Billing sorunu varsa bu yol tercih edilmeli
+
+### Yapılan Değişiklikler (Bu Oturum)
+- 4 commit push edildi
+- 37 dosya değiştirildi
+- Tüm production unwrap() kaldırıldı
+- Security: inbound signature verification fix
+- API key localStorage'dan kaldırıldı
+- CSP header eklendi
+- CORS restricted
