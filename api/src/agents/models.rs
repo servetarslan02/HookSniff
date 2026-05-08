@@ -124,6 +124,19 @@ pub struct UpdateRateLimitRequest {
     pub max_events_per_hour: Option<i32>,
 }
 
+// ============ Event Statistics ============
+
+#[derive(Debug, Serialize)]
+pub struct EventStats {
+    pub total_events: i64,
+    pub emit_count: i64,
+    pub receive_count: i64,
+    pub delivered_count: i64,
+    pub failed_count: i64,
+    pub unique_event_types: i64,
+    pub last_event_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
