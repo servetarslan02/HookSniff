@@ -27,7 +27,7 @@
 | Storage | Cloudflare R2 | ✅ | hooksniff-storage |
 | CDN | Cloudflare | ✅ | Hesap aktif |
 | Email | GCloud Gmail API | ✅ | Service account + Gmail API |
-| Monitoring | Grafana Cloud | ⏳ | OTEL headers hazır |
+| Monitoring | Grafana Cloud | ✅ | OTEL token güncellendi, traces akıyor |
 | Ödeme (Global) | Polar.sh | ✅ | Token yenilendi, Pro plan aktif |
 | Ödeme (TR) | iyzico | ❌ | Hesap açılacak |
 
