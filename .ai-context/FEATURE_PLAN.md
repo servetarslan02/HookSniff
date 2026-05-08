@@ -290,22 +290,38 @@
 
 ---
 
-## 📱 EN SON: Mobil Uygulama Planı
+## 📱 EN SON: Mobil Uygulama Planı (Admin & Müşteri Yönetim Paneli)
 
 > ⚠️ Bu EN SON yapılacak iş. Tüm web özellikleri bittikten sonra başlanacak.
 > Servet onayı beklemede.
 
 ### Ne Yapılacak?
-HookSniff mobil uygulaması — webhook'ları telefondan izle ve yönet.
+HookSniff mobil uygulaması — admin ve müşterilerin webhook'ları telefondan yönetmesi.
 
-### Özellikler
+### Kim Kullanacak?
+- **Müşteri:** Kendi webhook'larını izler, alert'leri yönetir, endpoint açar/kapatır
+- **Admin:** Tüm müşterileri izler, sistem durumunu kontrol eder, destek verir
+
+### Müşteri Özellikleri
 | # | Özellik | Açıklama |
 |---|---------|----------|
 | 1 | Dashboard | Event sayısı, başarı oranı, grafik |
 | 2 | Bildirimler | Kritik hatalarda push notification |
 | 3 | Event Listesi | Son event'leri filtrele, ara |
 | 4 | Endpoint Yönetimi | Endpoint ekle/düzenle/durdur |
-| 5 | Hızlı Aksiyon | Tek tıkla retry, disable, test |
+| 5 | Alert Ayarları | Alarm kuralları oluştur/düzenle |
+| 6 | Bildirim Tercihleri | Telegram/Email/Discord seçimi |
+| 7 | Hızlı Aksiyon | Tek tıkla retry, disable, test |
+
+### Admin Özellikleri
+| # | Özellik | Açıklama |
+|---|---------|----------|
+| 1 | Müşteri Listesi | Tüm müşterileri gör |
+| 2 | Sistem Durumu | API, DB, Redis, Worker sağlık |
+| 3 | Kullanım İstatistikleri | Toplam event, aktif müşteri, gelir |
+| 4 | Müşteri Detayı | Müşterinin endpoint'lerini, event'lerini gör |
+| 5 | Destek | Müşteriye mesaj gönder, sorun çöz |
+| 6 | Plan Yönetimi | Müşteri planını değiştir |
 
 ### Teknoloji Seçenekleri
 
