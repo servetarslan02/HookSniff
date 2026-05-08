@@ -20,7 +20,7 @@ env:
 jobs:
   # --- Rust linting (fmt + clippy) ---
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -42,7 +42,7 @@ jobs:
 
   # --- Rust tests ---
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:16-alpine
@@ -75,7 +75,7 @@ jobs:
 
   # --- Build Rust binaries ---
   build-api:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
@@ -97,7 +97,7 @@ jobs:
           path: target/release/hooksniff-api
 
   build-worker:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
@@ -120,7 +120,7 @@ jobs:
 
   # --- Dashboard (Next.js) ---
   build-dashboard:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -149,7 +149,7 @@ jobs:
 
   # --- Security audit (Rust + Node) ---
   security-audit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
