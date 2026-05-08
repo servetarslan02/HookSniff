@@ -1,3 +1,5 @@
+// In production, "/api" is rewritten by Vercel to the GCP Cloud Run API (see vercel.json).
+// In development, point directly to the local API server.
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? "/api" : "http://localhost:3000/v1");
 
 const REQUEST_TIMEOUT_MS = 30_000;
