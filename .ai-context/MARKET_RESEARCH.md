@@ -442,3 +442,105 @@ SaaS şirketleri kendi webhook'larını müşterilerine satabilir:
 | 7 | Go-to-market (PH + HN) | Reddit, HN | 🟡 Orta |
 | 8 | Schema validation | Forum complaints | 🟡 Orta |
 | 9 | Community building | GitHub stars | 🟡 Orta |
+
+---
+
+# 🤖 AI Agent Katmanı — Plan (HENÜZ BAŞLANMADI)
+
+> Tarih: 2026-05-08 21:14 GMT+8
+> ⚠️ **UYARI:** Bu plan Servet'in onayı olmadan BAŞLANMAYACAK.
+> En son iş bu olacak. Önce diğer yapılacaklar bitirilecek.
+> Sadece hafıza ve mantık kaydıdır.
+
+---
+
+## Ne Yapılacak?
+
+Mevcut webhook sisteminin yanına bir "AI Agent Katmanı" eklenecek.
+Agent'lar (yapay zeka robotları) birbirine webhook/event ile mesaj gönderebilecek.
+
+## Neden?
+
+- Gartner: 2028'de şirketlerin %33'ü AI agent iletişimi için event-driven architecture kullanacak
+- Rakiplerin hiçbirinde bu özellik yok
+- Mevcut sistem bunu destekleyecek altyapıya sahip
+
+## Nasıl?
+
+### Katman 1 — Mevcut Sistem (DEĞİŞMEZ ✅)
+- Webhook al, kaydet, ilet, tekrar dene
+- Dashboard, SDK'lar, API
+- Hiç dokunulmaz
+
+### Katman 2 — Agent Kimlik Sistemi (Yeni)
+- Dashboard'da "Agent oluştur" butonu
+- Her agent'a `agent_id` + `api_key`
+- Agent bağlanınca kimliğini doğrula
+
+### Katman 3 — Agent Event API'si (Yeni)
+- `agent.subscribe("order.created")` — event dinle
+- `agent.emit("stock.low", data)` — event gönder
+- Mevcut webhook motoru bunu zaten yapıyor
+
+### Katman 4 — Routing Motoru (Yeni)
+- "Bu event'i şu agent'lara gönder" kuralları
+- Dashboard'da görsel kural editörü
+
+### Katman 5 — Güvenlik + Monitoring (Yeni)
+- Agent davranış profili
+- Anormal hareket → alert
+- Rate limit per agent
+
+## Plan
+
+| Adım | Ne | Süre | Durum |
+|------|-----|------|-------|
+| 1 | Agent kimlik sistemi | 1 hafta | ⏳ Beklemede |
+| 2 | Agent event API'si | 1 hafta | ⏳ Beklemede |
+| 3 | Routing motoru | 1 hafta | ⏳ Beklemede |
+| 4 | Güvenlik + monitoring | 1 hafta | ⏳ Beklemede |
+| **Toplam** | | **4 hafta** | |
+
+## Güvenli Yaklaşım
+
+- Ayrı branch: `ai-agent-layer`
+- Ayrı Cloud Run service
+- Ayrı database tablosu
+- Mevcut koda HİÇ dokunulmaz
+- Test edilir → Servet onay verirse → main'e birleştir
+
+## Maliyet: $0
+
+| Kalem | Maliyet |
+|-------|---------|
+| AI API (OpenAI vb.) | $0 — kural tabanlı |
+| Yeni Cloud Run | $0 — free tier |
+| Yeni DB tablosu | $0 — mevcut Neon |
+| Ek Redis | $0 — 2. free instance |
+
+## Müşteri Deneyimi
+
+```python
+# Müşteri SDK yükle
+pip install hooksniff
+
+# 3 satır kod
+from hooksniff import HookSniff
+client = HookSniff("api_key")
+client.emit("siparis.geldi", {"urun": "Laptop"})
+```
+
+Müşteri API kurmaz, sunucu açmaz. Sadece SDK yükler + 1-3 satır kod ekler.
+
+## Risk Analizi
+
+| Senaryo | Olasılık | Sonuç |
+|---------|----------|-------|
+| Her şey çalışır | %70 | Mükemmel |
+| Küçük hatalar, düzeltilir | %25 | Normal |
+| Ciddi sorun | %4 | Branch sil, mevcut sağlam |
+| Mevcut sistem bozulur | %1 | Neredeyse imkansız |
+
+## Ne Zaman Başlanacak?
+
+Servet'in onayı ile. Önce diğer yapılacaklar bitirilecek.
