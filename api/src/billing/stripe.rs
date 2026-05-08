@@ -259,7 +259,7 @@ async fn handle_checkout_completed(
         .and_then(|v| v.as_str())
         .unwrap_or("pro");
 
-    let plan = Plan::from_str(plan_str);
+    let plan = Plan::parse_str(plan_str);
 
     // Update customer plan and Stripe IDs
     sqlx::query(

@@ -85,7 +85,7 @@ async fn update_routing(
 ) -> Result<Json<RoutingInfo>, AppError> {
     // Validate routing strategy if provided
     if let Some(ref strategy) = req.routing_strategy {
-        RoutingStrategy::from_str(strategy); // Accept any string, default to round-robin
+        RoutingStrategy::parse_str(strategy); // Accept any string, default to round-robin
     }
 
     // Validate fallback URL if provided

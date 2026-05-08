@@ -13,10 +13,6 @@ use sha2::Sha256;
 
 type HmacSha256 = Hmac<Sha256>;
 
-/// Default timestamp tolerance in seconds (5 minutes).
-#[allow(dead_code)]
-pub const DEFAULT_TIMESTAMP_TOLERANCE_SECS: i64 = 300;
-
 /// Compute Standard Webhooks HMAC-SHA256 signature.
 ///
 /// Returns a `v1,<base64(hmac)>` formatted signature string.
@@ -42,86 +38,6 @@ pub fn compute_standard_signature(
     format!("v1,{}", signature)
 }
 
-/// Verify a Standard Webhooks signature.
-///
-/// Checks:
-/// 1. Signature matches `v1,<base64(hmac)>` format
-/// 2. HMAC-SHA256 of `{msg_id}.{timestamp}.{body}` matches
-/// 3. Timestamp is within tolerance (default 5 minutes)
-///
-/// Returns `Ok(())` on success, `Err(VerificationError)` on failure.
-#[allow(dead_code)]
-pub fn verify_standard_signature(
-    secret: &str,
-    msg_id: &str,
-    timestamp: &str,
-    signature_header: &str,
-    body: &str,
-    tolerance_secs: Option<i64>,
-) -> Result<(), VerificationError> {
-    let tolerance = tolerance_secs.unwrap_or(DEFAULT_TIMESTAMP_TOLERANCE_SECS);
-
-    // 1. Validate timestamp is numeric and within tolerance
-    let ts: i64 = timestamp
-        .parse()
-        .map_err(|_| VerificationError::InvalidTimestamp)?;
-
-    let now = chrono::Utc::now().timestamp();
-    let age = (now - ts).abs();
-
-    if age > tolerance {
-        return Err(VerificationError::TimestampExpired {
-            age_secs: age,
-            tolerance_secs: tolerance,
-        });
-    }
-
-    // 2. Parse signature header — may contain multiple signatures separated by spaces
-    //    Format: "v1,<base64>" or "v1,<base64> v1,<base64>"
-    let secret_bytes = decode_secret(secret);
-    let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
-
-    let mut mac = HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
-    mac.update(signed_content.as_bytes());
-    let expected_bytes = mac.finalize().into_bytes();
-
-    let mut verified = false;
-    for sig_part in signature_header.split(' ') {
-        let sig_part = sig_part.trim();
-        if sig_part.is_empty() {
-            continue;
-        }
-
-        // Must start with "v1,"
-        let encoded = match sig_part.strip_prefix("v1,") {
-            Some(e) => e,
-            None => continue,
-        };
-
-        let sig_bytes = match BASE64.decode(encoded) {
-            Ok(b) => b,
-            Err(_) => continue,
-        };
-
-        if sig_bytes.len() == expected_bytes.len()
-            && hmac::digest::CtOutput::<HmacSha256>::new(
-                hmac::digest::Output::<HmacSha256>::clone_from_slice(&sig_bytes),
-            ) == hmac::digest::CtOutput::<HmacSha256>::new(
-                hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
-            )
-        {
-            verified = true;
-            break;
-        }
-    }
-
-    if verified {
-        Ok(())
-    } else {
-        Err(VerificationError::SignatureMismatch)
-    }
-}
-
 /// Decode a Standard Webhooks secret.
 ///
 /// Secrets may have a `whsec_` prefix. The remainder is base64-encoded.
@@ -142,104 +58,155 @@ pub fn compute_hmac(secret: &str, payload: &str) -> String {
     hex::encode(result.into_bytes())
 }
 
-/// Verify legacy HMAC-SHA256 signature (hex-encoded).
-///
-/// Uses constant-time comparison to prevent timing attacks.
-/// The hex-encoded signature is decoded to bytes and compared
-/// via `CtOutput` from the `hmac` crate.
-#[allow(dead_code)]
-pub fn verify_hmac(secret: &str, payload: &str, expected_signature: &str) -> bool {
-    // Decode expected signature from hex to raw bytes
-    let expected_bytes = match hex::decode(expected_signature) {
-        Ok(b) => b,
-        Err(_) => return false,
-    };
-
-    // Compute HMAC as raw bytes (constant-time compare requires byte-level access)
-    let mut mac =
-        HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take key of any size");
-    mac.update(payload.as_bytes());
-    let computed_bytes = mac.finalize().into_bytes();
-
-    // Length check is not timing-sensitive (length is not secret)
-    if expected_bytes.len() != computed_bytes.len() {
-        return false;
-    }
-
-    // Constant-time comparison via CtOutput
-    hmac::digest::CtOutput::<HmacSha256>::new(hmac::digest::Output::<HmacSha256>::clone_from_slice(
-        &expected_bytes,
-    )) == hmac::digest::CtOutput::<HmacSha256>::new(
-        hmac::digest::Output::<HmacSha256>::clone_from_slice(&computed_bytes),
-    )
-}
-
-/// Verify signature against both current and old signing secrets.
-/// Returns true if either matches.
-#[allow(dead_code)]
-pub fn verify_with_rotation(
-    current_secret: &str,
-    old_secret: Option<&str>,
-    payload: &str,
-    expected_signature: &str,
-    secret_rotated_at: Option<chrono::DateTime<chrono::Utc>>,
-) -> bool {
-    // Check current secret first
-    if verify_hmac(current_secret, payload, expected_signature) {
-        return true;
-    }
-
-    // Check old secret if rotation was recent (within 24h)
-    if let (Some(old), Some(rotated_at)) = (old_secret, secret_rotated_at) {
-        let twenty_four_hours_ago = chrono::Utc::now() - chrono::Duration::hours(24);
-        if rotated_at > twenty_four_hours_ago {
-            return verify_hmac(old, payload, expected_signature);
-        }
-    }
-
-    false
-}
-
-/// Errors that can occur during Standard Webhooks signature verification.
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
-pub enum VerificationError {
-    /// The timestamp header is not a valid integer.
-    InvalidTimestamp,
-    /// The timestamp is outside the allowed tolerance window.
-    TimestampExpired { age_secs: i64, tolerance_secs: i64 },
-    /// No matching signature found in the header.
-    SignatureMismatch,
-}
-
-impl std::fmt::Display for VerificationError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InvalidTimestamp => write!(f, "Invalid webhook timestamp"),
-            Self::TimestampExpired {
-                age_secs,
-                tolerance_secs,
-            } => write!(
-                f,
-                "Webhook timestamp expired: age {}s exceeds tolerance {}s",
-                age_secs, tolerance_secs
-            ),
-            Self::SignatureMismatch => write!(f, "Webhook signature mismatch"),
-        }
-    }
-}
-
-impl std::error::Error for VerificationError {}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const DEFAULT_TIMESTAMP_TOLERANCE_SECS: i64 = 300;
+
+    /// Verify a Standard Webhooks signature (test-only).
+    fn verify_standard_signature(
+        secret: &str,
+        msg_id: &str,
+        timestamp: &str,
+        signature_header: &str,
+        body: &str,
+        tolerance_secs: Option<i64>,
+    ) -> Result<(), VerificationError> {
+        let tolerance = tolerance_secs.unwrap_or(DEFAULT_TIMESTAMP_TOLERANCE_SECS);
+
+        let ts: i64 = timestamp
+            .parse()
+            .map_err(|_| VerificationError::InvalidTimestamp)?;
+
+        let now = chrono::Utc::now().timestamp();
+        let age = (now - ts).abs();
+
+        if age > tolerance {
+            return Err(VerificationError::TimestampExpired {
+                age_secs: age,
+                tolerance_secs: tolerance,
+            });
+        }
+
+        let secret_bytes = decode_secret(secret);
+        let signed_content = format!("{}.{}.{}", msg_id, timestamp, body);
+
+        let mut mac =
+            HmacSha256::new_from_slice(&secret_bytes).expect("HMAC can take key of any size");
+        mac.update(signed_content.as_bytes());
+        let expected_bytes = mac.finalize().into_bytes();
+
+        let mut verified = false;
+        for sig_part in signature_header.split(' ') {
+            let sig_part = sig_part.trim();
+            if sig_part.is_empty() {
+                continue;
+            }
+
+            let encoded = match sig_part.strip_prefix("v1,") {
+                Some(e) => e,
+                None => continue,
+            };
+
+            let sig_bytes = match BASE64.decode(encoded) {
+                Ok(b) => b,
+                Err(_) => continue,
+            };
+
+            if sig_bytes.len() == expected_bytes.len()
+                && hmac::digest::CtOutput::<HmacSha256>::new(
+                    hmac::digest::Output::<HmacSha256>::clone_from_slice(&sig_bytes),
+                ) == hmac::digest::CtOutput::<HmacSha256>::new(
+                    hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
+                )
+            {
+                verified = true;
+                break;
+            }
+        }
+
+        if verified {
+            Ok(())
+        } else {
+            Err(VerificationError::SignatureMismatch)
+        }
+    }
+
+    /// Verify legacy HMAC-SHA256 signature (test-only).
+    fn verify_hmac(secret: &str, payload: &str, expected_signature: &str) -> bool {
+        let expected_bytes = match hex::decode(expected_signature) {
+            Ok(b) => b,
+            Err(_) => return false,
+        };
+
+        let mut mac =
+            HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take key of any size");
+        mac.update(payload.as_bytes());
+        let computed_bytes = mac.finalize().into_bytes();
+
+        if expected_bytes.len() != computed_bytes.len() {
+            return false;
+        }
+
+        hmac::digest::CtOutput::<HmacSha256>::new(hmac::digest::Output::<HmacSha256>::clone_from_slice(
+            &expected_bytes,
+        )) == hmac::digest::CtOutput::<HmacSha256>::new(
+            hmac::digest::Output::<HmacSha256>::clone_from_slice(&computed_bytes),
+        )
+    }
+
+    /// Verify signature with rotation support (test-only).
+    fn verify_with_rotation(
+        current_secret: &str,
+        old_secret: Option<&str>,
+        payload: &str,
+        expected_signature: &str,
+        secret_rotated_at: Option<chrono::DateTime<chrono::Utc>>,
+    ) -> bool {
+        if verify_hmac(current_secret, payload, expected_signature) {
+            return true;
+        }
+
+        if let (Some(old), Some(rotated_at)) = (old_secret, secret_rotated_at) {
+            let twenty_four_hours_ago = chrono::Utc::now() - chrono::Duration::hours(24);
+            if rotated_at > twenty_four_hours_ago {
+                return verify_hmac(old, payload, expected_signature);
+            }
+        }
+
+        false
+    }
+
+    /// Errors that can occur during signature verification (test-only).
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    enum VerificationError {
+        InvalidTimestamp,
+        TimestampExpired { age_secs: i64, tolerance_secs: i64 },
+        SignatureMismatch,
+    }
+
+    impl std::fmt::Display for VerificationError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::InvalidTimestamp => write!(f, "Invalid webhook timestamp"),
+                Self::TimestampExpired {
+                    age_secs,
+                    tolerance_secs,
+                } => write!(
+                    f,
+                    "Webhook timestamp expired: age {}s exceeds tolerance {}s",
+                    age_secs, tolerance_secs
+                ),
+                Self::SignatureMismatch => write!(f, "Webhook signature mismatch"),
+            }
+        }
+    }
 
     #[test]
     fn test_compute_standard_signature_format() {
         let sig = compute_standard_signature("whsec_test123", "msg_123", "1234567890", "{}");
         assert!(sig.starts_with("v1,"));
-        // Should be valid base64 after the prefix
         let encoded = &sig[3..];
         assert!(BASE64.decode(encoded).is_ok());
     }
@@ -252,7 +219,6 @@ mod tests {
         let body = r#"{"event":"order.created"}"#;
 
         let sig = compute_standard_signature(secret, msg_id, timestamp, body);
-
         assert!(verify_standard_signature(secret, msg_id, timestamp, &sig, body, None).is_ok());
     }
 
@@ -260,11 +226,10 @@ mod tests {
     fn test_verify_standard_signature_expired() {
         let secret = "whsec_test123";
         let msg_id = "msg_test_002";
-        let old_timestamp = (chrono::Utc::now().timestamp() - 600).to_string(); // 10 min ago
+        let old_timestamp = (chrono::Utc::now().timestamp() - 600).to_string();
         let body = r#"{"event":"order.created"}"#;
 
         let sig = compute_standard_signature(secret, msg_id, &old_timestamp, body);
-
         let result = verify_standard_signature(secret, msg_id, &old_timestamp, &sig, body, None);
         assert!(matches!(
             result,
@@ -279,7 +244,6 @@ mod tests {
         let body = r#"{"event":"order.created"}"#;
 
         let sig = compute_standard_signature("whsec_correct", msg_id, timestamp, body);
-
         let result = verify_standard_signature("whsec_wrong", msg_id, timestamp, &sig, body, None);
         assert_eq!(result, Err(VerificationError::SignatureMismatch));
     }
@@ -293,7 +257,6 @@ mod tests {
 
         let valid_sig = compute_standard_signature(secret, msg_id, timestamp, body);
         let header = format!("v1,invalidbase64 {}", valid_sig);
-
         assert!(verify_standard_signature(secret, msg_id, timestamp, &header, body, None).is_ok());
     }
 
@@ -331,7 +294,6 @@ mod tests {
         let sig_current = compute_hmac(current, payload);
         let sig_old = compute_hmac(old, payload);
 
-        // Current secret works
         assert!(verify_with_rotation(
             current,
             Some(old),
@@ -340,7 +302,6 @@ mod tests {
             Some(chrono::Utc::now()),
         ));
 
-        // Old secret works within 24h
         assert!(verify_with_rotation(
             current,
             Some(old),
@@ -349,7 +310,6 @@ mod tests {
             Some(chrono::Utc::now()),
         ));
 
-        // Old secret doesn't work after 24h
         assert!(!verify_with_rotation(
             current,
             Some(old),
@@ -358,15 +318,11 @@ mod tests {
             Some(chrono::Utc::now() - chrono::Duration::hours(25)),
         ));
 
-        // No old secret
-        assert!(!verify_with_rotation(
-            current, None, payload, &sig_old, None,
-        ));
+        assert!(!verify_with_rotation(current, None, payload, &sig_old, None,));
     }
 
     #[test]
     fn test_decode_secret_with_prefix() {
-        // whsec_ prefix should be stripped, then base64 decoded
         let raw = b"test123";
         let encoded = BASE64.encode(raw);
         let secret = format!("whsec_{}", encoded);
@@ -376,7 +332,6 @@ mod tests {
 
     #[test]
     fn test_decode_secret_plain_fallback() {
-        // Plain secret (no prefix, not base64) should fall back to raw bytes
         let decoded = decode_secret("plain_secret");
         assert_eq!(decoded, b"plain_secret");
     }
