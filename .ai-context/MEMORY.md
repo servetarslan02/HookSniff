@@ -117,12 +117,10 @@
 7. CI'da otomatik tarama araçları yok (clippy, audit, lint)
 
 ### 🔴 KRİTİK GÜVENLİK (2026-05-08 tespit edildi — detay: .ai-context/FULL_SYSTEM_AUDIT.md)
-1. **GCP Service Account private key GitHub'da açıkta** — DERHAL yenilenmeli
-2. **GitHub Token GitHub'da açıkta** — DERHAL yenilenmeli
-3. OpenAPI spec boş (1 satır) — SDK üretimi yapılamaz
-4. Dependabot kurulmamış — güvenlik taraması yok
-5. Migration numara boşluğu (013-025 arası 13 eksik)
-6. .env.production.example'de 3 eksik env var + eski domain
+1. OpenAPI spec boş (1 satır) — SDK üretimi yapılamaz
+2. Dependabot kurulmamış — güvenlik taraması yok
+3. Migration numara boşluğu (013-025 arası 13 eksik)
+4. .env.production.example'de 3 eksik env var + eski domain
 
 ---
 
