@@ -246,3 +246,13 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
    - Tabloda "161 test" yazıyor ama gerçek: Rust 146 + Node.js 12 + Python 12 = 170
    - Tüm testler passing ✅
 6. **cargo fmt** — 2 dosya formatlandı (hafif fark)
+
+### Bu Oturum (22) — 2026-05-09 05:26-05:35 GMT+8:
+
+1. **SDK Publish denemesi (M2)** — npm, PyPI, crates.io token'ları ile deneme
+2. **npm** — ❌ 403: "bypass 2FA" gerektiriyor, granular token'da bu seçenek kapalı
+3. **PyPI** — ✅ `hooksniff 0.1.0` zaten publish edilmiş (önceki oturumlarda)
+4. **crates.io** — ❌ 400: doğrulanmış email gerekli
+5. **Sonuç:** M2 tamamlanması için Servet'in 2 şey yapması lazım:
+   - npm: Granular token + "Allow 2FA bypass"
+   - crates.io: Email doğrula
