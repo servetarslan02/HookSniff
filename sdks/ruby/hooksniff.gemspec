@@ -15,4 +15,5 @@ Gem::Specification.new do |s|
   s.add_dependency "net-http", ">= 0.3.0"
   s.add_dependency "json", ">= 2.0.0"
   s.add_dependency "uri", ">= 0.12.0"
+  s.signing_key = nil
 end
