@@ -5,7 +5,7 @@
 //! Required attributes: specversion, type, source, id, time
 //! Optional attributes: datacontenttype, dataschema, subject
 
-use chrono::{Utc};
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

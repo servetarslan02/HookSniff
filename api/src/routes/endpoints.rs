@@ -1,7 +1,7 @@
 use axum::extract::{Extension, Path};
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
-use serde::{Deserialize};
+use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
