@@ -18,12 +18,14 @@
 - ~~is-a.dev~~ iptal
 - Şimdilik: `hooksniff.vercel.app` (Vercel ücretsiz)
 
-## KRİTİK GÖREV: API Taşıma
+## KRİTİK GÖREV: API Taşıma (TAMAMLANDI)
 - **Render API build_failed** — Rust compile hataları düzeltilemedi
-- **Çözüm**: API'yi Google Cloud Run'a taşı
-- GCP service account `.ai-context/gcp-service-account.json` dosyasında
-- Proje: hooksniff-app, bölge: europe-west1
-- Dockerfile.api zaten hazır
+- **Çözüm**: API'yi Google Cloud Run'a taşı → Deploy workflow güncellendi
+- Deploy workflow push edildi: commit `0055753`
+- Servet'in GitHub Secrets ayarlaması gerekiyor (GCP_SA_KEY + Secret Manager secretları)
+- GCP service account: `hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com`
+- Proje: hooksniff-app, Bölge: europe-west1
+- Artifact Registry: `europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/`
 
 ## ✅ Tamamlanan İşler (26/26 + düzeltmeler)
 - 26/26 teknik görev tamamlandı
