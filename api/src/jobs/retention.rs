@@ -1,8 +1,6 @@
 use anyhow::Result;
 use chrono::{DateTime, Datelike, Utc};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use uuid::Uuid;
 
 /// Archive delivered deliveries to dead_letters before deleting them.
 async fn archive_deliveries(pool: &PgPool, before: DateTime<Utc>) -> Result<u64> {

@@ -7,13 +7,12 @@ use anyhow::{Context, Result};
 use axum::extract::ws::{Message, WebSocket};
 use futures::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tracing::{debug, error, info, warn};
 use uuid::Uuid;
 
-use super::{SubscribeRequest, WsEvent, WsGateway, WsMessage};
+use super::{WsGateway, WsMessage};
 
 /// Rate limiter per WebSocket connection.
 ///
@@ -143,7 +142,6 @@ pub async fn handle_connection(
     let conn_id_for_recv = connection_id.clone();
     let gw_for_recv = gateway.clone();
     let conn_id_for_fwd = connection_id.clone();
-    let gw_for_fwd = gateway.clone();
 
     // Spawn a task to forward events from the gateway to the WebSocket
     let forward_handle = tokio::spawn(async move {
@@ -238,7 +236,7 @@ async fn handle_client_message(text: &str, connection_id: &str, gateway: &Arc<Ws
             // Get current filters and remove the specified ones
             let connections = gateway.connections.read().await;
             if let Some(conn) = connections.get(connection_id) {
-                let mut filters: Vec<String> = conn
+                let filters: Vec<String> = conn
                     .event_filters
                     .iter()
                     .filter(|f| !event_types.contains(f))
@@ -272,7 +270,7 @@ pub fn authenticate_ws_token(token: &str, jwt_secret: &str) -> Result<Uuid> {
     #[derive(Debug, Deserialize)]
     struct Claims {
         sub: String,
-        exp: usize,
+        _exp: usize,
     }
 
     let token_data = decode::<Claims>(

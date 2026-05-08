@@ -13,21 +13,18 @@ use crate::middleware::{generate_api_key, hash_api_key};
 use crate::models::customer::{
     AuthResponse, ChangePasswordRequest, Confirm2faRequest, CreateCustomerRequest, Customer,
     CustomerResponse, Disable2faRequest, Enable2faRequest, ForgotPasswordRequest, LoginRequest,
-    RefreshTokenRequest, RegisterDeviceRequest, ResendVerificationRequest, ResetPasswordRequest,
+    RefreshTokenRequest, ResendVerificationRequest, ResetPasswordRequest,
     TwoFactorRequiredResponse, UpdateProfileRequest, Verify2faRequest, VerifyEmailRequest,
 };
 
 /// Maximum login attempts per IP per 15-minute window.
 const LOGIN_RATE_LIMIT: u32 = 10;
-const LOGIN_RATE_WINDOW_SECS: u64 = 15 * 60;
 
 /// Maximum registration attempts per IP per hour.
 const REGISTER_RATE_LIMIT: u32 = 5;
-const REGISTER_RATE_WINDOW_SECS: u64 = 60 * 60;
 
 /// Maximum password reset attempts per IP per hour.
 const RESET_RATE_LIMIT: u32 = 5;
-const RESET_RATE_WINDOW_SECS: u64 = 60 * 60;
 
 /// Extract client IP from request headers (handles reverse proxies).
 fn extract_client_ip(headers: &HeaderMap) -> String {

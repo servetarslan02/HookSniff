@@ -4,10 +4,9 @@
 //! including version tracking and compatibility checking.
 
 use anyhow::{Context, Result};
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::PgPool;
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 use uuid::Uuid;
 
 use super::{
