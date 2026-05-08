@@ -436,7 +436,7 @@ mod tests {
         let timestamp = &chrono::Utc::now().timestamp().to_string();
         let body = r#"{"event":"test"}"#;
 
-        let sig = compute_standard_signature(secret, msg_id, timestamp, body);
+        let _sig = compute_standard_signature(secret, msg_id, timestamp, body);
         let wrong_sig = "v1,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
         let result = verify_standard_signature(secret, msg_id, timestamp, wrong_sig, body, None);
         assert_eq!(result, Err(VerificationError::SignatureMismatch));
