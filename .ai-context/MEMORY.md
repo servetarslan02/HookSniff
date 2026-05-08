@@ -159,7 +159,7 @@ cd dashboard && npm install && npm run build
 - **GitHub billing** — $12 ödenmemiş fatura (opsiyonel, CI artık local)
 
 ### Teknik Borç
-- sqlx 0.7.4 → 0.8 upgrade (security audit vulnerabilities)
+- sqlx 0.8.4 → 0.8 upgrade (security audit vulnerabilities)
 - Dependency temizliği — cargo-udeps ile kontrol (API: 37, Worker: 22)
 
 ---
@@ -204,7 +204,8 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 - Cleanup Jobs: 6 saatte bir (seen_webhooks, idempotency_keys)
 - Zombie Reaper: 30 saniyede bir (5dk+ processing kayıtları)
 
-### Bu Oturum (18) — 2026-05-09 04:00-04:12 GMT+8:
+
+### Bu Oturum (18) — 2026-05-09 04:00-04:15 GMT+8:
 
 1. **Grafana OTEL token güncellendi** — yeni `glc_` cloud access policy token
 2. `.env.production.example` → OTEL_HEADERS güncellendi
@@ -214,4 +215,7 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 6. **GCP SA doğrulandı** — hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com ✅
 7. **Grafana Tempo doğrulandı** — hooksniff-api trace'leri akıyor ✅
 8. **API durumu** — healthy, uptime OK, queue boş
-9. Commit `9a0c81d` push edildi
+9. **sqlx 0.8.4 → 0.8.6 upgrade** — RUSTSEC-2024-0374 güvenlik açığı kapatıldı
+   - `fifo/mod.rs` Encode trait return type düzeltildi
+   - 29/29 test ✅, clippy ✅, fmt ✅
+10. Commit `d0df105` push edildi
