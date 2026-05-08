@@ -368,7 +368,7 @@ async fn handle_inbound_to_endpoint(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    // Try to verify signature if config exists
+    // Verify signature if config exists — reject if invalid
     if let Ok(config) = sqlx::query_as::<_, InboundConfig>(
         "SELECT * FROM inbound_configs WHERE customer_id = $1 AND provider = $2 AND enabled = true",
     )
@@ -377,7 +377,15 @@ async fn handle_inbound_to_endpoint(
     .fetch_one(&pool)
     .await
     {
-        let _ = provider.verify_signature(&config.secret, &headers, &body);
+        if let Err(e) = provider.verify_signature(&config.secret, &headers, &body) {
+            tracing::warn!(
+                "❌ Inbound webhook signature verification failed for provider={} customer={}: {}",
+                provider,
+                customer.id,
+                e
+            );
+            return Err(AppError::Unauthorized);
+        }
     }
 
     // Create delivery

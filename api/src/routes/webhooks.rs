@@ -378,9 +378,10 @@ async fn batch_webhooks(
         let payload_str = match serde_json::to_string(&payload) {
             Ok(s) => s,
             Err(e) => {
+                tracing::warn!("Batch webhook serialization error at index {}: {:?}", i, e);
                 errors.push(BatchError {
                     index: i,
-                    error: format!("Serialization error: {}", e),
+                    error: "Invalid payload format".to_string(),
                 });
                 continue;
             }

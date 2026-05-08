@@ -4,14 +4,21 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
+interface Template {
+  id: string;
+  name: string;
+  description?: string;
+  tags?: string[];
+}
+
 export default function TemplatesPage() {
   const { token } = useAuth();
-  const [templates, setTemplates] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!token) return;
-    apiFetch<any>('/templates', { token })
+    apiFetch<{ templates: Template[] }>('/templates', { token })
       .then((res) => setTemplates(res.templates || []))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -32,7 +39,7 @@ export default function TemplatesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {templates.map((t: any) => (
+          {templates.map((t) => (
             <div key={t.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700 hover:border-purple-500 transition cursor-pointer">
               <h3 className="font-semibold mb-1">{t.name}</h3>
               <p className="text-sm text-gray-500 mb-3">{t.description}</p>

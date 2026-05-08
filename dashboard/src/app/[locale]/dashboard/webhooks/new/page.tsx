@@ -17,7 +17,7 @@ export default function SendWebhookPage() {
   const [eventType, setEventType] = useState('');
   const [payload, setPayload] = useState('{\n  "message": "Hello from HookSniff!"\n}');
   const [sending, setSending] = useState(false);
-  const [response, setResponse] = useState<any>(null);
+  const [response, setResponse] = useState<unknown>(null);
   const [jsonError, setJsonError] = useState('');
   const t = useTranslations('webhooks');
 

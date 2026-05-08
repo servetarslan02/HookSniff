@@ -4,14 +4,21 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
+interface Schema {
+  id: string;
+  name: string;
+  version: string;
+  created_at: string;
+}
+
 export default function SchemasPage() {
   const { token } = useAuth();
-  const [schemas, setSchemas] = useState<any[]>([]);
+  const [schemas, setSchemas] = useState<Schema[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!token) return;
-    apiFetch<any>('/schemas', { token })
+    apiFetch<{ schemas: Schema[] }>('/schemas', { token })
       .then((res) => setSchemas(res.schemas || []))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -32,7 +39,7 @@ export default function SchemasPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {schemas.map((s: any) => (
+          {schemas.map((s) => (
             <div key={s.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
               <h3 className="font-semibold">{s.name}</h3>
               <p className="text-sm text-gray-500">v{s.version} · {s.created_at}</p>
