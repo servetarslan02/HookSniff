@@ -45,7 +45,7 @@ async fn create_endpoint(
     Json(req): Json<CreateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Check endpoint limit based on plan
-    let plan = Plan::from_str(&customer.plan);
+    let plan = Plan::parse_str(&customer.plan);
     let endpoint_count: (i64,) =
         sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE customer_id = $1")
             .bind(customer.id)

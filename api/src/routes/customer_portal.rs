@@ -217,7 +217,7 @@ async fn get_usage(
 
 /// Plan bilgisi
 async fn get_plan(Extension(customer): Extension<Customer>) -> Json<serde_json::Value> {
-    let plan = crate::billing::Plan::from_str(&customer.plan);
+    let plan = crate::billing::Plan::parse_str(&customer.plan);
     Json(serde_json::json!({
         "plan": customer.plan,
         "max_webhooks_per_month": plan.max_webhooks_per_month(),

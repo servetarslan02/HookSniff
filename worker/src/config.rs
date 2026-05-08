@@ -1,7 +1,6 @@
 use anyhow::Result;
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 pub struct WorkerConfig {
     pub database_url: String,
     /// OpenTelemetry: enable OTLP exporter
@@ -10,10 +9,6 @@ pub struct WorkerConfig {
     pub otel_exporter_otlp_endpoint: Option<String>,
     /// OpenTelemetry: OTLP headers (comma-separated key=value pairs)
     pub otel_exporter_otlp_headers: Option<String>,
-    /// Resend API key for email delivery (optional)
-    pub resend_api_key: Option<String>,
-    /// Email from address
-    pub notify_from_email: String,
 }
 
 impl WorkerConfig {
@@ -34,9 +29,6 @@ impl WorkerConfig {
             otel_enabled,
             otel_exporter_otlp_endpoint,
             otel_exporter_otlp_headers,
-            resend_api_key: std::env::var("RESEND_API_KEY").ok(),
-            notify_from_email: std::env::var("NOTIFY_FROM_EMAIL")
-                .unwrap_or_else(|_| "noreply@hooksniff.is-a.dev".into()),
         })
     }
 }

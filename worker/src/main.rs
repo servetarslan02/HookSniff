@@ -445,12 +445,14 @@ async fn process_pending(
                 &mut tx,
                 delivery_id,
                 attempt,
-                attempt_status,
-                attempt_body,
-                duration_ms,
-                None,
-                trace_id.as_deref(),
-                attempt_headers,
+                AttemptRecord {
+                    status_code: attempt_status,
+                    response_body: attempt_body,
+                    duration_ms,
+                    error_message: None,
+                    trace_id: trace_id.as_deref(),
+                    response_headers: attempt_headers,
+                },
             )
             .await?;
 
@@ -513,12 +515,14 @@ async fn process_pending(
                 &mut tx,
                 delivery_id,
                 attempt,
-                attempt_status,
-                attempt_body,
-                duration_ms,
-                Some(&error_msg),
-                trace_id.as_deref(),
-                attempt_headers,
+                AttemptRecord {
+                    status_code: attempt_status,
+                    response_body: attempt_body,
+                    duration_ms,
+                    error_message: Some(&error_msg),
+                    trace_id: trace_id.as_deref(),
+                    response_headers: attempt_headers,
+                },
             )
             .await?;
 
@@ -564,12 +568,14 @@ async fn process_pending(
                 &mut tx,
                 delivery_id,
                 attempt,
-                attempt_status,
-                attempt_body,
-                duration_ms,
-                Some(&format!("{} — retry scheduled", error_msg)),
-                trace_id.as_deref(),
-                attempt_headers,
+                AttemptRecord {
+                    status_code: attempt_status,
+                    response_body: attempt_body,
+                    duration_ms,
+                    error_message: Some(&format!("{} — retry scheduled", error_msg)),
+                    trace_id: trace_id.as_deref(),
+                    response_headers: attempt_headers,
+                },
             )
             .await?;
 
@@ -735,18 +741,22 @@ async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
     Ok(orphaned.len())
 }
 
+/// Delivery attempt data for recording
+struct AttemptRecord<'a> {
+    status_code: Option<i32>,
+    response_body: Option<&'a str>,
+    duration_ms: i32,
+    error_message: Option<&'a str>,
+    trace_id: Option<&'a str>,
+    response_headers: Option<&'a serde_json::Value>,
+}
+
 /// Record a delivery attempt
-#[allow(clippy::too_many_arguments)]
 async fn record_attempt(
     conn: &mut sqlx::PgConnection,
     delivery_id: uuid::Uuid,
     attempt_number: i32,
-    status_code: Option<i32>,
-    response_body: Option<&str>,
-    duration_ms: i32,
-    error_message: Option<&str>,
-    trace_id: Option<&str>,
-    response_headers: Option<&serde_json::Value>,
+    record: AttemptRecord<'_>,
 ) -> Result<()> {
     sqlx::query::<sqlx::Postgres>(
         r#"
@@ -756,12 +766,12 @@ async fn record_attempt(
     )
     .bind(delivery_id)
     .bind(attempt_number)
-    .bind(status_code)
-    .bind(response_body)
-    .bind(duration_ms)
-    .bind(error_message)
-    .bind(trace_id)
-    .bind(response_headers)
+    .bind(record.status_code)
+    .bind(record.response_body)
+    .bind(record.duration_ms)
+    .bind(record.error_message)
+    .bind(record.trace_id)
+    .bind(record.response_headers)
     .execute(conn)
     .await?;
 
@@ -773,11 +783,4 @@ fn calculate_backoff(attempt: i32) -> i64 {
     let base = 30_i64;
     let delay = base * 2_i64.pow((attempt - 1).max(0) as u32);
     delay.min(1800) // Max 30 dakika
-}
-
-/// Truncate string to max length (UTF-8 safe — rounds down to char boundary)
-/// Delegates to delivery::truncate_str for consistency.
-#[allow(dead_code)]
-fn truncate(s: &str, max_len: usize) -> String {
-    delivery::truncate_str(s, max_len)
 }
