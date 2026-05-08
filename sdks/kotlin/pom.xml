@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.servetarslan02</groupId>
-    <artifactId>hooksniff-sdk</artifactId>
-    <version>0.1.0</version>
+    <artifactId>hooksniff</artifactId>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
-    <name>HookSniff Java SDK</name>
-    <description>Official Java client for HookSniff webhook delivery service</description>
-    <url>https://github.com/servetarslan02/HookSniff</url>
+    <name>HookSniff Kotlin SDK</name>
+    <description>Official Kotlin client for HookSniff webhook delivery service</description>
+    <url>https://github.com/servetarslan02/hooksniff-kotlin</url>
 
     <licenses>
         <license>
@@ -24,7 +24,6 @@
         <developer>
             <name>Servet Arslan</name>
             <email>support@hooksniff.dev</email>
-            <url>https://github.com/servetarslan02</url>
         </developer>
     </developers>
 
@@ -32,21 +31,25 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gson.version>2.11.0</gson.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
+            <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
         </dependency>
     </dependencies>
 
     <scm>
-        <connection>scm:git:git://github.com/servetarslan02/HookSniff.git</connection>
-        <developerConnection>scm:git:ssh://github.com:servetarslan02/HookSniff.git</developerConnection>
-        <url>https://github.com/servetarslan02/HookSniff</url>
+        <connection>scm:git:git://github.com/servetarslan02/hooksniff-kotlin.git</connection>
+        <developerConnection>scm:git:ssh://github.com:servetarslan02/hooksniff-kotlin.git</developerConnection>
+        <url>https://github.com/servetarslan02/hooksniff-kotlin</url>
     </scm>
 
     <distributionManagement>
