@@ -1,103 +1,170 @@
-# NEXT_SESSION.md — Sonraki Oturum
+# NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-08 19:00 GMT+8
-
-## Yeni Oturumda Ne Söyle
-
-HookSniff projesi çalışıyor. 16 düzeltme yapıldı, 3 test hatası kaldı.
-Önce test hatalarını düzelt, sonra feature geliştirme başla.
+> Son güncelleme: 2026-05-08 19:03 GMT+8
 
 ---
 
-## 🔴 ÖNCELİK 1: Kalan 3 Test Hatasını Düzelt
+## 🚀 Yeni Oturuma Başlarken
+
+### 1. Adım: Projeyi Klonla
+```bash
+cd /root/.openclaw/workspace
+git clone https://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@github.com/servetarslan02/HookSniff.git
+cd HookSniff
+```
+
+### 2. Adım: Rust Kur (eğer yoksa)
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source "$HOME/.cargo/env"
+```
+
+### 3. Adım: Hafıza Dosyalarını Oku
+```bash
+cat .ai-context/MEMORY.md
+cat .ai-context/NEXT_SESSION.md
+cat .ai-context/EXTERNAL_TOKENS.md
+```
+
+### 4. Adım: Servet'e Tanıtım Yap
+Servet projenin sahibi ama kod bilmiyor. Ona Türkçe olarak mevcut durumu özetle.
+
+---
+
+## 📌 Proje Bilgileri
+
+| Bilgi | Değer |
+|-------|-------|
+| **Repo** | https://github.com/servetarslan02/HookSniff |
+| **GitHub Token** | `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` |
+| **Dashboard** | https://hooksniff.vercel.app |
+| **API** | https://hooksniff-api-1046140057667.europe-west1.run.app |
+| **Worker** | https://hooksniff-worker-1046140057667.europe-west1.run.app |
+| **API Health** | https://hooksniff-api-1046140057667.europe-west1.run.app/health |
+| **Region** | europe-west1 (GCP Cloud Run) |
+| **DB** | Neon PostgreSQL (eu-central-1) |
+| **Cache** | Upstash Redis (64MB) |
+| **Storage** | Cloudflare R2 (hooksniff-storage) |
+
+---
+
+## 🔧 Servis Kontrolü
+
+```bash
+# API health check
+curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/health | python3 -m json.tool
+
+# Dashboard kontrol
+curl -s -o /dev/null -w "%{http_code}" https://hooksniff.vercel.app
+
+# GitHub Actions durumu
+curl -s -H "Authorization: token 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" \
+  "https://api.github.com/repos/servetarslan02/HookSniff/actions/runs?per_page=3" | \
+  python3 -c "import json,sys
+for r in json.load(sys.stdin).get('workflow_runs',[]):
+    print(f\"{r['name']} | {r['status']} | {r['conclusion'] or 'pending'}\")"
+```
+
+---
+
+## ❌ KALAN 3 TEST HATASI (Öncelikli)
 
 ### 1. `validate_json_depth` Test
-**Dosya:** `api/src/validation.rs`
+**Dosya:** `api/src/validation.rs` → `test_validate_json_depth`
+**Sorun:** `check_depth(value, 1)` ile başlıyor ama `MAX_JSON_DEPTH = 10`. 10 seviye JSON = depth 11 = hata.
+**Çözüm:** `check_depth(value, 0)` ile başlat. Şu anki kod:
 ```rust
-// SORUN: check_depth(value, 1) ile başlıyor, MAX_JSON_DEPTH = 10
-// 10 seviye JSON = depth 11 = hata ama test 10 seviyeyi kabul etmesini bekliyor
-// ÇÖZÜM: check_depth(value, 0) ile başlat VEYA MAX_JSON_DEPTH'i 11'e çıkar
+// Değiştir:
+check_depth(value, 1)
+// Şöyle yap:
+check_depth(value, 0)
 ```
 
 ### 2. Stripe Signature Testleri (5 test)
 **Dosya:** `api/src/billing/stripe.rs`
-```
-test_verify_signature_valid
-test_verify_signature_expired_timestamp
-test_verify_signature_future_timestamp
-test_verify_signature_tampered_payload
-test_verify_signature_wrong_secret
-```
-**SORUN:** Timestamp tolerance veya test verileri güncel değil
-**ÇÖZÜM:** stripe.rs'deki test fonksiyonlarını incele, timestamp hesaplamalarını düzelt
+**Testler:** `test_verify_signature_valid`, `test_verify_signature_expired_timestamp`, `test_verify_signature_future_timestamp`, `test_verify_signature_tampered_payload`, `test_verify_signature_wrong_secret`
+**Sorun:** Timestamp tolerance veya test verileri güncel değil.
+**Çözüm:** `stripe.rs` dosyasındaki test fonksiyonlarını incele. Timestamp hesaplamalarını ve tolerance değerlerini düzelt.
 
 ### 3. Transform Pipeline Test
-**Dosya:** `api/src/transform/mod.rs`
-```
-test_legacy_pipeline_chaining — output.get("name").is_none() assertion失败
-```
-**SORUN:** Transform pipeline name field'ını silmiyor
-**ÇÖZÜM:** Transform filter'ın name field'ını nasıl işlediğini incele
+**Dosya:** `api/src/transform/mod.rs` → `test_legacy_pipeline_chaining`
+**Sorun:** `output.get("name").is_none()` assertion失败
+**Çözüm:** Transform filter'ın name field'ını nasıl işlediğini incele.
 
 ---
 
-## 🟡 ÖNCELİK 2: Servet'in Yapması Gereken (Bekliyoruz)
-
-1. **Polar.sh yeni token** — polar.sh dashboard → Settings → Access Tokens → yeni token
-2. **Resend yeni domain** — resend.com dashboard → yeni domain ekle (is-a.dev iptal)
-3. **GitHub token yenile** — github.com → Settings → Developer Settings → PAT
-4. **iyzico hesap** — vergi levhası + banka hesabı
-
----
-
-## 🟢 ÖNCELİK 3: Feature Geliştirme
-
-### Dashboard
-- Login/Register sayfası çalışıyor mu? Test et
-- Dashboard sayfalarında gerçek veri gösterimi (API'ye bağla)
-- Endpoint oluşturma/webhook gönderme akışı test et
-
-### Billing (Polar.sh token gelince)
-- Polar.sh entegrasyonu aktifleştir
-- Free/Pro/Business plan gösterimi
-- Checkout flow
-
-### Email (Resend domain gelince)
-- Email bildirimleri (webhook failure alerts)
-- Hoşgeldin emaili
-
-### Storage (R2)
-- R2'ye dosya yükleme/okuma entegrasyonu
-- Webhook payload arşivleme
-
-### Monitoring
-- Grafana Cloud kurulumu (OTEL headers hazır)
-- Dashboard'da metrics gösterimi
-
----
-
-## 🔧 Kurulum Komutları (Yeni Oturum)
+## 📋 Düzeltmeleri Uygula ve Test Et
 
 ```bash
-# Rust toolchain
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source "$HOME/.cargo/env"
+# 1. validate_json_depth düzeltmesini yap
+# api/src/validation.rs dosyasını aç, check_depth(value, 1) → check_depth(value, 0) yap
 
-# Proje clone
-cd /root/.openclaw/workspace
-git clone https://github.com/servetarslan02/HookSniff.git
-cd HookSniff
-
-# Kontrol
+# 2. Format
 cargo fmt --all
+
+# 3. Derleme kontrol
 cargo check --workspace
+
+# 4. Test çalıştır
 cargo test --workspace
+
+# 5. Clippy
 cargo clippy --workspace
+
+# 6. Commit ve push
+git add -A
+git commit -m "🔧 Kalan 3 test hatası düzeltildi"
+git push origin main
 ```
 
 ---
 
-## 📋 Hafıza Kuralları
+## ⚠️ Servet'in Yapması Gereken (Ona Hatırlat)
+
+| Görev | Nasıl Yapılır | Durum |
+|-------|---------------|-------|
+| Polar.sh token | polar.sh → Settings → Access Tokens → Yeni token oluştur | ❌ |
+| Resend domain | resend.com → Domains → Yeni domain ekle → DNS kayıtları | ❌ |
+| GitHub token | github.com → Settings → Developer settings → Tokens → Yeni PAT | ❌ |
+| iyzico hesap | iyzico.com → Başvuru → Vergi levhası + banka hesabı | ❌ |
+
+---
+
+## 📁 Proje Yapısı
+
+```
+HookSniff/
+├── api/                    # Rust Axum API
+│   ├── src/
+│   │   ├── main.rs         # Giriş noktası
+│   │   ├── lib.rs          # Modül tanımları
+│   │   ├── routes/         # API endpoint'leri
+│   │   ├── middleware/      # Auth, rate limit, idempotency
+│   │   ├── billing/        # Polar.sh, Stripe, iyzico
+│   │   └── ...
+│   └── Cargo.toml
+├── worker/                 # Background worker
+│   ├── src/main.rs         # Queue processing + zombie reaper
+│   └── Cargo.toml
+├── dashboard/              # Next.js 15 dashboard
+│   ├── src/
+│   │   ├── lib/api.ts      # API client (token destekli)
+│   │   └── app/            # Sayfalar
+│   └── package.json
+├── .github/workflows/      # CI/CD
+│   ├── ci.yml              # Lint + test + build
+│   └── deploy.yml          # Cloud Run deploy
+├── .ai-context/            # AI hafıza dosyaları
+│   ├── MEMORY.md           # Proje durumu
+│   ├── NEXT_SESSION.md     # Bu dosya
+│   └── EXTERNAL_TOKENS.md  # Token'lar
+├── migrations/             # PostgreSQL migration'ları
+└── docker-compose.yml
+```
+
+---
+
+## 🔄 Hafıza Kuralları
 
 Her oturum sonunda:
 1. `.ai-context/MEMORY.md` güncelle
