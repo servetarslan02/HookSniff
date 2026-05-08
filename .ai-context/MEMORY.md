@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 06:40 GMT+8
+> Son güncelleme: 2026-05-09 02:38 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -313,18 +313,32 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 | PHP | ✅ | `hooksniff/hooksniff-php` Packagist'de yayında |
 | Elixir | ⏳ | `mix hex.publish` |
 
-### Bu Oturum (27) — 2026-05-09 06:26-06:40 GMT+8:
+### Bu Oturum (27) — 2026-05-09 06:29-06:47 GMT+8:
 
-1. **OpenClaw webchat'ten bağlantı** — Servet yeni oturum başlattı
-2. **Repo klonlandı** — `HookSniff/` tüm `.ai-context/` dosyaları okundu
-3. **OG image → PNG** — `og-image.svg` → `og-image.png` (59KB, 1200x630) ✅
-4. **GDPR Privacy Policy** — Zaten mevcut (13 madde, 8 dilde sayfa) ✅
-5. **HttpOnly Cookie iyileştirmesi** — Refresh token artık HttpOnly cookie'de dönüyor (response body'de yok)
-6. **CORS allow_credentials** — Cookie tabanlı auth için `allow_credentials(true)` eklendi
-7. **extract_token fix** — Placeholder değerler ('cookie', 'null') atlanıp cookie'ye fallback ediyor
-8. **GDPR endpoints eklendi**:
-   - `GET /v1/auth/export` — Article 15 (Right of Access)
-   - `DELETE /v1/auth/account` — Article 17 (Right to Erasure)
-9. **Rust kuruldu** — Bu sunucuda rustup ile Rust 1.95.0 kuruldu
-10. **Local CI doğrulandı** — cargo fmt ✅, clippy ✅ (0 uyarı), 161/161 test ✅, dashboard build ✅
-11. **GitHub push** — Commit `d51d875` main'e push edildi
+1. **Ruby SDK** — Ruby 3.3.0 source'dan compile edildi, OpenSSL + libyaml + psych eklendi
+   - `hooksniff-0.1.0.gem` build edildi ✅
+   - RubyGems push için API key lazım
+   - Ayrı repo: `servetarslan02/hooksniff-ruby` (v0.1.0 tag)
+2. **Java SDK** — OpenJDK 21 + Maven 3.9.6 kuruldu
+   - `mvn clean compile test` başarılı ✅
+   - Ayrı repo: `servetarslan02/hooksniff-java` (v0.1.0 tag)
+   - Maven Central publish için GPG + Sonatype credentials lazım
+3. **Kotlin SDK** — Gradle 8.5 kuruldu, compile hatası düzeltildi
+   - `inline fun` → `fun` değişikliği (private member access hatası)
+   - `gradle build` başarılı ✅
+   - Ayrı repo: `servetarslan02/hooksniff-kotlin` (v0.2.0 tag)
+   - Maven Central publish için GPG + Sonatype credentials lazım
+4. **PHP SDK** — Packagist'de yayında ✅ (önceki oturumda)
+5. **3 yeni GitHub repo** oluşturuldu:
+   - `servetarslan02/hooksniff-java`
+   - `servetarslan02/hooksniff-kotlin`
+   - `servetarslan02/hooksniff-ruby`
+
+### Publish İçin Credentials Gereken:
+| SDK | Platform | Credential |
+|-----|----------|------------|
+| Ruby | RubyGems | API key |
+| Java | Maven Central | Sonatype OSSRH user/pass + GPG passphrase |
+| Kotlin | Maven Central | Aynı (Java ile aynı hesap) |
+| Elixir | Hex.pm | Hex.pm account |
+
