@@ -24,7 +24,6 @@ export default function DeliveriesPage() {
   const [replayTarget, setReplayTarget] = useState<Delivery | null>(null);
   const [replaying, setReplaying] = useState(false);
   const t = useTranslations('deliveries');
-  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchData = useCallback(async () => {

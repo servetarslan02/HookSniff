@@ -27,12 +27,11 @@ export default function SearchPage() {
   const { token } = useAuth();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
-  const [event, setEvent] = useState('');
+  const [event, _setEvent] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const t = useTranslations('search');
-  const tc = useTranslations('common');
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
 

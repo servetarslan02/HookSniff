@@ -26,7 +26,8 @@ export default function InboundPage() {
   const { toast } = useToast();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [configs, setConfigs] = useState<InboundConfig[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
+  
   const [showCreate, setShowCreate] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState('');
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
