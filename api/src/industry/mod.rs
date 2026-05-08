@@ -4,7 +4,6 @@ pub mod healthcare;
 pub mod saas;
 
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 /// Compliance requirement for an industry package
 #[derive(Debug, Clone, Serialize, Deserialize)]

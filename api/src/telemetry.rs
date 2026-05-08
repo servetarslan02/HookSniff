@@ -33,7 +33,6 @@ fn init_otel(
     use opentelemetry::trace::TracerProvider as _;
     use opentelemetry_otlp::WithExportConfig;
     use opentelemetry_sdk::trace::TracerProvider;
-    use std::collections::HashMap;
 
     let otlp_endpoint = cfg
         .otel_exporter_otlp_endpoint

@@ -2,7 +2,7 @@
 ///
 /// Exposes routing configuration and health status for endpoints.
 use axum::extract::{Extension, Path};
-use axum::routing::{get, put};
+use axum::routing::get;
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

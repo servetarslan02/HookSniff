@@ -180,7 +180,7 @@ pub async fn system_status(
                 }
             }
         }
-        Err(e) => {
+        Err(_e) => {
             // Table might not exist yet — treat as healthy
             ComponentStatus {
                 name: "Worker".to_string(),
@@ -228,7 +228,7 @@ pub async fn system_status(
 pub async fn health_check(
     axum::extract::Extension(pool): axum::extract::Extension<sqlx::PgPool>,
 ) -> (StatusCode, Json<Value>) {
-    let start = Instant::now();
+    let _start = Instant::now();
     let mut checks = serde_json::Map::new();
     let mut overall_healthy = true;
 

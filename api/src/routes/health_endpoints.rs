@@ -85,8 +85,7 @@ async fn list_endpoint_health(
     let health_list: Vec<EndpointHealth> = endpoints
         .into_iter()
         .map(|ep| {
-            let (total, successful, failed) =
-                stats_map.get(&ep.id).copied().unwrap_or((0, 0, 0));
+            let (total, successful, failed) = stats_map.get(&ep.id).copied().unwrap_or((0, 0, 0));
             let success_rate = if total > 0 {
                 (successful as f64 / total as f64) * 100.0
             } else {
