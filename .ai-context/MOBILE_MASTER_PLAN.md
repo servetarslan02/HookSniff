@@ -9,7 +9,7 @@
 
 | Konu | Karar |
 |------|-------|
-| **Platform** | Android (şimdilik) |
+| **Platform** | Android (sadece) |
 | **Teknoloji** | React Native + Expo |
 | **Dağıtım** | Siteden APK indirme (Google Play YOK) |
 | **Güncelleme** | OTA (Expo Updates) + APK güncelleme |

@@ -146,7 +146,7 @@ Detay: `.ai-context/MOBILE_MASTER_PLAN.md` ← TEK KAYNAK DÖKÜMAN
 Eksiklik analizi: `.ai-context/MOBILE_APP_AUDIT.md`
 
 **Kararlar:**
-- Platform: Android (şimdilik)
+- Platform: Android (sadece, iOS yok)
 - Teknoloji: React Native + Expo (SDK 53)
 - Dağıtım: Siteden APK indirme (Google Play YOK)
 - Güncelleme: OTA (Expo Updates) + APK güncelleme
