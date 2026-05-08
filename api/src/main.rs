@@ -1,5 +1,3 @@
-#![allow(dead_code, unused_imports, unused_variables, unused_mut, unused_assignments)]
-
 use anyhow::Result;
 use axum::{routing::get, Router};
 use tower_http::cors::{AllowOrigin, Any, CorsLayer};
@@ -70,6 +68,40 @@ async fn main() -> Result<()> {
             tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
             if let Err(e) = jobs::retention::reset_monthly_webhook_counts(&reset_pool).await {
                 tracing::error!("❌ Monthly count reset failed: {:?}", e);
+            }
+        }
+    });
+
+    // Spawn cleanup job for seen_webhooks + idempotency_keys (runs every 6 hours)
+    let cleanup_pool = pool.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(6 * 60 * 60)).await;
+            // Clean expired seen_webhooks
+            match sqlx::query("DELETE FROM seen_webhooks WHERE expires_at < now()")
+                .execute(&cleanup_pool)
+                .await
+            {
+                Ok(r) => {
+                    let deleted = r.rows_affected();
+                    if deleted > 0 {
+                        tracing::info!("🧹 Cleaned {} expired seen_webhooks", deleted);
+                    }
+                }
+                Err(e) => tracing::error!("❌ seen_webhooks cleanup failed: {:?}", e),
+            }
+            // Clean expired idempotency_keys
+            match sqlx::query("DELETE FROM idempotency_keys WHERE expires_at < now()")
+                .execute(&cleanup_pool)
+                .await
+            {
+                Ok(r) => {
+                    let deleted = r.rows_affected();
+                    if deleted > 0 {
+                        tracing::info!("🧹 Cleaned {} expired idempotency_keys", deleted);
+                    }
+                }
+                Err(e) => tracing::error!("❌ idempotency_keys cleanup failed: {:?}", e),
             }
         }
     });

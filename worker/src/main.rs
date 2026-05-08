@@ -14,8 +14,6 @@
 //!
 //! ## Basit, güvenilir, bakımı kolay.
 
-#![allow(dead_code, unused_imports, unused_variables, unused_mut, unused_assignments)]
-
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgListener, PgPoolOptions};
@@ -197,6 +195,17 @@ async fn main() -> Result<()> {
                     }
                     Err(e) => {
                         tracing::error!("❌ Zombie reaper error: {:?}", e);
+                    }
+                }
+                // Also recover orphaned deliveries
+                match reap_orphaned_deliveries(&pool).await {
+                    Ok(orphaned) => {
+                        if orphaned > 0 {
+                            tracing::warn!("🧟 Re-queued {} orphaned deliveries", orphaned);
+                        }
+                    }
+                    Err(e) => {
+                        tracing::error!("❌ Orphaned delivery reaper error: {:?}", e);
                     }
                 }
             }
@@ -589,6 +598,71 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
     Ok(stuck.len())
 }
 
+/// Also recover deliveries stuck in 'pending' with no active queue entry.
+/// These are orphaned records from crashed workers.
+async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
+    let orphaned: Vec<(uuid::Uuid,)> = sqlx::query_as(
+        r#"
+        SELECT d.id FROM deliveries d
+        WHERE d.status = 'pending'
+          AND d.created_at < now() - interval '10 minutes'
+          AND NOT EXISTS (
+              SELECT 1 FROM webhook_queue wq
+              WHERE wq.delivery_id = d.id
+                AND wq.status IN ('pending', 'processing')
+          )
+        "#,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    if orphaned.is_empty() {
+        return Ok(0);
+    }
+
+    for (delivery_id,) in &orphaned {
+        // Re-insert into queue for retry
+        let delivery: Option<(uuid::Uuid, uuid::Uuid, uuid::Uuid, serde_json::Value, Option<serde_json::Value>)> =
+            sqlx::query_as(
+                "SELECT id, endpoint_id, customer_id, payload, custom_headers FROM deliveries WHERE id = $1"
+            )
+            .bind(delivery_id)
+            .fetch_optional(pool)
+            .await?;
+
+        if let Some((id, endpoint_id, customer_id, payload, custom_headers)) = delivery {
+            let endpoint_url: Option<(String,)> = sqlx::query_as(
+                "SELECT url FROM endpoints WHERE id = $1"
+            )
+            .bind(endpoint_id)
+            .fetch_optional(pool)
+            .await?;
+
+            if let Some((url,)) = endpoint_url {
+                sqlx::query::<sqlx::Postgres>(
+                    r#"INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, payload, custom_headers, status, attempt_count)
+                       VALUES ($1, $2, $3, $4, $5, 'pending', 0)
+                       ON CONFLICT (delivery_id) DO NOTHING"#
+                )
+                .bind(id)
+                .bind(endpoint_id)
+                .bind(&url)
+                .bind(&payload)
+                .bind(&custom_headers)
+                .execute(pool)
+                .await?;
+
+                tracing::warn!(
+                    "🧟 Re-queued orphaned delivery: {} (endpoint={})",
+                    id, endpoint_id
+                );
+            }
+        }
+    }
+
+    Ok(orphaned.len())
+}
+
 /// Record a delivery attempt
 async fn record_attempt(
     conn: &mut sqlx::PgConnection,
@@ -629,15 +703,7 @@ fn calculate_backoff(attempt: i32) -> i64 {
 }
 
 /// Truncate string to max length (UTF-8 safe — rounds down to char boundary)
+/// Delegates to delivery::truncate_str for consistency.
 fn truncate(s: &str, max_len: usize) -> String {
-    if s.len() <= max_len {
-        s.to_string()
-    } else {
-        // Find the nearest char boundary at or before max_len
-        let mut end = max_len;
-        while end > 0 && !s.is_char_boundary(end) {
-            end -= 1;
-        }
-        format!("{}...", &s[..end])
-    }
+    delivery::truncate_str(s, max_len)
 }

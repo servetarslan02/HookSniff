@@ -469,6 +469,20 @@ async fn process_webhook_result(
             .execute(pool)
             .await?;
 
+            // Create invoice record
+            let amount_cents = plan.monthly_price_cents() as i32;
+            let currency = if provider == "iyzico" { "TRY" } else { "USD" };
+            sqlx::query(
+                "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
+                 VALUES ($1, $2, $3, 'paid', $4)"
+            )
+            .bind(customer_id)
+            .bind(amount_cents)
+            .bind(currency)
+            .bind(plan.as_str())
+            .execute(pool)
+            .await?;
+
             tracing::info!(
                 "✅ Customer {} upgraded to {} via {}",
                 customer_id,
@@ -503,6 +517,31 @@ async fn process_webhook_result(
             };
 
             query.execute(pool).await?;
+
+            // Create invoice record for plan change
+            let amount_cents = plan.monthly_price_cents() as i32;
+            let currency = if provider == "iyzico" { "TRY" } else { "USD" };
+            let customer_id: Option<(uuid::Uuid,)> = match provider {
+                "polar" => sqlx::query_as(
+                    "SELECT id FROM customers WHERE polar_subscription_id = $1"
+                ).bind(provider_subscription_id).fetch_optional(pool).await?,
+                "iyzico" => sqlx::query_as(
+                    "SELECT id FROM customers WHERE iyzico_subscription_id = $1"
+                ).bind(provider_subscription_id).fetch_optional(pool).await?,
+                _ => None,
+            };
+            if let Some((cid,)) = customer_id {
+                let _ = sqlx::query(
+                    "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
+                     VALUES ($1, $2, $3, 'paid', $4)"
+                )
+                .bind(cid)
+                .bind(amount_cents)
+                .bind(currency)
+                .bind(plan.as_str())
+                .execute(pool)
+                .await;
+            }
 
             tracing::info!(
                 "✅ {} subscription {} updated: status={}, plan={}",

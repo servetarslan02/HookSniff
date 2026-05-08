@@ -31,11 +31,9 @@ jobs:
 
       - name: Check formatting
         run: cargo fmt --all -- --check
-        continue-on-error: true
 
       - name: Clippy lints
         run: cargo clippy --workspace --all-targets -- -D warnings
-        continue-on-error: true
 
   # ──────────────────────────────────────────────
   # Rust tests
@@ -67,7 +65,6 @@ jobs:
 
       - name: Run tests
         run: cargo test --workspace
-        continue-on-error: true
         env:
           DATABASE_URL: postgresql://hooksniff:hooksniff_test@localhost:5432/hooksniff?sslmode=disable
 
