@@ -82,8 +82,7 @@ impl FifoStatus {
         }
     }
 
-    #[allow(clippy::should_implement_trait)]
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_str(s: &str) -> Self {
         match s {
             "processing" => Self::Processing,
             "delivered" => Self::Delivered,
@@ -106,7 +105,7 @@ impl<'r> sqlx::Decode<'r, sqlx::Postgres> for FifoStatus {
         value: sqlx::postgres::PgValueRef<'r>,
     ) -> std::result::Result<Self, sqlx::error::BoxDynError> {
         let s = <String as sqlx::Decode<sqlx::Postgres>>::decode(value)?;
-        Ok(Self::from_str(&s))
+        Ok(Self::parse_str(&s))
     }
 }
 
@@ -651,7 +650,7 @@ mod tests {
 
         for status in statuses {
             let s = status.as_str();
-            let back = FifoStatus::from_str(s);
+            let back = FifoStatus::parse_str(s);
             assert_eq!(status, back, "Roundtrip failed for {:?}", s);
         }
     }

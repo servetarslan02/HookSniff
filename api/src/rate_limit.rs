@@ -287,7 +287,7 @@ impl RateLimitStore for RedisRateLimiter {
             .query_async(&mut conn)
             .await
             .unwrap_or(None);
-        plan_str.map(|s| Plan::from_str(&s))
+        plan_str.map(|s| Plan::parse_str(&s))
     }
 
     async fn set_plan(&self, api_key_prefix: &str, plan: Plan) {
