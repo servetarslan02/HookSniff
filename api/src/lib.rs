@@ -3,6 +3,7 @@
 
 pub mod auth;
 pub mod billing;
+pub mod circuit_breaker;
 pub mod config;
 pub mod db;
 pub mod email;

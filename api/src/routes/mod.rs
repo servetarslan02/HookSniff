@@ -9,6 +9,7 @@ pub mod customer_portal;
 pub mod delivery_details;
 pub mod devices;
 pub mod docs;
+pub mod embed;
 pub mod endpoints;
 pub mod events;
 pub mod health;
@@ -20,6 +21,7 @@ pub mod playground;
 pub mod routing;
 pub mod schemas;
 pub mod search;
+pub mod simulator;
 pub mod stats;
 pub mod stream;
 pub mod teams;
@@ -58,6 +60,8 @@ pub fn api_router() -> Router {
         .nest("/alerts", alerts::router())
         .nest("/api-keys", api_keys::router())
         .nest("/playground", playground::router())
+        .nest("/simulator", simulator::router())
+        .nest("/embed", embed::router())
         .nest("/endpoint-health", health_endpoints::router())
         .nest("/stats", stats::router())
         .nest("/routing", routing::router())
