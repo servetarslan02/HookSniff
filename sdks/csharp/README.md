@@ -1,6 +1,6 @@
 # HookSniff C# SDK
 
-Official C# client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official C# client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 
@@ -201,7 +201,7 @@ catch (PayloadTooLargeException)
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `ApiKey` | `string` | required | Your HookSniff API key |
-| `BaseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
+| `BaseUrl` | `string` | `https://hooksniff-api-1046140057667.europe-west1.run.app/v1` | API base URL |
 | `Timeout` | `int` | `30` | Request timeout in seconds |
 
 ### `client.Endpoints`

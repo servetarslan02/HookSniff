@@ -1,6 +1,6 @@
 //! # HookSniff Rust SDK
 //!
-//! Official Rust client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+//! Official Rust client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 //!
 //! ## Usage
 //!
@@ -141,7 +141,7 @@ pub struct Stats {
 
 // ==================== Client ====================
 
-const DEFAULT_BASE_URL: &str = "https://api.hooksniff.is-a.dev/v1";
+const DEFAULT_BASE_URL: &str = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1";
 const DEFAULT_TIMEOUT: u64 = 30;
 const USER_AGENT: &str = "hooksniff-rust/0.2.0";
 

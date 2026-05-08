@@ -1,6 +1,6 @@
 # HookSniff Java SDK
 
-Official Java client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official Java client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 

@@ -203,7 +203,7 @@ async fn deliver_email(
     };
 
     let from_email = std::env::var("NOTIFY_FROM_EMAIL")
-        .unwrap_or_else(|_| "noreply@hooksniff.is-a.dev".to_string());
+        .unwrap_or_else(|_| "noreply@hooksniff.vercel.app".to_string());
 
     // Read and parse service account key
     let sa_json = match std::fs::read_to_string(&sa_path) {

@@ -12,7 +12,7 @@ export default function ContactPage() {
     e.preventDefault();
     setStatus('sending');
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.hooksniff.is-a.dev/v1';
+      const API = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
       const res = await fetch(`${API}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,7 +55,7 @@ export default function ContactPage() {
               </svg>
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Email</h3>
-            <a href="mailto:support@hooksniff.is-a.dev" className="text-brand-600 dark:text-brand-400 hover:underline text-sm">support@hooksniff.is-a.dev</a>
+            <a href="mailto:support@hooksniff.vercel.app" className="text-brand-600 dark:text-brand-400 hover:underline text-sm">support@hooksniff.vercel.app</a>
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
@@ -92,7 +92,7 @@ export default function ContactPage() {
 
           {status === 'error' && (
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4 mb-6">
-              <p className="text-red-700 dark:text-red-400 font-medium">❌ Failed to send. Please email us directly at support@hooksniff.is-a.dev</p>
+              <p className="text-red-700 dark:text-red-400 font-medium">❌ Failed to send. Please email us directly at support@hooksniff.vercel.app</p>
             </div>
           )}
 

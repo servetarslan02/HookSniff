@@ -9,7 +9,7 @@ interface EmailOptions {
   from?: string;
 }
 
-const DEFAULT_FROM = 'HookSniff <noreply@hooksniff.is-a.dev>';
+const DEFAULT_FROM = 'HookSniff <noreply@hooksniff.vercel.app>';
 
 export async function sendEmail({ to, subject, html, from = DEFAULT_FROM }: EmailOptions) {
   try {
@@ -94,7 +94,7 @@ export function deliveryFailedEmail(event: string, endpoint: string, attempts: n
         Webhook endpoint'inize teslimat yapılamadı. Lütfen endpoint durumunu kontrol edin.
       </p>
       <div style="text-align: center; margin: 24px 0;">
-        <a href="https://hooksniff.is-a.dev/dashboard/deliveries" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="https://hooksniff.vercel.app/dashboard/deliveries" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Teslimatları Görüntüle
         </a>
       </div>
@@ -114,7 +114,7 @@ export function welcomeEmail(name: string) {
         HookSniff'e kayıt olduğun için teşekkürler! Webhook teslimatlarını güvenilir bir şekilde yönetmeye hemen başlayabilirsin.
       </p>
       <div style="text-align: center; margin: 24px 0;">
-        <a href="https://hooksniff.is-a.dev/dashboard" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="https://hooksniff.vercel.app/dashboard" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Dashboard'a Git
         </a>
       </div>

@@ -1,6 +1,6 @@
 # HookSniff API Reference
 
-**Base URL:** `https://api.hooksniff.is-a.dev/v1`
+**Base URL:** `https://hooksniff-api-1046140057667.europe-west1.run.app/v1`
 **Local:** `http://localhost:3000/v1`
 
 **Authentication:** All endpoints (except `/auth/*` and `/health`) require:

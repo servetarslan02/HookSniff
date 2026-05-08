@@ -36,7 +36,7 @@ Webhook delivery pazarı 2026'da olgunlaşıyor. Büyük oyuncular var ama hala 
 ## 🔴 Kritik Eksiklikler
 
 ### 1. Domain ve Marka
-- **hooksniff.is-a.dev zaten var!** — İsim çakışması
+- **hooksniff.vercel.app zaten var!** — İsim çakışması
 - Henüz domain alınmamış
 - **Yapılacak:** Alternatif isim düşün (bkz. isim önerileri aşağıda)
 
@@ -161,7 +161,7 @@ Rakiplerde 10+ SDK var, bizde 3:
 
 ## 🎯 Önerilen İsim Alternatifleri
 
-hooksniff.is-a.dev zaten var. Alternatifler:
+hooksniff.vercel.app zaten var. Alternatifler:
 
 | İsim | Domain Uygunluğu | Not |
 |------|------------------|-----|

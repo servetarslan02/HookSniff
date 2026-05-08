@@ -23,7 +23,7 @@ pub struct CloudEvent {
     pub event_type: String,
 
     /// Event source — identifies the context in which the event originated.
-    /// Example: `https://api.hooksniff.is-a.dev`
+    /// Example: `https://hooksniff-api-1046140057667.europe-west1.run.app`
     pub source: String,
 
     /// Unique event ID.
@@ -87,7 +87,11 @@ impl CloudEvent {
         endpoint_id: &str,
         payload: serde_json::Value,
     ) -> Self {
-        let mut ce = Self::new(event_type, "https://api.hooksniff.is-a.dev", Some(payload));
+        let mut ce = Self::new(
+            event_type,
+            "https://hooksniff-api-1046140057667.europe-west1.run.app",
+            Some(payload),
+        );
         ce.id = delivery_id.to_string();
         ce.subject = Some(endpoint_id.to_string());
         ce
@@ -168,13 +172,16 @@ mod tests {
     fn test_cloud_event_creation() {
         let ce = CloudEvent::new(
             "com.hooksniff.delivery.completed",
-            "https://api.hooksniff.is-a.dev",
+            "https://hooksniff-api-1046140057667.europe-west1.run.app",
             Some(serde_json::json!({"delivery_id": "del_123"})),
         );
 
         assert_eq!(ce.specversion, "1.0");
         assert_eq!(ce.event_type, "com.hooksniff.delivery.completed");
-        assert_eq!(ce.source, "https://api.hooksniff.is-a.dev");
+        assert_eq!(
+            ce.source,
+            "https://hooksniff-api-1046140057667.europe-west1.run.app"
+        );
         assert!(!ce.id.is_empty());
         assert!(!ce.time.is_empty());
         assert!(ce.validate().is_ok());
@@ -200,7 +207,7 @@ mod tests {
     fn test_cloud_event_json_roundtrip() {
         let ce = CloudEvent::new(
             "com.hooksniff.endpoint.created",
-            "https://api.hooksniff.is-a.dev",
+            "https://hooksniff-api-1046140057667.europe-west1.run.app",
             Some(serde_json::json!({"url": "https://example.com/hook"})),
         );
 

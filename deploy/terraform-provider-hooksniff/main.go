@@ -32,7 +32,7 @@ func (p *HookSniffProvider) Schema(_ context.Context, _ provider.SchemaRequest, 
 		Description: "Manage HookSniff webhook infrastructure with Terraform.",
 		Attributes: map[string]schema.Attribute{
 			"api_url": schema.StringAttribute{
-				Description: "HookSniff API base URL. Defaults to https://api.hooksniff.is-a.dev",
+				Description: "HookSniff API base URL. Defaults to https://hooksniff-api-1046140057667.europe-west1.run.app",
 				Optional:    true,
 			},
 			"api_key": schema.StringAttribute{
@@ -52,7 +52,7 @@ func (p *HookSniffProvider) Configure(_ context.Context, req provider.ConfigureR
 		return
 	}
 
-	apiURL := "https://api.hooksniff.is-a.dev"
+	apiURL := "https://hooksniff-api-1046140057667.europe-west1.run.app"
 	if !config.APIURL.IsNull() {
 		apiURL = config.APIURL.ValueString()
 	}

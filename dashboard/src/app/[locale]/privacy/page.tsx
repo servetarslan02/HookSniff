@@ -153,7 +153,7 @@ export default function PrivacyPage() {
               <li><strong>Object</strong> to certain processing</li>
               <li><strong>Withdraw consent</strong> where applicable</li>
             </ul>
-            <p className="mt-4">To exercise these rights, contact us at <a href="mailto:privacy@hooksniff.is-a.dev" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@hooksniff.is-a.dev</a>.</p>
+            <p className="mt-4">To exercise these rights, contact us at <a href="mailto:privacy@hooksniff.vercel.app" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@hooksniff.vercel.app</a>.</p>
           </section>
 
           <section>
@@ -185,7 +185,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">13. Contact</h2>
             <p>For privacy-related questions or requests:</p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
-              <li>Email: <a href="mailto:privacy@hooksniff.is-a.dev" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@hooksniff.is-a.dev</a></li>
+              <li>Email: <a href="mailto:privacy@hooksniff.vercel.app" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@hooksniff.vercel.app</a></li>
               <li>Data Controller: HookSniff</li>
             </ul>
           </section>

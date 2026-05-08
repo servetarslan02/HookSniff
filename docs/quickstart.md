@@ -2,7 +2,7 @@
 
 ## 1. Get Your API Key
 
-Sign up at [hooksniff.is-a.dev](https://hooksniff.is-a.dev) and get your API key.
+Sign up at [hooksniff.vercel.app](https://hooksniff.vercel.app) and get your API key.
 
 ```bash
 export HOOKRELAY_KEY="hr_live_your_key_here"
@@ -11,7 +11,7 @@ export HOOKRELAY_KEY="hr_live_your_key_here"
 ## 2. Create an Endpoint
 
 ```bash
-curl -X POST https://api.hooksniff.is-a.dev/v1/endpoints \
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://myapp.com/webhook"}'
@@ -22,7 +22,7 @@ Save the returned `id`.
 ## 3. Send a Webhook
 
 ```bash
-curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
   -H "Authorization: Bearer $HOOKRELAY_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -35,7 +35,7 @@ curl -X POST https://api.hooksniff.is-a.dev/v1/webhooks \
 ## 4. Check Status
 
 ```bash
-curl https://api.hooksniff.is-a.dev/v1/webhooks/YOUR_DELIVERY_ID \
+curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/YOUR_DELIVERY_ID \
   -H "Authorization: Bearer $HOOKRELAY_KEY"
 ```
 
