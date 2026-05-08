@@ -112,10 +112,10 @@ Her özellik tek tek tamamlanacak:
 3. [x] Monitoring sayfasını tamamla — anomaly status, istatistikler, audit log
 4. [x] Hata durumlarını göster — empty state, error state, loading state
 
-### Aşama 4: SDK'lar (1-2 gün)
-1. [ ] Node.js SDK'yı tamamla (test, dokümantasyon)
-2. [ ] Python SDK'yı tamamla (test, dokümantasyon)
-3. [ ] SDK'ları publish et (npm, PyPI)
+### Aşama 4: SDK'lar ✅ (2026-05-09 tamamlandı)
+1. [x] Node.js SDK'yı tamamla — SSE, filtreleme, stats, health, rate limit, error handling
+2. [x] Python SDK'yı tamamla — SSE, filtreleme, stats, health, rate limit, dataclass, error handling
+3. [ ] SDK'ları publish et (npm, PyPI) — Servet onayı gerektirir
 
 ### Aşama 5: Performans (1 gün)
 1. [ ] Load test yap (1000 agent)
