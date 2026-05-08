@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 01:27 GMT+8
+> Son güncelleme: 2026-05-09 01:37 GMT+8
 
 ---
 
@@ -19,7 +19,6 @@
 
 **GitHub Actions kullanılmAYACAK.** Yerine local CI:
 
-### Local CI Komutları
 ```bash
 source "$HOME/.cargo/env"
 cargo fmt --check
@@ -29,39 +28,15 @@ cargo build --release
 cd dashboard && npm install && npm run build
 ```
 
-### PR Merge İşlemi
-1. Local CI çalıştır → hepsi geçsin
-2. Format düzeltmesi varsa: `cargo fmt` → GitHub API ile push
-3. GitHub API ile squash merge (admin override)
-4. main-protection ruleset: CI check yok, sadece PR zorunlu
-
-### Neden?
-- GitHub Actions dakika limiti (private repo, 2000 dk/ay)
-- Hesapta $12 ödenmemiş fatura
-- Local CI ücretsiz ve daha hızlı
+PR merge: admin override ile CI bypass.
 
 ---
 
 ## 🚀 Yeni Oturuma Başlarken
 
-### 1. Adım: Hafıza Dosyalarını Oku
-```bash
-# .ai-context/ klasöründen GitHub API ile çek
-MEMORY.md ve NEXT_SESSION.md oku
-```
-
-### 2. Adım: Gerekirse Projeyi Klonla
-```bash
-cd /root/.openclaw/workspace
-git clone https://github.com/servetarslan02/HookSniff.git
-cd HookSniff
-```
-
-### 3. Adım: Rust Kur (eğer yoksa)
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source "$HOME/.cargo/env"
-```
+1. `.ai-context/MEMORY.md` ve `.ai-context/NEXT_SESSION.md` oku
+2. Gerekirse repo'yu klonla
+3. Rust kurulu değilse kur: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`
 
 ---
 
@@ -76,29 +51,46 @@ source "$HOME/.cargo/env"
 
 ---
 
-## ⏳ BEKLEYEN İŞLER
+## 📋 YENİ OTURUM YAPILACAKLAR — MEVCUT SİSTEMİ KUSURSUZLAŞTIR
 
-### Servet'in görevleri:
-- **iyzico hesap** — vergi levhası + banka hesabı
-- **GitHub billing** — $12 fatura (opsiyonel)
+### 1. OpenAPI Spec Yaz (🔴 Yüksek Öncelik)
+- **Dosya:** `docs/openapi.yaml` — şu an boş (1 satır)
+- Tüm endpoint'ler için OpenAPI 3.0 spec yaz
+- SDK otomatik üretimi ve dokümantasyon için gerekli
 
-### Deploy Sonrası Eklenecek Env Var'lar
-- `EMAIL_BASE_URL` — `https://hooksniff.vercel.app`
-- `FCM_SERVER_KEY` — Firebase Cloud Messaging server key
+### 2. `.env.production.example` Güncelle (🔴 Yüksek Öncelik)
+- `EMAIL_BASE_URL=https://hooksniff.vercel.app` ekle (PR #31 sonrası)
+- `FCM_SERVER_KEY=` ekle (PR #31 sonrası)
+- Email section: "Resend" → "Gmail API" olarak güncelle
 
-### Teknik Borç
-- sqlx 0.7.4 → 0.8 upgrade
-- 107 eski domain referansı
-- console.log kalıntıları
+### 3. console.log Temizle (🟡 Orta)
+- `dashboard/src/app/[locale]/docs/sdks/page.tsx` — 3 adet
+- `dashboard/src/app/[locale]/docs/page.tsx` — 1 adet
+
+### 4. TODO Çöz veya Sil (🟡 Orta)
+- `api/src/config.rs` — 1 adet TODO
+- `dashboard/src/messages/es.json` — 1 adet
+- `dashboard/src/messages/pt-BR.json` — 1 adet
+
+### 5. Vercel Deploy Hook Düzelt (🟡 Orta)
+- EXTERNAL_TOKENS.md'de deploy hook URL'inde farklı project ID var
+- `prj_NQgFly8h06oH5DTzClj7vyq3hqSO` → `prj_cSIVYHpCoAtoihRp8xlXIun1KVSR` ile eşleşmeli
+
+### 6. Servis Doğrulama (⚠️ Test Edilmeli)
+- Neon DB bağlantı testi
+- Grafana OTEL doğrulama
+- GCP Service Account doğrulama
+
+### 7. Dependency Temizliği (🟢 Düşük)
+- `cargo-udeps` ile kullanılmayan Rust dependency'leri tespit et
+- API: 37, Worker: 22 dependency
 
 ---
 
-## ✅ SON TAMAMLANAN İŞLER (Oturum 15)
+## ⏳ SERVET'İN GÖREVLERİ
 
-1. PR #31 merge edildi (5 backend feature)
-2. Local CI ile doğrulandı (29/29 test)
-3. CI politikası değişti (GitHub Actions → local CI)
-4. main-protection ruleset güncellendi
+- **iyzico hesap** — vergi levhası + banka hesabı
+- **GitHub billing** — $12 fatura (opsiyonel)
 
 ---
 
