@@ -127,7 +127,7 @@ async fn register(
     tracing::info!("✅ New customer registered: {}", req.email);
 
     // Send welcome email (fire-and-forget, don't fail registration on email errors)
-    if let Some(email_client) = crate::email::ResendClient::from_config(&cfg) {
+    if let Some(email_client) = crate::email::GCloudEmailClient::from_config(&cfg) {
         let to = req.email.clone();
         let name = req.name.clone();
         tokio::spawn(async move {

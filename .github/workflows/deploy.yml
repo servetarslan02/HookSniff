@@ -77,7 +77,7 @@ jobs:
             --max-instances 3 \
             --timeout 300 \
             --set-env-vars "APP_ENV=production,RUST_LOG=info,RATE_LIMIT_STORE=redis,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,APP_URL=https://hooksniff.vercel.app,CORS_ORIGINS=https://hooksniff.vercel.app" \
-            --set-secrets "DATABASE_URL=neon-db-url:latest,REDIS_URL=upstash-redis-url:latest,JWT_SECRET=jwt-secret:latest,HMAC_SECRET=hmac-secret:latest,POLAR_ACCESS_TOKEN=polar-token:latest,POLAR_WEBHOOK_SECRET=polar-webhook:latest,POLAR_PRODUCT_PRO=polar-pro:latest,POLAR_PRODUCT_BUSINESS=polar-business:latest,RESEND_API_KEY=resend-key:latest,OTEL_EXPORTER_OTLP_HEADERS=otel-headers:latest" \
+            --set-secrets "DATABASE_URL=neon-db-url:latest,REDIS_URL=upstash-redis-url:latest,JWT_SECRET=jwt-secret:latest,HMAC_SECRET=hmac-secret:latest,POLAR_ACCESS_TOKEN=polar-token:latest,POLAR_WEBHOOK_SECRET=polar-webhook:latest,POLAR_PRODUCT_PRO=polar-pro:latest,POLAR_PRODUCT_BUSINESS=polar-business:latest,OTEL_EXPORTER_OTLP_HEADERS=otel-headers:latest,GCP_SA_JSON=gcp-sa-json:latest" \
             --project ${{ env.PROJECT_ID }}
 
       # ── Deploy Worker to Cloud Run ──
@@ -93,7 +93,7 @@ jobs:
             --min-instances 0 \
             --max-instances 2 \
             --set-env-vars "APP_ENV=production,RUST_LOG=info,RATE_LIMIT_STORE=redis,LOG_FORMAT=json" \
-            --set-secrets "DATABASE_URL=neon-db-url:latest,REDIS_URL=upstash-redis-url:latest,JWT_SECRET=jwt-secret:latest,HMAC_SECRET=hmac-secret:latest" \
+            --set-secrets "DATABASE_URL=neon-db-url:latest,REDIS_URL=upstash-redis-url:latest,JWT_SECRET=jwt-secret:latest,HMAC_SECRET=hmac-secret:latest,GCP_SA_JSON=gcp-sa-json:latest" \
             --project ${{ env.PROJECT_ID }}
 
       # ── Output URLs ──

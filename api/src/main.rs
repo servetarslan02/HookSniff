@@ -30,8 +30,8 @@ async fn main() -> Result<()> {
     let rate_limiter = rate_limit::create_rate_limiter().await;
     let throttle_manager = throttle::ThrottleManager::new();
 
-    // Initialize Resend email client (None if RESEND_API_KEY not set)
-    let resend_client = email::ResendClient::from_config(&cfg);
+    // Initialize GCloud email client (None if GCP_SERVICE_ACCOUNT_PATH not set)
+    let gcloud_email = email::GCloudEmailClient::from_config(&cfg);
 
     // Spawn retention background job (runs every 24 hours)
     let retention_pool = pool.clone();
@@ -110,7 +110,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(pool.clone()))
         .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(metrics.clone()))
-        .layer(axum::Extension(resend_client))
+        .layer(axum::Extension(gcloud_email))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins

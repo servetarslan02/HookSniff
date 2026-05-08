@@ -67,9 +67,9 @@ Render Dashboard'da her servis için:
 | `REDIS_URL` | `rediss://default:gQAAAAAAAYCPAAIgcDI1ZGFhYWUxZGRhZjM0YjhhYTQ1OGFjOGEzZTg1OTMzNg@integral-ostrich-98447.upstash.io:6379` |
 | `POLAR_ACCESS_TOKEN` | `polar_oat_MG9p6TbzA7YjRWtFruRB8YUPa1CG2tkwVAJXI32Zw9F` |
 | `POLAR_WEBHOOK_SECRET` | `polar_whs_bjhiDZvCoWIoGvrgBBVm49ZhMIKmX7hSekMt92hxmnB` |
-| `RESEND_API_KEY` | `re_BGbQVTfq_NyahSBBbiS4GERnctr7DN8Xu` |
+| `GCP_SA_JSON` | GCP service account JSON (Secret Manager) |
 
-**hooksniff-worker** servisi için de aynı `DATABASE_URL`, `REDIS_URL`, `RESEND_API_KEY` gir.
+**hooksniff-worker** servisi için de aynı `DATABASE_URL`, `REDIS_URL`, `GCP_SA_JSON` gir.
 
 ### 2.4 Custom Domain Ekle
 1. **hooksniff-api** servisine tıkla
@@ -101,23 +101,23 @@ Deploy tamamlandıktan sonra:
 
 ---
 
-## Adım 4: Resend Domain Doğrulama (5 dk)
+## Adım 4: GCloud Email Kurulumu (5 dk)
 
-### 4.1 Resend Dashboard
-1. https://resend.com adresine git
+### 4.1 Gmail API (Service Account)
+1. GCP Console → IAM → Service Accounts → hooksniff-deploy
 2. **Domains** → **Add Domain**
 3. `hooksniff.is-a.dev` ekle
 
 ### 4.2 DNS Kayıtları
-Resend sana DNS kayıtları verecek. Cloudflare'da ekle:
+Gmail API DNS kayıtları gerekmez. Service account domain-wide delegation ile çalışır:
 
 | Type | Name | Content |
 |------|------|---------|
-| TXT | `_resend` | (Resend'in verdiği değer) |
-| MX | `@` | (Resend'in verdiği değer) |
+| — | — | Gmail API DNS gerektirmez |
+
 
 ### 4.3 Doğrulama
-1. DNS kayıtlarını ekledikten sonra Resend'de **"Verify"** butonuna bas
+1. Service account'a domain-wide delegation ekle (Google Workspace Admin Console)
 2. Doğrulanınca `noreply@hooksniff.is-a.dev` çalışacak
 
 ---
@@ -148,7 +148,7 @@ Dashboard'dan yeni endpoint oluştur ve test webhook gönder.
 - Neon password → Neon Dashboard → Settings → Reset Password
 - Upstash token → Upstash Dashboard → Redis → REST API → Rotate
 - Polar tokens → Polar Dashboard → Settings → Tokens → Revoke
-- Resend key → Resend Dashboard → API Keys → Delete & Recreate
+- GCP SA JSON → GCP Console → Service Accounts → Create New Key
 - Render key → Render Dashboard → API Keys → Revoke
 - Cloudflare tokens → Cloudflare Dashboard → My Profile → API Tokens → Revoke
 - Grafana key → Grafana Dashboard → API Keys → Delete

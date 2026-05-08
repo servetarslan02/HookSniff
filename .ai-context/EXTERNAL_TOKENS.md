@@ -30,9 +30,6 @@ POLAR_WEBHOOK_SECRET=polar_whs_bjhiDZvCoWIoGvrgBBVm49ZhMIKmX7hSekMt92hxmnB
 POLAR_PRODUCT_PRO=79fee3f9-04a2-46c1-804e-8ca7542b8119
 POLAR_PRODUCT_BUSINESS=e5b7d88a-7606-4963-a070-4102ca6405e2
 
-# Resend
-RESEND_API_KEY=re_BGbQVTfq_NyahSBBbiS4GERnctr7DN8Xu
-
 # Grafana
 GRAFANA_OTEL_HEADERS=Authorization=Bearer 1757335:glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rcmVsYXktaG9va3JlbGF5IiwiayI6IlRRYjc5MkxvNWhZNlZFODdBUlI3eDU2ZyIsIm0iOnsiciI6InVzIn19
 
@@ -59,6 +56,8 @@ CARGO_REGISTRY_TOKEN=cio2FnCRfPQI3ejDDjWpzdYwZiVR1AuSbAN
 # Service account JSON: .ai-context/gcp-service-account.json
 # Project: hooksniff-app
 # Bölge: europe-west1
+# Email: Gmail API via service account (replaces Resend)
+# Cloud Run secret: gcp-sa-json (contains the full JSON)
 
 # HashiCorp Cloud Platform
 HCP_CLIENT_ID=hooksniff-243241@d462de5c-6702-4737-86eb-5f97378fd4ad
