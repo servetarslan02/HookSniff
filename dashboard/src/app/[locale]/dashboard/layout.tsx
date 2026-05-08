@@ -33,6 +33,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('playground'), href: '/dashboard/playground', icon: '🧪' },
     { name: t('analytics'), href: '/dashboard/analytics', icon: '📈' },
     { name: 'AI Agents', href: '/dashboard/agents', icon: '🤖' },
+    { name: 'Agent Monitoring', href: '/dashboard/agents/monitoring', icon: '📡' },
     { name: 'Transforms', href: '/dashboard/transforms', icon: '🔄' },
     { name: 'Inbound', href: '/dashboard/inbound', icon: '📨' },
     { name: t('team'), href: '/dashboard/team', icon: '👥' },

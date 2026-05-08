@@ -61,3 +61,18 @@ CREATE INDEX IF NOT EXISTS idx_agent_events_created ON agent_events(created_at D
 CREATE INDEX IF NOT EXISTS idx_agent_routes_customer ON agent_routes(customer_id);
 CREATE INDEX IF NOT EXISTS idx_agent_routes_event ON agent_routes(event_type);
 CREATE INDEX IF NOT EXISTS idx_agent_rate_limits_agent ON agent_rate_limits(agent_id);
+
+-- Audit log tablosu
+CREATE TABLE IF NOT EXISTS agent_audit_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    agent_id UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    action STRING NOT NULL,
+    details JSONB DEFAULT '{}',
+    ip_address STRING,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_audit_agent ON agent_audit_log(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_audit_customer ON agent_audit_log(customer_id);
+CREATE INDEX IF NOT EXISTS idx_agent_audit_created ON agent_audit_log(created_at DESC);

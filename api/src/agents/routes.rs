@@ -10,6 +10,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use super::auth::generate_agent_key;
+use super::security::AuditLogQuery;
 use super::models::*;
 
 #[derive(Debug, Deserialize)]
@@ -31,6 +32,8 @@ pub fn router() -> Router {
         .route("/routes/{route_id}", delete(delete_route))
         // Rate limit
         .route("/{agent_id}/rate-limit", get(get_rate_limit).put(update_rate_limit))
+        .route("/audit", get(get_audit_log))
+        .route("/{agent_id}/anomaly", get(get_anomaly_status))
 }
 
 // ============ Agent CRUD ============
@@ -427,4 +430,77 @@ async fn update_rate_limit(
         Some(r) => Ok(Json(serde_json::json!({ "rate_limit": r }))),
         None => Err(StatusCode::NOT_FOUND),
     }
+}
+
+// ============ Audit Log & Anomaly ============
+
+async fn get_audit_log(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<crate::models::customer::Customer>,
+    Query(query): Query<AuditLogQuery>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let page = query.page.unwrap_or(1).max(1);
+    let per_page = query.per_page.unwrap_or(50).min(200);
+    let offset = (page - 1) * per_page;
+
+    let logs = if let Some(agent_id) = query.agent_id {
+        sqlx::query_as::<_, super::security::AuditLog>(
+            "SELECT * FROM agent_audit_log WHERE agent_id = $1 AND customer_id = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4"
+        )
+        .bind(agent_id)
+        .bind(customer.id)
+        .bind(per_page)
+        .bind(offset)
+        .fetch_all(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    } else {
+        sqlx::query_as::<_, super::security::AuditLog>(
+            "SELECT * FROM agent_audit_log WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3"
+        )
+        .bind(customer.id)
+        .bind(per_page)
+        .bind(offset)
+        .fetch_all(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    };
+
+    Ok(Json(serde_json::json!({ "logs": logs })))
+}
+
+async fn get_anomaly_status(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<crate::models::customer::Customer>,
+    Path(agent_id): Path<Uuid>,
+) -> Result<impl IntoResponse, StatusCode> {
+    // Agent dogrula
+    let _agent = sqlx::query_as::<_, super::models::Agent>(
+        "SELECT * FROM agents WHERE id = $1 AND customer_id = $2"
+    )
+    .bind(agent_id)
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let _ = match _agent {
+        Some(a) => a,
+        None => return Err(StatusCode::NOT_FOUND),
+    };
+
+    let warnings = super::security::check_anomaly(&pool, agent_id)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let rate_status = super::security::check_rate_limit(&pool, agent_id)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    Ok(Json(serde_json::json!({
+        "agent_id": agent_id,
+        "warnings": warnings,
+        "rate_limit": rate_status,
+        "healthy": warnings.is_empty()
+    })))
 }

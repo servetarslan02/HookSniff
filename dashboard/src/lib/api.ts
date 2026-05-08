@@ -471,3 +471,12 @@ export const agentsApi = {
       body: data,
     }),
 };
+
+// Agent Monitoring API
+export const agentMonitoringApi = {
+  getAgentStats: (token: string) =>
+    apiFetch<{ stats: any }>('/agents/stats', { token }),
+
+  getAuditLog: (token: string, agentId?: string, page = 1) =>
+    apiFetch<{ logs: any[] }>(`/agents/audit${agentId ? `?agent_id=${agentId}` : ''}&page=${page}`, { token }),
+};
