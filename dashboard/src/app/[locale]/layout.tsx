@@ -26,7 +26,7 @@ export async function generateMetadata({
     openGraph: {
       title: 'HookSniff — Webhook Delivery Service',
       description: t('hero.subtitle'),
-      url: 'https://hooksniff.is-a.dev',
+      url: 'https://hooksniff.vercel.app',
       siteName: 'HookSniff',
       type: 'website',
       locale: locale === 'pt-BR' ? 'pt_BR' : `${locale}_${locale.toUpperCase()}`,
@@ -41,7 +41,7 @@ export async function generateMetadata({
       follow: true,
     },
     metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.is-a.dev'
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.vercel.app'
     ),
   };
 }

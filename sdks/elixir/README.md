@@ -1,6 +1,6 @@
 # HookSniff Elixir SDK
 
-Official Elixir client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official Elixir client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 

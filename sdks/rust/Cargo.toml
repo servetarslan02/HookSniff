@@ -5,7 +5,7 @@ edition = "2021"
 description = "Official Rust client for the HookSniff webhook delivery service"
 license = "MIT"
 repository = "https://github.com/servetarslan02/hooksniff"
-homepage = "https://hooksniff.is-a.dev"
+homepage = "https://hooksniff.vercel.app"
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }

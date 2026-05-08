@@ -1,6 +1,6 @@
 # HookSniff Node.js SDK
 
-Official TypeScript/Node.js client for the [HookSniff](https://hooksniff.is-a.dev) webhook delivery service.
+Official TypeScript/Node.js client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
 
@@ -195,7 +195,7 @@ try {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `apiKey` | `string` | required | Your HookSniff API key |
-| `baseUrl` | `string` | `https://api.hooksniff.is-a.dev/v1` | API base URL |
+| `baseUrl` | `string` | `https://hooksniff-api-1046140057667.europe-west1.run.app/v1` | API base URL |
 | `timeout` | `number` | `30000` | Request timeout in ms |
 
 ### `client.endpoints`

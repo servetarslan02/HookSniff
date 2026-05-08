@@ -255,14 +255,14 @@ REDIS_URL=rediss://default:...@xxx.upstash.io:6379
    - Framework: `Next.js` (auto-detected)
    - Root Directory: `dashboard`
 4. **Configure environment variables:**
-   - `NEXT_PUBLIC_API_URL` = `https://api.hooksniff.is-a.dev/v1` (your Google Cloud Run API URL)
+   - `NEXT_PUBLIC_API_URL` = `https://hooksniff-api-1046140057667.europe-west1.run.app/v1` (your Google Cloud Run API URL)
 5. **Deploy:** Click **Deploy** — Vercel builds and deploys automatically on every push to `main`
 
 ### Environment Variables
 
 ```env
 # Set in Vercel Dashboard → Settings → Environment Variables
-NEXT_PUBLIC_API_URL=https://api.hooksniff.is-a.dev/v1
+NEXT_PUBLIC_API_URL=https://hooksniff-api-1046140057667.europe-west1.run.app/v1
 ```
 
 ### Gotchas
@@ -399,7 +399,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
    - Copy the key (starts with `re_`)
 4. **Add your domain** (optional but recommended):
    - Go to **Domains** → **Add Domain**
-   - Enter your domain (e.g., `hooksniff.is-a.dev`)
+   - Enter your domain (e.g., `hooksniff.vercel.app`)
    - Add the DNS records (SPF, DKIM, DMARC) to your Cloudflare DNS
    - Wait for verification (~5 minutes)
 5. **Test:**
@@ -407,7 +407,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
    curl -X POST https://gmail.googleapis.com/gmail/v1/users/me/messages/send \
      -H "Authorization: Bearer re_YOUR_API_KEY" \
      -H "Content-Type: application/json" \
-     -d '{"from": "noreply@hooksniff.is-a.dev", "to": "you@example.com", "subject": "Test", "html": "<p>Hello!</p>"}'
+     -d '{"from": "noreply@hooksniff.vercel.app", "to": "you@example.com", "subject": "Test", "html": "<p>Hello!</p>"}'
    ```
 
 ### Environment Variables
@@ -415,7 +415,7 @@ R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
 ```env
 GCP_SA_JSON={"type":"service_account",...}
 NOTIFY_EMAIL=admin@example.com
-NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
+NOTIFY_EMAIL_FROM=noreply@hooksniff.vercel.app
 ```
 
 ### Gotchas
@@ -459,14 +459,14 @@ NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
    - Go to **SSL/TLS** → **Origin Server** → **Create Certificate**
    - Install the certificate on your Google Cloud Run VM (Nginx/Caddy)
 8. **Page Rules** (optional):
-   - Cache everything for dashboard: `hooksniff.is-a.dev/*` → Cache Level: Cache Everything
+   - Cache everything for dashboard: `hooksniff.vercel.app/*` → Cache Level: Cache Everything
 
 ### Environment Variables
 
 ```env
 # Set in .env on Google Cloud Run
-CORS_ORIGINS=https://hooksniff.is-a.dev,https://hooksniff.is-a.dev
-APP_URL=https://hooksniff.is-a.dev
+CORS_ORIGINS=https://hooksniff.vercel.app,https://hooksniff.vercel.app
+APP_URL=https://hooksniff.vercel.app
 ```
 
 ### Gotchas
@@ -475,7 +475,7 @@ APP_URL=https://hooksniff.is-a.dev
 - **Full (Strict) SSL** requires an origin certificate on your VM. Without it, use "Full" (not strict).
 - **Free plan** includes DDoS protection — no need to upgrade for security.
 - **Orange cloud** (proxied) vs **Grey cloud** (DNS only): Keep API and dashboard proxied for SSL and caching.
-- **API caching:** Be careful with Cloudflare's default caching. API responses shouldn't be cached — add a Page Rule for `api.hooksniff.is-a.dev/*` with Cache Level: Bypass.
+- **API caching:** Be careful with Cloudflare's default caching. API responses shouldn't be cached — add a Page Rule for `hooksniff-api-1046140057667.europe-west1.run.app/*` with Cache Level: Bypass.
 
 ---
 
@@ -510,10 +510,10 @@ MAX_PAYLOAD_BYTES=1048576
 RETENTION_DAYS=7
 
 # ── CORS ──
-CORS_ORIGINS=https://hooksniff.is-a.dev
+CORS_ORIGINS=https://hooksniff.vercel.app
 
 # ── App URL (for Stripe redirects) ──
-APP_URL=https://hooksniff.is-a.dev
+APP_URL=https://hooksniff.vercel.app
 
 # ── Stripe (optional) ──
 STRIPE_SECRET_KEY=sk_live_...
@@ -524,7 +524,7 @@ STRIPE_PRICE_BUSINESS=price_...
 # ── Email (GCloud Gmail) ──
 GCP_SA_JSON={"type":"service_account",...}
 NOTIFY_EMAIL=admin@example.com
-NOTIFY_EMAIL_FROM=noreply@hooksniff.is-a.dev
+NOTIFY_EMAIL_FROM=noreply@hooksniff.vercel.app
 
 # ── Storage (Cloudflare R2) ──
 R2_ACCOUNT_ID=your_cf_account_id
