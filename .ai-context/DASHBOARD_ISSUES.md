@@ -138,6 +138,8 @@ landing.footer.contact
 | 33 | **Footer.tsx** | 1 | `'GitHub'` → yanlış URL (`github.com/hooksniff` → `github.com/servetarslan02/HookSniff`) |
 | 34 | **Footer.tsx** | 2-6 | Tüm linkler hardcoded (`'GitHub'`, `'Docs'`, `'Status'`, `'Blog'`, `'Terms'`, `'Privacy'`) — t() kullanmıyor |
 | 35 | **Footer.tsx** | - | `© {new Date().getFullYear()} HookSniff` hardcoded |
+| 36 | **Dashboard layout.tsx** | 73 | Sidebar logo `HookSniff` link değil (sadece `<div>`), ana sayfaya dönüş yok |
+| 37 | **Dashboard layout.tsx** | - | Sidebar'da "Home" / "Ana Sayfa" menü öğesi yok |
 
 ### ✅ DÜZELTİLMİŞ (rm -rf .next sonrası)
 
