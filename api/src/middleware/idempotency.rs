@@ -199,8 +199,8 @@ pub async fn mark_webhook_seen(
 ///
 /// This is the main entrypoint for replay protection. It:
 /// 1. Validates the webhook timestamp is within tolerance
-/// 2. Checks if the webhook ID was already seen
-/// 3. Marks the webhook as seen if both checks pass
+/// 2. Atomically inserts the webhook ID (INSERT ... ON CONFLICT DO NOTHING)
+/// 3. Returns error if the ID was already present (duplicate)
 ///
 /// Returns `Ok(())` if the webhook is valid, `Err(ReplayError)` otherwise.
 pub async fn check_replay(
@@ -212,28 +212,39 @@ pub async fn check_replay(
     // 1. Check timestamp freshness
     check_timestamp(webhook_timestamp, tolerance_secs)?;
 
-    // 2. Check for duplicates
-    let is_new = check_webhook_seen(pool, webhook_id)
-        .await
-        .map_err(|e| {
+    // 2. Atomic check-and-mark: INSERT ... ON CONFLICT DO NOTHING
+    //    If rows_affected == 0, the webhook was already seen (duplicate).
+    let tolerance = tolerance_secs.unwrap_or(DEFAULT_TIMESTAMP_TOLERANCE_SECS);
+    let now = Utc::now();
+    let expires_at = now + chrono::Duration::seconds(tolerance);
+
+    let result = sqlx::query(
+        "INSERT INTO seen_webhooks (webhook_id, seen_at, expires_at) \
+         VALUES ($1, $2, $3) ON CONFLICT (webhook_id) DO NOTHING",
+    )
+    .bind(webhook_id)
+    .bind(now)
+    .bind(expires_at)
+    .execute(pool)
+    .await;
+
+    match result {
+        Ok(r) => {
+            if r.rows_affected() == 0 {
+                // Conflict — already seen
+                Err(ReplayError::Duplicate {
+                    webhook_id: webhook_id.to_string(),
+                })
+            } else {
+                Ok(())
+            }
+        }
+        Err(e) => {
             tracing::warn!("Failed to check seen webhooks: {:?}", e);
             // On DB error, allow the webhook through (fail open)
-            ReplayError::Duplicate {
-                webhook_id: webhook_id.to_string(),
-            }
-        })
-        .unwrap_or(true);
-
-    if !is_new {
-        return Err(ReplayError::Duplicate {
-            webhook_id: webhook_id.to_string(),
-        });
+            Ok(())
+        }
     }
-
-    // 3. Mark as seen
-    let _ = mark_webhook_seen(pool, webhook_id, tolerance_secs).await;
-
-    Ok(())
 }
 
 /// SQL migration to create the `seen_webhooks` table.
