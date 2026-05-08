@@ -44,7 +44,7 @@ export default function TransformsPage() {
     if (!token || !endpointId) return;
     try {
       const res = await fetch(`${API}/endpoints/${endpointId}/transforms`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       if (res.ok) setRules(await res.json());
     } catch {} finally { setLoading(false); }
@@ -64,7 +64,7 @@ export default function TransformsPage() {
     try {
       const res = await fetch(`${API}/endpoints/${selectedEndpoint}/transforms`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' }, credentials: 'include' as const,
         body: JSON.stringify({ rule }),
       });
       if (res.ok) {
@@ -83,7 +83,7 @@ export default function TransformsPage() {
     try {
       await fetch(`${API}/endpoints/${selectedEndpoint}/transforms/${ruleId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       setRules(prev => prev.filter(r => r.id !== ruleId));
       toast('Rule deleted', 'info');

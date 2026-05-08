@@ -90,7 +90,7 @@ export default function EndpointSettingsPage() {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1'}/endpoints/${id}/rotate-secret`,
-        { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
+        { method: 'POST', headers: {}, credentials: 'include' as const }
       );
       if (!res.ok) throw new Error('Rotation failed');
       const data = await res.json();

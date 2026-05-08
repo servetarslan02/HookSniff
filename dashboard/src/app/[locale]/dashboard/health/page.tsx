@@ -28,7 +28,7 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: strin
 };
 
 export default function EndpointHealthPage() {
-  const { token } = useAuth();
+  const { } = useAuth();
   const [endpoints, setEndpoints] = useState<EndpointHealth[]>([]);
   const [loading, setLoading] = useState(true);
   const t = useTranslations('health');
@@ -39,7 +39,7 @@ export default function EndpointHealthPage() {
   const fetchHealth = useCallback(async () => {
     try {
       const res = await fetch(`${API}/endpoint-health`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       if (res.ok) setEndpoints(await res.json());
     } catch (e) {
@@ -47,7 +47,7 @@ export default function EndpointHealthPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, API]);
+  }, [API]);
 
   useEffect(() => {
     fetchHealth();
