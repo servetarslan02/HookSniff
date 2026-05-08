@@ -2,7 +2,7 @@
 
 > Bu dosya, AI asistanın oturumlar arası hafızasıdır.
 > Her oturum başında bu dosya okunur, oturum sonunda güncellenir.
-> Son güncelleme: 2026-05-08 18:20 GMT+8
+> Son güncelleme: 2026-05-08 18:29 GMT+8
 
 ---
 
@@ -67,23 +67,25 @@
 
 ---
 
-## 🐛 Tespit Edilen Hatalar (2026-05-08)
+## 🐛 Tespit Edilen ve Düzeltilen Hatalar (2026-05-08)
 
-### KRİTİK:
-1. Dashboard `api.get/post/put/delete` wrapper'ları token geçirmiyor → korumalı sayfalar çalışmaz
-2. CI pipeline'da `continue-on-error: true` → bozuk kod deploy'a geçebilir
-3. Login/register endpoint'lerinde rate limit yok → brute-force riski
+### Tümü Düzeltildi ✅
+1. ✅ CI `continue-on-error` kaldırıldı — bozuk kod artık deploy'a geçemez
+2. ✅ Dashboard API wrapper token desteği eklendi
+3. ✅ Login/register rate limit eklendi (10/15dk login, 5/saat register)
+4. ✅ `seen_webhooks` cleanup job eklendi (6 saatte bir)
+5. ✅ `idempotency_keys` cleanup job eklendi (6 saatte bir)
+6. ✅ Billing `webhook_limit` zaten doğru çalışıyormuş (yanlış tespit düzeltildi)
+7. ✅ Admin plan değişikliği: upgrade'de sıfırla, downgrade'de cap
+8. ✅ Duplicate `truncate` fonksiyonu birleştirildi
+9. ✅ Duplicate `validate_url` fonksiyonu ssrf.rs'e yönlendirildi
+10. ✅ Zombie reaper artık orphaned delivery'leri de kurtarıyor
+11. ✅ `#[allow(dead_code)]` kaldırıldı — development uyarıları artık görünür
+12. ✅ Invoice oluşturma eklendi (SubscriptionCreated + SubscriptionUpdated)
 
-### ORTA:
-4. `seen_webhooks` cleanup fonksiyonu tanımlı ama çağrılmıyor → DB şişer
-5. `idempotency_keys` cleanup job'ı yok → DB şişer
-6. Billing webhook'ta `webhook_limit` güncellenmiyor (SubscriptionUpdated)
-7. Admin plan değişikliği `webhook_count` sıfırlıyor (tutarsızlık)
+### NOT: Bug #6 (Billing webhook_limit) aslında doğru çalışıyormuş, düzeltme gerekmedi.
 
-### DÜŞÜK:
-8. `truncate` ve `validate_url` fonksiyonları ikişer yerde tanımlanmış
-9. Invoice oluşturma eksik (PaymentSucceeded)
-10. Zombie reaper sadece webhook_queue'yu temizliyor, deliveries'ı değil
+Değişen dosyalar: ci.yml, main.rs (api), admin.rs, auth.rs, billing.rs, validation.ts, api.ts, main.rs (worker)
 
 Detaylı rapor: `BUG_REPORT.md`
 
