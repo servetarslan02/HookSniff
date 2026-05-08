@@ -234,8 +234,43 @@ class HookSniffClient(
         fun attempts(deliveryId: String): List<DeliveryAttempt> {
             return request("GET", "/webhooks/$deliveryId/attempts")
         }
+
+        fun export(
+            format: String? = null,
+            status: String? = null,
+            dateFrom: String? = null,
+            dateTo: String? = null
+        ): Any {
+            val params = mutableListOf<String>()
+            format?.let { params.add("format=$it") }
+            status?.let { params.add("status=$it") }
+            dateFrom?.let { params.add("date_from=$it") }
+            dateTo?.let { params.add("date_to=$it") }
+            val qs = if (params.isNotEmpty()) "?${params.joinToString("&")}" else ""
+            return request("GET", "/webhooks/export$qs")
+        }
     }
-}
+
+    inner class SearchResource {
+        fun search(
+            query: String? = null,
+            event: String? = null,
+            status: String? = null,
+            endpointId: String? = null,
+            page: Int = 1,
+            perPage: Int = 20
+        ): Map<String, Any> {
+            val params = mutableListOf("page=$page", "per_page=$perPage")
+            query?.let { params.add("q=$it") }
+            event?.let { params.add("event=$it") }
+            status?.let { params.add("status=$it") }
+            endpointId?.let { params.add("endpoint_id=$it") }
+            val qs = params.joinToString("&")
+            return request("GET", "/search?$qs")
+        }
+    }
+
+    val search = SearchResource()
 
 // ==================== Webhook Verification ====================
 
