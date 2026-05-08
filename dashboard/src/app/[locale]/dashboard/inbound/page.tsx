@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, type Endpoint } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 interface InboundConfig {
   id: string;
@@ -24,6 +25,7 @@ const PROVIDERS = [
 export default function InboundPage() {
   const { token } = useAuth();
   const { toast } = useToast();
+  const t = useTranslations();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [configs, setConfigs] = useState<InboundConfig[]>([]);
   const [_loading, setLoading] = useState(true);
@@ -59,13 +61,13 @@ export default function InboundPage() {
         }),
       });
       if (res.ok) {
-        toast('Inbound config created!', 'success');
+        toast(t('configCreated'), 'success');
         setShowCreate(false);
         // Reload
         const cfgs = await fetch(`${API}/inbound/configs`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).catch(() => []);
         setConfigs(cfgs);
       } else {
-        toast('Failed to create config', 'error');
+        toast(t('configFailed'), 'error');
       }
     } catch { toast('Failed', 'error'); }
   };
@@ -172,7 +174,7 @@ export default function InboundPage() {
                     </div>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.enabled ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-500'}`}>
-                    {cfg.enabled ? 'Active' : 'Disabled'}
+                    {cfg.enabled ? t('active') : t('disabled')}
                   </span>
                 </div>
               );

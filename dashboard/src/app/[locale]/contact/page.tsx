@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useTranslations } from 'next-intl';
 
 export default function ContactPage() {
+  const t = useTranslations();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
@@ -154,7 +155,7 @@ export default function ContactPage() {
               disabled={status === 'sending'}
               className="bg-brand-600 dark:bg-brand-500 text-white px-8 py-3 rounded-xl font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {status === 'sending' ? 'Sending...' : 'Send Message'}
+              {status === 'sending' ? t('sending') : t('sendMessage')}
             </button>
           </form>
         </div>
