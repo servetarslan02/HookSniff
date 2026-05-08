@@ -18,6 +18,11 @@ pub struct Delivery {
     pub next_retry_at: Option<DateTime<Utc>>,
     pub replay_count: i32,
     pub created_at: DateTime<Utc>,
+    // Fields added by migrations
+    pub sequence_num: Option<i64>,
+    pub fifo_group_id: Option<String>,
+    pub updated_at: DateTime<Utc>,
+    pub error_message: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -74,6 +79,8 @@ pub struct DeliveryAttempt {
     pub duration_ms: Option<i32>,
     pub error_message: Option<String>,
     pub created_at: DateTime<Utc>,
+    pub trace_id: Option<String>,
+    pub response_headers: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize)]
