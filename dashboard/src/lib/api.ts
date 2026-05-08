@@ -470,6 +470,15 @@ export const agentsApi = {
       method: 'PUT',
       body: data,
     }),
+
+  getAnomalyStatus: (token: string, agentId: string) =>
+    apiFetch<{ agent_id: string; warnings: string[]; rate_limit: any; healthy: boolean }>(`/agents/${agentId}/anomaly`, { token }),
+
+  getEventStats: (token: string, agentId: string) =>
+    apiFetch<{ stats: any }>(`/agents/${agentId}/stats`, { token }),
+
+  getAuditLog: (token: string, agentId?: string, page = 1) =>
+    apiFetch<{ logs: any[]; pagination: any }>(`/agents/audit${agentId ? `?agent_id=${agentId}` : ''}&page=${page}`, { token }),
 };
 
 // Agent Monitoring API
