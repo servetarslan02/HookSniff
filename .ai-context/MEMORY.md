@@ -140,13 +140,22 @@ Detay: `.ai-context/MARKET_RESEARCH.md` (son bölüm)
 4 hafta, $0 maliyet, kural tabanlı (AI API yok).
 Lab repo'da geliştirilecek.
 
-## 📱 MOBİL UYGULAMA (2026-05-08 — Hafıza Kaydı)
+## 📱 MOBİL UYGULAMA (2026-05-08 — Servet Onayı İle Netleştirildi)
 
-Detay: `.ai-context/FEATURE_PLAN.md` (son bölüm)
-⚠️ Servet onayı BEKLENİYOR. Tüm web özellikleri bittikten sonra.
-Admin & müşteri yönetim paneli — webhook'ları telefondan yönetme.
-Önce PWA (2 hafta, $0), gerekirse React Native/Expo (4-6 hafta).
-WhatsApp bot İPTAL — sadece Telegram bot kullanılacak.
+Detay: `.ai-context/MOBILE_MASTER_PLAN.md` ← TEK KAYNAK DÖKÜMAN
+Eksiklik analizi: `.ai-context/MOBILE_APP_AUDIT.md`
+
+**Kararlar:**
+- Platform: Android (şimdilik)
+- Teknoloji: React Native + Expo (SDK 53)
+- Dağıtım: Siteden APK indirme (Google Play YOK)
+- Güncelleme: OTA (Expo Updates) + APK güncelleme
+- Tasarım: Premium, native his, dark mode varsayılan, 29 sayfa
+- Dil: Türkçe varsayılan, İngilizce destek
+- Maliyet: $0
+- Süre: 6-8 hafta
+- Backend %90 hazır, sadece push notification + şifre sıfırlama + refresh token eksik
+- WhatsApp bot İPTAL — sadece Telegram bot kullanılacak
 
 ---
 
