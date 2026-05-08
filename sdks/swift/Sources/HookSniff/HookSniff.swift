@@ -294,6 +294,35 @@ public class WebhooksResource: @unchecked Sendable {
     public func attempts(_ deliveryId: String) async throws -> [DeliveryAttempt] {
         return try await client.request("GET", path: "/webhooks/\(deliveryId)/attempts")
     }
+
+    public func export(format: String? = nil, status: String? = nil, dateFrom: String? = nil, dateTo: String? = nil) async throws -> Any {
+        var params: [String] = []
+        if let f = format { params.append("format=\(f)") }
+        if let s = status { params.append("status=\(s)") }
+        if let df = dateFrom { params.append("date_from=\(df)") }
+        if let dt = dateTo { params.append("date_to=\(dt)") }
+        let qs = params.isEmpty ? "" : "?\(params.joined(separator: "&"))"
+        return try await client.request("GET", path: "/webhooks/export\(qs)")
+    }
+}
+
+// MARK: - Search Resource
+public class SearchResource {
+    private let client: HookSniffClient
+
+    init(client: HookSniffClient) {
+        self.client = client
+    }
+
+    public func search(query: String? = nil, event: String? = nil, status: String? = nil, endpointId: String? = nil, page: Int = 1, perPage: Int = 20) async throws -> [String: Any] {
+        var params = ["page=\(page)", "per_page=\(perPage)"]
+        if let q = query { params.append("q=\(q)") }
+        if let e = event { params.append("event=\(e)") }
+        if let s = status { params.append("status=\(s)") }
+        if let eid = endpointId { params.append("endpoint_id=\(eid)") }
+        let qs = params.joined(separator: "&")
+        return try await client.request("GET", path: "/search?\(qs)")
+    }
 }
 
 // MARK: - Webhook Verification
