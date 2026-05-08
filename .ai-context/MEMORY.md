@@ -14,6 +14,15 @@
 - Her oturum sonunda MEMORY.md + NEXT_SESSION.md güncelle
 - Local dosyalar silinir, önemli bilgiler GitHub'a commit et
 
+### ⚠️ REPO AYRIMI KURALI (2026-05-08 — Servet Kararı)
+- **Hata düzeltme, fix, refactor** → Orijinal repo `servetarslan02/HookSniff` (main branch)
+- **Yeni özellik geliştirme** → Ayrı lab repo `servetarslan02/hooksniff-lab`
+  - Lab repo'da test edilir, kusursuz çalışınca Servet onayı ile ana repo'ya merge edilir
+  - Ana repo'nun main branch'i bozulmaz
+  - Her özellik ayrı branch'te geliştirilir
+- **AI Agent katmanı** → Lab repo'da geliştirilecek (Servet onayı beklemede, en son iş)
+- **Market research, plan, notlar** → `.ai-context/` klasörüne kaydedilir
+
 ## Domain Kararı
 - ~~is-a.dev~~ iptal
 - Vercel ücretsiz domain: `hooksniff.vercel.app` ✅
@@ -108,6 +117,30 @@
    - Cloud Run servis hesabına `secretAccessor` izni verildi
 3. **cargo fmt + clippy + test:** 29/29 test geçti, 0 Clippy hatası
 4. **CI yeşil** — Deploy tetiklendi
+
+## 📋 YENİ ÖZELLİK PLANI (2026-05-08 — Hafıza Kaydı)
+
+Detay: `.ai-context/FEATURE_PLAN.md`
+Araştırma: `.ai-context/MARKET_RESEARCH.md`
+
+12 yeni özellik, 4 faz, 9-10 hafta tahmini. Tümü Servet onayı ile başlayacak.
+Lab repo'da geliştirilecek → test → onay → ana repo'ya merge.
+
+| Faz | Özellikler | Süre |
+|-----|-----------|------|
+| 1 | Akıllı Alarm + Telegram/Discord Bot + Test Modu | 2 hafta |
+| 2 | Zaman Tüneli + Playground + Custom Retry + Etiketler | 2 hafta |
+| 3 | Müşteri İstatistikleri + Uptime + Export + IP Whitelist | 2-3 hafta |
+| 4 | Webhook Zinciri (otomasyon) | 3+ hafta |
+
+## 🤖 AI AGENT KATMANI (2026-05-08 — Hafıza Kaydı)
+
+Detay: `.ai-context/MARKET_RESEARCH.md` (son bölüm)
+⚠️ Servet onayı BEKLENİYOR. En son iş bu olacak.
+4 hafta, $0 maliyet, kural tabanlı (AI API yok).
+Lab repo'da geliştirilecek.
+
+---
 
 ## ❌ KALAN SORUNLAR
 
