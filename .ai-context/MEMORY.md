@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 01:27 GMT+8
+> Son güncelleme: 2026-05-09 01:37 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -88,7 +88,7 @@ cd dashboard && npm install && npm run build
 1. Clippy ✅, Test ✅ (29), Dashboard build ✅, Security audit ✅
 2. Push edildi — `7ff7c94` commit
 
-### Bu Oturum (15) — 2026-05-08 23:50-01:27 GMT+8:
+### Bu Oturum (15) — 2026-05-08 23:50-01:37 GMT+8:
 
 1. PR #29 + PR #30 merge edildi
 2. 5 yeni backend feature kodlandı (password reset, email verification, refresh token, 2FA, push notifications)
@@ -97,6 +97,7 @@ cd dashboard && npm install && npm run build
 5. **CI politikası değişti** — GitHub Actions devre dışı, local CI'ya geçildi
 6. Hassas dosyalar yönetildi (public/private toggle)
 7. main-protection ruleset güncellendi — CI check'leri kaldırıldı
+8. **Kapsamlı denetim yapıldı** — mevcut sistem sorunları kontrol edildi (aşağıda)
 
 ### Deploy Sonrası Eklenecek Env Var'lar
 - `EMAIL_BASE_URL` — `https://hooksniff.vercel.app`
@@ -104,7 +105,25 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## ❌ KALAN SORUNLAR (Güncel — 2026-05-09)
+## ❌ KALAN SORUNLAR (Güncel — 2026-05-09 01:37 — Denetim Sonrası)
+
+### ✅ ZATEN DÜZELTİLMİŞ (4 adet — bu oturumda tespit edildi)
+- ~~`#[allow(dead_code)]` (7 adet)~~ → tümü temizlenmiş
+- ~~TypeScript strict ayarları~~ → `noUnusedLocals: true`, `noUnusedParameters: true` ekli
+- ~~Hardcoded DB credentials (run-migrations.js)~~ → script silinmiş
+- ~~truncate duplicate (main.rs)~~ → sadece delivery/http.rs'de kalmış
+
+### ❌ HALA DÜZELTİLMEMİŞ (5 adet)
+1. **OpenAPI spec boş** — `docs/openapi.yaml` sadece 1 satır
+2. **`.env.production.example` eksik** — `EMAIL_BASE_URL`, `FCM_SERVER_KEY` yok + email "Resend" diyor (Gmail API'ye geçildi)
+3. **console.log kalıntıları** — `dashboard/src/app/[locale]/docs/sdks/page.tsx` + `docs/page.tsx`
+4. **TODO kalıntıları** — `api/src/config.rs` (1), dashboard mesaj dosyaları (2)
+5. **Vercel deploy hook URL** — farklı project ID (`prj_NQgFly8h...`) kullanıyor
+
+### ⚠️ DOĞRULANMADI (test edilmeli)
+- Neon DB bağlantı testi
+- Grafana OTEL doğrulama
+- GCP Service Account doğrulama
 
 ### Servet'in görevleri:
 - **iyzico hesap** — vergi levhası + banka hesabı
@@ -112,8 +131,7 @@ cd dashboard && npm install && npm run build
 
 ### Teknik Borç
 - sqlx 0.7.4 → 0.8 upgrade (security audit vulnerabilities)
-- 107 eski domain referansı
-- console.log kalıntıları
+- Dependency temizliği — cargo-udeps ile kontrol (API: 37, Worker: 22)
 
 ---
 
