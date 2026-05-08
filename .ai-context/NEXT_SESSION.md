@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-08 23:25 GMT+8
+> Son güncelleme: 2026-05-08 23:40 GMT+8
 
 ---
 
@@ -17,36 +17,57 @@
 
 ## 🤖 AI AGENT KATMANI — DURUM
 
-### Tamamlanan (Oturum 14 — 2026-05-08 23:25)
+### Tamamlanan (Oturum 14 — 2026-05-08 23:25-23:40)
 - ✅ Katman 1: DB Migration (030_ai_agents.sql)
-  - agents, agent_events, agent_routes, agent_rate_limits tablolari
+  - agents, agent_events, agent_routes, agent_rate_limits, agent_audit_log tablolari
 - ✅ Katman 2: API Routes
   - Agent CRUD: create, list, get, update, delete
   - Event API: emit, list events
   - Routing: create, list, delete routes
   - Rate limit: get, update per agent
-  - Auth: X-Agent-Key header + Argon2id
-- ✅ Dashboard sayfalari
+  - Audit log: list logs (GET /agents/audit)
+  - Anomaly detection: trafik spike, hata orani, sessizlik (GET /agents/{id}/anomaly)
+  - Auth: X-Agent-Key header + Argon2id hash
+- ✅ Katman 3: Dashboard
   - Agent listesi (/dashboard/agents)
-  - Agent detay (/dashboard/agents/[id])
-  - Sidebar'da AI Agents linki
+  - Agent detay (/dashboard/agents/[id]) — 3 sekme: events, routes, emit
+  - Agent monitoring (/dashboard/agents/monitoring) — stats, timeline, routing
+  - Sidebar'da AI Agents + Agent Monitoring linkleri
+- ✅ Katman 4: Guvenlik
+  - Audit log sistemi (agent_audit_log tablosu + API)
+  - Anomaly detection (trafik spike, hata orani, sessizlik)
+  - Rate limit durum kontrolu
 - ✅ 18/18 test gecti, Clippy temiz
-- ✅ GitHub'a push edildi: `ai-agent-layer` branch
+- ✅ GitHub'a push edildi: `ai-agent-layer` branch (2 commit)
 
 ### Sıradaki (Bir sonraki oturum)
-- ⏳ Katman 3: Dashboard gelistirme
-  - Agent monitoring sayfasi
-  - Routing gorsel editor
-  - Event timeline
-- ⏳ Katman 4: Guvenlik + Monitoring
-  - Agent davranis profili
-  - Anomaly detection
-  - Audit log
 - ⏳ Deploy: Cloud Run'a deploy
+- ⏳ Dashboard gelistirmeleri:
+  - Routing gorsel editor (surukle-birak)
+  - Event timeline animasyonlari
+  - Real-time event stream (WebSocket)
+- ⏳ SDK'lar: Agent SDK (Node.js, Python)
+- ⏳ Test: End-to-end test senaryolari
+- ⏳ main branch'e merge (Servet onayi ile)
 
 ### Branch
 ```
 git checkout ai-agent-layer
+```
+
+### Oluşturulan Dosyalar
+```
+migrations/030_ai_agents.sql          — DB tablolari
+api/src/agents/mod.rs                 — Modül yapisi
+api/src/agents/models.rs              — Veri modelleri
+api/src/agents/routes.rs              — API endpoint'leri
+api/src/agents/auth.rs                — Agent kimlik dogrulama
+api/src/agents/security.rs            — Audit log + anomaly detection
+dashboard/.../agents/page.tsx         — Agent listesi
+dashboard/.../agents/[id]/page.tsx    — Agent detay (3 sekme)
+dashboard/.../agents/monitoring/page.tsx — Monitoring sayfasi
+dashboard/.../layout.tsx              — Sidebar (2 link eklendi)
+dashboard/src/lib/api.ts              — API istemcisi
 ```
 
 ---

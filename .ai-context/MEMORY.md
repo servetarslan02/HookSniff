@@ -102,12 +102,24 @@ Lab repo'da geliştirilecek → test → onay → ana repo'ya merge.
 | 3 | Müşteri İstatistikleri + Uptime + Export + IP Whitelist | 2-3 hafta |
 | 4 | Webhook Zinciri (otomasyon) | 3+ hafta |
 
-## 🤖 AI AGENT KATMANI (2026-05-08 — Hafıza Kaydı)
+## 🤖 AI AGENT KATMANI (2026-05-08 — 4 Katman Tamamlandı)
 
-Detay: `.ai-context/MARKET_RESEARCH.md` (son bölüm)
-⚠️ Servet onayı BEKLENİYOR. En son iş bu olacak.
-4 hafta, $0 maliyet, kural tabanlı (AI API yok).
-Lab repo'da geliştirilecek.
+Detay: 
+Branch: `ai-agent-layer`
+
+**4 katman tamamlandı:**
+1. ✅ DB Migration — 5 tablo (agents, events, routes, rate_limits, audit_log)
+2. ✅ API Routes — CRUD, Event emit/subscribe, Routing, Rate limit, Audit, Anomaly
+3. ✅ Dashboard — Agent listesi, detay (3 sekme), monitoring sayfasi
+4. ✅ Guvenlik — Audit log, anomaly detection, rate limit kontrolu
+
+**18/18 test gecti, Clippy temiz.**
+
+**Sıradaki:**
+- Deploy: Cloud Run
+- Dashboard: Gorsel editor, real-time stream
+- SDK: Agent SDK (Node.js, Python)
+- main branch'e merge (Servet onayi ile)
 
 ## 📱 MOBİL UYGULAMA (2026-05-08 — Servet Onayı İle Netleştirildi)
 
