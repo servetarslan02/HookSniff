@@ -6,38 +6,22 @@
 
 ---
 
-## 🔴 KRİTİK GÜVENLİK SORUNLARI
+## 🟡 YÜKSEK ÖNCELİK
 
-### 1. GCP Service Account Private Key GitHub'da Açıkta
-**Dosya:** `.ai-context/gcp-service-account.json`
-**Sorun:** GCP service account private key plaintext olarak GitHub'a commit edilmiş. Bu key ile birisi GCP projene tam erişim sağlayabilir.
-**Çözüm:** Bu dosyayı DERHAL GitHub'dan sil + key'i GCP console'dan yenile. `.gitignore`'a `gcp-service-account.json` ekle.
-
-### 2. GitHub Token GitHub'da Açıkta
-**Dosyalar:**
-- `.ai-context/NEXT_SESSION.md` (3 yerde)
-- `.ai-context/EXTERNAL_TOKENS.md` (1 yerde)
-**Sorun:** `ghp_` token plaintext olarak commit edilmiş. Bu token ile birisi repo'nu silebilir, değiştirebilir.
-**Çözüm:** DERHAL GitHub'dan yeni PAT oluştur, eskiyi iptal et. Token'ları dosyadan sil.
-
-### 3. OpenAPI Spec Boş
+### 1. OpenAPI Spec Boş
 **Dosya:** `docs/openapi.yaml` — sadece 1 satır: `openapi: "3.0.0"`
 **Sorun:** API spec yok. SDK otomatik üretimi yapılamaz. Dokümantasyon eksik.
 **Çözüm:** Tüm endpoint'ler için OpenAPI spec yazılmalı.
 
----
-
-## 🟡 YÜKSEK ÖNCELİK
-
-### 4. Dependabot Kurulmamış
+### 2. Dependabot Kurulmamış
 **Sorun:** `.github/dependabot.yml` dosyası yok. Dependency güvenlik taraması yapılmıyor.
 **Çözüm:** Dependabot config oluşturulmalı (Cargo.toml, package.json, SDK'lar).
 
-### 5. Migration Numara Boşluğu (013-025)
+### 3. Migration Numara Boşluğu (013-025)
 **Sorun:** `migrations/` klasöründe 012'den 026'ya 13 numara eksik. Bu, silinen migration'lar veya numara karışıklığı olduğunu gösterir.
 **Çözüm:** Bu migration'lar gerçekten silindiyse bir not bırakılmalı. Yoksa geri yüklenmeli.
 
-### 6. .env.production.example Eksik
+### 4. .env.production.example Eksik
 **Eksik env vars:**
 - `MAX_PAYLOAD_BYTES` — webhook body boyut limiti
 - `WEBHOOK_FORMAT` — webhook format ayarı
@@ -108,44 +92,35 @@
 | README | 17 adet |
 | OpenAPI spec | ❌ Boş |
 | Dependabot | ❌ Yok |
-| GCP key exposed | ❌ Kritik |
-| GitHub token exposed | ❌ Kritik |
 
 ---
 
 ## Düzeltme Sırası (Öncelik Sırasıyla)
 
-### 🔴 Servet Tarafından Yapılacak (Güvenlik)
 | # | Ne | Öncelik | Süre |
 |---|---|---------|------|
-| 1 | GCP Service Account key yenile + dosyayı GitHub'dan sil | 🔴 KRİTİK | 5 dk |
-| 2 | GitHub Token yenile + .ai-context dosyalarından eski token'ı sil | 🔴 KRİTİK | 5 dk |
-
-### 📋 AI Agent Tarafından Yapılacak
-| # | Ne | Öncelik | Süre |
-|---|---|---------|------|
-| 3 | OpenAPI spec yaz (tüm endpoint'ler) | 🔴 Yüksek | 2-3 saat |
-| 4 | Dependabot kur (.github/dependabot.yml) | 🟡 Orta | 10 dk |
-| 5 | Migration gap açıklaması (013-025 arası 13 eksik) | 🟡 Orta | 5 dk |
-| 6 | .env.production.example güncelle (3 eksik env var + eski domain) | 🟡 Orta | 10 dk |
-| 7 | Dashboard license ekle (package.json) | 🟢 Düşük | 1 dk |
-| 8 | TypeScript strict ayarları (noUnusedLocals, noUnusedParameters) | 🟢 Düşük | 5 dk |
-| 9 | Dead code temizliği (8 allow(dead_code)) | 🟢 Düşük | 30 dk |
-| 10 | 107 domain referansı temizle (is-a.dev → yeni domain) | 🟢 Düşük | 1 saat |
-| 11 | 3 eksik env var ekle (.env.production.example) | 🟢 Düşük | 5 dk |
-| 12 | PHP SDK duplicate satır düzelt | 🟢 Düşük | 2 dk |
-| 13 | AI Center SDK'dan çıkar (Node + Python) | 🟢 Düşük | 15 dk |
-| 14 | Feature parity (AI Center + Handler ekle Go/Java/PHP/Ruby) | 🟢 Düşük | 2-3 saat |
-| 15 | Quick Start fonksiyonu (SDK) | 🟢 Düşük | 30 dk |
-| 16 | Webhook Simulator (SDK) | 🟢 Düşük | 1-2 saat |
-| 17 | npm + PyPI'ye yayınla | 🟢 Düşük | 1 saat |
-| 18 | Changelog + Migration Guide (SDK) | 🟢 Düşük | 30 dk |
-| 19 | TypeScript tipleri aktifleştir (SDK) | 🟢 Düşük | 15 dk |
-| 20 | CI'a cargo clippy + audit ekle | 🟡 Orta | 30 dk |
-| 21 | CI'a npm audit + lint ekle | 🟡 Orta | 15 dk |
-| 22 | console.log temizle (dashboard docs) | 🟢 Düşük | 5 dk |
-| 23 | TODO'ları çöz veya sil (customer_portal.rs) | 🟢 Düşük | Değişken |
-| 24 | cargo-udeps ile dependency temizliği | 🟢 Düşük | 30 dk |
-| 25 | Gson 2.10.1 → 2.11.0 güncelle (Java SDK) | 🟢 Düşük | 5 dk |
-| 26 | Go 1.21 → 1.22 güncelle | 🟢 Düşük | 5 dk |
-| 27 | SDK versiyon senkronizasyonu (0.1.0 ~ 0.4.0 → tek versiyon) | 🟢 Düşük | 10 dk |
+| 1 | OpenAPI spec yaz (tüm endpoint'ler) | 🔴 Yüksek | 2-3 saat |
+| 2 | Dependabot kur (.github/dependabot.yml) | 🟡 Orta | 10 dk |
+| 3 | Migration gap açıklaması (013-025) | 🟡 Orta | 5 dk |
+| 4 | .env.production.example güncelle (3 eksik + eski domain) | 🟡 Orta | 10 dk |
+| 5 | Dashboard license ekle (package.json) | 🟢 Düşük | 1 dk |
+| 6 | TypeScript strict ayarları (noUnusedLocals, noUnusedParameters) | 🟢 Düşük | 5 dk |
+| 7 | Dead code temizliği (8 allow(dead_code)) | 🟢 Düşük | 30 dk |
+| 8 | 107 domain referansı temizle (is-a.dev → yeni domain) | 🟢 Düşük | 1 saat |
+| 9 | 3 eksik env var ekle (.env.production.example) | 🟢 Düşük | 5 dk |
+| 10 | PHP SDK duplicate satır düzelt | 🟢 Düşük | 2 dk |
+| 11 | AI Center SDK'dan çıkar (Node + Python) | 🟢 Düşük | 15 dk |
+| 12 | Feature parity (AI Center + Handler ekle Go/Java/PHP/Ruby) | 🟢 Düşük | 2-3 saat |
+| 13 | Quick Start fonksiyonu (SDK) | 🟢 Düşük | 30 dk |
+| 14 | Webhook Simulator (SDK) | 🟢 Düşük | 1-2 saat |
+| 15 | npm + PyPI'ye yayınla | 🟢 Düşük | 1 saat |
+| 16 | Changelog + Migration Guide (SDK) | 🟢 Düşük | 30 dk |
+| 17 | TypeScript tipleri aktifleştir (SDK) | 🟢 Düşük | 15 dk |
+| 18 | CI'a cargo clippy + audit ekle | 🟡 Orta | 30 dk |
+| 19 | CI'a npm audit + lint ekle | 🟡 Orta | 15 dk |
+| 20 | console.log temizle (dashboard docs) | 🟢 Düşük | 5 dk |
+| 21 | TODO'ları çöz veya sil (customer_portal.rs) | 🟢 Düşük | Değişken |
+| 22 | cargo-udeps ile dependency temizliği | 🟢 Düşük | 30 dk |
+| 23 | Gson 2.10.1 → 2.11.0 güncelle (Java SDK) | 🟢 Düşük | 5 dk |
+| 24 | Go 1.21 → 1.22 güncelle | 🟢 Düşük | 5 dk |
+| 25 | SDK versiyon senkronizasyonu (0.1.0 ~ 0.4.0 → tek versiyon) | 🟢 Düşük | 10 dk |
