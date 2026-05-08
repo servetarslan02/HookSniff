@@ -1,5 +1,6 @@
 # HookSniff — Kapsamlı Denetim Raporu
 
+> Son güncelleme: 2026-05-08 22:08 GMT+8
 > Tarih: 2026-05-08 07:18 GMT+8
 > Hazırlayan: Mamo (AI)
 
@@ -7,31 +8,25 @@
 
 ## 🔴 KRİTİK SORUNLAR (Hemen düzeltilmeli)
 
-### 1. Render API Build Başarısız ❌
-- **Durum:** `build_failed` — son deploy çalışmadı
-- **Sebebi:** Rust compilation hatası (muhtemelen yeni eklenen kodlar)
-- **Worker:** ✅ Çalışıyor (`live`)
-- **API:** ❌ Başarısız
-- **Çözüm:** Render dashboard'dan build loglarını kontrol et, hataları düzelt
+### 1. ~~Render API Build Başarısız ❌~~ ✅ Düzeltildi (GCP Cloud Run'a taşındı)
+- **Durum:** ✅ Düzeltildi — API artık GCP Cloud Run'da çalışıyor
+- **Önceki sorun:** `build_failed` — Render'da son deploy çalışmadı
+- **Çözüm:** GCP Cloud Run'a migrate edildi
 
-### 2. Vercel Dashboard Deploy Başarısız ❌
-- **Durum:** Son 2 deploy `ERROR` durumunda
-- **Sebebi:** Next.js build hatası (muhtemelen yeni sayfalar)
-- **Çözüm:** Vercel dashboard'dan build loglarını kontrol et
+### 2. ~~Vercel Dashboard Deploy Başarısız ❌~~ ✅ Düzeltildi
+- **Durum:** ✅ Düzeltildi — Dashboard deploy ediliyor
+- **Önceki sorun:** Son 2 deploy `ERROR` durumundaydı
+- **Çözüm:** Build hataları düzeltildi
 
-### 3. Polar.sh Token Süresi Dolmuş ❌
-- **Durum:** `invalid_token` — expired
-- **Etki:** Ödeme sistemi çalışmıyor
-- **Çözüm:** Polar.sh dashboard'dan yeni token al
+### 3. ~~Polar.sh Token Süresi Dolmuş ❌~~ ✅ Düzeltildi
+- **Durum:** ✅ Yenilendi — Token geçerli
+- **Önceki sorun:** `invalid_token` — expired
+- **Çözüm:** Yeni token alındı ve güncellendi
 
-### 4. Resend Domain Doğrulanmamış ⚠️
-- **Durum:** `not_started` — DNS kayıtları eklenmemiş
-- **Etki:** Email gönderimi çalışmıyor
-- **Kayıtlar:**
-  - TXT: `resend._domainkey.hooksniff` → DKIM key
-  - MX: `send.hooksniff` → feedback-smtp.us-east-1.amazonses.com
-  - TXT: `send.hooksniff` → SPF record
-- **Çözüm:** Cloudflare DNS'e bu kayıtları ekle
+### 4. ~~Resend Domain Doğrulanmamış ⚠️~~ ✅ Düzeltildi (GCloud Gmail API'ya taşındı)
+- **Durum:** ✅ Düzeltildi — Email gönderimi GCloud Gmail API üzerinden yapılıyor
+- **Önceki sorun:** DNS kayıtları eklenmemiş, email gönderimi çalışmıyordu
+- **Çözüm:** Resend yerine GCloud Gmail API'ya geçildi
 
 ---
 
@@ -127,10 +122,10 @@
 ## 📋 YAPILACAKLAR (Öncelik Sırası)
 
 ### Acil (Bugün)
-1. [ ] Render API build hatasını düzelt
-2. [ ] Vercel deploy hatasını düzelt
-3. [ ] Polar.sh token yenile
-4. [ ] Resend DNS kayıtlarını ekle
+1. [x] ~~Render API build hatasını düzelt~~ → ✅ GCP Cloud Run'a taşındı
+2. [x] ~~Vercel deploy hatasını düzelt~~ → ✅ Düzeltildi
+3. [x] ~~Polar.sh token yenile~~ → ✅ Yenilendi
+4. [x] ~~Resend DNS kayıtlarını ekle~~ → ✅ GCloud Gmail API'ya taşındı
 
 ### Bu Hafta
 5. [ ] Neon DB bağlantısını test et
