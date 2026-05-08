@@ -90,9 +90,14 @@ Bu oturumda çözülenler:
 - Toplam 12 düzeltme, hepsi kesin kök neden analiziyle çözüldü.
 
 ### Bir Sonraki Oturumda Yapılabilecekler
-1. CI workflow'unu kontrol et — bu commit'ler CI'ı yeşil yapmalı
-2. Production deploy test
-3. Servet'in dış servis görevleri (Polar.sh, Resend, iyzico)
+1. **Mobil uygulama geliştirmeye başla** — plan: `.ai-context/MOBILE_MASTER_PLAN.md`
+   - Expo projesi kur
+   - Auth ekranları (giriş, kayıt, şifre sıfırlama)
+   - Dashboard + grafikler
+   - Event + Endpoint yönetimi
+2. CI workflow'unu kontrol et — bu commit'ler CI'ı yeşil yapmalı
+3. Production deploy test
+4. Servet'in dış servis görevleri (Polar.sh, Resend, iyzico)
 
 ### Kapsamlı Denetim Bulguları (Oturum 9 — tam liste: FULL_SYSTEM_AUDIT.md)
 **AI agent yapacak (25 madde):**
