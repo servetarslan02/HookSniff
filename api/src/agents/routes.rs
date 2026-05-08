@@ -121,7 +121,7 @@ async fn create_agent(
         super::validation::validate_description(desc)?;
     }
 
-    // Ayni isimde agent var mi kontrol et
+    // Ayni isimde agent var mi kontrol et (race condition: UNIQUE constraint de korur)
     let existing: Option<Agent> = sqlx::query_as(
         "SELECT * FROM agents WHERE customer_id = $1 AND name = $2",
     )
@@ -164,7 +164,17 @@ async fn create_agent(
     .bind(req.metadata.unwrap_or(serde_json::json!({})))
     .fetch_one(&pool)
     .await
-    .map_err(|e| AppError::Database(e))?;
+    .map_err(|e| {
+        // UNIQUE constraint violation — race condition durumunda
+        if let sqlx::Error::Database(ref db_err) = e {
+            if db_err.constraint() == Some("agents_name_customer_unique") {
+                return AppError::BadRequest(
+                    "Bu isimde bir agent zaten mevcut".to_string(),
+                );
+            }
+        }
+        AppError::Database(e)
+    })?;
 
     // Varsayilan rate limit olustur
     sqlx::query("INSERT INTO agent_rate_limits (agent_id) VALUES ($1)")
@@ -468,7 +478,7 @@ async fn emit_event(
         }
 
         // Hedef agent'a event kaydet (receive)
-        let _ = sqlx::query(
+        let result = sqlx::query(
             r#"INSERT INTO agent_events (agent_id, customer_id, event_type, payload, direction, target_agent_id)
                VALUES ($1, $2, $3, $4, 'receive', $5)"#,
         )
@@ -480,7 +490,14 @@ async fn emit_event(
         .execute(&pool)
         .await;
 
-        delivered_to.push(route.target_agent_id);
+        if let Err(e) = result {
+            tracing::error!(
+                "Route delivery hatasi (route {}, target {}): {:?}",
+                route.id, route.target_agent_id, e
+            );
+        } else {
+            delivered_to.push(route.target_agent_id);
+        }
     }
 
     // Eger direkt target varsa onu da ekle
@@ -502,7 +519,7 @@ async fn emit_event(
                 ));
             }
 
-            let _ = sqlx::query(
+            let result = sqlx::query(
                 r#"INSERT INTO agent_events (agent_id, customer_id, event_type, payload, direction, target_agent_id)
                    VALUES ($1, $2, $3, $4, 'receive', $5)"#,
             )
@@ -513,7 +530,15 @@ async fn emit_event(
             .bind(agent_id)
             .execute(&pool)
             .await;
-            delivered_to.push(target);
+
+            if let Err(e) = result {
+                tracing::error!(
+                    "Direct delivery hatasi (target {}): {:?}",
+                    target, e
+                );
+            } else {
+                delivered_to.push(target);
+            }
         }
     }
 
@@ -582,6 +607,26 @@ async fn list_agent_events(
         super::validation::validate_event_type(event_type)?;
     }
 
+    // Tarih parametrelerini once parse et (unwrap yok)
+    let parsed_since: Option<chrono::DateTime<chrono::Utc>> = if let Some(ref since) = filter.since {
+        Some(
+            chrono::DateTime::parse_from_rfc3339(since)
+                .map_err(|_| AppError::BadRequest("Since parametresi gecersiz ISO 8601 formati".to_string()))?
+                .with_timezone(&chrono::Utc),
+        )
+    } else {
+        None
+    };
+    let parsed_until: Option<chrono::DateTime<chrono::Utc>> = if let Some(ref until) = filter.until {
+        Some(
+            chrono::DateTime::parse_from_rfc3339(until)
+                .map_err(|_| AppError::BadRequest("Until parametresi gecersiz ISO 8601 formati".to_string()))?
+                .with_timezone(&chrono::Utc),
+        )
+    } else {
+        None
+    };
+
     // Dinamik SQL olustur
     let mut where_clauses = vec!["agent_id = $1".to_string(), "customer_id = $2".to_string()];
     let mut param_idx = 3u32;
@@ -598,18 +643,18 @@ async fn list_agent_events(
         where_clauses.push(format!("status = ${}", param_idx));
         param_idx += 1;
     }
-    if filter.since.is_some() {
+    if parsed_since.is_some() {
         where_clauses.push(format!("created_at >= ${}", param_idx));
         param_idx += 1;
     }
-    if filter.until.is_some() {
+    if parsed_until.is_some() {
         where_clauses.push(format!("created_at <= ${}", param_idx));
         param_idx += 1;
     }
 
     let where_sql = where_clauses.join(" AND ");
 
-    // Toplam sayi (filtreli)
+    // Toplam sayi (filtreli) — parametre sirasi: agent_id, customer_id, [event_type, direction, status, since, until]
     let count_sql = format!("SELECT COUNT(*) FROM agent_events WHERE {}", where_sql);
     let mut count_query = sqlx::query_scalar::<_, i64>(&count_sql)
         .bind(agent_id)
@@ -623,22 +668,16 @@ async fn list_agent_events(
     if let Some(ref st) = filter.status {
         count_query = count_query.bind(st);
     }
-    if let Some(ref since) = filter.since {
-        let dt = chrono::DateTime::parse_from_rfc3339(since)
-            .map_err(|_| AppError::BadRequest("Since parametresi gecersiz ISO 8601 formati".to_string()))?
-            .with_timezone(&chrono::Utc);
-        count_query = count_query.bind(dt);
+    if let Some(since) = parsed_since {
+        count_query = count_query.bind(since);
     }
-    if let Some(ref until) = filter.until {
-        let dt = chrono::DateTime::parse_from_rfc3339(until)
-            .map_err(|_| AppError::BadRequest("Until parametresi gecersiz ISO 8601 formati".to_string()))?
-            .with_timezone(&chrono::Utc);
-        count_query = count_query.bind(dt);
+    if let Some(until) = parsed_until {
+        count_query = count_query.bind(until);
     }
 
     let total = count_query.fetch_one(&pool).await.map_err(|e| AppError::Database(e))?;
 
-    // Event'leri getir
+    // Event'leri getir — ayni parametre sirasi
     let data_sql = format!(
         "SELECT * FROM agent_events WHERE {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
         where_sql,
@@ -657,17 +696,11 @@ async fn list_agent_events(
     if let Some(ref st) = filter.status {
         data_query = data_query.bind(st);
     }
-    if let Some(ref since) = filter.since {
-        let dt = chrono::DateTime::parse_from_rfc3339(since)
-            .unwrap()
-            .with_timezone(&chrono::Utc);
-        data_query = data_query.bind(dt);
+    if let Some(since) = parsed_since {
+        data_query = data_query.bind(since);
     }
-    if let Some(ref until) = filter.until {
-        let dt = chrono::DateTime::parse_from_rfc3339(until)
-            .unwrap()
-            .with_timezone(&chrono::Utc);
-        data_query = data_query.bind(dt);
+    if let Some(until) = parsed_until {
+        data_query = data_query.bind(until);
     }
     data_query = data_query.bind(per_page).bind(offset);
 

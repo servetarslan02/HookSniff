@@ -477,8 +477,12 @@ export const agentsApi = {
   getEventStats: (token: string, agentId: string) =>
     apiFetch<{ stats: any }>(`/agents/${agentId}/stats`, { token }),
 
-  getAuditLog: (token: string, agentId?: string, page = 1) =>
-    apiFetch<{ logs: any[]; pagination: any }>(`/agents/audit${agentId ? `?agent_id=${agentId}` : ''}&page=${page}`, { token }),
+  getAuditLog: (token: string, agentId?: string, page = 1) => {
+    const params = new URLSearchParams();
+    if (agentId) params.set('agent_id', agentId);
+    params.set('page', String(page));
+    return apiFetch<{ logs: any[]; pagination: any }>(`/agents/audit?${params.toString()}`, { token });
+  },
 };
 
 // Agent Monitoring API
@@ -486,6 +490,10 @@ export const agentMonitoringApi = {
   getAgentStats: (token: string) =>
     apiFetch<{ stats: any }>('/agents/stats', { token }),
 
-  getAuditLog: (token: string, agentId?: string, page = 1) =>
-    apiFetch<{ logs: any[] }>(`/agents/audit${agentId ? `?agent_id=${agentId}` : ''}&page=${page}`, { token }),
+  getAuditLog: (token: string, agentId?: string, page = 1) => {
+    const params = new URLSearchParams();
+    if (agentId) params.set('agent_id', agentId);
+    params.set('page', String(page));
+    return apiFetch<{ logs: any[] }>(`/agents/audit?${params.toString()}`, { token });
+  },
 };

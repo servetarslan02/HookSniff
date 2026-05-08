@@ -57,9 +57,7 @@ export default function AgentDetailPage() {
         agentsApi.listEvents(token, id as string, eventPage),
         agentsApi.listRoutes(token),
         agentsApi.list(token),
-        fetch(`/api/agents/${id}/stats`, { headers: { Authorization: `Bearer ${token}` } })
-          .then(r => r.ok ? r.json() : null)
-          .catch(() => null),
+        agentsApi.getEventStats(token, id as string).catch(() => null),
         agentsApi.getRateLimit(token, id as string).catch(() => null),
       ]);
       setAgent(agentRes.agent);

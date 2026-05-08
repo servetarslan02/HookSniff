@@ -300,13 +300,18 @@ class HookSniffAgent:
         self,
         event_type: Optional[str] = None,
         direction: Optional[str] = None,
+        jwt_token: Optional[str] = None,
     ):
         """
         SSE ile real-time bağlan (blocking).
 
+        NOT: SSE endpoint JWT auth gerektirir. Agent key ile SSE çalışmaz.
+        Agent'lar için connect() (WebSocket) kullanın.
+
         Args:
             event_type: Event tipi filtresi
             direction: "emit" veya "receive" filtresi
+            jwt_token: JWT token (dashboard token). None ise agent_key kullanılır (çalışmaz).
         """
         self._resolve_agent_id()
         params = {}
@@ -320,8 +325,9 @@ class HookSniffAgent:
         if qs:
             url += f"?{qs}"
 
+        auth_token = jwt_token or self.agent_key
         headers = {
-            "Authorization": f"Bearer {self.agent_key}",
+            "Authorization": f"Bearer {auth_token}",
             "Accept": "text/event-stream",
         }
 
@@ -360,11 +366,12 @@ class HookSniffAgent:
         self,
         event_type: Optional[str] = None,
         direction: Optional[str] = None,
+        jwt_token: Optional[str] = None,
     ):
         """SSE ile real-time bağlan (non-blocking)."""
         self._sse_thread = threading.Thread(
             target=self.connect_sse,
-            args=(event_type, direction),
+            args=(event_type, direction, jwt_token),
             daemon=True,
         )
         self._sse_thread.start()

@@ -275,8 +275,11 @@ export class HookSniffAgent {
 
   /**
    * Fetch tabanlı SSE bağlan (token destekli)
+   *
+   * NOT: SSE endpoint JWT auth gerektirir (dashboard token).
+   * Agent key ile SSE çalışmaz. Agent'lar için WebSocket kullanın.
    */
-  async connectSSEWithToken(filter?: { event_type?: string; direction?: string }): Promise<void> {
+  async connectSSEWithToken(jwtToken: string, filter?: { event_type?: string; direction?: string }): Promise<void> {
     await this.resolveAgentId();
 
     const params = new URLSearchParams();
@@ -289,7 +292,7 @@ export class HookSniffAgent {
     try {
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${this.agentKey}`,
+          'Authorization': `Bearer ${jwtToken}`,
           'Accept': 'text/event-stream',
         },
       });
