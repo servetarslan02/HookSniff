@@ -16,13 +16,13 @@ pub struct GCloudEmailClient {
 
 #[derive(Clone, Debug, Deserialize)]
 struct ServiceAccountKey {
-    r#type: String,
-    project_id: String,
-    private_key_id: String,
+    _type: String,
+    _project_id: String,
+    _private_key_id: String,
     private_key: String,
     client_email: String,
-    client_id: String,
-    auth_uri: String,
+    _client_id: String,
+    _auth_uri: String,
     token_uri: String,
 }
 
@@ -46,10 +46,6 @@ struct TokenResponse {
     expires_in: u64,
 }
 
-#[derive(serde::Serialize)]
-struct GmailMessage {
-    raw: String,
-}
 
 impl GCloudEmailClient {
     /// Create a new GCloudEmailClient from config.
