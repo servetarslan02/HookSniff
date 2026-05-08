@@ -47,7 +47,7 @@ export default function SearchPage() {
       params.set('per_page', '20');
 
       const res = await fetch(`${API}/search?${params}`, {
-        headers: { Authorization: `Bearer ${token || ''}` },
+        headers: { credentials: 'include' as const },
       });
       if (res.ok) setResults(await res.json());
     } catch (e) {

@@ -299,13 +299,7 @@ function HistoryPanel({
 }
 
 // ─── Live Request Viewer ───
-function LiveRequestViewer({
-
-  token,
-}: {
-
-  token: string;
-}) {
+function LiveRequestViewer() {
   const t = useTranslations('playground');
   const [liveDeliveries, setLiveDeliveries] = useState<
     Array<{ id: string; event: string; status: string; time: string }>
@@ -319,7 +313,7 @@ function LiveRequestViewer({
     const poll = async () => {
       try {
         const res = await fetch(`${API_BASE}/webhooks?page=1`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {}, credentials: 'include' as const,
         });
         if (res.ok) {
           const data = await res.json();
@@ -337,7 +331,7 @@ function LiveRequestViewer({
     };
     poll();
     intervalRef.current = setInterval(poll, 3000);
-  }, [token]);
+  }, []);
 
   const stopLive = useCallback(() => {
     setIsLive(false);
@@ -408,7 +402,7 @@ function LiveRequestViewer({
 
 // ─── Main Playground Page ───
 export default function PlaygroundPage() {
-  const { token } = useAuth();
+  useAuth();
   const { toast } = useToast();
   const t = useTranslations('playground');
   const [_endpoints, setEndpoints] = useState<Endpoint[]>([]);
@@ -425,14 +419,14 @@ export default function PlaygroundPage() {
   const [_showAiGenerator, setShowAiGenerator] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
-    endpointsApi.list(token).then(setEndpoints).catch(() => {});
+    
+    endpointsApi.list("").then(setEndpoints).catch(() => {});
     setHistory(loadHistory());
-  }, [token]);
+  }, []);
 
   const headers = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${token || 'YOUR_TOKEN'}`,
+    Authorization: 'Bearer YOUR_TOKEN',
   };
 
   const curlCommand = `curl -X ${method} ${API_BASE}${path} \\
@@ -681,7 +675,7 @@ ${Object.entries(headers)
           </div>
 
           {/* Live Request Viewer */}
-          <LiveRequestViewer token={token || ''} />
+          <LiveRequestViewer />
         </div>
 
         {/* Response + History */}
