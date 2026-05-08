@@ -5,6 +5,7 @@ use axum::{
     routing::{delete, get, post, put},
     Json, Router,
 };
+use crate::error::AppError;
 use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -42,7 +43,7 @@ async fn list_agents(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Query(pagination): Query<Pagination>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let page = pagination.page.unwrap_or(1).max(1);
     let per_page = pagination.per_page.unwrap_or(20).min(100);
     let offset = (page - 1) * per_page;
@@ -55,7 +56,7 @@ async fn list_agents(
     .bind(offset)
     .fetch_all(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     let responses: Vec<AgentResponse> = agents.into_iter().map(AgentResponse::from).collect();
     Ok(Json(serde_json::json!({ "agents": responses })))
@@ -65,7 +66,13 @@ async fn create_agent(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Json(req): Json<CreateAgentRequest>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
+    // Input validation
+    super::validation::validate_agent_name(&req.name)?;
+    if let Some(ref desc) = req.description {
+        super::validation::validate_description(desc)?;
+    }
+
     let agent_key = generate_agent_key();
 
     // Argon2id hash
@@ -77,7 +84,7 @@ async fn create_agent(
         argon2
             .hash_password(agent_key.as_bytes(), &salt)
             .map(|h| h.to_string())
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+            .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?
     };
 
     let agent = sqlx::query_as::<_, Agent>(
@@ -93,7 +100,7 @@ async fn create_agent(
     .bind(req.metadata.unwrap_or(serde_json::json!({})))
     .fetch_one(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     // Varsayilan rate limit olustur
     let _ = sqlx::query(
@@ -123,7 +130,7 @@ async fn get_agent(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(agent_id): Path<Uuid>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let agent = sqlx::query_as::<_, Agent>(
         "SELECT * FROM agents WHERE id = $1 AND customer_id = $2"
     )
@@ -131,11 +138,11 @@ async fn get_agent(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     match agent {
         Some(a) => Ok(Json(serde_json::json!({ "agent": AgentResponse::from(a) }))),
-        None => Err(StatusCode::NOT_FOUND),
+        None => Err(AppError::NotFound),
     }
 }
 
@@ -144,7 +151,7 @@ async fn update_agent(
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(agent_id): Path<Uuid>,
     Json(req): Json<UpdateAgentRequest>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let agent = sqlx::query_as::<_, Agent>(
         r#"UPDATE agents SET
             name = COALESCE($3, name),
@@ -163,11 +170,11 @@ async fn update_agent(
     .bind(req.metadata)
     .fetch_optional(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     match agent {
         Some(a) => Ok(Json(serde_json::json!({ "agent": AgentResponse::from(a) }))),
-        None => Err(StatusCode::NOT_FOUND),
+        None => Err(AppError::NotFound),
     }
 }
 
@@ -175,7 +182,7 @@ async fn delete_agent(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(agent_id): Path<Uuid>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let result = sqlx::query(
         "DELETE FROM agents WHERE id = $1 AND customer_id = $2"
     )
@@ -183,10 +190,10 @@ async fn delete_agent(
     .bind(customer.id)
     .execute(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     if result.rows_affected() == 0 {
-        return Err(StatusCode::NOT_FOUND);
+        return Err(AppError::NotFound);
     }
 
     // Audit log
@@ -209,7 +216,11 @@ async fn emit_event(
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(agent_id): Path<Uuid>,
     Json(req): Json<EmitEventRequest>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
+    // Input validation
+    super::validation::validate_event_type(&req.event_type)?;
+    super::validation::validate_payload(&req.payload)?;
+
     // Agent dogrula
     let agent = sqlx::query_as::<_, Agent>(
         "SELECT * FROM agents WHERE id = $1 AND customer_id = $2 AND status = 'active'"
@@ -218,11 +229,11 @@ async fn emit_event(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     let _agent = match agent {
         Some(a) => a,
-        None => return Err(StatusCode::NOT_FOUND),
+        None => return Err(AppError::NotFound),
     };
 
     // Rate limit kontrolu
@@ -232,7 +243,7 @@ async fn emit_event(
     .bind(agent_id)
     .fetch_optional(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     if let Some(rl) = rate_limit {
         let count: (i64,) = sqlx::query_as(
@@ -241,10 +252,10 @@ async fn emit_event(
         .bind(agent_id)
         .fetch_one(&pool)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
         if count.0 >= rl.max_events_per_minute as i64 {
-            return Err(StatusCode::TOO_MANY_REQUESTS);
+            return Err(AppError::RateLimitExceeded);
         }
     }
 
@@ -261,7 +272,7 @@ async fn emit_event(
     .bind(req.target_agent_id)
     .fetch_one(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     // Routing kurallarini uygula
     let routes = sqlx::query_as::<_, AgentRoute>(
@@ -342,7 +353,7 @@ async fn list_agent_events(
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(agent_id): Path<Uuid>,
     Query(pagination): Query<Pagination>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let page = pagination.page.unwrap_or(1).max(1);
     let per_page = pagination.per_page.unwrap_or(50).min(200);
     let offset = (page - 1) * per_page;
@@ -356,7 +367,7 @@ async fn list_agent_events(
     .bind(offset)
     .fetch_all(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     Ok(Json(serde_json::json!({ "events": events })))
 }
@@ -366,14 +377,14 @@ async fn list_agent_events(
 async fn list_routes(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let routes = sqlx::query_as::<_, AgentRoute>(
         "SELECT * FROM agent_routes WHERE customer_id = $1 ORDER BY created_at DESC"
     )
     .bind(customer.id)
     .fetch_all(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     Ok(Json(serde_json::json!({ "routes": routes })))
 }
@@ -382,7 +393,10 @@ async fn create_route(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Json(req): Json<CreateRouteRequest>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
+    // Input validation
+    super::validation::validate_event_type(&req.event_type)?;
+
     let route = sqlx::query_as::<_, AgentRoute>(
         r#"INSERT INTO agent_routes (customer_id, event_type, source_agent_id, target_agent_id, filter_expression)
            VALUES ($1, $2, $3, $4, $5)
@@ -395,7 +409,7 @@ async fn create_route(
     .bind(req.filter_expression)
     .fetch_one(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     Ok((StatusCode::CREATED, Json(serde_json::json!({ "route": route }))))
 }
@@ -404,7 +418,7 @@ async fn delete_route(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(route_id): Path<Uuid>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let result = sqlx::query(
         "DELETE FROM agent_routes WHERE id = $1 AND customer_id = $2"
     )
@@ -412,10 +426,10 @@ async fn delete_route(
     .bind(customer.id)
     .execute(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     if result.rows_affected() == 0 {
-        return Err(StatusCode::NOT_FOUND);
+        return Err(AppError::NotFound);
     }
     Ok(Json(serde_json::json!({ "message": "Route deleted" })))
 }
@@ -425,18 +439,18 @@ async fn delete_route(
 async fn get_rate_limit(
     Extension(pool): Extension<PgPool>,
     Path(agent_id): Path<Uuid>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let rl = sqlx::query_as::<_, AgentRateLimit>(
         "SELECT * FROM agent_rate_limits WHERE agent_id = $1"
     )
     .bind(agent_id)
     .fetch_optional(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     match rl {
         Some(r) => Ok(Json(serde_json::json!({ "rate_limit": r }))),
-        None => Err(StatusCode::NOT_FOUND),
+        None => Err(AppError::NotFound),
     }
 }
 
@@ -444,7 +458,7 @@ async fn update_rate_limit(
     Extension(pool): Extension<PgPool>,
     Path(agent_id): Path<Uuid>,
     Json(req): Json<UpdateRateLimitRequest>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let rl = sqlx::query_as::<_, AgentRateLimit>(
         r#"UPDATE agent_rate_limits SET
             max_events_per_minute = COALESCE($2, max_events_per_minute),
@@ -458,11 +472,11 @@ async fn update_rate_limit(
     .bind(req.max_events_per_hour)
     .fetch_optional(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     match rl {
         Some(r) => Ok(Json(serde_json::json!({ "rate_limit": r }))),
-        None => Err(StatusCode::NOT_FOUND),
+        None => Err(AppError::NotFound),
     }
 }
 
@@ -472,7 +486,7 @@ async fn get_audit_log(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Query(query): Query<AuditLogQuery>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     let page = query.page.unwrap_or(1).max(1);
     let per_page = query.per_page.unwrap_or(50).min(200);
     let offset = (page - 1) * per_page;
@@ -487,7 +501,7 @@ async fn get_audit_log(
         .bind(offset)
         .fetch_all(&pool)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?
     } else {
         sqlx::query_as::<_, super::security::AuditLog>(
             "SELECT * FROM agent_audit_log WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3"
@@ -497,7 +511,7 @@ async fn get_audit_log(
         .bind(offset)
         .fetch_all(&pool)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?
     };
 
     Ok(Json(serde_json::json!({ "logs": logs })))
@@ -507,7 +521,7 @@ async fn get_anomaly_status(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(agent_id): Path<Uuid>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<impl IntoResponse, AppError> {
     // Agent dogrula
     let _agent = sqlx::query_as::<_, super::models::Agent>(
         "SELECT * FROM agents WHERE id = $1 AND customer_id = $2"
@@ -516,20 +530,20 @@ async fn get_anomaly_status(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     let _ = match _agent {
         Some(a) => a,
-        None => return Err(StatusCode::NOT_FOUND),
+        None => return Err(AppError::NotFound),
     };
 
     let warnings = super::security::check_anomaly(&pool, agent_id)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     let rate_status = super::security::check_rate_limit(&pool, agent_id)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("{}", e)))?;
 
     Ok(Json(serde_json::json!({
         "agent_id": agent_id,
