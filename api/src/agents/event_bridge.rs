@@ -1,33 +1,17 @@
-//! Agent Event → WebSocket Bridge
+//! Agent Event → SSE Bridge
 //!
-//! Agent event'lerini mevcut WebSocket gateway'ye broadcast eder.
-//! Dashboard'da real-time güncelleme sağlar.
+//! Agent event'leri DB'ye yazildiginda, mevcut SSE stream otomatik olarak
+//! yeni event'leri 2 saniye icinde gosterir.
+//!
+//! Ekstra bir broadcast mekanizmasi gereksiz — SSE zaten DB'den okuyor.
 
-use crate::ws::{WsEvent, WsGateway};
 use uuid::Uuid;
 
-/// Agent event'ini WebSocket gateway'ye broadcast et.
-/// Dashboard'daki agent monitoring sayfası real-time güncellenir.
-pub fn broadcast_agent_event(
-    ws: &WsGateway,
+/// Agent event bilgisi (SSE icin hazir format)
+pub fn format_agent_event_for_sse(
     agent_id: Uuid,
     event_type: &str,
-    payload: &serde_json::Value,
     direction: &str,
-) {
-    let ws_event = WsEvent {
-        event_type: format!("agent.{}.{}", direction, event_type),
-        delivery_id: agent_id.to_string(),
-        endpoint_id: agent_id.to_string(),
-        payload: serde_json::json!({
-            "agent_id": agent_id,
-            "event_type": event_type,
-            "direction": direction,
-            "data": payload,
-        }),
-        timestamp: chrono::Utc::now(),
-    };
-
-    // Non-blocking broadcast
-    let _ = ws.event_tx.send(ws_event);
+) -> String {
+    format!("agent.{}.{}", direction, event_type)
 }
