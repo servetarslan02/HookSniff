@@ -28,7 +28,7 @@
 | CDN | Cloudflare | ✅ | Hesap aktif |
 | Email | GCloud Gmail API | ✅ | Service account configured |
 | Monitoring | Grafana Cloud | ⏳ | OTEL headers hazır |
-| Ödeme (Global) | Polar.sh | ❌ | Token expired |
+| Ödeme (Global) | Polar.sh | ✅ | Token yenilendi, Pro plan aktif |
 | Ödeme (TR) | iyzico | ❌ | Hesap açılacak |
 
 ---
@@ -48,9 +48,9 @@
 
 ## Servet'in Yapması Gereken
 
-1. **Polar.sh yeni token** — polar.sh dashboard'dan
-2. ~~Resend yeni domain~~ → GCloud Gmail API'ya taşındı
-3. **GitHub token yenile** — güvenlik riski
+1. **GitHub token yenile** — güvenlik riski
+2. ~~Resend yeni domain~~ → GCloud Gmail API'ya taşındı ✅
+3. ~~Polar.sh token~~ → ✅ Yenilendi
 4. **Domain kararı** — şimdilik hooksniff.vercel.app yeterli
 
 ---

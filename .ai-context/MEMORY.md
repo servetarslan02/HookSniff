@@ -41,7 +41,7 @@
 | Upstash Redis | 64MB | ✅ PONG |
 | R2 Storage | hooksniff-storage | ✅ Bucket var |
 | Cloudflare | Hesap aktif | ✅ |
-| Polar.sh | Token expired | ❌ Yeni token lazım |
+| Polar.sh | ✅ Token aktif (yeni OAT) | ✅ | Pro plan: ec5826ad |
 | ~~Resend~~ | ~~hooksniff.is-a.dev iptal~~ → GCloud Gmail API'ya taşındı | ✅ |
 
 ---
@@ -194,7 +194,6 @@ Eksiklik analizi: `.ai-context/MOBILE_APP_AUDIT.md`
 
 ## ⚠️ SERVET'İN YAPMASI GEREKEN
 
-1. **Polar.sh yeni token** — polar.sh dashboard → Settings → Access Tokens
 2. ~~Resend yeni domain~~ → ✅ GCloud Gmail API'ya taşındı
 3. **GitHub token yenile** — eski token açık paylaşıldı, güvenlik riski
 4. **Domain kararı** — şimdilik `hooksniff.vercel.app` yeterli
