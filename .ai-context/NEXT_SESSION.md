@@ -67,29 +67,21 @@ for r in json.load(sys.stdin).get('workflow_runs',[]):
 
 ---
 
-## ❌ KALAN 3 TEST HATASI (Öncelikli)
+## ❌ KALAN SORUNLAR
 
-### 1. `validate_json_depth` Test
-**Dosya:** `api/src/validation.rs` → `test_validate_json_depth`
-**Sorun:** `check_depth(value, 1)` ile başlıyor ama `MAX_JSON_DEPTH = 10`. 10 seviye JSON = depth 11 = hata.
-**Çözüm:** `check_depth(value, 0)` ile başlat. Şu anki kod:
-```rust
-// Değiştir:
-check_depth(value, 1)
-// Şöyle yap:
-check_depth(value, 0)
-```
+### Integration Test Hataları (5 test)
+Bu testler lib testlerinden ayrı, `api/tests/integration.rs` dosyasında:
 
-### 2. Stripe Signature Testleri (5 test)
-**Dosya:** `api/src/billing/stripe.rs`
-**Testler:** `test_verify_signature_valid`, `test_verify_signature_expired_timestamp`, `test_verify_signature_future_timestamp`, `test_verify_signature_tampered_payload`, `test_verify_signature_wrong_secret`
-**Sorun:** Timestamp tolerance veya test verileri güncel değil.
-**Çözüm:** `stripe.rs` dosyasındaki test fonksiyonlarını incele. Timestamp hesaplamalarını ve tolerance değerlerini düzelt.
+1. `test_api_key_generation` — Argon2 hash sabit değerle karşılaştırma
+2. `test_api_key_hashing` — Aynı sorun
+3. `test_plan_limits` — Plan limit mantığı
+4. `test_usage_calculations` — Usage hesaplama (9500 vs 500 bekleniyor)
+5. `test_usage_limit_exceeded` — Limit aşma kontrolü
 
-### 3. Transform Pipeline Test
-**Dosya:** `api/src/transform/mod.rs` → `test_legacy_pipeline_chaining`
-**Sorun:** `output.get("name").is_none()` assertion失败
-**Çözüm:** Transform filter'ın name field'ını nasıl işlediğini incele.
+**Önceki oturumda çözülen 7 test hatası ✅:**
+- Stripe signature (5): test secret base64 değildi
+- validate_json_depth: başlangıç depth değeri yanlıştı
+- FieldMapper: kaynak anahtar silinmiyordu
 
 ---
 
