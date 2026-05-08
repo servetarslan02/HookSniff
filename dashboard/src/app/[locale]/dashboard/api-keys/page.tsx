@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
@@ -65,8 +67,8 @@ export default function ApiKeysPage() {
       setNewKey(data.key);
       setKeyName('');
       fetchKeys();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setCreating(false);
     }
@@ -81,8 +83,8 @@ export default function ApiKeysPage() {
       });
       if (!res.ok) throw new Error(tc('error'));
       setKeys((prev) => prev.filter((k) => k.id !== id));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setActionLoading(null);
       setDeleteTarget(null);
@@ -100,8 +102,8 @@ export default function ApiKeysPage() {
       const data = await res.json();
       setNewKey(data.key);
       fetchKeys();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setActionLoading(null);
       setRotateTarget(null);

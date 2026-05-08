@@ -33,12 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // On mount: restore user info from localStorage, then verify session with backend
   useEffect(() => {
+    // Restore user info from localStorage (NOT api_key — it's sensitive)
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        const { user: u, apiKey: k } = JSON.parse(stored);
+        const { user: u } = JSON.parse(stored);
         setUser(u);
-        setApiKeyState(k);
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
@@ -59,9 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           is_admin: data.is_admin ?? false,
         };
         setUser(u);
-        setApiKeyState(data.api_key || null);
+        setApiKeyState(null); // Don't persist API key in localStorage
         setToken('cookie'); // Indicates session is active via cookie
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u, apiKey: data.api_key || null }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
       })
       .catch(() => {
         // Not authenticated — clear stale data
@@ -75,9 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const persistAuth = useCallback((u: User, k?: string) => {
     setUser(u);
-    setApiKeyState(k || null);
+    setApiKeyState(k || null); // Keep in memory only for one-time display
     setToken('cookie'); // Token is in HttpOnly cookie
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u, apiKey: k || null }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -129,12 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const setApiKey = useCallback((key: string) => {
     setApiKeyState(key);
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const data = JSON.parse(stored);
-      data.apiKey = key;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
+    // Don't persist API key in localStorage — memory only
   }, []);
 
   return (

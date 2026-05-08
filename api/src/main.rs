@@ -135,8 +135,21 @@ async fn main() -> Result<()> {
                     .allow_headers(Any)
                     .allow_credentials(true)
             } else if origins.is_empty() {
-                // Development with no CORS origins = allow all
-                CorsLayer::permissive()
+                // Development — allow localhost only
+                let dev_origins: Vec<axum::http::HeaderValue> = [
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "http://127.0.0.1:3000",
+                    "http://127.0.0.1:3001",
+                ]
+                .iter()
+                .filter_map(|o| o.parse().ok())
+                .collect();
+                CorsLayer::new()
+                    .allow_origin(AllowOrigin::list(dev_origins))
+                    .allow_methods(Any)
+                    .allow_headers(Any)
+                    .allow_credentials(true)
             } else {
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(origins))

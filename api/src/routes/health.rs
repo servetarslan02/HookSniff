@@ -8,16 +8,22 @@ use std::time::Instant;
 /// OPTIONS /v1/status — CORS preflight for public status endpoint.
 pub async fn status_options() -> (StatusCode, axum::http::HeaderMap, &'static str) {
     let mut headers = axum::http::HeaderMap::new();
-    headers.insert("Access-Control-Allow-Origin", "*".parse().unwrap());
+    headers.insert(
+        "Access-Control-Allow-Origin",
+        "*".parse().expect("valid header value"),
+    );
     headers.insert(
         "Access-Control-Allow-Methods",
-        "GET, OPTIONS".parse().unwrap(),
+        "GET, OPTIONS".parse().expect("valid header value"),
     );
     headers.insert(
         "Access-Control-Allow-Headers",
-        "Content-Type".parse().unwrap(),
+        "Content-Type".parse().expect("valid header value"),
     );
-    headers.insert("Access-Control-Max-Age", "86400".parse().unwrap());
+    headers.insert(
+        "Access-Control-Max-Age",
+        "86400".parse().expect("valid header value"),
+    );
     (StatusCode::NO_CONTENT, headers, "")
 }
 
@@ -54,14 +60,17 @@ pub async fn system_status(
     axum::extract::Extension(pool): axum::extract::Extension<sqlx::PgPool>,
 ) -> (StatusCode, axum::http::HeaderMap, Json<SystemStatus>) {
     let mut headers = axum::http::HeaderMap::new();
-    headers.insert("Access-Control-Allow-Origin", "*".parse().unwrap());
+    headers.insert(
+        "Access-Control-Allow-Origin",
+        "*".parse().expect("valid header value"),
+    );
     headers.insert(
         "Access-Control-Allow-Methods",
-        "GET, OPTIONS".parse().unwrap(),
+        "GET, OPTIONS".parse().expect("valid header value"),
     );
     headers.insert(
         "Access-Control-Allow-Headers",
-        "Content-Type".parse().unwrap(),
+        "Content-Type".parse().expect("valid header value"),
     );
 
     let now = chrono::Utc::now().to_rfc3339();

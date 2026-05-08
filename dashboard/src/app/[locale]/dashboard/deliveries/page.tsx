@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
@@ -37,8 +39,8 @@ export default function DeliveriesPage() {
       });
       setDeliveries(data.deliveries);
       setTotal(data.total);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load deliveries');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err) || 'Failed to load deliveries');
     } finally {
       setLoading(false);
     }
@@ -53,8 +55,8 @@ export default function DeliveriesPage() {
       await webhooksApi.replay(token, replayTarget.id);
       toast(t('replaySuccess'), 'success');
       fetchData();
-    } catch (err: any) {
-      toast(err.message || 'Replay failed', 'error');
+    } catch (err: unknown) {
+      toast(getErrorMessage(err) || 'Replay failed', 'error');
     } finally {
       setReplaying(false);
       setReplayTarget(null);

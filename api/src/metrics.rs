@@ -35,7 +35,7 @@ impl Metrics {
             Opts::new("http_requests_total", "Total number of HTTP requests"),
             &["method", "path", "status"],
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         let http_request_duration_seconds = Histogram::with_opts(
             HistogramOpts::new(
@@ -46,13 +46,13 @@ impl Metrics {
                 0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0,
             ]),
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         let active_connections = Gauge::with_opts(Opts::new(
             "active_connections",
             "Number of active connections",
         ))
-        .unwrap();
+        .expect("valid metric definition");
 
         let webhook_deliveries_total = IntCounterVec::new(
             Opts::new(
@@ -61,7 +61,7 @@ impl Metrics {
             ),
             &["status"],
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         // ── Per-endpoint delivery count ──
         let delivery_count = IntCounterVec::new(
@@ -71,7 +71,7 @@ impl Metrics {
             ),
             &["endpoint_id", "status"],
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         // ── Delivery latency histogram ──
         let delivery_latency_seconds = Histogram::with_opts(
@@ -81,21 +81,21 @@ impl Metrics {
             )
             .buckets(vec![0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0]),
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         // ── Error counter by type ──
         let error_count = IntCounterVec::new(
             Opts::new("error_count", "Error count by type"),
             &["error_type"],
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         // ── Active endpoints gauge ──
         let active_endpoints = Gauge::with_opts(Opts::new(
             "active_endpoints",
             "Number of active webhook endpoints",
         ))
-        .unwrap();
+        .expect("valid metric definition");
 
         let queue_publish_latency_seconds = Histogram::with_opts(
             HistogramOpts::new(
@@ -104,7 +104,7 @@ impl Metrics {
             )
             .buckets(vec![0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0]),
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         let db_query_duration_seconds = Histogram::with_opts(
             HistogramOpts::new(
@@ -113,34 +113,38 @@ impl Metrics {
             )
             .buckets(vec![0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0]),
         )
-        .unwrap();
+        .expect("valid metric definition");
 
         registry
             .register(Box::new(http_requests_total.clone()))
-            .unwrap();
+            .expect("valid metric definition");
         registry
             .register(Box::new(http_request_duration_seconds.clone()))
-            .unwrap();
+            .expect("valid metric definition");
         registry
             .register(Box::new(active_connections.clone()))
-            .unwrap();
+            .expect("valid metric definition");
         registry
             .register(Box::new(webhook_deliveries_total.clone()))
-            .unwrap();
-        registry.register(Box::new(delivery_count.clone())).unwrap();
+            .expect("valid metric definition");
+        registry
+            .register(Box::new(delivery_count.clone()))
+            .expect("valid metric definition");
         registry
             .register(Box::new(delivery_latency_seconds.clone()))
-            .unwrap();
-        registry.register(Box::new(error_count.clone())).unwrap();
+            .expect("valid metric definition");
+        registry
+            .register(Box::new(error_count.clone()))
+            .expect("valid metric definition");
         registry
             .register(Box::new(active_endpoints.clone()))
-            .unwrap();
+            .expect("valid metric definition");
         registry
             .register(Box::new(queue_publish_latency_seconds.clone()))
-            .unwrap();
+            .expect("valid metric definition");
         registry
             .register(Box::new(db_query_duration_seconds.clone()))
-            .unwrap();
+            .expect("valid metric definition");
 
         Self {
             registry,
@@ -161,7 +165,9 @@ impl Metrics {
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();
         let mut buffer = Vec::new();
-        encoder.encode(&metric_families, &mut buffer).unwrap();
+        encoder
+            .encode(&metric_families, &mut buffer)
+            .expect("valid metric definition");
         String::from_utf8(buffer).unwrap()
     }
 }

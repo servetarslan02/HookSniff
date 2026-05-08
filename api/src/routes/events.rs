@@ -23,7 +23,6 @@ struct EventsParams {
     since: Option<String>,
     status: Option<String>,
     endpoint_id: Option<Uuid>,
-    #[allow(dead_code)]
     event: Option<String>,
     page: Option<i64>,
     per_page: Option<i64>,
@@ -58,50 +57,54 @@ async fn list_events(
     let per_page = params.per_page.unwrap_or(50).min(200);
     let offset = (page - 1) * per_page;
 
-    // Simple approach: fetch with optional filters
-    let deliveries = if let Some(ref since) = params.since {
+    // Build query with optional filters
+    let mut conditions = vec!["customer_id = $1".to_string()];
+    let mut bind_idx: i32 = 2;
+
+    if params.since.is_some() {
+        conditions.push(format!("created_at >= ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.status.is_some() {
+        conditions.push(format!("status = ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.endpoint_id.is_some() {
+        conditions.push(format!("endpoint_id = ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.event.is_some() {
+        conditions.push(format!("event_type = ${}", bind_idx));
+        bind_idx += 1;
+    }
+
+    let where_clause = format!("WHERE {}", conditions.join(" AND "));
+    let query = format!(
+        "SELECT * FROM deliveries {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
+        where_clause,
+        bind_idx,
+        bind_idx + 1
+    );
+
+    let mut q = sqlx::query_as::<_, Delivery>(&query).bind(customer.id);
+
+    if let Some(ref since) = params.since {
         let parsed: DateTime<Utc> = since.parse().map_err(|_| {
             AppError::BadRequest("Invalid 'since' timestamp. Use ISO 8601 format.".into())
         })?;
-        sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 AND created_at >= $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4",
-        )
-        .bind(customer.id)
-        .bind(parsed)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?
-    } else if let Some(ref status) = params.status {
-        sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4",
-        )
-        .bind(customer.id)
-        .bind(status)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?
-    } else if let Some(endpoint_id) = params.endpoint_id {
-        sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 AND endpoint_id = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4",
-        )
-        .bind(customer.id)
-        .bind(endpoint_id)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?
-    } else {
-        sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
-        )
-        .bind(customer.id)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?
-    };
+        q = q.bind(parsed);
+    }
+    if let Some(ref status) = params.status {
+        q = q.bind(status);
+    }
+    if let Some(endpoint_id) = params.endpoint_id {
+        q = q.bind(endpoint_id);
+    }
+    if let Some(ref event) = params.event {
+        q = q.bind(event);
+    }
+
+    let deliveries = q.bind(per_page).bind(offset).fetch_all(&pool).await?;
 
     // Get total count
     let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE customer_id = $1")
