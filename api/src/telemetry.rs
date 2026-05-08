@@ -49,12 +49,18 @@ fn init_otel(
         }
     }
 
-    let exporter = opentelemetry_otlp::new_exporter()
+    let exporter = match opentelemetry_otlp::new_exporter()
         .http()
         .with_endpoint(otlp_endpoint)
         .with_headers(headers)
         .build_span_exporter()
-        .expect("Failed to build OTLP exporter");
+    {
+        Ok(exporter) => exporter,
+        Err(e) => {
+            tracing::warn!("⚠️ Failed to build OTLP exporter ({}), falling back to plain logging", e);
+            return init_plain(env_filter, use_json, "production");
+        }
+    };
 
     let provider = TracerProvider::builder()
         .with_simple_exporter(exporter)
