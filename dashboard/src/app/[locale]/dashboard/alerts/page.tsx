@@ -30,7 +30,7 @@ const CHANNEL_ICONS: Record<string, string> = {
 export default function AlertsPage() {
   const t = useTranslations('alerts');
   const tc = useTranslations('common');
-  const { token } = useAuth();
+  const { } = useAuth();
   const [alerts, setAlerts] = useState<AlertRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -48,7 +48,7 @@ export default function AlertsPage() {
   const fetchAlerts = useCallback(async () => {
     try {
       const res = await fetch(`${API}/alerts`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       if (res.ok) setAlerts(await res.json());
     } catch (e) {
@@ -56,7 +56,7 @@ export default function AlertsPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, API]);
+  }, [API]);
 
   useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
 
@@ -66,7 +66,7 @@ export default function AlertsPage() {
       const res = await fetch(`${API}/alerts`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          credentials: 'include' as const,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(form),
@@ -92,7 +92,7 @@ export default function AlertsPage() {
     try {
       await fetch(`${API}/alerts/${deleteId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       fetchAlerts();
     } catch (e) {
@@ -106,7 +106,7 @@ export default function AlertsPage() {
     try {
       await fetch(`${API}/alerts/${id}/test`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       alert(t('testSent'));
     } catch (e) {

@@ -16,7 +16,7 @@ interface ApiKey {
 export default function ApiKeysPage() {
   const t = useTranslations('apiKeys');
   const tc = useTranslations('common');
-  const { token } = useAuth();
+  const { } = useAuth();
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [newKey, setNewKey] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function ApiKeysPage() {
   const fetchKeys = useCallback(async () => {
     try {
       const res = await fetch(`${API}/api-keys`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       if (res.ok) setKeys(await res.json());
     } catch (e) {
@@ -41,7 +41,7 @@ export default function ApiKeysPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, API]);
+  }, [API]);
 
   useEffect(() => { fetchKeys(); }, [fetchKeys]);
 
@@ -52,7 +52,7 @@ export default function ApiKeysPage() {
       const res = await fetch(`${API}/api-keys`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          credentials: 'include' as const,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name: keyName || undefined }),
@@ -77,7 +77,7 @@ export default function ApiKeysPage() {
     try {
       const res = await fetch(`${API}/api-keys/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       if (!res.ok) throw new Error(tc('error'));
       setKeys((prev) => prev.filter((k) => k.id !== id));
@@ -94,7 +94,7 @@ export default function ApiKeysPage() {
     try {
       const res = await fetch(`${API}/api-keys/${id}/rotate`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {}, credentials: 'include' as const,
       });
       if (!res.ok) throw new Error(tc('error'));
       const data = await res.json();
