@@ -168,9 +168,10 @@ pub struct DeliveryTargetRow {
     pub enabled: bool,
 }
 
-/// Deliver a webhook payload via email using Resend API.
+/// Deliver a webhook payload via email using Google Cloud Gmail API.
 ///
-/// Requires RESEND_API_KEY environment variable to be set.
+/// Requires GCP_SERVICE_ACCOUNT_PATH environment variable pointing to a service
+/// account JSON file with Gmail send permissions (domain-wide delegation).
 /// Config should include "to" (recipient email) and optionally "subject".
 async fn deliver_email(
     config: &serde_json::Value,
@@ -186,17 +187,17 @@ async fn deliver_email(
         .and_then(|v| v.as_str())
         .unwrap_or("Webhook Delivery Notification");
 
-    let api_key = match std::env::var("RESEND_API_KEY") {
-        Ok(key) => key,
+    let sa_path = match std::env::var("GCP_SERVICE_ACCOUNT_PATH") {
+        Ok(path) => path,
         Err(_) => {
-            warn!("RESEND_API_KEY not set — email delivery unavailable");
+            warn!("GCP_SERVICE_ACCOUNT_PATH not set — email delivery unavailable");
             return Ok(DeliveryResult {
                 success: false,
                 status_code: 0,
                 response_body: String::new(),
                 response_headers: serde_json::json!({}),
                 duration_ms: 0,
-                error: "RESEND_API_KEY not configured".to_string(),
+                error: "GCP_SERVICE_ACCOUNT_PATH not configured".to_string(),
             });
         }
     };
@@ -204,23 +205,150 @@ async fn deliver_email(
     let from_email = std::env::var("NOTIFY_FROM_EMAIL")
         .unwrap_or_else(|_| "noreply@hooksniff.is-a.dev".to_string());
 
+    // Read and parse service account key
+    let sa_json = match std::fs::read_to_string(&sa_path) {
+        Ok(json) => json,
+        Err(e) => {
+            warn!("Failed to read service account file {}: {}", sa_path, e);
+            return Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms: 0,
+                error: format!("Failed to read service account: {}", e),
+            });
+        }
+    };
+
+    let sa_key: serde_json::Value = match serde_json::from_str(&sa_json) {
+        Ok(v) => v,
+        Err(e) => {
+            warn!("Failed to parse service account JSON: {}", e);
+            return Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms: 0,
+                error: format!("Invalid service account JSON: {}", e),
+            });
+        }
+    };
+
     let start = std::time::Instant::now();
 
-    let body = serde_json::json!({
-        "from": from_email,
-        "to": [to],
-        "subject": subject,
-        "html": format!(
-            "<h2>Webhook Delivery</h2><p><strong>Event:</strong> {}</p><p><strong>Endpoint:</strong> {}</p><pre>{}</pre>",
-            webhook.delivery_id, webhook.endpoint_url, webhook.payload
-        )
+    // Build OAuth2 JWT and exchange for access token
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    let client_email = sa_key["client_email"].as_str().unwrap_or("");
+    let private_key = sa_key["private_key"].as_str().unwrap_or("");
+    let token_uri = sa_key["token_uri"].as_str().unwrap_or("https://oauth2.googleapis.com/token");
+
+    let header = jsonwebtoken::Header::new(jsonwebtoken::Algorithm::RS256);
+    let claims = serde_json::json!({
+        "iss": client_email,
+        "scope": "https://www.googleapis.com/auth/gmail.send",
+        "aud": token_uri,
+        "exp": now + 3600,
+        "iat": now,
     });
 
-    let client = reqwest::Client::new();
-    let result = client
-        .post("https://api.resend.com/emails")
-        .bearer_auth(&api_key)
-        .json(&body)
+    let encoding_key = match jsonwebtoken::EncodingKey::from_rsa_pem(private_key.as_bytes()) {
+        Ok(key) => key,
+        Err(e) => {
+            warn!("Failed to create RSA key from service account: {}", e);
+            return Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms: 0,
+                error: format!("RSA key error: {}", e),
+            });
+        }
+    };
+
+    let jwt = match jsonwebtoken::encode(&header, &claims, &encoding_key) {
+        Ok(j) => j,
+        Err(e) => {
+            warn!("Failed to sign JWT: {}", e);
+            return Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms: 0,
+                error: format!("JWT signing error: {}", e),
+            });
+        }
+    };
+
+    // Exchange JWT for access token
+    let http_client = reqwest::Client::new();
+    let token_result = http_client
+        .post(token_uri)
+        .form(&[
+            ("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer"),
+            ("assertion", jwt.as_str()),
+        ])
+        .send()
+        .await;
+
+    let access_token = match token_result {
+        Ok(resp) if resp.status().is_success() => {
+            let body: serde_json::Value = resp.text().await
+                .and_then(|t| serde_json::from_str(&t).map_err(|e| reqwest::Error::from(e)))
+                .unwrap_or_default();
+            body["access_token"].as_str().unwrap_or("").to_string()
+        }
+        Ok(resp) => {
+            let status = resp.status().as_u16() as i32;
+            let text = resp.text().await.unwrap_or_default();
+            warn!("GCloud token exchange failed: status={}, body={}", status, text);
+            return Ok(DeliveryResult {
+                success: false,
+                status_code: status,
+                response_body: truncate_str(&text, 1000),
+                response_headers: serde_json::json!({}),
+                duration_ms: start.elapsed().as_millis() as i32,
+                error: format!("Token exchange HTTP {}", status),
+            });
+        }
+        Err(e) => {
+            warn!("GCloud token exchange request failed: {}", e);
+            return Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms: start.elapsed().as_millis() as i32,
+                error: e.to_string(),
+            });
+        }
+    };
+
+    // Build MIME message
+    let html_body = format!(
+        "<h2>Webhook Delivery</h2><p><strong>Event:</strong> {}</p><p><strong>Endpoint:</strong> {}</p><pre>{}</pre>",
+        webhook.delivery_id, webhook.endpoint_url, webhook.payload
+    );
+    let mime = format!(
+        "From: {}\r\nTo: {}\r\nSubject: {}\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{}",
+        from_email, to, subject, html_body
+    );
+    use base64::Engine;
+    let raw = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(mime.as_bytes());
+
+    let msg_body = serde_json::json!({ "raw": raw });
+
+    let result = http_client
+        .post("https://gmail.googleapis.com/gmail/v1/users/me/messages/send")
+        .bearer_auth(&access_token)
+        .json(&msg_body)
         .send()
         .await;
 
