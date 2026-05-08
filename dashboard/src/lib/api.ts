@@ -34,6 +34,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     const res = await fetch(`${API_BASE}${path}`, {
       method,
       headers,
+      credentials: 'include',
       body: body ? JSON.stringify(body) : undefined,
       signal: controller.signal,
     });
