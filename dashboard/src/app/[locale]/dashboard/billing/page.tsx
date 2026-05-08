@@ -9,26 +9,26 @@ import { billingApi, type Invoice } from '@/lib/api';
 
 const plans = [
   {
-    name: 'Free',
+    nameKey: 'plans.free',
     price: 0,
     period: '/month',
-    limit: '1,000 webhooks/month',
+    limitKey: 'plans.freeLimit',
     features: ['100 requests/min', '3 retry attempts', 'Community support', '5 endpoints', '7-day retention'],
     popular: false,
   },
   {
-    name: 'Pro',
+    nameKey: 'plans.pro',
     price: 49,
     period: '/month',
-    limit: '50,000 webhooks/month',
+    limitKey: 'plans.proLimit',
     features: ['1,000 requests/min', '5 retry attempts', 'Priority support', '50 endpoints', '30-day retention'],
     popular: true,
   },
   {
-    name: 'Business',
+    nameKey: 'plans.business',
     price: 149,
     period: '/month',
-    limit: '500,000 webhooks/month',
+    limitKey: 'plans.businessLimit',
     features: ['10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', '500 endpoints', '90-day retention'],
     popular: false,
   },
@@ -100,7 +100,7 @@ export default function BillingPage() {
   const tc = useTranslations('common');
   const currentPlan = user?.plan || 'free';
   const [usageCount, setUsageCount] = useState(0);
-  const [usageLimit, setUsageLimit] = useState(1000);
+  const [usageLimit, setUsageLimit] = useState(10000);
   const [chartData, setChartData] = useState<UsageChartData[]>([]);
   const [loadingUsage, setLoadingUsage] = useState(true);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -117,7 +117,7 @@ export default function BillingPage() {
       .then((res) => res.json())
       .then((data) => {
         const used = data.webhooks?.used ?? 0;
-        const limit = data.webhooks?.limit ?? 1000;
+        const limit = data.webhooks?.limit ?? 10000;
         setUsageCount(used);
         setUsageLimit(limit);
 
@@ -304,11 +304,12 @@ export default function BillingPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('currentPlan')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((plan) => {
-            const isCurrent = plan.name.toLowerCase() === currentPlan;
-            const isDowngrade = plans.findIndex((p) => p.name.toLowerCase() === currentPlan) > plans.indexOf(plan);
+            const planId = t(plan.nameKey).toLowerCase();
+            const isCurrent = planId === currentPlan;
+            const isDowngrade = plans.findIndex((p) => t(p.nameKey).toLowerCase() === currentPlan) > plans.indexOf(plan);
             return (
               <div
-                key={plan.name}
+                key={plan.nameKey}
                 className={clsx(
                   'glass-card p-6 hover-lift relative',
                   plan.popular && 'ring-2 ring-brand-500'
@@ -319,12 +320,12 @@ export default function BillingPage() {
                     {t('mostPopular')}
                   </div>
                 )}
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t(plan.nameKey)}</h3>
                 <div className="mt-2 mb-4">
                   <span className="text-3xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
                   <span className="text-gray-500 dark:text-slate-400 text-sm">{plan.period}</span>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{plan.limit}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t(plan.limitKey)}</p>
                 <ul className="space-y-2 mb-6">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
@@ -338,7 +339,7 @@ export default function BillingPage() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => handleUpgrade(plan.name)}
+                    onClick={() => handleUpgrade(t(plan.nameKey))}
                     className={clsx(
                       'w-full py-2.5 rounded-xl text-sm font-medium transition',
                       plan.popular
@@ -346,7 +347,7 @@ export default function BillingPage() {
                         : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'
                     )}
                   >
-                    {t('upgradeTo', { action: isDowngrade ? t('downgrade') : t('upgrade'), plan: plan.name })}
+                    {t('upgradeTo', { action: isDowngrade ? t('downgrade') : t('upgrade'), plan: t(plan.nameKey) })}
                   </button>
                 )}
               </div>
@@ -425,14 +426,14 @@ export default function BillingPage() {
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('upgradeTo', {
-                action: plans.findIndex((p) => p.name.toLowerCase() === currentPlan) > plans.findIndex((p) => p.name === showUpgradeModal)
+                action: plans.findIndex((p) => t(p.nameKey).toLowerCase() === currentPlan) > plans.findIndex((p) => t(p.nameKey) === showUpgradeModal)
                   ? t('downgrade')
                   : t('upgrade'),
                 plan: showUpgradeModal
               })}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              {plans.findIndex((p) => p.name.toLowerCase() === currentPlan) > plans.findIndex((p) => p.name === showUpgradeModal)
+              {plans.findIndex((p) => t(p.nameKey).toLowerCase() === currentPlan) > plans.findIndex((p) => t(p.nameKey) === showUpgradeModal)
                 ? t('downgradeDesc')
                 : t('upgradeDesc')}
             </p>
