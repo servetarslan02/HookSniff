@@ -133,6 +133,7 @@ async fn main() -> Result<()> {
                     .allow_origin(AllowOrigin::list(default_origins))
                     .allow_methods(Any)
                     .allow_headers(Any)
+                    .allow_credentials(true)
             } else if origins.is_empty() {
                 // Development with no CORS origins = allow all
                 CorsLayer::permissive()
@@ -141,6 +142,7 @@ async fn main() -> Result<()> {
                     .allow_origin(AllowOrigin::list(origins))
                     .allow_methods(Any)
                     .allow_headers(Any)
+                    .allow_credentials(true)
             }
         })
         .layer(TraceLayer::new_for_http())

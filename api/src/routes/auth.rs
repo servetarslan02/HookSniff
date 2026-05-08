@@ -2,15 +2,18 @@ use axum::extract::Extension;
 use axum::http::{HeaderMap, HeaderValue};
 use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
-use axum::Json;
+use axum::{Json, Router};
 use chrono::{Duration, Utc};
-use sqlx::PgPool;
+use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
 use crate::auth::jwt;
 use crate::config::Config;
 use crate::error::AppError;
-use crate::middleware::{create_auth_cookie, clear_auth_cookie, generate_api_key, hash_api_key};
+use crate::middleware::{
+    clear_auth_cookie, clear_refresh_token_cookie, create_auth_cookie, create_refresh_token_cookie,
+    generate_api_key, hash_api_key,
+};
 use crate::models::customer::{
     AuthResponse, ChangePasswordRequest, Confirm2faRequest, CreateCustomerRequest, Customer,
     CustomerResponse, Disable2faRequest, Enable2faRequest, ForgotPasswordRequest, LoginRequest,
@@ -27,15 +30,37 @@ const REGISTER_RATE_LIMIT: u32 = 5;
 /// JWT token max age in seconds (24 hours).
 const TOKEN_MAX_AGE: i64 = 86400;
 
-/// Create an auth response with HttpOnly cookie set.
-fn auth_response_with_cookie(body: AuthResponse) -> impl IntoResponse {
-    let cookie = create_auth_cookie(&body.token, TOKEN_MAX_AGE);
+/// Refresh token max age in seconds (30 days).
+const REFRESH_TOKEN_MAX_AGE: i64 = 2592000;
+
+/// Create an auth response with HttpOnly cookies set for both access and refresh tokens.
+/// Refresh token is also set as HttpOnly cookie (not exposed in response body).
+fn auth_response_with_cookie(body: AuthResponse) -> (HeaderMap, Json<serde_json::Value>) {
     let mut headers = HeaderMap::new();
+
+    // Set access token cookie
+    let access_cookie = create_auth_cookie(&body.token, TOKEN_MAX_AGE);
     headers.insert(
         "set-cookie",
-        HeaderValue::from_str(&cookie).unwrap_or_else(|_| HeaderValue::from_static("")),
+        HeaderValue::from_str(&access_cookie).unwrap_or_else(|_| HeaderValue::from_static("")),
     );
-    (headers, Json(body))
+
+    // Set refresh token cookie (if present)
+    if let Some(ref refresh) = body.refresh_token {
+        let refresh_cookie = create_refresh_token_cookie(refresh, REFRESH_TOKEN_MAX_AGE);
+        headers.append(
+            "set-cookie",
+            HeaderValue::from_str(&refresh_cookie).unwrap_or_else(|_| HeaderValue::from_static("")),
+        );
+    }
+
+    // Return response without refresh_token in body (it's in HttpOnly cookie now)
+    let response_body = serde_json::json!({
+        "token": body.token,
+        "customer": body.customer,
+    });
+
+    (headers, Json(response_body))
 }
 
 /// Maximum password reset attempts per IP per hour.
@@ -76,6 +101,9 @@ pub fn router() -> Router {
         .route("/2fa/enable", post(enable_2fa))
         .route("/2fa/confirm", post(confirm_2fa))
         .route("/2fa/disable", post(disable_2fa))
+        // GDPR endpoints
+        .route("/export", get(export_data))
+        .route("/account", axum::routing::delete(delete_account))
         .layer(axum::middleware::from_fn(
             crate::middleware::auth_middleware,
         ));
@@ -91,7 +119,7 @@ async fn register(
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: HeaderMap,
     Json(req): Json<CreateCustomerRequest>,
-) -> Result<Json<AuthResponse>, AppError> {
+) -> Result<impl IntoResponse, AppError> {
     // Rate limit: 5 registrations per IP per hour
     let client_ip = extract_client_ip(&headers);
     let rl_key = format!("register:{}", client_ip);
@@ -228,11 +256,23 @@ async fn login(
             &cfg.jwt_secret,
             Duration::minutes(5),
         )?;
-        return Ok(Json(serde_json::json!(TwoFactorRequiredResponse {
-            requires_2fa: true,
-            temp_token,
-            message: "Two-factor authentication required. Please provide your TOTP code.".into(),
-        })));
+        let mut headers = HeaderMap::new();
+        // Clear any existing auth cookies for partial 2FA response
+        headers.insert(
+            "set-cookie",
+            HeaderValue::from_static(
+                "hooksniff_token=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
+            ),
+        );
+        return Ok((
+            headers,
+            Json(serde_json::json!(TwoFactorRequiredResponse {
+                requires_2fa: true,
+                temp_token,
+                message: "Two-factor authentication required. Please provide your TOTP code."
+                    .into(),
+            })),
+        ));
     }
 
     // Generate short-lived access token + refresh token
@@ -259,7 +299,7 @@ async fn verify_2fa_login(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Json(req): Json<Verify2faRequest>,
-) -> Result<Json<AuthResponse>, AppError> {
+) -> Result<impl IntoResponse, AppError> {
     // Verify the temp token
     let claims = jwt::verify_token(&req.temp_token, &cfg.jwt_secret)?;
 
@@ -503,9 +543,24 @@ async fn resend_verification(
 async fn refresh_token(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
-    Json(req): Json<RefreshTokenRequest>,
-) -> Result<Json<AuthResponse>, AppError> {
-    let token_hash = jwt::hash_token(&req.refresh_token);
+    headers: HeaderMap,
+    // Accept refresh token from either cookie or JSON body (cookie takes priority)
+    body: Option<Json<RefreshTokenRequest>>,
+) -> Result<impl IntoResponse, AppError> {
+    // Try cookie first, then fall back to body
+    let refresh_token_value = headers
+        .get("cookie")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|cookies| {
+            cookies.split(';').find_map(|c| {
+                let c = c.trim();
+                c.strip_prefix("hooksniff_refresh=").map(|s| s.to_string())
+            })
+        })
+        .or_else(|| body.map(|b| b.refresh_token.clone()))
+        .ok_or(AppError::BadRequest("Refresh token required".into()))?;
+
+    let token_hash = jwt::hash_token(&refresh_token_value);
 
     // Find valid, non-revoked refresh token
     let record: Option<(Uuid, Uuid, chrono::DateTime<Utc>,)> = sqlx::query_as(
@@ -555,7 +610,13 @@ async fn logout() -> impl IntoResponse {
     let mut headers = HeaderMap::new();
     headers.insert(
         "set-cookie",
-        HeaderValue::from_str(&clear_auth_cookie()).unwrap_or_else(|_| HeaderValue::from_static("")),
+        HeaderValue::from_str(&clear_auth_cookie())
+            .unwrap_or_else(|_| HeaderValue::from_static("")),
+    );
+    headers.append(
+        "set-cookie",
+        HeaderValue::from_str(&clear_refresh_token_cookie())
+            .unwrap_or_else(|_| HeaderValue::from_static("")),
     );
     (headers, Json(serde_json::json!({ "ok": true })))
 }
@@ -747,6 +808,172 @@ async fn change_password(
     Ok(Json(
         serde_json::json!({"message": "Password updated successfully"}),
     ))
+}
+
+// ── GDPR Endpoints ──────────────────────────────────────────
+
+/// GET /v1/auth/export — Export all user data (GDPR Article 15 — Right of Access)
+async fn export_data(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Fetch user's endpoints
+    let endpoints: Vec<serde_json::Value> = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
+        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at",
+    )
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?
+    .into_iter()
+    .map(|e| serde_json::to_value(e).unwrap_or_default())
+    .collect();
+
+    // Fetch recent deliveries (last 90 days)
+    let deliveries: Vec<serde_json::Value> = sqlx::query(
+        "SELECT id, endpoint_id, event, status, attempt_count, response_status, created_at FROM deliveries WHERE customer_id = $1 AND created_at > NOW() - INTERVAL '90 days' ORDER BY created_at DESC LIMIT 10000",
+    )
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?
+    .into_iter()
+    .map(|row| {
+        serde_json::json!({
+            "id": row.get::<Uuid, _>("id"),
+            "endpoint_id": row.get::<Uuid, _>("endpoint_id"),
+            "event": row.get::<Option<String>, _>("event"),
+            "status": row.get::<String, _>("status"),
+            "attempt_count": row.get::<i32, _>("attempt_count"),
+            "response_status": row.get::<Option<i32>, _>("response_status"),
+            "created_at": row.get::<chrono::DateTime<Utc>, _>("created_at"),
+        })
+    })
+    .collect();
+
+    // Fetch API keys (prefixes only, not hashes)
+    let api_keys: Vec<serde_json::Value> = sqlx::query(
+        "SELECT id, name, api_key_prefix, is_active, created_at FROM api_keys WHERE customer_id = $1",
+    )
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?
+    .into_iter()
+    .map(|row| {
+        serde_json::json!({
+            "id": row.get::<Uuid, _>("id"),
+            "name": row.get::<Option<String>, _>("name"),
+            "prefix": row.get::<String, _>("api_key_prefix"),
+            "is_active": row.get::<bool, _>("is_active"),
+            "created_at": row.get::<chrono::DateTime<Utc>, _>("created_at"),
+        })
+    })
+    .collect();
+
+    tracing::info!("📦 Data export requested by customer {}", customer.id);
+
+    Ok(Json(serde_json::json!({
+        "export_date": Utc::now().to_rfc3339(),
+        "account": {
+            "id": customer.id,
+            "email": customer.email,
+            "name": customer.name,
+            "plan": customer.plan,
+            "email_verified": customer.email_verified,
+            "created_at": customer.created_at,
+        },
+        "endpoints": endpoints,
+        "deliveries": deliveries,
+        "api_keys": api_keys,
+    })))
+}
+
+/// DELETE /v1/auth/account — Delete user account and all data (GDPR Article 17 — Right to Erasure)
+async fn delete_account(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<serde_json::Value>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Require password confirmation for deletion
+    let password = req
+        .get("password")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| AppError::BadRequest("Password is required for account deletion".into()))?;
+
+    let hash = customer
+        .password_hash
+        .as_ref()
+        .ok_or(AppError::BadRequest("Password not set".into()))?;
+
+    if !jwt::verify_password(password, hash)? {
+        return Err(AppError::BadRequest("Invalid password".into()));
+    }
+
+    // Delete all user data in a transaction
+    let mut tx = pool.begin().await?;
+
+    // Delete in correct order (foreign keys)
+    sqlx::query("DELETE FROM delivery_attempts WHERE delivery_id IN (SELECT id FROM deliveries WHERE customer_id = $1)")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM deliveries WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM endpoints WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM api_keys WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM refresh_tokens WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM password_reset_tokens WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM email_verification_tokens WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM notifications WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM devices WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    // Finally delete the customer
+    sqlx::query("DELETE FROM customers WHERE id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    tx.commit().await?;
+
+    tracing::info!(
+        "🗑️ Account deleted for customer {} ({})",
+        customer.id,
+        customer.email
+    );
+
+    Ok(Json(serde_json::json!({
+        "message": "Account and all associated data have been permanently deleted.",
+        "deleted_at": Utc::now().to_rfc3339(),
+    })))
 }
 
 // ── Helpers ─────────────────────────────────────────────────
