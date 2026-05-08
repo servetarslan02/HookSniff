@@ -42,7 +42,6 @@ pub enum ThrottleStrategy {
     TokenBucket,
 }
 
-
 /// Endpoint throttling yapılandırması
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ThrottleConfig {
