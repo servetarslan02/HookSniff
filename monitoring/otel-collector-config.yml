@@ -24,11 +24,19 @@ processors:
         - 'attributes["http.target"] == "/metrics"'
 
 exporters:
-  # Export to Jaeger
+  # Export to Jaeger (local)
   otlp/jaeger:
     endpoint: jaeger:4317
     tls:
       insecure: true
+
+  # Export to Grafana Cloud (production)
+  # Auth: Basic base64(1625476:<glc_token>)
+  # Token yenileme: https://grafana.com/orgs/hookrelay → Security → Cloud Access Policies → hooksniff
+  otlphttp/grafana:
+    endpoint: https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
+    headers:
+      authorization: "Basic MTYyNTQ3NjpnbGNfZXlKdklqb2lNVGMxTnpNek5TSXNJbTRpT2lKb2IyOXJjMjVwWm1ZdGFHOXZhM0psYkdGNUlpd2lheUk2SWpoQk1FTllOVE54YUdOME56WlBNVXhGVURnNWFVUXhRaUlzSW0waU9uc2ljaUk2SW5WekluMTk="
 
   # Debug exporter for troubleshooting (remove in production)
   debug:
@@ -39,6 +47,14 @@ service:
     traces:
       receivers: [otlp]
       processors: [filter, batch]
-      exporters: [otlp/jaeger, debug]
+      exporters: [otlp/jaeger, otlphttp/grafana, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/grafana]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/grafana]
 
   extensions: []
