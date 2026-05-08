@@ -70,7 +70,7 @@ fn init_otel(
     if use_json {
         let tracer = provider.tracer("hooksniff");
         let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
-        let _ = tracing_subscriber::registry()
+        tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer().json())
             .with(otel_layer)
@@ -78,7 +78,7 @@ fn init_otel(
     } else {
         let tracer = provider.tracer("hooksniff");
         let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
-        let _ = tracing_subscriber::registry()
+        tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer())
             .with(otel_layer)
@@ -91,13 +91,13 @@ fn init_otel(
 /// Plain structured logging (no OTel).
 fn init_plain(env_filter: tracing_subscriber::EnvFilter, use_json: bool, env: &str) {
     if use_json {
-        let _ = tracing_subscriber::registry()
+        tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer().json())
             .init();
         tracing::info!("Logging format: JSON (env={})", env);
     } else {
-        let _ = tracing_subscriber::registry()
+        tracing_subscriber::registry()
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer())
             .init();

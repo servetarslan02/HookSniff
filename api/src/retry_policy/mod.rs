@@ -476,19 +476,19 @@ mod tests {
 
         // Attempt 1: base_delay_ms (1000ms) + jitter
         let d1 = p.next_retry_delay(1).unwrap();
-        assert!(d1 >= 1_000 && d1 <= 1_250, "attempt 1: {}", d1);
+        assert!((1_000..=1_250).contains(&d1), "attempt 1: {}", d1);
 
         // Attempt 2: ~2000ms + jitter
         let d2 = p.next_retry_delay(2).unwrap();
-        assert!(d2 >= 2_000 && d2 <= 2_500, "attempt 2: {}", d2);
+        assert!((2_000..=2_500).contains(&d2), "attempt 2: {}", d2);
 
         // Attempt 3: ~4000ms + jitter
         let d3 = p.next_retry_delay(3).unwrap();
-        assert!(d3 >= 4_000 && d3 <= 5_000, "attempt 3: {}", d3);
+        assert!((4_000..=5_000).contains(&d3), "attempt 3: {}", d3);
 
         // Attempt 4: ~8000ms + jitter
         let d4 = p.next_retry_delay(4).unwrap();
-        assert!(d4 >= 8_000 && d4 <= 10_000, "attempt 4: {}", d4);
+        assert!((8_000..=10_000).contains(&d4), "attempt 4: {}", d4);
 
         // Attempt 5: max_attempts aşıldı
         assert!(p.next_retry_delay(5).is_none());
@@ -596,7 +596,7 @@ mod tests {
         for _ in 0..100 {
             let jitter = random_jitter_factor();
             assert!(
-                jitter >= 0.0 && jitter <= 0.25,
+                (0.0..=0.25).contains(&jitter),
                 "jitter out of range: {}",
                 jitter
             );
@@ -635,8 +635,8 @@ mod tests {
         let d3 = p.next_retry_delay(3).unwrap();
 
         // Jitter nedeniyle tam eşitlik yok ama yakın olmalı
-        assert!(d1 >= 1_000 && d1 <= 1_250);
-        assert!(d2 >= 1_000 && d2 <= 1_250);
-        assert!(d3 >= 1_000 && d3 <= 1_250);
+        assert!((1_000..=1_250).contains(&d1));
+        assert!((1_000..=1_250).contains(&d2));
+        assert!((1_000..=1_250).contains(&d3));
     }
 }

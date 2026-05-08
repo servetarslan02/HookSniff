@@ -113,7 +113,7 @@ fn evaluate_condition(condition: &Condition, event: &Value) -> Result<bool> {
                 Some(Value::String(s)) => {
                     let re = Regex::new(pattern)
                         .context(format!("Invalid regex pattern: {}", pattern))?;
-                    Ok(re.is_match(&s))
+                    Ok(re.is_match(s))
                 }
                 _ => Ok(false),
             }

@@ -247,7 +247,7 @@ async fn create_webhook(
     // Store idempotency key if provided
     if let Some(key) = idempotency_key {
         let response_body =
-            serde_json::to_value(&delivery.to_response()).unwrap_or(serde_json::Value::Null);
+            serde_json::to_value(delivery.to_response()).unwrap_or(serde_json::Value::Null);
         if let Err(e) = idempotency::store_idempotency(
             &pool,
             key,
@@ -491,7 +491,7 @@ fn escape_csv_cell(value: &str) -> String {
         value.as_bytes().first(),
         Some(b'=') | Some(b'+') | Some(b'-') | Some(b'@') | Some(b'\t') | Some(b'\r')
     );
-    let needs_quote = value.contains(|c: char| c == ',' || c == '"' || c == '\n');
+    let needs_quote = value.contains([',', '"', '\n']);
 
     let mut out = String::new();
     if needs_prefix {

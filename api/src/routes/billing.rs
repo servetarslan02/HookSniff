@@ -317,19 +317,21 @@ struct InvoiceResponse {
     plan: String,
 }
 
+type InvoiceRow = (
+    uuid::Uuid,
+    i32,
+    String,
+    String,
+    String,
+    Option<chrono::DateTime<chrono::Utc>>,
+    chrono::DateTime<chrono::Utc>,
+);
+
 async fn get_invoices(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<InvoiceResponse>>, AppError> {
-    let rows: Vec<(
-        uuid::Uuid,
-        i32,
-        String,
-        String,
-        String,
-        Option<chrono::DateTime<chrono::Utc>>,
-        chrono::DateTime<chrono::Utc>,
-    )> = sqlx::query_as(
+    let rows: Vec<InvoiceRow> = sqlx::query_as(
         "SELECT id, amount_cents, currency, status, plan, paid_at, created_at \
              FROM invoices WHERE customer_id = $1 ORDER BY created_at DESC",
     )
