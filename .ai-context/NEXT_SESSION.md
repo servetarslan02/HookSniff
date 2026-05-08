@@ -1,6 +1,19 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-08 20:59 GMT+8
+> Son güncelleme: 2026-05-08 21:24 GMT+8
+
+---
+
+## ⚠️ KRİTİK KURAL: REPO AYRIMI
+
+| İş Türü | Repo | Branch |
+|---------|------|--------|
+| Hata düzeltme, fix, refactor | `servetarslan02/HookSniff` (orijinal) | main |
+| Yeni özellik geliştirme | `servetarslan02/hooksniff-lab` (lab) | feature/... |
+| Market research, plan, notlar | `.ai-context/` klasörü (her iki repo'da) | main |
+
+**Kural:** Yeni özellikler lab repo'da geliştirilir → test edilir → Servet onayı → ana repo'ya merge.
+Ana repo'nun main branch'i bozulmaz. Hata fixleri doğrudan ana repo'da yapılır.
 
 ---
 
