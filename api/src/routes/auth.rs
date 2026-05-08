@@ -1,4 +1,5 @@
 use axum::extract::Extension;
+use axum::http::HeaderMap;
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use sqlx::PgPool;
@@ -12,6 +13,30 @@ use crate::models::customer::{
     AuthResponse, ChangePasswordRequest, CreateCustomerRequest, Customer, CustomerResponse,
     LoginRequest, UpdateProfileRequest,
 };
+
+/// Maximum login attempts per IP per 15-minute window.
+const LOGIN_RATE_LIMIT: u32 = 10;
+const LOGIN_RATE_WINDOW_SECS: u64 = 15 * 60;
+
+/// Maximum registration attempts per IP per hour.
+const REGISTER_RATE_LIMIT: u32 = 5;
+const REGISTER_RATE_WINDOW_SECS: u64 = 60 * 60;
+
+/// Extract client IP from request headers (handles reverse proxies).
+fn extract_client_ip(headers: &HeaderMap) -> String {
+    headers
+        .get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.split(',').next())
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|| {
+            headers
+                .get("x-real-ip")
+                .and_then(|v| v.to_str().ok())
+                .unwrap_or("unknown")
+                .to_string()
+        })
+}
 
 pub fn router() -> Router {
     let public = Router::new()
@@ -30,8 +55,18 @@ pub fn router() -> Router {
 async fn register(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    headers: HeaderMap,
     Json(req): Json<CreateCustomerRequest>,
 ) -> Result<Json<AuthResponse>, AppError> {
+    // Rate limit: 5 registrations per IP per hour
+    let client_ip = extract_client_ip(&headers);
+    let rl_key = format!("register:{}", client_ip);
+    let rl_result = rate_limiter.check_with_headers(&rl_key, REGISTER_RATE_LIMIT).await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     // Validate email
     if !req.email.contains('@') {
         return Err(AppError::BadRequest("Invalid email".into()));
@@ -105,8 +140,19 @@ async fn register(
 async fn login(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    headers: HeaderMap,
     Json(req): Json<LoginRequest>,
 ) -> Result<Json<AuthResponse>, AppError> {
+    // Rate limit: 10 login attempts per IP per 15 minutes
+    let client_ip = extract_client_ip(&headers);
+    let rl_key = format!("login:{}", client_ip);
+    let rl_result = rate_limiter.check_with_headers(&rl_key, LOGIN_RATE_LIMIT).await;
+    if !rl_result.allowed {
+        tracing::warn!("⚠️ Login rate limit exceeded for IP: {}", client_ip);
+        return Err(AppError::RateLimitExceeded);
+    }
+
     let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE email = $1")
         .bind(&req.email)
         .fetch_optional(&pool)

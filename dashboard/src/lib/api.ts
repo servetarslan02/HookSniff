@@ -125,10 +125,10 @@ export const authApi = {
 
 // Generic API client (axios-style wrapper — returns { data } for compatibility)
 export const api = {
-  get: async <T = unknown>(path: string) => ({ data: await apiFetch<T>(path) }),
-  post: async <T = unknown>(path: string, body?: unknown) => ({ data: await apiFetch<T>(path, { method: 'POST', body }) }),
-  put: async <T = unknown>(path: string, body?: unknown) => ({ data: await apiFetch<T>(path, { method: 'PUT', body }) }),
-  delete: async <T = unknown>(path: string) => ({ data: await apiFetch<T>(path, { method: 'DELETE' }) }),
+  get: async <T = unknown>(path: string, token?: string) => ({ data: await apiFetch<T>(path, { token }) }),
+  post: async <T = unknown>(path: string, body?: unknown, token?: string) => ({ data: await apiFetch<T>(path, { method: 'POST', body, token }) }),
+  put: async <T = unknown>(path: string, body?: unknown, token?: string) => ({ data: await apiFetch<T>(path, { method: 'PUT', body, token }) }),
+  delete: async <T = unknown>(path: string, token?: string) => ({ data: await apiFetch<T>(path, { method: 'DELETE', token }) }),
 };
 
 // Types
