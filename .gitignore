@@ -47,3 +47,5 @@ sdks/node/dist/
 sdks/python/dist/
 sdks/python/hooksniff.egg-info/
 sdks/node/package-lock.json
+sdks/csharp/bin/
+sdks/csharp/obj/
