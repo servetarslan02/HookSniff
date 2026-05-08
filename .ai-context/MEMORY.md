@@ -263,3 +263,12 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
    - `@hooksniff` scope'u yok → `hooksniff-sdk` olarak publish edildi
    - Yeni token ile 2FA bypass sorun çözüldü
 2. **crates.io** — hala email doğrulama bekliyor
+
+### Bu Oturum (24) — 2026-05-09 05:33 GMT+8:
+
+1. **crates.io publish** — ✅ `hooksniff v0.2.0` yayında!
+2. **M2 TAMAMLANDI** — tüm 3 platformda SDK publish edildi:
+   - npm: `hooksniff-sdk@0.1.0`
+   - PyPI: `hooksniff 0.1.0`
+   - crates.io: `hooksniff v0.2.0`
+3. **Tüm 10 milestone tamamlandı!** 🎉
