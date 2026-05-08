@@ -143,7 +143,7 @@ public class HookSniff: @unchecked Sendable {
     public let endpoints: EndpointsResource
     public let webhooks: WebhooksResource
 
-    public init(apiKey: String, baseUrl: String = "https://api.hooksniff.io/v1", timeout: TimeInterval = 30) {
+    public init(apiKey: String, baseUrl: String = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1", timeout: TimeInterval = 30) {
         self.apiKey = apiKey
         self.baseUrl = baseUrl.hasSuffix("/") ? String(baseUrl.dropLast()) : baseUrl
 

@@ -15,7 +15,7 @@ namespace HookSniff
     public class HookSniffConfig
     {
         public string ApiKey { get; set; } = "";
-        public string BaseUrl { get; set; } = "https://api.hooksniff.is-a.dev/v1";
+        public string BaseUrl { get; set; } = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1";
         public int Timeout { get; set; } = 30;
     }
 
@@ -199,7 +199,7 @@ namespace HookSniff
         public HookSniffClient(HookSniffConfig config)
         {
             _apiKey = config.ApiKey ?? throw new ArgumentNullException(nameof(config.ApiKey));
-            _baseUrl = (config.BaseUrl ?? "https://api.hooksniff.is-a.dev/v1").TrimEnd('/');
+            _baseUrl = (config.BaseUrl ?? "https://hooksniff-api-1046140057667.europe-west1.run.app/v1").TrimEnd('/');
 
             _httpClient = new HttpClient
             {
