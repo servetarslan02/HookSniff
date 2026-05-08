@@ -106,11 +106,11 @@ Her özellik tek tek tamamlanacak:
 3. [x] Real-time SSE entegrasyonunu tamamla — /agents/{id}/stream
 4. [x] Event geçmişi ve filtreleme — event_type, direction, status, since/until
 
-### Aşama 3: Dashboard (1-2 gün)
-1. [ ] Agent listesi sayfasını tamamla
-2. [ ] Agent detay sayfasını tamamla
-3. [ ] Monitoring sayfasını tamamla
-4. [ ] Hata durumlarını göster (empty state, error state, loading state)
+### Aşama 3: Dashboard ✅ (2026-05-09 tamamlandı)
+1. [x] Agent listesi sayfasını tamamla — pagination, error state, create error handling
+2. [x] Agent detay sayfasını tamamla — filtreleme, stats, rate limit, edit, settings tab
+3. [x] Monitoring sayfasını tamamla — anomaly status, istatistikler, audit log
+4. [x] Hata durumlarını göster — empty state, error state, loading state
 
 ### Aşama 4: SDK'lar (1-2 gün)
 1. [ ] Node.js SDK'yı tamamla (test, dokümantasyon)
