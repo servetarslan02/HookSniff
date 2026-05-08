@@ -19,28 +19,20 @@ Ana repo'nun main branch'i bozulmaz. Hata fixleri doğrudan ana repo'da yapılı
 
 ## 🚀 Yeni Oturuma Başlarken
 
-### 1. Adım: Projeyi Klonla
+### 0. Adım: Hafıza Yükle (EN ÖNEMLİ)
 ```bash
 cd /root/.openclaw/workspace
-git clone https://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@github.com/servetarslan02/HookSniff.git
+git clone https://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@github.com/servetarslan02/HookSniff.git 2>/dev/null || (cd HookSniff && git pull origin main)
 cd HookSniff
-```
-
-### 2. Adım: Rust Kur (eğer yoksa)
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source "$HOME/.cargo/env"
-```
-
-### 3. Adım: Hafıza Dosyalarını Oku
-```bash
+cat .ai-context/ONBOARDING.md
 cat .ai-context/MEMORY.md
 cat .ai-context/NEXT_SESSION.md
-cat .ai-context/EXTERNAL_TOKENS.md
+cat .ai-context/2026-05-08.md
+cat .ai-context/MOBILE_MASTER_PLAN.md
 ```
 
-### 4. Adım: Servet'e Tanıtım Yap
-Servet projenin sahibi ama kod bilmiyor. Ona Türkçe olarak mevcut durumu özetle.
+### 1. Adım: Servet'e Tanıtım Yap
+> "Merhaba Servet, ben [isim]. Son oturumda [ne yaptık]. Sıradaki iş: [ne]. Başlayalım mı?"
 
 ---
 
@@ -90,14 +82,19 @@ Bu oturumda çözülenler:
 - Toplam 12 düzeltme, hepsi kesin kök neden analiziyle çözüldü.
 
 ### Bir Sonraki Oturumda Yapılabilecekler
-1. **Mobil uygulama geliştirmeye başla** — plan: `.ai-context/MOBILE_MASTER_PLAN.md`
+1. **Backend hazırlığı** — mobil uygulama için API eksikleri:
+   - `POST /auth/forgot-password` route'u
+   - `POST /auth/reset-password` route'u
+   - `POST /auth/verify-email` route'u
+   - `POST /auth/refresh-token` route'u
+   - Push notification service (FCM)
+   - `GET /app/version` endpoint'i
+2. **Mobil uygulama geliştirme** — plan: `.ai-context/MOBILE_MASTER_PLAN.md`
    - Expo projesi kur
    - Auth ekranları (giriş, kayıt, şifre sıfırlama)
    - Dashboard + grafikler
    - Event + Endpoint yönetimi
-2. CI workflow'unu kontrol et — bu commit'ler CI'ı yeşil yapmalı
-3. Production deploy test
-4. Servet'in dış servis görevleri (Polar.sh, Resend, iyzico)
+3. Servet'in dış servis görevleri (Sentry hesabı, Firebase hesabı)
 
 ### Kapsamlı Denetim Bulguları (Oturum 9 — tam liste: FULL_SYSTEM_AUDIT.md)
 **AI agent yapacak (25 madde):**
