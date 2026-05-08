@@ -73,7 +73,9 @@
     "settings": "Ayarlar",
     "adminPanel": "Yönetici Paneli",
     "docs": "Dokümantasyon",
-    "logout": "Çıkış"
+    "logout": "Çıkış",
+    "transforms": "Dönüştürmeler",
+    "inbound": "Gelen"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -230,7 +232,9 @@
       "failureRate": "Başarısızlık Oranı (%)",
       "latency": "Ort. Gecikme (ms)",
       "consecutiveFailures": "Ardışık Başarısızlıklar"
-    }
+    },
+    "deleteTitle": "Alarmı Sil",
+    "delete": "Sil"
   },
   "playground": {
     "title": "API Oyun Alanı",
@@ -407,7 +411,13 @@
       "support": "Öncelikli destek",
       "customDomain": "Özel alan adı",
       "sla": "SLA garantisi"
-    }
+    },
+    "plans.free": "Ücretsiz",
+    "plans.pro": "Pro",
+    "plans.business": "İşletme",
+    "plans.freeLimit": "10.000 webhook/ay",
+    "plans.proLimit": "50.000 webhook/ay",
+    "plans.businessLimit": "500.000 webhook/ay"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -680,9 +690,9 @@
     },
     "footer": {
       "github": "GitHub",
-      "docs": "Dokümanlar",
+      "docs": "Dokümantasyon",
       "status": "Durum",
-      "about": "Hakkımızda",
+      "about": "Hakkında",
       "faq": "SSS",
       "contact": "İletişim",
       "terms": "Şartlar",
@@ -734,5 +744,54 @@
     "hours24": "24 Saat",
     "days7": "7 Gün",
     "days30": "30 Gün"
-  }
+  },
+  "generic": "Genel",
+  "active": "Aktif",
+  "disabled": "Pasif",
+  "configCreated": "Gelen yapılandırma oluşturuldu!",
+  "configFailed": "Yapılandırma oluşturulamadı",
+  "deliveryRate": "Teslimat Oranı",
+  "avgLatency": "Ort. Gecikme",
+  "faqTitle": "Sıkça Sorulan Sorular",
+  "faqSubtitle": "HookSniff hakkında bilmeniz gereken her şey",
+  "catGeneral": "Genel",
+  "catGettingStarted": "Başlarken",
+  "catBilling": "Faturalandırma",
+  "catTechnical": "Teknik",
+  "catSecurity": "Güvenlik",
+  "q1": "HookSniff nedir?",
+  "a1": "HookSniff, geliştiriciler için bir webhook teslimat servisidir. Siz webhook gönderin, biz teslim edelim. Başarısız olursa üstel geri çekme ile tekrar deneriz.",
+  "q2": "HookSniff, Svix veya Hookdeck'ten nasıl farklı?",
+  "a2": "HookSniff çok daha ucuzdur ($0/ay ile başlar, $49+/ay yerine), birden fazla teslimat yöntemini destekler (HTTP, WebSocket, gRPC, SQS) ve 10.000 webhook/ay ücretsiz plan sunar.",
+  "q3": "HookSniff açık kaynak mı?",
+  "a3": "Temel API ve worker MIT lisanslıdır. SDK'lar açık kaynaktır. Dashboard ve özel özellikler kaynak mevcuttur.",
+  "q4": "Nasıl başlarım?",
+  "a4": "Ücretsiz bir hesap oluşturun, sunucu URL'inize指向 bir endpoint oluşturun ve API veya SDK'larımız üzerinden webhook göndermeye başlayın. Kredi kartı gerekmez.",
+  "q5": "Bir şey yüklemem gerekiyor mu?",
+  "a5": "Hayır. HookSniff bir bulut servisidir. Sadece kaydolun ve API veya SDK'larımızı kullanın. Self-hosting için Docker imajları sunuyoruz.",
+  "q6": "Ücretsiz plan var mı?",
+  "a6": "Evet! Ücretsiz planımız 10.000 webhook/ay, 5 endpoint, 100 istek/dk hız limiti ve 7 gün saklama içerir. Kredi kartı gerekmez.",
+  "q7": "Faturalandırma nasıl çalışır?",
+  "a7": "Planınıza göre aylık faturalandırılır. İstediğiniz zaman yükseltebilir veya düşürebilirsiniz. Polar.sh ve iyzico üzerinden ödeme kabul ediyoruz.",
+  "q8": "Plan limitlerini aşarsam ne olur?",
+  "a8": "Size bir bildirim göndeririz. Limitin üzerindeki webhook'lar kuyruğa alınır ve bir sonraki fatura döneminizde teslim edilir veya hemen yükseltebilirsiniz.",
+  "q9": "Hangi webhook formatlarını destekliyorsunuz?",
+  "a9": "Standard Webhooks (HMAC-SHA256), Svix uyumlu header'lar ve özel imza formatlarını destekliyoruz. SDK'larımız doğrulamayı otomatik yapar.",
+  "q10": "Tekrar denemeler nasıl çalışır?",
+  "a10": "Başarısız teslimatlar üstel geri çekme ve jitter ile tekrar dener. Endpoint başına yapılandırılabilir: hızlı (1sn, 5sn, 30sn), normal (1dk, 5dk, 30dk) veya sabırlı (5dk, 30dk, 2sa).",
+  "q11": "Başarısız webhook'ları tekrar gönderebilir miyim?",
+  "a11": "Evet. Dashboard veya API üzerinden tek tek veya toplu olarak belirli bir zaman aralığındaki tüm başarısız webhook'ları tekrar gönderebilirsiniz.",
+  "q12": "WebSocket veya gRPC teslimatını destekliyor musunuz?",
+  "a12": "Evet. 4 teslimat yöntemi destekliyoruz: HTTP, WebSocket, gRPC ve Amazon SQS. Endpoint başına yapılandırın.",
+  "q13": "Webhook imzalarını nasıl doğruluyorsunuz?",
+  "a13": "Standard Webhooks spesifikasyonuna uyarak sabit zamanlı karşılaştırma ile HMAC-SHA256 kullanıyoruz. Her endpoint'in benzersiz bir imza secret'ı vardır.",
+  "q14": "Verilerim şifreleniyor mu?",
+  "a14": "Evet. Tüm veriler aktarım sırasında (TLS 1.3) ve dinlenirken şifrelenir. Parola karmaşıklığı için Argon2id kullanırız ve düz metin secret'ları asla saklamayız.",
+  "q15": "GDPR'a uyuyor musunuz?",
+  "a15": "GDPR uyumluluğu üzerinde çalışıyoruz. Altyapımız AB sunucularında çalışır (GCP europe-west1). Veri İşleme Anlaşması yakında geliyor.",
+  "stillHaveQuestions": "Hâlâ sorularınız mı var?",
+  "cantFindAnswer": "Aradığınız cevabı bulamıyor musunuz? Buradayız.",
+  "contactSupport": "Destek ile İletişim",
+  "sending": "Gönderiliyor...",
+  "sendMessage": "Mesaj Gönder"
 }

@@ -32,8 +32,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('apiKeys'), href: '/dashboard/api-keys', icon: '🔑' },
     { name: t('playground'), href: '/dashboard/playground', icon: '🧪' },
     { name: t('analytics'), href: '/dashboard/analytics', icon: '📈' },
-    { name: 'Transforms', href: '/dashboard/transforms', icon: '🔄' },
-    { name: 'Inbound', href: '/dashboard/inbound', icon: '📨' },
+    { name: t('transforms'), href: '/dashboard/transforms', icon: '🔄' },
+    { name: t('inbound'), href: '/dashboard/inbound', icon: '📨' },
     { name: t('team'), href: '/dashboard/team', icon: '👥' },
     { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
     { name: t('billing'), href: '/dashboard/billing', icon: '💳' },
@@ -65,7 +65,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-800">
+        <Link href="/" className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
             🪝
           </div>
@@ -73,7 +73,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="font-bold text-gray-900 dark:text-white">HookSniff</div>
             <div className="text-xs text-gray-500 dark:text-slate-400">Webhook Dashboard</div>
           </div>
-        </div>
+        </Link>
         <nav className="px-3 py-4 space-y-1">
           {navigation.map((item) => {
             const isActive = cleanPath === item.href;

@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const t = useTranslations('docs');
-  const tc = useTranslations('common');
+  const tNav = useTranslations('nav');
 
   const sidebarNav = [
     { name: t('gettingStarted'), href: '/docs' },
@@ -20,7 +20,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       {/* Top Nav */}
-      <nav className="border-b border-gray-200 dark:border-slate-700 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-gray-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
@@ -32,7 +32,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
             <Link href="/dashboard" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
-              {tc('nav.dashboard')}
+              {tNav('dashboard')}
             </Link>
             <Link href="/" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
               {t('home')}

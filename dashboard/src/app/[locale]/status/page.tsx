@@ -180,9 +180,17 @@ export default function StatusPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <div className="absolute top-4 right-4">
-        <LanguageSwitcher />
-      </div>
+      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="text-xl">🪝</span>
+            <span className="font-bold text-gray-900 dark:text-white">HookSniff</span>
+            <span className="text-gray-400">/</span>
+            <span className="text-gray-600 dark:text-slate-400">Status</span>
+          </Link>
+          <LanguageSwitcher />
+        </div>
+      </nav>
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-10">

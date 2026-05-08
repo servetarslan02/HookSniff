@@ -2,8 +2,10 @@
 
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useTranslations } from 'next-intl';
 
 export default function AboutPage() {
+  const t = useTranslations();
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -46,8 +48,8 @@ export default function AboutPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {[
-            { value: '99.97%', label: 'Delivery Rate' },
-            { value: '<50ms', label: 'Avg Latency' },
+            { value: '99.97%', label: t('deliveryRate') },
+            { value: '<50ms', label: t('avgLatency') },
             { value: '11', label: 'SDK Languages' },
             { value: '$0', label: 'Starting Price' },
           ].map(stat => (
