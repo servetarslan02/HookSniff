@@ -302,7 +302,7 @@ public class WebhooksResource: @unchecked Sendable {
         if let df = dateFrom { params.append("date_from=\(df)") }
         if let dt = dateTo { params.append("date_to=\(dt)") }
         let qs = params.isEmpty ? "" : "?\(params.joined(separator: "&"))"
-        return try await client.request("GET", path: "/webhooks/export\(qs)")
+        return try await client.requestRaw("GET", path: "/webhooks/export\(qs)")
     }
 }
 
@@ -321,7 +321,11 @@ public class SearchResource {
         if let s = status { params.append("status=\(s)") }
         if let eid = endpointId { params.append("endpoint_id=\(eid)") }
         let qs = params.joined(separator: "&")
-        return try await client.request("GET", path: "/search?\(qs)")
+        let result: Any = try await client.requestRaw("GET", path: "/search?\(qs)")
+        guard let dict = result as? [String: Any] else {
+            throw NSError(domain: "HookSniff", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unexpected response type"])
+        }
+        return dict
     }
 }
 

@@ -29,6 +29,7 @@ describe("verifySignature", () => {
   });
 
   it("returns false for empty inputs", () => {
+    const sig = sign(payload, secret);
     expect(verifySignature("", sig, secret)).toBe(false);
     expect(verifySignature(payload, "", secret)).toBe(false);
     expect(verifySignature(payload, sig, "")).toBe(false);
