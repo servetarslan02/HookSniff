@@ -155,6 +155,15 @@ Eksiklik analizi: `.ai-context/MOBILE_APP_AUDIT.md`
 - Maliyet: $0
 - Süre: 6-8 hafta
 - Backend %90 hazır, sadece push notification + şifre sıfırlama + refresh token eksik
+- Ek kararlar: `.ai-context/MOBILE_DECISIONS.md`
+  - Offline: AsyncStorage + TanStack Query cache
+  - Hata raporlama: Sentry
+  - Analitik: Sentry Performance
+  - Deep link: `hooksniff://screen/id`
+  - Dil: Türkçe + İngilizce (i18next)
+  - Arama: Global search
+  - Widget: İkinci sürümde
+  - QR kod: Endpoint ekleme için
 - WhatsApp bot İPTAL — sadece Telegram bot kullanılacak
 
 ---
