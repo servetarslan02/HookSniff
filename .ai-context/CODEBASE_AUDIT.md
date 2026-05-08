@@ -1,5 +1,6 @@
 # 🔍 HookSniff — Kapsamlı Kod Denetim Raporu
 
+> Son güncelleme: 2026-05-08 22:08 GMT+8
 > Tarih: 2026-05-08 19:55 GMT+8
 > Oturum: 9 (Soru-Cevap)
 > Durum: Tespit edildi, düzeltilmedi
@@ -8,19 +9,17 @@
 
 ## 🔴 Kritik Bulunanlar
 
-### 1. 107 Tane Eski Domain Referansı (`is-a.dev`)
-**Sorun:** Kodbase genelinde `hooksniff.is-a.dev` ve `hooksniff.io` referansları var. Domain kararı verilmeden temizlenemez.
-**Etkilenen:** API, Worker, SDK'lar, config dosyaları
-**Çözüm:** Domain kararı sonrası global find-replace
+### 1. ~~107 Tane Eski Domain Referansı (`is-a.dev`)~~ ✅ Düzeltildi (Oturum 11)
+**Sorun:** Kodbase genelinde `hooksniff.is-a.dev` ve `hooksniff.io` referansları vardı.
+**Çözüm:** ✅ 130 eski domain referansı düzeltildi (Oturum 11)
 
-### 2. 8 Tane `#[allow(dead_code)]`
+### 2. ~~8 Tane `#[allow(dead_code)]`~~ 🟡 Kısmen düzeltildi
 **Dosyalar:**
-- `api/src/ws/handler.rs:275` — 1 adet
-- `worker/src/config.rs:4` — 1 adet
-- `worker/src/main.rs:780` — 1 adet
-- `worker/src/signing.rs` — 5 adet (17, 53, 150, 179, 205)
-**Sorun:** Dead code gizleniyor, uyarılar görünmüyor
-**Çözüm:** Kullanılmayan kodu sil veya gerçekten kullanılıyorsa `allow` kaldır
+- `api/src/ws/handler.rs:275` — ✅ Düzeltildi (Oturum 12)
+- `worker/src/config.rs:4` — 1 adet (hâlâ mevcut)
+- `worker/src/main.rs:780` — 1 adet (hâlâ mevcut)
+- `worker/src/signing.rs` — 5 adet (hâlâ mevcut)
+**Çözüm:** `ws/handler.rs` dead_code düzeltildi (Oturum 12). Diğerleri hâlâ mevcut.
 
 ### 3. Duplicate Fonksiyonlar
 | Fonksiyon | Dosya 1 | Dosya 2 |
@@ -30,14 +29,14 @@
 **Sorun:** Bakım zorluğu, biri güncellenince diğeri unutulabilir
 **Çözüm:** validation.rs'teki → ssrf.rs'e yönlendir (zaten yapılmış ama hâlâ duruyor), main.rs'teki truncate → delivery/http.rs'e delegasyon
 
-### 4. AI Center Backend'de Yok
-**Detay:** SDK_AUDIT.md'de #0 numaralı madde olarak kayıtlı
-**Çözüm:** SDK'lardan AI Center kodu çıkarılacak
+### 4. ~~AI Center Backend'de Yok~~ ✅ Düzeltildi (Oturum 11)
+**Detay:** SDK_AUDIT.md'de #0 numaralı madde olarak kayıtlıydı.
+**Çözüm:** ✅ SDK'lardan AI Center kodu çıkarıldı (Oturum 11)
 
-### 5. PHP SDK Kopyala-Yapıştır Hatası
+### 5. ~~PHP SDK Kopyala-Yapıştır Hatası~~ ✅ Düzeltildi (Oturum 11)
 **Dosya:** `sdks/php/src/HookSniffClient.php:207`
 **Sorun:** `;>` fazla karakter — kod çalışmaz
-**Çözüm:** Fazla kısmı sil
+**Çözüm:** ✅ Fazla kısım silindi (Oturum 11)
 
 ---
 
@@ -72,6 +71,11 @@
 
 ## ✅ İyi Yapılmış Şeyler
 
+- ✅ PHP SDK duplicate satır düzeltildi (Oturum 11)
+- ✅ AI Center SDK'dan çıkarıldı (Oturum 11)
+- ✅ SDK base URL'leri düzeltildi (Oturum 11)
+- ✅ 130 eski domain referansı düzeltildi (Oturum 11)
+- ✅ `dead_code` ws/handler.rs düzeltildi (Oturum 12)
 - `cargo fmt` uygulanmış (70 dosya)
 - Clippy uyarıları temiz
 - Testler çalışıyor (156/156)
@@ -98,15 +102,15 @@
 
 ## Düzeltme Sırası
 
-| # | Ne | Öncelik | Zorluk |
-|---|---|---------|--------|
-| 1 | PHP SDK hatası düzelt | 🔴 Kritik | 2 dk |
-| 2 | AI Center SDK'dan çıkar | 🔴 Kritik | 15 dk |
-| 3 | 8 dead_code → sil veya kullan | 🟡 Orta | 30 dk |
-| 4 | Duplicate fonksiyonları birleştir | 🟡 Orta | 20 dk |
-| 5 | Domain kararı → 107 referansı temizle | 🟡 Orta | 1 saat |
-| 6 | CI'a cargo clippy + audit ekle | 🟡 Orta | 30 dk |
-| 7 | CI'a npm audit + lint ekle | 🟡 Orta | 15 dk |
-| 8 | TODO'ları çöz veya sil | 🟢 Düşük | Değişken |
-| 9 | console.log'ları temizle | 🟢 Düşük | 5 dk |
-| 10 | cargo-udeps ile dependency temizliği | 🟢 Düşük | 30 dk |
+| # | Ne | Öncelik | Zorluk | Durum |
+|---|---|---------|--------|-------|
+| 1 | PHP SDK hatası düzelt | 🔴 Kritik | 2 dk | ✅ Düzeltildi (Oturum 11) |
+| 2 | AI Center SDK'dan çıkar | 🔴 Kritik | 15 dk | ✅ Düzeltildi (Oturum 11) |
+| 3 | 8 dead_code → sil veya kullan | 🟡 Orta | 30 dk | 🟡 Kısmen (Oturum 12) |
+| 4 | Duplicate fonksiyonları birleştir | 🟡 Orta | 20 dk | ⬜ Beklemede |
+| 5 | Domain kararı → 107 referansı temizle | 🟡 Orta | 1 saat | ✅ Düzeltildi (Oturum 11) |
+| 6 | CI'a cargo clippy + audit ekle | 🟡 Orta | 30 dk | ⬜ Beklemede |
+| 7 | CI'a npm audit + lint ekle | 🟡 Orta | 15 dk | ⬜ Beklemede |
+| 8 | TODO'ları çöz veya sil | 🟢 Düşük | Değişken | ⬜ Beklemede |
+| 9 | console.log'ları temizle | 🟢 Düşük | 5 dk | ⬜ Beklemede |
+| 10 | cargo-udeps ile dependency temizliği | 🟢 Düşük | 30 dk | ⬜ Beklemede |
