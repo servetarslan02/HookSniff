@@ -191,7 +191,7 @@ export default function SettingsPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('displayName')}</label>
             <input
-              type="text"
+              type="text" autoComplete="name"
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
               placeholder={t('namePlaceholder')}
@@ -202,7 +202,7 @@ export default function SettingsPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('emailAddress')}</label>
             <input
-              type="email"
+              type="email" autoComplete="email"
               value={profileEmail}
               onChange={(e) => setProfileEmail(e.target.value)}
               placeholder={t('emailPlaceholder')}
@@ -242,7 +242,7 @@ export default function SettingsPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('currentPassword')}</label>
             <input
-              type="password"
+              type="password" autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="••••••••"
@@ -254,7 +254,7 @@ export default function SettingsPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('newPassword')}</label>
             <input
-              type="password"
+              type="password" autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="••••••••"
