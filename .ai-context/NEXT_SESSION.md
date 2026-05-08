@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 06:25 GMT+8
+> Son güncelleme: 2026-05-09 06:40 GMT+8
 
 ---
 
