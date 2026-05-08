@@ -14,6 +14,8 @@
 //!
 //! ## Basit, güvenilir, bakımı kolay.
 
+#![allow(dead_code, unused_imports, unused_variables, unused_mut, unused_assignments)]
+
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgListener, PgPoolOptions};
