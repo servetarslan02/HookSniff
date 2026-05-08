@@ -40,6 +40,7 @@ Tüm hafıza `.ai-context/` klasöründe tutuluyor.
   SDK_AUDIT.md         → SDK denetim raporu (5 hata + eksikler)
   PRODUCT_IMPROVEMENTS.md → Ürün iyileştirme önerileri (7 madde)
   CODEBASE_AUDIT.md      → Kapsamlı kod denetim raporu (10 madde)
+  FULL_SYSTEM_AUDIT.md   → Tam sistem denetimi (kritik güvenlik + 10 madde)
   2026-05-08.md        → Oturum logları
   README.md            → Klasör açıklaması
 
