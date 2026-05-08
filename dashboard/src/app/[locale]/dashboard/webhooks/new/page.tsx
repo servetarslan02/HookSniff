@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -28,8 +30,8 @@ export default function SendWebhookPage() {
     try {
       JSON.parse(val);
       setJsonError('');
-    } catch (e: any) {
-      setJsonError(e.message);
+    } catch (e: unknown) {
+      setJsonError(getErrorMessage(e));
     }
   };
 
@@ -51,8 +53,8 @@ export default function SendWebhookPage() {
       });
       setResponse(res);
       toast(t('sendSuccess'), 'success');
-    } catch (err: any) {
-      setResponse({ error: err.message });
+    } catch (err: unknown) {
+      setResponse({ error: getErrorMessage(err) });
       toast(t('sendFailed'), 'error');
     } finally {
       setSending(false);

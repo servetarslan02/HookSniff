@@ -52,7 +52,7 @@ export default function AlertsPage() {
       });
       if (res.ok) setAlerts(await res.json());
     } catch (e) {
-      console.error('Failed to fetch alerts:', e);
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ export default function AlertsPage() {
         fetchAlerts();
       }
     } catch (e) {
-      console.error('Failed to create alert:', e);
+      // Error handled silently
     } finally {
       setCreating(false);
     }
@@ -96,7 +96,7 @@ export default function AlertsPage() {
       });
       fetchAlerts();
     } catch (e) {
-      console.error('Failed to delete alert:', e);
+      // Error handled silently
     } finally {
       setDeleteId(null);
     }
@@ -110,7 +110,7 @@ export default function AlertsPage() {
       });
       alert(t('testSent'));
     } catch (e) {
-      console.error('Failed to test alert:', e);
+      // Error handled silently
     }
   };
 

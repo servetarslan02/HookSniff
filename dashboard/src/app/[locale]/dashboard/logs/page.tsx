@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { webhooksApi, type Delivery } from '@/lib/api';
@@ -34,8 +36,8 @@ export default function LogsPage() {
       });
       setDeliveries(data.deliveries);
       setTotal(data.total);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load logs');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err) || 'Failed to load logs');
     } finally {
       setLoading(false);
     }

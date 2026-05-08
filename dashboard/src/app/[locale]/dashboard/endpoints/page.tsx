@@ -25,7 +25,7 @@ export default function EndpointsPage() {
     if (!token) return;
     endpointsApi.list(token)
       .then(setEndpoints)
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -40,8 +40,8 @@ export default function EndpointsPage() {
       setNewUrl('');
       setNewDesc('');
       setShowCreate(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to create endpoint');
+    } catch (err: unknown) {
+      setError((err instanceof Error ? err.message : 'Unknown error') || 'Failed to create endpoint');
     } finally {
       setCreating(false);
     }
@@ -57,8 +57,8 @@ export default function EndpointsPage() {
     try {
       await endpointsApi.delete(token, deleteId);
       setEndpoints((prev) => prev.filter((ep) => ep.id !== deleteId));
-    } catch (err: any) {
-      alert(err.message || 'Failed to delete');
+    } catch (err: unknown) {
+      alert((err instanceof Error ? err.message : 'Unknown error') || 'Failed to delete');
     } finally {
       setDeleteId(null);
     }

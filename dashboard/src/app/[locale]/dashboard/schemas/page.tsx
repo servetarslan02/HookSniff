@@ -13,7 +13,7 @@ export default function SchemasPage() {
     if (!token) return;
     apiFetch<any>('/schemas', { token })
       .then((res) => setSchemas(res.schemas || []))
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [token]);
 

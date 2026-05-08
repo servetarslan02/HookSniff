@@ -18,8 +18,8 @@ struct OutboundIpsResponse {
     updated_at: String,
 }
 
-/// Default outbound IPs used when the OUTBOUND_IPS env var is not set.
-/// TODO: Replace with real IPs from the production infrastructure.
+/// Default outbound IPs — set OUTBOUND_IPS env var with comma-separated IPs.
+/// Returns empty list when not configured (warning logged at startup).
 const DEFAULT_IPS: &[&str] = &[];
 
 fn load_outbound_ips() -> OutboundIpsResponse {
