@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum
 
-> 2026-05-08 13:53
+> 2026-05-08 14:43 GMT+8
 
 ## Yeni Oturumda Ne Söyle
 
@@ -10,68 +10,96 @@
 
 **Mesaj:**
 
-HookSniff projesi üzerinde çalışacaksın. 50 dakika süren var.
+HookSniff projesi üzerinde çalışacaksın.
 
 Repo: https://github.com/servetarslan02/HookSniff
 GitHub PAT: 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
 
 Önce `.ai-context/MEMORY.md` ve `.ai-context/NEXT_SESSION.md` dosyalarını oku — tüm hafıza orada.
 
-## MEVCUT DURUM
+---
 
-Tüm 26 teknik görev tamamlandı. Dış servislerde sorunlar var.
+## 🔴 GÖREV: API'yi Render'dan Google Cloud Run'a Taşı
 
-## KRİTİK SORUNLAR
+### Neden?
+- Render API build_failed hatası sürekli tekrarlıyor
+- Rust compile sorunları var (struct field mismatch, Display trait eksik)
+- Google Cloud Run zaten orijinal plan, GCP service account hazır
 
-### 1. Render API — Build Failed ❌
-- Servet son deploy'larda build_failed alıyor
-- `cargo build --release -p hooksniff-api` ile localde derlemeyi dene
-- Hataları düzelt, commit + push yap
+### Yapılacaklar (Sırasıyla)
 
-### 2. Vercel — Proje ID Bulunamıyor ⚠️
-- Token çalışıyor ama `prj_NQgFly8h06oH5DTzClj7vyq3hqSO` bulunamıyor
-- Servet doğru ID'yi Vercel dashboard'dan bulacak
-- ID gelince: `dashboard/` klasörünü kontrol et, Next.js build hatası var mı bak
+#### 1. GCP Service Account Dosyasını Kullan
+- Dosya: `.ai-context/gcp-service-account.json`
+- Bu dosyayı oku, GCP projesi: `hooksniff-app`
+- Bölge: `europe-west1`
 
-### 3. Polar.sh — Token Expired ❌
-- Servet yeni token alacak
-- Token gelince: ödeme sistemi test et
+#### 2. Docker Image Build
+- `Dockerfile.api` zaten var, sorunsuz çalışmalı
+- Localde veya GitHub Actions'da build et:
+```bash
+docker build -f Dockerfile.api -t hooksniff-api .
+```
 
-### 4. Resend — Domain Değişikliği ❌
-- is-a.dev iptal edildi
-- Yeni domain ile Resend'de doğrulama yapılacak
-- Servet domain seçmeli (eu.org veya .com)
+#### 3. Cloud Run'a Deploy
+```bash
+# GCP auth
+gcloud auth activate-service-account --key-file=.ai-context/gcp-service-account.json
+gcloud config set project hooksniff-app
 
-### 5. Cloudflare R2 — Bucket Yok ❌
-- R2 bucket hiç oluşturulmamış
-- İstersen oluştur: bucket adı `hooksniff-storage`
+# Image'ı Container Registry'ye push et
+docker tag hooksniff-api gcr.io/hooksniff-app/hooksniff-api
+docker push gcr.io/hooksniff-app/hooksniff-api
 
-## DOMAIN KARARI
+# Cloud Run'a deploy
+gcloud run deploy hooksniff-api   --image gcr.io/hooksniff-app/hooksniff-api   --region europe-west1   --allow-unauthenticated   --port 3000   --set-env-vars "DATABASE_URL=...,REDIS_URL=...,JWT_SECRET=..."   --memory 512Mi   --cpu 1
+```
+
+#### 4. Render'ı Kapat (Opsiyonel)
+- Render dashboard'dan API servisini sil veya suspend et
+- Worker hâlâ Render'da çalışıyor, onu da sonra Cloud Run'a taşıyabiliriz
+
+#### 5. GitHub Dosyalarını Güncelle
+- `STATUS.md` — API URL'ini Cloud Run olarak güncelle
+- `.ai-context/MEMORY.md` — Taşıma işlemini kaydet
+- `.ai-context/EXTERNAL_TOKENS.md` — GCP bilgilerini ekle
+
+---
+
+## Dış Servis Durumu (Son Kontrol: 14:41)
+
+| Servis | Durum | Token/Not |
+|--------|-------|-----------|
+| GitHub | ✅ | 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 |
+| Render Worker | ✅ Live | rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m |
+| Render API | ❌ Build failed | Aynı servis, taşıyacağız |
+| Vercel Dashboard | ✅ | vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW |
+| Neon DB | ✅ | postgresql://neondb_owner:REDACTED_PASSWORD@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require |
+| Upstash Redis | ✅ | integral-ostrich-98447.upstash.io |
+| Cloudflare | ✅ | cfat_1tT40u7CwzgC8TfHfTtzfqZTGU6o7dt3j2Hpgkgh4bfc2231 |
+| Polar.sh | ❌ Token expired | Servet yeni token alacak |
+| Resend | ❌ Domain not_started | is-a.dev iptal, yeni domain gerekli |
+| Cloudflare R2 | ❌ Bucket yok | Servet istersen oluştur |
+
+## Vercel Proje Bilgisi
+- Proje adı: hooksniff-dash
+- Proje ID: prj_cSIVYHpCoAtoihRp8xlXIun1KVSR (DÜZELTİLDİ)
+- URL: https://hooksniff.vercel.app
+
+## Domain Kararı
 - ~~is-a.dev~~ iptal
-- **Şimdilik**: Vercel ücretsiz domain (`hooksniff.vercel.app`)
-- **İleride**: eu.org (ücretsiz) veya .com ($12/yıl)
+- Şimdilik: Vercel ücretsiz domain (`hooksniff.vercel.app`)
+- İleride: eu.org (ücretsiz) veya .com ($12/yıl)
 
-##потенциyel İLERİ İŞLER
-- npm @hooksniff scope publish
-- PyPI hooksniff publish
-- crates.io hooksniff publish
-- Terraform Registry submit
-- Production deploy test
+## Yapılan Düzeltmeler (Bu Oturum)
+- Delivery struct: sequence_num, fifo_group_id, updated_at, error_message eklendi
+- DeliveryAttempt struct: trace_id, response_headers eklendi
+- Endpoint struct: fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy eklendi
+- inbound.rs: Provider Display impl eklendi
+- Vercel proje ID düzeltildi
+- Tüm değişiklikler GitHub'a push edildi (commit 1fff845)
 
-## Dış Servis Tokenları
-
-| Servis | Token |
-|--------|-------|
-| GitHub PAT | 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 |
-| Render API | rnd_mBsut7XMRYCzeJKpJTqHnF7uiN1m |
-| Vercel | vcp_2iNdOvIOwWHJ9r45c6bvs688meo9iZDe1rGs9kQtymO8P4yzqr0zbtsW |
-| Resend | re_BGbQVTfq_NyahSBBbiS4GERnctr7DN8Xu |
-| Cloudflare | cfat_1tT40u7CwzgC8TfHfTtzfqZTGU6o7dt3j2Hpgkgh4bfc2231 |
-| npm | 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 |
-
-## Hafıza Güncelleme Kuralları
-
+## Hafıza Kuralları
 Her oturum sonunda:
-1. `.ai-context/MEMORY.md` güncelle (yapılan işler + durum)
-2. `.ai-context/NEXT_SESSION.md` güncelle (sıradaki görevler)
+1. `.ai-context/MEMORY.md` güncelle
+2. `.ai-context/NEXT_SESSION.md` güncelle
 3. `git add -A && git commit && git push origin main`
