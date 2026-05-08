@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 19:35 GMT+8
+> Son güncelleme: 2026-05-08 20:59 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -33,7 +33,7 @@
 | R2 Storage | hooksniff-storage | ✅ Bucket var |
 | Cloudflare | Hesap aktif | ✅ |
 | Polar.sh | Token expired | ❌ Yeni token lazım |
-| Resend | hooksniff.is-a.dev iptal → GCloud'a taşınacak | ❌ |
+| ~~Resend~~ | ~~hooksniff.is-a.dev iptal~~ → GCloud Gmail API'ya taşındı | ✅ |
 
 ---
 
@@ -85,11 +85,29 @@
 
 ### Servet'in dış servis görevleri:
 - Polar.sh token yenile
-- Resend yeni domain
+- ~~Resend yeni domain~~ → GCloud Gmail API'ya taşındı ✅
 - GitHub token yenile
 - iyzico hesap aç
 
 ---
+
+### Bu Oturum (10) — 2026-05-08 20:06-20:59 GMT+8:
+1. **Resend → GCloud Gmail API tamamen kaldırıldı:**
+   - `api/src/email.rs`: `ResendClient` → `GCloudEmailClient` (service account JWT → Gmail API)
+   - `api/src/config.rs`: `resend_api_key` kaldırıldı, `gcp_service_account_path` eklendi
+   - `api/src/main.rs`: `resend_client` → `gcloud_email` init
+   - `api/src/routes/contact.rs`: yeni client'a taşındı
+   - `api/src/routes/auth.rs`: `ResendClient` → `GCloudEmailClient`
+   - `worker/src/delivery/mod.rs`: Resend API → Gmail API (service account auth)
+   - `worker/Cargo.toml`: `jsonwebtoken` dependency eklendi
+   - `.github/workflows/deploy.yml`: `RESEND_API_KEY` kaldırıldı, `GCP_SA_JSON` eklendi (API + Worker)
+   - `.ai-context/EXTERNAL_TOKENS.md`: Resend section kaldırıldı, GCloud email notu eklendi
+   - `DEPLOY_GUIDE.md`, `FREE_TIER_SETUP.md`, `STATUS.md`, `README.md`: dokümantasyon güncellendi
+2. **GCP Secret Manager:**
+   - `gcp-sa-json` secret'ı oluşturuldu (version 1)
+   - Cloud Run servis hesabına `secretAccessor` izni verildi
+3. **cargo fmt + clippy + test:** 29/29 test geçti, 0 Clippy hatası
+4. **CI yeşil** — Deploy tetiklendi
 
 ## ❌ KALAN SORUNLAR
 
@@ -127,7 +145,7 @@
 ## ⚠️ SERVET'İN YAPMASI GEREKEN
 
 1. **Polar.sh yeni token** — polar.sh dashboard → Settings → Access Tokens
-2. **Resend yeni domain** — resend.com → yeni domain ekle + DNS TXT+MX
+2. ~~Resend yeni domain~~ → ✅ GCloud Gmail API'ya taşındı
 3. **GitHub token yenile** — eski token açık paylaşıldı, güvenlik riski
 4. **Domain kararı** — şimdilik `hooksniff.vercel.app` yeterli
 5. **iyzico hesap** — vergi levhası + banka hesabı
