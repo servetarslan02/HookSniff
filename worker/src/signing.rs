@@ -149,9 +149,9 @@ mod tests {
             return false;
         }
 
-        hmac::digest::CtOutput::<HmacSha256>::new(hmac::digest::Output::<HmacSha256>::clone_from_slice(
-            &expected_bytes,
-        )) == hmac::digest::CtOutput::<HmacSha256>::new(
+        hmac::digest::CtOutput::<HmacSha256>::new(
+            hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
+        ) == hmac::digest::CtOutput::<HmacSha256>::new(
             hmac::digest::Output::<HmacSha256>::clone_from_slice(&computed_bytes),
         )
     }
@@ -318,7 +318,9 @@ mod tests {
             Some(chrono::Utc::now() - chrono::Duration::hours(25)),
         ));
 
-        assert!(!verify_with_rotation(current, None, payload, &sig_old, None,));
+        assert!(!verify_with_rotation(
+            current, None, payload, &sig_old, None,
+        ));
     }
 
     #[test]

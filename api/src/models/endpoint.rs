@@ -115,7 +115,6 @@ pub enum DeliveryFormat {
     CloudEvents,
 }
 
-
 impl DeliveryFormat {
     pub fn as_str(&self) -> &'static str {
         match self {
