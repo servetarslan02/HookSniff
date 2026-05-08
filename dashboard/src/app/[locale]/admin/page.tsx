@@ -18,7 +18,7 @@ export default function AdminOverviewPage() {
   const [stats, setStats] = useState<AdminStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const t = useTranslations('admin');
-  const tc = useTranslations('common');
+
 
   const fetchStats = useCallback(async () => {
     if (!token) return;

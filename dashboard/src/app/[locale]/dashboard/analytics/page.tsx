@@ -20,7 +20,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { ChartCard, StatCard, StatusBadge } from '@/components/tremor';
+import { ChartCard, StatCard } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
 
 type TimeRange = '24h' | '7d' | '30d';
