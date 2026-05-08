@@ -221,6 +221,111 @@ Ama `cleanPath` hesaplaması locale prefix'i kaldırıyor → doğru çalışıy
 
 ---
 
+## 🔴🔴 GÜVENLİK SORUNLARI
+
+### F. TOKEN LOCALSTORAGE'DA — XSS Riski
+
+`src/lib/store.tsx:33` → `localStorage.getItem('hooksniff_auth')`
+
+Token localStorage'da saklanıyor. XSS saldırısıyla çalınabilir. HttpOnly cookie daha güvenli.
+
+### G. PASSWORD STRENGTH YOK
+
+Login/register formunda `minLength={8}` var ama:
+- ❌ Şifre gücü göstergesi yok
+- ❌ Büyük/küçük harf, rakam, özel karakter kontrolü yok
+- ❌ "Zayıf şifre" uyarısı yok
+
+### H. CONSOLE STATEMENT — 21 Adet
+
+Production'da 21 `console.log/error/warn` kalıntısı var. Bunlar kaldırılmalı.
+
+---
+
+## 🔴🔴 SEO SORUNLARI
+
+### I. SITEMAP YOK
+
+`sitemap.xml` dosyası yok. Google'da indekslenme sorunlu olacak.
+
+### J. ROBOTS.TXT YOK
+
+`robots.txt` dosyası yok. Arama motorları siteyi nasıl tarayacağını bilemez.
+
+### K. OG IMAGE YOK
+
+`og:image` meta tag'i yok. Sosyal medyada paylaşıldığında görsel çıkmaz.
+
+### L. CANONICAL URL YOK
+
+`<link rel="canonical">` yok. Duplicate content riski.
+
+### M. STRUCTURED DATA YOK
+
+`application/ld+json` yok. Google rich snippet'leri çıkmaz.
+
+### N. FAVICON YOK
+
+`public/` klasörü boş (sadece `.gitkeep`). Favicon yok.
+
+### O. MANIFEST YOK
+
+PWA manifest dosyası yok. "Add to Home Screen" özelliği yok.
+
+---
+
+## 🔴 PERFORMANS SORUNLARI
+
+### P. FONT CSS @import İLE YÜKLENİYOR
+
+`globals.css:5` → `@import url('https://fonts.googleapis.com/css2?family=Inter...')`
+
+CSS @import render-blocking. `next/font` ile preload yapılmalı.
+
+### Q. GLOBAL ERROR PAGE YOK
+
+- ❌ `error.tsx` yok
+- ❌ `not-found.tsx` yok  
+- ❌ `loading.tsx` yok
+
+Hata durumunda kullanıcı boş sayfa veya çirkin hata görür.
+
+### R. LAZY LOADING AZ
+
+Sadece 2 component lazy loaded (ThemeToggle, LanguageSwitcher). Dashboard sayfaları lazy değil.
+
+---
+
+## 🟡 DİĞER SORUNLAR
+
+### S. KEYBOARD NAVIGATION YOK
+
+0 `onKeyDown` handler. Klavye ile navigasyon imkansız. Erişilebilirlik sorunu.
+
+### T. AUTOCOMPLETE EKSİK
+
+- Login form: ✅ `autoComplete` var
+- Settings form: ❌ `autoComplete` yok
+- Contact form: ❌ `autoComplete` yok
+
+### U. OFFLINE HANDLING YOK
+
+`navigator.onLine` kontrolü yok. Offline'da kullanıcı hata alır, uyarı yok.
+
+### V. CSRF KORUMASI YOK
+
+Client-side CSRF koruması yok. API'de var mı kontrol edilmeli.
+
+### W. CONFIRM DIALOG TUTARSIZ
+
+- Endpoints delete: `confirm()` (browser dialog)
+- API Keys delete: Custom modal ✅
+- Alerts delete: `confirm()` (browser dialog)
+
+Tutarlı olmalı — ya hep custom modal ya hep browser dialog.
+
+---
+
 > **Not:** Bu dosya her inceleme sonrası güncellenir.
 
 ### ✅ İYİ YAPILANLAR
