@@ -69,7 +69,7 @@ PR merge: admin override ile CI bypass.
 | Java | Maven Central | 0.1.0 | GPG key propagasyonu bekliyor |
 | Kotlin | Maven Central | 0.2.0 | Gradle wrapper eksik |
 | Ruby | RubyGems | 0.1.0 | Local'de publish edilecek |
-| PHP | Packagist | 0.1.0 | Servet Packagist'e submit edecek |
+| PHP | Packagist | 0.1.0 | ✅ Yayında — `hooksniff/hooksniff-php` |
 | Elixir | Hex.pm | 0.2.0 | Local'de publish edilecek |
 
 ### 📖 Publish Rehberi
@@ -80,7 +80,7 @@ Detaylı rehber: `.ai-context/SDK_PUBLISH_GUIDE.md`
 ## 🎯 YENİ OTURUM GÖREVLERİ
 
 ### Öncelik 1: SDK Publish (Kalan 5)
-1. **PHP** — Packagist'e submit (en kolay, browser ile)
+1. ~~**PHP** — Packagist'e submit~~ ✅ `hooksniff/hooksniff-php` yayında
 2. **Ruby** — `gem push hooksniff-0.1.0.gem`
 3. **Elixir** — `mix hex.publish`
 4. **Java** — `mvn deploy` (Maven + GPG)
@@ -104,7 +104,7 @@ Detaylı rehber: `.ai-context/SDK_PUBLISH_GUIDE.md`
 - **Java**: GPG key'i local'e import et, `mvn deploy` çalıştır
 - **Kotlin**: `gradle wrapper --gradle-version 8.5` çalıştır, sonra `gradle publish`
 - **Ruby**: `gem signin` + `gem push`
-- **PHP**: https://packagist.org/packages/submit → repo URL gir
+- ~~**PHP**: https://packagist.org/packages/submit → repo URL gir~~ ✅ API ile yapıldı
 - **Elixir**: `mix hex.auth` + `mix hex.publish`
 
 ### Diğer

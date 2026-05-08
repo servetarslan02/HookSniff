@@ -310,5 +310,5 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 | Java | ⏳ | Maven + GPG ile `mvn deploy` |
 | Kotlin | ⏳ | Gradle wrapper ekle + `gradle publish` |
 | Ruby | ⏳ | `gem push hooksniff-0.1.0.gem` |
-| PHP | ⏳ | Packagist'e submit |
+| PHP | ✅ | `hooksniff/hooksniff-php` Packagist'de yayında |
 | Elixir | ⏳ | `mix hex.publish` |
