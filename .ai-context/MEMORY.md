@@ -140,6 +140,13 @@ Detay: `.ai-context/MARKET_RESEARCH.md` (son bölüm)
 4 hafta, $0 maliyet, kural tabanlı (AI API yok).
 Lab repo'da geliştirilecek.
 
+## 📱 MOBİL UYGULAMA (2026-05-08 — Hafıza Kaydı)
+
+Detay: `.ai-context/FEATURE_PLAN.md` (son bölüm)
+⚠️ Servet onayı BEKLENİYOR. Tüm web özellikleri bittikten sonra.
+Önce PWA (2 hafta, $0), gerekirse React Native/Expo (4-6 hafta).
+WhatsApp bot İPTAL — sadece Telegram bot kullanılacak.
+
 ---
 
 ## ❌ KALAN SORUNLAR
