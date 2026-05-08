@@ -28,8 +28,8 @@ fn init_otel(
 ) {
     use opentelemetry::global;
     use opentelemetry::trace::TracerProvider as _;
-    use opentelemetry_sdk::trace::TracerProvider;
     use opentelemetry_otlp::WithExportConfig;
+    use opentelemetry_sdk::trace::TracerProvider;
 
     let otlp_endpoint = endpoint.unwrap_or("http://localhost:4317");
 

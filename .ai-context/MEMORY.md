@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-08 14:43 GMT+8
+> Son güncelleme: 2026-05-08 16:31 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -18,29 +18,51 @@
 - ~~is-a.dev~~ iptal
 - Şimdilik: `hooksniff.vercel.app` (Vercel ücretsiz)
 
-## KRİTİK GÖREV: API Taşıma (TAMAMLANDI ✅)
-- **Render API build_failed** → Cloud Run'a taşındı
-- **API**: https://hooksniff-api-1046140057667.europe-west1.run.app ✅ Live
-- **Worker**: https://hooksniff-worker-1046140057667.europe-west1.run.app ✅ Live
-- Health check: database ✅ queue ✅
-- GCP secret manager'da 10 secret oluşturuldu
-- Deploy workflow güncellendi, GitHub push edildi
-- Compile hatası düzeltildi: serde_json::Error → AppError conversion eklendi
+## KRİTİK DURUM: CI/CD Fix (Devam Ediyor)
 
-## ✅ Tamamlanan İşler (26/26 + düzeltmeler)
-- 26/26 teknik görev tamamlandı
-- Bu oturumda: struct field düzeltmeleri, Provider Display impl, Vercel ID fix
-- Tüm değişiklikler push edildi
+### Sorun
+- CI `RUSTFLAGS="-D warnings"` kullanıyor → tüm warning = error
+- 152+ unused import/variable/function/struct hatası
+- Deploy workflow CI başarılı olmadan tetiklenmiyor
+
+### Yapılan Düzeltmeler (Bu Oturum)
+1. ✅ `Config` extension eklendi `api/src/main.rs` → RateLimiter hatası düzeldi
+2. ✅ `worker/src/telemetry.rs` formatting düzeltildi (import sırası + fn signature)
+3. ✅ Dashboard `.eslintrc.json` oluşturuldu
+4. ✅ `eslint` + `eslint-config-next` devDependencies'a eklendi
+5. ✅ GitHub Actions secret `GCP_SA_KEY` ayarlandı
+
+### Kalan Sorun
+- ~152 unused code warning'ı (imports, variables, structs, functions)
+- Çözüm: crate-level `#![allow(dead_code, unused_imports)]` ekle veya unused kodları temizle
+
+## Cloud Run Durumu
+
+| Servis | URL | Durum |
+|--------|-----|-------|
+| API | https://hooksniff-api-1046140057667.europe-west1.run.app | ✅ Live (health OK) |
+| Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Deployed (403 auth) |
+| Dashboard | https://hooksniff.vercel.app | ✅ Vercel'de |
+
+### Health Check (API)
+```json
+{
+  "status": "healthy",
+  "checks": {
+    "database": {"status": "healthy", "latency_ms": 36},
+    "queue": {"status": "healthy", "latency_ms": 76},
+    "last_delivery": {"status": "healthy"}
+  }
+}
+```
 
 ## Dış Servis Durumu
 
 | Servis | Durum | Not |
 |--------|-------|-----|
-| GitHub | ✅ | Private repo |
+| GitHub | ✅ | Private repo, `GCP_SA_KEY` secret ayarlandı |
 | Cloud Run API | ✅ | hooksniff-api-1046140057667.europe-west1.run.app |
 | Cloud Run Worker | ✅ | hooksniff-worker-1046140057667.europe-west1.run.app |
-| Render API | ❌ | Artık kullanılmıyor → Cloud Run'a taşındı |
-| Render Worker | ❌ | Artık kullanılmıyor → Cloud Run'a taşındı |
 | Vercel | ✅ | prj_cSIVYHpCoAtoihRp8xlXIun1KVSR |
 | Neon DB | ✅ | eu-central-1 |
 | Upstash Redis | ✅ | 64MB |
