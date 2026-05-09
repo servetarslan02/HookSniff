@@ -2,7 +2,7 @@
 
 # Default target
 help: ## Show this help
-	@echo "🪝 HookRelay — Komutlar"
+	@echo "🪝 HookSniff — Komutlar"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
@@ -10,7 +10,7 @@ help: ## Show this help
 # ── Ana Komutlar ──
 
 local: ## Her şeyi localde başlat
-	@echo "🚀 HookRelay başlatılıyor..."
+	@echo "🚀 HookSniff başlatılıyor..."
 	docker compose up -d --build
 	@echo ""
 	@echo "✅ Başlatılıyor! İlk açılış 5-10 dakika sürebilir."
@@ -51,7 +51,7 @@ fix: ## Sorunları otomatik çöz
 	@echo "✅ Tamamlandı! http://localhost:3001 adresini kontrol et"
 
 status: ## Ne durumda göster
-	@echo "🪝 HookRelay Durum"
+	@echo "🪝 HookSniff Durum"
 	@echo ""
 	@docker compose ps 2>/dev/null || echo "❌ Servisler çalışmıyor. 'make local' ile başlat."
 	@echo ""
@@ -90,7 +90,7 @@ generate-api-key: ## Örnek API key oluştur
 	@echo "hr_live_$(openssl rand -hex 16)"
 
 db-shell: ## PostgreSQL kabuğu aç
-	docker compose exec postgres psql -U hookrelay -d hookrelay
+	docker compose exec postgres psql -U hooksniff -d hooksniff
 
 # ═══════════════════════════════════════════════════════════════════
 # Self-Host — Tek komutla kendi sunucunuzda çalıştırın
@@ -132,14 +132,14 @@ self-host-status: ## Self-host durumunu göster
 	@echo "API:       $$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/health 2>/dev/null || echo 'kapalı')"
 	@echo ""
 	@echo "Veritabanı:"
-	@docker compose exec -T postgres psql -U hookrelay -d hookrelay -c "SELECT COUNT(*) as customers FROM customers;" 2>/dev/null || echo "  Bağlanılamadı"
-	@docker compose exec -T postgres psql -U hookrelay -d hookrelay -c "SELECT COUNT(*) as endpoints FROM endpoints;" 2>/dev/null || true
-	@docker compose exec -T postgres psql -U hookrelay -d hookrelay -c "SELECT COUNT(*) as deliveries FROM deliveries;" 2>/dev/null || true
+	@docker compose exec -T postgres psql -U hooksniff -d hooksniff -c "SELECT COUNT(*) as customers FROM customers;" 2>/dev/null || echo "  Bağlanılamadı"
+	@docker compose exec -T postgres psql -U hooksniff -d hooksniff -c "SELECT COUNT(*) as endpoints FROM endpoints;" 2>/dev/null || true
+	@docker compose exec -T postgres psql -U hooksniff -d hooksniff -c "SELECT COUNT(*) as deliveries FROM deliveries;" 2>/dev/null || true
 
 self-host-backup: ## Veritabanını yedekle
 	@echo "📦 Veritabanı yedekleniyor..."
 	@mkdir -p backups
-	@docker compose exec -T postgres pg_dump -U hookrelay -d hookrelay > backups/hooksniff_$$(date +%Y%m%d_%H%M%S).sql
+	@docker compose exec -T postgres pg_dump -U hooksniff -d hooksniff > backups/hooksniff_$$(date +%Y%m%d_%H%M%S).sql
 	@echo "✅ Yedeklendi: backups/hooksniff_$$(date +%Y%m%d_%H%M%S).sql"
 
 self-host-update: ## Self-host güncellemesi (git pull + rebuild)
@@ -155,12 +155,12 @@ self-host-update: ## Self-host güncellemesi (git pull + rebuild)
 
 deploy-build: ## Production image'ları build et (ARM64)
 	@echo "🔨 Production image'lar build ediliyor..."
-	docker build -f deploy/Dockerfile.api.prod -t hookrelay-api:latest .
-	docker build -f deploy/Dockerfile.worker.prod -t hookrelay-worker:latest .
+	docker build -f deploy/Dockerfile.api.prod -t hooksniff-api:latest .
+	docker build -f deploy/Dockerfile.worker.prod -t hooksniff-worker:latest .
 	@echo ""
 	@echo "✅ Build tamamlandı!"
-	@echo "   hookrelay-api:latest    $$(docker images hookrelay-api:latest --format '{{.Size}}')"
-	@echo "   hookrelay-worker:latest $$(docker images hookrelay-worker:latest --format '{{.Size}}')"
+	@echo "   hooksniff-api:latest    $$(docker images hooksniff-api:latest --format '{{.Size}}')"
+	@echo "   hooksniff-worker:latest $$(docker images hooksniff-worker:latest --format '{{.Size}}')"
 
 deploy-test: ## Production build'i localde test et
 	@echo "🧪 Production build test ediliyor..."
@@ -174,8 +174,8 @@ deploy-test: ## Production build'i localde test et
 		cp deploy/env.production.example .env; \
 	fi
 	@echo "📦 Image'lar build ediliyor..."
-	docker build -f deploy/Dockerfile.api.prod -t hookrelay-api:test .
-	docker build -f deploy/Dockerfile.worker.prod -t hookrelay-worker:test .
+	docker build -f deploy/Dockerfile.api.prod -t hooksniff-api:test .
+	docker build -f deploy/Dockerfile.worker.prod -t hooksniff-worker:test .
 	@echo ""
 	@echo "🚀 Servisler başlatılıyor (docker-compose.prod.yml)..."
 	docker compose -f deploy/docker-compose.prod.yml up -d
@@ -199,11 +199,11 @@ deploy-push: ## Image'ları registry'ye push et
 		echo "   Kullanım: make deploy-push REGISTRY=ghcr.io/your-org"; \
 		exit 1; \
 	fi
-	@echo "Tag: $(REGISTRY)/hookrelay-api:latest"
-	docker tag hookrelay-api:latest $(REGISTRY)/hookrelay-api:latest
-	docker tag hookrelay-worker:latest $(REGISTRY)/hookrelay-worker:latest
-	docker push $(REGISTRY)/hookrelay-api:latest
-	docker push $(REGISTRY)/hookrelay-worker:latest
+	@echo "Tag: $(REGISTRY)/hooksniff-api:latest"
+	docker tag hooksniff-api:latest $(REGISTRY)/hooksniff-api:latest
+	docker tag hooksniff-worker:latest $(REGISTRY)/hooksniff-worker:latest
+	docker push $(REGISTRY)/hooksniff-api:latest
+	docker push $(REGISTRY)/hooksniff-worker:latest
 	@echo "✅ Push tamamlandı!"
 
 deploy-compose: ## Production compose ile başlat (local test)
