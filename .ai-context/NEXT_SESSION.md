@@ -10,8 +10,8 @@
 ### Test Coverage
 | Modül | Test Sayısı | Durum |
 |-------|------------|-------|
-| Rust API | **907 test, 0 hata** | ✅ Büyük ölçüde tamamlandı |
-| Dashboard | **136 test, 0 hata** (11 dosya) | ✅ Component/hook/store testleri eklendi |
+| Rust API | **952 test, 0 hata** | ✅ Tüm modüller covered |
+| Dashboard | **374 test, 0 hata** (50 dosya) | ✅ Tüm sayfalar + component'ler covered |
 
 ### Servis Durumu
 | Servis | Durum | Not |
@@ -55,7 +55,7 @@
 ## 🔄 Sonraki Görevler (Öncelik Sırası)
 
 ### Kısa Vadeli
-1. **Dashboard test coverage artır** — mevcut 136 test var, page-level testler eklenebilir (analytics, dashboard, deliveries, endpoints sayfaları)
+1. ✅ ~~Dashboard test coverage artır~~ — 374 test, 50 dosya, tamamlandı
 2. **API deploy** — GCP Console manuel
 3. **k6 load test** — trafik simülasyonu çalıştır
 
