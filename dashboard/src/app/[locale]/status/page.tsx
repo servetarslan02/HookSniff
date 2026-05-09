@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 // ─── Types ───
@@ -488,7 +488,6 @@ function unreachableData(): StatusData {
 
 // ─── Main Status Page ───
 export default function StatusPage() {
-  const t = useTranslations('status');
   const [data, setData] = useState<StatusData>(unreachableData());
   const [history, setHistory] = useState<HistoryDay[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
