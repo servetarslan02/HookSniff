@@ -48,7 +48,7 @@
 | Accessibility statement | ❌ Yok | Yasal zorunluluk (EU) |
 | i18n + a11y | 🟡 Kısmen var | 6 dil desteği mevcut ama aria-label'lar çevrilmemiş olabilir |
 
-### Mevcut Dosya Analizi
+### Mevcut Dosya Analizi (Detaylı Kod İncelemesi — 2026-05-10)
 
 ```
 dashboard/src/
@@ -65,6 +65,89 @@ dashboard/src/
 ├── app/[locale]/dashboard/endpoints/ → ARIA YOK
 ├── app/[locale]/dashboard/settings/  → ARIA YOK
 └── ... (30+ sayfa daha)
+```
+
+### 🚨 Sistemik Sorunlar (Kod İncelemesiyle Tespit Edildi)
+
+| Sorun | Kapsam | WCAG Kriteri | Severity |
+|-------|--------|-------------|----------|
+| **`htmlFor` hiç kullanılmamış** | 13 dosyada `<label>` var ama **0 `htmlFor`** | 3.3.2, 1.3.1 | 🔴 Kritik |
+| **`aria-live` / `role="alert"` hiç yok** | Hata mesajları screen reader'a duyurulmuyor | 4.1.3 | 🔴 Kritik |
+| **Label-input association yok** | Tüm form alanları (login, endpoints, alerts, playground, transforms) | 3.3.2 | 🔴 Kritik |
+| **Skip navigation link yok** | Dashboard layout'unda "İçeriğe atla" linki yok | 2.4.1 | 🔴 Yüksek |
+| **Icon button'lar labelsız** | `ErrorBoundary`, `Onboarding`, `ConfirmDialog`, `ChartCard` | 4.1.2 | 🔴 Yüksek |
+| **Password strength sadece renk** | Login sayfası: kırmızı/sarı/yeşil — renk körü kullanıcılar için | 1.4.1 | 🟡 Orta |
+| **Emoji içerik olarak kullanılıyor** | 📋 Schemas, 🔀 Routing, 👤 Portal — aria alternatifi yok | 1.1.1 | 🟡 Orta |
+| **Heading hierarchy tutarsız** | Bazı sayfalarda birden fazla `<h1>`, bazılarında hiç yok | 1.3.1, 2.4.6 | 🟡 Orta |
+| **Landmark role eksik** | `<nav>`, `<main>`, `<aside>` semantic element yok | 1.3.1 | 🟡 Orta |
+
+### Detaylı Tespit: Login Sayfası
+
+```tsx
+// src/app/[locale]/login/page.tsx — İNCELENEN KOD
+
+// ❌ SORUN 1: Label-input association yok
+<label className="block text-sm font-medium ...">{t('email')}</label>
+<input placeholder={t('emailPlaceholder')} className="..." />
+// ↑ htmlFor/id yok! Screen reader "email" label'ını input ile ilişkilendiremez
+
+// ❌ SORUN 2: Hata mesajı screen reader'a duyurulmuyor
+{error && (
+  <div className="mb-4 p-3 rounded-xl bg-red-50 ...">
+    {error}
+  </div>
+  // ↑ role="alert" veya aria-live="polite" yok!
+)}
+
+// ❌ SORUN 3: Password strength sadece renk ile gösteriliyor
+<span className={`inline-block w-2 h-2 rounded-full ${passwordStrength.color}`} />
+<span>{passwordStrength.label}</span>
+// ↑ Renk körü kullanıcılar "Weak/Medium/Strong" ayrımı yapamaz
+// Düzeltme: ikon veya metin ekle (✓ Strong, ✗ Weak)
+
+// ❌ SORUN 4: Password requirements açıklanmamış
+// 8+ karakter, büyük harf, küçük harf, rakam, özel karakter
+// ↑ aria-describedby ile password kuralları gösterilmeli
+```
+
+### Detaylı Tespit: Dashboard Sayfaları
+
+```tsx
+// endpoints/page.tsx — Label association yok
+<label className="block text-sm font-medium ...">URL</label>
+<input placeholder="https://..." className="..." />
+// ↑ htmlFor/id yok!
+
+// alerts/page.tsx — Label association yok
+<label className="block text-sm font-medium ...">Name</label>
+<input placeholder="Alert name" className="..." />
+// ↑ htmlFor/id yok!
+
+// playground/page.tsx — Label association yok
+<label className="block text-sm font-medium ...">{t('requestBody')}</label>
+<textarea placeholder="..." className="..." />
+// ↑ htmlFor/id yok!
+
+// transforms/page.tsx — Label association yok
+<label className="block text-sm font-medium ...">Select Endpoint</label>
+<select className="...">
+// ↑ htmlFor/id yok!
+```
+
+### Detaylı Tespit: Icon Button'lar
+
+```tsx
+// ErrorBoundary.tsx — Button without label
+<button onClick={() => window.location.reload()}>Try Again</button>
+// ↑ Metin var, bu iyi
+
+// Onboarding.tsx — Icon-only buttons
+<button onClick={handleNext}>→</button>
+// ↑ aria-label="Next" yok!
+
+// LanguageSwitcher.tsx — Dropdown trigger
+<button>{currentLocale.flag}</button>
+// ↑ aria-label="Select language" yok!
 ```
 
 ---
@@ -155,8 +238,9 @@ dashboard/src/
 
 | # | Kriter | Seviye | Açıklama | HookSniff Riski |
 |---|--------|--------|----------|----------------|
-| 1.1.1 | Non-text Content | A | Alt text | 🔴 Yüksek — image'lar |
-| 1.3.1 | Info and Relationships | A | Semantic HTML | 🔴 Yüksek — tablolar |
+| 1.1.1 | Non-text Content | A | Alt text | 🔴 Yüksek — emoji içerik |
+| 1.3.1 | Info and Relationships | A | Semantic HTML | 🔴 Yüksek — label association yok |
+| 1.4.1 | Use of Color | A | Renk tek başına bilgi taşımamalı | 🟡 Orta — password strength |
 | 1.4.3 | Contrast (Minimum) | AA | 4.5:1 ratio | 🔴 Yüksek — Tailwind |
 | 1.4.11 | Non-text Contrast | AA | 3:1 UI components | 🔴 Yüksek — butonlar |
 | 2.1.1 | Keyboard | A | Keyboard erişilebilirlik | 🔴 Yüksek |
@@ -166,10 +250,82 @@ dashboard/src/
 | 2.4.6 | Headings and Labels | AA | Başlık hiyerarşisi | 🟡 Orta |
 | 2.4.7 | Focus Visible | AA | Focus göstergesi | 🔴 Yüksek |
 | 3.1.1 | Language of Page | A | lang attribute | 🟡 Orta — i18n var |
-| 3.3.1 | Error Identification | A | Hata tanımlama | 🟡 Orta |
-| 3.3.2 | Labels or Instructions | AA | Form labels | 🔴 Yüksek |
+| 3.3.1 | Error Identification | A | Hata tanımlama | 🔴 Yüksek — aria-live yok |
+| 3.3.2 | Labels or Instructions | AA | Form labels | 🔴 Kritik — htmlFor yok |
 | 4.1.2 | Name, Role, Value | A | ARIA | 🔴 Yüksek |
-| 4.1.3 | Status Messages | AA | Live regions | 🟡 Orta — toast/alert |
+| 4.1.3 | Status Messages | AA | Live regions | 🔴 Kritik — aria-live yok |
+
+### WCAG 2.2 Yeni Kriterler (Ekim 2023 — Eksik Olanlar)
+
+> **Kaynak:** https://testparty.ai/blog/wcag-22-new-success-criteria (✅ doğrulanmış)
+> **Kaynak:** https://www.w3.org/TR/WCAG22/ (✅ doğrulanmış)
+
+WCAG 2.2, WCAG 2.1 üzerine **9 yeni başarı kriteri** ekledi. HookSniff'in bunları da hesaba katması gerekiyor:
+
+| # | Kriter | Seviye | Açıklama | HookSniff Riski |
+|---|--------|--------|----------|----------------|
+| **2.4.11** | Focus Not Obscured (Minimum) | A | Focus element sticky header tarafından gizlenmemeli | 🟡 Orta — sticky header var |
+| **2.4.12** | Focus Not Obscured (Enhanced) | AA | Focus element'in hiçbir kısmı gizlenmemeli | 🟡 Orta |
+| **2.4.13** | Focus Appearance | AA | Focus indicator: 2px+ kalınlık, 3:1+ kontrast | 🔴 Yüksek — shadcn ring/50 |
+| **2.5.7** | Dragging Movements | AA | Drag-and-drop için alternatif olmalı | 🟢 Düşük — DnD yok |
+| **2.5.8** | Target Size (Minimum) | AA | Min 24×24 CSS px interactive target | 🟡 Orta — icon button'lar |
+| **3.2.6** | Consistent Help | AAA | Yardım tutarlı olmalı | 🟢 Düşük |
+| **3.3.7** | Redundant Entry | A | Aynı bilgi tekrar istenmemeli | 🟢 Düşük |
+| **3.3.8** | Accessible Authentication (Minimum) | AA | CAPTCHA/cognitive test alternatifi | 🟢 Düşük — CAPTCHA yok |
+| **3.3.9** | Accessible Authentication (Enhanced) | AAA | Gelişmiş auth erişilebilirliği | 🟢 Düşük |
+
+#### 2.4.11 Focus Not Obscured — HookSniff Etkisi
+
+```tsx
+// Dashboard layout'ta sticky sidebar var
+// Eğer sidebar fixed position ise, Tab ile gezinirken
+// focus olan element sidebar altında kalabilir
+
+// Düzeltme:
+html {
+  scroll-padding-top: 80px; /* Sticky header yüksekliği */
+}
+:focus {
+  scroll-margin-top: 100px;
+}
+```
+
+#### 2.4.13 Focus Appearance — HookSniff Etkisi
+
+```css
+/* ❌ Mevcut shadcn default — GEÇMİYOR */
+:focus-visible {
+  ring: 1px;
+  ring-color: var(--ring);
+  opacity: 0.5; /* 2.4:1 kontrast — 3:1 gerekli */
+}
+
+/* ✅ Düzeltme — GEÇİYOR */
+:focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+  /* veya */
+  box-shadow: 0 0 0 3px hsl(var(--ring));
+}
+```
+
+#### 2.5.8 Target Size — HookSniff Etkisi
+
+```tsx
+// ❌ Mevcut icon button'lar — Küçük touch target
+<button className="h-6 w-6">  // 24px — minimum sınırda
+  <X className="h-4 w-4" />
+</button>
+
+// ✅ Düzeltme — Yeterli touch target
+<button className="h-9 w-9 flex items-center justify-center">  // 36px — rahat
+  <X className="h-4 w-4" />
+</button>
+// Veya spacing ile:
+<button className="h-6 w-6 m-1.5">  // target + spacing = 24px+
+  <X className="h-4 w-4" />
+</button>
+```
 
 ---
 
@@ -320,6 +476,76 @@ Faz 4: Sürekli Bakım (devam eden)
 ## 8. Uygulama Planı
 
 ### Faz 1: Temel Uyumluluk (1-2 hafta)
+
+#### 1.0 ACİL: Label-Input Association (TÜM SAYFALAR)
+
+> **🚨 EN KRİTİK SORUN:** Dashboard'daki 13 dosyada `<label>` var ama **hiçbirinde `htmlFor` yok**. Bu, WCAG 3.3.2 ve 1.3.1 ihlali. Tüm formlar düzeltilmeli.
+
+```tsx
+// ❌ MEVCUT — 13 dosyada bu pattern var
+<label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+  {t('email')}
+</label>
+<input placeholder={t('emailPlaceholder')} className="..." />
+
+// ✅ DÜZELTME — htmlFor + id + aria-describedby
+<div>
+  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+    {t('email')}
+  </label>
+  <input
+    id="email"
+    type="email"
+    placeholder={t('emailPlaceholder')}
+    aria-describedby="email-hint"
+    className="..."
+  />
+  <p id="email-hint" className="text-xs text-gray-500 mt-1">
+    {t('emailHint')}
+  </p>
+</div>
+```
+
+**Düzeltilecek dosyalar (öncelik sırası):**
+1. `login/page.tsx` — email, password, name inputs
+2. `endpoints/page.tsx` — URL, description inputs
+3. `endpoints/[id]/page.tsx` — 5+ input alanı
+4. `alerts/page.tsx` — name, condition, threshold, channels
+5. `playground/page.tsx` — 4+ input alanı
+6. `transforms/page.tsx` — endpoint select, filter inputs
+7. `inbound/page.tsx` — webhook secret, route select
+8. `settings/page.tsx` — tüm ayar inputları
+9. `team/page.tsx` — invite form
+10. `api-keys/page.tsx` — key creation form
+11. `billing/page.tsx` — ödeme formu
+12. `webhooks/new/page.tsx` — webhook creation form
+13. `search/page.tsx` — search input
+
+#### 1.0b ACİL: Error Messages — aria-live
+
+> **🚨 KRİTİK SORUN:** Hiçbir sayfada `aria-live` veya `role="alert"` yok. Hata mesajları screen reader kullanıcılarına duyurulmuyor.
+
+```tsx
+// ❌ MEVCUT
+{error && (
+  <div className="mb-4 p-3 rounded-xl bg-red-50 ...">
+    {error}
+  </div>
+)}
+
+// ✅ DÜZELTME
+<div aria-live="polite" aria-atomic="true" className="sr-only">
+  {error && <p>{error}</p>}
+</div>
+{error && (
+  <div role="alert" className="mb-4 p-3 rounded-xl bg-red-50 ...">
+    {error}
+  </div>
+)}
+
+// Veya shadcn Form bileşeni ile (otomatik aria-live):
+<FormMessage /> {/* shadcn otomatik role="alert" ekler */}
+```
 
 #### 1.1 ESLint jsx-a11y Kurulumu
 
