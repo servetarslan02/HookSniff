@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 01:52 GMT+8
+> Son güncelleme: 2026-05-10 01:55 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -358,6 +358,19 @@ cd dashboard && npm install && npm run build
 
 ### Sonraki Oturum İçin Kalan (Öncelik 3 — 2 rapor)
 - ~~COMPETITIVE_MOAT_STRATEGY~~ ✅
+
+---
+
+## 📝 Oturum 50 (2026-05-10 01:52 - 01:55 GMT+8)
+
+### Yapılan İşler
+- `COMPETITIVE_MOAT_STRATEGY.md` düzeltildi — NPS benchmarks, switching cost, 7 Powers eklendi
+  - SaaS NPS median: +33 (CustomerGauge 2025 ✅)
+  - B2B switching cost: $180K (Improvado 2026 ✅)
+  - Counter-positioning: Robinhood örneği (Nandu 7 Powers ✅)
+  - HookSniff NPS hedefi: +30 → +45 → +60
+- Toplam rapor durumu: **14/19 tamamlandı** (Öncelik 3: 4/5)
+- Kalan: FEATURE_FLAGS_STRATEGY (son rapor)
 - FEATURE_FLAGS_STRATEGY
 
 ---
@@ -382,6 +395,19 @@ cd dashboard && npm install && npm run build
 - EXIT_SCALING_STRATEGY (Öncelik 4)
 - FEATURE_FLAGS_STRATEGY
 - ~~COMPETITIVE_MOAT_STRATEGY~~ ✅
+
+---
+
+## 📝 Oturum 50 (2026-05-10 01:52 - 01:55 GMT+8)
+
+### Yapılan İşler
+- `COMPETITIVE_MOAT_STRATEGY.md` düzeltildi — NPS benchmarks, switching cost, 7 Powers eklendi
+  - SaaS NPS median: +33 (CustomerGauge 2025 ✅)
+  - B2B switching cost: $180K (Improvado 2026 ✅)
+  - Counter-positioning: Robinhood örneği (Nandu 7 Powers ✅)
+  - HookSniff NPS hedefi: +30 → +45 → +60
+- Toplam rapor durumu: **14/19 tamamlandı** (Öncelik 3: 4/5)
+- Kalan: FEATURE_FLAGS_STRATEGY (son rapor)
 - FEATURE_FLAGS_STRATEGY
 
 ---
@@ -459,6 +485,19 @@ cd dashboard && npm install && npm run build
 
 ### Sonraki Oturum İçin Kalan (Öncelik 3 — 2 rapor)
 - ~~COMPETITIVE_MOAT_STRATEGY~~ ✅
+
+---
+
+## 📝 Oturum 50 (2026-05-10 01:52 - 01:55 GMT+8)
+
+### Yapılan İşler
+- `COMPETITIVE_MOAT_STRATEGY.md` düzeltildi — NPS benchmarks, switching cost, 7 Powers eklendi
+  - SaaS NPS median: +33 (CustomerGauge 2025 ✅)
+  - B2B switching cost: $180K (Improvado 2026 ✅)
+  - Counter-positioning: Robinhood örneği (Nandu 7 Powers ✅)
+  - HookSniff NPS hedefi: +30 → +45 → +60
+- Toplam rapor durumu: **14/19 tamamlandı** (Öncelik 3: 4/5)
+- Kalan: FEATURE_FLAGS_STRATEGY (son rapor)
 - FEATURE_FLAGS_STRATEGY
 
 ---
@@ -483,6 +522,19 @@ cd dashboard && npm install && npm run build
 - EXIT_SCALING_STRATEGY (Öncelik 4)
 - FEATURE_FLAGS_STRATEGY
 - ~~COMPETITIVE_MOAT_STRATEGY~~ ✅
+
+---
+
+## 📝 Oturum 50 (2026-05-10 01:52 - 01:55 GMT+8)
+
+### Yapılan İşler
+- `COMPETITIVE_MOAT_STRATEGY.md` düzeltildi — NPS benchmarks, switching cost, 7 Powers eklendi
+  - SaaS NPS median: +33 (CustomerGauge 2025 ✅)
+  - B2B switching cost: $180K (Improvado 2026 ✅)
+  - Counter-positioning: Robinhood örneği (Nandu 7 Powers ✅)
+  - HookSniff NPS hedefi: +30 → +45 → +60
+- Toplam rapor durumu: **14/19 tamamlandı** (Öncelik 3: 4/5)
+- Kalan: FEATURE_FLAGS_STRATEGY (son rapor)
 - FEATURE_FLAGS_STRATEGY
 
 ---
