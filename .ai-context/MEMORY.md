@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 00:55 GMT+8
+> Son güncelleme: 2026-05-10 01:20 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -210,6 +210,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 43 | 2026-05-10 01:02 | **Strateji raporları** — Financial Model, A/B Testing, SEO (3 rapor, internet araştırmasıyla doğrulanmış, Svix $10.5M/$5M verileri eklendi) |
 | 42 | 2026-05-10 00:21 | **Kritik fix oturumu** — 4 eksik tablo (refresh_tokens vb.), CSP hostname fix, vitest build fix, gcloud kurulumu, admin hesap, Vercel env var, deploy limiti tespit |
 | 39 | 2026-05-09 23:06 | **Strategy oturumu** — Status Page raporu (22 bölüm), Technical Cleanup raporu (10 bölüm), Conversion Funnel raporu, LAUNCH fiyat düzeltmesi ($49→$29), Grafana OTEL token tespiti (public!), GCP WIF rehberi, 19 yeni rapor planlandı |
 | 38 | 2026-05-09 22:06 | Dashboard coverage artırma — 4 detail page fix + 45 yeni test, 60 dosya/471 test/0 hata |
@@ -247,3 +248,31 @@ cd dashboard && npm install && npm run build
 ### Servet'in Yapması Gereken
 - 🔴 Login test (deploy sonrası)
 - ⚠️ Token rotation (GitHub PAT, npm, GCP SA)
+
+---
+
+## 📝 Oturum 43 (2026-05-10 01:02 - 01:20 GMT+8)
+
+### Yapılan İşler
+- 3 strateji raporu oluşturuldu (internet araştırmasıyla doğrulanmış):
+  1. `FINANCIAL_MODEL_STRATEGY.md` (15KB) — birim ekonomi, LTV/CAC, break-even, gelir projeksiyonu, maliyet yapısı
+  2. `AB_TESTING_STRATEGY.md` (15.5KB) — 13 test planı, PostHog seçimi, istatistiksel metodoloji
+  3. `SEO_DETAILED_STRATEGY.md` (23KB) — anahtar kelime araştırması, teknik SEO, rakip analizi, backlink stratejisi
+- Raporlar eksikler giderilerek güncellendi:
+  - Svix gerçek verileri eklendi: 3,199 GitHub stars, $10.5M funding, $5M revenue, 20+ Fortune 500 müşteri
+  - Hookdeck/Hook0 doğrulanmış verileri eklendi
+  - Türkiye pazar analizi eklendi (KPMG Q3 2025)
+  - Anahtar kelime hacimleri güven aralıklarıyla işaretlendi
+  - PostHog kurulum kodu Next.js 15 App Router ile güncellendi
+  - A/B test feature flag örneği eklendi
+- Toplam rapor durumu: **8/19 tamamlandı** (Öncelik 1: 5/5, Öncelik 2: 3/5)
+- GitHub'a push edildi: `0e5e0ec`, `8d5aeba`, güncelleme commit'leri
+
+### Doğrulanmış Rakip Verileri (Yeni)
+- **Svix:** $10.5M Series A, $5M revenue (2024), 11 kişi ekip, 3,199 GitHub stars, 20+ Fortune 500 müşteri (Twilio, PagerDuty, Brex, Clerk, Lob, Replicate, Guesty, Benchling, Drata, Beehiiv, Taskrabbit)
+- **Hookdeck:** SOC2 Type 2, G2 listlemesi, funding/revenue kamuoyuna açık değil
+- **Hook0:** Open-source, self-hosted, funding kamuoyuna açık değil
+
+### Sonraki Oturum İçin Kalan
+- `EMAIL_MARKETING_STRATEGY.md` — Drip campaigns, lifecycle emails
+- `CONTENT_MARKETING_STRATEGY.md` — Blog editorial calendar, SEO content

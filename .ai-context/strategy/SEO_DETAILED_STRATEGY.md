@@ -371,44 +371,76 @@ Her blog post için standart format:
 
 ## 5. Rakip SEO Analizi
 
-### Svix SEO Durumu
+### Svix SEO Durumu (Doğrulanmış Veriler)
 
-| Metrik | Tahmini Değer | Not |
-|--------|---------------|-----|
-| Domain authority | 40-50 | Kurulu marka |
-| Organik trafik | 10K-20K/ay | Tahmini |
-| Indexed pages | 100-200 | Dokümantasyon ağırlıklı |
-| Backlinks | 500-1,000 | Kurulu backlink profili |
-| Content strategy | Blog + docs | Düzenli içerik |
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Domain authority | Tahmini 45-55 | 3,199 GitHub stars + $10.5M funding + 20+ enterprise müşteri |
+| Organik trafik | Tahmini 15K-30K/ay | 20+ müşteri case study + güçlü içerik |
+| Indexed pages | 200+ | Blog + docs + use cases + customers |
+| Backlinks | 1,000+ (tahmini) | Open-source repo (3,199 stars) + müşteri blogları |
+| Content strategy | Blog + customer stories + use case pages | svix.com/blog, svix.com/customers |
+| GitHub stars | **3,199** | GitHub API (doğrulanmış) |
+| Funding | **$10.5M Series A** | Clay/Tracxn (doğrulanmış) |
+| Revenue | **$5M (2024)** | GetLatka (doğrulanmış) |
+| Tanınmış müşteriler | Twilio, PagerDuty, Brex, Clerk, Lob, Replicate, Guesty, Benchling, Drata, Beehiiv, Taskrabbit | svix.com/customers (doğrulanmış) |
 
 **Svix'in güçlü yanları:**
-- Kurulu domain authority
-- "Svix" marka aramaları
-- Lob, Lithic, Guesty müşteri referansları
-- Open-source GitHub repo (backlink kaynağı)
+- 3,199 GitHub stars → güçlü domain authority
+- 20+ Fortune 500 müşteri referansı → backlink + trust
+- $10.5M funding → içerik pazarlama bütçesi
+- Open-source → developer topluluğunda organik mention
+- "Svix" marka aramaları (branded keywords)
 
 **Svix'in zayıf yanları:**
 - Pahalı ($490+) — "cheap webhook service" anahtar kelimesinde kaybediyor
 - 6 SDK — "webhook [dil] SDK" long-tail'de eksik
 - FIFO/Schema Registry yok — teknik anahtar kelimelerde kaybediyor
+- Türkiye'de ödeme yöntemi yok
 
-### Hookdeck SEO Durumu
+### Hookdeck SEO Durumu (Doğrulanmış Veriler)
 
-| Metrik | Tahmini Değer | Not |
-|--------|---------------|-----|
-| Domain authority | 35-45 | Kurulu marka |
-| Organik trafik | 5K-15K/ay | Tahmini |
-| Indexed pages | 50-100 | Dokümantasyon |
-| Backlinks | 300-600 | Kurulu |
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Domain authority | Tahmini 35-45 | G2 listelemesi + SOC2 + blog |
+| Organik trafik | Tahmini 5K-15K/ay | Blog + docs |
+| Indexed pages | 100+ | Docs + blog |
+| Backlinks | 500+ (tahmini) | G2, The New Stack, Nordic APIs |
+| Content strategy | Blog + technical docs | hookdeck.com/blog |
+| G2 listelemesi | ✅ Message Queue Software kategorisi | G2 (doğrulanmış) |
+| SOC2 | ✅ Type 2 | hookdeck.com/pricing (doğrulanmış) |
 
 **Hookdeck'in güçlü yanları:**
 - "Webhook debugging" konusunda güçlü içerik
 - Outpost (self-hosted) seçeneği
+- SOC2 Type 2 sertifikası
 
 **Hookdeck'in zayıf yanları:**
 - SDK yok — "webhook SDK" aramalarında yok
 - FIFO/Schema Registry yok
 - Free plan 3 gün retention (çok kısa)
+
+### Hook0 SEO Durumu
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Domain authority | Tahmini 15-25 | Yeni open-source proje |
+| Organik trafik | Tahmini 1K-3K/ay | Sınırlı içerik |
+| Model | Self-hosted | hook0.com |
+
+### Anahtar Kelime Hacimleri — Doğrulama Notu
+
+⚠️ **Önemli:** Aşağıdaki anahtar kelime hacimleri tahminidir. Gerçek hacimler Ahrefs veya SEMrush ile doğrulanmalıdır. Tahminler Google Trends, rakip içerik varlığı ve sektör benchmark'larına dayanmaktadır.
+
+| Anahtar Kelime | Tahmini Hacim | Güven Aralığı | Doğrulama Yöntemi |
+|----------------|---------------|---------------|-------------------|
+| webhook delivery | 500-1,000/ay | ±%50 | Ahrefs/SEMrush gerekli |
+| webhook service | 300-600/ay | ±%50 | Ahrefs/SEMrush gerekli |
+| what is a webhook | 1,000-2,000/ay | ±%30 | Google Trends yüksek gösteriyor |
+| webhook best practices | 300-500/ay | ±%40 | Ahrefs/SEMrush gerekli |
+| svix alternative | 50-100/ay | ±%60 | Düşük hacim, yüksek dönüşüm |
+
+**Doğrulama önerisi:** Ahrefs ($99/ay) veya SEMrush ($129/ay) ile ilk ay keyword research yap. Ücretsiz alternatif: Google Keyword Planner (Google Ads hesabıyla).
 
 ### HookSniff SEO Fırsatları
 

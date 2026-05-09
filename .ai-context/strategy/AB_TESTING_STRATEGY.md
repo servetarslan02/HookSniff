@@ -40,9 +40,10 @@
 
 | Rakip | A/B Test | Araç | Not |
 |-------|----------|------|-----|
-| Svix | ✅ Aktif | Bilinmiyor | Pricing page'de sürekli optimizasyon |
-| Hookdeck | ✅ Aktif | Bilinmiyor | Landing page A/B testleri |
+| Svix | ✅ Aktif | Bilinmiyor | $10.5M funding, $5M revenue — sürekli optimizasyon yapıyorlar |
+| Hookdeck | ✅ Aktif | Bilinmiyor | SOC2 Type 2, G2 listelemesi — profesyonel operasyon |
 | Stripe | ✅ Aktif | Özel araç | Endüstri lideri CRO |
+| HookSniff | ❌ Henüz yok | — | Bu strateji ile başlanacak |
 
 ---
 
@@ -412,20 +413,33 @@ n ≈ 7,840 per variant
 - MarketingLTB: %58 şirket opinion-based karar alıyor (2026)
 - Unbounce: Landing page conversion benchmarks (2026)
 
-### PostHog Kurulum Kodu (Next.js)
+### PostHog Kurulum Kodu (Next.js 15 — App Router)
+
+⚠️ **Not:** Bu kod PostHog dokümantasyonuna dayanmaktadır. Dashboard deploy sonrası test edilmelidir. PostHog free tier: 1M events/ay, 15K session recordings/ay.
 
 ```typescript
 // app/providers.tsx
 'use client'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
+import { useEffect } from 'react'
 
-if (typeof window !== 'undefined') {
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com',
-    capture_pageview: false, // Manuel capture
-    capture_pageleave: true,
-  })
+export function PostHogInit() {
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com',
+        capture_pageview: false, // Manuel capture ile kontrol
+        capture_pageleave: true,
+        person_profiles: 'identified_only', // Sadece identified kullanıcılar
+        loaded: (posthog) => {
+          if (process.env.NODE_ENV === 'development') posthog.debug() // Dev'de debug
+        },
+      })
+    }
+  }, [])
+
+  return null
 }
 
 export function CSPostHogProvider({ children }: { children: React.ReactNode }) {
@@ -433,25 +447,115 @@ export function CSPostHogProvider({ children }: { children: React.ReactNode }) {
 }
 ```
 
+```typescript
+// app/layout.tsx
+import { CSPostHogProvider, PostHogInit } from './providers'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <CSPostHogProvider>
+        <PostHogInit />
+        <body>{children}</body>
+      </CSPostHogProvider>
+    </html>
+  )
+}
+```
+
 ### Event Tracking Örneği
 
 ```typescript
-// Signup tracking
-posthog.capture('signup_started', { source: 'landing_page' })
-posthog.capture('signup_completed', { plan: 'free', method: 'email' })
+// lib/posthog-events.ts
+import posthog from 'posthog-js'
 
-// Webhook tracking
-posthog.capture('first_webhook_sent', { sdk: 'node', time_to_first: seconds })
+// Auth events
+export function trackSignupStarted(source: string) {
+  posthog.capture('signup_started', { source })
+}
 
-// Upgrade tracking
-posthog.capture('upgrade_clicked', { from_plan: 'free', to_plan: 'pro' })
-posthog.capture('payment_completed', { plan: 'pro', amount: 29, currency: 'USD' })
+export function trackSignupCompleted(method: string) {
+  posthog.capture('signup_completed', { method, timestamp: new Date().toISOString() })
+}
+
+export function trackLogin(method: string) {
+  posthog.capture('login_completed', { method })
+}
+
+// Webhook events
+export function trackFirstWebhookSent(sdk: string, timeToFirst: number) {
+  posthog.capture('first_webhook_sent', { sdk, time_to_first_seconds: timeToFirst })
+}
+
+export function trackWebhookSent(plan: string, event: string) {
+  posthog.capture('webhook_sent', { plan, event_type: event })
+}
+
+// Billing events
+export function trackUpgradeClicked(fromPlan: string, toPlan: string) {
+  posthog.capture('upgrade_clicked', { from_plan: fromPlan, to_plan: toPlan })
+}
+
+export function trackPaymentCompleted(plan: string, amount: number, currency: string) {
+  posthog.capture('payment_completed', { plan, amount, currency })
+}
+
+export function trackPlanSelected(plan: string, billing: 'monthly' | 'yearly') {
+  posthog.capture('plan_selected', { plan, billing_cycle: billing })
+}
+
+// Feature usage events
+export function trackFeatureUsed(feature: string, plan: string) {
+  posthog.capture('feature_used', { feature_name: feature, current_plan: plan })
+}
+
+// Identify user (signup sonrası)
+export function identifyUser(userId: string, email: string, plan: string) {
+  posthog.identify(userId, { email, plan, signup_date: new Date().toISOString() })
+}
 ```
+
+### A/B Test Feature Flag Örneği
+
+```typescript
+// components/HeroSection.tsx
+'use client'
+import { useFeatureFlagVariantKey } from 'posthog-js/react'
+
+export function HeroSection() {
+  const variant = useFeatureFlagVariantKey('hero-headline-test')
+
+  const headlines: Record<string, string> = {
+    control: 'Reliable webhook delivery for developers',
+    variant_a: 'Send webhooks. We deliver them. If they fail, we retry.',
+    variant_b: 'Webhook infrastructure that never drops a message',
+    variant_c: 'Ship webhooks in 5 minutes, not 5 weeks',
+  }
+
+  return (
+    <section>
+      <h1>{headlines[variant as string] || headlines.control}</h1>
+      {/* ... */}
+    </section>
+  )
+}
+```
+
+### Kurulum Checklist (Doğrulanacak)
+
+- [ ] `posthog-js` npm package: `npm install posthog-js` — PostHog dokümantasyonuna göre
+- [ ] `NEXT_PUBLIC_POSTHOG_KEY` env var: PostHog dashboard → Project Settings → API Key
+- [ ] `NEXT_PUBLIC_POSTHOG_HOST` env var: Vercel'de ayarla (varsayılan: `https://app.posthog.com`)
+- [ ] Feature flags: PostHog dashboard'dan manuel oluştur
+- [ ] Test: `posthog.debug()` ile browser console'da event'leri doğrula
 
 ### Dikkat Edilecekler
 
-1. **GDPR uyumluluğu** — PostHog self-hosted seçeneği veri kontrolü sağlar
-2. **Düşük trafik** — İlk aylarda büyük MDE kullan, küçük etkileri bekleme
+1. **GDPR uyumluluğu** — PostHog self-hosted seçeneği veri kontrolü sağlar. Varsayılan olarak EU'da veri saklanabilir
+2. **Düşük trafik** — İlk aylarda büyük MDE (%25-50) kullan, küçük etkileri bekleme
 3. **Test çakışması** — Aynı anda max 2-3 test çalıştır
 4. **Süre yeterliliği** — Minimum 2 hafta, hafta sonu etkisini hesaba kat
 5. **Multiple testing correction** — Birden fazla test sonucunu Bonferroni ile düzelt
+6. **PostHog free tier limiti** — 1M events/ay. İlk aylarda yeterli, trafik artınca plan kontrol et
+7. **Next.js 15 App Router** — `'use client'` directive gerekli, SSR'da PostHog çalışmaz
+8. **Vercel env vars** — `NEXT_PUBLIC_` prefix'i zorunlu, yoksa client-side erişilemez
