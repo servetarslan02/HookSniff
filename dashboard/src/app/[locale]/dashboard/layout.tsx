@@ -9,6 +9,7 @@ import { AuthGuard } from '@/components/AuthGuard';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationCenter } from '@/components/NotificationCenter';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -39,6 +40,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: '🔐 Signature Tool', href: '/dashboard/signature-verifier', icon: '🔐' },
     { name: '📥 API Importer', href: '/dashboard/api-importer', icon: '📥' },
     { name: '🖼️ Portal Customize', href: '/dashboard/portal-customize', icon: '🖼️' },
+    { name: '🔧 Webhook Builder', href: '/dashboard/webhook-builder', icon: '🔧' },
+    { name: '📋 Audit Log', href: '/dashboard/audit-log', icon: '📋' },
+    { name: '🔐 SSO / SAML', href: '/dashboard/sso', icon: '🔐' },
+    { name: '🌐 Custom Domain', href: '/dashboard/custom-domain', icon: '🌐' },
     { name: t('team'), href: '/dashboard/team', icon: '👥' },
     { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
     { name: t('billing'), href: '/dashboard/billing', icon: '💳' },
@@ -150,7 +155,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="p-4 md:p-8 page-enter">{children}</main>
+        <main className="p-4 md:p-8 page-enter">
+          <EmailVerificationBanner />
+          {children}
+        </main>
       </div>
     </div>
   );
