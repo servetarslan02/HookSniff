@@ -69,7 +69,7 @@ cd dashboard && npm install && npm run build
 | Elixir | Hex.pm | ✅ `hooksniff 0.2.0` (Oturum 32) | ✅ GCP Cloud Run |
 | Java | Maven Central | ❌ GPG key + versiyon conflict | ✅ GCP Cloud Run |
 | Kotlin | Maven Central | ❌ GPG imza gerekli | ✅ GCP Cloud Run |
-| Ruby | RubyGems | ❌ MFA (WebAuthn) gerekli | ✅ GCP Cloud Run |
+| Ruby | RubyGems | ✅ `hooksniff 0.1.0` (önceki oturumda publish edilmiş) | ✅ GCP Cloud Run |
 
 ---
 
@@ -86,7 +86,7 @@ cd dashboard && npm install && npm run build
 |-------|-------|------|
 | API deploy (GCP Console) | 🔴 ACİL | RateLimiter fix deploy edilmeli |
 | iyzico hesap | ❌ | Vergi levhası + banka hesabı |
-| Java/Kotlin/Ruby SDK publish | ⏳ | GPG key + MFA gerekli (scriptler hazır) |
+| Java/Kotlin SDK publish | ⏳ | OSSRH credential gerekli (build hazır, GPG key oluşturuldu) |
 | npm token rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
 | GCP SA key rotate | ⚠️ | Eski key paylaşıldı, yeni key oluştur |
 | GitHub PAT rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
@@ -158,7 +158,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
-| 33 | 2026-05-09 19:51 | OpenClaw webchat, GitHub sync sistemi kuruldu, otomatik cron |
+| 33 | 2026-05-09 19:51 | OpenClaw webchat, SDK publish — Ruby ✅ mevcut, Java/Kotlin build hazır, OSSRH credential bekleniyor |
 | 32 | 2026-05-09 18:57 | SDK build & publish — Elixir hex.pm'e yüklendi (8/11) |
 | 31 | 2026-05-09 18:51 | OpenClaw webchat bağlantı, GitHub hafıza sistemi doğrulama |
 | 30 | 2026-05-09 18:19 | notification_preferences, FIXME, integration test, OpenAPI, test coverage 10/10 |
