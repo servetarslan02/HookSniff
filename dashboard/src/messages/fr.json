@@ -715,7 +715,11 @@
       "copyright": "© 2026 HookSniff. Tous droits réservés.",
       "changelog": "Changelog",
       "pricing": "Pricing",
-      "useCases": "Use Cases"
+      "useCases": "Use Cases",
+      "compare": "Compare",
+      "customers": "Customers",
+      "security": "Security",
+      "playground": "Playground"
     }
   },
   "apiKeys": {
