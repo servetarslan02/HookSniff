@@ -24,7 +24,11 @@ strategy/
 │   ├── ACCESSIBILITY_STRATEGY.md
 │   ├── LOAD_TESTING_STRATEGY.md
 │   ├── TECHNICAL_CLEANUP_STRATEGY.md
-│   └── STATUS_PAGE_STRATEGY.md
+│   ├── STATUS_PAGE_STRATEGY.md
+│   ├── DISASTER_RECOVERY_STRATEGY.md
+│   ├── API_DOCUMENTATION_STRATEGY.md
+│   ├── MONITORING_OBSERVABILITY_STRATEGY.md
+│   └── CICD_STRATEGY.md
 │
 ├── 04-security/        ← Güvenlik ve operasyonlar
 │   ├── DDOS_PROTECTION_STRATEGY.md
@@ -50,7 +54,7 @@ strategy/
 └── README.md           ← Bu dosya
 ```
 
-## Tüm Belgeler (19/19 ✅)
+## Tüm Belgeler (31/31 ✅)
 
 | # | Kategori | Dosya | Boyut | Durum |
 |---|----------|-------|-------|-------|
@@ -81,8 +85,12 @@ strategy/
 | 25 | 06-analytics | ACTIVATION_RETENTION_STRATEGY.md | ~15KB | ✅ |
 | 26 | 07-legal | LEGAL_REPORT.md | ~12KB | ✅ |
 | 27 | 07-legal | SUPPORT_REPORT.md | ~10KB | ✅ |
+| 28 | 03-product | DISASTER_RECOVERY_STRATEGY.md | ~32KB | ✅ |
+| 29 | 03-product | API_DOCUMENTATION_STRATEGY.md | ~16KB | ✅ |
+| 30 | 03-product | MONITORING_OBSERVABILITY_STRATEGY.md | ~22KB | ✅ |
+| 31 | 03-product | CICD_STRATEGY.md | ~18KB | ✅ |
 
-**Toplam:** ~200KB+ strateji dokümantasyonu
+**Toplam:** ~290KB+ strateji dokümantasyonu
 
 ## Her Rapor İçin Format
 
