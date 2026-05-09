@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HookSniff Logo Konseptleri</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+    background: #0f0f0f; 
+    color: #f4f4f5; 
+    padding: 40px 20px;
+  }
+  h1 { 
+    text-align: center; 
+    font-size: 28px; 
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #6d28d9, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { text-align: center; color: #71717a; margin-bottom: 40px; font-size: 14px; }
+  .grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 24px; 
+    max-width: 1000px; 
+    margin: 0 auto 48px;
+  }
+  .card { 
+    background: #18181b; 
+    border: 1px solid #27272a; 
+    border-radius: 16px; 
+    padding: 24px; 
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #7c3aed; }
+  .card img { 
+    width: 160px; 
+    height: 160px; 
+    margin-bottom: 16px;
+    border-radius: 24px;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: #a1a1aa; line-height: 1.5; }
+  .badge { 
+    display: inline-block; 
+    background: #6d28d9; 
+    color: white; 
+    font-size: 11px; 
+    font-weight: 600;
+    padding: 3px 10px; 
+    border-radius: 20px; 
+    margin-bottom: 12px; 
+  }
+  .badge.alt { background: #27272a; color: #a1a1aa; }
+  .section-title { 
+    font-size: 20px; 
+    font-weight: 600; 
+    margin: 48px auto 20px; 
+    max-width: 1000px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #27272a;
+  }
+  .full-logo { 
+    background: #18181b; 
+    border: 1px solid #27272a; 
+    border-radius: 16px; 
+    padding: 32px; 
+    max-width: 700px; 
+    margin: 0 auto 24px;
+    text-align: center;
+  }
+  .full-logo img { 
+    max-width: 100%; 
+    height: auto; 
+    margin-bottom: 12px;
+  }
+  .full-logo p { font-size: 13px; color: #a1a1aa; }
+  .palette { 
+    display: flex; 
+    gap: 12px; 
+    justify-content: center; 
+    flex-wrap: wrap; 
+    margin: 20px auto; 
+    max-width: 600px;
+  }
+  .swatch { 
+    width: 60px; 
+    height: 60px; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: flex-end; 
+    padding: 6px;
+    font-size: 10px; 
+    color: white; 
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .favicons { 
+    display: flex; 
+    gap: 16px; 
+    align-items: flex-end; 
+    justify-content: center; 
+    margin: 20px auto; 
+    flex-wrap: wrap;
+  }
+  .fav-item { text-align: center; }
+  .fav-item span { display: block; font-size: 11px; color: #71717a; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<h1>🪝 HookSniff — Logo Konseptleri</h1>
+<p class="subtitle">5 ikon varyasyonu + renk paleti + favicon seti</p>
+
+<!-- ICON CONCEPTS -->
+<div class="grid">
+  <div class="card">
+    <span class="badge">Konsept 1</span>
+    <img src="logo-concept-1.png" alt="Konsept 1">
+    <h3>Geometric H-Hook</h3>
+    <p>H'nin sağ bacağı aşağı inip kancaya dönüşüyor. Crossbar ile "H" hemen tanınıyor.</p>
+  </div>
+  <div class="card">
+    <span class="badge">Konsept 2</span>
+    <img src="logo-concept-2.png" alt="Konsept 2">
+    <h3>Minimal Hook + Signal</h3>
+    <p>En sade tasarım. Kanca formu + sinyal noktası. Webhook "teslimat" hissi.</p>
+  </div>
+  <div class="card">
+    <span class="badge alt">Konsept 3 — ❌ Render hatası</span>
+    <img src="logo-concept-3.png" alt="Konsept 3">
+    <h3>Geometric Hook Mark</h3>
+    <p>Render edilemedi, görmezden gel.</p>
+  </div>
+  <div class="card">
+    <span class="badge">Konsept 4 ⭐ Önerilen</span>
+    <img src="logo-concept-4.png" alt="Konsept 4">
+    <h3>H + Alt Kanca Kıvrımı</h3>
+    <p>Sol dikey + sağ dikey + crossbar = H. Sağ bacak aşağı inip kancaya dönüşüyor. En okunur tasarım.</p>
+  </div>
+  <div class="card">
+    <span class="badge">Konsept 5</span>
+    <img src="logo-concept-5.png" alt="Konsept 5">
+    <h3>Fishhook + Signal Line</h3>
+    <p>Balık iğnesi formu. Yatay çizgi "webhook gönderimi" hissi veriyor. Daha cesur.</p>
+  </div>
+</div>
+
+<!-- RENK PALETİ -->
+<h2 class="section-title">🎨 Renk Paleti</h2>
+<div class="palette">
+  <div class="swatch" style="background: #6d28d9;">#6d28d9<br>Primary</div>
+  <div class="swatch" style="background: #7c3aed;">#7c3aed<br>Violet</div>
+  <div class="swatch" style="background: #8b5cf6;">#8b5cf6<br>Hover</div>
+  <div class="swatch" style="background: #a78bfa;">#a78bfa<br>Light</div>
+  <div class="swatch" style="background: #0f0f0f; border: 1px solid #333;">#0f0f0f<br>BG Dark</div>
+  <div class="swatch" style="background: #10b981;">#10b981<br>Success</div>
+  <div class="swatch" style="background: #f43f5e;">#f43f5e<br>Error</div>
+</div>
+
+<!-- FAVICON SET -->
+<h2 class="section-title">📐 Favicon Seti (Konsept 4'tan türetilmiş)</h2>
+<div class="favicons">
+  <div class="fav-item">
+    <img src="logo-concept-4.png" width="16" height="16" style="border-radius:3px;">
+    <span>16×16</span>
+  </div>
+  <div class="fav-item">
+    <img src="logo-concept-4.png" width="32" height="32" style="border-radius:6px;">
+    <span>32×32</span>
+  </div>
+  <div class="fav-item">
+    <img src="logo-concept-4.png" width="48" height="48" style="border-radius:10px;">
+    <span>48×48</span>
+  </div>
+  <div class="fav-item">
+    <img src="logo-concept-4.png" width="96" height="96" style="border-radius:16px;">
+    <span>96×96</span>
+  </div>
+  <div class="fav-item">
+    <img src="logo-concept-4.png" width="180" height="180" style="border-radius:24px;">
+    <span>180×180</span>
+  </div>
+  <div class="fav-item">
+    <img src="logo-concept-4.png" width="256" height="256" style="border-radius:32px;">
+    <span>256×256</span>
+  </div>
+</div>
+
+<!-- FULL LOGO (text not rendering due to font, but icon is visible) -->
+<h2 class="section-title">📝 Tam Logo (Wordmark ile)</h2>
+<div class="full-logo" style="background: #ffffff;">
+  <img src="logo-full-dark.png" alt="Full Logo Light BG">
+  <p>Açık arka plan versiyonu (font eksik — production'da Inter font ile düzgün render olur)</p>
+</div>
+<div class="full-logo">
+  <img src="logo-full-light.png" alt="Full Logo Dark BG">
+  <p>Koyu arka plan versiyonu</p>
+</div>
+
+</body>
+</html>
