@@ -17,6 +17,7 @@ const posts = [
   { slug: 'github-webhook-guide', title: 'How to Set Up GitHub Webhooks', date: '2026-04-15', excerpt: 'Receive push, PR, and issue events from GitHub.' },
   { slug: 'cloudevents-standard', title: 'Embracing the CloudEvents Standard', date: '2026-04-10', excerpt: 'CloudEvents v1.0 provides a standardized way to describe event data.' },
   { slug: 'webhook-security-guide', title: 'Webhook Security: A Complete Guide', date: '2026-04-05', excerpt: 'HMAC, replay attack prevention, IP whitelisting, and TLS.' },
+  { slug: 'shopify-webhook-incident-analysis', title: 'What the Shopify Webhook Incident Teaches Us About Resilience', date: '2026-04-30', excerpt: 'Analysis of the Shopify webhook delivery latency incident and lessons for building resilient webhook infrastructure.' },
 ];
 
 export async function GET() {
