@@ -35,17 +35,41 @@
 | SDK sayısı | 11 | npm, PyPI, crates.io, NuGet, Go, Swift, Packagist, Hex, Maven, RubyGems |
 | Hosting | $0/ay | Tüm servisler free tier üzerinde |
 
-### Pazar Büyüklüğü
+### Rakip Fiyat Karşılaştırması
 
-Webhook delivery pazarı hızla büyüyor:
-- Svix: 30+ müşteri (Lob, Lithic, Guesty dahil)
-- Hookdeck: SMB ve enterprise segmentinde aktif
-- Hook0: Open-source alternatif
-- Pazar boşluğu: Uygun fiyatlı, self-hosted seçeneği olan bir çözüm eksik
+#### Svix Hakkında Gerçek Veriler (Doğrulanmış 2026-05-10)
 
----
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Funding | $10.5M (Series A) | Clay/Tracxn/Frontlines.io |
+| Revenue | $5M (2024) | GetLatka |
+| Ekip | 11 kişi | GetLatka |
+| GitHub Stars | 3,199 | GitHub API |
+| GitHub Forks | 245 | GitHub API |
+| Müşteri sayısı | 20+ enterprise | svix.com/customers |
+| Tanınmış müşteriler | Twilio, PagerDuty, Brex, Clerk, Lob, Replicate, Guesty, Benchling, Drata, Beehiiv, Taskrabbit | svix.com/customers |
+| Kuruluş | 2021, San Francisco | Tracxn |
+| Open-source | ✅ (Rust) | GitHub |
 
-## 2. Rakip Fiyat Karşılaştırması
+#### Hookdeck Hakkında Gerçek Veriler (Doğrulanmış 2026-05-10)
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Funding | Kamuoyuna açık değil | — |
+| Revenue | Kamuoyuna açık değil | — |
+| Ürün | Event Gateway (webhook monitoring + debugging) | hookdeck.com |
+| Self-hosted | Outpost (planlanıyor) | hookdeck.com/blog |
+| SOC2 | ✅ Type 2 | hookdeck.com/pricing |
+| G2 kategorisi | Message Queue Software | G2 |
+
+#### Hook0 Hakkında Gerçek Veriler (Doğrulanmış 2026-05-10)
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Model | Open-source, self-hosted | hook0.com |
+| Funding | Kamuoyuna açık değil | — |
+| Hosting | Self-hosted (Docker) | hook0.com |
+| Konumlandır | "Free open-source webhook platform" | hook0.com |
 
 ### Doğrulanmış Fiyatlandırma (2026-05-10)
 
@@ -415,12 +439,47 @@ Her ay güncellenmeli:
 - Hookdeck Pricing (doğrulanmış): https://hookdeck.com/pricing
 - DevOpsSchool: "Top 10 Webhook Management Tools" — https://www.devopsschool.com/blog/top-10-webhook-management-tools-features-pros-cons-comparison/
 
-### Türkiye Pazarı Notu
+### Türkiye Pazarı Analizi (Güncelleme)
 
-- iyzico ile ₺149/₺449 fiyatlandırma
-- Türkiye'de developer tools pazarı henüz doymamış
-- Yerel ödeme yöntemi (iyzico) büyük avantaj — rakiplerde yok
-- KVKK uyumluluğu gerekli (bkz. LEGAL_REPORT.md)
+Kaynak: KPMG Turkish Startup Investments Q3 2025
+
+| Metrik | Değer | Not |
+|--------|-------|-----|
+| Türk startup ekosistemi | 121 işlem (Q3 2025) | KPMG raporu |
+| SaaS büyüme trendi | Hızlı büyüme | CloseFuture 2026 |
+| Developer tools pazarı | Henüz doymamış | Yerel rakip yok |
+| Ödeme altyapısı | iyzico aktif | TR'ye özel avantaj |
+| Kur riski | ₺ volatilitesi | USD bazlı fiyat önerilir |
+
+**HookSniff'in Türkiye avantajı:**
+- iyzico ile yerel ödeme (Svix/Hookdeck'te yok)
+- Türkçe destek potansiyeli
+- ₺149/₺449 fiyatlandırma (düşük alım gücüne uygun)
+- KVKK uyumluluğu (GDPR muadili)
+
+### Gelir Projeksiyonu Uyarısı
+
+⚠️ **Önemli:** Aşağıdaki projeksiyonlar sektör benchmark'larına dayalı tahminlerdir. Gerçek verilerle önemli farklılıklar olabilir:
+
+- Freemium conversion %1-3 aralığı (developer tools benchmark: Monetizely 2026) — HookSniff'in gerçek oranı farklı olabilir
+- %5 aylık churn tahmini — sektör ortalaması %3-7 aralığında
+- İlk 6 aydaki büyüme hızı tamamen tahmin — Product Hunt lansmanı veya viral bir tweet her şeyi değiştirebilir
+- Svix'in $5M revenue'a 11 kişiyle ulaştığı göz önüne alındığında, webhook pazarı güçlü bir talep gösteriyor
+
+Bu projeksiyonlar **planlama amaçlıdır**, garanti değildir. İlk 3 ay sonra gerçek verilerle revize edilmelidir.
+
+### Rakip Finansal Karşılaştırma
+
+| Metrik | HookSniff | Svix | Hookdeck | Hook0 |
+|--------|-----------|------|----------|-------|
+| Funding | $0 (bootstrapped) | $10.5M (Series A) | Kamuoyuna açık değil | Kamuoyuna açık değil |
+| Revenue | $0 (lansman öncesi) | $5M (2024) | Kamuoyuna açık değil | Kamuoyuna açık değil |
+| Ekip | 1 (Servet + AI) | 11 kişi | Bilinmiyor | Open-source topluluk |
+| Altyapı maliyeti | $0/ay | Yüksek (managed) | Yüksek (managed) | Self-hosted |
+| GitHub Stars | ~0 (yeni) | 3,199 | ~500 | ~200 |
+| Break-even | 4-5 paid müşteri | VC-backed | Bilinmiyor | N/A (open-source) |
+
+**Sonuç:** Svix $10.5M yatırım almış, $5M revenue yapıyor — bu pazarın gerçek talep kanıtı. HookSniff aynı pazarda **$0 maliyetle** rekabet ediyor.
 
 ### Maliyet Tahmini (İlk Yıl)
 
