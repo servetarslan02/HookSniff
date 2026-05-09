@@ -229,25 +229,86 @@ async fn get_plan(Extension(customer): Extension<Customer>) -> Json<serde_json::
 }
 
 /// Bildirim tercihleri
-async fn get_notifications(Extension(_customer): Extension<Customer>) -> Json<serde_json::Value> {
-    // TODO: Requires notification_preferences table migration.
-    // Default preferences returned until migration is applied.
-    Json(serde_json::json!({
-        "email_on_failure": true,
-        "email_on_dead_letter": true,
-        "slack_webhook_url": null,
-    }))
+async fn get_notifications(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let prefs = sqlx::query_as::<_, (bool, bool, bool, Option<String>, Option<String>, Option<String>)>(
+        "SELECT email_on_failure, email_on_dead_letter, email_on_success, slack_webhook_url, discord_webhook_url, webhook_url FROM notification_preferences WHERE customer_id = $1"
+    )
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?;
+
+    match prefs {
+        Some((email_on_failure, email_on_dead_letter, email_on_success, slack, discord, webhook)) => {
+            Ok(Json(serde_json::json!({
+                "email_on_failure": email_on_failure,
+                "email_on_dead_letter": email_on_dead_letter,
+                "email_on_success": email_on_success,
+                "slack_webhook_url": slack,
+                "discord_webhook_url": discord,
+                "webhook_url": webhook,
+            })))
+        }
+        None => {
+            // Return defaults if no preferences saved yet
+            Ok(Json(serde_json::json!({
+                "email_on_failure": true,
+                "email_on_dead_letter": true,
+                "email_on_success": false,
+                "slack_webhook_url": null,
+                "discord_webhook_url": null,
+                "webhook_url": null,
+            })))
+        }
+    }
 }
 
 /// Bildirim tercihlerini güncelle
 async fn update_notifications(
-    Extension(_customer): Extension<Customer>,
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
     Json(req): Json<serde_json::Value>,
-) -> Json<serde_json::Value> {
-    // TODO: Requires notification_preferences table migration.
-    // Acknowledges update but does not persist until migration is applied.
-    Json(serde_json::json!({
+) -> Result<Json<serde_json::Value>, AppError> {
+    let email_on_failure = req.get("email_on_failure").and_then(|v| v.as_bool()).unwrap_or(true);
+    let email_on_dead_letter = req.get("email_on_dead_letter").and_then(|v| v.as_bool()).unwrap_or(true);
+    let email_on_success = req.get("email_on_success").and_then(|v| v.as_bool()).unwrap_or(false);
+    let slack_webhook_url = req.get("slack_webhook_url").and_then(|v| v.as_str()).map(|s| s.to_string());
+    let discord_webhook_url = req.get("discord_webhook_url").and_then(|v| v.as_str()).map(|s| s.to_string());
+    let webhook_url = req.get("webhook_url").and_then(|v| v.as_str()).map(|s| s.to_string());
+
+    sqlx::query(
+        r#"INSERT INTO notification_preferences (customer_id, email_on_failure, email_on_dead_letter, email_on_success, slack_webhook_url, discord_webhook_url, webhook_url, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, now())
+           ON CONFLICT (customer_id) DO UPDATE SET
+               email_on_failure = EXCLUDED.email_on_failure,
+               email_on_dead_letter = EXCLUDED.email_on_dead_letter,
+               email_on_success = EXCLUDED.email_on_success,
+               slack_webhook_url = EXCLUDED.slack_webhook_url,
+               discord_webhook_url = EXCLUDED.discord_webhook_url,
+               webhook_url = EXCLUDED.webhook_url,
+               updated_at = now()"#
+    )
+    .bind(customer.id)
+    .bind(email_on_failure)
+    .bind(email_on_dead_letter)
+    .bind(email_on_success)
+    .bind(&slack_webhook_url)
+    .bind(&discord_webhook_url)
+    .bind(&webhook_url)
+    .execute(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({
         "updated": true,
-        "preferences": req,
-    }))
+        "preferences": {
+            "email_on_failure": email_on_failure,
+            "email_on_dead_letter": email_on_dead_letter,
+            "email_on_success": email_on_success,
+            "slack_webhook_url": slack_webhook_url,
+            "discord_webhook_url": discord_webhook_url,
+            "webhook_url": webhook_url,
+        }
+    })))
 }

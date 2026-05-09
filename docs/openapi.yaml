@@ -1074,6 +1074,48 @@ components:
         checked_at:
           type: string
 
+    # ── Notification Preferences ──
+    NotificationPreferences:
+      type: object
+      properties:
+        email_on_failure:
+          type: boolean
+          default: true
+        email_on_dead_letter:
+          type: boolean
+          default: true
+        email_on_success:
+          type: boolean
+          default: false
+        slack_webhook_url:
+          type: string
+          nullable: true
+        discord_webhook_url:
+          type: string
+          nullable: true
+        webhook_url:
+          type: string
+          nullable: true
+
+    UpdateNotificationPreferences:
+      type: object
+      properties:
+        email_on_failure:
+          type: boolean
+        email_on_dead_letter:
+          type: boolean
+        email_on_success:
+          type: boolean
+        slack_webhook_url:
+          type: string
+          nullable: true
+        discord_webhook_url:
+          type: string
+          nullable: true
+        webhook_url:
+          type: string
+          nullable: true
+
     # ── Customer Portal ──
     PortalProfile:
       type: object
@@ -2948,7 +2990,11 @@ paths:
       summary: Get notification preferences (portal)
       responses:
         "200":
-          description: Preferences
+          description: Notification preferences
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
     put:
       tags: [Customer Portal]
       summary: Update notification preferences (portal)
@@ -2957,10 +3003,19 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: "#/components/schemas/UpdateNotificationPreferences"
       responses:
         "200":
           description: Preferences updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: boolean
+                  preferences:
+                    $ref: "#/components/schemas/NotificationPreferences"
 
   # ══════════════════════════════════════
   # ENDPOINT HEALTH
