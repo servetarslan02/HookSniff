@@ -13,7 +13,15 @@
 3. [Mevcut Durum Analizi](#3-mevcut-durum-analizi)
 4. [Tespit Edilen Sorunlar](#4-tespit-edilen-sorunlar)
 5. [Çözümler](#5-çözümler)
-6. [Uygulama Planı](#6-uygulama-planı)
+6. [Ek Analiz](#6-ek-analiz-tamamlayıcı)
+   - 6.1 Email Akışları
+   - 6.2 Hata Durumları
+   - 6.3 Mobil Deneyim
+   - 6.4 Billing (Ödeme) Akışı
+   - 6.5 "Kendin Yap" Rakibi
+   - 6.6 Analytics/Takip Planı
+7. [Uygulama Planı (Güncellenmiş)](#7-uygulama-planı-güncellenmiş)
+8. [Beklenen Etki](#8-beklenen-etki)
 
 ---
 
@@ -564,54 +572,215 @@ Kullanıcı template seçince form otomatik dolar.
 
 ---
 
-## 6. Uygulama Planı
+## 6. Ek Analiz (Tamamlayıcı)
 
-### Faz 1: Temel İyileştirmeler (Lansmandan önce — 6 saat)
+### 6.1 Email Akışları
 
-| Sıra | Ne | Zaman | Dosya |
-|------|-----|-------|-------|
-| 1 | Core Concepts bölümü (docs + dashboard) | 1 saat | docs/quickstart.md, dashboard docs page |
-| 2 | SDK quick start (11 dil, 3'er satır) | 2 saat | docs/quickstart.md, dashboard docs page |
-| 3 | Fiyatları güncelle ($29/$99) | 30 dk | dashboard landing page |
-| 4 | Landing page'e "5x cheaper than Svix" | 30 dk | dashboard landing page |
-| 5 | Integration örneklerini docs sayfasına taşı | 30 dk | dashboard docs page |
-| 6 | Playground template'leri ekle | 1 saat | dashboard playground page |
+**Mevcut email sistemi:** Google Cloud Gmail API (service account)
 
-### Faz 2: Onboarding İyileştirmeleri (İlk hafta — 8 saat)
+| Email | Durum | İçerik |
+|-------|-------|--------|
+| Hoş geldin emaili | ✅ Var | "Welcome to HookSniff!" — basit HTML |
+| Email doğrulama | ✅ Var | 24 saat geçerli link |
+| Şifre sıfırlama | ✅ Var | 1 saat geçerli link |
+| Başarısız teslimat bildirimi | ✅ Var | Endpoint adı + hata detayı |
+| Haftalık özet | ❌ Yok | — |
+| Kullanım limiti uyarısı | ❌ Yok | — |
+| İlk webhook tebrik | ❌ Yok | — |
+| Pro plan'a geçiş tebrik | ❌ Yok | — |
 
-| Sıra | Ne | Zaman | Dosya |
-|------|-----|-------|-------|
-| 7 | Dashboard Quick Start kartı | 2 saat | dashboard page.tsx |
-| 8 | Onboarding modal yenileme (etkileşimli) | 3 saat | Onboarding.tsx |
-| 9 | "Test Webhook" butonu (endpoints sayfası) | 1 saat | endpoints page.tsx |
-| 10 | Onboarding tekrar açma butonu | 30 dk | Onboarding.tsx |
-| 11 | API key otomatik oluşturma (kayıt sonrası) | 1 saat | auth flow |
+**Eksik emailler:**
 
-### Faz 3: Gelişmiş Özellikler (İlk ay — 6 saat)
+| Email | Ne zaman gönderilmeli | İçerik |
+|-------|---------------------|--------|
+| İlk webhook tebrik | İlk başarılı teslimattan sonra | "Tebrikler! İlk webhook'un teslim edildi. Dashboard'dan sonuçları görebilirsin." |
+| Haftalık özet | Her Pazartesi | "Bu hafta X webhook teslim edildi, %Y başarı oranı." |
+| Kullanım limiti uyarısı | Limitin %80'ine ulaşıldığında | "Bu ay X/Y webhook kullandınız. Pro plan'a geçmeyi düşünün." |
+| Pro plan tebrik | Plan yükseltme sonrası | "Pro plan'a hoş geldiniz! Yeni özellikleriniz: ..." |
+| 30 gün pasif | 30 gün giriş yapılmamış | "Sizi özledik! Dashboard'da sizi bekleyen X teslimat var." |
 
-| Sıra | Ne | Zaman | Dosya |
-|------|-----|-------|-------|
-| 12 | "Try It Now" sayfası (kayıt gerekmez) | 3 saat | yeni sayfa + API |
-| 13 | CLI tool tanıtımı (docs) | 1 saat | docs |
-| 14 | Portal sistemi tanıtımı (docs) | 1 saat | docs |
-| 15 | Landing page SDK showcase | 1 saat | landing page |
+### 6.2 Hata Durumları
 
-### Toplam: ~20 saat
+**Kayıt hataları:**
+
+| Hata | Mevcut mesaj | Sorun |
+|------|-------------|-------|
+| Email zaten kayıtlı | "Email already registered" | İyi ama "Giriş yap veya şifre sıfırla" linki yok |
+| Şifre kısa | "Password must be at least 8 characters" | İyi |
+| Email geçersiz | "Invalid email" | İyi |
+| Rate limit | "Rate limit exceeded" | Kullanıcı ne yapacağını bilmiyor |
+| Sunucu hatası | Generic error | İyi |
+
+**Giriş hataları:**
+
+| Hata | Mevcut mesaj | Sorun |
+|------|-------------|-------|
+| Email bulunamadı | "Unauthorized" | Çok belirsiz — "Email bulunamadı" demeli |
+| Yanlış şifre | "Unauthorized" | Çok belirsiz — "Şifre yanlış" demeli |
+| Hesap deaktif | "Account has been deactivated" | İyi |
+| 2FA gerekli | TwoFactorRequiredResponse | İyi |
+| Rate limit | "Rate limit exceeded" | İyi |
+
+**Dashboard hataları:**
+
+| Hata | Mevcut | Sorun |
+|------|--------|-------|
+| Sayfa hatası | error.tsx — "Something went wrong" + Try again | İyi |
+| 404 | not-found.tsx — "404" + Back to Home | İyi |
+| Loading | loading.tsx var | İyi |
+| API hatası | getErrorMessage() helper | İyi |
+| Toast bildirimleri | Toast component var | İyi |
+
+**Kritik eksiklik:**
+- Hata mesajları çok genel. "Unauthorized" yerine "Email veya şifre hatalı" demeli.
+- Rate limit mesajında "X dakika sonra tekrar deneyin" demeli.
+- Kayıt hatasında "Zaten hesabın var mı? Giriş yap" linki olmalı.
+
+### 6.3 Mobil Deneyim
+
+**Landing page:**
+- ✅ Responsive — `md:` ve `sm:` breakpoint'leri var
+- ✅ Mobil hamburger menü var
+- ✅ Font boyutları responsive (`text-4xl md:text-6xl`)
+- ✅ Grid layout responsive (`grid-cols-1 md:grid-cols-3`)
+
+**Dashboard:**
+- ⚠️ Sidebar mobilde gizleniyor ama toggle mekanizması kontrol edilmedi
+- ⚠️ Tablolar mobilde taşabilir
+- ⚠️ Grafikler mobilde küçük kalabilir
+
+**Onboarding modal:**
+- ✅ `max-w-lg w-full` — responsive
+- ⚠️ Küçük ekranda butonlar sıkışabilir
+
+**Genel:** Landing page iyi. Dashboard'da mobil test yapılmalı.
+
+### 6.4 Billing (Ödeme) Akışı
+
+**Mevcut ödeme sağlayıcıları:**
+- ✅ Stripe (global)
+- ✅ Polar.sh (global, MoR)
+- ✅ iyzico (Türkiye) — hesap açılacak
+
+**Billing sayfası:**
+- Plan karşılaştırma tablosu: $0 / $49 / $149 (güncellenmeli)
+- Kullanım grafiği (SVG chart)
+- Fatura listesi
+- Plan yükseltme butonu
+
+**Eksiklikler:**
+| Konu | Durum | Sorun |
+|------|-------|-------|
+| Fiyatlar | $49/$149 | ❌ $29/$99 olmalı |
+| Türkiye fiyatı | ₺149 | ₺99 olmalı |
+| Kullanım limiti uyarısı | ❌ Yok | %80'de email + dashboard bildirimi |
+| Plan yükseltme sonrası | ❌ Yok | Tebrik emaili + dashboard toast |
+| Downgrade akışı | ❌ Yok | Kullanıcı plan düşürmek isterse |
+| Fatura indirme | ✅ Var | İyi |
+| Müşteri portalı | ✅ Var | İyi |
+
+### 6.5 "Kendin Yap" Rakibi
+
+Developer'lar webhook altyapısını kendileri de yazabilir. Karşılaştırma:
+
+| | Kendin Yap | HookSniff |
+|---|-----------|-----------|
+| Kurulum süresi | 2-4 hafta | 5 dakika |
+| Retry mekanizması | Elle yazılmalı | Otomatik |
+| HMAC imzalama | Elle yazılmalı | Otomatik |
+| Dead letter queue | Elle yazılmalı | Otomatik |
+| Monitoring | Elle yazılmalı | Dashboard dahil |
+| SDK desteği | Yok | 11 dil |
+| Bakım | Sürekli | HookSniff halleder |
+| Maliyet | Developer zamanı | $0/ay (free tier) |
+
+**Pazarlama mesajı:** "Webhook altyapısını kendin yazmak 2-4 hafta sürer. HookSniff ile 5 dakikada başlayın."
+
+### 6.6 Analytics/Takip Planı
+
+**Ölçülmesi gerekenler:**
+
+| Metrik | Tanım | Hedef |
+|--------|-------|-------|
+| Signup conversion | Landing page → kayıt | %5+ |
+| Activation rate | Kayıt → ilk webhook | %60+ |
+| Time to first webhook | Kayıttan ilk webhook'a süre | <10 dk |
+| Onboarding completion | Modal'ı tamamlayanlar | %80+ |
+| Drop-off noktası | Hangi adımda vazgeçiyorlar | Tespit et |
+| Feature adoption | Hangi özellikler kullanılıyor | Tespit et |
+
+**Nasıl ölçülecek:**
+- Google Analytics (ücretsiz) — landing page trafik
+- Dashboard'da event tracking — onboarding adımları
+- Backend'de log — API kullanımı, hata oranları
+- PostHog veya Mixpanel (ücretsiz tier) — kullanıcı yolculuğu
 
 ---
 
-## Beklenen Etki
+## 7. Uygulama Planı (Güncellenmiş)
+
+> Not: Aşağıdaki plan, Bölüm 6'daki orijinal planın genişletilmiş halidir. Ek analiz bulgularını içerir.
+
+### Faz 0: Temel Düzeltmeler (Lansmandan önce — 4 saat)
+
+| Sıra | Ne | Zaman | Dosya |
+|------|-----|-------|-------|
+| 1 | Fiyatları güncelle ($29/$99, ₺99/₺299) | 30 dk | landing page + billing page |
+| 2 | Hata mesajlarını iyileştir (Türkçe + İngilizce) | 1 saat | auth flow + errors.ts |
+| 3 | "Zaten hesabın var mı?" linki (kayıt hatasında) | 30 dk | login page |
+| 4 | Rate limit mesajında süre göster | 30 dk | auth flow |
+| 5 | Kullanım limiti uyarısı (%80'de) | 1 saat | billing page + email |
+
+### Faz 1: Onboarding İyileştirmeleri (İlk hafta — 10 saat)
+
+| Sıra | Ne | Zaman | Dosya |
+|------|-----|-------|-------|
+| 6 | Core Concepts bölümü | 1 saat | docs + dashboard |
+| 7 | SDK quick start (11 dil) | 2 saat | docs + dashboard |
+| 8 | Dashboard Quick Start kartı | 2 saat | dashboard page.tsx |
+| 9 | Onboarding modal yenileme | 3 saat | Onboarding.tsx |
+| 10 | "Test Webhook" butonu | 1 saat | endpoints page.tsx |
+| 11 | Playground template'leri | 1 saat | playground page.tsx |
+
+### Faz 2: Gelişmiş Özellikler (İlk ay — 8 saat)
+
+| Sıra | Ne | Zaman | Dosya |
+|------|-----|-------|-------|
+| 12 | "Try It Now" sayfası | 3 saat | yeni sayfa + API |
+| 13 | Eksik emailler (tebrik, haftalık özet) | 2 saat | email.rs |
+| 14 | Integration örneklerini docs'a taşı | 1 saat | docs page |
+| 15 | CLI tool tanıtımı | 1 saat | docs |
+| 16 | Analytics entegrasyonu | 1 saat | dashboard |
+
+### Faz 3: Ölçme ve Optimizasyon (İlk 3 ay — sürekli)
+
+| Sıra | Ne | Zaman |
+|------|-----|-------|
+| 17 | Google Analytics kurulumu | 1 saat |
+| 18 | PostHog/Mixpanel kurulumu | 2 saat |
+| 19 | Haftalık metrik review | Sürekli |
+| 20 | A/B test (onboarding varyasyonları) | Sürekli |
+
+### Toplam: ~22 saat + sürekli optimizasyon
+
+---
+
+## 8. Beklenen Etki
 
 | İyileştirme | Dönüşüm Etkisi |
 |-------------|---------------|
+| Fiyat güncelleme | Doğru bilgi → güven artar |
+| Hata mesajları | Kullanıcı ne yapacağını bilir → frustration azalır |
 | Core concepts | Kullanıcı ne yaptığını anlar → güven artar |
 | SDK quickstart | Developer deneyimi iyileşir → signup artar |
 | Quick Start kartı | İlk adımlar netleşir → activation artar |
 | Onboarding yenileme | Kaybolma azalır → activation artar |
 | Test webhook butonu | Deneme kolaylaşır → activation artar |
 | Try It Now | Kayıt gerekmez → signup artar |
-| Fiyat güncelleme | Doğru bilgi → güven artar |
+| Eksik emailler | Kullanıcı bağlılığı artar → churn azalır |
+| Analytics | Ölçme → optimizasyon → sürekli iyileştirme |
 
-**Tahmini etki:** Mevcut activation oranı ~%30 → hedef ~%60
-
-(Activation = kayıt olan kullanıcıdan ilk webhook'unu gönderen oranı)
+**Tahmini etki:**
+- Mevcut activation oranı: ~%30 (tahmini)
+- Hedef activation oranı: ~%60
+- İlk 2 ay hedefi: 50-100 kullanıcı, 5-10 ödeme
