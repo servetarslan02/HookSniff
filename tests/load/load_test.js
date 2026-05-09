@@ -6,7 +6,7 @@
  *
  * Usage:
  *   k6 run tests/load/load_test.js
- *   k6 run -e BASE_URL=https://staging.hooksniff.is-a.dev -e API_KEY=hr_live_staging tests/load/load_test.js
+ *   k6 run -e BASE_URL=https://hooksniff-api-1046140057667.europe-west1.run.app -e API_KEY=hr_live_staging tests/load/load_test.js
  */
 
 import http from 'k6/http';
