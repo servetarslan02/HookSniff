@@ -715,7 +715,11 @@
       "copyright": "© 2026 HookSniff. 모든 권리 보유.",
       "changelog": "Changelog",
       "pricing": "Pricing",
-      "useCases": "Use Cases"
+      "useCases": "Use Cases",
+      "compare": "Compare",
+      "customers": "Customers",
+      "security": "Security",
+      "playground": "Playground"
     }
   },
   "apiKeys": {

@@ -716,7 +716,11 @@
       "copyright": "© 2026 HookSniff. Tüm hakları saklıdır.",
       "changelog": "Değişiklik Günlüğü",
       "pricing": "Pricing",
-      "useCases": "Use Cases"
+      "useCases": "Use Cases",
+      "compare": "Compare",
+      "customers": "Customers",
+      "security": "Security",
+      "playground": "Playground"
     }
   },
   "apiKeys": {
