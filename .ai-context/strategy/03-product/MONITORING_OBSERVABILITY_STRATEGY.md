@@ -616,14 +616,30 @@ slos:
 
 ### 9.1 Free Tier Limitleri
 
+> Kaynak: Grafana Pricing (2026-05-10, doğrulanmış: grafana.com/pricing)
+
 | Özellik | Free Tier | HookSniff Kullanımı |
 |---------|-----------|-------------------|
-| Metrics | 10K series | ~500 series (yeterli) |
-| Logs | 50 GB/ay | ~5 GB/ay (yeterli) |
-| Traces | 50 GB/ay | ~10 GB/ay (yeterli) |
+| Metrics | 10K active series | ~500 series (yeterli) |
+| Logs | 50 GB ingested/ay | ~5 GB/ay (yeterli) |
+| Traces | 50 GB ingested/ay | ~10 GB/ay (yeterli) |
 | Alert rules | 100 rules | ~15 rules (yeterli) |
 | Dashboard | Sınırsız | ~4 dashboard |
-| Data retention | 14 gün | ⚠️ Kısa |
+| Data retention | 14 gün | ⚠️ Kısa (Pro'da 13 ay) |
+| **SLO** | ✅ Ücretsiz | ⚠️ Kurulmalı |
+| **OnCall (IRM)** | ✅ 3 kullanıcı ücretsiz | ⚠️ Kurulmalı |
+| Profiles | ✅ Ücretsiz | ❌ Gerek yok |
+| k6 performance tests | ✅ Ücretsiz | ⚠️ Load test için kullanılabilir |
+| Support | Community | — |
+
+**Kritik düzeltme:** Grafana Cloud free tier'a **SLO feature** ve **OnCall (3 kullanıcı)** dahil. Bu, PagerDuty/Opsgenie ihtiyacını ortadan kaldırır — $0 ile incident management mümkün!
+
+**Grafana Cloud IRM (Incident Response Management):**
+- OnCall scheduling + escalation policies
+- Incident management + post-mortem
+- Alert grouping + deduplication
+- Mobile app (iOS + Android)
+- 3 kullanıcı ücretsiz (Servet + 2 ekip üyesi yeterli)
 
 ### 9.2 Grafana Cloud Dashboard Export
 
@@ -639,7 +655,8 @@ curl -H "Authorization: Bearer $GRAFANA_TOKEN" \
 |-------|----------|-------|
 | Discord webhook | P2, P3, P4 | ⚠️ Kurulmalı |
 | Email | Tüm seviyeler | ⚠️ Kurulmalı |
-| Grafana OnCall | P1 (gelecek) | ❌ Henüz yok |
+| Grafana OnCall (IRM) | P1, escalation | ✅ 3 kullanıcı ücretsiz — kurulmalı! |
+| Grafana Mobile App | P1 push notification | ✅ OnCall ile birlikte gelir |
 
 ---
 
