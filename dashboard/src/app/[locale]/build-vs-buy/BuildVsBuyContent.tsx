@@ -267,6 +267,8 @@ export default function BuildVsBuyContent() {
             {faq.map((item, i) => (
               <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
                 <button
+                  type="button"
+                  aria-expanded={expandedFaq === i}
                   onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
                   className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                 >
