@@ -1,10 +1,10 @@
 # HookSniff — DDoS Koruma Stratejisi
 
 > Oluşturma: 2026-05-10
-> Son güncelleme: 2026-05-10
+> Son güncelleme: 2026-05-10 (revize — detaylı araştırma)
 > Durum: Taslak
 > Öncelik: 🟢 Lansman sonrası
-> Kaynaklar: Cloudflare Free Plan (✅ doğrulanmış), Cloudflare Rate Limiting Docs (✅ doğrulanmış), API Rate Limiting Best Practices (✅ doğrulanmış)
+> Kaynaklar: Cloudflare Free Plan (✅ doğrulanmış), Cloudflare Rate Limiting (✅ doğrulanmış), GCP Cloud Armor Pricing (✅ cloud.google.com/armor/pricing doğrulanmış), OWASP API Security Top 10 2023 (✅ owasp.org doğrulanmış), GCP Cloud Armor Features (✅ doğrulanmış)
 
 ---
 
@@ -154,14 +154,32 @@ Cloudflare free plan ile gelen korumalar (✅ Doğrulanmış — developers.clou
 
 | Araç | Free Tier | Fiyat | Özellikler | HookSniff Uygunluğu |
 |------|-----------|-------|-----------|-------------------|
-| **Cloudflare Free** | ✅ Sınırsız DDoS | $0 | L3/L4 DDoS, SSL, CDN | ✅ Zaten aktif |
-| **Cloudflare Pro** | ❌ | $20/ay | WAF, rate limiting, bot mgmt | ✅ İyi değer |
-| **Cloudflare Business** | ❌ | $200/ay | Gelişmiş WAF, custom rules | ❌ Pahalı |
+| **Cloudflare Free** | ✅ Sınırsız DDoS L3/L4 | $0 | DDoS, SSL, CDN, 1 rate limit kuralı | ✅ Zaten aktif |
+| **Cloudflare Pro** | ❌ | $20/ay | WAF, 2 rate limit kuralı, bot mgmt | ✅ İyi değer |
+| **Cloudflare Business** | ❌ | $200/ay | 5 rate limit kuralı, custom rules | ❌ Pahalı |
 | **AWS Shield Standard** | ✅ | $0 (AWS'de) | L3/L4 DDoS | ❌ GCP'de |
-| **AWS WAF** | ❌ | $6/ay + kullanım | WAF rules, rate limiting | ❌ AWS'ye taşınma gerekir |
-| **GCP Cloud Armor** | ❌ | $0.75/policy + $0.39/million | WAF, DDoS, geo-blocking | ✅ Mevcut altyapıda |
+| **GCP Cloud Armor Standard** | ❌ Free tier yok | ~$6-10/ay | WAF, rate limiting, OWASP rules | ✅ Mevcut altyapıda |
+| **GCP Cloud Armor Enterprise Paygo** | ❌ | ~$200/ay | Adaptive protection, bot mgmt | ❌ Pahalı |
+| **GCP Cloud Armor Enterprise Annual** | ❌ | ~$3000/ay | Full koruma | ❌ Aşırı pahalı |
 | **ModSecurity** | ✅ (OSS) | $0 | WAF (self-hosted) | 🟡 Kendi sunucusu gerekir |
 | **Fail2Ban** | ✅ (OSS) | $0 | Brute force koruması | 🟡 Sadece SSH/login |
+
+### GCP Cloud Armor Fiyat Detayı (✅ Doğrulanmış — cloud.google.com/armor/pricing)
+
+| Bileşen | Cloud Armor Standard | Enterprise Paygo | Enterprise Annual |
+|---------|---------------------|-----------------|-------------------|
+| Subscription | — | $0.27/saat (~$200/ay) | $4.11/saat (~$3000/ay) |
+| Protected resources | — | 2 dahil, sonra $0.27/saat | 100 dahil |
+| Requests (global) | $0.75/milyon | Dahil | Dahil |
+| Requests (regional) | $0.60/milyon | Dahil | Dahil |
+| Security policies | $0.007/saat (~$5/ay) | Dahil | Dahil |
+| Rules | $0.001/saat (~$1/ay) | Dahil | Dahil |
+| Data processing | Yok | $0.05-0.075/GiB | $0.05/GiB |
+| WAF rules | Dahil | Dahil | Dahil |
+| Adaptive protection (ML) | ❌ | ✅ | ✅ |
+| Bot management | ❌ | reCAPTCHA pricing | reCAPTCHA pricing |
+
+> **⚠️ Cloud Armor'ın free tier'ı YOK.** Minimum maliyet: ~$6-10/ay (policy + rules + requests). Cloudflare Free'nin aksine, Cloud Armor sadece ödeme yapan müşterilere açık.
 
 ### Rate Limiting Araçları
 
@@ -270,18 +288,34 @@ pub async fn request_size_limit(
 }
 ```
 
-#### 1.2 Timeout Koruma
+#### 1.2 Timeout Koruma (Axum + Tower)
 
 ```rust
-// api/src/middleware/timeout.rs
-use std::time::Duration;
+// api/src/main.rs — Axum timeout layer
 use tower::timeout::TimeoutLayer;
+use std::time::Duration;
 
 // Her request için max 30 saniye timeout
-let timeout_layer = TimeoutLayer::new(Duration::from_secs(30));
+// Slowloris saldırılarına karşı kritik
+let app = Router::new()
+    .merge(api_routes())
+    .layer(TimeoutLayer::new(Duration::from_secs(30)));
 ```
 
-#### 1.3 Header Doğrulama
+#### 1.3 Connection Limit (Axum)
+
+```rust
+// api/src/main.rs — Concurrent connection limit
+use tower::limit::ConcurrencyLimitLayer;
+
+// Aynı anda max 500 concurrent request
+// Kaynak tükenmesini önler
+let app = Router::new()
+    .merge(api_routes())
+    .layer(ConcurrencyLimitLayer::new(500));
+```
+
+#### 1.4 Header Doğrulama
 
 ```rust
 // api/src/middleware/header_validation.rs
@@ -511,6 +545,25 @@ pub async fn send_ddos_alert(anomaly: AnomalyType) {
 
 ## 7. HookSniff'e Özel Senaryolar
 
+### OWASP API Security Top 10 2023 — HookSniff Risk Haritası
+
+> **Kaynak:** https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (✅ tam sayfa doğrulanmış)
+
+| # | Risk | Açıklama | HookSniff Durum | Koruma |
+|---|------|----------|----------------|--------|
+| API1 | Broken Object Level Authorization | Object ID ile yetkisiz erişim | 🟡 Orta | Endpoint ownership check |
+| API2 | Broken Authentication | Auth token compromise | 🟢 İyi | JWT + 2FA + API key |
+| API3 | Broken Object Property Level Authorization | Fazla veri sızıntısı | 🟡 Orta | Response filtering |
+| **API4** | **Unrestricted Resource Consumption** | **Rate limiting eksik → DoS** | **🔴 Yüksek** | **Rate limiting + throttle** |
+| API5 | Broken Function Level Authorization | Admin fonksiyonlarına erişim | 🟢 İyi | is_admin check |
+| API6 | Unrestricted Access to Sensitive Business Flows | Otomatik abuse | 🔴 Yüksek | Webhook spam, endpoint spam |
+| **API7** | **Server Side Request Forgery (SSRF)** | **Internal IP erişimi** | **🟢 İyi** | **ssrf.rs aktif ✅** |
+| API8 | Security Misconfiguration | Hatalı config | 🟡 Orta | Env-based config |
+| API9 | Improper Inventory Management | Eski endpoint'ler | 🟡 Orta | API versioning |
+| API10 | Unsafe Consumption of APIs | 3. parti API güvenliği | 🟢 İyi | Polar.sh, iyzico |
+
+> **API4 (Unrestricted Resource Consumption)** HookSniff için en büyük risk. Webhook platformu olduğu için yüksek trafik normal — ama kötü niyetli trafik ile ayırt etmek kritik.
+
 ### Senaryo 1: Webhook Spam Saldırısı
 
 **Saldırı:** Birisi 1M sahte webhook gönderiyor.
@@ -678,25 +731,72 @@ if content_length > max_size {
 ### Servet İçin Özet
 
 **Mevcut durum:** HookSniff'in zaten iyi bir temel koruması var:
-- Cloudflare (DDoS + SSL + CDN)
+- Cloudflare (DDoS L3/L4 + SSL + CDN)
 - Rate limiting (sliding window, plan-based)
-- SSRF protection
+- SSRF protection (OWASP API7 koruması ✅)
 - Circuit breaker
 - Input validation
 
 **Yapılması gereken (lansman sonrası):**
 1. Request size limit ekle (1MB max)
-2. Timeout koruması ekle (30s max)
-3. Header doğrulama ekle
-4. Traffic anomaly monitoring kur
-5. Emergency playbook hazırla
-6. DDoS alert mekanizması kur
+2. Timeout koruması ekle (30s max — Slowloris koruması)
+3. Concurrent connection limit ekle (500 max)
+4. Header doğrulama ekle
+5. Traffic anomaly monitoring kur
+6. Emergency playbook hazırla
+7. DDoS alert mekanizması kur
 
 **Ne kadar süre:** 4-6 gün
 **Maliyet:** $0 (mevcut koruma yeterli)
 **Risk:** Düşük — Cloudflare zaten L3/L4 koruyor, mevcut rate limiting L7'de çalışıyor
 
-**Opsiyonel:** Cloudflare Pro ($20/ay) — WAF kuralları ve bot management için değer.
+**Opsiyonel:**
+- Cloudflare Pro ($20/ay) — WAF kuralları ve bot management için değer
+- GCP Cloud Armor Standard (~$6-10/ay) — WAF rules, OWASP koruması, geo-blocking
+  - ⚠️ Free tier YOK, minimum ~$6-10/ay
+  - Cloud Run için Load Balancer gerekir (ek maliyet)
+  - Adaptive protection (ML) sadece Enterprise'da (~$200/ay)
+
+### GCP Cloud Armor Entegrasyonu (Opsiyonel — ~$6-10/ay)
+
+Cloud Run'da Cloud Armor kullanmak için:
+1. External Application Load Balancer oluştur (gerekli)
+2. Backend service'i Cloud Run'a yönlendir
+3. Cloud Armor security policy oluştur
+4. WAF rules ekle (SQL injection, XSS, path traversal)
+5. Rate limiting rules ekle
+6. Geo-blocking rules ekle (istenmeyen ülkeler)
+
+```bash
+# GCP Cloud Armor policy oluşturma
+gcloud compute security-policies create hooksniff-waf \
+    --description "HookSniff WAF policy"
+
+# OWASP ModSecurity rules ekle
+gcloud compute security-policies rules create 1000 \
+    --security-policy hooksniff-waf \
+    --expression "evaluatePreconfiguredExpr('xss-v33-stable')" \
+    --action "deny-403" \
+    --description "Block XSS attacks"
+
+gcloud compute security-policies rules create 1001 \
+    --security-policy hooksniff-waf \
+    --expression "evaluatePreconfiguredExpr('sqli-v33-stable')" \
+    --action "deny-403" \
+    --description "Block SQL injection"
+
+# Rate limiting
+gcloud compute security-policies rules create 2000 \
+    --security-policy hooksniff-waf \
+    --src-ip-ranges="*" \
+    --action "rate-based-ban" \
+    --rate-limit-threshold-count=1000 \
+    --rate-limit-threshold-interval-sec=60 \
+    --ban-duration-sec=600 \
+    --description "Rate limit: 1000 req/min per IP"
+```
+
+> **⚠️ Dikkat:** Cloud Armor + Load Balancer ek maliyet getirir. Mevcut Cloud Run setup'ında doğrudan çalışır, LB gerekir.
 
 ### Öncelik Sırası
 
@@ -707,17 +807,26 @@ if content_length > max_size {
 
 ---
 
-## 12. Kaynaklar
+## 12. Kaynaklar (Revize — Tümü Doğrulanmış)
 
 ### Cloudflare
 - Cloudflare Free Plan: https://www.cloudflare.com/plans/free/ (✅ doğrulanmış)
-- Cloudflare Rate Limiting: https://developers.cloudflare.com/waf/rate-limiting-rules/ (✅ doğrulanmış)
+- Cloudflare Rate Limiting: https://developers.cloudflare.com/waf/rate-limiting-rules/ (✅ doğrulanmış — free plan: 1 kural, 10s, Path+Verified Bot)
 - Cloudflare DDoS Protection: https://developers.cloudflare.com/ddos/ (✅ doğrulanmış)
 
 ### GCP
-- GCP Cloud Armor: https://cloud.google.com/armor (✅ doğrulanmış)
+- GCP Cloud Armor: https://cloud.google.com/security/products/armor (✅ doğrulanmış)
+- GCP Cloud Armor Pricing: https://cloud.google.com/armor/pricing (✅ doğrulanmış — free tier YOK, min ~$6-10/ay)
 - Cloud Run Security: https://cloud.google.com/run/docs/securing (✅ doğrulanmış)
+- GCP Cloud Armor Adaptive Protection: ML-based L7 DDoS detection (✅ doğrulanmış)
+- GCP Largest DDoS Mitigation: 398M rps (✅ doğrulanmış — cloud.google.com/blog)
+
+### OWASP
+- OWASP API Security Top 10 2023: https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (✅ tam sayfa doğrulanmış)
+- OWASP API Security — API4 Unrestricted Resource Consumption: https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/ (✅ doğrulanmış)
+- OWASP API Security — API7 SSRF: https://owasp.org/API-Security/editions/2023/en/0xa7-server-side-request-forgery/ (✅ doğrulanmış — HookSniff ssrf.rs ile korumalı)
 
 ### Best Practices
 - API Rate Limiting Best Practices: https://zuplo.com/learning-center/10-best-practices-for-api-rate-limiting-in-2026/ (✅ doğrulanmış)
-- OWASP API Security: https://owasp.org/www-project-api-security/ (✅ doğrulanmış)
+- Axum Tower Timeout: https://docs.rs/tower/latest/tower/timeout/ (✅ doğrulanmış)
+- Axum Tower ConcurrencyLimit: https://docs.rs/tower/latest/tower/limit/ConcurrencyLimitLayer/ (✅ doğrulanmış)
