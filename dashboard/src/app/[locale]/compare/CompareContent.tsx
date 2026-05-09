@@ -21,6 +21,7 @@ const sections = [
     hookdeck: { text: 'Processing billions of events/week. SOC 2 Type 2 certified. Used by thousands of developers worldwide.', badge: 'Established' },
     hook0: { text: 'Independent European company. Bootstrapped, no VC. Smaller but dedicated community.', badge: 'Niche' },
     winner: 'svix',
+    bestFit: 'Svix for enterprise trust, HookSniff for cost-conscious startups.',
   },
   {
     title: 'Uptime SLA',
@@ -30,6 +31,7 @@ const sections = [
     hookdeck: { text: 'Up to 99.999% depending on tier. 99.999% measured uptime.', badge: '99.999%' },
     hook0: { text: 'No SLA. Self-hosted — uptime depends on your infrastructure.', badge: 'N/A' },
     winner: 'svix',
+    bestFit: 'Svix and Hookdeck for mission-critical. HookSniff for growing teams.',
   },
   {
     title: 'Pricing',
@@ -39,6 +41,7 @@ const sections = [
     hookdeck: { text: 'Developer: $0 (10K events). Team: $39/mo + usage. Growth: $499/mo. $1.00 per 100K events.', badge: '$39/mo+' },
     hook0: { text: 'Self-hosted: free. Cloud: €99/mo. No per-event pricing on self-hosted.', badge: 'Free' },
     winner: 'hooksniff',
+    bestFit: 'HookSniff for best value. Hook0 for zero budget.',
   },
   {
     title: 'SDKs & Language Support',
@@ -48,6 +51,7 @@ const sections = [
     hookdeck: { text: '8 SDKs: TypeScript, Python, Go, Java, Ruby, PHP, C#, Rust. Plus CLI tool.', badge: '8 SDKs' },
     hook0: { text: '4 SDKs: JavaScript, Python, Go, PHP. Smaller ecosystem.', badge: '4 SDKs' },
     winner: 'tie',
+    bestFit: 'HookSniff and Svix tied. Both cover every major language.',
   },
   {
     title: 'FIFO Ordered Delivery',
@@ -57,6 +61,7 @@ const sections = [
     hookdeck: { text: '❌ Not supported. Events may arrive out of order.', badge: '❌' },
     hook0: { text: '❌ Not supported.', badge: '❌' },
     winner: 'hooksniff',
+    bestFit: 'HookSniff — only service with FIFO support.',
   },
   {
     title: 'CloudEvents v1.0',
@@ -66,6 +71,7 @@ const sections = [
     hookdeck: { text: '❌ Not supported.', badge: '❌' },
     hook0: { text: '❌ Not supported.', badge: '❌' },
     winner: 'hooksniff',
+    bestFit: 'HookSniff — only service with CloudEvents support.',
   },
   {
     title: 'Schema Registry',
@@ -75,6 +81,7 @@ const sections = [
     hookdeck: { text: '❌ No schema registry.', badge: '❌' },
     hook0: { text: '❌ No schema registry.', badge: '❌' },
     winner: 'hooksniff',
+    bestFit: 'HookSniff — only service with schema registry.',
   },
   {
     title: 'Embeddable Consumer Portal',
@@ -84,6 +91,7 @@ const sections = [
     hookdeck: { text: '❌ No embeddable portal. Dashboard-only.', badge: '❌' },
     hook0: { text: '❌ Basic UI only.', badge: '❌' },
     winner: 'svix',
+    bestFit: 'Svix for best portal. HookSniff for solid alternative.',
   },
   {
     title: 'Smart Routing',
@@ -93,6 +101,7 @@ const sections = [
     hookdeck: { text: '✅ Advanced routing with filtering, transformation, and fan-out.', badge: '✅ Best' },
     hook0: { text: '❌ No smart routing.', badge: '❌' },
     winner: 'hookdeck',
+    bestFit: 'Hookdeck for advanced routing. HookSniff for basic needs.',
   },
   {
     title: 'Payload Transformations',
@@ -102,6 +111,7 @@ const sections = [
     hookdeck: { text: '✅ Custom functions for payload modification.', badge: '✅' },
     hook0: { text: '❌ Not supported.', badge: '❌' },
     winner: 'svix',
+    bestFit: 'Svix for JS-based transforms. HookSniff for templates.',
   },
   {
     title: 'Inbound Webhook Proxy',
@@ -111,6 +121,7 @@ const sections = [
     hookdeck: { text: '✅ Core strength — Event Gateway for inbound webhooks.', badge: '✅ Best' },
     hook0: { text: '❌ Not supported.', badge: '❌' },
     winner: 'hookdeck',
+    bestFit: 'Hookdeck for core strength. HookSniff and Svix for basic needs.',
   },
   {
     title: 'Real-Time Streaming',
@@ -120,6 +131,7 @@ const sections = [
     hookdeck: { text: '❌ No real-time streaming.', badge: '❌' },
     hook0: { text: '❌ No real-time streaming.', badge: '❌' },
     winner: 'svix',
+    bestFit: 'Svix for dedicated streaming product. HookSniff for SSE.',
   },
   {
     title: 'Rate Limiting',
@@ -129,6 +141,7 @@ const sections = [
     hookdeck: { text: '✅ Throughput management with backpressure.', badge: '✅' },
     hook0: { text: '❌ Not supported.', badge: '❌' },
     winner: 'hooksniff',
+    bestFit: 'HookSniff for per-endpoint control. Svix for tier-based.',
   },
   {
     title: 'Latency Alerts',
@@ -138,6 +151,7 @@ const sections = [
     hookdeck: { text: '✅ Radar — dedicated latency alerting for third-party webhooks.', badge: '✅ Best' },
     hook0: { text: '❌ Not supported.', badge: '❌' },
     winner: 'hookdeck',
+    bestFit: 'Hookdeck for Radar. HookSniff for alerts API.',
   },
   {
     title: 'Standard Webhooks',
@@ -147,6 +161,7 @@ const sections = [
     hookdeck: { text: '⚠️ Custom signature schemes only. No Standard Webhooks.', badge: '⚠️' },
     hook0: { text: '✅ Compatible with Standard Webhooks.', badge: '✅' },
     winner: 'svix',
+    bestFit: 'Svix as spec author. HookSniff and Hook0 as adopters.',
   },
   {
     title: 'Compliance & Security',
@@ -156,6 +171,7 @@ const sections = [
     hookdeck: { text: 'SOC 2 Type II. PIPEDA. GDPR. CCPA. SSO/SAML on Growth+. IP whitelisting (add-on).', badge: 'SOC 2' },
     hook0: { text: 'GDPR compliant (EU hosting). No SOC 2. No HIPAA.', badge: 'GDPR' },
     winner: 'svix',
+    bestFit: 'Svix for full compliance. HookSniff for startups.',
   },
   {
     title: 'Data Residency',
@@ -165,6 +181,7 @@ const sections = [
     hookdeck: { text: 'US, EU, and Asia.', badge: '3 regions' },
     hook0: { text: 'Your choice — self-hosted anywhere. Cloud: Europe.', badge: 'Any' },
     winner: 'svix',
+    bestFit: 'Svix for 6+ regions. Hook0 for self-hosted anywhere.',
   },
   {
     title: 'Open Source & Self-Hosted',
@@ -174,6 +191,7 @@ const sections = [
     hookdeck: { text: '❌ Closed-source. Cloud-only.', badge: '❌' },
     hook0: { text: '✅ Open-source. Self-hosted or cloud.', badge: '✅' },
     winner: 'hooksniff',
+    bestFit: 'All except Hookdeck. HookSniff for MIT + full features.',
   },
   {
     title: 'Developer Experience',
@@ -183,6 +201,7 @@ const sections = [
     hookdeck: { text: 'CLI tool. Terraform provider. MCP support. Console. Radar.', badge: 'Strong' },
     hook0: { text: 'MCP Server. Basic docs. Smaller ecosystem.', badge: 'Basic' },
     winner: 'svix',
+    bestFit: 'Svix for best DX. HookSniff for i18n + MCP.',
   },
   {
     title: 'Business Continuity',
@@ -192,6 +211,7 @@ const sections = [
     hookdeck: { text: 'VC-backed. Established customer base. SOC 2 certified.', badge: 'Low' },
     hook0: { text: 'Bootstrapped, no VC. "100% bootstrapped, we are here to stay."', badge: 'Low' },
     winner: 'svix',
+    bestFit: 'Svix for VC backing. HookSniff and Hook0 for no lock-in.',
   },
 ];
 
@@ -278,6 +298,41 @@ export default function CompareContent() {
           </ul>
         </div>
 
+        {/* Screenshots */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">HookSniff in Action</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+              <img src="/screenshots/compare-hero.jpg" alt="HookSniff Compare — side-by-side webhook service comparison" className="w-full" />
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Compare Page</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-500">20 detailed sections with honest, side-by-side comparison.</p>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+              <img src="/screenshots/scorecard.jpg" alt="HookSniff Scorecard — feature comparison across 6 categories" className="w-full" />
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Scorecard</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-500">6 categories scored honestly. Svix: 51, HookSniff: 50.</p>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+              <img src="/screenshots/playground.png" alt="HookSniff Playground — test webhooks in real-time" className="w-full" />
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Webhook Playground</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-500">Generate URLs, send webhooks, inspect payloads in real-time.</p>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+              <img src="/screenshots/build-vs-buy.png" alt="HookSniff Build vs Buy — 12 dimension webhook infrastructure comparison" className="w-full" />
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Build vs Buy</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-500">12 dimensions: cost, time, security, reliability, and more.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Scorecard */}
         <div className="mb-16 p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Scorecard</h2>
@@ -342,6 +397,7 @@ export default function CompareContent() {
                     <div>
                       <h3 className="text-lg font-bold text-gray-900 dark:text-white">{section.title}</h3>
                       <p className="text-xs text-gray-500 dark:text-slate-500">{section.description}</p>
+                      {section.bestFit && <p className="text-xs text-brand-600 dark:text-brand-400 mt-1 font-medium">Best fit: {section.bestFit}</p>}
                     </div>
                   </div>
                 </div>
