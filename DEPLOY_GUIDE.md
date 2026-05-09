@@ -1,10 +1,11 @@
 # 🚀 HookSniff Deploy Rehberi
 
+> Son güncelleme: 2026-05-09
 > Servet, bu rehberi adım adım takip et. Her adımda takılırsan bana sor.
 
 ---
 
-## Adım 1: Vercel Dashboard'ı Düzelt (5 dk)
+## Adım 1: Vercel Dashboard (5 dk)
 
 ### 1.1 Build Hatasını Kontrol Et
 1. https://vercel.com adresine git
@@ -19,18 +20,9 @@
 2. **Redeploy** seç
 3. "Redeploy" onayla
 4. 1-3 dakika bekle
-5. https://hooksniff.vercel.app/en/about adresini kontrol et
+5. https://hooksniff.vercel.app adresini kontrol et
 
-### 1.3 Vercel Proje Ayarlarını Kontrol Et
-1. **Settings** → **General**
-2. **Root Directory** → `dashboard` olmalı (veya boş)
-3. **Framework Preset** → Next.js olmalı
-4. **Build & Development Settings**:
-   - Build Command: `npm run build`
-   - Output Directory: `.next`
-   - Install Command: `npm install`
-
-### 1.4 Environment Variables
+### 1.3 Environment Variables
 1. **Settings** → **Environment Variables**
 2. Şu değişkenin tanımlı olduğundan emin ol:
    ```
@@ -39,48 +31,29 @@
 
 ---
 
-## Adım 2: Render'a Deploy (10 dk)
+## Adım 2: GitHub Actions CI/CD (Otomatik)
 
-### 2.1 Render Hesabı Aç
-1. https://render.com adresine git
-2. GitHub ile giriş yap (servetarslan02 hesabın)
+CI/CD `.github/workflows/deploy.yml` ile yapılandırıldı:
 
-### 2.2 Blueprint Deploy
-1. https://dashboard.render.com/blueprints adresine git
-2. **"New Blueprint Instance"** butonuna bas
-3. GitHub repo: `servetarslan02/HookSniff` seç
-4. Branch: `main`
-5. **"Apply"** butonuna bas
+1. `main` branch'e push → CI çalışır (lint, test, build)
+2. CI başarılı → Deploy tetiklenir
+3. Docker image build + push → Artifact Registry
+4. Cloud Run servisleri güncellenir
 
-Render otomatik olarak şunları oluşturacak:
-- `hooksniff-api` (Web Service — Docker)
-- `hooksniff-worker` (Worker — Docker)
+### Gerekli GitHub Secrets
+- `GCP_SA_KEY` — GCP service account JSON key
 
-### 2.3 Secret'ları Gir
-Render Dashboard'da her servis için:
+### Manuel Deploy (opsiyonel)
+```bash
+# Authenticate
+gcloud auth activate-service-account --key-file=gcp-sa-key.json
+gcloud config set project hooksniff-app
 
-**hooksniff-api** servisine tıkla → **Environment** sekmesi:
-
-| Key | Value |
-|-----|-------|
-| `DATABASE_URL` | `postgresql://neondb_owner:REDACTED_PASSWORD@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require` |
-| `REDIS_URL` | `rediss://default:gQAAAAAAAYCPAAIgcDI1ZGFhYWUxZGRhZjM0YjhhYTQ1OGFjOGEzZTg1OTMzNg@integral-ostrich-98447.upstash.io:6379` |
-| `POLAR_ACCESS_TOKEN` | `polar_oat_MG9p6TbzA7YjRWtFruRB8YUPa1CG2tkwVAJXI32Zw9F` |
-| `POLAR_WEBHOOK_SECRET` | `polar_whs_bjhiDZvCoWIoGvrgBBVm49ZhMIKmX7hSekMt92hxmnB` |
-| `GCP_SA_JSON` | GCP service account JSON (Secret Manager) |
-
-**hooksniff-worker** servisi için de aynı `DATABASE_URL`, `REDIS_URL`, `GCP_SA_JSON` gir.
-
-### 2.4 Custom Domain Ekle
-1. **hooksniff-api** servisine tıkla
-2. **Settings** → **Custom Domains**
-3. **"Add Custom Domain"** → `hooksniff-api-1046140057667.europe-west1.run.app` yaz
-4. Render sana bir DNS record verecek (CNAME)
-
-### 2.5 Health Check
-Deploy tamamlandıktan sonra:
-- `https://hooksniff-api.onrender.com/health` adresini aç
-- `{"status":"ok"}` görmeliysin
+# Build + Push + Deploy
+docker build -f Dockerfile.api -t europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest .
+docker push europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest
+gcloud run deploy hooksniff-api --image europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest --region europe-west1
+```
 
 ---
 
@@ -88,55 +61,44 @@ Deploy tamamlandıktan sonra:
 
 ### 3.1 Cloudflare'a Gir
 1. https://dash.cloudflare.com adresine git
-2. **is-a.dev** zone'unu seç (veya arat)
+2. Zone'unu seç
 
-### 3.2 DNS Kayıtları Ekle
+### 3.2 DNS Kayıtları
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
-| CNAME | `api` | `hooksniff-api.onrender.com` | ✅ Proxied |
-
-> Not: `hooksniff` ve `www` kayıtları zaten is-a-dev/register PR'ında yapılacak.
-> Eğer PR onaylandıysa, bunlar otomatik oluşur.
+| CNAME | `api` | `hooksniff-api-1046140057667.europe-west1.run.app` | ✅ Proxied |
+| CNAME | `dashboard` | `cname.vercel-dns.com` | ✅ Proxied |
 
 ---
 
-## Adım 4: GCloud Email Kurulumu (5 dk)
+## Adım 4: Test Et (5 dk)
 
-### 4.1 Gmail API (Service Account)
-1. GCP Console → IAM → Service Accounts → hooksniff-deploy
-2. **Domains** → **Add Domain**
-3. `hooksniff.vercel.app` ekle
-
-### 4.2 DNS Kayıtları
-Gmail API DNS kayıtları gerekmez. Service account domain-wide delegation ile çalışır:
-
-| Type | Name | Content |
-|------|------|---------|
-| — | — | Gmail API DNS gerektirmez |
-
-
-### 4.3 Doğrulama
-1. Service account'a domain-wide delegation ekle (Google Workspace Admin Console)
-2. Doğrulanınca `noreply@hooksniff.vercel.app` çalışacak
-
----
-
-## Adım 5: Test Et (5 dk)
-
-### 5.1 API Health Check
+### 4.1 API Health Check
 ```bash
 curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
+# → {"status":"ok"}
 ```
-Beklenen: `{"status":"ok"}`
 
-### 5.2 Dashboard Test
-1. https://hooksniff.vercel.app/en/login adresine git
+### 4.2 Dashboard Test
+1. https://hooksniff.vercel.app adresine git
 2. Kayıt ol veya giriş yap
 3. Dashboard yükleniyor mu kontrol et
 
-### 5.3 Webhook Test
-Dashboard'dan yeni endpoint oluştur ve test webhook gönder.
+### 4.3 Webhook Test
+```bash
+# Endpoint oluştur
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
+  -H "Authorization: Bearer hr_live_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://webhook.site/YOUR_URL"}'
+
+# Webhook gönder
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
+  -H "Authorization: Bearer hr_live_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"endpoint_id": "YOUR_ENDPOINT_ID", "event": "test.ping", "data": {"hello": "world"}}'
+```
 
 ---
 
@@ -144,14 +106,8 @@ Dashboard'dan yeni endpoint oluştur ve test webhook gönder.
 
 **Tüm token'ları yenile!** Chat'te paylaşmıştın:
 - GitHub PAT → Settings → Developer Settings → Personal Access Tokens → Delete & Recreate
-- Vercel token → Vercel Dashboard → Settings → Tokens → Revoke
-- Neon password → Neon Dashboard → Settings → Reset Password
-- Upstash token → Upstash Dashboard → Redis → REST API → Rotate
-- Polar tokens → Polar Dashboard → Settings → Tokens → Revoke
 - GCP SA JSON → GCP Console → Service Accounts → Create New Key
-- Render key → Render Dashboard → API Keys → Revoke
-- Cloudflare tokens → Cloudflare Dashboard → My Profile → API Tokens → Revoke
-- Grafana key → Grafana Dashboard → API Keys → Delete
+- Polar tokens → Polar Dashboard → Settings → Tokens → Revoke
 
 ---
 
@@ -161,5 +117,3 @@ Her adımda sorun yaşarsan bana:
 1. Hangi adımda takıldığını söyle
 2. Varsa hata mesajını gönder
 3. Screenshot da gönderebilirsin
-
-Hızlı çözerim! 💪

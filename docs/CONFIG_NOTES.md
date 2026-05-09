@@ -1,214 +1,139 @@
-# 🔧 Yapılandırma Notları
+# 🔧 Configuration Notes
 
-Bu dosya sistemi aktif hale getirmek için yapman gerekenleri listeler.
-
----
-
-## 1. API Key'ler (ZORUNLU DEĞİL — ama güçlü AI için önerilir)
-
-### MiMo API Key
-- **Ne için:** Log analizi, anomali tespiti, güvenlik tehdidi analizi
-- **Nereden alınır:** https://mimo.xiaomi.com
-- **Ortam değişkeni:** `MIMO_API_KEY`
-- **Maliyet:** Ücretsiz/ücretli planlar mevcut
-
-### OpenAI API Key
-- **Ne için:** Kod inceleme, otomatik fix önerisi, doğal dil komutları
-- **Nereden alınır:** https://platform.openai.com/api-keys
-- **Ortam değişkeni:** `OPENAI_API_KEY`
-- **Maliyet:** ~$0.15/1M token (gpt-4o-mini)
-- **Önerilen model:** gpt-4o-mini (ucuz ve yeterli)
-
-### Her ikisi de opsiyonel
-- İkisi de yoksa → Kural tabanlı analiz çalışır (eşik tabanlı, matematiksel)
-- Biri varsa → O kullanılır
-- İkisi de varsa → MiMo log analizi, OpenAI kod inceleme için tercih edilir
+> Last updated: 2026-05-09
 
 ---
 
-## 2. Veritabanı
+## Required Environment Variables
 
-### Mevcut
-- PostgreSQL / CockroachDB zaten yapılandırılmış
-- `DATABASE_URL` ortam değişkeni tanımlı
+See [docs/DEPLOYMENT.md](DEPLOYMENT.md#environment-variables-reference) for the full list.
 
-### AI Center Tabloları (otomatik oluşur)
-- `ai_events` — AI olay kayıtları
-- `risk_scores` — Risk skor geçmişi
-- `ai_actions` — Aksiyon kayıtları (onay/red/geri alma)
-- `ai_blocklist` — IP/müşteri/endpoint engelleme listesi
-- `ai_config` — AI yapılandırma
+### Minimum for local development
 
----
-
-## 3. Servisler
-
-### Mevcut Servisler
-| Servis | Port | Durum |
-|--------|------|-------|
-| API (Axum) | 3000 | ✅ Çalışıyor |
-| Worker (PostgreSQL polling) | - | ✅ Çalışıyor |
-| Dashboard (Next.js) | 3001 | ✅ Çalışıyor |
-
-### Yeni Eklenen
-| Servis | Port | Durum |
-|--------|------|-------|
-| AI Center | - | ✅ Eklendi (30sn döngü) |
-
-### AI Center Ne Yapıyor (her 30 saniye)
-1. Sistem metriklerini topla (CPU, RAM, disk)
-2. Webhook sağlık durumunu kontrol et
-3. Risk skorlarını hesapla (0-100)
-4. Saldırı taraması (DDoS, spam, injection)
-5. Otomatik fix (circuit breaker, retry ayarlama)
-6. **EĞER AI API key varsa:** AI ile derin analiz yap
-
----
-
-## 4. Docker / Kubernetes
-
-### Docker Compose ile Çalıştırma
 ```bash
-# .env dosyasını oluştur
-cp .env.example .env
-# API key'leri düzenle
-nano .env
-
-# Tüm servisleri başlat
-docker-compose up -d
-
-# AI Center'ı ayrı başlat
-docker-compose -f docker-compose.ai.yml up -d
+DATABASE_URL=postgresql://hooksniff:hooksniff@localhost:5432/hooksniff?sslmode=disable
+JWT_SECRET=dev-jwt-secret-change-in-production-min-32-chars
+HMAC_SECRET=dev-hmac-secret-change-in-production-min-32-chars
 ```
 
-### Kubernetes ile Deploy
+### Minimum for production
+
 ```bash
-# Secret'ları oluştur (API key'ler dahil)
-kubectl apply -f k8s/secrets.yaml
-
-# Tüm servisleri deploy et
-kubectl apply -f k8s/
+DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/hooksniff?sslmode=require
+REDIS_URL=rediss://default:token@xxx.upstash.io:6379
+JWT_SECRET=$(openssl rand -hex 32)
+HMAC_SECRET=$(openssl rand -hex 32)
+APP_ENV=production
+LOG_FORMAT=json
 ```
 
 ---
 
-## 5. Dashboard
+## Optional: AI Center
 
-### AI Merkezi Paneli
-- Özellikler:
-  - Durum kartları (aktif olaylar, kritik, risk skoru)
-  - Olay tablosu (tüm AI olayları)
-  - Risk skorları (endpoint bazlı)
-  - Aksiyon yönetimi (onayla/reddet/geri al)
-  - Engelleme listesi
+HookSniff includes an AI Center for automated monitoring and anomaly detection. It runs as a background job every 30 seconds.
+
+### What it does
+
+1. Collects system metrics (CPU, RAM, disk)
+2. Checks webhook health status
+3. Calculates risk scores (0-100)
+4. Scans for attacks (DDoS, spam, injection)
+5. Auto-fixes (circuit breaker, retry adjustment)
+6. If AI API key is configured: deep analysis via AI
+
+### Configuration
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MIMO_API_KEY` | Optional | MiMo API for log analysis, anomaly detection |
+| `OPENAI_API_KEY` | Optional | OpenAI for code review, auto-fix suggestions |
+
+If neither is set, rule-based analysis runs (threshold-based, mathematical).
+
+### Database Tables (auto-created)
+
+- `ai_events` — AI event logs
+- `risk_scores` — Risk score history
+- `ai_actions` — Action records (approve/reject/rollback)
+- `ai_blocklist` — IP/customer/endpoint block list
+- `ai_config` — AI configuration
+
+### API Endpoints
+
+```
+GET  /v1/ai/status          — AI Center status
+GET  /v1/ai/events          — Event logs
+GET  /v1/ai/risks           — Risk scores
+GET  /v1/ai/actions         — Action queue
+POST /v1/ai/actions/{id}/approve   — Approve action
+POST /v1/ai/actions/{id}/reject    — Reject action
+POST /v1/ai/actions/{id}/rollback  — Rollback action
+GET  /v1/ai/blocklist       — Block list
+POST /v1/ai/blocklist       — Add to block list
+DELETE /v1/ai/blocklist/{id} — Remove from block list
+```
+
+### Autonomous Behavior
+
+| Condition | AI Action | Human Required? |
+|-----------|-----------|-----------------|
+| CPU > 80% | Log event | ❌ |
+| CPU > 95% | Critical event + notification | ❌ |
+| Error rate > 20% | Increase retry policy | ❌ |
+| Error rate > 50% | Circuit break | ❌ |
+| DDoS spike detected | Tighten rate limit | ❌ |
+| Payload injection | Reject request + log | ❌ |
+| Risk score > 80 | **Send notification only** | ✅ |
+| Manual intervention | Queue action | ✅ |
 
 ---
 
-## 6. API Endpoints (AI Center)
-
-### Durum
-```
-GET /v1/ai/status
-```
-
-### Olaylar
-```
-GET /v1/ai/events?severity=critical&limit=50
-```
-
-### Risk Skorları
-```
-GET /v1/ai/risks
-```
-
-### Aksiyonlar
-```
-GET /v1/ai/actions
-POST /v1/ai/actions/{id}/approve
-POST /v1/ai/actions/{id}/reject
-POST /v1/ai/actions/{id}/rollback
-```
-
-### Engelleme Listesi
-```
-GET /v1/ai/blocklist
-POST /v1/ai/blocklist
-DELETE /v1/ai/blocklist/{id}
-```
-
----
-
-## 7. Otonom Davranış Tablosı
-
-| Durum | AI Aksiyonu | İnsan Gerekli mi? |
-|-------|-------------|-------------------|
-| CPU > %80 | Olay logla | ❌ |
-| CPU > %95 | Kritik olay + bildirim | ❌ |
-| Hata oranı > %20 | Retry policy artır | ❌ |
-| Hata oranı > %50 | Circuit break | ❌ |
-| DDoS spike tespiti | Rate limit sıkılaştır | ❌ |
-| Payload injection | İsteği reddet + logla | ❌ |
-| Risk skoru > 80 | **Sadece bildirim gönder** | ✅ |
-| Manuel müdahale | Aksiyon kuyruğuna al | ✅ |
-
----
-
-## 8. Bildirim Kanalları (Opsiyonel)
+## Optional: Notifications
 
 ### Slack
-- **Ne için:** Kritik olaylar, uyarılar
-- **Nereden alınır:** Slack → Apps → Incoming Webhooks
-- **Ortam değişkeni:** `SLACK_WEBHOOK_URL`
 
-### Email (SendGrid)
-- **Ne için:** Email bildirimleri
-- **Nereden alınır:** https://sendgrid.com
-- **Ortam değişkenleri:** `SENDGRID_API_KEY`, `NOTIFY_EMAIL`
+| Variable | Description |
+|----------|-------------|
+| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL |
 
-### Email (SMTP)
-- **Ne için:** SendGrid alternatifi
-- **Ortam değişkenleri:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `NOTIFY_EMAIL`
+### Email
 
-### Bildirim Davranışı
-| Seviye | Gönderilir mi? |
-|--------|---------------|
-| ℹ️ Info | ❌ (sadece log) |
+Email is sent via Gmail API (GCP Service Account). See `GCP_SA_JSON` in deployment guide.
+
+| Variable | Description |
+|----------|-------------|
+| `GCP_SA_JSON` | GCP service account JSON |
+| `NOTIFY_FROM_EMAIL` | Sender email |
+| `NOTIFY_EMAIL` | Admin notification email |
+
+### Notification Levels
+
+| Level | Sent? |
+|-------|-------|
+| ℹ️ Info | ❌ (log only) |
 | ⚠️ Warning | ✅ Slack + Email |
 | 🔴 Critical | ✅ Slack + Email |
 
 ---
 
-## 9. Gelecek Planlar (Henüz Eklenmedi)
+## Database
 
-- [ ] ML tabanlı anomali tespiti (scikit-learn, TensorFlow)
-- [ ] Webhook trafik tahmini (time series forecasting)
-- [ ] Otomatik kapasite planlama
-- [ ] Email/Slack/Discord bildirimleri
-- [ ] Rapor oluşturu (PDF/HTML)
-- [ ] Multi-region AI koordinasyonu
+- **Engine:** PostgreSQL (Neon serverless in production)
+- **Connection:** `sslmode=require` in production
+- **Migrations:** Auto-run on API startup (`api/src/db.rs`)
+- **Pooling:** Neon pooled connection string recommended for API
 
----
+### Migration Files
 
-## 9. Sorun Giderme
-
-### AI Center çalışmıyor
-```bash
-# Logları kontrol et
-
-# Veritabanı bağlantısını test et
-psql $DATABASE_URL -c "SELECT 1"
 ```
-
-### API key çalışmıyor
-```bash
-# MiMo test
-curl -H "Authorization: Bearer $MIMO_API_KEY" https://api.mimo.xiaomi.com/v1/models
-
-# OpenAI test
-curl -H "Authorization: Bearer $OPENAI_API_KEY" https://api.openai.com/v1/models
+migrations/
+├── 001_init.sql              # Core tables
+├── 002_security_features.sql # Rate limiting, IP allowlisting
+├── 003_routing.sql           # Smart routing columns
+├── 004_teams.sql             # Team management
+├── 005_event_mesh.sql        # Schema registry, delivery targets, fanout
+├── 006_fifo_queue.sql        # FIFO ordered delivery
+├── 007_retry_policies.sql    # Per-endpoint retry policies
+└── 017_ai_center.sql         # AI Center tables
 ```
-
-### Risk skorları çok yüksek
-- Endpoint'in retry policy'sini kontrol et
-- Hedef endpoint'in çalışıp çalışmadığını kontrol et
-- Dead letter queue'yu incele
