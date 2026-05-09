@@ -1,483 +1,561 @@
-# HOOKSNIFF — DESTEK SİSTEMİ RAPORU
+# HOOKSNIFF — DESTEK SİSTEMİ DERİN ANALİZ
 
 > Son güncelleme: 2026-05-09
 > Bütçe: $0
 
 ---
 
-## 1. MEVCUT DURUM
+## 1. RAKİP DESTEK ANALİZİ
 
-| Kanal | Durum | Detay |
-|-------|-------|-------|
-| Email | ✅ Var | support@hooksniff.vercel.app (Gmail API) |
-| Contact form | ✅ Var | /contact sayfası, email'e yönlendiriyor |
-| FAQ | ✅ Var | /faq sayfası, 15 soru |
-| Docs | ✅ Var | /docs/api, /docs/sdks |
-| Live chat | ❌ Yok | — |
-| Ticket sistemi | ❌ Yok | — |
-| Discord | ❌ Yok | — |
-| Knowledge base | ❌ Yok | FAQ var ama kapsamlı değil |
-| Status page | ❌ Yok | /status sayfası var ama boş |
-| Chatbot | ❌ Yok | — |
+### Svix — Sektör Lideri ($17M yatırımlı)
 
----
+**Destek Kanalları:**
 
-## 2. RAKİP KARŞILAŞTIRMA
+| Kanal | Detay | Kalite |
+|-------|-------|--------|
+| Email | support@svix.com | ✅ İyi |
+| Slack | svix.com/slack — topluluk | ✅ İyi |
+| Docs | docs.svix.com — kapsamlı | ✅ İyi |
+| GitHub Issues | Açık kaynak repo | ✅ İyi |
+| Status page | status.svix.com | ✅ İyi |
+| Trust center | Vanta ile | ✅ İyi |
 
-| Kanal | Svix | Hookdeck | Hook0 | HookSniff |
-|-------|------|----------|-------|-----------|
-| Email | ✅ | ✅ | ❌ | ✅ |
-| Docs | ✅ Detaylı | ✅ | ✅ | ✅ Temel |
-| Slack | ✅ | ✅ | ❌ | ❌ |
-| Discord | ❌ | ❌ | ❌ | ❌ |
-| GitHub Issues | ✅ | ✅ | ✅ | ✅ (SDK'lar) |
-| Status page | ✅ | ✅ | ❌ | ❌ |
-| Live chat | ❌ | ❌ | ❌ | ❌ |
-| Trust center | ✅ | ✅ | ❌ | ❌ |
+**Güçlü Yönleri:**
+- Docs çok iyi yapılandırılmış: Introduction → Quickstart → Core Concepts → API Reference
+- Her SDK için ayrı kurulum rehberi
+- "How Svix works" bölümü — akış şeması ile açıklama
+- Core concepts (Application, Endpoint, Message) hemen açıklanıyor
+- Slack topluluğu aktif — sorulara hızlı yanıt
 
-**Not:** Svix ve Hookdeck bile live chat kullanmıyor. Developer tool'larda email + docs + Slack standart.
+**Zayıf Yönleri:**
+- ❌ Live chat yok
+- ❌ Ticket sistemi yok (sadece email)
+- ❌ Chatbot yok
+- ❌ Knowledge base ayrı yok (docs'un içinde)
+- ❌ Türkçe destek yok
+- ❌ Video tutorial yok
+- ❌ Interactive playground yok (sadece Svix Play — test endpoint)
 
----
-
-## 3. ÜCRETSİZ DESTEK ARAÇLARI
-
-### tawk.to — ⭐ En İyi Ücretsiz Seçenek
-
-| Özellik | Durum |
-|---------|-------|
-| Fiyat | **%100 ücretsiz** (ömür boyu) |
-| Live chat widget | ✅ Sınırsız |
-| Ticketing | ✅ Dahili |
-| Knowledge base | ✅ Dahili |
-| Agent sayısı | ✅ Sınırsız |
-| Mobil uygulama | ✅ iOS + Android |
-| Otomatik tetikleyiciler | ✅ |
-| Özelleştirilebilir widget | ✅ |
-| Marka kaldırma | 💰 $19 tek seferlik |
-| Entegrasyonlar | ✅ 100+ |
-| Raporlama | ✅ |
-| CRM | ✅ Dahili |
-| Çoklu dil | ✅ 27 dil |
-
-**Neden tawk.to?**
-- Tamamen ücretsiz, gizli maliyet yok
-- Sınırsız agent (tek kişilik ekip bile)
-- Live chat + ticket + knowledge base tek platformda
-- Widget HookSniff dashboard'a gömülebilir
-- Mobil uygulama ile her yerden cevaplanabilir
-- Otomatik tetikleyiciler (kullanıcı belirli sayfada 30 sn beklerse chat açılır)
-
-**Sınırlamalar:**
-- Marka kaldırma ücretli ($19 tek seferlik)
-- AI chatbot ücretsiz planda yok
-- Entegrasyonlar ücretsiz planda sınırlı
-
-### Crisp
-
-| Plan | Fiyat | Agent | Özellik |
-|------|-------|-------|---------|
-| Free | €0 | 2 | Chat widget, shared inbox, 100 müşteri profili |
-| Mini | €45/ay | 4 | Email desteği, custom domain |
-| Essentials | €95/ay | 10 | Knowledge base, omnichannel, 50 AI/ay |
-
-**Değerlendirme:** Free plan çok sınırlı (2 agent, 100 profil). tawk.to daha iyi.
-
-### Freshdesk
-
-| Plan | Fiyat | Agent | Özellik |
-|------|-------|-------|---------|
-| Free | $0 | 2 | Email ticketing, knowledge base, ticket trend raporları |
-| Growth | $15/ay/agent | Sınırsız | Automasyon, SLA, raporlama |
-
-**Değerlendirme:** Free plan iyi ama 2 agent limiti var. Ticket sistemi güçlü.
-
-### Zoho Desk
-
-| Plan | Fiyat | Agent | Özellik |
-|------|-------|-------|---------|
-| Free | $0 | 3 | Email ticketing, knowledge base, müşteri portalı |
-| Standard | $14/ay/agent | Sınırsız | Automasyon, SLA, telefoni |
-
-**Değerlendirme:** 3 agent limiti var. Zoho ekosistemi ile entegrasyon iyi.
-
-### Discord — Topluluk Desteği
-
-| Özellik | Durum |
-|---------|-------|
-| Fiyat | Ücretsiz |
-| Kanal yapısı | Özelleştirilebilir |
-| Bot entegrasyonu | ✅ |
-| Forum kanalı | ✅ (soru/cevap için ideal) |
-| Ticket bot | ✅ (ücretsiz) |
-| Moderasyon | ✅ |
-
-**Neden Discord?**
-- Developer'lar Discord kullanır
-- Topluluk oluşturur (kullanıcılar birbirine yardım eder)
-- Forum kanalı ile soru/cevap organize edilir
-- Bot ile otomatik yanıtlar verilebilir
-- Ücretsiz, ölçeklenebilir
-
-### GitHub Issues — Teknik Destek
-
-| Özellik | Durum |
-|---------|-------|
-| Fiyat | Ücretsiz (public repo) |
-| Issue template | ✅ Bug report + feature request |
-| Label sistemi | ✅ |
-| Milestone | ✅ |
-| Entegrasyon | ✅ Linear, Slack, Discord |
+**Destek Modeli:** Self-service odaklı. Kullanıcı önce docs'a bakar, çözemezse Slack veya email. Cevap süresi: 24-48 saat (tahmini).
 
 ---
 
-## 4. RAKİPLERİN DESTEK MODELİ
+### Hookdeck — $5.5M Yatırımlı
 
-### Svix
+**Destek Kanalları:**
 
-| Kanal | Kullanım |
-|-------|----------|
-| Email | support@svix.com — genel destek |
-| Slack | svix.com/slack — topluluk, hızlı soru/cevap |
-| GitHub Issues | Açık kaynak SDK'lar için |
-| Docs | docs.svix.com — kapsamlı dokümantasyon |
-| Status page | status.svix.com — servis durumu |
+| Kanal | Detay | Kalite |
+|-------|-------|--------|
+| Email | support@hookdeck.com | ✅ İyi |
+| Slack | hookdeck.com/slack — topluluk | ✅ İyi |
+| Docs | hookdeck.com/docs — kapsamlı | ✅ İyi |
+| GitHub Issues | Açık kaynak SDK'lar | ✅ İyi |
+| Status page | status.hookdeck.com | ✅ İyi |
+| Trust center | Vanta ile | ✅ İyi |
+| CLI tool | hookdeck CLI — localhost test | ✅ İyi |
 
-**Model:** Self-service odaklı. Kullanıcı önce docs'a bakar, çözemezse Slack veya email.
+**Güçlü Yönleri:**
+- CLI tool ile localhost'ta webhook test — developer deneyimi çok iyi
+- Docs use-case odaklı: "Receive Webhooks", "Localhost Webhooks", "Third-Party Routing"
+- Console'da payload inspection — gerçek zamanlı debug
+- Radar ile latency alerts
 
-### Hookdeck
+**Zayıf Yönleri:**
+- ❌ Live chat yok
+- ❌ Ticket sistemi yok
+- ❌ Chatbot yok
+- ❌ Knowledge base ayrı yok
+- ❌ Türkçe destek yok
+- ❌ Video tutorial yok
+- ❌ Onboarding rehberi yok (CLI odaklı,新手 için zor)
 
-| Kanal | Kullanım |
-|-------|----------|
-| Email | support@hookdeck.com |
-| Slack | hookdeck.com/slack — topluluk |
-| Docs | hookdeck.com/docs — kapsamlı |
-| Status page | status.hookdeck.com |
-
-**Model:** Svix ile aynı. Developer tool'larda live chat yaygın değil.
-
----
-
-## 5. ÖNERİLEN DESTEK MODELİ
-
-### Aşama 1 — Lansman ($0)
-
-| Kanal | Araç | Maliyet | Ne zaman |
-|-------|------|---------|----------|
-| Email | Gmail API (mevcut) | $0 | Hemen |
-| Live chat | **tawk.to** | $0 | Hemen |
-| Knowledge base | **tawk.to** dahili | $0 | Hemen |
-| Ticket sistemi | **tawk.to** dahili | $0 | Hemen |
-| Topluluk | **Discord** | $0 | Hemen |
-| Teknik destek | **GitHub Issues** | $0 | Hemen |
-| Status page | **Better Uptime** free tier | $0 | Hemen |
-
-**Toplam maliyet:** $0
-
-### Aşama 2 — Büyüme (100+ kullanıcı)
-
-| Kanal | Araç | Maliyet | Ne zaman |
-|-------|------|---------|----------|
-| Tüm Aşama 1 | Aynı | $0 | — |
-| Marka kaldırma | tawk.to | $19 tek seferlik | $500+ gelir |
-| Chatbot | tawk.to AI veya Crisp | $0-45/ay | $1000+ gelir |
-
-### Aşama 3 — Ölçekleme (500+ kullanıcı)
-
-| Kanal | Araç | Maliyet | Ne zaman |
-|-------|------|---------|----------|
-| Tüm Aşama 2 | Aynı | — | — |
-| Omnichannel | Crisp Essentials | €95/ay | $2000+ gelir |
-| AI chatbot | Intercom veya Crisp | $39-95/ay | $5000+ gelir |
+**Destek Modeli:** Svix ile aynı. CLI tool güçlü ama新手 için korkutucu.
 
 ---
 
-## 6. DOCS-FIRST STRATEJİSİ
+### Hook0 — Açık Kaynak
 
-### Neden?
+**Destek Kanalları:**
 
-Tek kişilik ekip → günde 10+ ticket gelirse cevaplanamaz. Çözüm: kullanıcı önce docs/KB'den kendisi çözsün.
+| Kanal | Detay | Kalite |
+|-------|-------|--------|
+| GitHub Issues | Ana destek kanalı | 🟡 Orta |
+| Docs | hook0.com/docs | 🟡 Orta |
+| Email | Yok | ❌ |
+| Slack/Discord | Yok | ❌ |
+| Status page | Yok | ❌ |
 
-### Akış
+**Güçlü Yönleri:**
+- Hook0 Play — anında test, kayıt gerekmez
+- 8 adımlı inline tutorial
+- webhook.site entegrasyonu
+
+**Zayıf Yönleri:**
+- ❌ Canlı destek kanalı yok
+- ❌ Sadece GitHub Issues
+- ❌ Docs yetersiz (2 SDK için)
+- ❌ Topluluk yok
+- ❌ Self-hosted odaklı — kurulum zor
+
+---
+
+## 2. RAKİPLERİN ORTAK ZAYIFLIĞI
+
+| Zayıflık | Svix | Hookdeck | Hook0 | HookSniff avantajı |
+|----------|------|----------|-------|-------------------|
+| Live chat yok | ❌ | ❌ | ❌ | ✅ tawk.to ile live chat |
+| Ticket sistemi yok | ❌ | ❌ | ❌ | ✅ tawk.to ile ticketing |
+| Chatbot yok | ❌ | ❌ | ❌ | ✅ tawk.to ile (gelecekte) |
+| Knowledge base ayrı yok | ❌ | ❌ | ❌ | ✅ tawk.to KB |
+| Türkçe destek yok | ❌ | ❌ | ❌ | ✅ TR + EN |
+| Video tutorial yok | ❌ | ❌ | ❌ | ✅ YouTube Shorts |
+| Interactive playground | ❌ | ❌ | ✅ | ✅ Mevcut playground |
+| Onboarding rehberi eksik | 🟡 | ❌ | ✅ | ✅ Onboarding modal var |
+
+**Sonuç:** Rakiplerin hiçbiri live chat, ticket sistemi veya ayrı KB kullanmıyor. Bu, HookSniff için büyük farklılaşma fırsatı.
+
+---
+
+## 3. HOOKSNIFF'İN MEVCUT DESTEK İÇERİĞİ
+
+### Dashboard Sayfaları
+
+| Sayfa | Satır | İçerik | Kalite |
+|-------|-------|--------|--------|
+| /docs/api | 234 | Swagger UI, endpoint listesi | ✅ İyi |
+| /docs/sdks | 200 | SDK kurulum örnekleri (11 dil) | ✅ İyi |
+| /docs | — | Ana docs sayfası | ✅ İyi |
+| /faq | 108 | 15 soru/cevap | 🟡 Temel |
+| /contact | 167 | Email formu | 🟡 Temel |
+| /status | 289 | Servis durumu (placeholder) | ❌ Boş |
+
+### Repo Docs
+
+| Dosya | Satır | İçerik |
+|-------|-------|--------|
+| quickstart.md | 89 | curl ile quickstart |
+| api-reference.md | 877 | API endpoint detayları |
+| examples.md | 158 | Node.js + Python örnekleri |
+| ARCHITECTURE.md | 461 | Sistem mimarisi |
+| SECURITY.md | 166 | Güvenlik politikası |
+| DEPLOYMENT.md | 320 | Deploy rehberi |
+| CONTRIBUTING.md | 338 | Katkı rehberi |
+| SELF-HOST.md | 207 | Self-host rehberi |
+
+### Eksikler
+
+| Eksik | Önem | Açıklama |
+|-------|------|----------|
+| SDK quickstart (11 dil) | 🔴 | docs/sdks'de var ama quickstart'ta yok |
+| Core concepts | 🔴 | Endpoint, Delivery, Secret açıklanmamış |
+| HMAC doğrulama rehberi | 🔴 | Sadece docs'ta kısa bahsedilmiş |
+| Hata kodları rehberi | 🔴 | API response kodları açıklanmamış |
+| Video tutorial | 🟡 | Hiç yok |
+| Interactive examples | 🟡 | Playground var ama entegre değil |
+| Changelog | 🟡 | CHANGELOG.md var ama dashboard'da yok |
+| Migration guide | 🟡 | SDK sürümleri arası geçiş rehberi yok |
+
+---
+
+## 4. DOCS-FIRST STRATEJİ — DETAY
+
+### Neden Docs-First?
+
+| Senaryo | Docs-first | Ticket-first |
+|---------|-----------|-------------|
+| Kullanıcı soru sorar | KB'de cevap bulur → ✅ | Ticket açar → Servet cevaplar → ⏰ |
+| 10 kullanıcı aynı soruyu sorar | 1 kez yazılır, 10 kişi okur | 10 kez cevaplanır |
+| Servet uyurken soru gelir | KB cevap verir | Sabaha kadar bekler |
+| Kullanıcı memnuniyeti | Hızlı çözüm → ✅ | Yavaş çözüm → 🟡
+
+### Akış Diyagramı
 
 ```
 Kullanıcı soru sorur
-       ↓
-  tawk.to chatbot kontrol eder
-       ↓
-  KB'de cevap var mı? → EVET → Otomatik yanıt göster
-       ↓ HAYIR
-  Ticket oluşturulur
-       ↓
-  Servet cevaplar (mobil uygulama)
-       ↓
-  Cevap KB'ye eklenir (gelecekte otomatik yanıt)
+       │
+       ▼
+  ┌─────────────┐
+  │ KB'de var mı? │
+  └──────┬──────┘
+     EVET│    │HAYIR
+         ▼    ▼
+  Otomatik   ┌──────────────┐
+  yanıt      │ Dashboard'da │
+  göster     │ "Yardım"     │
+             │ butonu       │
+             └──────┬───────┘
+                    ▼
+             ┌──────────────┐
+             │ tawk.to chat │
+             │ widget açılır│
+             └──────┬───────┘
+                    ▼
+             ┌──────────────┐
+             │ Kullanıcı    │
+             │ yazar        │
+             └──────┬───────┘
+                    ▼
+             ┌──────────────┐
+             │ Ticket       │
+             │ oluşturulur  │
+             └──────┬───────┘
+                    ▼
+             ┌──────────────┐
+             │ Servet       │
+             │ cevaplar     │
+             └──────┬───────┘
+                    ▼
+             ┌──────────────┐
+             │ Cevap KB'ye  │
+             │ eklenir      │
+             └──────────────┘
 ```
 
-### Hedef
+### Self-Service Hedefleri
 
-| Dönem | Self-service oranı | Ticket sayısı/gün |
-|-------|-------------------|-------------------|
-| Lansman | %30 | 5-10 |
-| 1. ay | %50 | 3-5 |
-| 3. ay | %70 | 1-3 |
-| 6. ay | %80 | 0-2 |
-
-### Nasıl?
-
-1. **Her ticket'ın cevabı KB'ye eklenecek** — gelecekte aynı soru gelince otomatik yanıt
-2. **Dashboard'da "Yardım" butonu** — doğrudan KB'ye yönlendirir
-3. **tawk.to otomatik tetikleyiciler** — belirli sayfalarda yardım önerisi
-4. **Discord'da pinned messages** — sık sorulan sorular sabitlenir
+| Dönem | Self-service oranı | Ticket/gün | KB makale sayısı |
+|-------|-------------------|------------|-----------------|
+| Lansman | %30 | 5-10 | 10 |
+| 1. ay | %50 | 3-5 | 25 |
+| 3. ay | %65 | 1-3 | 50 |
+| 6. ay | %80 | 0-2 | 100 |
 
 ---
 
-## 7. ÇOKLU DİL DESTEĞİ
+## 5. ÇOKLU DİL STRATEJİSİ
 
 ### Durum
 
-HookSniff 8 dilde destek veriyor (i18n). Ama destek sistemi sadece İngilizce.
+HookSniff 8 dilde i18n destekliyor. Ama destek içeriği sadece İngilizce.
 
-### Sorun
+### Dil Matrisi
 
-| Müşteri | Dil | Sorun |
-|---------|-----|-------|
-| TR developer | Türkçe | İngilizce KB anlamayabilir |
-| Global developer | İngilizce | Sorun yok |
-| TR kurumsal | Türkçe | DPA, fatura Türkçe olmalı |
-
-### Çözüm
-
-| Kanal | TR desteği | Maliyet |
-|-------|-----------|---------|
-| Knowledge base | Her makale TR + EN | $0 (kendimiz yazarız) |
-| tawk.to chat | tawk.to çeviri özelliği (beta) | $0 |
-| Email | Manuel çeviri | $0 |
-| Discord | #tr-destek kanalı | $0 |
-| DPA | TR + EN versiyon | $0 |
-
-### Knowledge Base Dilleri
-
-| Kategori | EN | TR | Öncelik |
-|----------|----|----|---------|
+| İçerik | EN | TR | Öncelik |
+|--------|----|----|---------|
 | Quick start | ✅ | ✅ | 🔴 Acil |
-| SDK kurulum | ✅ | ✅ | 🔴 Acil |
-| API referansı | ✅ | 🟡 | 🟡 Önemli |
+| Core concepts | ✅ | ✅ | 🔴 Acil |
+| SDK kurulum (Node.js) | ✅ | ✅ | 🔴 Acil |
+| SDK kurulum (diğer 10) | ✅ | ❌ | 🟡 Önemli |
 | HMAC doğrulama | ✅ | ✅ | 🔴 Acil |
+| API hata kodları | ✅ | ❌ | 🟡 Önemli |
 | Faturalama SSS | ✅ | ✅ | 🟡 Önemli |
 | Sık hatalar | ✅ | ✅ | 🟡 Önemli |
+| API referansı | ✅ | ❌ | 🟢 Gerekmez |
 
-**Kural:** Temel makaleler her zaman TR + EN. API referansı sadece EN (developer'lar İngilizce bilir).
+**Kural:** Temel makaleler TR + EN. API referansı ve teknik detaylar sadece EN (developer'lar İngilizce bilir).
+
+### TR Desteği için Pratik Çözüm
+
+1. **tawk.to çeviri özelliği** (beta) — otomatik çeviri
+2. **Manuel çeviri** — temel makaleler kendimiz çeviririz ($0)
+3. **#tr-destek Discord kanalı** — Türkçe sorular için
+4. **Dashboard'da dil seçimi** — mevcut i18n desteği
 
 ---
 
-## 8. ESCALATION PATH — SORUN ÇÖZÜLMEZSE
+## 6. ESCALATION PATH — 5 SEVİYE
 
-### Seviye 1: Self-service
+### Seviye 1: Self-service (Otomatik)
 
 ```
-Kullanıcı → KB/FAQ → Sorun çözülür → ✅ Bitti
+Kullanıcı → KB/FAQ → Cevap bulur → ✅ Bitti
+Tawk.to chatbot → KB'den otomatik yanıt → ✅ Bitti
 ```
 
-### Seviye 2: Chat/Email
+**Hedef:** %80 sorun bu seviyede çözülür.
+
+### Seviye 2: Chat/Email (Servet)
 
 ```
 Kullanıcı → tawk.to chat veya email → Servet cevaplar → ✅ Bitti
 ```
 
-### Seviye 3: Teknik sorun (kod hatası)
+**SLA:** 4 saat içinde ilk yanıt.
+
+### Seviye 3: Teknik Sorun (Kod Hatası)
 
 ```
 Kullanıcı → GitHub Issue açar → Servet + AI inceler → Fix push edilir → ✅ Bitti
 ```
 
-### Seviye 4: Kritik sorun (servis çöktü)
+**SLA:** 24 saat içinde ilk yanıt, 1 hafta içinde çözüm.
+
+### Seviye 4: Kritik Sorun (Servis Çöktü)
 
 ```
 Kullanıcı → email + Discord → Servet hemen bakar → Hotfix → ✅ Bitti
 ```
 
+**SLA:** 1 saat içinde ilk yanıt, 4 saat içinde çözüm.
+
 ### Seviye 5: Çözülemedi
 
 ```
-Kullanıcı → ısrar eder → Servet video call yapar (Google Meet, ücretsiz) → ✅ Bitti
+Kullanıcı → ısrar eder → Servet video call yapar (Google Meet) → ✅ Bitti
 ```
+
+**SLA:** 48 saat içinde schedule.
 
 ### Kurallar
 
 - Her ticket 48 saat içinde bir yanıt almalı (çözüm değil, "bakıyoruz" mesajı)
 - Kritik sorunlar 1 saat içinde ilk yanıt
-- Çözülemeyen sorunlar GitHub Issue'ya taşınır, takip edilir
+- Çözülemeyen sorunlar GitHub Issue'ya taşınır
 - Kullanıcı memnun kalmazsa video call seçeneği sunulur
+- Her ticket'ın cevabı KB'ye eklenir (gelecekte otomatik yanıt)
 
 ---
 
-## 9. TEK KİŞİLİK EKİP — PRATİK SENARYO
+## 7. TEK KİŞİLİK EKİP — PRATİK SENARYO
 
-### Problem
+### Zaman Bütçesi
 
-Servet tek kişi. Günde 10 ticket gelirse ne olur?
+| Gün | Saat | Aktivite | Süre |
+|-----|------|----------|------|
+| Her gün | 09:00 | Ticket'ları kontrol et, kritik olanları cevapla | 15 dk |
+| Her gün | 13:00 | Kalan ticket'ları cevapla | 15 dk |
+| Her gün | 20:00 | KB'yi güncelle, Discord kontrol | 15 dk |
+| Hafta sonu | — | KB makale yazma (1-2 makale) | 1 saat |
 
-### Çözüm: Zaman Bütçesi
+**Toplam:** Hafta içi günde 45 dk, hafta sonu 1 saat/hafta.
 
-| Gün | Destek süresi | Öncelik |
-|-----|--------------|---------|
-| Sabah (15 dk) | Ticket'ları kontrol et, kritik olanları cevapla | Kritik + Yüksek |
-| Öğle (15 dk) | Kalan ticket'ları cevapla | Orta |
-| Akşam (15 dk) | KB'yi güncelle, Discord kontrol | Düşük + Bakım |
+### Yoğun Gün Senaryosu (20+ ticket)
 
-**Toplam:** Günde 45 dakika.
+1. **Kritik olanları hemen cevapla** (5 dk)
+2. **Basit soruları KB linki ile cevapla** (10 dk)
+3. **Karmaşık sorulara "bakıyorum, yarın cevaplarım" de** (5 dk)
+4. **Ertesi gün hepsini cevapla**
 
 ### Otomasyon ile Azaltma
 
-| Yöntem | Ticket azaltma | Maliyet |
-|--------|---------------|---------|
-| KB'de cevap arama | %30 azaltır | $0 |
-| tawk.to otomatik tetikleyici | %10 azaltır | $0 |
-| Discord topluluk yanıtı | %20 azaltır | $0 |
-| İyi dokümantasyon | %20 azaltır | $0 |
-| **Toplam** | **%80 azaltma** | **$0** |
+| Yöntem | Ticket azaltma | Nasıl |
+|--------|---------------|-------|
+| KB'de cevap arama | %30 | tawk.to chatbot KB'yi tarar |
+| Otomatik tetikleyici | %10 | Belirli sayfalarda yardım önerisi |
+| Discord topluluk yanıtı | %20 | Kullanıcılar birbirine yardım eder |
+| İyi dokümantasyon | %20 | Sorun oluşmadan önce cevap hazır |
+| **Toplam** | **%80** | |
 
 **Sonuç:** Günde 10 ticket → 2 ticket düşer. 15 dakika yeterli.
 
-### Yoğun Gün Senaryosu
+---
 
-Bir gün 20+ ticket gelirse:
-1. Kritik olanları hemen cevapla (5 dk)
-2. Basit soruları KB linki ile cevapla (10 dk)
-3. Karmaşık soruları "bakıyorum, yarın cevaplarım" de (5 dk)
-4. Ertesi gün hepsini cevapla
+## 8. ÜCRETSİZ ARAÇLAR — DETAYLI KARŞILAŞTIRMA
+
+### tawk.to
+
+| Özellik | Ücretsiz | Ücretli ($19 tek sefer) |
+|---------|----------|------------------------|
+| Live chat | ✅ Sınırsız | ✅ |
+| Ticketing | ✅ | ✅ |
+| Knowledge base | ✅ | ✅ |
+| Agent sayısı | ✅ Sınırsız | ✅ |
+| Mobil uygulama | ✅ | ✅ |
+| Otomatik tetikleyici | ✅ | ✅ |
+| Widget özelleştirme | ✅ | ✅ |
+| Marka kaldırma | ❌ | ✅ |
+| Raporlama | ✅ Temel | ✅ Gelişmiş |
+| CRM | ✅ | ✅ |
+| Entegrasyon | 100+ | 100+ |
+
+**Neden tawk.to?**
+- Tamamen ücretsiz, gizli maliyet yok
+- Sınırsız agent
+- Live chat + ticket + KB tek platformda
+- Widget dashboard'a gömülebilir
+- Mobil uygulama ile her yerden cevaplanabilir
+
+### Discord
+
+| Kanal | Amaç |
+|-------|------|
+| #genel | Genel sohbet |
+| #duyurular | Yeni özellik, lansman |
+| #destek | Teknik sorular |
+| #tr-destek | Türkçe destek |
+| #feature-request | Özellik istekleri |
+| #showcase | Kullanıcı projeleri |
+| #beta | Beta tester özel |
+
+**Bot:**
+- Ticket bot — özel ticket kanalı oluşturur
+- FAQ bot — sık sorulan soruları otomatik yanıtlar
+- Status bot — servis durumu değişikliklerini bildirir
+
+### Better Uptime
+
+| Özellik | Ücretsiz |
+|---------|----------|
+| Monitor sayısı | 5 |
+| Status page | ✅ |
+| Alert | ✅ Email + Discord |
+| Custom domain | ❌ (ücretli) |
+| Kontrol sıklığı | 3 dakika |
+
+**Monitor edilecekler:**
+- Dashboard (hooksniff.vercel.app)
+- API (hooksniff-api...run.app/health)
+- Worker (hooksniff-worker...run.app/health)
+- Database (Neon)
+- Redis (Upstash)
 
 ---
 
-## 10. DESTEK İÇERİĞİ — NE HAZIRLANMALI?
+## 9. DESTEK İÇERİĞİ — HAZIRLANACAKLAR
 
-### Knowledge Base Kategorileri
+### Knowledge Base Yapısı
 
-| Kategori | İçerik | Öncelik |
-|----------|--------|---------|
-| **Başlangıç** | Hesap oluşturma, ilk webhook, API key | 🔴 Acil |
-| **SDK'lar** | Her SDK için kurulum ve kullanım | 🔴 Acil |
-| **API Referansı** | Endpoint'ler, authentication, hatalar | 🔴 Acil |
-| **Güvenlik** | HMAC doğrulama, IP allowlist, SSL | 🟡 Önemli |
-| **Faturalama** | Plan değişikliği, ödeme, iptal | 🟡 Önemli |
-| **Entegrasyonlar** | Stripe, Slack, Discord webhook örnekleri | 🟡 Önemli |
-| **Sorun Giderme** | Sık hatalar, debug ipuçları | 🟡 Önemli |
-| **SSS** | En sık sorulan sorular | 🟡 Önemli |
+```
+📁 Getting Started
+   ├── Hesap oluşturma
+   ├── İlk webhook'unu gönder
+   ├── API key alma
+   └── Dashboard turu
 
-### Hazırlanacak İçerikler
+📁 SDK'lar
+   ├── Node.js kurulum
+   ├── Python kurulum
+   ├── Go kurulum
+   ├── Rust kurulum
+   ├── Ruby kurulum
+   ├── Java kurulum
+   ├── Kotlin kurulum
+   ├── PHP kurulum
+   ├── C# kurulum
+   ├── Elixir kurulum
+   └── Swift kurulum
 
-| İçerik | Format | Süre | Dil |
-|--------|--------|------|-----|
-| Quick start rehberi | Markdown | 1 saat | TR + EN |
-| SDK kurulum rehberleri (11 dil) | Markdown | 2 saat | EN |
-| API hata kodları rehberi | Markdown | 30 dk | EN |
-| HMAC doğrulama rehberi | Markdown + kod | 1 saat | TR + EN |
-| Sık hatalar ve çözümleri | Markdown | 1 saat | TR + EN |
-| Faturalama SSS | Markdown | 30 dk | TR + EN |
-| Video demo (opsiyonel) | MP4 | 1 saat | EN |
+📁 API
+   ├── Authentication
+   ├── Endpoint'ler
+   ├── Webhook gönderme
+   ├── Delivery'leri kontrol etme
+   └── Hata kodları
+
+📁 Güvenlik
+   ├── HMAC doğrulama
+   ├── IP allowlist
+   ├── SSL/TLS
+   └── API key güvenliği
+
+📁 Faturalama
+   ├── Plan karşılaştırma
+   ├── Plan değiştirme
+   ├── Ödeme yöntemleri
+   ├── İptal
+   └── Fatura indirme
+
+📁 Sorun Giderme
+   ├── Webhook teslim edilmiyor
+   ├── 401 Unauthorized
+   ├── 500 Server Error
+   ├── Rate limit aşıldı
+   └── Bağlantı hatası
+
+📁 SSS
+   ├── HookSniff ücretsiz mi?
+   ├── Kaç webhook gönderebilirim?
+   ├── Verilerim nerede saklanıyor?
+   ├── GDPR uyumlu musunuz?
+   └── SDK'lar açık kaynak mı?
+```
+
+### Hazırlanacak İçerikler (Öncelik Sırası)
+
+| # | İçerik | Format | Süre | Dil |
+|---|--------|--------|------|-----|
+| 1 | Quick start rehberi | Markdown | 30 dk | TR + EN |
+| 2 | Core concepts (Endpoint, Delivery, Secret) | Markdown | 30 dk | TR + EN |
+| 3 | HMAC doğrulama rehberi | Markdown + kod | 30 dk | TR + EN |
+| 4 | Node.js SDK kurulum | Markdown | 15 dk | TR + EN |
+| 5 | Python SDK kurulum | Markdown | 15 dk | TR + EN |
+| 6 | API hata kodları rehberi | Markdown | 30 dk | EN |
+| 7 | Sık hatalar ve çözümleri | Markdown | 1 saat | TR + EN |
+| 8 | Faturalama SSS | Markdown | 30 dk | TR + EN |
+| 9 | Go SDK kurulum | Markdown | 15 dk | EN |
+| 10 | Rust SDK kurulum | Markdown | 15 dk | EN |
+| 11 | Video: 2 dakikada ilk webhook | MP4 | 1 saat | EN |
+| 12 | Entegrasyon örnekleri (Stripe, Slack) | Markdown | 1 saat | EN |
 
 **Toplam:** ~7 saat, $0
 
 ---
 
-## 11. DESTEK SLA — YANIT SÜRELERİ
+## 10. RAKİPLERDEN FARKLILAŞMA
 
-| Öncelik | Tanım | Yanıt süresi | Çözüm süresi |
-|---------|-------|-------------|-------------|
-| Kritik | Servis çöktü, veri kaybı | 1 saat | 4 saat |
-| Yüksek | Webhook teslim edilmiyor, ödeme sorunu | 4 saat | 24 saat |
-| Orta | SDK sorusu, özellik isteği | 24 saat | 1 hafta |
-| Düşük | Genel soru, öneri | 48 saat | Planlanacak |
+### HookSniff Destek Avantajları
 
-**İlk 3 ay:** Tüm destek tek kişi (Servet + AI). SLA esnek.
+| Avantaj | Nasıl | Rakip durum |
+|---------|-------|-------------|
+| **Live chat** | tawk.to widget | Hiçbir rakipte yok |
+| **Ticket sistemi** | tawk.to dahili | Hiçbir rakipte yok |
+| **Knowledge base** | tawk.to KB | Rakipler docs'un içinde |
+| **Türkçe destek** | TR + EN makaleler | Hiçbir rakipte yok |
+| **Status page** | Better Uptime | Hook0'da yok |
+| **Video tutorial** | YouTube | Hiçbir rakipte yok |
+| **Interactive playground** | Mevcut | Sadece Hook0'da var |
+| **Onboarding modal** | Mevcut (4 adım) | Svix'te var, Hook0'da var |
 
----
+### Pazarlama Mesajı
 
-## 12. OTOMASYON — NE YAPILABİLİR?
+```
+Svix: "Docs oku, Slack'te sor."
+Hookdeck: "CLI kullan, Slack'te sor."
+Hook0: "GitHub Issue aç, bekle."
 
-### tawk.to Otomatik Tetikleyiciler
-
-| Tetikleyici | Aksiyon |
-|-------------|---------|
-| Kullanıcı 30 sn bekler | Chat widget açılır |
-| Kullanıcı /pricing sayfasında | "Fiyat soruları için yardımcı olabilir miyim?" |
-| Kullanıcı hata sayfasında | "Sorun mu yaşıyorsunuz? Yardımcı olalım" |
-| Kullanıcı /docs sayfasında | Chat gizlenir (self-service) |
-
-### Discord Bot
-
-| Bot | Ne yapar | Maliyet |
-|-----|----------|---------|
-| Ticket bot | Özel ticket kanalı oluşturur | $0 |
-| FAQ bot | Sık sorulan soruları otomatik yanıtlar | $0 |
-| Status bot | Servis durumu değişikliklerini bildirir | $0 |
-
-### Email Otomasyonu
-
-| Email | Ne zaman | İçerik |
-|-------|----------|--------|
-| Hoş geldin | Kayıt sonrası | Quick start linki |
-| İlk webhook tebrik | İlk başarılı teslimat | "Tebrikler!" + docs linki |
-| Haftalık özet | Her Pazartesi | "Bu hafta X webhook teslim edildi" |
-| %80 limit uyarısı | Limit dolmak üzere | "Pro plan'a geçin" |
+HookSniff: "Canlı chat'ten sor, hemen cevap al."
+```
 
 ---
 
-## 13. METRIKLER — NE ÖLÇÜLECEK?
+## 11. METRIKLER
 
-| Metrik | Tanım | Hedef |
-|--------|-------|-------|
-| İlk yanıt süresi | Ticket açıldıktan ilk yanıta kadar | <4 saat |
-| Çözüm süresi | Ticket açıldıktan çözüme kadar | <24 saat |
-| Müşteri memnuniyeti (CSAT) | Çözüm sonrası puan | >4/5 |
-| Self-service oranı | Docs/FAQ ile çözülen | >%60 |
-| Ticket sayısı/ay | Toplam destek talebi | Takip et |
-| Tekrarlayan sorular | Aynı soruyu soran sayısı | Azalt |
-
----
-
-## 14. RİSKLER
-
-| Risk | Olasılık | Etki | Önlem |
-|------|----------|------|-------|
-| Çok fazla ticket gelir | Düşük | Orta | Self-service odaklı docs hazırla |
-| Yanıtlar geç kalır | Orta | Yüksek | tawk.to mobil uygulama ile her yerden cevapla |
-| Kullanıcı docs bulamaz | Orta | Orta | Dashboard'da "yardım" butonu ekle |
-| Spam/yalan ticket | Düşük | Düşük | tawk.to spam filtresi |
-| Dil bariyeri (TR/EN) | Orta | Orta | tawk.to çeviri özelliği (beta) |
+| Metrik | Tanım | Hedef | Nasıl ölçülür |
+|--------|-------|-------|-------------|
+| İlk yanıt süresi | Ticket → ilk yanıt | <4 saat | tawk.to raporlama |
+| Çözüm süresi | Ticket → çözüm | <24 saat | tawk.to raporlama |
+| CSAT | Müşteri memnuniyeti | >4/5 | tawk.to anket |
+| Self-service oranı | KB ile çözülen | >%60 | tawk.to analytics |
+| Ticket sayısı/ay | Toplam destek talebi | Takip | tawk.to raporlama |
+| KB görüntülenme | Makale okunma sayısı | Takip | tawk.to analytics |
+| Chat dönüşümü | Chat → kayıt | >%5 | tawk.to analytics |
 
 ---
 
-## 15. YAPILACAKLAR
+## 12. YAPILACAKLAR
 
 ### Acil (Lansmandan önce) — 3 saat
 
 | # | Ne | Süre |
 |---|-----|------|
-| 1 | tawk.to hesabı aç, widget'ı dashboard'a ekle | 1 saat |
-| 2 | Discord sunucusu kur (5-6 kanal) | 30 dk |
-| 3 | Knowledge base: Quick start + 3 temel rehber (TR + EN) | 1.5 saat |
+| 1 | tawk.to hesabı aç | 10 dk |
+| 2 | tawk.to widget'ı dashboard'a ekle | 1 saat |
+| 3 | Discord sunucusu kur (7 kanal) | 30 dk |
+| 4 | KB: Quick start + Core concepts (TR + EN) | 1 saat |
+| 5 | Better Uptime hesabı aç, 5 monitor ekle | 20 dk |
 
 ### İlk Hafta — 4 saat
 
 | # | Ne | Süre |
 |---|-----|------|
-| 4 | Knowledge base: SDK kurulum rehberleri | 2 saat |
-| 5 | Knowledge base: API hata kodları + HMAC rehberi | 1 saat |
-| 6 | Status page: Better Uptime kurulumu | 30 dk |
-| 7 | tawk.to otomatik tetikleyicileri ayarla | 30 dk |
+| 6 | KB: HMAC rehberi + Node.js/Python SDK (TR + EN) | 1 saat |
+| 7 | KB: API hata kodları + Sık hatalar | 1 saat |
+| 8 | tawk.to otomatik tetikleyiciler | 30 dk |
+| 9 | Discord bot kurulumu | 30 dk |
+| 10 | KB: Faturalama SSS (TR + EN) | 30 dk |
+| 11 | Status page: Better Uptime ayarları | 30 dk |
 
 ### İlk Ay — 3 saat
 
 | # | Ne | Süre |
 |---|-----|------|
-| 8 | Knowledge base: Entegrasyon örnekleri | 1 saat |
-| 9 | Knowledge base: Sık hatalar ve çözümleri | 1 saat |
-| 10 | Discord bot kurulumu (ticket + FAQ) | 1 saat |
+| 12 | KB: Kalan SDK rehberleri (9 dil) | 1.5 saat |
+| 13 | KB: Entegrasyon örnekleri | 1 saat |
+| 14 | Video: 2 dakikada ilk webhook (opsiyonel) | 1 saat |
 
 ---
 
-## 16. SONUÇ
+## 13. SONUÇ
 
 | Konu | Değerlendirme |
 |------|---------------|
@@ -490,4 +568,5 @@ Bir gün 20+ ticket gelirse:
 | Destek yükü (tek kişi) | Günde 45 dk (otomasyon ile 15 dk'ya düşer) |
 | Çoklu dil | TR + EN (temel makaleler) |
 | Self-service hedefi | %80 (6. ay) |
-| Rakip farkı | Svix/Hookdeck de live chat kullanmıyor — avantaj olabilir |
+| Rakip avantajı | Live chat + ticket + TR destek (rakiplerde yok) |
+| Pazarlama mesajı | "Canlı chat'ten sor, hemen cevap al" |
