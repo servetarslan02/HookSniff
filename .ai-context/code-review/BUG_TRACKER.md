@@ -64,17 +64,22 @@
 - **Fix**: API key'i postMessage ile iframe'e geçir
 - **Durum**: ❌ Düzeltilmedi
 
-### BUG-007: "hookrelay" Artıkları
+### BUG-007: "hookrelay" Artıkları (~45+ referans)
 - **Dosyalar**:
-  - `scripts/backup.sh`: `DB_NAME="${DB_NAME:-hookrelay}"`
-  - `cli/index.js`: `process.env.HOOKRELAY_API_URL`, `process.env.HOOKRELAY_API_KEY`, `process.env.HOOKRELAY_TOKEN`
-  - `sdks/python/hooksniff/utils.py`: Docstring'te `X-Hookrelay-Signature`
-  - `sdks/python/hooksniff/verify.py`: `X-Hookrelay-Signature` header lookup
-  - `sdks/go/hooksniff.go`: `X-Hookrelay-Signature` header lookup
-- `deploy/oracle-cloud-setup.sh`: Script header "HookRelay" olarak kalmış
-- `deploy/gcp-deploy.ps1`: Script header "HookRelay" olarak kalmış
-- **Etki**: Eski isim kalıntısı, production'da hata oluşturabilir
-- **Fix**: "hookrelay" → "hooksniff" olarak değiştir
+  - `scripts/backup.sh`: 10+ referans (DB_NAME, DB_USER, BACKUP_DIR, S3_BUCKET, filenames)
+  - `scripts/restore.sh`: 10+ referans (aynı pattern)
+  - `deploy/oracle-cloud-setup.sh`: 20+ referans (HOOKRELAY_DIR, systemd service, docker, update script)
+  - `migrations/001_initial.sql`: "HookRelay initial schema"
+  - `migrations/002_security_features.sql`: `X-HookRelay-Signature` default header
+  - `migrations/005_event_mesh.sql`: "Extends HookRelay"
+  - `api/migrations/001_initial_schema.sql`: "HookRelay Database Schema"
+  - `cli/index.js`: HOOKRELAY_API_URL, HOOKRELAY_API_KEY, HOOKRELAY_TOKEN env vars
+  - `sdks/python/hooksniff/utils.py`: "X-Hookrelay-Signature" docstring
+  - `sdks/python/hooksniff/verify.py`: "x-hooksniff-signature" header lookup
+  - `sdks/go/hooksniff.go`: "X-Hookrelay-Signature" header lookup
+  - `deploy/gcp-deploy.ps1`: Script header
+- **Etki**: backup.sh production'da DB_NAME=hookrelay ile hata verir. 45+ dosyada eski isim
+- **Fix**: Toplu find-replace (migration'lar çalışmış olabilir, dikkatli ol)
 - **Durum**: ❌ Düzeltilmedi
 
 ---
