@@ -55,7 +55,7 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## 📦 SDK DURUMU (8/11 Yayınlandı)
+## 📦 SDK DURUMU (11/11 Yayınlandı — TAMAMI YAYINDA! 🎉)
 
 | SDK | Platform | Durum | Base URL |
 |-----|----------|-------|----------|
@@ -67,8 +67,8 @@ cd dashboard && npm install && npm run build
 | Swift | Swift Package Index | ✅ `v0.1.0` tag | ✅ GCP Cloud Run |
 | PHP | Packagist | ✅ `hooksniff/hooksniff-php` | ✅ GCP Cloud Run |
 | Elixir | Hex.pm | ✅ `hooksniff 0.2.0` (Oturum 32) | ✅ GCP Cloud Run |
-| Java | Maven Central | ❌ GPG key + versiyon conflict | ✅ GCP Cloud Run |
-| Kotlin | Maven Central | ❌ GPG imza gerekli | ✅ GCP Cloud Run |
+| Java | Maven Central | ✅ `hooksniff-sdk 0.2.0` (Oturum 33) | ✅ GCP Cloud Run |
+| Kotlin | Maven Central | ✅ `hooksniff 0.3.0` (Oturum 33) | ✅ GCP Cloud Run |
 | Ruby | RubyGems | ✅ `hooksniff 0.1.0` (önceki oturumda publish edilmiş) | ✅ GCP Cloud Run |
 
 ---
@@ -86,7 +86,7 @@ cd dashboard && npm install && npm run build
 |-------|-------|------|
 | API deploy (GCP Console) | 🔴 ACİL | RateLimiter fix deploy edilmeli |
 | iyzico hesap | ❌ | Vergi levhası + banka hesabı |
-| Java/Kotlin SDK publish | ⏳ | OSSRH credential gerekli (build hazır, GPG key oluşturuldu) |
+| Java/Kotlin SDK publish | ✅ | Oturum 33'te tamamlandı — Maven Central'a yüklendi |
 | npm token rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
 | GCP SA key rotate | ⚠️ | Eski key paylaşıldı, yeni key oluştur |
 | GitHub PAT rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
@@ -158,7 +158,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
-| 33 | 2026-05-09 19:51 | OpenClaw webchat, SDK publish — Ruby ✅ mevcut, Java/Kotlin build hazır, OSSRH credential bekleniyor |
+| 33 | 2026-05-09 19:51 | OpenClaw webchat, SDK publish tamamlandı — Java 0.2.0 + Kotlin 0.3.0 Maven Central'a yüklendi (11/11 🎉) |
 | 32 | 2026-05-09 18:57 | SDK build & publish — Elixir hex.pm'e yüklendi (8/11) |
 | 31 | 2026-05-09 18:51 | OpenClaw webchat bağlantı, GitHub hafıza sistemi doğrulama |
 | 30 | 2026-05-09 18:19 | notification_preferences, FIXME, integration test, OpenAPI, test coverage 10/10 |
