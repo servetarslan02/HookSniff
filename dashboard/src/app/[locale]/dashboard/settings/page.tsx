@@ -142,12 +142,30 @@ export default function SettingsPage() {
 
   const handleNotificationSave = async () => {
     setNotificationSaving(true);
-    // Notification preferences are stored locally for now
-    // FIXME: /v1/customer/notifications endpoint hazır olunca buraya bağlanacak
-    setTimeout(() => {
-      setNotificationSaving(false);
+    try {
+      const res = await fetch(`${API}/portal/notifications`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          credentials: 'include' as const,
+        },
+        body: JSON.stringify({
+          email_on_failure: failureAlerts,
+          email_on_dead_letter: failureAlerts,
+          email_on_success: emailNotifs,
+          slack_webhook_url: null,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to save notification preferences');
+      }
       toast(tc('success'), 'success');
-    }, 500);
+    } catch (e: unknown) {
+      toast(getErrorMessage(e), 'error');
+    } finally {
+      setNotificationSaving(false);
+    }
   };
 
   return (

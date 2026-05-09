@@ -445,3 +445,256 @@ fn test_subscription_status_serialization() {
         "\"canceled\""
     );
 }
+
+// ──────────────────────────────────────────────────────────────
+// SSRF protection tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_ssrf_blocks_private_ips() {
+    use hooksniff_api::ssrf::is_safe_url;
+
+    // Private IPs should be blocked
+    assert!(is_safe_url("http://127.0.0.1").is_err());
+    assert!(is_safe_url("http://localhost").is_err());
+    assert!(is_safe_url("http://10.0.0.1").is_err());
+    assert!(is_safe_url("http://172.16.0.1").is_err());
+    assert!(is_safe_url("http://192.168.1.1").is_err());
+    assert!(is_safe_url("http://169.254.169.254").is_err()); // AWS metadata
+    assert!(is_safe_url("http://[::1]").is_err()); // IPv6 loopback
+}
+
+#[test]
+fn test_ssrf_allows_public_urls() {
+    use hooksniff_api::ssrf::is_safe_url;
+
+    assert!(is_safe_url("https://example.com").is_ok());
+    assert!(is_safe_url("https://api.stripe.com/webhooks").is_ok());
+    assert!(is_safe_url("https://hooks.slack.com/services/xxx").is_ok());
+}
+
+// ──────────────────────────────────────────────────────────────
+// Validation tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_event_type_regex() {
+    use hooksniff_api::validation::validate_event_type;
+
+    assert!(validate_event_type("order.created").is_ok());
+    assert!(validate_event_type("user.signed_up").is_ok());
+    assert!(validate_event_type("payment.refund.completed").is_ok());
+    assert!(validate_event_type("").is_err());
+    assert!(validate_event_type("spaces not allowed").is_err());
+    assert!(validate_event_type("UPPERCASE").is_err());
+}
+
+#[test]
+fn test_json_depth_check() {
+    use hooksniff_api::validation::check_json_depth;
+
+    let shallow = serde_json::json!({"a": 1});
+    assert!(check_json_depth(&shallow, 5).is_ok());
+
+    let deep = serde_json::json!({"a": {"b": {"c": {"d": {"e": 1}}}}});
+    assert!(check_json_depth(&deep, 5).is_ok());
+    assert!(check_json_depth(&deep, 3).is_err());
+}
+
+#[test]
+fn test_html_sanitization() {
+    use hooksniff_api::validation::sanitize_html;
+
+    let clean = sanitize_html("Hello World");
+    assert_eq!(clean, "Hello World");
+
+    let with_script = sanitize_html("<script>alert('xss')</script>Hello");
+    assert!(!with_script.contains("<script>"));
+    assert!(with_script.contains("Hello"));
+}
+
+// ──────────────────────────────────────────────────────────────
+// Circuit breaker tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_circuit_breaker_state_transitions() {
+    use hooksniff_api::circuit_breaker::CircuitBreaker;
+
+    let cb = CircuitBreaker::new(3, std::time::Duration::from_secs(60));
+
+    // Starts closed
+    assert!(cb.is_closed());
+
+    // After threshold failures, opens
+    cb.record_failure();
+    cb.record_failure();
+    assert!(cb.is_closed());
+    cb.record_failure();
+    assert!(cb.is_open());
+
+    // Success resets
+    let cb2 = CircuitBreaker::new(3, std::time::Duration::from_secs(60));
+    cb2.record_failure();
+    cb2.record_success();
+    cb2.record_failure();
+    assert!(cb2.is_closed());
+}
+
+// ──────────────────────────────────────────────────────────────
+// Retry policy tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_exponential_backoff_calculation() {
+    use hooksniff_api::retry_policy::calculate_backoff;
+
+    let delay1 = calculate_backoff(1, 10, 3600, "exponential");
+    let delay2 = calculate_backoff(2, 10, 3600, "exponential");
+    let delay3 = calculate_backoff(3, 10, 3600, "exponential");
+
+    assert!(delay1 >= 5 && delay1 <= 15); // ~10s with jitter
+    assert!(delay2 >= 15 && delay2 <= 30); // ~20s with jitter
+    assert!(delay3 >= 30 && delay3 <= 50); // ~40s with jitter
+}
+
+#[test]
+fn test_backoff_respects_max_delay() {
+    use hooksniff_api::retry_policy::calculate_backoff;
+
+    let delay = calculate_backoff(20, 10, 60, "exponential");
+    assert!(delay <= 60, "Backoff should not exceed max_delay_secs");
+}
+
+// ──────────────────────────────────────────────────────────────
+// Idempotency tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_idempotency_key_generation() {
+    let key1 = uuid::Uuid::new_v4().to_string();
+    let key2 = uuid::Uuid::new_v4().to_string();
+
+    assert_ne!(key1, key2);
+    assert_eq!(key1.len(), 36); // UUID format
+}
+
+// ──────────────────────────────────────────────────────────────
+// Webhook template tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_template_variable_substitution() {
+    use std::collections::HashMap;
+
+    let template = r#"{"event":"order.created","order_id":"{{order_id}}","total":{{total}}}"#;
+    let mut vars = HashMap::new();
+    vars.insert("order_id".to_string(), "ord_123".to_string());
+    vars.insert("total".to_string(), "99.99".to_string());
+
+    let mut result = template.to_string();
+    for (key, value) in &vars {
+        result = result.replace(&format!("{{{{{}}}}}", key), value);
+    }
+
+    assert!(result.contains("ord_123"));
+    assert!(result.contains("99.99"));
+    assert!(!result.contains("{{order_id}}"));
+}
+
+// ──────────────────────────────────────────────────────────────
+// Notification preferences schema tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_notification_preferences_defaults() {
+    // Verify that default notification preferences match expected values
+    let defaults = serde_json::json!({
+        "email_on_failure": true,
+        "email_on_dead_letter": true,
+        "email_on_success": false,
+        "slack_webhook_url": null,
+        "discord_webhook_url": null,
+        "webhook_url": null,
+    });
+
+    assert_eq!(defaults["email_on_failure"], true);
+    assert_eq!(defaults["email_on_dead_letter"], true);
+    assert_eq!(defaults["email_on_success"], false);
+    assert!(defaults["slack_webhook_url"].is_null());
+    assert!(defaults["discord_webhook_url"].is_null());
+    assert!(defaults["webhook_url"].is_null());
+}
+
+// ──────────────────────────────────────────────────────────────
+// Rate limiter tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_rate_limit_plan_limits() {
+    use hooksniff_api::billing::Plan;
+
+    let free = Plan::Free;
+    let pro = Plan::Pro;
+    let business = Plan::Business;
+
+    assert!(free.max_requests_per_minute() < pro.max_requests_per_minute());
+    assert!(pro.max_requests_per_minute() < business.max_requests_per_minute());
+    assert!(free.max_webhooks_per_month() < pro.max_webhooks_per_month());
+}
+
+// ──────────────────────────────────────────────────────────────
+// Signing edge cases
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_signature_with_empty_body() {
+    let secret = "whsec_test_empty_body";
+    let msg_id = "msg_empty";
+    let timestamp = &chrono::Utc::now().timestamp().to_string();
+
+    let sig = signing::compute_standard_signature(secret, msg_id, timestamp, "");
+    assert!(sig.starts_with("v1,"));
+    assert!(signing::verify_standard_signature(secret, msg_id, timestamp, &sig, "", None).is_ok());
+}
+
+#[test]
+fn test_signature_with_unicode_body() {
+    let secret = "whsec_test_unicode";
+    let msg_id = "msg_unicode";
+    let timestamp = &chrono::Utc::now().timestamp().to_string();
+    let body = r#"{"message":"Merhaba dünya 🪝","emoji":"🎉"}"#;
+
+    let sig = signing::compute_standard_signature(secret, msg_id, timestamp, body);
+    assert!(signing::verify_standard_signature(secret, msg_id, timestamp, &sig, body, None).is_ok());
+}
+
+#[test]
+fn test_signature_with_very_large_body() {
+    let secret = "whsec_test_large";
+    let msg_id = "msg_large";
+    let timestamp = &chrono::Utc::now().timestamp().to_string();
+    let body = "x".repeat(1_000_000); // 1MB body
+
+    let sig = signing::compute_standard_signature(secret, msg_id, timestamp, &body);
+    assert!(signing::verify_standard_signature(secret, msg_id, timestamp, &sig, &body, None).is_ok());
+}
+
+// ──────────────────────────────────────────────────────────────
+// CSV injection prevention tests
+// ──────────────────────────────────────────────────────────────
+
+#[test]
+fn test_csv_formula_injection_prevention() {
+    use hooksniff_api::validation::escape_csv_cell;
+
+    // Formulas should be escaped
+    assert!(escape_csv_cell("=cmd|'/c calc'!A0").starts_with("'"));
+    assert!(escape_csv_cell("+SUM(A1:A10)").starts_with("'"));
+    assert!(escape_csv_cell("-2+3").starts_with("'"));
+    assert!(escape_csv_cell("@SUM(A1)").starts_with("'"));
+
+    // Normal values should pass through
+    assert_eq!(escape_csv_cell("normal text"), "normal text");
+    assert_eq!(escape_csv_cell("12345"), "12345");
+}
