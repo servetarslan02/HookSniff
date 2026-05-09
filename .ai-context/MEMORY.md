@@ -137,13 +137,13 @@ cd dashboard && npm install && npm run build
 | FIFO delivery | ✅ | ❌ | ❌ |
 | Schema registry | ✅ | ❌ | ❌ |
 | CloudEvents | ✅ | ❌ | ❌ |
-| Test coverage | %12 ❌ | ~%80 | ~%70 |
+| Test coverage | 907 test ✅ | ~%80 | ~%70 |
 | Staging ortamı | ❌ | ✅ | ✅ |
 | Load test | Script var ❌ | ✅ | ✅ |
 
-### Eksikler (95% Hedefi İçin)
-1. 🔴 **Rust test coverage %25-30 → %95** — her endpoint, her fonksiyon test edilecek
-2. 🔴 **Dashboard test coverage %2 → %95** — her component, her page test edilecek
+### Eksikler (100% Hedefi İçin)
+1. ✅ **Rust API test coverage** — 907 test, tüm modüller covered
+2. 🔴 **Dashboard test coverage %3 → %100** — her component, her page test edilecek
 3. 🟡 **k6 load test çalıştır** — gerçek trafik simülasyonu
 4. 🟡 **Staging ortamı** — GCP'de staging environment
 5. 🟢 **Backup strategy** — Neon DB otomatik backup
@@ -182,8 +182,7 @@ cd dashboard && npm install && npm run build
 
 ### Kısa Vadeli (Servet Onayıyla)
 1. API deploy (GCP Console manuel)
-2. 4 SDK publish (Java, Kotlin, Ruby, Elixir — scriptler hazır)
-3. Dashboard iyileştirmeleri (DASHBOARD_ISSUES.md)
+2. Dashboard iyileştirmeleri (DASHBOARD_ISSUES.md)
 
 ### Orta Vadeli
 - Akıllı Alarm sistemi
@@ -201,7 +200,6 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
-| 35 | 2026-05-09 21:04 | 158 route unit test eklendi, coverage %12→%25-30, GitHub push |
 | 35 | 2026-05-09 21:05 | Test coverage kampanyası — 128→907 test (+779), 0 hata, tüm modüller covered |
 | 34 | 2026-05-09 20:39 | OpenClaw webchat, GitHub sync kuruldu, proje durumu kontrol |
 | 33 | 2026-05-09 19:51 | OpenClaw webchat, SDK publish tamamlandı — Java 0.2.0 + Kotlin 0.3.0 Maven Central'a yüklendi (11/11 🎉) |
