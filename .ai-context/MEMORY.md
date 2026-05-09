@@ -178,29 +178,6 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## 📋 LANSMAN STRATEJİSİ (2026-05-09 — Oturum 36)
-
-**Belge:** `.ai-context/LAUNCH_STRATEGY.md` — 16KB, 9 bölüm
-
-### Fiyatlandırma Kararı
-- Global: $0 / $29 / $99
-- Türkiye: ₺0 / ₺99 / ₺299
-- Ödeme: Polar.sh (başlangıç), iyzico (sonra)
-
-### Lansman Planı
-- Hafta 1: Türkiye (r/CodingTR, Twitter TR, LinkedIn TR)
-- Hafta 2: Global (Hacker News Show HN, Reddit EN)
-- Hafta 3: Blog + Dizinler (Dev.to, BetaList, DevHunt)
-- Hafta 4: Product Hunt
-- Beta: 20 kullanıcı, 6 ay ücretsiz Pro
-
-### Hedef (2. Ay Sonu)
-- 50-100 kayıtlı kullanıcı
-- 5-10 ödeme yapan müşteri
-- $150-500/ay gelir
-
----
-
 ## 🚀 Sonraki Adımlar (Öncelik Sırası)
 
 ### Kısa Vadeli (Servet Onayıyla)
