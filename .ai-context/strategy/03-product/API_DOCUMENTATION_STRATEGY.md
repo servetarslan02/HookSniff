@@ -263,6 +263,52 @@ rules:
   path-params: error
 ```
 
+### 4.4 OpenAPI 3.1 Upgrade Yolu
+
+> Kaynak: Speakeasy — "Webhooks in OpenAPI" (2026, doğrulanmış), Swagger — OpenAPI 3.1.0 (2021, doğrulanmış)
+
+HookSniff şu an **OpenAPI 3.0.3** kullanıyor. OpenAPI 3.1 (Şubat 2021'de yayınlanmış) native `webhooks` field destekliyor:
+
+```yaml
+# OpenAPI 3.0.3 (mevcut) — webhooks YOK, sadece callbacks
+# OpenAPI 3.1 (hedef) — native webhooks field
+webhooks:
+  webhookDelivery:
+    post:
+      summary: Receive webhook delivery notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookEvent"
+      responses:
+        "200":
+          description: Webhook received successfully
+```
+
+| Özellik | 3.0.3 (mevcut) | 3.1 (hedef) |
+|---------|-------|-----|
+| `webhooks` field | ❌ Yok (callbacks var) | ✅ Native |
+| JSON Schema uyumluluğu | Kısmen | ✅ Tam (draft 2020-12) |
+| Nullable handling | `nullable: true` | `type: ["string", "null"]` |
+| Swagger UI desteği | ✅ | ✅ (2023+) |
+
+**Öneri:** OpenAPI 3.1'e upgrade düşük riskli, yüksek değerli bir iyileştirme.
+
+### 4.5 AsyncAPI Karşılaştırması
+
+> Kaynak: Swagger — "AsyncAPI support for OpenAPI 3.1" (2023, doğrulanmış)
+
+| Konu | OpenAPI | AsyncAPI |
+|------|---------|----------|
+| Odak | HTTP request/response | Event-driven messaging |
+| Webhook desteği | 3.1+ `webhooks` field | ✅ Native |
+| Protokoller | HTTP | HTTP, WebSocket, Kafka, AMQP, MQTT |
+| Tooling | Swagger, Redoc, Stoplight | AsyncAPI Studio, Generator |
+| HookSniff için | ✅ Yeterli (webhook delivery) | Gereksiz (kullanıcıya push yok) |
+
+**Sonuç:** HookSniff bir webhook *delivery* servisi, bir event *consumer* değil. OpenAPI 3.1 yeterli. AsyncAPI gerekmez.
+
 ---
 
 ## 5. Dokümantasyon Türleri

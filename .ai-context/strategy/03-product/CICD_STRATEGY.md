@@ -171,16 +171,32 @@ Developer → Git Push → CI Pipeline → Quality Gates → Deploy Pipeline →
 
 ### 4.2 GitHub Actions Pricing (2026)
 
-> Kaynak: Reddit r/programming — "Starting March 1, 2026, GitHub will introduce a new $0.002 per..." (2025-12-16, doğrulanmış)
+> Kaynak: Reddit r/programming — "Starting March 1, 2026, GitHub will introduce a new $0.002 per..." (2025-12-16, doğrulanmış), GitHub Docs — Actions billing (2026, doğrulanmış)
 
-| Plan | Free Minutes | Storage | Ücret |
-|------|-------------|---------|-------|
-| Free | 2,000 dk/ay (Linux) | 500 MB | $0 |
-| Pro | 3,000 dk/ay | 1 GB | $4/ay |
-| Team | 3,000 dk/ay | 2 GB | $4/kullanıcı/ay |
-| Enterprise | 50,000 dk/ay | 50 GB | $21/kullanıcı/ay |
+| Plan | Free Minutes (Private Repo) | Free Minutes (Public Repo) | Storage | Ücret |
+|------|---------------------------|---------------------------|---------|-------|
+| Free | 2,000 dk/ay (Linux) | **Sınırsız** | 500 MB | $0 |
+| Pro | 3,000 dk/ay | **Sınırsız** | 1 GB | $4/ay |
+| Team | 3,000 dk/ay | **Sınırsız** | 2 GB | $4/kullanıcı/ay |
+| Enterprise | 50,000 dk/ay | **Sınırsız** | 50 GB | $21/kullanıcı/ay |
 
-**HookSniff'in durumu:** Free plan, dakika limiti aşılmış. Alternatif gerekli.
+> ⚠️ **Mart 2026 değişikliği:** GitHub, self-hosted runner'lar için private repo'larda **$0.002/dk** ücret getirdi. Bu, self-hosted runner stratejisini etkileyebilir.
+
+### ⚠️ KRİTİK BULGU: Repo Private!
+
+**HookSniff reposu şu an PRIVATE.** Bu şu anlama geliyor:
+- GitHub Actions: **2,000 dk/ay limit** (aşılmış durumda!)
+- Public olsa: **Sınırsız ücretsiz dakika**
+
+**Seçenekler:**
+
+| Seçenek | Etki | Risk |
+|---------|------|------|
+| **A) Repo'yu public yap** | ✅ Sınırsız GHA dakika, $0 | ⚠️ Kod herkese açık olur (açık kaynak yapabilir) |
+| **B) Repo private kalsın** | ❌ 2K dk/ay limit, aşılmış | ✅ Kod gizli kalır |
+| **C) Hybrid: Public CI repo + Private code repo** | ✅ CI sınırsız, kod gizli | ⚠️ İki repo yönetmek gerek |
+
+**Öneri:** Eğer HookSniff açık kaynak olacaksa → public yap (Svix da open-source). Eğer değilse → Cloud Build veya local CI ile devam.
 
 ### 4.3 Seçenek Analizi
 
@@ -199,10 +215,22 @@ Developer → Git Push → CI Pipeline → Quality Gates → Deploy Pipeline →
 ### 5.1 Karar: Hybrid Yaklaşım
 
 **Neden hybrid?**
-- GitHub Actions dakika limiti var (2K dk/ay, free)
+- Repo **private** → GitHub Actions 2K dk/ay limit (aşılmış!)
 - Local CI hızlı ama manuel
 - Cloud Build deploy için ideal (120 dk/gün free)
-- Her birini doğru yerde kullan → $0 maliyet
+- **Repo public yapılırsa → GHA sınırsız, local CI'a gerek kalmaz**
+
+**Karar ağacı:**
+```
+Repo public mu?
+    │
+    ├── Evet → GitHub Actions (sınırsız, $0) → Tercih edilen
+    │
+    └── Hayır → Hybrid: Local CI + Cloud Build
+                ├── Pre-commit: Local CI
+                ├── PR/CI: Cloud Build (120 dk/gün)
+                └── Deploy: Cloud Build
+```
 
 ### 5.2 Strateji Tablosu
 
@@ -218,15 +246,17 @@ Developer → Git Push → CI Pipeline → Quality Gates → Deploy Pipeline →
 
 ### 5.3 Dakika Bütçesi (Aylık)
 
+#### Senaryo A: Repo Private (Mevcut)
+
 ```
-GitHub Actions Free: 2,000 dk/ay
+GitHub Actions Free: 2,000 dk/ay (PRIVATE repos)
 
 Tahmini kullanım:
   - PR checks: ~20 PR × 5 dk = 100 dk
   - Full CI: ~10 merge × 15 dk = 150 dk
   - Release CI: ~2 × 20 dk = 40 dk
   ────────────────────────────
-  Toplam: ~290 dk/ay (%14.5 kullanım)
+  Toplam: ~290 dk/ay (%14.5 kullanım) ✅ limit dahilinde
 
 Cloud Build Free: 120 dk/gün = 3,600 dk/ay
 
@@ -234,10 +264,26 @@ Tahmini kullanım:
   - API deploy: ~10 × 10 dk = 100 dk
   - Worker deploy: ~10 × 10 dk = 100 dk
   ────────────────────────────
-  Toplam: ~200 dk/ay (%5.5 kullanım)
+  Toplam: ~200 dk/ay (%5.5 kullanım) ✅
 ```
 
-**Sonuç:** $0 bütçeyle, aylık ~490 dakika toplam CI/CD kullanımı. Her iki platformda da free tier sınırları içinde.
+#### Senaryo B: Repo Public (Önerilen)
+
+```
+GitHub Actions: SINIRSIZ dk/ay (PUBLIC repos) ✅
+
+Tahmini kullanım:
+  - PR checks: ~20 PR × 5 dk = 100 dk
+  - Full CI: ~10 merge × 15 dk = 150 dk
+  - Release CI: ~2 × 20 dk = 40 dk
+  - Deploy: ~10 × 10 dk = 100 dk
+  ────────────────────────────
+  Toplam: ~390 dk/ay (sınırsız, $0) ✅
+
+Cloud Build: Gerek yok (GitHub Actions deploy da yapar)
+```
+
+**Sonuç:** Repo public yapılırsa Cloud Build'e bile gerek kalmaz. $0 bütçeyle sınırsız CI/CD.
 
 ---
 
