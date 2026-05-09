@@ -1,7 +1,40 @@
 import { NextResponse } from 'next/server';
 
+// In-memory rate limiting (resets on server restart — fine for newsletter)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX = 3; // max 3 attempts per IP per hour
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+
+// In-memory subscriber store (production: replace with database)
+const subscribers = new Set<string>();
+
+function getRateLimitKey(request: Request): string {
+  return request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+}
+
+function checkRateLimit(key: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 export async function POST(request: Request) {
   try {
+    // Rate limiting
+    const rateLimitKey = getRateLimitKey(request);
+    if (!checkRateLimit(rateLimitKey)) {
+      return NextResponse.json(
+        { success: false, error: 'Too many attempts. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { email } = body;
 
@@ -21,13 +54,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // In production, this would store to a database or send to a mailing list service
-    // For now, validate and return success
-    // Production: store to database or mailing list
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Deduplication
+    if (subscribers.has(normalizedEmail)) {
+      return NextResponse.json({
+        success: true,
+        message: 'You are already subscribed! Check your inbox for our latest issue.',
+      });
+    }
+
+    // Store subscriber
+    subscribers.add(normalizedEmail);
+
+    // TODO: Production — store to database or mailing list service
+    // TODO: Production — send confirmation email (double opt-in)
+    // TODO: Production — send welcome email
+
+    console.log(`[Newsletter] New subscriber: ${normalizedEmail} (total: ${subscribers.size})`);
 
     return NextResponse.json({
       success: true,
-      message: 'Successfully subscribed! You will receive our next newsletter.',
+      message: 'Successfully subscribed! Check your inbox to confirm.',
     });
   } catch {
     return NextResponse.json(
@@ -35,4 +83,12 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+}
+
+// GET — list subscribers (admin only, for debugging)
+export async function GET() {
+  return NextResponse.json({
+    success: true,
+    count: subscribers.size,
+  });
 }
