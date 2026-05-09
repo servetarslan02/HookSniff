@@ -16,6 +16,15 @@
 7. [İçerik Şablonları](#7-içerik-şablonları)
 8. [Beklenen Sonuçlar](#8-beklenen-sonuçlar)
 9. [Servet'in Yapması Gerekenler](#9-servetin-yapması-gerekenler)
+10. [Uzun Vadeli İçerik Planı](#10-uzun-vadeli-i̇çerik-planı)
+11. [Email Pazarlama](#11-email-pazarlama)
+12. [Referans ve Viral Döngü](#12-referans-ve-viral-döngü)
+13. [PR ve Medya Stratejisi](#13-pr-ve-medya-stratejisi)
+14. [Müşteri Destek Planı](#14-müşteri-destek-planı)
+15. [Başarı Metrikleri](#15-başarı-metrikleri)
+16. [Kriz Planı](#16-kriz-planı)
+17. [Bütçe](#17-bütçe)
+18. [Rakip Reaksiyon Planı](#18-rakip-reaksiyon-planı)
 
 ---
 
@@ -533,6 +542,401 @@ Dönüşüm oranı: ~%10 signup, ~%10 ödeme (standart SaaS ortalaması)
 - [ ] Beta kullanıcılarından testimonial topla
 - [ ] Haftalık update post'ları paylaş
 - [ ] Blog yazıları üretmeye devam et
+
+---
+
+## 10. Uzun Vadeli İçerik Planı
+
+### Blog Stratejisi
+
+Lansman günü tek seferlik paylaşım yetmez. Sürekli içerik üretmek gerekli.
+
+**Haftalık içerik takvimi:**
+
+| Hafta | İçerik | Platform |
+|-------|--------|----------|
+| 1 | "Webhook nedir? Neden güvenilir teslimat önemli?" | Dev.to + Medium |
+| 2 | "Rust ile webhook platformu mimarisi" | Dev.to + Hashnode |
+| 3 | "Svix vs Hookdeck vs HookSniff karşılaştırma" | Blog + Reddit |
+| 4 | "Webhook best practices: HMAC imzalama nasıl yapılır" | Dev.to |
+| 5 | "$0/ay ile SaaS altyapısı kurma rehberi" | Medium + Reddit |
+| 6 | "Webhook retry stratejileri: Exponential backoff nedir?" | Dev.to |
+| 7 | "11 dilde SDK: HookSniff SDK'ları nasıl çalışır" | Blog |
+| 8 | "Müşteri hikayesi: [İsim] HookSniff ile ne yaptı" | Blog + LinkedIn |
+
+**Aylık tekrar:** Her ay 4 yeni yazı. SEO kalıcı trafik sağlar.
+
+### SEO Hedefleri
+
+| Ana Hedef Kelime | Aylık Arama | Hedef Sıra |
+|-----------------|-------------|------------|
+| webhook delivery service | 500+ | Top 10 |
+| webhook as a service | 1.000+ | Top 20 |
+| webhook retry | 300+ | Top 10 |
+| standard webhooks | 2.000+ | Top 20 |
+| svix alternative | 200+ | Top 5 |
+| hookdeck alternative | 150+ | Top 5 |
+| webhook türkiye | 50+ | Top 3 |
+
+**Nasıl:** Her blog yazısında bu anahtar kelimeleri doğal şekilde kullan. Backlink'ler için Reddit, Dev.to, Hashnode'da paylaş.
+
+### Video İçerik
+
+| Video | Süre | Platform |
+|-------|------|----------|
+| "HookSniff demo — 2 dakikada ilk webhook" | 2 dk | YouTube |
+| "Webhook nedir? 5 dakikada açıkla" | 5 dk | YouTube |
+| "HookSniff kurulum rehberi" | 10 dk | YouTube |
+| "Rust ile webhook platformu nasıl yapılır" | 15 dk | YouTube |
+
+**Sıklık:** Ayda 1-2 video. Shorts olarak da paylaş (60 sn).
+
+---
+
+## 11. Email Pazarlama
+
+### Email Toplama
+
+**Nereden topla:**
+- Landing page'de "Beta'ya katıl" formu
+- Blog yazılarında "Newsletter'a abone ol" butonu
+- Product Hunt'ta "Notify me" butonu
+- Try It Now sayfasında "Sonuçları email ile al"
+
+**Hedef:** İlk 2 ayda 200-500 email adresi.
+
+### Otomatik Email Dizisi
+
+Kayıt olmayan ama email bırakan kullanıcılar için:
+
+| Gün | Email | İçerik |
+|-----|-------|--------|
+| 0 | Hoş geldin | "HookSniff'e hoş geldin! İşte ilk webhook'unu göndermenin 3 yolu." |
+| 3 | Değer | "Webhook best practices: HMAC imzalama nasıl yapılır" (blog linki) |
+| 7 | Sosyal ispat | "50 developer HookSniff kullanıyor. Sen de dene." |
+| 14 | CTA | "Hala kayıt olmadın mı? 5 dakikada ilk webhook'unu gönder." |
+
+**Araç:** MailerLite (ücretsiz, 1.000 subscriber'a kadar) veya Beehiiv.
+
+### Mevcut Kullanıcılar İçin
+
+| Durum | Email | İçerik |
+|-------|-------|--------|
+| Kayıt sonrası | Hoş geldin | ✅ Mevcut (email.rs) |
+| İlk webhook | Tebrik | ❌ Eklenecek |
+| Haftalık | Özet | ❌ Eklenecek |
+| %80 limit | Uyarı | ❌ Eklenecek |
+| Plan yükseltme | Tebrik | ❌ Eklenecek |
+| 30 gün pasif | Hatırlatma | ❌ Eklenecek |
+
+---
+
+## 12. Referans ve Viral Döngü
+
+### Referans Programı
+
+**Yapı:**
+- Mevcut kullanıcı arkadaşını davet eder
+- Arkadaşı kaydolursa: davet eden 1 ay ücretsiz Pro alır
+- Arkadaşı ödeme yaparsa: davet eden 1 ay daha ücretsiz Pro alır
+
+**Nasıl çalışır:**
+- Dashboard'da "Davet Et" butonu
+- Benzersiz referans linki: `hooksniff.vercel.app/ref/abc123`
+- Takip: referans linkinden kayıt olanlar ayrı sayılır
+
+**Maliyet:** $0 (kullanıcı zaten free tier'da ise maliyet yok)
+
+### Viral Döngü
+
+**Döngü 1: Açık kaynak katkısı**
+- HookSniff open-source değil ama SDK'lar open-source
+- SDK'lara katkı yapanlar kendi network'lerinde paylaşır
+- "I contributed to hooksniff-sdk" paylaşımı → organik trafik
+
+**Döngü 2: Blog + SEO**
+- Blog yazısı yaz → Google'da çıkar → yeni kullanıcı gelir
+- Kullanıcı deneyimini paylaşır → yeni kullanıcı gelir
+
+**Döngü 3: Entegrasyon**
+- Kullanıcı HookSniff'i kendi ürününe entegre eder
+- Müşterisi webhook alır → "Powered by HookSniff" görür
+- Müşterisi de HookSniff kullanır
+
+**Döngü 4: Build in public**
+- Haftalık progress update paylaş
+- "Bu hafta X yeni kullanıcı, Y webhook teslim edildi"
+- İnsanlar hikayeyi takip eder, denemek ister
+
+---
+
+## 13. PR ve Medya Stratejisi
+
+### Tech Blog Pitch
+
+**Hedef bloglar:**
+
+| Blog | Neden | Pitch konusu |
+|------|-------|-------------|
+| Dev.to | Developer odaklı | "How I built a webhook platform in Rust" |
+| Hashnode | Developer odaklı | "Webhook best practices" |
+| HackerNoon | Tech hikayeleri | "From zero to 11 SDKs: HookSniff story" |
+| freeCodeCamp | Eğitim | "Webhook nedir? Beginner's guide" |
+| Better Programming | Teknik | "Rust + Axum: Building a webhook API" |
+
+**Pitch formatı:**
+```
+Konu: Guest post pitch — "How I built a webhook delivery platform in Rust"
+
+Merhaba [Editör],
+
+HookSniff adında bir webhook teslimat platformu geliştirdim.
+Rust ile yazdım, 11 dilde SDK var, $0/ay maliyetle çalışıyor.
+
+Şu konularda yazı yazmak istiyorum:
+- [Konu 1]
+- [Konu 2]
+
+Örnek yazım: [link]
+
+Teşekkürler,
+Servet
+```
+
+### Podcast
+
+**Hedef podcast'ler:**
+- Syntax.fm — web development
+- ShopTalk Show — web development
+- Indie Hackers Podcast — startup
+- Software Engineering Daily — teknik
+- Türkiye: Teknoloji podcast'leri
+
+**Pitch konusu:** "Sıfır maliyetle webhook platformu kurdum, 11 SDK yayınladım"
+
+### Newsletter Sponsorluğu
+
+**Hedef newsletter'lar:**
+- TLDR DevOps — sponsorluk ($50-200)
+- ByteByteGo — sistem tasarımı
+- Console.dev — developer tools
+- Türkiye: Yazılımcı newsletter'ları
+
+**Maliyet:** $0-200/ay (bütçeye göre)
+
+---
+
+## 14. Müşteri Destek Planı
+
+### Kanallar
+
+| Kanal | Ne zaman | Maliyet |
+|-------|----------|---------|
+| **Discord sunucusu** | Lansmandan önce kur | $0 |
+| **Email desteği** | Lansmandan itibaren | $0 (Gmail API) |
+| **GitHub Issues** | Açık kaynak SDK'lar için | $0 |
+| **Docs/FAQ** | Self-service | $0 |
+
+### Discord Sunucusu Yapısı
+
+```
+#genel — Genel sohbet
+#duyurular — Yeni özellik, lansman duyuruları
+#destek — Teknik sorular
+#feature-request — Özellik istekleri
+#showcase — Kullanıcı projeleri
+#beta — Beta tester özel kanalı
+```
+
+**Neden Discord?**
+- Developer'lar Discord kullanır
+- Ücretsiz
+- Bot ile otomatik yanıt verilebilir
+- Topluluk oluşturur
+
+### Destek SLA
+
+| Öncelik | Yanıt süresi | Çözüm süresi |
+|---------|-------------|-------------|
+| Kritik (site çöktü) | 1 saat | 4 saat |
+| Yüksek (ödeme sorunu) | 4 saat | 24 saat |
+| Orta (özellik sorusu) | 24 saat | 1 hafta |
+| Düşük (öneri) | 1 hafta | Planlanacak |
+
+**İlk 3 ay:** Tüm destek Servet + AI tarafından. Sonra otomatize et.
+
+---
+
+## 15. Başarı Metrikleri
+
+### Temel Metrikler (KPI)
+
+| Metrik | Tanım | 1. Ay Hedefi | 3. Ay Hedefi | 6. Ay Hedefi |
+|--------|-------|-------------|-------------|-------------|
+| Kayıtlı kullanıcı | Toplam signup | 50 | 200 | 500 |
+| Aktif kullanıcı | Son 30 günde giriş yapan | 20 | 80 | 200 |
+| Ödeme yapan | Pro plan alan | 3 | 15 | 50 |
+| Activation rate | Kayıt → ilk webhook | %40 | %50 | %60 |
+| Churn rate | Ayrılan/aylık kullanıcı | %15 | %10 | %5 |
+| MRR | Aylık tekrarlayan gelir | $150 | $750 | $2.500 |
+| NPS | Müşteri memnuniyeti | 30+ | 40+ | 50+ |
+
+### Takip Metrikleri
+
+| Metrik | Tanım | Nasıl ölçülür |
+|--------|-------|-------------|
+| Trafik kaynakları | Nereden geliyorlar | Google Analytics |
+| Signup conversion | Ziyaretçi → kayıt | Dashboard analytics |
+| Time to first webhook | Kayıttan ilk webhook'a | Backend logs |
+| Onboarding completion | Modal'ı tamamlayanlar | localStorage |
+| Drop-off noktası | Hangi adımda vazgeçiyorlar | Event tracking |
+| Feature adoption | Hangi özellikler kullanılıyor | Backend logs |
+| Support ticket volume | Destek talebi sayısı | Discord/email |
+
+### Ölçme Araçları
+
+| Araç | Ne ölçer | Maliyet |
+|------|----------|---------|
+| Google Analytics | Trafik, kaynaklar | $0 |
+| PostHog | Kullanıcı yolculuğu | $0 (free tier) |
+| Backend logs | API kullanımı, hatalar | $0 |
+| Discord analytics | Topluluk etkileşimi | $0 |
+
+---
+
+## 16. Kriz Planı
+
+### Senaryo 1: Lansman Günü Site Çökerse
+
+**Önlem:**
+- Lansmandan 1 gün önce load test yap
+- Cloud Run auto-scale ayarla
+- Vercel zaten auto-scale yapıyor
+
+**Çözüm:**
+- Hemen Discord'da duyuru yap: "Yoğunluk nedeniyle kısa süreli kesinti, çalışıyoruz"
+- 30 dakika içinde düzelt
+- Düzeldikten sonra update paylaş
+
+### Senaryo 2: Güvenlik Açığı Bulunursa
+
+**Önlem:**
+- Security policy dosyası hazır (SECURITY.md)
+- Responsible disclosure prosedürü var
+
+**Çözüm:**
+- Açığı bulan kişiye teşekkür et
+- 24 saat içinde patch yap
+- CVE yayınla (gerekirse)
+- Kullanıcılara bilgi ver
+
+### Senaryo 3: Negatif Yorum Gelirse
+
+**Reddit/Product Hunt'ta negatif yorum:**
+- Sakin ve profesyonel cevap ver
+- Sorunu kabul et, çözüm öner
+- "Bunu düzeltiyoruz, teşekkürler" de
+- Asla tartışmaya girme
+
+**Hacker News'te eleştiri:**
+- Teknik eleştiriye teknik cevap ver
+- "Good point, I'll fix this" de
+- Savunmaya geçme
+
+### Senaryo 4: Rakip Fiyat Kırarsa
+
+**Svix fiyat düşürürse:**
+- Fiyat avantajı azalır ama özellik avantajı kalır
+- "11 SDK, FIFO, Schema Registry" vurgula
+- Fiyat düşürme, değer artır
+
+**Hookdeck yeni özellik eklerse:**
+- Hızlıca aynı özelliği geliştir (AI ile mümkün)
+- Open-source avantajını kullan
+- Türkiye pazarına odaklan (rakip yapmaz)
+
+### Senaryo 5: Beklenen Trafik Gelmezse
+
+**2. ay sonunda 10 kişi kaydolduysa:**
+- Kanal değiştir — farklı subreddit'ler dene
+- İçerik formatını değiştir — video dene
+- Direkt outreach — developer'lara DM at
+- Pivot — farklı hedef kitle dene
+
+---
+
+## 17. Bütçe
+
+### Zorunlu ($0)
+
+| Kalem | Maliyet | Not |
+|-------|---------|-----|
+| Hosting (Cloud Run) | $0 | Free tier |
+| Database (Neon) | $0 | Free tier |
+| Dashboard (Vercel) | $0 | Free tier |
+| Cache (Upstash) | $0 | Free tier |
+| Email (Gmail API) | $0 | Service account |
+| Monitoring (Grafana) | $0 | Free tier |
+| Analytics (Google) | $0 | Ücretsiz |
+| PostHog | $0 | Free tier |
+| MailerLite | $0 | 1.000 subscriber'a kadar |
+| Discord | $0 | Ücretsiz |
+
+### Opsiyonel (İleride)
+
+| Kalem | Maliyet | Ne zaman |
+|-------|---------|---------|
+| Domain (hooksniff.com) | $12/yıl | İstediğin zaman |
+| BetaList hızlı onay | $129 | Product Hunt'tan önce |
+| Newsletter sponsorluk | $50-200/ay | Gelir olduğunda |
+| Google Ads | $100/ay | Gelir olduğunda |
+| Tasarımcı (logo, banner) | $50-200 | İstediğin zaman |
+
+**Toplam başlangıç maliyeti:** $0
+**Toplam opsiyonel maliyet:** $300-500 (ilk 6 ay)
+
+---
+
+## 18. Rakip Reaksiyon Planı
+
+### Svix Fiyat Düşürürse
+
+**Olasılık:** Orta — Svix $490'dan $99'a düşürebilir
+**Etki:** Fiyat avantajı azalır
+**Plan:**
+- Fiyat düşürme, değer artır
+- "11 SDK, FIFO, Schema Registry" vurgula
+- Türkiye pazarına odaklan
+- Open-source opsiyonu değerlendir
+
+### Hook0 Aynı Özellikleri Eklerse
+
+**Olasılık:** Yüksek — Hook0 açık kaynak, hızlı geliştirebilir
+**Etki:** Özellik avantajı azalır
+**Plan:**
+- Hızlı geliştirme — AI ile 2-3 kat hızlı
+- Türkiye pazarı — Hook0 yapmaz
+- SDK sayısı — 11 SDK koru
+- Enterprise özellikler — gRPC, SQS ekle
+
+### Birisi HookSniff'i Fork Ederse
+
+**Olasılık:** Düşük — HookSniff open-source değil
+**Etki:** Minimal
+**Plan:**
+- Open-source değil, fork zor
+- Ama SDK'lar open-source — onları koru
+- Marka bilinirliği — "orijinal HookSniff" vurgusu
+
+### Yeni Rakip Çıkarsa
+
+**Olasılık:** Orta — webhook pazarı büyüyor
+**Etki:** Belirsiz
+**Plan:**
+- İlk hamle avantajı — Türkiye pazarında
+- Müşteri sadakati — iyi destek
+- Sürekli geliştirme — yeni özellikler
+- Niche odak — belirli sektörler
 
 ---
 
