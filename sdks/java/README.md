@@ -1,5 +1,8 @@
 # HookSniff Java SDK
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.hooksniff/hooksniff-java.svg)](https://central.sonatype.com/artifact/com.hooksniff/hooksniff-java)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official Java client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
@@ -27,7 +30,12 @@ import com.hooksniff.*;
 import java.util.*;
 
 // Initialize client
+// Default base URL is used automatically
 HookSniffClient client = new HookSniffClient("hr_live_your_api_key_here");
+
+// Or with custom config
+HookSniffClient client2 = new HookSniffClient("hr_live_your_api_key_here",
+    "https://hooksniff-api-1046140057667.europe-west1.run.app/v1", 30);
 
 // Create a webhook endpoint
 Endpoint endpoint = client.endpoints().create(

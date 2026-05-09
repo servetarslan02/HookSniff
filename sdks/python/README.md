@@ -1,5 +1,8 @@
 # HookSniff Python SDK
 
+[![PyPI version](https://img.shields.io/pypi/v/hooksniff.svg)](https://pypi.org/project/hooksniff/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official Python client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
