@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 04:54 GMT+8
+> Son güncelleme: 2026-05-10 05:02 GMT+8
 
 ---
 
@@ -17,7 +17,7 @@
 
 ---
 
-## ✅ SON OTURUM (64) — Yapılan İşler (2026-05-10 04:13-04:54 GMT+8)
+## ✅ SON OTURUM (64) — TAM ÖZET (2026-05-10 04:13-05:02 GMT+8)
 
 ### Yeni Sayfalar (11 adet)
 | Sayfa | İçerik |
@@ -34,26 +34,28 @@
 | `/alternatives/hookdeck-alternatives` | 5 servis + pros/cons |
 | `/alternatives/convoy-alternatives` | 5 servis karşılaştırma |
 
-### Compare Sayfası Tam Yeniden Yazım
+### Compare Sayfası — Svix Seviyesi
 - **TL;DR** — 5 anahtar takeaway
+- **Screenshots** — 4 preview kartı (playground, compare, scorecard, build-vs-buy)
 - **Scorecard** — 6 kategori, toplam puan (HookSniff: 50, Svix: 51, Hookdeck: 41, Hook0: 38)
-- **20 detaylı section** — Her biri 4 servis, açıklama, badge, winner
+- **20 detaylı section** — Her birinde: başlık, açıklama, bestFit, 4 servis, badge, winner
 - **Sections:** Production Track Record, Uptime SLA, Pricing, SDKs, FIFO, CloudEvents, Schema Registry, Portal, Smart Routing, Transformations, Inbound Proxy, Streaming, Rate Limiting, Latency Alerts, Standard Webhooks, Compliance, Data Residency, Open Source, DX, Business Continuity
 - **Sosyal kanıt** — 3 testimonial
 - **8 FAQ** — HIPAA eksikliği dürüstçe belirtilmiş
 - **Deep dive links** — 6 link
+- **When to choose** — 4 kart
+- **CTA** — Start for free
 
-### Footer Yeniden Yapılandırma
+### Footer
 - 4 sütun: Product, Compare (8 link), Resources (9 link), Company
 
 ### Rakip Analizi Düzeltmeleri
-- Svix SDK sayısı: 6→11
-- Svix yeni ürünler: Stream, Ingest, Diom
+- Svix SDK 6→11, Stream/Ingest/Diom keşfedildi
 - Svix compliance: HIPAA, PCI-DSS eklendi
 - Hookdeck: MCP, Radar keşfedildi
 - Hook0: MCP Server keşfedildi
-- Convoy: GitHub 404, muhtemelen durdurulmuş
-- API'deki gizli özellikler ortaya çıkarıldı: static IPs, streaming, routing, CLI, alerts
+- Convoy: GitHub 404, durdurulmuş
+- API'deki gizli özellikler ortaya çıkarıldı (static IPs, streaming, routing, CLI, alerts)
 
 ### Bug Düzeltmeleri
 - Server/client split (SEO metadata)
@@ -61,14 +63,21 @@
 - Glossary quick nav 10→34
 - Accessibility (aria-expanded, type=button)
 
-### GitHub Push Özeti
+### GitHub Push (8 commit)
 - `2116baa` — feat: 10 new pages
 - `ab38999` — fix: SEO metadata, dead links
 - `d2b33e6` — fix: accessibility
 - `3610697` — fix: accurate competitor data
 - `8d1f57b` — fix: hidden features revealed
-- `3f37367` — feat: compare page rewrite (Svix-level)
-- **13 dosya changed, +1604 satır, 664+ static page**
+- `3f37367` — feat: compare page rewrite
+- `4896823` — docs: hafıza dosyaları
+- `cd5623d` — feat: screenshots + bestFit
+
+### Toplam Etki
+- 13+ dosya changed
+- +1600 satır kod
+- 83 locale route × 8 dil = 664+ static page
+- Build: 0 error, 0 warning
 
 ---
 
@@ -92,5 +101,5 @@
 - **Oturumlar 1 saat** — planlı çalış, GitHub push sık yap
 - **Hafıza GitHub'da kalıcı** — `.ai-context/`
 - **Scorecard dürüst** — Svix 51, biz 50 (compliance farkı)
+- **Compare sayfası tamam** — 20 section, screenshots, bestFit, TL;DR
 - **API'de gizli özellikler var** — compare sayfasında artık gösteriliyor
-- **Compare sayfası Svix seviyesinde** — 20 section, scorecard, TL;DR
