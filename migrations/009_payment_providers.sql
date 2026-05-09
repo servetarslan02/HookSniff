@@ -2,7 +2,7 @@
 -- Adds payment_provider field and provider-specific IDs to customers table.
 
 -- Add payment provider column
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS payment_provider STRING NOT NULL DEFAULT 'stripe';
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS payment_provider TEXT NOT NULL DEFAULT 'stripe';
 
 -- Polar.sh fields
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_customer_id STRING;
@@ -21,12 +21,12 @@ CREATE INDEX IF NOT EXISTS idx_customers_iyzico_id ON customers(iyzico_customer_
 CREATE TABLE IF NOT EXISTS payment_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    provider STRING NOT NULL,          -- 'stripe' | 'polar' | 'iyzico'
-    provider_tx_id STRING,             -- External transaction ID
+    provider TEXT NOT NULL,          -- 'stripe' | 'polar' | 'iyzico'
+    provider_tx_id TEXT,             -- External transaction ID
     amount_cents INT NOT NULL,
-    currency STRING NOT NULL DEFAULT 'USD',
-    status STRING NOT NULL DEFAULT 'pending',  -- pending, completed, failed, refunded
-    plan STRING NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'USD',
+    status TEXT NOT NULL DEFAULT 'pending',  -- pending, completed, failed, refunded
+    plan TEXT NOT NULL,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
