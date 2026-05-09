@@ -14,7 +14,7 @@
 5. [Status Page](#5-status-page)
 6. [Teknik Temizlik](#6-teknik-temizlik)
 7. [Pazarlama İçeriği](#7-pazarlama-i̇çeriği)
-8. [Servet'in Yapması Gerekenler](#8-servetin-yapması-gerekenler)
+8. [Yapılacaklar](#8-servetin-yapması-gerekenler)
 
 ---
 
@@ -162,7 +162,7 @@
 **Nasıl hazırlanır:**
 - GDPR DPA template'lerinden başla
 - HookSniff'in alt işleyicilerini listele
-- Hukukçu kontrolü (Servet'in yapması gereken)
+- Hukukçu kontrolü (yapılacak)
 
 **Maliyet:** $0 (template kullan) + hukukçu kontrolü ($100-300 opsiyonel)
 
@@ -408,7 +408,7 @@ status.hooksniff.com
 4. Cloud Run environment variables güncelle
 5. Local .env güncelle
 
-**Kim yapacak:** Servet (GCP Console erişimi gerekli)
+**yapılacak (GCP Console erişimi gerekli)
 
 **Öncelik:** 🔴 ACİL — eski key paylaşıldı, güvenlik riski
 
@@ -423,7 +423,7 @@ status.hooksniff.com
 4. OpenClaw config güncelle
 5. GitHub Actions secrets güncelle (varsa)
 
-**Kim yapacak:** Servet
+**yapılacak
 
 **Öncelik:** 🔴 ACİL — eski token paylaşıldı, güvenlik riski
 
@@ -437,7 +437,7 @@ status.hooksniff.com
 3. Eski token'ı revoke et
 4. GitHub Actions secrets güncelle
 
-**Kim yapacak:** Servet
+**yapılacak
 
 **Öncelik:** ⚠️ ACİL
 
@@ -553,7 +553,7 @@ status.hooksniff.com
 
 ---
 
-## 8. Servet'in Yapması Gerekenler
+## 8. Yapılacaklar
 
 ### 🔴 ACİL (Bu Hafta)
 
