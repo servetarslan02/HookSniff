@@ -201,6 +201,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 34 | 2026-05-09 20:39 | OpenClaw webchat, GitHub sync kuruldu, proje durumu kontrol |
 | 33 | 2026-05-09 19:51 | OpenClaw webchat, SDK publish tamamlandı — Java 0.2.0 + Kotlin 0.3.0 Maven Central'a yüklendi (11/11 🎉) |
 | 32 | 2026-05-09 18:57 | SDK build & publish — Elixir hex.pm'e yüklendi (8/11) |
 | 31 | 2026-05-09 18:51 | OpenClaw webchat bağlantı, GitHub hafıza sistemi doğrulama |
