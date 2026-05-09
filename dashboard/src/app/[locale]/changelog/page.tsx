@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   changelog,
@@ -250,8 +251,8 @@ export default function ChangelogPage() {
                                           </div>
                                         )}
                                         {entry.image && (
-                                          <div className="mt-3">
-                                            <img src={entry.image.src} alt={entry.image.alt} className="rounded-lg border border-gray-200 dark:border-slate-700 w-full" loading="lazy" />
+                                          <div className="mt-3 relative w-full h-[200px]">
+                                            <Image src={entry.image.src} alt={entry.image.alt} fill className="rounded-lg border border-gray-200 dark:border-slate-700 object-cover" loading="lazy" />
                                             {entry.image.caption && <p className="text-xs text-gray-500 dark:text-slate-500 mt-1 text-center">{entry.image.caption}</p>}
                                           </div>
                                         )}
