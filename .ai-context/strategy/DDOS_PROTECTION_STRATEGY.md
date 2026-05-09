@@ -96,19 +96,25 @@ Webhook platformu olduğu için:
 
 ### Katman 1: Cloudflare (Network Layer)
 
-Cloudflare free plan ile gelen korumalar:
+Cloudflare free plan ile gelen korumalar (✅ Doğrulanmış — developers.cloudflare.com/waf/rate-limiting-rules):
 
-| Koruma | Free Plan | Pro Plan ($20/ay) |
-|--------|-----------|-------------------|
-| DDoS L3/L4 | ✅ Sınırsız | ✅ Sınırsız |
-| DDoS L7 (temel) | ✅ | ✅ Gelişmiş |
-| SSL/TLS | ✅ | ✅ |
-| CDN | ✅ | ✅ |
-| WAF (temel) | ❌ | ✅ |
-| Rate Limiting (kurallar) | ❌ | ✅ |
-| Bot Management | ❌ | ✅ (basic) |
-| Page Rules | 3 | 20 |
-| Firewall Rules | 5 | 20 |
+| Koruma | Free Plan | Pro Plan ($20/ay) | Business ($200/ay) |
+|--------|-----------|-------------------|---------------------|
+| DDoS L3/L4 | ✅ Sınırsız | ✅ Sınırsız | ✅ Sınırsız |
+| DDoS L7 (temel) | ✅ | ✅ Gelişmiş | ✅ Gelişmiş |
+| SSL/TLS | ✅ | ✅ | ✅ |
+| CDN | ✅ | ✅ | ✅ |
+| WAF (temel) | ❌ | ✅ | ✅ |
+| **Rate Limiting Kuralları** | **1 kural** | **2 kural** | **5 kural** |
+| Rate Limit Period | **Sadece 10s** | 1 dakikaya kadar | 10 dakikaya kadar |
+| Rate Limit Timeout | **Sadece 10s** | 1 saate kadar | 1 güne kadar |
+| Rate Limit Alanları | **Path, Verified Bot** | Host, URI, Path, Query | + Method, Source IP, User Agent |
+| Counting | **IP only** | IP only | IP, IP+NAT |
+| Firewall Rules | 5 | 20 | Custom |
+| Page Rules | 3 | 20 | 50 |
+| Bot Management | ❌ | ❌ | ❌ (Enterprise) |
+
+> **⚠️ Kritik Sınırlama:** Cloudflare Free plan rate limiting **1 kural, 10s periyot, 10s timeout** ile sınırlıdır. Bu, bir IP'nin 10 saniyede 100 istek göndermesini engelleyebilir ama daha sofistike koruma için yeterli değildir. Uygulama katmanı rate limiting (mevcut Rust implementasyonu) asıl korumayı sağlamalıdır.
 
 ### Katman 2: Uygulama Katmanı (Rust API)
 
@@ -167,20 +173,25 @@ Cloudflare free plan ile gelen korumalar:
 | **Traefik** | ✅ (OSS) | $0 | Redis | 🟡 Ekstra servis |
 | **Upstash Rate Limit** | ✅ 10K istek | $0 | Redis | ✅ Mevcut Redis |
 
-### Tavsiye: Mevcut + Cloudflare Pro
+### Tavsiye: Mevcut Rust Koruma + Cloudflare Free + (Opsiyonel) GCP Cloud Armor
 
-**Neden Cloudflare Pro?**
-- $20/ay = günde $0.66 — çok uygun
-- WAF kuralları dahil
-- Rate limiting kuralları (edge-side)
-- Bot management (temel)
-- Gelişmiş DDoS koruması
-- Page Rules (20 adet)
+**Neden Mevcut Rust Koruma Asıl Koruma?**
+- Cloudflare Free plan rate limiting çok sınırlı (1 kural, 10s)
+- Mevcut Rust rate limiting: plan-based, sliding window, Redis destekli
+- Mevcut throttle: per-endpoint
+- Mevcut circuit breaker: otomatik devre dışı bırakma
 
-**Alternatif: GCP Cloud Armor**
+**Cloudflare Free = DDoS L3/L4 koruması (ücretsiz, sınırsız)**
+- Volumetric DDoS saldırılarını otomatik engeller
+- SSL/CDN dahil
+- Rate limiting'i sadece auth endpoint için kullanın
+
+**GCP Cloud Armor (opsiyonel — $0.75/policy + $0.39/million):**
 - Mevcut GCP altyapısında
-- $0.75/policy + $0.39/million istek
-- Ama Cloudflare zaten var → neden ikinci bir katman?
+- WAF kuralları (SQL injection, XSS, path traversal)
+- Geo-blocking
+- Adaptive DDoS koruması
+- Ama Cloudflare zaten var → sadece ek katman olarak
 
 ---
 
@@ -309,13 +320,12 @@ fn is_valid_host(host: &str) -> bool {
 
 ### Faz 2: Cloudflare Kuralları (1 gün)
 
-#### 2.1 Cloudflare Free Plan Kuralları
+#### 2.1 Cloudflare Free Plan Kuralları (✅ Doğrulanmış — 1 kural limiti)
 
 ```
-# Page Rules (3 adet free plan'da)
-1. api.hooksniff.com/* → Cache Level: Bypass, SSL: Full
-2. hooksniff.com/_next/static/* → Cache Level: Cache Everything, Edge Cache TTL: 1 month
-3. hooksniff.com/* → Always Use HTTPS: On
+# Rate Limiting (1 kural — free plan'da tek kural hakkınız var!)
+# EN KRİTİK ENDPOINT'I KORUMA: Auth endpoint'leri
+(http.request.uri.path contains "/api/auth") → Rate limit: 50 req/10s per IP → Block 10s
 
 # Firewall Rules (5 adet free plan'da)
 1. (http.request.uri.path contains "/api/auth") and (rate gt 10) → Challenge
@@ -323,7 +333,14 @@ fn is_valid_host(host: &str) -> bool {
 3. (ip.geoip.country in {"XX" "YY"}) → Block (istenmeyen ülkeler)
 4. (http.user_agent contains "bot" or http.user_agent contains "crawler") → Challenge
 5. (http.request.uri.path contains "/api/admin") and (not ip.src in {office_ip}) → Block
+
+# Page Rules (3 adet free plan'da)
+1. api.hooksniff.com/* → Cache Level: Bypass, SSL: Full
+2. hooksniff.com/_next/static/* → Cache Level: Cache Everything, Edge Cache TTL: 1 month
+3. hooksniff.com/* → Always Use HTTPS: On
 ```
+
+> **⚠️ Free Plan Stratejisi:** 1 rate limiting kuralınızı auth endpoint'e ayırın. Diğer korumalar için mevcut Rust rate limiting + throttle + circuit breaker kullanın.
 
 #### 2.2 Cloudflare Pro Plan ($20/ay — Opsiyonel)
 

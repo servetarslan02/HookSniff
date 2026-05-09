@@ -203,18 +203,55 @@ dashboard/src/
 
 ### shadcn/ui Bileşenleri Risk Analizi
 
-| Bileşen | Varsayılan A11y | Düzeltme Gerekli |
-|---------|----------------|-----------------|
-| Dialog | ✅ Focus trap, aria | 🟡 Minör |
-| Select | ✅ Keyboard nav | ✅ İyi |
-| DropdownMenu | ✅ Keyboard nav | ✅ İyi |
-| Form + FormField | ✅ Label association | ✅ İyi |
-| Table | ⚠️ Sortable columns | 🟡 aria-sort ekle |
-| Tabs | ✅ Keyboard nav | ✅ İyi |
-| Toast | ⚠️ Live region | 🟡 aria-live ekle |
-| Toggle | ⚠️ State announcement | 🟡 aria-pressed |
-| Command | ✅ Keyboard nav | ✅ İyi |
-| Sheet | ✅ Focus trap | ✅ İyi |
+> **Kaynak:** "We Audited All 48 shadcn/ui Components for WCAG 2.2 AA" — TheFrontKit, Nisan 2026 (✅ tam sayfa doğrulanmış)
+
+**Sonuç:** 48 bileşenden **34'ü** doğrudan geçiyor, **9'u** küçük düzeltme istiyor, **5'i** gerçek denetim hatası var.
+
+#### ✅ Doğrudan Geçen 34 Bileşen (Güvenle Kullanılabilir)
+
+Layout: Accordion, Aspect Ratio, Breadcrumb, Card, Collapsible, Resizable, Scroll Area, Separator, Sheet, Sidebar
+Form: Checkbox, Form, Input OTP, Label, Radio Group, Select, Switch, Textarea, Toggle, Toggle Group
+Feedback: Alert, Dialog, Popover, Progress, Skeleton, Sonner (Toast), Tooltip
+Display: Avatar, Badge, Calendar, Hover Card, Pagination, Table, Tabs
+
+#### 🟡 Küçük Düzeltme Gereken 9 Bileşen
+
+| Bileşen | Sorun | Düzeltme |
+|---------|-------|----------|
+| **Button** | Focus ring %50 opacity → 2.4:1 kontrast (3:1 gerekli) | `focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2` |
+| **Input** | Placeholder `text-muted-foreground` → 2.8:1 kontrast | `placeholder:text-zinc-600 dark:placeholder:text-zinc-400` |
+| **Slider** | Varsayılan step=1, ince kontrol yok | `step` prop'u açıkça belirt |
+| **Command (Cmdk)** | Search input'ta `aria-label` yok | `aria-label="Search commands"` ekle |
+| **Carousel** | Autoplay `prefers-reduced-motion` saygı göstermiyor | Autoplay'i motion check ile sar |
+| **Toast (Sonner)** | 4 saniye otomatik kapanma → bilişsel erişilebilirlik | `duration={8000}`, `closeButton`, kritik mesajlarda `duration: Infinity` |
+| **Date Picker** | Ay/yıl nav butonları küçük touch target | `size-9` yap, `aria-label` ekle |
+| **Menubar** | Submenu trigger `aria-expanded` düşebilir | DevTools ile doğrula, gerekirse manuel ekle |
+| **Drawer (Vaul)** | Kapandıktan sonra focus trigger'a dönmeyebilir | Trigger'ın mounted kaldığından emin ol |
+
+#### 🔴 Denetim Hatası Olan 5 Bileşen
+
+| Bileşen | Sorun | Düzeltme |
+|---------|-------|----------|
+| **Combobox** | `aria-haspopup`, `aria-expanded`, `aria-controls` yok | Manuel ARIA ekle veya Ariakit `useComboboxState` kullan |
+| **Data Table** | `<caption>` yok, sort state duyurulmuyor, satır seçim label'ı yok | `caption`, `aria-sort`, `aria-label` ekle |
+| **Context Menu** | Klavye kısayolları gösteriliyor ama çalışmıyor | Kısayol metnini kaldır veya gerçekten uygula |
+| **Chart (Recharts)** | Canvas-based → screen reader okuyamıyor | Data table alternatifi + `aria-label` |
+| **Carousel (autoplay)** | Reduced motion desteği eksik | `prefers-reduced-motion` kontrolü |
+
+#### HookSniff'te Kullanılan shadcn/ui Bileşenleri
+
+HookSniff dashboard'unda muhtemelen kullanılan bileşenler:
+- **Button** → 🔴 Focus ring fix gerekli
+- **Input** → 🔴 Placeholder contrast fix gerekli
+- **Table (Data Table)** → 🔴 Caption, sort state, row selection label
+- **Dialog** → ✅ Geçiyor
+- **Select** → ✅ Geçiyor
+- **DropdownMenu** → ✅ Geçiyor (ama Combobox kullanılıyorsa 🔴)
+- **Toast (Sonner)** → 🟡 Duration fix gerekli
+- **Tabs** → ✅ Geçiyor
+- **Badge** → ✅ Geçiyor
+- **Alert** → ✅ Geçiyor
+- **Form** → ✅ Geçiyor
 
 ---
 
@@ -453,12 +490,19 @@ export default function DashboardLayout({ children }) {
 #### 2.1 Keyboard Navigation
 
 ```tsx
-// Tablo erişilebilirliği
+// Tablo erişilebilirliği — shadcn Data Table fix (✅ TheFrontKit 2026 denetimi doğrulanmış)
+// EN SIK GÖRÜLEN HATA: Data Table'da caption, sort state, row selection label eksik
+
 <table role="table" aria-label="Webhook endpoint'leri">
+  <caption className="sr-only">
+    Webhook endpoint'leri listesi, {endpoints.length} toplam endpoint
+  </caption>
   <thead>
     <tr>
-      <th scope="col" aria-sort="none">
-        <button onClick={sortBy}>Ad</button>
+      <th scope="col" aria-sort={column.getIsSorted() === "asc" ? "ascending" : column.getIsSorted() === "desc" ? "descending" : "none"}>
+        <button onClick={column.getToggleSortingHandler()} aria-label={`Ad sırala`}>
+          Ad
+        </button>
       </th>
       <th scope="col">URL</th>
       <th scope="col">Durum</th>
@@ -476,6 +520,12 @@ export default function DashboardLayout({ children }) {
           </Badge>
         </td>
         <td>
+          {/* Satır seçim checkbox'ı — label zorunlu */}
+          <Checkbox
+            aria-label={`${ep.name} endpoint'ini seç`}
+            checked={selected.includes(ep.id)}
+            onCheckedChange={() => toggleSelect(ep.id)}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" aria-label={`${ep.name} için işlemler`}>
@@ -489,6 +539,11 @@ export default function DashboardLayout({ children }) {
     ))}
   </tbody>
 </table>
+
+// Pagination live region — sayfa değişikliğini duyur
+<div aria-live="polite" className="sr-only">
+  Sayfa {currentPage}, {startRow}-{endRow} arası gösteriliyor, toplam {totalRows}
+</div>
 ```
 
 #### 2.2 Modal Focus Trap
