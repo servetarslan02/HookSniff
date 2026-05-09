@@ -121,4 +121,68 @@ mod tests {
         }
         assert!(validate_json_depth(&too_deep).is_err());
     }
+
+    // ── Additional edge cases ────────────────────────────────
+
+    #[test]
+    fn test_validate_event_type_underscore_ok() {
+        assert!(validate_event_type("user_signed_up").is_ok());
+        assert!(validate_event_type("a_b_c_d").is_ok());
+    }
+
+    #[test]
+    fn test_validate_event_type_dot_ok() {
+        assert!(validate_event_type("com.example.event").is_ok());
+    }
+
+    #[test]
+    fn test_validate_event_type_special_chars_fail() {
+        assert!(validate_event_type("event@type").is_err());
+        assert!(validate_event_type("event#type").is_err());
+        assert!(validate_event_type("event/type").is_err());
+    }
+
+    #[test]
+    fn test_sanitize_description_empty() {
+        assert_eq!(sanitize_description(""), "");
+    }
+
+    #[test]
+    fn test_sanitize_description_no_html() {
+        assert_eq!(sanitize_description("plain text"), "plain text");
+    }
+
+    #[test]
+    fn test_sanitize_description_multiple_tags() {
+        assert_eq!(
+            sanitize_description("<b>bold</b> and <i>italic</i>"),
+            "bold and italic"
+        );
+    }
+
+    #[test]
+    fn test_validate_url_empty() {
+        assert!(validate_url("").is_err());
+    }
+
+    #[test]
+    fn test_validate_url_with_port() {
+        assert!(validate_url("https://example.com:8080/webhook").is_ok());
+    }
+
+    #[test]
+    fn test_validate_json_depth_empty_object() {
+        assert!(validate_json_depth(&serde_json::json!({})).is_ok());
+    }
+
+    #[test]
+    fn test_validate_json_depth_array() {
+        assert!(validate_json_depth(&serde_json::json!([1, 2, 3])).is_ok());
+    }
+
+    #[test]
+    fn test_validate_json_depth_nested_array() {
+        let val = serde_json::json!({"items": [1, {"nested": true}]});
+        assert!(validate_json_depth(&val).is_ok());
+    }
 }

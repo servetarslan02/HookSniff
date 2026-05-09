@@ -428,4 +428,66 @@ mod tests {
             .unwrap();
         assert!(extract_refresh_token(&req).is_none());
     }
+
+    // ── Cookie name constants ─────────────────────────────────
+
+    #[test]
+    fn test_auth_cookie_name() {
+        assert_eq!(AUTH_COOKIE_NAME, "hooksniff_token");
+    }
+
+    #[test]
+    fn test_refresh_cookie_name() {
+        assert_eq!(REFRESH_COOKIE_NAME, "hooksniff_refresh");
+    }
+
+    // ── Cookie format edge cases ──────────────────────────────
+
+    #[test]
+    fn test_create_auth_cookie_zero_max_age() {
+        let cookie = create_auth_cookie("tok", 0);
+        assert!(cookie.contains("Max-Age=0"));
+    }
+
+    #[test]
+    fn test_create_refresh_token_cookie_format() {
+        let cookie = create_refresh_token_cookie("rt_abc", 2592000);
+        assert!(cookie.starts_with("hooksniff_refresh=rt_abc"));
+        assert!(cookie.contains("Max-Age=2592000"));
+        assert!(cookie.contains("Secure"));
+        assert!(cookie.contains("SameSite=None"));
+        assert!(cookie.contains("Path=/"));
+    }
+
+    #[test]
+    fn test_clear_auth_cookie_format() {
+        let cookie = clear_auth_cookie();
+        assert!(cookie.starts_with("hooksniff_token="));
+        assert!(cookie.contains("Max-Age=0"));
+        assert!(cookie.contains("HttpOnly"));
+        assert!(cookie.contains("Secure"));
+    }
+
+    #[test]
+    fn test_clear_refresh_token_cookie_format() {
+        let cookie = clear_refresh_token_cookie();
+        assert!(cookie.starts_with("hooksniff_refresh="));
+        assert!(cookie.contains("Max-Age=0"));
+    }
+
+    // ── IsTestKey debug ──────────────────────────────────────
+
+    #[test]
+    fn test_is_test_key_debug() {
+        let key = IsTestKey(true);
+        let debug = format!("{:?}", key);
+        assert!(debug.contains("IsTestKey"));
+    }
+
+    #[test]
+    fn test_is_test_key_clone() {
+        let key = IsTestKey(true);
+        let cloned = key;
+        assert!(cloned.0);
+    }
 }
