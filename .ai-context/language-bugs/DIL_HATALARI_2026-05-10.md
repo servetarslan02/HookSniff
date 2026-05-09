@@ -496,3 +496,19 @@ Hardcoded: "API Server", "PostgreSQL Database", "Redis Cache", "Webhook Queue", 
 - Error mesajları (throw new Error) kullanıcıya gösteriliyor — bunlar da çevrilmeli
 - Terms ve Privacy sayfaları tamamen İngilizce — yasal metinler olduğu için profesyonel çeviri gerekir
 - StatusBadge component API'den gelen status string'ini doğrudan gösteriyor — backend'den çevrilmiş gelmeli veya frontend'de map'lenmeli
+
+---
+
+## 13. Son Kontrol — Daha Önce Taranmamış Sayfalar
+
+| Sayfa | Hardcoded Metinler |
+|-------|-------------------|
+| `dashboard/api-importer/page.tsx` | "OpenAPI Spec URL", "Paste OpenAPI JSON", "Supported Formats" |
+| `dashboard/portal-customize/page.tsx` | "Company Name", "Logo URL", "Primary Color", "Font Family", "Dark Mode", "Enable dark mode by default", "Show Deliveries", "Show Events", "Event Subscriptions", "All events allowed", "Allow users to view delivery history", "Allow users to view event types", "Webhook Endpoints", "Recent Deliveries" |
+| `dashboard/rate-limiting/page.tsx` | "Rate Limiting", "How Rate Limiting Works", "RPM", "RPS", "Burst", "Throttled", "Throttled Requests", "Auto Retry", "Exponential backoff", "Custom limits", "Endpoint", "Queue", "Alerts", "Throttle notifications", "Total Endpoints" |
+| `dashboard/signature-verifier/page.tsx` | "How Webhook Signatures Work", "Verify Signature", "Webhook Secret", "Algorithm" |
+| `get-started/page.tsx` | "Quickstart", "Endpoints", "Install", "Test Webhook", "Alerts", "Auto Retries", "Portal Settings", "Embed Code", "Your API Key", "HookSniff", "HookSniff Playground", "Free forever", "No credit card", "Result", "Use" |
+| `admin/layout.tsx` | "Access Denied", "Admin Panel", "HookSniff Management" |
+| `changelog/[slug]/page.tsx` | "Changelog", "Latest" |
+
+**Tarama tamamlandı.** Toplam 60+ sayfa, 15+ bileşen tarandı. 500+ hardcoded İngilizce metin tespit edildi.
