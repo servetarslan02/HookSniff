@@ -94,7 +94,7 @@ cd dashboard && npm install && npm run build
 
 | Kategori | Puan | Not |
 |----------|------|-----|
-| Kod kalitesi | 10/10 | TODO/FIXME temizlendi |
+| Kod kalitesi | 10/10 | TODO/FIXME temizlendi, sessiz catch düzeltildi |
 | Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time |
 | Test coverage | 10/10 | 180+ test (Rust, Dashboard, Go, Node, Python) |
 | Dokümantasyon | 10/10 | OpenAPI spec + SDK badge'leri |
