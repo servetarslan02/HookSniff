@@ -1,9 +1,22 @@
+'use client';
+
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const categories = ['All', 'Announcement', 'Engineering', 'Standard', 'Changelog', 'Integration', 'AI & Agents'];
 
 const posts = [
+  {
+    slug: 'hooksniff-vs-svix-vs-hookdeck',
+    title: 'HookSniff vs Svix vs Hookdeck vs Hook0: 2026 Webhook Service Comparison',
+    excerpt: 'A comprehensive comparison of the top webhook services in 2026 — pricing, SDKs, features, self-hosting, and free tiers. Find the right fit for your stack.',
+    date: '2026-05-10',
+    category: 'Engineering',
+    readTime: '10 min',
+    tags: ['comparison', 'svix', 'hookdeck', 'webhooks'],
+    featured: true,
+  },
   {
     slug: 'why-ai-agents-need-webhooks',
     title: 'Why AI Agents Need Webhooks',
@@ -12,7 +25,15 @@ const posts = [
     category: 'AI & Agents',
     readTime: '6 min',
     tags: ['ai', 'agents', 'mcp'],
-    featured: true,
+  },
+  {
+    slug: 'building-mcp-ready-webhooks',
+    title: 'Building an MCP-Ready Webhook Service: Lessons from HookSniff',
+    excerpt: 'MCP assumes synchronous request-response, but the real world is async. Here is how we built webhook infrastructure that bridges the gap for AI agents.',
+    date: '2026-05-09',
+    category: 'AI & Agents',
+    readTime: '8 min',
+    tags: ['mcp', 'ai', 'agents', 'architecture'],
   },
   {
     slug: 'gemini-webhook-integration',
@@ -33,6 +54,24 @@ const posts = [
     tags: ['stripe', 'payments', 'integration'],
   },
   {
+    slug: 'may-2026-changelog',
+    title: 'HookSniff Changelog — May 2026 (Week 2)',
+    excerpt: 'Blog launch, 11/11 SDKs published, CSP fixes, 4 new DB tables, API deploy automation, admin dashboard, and 1,378 tests passing.',
+    date: '2026-05-10',
+    category: 'Changelog',
+    readTime: '4 min',
+    tags: ['changelog', 'product'],
+  },
+  {
+    slug: 'webhook-integration-tutorial',
+    title: 'Complete Webhook Integration Tutorial: From Zero to Production',
+    excerpt: 'A hands-on guide to integrating webhooks with HookSniff — from signing up and creating endpoints to verifying signatures and monitoring delivery.',
+    date: '2026-05-07',
+    category: 'Engineering',
+    readTime: '12 min',
+    tags: ['tutorial', 'getting-started', 'integration'],
+  },
+  {
     slug: 'changelog-may-2026',
     title: 'HookSniff Changelog — May 2026',
     excerpt: 'Blog launch, CSP fixes, 4 new database tables, API deploy automation, and 11 SDK updates.',
@@ -42,6 +81,15 @@ const posts = [
     tags: ['changelog', 'product'],
   },
   {
+    slug: 'webhook-architecture-deep-dive',
+    title: 'Inside HookSniff: How We Built a $0/Month Webhook Service',
+    excerpt: 'A technical deep-dive into HookSniff architecture — Rust/Axum, PostgreSQL queues, Upstash Redis rate limiting, and how we handle 10K+ webhooks on free tiers.',
+    date: '2026-05-03',
+    category: 'Engineering',
+    readTime: '10 min',
+    tags: ['architecture', 'rust', 'engineering', 'infrastructure'],
+  },
+  {
     slug: 'introducing-hooksniff',
     title: 'Introducing HookSniff: Webhooks Made Simple',
     excerpt: 'We built HookSniff to solve a simple problem — webhook delivery should just work. No more missed events, no more complex retry logic.',
@@ -49,6 +97,15 @@ const posts = [
     category: 'Announcement',
     readTime: '3 min',
     tags: ['announcement', 'product'],
+  },
+  {
+    slug: 'customer-spotlight-ecommerce',
+    title: 'How an E-Commerce Platform Scaled Webhook Delivery with HookSniff',
+    excerpt: 'How an e-commerce platform processing 50K orders/day achieved 99.97% webhook delivery rate and cut infrastructure engineering time by 60%.',
+    date: '2026-04-18',
+    category: 'Announcement',
+    readTime: '6 min',
+    tags: ['customer', 'use-case', 'ecommerce'],
   },
   {
     slug: 'webhook-best-practices',
@@ -98,6 +155,14 @@ const posts = [
 ];
 
 export default function BlogPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredPosts = posts.filter(post => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return post.title.toLowerCase().includes(q) || post.excerpt.toLowerCase().includes(q);
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -132,6 +197,35 @@ export default function BlogPage() {
           </div>
         </div>
 
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search posts by title or content..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="text-sm text-gray-500 dark:text-slate-500 mt-2">
+              {filteredPosts.length} {filteredPosts.length === 1 ? 'post' : 'posts'} found
+            </p>
+          )}
+        </div>
+
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-8">
           {categories.map((cat) => (
@@ -142,7 +236,7 @@ export default function BlogPage() {
         </div>
 
         {/* Featured Post */}
-        {posts.filter(p => p.featured).map((post) => (
+        {filteredPosts.filter(p => p.featured).map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`} className="block group mb-8">
             <article className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-800 p-8 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
               <div className="flex items-center gap-3 mb-4">
@@ -165,7 +259,7 @@ export default function BlogPage() {
 
         {/* Post Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {posts.filter(p => !p.featured).map((post) => (
+          {filteredPosts.filter(p => !p.featured).map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className="block group">
               <article className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
                 <div className="flex items-center gap-3 mb-3">
