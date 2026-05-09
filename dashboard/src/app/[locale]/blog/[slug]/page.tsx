@@ -5,6 +5,20 @@ import type { Metadata } from 'next';
 
 type Post = { title: string; date: string; category: string; readTime: string; tags: string[]; author: string; content: string };
 
+const authors: Record<string, { name: string; role: string; initials: string }> = {
+  'HookSniff Team': { name: 'HookSniff Team', role: 'Engineering', initials: 'HS' },
+  'Servet Arslan': { name: 'Servet Arslan', role: 'Founder', initials: 'SA' },
+};
+
+const categoryGradients: Record<string, string> = {
+  'AI & Agents': 'from-purple-600 to-indigo-700',
+  'Engineering': 'from-blue-600 to-cyan-700',
+  'Integration': 'from-emerald-600 to-teal-700',
+  'Changelog': 'from-orange-500 to-amber-600',
+  'Announcement': 'from-rose-500 to-pink-600',
+  'Standard': 'from-teal-500 to-cyan-600',
+};
+
 const posts: Record<string, Post> = {
   'hooksniff-vs-svix-vs-hookdeck': {
     title: 'HookSniff vs Svix vs Hookdeck vs Hook0: 2026 Webhook Service Comparison',
@@ -101,6 +115,14 @@ HookSniff was built by developers who were frustrated with existing options. Our
 **Choose Hookdeck if:** You want a developer-friendly platform with a generous free tier and don't need FIFO ordering. Good for event-driven architectures that need transformation and filtering capabilities.
 
 **Choose Hook0 if:** You want full control over your webhook infrastructure and have the engineering bandwidth to operate it. Best for teams that already run their own infrastructure and want an open-source foundation.
+
+### What Users Say
+
+> "We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time." — **CTO, SaaS Startup**
+
+> "The FIFO delivery feature is a game-changer for our order processing pipeline." — **Lead Developer, E-commerce Platform**
+
+> "Free tier that actually works for startups. We process 8K webhooks/month without paying a cent." — **Solo Founder**
 
 ### The Bottom Line
 
@@ -1356,13 +1378,244 @@ Validate webhook payloads against a JSON schema. HookSniff's schema registry han
 
 Alert on unusual patterns — spike in volume, new IP addresses, failed signatures.`,
   },
+  'shopify-webhook-incident-analysis': {
+    title: 'What the Shopify Webhook Incident Teaches Us About Resilience',
+    date: '2026-04-30',
+    category: 'Engineering',
+    readTime: '8 min',
+    tags: ['incident', 'resilience', 'shopify', 'engineering'],
+    author: 'HookSniff Team',
+    content: `On April 28, 2026, Shopify experienced a significant webhook delivery incident that lasted approximately 8 hours. Webhooks that normally arrived within seconds were delayed by minutes to over an hour. When the issue was resolved, a recovery surge flooded downstream systems with 3x the normal webhook volume.
+
+This post analyzes what happened, what we can learn, and how resilient webhook infrastructure should handle these scenarios.
+
+### Timeline of the Incident
+
+\`\`\`
+2026-04-28 Timeline (UTC)
+─────────────────────────────────────────────────────
+02:15  ┃ First reports of delayed webhooks in Shopify community forums
+02:45  ┃ Shopify acknowledges increased webhook latency on status page
+03:30  ┃ Latency increases to 15-30 minutes for most event types
+05:00  ┃ Some webhooks delayed by 45+ minutes; order events most affected
+07:00  ┃ Root cause identified: database migration caused queue backlog
+08:30  ┃ Fix deployed; backlog begins clearing
+09:00  ┃ Recovery surge starts — 3x normal webhook volume
+09:45  ┃ Downstream systems start reporting 5xx errors from surge
+10:15  ┃ Shopify throttles recovery delivery to 1.5x normal rate
+10:30  ┃ Incident resolved; all webhooks delivered
+─────────────────────────────────────────────────────
+\`\`\`
+
+### The Surge Pattern
+
+The most dangerous part of the incident was not the delay — it was the recovery. Here is what the webhook delivery volume looked like:
+
+\`\`\`
+Webhook Volume (events/minute)
+│
+│                    ╭──╮ Recovery surge
+│                   ╭╯  ╰╮  3x normal
+│                  ╭╯    ╰╮
+│    ╭────╮       ╭╯      ╰╮
+│───╯    ╰──────╯        ╰────────── Normal
+│   ╰──╮  ╰─────╮
+│      ╰──╮     ╰──── Backlog clearing
+│         ╰── Incident window
+│
+└────────────────────────────────────────────── Time
+  02:00  04:00  06:00  08:00  10:00  12:00
+\`\`\`
+
+During the incident window (02:15–08:30), webhooks accumulated in Shopify's internal queue. When the fix was deployed, all queued webhooks were released simultaneously, creating a surge that overwhelmed unprepared downstream systems.
+
+### Why Recovery Surges Are Dangerous
+
+Most webhook consumers are designed for steady-state traffic. They handle normal volume fine but break under sudden spikes:
+
+- **Connection pool exhaustion** — Database connections max out
+- **Memory pressure** — Queued processing tasks consume all available RAM
+- **Rate limit hits** — Third-party API rate limits get triggered
+- **Cascading failures** — One slow consumer backs up the entire pipeline
+
+The irony: the systems that survived the 8-hour delay just fine were the ones that crashed during the recovery.
+
+### Lessons for Webhook Consumers
+
+**1. Design for 3x burst capacity.** Your webhook endpoint should handle 3x your normal peak volume without degradation. This means connection pooling, async processing, and backpressure mechanisms.
+
+**2. Implement circuit breakers.** If your downstream service starts returning 5xx, stop sending and queue locally. A circuit breaker prevents cascading failures during surge events.
+
+**3. Use dead letter queues.** If processing fails after retries, preserve the event. Do not drop webhooks — they contain critical business data.
+
+**4. Monitor p99 latency, not just averages.** During the Shopify incident, average latency was misleading. P99 showed the real story: some webhooks were delayed by over an hour while most arrived within minutes.
+
+**5. Implement idempotent processing.** Recovery surges may deliver events that were partially processed before the incident. Idempotency ensures duplicate processing is safe.
+
+### How HookSniff Handles Incident Recovery
+
+HookSniff was designed with these scenarios in mind. Here is how we handle recovery surges:
+
+**Exponential backoff with jitter.** Failed deliveries retry with increasing delays (10s, 30s, 2m, 10m, 30m) plus random jitter. This spreads retry traffic and prevents thundering herd problems.
+
+\`\`\`typescript
+// HookSniff retry configuration
+const retryPolicy = {
+  maxAttempts: 5,
+  backoff: 'exponential',
+  baseDelay: 10000,     // 10 seconds
+  maxDelay: 1800000,    // 30 minutes
+  jitter: true,         // Random ±25% to spread load
 };
+\`\`\`
+
+**Circuit breaker per endpoint.** If an endpoint fails 5 consecutive deliveries, we open the circuit for 5 minutes. This prevents us from hammering a struggling service during a surge.
+
+\`\`\`
+Endpoint Health Check:
+┌─────────────────────────────────────────┐
+│  endpoint: https://shop.example.com/wh  │
+│  status: OPEN (circuit tripped)         │
+│  failures: 5 consecutive                │
+│  cooldown: 4m 32s remaining             │
+│  last_error: 503 Service Unavailable    │
+└─────────────────────────────────────────┘
+\`\`\`
+
+**Dead letter queue with batch replay.** Events that exhaust all retries move to the DLQ. When the downstream service recovers, operators can batch-replay all dead-lettered events with a single API call.
+
+\`\`\`python
+# Batch replay all dead-lettered events for an endpoint
+from hooksniff import HookSniff
+
+client = HookSniff(api_key="hs_...")
+
+# Replay all DLQ events for the affected endpoint
+result = client.dead_letters.replay_all(
+    endpoint_id="ep_shopify_integration",
+    after="2026-04-28T02:00:00Z",
+    before="2026-04-28T10:30:00Z",
+)
+
+print(f"Replayed {result.count} events")
+\`\`\`
+
+**Per-endpoint throttling.** During recovery, we limit delivery rate per endpoint to prevent overwhelming downstream systems. Default: 100 requests/second per endpoint, configurable.
+
+\`\`\`rust
+async fn apply_throttle(endpoint: &Endpoint, delivery: &Delivery) -> Result<()> {
+    let rate = endpoint.throttle_rate.unwrap_or(100); // req/s
+    let window = Duration::from_secs(1);
+
+    if rate_limiter.check(&endpoint.id, rate, window).await?.is_limited() {
+        // Re-queue with delay instead of dropping
+        delivery.retry_at(chrono::Utc::now() + chrono::Duration::seconds(1)).await?;
+        return Err(Error::Throttled);
+    }
+
+    Ok(())
+}
+\`\`\`
+
+### Monitoring Checklist
+
+After reviewing the Shopify incident, here is what every webhook consumer should monitor:
+
+- **Delivery latency p50/p95/p99** — Not just average
+- **Queue depth** — How many webhooks are pending delivery
+- **Error rate by endpoint** — Per-consumer health
+- **Retry rate** — Spikes indicate downstream issues
+- **Circuit breaker state** — Open circuits need attention
+- **DLQ depth** — Growing DLQ means lost events
+
+### The Bigger Picture
+
+The Shopify incident is a reminder that webhook infrastructure is only as resilient as its weakest consumer. The delivery service (Shopify) recovered, but many downstream systems were not prepared for the surge.
+
+Building resilient webhook consumers is not optional — it is a production requirement. Plan for 3x burst capacity, implement circuit breakers, use dead letter queues, and monitor p99 latency.
+
+And if you do not want to build all of that yourself, HookSniff handles it out of the box. Sign up at hooksniff.vercel.app — your first 10,000 webhooks per month are free.`,
+  },
+};
+
+// Get ordered list of slugs for prev/next navigation
+const orderedSlugs = [
+  'hooksniff-vs-svix-vs-hookdeck',
+  'may-2026-changelog',
+  'building-mcp-ready-webhooks',
+  'webhook-integration-tutorial',
+  'why-ai-agents-need-webhooks',
+  'gemini-webhook-integration',
+  'stripe-webhook-guide',
+  'changelog-may-2026',
+  'webhook-architecture-deep-dive',
+  'customer-spotlight-ecommerce',
+  'introducing-hooksniff',
+  'webhook-best-practices',
+  'fifo-webhook-delivery',
+  'shopify-webhook-incident-analysis',
+  'github-webhook-guide',
+  'cloudevents-standard',
+  'webhook-security-guide',
+];
 
 function getRelatedPosts(currentSlug: string, tags: string[]) {
   return Object.entries(posts)
     .filter(([slug, post]) => slug !== currentSlug && post.tags.some(t => tags.includes(t)))
     .slice(0, 3)
     .map(([slug, post]) => ({ slug, ...post }));
+}
+
+function getAdjacentPosts(currentSlug: string) {
+  const idx = orderedSlugs.indexOf(currentSlug);
+  const prev = idx > 0 ? { slug: orderedSlugs[idx - 1], ...posts[orderedSlugs[idx - 1]] } : null;
+  const next = idx < orderedSlugs.length - 1 ? { slug: orderedSlugs[idx + 1], ...posts[orderedSlugs[idx + 1]] } : null;
+  return { prev, next };
+}
+
+function tokenizeCode(code: string, language: string): string {
+  // Simple regex-based syntax highlighting
+  let highlighted = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // Comments
+  highlighted = highlighted.replace(/(\/\/.*$)/gm, '<span class="code-comment">$1</span>');
+  highlighted = highlighted.replace(/(#.*$)/gm, '<span class="code-comment">$1</span>');
+  highlighted = highlighted.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="code-comment">$1</span>');
+
+  // Strings
+  highlighted = highlighted.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="code-string">$1</span>');
+  highlighted = highlighted.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="code-string">$1</span>');
+  highlighted = highlighted.replace(/(`(?:[^`\\]|\\.)*`)/g, '<span class="code-string">$1</span>');
+
+  // Numbers
+  highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, '<span class="code-number">$1</span>');
+
+  // Keywords by language
+  const allKeywords: Record<string, string> = {
+    javascript: 'const|let|var|function|async|await|return|if|else|switch|case|break|default|for|while|do|try|catch|throw|new|import|from|export|class|extends|this|typeof|instanceof|void|null|undefined|true|false|of|in',
+    typescript: 'const|let|var|function|async|await|return|if|else|switch|case|break|default|for|while|do|try|catch|throw|new|import|from|export|class|extends|this|typeof|instanceof|void|null|undefined|true|false|of|in|type|interface|enum|implements|abstract|declare|namespace',
+    python: 'def|class|import|from|return|if|elif|else|for|while|try|except|raise|with|as|in|not|and|or|is|None|True|False|self|async|await|lambda|yield|pass|break|continue|global|nonlocal',
+    go: 'func|package|import|return|if|else|for|range|switch|case|default|var|const|type|struct|interface|map|chan|go|defer|select|break|continue|nil|true|false|error|string|int|bool|byte',
+    rust: 'fn|let|mut|const|struct|enum|impl|trait|pub|use|mod|crate|self|super|match|if|else|for|while|loop|return|async|await|move|ref|type|where|dyn|unsafe|extern|static|true|false|Some|None|Ok|Err|Box|Vec|String|Option|Result',
+    bash: 'if|then|else|elif|fi|for|while|do|done|case|esac|function|return|local|export|source|echo|exit|set|unset|readonly|shift|trap|eval|exec',
+    sql: 'SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|TABLE|INDEX|ALTER|DROP|JOIN|LEFT|RIGHT|INNER|OUTER|ON|AND|OR|NOT|IN|IS|NULL|AS|ORDER|BY|GROUP|HAVING|LIMIT|OFFSET|UNION|ALL|DISTINCT|PRIMARY|KEY|FOREIGN|REFERENCES|DEFAULT|NOW|UUID|JSONB|VARCHAR|BIGINT|INT|TIMESTAMPTZ|BOOLEAN|TEXT',
+  };
+
+  const kwPattern = allKeywords[language] || allKeywords['javascript'];
+
+  // Apply keywords but avoid re-highlighting inside existing spans
+  highlighted = highlighted.replace(
+    new RegExp(`(<span[^>]*>.*?<\\/span>)|(\\b(?:${kwPattern})\\b)`, 'g'),
+    (_match: string, span: string | undefined, kw: string | undefined) => {
+      if (span) return span;
+      return `<span class="code-keyword">${kw}</span>`;
+    }
+  );
+
+  return highlighted;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
@@ -1405,9 +1658,34 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!post) notFound();
 
   const related = getRelatedPosts(slug, post.tags);
+  const { prev, next } = getAdjacentPosts(slug);
+  const author = authors[post.author] || authors['HookSniff Team'];
+  const gradient = categoryGradients[post.category] || 'from-gray-600 to-slate-700';
+
+  // Extract ### headings for TOC
+  const headings = post.content
+    .split('\n\n')
+    .filter(p => p.startsWith('### '))
+    .map(p => p.replace('### ', ''));
+
+  const hasTOC = headings.length >= 5;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
+      {/* Syntax highlighting styles */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .code-keyword { color: #c678dd; }
+        .code-string { color: #98c379; }
+        .code-comment { color: #5c6370; font-style: italic; }
+        .code-function { color: #61afef; }
+        .code-number { color: #d19a66; }
+        .dark .code-keyword { color: #c678dd; }
+        .dark .code-string { color: #98c379; }
+        .dark .code-comment { color: #5c6370; font-style: italic; }
+        .dark .code-function { color: #61afef; }
+        .dark .code-number { color: #d19a66; }
+      `}} />
+
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
@@ -1419,25 +1697,43 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
       </nav>
 
-      <article className="max-w-3xl mx-auto px-6 py-16">
+      <article className={`max-w-3xl mx-auto px-6 py-16 ${hasTOC ? 'lg:mr-64' : ''}`}>
+        {/* Cover Image / Gradient Header */}
+        <div className={`relative rounded-xl bg-gradient-to-br ${gradient} p-8 mb-8 overflow-hidden`}>
+          <div className="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1.5" fill="white" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#dots)" />
+            </svg>
+          </div>
+          <div className="relative z-10">
+            <span className="inline-block text-xs font-medium bg-white/20 text-white px-3 py-1 rounded-full backdrop-blur-sm mb-4">
+              {post.category}
+            </span>
+            <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">{post.title}</h1>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-full">{post.category}</span>
             <span className="text-sm text-gray-500 dark:text-slate-500">{post.date}</span>
             <span className="text-sm text-gray-400 dark:text-slate-600">·</span>
             <span className="text-sm text-gray-500 dark:text-slate-500">{post.readTime}</span>
           </div>
           {/* Author */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white text-sm font-bold">HS</div>
+            <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white text-sm font-bold">{author.initials}</div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">By {post.author}</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">Published on {post.date}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">By {author.name}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{author.role} · Published on {post.date}</p>
             </div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">{post.title}</h1>
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2">
             {post.tags.map(tag => (
               <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded">#{tag}</span>
             ))}
@@ -1448,14 +1744,67 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="prose prose-gray dark:prose-invert max-w-none">
           {post.content.split('\n\n').map((paragraph, i) => {
             if (paragraph.startsWith('### ')) {
-              return <h3 key={i} className="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">{paragraph.replace('### ', '')}</h3>;
+              const headingText = paragraph.replace('### ', '');
+              const headingId = headingText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+              return <h3 key={i} id={headingId} className="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4 scroll-mt-24">{headingText}</h3>;
             }
             if (paragraph.startsWith('```')) {
+              const firstLine = paragraph.split('\n')[0];
+              const language = firstLine.replace('```', '').trim() || 'text';
               const lines = paragraph.split('\n').slice(1, -1);
+              const rawCode = lines.join('\n');
+              const highlighted = tokenizeCode(rawCode, language);
               return (
-                <pre key={i} className="bg-gray-100 dark:bg-slate-800 rounded-lg p-4 overflow-x-auto text-sm my-4">
-                  <code className="text-gray-800 dark:text-slate-200">{lines.join('\n')}</code>
-                </pre>
+                <div key={i} className="my-4 rounded-lg overflow-hidden">
+                  <div className="bg-gray-200 dark:bg-slate-700 px-4 py-1.5 flex items-center justify-between">
+                    <span className="text-xs font-mono text-gray-600 dark:text-slate-400">{language}</span>
+                    <span className="text-xs text-gray-400 dark:text-slate-500">{lines.length} lines</span>
+                  </div>
+                  <pre className="bg-gray-100 dark:bg-slate-800 p-4 overflow-x-auto text-sm">
+                    <code className="text-gray-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: highlighted }} />
+                  </pre>
+                </div>
+              );
+            }
+            if (paragraph.startsWith('> ')) {
+              const lines = paragraph.split('\n');
+              return (
+                <blockquote key={i} className="border-l-4 border-brand-300 dark:border-brand-600 pl-4 my-4 italic text-gray-600 dark:text-slate-400">
+                  {lines.map((line, j) => (
+                    <p key={j}>{line.replace(/^>\s*/, '')}</p>
+                  ))}
+                </blockquote>
+              );
+            }
+            if (paragraph.startsWith('| ')) {
+              const rows = paragraph.split('\n').filter(r => r.startsWith('|'));
+              const headerRow = rows[0];
+              const dataRows = rows.slice(2); // skip header and separator
+              const headers = headerRow.split('|').filter(Boolean).map(h => h.trim());
+              return (
+                <div key={i} className="overflow-x-auto my-4">
+                  <table className="min-w-full text-sm border border-gray-200 dark:border-slate-700 rounded-lg">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-slate-800">
+                        {headers.map((h, j) => (
+                          <th key={j} className="px-3 py-2 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dataRows.map((row, j) => {
+                        const cells = row.split('|').filter(Boolean).map(c => c.trim());
+                        return (
+                          <tr key={j} className="border-b border-gray-200 dark:border-slate-700 last:border-0">
+                            {cells.map((cell, k) => (
+                              <td key={k} className="px-3 py-2 text-gray-600 dark:text-slate-400">{cell}</td>
+                            ))}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               );
             }
             if (paragraph.startsWith('- **')) {
@@ -1483,6 +1832,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   {items.map((item, j) => <li key={j}>{item.replace(/^\d+\.\s*/, '')}</li>)}
                 </ol>
               );
+            }
+            if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+              return <p key={i} className="text-gray-900 dark:text-white font-semibold my-4">{paragraph.replace(/\*\*/g, '')}</p>;
+            }
+            if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
+              return <p key={i} className="text-gray-500 dark:text-slate-400 italic my-4">{paragraph.replace(/^\*|\*$/g, '')}</p>;
             }
             return <p key={i} className="text-gray-600 dark:text-slate-400 leading-relaxed my-4">{paragraph}</p>;
           })}
@@ -1514,10 +1869,54 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
         )}
 
+        {/* Previous / Next Navigation */}
         <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {prev ? (
+              <Link href={`/blog/${prev.slug}`} className="group block bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+                <span className="text-xs text-gray-500 dark:text-slate-500">← Previous</span>
+                <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mt-1 text-sm">{prev.title}</h4>
+                <span className="text-xs text-brand-600 dark:text-brand-400">{prev.category}</span>
+              </Link>
+            ) : <div />}
+            {next && (
+              <Link href={`/blog/${next.slug}`} className="group block bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-right">
+                <span className="text-xs text-gray-500 dark:text-slate-500">Next →</span>
+                <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mt-1 text-sm">{next.title}</h4>
+                <span className="text-xs text-brand-600 dark:text-brand-400">{next.category}</span>
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-8">
           <Link href="/blog" className="text-brand-600 dark:text-brand-400 hover:underline">← Back to Blog</Link>
         </div>
       </article>
+
+      {/* Floating Table of Contents (desktop only) */}
+      {hasTOC && (
+        <nav className="hidden lg:block fixed right-4 top-24 w-56 max-h-[calc(100vh-8rem)] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4">
+            <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-3">On This Page</h4>
+            <ul className="space-y-1.5">
+              {headings.map((h, i) => {
+                const headingId = h.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                return (
+                  <li key={i}>
+                    <a
+                      href={`#${headingId}`}
+                      className="block text-sm text-gray-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors truncate"
+                    >
+                      {h}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </nav>
+      )}
     </div>
   );
 }

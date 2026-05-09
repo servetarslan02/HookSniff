@@ -1,12 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const categories = ['All', 'Announcement', 'Engineering', 'Standard', 'Changelog', 'Integration', 'AI & Agents'];
 
-const posts = [
+const POSTS_PER_PAGE = 6;
+
+type BlogPost = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  category: string;
+  readTime: string;
+  tags: string[];
+  featured?: boolean;
+};
+
+const posts: BlogPost[] = [
   {
     slug: 'hooksniff-vs-svix-vs-hookdeck',
     title: 'HookSniff vs Svix vs Hookdeck vs Hook0: 2026 Webhook Service Comparison',
@@ -126,6 +139,15 @@ const posts = [
     tags: ['engineering', 'fifo', 'architecture'],
   },
   {
+    slug: 'shopify-webhook-incident-analysis',
+    title: 'What the Shopify Webhook Incident Teaches Us About Resilience',
+    excerpt: 'Analysis of the Shopify webhook delivery latency incident (April 28, 2026) and lessons for building resilient webhook infrastructure.',
+    date: '2026-04-30',
+    category: 'Engineering',
+    readTime: '8 min',
+    tags: ['incident', 'resilience', 'shopify', 'engineering'],
+  },
+  {
     slug: 'github-webhook-guide',
     title: 'How to Set Up GitHub Webhooks',
     excerpt: 'Receive push, PR, and issue events from GitHub. Full guide with code examples in Node.js and Python.',
@@ -154,14 +176,74 @@ const posts = [
   },
 ];
 
+const testimonials = [
+  {
+    quote: "We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time.",
+    author: "CTO",
+    company: "SaaS Startup",
+  },
+  {
+    quote: "The FIFO delivery feature is a game-changer for our order processing pipeline.",
+    author: "Lead Developer",
+    company: "E-commerce Platform",
+  },
+  {
+    quote: "Free tier that actually works for startups. We process 8K webhooks/month without paying a cent.",
+    author: "Solo Founder",
+    company: "Indie Hacker",
+  },
+];
+
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
 
   const filteredPosts = posts.filter(post => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    return post.title.toLowerCase().includes(q) || post.excerpt.toLowerCase().includes(q);
+    const matchesSearch = !searchQuery.trim() || post.title.toLowerCase().includes(searchQuery.toLowerCase()) || post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
+    return matchesSearch && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const paginatedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
+
+  const handleCategoryClick = (cat: string) => {
+    setActiveCategory(cat);
+    setCurrentPage(1);
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+
+    setNewsletterStatus('loading');
+    setNewsletterMessage('');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setNewsletterStatus('success');
+        setNewsletterMessage(data.message);
+        setNewsletterEmail('');
+      } else {
+        setNewsletterStatus('error');
+        setNewsletterMessage(data.error || 'Something went wrong');
+      }
+    } catch {
+      setNewsletterStatus('error');
+      setNewsletterMessage('Network error. Please try again.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -190,11 +272,28 @@ export default function BlogPage() {
               <h3 className="font-semibold text-gray-900 dark:text-white">Subscribe to our newsletter</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400">Get webhook tips, product updates, and engineering insights. No spam.</p>
             </div>
-            <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input type="email" placeholder="you@example.com" className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none w-64" />
-              <button type="submit" className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Subscribe</button>
+            <form className="flex gap-2" onSubmit={handleNewsletterSubmit}>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none w-64"
+              />
+              <button
+                type="submit"
+                disabled={newsletterStatus === 'loading'}
+                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                {newsletterStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
+              </button>
             </form>
           </div>
+          {newsletterMessage && (
+            <p className={`text-sm mt-3 ${newsletterStatus === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {newsletterMessage}
+            </p>
+          )}
         </div>
 
         {/* Search */}
@@ -207,12 +306,12 @@ export default function BlogPage() {
               type="text"
               placeholder="Search posts by title or content..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
               className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => { setSearchQuery(''); setCurrentPage(1); }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
               >
                 ✕
@@ -229,14 +328,22 @@ export default function BlogPage() {
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-8">
           {categories.map((cat) => (
-            <span key={cat} className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${cat === 'All' ? 'bg-brand-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40'}`}>
+            <button
+              key={cat}
+              onClick={() => handleCategoryClick(cat)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${
+                activeCategory === cat
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40'
+              }`}
+            >
               {cat}
-            </span>
+            </button>
           ))}
         </div>
 
         {/* Featured Post */}
-        {filteredPosts.filter(p => p.featured).map((post) => (
+        {currentPage === 1 && activeCategory === 'All' && !searchQuery && filteredPosts.filter((p: typeof posts[0]) => p.featured).map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`} className="block group mb-8">
             <article className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-800 p-8 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
               <div className="flex items-center gap-3 mb-4">
@@ -259,7 +366,10 @@ export default function BlogPage() {
 
         {/* Post Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {filteredPosts.filter(p => !p.featured).map((post) => (
+          {(currentPage === 1 && activeCategory === 'All' && !searchQuery
+            ? paginatedPosts.filter((p: BlogPost) => !p.featured)
+            : paginatedPosts
+          ).map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className="block group">
               <article className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
                 <div className="flex items-center gap-3 mb-3">
@@ -278,6 +388,53 @@ export default function BlogPage() {
               </article>
             </Link>
           ))}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 mt-10">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-brand-300 dark:hover:border-brand-500/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              ← Previous
+            </button>
+            <span className="text-sm text-gray-500 dark:text-slate-500">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-brand-300 dark:hover:border-brand-500/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next →
+            </button>
+          </div>
+        )}
+
+        {/* Testimonials */}
+        <div className="mt-16 pt-10 border-t border-gray-200 dark:border-slate-800">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">What Users Say</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+                <svg className="w-8 h-8 text-brand-200 dark:text-brand-800 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
+                </svg>
+                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{t.quote}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
+                    {t.author.split(' ').map(w => w[0]).join('')}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t.author}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-500">{t.company}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* RSS */}

@@ -17,6 +17,7 @@ const posts = [
   'github-webhook-guide',
   'cloudevents-standard',
   'webhook-security-guide',
+  'shopify-webhook-incident-analysis',
 ];
 
 export async function GET() {
