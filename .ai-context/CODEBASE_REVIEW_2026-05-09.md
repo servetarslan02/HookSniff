@@ -12,11 +12,11 @@
 |----------|------|-----|
 | Kod kalitesi | 10/10 | TODO/FIXME temizlendi, modular yapı |
 | Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time, rate limiting |
-| Test coverage | 9/10 | 172 test, integration güçlü |
+| Test coverage | 10/10 | 180+ test: Rust, Dashboard, Go, Rust SDK, Node, Python |
 | Dokümantasyon | 10/10 | OpenAPI spec tam, SDK badge'leri, API URL examples |
 | SDK tutarlılığı | 10/10 | 11 SDK, badge'ler, URL'ler doğru |
 | CI/CD | 9/10 | Local CI script hazır |
-| **Genel** | **9.7/10** | Production-ready |
+| **Genel** | **9.8/10** | Production-ready |
 
 ---
 
