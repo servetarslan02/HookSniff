@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
+import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   changelog,
@@ -120,8 +121,8 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
 
         {/* Hero Image */}
         {release.heroImage && (
-          <div className="mb-10">
-            <img src={release.heroImage} alt={release.title} className="w-full rounded-xl border border-gray-200 dark:border-slate-800" />
+          <div className="mb-10 relative w-full h-[400px]">
+            <Image src={release.heroImage} alt={release.title} fill className="rounded-xl border border-gray-200 dark:border-slate-800 object-cover" />
           </div>
         )}
 
@@ -156,8 +157,8 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
                     )}
 
                     {entry.image && (
-                      <div className="mt-4">
-                        <img src={entry.image.src} alt={entry.image.alt} className="rounded-lg border border-gray-200 dark:border-slate-700 w-full" loading="lazy" />
+                      <div className="mt-4 relative w-full h-[300px]">
+                        <Image src={entry.image.src} alt={entry.image.alt} fill className="rounded-lg border border-gray-200 dark:border-slate-700 object-cover" loading="lazy" />
                         {entry.image.caption && <p className="text-xs text-gray-500 dark:text-slate-500 mt-2 text-center">{entry.image.caption}</p>}
                       </div>
                     )}
