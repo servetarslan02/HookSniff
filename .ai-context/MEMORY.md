@@ -200,6 +200,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 37 | 2026-05-09 21:39 | OpenClaw webchat — yeni oturum, GitHub sync cron kuruldu (10 dk aralıkla), proje durumu kontrol |
 | 36 | 2026-05-09 21:19 | Dashboard Vitest testleri — 11 dosya, 136 test, 0 hata (subagent) |
 | 35 | 2026-05-09 21:05 | Test coverage kampanyası — 128→952 test (+824), 0 hata, tüm modüller covered |
 | 34 | 2026-05-09 20:39 | OpenClaw webchat, GitHub sync kuruldu, proje durumu kontrol |
