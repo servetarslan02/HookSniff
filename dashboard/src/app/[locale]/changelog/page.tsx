@@ -77,10 +77,6 @@ const changelog: ChangelogItem[] = [
         text: 'Docs v2 — 14 doc pages, CodeBlock with copy button, SdkTabs for multi-language examples',
         detail: "3'ten 14 sayfaya çıktı. Getting Started, Guides, Features, Reference kategorileri.",
         commit: '9d34ee0',
-        code: {
-          lang: 'text',
-          snippet: 'quickstart → concepts → retries → security → dashboard → integrations → self-hosting → architecture → idempotency → event-types → portal → dlq',
-        },
       },
       { type: 'fix', text: 'CSP header — multi-level subdomain matching fix', commit: 'b79fd88' },
       { type: 'fix', text: 'Dashboard build — invalid oxc.jsx config removed', commit: '87c3132' },
@@ -97,7 +93,7 @@ const changelog: ChangelogItem[] = [
       {
         type: 'feature',
         text: 'All 11 SDKs published — Node.js, Python, Rust, C#, Go, Swift, PHP, Elixir, Java, Kotlin, Ruby',
-        detail: 'Her SDK kendi package manager\'ında yayınlandı. Base URL\'ler GCP Cloud Run\'a指向.',
+        detail: 'Her SDK kendi package manager\'ında yayınlandı. Base URL\'ler GCP Cloud Run\'apoints to.',
         code: {
           lang: 'bash',
           snippet: `# npm
@@ -147,10 +143,10 @@ composer require hooksniff/hooksniff-php`,
         detail: 'refresh_tokens, password_reset_tokens, email_verification_tokens, device_tokens — migration\'lar inline\'a eklendi.',
         commit: '0b79877',
       },
-      { type: 'security', text: 'Argon2id password hashing with constant-time comparison' },
-      { type: 'security', text: 'SSRF protection — blocks private IPs, metadata endpoints' },
-      { type: 'security', text: 'HMAC-SHA256 webhook signatures (Standard Webhooks compliant)' },
-      { type: 'security', text: '2FA/TOTP support' },
+      { type: 'security', text: 'Argon2id password hashing with constant-time comparison', commit: '8093523' },
+      { type: 'security', text: 'SSRF protection — blocks private IPs, metadata endpoints', commit: '8093523' },
+      { type: 'security', text: 'HMAC-SHA256 webhook signatures (Standard Webhooks compliant)', commit: '8093523' },
+      { type: 'security', text: '2FA/TOTP support', commit: '5762489' },
     ],
   },
   {
@@ -164,26 +160,29 @@ composer require hooksniff/hooksniff-php`,
         type: 'feature',
         text: 'Rust/Axum API with PostgreSQL queue and Redis rate limiting',
         detail: 'Google Cloud Run free tier. Connection pool, async, batch processing.',
+        commit: '5a3d2f9',
       },
       {
         type: 'feature',
         text: 'Next.js 15 dashboard — 41 pages, 8 languages',
         detail: 'TR, EN, DE, FR, ES, JA, KO, PT-BR. next-intl ile i18n.',
+        commit: 'a5893a0',
       },
       {
         type: 'feature',
         text: 'Automatic retry with exponential backoff (5 retries over 24h)',
+        commit: 'eb85be0',
         code: {
           lang: 'text',
           snippet: 'Attempt 1: 0s → Attempt 2: 30s → Attempt 3: 2min → Attempt 4: 10min → Attempt 5: 1h',
         },
       },
-      { type: 'feature', text: 'FIFO webhook delivery with sequence numbers' },
-      { type: 'feature', text: 'CloudEvents v1.0 standard support' },
-      { type: 'feature', text: 'Schema registry for webhook payload validation' },
-      { type: 'feature', text: 'Inbound webhook proxy (Stripe, GitHub, Shopify)' },
-      { type: 'feature', text: 'Customer portal (embeddable widget)' },
-      { type: 'feature', text: 'DLQ (Dead Letter Queue) for failed deliveries' },
+      { type: 'feature', text: 'FIFO webhook delivery with sequence numbers', commit: 'eb85be0' },
+      { type: 'feature', text: 'CloudEvents v1.0 standard support', commit: 'f5ff2b2' },
+      { type: 'feature', text: 'Schema registry for webhook payload validation', commit: '8093523' },
+      { type: 'feature', text: 'Inbound webhook proxy (Stripe, GitHub, Shopify)', commit: '8093523' },
+      { type: 'feature', text: 'Customer portal (embeddable widget)', commit: 'f5ff2b2' },
+      { type: 'feature', text: 'DLQ (Dead Letter Queue) for failed deliveries', commit: 'eb85be0' },
     ],
   },
   {
@@ -193,11 +192,11 @@ composer require hooksniff/hooksniff-php`,
     summary: 'Core webhook delivery engine with REST API, HMAC signatures, basic dashboard, and Node.js/Python SDKs.',
     area: 'api',
     entries: [
-      { type: 'feature', text: 'Core webhook delivery engine' },
-      { type: 'feature', text: 'REST API with 4 endpoints' },
-      { type: 'feature', text: 'HMAC-SHA256 signature verification' },
-      { type: 'feature', text: 'Basic dashboard with delivery logs' },
-      { type: 'feature', text: 'Node.js and Python SDKs' },
+      { type: 'feature', text: 'Core webhook delivery engine', commit: '5a3d2f9' },
+      { type: 'feature', text: 'REST API with 4 endpoints', commit: '5a3d2f9' },
+      { type: 'feature', text: 'HMAC-SHA256 signature verification', commit: '5a3d2f9' },
+      { type: 'feature', text: 'Basic dashboard with delivery logs', commit: 'a5893a0' },
+      { type: 'feature', text: 'Node.js and Python SDKs', commit: '5a3d2f9' },
     ],
   },
 ];
@@ -207,9 +206,12 @@ composer require hooksniff/hooksniff-php`,
 export default function ChangelogPage() {
   const [activeType, setActiveType] = useState<ChangeType | 'all'>('all');
   const [activeArea, setActiveArea] = useState<ProductArea | 'all'>('all');
-  const [expandedVersion, setExpandedVersion] = useState<string | null>(null);
+  const [expandedVersion, setExpandedVersion] = useState<string | null>(
+    changelog.find((r) => r.tag === 'latest')?.version || null
+  );
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [subscribeError, setSubscribeError] = useState('');
 
   const filteredChangelog = changelog
     .map((release) => ({
@@ -225,15 +227,20 @@ export default function ChangelogPage() {
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    setSubscribeError('');
     try {
-      await fetch('/api/newsletter', {
+      const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      setSubscribed(true);
+      if (res.ok) {
+        setSubscribed(true);
+      } else {
+        setSubscribeError('Something went wrong. Please try again.');
+      }
     } catch {
-      // Silent fail
+      setSubscribeError('Network error — check your connection.');
     }
   };
 
@@ -291,6 +298,7 @@ export default function ChangelogPage() {
               <p className="text-sm text-emerald-700 dark:text-emerald-400">✅ Subscribed! You&apos;ll get notified about new releases.</p>
             </div>
           ) : (
+            <>
             <form onSubmit={handleSubscribe} className="flex gap-2">
               <input
                 type="email"
@@ -307,6 +315,10 @@ export default function ChangelogPage() {
                 Subscribe
               </button>
             </form>
+            {subscribeError && (
+              <p className="text-xs text-red-500 dark:text-red-400 mt-2 text-center">{subscribeError}</p>
+            )}
+            </>
           )}
         </div>
 
