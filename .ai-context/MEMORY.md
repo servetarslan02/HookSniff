@@ -15,6 +15,26 @@
 - Local dosyalar silinir, önemli bilgiler GitHub'a commit et
 - **Otomatik senkronizasyon:** Her 10 dakikada bir `.ai-context/` → GitHub (OpenClaw cron: f65a0f40)
 
+### 🏆 PROFESYONEL ÇALIŞMA STANDARTLARI (2026-05-09 — Servet Kararı)
+**Kural: Sıfır tolerans, kusursuz sistem.**
+
+1. **Savsak iş YASAK** — her kod, her test, her deploy kusursuz olacak
+2. **Test coverage hedefi: %95+** — %12 ile yetinmek yok, her satır test edilecek
+3. **"Çalışıyor" yeterli DEĞİL** — production-ready, edge-case'ler covered, error handling complete
+4. **Kopyala-yapıştır kod YASAK** — DRY prensibi, her fonksiyon tek sorumluluk
+5. **TODO/FIXME bırakmak YASAK** — bir oturumda tamamlanmayacak iş başlanmaz
+6. **Console.log/debug kalıntısı YASAK** — production'a temiz kod gider
+7. **Hardcoded değer YASAK** — her şey config/env'den okunur
+8. **Test yazmadan feature YASAK** — önce test, sonra kod (TDD)
+9. **Deploy öncesi checklist:**
+   - [ ] Tüm testler geçiyor mu?
+   - [ ] Build başarılı mı?
+   - [ ] Security scan temiz mi?
+   - [ ] Edge case'ler test edilmiş mi?
+   - [ ] Error handling complete mi?
+   - [ ] Monitoring/logging doğru mu?
+10. **Her oturum sonunda:** Kod kalitesi raporu + test coverage + GitHub push
+
 ### ⚠️ REPO AYRIMI KURALI (2026-05-08 — Servet Kararı)
 - **Hata düzeltme, fix, refactor** → Orijinal repo `servetarslan02/HookSniff` (main branch)
 - **Mobil uygulama** → Ayrı repo `servetarslan02/hooksniff-mobile` (main branch)
@@ -93,17 +113,40 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 20:25 GMT+8)
+## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 20:35 GMT+8)
 
-| Kategori | Puan | Not |
-|----------|------|-----|
-| Kod kalitesi | 10/10 | TODO/FIXME yok, 0 production unwrap(), temiz yapı |
-| Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time, hassas dosyalar git'den çıkarıldı |
-| Test coverage | 10/10 | 177 Rust test + 38 Dashboard test + SDK testleri |
-| Dokümantasyon | 10/10 | 1316 doc comment, OpenAPI spec, README, badge |
-| SDK tutarlılığı | 10/10 | 11/11 SDK tutarlı base URL, version, badge |
-| CI/CD | 9/10 | Local CI script hazır (GitHub Actions devre dışı) |
-| **Genel** | **10/10** | Production-ready, tüm eksikler tamamlandı |
+### Genel Puan: 10/10 (Kod Kalitesi) | Sistem Olgunluğu: 8.5/10
+
+| Kategori | Puan | Hedef | Not |
+|----------|------|-------|-----|
+| Kod kalitesi | 10/10 | 10/10 | TODO/FIXME yok, 0 production unwrap(), temiz yapı |
+| Güvenlik | 10/10 | 10/10 | SSRF, HMAC, Argon2, constant-time, 2FA, GDPR |
+| Test coverage | 3/10 | **95%** | Rust %12, Dashboard %2 — ACİL artırılmalı |
+| Dokümantasyon | 10/10 | 10/10 | 1316 doc comment, OpenAPI spec, README |
+| SDK tutarlılığı | 10/10 | 10/10 | 11/11 tutarlı base URL, version, badge |
+| CI/CD | 9/10 | 10/10 | Local CI script hazır (GitHub Actions devre dışı) |
+| Monitoring | 10/10 | 10/10 | OpenTelemetry (314), metrics, health check |
+| Performance | 9/10 | 10/10 | Connection pool, Redis, async, batch |
+| **Genel** | **8.5/10** | **10/10** | Kod mükemmel, coverage artırılmalı |
+
+### Sektör Karşılaştırması
+| Alan | HookSniff | Svix (Rakip) | Hookdeck (Rakip) |
+|------|-----------|-------------|-----------------|
+| SDK sayısı | 11 ✅ | 6 | 8 |
+| Maliyet | $0/ay ✅ | $50-500/ay | $50-500/ay |
+| FIFO delivery | ✅ | ❌ | ❌ |
+| Schema registry | ✅ | ❌ | ❌ |
+| CloudEvents | ✅ | ❌ | ❌ |
+| Test coverage | %12 ❌ | ~%80 | ~%70 |
+| Staging ortamı | ❌ | ✅ | ✅ |
+| Load test | Script var ❌ | ✅ | ✅ |
+
+### Eksikler (95% Hedefi İçin)
+1. 🔴 **Rust test coverage %12 → %95** — her endpoint, her fonksiyon test edilecek
+2. 🔴 **Dashboard test coverage %2 → %95** — her component, her page test edilecek
+3. 🟡 **k6 load test çalıştır** — gerçek trafik simülasyonu
+4. 🟡 **Staging ortamı** — GCP'de staging environment
+5. 🟢 **Backup strategy** — Neon DB otomatik backup
 
 ---
 
