@@ -28,18 +28,20 @@ const comparison = [
     category: 'Features',
     whyItMatters: 'Feature parity determines how far you can go without switching providers. FIFO delivery, CloudEvents, and schema registry are differentiators that matter in production.',
     items: [
-      { feature: 'SDK count', hooksniff: '11 ✅', svix: '6', hookdeck: '8', hook0: '4' },
+      { feature: 'SDK count', hooksniff: '11 ✅', svix: '11', hookdeck: '8', hook0: '4' },
       { feature: 'FIFO ordered delivery', hooksniff: '✅', svix: '❌', hookdeck: '❌', hook0: '❌' },
       { feature: 'CloudEvents v1.0', hooksniff: '✅', svix: '❌', hookdeck: '❌', hook0: '❌' },
       { feature: 'Schema registry', hooksniff: '✅', svix: '❌', hookdeck: '❌', hook0: '❌' },
       { feature: 'Delivery methods', hooksniff: 'HTTP/WS/gRPC/SQS', svix: 'HTTP', hookdeck: 'HTTP', hook0: 'HTTP' },
-      { feature: 'Webhook playground', hooksniff: '✅', svix: '✅ (Svix Play)', hookdeck: '✅ (Console)', hook0: '❌' },
+      { feature: 'Data streaming', hooksniff: '❌', svix: '✅ (Svix Stream)', hookdeck: '❌', hook0: '❌' },
+      { feature: 'Webhook playground', hooksniff: '✅', svix: '✅ (Svix Play)', hookdeck: '✅ (Console)', hook0: '✅ (Play)' },
       { feature: 'Embeddable portal', hooksniff: '✅', svix: '✅', hookdeck: '❌', hook0: '❌' },
-      { feature: 'Inbound proxy', hooksniff: '✅', svix: '❌', hookdeck: '✅', hook0: '❌' },
+      { feature: 'Inbound proxy', hooksniff: '✅', svix: '✅ (Svix Ingest)', hookdeck: '✅', hook0: '❌' },
       { feature: 'Dead letter queue', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '❌' },
-      { feature: 'Custom retry policies', hooksniff: '✅', svix: '❌', hookdeck: '✅', hook0: '✅' },
-      { feature: 'Rate limiting (per-endpoint)', hooksniff: '✅', svix: '❌', hookdeck: '✅', hook0: '❌' },
+      { feature: 'Custom retry policies', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '✅' },
+      { feature: 'Rate limiting', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '❌' },
       { feature: 'Event transformations', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '❌' },
+      { feature: 'Components platform', hooksniff: '❌', svix: '✅ (Diom)', hookdeck: '❌', hook0: '❌' },
     ],
   },
   {
@@ -49,9 +51,11 @@ const comparison = [
       { feature: 'HMAC-SHA256', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '✅' },
       { feature: '2FA / TOTP', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '❌' },
       { feature: 'SSO / SAML', hooksniff: '✅ (Business)', svix: '✅ (Enterprise)', hookdeck: '✅ (Growth+)', hook0: '❌' },
-      { feature: 'IP whitelisting', hooksniff: '✅', svix: '❌', hookdeck: '✅ (add-on)', hook0: '❌' },
+      { feature: 'IP whitelisting', hooksniff: '✅', svix: '✅ (Static IPs)', hookdeck: '✅ (add-on)', hook0: '❌' },
       { feature: 'SSRF protection', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '❌' },
       { feature: 'SOC 2', hooksniff: 'Ready', svix: 'Type 2', hookdeck: 'Type 2', hook0: '❌' },
+      { feature: 'HIPAA', hooksniff: '❌', svix: '✅', hookdeck: '❌', hook0: '❌' },
+      { feature: 'PCI-DSS', hooksniff: '❌', svix: '✅', hookdeck: '❌', hook0: '❌' },
       { feature: 'GDPR', hooksniff: '✅ (EU)', svix: '✅', hookdeck: '✅', hook0: '✅' },
       { feature: 'Constant-time comparison', hooksniff: '✅', svix: '✅', hookdeck: 'Unknown', hook0: '❌' },
       { feature: 'Secret rotation', hooksniff: '✅', svix: '✅', hookdeck: '✅', hook0: '❌' },
@@ -65,7 +69,7 @@ const comparison = [
       { feature: 'Self-hosted', hooksniff: '✅ (Docker)', svix: '✅', hookdeck: '❌', hook0: '✅' },
       { feature: 'Terraform provider', hooksniff: '❌', svix: '✅', hookdeck: '✅', hook0: '❌' },
       { feature: 'CLI tool', hooksniff: '❌', svix: '✅', hookdeck: '✅', hook0: '❌' },
-      { feature: 'MCP support', hooksniff: '✅', svix: '❌', hookdeck: '✅', hook0: '❌' },
+      { feature: 'MCP support', hooksniff: '✅', svix: '❌', hookdeck: '✅', hook0: '✅' },
       { feature: '8 language i18n', hooksniff: '✅', svix: '❌', hookdeck: '❌', hook0: '❌' },
       { feature: 'Test coverage', hooksniff: '1,378 tests', svix: '~80%', hookdeck: '~70%', hook0: 'Unknown' },
       { feature: 'API documentation', hooksniff: 'OpenAPI spec', svix: 'Swagger', hookdeck: 'API Reference', hook0: 'Basic' },
@@ -78,10 +82,10 @@ const comparison = [
       { feature: 'Hosting', hooksniff: 'GCP Cloud Run', svix: 'AWS', hookdeck: 'AWS', hook0: 'Self-hosted' },
       { feature: 'Database', hooksniff: 'Neon PostgreSQL', svix: 'PostgreSQL', hookdeck: 'Custom', hook0: 'PostgreSQL' },
       { feature: 'Cache/Queue', hooksniff: 'Upstash Redis', svix: 'Redis', hookdeck: 'Custom', hook0: 'Redis' },
-      { feature: 'Monitoring', hooksniff: 'OpenTelemetry', svix: 'Internal', hookdeck: 'Internal', hook0: 'Basic' },
+      { feature: 'Monitoring', hooksniff: 'OpenTelemetry', svix: 'Internal', hookdeck: 'Internal + Datadog', hook0: 'Basic' },
       { feature: 'Uptime SLA', hooksniff: '99.9%', svix: '99.99%', hookdeck: '99.999%', hook0: 'N/A' },
       { feature: 'Data region', hooksniff: 'EU (Frankfurt)', svix: 'US/EU', hookdeck: 'US/EU', hook0: 'Your choice' },
-      { feature: 'Observability', hooksniff: 'OTLP + Grafana', svix: 'Internal', hookdeck: 'Datadog export', hook0: 'Basic' },
+      { feature: 'Webhook latency alerts', hooksniff: '❌', svix: '❌', hookdeck: '✅ (Radar)', hook0: '❌' },
     ],
   },
 ];
@@ -90,27 +94,27 @@ const verdicts = [
   {
     title: 'Best for startups on a budget',
     winner: 'HookSniff',
-    reason: '$29/mo Pro plan vs Svix $490/mo. 11 SDKs, FIFO delivery, CloudEvents — all included.',
+    reason: '$29/mo Pro plan vs Svix $490/mo. FIFO delivery, CloudEvents, schema registry — all included.',
   },
   {
     title: 'Best for enterprise compliance',
     winner: 'Svix',
-    reason: 'SOC 2 Type 2, 99.99% SLA, YC/a16z backed. More mature for Fortune 500.',
+    reason: 'SOC 2 Type 2, HIPAA, PCI-DSS, 99.99% SLA, YC/a16z backed. 30+ enterprise customers.',
   },
   {
     title: 'Best for event routing',
     winner: 'Hookdeck',
-    reason: 'Advanced filtering, routing rules, and throughput management. Purpose-built for complex event flows.',
+    reason: 'Advanced filtering, routing rules, throughput management, and Radar latency alerts. 99.999% SLA.',
   },
   {
     title: 'Best for self-hosted',
     winner: 'HookSniff / Hook0',
-    reason: 'Both open-source with Docker support. HookSniff has more features; Hook0 is simpler.',
+    reason: 'Both open-source with Docker support. HookSniff has more features; Hook0 is simpler and European.',
   },
   {
     title: 'Best developer experience',
-    winner: 'HookSniff',
-    reason: '11 SDKs, webhook playground, schema registry, CloudEvents, 8-language dashboard.',
+    winner: 'Svix / HookSniff',
+    reason: 'Both have 11 SDKs. Svix has Terraform + CLI. HookSniff has FIFO + CloudEvents + MCP.',
   },
 ];
 
@@ -290,10 +294,10 @@ export default function CompareContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">When to choose what?</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              { when: 'Choose HookSniff if...', items: ['You want the best price/feature ratio', 'You need FIFO ordered delivery', 'You need 11 SDKs across all languages', 'You want CloudEvents standard support', 'You\'re a startup watching costs', 'You want self-hosted + managed options'] },
-              { when: 'Choose Svix if...', items: ['You need SOC 2 Type 2 compliance today', 'You\'re a Fortune 500 company', 'You need 99.99% SLA guarantees', 'You want YC/a16z backing for trust', 'You need a mature ecosystem'] },
-              { when: 'Choose Hookdeck if...', items: ['You need complex event routing rules', 'You need advanced throughput management', 'You want a fully managed solution', 'You don\'t need self-hosted', 'SOC 2 Type 2 is required'] },
-              { when: 'Choose Hook0 if...', items: ['You want 100% self-hosted control', 'You need a simple, minimal solution', 'Budget is the #1 priority', 'You don\'t need advanced features'] },
+              { when: 'Choose HookSniff if...', items: ['You want the best price/feature ratio', 'You need FIFO ordered delivery', 'You want CloudEvents standard support', 'You\'re a startup watching costs', 'You want self-hosted + managed options', 'You need a schema registry'] },
+              { when: 'Choose Svix if...', items: ['You need SOC 2 Type 2, HIPAA, or PCI-DSS compliance', 'You\'re a Fortune 500 company', 'You need 99.99% SLA guarantees', 'You want data streaming (Svix Stream)', 'You need a mature ecosystem with 30+ enterprise customers'] },
+              { when: 'Choose Hookdeck if...', items: ['You need complex event routing rules', 'You need 99.999% uptime SLA', 'You want webhook latency alerts (Radar)', 'You want a fully managed solution', 'You don\'t need self-hosted'] },
+              { when: 'Choose Hook0 if...', items: ['You want 100% self-hosted control', 'You need European data sovereignty', 'Budget is the #1 priority', 'You want a bootstrapped, no-VC company'] },
             ].map((section) => (
               <div key={section.when} className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-3">{section.when}</h3>
