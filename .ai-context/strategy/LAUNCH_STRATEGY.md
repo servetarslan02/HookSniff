@@ -36,7 +36,7 @@
 |---|---|---|---|---|
 | Ne yapıyor | Webhook gönderme | Webhook alma (inbound) | Webhook gönderme | Webhook gönderme |
 | Free plan | $0, 50 msg/sn, 30 gün | $0, 10K event, 3 gün | $0, self-hosted sınırsız | $0, 10K webhook, 7 gün |
-| Pro plan | $490/ay | $39/ay | Self-hosted ücretsiz | $49/ay |
+| Pro plan | $490/ay | $39/ay | Self-hosted ücretsiz | $29/ay |
 | Enterprise | Özel fiyat | $499/ay | Özel fiyat | Özel fiyat |
 | Self-hosted | Kısmi (open-core) | Yok | Tam (SSPL lisans) | Yok |
 | SDK sayısı | 5 | 4 | 2 | 11 |
@@ -84,7 +84,7 @@
 ### Neden Bu Fiyatlar?
 
 - **$29 Starter:** Hookdeck $39, onlardan ucuz olmak için. İlk müşterileri kapmak gerekli.
-- **$99 Pro:** Svix $490, "5 kat ucuz" mesajı güçlü bir pazarlama argümanı.
+- **$99 Pro:** Svix $490, "17 kat ucuz" mesajı güçlü bir pazarlama argümanı.
 - **₺99 Starter (Türkiye):** $29 = ~₺1000, Türkiye'de pahalı. ₺99 psikolojik olarak erişilebilir.
 - **₺299 Pro (Türkiye):** Kurumsal bütçe için uygun seviye.
 - **5K free (10K değil):** Daha agresif geçiş. Kullanıcı 5K'dan sonra Pro'ya geçsin.
@@ -99,7 +99,7 @@
 
 ### Pazarlama Mesajları
 
-- Landing page: "5x cheaper than Svix"
+- Landing page: "17x cheaper than Svix"
 - Türkiye: "Türkiye'nin ilk webhook platformu"
 - Global: "Reliable webhook delivery for developers"
 
@@ -164,7 +164,7 @@ Bugün itibarıyla:
 - FIFO teslimat
 
 Rakipler: Svix $490/ay, Hookdeck $39/ay
-Ben: $49/ay (Türkiye'de ₺99/ay)
+Ben: $29/ay (Türkiye'de ₺99/ay)
 
 Demo: [link]
 GitHub: [link]
@@ -196,7 +196,7 @@ Ne dersiniz, nasıl olmuş?
 4/ Maliyet: Google Cloud Run free tier + Neon PostgreSQL + Vercel.
    Hiçbir sunucu parası yok. $0/ay.
 
-5/ Rakipler: Svix $490/ay. Hookdeck $39/ay. Ben $49/ay.
+5/ Rakipler: Svix $490/ay. Hookdeck $39/ay. Ben $29/ay.
    Türkiye'de ₺99/ay. 5x daha ucuz.
 
 6/ Denemek isteyen: [link]
@@ -221,7 +221,7 @@ Bugün:
 
 Svix $490/ay istiyor.
 Hookdeck $39/ay istiyor.
-Ben $49/ay (Türkiye'de ₺99/ay).
+Ben $29/ay (Türkiye'de ₺99/ay).
 
 Neden bu kadar ucuz? Çünkü Google Cloud Run free tier + Neon PostgreSQL
 + Vercel kullanıyorum. Hiçbir sunucu parası yok.
