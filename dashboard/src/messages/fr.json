@@ -712,7 +712,8 @@
       "contact": "Contact",
       "terms": "Conditions",
       "privacy": "Confidentialité",
-      "copyright": "© 2026 HookSniff. Tous droits réservés."
+      "copyright": "© 2026 HookSniff. Tous droits réservés.",
+      "changelog": "Changelog"
     }
   },
   "apiKeys": {
