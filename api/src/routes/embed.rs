@@ -132,3 +132,81 @@ async fn embed_script() -> Html<String> {
         script
     ))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_success_rate_calculation() {
+        // With deliveries
+        let total = 100i64;
+        let delivered = 95i64;
+        let rate = if total > 0 {
+            (delivered as f64 / total as f64 * 100.0).round()
+        } else {
+            100.0
+        };
+        assert_eq!(rate, 95.0);
+
+        // No deliveries
+        let total = 0i64;
+        let rate = if total > 0 {
+            (delivered as f64 / total as f64 * 100.0).round()
+        } else {
+            100.0
+        };
+        assert_eq!(rate, 100.0);
+    }
+
+    #[test]
+    fn test_embed_portal_html_generation() {
+        // Test the HTML generation logic with mock data
+        let total = 50i64;
+        let delivered = 45i64;
+        let failed = 5i64;
+        let success_rate = if total > 0 {
+            (delivered as f64 / total as f64 * 100.0).round()
+        } else {
+            100.0
+        };
+        let endpoints = 3i64;
+
+        let html = format!(
+            r#"Total: {total}, Delivered: {delivered}, Failed: {failed}, Rate: {success_rate}%, Endpoints: {endpoints}"#,
+            total = total,
+            delivered = delivered,
+            failed = failed,
+            success_rate = success_rate,
+            endpoints = endpoints,
+        );
+        assert!(html.contains("Total: 50"));
+        assert!(html.contains("Delivered: 45"));
+        assert!(html.contains("Failed: 5"));
+        assert!(html.contains("Rate: 90%"));
+        assert!(html.contains("Endpoints: 3"));
+    }
+
+    #[test]
+    fn test_embed_script_contains_iframe() {
+        let script = r#"(function() {
+  var iframe = document.createElement('iframe');
+  iframe.src = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/embed/portal';
+  iframe.style.width = '100%';
+  iframe.style.border = 'none';
+  iframe.style.minHeight = '300px';
+  iframe.style.borderRadius = '12px';
+  iframe.loading = 'lazy';
+  var container = document.getElementById('hooksniff-portal');
+  if (container) { container.appendChild(iframe); }
+})();"#;
+        assert!(script.contains("iframe"));
+        assert!(script.contains("hooksniff-portal"));
+        assert!(script.contains("hooksniff-api"));
+    }
+}

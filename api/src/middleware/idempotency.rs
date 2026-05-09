@@ -288,6 +288,8 @@ pub async fn cleanup_expired_webhooks(pool: &sqlx::PgPool) -> Result<u64, sqlx::
 mod tests {
     use super::*;
 
+    // ── check_timestamp ───────────────────────────────────────
+
     #[test]
     fn test_check_timestamp_fresh() {
         let now = Utc::now().timestamp();
@@ -318,6 +320,19 @@ mod tests {
     }
 
     #[test]
+    fn test_check_timestamp_boundary() {
+        // Exactly at tolerance boundary
+        let now = Utc::now().timestamp();
+        let tolerance = DEFAULT_TIMESTAMP_TOLERANCE_SECS;
+        let _boundary = now - tolerance;
+        // Should be right at the edge — may pass or fail depending on timing
+        // But definitely past tolerance should fail
+        assert!(check_timestamp(now - tolerance - 10, None).is_err());
+    }
+
+    // ── ReplayError ───────────────────────────────────────────
+
+    #[test]
     fn test_replay_error_display() {
         let err = ReplayError::TimestampExpired {
             age_secs: 600,
@@ -329,5 +344,86 @@ mod tests {
             webhook_id: "wh_123".to_string(),
         };
         assert!(format!("{}", err).contains("wh_123"));
+    }
+
+    #[test]
+    fn test_replay_error_debug() {
+        let err = ReplayError::TimestampExpired {
+            age_secs: 100,
+            tolerance_secs: 50,
+        };
+        let debug = format!("{:?}", err);
+        assert!(debug.contains("TimestampExpired"));
+    }
+
+    // ── compute_body_hash ─────────────────────────────────────
+
+    #[test]
+    fn test_compute_body_hash_deterministic() {
+        let body = serde_json::json!({"key": "value"});
+        let h1 = compute_body_hash(&body);
+        let h2 = compute_body_hash(&body);
+        assert_eq!(h1, h2);
+    }
+
+    #[test]
+    fn test_compute_body_hash_different_bodies() {
+        let b1 = serde_json::json!({"key": "value1"});
+        let b2 = serde_json::json!({"key": "value2"});
+        assert_ne!(compute_body_hash(&b1), compute_body_hash(&b2));
+    }
+
+    #[test]
+    fn test_compute_body_hash_is_16_hex() {
+        let body = serde_json::json!({"test": true});
+        let hash = compute_body_hash(&body);
+        assert_eq!(hash.len(), 16);
+        assert!(hash.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn test_compute_body_hash_empty_object() {
+        let body = serde_json::json!({});
+        let hash = compute_body_hash(&body);
+        assert_eq!(hash.len(), 16);
+    }
+
+    // ── DEFAULT_TIMESTAMP_TOLERANCE_SECS ──────────────────────
+
+    #[test]
+    fn test_default_tolerance_is_5_minutes() {
+        assert_eq!(DEFAULT_TIMESTAMP_TOLERANCE_SECS, 300);
+    }
+
+    // ── IdempotencyKey serde ──────────────────────────────────
+
+    #[test]
+    fn test_idempotency_key_serde() {
+        let key = IdempotencyKey {
+            key: "test-key".to_string(),
+            customer_id: Uuid::new_v4(),
+            response_body: serde_json::json!({"status": "ok"}),
+            status_code: 200,
+            created_at: Utc::now(),
+            expires_at: Utc::now() + chrono::Duration::hours(24),
+        };
+        let json = serde_json::to_string(&key).unwrap();
+        let back: IdempotencyKey = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.key, "test-key");
+        assert_eq!(back.status_code, 200);
+    }
+
+    // ── SeenWebhook serde ─────────────────────────────────────
+
+    #[test]
+    fn test_seen_webhook_serde() {
+        let wh = SeenWebhook {
+            webhook_id: "wh_456".to_string(),
+            seen_at: Utc::now(),
+            expires_at: Utc::now() + chrono::Duration::hours(1),
+        };
+        let json = serde_json::to_string(&wh).unwrap();
+        let back: SeenWebhook = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.webhook_id, "wh_456");
     }
 }

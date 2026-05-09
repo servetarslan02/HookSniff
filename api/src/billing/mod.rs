@@ -213,3 +213,270 @@ pub enum InvoiceStatus {
     Void,
     Uncollectible,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Plan::parse_str ────────────────────────────────────────
+
+    #[test]
+    fn parse_str_pro() {
+        assert_eq!(Plan::parse_str("pro"), Plan::Pro);
+        assert_eq!(Plan::parse_str("Pro"), Plan::Pro);
+        assert_eq!(Plan::parse_str("PRO"), Plan::Pro);
+    }
+
+    #[test]
+    fn parse_str_business() {
+        assert_eq!(Plan::parse_str("business"), Plan::Business);
+        assert_eq!(Plan::parse_str("Business"), Plan::Business);
+        assert_eq!(Plan::parse_str("BUSINESS"), Plan::Business);
+    }
+
+    #[test]
+    fn parse_str_enterprise() {
+        assert_eq!(Plan::parse_str("enterprise"), Plan::Enterprise);
+        assert_eq!(Plan::parse_str("Enterprise"), Plan::Enterprise);
+        assert_eq!(Plan::parse_str("ENTERPRISE"), Plan::Enterprise);
+    }
+
+    #[test]
+    fn parse_str_free_default() {
+        assert_eq!(Plan::parse_str("free"), Plan::Free);
+        assert_eq!(Plan::parse_str("Free"), Plan::Free);
+        assert_eq!(Plan::parse_str(""), Plan::Free);
+        assert_eq!(Plan::parse_str("unknown"), Plan::Free);
+        assert_eq!(Plan::parse_str("random_string"), Plan::Free);
+    }
+
+    // ── Plan::as_str ───────────────────────────────────────────
+
+    #[test]
+    fn as_str_all_variants() {
+        assert_eq!(Plan::Free.as_str(), "free");
+        assert_eq!(Plan::Pro.as_str(), "pro");
+        assert_eq!(Plan::Business.as_str(), "business");
+        assert_eq!(Plan::Enterprise.as_str(), "enterprise");
+    }
+
+    // ── Roundtrip parse_str ↔ as_str ───────────────────────────
+
+    #[test]
+    fn parse_str_as_str_roundtrip() {
+        for variant in &[Plan::Free, Plan::Pro, Plan::Business, Plan::Enterprise] {
+            let s = variant.as_str();
+            assert_eq!(Plan::parse_str(s), *variant);
+        }
+    }
+
+    // ── max_webhooks_per_month ─────────────────────────────────
+
+    #[test]
+    fn max_webhooks_per_month_free() {
+        assert_eq!(Plan::Free.max_webhooks_per_month(), 10_000);
+    }
+
+    #[test]
+    fn max_webhooks_per_month_pro() {
+        assert_eq!(Plan::Pro.max_webhooks_per_month(), 50_000);
+    }
+
+    #[test]
+    fn max_webhooks_per_month_business() {
+        assert_eq!(Plan::Business.max_webhooks_per_month(), 500_000);
+    }
+
+    #[test]
+    fn max_webhooks_per_month_enterprise() {
+        assert_eq!(Plan::Enterprise.max_webhooks_per_month(), u64::MAX);
+    }
+
+    // ── max_requests_per_minute ────────────────────────────────
+
+    #[test]
+    fn max_requests_per_minute_all() {
+        assert_eq!(Plan::Free.max_requests_per_minute(), 100);
+        assert_eq!(Plan::Pro.max_requests_per_minute(), 1_000);
+        assert_eq!(Plan::Business.max_requests_per_minute(), 10_000);
+        assert_eq!(Plan::Enterprise.max_requests_per_minute(), u32::MAX);
+    }
+
+    // ── max_endpoints ──────────────────────────────────────────
+
+    #[test]
+    fn max_endpoints_all() {
+        assert_eq!(Plan::Free.max_endpoints(), 5);
+        assert_eq!(Plan::Pro.max_endpoints(), 50);
+        assert_eq!(Plan::Business.max_endpoints(), 500);
+        assert_eq!(Plan::Enterprise.max_endpoints(), u32::MAX);
+    }
+
+    // ── max_payload_bytes ──────────────────────────────────────
+
+    #[test]
+    fn max_payload_bytes_all() {
+        assert_eq!(Plan::Free.max_payload_bytes(), 256 * 1024);
+        assert_eq!(Plan::Pro.max_payload_bytes(), 1024 * 1024);
+        assert_eq!(Plan::Business.max_payload_bytes(), 5 * 1024 * 1024);
+        assert_eq!(Plan::Enterprise.max_payload_bytes(), 10 * 1024 * 1024);
+    }
+
+    // ── retention_days ─────────────────────────────────────────
+
+    #[test]
+    fn retention_days_all() {
+        assert_eq!(Plan::Free.retention_days(), 7);
+        assert_eq!(Plan::Pro.retention_days(), 30);
+        assert_eq!(Plan::Business.retention_days(), 90);
+        assert_eq!(Plan::Enterprise.retention_days(), 365);
+    }
+
+    // ── monthly_price_cents ────────────────────────────────────
+
+    #[test]
+    fn monthly_price_cents_all() {
+        assert_eq!(Plan::Free.monthly_price_cents(), 0);
+        assert_eq!(Plan::Pro.monthly_price_cents(), 4900);
+        assert_eq!(Plan::Business.monthly_price_cents(), 14900);
+        assert_eq!(Plan::Enterprise.monthly_price_cents(), 0);
+    }
+
+    // ── monthly_price_kurus ────────────────────────────────────
+
+    #[test]
+    fn monthly_price_kurus_all() {
+        assert_eq!(Plan::Free.monthly_price_kurus(), 0);
+        assert_eq!(Plan::Pro.monthly_price_kurus(), 14900);
+        assert_eq!(Plan::Business.monthly_price_kurus(), 44900);
+        assert_eq!(Plan::Enterprise.monthly_price_kurus(), 0);
+    }
+
+    // ── Plan ordering (higher tiers have higher limits) ────────
+
+    #[test]
+    fn higher_tiers_have_higher_limits() {
+        assert!(Plan::Free.max_requests_per_minute() < Plan::Pro.max_requests_per_minute());
+        assert!(Plan::Pro.max_requests_per_minute() < Plan::Business.max_requests_per_minute());
+        assert!(Plan::Business.max_requests_per_minute() < Plan::Enterprise.max_requests_per_minute());
+
+        assert!(Plan::Free.max_endpoints() < Plan::Pro.max_endpoints());
+        assert!(Plan::Pro.max_endpoints() < Plan::Business.max_endpoints());
+        assert!(Plan::Business.max_endpoints() < Plan::Enterprise.max_endpoints());
+
+        assert!(Plan::Free.max_webhooks_per_month() < Plan::Pro.max_webhooks_per_month());
+        assert!(Plan::Pro.max_webhooks_per_month() < Plan::Business.max_webhooks_per_month());
+        assert!(Plan::Business.max_webhooks_per_month() < Plan::Enterprise.max_webhooks_per_month());
+    }
+
+    // ── Usage ──────────────────────────────────────────────────
+
+    fn make_usage(plan: Plan, webhooks_today: u64, endpoints_count: u32) -> Usage {
+        Usage {
+            customer_id: "test-customer".to_string(),
+            plan,
+            webhooks_today,
+            api_calls_today: 0,
+            endpoints_count,
+            period_start: "2025-01-01".to_string(),
+            period_end: "2025-01-31".to_string(),
+        }
+    }
+
+    #[test]
+    fn usage_webhook_limit_not_exceeded() {
+        let usage = make_usage(Plan::Free, 5000, 2);
+        assert!(!usage.is_webhook_limit_exceeded());
+    }
+
+    #[test]
+    fn usage_webhook_limit_exceeded_at_boundary() {
+        let usage = make_usage(Plan::Free, 10_000, 2);
+        assert!(usage.is_webhook_limit_exceeded());
+    }
+
+    #[test]
+    fn usage_webhook_limit_exceeded_over() {
+        let usage = make_usage(Plan::Free, 15_000, 2);
+        assert!(usage.is_webhook_limit_exceeded());
+    }
+
+    #[test]
+    fn usage_endpoint_limit_not_exceeded() {
+        let usage = make_usage(Plan::Free, 0, 3);
+        assert!(!usage.is_endpoint_limit_exceeded());
+    }
+
+    #[test]
+    fn usage_endpoint_limit_exceeded_at_boundary() {
+        let usage = make_usage(Plan::Free, 0, 5);
+        assert!(usage.is_endpoint_limit_exceeded());
+    }
+
+    #[test]
+    fn usage_endpoint_limit_exceeded_over() {
+        let usage = make_usage(Plan::Free, 0, 10);
+        assert!(usage.is_endpoint_limit_exceeded());
+    }
+
+    #[test]
+    fn usage_remaining_webhooks_normal() {
+        let usage = make_usage(Plan::Pro, 20_000, 0);
+        assert_eq!(usage.remaining_webhooks(), 30_000);
+    }
+
+    #[test]
+    fn usage_remaining_webhooks_saturates_at_zero() {
+        let usage = make_usage(Plan::Free, 20_000, 0);
+        assert_eq!(usage.remaining_webhooks(), 0);
+    }
+
+    #[test]
+    fn usage_remaining_endpoints_normal() {
+        let usage = make_usage(Plan::Pro, 0, 10);
+        assert_eq!(usage.remaining_endpoints(), 40);
+    }
+
+    #[test]
+    fn usage_remaining_endpoints_saturates_at_zero() {
+        let usage = make_usage(Plan::Free, 0, 100);
+        assert_eq!(usage.remaining_endpoints(), 0);
+    }
+
+    // ── SubscriptionStatus ─────────────────────────────────────
+
+    #[test]
+    fn subscription_status_serde() {
+        let s = serde_json::to_string(&SubscriptionStatus::Active).unwrap();
+        assert_eq!(s, "\"active\"");
+        let s = serde_json::to_string(&SubscriptionStatus::Canceled).unwrap();
+        assert_eq!(s, "\"canceled\"");
+    }
+
+    #[test]
+    fn invoice_status_serde() {
+        let s = serde_json::to_string(&InvoiceStatus::Paid).unwrap();
+        assert_eq!(s, "\"paid\"");
+        let s = serde_json::to_string(&InvoiceStatus::Draft).unwrap();
+        assert_eq!(s, "\"draft\"");
+    }
+
+    // ── Plan serde ─────────────────────────────────────────────
+
+    #[test]
+    fn plan_serde_roundtrip() {
+        for variant in &[Plan::Free, Plan::Pro, Plan::Business, Plan::Enterprise] {
+            let json = serde_json::to_string(variant).unwrap();
+            let deserialized: Plan = serde_json::from_str(&json).unwrap();
+            assert_eq!(*variant, deserialized);
+        }
+    }
+
+    #[test]
+    fn plan_deserialize_from_json() {
+        assert_eq!(serde_json::from_str::<Plan>("\"free\"").unwrap(), Plan::Free);
+        assert_eq!(serde_json::from_str::<Plan>("\"pro\"").unwrap(), Plan::Pro);
+        assert_eq!(serde_json::from_str::<Plan>("\"business\"").unwrap(), Plan::Business);
+        assert_eq!(serde_json::from_str::<Plan>("\"enterprise\"").unwrap(), Plan::Enterprise);
+    }
+}

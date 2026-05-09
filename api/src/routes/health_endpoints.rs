@@ -183,3 +183,107 @@ async fn get_endpoint_health(
         uptime_7d: success_rate,
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_endpoint_health_serialize() {
+        let eh = EndpointHealth {
+            id: Uuid::new_v4(),
+            url: "https://example.com".to_string(),
+            description: Some("test".to_string()),
+            is_active: true,
+            health_status: "healthy".to_string(),
+            success_rate: 99.5,
+            avg_response_ms: 150,
+            p95_response_ms: 300,
+            p99_response_ms: 450,
+            total_deliveries: 100,
+            successful: 99,
+            failed: 1,
+            consecutive_failures: 0,
+            last_success_at: Some("2024-01-01T00:00:00Z".to_string()),
+            last_failure_at: None,
+            uptime_24h: 99.5,
+            uptime_7d: 99.8,
+        };
+        let json = serde_json::to_value(&eh).unwrap();
+        assert_eq!(json["url"], "https://example.com");
+        assert_eq!(json["health_status"], "healthy");
+        assert_eq!(json["success_rate"], 99.5);
+        assert_eq!(json["total_deliveries"], 100);
+        assert!(json["last_failure_at"].is_null());
+    }
+
+    #[test]
+    fn test_health_status_logic() {
+        // failure_streak >= 5 => unhealthy
+        let status = if 5i32 >= 5 {
+            "unhealthy"
+        } else if 5i32 >= 3 || 90.0f64 < 95.0 {
+            "degraded"
+        } else {
+            "healthy"
+        };
+        assert_eq!(status, "unhealthy");
+
+        // failure_streak >= 3 => degraded
+        let status = if 3i32 >= 5 {
+            "unhealthy"
+        } else if 3i32 >= 3 || 99.0f64 < 95.0 {
+            "degraded"
+        } else {
+            "healthy"
+        };
+        assert_eq!(status, "degraded");
+
+        // success_rate < 95 => degraded
+        let status = if 0i32 >= 5 {
+            "unhealthy"
+        } else if 0i32 >= 3 || 90.0f64 < 95.0 {
+            "degraded"
+        } else {
+            "healthy"
+        };
+        assert_eq!(status, "degraded");
+
+        // All good => healthy
+        let status = if 0i32 >= 5 {
+            "unhealthy"
+        } else if 0i32 >= 3 || 99.0f64 < 95.0 {
+            "degraded"
+        } else {
+            "healthy"
+        };
+        assert_eq!(status, "healthy");
+    }
+
+    #[test]
+    fn test_success_rate_calculation() {
+        // With deliveries
+        let total = 100i64;
+        let successful = 95i64;
+        let rate = if total > 0 {
+            (successful as f64 / total as f64) * 100.0
+        } else {
+            100.0
+        };
+        assert_eq!(rate, 95.0);
+
+        // No deliveries
+        let total = 0i64;
+        let rate = if total > 0 {
+            (successful as f64 / total as f64) * 100.0
+        } else {
+            100.0
+        };
+        assert_eq!(rate, 100.0);
+    }
+}

@@ -150,3 +150,78 @@ async fn rotate_api_key(
 struct CreateKeyRequest {
     name: Option<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_api_key_info_serialize() {
+        let info = ApiKeyInfo {
+            id: Uuid::new_v4(),
+            prefix: "hr_live_abc123...".to_string(),
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+            last_used_at: Some("2024-01-02T00:00:00Z".to_string()),
+            is_active: true,
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert_eq!(json["prefix"], "hr_live_abc123...");
+        assert_eq!(json["is_active"], true);
+        assert_eq!(json["last_used_at"], "2024-01-02T00:00:00Z");
+    }
+
+    #[test]
+    fn test_api_key_info_no_last_used() {
+        let info = ApiKeyInfo {
+            id: Uuid::new_v4(),
+            prefix: "hr_live_xyz...".to_string(),
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+            last_used_at: None,
+            is_active: false,
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert!(json["last_used_at"].is_null());
+        assert_eq!(json["is_active"], false);
+    }
+
+    #[test]
+    fn test_create_api_key_response_serialize() {
+        let resp = CreateApiKeyResponse {
+            id: Uuid::new_v4(),
+            key: "hr_live_abc123def456".to_string(),
+            prefix: "hr_live_abc123".to_string(),
+            message: "Save this key — it won't be shown again.".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["key"], "hr_live_abc123def456");
+        assert_eq!(json["prefix"], "hr_live_abc123");
+        assert!(json["message"].as_str().unwrap().contains("won't be shown"));
+    }
+
+    #[test]
+    fn test_create_key_request_deserialize() {
+        let json = r#"{"name": "Production Key"}"#;
+        let req: CreateKeyRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.name.unwrap(), "Production Key");
+    }
+
+    #[test]
+    fn test_create_key_request_no_name() {
+        let json = r#"{}"#;
+        let req: CreateKeyRequest = serde_json::from_str(json).unwrap();
+        assert!(req.name.is_none());
+    }
+
+    #[test]
+    fn test_api_key_prefix_format() {
+        // Prefix should be first 15 chars of the key
+        let api_key = "hr_live_abc123def456ghi789";
+        let prefix = &api_key[..15];
+        assert_eq!(prefix, "hr_live_abc123d");
+    }
+}

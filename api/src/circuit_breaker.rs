@@ -197,4 +197,134 @@ mod tests {
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
         assert!(cb.allow_request(ep_id).await); // half-open
     }
+
+    // ── Additional tests ──────────────────────────────────────
+
+    #[tokio::test]
+    async fn test_default_config() {
+        let config = CircuitBreakerConfig::default();
+        assert_eq!(config.failure_threshold, 5);
+        assert_eq!(config.cooldown_secs, 60);
+    }
+
+    #[tokio::test]
+    async fn test_unknown_endpoint_returns_closed() {
+        let cb = CircuitBreaker::new(CircuitBreakerConfig::default());
+        let ep_id = Uuid::new_v4();
+        let state = cb.get_state(ep_id).await;
+        assert_eq!(state.state, CircuitState::Closed);
+        assert_eq!(state.consecutive_failures, 0);
+        assert_eq!(state.total_opens, 0);
+    }
+
+    #[tokio::test]
+    async fn test_total_opens_increments() {
+        let cb = CircuitBreaker::new(CircuitBreakerConfig {
+            failure_threshold: 2,
+            cooldown_secs: 1,
+        });
+        let ep_id = Uuid::new_v4();
+
+        // First open
+        cb.record_failure(ep_id).await;
+        cb.record_failure(ep_id).await;
+        assert_eq!(cb.get_state(ep_id).await.total_opens, 1);
+
+        // Wait for cooldown → half-open → success → closed
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        assert!(cb.allow_request(ep_id).await); // half-open
+        cb.record_success(ep_id).await; // back to closed
+
+        // Second open
+        cb.record_failure(ep_id).await;
+        cb.record_failure(ep_id).await;
+        assert_eq!(cb.get_state(ep_id).await.total_opens, 2);
+    }
+
+    #[tokio::test]
+    async fn test_multiple_endpoints_independent() {
+        let cb = CircuitBreaker::new(CircuitBreakerConfig {
+            failure_threshold: 2,
+            cooldown_secs: 60,
+        });
+        let ep1 = Uuid::new_v4();
+        let ep2 = Uuid::new_v4();
+
+        cb.record_failure(ep1).await;
+        cb.record_failure(ep1).await; // ep1 opens
+
+        assert!(!cb.allow_request(ep1).await);
+        assert!(cb.allow_request(ep2).await); // ep2 still closed
+    }
+
+    #[tokio::test]
+    async fn test_get_all_returns_all_circuits() {
+        let cb = CircuitBreaker::new(CircuitBreakerConfig::default());
+        let ep1 = Uuid::new_v4();
+        let ep2 = Uuid::new_v4();
+
+        cb.record_failure(ep1).await;
+        cb.record_failure(ep2).await;
+
+        let all = cb.get_all().await;
+        assert_eq!(all.len(), 2);
+        assert!(all.contains_key(&ep1));
+        assert!(all.contains_key(&ep2));
+    }
+
+    #[tokio::test]
+    async fn test_get_all_empty_initially() {
+        let cb = CircuitBreaker::new(CircuitBreakerConfig::default());
+        let all = cb.get_all().await;
+        assert!(all.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_consecutive_failures_resets_on_success() {
+        let cb = CircuitBreaker::new(CircuitBreakerConfig {
+            failure_threshold: 5,
+            cooldown_secs: 60,
+        });
+        let ep_id = Uuid::new_v4();
+
+        cb.record_failure(ep_id).await;
+        cb.record_failure(ep_id).await;
+        cb.record_failure(ep_id).await;
+        assert_eq!(cb.get_state(ep_id).await.consecutive_failures, 3);
+
+        cb.record_success(ep_id).await;
+        assert_eq!(cb.get_state(ep_id).await.consecutive_failures, 0);
+        assert_eq!(cb.get_state(ep_id).await.state, CircuitState::Closed);
+    }
+
+    #[tokio::test]
+    async fn test_half_open_failure_reopens() {
+        let cb = CircuitBreaker::new(CircuitBreakerConfig {
+            failure_threshold: 1,
+            cooldown_secs: 1,
+        });
+        let ep_id = Uuid::new_v4();
+
+        cb.record_failure(ep_id).await; // opens
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        assert!(cb.allow_request(ep_id).await); // half-open
+
+        cb.record_failure(ep_id).await; // should reopen
+        assert_eq!(cb.get_state(ep_id).await.total_opens, 2);
+    }
+
+    #[test]
+    fn test_endpoint_circuit_default() {
+        let ec = EndpointCircuit::default();
+        assert_eq!(ec.state, CircuitState::Closed);
+        assert_eq!(ec.consecutive_failures, 0);
+        assert_eq!(ec.total_opens, 0);
+    }
+
+    #[test]
+    fn test_circuit_state_clone() {
+        let state = CircuitState::Closed;
+        let cloned = state.clone();
+        assert_eq!(state, cloned);
+    }
 }

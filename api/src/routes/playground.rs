@@ -192,3 +192,143 @@ struct TestWebhookResponse {
     duration_ms: i32,
     endpoint_url: String,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── PlaygroundResponse ──────────────────────────────────
+
+    #[test]
+    fn test_playground_response_serialization() {
+        let resp = PlaygroundResponse {
+            endpoints: vec![],
+            recent_deliveries: vec![],
+            sample_payloads: vec![],
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert!(json["endpoints"].as_array().unwrap().is_empty());
+        assert!(json["recent_deliveries"].as_array().unwrap().is_empty());
+        assert!(json["sample_payloads"].as_array().unwrap().is_empty());
+    }
+
+    // ── EndpointInfo ────────────────────────────────────────
+
+    #[test]
+    fn test_endpoint_info_serialization() {
+        let info = EndpointInfo {
+            id: Uuid::new_v4(),
+            url: "https://example.com/webhook".to_string(),
+            description: Some("Main endpoint".to_string()),
+            is_active: true,
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert_eq!(json["url"], "https://example.com/webhook");
+        assert!(json["is_active"].as_bool().unwrap());
+    }
+
+    #[test]
+    fn test_endpoint_info_no_description() {
+        let info = EndpointInfo {
+            id: Uuid::new_v4(),
+            url: "https://example.com".to_string(),
+            description: None,
+            is_active: false,
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert!(json["description"].is_null());
+        assert!(!json["is_active"].as_bool().unwrap());
+    }
+
+    // ── DeliveryPreview ─────────────────────────────────────
+
+    #[test]
+    fn test_delivery_preview_serialization() {
+        let preview = DeliveryPreview {
+            id: Uuid::new_v4(),
+            event: Some("order.created".to_string()),
+            status: "delivered".to_string(),
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+        let json = serde_json::to_value(&preview).unwrap();
+        assert_eq!(json["event"], "order.created");
+        assert_eq!(json["status"], "delivered");
+    }
+
+    #[test]
+    fn test_delivery_preview_no_event() {
+        let preview = DeliveryPreview {
+            id: Uuid::new_v4(),
+            event: None,
+            status: "failed".to_string(),
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+        let json = serde_json::to_value(&preview).unwrap();
+        assert!(json["event"].is_null());
+    }
+
+    // ── SamplePayload ───────────────────────────────────────
+
+    #[test]
+    fn test_sample_payload_serialization() {
+        let payload = SamplePayload {
+            name: "Order Created".to_string(),
+            event: "order.created".to_string(),
+            data: serde_json::json!({"order_id": "ord_123"}),
+        };
+        let json = serde_json::to_value(&payload).unwrap();
+        assert_eq!(json["name"], "Order Created");
+        assert_eq!(json["event"], "order.created");
+        assert_eq!(json["data"]["order_id"], "ord_123");
+    }
+
+    // ── TestWebhookRequest ──────────────────────────────────
+
+    #[test]
+    fn test_test_webhook_request_deserialization() {
+        let json = r#"{"endpoint_id":"11111111-1111-1111-1111-111111111111"}"#;
+        let req: TestWebhookRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            req.endpoint_id,
+            Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap()
+        );
+    }
+
+    // ── TestWebhookResponse ─────────────────────────────────
+
+    #[test]
+    fn test_test_webhook_response_serialization() {
+        let resp = TestWebhookResponse {
+            success: true,
+            status_code: 200,
+            response_body: "OK".to_string(),
+            duration_ms: 150,
+            endpoint_url: "https://example.com".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert!(json["success"].as_bool().unwrap());
+        assert_eq!(json["status_code"], 200);
+        assert_eq!(json["duration_ms"], 150);
+    }
+
+    #[test]
+    fn test_test_webhook_response_failure() {
+        let resp = TestWebhookResponse {
+            success: false,
+            status_code: 500,
+            response_body: "Internal Server Error".to_string(),
+            duration_ms: 5000,
+            endpoint_url: "https://broken.com".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert!(!json["success"].as_bool().unwrap());
+        assert_eq!(json["status_code"], 500);
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_playground_router_construction() {
+        let _router = router();
+    }
+}

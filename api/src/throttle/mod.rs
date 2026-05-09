@@ -190,3 +190,183 @@ pub async fn run_throttle_migration(pool: &PgPool) -> anyhow::Result<()> {
     tracing::info!("✅ Throttle migration completed");
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── ThrottleConfig::default ────────────────────────────────
+
+    #[test]
+    fn throttle_config_default() {
+        let config = ThrottleConfig::default();
+        assert!(config.rate.is_none());
+        assert_eq!(config.period_secs, 60);
+        assert!(matches!(config.strategy, ThrottleStrategy::SlidingWindow));
+    }
+
+    // ── ThrottleStrategy::default ──────────────────────────────
+
+    #[test]
+    fn throttle_strategy_default_is_sliding_window() {
+        let strategy = ThrottleStrategy::default();
+        assert!(matches!(strategy, ThrottleStrategy::SlidingWindow));
+    }
+
+    // ── ThrottleStrategy serde ─────────────────────────────────
+
+    #[test]
+    fn throttle_strategy_serialize() {
+        assert_eq!(
+            serde_json::to_string(&ThrottleStrategy::FixedWindow).unwrap(),
+            "\"fixed_window\""
+        );
+        assert_eq!(
+            serde_json::to_string(&ThrottleStrategy::SlidingWindow).unwrap(),
+            "\"sliding_window\""
+        );
+        assert_eq!(
+            serde_json::to_string(&ThrottleStrategy::TokenBucket).unwrap(),
+            "\"token_bucket\""
+        );
+    }
+
+    #[test]
+    fn throttle_strategy_deserialize() {
+        assert!(matches!(
+            serde_json::from_str::<ThrottleStrategy>("\"fixed_window\"").unwrap(),
+            ThrottleStrategy::FixedWindow
+        ));
+        assert!(matches!(
+            serde_json::from_str::<ThrottleStrategy>("\"sliding_window\"").unwrap(),
+            ThrottleStrategy::SlidingWindow
+        ));
+        assert!(matches!(
+            serde_json::from_str::<ThrottleStrategy>("\"token_bucket\"").unwrap(),
+            ThrottleStrategy::TokenBucket
+        ));
+    }
+
+    // ── ThrottleConfig serde ───────────────────────────────────
+
+    #[test]
+    fn throttle_config_serde_roundtrip() {
+        let config = ThrottleConfig {
+            rate: Some(100),
+            period_secs: 120,
+            strategy: ThrottleStrategy::TokenBucket,
+        };
+        let json = serde_json::to_string(&config).unwrap();
+        let deserialized: ThrottleConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.rate, Some(100));
+        assert_eq!(deserialized.period_secs, 120);
+        assert!(matches!(deserialized.strategy, ThrottleStrategy::TokenBucket));
+    }
+
+    // ── ThrottleManager::new ───────────────────────────────────
+
+    #[test]
+    fn throttle_manager_new() {
+        let manager = ThrottleManager::new();
+        // Just verify construction doesn't panic
+        drop(manager);
+    }
+
+    #[test]
+    fn throttle_manager_default() {
+        let manager = ThrottleManager::default();
+        drop(manager);
+    }
+
+    // ── ThrottleManager::check ─────────────────────────────────
+
+    #[tokio::test]
+    async fn check_allows_within_rate() {
+        let manager = ThrottleManager::new();
+        let endpoint_id = Uuid::new_v4();
+        assert!(manager.check(endpoint_id, 5, Duration::from_secs(60)).await);
+    }
+
+    #[tokio::test]
+    async fn check_blocks_at_rate_limit() {
+        let manager = ThrottleManager::new();
+        let endpoint_id = Uuid::new_v4();
+        for _ in 0..3 {
+            assert!(manager.check(endpoint_id, 3, Duration::from_secs(60)).await);
+        }
+        assert!(!manager.check(endpoint_id, 3, Duration::from_secs(60)).await);
+    }
+
+    #[tokio::test]
+    async fn check_different_endpoints_independent() {
+        let manager = ThrottleManager::new();
+        let ep1 = Uuid::new_v4();
+        let ep2 = Uuid::new_v4();
+
+        for _ in 0..3 {
+            manager.check(ep1, 3, Duration::from_secs(60)).await;
+        }
+        // ep1 at limit, ep2 should be fine
+        assert!(manager.check(ep2, 3, Duration::from_secs(60)).await);
+    }
+
+    #[tokio::test]
+    async fn check_window_expires() {
+        let manager = ThrottleManager::new();
+        let endpoint_id = Uuid::new_v4();
+        assert!(manager.check(endpoint_id, 2, Duration::from_secs(1)).await);
+        assert!(manager.check(endpoint_id, 2, Duration::from_secs(1)).await);
+        assert!(!manager.check(endpoint_id, 2, Duration::from_secs(1)).await);
+
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        assert!(manager.check(endpoint_id, 2, Duration::from_secs(1)).await);
+    }
+
+    #[tokio::test]
+    async fn check_rate_of_one() {
+        let manager = ThrottleManager::new();
+        let endpoint_id = Uuid::new_v4();
+        assert!(manager.check(endpoint_id, 1, Duration::from_secs(60)).await);
+        assert!(!manager.check(endpoint_id, 1, Duration::from_secs(60)).await);
+    }
+
+    // ── ThrottleManager::retry_after ───────────────────────────
+
+    #[tokio::test]
+    async fn retry_after_returns_default_when_not_throttled() {
+        let manager = ThrottleManager::new();
+        let endpoint_id = Uuid::new_v4();
+        let retry = manager.retry_after(endpoint_id, 5, Duration::from_secs(60)).await;
+        assert_eq!(retry, 1);
+    }
+
+    #[tokio::test]
+    async fn retry_after_returns_nonzero_when_throttled() {
+        let manager = ThrottleManager::new();
+        let endpoint_id = Uuid::new_v4();
+        for _ in 0..3 {
+            manager.check(endpoint_id, 3, Duration::from_secs(60)).await;
+        }
+        let retry = manager.retry_after(endpoint_id, 3, Duration::from_secs(60)).await;
+        assert!(retry > 0);
+    }
+
+    // ── ThrottleManager::check with zero rate ──────────────────
+
+    #[tokio::test]
+    async fn check_zero_rate_blocks_immediately() {
+        let manager = ThrottleManager::new();
+        let endpoint_id = Uuid::new_v4();
+        // rate=0: timestamps.len() (0) >= 0 is true → blocked
+        assert!(!manager.check(endpoint_id, 0, Duration::from_secs(60)).await);
+    }
+
+    // ── THROTTLE_MIGRATION constant ────────────────────────────
+
+    #[test]
+    fn throttle_migration_contains_expected_columns() {
+        assert!(THROTTLE_MIGRATION.contains("throttle_rate"));
+        assert!(THROTTLE_MIGRATION.contains("throttle_period_secs"));
+        assert!(THROTTLE_MIGRATION.contains("throttle_strategy"));
+    }
+}

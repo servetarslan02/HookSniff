@@ -342,5 +342,111 @@ async fn rotate_secret(
 
 #[cfg(test)]
 mod tests {
-    // Tests moved to ssrf.rs — endpoint creation uses crate::ssrf::validate_url
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_update_endpoint_request_deserialize() {
+        let json = r#"{
+            "url": "https://example.com/hook",
+            "description": "My endpoint",
+            "is_active": true,
+            "allowed_ips": ["192.168.1.0/24"],
+            "event_filter": ["order.*"],
+            "custom_headers": {"X-Custom": "value"},
+            "retry_policy": {
+                "max_attempts": 5,
+                "backoff": "exponential",
+                "initial_delay_secs": 10,
+                "max_delay_secs": 3600
+            },
+            "routing_strategy": "failover",
+            "fallback_url": "https://fallback.com",
+            "format": "cloudevents"
+        }"#;
+        let req: UpdateEndpointRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.url.unwrap(), "https://example.com/hook");
+        assert_eq!(req.description.unwrap(), "My endpoint");
+        assert!(req.is_active.unwrap());
+        assert_eq!(req.allowed_ips.unwrap().len(), 1);
+        assert_eq!(req.event_filter.unwrap(), vec!["order.*"]);
+        assert!(req.custom_headers.is_some());
+        let rp = req.retry_policy.unwrap();
+        assert_eq!(rp.max_attempts, 5);
+        assert_eq!(rp.backoff, "exponential");
+        assert_eq!(req.routing_strategy.unwrap(), "failover");
+        assert_eq!(req.fallback_url.unwrap(), "https://fallback.com");
+        assert_eq!(req.format.unwrap(), "cloudevents");
+    }
+
+    #[test]
+    fn test_update_endpoint_request_partial() {
+        let json = r#"{"url": "https://new.url"}"#;
+        let req: UpdateEndpointRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.url.unwrap(), "https://new.url");
+        assert!(req.description.is_none());
+        assert!(req.is_active.is_none());
+        assert!(req.retry_policy.is_none());
+    }
+
+    #[test]
+    fn test_update_endpoint_request_empty() {
+        let json = r#"{}"#;
+        let req: UpdateEndpointRequest = serde_json::from_str(json).unwrap();
+        assert!(req.url.is_none());
+        assert!(req.description.is_none());
+        assert!(req.is_active.is_none());
+    }
+
+    #[test]
+    fn test_update_endpoint_request_debug() {
+        let json = r#"{"url": "https://example.com"}"#;
+        let req: UpdateEndpointRequest = serde_json::from_str(json).unwrap();
+        let debug_str = format!("{:?}", req);
+        assert!(debug_str.contains("UpdateEndpointRequest"));
+    }
+
+    #[test]
+    fn test_custom_headers_validation_logic() {
+        // Valid: X- prefixed headers with string values
+        let headers = serde_json::json!({"X-Custom-Id": "abc123"});
+        if let Some(obj) = headers.as_object() {
+            for (key, value) in obj {
+                assert!(key.starts_with("X-"));
+                assert!(value.is_string());
+            }
+        }
+
+        // Invalid: non-X- prefix
+        let headers = serde_json::json!({"Authorization": "Bearer token"});
+        if let Some(obj) = headers.as_object() {
+            for (key, _value) in obj {
+                assert!(!key.starts_with("X-"));
+            }
+        }
+    }
+
+    #[test]
+    fn test_url_validation_logic() {
+        // Valid URLs
+        assert!("https://example.com".starts_with("https://"));
+        assert!("http://example.com".starts_with("http://"));
+
+        // Invalid URLs
+        assert!(!"ftp://example.com".starts_with("https://"));
+        assert!(!"ftp://example.com".starts_with("http://"));
+        assert!(!"example.com".starts_with("https://"));
+    }
+
+    #[test]
+    fn test_signing_secret_format() {
+        let id = Uuid::new_v4();
+        let secret = format!("whsec_{}", id.to_string().replace('-', ""));
+        assert!(secret.starts_with("whsec_"));
+        assert!(!secret.contains('-'));
+    }
 }

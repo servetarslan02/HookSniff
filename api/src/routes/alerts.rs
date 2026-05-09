@@ -182,3 +182,99 @@ async fn test_alert(
         "message": "Test alert sent. Check your notification channels."
     })))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── AlertRule ───────────────────────────────────────────
+
+    #[test]
+    fn test_alert_rule_serialization() {
+        let rule = AlertRule {
+            id: Uuid::new_v4(),
+            name: "High failure rate".to_string(),
+            condition: "failure_rate".to_string(),
+            threshold: 5,
+            channels: vec!["slack".to_string(), "email".to_string()],
+            is_active: true,
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+        let json = serde_json::to_value(&rule).unwrap();
+        assert_eq!(json["name"], "High failure rate");
+        assert_eq!(json["condition"], "failure_rate");
+        assert_eq!(json["threshold"], 5);
+        assert!(json["is_active"].as_bool().unwrap());
+        let channels = json["channels"].as_array().unwrap();
+        assert_eq!(channels.len(), 2);
+        assert_eq!(channels[0], "slack");
+        assert_eq!(channels[1], "email");
+    }
+
+    #[test]
+    fn test_alert_rule_inactive() {
+        let rule = AlertRule {
+            id: Uuid::new_v4(),
+            name: "Latency alert".to_string(),
+            condition: "latency".to_string(),
+            threshold: 5000,
+            channels: vec!["webhook".to_string()],
+            is_active: false,
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+        let json = serde_json::to_value(&rule).unwrap();
+        assert!(!json["is_active"].as_bool().unwrap());
+    }
+
+    // ── CreateAlertRequest ──────────────────────────────────
+
+    #[test]
+    fn test_create_alert_request_deserialization() {
+        let json = r#"{
+            "name":"High failure rate",
+            "condition":"failure_rate",
+            "threshold":5,
+            "channels":["slack","email"],
+            "_endpoint_id":null
+        }"#;
+        let req: CreateAlertRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.name, "High failure rate");
+        assert_eq!(req.condition, "failure_rate");
+        assert_eq!(req.threshold, 5);
+        assert_eq!(req.channels, vec!["slack", "email"]);
+        assert!(req._endpoint_id.is_none());
+    }
+
+    #[test]
+    fn test_create_alert_request_with_endpoint_id() {
+        let json = r#"{
+            "name":"Endpoint latency",
+            "condition":"latency",
+            "threshold":3000,
+            "channels":["webhook"],
+            "_endpoint_id":"11111111-1111-1111-1111-111111111111"
+        }"#;
+        let req: CreateAlertRequest = serde_json::from_str(json).unwrap();
+        assert!(req._endpoint_id.is_some());
+    }
+
+    #[test]
+    fn test_create_alert_request_consecutive_failures() {
+        let json = r#"{
+            "name":"Consecutive failures",
+            "condition":"consecutive_failures",
+            "threshold":3,
+            "channels":["email"]
+        }"#;
+        let req: CreateAlertRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.condition, "consecutive_failures");
+        assert_eq!(req.threshold, 3);
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_alerts_router_construction() {
+        let _router = router();
+    }
+}

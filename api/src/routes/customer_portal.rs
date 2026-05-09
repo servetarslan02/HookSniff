@@ -335,3 +335,95 @@ async fn update_notifications(
         }
     })))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── ProfileResponse ─────────────────────────────────────
+
+    #[test]
+    fn test_profile_response_serialization() {
+        let resp = ProfileResponse {
+            id: Uuid::new_v4(),
+            email: "user@test.com".to_string(),
+            plan: "pro".to_string(),
+            webhook_limit: 50_000,
+            webhook_count: 100,
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["email"], "user@test.com");
+        assert_eq!(json["plan"], "pro");
+        assert_eq!(json["webhook_limit"], 50_000);
+        assert_eq!(json["webhook_count"], 100);
+    }
+
+    // ── UpdateProfileRequest ────────────────────────────────
+
+    #[test]
+    fn test_update_profile_request_with_email() {
+        let json = r#"{"email":"new@test.com"}"#;
+        let req: UpdateProfileRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.email, Some("new@test.com".to_string()));
+    }
+
+    #[test]
+    fn test_update_profile_request_empty() {
+        let json = r#"{}"#;
+        let req: UpdateProfileRequest = serde_json::from_str(json).unwrap();
+        assert!(req.email.is_none());
+    }
+
+    // ── ApiKeyInfo ──────────────────────────────────────────
+
+    #[test]
+    fn test_api_key_info_serialization() {
+        let info = ApiKeyInfo {
+            id: "key_123".to_string(),
+            prefix: "hr_live_abc...".to_string(),
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+            last_used_at: Some("2024-06-01T12:00:00Z".to_string()),
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert_eq!(json["prefix"], "hr_live_abc...");
+        assert_eq!(json["last_used_at"], "2024-06-01T12:00:00Z");
+    }
+
+    #[test]
+    fn test_api_key_info_no_last_used() {
+        let info = ApiKeyInfo {
+            id: "key_456".to_string(),
+            prefix: "hr_live_xyz...".to_string(),
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+            last_used_at: None,
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert!(json["last_used_at"].is_null());
+    }
+
+    // ── UsageResponse ───────────────────────────────────────
+
+    #[test]
+    fn test_portal_usage_response_serialization() {
+        let resp = UsageResponse {
+            webhooks_today: 42,
+            webhook_limit: 1000,
+            endpoints_count: 5,
+            success_rate: 99.5,
+            plan: "pro".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["webhooks_today"], 42);
+        assert_eq!(json["webhook_limit"], 1000);
+        assert_eq!(json["success_rate"], 99.5);
+        assert_eq!(json["plan"], "pro");
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_customer_portal_router_construction() {
+        let _router = router();
+    }
+}

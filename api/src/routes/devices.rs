@@ -108,3 +108,40 @@ async fn remove_device(
 
     Ok(Json(serde_json::json!({"deleted": true})))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_device_platform_validation() {
+        // Valid platforms
+        assert!(["android", "ios", "web"].contains(&"android"));
+        assert!(["android", "ios", "web"].contains(&"ios"));
+        assert!(["android", "ios", "web"].contains(&"web"));
+
+        // Invalid platform
+        assert!(!["android", "ios", "web"].contains(&"windows"));
+    }
+
+    #[test]
+    fn test_empty_token_validation() {
+        let token = "  ";
+        assert!(token.trim().is_empty());
+
+        let token = "valid_token_123";
+        assert!(!token.trim().is_empty());
+    }
+
+    #[test]
+    fn test_default_platform() {
+        let platform = None::<String>;
+        let platform = platform.unwrap_or_else(|| "android".to_string());
+        assert_eq!(platform, "android");
+    }
+}

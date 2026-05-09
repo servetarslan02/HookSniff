@@ -584,3 +584,300 @@ async fn notify_sdk_update(
         "updates_count": req.updates.len(),
     })))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::{TimeZone, Utc};
+
+    // ── PaginationParams ────────────────────────────────────
+
+    #[test]
+    fn test_pagination_params_all_none() {
+        let json = r#"{}"#;
+        let params: PaginationParams = serde_json::from_str(json).unwrap();
+        assert!(params.page.is_none());
+        assert!(params.per_page.is_none());
+        assert!(params.search.is_none());
+        assert!(params.plan.is_none());
+        assert!(params.status.is_none());
+    }
+
+    #[test]
+    fn test_pagination_params_all_some() {
+        let json = r#"{"page":2,"per_page":50,"search":"test","plan":"pro","status":"active"}"#;
+        let params: PaginationParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.page, Some(2));
+        assert_eq!(params.per_page, Some(50));
+        assert_eq!(params.search, Some("test".to_string()));
+        assert_eq!(params.plan, Some("pro".to_string()));
+        assert_eq!(params.status, Some("active".to_string()));
+    }
+
+    // ── PlanRequest ─────────────────────────────────────────
+
+    #[test]
+    fn test_plan_request_deserialization() {
+        let json = r#"{"plan":"pro"}"#;
+        let req: PlanRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.plan, "pro");
+    }
+
+    // ── StatusRequest ───────────────────────────────────────
+
+    #[test]
+    fn test_status_request_deserialization() {
+        let json_true = r#"{"is_active":true}"#;
+        let req: StatusRequest = serde_json::from_str(json_true).unwrap();
+        assert!(req.is_active);
+
+        let json_false = r#"{"is_active":false}"#;
+        let req: StatusRequest = serde_json::from_str(json_false).unwrap();
+        assert!(!req.is_active);
+    }
+
+    // ── SdkUpdateRequest / SdkUpdateItem ────────────────────
+
+    #[test]
+    fn test_sdk_update_request_deserialization() {
+        let json = r#"{
+            "updates": [
+                {"sdk": "python", "local_version": "1.0.0", "published_version": "1.1.0"},
+                {"sdk": "node", "local_version": "2.0.0", "published_version": "2.1.0"}
+            ]
+        }"#;
+        let req: SdkUpdateRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.updates.len(), 2);
+        assert_eq!(req.updates[0].sdk, "python");
+        assert_eq!(req.updates[0].local_version, "1.0.0");
+        assert_eq!(req.updates[0].published_version, "1.1.0");
+        assert_eq!(req.updates[1].sdk, "node");
+    }
+
+    #[test]
+    fn test_sdk_update_item_deserialization() {
+        let json = r#"{"sdk":"rust","local_version":"0.1.0","published_version":"0.2.0"}"#;
+        let item: SdkUpdateItem = serde_json::from_str(json).unwrap();
+        assert_eq!(item.sdk, "rust");
+    }
+
+    #[test]
+    fn test_sdk_update_request_empty() {
+        let json = r#"{"updates":[]}"#;
+        let req: SdkUpdateRequest = serde_json::from_str(json).unwrap();
+        assert!(req.updates.is_empty());
+    }
+
+    // ── UserSummary ─────────────────────────────────────────
+
+    #[test]
+    fn test_user_summary_serialization() {
+        let user = UserSummary {
+            id: Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap(),
+            email: "test@example.com".to_string(),
+            name: Some("Test User".to_string()),
+            plan: "pro".to_string(),
+            is_active: true,
+            is_admin: false,
+            created_at: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
+        };
+        let json = serde_json::to_value(&user).unwrap();
+        assert_eq!(json["email"], "test@example.com");
+        assert_eq!(json["plan"], "pro");
+        assert_eq!(json["status"], "active");
+        assert!(!json["is_admin"].as_bool().unwrap());
+    }
+
+    #[test]
+    fn test_user_summary_banned_status() {
+        let user = UserSummary {
+            id: Uuid::new_v4(),
+            email: "banned@x.com".to_string(),
+            name: None,
+            plan: "free".to_string(),
+            is_active: false,
+            is_admin: false,
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&user).unwrap();
+        assert_eq!(json["status"], "banned");
+    }
+
+    // ── PaginatedUsers ──────────────────────────────────────
+
+    #[test]
+    fn test_paginated_users_serialization() {
+        let resp = PaginatedUsers {
+            users: vec![],
+            total: 0,
+            page: 1,
+            per_page: 20,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["total"], 0);
+        assert_eq!(json["page"], 1);
+        assert_eq!(json["per_page"], 20);
+        assert!(json["users"].as_array().unwrap().is_empty());
+    }
+
+    // ── EndpointSummary ─────────────────────────────────────
+
+    #[test]
+    fn test_endpoint_summary_serialization() {
+        let ep = EndpointSummary {
+            id: Uuid::new_v4(),
+            url: "https://example.com/webhook".to_string(),
+            description: Some("Main endpoint".to_string()),
+            is_active: true,
+        };
+        let json = serde_json::to_value(&ep).unwrap();
+        assert_eq!(json["url"], "https://example.com/webhook");
+        assert!(json["is_active"].as_bool().unwrap());
+    }
+
+    // ── DeliverySummary ─────────────────────────────────────
+
+    #[test]
+    fn test_delivery_summary_serialization() {
+        let d = DeliverySummary {
+            id: Uuid::new_v4(),
+            endpoint_id: Uuid::new_v4(),
+            status: "delivered".to_string(),
+            event_type: Some("order.created".to_string()),
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&d).unwrap();
+        assert_eq!(json["status"], "delivered");
+        assert_eq!(json["event_type"], "order.created");
+    }
+
+    // ── UsageStats ──────────────────────────────────────────
+
+    #[test]
+    fn test_usage_stats_serialization() {
+        let stats = UsageStats {
+            total_deliveries: 1000,
+            success_rate: 98.5,
+            endpoints_count: 5,
+        };
+        let json = serde_json::to_value(&stats).unwrap();
+        assert_eq!(json["total_deliveries"], 1000);
+        assert_eq!(json["success_rate"], 98.5);
+        assert_eq!(json["endpoints_count"], 5);
+    }
+
+    // ── SystemStats ─────────────────────────────────────────
+
+    #[test]
+    fn test_system_stats_serialization() {
+        let stats = SystemStats {
+            total_users: 500,
+            total_deliveries: 10000,
+            total_revenue: 25000.0,
+            active_users_today: 50,
+            users_by_plan: vec![],
+            recent_signups: vec![],
+        };
+        let json = serde_json::to_value(&stats).unwrap();
+        assert_eq!(json["total_users"], 500);
+        assert_eq!(json["total_revenue"], 25000.0);
+    }
+
+    // ── PlanCount ───────────────────────────────────────────
+
+    #[test]
+    fn test_plan_count_serialization() {
+        let pc = PlanCount {
+            plan: "pro".to_string(),
+            count: 42,
+        };
+        let json = serde_json::to_value(&pc).unwrap();
+        assert_eq!(json["plan"], "pro");
+        assert_eq!(json["count"], 42);
+    }
+
+    // ── RecentSignup ────────────────────────────────────────
+
+    #[test]
+    fn test_recent_signup_serialization() {
+        let signup = RecentSignup {
+            id: Uuid::new_v4(),
+            email: "new@user.com".to_string(),
+            name: Some("New User".to_string()),
+            plan: "free".to_string(),
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&signup).unwrap();
+        assert_eq!(json["email"], "new@user.com");
+        assert_eq!(json["plan"], "free");
+    }
+
+    // ── RevenueRow ──────────────────────────────────────────
+
+    #[test]
+    fn test_revenue_row_serialization() {
+        let row = RevenueRow {
+            month: "2024-01".to_string(),
+            revenue: 5000.0,
+        };
+        let json = serde_json::to_value(&row).unwrap();
+        assert_eq!(json["month"], "2024-01");
+        assert_eq!(json["revenue"], 5000.0);
+    }
+
+    // ── UserDetailResponse ──────────────────────────────────
+
+    #[test]
+    fn test_user_detail_response_serialization() {
+        let resp = UserDetailResponse {
+            user: UserSummary {
+                id: Uuid::new_v4(),
+                email: "a@b.com".to_string(),
+                name: None,
+                plan: "free".to_string(),
+                is_active: true,
+                is_admin: false,
+                created_at: Utc::now(),
+            },
+            endpoints: vec![],
+            recent_deliveries: vec![],
+            usage_stats: UsageStats {
+                total_deliveries: 0,
+                success_rate: 100.0,
+                endpoints_count: 0,
+            },
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert!(json.get("user").is_some());
+        assert!(json.get("usage_stats").is_some());
+    }
+
+    // ── UserDetail ──────────────────────────────────────────
+
+    #[test]
+    fn test_user_detail_serialization() {
+        let detail = UserDetail {
+            id: Uuid::new_v4(),
+            email: "admin@x.com".to_string(),
+            name: Some("Admin".to_string()),
+            plan: "business".to_string(),
+            is_active: true,
+            is_admin: true,
+            webhook_limit: 500_000,
+            webhook_count: 1234,
+            created_at: Utc::now(),
+            endpoints: vec![],
+            recent_deliveries: vec![],
+        };
+        let json = serde_json::to_value(&detail).unwrap();
+        assert_eq!(json["webhook_limit"], 500_000);
+        assert_eq!(json["webhook_count"], 1234);
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_admin_router_construction() {
+        let _router = router();
+    }
+}

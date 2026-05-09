@@ -157,3 +157,77 @@ pub async fn notify_delivery_success(
     });
     notify_customer(pool, fcm, customer_id, title, body, Some(data)).await;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── FcmMessage serialization ───────────────────────────────
+
+    #[test]
+    fn fcm_message_serializes_correctly() {
+        let msg = FcmMessage {
+            to: "device_token_123",
+            notification: FcmNotification {
+                title: "Test Title",
+                body: "Test Body",
+            },
+            data: None,
+        };
+        let json = serde_json::to_string(&msg).unwrap();
+        assert!(json.contains("device_token_123"));
+        assert!(json.contains("Test Title"));
+        assert!(json.contains("Test Body"));
+    }
+
+    #[test]
+    fn fcm_message_with_data_serializes() {
+        let msg = FcmMessage {
+            to: "token",
+            notification: FcmNotification {
+                title: "Title",
+                body: "Body",
+            },
+            data: Some(serde_json::json!({"key": "value"})),
+        };
+        let json = serde_json::to_string(&msg).unwrap();
+        assert!(json.contains("\"key\""));
+        assert!(json.contains("\"value\""));
+    }
+
+    // ── FcmNotification serialization ──────────────────────────
+
+    #[test]
+    fn fcm_notification_serializes() {
+        let notif = FcmNotification {
+            title: "Hello",
+            body: "World",
+        };
+        let json = serde_json::to_string(&notif).unwrap();
+        assert_eq!(json, r#"{"title":"Hello","body":"World"}"#);
+    }
+
+    // ── notify_delivery_failed data format ─────────────────────
+
+    #[test]
+    fn delivery_failed_data_format() {
+        let data = serde_json::json!({
+            "type": "delivery_failed",
+            "endpoint_name": "my-endpoint",
+        });
+        assert_eq!(data["type"], "delivery_failed");
+        assert_eq!(data["endpoint_name"], "my-endpoint");
+    }
+
+    // ── notify_delivery_success data format ────────────────────
+
+    #[test]
+    fn delivery_success_data_format() {
+        let data = serde_json::json!({
+            "type": "delivery_success",
+            "endpoint_name": "my-endpoint",
+        });
+        assert_eq!(data["type"], "delivery_success");
+        assert_eq!(data["endpoint_name"], "my-endpoint");
+    }
+}

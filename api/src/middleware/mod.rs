@@ -282,11 +282,29 @@ pub fn extract_refresh_token(req: &axum::extract::Request) -> Option<String> {
 mod tests {
     use super::*;
 
+    // ── generate_api_key ──────────────────────────────────────
+
     #[test]
     fn test_api_key_generation() {
         let key = generate_api_key();
         assert!(key.starts_with("hr_live_"));
     }
+
+    #[test]
+    fn test_api_key_unique() {
+        let k1 = generate_api_key();
+        let k2 = generate_api_key();
+        assert_ne!(k1, k2);
+    }
+
+    #[test]
+    fn test_api_key_length() {
+        let key = generate_api_key();
+        // hr_live_ (8) + 48 hex chars = 56
+        assert!(key.len() >= 50);
+    }
+
+    // ── generate_test_api_key ─────────────────────────────────
 
     #[test]
     fn test_test_api_key_generation() {
@@ -295,10 +313,116 @@ mod tests {
     }
 
     #[test]
+    fn test_test_api_key_unique() {
+        let k1 = generate_test_api_key();
+        let k2 = generate_test_api_key();
+        assert_ne!(k1, k2);
+    }
+
+    // ── hash_api_key / verify_api_key ─────────────────────────
+
+    #[test]
     fn test_api_key_hashing_and_verification() {
         let key = "hr_live_test123";
         let hash = hash_api_key(key);
         assert!(verify_api_key(key, &hash));
         assert!(!verify_api_key("hr_live_wrong", &hash));
+    }
+
+    #[test]
+    fn test_api_key_hash_deterministic() {
+        let key = "hr_live_same";
+        let h1 = hash_api_key(key);
+        let h2 = hash_api_key(key);
+        assert_eq!(h1, h2);
+    }
+
+    #[test]
+    fn test_api_key_different_keys_different_hashes() {
+        let h1 = hash_api_key("hr_live_aaa");
+        let h2 = hash_api_key("hr_live_bbb");
+        assert_ne!(h1, h2);
+    }
+
+    #[test]
+    fn test_api_key_empty_key() {
+        let hash = hash_api_key("");
+        assert!(verify_api_key("", &hash));
+        assert!(!verify_api_key("not-empty", &hash));
+    }
+
+    #[test]
+    fn test_api_key_verify_wrong_hash_format() {
+        assert!(!verify_api_key("key", "not-a-valid-hash"));
+    }
+
+    // ── cookie functions ──────────────────────────────────────
+
+    #[test]
+    fn test_create_auth_cookie_contains_token() {
+        let cookie = create_auth_cookie("my-token", 3600);
+        assert!(cookie.contains("my-token"));
+        assert!(cookie.contains("auth_token"));
+        assert!(cookie.contains("HttpOnly"));
+    }
+
+    #[test]
+    fn test_create_auth_cookie_max_age() {
+        let cookie = create_auth_cookie("tok", 7200);
+        assert!(cookie.contains("Max-Age=7200"));
+    }
+
+    #[test]
+    fn test_clear_auth_cookie() {
+        let cookie = clear_auth_cookie();
+        assert!(cookie.contains("auth_token"));
+        assert!(cookie.contains("Max-Age=0"));
+    }
+
+    #[test]
+    fn test_create_refresh_token_cookie() {
+        let cookie = create_refresh_token_cookie("refresh-tok", 86400);
+        assert!(cookie.contains("refresh-tok"));
+        assert!(cookie.contains("refresh_token"));
+        assert!(cookie.contains("HttpOnly"));
+    }
+
+    #[test]
+    fn test_clear_refresh_token_cookie() {
+        let cookie = clear_refresh_token_cookie();
+        assert!(cookie.contains("refresh_token"));
+        assert!(cookie.contains("Max-Age=0"));
+    }
+
+    #[test]
+    fn test_auth_cookie_is_secure() {
+        let cookie = create_auth_cookie("tok", 3600);
+        assert!(cookie.contains("Secure"));
+        assert!(cookie.contains("SameSite"));
+    }
+
+    // ── IsTestKey ─────────────────────────────────────────────
+
+    #[test]
+    fn test_is_test_key_true() {
+        let key = IsTestKey(true);
+        assert!(key.0);
+    }
+
+    #[test]
+    fn test_is_test_key_false() {
+        let key = IsTestKey(false);
+        assert!(!key.0);
+    }
+
+    // ── extract_refresh_token ─────────────────────────────────
+
+    #[test]
+    fn test_extract_refresh_token_none_when_no_cookie() {
+        let req = axum::extract::Request::builder()
+            .uri("/")
+            .body(axum::body::Body::empty())
+            .unwrap();
+        assert!(extract_refresh_token(&req).is_none());
     }
 }
