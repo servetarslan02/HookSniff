@@ -15,7 +15,7 @@ Every webhook delivery includes these headers:
 | `webhook-signature` | `v1,<base64(hmac)>` signature |
 
 Legacy headers are also included for backward compatibility:
-- `X-HookSniff-Signature`: `sha256=<hex(hmac)>`
+- Legacy header — use Standard Webhooks headers instead
 - `X-HookSniff-Delivery-Id`: Same as `webhook-id`
 - `X-HookSniff-Delivery-Attempt`: Attempt number
 

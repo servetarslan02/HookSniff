@@ -740,7 +740,7 @@ When HookSniff delivers a webhook to your endpoint:
 ```http
 POST https://myapp.com/webhook HTTP/1.1
 Content-Type: application/json
-X-HookSniff-Signature: sha256=abc123def456...
+webhook-signature: v1,<base64(hmac)>
 X-HookSniff-Delivery-Id: wh_xyz789
 X-HookSniff-Attempt: 1
 
@@ -756,7 +756,7 @@ X-HookSniff-Attempt: 1
 
 ### Signature Verification
 
-Verify the `X-HookSniff-Signature` header using HMAC-SHA256:
+Verify the `webhook-signature` header using Standard Webhooks HMAC-SHA256:
 
 ```javascript
 const crypto = require('crypto');

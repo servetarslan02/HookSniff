@@ -70,7 +70,7 @@ curl -X POST http://localhost:3000/v1/auth/register \
 
 ```env
 # Veritabanı (Docker PostgreSQL kullanıyorsanız değişmeyin)
-DATABASE_URL=postgresql://hookrelay:hookrelay@postgres:5432/hookrelay
+DATABASE_URL=postgresql://hooksniff:hooksniff@postgres:5432/hooksniff
 
 # Redis (Docker Redis kullanıyorsanız değişmeyin)
 REDIS_URL=redis://redis:6379
@@ -203,5 +203,5 @@ docker compose up -d
 make self-host-backup
 
 # Geri yükle
-docker compose exec -T postgres psql -U hookrelay -d hookrelay < backups/hooksniff_20240101_120000.sql
+docker compose exec -T postgres psql -U hooksniff -d hooksniff < backups/hooksniff_20240101_120000.sql
 ```

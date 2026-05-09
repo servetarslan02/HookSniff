@@ -5,14 +5,14 @@
 Sign up at [hooksniff.vercel.app](https://hooksniff.vercel.app) and get your API key.
 
 ```bash
-export HOOKRELAY_KEY="hr_live_your_key_here"
+export HOOKSNIFF_KEY="hr_live_your_key_here"
 ```
 
 ## 2. Create an Endpoint
 
 ```bash
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
-  -H "Authorization: Bearer $HOOKRELAY_KEY" \
+  -H "Authorization: Bearer $HOOKSNIFF_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://myapp.com/webhook"}'
 ```
@@ -23,7 +23,7 @@ Save the returned `id`.
 
 ```bash
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
-  -H "Authorization: Bearer $HOOKRELAY_KEY" \
+  -H "Authorization: Bearer $HOOKSNIFF_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "endpoint_id": "ep_YOUR_ENDPOINT_ID",
@@ -36,27 +36,44 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
 
 ```bash
 curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/YOUR_DELIVERY_ID \
-  -H "Authorization: Bearer $HOOKRELAY_KEY"
+  -H "Authorization: Bearer $HOOKSNIFF_KEY"
 ```
 
 ## 5. Verify Signatures (Recommended)
 
-In your webhook handler, verify the `X-HookSniff-Signature` header:
+HookSniff uses [Standard Webhooks](https://www.standardwebhooks.com/) signatures. Verify the `webhook-signature` header:
 
 ```javascript
 const crypto = require('crypto');
 
 app.post('/webhook', (req, res) => {
-  const signature = req.headers['x-hooksniff-signature'];
+  const msgId = req.headers['webhook-id'];
+  const timestamp = req.headers['webhook-timestamp'];
+  const signature = req.headers['webhook-signature'];
   const secret = 'whsec_your_endpoint_secret';
 
-  const expected = 'sha256=' + crypto
-    .createHmac('sha256', secret)
-    .update(JSON.stringify(req.body))
-    .digest('hex');
+  // Decode secret
+  const secretBytes = Buffer.from(secret.replace('whsec_', ''), 'base64');
 
-  if (signature !== expected) {
+  // Compute expected signature
+  const signedContent = `${msgId}.${timestamp}.${JSON.stringify(req.body)}`;
+  const expected = 'v1,' + crypto
+    .createHmac('sha256', secretBytes)
+    .update(signedContent)
+    .digest('base64');
+
+  // Verify signature (may have multiple, space-separated)
+  const sigs = signature.split(' ');
+  const valid = sigs.some(sig => sig === expected);
+
+  if (!valid) {
     return res.status(401).send('Invalid signature');
+  }
+
+  // Check timestamp (reject if older than 5 minutes)
+  const age = Math.abs(Date.now() / 1000 - parseInt(timestamp));
+  if (age > 300) {
+    return res.status(401).send('Timestamp expired');
   }
 
   // Process webhook
