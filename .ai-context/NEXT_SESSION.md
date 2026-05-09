@@ -1,33 +1,24 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 07:01 GMT+8
+> Son güncelleme: 2026-05-10 07:05 GMT+8
 
 ---
 
 ## ✅ BU OTURUMDA YAPILAN (Tümü Tamamlandı)
 
-### Backend Endpoints (7 endpoint)
-- OAuth (Google + GitHub), Audit Log, SSO, Custom Domains, Portal Config, Rate Limits
-- Migration 038: 5 yeni tablo (Neon DB'de çalıştırıldı ✅)
-- 6 yeni Rust dosyası + 1 migration SQL
+### Session 67 — Redis TLS Fix
+- **Redis TLS desteği eklendi** (`api/Cargo.toml`)
+  - `tls-rustls` feature eklendi → Upstash Redis TLS bağlantısı artık çalışmalı
+  - Commit: `4373437`
+  - Push edildi ✅
 
-### Dashboard → API Entegrasyonu (7 sayfa)
-- Login OAuth butonları, SSO, Custom Domain, Portal, Rate Limiting, Retry Policy, Audit Log
-- localStorage fallback'ları kaldırıldı, gerçek API'ye bağlandı
-- OAuth callback sayfası oluşturuldu
+### Dashboard Build Kontrol
+- `npm run build` → ✅ 0 hata, 0 uyarı
+- Tüm sayfalar derleniyor (800+ static page)
 
-### OAuth Kurulumu (Google + GitHub)
-- **Google OAuth:** Client ID `REDACTED_GOOGLE_CLIENT_ID`
-  - Redirect URI eklendi ✅
-  - Client Secret: `REDACTED_GOOGLE_CLIENT_SECRET`
-- **GitHub OAuth:** Client ID `REDACTED_GITHUB_CLIENT_ID`
-  - Client Secret: `REDACTED_GITHUB_CLIENT_SECRET`
-  - Redirect URI eklendi ✅
-
-### Deploy
-- Cloud Build: `rust:1-bookworm` GLIBC fix ✅
-- Cloud Run: Tüm env var'lar ayarlandı ✅
-- API Live: `https://hooksniff-api-1046140057667.europe-west1.run.app`
+### API Durumu
+- Health check: ✅ 200 (database healthy, 33ms latency)
+- API live: `https://hooksniff-api-1046140057667.europe-west1.run.app`
 
 ---
 
@@ -35,10 +26,10 @@
 
 | # | Görev | Öncelik | Not |
 |---|-------|---------|-----|
-| 1 | OAuth test | 🔴 | Login sayfasından Google/GitHub OAuth dene |
-| 2 | Redis TLS fix | 🔴 | Upstash Redis TLS hatası var |
-| 3 | Vercel dashboard rebuild | 🔴 | Yeni dashboard kodunu deploy et |
-| 4 | Token rotation | ⚠️ | GitHub PAT, npm, GCP SA key rotate et |
+| 1 | OAuth test | 🔴 | Login sayfasından Google/GitHub OAuth dene (Servet) |
+| 2 | Vercel dashboard rebuild | 🔴 | GitHub push → Vercel otomatik deploy olmalı, kontrol et (Servet) |
+| 3 | Token rotation | ⚠️ | GitHub PAT, npm, GCP SA key rotate et (Servet) |
+| 4 | Redis REDIS_URL kontrol | ⚠️ | Upstash URL `rediss://` ile başlıyor mu? Cloud Run env var'da kontrol et (Servet) |
 
 ---
 
