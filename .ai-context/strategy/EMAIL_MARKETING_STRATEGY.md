@@ -1,7 +1,7 @@
 # HookSniff — E-posta Pazarlama Stratejisi
 
 > Oluşturma: 2026-05-10
-> Son güncelleme: 2026-05-10 (Doğrulandı)
+> Son güncelleme: 2026-05-10 (Doğrulandı — ikinci revizyon)
 > Durum: Taslak
 > Kaynaklar: Postmark pricing (doğrulanmış), Resend pricing (doğrulanmış), Knock 11 Email Services 2026, Folderly Tech Email Benchmarks 2025, Oliver Munro SaaS Marketing Stats 2026, ActiveCampaign Benchmarks 2026
 
@@ -37,10 +37,10 @@
 ### Neden E-posta Pazarlama Kritik?
 
 Kaynak: Oliver Munro SaaS Marketing Stats 2026:
-- **E-posta pazarlama ROI'si: 3,600-4,000%** — her £1 için £36-40 getiri
-- **Organik arama B2B gelirinin %44.6'sını** oluşturuyor — e-posta bunu besler
-- **Freemium-to-paid conversion (organik): %2.6** — e-posta bu oranı artırabilir
-- **B2B SaaS churn: %3.5/yıl** — e-posta ile churn azaltılabilir
+- **E-posta pazarlama ROI'si: $42:$1** — her $1 için $42 getiri (Genesys Growth 2026, doğrulanmış)
+- **Organik arama B2B gelirinin %44.6'sını** oluşturuyor (Oliver Munro 2026, doğrulanmış)
+- **Software sektörü email open rate: %36.20-%39.31** (ActiveCampaign + MailerLite 2025, doğrulanmış)
+- **E-posta maliyeti: Geleneksel pazarlamadan %62 daha ucuz** (Genesys Growth 2026, doğrulanmış)
 
 ---
 
@@ -291,31 +291,96 @@ Hemen upgrade et → {dashboard_url}/billing
 
 ## 7. Benchmark'lar
 
-### Sektör Benchmark'ları (Doğrulanmış)
+### Sektör Benchmark'ları (Doğrulanmış — Tam Sayfa Çekilmiş)
 
-Kaynak: Folderly Tech Industry Email Benchmarks 2025, ActiveCampaign 2026, Oliver Munro 2026
+#### ActiveCampaign 2026 Benchmarks (Doğrulanmış)
 
-| Metrik | Developer Tools Ortalaması | SaaS Ortalaması | HookSniff Hedefi |
-|--------|---------------------------|-----------------|-----------------|
-| Open rate | **%26.3** | %21.5 | >%25 |
-| Click rate | **%6.21** | %3.5 | >%5 |
-| Unsubscribe rate | %0.3 | %0.5 | <%0.3 |
-| Bounce rate | %1.5 | %2.0 | <%1.5 |
-| Spam complaint | %0.05 | %0.1 | <%0.05 |
-| Conversion (email → signup) | %2.1 | %1.5 | >%2 |
+Kaynak: ActiveCampaign — 2025 yılı müşteri verileri analizi (Jan 1 - Dec 10, 2025)
+URL: https://www.activecampaign.com/blog/activecampaign-email-benchmarks
+
+| Sektör | Open Rate | Click Rate |
+|--------|-----------|------------|
+| Media / Publishing | 43.16% | 7.32% |
+| Non-profit | 42.68% | 5.51% |
+| Blogger / Author | 41.99% | 7.73% |
+| Healthcare | 41.48% | 5.64% |
+| Travel / Hospitality | 40.87% | 5.28% |
+| Fitness / Nutrition | 40.60% | 5.49% |
+| Real Estate | 39.87% | 5.42% |
+| Consulting / Agency | 39.08% | 7.05% |
+| Online Training / Education | 39.06% | 6.38% |
+| Entertainment / Events | 38.17% | 5.32% |
+| Accounting / Financial | 37.74% | 4.40% |
+| **Software** | **36.20%** | **6.67%** |
+| E-Commerce / Retail | 35.66% | 5.07% |
+| **Overall** | **39.26%** | **6.21%** |
+
+**HookSniff hedef sektör: Software — Open rate %36.20, Click rate %6.67**
+
+#### Mailchimp Benchmarks (Doğrulanmış)
+
+Kaynak: Mailchimp — Milyarlarca email verisi, Aralık 2023 güncelleme
+URL: https://mailchimp.com/resources/email-marketing-benchmarks/
+
+| Sektör | Open Rate | Click Rate | Unsubscribe |
+|--------|-----------|------------|-------------|
+| Business + Finance | 31.35% | 2.78% | 0.15% |
+| Non-Profits | 40.04% | 3.27% | 0.18% |
+| Education + Training | 35.64% | 3.02% | 0.18% |
+| Ecommerce | 29.81% | 1.74% | 0.19% |
+| **All Users** | **35.63%** | **2.62%** | **0.22%** |
+
+#### MailerLite Benchmarks (Doğrulanmış)
+
+Kaynak: MailerLite — 3.6 milyon kampanya, 181,000+ hesap, Aralık 2024 - Kasım 2025
+URL: https://www.mailerlite.com/blog/compare-your-email-performance-metrics-industry-benchmarks
+
+| Metrik | 2025 Değeri | 2024 Değeri | Değişim |
+|--------|-------------|-------------|---------|
+| Open rate (tüm sektörler) | **43.46%** | 42.35% | +1.11% |
+| Click-to-open rate | **6.81%** | 5.63% | +1.18% |
+| Click rate | **2.09%** | 2.00% | +0.09% |
+| Unsubscribe rate | **0.22%** | 0.08% | +0.14% |
+
+| Sektör | Open Rate | Click Rate |
+|--------|-----------|------------|
+| **Software and web app** | **39.31%** | **1.15%** |
+| Consulting | 45.96% | 2.41% |
+| E-commerce | 32.67% | 1.07% |
+| Non-profit | 52.38% | 2.90% |
+
+#### Folderly Tech Industry (Doğrulanmış — Arama Özeti)
+
+Kaynak: Folderly Tech Industry Email Benchmarks 2025
+URL: https://generate.folderly.com/tech-industry-email-benchmarks
+
+- Developer tools: **%26.3 open rate** (en yüksek engagement teknoloji sektöründe)
+- SaaS: Ortalama engagement
+
+⚠️ **Not:** Folderly verisi arama sonucu özeti olarak doğrulanmıştır. Tam sayfa içeriği yüklenemedi.
+
+### HookSniff İçin Hedef Benchmark'lar
+
+| Metrik | Sektör Ortalaması | HookSniff Hedefi | Kaynak |
+|--------|-------------------|-----------------|--------|
+| Open rate (Software) | %36.20 - %39.31 | >%35 | ActiveCampaign + MailerLite |
+| Click rate (Software) | %1.15 - %6.67 | >%3 | MailerLite + ActiveCampaign |
+| Unsubscribe rate | %0.22 | <%0.2 | Mailchimp + MailerLite |
+| Bounce rate | %1-2 | <%1.5 | Industry standard |
+| Spam complaint | <%0.1 | <%0.05 | Industry standard |
 
 ### E-posta ROI Benchmark'ları
 
-Kaynak: Oliver Munro SaaS Marketing Stats 2026
-
 | Kanal | ROI | Kaynak |
 |-------|-----|--------|
-| E-posta pazarlama | **3,600-4,000%** | Oliver Munro 2026 |
-| SEO | **702%** | Oliver Munro 2026 |
+| E-posta pazarlama | **$42 ROI / $1 harcama** | Genesys Growth 2026 (Firework kaynaklı) |
+| E-posta (genel) | **3,600-4,000%** | Oliver Munro 2026 |
+| SEO | **748%** | Data Mania / Oliver Munro 2026 |
+| İçerik pazarlama | **$3 ROI / $1 harcama** | Revenue Zen / Genesys Growth 2026 |
 | LinkedIn | **113%** | Oliver Munro 2026 |
-| Google Ads | **78%** | Oliver Munro 2026 |
+| Google Ads | **78%** | SaaSHero 2026 |
 
-**Sonuç:** E-posta, ROI açısından en yüksek getirili kanal.
+**Sonuç:** E-posta, ROI açısından en yüksek getirili kanal ($42:$1).
 
 ### Churn Benchmark'ları
 
@@ -482,13 +547,16 @@ export function WelcomeTemplate({ name }: { name: string }) {
 
 ### Kaynaklar
 
-- Knock: "The 11 best transactional email services for developers in 2026" — https://knock.app/blog/the-top-transactional-email-services-for-developers
-- Postmark: "6 best transactional email service providers compared" (2026) — https://postmarkapp.com/blog/transactional-email-providers
-- Postmark Pricing (doğrulanmış): https://postmarkapp.com/pricing
-- Resend Pricing (doğrulanmış): https://resend.com/pricing
-- Folderly: "Tech Industry Email Benchmarks 2025" — https://generate.folderly.com/tech-industry-email-benchmarks
-- ActiveCampaign: "Email Marketing Benchmarks 2026" — https://www.activecampaign.com/blog/activecampaign-email-benchmarks
-- Oliver Munro: "60+ SaaS Marketing Statistics & Benchmarks for 2026" — https://www.olivermunro.com/writersblog/saas-marketing-statistics
+- ActiveCampaign: "2026 Email Marketing Benchmarks" (Jan 2026, 2025 verileri) — https://www.activecampaign.com/blog/activecampaign-email-benchmarks (✅ Tam sayfa doğrulanmış)
+- Mailchimp: "Email Marketing Benchmarks & Industry Statistics" (Dec 2023 güncelleme) — https://mailchimp.com/resources/email-marketing-benchmarks/ (✅ Tam sayfa doğrulanmış)
+- MailerLite: "Email Marketing Benchmarks 2025" (Dec 2024-Nov 2025, 3.6M kampanya) — https://www.mailerlite.com/blog/compare-your-email-performance-metrics-industry-benchmarks (✅ Tam sayfa doğrulanmış)
+- Folderly: "Tech Industry Email Benchmarks 2025" — https://generate.folderly.com/tech-industry-email-benchmarks (⚠️ Arama özeti doğrulanmış)
+- Genesys Growth: "45 Content Marketing ROI Stats 2026" — https://genesysgrowth.com/blog/content-marketing-roi-stats-for-marketing-leaders (✅ Tam sayfa doğrulanmış)
+- Oliver Munro: "60+ SaaS Marketing Statistics 2026" — https://www.olivermunro.com/writersblog/saas-marketing-statistics (✅ Tam sayfa doğrulanmış)
+- Knock: "11 best transactional email services 2026" — https://knock.app/blog/the-top-transactional-email-services-for-developers (✅ Tam sayfa doğrulanmış)
+- Postmark: "6 best transactional email providers" — https://postmarkapp.com/blog/transactional-email-providers (✅ Tam sayfa doğrulanmış)
+- Postmark Pricing (✅ doğrulanmış): https://postmarkapp.com/pricing
+- Resend Pricing (✅ doğrulanmış): https://resend.com/pricing
 
 ### Dikkat Edilecekler
 

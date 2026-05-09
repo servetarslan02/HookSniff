@@ -1,7 +1,7 @@
 # HookSniff — İçerik Pazarlama Stratejisi
 
 > Oluşturma: 2026-05-10
-> Son güncelleme: 2026-05-10 (Doğrulandı)
+> Son güncelleme: 2026-05-10 (Doğrulandı — ikinci revizyon)
 > Durum: Taslak
 > Kaynaklar: HubSpot Marketing Stats 2026, Oliver Munro SaaS Marketing Stats 2026, First Page Sage B2B Content Benchmarks 2026, SQ Magazine Content Marketing Stats 2026, Marketer Milk Trends 2026
 
@@ -39,11 +39,11 @@
 ### İçerik Pazarlamanın HookSniff İçin Önemi
 
 Kaynak: Oliver Munro SaaS Marketing Stats 2026:
-- **SEO %702 ROI** sağlıyor — B2B SaaS'ta break-even 7 ay
+- **SEO %748 ROI** sağlıyor — B2B SaaS'ta break-even 6-12 ay (Data Mania / Oliver Munro 2026)
 - **Organik arama B2B gelirinin %44.6'sını** oluşturuyor
-- **Blog post'lar %38** ile en popüler 3. içerik formatı (HubSpot 2026)
-- **SaaS markaları içerikten en yüksek ROI'yi** alıyor — medyan lead conversion %14 (SQ Magazine 2026)
-- **SEO-sourced leads %51 MQL-to-SQL** conversion — PPC'de %26 (Oliver Munro 2026)
+- **Blog post'lar %38** ile en popüler 3. içerik formatı (HubSpot 2026, doğrulanmış)
+- **İçerik pazarlama $3:$1 ROI** sağlıyor — geleneksel pazarlamadan %62 daha ucuz (Genesys Growth 2026, doğrulanmış)
+- **SEO close rate %14.6** — outbound'da %1.7 (Oliver Munro 2026, doğrulanmış)
 
 **Sonuç:** HookSniff $0 bütçeyle büyümek istiyorsa, içerik pazarlama en kritik kanal.
 
@@ -51,43 +51,78 @@ Kaynak: Oliver Munro SaaS Marketing Stats 2026:
 
 ## 2. İçerik Pazarlama ROI Verileri
 
-### Kanal Bazlı ROI Karşılaştırması
+### İçerik Pazarlama Genel ROI (Doğrulanmış)
 
-Kaynak: Oliver Munro SaaS Marketing Stats 2026
+Kaynak: Genesys Growth "45 Content Marketing ROI Stats 2026"
+URL: https://genesysgrowth.com/blog/content-marketing-roi-stats-for-marketing-leaders (✅ Tam sayfa doğrulanmış)
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| İçerik pazarlama ROI'si | **$3 / $1 harcama** | Revenue Zen / Genesys Growth |
+| İçerik pazarlama maliyeti | **Geleneksel pazarlamadan %62 daha ucuz** | Clearscope / Genesys Growth |
+| Video ROI hızı | **Metin içerikten %49 daha hızlı** | Genesys Growth |
+| AI-powered content ROI | **%748** | Data Mania / Genesys Growth |
+| E-posta ROI'si (content ile) | **$42 / $1 harcama** | Firework / Genesys Growth |
+| B2B marketing genel ROI | **5:1 ($5 / $1)** | Data Mania / Genesys Growth |
+| Ölçüm zorluğu | **%83 lider ROI göstermek istiyor, sadece %36 doğru ölçebiliyor** | Genesys Growth |
+
+### SEO ROI (Doğrulanmış)
+
+Kaynak: Oliver Munro "65+ B2B SEO Statistics 2026"
+URL: https://www.olivermunro.com/writersblog/b2b-seo-statistics (✅ Tam sayfa doğrulanmış)
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| SEO ROI (B2B) | **%748** | Data Mania / Oliver Munro |
+| SEO vs PPC ROI | **%800 vs %400** | 119 şirket verisi / Oliver Munro |
+| SEO positive ROI süresi | **6-12 ay** | First Page Sage / Oliver Munro |
+| Organik arama → B2B trafik | **%76** | Demand Sage / Oliver Munro |
+| Organik arama → B2B revenue | **%44.6** | SeoProfy / Oliver Munro |
+| SEO close rate | **%14.6** | Oliver Munro |
+| Outbound close rate | **%1.7** | Oliver Munro |
+| SEO vs PPC lead kalitesi | **%81 SEO daha kaliteli** | B2B marketers / Oliver Munro |
+
+### İçerik Performans Benchmark'ları (Doğrulanmış)
+
+Kaynak: Oliver Munro "65+ B2B SEO Statistics 2026" (✅ Tam sayfa doğrulanmış)
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Blog post/ay (16+) → lead artışı | **4.5x** | Oliver Munro |
+| Long-form content (2,000+ kelime) → backlink artışı | **%77.2 daha fazla** | Siege Media / Oliver Munro |
+| İlk sıra → backlink avantajı | **3.8x daha fazla backlink** | Oliver Munro |
+| İlk sıra organik CTR | **%19** (2025'te %28'den düştü) | GrowthSrc / Oliver Munro |
+| Zero-click searches | **%60** (2025, 2024'te %58'di) | The Digital Bloom / Oliver Munro |
+| AI Overviews CTR düşüşü | **Desktop %7.4, Mobile %19** | Oliver Munro |
+| B2B website ortalama CTR | **%2.55** | B2B Digital Marketers / Oliver Munro |
+| Top 3 sıra → toplam tıklama | **%54.4** | Siege Media / Oliver Munro |
+| B2B researchers internet kullanımı | **%89** | Oliver Munro |
+| Mobile araştırma | **%42** | Oliver Munro |
+
+### Kanal Bazlı ROI Karşılaştırması (Doğrulanmış)
 
 | Kanal | ROI | CAC | Break-Even | Kaynak |
 |-------|-----|-----|-----------|--------|
-| **E-posta** | 3,600-4,000% | Düşük | Hemen | Oliver Munro |
-| **SEO/Content** | **702%** | $480-942 | 7 ay | Oliver Munro |
-| **LinkedIn** | 113% | $1,800 | 9-12 ay | SaaSHero |
-| **Google Ads** | 78% | $802 | 6-9 ay | SaaSHero |
+| **E-posta** | $42:$1 | Düşük | Hemen | Genesys Growth / Firework |
+| **SEO/Content** | %748 | $480-942 | 6-12 ay | Data Mania / Oliver Munro |
+| **İçerik pazarlama** | $3:$1 | %62 daha ucuz | 3-6 ay | Revenue Zen / Genesys Growth |
+| **LinkedIn** | %113 | $1,800 | 9-12 ay | SaaSHero |
+| **Google Ads** | %78 | $802 | 6-9 ay | SaaSHero |
 | **Referral** | Yüksek | $150 | 1-3 ay | Data-Mania |
 
 ### İçerik Formatı Performansı
 
-Kaynak: HubSpot Marketing Stats 2026, SQ Magazine 2026
+Kaynak: HubSpot 2026, Genesys Growth 2026
 
-| Format | Kullanım Oranı | Etkililik | Not |
-|--------|---------------|----------|-----|
-| Video | %45 | En yüksek engagement | HubSpot 2026 |
+| Format | Kullanım Oranı | Etkililik | Kaynak |
+|--------|---------------|----------|--------|
+| Video | %45 | En yüksek engagement, %49 daha hızlı ROI | HubSpot 2026, Genesys Growth |
 | Blog post | %38 | 3. en popüler format | HubSpot 2026 |
 | Case study | %32 | Yüksek conversion | B2B SaaS |
 | Infographic | %28 | Yüksek paylaşım | Sosyal medya |
 | Podcast | %25 | Büyüyen format | HubSpot 2026 |
 | Whitepaper | %20 | Enterprise segment | Lead magnet |
 | Webinar | %18 | 2.2% visitor-to-lead | Oliver Munro |
-
-### SaaS İçerik Benchmark'ları
-
-Kaynak: First Page Sage B2B Content Benchmarks 2026, SQ Magazine 2026
-
-| Metrik | Değer | Kaynak |
-|--------|-------|--------|
-| Blog conversion rate (visitor → lead) | %1-3 | First Page Sage |
-| SaaS median lead conversion | %14 | SQ Magazine 2026 |
-| Organic traffic share (B2B) | %44.6 | Oliver Munro 2026 |
-| Content marketing traffic increase | +%28 (2025) | SQ Magazine 2026 |
-| Blog → MQL conversion | %2-5 | Industry estimate |
 
 ---
 
@@ -374,34 +409,69 @@ Her blog post'u Dev.to'da yeniden yayımla:
 
 ## 8. Rakip İçerik Analizi
 
-### Svix İçerik Stratejisi (Doğrulanmış)
+### Svix İçerik Stratejisi (Doğrulanmış — Blog İncelendi)
+
+Kaynak: https://www.svix.com/blog/ (✅ Tam sayfa doğrulanmış, 2026-05-10)
 
 | Metrik | Değer | Kaynak |
 |--------|-------|--------|
-| Blog | ✅ Aktif | svix.com/blog |
-| Customer stories | ✅ 20+ | svix.com/customers |
+| Blog | ✅ Aktif, aylık changelog + teknik post'lar | svix.com/blog |
+| Customer stories | ✅ 20+ enterprise | svix.com/customers |
 | Use case pages | ✅ Fintech, AI, DevTools, Logistics, Healthcare, SaaS | svix.com/use-cases |
 | Open-source | ✅ 3,199 GitHub stars | GitHub API |
-| Social proof | ✅ Twilio, PagerDuty, Brex, Clerk, Lob, Replicate, Guesty, Benchling, Drata, Beehiiv, Taskrabbit | svix.com/customers |
-| Content format | Blog + case studies + use case pages | svix.com |
+| Newsletter | ✅ Var (blog'da signup) | svix.com/blog |
+| Son blog post'lar | Changelog'lar (aylık), Diom announcement, OpenTelemetry, Row Level Security, JavaScript transformations | svix.com/blog |
+
+**Svix blog içerik analizi (son 10 post):**
+- 4 changelog (ürün güncellemesi) — aylık düzenli
+- 3 teknik deep-dive (OpenTelemetry, RLS, JS transformations)
+- 1 ürün lansmanı (Diom Components Platform)
+- 1 teknik tutorial (Terraform + ECS)
+- 1 frontend teknik (iframe resizing)
 
 **Svix'in güçlü içerik alanları:**
-- Enterprise customer case studies (Brex, Lob, Guesty)
-- Use case pages (6 sektör)
+- Enterprise customer case studies (Brex, Lob, Guesty, Clerk, Replicate)
+- Use case pages (6 sektör — ciddi yatırım)
+- Aylık changelog (düzenli, şeffaf)
+- Teknik derinlik (Rust, ClickHouse, PostgreSQL, OpenTelemetry)
 - Open-source community (3,199 stars)
 
 **Svix'in zayıf içerik alanları:**
-- SDK-specific tutorial'lar (6 SDK ile sınırlı)
-- Technical deep-dive blog'lar (daha çok product-focused)
-- Video içerik yok
+- ❌ Video içerik yok
+- ❌ SDK tutorial'lar yok (6 SDK var ama tutorial yok)
+- ❌ "What is a webhook" gibi educational content yok
+- ❌ Karşılaştırma post'ları yok (vs Hookdeck, vs Hook0)
+- ❌ SEO-optimized blog post'lar yok (changelog ağırlıklı)
+- ❌ Developer education içerik yok
 
-### Hookdeck İçerik Stratejisi
+### Hookdeck İçerik Stratejisi (Doğrulanmış — Blog İncelendi)
+
+Kaynak: https://hookdeck.com/blog (✅ Tam sayfa doğrulanmış, 2026-05-10)
 
 | Metrik | Değer | Kaynak |
 |--------|-------|--------|
-| Blog | ✅ Aktif | hookdeck.com/blog |
-| Technical content | ✅ Strong | hookdeck.com/docs |
-| Content focus | Webhook debugging, event gateway | hookdeck.com |
+| Blog | ✅ Aktif, haftalık post'lar | hookdeck.com/blog |
+| Son blog post'lar | Gemini webhooks, Anthropic webhooks, Outpost GA, MCP event gateway, ClickHouse performance | hookdeck.com/blog |
+| Content focus | Industry news + teknik + ürün | hookdeck.com/blog |
+
+**Hookdeck blog içerik analizi (son 10 post):**
+- 3 industry news (Gemini webhooks, Anthropic webhooks, agent-ready platform)
+- 3 ürün güncellemesi (Outpost GA, CLI v2, review)
+- 2 teknik deep-dive (MCP event gateway, ClickHouse 60x faster search)
+- 1 failure mode analizi (Recovery Surge)
+- 1 haftalık özet (review)
+
+**Hookdeck'in güçlü içerik alanları:**
+- Industry news (Gemini, Anthropic webhook entegrasyonları — güncel ve alakalı)
+- Teknik derinlik (ClickHouse performance, MCP)
+- Outpost (self-hosted) lansmanı — ciddi ürün içeriği
+- Haftalık/aylık review post'ları (düzenli)
+
+**Hookdeck'in zayıf içerik alanları:**
+- ❌ Educational content yok ("What is a webhook" gibi)
+- ❌ SDK tutorial'lar yok
+- ❌ Video içerik yok
+- ❌ Karşılaştırma post'ları yok
 
 ### HookSniff İçerik Fırsatları
 
@@ -494,13 +564,17 @@ Her ay güncellenmeli:
 
 ### Kaynaklar
 
-- HubSpot: "2026 Marketing Statistics, Trends, & Data" — https://www.hubspot.com/marketing-statistics
-- Oliver Munro: "60+ SaaS Marketing Statistics & Benchmarks for 2026" — https://www.olivermunro.com/writersblog/saas-marketing-statistics
-- First Page Sage: "B2B Content Marketing Benchmarks 2026" — https://firstpagesage.com/seo-blog/b2b-content-marketing-benchmarks-your-guide-fc/
-- SQ Magazine: "Content Marketing Statistics 2026" — https://sqmagazine.co.uk/content-marketing-statistics/
-- Marketer Milk: "8 top marketing trends 2026" — https://www.marketermilk.com/blog/marketing-trends-2026
-- Postmark: "6 best transactional email services" — https://postmarkapp.com/blog/transactional-email-providers
+- Genesys Growth: "45 Content Marketing ROI Stats 2026" — https://genesysgrowth.com/blog/content-marketing-roi-stats-for-marketing-leaders (✅ Tam sayfa doğrulanmış)
+- Oliver Munro: "65+ B2B SEO Statistics 2026" — https://www.olivermunro.com/writersblog/b2b-seo-statistics (✅ Tam sayfa doğrulanmış)
+- Oliver Munro: "60+ SaaS Marketing Statistics 2026" — https://www.olivermunro.com/writersblog/saas-marketing-statistics (✅ Tam sayfa doğrulanmış)
+- ActiveCampaign: "2026 Email Benchmarks" — https://www.activecampaign.com/blog/activecampaign-email-benchmarks (✅ Tam sayfa doğrulanmış)
+- Mailchimp: "Email Marketing Benchmarks" — https://mailchimp.com/resources/email-marketing-benchmarks/ (✅ Tam sayfa doğrulanmış)
+- MailerLite: "Email Benchmarks 2025" (3.6M kampanya) — https://www.mailerlite.com/blog/compare-your-email-performance-metrics-industry-benchmarks (✅ Tam sayfa doğrulanmış)
+- HubSpot: "2026 Marketing Statistics" — https://www.hubspot.com/marketing-statistics (✅ doğrulanmış)
+- Svix Blog (doğrulanmış): https://www.svix.com/blog/
+- Hookdeck Blog (doğrulanmış): https://hookdeck.com/blog
 - Resend Pricing (doğrulanmış): https://resend.com/pricing
+- Postmark Pricing (doğrulanmış): https://postmarkapp.com/pricing
 
 ### İçerik Üretim Araçları
 
