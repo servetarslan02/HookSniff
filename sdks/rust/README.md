@@ -1,5 +1,8 @@
 # HookSniff Rust SDK
 
+[![Crates.io](https://img.shields.io/crates/v/hooksniff.svg)](https://crates.io/crates/hooksniff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official Rust client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
@@ -18,7 +21,14 @@ use hooksniff::HookSniffClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Default base URL is used automatically
     let client = HookSniffClient::new("hr_live_...");
+
+    // Or with custom base URL
+    let client = HookSniffClient::with_base_url(
+        "hr_live_...",
+        "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
+    );
 
     // Create endpoint
     let endpoint = client.endpoints()

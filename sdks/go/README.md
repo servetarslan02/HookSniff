@@ -1,5 +1,8 @@
 # HookSniff Go SDK
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/servetarslan02/hooksniff-go.svg)](https://pkg.go.dev/github.com/servetarslan02/hooksniff-go)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Go client library for the [HookSniff](https://github.com/servetarslan02/hooksniff) webhook delivery API.
 
 ## Installation
