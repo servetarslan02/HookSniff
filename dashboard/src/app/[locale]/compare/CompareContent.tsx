@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -303,28 +304,28 @@ export default function CompareContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">HookSniff in Action</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
-              <img src="/screenshots/compare-hero.jpg" alt="HookSniff Compare — side-by-side webhook service comparison" className="w-full" />
+              <Image src="/screenshots/compare-hero.jpg" alt="HookSniff Compare — side-by-side webhook service comparison" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">Compare Page</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">20 detailed sections with honest, side-by-side comparison.</p>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
-              <img src="/screenshots/scorecard.jpg" alt="HookSniff Scorecard — feature comparison across 6 categories" className="w-full" />
+              <Image src="/screenshots/scorecard.jpg" alt="HookSniff Scorecard — feature comparison across 6 categories" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">Scorecard</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">6 categories scored honestly. Svix: 51, HookSniff: 50.</p>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
-              <img src="/screenshots/playground.png" alt="HookSniff Playground — test webhooks in real-time" className="w-full" />
+              <Image src="/screenshots/playground.png" alt="HookSniff Playground — test webhooks in real-time" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">Webhook Playground</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">Generate URLs, send webhooks, inspect payloads in real-time.</p>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
-              <img src="/screenshots/build-vs-buy.png" alt="HookSniff Build vs Buy — 12 dimension webhook infrastructure comparison" className="w-full" />
+              <Image src="/screenshots/build-vs-buy.png" alt="HookSniff Build vs Buy — 12 dimension webhook infrastructure comparison" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">Build vs Buy</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">12 dimensions: cost, time, security, reliability, and more.</p>

@@ -54,7 +54,7 @@ export default function AuditLogPage() {
       if (filter) params.set('action', filter);
       try {
         const data = await apiFetch<{ entries: AuditEntry[]; has_more: boolean }>(`/audit-log?${params}`, { token });
-        setEntries(p === 1 ? data.entries : [...entries, ...data.entries]);
+        setEntries(p === 1 ? data.entries : (prev) => [...prev, ...data.entries]);
         setHasMore(data.has_more);
       } catch {
         // Endpoint may not exist — show empty state
