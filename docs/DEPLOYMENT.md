@@ -4,18 +4,16 @@
 
 - [Prerequisites](#prerequisites)
 - [Local Development (Docker Compose)](#local-development-docker-compose)
-- [Production Deployment (Fly.io)](#production-deployment-flyio)
+- [Production Deployment (Google Cloud Run)](#production-deployment-google-cloud-run)
   - [1. Neon PostgreSQL Setup](#1-neon-postgresql-setup)
-  - [2. Fly.io App Setup](#2-flyio-app-setup)
-  - [3. Environment Variables](#3-environment-variables)
-  - [4. Deploy Services](#4-deploy-services)
-  - [5. Database Migrations](#5-database-migrations)
-  - [6. Custom Domain](#6-custom-domain)
+  - [2. Upstash Redis Setup](#2-upstash-redis-setup)
+  - [3. GCP Service Account](#3-gcp-service-account)
+  - [4. Cloud Run Deployment](#4-cloud-run-deployment)
+  - [5. Dashboard (Vercel)](#5-dashboard-vercel)
+  - [6. Database Migrations](#6-database-migrations)
 - [Environment Variables Reference](#environment-variables-reference)
-- [Stripe Configuration](#stripe-configuration)
-- [Monitoring](#monitoring)
-- [Scaling](#scaling)
-- [Backup & Restore](#backup--restore)
+- [Billing Configuration](#billing-configuration)
+- [Monitoring (Grafana Cloud)](#monitoring-grafana-cloud)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -27,10 +25,11 @@
 - 4 GB RAM minimum
 
 ### Production
-- [Fly.io](https://fly.io) account (free tier available)
+- [Google Cloud](https://cloud.google.com) account (Cloud Run free tier)
 - [Neon](https://neon.tech) PostgreSQL account (free tier: 0.5 GB)
-- [Stripe](https://stripe.com) account (for billing)
-- Domain name (optional, for custom domain)
+- [Upstash](https://upstash.com) Redis account (free tier: 10K commands/day)
+- [Vercel](https://vercel.com) account (for dashboard)
+- [Polar.sh](https://polar.sh) account (for billing, optional)
 
 ---
 
@@ -39,14 +38,9 @@
 ### Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/servetarslan02/hooksniff.git
-cd hooksniff
-
-# Copy environment file
+git clone https://github.com/servetarslan02/HookSniff.git
+cd HookSniff
 cp .env.example .env
-
-# Start everything
 make local
 ```
 
@@ -72,279 +66,121 @@ make logs-api       # API logs only
 make logs-worker    # Worker logs only
 make logs-db        # Database logs only
 make db-shell       # Open PostgreSQL shell
-make generate-secret  # Generate random secret
-make generate-api-key # Generate sample API key
-```
-
-### First API Call
-
-```bash
-# Register
-curl -X POST http://localhost:3000/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email": "test@example.com", "password": "TestPass123!"}'
-
-# Use the returned API key for subsequent requests
-curl http://localhost:3000/v1/endpoints \
-  -H "Authorization: Bearer hr_live_YOUR_KEY"
-```
-
-### Docker Compose Architecture
-
-```
-docker-compose.yml (development)
-├── postgres:16-alpine     — Database (port 5432)
-├── hooksniff-api          — API server (port 3000)
-├── hooksniff-worker       — Background worker
-└── hooksniff-dashboard    — Next.js UI (port 3001)
 ```
 
 ---
 
-## Production Deployment (Fly.io)
+## Production Deployment (Google Cloud Run)
+
+HookSniff uses **Google Cloud Run** for API and Worker, **Vercel** for Dashboard, **Neon** for PostgreSQL, and **Upstash** for Redis. Total cost: **$0/month** on free tiers.
 
 ### 1. Neon PostgreSQL Setup
 
-[Neon](https://neon.tech) provides serverless PostgreSQL with a generous free tier.
-
-**Step 1: Create a Neon project**
-
 1. Go to [console.neon.tech](https://console.neon.tech)
-2. Create a new project: `hooksniff-prod`
-3. Choose region closest to your Fly.io deployment (e.g., `us-east-1`)
-4. Note the connection string
-
-**Step 2: Get connection string**
-
-```
-postgresql://username:password@ep-cool-rain-123456.us-east-2.aws.neon.tech/hooksniff?sslmode=require
-```
+2. Create project: `hooksniff-prod`
+3. Choose region: `eu-central-1` (Frankfurt)
+4. Copy the connection string:
+   ```
+   postgresql://user:pass@ep-xxx.eu-central-1.aws.neon.tech/hooksniff?sslmode=require
+   ```
+5. Run migrations via Neon SQL editor or `psql`
 
 > ⚠️ Always use `sslmode=require` for Neon connections.
 
-**Step 3: Run migrations**
+### 2. Upstash Redis Setup
+
+1. Go to [console.upstash.com](https://console.upstash.com)
+2. Create Redis database: `hooksniff`
+3. Choose region: `eu-west-1` (Ireland)
+4. Copy the REST URL and token
+
+### 3. GCP Service Account
+
+1. Go to [GCP Console](https://console.cloud.google.com)
+2. Create project: `hooksniff-app`
+3. Enable Cloud Run API
+4. Create service account: `hooksniff-deploy`
+5. Grant roles: Cloud Run Admin, Secret Manager Admin, Artifact Registry Admin
+6. Create JSON key → save securely (used in GitHub Actions)
+
+### 4. Cloud Run Deployment
+
+**Option A: GitHub Actions (recommended)**
+
+CI/CD is configured in `.github/workflows/deploy.yml`:
+1. Push to `main` → CI runs (lint, test, build)
+2. If CI passes → Deploy triggers automatically
+3. Docker images built and pushed to Artifact Registry
+4. Cloud Run services updated with new images
+
+Required GitHub Secrets:
+- `GCP_SA_KEY` — Service account JSON key
+
+**Option B: Manual deploy**
 
 ```bash
-# Connect and run schema
-psql "postgresql://username:password@ep-xxx.neon.tech/hooksniff?sslmode=require" \
-  -f migrations/001_init.sql
+# Authenticate
+gcloud auth activate-service-account --key-file=gcp-sa-key.json
+gcloud config set project hooksniff-app
+
+# Configure Docker
+gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+
+# Build and push API
+docker build -f Dockerfile.api -t europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest .
+docker push europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest
+
+# Deploy API
+gcloud run deploy hooksniff-api \
+  --image europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest \
+  --region europe-west1 \
+  --platform managed \
+  --allow-unauthenticated \
+  --port 3000 \
+  --memory 512Mi \
+  --cpu 1 \
+  --min-instances 0 \
+  --max-instances 3 \
+  --timeout 300 \
+  --set-env-vars "APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json" \
+  --set-secrets "DATABASE_URL=neon-db-url:latest,REDIS_URL=upstash-redis-url:latest,JWT_SECRET=jwt-secret:latest,HMAC_SECRET=hmac-secret:latest" \
+  --project hooksniff-app
+
+# Build and push Worker
+docker build -f Dockerfile.worker -t europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest .
+docker push europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest
+
+# Deploy Worker
+gcloud run deploy hooksniff-worker \
+  --image europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest \
+  --region europe-west1 \
+  --platform managed \
+  --no-allow-unauthenticated \
+  --memory 256Mi \
+  --cpu 1 \
+  --min-instances 0 \
+  --max-instances 2 \
+  --set-secrets "DATABASE_URL=neon-db-url:latest,REDIS_URL=upstash-redis-url:latest" \
+  --project hooksniff-app
 ```
 
-Or use the Neon SQL editor in the dashboard.
+### 5. Dashboard (Vercel)
 
-**Step 4: Enable connection pooling (optional)**
+1. Connect GitHub repo to Vercel
+2. Root Directory: `dashboard`
+3. Framework: Next.js
+4. Environment Variable:
+   ```
+   NEXT_PUBLIC_API_URL=https://hooksniff-api-1046140057667.europe-west1.run.app/v1
+   ```
 
-Neon supports connection pooling via a pooled connection string:
-```
-postgresql://username:password@ep-xxx-pooler.neon.tech/hooksniff?sslmode=require
-```
+### 6. Database Migrations
 
-Use the pooled string for the API server (high connection churn) and the direct string for migrations.
+Migrations run automatically on API startup (`api/src/db.rs`).
 
----
-
-### 2. Fly.io App Setup
-
-**Step 1: Install Fly CLI**
-
+Manual migration:
 ```bash
-# macOS
-brew install flyctl
-
-# Linux
-curl -L https://fly.io/install.sh | sh
-
-# Login
-fly auth login
-```
-
-**Step 2: Create the app**
-
-```bash
-cd hooksniff
-
-# Create app (choose a unique name)
-fly launch --no-deploy --name hooksniff-api
-
-# This creates fly.toml — we'll edit it next
-```
-
-**Step 3: Configure `fly.toml`**
-
-```toml
-app = "hooksniff-api"
-primary_region = "iad"
-
-[build]
-  dockerfile = "Dockerfile.api"
-
-[env]
-  APP_ENV = "production"
-  PORT = "3000"
-  RUST_LOG = "info"
-  MAX_PAYLOAD_BYTES = "1048576"
-  RETENTION_DAYS = "30"
-  WEBHOOK_FORMAT = "standard"
-
-[http_service]
-  internal_port = 3000
-  force_https = true
-  auto_stop_machines = true
-  auto_start_machines = true
-  min_machines_running = 0
-
-  [http_service.concurrency]
-    type = "requests"
-    hard_limit = 250
-    soft_limit = 200
-
-[[vm]]
-  cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 512
-
-[[services]]
-  protocol = "tcp"
-  internal_port = 3000
-
-  [[services.ports]]
-    port = 443
-    handlers = ["tls", "http"]
-
-  [[services.ports]]
-    port = 80
-    handlers = ["http"]
-```
-
----
-
-### 3. Environment Variables
-
-Set secrets in Fly.io:
-
-```bash
-# Database
-fly secrets set DATABASE_URL="postgresql://user:pass@ep-xxx.neon.tech/hooksniff?sslmode=require"
-
-# Auth
-fly secrets set JWT_SECRET="$(openssl rand -hex 32)"
-fly secrets set HMAC_SECRET="$(openssl rand -hex 32)"
-
-# Stripe (get from Stripe dashboard)
-fly secrets set STRIPE_SECRET_KEY="sk_live_..."
-fly secrets set STRIPE_WEBHOOK_SECRET="whsec_..."
-fly secrets set STRIPE_PRO_PRICE_ID="price_..."
-fly secrets set STRIPE_BUSINESS_PRICE_ID="price_..."
-
-# PostgreSQL queue configuration
-fly secrets set KAFKA_BROKERS="broker1:9092,broker2:9092"
-fly secrets set KAFKA_TOPIC="webhook-deliveries"
-```
-
-Verify secrets:
-```bash
-fly secrets list
-```
-
----
-
-### 4. Deploy Services
-
-**Deploy the API:**
-
-```bash
-fly deploy
-```
-
-**Deploy the Worker (separate Fly app):**
-
-```bash
-# Create a separate app for the worker
-fly launch --no-deploy --name hooksniff-worker --dockerfile Dockerfile.worker
-
-# Copy the same secrets
-fly secrets set \
-  DATABASE_URL="..." \
-  KAFKA_BROKERS="..." \
-  KAFKA_TOPIC="webhook-deliveries" \
-  RUST_LOG="info"
-
-# Worker doesn't need HTTP — configure as machine
-fly scale count 1
-
-fly deploy
-```
-
-**Deploy the Dashboard (separate Fly app or Vercel):**
-
-Option A: Fly.io
-```bash
-fly launch --no-deploy --name hooksniff-dashboard --dockerfile Dockerfile.dashboard
-
-fly secrets set \
-  NEXT_PUBLIC_API_URL="https://hooksniff-api.fly.dev/v1"
-
-fly deploy
-```
-
-Option B: Vercel (recommended for Next.js)
-```bash
-cd dashboard
-vercel --prod
-# Set NEXT_PUBLIC_API_URL in Vercel environment variables
-```
-
----
-
-### 5. Database Migrations
-
-```bash
-# Option 1: Direct psql
 psql "$DATABASE_URL" -f migrations/001_init.sql
-
-# Option 2: Using Fly SSH
-fly ssh console -C "psql \$DATABASE_URL -f /app/migrations/001_init.sql"
-
-# Option 3: Neon SQL Editor
-# Copy/paste migrations into the Neon dashboard SQL editor
-```
-
-**Migration files:**
-```
-migrations/
-├── 001_init.sql           # Core tables (customers, endpoints, deliveries)
-├── 002_api_keys.sql       # API keys table
-├── 003_delivery_attempts.sql  # Delivery attempt tracking
-└── 005_alerts.sql         # Alert rules
-```
-
----
-
-### 6. Custom Domain
-
-```bash
-# Add domain to API app
-fly certs add hooksniff-api-1046140057667.europe-west1.run.app
-
-# Add domain to Dashboard
-fly certs add dashboard.hooksniff.vercel.app
-
-# Check certificate status
-fly certs list
-fly certs show hooksniff-api-1046140057667.europe-west1.run.app
-```
-
-**DNS records to add:**
-
-| Type | Name | Value |
-|------|------|-------|
-| A | `api` | `<fly.io IP>` |
-| AAAA | `api` | `<fly.io IPv6>` |
-| CNAME | `dashboard` | `hooksniff-dashboard.fly.dev` |
-
-Get IPs:
-```bash
-fly ips list
 ```
 
 ---
@@ -353,285 +189,132 @@ fly ips list
 
 ### Required
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host/db?sslmode=require` |
-| `JWT_SECRET` | JWT signing secret (min 32 bytes) | `openssl rand -hex 32` |
-| `HMAC_SECRET` | Webhook payload signing secret | `openssl rand -hex 32` |
+| Variable | Description | Source |
+|----------|-------------|--------|
+| `DATABASE_URL` | PostgreSQL connection string | Neon Console |
+| `REDIS_URL` | Redis connection string | Upstash Console |
+| `JWT_SECRET` | JWT signing secret (min 32 chars) | `openssl rand -hex 32` |
+| `HMAC_SECRET` | Webhook signing secret (min 32 chars) | `openssl rand -hex 32` |
 
-### Optional
+### Application
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `APP_ENV` | `development` | Environment name |
+| `APP_ENV` | `development` | Environment (`production`, `development`) |
 | `PORT` | `3000` | API server port |
-| `RUST_LOG` | `info` | Log level (`debug`, `info`, `warn`, `error`) |
-| `DATABASE_URL` | — | PostgreSQL connection string |
-| `MAX_ATTEMPTS` | `3` | Max delivery attempts |
-| `MAX_PAYLOAD_BYTES` | `1048576` | Max webhook payload size (1 MB) |
+| `RUST_LOG` | `info` | Log level |
+| `LOG_FORMAT` | `text` | `json` for production |
+| `MAX_PAYLOAD_BYTES` | `1048576` | Max webhook payload (bytes) |
 | `RETENTION_DAYS` | `30` | Days to keep delivery logs |
-| `WEBHOOK_FORMAT` | `standard` | Webhook format (`standard` for Standard Webhooks) |
-| `WEBHOOK_TIMESTAMP_TOLERANCE_SECS` | `300` | Timestamp tolerance for signature verification |
+| `WEBHOOK_FORMAT` | `standard` | `standard` or `cloudevents` |
+| `WEBHOOK_TIMESTAMP_TOLERANCE_SECS` | `300` | Replay protection window (seconds) |
+| `CORS_ORIGINS` | — | Comma-separated allowed origins |
+| `APP_URL` | — | Dashboard URL for email links |
+| `EMAIL_BASE_URL` | — | Base URL for email links |
 
-### Stripe (Billing)
+### Billing (Polar.sh)
 
 | Variable | Description |
 |----------|-------------|
-| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_live_...`) |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) |
-| `STRIPE_PRO_PRICE_ID` | Stripe Price ID for Pro plan |
-| `STRIPE_BUSINESS_PRICE_ID` | Stripe Price ID for Business plan |
+| `POLAR_ACCESS_TOKEN` | Polar.sh API token |
+| `POLAR_WEBHOOK_SECRET` | Webhook signing secret |
+| `POLAR_PRODUCT_PRO` | Product ID for Pro plan |
+| `POLAR_PRODUCT_BUSINESS` | Product ID for Business plan |
+| `POLAR_ENV` | `production` or `sandbox` |
+
+### Billing (iyzico — Turkey)
+
+| Variable | Description |
+|----------|-------------|
+| `IYZICO_API_KEY` | iyzico API key |
+| `IYZICO_SECRET_KEY` | iyzico secret key |
+| `IYZICO_ENV` | `sandbox` or `production` |
+
+### Email (Gmail API)
+
+| Variable | Description |
+|----------|-------------|
+| `GCP_SA_JSON` | GCP service account JSON (for Gmail API) |
+| `NOTIFY_FROM_EMAIL` | Sender email address |
+| `NOTIFY_EMAIL` | Admin notification email |
+
+### Monitoring
+
+| Variable | Description |
+|----------|-------------|
+| `OTEL_ENABLED` | `true` to enable OpenTelemetry |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Grafana Cloud OTLP endpoint |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Auth headers |
 
 ### Dashboard
 
 | Variable | Description |
 |----------|-------------|
-| `NEXT_PUBLIC_API_URL` | API base URL (e.g., `https://hooksniff-api-1046140057667.europe-west1.run.app/v1`) |
+| `NEXT_PUBLIC_API_URL` | API base URL |
 
 ---
 
-## Stripe Configuration
+## Billing Configuration
 
-### 1. Create Products & Prices
+### Polar.sh (Global)
 
-In the Stripe Dashboard:
+1. Create account at [polar.sh](https://polar.sh)
+2. Create products: HookSniff Pro ($49/mo), HookSniff Business ($149/mo)
+3. Get API token from Settings → API
+4. Set webhook endpoint: `https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook/polar`
+5. Configure secrets in GCP Secret Manager
 
-1. **Product: HookSniff Pro**
-   - Price: $49/month recurring
-   - Note the Price ID: `price_xxxxx`
+### iyzico (Turkey)
 
-2. **Product: HookSniff Business**
-   - Price: $149/month recurring
-   - Note the Price ID: `price_yyyyy`
-
-### 2. Configure Webhook Endpoint
-
-In Stripe Dashboard → Developers → Webhooks:
-
-- **Endpoint URL:** `https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook`
-- **Events:**
-  - `checkout.session.completed`
-  - `customer.subscription.created`
-  - `customer.subscription.updated`
-  - `customer.subscription.deleted`
-  - `invoice.payment_succeeded`
-  - `invoice.payment_failed`
-
-### 3. Set Environment Variables
-
-```bash
-fly secrets set \
-  STRIPE_SECRET_KEY="sk_live_..." \
-  STRIPE_WEBHOOK_SECRET="whsec_..." \
-  STRIPE_PRO_PRICE_ID="price_..." \
-  STRIPE_BUSINESS_PRICE_ID="price_..."
-```
-
-### 4. Test Webhooks (Development)
-
-```bash
-# Install Stripe CLI
-brew install stripe/stripe-cli/stripe
-
-# Login
-stripe login
-
-# Forward webhooks to local server
-stripe listen --forward-to localhost:3000/v1/billing/webhook
-```
+1. Create account at [iyzico](https://iyzico.com)
+2. Get API key and secret from dashboard
+3. Set webhook endpoint: `https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook/iyzico`
+4. Configure secrets in GCP Secret Manager
 
 ---
 
-## Monitoring
+## Monitoring (Grafana Cloud)
 
-### Health Check
-
-```bash
-curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/health
-```
-
-```json
-{
-  "status": "ok",
-  "service": "hooksniff-api",
-  "version": "0.1.0"
-}
-```
-
-### Prometheus Metrics
-
-The API exposes metrics at `/metrics` (internal only).
-
-### Grafana (Optional)
-
-```bash
-# Start monitoring stack locally
-docker compose -f monitoring/docker-compose.monitoring.yml up -d
-
-# Access Grafana
-open http://localhost:3002
-# Default: admin / hooksniff_grafana_change_me
-```
-
-### Fly.io Monitoring
-
-```bash
-# View logs
-fly logs
-
-# View machines
-fly machine list
-
-# View metrics
-fly dashboard metrics
-```
-
----
-
-## Scaling
-
-### Fly.io Auto-scaling
-
-HookSniff uses Fly.io's auto-scaling:
-
-```toml
-[http_service]
-  auto_stop_machines = true    # Scale to zero when idle
-  auto_start_machines = true   # Scale up on demand
-  min_machines_running = 0     # Minimum machines (set to 1 for always-on)
-
-  [http_service.concurrency]
-    type = "requests"
-    hard_limit = 250           # Max concurrent requests per machine
-    soft_limit = 200           # Scale trigger
-```
-
-### Manual Scaling
-
-```bash
-# Scale API to 2 machines
-fly scale count 2 --app hooksniff-api
-
-# Scale worker to 2 machines
-fly scale count 2 --app hooksniff-worker
-
-# Increase memory
-fly scale memory 1024 --app hooksniff-api
-```
-
-### Database Scaling (Neon)
-
-Neon auto-scales compute based on load. For higher limits:
-
-1. Upgrade Neon plan (Pro: 8 GB storage, better performance)
-2. Enable autoscaling in Neon dashboard
-3. Use connection pooling for high-concurrency workloads
-
----
-
-## Backup & Restore
-
-### Neon Backups
-
-Neon provides automatic backups:
-- **Free tier:** Point-in-time restore (24 hours)
-- **Pro tier:** Point-in-time restore (7 days)
-
-### Manual Backup
-
-```bash
-# Full database dump
-pg_dump "$DATABASE_URL" --format=custom --file=hooksniff-backup-$(date +%Y%m%d).dump
-
-# Restore
-pg_restore --clean --if-exists -d "$DATABASE_URL" hooksniff-backup-20260506.dump
-```
-
-### Automated Backups (Cron)
-
-```bash
-# Add to crontab
-0 3 * * * pg_dump "$DATABASE_URL" --format=custom --file="/backups/hooksniff-$(date +\%Y\%m\%d).dump"
-```
+1. Create account at [grafana.com](https://grafana.com)
+2. Create a stack (region: EU West)
+3. Go to Connections → OpenTelemetry → Generate API token
+4. Set environment variables:
+   ```
+   OTEL_ENABLED=true
+   OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net
+   OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic <base64(stack_id:token)>
+   ```
+5. Import dashboards from `monitoring/` directory
 
 ---
 
 ## Troubleshooting
 
-### API won't start
+### Container fails to start
 
+Check Cloud Run logs:
 ```bash
-# Check logs
-fly logs --app hooksniff-api
-
-# Common issues:
-# 1. DATABASE_URL not set → fly secrets list
-# 2. Migration not run → psql "$DATABASE_URL" -f migrations/001_init.sql
-# 3. Port conflict → check PORT env var
+gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="hooksniff-api"' --limit=20
 ```
+
+Common causes:
+- Missing environment variables
+- Database connection failure
+- OTLP exporter panic (check `OTEL_ENABLED=false` to test)
 
 ### Database connection issues
 
 ```bash
 # Test connection
-psql "$DATABASE_URL" -c "SELECT 1;"
+psql "$DATABASE_URL" -c "SELECT 1"
 
-# Check Neon status: https://console.neon.tech
-# Ensure sslmode=require is in connection string
+# Check migrations
+psql "$DATABASE_URL" -c "SELECT * FROM _migrations ORDER BY version DESC LIMIT 5"
 ```
 
-### Webhook delivery failures
+### Rate limit errors
 
+Check Redis connection:
 ```bash
-# Check worker logs
-fly logs --app hooksniff-worker
-
-# Check endpoint health
-curl -H "Authorization: Bearer hr_live_..." \
-  https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoint-health
-
-# Common issues:
-# 1. Endpoint URL unreachable
-# 2. Endpoint returning 4xx/5xx
-# 3. PostgreSQL down
-```
-
-### Stripe webhook issues
-
-```bash
-# Test webhook endpoint
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"type": "ping"}'
-
-# Check Stripe webhook logs in Stripe Dashboard
-# Ensure STRIPE_WEBHOOK_SECRET matches the signing secret
-```
-
-### Rate limiting
-
-Check response headers:
-```
-X-RateLimit-Limit: 1000
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 45
-```
-
-If hitting limits:
-1. Upgrade plan
-2. Implement request batching (`POST /v1/webhooks/batch`)
-3. Cache responses client-side
-
-### Memory issues
-
-```bash
-# Check machine resources
-fly machine list --app hooksniff-api
-
-# Increase memory
-fly scale memory 1024 --app hooksniff-api
-
-# Or update fly.toml
-# [[vm]]
-#   memory_mb = 1024
+curl -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" "$UPSTASH_REDIS_REST_URL/ping"
 ```
