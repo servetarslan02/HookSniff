@@ -719,7 +719,9 @@
       "compare": "Compare",
       "customers": "Customers",
       "security": "Security",
-      "playground": "Playground"
+      "playground": "Playground",
+      "startups": "Startups",
+      "newsletter": "Newsletter"
     }
   },
   "apiKeys": {
