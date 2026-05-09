@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 01:55 GMT+8
+> Son güncelleme: 2026-05-10 02:19 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -645,3 +645,48 @@ cd dashboard && npm install && npm run build
 ### Sonraki Oturum İçin Kalan (Öncelik 4 — 2 rapor)
 - CRM_SETUP_STRATEGY
 - EXIT_SCALING_STRATEGY
+
+---
+
+## 📝 Oturum 54 (2026-05-10 01:22 - 02:19 GMT+8) — Blog + Status + Docs v2
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**Blog v2:**
+- 6 yeni blog yazısı (rakip karşılaştırma, changelog, MCP, tutorial, architecture, customer story)
+- 10 altyapı (search, pagination, syntax highlighting, TOC, cover image, author, testimonials, newsletter API, OG meta, redirect)
+- 17 toplam blog yazısı
+
+**Status Page v2:**
+- API bağımsız (3 katmanlı fallback: /api/status → API → static JSON)
+- 7 component (API, Dashboard, Worker, DB, Cache, Email, Storage)
+- 90 gün uptime geçmişi, per-component uptime %
+- Sparkline grafikler, incident log, uptime calendar, maintenance
+- Build hatası fix (useTranslations unused import)
+
+**Docs v2:**
+- 14 doc sayfası (3'ten 14'e): quickstart, concepts, retries, security, dashboard, integrations, self-hosting, architecture, idempotency, event-types, portal, dlq
+- 2 component: CodeBlock (copy button), SdkTabs (multi-lang tabs)
+- Kategorili sidebar: Getting Started, Guides, Features, Reference
+- Build hatası fix (9 unused imports, JSX escape, i18n keys)
+
+**Test Sonuçları: 31/31 ✅**
+- Blog: 10/10, Status: 7/7, Docs: 9/9, i18n: 5/5
+- Build: 0 hata, 0 MISSING_MESSAGE
+
+### GitHub Push'ları
+- `4e9d8a5` — blog 6 yeni yazı
+- `a02c1ce` — blog v2 altyapı
+- `553afb1` — status page v2
+- `256206f` — status page build fix
+- `9d34ee0` — docs v2
+- `967119f` — docs build fixes
+- `27dcb0c` — hafıza güncelleme
+
+### Toplam Değişiklik
+- ~50 dosya create/modify
+- ~7000+ satır kod
