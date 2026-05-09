@@ -43,6 +43,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: '🔧 Webhook Builder', href: '/dashboard/webhook-builder', icon: '🔧' },
     { name: '📋 Audit Log', href: '/dashboard/audit-log', icon: '📋' },
     { name: '🔐 SSO / SAML', href: '/dashboard/sso', icon: '🔐' },
+    { name: '🔄 Retry Policy', href: '/dashboard/retry-policy', icon: '🔄' },
     { name: '🌐 Custom Domain', href: '/dashboard/custom-domain', icon: '🌐' },
     { name: t('team'), href: '/dashboard/team', icon: '👥' },
     { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
