@@ -22,6 +22,7 @@
    - 6.6 Analytics/Takip Planı
 7. [Uygulama Planı (Güncellenmiş)](#7-uygulama-planı-güncellenmiş)
 8. [Beklenen Etki](#8-beklenen-etki)
+9. [Canlı Test Planı](#9-canlı-test-planı-ai-tarafından-yapılacak)
 
 ---
 
@@ -784,3 +785,78 @@ Developer'lar webhook altyapısını kendileri de yazabilir. Karşılaştırma:
 - Mevcut activation oranı: ~%30 (tahmini)
 - Hedef activation oranı: ~%60
 - İlk 2 ay hedefi: 50-100 kullanıcı, 5-10 ödeme
+
+---
+
+## 9. Canlı Test Planı (AI Tarafından Yapılacak)
+
+> Bu testler bir sonraki oturumda AI tarafından gerçekleştirilecektir. Sonuçlar rapora eklenecek ve tespitler güncellenecektir.
+
+### Test 1: Landing Page İncelemesi
+- [ ] hooksniff.vercel.app açılacak
+- [ ] Tüm bölümler kontrol edilecek (hero, features, pricing, footer)
+- [ ] Responsive kontrol (mobil, tablet, desktop)
+- [ ] Linkler çalışıp çalışmadığı kontrol edilecek
+- [ ] Fiyat bilgilerinin doğruluğu kontrol edilecek
+- [ ] Ekran görüntüsü alınacak
+
+### Test 2: Kayıt Akışı
+- [ ] Register formu açılacak
+- [ ] Geçersiz email ile deneme (hata mesajı kontrol)
+- [ ] Kısa şifre ile deneme (hata mesajı kontrol)
+- [ ] Başarılı kayıt denemesi
+- [ ] Hoş geldin emaili tetikleniyor mu kontrol
+- [ ] Email doğrulama akışı kontrol
+
+### Test 3: Giriş Akışı
+- [ ] Yanlış email ile deneme (hata mesajı kontrol)
+- [ ] Yanlış şifre ile deneme (hata mesajı kontrol)
+- [ ] Rate limit tetikleme (10+ başarısız deneme)
+- [ ] Başarılı giriş
+- [ ] 2FA akışı (varsa)
+
+### Test 4: Dashboard Gezintisi
+- [ ] Ana sayfa (stat kartları, grafikler)
+- [ ] Onboarding modal açılıyor mu
+- [ ] Endpoints sayfası
+- [ ] API Keys sayfası
+- [ ] Deliveries sayfası
+- [ ] Analytics sayfası
+- [ ] Billing sayfası
+- [ ] Settings sayfası
+- [ ] Tüm sidebar linkleri çalışıyor mu
+
+### Test 5: Hata Durumları
+- [ ] Var olmayan URL'ye gitme (404 sayfası)
+- [ ] API key olmadan istek atma (401 hatası)
+- [ ] Geçersiz endpoint URL'si ile webhook gönderme
+- [ ] Boş form ile endpoint oluşturma
+- [ ] Ağ hatası simülasyonu
+
+### Test 6: API Testleri (curl)
+- [ ] POST /v1/auth/register
+- [ ] POST /v1/auth/login
+- [ ] GET /v1/endpoints
+- [ ] POST /v1/endpoints
+- [ ] POST /v1/webhooks
+- [ ] GET /v1/webhooks
+- [ ] Health check endpoint
+
+### Test 7: Mobil Kontrol
+- [ ] Landing page mobil görünüm
+- [ ] Dashboard mobil görünüm
+- [ ] Onboarding modal mobil
+- [ ] Form'lar mobilde çalışır mı
+- [ ] Tablolar mobilde okunabilir mi
+
+### Test 8: Karşılaştırma (Rakipler)
+- [ ] Svix kayıt akışı (mümkünse)
+- [ ] Hook0 kayıt akışı (mümkünse)
+- [ ] Onboarding deneyimleri not edilecek
+
+### Çıktı
+Testler tamamlandıktan sonra:
+- Her testin sonucu (geçti/başarısız/not)
+- Ekran görüntüleri
+- Tespit edilen yeni sorunlar
+- Raporun güncellenmesi
