@@ -308,9 +308,9 @@ public class WebhooksResource: @unchecked Sendable {
 
 // MARK: - Search Resource
 public class SearchResource {
-    private let client: HookSniffClient
+    private let client: HookSniff
 
-    init(client: HookSniffClient) {
+    init(client: HookSniff) {
         self.client = client
     }
 
