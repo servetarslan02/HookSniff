@@ -93,9 +93,9 @@ RateLimiter fix push edildi (`4bbd9aa`) ama Cloud Run'a deploy edilemedi.
 | Go | pkg.go.dev | ✅ `v0.1.0` | — |
 | Swift | Swift Package Index | ✅ `v0.1.0` | — |
 | PHP | Packagist | ✅ `hooksniff/hooksniff-php` | — |
-| Java | Maven Central | ⏳ | GPG key + `scripts/publish-java.sh` |
-| Kotlin | Maven Central | ⏳ | Gradle wrapper + `scripts/publish-kotlin.sh` |
-| Ruby | RubyGems | ⏳ | `scripts/publish-ruby.sh` |
+| Java | Maven Central | ⏳ | OSSRH credential gerekli (build hazır) |
+| Kotlin | Maven Central | ⏳ | OSSRH credential gerekli (build hazır) |
+| Ruby | RubyGems | ✅ `hooksniff 0.1.0` mevcut | — |
 | Elixir | Hex.pm | ⏳ | `scripts/publish-elixir.sh` |
 
 ---
