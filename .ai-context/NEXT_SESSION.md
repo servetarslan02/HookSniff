@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 02:53 GMT+8
+> Son güncelleme: 2026-05-10 02:58 GMT+8
 > Bu dosya bir sonraki oturumda ne yapılacağını anlatır.
 
 ---
