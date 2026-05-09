@@ -1,30 +1,36 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 07:38 GMT+8
+> Son güncelleme: 2026-05-10 07:49 GMT+8
 
 ---
 
 ## ✅ BU OTURUMDA YAPILAN (Session 67 — TAMAMLANDI)
 
-### Güvenlik Düzeltmeleri
-1. **OAuth CSRF Koruması** — State parametresi cookie'de saklanıyor, callback'te doğrulanıyor
-2. **OAuth Refresh Token** — 30 günlük refresh cookie, database'e kaydediliyor
-3. **Custom CSS XSS** — `<script>`, `javascript:`, `expression()` vb. pattern'ler engelleniyor
-4. **Error Sızıntısı** — OAuth redirect URL'lerinden `details` parametresi kaldırıldı
-5. **Redis TLS** — `tokio-rustls-comp` feature ile düzeltildi, Cargo.lock güncellendi
+### Kritik Güvenlik Düzeltmeleri (6)
+1. OAuth CSRF koruması — state cookie doğrulaması
+2. OAuth refresh token — 30 günlük cookie + database
+3. Custom CSS XSS — tehlikeli pattern engelleme
+4. Error sızıntısı — OAuth URL'lerden detail kaldırıldı
+5. Redis TLS — `tokio-rustls-comp` feature
+6. Google OAuth env var'ları Cloud Run'a eklendi
+
+### Orta Seviye Düzeltmeleri (2)
+7. Domain validasyonu — regex, max 253 char, alphanumeric+hyphen
+8. IP spoofing — X-Real-IP öncelikli, X-Forwarded-For son entry
 
 ### Altyapı
-6. **Google OAuth** — Cloud Run env var'ları eklendi (GOOGLE_CLIENT_ID, SECRET, OAUTH_REDIRECT_BASE)
-7. **Cloud Build** — `rust:1-bookworm` ile başarılı build
-8. **Deploy** — Revision `00050-jw8` live
-9. **gcloud CLI** — Bu makineye kuruldu + SA key auth
+- Cloud Build: 4 başarılı build
+- Cloud Run: 5 deploy (00048 → 00051)
+- gcloud CLI kuruldu + SA key auth
+- 31/31 test geçiyor
 
 ---
 
-## 🟡 SERVET'İN YAPMASI GEREKEN
+## ⚠️ Kalan (Düşük Öncelik)
+- SSO client_secret: Base64 yerine AES-GCM gerekli
+- Dashboard: Bazı sayfalar `apiFetch` yerine doğrudan fetch kullanıyor
 
-| # | Görev | Öncelik |
-|---|-------|---------|
-| 1 | OAuth test et (Google + GitHub) | 🔴 |
-| 2 | GitHub PAT rotate et | ⚠️ |
-| 3 | Vercel dashboard rebuild (yarın) | 🔴 |
+## 🟡 Servet'in Yapması Gereken
+- OAuth test et (Google + GitHub)
+- GitHub PAT rotate et
+- Vercel dashboard rebuild (yarın)
