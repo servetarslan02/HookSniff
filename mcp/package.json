@@ -1,0 +1,22 @@
+{
+  "name": "@hooksniff/mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for HookSniff webhook management — allows AI agents to manage webhooks",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "hooksniff-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test test.js"
+  },
+  "keywords": ["mcp", "hooksniff", "webhooks", "ai-agent"],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
