@@ -11,6 +11,7 @@
 ### BUG-001: Fiyat Tutarsızlığı ($49/$149 → $29/$99)
 - **Dosya**: `api/src/billing/mod.rs` satır ~85
 - **Ayrıca**: `api/src/routes/admin.rs` revenue query'si
+- **Ayrıca**: `dashboard/src/app/[locale]/dashboard/billing/page.tsx` — `price: 49`, `price: 149` hardcoded
 - **Sorun**: Kodda Pro=$49, Business=$149 tanımlı ama fiyat $29/$99 olmalı
 - **Etki**: Stripe/Polar/iyzico'da yanlış fiyat gösterilir, müşteriler yanlış ücretlendirilir
 - **Fix**: `monthly_price_cents()` fonksiyonunda `2900` ve `9900` yap. Admin revenue query'sindeki CASE ifadelerini güncelle.
@@ -70,6 +71,8 @@
   - `sdks/python/hooksniff/utils.py`: Docstring'te `X-Hookrelay-Signature`
   - `sdks/python/hooksniff/verify.py`: `X-Hookrelay-Signature` header lookup
   - `sdks/go/hooksniff.go`: `X-Hookrelay-Signature` header lookup
+- `deploy/oracle-cloud-setup.sh`: Script header "HookRelay" olarak kalmış
+- `deploy/gcp-deploy.ps1`: Script header "HookRelay" olarak kalmış
 - **Etki**: Eski isim kalıntısı, production'da hata oluşturabilir
 - **Fix**: "hookrelay" → "hooksniff" olarak değiştir
 - **Durum**: ❌ Düzeltilmedi
