@@ -217,3 +217,22 @@ cd dashboard && npm install && npm run build
 | 24 | 2026-05-09 05:33 | SDK publish tamamlandı (M2) |
 | 20-23 | 2026-05-09 04:28 | Kod incelesi, 52 clippy fix, SDK publish denemeleri |
 | 9-19 | 2026-05-08 | İlk oturumlar, test fix, Gmail API geçişi |
+
+---
+
+## 📝 Oturum 40-41 (2026-05-09 23:24 - 2026-05-10 00:19)
+
+### Yapılan İşler
+- API deploy: CORS fix (AllowHeaders + AllowMethods wildcard → explicit)
+- DB migration: email_verified, totp_secret, totp_enabled, refresh_tokens, password_reset_tokens, email_verification_tokens, device_tokens, test_mode columns/tables
+- STRING → TEXT düzeltmesi (PostgreSQL uyumluluğu)
+- GCP Service Account ile Cloud Build/Deploy kuruldu
+
+### Kalan Sorunlar
+- Redis TLS bağlantısı yok (in-memory fallback)
+- GCP SA JSON parse hatası (email servisi çalışmıyor)
+- Cloud Build Trigger kurulmalı (otomatik deploy)
+
+### Servet'in Yapması Gereken
+- 🔴 Login test (deploy sonrası)
+- ⚠️ Token rotation (GitHub PAT, npm, GCP SA)
