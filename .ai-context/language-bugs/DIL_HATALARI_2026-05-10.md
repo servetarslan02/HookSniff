@@ -255,7 +255,132 @@ Aşağıdaki sayfalar için çeviri key'leri hiç oluşturulmamış:
 
 ---
 
-## 10. Notlar
+## 10. Derin Tarama — Ek Bulgular
+
+### 10.1 Landing Page
+| Yer | Hardcoded Metin |
+|-----|----------------|
+| `DashboardPreview` component | "Deliveries", "Success Rate", "Avg Latency" |
+| Pricing CTA button | "Get Started" |
+
+### 10.2 Error / Not Found Sayfaları
+| Sayfa | Hardcoded Metinler |
+|-------|-------------------|
+| `error.tsx` | "Something went wrong", "An unexpected error occurred. Please try again.", "Try again" |
+| `not-found.tsx` | "404", "The page you're looking for doesn't exist.", "← Back to Home" |
+
+### 10.3 Form Validation & Error Messages
+| Dosya | Hardcoded |
+|-------|-----------|
+| `lib/store.tsx` | "Not authenticated", "Login failed", "Registration failed" |
+| `dashboard/settings/page.tsx` | "Password must be at least 8 characters", "Failed to update profile", "Failed to change password", "Failed to delete account" |
+| `dashboard/billing/page.tsx` | "Cancel failed", "Upgrade failed" |
+| `dashboard/endpoints/page.tsx` | "Failed to create endpoint", "Failed to delete", "Unknown error" |
+| `dashboard/endpoints/[id]/page.tsx` | "Failed to load endpoint", "Failed to update", "Rotation failed" |
+| `dashboard/transforms/page.tsx` | "Failed to create rule", "Failed to delete" |
+| `dashboard/inbound/page.tsx` | "Failed" |
+| `dashboard/portal/page.tsx` | "Failed to load portal data" |
+| `dashboard/playground/page.tsx` | "Unknown error" |
+| `dashboard/api-keys/page.tsx` | (error key used but fallback hardcoded) |
+| `OnboardingWizard.tsx` | "Failed to create endpoint" |
+| `lib/api.ts` | "Unknown error", "API error: {status}" |
+
+### 10.4 Empty States (Hardcoded)
+| Dosya | Hardcoded Metin |
+|-------|----------------|
+| `dashboard/endpoints/page.tsx` | "No endpoints yet. Create one to start receiving webhooks." |
+| `dashboard/alerts/page.tsx` | "No alert rules yet. Create one to get notified about webhook failures." |
+| `dashboard/team/page.tsx` | "No members yet. Invite someone!" |
+| `dashboard/health/page.tsx` | "No endpoints yet. Create one to start monitoring health." |
+| `dashboard/deliveries/[id]/page.tsx` | "No additional debug data captured for this attempt" |
+| `admin/users/page.tsx` | "No users found." |
+| `dashboard/schemas/page.tsx` | "No schemas registered yet" |
+| `dashboard/templates/page.tsx` | "No templates available" |
+
+### 10.5 OnboardingWizard Component
+Hardcoded: "Setup Progress", "Create your first endpoint", "Choose your SDK", "Install Command", "Test Command", "Send a test webhook", "API Keys", "Endpoints", "Deliveries", "Playground", " Use the "
+
+### 10.6 StatusBadge Component
+Status text'leri API'den geldiği için çevrilebilir ama şu an raw İngilizce: "delivered", "failed", "pending", "active", "inactive", "banned", "paid", "warning"
+
+### 10.7 Contact Sayfası (Detaylı)
+Hardcoded: "Contact", "Contact Us", "Email", "Location", "Response Time", "Name", "Subject", "Message", "Send us a message", "Select a topic", "General question", "Technical support", "Feature request", "Bug report", "Enterprise inquiry"
+
+### 10.8 Terms Sayfası (Detaylı)
+~25 hardcoded paragraf/sentence — tüm kullanım şartları İngilizce
+
+### 10.9 Privacy Sayfası (Detaylı)
+~25 hardcoded paragraf/sentence — tüm gizlilik politikası İngilizce
+
+### 10.10 Newsletter Sayfası
+Hardcoded: "Newsletter", "The Webhook Digest", "Subscribers", "Issues sent", "Open rate", "Recent Issues", "What subscribers say", "Your privacy matters", "Privacy Policy", "Frequently Asked Questions", "Servet Arslan"
+
+### 10.11 CompareContent Component
+Hardcoded: "Compare", "Compare Page", "Category", "Scorecard", "Total", "Detailed Comparison", "Deep Dive Comparisons", "Frequently Asked Questions", "HookSniff in Action", "Webhook Playground", "Build vs Buy", "View pricing", "Trusted by developers who switched from building their own webhooks"
+
+### 10.12 BuildVsBuyContent Component
+Hardcoded: "Build vs Buy", "Time to production", "Days", "Engineers to deploy HookSniff", "HookSniff Pro", "When Building Still Makes Sense", "Compare alternatives", "Frequently Asked Questions"
+
+### 10.13 Startups Sayfası
+Hardcoded: "Startups", "Build faster with HookSniff", "Apply for startup pricing"
+
+### 10.14 Status Sayfası (Detaylı)
+Hardcoded: "System Status", "Overall Uptime", "Latency", "Components", "Incident History", "Past Maintenance", "Scheduled Maintenance", "Upcoming", "Today", "No data", "No scheduled maintenance", "Uptime", "HookSniff", "Docs"
+
+### 10.15 Dashboard Webhooks New
+Hardcoded: "Endpoint", "Event Type"
+
+### 10.16 Changelog Sayfası
+Hardcoded: "Changelog", "Latest", "All areas", "All types", "Navigate", "Subscribe"
+
+---
+
+## 11. Öncelik Sıralaması (Güncellenmiş)
+
+### 🔴 Kritik (kullanıcı doğrudan görür, etkisi büyük)
+1. `dashboard/deliveries/[id]` — Detay sayfası tamamen İngilizce
+2. `dashboard/endpoints/[id]` — Ayarlar sayfası tamamen İngilizce
+3. `dashboard/portal` — Kullanıcı profili tamamen İngilizce
+4. `dashboard/transforms` — Transform kuralları tamamen İngilizce
+5. `dashboard/layout.tsx` — "HookSniff", "Webhook Dashboard" hardcoded
+6. `dashboard/inbound/page.tsx` — "How it works" vb. hardcoded
+7. `dashboard/alerts/page.tsx` — Tablo header'ları hardcoded
+8. `dashboard/team/page.tsx` — Tablo header'ları hardcoded
+9. `dashboard/deliveries/page.tsx` — Tablo header'ları hardcoded
+10. `dashboard/search/page.tsx` — Tablo header'ları hardcoded
+11. Bileşenler: `ErrorBoundary`, `NotificationCenter`, `OnboardingWizard`
+12. `error.tsx` — "Something went wrong"
+13. `not-found.tsx` — "404", "Back to Home"
+14. Empty states — 8 sayfada hardcoded "No X yet" mesajları
+15. Error messages — 12+ dosyada hardcoded error text'leri
+
+### 🟡 Orta (pazarlama sayfaları, kullanıcı ilk girişte görür)
+16. `pricing/page.tsx` — Fiyatlandırma tamamen İngilizce
+17. `security/page.tsx` — Güvenlik sayfası tamamen İngilizce
+18. `contact/page.tsx` — İletişim formu hardcoded (15+ alan)
+19. `about/page.tsx` — Hakkımızda hardcoded
+20. `login/page.tsx` — Login sayfası
+21. `terms/page.tsx` — Kullanım şartları (~25 paragraf hardcoded)
+22. `privacy/page.tsx` — Gizlilik politikası (~25 paragraf hardcoded)
+23. `providers/` — Tüm provider sayfaları (3 sayfa)
+24. `startups/page.tsx` — "Build faster with HookSniff"
+25. `newsletter/page.tsx` — 11+ hardcoded alan
+26. `compare/CompareContent.tsx` — 13+ hardcoded alan
+27. `build-vs-buy/BuildVsBuyContent.tsx` — 8+ hardcoded alan
+28. `DashboardPreview` — "Deliveries", "Success Rate", "Avg Latency"
+29. Landing page "Get Started" button
+
+### 🟢 Düşük (içerik/blog, SEO odaklı)
+30. `docs/` — Tüm dokümantasyon (11 sayfa)
+31. `alternatives/` — Tüm alternatifler (8 sayfa)
+32. `blog/`, `changelog/`, `customers/`, `use-cases/`
+33. `status/page.tsx` — 15+ hardcoded alan
+34. `playground/page.tsx` — 15+ hardcoded alan
+35. `admin/` sayfaları
+
+---
+
+## 12. Notlar
 
 - `tr.json` neredeyse tam çevrilmiş, diğer dillerde büyük eksiklik var
 - Bazı terimler (Endpoint, Plan, Test, GitHub, Pricing vb.) evrensel olabilir — bunlar kasıtlı İngilizce bırakılmış olabilir
@@ -264,3 +389,6 @@ Aşağıdaki sayfalar için çeviri key'leri hiç oluşturulmamış:
 - `dashboard/deliveries/[id]` sayfası için çeviri key'leri `en.json`'da mevcut ama sayfa bunları kullanmıyor
 - `dashboard/routing` sayfası boş — ne hardcoded ne çeviri var
 - `dashboard/templates` ve `dashboard/schemas` sayfaları neredeyse boş, sadece "No data" mesajı var
+- Error mesajları (throw new Error) kullanıcıya gösteriliyor — bunlar da çevrilmeli
+- Terms ve Privacy sayfaları tamamen İngilizce — yasal metinler olduğu için profesyonel çeviri gerekir
+- StatusBadge component API'den gelen status string'ini doğrudan gösteriyor — backend'den çevrilmiş gelmeli veya frontend'de map'lenmeli
