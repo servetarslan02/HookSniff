@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function CodeBlock({ code, language }: { code: string; language?: string }) {
+export default function CodeBlock({ code, language: _language }: { code: string; language?: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
