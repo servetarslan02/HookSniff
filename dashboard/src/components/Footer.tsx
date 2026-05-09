@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 const footerLinks = [
   { nameKey: 'github', href: 'https://github.com/servetarslan02/HookSniff' },
   { nameKey: 'docs', href: '/docs' },
+  { nameKey: 'pricing', href: '/pricing' },
   { nameKey: 'changelog', href: '/changelog' },
   { nameKey: 'status', href: '/status' },
   { nameKey: 'about', href: '/about' },
