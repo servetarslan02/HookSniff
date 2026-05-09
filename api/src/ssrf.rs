@@ -238,4 +238,48 @@ mod tests {
         assert!(validate_url("not-a-url").is_err());
         assert!(validate_url("").is_err());
     }
+
+    #[test]
+    fn test_broadcast_not_blocked_by_current_rules() {
+        // 255.255.255.255 is not in any blocked range (private/link-local/loopback)
+        // It passes IP validation but may fail DNS resolution in production
+        let result = validate_url("http://255.255.255.255/webhook");
+        // Current implementation doesn't block broadcast addresses
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_blocks_class_a_private() {
+        assert!(validate_url("http://10.255.255.255/webhook").is_err());
+        assert!(validate_url("http://10.0.0.0/webhook").is_err());
+    }
+
+    #[test]
+    fn test_blocks_class_b_private() {
+        assert!(validate_url("http://172.31.255.255/webhook").is_err());
+        assert!(validate_url("http://172.16.0.0/webhook").is_err());
+    }
+
+    #[test]
+    fn test_allows_public_ips() {
+        assert!(validate_url("http://8.8.8.8/webhook").is_ok());
+        assert!(validate_url("http://1.1.1.1/webhook").is_ok());
+    }
+
+    #[test]
+    fn test_error_display() {
+        let err = validate_url("http://127.0.0.1/test").unwrap_err();
+        let display = format!("{}", err);
+        assert!(!display.is_empty());
+    }
+
+    #[test]
+    fn test_url_with_query_params() {
+        assert!(validate_url("https://example.com/webhook?token=abc").is_ok());
+    }
+
+    #[test]
+    fn test_url_with_port() {
+        assert!(validate_url("https://example.com:8080/webhook").is_ok());
+    }
 }
