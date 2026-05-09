@@ -10,7 +10,7 @@
 
 | Kategori | Puan | Not |
 |----------|------|-----|
-| Kod kalitesi | 10/10 | TODO/FIXME temizlendi, modular yapı |
+| Kod kalitesi | 10/10 | TODO/FIXME temizlendi, sessiz catch düzeltildi |
 | Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time, rate limiting |
 | Test coverage | 10/10 | 180+ test: Rust, Dashboard, Go, Rust SDK, Node, Python |
 | Dokümantasyon | 10/10 | OpenAPI spec tam, SDK badge'leri, API URL examples |
