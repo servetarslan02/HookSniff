@@ -33,14 +33,29 @@ export default function RateLimitingPage() {
   const fetchStats = useCallback(async () => {
     if (!token) return;
     try {
-      // Try to fetch from rate-limit endpoint, fallback to mock data
-      try {
-        const data = await apiFetch<RateLimitStats>('/rate-limits', { token });
-        setStats(data);
-      } catch {
-        // Endpoint may not exist yet — show helpful empty state
+      const data = await apiFetch<Array<{ endpoint_id: string; requests_per_second: number; burst_size: number; enabled: boolean }>>('/rate-limits', { token });
+      if (data.length === 0) {
         setStats(null);
+      } else {
+        setStats({
+          total_endpoints: data.length,
+          total_throttled: 0,
+          avg_rps: data.reduce((acc, d) => acc + d.requests_per_second, 0) / data.length,
+          peak_rps: Math.max(...data.map(d => d.requests_per_second)),
+          limits: data.map(d => ({
+            endpoint_id: d.endpoint_id,
+            endpoint_url: d.endpoint_id.slice(0, 8) + '...',
+            requests_per_second: d.requests_per_second,
+            requests_per_minute: d.requests_per_second * 60,
+            burst_size: d.burst_size,
+            current_queue_depth: 0,
+            throttled_count: 0,
+            last_throttled_at: null,
+          })),
+        });
       }
+    } catch {
+      setStats(null);
     } finally {
       setLoading(false);
     }
