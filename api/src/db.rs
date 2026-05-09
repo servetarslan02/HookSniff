@@ -891,7 +891,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
-    // Step 39: Migration 038 — email_verified + 2FA columns (missing from inline migrations)
+    // Step 39: Migration 038 — email_verified + 2FA columns
     run_migration(
         pool,
         "038_email_verified_totp",
@@ -899,6 +899,95 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
         ALTER TABLE customers ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false;
         ALTER TABLE customers ADD COLUMN IF NOT EXISTS totp_secret TEXT;
         ALTER TABLE customers ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN NOT NULL DEFAULT false;
+        "#,
+    )
+    .await?;
+
+    // Step 40: Migration 039 — password_reset_tokens table
+    run_migration(
+        pool,
+        "039_password_reset_tokens",
+        r#"
+        CREATE TABLE IF NOT EXISTS password_reset_tokens (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            token_hash TEXT NOT NULL,
+            expires_at TIMESTAMPTZ NOT NULL,
+            used BOOLEAN NOT NULL DEFAULT false,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_hash ON password_reset_tokens(token_hash);
+        CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_customer ON password_reset_tokens(customer_id);
+        "#,
+    )
+    .await?;
+
+    // Step 41: Migration 040 — email_verification_tokens table
+    run_migration(
+        pool,
+        "040_email_verification_tokens",
+        r#"
+        CREATE TABLE IF NOT EXISTS email_verification_tokens (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            token_hash TEXT NOT NULL,
+            expires_at TIMESTAMPTZ NOT NULL,
+            used BOOLEAN NOT NULL DEFAULT false,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_hash ON email_verification_tokens(token_hash);
+        CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_customer ON email_verification_tokens(customer_id);
+        "#,
+    )
+    .await?;
+
+    // Step 42: Migration 041 — refresh_tokens table
+    run_migration(
+        pool,
+        "041_refresh_tokens",
+        r#"
+        CREATE TABLE IF NOT EXISTS refresh_tokens (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            token_hash TEXT NOT NULL,
+            expires_at TIMESTAMPTZ NOT NULL,
+            revoked BOOLEAN NOT NULL DEFAULT false,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_refresh_tokens_hash ON refresh_tokens(token_hash);
+        CREATE INDEX IF NOT EXISTS idx_refresh_tokens_customer ON refresh_tokens(customer_id);
+        "#,
+    )
+    .await?;
+
+    // Step 43: Migration 042 — device_tokens table
+    run_migration(
+        pool,
+        "042_device_tokens",
+        r#"
+        CREATE TABLE IF NOT EXISTS device_tokens (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            token TEXT NOT NULL,
+            platform TEXT NOT NULL DEFAULT 'android',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            last_used_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            UNIQUE(customer_id, token)
+        );
+        CREATE INDEX IF NOT EXISTS idx_device_tokens_customer ON device_tokens(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_device_tokens_token ON device_tokens(token);
+        "#,
+    )
+    .await?;
+
+    // Step 44: Migration 043 — test mode columns
+    run_migration(
+        pool,
+        "043_test_mode",
+        r#"
+        ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT false;
+        ALTER TABLE webhook_queue ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT false;
+        CREATE INDEX IF NOT EXISTS idx_deliveries_is_test ON deliveries(is_test) WHERE is_test = true;
         "#,
     )
     .await?;
