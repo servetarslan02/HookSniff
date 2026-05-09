@@ -1,3 +1,3 @@
-module github.com/hooksniff/hooksniff-go
+module github.com/servetarslan02/hooksniff-go
 
 go 1.22
