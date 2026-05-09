@@ -290,7 +290,7 @@ mod tests {
     #[test]
     fn test_cloud_event_from_json_invalid() {
         assert!(CloudEvent::from_json("not json").is_err());
-        assert!(CloudEvent::from_json("{}").is_ok()); // missing fields default
+        assert!(CloudEvent::from_json("{}").is_err()); // missing required fields
     }
 
     #[test]
