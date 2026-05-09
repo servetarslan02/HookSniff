@@ -512,3 +512,140 @@ Hardcoded: "API Server", "PostgreSQL Database", "Redis Cache", "Webhook Queue", 
 | `changelog/[slug]/page.tsx` | "Changelog", "Latest" |
 
 **Tarama tamamlandı.** Toplam 60+ sayfa, 15+ bileşen tarandı. 500+ hardcoded İngilizce metin tespit edildi.
+
+---
+
+## 14. Satır Satır Okuma — Detaylı Bulgular
+
+### 14.1 get-started/page.tsx (EN DETAYLI — 300+ satır hardcoded)
+**SDK_EXAMPLES objesi:**
+- label: "Node.js", "Python", "Go", "Rust", "curl"
+- install: "npm install hooksniff-sdk", "pip install hooksniff", "go get github.com/hooksniff/hooksniff-go", "cargo add hooksniff"
+- code: Her SDK için tam kod örnekleri (hardcoded)
+
+**EVENT_TYPES objesi:**
+- category: "💳 Payments", "👤 Users", "📦 Orders", "📧 Email", "🤖 AI / Agents", "🔔 Notifications"
+- events: Her kategori için 5-6 event type (hardcoded)
+
+**Hero section:**
+- "Free tier — no credit card required"
+- "Get Started with HookSniff"
+- "Send your first webhook in under 5 minutes. HookSniff handles delivery, retries, security, and monitoring."
+- "Free forever", "11 SDKs", "No credit card", "5 min setup"
+
+**Step 1:**
+- "Create your account"
+- "Sign up for free — no credit card required. You get 10,000 webhook deliveries per month on the free plan."
+- "Create Free Account →"
+- "✓ Signed in as {email}"
+
+**Step 2:**
+- "Get your API key"
+- "Your API key authenticates requests. You can find it in your dashboard after signing up."
+- "Your API Key", "Manage keys →"
+- "🙈 Hide", "👁 Show"
+- "💡 Keep your API key secret. Never commit it to version control."
+
+**Step 3:**
+- "Install the SDK"
+- "Choose your language and install the SDK. HookSniff has official SDKs for 11 languages."
+- "Install" (label), "Quickstart" (label)
+
+**Step 4:**
+- "Create an endpoint"
+- "An endpoint is a URL where HookSniff delivers your webhooks. You can create one via the SDK, API, or dashboard."
+- "🖥️ Via Dashboard", "⚡ Via API"
+- "💡 Tip: Use HookSniff Playground to test webhooks without a real endpoint..."
+
+**Step 5:**
+- "Send your first webhook"
+- "Now let's send a test webhook. Use the code below or try the interactive playground."
+- "Test Webhook" (label)
+- "🧪 Try Playground", "📦 View Deliveries"
+
+**Step 6:**
+- "Monitor deliveries & go live"
+- "Track every webhook delivery in real-time..."
+- "📊 Real-time Dashboard", "🔄 Auto Retries", "🔔 Alerts"
+- "Success rates, latency, throughput", "Exponential backoff, configurable", "Get notified on failures"
+- "Open Dashboard →"
+
+**Event Types Reference section:**
+- "📋 Event Type Reference"
+- "Common webhook event types you can use. These are suggestions — use any event type you want."
+
+**Embed section:**
+- "🖼️ Embed in Your App"
+- "Give your customers a white-labeled webhook portal inside your own dashboard."
+- "Embed Code" (label)
+- "Portal Settings" link text
+
+**CLI section:**
+- "⌨️ CLI Quickstart"
+- "Manage HookSniff from your terminal."
+- "Install & Use" (label)
+
+**CTA section:**
+- "Ready to start?"
+- "Create your free account and send your first webhook in minutes."
+- "Create Free Account", "Try Playground", "Go to Dashboard →"
+
+### 14.2 portal-customize/page.tsx
+- "🖼️ Portal Customization"
+- "Customize the look and feel of your embedded webhook portal."
+- "Saving...", "Save Changes"
+- "🎨 Branding" section: "Company Name", "Logo URL", "Primary Color", "Font Family"
+- "⚙️ Features" section: "Dark Mode", "Enable dark mode by default", "Show Events", "Allow users to view event types", "Show Deliveries", "Allow users to view delivery history"
+- "📋 Allowed Events": "Leave empty to show all events. Add specific event types to filter what users can subscribe to."
+- "All events allowed"
+- "👁️ Preview": "Webhook Endpoints", "Event Subscriptions", "Recent Deliveries", "2 endpoints configured", "✅ 47 delivered · ❌ 3 failed"
+- "📋 Embed Code": "Copy this code into your dashboard to embed the portal."
+- "⚛️ React Integration"
+- Error messages: "Portal configuration saved!", "Failed to save: {error}", "Event already added"
+- "Copied!", "Copy"
+
+### 14.3 rate-limiting/page.tsx
+- "⚡ Rate Limiting"
+- "Monitor and configure rate limits for your webhook endpoints."
+- Overview cards: "Total Endpoints", "Avg Requests/sec", "Peak Requests/sec", "Throttled Requests"
+- Table headers: "Endpoint", "RPS", "RPM", "Burst", "Queue", "Throttled"
+- Empty state: "Rate Limiting", "HookSniff automatically rate-limits webhook deliveries to protect your endpoints. Configure limits per endpoint in settings."
+- Feature cards: "🔄 Auto Retry", "Exponential backoff", "📊 Per-Endpoint", "Custom limits", "🔔 Alerts", "Throttle notifications"
+- "How Rate Limiting Works" section:
+  - "1️⃣ Token Bucket Algorithm", "Each endpoint has a token bucket that refills at the configured rate. Requests consume tokens."
+  - "2️⃣ Burst Handling", "Short bursts are allowed up to the burst size, then requests are queued."
+  - "3️⃣ Queue & Retry", "Excess requests are queued and delivered when capacity is available. Failed deliveries retry with exponential backoff."
+  - "4️⃣ Per-Endpoint Config", "Each endpoint can have custom rate limits. Defaults: 10 req/sec, 600 req/min, burst 20."
+
+### 14.4 signature-verifier/page.tsx
+- "🔐 Signature Verifier"
+- "Verify webhook signatures to ensure payloads are authentic. HookSniff signs every webhook with HMAC-SHA256."
+- "Algorithm" section: "HMAC-SHA256", "HMAC-SHA512"
+- "Verify Signature" section: "Webhook Payload (raw body)", "Webhook Secret", "Signature (from x-hooksniff-signature header)"
+- "Verifying...", "✓ Verify Signature", "🔧 Compute Signature"
+- Result: "Signature Valid!", "The payload is authentic and has not been tampered with.", "Signature Invalid!", "The signature does not match. The payload may have been tampered with."
+- "Code Example — Node.js"
+- "How Webhook Signatures Work" section:
+  - "1. HookSniff signs the payload", "When a webhook is delivered, HookSniff computes an HMAC hash of the raw request body using your endpoint's secret key."
+  - "2. Signature is included in headers", "The signature is sent in the x-hooksniff-signature header (format: sha256=<hex_digest>)."
+  - "3. You verify on your server", "Compute the same HMAC hash on your server and compare it with the received signature. Use constant-time comparison to prevent timing attacks."
+- Error messages: "Payload and secret are required", "Signature computed!", "Failed to compute signature", "All fields are required", "Verification failed"
+
+### 14.5 api-importer/page.tsx
+- "📥 API Spec Importer"
+- "Import endpoints from an OpenAPI/Swagger specification. Auto-create webhook endpoints from your existing API."
+- Mode toggle: "🔗 From URL", "📋 Paste JSON"
+- "OpenAPI Spec URL", "Paste OpenAPI JSON"
+- "Fetch", "Parse"
+- Results: "{title} v{version}", "{n} endpoints found", "Deselect All", "Select All", "Importing {n}...", "Import {n} Endpoints"
+- "Supported Formats" section: "OpenAPI 3.0", "Swagger 2.0", "URL", ".json / .yaml", ".json", "https://..."
+- Error messages: "Found {n} endpoints", "Failed to parse OpenAPI spec", "Failed to fetch: {error}", "Failed to parse. Make sure it's valid JSON.", "Select at least one endpoint", "Imported {n}/{total} endpoints"
+- "💡 Tip: Imported endpoints will be created with the URL from your API spec. You can update the URL later to point to your actual webhook receiver."
+- "Copied!", "Copy"
+
+### 14.6 admin/layout.tsx
+- "Access Denied"
+- "Admin Panel"
+- "HookSniff Management"
+
+**Tarama tamamlandı. Tüm dosyalar satır satır okundu.**
