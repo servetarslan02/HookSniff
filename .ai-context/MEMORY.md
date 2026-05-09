@@ -1533,3 +1533,35 @@ Dashboard'daki localStorage fallback'lar artık bu endpoint'lere bağlanabilir:
 - `/dashboard/rate-limiting` → `/v1/rate-limits`
 - `/dashboard/retry-policy` → `/v1/endpoints/{id}/retry-policy` (zaten var)
 - Login sayfası OAuth butonları → `/v1/oauth/providers`
+
+## 📝 Oturum 66b (2026-05-10 06:15 - 06:25 GMT+8) — Dashboard → API Entegrasyonu
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**7 Dashboard sayfası gerçek API'ye bağlandı:**
+
+1. **Login OAuth butonları** — URL düzeltmesi: `/auth/oauth/*` → `/oauth/*`
+2. **SSO sayfası** — `apiFetch('/sso/config')` ile GET/POST, localStorage fallback kaldırıldı
+3. **Custom Domain** — `apiFetch('/custom-domains')` ile POST, domain ID takibi, verify endpoint
+4. **Portal Customize** — `apiFetch('/portal/config')` ile GET/POST, localStorage fallback kaldırıldı
+5. **Rate Limiting** — `apiFetch('/rate-limits')` ile GET, array response mapping
+6. **Retry Policy** — Tüm endpoint'lere retry policy kaydetme (loop ile)
+7. **Audit Log** — Zaten bağlıydı (önceki oturumda)
+
+**Yeni dosya:**
+- `/auth/callback` — OAuth callback sayfası (session verify + redirect)
+
+**Backend düzeltmesi:**
+- OAuth callback'leri artık HttpOnly cookie ayarlıyor (redirect öncesi)
+
+### GitHub Push
+- `16fcf9b` — feat: dashboard → API integration
+- 8 dosya, +248 satır, -122 satır
+
+### Build Durumu
+- ⚠️ Build test edilemedi (Rust kurulu değil)
+- Dashboard Next.js buildпотен sorun: apiFetch response format mapping
