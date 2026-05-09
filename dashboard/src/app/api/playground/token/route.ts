@@ -11,6 +11,16 @@ function generateToken(): string {
   return result;
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
 export async function POST() {
   try {
     const token = generateToken();
@@ -23,12 +33,12 @@ export async function POST() {
       token,
       url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.vercel.app'}/api/playground/in/${token}`,
       expires_in: '24 hours',
-    });
+    }, { headers: corsHeaders });
   } catch (error) {
     console.error('Token generation error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to generate token' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
