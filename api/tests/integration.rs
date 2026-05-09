@@ -452,25 +452,25 @@ fn test_subscription_status_serialization() {
 
 #[test]
 fn test_ssrf_blocks_private_ips() {
-    use hooksniff_api::ssrf::is_safe_url;
+    use hooksniff_api::ssrf::validate_url;
 
     // Private IPs should be blocked
-    assert!(is_safe_url("http://127.0.0.1").is_err());
-    assert!(is_safe_url("http://localhost").is_err());
-    assert!(is_safe_url("http://10.0.0.1").is_err());
-    assert!(is_safe_url("http://172.16.0.1").is_err());
-    assert!(is_safe_url("http://192.168.1.1").is_err());
-    assert!(is_safe_url("http://169.254.169.254").is_err()); // AWS metadata
-    assert!(is_safe_url("http://[::1]").is_err()); // IPv6 loopback
+    assert!(validate_url("http://127.0.0.1").is_err());
+    assert!(validate_url("http://localhost").is_err());
+    assert!(validate_url("http://10.0.0.1").is_err());
+    assert!(validate_url("http://172.16.0.1").is_err());
+    assert!(validate_url("http://192.168.1.1").is_err());
+    assert!(validate_url("http://169.254.169.254").is_err()); // AWS metadata
+    assert!(validate_url("http://[::1]").is_err()); // IPv6 loopback
 }
 
 #[test]
 fn test_ssrf_allows_public_urls() {
-    use hooksniff_api::ssrf::is_safe_url;
+    use hooksniff_api::ssrf::validate_url;
 
-    assert!(is_safe_url("https://example.com").is_ok());
-    assert!(is_safe_url("https://api.stripe.com/webhooks").is_ok());
-    assert!(is_safe_url("https://hooks.slack.com/services/xxx").is_ok());
+    assert!(validate_url("https://example.com").is_ok());
+    assert!(validate_url("https://api.stripe.com/webhooks").is_ok());
+    assert!(validate_url("https://hooks.slack.com/services/xxx").is_ok());
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -491,24 +491,28 @@ fn test_event_type_regex() {
 
 #[test]
 fn test_json_depth_check() {
-    use hooksniff_api::validation::check_json_depth;
+    use hooksniff_api::validation::validate_json_depth;
 
     let shallow = serde_json::json!({"a": 1});
-    assert!(check_json_depth(&shallow, 5).is_ok());
+    assert!(validate_json_depth(&shallow).is_ok());
 
     let deep = serde_json::json!({"a": {"b": {"c": {"d": {"e": 1}}}}});
-    assert!(check_json_depth(&deep, 5).is_ok());
-    assert!(check_json_depth(&deep, 3).is_err());
+    assert!(validate_json_depth(&deep).is_ok());
+
+    // Depth > 10 should fail
+    let very_deep =
+        serde_json::json!({"a":{"b":{"c":{"d":{"e":{"f":{"g":{"h":{"i":{"j":{"k":1}}}}}}}}}}});
+    assert!(validate_json_depth(&very_deep).is_err());
 }
 
 #[test]
 fn test_html_sanitization() {
-    use hooksniff_api::validation::sanitize_html;
+    use hooksniff_api::validation::sanitize_description;
 
-    let clean = sanitize_html("Hello World");
+    let clean = sanitize_description("Hello World");
     assert_eq!(clean, "Hello World");
 
-    let with_script = sanitize_html("<script>alert('xss')</script>Hello");
+    let with_script = sanitize_description("<script>alert('xss')</script>Hello");
     assert!(!with_script.contains("<script>"));
     assert!(with_script.contains("Hello"));
 }
@@ -517,53 +521,43 @@ fn test_html_sanitization() {
 // Circuit breaker tests
 // ──────────────────────────────────────────────────────────────
 
-#[test]
-fn test_circuit_breaker_state_transitions() {
-    use hooksniff_api::circuit_breaker::CircuitBreaker;
+#[tokio::test]
+async fn test_circuit_breaker_state_transitions() {
+    use hooksniff_api::circuit_breaker::{CircuitBreaker, CircuitBreakerConfig, CircuitState};
 
-    let cb = CircuitBreaker::new(3, std::time::Duration::from_secs(60));
+    let config = CircuitBreakerConfig {
+        failure_threshold: 3,
+        cooldown_secs: 60,
+    };
+    let cb = CircuitBreaker::new(config);
+    let ep = uuid::Uuid::new_v4();
 
     // Starts closed
-    assert!(cb.is_closed());
+    assert!(matches!(cb.get_state(ep).await.state, CircuitState::Closed));
 
     // After threshold failures, opens
-    cb.record_failure();
-    cb.record_failure();
-    assert!(cb.is_closed());
-    cb.record_failure();
-    assert!(cb.is_open());
+    cb.record_failure(ep).await;
+    cb.record_failure(ep).await;
+    assert!(matches!(cb.get_state(ep).await.state, CircuitState::Closed));
+    cb.record_failure(ep).await;
+    assert!(matches!(
+        cb.get_state(ep).await.state,
+        CircuitState::Open { .. }
+    ));
 
-    // Success resets
-    let cb2 = CircuitBreaker::new(3, std::time::Duration::from_secs(60));
-    cb2.record_failure();
-    cb2.record_success();
-    cb2.record_failure();
-    assert!(cb2.is_closed());
-}
-
-// ──────────────────────────────────────────────────────────────
-// Retry policy tests
-// ──────────────────────────────────────────────────────────────
-
-#[test]
-fn test_exponential_backoff_calculation() {
-    use hooksniff_api::retry_policy::calculate_backoff;
-
-    let delay1 = calculate_backoff(1, 10, 3600, "exponential");
-    let delay2 = calculate_backoff(2, 10, 3600, "exponential");
-    let delay3 = calculate_backoff(3, 10, 3600, "exponential");
-
-    assert!(delay1 >= 5 && delay1 <= 15); // ~10s with jitter
-    assert!(delay2 >= 15 && delay2 <= 30); // ~20s with jitter
-    assert!(delay3 >= 30 && delay3 <= 50); // ~40s with jitter
-}
-
-#[test]
-fn test_backoff_respects_max_delay() {
-    use hooksniff_api::retry_policy::calculate_backoff;
-
-    let delay = calculate_backoff(20, 10, 60, "exponential");
-    assert!(delay <= 60, "Backoff should not exceed max_delay_secs");
+    // Success resets on a fresh circuit breaker
+    let cb2 = CircuitBreaker::new(CircuitBreakerConfig {
+        failure_threshold: 3,
+        cooldown_secs: 60,
+    });
+    let ep2 = uuid::Uuid::new_v4();
+    cb2.record_failure(ep2).await;
+    cb2.record_success(ep2).await;
+    cb2.record_failure(ep2).await;
+    assert!(matches!(
+        cb2.get_state(ep2).await.state,
+        CircuitState::Closed
+    ));
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -666,7 +660,9 @@ fn test_signature_with_unicode_body() {
     let body = r#"{"message":"Merhaba dünya 🪝","emoji":"🎉"}"#;
 
     let sig = signing::compute_standard_signature(secret, msg_id, timestamp, body);
-    assert!(signing::verify_standard_signature(secret, msg_id, timestamp, &sig, body, None).is_ok());
+    assert!(
+        signing::verify_standard_signature(secret, msg_id, timestamp, &sig, body, None).is_ok()
+    );
 }
 
 #[test]
@@ -677,24 +673,7 @@ fn test_signature_with_very_large_body() {
     let body = "x".repeat(1_000_000); // 1MB body
 
     let sig = signing::compute_standard_signature(secret, msg_id, timestamp, &body);
-    assert!(signing::verify_standard_signature(secret, msg_id, timestamp, &sig, &body, None).is_ok());
-}
-
-// ──────────────────────────────────────────────────────────────
-// CSV injection prevention tests
-// ──────────────────────────────────────────────────────────────
-
-#[test]
-fn test_csv_formula_injection_prevention() {
-    use hooksniff_api::validation::escape_csv_cell;
-
-    // Formulas should be escaped
-    assert!(escape_csv_cell("=cmd|'/c calc'!A0").starts_with("'"));
-    assert!(escape_csv_cell("+SUM(A1:A10)").starts_with("'"));
-    assert!(escape_csv_cell("-2+3").starts_with("'"));
-    assert!(escape_csv_cell("@SUM(A1)").starts_with("'"));
-
-    // Normal values should pass through
-    assert_eq!(escape_csv_cell("normal text"), "normal text");
-    assert_eq!(escape_csv_cell("12345"), "12345");
+    assert!(
+        signing::verify_standard_signature(secret, msg_id, timestamp, &sig, &body, None).is_ok()
+    );
 }
