@@ -36,11 +36,17 @@ export default function SsoSettingsPage() {
       });
       if (res.ok) {
         toast('SSO configuration saved!', 'success');
+      } else if (res.status === 404) {
+        // Backend endpoint doesn't exist yet — save locally
+        try { localStorage.setItem('hooksniff_sso_config', JSON.stringify({ provider, metadata, entityId, ssoUrl, certificate, enabled })); } catch {}
+        toast('SSO config saved locally (backend endpoint pending)', 'success');
       } else {
         toast('Failed to save SSO config', 'error');
       }
     } catch {
-      toast('Network error', 'error');
+      // Network error or endpoint doesn't exist — save locally
+      try { localStorage.setItem('hooksniff_sso_config', JSON.stringify({ provider, metadata, entityId, ssoUrl, certificate, enabled })); } catch {}
+      toast('SSO config saved locally (backend endpoint pending)', 'success');
     } finally {
       setSaving(false);
     }

@@ -184,6 +184,9 @@ function LoginForm() {
                 GitHub
               </button>
             </div>
+            <p className="mt-3 text-xs text-center text-gray-400 dark:text-slate-500">
+              OAuth coming soon — currently using email/password authentication
+            </p>
           </div>
 
           <div className="mt-6 text-center text-sm text-gray-500 dark:text-slate-400">
