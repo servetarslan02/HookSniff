@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 19:45 GMT+8
+> Son güncelleme: 2026-05-09 19:55 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -13,7 +13,7 @@
 - `.ai-context/` GitHub'da kalıcı hafıza
 - Her oturum sonunda MEMORY.md + NEXT_SESSION.md güncelle
 - Local dosyalar silinir, önemli bilgiler GitHub'a commit et
-- **Otomatik senkronizasyon:** Her 10 dakikada bir `.ai-context/` → GitHub (cron job: d6b53a2a)
+- **Otomatik senkronizasyon:** Her 10 dakikada bir `.ai-context/` → GitHub (OpenClaw cron: f65a0f40)
 
 ### ⚠️ REPO AYRIMI KURALI (2026-05-08 — Servet Kararı)
 - **Hata düzeltme, fix, refactor** → Orijinal repo `servetarslan02/HookSniff` (main branch)
@@ -158,6 +158,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 33 | 2026-05-09 19:51 | OpenClaw webchat, GitHub sync sistemi kuruldu, otomatik cron |
 | 32 | 2026-05-09 18:57 | SDK build & publish — Elixir hex.pm'e yüklendi (8/11) |
 | 31 | 2026-05-09 18:51 | OpenClaw webchat bağlantı, GitHub hafıza sistemi doğrulama |
 | 30 | 2026-05-09 18:19 | notification_preferences, FIXME, integration test, OpenAPI, test coverage 10/10 |

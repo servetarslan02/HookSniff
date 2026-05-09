@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 19:45 GMT+8
+> Son güncelleme: 2026-05-09 19:55 GMT+8
 
 ---
 
@@ -117,3 +117,6 @@ RateLimiter fix push edildi (`4bbd9aa`) ama Cloud Run'a deploy edilemedi.
 - Her oturum sonunda MEMORY.md + NEXT_SESSION.md + günlük log güncellenir
 - OpenClaw workspace dosyaları 1 saat sonra silinir → önemli bilgiler GitHub'a commit et
 - Servet kod bilmiyor, tüm teknik işler AI'da
+- **Oturum 33 itibarıyla:** OpenClaw webchat üzerinden çalışılıyor
+- **Otomatik sync:** Her 10 dk'da `.ai-context/` → GitHub (cron: f65a0f40)
+- **Güvenlik:** Token açık metin paylaşıldı → revoke edilmeli!
