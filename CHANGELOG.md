@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### API (Rust/Axum) — 31 route modules, ~22K lines
+#### API (Rust/Axum) — 30 route modules, ~22K lines
 - **Authentication**: Register, login, JWT + API key auth (`hr_live_*`/`hr_test_*`), Argon2id password hashing
 - **Two-Factor Auth**: TOTP-based 2FA (enable, confirm, verify, disable)
 - **Email Verification**: Verification emails via Gmail API (GCP service account)

@@ -26,7 +26,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 - [Rust](https://rustup.rs/) 1.82+
 - [Node.js](https://nodejs.org/) 20+
 - [Docker](https://docker.com/) & Docker Compose
-- [protoc](https://grpc.io/docs/protoc-installation/) (for gRPC delivery)
+- [protoc](https://grpc.io/docs/protoc-installation/) (for future gRPC delivery support)
 
 ## Quick Setup
 
@@ -62,7 +62,7 @@ HookSniff/
 ├── api/                        # Rust API server (Axum) — 81 files, ~22K lines
 │   └── src/
 │       ├── main.rs             # Entry point, router setup, background jobs
-│       ├── routes/             # 31 route modules (see below)
+│       ├── routes/             # 30 route modules (see below)
 │       ├── middleware/          # Auth (JWT + API key), rate limiting, idempotency
 │       ├── models/             # Customer, Endpoint, Delivery models
 │       ├── billing/            # Polar.sh, iyzico, Stripe integrations

@@ -17,10 +17,10 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 - **Reliable delivery** — Automatic retries with exponential backoff + jitter
 - **HMAC signatures** — Standard Webhooks compliant (HMAC-SHA256, `whsec_` secrets)
 - **Dashboard** — 41 pages: real-time analytics, endpoint management, team collaboration (Next.js 15)
-- **Simple API** — 31 route modules, RESTful design, Swagger UI
+- **Simple API** — 30 route modules, RESTful design, Swagger UI
 - **Multi-provider billing** — Polar.sh (global) + iyzico (Turkey) + Stripe (legacy)
 - **User auth** — JWT + API key (Argon2id), 2FA (TOTP), email verification
-- **Multiple delivery methods** — HTTP, WebSocket, gRPC, SQS, Email
+- **Multiple delivery methods** — HTTP, WebSocket, Email (gRPC, SQS planned)
 - **Dead letter queue** — Failed deliveries preserved for debugging
 - **OpenTelemetry** — Distributed tracing (Grafana Cloud), structured JSON logging
 - **Smart routing** — Round-robin, latency-based, failover with fallback URLs
