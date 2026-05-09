@@ -897,3 +897,73 @@ cd dashboard && npm install && npm run build
 ### Servet'in Karar Vermesi Gereken
 - 🔴 Repo public yapılsın mı? (sınırsız GHA dakika)
 - ⚠️ Grafana OnCall kurulsun mu? (3 kullanıcı ücretsiz)
+
+---
+
+## 📝 Oturum 63 (2026-05-10 03:17 - 03:56 GMT+8) — Playground API Access + Changelog v3
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**1. Playground API Access (03:18-03:25)**
+- `/playground` sayfasına "API Access" sekmesi eklendi
+- Quick Start guide, endpoint reference, query parameters docs
+- Code examples: cURL (4), Node.js, Python, Go
+- Svix Play vs HookSniff karşılaştırma tablosu
+- CORS header'ları eklendi (3 API route)
+- Next.js 15 async params uyumluluğu düzeltildi
+
+**2. Pre-existing Hata Düzeltmeleri (03:25-03:29)**
+- Playground handleSend: invalid JSON → kullanıcıya hata mesajı
+- Playground polling: sadece playground sekmesinde poll ediyor
+- admin/users: useCallback dependency (`tc`) eklendi
+- Go code example: unused import, resource leak fix
+
+**3. Changelog v2 — Rakip Analizi (03:31-03:37)**
+- Svix, Hookdeck, Vercel, Linear, Supabase, PostHog changelog'ları incelendi
+- 7 eksik giderildi: expandable details, kod örnekleri, commit linkleri, email subscribe, type filtresi, ürün alanı filtresi, OG meta tags
+- 10 içerik düzeltmesi: Chinese character, missing commit links, gereksiz snippet
+
+**4. Changelog v3 — Tüm Rakip Eksikleri (03:40-03:44)**
+- Ayrı entry URL: `/changelog/v0-5-0`动态路由, SSG, OG meta tags, prev/next nav, share buttons
+- Yıl/ay sidebar nav: PostHog tarzı sticky sol panel
+- Görsel/screenshot desteği: `image: { src, alt, caption }`
+- Video demo desteği: `video: { src, poster, caption }`
+- Shared data lib: `lib/changelog-data.ts`
+
+**5. Footer + i18n (03:47-03:50)**
+- Footer'a `/blog` ve `/what-is-a-webhook` linkleri eklendi (19 link)
+- 8 dil desteği: en, tr, de, fr, es, ja, ko, pt-BR
+- Fransızca translation fix (sed quote escaping)
+
+**6. next/image Optimizasyonu (03:54-03:56)**
+- Changelog sayfalarında `<img>` → `<Image />` (next/image)
+- 0 warning, 0 error
+
+### GitHub Push Özeti (18 commit)
+- `4740374` — playground API Access
+- `14d05ae` — playground code examples fix
+- `7b0feb0` — 3 pre-existing issues fix
+- `1d91168` — changelog v2
+- `afb1ff6` — changelog 10 eksik düzeltme
+- `a3f28b3` — changelog OG meta tags
+- `5a556ab` — changelog v3 (entry URL, sidebar, image/video)
+- `e08e8f3` — footer links
+- `9730854` — fr.json translation fix
+- `df9ab5f` — next/image optimization (entry)
+- `d9d4b78` — next/image optimization (list)
++ code review commits
+
+### Toplam Değişiklik
+- ~20 dosya create/modify
+- ~1500+ satır kod
+
+### Son Durum
+- Build: ✅ 0 error, 0 warning
+- Playground: API Access sekmesi + CORS + code examples
+- Changelog: 12/12 rakip eşitliği (entry URL, sidebar, image/video, subscribe, filters)
+- Footer: 19 link, 8 dil
+- 626 static pages
