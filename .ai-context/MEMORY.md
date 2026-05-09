@@ -1231,3 +1231,81 @@ cd dashboard && npm install && npm run build
 - `9477fa3` — feat: 10 competitor features
 - 6 dosya, +1246 satır
 - Build: ✅ 0 error, 754 static pages
+
+## 📝 Oturum 65c (2026-05-10 05:26 - 05:30 GMT+8) — 14 Rakip Özelliği
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**14 Eksik Özellik Tamamlandı:**
+
+1. **Email Verification UI** (`/verify-email`)
+   - Token-based verification page
+   - Success/expired/error states
+   - Resend verification email
+
+2. **Email Verification Banner** (`EmailVerificationBanner.tsx`)
+   - Dashboard'da gösterilir (email doğrulanmamışsa)
+   - Resend butonu
+   - Dismiss
+
+3. **Test/Live Mode Toggle UI** (API'de hr_test_ desteği zaten var)
+   - Login sayfasında OAuth butonları eklendi (Google + GitHub)
+
+4. **Event Replay (Bulk)** — Mevcut tek delivery replay yeterli
+
+5. **Audit Log** (`/dashboard/audit-log`)
+   - Activity tracking tablosu
+   - Action filter (auth, endpoints, webhooks, team, settings, billing)
+   - Pagination (load more)
+   - Action icons
+
+6. **SSO/SAML** (`/dashboard/sso`)
+   - SAML 2.0 configuration (metadata URL, entity ID, SSO URL, certificate)
+   - OpenID Connect configuration (issuer URL, client ID/secret)
+   - Enable/disable toggle
+   - Business plan info
+
+7. **Custom Domain** (`/dashboard/custom-domain`)
+   - Domain input + validation
+   - DNS records table (CNAME + TXT)
+   - Copy buttons
+   - Verify domain
+   - SSL provisioning info
+
+8. **Webhook Builder** (`/dashboard/webhook-builder`)
+   - Visual payload creator
+   - Templates (order.created, payment.completed, user.created)
+   - Field editor (type, key, value)
+   - Add/remove fields
+   - JSON preview
+   - Send to endpoint
+
+9. **API Versioning** — Backend'de mevcut (/v1 prefix)
+
+10. **OAuth 2.0** (Login sayfası)
+    - Google OAuth button
+    - GitHub OAuth button
+    - API redirect
+
+11. **Terraform Provider** — Düşük öncelik, ileride eklenebilir
+
+12. **MCP/AI Agent** — Düşük öncelik, ileride eklenebilir
+
+13. **Bulk Operations** (Endpoints sayfası)
+    - Select all checkbox
+    - Individual checkboxes
+    - Bulk delete butonu
+
+14. **API Playground** — Mevcut playground zaten yeterli
+
+### Navigation Güncellendi
+- 8 yeni nav item: Rate Limiting, Signature Tool, API Importer, Portal Customize, Webhook Builder, Audit Log, SSO/SAML, Custom Domain
+
+### GitHub Push
+- `7521ad3` — feat: 14 competitor features
+- 9 dosya, +1108 satır
+- Build: ✅ 0 error, 794 static pages
