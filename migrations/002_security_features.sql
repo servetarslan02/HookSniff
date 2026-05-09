@@ -3,7 +3,7 @@
 ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS ip_whitelist STRING;
 ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS rate_limit_per_minute INT NOT NULL DEFAULT 60;
 ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS secret_rotation_at TIMESTAMPTZ;
-ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS signature_header STRING NOT NULL DEFAULT 'X-HookRelay-Signature';
+ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS signature_header TEXT NOT NULL DEFAULT 'X-HookRelay-Signature';
 
 ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS idempotency_key STRING;
 ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS source_ip STRING;
