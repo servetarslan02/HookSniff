@@ -9,6 +9,8 @@ const footerLinks = [
   { nameKey: 'customers', href: '/customers' },
   { nameKey: 'security', href: '/security' },
   { nameKey: 'playground', href: '/playground' },
+  { nameKey: 'startups', href: '/startups' },
+  { nameKey: 'newsletter', href: '/newsletter' },
   { nameKey: 'useCases', href: '/use-cases' },
   { nameKey: 'changelog', href: '/changelog' },
   { nameKey: 'status', href: '/status' },
