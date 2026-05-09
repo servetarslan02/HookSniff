@@ -7,7 +7,7 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
 }));
 
 vi.mock('@/i18n/navigation', () => ({
@@ -18,8 +18,9 @@ vi.mock('@/lib/store', () => ({
   useAuth: () => ({ token: 'test-token' }),
 }));
 
+const mockToast = vi.fn();
 vi.mock('@/components/Toast', () => ({
-  useToast: () => ({ toast: vi.fn() }),
+  useToast: () => ({ toast: mockToast }),
 }));
 
 const mockNotificationsList = vi.fn().mockResolvedValue({

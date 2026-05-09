@@ -9,7 +9,7 @@ global.fetch = mockFetch;
 
 // Mock next-intl
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
 }));
 
 // Mock @/i18n/navigation

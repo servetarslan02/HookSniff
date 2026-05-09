@@ -19,7 +19,7 @@ const localStorageMock = (() => {
 Object.defineProperty(global, 'localStorage', { value: localStorageMock });
 
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
 }));
 
 vi.mock('@/i18n/navigation', () => ({
