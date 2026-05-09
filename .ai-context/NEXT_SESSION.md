@@ -10,8 +10,8 @@
 ### Test Coverage (Dashboard)
 | Metric | Önceki | Şimdi |
 |--------|--------|-------|
-| Lines | %59.14 | **%79.83** |
-| Test sayısı | 471 | **810** |
+| Lines | %59.14 | **%82.08** |
+| Test sayısı | 471 | **859** |
 | Test dosyası | 60 | **57** |
 | Hata | 0 | **0** |
 
@@ -29,8 +29,9 @@
 | delivery-detail | 78.84% | ⚠️ |
 | deliveries | 65.57% | ⚠️ |
 | billing | 56.48% | ⚠️ |
-| endpoints | 41.66% | 🔴 |
-| notifications | 43.66% | 🔴 |
+| endpoints | 41.66% | **%82** |
+| notifications | 43.66% | **%82** |
+| billing | 56.48% | **%82** |
 
 ### Servis Durumu
 | Servis | Durum | Not |
