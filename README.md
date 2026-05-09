@@ -14,15 +14,24 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 
 ## Features
 
-- **Reliable delivery** — Automatic retries with exponential backoff
-- **HMAC signatures** — Verify webhooks are from HookSniff (Standard Webhooks compliant)
-- **Dashboard** — Monitor deliveries in real-time (Next.js 15)
-- **Simple API** — 4 endpoints, that's it
-- **Multi-provider billing** — Polar.sh (global) + iyzico (Turkey)
-- **User auth** — JWT + API key authentication (Argon2)
-- **Multiple delivery methods** — HTTP, WebSocket, gRPC, SQS
+- **Reliable delivery** — Automatic retries with exponential backoff + jitter
+- **HMAC signatures** — Standard Webhooks compliant (HMAC-SHA256, `whsec_` secrets)
+- **Dashboard** — 41 pages: real-time analytics, endpoint management, team collaboration (Next.js 15)
+- **Simple API** — 31 route modules, RESTful design, Swagger UI
+- **Multi-provider billing** — Polar.sh (global) + iyzico (Turkey) + Stripe (legacy)
+- **User auth** — JWT + API key (Argon2id), 2FA (TOTP), email verification
+- **Multiple delivery methods** — HTTP, WebSocket, gRPC, SQS, Email
 - **Dead letter queue** — Failed deliveries preserved for debugging
-- **OpenTelemetry** — Distributed tracing and structured logging (Grafana Cloud)
+- **OpenTelemetry** — Distributed tracing (Grafana Cloud), structured JSON logging
+- **Smart routing** — Round-robin, latency-based, failover with fallback URLs
+- **FIFO delivery** — Ordered delivery with sequence numbers
+- **Per-endpoint throttling** — Token bucket / sliding window to protect customer servers
+- **SSRF protection** — Blocks private IPs, metadata endpoints, DNS validation
+- **Schema registry** — JSON schema validation with versioning
+- **CloudEvents** — v1.0 event format support
+- **Inbound proxy** — Receive webhooks from Stripe, GitHub, Shopify
+- **11 SDKs** — Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
+- **GDPR compliant** — Data export + account deletion endpoints
 - **Free-tier friendly** — Runs entirely on free services ($0/month)
 
 ## Tech Stack
@@ -115,24 +124,42 @@ HookSniff/
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/v1/auth/register` | Create account |
-| POST | `/v1/auth/login` | Get JWT token |
-| POST | `/v1/endpoints` | Create endpoint |
-| GET | `/v1/endpoints` | List endpoints |
+| POST | `/v1/auth/login` | Get JWT token (supports 2FA) |
+| POST | `/v1/auth/2fa/enable` | Enable two-factor auth |
+| GET | `/v1/auth/verify-email` | Verify email address |
+| POST | `/v1/auth/forgot-password` | Request password reset |
+| GET | `/v1/auth/export` | Export user data (GDPR) |
+| DELETE | `/v1/auth/account` | Delete account (GDPR) |
+| GET/POST | `/v1/endpoints` | List / Create endpoints |
+| GET/PUT/DELETE | `/v1/endpoints/:id` | Get / Update / Delete endpoint |
+| POST | `/v1/endpoints/:id/rotate-secret` | Rotate signing secret |
 | POST | `/v1/webhooks` | Send webhook |
+| POST | `/v1/webhooks/batch` | Send batch webhooks |
 | GET | `/v1/webhooks` | List deliveries |
 | GET | `/v1/webhooks/:id` | Get delivery |
 | POST | `/v1/webhooks/:id/replay` | Replay webhook |
+| GET | `/v1/stream/deliveries` | SSE real-time stream |
+| GET | `/v1/analytics/deliveries` | Delivery trend data |
+| GET | `/v1/analytics/success-rate` | Success rate metrics |
+| GET | `/v1/search` | Search deliveries |
+| GET/POST | `/v1/api-keys` | List / Create API keys |
 | POST | `/v1/billing/upgrade` | Upgrade plan |
 | POST | `/v1/billing/portal` | Open customer portal |
 | GET | `/v1/outbound-ips` | List outbound IPs |
+| GET | `/v1/docs` | Swagger UI |
+| GET | `/health` | Health check |
+| GET | `/metrics` | Prometheus metrics |
 
 ## Pricing
 
-| Plan | Price | Webhooks/mo | Endpoints | Retention |
-|------|-------|-------------|-----------|-----------|
-| Free | $0 | 10,000 | 5 | 7 days |
-| Pro | $49/mo | 50,000 | 50 | 30 days |
-| Business | $149/mo | 500,000 | 500 | 90 days |
+| Plan | Price | Webhooks/mo | Endpoints | Payload | Retention | Rate/min |
+|------|-------|-------------|-----------|---------|-----------|----------|
+| Free | $0 | 10,000 | 5 | 256 KB | 7 days | 100 |
+| Pro | $49/mo | 50,000 | 50 | 1 MB | 30 days | 1,000 |
+| Business | $149/mo | 500,000 | 500 | 5 MB | 90 days | 10,000 |
+| Enterprise | Custom | Unlimited | Unlimited | 10 MB | 365 days | Unlimited |
+
+**Turkey pricing**: Pro ₺149/mo, Business ₺449/mo (via iyzico)
 
 **Hosting cost:** $0/month on free-tier services.
 
