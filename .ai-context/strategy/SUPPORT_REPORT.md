@@ -53,7 +53,7 @@
 | Mobil uygulama | ✅ iOS + Android |
 | Otomatik tetikleyiciler | ✅ |
 | Özelleştirilebilir widget | ✅ |
-| Marka kaldırma | 💰 $29/ay (tek seferlik $19) |
+| Marka kaldırma | 💰 $19 tek seferlik |
 | Entegrasyonlar | ✅ 100+ |
 | Raporlama | ✅ |
 | CRM | ✅ Dahili |
@@ -128,12 +128,6 @@
 | Milestone | ✅ |
 | Entegrasyon | ✅ Linear, Slack, Discord |
 
-**Neden GitHub Issues?**
-- SDK'lar zaten açık kaynak
-- Developer'lar GitHub'da sorun açar
-- Issue template ile yapılandırılmış raporlama
-- Kod referansı ile birlikte sorun raporu
-
 ---
 
 ## 4. RAKİPLERİN DESTEK MODELİ
@@ -148,7 +142,7 @@
 | Docs | docs.svix.com — kapsamlı dokümantasyon |
 | Status page | status.svix.com — servis durumu |
 
-**Model:** Self-service odaklı. Kullanıcı önce docs'a bakar, çözemezse Slack veya email. Live chat yok.
+**Model:** Self-service odaklı. Kullanıcı önce docs'a bakar, çözemezse Slack veya email.
 
 ### Hookdeck
 
@@ -158,7 +152,6 @@
 | Slack | hookdeck.com/slack — topluluk |
 | Docs | hookdeck.com/docs — kapsamlı |
 | Status page | status.hookdeck.com |
-| Trust center | Güvenlik politikaları, SOC 2 |
 
 **Model:** Svix ile aynı. Developer tool'larda live chat yaygın değil.
 
@@ -187,7 +180,6 @@
 | Tüm Aşama 1 | Aynı | $0 | — |
 | Marka kaldırma | tawk.to | $19 tek seferlik | $500+ gelir |
 | Chatbot | tawk.to AI veya Crisp | $0-45/ay | $1000+ gelir |
-| Ticket SLA | Freshdesk veya Zoho | $0-14/ay | B2B müşteri gelince |
 
 ### Aşama 3 — Ölçekleme (500+ kullanıcı)
 
@@ -196,11 +188,168 @@
 | Tüm Aşama 2 | Aynı | — | — |
 | Omnichannel | Crisp Essentials | €95/ay | $2000+ gelir |
 | AI chatbot | Intercom veya Crisp | $39-95/ay | $5000+ gelir |
-| Enterprise destek | Özel SLA | Değişken | Enterprise müşteri |
 
 ---
 
-## 6. DESTEK İÇERİĞİ — NE HAZIRLANMALI?
+## 6. DOCS-FIRST STRATEJİSİ
+
+### Neden?
+
+Tek kişilik ekip → günde 10+ ticket gelirse cevaplanamaz. Çözüm: kullanıcı önce docs/KB'den kendisi çözsün.
+
+### Akış
+
+```
+Kullanıcı soru sorur
+       ↓
+  tawk.to chatbot kontrol eder
+       ↓
+  KB'de cevap var mı? → EVET → Otomatik yanıt göster
+       ↓ HAYIR
+  Ticket oluşturulur
+       ↓
+  Servet cevaplar (mobil uygulama)
+       ↓
+  Cevap KB'ye eklenir (gelecekte otomatik yanıt)
+```
+
+### Hedef
+
+| Dönem | Self-service oranı | Ticket sayısı/gün |
+|-------|-------------------|-------------------|
+| Lansman | %30 | 5-10 |
+| 1. ay | %50 | 3-5 |
+| 3. ay | %70 | 1-3 |
+| 6. ay | %80 | 0-2 |
+
+### Nasıl?
+
+1. **Her ticket'ın cevabı KB'ye eklenecek** — gelecekte aynı soru gelince otomatik yanıt
+2. **Dashboard'da "Yardım" butonu** — doğrudan KB'ye yönlendirir
+3. **tawk.to otomatik tetikleyiciler** — belirli sayfalarda yardım önerisi
+4. **Discord'da pinned messages** — sık sorulan sorular sabitlenir
+
+---
+
+## 7. ÇOKLU DİL DESTEĞİ
+
+### Durum
+
+HookSniff 8 dilde destek veriyor (i18n). Ama destek sistemi sadece İngilizce.
+
+### Sorun
+
+| Müşteri | Dil | Sorun |
+|---------|-----|-------|
+| TR developer | Türkçe | İngilizce KB anlamayabilir |
+| Global developer | İngilizce | Sorun yok |
+| TR kurumsal | Türkçe | DPA, fatura Türkçe olmalı |
+
+### Çözüm
+
+| Kanal | TR desteği | Maliyet |
+|-------|-----------|---------|
+| Knowledge base | Her makale TR + EN | $0 (kendimiz yazarız) |
+| tawk.to chat | tawk.to çeviri özelliği (beta) | $0 |
+| Email | Manuel çeviri | $0 |
+| Discord | #tr-destek kanalı | $0 |
+| DPA | TR + EN versiyon | $0 |
+
+### Knowledge Base Dilleri
+
+| Kategori | EN | TR | Öncelik |
+|----------|----|----|---------|
+| Quick start | ✅ | ✅ | 🔴 Acil |
+| SDK kurulum | ✅ | ✅ | 🔴 Acil |
+| API referansı | ✅ | 🟡 | 🟡 Önemli |
+| HMAC doğrulama | ✅ | ✅ | 🔴 Acil |
+| Faturalama SSS | ✅ | ✅ | 🟡 Önemli |
+| Sık hatalar | ✅ | ✅ | 🟡 Önemli |
+
+**Kural:** Temel makaleler her zaman TR + EN. API referansı sadece EN (developer'lar İngilizce bilir).
+
+---
+
+## 8. ESCALATION PATH — SORUN ÇÖZÜLMEZSE
+
+### Seviye 1: Self-service
+
+```
+Kullanıcı → KB/FAQ → Sorun çözülür → ✅ Bitti
+```
+
+### Seviye 2: Chat/Email
+
+```
+Kullanıcı → tawk.to chat veya email → Servet cevaplar → ✅ Bitti
+```
+
+### Seviye 3: Teknik sorun (kod hatası)
+
+```
+Kullanıcı → GitHub Issue açar → Servet + AI inceler → Fix push edilir → ✅ Bitti
+```
+
+### Seviye 4: Kritik sorun (servis çöktü)
+
+```
+Kullanıcı → email + Discord → Servet hemen bakar → Hotfix → ✅ Bitti
+```
+
+### Seviye 5: Çözülemedi
+
+```
+Kullanıcı → ısrar eder → Servet video call yapar (Google Meet, ücretsiz) → ✅ Bitti
+```
+
+### Kurallar
+
+- Her ticket 48 saat içinde bir yanıt almalı (çözüm değil, "bakıyoruz" mesajı)
+- Kritik sorunlar 1 saat içinde ilk yanıt
+- Çözülemeyen sorunlar GitHub Issue'ya taşınır, takip edilir
+- Kullanıcı memnun kalmazsa video call seçeneği sunulur
+
+---
+
+## 9. TEK KİŞİLİK EKİP — PRATİK SENARYO
+
+### Problem
+
+Servet tek kişi. Günde 10 ticket gelirse ne olur?
+
+### Çözüm: Zaman Bütçesi
+
+| Gün | Destek süresi | Öncelik |
+|-----|--------------|---------|
+| Sabah (15 dk) | Ticket'ları kontrol et, kritik olanları cevapla | Kritik + Yüksek |
+| Öğle (15 dk) | Kalan ticket'ları cevapla | Orta |
+| Akşam (15 dk) | KB'yi güncelle, Discord kontrol | Düşük + Bakım |
+
+**Toplam:** Günde 45 dakika.
+
+### Otomasyon ile Azaltma
+
+| Yöntem | Ticket azaltma | Maliyet |
+|--------|---------------|---------|
+| KB'de cevap arama | %30 azaltır | $0 |
+| tawk.to otomatik tetikleyici | %10 azaltır | $0 |
+| Discord topluluk yanıtı | %20 azaltır | $0 |
+| İyi dokümantasyon | %20 azaltır | $0 |
+| **Toplam** | **%80 azaltma** | **$0** |
+
+**Sonuç:** Günde 10 ticket → 2 ticket düşer. 15 dakika yeterli.
+
+### Yoğun Gün Senaryosu
+
+Bir gün 20+ ticket gelirse:
+1. Kritik olanları hemen cevapla (5 dk)
+2. Basit soruları KB linki ile cevapla (10 dk)
+3. Karmaşık soruları "bakıyorum, yarın cevaplarım" de (5 dk)
+4. Ertesi gün hepsini cevapla
+
+---
+
+## 10. DESTEK İÇERİĞİ — NE HAZIRLANMALI?
 
 ### Knowledge Base Kategorileri
 
@@ -214,25 +363,24 @@
 | **Entegrasyonlar** | Stripe, Slack, Discord webhook örnekleri | 🟡 Önemli |
 | **Sorun Giderme** | Sık hatalar, debug ipuçları | 🟡 Önemli |
 | **SSS** | En sık sorulan sorular | 🟡 Önemli |
-| **Enterprise** | DPA, SLA, özel kurulum | 🟢 Opsiyonel |
 
 ### Hazırlanacak İçerikler
 
-| İçerik | Format | Süre |
-|--------|--------|------|
-| Quick start rehberi | Markdown | 1 saat |
-| SDK kurulum rehberleri (11 dil) | Markdown | 2 saat |
-| API hata kodları rehberi | Markdown | 30 dk |
-| HMAC doğrulama rehberi | Markdown + kod | 1 saat |
-| Sık hatalar ve çözümleri | Markdown | 1 saat |
-| Faturalama SSS | Markdown | 30 dk |
-| Video demo (opsiyonel) | MP4 | 1 saat |
+| İçerik | Format | Süre | Dil |
+|--------|--------|------|-----|
+| Quick start rehberi | Markdown | 1 saat | TR + EN |
+| SDK kurulum rehberleri (11 dil) | Markdown | 2 saat | EN |
+| API hata kodları rehberi | Markdown | 30 dk | EN |
+| HMAC doğrulama rehberi | Markdown + kod | 1 saat | TR + EN |
+| Sık hatalar ve çözümleri | Markdown | 1 saat | TR + EN |
+| Faturalama SSS | Markdown | 30 dk | TR + EN |
+| Video demo (opsiyonel) | MP4 | 1 saat | EN |
 
 **Toplam:** ~7 saat, $0
 
 ---
 
-## 7. DESTEK SLA — YANIT SÜRELERİ
+## 11. DESTEK SLA — YANIT SÜRELERİ
 
 | Öncelik | Tanım | Yanıt süresi | Çözüm süresi |
 |---------|-------|-------------|-------------|
@@ -245,7 +393,7 @@
 
 ---
 
-## 8. OTOMASYON — NE YAPILABİLİR?
+## 12. OTOMASYON — NE YAPILABİLİR?
 
 ### tawk.to Otomatik Tetikleyiciler
 
@@ -275,7 +423,7 @@
 
 ---
 
-## 9. METRIKLER — NE ÖLÇÜLECEK?
+## 13. METRIKLER — NE ÖLÇÜLECEK?
 
 | Metrik | Tanım | Hedef |
 |--------|-------|-------|
@@ -288,7 +436,7 @@
 
 ---
 
-## 10. RİSKLER
+## 14. RİSKLER
 
 | Risk | Olasılık | Etki | Önlem |
 |------|----------|------|-------|
@@ -300,7 +448,7 @@
 
 ---
 
-## 11. YAPILACAKLAR
+## 15. YAPILACAKLAR
 
 ### Acil (Lansmandan önce) — 3 saat
 
@@ -308,13 +456,13 @@
 |---|-----|------|
 | 1 | tawk.to hesabı aç, widget'ı dashboard'a ekle | 1 saat |
 | 2 | Discord sunucusu kur (5-6 kanal) | 30 dk |
-| 3 | Knowledge base: Quick start + 3 temel rehber | 1.5 saat |
+| 3 | Knowledge base: Quick start + 3 temel rehber (TR + EN) | 1.5 saat |
 
 ### İlk Hafta — 4 saat
 
 | # | Ne | Süre |
 |---|-----|------|
-| 4 | Knowledge base: SDK kurulum rehberleri (11 dil) | 2 saat |
+| 4 | Knowledge base: SDK kurulum rehberleri | 2 saat |
 | 5 | Knowledge base: API hata kodları + HMAC rehberi | 1 saat |
 | 6 | Status page: Better Uptime kurulumu | 30 dk |
 | 7 | tawk.to otomatik tetikleyicileri ayarla | 30 dk |
@@ -329,7 +477,7 @@
 
 ---
 
-## 12. SONUÇ
+## 16. SONUÇ
 
 | Konu | Değerlendirme |
 |------|---------------|
@@ -339,5 +487,7 @@
 | Status page | **Better Uptime** (ücretsiz) |
 | Toplam maliyet | **$0** |
 | Hazırlık süresi | **~10 saat** |
-| Rakip farkı | Svix/Hookdeck de live chat kullanmıyor — standart model |
-| En büyük avantaj | tawk.to ile profesyonel destek deneyimi, $0 |
+| Destek yükü (tek kişi) | Günde 45 dk (otomasyon ile 15 dk'ya düşer) |
+| Çoklu dil | TR + EN (temel makaleler) |
+| Self-service hedefi | %80 (6. ay) |
+| Rakip farkı | Svix/Hookdeck de live chat kullanmıyor — avantaj olabilir |
