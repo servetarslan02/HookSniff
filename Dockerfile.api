@@ -1,5 +1,5 @@
 # ── Stage 1: Builder ──
-FROM rust:slim AS builder
+FROM rust:1-bookworm AS builder
 
 # Install build dependencies (no OpenSSL needed — using rustls)
 RUN apt-get update && \
