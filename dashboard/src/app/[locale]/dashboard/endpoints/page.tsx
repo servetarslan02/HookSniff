@@ -18,6 +18,8 @@ export default function EndpointsPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const t = useTranslations('endpoints');
   const tc = useTranslations('common');
 
@@ -62,6 +64,41 @@ export default function EndpointsPage() {
     } finally {
       setDeleteId(null);
     }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === endpoints.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(endpoints.map((ep) => ep.id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!token || selected.size === 0) return;
+    setBulkDeleting(true);
+    let deleted = 0;
+    for (const id of selected) {
+      try {
+        await endpointsApi.delete(token, id);
+        deleted++;
+      } catch {
+        // Continue with remaining
+      }
+    }
+    setEndpoints((prev) => prev.filter((ep) => !selected.has(ep.id)));
+    setSelected(new Set());
+    setBulkDeleting(false);
+    alert(`Deleted ${deleted} endpoints`);
   };
 
   if (loading) {
@@ -145,10 +182,43 @@ export default function EndpointsPage() {
           No endpoints yet. Create one to start receiving webhooks.
         </div>
       ) : (
-        <div className="grid gap-4">
+        <>
+          {/* Bulk Actions Bar */}
+          {endpoints.length > 1 && (
+            <div className="flex items-center gap-4 mb-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selected.size === endpoints.length && endpoints.length > 0}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                />
+                <span className="text-sm text-gray-600 dark:text-slate-400">Select all ({endpoints.length})</span>
+              </label>
+              {selected.size > 0 && (
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleting}
+                  className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                >
+                  {bulkDeleting ? 'Deleting...' : `🗑 Delete ${selected.size} selected`}
+                </button>
+              )}
+            </div>
+          )}
+
+          <div className="grid gap-4">
           {endpoints.map((ep) => (
             <div key={ep.id} className="glass-card p-6 hover-lift">
               <div className="flex items-start justify-between">
+                {endpoints.length > 1 && (
+                  <input
+                    type="checkbox"
+                    checked={selected.has(ep.id)}
+                    onChange={() => toggleSelect(ep.id)}
+                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 mt-1 mr-3"
+                  />
+                )}
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="font-mono text-sm text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-3 py-1 rounded-lg">
@@ -185,6 +255,7 @@ export default function EndpointsPage() {
             </div>
           ))}
         </div>
+        </>
       )}
       <ConfirmDialog
         open={!!deleteId}
