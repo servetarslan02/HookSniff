@@ -1,12 +1,12 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 18:40 GMT+8
+> Son güncelleme: 2026-05-09 18:51 GMT+8
 
 ---
 
 ## 🔴 ACİL: API DEPLOY
 
-RateLimiter fix push edildi ama Cloud Run'a deploy edilemedi.
+RateLimiter fix push edildi (`4bbd9aa`) ama Cloud Run'a deploy edilemedi.
 
 **Çözüm:** Servet'in GCP Console'dan manuel deploy yapması:
 1. https://console.cloud.google.com/run → `hooksniff-api`
@@ -29,7 +29,7 @@ RateLimiter fix push edildi ama Cloud Run'a deploy edilemedi.
 | Dashboard | ✅ Live | hooksniff.vercel.app |
 | API | ⚠️ Deploy bekliyor | RateLimiter fix push edildi |
 | Worker | ✅ Deployed | GCP Cloud Run |
-| Neon DB | ✅ Çalışıyor | 37 migration |
+| Neon DB | ✅ Çalışıyor | 43 tablo, 35ms latency |
 | 11 SDK | 7/11 yayınlandı | 4 SDK publish scriptleri hazır |
 | CI | ✅ Local CI | `scripts/ci-local.sh` |
 | Test | ✅ 186+ test tümü geçti | Rust (162), Dashboard (6), Go, Rust SDK, Node, Python |
@@ -78,3 +78,42 @@ RateLimiter fix push edildi ama Cloud Run'a deploy edilemedi.
 | `scripts/publish-ruby.sh` | Ruby SDK → RubyGems |
 | `scripts/publish-elixir.sh` | Elixir SDK → Hex.pm |
 | `scripts/publish-java.sh` | Java SDK → Maven Central |
+| `scripts/publish-kotlin.sh` | Kotlin SDK → Maven Central |
+
+---
+
+## 📦 SDK Publish Durumu
+
+| SDK | Platform | Durum | Servet'in Yapması |
+|-----|----------|-------|-------------------|
+| Node.js | npm | ✅ `hooksniff-sdk@0.1.0` | — |
+| Python | PyPI | ✅ `hooksniff 0.1.0` | — |
+| Rust | crates.io | ✅ `hooksniff 0.2.0` | — |
+| C# | NuGet | ✅ `HookSniff 0.1.0` | — |
+| Go | pkg.go.dev | ✅ `v0.1.0` | — |
+| Swift | Swift Package Index | ✅ `v0.1.0` | — |
+| PHP | Packagist | ✅ `hooksniff/hooksniff-php` | — |
+| Java | Maven Central | ⏳ | GPG key + `scripts/publish-java.sh` |
+| Kotlin | Maven Central | ⏳ | Gradle wrapper + `scripts/publish-kotlin.sh` |
+| Ruby | RubyGems | ⏳ | `scripts/publish-ruby.sh` |
+| Elixir | Hex.pm | ⏳ | `scripts/publish-elixir.sh` |
+
+---
+
+## ⚠️ Servet'in Yapması Gereken
+
+| Görev | Öncelik | Not |
+|-------|---------|-----|
+| API deploy (GCP Console) | 🔴 ACİL | RateLimiter fix deploy edilmeli |
+| iyzico hesap | ❌ | Vergi levhası + banka hesabı |
+| 4 SDK publish | ⏳ | Scriptler hazır, local bilgisayarında çalıştır |
+| Token rotation | ⚠️ | npm, GCP SA, GitHub PAT — eski token'lar paylaşıldı |
+
+---
+
+## 🧠 OpenClaw Hafıza Sistemi
+
+- `.ai-context/` GitHub'da kalıcı hafıza
+- Her oturum sonunda MEMORY.md + NEXT_SESSION.md + günlük log güncellenir
+- OpenClaw workspace dosyaları 1 saat sonra silinir → önemli bilgiler GitHub'a commit et
+- Servet kod bilmiyor, tüm teknik işler AI'da
