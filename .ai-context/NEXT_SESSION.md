@@ -1,37 +1,30 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 07:26 GMT+8
+> Son güncelleme: 2026-05-10 07:38 GMT+8
 
 ---
 
-## ✅ BU OTURUMDA YAPILAN (Session 67)
+## ✅ BU OTURUMDA YAPILAN (Session 67 — TAMAMLANDI)
 
-### 1. Redis TLS Fix ✅
-- `api/Cargo.toml` → `tokio-rustls-comp` feature (doğru TLS combo)
-- `tokio-rustls v0.25.0` Cargo.lock'a eklendi
-- Cloud Build başarılı, Cloud Run deploy edildi
-- Log: "✅ Redis rate limiter connected"
+### Güvenlik Düzeltmeleri
+1. **OAuth CSRF Koruması** — State parametresi cookie'de saklanıyor, callback'te doğrulanıyor
+2. **OAuth Refresh Token** — 30 günlük refresh cookie, database'e kaydediliyor
+3. **Custom CSS XSS** — `<script>`, `javascript:`, `expression()` vb. pattern'ler engelleniyor
+4. **Error Sızıntısı** — OAuth redirect URL'lerinden `details` parametresi kaldırıldı
+5. **Redis TLS** — `tokio-rustls-comp` feature ile düzeltildi, Cargo.lock güncellendi
 
-### 2. OAuth Env Var'ları ✅
-- Google OAuth: GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET Cloud Run'a eklendi
-- GitHub OAuth: zaten vardı
-- OAUTH_REDIRECT_BASE, APP_URL, CORS_ORIGINS, RATE_LIMIT_STORE=redis eklendi
-- `/v1/oauth/providers` → google=true, github=true
-
-### 3. Cloud Build + Deploy ✅
-- `cloudbuild.yaml` ile image build edildi
-- Cloud Run revision `00049-dpb` live
-- gcloud CLI bu makineye kuruldu + SA key ile auth
-
-### 4. Dashboard Build ✅
-- 0 hata, 0 uyarı, 800+ static page
+### Altyapı
+6. **Google OAuth** — Cloud Run env var'ları eklendi (GOOGLE_CLIENT_ID, SECRET, OAUTH_REDIRECT_BASE)
+7. **Cloud Build** — `rust:1-bookworm` ile başarılı build
+8. **Deploy** — Revision `00050-jw8` live
+9. **gcloud CLI** — Bu makineye kuruldu + SA key auth
 
 ---
 
 ## 🟡 SERVET'İN YAPMASI GEREKEN
 
-| # | Görev | Öncelik | Not |
-|---|-------|---------|-----|
-| 1 | OAuth test | 🔴 | https://hooksniff.vercel.app/login → Google/GitHub dene |
-| 2 | Vercel deploy | 🔴 | Yarın otomatik olur veya manuel Redeploy |
-| 3 | Token rotation | ⚠️ | GitHub PAT rotate et |
+| # | Görev | Öncelik |
+|---|-------|---------|
+| 1 | OAuth test et (Google + GitHub) | 🔴 |
+| 2 | GitHub PAT rotate et | ⚠️ |
+| 3 | Vercel dashboard rebuild (yarın) | 🔴 |
