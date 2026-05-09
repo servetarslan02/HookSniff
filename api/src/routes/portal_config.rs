@@ -190,18 +190,18 @@ async fn get_embed_code(
     );
 
     let react_code = format!(
-        r#"import {{ HookSniffPortal }} from 'hooksniff-react';
+        r##"import {{ HookSniffPortal }} from 'hooksniff-react';
 
 <HookSniffPortal
   portalId="{}"
   theme="dark"
   primaryColor="#6366f1"
-/>"#,
+/>"##,
         portal_id
     );
 
     let script_code = format!(
-        r#"<script src="https://hooksniff.vercel.app/portal/widget.js"></script>
+        r##"<script src="https://hooksniff.vercel.app/portal/widget.js"></script>
 <script>
   HookSniffPortal.init({{
     portalId: '{}',
@@ -209,7 +209,7 @@ async fn get_embed_code(
     theme: 'dark',
   }});
 </script>
-<div id="hooksniff-portal"></div>"#,
+<div id="hooksniff-portal"></div>"##,
         portal_id
     );
 
