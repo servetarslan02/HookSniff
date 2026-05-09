@@ -131,7 +131,7 @@ async fn main() -> Result<()> {
                 );
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(default_origins))
-                    .allow_methods(Any)
+                    .allow_methods([axum::http::Method::GET, axum::http::Method::POST, axum::http::Method::PUT, axum::http::Method::DELETE, axum::http::Method::PATCH, axum::http::Method::OPTIONS])
                     .allow_headers(AllowHeaders::list([
                         axum::http::header::AUTHORIZATION,
                         axum::http::header::CONTENT_TYPE,
@@ -157,7 +157,7 @@ async fn main() -> Result<()> {
                 .collect();
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(dev_origins))
-                    .allow_methods(Any)
+                    .allow_methods([axum::http::Method::GET, axum::http::Method::POST, axum::http::Method::PUT, axum::http::Method::DELETE, axum::http::Method::PATCH, axum::http::Method::OPTIONS])
                     .allow_headers(AllowHeaders::list([
                         axum::http::header::AUTHORIZATION,
                         axum::http::header::CONTENT_TYPE,
@@ -173,7 +173,7 @@ async fn main() -> Result<()> {
             } else {
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(origins))
-                    .allow_methods(Any)
+                    .allow_methods([axum::http::Method::GET, axum::http::Method::POST, axum::http::Method::PUT, axum::http::Method::DELETE, axum::http::Method::PATCH, axum::http::Method::OPTIONS])
                     .allow_headers(AllowHeaders::list([
                         axum::http::header::AUTHORIZATION,
                         axum::http::header::CONTENT_TYPE,
