@@ -615,3 +615,74 @@ impl WebhookVerifier {
         self.verify(body, msg_id, timestamp, signature_header)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use hmac::{Hmac, Mac};
+    use sha2::Sha256;
+
+    type HmacSha256 = Hmac<Sha256>;
+
+    fn sign(payload: &str, secret: &str) -> String {
+        let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
+        mac.update(payload.as_bytes());
+        hex::encode(mac.finalize().into_bytes())
+    }
+
+    #[test]
+    fn test_webhook_verifier_valid_signature() {
+        let secret = "whsec_test_secret_key_1234567890abcdef";
+        let payload = r#"{"event":"order.created","data":{"id":"123"}}"#;
+        let msg_id = "msg_test_001";
+        let timestamp = "1704067200";
+
+        let sig = sign(payload, secret);
+        let sig_header = format!("v1,{}", sig);
+
+        let verifier = WebhookVerifier::new(secret);
+        assert!(verifier.verify(payload, msg_id, timestamp, &sig_header).is_ok());
+    }
+
+    #[test]
+    fn test_webhook_verifier_wrong_secret() {
+        let secret = "whsec_test_secret_key_1234567890abcdef";
+        let payload = r#"{"event":"order.created","data":{"id":"123"}}"#;
+        let msg_id = "msg_test_002";
+        let timestamp = "1704067200";
+
+        let sig = sign(payload, secret);
+        let sig_header = format!("v1,{}", sig);
+
+        let verifier = WebhookVerifier::new("whsec_wrong_secret");
+        assert!(verifier.verify(payload, msg_id, timestamp, &sig_header).is_err());
+    }
+
+    #[test]
+    fn test_webhook_verifier_tampered_body() {
+        let secret = "whsec_test_secret_key_1234567890abcdef";
+        let payload = r#"{"event":"order.created","data":{"id":"123"}}"#;
+        let msg_id = "msg_test_003";
+        let timestamp = "1704067200";
+
+        let sig = sign(payload, secret);
+        let sig_header = format!("v1,{}", sig);
+
+        let verifier = WebhookVerifier::new(secret);
+        let tampered = r#"{"event":"tampered","data":{"id":"123"}}"#;
+        assert!(verifier.verify(tampered, msg_id, timestamp, &sig_header).is_err());
+    }
+
+    #[test]
+    fn test_client_default_base_url() {
+        let client = HookSniffClient::new("hr_live_test_key");
+        assert_eq!(client.base_url, DEFAULT_BASE_URL);
+    }
+
+    #[test]
+    fn test_client_custom_base_url() {
+        let custom = "https://custom.api.com/v1";
+        let client = HookSniffClient::with_base_url("hr_live_test_key", custom);
+        assert_eq!(client.base_url, custom);
+    }
+}
