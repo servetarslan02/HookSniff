@@ -390,3 +390,6 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
    - CI ❌ Bozuk (GitHub Actions runner sorunu)
 5. **Hafıza güncelleme** — MEMORY.md, 2026-05-09.md güncellendi
 6. **Servet'in kuralları:** Tüm işler GitHub'a düzenli commit edilecek
+7. **API RateLimiter fix** — Layer sıralaması düzeltildi, `4bbd9aa` push edildi
+   - `from_fn(rate_limit_middleware)` innermost katmana taşındı
+   - Deploy için CI bozuk, Servet'in manuel deploy yapması gerekiyor
