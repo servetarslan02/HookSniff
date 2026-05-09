@@ -15,6 +15,9 @@
 5. [npm Token](#5-npm-token)
 6. [Rakip Karşılaştırması](#6-rakip-karşılaştırması)
 7. [Öncelik Sırası ve Aksiyon Planı](#7-öncelik-sırası-ve-aksıyon-planı)
+8. [Tüm Token ve Secret Envanteri](#8-tüm-token-ve-secret-envanteri)
+9. [WIF Kurulum Rehberi ve Rollback Planı](#9-wif-kurulum-rehberi-ve-rollback-planı)
+10. [Token Rotate Sırası ve Bağımlılıklar](#10-token-rotate-sırası-ve-bağımlılıklar)
 
 ---
 
@@ -582,10 +585,346 @@ jobs:
 
 ---
 
+## 8. Tüm Token ve Secret Envanteri
+
+### 8.1 Envanter Tablosu
+
+`.env.production.example` (GitHub'da public) + GitHub Actions secrets + Cloud Run env incelendi:
+
+| Secret | Nerede Kullanılıyor | .env.example'da Değer Var mı? | GitHub Actions'ta mı? | Cloud Run'da mı? | Durum |
+|--------|---------------------|-------------------------------|----------------------|-----------------|-------|
+| `GCP_SA_KEY` | Cloud Run deploy | ❌ | ✅ `secrets.GCP_SA_KEY` | ❌ | 🔴 Paylaşıldı, rotate |
+| `DATABASE_URL` | API, Worker | ❌ Boş | ❌ | ✅ Secret Manager | ✅ Güvenli |
+| `REDIS_URL` | API, Worker | ❌ Boş | ❌ | ✅ Secret Manager | ✅ Güvenli |
+| `JWT_SECRET` | Auth | ❌ Boş | ❌ | ✅ Secret Manager | ✅ Güvenli |
+| `HMAC_SECRET` | Webhook signing | ❌ Boş | ❌ | ✅ Secret Manager | ✅ Güvenli |
+| `POLAR_ACCESS_TOKEN` | Ödeme | ❌ Boş | ❌ | ✅ Secret Manager | ✅ Güvenli |
+| `POLAR_WEBHOOK_SECRET` | Ödeme webhook | ❌ Boş | ❌ | ✅ Secret Manager | ✅ Güvenli |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Grafana monitoring | ⚠️ **GERÇEK TOKEN** | ❌ | ✅ Secret Manager | 🔴 **PUBLIC!** |
+| `STRIPE_SECRET_KEY` | Ödeme (legacy) | ❌ Boş | ❌ | ✅ Secret Manager | ✅ Güvenli |
+| `FCM_SERVER_KEY` | Push notification | ❌ Boş | ❌ | Belirsiz | 🟡 Kontrol et |
+| `R2_ACCESS_KEY_ID` | Cloudflare storage | ❌ Boş | ❌ | Belirsiz | 🟡 Kontrol et |
+| `R2_SECRET_ACCESS_KEY` | Cloudflare storage | ❌ Boş | ❌ | Belirsiz | 🟡 Kontrol et |
+| GitHub PAT | OpenClaw, git | ❌ | ❌ | ❌ | 🔴 Paylaşıldı, rotate |
+| npm token | SDK publish | ❌ | ❌ | ❌ | ⚠️ Eski oturumda paylaşıldı |
+
+### 8.2 KRİTİK: Grafana Cloud OTEL Token Exposed!
+
+**`.env.production.example` dosyası GitHub'da public ve gerçek Grafana Cloud token içeriyor.**
+
+```bash
+# .env.production.example'daki satır:
+OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic MTYyNTQ3NjpnbGNfZXlKdklqb2lNVGMxTnpNek5TSXNJbTRp...
+```
+
+Bu base64 decode edildiğinde gerçek Grafana Cloud API key çıkıyor:
+- Stack ID: `1625476`
+- Stack name: `hooksniff-hooksniff2`
+- Region: `us`
+- API key format: `glc_eyJv...`
+
+**Risk:** Herkes bu token ile Grafana Cloud hesabınıza erişebilir, logları okuyabilir, silebilir.
+
+**Acil Aksiyon:**
+```
+1. Grafana Cloud → hookrelay org → Security → Cloud Access Policies
+2. Mevcut policy'yi bul → "hooksniff" adlı
+3. Token'ı revoke et / yeni token oluştur
+4. Yeni token'ı GCP Secret Manager'da güncelle:
+   gcloud secrets versions add otel-headers --data-file=new-token.txt
+5. .env.production.example'daki OTEL_EXPORTER_OTLP_HEADERS satırını boşalt:
+   OTEL_EXPORTER_OTLP_HEADERS=
+6. GitHub'da commit et → force push (tarihi temizle)
+7. Cloud Run servislerini yeniden deploy et
+```
+
+### 8.3 Polar Product ID'ler
+
+`.env.production.example`'da Polar.sh product UUID'leri var:
+```
+POLAR_PRODUCT_PRO=ec5826ad-4a01-4146-b2d0-3b99eaf150a5
+POLAR_PRODUCT_BUSINESS=e5b7d88a-7606-4963-a070-4102ca6405e2
+```
+
+**Risk analizi:** Bunlar sadece ürün ID'leri, secret değil. Polar.sh'de ürün oluştururken otomatik üretilir. Birisi bu ID'leri bilse bile ödeme yapamaz veya hesaba erişemez. **Güvenli, rotate gerekmez.**
+
+### 8.4 Secret Manager vs Environment Variables
+
+**Mevcut yapı (iyi):**
+- Gerçek secret'lar GCP Secret Manager'da saklanıyor
+- GitHub Actions'ta `secrets.*` olarak referans ediliyor
+- Cloud Run'da `--set-secrets` ile inject ediliyor
+- `.env.production.example` sadece template (boş değerler)
+
+**Tek sorun:** OTEL token example'a düşmüş.
+
+**Önerilen yapı:**
+```
+┌─────────────────────────────────────────────────────────┐
+│ GCP Secret Manager                                       │
+│ ├── neon-db-url → DATABASE_URL                          │
+│ ├── upstash-redis-url → REDIS_URL                       │
+│ ├── jwt-secret → JWT_SECRET                             │
+│ ├── hmac-secret → HMAC_SECRET                           │
+│ ├── polar-token → POLAR_ACCESS_TOKEN                    │
+│ ├── polar-webhook → POLAR_WEBHOOK_SECRET                │
+│ ├── otel-headers → OTEL_EXPORTER_OTLP_HEADERS           │
+│ └── gcp-sa-json → GCP_SA_KEY (WIF sonrası silinecek)   │
+└─────────────────────────────────────────────────────────┘
+        │
+        ▼ (inject)
+┌─────────────────────────────────────────────────────────┐
+│ Cloud Run Services (API, Worker)                         │
+│ Environment variables → Secret Manager'dan okunur       │
+│ Hiçbir secret image'da veya env dosyasında yok          │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 9. WIF Kurulum Rehberi ve Rollback Planı
+
+### 9.1 WIF Kurulum Adımları (Detaylı)
+
+**Önkoşul:** GCP Console erişimi (Servet)
+
+**Adım 1: Workload Identity Pool oluştur**
+```
+GCP Console → IAM & Admin → Workload Identity Pools → Create Pool
+  - Name: github-actions-pool
+  - Description: GitHub Actions CI/CD for HookSniff
+  - Pool ID: github-actions-pool
+```
+
+**Adım 2: Identity Provider ekle**
+```
+Pool → Add Provider
+  - Provider name: github-oidc
+  - Provider type: OIDC (OpenID Connect)
+  - Issuer URL: https://token.actions.githubusercontent.com
+  - Allowed audiences: (boş bırak)
+```
+
+**Adım 3: Attribute Mapping ayarla**
+```
+Provider → Attribute Mapping
+  - google.subject → assertion.sub
+  - attribute.repository → assertion.repository
+  - attribute.repository_owner → assertion.repository_owner
+  - attribute.ref → assertion.ref
+  - attribute.event_name → assertion.event_name
+```
+
+**Adım 4: Attribute Condition ayarla**
+```
+Provider → Attribute Condition
+  - expression: assertion.repository == 'servetarslan02/HookSniff'
+  - Bu sadece HookSniff repo'sundan gelen isteklere izin verir
+```
+
+**Adım 5: Service Account oluştur**
+```
+IAM & Admin → Service Accounts → Create
+  - Name: github-deploy
+  - Description: GitHub Actions deploy for HookSniff
+  - Service account ID: github-deploy
+```
+
+**Adım 6: IAM Roller ata**
+```
+Service Account → Permissions → Add
+  - roles/run.admin (Cloud Run deploy)
+  - roles/artifactregistry.writer (Docker image push)
+  - roles/secretmanager.secretAccessor (Secret okuma)
+  - roles/iam.serviceAccountUser (SA impersonation)
+```
+
+**Adım 7: Workload Identity User binding**
+```
+Service Account → Permissions → Add IAM Policy Binding
+  - Principal: principalSet://iam.googleapis.com/projects/[PROJECT_NUM]/locations/global/workloadIdentityPools/github-actions-pool/attribute.repository/servetarslan02/HookSniff
+  - Role: roles/iam.workloadIdentityUser
+```
+
+**Adım 8: GitHub Actions workflow güncelle**
+```yaml
+# deploy.yml — Eski:
+- uses: google-github-actions/auth@v2
+  with:
+    credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+# deploy.yml — Yeni:
+- uses: google-github-actions/auth@v2
+  with:
+    workload_identity_provider: 'projects/[PROJECT_NUM]/locations/global/workloadIdentityPools/github-actions-pool/providers/github-oidc'
+    service_account: 'github-deploy@hooksniff-app.iam.gserviceaccount.com'
+```
+
+**Adım 9: Test et**
+```
+GitHub → Actions → Deploy to Cloud Run → Run workflow (main branch)
+Başarılı olursa:
+  - Eski SA key'i GCP Console'dan sil
+  - GitHub Secrets'tan GCP_SA_KEY'i sil
+```
+
+### 9.2 WIF Rollback Planı
+
+WIF kurulumu başarısız olursa:
+
+**Senaryo 1: WIF auth başarısız**
+```
+Belirti: GitHub Actions "Permission denied" hatası
+Çözüm:
+  1. GCP Console → IAM → Workload Identity Pool → Provider
+  2. Attribute condition'ı kontrol et (repo adı doğru mu?)
+  3. Service account binding'leri kontrol et
+  4. GCP audit log'dan hata detayını gör
+  5. Düzeltemezsen → eski SA key ile devam et
+```
+
+**Senaryo 2: SA key silindiyse ama WIF çalışmıyorsa**
+```
+Belirti: Ne WIF ne de SA key çalışıyor → deploy yapılamıyor
+Çözüm:
+  1. GCP Console → IAM → Service Accounts → github-deploy
+  2. Keys tab → Add Key → Create new key (JSON)
+  3. Yeni key'i GitHub Secrets'ta GCP_SA_KEY olarak ekle
+  4. deploy.yml'yi eski haline geri al (credentials_json)
+  5. Deploy'u test et
+  6. WIF'i tekrar kurmayı dene
+```
+
+**Senaryo 3: Yanlışlıkla tüm SA key'ler silindi**
+```
+Belirti: Service account'un hiç key'i yok
+Çözüm:
+  1. GCP Console → IAM → Service Accounts → hooksniff-app SA
+  2. Keys tab → Add Key → Create new key
+  3. Cloud Run servislerinin çalıştığını doğrula
+  4. (Cloud Run Secret Manager kullandığı için etkilenmez)
+```
+
+**Senaryo 4: GitHub Actions timeout**
+```
+Belirti: Auth step 10+ dakika sürüyor
+Çözüm:
+  1. GitHub Actions logs'da "Federated token" adımını kontrol et
+  2. GCP'de Workload Identity Pool'un "Enabled" olduğunu doğrula
+  3. Provider'un "Enabled" olduğunu doğrula
+  4. GitHub OIDC endpoint'in erişilebilir olduğunu kontrol et
+```
+
+### 9.3 WIF Doğrulama Checklist
+
+Kurulum sonrası mutlaka kontrol et:
+
+```
+□ GitHub Actions deploy başarılı mı?
+□ Cloud Run servisleri çalışıyor mu?
+□ Secret Manager'dan secret okunabiliyor mu?
+□ Docker image Artifact Registry'a push edilebildi mi?
+□ Eski SA key silindi mi?
+□ GitHub Secrets'tan GCP_SA_KEY silindi mi?
+□ Audit log'da "WorkloadIdentityFederation" girişleri var mı?
+```
+
+---
+
+## 10. Token Rotate Sırası ve Bağımlılıklar
+
+### 10.1 Bağımlılık Haritası
+
+```
+[GCP SA Key] ──────┬──→ GitHub Actions deploy
+                   └──→ Cloud Run services
+                         │
+[Github PAT] ───────────→ OpenClaw (repo erişimi)
+                         │
+[npm token] ────────────→ SDK publish
+                         │
+[Grafana OTEL token] ───→ Monitoring (bağımsız)
+```
+
+### 10.2 Doğru Sıra
+
+**Kural:** Önce bağımlı olmayanları rotate et, sonra bağımlı olanları.
+
+```
+GÜN 1 — Bağımsız token'lar (diğerlerini etkilemez)
+├── 1. Grafana OTEL token (ACİL — public exposed)
+│   ├── Grafana Cloud'da revoke et
+│   ├── Yeni token oluştur
+│   ├── GCP Secret Manager'da güncelle
+│   └── .env.production.example'ı temizle
+│
+├── 2. GitHub PAT (OpenClaw erişimi)
+│   ├── Eski PAT'ı revoke et
+│   ├── Fine-grained PAT oluştur (90 gün)
+│   └── OpenClaw config'te güncelle
+│
+└── 3. npm token (SDK publish)
+    ├── Eski token'ı kontrol et/sil
+    ├── Granular token oluştur (90 gün)
+    └── (GitHub Actions'ta NPM_TOKEN yok, local'de kullanılıyor)
+
+GÜN 2 — GCP SA Key (en kritik, deploy'u etkiler)
+├── 4. GCP SA Key rotate (acil)
+│   ├── Yeni key oluştur
+│   ├── Eski key sil
+│   ├── GitHub Secrets'ta güncelle
+│   └── Deploy test et
+│
+└── 5. (Opsiyonel) WIF kurulumu
+    ├── WIF pool + provider oluştur
+    ├── Service account binding
+    ├── Workflow güncelle
+    ├── Test et
+    └── Eski SA key sil + GitHub Secrets'tan GCP_SA_KEY sil
+
+GÜN 3 — Doğrulama
+├── 6. Tüm servislerin çalıştığını doğrula
+├── 7. GitHub Actions deploy test et
+├── 8. Monitoring (Grafana) çalışıyor mu?
+└── 9. SDK publish test et (local)
+```
+
+### 10.3 Neden Bu Sıra?
+
+| Sıra | Token | Neden |
+|------|-------|-------|
+| 1 | Grafana OTEL | 🔴 PUBLIC — en acil, bağımsız |
+| 2 | GitHub PAT | 🔴 Paylaşıldı, bağımsız (OpenClaw erişimi) |
+| 3 | npm token | ⚠️ Eski oturumda paylaşıldı, bağımsız |
+| 4 | GCP SA Key | 🔴 Paylaşıldı ama deploy'u etkiliyor → dikkatli rotate |
+| 5 | WIF | GCP SA Key sonrası, en güvenli çözüm |
+
+### 10.4 Senaryo: Bir Şey Yanlış Giderse
+
+| Durum | Etki | Çözüm |
+|-------|------|-------|
+| Grafana rotate sonrası monitoring çalışmaz | Log kaybı | Eski token'ı geri al (eğer revoke edilmediyse) |
+| GitHub PAT rotate sonrası OpenClaw erişimi kaybolur | Bu oturum kesilir | Yeni PAT ile OpenClaw config güncelle |
+| npm token rotate sonrası SDK publish başarısız | Bir sonraki publish'de sorun | Yeni token ile local .npmrc güncelle |
+| GCP SA key rotate sonrası deploy başarısız | Yeni sürüm deploy edilemez | Eski key'i geri al (eğer silindiyse yeni key oluştur) |
+| WIF kurulumu başarısız | Deploy yapılamaz | Eski SA key'e geri dön (rollback planı §9.2) |
+
+### 10.5 Acil Durum İletişim
+
+| Durum | Ne Yap |
+|-------|--------|
+| Tüm token'lar rotate edildi ama bir şey çalışmıyor | GCP Console → Service Accounts → yeni key oluştur |
+| GitHub'a erişim yok | github.com → Settings → Developer settings → PAT → yeni oluştur |
+| npm'e erişim yok | npmjs.com → Access Tokens → yeni oluştur |
+| Grafana'ya erişim yok | grafana.com → org → Security → Cloud Access Policies |
+
+---
+
 ## Notlar
 
 - Bu rapor OPERATIONS_STRATEGY.md ve STATUS_PAGE_STRATEGY.md ile birlikek okunmalı
 - GCP WIF kurulumu en kritik iyileştirme — key'i tamamen kaldırır
 - npm Trusted Publishers yakında zorunlu olacak — classic token'lar Kasım 2025'te kaldırılıyor
+- Grafana OTEL token ACİL — GitHub'da public, hemen revoke edilmeli
 - .ai-context temizliği bir sonraki oturumda AI tarafından yapılacak
 - SDK auto-generation uzun vadeli hedef — şimdilik manuel bakım yeterli
