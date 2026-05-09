@@ -200,6 +200,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 38 | 2026-05-09 22:06 | Dashboard coverage artırma — 4 detail page fix + 45 yeni test, 60 dosya/471 test/0 hata |
 | 37 | 2026-05-09 21:39 | Dashboard test coverage tamamlandı — 24 yeni test dosyası, 57 dosya/426 test/0 hata, tüm sayfalar covered |
 | 36 | 2026-05-09 21:19 | Dashboard Vitest testleri — 11 dosya, 136 test, 0 hata (subagent) |
 | 35 | 2026-05-09 21:05 | Test coverage kampanyası — 128→952 test (+824), 0 hata, tüm modüller covered |
