@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
@@ -299,7 +300,7 @@ export default function PortalCustomizationPage() {
               >
                 <div className="flex items-center gap-3">
                   {config.logo_url ? (
-                    <img src={config.logo_url} alt="Logo" className="w-8 h-8 rounded" />
+                    <Image src={config.logo_url} alt="Logo" width={32} height={32} className="w-8 h-8 rounded" />
                   ) : (
                     <span className="text-2xl">🪝</span>
                   )}
