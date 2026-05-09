@@ -1,10 +1,27 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 19:55 GMT+8
+> Son güncelleme: 2026-05-09 20:35 GMT+8
 
 ---
 
-## 🔴 ACİL: API DEPLOY
+## 🔴 ACİL: TEST COVERAGE %95
+
+**Servet kararı: Profesyonel, kusursuz sistem. Test coverage %95 hedefi.**
+
+### Mevcut Durum
+| Modül | Coverage | Hedef | Gap |
+|-------|----------|-------|-----|
+| Rust API | %12 | %95 | +83% |
+| Dashboard | %3 | %95 | +92% |
+
+### Öncelik Sırası
+1. **Rust API** — her route, her fonksiyon için test yaz
+2. **Dashboard** — her component, her page için test yaz
+3. **k6 load test** — çalıştır ve sonuçları raporla
+
+---
+
+## ⚠️ CI DURUMU
 
 RateLimiter fix push edildi (`4bbd9aa`) ama Cloud Run'a deploy edilemedi.
 
