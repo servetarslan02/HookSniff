@@ -1,6 +1,8 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+export const metadata = { title: 'Customer Stories — HookSniff' };
+
 /* ─── Customer Stories Database ─── */
 
 const stories: Record<string, {
