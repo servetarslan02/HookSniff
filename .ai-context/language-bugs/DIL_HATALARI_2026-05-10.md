@@ -257,6 +257,20 @@ Aşağıdaki sayfalar için çeviri key'leri hiç oluşturulmamış:
 
 ## 10. Derin Tarama — Ek Bulgular
 
+### 10.0 Metadata Titles (SEO — tüm sayfalar)
+Hardcoded `<title>` tag'leri — dil değiştirince değişmez:
+- `what-is-a-webhook/page.tsx` — "What is a Webhook? A Complete Guide — HookSniff"
+- `alternatives/webhook-relay/page.tsx` — "HookSniff vs Webhook Relay — Alternative"
+- `alternatives/hookdeck/page.tsx` — "HookSniff vs Hookdeck — Why Choose HookSniff"
+- `alternatives/svix/page.tsx` — "HookSniff vs Svix — Why Choose HookSniff"
+- `alternatives/hook0/page.tsx` — "HookSniff vs Hook0 — Why Choose HookSniff"
+- `alternatives/convoy/page.tsx` — "HookSniff vs Convoy — Convoy Alternative"
+- `customers/[slug]/page.tsx` — "Customer Stories — HookSniff"
+- `startups/page.tsx` — "HookSniff for Startups — Special Pricing"
+- `security/page.tsx` — "Security & Compliance — HookSniff"
+- `build-vs-buy/page.tsx` — "Should you build webhook infrastructure in-house or use a service? Compare 12 dimensions..."
+- `compare/CompareContent.tsx` — metadata description hardcoded
+
 ### 10.1 Landing Page
 | Yer | Hardcoded Metin |
 |-----|----------------|
@@ -332,6 +346,96 @@ Hardcoded: "Endpoint", "Event Type"
 
 ### 10.16 Changelog Sayfası
 Hardcoded: "Changelog", "Latest", "All areas", "All types", "Navigate", "Subscribe"
+Error messages: "Something went wrong. Please try again.", "Network error — check your connection."
+
+### 10.17 Ternary Operator Hardcoded Text
+| Dosya | Hardcoded |
+|-------|-----------|
+| `components/ConfirmDialog.tsx` | "Processing..." |
+| `components/OnboardingWizard.tsx` | "Creating...", "Create Endpoint →" |
+| `dashboard/playground/page.tsx` | "OK", "Redirect", "Client Error", "Server Error" |
+| `dashboard/endpoints/[id]/page.tsx` | "Saving...", "Save Retry Policy", "Rotating...", "Rotate Secret" |
+| `dashboard/routing/page.tsx` | "Unhealthy", "Healthy" |
+| `admin/users/[id]/page.tsx` | "Ban User", "Activate User", "Active", "Inactive" |
+| `admin/users/page.tsx` | "Ban", "Activate" |
+| `playground/page.tsx` | "Sending...", "Send →" |
+| `changelog/page.tsx` | "Hide details ↑", "Show {n} changes →" |
+| `newsletter/page.tsx` | "All", "Subscribing...", "Subscribe" |
+| `blog/page.tsx` | "Subscribing...", "Subscribe" |
+
+### 10.18 Variable-Assigned Hardcoded Text
+| Dosya | Hardcoded |
+|-------|-----------|
+| `components/OnboardingWizard.tsx` | "Payments", "Email / Notifications", "E-commerce", "SaaS Platform", "AI / Agents", "Other" |
+| `components/OnboardingWizard.tsx` | "Node.js", "Python", "Go", "Rust", "C#", "Java", "Ruby", "PHP", "Kotlin", "Elixir" (SDK labels) |
+| `components/OnboardingWizard.tsx` | "Create account", "Get API key", "Create first endpoint", "Send first webhook" |
+| `dashboard/endpoints/[id]/page.tsx` | "Exponential", "Linear", "Fixed" (retry strategy labels) |
+| `dashboard/endpoints/[id]/page.tsx` | "Delay doubles each attempt (10s → 20s → 40s → 80s...)", "Delay increases linearly...", "Same delay every attempt..." |
+
+### 10.19 Template Literal Hardcoded Text
+| Dosya | Hardcoded |
+|-------|-----------|
+| `components/ThemeToggle.tsx` | "Switch to {light/dark} mode" |
+| `dashboard/playground/page.tsx` | "Generated {eventType} payload" |
+| `dashboard/deliveries/[id]/page.tsx` | "Replay this webhook delivery to the same endpoint? This will create a new delivery attempt." |
+| `dashboard/deliveries/page.tsx` | "Replay delivery {id}… to the same endpoint?" |
+| `admin/system/page.tsx` | "Checking...", "Uptime: {time}", "Latency: {ms}ms", "{pending} pending · {processing} processing · {failed} failed" |
+| `admin/users/[id]/page.tsx` | "Plan updated to {plan}", "User banned/activated" |
+| `admin/users/page.tsx` | "Plan updated to {plan}", "User banned/activated" |
+| `playground/page.tsx` | "Status: {status} · {time}ms" |
+
+### 10.20 Footer Component — Section Headers
+Hardcoded: "Product", "Resources", "Company", "Get Started", "GitHub"
+
+### 10.21 Dashboard Error Messages (Toast/Alert)
+| Dosya | Hardcoded |
+|-------|-----------|
+| `dashboard/endpoints/page.tsx` | "Failed to create endpoint", "Failed to delete", "Unknown error" |
+| `dashboard/endpoints/[id]/page.tsx` | "Endpoint not found", "Retry policy updated!", "Failed to load endpoint", "Failed to update", "Rotation failed", "Rotation failed" |
+| `dashboard/deliveries/[id]/page.tsx` | "Failed to load delivery", "Webhook replayed successfully!", "Replay failed", "Failed to copy", "No headers captured", "No payload captured" |
+| `dashboard/deliveries/page.tsx` | "Failed to load deliveries", "Replay failed" |
+| `dashboard/team/page.tsx` | "Failed to load teams", "Failed to load members", "Failed to create team", "Failed to invite member", "Failed to remove member", "Failed to update role" |
+| `dashboard/transforms/page.tsx` | "Transform rule created!", "Failed to create rule", "Rule deleted", "Failed to delete" |
+| `dashboard/inbound/page.tsx` | "Failed" |
+| `dashboard/portal/page.tsx` | "Failed to load portal data" |
+| `dashboard/billing/page.tsx` | "Cancel failed", "Upgrade failed" |
+| `dashboard/settings/page.tsx` | "Failed to update profile", "Failed to change password", "Failed to delete account", "Password must be at least 8 characters" |
+
+### 10.22 Docs Pages (Detaylı)
+| Sayfa | Hardcoded Metinler |
+|-------|-------------------|
+| `docs/integrations` | "Integration Guides", "GitHub Webhooks", "Shopify Webhooks", "Stripe Webhooks", "Generic Webhook Receiver", "Inbound Proxy", "Accepts incoming webhooks on your behalf", "Provides retry logic and monitoring for inbound webhooks", "Validates payloads and logs delivery attempts" + step-by-step instructions |
+| `docs/portal` | "Embeddable Portal", "How to Embed", "Iframe", "Customization", "Secure access", "API key scoping", "View deliveries", "Inspect payloads", "Replay failed webhooks", "Rotate secrets", "Zero support tickets" |
+| `docs/security` | "Webhook Security Guide", "HMAC signatures", "HTTPS only", "IP Whitelisting", "SSRF Protection", "Timestamp Validation", "TLS Enforcement", "Standard Webhooks", "Python Verification", "localhost" |
+| `docs/event-types` | "Event Types", "Registering Event Types", "Filtering by Event Type", "Querying by Event Type", "Schema Validation" |
+| `docs/idempotency` | "Idempotency", "Idempotency Keys", "How HookSniff Handles Duplicates", "Best Practices", "Retry with the same idempotency key on network failures", "Keys are retained for {days} days", "Include the event type in the key to avoid collisions across event types" |
+| `docs/dashboard` | "Dashboard Guide", "Overview", "Recent Deliveries", "Delivery Monitoring", "Delivery Log", "Attempt Details", "Endpoint Management", "Create Endpoints", "Custom Headers", "Default Retry Policy", "Rotate Secrets", "Event Filtering", "Delivery Stats", "Success Rate", "Latency", "Volume Trends", "Activity Charts", "Activity Log", "Failure Analysis", "Replay", "Alerts", "Endpoint Health", "API Keys", "Multiple API Keys", "Team Collaboration", "Shared Dashboard", "Analytics", "Export", "Settings", "Billing", "Webhook Payload Limits" |
+| `docs/quickstart` | (kullanılmayan description field'ı) |
+| `docs/sdks` | (kullanılmayan description field'ı) |
+
+### 10.23 Alternatives Pages (Detaylı)
+| Sayfa | Hardcoded |
+|-------|-----------|
+| `alternatives/svix-alternatives` | "Alternatives", "Svix", "Service", "Open Source", "SDKs", "Price", "Recommended" |
+| `alternatives/hookdeck-alternatives` | "Alternatives", "Hookdeck", "Service", "Open Source", "SDKs", "Price", "Routing" |
+| `alternatives/convoy-alternatives` | "Alternatives", "Convoy", "Service", "Open Source", "SDKs", "Price", "Portal", "Managed Cloud" |
+
+### 10.24 What-is-a-Webhook Sayfası (Detaylı)
+Hardcoded: "The Simple Explanation", "How Webhooks Work", "Common Use Cases", "Webhook vs API vs Polling", "Webhook Security", "Getting Started with Webhooks" + tüm comparison table ("Aspect", "Webhook", "Polling", "Direction", "Timing", "Latency", "Efficiency", "Complexity") + use case descriptions ("Payment notifications", "CI/CD pipelines", "Chat bots", "E-commerce", "AI agents", "Monitoring") + security items ("HMAC signatures", "HTTPS only", "IP whitelisting", "Timestamp validation")
+
+### 10.25 Use-Cases Sayfası (Detaylı)
+Her use case için hardcoded: title, tagline, description, pain points, benefits, events, metrics, testimonial quote/author/role
+- "SaaS Platforms", "E-Commerce", "Fintech & Payments", "AI Agents", "Developer Platforms"
+
+### 10.26 Newsletter Sayfası (Detaylı)
+- Recent issues: title, category, excerpt (3 issue)
+- FAQ: 5 soru + cevap
+- Category types: "Product updates", "Engineering insights", "Industry trends" + descriptions
+- Testimonials: quote, author, role (3 adet)
+- Error messages: "Something went wrong. Please try again.", "Network error — check your connection."
+
+### 10.27 Admin System Sayfası (Detaylı)
+Hardcoded: "API Server", "PostgreSQL Database", "Redis Cache", "Webhook Queue", "Checking...", "Uptime: {time}", "Latency: {ms}ms", "{pending} pending · {processing} processing · {failed} failed", "Monitor infrastructure services and system status", "Last checked: {date} · Auto-refresh every 15s", "Oracle Cloud ARM", "4 OCPU, 24 GB RAM", "Neon PostgreSQL", "Serverless, 0.5 GB", "Upstash Redis", "Serverless, 256 MB", "Cloudflare", "DNS, SSL, DDoS", "Vercel", "Next.js 15", "Grafana Cloud", "OpenTelemetry"
 
 ---
 
