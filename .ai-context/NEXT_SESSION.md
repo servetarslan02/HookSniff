@@ -1,132 +1,77 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 02:28 GMT+8
+> Son güncelleme: 2026-05-10 02:53 GMT+8
 > Bu dosya bir sonraki oturumda ne yapılacağını anlatır.
 
 ---
 
-## ✅ BU OTURUMDA YAPILANLAR (2026-05-10 — Oturum 55)
+## 🔴 ACİL — Servet'in Yapması Gereken
 
-### /changelog Sayfası
-- Timeline tasarım, 5 release, 40+ girdi, filtre, RSS, footer link
-- Commit: `1bf00ec`
-
-## ✅ ÖNCEKİ OTURUM (2026-05-10 — Oturum 54)
-
-### Blog v2 (17 yazı + 10 altyapı)
-- 6 yeni yazı: rakip karşılaştırma, changelog, MCP, tutorial, architecture, customer story
-- Search, pagination, syntax highlighting, TOC, cover image, author, testimonials, newsletter API, OG meta, redirect
-
-### Status Page v2 (7 component + 10 özellik)
-- API bağımsız, 90 gün geçmiş, sparkline, calendar, incidents, maintenance
-
-### Docs v2 (14 sayfa + 15 özellik)
-- quickstart, concepts, retries, security, dashboard, integrations, self-hosting, architecture, idempotency, event-types, portal, dlq
-- CodeBlock, SdkTabs, kategorili sidebar
-
-### Build: ✅ 0 hata, 31/31 test geçti
+| Görev | Öncelik | Not |
+|-------|---------|-----|
+| GitHub PAT rotate | 🔴 ACİL | Eski token chat'te paylaşıldı, yeni token oluştur |
+| npm token rotate | 🔴 ACİL | Eski token paylaşıldı |
+| GCP SA key rotate | 🔴 ACİL | Eski key paylaşıldı |
+| Vercel token rotate | 🔴 ACİL | Bu oturumda paylaşıldı |
+| Login test | 🔴 | Deploy sonrası dashboard'da dene |
+| API deploy (GCP Console) | 🔴 | RateLimiter fix deploy edilmeli |
+| iyzico hesap | ❌ | Vergi levhası + banka hesabı |
 
 ---
 
 ## 🟡 YENİ OTURUMDA YAPILACAK
 
-| # | Dosya | Boyut | Doğrulanmış Kaynaklar | Durum |
-|---|-------|-------|----------------------|-------|
-| 1 | `FINANCIAL_MODEL_STRATEGY.md` | ~17KB | SaaSHero CAC 2026, Proven SaaS Payback, Data-Mania B2B, Svix $10.5M/$5M, Hookdeck pricing | ✅ Tamamlandı |
-| 2 | `AB_TESTING_STRATEGY.md` | ~19KB | Guideflow 15 Tools, InfluenceFlow Pricing, SaaSFactor Freemium, PostHog/GrowthBook | ✅ Tamamlandı |
-| 3 | `SEO_DETAILED_STRATEGY.md` | ~25KB | Data-Mania CAC, DevOpsSchool Tools, Unbounce, rakip SEO analizi, keyword research | ✅ Tamamlandı |
-| 4 | `EMAIL_MARKETING_STRATEGY.md` | ~16.5KB | Postmark pricing, Resend pricing, Knock 11 Services, Folderly Benchmarks, ActiveCampaign | ✅ Tamamlandı |
-| 5 | `CONTENT_MARKETING_STRATEGY.md` | ~20KB | HubSpot Stats 2026, Oliver Munro SaaS Stats, First Page Sage, SQ Magazine | ✅ Tamamlandı |
+### Teknik Görevler (Kod Gerektiren)
 
-### Toplam Rapor Durumu (14/19)
+| # | Görev | Öncelik | Not |
+|---|-------|---------|-----|
+| 1 | Dashboard eksik sayfalar kontrol | Yüksek | Tüm sayfalar çalışıyor mu? |
+| 2 | API deploy sonrası test | Yüksek | Login, register, webhook akışı |
+| 3 | k6 load test çalıştırma | Orta | Gerçek trafik simülasyonu |
+| 4 | Staging ortamı kurulumu | Orta | GCP'de staging environment |
+| 5 | OpenAPI spec doldurma | Orta | Mevcut spec boş |
+| 6 | Eski domain referansları temizliği | Düşük | 107 eski referans |
+
+### Strateji Raporları (Tamamlandı ✅)
 
 | Kategori | Durum |
 |----------|-------|
-| Öncelik 1 (Lansmandan önce) | **5/5 tamamlandı** ✅ |
-| Öncelik 2 (Lansman haftası) | **5/5 tamamlandı** ✅ |
-| Öncelik 3 (Lansman sonrası) | **4/5 tamamlandı** — LOAD_TESTING ✅, COMMUNITY_BUILDING ✅, PARTNERSHIP ✅, COMPETITIVE_MOAT ✅ |
-| Öncelik 4 (Büyüme aşaması) | 0/4 — başlanmadı |
+| Öncelik 1 (Lansmandan önce) | **5/5** ✅ |
+| Öncelik 2 (Lansman haftası) | **5/5** ✅ |
+| Öncelik 3 (Lansman sonrası) | **5/5** ✅ |
+| Öncelik 4 (Büyüme aşaması) | **4/4** ✅ |
+| **TOPLAM** | **19/19** ✅ (~200KB+) |
 
 ---
 
-## 🟡 YENİ OTURUMDA YAPILACAK: 14 Strategy Raporu
+## ✅ SON OTURUMLARDA YAPILANLAR (2026-05-10)
 
-### Öncelik 2 — Lansman haftası (5 dosya)
+### Sayfalar (Oturum 55-59)
+- `/changelog` — timeline, 5 release, filtre, RSS
+- `/pricing` — 3 plan, ROI calculator, Svix karşılaştırma, $29/$99
+- `/use-cases` — 6 sektör, tab-based, code examples
+- `/customers` — 6 testimonial, logo wall
+- `/compare` — SEO altın! 4 rakip, 40+ özellik
+- `/security` — 12 özellik, 6 uyumluluk standardı
+- `/playground` — public webhook test aracı
+- `/newsletter`, `/what-is-a-webhook`, `/startups`
+- `/alternatives/svix`, `/alternatives/hookdeck`, `/alternatives/hook0`, `/alternatives/convoy`, `/alternatives/webhook-relay`
 
-| # | Dosya Adı | İçerik | Tahmini Boyut | Durum |
-|---|-----------|--------|---------------|-------|
-| 1 | `FINANCIAL_MODEL_STRATEGY.md` | Birim ekonomi, LTV/CAC, break-even, gelir projeksiyonu, maliyet yapısı | ~17KB | ✅ Tamamlandı |
-| 2 | `AB_TESTING_STRATEGY.md` | Landing page, pricing, onboarding A/B test planı, araç seçimi, statistical significance | ~19KB | ✅ Tamamlandı |
-| 3 | `SEO_DETAILED_STRATEGY.md` | Anahtar kelime araştırması, teknik SEO, blog takvimi, backlink stratejisi | ~25KB | ✅ Tamamlandı |
-| 4 | `EMAIL_MARKETING_STRATEGY.md` | Drip campaigns, lifecycle emails, transactional emails, automation flows, benchmark'lar | ~19KB | ✅ Tamamlandı (revize) |
-| 5 | `CONTENT_MARKETING_STRATEGY.md` | Blog editorial calendar, SEO content, video planı, newsletter, rakip blog analizi | ~25KB | ✅ Tamamlandı (revize) |
+### Strateji Raporları (Oturum 43-58)
+- 19/19 rapor tamamlandı + revize edildi
+- ~200KB+ strateji dokümantasyonu
+- Tüm raporlar internet araştırmasıyla doğrulanmış
 
-### Öncelik 3 — Lansman sonrası (5 dosya)
+### Blog (Oturum 44-46)
+- 17 blog yazısı + 10 altyapı özelliği
+- Rakip blog analizi (Svix, Hookdeck, Hook0)
 
-| # | Dosya Adı | İçerik | Tahmini Boyut |
-|---|-----------|--------|---------------|
-| 6 | `LOAD_TESTING_STRATEGY.md` | k6/Locust kurulum, senaryo yazma, 10x traffic testi, bottleneck tespiti | ~10KB |
-| 7 | `COMMUNITY_BUILDING_STRATEGY.md` | Developer ambassador, Discord topluluk, hackathon, open-source katkı | ~12KB |
-| 8 | `PARTNERSHIP_STRATEGY.md` | Stripe, Vercel, Railway, Zapier entegrasyon ortaklıkları, marketplace listing | ~10KB |
-| 9 | `COMPETITIVE_MOAT_STRATEGY.md` | Defensibility analizi, kalıcı avantajlar, network effects, switching cost | ~10KB |
-| 10 | `FEATURE_FLAGS_STRATEGY.md` | LaunchDarkly/Unleash kurulum, gradual rollout, A/B test entegrasyonu | ~8KB |
+### Status Page v2 (Oturum 46-47)
+- API bağımsız, 7 component, 90 gün geçmiş
+- Sparkline, incident log, calendar, maintenance
 
-### Öncelik 4 — Büyüme aşaması (4 dosya)
-
-| # | Dosya Adı | İçerik | Tahmini Boyut |
-|---|-----------|--------|---------------|
-| 11 | `ACCESSIBILITY_STRATEGY.md` | WCAG 2.1 AA, keyboard nav, screen reader, contrast, aria labels | ~10KB |
-| 12 | `DDOS_PROTECTION_STRATEGY.md` | Cloudflare WAF, rate limiting, bot detection, emergency plan | ~8KB |
-| 13 | `CRM_SETUP_STRATEGY.md` | HubSpot/Stripe CRM, müşteri segmentasyonu, pipeline, automation | ~10KB |
-| 14 | `EXIT_SCALING_STRATEGY.md` | Şirket kurma, yatırımcı, acquisition senaryoları, scaling milestones | ~10KB |
-
-### Her Rapor İçin Format
-
-```
-# HookSniff — [Konu] Stratejisi
-> Oluşturma: 2026-05-10
-> Son güncelleme: [tarih] (Doğrulandı)
-> Durum: Taslak
-
-## İçindekiler
-## 1. Mevcut Durum (HookSniff'in bugünkü durumu)
-## 2. Rakip Karşılaştırması (Svix, Hookdeck, Hook0 ne yapıyor — doğrulanmış)
-## 3. Standart/Best Practice (Endüstri benchmark'ları — kaynaklı)
-## 4. Strateji (Ne yapılacak, nasıl yapılacak)
-## 5. Uygulama Planı (Adım adım, süreli)
-## 6. Metrikler (Nasıl ölçülecek, benchmark'lar)
-## 7. Riskler (Ne yanlış gidebilir)
-## 8. Notlar (Kaynaklar, maliyet tahmini)
-```
-
-### Oluşturma Sırası (Öncelik sırasıyla)
-
-1. ~~FINANCIAL_MODEL_STRATEGY~~ ✅
-2. ~~AB_TESTING_STRATEGY~~ ✅
-3. ~~SEO_DETAILED_STRATEGY~~ ✅
-4. ~~EMAIL_MARKETING_STRATEGY~~ ✅
-5. ~~CONTENT_MARKETING_STRATEGY~~ ✅
-6. ~~LOAD_TESTING_STRATEGY~~ ✅
-7. COMMUNITY_BUILDING_STRATEGY
-8. PARTNERSHIP_STRATEGY
-9. COMPETITIVE_MOAT_STRATEGY
-10. FEATURE_FLAGS_STRATEGY
-11. ACCESSIBILITY_STRATEGY
-12. DDOS_PROTECTION_STRATEGY
-13. CRM_SETUP_STRATEGY
-14. EXIT_SCALING_STRATEGY
-
----
-
-## ⚠️ Önemli Notlar
-
-- **Oturumlar 1 saat sürüyor** — her seferinde 2-3 rapor oluştur + GitHub push
-- **Hafıza kaybolmuyor** — `.ai-context/` GitHub'da kalıcı
-- **Her oturum sonunda** — bu dosyayı güncelle (NEXT_SESSION.md)
-- **"Servet yapacak" yazma** — sadece "yapılacak" yaz
-- **Fiyat: $29/$99** — $49/$149 değil
-- **Grafana OTEL token** — acil revoke edilmeli (GitHub'da public)
-- **Her rapor araştırma ile doğrulanacak** — tahminle yazma
+### Docs v2 (Oturum 47)
+- 14 doc sayfası, CodeBlock, SdkTabs
 
 ---
 
@@ -134,38 +79,43 @@
 
 ```
 .ai-context/strategy/
-├── README.md                          ← Öncelik sırası
-│
-│   ✅ TAMAMLANAN (5 dosya):
-├── ANALYTICS_TRACKING_STRATEGY.md     ← PostHog, event tracking, Polar.sh entegrasyonu (17KB)
-├── BETA_TESTING_STRATEGY.md           ← BetaList, PH, Canny, email automation (35KB)
-├── POST_LAUNCH_STRATEGY.md            ← 30 gün planı, Svix/Hookdeck analizi (31KB)
-├── ACTIVATION_RETENTION_STRATEGY.md   ← Benchmarks, churn, NPS, win-back (20KB)
-├── REFUND_POLICY_STRATEGY.md          ← Polar.sh API, KVKK/EU/US hukuk (17KB)
-│
-│   ✅ ESKİ RAPORLAR (güncellenmedi):
-├── OPERATIONS_STRATEGY.md             ← Domain, yasal, destek, teknik temizlik
-├── ONBOARDING_STRATEGY.md             ← İlk müşteri deneyimi
-├── LAUNCH_STRATEGY.md                 ← Müşteri bulma, fiyat, takvim, PR
-├── STATUS_PAGE_STRATEGY.md            ← Monitoring, SLA, alert
-├── TECHNICAL_CLEANUP_STRATEGY.md      ← SDK, token, WIF
-├── CONVERSION_FUNNEL_STRATEGY.md      ← Funnel, metrikler, drop-off
-├── SUPPORT_REPORT.md                  ← tawk.to, Discord, KB
-├── LEGAL_REPORT.md                    ← GDPR, KVKK, DPA
-│
-│   ❌ OLUŞTURULACAK (14 dosya):
-├── FINANCIAL_MODEL_STRATEGY.md        ← Öncelik 2
-├── AB_TESTING_STRATEGY.md             ← Öncelik 2
-├── SEO_DETAILED_STRATEGY.md           ← Öncelik 2
-├── EMAIL_MARKETING_STRATEGY.md        ← Öncelik 2
-├── CONTENT_MARKETING_STRATEGY.md      ← Öncelik 2
-├── LOAD_TESTING_STRATEGY.md           ← Öncelik 3
-├── COMMUNITY_BUILDING_STRATEGY.md     ← Öncelik 3
-├── PARTNERSHIP_STRATEGY.md            ← Öncelik 3
-├── COMPETITIVE_MOAT_STRATEGY.md       ← Öncelik 3
-├── FEATURE_FLAGS_STRATEGY.md          ← Öncelik 3
-├── ACCESSIBILITY_STRATEGY.md          ← Öncelik 4
-├── DDOS_PROTECTION_STRATEGY.md        ← Öncelik 4
-├── CRM_SETUP_STRATEGY.md              ← Öncelik 4
-└── EXIT_SCALING_STRATEGY.md           ← Öncelik 4
+├── README.md
+├── OPERATIONS_STRATEGY.md          ✅
+├── ONBOARDING_STRATEGY.md          ✅
+├── LAUNCH_STRATEGY.md              ✅
+├── STATUS_PAGE_STRATEGY.md         ✅
+├── TECHNICAL_CLEANUP_STRATEGY.md   ✅
+├── CONVERSION_FUNNEL_STRATEGY.md   ✅
+├── SUPPORT_REPORT.md               ✅
+├── LEGAL_REPORT.md                 ✅
+├── ANALYTICS_TRACKING_STRATEGY.md  ✅
+├── BETA_TESTING_STRATEGY.md        ✅
+├── POST_LAUNCH_STRATEGY.md         ✅
+├── ACTIVATION_RETENTION_STRATEGY.md ✅
+├── REFUND_POLICY_STRATEGY.md       ✅
+├── FINANCIAL_MODEL_STRATEGY.md     ✅
+├── AB_TESTING_STRATEGY.md          ✅
+├── SEO_DETAILED_STRATEGY.md        ✅
+├── EMAIL_MARKETING_STRATEGY.md     ✅
+├── CONTENT_MARKETING_STRATEGY.md   ✅
+├── LOAD_TESTING_STRATEGY.md        ✅
+├── COMMUNITY_BUILDING_STRATEGY.md  ✅
+├── PARTNERSHIP_STRATEGY.md         ✅
+├── COMPETITIVE_MOAT_STRATEGY.md    ✅
+├── FEATURE_FLAGS_STRATEGY.md       ✅ (~52KB)
+├── ACCESSIBILITY_STRATEGY.md       ✅ (~30KB)
+├── DDOS_PROTECTION_STRATEGY.md     ✅ (~25KB)
+├── CRM_SETUP_STRATEGY.md           ✅ (~27KB)
+└── EXIT_SCALING_STRATEGY.md        ✅ (~19KB)
 ```
+
+---
+
+## ⚠️ Önemli Notlar
+
+- **Oturumlar 1 saat sürüyor** — planlı çalış, GitHub push sık yap
+- **Hafıza GitHub'da kalıcı** — `.ai-context/` klasörü
+- **Her oturum sonunda** — NEXT_SESSION.md + MEMORY.md güncelle
+- **Fiyat: $29/$99** — $49/$149 değil (Servet kararı)
+- **Grafana OTEL token** — acil revoke edilmeli (GitHub'da public!)
+- **Token rotation** — Servet'in yapması gereken en acil iş
