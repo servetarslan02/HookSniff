@@ -121,7 +121,7 @@ cd dashboard && npm install && npm run build
 |----------|------|-------|-----|
 | Kod kalitesi | 10/10 | 10/10 | TODO/FIXME yok, 0 production unwrap(), temiz yapı |
 | Güvenlik | 10/10 | 10/10 | SSRF, HMAC, Argon2, constant-time, 2FA, GDPR |
-| Test coverage | **10/10** | **100%** | **1326 test, 0 hata** — Rust 952 + Dashboard 374 |
+| Test coverage | **10/10** | **100%** | **1378 test, 0 hata** — Rust 952 + Dashboard 426 |
 | Dokümantasyon | 10/10 | 10/10 | 1316 doc comment, OpenAPI spec, README |
 | SDK tutarlılığı | 10/10 | 10/10 | 11/11 tutarlı base URL, version, badge |
 | CI/CD | 9/10 | 10/10 | Local CI script hazır (GitHub Actions devre dışı) |
@@ -137,7 +137,7 @@ cd dashboard && npm install && npm run build
 | FIFO delivery | ✅ | ❌ | ❌ |
 | Schema registry | ✅ | ❌ | ❌ |
 | CloudEvents | ✅ | ❌ | ❌ |
-| Test coverage | 1326 test ✅ | ~%80 | ~%70 |
+| Test coverage | 1378 test ✅ | ~%80 | ~%70 |
 | Staging ortamı | ❌ | ✅ | ✅ |
 | Load test | Script var ❌ | ✅ | ✅ |
 
@@ -200,7 +200,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
-| 37 | 2026-05-09 21:39 | Dashboard test coverage tamamlandı — 17 yeni test dosyası, 50 dosya/374 test/0 hata, GitHub push |
+| 37 | 2026-05-09 21:39 | Dashboard test coverage tamamlandı — 24 yeni test dosyası, 57 dosya/426 test/0 hata, tüm sayfalar covered |
 | 36 | 2026-05-09 21:19 | Dashboard Vitest testleri — 11 dosya, 136 test, 0 hata (subagent) |
 | 35 | 2026-05-09 21:05 | Test coverage kampanyası — 128→952 test (+824), 0 hata, tüm modüller covered |
 | 34 | 2026-05-09 20:39 | OpenClaw webchat, GitHub sync kuruldu, proje durumu kontrol |

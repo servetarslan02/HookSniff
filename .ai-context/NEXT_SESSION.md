@@ -11,7 +11,7 @@
 | Modül | Test Sayısı | Durum |
 |-------|------------|-------|
 | Rust API | **952 test, 0 hata** | ✅ Tüm modüller covered |
-| Dashboard | **374 test, 0 hata** (50 dosya) | ✅ Tüm sayfalar + component'ler covered |
+| Dashboard | **426 test, 0 hata** (57 dosya) | ✅ Tüm sayfalar + component'ler covered |
 
 ### Servis Durumu
 | Servis | Durum | Not |
