@@ -1,5 +1,6 @@
 # HookSniff — Analytics & Tracking Stratejisi
 > Oluşturma: 2026-05-10
+> Son güncelleme: 2026-05-10 (Doğrulandı)
 > Durum: Taslak
 > Öncelik: 🔴 Lansmandan önce
 
@@ -21,17 +22,18 @@
 - **OpenTelemetry (OTEL)** entegrasyonu mevcut — 314 OTEL referansı kod tabanında
 - **Health check** endpoint'leri aktif
 - **Metrics** endpoint'i mevcut
-- **Grafana Cloud** OTEL token tespit edildi (⚠️ GitHub'da public — acil revoke)
+- **Grafana Cloud** OTEL token tespit edildi (⚠️ GitHub'da public — acil revoke gerekli)
 - **Dashboard** Vercel'de canlı — temel pageview tracking yok
 - **API** Cloud Run'da — structured logging mevcut ama event tracking yok
 - **Kullanıcı davranış analizi** yok — hangi feature kullanılıyor bilinmiyor
 - **Funnel tracking** yok — signup → activate → pay akışı ölçülmüyor
 - **Cohort analysis** yok
+- **Error tracking** (Sentry) yok
 
 ### Eksiklikler
 | Alan | Durum | Öncelik |
 |------|-------|---------|
-| Product analytics (PostHog/Mixpanel) | ❌ Yok | 🔴 Kritik |
+| Product analytics (PostHog) | ❌ Yok | 🔴 Kritik |
 | Event tracking planı | ❌ Yok | 🔴 Kritik |
 | Funnel visualization | ❌ Yok | 🔴 Kritik |
 | Cohort analysis | ❌ Yok | 🟡 Orta |
@@ -44,133 +46,159 @@
 
 ## 2. Rakip Karşılaştırması
 
-| Özellik | Svix | Hookdeck | Hook0 | HookSniff (Bugün) | HookSniff (Hedef) |
-|---------|------|----------|-------|--------------------|--------------------|
-| Product analytics | Mixpanel | Amplitude | PostHog | ❌ | PostHog |
-| Event tracking | ✅ 50+ event | ✅ 30+ event | ✅ 20+ event | ❌ | ✅ 40+ event |
-| Funnel tracking | ✅ | ✅ | ❌ | ❌ | ✅ |
-| Cohort analysis | ✅ | ✅ | ❌ | ❌ | ✅ |
-| Session replay | Hotjar | FullStory | ❌ | ❌ | PostHog |
-| Error tracking | Sentry | Sentry | Sentry | ❌ | Sentry |
-| Revenue tracking | Stripe MRR | ChartMogul | ❌ | ❌ | Polar.sh + PostHog |
+### Rakip Pricing (Doğrulanmış — 2026-05-10)
 
-### Rakip Yaklaşımları
-- **Svix**: Mixpanel + Hotjar + Sentry üçlüsü. Her webhook event'i için tracking.
-- **Hookdeck**: Amplitude ile deep funnel analysis. FullStory ile user journey mapping.
-- **Hook0**: PostHog self-hosted. Minimal ama yeterli.
+| Rakip | Free Tier | Başlangıç Fiyatı | Enterprise | Kaynak |
+|-------|-----------|-----------------|------------|--------|
+| **Svix** | 50 msg/sn, 30 gün retention, 99.9% SLA | $490/ay (Professional) | Özel | svix.com/pricing |
+| **Hookdeck** | 10K event, 3 gün retention, 1 user | $39/ay (Team) | $499/ay (Growth) | hookdeck.com/pricing |
+| **HookSniff** | Limitsiz webhook, 1 endpoint | $29/ay (Plan) | $99/ay (Team) | — |
+
+### Rakip Analytics Kullanımı
+
+**Svix:**
+- YC + a16z destekli, Fortune 500 müşterileri (Brex, PagerDuty, Twilio)
+- Açık kaynak (GitHub: svix/svix-webhooks)
+- Status page: status.svix.com (dışarıdan izlenebilir)
+- Dashboard'da built-in metrics (latency, throughput, error rate)
+- Hangi analytics tool kullandıkları kamuya açık değil
+
+**Hookdeck:**
+- SoC2 compliance
+- Built-in metrics dashboard (latency, throughput, error rates, backpressure)
+- Metrics Export: Datadog entegrasyonu (Growth plan+)
+- Issues Management: Otomatik hata takibi
+- Hangi analytics tool kullandıkları kamuya açık değil
+
+### HookSniff Avantajları
+| Özellik | Svix | Hookdeck | HookSniff |
+|---------|------|----------|-----------|
+| Free tier webhook limiti | 50 msg/sn | 10K event | Limitsiz |
+| Fiyat (başlangıç) | $490/ay | $39/ay | $29/ay |
+| FIFO delivery | ❌ | ❌ | ✅ |
+| Schema registry | ❌ | ❌ | ✅ |
+| CloudEvents | ❌ | ❌ | ✅ |
+| Açık kaynak | ✅ | ❌ | ✅ |
 
 ---
 
 ## 3. Standart/Best Practice
 
-### SaaS Analytics Stack (2025-2026 Best Practices)
+### SaaS Analytics Stack (2025-2026)
 
-**Minimum Viable Analytics Stack:**
-1. **Product Analytics**: PostHog (open-source, self-hostable, generous free tier)
-2. **Error Tracking**: Sentry (free tier: 5K events/month)
-3. **Session Replay**: PostHog built-in (veya LogRocket)
-4. **Revenue Analytics**: Polar.sh dashboard + PostHog revenue events
+**Neden PostHog? (Doğrulanmış — 2026-05-10)**
 
-**Event Naming Convention (Best Practice):**
+Kaynak: posthog.com/pricing
+
+| Özellik | PostHog Free Tier | Not |
+|---------|-------------------|-----|
+| Product analytics | **1M events/ay** | Yeterli lansman dönemi |
+| Session replay | 5K recordings/ay | Kullanıcı davranışı izleme |
+| Feature flags | 1M requests/ay | gradual rollout |
+| Error tracking | 100K exceptions/ay | Sentry alternatifi |
+| Surveys | 1,500 responses/ay | NPS, feedback |
+| Data warehouse | 1M rows | Veri analizi |
+| Rust SDK | ✅ `posthog-rs` crate | HookSniff Rust tabanlı |
+| EU hosting | ✅ EU region | GDPR uyumlu |
+
+**Fiyatlandırmа (Doğrulanmış):**
+- 0-1M events: **$0** (free)
+- 1-2M events: $0.0000500/event
+- 2-15M events: $0.0000343/event
+- Session replay: İlk 5K ücretsiz, sonra $0.005/recording
+
+**Rust SDK (Doğrulanmış):**
+- Crate: `posthog-rs`
+- Async ve blocking client desteği
+- Feature flags entegrasyonu
+- Batch event capture
+- Kaynak: posthog.com/docs/libraries/rust
+
+**Alternatifler:**
+| Platform | Artı | Eksi | Karar |
+|----------|------|------|-------|
+| **PostHog** | Open-source, 1M free, Rust SDK, EU region | Self-host karmaşık | ✅ Seçildi |
+| Mixpanel | Powerful funnels | Pahalı, proprietary, free tier küçük | ❌ |
+| Amplitude | Enterprise features | Free tier çok sınırlı | ❌ |
+| Plausible | Privacy-first, simple | Product analytics yok, sadece pageview | ❌ |
+| Umami | Self-hosted, minimal | Feature eksik (funnel, cohort yok) | ❌ |
+
+### Event Naming Convention
 ```
-{object}_{action}_{context}
-Örnek: webhook_created_dashboard
-Örnek: sdk_installed_nodejs
-Örnek: plan_upgraded_pro
+{object}_{action}
+Örnek: webhook_created
+Örnek: sdk_installed
+Örnek: plan_upgraded
 ```
+PostHog kendi dokümantasyonunda `[object] [verb]` formatını öneriyor: "project created", "user signed up" gibi.
 
-**Pirate Metrics (AARRR) Framework:**
-| Aşama | Metrik | Tool |
-|-------|--------|------|
-| Acquisition | Signup source, channel | PostHog UTM tracking |
-| Activation | First webhook sent, SDK installed | PostHog events |
-| Retention | Weekly active webhooks | PostHog retention |
-| Revenue | MRR, ARPU, churn | Polar.sh + PostHog |
-| Referral | Invite sent, referral conversion | PostHog custom events |
-
-**Event Taxonomy Standards:**
-- **Identify** events: user signup, profile update
-- **Track** events: feature usage, errors, upgrades
-- **Group** events: team/workspace actions
-- **Page** events: pageview, section view
+### Pirate Metrics (AARRR) Framework
+| Aşama | Metrik | PostHog Özelliği |
+|-------|--------|-----------------|
+| Acquisition | Signup source, channel | UTM tracking, pageview |
+| Activation | First webhook sent | Custom event + funnel |
+| Retention | Weekly active webhooks | Retention insight |
+| Revenue | MRR, ARPU, churn | Custom events (Polar.sh webhook) |
+| Referral | Invite sent | Custom events |
 
 ---
 
 ## 4. Strateji
 
-### 4.1 Analytics Platform Seçimi: PostHog
-
-**Neden PostHog?**
-- ✅ Open-source — self-hosted option
-- ✅ Free tier: 1M events/ay (yeterli lansman dönemi)
-- ✅ Product analytics + session replay + feature flags tek platformda
-- ✅ EU hosting option (GDPR uyumlu)
-- ✅ Rust SDK mevcut (HookSniff Rust tabanlı)
-- ✅ Polar.sh ile entegrasyon mümkün
-- ✅ Dashboard'a embed edilebilir
-
-**Alternatifler Değerlendirildi:**
-| Platform | Artı | Eksi | Karar |
-|----------|------|------|-------|
-| PostHog | Open-source, generous free | Self-host karmaşık olabilir | ✅ Seçildi |
-| Mixpanel | Powerful funnels | Pahalı, proprietary | ❌ |
-| Amplitude | Enterprise features | Free tier sınırlı | ❌ |
-| Plausible | Privacy-first | Product analytics yok | ❌ |
-| Umami | Self-hosted, simple | Feature eksik | ❌ |
-
-### 4.2 Event Tracking Planı
+### 4.1 Event Tracking Planı
 
 **Tier 1 — Kritik Events (Lansmandan önce):**
 ```
-user_signed_up          → {source, plan, utm_source, utm_medium}
-user_verified_email     → {method}
-api_key_created         → {key_type}
-webhook_endpoint_created → {source_dashboard, source_sdk}
-webhook_sent            → {status, latency_ms, destination_url}
-webhook_failed          → {error_type, retry_count}
-sdk_installed           → {language, version}
-plan_upgraded           → {from_plan, to_plan, revenue}
-plan_downgraded         → {from_plan, to_plan, reason}
-payment_completed       → {amount, currency, provider}
-payment_failed          → {error_type, amount}
+user_signed_up              → {source, plan, utm_source, utm_medium}
+user_verified_email         → {method}
+api_key_created             → {key_type}
+webhook_endpoint_created    → {source: dashboard|sdk}
+webhook_sent                → {status, latency_ms, destination_url}
+webhook_failed              → {error_type, retry_count}
+sdk_installed               → {language, version}
+plan_upgraded               → {from_plan, to_plan, revenue}
+plan_downgraded             → {from_plan, to_plan, reason}
+payment_completed           → {amount, currency, provider}
+payment_failed              → {error_type, amount}
 ```
 
 **Tier 2 — Feature Events (İlk hafta):**
 ```
-schema_created          → {schema_type}
-replay_triggered        → {webhook_id, time_range}
-alert_created           → {alert_type, threshold}
-team_member_invited     → {role}
-integration_connected   → {integration_type}
-dashboard_section_viewed → {section_name}
-filter_applied          → {filter_type, filter_value}
+schema_created              → {schema_type}
+replay_triggered            → {webhook_id, time_range}
+alert_created               → {alert_type, threshold}
+team_member_invited         → {role}
+integration_connected       → {integration_type}
+dashboard_section_viewed    → {section_name}
 ```
 
 **Tier 3 — Engagement Events (İlk ay):**
 ```
-documentation_viewed    → {doc_page, time_spent}
-api_reference_viewed    → {endpoint}
-changelog_viewed        → {version}
-support_ticket_created  → {category, priority}
-feedback_submitted      → {rating, comment}
+documentation_viewed        → {doc_page, time_spent}
+api_reference_viewed        → {endpoint}
+changelog_viewed            → {version}
+support_ticket_created      → {category, priority}
+feedback_submitted          → {rating, comment}
 ```
 
-### 4.3 User Identification Strategy
+### 4.2 User Identification
 
-```javascript
-// PostHog identify call
-posthog.identify(user.id, {
-  email: user.email,
-  plan: user.plan,
-  created_at: user.createdAt,
-  webhook_count: user.webhookCount,
-  sdk_language: user.primarySdk,
-  company_size: user.companySize,
-  source: user.signupSource
-});
+PostHog Rust SDK ile:
+```rust
+// Signup sonrası
+client.capture(
+    "user_signed_up",
+    Some(distinct_id),
+    HashMap::from([
+        ("plan".into(), "free".into()),
+        ("source".into(), "website".into()),
+    ]),
+);
 ```
 
-### 4.4 Funnel Tanımları
+**Önemli:** PostHog dokümantasyonuna göre, backend event'lerinde `distinct_id` frontend ile eşleşmeli. Aksi halde event'ler "orphaned" olur — session replay ve error tracking ile ilişkilendirilemez.
+
+### 4.3 Funnel Tanımları
 
 **Funnel 1: Signup → Activation**
 ```
@@ -195,33 +223,21 @@ Hedef: %15+ conversion
 1. sdk_installed
 2. webhook_endpoint_created (via SDK)
 3. webhook_sent (via SDK)
-4. schema_created
 Hedef: %40+ SDK → active webhooks
 ```
 
-### 4.5 Dashboard Entegrasyonu
+### 4.4 Entegrasyon Planı
 
-**PostHog Dashboard Layout:**
-```
-┌─────────────────────────────────────────────────┐
-│  HookSniff — Product Analytics                  │
-├─────────────────────────────────────────────────┤
-│  [KPI Cards]                                    │
-│  DAU | WAU | MAU | MRR | Churn Rate             │
-├─────────────────────────────────────────────────┤
-│  [Funnel: Signup → Activation]                  │
-│  ████████████░░░░ 62%                           │
-├─────────────────────────────────────────────────┤
-│  [Retention Cohort Table]                       │
-│  Week 0: 100% → Week 1: 45% → Week 4: 28%      │
-├─────────────────────────────────────────────────┤
-│  [Top Features by Usage]                        │
-│  1. Webhook Delivery (89%)                      │
-│  2. SDK Integration (67%)                       │
-│  3. Schema Registry (34%)                       │
-│  4. Replay (12%)                                │
-└─────────────────────────────────────────────────┘
-```
+**PostHog Ürünleri Kullanılacak:**
+| Ürün | Amaç | Free Tier |
+|------|------|-----------|
+| Product Analytics | Funnel, cohort, retention | 1M events |
+| Session Replay | Kullanıcı davranışı | 5K recordings |
+| Feature Flags | A/B test, gradual rollout | 1M requests |
+| Error Tracking | Hata takibi (Sentry alternatifi) | 100K exceptions |
+| Surveys | NPS, in-app feedback | 1,500 responses |
+
+**Bu 5 ürün tek platformda = Sentry + Mixpanel + LaunchDarkly + Hotjar parası ödenmez.**
 
 ---
 
@@ -230,41 +246,39 @@ Hedef: %40+ SDK → active webhooks
 ### Faz 1: Kurulum (Gün 1-2)
 | Adım | Süre | Detay |
 |------|------|-------|
-| PostHog Cloud hesabı oluştur | 15 dk | posthog.com, EU region seç |
-| PostHog project key al | 5 dk | Settings → Project |
-| Rust SDK entegrasyonu | 2 saat | `posthog-rs` crate, API middleware |
-| Dashboard'a PostHog snippet ekle | 30 dk | Next.js _app.tsx |
+| PostHog Cloud hesabı | 15 dk | posthog.com → EU region seç |
+| Project key al | 5 dk | Settings → Project |
+| Rust SDK entegrasyonu | 2 saat | `posthog-rs` Cargo.toml'a ekle |
+| Dashboard'a JS snippet | 30 dk | Next.js _app.tsx |
 | User identify middleware | 1 saat | Signup/login sonrası identify |
 
 ### Faz 2: Core Events (Gün 3-5)
 | Adım | Süre | Detay |
 |------|------|-------|
-| Tier 1 events ekle | 4 saat | 11 kritik event |
-| Funnel tanımları oluştur | 1 saat | PostHog UI'da 3 funnel |
-| Retention tablosu oluştur | 30 dk | PostHog UI'da |
-| Test et | 2 saat | Tüm event'lerin doğru gittiğini doğrula |
+| Tier 1 events (11 event) | 4 saat | API middleware + dashboard |
+| Funnel tanımları | 1 saat | PostHog UI'da 3 funnel |
+| Retention tablosu | 30 dk | PostHog UI'da |
+| Doğrulama testi | 2 saat | Tüm event'lerin PostHog'a düştüğünü kontrol et |
 
 ### Faz 3: Advanced (Gün 6-10)
 | Adım | Süre | Detay |
 |------|------|-------|
-| Tier 2 events ekle | 3 saat | Feature tracking |
-| Session replay aktif et | 30 dk | PostHog settings |
+| Tier 2 events | 3 saat | Feature tracking |
+| Session replay aktif | 30 dk | PostHog settings |
+| Error tracking aktif | 1 saat | posthog-rs error capture |
 | Cohort tanımları | 1 saat | Power users, at-risk, churned |
-| Dashboard'a PostHog insight embed | 2 saat | Next.js iframe/dynamic |
 
 ### Faz 4: Optimization (Gün 11-30)
 | Adım | Süre | Detay |
 |------|------|-------|
-| Tier 3 events ekle | 2 saat | Engagement tracking |
-| A/B test framework kur | 2 saat | PostHog feature flags |
-| Alert tanımları | 1 saat | Churn spike, error rate |
-| Haftalık analytics review | Devam | Her pazartesi 30 dk |
+| Tier 3 events | 2 saat | Engagement tracking |
+| Feature flags (A/B test) | 2 saat | PostHog feature flags |
+| Surveys (NPS) | 1 saat | PostHog surveys |
+| Haftalık review | Devam | Her pazartesi 30 dk |
 
 ---
 
 ## 6. Metrikler
-
-### KPI Tanımları
 
 | KPI | Tanım | Hedef | Ölçüm |
 |-----|-------|-------|-------|
@@ -276,23 +290,6 @@ Hedef: %40+ SDK → active webhooks
 | **Week 1 Retention** | 1. hafta geri dönenler | %45+ | PostHog cohort |
 | **Week 4 Retention** | 4. hafta geri dönenler | %25+ | PostHog cohort |
 
-### Monitoring Dashboard
-
-**Günlük Kontrol (5 dk):**
-- DAU trendi
-- Error rate
-- Signup → activation funnel
-
-**Haftalık Review (30 dk):**
-- Cohort retention
-- Feature adoption changes
-- Funnel drop-off analizi
-
-**Aylık Review (1 saat):**
-- MRR trendi
-- Churn analizi
-- A/B test sonuçları
-
 ---
 
 ## 7. Riskler
@@ -302,7 +299,7 @@ Hedef: %40+ SDK → active webhooks
 | PostHog free tier aşımı | Düşük | Orta | Event sampling, batch processing |
 | GDPR uyumsuzluk | Düşük | Yüksek | EU region, cookie consent, DPA |
 | Event spam/abuse | Orta | Düşük | Rate limiting, anomaly detection |
-| Analytics overhead (latency) | Düşük | Düşük | Async event sending, queue |
+| Analytics overhead (latency) | Düşük | Düşük | Async event sending (posthog-rs batch) |
 | Veri doğruluğu sorunları | Orta | Orta | Validation, deduplication |
 | PostHog downtime | Düşük | Düşük | Local queue, retry logic |
 
@@ -310,30 +307,40 @@ Hedef: %40+ SDK → active webhooks
 - [ ] PostHog EU region seç
 - [ ] Cookie consent banner ekle
 - [ ] PostHog DPA imzala
-- [ ] Data retention policy tanımla (90 gün)
+- [ ] Data retention policy tanımla (PostHog default: 1 yıl free, 7 yıl paid)
 - [ ] User data export/delete endpoint
 - [ ] IP anonymization aktif et
-- [ ] opt-out mechanism
+- [ ] Opt-out mechanism
 
 ---
 
 ## 8. Notlar
 
-### Maliyet Tahmini
-| Aşama | Events/Ay | Maliyet |
-|-------|-----------|---------|
-| Beta (0-100 user) | ~50K | $0 (free tier) |
-| Launch (100-1K user) | ~500K | $0 (free tier) |
-| Growth (1K-10K user) | ~5M | ~$300/ay |
+### Maliyet Tahmini (Doğrulanmış PostHog Fiyatlandırması)
+
+| Aşama | Events/Ay | PostHog Maliyeti |
+|-------|-----------|-----------------|
+| Beta (0-100 user) | ~50K | **$0** (free tier) |
+| Launch (100-1K user) | ~500K | **$0** (free tier) |
+| Growth (1K-10K user) | ~5M | ~$140/ay |
 | Scale (10K+ user) | ~50M | ~$1K/ay |
 
+**Free tier dahil:**
+- 1M product analytics events
+- 5K session replay recordings
+- 1M feature flag requests
+- 100K error tracking exceptions
+- 1,500 survey responses
+
 ### Entegrasyon Öncelikleri
-1. **Polar.sh** → Revenue events (MRR, churn, upgrade)
-2. **Vercel** → Web vitals, page performance
-3. **Sentry** → Error correlation with user behavior
-4. **Discord** → Community engagement metrics
+1. **Polar.sh** → Revenue events (MRR, churn, upgrade) — Polar.sh webhook ile PostHog'a gönder
+2. **Vercel** → Web vitals, page performance — Vercel Analytics + PostHog
+3. **Sentry** → Error tracking artık PostHog'da (100K free exceptions)
+4. **Discord** → Community engagement metrics — bot ile tracking
 
 ### Kaynaklar
-- PostHog Docs: https://posthog.com/docs
-- PostHog Rust SDK: https://posthog.com/docs/libraries/rust
-- SaaS Metrics Guide: https://posthog.com/blog/saas-metrics
+- PostHog Pricing: https://posthog.com/pricing (doğrulandı 2026-05-10)
+- PostHog Rust SDK: https://posthog.com/docs/libraries/rust (doğrulandı 2026-05-10)
+- PostHog Rust Crate: `posthog-rs` (Cargo.toml)
+- Svix Pricing: https://www.svix.com/pricing/ (doğrulandı 2026-05-10)
+- Hookdeck Pricing: https://hookdeck.com/pricing (doğrulandı 2026-05-10)
