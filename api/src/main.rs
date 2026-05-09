@@ -1,6 +1,6 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
-use tower_http::cors::{AllowOrigin, Any, CorsLayer};
+use tower_http::cors::{AllowHeaders, AllowOrigin, Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 
 use hooksniff_api::config;
@@ -132,7 +132,17 @@ async fn main() -> Result<()> {
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(default_origins))
                     .allow_methods(Any)
-                    .allow_headers(Any)
+                    .allow_headers(AllowHeaders::list([
+                        axum::http::header::AUTHORIZATION,
+                        axum::http::header::CONTENT_TYPE,
+                        axum::http::header::ACCEPT,
+                        axum::http::header::ORIGIN,
+                        axum::http::header::HeaderName::from_static("x-api-key"),
+                        axum::http::header::HeaderName::from_static("x-request-id"),
+                        axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-webhook-signature"),
+                        axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
+                    ]))
                     .allow_credentials(true)
             } else if origins.is_empty() {
                 // Development — allow localhost only
@@ -148,13 +158,33 @@ async fn main() -> Result<()> {
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(dev_origins))
                     .allow_methods(Any)
-                    .allow_headers(Any)
+                    .allow_headers(AllowHeaders::list([
+                        axum::http::header::AUTHORIZATION,
+                        axum::http::header::CONTENT_TYPE,
+                        axum::http::header::ACCEPT,
+                        axum::http::header::ORIGIN,
+                        axum::http::header::HeaderName::from_static("x-api-key"),
+                        axum::http::header::HeaderName::from_static("x-request-id"),
+                        axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-webhook-signature"),
+                        axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
+                    ]))
                     .allow_credentials(true)
             } else {
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(origins))
                     .allow_methods(Any)
-                    .allow_headers(Any)
+                    .allow_headers(AllowHeaders::list([
+                        axum::http::header::AUTHORIZATION,
+                        axum::http::header::CONTENT_TYPE,
+                        axum::http::header::ACCEPT,
+                        axum::http::header::ORIGIN,
+                        axum::http::header::HeaderName::from_static("x-api-key"),
+                        axum::http::header::HeaderName::from_static("x-request-id"),
+                        axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-webhook-signature"),
+                        axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
+                    ]))
                     .allow_credentials(true)
             }
         })
