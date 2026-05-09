@@ -20,6 +20,15 @@
 10. [Uygulama Planı](#10-uygulama-planı)
 11. [Maliyet](#11-maliyet)
 12. [Kaynaklar](#12-kaynaklar)
+13. [Implementation Detayları — Adım Adım Komutlar](#13-implementation-detayları--adım-adım-komutlar)
+    - 13.1 OpenAPI Generator Kurulumu
+    - 13.2 Speakeasy Kurulumu (Ruby SDK)
+    - 13.3 Swift OpenAPI Generator Kurulumu
+    - 13.4 GitHub Actions Workflow
+    - 13.5 Publish Scriptleri
+    - 13.6 Elixir Fix Scripti
+    - 13.7 Versiyon Yönetimi
+    - 13.8 Troubleshooting
 
 ---
 
@@ -531,3 +540,514 @@ GitHub Actions her Pazartesi 12:00'de otomatik çalışır:
 | RubyGems | https://rubygems.org | Ruby paket dağıtımı |
 | Hex.pm | https://hex.pm | Elixir paket dağıtımı |
 | Swift Package Index | https://swiftpackageindex.com | Swift paket dağıtımı |
+
+---
+
+## 13. Implementation Detayları — Adım Adım Komutlar
+
+> Bu bölüm her aracın nasıl kurulacağını ve kullanılacağını adım adım anlatır.
+> İlk kez yapan kişi bu komutları sırayla çalıştırarak sistemi kurabilir.
+
+### 13.1 OpenAPI Generator Kurulumu
+
+**Ne yapıyor:** OpenAPI spec'den 9 dilde SDK otomatik üretir (Node, Python, Go, Java, Kotlin, C#, Rust, PHP, Elixir).
+
+**Kurulum (bir kere yapılır):**
+```bash
+# npm ile kur (en kolay yol)
+npm install @openapitools/openapi-generator-cli -g
+
+# Kurulumu doğrula
+openapi-generator-cli version
+```
+
+**Kullanım (her SDK için):**
+```bash
+# Node.js (TypeScript) SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g typescript-node \
+  -o sdks/node/ \
+  --additional-properties=packageName=hooksniff-sdk,npmName=hooksniff-sdk,npmVersion=0.3.0
+
+# Python SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g python \
+  -o sdks/python/ \
+  --additional-properties=packageName=hooksniff,projectName=hooksniff
+
+# Go SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g go \
+  -o sdks/go/ \
+  --additional-properties=packageName=hooksniff,gitUserId=servetarslan02,gitRepoId=hooksniff-go
+
+# Java SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g java \
+  -o sdks/java/ \
+  --additional-properties=groupId=com.hooksniff,artifactId=hooksniff-sdk,artifactVersion=0.3.0
+
+# Kotlin SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g kotlin \
+  -o sdks/kotlin/ \
+  --additional-properties=packageName=com.hooksniff,artifactVersion=0.3.0
+
+# C# SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g csharp \
+  -o sdks/csharp/ \
+  --additional-properties=packageName=HookSniff,packageVersion=0.3.0
+
+# Rust SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g rust \
+  -o sdks/rust/ \
+  --additional-properties=packageName=hooksniff,crateVersion=0.3.0
+
+# PHP SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g php \
+  -o sdks/php/ \
+  --additional-properties=packageName=HookSniff,artifactVersion=0.3.0
+
+# Elixir SDK üret
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g elixir \
+  -o sdks/elixir/ \
+  --additional-properties=packageName=HookSniff
+```
+
+**Doğrulama:**
+```bash
+# Hangi generator'lar mevcut?
+openapi-generator-cli list -s
+
+# Spec'i doğrula
+openapi-generator-cli validate -i docs/openapi.yaml
+```
+
+---
+
+### 13.2 Speakeasy Kurulumu (Ruby SDK için)
+
+**Ne yapıyor:** Ruby SDK'yı OpenAPI spec'den üretir. OpenAPI Generator'dan daha iyi Ruby kodu üretir.
+
+**Kurulum (bir kere yapılır):**
+```bash
+# macOS
+brew install speakeasy-api/tap/speakeasy
+
+# Linux
+curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
+
+# Kurulumu doğrula
+speakeasy --version
+```
+
+**İlk kurulum (bir kere yapılır):**
+```bash
+# Speakeasy hesabı oluştur (browser açılır)
+speakeasy quickstart
+
+# OpenAPI spec yolunu göster
+# → "Local file" seç
+# → docs/openapi.yaml ver
+# → "Ruby" dilini seç
+# → SDK adı: hooksniff
+```
+
+**Kullanım (her güncellemede):**
+```bash
+# Ruby SDK'yı yeniden üret
+speakeasy generate sdk \
+  --schema docs/openapi.yaml \
+  --lang ruby \
+  --out sdks/ruby/
+```
+
+**Not:** Speakeasy free tier = 1 SDK, 50 API method. Ruby SDK için yeterli.
+
+---
+
+### 13.3 Swift OpenAPI Generator Kurulumu
+
+**Ne yapıyor:** Swift SDK'yı OpenAPI spec'den üretir. Apple'ın kendi aracı.
+
+**Kurulum (bir kere yapılır):**
+```bash
+# Swift Package Manager ile (bir kere, Package.swift'e eklenir)
+# Ya da CLI olarak:
+git clone https://github.com/apple/swift-openapi-generator.git
+cd swift-openapi-generator
+swift build -c release
+cp .build/release/swift-openapi-generator /usr/local/bin/
+```
+
+**Kullanım (her güncellemede):**
+```bash
+# Swift SDK üret
+swift-openapi-generate generate \
+  --spec docs/openapi.yaml \
+  --mode client \
+  --output sdks/swift/Sources/HookSniff/
+```
+
+**Ya da Swift Package Plugin olarak (önerilen):**
+```swift
+// Package.swift'e eklenir:
+.package(url: "https://github.com/apple/swift-openapi-generator", from: "1.0.0")
+
+// Derleme sırasında otomatik üretilir:
+// swift build
+```
+
+**Not:** Swift OpenAPI Generator, kodu build-time'da üretir. Source control'e commit etmeye gerek yok.
+
+---
+
+### 13.4 GitHub Actions Workflow
+
+**Ne yapıyor:** OpenAPI spec değiştiğinde otomatik olarak tüm SDK'ları üretir ve publish eder.
+
+**Dosya:** `.github/workflows/generate-sdks.yml`
+
+```yaml
+name: Generate & Publish SDKs
+
+on:
+  push:
+    paths:
+      - 'docs/openapi.yaml'
+    branches:
+      - main
+  workflow_dispatch:  # Manuel tetikleme
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java (OpenAPI Generator için)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install OpenAPI Generator
+        run: npm install @openapitools/openapi-generator-cli -g
+
+      - name: Validate OpenAPI Spec
+        run: openapi-generator-cli validate -i docs/openapi.yaml
+
+      # ── OpenAPI Generator ile 8 SDK ──
+
+      - name: Generate Node.js SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g typescript-node \
+            -o sdks/node/ \
+            --additional-properties=packageName=hooksniff-sdk,npmName=hooksniff-sdk
+
+      - name: Generate Python SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g python \
+            -o sdks/python/ \
+            --additional-properties=packageName=hooksniff
+
+      - name: Generate Go SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g go \
+            -o sdks/go/ \
+            --additional-properties=packageName=hooksniff
+
+      - name: Generate Java SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g java \
+            -o sdks/java/ \
+            --additional-properties=groupId=com.hooksniff,artifactId=hooksniff-sdk
+
+      - name: Generate Kotlin SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g kotlin \
+            -o sdks/kotlin/ \
+            --additional-properties=packageName=com.hooksniff
+
+      - name: Generate C# SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g csharp \
+            -o sdks/csharp/ \
+            --additional-properties=packageName=HookSniff
+
+      - name: Generate Rust SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g rust \
+            -o sdks/rust/ \
+            --additional-properties=packageName=hooksniff
+
+      - name: Generate PHP SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g php \
+            -o sdks/php/ \
+            --additional-properties=packageName=HookSniff
+
+      - name: Generate Elixir SDK
+        run: |
+          openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g elixir \
+            -o sdks/elixir/ \
+            --additional-properties=packageName=HookSniff
+
+      # ── Speakeasy ile Ruby SDK ──
+
+      - name: Install Speakeasy
+        run: curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
+
+      - name: Generate Ruby SDK
+        run: |
+          speakeasy generate sdk \
+            --schema docs/openapi.yaml \
+            --lang ruby \
+            --out sdks/ruby/
+        env:
+          SPEAKEASY_API_KEY: ${{ secrets.SPEAKEASY_API_KEY }}
+
+      # ── Swift OpenAPI Generator ile Swift SDK ──
+
+      - name: Generate Swift SDK
+        run: |
+          swift-openapi-generate generate \
+            --spec docs/openapi.yaml \
+            --mode client \
+            --output sdks/swift/Sources/HookSniff/
+
+      # ── Test ──
+
+      - name: Test Node.js SDK
+        run: cd sdks/node && npm install && npm test || true
+
+      - name: Test Python SDK
+        run: cd sdks/python && pip install -e . && python -m pytest || true
+
+      # ── Publish ──
+
+      - name: Publish Node.js to npm
+        run: cd sdks/node && npm publish || true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish Python to PyPI
+        run: cd sdks/python && python -m build && python -m twine upload dist/* || true
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+      # Go, Rust, Java, Kotlin, C#, PHP, Ruby, Elixir, Swift
+      # → Git tag ile publish (aşağıda)
+
+      - name: Create Git tag and push
+        run: |
+          VERSION=$(grep 'version:' docs/openapi.yaml | head -1 | awk '{print $2}' | tr -d '"')
+          git tag "sdk-v${VERSION}"
+          git push origin "sdk-v${VERSION}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+---
+
+### 13.5 Publish Scriptleri
+
+**Dosya:** `scripts/publish-all.sh`
+
+```bash
+#!/bin/bash
+# Tüm SDK'ları publish et
+# Kullanım: bash scripts/publish-all.sh
+
+set -e
+
+VERSION=$(grep 'version:' docs/openapi.yaml | head -1 | awk '{print $2}' | tr -d '"')
+echo "Publishing SDKs for version: $VERSION"
+
+# Node.js → npm
+echo "📦 Publishing Node.js SDK..."
+cd sdks/node
+npm version $VERSION --no-git-tag-version
+npm publish
+cd ../..
+
+# Python → PyPI
+echo "📦 Publishing Python SDK..."
+cd sdks/python
+python -m build
+python -m twine upload dist/*
+cd ../..
+
+# Rust → crates.io
+echo "📦 Publishing Rust SDK..."
+cd sdks/rust
+cargo publish
+cd ../..
+
+# C# → NuGet
+echo "📦 Publishing C# SDK..."
+cd sdks/csharp
+dotnet pack -c Release
+dotnet nuget push bin/Release/*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+cd ../..
+
+# PHP → Packagist (git tag ile)
+echo "📦 Publishing PHP SDK (git tag)..."
+cd sdks/php
+git tag "php-v$VERSION"
+git push origin "php-v$VERSION"
+cd ../..
+
+# Ruby → RubyGems
+echo "📦 Publishing Ruby SDK..."
+cd sdks/ruby
+gem build hooksniff.gemspec
+gem push hooksniff-$VERSION.gem
+cd ../..
+
+# Elixir → Hex.pm
+echo "📦 Publishing Elixir SDK..."
+cd sdks/elixir
+mix hex.publish --yes
+cd ../..
+
+# Go → pkg.go.dev (git tag ile)
+echo "📦 Publishing Go SDK (git tag)..."
+git tag "go-v$VERSION"
+git push origin "go-v$VERSION"
+
+# Java + Kotlin → Maven Central (ayrı script)
+echo "📦 Java/Kotlin → Maven Central (scripts/publish-java.sh çalıştırın)"
+
+# Swift → Swift Package Index (git tag ile)
+echo "📦 Publishing Swift SDK (git tag)..."
+git tag "swift-v$VERSION"
+git push origin "swift-v$VERSION"
+
+echo "✅ Tüm SDK'lar publish edildi!"
+```
+
+---
+
+### 13.6 Elixir Fix Scripti
+
+**Ne yapıyor:** OpenAPI Generator'ın ürettiği Elixir kodunu düzeltir.
+
+**Dosya:** `scripts/fix-elixir.sh`
+
+```bash
+#!/bin/bash
+# Elixir SDK düzeltmeleri
+# OpenAPI Generator'ın ürettiği Elixir kodunda bilinen sorunları düzeltir
+
+SDK_DIR="sdks/elixir"
+
+echo "🔧 Fixing Elixir SDK..."
+
+# 1. mix.exs düzelt (gerekirse)
+if [ -f "$SDK_DIR/mix.exs" ]; then
+  # Versiyonu güncelle
+  sed -i 's/version: ".*"/version: "0.3.0"/' "$SDK_DIR/mix.exs"
+  
+  # HookSniff package adını düzelt
+  sed -i 's/app: :openapi/app: :hooksniff/' "$SDK_DIR/mix.exs"
+  sed -i 's/name: "OpenAPI"/name: "hooksniff"/' "$SDK_DIR/mix.exs"
+fi
+
+# 2. Module adlarını düzelt
+find "$SDK_DIR/lib" -name "*.ex" -exec sed -i 's/OpenAPI\./HookSniff./g' {} \;
+
+# 3. Config dosyası oluştur (yoksa)
+if [ ! -f "$SDK_DIR/config/config.exs" ]; then
+  mkdir -p "$SDK_DIR/config"
+  cat > "$SDK_DIR/config/config.exs" << 'EOF'
+import Config
+
+config :hooksniff,
+  base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
+EOF
+fi
+
+echo "✅ Elixir SDK düzeltildi"
+```
+
+---
+
+### 13.7 Versiyon Yönetimi
+
+**Kural:** Semver kullan (Major.Minor.Patch)
+
+```
+0.2.0 → 0.2.1  (patch: bug fix)
+0.2.0 → 0.3.0  (minor: yeni özellik, geriye uyumlu)
+0.2.0 → 1.0.0  (major: kırıcı değişiklik)
+```
+
+**Versiyon nerede güncellenir?**
+- OpenAPI spec'de: `info.version` alanı
+- Her SDK'da: otomatik olarak spec'den çekilir
+
+**Nasıl güncellenir?**
+```bash
+# openapi.yaml'da versiyonu değiştir:
+# info:
+#   version: "0.3.0"  ← burayı güncelle
+
+# Sonra SDK'ları yeniden üret:
+openapi-generator-cli generate -i docs/openapi.yaml -g typescript-node -o sdks/node/
+# ... diğerleri
+```
+
+---
+
+### 13.8 Troubleshooting — Sık Karşılaşılan Sorunlar
+
+| Sorun | Çözüm |
+|-------|-------|
+| **OpenAPI Generator "command not found"** | `npm install @openapitools/openapi-generator-cli -g` |
+| **Java gerekli hatası** | Java 17+ kur: `apt install openjdk-17-jdk` |
+| **Speakeasy auth hatası** | `speakeasy quickstart` ile tekrar giriş yap |
+| **Swift generator bulunamadı** | swift-openapi-generator'ı PATH'e ekle |
+| **Elixir module adı yanlış** | `scripts/fix-elixir.sh` çalıştır |
+| **npm publish "403"** | `npm login` ile giriş yap |
+| **PyPI publish "401"** | PyPI token oluştur ve `~/.pypirc`'ye ekle |
+| **Maven Central onay bekliyor** | Normal — 1-2 gün sürebilir |
+| **Go pkg.go.dev güncellenmiyor** | Git tag push et: `git tag go-v0.3.0 && git push origin go-v0.3.0` |
