@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 03:13 GMT+8
+> Son güncelleme: 2026-05-10 04:54 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -1076,3 +1076,76 @@ cd dashboard && npm install && npm run build
 ### GitHub Push
 - `3610697` — fix: accurate competitor data — fresh analysis May 2026
 - 4 dosya changed, +28 satır, -23 satır
+
+---
+
+## 📝 Oturum 64 — TAM ÖZET (2026-05-10 04:13 - 04:54 GMT+8)
+
+### Katılanlar
+- Servet Arslan (proje sahibi, Türkçe konuşuyor, kod bilmiyor)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler (Kronolojik)
+
+**04:13-04:17 — Rakip Analizi**
+- Svix, Hookdeck, Hook0 siteleri tarandı
+- Svix: Build vs Buy sayfası, 10+ müşteri testimonial'ı, 20+ SEO sayfası keşfedildi
+- Hookdeck: /webhooks/tools hub, 20+ alternatif sayfası keşfedildi
+- Hook0: Footer SEO link yapısı keşfedildi
+
+**04:17-04:23 — 11 Yeni Sayfa Oluşturuldu**
+- /build-vs-buy, /webhooks, /webhooks/glossary, /webhooks/guides
+- /providers, /providers/stripe, /providers/github, /providers/shopify
+- /alternatives/svix-alternatives, /alternatives/hookdeck-alternatives, /alternatives/convoy-alternatives
+
+**04:23-04:25 — Compare Sayfası + Footer**
+- Compare: sosyal kanıt, FAQ, "Why it matters", deep dive links
+- Footer: 4 sütun SEO yapısı
+
+**04:25-04:31 — Bug Düzeltmeleri (3 tur)**
+- Server/client split (SEO metadata fix)
+- Dead link /docs/examples → /docs/quickstart
+- Glossary quick nav 10→34
+- Accessibility: aria-expanded + type=button
+
+**04:37-04:42 — Taze Rakip Analizi**
+- Svix SDK sayısı düzeltildi (6→11)
+- Svix yeni ürünler: Stream, Ingest, Diom
+- Svix compliance: HIPAA, PCI-DSS eklendi
+- Hookdeck: MCP, Radar keşfedildi
+- Hook0: MCP Server keşfedildi
+- Convoy: GitHub 404, durdurulmuş
+
+**04:42-04:44 — API Gizli Özellikleri Ortaya Çıkarıldı**
+- outbound_ips.rs → Static IPs (zaten var)
+- stream.rs → SSE streaming (zaten var)
+- alerts.rs → Latency alerts (zaten var)
+- routing.rs → Smart routing (zaten var)
+- cli/index.js → CLI tool (zaten var, 442 satır)
+- rate_limit.rs → Rate limiting (zaten var)
+- inbound.rs → Inbound proxy (zaten var)
+
+**04:47-04:51 — Compare Sayfası Tam Yeniden Yazım**
+- Svix seviyesine çıkarıldı
+- TL;DR, Scorecard, 20 section, badges, testimonials, 8 FAQ
+- Scorecard: HookSniff 50, Svix 51, Hookdeck 41, Hook0 38
+
+### GitHub Push Özeti (6 commit)
+- `2116baa` — feat: 10 new pages
+- `ab38999` — fix: SEO metadata, dead links
+- `d2b33e6` — fix: accessibility
+- `3610697` — fix: accurate competitor data
+- `8d1f57b` — fix: hidden features revealed
+- `3f37367` — feat: compare page rewrite
+
+### Toplam Etki
+- 13 yeni/modified dosya
+- +1604 satır kod
+- 83 locale route × 8 dil = 664+ static page
+- Build: 0 error, 0 warning
+
+### Dersler
+1. API'de zaten olan özellikler compare sayfasında gösterilmiyormuş → her zaman kod tabanını kontrol et
+2. Rakip analizi tek seferlik değil, her oturum taze yapılmalı
+3. Compare sayfası "bilgi vermek" değil "satmak" için olmalı — Svix'in agresif positioning'i örnek
+4. Scorecard dürüst olmalı — biz compliance'da gerideyiz, bu kabul edilmeli
