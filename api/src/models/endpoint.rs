@@ -533,4 +533,215 @@ mod tests {
         let ep = make_endpoint("round-robin", None, 2);
         assert!(ep.is_healthy());
     }
+
+    // ── RoutingStrategy ─────────────────────────────────────
+
+    #[test]
+    fn test_routing_strategy_parse_str() {
+        assert_eq!(RoutingStrategy::parse_str("round-robin"), RoutingStrategy::RoundRobin);
+        assert_eq!(RoutingStrategy::parse_str("failover"), RoutingStrategy::Failover);
+        assert_eq!(RoutingStrategy::parse_str("latency"), RoutingStrategy::Latency);
+        assert_eq!(RoutingStrategy::parse_str("unknown"), RoutingStrategy::RoundRobin);
+        assert_eq!(RoutingStrategy::parse_str(""), RoutingStrategy::RoundRobin);
+    }
+
+    #[test]
+    fn test_routing_strategy_as_str() {
+        assert_eq!(RoutingStrategy::RoundRobin.as_str(), "round-robin");
+        assert_eq!(RoutingStrategy::Failover.as_str(), "failover");
+        assert_eq!(RoutingStrategy::Latency.as_str(), "latency");
+    }
+
+    #[test]
+    fn test_routing_strategy_roundtrip() {
+        for s in &["round-robin", "failover", "latency"] {
+            let strategy = RoutingStrategy::parse_str(s);
+            assert_eq!(strategy.as_str(), *s);
+        }
+    }
+
+    // ── DeliveryFormat ──────────────────────────────────────
+
+    #[test]
+    fn test_delivery_format_parse_str() {
+        assert_eq!(DeliveryFormat::parse_str("standard"), DeliveryFormat::Standard);
+        assert_eq!(DeliveryFormat::parse_str("cloudevents"), DeliveryFormat::CloudEvents);
+        assert_eq!(DeliveryFormat::parse_str("unknown"), DeliveryFormat::Standard);
+        assert_eq!(DeliveryFormat::parse_str(""), DeliveryFormat::Standard);
+    }
+
+    #[test]
+    fn test_delivery_format_as_str() {
+        assert_eq!(DeliveryFormat::Standard.as_str(), "standard");
+        assert_eq!(DeliveryFormat::CloudEvents.as_str(), "cloudevents");
+    }
+
+    #[test]
+    fn test_delivery_format_roundtrip() {
+        for s in &["standard", "cloudevents"] {
+            let format = DeliveryFormat::parse_str(s);
+            assert_eq!(format.as_str(), *s);
+        }
+    }
+
+    // ── RetryPolicy::from_value ─────────────────────────────
+
+    #[test]
+    fn test_retry_policy_from_value_none() {
+        let rp = RetryPolicy::from_value(None);
+        assert_eq!(rp.max_attempts, 3);
+        assert_eq!(rp.backoff, "exponential");
+    }
+
+    #[test]
+    fn test_retry_policy_from_value_custom() {
+        let val = serde_json::json!({
+            "max_attempts": 5,
+            "backoff": "linear",
+            "initial_delay_secs": 30,
+            "max_delay_secs": 600
+        });
+        let rp = RetryPolicy::from_value(Some(&val));
+        assert_eq!(rp.max_attempts, 5);
+        assert_eq!(rp.backoff, "linear");
+        assert_eq!(rp.initial_delay_secs, 30);
+        assert_eq!(rp.max_delay_secs, 600);
+    }
+
+    #[test]
+    fn test_retry_policy_from_value_partial() {
+        // from_value uses serde_json::from_value which requires all fields
+        // if any are present. With only max_attempts, serde fails and falls back to default.
+        let val = serde_json::json!({"max_attempts": 10});
+        let rp = RetryPolicy::from_value(Some(&val));
+        assert_eq!(rp.max_attempts, 3); // default (serde deserialization failed)
+    }
+
+    #[test]
+    fn test_retry_policy_delay_linear() {
+        let val = serde_json::json!({
+            "max_attempts": 5,
+            "backoff": "linear",
+            "initial_delay_secs": 10,
+            "max_delay_secs": 60
+        });
+        let rp = RetryPolicy::from_value(Some(&val));
+        // Linear: base * attempt = 10*1=10, 10*2=20, 10*3=30
+        assert_eq!(rp.delay_for_attempt(1), 10);
+        assert_eq!(rp.delay_for_attempt(2), 20);
+        assert_eq!(rp.delay_for_attempt(3), 30);
+    }
+
+    #[test]
+    fn test_retry_policy_delay_capped() {
+        let rp = RetryPolicy::default();
+        // Exponential: 10, 20, 40, 80, 160, 320, 640, 1280, 2560, 3600 (capped)
+        let delay = rp.delay_for_attempt(20);
+        assert!(delay <= rp.max_delay_secs as i64);
+    }
+
+    // ── Endpoint::to_response ───────────────────────────────
+
+    #[test]
+    fn test_endpoint_to_response() {
+        let ep = make_endpoint("round-robin", Some("https://fallback.com"), 0);
+        let resp = ep.to_response();
+        assert_eq!(resp.url, "https://primary.com");
+        assert!(resp.is_active);
+        assert_eq!(resp.routing_strategy, "round-robin");
+        assert_eq!(resp.fallback_url, Some("https://fallback.com".to_string()));
+    }
+
+    // ── Endpoint::is_healthy edge cases ─────────────────────
+
+    #[test]
+    fn test_is_healthy_at_threshold() {
+        let ep = make_endpoint("round-robin", None, 3);
+        assert!(!ep.is_healthy());
+    }
+
+    #[test]
+    fn test_is_healthy_above_threshold() {
+        let ep = make_endpoint("round-robin", None, 10);
+        assert!(!ep.is_healthy());
+    }
+
+    // ── Endpoint serialization ──────────────────────────────
+
+    #[test]
+    fn test_endpoint_serialization_roundtrip() {
+        let ep = make_endpoint("failover", Some("https://fb.com"), 1);
+        let json = serde_json::to_string(&ep).unwrap();
+        let deserialized: Endpoint = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.url, "https://primary.com");
+        assert_eq!(deserialized.routing_strategy, "failover");
+        assert_eq!(deserialized.failure_streak, 1);
+    }
+
+    #[test]
+    fn test_endpoint_clone() {
+        let ep = make_endpoint("latency", None, 0);
+        let cloned = ep.clone();
+        assert_eq!(cloned.id, ep.id);
+        assert_eq!(cloned.url, ep.url);
+    }
+
+    // ── CreateEndpointRequest ───────────────────────────────
+
+    #[test]
+    fn test_create_endpoint_request_deserialization() {
+        let json = r#"{
+            "url": "https://example.com/webhook",
+            "description": "Test endpoint",
+            "allowed_ips": ["192.168.1.0/24"],
+            "event_filter": ["order.*"],
+            "routing_strategy": "failover",
+            "fallback_url": "https://fallback.com",
+            "format": "cloudevents"
+        }"#;
+        let req: CreateEndpointRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.url, "https://example.com/webhook");
+        assert_eq!(req.description, Some("Test endpoint".to_string()));
+        assert_eq!(req.routing_strategy, Some("failover".to_string()));
+        assert_eq!(req.format, Some("cloudevents".to_string()));
+    }
+
+    #[test]
+    fn test_create_endpoint_request_minimal() {
+        let json = r#"{"url": "https://example.com"}"#;
+        let req: CreateEndpointRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.url, "https://example.com");
+        assert!(req.description.is_none());
+        assert!(req.allowed_ips.is_none());
+        assert!(req.event_filter.is_none());
+        assert!(req.routing_strategy.is_none());
+        assert!(req.fallback_url.is_none());
+        assert!(req.format.is_none());
+    }
+
+    // ── EndpointResponse ────────────────────────────────────
+
+    #[test]
+    fn test_endpoint_response_serialization() {
+        let resp = EndpointResponse {
+            id: Uuid::new_v4(),
+            url: "https://example.com".to_string(),
+            description: Some("desc".to_string()),
+            is_active: true,
+            retry_policy: None,
+            created_at: chrono::Utc::now(),
+            allowed_ips: None,
+            event_filter: None,
+            custom_headers: None,
+            routing_strategy: "round-robin".to_string(),
+            fallback_url: None,
+            avg_response_ms: 100,
+            failure_streak: 0,
+            format: "standard".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["url"], "https://example.com");
+        assert_eq!(json["routing_strategy"], "round-robin");
+        assert_eq!(json["format"], "standard");
+    }
 }
