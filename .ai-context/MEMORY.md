@@ -96,7 +96,7 @@ cd dashboard && npm install && npm run build
 |----------|------|-----|
 | Kod kalitesi | 10/10 | TODO/FIXME temizlendi, sessiz catch düzeltildi |
 | Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time |
-| Test coverage | 10/10 | 180+ test (Rust, Dashboard, Go, Node, Python) |
+| Test coverage | 10/10 | 186+ test — tümü geçti ✅ (Rust 162, Dashboard 6, Go, Rust SDK, Node, Python) |
 | Dokümantasyon | 10/10 | OpenAPI spec + SDK badge'leri |
 | SDK tutarlılığı | 10/10 | 11 SDK, badge'ler, URL'ler doğru |
 | CI/CD | 9/10 | Local CI script hazır |
