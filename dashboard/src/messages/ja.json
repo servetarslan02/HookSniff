@@ -712,7 +712,8 @@
       "contact": "お問い合わせ",
       "terms": "利用規約",
       "privacy": "プライバシー",
-      "copyright": "© 2026 HookSniff. 全著作権所有。"
+      "copyright": "© 2026 HookSniff. 全著作権所有。",
+      "changelog": "Changelog"
     }
   },
   "apiKeys": {
