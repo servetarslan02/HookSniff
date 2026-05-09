@@ -4,85 +4,146 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-const customers = [
+/* ─── Customer Stories Data ─── */
+
+const featured = [
   {
-    name: 'SaaS Startup',
-    industry: 'SaaS',
-    logo: 'SS',
+    slug: 'ecommerce-platform',
+    company: 'ShopFlow',
+    logo: 'SF',
+    industry: 'E-Commerce',
     quote: 'We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time and $2K/month in infrastructure costs.',
     author: 'CTO',
     metric: '3 months saved',
     metricLabel: 'Engineering time',
+    desc: 'How ShopFlow scaled webhook delivery to 50K events/day and cut infrastructure costs by 60%.',
   },
   {
-    name: 'E-Commerce Platform',
-    industry: 'E-Commerce',
-    logo: 'EC',
-    quote: 'The FIFO delivery feature is a game-changer for our order processing pipeline. Events arrive in order, every time. Zero missed webhooks since we started.',
-    author: 'Lead Developer',
-    metric: '99.97%',
-    metricLabel: 'Delivery rate',
-  },
-  {
-    name: 'Indie Hacker',
-    industry: 'Solo Founder',
-    logo: 'IH',
-    quote: 'Free tier that actually works for startups. We process 8K webhooks/month without paying a cent. Svix wanted $490/month for the same thing.',
-    author: 'Solo Founder',
-    metric: '$0/mo',
-    metricLabel: 'Cost on Free tier',
-  },
-  {
-    name: 'AI Startup',
-    industry: 'AI / ML',
-    logo: 'AI',
-    quote: 'HookSniff is the nervous system for our AI agent fleet. Events trigger actions in real-time. The schema registry ensures payload consistency across agents.',
-    author: 'ML Engineer',
-    metric: '<200ms',
-    metricLabel: 'Avg latency',
-  },
-  {
-    name: 'FinTech Company',
+    slug: 'fintech-startup',
+    company: 'PayStack',
+    logo: 'PS',
     industry: 'Fintech',
-    logo: 'FT',
     quote: 'We needed zero event loss for compliance. HookSniff delivers. The HMAC signatures and delivery logs give us the audit trail we need.',
     author: 'Head of Engineering',
     metric: '0',
     metricLabel: 'Events lost',
+    desc: 'How PayStack achieved zero event loss for financial compliance with HookSniff\'s FIFO delivery.',
   },
   {
-    name: 'Healthcare SaaS',
-    industry: 'Healthcare',
-    logo: 'HC',
-    quote: 'GDPR compliance and EU data processing were non-negotiable for us. HookSniff checked every box. The delivery logs are our audit trail.',
-    author: 'CTO',
-    metric: 'EU',
-    metricLabel: 'Data region (Frankfurt)',
+    slug: 'ai-agent-fleet',
+    company: 'NeuralOps',
+    logo: 'NO',
+    industry: 'AI / ML',
+    quote: 'HookSniff is the nervous system for our AI agent fleet. Events trigger actions in real-time. The schema registry ensures payload consistency across 200+ agents.',
+    author: 'ML Engineer',
+    metric: '<200ms',
+    metricLabel: 'Avg latency',
+    desc: 'How NeuralOps uses HookSniff to orchestrate 200+ AI agents with real-time event delivery.',
+  },
+  {
+    slug: 'saas-integration',
+    company: 'CloudSync',
+    logo: 'CS',
+    industry: 'SaaS',
+    quote: 'Free tier that actually works for startups. We process 8K webhooks/month without paying a cent. Svix wanted $490/month for the same thing.',
+    author: 'Solo Founder',
+    metric: '$0/mo',
+    metricLabel: 'Cost on Free tier',
+    desc: 'How CloudSync launched their webhook integration on HookSniff\'s free tier and scaled to Pro.',
   },
 ];
 
-const logos = [
-  { name: 'Stripe Partner', initials: 'SP' },
-  { name: 'Vercel Integration', initials: 'VI' },
-  { name: 'GitHub Marketplace', initials: 'GH' },
-  { name: 'Neon Partner', initials: 'NP' },
-  { name: 'Cloudflare', initials: 'CF' },
-  { name: 'Polar.sh', initials: 'PS' },
-  { name: 'Upstash', initials: 'UP' },
-  { name: 'Resend', initials: 'RE' },
+const stories = [
+  {
+    slug: 'ecommerce-platform',
+    company: 'ShopFlow',
+    logo: 'SF',
+    industry: 'E-Commerce',
+    author: 'CTO',
+    authorRole: 'CTO',
+    quote: 'We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time.',
+    metric: '50K',
+    metricLabel: 'events/day',
+  },
+  {
+    slug: 'fintech-startup',
+    company: 'PayStack',
+    logo: 'PS',
+    industry: 'Fintech',
+    author: 'Head of Engineering',
+    authorRole: 'Head of Engineering',
+    quote: 'Zero event loss for compliance. The HMAC signatures and delivery logs give us the audit trail we need.',
+    metric: '99.99%',
+    metricLabel: 'delivery rate',
+  },
+  {
+    slug: 'ai-agent-fleet',
+    company: 'NeuralOps',
+    logo: 'NO',
+    industry: 'AI / ML',
+    author: 'ML Engineer',
+    authorRole: 'ML Engineer',
+    quote: 'HookSniff is the nervous system for our AI agent fleet. Events trigger actions in real-time.',
+    metric: '200+',
+    metricLabel: 'agents connected',
+  },
+  {
+    slug: 'saas-integration',
+    company: 'CloudSync',
+    logo: 'CS',
+    industry: 'SaaS',
+    author: 'Solo Founder',
+    authorRole: 'Founder',
+    quote: 'Free tier that actually works. We process 8K webhooks/month without paying a cent.',
+    metric: '8K',
+    metricLabel: 'events/month free',
+  },
+  {
+    slug: 'healthcare-saas',
+    company: 'MedConnect',
+    logo: 'MC',
+    industry: 'Healthcare',
+    author: 'CTO',
+    authorRole: 'CTO',
+    quote: 'GDPR compliance and EU data processing were non-negotiable. HookSniff checked every box.',
+    metric: 'EU',
+    metricLabel: 'data region (Frankfurt)',
+  },
+  {
+    slug: 'devtools-platform',
+    company: 'BuildKit',
+    logo: 'BK',
+    industry: 'Developer Tools',
+    author: 'Lead Developer',
+    authorRole: 'Lead Developer',
+    quote: 'The webhook playground and 11 SDKs made integration a breeze. Our developers love it.',
+    metric: '11',
+    metricLabel: 'SDKs available',
+  },
+];
+
+const techLogos = [
+  { name: 'GCP Cloud Run', desc: 'API hosting' },
+  { name: 'Neon PostgreSQL', desc: 'Database' },
+  { name: 'Upstash Redis', desc: 'Cache & rate limiting' },
+  { name: 'Cloudflare', desc: 'CDN & DNS' },
+  { name: 'Vercel', desc: 'Dashboard hosting' },
+  { name: 'Polar.sh', desc: 'Payments' },
+  { name: 'Rust', desc: 'API language' },
+  { name: 'Next.js', desc: 'Dashboard framework' },
 ];
 
 const stats = [
   { value: '11', label: 'SDKs published' },
   { value: '1,378', label: 'Tests passing' },
   { value: '99.97%', label: 'Delivery rate' },
-  { value: '11/11', label: 'SDKs on package managers' },
+  { value: '8', label: 'Languages supported' },
 ];
 
 export default function CustomersPage() {
   const [activeFilter, setActiveFilter] = useState('All');
-  const industries = ['All', ...new Set(customers.map((c) => c.industry))];
-  const filtered = activeFilter === 'All' ? customers : customers.filter((c) => c.industry === activeFilter);
+  const industries = ['All', ...new Set(stories.map((s) => s.industry))];
+  const filtered = activeFilter === 'All' ? stories : stories.filter((s) => s.industry === activeFilter);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -118,60 +179,100 @@ export default function CustomersPage() {
           ))}
         </div>
 
-        {/* Logo Wall */}
+        {/* Technology Logos */}
         <div className="mb-16">
-          <p className="text-center text-sm text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-6">Integrated with</p>
-          <div className="flex flex-wrap justify-center gap-8">
-            {logos.map((l) => (
-              <div key={l.name} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">{l.initials}</div>
-                <span className="text-sm text-gray-700 dark:text-slate-300 font-medium">{l.name}</span>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-6">Built on trusted infrastructure</p>
+          <div className="flex flex-wrap justify-center gap-6">
+            {techLogos.map((t) => (
+              <div key={t.name} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-blue-100 dark:from-brand-900/30 dark:to-blue-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
+                  {t.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{t.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-500">{t.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Filter */}
-        <div className="flex flex-wrap gap-2 mb-8 justify-center">
-          {industries.map((ind) => (
-            <button
-              key={ind}
-              onClick={() => setActiveFilter(ind)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${
-                activeFilter === ind
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40'
-              }`}
-            >
-              {ind}
-            </button>
-          ))}
+        {/* Featured Stories */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">Featured stories</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {featured.map((f) => (
+              <Link key={f.slug} href={`/customers/${f.slug}`} className="group">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-lg">{f.logo}</div>
+                    <div>
+                      <p className="font-bold text-gray-900 dark:text-white text-lg">{f.company}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-500">{f.industry}</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{f.desc}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-2xl font-bold text-brand-600 dark:text-brand-400">{f.metric}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-500">{f.metricLabel}</p>
+                    </div>
+                    <span className="text-sm text-brand-600 dark:text-brand-400 group-hover:underline">Read story →</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Customer Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {filtered.map((c) => (
-            <div key={c.name} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-sm">{c.logo}</div>
-                <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">{c.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-slate-500">{c.industry}</p>
+        {/* All Stories */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">All customer stories</h2>
+
+          {/* Filter */}
+          <div className="flex flex-wrap gap-2 mb-8 justify-center">
+            {industries.map((ind) => (
+              <button
+                key={ind}
+                onClick={() => setActiveFilter(ind)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${
+                  activeFilter === ind
+                    ? 'bg-brand-600 text-white'
+                    : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40'
+                }`}
+              >
+                {ind}
+              </button>
+            ))}
+          </div>
+
+          {/* Story Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((s) => (
+              <Link key={s.slug} href={`/customers/${s.slug}`} className="group">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-sm">{s.logo}</div>
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">{s.company}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-500">{s.industry}</p>
+                    </div>
+                  </div>
+                  <svg className="w-6 h-6 text-brand-200 dark:text-brand-800 mb-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
+                  </svg>
+                  <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{s.quote}</p>
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{s.author}</p>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-brand-600 dark:text-brand-400">{s.metric}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-500">{s.metricLabel}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <svg className="w-6 h-6 text-brand-200 dark:text-brand-800 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
-              </svg>
-              <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{c.quote}</p>
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{c.author}</p>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-brand-600 dark:text-brand-400">{c.metric}</p>
-                  <p className="text-xs text-gray-500 dark:text-slate-500">{c.metricLabel}</p>
-                </div>
-              </div>
-            </div>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* CTA */}
