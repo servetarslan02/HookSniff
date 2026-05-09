@@ -36,6 +36,11 @@ use crate::error::AppError;
 use crate::middleware::{create_auth_cookie, create_refresh_token_cookie, generate_api_key, hash_api_key};
 use crate::models::customer::Customer;
 
+/// OAuth state cookie name (short-lived, CSRF protection)
+const OAUTH_STATE_COOKIE: &str = "hr_oauth_state";
+/// OAuth state cookie max age (5 minutes)
+const OAUTH_STATE_MAX_AGE: i64 = 300;
+
 pub fn router() -> Router {
     Router::new()
         .route("/providers", get(list_providers))
@@ -77,7 +82,7 @@ async fn list_providers() -> Json<serde_json::Value> {
 }
 
 /// GET /oauth/google — Redirect to Google OAuth consent screen
-async fn google_login(Extension(_cfg): Extension<Config>) -> Result<Redirect, AppError> {
+async fn google_login(Extension(_cfg): Extension<Config>) -> Result<impl axum::response::IntoResponse, AppError> {
     let client_id = std::env::var("GOOGLE_CLIENT_ID").map_err(|_| {
         AppError::BadRequest("Google OAuth not configured. Set GOOGLE_CLIENT_ID.".into())
     })?;
@@ -95,7 +100,15 @@ async fn google_login(Extension(_cfg): Extension<Config>) -> Result<Redirect, Ap
         state
     );
 
-    Ok(Redirect::temporary(&url))
+    // Save state in a short-lived cookie for CSRF verification
+    let state_cookie = format!(
+        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
+    );
+    let mut headers = HeaderMap::new();
+    headers.insert("set-cookie", axum::http::HeaderValue::from_str(&state_cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+    headers.insert("location", axum::http::HeaderValue::from_str(&url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
+    Ok((headers, Redirect::temporary(&url)))
 }
 
 /// GET /oauth/google/callback — Handle Google OAuth callback
@@ -103,15 +116,22 @@ async fn google_callback(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Query(params): Query<OAuthCallback>,
+    req: axum::extract::Request,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
-    if let Some(error) = params.error {
-        let url = format!("/login?error=oauth_denied&details={}", error);
-        return Ok((HeaderMap::new(), Redirect::temporary(&url)));
+    if let Some(_error) = params.error {
+        let url = "/login?error=oauth_denied";
+        return Ok((HeaderMap::new(), Redirect::temporary(url)));
     }
 
     let code = params.code.ok_or_else(|| {
         AppError::BadRequest("Missing authorization code".into())
     })?;
+
+    // Verify CSRF state parameter
+    let expected_state = params.state.ok_or_else(|| {
+        AppError::BadRequest("Missing state parameter".into())
+    })?;
+    verify_oauth_state(&req, &expected_state)?;
 
     let client_id = std::env::var("GOOGLE_CLIENT_ID").map_err(|_| {
         AppError::BadRequest("Google OAuth not configured".into())
@@ -134,29 +154,33 @@ async fn google_callback(
     // Find or create customer
     let customer = find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "google").await?;
 
-    // Generate JWT
+    // Generate JWT (access + refresh)
     let token = jwt::generate_access_token(
         customer.id,
         &customer.email,
         &customer.plan,
         &cfg.jwt_secret,
     )?;
+    let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
-    // Set HttpOnly auth cookie and redirect
+    // Set HttpOnly auth + refresh cookies and redirect
     let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
-    let cookie = create_auth_cookie(&token, 86400);
-    let mut headers = axum::http::HeaderMap::new();
-    headers.insert(
-        "set-cookie",
-        axum::http::HeaderValue::from_str(&cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
-    );
+    let auth_cookie = create_auth_cookie(&token, 86400);
+    let refresh_cookie = create_refresh_token_cookie(&refresh_token_value, 30 * 86400);
+    let state_clear = clear_oauth_state_cookie();
+
+    let mut headers = HeaderMap::new();
+    headers.insert("set-cookie", axum::http::HeaderValue::from_str(&auth_cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+    headers.append("set-cookie", axum::http::HeaderValue::from_str(&refresh_cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+    headers.append("set-cookie", axum::http::HeaderValue::from_str(&state_clear).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+
     let redirect_url = format!("{}/auth/callback", app_url);
     headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
     Ok((headers, axum::response::Redirect::temporary(&redirect_url)))
 }
 
 /// GET /oauth/github — Redirect to GitHub OAuth consent screen
-async fn github_login() -> Result<Redirect, AppError> {
+async fn github_login() -> Result<impl axum::response::IntoResponse, AppError> {
     let client_id = std::env::var("GITHUB_CLIENT_ID").map_err(|_| {
         AppError::BadRequest("GitHub OAuth not configured. Set GITHUB_CLIENT_ID.".into())
     })?;
@@ -173,7 +197,15 @@ async fn github_login() -> Result<Redirect, AppError> {
         state
     );
 
-    Ok(Redirect::temporary(&url))
+    // Save state in a short-lived cookie for CSRF verification
+    let state_cookie = format!(
+        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
+    );
+    let mut headers = HeaderMap::new();
+    headers.insert("set-cookie", axum::http::HeaderValue::from_str(&state_cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+    headers.insert("location", axum::http::HeaderValue::from_str(&url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
+    Ok((headers, Redirect::temporary(&url)))
 }
 
 /// GET /oauth/github/callback — Handle GitHub OAuth callback
@@ -181,15 +213,22 @@ async fn github_callback(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Query(params): Query<OAuthCallback>,
+    req: axum::extract::Request,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
-    if let Some(error) = params.error {
-        let url = format!("/login?error=oauth_denied&details={}", error);
-        return Ok((HeaderMap::new(), Redirect::temporary(&url)));
+    if let Some(_error) = params.error {
+        let url = "/login?error=oauth_denied";
+        return Ok((HeaderMap::new(), Redirect::temporary(url)));
     }
 
     let code = params.code.ok_or_else(|| {
         AppError::BadRequest("Missing authorization code".into())
     })?;
+
+    // Verify CSRF state parameter
+    let expected_state = params.state.ok_or_else(|| {
+        AppError::BadRequest("Missing state parameter".into())
+    })?;
+    verify_oauth_state(&req, &expected_state)?;
 
     let client_id = std::env::var("GITHUB_CLIENT_ID").map_err(|_| {
         AppError::BadRequest("GitHub OAuth not configured".into())
@@ -208,22 +247,26 @@ async fn github_callback(
     // Find or create customer
     let customer = find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "github").await?;
 
-    // Generate JWT
+    // Generate JWT (access + refresh)
     let token = jwt::generate_access_token(
         customer.id,
         &customer.email,
         &customer.plan,
         &cfg.jwt_secret,
     )?;
+    let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
-    // Set HttpOnly auth cookie and redirect
+    // Set HttpOnly auth + refresh cookies and redirect
     let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
-    let cookie = create_auth_cookie(&token, 86400);
-    let mut headers = axum::http::HeaderMap::new();
-    headers.insert(
-        "set-cookie",
-        axum::http::HeaderValue::from_str(&cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
-    );
+    let auth_cookie = create_auth_cookie(&token, 86400);
+    let refresh_cookie = create_refresh_token_cookie(&refresh_token_value, 30 * 86400);
+    let state_clear = clear_oauth_state_cookie();
+
+    let mut headers = HeaderMap::new();
+    headers.insert("set-cookie", axum::http::HeaderValue::from_str(&auth_cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+    headers.append("set-cookie", axum::http::HeaderValue::from_str(&refresh_cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+    headers.append("set-cookie", axum::http::HeaderValue::from_str(&state_clear).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+
     let redirect_url = format!("{}/auth/callback", app_url);
     headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
     Ok((headers, axum::response::Redirect::temporary(&redirect_url)))
@@ -232,6 +275,56 @@ async fn github_callback(
 // ── OAuth helpers ────────────────────────────────────────────
 
 use crate::auth::jwt;
+
+/// Verify the OAuth state parameter matches the cookie (CSRF protection).
+fn verify_oauth_state(req: &axum::extract::Request, expected_state: &str) -> Result<(), AppError> {
+    let cookie_header = req
+        .headers()
+        .get("cookie")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+
+    let state_from_cookie = cookie_header
+        .split(';')
+        .map(|c| c.trim())
+        .find(|c| c.starts_with(&format!("{}=", OAUTH_STATE_COOKIE)))
+        .and_then(|c| c.split('=').nth(1));
+
+    match state_from_cookie {
+        Some(cookie_state) if cookie_state == expected_state => Ok(()),
+        _ => {
+            tracing::warn!("OAuth state mismatch: expected={}, cookie={:?}", expected_state, state_from_cookie);
+            Err(AppError::BadRequest("Invalid OAuth state — possible CSRF attack. Please try again.".into()))
+        }
+    }
+}
+
+/// Clear the OAuth state cookie after successful verification.
+fn clear_oauth_state_cookie() -> String {
+    format!(
+        "{}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
+        OAUTH_STATE_COOKIE
+    )
+}
+
+/// Create a refresh token in the database (same logic as auth.rs).
+async fn create_refresh_token(pool: &PgPool, customer_id: Uuid) -> Result<String, AppError> {
+    use chrono::{Duration, Utc};
+    let token = jwt::generate_random_token();
+    let token_hash = jwt::hash_token(&token);
+    let expires_at = Utc::now() + Duration::days(30);
+
+    sqlx::query(
+        "INSERT INTO refresh_tokens (customer_id, token_hash, expires_at) VALUES ($1, $2, $3)",
+    )
+    .bind(customer_id)
+    .bind(&token_hash)
+    .bind(expires_at)
+    .execute(pool)
+    .await?;
+
+    Ok(token)
+}
 
 struct GoogleTokenResponse {
     access_token: String,
