@@ -18,17 +18,22 @@ Webhook delivery pazarı 2026'da olgunlaşıyor. Büyük oyuncular var ama hala 
 | **Lisans** | MIT (açık kaynak) | Apache 2.0 (Outpost) | SSPL v1 | Elastic License v2.0 | MIT |
 | **Dil** | Rust | Go (Outpost) | Rust | Go | Rust |
 | **Self-hosted** | ✅ | ✅ (Outpost) | ✅ | ✅ | ✅ |
-| **FIFO Sıralama** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Endpoint Throttling** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Multi-destination** | HTTP + Bridge | 8 tür | HTTPS only | HTTP only | HTTP/WS/gRPC/SQS |
+| **FIFO Sıralama** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Endpoint Throttling** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Multi-destination** | HTTP + Bridge | 8 tür | HTTPS only | HTTP only | HTTP + WS + Email |
 | **SOC 2 Type II** | ✅ | ✅ | ❌ | ❌ | ❌ |
 | **HIPAA** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **PCI-DSS** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **GDPR** | ✅ | ✅ | ✅ (EU) | ❌ | ❌ |
+| **GDPR** | ✅ | ✅ | ✅ (EU) | ❌ | ✅ |
 | **Uptime** | 99.99999% | Yüksek | Düşük | <99% | Ölçülmemiş |
-| **SDK Sayısı** | 10+ | 3 | 2 | 3 | 3 (Node, Python, Go) |
-| **Customer Portal** | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **SDK Sayısı** | 10+ | 3 | 2 | 3 | 11 (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift) |
+| **Customer Portal** | ✅ | ✅ | ✅ | ❌ | ✅ |
 | **OTel Desteği** | ✅ | ✅ | ❌ | ✅ | ✅ |
+| **Schema Registry** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Inbound Proxy** | ❌ | ❌ | ❌ | ❌ | ✅ (Stripe, GitHub, Shopify) |
+| **Embeddable Widget** | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Standard Webhooks** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Smart Routing** | ❌ | ✅ | ❌ | ❌ | ✅ (round-robin, latency, failover) |
 | **Firma Durumu** | a16z backed, aktif | Aktif | Bootstrapped, EU | ⚠️ Kapandı | Bireysel |
 
 ---
