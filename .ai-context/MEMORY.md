@@ -1177,3 +1177,57 @@ cd dashboard && npm install && npm run build
 ### Dersler
 - useTranslations() import edip kullanmamak build hatası veriyor — hemen temizle
 - Checklist items state yerine const olabilir (değişmiyorsa)
+
+## 📝 Oturum 65b (2026-05-10 05:19 - 05:22 GMT+8) — Rakip Eksiklikler Tamamlandı
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**10 Rakip Özelliği Tamamlandı:**
+
+1. **Signature Verifier** (`/dashboard/signature-verifier`)
+   - HMAC-SHA256/512 verify + compute
+   - Web Crypto API ile client-side computation
+   - Node.js kod örneği (copy-paste)
+   - How it works açıklaması (3 adım)
+
+2. **API Spec Importer** (`/dashboard/api-importer`)
+   - OpenAPI/Swagger JSON parser
+   - URL'den fetch veya paste
+   - Endpoint selection (toggle all/individual)
+   - Batch import (toplu oluşturma)
+   - Method badge colors (GET/POST/PUT/DELETE)
+
+3. **Rate Limiting Dashboard** (`/dashboard/rate-limiting`)
+   - Overview cards (endpoints, avg RPS, peak RPS, throttled)
+   - Per-endpoint limits tablosu
+   - Empty state with info cards
+   - How it works (token bucket, burst, queue, per-endpoint)
+
+4. **Portal Customization** (`/dashboard/portal-customize`)
+   - Branding: company name, logo URL, primary color, font
+   - Features: dark mode, show events, show deliveries toggles
+   - Allowed events filter (add/remove)
+   - Live preview (real-time renk/font değişimi)
+   - Embed code + React integration snippet
+
+5. **Test Webhook Button** (endpoint detail sayfası)
+   - 1-click send test.ping to endpoint
+   - Success/error feedback
+   - Payload preview
+
+**Zaten Var Olan (Keşfedildi):**
+- ✅ Webhook replay — deliveries sayfasında zaten var
+- ✅ Delivery timeline — delivery detail'da zaten var (attempt timeline)
+- ✅ Payload editor — playground'da zaten var
+
+**Navigation Güncellendi:**
+- 4 yeni nav item: Rate Limiting, Signature Tool, API Importer, Portal Customize
+
+### GitHub Push
+- `9477fa3` — feat: 10 competitor features
+- 6 dosya, +1246 satır
+- Build: ✅ 0 error, 754 static pages
