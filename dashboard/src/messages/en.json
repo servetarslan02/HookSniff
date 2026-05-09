@@ -713,7 +713,8 @@
       "contact": "Contact",
       "terms": "Terms",
       "privacy": "Privacy",
-      "copyright": "© 2026 HookSniff. All rights reserved."
+      "copyright": "© 2026 HookSniff. All rights reserved.",
+      "changelog": "Changelog"
     }
   },
   "apiKeys": {

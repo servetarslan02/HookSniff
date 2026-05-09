@@ -713,7 +713,8 @@
       "contact": "İletişim",
       "terms": "Şartlar",
       "privacy": "Gizlilik",
-      "copyright": "© 2026 HookSniff. Tüm hakları saklıdır."
+      "copyright": "© 2026 HookSniff. Tüm hakları saklıdır.",
+      "changelog": "Değişiklik Günlüğü"
     }
   },
   "apiKeys": {
