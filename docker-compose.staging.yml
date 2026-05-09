@@ -1,0 +1,94 @@
+# HookSniff — Staging Environment
+# Usage: docker compose -f docker-compose.staging.yml up -d
+#
+# Differences from dev:
+# - Separate database (hooksniff_staging)
+# - Staging-specific secrets
+# - Rate limits matching production
+# - Verbose logging for debugging
+
+services:
+  # ── PostgreSQL (Staging) ──
+  postgres-staging:
+    image: postgres:16-alpine
+    container_name: hooksniff-staging-db
+    environment:
+      POSTGRES_USER: hooksniff_staging
+      POSTGRES_PASSWORD: "${STAGING_DB_PASSWORD:-hooksniff_staging_pass}"
+      POSTGRES_DB: hooksniff_staging
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata-staging:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hooksniff_staging -d hooksniff_staging"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # ── Redis (Staging) ──
+  redis-staging:
+    image: redis:7-alpine
+    container_name: hooksniff-staging-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redisdata-staging:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # ── HookSniff API (Staging) ──
+  api-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: hooksniff-staging-api
+    ports:
+      - "3001:3000"
+    environment:
+      APP_ENV: staging
+      PORT: "3000"
+      DATABASE_URL: "postgresql://hooksniff_staging:${STAGING_DB_PASSWORD:-hooksniff_staging_pass}@postgres-staging:5432/hooksniff_staging?sslmode=disable"
+      REDIS_URL: "redis://redis-staging:6379"
+      HMAC_SECRET: "${STAGING_HMAC_SECRET:-staging-hmac-secret-change-me}"
+      JWT_SECRET: "${STAGING_JWT_SECRET:-staging-jwt-secret-change-me}"
+      RUST_LOG: "info,hooksniff=debug"
+      MAX_PAYLOAD_BYTES: "1048576"
+      RETENTION_DAYS: "7"
+      RATE_LIMIT_RPS: "10"
+      RATE_LIMIT_RPM: "600"
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── HookSniff Worker (Staging) ──
+  worker-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: hooksniff-staging-worker
+    environment:
+      APP_ENV: staging
+      DATABASE_URL: "postgresql://hooksniff_staging:${STAGING_DB_PASSWORD:-hooksniff_staging_pass}@postgres-staging:5432/hooksniff_staging?sslmode=disable"
+      REDIS_URL: "redis://redis-staging:6379"
+      RUST_LOG: "info,hooksniff=debug"
+      WORKER_CONCURRENCY: "5"
+      MAX_RETRY_ATTEMPTS: "3"
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata-staging:
+  redisdata-staging:
