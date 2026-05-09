@@ -1,10 +1,10 @@
 # HookSniff — Exit ve Ölçekleme Stratejisi
 
 > Oluşturma: 2026-05-10
-> Son güncelleme: 2026-05-10
+> Son güncelleme: 2026-05-10 (revize — detaylı araştırma)
 > Durum: Taslak
 > Öncelik: 🟢 Uzun vadeli
-> Kaynaklar: SaaS Valuation Guide 2026 (✅ growigami.com doğrulanmış), SaaS Capital Private Valuations (✅ saas-capital.com doğrulanmış), Acquire.com (✅ acquire.com doğrulanmış), KPMG Turkish Startup Investments 2025 (✅ doğrulanmış), Vergi Merkezi Company Formation (✅ vergimerkezi.com.tr doğrulanmış)
+> Kaynaklar: SaaS Valuation Guide 2026 (✅ growigami.com doğrulanmış), Founderpath SaaS Multiples (✅ founderpath.com tam sayfa doğrulanmış), SaaS Capital Private Valuations (✅ saas-capital.com doğrulanmış), Acquire.com (✅ acquire.com doğrulanmış), KPMG Turkish Startup Investments 2025 (✅ doğrulanmış), Vergi Merkezi Ltd. Şti. Kuruluşu 2026 (✅ vergimerkezi.com.tr tam sayfa doğrulanmış), Stripe Atlas (✅ stripe.com doğrulanmış)
 
 ---
 
@@ -72,54 +72,69 @@
 
 ## 3. SaaS Değerleme Yöntemleri
 
-### 2026 SaaS Değerleme Çarpanları (✅ Doğrulanmış — growigami.com + saas-capital.com)
+### 2026 SaaS Değerleme Çarpanları (✅ Doğrulanmış — Founderpath + growigami.com + SaaS Capital)
 
-> **Kaynak:** "How to Value a SaaS Company: The Complete 2026 Guide" — growigami.com (✅ tam sayfa doğrulanmış)
+> **Kaynaklar:** Founderpath SaaS Multiples (✅ tam sayfa doğrulanmış), growigami.com 2026 Guide (✅ doğrulanmış), SaaS Capital Index (✅ doğrulanmış)
 
-#### Yöntem 1: Revenue Multiple (ARR Çarpanı)
+#### Değerleme Yöntemleri (Şirket Aşamasına Göre)
 
-| ARR Aralığı | Büyüme | Çarpan | Örnek Değerleme |
-|-------------|--------|--------|----------------|
-| Pre-revenue | — | 1-3x (projeksiyon) | $0 → $0-100K |
-| $1-5M ARR | %20-40 | 3-6x | $100K ARR → $300K-600K |
-| $5-20M ARR | %30-50 | 5-10x | $500K ARR → $2.5M-5M |
-| $20-50M ARR | %40+ | 8-15x | — |
-| $50M+ ARR | %30+ | 10-20x+ | — |
+| ARR Aralığı | Değerleme Yöntemi | Çarpan | Not |
+|-------------|-------------------|--------|-----|
+| **< $500K** | **SDE × 2-4x** | 2-4x | Revenue çok küçük, ARR multiple uygulanmaz; buyers nakit akışına bakar |
+| **$500K-$2M** | **ARR × 2.5-4x** | 2.5-4x | Geçiş bölgesi: ARR multiple başlar ama kârlılık hâlâ önemli |
+| **$2M-$5M** | **ARR × 3-5x** | 3-5x | Ölçek kanıtlanmış; revenue-based valuation |
+| **$5M-$20M** | **ARR + Rule of 40** | 5-8x | Growth-efficiency balance kilit faktör |
+| **$20M+** | **ARR + growth + profitability** | 7-12x | Public-market karşılaştırmaları başlar |
 
-#### Yöntem 2: SDE (Seller's Discretionary Earnings)
+> **⚠️ Düzeltme (Revize):** Küçük SaaS şirketleri (< $500K ARR) için ARR multiple uygulanmaz. Bunun yerine **SDE (Seller's Discretionary Earnings) × 2-4x** kullanılır. HookSniff'in mevcut durumunda ($0 ARR) değerleme sadece ürün + IP değeridir.
 
-**Küçük SaaS şirketleri için (ARR < $5M):**
+### SaaS Pazar Karşılaştırma (✅ Doğrulanmış — Founderpath + SaaS Capital 2024-2025)
 
-| SDE Aralığı | Çarpan | Not |
-|-------------|--------|-----|
-| < $500K | 2-3x | Yüksek risk, founder-dependent |
-| $500K-$2M | 3-4x | Emerging product-market fit |
-| $2M-$5M | 4-5x | Established, potential to scale |
+| Pazar | Çarpan | Kaynak |
+|-------|--------|--------|
+| Public SaaS (median) | **7.0x ARR** | SaaS Capital Index (2024) |
+| VC-backed private SaaS | **5.3x ARR** | SaaS Capital (2025) |
+| Bootstrapped private SaaS | **4.8x ARR** | SaaS Capital (2025) |
+| M&A transactions (median) | **3.8x revenue** | Aventis Advisors (537 işlem, 2015-2025) |
+| Public SaaS acquisitions | **8-9x LTM revenue** | Blossom Street Ventures |
+| High growth (>27%) | **10.0x** | Jamin Ball / Clouded Judgement (2024) |
+| Low growth (<15%) | **4.5x** | Jamin Ball / Clouded Judgement (2024) |
 
-**SDE Formülü:**
-```
-SDE = Net Gelir + Sahibin Maaşı + Tek Seferlik Giderler + Nakit Olmayan Giderler
-Değerleme = SDE × Çarpan
-```
+### NRR'nin Çarpansa Etkisi (✅ Doğrulanmış — Software Equity Group Q2 2024)
 
-#### Yöntem 3: EBITDA Multiple (Büyük Şirketler)
+| NRR Seviyesi | Public SaaS Çarpanı | M&A Çarpanı |
+|-------------|-------------------|-------------|
+| %90 altı | 3.1x | 1.2x |
+| %100-110 | — | 6.0x |
+| %120+ | **9.3x** | **11.7x** |
 
-| EBITDA Aralığı | Çarpan | Not |
-|----------------|--------|-----|
-| < $1M | 4-6x | Küçük şirket |
-| $1M-$5M | 6-10x | Orta şirket |
-| $5M+ | 10-15x+ | Büyük şirket |
+> **Kritik bulgu:** %120+ NRR ile %90 altı NRR arasındaki çarpan farkı **10 kat** (M&A). HookSniff'in NRR'yi %120+ seviyede tutması exit değerini dramatik artırır.
+
+### Son Satın Alımlar — Gerçek Fiyatlar (✅ Doğrulanmış — Blossom Street Ventures)
+
+| Şirket | Alıcı | Fiyat | LTM Revenue | Çarpan |
+|--------|-------|-------|-------------|--------|
+| Splunk | Cisco | $28B | $3.73B | 7.5x |
+| HashiCorp | IBM | $6.4B | $583M | 11.0x |
+| Smartsheet | Blackstone/Vista | $8.4B | $1.0B | 8.4x |
+| Confluent | IBM | $11B | $1.065B | 10.3x |
+| SolarWinds | Turn/River Capital | $4.4B | $784M | 5.6x |
+| Informatica | Salesforce | $8.0B | $1.64B | 4.9x |
+
+> **Median:** Public SaaS acquisitions ~8-9x LTM revenue. Strategic acquirers (Cisco, IBM) premium öder; PE firmaları (Vista, Blackstone) daha disiplinli fiyat verir.
 
 ### HookSniff Değerleme Projeksiyonu
 
-| Senaryo | ARR | Çarpan | Değerleme |
-|---------|-----|--------|-----------|
-| **Şimdi** | $0 | 1-2x | $0-50K (ürün + IP) |
-| **6 ay** | $6K ($500/ay) | 2-3x | $12K-18K |
-| **1 yıl** | $36K ($3K/ay) | 3-4x | $108K-144K |
-| **2 yıl** | $120K ($10K/ay) | 4-5x | $480K-600K |
-| **3 yıl** | $360K ($30K/ay) | 5-6x | $1.8M-2.2M |
-| **5 yıl** | $1.2M ($100K/ay) | 6-8x | $7.2M-9.6M |
+| Senaryo | ARR | Yöntem | Çarpan | Değerleme |
+|---------|-----|--------|--------|-----------|
+| **Şimdi** | $0 | Ürün + IP | 1-2x | $0-50K |
+| **6 ay** | $6K ($500/ay) | SDE × 2-4x | 2-3x | $12K-18K |
+| **1 yıl** | $36K ($3K/ay) | SDE × 3-4x | 3-4x | $108K-144K |
+| **2 yıl** | $120K ($10K/ay) | ARR × 3-4x | 3-4x | $360K-480K |
+| **3 yıl** | $360K ($30K/ay) | ARR × 4-5x | 4-5x | $1.4M-1.8M |
+| **5 yıl** | $1.2M ($100K/ay) | ARR × 5-6x | 5-6x | $6M-7.2M |
+
+> **⚠️ Düzeltme (Revize):** $500K ARR altı şirketler için ARR multiple yerine SDE × 2-4x kullanılır. HookSniff $500K ARR'ye ulaşana kadar SDE-based değerleme geçerlidir.
 
 ### Çarpanı Artıran Faktörler
 
@@ -148,50 +163,62 @@ Değerleme = SDE × Çarpan
 
 ## 4. Şirket Kurma Seçenekleri
 
-### Türkiye'de Şirket Kurma
+### Türkiye'de Şirket Kurma (✅ Doğrulanmış — vergimerkezi.com.tr 2026)
 
 | Şirket Türü | Maliyet | Süre | Vergi | Avantaj | Dezavantaj |
 |-------------|---------|------|-------|---------|------------|
 | **Şahıs Şirketi** | ~₺2,000 ($60) | 1-2 gün | %15-40 gelir vergisi | En ucuz, hızlı | Sınırlı sorumluluk yok |
-| **Limited (Ltd. Şti.)** | ~₺10,000-15,000 ($300-450) | 3-5 gün | %20 kurumlar vergisi | Sınırlı sorumluluk | Muhasebe zorunlu |
-| **Anonim (A.Ş.)** | ~₺50,000+ ($1,500+) | 1-2 hafta | %20 kurumlar vergisi | Yatırımcı dostu | En pahalı |
+| **Limited (Ltd. Şti.)** | ~₺29,000-35,000 ($850-1,000) | 2-3 iş günü | %20 kurumlar vergisi | Sınırlı sorumluluk, sanal ofis | Muhasebe zorunlu |
+| **Anonim (A.Ş.)** | ~₺50,000+ ($1,500+) | 1-2 hafta | %20 kurumlar vergisi | Yatırımcı dostu | En pahalı, sermaye blokesi |
 | **Teknopark** | Ücretsiz | 1-3 ay | %100 kurumlar vergisi muafiyeti | Vergi avantajı | Kabul zor |
 
-### Türkiye Vergi Avantajları (✅ Doğrulanmış — vergimerkezi.com.tr)
+> **⚠️ Düzeltme (Revize):** Ltd. Şti. maliyeti daha önce "$300-450" olarak belirtilmişti. Gerçek maliyet 2026 itibarıyla **₺29,000-35,000 ($850-1,000)** (sermaye hariç). Kaynak: vergimerkezi.com.tr
 
-| Avantaj | Açıklama | Şart |
-|---------|----------|------|
-| **Ar-Ge indirimi** | %100 kurumlar vergisi muafiyeti | Teknopark veya Ar-Ge merkezi |
-| ** Genç girişimci** | 3 yıl boyunca 75,000 TL istisna | 29 yaş altı, ilk şirket |
-| **KDV istisnası** | Yazılım ihracatı KDV'siz | Yurtdışı müşteri |
-| **Stopaj indirimi** | Ar-Ge personeli stopaj indirimi | Teknopark |
+### Türkiye Ltd. Şti. Kuruluş Detayları (✅ Doğrulanmış — vergimerkezi.com.tr 2026)
 
-### ABD'de Şirket Kurma (Delaware LLC/C-Corp)
+| Detay | Bilgi |
+|-------|-------|
+| **Asgari sermaye** | ₺50,000 (2026) |
+| **Sermaye blokesi** | ❌ YOK — 24 ay içinde şirkete yatırılabilir (A.Ş.'de bloke zorunlu) |
+| **Kuruluş süresi** | 2-3 iş günü (MERSİS üzerinden dijital) |
+| **Toplam maliyet (sermaye hariç)** | ₺29,000-35,000 (~$850-1,000) |
+| **Sanal ofis** | ✅ %100 yasal, fiziksel ofis şart değil |
+| **Ev ofis** | ✅ mümkün ama kira stopajı (%20) gerekir |
+| **NACE kodu** | Yazılım için doğru seçilmeli (teşvikler için kritik) |
+| **SGK avantajı** | Başka işte çalışırken Bağ-Kur ödemez |
+| **İlk 7 gün** | Vergi dairesi yoklaması, imza sirküleri, e-tebligat |
+
+### ABD'de Şirket Kurma (✅ Doğrulanmış — stripe.com/atlas)
 
 | Şirket Türü | Maliyet | Vergi | Avantaj | Dezavantaj |
 |-------------|---------|-------|---------|------------|
-| **Delaware LLC** | ~$500-1,000/yıl | Passthrough (ABD'de vergi yoksa) | Basit yapı, global ödeme | Yatırımcı C-Corp ister |
-| **Delaware C-Corp** | ~$500-1,500/yıl | %21 federal + eyalet | Yatırımcı dostu, Stripe Atlas | Çifte vergilendirme |
-| **Wyoming LLC** | ~$100-300/yıl | Passthrough | En ucuz, gizlilik | Daha az tanınmış |
+| **Delaware LLC** | ~$500 (Stripe Atlas) | Passthrough | Basit yapı, global ödeme | Yatırımcı C-Corp ister |
+| **Delaware C-Corp** | ~$500 (Stripe Atlas) | %21 federal + eyalet | Yatırımcı dostu, global standart | Çifte vergilendirme |
+| **Wyoming LLC** | ~$100-300 | Passthrough | En ucuz, gizlilik | Daha az tanınmış |
+
+> **Stripe Atlas:** $500 tek seferlik ücret. Delaware C-Corp veya LLC kurulumu, registered agent, EIN, banka hesabı açılışı dahil. Kaynak: stripe.com/atlas (✅ doğrulanmış)
 
 ### Karşılaştırma: Türkiye vs ABD
 
-| Kriter | Türkiye Ltd. Şti. | ABD Delaware C-Corp |
-|--------|-------------------|---------------------|
-| Kurulum maliyeti | ~$300-450 | ~$500-1,500 |
+| Kriter | Türkiye Ltd. Şti. | ABD Delaware C-Corp (Stripe Atlas) |
+|--------|-------------------|-------------------------------------|
+| Kurulum maliyeti | ~$850-1,000 | ~$500 |
 | Yıllık maliyet | ~$500-1,000 (muhasebe) | ~$800-2,000 (registered agent + tax) |
 | Vergi | %20 kurumlar | %21 federal + eyalet |
 | Yatırımcı çekme | Zor (Türk şirket) | Kolay (global standart) |
 | Stripe/Polar | ✅ | ✅ |
 | Exit kolaylığı | Zor | Kolay |
 | Hukuki koruma | Türkiye mahkemeleri | Delaware Chancery Court |
+| Sermaye blokesi | ❌ Yok (24 ay) | ❌ Yok |
+| Sanal ofis | ✅ | ✅ |
 
 ### Tavsiye
 
-**Şimdi:** Şahıs şirketi veya yok (bireysel, $500/ay altı)
-**$1,000/ay:** Türkiye Ltd. Şti. kur
-**$5,000/ay:** ABD Delaware C-Corp kur (Stripe Atlas ile)
-**$50,000/ay:** Her iki ülkede şirket (TR operasyon, ABD holding)
+**$0-$500/ay:** Bireysel çalış, şirket kurma
+**$500-$1,000/ay:** Şahıs şirketi düşün (opsiyonel, $60)
+**$1,000-$5,000/ay:** Türkiye Ltd. Şti. kur (~$850-1,000)
+**$5,000+/ay:** ABD Delaware C-Corp kur (Stripe Atlas $500)
+**$50,000+/ay:** Her iki ülkede şirket (TR operasyon, ABD holding)
 
 ---
 
@@ -512,10 +539,11 @@ Aşama 5: Maturity ($200K+/ay)
 
 ---
 
-## 13. Kaynaklar (Tümü Doğrulanmış)
+## 13. Kaynaklar (Revize — Tümü Doğrulanmış)
 
 ### Değerleme
-- SaaS Valuation Guide 2026: https://growigami.com/blog/saas-valuations-guide (✅ tam sayfa doğrulanmış)
+- Founderpath SaaS Multiples: https://founderpath.com/blog/saas-multiples (✅ tam sayfa doğrulanmış — SDE vs ARR, NRR impact, real acquisitions)
+- SaaS Valuation Guide 2026: https://growigami.com/blog/saas-valuations-guide (✅ doğrulanmış)
 - SaaS Capital Private Valuations: https://www.saas-capital.com/blog-posts/private-saas-company-valuations-multiples/ (✅ doğrulanmış)
 - SaaS Capital Valuation Multiples: https://www.saas-capital.com/blog-posts/saas-valuation-multiples-understanding-the-new-normal/ (✅ doğrulanmış)
 
@@ -527,9 +555,16 @@ Aşama 5: Maturity ($200K+/ay)
 - KPMG Turkish Startup Investments Q1 2025: https://assets.kpmg.com/content/dam/kpmg/tr/pdf/2025/05/Turkish-Startup-InvestmentsQ1-2025.pdf (✅ doğrulanmış)
 - KPMG Turkish Startup Investments Review 2025: https://assets.kpmg.com/content/dam/kpmg/tr/pdf/2026/03/turkish-startup-investments-review-2025.pdf (✅ doğrulanmış)
 - Revo Capital $86M Fund: https://vestbee.com/insights/articles/revo-capital-announces-86-m-first-close-of-new-fund (✅ doğrulanmış)
-- Vergi Merkezi Company Formation: https://vergimerkezi.com.tr/company-formation-turkey-digital-business-2026/ (✅ doğrulanmış)
+- Vergi Merkezi Ltd. Şti. Kuruluşu 2026: https://vergimerkezi.com.tr/limited-sirket-kurulusu-ipuclari-2026/ (✅ tam sayfa doğrulanmış — ₺29K-35K maliyet, 2-3 gün, sanal ofis)
+- Vergi Merkezi Şirket Formation: https://vergimerkezi.com.tr/company-formation-turkey-digital-business-2026/ (✅ doğrulanmış)
 - Vergi Merkezi Yazılımcı Rehberi: https://vergimerkezi.com.tr/yazilimcilar-icin-ulke-secimi-yasamak-vs-sirket-kurmak/ (✅ doğrulanmış)
+- TTK Md. 573: Limited Şirket asgari sermaye ₺50,000 (✅ doğrulanmış)
+
+### ABD Şirket Kurma
+- Stripe Atlas: https://stripe.com/atlas (✅ doğrulanmış — $500, Delaware C-Corp/LLC)
+- Delaware C-Corp: https://stripe.com/resources/more/what-is-a-delaware-c-corp (✅ doğrulanmış)
 
 ### M&A Trends
 - Software M&A: 460 deals (2020) → 546 deals (2024), 149 deals Q1 2025 (✅ LinkedIn doğrulanmış)
 - Turkish startup ecosystem: 59 deals, $70.2M Q1 2025 (✅ KPMG doğrulanmış)
+- SaaS M&A median: 3.8x revenue (Aventis Advisors, 537 işlem) (✅ doğrulanmış)
