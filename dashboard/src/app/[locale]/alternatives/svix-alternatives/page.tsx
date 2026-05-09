@@ -13,8 +13,8 @@ const alternatives = [
     tagline: 'Best Svix alternative for startups',
     price: '$29/mo',
     svixPrice: '$490/mo',
-    pros: ['10x cheaper than Svix', 'FIFO ordered delivery', 'CloudEvents v1.0', 'Schema registry', 'Open source + self-hosted', '8-language dashboard', 'MCP support'],
-    cons: ['Newer (less enterprise trust)', 'SOC 2 ready (not Type 2 yet)', '99.9% SLA (vs Svix 99.99%)', 'No HIPAA/PCI-DSS yet', 'No data streaming'],
+    pros: ['10x cheaper than Svix', 'FIFO ordered delivery', 'CloudEvents v1.0', 'Schema registry', 'Open source + self-hosted', '8-language dashboard', 'MCP support', 'CLI tool', 'Smart routing (round-robin, latency, failover)', 'Real-time SSE streaming'],
+    cons: ['Newer (less enterprise trust)', 'SOC 2 ready (not Type 2 yet)', '99.9% SLA (vs Svix 99.99%)', 'No HIPAA/PCI-DSS yet', 'No components platform (Diom)'],
     bestFor: 'Startups and growing teams who want enterprise features at startup prices.',
   },
   {
