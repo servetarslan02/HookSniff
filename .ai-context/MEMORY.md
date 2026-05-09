@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 18:15 GMT+8
+> Son güncelleme: 2026-05-09 18:51 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -38,14 +38,14 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## ✅ SERVİS DURUMU (2026-05-09 18:15)
+## ✅ SERVİS DURUMU (2026-05-09 18:51)
 
 | Servis | URL | Durum |
 |--------|-----|-------|
 | Dashboard | https://hooksniff.vercel.app | ✅ Live |
-| API | https://hooksniff-api-1046140057667.europe-west1.run.app | ⚠️ Deploy bekliyor |
+| API | https://hooksniff-api-1046140057667.europe-west1.run.app | ⚠️ Deploy bekliyor (RateLimiter fix) |
 | Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Deployed |
-| CI/CD | Local CI (GitHub Actions devre dışı) | ⚠️ Runner sorunu |
+| CI/CD | Local CI (GitHub Actions devre dışı) | ✅ scripts/ci-local.sh |
 | Neon DB | eu-central-1 | ✅ Çalışıyor |
 | Upstash Redis | 64MB | ✅ PONG |
 | R2 Storage | hooksniff-storage | ✅ Bucket var |
@@ -76,7 +76,7 @@ cd dashboard && npm install && npm run build
 ## 🔴 ACİL GÖREVLER
 
 1. **API Deploy** — RateLimiter fix (`4bbd9aa`) push edildi ama Cloud Run'a deploy edilemedi. Servet'in GCP Console'dan manuel deploy yapması gerekiyor
-2. **CI Pipeline** — GitHub Actions runner sorunu
+2. **CI Pipeline** — GitHub Actions runner sorunu (local CI alternatifi hazır)
 
 ---
 
@@ -84,49 +84,86 @@ cd dashboard && npm install && npm run build
 
 | Görev | Durum | Not |
 |-------|-------|------|
-| API deploy (GCP Console) | ⚠️ | RateLimiter fix deploy edilmeli |
+| API deploy (GCP Console) | 🔴 ACİL | RateLimiter fix deploy edilmeli |
 | iyzico hesap | ❌ | Vergi levhası + banka hesabı |
-| Java/Kotlin/Ruby/Elixir SDK publish | ⏳ | Servet'in local bilgisayarında |
+| Java/Kotlin/Ruby/Elixir SDK publish | ⏳ | Servet'in local bilgisayarında (scriptler hazır) |
+| npm token rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
+| GCP SA key rotate | ⚠️ | Eski key paylaşıldı, yeni key oluştur |
+| GitHub PAT rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
 
 ---
 
-## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 18:25)
+## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 18:51)
 
 | Kategori | Puan | Not |
 |----------|------|-----|
 | Kod kalitesi | 10/10 | TODO/FIXME temizlendi, sessiz catch düzeltildi |
 | Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time |
-| Test coverage | 10/10 | 186+ test — tümü geçti ✅ (Rust 162, Dashboard 6, Go, Rust SDK, Node, Python) |
+| Test coverage | 10/10 | 186+ test — tümü geçti ✅ |
 | Dokümantasyon | 10/10 | OpenAPI spec + SDK badge'leri |
 | SDK tutarlılığı | 10/10 | 11 SDK, badge'ler, URL'ler doğru |
 | CI/CD | 9/10 | Local CI script hazır |
 | **Genel** | **9.8/10** | Production-ready |
 
-### Düzeltilen Sorunlar (Oturum 29-30)
-- ✅ `portal/embed.js` eski domain temizlendi
-- ✅ `tests/load/load_test.js` eski domain temizlendi
-- ✅ Kapsamlı inceleme raporu oluşturuldu
-- ✅ `migrations/037_notification_preferences.sql` — tablo oluşturuldu
-- ✅ `customer_portal.rs` TODO'lar kaldırıldı, gerçek DB bağlantısı
-- ✅ `settings/page.tsx` FIXME kaldırıldı, `/portal/notifications` API'ye bağlandı
-- ✅ `db.rs` migration 037 eklendi
-- ✅ `openapi.yaml` — NotificationPreferences schema eklendi
-- ✅ `integration.rs` — +15 yeni test (SSRF, validation, circuit breaker, signing, CSV injection)
+---
 
-### Kalan Servet Görevleri
-- ⚠️ API deploy (GCP Console manuel)
-- ⚠️ iyzico hesap
-- ⚠️ 4 SDK publish (Java, Kotlin, Ruby, Elixir)
+## 🔧 Düzeltilen Sorunlar (Tüm Oturumlar)
+
+### Oturum 28-30 (2026-05-09)
+- ✅ RateLimiter layer sıralaması fix (`4bbd9aa`)
+- ✅ EXTERNAL_TOKENS.md .gitignore'a eklendi (`ca20f17`)
+- ✅ notification_preferences migration (037)
+- ✅ customer_portal.rs TODO → gerçek DB bağlantısı
+- ✅ settings/page.tsx FIXME kaldırıldı
+- ✅ OpenAPI spec güncellendi
+- ✅ +15 integration test eklendi
+- ✅ Dashboard smoke test (6/6)
+- ✅ Go SDK test + Rust SDK test
+- ✅ SDK publish scriptleri (ruby, elixir, java, kotlin)
+- ✅ Local CI script (`scripts/ci-local.sh`)
+- ✅ SDK readme badge'leri
+- ✅ Sessiz hata yutma düzeltildi
+
+### Oturum 20-27 (2026-05-08-09)
+- ✅ Resend → GCloud Gmail API geçişi
+- ✅ 12 test hatası düzeltildi
+- ✅ 52 clippy uyarısı temizlendi
+- ✅ 7 kod kalitesi sorunu düzeltildi
+- ✅ SDK testleri (Node.js 12, Python 12)
+- ✅ events endpoint, test mode, webhook simulator
+- ✅ 7/11 SDK publish edildi
 
 ---
 
-## Son Oturumlar
+## 🚀 Sonraki Adımlar (Öncelik Sırası)
 
-| Oturum | Tarih | Konu |
-|--------|-------|------|
-| 30 | 2026-05-09 18:19 | notification_preferences migration, FIXME, integration test, OpenAPI |
+### Kısa Vadeli (Servet Onayıyla)
+1. API deploy (GCP Console manuel)
+2. 4 SDK publish (Java, Kotlin, Ruby, Elixir — scriptler hazır)
+3. Dashboard iyileştirmeleri (DASHBOARD_ISSUES.md)
+
+### Orta Vadeli
+- Akıllı Alarm sistemi
+- Telegram/Discord Bot
+- Embeddable portal widget iyileştirmesi
+
+### Uzun Vadeli
+- AI Agent katmanı (lab repo)
+- Enterprise özellikler (gRPC, SQS)
+- SOC 2 hazırlık
+
+---
+
+## 📝 Oturum Geçmişi
+
+| # | Tarih | Konu |
+|---|-------|------|
+| 31 | 2026-05-09 18:51 | OpenClaw webchat bağlantı, GitHub hafıza sistemi doğrulama |
+| 30 | 2026-05-09 18:19 | notification_preferences, FIXME, integration test, OpenAPI, test coverage 10/10 |
 | 29 | 2026-05-09 18:00 | Kapsamlı kod tabanlı inceleme, eski domain temizliği |
 | 28 | 2026-05-09 08:26 | RateLimiter fix, kod incelemesi |
 | 27 | 2026-05-09 06:26 | PHP SDK Packagist publish |
 | 26 | 2026-05-09 06:21 | SDK publish rehberi |
 | 24 | 2026-05-09 05:33 | SDK publish tamamlandı (M2) |
+| 20-23 | 2026-05-09 04:28 | Kod incelesi, 52 clippy fix, SDK publish denemeleri |
+| 9-19 | 2026-05-08 | İlk oturumlar, test fix, Gmail API geçişi |
