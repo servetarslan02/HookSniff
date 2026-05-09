@@ -1,8 +1,6 @@
-import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function SecurityPage() {
-  const t = useTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Webhook Security Guide</h1>
@@ -17,7 +15,7 @@ export default function SecurityPage() {
           Every webhook is signed using <strong>Standard Webhooks</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook-signature</code> header.
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Format: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">v1,{base64(hmac_signature)}</code>
+          Format: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">v1,{'{'}base64(hmac_signature){'}'}</code>
         </p>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Node.js Verification</h3>
