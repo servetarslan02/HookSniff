@@ -423,3 +423,278 @@ const OPENAPI_SPEC: &str = include_str!("../../../docs/openapi.yaml");
 ---
 
 *Bu rapor 70,689 satır kodun satır satır incelenmesiyle hazırlanmıştır. Her modül okunmuş, değerlendirilmiş, test edilmiştir.*
+
+---
+
+# 🔄 GÜNCELLEME — Tam İnceleme Sonrası Yeni Bulgular
+
+> Tarih: 2026-05-10 04:39 GMT+8
+> Kapsam: Kalan tüm dosyalar %100 okundu (dashboard sayfaları, testler, i18n, migrations, infra, SDK'lar, deploy, monitoring, scripts, portal, CLI)
+> Okuma oranı: **%100** (~410 dosya)
+
+---
+
+## 📊 Güncellenmiş Skor Kartı
+
+| Kategori | Önceki | Güncel | Değişiklik |
+|----------|--------|--------|------------|
+| **Güvenlik** | 8.5/10 | **6.5/10** | ↓ CSRF eksik, credential leaks, SSRF dashboard'da |
+| **Kod Kalitesi** | 7.5/10 | **7/10** | ↓ Silent error swallowing, dead code |
+| **Test Kapsamı** | 7/10 | **5/10** | ↓ Sıfır güvenlik testi, zayıf test coverage |
+| **Performans** | 7/10 | **7/10** | → Değişmedi |
+| **Güvenilirlik** | 8/10 | **7.5/10** | ↓ Dual migration conflict |
+| **Bakım** | 6.5/10 | **5.5/10** | ↓ hookrelay artıkları, hardcoded values |
+| **i18n** | - | **3/10** | 🆕 6/8 dil <%40 çevrilmiş |
+| **Genel** | **7.4/10** | **6.2/10** | ↓ Detaylı inceleme daha fazla sorun ortaya çıkardı |
+
+---
+
+## 🔴 YENİ KRİTİK SORUNLAR (Detaylı İnceleme Sonrası)
+
+### K8. Dashboard'da `credentials: 'include'` Yanlış Konum
+**Dosya**: `dashboard/src/app/[locale]/dashboard/page.tsx` + api-keys + search
+```typescript
+fetch(url, { headers: { 'Authorization': ..., 'credentials': 'include' } })
+// credentials headers İÇİNDE olmamalı, kardeş key olmalı
+```
+**Doğru**: `fetch(url, { headers: {...}, credentials: 'include' })`
+**Etki**: Auth cookie gönderilmiyor, tüm dashboard sayfaları 401 alabilir.
+
+### K9. 9+ Dashboard Sayfasında Authorization Header Eksik
+**Dosya**: alerts, billing, health, inbound, transforms, analytics, logs, notifications, routing
+**Etki**: API'ye yetkisiz istek, 401 hata.
+
+### K10. Playground'ta Hardcoded Token + SSRF
+**Dosya**: `dashboard/src/app/[locale]/dashboard/playground/page.tsx`
+```typescript
+headers: { 'Authorization': 'Bearer YOUR_TOKEN' }
+// + user-controlled path appended to API base URL
+```
+**Etki**: Token sızıntısı + SSRF riski.
+
+### K11. Admin Sayfalarında Sunucu Tarafı Yetkilendirme Yok
+**Dosya**: 6 admin sayfası (admin/page.tsx, revenue, settings, system, users, users/[id])
+**Etki**: Client-side token kontrolü yeterli değil. Herkes admin API'lerine erişebilir.
+
+### K12. Dual Migration Systems — Çelişki
+**Dosya**: `migrations/` + `api/migrations/`
+**Etki**: Aynı tablolar (customers, endpoints, deliveries) iki farklı yerde farklı schema tanımları. Migration sırası bozulabilir.
+
+### K13. `webhook_queue` Tablosu Tanımsız
+**Dosya**: migrations 010, 011, 012 bu tabloyu refere ediyor ama oluşturma migration'ı yok.
+**Etki**: Tablo yoksa worker çöker.
+
+### K14. Migration Numara Gap: 013-025 Eksik
+**Etki**: Schema completeness doğrulanamıyor.
+
+### K15. Helm `values.yaml` Default Secret'lar
+**Dosya**: `deploy/helm/values.yaml`
+```yaml
+JWT_SECRET: "change-me-in-production"
+HMAC_SECRET: "change-me-in-production"
+```
+**Etki**: Override edilmeden deploy edilirse tüm JWT token'ları forge edilebilir.
+
+### K16. Publish Script'te Credential Leak
+**Dosya**: `scripts/publish-sdks.sh`
+- Maven Central: `username: f0wXBf`, `password: EYLV763IsQVseaffdOXNScf2HZlcLDGEK`
+- Hex.pm: `--key caff94171db7190c24957e07ac3439e1`
+**Etki**: GitHub'da public ise tüm publish hakları çalınabilir.
+
+### K17. Grafana Admin Password Hardcoded
+**Dosya**: `monitoring/docker-compose.monitoring.yml`
+```yaml
+GF_SECURITY_ADMIN_PASSWORD=hooksniff_grafana_change_me
+```
+**Etki**: Repo erişimi olan herkes Grafana admin.
+
+### K18. Polar Product ID'leri Hardcoded
+**Dosya**: `deploy/api-env.yaml`
+**Etki**: Business config source control'de.
+
+---
+
+## 🟡 YENİ ORTA SEVİYE SORUNLAR
+
+### M19. Dashboard'da CSRF Koruması Yok
+Contact, newsletter, playground formlarında CSRF token yok.
+
+### M20. 17/23 Dashboard Sayfası Hatayı Sessizce Yutuyor
+```typescript
+catch {} // boş catch — hata hiçbir yerde gösterilmiyor
+```
+
+### M21. Modal'larda Focus Trapping Yok
+Tüm modal'lar: ESC tuşu, focus trap, `role="dialog"` eksik.
+
+### M22. Erişilebilirlik Eksiklikleri
+- Icon-only butonlarda `aria-label` yok
+- Tıklanabilir satırlar keyboard-navigable değil
+- FAQ accordion'da `aria-expanded` yok
+- Form mesajlarında `role="alert"` yok
+
+### M23. Portal Double-Path Bug
+```javascript
+api("/api/v1/webhooks?limit=50") // API_URL zaten /v1 içeriyor → /v1/api/v1/webhooks
+```
+
+### M24. Swift SDK `@unchecked Sendable`
+Data race riski — mutable state senkronize edilmemiş.
+
+### M25. C# SDK API Key Validation Zayıf
+Sadece `null` kontrolü, boş string geçiyor.
+
+### M26. Elixir SDK `:patch` Method Eksik
+`:httpc` sadece GET/POST/PUT/DELETE handle ediyor, PATCH crash yapar.
+
+### M27. Terraform Provider Çalışmıyor
+Tüm CRUD methodları TODO stub. Kullanıcılar hayal kırıklığına uğrar.
+
+### M28. Helm'de DB Password Inline
+`DATABASE_URL` içinde plaintext password — `kubectl describe` ile görülebilir.
+
+### M29. TOTP Secrets Şifrelenmemiş
+Migration 033'te TOTP secret'ları plaintext olarak saklanıyor.
+
+### M30. Expired Token Temizliği Yok
+Password reset, email verification, refresh token için cleanup job yok.
+
+### M31. i18n: 6/8 Dil <%40 Çevrilmiş
+de, ja, pt-BR, es, fr, ko — neredeyse boş.
+
+### M32. Landing vs Pricing Fiyat Tutarsızlığı
+Landing page: Pro $49/mo, Pricing page: Pro $29/mo.
+
+### M33. ROI Calculator Yanlış Formüller
+Svix/Hookdeck maliyetleri yanlış hesaplanmış.
+
+### M34. 15+ Sayfa Gereksiz Client Component
+Static content `'use client'` ile render ediliyor — SEO ve performans kaybı.
+
+### M35. CORS Duplicate Entry
+`api-env.yaml`'da `hooksniff.vercel.app` iki kez.
+
+### M36. 6/8 i18n Dilinde <%40 Çeviri
+Dashboard çok dilli ama neredeyse sadece EN ve TR çalışır.
+
+---
+
+## 🟢 YENİ İYİ UYGULAMALAR
+
+- ✅ WebhookVerifier'lar tüm SDK'larda constant-time comparison kullanıyor
+- ✅ Changelog sayfası mükemmel OpenGraph desteği
+- ✅ Glossary ve guides sayfaları server component — iyi SEO
+- ✅ k6 load test suite kapsamlı
+- ✅ Grafana dashboard 8 panel ile iyi yapılandırılmış
+- ✅ OpenAPI spec 80KB — kapsamlı
+- ✅ CI/CD pipeline'da security audit var
+- ✅ Portal XSS koruması (DOM text node creation)
+
+---
+
+## 📊 Güncellenmiş Modül Özeti
+
+| Modül | Satır | Dosya | Kritik | Yüksek | Orta | Düşük |
+|-------|-------|-------|--------|--------|------|-------|
+| API Rust | 32,940 | 81 | 5 | 3 | 8 | 5 |
+| Worker Rust | 2,379 | 10 | 2 | 1 | 4 | 2 |
+| Dashboard Sayfalar | 15,000+ | 83 | 4 | 8 | 14 | 18 |
+| Dashboard Test | 8,000+ | 57 | 0 | 2 | 5 | 3 |
+| Dashboard Bileşen | 4,000+ | 19 | 0 | 1 | 3 | 2 |
+| SDK'lar | 8,534 | 52 | 1 | 2 | 5 | 8 |
+| Deploy/Helm | 3,000+ | 20 | 3 | 3 | 4 | 3 |
+| Monitoring | 1,500+ | 7 | 2 | 0 | 1 | 2 |
+| Scripts | 2,000+ | 10 | 2 | 2 | 1 | 2 |
+| Portal | 500+ | 5 | 0 | 2 | 1 | 2 |
+| CLI | 200+ | 2 | 0 | 0 | 2 | 1 |
+| i18n | 5,000+ | 8 | 0 | 0 | 1 | 0 |
+| Migrations | 3,000+ | 24 | 2 | 0 | 2 | 1 |
+| Root Config | 90KB+ | 9 | 1 | 1 | 1 | 0 |
+| Integration Tests | 32KB+ | 10 | 0 | 0 | 0 | 1 |
+| **TOPLAM** | **~70,689** | **~410** | **22** | **25** | **52** | **50** |
+
+---
+
+## 📋 Güncellenmiş Aksiyon Listesi
+
+### 🔴 P0 — Yayından Önce (Zorunlu) — 22 madde
+1. Fiyat düzeltmesi: $29/$99 (billing + admin + landing)
+2. Grafana token kaldır (OTEL config)
+3. Grafana password kaldır (docker-compose.monitoring)
+4. GDPR delete_account eksik tabloları ekle
+5. Config Debug redaction
+6. "hookrelay" → "hooksniff" rename (tüm projede)
+7. Portal API key URL'den kaldır
+8. Admin revenue query fiyatlarını düzelt
+9. `credentials: 'include'` pozisyon düzeltmesi (dashboard fetch)
+10. Authorization header ekle (9+ dashboard sayfası)
+11. Playground hardcoded token + SSRF fix
+12. Admin sayfalarında server-side yetkilendirme ekle
+13. Dual migration conflict çöz
+14. `webhook_queue` tablosu oluştur
+15. Migration gap 013-025 açıkla/doldur
+16. Helm default secret'ları zorunlu kıl
+17. Publish script credential'ları rotate et + kaldır
+18. Polar product ID'leri secret manager'a taşı
+19. TOTP secret'ları şifrele
+20. Portal double-path bug fix
+21. Landing vs pricing fiyat tutarlılığı
+22. CORS duplicate düzelt
+
+### 🟡 P1 — Yayına Yakın — 30 madde
+23. Batch webhook rollback
+24. Auth middleware cache
+25. Worker paralel processing
+26. Response header filtering
+27. Dashboard token refresh
+28. SDK default URL → api.hooksniff.com
+29. Body hash → SHA-256
+30. Deploy hardcoded product ID'leri taşı
+31. Custom header injection blocklist
+32. CSRF koruması (forms)
+33. Silent error handling → user-visible errors
+34. Modal focus trapping + ESC + role="dialog"
+35. Erişilebilirlik (aria-label, keyboard nav, aria-expanded)
+36. Swift SDK Sendable fix
+37. C# SDK API key validation
+38. Elixir SDK :patch method
+39. Terraform provider ya implement et ya kaldır
+40. Helm DB password → Secret reference
+41. Expired token cleanup job
+42. i18n çeviri tamamla (6 dil)
+43. ROI calculator formül düzeltmesi
+44. Client → server component dönüşümü (15+ sayfa)
+45. SDK search API consistency
+46. Helm replica count ayrı ayrı
+47. Redis auth enable
+48. Image tag pinning (latest → version)
+49. Prometheus lifecycle security
+50. Grafana dashboard deleteDeletion → true
+51. k6 Kafka metric verification
+52. Portal README İngilizce çevirisi
+
+### 🟢 P2 — Sonraki Sprint — 20 madde
+53. SDK test ekle (tüm diller)
+54. Dead code temizliği
+55. OpenAPI spec doğrulama
+56. Migration refactor (modüler)
+57. k6 load test çalıştır
+58. Staging ortamı
+59. Security test suite (XSS, CSRF, injection)
+60. Accessibility test suite
+61. Test boilerplate refactor (shared setup)
+62. Structured data (SEO)
+63. CLI test ekle
+64. CLI engines field
+65. Request ID tracking (SDK'lar)
+66. SDK logging support
+67. SDK CancellationToken (C#)
+68. SDK retry logic (C#, PHP)
+69. Portal postMessage (API key)
+70. Portal CSP headers
+71. Backup script hookrelay temizliği
+72. Integration test hookrelay temizliği
+
+---
+
+*Bu güncelleme ~410 dosyanın %100 satır satır okunmasıyla hazırlanmıştır.*
