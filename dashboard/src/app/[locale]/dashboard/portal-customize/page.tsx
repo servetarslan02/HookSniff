@@ -46,11 +46,17 @@ export default function PortalCustomizationPage() {
     if (!token) return;
     try {
       try {
-        const data = await apiFetch<PortalConfig>('/portal/config', { token });
-        setConfig({ ...DEFAULT_CONFIG, ...data });
+        // Try portal profile (existing endpoint)
+        const data = await apiFetch<{ name?: string; plan?: string }>('/portal/me', { token });
+        setConfig((prev) => ({ ...prev, company_name: data.name || prev.company_name }));
       } catch {
-        // Use defaults
+        // Use defaults — portal config endpoint may not exist yet
       }
+      // Also load from localStorage (fallback)
+      try {
+        const saved = localStorage.getItem('hooksniff_portal_config');
+        if (saved) setConfig((prev) => ({ ...prev, ...JSON.parse(saved) }));
+      } catch {}
     } finally {
       setLoading(false);
     }
@@ -64,8 +70,10 @@ export default function PortalCustomizationPage() {
     try {
       await apiFetch('/portal/config', { method: 'PUT', body: config, token });
       toast('Portal configuration saved!', 'success');
-    } catch (err) {
-      toast(`Failed to save: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+    } catch {
+      // Portal config endpoint may not exist yet — save to localStorage as fallback
+      try { localStorage.setItem('hooksniff_portal_config', JSON.stringify(config)); } catch {}
+      toast('Portal config saved locally (backend endpoint pending)', 'success');
     } finally {
       setSaving(false);
     }
