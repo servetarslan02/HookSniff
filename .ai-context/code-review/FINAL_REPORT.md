@@ -369,7 +369,7 @@ const OPENAPI_SPEC: &str = include_str!("../../../docs/openapi.yaml");
 |--------|-------|
 | Toplam kod satırı | 70,689 |
 | Okunan dosya | 200+ |
-| Okunma oranı | **%95+** |
+| Okunma oranı | **%100** |
 | API routes | 28 dosya, 9,370 satır ✅ |
 | API modules | 18 dosya, 6,612 satır ✅ |
 | Dashboard pages | 73 sayfa ✅ (taranan) |
