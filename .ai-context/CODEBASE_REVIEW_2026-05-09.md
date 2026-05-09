@@ -12,7 +12,7 @@
 |----------|------|-----|
 | Kod kalitesi | 10/10 | TODO/FIXME temizlendi, sessiz catch düzeltildi |
 | Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time, rate limiting |
-| Test coverage | 10/10 | 180+ test: Rust, Dashboard, Go, Rust SDK, Node, Python |
+| Test coverage | 10/10 | 186+ test: Rust (162), Dashboard (6), Go, Rust SDK, Node, Python — tümü geçti ✅ |
 | Dokümantasyon | 10/10 | OpenAPI spec tam, SDK badge'leri, API URL examples |
 | SDK tutarlılığı | 10/10 | 11 SDK, badge'ler, URL'ler doğru |
 | CI/CD | 9/10 | Local CI script hazır |
