@@ -20,6 +20,18 @@
 10. [Risk Analizi](#10-risk-analizi)
 11. [Uygulama Planı](#11-uygulama-planı)
 12. [Maliyet Projeksiyonu](#12-maliyet-projeksiyonu)
+13. [Incident Communication Templates](#13-incident-communication-templates)
+14. [DNS ve Domain Kurulumu](#14-dns-ve-domain-kurulumu)
+15. [Dashboard Entegrasyonu](#15-dashboard-entegrasyonu)
+16. [Discord Alert Entegrasyonu](#16-discord-alert-entegrasyonu)
+17. [Backup Monitoring Planı](#17-backup-monitoring-planı)
+18. [GDPR ve Veri Güvenliği](#18-gdpr-ve-veri-güvenliği)
+19. [Incident Response Workflow](#19-incident-response-workflow)
+20. [Test ve Validation Planı](#20-test-ve-validation-planı)
+21. [Status Page KPIları](#21-status-page-kpıları)
+22. [Periyodik Review Planı](#22-periyodik-review-planı)
+11. [Uygulama Planı](#11-uygulama-planı)
+12. [Maliyet Projeksiyonu](#12-maliyet-projeksiyonu)
 
 ---
 
@@ -538,6 +550,685 @@ Better Stack için "down" sayılacak durumlar:
 | Better Stack White-label | $208/ay | Beyaz etiketli status page |
 | SMS Alert | $0 (dahil) | Telefon bildirimi |
 | **Toplam** | **$220+/ay** | |
+
+---
+
+## 13. Incident Communication Templates
+
+### 13.1 Incident Severity Levels
+
+| Seviye | Tanım | Örnek | Müdahale Süresi | Bildirim |
+|--------|-------|-------|-----------------|----------|
+| **P1 — Critical** | Servis tamamen kullanılamıyor | API down, DB down, tüm webhook'lar başarısız | 15 dk | Email + Discord + SMS |
+| **P2 — Major** | Servis kısmen çalışıyor | Yüksek latency, bazı webhook'lar başarısız, Worker degraded | 30 dk | Email + Discord |
+| **P3 — Minor** | Küçük etki | Tek endpoint yavaş, UI hatası, raporlama gecikmesi | 2 saat | Discord |
+| **P4 — Info** | Bilgilendirme | Planlı bakım, scheduled maintenance | 24 saat | Status page |
+
+### 13.2 Incident Lifecycle Template
+
+Her incident 4 aşamadan geçer:
+
+```
+[Investigating] → [Identified] → [Monitoring] → [Resolved]
+```
+
+### 13.3 Incident Mesaj Şablonları
+
+**Aşama 1: Investigating (Araştırılıyor)**
+
+```
+🔴 [P1] HookSniff API — Service Disruption
+
+Durum: Investigating
+Etkilenen servis: API, Worker
+Etki: Webhook teslimatları geçici olarak durdu
+Başlangıç: [YYYY-MM-DD HH:MM UTC]
+
+Ekibimiz sorunu araştırıyor. Güncellemeleri buradan paylaşacağız.
+
+Özür dileriz, en kısa sürede çözeceğiz.
+```
+
+**Aşama 2: Identified (Tespit Edildi)**
+
+```
+🟡 [P1] HookSniff API — Issue Identified
+
+Durum: Identified
+Neden: [Kısa açıklama — örn: "Database bağlantı havuzu tükendi"]
+Etkilenen servis: API, Worker
+Başlangıç: [YYYY-MM-DD HH:MM UTC]
+
+Sorun tespit edildi, düzeltme üzerinde çalışılıyor.
+Tahmini çözüm süresi: [X] dakika.
+```
+
+**Aşama 3: Monitoring (İzleniyor)**
+
+```
+🟢 [P1] HookSniff API — Fix Deployed, Monitoring
+
+Durum: Monitoring
+Çözüm: [Kısa açıklama — örn: "Bağlantı havuzu artırıldı, yeniden başlatıldı"]
+Başlangıç: [YYYY-MM-DD HH:MM UTC]
+Çözüm: [YYYY-MM-DD HH:MM UTC]
+
+Düzeltme uygulandı. Servis normale döndü, izlemeye devam ediyoruz.
+Bir sorun yaşarsanız lütfen bildirin.
+```
+
+**Aşama 4: Resolved (Çözüldü)**
+
+```
+✅ [P1] HookSniff API — Resolved
+
+Durum: Resolved
+Neden: [Kısa açıklama]
+Süre: [X] dakika
+Başlangıç: [YYYY-MM-DD HH:MM UTC]
+Çözüm: [YYYY-MM-DD HH:MM UTC]
+
+Sorun çözüldü, tüm servisler normal çalışıyor.
+Post-mortem raporu 48 saat içinde paylaşılacak.
+```
+
+### 13.4 Türkçe Şablonlar
+
+**Investigating (TR):**
+```
+🔴 HookSniff API — Servis Kesintisi
+
+Durum: Araştırılıyor
+Etkilenen servis: API
+Başlangıç: [YYYY-MM-DD HH:MM UTC]
+
+Ekibimiz sorunu araştırıyor. Güncellemeleri buradan paylaşacağız.
+```
+
+**Resolved (TR):**
+```
+✅ HookSniff API — Çözüldü
+
+Durum: Çözüldü
+Süre: [X] dakika
+Başlangıç: [YYYY-MM-DD HH:MM UTC]
+Çözüm: [YYYY-MM-DD HH:MM UTC]
+
+Sorun çözüldü, tüm servisler normal çalışıyor.
+```
+
+### 13.5 Planlı Bakım Şablonu
+
+```
+🔧 Planned Maintenance — HookSniff API
+
+Tarih: [YYYY-MM-DD]
+Saat: [HH:MM - HH:MM UTC]
+Etkilenen servis: [API / Dashboard / Worker]
+Etki: [Kısmi kesinti / Tam kesinti / Gecikme]
+
+Bu bakım [neden] için yapılacaktır.
+Müşterilerimiz etkilenmeyecektir / kısa süreli kesinti yaşanacaktır.
+
+Sorularınız için: support@hooksniff.com
+```
+
+---
+
+## 14. DNS ve Domain Kurulumu
+
+### 14.1 status.hooksniff.com Kurulumu
+
+**Adım 1: Domain Satın Alma (eğer yoksa)**
+- Cloudflare Registrar: `hooksniff.com` → ~$12/yıl
+- Alternatif: `hooksniff.dev` → ~$12/yıl
+
+**Adım 2: Cloudflare DNS Ayarları**
+
+| Tip | Name | Target | Proxy |
+|-----|------|--------|-------|
+| CNAME | `status` | `cname.betterstack.com` | DNS only (gri bulut) |
+
+**Adım 3: Better Stack'te Custom Domain**
+1. Better Stack → Status Pages → Settings → Custom Domain
+2. `status.hooksniff.com` yaz
+3. Better Stack DNS doğrulamasını bekler (5-15 dk)
+4. SSL otomatik oluşturulur (Let's Encrypt)
+
+**Adım 4: Landing Page Linkini Güncelle**
+- `hooksniff.vercel.app/en/status` → `status.hooksniff.com` olarak değiştir
+- Footer'daki "Status" linki de güncellenmeli
+
+### 14.2 SSL Durumu
+
+| Konu | Durum |
+|------|-------|
+| SSL sertifikası | Better Stack otomatik oluşturur (Let's Encrypt) |
+| HTTPS zorlaması | Evet, HTTP → HTTPS redirect |
+| Certificate renewal | Otomatik |
+| Wildcard | Hayır, sadece `status.hooksniff.com` |
+
+### 14.3 Vercel Custom Domain (Opsiyonel)
+
+Eğer `hooksniff.com` alınırsa dashboard için de custom domain:
+1. Vercel → Project → Settings → Domains
+2. `hooksniff.com` ekle
+3. Cloudflare'de CNAME → `cname.vercel-dns.com`
+4. Dashboard: `hooksniff.com` (ana domain)
+5. API: `api.hooksniff.com` → Cloud Run custom domain mapping
+
+---
+
+## 15. Dashboard Entegrasyonu
+
+### 15.1 Mevcut Durum
+
+Dashboard'da `/en/status` sayfası var ama sadece kendi API'sinden veri çekiyor. API çökünce "API server unreachable" gösteriyor.
+
+### 15.2 Çözüm: Hybrid Status Gösterimi
+
+İki kaynaktan veri birleştirilecek:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ 🪝 HookSniff Status                                     │
+│                                                         │
+│ External Monitor (Better Stack)                         │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ ✅ All systems operational                           │ │
+│ │ Son kontrol: 2 dk önce                               │ │
+│ │ [status.hooksniff.com'da görüntüle →]               │ │
+│ └─────────────────────────────────────────────────────┘ │
+│                                                         │
+│ Internal Health (Kendi API'miz)                         │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ API     ✅ Healthy    12ms                          │ │
+│ │ Database ✅ Healthy    8ms                           │ │
+│ │ Redis   ✅ Healthy    3ms                           │ │
+│ │ Worker  ✅ Healthy    —                             │ │
+│ └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 15.3 Real-time Status Banner
+
+Dashboard'ın en üstünde sürekli görünen banner:
+
+```tsx
+// Dashboard layout'unda eklenecek
+{status === 'down' && (
+  <div className="bg-red-600 text-white px-4 py-2 text-center text-sm">
+    ⚠️ Some services are experiencing issues. 
+    <a href="https://status.hooksniff.com" className="underline ml-1">View status page →</a>
+  </div>
+)}
+{status === 'degraded' && (
+  <div className="bg-yellow-600 text-white px-4 py-2 text-center text-sm">
+    ⚡ Some services are running slower than usual.
+    <a href="https://status.hooksniff.com" className="underline ml-1">View status page →</a>
+  </div>
+)}
+```
+
+### 15.4 Polling Stratejisi
+
+| Durum | Polling Sıklığı | Neden |
+|-------|----------------|-------|
+| Normal (operational) | 5 dk | API yükünü azalt |
+| Degraded | 1 dk | Daha sık kontrol |
+| Down | 30 sn | Hızlı recovery tespiti |
+| Kullanıcı sayfayı açtığında | Anında | İlk yükleme |
+
+### 15.5 Fallback Davranışı
+
+API'ye bağlanılamazsa:
+1. Kullanıcıya "External status: check status.hooksniff.com" göster
+2. Better Stack embed widget'ı kullan (API'ye ihtiyaç duymaz)
+3. Son bilinen durumu localStorage'dan göster + "Son güncelleme: X dk önce"
+
+---
+
+## 16. Discord Alert Entegrasyonu
+
+### 16.1 Discord Webhook Oluşturma
+
+1. Discord → Sunucu Ayarları → Entegrasyonlar → Webhook'lar
+2. "Yeni Webhook" tıkla
+3. İsim: `HookSniff Alerts`
+4. Kanal: `#alerts` (önceden oluşturulmalı)
+5. Webhook URL'sini kopyala
+6. Better Stack'te Alert Channels → Discord → URL'yi yapıştır
+
+### 16.2 Discord Kanal Yapısı
+
+```
+🪝 HookSniff Discord
+
+📁 Monitoring
+  #alerts — Otomatik incident bildirimleri (sadece bot yazar)
+  #status-updates — Incident update'leri (sadece bot yazar)
+  #monitoring-log — Tüm health check logları (opsiyonel, verbose)
+
+📁 Destek
+  #destek — Kullanıcı soruları
+```
+
+### 16.3 Discord Embed Formatı
+
+Better Stack'in gönderdiği Discord mesajı:
+
+```
+┌─────────────────────────────────────────┐
+│ 🔴 HookSniff API is DOWN               │
+│                                         │
+│ Status: DOWN                            │
+│ Started: 2026-05-09 23:15 UTC           │
+│ Duration: 5 minutes                     │
+│                                         │
+│ Affected: API, Worker                   │
+│ Region: europe-west1                    │
+│                                         │
+│ [View Status Page] [View Incident]      │
+└─────────────────────────────────────────┘
+```
+
+### 16.4 Alert Filtreleme
+
+| Durum | Discord'a gönder? | Neden |
+|-------|-------------------|-------|
+| DOWN (ilk tespit) | ✅ Evet | Acil müdahale |
+| DOWN (devam ediyor) | ❌ Hayır | Spam önleme (15 dk'da bir hatırlatma) |
+| DEGRADED | ✅ Evet | Bilgilendirme |
+| RECOVERED | ✅ Evet | Rahatlama |
+| SSL expiration warning | ✅ Evet | 7 gün kala |
+| Domain expiration warning | ✅ Evet | 30 gün kala |
+
+### 16.5 Better Stack Discord Ayarları
+
+Better Stack → Alert Channels → Discord:
+1. Webhook URL yapıştır
+2. "Send on incident start" → ✅
+3. "Send on incident update" → ✅
+4. "Send on incident resolve" → ✅
+5. "Send degraded alerts" → ✅ (opsiyonel)
+
+---
+
+## 17. Backup Monitoring Planı
+
+### 17.1 Neden Backup Gerekli?
+
+| Senaryo | Olasılık | Etki |
+|---------|----------|------|
+| Better Stack'in kendisi çöker | Düşük | HookSniff down ama haber veren yok |
+| Better Stack false positive | Orta | Gereksiz alarm, alert fatigue |
+| Better Stack free tier kaldırır | Düşük | Monitoring kaybolur |
+| Network partitioning | Düşük | Better Stack HookSniff'e ulaşamıyor ama servis çalışıyor |
+
+### 17.2 Backup Çözüm: Upptime (GitHub Actions)
+
+**Neden Upptime?**
+- $0 (GitHub free tier)
+- Better Stack ile bağımsız
+- GitHub Actions ile 5 dk'da bir kontrol
+- GitHub Pages'de status page
+- Sıfır bakım
+
+**Kurulum:**
+1. GitHub'da `servetarslan02/hooksniff-status` repo oluştur
+2. Upptime template kullan: `upptime/upptime.js.org`
+3. `.upptimerc.yml` yapılandır:
+
+```yaml
+owner: servetarslan02
+repo: hooksniff-status
+statusWebsite: https://servetarslan02.github.io/hooksniff-status
+sites:
+  - name: HookSniff API
+    url: https://hooksniff-api-1046140057667.europe-west1.run.app/v1/status
+    expectedStatusCodes: [200]
+  - name: HookSniff Dashboard
+    url: https://hooksniff.vercel.app
+    expectedStatusCodes: [200]
+  - name: HookSniff Worker
+    url: https://hooksniff-worker-1046140057667.europe-west1.run.app/health
+    expectedStatusCodes: [200]
+```
+
+4. GitHub Actions otomatik çalışır
+5. Status page: `servetarslan02.github.io/hooksniff-status`
+
+### 17.3 Backup Alert Mekanizması
+
+| Kaynak | Alert | Kanal |
+|--------|-------|-------|
+| Better Stack (primary) | Email + Discord | Servet + #alerts |
+| Upptime (backup) | GitHub Issues | Servet GitHub notifications |
+| Kendi sisteminiz | Dashboard banner | Kullanıcılar |
+
+### 17.4 False Positive Azaltma
+
+| Yöntem | Açıklama |
+|--------|----------|
+| 3 consecutive failure | Tek seferlik timeout = alarm değil, 3 üst üste = alarm |
+| Multi-region check | Farklı lokasyonlardan kontrol (Better Stack paid) |
+| Confirmation check | İlk failure → 30 sn bekle → ikinci kontrol → hâlâ failure ise alarm |
+| Maintenance window | Planlı bakım sırasında alertleri sustur |
+
+---
+
+## 18. GDPR ve Veri Güvenliği
+
+### 18.1 Better Stack ve Veri Konumu
+
+| Konu | Durum |
+|------|-------|
+| Better Stack merkezi | ABD |
+| Veri depolama | ABD (varsayılan), EU opsiyonu var (paid) |
+| Health check logları | IP adresi içermez, sadece HTTP response |
+| Status page subscriber email'leri | Better Stack'te depolanır |
+
+### 18.2 Health Check Logları Kişisel Veri mi?
+
+| Veri | Kişisel Veri mi? | Açıklama |
+|------|-------------------|----------|
+| HTTP status code | ❌ Hayır | Servis durumu |
+| Response time | ❌ Hayır | Performans metriği |
+| Response body | ⚠️ Dikkat | Hata mesajı kullanıcı bilgisi içerebilir |
+| IP adresi | ✅ Evet | Eğer loglanıyorsa |
+| Subscriber email | ✅ Evet | Kullanıcı email'i |
+
+### 18.3 Sub-processor Listesine Ekleme
+
+Better Stack sub-processor listesine eklenmeli:
+
+| Servis | Amaç | Konum |
+|--------|------|-------|
+| Better Stack | Uptime monitoring, status page | ABD |
+
+Bu bilgi Privacy Policy'de ve DPA'da yer almalı.
+
+### 18.4 KVKK Uyumu
+
+| Konu | Durum | Aksiyon |
+|------|-------|---------|
+| Status page subscriber email'leri | Kişisel veri | Privacy Policy'de belirt |
+| Health check logları | Kişisel veri değil | Aksiyon gerekmez |
+| Incident history | Kişisel veri değil | Aksiyon gerekmez |
+| Better Stack EU hosting | Paid plan | Gerekirse geç |
+
+### 18.5 Veri Minimizasyonu
+
+| İlke | Uygulama |
+|------|----------|
+| Sadece gerekli veri | IP loglama yok, sadece HTTP response |
+| Retention süresi | Better Stack free: 30 gün log, 1 yıl incident |
+| Subscriber verisi | Email dışında bilgi toplama |
+| Right to erasure | Subscriber email silme prosedürü |
+
+---
+
+## 19. Incident Response Workflow
+
+### 19.1 Genel Akış
+
+```
+Alert gelir
+    │
+    ▼
+[1. Severity Belirle] ──── P1/P2/P3/P4
+    │
+    ▼
+[2. Etki Değerlendir] ──── Kaç kullanıcı etkileniyor?
+    │
+    ├── P1/P2 → [3. Hemen Müdahale]
+    │           │
+    │           ▼
+    │     [4. Teşhis] ──── Logları kontrol et, nedeni bul
+    │           │
+    │           ▼
+    │     [5. Düzelt] ──── Fix uygula, deploy et
+    │           │
+    │           ▼
+    │     [6. Status Page Update] ──── Incident mesajı yaz
+    │           │
+    │           ▼
+    │     [7. İzle] ──── Servis normale döndü mü?
+    │           │
+    │           ├── Evet → [8. Resolve] ──── "Resolved" mesajı
+    │           └── Hayır → [5]'e dön
+    │
+    └── P3/P4 → [9. Kayıt] ──── Jira/GitHub Issue oluştur
+                    │
+                    ▼
+              [10. Planla] ──── Bir sonraki sprint'te çöz
+```
+
+### 19.2 P1 Incident Checklist (API Down)
+
+```
+□ Alert geldi mi? → Discord/Email kontrol et
+□ Gerçekten down mu? → curl ile API'yi test et
+□ Status page'de "Investigating" mesajı yaz
+□ Logları kontrol et → Cloud Run logs, Neon logs
+□ Nedeni tespit et → DB connection? Memory? CPU?
+□ Fix uygula → Restart? Scale up? Config change?
+□ Status page'de "Identified" mesajı yaz
+□ Deploy sonrası izle → 5 dk bekle
+□ Normale döndü mü? → Evetse "Resolved" yaz
+□ Post-mortem yaz → 48 saat içinde
+```
+
+### 19.3 Post-Mortem Template
+
+```
+# Incident Post-Mortem — [Tarih]
+
+## Özet
+- Başlangıç: [YYYY-MM-DD HH:MM UTC]
+- Bitiş: [YYYY-MM-DD HH:MM UTC]
+- Süre: [X] dakika
+- Severity: P1/P2/P3/P4
+- Etkilenen servisler: [API, Worker, DB, Redis]
+
+## Ne oldu?
+[Kısa açıklama]
+
+## Neden oldu?
+[Kök neden analizi]
+
+## Nasıl tespit ettik?
+[Alert mekanizması, manuel tespit]
+
+## Nasıl çözdük?
+[Adım adım çözüm]
+
+## Ne öğrendik?
+[Dersler, gelecek önlemler]
+
+## Aksiyonlar
+- [ ] [Aksiyon 1]
+- [ ] [Aksiyon 2]
+- [ ] [Aksiyon 3]
+```
+
+### 19.4 Müşteri İletişimi
+
+**P1/P2 incident sonrası müşteriye email:**
+
+```
+Konu: HookSniff Service Incident — [Tarih]
+
+Merhaba,
+
+[Tarih] tarihinde [saat] UTC'de [X] dakika süren bir servis kesintisi yaşadık.
+
+Etkilenen servis: [API / Worker / DB]
+Etki: [Webhook teslimatları geçici olarak durdu / Yükseltilmiş gecikme]
+Neden: [Kısa açıklama]
+Çözüm: [Ne yaptık]
+Önlem: [Gelecekte nasıl önleyeceğiz]
+
+Bu kesintiden etkilenen tüm müşterilerimizden özür dileriz.
+
+Detaylı post-mortem raporu: [link]
+
+Saygılarımızla,
+HookSniff Ekibi
+```
+
+---
+
+## 20. Test ve Validation Planı
+
+### 20.1 Better Stack Kurulum Testi
+
+| Test | Nasıl | Beklenen Sonuç |
+|------|-------|-----------------|
+| Monitor oluşturma | 5 monitor ekle | Hepsi "Pending" → "Up" |
+| Health check | API'ye manuel curl | 200 OK döner |
+| Alert tetikleme | API'yi durdur (test ortamı) | Email + Discord alert gelir |
+| Recovery | API'yi başlat | "Resolved" alert gelir |
+| Status page | URL'yi aç | Servis durumları doğru gösterilir |
+| Subscriber | Email ile abone ol | Confirm email gelir |
+| Custom domain | `status.hooksniff.com` | Sayfa yüklenir, SSL çalışır |
+
+### 20.2 False Positive Testleri
+
+| Test | Nasıl | Beklenen Sonuç |
+|------|-------|-----------------|
+| Kısa timeout | API 35 sn yavaş yanıt versin | Alert gelmemeli (3 dk check) |
+| Tek seferlik hata | API 1 kez 503 döndürsün | Alert gelmemeli (3 consecutive) |
+| DNS glitch | Kısa DNS kesintisi | Alert gelmemeli |
+| Deploy sırasında | Yeni sürüm deploy edilirken | Alert gelmemeli (maintenance window) |
+
+### 20.3 Maintenance Window Testi
+
+| Test | Nasıl | Beklenen Sonuç |
+|------|-------|-----------------|
+| Planlı bakım | Better Stack'te maintenance oluştur | Alert'ler susturulur |
+| Bakım bitişi | Maintenance'i bitir | Monitoring devam eder |
+| Bakım uzatma | Süreyi uzat | Alert'ler hâlâ susturulur |
+
+### 20.4 Dry Run Senaryosu
+
+**Senaryo: API kasıtlı olarak kapatılır**
+
+1. Better Stack'te maintenance window oluştur (test)
+2. Cloud Run'da API servisini durdur
+3. Better Stack'in tespit etmesini bekle (3 dk)
+4. Email + Discord alert'in geldiğini doğrula
+5. Status page'de "Down" gösterildiğini doğrula
+6. API'yi başlat
+7. "Resolved" alert'in geldiğini doğrula
+8. Maintenance window'ı kapat
+
+**Süre:** ~15 dk
+**Ne sıklıkla:** İlk kurulumda 1 kez, sonra ayda 1 kez
+
+---
+
+## 21. Status Page KPIları
+
+### 21.1 Status Page Performans Metrikleri
+
+| KPI | Tanım | Hedef | Nasıl Ölçülür |
+|-----|-------|-------|---------------|
+| **Uptime Detection Time** | Down olayının tespit süresi | < 5 dk | Better Stack logs |
+| **MTTA (Mean Time to Acknowledge)** | Alert'ten ilk müdahaleye | < 15 dk (P1) | Incident logları |
+| **MTTR (Mean Time to Resolve)** | Alert'ten çözüme | < 60 dk (P1) | Incident logları |
+| **False Positive Rate** | Yanlış alarm oranı | < %5 | Aylık review |
+| **Status Page Uptime** | Status page'in kendisi | %99.99 | Upptime backup |
+| **Subscriber Growth** | Abone artışı | Ayda +20 | Better Stack dashboard |
+
+### 21.2 Kullanıcı Davranış Metrikleri
+
+| KPI | Tanım | Hedef | Nasıl Ölçülür |
+|-----|-------|-------|---------------|
+| **Status Page Visits** | Aylık ziyaretçi | Takip | Google Analytics |
+| **Subscriber Count** | Email abonesi | 100+ (6. ay) | Better Stack |
+| **Incident Page Views** | Incident detay görüntüleme | Takip | Better Stack |
+| **Self-service Rate** | Kullanıcı kendi kontrol ediyor | > %80 | Status page visit / support ticket |
+
+### 21.3 Aylık Review Template
+
+```
+# Status Page Aylık Review — [Ay/Yıl]
+
+## Metrikler
+- Toplam incident: [X]
+- P1: [X], P2: [X], P3: [X], P4: [X]
+- Ortalama MTTA: [X] dk
+- Ortalama MTTR: [X] dk
+- False positive: [X]
+- Status page ziyaretçi: [X]
+- Yeni subscriber: [X]
+
+## SLA Compliance
+- Hedef SLA: %99.[X]
+- Gerçekleşen: %99.[X]
+- SLA breach: [X] kez
+
+## Incident Özeti
+| # | Tarih | Severity | Süre | Neden |
+|---|-------|----------|------|-------|
+| 1 | ... | P1 | 15 dk | DB connection pool |
+
+## Aksiyonlar
+- [ ] [Aksiyon 1]
+- [ ] [Aksiyon 2]
+```
+
+---
+
+## 22. Periyodik Review Planı
+
+### 22.1 Günlük (Otomatik)
+
+| Kontrol | Sorumlu | Süre |
+|---------|---------|------|
+| Better Stack status check | Otomatik (3 dk) | 0 dk |
+| Discord alert kontrolü | Servet (sabah) | 2 dk |
+| Status page ziyaretçi | Otomatik | 0 dk |
+
+### 22.2 Haftalık
+
+| Kontrol | Sorumlu | Süre |
+|---------|---------|------|
+| Incident review (varsa) | Servet | 10 dk |
+| False positive kontrolü | Servet | 5 dk |
+| Alert tuning (çok mu az?) | Servet | 5 dk |
+| Backup monitoring kontrolü | Servet | 5 dk |
+
+### 22.3 Aylık
+
+| Kontrol | Sorumlu | Süre |
+|---------|---------|------|
+| SLA compliance raporu | Servet | 15 dk |
+| Status page KPI review | Servet | 10 dk |
+| Subscriber growth analizi | Servet | 5 dk |
+| Incident post-mortem review | Servet | 10 dk |
+| Alert kanalı testi | Servet | 5 dk |
+| Backup monitoring testi | Servet | 5 dk |
+
+### 22.4 Üç Aylık
+
+| Kontrol | Sorumlu | Süre |
+|---------|---------|------|
+| Araç karşılaştırma (yeni alternatif?) | Servet | 30 dk |
+| Fiyat/performans değerlendirmesi | Servet | 15 dk |
+| Plan yükseltme kararı | Servet | 10 dk |
+| GDPR/KVKK uyumluluk kontrolü | Servet | 15 dk |
+| Incident response drill (dry run) | Servet | 30 dk |
+
+### 22.5 Review Takvimi
+
+| Hafta | Gün | Aktivite |
+|-------|-----|----------|
+| Her hafta | Pazartesi | Haftalık review |
+| Her ay | 1'i | Aylık review |
+| Her 3 ay | 1'i | Üç aylık review + drill |
+| Her yıl | 1 Ocak | Yıllık strateji değerlendirmesi
 
 ---
 
