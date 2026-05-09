@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 18:51 GMT+8
+> Son güncelleme: 2026-05-09 19:45 GMT+8
 
 ---
 
@@ -30,7 +30,7 @@ RateLimiter fix push edildi (`4bbd9aa`) ama Cloud Run'a deploy edilemedi.
 | API | ⚠️ Deploy bekliyor | RateLimiter fix push edildi |
 | Worker | ✅ Deployed | GCP Cloud Run |
 | Neon DB | ✅ Çalışıyor | 43 tablo, 35ms latency |
-| 11 SDK | 7/11 yayınlandı | 4 SDK publish scriptleri hazır |
+| 11 SDK | 8/11 yayınlandı | Elixir hex.pm'e yüklendi (Oturum 32) |
 | CI | ✅ Local CI | `scripts/ci-local.sh` |
 | Test | ✅ 186+ test tümü geçti | Rust (162), Dashboard (6), Go, Rust SDK, Node, Python |
 

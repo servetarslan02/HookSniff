@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 18:51 GMT+8
+> Son güncelleme: 2026-05-09 19:45 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -55,7 +55,7 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## 📦 SDK DURUMU (7/11 Yayınlandı)
+## 📦 SDK DURUMU (8/11 Yayınlandı)
 
 | SDK | Platform | Durum | Base URL |
 |-----|----------|-------|----------|
@@ -66,10 +66,10 @@ cd dashboard && npm install && npm run build
 | Go | pkg.go.dev | ✅ `v0.1.0` tag | ✅ GCP Cloud Run |
 | Swift | Swift Package Index | ✅ `v0.1.0` tag | ✅ GCP Cloud Run |
 | PHP | Packagist | ✅ `hooksniff/hooksniff-php` | ✅ GCP Cloud Run |
-| Java | Maven Central | ⏳ GPG key bekliyor | ✅ GCP Cloud Run |
-| Kotlin | Maven Central | ⏳ Gradle wrapper gerekli | ✅ GCP Cloud Run |
-| Ruby | RubyGems | ⏳ `gem push` | ✅ GCP Cloud Run |
-| Elixir | Hex.pm | ⏳ `mix hex.publish` | ✅ GCP Cloud Run |
+| Elixir | Hex.pm | ✅ `hooksniff 0.2.0` (Oturum 32) | ✅ GCP Cloud Run |
+| Java | Maven Central | ❌ GPG key + versiyon conflict | ✅ GCP Cloud Run |
+| Kotlin | Maven Central | ❌ GPG imza gerekli | ✅ GCP Cloud Run |
+| Ruby | RubyGems | ❌ MFA (WebAuthn) gerekli | ✅ GCP Cloud Run |
 
 ---
 
@@ -86,7 +86,7 @@ cd dashboard && npm install && npm run build
 |-------|-------|------|
 | API deploy (GCP Console) | 🔴 ACİL | RateLimiter fix deploy edilmeli |
 | iyzico hesap | ❌ | Vergi levhası + banka hesabı |
-| Java/Kotlin/Ruby/Elixir SDK publish | ⏳ | Servet'in local bilgisayarında (scriptler hazır) |
+| Java/Kotlin/Ruby SDK publish | ⏳ | GPG key + MFA gerekli (scriptler hazır) |
 | npm token rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
 | GCP SA key rotate | ⚠️ | Eski key paylaşıldı, yeni key oluştur |
 | GitHub PAT rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
@@ -158,6 +158,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 32 | 2026-05-09 18:57 | SDK build & publish — Elixir hex.pm'e yüklendi (8/11) |
 | 31 | 2026-05-09 18:51 | OpenClaw webchat bağlantı, GitHub hafıza sistemi doğrulama |
 | 30 | 2026-05-09 18:19 | notification_preferences, FIXME, integration test, OpenAPI, test coverage 10/10 |
 | 29 | 2026-05-09 18:00 | Kapsamlı kod tabanlı inceleme, eski domain temizliği |
