@@ -1,0 +1,61 @@
+[
+  {
+    "id": "inc-2026-04-25-001",
+    "title": "Elevated API Latency",
+    "status": "resolved",
+    "severity": "minor",
+    "created_at": "2026-03-25T14:30:00Z",
+    "resolved_at": "2026-03-25T16:45:00Z",
+    "affected_components": ["API"],
+    "updates": [
+      { "time": "2026-03-25T14:30:00Z", "message": "Investigating elevated response times on the API endpoint.", "status": "investigating" },
+      { "time": "2026-03-25T15:10:00Z", "message": "Identified root cause: Cloud Run instance scaling delay under traffic spike.", "status": "identified" },
+      { "time": "2026-03-25T15:45:00Z", "message": "Deployed fix with increased min instances. Monitoring.", "status": "monitoring" },
+      { "time": "2026-03-25T16:45:00Z", "message": "Latency returned to normal levels. Resolved.", "status": "resolved" }
+    ]
+  },
+  {
+    "id": "inc-2026-04-10-001",
+    "title": "Email Delivery Delays",
+    "status": "resolved",
+    "severity": "minor",
+    "created_at": "2026-04-10T09:15:00Z",
+    "resolved_at": "2026-04-10T11:30:00Z",
+    "affected_components": ["Email Service"],
+    "updates": [
+      { "time": "2026-04-10T09:15:00Z", "message": "Users reporting delayed webhook delivery notifications.", "status": "investigating" },
+      { "time": "2026-04-10T09:45:00Z", "message": "Gmail API rate limits being hit. Implementing backoff.", "status": "identified" },
+      { "time": "2026-04-10T10:30:00Z", "message": "Queue draining. Monitoring delivery times.", "status": "monitoring" },
+      { "time": "2026-04-10T11:30:00Z", "message": "All emails delivered. Added rate limit protection.", "status": "resolved" }
+    ]
+  },
+  {
+    "id": "inc-2026-04-25-002",
+    "title": "Database Connection Pool Exhaustion",
+    "status": "resolved",
+    "severity": "major",
+    "created_at": "2026-04-25T03:20:00Z",
+    "resolved_at": "2026-04-25T05:10:00Z",
+    "affected_components": ["Database", "API"],
+    "updates": [
+      { "time": "2026-04-25T03:20:00Z", "message": "API returning 503 errors. Investigating.", "status": "investigating" },
+      { "time": "2026-04-25T03:40:00Z", "message": "Neon database connection pool exhausted. Scaling up.", "status": "identified" },
+      { "time": "2026-04-25T04:15:00Z", "message": "Connection pool resized. Services recovering.", "status": "monitoring" },
+      { "time": "2026-04-25T05:10:00Z", "message": "All systems nominal. Connection pooling improved.", "status": "resolved" }
+    ]
+  },
+  {
+    "id": "inc-2026-05-03-001",
+    "title": "Redis Cache Reconnection",
+    "status": "resolved",
+    "severity": "minor",
+    "created_at": "2026-05-03T22:10:00Z",
+    "resolved_at": "2026-05-03T22:35:00Z",
+    "affected_components": ["Cache"],
+    "updates": [
+      { "time": "2026-05-03T22:10:00Z", "message": "Upstash Redis connection dropped briefly.", "status": "investigating" },
+      { "time": "2026-05-03T22:20:00Z", "message": "Automatic reconnection triggered. Monitoring.", "status": "monitoring" },
+      { "time": "2026-05-03T22:35:00Z", "message": "Connection stable. No data loss.", "status": "resolved" }
+    ]
+  }
+]
