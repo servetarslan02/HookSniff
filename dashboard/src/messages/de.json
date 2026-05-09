@@ -714,7 +714,8 @@
       "privacy": "Datenschutz",
       "copyright": "© 2026 HookSniff. Alle Rechte vorbehalten.",
       "changelog": "Changelog",
-      "pricing": "Pricing"
+      "pricing": "Pricing",
+      "useCases": "Use Cases"
     }
   },
   "apiKeys": {
