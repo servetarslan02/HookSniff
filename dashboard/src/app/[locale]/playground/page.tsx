@@ -607,9 +607,7 @@ function ApiAccessSection({
     clear: `curl -X DELETE ${baseUrl}/api/playground/history/${exampleToken}`,
   };
 
-  const nodeExample = `import { HookSniffSDK } from 'hooksniff-sdk';
-
-// 1. Generate playground URL
+  const nodeExample = `// 1. Generate playground URL
 const { url, token } = await fetch('${baseUrl}/api/playground/token', {
   method: 'POST'
 }).then(r => r.json());
@@ -659,12 +657,17 @@ import (
 
 func main() {
 	// 1. Generate playground URL
-	resp, _ := http.Post("${baseUrl}/api/playground/token", "application/json", nil)
+	resp, err := http.Post("${baseUrl}/api/playground/token", "application/json", nil)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 	var result struct {
 		Url   string \`json:"url"\`
 		Token string \`json:"token"\`
 	}
 	json.NewDecoder(resp.Body).Decode(&result)
+	fmt.Printf("Playground URL: %s\\n", result.Url)
 
 	// 2. Send a webhook
 	payload, _ := json.Marshal(map[string]interface{}{
@@ -674,9 +677,13 @@ func main() {
 	http.Post(result.Url, "application/json", bytes.NewBuffer(payload))
 
 	// 3. Check history
-	histResp, _ := http.Get(
+	histResp, err := http.Get(
 		fmt.Sprintf("${baseUrl}/api/playground/history/%s", result.Token),
 	)
+	if err != nil {
+		panic(err)
+	}
+	defer histResp.Body.Close()
 	var history struct{ Count int }
 	json.NewDecoder(histResp.Body).Decode(&history)
 	fmt.Printf("Captured %d requests\\n", history.Count)
