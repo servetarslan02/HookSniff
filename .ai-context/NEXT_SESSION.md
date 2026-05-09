@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 01:25 GMT+8
+> Son güncelleme: 2026-05-10 01:35 GMT+8
 > Bu dosya bir sonraki oturumda ne yapılacağını anlatır.
 
 ---
@@ -37,8 +37,8 @@
 | 1 | `FINANCIAL_MODEL_STRATEGY.md` | Birim ekonomi, LTV/CAC, break-even, gelir projeksiyonu, maliyet yapısı | ~17KB | ✅ Tamamlandı |
 | 2 | `AB_TESTING_STRATEGY.md` | Landing page, pricing, onboarding A/B test planı, araç seçimi, statistical significance | ~19KB | ✅ Tamamlandı |
 | 3 | `SEO_DETAILED_STRATEGY.md` | Anahtar kelime araştırması, teknik SEO, blog takvimi, backlink stratejisi | ~25KB | ✅ Tamamlandı |
-| 4 | `EMAIL_MARKETING_STRATEGY.md` | Drip campaigns, lifecycle emails, transactional emails, automation flows | ~16.5KB | ✅ Tamamlandı |
-| 5 | `CONTENT_MARKETING_STRATEGY.md` | Blog editorial calendar, SEO content, video planı, newsletter stratejisi | ~20KB | ✅ Tamamlandı |
+| 4 | `EMAIL_MARKETING_STRATEGY.md` | Drip campaigns, lifecycle emails, transactional emails, automation flows, benchmark'lar | ~19KB | ✅ Tamamlandı (revize) |
+| 5 | `CONTENT_MARKETING_STRATEGY.md` | Blog editorial calendar, SEO content, video planı, newsletter, rakip blog analizi | ~25KB | ✅ Tamamlandı (revize) |
 
 ### Öncelik 3 — Lansman sonrası (5 dosya)
 
