@@ -1,0 +1,495 @@
+//! OAuth2 Social Login API
+//!
+//! Provides OAuth2 login via Google and GitHub.
+//!
+//! ## Endpoints
+//!
+//! - `GET /oauth/google` — Redirect to Google OAuth
+//! - `GET /oauth/google/callback` — Google OAuth callback
+//! - `GET /oauth/github` — Redirect to GitHub OAuth
+//! - `GET /oauth/github/callback` — GitHub OAuth callback
+//! - `GET /oauth/providers` — List available OAuth providers
+//!
+//! ## Configuration
+//!
+//! Set these environment variables:
+//!
+//! - `GOOGLE_CLIENT_ID` — Google OAuth client ID
+//! - `GOOGLE_CLIENT_SECRET` — Google OAuth client secret
+//! - `GITHUB_CLIENT_ID` — GitHub OAuth client ID
+//! - `GITHUB_CLIENT_SECRET` — GitHub OAuth client secret
+//! - `OAUTH_REDIRECT_BASE` — Base URL for OAuth callbacks (e.g. https://hooksniff-api.run.app)
+
+use axum::{
+    extract::{Extension, Query},
+    response::Redirect,
+    routing::get,
+    Json, Router,
+};
+use serde::Deserialize;
+use sqlx::PgPool;
+use uuid::Uuid;
+
+use crate::config::Config;
+use crate::error::AppError;
+use crate::middleware::{create_auth_cookie, create_refresh_token_cookie, generate_api_key, hash_api_key};
+use crate::models::customer::Customer;
+
+pub fn router() -> Router {
+    Router::new()
+        .route("/providers", get(list_providers))
+        .route("/google", get(google_login))
+        .route("/google/callback", get(google_callback))
+        .route("/github", get(github_login))
+        .route("/github/callback", get(github_callback))
+}
+
+/// OAuth callback query parameters
+#[derive(Debug, Deserialize)]
+pub struct OAuthCallback {
+    pub code: Option<String>,
+    pub state: Option<String>,
+    pub error: Option<String>,
+}
+
+/// GET /oauth/providers — List available OAuth providers
+async fn list_providers() -> Json<serde_json::Value> {
+    let google_available = std::env::var("GOOGLE_CLIENT_ID").is_ok();
+    let github_available = std::env::var("GITHUB_CLIENT_ID").is_ok();
+
+    Json(serde_json::json!({
+        "providers": [
+            {
+                "name": "google",
+                "available": google_available,
+                "url": "/v1/oauth/google",
+                "icon": "https://developers.google.com/identity/images/g-logo.png",
+            },
+            {
+                "name": "github",
+                "available": github_available,
+                "url": "/v1/oauth/github",
+                "icon": "https://github.githubassets.com/favicons/favicon.svg",
+            },
+        ]
+    }))
+}
+
+/// GET /oauth/google — Redirect to Google OAuth consent screen
+async fn google_login(Extension(cfg): Extension<Config>) -> Result<Redirect, AppError> {
+    let client_id = std::env::var("GOOGLE_CLIENT_ID").map_err(|_| {
+        AppError::BadRequest("Google OAuth not configured. Set GOOGLE_CLIENT_ID.".into())
+    })?;
+
+    let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
+        .unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string());
+
+    let redirect_uri = format!("{}/v1/oauth/google/callback", redirect_base);
+    let state = uuid::Uuid::new_v4().to_string();
+
+    let url = format!(
+        "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope=openid%20email%20profile&state={}&access_type=offline",
+        client_id,
+        urlencoding::encode(&redirect_uri),
+        state
+    );
+
+    Ok(Redirect::temporary(&url))
+}
+
+/// GET /oauth/google/callback — Handle Google OAuth callback
+async fn google_callback(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    Query(params): Query<OAuthCallback>,
+) -> Result<Redirect, AppError> {
+    if let Some(error) = params.error {
+        return Ok(Redirect::temporary(&format!(
+            "/login?error=oauth_denied&details={}",
+            error
+        )));
+    }
+
+    let code = params.code.ok_or_else(|| {
+        AppError::BadRequest("Missing authorization code".into())
+    })?;
+
+    let client_id = std::env::var("GOOGLE_CLIENT_ID").map_err(|_| {
+        AppError::BadRequest("Google OAuth not configured".into())
+    })?;
+
+    let client_secret = std::env::var("GOOGLE_CLIENT_SECRET").map_err(|_| {
+        AppError::BadRequest("Google OAuth not configured".into())
+    })?;
+
+    let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
+        .unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string());
+    let redirect_uri = format!("{}/v1/oauth/google/callback", redirect_base);
+
+    // Exchange code for token
+    let token_response = exchange_google_code(&code, &client_id, &client_secret, &redirect_uri).await?;
+
+    // Get user info
+    let user_info = get_google_user_info(&token_response.access_token).await?;
+
+    // Find or create customer
+    let customer = find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "google").await?;
+
+    // Generate JWT
+    let token = jwt::generate_access_token(
+        customer.id,
+        &customer.email,
+        &customer.plan,
+        &cfg.jwt_secret,
+    )?;
+
+    // Redirect to dashboard with token
+    let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
+    Ok(Redirect::temporary(&format!(
+        "{}/auth/callback?token={}",
+        app_url, token
+    )))
+}
+
+/// GET /oauth/github — Redirect to GitHub OAuth consent screen
+async fn github_login() -> Result<Redirect, AppError> {
+    let client_id = std::env::var("GITHUB_CLIENT_ID").map_err(|_| {
+        AppError::BadRequest("GitHub OAuth not configured. Set GITHUB_CLIENT_ID.".into())
+    })?;
+
+    let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
+        .unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string());
+    let redirect_uri = format!("{}/v1/oauth/github/callback", redirect_base);
+    let state = uuid::Uuid::new_v4().to_string();
+
+    let url = format!(
+        "https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope=user:email&state={}",
+        client_id,
+        urlencoding::encode(&redirect_uri),
+        state
+    );
+
+    Ok(Redirect::temporary(&url))
+}
+
+/// GET /oauth/github/callback — Handle GitHub OAuth callback
+async fn github_callback(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    Query(params): Query<OAuthCallback>,
+) -> Result<Redirect, AppError> {
+    if let Some(error) = params.error {
+        return Ok(Redirect::temporary(&format!(
+            "/login?error=oauth_denied&details={}",
+            error
+        )));
+    }
+
+    let code = params.code.ok_or_else(|| {
+        AppError::BadRequest("Missing authorization code".into())
+    })?;
+
+    let client_id = std::env::var("GITHUB_CLIENT_ID").map_err(|_| {
+        AppError::BadRequest("GitHub OAuth not configured".into())
+    })?;
+
+    let client_secret = std::env::var("GITHUB_CLIENT_SECRET").map_err(|_| {
+        AppError::BadRequest("GitHub OAuth not configured".into())
+    })?;
+
+    // Exchange code for token
+    let access_token = exchange_github_code(&code, &client_id, &client_secret).await?;
+
+    // Get user info
+    let user_info = get_github_user_info(&access_token).await?;
+
+    // Find or create customer
+    let customer = find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "github").await?;
+
+    // Generate JWT
+    let token = jwt::generate_access_token(
+        customer.id,
+        &customer.email,
+        &customer.plan,
+        &cfg.jwt_secret,
+    )?;
+
+    // Redirect to dashboard with token
+    let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
+    Ok(Redirect::temporary(&format!(
+        "{}/auth/callback?token={}",
+        app_url, token
+    )))
+}
+
+// ── OAuth helpers ────────────────────────────────────────────
+
+use crate::auth::jwt;
+
+struct GoogleTokenResponse {
+    access_token: String,
+}
+
+struct GoogleUserInfo {
+    email: String,
+    name: Option<String>,
+}
+
+struct GitHubUserInfo {
+    email: String,
+    name: Option<String>,
+}
+
+async fn exchange_google_code(
+    code: &str,
+    client_id: &str,
+    client_secret: &str,
+    redirect_uri: &str,
+) -> Result<GoogleTokenResponse, AppError> {
+    let client = reqwest::Client::new();
+
+    let params = [
+        ("code", code),
+        ("client_id", client_id),
+        ("client_secret", client_secret),
+        ("redirect_uri", redirect_uri),
+        ("grant_type", "authorization_code"),
+    ];
+
+    let resp = client
+        .post("https://oauth2.googleapis.com/token")
+        .form(&params)
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Google token exchange failed: {}", e)))?;
+
+    if !resp.status().is_success() {
+        let body = resp.text().await.unwrap_or_default();
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "Google token exchange failed: {}",
+            body
+        )));
+    }
+
+    let json: serde_json::Value = resp.json().await.map_err(|e| {
+        AppError::Internal(anyhow::anyhow!("Failed to parse Google response: {}", e))
+    })?;
+
+    let access_token = json["access_token"]
+        .as_str()
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("No access_token in Google response")))?
+        .to_string();
+
+    Ok(GoogleTokenResponse { access_token })
+}
+
+async fn get_google_user_info(access_token: &str) -> Result<GoogleUserInfo, AppError> {
+    let client = reqwest::Client::new();
+
+    let resp = client
+        .get("https://www.googleapis.com/oauth2/v2/userinfo")
+        .bearer_auth(access_token)
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Google userinfo failed: {}", e)))?;
+
+    if !resp.status().is_success() {
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "Google userinfo request failed"
+        )));
+    }
+
+    let json: serde_json::Value = resp.json().await.map_err(|e| {
+        AppError::Internal(anyhow::anyhow!("Failed to parse Google userinfo: {}", e))
+    })?;
+
+    let email = json["email"]
+        .as_str()
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("No email in Google userinfo")))?
+        .to_string();
+
+    let name = json["name"].as_str().map(|s| s.to_string());
+
+    Ok(GoogleUserInfo { email, name })
+}
+
+async fn exchange_github_code(
+    code: &str,
+    client_id: &str,
+    client_secret: &str,
+) -> Result<String, AppError> {
+    let client = reqwest::Client::new();
+
+    let params = [
+        ("code", code),
+        ("client_id", client_id),
+        ("client_secret", client_secret),
+    ];
+
+    let resp = client
+        .post("https://github.com/login/oauth/access_token")
+        .header("Accept", "application/json")
+        .form(&params)
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("GitHub token exchange failed: {}", e)))?;
+
+    if !resp.status().is_success() {
+        let body = resp.text().await.unwrap_or_default();
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "GitHub token exchange failed: {}",
+            body
+        )));
+    }
+
+    let json: serde_json::Value = resp.json().await.map_err(|e| {
+        AppError::Internal(anyhow::anyhow!("Failed to parse GitHub response: {}", e))
+    })?;
+
+    if let Some(error) = json["error"].as_str() {
+        let desc = json["error_description"].as_str().unwrap_or("unknown");
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "GitHub OAuth error: {} - {}",
+            error,
+            desc
+        )));
+    }
+
+    json["access_token"]
+        .as_str()
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("No access_token in GitHub response")))
+        .map(|s| s.to_string())
+}
+
+async fn get_github_user_info(access_token: &str) -> Result<GitHubUserInfo, AppError> {
+    let client = reqwest::Client::new();
+
+    // First try to get email from /user
+    let resp = client
+        .get("https://api.github.com/user")
+        .header("Authorization", format!("Bearer {}", access_token))
+        .header("User-Agent", "HookSniff")
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("GitHub user info failed: {}", e)))?;
+
+    if !resp.status().is_success() {
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "GitHub user info request failed"
+        )));
+    }
+
+    let json: serde_json::Value = resp.json().await.map_err(|e| {
+        AppError::Internal(anyhow::anyhow!("Failed to parse GitHub user info: {}", e))
+    })?;
+
+    let mut email = json["email"].as_str().map(|s| s.to_string());
+    let name = json["name"].as_str().map(|s| s.to_string());
+
+    // If email is null, try /user/emails
+    if email.is_none() {
+        let emails_resp = client
+            .get("https://api.github.com/user/emails")
+            .header("Authorization", format!("Bearer {}", access_token))
+            .header("User-Agent", "HookSniff")
+            .send()
+            .await;
+
+        if let Ok(resp) = emails_resp {
+            if let Ok(emails) = resp.json::<serde_json::Value>().await {
+                if let Some(arr) = emails.as_array() {
+                    // Find primary email
+                    for e in arr {
+                        if e["primary"].as_bool().unwrap_or(false) {
+                            email = e["email"].as_str().map(|s| s.to_string());
+                            break;
+                        }
+                    }
+                    // Fallback to first verified email
+                    if email.is_none() {
+                        for e in arr {
+                            if e["verified"].as_bool().unwrap_or(false) {
+                                email = e["email"].as_str().map(|s| s.to_string());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let email = email.ok_or_else(|| {
+        AppError::BadRequest(
+            "Could not get email from GitHub. Make sure your email is public or grant email permission.".into(),
+        )
+    })?;
+
+    Ok(GitHubUserInfo { email, name })
+}
+
+/// Find existing customer by email or create a new one via OAuth
+async fn find_or_create_oauth_customer(
+    pool: &PgPool,
+    email: &str,
+    name: &Option<String>,
+    provider: &str,
+) -> Result<Customer, AppError> {
+    // Try to find existing customer
+    let existing = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE email = $1")
+        .bind(email)
+        .fetch_optional(pool)
+        .await?;
+
+    if let Some(customer) = existing {
+        tracing::info!("✅ OAuth login ({}): {}", provider, email);
+        return Ok(customer);
+    }
+
+    // Create new customer
+    let api_key = generate_api_key();
+    let api_key_hash = hash_api_key(&api_key);
+    let api_key_prefix = api_key[..15].to_string();
+
+    let customer = sqlx::query_as::<_, Customer>(
+        "INSERT INTO customers (email, api_key_hash, api_key_prefix, name, is_active, email_verified)
+         VALUES ($1, $2, $3, $4, true, true)
+         RETURNING *"
+    )
+    .bind(email)
+    .bind(&api_key_hash)
+    .bind(&api_key_prefix)
+    .bind(name)
+    .fetch_one(pool)
+    .await?;
+
+    tracing::info!("✅ New OAuth customer created ({}): {}", provider, email);
+
+    Ok(customer)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_oauth_router_construction() {
+        let _router = router();
+    }
+
+    #[test]
+    fn test_oauth_callback_query() {
+        let json = r#"{"code":"abc123","state":"xyz"}"#;
+        let params: OAuthCallback = serde_json::from_str(json).unwrap();
+        assert_eq!(params.code.unwrap(), "abc123");
+        assert_eq!(params.state.unwrap(), "xyz");
+    }
+
+    #[test]
+    fn test_oauth_callback_error() {
+        let json = r#"{"error":"access_denied"}"#;
+        let params: OAuthCallback = serde_json::from_str(json).unwrap();
+        assert_eq!(params.error.unwrap(), "access_denied");
+        assert!(params.code.is_none());
+    }
+}
