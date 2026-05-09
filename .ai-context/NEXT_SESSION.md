@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 05:02 GMT+8
+> Son güncelleme: 2026-05-10 05:15 GMT+8
 
 ---
 
@@ -14,6 +14,57 @@
 | Vercel token rotate | 🔴 ACİL | Bu oturumda paylaşıldı |
 | Login test | 🔴 | Deploy sonrası dashboard'da dene |
 | iyzico hesap | ❌ | Vergi levhası + banka hesabı |
+
+---
+
+## ✅ SON OTURUM (65) — Onboarding Sistemi (2026-05-10 05:07-05:15 GMT+8)
+
+### Yapılan İşler
+
+**1. `/get-started` Sayfası Oluşturuldu**
+- 6 adım: Create Account → API Key → Install SDK → Create Endpoint → Send Webhook → Monitor
+- Her adımda kod örnekleri (Node.js, Python, Go, Rust, curl)
+- Copy-paste butonları
+- Event type catalog (6 kategori, 30+ event)
+- Embed portal section (iframe kodu)
+- CLI quickstart section
+- CTA (Create Free Account / Try Playground)
+
+**2. OnboardingWizard Component**
+- 6 interaktif adım: Welcome → Use Case → SDK → Endpoint → Test → Done
+- Use case seçim kartları (Payments, Email, E-commerce, SaaS, AI, Other)
+- 11 SDK seçici (install command ile)
+- Endpoint oluşturma formu (doğrudan wizard içinden)
+- Test webhook komutu (copy-paste)
+- Confetti celebration (tamamlama animasyonu)
+- localStorage state management
+
+**3. SetupChecklist Component**
+- Dashboard widget: 5 adım checklist
+- Progress bar (% completion)
+- Auto-dismiss (1 gün sonra tamamlandığında)
+- Her adım linkli (doğrudan ilgili sayfaya)
+
+**4. Navigasyon Linkleri**
+- Landing page nav: "Get Started" linki
+- Landing page mobile nav: "Get Started" linki
+- Dashboard sidebar: "🚀 Get Started" linki
+- Footer: "Get Started" linki (Product section)
+
+**5. i18n Çeviriler**
+- en.json: getStarted section + onboarding wizard updates
+- tr.json: getStarted section + onboarding wizard updates
+
+### GitHub Push
+- `1679d0f` — feat: comprehensive onboarding system
+- 8 dosya changed, +1377 satır, -4 satır
+- Build: ✅ 0 error, 0 new warning
+
+### Build Sonucu
+- Compiled successfully in 7.8s
+- 0 type errors
+- Pre-existing warnings: 4x `<img>` in CompareContent.tsx (mevcut)
+- get-started: 8 locale route × 8 dil = 64+ static page
 
 ---
 
