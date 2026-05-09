@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { apiFetch } from '@/lib/api';
 
 export default function CustomDomainPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const [domain, setDomain] = useState('');
   const [saving, setSaving] = useState(false);
+  const [domainId, setDomainId] = useState<string | null>(null);
   const [status, setStatus] = useState<'none' | 'pending' | 'verified' | 'error'>('none');
   const [dnsRecords, setDnsRecords] = useState<{ type: string; name: string; value: string }[]>([]);
 
@@ -16,63 +18,43 @@ export default function CustomDomainPage() {
     if (!domain || !token) return;
     setSaving(true);
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-      const res = await fetch(`${API}/custom-domains`, {
+      const data = await apiFetch<{ id: string; domain: string; cname_target: string; txt_record: string; instructions: Record<string, string> }>('/custom-domains', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ domain }),
+        body: { domain },
+        token,
       });
-      if (res.ok) {
-        const data = await res.json();
-        setStatus('pending');
-        setDnsRecords(data.dns_records || [
-          { type: 'CNAME', name: domain, value: 'portal.hooksniff.dev' },
-          { type: 'TXT', name: `_hooksniff.${domain}`, value: `hooksniff-verify=${data.verification_token || 'abc123'}` },
-        ]);
-        toast('Domain added! Add the DNS records below.', 'success');
-      } else if (res.status === 404) {
-        // Backend endpoint doesn't exist yet — show mock DNS records
-        setStatus('pending');
-        setDnsRecords([
-          { type: 'CNAME', name: domain, value: 'portal.hooksniff.dev' },
-          { type: 'TXT', name: `_hooksniff.${domain}`, value: `hooksniff-verify=pending` },
-        ]);
-        toast('Domain added (backend endpoint pending). Add DNS records below.', 'success');
-      } else {
-        toast('Failed to add domain', 'error');
-      }
-    } catch {
-      // Network error — show mock DNS records
+      setDomainId(data.id);
       setStatus('pending');
       setDnsRecords([
-        { type: 'CNAME', name: domain, value: 'portal.hooksniff.dev' },
-        { type: 'TXT', name: `_hooksniff.${domain}`, value: `hooksniff-verify=pending` },
+        { type: 'CNAME', name: domain, value: data.cname_target },
+        { type: 'TXT', name: `_hooksniff.${domain}`, value: data.txt_record },
       ]);
-      toast('Domain added (backend endpoint pending). Add DNS records below.', 'success');
+      toast('Domain added! Add the DNS records below.', 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Failed to add domain', 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const handleVerify = async () => {
-    if (!token) return;
+    if (!token || !domainId) return;
     setSaving(true);
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-      const res = await fetch(`${API}/custom-domains/${domain}/verify`, {
+      const data = await apiFetch<{ verified: boolean; message?: string; issues?: string[]; hint?: string }>(`/custom-domains/${domainId}/verify`, {
         method: 'POST',
-        credentials: 'include',
+        token,
       });
-      if (res.ok) {
+      if (data.verified) {
         setStatus('verified');
-        toast('Domain verified! SSL certificate provisioning...', 'success');
+        toast(data.message || 'Domain verified!', 'success');
       } else {
         setStatus('error');
-        toast('Verification failed. Check DNS records.', 'error');
+        const issues = data.issues?.join(', ') || 'Check DNS records';
+        toast(`Verification failed: ${issues}`, 'error');
       }
-    } catch {
-      toast('Network error', 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Verification failed', 'error');
     } finally {
       setSaving(false);
     }

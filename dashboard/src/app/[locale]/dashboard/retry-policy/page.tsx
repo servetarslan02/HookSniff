@@ -53,16 +53,20 @@ export default function RetryPolicyPage() {
   const fetchPolicy = useCallback(async () => {
     if (!token) return;
     try {
-      try {
-        const data = await apiFetch<GlobalRetryPolicy>('/settings/retry-policy', { token });
-        setPolicy({ ...DEFAULT_POLICY, ...data });
-      } catch {
-        // Try localStorage fallback
-        try {
-          const saved = localStorage.getItem('hooksniff_retry_policy');
-          if (saved) setPolicy({ ...DEFAULT_POLICY, ...JSON.parse(saved) });
-        } catch {}
+      // Fetch all retry policies to show global defaults
+      const data = await apiFetch<Array<{ max_attempts: number; base_delay_ms: number; max_delay_ms: number; multiplier: number }>>('/endpoints', { token });
+      // Use the first endpoint's policy as the "global" view, or defaults
+      if (data.length > 0) {
+        const first = data[0];
+        setPolicy({
+          ...DEFAULT_POLICY,
+          default_max_attempts: first.max_attempts,
+          default_initial_delay_secs: Math.round(first.base_delay_ms / 1000),
+          default_max_delay_secs: Math.round(first.max_delay_ms / 1000),
+        });
       }
+    } catch {
+      // Use defaults
     } finally {
       setLoading(false);
     }
@@ -74,12 +78,32 @@ export default function RetryPolicyPage() {
     if (!token) return;
     setSaving(true);
     try {
-      await apiFetch('/settings/retry-policy', { method: 'PUT', body: policy, token });
-      toast('Retry policy saved!', 'success');
-    } catch {
-      // Backend endpoint may not exist — save to localStorage as fallback
-      try { localStorage.setItem('hooksniff_retry_policy', JSON.stringify(policy)); } catch {}
-      toast('Retry policy saved locally (backend endpoint pending)', 'success');
+      // Save to all endpoints (global policy)
+      const endpoints = await apiFetch<Array<{ id: string }>>('/endpoints', { token });
+      const errors: string[] = [];
+      for (const ep of endpoints) {
+        try {
+          await apiFetch(`/endpoints/${ep.id}/retry-policy`, {
+            method: 'PUT',
+            body: {
+              max_attempts: policy.default_max_attempts,
+              base_delay_ms: policy.default_initial_delay_secs * 1000,
+              max_delay_ms: policy.default_max_delay_secs * 1000,
+              multiplier: policy.default_backoff === 'exponential' ? 2.0 : policy.default_backoff === 'linear' ? 1.5 : 1.0,
+            },
+            token,
+          });
+        } catch {
+          errors.push(ep.id);
+        }
+      }
+      if (errors.length === 0) {
+        toast('Retry policy saved for all endpoints!', 'success');
+      } else {
+        toast(`Saved with ${errors.length} errors`, 'error');
+      }
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Failed to save retry policy', 'error');
     } finally {
       setSaving(false);
     }

@@ -164,8 +164,8 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => {
-                  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-                  window.location.href = `${API}/auth/oauth/google`;
+                  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+                  window.location.href = `${API}/oauth/google`;
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
               >
@@ -175,8 +175,8 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => {
-                  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-                  window.location.href = `${API}/auth/oauth/github`;
+                  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+                  window.location.href = `${API}/oauth/github`;
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
               >
@@ -184,9 +184,6 @@ function LoginForm() {
                 GitHub
               </button>
             </div>
-            <p className="mt-3 text-xs text-center text-gray-400 dark:text-slate-500">
-              OAuth coming soon — currently using email/password authentication
-            </p>
           </div>
 
           <div className="mt-6 text-center text-sm text-gray-500 dark:text-slate-400">

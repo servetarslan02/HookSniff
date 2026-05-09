@@ -22,6 +22,7 @@
 
 use axum::{
     extract::{Extension, Query},
+    http::HeaderMap,
     response::Redirect,
     routing::get,
     Json, Router,
@@ -102,7 +103,7 @@ async fn google_callback(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Query(params): Query<OAuthCallback>,
-) -> Result<Redirect, AppError> {
+) -> Result<impl axum::response::IntoResponse, AppError> {
     if let Some(error) = params.error {
         return Ok(Redirect::temporary(&format!(
             "/login?error=oauth_denied&details={}",
@@ -143,12 +144,17 @@ async fn google_callback(
         &cfg.jwt_secret,
     )?;
 
-    // Redirect to dashboard with token
+    // Set HttpOnly auth cookie and redirect
     let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
-    Ok(Redirect::temporary(&format!(
-        "{}/auth/callback?token={}",
-        app_url, token
-    )))
+    let cookie = create_auth_cookie(&token, 86400);
+    let mut headers = axum::http::HeaderMap::new();
+    headers.insert(
+        "set-cookie",
+        axum::http::HeaderValue::from_str(&cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
+    );
+    let redirect_url = format!("{}/auth/callback", app_url);
+    headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
+    Ok((headers, axum::response::Redirect::temporary(&redirect_url)))
 }
 
 /// GET /oauth/github — Redirect to GitHub OAuth consent screen
@@ -177,7 +183,7 @@ async fn github_callback(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Query(params): Query<OAuthCallback>,
-) -> Result<Redirect, AppError> {
+) -> Result<impl axum::response::IntoResponse, AppError> {
     if let Some(error) = params.error {
         return Ok(Redirect::temporary(&format!(
             "/login?error=oauth_denied&details={}",
@@ -214,12 +220,17 @@ async fn github_callback(
         &cfg.jwt_secret,
     )?;
 
-    // Redirect to dashboard with token
+    // Set HttpOnly auth cookie and redirect
     let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
-    Ok(Redirect::temporary(&format!(
-        "{}/auth/callback?token={}",
-        app_url, token
-    )))
+    let cookie = create_auth_cookie(&token, 86400);
+    let mut headers = axum::http::HeaderMap::new();
+    headers.insert(
+        "set-cookie",
+        axum::http::HeaderValue::from_str(&cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
+    );
+    let redirect_url = format!("{}/auth/callback", app_url);
+    headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
+    Ok((headers, axum::response::Redirect::temporary(&redirect_url)))
 }
 
 // ── OAuth helpers ────────────────────────────────────────────
