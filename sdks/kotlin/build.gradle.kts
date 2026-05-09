@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.servetarslan02"
-version = "0.2.0"
+version = "0.3.0"
 
 repositories {
     mavenCentral()
@@ -37,7 +37,7 @@ publishing {
             from(components["java"])
             groupId = "io.github.servetarslan02"
             artifactId = "hooksniff"
-            version = "0.2.0"
+            version = "0.3.0"
 
             pom {
                 name.set("HookSniff Kotlin SDK")
@@ -66,23 +66,12 @@ publishing {
     repositories {
         maven {
             name = "central"
-            url = uri("https://central.sonatype.com/api/v1/publisher")
-            credentials {
-                username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME") ?: ""
-                password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD") ?: ""
-            }
+            url = uri(layout.buildDirectory.dir("repos/releases"))
         }
     }
 }
 
 signing {
-    val signingKeyId = findProperty("signing.keyId") as String? ?: System.getenv("SIGNING_KEY_ID") ?: ""
-    val signingKey = findProperty("signing.key") as String? ?: System.getenv("SIGNING_KEY") ?: ""
-    val signingPassword = findProperty("signing.password") as String? ?: System.getenv("SIGNING_PASSWORD") ?: ""
-
-    if (signingKeyId.isNotEmpty()) {
-        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    }
-
+    useGpgCmd()
     sign(publishing.publications["maven"])
 }
