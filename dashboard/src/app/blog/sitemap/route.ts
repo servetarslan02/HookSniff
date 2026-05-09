@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 
 const posts = [
+  'hooksniff-vs-svix-vs-hookdeck',
+  'may-2026-changelog',
+  'building-mcp-ready-webhooks',
+  'webhook-integration-tutorial',
   'why-ai-agents-need-webhooks',
   'gemini-webhook-integration',
   'stripe-webhook-guide',
   'changelog-may-2026',
+  'webhook-architecture-deep-dive',
+  'customer-spotlight-ecommerce',
   'introducing-hooksniff',
   'webhook-best-practices',
   'fifo-webhook-delivery',
