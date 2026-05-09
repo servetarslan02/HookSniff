@@ -77,7 +77,7 @@ async fn list_providers() -> Json<serde_json::Value> {
 }
 
 /// GET /oauth/google — Redirect to Google OAuth consent screen
-async fn google_login(Extension(cfg): Extension<Config>) -> Result<Redirect, AppError> {
+async fn google_login(Extension(_cfg): Extension<Config>) -> Result<Redirect, AppError> {
     let client_id = std::env::var("GOOGLE_CLIENT_ID").map_err(|_| {
         AppError::BadRequest("Google OAuth not configured. Set GOOGLE_CLIENT_ID.".into())
     })?;
@@ -105,10 +105,8 @@ async fn google_callback(
     Query(params): Query<OAuthCallback>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     if let Some(error) = params.error {
-        return Ok(Redirect::temporary(&format!(
-            "/login?error=oauth_denied&details={}",
-            error
-        )));
+        let url = format!("/login?error=oauth_denied&details={}", error);
+        return Ok((HeaderMap::new(), Redirect::temporary(&url)));
     }
 
     let code = params.code.ok_or_else(|| {
@@ -185,10 +183,8 @@ async fn github_callback(
     Query(params): Query<OAuthCallback>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     if let Some(error) = params.error {
-        return Ok(Redirect::temporary(&format!(
-            "/login?error=oauth_denied&details={}",
-            error
-        )));
+        let url = format!("/login?error=oauth_denied&details={}", error);
+        return Ok((HeaderMap::new(), Redirect::temporary(&url)));
     }
 
     let code = params.code.ok_or_else(|| {
