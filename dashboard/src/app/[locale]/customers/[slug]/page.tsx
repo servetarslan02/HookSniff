@@ -213,8 +213,9 @@ export function generateStaticParams() {
   return Object.keys(stories).map((slug) => ({ slug }));
 }
 
-export default function CustomerStoryPage({ params }: { params: { slug: string } }) {
-  const story = stories[params.slug];
+export default async function CustomerStoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const story = stories[slug];
 
   if (!story) {
     return (

@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+/* ─── Tab Types ─── */
+type PlaygroundTab = 'playground' | 'api';
+
 /* ─── Types ─── */
 
 type WebhookRecord = {
@@ -36,6 +39,7 @@ const samplePayloads = [
 
 export default function PlaygroundPage() {
   // State
+  const [activeTab, setActiveTab] = useState<PlaygroundTab>('playground');
   const [state, setState] = useState<PlaygroundState>('idle');
   const [token, setToken] = useState('');
   const [webhookUrl, setWebhookUrl] = useState('');
@@ -45,6 +49,7 @@ export default function PlaygroundPage() {
   const [lastPoll, setLastPoll] = useState<string>('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [apiCopied, setApiCopied] = useState<string | null>(null);
 
   // Send test form
   const [sendEvent, setSendEvent] = useState('order.created');
@@ -140,7 +145,6 @@ export default function PlaygroundPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback
       const el = document.createElement('textarea');
       el.value = webhookUrl;
       document.body.appendChild(el);
@@ -149,6 +153,16 @@ export default function PlaygroundPage() {
       document.body.removeChild(el);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleApiCopy = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setApiCopied(id);
+      setTimeout(() => setApiCopied(null), 2000);
+    } catch {
+      setApiCopied(null);
     }
   };
 
@@ -255,6 +269,42 @@ export default function PlaygroundPage() {
           <p className="text-gray-600 dark:text-slate-400">Get a unique URL, send webhooks, inspect requests in real-time. No signup required.</p>
         </div>
 
+        {/* Tabs */}
+        <div className="flex items-center gap-1 mb-6 border-b border-gray-200 dark:border-slate-800">
+          <button
+            onClick={() => setActiveTab('playground')}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'playground'
+                ? 'border-brand-600 text-brand-600 dark:text-brand-400'
+                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
+            }`}
+          >
+            🧪 Playground
+          </button>
+          <button
+            onClick={() => setActiveTab('api')}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'api'
+                ? 'border-brand-600 text-brand-600 dark:text-brand-400'
+                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
+            }`}
+          >
+            ⚡ API Access
+          </button>
+        </div>
+
+        {/* ─── API Access Tab ─── */}
+        {activeTab === 'api' && (
+          <ApiAccessSection
+            token={token}
+            webhookUrl={webhookUrl}
+            apiCopied={apiCopied}
+            onCopy={handleApiCopy}
+          />
+        )}
+
+        {/* ─── Playground Tab ─── */}
+        {activeTab === 'playground' && (<>
         {/* Idle State — Generate Token */}
         {state === 'idle' && (
           <div className="max-w-md mx-auto text-center py-16">
@@ -471,7 +521,381 @@ export default function PlaygroundPage() {
             </div>
           </div>
         )}
+        </>)}
       </main>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   API Access Section
+   ═══════════════════════════════════════════════════════════════════ */
+
+function ApiAccessSection({
+  token,
+  webhookUrl,
+  apiCopied,
+  onCopy,
+}: {
+  token: string;
+  webhookUrl: string;
+  apiCopied: string | null;
+  onCopy: (text: string, id: string) => void;
+}) {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://hooksniff.vercel.app';
+  const exampleToken = token || 'hs_AbCdEfGhJkMnPqRsTuvw';
+  const exampleUrl = webhookUrl || `${baseUrl}/api/playground/in/${exampleToken}`;
+
+  const endpoints = [
+    {
+      method: 'POST',
+      path: '/api/playground/token',
+      desc: 'Generate a unique playground URL',
+      response: `{
+  "success": true,
+  "token": "${exampleToken}",
+  "url": "${exampleUrl}",
+  "expires_in": "24 hours"
+}`,
+    },
+    {
+      method: 'ANY',
+      path: '/api/playground/in/{token}',
+      desc: 'Send any HTTP request — it gets captured',
+      response: `{
+  "received": true,
+  "id": "1715289600000-a1b2c3"
+}`,
+    },
+    {
+      method: 'GET',
+      path: '/api/playground/history/{token}',
+      desc: 'Retrieve captured requests',
+      response: `{
+  "success": true,
+  "count": 3,
+  "total": 3,
+  "data": [
+    {
+      "id": "1715289600000-a1b2c3",
+      "method": "POST",
+      "headers": { "content-type": "application/json" },
+      "body": "{ \\"event\\": \\"order.created\\" }",
+      "timestamp": "2026-05-10T03:18:00.000Z"
+    }
+  ]
+}`,
+    },
+    {
+      method: 'DELETE',
+      path: '/api/playground/history/{token}',
+      desc: 'Clear captured requests',
+      response: `{
+  "success": true,
+  "message": "History cleared"
+}`,
+    },
+  ];
+
+  const curlExamples = {
+    generate: `curl -X POST ${baseUrl}/api/playground/token`,
+    send: `curl -X POST ${exampleUrl} \\
+  -H "Content-Type: application/json" \\
+  -H "X-Webhook-Event: order.created" \\
+  -d '{"order_id": "ord_123", "total": 49.99}'`,
+    history: `curl ${baseUrl}/api/playground/history/${exampleToken}`,
+    clear: `curl -X DELETE ${baseUrl}/api/playground/history/${exampleToken}`,
+  };
+
+  const nodeExample = `import { HookSniffSDK } from 'hooksniff-sdk';
+
+// 1. Generate playground URL
+const { url, token } = await fetch('${baseUrl}/api/playground/token', {
+  method: 'POST'
+}).then(r => r.json());
+
+// 2. Send a webhook to the playground
+await fetch(url, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ event: 'order.created', data: { order_id: 'ord_123' } })
+});
+
+// 3. Check what was received
+const { data } = await fetch(
+  \`${baseUrl}/api/playground/history/\${token}\`
+).then(r => r.json());
+
+console.log('Captured requests:', data);`;
+
+  const pythonExample = `import requests
+
+# 1. Generate playground URL
+res = requests.post('${baseUrl}/api/playground/token')
+url = res.json()['url']
+token = res.json()['token']
+
+# 2. Send a webhook to the playground
+requests.post(url, json={
+    'event': 'order.created',
+    'data': {'order_id': 'ord_123', 'total': 49.99}
+})
+
+# 3. Check what was received
+history = requests.get(
+    f'${baseUrl}/api/playground/history/{token}'
+).json()
+
+print(f"Captured {history['count']} requests")`;
+
+  const goExample = `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
+func main() {
+	// 1. Generate playground URL
+	resp, _ := http.Post("${baseUrl}/api/playground/token", "application/json", nil)
+	var result struct {
+		Url   string \`json:"url"\`
+		Token string \`json:"token"\`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	// 2. Send a webhook
+	payload, _ := json.Marshal(map[string]interface{}{
+		"event": "order.created",
+		"data":  map[string]string{"order_id": "ord_123"},
+	})
+	http.Post(result.Url, "application/json", bytes.NewBuffer(payload))
+
+	// 3. Check history
+	histResp, _ := http.Get(
+		fmt.Sprintf("${baseUrl}/api/playground/history/%s", result.Token),
+	)
+	var history struct{ Count int }
+	json.NewDecoder(histResp.Body).Decode(&history)
+	fmt.Printf("Captured %d requests\\n", history.Count)
+}`;
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-200 dark:border-brand-500/20 p-6">
+        <div className="flex items-start gap-4">
+          <span className="text-3xl">⚡</span>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Playground API</h2>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
+              Use the playground programmatically — generate URLs, send webhooks, and inspect captured requests via API.
+              No authentication required. Same endpoints that power the UI above.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">No signup</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">REST API</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400">24h TTL</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300">Rate limited</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Start */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">🚀 Quick Start</h3>
+        <div className="grid md:grid-cols-3 gap-4">
+          {[
+            { step: '1', title: 'Generate URL', code: 'POST /api/playground/token', desc: 'Get a unique webhook endpoint' },
+            { step: '2', title: 'Send webhooks', code: 'POST /api/playground/in/{token}', desc: 'Any HTTP method, any payload' },
+            { step: '3', title: 'Read requests', code: 'GET /api/playground/history/{token}', desc: 'Inspect what was received' },
+          ].map((s) => (
+            <div key={s.step} className="p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-6 h-6 rounded-full bg-brand-600 text-white text-xs flex items-center justify-center font-bold">{s.step}</span>
+                <span className="text-sm font-bold text-gray-900 dark:text-white">{s.title}</span>
+              </div>
+              <p className="text-xs font-mono text-brand-600 dark:text-brand-400 mb-1">{s.code}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Endpoint Reference */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">📡 Endpoints</h3>
+        <div className="space-y-4">
+          {endpoints.map((ep) => (
+            <div key={ep.path + ep.method} className="border border-gray-100 dark:border-slate-800 rounded-lg overflow-hidden">
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-slate-800">
+                <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${
+                  ep.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' :
+                  ep.method === 'GET' ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' :
+                  ep.method === 'DELETE' ? 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400' :
+                  'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300'
+                }`}>
+                  {ep.method}
+                </span>
+                <code className="text-sm font-mono text-gray-900 dark:text-white">{ep.path}</code>
+                <span className="text-xs text-gray-500 dark:text-slate-500 ml-auto">{ep.desc}</span>
+              </div>
+              <div className="px-4 py-3">
+                <p className="text-xs text-gray-500 dark:text-slate-500 mb-2">Response:</p>
+                <div className="relative group">
+                  <pre className="bg-gray-900 dark:bg-slate-800 rounded-lg p-3 text-xs text-green-400 font-mono overflow-x-auto">{ep.response}</pre>
+                  <button
+                    onClick={() => onCopy(ep.response, ep.path)}
+                    className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-gray-700 dark:bg-slate-700 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    {apiCopied === ep.path ? '✓' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Query Parameters */}
+        <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Query Parameters</h4>
+          <div className="space-y-2">
+            <div className="flex items-start gap-3">
+              <code className="text-xs font-mono text-brand-600 dark:text-brand-400 shrink-0">force_status_code</code>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Force a specific HTTP response code (100-599). Example: <code className="bg-gray-200 dark:bg-slate-700 px-1 rounded">?force_status_code=500</code></p>
+            </div>
+            <div className="flex items-start gap-3">
+              <code className="text-xs font-mono text-brand-600 dark:text-brand-400 shrink-0">echo_body</code>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Echo back the request body in the response. Example: <code className="bg-gray-200 dark:bg-slate-700 px-1 rounded">?echo_body=true</code></p>
+            </div>
+            <div className="flex items-start gap-3">
+              <code className="text-xs font-mono text-brand-600 dark:text-brand-400 shrink-0">since</code>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Filter history by timestamp (ISO 8601). Only returns requests after this time.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <code className="text-xs font-mono text-brand-600 dark:text-brand-400 shrink-0">limit</code>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Max results from history (default: 100).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Code Examples */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">💻 Code Examples</h3>
+
+        {/* cURL */}
+        <div className="mb-6">
+          <h4 className="text-sm font-bold text-gray-700 dark:text-slate-300 mb-3">cURL</h4>
+          <div className="space-y-3">
+            {Object.entries(curlExamples).map(([key, code]) => (
+              <div key={key} className="relative group">
+                <div className="flex items-center justify-between px-3 py-1.5 bg-gray-800 dark:bg-slate-700 rounded-t-lg">
+                  <span className="text-xs text-gray-400">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
+                  <button
+                    onClick={() => onCopy(code, `curl-${key}`)}
+                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                  >
+                    {apiCopied === `curl-${key}` ? '✓ Copied' : 'Copy'}
+                  </button>
+                </div>
+                <pre className="bg-gray-900 dark:bg-slate-800 rounded-b-lg p-3 text-xs text-green-400 font-mono overflow-x-auto">{code}</pre>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Node.js */}
+        <div className="mb-6">
+          <h4 className="text-sm font-bold text-gray-700 dark:text-slate-300 mb-3">Node.js</h4>
+          <div className="relative group">
+            <button
+              onClick={() => onCopy(nodeExample, 'node')}
+              className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-gray-700 dark:bg-slate-700 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              {apiCopied === 'node' ? '✓ Copied' : 'Copy'}
+            </button>
+            <pre className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 text-xs text-green-400 font-mono overflow-x-auto">{nodeExample}</pre>
+          </div>
+        </div>
+
+        {/* Python */}
+        <div className="mb-6">
+          <h4 className="text-sm font-bold text-gray-700 dark:text-slate-300 mb-3">Python</h4>
+          <div className="relative group">
+            <button
+              onClick={() => onCopy(pythonExample, 'python')}
+              className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-gray-700 dark:bg-slate-700 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              {apiCopied === 'python' ? '✓ Copied' : 'Copy'}
+            </button>
+            <pre className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 text-xs text-green-400 font-mono overflow-x-auto">{pythonExample}</pre>
+          </div>
+        </div>
+
+        {/* Go */}
+        <div>
+          <h4 className="text-sm font-bold text-gray-700 dark:text-slate-300 mb-3">Go</h4>
+          <div className="relative group">
+            <button
+              onClick={() => onCopy(goExample, 'go')}
+              className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-gray-700 dark:bg-slate-700 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              {apiCopied === 'go' ? '✓ Copied' : 'Copy'}
+            </button>
+            <pre className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 text-xs text-green-400 font-mono overflow-x-auto">{goExample}</pre>
+          </div>
+        </div>
+      </div>
+
+      {/* Comparison */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">🆚 Svix Play vs HookSniff Playground</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-slate-700">
+                <th className="text-left py-2 text-gray-500 dark:text-slate-500 font-medium">Feature</th>
+                <th className="text-center py-2 text-gray-500 dark:text-slate-500 font-medium">Svix Play</th>
+                <th className="text-center py-2 text-gray-500 dark:text-slate-500 font-medium">HookSniff</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-700 dark:text-slate-300">
+              {[
+                ['Unique URL (no signup)', '✅', '✅'],
+                ['Any HTTP method', '✅', '✅'],
+                ['Request inspection', '✅', '✅'],
+                ['API access', '✅', '✅'],
+                ['Sample payloads', '❌', '✅'],
+                ['HMAC signature display', '✅', '✅'],
+                ['force_status_code', '✅', '✅'],
+                ['echo_body', '✅', '✅'],
+                ['CLI integration', '✅', '❌'],
+                ['Custom headers', '❌', '✅'],
+                ['Rate limit', 'Unknown', '100/min'],
+              ].map(([feature, svix, hooksniff]) => (
+                <tr key={feature as string} className="border-b border-gray-100 dark:border-slate-800/50">
+                  <td className="py-2 text-xs">{feature}</td>
+                  <td className="py-2 text-center text-xs">{svix}</td>
+                  <td className="py-2 text-center text-xs">{hooksniff}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="text-center p-6 bg-gradient-to-br from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-200 dark:border-brand-500/20">
+        <p className="text-gray-700 dark:text-slate-300 mb-2 text-sm font-medium">Need more than playground?</p>
+        <p className="text-gray-500 dark:text-slate-400 text-xs mb-4">Get reliable webhook delivery with retries, signatures, and analytics.</p>
+        <Link href="/login" className="inline-block px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
+          Start free →
+        </Link>
+      </div>
     </div>
   );
 }
