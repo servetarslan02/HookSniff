@@ -31,7 +31,8 @@
 
 | # | Sorun | Dosya |
 |---|-------|-------|
-| 1 | `ip_whitelist` tek STRING column — array/table olmalı | `migrations/002_security_features.sql` |
+| 1 | `events.rs` SQL string interpolation (where_clause format! ile) | `api/src/routes/events.rs` |
+| 2 | `ip_whitelist` tek STRING column — array/table olmalı | `migrations/002_security_features.sql` |
 | 2 | `role` VARCHAR(50) — ENUM olmalı | `migrations/004_teams.sql` |
 | 3 | `amount_cents` INT — BIGINT olmalı | `migrations/009_payment_providers.sql` |
 | 4 | `currency` TEXT — CHAR(3) olmalı | `migrations/009_payment_providers.sql` |

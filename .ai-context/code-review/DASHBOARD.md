@@ -51,6 +51,25 @@
 | 13 | Dead code (`selected` state, `_setEvent`, `_endpoints`) | deliveries, search, playground |
 | 14 | Duplicate chart code (dashboard + analytics) | `page.tsx` + `analytics/page.tsx` |
 
+## 🔵 Düşük
+
+| # | Sorun | Dosya |
+|---|-------|-------|
+| 1 | Missing structured data (JSON-LD) | Public SEO pages |
+| 2 | Tables `<caption>` eksik | docs, alternatives pages |
+| 3 | Inconsistent `<a>` vs `<Link>` (i18n routing bypass) | about, pricing |
+| 4 | Missing OpenGraph metadata on some pages | docs, alternatives |
+| 5 | Missing `aria-live` regions for loading states | Tüm dashboard pages |
+| 6 | Format edilmemiş tarihler | `schemas/page.tsx` |
+| 7 | Template cards clickable ama action yok | `templates/page.tsx` |
+| 8 | Blog post ordering manual (`orderedSlugs`) | `blog/[slug]/page.tsx` |
+| 9 | ASCII art diagrams accessibility | `docs/architecture/page.tsx` |
+| 10 | `formatRelativeTime` future date handle etmiyor | `status/page.tsx` |
+| 11 | Retry attempt docs'da tutarsız (3 vs 6) | docs/retries, docs/concepts |
+| 12 | Code example'da `useTranslations` (React hook) Express handler'da | `docs/sdks/page.tsx` |
+| 13 | Hook0 comparison hatalı (self-hosted only yazıyor ama cloud var) | `alternatives/hook0/page.tsx` |
+| 14 | Blog search input'da `<label>` eksik | `blog/page.tsx` |
+
 ## 🟢 Güçlü Yönler
 
 - ✅ i18n desteği (next-intl) tüm sayfalarda
