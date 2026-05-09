@@ -111,3 +111,38 @@ struct DeliverySnapshot {
     created_at: chrono::DateTime<chrono::Utc>,
     endpoint_url: String,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── StreamParams ────────────────────────────────────────
+
+    #[test]
+    fn test_stream_params_all_none() {
+        let json = r#"{}"#;
+        let params: StreamParams = serde_json::from_str(json).unwrap();
+        assert!(params.since.is_none());
+    }
+
+    #[test]
+    fn test_stream_params_since_now() {
+        let json = r#"{"since":"now"}"#;
+        let params: StreamParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.since, Some("now".to_string()));
+    }
+
+    #[test]
+    fn test_stream_params_since_timestamp() {
+        let json = r#"{"since":"2024-01-01T00:00:00Z"}"#;
+        let params: StreamParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.since, Some("2024-01-01T00:00:00Z".to_string()));
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_stream_router_construction() {
+        let _router = router();
+    }
+}

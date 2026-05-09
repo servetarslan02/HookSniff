@@ -178,3 +178,131 @@ impl IndustryPackage for FintechPackage {
         ]
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fintech_name() {
+        let pkg = FintechPackage::new();
+        assert_eq!(pkg.name(), "fintech");
+    }
+
+    #[test]
+    fn test_fintech_description() {
+        let pkg = FintechPackage::new();
+        assert!(pkg.description().contains("financial technology"));
+    }
+
+    #[test]
+    fn test_fintech_event_types() {
+        let pkg = FintechPackage::new();
+        let events = pkg.event_types();
+        assert!(events.len() >= 18);
+        assert!(events.contains(&"payment.completed"));
+        assert!(events.contains(&"payment.pending"));
+        assert!(events.contains(&"payment.failed"));
+        assert!(events.contains(&"payment.refunded"));
+        assert!(events.contains(&"refund.created"));
+        assert!(events.contains(&"fraud.detected"));
+        assert!(events.contains(&"fraud.escalated"));
+        assert!(events.contains(&"transaction.anomaly"));
+        assert!(events.contains(&"chargeback.created"));
+        assert!(events.contains(&"chargeback.resolved"));
+        assert!(events.contains(&"payout.initiated"));
+        assert!(events.contains(&"payout.completed"));
+        assert!(events.contains(&"kyc.verified"));
+        assert!(events.contains(&"kyc.rejected"));
+        assert!(events.contains(&"account.frozen"));
+    }
+
+    #[test]
+    fn test_fintech_compliance() {
+        let pkg = FintechPackage::new();
+        let reqs = pkg.compliance_requirements();
+        assert_eq!(reqs.len(), 1);
+        assert_eq!(reqs[0].name, "PCI-DSS");
+        assert_eq!(reqs[0].masking_rules.len(), 5);
+
+        let rule_paths: Vec<&str> = reqs[0].masking_rules.iter().map(|r| r.field_path.as_str()).collect();
+        assert!(rule_paths.contains(&"data.card_number"));
+        assert!(rule_paths.contains(&"data.card_cvv"));
+        assert!(rule_paths.contains(&"data.account_number"));
+        assert!(rule_paths.contains(&"data.routing_number"));
+        assert!(rule_paths.contains(&"data.ssn"));
+    }
+
+    #[test]
+    fn test_fintech_compliance_card_cvv_replacement() {
+        let pkg = FintechPackage::new();
+        let reqs = pkg.compliance_requirements();
+        let cvv_rule = reqs[0].masking_rules.iter().find(|r| r.field_path == "data.card_cvv").unwrap();
+        assert_eq!(cvv_rule.strategy, "full");
+        assert_eq!(cvv_rule.replacement, Some("***".to_string()));
+        assert!(cvv_rule.pattern.is_some());
+    }
+
+    #[test]
+    fn test_fintech_agents() {
+        let pkg = FintechPackage::new();
+        let agents = pkg.agents();
+        assert_eq!(agents.len(), 3);
+
+        let names: Vec<&str> = agents.iter().map(|a| a.name.as_str()).collect();
+        assert!(names.contains(&"fraud_detector"));
+        assert!(names.contains(&"transaction_anomaly_detector"));
+        assert!(names.contains(&"chargeback_predictor"));
+    }
+
+    #[test]
+    fn test_fintech_fraud_detector_agent() {
+        let pkg = FintechPackage::new();
+        let agent = pkg.agents().into_iter().find(|a| a.name == "fraud_detector").unwrap();
+        assert_eq!(agent.agent_type, "anomaly_detection");
+        assert!(agent.event_types.contains(&"payment.completed".to_string()));
+        assert!(agent.event_types.contains(&"fraud.detected".to_string()));
+        assert!(agent.config["velocity_threshold_per_minute"] == 10);
+        assert!(agent.config["geo_anomaly_enabled"] == true);
+    }
+
+    #[test]
+    fn test_fintech_webhook_chains() {
+        let pkg = FintechPackage::new();
+        let chains = pkg.webhook_chains();
+        assert_eq!(chains.len(), 2);
+        assert_eq!(chains[0].trigger_event, "payment.completed");
+        assert!(chains[0].downstream_events.contains(&"fraud.detected".to_string()));
+        assert_eq!(chains[1].trigger_event, "fraud.detected");
+        assert!(chains[1].downstream_events.contains(&"account.frozen".to_string()));
+    }
+
+    #[test]
+    fn test_fintech_rate_limits() {
+        let pkg = FintechPackage::new();
+        let limits = pkg.rate_limits();
+        assert_eq!(limits.len(), 3);
+        assert_eq!(limits[0].event_pattern, "payment.*");
+        assert_eq!(limits[0].requests_per_minute, 500);
+        assert_eq!(limits[1].event_pattern, "fraud.*");
+        assert_eq!(limits[1].requests_per_minute, 200);
+    }
+
+    #[test]
+    fn test_fintech_default() {
+        let pkg = FintechPackage::default();
+        assert_eq!(pkg.name(), "fintech");
+    }
+
+    #[test]
+    fn test_fintech_config() {
+        let pkg = FintechPackage::new();
+        let config = pkg.config();
+        assert_eq!(config.name, "fintech");
+        assert!(!config.event_types.is_empty());
+        assert!(!config.compliance.is_empty());
+        assert!(!config.agents.is_empty());
+        assert!(!config.webhook_chains.is_empty());
+        assert!(!config.rate_limits.is_empty());
+    }
+}

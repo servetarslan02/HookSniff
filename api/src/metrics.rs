@@ -206,3 +206,228 @@ pub async fn metrics_handler(
 ) -> String {
     metrics.render()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_metrics_new() {
+        let m = Metrics::new();
+        // Use each metric at least once so they appear in gather()
+        m.http_requests_total.with_label_values(&["GET", "/", "200"]).inc();
+        m.http_request_duration_seconds.observe(0.01);
+        m.active_connections.inc();
+        m.webhook_deliveries_total.with_label_values(&["ok"]).inc();
+        m.delivery_count.with_label_values(&["ep-1", "ok"]).inc();
+        m.delivery_latency_seconds.observe(0.01);
+        m.error_count.with_label_values(&["timeout"]).inc();
+        m.active_endpoints.set(1.0);
+        m.queue_publish_latency_seconds.observe(0.01);
+        m.db_query_duration_seconds.observe(0.01);
+
+        // Should have all expected metric families registered
+        let families = m.registry.gather();
+        let names: Vec<&str> = families.iter().map(|f| f.get_name()).collect();
+        assert!(names.contains(&"http_requests_total"), "missing http_requests_total, got: {:?}", names);
+        assert!(names.contains(&"http_request_duration_seconds"));
+        assert!(names.contains(&"active_connections"));
+        assert!(names.contains(&"webhook_deliveries_total"));
+        assert!(names.contains(&"delivery_count"));
+        assert!(names.contains(&"delivery_latency_seconds"));
+        assert!(names.contains(&"error_count"));
+        assert!(names.contains(&"active_endpoints"));
+        assert!(names.contains(&"queue_publish_latency_seconds"));
+        assert!(names.contains(&"db_query_duration_seconds"));
+    }
+
+    #[test]
+    fn test_metrics_default() {
+        let m = Metrics::default();
+        // Use at least one metric so gather() has data
+        m.active_connections.inc();
+        let families = m.registry.gather();
+        assert!(!families.is_empty());
+    }
+
+    #[test]
+    fn test_metrics_clone() {
+        let m = Metrics::new();
+        // Use at least one metric
+        m.active_connections.inc();
+        let m2 = m.clone();
+        // Both should share the same registry (Arc inside prometheus types)
+        let families1 = m.registry.gather();
+        let families2 = m2.registry.gather();
+        assert_eq!(families1.len(), families2.len());
+    }
+
+    #[test]
+    fn test_render_empty() {
+        let m = Metrics::new();
+        // render() produces empty output when no metrics have been used
+        let empty_output = m.render();
+        assert!(empty_output.is_empty() || !empty_output.contains("http_requests_total"));
+        // After using at least one metric, it should appear
+        m.http_requests_total.with_label_values(&["GET", "/", "200"]).inc();
+        let output = m.render();
+        assert!(!output.is_empty());
+        assert!(output.contains("http_requests_total"));
+    }
+
+    #[test]
+    fn test_render_with_data() {
+        let m = Metrics::new();
+        // Record some HTTP request metrics
+        m.http_requests_total
+            .with_label_values(&["GET", "/api/health", "200"])
+            .inc();
+        m.http_requests_total
+            .with_label_values(&["GET", "/api/health", "200"])
+            .inc();
+        m.http_request_duration_seconds.observe(0.05);
+
+        let output = m.render();
+        assert!(output.contains("http_requests_total"));
+        // Should have our labels
+        assert!(output.contains("GET"));
+        assert!(output.contains("/api/health"));
+    }
+
+    #[test]
+    fn test_active_connections_gauge() {
+        let m = Metrics::new();
+        assert_eq!(m.active_connections.get(), 0.0);
+        m.active_connections.inc();
+        assert_eq!(m.active_connections.get(), 1.0);
+        m.active_connections.inc();
+        assert_eq!(m.active_connections.get(), 2.0);
+        m.active_connections.dec();
+        assert_eq!(m.active_connections.get(), 1.0);
+    }
+
+    #[test]
+    fn test_active_endpoints_gauge() {
+        let m = Metrics::new();
+        m.active_endpoints.set(5.0);
+        assert_eq!(m.active_endpoints.get(), 5.0);
+        m.active_endpoints.set(0.0);
+        assert_eq!(m.active_endpoints.get(), 0.0);
+    }
+
+    #[test]
+    fn test_webhook_deliveries_counter() {
+        let m = Metrics::new();
+        m.webhook_deliveries_total
+            .with_label_values(&["success"])
+            .inc();
+        m.webhook_deliveries_total
+            .with_label_values(&["success"])
+            .inc();
+        m.webhook_deliveries_total
+            .with_label_values(&["failed"])
+            .inc();
+
+        let output = m.render();
+        assert!(output.contains("webhook_deliveries_total"));
+        assert!(output.contains("success"));
+        assert!(output.contains("failed"));
+    }
+
+    #[test]
+    fn test_delivery_count_counter() {
+        let m = Metrics::new();
+        m.delivery_count
+            .with_label_values(&["ep-123", "delivered"])
+            .inc();
+        m.delivery_count
+            .with_label_values(&["ep-123", "delivered"])
+            .inc_by(3);
+
+        let output = m.render();
+        assert!(output.contains("delivery_count"));
+        assert!(output.contains("ep-123"));
+    }
+
+    #[test]
+    fn test_delivery_latency_histogram() {
+        let m = Metrics::new();
+        m.delivery_latency_seconds.observe(0.1);
+        m.delivery_latency_seconds.observe(0.5);
+        m.delivery_latency_seconds.observe(2.0);
+
+        let output = m.render();
+        assert!(output.contains("delivery_latency_seconds"));
+    }
+
+    #[test]
+    fn test_error_count_counter() {
+        let m = Metrics::new();
+        m.error_count.with_label_values(&["timeout"]).inc();
+        m.error_count.with_label_values(&["dns"]).inc();
+
+        let output = m.render();
+        assert!(output.contains("error_count"));
+        assert!(output.contains("timeout"));
+        assert!(output.contains("dns"));
+    }
+
+    #[test]
+    fn test_queue_publish_latency_histogram() {
+        let m = Metrics::new();
+        m.queue_publish_latency_seconds.observe(0.01);
+        m.queue_publish_latency_seconds.observe(0.05);
+
+        let output = m.render();
+        assert!(output.contains("queue_publish_latency_seconds"));
+    }
+
+    #[test]
+    fn test_db_query_duration_histogram() {
+        let m = Metrics::new();
+        m.db_query_duration_seconds.observe(0.005);
+        m.db_query_duration_seconds.observe(0.1);
+
+        let output = m.render();
+        assert!(output.contains("db_query_duration_seconds"));
+    }
+
+    #[test]
+    fn test_render_contains_help_and_type() {
+        let m = Metrics::new();
+        // Use metrics so they appear in gather/render output
+        m.http_requests_total.with_label_values(&["GET", "/", "200"]).inc();
+        m.http_request_duration_seconds.observe(0.01);
+        m.active_connections.inc();
+        m.active_endpoints.set(1.0);
+        let output = m.render();
+        // Prometheus format includes HELP and TYPE lines
+        assert!(output.contains("# HELP http_requests_total"), "missing HELP for http_requests_total");
+        assert!(output.contains("# TYPE http_requests_total counter"), "missing TYPE for http_requests_total");
+        assert!(output.contains("# TYPE http_request_duration_seconds histogram"));
+        assert!(output.contains("# TYPE active_connections gauge"));
+    }
+
+    #[test]
+    fn test_metrics_handler_sync() {
+        let m = Metrics::new();
+        m.http_requests_total
+            .with_label_values(&["POST", "/webhooks", "201"])
+            .inc();
+        let output = m.render();
+        assert!(output.contains("http_requests_total"));
+        assert!(output.contains("POST"));
+    }
+
+    #[test]
+    fn test_arc_metrics() {
+        let m = Arc::new(Metrics::new());
+        let m2 = Arc::clone(&m);
+        m.http_requests_total
+            .with_label_values(&["GET", "/", "200"])
+            .inc();
+        // Shared state through Arc
+        let output = m2.render();
+        assert!(output.contains("http_requests_total"));
+    }
+}

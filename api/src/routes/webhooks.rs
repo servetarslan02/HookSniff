@@ -795,3 +795,199 @@ async fn get_delivery_attempts(
 
     Ok(Json(attempts))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    // ── escape_csv_cell tests ──
+
+    #[test]
+    fn test_escape_csv_cell_simple() {
+        assert_eq!(escape_csv_cell("hello"), "hello");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_with_comma() {
+        assert_eq!(escape_csv_cell("hello, world"), "\"hello, world\"");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_with_quote() {
+        assert_eq!(escape_csv_cell("say \"hi\""), "\"say \"\"hi\"\"\"");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_with_newline() {
+        assert_eq!(escape_csv_cell("line1\nline2"), "\"line1\nline2\"");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_formula_injection_equals() {
+        assert_eq!(escape_csv_cell("=cmd"), "'=cmd");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_formula_injection_plus() {
+        assert_eq!(escape_csv_cell("+SUM(A1)"), "'+SUM(A1)");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_formula_injection_minus() {
+        assert_eq!(escape_csv_cell("-1"), "'-1");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_formula_injection_at() {
+        assert_eq!(escape_csv_cell("@ref"), "'@ref");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_formula_injection_tab() {
+        assert_eq!(escape_csv_cell("\tvalue"), "'\tvalue");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_formula_injection_cr() {
+        assert_eq!(escape_csv_cell("\rvalue"), "'\rvalue");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_formula_and_comma() {
+        // Formula injection + comma => prefix + quoted
+        assert_eq!(escape_csv_cell("=A1,B2"), "'\"=A1,B2\"");
+    }
+
+    #[test]
+    fn test_escape_csv_cell_empty() {
+        assert_eq!(escape_csv_cell(""), "");
+    }
+
+    // ── parse_date_from_str tests ──
+
+    #[test]
+    fn test_parse_date_from_str_datetime() {
+        let dt = parse_date_from_str("2024-01-15T10:30:00").unwrap();
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+    }
+
+    #[test]
+    fn test_parse_date_from_str_date_only() {
+        let dt = parse_date_from_str("2024-01-15").unwrap();
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T00:00:00");
+    }
+
+    #[test]
+    fn test_parse_date_from_str_invalid() {
+        assert!(parse_date_from_str("not-a-date").is_none());
+    }
+
+    // ── parse_date_to_str tests ──
+
+    #[test]
+    fn test_parse_date_to_str_datetime() {
+        let dt = parse_date_to_str("2024-01-15T10:30:00").unwrap();
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+    }
+
+    #[test]
+    fn test_parse_date_to_str_date_only() {
+        let dt = parse_date_to_str("2024-01-15").unwrap();
+        // Date-only should set to end of day (23:59:59)
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T23:59:59");
+    }
+
+    #[test]
+    fn test_parse_date_to_str_invalid() {
+        assert!(parse_date_to_str("bad-date").is_none());
+    }
+
+    // ── ListParams tests ──
+
+    #[test]
+    fn test_list_params_deserialize() {
+        let json = r#"{"page": 2, "per_page": 50, "status": "delivered"}"#;
+        let params: ListParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.page.unwrap(), 2);
+        assert_eq!(params.per_page.unwrap(), 50);
+        assert_eq!(params.status.unwrap(), "delivered");
+    }
+
+    #[test]
+    fn test_list_params_defaults() {
+        let json = r#"{}"#;
+        let params: ListParams = serde_json::from_str(json).unwrap();
+        assert!(params.page.is_none());
+        assert!(params.per_page.is_none());
+        assert!(params.status.is_none());
+    }
+
+    // ── ExportParams tests ──
+
+    #[test]
+    fn test_export_params_deserialize() {
+        let json = r#"{"format": "csv", "status": "failed", "date_from": "2024-01-01", "date_to": "2024-01-31"}"#;
+        let params: ExportParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.format.unwrap(), "csv");
+        assert_eq!(params.status.unwrap(), "failed");
+        assert_eq!(params.date_from.unwrap(), "2024-01-01");
+        assert_eq!(params.date_to.unwrap(), "2024-01-31");
+    }
+
+    #[test]
+    fn test_export_params_empty() {
+        let json = r#"{}"#;
+        let params: ExportParams = serde_json::from_str(json).unwrap();
+        assert!(params.format.is_none());
+        assert!(params.status.is_none());
+    }
+
+    // ── BatchReplayRequest tests ──
+
+    #[test]
+    fn test_batch_replay_request_deserialize() {
+        let id1 = Uuid::new_v4();
+        let id2 = Uuid::new_v4();
+        let json = format!(r#"{{"delivery_ids": ["{}", "{}"]}}"#, id1, id2);
+        let req: BatchReplayRequest = serde_json::from_str(&json).unwrap();
+        assert_eq!(req.delivery_ids.len(), 2);
+        assert_eq!(req.delivery_ids[0], id1);
+        assert_eq!(req.delivery_ids[1], id2);
+    }
+
+    #[test]
+    fn test_batch_replay_request_empty() {
+        let json = r#"{"delivery_ids": []}"#;
+        let req: BatchReplayRequest = serde_json::from_str(json).unwrap();
+        assert!(req.delivery_ids.is_empty());
+    }
+
+    // ── Pagination logic tests ──
+
+    #[test]
+    fn test_pagination_defaults() {
+        let page = None::<i64>;
+        let per_page = None::<i64>;
+        let page = page.unwrap_or(1).max(1);
+        let per_page = per_page.unwrap_or(20).min(100);
+        let offset = (page - 1) * per_page;
+        assert_eq!(page, 1);
+        assert_eq!(per_page, 20);
+        assert_eq!(offset, 0);
+    }
+
+    #[test]
+    fn test_pagination_clamping() {
+        let page = Some(-1i64);
+        let per_page = Some(500i64);
+        let page = page.unwrap_or(1).max(1);
+        let per_page = per_page.unwrap_or(20).min(100);
+        assert_eq!(page, 1); // Clamped to 1
+        assert_eq!(per_page, 100); // Clamped to 100
+    }
+}
