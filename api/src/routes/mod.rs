@@ -2,9 +2,11 @@ pub mod admin;
 pub mod alerts;
 pub mod analytics;
 pub mod api_keys;
+pub mod audit_log;
 pub mod auth;
 pub mod billing;
 pub mod contact;
+pub mod custom_domains;
 pub mod customer_portal;
 pub mod delivery_details;
 pub mod devices;
@@ -16,12 +18,16 @@ pub mod health;
 pub mod health_endpoints;
 pub mod inbound;
 pub mod notifications;
+pub mod oauth;
 pub mod outbound_ips;
 pub mod playground;
+pub mod portal_config;
+pub mod rate_limits;
 pub mod routing;
 pub mod schemas;
 pub mod search;
 pub mod simulator;
+pub mod sso;
 pub mod stats;
 pub mod stream;
 pub mod teams;
@@ -73,9 +79,14 @@ pub fn api_router() -> Router {
         .nest("/schemas", schemas::router())
         .nest("/billing", billing::router())
         .nest("/portal", customer_portal::router())
+        .nest("/portal", portal_config::router())
         .nest("/teams", teams::router())
         .nest("/notifications", notifications::router())
         .nest("/devices", devices::router())
+        .nest("/audit-log", audit_log::router())
+        .nest("/sso", sso::router())
+        .nest("/custom-domains", custom_domains::router())
+        .nest("/rate-limits", rate_limits::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Inbound webhooks — uses API key auth (not JWT), so external services can call it
@@ -92,6 +103,7 @@ pub fn api_router() -> Router {
 
     Router::new()
         .nest("/auth", auth::router())
+        .nest("/oauth", oauth::router())
         .nest("/contact", contact::router())
         .nest("/outbound-ips", outbound_ips::router())
         .route(
@@ -135,5 +147,11 @@ mod tests {
         let _ = schemas::router();
         let _ = stream::router();
         let _ = outbound_ips::router();
+        let _ = audit_log::router();
+        let _ = sso::router();
+        let _ = custom_domains::router();
+        let _ = rate_limits::router();
+        let _ = portal_config::router();
+        let _ = oauth::router();
     }
 }

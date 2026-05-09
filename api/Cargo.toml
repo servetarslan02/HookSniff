@@ -45,3 +45,4 @@ async-trait.workspace = true
 redis = { version = "0.25", default-features = false, features = ["tokio-comp", "connection-manager", "script"] }
 totp-rs = { version = "5", features = ["otpauth"] }
 base32 = "0.5"
+urlencoding = "2"
