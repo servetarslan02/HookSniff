@@ -129,12 +129,26 @@ async fn upsert_portal_config(
         }
     }
 
-    // Validate custom CSS length
+    // Validate custom CSS length and sanitize
     if let Some(ref css) = req.custom_css {
         if css.len() > 10_000 {
             return Err(AppError::BadRequest(
                 "custom_css must be under 10KB".into(),
             ));
+        }
+        // Reject CSS containing dangerous patterns (XSS prevention)
+        let lower = css.to_lowercase();
+        let dangerous = [
+            "<script", "</script", "javascript:", "expression(", "url(data:",
+            "behavior:", "-moz-binding", "vbscript:", "<iframe", "</iframe",
+            "<object", "<embed", "onerror", "onload", "onclick", "onmouseover",
+        ];
+        for pattern in &dangerous {
+            if lower.contains(pattern) {
+                return Err(AppError::BadRequest(
+                    format!("custom_css contains forbidden pattern: {}", pattern),
+                ));
+            }
         }
     }
 
