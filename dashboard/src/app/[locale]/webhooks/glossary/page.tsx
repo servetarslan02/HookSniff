@@ -71,7 +71,7 @@ export default function GlossaryPage() {
 
         {/* Quick Nav */}
         <div className="flex flex-wrap gap-2 justify-center mb-12">
-          {glossary.slice(0, 10).map((item) => (
+          {glossary.map((item) => (
             <a
               key={item.term}
               href={`#${item.term.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`}
