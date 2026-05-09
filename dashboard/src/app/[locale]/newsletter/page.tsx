@@ -60,6 +60,7 @@ export default function NewsletterPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,8 +186,28 @@ export default function NewsletterPage() {
         {/* Past Issues */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Recent Issues</h2>
+
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-2 mb-6 justify-center">
+            {['all', 'Engineering', 'Product', 'Industry'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors ${
+                  activeCategory === cat
+                    ? 'bg-brand-600 text-white'
+                    : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-500'
+                }`}
+              >
+                {cat === 'all' ? 'All' : cat}
+              </button>
+            ))}
+          </div>
+
           <div className="space-y-4">
-            {pastIssues.map((issue) => (
+            {pastIssues
+              .filter((issue) => activeCategory === 'all' || issue.category === activeCategory)
+              .map((issue) => (
               <div
                 key={issue.slug}
                 className="flex items-start gap-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-500/20 transition-colors"
@@ -266,6 +287,32 @@ export default function NewsletterPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Team */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Who writes this?</h2>
+          <div className="max-w-lg mx-auto flex items-start gap-4 p-5 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shrink-0">
+              S
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 dark:text-white">Servet Arslan</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-500 mb-2">Founder &amp; Engineer @ HookSniff</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400">
+                Building webhook infrastructure for developers. Writing about distributed systems, Rust, and what I learn along the way.
+                Every issue is hand-crafted, not auto-generated.
+              </p>
+              <div className="flex items-center gap-3 mt-3">
+                <a href="https://github.com/servetarslan02" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  GitHub
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  𝕏 Twitter
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
