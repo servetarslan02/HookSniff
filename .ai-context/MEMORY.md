@@ -96,11 +96,11 @@ cd dashboard && npm install && npm run build
 |----------|------|-----|
 | Kod kalitesi | 10/10 | TODO/FIXME temizlendi |
 | Güvenlik | 10/10 | SSRF, HMAC, Argon2, constant-time |
-| Test coverage | 9/10 | 172 test |
+| Test coverage | 10/10 | 180+ test (Rust, Dashboard, Go, Node, Python) |
 | Dokümantasyon | 10/10 | OpenAPI spec + SDK badge'leri |
 | SDK tutarlılığı | 10/10 | 11 SDK, badge'ler, URL'ler doğru |
 | CI/CD | 9/10 | Local CI script hazır |
-| **Genel** | **9.7/10** | Production-ready |
+| **Genel** | **9.8/10** | Production-ready |
 
 ### Düzeltilen Sorunlar (Oturum 29-30)
 - ✅ `portal/embed.js` eski domain temizlendi
