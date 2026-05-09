@@ -8,7 +8,7 @@ Go client library for the [HookSniff](https://github.com/servetarslan02/hooksnif
 ## Installation
 
 ```bash
-go get github.com/servetarslan02/hooksniff/sdks/go
+go get github.com/servetarslan02/hooksniff-go
 ```
 
 ## Quick Start
@@ -21,7 +21,7 @@ import (
     "fmt"
     "log"
 
-    hooksniff "github.com/servetarslan02/hooksniff/sdks/go"
+    hooksniff "github.com/servetarslan02/hooksniff-go"
 )
 
 func main() {
