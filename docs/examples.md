@@ -7,14 +7,14 @@ Forward Stripe payment events to Slack.
 ```bash
 # 1. Create endpoint pointing to Slack incoming webhook
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
-  -H "Authorization: Bearer $HOOKRELAY_KEY" \
+  -H "Authorization: Bearer $HOOKSNIFF_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK", "description": "Stripe → Slack"}'
 
 # 2. In your Stripe webhook handler, forward to HookSniff
 # (Your app receives Stripe webhook, then sends to HookSniff)
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
-  -H "Authorization: Bearer $HOOKRELAY_KEY" \
+  -H "Authorization: Bearer $HOOKSNIFF_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "endpoint_id": "ep_YOUR_ID",
@@ -30,7 +30,7 @@ Trigger deployments on push events.
 ```bash
 # 1. Create endpoint for your deploy service
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
-  -H "Authorization: Bearer $HOOKRELAY_KEY" \
+  -H "Authorization: Bearer $HOOKSNIFF_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://deploy.myapp.com/api/trigger", "description": "GitHub push → Deploy"}'
 
@@ -109,7 +109,7 @@ def verify_signature(payload: str, signature: str) -> bool:
 
 @app.route('/webhook', methods=['POST'])
 def handle_webhook():
-    signature = request.headers.get('X-HookSniff-Signature', '')
+    signature = request.headers.get('webhook-signature', '')
     if not verify_signature(request.get_data(as_text=True), signature):
         return jsonify({'error': 'Invalid signature'}), 401
 
