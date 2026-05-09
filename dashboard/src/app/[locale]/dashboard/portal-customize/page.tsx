@@ -46,18 +46,19 @@ export default function PortalCustomizationPage() {
   const fetchConfig = useCallback(async () => {
     if (!token) return;
     try {
-      try {
-        // Try portal profile (existing endpoint)
-        const data = await apiFetch<{ name?: string; plan?: string }>('/portal/me', { token });
-        setConfig((prev) => ({ ...prev, company_name: data.name || prev.company_name }));
-      } catch {
-        // Use defaults — portal config endpoint may not exist yet
-      }
-      // Also load from localStorage (fallback)
-      try {
-        const saved = localStorage.getItem('hooksniff_portal_config');
-        if (saved) setConfig((prev) => ({ ...prev, ...JSON.parse(saved) }));
-      } catch {}
+      const data = await apiFetch<{ id?: string; company_name?: string; logo_url?: string; primary_color?: string; font_family?: string; dark_mode?: boolean; show_events?: boolean; show_deliveries?: boolean; allowed_events?: string[]; custom_css?: string }>('/portal/config', { token });
+      setConfig({
+        primary_color: data.primary_color || '#6366f1',
+        logo_url: data.logo_url || '',
+        company_name: data.company_name || '',
+        font_family: data.font_family || 'Inter',
+        dark_mode: data.dark_mode ?? false,
+        show_events: data.show_events ?? true,
+        show_deliveries: data.show_deliveries ?? true,
+        allowed_events: data.allowed_events || [],
+      });
+    } catch {
+      // Use defaults
     } finally {
       setLoading(false);
     }
@@ -69,12 +70,10 @@ export default function PortalCustomizationPage() {
     if (!token) return;
     setSaving(true);
     try {
-      await apiFetch('/portal/config', { method: 'PUT', body: config, token });
+      await apiFetch('/portal/config', { method: 'POST', body: config, token });
       toast('Portal configuration saved!', 'success');
-    } catch {
-      // Portal config endpoint may not exist yet — save to localStorage as fallback
-      try { localStorage.setItem('hooksniff_portal_config', JSON.stringify(config)); } catch {}
-      toast('Portal config saved locally (backend endpoint pending)', 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Failed to save portal config', 'error');
     } finally {
       setSaving(false);
     }

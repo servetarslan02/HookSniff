@@ -1,56 +1,81 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { apiFetch } from '@/lib/api';
 
 /* ─── SSO/SAML Configuration Page ─── */
 export default function SsoSettingsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const [provider, setProvider] = useState<'saml' | 'oidc' | ''>('');
+  const [provider, setProvider] = useState<'saml' | 'oidc'>('saml');
   const [metadata, setMetadata] = useState('');
   const [entityId, setEntityId] = useState('');
   const [ssoUrl, setSsoUrl] = useState('');
   const [certificate, setCertificate] = useState('');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [enabled, setEnabled] = useState(false);
+
+  const fetchConfig = useCallback(async () => {
+    if (!token) return;
+    try {
+      const data = await apiFetch<{ provider?: string; enabled?: boolean; metadata_url?: string; entity_id?: string; sso_url?: string; certificate_set?: boolean; issuer_url?: string; client_id?: string; client_secret_set?: boolean }>('/sso/config', { token });
+      if (data.provider) {
+        setProvider(data.provider as 'saml' | 'oidc');
+        setEnabled(data.enabled || false);
+        setMetadata(data.metadata_url || data.issuer_url || '');
+        setEntityId(data.entity_id || data.client_id || '');
+        setSsoUrl(data.sso_url || '');
+        // certificate_set tells us if one exists, but we don't load it
+      }
+    } catch {
+      // Config may not exist yet — use defaults
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => { fetchConfig(); }, [fetchConfig]);
 
   const handleSave = async () => {
     if (!token) return;
     setSaving(true);
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-      const res = await fetch(`${API}/sso/config`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          provider,
-          metadata_url: metadata,
-          entity_id: entityId,
-          sso_url: ssoUrl,
-          certificate,
-          enabled,
-        }),
-      });
-      if (res.ok) {
-        toast('SSO configuration saved!', 'success');
-      } else if (res.status === 404) {
-        // Backend endpoint doesn't exist yet — save locally
-        try { localStorage.setItem('hooksniff_sso_config', JSON.stringify({ provider, metadata, entityId, ssoUrl, certificate, enabled })); } catch {}
-        toast('SSO config saved locally (backend endpoint pending)', 'success');
+      const body: Record<string, unknown> = {
+        provider,
+        enabled,
+      };
+      if (provider === 'saml') {
+        body.metadata_url = metadata || null;
+        body.entity_id = entityId || null;
+        body.sso_url = ssoUrl || null;
+        if (certificate) body.certificate = certificate;
       } else {
-        toast('Failed to save SSO config', 'error');
+        body.issuer_url = metadata || null;
+        body.client_id = entityId || null;
+        if (certificate) body.client_secret = certificate;
       }
-    } catch {
-      // Network error or endpoint doesn't exist — save locally
-      try { localStorage.setItem('hooksniff_sso_config', JSON.stringify({ provider, metadata, entityId, ssoUrl, certificate, enabled })); } catch {}
-      toast('SSO config saved locally (backend endpoint pending)', 'success');
+      await apiFetch('/sso/config', { method: 'POST', body, token });
+      toast('SSO configuration saved!', 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Failed to save SSO config', 'error');
     } finally {
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="glass-card p-6 animate-pulse">
+          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4" />
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
