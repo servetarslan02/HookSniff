@@ -30,6 +30,8 @@ Thumbs.db
 .env.production
 .vercel
 deploy/gcp-service-account.json
+.ai-context/EXTERNAL_TOKENS.md
+.ai-context/gcp-service-account.json
 
 # OpenClaw workspace files (should NOT be in this repo)
 AGENTS.md
