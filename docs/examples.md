@@ -49,18 +49,28 @@ app.use(express.json());
 const WEBHOOK_SECRET = 'whsec_your_endpoint_secret';
 
 function verifySignature(req) {
-  const signature = req.headers['x-hooksniff-signature'];
-  if (!signature) return false;
+  const msgId = req.headers['webhook-id'];
+  const timestamp = req.headers['webhook-timestamp'];
+  const signature = req.headers['webhook-signature'];
+  if (!signature || !msgId || !timestamp) return false;
 
-  const expected = 'sha256=' + crypto
-    .createHmac('sha256', WEBHOOK_SECRET)
-    .update(JSON.stringify(req.body))
-    .digest('hex');
+  // Check timestamp (reject if older than 5 minutes)
+  const age = Math.abs(Date.now() / 1000 - parseInt(timestamp));
+  if (age > 300) return false;
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expected)
-  );
+  // Decode secret
+  const secretBytes = Buffer.from(WEBHOOK_SECRET.replace('whsec_', ''), 'base64');
+
+  // Compute expected signature
+  const signedContent = `${msgId}.${timestamp}.${JSON.stringify(req.body)}`;
+  const expected = 'v1,' + crypto
+    .createHmac('sha256', secretBytes)
+    .update(signedContent)
+    .digest('base64');
+
+  // Verify (may have multiple space-separated signatures)
+  const sigs = signature.split(' ');
+  return sigs.some(sig => sig === expected);
 }
 
 app.post('/webhook', (req, res) => {
@@ -99,18 +109,39 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 WEBHOOK_SECRET = 'whsec_your_endpoint_secret'
 
-def verify_signature(payload: str, signature: str) -> bool:
-    expected = 'sha256=' + hmac.new(
-        WEBHOOK_SECRET.encode(),
-        payload.encode(),
-        hashlib.sha256
-    ).hexdigest()
-    return hmac.compare_digest(signature, expected)
+def verify_webhook(request) -> bool:
+    import base64, time
+    msg_id = request.headers.get('webhook-id', '')
+    timestamp = request.headers.get('webhook-timestamp', '')
+    signature = request.headers.get('webhook-signature', '')
+    if not all([msg_id, timestamp, signature]):
+        return False
+
+    # Check timestamp (reject if older than 5 minutes)
+    age = abs(time.time() - int(timestamp))
+    if age > 300:
+        return False
+
+    # Decode secret
+    secret_bytes = base64.b64decode(WEBHOOK_SECRET.replace('whsec_', ''))
+
+    # Compute expected signature
+    payload = request.get_data(as_text=True)
+    signed_content = f"{msg_id}.{timestamp}.{payload}"
+    expected = 'v1,' + base64.b64encode(
+        hmac.new(secret_bytes, signed_content.encode(), hashlib.sha256).digest()
+    ).decode()
+
+    # Verify (may have multiple space-separated signatures)
+    return any(
+        hmac.compare_digest(sig.strip(), expected)
+        for sig in signature.split(' ')
+        if sig.strip()
+    )
 
 @app.route('/webhook', methods=['POST'])
 def handle_webhook():
-    signature = request.headers.get('webhook-signature', '')
-    if not verify_signature(request.get_data(as_text=True), signature):
+    if not verify_webhook(request):
         return jsonify({'error': 'Invalid signature'}), 401
 
     data = request.json

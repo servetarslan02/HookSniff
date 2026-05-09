@@ -11,7 +11,7 @@ This guide walks you through setting up every service, getting credentials, and 
 1. [Overview](#overview)
 2. [Neon — Database](#1-neon--postgresql-database)
 3. [Upstash — Redis Queue](#2-upstash--redis)
-4. [Google Cloud Run — API + Worker Hosting](#3-oracle-cloud--api--worker)
+4. [Google Cloud Run — API + Worker Hosting](#3-google-cloud-run--api--worker)
 5. [Vercel — Dashboard Hosting](#4-vercel--dashboard)
 6. [Grafana Cloud — Monitoring](#5-grafana-cloud--monitoring)
 7. [Cloudflare R2 — Storage](#6-cloudflare-r2--storage)
@@ -141,7 +141,7 @@ UPSTASH_REDIS_REST_TOKEN=AYxxASQxxxxxxxxxxxxxxxxxxxxx
 
 ### Step-by-Step Setup
 
-1. **Go to** [cloud.oracle.com](https://cloud.oracle.com/free)
+1. **Go to** [console.cloud.google.com](https://console.cloud.google.com/free)
 2. **Create an account:**
    - Email, password, home region
    - **Credit card required** for identity verification only — you will NOT be charged for Always Free resources
@@ -222,11 +222,11 @@ REDIS_URL=rediss://default:...@xxx.upstash.io:6379
 
 ### Gotchas
 
-- **Always Free is truly free** — Oracle will never charge you for these resources. They're "always free" by design.
+- **Always Free is truly free** — Google Cloud will never charge you for these resources. They're "always free" by design.
 - **Credit card** is only for identity verification. If you exceed Always Free limits, services stop (not charge).
 - **ARM architecture** — Make sure your Docker images are built for `linux/arm64`. The provided `Dockerfile.api` and `Dockerfile.worker` should work, but test locally first.
 - **Boot volume:** 47 GB included. Don't fill it up with Docker images — use `docker system prune` regularly.
-- **Public IP:** Oracle assigns ephemeral public IPs by default. For a permanent IP, allocate a reserved public IP (free, up to 2 for ARM).
+- **Public IP:** Google Cloud assigns ephemeral public IPs by default. For a permanent IP, allocate a reserved public IP (free, up to 2 for ARM).
 - **Outbound port 25** is blocked by default (anti-spam). Use Resend or SMTP relay for email.
 - **No built-in HTTPS** — You'll need Cloudflare or Let's Encrypt for SSL (see Cloudflare section).
 
@@ -599,7 +599,7 @@ When you outgrow free tiers:
 |------------|----------|------|
 | Neon storage > 0.5 GB | Neon Scale plan | $19/mo |
 | Upstash commands > 500K | Upstash Pro | $120/mo |
-| Need more VM resources | Oracle paid tier or AWS/GCP | $20-100/mo |
+| Need more VM resources | Google Cloud paid tier or AWS/GCP | $20-100/mo |
 | Vercel bandwidth > 100 GB | Vercel Pro | $20/mo |
 | Need more logs/metrics | Grafana Cloud paid | Pay-as-you-go |
 | R2 storage > 10 GB | R2 paid | $0.015/GB-mo |

@@ -6,9 +6,9 @@ HookSniff workers send webhook deliveries from **static IP addresses**. If your 
 
 | IP Address | Region | Status |
 |---|---|---|
-| `TBD` | EU (Frankfurt) | ⏳ Pending Oracle Cloud VM setup |
+| `TBD` | EU (Frankfurt) | ⏳ Pending Cloud Run IP allocation |
 
-> ⚠️ **Placeholder** — IPs will be published once the Oracle Cloud production VM is provisioned.
+> ⚠️ **Placeholder** — IPs will be published once Cloud Run static IPs are configured.
 
 ## API Endpoint
 
