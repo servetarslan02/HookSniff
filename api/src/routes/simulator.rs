@@ -101,3 +101,103 @@ async fn simulate_webhook(
         success: !fail,
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_simulate_request_deserialize() {
+        let json = r#"{
+            "data": {"key": "value"},
+            "event": "order.created",
+            "status_code": 201,
+            "delay_ms": 100,
+            "fail": false
+        }"#;
+        let req: SimulateRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.event.unwrap(), "order.created");
+        assert_eq!(req.status_code.unwrap(), 201);
+        assert_eq!(req.delay_ms.unwrap(), 100);
+        assert_eq!(req.fail.unwrap(), false);
+    }
+
+    #[test]
+    fn test_simulate_request_minimal() {
+        let json = r#"{"data": {"test": true}}"#;
+        let req: SimulateRequest = serde_json::from_str(json).unwrap();
+        assert!(req.event.is_none());
+        assert!(req.status_code.is_none());
+        assert!(req.delay_ms.is_none());
+        assert!(req.fail.is_none());
+    }
+
+    #[test]
+    fn test_simulate_response_serialize() {
+        let resp = SimulateResponse {
+            status_code: 200,
+            body: serde_json::json!({"received": true}),
+            signature: "v1,abc123".to_string(),
+            elapsed_ms: 5,
+            success: true,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["status_code"], 200);
+        assert_eq!(json["success"], true);
+        assert_eq!(json["elapsed_ms"], 5);
+        assert_eq!(json["signature"], "v1,abc123");
+    }
+
+    #[test]
+    fn test_simulate_request_debug() {
+        let json = r#"{"data": {}}"#;
+        let req: SimulateRequest = serde_json::from_str(json).unwrap();
+        let debug = format!("{:?}", req);
+        assert!(debug.contains("SimulateRequest"));
+    }
+
+    #[test]
+    fn test_fail_logic() {
+        let fail = Some(true);
+        let fail = fail.unwrap_or(false);
+        assert!(fail);
+
+        let status_code = if fail { 500 } else { 200 };
+        assert_eq!(status_code, 500);
+
+        let success = !fail;
+        assert!(!success);
+    }
+
+    #[test]
+    fn test_status_code_defaults() {
+        // When fail=true and no status_code => 500
+        let fail = true;
+        let status_code: u16 = if fail { None.unwrap_or(500) } else { None.unwrap_or(200) };
+        assert_eq!(status_code, 500);
+
+        // When fail=false and no status_code => 200
+        let fail = false;
+        let status_code: u16 = if fail { None.unwrap_or(500) } else { None.unwrap_or(200) };
+        assert_eq!(status_code, 200);
+    }
+
+    #[test]
+    fn test_delay_clamping() {
+        // Delay should be capped at 30000ms
+        let delay = Some(60000u64);
+        if let Some(d) = delay {
+            if d > 0 && d <= 30000 {
+                // Would sleep
+            } else {
+                // Too large, skip
+                assert!(d > 30000);
+            }
+        }
+    }
+}

@@ -52,3 +52,33 @@ pub async fn openapi_spec() -> (axum::http::StatusCode, axum::http::HeaderMap, &
     );
     (axum::http::StatusCode::OK, headers, OPENAPI_SPEC)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_swagger_ui_html_contains_title() {
+        assert!(SWAGGER_UI_HTML.contains("HookSniff API Documentation"));
+    }
+
+    #[test]
+    fn test_swagger_ui_html_contains_swagger_ui_div() {
+        assert!(SWAGGER_UI_HTML.contains(r#"id="swagger-ui""#));
+    }
+
+    #[test]
+    fn test_swagger_ui_html_contains_swagger_script() {
+        assert!(SWAGGER_UI_HTML.contains("swagger-ui-dist@5.10.3"));
+    }
+
+    #[test]
+    fn test_swagger_ui_html_contains_openapi_url() {
+        assert!(SWAGGER_UI_HTML.contains("/v1/openapi.yaml"));
+    }
+
+    #[test]
+    fn test_openapi_spec_not_empty() {
+        assert!(!OPENAPI_SPEC.is_empty());
+    }
+}

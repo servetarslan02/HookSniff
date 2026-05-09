@@ -255,4 +255,91 @@ mod tests {
         assert_eq!(json["datacontenttype"], "application/json");
         assert_eq!(json["data"]["key"], "value");
     }
+
+    // ── Additional tests ──────────────────────────────────────
+
+    #[test]
+    fn test_cloud_event_no_data() {
+        let ce = CloudEvent::new("test.event", "source", None);
+        assert!(ce.data.is_none());
+        assert!(ce.validate().is_ok());
+    }
+
+    #[test]
+    fn test_cloud_event_empty_event_type_fails() {
+        let ce = CloudEvent::new("", "source", None);
+        let errors = ce.validate().unwrap_err();
+        assert!(errors.iter().any(|e| e.contains("type")));
+    }
+
+    #[test]
+    fn test_cloud_event_empty_source_fails() {
+        let ce = CloudEvent::new("test.event", "", None);
+        let errors = ce.validate().unwrap_err();
+        assert!(errors.iter().any(|e| e.contains("source")));
+    }
+
+    #[test]
+    fn test_cloud_event_pretty_json() {
+        let ce = CloudEvent::new("test.event", "source", None);
+        let pretty = ce.to_json_pretty().unwrap();
+        assert!(pretty.contains("\n")); // pretty print has newlines
+        assert!(pretty.contains("test.event"));
+    }
+
+    #[test]
+    fn test_cloud_event_from_json_invalid() {
+        assert!(CloudEvent::from_json("not json").is_err());
+        assert!(CloudEvent::from_json("{}").is_ok()); // missing fields default
+    }
+
+    #[test]
+    fn test_cloud_event_from_value() {
+        let val = serde_json::json!({
+            "specversion": "1.0",
+            "type": "test.event",
+            "source": "test-source",
+            "id": "test-id",
+            "time": "2024-01-01T00:00:00Z"
+        });
+        let ce = CloudEvent::from_value(&val).unwrap();
+        assert_eq!(ce.event_type, "test.event");
+        assert_eq!(ce.source, "test-source");
+    }
+
+    #[test]
+    fn test_cloud_event_unique_ids() {
+        let ce1 = CloudEvent::new("test", "source", None);
+        let ce2 = CloudEvent::new("test", "source", None);
+        assert_ne!(ce1.id, ce2.id);
+    }
+
+    #[test]
+    fn test_cloud_event_clone() {
+        let ce = CloudEvent::new("test", "source", Some(serde_json::json!({"a": 1})));
+        let cloned = ce.clone();
+        assert_eq!(ce.id, cloned.id);
+        assert_eq!(ce.event_type, cloned.event_type);
+    }
+
+    #[test]
+    fn test_cloud_event_debug() {
+        let ce = CloudEvent::new("test.event", "source", None);
+        let debug = format!("{:?}", ce);
+        assert!(debug.contains("CloudEvent"));
+        assert!(debug.contains("test.event"));
+    }
+
+    #[test]
+    fn test_from_delivery_with_nested_payload() {
+        let payload = serde_json::json!({
+            "order": {
+                "id": "ORD-1",
+                "items": [{"sku": "A", "qty": 2}]
+            }
+        });
+        let ce = CloudEvent::from_delivery("test", "del-1", "ep-1", payload);
+        assert!(ce.validate().is_ok());
+        assert!(ce.data.is_some());
+    }
 }

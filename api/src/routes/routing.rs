@@ -165,3 +165,120 @@ async fn get_health(
         using_fallback,
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── RoutingInfo ─────────────────────────────────────────
+
+    #[test]
+    fn test_routing_info_serialization() {
+        let info = RoutingInfo {
+            endpoint_id: Uuid::new_v4(),
+            routing_strategy: "round-robin".to_string(),
+            fallback_url: Some("https://fallback.example.com".to_string()),
+            avg_response_ms: 150,
+            failure_streak: 0,
+            is_healthy: true,
+            resolved_url: "https://primary.example.com".to_string(),
+            using_fallback: false,
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert_eq!(json["routing_strategy"], "round-robin");
+        assert_eq!(json["fallback_url"], "https://fallback.example.com");
+        assert_eq!(json["avg_response_ms"], 150);
+        assert!(json["is_healthy"].as_bool().unwrap());
+        assert!(!json["using_fallback"].as_bool().unwrap());
+    }
+
+    #[test]
+    fn test_routing_info_no_fallback() {
+        let info = RoutingInfo {
+            endpoint_id: Uuid::new_v4(),
+            routing_strategy: "sticky".to_string(),
+            fallback_url: None,
+            avg_response_ms: 200,
+            failure_streak: 3,
+            is_healthy: false,
+            resolved_url: "https://fallback.example.com".to_string(),
+            using_fallback: true,
+        };
+        let json = serde_json::to_value(&info).unwrap();
+        assert!(json["fallback_url"].is_null());
+        assert!(json["using_fallback"].as_bool().unwrap());
+        assert!(!json["is_healthy"].as_bool().unwrap());
+    }
+
+    // ── UpdateRoutingRequest ────────────────────────────────
+
+    #[test]
+    fn test_update_routing_request_with_both_fields() {
+        let json = r#"{"routing_strategy":"round-robin","fallback_url":"https://fb.com"}"#;
+        let req: UpdateRoutingRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.routing_strategy, Some("round-robin".to_string()));
+        assert_eq!(req.fallback_url, Some("https://fb.com".to_string()));
+    }
+
+    #[test]
+    fn test_update_routing_request_empty() {
+        let json = r#"{}"#;
+        let req: UpdateRoutingRequest = serde_json::from_str(json).unwrap();
+        assert!(req.routing_strategy.is_none());
+        assert!(req.fallback_url.is_none());
+    }
+
+    #[test]
+    fn test_update_routing_request_partial() {
+        let json = r#"{"routing_strategy":"sticky"}"#;
+        let req: UpdateRoutingRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.routing_strategy, Some("sticky".to_string()));
+        assert!(req.fallback_url.is_none());
+    }
+
+    // ── EndpointHealth ──────────────────────────────────────
+
+    #[test]
+    fn test_endpoint_health_serialization() {
+        let health = EndpointHealth {
+            endpoint_id: Uuid::new_v4(),
+            is_healthy: true,
+            failure_streak: 0,
+            avg_response_ms: 100,
+            last_failure_at: None,
+            routing_strategy: "round-robin".to_string(),
+            resolved_url: "https://example.com".to_string(),
+            using_fallback: false,
+        };
+        let json = serde_json::to_value(&health).unwrap();
+        assert!(json["is_healthy"].as_bool().unwrap());
+        assert_eq!(json["failure_streak"], 0);
+        assert!(json["last_failure_at"].is_null());
+    }
+
+    #[test]
+    fn test_endpoint_health_unhealthy_with_last_failure() {
+        let health = EndpointHealth {
+            endpoint_id: Uuid::new_v4(),
+            is_healthy: false,
+            failure_streak: 5,
+            avg_response_ms: 5000,
+            last_failure_at: Some(chrono::Utc::now()),
+            routing_strategy: "sticky".to_string(),
+            resolved_url: "https://fallback.com".to_string(),
+            using_fallback: true,
+        };
+        let json = serde_json::to_value(&health).unwrap();
+        assert!(!json["is_healthy"].as_bool().unwrap());
+        assert_eq!(json["failure_streak"], 5);
+        assert!(json["last_failure_at"].is_string());
+        assert!(json["using_fallback"].as_bool().unwrap());
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_routing_router_construction() {
+        let _router = router();
+    }
+}

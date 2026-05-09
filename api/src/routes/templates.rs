@@ -109,3 +109,37 @@ async fn apply_template(
         ),
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_template_list_params_deserialize() {
+        let json = r#"{"industry": "ecommerce", "tag": "orders"}"#;
+        let params: TemplateListParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.industry.unwrap(), "ecommerce");
+        assert_eq!(params.tag.unwrap(), "orders");
+    }
+
+    #[test]
+    fn test_template_list_params_empty() {
+        let json = r#"{}"#;
+        let params: TemplateListParams = serde_json::from_str(json).unwrap();
+        assert!(params.industry.is_none());
+        assert!(params.tag.is_none());
+    }
+
+    #[test]
+    fn test_template_list_params_debug() {
+        let json = r#"{"industry": "saas"}"#;
+        let params: TemplateListParams = serde_json::from_str(json).unwrap();
+        let debug = format!("{:?}", params);
+        assert!(debug.contains("TemplateListParams"));
+    }
+}

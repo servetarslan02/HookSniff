@@ -18,7 +18,7 @@ pub fn router() -> Router {
         .route("/{id}", delete(delete_notification))
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Notification {
     pub id: Uuid,
     pub customer_id: Uuid,
@@ -204,4 +204,149 @@ async fn delete_notification(
     }
 
     Ok(Json(serde_json::json!({ "deleted": true })))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::TimeZone;
+
+    // ── Notification ────────────────────────────────────────
+
+    #[test]
+    fn test_notification_serialization() {
+        let n = Notification {
+            id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            notification_type: "alert".to_string(),
+            title: "High failure rate".to_string(),
+            message: Some("Failure rate exceeded 5%".to_string()),
+            is_read: false,
+            link: Some("/alerts/123".to_string()),
+            created_at: Utc.with_ymd_and_hms(2024, 1, 15, 10, 30, 0).unwrap(),
+        };
+        let json = serde_json::to_value(&n).unwrap();
+        assert_eq!(json["type"], "alert");
+        assert_eq!(json["title"], "High failure rate");
+        assert!(!json["is_read"].as_bool().unwrap());
+    }
+
+    #[test]
+    fn test_notification_type_field_rename() {
+        let n = Notification {
+            id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            notification_type: "system".to_string(),
+            title: "Update".to_string(),
+            message: None,
+            is_read: true,
+            link: None,
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&n).unwrap();
+        // The field is renamed to "type" in serialization
+        assert!(json.get("type").is_some());
+        assert_eq!(json["type"], "system");
+    }
+
+    #[test]
+    fn test_notification_optional_fields_none() {
+        let n = Notification {
+            id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            notification_type: "info".to_string(),
+            title: "Info".to_string(),
+            message: None,
+            is_read: false,
+            link: None,
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&n).unwrap();
+        assert!(json["message"].is_null());
+        assert!(json["link"].is_null());
+    }
+
+    #[test]
+    fn test_notification_clone() {
+        let n = Notification {
+            id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            notification_type: "test".to_string(),
+            title: "Test".to_string(),
+            message: None,
+            is_read: false,
+            link: None,
+            created_at: Utc::now(),
+        };
+        let cloned = n.clone();
+        assert_eq!(cloned.title, n.title);
+    }
+
+    #[test]
+    fn test_notification_debug() {
+        let n = Notification {
+            id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            notification_type: "test".to_string(),
+            title: "Debug".to_string(),
+            message: None,
+            is_read: false,
+            link: None,
+            created_at: Utc::now(),
+        };
+        let _ = format!("{:?}", n);
+    }
+
+    // ── ListParams ──────────────────────────────────────────
+
+    #[test]
+    fn test_list_params_all_none() {
+        let json = r#"{}"#;
+        let params: ListParams = serde_json::from_str(json).unwrap();
+        assert!(params.page.is_none());
+        assert!(params.per_page.is_none());
+        assert!(params.unread_only.is_none());
+    }
+
+    #[test]
+    fn test_list_params_all_some() {
+        let json = r#"{"page":2,"per_page":50,"unread_only":true}"#;
+        let params: ListParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.page, Some(2));
+        assert_eq!(params.per_page, Some(50));
+        assert_eq!(params.unread_only, Some(true));
+    }
+
+    #[test]
+    fn test_list_params_unread_only_false() {
+        let json = r#"{"unread_only":false}"#;
+        let params: ListParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.unread_only, Some(false));
+    }
+
+    // ── NotificationListResponse ────────────────────────────
+
+    #[test]
+    fn test_notification_list_response_serialization() {
+        let resp = NotificationListResponse {
+            notifications: vec![],
+            total: 0,
+            unread_count: 0,
+            page: 1,
+            per_page: 20,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["total"], 0);
+        assert_eq!(json["unread_count"], 0);
+        assert_eq!(json["page"], 1);
+        assert_eq!(json["per_page"], 20);
+        assert!(json["notifications"].as_array().unwrap().is_empty());
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_notifications_router_construction() {
+        let _router = router();
+    }
 }

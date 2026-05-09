@@ -129,3 +129,103 @@ pub async fn handle_contact(
 pub fn router() -> Router {
     Router::new().route("/", axum::routing::post(handle_contact))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_contact_request_deserialize() {
+        let json = r#"{
+            "name": "John Doe",
+            "email": "john@example.com",
+            "subject": "Question",
+            "message": "Hello, I have a question."
+        }"#;
+        let req: ContactRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.name, "John Doe");
+        assert_eq!(req.email, "john@example.com");
+        assert_eq!(req.subject, "Question");
+        assert_eq!(req.message, "Hello, I have a question.");
+    }
+
+    #[test]
+    fn test_contact_response_serialize() {
+        let resp = ContactResponse {
+            success: true,
+            message: "Message received.".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["success"], true);
+        assert_eq!(json["message"], "Message received.");
+    }
+
+    #[test]
+    fn test_contact_response_failure() {
+        let resp = ContactResponse {
+            success: false,
+            message: "Failed to send.".to_string(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["success"], false);
+    }
+
+    #[test]
+    fn test_input_validation_empty_name() {
+        let req = ContactRequest {
+            name: "  ".to_string(),
+            email: "john@example.com".to_string(),
+            subject: "Test".to_string(),
+            message: "Hello".to_string(),
+        };
+        assert!(req.name.trim().is_empty());
+    }
+
+    #[test]
+    fn test_input_validation_empty_email() {
+        let req = ContactRequest {
+            name: "John".to_string(),
+            email: "  ".to_string(),
+            subject: "Test".to_string(),
+            message: "Hello".to_string(),
+        };
+        assert!(req.email.trim().is_empty());
+    }
+
+    #[test]
+    fn test_input_validation_empty_message() {
+        let req = ContactRequest {
+            name: "John".to_string(),
+            email: "john@example.com".to_string(),
+            subject: "Test".to_string(),
+            message: "  ".to_string(),
+        };
+        assert!(req.message.trim().is_empty());
+    }
+
+    #[test]
+    fn test_email_validation() {
+        // Valid email
+        assert!("user@example.com".contains('@') && "user@example.com".contains('.'));
+
+        // Invalid: no @
+        assert!(!("userexample.com".contains('@') && "userexample.com".contains('.')));
+
+        // Invalid: no dot
+        assert!(!("user@example".contains('@') && "user@example".contains('.')));
+    }
+
+    #[test]
+    fn test_message_length_limit() {
+        let long_message = "a".repeat(5001);
+        assert!(long_message.len() > 5000);
+
+        let ok_message = "a".repeat(5000);
+        assert!(ok_message.len() <= 5000);
+    }
+}

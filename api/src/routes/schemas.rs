@@ -115,3 +115,128 @@ async fn validate_event(
         "errors": result.errors,
     })))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::schemas::{EventSchema, RegisterSchemaRequest, ValidateEventRequest, ValidationResult, ValidationError};
+
+    // ── RegisterSchemaRequest ───────────────────────────────
+
+    #[test]
+    fn test_register_schema_request_deserialization() {
+        let json = r#"{
+            "name": "order.created",
+            "schema": {"type": "object", "properties": {"order_id": {"type": "string"}}},
+            "auto_detect": false
+        }"#;
+        let req: RegisterSchemaRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.name, "order.created");
+        assert!(!req.auto_detect);
+        assert!(req.schema.is_object());
+    }
+
+    #[test]
+    fn test_register_schema_request_auto_detect_default() {
+        let json = r#"{
+            "name": "user.signup",
+            "schema": {}
+        }"#;
+        let req: RegisterSchemaRequest = serde_json::from_str(json).unwrap();
+        assert!(!req.auto_detect); // default false
+    }
+
+    // ── ValidateEventRequest ────────────────────────────────
+
+    #[test]
+    fn test_validate_event_request_deserialization() {
+        let json = r#"{"event": {"order_id": "ord_123", "total": 49.99}}"#;
+        let req: ValidateEventRequest = serde_json::from_str(json).unwrap();
+        assert!(req.event.is_object());
+        assert_eq!(req.event["order_id"], "ord_123");
+    }
+
+    // ── ValidationResult ────────────────────────────────────
+
+    #[test]
+    fn test_validation_result_valid() {
+        let result = ValidationResult {
+            valid: true,
+            errors: vec![],
+        };
+        let json = serde_json::to_value(&result).unwrap();
+        assert!(json["valid"].as_bool().unwrap());
+        assert!(json["errors"].as_array().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_validation_result_with_errors() {
+        let result = ValidationResult {
+            valid: false,
+            errors: vec![ValidationError {
+                path: "/order_id".to_string(),
+                message: "Expected string, got number".to_string(),
+                expected: Some("string".to_string()),
+                actual: Some("number".to_string()),
+            }],
+        };
+        let json = serde_json::to_value(&result).unwrap();
+        assert!(!json["valid"].as_bool().unwrap());
+        assert_eq!(json["errors"].as_array().unwrap().len(), 1);
+    }
+
+    // ── EventSchema ─────────────────────────────────────────
+
+    #[test]
+    fn test_event_schema_serialization() {
+        let schema = EventSchema {
+            id: Uuid::new_v4(),
+            name: "order.created".to_string(),
+            version: 1,
+            schema: serde_json::json!({"type": "object"}),
+            customer_id: Uuid::new_v4(),
+            created_at: chrono::Utc::now(),
+        };
+        let json = serde_json::to_value(&schema).unwrap();
+        assert_eq!(json["name"], "order.created");
+        assert_eq!(json["version"], 1);
+    }
+
+    #[test]
+    fn test_event_schema_clone() {
+        let schema = EventSchema {
+            id: Uuid::new_v4(),
+            name: "test".to_string(),
+            version: 1,
+            schema: serde_json::json!({}),
+            customer_id: Uuid::new_v4(),
+            created_at: chrono::Utc::now(),
+        };
+        let cloned = schema.clone();
+        assert_eq!(cloned.name, schema.name);
+        assert_eq!(cloned.id, schema.id);
+    }
+
+    // ── ValidationError ─────────────────────────────────────
+
+    #[test]
+    fn test_validation_error_serialization() {
+        let err = ValidationError {
+            path: "/name".to_string(),
+            message: "Required field missing".to_string(),
+            expected: Some("string".to_string()),
+            actual: None,
+        };
+        let json = serde_json::to_value(&err).unwrap();
+        assert_eq!(json["path"], "/name");
+        assert_eq!(json["message"], "Required field missing");
+        assert!(json["actual"].is_null());
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_schemas_router_construction() {
+        let _router = router();
+    }
+}

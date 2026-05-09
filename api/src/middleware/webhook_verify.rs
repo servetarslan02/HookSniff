@@ -133,3 +133,184 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
         Ok(next.run(req).await)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::{body::Body, routing::post, Router};
+    use tower::ServiceExt;
+
+    fn test_app(signing_secret: Option<String>) -> Router {
+        let app = Router::new()
+            .route("/webhook", post(|| async { "ok" }))
+            .layer(axum::middleware::from_fn(webhook_verify_middleware));
+
+        if let Some(secret) = signing_secret {
+            app.layer(axum::extract::Extension(secret))
+        } else {
+            app
+        }
+    }
+
+    #[tokio::test]
+    async fn passes_through_without_standard_webhooks_headers() {
+        let app = test_app(None);
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/webhook")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"test": true}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        // No Standard Webhooks headers → pass through (200)
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn passes_through_with_partial_headers() {
+        let app = test_app(None);
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/webhook")
+                    .header("webhook-id", "msg_123")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"test": true}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        // Only one header present → pass through
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn passes_through_with_all_headers_but_no_secret() {
+        let app = test_app(None);
+        let now = chrono::Utc::now().timestamp();
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/webhook")
+                    .header("webhook-id", "msg_123")
+                    .header("webhook-timestamp", now.to_string())
+                    .header("webhook-signature", "v1,fakesig")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"test": true}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        // All headers present but no signing secret in extensions → pass through
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn rejects_expired_timestamp() {
+        let secret = "whsec_test_secret_key_for_testing";
+        let app = test_app(Some(secret.to_string()));
+
+        let msg_id = "msg_001";
+        let timestamp = "1000000000"; // Year 2001 — definitely expired
+        let body = r#"{"test": true}"#;
+        let signature_header = crate::signing::compute_standard_signature(secret, msg_id, timestamp, body);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/webhook")
+                    .header("webhook-id", msg_id)
+                    .header("webhook-timestamp", timestamp)
+                    .header("webhook-signature", &signature_header)
+                    .header("content-type", "application/json")
+                    .body(Body::from(body))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn rejects_invalid_signature() {
+        let secret = "whsec_another_test_secret";
+        let app = test_app(Some(secret.to_string()));
+
+        let now = chrono::Utc::now().timestamp();
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/webhook")
+                    .header("webhook-id", "msg_002")
+                    .header("webhook-timestamp", now.to_string())
+                    .header("webhook-signature", "v1,aW52YWxpZHNpZ25hdHVyZQ==") // base64("invalidsignature")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"test": true}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn accepts_valid_signature() {
+        let secret = "whsec_valid_test_secret_key";
+        let app = test_app(Some(secret.to_string()));
+
+        let msg_id = "msg_valid";
+        let now = chrono::Utc::now().timestamp().to_string();
+        let body = r#"{"webhook":"test"}"#;
+        let signature_header = crate::signing::compute_standard_signature(secret, msg_id, &now, body);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/webhook")
+                    .header("webhook-id", msg_id)
+                    .header("webhook-timestamp", &now)
+                    .header("webhook-signature", &signature_header)
+                    .header("content-type", "application/json")
+                    .body(Body::from(body))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn rejects_invalid_timestamp_format() {
+        let secret = "whsec_test";
+        let app = test_app(Some(secret.to_string()));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/webhook")
+                    .header("webhook-id", "msg_003")
+                    .header("webhook-timestamp", "not_a_number")
+                    .header("webhook-signature", "v1,fakesig")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"test": true}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+}

@@ -224,3 +224,149 @@ async fn latency_trend(
         overall_avg_ms: overall.0,
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── AnalyticsQuery ──────────────────────────────────────
+
+    #[test]
+    fn test_analytics_query_default_range() {
+        let json = r#"{}"#;
+        let q: AnalyticsQuery = serde_json::from_str(json).unwrap();
+        assert!(q.range.is_none());
+        assert_eq!(q.interval_hours(), 24);
+        assert_eq!(q.bucket_size_hours(), 1);
+    }
+
+    #[test]
+    fn test_analytics_query_24h() {
+        let json = r#"{"range":"24h"}"#;
+        let q: AnalyticsQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(q.range, Some("24h".to_string()));
+        assert_eq!(q.interval_hours(), 24);
+        assert_eq!(q.bucket_size_hours(), 1);
+    }
+
+    #[test]
+    fn test_analytics_query_7d() {
+        let json = r#"{"range":"7d"}"#;
+        let q: AnalyticsQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(q.interval_hours(), 168);
+        assert_eq!(q.bucket_size_hours(), 6);
+    }
+
+    #[test]
+    fn test_analytics_query_30d() {
+        let json = r#"{"range":"30d"}"#;
+        let q: AnalyticsQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(q.interval_hours(), 720);
+        assert_eq!(q.bucket_size_hours(), 24);
+    }
+
+    #[test]
+    fn test_analytics_query_unknown_range_defaults_to_24h() {
+        let json = r#"{"range":"90d"}"#;
+        let q: AnalyticsQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(q.interval_hours(), 24);
+        assert_eq!(q.bucket_size_hours(), 1);
+    }
+
+    // ── TimeBucket ──────────────────────────────────────────
+
+    #[test]
+    fn test_time_bucket_serialization() {
+        let bucket = TimeBucket {
+            timestamp: "2024-01-01 12:00:00".to_string(),
+            successful: 100,
+            failed: 5,
+            total: 105,
+        };
+        let json = serde_json::to_value(&bucket).unwrap();
+        assert_eq!(json["successful"], 100);
+        assert_eq!(json["failed"], 5);
+        assert_eq!(json["total"], 105);
+    }
+
+    // ── DeliveryTrendResponse ───────────────────────────────
+
+    #[test]
+    fn test_delivery_trend_response_serialization() {
+        let resp = DeliveryTrendResponse {
+            range: "24h".to_string(),
+            buckets: vec![
+                TimeBucket {
+                    timestamp: "2024-01-01 00:00:00".to_string(),
+                    successful: 50,
+                    failed: 2,
+                    total: 52,
+                },
+                TimeBucket {
+                    timestamp: "2024-01-01 01:00:00".to_string(),
+                    successful: 60,
+                    failed: 0,
+                    total: 60,
+                },
+            ],
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["range"], "24h");
+        assert_eq!(json["buckets"].as_array().unwrap().len(), 2);
+    }
+
+    // ── SuccessRateResponse ─────────────────────────────────
+
+    #[test]
+    fn test_success_rate_response_serialization() {
+        let resp = SuccessRateResponse {
+            range: "7d".to_string(),
+            successful: 1000,
+            failed: 10,
+            pending: 5,
+            success_rate: 98.52,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["range"], "7d");
+        assert_eq!(json["successful"], 1000);
+        assert_eq!(json["failed"], 10);
+        assert_eq!(json["pending"], 5);
+        assert_eq!(json["success_rate"], 98.52);
+    }
+
+    // ── LatencyBucket ───────────────────────────────────────
+
+    #[test]
+    fn test_latency_bucket_serialization() {
+        let bucket = LatencyBucket {
+            timestamp: "2024-01-01 12:00:00".to_string(),
+            avg_ms: 150.5,
+            p95_ms: 300.0,
+        };
+        let json = serde_json::to_value(&bucket).unwrap();
+        assert_eq!(json["avg_ms"], 150.5);
+        assert_eq!(json["p95_ms"], 300.0);
+    }
+
+    // ── LatencyTrendResponse ────────────────────────────────
+
+    #[test]
+    fn test_latency_trend_response_serialization() {
+        let resp = LatencyTrendResponse {
+            range: "30d".to_string(),
+            buckets: vec![],
+            overall_avg_ms: 120.0,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["range"], "30d");
+        assert_eq!(json["overall_avg_ms"], 120.0);
+        assert!(json["buckets"].as_array().unwrap().is_empty());
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_analytics_router_construction() {
+        let _router = router();
+    }
+}
