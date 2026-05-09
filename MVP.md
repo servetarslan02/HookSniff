@@ -1,60 +1,67 @@
 # HookSniff — MVP Tanımı
 
+> Son güncelleme: 2026-05-09
 > MVP = Satılabilir En Basit Ürün
-> Müşteri girip kayıt oluyor → endpoint oluşturuyor → webhook gönderiyor → logları görüyor → retry ediyor → plan satın alıyor → hiçbir yerde "bu eksik" demiyor.
 
 ---
 
-## MVP Checklist (~5 saat)
+## ✅ MVP Tamamlandı
 
-| # | Görev | Süre | Durum |
-|---|-------|------|-------|
-| 1 | Free tier limit: 1,000 → 10,000/ay | 5dk | ✅ |
-| 2 | Standard Webhooks header'ları ekle (`webhook-id`, `webhook-timestamp`, `webhook-signature`) | 45dk | ✅ |
-| 3 | Playground UI tamamla | 20dk | ✅ |
-| 4 | Delivery Details UI tamamla | 20dk | ✅ |
-| 5 | Custom Retry Policy UI ekle | 25dk | ✅ |
-| 6 | Signature Rotation UI ekle | 20dk | ✅ |
-| 7 | Rate Limit Dashboard ekle | 20dk | ✅ |
-| 8 | Customer Self-Service sayfası | 25dk | ✅ |
-| 9 | Event hierarchy filtering kontrol/düzelt (`user.*` → `user.created`+`user.updated`) | 30dk | ✅ |
-| 10 | Timestamp tolerans docs (±5dk replay protection) | 20dk | ✅ |
-| 11 | Alerting test et | 15dk | ✅ |
-| 12 | Health Monitoring test et | 15dk | ✅ |
-| 13 | Grafana OTEL test et | 30dk | ✅ |
+MVP checklist'inin tüm maddeleri tamamlandı:
 
----
-
-## Sonraki Versiyonlar (MVP sonrası)
-
-### v1.1 — Rekabet Avantajı (~10 saat)
-- Embeddable Customer Portal
-- CLI Tool tamamla
-- Inbound Webhook Proxy
-- Webhook Transformations
-
-### v1.2 — Fark Yaratma (~10 saat)
-- Bulk Operations
-- WebSocket real-time updates
-- Event Schema Validation
-- Self-Host kolaylaştırma (Helm chart)
-
-### v1.3 — Enterprise Ready (~8 saat)
-- Terraform Provider
-- Test coverage (unit + integration)
-- SOC 2 hazırlık
+| # | Görev | Durum |
+|---|-------|-------|
+| 1 | Free tier limit: 10,000/ay | ✅ |
+| 2 | Standard Webhooks header'ları | ✅ |
+| 3 | Playground UI | ✅ |
+| 4 | Delivery Details UI | ✅ |
+| 5 | Custom Retry Policy UI | ✅ |
+| 6 | Signature Rotation UI | ✅ |
+| 7 | Rate Limit Dashboard | ✅ |
+| 8 | Customer Self-Service | ✅ |
+| 9 | Event hierarchy filtering | ✅ |
+| 10 | Timestamp tolerans docs | ✅ |
+| 11 | Alerting | ✅ |
+| 12 | Health Monitoring | ✅ |
+| 13 | Grafana OTEL | ✅ |
 
 ---
 
-## Bloklar (Kullanıcı yapacak)
+## ✅ v1.1 — Rekabet Avantajı (Tamamlandı)
 
-| Görev | Not |
-|-------|-----|
-| Render Docker build düzelt | Deploy erişimi gerekli |
-| Resend domain doğrulama | DNS erişimi gerekli |
-| Domain kararı (eu.org vs .com) | eu.org ücretsiz, .com $12/yıl |
-| iyzico hesap aç | Vergi levhası + banka hesabı |
+| Feature | Durum |
+|---------|-------|
+| Embeddable Customer Portal | ✅ `routes/embed.rs` |
+| CLI Tool | ✅ `cli/` |
+| Inbound Webhook Proxy | ✅ `routes/inbound.rs` |
+| Webhook Transformations | ✅ `transform/` |
+
+## ✅ v1.2 — Fark Yaratma (Tamamlandı)
+
+| Feature | Durum |
+|---------|-------|
+| Bulk Operations | ✅ `routes/webhooks.rs` (batch) |
+| WebSocket real-time updates | ✅ `ws/` |
+| Event Schema Validation | ✅ `schemas/` |
+| Self-Host | ✅ `docker-compose.yml` + `docs/SELF-HOST.md` |
+
+## 🔄 v1.3 — Enterprise Ready (Kısmen)
+
+| Feature | Durum |
+|---------|-------|
+| Terraform Provider | ⏳ `deploy/terraform-provider-hooksniff/` klasörü var |
+| Test coverage | ⚠️ Unit testler var, integration testler eksik |
+| SOC 2 hazırlık | ❌ Başlanmadı |
 
 ---
 
-> Son güncelleme: 2026-05-08
+## 🔄 Planned (Henüz implementasyon yok)
+
+| Feature | Not |
+|---------|-----|
+| gRPC Delivery | Schema'da `delivery_targets` var ama implementasyon yok |
+| SQS Delivery | Schema'da `delivery_targets` var ama implementasyon yok |
+| Kafka Delivery | Schema'da `delivery_targets` var ama implementasyon yok |
+| npm publish | `@hooksniff/sdk` scope hazır |
+| PyPI publish | `hooksniff` paket adı hazır |
+| crates.io publish | `hooksniff` paket adı hazır |
