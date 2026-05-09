@@ -1309,3 +1309,55 @@ cd dashboard && npm install && npm run build
 - `7521ad3` — feat: 14 competitor features
 - 9 dosya, +1108 satır
 - Build: ✅ 0 error, 794 static pages
+
+## 📝 Oturum 65d (2026-05-10 05:36 - 05:38 GMT+8) — Altyapı İşleri
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**5 Altyapı Eksikliği Tamamlandı:**
+
+1. **Staging Ortamı** (`docker-compose.staging.yml`)
+   - Ayrı PostgreSQL (port 5433)
+   - Ayrı Redis (port 6380)
+   - Staging-specific secrets
+   - Rate limits matching production
+   - Verbose logging
+
+2. **Backup Otomasyonu** (`scripts/backup-hooksniff.sh`)
+   - PostgreSQL backup (pg_dump + gzip)
+   - Redis key export
+   - Cloudflare R2 upload
+   - Retention cleanup (30 gün)
+   - Integrity verification
+   - Modular: full/postgres/redis/cleanup
+
+3. **Load Test Runner** (`tests/load/run-tests.sh`)
+   - k6 test wrapper
+   - Smoke test (30s)
+   - Webhook flow test (6.5min)
+   - API stress test (5min)
+   - Auto report generation
+   - Test receiver management
+
+4. **Staging Deploy** (`scripts/deploy-staging.sh`)
+   - GCP Cloud Run deploy
+   - Docker build + push
+   - Auto migration
+   - Teardown command
+
+5. **Global Retry Policy** (`/dashboard/retry-policy`)
+   - Max attempts, backoff strategy, delays
+   - Dead Letter Queue toggle + max age
+   - Retry on status codes (408, 429, 500, 502, 503, 504)
+   - Request timeout
+   - Delay preview visualization
+   - Per-endpoint override info
+
+### GitHub Push
+- `1539b60` — feat: infrastructure
+- 6 dosya, +814 satır
+- Build: ✅ 0 error, 802 static pages
