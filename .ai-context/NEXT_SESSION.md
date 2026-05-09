@@ -51,12 +51,33 @@
 
 ---
 
+## 📋 Lansman Stratejisi (Yeni)
+
+**Belge:** `.ai-context/LAUNCH_STRATEGY.md`
+
+### Servet'in Yapması Gereken (Hemen)
+- [ ] iyzico hesabı aç (vergi levhası + banka hesabı)
+- [ ] Twitter/X hesabı aç veya güncelle
+- [ ] LinkedIn profili güncelle (girişimci olarak)
+- [ ] Demo video hazırla (Canva, 30-60 sn)
+- [ ] Logo ve banner görselleri hazırla
+
+### AI'ın Yapması Gereken (Sonraki Oturum)
+- [ ] Fiyatları güncelle (dashboard + landing page)
+- [ ] Landing page'e "5x cheaper than Svix" ekle
+- [ ] Beta signup formu oluştur
+- [ ] Reddit post şablonlarını hazırla
+- [ ] Show HN post'unu hazırla
+
+---
+
 ## 🔄 Sonraki Görevler (Öncelik Sırası)
 
 ### Kısa Vadeli
-1. **Dashboard test coverage** — %3 → %100 (Next.js/React test'leri)
-2. **API deploy** — GCP Console manuel
-3. **k6 load test** — trafik simülasyonu çalıştır
+1. **Lansman hazırlıkları** — LAUNCH_STRATEGY.md'ye göre
+2. **Dashboard test coverage** — %3 → %100 (Next.js/React test'leri)
+3. **API deploy** — GCP Console manuel
+4. **k6 load test** — trafik simülasyonu çalıştır
 
 ### Orta Vadeli
 - Akıllı Alarm sistemi
