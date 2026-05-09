@@ -192,7 +192,7 @@ cd dashboard && npm install && npm run build
 
 ### Kısa Vadeli (Servet Onayıyla)
 1. API deploy (GCP Console manuel)
-2. Dashboard iyileştirmeleri (DASHBOARD_ISSUES.md)
+2. Dashboard iyileştirmeleri (audit/DASHBOARD_ISSUES.md)
 
 ### Orta Vadeli
 - Akıllı Alarm sistemi
