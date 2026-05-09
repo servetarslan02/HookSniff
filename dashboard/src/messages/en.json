@@ -722,7 +722,9 @@
       "security": "Security",
       "playground": "Playground",
       "startups": "Startups",
-      "newsletter": "Newsletter"
+      "newsletter": "Newsletter",
+      "blog": "Blog",
+      "whatIsAWebhook": "What is a Webhook?"
     }
   },
   "apiKeys": {
