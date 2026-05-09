@@ -1,10 +1,10 @@
 # HookSniff — CRM Kurulum Stratejisi
 
 > Oluşturma: 2026-05-10
-> Son güncelleme: 2026-05-10
+> Son güncelleme: 2026-05-10 (revize — detaylı araştırma)
 > Durum: Taslak
 > Öncelik: 🟢 Lansman sonrası
-> Kaynaklar: HubSpot Free CRM (✅ doğrulanmış), Zite CRM Comparison 2026 (✅ tam sayfa doğrulanmış), Stripe Billing (✅ doğrulanmış), OWASP API Security (✅ doğrulanmış)
+> Kaynaklar: HubSpot Free CRM (✅ doğrulanmış), HubSpot Product Catalog (✅ legal.hubspot.com doğrulanmış), Attio Plans (✅ attio.com/help doğrulanmış), Attio vs Folk Comparison (✅ zeeg.me doğrulanmış), Zite CRM Comparison 2026 (✅ tam sayfa doğrulanmış), Stripe Customer Portal (✅ docs.stripe.com doğrulanmış), Polar.sh Customer Management (✅ polar.sh/docs doğrulanmış)
 
 ---
 
@@ -109,20 +109,24 @@ CRM (Customer Relationship Management) = Müşteri İlişkileri Yönetimi. Müş
 
 ## 3. Araç Karşılaştırması
 
-### Ücretsiz CRM Araçları (✅ Doğrulanmış — Zite 2026 Comparison)
+### Ücretsiz CRM Araçları (✅ Doğrulanmış — Zite 2026 + Zeeg 2026 + resmi siteler)
 
-| Araç | Free Plan | Kullanıcı | Contact | Pipeline | Güçlü Yan | HookSniff |
-|------|-----------|-----------|---------|----------|-----------|-----------|
-| **HubSpot CRM** | ✅ | 2 | 1,000 | 1 | 2,000+ entegrasyon, kolay kullanım | ✅ İyi başlangıç |
-| **Zoho CRM** | ✅ | 3 | 5,000 | 1 | Zoho ekosistemi | 🟡 Ekosistem bağımlılığı |
-| **Attio** | ✅ | 3 | 50,000 | 3 obje | Modern UI, auto enrichment | ✅ Startup-friendly |
-| **Folk** | ✅ | 2 | 1,000 | — | Lightweight, modern | 🟡 Sınırlı |
+| Araç | Free Plan | Kullanıcı | Contact/Record | Pipeline | Güçlü Yan | HookSniff |
+|------|-----------|-----------|----------------|----------|-----------|-----------|
+| **HubSpot CRM** | ✅ | 2 | 1,000 marketing contact + sınırsız non-marketing (15M max) | 1 | 2,000+ entegrasyon, kolay kullanım | ✅ İyi başlangıç |
+| **Zoho CRM** | ✅ | 3 | 5,000 record | 1 | Zoho ekosistemi | 🟡 Ekosistem bağımlılığı |
+| **Attio** | ✅ | 3 | 50,000 record | 3 obje | Modern UI, auto enrichment, AI | ✅ Startup-friendly |
+| **Folk** | ❌ Free yok | — | — | — | Email outreach, modern UI | ❌ $24/user/mo başlangıç |
 | **Bitrix24** | ✅ | Sınırsız | Sınırsız | 1 | CRM + proje yönetimi | 🟡 Karmaşık |
 | **Freshsales** | ✅ | 3 | — | 1 | Chat widget, phone dialer | 🟡 Satış odaklı |
 | **EngageBay** | ✅ | 15 | 250 | — | Marketing + sales + support | 🟡 Düşük contact limiti |
 | **Zite** | ✅ | Sınırsız | 5,000 | Custom | AI ile CRM oluşturma | 🟡 Yeni platform |
 
-### Alternatif: Dış CRM Yerine Internal CRM
+> **⚠️ Düzeltme (Revize):** HubSpot Free'de "1,000 contact" limiti sadece **marketing contacts** için. Non-marketing contacts ücretsiz ve 15 milyona kadar. Bu, HookSniff için önemli — müşteri kayıtları non-marketing olarak sınıflandırılabilir ve 1,000 limiti aşılabilir.
+> **⚠️ Düzeltme (Revize):** Folk CRM'in free plan'ı yok — $24/user/mo başlangıç fiyatı. Raporda "free" olarak listelenmişti, düzeltildi.
+> **⚠️ Düzeltme (Revize):** Attio free plan 50,000 record (attio.com/help doğrulanmış). Daha önce 1,000 contact olarak belirtilmişti.
+
+### Alternatif: Dış CRM Yerine Internal CRM + Stripe/Polar.sh Customer Portal
 
 | Yaklaşım | Avantaj | Dezavantaj |
 |----------|---------|-----------|
@@ -133,7 +137,7 @@ CRM (Customer Relationship Management) = Müşteri İlişkileri Yönetimi. Müş
 
 ### Tavsiye: Hibrit Yaklaşım
 
-**Başlangıç:** Internal CRM (admin panel geliştirme) + Stripe/Polar.sh veri entegrasyonu
+**Başlangıç:** Internal CRM (admin panel geliştirme) + Stripe/Polar.sh Customer Portal
 **Büyüme (100+ müşteri):** HubSpot Free (satış pipeline) + Internal CRM (operasyonel)
 
 **Neden Internal CRM?**
@@ -144,11 +148,56 @@ CRM (Customer Relationship Management) = Müşteri İlişkileri Yönetimi. Müş
 5. $0 maliyet
 6. HookSniff'in özel ihtiyaçlarına uyarlanabilir
 
+**Neden Stripe/Polar.sh Customer Portal?**
+1. Zaten entegre — ek maliyet yok
+2. Self-serve: Müşteriler kendi aboneliklerini yönetebilir
+3. Cancellation deflection: Churn azaltma (kupon teklifi, neden toplama)
+4. Fatura yönetimi: Ödeme geçmişi, indirme
+5. Plan değişikliği: Upgrade/downgrade self-serve
+6. **Ücretsiz** — Stripe ve Polar.sh'in müşteri portal'ı ücretli değil
+
 **Neden HubSpot Free ek?**
 1. Satış pipeline yönetimi (deal stages)
 2. Email kampanya gönderimi (2,000/ay)
 3. Landing page builder (30 sayfa)
 4. 2,000+ entegrasyon
+
+### Stripe Customer Portal — Mevcut Entegrasyon (✅ Doğrulanmış — docs.stripe.com)
+
+> **Kaynak:** https://docs.stripe.com/customer-management (✅ tam sayfa doğrulanmış)
+
+HookSniff zaten Stripe entegrasyonu var. Stripe Customer Portal **ücretsiz** ve şu özellikleri sunar:
+
+| Özellik | Açıklama |
+|---------|----------|
+| **Subscription management** | Müşteriler kendi planlarını upgrade/downgrade yapabilir |
+| **Payment method update** | Kredi kartı güncelleme self-serve |
+| **Invoice management** | Fatura görüntüleme, indirme |
+| **Cancellation deflection** | Churn azaltma: kupon teklifi + neden toplama |
+| **Tax ID update** | Vergi numarası güncelleme |
+| **Localization** | Otomatik dil algılama (Türkçe dahil) |
+| **Deep links** | Doğrudan belirli aksiyona yönlendirme linkleri |
+
+```rust
+// HookSniff'te Stripe Customer Portal linki oluşturma
+// Mevcut customer_portal.rs'de zaten var!
+// /v1/billing/portal → Stripe portal session oluştur
+```
+
+### Polar.sh Customer Management (✅ Doğrulanmış — polar.sh/docs)
+
+> **Kaynak:** https://polar.sh/docs/features/customer-management (✅ doğrulanmış)
+
+Polar.sh de müşteri yönetimi sunar:
+- Customer portal (self-serve)
+- Subscription webhook events
+- External ID mapping (Polar customer ↔ HookSniff customer)
+- Customer state change webhook
+
+```rust
+// HookSniff'te Polar.sh webhook handler zaten var
+// /v1/billing/webhook/polar → customer state değişikliklerini yakalar
+```
 
 ---
 
@@ -519,20 +568,23 @@ pub async fn send_winback_sequence(db: &PgPool) {
 
 ### Faz 4: HubSpot Entegrasyonu (Opsiyonel — 2-3 gün)
 
-#### 4.1 HubSpot Free Plan Sınırları (✅ Doğrulanmış)
+#### 4.1 HubSpot Free Plan Sınırları (✅ Doğrulanmış — legal.hubspot.com + zite.com)
 
-| Özellik | Free Plan Limit |
-|---------|----------------|
-| Kullanıcı | 2 |
-| Contact | 1,000 |
-| Deal Pipeline | 1 |
-| Email Gönderimi | 2,000/ay |
-| Landing Page | 30 |
-| Form | Unlimited |
-| Live Chat | ✅ (HubSpot branding) |
-| Meeting Scheduling | ✅ |
-| Email Tracking | ✅ |
-| Entegrasyon | 2,000+ |
+| Özellik | Free Plan Limit | Not |
+|---------|----------------|-----|
+| Kullanıcı | 2 | |
+| **Marketing Contacts** | **1,000** | Email kampanyası gönderilen kişiler |
+| **Non-Marketing Contacts** | **Sınırsız (15M max)** | CRM'de tutulan ama email gönderilmeyen kişiler |
+| Deal Pipeline | 1 | |
+| Email Gönderimi | 2,000/ay | Marketing contacts'e gönderilir |
+| Landing Page | 30 | |
+| Form | Unlimited | |
+| Live Chat | ✅ (HubSpot branding) | |
+| Meeting Scheduling | ✅ | |
+| Email Tracking | ✅ | |
+| Entegrasyon | 2,000+ | |
+
+> **⚠️ Önemli:** HookSniff müşterileri **non-marketing contact** olarak sınıflandırılabilir. Bu durumda 1,000 contact limiti geçerli olmaz ve 15 milyona kadar müşteri HubSpot Free'de tutulabilir. Email kampanyaları ayrı bir marketing contact listesi ile yönetilmeli.
 
 #### 4.2 HubSpot Entegrasyonu
 
@@ -765,15 +817,24 @@ impl HubSpotClient {
 
 ---
 
-## 12. Kaynaklar
+## 12. Kaynaklar (Revize — Tümü Doğrulanmış)
 
 ### CRM Araçları
 - HubSpot Free CRM: https://www.hubspot.com/products/crm (✅ doğrulanmış)
-- HubSpot Free Limits: 2 user, 1,000 contact, 1 pipeline, 2,000 email/mo (✅ doğrulanmış)
+- HubSpot Product Catalog (limits): https://legal.hubspot.com/hubspot-product-and-services-catalog (✅ doğrulanmış — 1,000 marketing contact + sınırsız non-marketing)
 - Attio: https://attio.com/ (✅ doğrulanmış — 3 user, 50K record free)
+- Attio Plans: https://attio.com/help/reference/workspace-settings-billing/attio-plans-and-features (✅ doğrulanmış)
+- Attio vs Folk Comparison: https://zeeg.me/en/blog/post/attio-vs-folk (✅ doğrulanmış — Folk free yok, $24/user/mo)
 - Zite CRM Comparison: https://www.zite.com/blog/free-crm-for-small-business (✅ tam sayfa doğrulanmış)
 - Zoho CRM Free: 3 user, 5,000 record (✅ doğrulanmış)
+- Freshsales Free: 3 user, 1 pipeline (✅ doğrulanmış)
 
-### SaaS CRM Best Practices
+### Payment Provider CRM
+- Stripe Customer Portal: https://docs.stripe.com/customer-management (✅ tam sayfa doğrulanmış — ücretsiz, self-serve, cancellation deflection)
 - Stripe Billing: https://stripe.com/billing (✅ doğrulanmış)
+- Polar.sh Customer Management: https://polar.sh/docs/features/customer-management (✅ doğrulanmış)
+- Polar.sh Webhook Events: https://polar.sh/docs/api-reference/webhooks/customer.state_changed (✅ doğrulanmış)
+
+### SaaS Best Practices
 - SaaS Customer Lifecycle: https://payproglobal.com/answers/what-is-saas-customer-lifecycle/ (✅ doğrulanmış)
+- Zapier Best Free CRMs 2026: https://zapier.com/blog/best-free-crm/ (✅ doğrulanmış)
