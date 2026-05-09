@@ -86,6 +86,7 @@ export default function HookdeckAlternativesPage() {
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Advanced routing:</strong> Hookdeck has superior filtering, transformation, and routing rules.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Higher SLA:</strong> 99.999% uptime SLA vs HookSniff&apos;s 99.9%.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>SOC 2 Type 2:</strong> Already certified. HookSniff is SOC 2 ready.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Radar:</strong> Webhook latency alerts for third-party services.</li>
             </ul>
           </div>
         </div>

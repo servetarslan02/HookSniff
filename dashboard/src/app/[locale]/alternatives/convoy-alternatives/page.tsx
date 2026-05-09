@@ -3,7 +3,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export const metadata = {
   title: 'Convoy Alternatives — Best Webhook Services Compared (2026) | HookSniff',
-  description: 'Looking for Convoy alternatives? Compare HookSniff, Svix, Hookdeck, and Hook0. More SDKs, managed cloud, and better developer experience.',
+  description: 'Looking for Convoy alternatives? Convoy may be discontinued. Compare HookSniff, Svix, Hookdeck, and Hook0 as replacements.',
 };
 
 export default function ConvoyAlternativesPage() {
