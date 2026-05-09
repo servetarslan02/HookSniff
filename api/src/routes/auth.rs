@@ -68,18 +68,22 @@ const RESET_RATE_LIMIT: u32 = 5;
 
 /// Extract client IP from request headers (handles reverse proxies).
 fn extract_client_ip(headers: &HeaderMap) -> String {
+    // Prefer X-Real-IP (set by trusted reverse proxy like Cloudflare/Nginx)
+    if let Some(real_ip) = headers.get("x-real-ip").and_then(|v| v.to_str().ok()) {
+        let ip = real_ip.trim();
+        if !ip.is_empty() && ip != "unknown" {
+            return ip.to_string();
+        }
+    }
+    // Fallback: take LAST entry from X-Forwarded-For (first is client, rest are proxies)
+    // In production behind Cloudflare/GCP LB, the last trusted entry is most reliable
     headers
         .get("x-forwarded-for")
         .and_then(|v| v.to_str().ok())
-        .and_then(|v| v.split(',').next())
+        .and_then(|v| v.split(',').last())
         .map(|s| s.trim().to_string())
-        .unwrap_or_else(|| {
-            headers
-                .get("x-real-ip")
-                .and_then(|v| v.to_str().ok())
-                .unwrap_or("unknown")
-                .to_string()
-        })
+        .filter(|s| !s.is_empty() && s != "unknown")
+        .unwrap_or_else(|| "unknown".to_string())
 }
 
 pub fn router() -> Router {
@@ -1086,7 +1090,8 @@ mod tests {
     fn test_extract_client_ip_from_x_forwarded_for() {
         let mut headers = HeaderMap::new();
         headers.insert("x-forwarded-for", HeaderValue::from_static("1.2.3.4, 5.6.7.8"));
-        assert_eq!(extract_client_ip(&headers), "1.2.3.4");
+        // Now takes LAST entry (most recent proxy)
+        assert_eq!(extract_client_ip(&headers), "5.6.7.8");
     }
 
     #[test]
@@ -1103,11 +1108,12 @@ mod tests {
     }
 
     #[test]
-    fn test_extract_client_ip_prefers_forwarded_for_over_real_ip() {
+    fn test_extract_client_ip_prefers_real_ip_over_forwarded_for() {
         let mut headers = HeaderMap::new();
         headers.insert("x-forwarded-for", HeaderValue::from_static("1.1.1.1"));
         headers.insert("x-real-ip", HeaderValue::from_static("2.2.2.2"));
-        assert_eq!(extract_client_ip(&headers), "1.1.1.1");
+        // X-Real-IP takes priority (set by trusted proxy)
+        assert_eq!(extract_client_ip(&headers), "2.2.2.2");
     }
 
     #[test]
