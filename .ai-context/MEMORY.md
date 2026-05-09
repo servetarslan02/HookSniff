@@ -393,3 +393,8 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
 7. **API RateLimiter fix** — Layer sıralaması düzeltildi, `4bbd9aa` push edildi
    - `from_fn(rate_limit_middleware)` innermost katmana taşındı
    - Deploy için CI bozuk, Servet'in manuel deploy yapması gerekiyor
+8. **Kapsamlı kod incelemesi tamamlandı** — ~24K satır kod incelendi
+   - 5 parça: Core API, Routes/Worker, SDK'lar, Dashboard, Config
+   - Genel kalite: 8/10 (production-ready)
+   - Ek fix: EXTERNAL_TOKENS.md .gitignore'a eklendi (`ca20f17`)
+   - FCM Legacy API tespit edildi (düzeltilecek)
