@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 06:15 GMT+8
+> Son güncelleme: 2026-05-10 06:25 GMT+8
 
 ---
 
@@ -13,25 +13,23 @@
 | GCP SA key rotate | 🔴 ACİL | Eski key paylaşıldı |
 | Vercel token rotate | 🔴 ACİL | Eski token paylaşıldı |
 | Login test | 🔴 | Deploy sonrası dashboard'da dene |
+| OAuth test | 🔴 | Google/GitHub OAuth env var'ları ayarla |
 | iyzico hesap | ❌ | Vergi levhası + banka hesabı |
 
 ---
 
-## ✅ SON OTURUM (66) — Backend Endpoints
+## ✅ SON OTURUMLAR (66a + 66b) — Backend + Dashboard Entegrasyonu
 
-### Tamamlanan (2026-05-10 06:02 - 06:15 GMT+8)
+### Oturum 66a — Backend Endpoints (06:02 - 06:15)
+- 7 backend endpoint eklendi (OAuth, audit-log, SSO, custom-domains, portal-config, rate-limits)
+- Migration 038: 5 yeni tablo
+- GitHub: `fea537b`
 
-**7 backend endpoint eklendi:**
-1. ✅ OAuth (Google + GitHub) — `/v1/oauth/*`
-2. ✅ Audit Log — `/v1/audit-log/*`
-3. ✅ SSO/SAML/OIDC — `/v1/sso/*`
-4. ✅ Custom Domains — `/v1/custom-domains/*`
-5. ✅ Portal Config — `/v1/portal/config`
-6. ✅ Per-Endpoint Rate Limits — `/v1/rate-limits/*`
-7. ✅ Retry Policy — zaten vardı
-
-**Migration:** `038_backend_endpoints.sql` (5 yeni tablo)
-**GitHub:** `fea537b` — 9 dosya, +2030 satır
+### Oturum 66b — Dashboard → API (06:15 - 06:25)
+- 7 dashboard sayfası localStorage'dan gerçek API'ye bağlandı
+- OAuth callback sayfası oluşturuldu
+- OAuth backend HttpOnly cookie fix
+- GitHub: `16fcf9b`
 
 ---
 
@@ -39,23 +37,28 @@
 
 | # | Görev | Öncelik | Not |
 |---|-------|---------|-----|
-| 1 | Dashboard → API entegrasyonu | 🔴 | localStorage fallback'ları gerçek API'ye bağla |
-| 2 | OAuth frontend entegrasyonu | 🔴 | Login sayfası OAuth butonlarını aktif et |
-| 3 | Build & deploy | 🔴 | `cargo check` → fix → deploy |
-| 4 | Test dosyaları temizliği | 🟢 | Unused import'lar |
-| 5 | k6 load test çalıştırma | 🟢 | scripts/run-tests.sh ile |
+| 1 | Build & deploy | 🔴 | `cargo check` → fix → deploy |
+| 2 | OAuth env var'ları | 🔴 | GCP'de GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID ayarla |
+| 3 | Dashboard build test | 🔴 | `cd dashboard && npm run build` |
+| 4 | Migration çalıştır | 🔴 | 038_backend_endpoints.sql Neon DB'de |
+| 5 | Test dosyaları temizliği | 🟢 | Unused import'lar |
 
-### Dashboard → API Bağlantı Haritası
+### Deploy Checklist
+```
+1. Neon DB'de migration çalıştır:
+   psql $DATABASE_URL -f migrations/038_backend_endpoints.sql
 
-| Dashboard Sayfası | Endpoint | Durum |
-|-------------------|----------|-------|
-| `/dashboard/audit-log` | `GET /v1/audit-log` | 🔴 Bağlanacak |
-| `/dashboard/sso` | `GET/POST /v1/sso/config` | 🔴 Bağlanacak |
-| `/dashboard/custom-domain` | `GET/POST /v1/custom-domains` | 🔴 Bağlanacak |
-| `/dashboard/portal-customize` | `GET/POST /v1/portal/config` | 🔴 Bağlanacak |
-| `/dashboard/rate-limiting` | `GET/POST /v1/rate-limits` | 🔴 Bağlanacak |
-| `/dashboard/retry-policy` | Mevcut endpoint | 🔴 Bağlanacak |
-| Login OAuth butonları | `GET /v1/oauth/providers` | 🔴 Bağlanacak |
+2. GCP Cloud Run env var'ları ekle:
+   GOOGLE_CLIENT_ID=...
+   GOOGLE_CLIENT_SECRET=...
+   GITHUB_CLIENT_ID=...
+   GITHUB_CLIENT_SECRET=...
+   OAUTH_REDIRECT_BASE=https://hooksniff-api-1046140057667.europe-west1.run.app
+
+3. Vercel dashboard rebuild
+
+4. Login test + OAuth test
+```
 
 ---
 
