@@ -37,8 +37,8 @@ Node.js, Python, Go, Rust, Java, Kotlin, C#, Ruby, PHP, Swift, Elixir
 
 ### 🔴 Kritik Sorunlar
 1. **`gcp-deploy.sh` ve `gcp-deploy.ps1` — Secret hardcoded riski**
-   - Script'lerde service account key path veya env vars hardcoded olabilir
-   - Kontrol edilmeli
+   - `.env.production` dosyasından `source` ile okuyor — güvenli
+   - Ama `--set-env-vars` içinde OTEL headers hardcoded olabilir
 
 2. **`backup.sh` — DB name "hookrelay" olarak kalmış**
    ```bash
@@ -48,6 +48,19 @@ Node.js, Python, Go, Rust, Java, Kotlin, C#, Ruby, PHP, Swift, Elixir
 
 3. **`oracle-cloud-setup.sh` — Kontrol edilmedi**
    - Oracle-specific script, muhtemelen outdated
+
+4. **`gcp-deploy.sh` — `--set-env-vars` içinde Polar product ID'ler hardcoded**
+   ```bash
+   POLAR_PRODUCT_PRO=79fee3f9-04a2-46c1-804e-8ca7542b8119
+   POLAR_PRODUCT_BUSINESS=e5b7d88a-7606-4963-a070-4102ca6405e2
+   ```
+   **Sorun**: Product ID'ler script'te hardcoded. Bunlar Secret Manager'da olmalı.
+
+5. **`otel-collector-config.yml` — Grafana token hardcoded**
+   ```yaml
+   authorization: "Basic MTYyNTQ3NjpnbGNfZXlKdklqb2lNVGMxTnpNek5TSXNJbTRpT2lKb2IyOXJjMjVwWm1ZdGFHOXZhM051YVdabU1pSXNJbXNpT2lKUFUxQktZVEJzZERBek9UTk5hVFF3TmpaME1WaEtSVlFpTENKdElqcDdJbklpT2lKMWN5SjlmUT09"
+   ```
+   **🔴 KRİTİK**: Grafana Cloud token/base64 encoded credentials OTEL config'de hardcoded! Bu GitHub'da public ise token sızıntıda!
 
 ### 🟡 Sorunlar
 - `docker-compose.prod.yml` ve `docker-compose.gcp.yml` — Hangisi production'da kullanılıyor?

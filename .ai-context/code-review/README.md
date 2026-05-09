@@ -11,7 +11,7 @@
 | 1 | `api/` — Rust API (Axum) | API_ANALYSIS.md | ✅ Tamamlandı |
 | 2 | `worker/` — Webhook Delivery | WORKER_ANALYSIS.md | ✅ Tamamlandı |
 | 3 | `dashboard/` — Next.js Frontend | DASHBOARD_ANALYSIS.md | ✅ Tamamlandı |
-| 4 | `sdks/` — 11 SDK | REMAINING_MODULES_ANALYSIS.md | ✅ Hızlı tarama |
+| 4 | `sdks/` — 11 SDK | SDK_ANALYSIS.md | ✅ Tamamlandı |
 | 5 | `deploy/` — Terraform/Helm | REMAINING_MODULES_ANALYSIS.md | ✅ Hızlı tarama |
 | 6 | `monitoring/` — Grafana | REMAINING_MODULES_ANALYSIS.md | ✅ Hızlı tarama |
 | 7 | `scripts/` + `tests/` | REMAINING_MODULES_ANALYSIS.md | ✅ Hızlı tarama |
