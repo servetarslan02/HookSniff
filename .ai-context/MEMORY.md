@@ -200,6 +200,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 39 | 2026-05-09 23:06 | **Strategy oturumu** — Status Page raporu (22 bölüm), Technical Cleanup raporu (10 bölüm), Conversion Funnel raporu, LAUNCH fiyat düzeltmesi ($49→$29), Grafana OTEL token tespiti (public!), GCP WIF rehberi, 19 yeni rapor planlandı |
 | 38 | 2026-05-09 22:06 | Dashboard coverage artırma — 4 detail page fix + 45 yeni test, 60 dosya/471 test/0 hata |
 | 37 | 2026-05-09 21:39 | Dashboard test coverage tamamlandı — 24 yeni test dosyası, 57 dosya/426 test/0 hata, tüm sayfalar covered |
 | 36 | 2026-05-09 21:19 | Dashboard Vitest testleri — 11 dosya, 136 test, 0 hata (subagent) |
