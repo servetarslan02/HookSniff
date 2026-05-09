@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
 import { playgroundLrange, playgroundDelete } from '@/lib/redis';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const key = `play:history:${id}`;
 
     // Parse query params for pagination
@@ -30,32 +40,33 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }, {
       headers: {
         'Cache-Control': 'no-store',
+        ...corsHeaders,
       },
     });
   } catch (error) {
     console.error('Playground history error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch history' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const key = `play:history:${id}`;
     await playgroundDelete(key);
 
     return NextResponse.json({
       success: true,
       message: 'History cleared',
-    });
+    }, { headers: corsHeaders });
   } catch (error) {
     console.error('Playground delete error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to clear history' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

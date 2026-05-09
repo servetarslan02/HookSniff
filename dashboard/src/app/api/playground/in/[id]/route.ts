@@ -3,6 +3,12 @@ import { playgroundLpush, playgroundLrange, getRedis } from '@/lib/redis';
 
 const MAX_HISTORY = 100;
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Webhook-Event, X-HookSniff-Signature, Svix-ID, Svix-Timestamp, Svix-Signature',
+};
+
 // Capture any HTTP method (GET, POST, PUT, DELETE, PATCH, etc.)
 async function handleRequest(request: Request, id: string) {
   try {
@@ -74,7 +80,7 @@ async function handleRequest(request: Request, id: string) {
           echoBody === 'true' ? body : JSON.stringify({ error: `Forced status ${statusCode}` }),
           {
             status: statusCode,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
           }
         );
       }
@@ -88,6 +94,7 @@ async function handleRequest(request: Request, id: string) {
           'Content-Type': 'application/json',
           'X-HookSniff-Playground': 'true',
           'X-HookSniff-Delivery-Id': record.id,
+          ...corsHeaders,
         },
       }
     );
@@ -95,29 +102,35 @@ async function handleRequest(request: Request, id: string) {
     console.error('Playground receive error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  return handleRequest(request, params.id);
+type RouteParams = { params: Promise<{ id: string }> };
+
+async function resolveId(params: RouteParams['params']): Promise<string> {
+  return (await params).id;
 }
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-  return handleRequest(request, params.id);
+
+export async function GET(request: Request, ctx: RouteParams) {
+  return handleRequest(request, await resolveId(ctx.params));
 }
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  return handleRequest(request, params.id);
+export async function POST(request: Request, ctx: RouteParams) {
+  return handleRequest(request, await resolveId(ctx.params));
 }
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  return handleRequest(request, params.id);
+export async function PUT(request: Request, ctx: RouteParams) {
+  return handleRequest(request, await resolveId(ctx.params));
 }
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  return handleRequest(request, params.id);
+export async function DELETE(request: Request, ctx: RouteParams) {
+  return handleRequest(request, await resolveId(ctx.params));
 }
-export async function HEAD(request: Request, { params }: { params: { id: string } }) {
-  return handleRequest(request, params.id);
+export async function PATCH(request: Request, ctx: RouteParams) {
+  return handleRequest(request, await resolveId(ctx.params));
 }
-export async function OPTIONS(request: Request, { params }: { params: { id: string } }) {
-  return handleRequest(request, params.id);
+export async function HEAD(request: Request, ctx: RouteParams) {
+  return handleRequest(request, await resolveId(ctx.params));
+}
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
