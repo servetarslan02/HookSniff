@@ -63,7 +63,7 @@ cd dashboard && npm install && npm run build
 | Python | PyPI | ✅ `hooksniff 0.1.0` | ✅ GCP Cloud Run |
 | Rust | crates.io | ✅ `hooksniff 0.2.0` | ✅ GCP Cloud Run |
 | C# | NuGet | ✅ `HookSniff 0.1.0` | ✅ GCP Cloud Run |
-| Go | pkg.go.dev | ✅ `v0.1.0` tag | ✅ GCP Cloud Run |
+| Go | pkg.go.dev | ✅ `v0.1.0` (aynı repo: hooksniff-go) | ✅ GCP Cloud Run |
 | Swift | Swift Package Index | ✅ `v0.1.0` tag | ✅ GCP Cloud Run |
 | PHP | Packagist | ✅ `hooksniff/hooksniff-php` | ✅ GCP Cloud Run |
 | Elixir | Hex.pm | ✅ `hooksniff 0.2.0` (Oturum 32) | ✅ GCP Cloud Run |
