@@ -39,7 +39,7 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 | Component | Technology | Hosting | Cost |
 |---|---|---|---|
 | API | Rust (Axum) | Google Cloud Run (Free Tier) | $0 |
-| Worker | Rust | Oracle Cloud Always Free (ARM) | $0 |
+| Worker | Rust | Google Cloud Run (Free Tier) | $0 |
 | Database | PostgreSQL | Neon (serverless) | $0 (0.5 GB) |
 | Cache / Queue | PostgreSQL + Redis | Upstash (serverless) | $0 (256 MB) |
 | Dashboard | Next.js 15 | Vercel | $0 |
@@ -70,7 +70,7 @@ Dashboard runs on `http://localhost:3001`
 
 ### Production Deployment (Free Tier)
 
-See **[FREE_TIER_SETUP.md](FREE_TIER_SETUP.md)** for a complete guide to deploying HookSniff on free-tier services (Oracle Cloud, Neon, Vercel, Upstash, Grafana Cloud, Cloudflare R2, Resend).
+See **[FREE_TIER_SETUP.md](FREE_TIER_SETUP.md)** for a complete guide to deploying HookSniff on free-tier services (Google Cloud Run, Neon, Vercel, Upstash, Grafana Cloud, Cloudflare R2).
 
 ## API Usage
 
