@@ -1,40 +1,74 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 07:05 GMT+8
+> Son güncelleme: 2026-05-10 07:10 GMT+8
 
 ---
 
-## ✅ BU OTURUMDA YAPILAN (Tümü Tamamlandı)
+## ✅ BU OTURUMDA YAPILAN (Session 67)
 
-### Session 67 — Redis TLS Fix
-- **Redis TLS desteği eklendi** (`api/Cargo.toml`)
-  - `tls-rustls` feature eklendi → Upstash Redis TLS bağlantısı artık çalışmalı
-  - Commit: `4373437`
-  - Push edildi ✅
+### 1. Redis TLS Fix ✅
+- `api/Cargo.toml` → `tls-rustls` feature eklendi
+- Commit: `4373437`
 
-### Dashboard Build Kontrol
-- `npm run build` → ✅ 0 hata, 0 uyarı
-- Tüm sayfalar derleniyor (800+ static page)
+### 2. Dashboard Build ✅
+- `npm run build` → 0 hata, 0 uyarı, 800+ static page
 
-### API Durumu
-- Health check: ✅ 200 (database healthy, 33ms latency)
-- API live: `https://hooksniff-api-1046140057667.europe-west1.run.app`
+### 3. API Durumu ✅
+- Health check: 200, database 25ms, queue empty
+- GitHub OAuth: available=true
+- Google OAuth: available=false (env var eksik)
 
----
-
-## 🟡 YENİ OTURUMDA YAPILACAK
-
-| # | Görev | Öncelik | Not |
-|---|-------|---------|-----|
-| 1 | OAuth test | 🔴 | Login sayfasından Google/GitHub OAuth dene (Servet) |
-| 2 | Vercel dashboard rebuild | 🔴 | GitHub push → Vercel otomatik deploy olmalı, kontrol et (Servet) |
-| 3 | Token rotation | ⚠️ | GitHub PAT, npm, GCP SA key rotate et (Servet) |
-| 4 | Redis REDIS_URL kontrol | ⚠️ | Upstash URL `rediss://` ile başlıyor mu? Cloud Run env var'da kontrol et (Servet) |
+### 4. Cloud Run Script ✅
+- `scripts/set-cloud-run-env.sh` oluşturuldu
+- OAuth env var'larını Cloud Run'a set eder
+- Commit: `e3aa803`
 
 ---
 
-## ⚠️ Güvenlik Uyarıları
+## 🔴 SERVET'İN YAPMASI GEREKEN (ACİL)
 
-- GitHub PAT chat'te paylaşıldı → ROTATE ET
-- Google şifresi chat'te paylaşıldı → 2FA zaten aktif
-- OAuth client secret'ları Cloud Run env var'da saklı → güvenli
+### 1. Cloud Run OAuth Env Var'larını Ayarla
+**Seçenek A (GCP Console — Kolay):**
+1. GCP Console → Cloud Run → `hooksniff-api` → Edit & Deploy New Revision
+2. Variables & Secrets sekmesine git
+3. Bu env var'ları ekle:
+   - `GOOGLE_CLIENT_ID` = `1046140057667-111vspd37u60fs91o9u2cvon8hp5comh.apps.googleusercontent.com`
+   - `GOOGLE_CLIENT_SECRET` = `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`
+   - `GITHUB_CLIENT_ID` = `Ov23limyhZ2xUcZojypE`
+   - `GITHUB_CLIENT_SECRET` = `5a09936cb001e40e80650fac7804e657920b56ed`
+   - `OAUTH_REDIRECT_BASE` = `https://hooksniff-api-1046140057667.europe-west1.run.app`
+   - `APP_URL` = `https://hooksniff.vercel.app`
+   - `RATE_LIMIT_STORE` = `redis`
+4. Deploy
+
+**Seçenek B (gcloud CLI):**
+```bash
+bash scripts/set-cloud-run-env.sh
+```
+
+### 2. OAuth Test
+- Deploy sonrası: https://hooksniff.vercel.app/login
+- Google OAuth dene
+- GitHub OAuth dene
+
+### 3. Token Rotation (ACİL!)
+- GitHub PAT → yeni oluştur, eskiyi iptal et
+- npm token → yeni oluştur
+
+### 4. Vercel Dashboard
+- Yeni kod push edildi, Vercel limit dolu → yarın deploy olur
+- Deploy sonrası kontrol et
+
+---
+
+## 📊 Durum Özeti
+
+| Görev | Durum | Not |
+|-------|-------|-----|
+| Redis TLS fix | ✅ Tamamlandı | `tls-rustls` eklendi |
+| Dashboard build | ✅ Tamamlandı | 0 hata |
+| OAuth env vars | ⏳ Servet'e bağlı | Cloud Run'a set edilmeli |
+| Google OAuth test | ⏳ Servet'e bağlı | env var sonrası |
+| GitHub OAuth test | ⏳ Servet'e bağlı | env var sonrası |
+| Vercel deploy | ⏳ Yarın | limit dolu |
+| Token rotation | ⏳ Servet'e bağlı | ACİL |
