@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 05:52 GMT+8
+> Son güncelleme: 2026-05-10 06:15 GMT+8
 
 ---
 
@@ -8,7 +8,7 @@
 
 | Görev | Öncelik | Not |
 |-------|---------|-----|
-| GitHub PAT rotate | 🔴 ACİL | Eski token chat'te paylaşıldı |
+| GitHub PAT rotate | 🔴 ACİL | Eski token chat'te paylaşıldı — YENİ TOKEN OLUŞTUR |
 | npm token rotate | 🔴 ACİL | Eski token paylaşıldı |
 | GCP SA key rotate | 🔴 ACİL | Eski key paylaşıldı |
 | Vercel token rotate | 🔴 ACİL | Eski token paylaşıldı |
@@ -17,75 +17,21 @@
 
 ---
 
-## ✅ SON OTURUMLAR (65a-65f) — TAM ÖZET
+## ✅ SON OTURUM (66) — Backend Endpoints
 
-### Bugünkü Çalışma (2026-05-10 05:06 - 05:52 GMT+8)
+### Tamamlanan (2026-05-10 06:02 - 06:15 GMT+8)
 
-**6 oturum, 37 yeni dosya, 13 modifikasyon, +7447 satır kod**
+**7 backend endpoint eklendi:**
+1. ✅ OAuth (Google + GitHub) — `/v1/oauth/*`
+2. ✅ Audit Log — `/v1/audit-log/*`
+3. ✅ SSO/SAML/OIDC — `/v1/sso/*`
+4. ✅ Custom Domains — `/v1/custom-domains/*`
+5. ✅ Portal Config — `/v1/portal/config`
+6. ✅ Per-Endpoint Rate Limits — `/v1/rate-limits/*`
+7. ✅ Retry Policy — zaten vardı
 
-#### 1. Onboarding Sistemi (Oturum 65a)
-- `/get-started` sayfası (6 adım, 5 SDK kod örneği)
-- `OnboardingWizard` (6 interaktif adım, confetti)
-- `SetupChecklist` (dashboard widget, progress bar)
-- Event type catalog, embed portal, CLI quickstart
-- Nav linkleri (landing, sidebar, footer, mobile)
-
-#### 2. Rakip Özellikler (Oturum 65b)
-- Signature Verifier (`/dashboard/signature-verifier`)
-- API Spec Importer (`/dashboard/api-importer`)
-- Rate Limiting Dashboard (`/dashboard/rate-limiting`)
-- Portal Customization (`/dashboard/portal-customize`)
-- 1-click test webhook (endpoint detail)
-
-#### 3. 14 Eksik Özellik (Oturum 65c)
-- Email Verification UI + Banner
-- OAuth buttons (Google + GitHub) — coming soon
-- Audit Log (`/dashboard/audit-log`)
-- SSO/SAML (`/dashboard/sso`)
-- Custom Domain (`/dashboard/custom-domain`)
-- Webhook Builder (`/dashboard/webhook-builder`)
-- Bulk Operations (endpoints)
-
-#### 4. Altyapı (Oturum 65d)
-- `docker-compose.staging.yml`
-- `scripts/backup-hooksniff.sh`
-- `scripts/deploy-staging.sh`
-- `tests/load/run-tests.sh`
-- Global Retry Policy (`/dashboard/retry-policy`)
-
-#### 5. Terraform + MCP (Oturum 65e)
-- Terraform Provider (`terraform/`)
-- MCP Server (`mcp/`)
-
-#### 6. Kod Denetimi (Oturum 65f)
-- Build warnings düzeltildi (img→Image, useCallback)
-- Graceful fallbacks (localStorage) for missing endpoints
-- OAuth "coming soon" note
-- Suspense wrapper for verify-email
-
-### Dashboard Sayfaları (27+)
-```
-🚀 Get Started | 📊 Dashboard | 🔗 Endpoints | 📦 Deliveries
-📋 Logs | 🔍 Search | 💓 Health | 🔔 Alerts | 🔑 API Keys
-🧪 Playground | 📈 Analytics | 🔄 Transforms | 📨 Inbound
-⚡ Rate Limiting | 🔐 Signature Tool | 📥 API Importer
-🖼️ Portal Customize | 🔧 Webhook Builder | 📋 Audit Log
-🔐 SSO/SAML | 🌐 Custom Domain | 🔄 Retry Policy
-👥 Team | 🔔 Notifications | 💳 Billing | ⚙️ Settings
-```
-
-### Scripts
-```
-scripts/backup-hooksniff.sh    — PostgreSQL + Redis + R2 backup
-scripts/deploy-staging.sh      — GCP Cloud Run staging deploy
-tests/load/run-tests.sh        — k6 load test runner
-```
-
-### Build Durumu
-- ✅ 0 error
-- ✅ 0 warning (app code)
-- ✅ 802 static pages
-- ✅ 11 SDK published
+**Migration:** `038_backend_endpoints.sql` (5 yeni tablo)
+**GitHub:** `fea537b` — 9 dosya, +2030 satır
 
 ---
 
@@ -93,16 +39,23 @@ tests/load/run-tests.sh        — k6 load test runner
 
 | # | Görev | Öncelik | Not |
 |---|-------|---------|-----|
-| 1 | Backend: OAuth endpoint'leri | 🔴 | /auth/oauth/google, /auth/oauth/github |
-| 2 | Backend: /portal/config endpoint | 🟡 | Portal customization için |
-| 3 | Backend: /settings/retry-policy | 🟡 | Global retry policy için |
-| 4 | Backend: /audit-log endpoint | 🟡 | Audit log için |
-| 5 | Backend: /sso/config endpoint | 🟡 | SSO için |
-| 6 | Backend: /custom-domains endpoint | 🟡 | Custom domain için |
-| 7 | Backend: /rate-limits endpoint | 🟡 | Rate limiting için |
-| 8 | Test dosyaları temizliği | 🟢 | Unused import'lar |
-| 9 | k6 load test çalıştırma | 🟢 | scripts/run-tests.sh ile |
-| 10 | Staging deploy | 🟢 | scripts/deploy-staging.sh ile |
+| 1 | Dashboard → API entegrasyonu | 🔴 | localStorage fallback'ları gerçek API'ye bağla |
+| 2 | OAuth frontend entegrasyonu | 🔴 | Login sayfası OAuth butonlarını aktif et |
+| 3 | Build & deploy | 🔴 | `cargo check` → fix → deploy |
+| 4 | Test dosyaları temizliği | 🟢 | Unused import'lar |
+| 5 | k6 load test çalıştırma | 🟢 | scripts/run-tests.sh ile |
+
+### Dashboard → API Bağlantı Haritası
+
+| Dashboard Sayfası | Endpoint | Durum |
+|-------------------|----------|-------|
+| `/dashboard/audit-log` | `GET /v1/audit-log` | 🔴 Bağlanacak |
+| `/dashboard/sso` | `GET/POST /v1/sso/config` | 🔴 Bağlanacak |
+| `/dashboard/custom-domain` | `GET/POST /v1/custom-domains` | 🔴 Bağlanacak |
+| `/dashboard/portal-customize` | `GET/POST /v1/portal/config` | 🔴 Bağlanacak |
+| `/dashboard/rate-limiting` | `GET/POST /v1/rate-limits` | 🔴 Bağlanacak |
+| `/dashboard/retry-policy` | Mevcut endpoint | 🔴 Bağlanacak |
+| Login OAuth butonları | `GET /v1/oauth/providers` | 🔴 Bağlanacak |
 
 ---
 
@@ -110,6 +63,5 @@ tests/load/run-tests.sh        — k6 load test runner
 
 - **Oturumlar 1 saat** — planlı çalış, GitHub push sık yap
 - **Hafıza GitHub'da kalıcı** — `.ai-context/`
-- **Backend endpoint'ler eksik** — dashboard localStorage fallback kullanıyor
-- **OAuth butonları** — "coming soon" notu ile gösteriliyor
-- **Test dosyaları** — unused import'lar var ama production'ı etkilemez
+- **Rust kurulu değil** — bu makinede `cargo check` çalıştırılamıyor
+- **Token güvenliği** — Servet token paylaştı, rotate edilmeli
