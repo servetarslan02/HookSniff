@@ -340,6 +340,76 @@ Her çeyrekte değerlendir:
 | Embedding | ?/10 | — | — |
 | Network Effects | ?/10 | — | — |
 
+### NPS Benchmark'ları (Doğrulanmış)
+
+Kaynak: CustomerGauge SaaS NPS Benchmarks 2025 (✅ tam sayfa doğrulanmış)
+URL: https://customergauge.com/benchmarks/blog/nps-saas-net-promoter-score-benchmarks
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| SaaS industry average NPS | **+31** | CustomerGauge 2025 |
+| İyi NPS (SaaS) | **+31 ve üzeri** | CustomerGauge 2025 |
+| NPS lideri (SaaS) | **Nutanix: +92** | CustomerGauge 2025 |
+| Zoom NPS | **+72** | CustomerGauge 2025 |
+| Google NPS | **+58** | CustomerGauge 2025 |
+| Twilio NPS | **Listede** (38 şirket) | CustomerGauge 2025 |
+| NPS en güvenilen metrik | **%41** (B2B'de #1) | CustomerGauge |
+
+Kaynak: Sopact NPS Benchmarks 2026 (✅ tam sayfa doğrulanmış)
+URL: https://www.sopact.com/use-case/nps-benchmarks
+
+| Sektör | Median | İyi Aralık | Excellent |
+|--------|--------|-----------|-----------|
+| **SaaS / B2B Software** | **+33** | **+30 — +45** | **+60** |
+| Cable / Telecom | +5 | −5 — +20 | +30 |
+| Healthcare | +32 | +25 — +45 | +60 |
+| Financial Services | +35 | +30 — +50 | +65 |
+| Retail / E-commerce | +40 | +35 — +55 | +70 |
+
+**HookSniff NPS hedefi:**
+- İlk 6 ay: +30 (SaaS median)
+- 12 ay: +45 (SaaS iyi)
+- 24 ay: +60 (SaaS excellent)
+
+### Switching Cost Verileri (Doğrulanmış)
+
+Kaynak: Improvado API Integration Platforms 2026 (✅ doğrulanmış)
+URL: https://improvado.io/blog/the-best-api-integration-platforms
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| B2B SaaS switching cost (MuleSoft → Workato) | **$180,000** (4 developer × 3 ay) | Improvado 2026 |
+| Integration flow rewrite | **47 flow** | Improvado 2026 |
+| B2B SaaS NPS suppression | **10-15 puan** (switching cost nedeniyle) | Sopact 2026 |
+
+**HookSniff switching cost stratejisi:**
+- Entegrasyon derinliği ↑ → switching cost ↑
+- Schema Registry verisi → data gravity
+- Delivery logs → data lock-in
+- Custom webhook routing → workflow embedding
+
+### Counter-Positioning (Hamilton Helmer 7 Powers — Doğrulanmış)
+
+Kaynak: Nandu Anilal "Modern Software Moats" (✅ tam sayfa doğrulanmış)
+URL: https://nandu.substack.com/p/modern-software-moats
+
+**7 Powers Framework:**
+1. **Counter-positioning** — rakibin kopyalayamayacağı pozisyon
+2. **Cornered resource** — benzersiz kaynak
+3. **Scale economies** — ölçek ekonomisi
+4. **Switching costs** — geçiş maliyeti
+5. **Branding** — marka değeri
+6. **Network effects** — ağ etkisi
+7. **Process power** — süreç üstünlüğü
+
+**HookSniff counter-positioning:**
+- Svix $490 → HookSniff $29 (**%94 daha ucuz**)
+- Svix kapalı SaaS → HookSniff açık fiyat + cömert free tier
+- Svix enterprise-first → HookSniff developer-first
+- Rakip kopyalamak isterse: $490'dan $29'a düşmek gelir modelini bozar
+
+**Örnek:** Robinhood zero-commission trading → ETrade kopyalayamaz çünkü fee revenue bozulur. Aynı mantık: Svix $29'a düşerse $490 enterprise müşterilerini kaybeder.
+
 ---
 
 ## 10. Uygulama Planı
@@ -388,6 +458,10 @@ Her çeyrekte değerlendir:
 
 - NFX: "How AI Companies Will Build Real Defensibility" (Jul 2025) — https://www.nfx.com/post/ai-defensibility (✅ Tam sayfa doğrulanmış)
 - NFX: "The Network Effects Bible" — https://www.nfx.com/post/network-effects-bible (✅ doğrulanmış)
+- CustomerGauge: "SaaS NPS Benchmarks 2025" (38 şirket) — https://customergauge.com/benchmarks/blog/nps-saas-net-promoter-score-benchmarks (✅ Tam sayfa doğrulanmış)
+- Sopact: "NPS Benchmarks by Industry 2026" (14 sektör) — https://www.sopact.com/use-case/nps-benchmarks (✅ Tam sayfa doğrulanmış)
+- Improvado: "API Integration Platforms 2026" (switching cost verisi) — https://improvado.io/blog/the-best-api-integration-platforms (✅ doğrulanmış)
+- Nandu Anilal: "Modern Software Moats" (7 Powers framework) — https://nandu.substack.com/p/modern-software-moats (✅ Tam sayfa doğrulanmış)
 - Svix verileri (✅ doğrulanmış): $10.5M funding, $5M revenue, 3,199 GitHub stars, 20+ Fortune 500 müşteri
 - Hookdeck (✅ doğrulanmış): Outpost GA, SOC2, G2 listelemesi
 - Hook0 (✅ doğrulanmış): Open-source, self-hosted
