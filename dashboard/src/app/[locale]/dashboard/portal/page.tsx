@@ -29,6 +29,7 @@ export default function PortalPage() {
   const [profile, setProfile] = useState<PortalProfile | null>(null);
   const [usage, setUsage] = useState<PortalUsage | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -37,11 +38,25 @@ export default function PortalPage() {
       apiFetch<PortalUsage>('/portal/usage', { token }),
     ])
       .then(([p, u]) => { setProfile(p); setUsage(u); })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Failed to load portal data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load portal data');
+      })
       .finally(() => setLoading(false));
   }, [token]);
 
   if (loading) return <div className="p-8 text-gray-500">Loading...</div>;
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">👤 Customer Portal</h1>
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
