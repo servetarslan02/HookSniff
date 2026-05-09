@@ -22,6 +22,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const cleanPath = localePrefix ? pathname.slice(localePrefix[1].length + 1) || '/' : pathname;
 
   const navigation = [
+    { name: '🚀 Get Started', href: '/get-started', icon: '🚀' },
     { name: t('dashboard'), href: '/dashboard', icon: '📊' },
     { name: t('endpoints'), href: '/dashboard/endpoints', icon: '🔗' },
     { name: t('deliveries'), href: '/dashboard/deliveries', icon: '📦' },

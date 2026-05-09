@@ -54,6 +54,9 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">Product</h3>
             <ul className="space-y-2">
+              <li>
+                <Link href="/get-started" className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Get Started</Link>
+              </li>
               {['pricing', 'compare', 'playground', 'startups', 'security'].map((key) => {
                 const link = footerLinks.find((l) => l.nameKey === key);
                 return link ? (

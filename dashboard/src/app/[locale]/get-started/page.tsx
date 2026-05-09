@@ -1,0 +1,535 @@
+'use client';
+
+import { useState } from 'react';
+import { Link } from '@/i18n/navigation';
+import { useAuth } from '@/lib/store';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+
+/* ─── SDK Code Examples ─── */
+
+const SDK_EXAMPLES = {
+  nodejs: {
+    label: 'Node.js',
+    icon: '🟢',
+    install: 'npm install hooksniff-sdk',
+    code: `import { HookSniff } from 'hooksniff-sdk';
+
+const hs = new HookSniff({ apiKey: 'YOUR_API_KEY' });
+
+// 1. Create an endpoint
+const endpoint = await hs.endpoints.create({
+  url: 'https://myapp.com/webhooks',
+  description: 'My production endpoint',
+});
+
+// 2. Send a webhook
+const delivery = await hs.webhooks.send({
+  endpointId: endpoint.id,
+  event: 'order.created',
+  data: { order_id: 'ord_123', total: 49.99 },
+});
+
+console.log('Delivery ID:', delivery.id);`,
+  },
+  python: {
+    label: 'Python',
+    icon: '🐍',
+    install: 'pip install hooksniff',
+    code: `import hooksniff
+
+client = hooksniff.Client(api_key="YOUR_API_KEY")
+
+# 1. Create an endpoint
+endpoint = client.endpoints.create(
+    url="https://myapp.com/webhooks",
+    description="My production endpoint"
+)
+
+# 2. Send a webhook
+delivery = client.webhooks.send(
+    endpoint_id=endpoint.id,
+    event="order.created",
+    data={"order_id": "ord_123", "total": 49.99}
+)
+
+print(f"Delivery ID: {delivery.id}")`,
+  },
+  go: {
+    label: 'Go',
+    icon: '🔵',
+    install: 'go get github.com/hooksniff/hooksniff-go',
+    code: `package main
+
+import (
+    "fmt"
+    hooksniff "github.com/hooksniff/hooksniff-go"
+)
+
+func main() {
+    client := hooksniff.NewClient("YOUR_API_KEY")
+
+    // 1. Create an endpoint
+    endpoint, _ := client.Endpoints.Create(&hooksniff.EndpointParams{
+        URL:         "https://myapp.com/webhooks",
+        Description: "My production endpoint",
+    })
+
+    // 2. Send a webhook
+    delivery, _ := client.Webhooks.Send(&hooksniff.WebhookParams{
+        EndpointID: endpoint.ID,
+        Event:      "order.created",
+        Data:       map[string]interface{}{"order_id": "ord_123", "total": 49.99},
+    })
+
+    fmt.Printf("Delivery ID: %s\\n", delivery.ID)
+}`,
+  },
+  rust: {
+    label: 'Rust',
+    icon: '🦀',
+    install: 'cargo add hooksniff',
+    code: `use hooksniff::Client;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new("YOUR_API_KEY");
+
+    // 1. Create an endpoint
+    let endpoint = client.endpoints().create(
+        "https://myapp.com/webhooks",
+        Some("My production endpoint")
+    ).await?;
+
+    // 2. Send a webhook
+    let delivery = client.webhooks().send(
+        &endpoint.id,
+        "order.created",
+        serde_json::json!({"order_id": "ord_123", "total": 49.99}),
+    ).await?;
+
+    println!("Delivery ID: {}", delivery.id);
+    Ok(())
+}`,
+  },
+  python_requests: {
+    label: 'curl',
+    icon: '🌐',
+    install: '',
+    code: `# 1. Create an endpoint
+curl -X POST https://api.hooksniff.dev/v1/endpoints \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "url": "https://myapp.com/webhooks",
+    "description": "My production endpoint"
+  }'
+
+# 2. Send a webhook
+curl -X POST https://api.hooksniff.dev/v1/webhooks \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "endpoint_id": "ep_abc123",
+    "event": "order.created",
+    "data": {"order_id": "ord_123", "total": 49.99}
+  }'`,
+  },
+};
+
+type SdkKey = keyof typeof SDK_EXAMPLES;
+
+/* ─── Event Type Suggestions ─── */
+
+const EVENT_TYPES = [
+  { category: '💳 Payments', events: ['payment.completed', 'payment.failed', 'payment.refunded', 'subscription.created', 'subscription.cancelled'] },
+  { category: '👤 Users', events: ['user.created', 'user.updated', 'user.deleted', 'user.login', 'user.password_reset'] },
+  { category: '📦 Orders', events: ['order.created', 'order.shipped', 'order.delivered', 'order.cancelled', 'order.refunded'] },
+  { category: '📧 Email', events: ['email.sent', 'email.delivered', 'email.opened', 'email.bounced', 'email.complained'] },
+  { category: '🤖 AI / Agents', events: ['agent.task_started', 'agent.task_completed', 'agent.task_failed', 'model.response_completed'] },
+  { category: '🔔 Notifications', events: ['notification.created', 'notification.read', 'notification.dismissed'] },
+];
+
+/* ─── Copy Button ─── */
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+    >
+      {copied ? '✓ Copied!' : 'Copy'}
+    </button>
+  );
+}
+
+/* ─── Step Component ─── */
+function Step({ number, title, children }: { number: number; title: string; children: React.ReactNode }) {
+  return (
+    <div className="relative pl-12 pb-12 last:pb-0">
+      {/* Vertical line */}
+      <div className="absolute left-5 top-10 bottom-0 w-px bg-gray-200 dark:bg-slate-700 last:hidden" />
+      {/* Step number */}
+      <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-brand-600 dark:bg-brand-500 text-white flex items-center justify-center font-bold text-sm">
+        {number}
+      </div>
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{title}</h3>
+      <div className="text-gray-600 dark:text-slate-400">{children}</div>
+    </div>
+  );
+}
+
+/* ─── Main Page ─── */
+export default function GetStartedPage() {
+  const { user } = useAuth();
+  const [activeSdk, setActiveSdk] = useState<SdkKey>('nodejs');
+  const [apiKeyRevealed, setApiKeyRevealed] = useState(false);
+
+  const sdkKeys = Object.keys(SDK_EXAMPLES) as SdkKey[];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-brand-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
+      {/* Header */}
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="text-2xl">🪝</span>
+            <span className="font-bold text-gray-900 dark:text-white text-lg">HookSniff</span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            {user ? (
+              <Link href="/dashboard" className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+                Dashboard →
+              </Link>
+            ) : (
+              <Link href="/login" className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+                Sign Up Free
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Hero */}
+      <div className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-full text-sm font-medium mb-6">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          Free tier — no credit card required
+        </div>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
+          Get Started with HookSniff
+        </h1>
+        <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-8">
+          Send your first webhook in under 5 minutes. HookSniff handles delivery, retries, security, and monitoring.
+        </p>
+        <div className="flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-slate-400">
+          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> Free forever</span>
+          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> 11 SDKs</span>
+          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> No credit card</span>
+          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> 5 min setup</span>
+        </div>
+      </div>
+
+      {/* Steps */}
+      <div className="max-w-3xl mx-auto px-4 pb-20">
+
+        {/* Step 1: Create Account */}
+        <Step number={1} title="Create your account">
+          <p className="mb-4">
+            Sign up for free — no credit card required. You get 10,000 webhook deliveries per month on the free plan.
+          </p>
+          {!user ? (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
+            >
+              Create Free Account →
+            </Link>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-xl text-sm font-medium">
+              ✓ Signed in as {user.email}
+            </div>
+          )}
+        </Step>
+
+        {/* Step 2: Get API Key */}
+        <Step number={2} title="Get your API key">
+          <p className="mb-4">
+            Your API key authenticates requests. You can find it in your dashboard after signing up.
+          </p>
+          <div className="bg-gray-900 rounded-xl p-4 font-mono text-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-400">Your API Key</span>
+              {user && (
+                <Link href="/dashboard/api-keys" className="text-brand-400 text-xs hover:text-brand-300">
+                  Manage keys →
+                </Link>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              <code className="text-green-400">
+                {apiKeyRevealed ? 'hr_live_k3y_••••••••••••••••' : 'hr_live_••••••••••••••••••••'}
+              </code>
+              <button
+                onClick={() => setApiKeyRevealed(!apiKeyRevealed)}
+                className="text-gray-500 hover:text-gray-300 transition text-xs"
+              >
+                {apiKeyRevealed ? '🙈 Hide' : '👁 Show'}
+              </button>
+            </div>
+          </div>
+          <p className="mt-3 text-sm text-gray-500 dark:text-slate-500">
+            💡 Keep your API key secret. Never commit it to version control.
+          </p>
+        </Step>
+
+        {/* Step 3: Install SDK */}
+        <Step number={3} title="Install the SDK">
+          <p className="mb-4">
+            Choose your language and install the SDK. HookSniff has official SDKs for 11 languages.
+          </p>
+
+          {/* SDK Tabs */}
+          <div className="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
+            <div className="flex flex-wrap border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800">
+              {sdkKeys.map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveSdk(key)}
+                  className={`px-4 py-2.5 text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                    activeSdk === key
+                      ? 'text-brand-700 dark:text-brand-400 border-b-2 border-brand-500 bg-white dark:bg-slate-900'
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <span>{SDK_EXAMPLES[key].icon}</span>
+                  <span>{SDK_EXAMPLES[key].label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Install command */}
+            {SDK_EXAMPLES[activeSdk].install && (
+              <div className="border-b border-gray-200 dark:border-slate-700 p-4 bg-gray-900">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-400 uppercase tracking-wider">Install</span>
+                  <CopyButton text={SDK_EXAMPLES[activeSdk].install} />
+                </div>
+                <code className="text-green-400 text-sm font-mono">{SDK_EXAMPLES[activeSdk].install}</code>
+              </div>
+            )}
+
+            {/* Code example */}
+            <div className="p-4 bg-gray-900">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-gray-400 uppercase tracking-wider">Quickstart</span>
+                <CopyButton text={SDK_EXAMPLES[activeSdk].code} />
+              </div>
+              <pre className="text-sm font-mono overflow-x-auto text-green-400">
+                <code>{SDK_EXAMPLES[activeSdk].code}</code>
+              </pre>
+            </div>
+          </div>
+        </Step>
+
+        {/* Step 4: Create Endpoint */}
+        <Step number={4} title="Create an endpoint">
+          <p className="mb-4">
+            An endpoint is a URL where HookSniff delivers your webhooks. You can create one via the SDK, API, or dashboard.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🖥️ Via Dashboard</h4>
+              <p className="text-sm text-gray-500 dark:text-slate-400">
+                Go to <Link href="/dashboard/endpoints" className="text-brand-600 dark:text-brand-400 hover:underline">Endpoints</Link> →
+                click &quot;Create Endpoint&quot; → enter your URL.
+              </p>
+            </div>
+            <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">⚡ Via API</h4>
+              <p className="text-sm text-gray-500 dark:text-slate-400">
+                Use the SDK code from Step 3, or send a POST request to <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">/v1/endpoints</code>.
+              </p>
+            </div>
+          </div>
+          <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
+            <p className="text-sm text-blue-700 dark:text-blue-400">
+              💡 <strong>Tip:</strong> Use <Link href="/playground" className="underline">HookSniff Playground</Link> to test webhooks without a real endpoint. It gives you a temporary URL that captures all requests.
+            </p>
+          </div>
+        </Step>
+
+        {/* Step 5: Send Your First Webhook */}
+        <Step number={5} title="Send your first webhook">
+          <p className="mb-4">
+            Now let&apos;s send a test webhook. Use the code below or try the interactive playground.
+          </p>
+          <div className="bg-gray-900 rounded-xl p-4 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-gray-400 uppercase tracking-wider">Test Webhook</span>
+              <CopyButton text={`curl -X POST https://api.hooksniff.dev/v1/webhooks \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"endpoint_id":"ep_YOUR_ID","event":"order.created","data":{"order_id":"ord_123","total":49.99}}'`} />
+            </div>
+            <pre className="text-sm font-mono text-green-400 overflow-x-auto">
+              <code>{`curl -X POST https://api.hooksniff.dev/v1/webhooks \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "endpoint_id": "ep_YOUR_ID",
+    "event": "order.created",
+    "data": {"order_id": "ord_123", "total": 49.99}
+  }'`}</code>
+            </pre>
+          </div>
+          <div className="flex gap-3">
+            <Link
+              href="/dashboard/playground"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
+            >
+              🧪 Try Playground
+            </Link>
+            <Link
+              href="/dashboard/deliveries"
+              className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            >
+              📦 View Deliveries
+            </Link>
+          </div>
+        </Step>
+
+        {/* Step 6: Monitor & Go Live */}
+        <Step number={6} title="Monitor deliveries & go live">
+          <p className="mb-4">
+            Track every webhook delivery in real-time. See success rates, debug failures, replay failed webhooks, and monitor performance.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center">
+              <div className="text-3xl mb-2">📊</div>
+              <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Real-time Dashboard</h4>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Success rates, latency, throughput</p>
+            </div>
+            <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center">
+              <div className="text-3xl mb-2">🔄</div>
+              <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Auto Retries</h4>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Exponential backoff, configurable</p>
+            </div>
+            <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center">
+              <div className="text-3xl mb-2">🔔</div>
+              <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Alerts</h4>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Get notified on failures</p>
+            </div>
+          </div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition"
+          >
+            Open Dashboard →
+          </Link>
+        </Step>
+      </div>
+
+      {/* Event Types Reference */}
+      <div className="bg-gray-50 dark:bg-slate-900/50 border-t border-gray-200 dark:border-slate-800">
+        <div className="max-w-5xl mx-auto px-4 py-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">📋 Event Type Reference</h2>
+          <p className="text-gray-600 dark:text-slate-400 mb-8">Common webhook event types you can use. These are suggestions — use any event type you want.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {EVENT_TYPES.map((cat) => (
+              <div key={cat.category} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{cat.category}</h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {cat.events.map((ev) => (
+                    <code key={ev} className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 px-2 py-1 rounded">
+                      {ev}
+                    </code>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Embed Portal Section */}
+      <div className="max-w-5xl mx-auto px-4 py-16">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">🖼️ Embed in Your App</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-8">Give your customers a white-labeled webhook portal inside your own dashboard.</p>
+        <div className="bg-gray-900 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-gray-400 uppercase tracking-wider">Embed Code</span>
+            <CopyButton text={`<iframe\n  src="https://portal.hooksniff.dev/embed?token=YOUR_PORTAL_TOKEN"\n  style="width:100%;height:600px;border:none;"\n  allow="clipboard-write"\n/>`} />
+          </div>
+          <pre className="text-sm font-mono text-green-400 overflow-x-auto">
+            <code>{`<iframe
+  src="https://portal.hooksniff.dev/embed?token=YOUR_PORTAL_TOKEN"
+  style="width: 100%; height: 600px; border: none;"
+  allow="clipboard-write"
+/>`}</code>
+          </pre>
+        </div>
+        <p className="mt-3 text-sm text-gray-500 dark:text-slate-500">
+          Customize colors, logo, and fonts in <Link href="/dashboard/portal" className="text-brand-600 dark:text-brand-400 hover:underline">Portal Settings</Link>.
+        </p>
+      </div>
+
+      {/* CLI Section */}
+      <div className="bg-gray-50 dark:bg-slate-900/50 border-t border-gray-200 dark:border-slate-800">
+        <div className="max-w-5xl mx-auto px-4 py-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">⌨️ CLI Quickstart</h2>
+          <p className="text-gray-600 dark:text-slate-400 mb-8">Manage HookSniff from your terminal.</p>
+          <div className="bg-gray-900 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-gray-400 uppercase tracking-wider">Install & Use</span>
+              <CopyButton text={`npm install -g hooksniff-cli\n\n# Login\nhooksniff login\n\n# Create endpoint\nhooksniff endpoints create --url https://myapp.com/webhooks\n\n# Send test webhook\nhooksniff webhooks send --endpoint ep_abc123 --event order.created --data '{"total":49.99}'`} />
+            </div>
+            <pre className="text-sm font-mono text-green-400 overflow-x-auto">
+              <code>{`# Install
+npm install -g hooksniff-cli
+
+# Login
+hooksniff login
+
+# Create endpoint
+hooksniff endpoints create --url https://myapp.com/webhooks
+
+# Send test webhook
+hooksniff webhooks send \\
+  --endpoint ep_abc123 \\
+  --event order.created \\
+  --data '{"total": 49.99}'
+
+# View deliveries
+hooksniff deliveries list --limit 10`}</code>
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Ready to start?</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-8">Create your free account and send your first webhook in minutes.</p>
+        <div className="flex items-center justify-center gap-4">
+          {!user ? (
+            <>
+              <Link href="/login" className="px-8 py-3 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition">
+                Create Free Account
+              </Link>
+              <Link href="/playground" className="px-8 py-3 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition">
+                Try Playground
+              </Link>
+            </>
+          ) : (
+            <Link href="/dashboard" className="px-8 py-3 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition">
+              Go to Dashboard →
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
