@@ -1,8 +1,9 @@
-# 🔍 HookSniff — SDK Denetim Raporu
+# 🔍 HookSniff — SDK Denetim Raporu (GEÇMİŞ — 2026-05-08)
 
+> ⚠️ **ARŞİV:** Bu rapor 2026-05-08 tarihli. SDK'ların çoğu artık yayınlandı.
+> Güncel durum için: `sdk/STRATEGY.md`'ye bakın.
 > Tarih: 2026-05-08 19:40 GMT+8
 > Oturum: 9 (Soru-Cevap)
-> Durum: Tespit edildi, düzeltilmedi
 
 ---
 

@@ -2,7 +2,19 @@
 
 > Tarih: 2026-05-08 19:46 GMT+8
 > Oturum: 9 (Soru-Cevap)
-> Durum: Öneri, uygulanmadı
+> ⚠️ **ARŞİV:** Bu dosya 2026-05-08 tarihli. Bazı öneriler uygulandı, bazıları `market/FEATURE_PLAN.md`'ye taşındı.
+
+---
+
+## ✅ Uygulananlar
+
+- ~~AI Center SDK'dan kaldırılacak~~ → ✅ Kaldırıldı (Node + Python'dan çıkarıldı)
+- ~~npm + PyPI yayınla~~ → ✅ 11/11 SDK yayınlandı
+- ~~PHP hatası düzelt~~ → ✅ Düzeltildi
+
+## 🔄 Güncel Durum
+
+Güncel ürün planı için `market/FEATURE_PLAN.md`'ye bakın.
 
 ---
 
