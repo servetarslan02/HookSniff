@@ -113,7 +113,7 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 20:35 GMT+8)
+## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 21:09 GMT+8)
 
 ### Genel Puan: 10/10 (Kod Kalitesi) | Sistem Olgunluğu: 8.5/10
 
@@ -121,7 +121,7 @@ cd dashboard && npm install && npm run build
 |----------|------|-------|-----|
 | Kod kalitesi | 10/10 | 10/10 | TODO/FIXME yok, 0 production unwrap(), temiz yapı |
 | Güvenlik | 10/10 | 10/10 | SSRF, HMAC, Argon2, constant-time, 2FA, GDPR |
-| Test coverage | 3/10 | **95%** | Rust %12, Dashboard %2 — ACİL artırılmalı |
+| Test coverage | **4/10** | **95%** | Rust **%25-30** (853 test, 158 yeni), Dashboard %2 |
 | Dokümantasyon | 10/10 | 10/10 | 1316 doc comment, OpenAPI spec, README |
 | SDK tutarlılığı | 10/10 | 10/10 | 11/11 tutarlı base URL, version, badge |
 | CI/CD | 9/10 | 10/10 | Local CI script hazır (GitHub Actions devre dışı) |
@@ -142,7 +142,7 @@ cd dashboard && npm install && npm run build
 | Load test | Script var ❌ | ✅ | ✅ |
 
 ### Eksikler (95% Hedefi İçin)
-1. 🔴 **Rust test coverage %12 → %95** — her endpoint, her fonksiyon test edilecek
+1. 🔴 **Rust test coverage %25-30 → %95** — her endpoint, her fonksiyon test edilecek
 2. 🔴 **Dashboard test coverage %2 → %95** — her component, her page test edilecek
 3. 🟡 **k6 load test çalıştır** — gerçek trafik simülasyonu
 4. 🟡 **Staging ortamı** — GCP'de staging environment
@@ -201,6 +201,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 35 | 2026-05-09 21:04 | 158 route unit test eklendi, coverage %12→%25-30, GitHub push |
 | 34 | 2026-05-09 20:39 | OpenClaw webchat, GitHub sync kuruldu, proje durumu kontrol |
 | 33 | 2026-05-09 19:51 | OpenClaw webchat, SDK publish tamamlandı — Java 0.2.0 + Kotlin 0.3.0 Maven Central'a yüklendi (11/11 🎉) |
 | 32 | 2026-05-09 18:57 | SDK build & publish — Elixir hex.pm'e yüklendi (8/11) |
