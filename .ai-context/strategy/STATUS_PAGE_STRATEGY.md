@@ -1235,7 +1235,7 @@ HookSniff Ekibi
 ## Notlar
 
 - Bu belge OPERATIONS_STRATEGY.md ve LAUNCH_STRATEGY.md ile birlikte okunmalı
-- Better Stack kurulumu Servet tarafından yapılabilir (20-30 dk)
+- Better Stack kurulumu yapılacak (20-30 dk)
 - Mevcut `/v1/status` endpoint'i zaten iyi — sadece CORS ve status sayfası entegrasyonu düzeltilecek
 - İlk hedef: $0 ile professional status page → müşteri güveni
 - Rakip analizi: Hookdeck de Better Stack kullanıyor, Svix Statuspage.io kullanıyor

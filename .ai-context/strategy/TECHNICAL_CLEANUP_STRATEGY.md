@@ -250,7 +250,7 @@ GitHub Actions Workflow
 - HookSniff tek kişilik ekip → key rotate hatırlamak yük
 - WIF bir kez kurulur, sonra bakım gerektirmez
 
-**Adımlar (Servet yapacak):**
+**Adımlar (yapılacak):**
 
 ```
 1. GCP Console → IAM → Workload Identity Pools
@@ -344,7 +344,7 @@ WIF kurulumu 30-45 dk süreceği için, önce SA key rotate yapılmalı:
 - 90 gün süre → otomatik rotate hatırlatması
 - Minimum izin prensibi
 
-**Adımlar (Servet yapacak):**
+**Adımlar (yapılacak):**
 
 ```
 1. GitHub → Settings → Developer settings → Personal access tokens
@@ -450,7 +450,7 @@ npm 2025 Eylül'de büyük değişiklikler yaptı:
 - Provenance attestation otomatik
 - Supply chain attack riski sıfır
 
-**Adımlar (Servet yapacak):**
+**Adımlar (yapılacak):**
 
 **Aşama 1 — Hemen (Granular Token):**
 ```
@@ -546,33 +546,33 @@ jobs:
 
 ## 7. Öncelik Sırası ve Aksiyon Planı
 
-### 🔴 ACİL — Bu Hafta (Servet yapacak)
+### 🔴 ACİL — Bu Hafta (yapılacak)
 
-| # | Görev | Süre | Kim |
+| # | Görev | Süre 
 |---|-------|------|-----|
-| 1 | GCP SA Key rotate (acil, WIF kurulana kadar) | 15 dk | Servet |
-| 2 | GitHub PAT → Fine-grained PAT | 10 dk | Servet |
-| 3 | npm → Granular token oluştur (90 gün) | 10 dk | Servet |
+| 1 | GCP SA Key rotate (acil, WIF kurulana kadar) | 15 dk |
+| 2 | GitHub PAT → Fine-grained PAT | 10 dk |
+| 3 | npm → Granular token oluştur (90 gün) | 10 dk |
 
-### 🟡 ÖNEMLİ — Bu Ay (AI + Servet)
+### 🟡 ÖNEMLİ — Bu Ay
 
-| # | Görev | Süre | Kim |
+| # | Görev | Süre 
 |---|-------|------|-----|
-| 4 | GCP WIF kurulumu (SA key'i tamamen kaldır) | 30-45 dk | Servet |
-| 5 | .ai-context temizliği (5 sil, 2 birleştir) | 30 dk | AI |
-| 6 | npm Trusted Publishers kurulumu | 20 dk | Servet |
-| 7 | PHP SDK duplicate satır fix | 5 dk | AI |
-| 8 | GitHub Actions workflow WIF'e güncelle | 10 dk | AI |
+| 4 | GCP WIF kurulumu (SA key'i tamamen kaldır) | 30-45 dk |
+| 5 | .ai-context temizliği (5 sil, 2 birleştir) | 30 dk |
+| 6 | npm Trusted Publishers kurulumu | 20 dk |
+| 7 | PHP SDK duplicate satır fix | 5 dk |
+| 8 | GitHub Actions workflow WIF'e güncelle | 10 dk |
 
 ### 🟢 İYİLEŞTİRME — Gelecek
 
-| # | Görev | Süre | Kim |
+| # | Görev | Süre 
 |---|-------|------|-----|
-| 9 | OpenAPI spec oluştur | 2 saat | AI |
-| 10 | SDK auto-generation pipeline kur | 3 saat | AI |
-| 11 | Dependabot kur | 30 dk | AI |
-| 12 | GitHub App'e geç (100+ kullanıcı olduğunda) | 1 saat | Servet |
-| 13 | ADR formatına geç (karar dokümantasyonu) | 1 saat | AI |
+| 9 | OpenAPI spec oluştur | 2 saat |
+| 10 | SDK auto-generation pipeline kur | 3 saat |
+| 11 | Dependabot kur | 30 dk |
+| 12 | GitHub App'e geç (100+ kullanıcı olduğunda) | 1 saat |
+| 13 | ADR formatına geç (karar dokümantasyonu) | 1 saat |
 
 ### Takvim
 
