@@ -32,7 +32,7 @@ RateLimiter fix push edildi ama Cloud Run'a deploy edilemedi.
 | Neon DB | ✅ Çalışıyor | 37 migration |
 | 11 SDK | 7/11 yayınlandı | 4 SDK publish scriptleri hazır |
 | CI | ✅ Local CI | `scripts/ci-local.sh` |
-| Test | ✅ 180+ test | Rust, Dashboard, Go, Node, Python |
+| Test | ✅ 186+ test tümü geçti | Rust (162), Dashboard (6), Go, Rust SDK, Node, Python |
 
 ---
 
