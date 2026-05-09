@@ -1,6 +1,8 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+export const metadata = { title: 'Security & Compliance — HookSniff' };
+
 const features = [
   { icon: '🔒', title: 'TLS 1.3 Everywhere', desc: 'All data encrypted in transit with TLS 1.3. No HTTP, no exceptions.' },
   { icon: '🛡️', title: 'HMAC-SHA256 Signatures', desc: 'Every webhook is signed with your secret. Verify authenticity with standard HMAC-SHA256.' },

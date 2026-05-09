@@ -207,14 +207,12 @@ const testimonials = [
 
 function RoiCalculator() {
   const [events, setEvents] = useState(10000);
-  const [teamSize, setTeamSize] = useState(2);
 
   // Cost comparison
   const svixCost = events <= 0 ? 0 : 490; // Svix Pro starts at $490
   const hookdeckCost = events <= 10000 ? 0 : 39 + Math.max(0, Math.ceil((events - 10000) / 100000)) * 1;
   const hooksniffCost = events <= 1000 ? 0 : events <= 50000 ? 29 : 99;
   const savingsVsSvix = svixCost - hooksniffCost;
-  const savingsVsHookdeck = hookdeckCost - hooksniffCost;
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
   return (
@@ -222,44 +220,23 @@ function RoiCalculator() {
       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">💰 ROI Calculator</h3>
       <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">See how much you save with HookSniff vs competitors.</p>
 
-      <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-            Monthly webhooks: <span className="text-brand-600 dark:text-brand-400 font-bold">{events.toLocaleString()}</span>
-          </label>
-          <input
-            type="range"
-            min={0}
-            max={100000}
-            step={1000}
-            value={events}
-            onChange={(e) => setEvents(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-600"
-          />
-          <div className="flex justify-between text-xs text-gray-400 dark:text-slate-600 mt-1">
-            <span>0</span>
-            <span>50K</span>
-            <span>100K</span>
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-            Team size: <span className="text-brand-600 dark:text-brand-400 font-bold">{teamSize}</span>
-          </label>
-          <input
-            type="range"
-            min={1}
-            max={20}
-            step={1}
-            value={teamSize}
-            onChange={(e) => setTeamSize(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-600"
-          />
-          <div className="flex justify-between text-xs text-gray-400 dark:text-slate-600 mt-1">
-            <span>1</span>
-            <span>10</span>
-            <span>20</span>
-          </div>
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+          Monthly webhooks: <span className="text-brand-600 dark:text-brand-400 font-bold">{events.toLocaleString()}</span>
+        </label>
+        <input
+          type="range"
+          min={0}
+          max={100000}
+          step={1000}
+          value={events}
+          onChange={(e) => setEvents(Number(e.target.value))}
+          className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-600"
+        />
+        <div className="flex justify-between text-xs text-gray-400 dark:text-slate-600 mt-1">
+          <span>0</span>
+          <span>50K</span>
+          <span>100K</span>
         </div>
       </div>
 
