@@ -1459,3 +1459,77 @@ cd dashboard && npm install && npm run build
 - **5 altyapı** işi tamamlandı
 - **Terraform provider** + **MCP server** eklendi
 - **Kod denetimi** tamamlandı, tüm sorunlar düzeltildi
+## 📝 Oturum 66 (2026-05-10 06:02 - 06:15 GMT+8) — Backend Endpoints
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**7 Backend Endpoint Oluşturuldu:**
+
+1. **OAuth Social Login** (`/v1/oauth/`)
+   - `GET /providers` — Available providers list
+   - `GET /google` → Google OAuth redirect
+   - `GET /google/callback` → Token exchange + user creation
+   - `GET /github` → GitHub OAuth redirect
+   - `GET /github/callback` → Token exchange + user creation
+   - find_or_create_oauth_customer helper
+   - Config: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_REDIRECT_BASE
+
+2. **Audit Log** (`/v1/audit-log/`)
+   - `GET /` — List entries (paginated, filterable by action/resource_type)
+   - `GET /:id` — Single entry detail
+   - `log_action()` helper for other handlers to call
+   - Table: audit_log (customer_id, action, resource_type, resource_id, details JSONB, ip_address, user_agent)
+
+3. **SSO/SAML/OIDC** (`/v1/sso/`)
+   - `GET /config` — Get SSO config (hides secrets)
+   - `POST /config` — Create/update (SAML or OIDC)
+   - `DELETE /config` — Remove
+   - `POST /test` — Validate configuration
+   - Table: sso_configs (provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted)
+
+4. **Custom Domains** (`/v1/custom-domains/`)
+   - `GET /` — List domains
+   - `POST /` — Add domain (generates verification token, CNAME + TXT records)
+   - `DELETE /:id` — Remove
+   - `POST /:id/verify` — DNS verification (dig + nslookup fallback)
+   - Table: custom_domains (domain, verified, ssl_active, verification_token, cname_target, txt_record)
+
+5. **Portal Config** (`/v1/portal/config`)
+   - `GET /config` — Get branding config (defaults if none set)
+   - `POST /config` — Update (color validation, CSS length limit)
+   - `GET /embed-code` — Iframe, React, script embed snippets
+   - Table: portal_configs (company_name, logo_url, primary_color, font_family, dark_mode, show_events, show_deliveries, allowed_events, custom_css)
+
+6. **Per-Endpoint Rate Limits** (`/v1/rate-limits/`)
+   - `GET /` — List all configs for customer's endpoints
+   - `GET /:endpoint_id` — Get (returns defaults if none set)
+   - `POST /:endpoint_id` — Set (1-10000 rps, 1-10000 burst)
+   - `DELETE /:endpoint_id` — Remove (revert to defaults)
+   - Ownership verification before any operation
+   - Table: rate_limit_configs (requests_per_second, burst_size, enabled)
+
+7. **Retry Policy** — Already existed in backend (retry_policy/mod.rs), routes available via endpoints
+
+**Altyapı:**
+- Migration 038: 5 yeni tablo
+- `urlencoding` dependency eklendi
+- mod.rs güncellendi (6 yeni module + router registration)
+- Tüm endpoint'ler test ile
+
+### GitHub Push
+- `fea537b` — feat: backend endpoints
+- 9 dosya, +2030 satır
+
+### Dashboard Entegrasyonu
+Dashboard'daki localStorage fallback'lar artık bu endpoint'lere bağlanabilir:
+- `/dashboard/audit-log` → `/v1/audit-log`
+- `/dashboard/sso` → `/v1/sso/config`
+- `/dashboard/custom-domain` → `/v1/custom-domains`
+- `/dashboard/portal-customize` → `/v1/portal/config`
+- `/dashboard/rate-limiting` → `/v1/rate-limits`
+- `/dashboard/retry-policy` → `/v1/endpoints/{id}/retry-policy` (zaten var)
+- Login sayfası OAuth butonları → `/v1/oauth/providers`
