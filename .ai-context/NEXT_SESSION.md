@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 02:58 GMT+8
+> Son güncelleme: 2026-05-10 03:13 GMT+8
 > Bu dosya bir sonraki oturumda ne yapılacağını anlatır.
 
 ---
@@ -25,12 +25,31 @@
 
 | # | Görev | Öncelik | Not |
 |---|-------|---------|-----|
-| 1 | Dashboard eksik sayfalar kontrol | Yüksek | Tüm sayfalar çalışıyor mu? |
-| 2 | API deploy sonrası test | Yüksek | Login, register, webhook akışı |
-| 3 | k6 load test çalıştırma | Orta | Gerçek trafik simülasyonu |
-| 4 | Staging ortamı kurulumu | Orta | GCP'de staging environment |
-| 5 | OpenAPI spec doldurma | Orta | Mevcut spec boş |
-| 6 | Eski domain referansları temizliği | Düşük | 107 eski referans |
+| 1 | **Repo public/private kararı** | 🔴 Kritik | GHA sınırsız dakika vs kod gizliliği |
+| 2 | Dashboard eksik sayfalar kontrol | Yüksek | Tüm sayfalar çalışıyor mu? |
+| 3 | API deploy sonrası test | Yüksek | Login, register, webhook akışı |
+| 4 | k6 load test çalıştırma | Orta | Gerçek trafik simülasyonu |
+| 5 | Staging ortamı kurulumu | Orta | GCP'de staging environment |
+| 6 | OpenAPI spec doldurma | Orta | Mevcut spec boş |
+| 7 | Eski domain referansları temizliği | Düşük | 107 eski referans |
+
+### Yeni Strateji Raporları (Bu Oturumda Oluşturuldu)
+
+| # | Rapor | Boyut | Durum |
+|---|-------|-------|-------|
+| 28 | DISASTER_RECOVERY_STRATEGY | ~32KB | ✅ |
+| 29 | API_DOCUMENTATION_STRATEGY | ~16KB | ✅ |
+| 30 | MONITORING_OBSERVABILITY_STRATEGY | ~22KB | ✅ |
+| 31 | CICD_STRATEGY | ~18KB | ✅ |
+
+### Araştırma Düzeltmeleri (7 Hata)
+1. ⚠️ Repo private → GHA 2K dk/ay limit (public olsa sınırsız)
+2. ⚠️ Grafana Cloud free OnCall (3 kullanıcı) + SLO feature var
+3. ⚠️ OpenAPI 3.1 native webhooks field (upgrade yolu)
+4. ⚠️ AsyncAPI gereksiz (doğrulandı)
+5. ⚠️ GitHub self-hosted runner $0.002/dk (Mart 2026)
+6. ⚠️ Grafana logs: 50 GB ingested/month düzeltmesi
+7. ⚠️ Strategy README: 31/31 rapor güncellendi
 
 ### Strateji Raporları (Tamamlandı ✅)
 
