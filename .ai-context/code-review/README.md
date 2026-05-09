@@ -17,10 +17,12 @@
 
 ## Toplam Bulgu
 
-| Seviye | Sayı |
-|--------|------|
-| 🔴 Kritik | 22 |
-| 🟠 Yüksek | 25 |
-| 🟡 Orta | 52 |
-| 🔵 Düşük | 50 |
-| **Genel Skor** | **6.2/10** |
+| Seviye | Sayı | Not |
+|--------|------|-----|
+| 🔴 Kritik | 28 | Bazı bulgular birden fazla bölgeye ait |
+| 🟠 Yüksek | 30 | |
+| 🟡 Orta | 66 | |
+| 🔵 Düşük | 23 | |
+| **Genel Skor** | **6.2/10** | |
+
+> Not: Bölge bazlı organizasyonda bazı bulgular ilgili birden fazla dosyada listelenir (örn: TOTP secret hem API.md hem DEPLOY.md'de).
