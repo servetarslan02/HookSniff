@@ -1,7 +1,7 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-09 21:39 GMT+8
-> Oturum: 37
+> Son güncelleme: 2026-05-09 22:25 GMT+8
+> Oturum: 38
 
 ---
 
@@ -11,7 +11,7 @@
 | Modül | Test Sayısı | Durum |
 |-------|------------|-------|
 | Rust API | **952 test, 0 hata** | ✅ Tüm modüller covered |
-| Dashboard | **426 test, 0 hata** (57 dosya) | ✅ Tüm sayfalar + component'ler covered |
+| Dashboard | **471 test, 0 hata** (60 dosya) | ✅ Tüm sayfalar + component'ler covered, %58.43 lines coverage |
 
 ### Servis Durumu
 | Servis | Durum | Not |
@@ -55,7 +55,7 @@
 ## 🔄 Sonraki Görevler (Öncelik Sırası)
 
 ### Kısa Vadeli
-1. ✅ ~~Dashboard test coverage artır~~ — 374 test, 50 dosya, tamamlandı
+1. ✅ ~~Dashboard test coverage artır~~ — 471 test, 60 dosya, %58.43 coverage, tamamlandı
 2. **API deploy** — GCP Console manuel
 3. **k6 load test** — trafik simülasyonu çalıştır
 
