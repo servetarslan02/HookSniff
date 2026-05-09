@@ -38,14 +38,17 @@ pub fn create_routes(
     throttle_manager: crate::throttle::ThrottleManager,
     metrics: std::sync::Arc<crate::metrics::Metrics>,
 ) -> Router {
+    // Layer order matters: last .layer() = outermost middleware (runs first).
+    // from_fn middleware must be INNERMOST so Extension layers inject values
+    // into request extensions BEFORE the middleware tries to extract them.
     api_router()
+        .layer(axum_middleware::from_fn(
+            crate::rate_limit::rate_limit_middleware,
+        ))
         .layer(axum::Extension(pool))
         .layer(axum::Extension(rate_limiter))
         .layer(axum::Extension(throttle_manager))
         .layer(axum::Extension(metrics))
-        .layer(axum_middleware::from_fn(
-            crate::rate_limit::rate_limit_middleware,
-        ))
 }
 
 pub fn api_router() -> Router {
