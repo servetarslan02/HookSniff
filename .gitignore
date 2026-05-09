@@ -53,3 +53,18 @@ sdks/csharp/bin/
 sdks/csharp/obj/
 sdks/kotlin/.gradle/
 sdks/kotlin/build/
+
+# Elixir
+sdks/elixir/_build/
+sdks/elixir/deps/
+sdks/elixir/doc/
+
+# Ruby
+sdks/ruby/*.gem
+sdks/ruby/pkg/
+
+# Java
+sdks/java/target/
+
+# Gradle (global)
+.gradle/
