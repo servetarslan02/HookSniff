@@ -1,6 +1,7 @@
-# HookSniff — Kapsamlı Denetim Raporu
+# HookSniff — Kapsamlı Denetim Raporu (GEÇMİŞ — 2026-05-08)
 
-> Son güncelleme: 2026-05-08 22:08 GMT+8
+> ⚠️ **ARŞİV:** Bu rapor 2026-05-08 tarihli. Listelenen sorunların çoğu düzeltildi.
+> Güncel durum için: `audit/AUDIT_REPORT_2026-05-09.md` veya `MEMORY.md`'ye bakın.
 > Tarih: 2026-05-08 07:18 GMT+8
 > Hazırlayan: Mamo (AI)
 

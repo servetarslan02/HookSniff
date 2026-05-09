@@ -1,7 +1,7 @@
-# SDK Publish Rehberi — Kalan 5 SDK
+# SDK Publish Rehberi — 11/11 SDK ✅
 
-> Son güncelleme: 2026-05-09 06:25 GMT+8
-> Oturum: 26
+> Son güncelleme: 2026-05-10
+> ⚠️ Tüm SDK'lar yayınlandı. Bu rehber gelecekteki güncellemeler için referans.
 
 ---
 
@@ -13,13 +13,13 @@
 | Python | 0.1.0 | PyPI | ✅ Yayında | `twine upload` |
 | Rust | 0.2.0 | crates.io | ✅ Yayında | `cargo publish` |
 | C# | 0.1.0 | NuGet | ✅ Yayında | `dotnet nuget push` |
-| Go | v0.1.0 | pkg.go.dev | ✅ Tag atıldı | `git tag` |
-| Swift | v0.1.0 | Swift Package Index | ✅ Tag atıldı | `git tag` |
-| **Java** | 0.1.0 | Maven Central | ⏳ | Maven + GPG |
-| **Kotlin** | 0.2.0 | Maven Central | ⏳ | Gradle + GPG |
-| **Ruby** | 0.1.0 | RubyGems | ⏳ | `gem push` |
-| **PHP** | 0.1.0 | Packagist | ⏳ | GitHub submit |
-| **Elixir** | 0.2.0 | Hex.pm | ⏳ | `mix hex.publish` |
+| Go | v0.1.0 | pkg.go.dev | ✅ Yayında | `git tag` |
+| Swift | v0.1.0 | Swift Package Index | ✅ Yayında | `git tag` |
+| Java | 0.2.0 | Maven Central | ✅ Yayında | Maven + GPG |
+| Kotlin | 0.3.0 | Maven Central | ✅ Yayında | Gradle + GPG |
+| Ruby | 0.1.0 | RubyGems | ✅ Yayında | `gem push` |
+| **PHP** | 0.1.0 | Packagist | ✅ Yayında | GitHub submit |
+| **Elixir** | 0.2.0 | Hex.pm | ✅ Yayında | `mix hex.publish` |
 
 ---
 

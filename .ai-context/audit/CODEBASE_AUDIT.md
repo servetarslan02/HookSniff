@@ -1,9 +1,9 @@
-# 🔍 HookSniff — Kapsamlı Kod Denetim Raporu
+# 🔍 HookSniff — Kapsamlı Kod Denetim Raporu (GEÇMİŞ — 2026-05-08)
 
-> Son güncelleme: 2026-05-08 22:08 GMT+8
+> ⚠️ **ARŞİV:** Bu rapor 2026-05-08 tarihli. Listelenen sorunların çoğu düzeltildi.
+> Güncel durum için: `audit/CODEBASE_REVIEW_2026-05-09.md` veya `MEMORY.md`'ye bakın.
 > Tarih: 2026-05-08 19:55 GMT+8
 > Oturum: 9 (Soru-Cevap)
-> Durum: Tespit edildi, düzeltilmedi
 
 ---
 

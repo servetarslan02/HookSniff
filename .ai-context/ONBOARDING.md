@@ -1,6 +1,7 @@
 # 🪝 HookSniff — Yeni Oturum Rehberi
 
 > Her yeni oturumda ilk olarak bunu oku.
+> Son güncelleme: 2026-05-10
 
 ---
 
@@ -14,7 +15,6 @@
 | AI Agent katmanı | `servetarslan02/hooksniff-lab` | Lab repo, Servet onayı beklemede |
 
 **Kural:** Yeni özellikler lab repo'da geliştirilir, test edilir, Servet onay verirse ana repo'ya merge edilir.
-Ana repo'nun main branch'i bozulmaz. Hata fixleri doğrudan ana repo'da yapılır.
 
 ---
 
@@ -26,46 +26,35 @@ Ana repo'nun main branch'i bozulmaz. Hata fixleri doğrudan ana repo'da yapılı
 ## Proje: HookSniff
 
 Webhook delivery servisi. Geliştiricilere yönelik.
-- Gönder, teslim edelim. Başarısız olursa tekrar deneyelim.
-- Rakipler: Svix ($490/ay), Hookdeck ($39/ay), Convoy, Hook0
+- Rakipler: Svix ($490/ay), Hookdeck ($39/ay), Hook0
+- Fiyat: Free $0 / Pro $29 / Business $99
 - Hedef: $500/ay gelir → şirket kur
 
 ## Hafıza Sistemi
 
-Tüm hafıza `.ai-context/` klasöründe tutuluyor.
+Tüm hafıza `.ai-context/` klasöründe tutulur.
 
 ### Her yeni oturumda:
 1. `git pull origin main`
 2. Bu dosyayı oku (`.ai-context/ONBOARDING.md`)
-3. `.ai-context/EXTERNAL_TOKENS.md` — tüm token'lar burada
-4. `.ai-context/MEMORY.md` — proje durumu
-5. `TODO.md` — yapılacaklar (root)
-6. `.ai-context/NEXT_SESSION.md` — sıradaki işler
-7. Kaldığın yerden devam et
+3. `.ai-context/MEMORY.md` — proje durumu, oturum geçmişi
+4. `.ai-context/NEXT_SESSION.md` — sıradaki işler
+5. Kaldığın yerden devam et
 
-### Hafıza dosyaları:
+### Klasör Yapısı:
 ```
 .ai-context/
-  ONBOARDING.md        → Bu dosya (yeni oturum rehberi)
-  MEMORY.md            → Proje durumu, mimari, kritik bilgiler
-  NEXT_SESSION.md      → Sıradaki işler
-  EXTERNAL_TOKENS.md   → Tüm API token'ları
-  SDK_STRATEGY.md      → SDK bakım ve güvenlik planı (6 aktif, 5 pasif)
-  SDK_AUDIT.md         → SDK denetim raporu (5 hata + eksikler)
-  PRODUCT_IMPROVEMENTS.md → Ürün iyileştirme önerileri (7 madde)
-  CODEBASE_AUDIT.md      → Kapsamlı kod denetim raporu (10 madde)
-  FULL_SYSTEM_AUDIT.md   → Tam sistem denetimi (kritik güvenlik + 10 madde)
-  MOBILE_MASTER_PLAN.md → Mobil uygulama master plan
-  MOBILE_APP_AUDIT.md   → Mobil eksiklik analizi
-  MOBILE_DECISIONS.md   → Mobil plan kararları
-  MOBILE_PERFORMANCE.md → Mobil performans raporu
-  MOBILE_RESOURCES.md   → Mobil kaynaklar
-  2026-05-08.md         → Oturum logları
-  README.md            → Klasör açıklaması
-
-TODO.md                → Yapılacaklar listesi (root, birleştirilmiş)
-FEATURES.md            → Feature tracker (root)
-STATUS.md              → Genel durum özeti (root)
+├── MEMORY.md              ← Uzun vadeli hafıza
+├── NEXT_SESSION.md        ← Sonraki oturum planı
+├── ONBOARDING.md          ← Bu dosya
+├── README.md              ← İndeks
+│
+├── audit/                 ← Kod denetim raporları (8 dosya)
+├── mobile/                ← Mobil uygulama planları (5 dosya)
+├── sdk/                   ← SDK strateji ve rehberler (4 dosya)
+├── market/                ← Pazar, rekabet analizi (7 dosya)
+├── logs/                  ← Günlük oturum logları (4 dosya)
+└── strategy/              ← Strateji raporları (31 dosya, dokunulmaz)
 ```
 
 ## Teknoloji Stack
@@ -82,6 +71,7 @@ STATUS.md              → Genel durum özeti (root)
 | Monitoring | Grafana Cloud (OpenTelemetry) |
 | Ödeme | Polar.sh (global) + iyzico (TR) |
 | Email | GCloud Gmail API |
+| SDK | 11/11 yayınlandı ✅ |
 
 ## Servis Durumları
 
@@ -92,56 +82,43 @@ STATUS.md              → Genel durum özeti (root)
 | Worker | ✅ Çalışıyor | GCP Cloud Run |
 | Neon DB | ✅ Aktif | Serverless PostgreSQL |
 | Upstash Redis | ✅ Aktif | Serverless Redis |
-| Polar.sh | ✅ Aktif | Pro $49, Business $149 |
+| Polar.sh | ✅ Aktif | $29/$99 plan |
 | Gmail API | ✅ Aktif | Service account |
-| Grafana Cloud | ⚠️ Test edilecek | Hesap var |
+| Grafana Cloud | ✅ Aktif | OpenTelemetry |
 | Cloudflare R2 | ✅ Hazır | 10GB depolama |
 | iyzico | ❌ Hesap açılacak | TR ödemeler |
-
-## Domain Planı
-
-- **Seçenek A:** eu.org (ücretsiz) — https://nic.eu.org/arf/en/ adresinden `hooksniff.eu.org` başvurusu
-- **Seçenek B:** .com domain ($12/yıl) — Cloudflare Registrar'dan `hooksniff.com`
-- Domain gelince: Cloudflare DNS kur → Cloud Run custom domain mapping → Resend domain doğrulama
 
 ## Kritik Kurallar
 
 ### Güvenlik
-- `.env.production` asla GitHub'a push etme (gitignore'da)
-- Token'lar sadece `.ai-context/EXTERNAL_TOKENS.md`'de tutulur
+- `.env.production` asla GitHub'a push etme
+- Token paylaşımı: sadece chat'te, sonra rotate
 
 ### TLS
 - Tüm TLS bağımlılıkları rustls kullanır (OpenSSL yok)
-- `reqwest`: `default-features = false, features = ["json", "rustls-tls"]`
-- `redis`: `default-features = false, features = ["tokio-comp", "connection-manager", "tls-rustls"]`
-- `sqlx`: `features = ["tls-rustls"]`
 
 ### Deploy
 - Dashboard: Vercel (otomatik, GitHub push'ta)
 - API + Worker: Google Cloud Run
+
+### CI/CD
+- Repo **private** → GitHub Actions 2K dk/ay limit
+- Local CI: `scripts/ci-local.sh`
+- Cloud Build: 120 dk/gün free
 
 ## Proje Yapısı
 
 ```
 HookSniff/
 ├── api/                 → Rust API sunucusu (Axum)
-│   ├── src/routes/      → API endpoint'leri
-│   ├── src/billing/     → Polar.sh, iyzico, Stripe
-│   └── src/throttle/    → Rate limiting
 ├── worker/              → Background webhook delivery
-│   └── src/delivery/    → HTTP, gRPC, SQS, WebSocket
 ├── dashboard/           → Next.js 15 frontend (Vercel)
 ├── sdks/                → 11 dilde SDK
 ├── portal/              → Embeddable customer portal
 ├── cli/                 → CLI tool
-├── docs/                → OpenAPI spec + dokümantasyon
-├── deploy/              → Deploy scriptleri + Dockerfile'lar
+├── docs/                → OpenAPI spec (3171 satır) + dokümantasyon
 ├── .ai-context/         → AI hafıza dosyaları
-├── TODO.md              → Yapılacaklar (birleştirilmiş)
+├── TODO.md              → Yapılacaklar
 ├── FEATURES.md          → Feature tracker
 └── STATUS.md            → Genel durum
 ```
-
----
-
-> Son güncelleme: 2026-05-08 23:38 GMT+8

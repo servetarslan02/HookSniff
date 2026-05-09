@@ -1,18 +1,16 @@
-# 🔍 HookSniff — Kapsamlı Sistem Denetim Raporu
+# 🔍 HookSniff — Kapsamlı Sistem Denetim Raporu (GEÇMİŞ — 2026-05-08)
 
-> Son güncelleme: 2026-05-08 22:08 GMT+8
+> ⚠️ **ARŞİV:** Bu rapor 2026-05-08 tarihli. Listelenen sorunların çoğu düzeltildi.
+> Güncel durum için: `audit/AUDIT_REPORT_2026-05-09.md` veya `MEMORY.md`'ye bakın.
 > Tarih: 2026-05-08 20:00 GMT+8
 > Oturum: 9 (Soru-Cevap — Kapsamlı Tarama)
-> Durum: Tespit edildi, düzeltilmedi
 
 ---
 
 ## 🟡 YÜKSEK ÖNCELİK
 
-### 1. OpenAPI Spec Boş
-**Dosya:** `docs/openapi.yaml` — sadece 1 satır: `openapi: "3.0.0"`
-**Sorun:** API spec yok. SDK otomatik üretimi yapılamaz. Dokümantasyon eksik.
-**Çözüm:** Tüm endpoint'ler için OpenAPI spec yazılmalı.
+### 1. ~~OpenAPI Spec Boş~~ ✅ Düzeltildi
+**Dosya:** `docs/openapi.yaml` — artık 3,171 satır, tüm endpoint'ler covered.
 
 ### 2. ~~Dependabot Kurulmamış~~ ✅ Düzeltildi (Oturum 12)
 **Sorun:** `.github/dependabot.yml` dosyası yoktu. Dependency güvenlik taraması yapılmıyordu.
