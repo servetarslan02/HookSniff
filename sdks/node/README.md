@@ -1,5 +1,8 @@
 # HookSniff Node.js SDK
 
+[![npm version](https://img.shields.io/npm/v/hooksniff-sdk.svg)](https://www.npmjs.com/package/hooksniff-sdk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official TypeScript/Node.js client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation

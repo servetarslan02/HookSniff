@@ -1,5 +1,8 @@
 # HookSniff Swift SDK
 
+[![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official Swift client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
@@ -21,7 +24,12 @@ Or in Xcode: File → Add Package Dependencies → Enter the repo URL.
 ```swift
 import HookSniff
 
+// Default base URL is used automatically
 let client = HookSniff(apiKey: "hr_live_...")
+
+// Or with custom base URL
+let client2 = HookSniff(apiKey: "hr_live_...",
+    baseUrl: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
 
 // Create endpoint
 let endpoint = try await client.endpoints.create(

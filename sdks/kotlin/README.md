@@ -1,5 +1,8 @@
 # HookSniff Kotlin SDK
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.hooksniff/hooksniff-kotlin.svg)](https://central.sonatype.com/artifact/com.hooksniff/hooksniff-kotlin)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official Kotlin client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
@@ -36,7 +39,11 @@ dependencies {
 import com.hooksniff.*
 
 fun main() {
+    // Default base URL is used automatically
     val client = HookSniffClient("hr_live_...")
+
+    // Or with custom base URL
+    val client2 = HookSniffClient("hr_live_...", baseUrl = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
 
     // Create endpoint
     val endpoint = client.endpoints().create(

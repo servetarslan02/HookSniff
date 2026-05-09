@@ -1,5 +1,8 @@
 # HookSniff Elixir SDK
 
+[![Hex.pm](https://img.shields.io/hexpm/v/hooksniff.svg)](https://hex.pm/packages/hooksniff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official Elixir client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
@@ -18,7 +21,11 @@ end
 
 ```elixir
 # Create client
+# Default base URL is used automatically
 client = HookSniff.new("hr_live_...")
+
+# Or specify a custom base URL
+client = HookSniff.new("hr_live_...", base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
 
 # Create endpoint
 {:ok, endpoint} = HookSniff.Endpoints.create(client, %{
