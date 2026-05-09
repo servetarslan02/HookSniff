@@ -5,16 +5,48 @@
 
 ---
 
-## Genel Değerlendirme
+## 🔴 Kritik
 
-| Alan | Puan | Not |
-|------|------|-----|
-| Test breadth | ✅ İyi | Tüm sayfa/bileşen kapsanmış |
-| Assertion depth | ⚠️ Zayıf | Çoğu sadece `textContent` kontrolü |
-| Güvenlik testi | ❌ Yok | XSS, CSRF, injection, token leakage yok |
-| Erişilebilirlik testi | ❌ Yok | ARIA, keyboard nav, focus management yok |
-| Edge case | ⚠️ Kısmi | Bazı sayfalar error test ediyor, çoğu atlıyor |
-| Test isolation | ✅ İyi | `beforeEach` + `vi.clearAllMocks()` tutarlı |
+| # | Sorun | Etki |
+|---|-------|------|
+| 1 | Sıfır güvenlik testi (XSS, CSRF, injection, token leakage, auth bypass) | Güvenlik açıkları test edilmeden production'a gider |
+
+## 🟠 Yüksek
+
+| # | Sorun | Dosya |
+|---|-------|-------|
+| 1 | Sıfır erişilebilirlik testi (ARIA, keyboard nav, focus management) | Tüm test dosyaları |
+| 2 | Shallow assertions — çoğu sadece `textContent` kontrolü | Çoğu test dosyası |
+
+## 🟡 Orta
+
+| # | Sorun | Dosya |
+|---|-------|-------|
+| 1 | `analytics-page.test.tsx` sadece 3 test (chart, range, error yok) | `analytics-page.test.tsx` |
+| 2 | `routing-page.test.tsx` sadece 3 test (CRUD yok) | `routing-page.test.tsx` |
+| 3 | `schemas-page.test.tsx` sadece 3 test (CRUD yok) | `schemas-page.test.tsx` |
+| 4 | `admin-system-page.test.tsx` sadece 4 test (health data yok) | `admin-system-page.test.tsx` |
+| 5 | `admin-revenue-page.test.tsx` sadece 4 test (revenue data yok) | `admin-revenue-page.test.tsx` |
+| 6 | `admin-user-detail-page.test.tsx` sadece 5 test (plan/status change yok) | `admin-user-detail-page.test.tsx` |
+| 7 | `admin-users-page.test.tsx` sadece 5 test (search, user actions yok) | `admin-users-page.test.tsx` |
+| 8 | `smoke.test.ts` sadece 5 test (anlamlı fonksiyonellik yok) | `smoke.test.ts` |
+| 9 | `portal-page.test.tsx` sadece 5 test (profile editing yok) | `portal-page.test.tsx` |
+| 10 | Heavy mocking — translation key typo'lar yakalanmaz | Tüm test dosyaları |
+| 11 | Duplicated boilerplate (~20 satır mock setup her dosyada) | Tüm test dosyaları |
+
+## 🔵 Düşük
+
+| # | Sorun | Dosya |
+|---|-------|-------|
+| 1 | `endpoint-detail-page.test.tsx` sadece 5 test (retry policy update yok) | `endpoint-detail-page.test.tsx` |
+| 2 | `docs-page.test.tsx` sadece 4 test (quick start steps yok) | `docs-page.test.tsx` |
+| 3 | `logs-page.test.tsx` sadece 6 test (log entry rendering yok) | `logs-page.test.tsx` |
+| 4 | Error boundary testi yok | - |
+| 5 | SSE/WebSocket hook testi yok | - |
+| 6 | Large dataset performans testi yok | - |
+| 7 | Real-time notification arrival testi yok | - |
+| 8 | Request timeout handling testi yok | - |
+| 9 | 401 auto-logout behavior testi yok | - |
 
 ## En İyi Testler
 
@@ -29,48 +61,6 @@
 | `transforms-page.test.tsx` | 27 | Filter, mapping, enrichment, CRUD |
 | `team-page.test.tsx` | 25 | Team CRUD, member management, role changes |
 | `alerts-page.test.tsx` | 24 | CRUD, channel toggling, form validation |
-
-## En Zayıf Testler (Kritik Eksiklik)
-
-| Dosya | Test Sayısı | Eksik |
-|-------|-------------|-------|
-| `analytics-page.test.tsx` | 3 | Chart, data range, error handling yok |
-| `routing-page.test.tsx` | 3 | CRUD operations yok |
-| `schemas-page.test.tsx` | 3 | CRUD operations yok |
-| `smoke.test.ts` | 5 | Anlamlı fonksiyonellik testi yok |
-| `admin-system-page.test.tsx` | 4 | Health data display yok |
-| `admin-revenue-page.test.tsx` | 4 | Revenue data display yok |
-| `admin-user-detail-page.test.tsx` | 5 | Plan/status change interaction yok |
-| `admin-users-page.test.tsx` | 5 | Search interaction, user actions yok |
-| `portal-page.test.tsx` | 5 | Profile editing, usage details yok |
-| `endpoint-detail-page.test.tsx` | 5 | Retry policy update, delete yok |
-| `docs-page.test.tsx` | 4 | Quick start steps, navigation links yok |
-| `logs-page.test.tsx` | 6 | Log entry rendering, pagination yok |
-
-## Sistemik Sorunlar
-
-### 1. Sıfır Güvenlik Testi
-Hiçbir test dosyası şunları kapsamıyor:
-- XSS prevention (input sanitization)
-- CSRF protection
-- Auth bypass (unauthenticated access)
-- Token leakage (URL, error messages, localStorage)
-- API key exposure in DOM
-
-### 2. Sıfır Erişilebilirlik Testi
-- ARIA attributes
-- Keyboard navigation
-- Screen reader compatibility
-- Focus management
-
-### 3. Shallow Assertions
-Çoğu test sadece `container.textContent` contains string kontrolü yapıyor. Proper query (`getByRole`, `getByLabelText`) nadir kullanılıyor.
-
-### 4. Heavy Mocking
-Translation mock `(key) => key` → translation key typo'lar hiçbir zaman yakalanmaz.
-
-### 5. Duplicated Boilerplate
-~20 satır mock setup her dosyada copy-paste. Shared test utility dosyası gerekiyor.
 
 ## Önerilen İyileştirmeler
 
