@@ -1,5 +1,8 @@
 # HookSniff C# SDK
 
+[![NuGet](https://img.shields.io/nuget/v/HookSniff.svg)](https://www.nuget.org/packages/HookSniff/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official C# client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation

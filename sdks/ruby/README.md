@@ -1,5 +1,8 @@
 # HookSniff Ruby SDK
 
+[![Gem](https://img.shields.io/gem/v/hooksniff.svg)](https://rubygems.org/gems/hooksniff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Official Ruby client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
 
 ## Installation
