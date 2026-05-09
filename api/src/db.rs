@@ -891,6 +891,18 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 39: Migration 038 — email_verified + 2FA columns (missing from inline migrations)
+    run_migration(
+        pool,
+        "038_email_verified_totp",
+        r#"
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS totp_secret TEXT;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN NOT NULL DEFAULT false;
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
