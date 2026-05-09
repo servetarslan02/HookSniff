@@ -241,16 +241,21 @@ async fn get_notifications(
     .await?;
 
     match prefs {
-        Some((email_on_failure, email_on_dead_letter, email_on_success, slack, discord, webhook)) => {
-            Ok(Json(serde_json::json!({
-                "email_on_failure": email_on_failure,
-                "email_on_dead_letter": email_on_dead_letter,
-                "email_on_success": email_on_success,
-                "slack_webhook_url": slack,
-                "discord_webhook_url": discord,
-                "webhook_url": webhook,
-            })))
-        }
+        Some((
+            email_on_failure,
+            email_on_dead_letter,
+            email_on_success,
+            slack,
+            discord,
+            webhook,
+        )) => Ok(Json(serde_json::json!({
+            "email_on_failure": email_on_failure,
+            "email_on_dead_letter": email_on_dead_letter,
+            "email_on_success": email_on_success,
+            "slack_webhook_url": slack,
+            "discord_webhook_url": discord,
+            "webhook_url": webhook,
+        }))),
         None => {
             // Return defaults if no preferences saved yet
             Ok(Json(serde_json::json!({
@@ -271,12 +276,30 @@ async fn update_notifications(
     Extension(customer): Extension<Customer>,
     Json(req): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let email_on_failure = req.get("email_on_failure").and_then(|v| v.as_bool()).unwrap_or(true);
-    let email_on_dead_letter = req.get("email_on_dead_letter").and_then(|v| v.as_bool()).unwrap_or(true);
-    let email_on_success = req.get("email_on_success").and_then(|v| v.as_bool()).unwrap_or(false);
-    let slack_webhook_url = req.get("slack_webhook_url").and_then(|v| v.as_str()).map(|s| s.to_string());
-    let discord_webhook_url = req.get("discord_webhook_url").and_then(|v| v.as_str()).map(|s| s.to_string());
-    let webhook_url = req.get("webhook_url").and_then(|v| v.as_str()).map(|s| s.to_string());
+    let email_on_failure = req
+        .get("email_on_failure")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    let email_on_dead_letter = req
+        .get("email_on_dead_letter")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    let email_on_success = req
+        .get("email_on_success")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let slack_webhook_url = req
+        .get("slack_webhook_url")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string());
+    let discord_webhook_url = req
+        .get("discord_webhook_url")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string());
+    let webhook_url = req
+        .get("webhook_url")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string());
 
     sqlx::query(
         r#"INSERT INTO notification_preferences (customer_id, email_on_failure, email_on_dead_letter, email_on_success, slack_webhook_url, discord_webhook_url, webhook_url, updated_at)

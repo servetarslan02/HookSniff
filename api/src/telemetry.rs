@@ -57,7 +57,10 @@ fn init_otel(
     {
         Ok(exporter) => exporter,
         Err(e) => {
-            tracing::warn!("⚠️ Failed to build OTLP exporter ({}), falling back to plain logging", e);
+            tracing::warn!(
+                "⚠️ Failed to build OTLP exporter ({}), falling back to plain logging",
+                e
+            );
             return init_plain(env_filter, use_json, "production");
         }
     };
