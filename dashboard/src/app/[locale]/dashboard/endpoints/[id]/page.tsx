@@ -34,6 +34,10 @@ export default function EndpointSettingsPage() {
   const [rotating, setRotating] = useState(false);
   const [newSecret, setNewSecret] = useState<string | null>(null);
 
+  // Test webhook state
+  const [testSending, setTestSending] = useState(false);
+  const [testResult, setTestResult] = useState<'success' | 'error' | null>(null);
+
   const fetchEndpoint = useCallback(async () => {
     if (!token || !id) return;
     try {
@@ -102,6 +106,39 @@ export default function EndpointSettingsPage() {
     } finally {
       setRotating(false);
       setShowRotateConfirm(false);
+    }
+  };
+
+  const handleSendTestWebhook = async () => {
+    if (!token || !id || !endpoint) return;
+    setTestSending(true);
+    setTestResult(null);
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+      const res = await fetch(`${API}/webhooks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include' as const,
+        body: JSON.stringify({
+          endpoint_id: id,
+          event: 'test.ping',
+          data: {
+            test: true,
+            message: 'Hello from HookSniff! 🪝',
+            timestamp: new Date().toISOString(),
+            endpoint_url: endpoint.url,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to send');
+      setTestResult('success');
+      toast('Test webhook sent! Check your endpoint.', 'success');
+    } catch (err: unknown) {
+      setTestResult('error');
+      const msg = err instanceof Error ? err.message : 'Failed to send test';
+      toast(msg, 'error');
+    } finally {
+      setTestSending(false);
     }
   };
 
@@ -335,6 +372,46 @@ export default function EndpointSettingsPage() {
               {endpoint.failure_streak ?? 0}
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Send Test Webhook Card */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🧪 Test Webhook</h2>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+          Send a test webhook to this endpoint to verify it&apos;s working correctly.
+        </p>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleSendTestWebhook}
+            disabled={testSending}
+            className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50 flex items-center gap-2"
+          >
+            {testSending ? (
+              <>
+                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Sending...
+              </>
+            ) : (
+              <>🚀 Send Test Webhook</>
+            )}
+          </button>
+          {testResult === 'success' && (
+            <span className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-1">
+              ✅ Sent! Check your endpoint logs.
+            </span>
+          )}
+          {testResult === 'error' && (
+            <span className="text-red-600 dark:text-red-400 text-sm font-medium flex items-center gap-1">
+              ❌ Failed — check endpoint URL and try again.
+            </span>
+          )}
+        </div>
+        <div className="mt-3 text-xs text-gray-400 dark:text-slate-500">
+          Payload: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{"{"}&quot;event&quot;: &quot;test.ping&quot;, &quot;data&quot;: {"{"}&quot;message&quot;: &quot;Hello from HookSniff! 🪝&quot;{"}"}{"}"}</code>
         </div>
       </div>
 
