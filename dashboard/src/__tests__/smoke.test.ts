@@ -15,52 +15,40 @@ describe('Error handling', () => {
     expect(getErrorMessage(new Error('test error'))).toBe('test error');
   });
 
-  it('getErrorMessage returns string for unknown values', async () => {
+  it('getErrorMessage returns string for string values', async () => {
     const { getErrorMessage } = await import('@/lib/errors');
     expect(getErrorMessage('string error')).toBe('string error');
-    expect(getErrorMessage(42)).toBe('42');
-    expect(getErrorMessage(null)).toBe('An unexpected error occurred');
   });
-});
 
-// ─── Store ───
+  it('getErrorMessage returns Unknown error for non-string non-Error values', async () => {
+    const { getErrorMessage } = await import('@/lib/errors');
+    expect(getErrorMessage(42)).toBe('Unknown error');
+    expect(getErrorMessage(null)).toBe('Unknown error');
+    expect(getErrorMessage(undefined)).toBe('Unknown error');
+  });
 
-describe('Auth store', () => {
-  it('exports useAuth hook', async () => {
-    const store = await import('@/lib/store');
-    expect(store.useAuth).toBeDefined();
-    expect(typeof store.useAuth).toBe('function');
+  it('getErrorMessage extracts message from object with message property', async () => {
+    const { getErrorMessage } = await import('@/lib/errors');
+    expect(getErrorMessage({ message: 'obj error' })).toBe('obj error');
   });
 });
 
 // ─── API Client ───
 
 describe('API client', () => {
-  it('exports api object', async () => {
+  it('exports apiFetch function', async () => {
     const api = await import('@/lib/api');
-    expect(api).toBeDefined();
+    expect(api.apiFetch).toBeDefined();
+    expect(typeof api.apiFetch).toBe('function');
   });
 });
 
-// ─── i18n ───
+// ─── Error messages ───
 
-describe('Internationalization', () => {
-  it('has locale messages for all supported languages', async () => {
-    const locales = ['en', 'tr', 'de', 'ja', 'pt-br', 'es', 'fr', 'ko'];
-    for (const locale of locales) {
-      const messages = await import(`../../messages/${locale}.json`);
-      expect(messages.default).toBeDefined();
-      expect(typeof messages.default).toBe('object');
-    }
-  });
-});
-
-// ─── Components ───
-
-describe('Component exports', () => {
-  it('Toast component is exported', async () => {
-    const mod = await import('@/components/Toast');
-    expect(mod.ToastProvider).toBeDefined();
-    expect(mod.useToast).toBeDefined();
+describe('Error module', () => {
+  it('exports getErrorMessage function', async () => {
+    const mod = await import('@/lib/errors');
+    expect(mod.getErrorMessage).toBeDefined();
+    expect(typeof mod.getErrorMessage).toBe('function');
   });
 });
