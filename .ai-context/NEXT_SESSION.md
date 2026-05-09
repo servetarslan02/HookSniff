@@ -1,11 +1,17 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 02:19 GMT+8
+> Son güncelleme: 2026-05-10 02:28 GMT+8
 > Bu dosya bir sonraki oturumda ne yapılacağını anlatır.
 
 ---
 
-## ✅ BU OTURUMDA YAPILANLAR (2026-05-10 — Oturum 54)
+## ✅ BU OTURUMDA YAPILANLAR (2026-05-10 — Oturum 55)
+
+### /changelog Sayfası
+- Timeline tasarım, 5 release, 40+ girdi, filtre, RSS, footer link
+- Commit: `1bf00ec`
+
+## ✅ ÖNCEKİ OTURUM (2026-05-10 — Oturum 54)
 
 ### Blog v2 (17 yazı + 10 altyapı)
 - 6 yeni yazı: rakip karşılaştırma, changelog, MCP, tutorial, architecture, customer story
