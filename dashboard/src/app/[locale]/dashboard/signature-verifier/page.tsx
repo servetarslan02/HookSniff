@@ -1,0 +1,244 @@
+'use client';
+
+import { useState } from 'react';
+import { useToast } from '@/components/Toast';
+
+/* ─── Signature Verifier Tool ─── */
+export default function SignatureVerifierPage() {
+  const { toast } = useToast();
+  const [payload, setPayload] = useState('');
+  const [secret, setSecret] = useState('');
+  const [signature, setSignature] = useState('');
+  const [algorithm, setAlgorithm] = useState<'sha256' | 'sha512'>('sha256');
+  const [result, setResult] = useState<'valid' | 'invalid' | null>(null);
+  const [computing, setComputing] = useState(false);
+
+  const computeSignature = async () => {
+    if (!payload || !secret) {
+      toast('Payload and secret are required', 'error');
+      return;
+    }
+    setComputing(true);
+    try {
+      const encoder = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(secret),
+        { name: 'HMAC', hash: algorithm === 'sha256' ? 'SHA-256' : 'SHA-512' },
+        false,
+        ['sign']
+      );
+      const sigBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(payload));
+      const sigHex = Array.from(new Uint8Array(sigBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+      const computed = `${algorithm}=${sigHex}`;
+      setSignature(computed);
+      toast('Signature computed!', 'success');
+    } catch {
+      toast('Failed to compute signature', 'error');
+    } finally {
+      setComputing(false);
+    }
+  };
+
+  const verifySignature = async () => {
+    if (!payload || !secret || !signature) {
+      toast('All fields are required', 'error');
+      return;
+    }
+    setComputing(true);
+    try {
+      const encoder = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(secret),
+        { name: 'HMAC', hash: algorithm === 'sha256' ? 'SHA-256' : 'SHA-512' },
+        false,
+        ['sign']
+      );
+      const sigBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(payload));
+      const sigHex = Array.from(new Uint8Array(sigBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+      const computed = `${algorithm}=${sigHex}`;
+      const provided = signature.trim();
+      const isValid = computed === provided;
+      setResult(isValid ? 'valid' : 'invalid');
+    } catch {
+      toast('Verification failed', 'error');
+    } finally {
+      setComputing(false);
+    }
+  };
+
+  const sampleCode = `// Node.js — Verify webhook signature
+import crypto from 'crypto';
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  const expectedSig = \`sha256=\${expected}\`;
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSig)
+  );
+}
+
+// Usage
+const isValid = verifyWebhookSignature(
+  req.body,                              // raw body string
+  req.headers['x-hooksniff-signature'],  // signature header
+  process.env.WEBHOOK_SECRET             // your endpoint secret
+);
+
+if (!isValid) {
+  return res.status(401).json({ error: 'Invalid signature' });
+}`;
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🔐 Signature Verifier</h1>
+        <p className="text-gray-500 dark:text-slate-400 mt-1">
+          Verify webhook signatures to ensure payloads are authentic. HookSniff signs every webhook with HMAC-SHA256.
+        </p>
+      </div>
+
+      {/* Algorithm Selector */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Algorithm</h2>
+        <div className="flex gap-3">
+          {(['sha256', 'sha512'] as const).map((alg) => (
+            <button
+              key={alg}
+              onClick={() => { setAlgorithm(alg); setResult(null); }}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+                algorithm === alg
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {alg === 'sha256' ? 'HMAC-SHA256' : 'HMAC-SHA512'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Verify Tool */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Verify Signature</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Webhook Payload (raw body)</label>
+            <textarea
+              value={payload}
+              onChange={(e) => { setPayload(e.target.value); setResult(null); }}
+              placeholder='{"event":"order.created","data":{"id":"ord_123"}}'
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Webhook Secret</label>
+            <input
+              type="password"
+              value={secret}
+              onChange={(e) => { setSecret(e.target.value); setResult(null); }}
+              placeholder="whsec_your_secret_key"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Signature (from x-hooksniff-signature header)</label>
+            <input
+              type="text"
+              value={signature}
+              onChange={(e) => { setSignature(e.target.value); setResult(null); }}
+              placeholder="sha256=abc123..."
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={verifySignature}
+              disabled={computing || !payload || !secret || !signature}
+              className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
+            >
+              {computing ? 'Verifying...' : '✓ Verify Signature'}
+            </button>
+            <button
+              onClick={computeSignature}
+              disabled={computing || !payload || !secret}
+              className="px-6 py-3 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-50"
+            >
+              🔧 Compute Signature
+            </button>
+          </div>
+          {result && (
+            <div className={`p-4 rounded-xl ${
+              result === 'valid'
+                ? 'bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20'
+                : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20'
+            }`}>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{result === 'valid' ? '✅' : '❌'}</span>
+                <div>
+                  <div className={`font-semibold ${result === 'valid' ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
+                    {result === 'valid' ? 'Signature Valid!' : 'Signature Invalid!'}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-slate-400">
+                    {result === 'valid'
+                      ? 'The payload is authentic and has not been tampered with.'
+                      : 'The signature does not match. The payload may have been tampered with.'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Code Example */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Code Example — Node.js</h2>
+        <div className="relative">
+          <button
+            onClick={() => { navigator.clipboard.writeText(sampleCode); toast('Copied!', 'success'); }}
+            className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
+          >
+            Copy
+          </button>
+          <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
+            <code>{sampleCode}</code>
+          </pre>
+        </div>
+      </div>
+
+      {/* How it works */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How Webhook Signatures Work</h2>
+        <div className="space-y-4">
+          {[
+            { step: '1', title: 'HookSniff signs the payload', desc: 'When a webhook is delivered, HookSniff computes an HMAC hash of the raw request body using your endpoint\'s secret key.' },
+            { step: '2', title: 'Signature is included in headers', desc: 'The signature is sent in the x-hooksniff-signature header (format: sha256=<hex_digest>).' },
+            { step: '3', title: 'You verify on your server', desc: 'Compute the same HMAC hash on your server and compare it with the received signature. Use constant-time comparison to prevent timing attacks.' },
+          ].map((item) => (
+            <div key={item.step} className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                {item.step}
+              </div>
+              <div>
+                <div className="font-medium text-gray-900 dark:text-white">{item.title}</div>
+                <div className="text-sm text-gray-500 dark:text-slate-400">{item.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
