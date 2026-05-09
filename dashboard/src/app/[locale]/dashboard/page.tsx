@@ -26,6 +26,7 @@ import {
   Legend,
 } from 'recharts';
 import { Onboarding } from '@/components/Onboarding';
+import { OnboardingWizard, SetupChecklist } from '@/components/OnboardingWizard';
 import { StatCard, ChartCard, StatusBadge } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
 
@@ -478,6 +479,8 @@ export default function DashboardOverview() {
   return (
     <div className="space-y-8">
       <Onboarding />
+      <OnboardingWizard />
+      <SetupChecklist />
       {/* Time Range Selector */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
