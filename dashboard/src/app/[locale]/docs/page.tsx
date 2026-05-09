@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 export default function DocsPage() {
@@ -6,144 +7,63 @@ export default function DocsPage() {
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('gettingStarted')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Send your first webhook in under 5 minutes. HookSniff handles delivery, retries, and monitoring so you can focus on building.
+        HookSniff is a webhook delivery and monitoring platform. Send webhooks with confidence — we handle delivery, retries, signature verification, and observability.
       </p>
 
-      {/* Quick Start */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('quickStart')}</h2>
+      {/* Quick Links Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-12">
+        {[
+          { title: '🚀 Quickstart', desc: 'Send your first webhook in under 5 minutes.', href: '/docs/quickstart' },
+          { title: '📐 Core Concepts', desc: 'Endpoints, deliveries, retries, and more.', href: '/docs/concepts' },
+          { title: '🔒 Security', desc: 'HMAC-SHA256 verification, IP whitelisting, TLS.', href: '/docs/security' },
+          { title: '🖥️ Dashboard', desc: 'Monitor deliveries, manage endpoints, view analytics.', href: '/docs/dashboard' },
+          { title: '🔌 Integrations', desc: 'Stripe, GitHub, Shopify, and generic guides.', href: '/docs/integrations' },
+          { title: '🐳 Self-Hosting', desc: 'Run HookSniff on your own infrastructure.', href: '/docs/self-hosting' },
+          { title: '🔄 Retries & DLQ', desc: 'Exponential backoff, replay failed webhooks.', href: '/docs/retries' },
+          { title: '📦 SDKs', desc: 'Official Node.js, Python, and Go SDKs.', href: '/docs/sdks' },
+        ].map((card) => (
+          <Link
+            key={card.href}
+            href={card.href}
+            className="block p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition group"
+          >
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
+              {card.title}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{card.desc}</p>
+          </Link>
+        ))}
+      </div>
 
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('getApiKey')}</h3>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">
-              Sign up at <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hooksniff.vercel.app</code> and grab your API key from the dashboard settings.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('createEndpoint')}</h3>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">{t('createEndpointDesc')}</p>
-            <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
-  -H "Authorization: Bearer hr_live_YOUR_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{"url": "https://myapp.com/webhook"}'`}
-            </pre>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('sendWebhook')}</h3>
-            <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\
-  -H "Authorization: Bearer hr_live_YOUR_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "endpoint_id": "ep_abc123",
-    "event": "order.created",
-    "data": {"order_id": "12345", "total": 99.99}
-  }'`}
-            </pre>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('verifySignature')}</h3>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">Every webhook includes an HMAC-SHA256 signature in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Signature</code> header:</p>
-            <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`import hmac, hashlib
-
-def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
-    expected = hmac.HMAC(
-        secret.encode(), payload, hashlib.sha256
-    ).hexdigest()
-    return hmac.compare_digest(f"sha256={expected}", signature)`}
-            </pre>
-          </div>
-        </div>
+      {/* API Info */}
+      <section className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">API Base URL</h2>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
+          {`https://hooksniff-api-1046140057667.europe-west1.run.app/v1`}
+        </pre>
       </section>
 
-      {/* Authentication */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('authentication')}</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          All API requests require authentication via a Bearer token in the Authorization header:
+      {/* Authentication Quick Reference */}
+      <section className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Authentication</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-3">
+          All API requests require a Bearer token with an <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hr_live_</code> prefixed API key:
         </p>
         <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-700 p-4 rounded-xl text-sm font-mono">
-{`Authorization: Bearer hr_live_abc123xyz789`}
-        </pre>
-        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-          <p className="text-sm text-yellow-800">
-            <strong>⚠️ Keep your API key secret.</strong> Never expose it in client-side code, public repos, or browser requests. Use environment variables.
-          </p>
-        </div>
-      </section>
-
-      {/* Code Examples */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('codeExamples')}</h2>
-
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Node.js</h3>
-        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
-{`const response = await fetch('https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks', {
-  method: 'POST',
-  headers: {
-    'Authorization': \`Bearer \${process.env.HOOKRELAY_KEY}\`,
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    endpoint_id: 'ep_abc123',
-    event: 'user.created',
-    data: { email: 'user@example.com' },
-  }),
-});
-
-const result = await response.json();
-console.log('Delivery ID:', result.id);`}
-        </pre>
-
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Python</h3>
-        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
-{`import requests
-import os
-
-response = requests.post(
-    'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks',
-    headers={
-        'Authorization': f'Bearer {os.environ["HOOKRELAY_KEY"]}',
-        'Content-Type': 'application/json',
-    },
-    json={
-        'endpoint_id': 'ep_abc123',
-        'event': 'payment.completed',
-        'data': {'amount': 49.99, 'currency': 'USD'},
-    },
-)
-
-print('Delivery ID:', response.json()['id'])`}
-        </pre>
-
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Go</h3>
-        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-{`body := \`{"endpoint_id":"ep_abc123","event":"order.shipped","data":{"tracking":"1Z999"}}\`
-req, _ := http.NewRequest("POST", "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks", strings.NewReader(body))
-req.Header.Set("Authorization", "Bearer "+os.Getenv("HOOKRELAY_KEY"))
-req.Header.Set("Content-Type", "application/json")
-
-resp, _ := http.DefaultClient.Do(req)
-defer resp.Body.Close()`}
+          {`Authorization: Bearer hr_live_abc123xyz789`}
         </pre>
       </section>
 
       {/* Rate Limits */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('rateLimits')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Rate Limits</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('requestsPerMin')}</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('webhooksPerMonth')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Requests/min</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Webhooks/month</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
