@@ -1,5 +1,6 @@
 # HookSniff — Activation & Retention Stratejisi
 > Oluşturma: 2026-05-10
+> Son güncelleme: 2026-05-10 (Doğrulandı)
 > Durum: Taslak
 > Öncelik: 🔴 Lansmandan önce
 
@@ -11,11 +12,13 @@
 5. [Uygulama Planı](#5-uygulama-planı)
 6. [Metrikler](#6-metrikler)
 7. [Riskler](#7-riskler)
+8. [Notlar](#8-notlar)
 
 ---
 
 ## 1. Mevcut Durum
 
+### HookSniff'in Bugünkü Durumu
 - **Activation tanımı**: Yok — "aktif kullanıcı" tanımlanmamış
 - **Onboarding flow**: Strateji raporu hazır, uygulanmamış
 - **Retention mekanizması**: Yok
@@ -23,58 +26,147 @@
 - **Win-back campaign**: Yok
 - **NPS measurement**: Yok
 - **Engagement scoring**: Yok
+- **Analytics**: PostHog entegre değil (eş zamanlı kurulacak)
+
+### Eksiklikler
+| Alan | Durum | Öncelik |
+|------|-------|---------|
+| Activation tanımı | ❌ | 🔴 |
+| Onboarding checklist | ❌ | 🔴 |
+| Engagement scoring | ❌ | 🔴 |
+| Re-engagement emails | ❌ | 🔴 |
+| Churn prevention | ❌ | 🔴 |
+| Win-back campaigns | ❌ | 🟡 |
+| NPS survey | ❌ | 🟡 |
+| Feature discovery prompts | ❌ | 🟡 |
 
 ---
 
 ## 2. Rakip Karşılaştırması
 
-| Metrik | Svix | Hookdeck | Hook0 | HookSniff Hedef |
-|--------|------|----------|-------|-----------------|
-| Activation tanımı | İlk webhook | İlk endpoint | İlk event | İlk başarılı webhook |
-| Time to activate | ~10 dk | ~5 dk | ~15 dk | <10 dk |
-| Week 1 retention | ~50% | ~55% | ~35% | 45%+ |
-| Month 1 retention | ~30% | ~35% | ~20% | 25%+ |
-| Churn prevention | Email drip | In-app nudge | ❌ | Email + in-app |
-| Win-back | Email | ❌ | ❌ | Email + offer |
-| NPS measurement | Quarterly | ❌ | ❌ | Monthly |
+### 2.1 Rakip Activation/Onboarding (Doğrulanmış Veri)
+
+**Svix (svix.com):**
+- "Start in 5 dakika" — quick start promise
+- Dashboard'da built-in webhook UI (Svix Portal)
+- Embeddable webhook UI — kendi dashboard'una entegre et
+- Case study'ler: Brex, Lob, Replicate, Guesty — her müşteri için success story
+- Open-source → developer self-serve
+- **Activation approach**: SDK kurulumu → endpoint oluşturma → ilk webhook
+
+**Hookdeck (hookdeck.com):**
+- Free tier: 10K event, 3 gün retention — limitsiz connections
+- Built-in metrics dashboard — anında feedback
+- Issues Management — otomatik hata tespiti
+- SoC2 compliance → enterprise güvenilirlik
+- **Activation approach**: Connection oluşturma → webhook gönderimi → metrics görme
+
+**HookSniff:**
+- Free tier: Limitsiz webhook, 1 endpoint
+- 11 SDK — self-serve kurulum
+- Dashboard: Vercel'de canlı
+- OTEL entegrasyonu — built-in observability
+- **Activation approach**: Signup → API key → endpoint → ilk webhook (4 adım)
+
+### 2.2 Karşılaştırma Tablosu
+
+| Özellik | Svix | Hookdeck | HookSniff |
+|---------|------|----------|-----------|
+| Quick start promise | "5 dakika" | — | "5 dakika" (hedef) |
+| Free tier | 50 msg/sn | 10K event | Limitsiz webhook |
+| Onboarding guide | ✅ Docs | ✅ Docs | 🟡 Planlandı |
+| Embeddable UI | ✅ Portal | ❌ | 🟡 Planlandı |
+| Built-in metrics | ✅ | ✅ | ✅ OTEL |
+| Case studies | 10+ | — | ❌ |
+| SDK'lar | 6+ | — | 11 ✅ |
 
 ---
 
 ## 3. Standart/Best Practice
 
-### Activation Framework
+### 3.1 Developer Tools Benchmarks (Doğrulanmış)
 
-**Hook Model (Nir Eyal):**
-```
-Trigger → Action → Variable Reward → Investment
-  ↓         ↓           ↓              ↓
-Email    Webhook    Dashboard       API key
-Push     gönder     insights        oluştur
-```
+**OpenView/Boldstart Dev Tools Report 2023 (37 şirket verisi):**
 
-**Activation Metrics (SaaS benchmark):**
-- Good activation rate: 40-60%
-- Great activation rate: 60-80%
-- Time to activate: <10 dk (developer tools)
+| Metrik | Dev Tools | Genel SaaS | Kaynak |
+|--------|-----------|------------|--------|
+| Visitor → Signup | **%10** (median) | %5 | OpenView 2023 |
+| Freemium visitor → signup | **%9** | — | OpenView 2023 |
+| Organic leads | **%31** (PLG: %41) | — | OpenView 2023 |
+| Sales-generated leads | **%28** (PLG: %12) | — | OpenView 2023 |
+| Referral leads | **%5** (freemium: %9) | — | OpenView 2023 |
+| Return visits before signup | **3.3** | — | OpenView 2023 |
 
-### Retention Framework
+**Kaynak:** boldstart-ventures/Medium, OpenView 2023 SaaS Benchmarks
 
-**Retention Curves (SaaS benchmark):**
-```
-Week 0: 100%
-Week 1: 40-60% (good: 50%+)
-Week 4: 20-40% (good: 30%+)
-Month 3: 15-30% (good: 20%+)
-Month 6: 10-25% (good: 15%+)
-Month 12: 5-20% (good: 10%+)
-```
+**Kritik Bulgu:**
+> "Higher growth companies (100%+ YoY) were more likely to have leads from organic sources."
 
-### Churn Prevention Levers
-1. **Engagement scoring** — düşük skor = risk
-2. **Usage alerts** — limit yaklaşınca bildirim
-3. **Re-engagement email** — 7 gün inactive
-4. **In-app nudges** — unused feature提示
-5. **Exit survey** — neden gidiyorsun?
+### 3.2 Time to Value (Doğrulanmış)
+
+**Userpilot Benchmark 2025 (547 SaaS şirket):**
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Ortalama TTV | **1 gün 12 saat 23 dk** | Userpilot 2025 |
+| İyi TTV (dev tools) | **<10 dakika** | Evil Martians 2026 |
+| Kötü TTV | **>3 gün** | Userpilot 2025 |
+
+**Evil Martians PMF Methodology (2026, 37 devtools şirketi):**
+
+> "Self-serve is existential, not nice-to-have. If you can't deliver value in 5 minutes, developers leave."
+
+**Devtools vs Genel SaaS Farkları (Evil Martians 2026):**
+| Metrik | Dev Tools | Genel SaaS |
+|--------|-----------|------------|
+| Conversion rate | **Daha yüksek** | Daha düşük |
+| Net Revenue Retention (NRR) | **Daha yüksek** | Daha düşük |
+| Time to value | **Daha hızlı** | Daha yavaş |
+| YoY growth | **Daha hızlı** | Daha yavaş |
+
+**Neden?**
+> "When a devtool solves a real workflow problem, the value is concrete and measurable. Developers can justify the spend because they can point to time saved."
+
+### 3.3 Churn Benchmarks (Doğrulanmış)
+
+**SaaS Capital / Zylo / Vena Solutions (2025-2026):**
+
+| Metrik | Değer | Kaynak |
+|--------|-------|--------|
+| Median gross revenue retention | **%90** | Zylo 2026 |
+| B2B average annual retention | **%74** | Directive 2026 |
+| Elite companies annual retention | **%90+** | Directive 2026 |
+| Average annual churn | **%5-7** | Vena 2026 |
+| Monthly churn (B2B SaaS) | **%0.5-1** | Industry standard |
+
+### 3.4 NPS Benchmarks (Doğrulanmış)
+
+**Sopact NPS Benchmarks 2026 (14 endüstri):**
+
+| NPS Aralığı | Değerlendirme |
+|-------------|--------------|
+| <0 | Kötü (telecom, cable) |
+| +10 to +30 | Ortalama (B2B) |
+| **+30 to +50** | **İyi** |
+| +50 to +70 | Mükemmel |
+| +70+ | Dünya sınıfı |
+
+**SaaS Ortalaması:** +30 to +40 (CustomerGauge, Sopact)
+
+**HookSniff Hedefi:** +40 (6. ayda)
+
+### 3.5 Win-Back Best Practices (Doğrulanmış)
+
+**PayPro Global SaaS Guide (2025):**
+
+> "Retaining or reactivating customers is 5-25x cheaper than acquiring new ones."
+
+**Win-Back Framework:**
+1. **Churn analizi** — neden ve ne zaman ayrıldılar?
+2. **Segmentasyon** — RFM (Recency, Frequency, Monetary) analizi
+3. **High-value segment** — en yüksek CLV'li churned users'ı bul
+4. **Targeted re-engagement** — churn nedenine göre özelleştirilmiş kampanya
+5. **Offer** — indirim, ücretsiz ay, yeni feature
 
 ---
 
@@ -82,248 +174,353 @@ Month 12: 5-20% (good: 10%+)
 
 ### 4.1 Activation Tanımı
 
-**HookSniff Activation = İlk başarılı webhook gönderimi**
+**HookSniff Activation = İlk başarılı webhook gönderimi (signup sonrası 24 saat içinde)**
 
-**Activation Steps:**
+**Activation Steps (4 adım, hedef TTV: <10 dk):**
 ```
-1. Signup (email + password)
-   ↓ 100%
-2. Email verification
-   ↓ 85%
-3. API key oluştur
-   ↓ 70%
-4. İlk endpoint oluştur
-   ↓ 60%
-5. İlk webhook gönder (SDK veya dashboard)
-   ↓ 45% ← ACTIVATION
-6. İlk başarılı yanıt al
-   ↓ 40%
+1. Signup (email + password)              → 100%
+2. API key oluştur (dashboard'dan)         → %75
+3. İlk endpoint oluştur                    → %65
+4. İlk webhook gönder (SDK veya simulator) → %55
+5. İlk başarılı yanıt al                   → %50 ← ACTIVATION
 ```
 
-**Activation Rate Hedefi**: %60 (5. adım)
+**Activation Rate Hedefi:** %50 (5. adım — dev tools benchmark: %10 signup conversion + activation)
 
-### 4.2 Activation Scoring Model
+### 4.2 Engagement Scoring Model
 
-| Aksiyon | Puan | Ağırlık |
-|---------|------|---------|
+| Aksiyon | Puan | Kategori |
+|---------|------|----------|
 | Signup | +10 | Base |
-| Email verified | +15 | Engagement |
+| Email verified | +10 | Base |
 | API key created | +20 | Technical |
 | Endpoint created | +25 | Technical |
-| First webhook sent | +30 | ACTIVATION |
-| First success response | +35 | ACTIVATION |
+| First webhook sent | +30 | **ACTIVATION** |
+| First success response | +35 | **ACTIVATION** |
 | SDK installed | +25 | Adoption |
 | Schema created | +20 | Advanced |
 | Team member invited | +15 | Expansion |
 | Documentation viewed | +5 | Learning |
+| Replay triggered | +15 | Advanced |
+| Alert created | +10 | Advanced |
 
-**Risk Scoring:**
-| Skor | Durum | Aksiyon |
-|------|-------|---------|
-| 0-20 | 🔴 Düşük risk | Hoşgeldin emaili |
-| 21-40 | 🟡 Orta risk | Onboarding nudge |
-| 41-60 | 🟢 İyi | Feature suggestion |
-| 61-80 | 🔵 Güçlü | Expansion nudge |
-| 81+ | 🟣 Champion | Referral program |
+**Risk Segmentation:**
 
-### 4.3 Onboarding İyileştirmeleri
+| Skor | Segment | Durum | Aksiyon |
+|------|---------|-------|---------|
+| 0-20 | 🔴 Cold | Düşük risk | Hoşgeldin emaili + quick start |
+| 21-40 | 🟡 Warm | Orta risk | Onboarding nudge + video tutorial |
+| 41-60 | 🟢 Active | İyi | Feature suggestion + expansion |
+| 61-80 | 🔵 Power | Güçlü | Team invite nudge + referral |
+| 81+ | 🟣 Champion | Şampiyon | Referral program + case study |
 
-**İlk 5 Dakika Deneyimi:**
+### 4.3 Onboarding Checklist (In-App)
+
+**Dashboard'da gösterilecek widget:**
+
 ```
-Signup
-  ↓
-"Welcome to HookSniff!" → 3 quick action card:
-  ↓
 ┌─────────────────────────────────────────┐
-│  🚀 Quick Start (pick one):            │
+│  🚀 HookSniff'e Hoş Geldin!            │
 │                                         │
-│  1. 📦 Install SDK (30 sec)            │
-│     npm install hooksniff-sdk           │
+│  ✅ Hesap oluşturdu                     │
+│  ⬜ Email doğrula                       │
+│  ⬜ API key oluştur                     │
+│  ⬜ İlk endpoint'i oluştur              │
+│  ⬜ İlk webhook'ı gönder               │
+│  ⬜ SDK kur (opsiyonel)                 │
 │                                         │
-│  2. 🔗 Create endpoint (1 click)       │
-│     [Create Endpoint]                   │
-│                                         │
-│  3. 🧪 Try webhook simulator           │
-│     [Send Test Webhook]                 │
+│  ████░░░░░░ %30 tamamlandı              │
 └─────────────────────────────────────────┘
-  ↓
-Progress bar: ████░░░░ 25% → ███░░░░░ 50% → ██░░░░░░ 75% → █░░░░░░░ 100%
-  ↓
-"🎉 Congrats! Your first webhook was delivered!"
 ```
 
-**Checklist Widget (In-app):**
+### 4.4 Quick Start Wizard (3 Adım)
+
+**Signup sonrası ilk ekran:**
+
 ```
-✅ Create account
-⬜ Verify email
-⬜ Create API key
-⬜ Create first endpoint
-⬜ Send first webhook
-⬜ Install SDK
-⬜ Invite team member
-```
-
-### 4.4 Retention Mekanizmaları
-
-**Haftalık Email Drip (Inactive users):**
-```
-Day 7 (inactive):
-  Subject: "We miss you! Here's what's new"
-  Content: New features + quick start reminder
-
-Day 14 (inactive):
-  Subject: "Your webhooks are waiting"
-  Content: Use case example + offer help
-
-Day 21 (inactive):
-  Subject: "Can we help?"
-  Content: 1:1 call offer + feedback request
-
-Day 30 (inactive):
-  Subject: "Before you go..."
-  Content: Exit survey + win-back offer
+┌─────────────────────────────────────────────────┐
+│  🚀 Hızlı Başlangıç (30 saniye)                │
+│                                                  │
+│  1️⃣ API Key Oluştur                             │
+│     [Otomatik Oluştur] → sk_live_xxxxx          │
+│                                                  │
+│  2️⃣ İlk Endpoint                               │
+│     URL: [https://example.com/webhook]          │
+│     [Endpoint Oluştur]                          │
+│                                                  │
+│  3️⃣ İlk Webhook Gönder                         │
+│     [🧪 Test Webhook Gönder]                    │
+│     → 200 OK ✓                                  │
+│                                                  │
+│  🎉 İlk webhook'ın teslim edildi!               │
+│     [Dashboard'a Git →]                         │
+└─────────────────────────────────────────────────┘
 ```
 
-**In-app Nudges:**
+### 4.5 Re-Engagement Email Sequence
+
+**Based on PayPro Global framework + Userpilot TTV benchmarks:**
+
 ```
-// 3 gün inactive
-"👋 Haven't seen you in a while! Check out [new feature]"
+Gün 0 (Signup):
+  → Hoşgeldin emaili (BETA_TESTING_STRATEGY §10)
 
-// 7 gün inactive
-"📊 Your webhooks have been processing. See your dashboard"
+Gün 1 (Inactive — 24 saat, webhook yok):
+  Subject: "İlk webhook'ını gönderdin mi?"
+  Content: Quick start link + video tutorial
 
-// Feature discovery
-"💡 Did you know? You can set up alerts for failed webhooks"
+Gün 3 (Inactive — 3 gün, webhook yok):
+  Subject: "5 dakika içinde ilk webhook'ın hazır"
+  Content: Step-by-step guide + "Sorun mu var? Cevapla"
+
+Gün 7 (Inactive — 7 gün, webhook yok):
+  Subject: "Seni özledik — webhook'lar seni bekliyor"
+  Content: Use case examples + "1:1 call ister misin?"
+
+Gün 14 (Inactive — 14 gün):
+  Subject: "Sana nasıl yardımcı olabiliriz?"
+  Content: Feedback survey link + feature list
+
+Gün 21 (Inactive — 21 gün):
+  Subject: "Son şans: %20 indirim (3 gün geçerli)"
+  Content: Win-back offer + CTA
+
+Gün 30 (Inactive — 30 gün):
+  Subject: "Görüşmek üzere 👋"
+  Content: Exit survey + "Geri dönmek istersen buradayız"
 ```
 
-**Engagement Triggers:**
-| Tetikleyici | Aksiyon | Kanal |
-|-------------|---------|-------|
-| 3 gün login yok | Re-engagement email | Email |
-| 7 gün login yok | "We miss you" email | Email |
-| Limit %80 doldu | Upgrade nudge | In-app |
-| 100+ webhook gönderdi | "Power user" badge | In-app |
-| Team invite gönderdi | Expansion email | Email |
-| Schema oluşturdu | Advanced feature suggestion | In-app |
+### 4.6 Churn Prevention
 
-### 4.5 Churn Prevention
+**Churn Risk Belirleme (Basit Model):**
 
-**Churn Risk Belirleme:**
 ```python
+# Backend'de hesaplanacak
 churn_risk_score = (
-    days_inactive * 2 +
-    feature_usage_decline * 3 +
-    support_tickets * 1 +
-    payment_failures * 5
+    days_inactive * 2 +          # 7 gün inactive = +14
+    webhook_decline_rate * 3 +   # %50 azalma = +1.5
+    support_tickets * 1 +        # 3 ticket = +3
+    payment_failures * 5         # 1 failure = +5
 )
+
+# churn_risk_score > 20 → yüksek risk
+# churn_risk_score 10-20 → orta risk
+# churn_risk_score < 10 → düşük risk
 ```
 
 **Churn Prevention Flow:**
 ```
 Churn Risk Tespit (7 gün inactive + düşük usage)
     ↓
-Re-engagement email (#1)
+Re-engagement email (#1) — "Seni özledik"
     ↓ (3 gün bekle)
-In-app nudge + feature suggestion
+In-app nudge — "Yeni feature'ı denedin mi?"
     ↓ (3 gün bekle)
-Re-engagement email (#2) + discount offer
+Re-engagement email (#2) — "Sana nasıl yardımcı olabiliriz?"
     ↓ (3 gün bekle)
-1:1 call invitation
+1:1 call invitation — "15 dakika konuşalım mı?"
     ↓ (7 gün bekle)
-Exit survey + win-back offer
+Exit survey + win-back offer — "%20 indirim"
     ↓ (Inactive >30 gün)
-Monthly cleanup email (quarterly)
+Quarterly cleanup email — "Geri dönmek ister misin?"
 ```
 
-### 4.6 Win-Back Campaign
+### 4.7 Win-Back Campaign
 
-**Win-Back Offers:**
-| Süre | Offer | Kanal |
-|------|-------|-------|
-| 30 gün inactive | %20 indirim (3 ay) | Email |
-| 60 gün inactive | 1 ay ücretsiz | Email |
-| 90 gün inactive | Lifetime discount | Email |
+**PayPro Global Framework'e Göre:**
 
-### 4.7 NPS Measurement
+**Adım 1: Churn Analizi**
+- Neden ayrıldılar? (exit survey verisi)
+- Ne zaman ayrıldılar? (recency)
+- Ne kadar değerliydiler? (CLV)
+
+**Adım 2: Segmentasyon (RFM)**
+| Segment | Recency | Frequency | Monetary | Aksiyon |
+|---------|---------|-----------|----------|---------|
+| High-CLV churned | <30 gün | Yüksek | Yüksek | Kişisel email + %20 indirim |
+| Mid-CLV churned | 30-60 gün | Orta | Orta | Email sequence + %15 indirim |
+| Low-CLV churned | 60-90 gün | Düşük | Düşük | Otomatik email + %10 indirim |
+| Never activated | Herhangi | Yok | Yok | "Tekrar dene" + video tutorial |
+
+**Adım 3: Win-Back Offers**
+
+| Durum | Offer | Süre | Kanal |
+|-------|-------|------|-------|
+| Cancel (fiyat) | %20 indirim (3 ay) | 7 gün geçerli | Email |
+| Cancel (feature) | Feature roadmap paylaş | Hemen | Email |
+| Cancel (geçici) | 3 ay pause | 14 gün geçerli | Email |
+| 30 gün inactive | %15 indirim | 30 gün geçerli | Email |
+| 60 gün inactive | 1 ay ücretsiz | 14 gün geçerli | Email |
+| 90 gün inactive | Lifetime %25 discount | 14 gün geçerli | Email |
+
+**Adım 4: Win-Back Email Template'leri**
+
+**Template: Fiyat Nedeniyle Ayrılan**
+```
+Subject: [İsim], seni özledik — özel teklifimiz var
+
+Merhaba [İsim],
+
+HookSniff'den ayrıldığını gördük. Anlıyoruz — fiyat önemli.
+
+Sana özel teklif: 3 ay boyunca %20 indirim.
+- Plan: $29/ay → $23.20/ay
+- Team: $99/ay → $79.20/ay
+
+Teklif 7 gün geçerli: [link]
+
+Neden ayrılmıştın? Bize söylersen daha iyi yapabiliriz: [survey link]
+
+Teşekkürler,
+HookSniff ekibi
+```
+
+**Template: Feature Eksikliği Nedeniyle Ayrılan**
+```
+Subject: [İsim], istediğin feature geldi!
+
+Merhaba [İsim],
+
+Sen ayrıldıktan sonra [feature] ekledik:
+
+✅ [Feature 1] — [kısa açıklama]
+✅ [Feature 2] — [kısa açıklama]
+✅ [Feature 3] — [kısa açıklama]
+
+Geri dönmek ister misin? 1 ay ücretsiz: [link]
+
+Görüşlerini merak ediyoruz: [survey link]
+
+HookSniff ekibi
+```
+
+### 4.8 NPS Measurement
 
 **NPS Survey Schedule:**
 - İlk 14 gün sonra (activation sonrası)
 - Her 90 günde bir (aktif kullanıcılar)
 - Churn sonrası (exit survey)
 
-**NPS Questions:**
+**NPS Soruları (PostHog Surveys ile):**
 ```
 1. "HookSniff'i bir arkadaşına tavsiye eder misin?" (0-10)
 2. "En çok neyi seviyorsun?" (open text)
 3. "En çok neyi geliştirsek?" (open text)
 4. "Hangi feature'ı eksik buluyorsun?" (multiple choice)
+   □ Daha fazla SDK  □ Daha iyi docs  □ Monitoring
+   □ Team management  □ API testing  □ Diğer: ___
 ```
 
-**NPS Benchmarks (Developer Tools):**
-- <0: Kötü
-- 0-30: Ortalama
-- 30-50: İyi
-- 50-70: Mükemmel
-- 70+: Dünya sınıfı
+**NPS Hedefleri:**
+| Dönem | Hedef | Benchmark |
+|-------|-------|-----------|
+| Beta sonu | +30 | Başlangıç |
+| Ay 3 | +35 | SaaS ortalaması |
+| Ay 6 | +40 | İyi |
+| Ay 12 | +50 | Mükemmel |
 
-**Hedef**: 40+ (6. ayda)
+### 4.9 Feature Discovery Prompts
+
+**In-app nudges (context-based):**
+
+| Tetikleyici | Nudge | Konum |
+|-------------|-------|-------|
+| 5+ webhook gönderdi | "💡 Schema registry ile payload'larını doğrula" | Dashboard banner |
+| Endpoint oluşturdu | "🔄 FIFO delivery'yi denedin mi? Sıralı teslimat garantisi" | Endpoint detail page |
+| API key oluşturdu | "📦 SDK kurulumu 30 saniye sürüyor" | Quick start modal |
+| Hata aldı | "🔍 Replay ile hatayı tekrar incele" | Error notification |
+| Team üyesi yok | "👥 Ekip arkadaşlarını davet et" | Sidebar |
 
 ---
 
 ## 5. Uygulama Planı
 
-### Faz 1: Activation (Gün 1-7)
-| Adım | Süre | Detay |
-|------|------|-------|
-| Activation tanımını kodla | 2 saat | PostHog funnel |
-| Onboarding checklist widget | 4 saat | React component |
-| Quick start wizard | 4 saat | 3-step wizard |
-| Activation email sequence | 2 saat | 3 email template |
-| Test + iterate | 2 saat | Beta feedback |
+### Faz 1: Activation (Gün 1-5)
+| Adım | Süre | Tool | Detay |
+|------|------|------|-------|
+| Activation tanımını kodla | 2 saat | PostHog | "webhook_first_success" funnel |
+| Onboarding checklist widget | 4 saat | React | Dashboard component |
+| Quick start wizard | 4 saat | React | 3-step wizard |
+| Activation email sequence | 2 saat | Resend | 3 email template |
+| Test + iterate | 2 saat | — | E2E test |
 
-### Faz 2: Retention (Gün 8-14)
-| Adım | Süre | Detay |
-|------|------|-------|
-| Engagement scoring model | 3 saat | Backend logic |
-| Inactive detection cron | 1 saat | Daily check |
-| Re-engagement email sequence | 2 saat | 4 email template |
-| In-app nudge component | 3 saat | React component |
-| Feature discovery prompts | 2 saat | Context-based |
+### Faz 2: Retention (Gün 6-10)
+| Adım | Süre | Tool | Detay |
+|------|------|------|-------|
+| Engagement scoring model | 3 saat | Backend | Rust scoring logic |
+| Inactive detection cron | 1 saat | Rust | Daily check |
+| Re-engagement email sequence | 2 saat | Resend | 4 email template |
+| In-app nudge component | 3 saat | React | Context-based prompts |
+| Feature discovery prompts | 2 saat | React | Banner + modal |
 
-### Faz 3: Churn Prevention (Gün 15-21)
-| Adım | Süre | Detay |
-|------|------|-------|
-| Churn risk scoring | 2 saat | Backend algorithm |
-| Automated prevention flow | 3 saat | Email + in-app |
-| Exit survey form | 1 saat | Tally.so |
-| Win-back email sequence | 2 saat | 3 email template |
-| Dashboard: churn metrics | 2 saat | PostHog insight |
+### Faz 3: Churn Prevention (Gün 11-15)
+| Adım | Süre | Tool | Detay |
+|------|------|------|-------|
+| Churn risk scoring | 2 saat | Backend | Risk algorithm |
+| Automated prevention flow | 3 saat | Backend | Email + in-app |
+| Exit survey form | 1 saat | Tally.so | 5 soru |
+| Win-back email sequence | 2 saat | Resend | 3 email template |
+| Dashboard: churn metrics | 2 saat | PostHog | Insight |
 
-### Faz 4: NPS + Optimization (Gün 22-30)
-| Adım | Süre | Detay |
-|------|------|-------|
-| NPS survey automation | 2 saat | Email + in-app |
-| NPS dashboard | 1 saat | PostHog insight |
-| Retention cohort analysis | 2 saat | PostHog cohort |
-| 30 gün raporu | 2 saat | Metrics + learnings |
-| Iterate on learnings | Devam | Continuous |
+### Faz 4: NPS + Optimization (Gün 16-21)
+| Adım | Süre | Tool | Detay |
+|------|------|------|-------|
+| NPS survey automation | 2 saat | PostHog | Surveys feature |
+| NPS dashboard | 1 saat | PostHog | Insight |
+| Retention cohort analysis | 2 saat | PostHog | Cohort |
+| 21 gün raporu | 2 saat | — | Metrics + learnings |
 
 ---
 
 ## 6. Metrikler
 
-| Metrik | Hedef | Ölçüm |
-|--------|-------|-------|
-| Activation rate | %60+ | PostHog funnel |
-| Time to activate | <10 dk | PostHog timing |
-| Week 1 retention | %45+ | PostHog cohort |
-| Week 4 retention | %25+ | PostHog cohort |
-| Month 3 retention | %15+ | PostHog cohort |
-| Churn rate (monthly) | <%10 | Polar.sh |
-| NPS skoru | 40+ | Survey |
-| Win-back rate | %10+ | Email analytics |
-| Email open rate | %30+ | Resend/Gmail |
-| Email click rate | %5+ | Resend/Gmail |
+### KPI Tanımları (Doğrulanmış Benchmark'lar ile)
+
+| KPI | Tanım | Hedef | Benchmark | Kaynak |
+|-----|-------|-------|-----------|--------|
+| **Activation Rate** | Signup → ilk webhook (24 saat) | %50+ | Dev tools: %10 visitor→signup | OpenView 2023 |
+| **Time to First Webhook** | Signup → ilk success | <10 dk | İyi: <5 dk, Kötü: >3 gün | Evil Martians 2026 |
+| **DAU/MAU Ratio** | Günlük aktif / Aylık aktif | %25+ | SaaS: %10-20 | Industry |
+| **Week 1 Retention** | 1. hafta geri dönenler | %45+ | B2B: %30-40 | Industry |
+| **Week 4 Retention** | 4. hafta geri dönenler | %25+ | B2B: %15-25 | Industry |
+| **Month 3 Retention** | 3. ay geri dönenler | %15+ | B2B: %10-20 | Industry |
+| **Gross Revenue Retention** | Gelir koruma oranı | %90+ | Median: %90 | Zylo 2026 |
+| **Monthly Churn** | Aylık kayıp oranı | <%5 | B2B: %0.5-1 | Industry |
+| **NPS** | Net Promoter Score | +40+ | SaaS: +30-40 | Sopact 2026 |
+| **Win-back Rate** | Geri dönen churned users | %10+ | — | PayPro Global |
+
+### Monitoring Dashboard (PostHog)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  HookSniff — Activation & Retention                  │
+├─────────────────────────────────────────────────────┤
+│                                                      │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  Activation Funnel                            │   │
+│  │  Signup → API Key → Endpoint → Webhook Sent   │   │
+│  │  100%    75%      65%       50%               │   │
+│  └──────────────────────────────────────────────┘   │
+│                                                      │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  Retention Cohort (Weekly)                    │   │
+│  │  Week 0: 100% │ Week 1: 48% │ Week 4: 22%    │   │
+│  └──────────────────────────────────────────────┘   │
+│                                                      │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  Engagement Score Distribution                │   │
+│  │  🔴 Cold: 25% │ 🟡 Warm: 30% │ 🟢 Active: 30% │   │
+│  │  🔵 Power: 10% │ 🟣 Champion: 5%              │   │
+│  └──────────────────────────────────────────────┘   │
+│                                                      │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  Churn Risk                                   │   │
+│  │  🔴 High: 5  │ 🟡 Medium: 12 │ 🟢 Low: 83%   │   │
+│  └──────────────────────────────────────────────┘   │
+│                                                      │
+│  NPS: +38  │  MRR: $145  │  Churn: 2.1%/mo         │
+└─────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -331,9 +528,36 @@ Monthly cleanup email (quarterly)
 
 | Risk | Olasılık | Etki | Azaltma |
 |------|----------|------|---------|
-| Activation tanımı yanlış | Orta | Yüksek | Beta'da validate et |
-| Email spam filtresi | Orta | Orta | SPF/DKIM, warm-up |
-| Kullanıcı email fatigue | Orta | Orta | Frequency cap, preference center |
-| Scoring modeli yanlış | Düşük | Yüksek | Beta verisi ile calibre |
+| Activation tanımı yanlış | Orta | Yüksek | Beta'da validate et, iterate |
+| Email spam filtresi | Orta | Orta | SPF/DKIM, warm-up, frequency cap |
+| Kullanıcı email fatigue | Orta | Orta | Preference center, unsubscribe |
+| Scoring modeli yanlış | Düşük | Yüksek | Beta verisi ile calibrate |
 | Win-back yetersiz | Orta | Orta | Test different offers |
 | NPS düşük çıkarsa | Orta | Yüksek | Hızlı aksiyon, iletişim |
+| TTV çok uzun | Orta | Yüksek | Quick start wizard, video tutorial |
+| Churn high çıkarsa | Orta | Yüksek | Exit survey, feature iteration |
+
+---
+
+## 8. Notlar
+
+### Maliyet Tahmini
+
+| Kalem | Maliyet |
+|-------|---------|
+| PostHog (free tier) | $0 |
+| Resend (free tier) | $0 |
+| Tally.so (free) | $0 |
+| **Toplam** | **$0** |
+
+### Kaynaklar (Doğrulanmış)
+- Evil Martians PMF Methodology: https://evilmartians.com/chronicles/product-market-fit-methodology-devtools (2026-03-23, 37 devtools şirketi)
+- OpenView Dev Tools Benchmarks: boldstart-ventures/Medium (2023, OpenView raw data)
+- Userpilot TTV Benchmark: https://userpilot.com/blog/time-to-value/ (2025, 547 SaaS şirketi)
+- Zylo SaaS Statistics: https://zylo.com/blog/saas-statistics/ (2026)
+- Directive B2B SaaS: https://directiveconsulting.com/blog/blog-b2b-saas-marketing-guide-2026/ (2026)
+- Vena SaaS Statistics: https://www.venasolutions.com/blog/saas-statistics (2026)
+- Sopact NPS Benchmarks: https://www.sopact.com/use-case/nps-benchmarks (2026, 14 endüstri)
+- PayPro Global Win-Back: https://payproglobal.com/how-to/win-back-lost-customers/ (2025)
+- Svix: https://www.svix.com (doğrulandı 2026-05-10)
+- Hookdeck: https://hookdeck.com (doğrulandı 2026-05-10)
