@@ -119,9 +119,9 @@ export default function PlaygroundPage() {
     }
   }, [token, lastPoll]);
 
-  // Start/stop polling
+  // Start/stop polling (only on playground tab)
   useEffect(() => {
-    if (state === 'ready' && token) {
+    if (state === 'ready' && token && activeTab === 'playground') {
       // Initial fetch
       fetchHistory();
       // Poll every 2 seconds
@@ -135,7 +135,7 @@ export default function PlaygroundPage() {
       }
       setPolling(false);
     };
-  }, [state, token, fetchHistory]);
+  }, [state, token, fetchHistory, activeTab]);
 
   /* ─── Copy URL ─── */
 
@@ -175,6 +175,7 @@ export default function PlaygroundPage() {
     try {
       JSON.parse(sendPayload);
     } catch {
+      setSendResult({ status: 0, time: 0 });
       setSending(false);
       return;
     }
@@ -389,7 +390,9 @@ export default function PlaygroundPage() {
               </div>
               {sendResult && (
                 <div className={`mt-3 px-3 py-2 rounded-lg text-sm ${sendResult.status >= 200 && sendResult.status < 300 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'}`}>
-                  Status: {sendResult.status} · {sendResult.time}ms
+                  {sendResult.status === 0 && sendResult.time === 0
+                    ? '⚠️ Invalid JSON — check your payload'
+                    : `Status: ${sendResult.status} · ${sendResult.time}ms`}
                 </div>
               )}
             </div>

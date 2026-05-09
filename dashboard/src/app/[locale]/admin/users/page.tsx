@@ -43,7 +43,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, page, search, planFilter, statusFilter, toast]);
+  }, [token, page, search, planFilter, statusFilter, toast, tc]);
 
   useEffect(() => {
     fetchUsers();
