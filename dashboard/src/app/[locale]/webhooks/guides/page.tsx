@@ -20,8 +20,8 @@ const guides = [
     items: [
       { title: 'Quickstart Guide', description: 'Send your first webhook in 5 minutes. Standard Webhooks format with HMAC-SHA256 signing.', href: '/docs/quickstart' },
       { title: 'Webhook Security Best Practices', description: 'HMAC verification, SSRF protection, secret rotation, replay prevention, and rate limiting.', href: '/docs/security' },
-      { title: 'Node.js Webhook Integration', description: 'Complete guide to receiving and verifying webhooks in Node.js with the HookSniff SDK.', href: '/docs/examples' },
-      { title: 'Python Webhook Integration', description: 'Receive, verify, and process webhooks in Python with Flask, FastAPI, or Django.', href: '/docs/examples' },
+      { title: 'Node.js Webhook Integration', description: 'Complete guide to receiving and verifying webhooks in Node.js with the HookSniff SDK.', href: '/docs/quickstart' },
+      { title: 'Python Webhook Integration', description: 'Receive, verify, and process webhooks in Python with Flask, FastAPI, or Django.', href: '/docs/quickstart' },
     ],
   },
   {
