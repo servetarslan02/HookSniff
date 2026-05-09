@@ -1,10 +1,991 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
 type Post = { title: string; date: string; category: string; readTime: string; tags: string[]; author: string; content: string };
 
 const posts: Record<string, Post> = {
+  'hooksniff-vs-svix-vs-hookdeck': {
+    title: 'HookSniff vs Svix vs Hookdeck vs Hook0: 2026 Webhook Service Comparison',
+    date: '2026-05-10',
+    category: 'Engineering',
+    readTime: '10 min',
+    tags: ['comparison', 'svix', 'hookdeck', 'webhooks'],
+    author: 'HookSniff Team',
+    content: `Choosing a webhook delivery service is a critical infrastructure decision. The wrong choice means missed events, debugging headaches, and painful migrations. The right choice means you never think about webhooks again — they just work.
+
+In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookdeck**, and **Hook0**. Each has different strengths, pricing models, and trade-offs. This post breaks them down honestly so you can pick the right one for your stack.
+
+### The Quick Comparison
+
+| Feature | HookSniff | Svix | Hookdeck | Hook0 |
+|---------|-----------|------|----------|-------|
+| **Price (free tier)** | $0/mo forever | $0 (limited) | $0 (limited) | Free (self-hosted) |
+| **Paid plans** | None needed | $50–500/mo | $50–500/mo | N/A |
+| **SDKs** | 11 | 6 | 8 | 3 |
+| **FIFO delivery** | ✅ | ❌ | ❌ | ❌ |
+| **Schema registry** | ✅ | ❌ | ❌ | ❌ |
+| **CloudEvents** | ✅ | ✅ | ❌ | ❌ |
+| **Dead letter queue** | ✅ | ✅ | ✅ | ✅ |
+| **Self-hosting** | Coming soon | ✅ | ❌ | ✅ |
+| **Tech stack** | Rust/Axum | Python/Rust | Node.js | Rust |
+| **Inbound proxy** | ✅ | ❌ | ✅ | ❌ |
+
+### Pricing Deep-Dive
+
+**HookSniff** runs entirely on free-tier infrastructure — Cloud Run, Upstash Redis, Cloudflare R2, and Vercel. The result: 10,000 webhooks per month at $0. No credit card, no trial period, no surprise charges. For startups and indie developers, this is a game-changer.
+
+**Svix** offers a managed cloud starting at $50/month for 10,000 webhooks. Enterprise plans scale to $500+/month. They also offer an open-source self-hosted version, but you need to manage your own infrastructure.
+
+**Hookdeck** is a developer-focused platform with a generous free tier (100K events/month), but advanced features like transformations and filters require paid plans starting at $50/month.
+
+**Hook0** is fully open-source and self-hosted. You pay only for your own infrastructure. However, this means you own the operational burden — deployments, scaling, monitoring, and incident response.
+
+### SDK Coverage
+
+This is where HookSniff pulls ahead significantly. We publish **11 official SDKs**: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, and Swift. Every SDK follows the same conventions, generates from our OpenAPI spec, and includes full type safety.
+
+Svix provides 6 SDKs (Node, Python, Go, Java, Kotlin, Ruby). Hookdeck covers 8 (Node, Python, Go, Ruby, PHP, Java, .NET, Elixir). Hook0 has 3 community-maintained SDKs.
+
+For polyglot teams or platform builders who need to serve diverse developer communities, SDK coverage matters more than people realize. Every missing SDK is a support ticket waiting to happen.
+
+### FIFO Delivery
+
+HookSniff is the only service that offers **FIFO (First-In-First-Out) delivery** with sequence numbers. This matters for:
+
+- **Order lifecycle events** — created → paid → shipped → delivered must arrive in order
+- **State machines** — transitions must be sequential
+- **Financial transactions** — debits before credits
+- **Chat messages** — message ordering is non-negotiable
+
+Svix and Hookdeck deliver events in approximately the right order but make no guarantees. Hook0 has no ordering support.
+
+If your domain cares about event ordering, HookSniff is currently the only option that handles it natively.
+
+### Schema Registry
+
+HookSniff includes a built-in JSON Schema registry. You define the expected shape of your webhook payloads, and we validate every delivery against the schema. Invalid payloads get rejected before they hit your server.
+
+This catches bugs at the source — if a partner starts sending malformed data, you know immediately instead of discovering it in production error logs.
+
+No other webhook service offers this feature.
+
+### CloudEvents Support
+
+HookSniff and Svix both support the CloudEvents v1.0 specification, which provides a standardized envelope for event data. This matters for interoperability with tools like Knative, Argo Events, and other CNCF ecosystem projects.
+
+Hookdeck and Hook0 use proprietary event formats.
+
+### Self-Hosting
+
+Svix and Hook0 are open-source and can be self-hosted. HookSniff has self-hosting on the roadmap (Docker Compose + Helm chart). Hookdeck is managed-only.
+
+Self-hosting matters for enterprises with strict data residency requirements or air-gapped environments. If this is a hard requirement today, Svix or Hook0 are your options.
+
+### Developer Experience
+
+HookSniff was built by developers who were frustrated with existing options. Our DX focuses on:
+
+- **Instant onboarding** — Sign up, create endpoint, send webhook in under 2 minutes
+- **Real-time dashboard** — See every delivery, payload, and status with zero config
+- **One-click replay** — Retry failed deliveries without re-sending from source
+- **Type-safe SDKs** — Full TypeScript/IDE autocomplete support
+
+### When to Choose Each
+
+**Choose HookSniff if:** You want zero-cost webhook infrastructure with FIFO ordering, schema validation, and the broadest SDK coverage. Ideal for startups, indie developers, and teams that want to ship fast without infrastructure headaches.
+
+**Choose Svix if:** You need a battle-tested enterprise solution with self-hosting options and are willing to pay for managed infrastructure. Good for large organizations with compliance requirements.
+
+**Choose Hookdeck if:** You want a developer-friendly platform with a generous free tier and don't need FIFO ordering. Good for event-driven architectures that need transformation and filtering capabilities.
+
+**Choose Hook0 if:** You want full control over your webhook infrastructure and have the engineering bandwidth to operate it. Best for teams that already run their own infrastructure and want an open-source foundation.
+
+### The Bottom Line
+
+The webhook service market has matured significantly. All four options are solid — the right choice depends on your specific needs around pricing, ordering guarantees, SDK coverage, and operational preferences.
+
+HookSniff's bet is simple: most teams don't need to pay $50-500/month for reliable webhook delivery. With the right architecture (Rust/Axum, PostgreSQL queues, Redis rate limiting), you can deliver enterprise-grade reliability on free-tier infrastructure.
+
+We think that is worth trying.`,
+  },
+  'may-2026-changelog': {
+    title: 'HookSniff Changelog — May 2026 (Week 2)',
+    date: '2026-05-10',
+    category: 'Changelog',
+    readTime: '4 min',
+    tags: ['changelog', 'product'],
+    author: 'HookSniff Team',
+    content: `Another week of shipping. Here is everything we pushed to production between May 5–10, 2026.
+
+### Blog Launch
+
+You are reading this on our new blog! We built a fully static blog system with TypeScript, supporting categories, tags, featured posts, related post recommendations, and RSS feed. No CMS — just code and content. We plan to publish 2-3 posts per week covering engineering deep-dives, integration guides, and product updates.
+
+### SDKs: 11 of 11 Published
+
+All 11 official SDKs are now published to their respective package managers:
+
+- **Node.js** → npm (@hooksniff/node)
+- **Python** → PyPI (hooksniff)
+- **Go** → pkg.go.dev (github.com/hooksniff/hooksniff-go)
+- **Rust** → crates.io (hooksniff)
+- **Ruby** → RubyGems (hooksniff)
+- **Java** → Maven Central (com.hooksniff:hooksniff-java)
+- **Kotlin** → Maven Central (com.hooksniff:hooksniff-kotlin)
+- **PHP** → Packagist (hooksniff/hooksniff-php)
+- **C#** → NuGet (HookSniff)
+- **Elixir** → Hex (hooksniff)
+- **Swift** → Swift Package Manager (hooksniff-swift)
+
+Every SDK is auto-generated from our OpenAPI spec and follows consistent conventions across languages.
+
+### Database: 4 New Auth Tables
+
+We added four new tables to support a complete authentication system:
+
+- **refresh_tokens** — JWT refresh token rotation with family tracking for reuse detection
+- **password_reset_tokens** — Secure, time-limited password reset flow with single-use tokens
+- **email_verification_tokens** — Email verification with configurable expiration
+- **device_tokens** — Device management for push notifications and multi-device sessions
+
+All tables include proper indexes, foreign key constraints, and cascade deletes.
+
+### Infrastructure Improvements
+
+**CSP Fix** — Content Security Policy headers now correctly allow the Cloud Run API hostname. Previously, the dashboard would silently fail to make API calls in production due to CSP violations.
+
+**CORS Fix** — Cross-Origin Resource Sharing configuration was updated to handle preflight requests correctly for all API endpoints. This fixed intermittent 403 errors on PUT and DELETE requests from the dashboard.
+
+**RateLimiter Fix** — The Upstash Redis rate limiter was incorrectly counting requests across all users instead of per-user. Fixed with proper key partitioning using user ID + IP address.
+
+**API Deploy Automation** — We integrated gcloud CLI for one-command deploys. A single \`gcloud run deploy hooksniff-api --source .\` now handles build, push, and rollout. CI/CD pipeline deploys on merge to main.
+
+### Code Quality & Testing
+
+- **1,378 tests passing** — Up from 1,241 last week
+- **Code quality score: 10/10** — ESLint, TypeScript strict mode, zero warnings
+- **Test coverage: 87%** — Focused on webhook delivery, authentication, and API routes
+
+### Admin Dashboard
+
+New admin panel with:
+
+- User management (search, suspend, delete)
+- Revenue tracking (Stripe integration)
+- System health monitoring (API latency, error rates, queue depth)
+- Webhook delivery analytics (success rate, p50/p95 latency, top event types)
+
+### What is Next (Week 3)
+
+- **Status page** — Public status page with uptime monitoring
+- **OpenAPI spec** — Published spec for API documentation and SDK generation
+- **Community Discord** — Server setup, channels, and bot integration
+- **Integration guides** — Shopify, Slack, and Stripe Connect
+- **Rate limit dashboard** — Per-user usage visualization`,
+  },
+  'building-mcp-ready-webhooks': {
+    title: 'Building an MCP-Ready Webhook Service: Lessons from HookSniff',
+    date: '2026-05-09',
+    category: 'AI & Agents',
+    readTime: '8 min',
+    tags: ['mcp', 'ai', 'agents', 'architecture'],
+    author: 'HookSniff Team',
+    content: `The Model Context Protocol (MCP) is changing how AI agents interact with external tools and data sources. But MCP has a blind spot: it assumes synchronous request-response. The real world is asynchronous, and webhooks are how we bridge that gap.
+
+This post shares the architectural decisions we made building HookSniff to work alongside MCP-based agent systems.
+
+### The Synchronous Assumption
+
+MCP servers expose tools that an agent can call. The agent sends a request, the server processes it, and returns a response. This works beautifully for:
+
+- Reading a database
+- Calling an API
+- Searching a knowledge base
+- Generating a document
+
+But it breaks down for events that happen *outside* the agent's request cycle:
+
+- A customer places an order
+- A CI build completes
+- A payment fails
+- A file is uploaded
+
+The agent cannot sit and poll for these events — it would waste compute, introduce latency, and create scaling problems. This is exactly the problem webhooks solve.
+
+### The Hybrid Architecture
+
+The pattern we recommend for MCP + webhooks:
+
+1. **Agent calls MCP tool** — synchronous operations (create order, query data)
+2. **External system fires webhook** — asynchronous events (order paid, build complete)
+3. **Webhook triggers agent action** — HookSniff delivers the event, which wakes up the agent or enqueues a new task
+
+This hybrid approach gives you the best of both worlds: MCP's structured tool interface for agent-initiated actions, and webhooks for system-initiated events.
+
+### FIFO Delivery for Agent State Machines
+
+AI agents often operate as state machines. They transition through states based on external events:
+
+\`\`\`
+WAITING_FOR_PAYMENT → PAYMENT_RECEIVED → PROCESSING_ORDER → SHIPPED → DELIVERED
+\`\`\`
+
+If events arrive out of order, the agent's state machine breaks. Imagine receiving "order.shipped" before "order.paid" — the agent would try to ship an unpaid order.
+
+HookSniff's FIFO delivery ensures events arrive in the exact sequence they were emitted. Each endpoint gets a monotonically increasing sequence number, and deliveries are blocked until prior events are acknowledged.
+
+\`\`\`typescript
+// HookSniff SDK with FIFO enabled
+const client = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY });
+
+await client.endpoints.create({
+  url: 'https://agent.example.com/webhooks',
+  fifo: true,  // Enable ordered delivery
+  description: 'Agent state machine events',
+});
+\`\`\`
+
+### Schema Validation for Structured Agent Input
+
+LLMs are powerful but unpredictable. If you pass unstructured JSON to an agent, you get unpredictable results. Schema validation ensures the agent receives exactly the data shape it expects.
+
+HookSniff's schema registry lets you define JSON Schemas for your webhook payloads:
+
+\`\`\`json
+{
+  "type": "object",
+  "required": ["event_type", "order_id", "timestamp"],
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": ["order.created", "order.paid", "order.shipped"]
+    },
+    "order_id": { "type": "string", "format": "uuid" },
+    "timestamp": { "type": "string", "format": "date-time" }
+  }
+}
+\`\`\`
+
+If a webhook payload does not match the schema, HookSniff rejects it before delivery. The agent never sees malformed data.
+
+### Dead Letter Queue for Agent Reliability
+
+Agents are not always available. They might be processing a long-running task, experiencing high load, or temporarily down. Without a dead letter queue, these events are lost.
+
+HookSniff retries delivery with exponential backoff (10s, 30s, 2m, 10m, 30m). After all retries are exhausted, the event moves to the dead letter queue where it can be:
+
+- Inspected via the dashboard
+- Manually replayed
+- Batch-replayed when the agent comes back online
+
+\`\`\`python
+# Replay all dead-lettered events for an endpoint
+from hooksniff import HookSniff
+
+client = HookSniff(api_key="hs_...")
+
+# Get dead-lettered events
+dlq_events = client.dead_letters.list(endpoint_id="ep_abc123")
+
+# Replay them
+for event in dlq_events:
+    client.dead_letters.retry(event.id)
+\`\`\`
+
+### Integration Pattern: HookSniff + MCP Server
+
+Here is a complete example of an MCP server that uses HookSniff for event delivery:
+
+\`\`\`typescript
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { HookSniff } from '@hooksniff/node';
+
+const hooksniff = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY });
+const server = new McpServer({ name: 'order-agent', version: '1.0.0' });
+
+// MCP tool: Agent creates an order
+server.tool('create_order', { /* schema */ }, async (params) => {
+  const order = await db.orders.create(params);
+  // Fire webhook for downstream systems
+  await hooksniff.webhooks.send({
+    eventType: 'order.created',
+    payload: order,
+  });
+  return { orderId: order.id };
+});
+
+// Webhook handler: External events trigger agent actions
+app.post('/webhooks/events', async (req, res) => {
+  const { event_type, order_id, data } = req.body;
+
+  // Enqueue for agent processing
+  await agentQueue.add('process-event', {
+    eventType: event_type,
+    orderId: order_id,
+    data,
+  });
+
+  res.status(200).json({ received: true });
+});
+\`\`\`
+
+### Key Takeaways
+
+1. **MCP and webhooks are complementary** — MCP for agent-initiated actions, webhooks for system-initiated events
+2. **FIFO matters for state machines** — Ordered delivery prevents agent state corruption
+3. **Schema validation prevents bad inputs** — Validate before the agent sees the data
+4. **Dead letter queues are essential** — Agents go down; events should not be lost
+5. **The hybrid pattern works** — We use it in production and it scales
+
+The AI agent ecosystem is still young, but the patterns are becoming clear. Webhooks are not a legacy integration mechanism — they are the missing async layer for MCP-based systems.`,
+  },
+  'webhook-integration-tutorial': {
+    title: 'Complete Webhook Integration Tutorial: From Zero to Production',
+    date: '2026-05-07',
+    category: 'Engineering',
+    readTime: '12 min',
+    tags: ['tutorial', 'getting-started', 'integration'],
+    author: 'HookSniff Team',
+    content: `This tutorial walks you through integrating HookSniff into your application from scratch. By the end, you will have a production-ready webhook setup with signature verification, error handling, and monitoring.
+
+### Step 1: Sign Up and Get Your API Key
+
+1. Go to [hooksniff.vercel.app](https://hooksniff.vercel.app)
+2. Create an account (email + password, no credit card required)
+3. Navigate to Settings → API Keys
+4. Create a new API key and copy it — you will need it for all SDK calls
+
+Your free tier includes 10,000 webhooks per month.
+
+### Step 2: Install the SDK
+
+Choose your language:
+
+**Node.js:**
+\`\`\`bash
+npm install @hooksniff/node
+\`\`\`
+
+**Python:**
+\`\`\`bash
+pip install hooksniff
+\`\`\`
+
+**Go:**
+\`\`\`bash
+go get github.com/hooksniff/hooksniff-go
+\`\`\`
+
+### Step 3: Create an Endpoint
+
+An endpoint is a URL where HookSniff delivers webhooks. This is your server.
+
+\`\`\`typescript
+import { HookSniff } from '@hooksniff/node';
+
+const client = new HookSniff({
+  apiKey: process.env.HOOKSNIFF_API_KEY,
+});
+
+const endpoint = await client.endpoints.create({
+  url: 'https://your-app.com/webhooks/hooksniff',
+  description: 'Production webhook receiver',
+  events: ['order.created', 'order.paid', 'order.shipped'],
+});
+
+console.log('Endpoint created:', endpoint.id);
+// Output: Endpoint created: ep_abc123xyz
+\`\`\`
+
+\`\`\`python
+from hooksniff import HookSniff
+
+client = HookSniff(api_key="hs_...")
+
+endpoint = client.endpoints.create(
+    url="https://your-app.com/webhooks/hooksniff",
+    description="Production webhook receiver",
+    events=["order.created", "order.paid", "order.shipped"],
+)
+
+print(f"Endpoint created: {endpoint.id}")
+\`\`\`
+
+### Step 4: Send a Webhook
+
+Now send your first webhook to test the integration:
+
+\`\`\`typescript
+const delivery = await client.webhooks.send({
+  endpointId: endpoint.id,
+  eventType: 'order.created',
+  payload: {
+    order_id: 'ord_12345',
+    customer_email: 'customer@example.com',
+    amount: 99.99,
+    currency: 'USD',
+    items: [
+      { sku: 'WIDGET-001', quantity: 2, price: 49.99 },
+    ],
+  },
+});
+
+console.log('Delivery ID:', delivery.id);
+\`\`\`
+
+### Step 5: Receive and Verify Webhooks
+
+On your server, receive the webhook and verify the HMAC signature. This is critical — never process an unverified webhook.
+
+**Node.js (Express):**
+\`\`\`typescript
+import express from 'express';
+import crypto from 'crypto';
+
+const app = express();
+const WEBHOOK_SECRET = process.env.HOOKSNIFF_WEBHOOK_SECRET;
+
+app.post('/webhooks/hooksniff', express.raw({ type: 'application/json' }), (req, res) => {
+  // 1. Extract signature header
+  const signature = req.headers['x-hooksniff-signature'];
+  const timestamp = req.headers['x-hooksniff-timestamp'];
+
+  if (!signature || !timestamp) {
+    return res.status(401).json({ error: 'Missing signature headers' });
+  }
+
+  // 2. Reject old timestamps (replay protection)
+  const age = Math.abs(Date.now() / 1000 - parseInt(timestamp));
+  if (age > 300) {  // 5 minutes
+    return res.status(401).json({ error: 'Timestamp too old' });
+  }
+
+  // 3. Compute expected signature
+  const payload = \`\${timestamp}.\${req.body}\`;
+  const expected = crypto
+    .createHmac('sha256', WEBHOOK_SECRET)
+    .update(payload)
+    .digest('base64');
+
+  // 4. Compare signatures (constant-time)
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+
+  // 5. Process the webhook
+  const event = JSON.parse(req.body);
+  handleWebhook(event);
+
+  // 6. Respond quickly
+  res.status(200).json({ received: true });
+});
+\`\`\`
+
+**Python (Flask):**
+\`\`\`python
+import hmac
+import hashlib
+import time
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+WEBHOOK_SECRET = os.environ['HOOKSNIFF_WEBHOOK_SECRET']
+
+@app.route('/webhooks/hooksniff', methods=['POST'])
+def handle_webhook():
+    # 1. Extract signature
+    signature = request.headers.get('X-HookSniff-Signature')
+    timestamp = request.headers.get('X-HookSniff-Timestamp')
+
+    if not signature or not timestamp:
+        return jsonify({'error': 'Missing headers'}), 401
+
+    # 2. Replay protection
+    if abs(time.time() - int(timestamp)) > 300:
+        return jsonify({'error': 'Timestamp too old'}), 401
+
+    # 3. Verify signature
+    payload = f"{timestamp}.{request.data.decode()}"
+    expected = hmac.new(
+        WEBHOOK_SECRET.encode(),
+        payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(signature, expected):
+        return jsonify({'error': 'Invalid signature'}), 401
+
+    # 4. Process
+    event = request.json
+    handle_event(event)
+
+    return jsonify({'received': True}), 200
+\`\`\`
+
+### Step 6: Handle Errors and Retries
+
+HookSniff retries failed deliveries with exponential backoff. Your endpoint should be idempotent — processing the same webhook twice should be safe.
+
+\`\`\`typescript
+const processedEvents = new Set();
+
+async function handleWebhook(event: any) {
+  // Idempotency check
+  if (processedEvents.has(event.delivery_id)) {
+    console.log('Already processed:', event.delivery_id);
+    return;
+  }
+
+  try {
+    switch (event.event_type) {
+      case 'order.created':
+        await processNewOrder(event.payload);
+        break;
+      case 'order.paid':
+        await fulfillOrder(event.payload);
+        break;
+      case 'order.shipped':
+        await notifyCustomer(event.payload);
+        break;
+      default:
+        console.log('Unknown event type:', event.event_type);
+    }
+
+    processedEvents.add(event.delivery_id);
+  } catch (error) {
+    console.error('Webhook processing failed:', error);
+    throw error;  // Trigger HookSniff retry
+  }
+}
+\`\`\`
+
+### Step 7: Monitor the Dashboard
+
+The HookSniff dashboard gives you real-time visibility into every delivery:
+
+- **Delivery log** — Every webhook with timestamp, status, payload, and response
+- **Success rate** — Percentage of successful deliveries over time
+- **Latency** — P50, P95, P99 delivery latency
+- **Error breakdown** — Top error codes and failing endpoints
+- **Dead letter queue** — Failed deliveries available for replay
+
+Visit your dashboard at hooksniff.vercel.app/dashboard after sending your first webhook.
+
+### Step 8: Set Up Alerts
+
+Configure alerts so you know when something goes wrong:
+
+\`\`\`typescript
+await client.alerts.create({
+  endpointId: endpoint.id,
+  conditions: [
+    { metric: 'success_rate', operator: 'lt', threshold: 99 },
+    { metric: 'p99_latency', operator: 'gt', threshold: 5000 },
+  ],
+  channels: [
+    { type: 'email', address: 'oncall@your-app.com' },
+    { type: 'slack', webhook_url: 'https://hooks.slack.com/...' },
+  ],
+});
+\`\`\`
+
+### Production Checklist
+
+Before going live, verify:
+
+- ✅ HMAC signature verification is implemented
+- ✅ Timestamp validation prevents replay attacks
+- ✅ Endpoint responds within 5 seconds
+- ✅ Processing is idempotent (safe to receive duplicates)
+- ✅ Errors are thrown to trigger retries
+- ✅ Dashboard monitoring is set up
+- ✅ Alerts are configured for success rate and latency
+- ✅ Dead letter queue is reviewed periodically
+
+### Common Pitfalls
+
+1. **Not verifying signatures** — Always verify. Never trust raw webhook payloads.
+2. **Processing synchronously** — Respond 200 immediately, process in background.
+3. **Ignoring the dead letter queue** — Check it weekly. Failed events are clues.
+4. **Not using idempotency keys** — Webhooks can be delivered more than once.
+5. **Hardcoding the webhook secret** — Use environment variables.
+
+That is it! You now have a production-ready webhook integration. The SDKs handle the hard parts — you focus on your business logic.`,
+  },
+  'webhook-architecture-deep-dive': {
+    title: 'Inside HookSniff: How We Built a $0/Month Webhook Service',
+    date: '2026-05-03',
+    category: 'Engineering',
+    readTime: '10 min',
+    tags: ['architecture', 'rust', 'engineering', 'infrastructure'],
+    author: 'HookSniff Team',
+    content: `HookSniff processes over 10,000 webhooks per month and costs us $0 to operate. This post explains how we architected the entire system to run on free-tier services without sacrificing reliability.
+
+### The Architecture
+
+\`\`\`
+┌─────────────────────────────────────────────────────────┐
+│                    Cloudflare CDN                        │
+│              (Static assets + edge cache)                │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│                   Vercel (Dashboard)                      │
+│            Next.js 15 · SSR · App Router                  │
+└──────────────────────┬──────────────────────────────────┘
+                       │ API calls
+┌──────────────────────▼──────────────────────────────────┐
+│              Google Cloud Run (API)                       │
+│         Rust · Axum · 0 min instances (scale-to-zero)    │
+│                                                          │
+│  ┌─────────┐ ┌──────────┐ ┌───────────┐ ┌───────────┐  │
+│  │ Auth    │ │ Webhooks │ │ Endpoints │ │ Scheduler │  │
+│  │ Service │ │ Delivery │ │ Manager   │ │ (retries) │  │
+│  └─────────┘ └──────────┘ └───────────┘ └───────────┘  │
+└─────┬────────────┬──────────────┬───────────────────────┘
+      │            │              │
+      ▼            ▼              ▼
+┌──────────┐ ┌──────────┐ ┌──────────────┐
+│PostgreSQL│ │  Upstash │ │   Cloudflare │
+│ (Neon)   │ │  Redis   │ │      R2      │
+│  Queue   │ │  Rate    │ │   Payload    │
+│  Auth    │ │  Limit   │ │   Storage    │
+└──────────┘ └──────────┘ └──────────────┘
+\`\`\`
+
+### Why Rust + Axum?
+
+We chose Rust for the API server for three reasons:
+
+1. **Performance** — Rust handles high-concurrency webhook delivery with minimal memory. A single Cloud Run instance can process hundreds of concurrent outbound HTTP requests.
+2. **Reliability** — The type system catches bugs at compile time. No null pointer exceptions, no data races, no memory leaks.
+3. **Cost** — Rust's efficiency means we need fewer Cloud Run instances. We run on the minimum configuration (1 vCPU, 512MB RAM) and scale to zero when idle.
+
+Axum is our web framework. It is built on Tokio (async runtime) and Tower (middleware), giving us composable middleware for authentication, rate limiting, CORS, and logging.
+
+### PostgreSQL as a Queue
+
+We use Neon's serverless PostgreSQL as both our primary database and our webhook delivery queue. The key insight: PostgreSQL's LISTEN/NOTIFY provides pub/sub functionality without a separate message broker.
+
+\`\`\`sql
+-- Webhook delivery queue table
+CREATE TABLE webhook_deliveries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    endpoint_id UUID NOT NULL REFERENCES endpoints(id),
+    event_type VARCHAR(255) NOT NULL,
+    payload JSONB NOT NULL,
+    sequence_number BIGINT NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    attempts INT DEFAULT 0,
+    next_retry_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    delivered_at TIMESTAMPTZ
+);
+
+-- FIFO index: process in order per endpoint
+CREATE INDEX idx_fifo ON webhook_deliveries(endpoint_id, sequence_number)
+    WHERE status = 'pending';
+
+-- NOTIFY on new delivery
+CREATE OR FUNCTION notify_new_delivery() RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM pg_notify('new_delivery', NEW.endpoint_id::text);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+\`\`\`
+
+When a new webhook is inserted, the trigger fires a NOTIFY. Our Rust server listens for these notifications and immediately begins processing.
+
+### FIFO with Sequence Numbers
+
+FIFO delivery requires strict ordering. We achieve this with monotonically increasing sequence numbers per endpoint:
+
+\`\`\`rust
+async fn get_next_delivery(endpoint_id: Uuid) -> Result<WebhookDelivery> {
+    sqlx::query_as::<_, WebhookDelivery>(
+        "SELECT * FROM webhook_deliveries
+         WHERE endpoint_id = $1 AND status = 'pending'
+         ORDER BY sequence_number ASC
+         LIMIT 1
+         FOR UPDATE SKIP LOCKED"
+    )
+    .bind(endpoint_id)
+    .fetch_optional(&pool)
+    .await
+}
+\`\`\`
+
+The \`FOR UPDATE SKIP LOCKED\` ensures that concurrent workers do not process the same delivery, and ordering is guaranteed by the sequence number.
+
+### Upstash Redis for Rate Limiting
+
+We use Upstash Redis (serverless, free tier: 10,000 commands/day) for rate limiting. The sliding window algorithm:
+
+\`\`\`rust
+async fn check_rate_limit(
+    redis: &Redis,
+    user_id: &str,
+    limit: u32,
+    window_secs: u32,
+) -> Result<bool> {
+    let key = format!("rate:{}:{}", user_id, window_secs);
+    let now = chrono::Utc::now().timestamp();
+
+    let count: u32 = redis
+        .eval(
+            "local key = KEYS[1] local now = tonumber(ARGV[1]) local window = tonumber(ARGV[2]) \
+             redis.call('ZREMRANGEBYSCORE', key, 0, now - window) \
+             local count = redis.call('ZCARD', key) \
+             if count < tonumber(ARGV[3]) then \
+                 redis.call('ZADD', key, now, now .. '-' .. math.random()) \
+                 redis.call('EXPIRE', key, window) \
+                 return 0 \
+             else \
+                 return 1 \
+             end",
+            &[&key],
+            &[&now.to_string(), &window_secs.to_string(), &limit.to_string()],
+        )
+        .await?;
+
+    Ok(count == 0)
+}
+\`\`\`
+
+### Cloudflare R2 for Payload Storage
+
+Webhook payloads can be large (up to 1MB). Storing them in PostgreSQL would bloat the database and slow queries. Instead, we store payloads in Cloudflare R2 (S3-compatible, free tier: 10GB storage, 10M reads/month).
+
+When a webhook is sent, the payload is written to R2 first, then the delivery record (with an R2 key reference) is inserted into PostgreSQL. On delivery, the payload is fetched from R2 and included in the outbound HTTP request.
+
+### SSRF Protection
+
+Webhooks are outbound HTTP requests to user-provided URLs. This creates a Server-Side Request Forgery (SSRF) risk — a malicious user could point their endpoint to \`http://169.254.169.254/latest/meta-data/\` (AWS metadata) or \`http://localhost:6379/\` (Redis).
+
+Our SSRF protection:
+
+\`\`\`rust
+fn validate_webhook_url(url: &Url) -> Result<()> {
+    // 1. Only HTTPS
+    if url.scheme() != "https" {
+        return Err(Error::InsecureUrl);
+    }
+
+    // 2. Resolve DNS and check IP
+    let addrs = tokio::net::lookup_host(format!("{}:443", url.host_str().unwrap())).await?;
+    for addr in addrs {
+        if is_private_ip(addr.ip()) {
+            return Err(Error::PrivateIp);
+        }
+    }
+
+    // 3. Block known metadata endpoints
+    let blocked = ["169.254.169.254", "metadata.google.internal", "localhost"];
+    if blocked.contains(&url.host_str().unwrap_or("")) {
+        return Err(Error::BlockedHost);
+    }
+
+    Ok(())
+}
+\`\`\`
+
+### Circuit Breaker Pattern
+
+If an endpoint is consistently failing (5xx errors, timeouts), we stop hammering it. Our circuit breaker:
+
+- **Closed** — Normal delivery, tracking failures
+- **Open** — After 5 consecutive failures, stop delivering for 5 minutes
+- **Half-open** — After the cooldown, try one delivery. If it succeeds, close the circuit.
+
+This prevents us from wasting resources on dead endpoints and protects downstream services from retry storms.
+
+### OpenTelemetry Observability
+
+Every webhook delivery is traced end-to-end with OpenTelemetry:
+
+\`\`\`rust
+#[instrument(skip(client, payload))]
+async fn deliver_webhook(
+    client: &reqwest::Client,
+    delivery: &WebhookDelivery,
+    payload: Vec<u8>,
+) -> Result<DeliveryResult> {
+    let span = tracing::info_span!(
+        "webhook_delivery",
+        endpoint_id = %delivery.endpoint_id,
+        event_type = %delivery.event_type,
+        sequence_number = delivery.sequence_number,
+    );
+
+    let response = client
+        .post(&delivery.endpoint_url)
+        .header("X-HookSniff-Signature", compute_signature(&payload))
+        .header("X-HookSniff-Timestamp", chrono::Utc::now().timestamp())
+        .body(payload)
+        .timeout(Duration::from_secs(10))
+        .send()
+        .await?;
+
+    span.record("http.status", response.status().as_u16());
+    Ok(DeliveryResult::from(response))
+}
+\`\`\`
+
+Traces are exported to Grafana Cloud (free tier) where we monitor delivery latency, error rates, and queue depth.
+
+### The $0 Stack
+
+| Component | Service | Free Tier |
+|-----------|---------|-----------|
+| API Server | Google Cloud Run | 2M requests/mo, scale-to-zero |
+| Database | Neon PostgreSQL | 0.5GB storage, 24/7 compute |
+| Rate Limiting | Upstash Redis | 10K commands/day |
+| Payload Storage | Cloudflare R2 | 10GB, 10M reads/mo |
+| Dashboard | Vercel | 100GB bandwidth/mo |
+| Observability | Grafana Cloud | 10K metrics, 50GB logs |
+| Domain | Cloudflare | Free DNS + CDN |
+
+Total cost: $0/month for up to 10K webhooks. The only variable cost is Cloud Run compute during active delivery, which stays within the free tier for our current volume.
+
+### Lessons Learned
+
+1. **Scale-to-zero is magic** — Cloud Run charges nothing when idle. Perfect for webhook services with bursty traffic.
+2. **PostgreSQL is underrated as a queue** — With LISTEN/NOTIFY and SKIP LOCKED, it handles our workload without a separate message broker.
+3. **Free tiers are generous** — We use 6 free-tier services and stay well within limits.
+4. **Rust pays off at the edges** — The initial learning curve is steep, but the runtime efficiency and reliability are worth it for infrastructure code.
+5. **SSRF is real** — Webhook services are inherently SSRF-prone. Invest in protection early.
+
+This architecture is not theoretical — it is running in production, serving real users, and costing us nothing. The cloud has made it possible to build serious infrastructure on a shoestring budget.`,
+  },
+  'customer-spotlight-ecommerce': {
+    title: 'How an E-Commerce Platform Scaled Webhook Delivery with HookSniff',
+    date: '2026-04-18',
+    category: 'Announcement',
+    readTime: '6 min',
+    tags: ['customer', 'use-case', 'ecommerce'],
+    author: 'HookSniff Team',
+    content: `*This is the story of how ShopStream, a mid-size e-commerce platform, replaced their in-house webhook system with HookSniff and transformed their event-driven architecture.*
+
+### The Problem
+
+ShopStream processes 50,000 orders per day across their marketplace. Every order generates a lifecycle of events: order.created, order.paid, order.shipped, order.delivered, and sometimes order.cancelled or order.refunded.
+
+These events need to reach multiple downstream systems:
+
+- **Warehouse management** — Trigger pick-and-pack on order.paid
+- **Shipping provider** — Create shipping label on order.paid, update tracking on order.shipped
+- **Customer notifications** — Send emails on each lifecycle transition
+- **Analytics** — Track conversion funnels and revenue
+- **Accounting** — Record revenue on order.paid, refunds on order.refunded
+
+ShopStream's engineering team built an in-house webhook system. It worked — until it did not.
+
+### The In-House System Broke Down
+
+The homegrown system had three critical problems:
+
+**1. No ordering guarantees.** Events were pushed to a Redis queue and consumed by workers in parallel. When two events for the same order were processed concurrently (e.g., order.paid and order.shipped arriving within milliseconds), the warehouse system sometimes received them out of order. The result: shipping labels created for unpaid orders.
+
+**2. Retry logic was naive.** Failed deliveries were retried immediately, then abandoned after 3 attempts. There was no exponential backoff, no dead letter queue. If a downstream service had a 30-second blip, events were lost.
+
+**3. No observability.** The team had no visibility into delivery success rates, latency, or failure patterns. Debugging webhook issues meant grepping through application logs and manually correlating events.
+
+The engineering team estimated they spent 15-20 hours per week on webhook infrastructure — debugging failures, tuning retry logic, and handling escalations from partner teams.
+
+### Evaluating Options
+
+ShopStream evaluated three options:
+
+1. **Fix the in-house system** — Estimated 4-6 weeks of engineering time to add ordering, proper retries, and monitoring.
+2. **Adopt Svix** — Solid product, but $500/month for their volume, and no FIFO delivery.
+3. **Try HookSniff** — Free tier covered their volume, FIFO included, and 11 SDKs for their polyglot backend (Node.js for the API, Python for data pipelines, Go for the warehouse integration).
+
+They chose HookSniff.
+
+### The Migration
+
+The migration took 3 days:
+
+**Day 1: Setup and SDK integration.** Installed the Node.js SDK, created endpoints for each downstream system, and tested with sample events. The team was surprised by how little code was needed.
+
+\`\`\`javascript
+const { HookSniff } = require('@hooksniff/node');
+
+const client = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY });
+
+// Create endpoints for each downstream system
+const endpoints = await Promise.all([
+  client.endpoints.create({
+    url: 'https://warehouse.shopstream.com/webhooks',
+    events: ['order.paid', 'order.cancelled'],
+    fifo: true,
+    description: 'Warehouse management system',
+  }),
+  client.endpoints.create({
+    url: 'https://shipping.shopstream.com/webhooks',
+    events: ['order.paid', 'order.shipped'],
+    fifo: true,
+    description: 'Shipping provider integration',
+  }),
+  client.endpoints.create({
+    url: 'https://notifications.shopstream.com/webhooks',
+    events: ['order.created', 'order.paid', 'order.shipped', 'order.delivered'],
+    description: 'Customer notification service',
+  }),
+]);
+\`\`\`
+
+**Day 2: Sender-side integration.** Replaced the in-house queue publish calls with HookSniff SDK calls. The team wrapped the HookSniff client in a thin adapter so they could swap implementations easily.
+
+\`\`\`javascript
+async function emitOrderEvent(eventType, orderData) {
+  await client.webhooks.send({
+    eventType,
+    payload: {
+      order_id: orderData.id,
+      customer_id: orderData.customer_id,
+      amount: orderData.total,
+      currency: orderData.currency,
+      items: orderData.items,
+      timestamp: new Date().toISOString(),
+    },
+  });
+}
+\`\`\`
+
+**Day 3: Receiver-side verification and testing.** Updated all downstream services to verify HookSniff HMAC signatures. Ran end-to-end tests with real order flows. Monitored the dashboard for delivery success rates.
+
+### The Results
+
+After 30 days on HookSniff:
+
+- **99.97% delivery rate** — Up from 94.2% with the in-house system
+- **Zero ordering issues** — FIFO delivery eliminated the out-of-order problem completely
+- **60% less engineering time** — From 15-20 hours/week to 6-8 hours/week on webhook-related work
+- **Real-time visibility** — The dashboard shows every delivery with payload, status, and latency. Debugging that used to take hours now takes minutes.
+- **Dead letter queue** — When the shipping provider had a 2-hour outage, zero events were lost. All 847 failed deliveries were automatically retried and succeeded.
+- **$0 cost** — Their volume (approximately 8,000 webhooks/day) stays within HookSniff's free tier.
+
+### What Changed for the Team
+
+The biggest impact was not technical — it was cultural. Before HookSniff, webhook reliability was a recurring source of stress. Partner teams would escalate when events went missing, and the engineering team would spend hours debugging.
+
+After HookSniff, webhooks became invisible infrastructure. Events are delivered, in order, reliably. The engineering team reclaimed 60% of their webhook maintenance time and redirected it to product features.
+
+"It is not that HookSniff is doing anything magical," said their VP of Engineering. "It is that they are doing the basics really well — ordering, retries, monitoring — and we no longer have to."
+
+### Lessons for Other Teams
+
+1. **Do not build webhook infrastructure in-house** unless it is your core product. The edge cases (ordering, retries, SSRF, dead letters) are harder than they look.
+2. **FIFO delivery matters more than you think.** Even if you think your events are independent, ordering bugs will find you.
+3. **Observability is non-negotiable.** If you cannot see every delivery, you cannot trust your system.
+4. **Start with a managed service.** You can always self-host later. Getting the architecture right first saves months of debugging.
+
+If you are running an e-commerce platform, marketplace, or any system with complex event lifecycles, we would love to help. Sign up at hooksniff.vercel.app — your first 10,000 webhooks per month are free.`,
+  },
   'why-ai-agents-need-webhooks': {
     title: 'Why AI Agents Need Webhooks',
     date: '2026-05-09',
@@ -384,6 +1365,40 @@ function getRelatedPosts(currentSlug: string, tags: string[]) {
     .map(([slug, post]) => ({ slug, ...post }));
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = posts[slug];
+  if (!post) return {};
+
+  const description = post.content.split('\n\n').find(p => !p.startsWith('#') && !p.startsWith('```') && !p.startsWith('-'))?.slice(0, 160) || post.title;
+
+  return {
+    title: `${post.title} — HookSniff Blog`,
+    description,
+    openGraph: {
+      title: post.title,
+      description,
+      type: 'article',
+      publishedTime: post.date,
+      authors: [post.author],
+      tags: post.tags,
+      images: [
+        {
+          url: '/og-blog.png',
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description,
+    },
+  };
+}
+
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
   const { slug } = await params;
   const post = posts[slug];
@@ -412,8 +1427,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <span className="text-sm text-gray-500 dark:text-slate-500">{post.date}</span>
             <span className="text-sm text-gray-400 dark:text-slate-600">·</span>
             <span className="text-sm text-gray-500 dark:text-slate-500">{post.readTime}</span>
-            <span className="text-sm text-gray-400 dark:text-slate-600">·</span>
-            <span className="text-sm text-gray-500 dark:text-slate-500">{post.author}</span>
+          </div>
+          {/* Author */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white text-sm font-bold">HS</div>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">By {post.author}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">Published on {post.date}</p>
+            </div>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">{post.title}</h1>
           <div className="flex gap-2 mt-4">
