@@ -331,10 +331,13 @@ mod tests {
 
     #[test]
     fn test_api_key_hash_deterministic() {
+        // Argon2 uses random salts, so hashes are NOT deterministic
         let key = "hr_live_same";
         let h1 = hash_api_key(key);
         let h2 = hash_api_key(key);
-        assert_eq!(h1, h2);
+        // Both should still verify against the original key
+        assert!(verify_api_key(key, &h1));
+        assert!(verify_api_key(key, &h2));
     }
 
     #[test]
@@ -362,7 +365,7 @@ mod tests {
     fn test_create_auth_cookie_contains_token() {
         let cookie = create_auth_cookie("my-token", 3600);
         assert!(cookie.contains("my-token"));
-        assert!(cookie.contains("auth_token"));
+        assert!(cookie.contains("hooksniff_token"));
         assert!(cookie.contains("HttpOnly"));
     }
 
@@ -375,7 +378,7 @@ mod tests {
     #[test]
     fn test_clear_auth_cookie() {
         let cookie = clear_auth_cookie();
-        assert!(cookie.contains("auth_token"));
+        assert!(cookie.contains("hooksniff_token"));
         assert!(cookie.contains("Max-Age=0"));
     }
 
@@ -383,14 +386,14 @@ mod tests {
     fn test_create_refresh_token_cookie() {
         let cookie = create_refresh_token_cookie("refresh-tok", 86400);
         assert!(cookie.contains("refresh-tok"));
-        assert!(cookie.contains("refresh_token"));
+        assert!(cookie.contains("hooksniff_refresh"));
         assert!(cookie.contains("HttpOnly"));
     }
 
     #[test]
     fn test_clear_refresh_token_cookie() {
         let cookie = clear_refresh_token_cookie();
-        assert!(cookie.contains("refresh_token"));
+        assert!(cookie.contains("hooksniff_refresh"));
         assert!(cookie.contains("Max-Age=0"));
     }
 
