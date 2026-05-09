@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 02:38 GMT+8
+> Son güncelleme: 2026-05-09 08:26 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -376,3 +376,17 @@ Kural: Minimal bağımlılık, OpenAPI spec gelecekte
    - Erlang/OTP 26.2.5 (source'dan)
    - Elixir 1.16.3
    - ncurses 6.4 (source'dan)
+
+### Bu Oturum (28) — 2026-05-09 08:26 GMT+8:
+
+1. **OpenClaw webchat'ten bağlantı** — Servet tekrar bağlandı
+2. **Hafıza sistemi doğrulama** — Tüm .ai-context/ dosyaları okundu
+3. **Repo klonlandı** — HookSniff workspace'e çekildi
+4. **Proje durumu tespit edildi:**
+   - API ❌ Bozuk (RateLimiter extension eksik, /v1/* rotaları 500 hatası)
+   - Dashboard ✅ Çalışıyor (hooksniff.vercel.app)
+   - Worker ✅ Deployed (GCP Cloud Run)
+   - 11 SDK ✅ Yayında
+   - CI ❌ Bozuk (GitHub Actions runner sorunu)
+5. **Hafıza güncelleme** — MEMORY.md, 2026-05-09.md güncellendi
+6. **Servet'in kuralları:** Tüm işler GitHub'a düzenli commit edilecek
