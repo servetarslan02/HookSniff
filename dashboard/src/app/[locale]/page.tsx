@@ -275,6 +275,7 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-4">
             <a href="#features" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
             <a href="#pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
+            <Link href="/get-started" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Get Started</Link>
             <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
             <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <LanguageSwitcherBtn />
@@ -296,6 +297,7 @@ export default function Home() {
             <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
             <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
             <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
+            <Link href="/get-started" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Get Started</Link>
             <Link href="/status" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <div className="flex items-center gap-2 pt-2">
               <LanguageSwitcherBtn />
