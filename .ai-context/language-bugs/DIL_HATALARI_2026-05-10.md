@@ -780,3 +780,96 @@ Python script ile 100+ dosya satır satır analiz edildi. Toplam **1408 hardcode
 | `lib/api.ts` | "Unknown error", "AbortError" |
 
 **Tarama %95+ tamamlandı.** Kalan %5: blog post content'leri (çok uzun, SEO odaklı) ve test dosyaları.
+
+---
+
+## 18. Çeviri Kalitesi — Anlam Hataları ve Dil Bilgisi Sorunları
+
+### 18.1 KRİTİK: Yanlış Dil Karakteri
+| Dil | Key | Sorun |
+|-----|-----|-------|
+| tr.json | `a4` | Çince karakter `指向` Türkçe metinde |
+| ja.json | `q4` | Korece karakter `어` Japonca metinde |
+
+### 18.2 Placeholder Eksik
+| Dil | Key | Sorun |
+|-----|-----|-------|
+| tr.json | `apiKeys.keyCount` | `{plural}` placeholder eksik |
+
+### 18.3 Anlam Kayması — Plan İsimleri
+| Dil | Key | en | Çeviri | Sorun |
+|-----|-----|-------|--------|-------|
+| tr.json | `landing.pricing.business` | "Business" | "İş" | Tek başına anlamsız, "Kurumsal" olmalı |
+
+### 18.4 Anlam Kayması — "Deliveries" (Webhook Bağlamı)
+| Dil | Çeviri | Sorun |
+|-----|--------|-------|
+| de.json | "Zustellungen" | Posta bağlamı, "Lieferungen" daha uygun |
+| fr.json | "Livraisons" | Fiziksel bağlam, "Diffusions" daha uygun |
+| ko.json | "배달" | Yemek bağlamı, "전달" daha uygun |
+
+### 18.5 Çevrilmemiş Teknik Terimler (Kasıtlı Olabilir)
+
+**tr.json — 39 untranslated:**
+- "Dashboard" (3 kez) — kasıtlı olabilir
+- "Endpoint" (5+ kez) — kasıtlı
+- "Webhook" (10+ kez) — kasıtlı
+- "Plan", "Limit", "API", "SDK" — kasıtlı
+
+**de.json — 80 untranslated:**
+- "Webhook" (15+ kez)
+- "Dashboard" (3 kez)
+- "Endpoint" (5+ kez)
+- "Server", "Image", "Back", "Delivery" — bazıları kasıtlı, bazıları çevrilmeli
+
+**ja.json — 34 untranslated:**
+- "Webhook" (15+ kez) — kasıtlı
+- "Dashboard" (2 kez) — kasıtlı
+
+**fr.json — 14 untranslated:**
+- "Dashboard" → "Tableau de bord" (çevrilmiş ama "Table" kelimesi yakalanmış)
+- "Support" (3 kez) — "Support prioritaire" doğru çeviri
+- "Notification" (2 kez) — "Notifications par e-mail" doğru
+- "Backoff" — teknik terim, kasıtlı
+
+**es.json — 6 untranslated:**
+- "Info" → "Información" (doğru çeviri, false positive)
+- "Error" → "Error" (İspanyolca'da aynı)
+- "Admin" → "Administrar" (doğru)
+- "Pro" → "Promedio" (doğru)
+
+**pt-BR.json — 3 untranslated:**
+- "Back" → "Backoff" (teknik terim)
+- "Test" → "Teste" (doğru)
+- "Alert" → "Alertas" (doğru)
+
+**ko.json — 6 untranslated:**
+- "Webhook" (6 kez) — kasıtlı
+
+### 18.6 Dil Bilgisi Sorunları
+
+**tr.json:**
+- `a4`: "sunucu URL'inize**指向** bir endpoint oluşturun" — Çince karakter cümle ortasında
+- `apiKeys.keyCount`: "{count} anahtar" — çoğul eksik ("{count} anahtar" → "{count} anahtar**lar**")
+
+**de.json:**
+- "Zustellungen" → "Lieferungen" daha uygun webhook bağlamında
+
+**fr.json:**
+- "Livraisons" → "Diffusions" veya "Envois" daha uygun webhook bağlamında
+
+**ko.json:**
+- "배달" → "전달" daha uygun webhook bağlamında
+
+### 18.7 Özet
+
+| Kategori | Sayı |
+|----------|------|
+| KRİTİK (yanlış dil karakteri) | 2 |
+| ERROR (placeholder eksik) | 1 |
+| WARNING (anlam kayması) | 4 |
+| UNTRANSLATED (çevrilmemiş terim) | ~180 |
+| Kasıtlı bırakılan (Webhook, API, SDK vb.) | ~100 |
+| Gerçek çevrilmeli olan | ~80 |
+
+**Not:** "Webhook", "API", "SDK", "Endpoint" gibi terimler çoğu dilde kasıtlı olarak İngilizce bırakılmış. Bu yaygın bir uygulama ve hata değil. Ancak "Dashboard", "Server", "Image" gibi terimler bazı dillerde çevrilmeli.
