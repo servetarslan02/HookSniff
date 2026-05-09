@@ -240,7 +240,7 @@ mod tests {
 
     #[test]
     fn test_update_portal_request_full() {
-        let json = r#"{"company_name":"Acme","primary_color":"#ff0000","dark_mode":false}"#;
+        let json = r##"{"company_name":"Acme","primary_color":"#ff0000","dark_mode":false}"##;
         let req: UpdatePortalRequest = serde_json::from_str(json).unwrap();
         assert_eq!(req.company_name.unwrap(), "Acme");
         assert_eq!(req.primary_color.unwrap(), "#ff0000");
