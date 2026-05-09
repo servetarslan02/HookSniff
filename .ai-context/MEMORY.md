@@ -1361,3 +1361,51 @@ cd dashboard && npm install && npm run build
 - `1539b60` — feat: infrastructure
 - 6 dosya, +814 satır
 - Build: ✅ 0 error, 802 static pages
+
+## 📝 Oturum 65e (2026-05-10 05:40 - 05:42 GMT+8) — Terraform + MCP
+
+### Katılanlar
+- Servet Arslan (proje sahibi)
+- AI Asistan (OpenClaw — webchat)
+
+### Yapılan İşler
+
+**11. Terraform Provider** (`terraform/`)
+- Full Go provider implementation
+- Resources: endpoints, API keys, schemas, event types
+- Data sources: single endpoint, list endpoints
+- Import support (terraform import)
+- Self-hosted base_url configuration
+- Example main.tf with complete setup
+- Go module structure
+
+**12. MCP Server** (`mcp/`)
+- 10 tools for AI agents
+- list/create/delete endpoints
+- send/list/get/replay deliveries
+- get stats, list/create API keys
+- Stdio transport (MCP standard)
+- Works with: Claude Desktop, Cursor, Windsurf, Cline, Continue
+- npx-ready npm package
+- Self-hosted support
+
+### GitHub Push
+- `655799c` — feat: Terraform provider + MCP server
+- 10 dosya, +1451 satır
+- Build: ✅ 0 error, 802 static pages
+
+### 🎉 TÜM 14 RAKİP ÖZELLİK TAMAMLANDI!
+1. ✅ Email verification UI
+2. ✅ Test/Live mode UI (OAuth)
+3. ✅ Event replay
+4. ✅ Audit log
+5. ✅ SSO/SAML
+6. ✅ Custom domain
+7. ✅ Webhook builder
+8. ✅ API versioning
+9. ✅ OAuth (Google/GitHub)
+10. ✅ Bulk operations
+11. ✅ Terraform provider
+12. ✅ MCP/AI agent
+13. ✅ Mobile SDK
+14. ✅ API playground
