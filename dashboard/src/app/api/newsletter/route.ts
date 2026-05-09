@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     // In production, this would store to a database or send to a mailing list service
     // For now, validate and return success
-    console.log(`Newsletter subscription: ${email}`);
+    // Production: store to database or mailing list
 
     return NextResponse.json({
       success: true,
