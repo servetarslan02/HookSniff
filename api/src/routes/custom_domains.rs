@@ -105,9 +105,17 @@ async fn add_domain(
 ) -> Result<Json<serde_json::Value>, AppError> {
     let domain = req.domain.trim().to_lowercase();
 
-    // Validate domain format
-    if domain.is_empty() || !domain.contains('.') {
+    // Validate domain format: max 253 chars, valid hostname pattern
+    if domain.is_empty() || domain.len() > 253 || !domain.contains('.') {
         return Err(AppError::BadRequest("Invalid domain format".into()));
+    }
+    // Reject domains with invalid characters (only allow a-z, 0-9, hyphen, dot)
+    if !domain.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.') {
+        return Err(AppError::BadRequest("Domain contains invalid characters".into()));
+    }
+    // Reject domains starting/ending with hyphen
+    if domain.starts_with('-') || domain.ends_with('-') {
+        return Err(AppError::BadRequest("Domain cannot start or end with hyphen".into()));
     }
 
     // Reject common domains
