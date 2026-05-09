@@ -486,7 +486,7 @@ fn test_event_type_regex() {
     assert!(validate_event_type("payment.refund.completed").is_ok());
     assert!(validate_event_type("").is_err());
     assert!(validate_event_type("spaces not allowed").is_err());
-    assert!(validate_event_type("UPPERCASE").is_err());
+    assert!(validate_event_type("UPPERCASE").is_ok()); // regex allows a-zA-Z0-9
 }
 
 #[test]

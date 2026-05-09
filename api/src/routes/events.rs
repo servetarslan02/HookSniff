@@ -135,3 +135,123 @@ async fn list_events(
         has_more,
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_events_params_deserialize() {
+        let json = r#"{
+            "since": "2024-01-01T00:00:00Z",
+            "status": "delivered",
+            "endpoint_id": "550e8400-e29b-41d4-a716-446655440000",
+            "event": "order.created",
+            "page": 2,
+            "per_page": 100
+        }"#;
+        let params: EventsParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.since.unwrap(), "2024-01-01T00:00:00Z");
+        assert_eq!(params.status.unwrap(), "delivered");
+        assert!(params.endpoint_id.is_some());
+        assert_eq!(params.event.unwrap(), "order.created");
+        assert_eq!(params.page.unwrap(), 2);
+        assert_eq!(params.per_page.unwrap(), 100);
+    }
+
+    #[test]
+    fn test_events_params_defaults() {
+        let json = r#"{}"#;
+        let params: EventsParams = serde_json::from_str(json).unwrap();
+        assert!(params.since.is_none());
+        assert!(params.status.is_none());
+        assert!(params.endpoint_id.is_none());
+        assert!(params.event.is_none());
+        assert!(params.page.is_none());
+        assert!(params.per_page.is_none());
+    }
+
+    #[test]
+    fn test_event_item_serialize() {
+        let item = EventItem {
+            id: Uuid::new_v4(),
+            endpoint_id: Uuid::new_v4(),
+            event: Some("order.created".to_string()),
+            status: "delivered".to_string(),
+            attempt_count: 1,
+            response_status: Some(200),
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+        let json = serde_json::to_value(&item).unwrap();
+        assert_eq!(json["event"], "order.created");
+        assert_eq!(json["status"], "delivered");
+        assert_eq!(json["attempt_count"], 1);
+        assert_eq!(json["response_status"], 200);
+    }
+
+    #[test]
+    fn test_event_item_serialize_no_event() {
+        let item = EventItem {
+            id: Uuid::new_v4(),
+            endpoint_id: Uuid::new_v4(),
+            event: None,
+            status: "pending".to_string(),
+            attempt_count: 0,
+            response_status: None,
+            created_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+        let json = serde_json::to_value(&item).unwrap();
+        assert!(json["event"].is_null());
+        assert!(json["response_status"].is_null());
+    }
+
+    #[test]
+    fn test_events_response_serialize() {
+        let resp = EventsResponse {
+            events: vec![],
+            total: 0,
+            page: 1,
+            per_page: 50,
+            has_more: false,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["total"], 0);
+        assert_eq!(json["page"], 1);
+        assert_eq!(json["per_page"], 50);
+        assert_eq!(json["has_more"], false);
+    }
+
+    #[test]
+    fn test_pagination_logic() {
+        let page = 2i64;
+        let per_page = 50i64;
+        let offset = (page - 1) * per_page;
+        assert_eq!(offset, 50);
+
+        let total = 120i64;
+        let has_more = (page * per_page) < total;
+        assert!(has_more);
+
+        let total = 100i64;
+        let has_more = (page * per_page) < total;
+        assert!(!has_more);
+    }
+
+    #[test]
+    fn test_pagination_clamping() {
+        // page should be max(1)
+        let page = Some(0i64);
+        let page = page.unwrap_or(1).max(1);
+        assert_eq!(page, 1);
+
+        // per_page should be min(200)
+        let per_page = Some(500i64);
+        let per_page = per_page.unwrap_or(50).min(200);
+        assert_eq!(per_page, 200);
+    }
+}

@@ -466,3 +466,240 @@ async fn change_role(
         "message": "Role updated successfully"
     })))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::TimeZone;
+
+    // ── Team ────────────────────────────────────────────────
+
+    #[test]
+    fn test_team_construction_and_serialization() {
+        let team = Team {
+            id: Uuid::new_v4(),
+            name: "Engineering".to_string(),
+            owner_id: Uuid::new_v4(),
+            created_at: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
+            updated_at: Utc.with_ymd_and_hms(2024, 6, 1, 12, 0, 0).unwrap(),
+        };
+        let json = serde_json::to_value(&team).unwrap();
+        assert_eq!(json["name"], "Engineering");
+        assert!(json.get("id").is_some());
+    }
+
+    #[test]
+    fn test_team_clone() {
+        let team = Team {
+            id: Uuid::new_v4(),
+            name: "Test".to_string(),
+            owner_id: Uuid::new_v4(),
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        };
+        let cloned = team.clone();
+        assert_eq!(cloned.name, team.name);
+        assert_eq!(cloned.id, team.id);
+    }
+
+    #[test]
+    fn test_team_debug() {
+        let team = Team {
+            id: Uuid::new_v4(),
+            name: "Debug".to_string(),
+            owner_id: Uuid::new_v4(),
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        };
+        let _ = format!("{:?}", team);
+    }
+
+    // ── TeamMember ──────────────────────────────────────────
+
+    #[test]
+    fn test_team_member_serialization() {
+        let member = TeamMember {
+            id: Uuid::new_v4(),
+            team_id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            role: "admin".to_string(),
+            invited_at: Utc::now(),
+            joined_at: Some(Utc::now()),
+        };
+        let json = serde_json::to_value(&member).unwrap();
+        assert_eq!(json["role"], "admin");
+        assert!(json["joined_at"].is_string());
+    }
+
+    #[test]
+    fn test_team_member_no_joined_at() {
+        let member = TeamMember {
+            id: Uuid::new_v4(),
+            team_id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            role: "viewer".to_string(),
+            invited_at: Utc::now(),
+            joined_at: None,
+        };
+        let json = serde_json::to_value(&member).unwrap();
+        assert!(json["joined_at"].is_null());
+    }
+
+    // ── TeamInvite ──────────────────────────────────────────
+
+    #[test]
+    fn test_team_invite_serialization() {
+        let invite = TeamInvite {
+            id: Uuid::new_v4(),
+            team_id: Uuid::new_v4(),
+            email: "invite@example.com".to_string(),
+            role: "editor".to_string(),
+            token: "inv_abc123".to_string(),
+            expires_at: Utc::now() + chrono::Duration::days(7),
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&invite).unwrap();
+        assert_eq!(json["email"], "invite@example.com");
+        assert_eq!(json["role"], "editor");
+    }
+
+    // ── CreateTeamRequest ───────────────────────────────────
+
+    #[test]
+    fn test_create_team_request_deserialization() {
+        let json = r#"{"name":"My Team"}"#;
+        let req: CreateTeamRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.name, "My Team");
+    }
+
+    // ── InviteRequest ───────────────────────────────────────
+
+    #[test]
+    fn test_invite_request_with_role() {
+        let json = r#"{"email":"a@b.com","role":"editor"}"#;
+        let req: InviteRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.email, "a@b.com");
+        assert_eq!(req.role, Some("editor".to_string()));
+    }
+
+    #[test]
+    fn test_invite_request_without_role() {
+        let json = r#"{"email":"a@b.com"}"#;
+        let req: InviteRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.email, "a@b.com");
+        assert!(req.role.is_none());
+    }
+
+    // ── ChangeRoleRequest ───────────────────────────────────
+
+    #[test]
+    fn test_change_role_request_deserialization() {
+        let json = r#"{"role":"admin"}"#;
+        let req: ChangeRoleRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.role, "admin");
+    }
+
+    // ── TeamResponse ────────────────────────────────────────
+
+    #[test]
+    fn test_team_response_serialization() {
+        let resp = TeamResponse {
+            id: Uuid::new_v4(),
+            name: "My Team".to_string(),
+            owner_id: Uuid::new_v4(),
+            member_count: 5,
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["name"], "My Team");
+        assert_eq!(json["member_count"], 5);
+    }
+
+    // ── TeamDetailResponse ──────────────────────────────────
+
+    #[test]
+    fn test_team_detail_response_serialization() {
+        let resp = TeamDetailResponse {
+            id: Uuid::new_v4(),
+            name: "Detail Team".to_string(),
+            owner_id: Uuid::new_v4(),
+            members: vec![],
+            invites: vec![],
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["name"], "Detail Team");
+        assert!(json["members"].as_array().unwrap().is_empty());
+        assert!(json["invites"].as_array().unwrap().is_empty());
+    }
+
+    // ── MemberResponse ──────────────────────────────────────
+
+    #[test]
+    fn test_member_response_serialization() {
+        let resp = MemberResponse {
+            id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            email: "member@team.com".to_string(),
+            name: Some("Member Name".to_string()),
+            role: "editor".to_string(),
+            invited_at: Utc::now(),
+            joined_at: Some(Utc::now()),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["email"], "member@team.com");
+        assert_eq!(json["role"], "editor");
+    }
+
+    // ── InviteResponse ──────────────────────────────────────
+
+    #[test]
+    fn test_invite_response_serialization() {
+        let resp = InviteResponse {
+            id: Uuid::new_v4(),
+            email: "pending@invite.com".to_string(),
+            role: "viewer".to_string(),
+            expires_at: Utc::now() + chrono::Duration::days(7),
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["email"], "pending@invite.com");
+        assert_eq!(json["role"], "viewer");
+    }
+
+    // ── VALID_ROLES constant ────────────────────────────────
+
+    #[test]
+    fn test_valid_roles_contains_expected() {
+        assert!(VALID_ROLES.contains(&"admin"));
+        assert!(VALID_ROLES.contains(&"editor"));
+        assert!(VALID_ROLES.contains(&"viewer"));
+        assert!(!VALID_ROLES.contains(&"owner"));
+        assert!(!VALID_ROLES.contains(&"superadmin"));
+    }
+
+    // ── validate_role ───────────────────────────────────────
+
+    #[test]
+    fn test_validate_role_valid() {
+        assert!(validate_role("admin").is_ok());
+        assert!(validate_role("editor").is_ok());
+        assert!(validate_role("viewer").is_ok());
+    }
+
+    #[test]
+    fn test_validate_role_invalid() {
+        assert!(validate_role("owner").is_err());
+        assert!(validate_role("superadmin").is_err());
+        assert!(validate_role("").is_err());
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_teams_router_construction() {
+        let _router = router();
+    }
+}

@@ -191,3 +191,112 @@ fn parse_date_to_str(s: &str) -> Option<DateTime<Utc>> {
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── SearchParams ────────────────────────────────────────
+
+    #[test]
+    fn test_search_params_all_none() {
+        let json = r#"{}"#;
+        let params: SearchParams = serde_json::from_str(json).unwrap();
+        assert!(params.q.is_none());
+        assert!(params.event.is_none());
+        assert!(params.status.is_none());
+        assert!(params.endpoint_id.is_none());
+        assert!(params.date_from.is_none());
+        assert!(params.date_to.is_none());
+        assert!(params.page.is_none());
+        assert!(params.per_page.is_none());
+    }
+
+    #[test]
+    fn test_search_params_all_some() {
+        let json = r#"{
+            "q":"test",
+            "event":"order.created",
+            "status":"delivered",
+            "endpoint_id":"11111111-1111-1111-1111-111111111111",
+            "date_from":"2024-01-01",
+            "date_to":"2024-01-31",
+            "page":2,
+            "per_page":50
+        }"#;
+        let params: SearchParams = serde_json::from_str(json).unwrap();
+        assert_eq!(params.q, Some("test".to_string()));
+        assert_eq!(params.event, Some("order.created".to_string()));
+        assert_eq!(params.status, Some("delivered".to_string()));
+        assert!(params.endpoint_id.is_some());
+        assert_eq!(params.date_from, Some("2024-01-01".to_string()));
+        assert_eq!(params.date_to, Some("2024-01-31".to_string()));
+        assert_eq!(params.page, Some(2));
+        assert_eq!(params.per_page, Some(50));
+    }
+
+    // ── SearchResult ────────────────────────────────────────
+
+    #[test]
+    fn test_search_result_serialization() {
+        let result = SearchResult {
+            deliveries: vec![],
+            total: 0,
+            page: 1,
+            per_page: 20,
+            query: "test".to_string(),
+        };
+        let json = serde_json::to_value(&result).unwrap();
+        assert_eq!(json["total"], 0);
+        assert_eq!(json["page"], 1);
+        assert_eq!(json["query"], "test");
+        assert!(json["deliveries"].as_array().unwrap().is_empty());
+    }
+
+    // ── parse_date_from_str ─────────────────────────────────
+
+    #[test]
+    fn test_parse_date_from_str_datetime() {
+        let dt = parse_date_from_str("2024-01-15T10:30:00").unwrap();
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+    }
+
+    #[test]
+    fn test_parse_date_from_str_date_only() {
+        let dt = parse_date_from_str("2024-01-15").unwrap();
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T00:00:00");
+    }
+
+    #[test]
+    fn test_parse_date_from_str_invalid() {
+        assert!(parse_date_from_str("not-a-date").is_none());
+        assert!(parse_date_from_str("").is_none());
+    }
+
+    // ── parse_date_to_str ───────────────────────────────────
+
+    #[test]
+    fn test_parse_date_to_str_datetime() {
+        let dt = parse_date_to_str("2024-01-15T10:30:00").unwrap();
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+    }
+
+    #[test]
+    fn test_parse_date_to_str_date_only_sets_end_of_day() {
+        let dt = parse_date_to_str("2024-01-15").unwrap();
+        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T23:59:59");
+    }
+
+    #[test]
+    fn test_parse_date_to_str_invalid() {
+        assert!(parse_date_to_str("invalid").is_none());
+        assert!(parse_date_to_str("").is_none());
+    }
+
+    // ── Router construction ─────────────────────────────────
+
+    #[test]
+    fn test_search_router_construction() {
+        let _router = router();
+    }
+}

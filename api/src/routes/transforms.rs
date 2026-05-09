@@ -91,7 +91,7 @@ async fn delete_rule(
     Ok(Json(serde_json::json!({ "deleted": deleted })))
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct TestTransformRequest {
     payload: serde_json::Value,
     config: TransformRuleConfig,
@@ -103,4 +103,35 @@ async fn test_transform(
     let result = transform::TransformEngine::apply(&req.payload, &req.config)
         .map_err(|e| AppError::BadRequest(e.to_string()))?;
     Ok(Json(result))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_test_transform_request_deserialize() {
+        let json = r#"{
+            "payload": {"key": "value"},
+            "config": {}
+        }"#;
+        let req: TestTransformRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.payload["key"], "value");
+    }
+
+    #[test]
+    fn test_test_transform_request_debug() {
+        let json = r#"{
+            "payload": {},
+            "config": {}
+        }"#;
+        let req: TestTransformRequest = serde_json::from_str(json).unwrap();
+        let debug = format!("{:?}", req);
+        assert!(debug.contains("TestTransformRequest"));
+    }
 }

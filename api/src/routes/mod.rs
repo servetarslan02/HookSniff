@@ -102,3 +102,38 @@ pub fn api_router() -> Router {
         .merge(inbound_routes)
         .merge(admin_routes)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── api_router construction ─────────────────────────────
+
+    #[test]
+    fn test_api_router_construction() {
+        // Should not panic; verifies all route registrations compile
+        let _router = api_router();
+    }
+
+    // ── Individual router constructions ─────────────────────
+
+    #[test]
+    fn test_all_sub_routers_construction() {
+        // Verify each sub-router can be constructed without panicking
+        let _ = auth::router();
+        let _ = billing::router();
+        let _ = admin::router();
+        let _ = teams::router();
+        let _ = inbound::router();
+        let _ = customer_portal::router();
+        let _ = analytics::router();
+        let _ = notifications::router();
+        let _ = search::router();
+        let _ = playground::router();
+        let _ = alerts::router();
+        let _ = routing::router();
+        let _ = schemas::router();
+        let _ = stream::router();
+        let _ = outbound_ips::router();
+    }
+}

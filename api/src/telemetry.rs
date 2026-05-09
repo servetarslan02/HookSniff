@@ -153,3 +153,94 @@ pub fn current_trace_id() -> String {
         uuid::Uuid::new_v4().to_string().replace('-', "")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_current_trace_id_returns_string() {
+        // Without OTel active, should return a UUID-v4 fallback (32 hex chars)
+        let trace_id = current_trace_id();
+        assert!(!trace_id.is_empty());
+        assert_eq!(trace_id.len(), 32, "trace-id should be 32 hex chars");
+        // Should be valid hex
+        assert!(
+            trace_id.chars().all(|c| c.is_ascii_hexdigit()),
+            "trace-id should be hex: {}",
+            trace_id
+        );
+    }
+
+    #[test]
+    fn test_current_trace_id_unique_per_call() {
+        // Without OTel, each call generates a new UUID
+        let id1 = current_trace_id();
+        let id2 = current_trace_id();
+        // They should be different (statistically ~guaranteed with UUID v4)
+        assert_ne!(id1, id2);
+    }
+
+    #[test]
+    fn test_current_trace_id_no_dashes() {
+        // The fallback path strips dashes from UUID
+        let trace_id = current_trace_id();
+        assert!(
+            !trace_id.contains('-'),
+            "trace-id should not contain dashes: {}",
+            trace_id
+        );
+    }
+
+    #[tokio::test]
+    async fn test_trace_id_middleware_sets_header() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use axum::middleware;
+        use axum::routing::get;
+        use axum::Router;
+        use tower::ServiceExt;
+
+        let app = Router::new()
+            .route("/test", get(|| async { "ok" }))
+            .layer(middleware::from_fn(trace_id_middleware));
+
+        let request = Request::builder()
+            .uri("/test")
+            .body(Body::empty())
+            .unwrap();
+
+        let response = app.oneshot(request).await.unwrap();
+        let trace_id = response
+            .headers()
+            .get("X-Trace-Id")
+            .expect("X-Trace-Id header should be present")
+            .to_str()
+            .unwrap();
+
+        assert_eq!(trace_id.len(), 32);
+        assert!(trace_id.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[tokio::test]
+    async fn test_trace_id_middleware_returns_ok() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use axum::middleware;
+        use axum::routing::get;
+        use axum::Router;
+        use tower::ServiceExt;
+
+        let app = Router::new()
+            .route("/health", get(|| async { "healthy" }))
+            .layer(middleware::from_fn(trace_id_middleware));
+
+        let request = Request::builder()
+            .uri("/health")
+            .body(Body::empty())
+            .unwrap();
+
+        let response = app.oneshot(request).await.unwrap();
+        assert_eq!(response.status(), axum::http::StatusCode::OK);
+    }
+}

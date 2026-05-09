@@ -60,3 +60,68 @@ async fn get_stats(
         endpoints_count: endpoints_count.0,
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_router_construction() {
+        let _r = router();
+    }
+
+    #[test]
+    fn test_stats_response_serialize() {
+        let resp = StatsResponse {
+            total_deliveries: 1000,
+            delivered: 950,
+            failed: 40,
+            pending: 10,
+            success_rate: 95.0,
+            endpoints_count: 5,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["total_deliveries"], 1000);
+        assert_eq!(json["delivered"], 950);
+        assert_eq!(json["failed"], 40);
+        assert_eq!(json["pending"], 10);
+        assert_eq!(json["success_rate"], 95.0);
+        assert_eq!(json["endpoints_count"], 5);
+    }
+
+    #[test]
+    fn test_stats_response_debug() {
+        let resp = StatsResponse {
+            total_deliveries: 0,
+            delivered: 0,
+            failed: 0,
+            pending: 0,
+            success_rate: 100.0,
+            endpoints_count: 0,
+        };
+        let debug = format!("{:?}", resp);
+        assert!(debug.contains("StatsResponse"));
+    }
+
+    #[test]
+    fn test_success_rate_calculation() {
+        // With deliveries
+        let total = 100i64;
+        let delivered = 95i64;
+        let rate = if total > 0 {
+            (delivered as f64 / total as f64) * 100.0
+        } else {
+            100.0
+        };
+        assert_eq!(rate, 95.0);
+
+        // No deliveries
+        let total = 0i64;
+        let rate = if total > 0 {
+            (delivered as f64 / total as f64) * 100.0
+        } else {
+            100.0
+        };
+        assert_eq!(rate, 100.0);
+    }
+}

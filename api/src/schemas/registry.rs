@@ -207,3 +207,182 @@ impl From<EventSchemaRow> for EventSchema {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::super::{CompatibilityResult, ValidationError};
+    use serde_json::json;
+
+    #[test]
+    fn test_event_schema_serialization_roundtrip() {
+        let schema = EventSchema {
+            id: Uuid::new_v4(),
+            name: "order.created".to_string(),
+            version: 1,
+            schema: json!({"type": "object", "properties": {"id": {"type": "string"}}}),
+            customer_id: Uuid::new_v4(),
+            created_at: chrono::Utc::now(),
+        };
+        let json_str = serde_json::to_string(&schema).unwrap();
+        let deserialized: EventSchema = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(deserialized.name, "order.created");
+        assert_eq!(deserialized.version, 1);
+        assert_eq!(deserialized.schema["type"], "object");
+    }
+
+    #[test]
+    fn test_register_schema_request_deserialization() {
+        let json = r#"{
+            "name": "user.created",
+            "schema": {"type": "object", "properties": {"email": {"type": "string"}}},
+            "auto_detect": false
+        }"#;
+        let req: RegisterSchemaRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.name, "user.created");
+        assert!(!req.auto_detect);
+        assert_eq!(req.schema["type"], "object");
+    }
+
+    #[test]
+    fn test_register_schema_request_auto_detect_default() {
+        let json = r#"{
+            "name": "test.event",
+            "schema": {}
+        }"#;
+        let req: RegisterSchemaRequest = serde_json::from_str(json).unwrap();
+        assert!(!req.auto_detect); // default is false
+    }
+
+    #[test]
+    fn test_validate_event_request_deserialization() {
+        let json = r#"{"event": {"name": "test", "value": 42}}"#;
+        let req: ValidateEventRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.event["name"], "test");
+        assert_eq!(req.event["value"], 42);
+    }
+
+    #[test]
+    fn test_validation_result_serialization() {
+        let result = ValidationResult {
+            valid: true,
+            errors: vec![],
+        };
+        let json = serde_json::to_value(&result).unwrap();
+        assert!(json["valid"].as_bool().unwrap());
+        assert!(json["errors"].as_array().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_validation_result_with_errors() {
+        let result = ValidationResult {
+            valid: false,
+            errors: vec![
+                ValidationError {
+                    path: "data.email".to_string(),
+                    message: "Expected string, got number".to_string(),
+                    expected: Some("string".to_string()),
+                    actual: Some("number".to_string()),
+                },
+            ],
+        };
+        let json = serde_json::to_value(&result).unwrap();
+        assert!(!json["valid"].as_bool().unwrap());
+        assert_eq!(json["errors"].as_array().unwrap().len(), 1);
+        assert_eq!(json["errors"][0]["path"], "data.email");
+    }
+
+    #[test]
+    fn test_validation_error_serialization() {
+        let err = ValidationError {
+            path: "root.field".to_string(),
+            message: "Missing required field".to_string(),
+            expected: Some("present".to_string()),
+            actual: Some("missing".to_string()),
+        };
+        let json = serde_json::to_value(&err).unwrap();
+        assert_eq!(json["path"], "root.field");
+        assert_eq!(json["message"], "Missing required field");
+        assert_eq!(json["expected"], "present");
+        assert_eq!(json["actual"], "missing");
+    }
+
+    #[test]
+    fn test_validation_error_optional_fields() {
+        let err = ValidationError {
+            path: "".to_string(),
+            message: "error".to_string(),
+            expected: None,
+            actual: None,
+        };
+        let json = serde_json::to_value(&err).unwrap();
+        assert!(json["expected"].is_null());
+        assert!(json["actual"].is_null());
+    }
+
+    #[test]
+    fn test_event_schema_clone() {
+        let schema = EventSchema {
+            id: Uuid::new_v4(),
+            name: "test".to_string(),
+            version: 1,
+            schema: json!({"type": "string"}),
+            customer_id: Uuid::new_v4(),
+            created_at: chrono::Utc::now(),
+        };
+        let cloned = schema.clone();
+        assert_eq!(cloned.id, schema.id);
+        assert_eq!(cloned.name, schema.name);
+        assert_eq!(cloned.version, schema.version);
+    }
+
+    #[test]
+    fn test_compatibility_result_serialization() {
+        let result = CompatibilityResult {
+            compatible: true,
+            issues: vec![],
+        };
+        let json = serde_json::to_value(&result).unwrap();
+        assert!(json["compatible"].as_bool().unwrap());
+
+        let result_with_issues = CompatibilityResult {
+            compatible: false,
+            issues: vec!["Type changed at 'email'".to_string()],
+        };
+        let json = serde_json::to_value(&result_with_issues).unwrap();
+        assert!(!json["compatible"].as_bool().unwrap());
+        assert_eq!(json["issues"][0], "Type changed at 'email'");
+    }
+
+    #[test]
+    fn test_schema_registry_new() {
+        // We can't easily create a PgPool without a real database,
+        // but we can verify the struct signature compiles correctly.
+        // This test ensures the type exists and has the expected shape.
+        // SchemaRegistry::new requires PgPool, so we just verify the
+        // EventSchemaRow -> EventSchema conversion works.
+        let row = EventSchemaRow {
+            id: Uuid::new_v4(),
+            name: "test_schema".to_string(),
+            version: 2,
+            schema: json!({"type": "object", "properties": {"name": {"type": "string"}}}),
+            customer_id: Uuid::new_v4(),
+            created_at: chrono::Utc::now(),
+        };
+        let schema: EventSchema = row.into();
+        assert_eq!(schema.name, "test_schema");
+        assert_eq!(schema.version, 2);
+        assert_eq!(schema.schema["type"], "object");
+    }
+
+    #[test]
+    fn test_register_schema_request_auto_detect_true() {
+        let json = r#"{
+            "name": "auto.schema",
+            "schema": {},
+            "auto_detect": true
+        }"#;
+        let req: RegisterSchemaRequest = serde_json::from_str(json).unwrap();
+        assert!(req.auto_detect);
+    }
+}

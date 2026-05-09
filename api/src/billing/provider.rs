@@ -111,3 +111,209 @@ pub trait PaymentProviderImpl: Send + Sync {
     /// Cancel a subscription.
     async fn cancel_subscription(&self, provider_subscription_id: &str) -> Result<(), AppError>;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── PaymentProvider::parse_str ─────────────────────────────
+
+    #[test]
+    fn parse_str_polar() {
+        assert_eq!(PaymentProvider::parse_str("polar"), PaymentProvider::Polar);
+        assert_eq!(PaymentProvider::parse_str("Polar"), PaymentProvider::Polar);
+        assert_eq!(PaymentProvider::parse_str("POLAR"), PaymentProvider::Polar);
+    }
+
+    #[test]
+    fn parse_str_iyzico() {
+        assert_eq!(PaymentProvider::parse_str("iyzico"), PaymentProvider::Iyzico);
+        assert_eq!(PaymentProvider::parse_str("Iyzico"), PaymentProvider::Iyzico);
+        assert_eq!(PaymentProvider::parse_str("IYZICO"), PaymentProvider::Iyzico);
+    }
+
+    #[test]
+    fn parse_str_stripe_default() {
+        assert_eq!(PaymentProvider::parse_str("stripe"), PaymentProvider::Stripe);
+        assert_eq!(PaymentProvider::parse_str("Stripe"), PaymentProvider::Stripe);
+        assert_eq!(PaymentProvider::parse_str(""), PaymentProvider::Stripe);
+        assert_eq!(PaymentProvider::parse_str("unknown"), PaymentProvider::Stripe);
+    }
+
+    // ── PaymentProvider::as_str ────────────────────────────────
+
+    #[test]
+    fn as_str_all_variants() {
+        assert_eq!(PaymentProvider::Stripe.as_str(), "stripe");
+        assert_eq!(PaymentProvider::Polar.as_str(), "polar");
+        assert_eq!(PaymentProvider::Iyzico.as_str(), "iyzico");
+    }
+
+    // ── Roundtrip ──────────────────────────────────────────────
+
+    #[test]
+    fn parse_str_as_str_roundtrip() {
+        for v in &[
+            PaymentProvider::Stripe,
+            PaymentProvider::Polar,
+            PaymentProvider::Iyzico,
+        ] {
+            assert_eq!(PaymentProvider::parse_str(v.as_str()), *v);
+        }
+    }
+
+    // ── PaymentProvider serde ──────────────────────────────────
+
+    #[test]
+    fn payment_provider_serde_roundtrip() {
+        for v in &[
+            PaymentProvider::Stripe,
+            PaymentProvider::Polar,
+            PaymentProvider::Iyzico,
+        ] {
+            let json = serde_json::to_string(v).unwrap();
+            let deserialized: PaymentProvider = serde_json::from_str(&json).unwrap();
+            assert_eq!(*v, deserialized);
+        }
+    }
+
+    // ── CheckoutResult ─────────────────────────────────────────
+
+    #[test]
+    fn checkout_result_debug() {
+        let result = CheckoutResult {
+            checkout_url: "https://example.com/checkout".to_string(),
+            session_id: "sess_123".to_string(),
+        };
+        let debug = format!("{:?}", result);
+        assert!(debug.contains("checkout_url"));
+        assert!(debug.contains("session_id"));
+    }
+
+    // ── WebhookResult variants ─────────────────────────────────
+
+    #[test]
+    fn webhook_result_subscription_created() {
+        let customer_id = Uuid::new_v4();
+        let result = WebhookResult::SubscriptionCreated {
+            customer_id,
+            plan: Plan::Pro,
+            provider_customer_id: Some("cust_123".to_string()),
+            provider_subscription_id: Some("sub_456".to_string()),
+        };
+        match result {
+            WebhookResult::SubscriptionCreated {
+                customer_id: cid,
+                plan,
+                provider_customer_id,
+                provider_subscription_id,
+            } => {
+                assert_eq!(cid, customer_id);
+                assert_eq!(plan, Plan::Pro);
+                assert_eq!(provider_customer_id.as_deref(), Some("cust_123"));
+                assert_eq!(provider_subscription_id.as_deref(), Some("sub_456"));
+            }
+            _ => panic!("Expected SubscriptionCreated"),
+        }
+    }
+
+    #[test]
+    fn webhook_result_subscription_created_with_none_fields() {
+        let result = WebhookResult::SubscriptionCreated {
+            customer_id: Uuid::new_v4(),
+            plan: Plan::Free,
+            provider_customer_id: None,
+            provider_subscription_id: None,
+        };
+        match result {
+            WebhookResult::SubscriptionCreated {
+                provider_customer_id,
+                provider_subscription_id,
+                ..
+            } => {
+                assert!(provider_customer_id.is_none());
+                assert!(provider_subscription_id.is_none());
+            }
+            _ => panic!("Expected SubscriptionCreated"),
+        }
+    }
+
+    #[test]
+    fn webhook_result_subscription_updated() {
+        let result = WebhookResult::SubscriptionUpdated {
+            provider_subscription_id: "sub_789".to_string(),
+            plan: Plan::Business,
+            status: "active".to_string(),
+        };
+        match result {
+            WebhookResult::SubscriptionUpdated {
+                provider_subscription_id,
+                plan,
+                status,
+            } => {
+                assert_eq!(provider_subscription_id, "sub_789");
+                assert_eq!(plan, Plan::Business);
+                assert_eq!(status, "active");
+            }
+            _ => panic!("Expected SubscriptionUpdated"),
+        }
+    }
+
+    #[test]
+    fn webhook_result_subscription_canceled() {
+        let result = WebhookResult::SubscriptionCanceled {
+            provider_subscription_id: "sub_cancel".to_string(),
+        };
+        match result {
+            WebhookResult::SubscriptionCanceled {
+                provider_subscription_id,
+            } => {
+                assert_eq!(provider_subscription_id, "sub_cancel");
+            }
+            _ => panic!("Expected SubscriptionCanceled"),
+        }
+    }
+
+    #[test]
+    fn webhook_result_payment_succeeded() {
+        let result = WebhookResult::PaymentSucceeded {
+            provider_tx_id: "tx_001".to_string(),
+            amount_cents: 4900,
+            currency: "USD".to_string(),
+        };
+        match result {
+            WebhookResult::PaymentSucceeded {
+                provider_tx_id,
+                amount_cents,
+                currency,
+            } => {
+                assert_eq!(provider_tx_id, "tx_001");
+                assert_eq!(amount_cents, 4900);
+                assert_eq!(currency, "USD");
+            }
+            _ => panic!("Expected PaymentSucceeded"),
+        }
+    }
+
+    #[test]
+    fn webhook_result_payment_failed() {
+        let result = WebhookResult::PaymentFailed {
+            provider_tx_id: "tx_fail".to_string(),
+        };
+        match result {
+            WebhookResult::PaymentFailed { provider_tx_id } => {
+                assert_eq!(provider_tx_id, "tx_fail");
+            }
+            _ => panic!("Expected PaymentFailed"),
+        }
+    }
+
+    #[test]
+    fn webhook_result_ignored() {
+        let result = WebhookResult::Ignored;
+        match result {
+            WebhookResult::Ignored => {}
+            _ => panic!("Expected Ignored"),
+        }
+    }
+}
