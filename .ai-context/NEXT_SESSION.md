@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 04:25 GMT+8
+> Son güncelleme: 2026-05-10 04:54 GMT+8
 
 ---
 
@@ -17,39 +17,58 @@
 
 ---
 
-## ✅ SON OTURUM (64) — Yapılan İşler
+## ✅ SON OTURUM (64) — Yapılan İşler (2026-05-10 04:13-04:54 GMT+8)
 
-### Compare Page Overhaul + 10 New Pages
+### Yeni Sayfalar (11 adet)
+| Sayfa | İçerik |
+|-------|--------|
+| `/build-vs-buy` | 12 boyut, maliyet analizi, 6 FAQ |
+| `/webhooks` | Hub: guides, glossary, providers, alternatives |
+| `/webhooks/glossary` | 35+ webhook terimi |
+| `/webhooks/guides` | 4 kategori rehber |
+| `/providers` | Provider hub |
+| `/providers/stripe` | Stripe setup, events, kod örneği |
+| `/providers/github` | GitHub setup, events |
+| `/providers/shopify` | Shopify setup, events |
+| `/alternatives/svix-alternatives` | 4 servis karşılaştırma |
+| `/alternatives/hookdeck-alternatives` | 5 servis + pros/cons |
+| `/alternatives/convoy-alternatives` | 5 servis karşılaştırma |
 
-**Yeni sayfalar (11 adet):**
-| Sayfa | İçerik | Durum |
-|-------|--------|-------|
-| `/build-vs-buy` | 12 boyut karşılaştırma, maliyet analizi, 6 FAQ | ✅ |
-| `/webhooks` | Webhooks hub (guides, glossary, providers, alternatives) | ✅ |
-| `/webhooks/glossary` | 35+ webhook terimi tanımlı | ✅ |
-| `/webhooks/guides` | 4 kategori: Fundamentals, Implementation, Advanced, Providers | ✅ |
-| `/providers` | Provider guides hub | ✅ |
-| `/providers/stripe` | Stripe webhook setup, events tablosu, Node.js kod örneği | ✅ |
-| `/providers/github` | GitHub webhook setup, events tablosu | ✅ |
-| `/providers/shopify` | Shopify webhook setup, events tablosu | ✅ |
-| `/alternatives/svix-alternatives` | 4 servis karşılaştırma (HookSniff, Hookdeck, Hook0, Convoy) | ✅ |
-| `/alternatives/hookdeck-alternatives` | 5 servis karşılaştırma + pros/cons | ✅ |
-| `/alternatives/convoy-alternatives` | 5 servis karşılaştırma | ✅ |
+### Compare Sayfası Tam Yeniden Yazım
+- **TL;DR** — 5 anahtar takeaway
+- **Scorecard** — 6 kategori, toplam puan (HookSniff: 50, Svix: 51, Hookdeck: 41, Hook0: 38)
+- **20 detaylı section** — Her biri 4 servis, açıklama, badge, winner
+- **Sections:** Production Track Record, Uptime SLA, Pricing, SDKs, FIFO, CloudEvents, Schema Registry, Portal, Smart Routing, Transformations, Inbound Proxy, Streaming, Rate Limiting, Latency Alerts, Standard Webhooks, Compliance, Data Residency, Open Source, DX, Business Continuity
+- **Sosyal kanıt** — 3 testimonial
+- **8 FAQ** — HIPAA eksikliği dürüstçe belirtilmiş
+- **Deep dive links** — 6 link
 
-**Güncellenen sayfalar (2 adet):**
-| Sayfa | Değişiklik | Durum |
-|-------|-----------|-------|
-| `/compare` | Sosyal kanıt (3 testimonial), 7 FAQ, "Why it matters" açıklamaları, deep dive links | ✅ |
-| Footer | 4 sütunlu SEO yapısı: Product, Compare, Resources, Company | ✅ |
+### Footer Yeniden Yapılandırma
+- 4 sütun: Product, Compare (8 link), Resources (9 link), Company
 
-### GitHub Push
-- `2116baa` — feat: comprehensive compare page overhaul + 10 new pages
-- 13 dosya changed, +1604 satır, -58 satır
-- Build: ✅ 0 error, 0 warning
+### Rakip Analizi Düzeltmeleri
+- Svix SDK sayısı: 6→11
+- Svix yeni ürünler: Stream, Ingest, Diom
+- Svix compliance: HIPAA, PCI-DSS eklendi
+- Hookdeck: MCP, Radar keşfedildi
+- Hook0: MCP Server keşfedildi
+- Convoy: GitHub 404, muhtemelen durdurulmuş
+- API'deki gizli özellikler ortaya çıkarıldı: static IPs, streaming, routing, CLI, alerts
 
-### Toplam
-- 83 locale route × 8 dil = 664+ static page
-- Build başarılı, GitHub push başarılı
+### Bug Düzeltmeleri
+- Server/client split (SEO metadata)
+- Dead link /docs/examples
+- Glossary quick nav 10→34
+- Accessibility (aria-expanded, type=button)
+
+### GitHub Push Özeti
+- `2116baa` — feat: 10 new pages
+- `ab38999` — fix: SEO metadata, dead links
+- `d2b33e6` — fix: accessibility
+- `3610697` — fix: accurate competitor data
+- `8d1f57b` — fix: hidden features revealed
+- `3f37367` — feat: compare page rewrite (Svix-level)
+- **13 dosya changed, +1604 satır, 664+ static page**
 
 ---
 
@@ -57,16 +76,14 @@
 
 | # | Görev | Öncelik | Not |
 |---|-------|---------|-----|
-| 1 | **Repo public/private kararı** | 🔴 Kritik | GHA sınırsız dakika |
+| 1 | **SOC 2 Type 2 audit** | 🔴 Kritik | Scorecard'ta 4 puan fark |
 | 2 | Newsletter → DB taşıma | Yüksek | Neon PostgreSQL |
 | 3 | Newsletter → double opt-in email | Yüksek | Gmail API |
 | 4 | k6 load test | Orta | Gerçek trafik simülasyonu |
 | 5 | Staging ortamı | Orta | GCP'de staging |
 | 6 | OpenAPI spec doldurma | Orta | Mevcut spec boş |
 | 7 | Terraform provider | Orta | Svix ve Hookdeck'te var |
-| 8 | CLI tool | Orta | Svix ve Hookdeck'te var |
-| 9 | Rakip logo'ları ekleme | Düşük | Compare sayfası görsel iyileştirme |
-| 10 | Pricing calculator | Düşük | Hookdeck'te var (events slider) |
+| 8 | HIPAA compliance | Düşük | Dış denetim gerekli |
 
 ---
 
@@ -74,7 +91,6 @@
 
 - **Oturumlar 1 saat** — planlı çalış, GitHub push sık yap
 - **Hafıza GitHub'da kalıcı** — `.ai-context/`
-- **Token rotation** — en acil iş
-- **Newsletter API** — şu an in-memory, production'da DB gerekli
-- **Build vs Buy sayfası** — Svix'in en güçlü SEO sayfasıydı, artık bizde de var
-- **Footer SEO** — Hook0 tarzı 4 sütunlu yapı eklendi
+- **Scorecard dürüst** — Svix 51, biz 50 (compliance farkı)
+- **API'de gizli özellikler var** — compare sayfasında artık gösteriliyor
+- **Compare sayfası Svix seviyesinde** — 20 section, scorecard, TL;DR
