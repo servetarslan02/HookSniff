@@ -1,44 +1,37 @@
 # NEXT_SESSION.md — Yeni Oturum Rehberi
 
-> Son güncelleme: 2026-05-10 00:19 GMT+8
-> Oturum: 42
+> Son güncelleme: 2026-05-10 00:55 GMT+8
+> Oturum: 43
 
 ---
 
 ## 🔴 ACİL: İlk Yapılacak İş
 
-### 1. API Deploy (CORS + DB migration fix)
-Build `0b79877` push edildi ama deploy edilemedi (oturum kapandı).
-
-**Deploy adımları:**
-```bash
-export PATH="/opt/google-cloud-sdk/bin:$PATH"
-
-# Build
-cd /root/.openclaw/workspace/HookSniff
-gcloud builds submit --config=cloudbuild.yaml --region=europe-west1
-
-# Deploy
-gcloud run deploy hooksniff-api \
-  --image europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest \
-  --region europe-west1 --platform managed --allow-unauthenticated \
-  --port 3000 --memory 512Mi --cpu 1 --min-instances 0 --max-instances 3 --timeout 300 \
-  --set-env-vars "APP_ENV=production,RUST_LOG=info,RATE_LIMIT_STORE=redis,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,APP_URL=https://hooksniff.vercel.app,CORS_ORIGINS=https://hooksniff.vercel.app" \
-  --set-secrets "DATABASE_URL=neon-db-url:latest,REDIS_URL=upstash-redis-url:latest,JWT_SECRET=jwt-secret:latest,HMAC_SECRET=hmac-secret:latest,POLAR_ACCESS_TOKEN=polar-token:latest,POLAR_WEBHOOK_SECRET=polar-webhook:latest,POLAR_PRODUCT_PRO=polar-pro:latest,POLAR_PRODUCT_BUSINESS=polar-business:latest,OTEL_EXPORTER_OTLP_HEADERS=otel-headers:latest,GCP_SA_JSON=gcp-sa-json:latest" \
-  --project hooksniff-app
-```
-
-**Test:**
-```bash
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@test.com","password":"Test123!"}'
-```
+### 1. Dashboard Deploy Kontrol
+Vercel deploy limiti aşılmıştı (100/gün). Yeni oturumda kontrol et:
+- `curl -s "https://api.vercel.com/v5/now/deployments?projectId=prj_cSIVYHpCoAtoihRp8xlXIun1KVSR&limit=3"` ile son deploy durumuna bak
+- READY ise → login test et
+- Hâlâ ERROR ise → Servet'e Vercel'dan manuel Redeploy basmasını söyle
 
 ### 2. Login Test
 - Dashboard: https://hooksniff.vercel.app
-- Register/Login dene
-- 200 dönerse ✅, 500 dönerse log kontrol et
+- Email: `servetarslan02@gmail.com`
+- Şifre: `Alayci_165`
+- "Failed to fetch" hatası gelirse → CSP hâlâ sorun, deploy gerçekleşmemiş
+
+### 3. API Deploy (hâlâ bekliyor)
+CORS fix + DB migration push edildi ama Cloud Run'a deploy edilemedi.
+gcloud CLI kurulu (`/opt/google-cloud-sdk/bin/gcloud`), SA key mevcut.
+
+```bash
+export PATH="/opt/google-cloud-sdk/bin:$PATH"
+cd /root/.openclaw/workspace/HookSniff
+gcloud builds submit --config=cloudbuild.yaml --region=europe-west1
+gcloud run deploy hooksniff-api \
+  --image europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest \
+  --region europe-west1 --platform managed --allow-unauthenticated \
+  --project hooksniff-app
+```
 
 ---
 
@@ -46,32 +39,29 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/lo
 
 | Servis | Durum | Not |
 |--------|-------|-----|
-| Dashboard | ✅ Live | hooksniff.vercel.app |
-| API | ⚠️ Deploy bekliyor | CORS fix + DB migration push edildi |
+| Dashboard | ⚠️ Deploy bekliyor | CSP fix + vitest fix push edildi, Vercel limit aşıldı |
+| API | ✅ Çalışıyor | Eki deploy'dan servis ediliyor |
 | Worker | ✅ Deployed | GCP Cloud Run |
-| Neon DB | ✅ Çalışıyor | 43+ tablo |
+| Neon DB | ✅ Çalışıyor | 4 tablo eklendi (oturum 42) |
 | Redis | ⚠️ TLS hatası | In-memory fallback |
-| Email | ❌ SA JSON parse hatası | `_type` field eksik |
 
-## 🔧 Düzeltilen Sorunlar (Oturum 40-41)
+## 🔧 Oturum 42'de Yapılan İşler
 
-| Sorun | Durum | Commit |
-|-------|-------|--------|
-| CORS AllowHeaders wildcard | ✅ | `5c2d915` |
-| CORS AllowMethods wildcard | ✅ | `6477960` |
-| email_verified + totp columns | ✅ | `5762489` |
-| refresh_tokens tablosu | ✅ | `0b79877` |
-| password_reset_tokens tablosu | ✅ | `0b79877` |
-| email_verification_tokens tablosu | ✅ | `0b79877` |
-| device_tokens tablosu | ✅ | `0b79877` |
-| test_mode columns | ✅ | `0b79877` |
-| STRING→TEXT migration files | ✅ | `5762489` |
+| İş | Durum | Commit |
+|----|-------|--------|
+| 4 eksik tablo (refresh_tokens vb.) | ✅ | Database direkt |
+| Admin hesap ayarı | ✅ | Database direkt |
+| CSP hostname fix | ✅ | `b79fd88` |
+| vitest.config.ts fix | ✅ | `87c3132` |
+| NEXT_PUBLIC_API_URL="/api" | ✅ | Vercel API |
+| gcloud CLI kurulumu | ✅ | `/opt/google-cloud-sdk/` |
 
-## ⚠️ Kalan Sorunlar
+## ⚠️ Kritik Hatırlatma
 
-1. **Redis TLS** — `can't connect with TLS, the feature is not enabled`
-2. **GCP SA JSON** — `missing field _type` → email servisi çalışmıyor
-3. **Cloud Build Trigger** — GitHub push → otomatik deploy kurulmalı
+- **Vercel token:** `vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h`
+- **GCP SA key:** `/tmp/gcp-sa.json` (oturum başında yeniden indirilmeli)
+- **GitHub token:** Servet'in paylaştığı token — yeni PAT oluşturulmalı (güvenlik)
+- **Vercel deploy limiti:** Günde 100, dikkatli kullan
 
 ## 📌 Proje Bilgileri
 
@@ -82,4 +72,4 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/lo
 | **API** | https://hooksniff-api-1046140057667.europe-west1.run.app |
 | **Worker** | https://hooksniff-worker-1046140057667.europe-west1.run.app |
 | **GCP Project** | hooksniff-app |
-| **GCP SA** | hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com |
+| **Vercel Project** | prj_cSIVYHpCoAtoihRp8xlXIun1KVSR |

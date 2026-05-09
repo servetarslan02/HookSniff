@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-09 19:55 GMT+8
+> Son güncelleme: 2026-05-10 00:55 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -104,12 +104,14 @@ cd dashboard && npm install && npm run build
 
 | Görev | Durum | Not |
 |-------|-------|------|
+| Vercel deploy kontrol | 🔴 ACİL | Deploy limiti aşıldı, yarın otomatik olur veya manuel Redeploy |
+| Login test | 🔴 ACİL | Deploy sonrası dashboard'da dene |
 | API deploy (GCP Console) | 🔴 ACİL | RateLimiter fix deploy edilmeli |
 | iyzico hesap | ❌ | Vergi levhası + banka hesabı |
-| Java/Kotlin SDK publish | ✅ | Oturum 33'te tamamlandı — Maven Central'a yüklendi |
 | npm token rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
 | GCP SA key rotate | ⚠️ | Eski key paylaşıldı, yeni key oluştur |
 | GitHub PAT rotate | ⚠️ | Eski token paylaşıldı, yeni token oluştur |
+| Vercel token rotate | ⚠️ | Bu oturumda paylaşıldı, yeni token oluştur |
 
 ---
 
@@ -151,6 +153,14 @@ cd dashboard && npm install && npm run build
 ---
 
 ## 🔧 Düzeltilen Sorunlar (Tüm Oturumlar)
+
+### Oturum 42 (2026-05-10)
+- ✅ 4 eksik tablo oluşturuldu (refresh_tokens, password_reset_tokens, email_verification_tokens, device_tokens)
+- ✅ Admin hesap: servetarslan02@gmail.com → is_admin=true
+- ✅ CSP hostname fix — wildcard çok seviyeli subdomain eşleşmiyordu
+- ✅ vitest.config.ts build fix — oxc.jsx type error
+- ✅ NEXT_PUBLIC_API_URL="/api" (Vercel proxy)
+- ✅ gcloud CLI kuruldu + SA key ile auth
 
 ### Oturum 28-30 (2026-05-09)
 - ✅ RateLimiter layer sıralaması fix (`4bbd9aa`)
@@ -200,6 +210,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 42 | 2026-05-10 00:21 | **Kritik fix oturumu** — 4 eksik tablo (refresh_tokens vb.), CSP hostname fix, vitest build fix, gcloud kurulumu, admin hesap, Vercel env var, deploy limiti tespit |
 | 39 | 2026-05-09 23:06 | **Strategy oturumu** — Status Page raporu (22 bölüm), Technical Cleanup raporu (10 bölüm), Conversion Funnel raporu, LAUNCH fiyat düzeltmesi ($49→$29), Grafana OTEL token tespiti (public!), GCP WIF rehberi, 19 yeni rapor planlandı |
 | 38 | 2026-05-09 22:06 | Dashboard coverage artırma — 4 detail page fix + 45 yeni test, 60 dosya/471 test/0 hata |
 | 37 | 2026-05-09 21:39 | Dashboard test coverage tamamlandı — 24 yeni test dosyası, 57 dosya/426 test/0 hata, tüm sayfalar covered |
