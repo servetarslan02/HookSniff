@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 01:25 GMT+8
+> Son güncelleme: 2026-05-10 01:35 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -281,23 +281,43 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## 📝 Oturum 44 (2026-05-10 01:20 - 01:25 GMT+8)
+## 📝 Oturum 44 (2026-05-10 01:20 - 01:35 GMT+8)
 
 ### Yapılan İşler
 - 2 strateji raporu daha oluşturuldu (internet araştırmasıyla doğrulanmış):
-  1. `EMAIL_MARKETING_STRATEGY.md` (16.5KB) — Resend + Gmail API hybrid, lifecycle akışları, drip campaigns, benchmark'lar
-  2. `CONTENT_MARKETING_STRATEGY.md` (20KB) — Blog takvimi, video stratejisi, newsletter, sosyal medya, ROI verileri
+  1. `EMAIL_MARKETING_STRATEGY.md` (~19KB) — Resend + Gmail API hybrid, lifecycle akışları, drip campaigns, benchmark'lar
+  2. `CONTENT_MARKETING_STRATEGY.md` (~25KB) — Blog takvimi, video stratejisi, newsletter, sosyal medya, ROI verileri
 - **Öncelik 2 tamamlandı: 5/5 rapor** ✅
 - Toplam rapor durumu: **10/19 tamamlandı** (Öncelik 1: 5/5, Öncelik 2: 5/5)
+- Raporlar düzeltildi — eksik veriler tamamlandı:
+  - ActiveCampaign, MailerLite, Mailchimp email benchmarks (tam sayfa doğrulanmış)
+  - Genesys Growth content marketing ROI (tam sayfa doğrulanmış)
+  - Oliver Munro B2B SEO statistics (tam sayfa doğrulanmış)
+  - Svix blog analizi (10 post incelendi — changelog ağırlıklı, educational content yok)
+  - Hookdeck blog analizi (10 post incelendi — industry news + teknik)
 
-### Doğrulanmış Yeni Veriler
-- **Resend pricing:** Free 3,000/mo, Pro $20/mo (50K), Scale $90/mo (100K) — resend.com/pricing
-- **Postmark pricing:** Free 100/mo, $15/mo (10K), $16.50/mo (10K) — postmarkapp.com/pricing
-- **Email ROI:** 3,600-4,000% (Oliver Munro 2026)
-- **Developer tools open rate:** %26.3 (Folderly 2025)
-- **SEO ROI:** %702, break-even 7 ay (Oliver Munro 2026)
-- **Organic search → B2B revenue:** %44.6 (Oliver Munro 2026)
-- **B2B SaaS churn:** %3.5/yıl (Oliver Munro 2026)
+### Doğrulanmış Veriler (İkinci Revizyon — Tam Sayfa Çekilmiş)
+
+**Email Marketing:**
+- ActiveCampaign: Software open rate %36.20, click rate %6.67 (2025 verileri)
+- MailerLite: Software open rate %39.31, click rate %1.15 (3.6M kampanya, 181K hesap)
+- Mailchimp: All users open rate %35.63, click rate %2.62
+- Email ROI: $42:$1 (Genesys Growth / Firework 2026)
+- Resend: Free 3,000/mo, Pro $20/mo (50K) — resend.com/pricing
+- Postmark: Free 100/mo, $15/mo (10K) — postmarkapp.com/pricing
+
+**Content Marketing:**
+- SEO ROI: %748 (Data Mania, 119 şirket verisi)
+- Content marketing ROI: $3:$1, geleneksel pazarlamadan %62 daha ucuz
+- Organic search → B2B trafik: %76, revenue: %44.6
+- SEO close rate: %14.6 vs outbound %1.7
+- Blog post 16+/ay → 4.5x lead artışı
+- Video ROI: Metin içerikten %49 daha hızlı
+
+**Rakip Blog Analizi:**
+- Svix: Changelog ağırlıklı (4/10 post), teknik deep-dive (3/10), educational content YOK
+- Hookdeck: Industry news (3/10), ürün güncellemesi (3/10), teknik (2/10), educational content YOK
+- HookSniff fırsatı: Educational content + SDK tutorial'lar + video → rakiplerden ayrışma
 
 ### Sonraki Oturum İçin Kalan (Öncelik 3 — 9 rapor)
 - LOAD_TESTING_STRATEGY
