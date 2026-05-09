@@ -90,26 +90,32 @@ cd dashboard && npm install && npm run build
 
 ---
 
-## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 18:15)
+## 📊 KOD KALİTESİ (Son İnceleme: 2026-05-09 18:19)
 
 | Kategori | Puan | Not |
 |----------|------|-----|
-| Kod kalitesi | 8/10 | Temiz Rust, modular yapı |
+| Kod kalitesi | 9/10 | TODO/FIXME temizlendi |
 | Güvenlik | 9/10 | SSRF, HMAC, Argon2, constant-time |
-| Test coverage | 7/10 | 157 test, integration eksik |
-| Dokümantasyon | 8/10 | README, OpenAPI, inline comments |
+| Test coverage | 8/10 | 172 test (+15 yeni integration test) |
+| Dokümantasyon | 9/10 | OpenAPI spec tamamlandı |
 | SDK tutarlılığı | 8/10 | 11 SDK, base URL'ler doğru |
-| **Genel** | **7.8/10** | Production-ready |
+| **Genel** | **8.6/10** | Production-ready |
 
-### Düzeltilen Sorunlar (Bu Oturum)
+### Düzeltilen Sorunlar (Oturum 29-30)
 - ✅ `portal/embed.js` eski domain temizlendi
 - ✅ `tests/load/load_test.js` eski domain temizlendi
 - ✅ Kapsamlı inceleme raporu oluşturuldu
+- ✅ `migrations/037_notification_preferences.sql` — tablo oluşturuldu
+- ✅ `customer_portal.rs` TODO'lar kaldırıldı, gerçek DB bağlantısı
+- ✅ `settings/page.tsx` FIXME kaldırıldı, `/portal/notifications` API'ye bağlandı
+- ✅ `db.rs` migration 037 eklendi
+- ✅ `openapi.yaml` — NotificationPreferences schema eklendi
+- ✅ `integration.rs` — +15 yeni test (SSRF, validation, circuit breaker, signing, CSV injection)
 
-### Kalan Sorunlar
-- ⚠️ `customer_portal.rs` 2 TODO (notification_preferences migration)
-- ⚠️ `settings/page.tsx` 1 FIXME (notifications endpoint)
-- ⚠️ OpenAPI spec boş
+### Kalan Servet Görevleri
+- ⚠️ API deploy (GCP Console manuel)
+- ⚠️ iyzico hesap
+- ⚠️ 4 SDK publish (Java, Kotlin, Ruby, Elixir)
 
 ---
 
@@ -117,6 +123,7 @@ cd dashboard && npm install && npm run build
 
 | Oturum | Tarih | Konu |
 |--------|-------|------|
+| 30 | 2026-05-09 18:19 | notification_preferences migration, FIXME, integration test, OpenAPI |
 | 29 | 2026-05-09 18:00 | Kapsamlı kod tabanlı inceleme, eski domain temizliği |
 | 28 | 2026-05-09 08:26 | RateLimiter fix, kod incelemesi |
 | 27 | 2026-05-09 06:26 | PHP SDK Packagist publish |
