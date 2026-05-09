@@ -649,3 +649,74 @@ Hardcoded: "API Server", "PostgreSQL Database", "Redis Cache", "Webhook Queue", 
 - "HookSniff Management"
 
 **Tarama tamamlandı. Tüm dosyalar satır satır okundu.**
+
+---
+
+## 15. Dil Bilgisi ve Anlam Kayması Tespitleri
+
+### 15.1 KRİTİK: Yanlış Dil Karakteri (Machine Translation Bug)
+
+| Dil | Key | Sorun | Değer |
+|-----|-----|-------|-------|
+| **tr.json** | `a4` | **Çince karakter** (指向) Türkçe metinde | "Ücretsiz bir hesap oluşturun, sunucu URL'inize**指向** bir endpoint oluşturun..." |
+| **ja.json** | `q4` | **Korece karakter** (어) Japonca metinde | "どうהתחילればいいですか？" → "어떻게始めればいいですか？" |
+
+Bu makine çevirisi hataları. Kullanıcıya doğrudan görünüyor.
+
+### 15.2 Placeholder Eksik
+
+| Dil | Key | Sorun |
+|-----|-----|-------|
+| **tr.json** | `apiKeys.keyCount` | `{plural}` placeholder eksik. en: `{count} key{plural}` → tr: `{count} anahtar` |
+
+### 15.3 Anlam Kayması — Plan İsimleri
+
+| Dil | Key | en | Çeviri | Sorun |
+|-----|-----|-------|--------|-------|
+| **tr.json** | `landing.pricing.business` | "Business" | "İş" | Plan adı olarak "İş" tek başına anlamsız. "Kurumsal" daha uygun. |
+
+### 15.4 Anlam Kayması — "Deliveries" Çevirisi (Webhook Bağlamı)
+
+| Dil | Key | Çeviri | Sorun |
+|-----|-----|--------|-------|
+| **de.json** | `deliveries.title` | "Zustellungen" | Posta/kargo bağlamında kullanılır. Webhook için "Lieferungen" daha uygun. |
+| **fr.json** | `deliveries.title` | "Livraisons" | Fiziksel teslimat bağlamında kullanılır. Webhook için "Diffusions" veya "Envois" daha uygun. |
+| **ko.json** | `deliveries.title` | "배달" | Yemek/paket teslimatı bağlamında kullanılır. Webhook için "전달" daha uygun. |
+
+### 15.5 Çevrilmemiş Terimler (Kasıtlı Olabilir)
+
+| Terim | Diller | Not |
+|-------|--------|-----|
+| "Dashboard" | tr, de, fr, es, pt-BR, ko | Kasıtlı olabilir — teknik terim |
+| "Endpoint" | Tüm diller | Kasıtlı — teknik terim |
+| "Webhook" | Tüm diller | Kasıtlı — teknik terim |
+| "API" | Tüm diller | Kasıtlı — teknik terim |
+
+### 15.6 Uzunluk Anomalileri (Japonca / Korece)
+
+Japonca ve Korece'de karakter başına anlam yoğunluğu yüksek olduğu için "2 karakter = 8 karakter İngilizce" normaldir. Bunlar hata değil:
+- ja: "設定" (2 char) = "Settings" (8 char) ✅
+- ko: "설정" (2 char) = "Settings" (8 char) ✅
+
+Ancak bazı çevirilerde anlam daralması olabilir:
+- ja: `endpoints.empty` → "エンドポイントがまだありません" (sadece "Endpoint yok") — İngilizce "Create one to start receiving webhooks" kısmı atlanmış.
+- ko: `endpoints.empty` → "아직 엔드포인트가 없습니다" (sadece "Endpoint yok") — Aynı sorun.
+
+---
+
+## 16. Özet — Düzeltilmesi Gereken Sorunlar
+
+### Acil (Kullanıcıyı Etkiliyor)
+1. `tr.json a4` — Çince karakter (指向) silinmeli
+2. `ja.json q4` — Korece karakter (어) silinmeli
+3. `tr.json apiKeys.keyCount` — `{plural}` placeholder eklenmeli
+4. `tr.json landing.pricing.business` — "İş" → "Kurumsal"
+
+### Orta (Anlam Kayması)
+5. `de.json deliveries.title` — "Zustellungen" → "Lieferungen"
+6. `fr.json deliveries.title` — "Livraisons" → "Diffusions" veya "Envois"
+7. `ko.json deliveries.title` — "배달" → "전달"
+
+### Düşük (İyileştirme)
+8. `ja.json endpoints.empty` — "Create one..." kısmı eklenmeli
+9. `ko.json endpoints.empty` — "Create one..." kısmı eklenmeli
