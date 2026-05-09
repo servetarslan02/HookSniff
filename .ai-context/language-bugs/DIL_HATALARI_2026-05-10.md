@@ -720,3 +720,63 @@ Ancak bazı çevirilerde anlam daralması olabilir:
 ### Düşük (İyileştirme)
 8. `ja.json endpoints.empty` — "Create one..." kısmı eklenmeli
 9. `ko.json endpoints.empty` — "Create one..." kısmı eklenmeli
+
+---
+
+## 17. Derin Python Taraması — 1408 Hardcoded String
+
+Python script ile 100+ dosya satır satır analiz edildi. Toplam **1408 hardcoded İngilizce string** tespit edildi, **85 dosya**.
+
+### En Çok Hardcoded String Olan Sayfalar
+
+| # | Sayfa | Sayı |
+|---|-------|------|
+| 1 | use-cases/page.tsx | 146 |
+| 2 | pricing/page.tsx | 104 |
+| 3 | customers/[slug]/page.tsx | 108 |
+| 4 | compare/CompareContent.tsx | 80 |
+| 5 | customers/page.tsx | 71 |
+| 6 | blog/page.tsx | 47 |
+| 7 | OnboardingWizard.tsx | 40 |
+| 8 | security/page.tsx | 36 |
+| 9 | svix-alternatives/page.tsx | 36 |
+| 10 | playground/page.tsx | 29 |
+| 11 | what-is-a-webhook/page.tsx | 12 |
+| 12 | terms/page.tsx | 28 |
+| 13 | webhooks/guides/page.tsx | 28 |
+| 14 | admin/system/page.tsx | 27 |
+| 15 | webhooks/glossary/page.tsx | 26 |
+| 16 | Footer.tsx | 24 |
+| 17 | build-vs-buy/BuildVsBuyContent.tsx | 24 |
+| 18 | docs/dashboard/page.tsx | 24 |
+| 19 | privacy/page.tsx | 22 |
+| 20 | newsletter/page.tsx | 20 |
+
+### Yeni Tespit Edilen (Daha Önce Raporda Olmayan)
+
+| Sayfa | Yeni Bulgu |
+|-------|-----------|
+| `dashboard/analytics/page.tsx` | "Success", "Failed", "Pending", "Success Rate", "Total Delivered", "Total Failed", "Successful" |
+| `dashboard/notifications/page.tsx` | "All", "Webhook Failed", "Alerts", "System", "Billing", "Failed to load notifications", "Failed to mark as read", "Failed to mark all as read", "Notification deleted", "Failed to delete notification" |
+| `dashboard/health/page.tsx` | "Healthy", "Degraded", "Unhealthy" |
+| `dashboard/logs/page.tsx` | "Failed to load logs", "Status" |
+| `dashboard/layout.tsx` | "Open sidebar", "User" |
+| `dashboard/page.tsx` | "Failed", "Pending" |
+| `dashboard/settings/page.tsx` | "New passwords do not match", "Failed to save notification preferences", "Copy" |
+| `dashboard/billing/page.tsx` | "Community support", "Priority support", "Dedicated support", "SLA guarantee", "Cancel Subscription" |
+| `dashboard/audit-log/page.tsx` | "All Actions", "Authentication", "Endpoints", "Webhooks", "Team", "Settings", "Billing" |
+| `dashboard/custom-domain/page.tsx` | "Failed to add domain", "Network error", "Add your domain", "Add DNS records", "Verify & go live" |
+| `docs/layout.tsx` | "Introduction", "Quickstart", "Core Concepts", "Guides", "Webhook Security", "Dashboard", "Integrations", "Architecture", "Features", "Dead Letter Queue" |
+| `docs/portal/page.tsx` | "View deliveries", "Inspect payloads", "Rotate secrets", "Replay failed webhooks", "Zero support tickets", "Secure access", "API key scoping" |
+| `docs/concepts/page.tsx` | "Status", "Payloads", "Attempt Tracking", "Dead Letter Queue", "FIFO order" |
+| `docs/dashboard/page.tsx` | "Delivery Stats", "Activity Charts", "Recent Deliveries", "Endpoint Health", "Create Endpoints", "Rotate Secrets", "Custom Headers", "Event Filtering" |
+| `docs/dlq/page.tsx` | "Understand why delivery failed", "Inspect the original payload...", "Replay deliveries...", "Audit failed deliveries..." |
+| `docs/retries/page.tsx` | "DNS resolution failure", "TLS handshake failure" |
+| `docs/sdks/page.tsx` | "Production webhook", "Invalid API key", "Invalid signature", "Stable", "Beta" |
+| `providers/github/page.tsx` | "Code pushed to a branch", "GitHub Actions workflow completed", "Deployment created via API" |
+| `providers/shopify/page.tsx` | "New order placed", "Order cancelled", "Order refunded", "New product added" |
+| `providers/stripe/page.tsx` | "Payment completed successfully", "Payment attempt failed", "New subscription started" |
+| `components/EmailVerificationBanner.tsx` | "Resend" |
+| `lib/api.ts` | "Unknown error", "AbortError" |
+
+**Tarama %95+ tamamlandı.** Kalan %5: blog post content'leri (çok uzun, SEO odaklı) ve test dosyaları.
