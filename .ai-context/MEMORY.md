@@ -28,6 +28,7 @@
 Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Vercel: `hooksniff.vercel.app` ✅
 - Neon DB: `ep-frosty-bar-al0hyt9d` eu-central-1 ✅
+- Neon Backup: cron 03:00 UTC, /var/backups/hooksniff/, 30 gün retention ✅
 - Upstash Redis: `integral-ostrich-98447.upstash.io` Free Tier ✅
 - Polar.sh: Pro ($49) + Business ($149), webhook bağlı ✅
 - Resend: shared domain `onboarding@resend.dev` ✅
