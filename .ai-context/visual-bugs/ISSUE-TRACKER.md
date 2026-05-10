@@ -19,14 +19,14 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 
 | ID | Sorun | Kaynak | Durum |
 |----|-------|--------|-------|
-| HS-001 | `verify_email` rate limit yok — brute force | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
-| HS-002 | `verify_2fa` rate limit yok — TOTP brute force | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
-| HS-003 | `refresh_token` rate limit yok — token stuffing | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
+| HS-001 | `verify_email` rate limit yok — brute force | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
+| HS-002 | `verify_2fa` rate limit yok — TOTP brute force | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
+| HS-003 | `refresh_token` rate limit yok — token stuffing | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-004 | Inbound webhook signature verification optional — secret boşsa `Ok(())` | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
 | HS-005 | Billing webhook secret boşsa verification atlıyor | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
 | HS-006 | `.env.production.example`'da gerçek Grafana token (base64) | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
 | HS-007 | `.gitignore`'da `.env` pattern eksik | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
-| HS-008 | Contact form rate limit yok | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
+| HS-008 | Contact form rate limit yok | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-009 | Schema endpoint'lerinde ownership check yok — cross-tenant leak | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
 | HS-010 | Concurrent delivery limit yok — DDoS riski | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
 
