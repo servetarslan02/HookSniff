@@ -47,8 +47,8 @@
 | 9 | Inconsistent styling (`glass-card` vs plain `bg-white`) | portal, routing, schemas, templates |
 | 10 | Dashboard token refresh yok (401 → login) | `lib/api.ts` |
 | 11 | 5s/30s polling background tab'da devam ediyor | dashboard, health, status |
-| 12 | `window.location.href` yerine Next.js router | `search/page.tsx` |
-| 13 | Dead code (`selected` state, `_setEvent`, `_endpoints`) | deliveries, search, playground |
+| 12 | `window.location.href` yerine Next.js router | `search/page.tsx` | ✅ Düzeltildi (2026-05-10) |
+| 13 | Dead code (`selected` state, `_setEvent`, `_endpoints`) | deliveries, search, playground | ✅ Düzeltildi (2026-05-10) |
 | 14 | Duplicate chart code (dashboard + analytics) | `page.tsx` + `analytics/page.tsx` |
 
 ## 🔵 Düşük
