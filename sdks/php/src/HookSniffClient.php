@@ -25,21 +25,34 @@ class HookSniffClient
 {
     private const DEFAULT_BASE_URL = 'https://api.hooksniff.com/v1';
     private const DEFAULT_TIMEOUT = 30;
+    private const DEFAULT_MAX_RETRIES = 3;
 
     private string $apiKey;
     private string $baseUrl;
     private int $timeout;
+    private int $maxRetries;
 
     private EndpointsResource $endpoints;
     private WebhooksResource $webhooks;
 
-    public function __construct(string $apiKey, ?string $baseUrl = null, int $timeout = 0)
+    public function __construct(string $apiKey, ?string $baseUrl = null, int $timeout = 0, int $maxRetries = 0)
     {
         $this->apiKey = $apiKey;
         $this->baseUrl = rtrim($baseUrl ?? self::DEFAULT_BASE_URL, '/');
         $this->timeout = $timeout > 0 ? $timeout : self::DEFAULT_TIMEOUT;
+        $this->maxRetries = $maxRetries >= 0 ? $maxRetries : self::DEFAULT_MAX_RETRIES;
         $this->endpoints = new EndpointsResource($this);
         $this->webhooks = new WebhooksResource($this);
+    }
+
+    private static function isRetryable(int $statusCode): bool
+    {
+        return $statusCode === 429 || $statusCode >= 500;
+    }
+
+    private static function calculateBackoff(int $attempt): int
+    {
+        return min(1000 * (1 << $attempt), 30000); // milliseconds
     }
 
     public function endpoints(): EndpointsResource
@@ -62,61 +75,84 @@ class HookSniffClient
     }
 
     /**
-     * @internal Make an API request.
+     * @internal Make an API request with automatic retry on transient failures.
      */
     public function request(string $method, string $path, ?array $body = null): mixed
     {
-        $url = $this->baseUrl . $path;
+        $lastException = null;
 
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => $this->timeout,
-            CURLOPT_CONNECTTIMEOUT => $this->timeout,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_HTTPHEADER => [
-                'Authorization: Bearer ' . $this->apiKey,
-                'Content-Type: application/json',
-                'User-Agent: hooksniff-php/0.1.0',
-            ],
-        ]);
+        for ($attempt = 0; $attempt <= $this->maxRetries; $attempt++) {
+            $url = $this->baseUrl . $path;
 
-        if ($body !== null && in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-        }
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => $this->timeout,
+                CURLOPT_CONNECTTIMEOUT => $this->timeout,
+                CURLOPT_CUSTOMREQUEST => $method,
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: Bearer ' . $this->apiKey,
+                    'Content-Type: application/json',
+                    'User-Agent: hooksniff-php/0.3.0',
+                ],
+            ]);
 
-        $response = curl_exec($ch);
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($response === false) {
-            throw new HookSniffException("cURL error: {$error}", 0, 'NETWORK_ERROR');
-        }
-
-        if ($statusCode >= 200 && $statusCode < 300) {
-            if (str_contains($contentType ?? '', 'text/csv')) {
-                return $response;
+            if ($body !== null && in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
             }
-            return json_decode($response, true);
+
+            $response = curl_exec($ch);
+            $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false) {
+                $lastException = new HookSniffException("cURL error: {$error}", 0, 'NETWORK_ERROR');
+                if ($attempt < $this->maxRetries) {
+                    usleep(self::calculateBackoff($attempt) * 1000);
+                    continue;
+                }
+                throw $lastException;
+            }
+
+            if ($statusCode >= 200 && $statusCode < 300) {
+                if (str_contains($contentType ?? '', 'text/csv')) {
+                    return $response;
+                }
+                return json_decode($response, true);
+            }
+
+            // Retry on 429 (respect Retry-After) and 5xx
+            if (self::isRetryable($statusCode) && $attempt < $this->maxRetries) {
+                $delayMs = self::calculateBackoff($attempt);
+                if ($statusCode === 429) {
+                    // Try to get Retry-After header
+                    $headers = [];
+                    // cURL doesn't easily expose Retry-After, use default backoff
+                }
+                usleep($delayMs * 1000);
+                continue;
+            }
+
+            $message = "HTTP {$statusCode}";
+            $decoded = json_decode($response, true);
+            if ($decoded && isset($decoded['error']['message'])) {
+                $message = $decoded['error']['message'];
+            }
+
+            return match ($statusCode) {
+                400 => throw new ValidationException($message),
+                401 => throw new AuthenticationException($message),
+                404 => throw new NotFoundException($message),
+                413 => throw new PayloadTooLargeException($message),
+                429 => throw new RateLimitException($message),
+                default => throw new HookSniffException($message, $statusCode, 'UNKNOWN'),
+            };
         }
 
-        $message = "HTTP {$statusCode}";
-        $decoded = json_decode($response, true);
-        if ($decoded && isset($decoded['error']['message'])) {
-            $message = $decoded['error']['message'];
-        }
-
-        return match ($statusCode) {
-            400 => throw new ValidationException($message),
-            401 => throw new AuthenticationException($message),
-            404 => throw new NotFoundException($message),
-            413 => throw new PayloadTooLargeException($message),
-            429 => throw new RateLimitException($message),
-            default => throw new HookSniffException($message, $statusCode, 'UNKNOWN'),
-        };
+        throw $lastException ?? new HookSniffException("Request failed after {$this->maxRetries} retries", 0, 'MAX_RETRIES');
     }
 }
 

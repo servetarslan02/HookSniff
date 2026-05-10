@@ -31,10 +31,12 @@ public class HookSniffClient {
 
     private static final String DEFAULT_BASE_URL = "https://api.hooksniff.com/v1";
     private static final int DEFAULT_TIMEOUT = 30000;
+    private static final int DEFAULT_MAX_RETRIES = 3;
 
     private final String apiKey;
     private final String baseUrl;
     private final int timeout;
+    private final int maxRetries;
     private final Gson gson;
 
     private final Endpoints endpoints;
@@ -46,7 +48,7 @@ public class HookSniffClient {
      * @param apiKey Your HookSniff API key
      */
     public HookSniffClient(String apiKey) {
-        this(apiKey, DEFAULT_BASE_URL, DEFAULT_TIMEOUT);
+        this(apiKey, DEFAULT_BASE_URL, DEFAULT_TIMEOUT, DEFAULT_MAX_RETRIES);
     }
 
     /**
@@ -57,12 +59,34 @@ public class HookSniffClient {
      * @param timeout Request timeout in milliseconds
      */
     public HookSniffClient(String apiKey, String baseUrl, int timeout) {
+        this(apiKey, baseUrl, timeout, DEFAULT_MAX_RETRIES);
+    }
+
+    /**
+     * Create a new HookSniff client with full configuration.
+     *
+     * @param apiKey     Your HookSniff API key
+     * @param baseUrl    API base URL
+     * @param timeout    Request timeout in milliseconds
+     * @param maxRetries Maximum number of retries for transient failures (5xx, 429, network errors)
+     */
+    public HookSniffClient(String apiKey, String baseUrl, int timeout, int maxRetries) {
         this.apiKey = apiKey;
         this.baseUrl = (baseUrl != null ? baseUrl : DEFAULT_BASE_URL).replaceAll("/+$", "");
         this.timeout = timeout > 0 ? timeout : DEFAULT_TIMEOUT;
+        this.maxRetries = maxRetries >= 0 ? maxRetries : DEFAULT_MAX_RETRIES;
         this.gson = new GsonBuilder().create();
         this.endpoints = new Endpoints();
         this.webhooks = new Webhooks();
+    }
+
+    private static boolean isRetryable(int statusCode) {
+        return statusCode == 429 || statusCode >= 500;
+    }
+
+    /** Exponential backoff: 1s, 2s, 4s (capped at 30s) */
+    private long calculateBackoff(int attempt) {
+        return Math.min(1000L * (1L << attempt), 30_000L);
     }
 
     /** Access the Endpoints resource. */
@@ -282,101 +306,160 @@ public class HookSniffClient {
     // ==================== HTTP Layer ====================
 
     JsonObject request(String method, String path, JsonObject body) {
-        try {
-            URL url = new URL(baseUrl + path);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod(method);
-            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("User-Agent", "hooksniff-java/0.1.0");
-            conn.setConnectTimeout(timeout);
-            conn.setReadTimeout(timeout);
+        Exception lastException = null;
 
-            if (body != null && ("POST".equals(method) || "PUT".equals(method))) {
-                conn.setDoOutput(true);
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(body.toString().getBytes(StandardCharsets.UTF_8));
-                }
-            }
-
-            int statusCode = conn.getResponseCode();
-
-            if (statusCode >= 200 && statusCode < 300) {
-                String contentType = conn.getContentType();
-                if (contentType != null && contentType.contains("text/csv")) {
-                    return null; // CSV not supported as JsonObject
-                }
-                String responseBody = readStream(conn.getInputStream());
-                return JsonParser.parseString(responseBody).getAsJsonObject();
-            }
-
-            String errBody = readStream(conn.getErrorStream());
-            String message = "HTTP " + statusCode;
+        for (int attempt = 0; attempt <= maxRetries; attempt++) {
             try {
-                JsonObject err = JsonParser.parseString(errBody).getAsJsonObject();
-                message = err.getAsJsonObject("error").get("message").getAsString();
-            } catch (Exception ignored) {}
+                URL url = new URL(baseUrl + path);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod(method);
+                conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("User-Agent", "hooksniff-java/0.3.0");
+                conn.setConnectTimeout(timeout);
+                conn.setReadTimeout(timeout);
 
-            switch (statusCode) {
-                case 400: throw new HookSniffException.ValidationException(message);
-                case 401: throw new HookSniffException.AuthenticationException(message);
-                case 404: throw new HookSniffException.NotFoundException(message);
-                case 413: throw new HookSniffException.PayloadTooLargeException(message);
-                case 429: throw new HookSniffException.RateLimitException(message);
-                default: throw new HookSniffException(message, statusCode, "UNKNOWN");
+                if (body != null && ("POST".equals(method) || "PUT".equals(method))) {
+                    conn.setDoOutput(true);
+                    try (OutputStream os = conn.getOutputStream()) {
+                        os.write(body.toString().getBytes(StandardCharsets.UTF_8));
+                    }
+                }
+
+                int statusCode = conn.getResponseCode();
+
+                if (statusCode >= 200 && statusCode < 300) {
+                    String contentType = conn.getContentType();
+                    if (contentType != null && contentType.contains("text/csv")) {
+                        return null;
+                    }
+                    String responseBody = readStream(conn.getInputStream());
+                    return JsonParser.parseString(responseBody).getAsJsonObject();
+                }
+
+                String errBody = readStream(conn.getErrorStream());
+                String message = "HTTP " + statusCode;
+                try {
+                    JsonObject err = JsonParser.parseString(errBody).getAsJsonObject();
+                    message = err.getAsJsonObject("error").get("message").getAsString();
+                } catch (Exception ignored) {}
+
+                // Retry on 429 (respect Retry-After) and 5xx
+                if (isRetryable(statusCode) && attempt < maxRetries) {
+                    long delayMs;
+                    if (statusCode == 429) {
+                        String retryAfter = conn.getHeaderField("Retry-After");
+                        delayMs = (retryAfter != null) ? Long.parseLong(retryAfter) * 1000 : calculateBackoff(attempt);
+                    } else {
+                        delayMs = calculateBackoff(attempt);
+                    }
+                    Thread.sleep(delayMs);
+                    continue;
+                }
+
+                switch (statusCode) {
+                    case 400: throw new HookSniffException.ValidationException(message);
+                    case 401: throw new HookSniffException.AuthenticationException(message);
+                    case 404: throw new HookSniffException.NotFoundException(message);
+                    case 413: throw new HookSniffException.PayloadTooLargeException(message);
+                    case 429: throw new HookSniffException.RateLimitException(message);
+                    default: throw new HookSniffException(message, statusCode, "UNKNOWN");
+                }
+            } catch (HookSniffException e) {
+                throw e;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new HookSniffException("Request interrupted", 0, "INTERRUPTED");
+            } catch (Exception e) {
+                lastException = e;
+                if (attempt < maxRetries) {
+                    try { Thread.sleep(calculateBackoff(attempt)); } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new HookSniffException("Request interrupted", 0, "INTERRUPTED");
+                    }
+                    continue;
+                }
             }
-        } catch (HookSniffException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new HookSniffException("Request failed: " + e.getMessage(), 0, "NETWORK_ERROR");
         }
+
+        throw new HookSniffException("Request failed after " + (maxRetries + 1) + " attempts: " +
+            (lastException != null ? lastException.getMessage() : "unknown"), 0, "NETWORK_ERROR");
     }
 
     JsonArray requestArray(String method, String path, JsonObject body) {
-        try {
-            URL url = new URL(baseUrl + path);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod(method);
-            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("User-Agent", "hooksniff-java/0.1.0");
-            conn.setConnectTimeout(timeout);
-            conn.setReadTimeout(timeout);
+        Exception lastException = null;
 
-            if (body != null && ("POST".equals(method) || "PUT".equals(method))) {
-                conn.setDoOutput(true);
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(body.toString().getBytes(StandardCharsets.UTF_8));
+        for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                URL url = new URL(baseUrl + path);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod(method);
+                conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("User-Agent", "hooksniff-java/0.3.0");
+                conn.setConnectTimeout(timeout);
+                conn.setReadTimeout(timeout);
+
+                if (body != null && ("POST".equals(method) || "PUT".equals(method))) {
+                    conn.setDoOutput(true);
+                    try (OutputStream os = conn.getOutputStream()) {
+                        os.write(body.toString().getBytes(StandardCharsets.UTF_8));
+                    }
+                }
+
+                int statusCode = conn.getResponseCode();
+
+                if (statusCode >= 200 && statusCode < 300) {
+                    String responseBody = readStream(conn.getInputStream());
+                    return JsonParser.parseString(responseBody).getAsJsonArray();
+                }
+
+                String errBody = readStream(conn.getErrorStream());
+                String message = "HTTP " + statusCode;
+                try {
+                    JsonObject err = JsonParser.parseString(errBody).getAsJsonObject();
+                    message = err.getAsJsonObject("error").get("message").getAsString();
+                } catch (Exception ignored) {}
+
+                if (isRetryable(statusCode) && attempt < maxRetries) {
+                    long delayMs;
+                    if (statusCode == 429) {
+                        String retryAfter = conn.getHeaderField("Retry-After");
+                        delayMs = (retryAfter != null) ? Long.parseLong(retryAfter) * 1000 : calculateBackoff(attempt);
+                    } else {
+                        delayMs = calculateBackoff(attempt);
+                    }
+                    Thread.sleep(delayMs);
+                    continue;
+                }
+
+                switch (statusCode) {
+                    case 400: throw new HookSniffException.ValidationException(message);
+                    case 401: throw new HookSniffException.AuthenticationException(message);
+                    case 404: throw new HookSniffException.NotFoundException(message);
+                    case 413: throw new HookSniffException.PayloadTooLargeException(message);
+                    case 429: throw new HookSniffException.RateLimitException(message);
+                    default: throw new HookSniffException(message, statusCode, "UNKNOWN");
+                }
+            } catch (HookSniffException e) {
+                throw e;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new HookSniffException("Request interrupted", 0, "INTERRUPTED");
+            } catch (Exception e) {
+                lastException = e;
+                if (attempt < maxRetries) {
+                    try { Thread.sleep(calculateBackoff(attempt)); } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new HookSniffException("Request interrupted", 0, "INTERRUPTED");
+                    }
+                    continue;
                 }
             }
-
-            int statusCode = conn.getResponseCode();
-
-            if (statusCode >= 200 && statusCode < 300) {
-                String responseBody = readStream(conn.getInputStream());
-                return JsonParser.parseString(responseBody).getAsJsonArray();
-            }
-
-            String errBody = readStream(conn.getErrorStream());
-            String message = "HTTP " + statusCode;
-            try {
-                JsonObject err = JsonParser.parseString(errBody).getAsJsonObject();
-                message = err.getAsJsonObject("error").get("message").getAsString();
-            } catch (Exception ignored) {}
-
-            switch (statusCode) {
-                case 400: throw new HookSniffException.ValidationException(message);
-                case 401: throw new HookSniffException.AuthenticationException(message);
-                case 404: throw new HookSniffException.NotFoundException(message);
-                case 413: throw new HookSniffException.PayloadTooLargeException(message);
-                case 429: throw new HookSniffException.RateLimitException(message);
-                default: throw new HookSniffException(message, statusCode, "UNKNOWN");
-            }
-        } catch (HookSniffException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new HookSniffException("Request failed: " + e.getMessage(), 0, "NETWORK_ERROR");
         }
+
+        throw new HookSniffException("Request failed after " + (maxRetries + 1) + " attempts: " +
+            (lastException != null ? lastException.getMessage() : "unknown"), 0, "NETWORK_ERROR");
     }
 
     private String readStream(InputStream stream) throws IOException {
