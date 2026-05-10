@@ -9,22 +9,30 @@
 ## 🚨 P0 — ACİL (Bu hafta çözülmeli)
 
 ### Güvenlik Kritik
-| # | Bulgu | Kaynak | Etki |
-|---|-------|--------|------|
-| 1 | **Authorization bypass** — API key sadece prefix ile eşleştiriliyor, tam hash doğrulaması atlanmış | deep-rust-api | 🔴 Kimse herhangi bir endpoint'e erişebilir |
-| 2 | **Token her zaman 'cookie'** — tüm API istekleri `Authorization: Bearer cookie` gönderiyor | deep-component-logic | 🔴 Auth tamamen çalışmıyor |
-| 3 | **API keys cookie auth çalışmıyor** — `credentials: 'include'` yanlışlıkla `headers` içinde | deep-component-logic | 🔴 API key yönetimi çökmüş |
-| 4 | **Playground token localStorage'da** — XSS ile token çalınabilir | deep-component-logic | 🔴 Hesap ele geçirme |
-| 5 | **Gerçek Grafana token .env.example'da** — base64 encoded ama decode edilebilir | deep-deps-config | 🔴 Monitoring hesabı compromised |
-| 6 | **Inbound webhook signature verification optional** — secret boşsa bypass | deep-api-endpoints | 🔴 Webhook spoofing |
-| 7 | **Billing webhook signature verification optional** — secret boşsa bypass | deep-api-endpoints | 🔴 Billing manipülasyonu |
+| # | Bulgu | Kaynak | Etki | Durum |
+|---|-------|--------|------|-------|
+| 1 | **Gerçek Grafana token .env.example'da** — base64 encoded ama decode edilebilir | deep-deps-config | 🔴 Monitoring hesabı compromised | ✅ Doğrulandı |
+| 2 | **Inbound webhook signature verification optional** — secret boşsa `Ok(())` döner, her request kabul edilir (`inbound.rs:194`) | deep-api-endpoints | 🔴 Webhook spoofing | ✅ Doğrulandı |
+| 3 | **verify_email rate limit yok** — brute force ile token tahmini (`auth.rs:474`) | deep-api-endpoints | 🔴 Email verification bypass | ✅ Doğrulandı |
+| 4 | **verify_2fa rate limit yok** — TOTP brute force (`auth.rs:302`) | deep-api-endpoints | 🔴 2FA bypass | ✅ Doğrulandı |
+| 5 | **refresh_token rate limit yok** — token stuffing saldırısı (`auth.rs:547`) | deep-api-endpoints | 🔴 Session hijacking | ✅ Doğrulandı |
+| 6 | **Billing webhook secret boşsa verification atlıyor** — Stripe handler boş secret ile çalışıyor (`billing.rs:378`) | deep-api-endpoints | 🔴 Billing manipülasyonu | ✅ Doğrulandı |
+
+### ❌ ÖNCEKİ AUDIT'TEN DÜZELTİLEN (YANLIŞ BULGULAR)
+| # | Önceki Bulgu | Gerçek Durum |
+|---|-------------|-------------|
+| ~~1~~ | Authorization bypass — API key sadece prefix | ❌ YANLIŞ — `verify_api_key()` Argon2 ile tam hash doğrulaması yapıyor. Prefix sadece lookup için. |
+| ~~2~~ | Token her zaman 'cookie' | ❌ YANLIŞ — `setToken('cookie')` sentinel değer. Auth HttpOnly cookie ile yapılıyor. Kasıtlı tasarım. |
+| ~~3~~ | API keys cookie auth çalışmıyor | ❌ YANLIŞ — `credentials: 'include'` doğru yerde (fetch options). |
+| ~~4~~ | Playground token localStorage'da | ❌ YANLIŞ — localStorage sadece request HISTORY saklıyor, token değil. |
 
 ### Altyapı Kritik
 | # | Bulgu | Kaynak | Etki |
 |---|-------|--------|------|
-| 8 | **Concurrent delivery limit yok** — 50 eşzamanlı HTTP request, DDoS riski | deep-worker-billing | 🔴 Hedef sunucu çökmesi |
-| 9 | **Throttle state in-memory** — restart'ta kaybolur, multi-instance'da bypass | deep-worker-billing | 🔴 Rate limit tamamen işlevsiz |
-| 10 | **`.gitignore`'da `.env` eksik** — secret'lar repo'ya commit edilebilir | deep-deps-config | 🔴 Secret leak |
+| 7 | **Concurrent delivery limit yok** — 50 eşzamanlı HTTP request, DDoS riski | deep-worker-billing | 🔴 Hedef sunucu çökmesi |
+| 8 | **Throttle state in-memory** — restart'ta kaybolur, multi-instance'da bypass | deep-worker-billing | 🔴 Rate limit tamamen işlevsiz |
+| 9 | **`.gitignore`'da `.env` eksik** — secret'lar repo'ya commit edilebilir | deep-deps-config | 🔴 Secret leak |
+| 10 | **Contact form rate limit yok** — spam/flood saldırısı | deep-api-endpoints | 🔴 Servis kötüye kullanımı |
 
 ---
 
@@ -148,6 +156,15 @@
 | 🟡 P2 — Orta | 31 | %44 |
 | 🟢 P3 — Düşük | 10 | %14 |
 | **TOPLAM** | **70** | **100%** |
+
+### 🔍 SON DAKİKA DÜZELTMELERİ (17:22 GMT+8)
+Önceki audit'in **4 bulgusu yanlış** olarak tespit edildi:
+- Authorization bypass → ❌ Argon2 doğrulaması var, prefix sadece lookup
+- Token 'cookie' hatası → ❌ Kasıtlı sentinel değer, HttpOnly cookie auth
+- credentials placement → ❌ Doğru yerde
+- Playground localStorage token → ❌ Sadece history saklıyor
+
+**Doğrulanan yeni bulgular:** verify_email, verify_2fa, refresh_token endpoint'lerinde rate limit eksik (3 yeni P0)
 
 ---
 
