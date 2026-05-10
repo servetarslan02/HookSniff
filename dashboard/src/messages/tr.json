@@ -658,7 +658,7 @@
       "dashboardDesc": "Teslimatları izleyin, başarı oranlarını takip edin.",
       "lowLatency": "Düşük Gecikme",
       "lowLatencyDesc": "Hız için Rust ile inşa edildi.",
-      "dlq": "Ölü Mektup Kuyruğu",
+      "dlq": "Başarısız Teslimat Kuyruğu",
       "dlqDesc": "Başarısız teslimatlar hata ayıklama için korunur.",
       "global": "Küresel Altyapı",
       "globalDesc": "Düşük gecikmeli webhook teslimatı için dünya çapında dağıtın."
@@ -667,7 +667,7 @@
       "title": "Nasıl çalışır",
       "subtitle": "Güvenilir webhook teslimatı için üç basit adım.",
       "send": "Gönder",
-      "sendDesc": "APIimize bir webhook POST edin.",
+      "sendDesc": "API'mize bir webhook POST edin.",
       "deliver": "Teslim Et",
       "deliverDesc": "Tekrar denemeler, imzalar ve izleme ile teslim ediyoruz.",
       "monitor": "İzle",
