@@ -42,7 +42,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-014 | Git history'de OTEL credentials (base64 Grafana secrets) | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
 | HS-015 | Password reset token URL'de exposure | `backend/DEEP-RUST-API.md` | ⬜ |
 | HS-016 | `DefaultHasher` idempotency hash'te (kriptografik değil) | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-017 | Retry'da jitter yok — thundering herd | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
+| ~~HS-017~~ | ~~Retry'da jitter yok~~ | ❌ YANLIŞ — jitter var (retry_policy/mod.rs:142) | ❌ |
 | HS-018 | Error classification yok — 400/401/404 de retry ediliyor | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
 | HS-019 | WebSocket connection limit yok — bellek tüketimi | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
 | HS-020 | Circuit breaker modülü var ama entegre edilmemiş | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
@@ -151,10 +151,10 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | Öncelik | Adet |
 |---------|------|
 | 🚨 P0 | 10 |
-| 🔴 P1 | 43 |
+| 🔴 P1 | 42 (1 yanlış çıkarıldı) |
 | 🟡 P2 | 38 |
 | 🟢 P3 | 13 |
-| **TOPLAM** | **104 benzersiz sorun** |
+| **TOPLAM** | **103 benzersiz sorun** (1 yanlış) |
 
 ---
 
