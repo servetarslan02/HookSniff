@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 21:30 GMT+8
+> Son güncelleme: 2026-05-10 21:52 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -89,6 +89,8 @@
 5. HS-063: Sampling — zaten default parent-based sampling, değişiklik gerekmedi
 6. HS-064: PII redaction — worker'da 500 char truncation, API'de regex redaction (email, token, JWT)
 7. Ek düzeltmeler: 4 pre-existing compile hatası düzeltildi (inbound.rs, rate_limit.rs, worker semaphore, svix JSX)
+8. Bug fix: PaymentFailed grace period condition IS NOT NULL → IS NULL (ilk failure'da grace period başlamazdı)
+9. Final doğrulama: cargo check API ✅, cargo check Worker ✅, tsc --noEmit ✅, Neon DB ✅
 
 ## 📝 Oturum 86 (2026-05-10 21:10 - 21:15 GMT+8) ✅
 1. Accessibility & Dark Mode: 4 sorun
