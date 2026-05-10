@@ -64,7 +64,7 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
 
-## Oturum 104 (2026-05-11 06:57 - 07:08) ✅
+## Oturum 104 (2026-05-11 06:57 - 07:12) ✅
 - **Grafana OTEL KRİTİK BULGU** — Deploy scriptlerinde yanlış region!
   - `deploy/gcp-deploy.sh`, `gcp-deploy.ps1`, `api-env.yaml`, `worker-env.yaml` → `us-east-0` kullanıyordu
   - Doğru region: `eu-west-2` (Grafana stack hookrelay.grafana.net)
@@ -75,15 +75,16 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Endpoint ve headers count logu eklendi
 - **OTEL sağlık kontrolü** — `api/src/routes/health.rs`:
   - `/health` endpoint'ine `otel` objesi eklendi (enabled, endpoint, headers_configured, headers_length)
-- **Email adresleri temizlendi** — `@hooksniff.vercel.app` adresleri kaldırıldı (MX kaydı yok):
-  - `contact/page.tsx`: email kartı → "Use the form below"
-  - `terms/page.tsx`: `legal@` → contact form link
-  - `security/page.tsx`: `security@` → contact form link
-  - `en.json`: `privacy@`, `hello@` → contact form referansları
-  - `tr.json`: `privacy@`, `hello@` → iletişim formu referansları
+- **Email adresleri KRİTİK DÜZELTME** — sadece dashboard değil, API ve worker'da da kırık adresler varmış:
+  - `contact.rs`: admin bildirimi `support@hooksniff.vercel.app` → `NOTIFY_EMAIL` env var (fallback: servetarslan02@gmail.com)
+  - `resend_email.rs`: default from `noreply@hooksniff.vercel.app` → `onboarding@resend.dev`
+  - `config.rs`: default NOTIFY_FROM_EMAIL → `onboarding@resend.dev`
+  - `worker/delivery/mod.rs`: aynı düzeltme
+  - `dashboard/email.ts`: default from → `onboarding@resend.dev`
+  - Dashboard sayfaları: contact, terms, security, privacy, hello adresleri → contact form
   - 5 test dosyası güncellendi
 - **Testler:** API 983/983, Worker 48/48, ESLint clean
-- **Commit:** `3f83bfb` — main branch
+- **Commitler:** `3f83bfb`, `4a56822`, `8fe20f3` — main branch
 
 ## Oturum 103 (2026-05-11 05:56 - 06:54) ✅
 - **Resend email entegrasyonu** — `EmailProvider` enum oluşturuldu (Resend → GCloud → None)
