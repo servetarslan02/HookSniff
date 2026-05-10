@@ -264,9 +264,6 @@ async fn main() -> Result<()> {
 
     tracing::info!("👋 HookSniff Worker shut down gracefully");
 
-    // Flush OpenTelemetry traces before exit
-    opentelemetry::global::shutdown_tracer_provider();
-
     Ok(())
 }
 

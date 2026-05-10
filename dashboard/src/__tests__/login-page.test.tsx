@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -188,7 +188,7 @@ describe('LoginPage', () => {
   });
 
   it('shows loading spinner during login', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise((r) => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));
@@ -215,7 +215,7 @@ describe('LoginPage', () => {
   });
 
   it('disables submit button during loading', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise((r) => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));
