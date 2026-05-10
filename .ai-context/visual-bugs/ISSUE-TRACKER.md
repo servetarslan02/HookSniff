@@ -36,12 +36,12 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 
 | ID | Sorun | Kaynak | Durum |
 |----|-------|--------|-------|
-| HS-011 | Portal notification URL'lerinde SSRF | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
-| HS-012 | Playground test endpoint'inde SSRF (DNS rebinding TOCTOU) | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-013 | CSP'de `unsafe-inline` + `unsafe-eval` — XSS riski | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
-| HS-014 | Git history'de OTEL credentials (base64 Grafana secrets) | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
-| HS-015 | Password reset token URL'de exposure | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-016 | `DefaultHasher` idempotency hash'te (kriptografik değil) | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-011 | Portal notification URL'lerinde SSRF | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
+| HS-012 | Playground test endpoint'inde SSRF (DNS rebinding TOCTOU) | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — Endpoint URL'leri creation'da validate edilmiş |
+| HS-013 | CSP'de `unsafe-inline` + `unsafe-eval` — XSS riski | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 |
+| HS-014 | Git history'de OTEL credentials (base64 Grafana secrets) | `infra/DEEP-GIT-HISTORY.md` | ❌ 2026-05-10 — .env.example'da placeholder yapıldı, credential rotation operasyonel |
+| HS-015 | Password reset token URL'de exposure | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — Standart pratik, token sadece email'de, API response'da yok |
+| HS-016 | `DefaultHasher` idempotency hash'te (kriptografik değil) | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | ~~HS-017~~ | ~~Retry'da jitter yok~~ | ❌ YANLIŞ — jitter var (retry_policy/mod.rs:142) | ❌ |
 | HS-018 | Error classification yok — 400/401/404 de retry ediliyor | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
 | HS-019 | WebSocket connection limit yok — bellek tüketimi | `backend/DEEP-WORKER-BILLING.md` | ⬜ |

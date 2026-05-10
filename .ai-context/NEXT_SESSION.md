@@ -1,37 +1,38 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 19:22 GMT+8
+> Son güncelleme: 2026-05-10 19:26 GMT+8
 
 ---
 
 ## ✅ Tamamlanan Oturumlar
 
-### Oturum 73-77 ✅
-- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu
+### Oturum 73-78 ✅
+- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu, Billing & Account
 
-### Oturum 78 — Billing & Account Endpoints ✅
-- HS-032: `DELETE /billing/subscription` endpoint'i eklendi
-- HS-033: Hesap silme `/auth/me` → `/auth/account` düzeltildi
-- HS-073: Playground hardcoded token → apiKey kullanılıyor
-- HS-074: ❌ Yanlış bulgu — cookie auth çalışıyor
-- HS-076: api-keys `credentials` headers içinden çıkarıldı
+### Oturum 79 — SSRF & Security Hardening ✅
+- HS-011: Notification URL'lerine SSRF validation eklendi
+- HS-012: ❌ Yanlış bulgu — endpoint URL'leri creation'da validate edilmiş
+- HS-013: CSP'den `unsafe-eval` kaldırıldı
+- HS-014: ❌ Operasyonel — credential rotation gerekli
+- HS-015: ❌ Standart pratik — token sadece email'de
+- HS-016: `DefaultHasher` → SHA-256
 
 ---
 
-## 🔴 Sıradaki Oturum: #79 — SSRF & Security Hardening
+## 🔴 Sıradaki Oturum: #80 — Worker & Backend Core
 
 ### Görev
-SSRF koruması ve güvenlik sertleştirme.
+Worker ve backend düzeltmeleri.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-011 | Portal notification URL'lerinde SSRF | `api/src/routes/inbound.rs` |
-| HS-012 | Playground test endpoint'inde SSRF | `api/src/routes/playground.rs` |
-| HS-013 | CSP'de `unsafe-inline` + `unsafe-eval` | `dashboard/next.config.js` |
-| HS-014 | Git history'de OTEL credentials | Git history |
-| HS-015 | Password reset token URL'de exposure | `api/src/routes/auth.rs` |
-| HS-016 | `DefaultHasher` idempotency hash'te | `api/src/middleware/` |
+| HS-018 | Error classification yok — 400/401/404 de retry ediliyor | `worker/src/delivery/mod.rs` |
+| HS-019 | WebSocket connection limit yok | `api/src/ws/` |
+| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | `api/src/circuit_breaker.rs` |
+| HS-021 | Billing webhook'larda idempotency yok | `api/src/routes/billing.rs` |
+| HS-022 | Throttle state in-memory | `api/src/throttle/` |
+| HS-023 | FIFO modülü var ama worker'a bağlanmamış | `worker/src/` |
 
 ---
 
@@ -39,11 +40,11 @@ SSRF koruması ve güvenlik sertleştirme.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 79 | **SSRF & Security Hardening** | HS-011, HS-012, HS-013, HS-014, HS-015, HS-016 |
-| 80 | Worker & Backend Core | HS-018, HS-019, HS-020, HS-021, HS-022, HS-023 |
+| 80 | **Worker & Backend Core** | HS-018, HS-019, HS-020, HS-021, HS-022, HS-023 |
 | 81 | Database Issues | HS-024, HS-025, HS-026, HS-027, HS-038d, HS-038e |
 | 82 | Auth & Crypto Security | HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l |
 | 83 | SDK & Config Fixes | HS-035, HS-036, HS-037, HS-038, HS-038m, HS-038n |
+| 84 | Frontend Component Issues | HS-039, HS-040, HS-041, HS-042, HS-043, HS-044 |
 
 ---
 
@@ -52,7 +53,7 @@ SSRF koruması ve güvenlik sertleştirme.
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 8 (+4 yanlış) | 32 |
+| 🔴 P1 | 44 | 11 (+6 yanlış) | 27 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **21** | **79** |
+| **TOPLAM** | **103** | **24** | **76** |

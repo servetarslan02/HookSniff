@@ -301,6 +301,25 @@ async fn update_notifications(
         .and_then(|v| v.as_str())
         .map(|s| s.to_string());
 
+    // SSRF validation — block private/internal IPs on notification webhook URLs
+    for (name, url) in [
+        ("slack_webhook_url", &slack_webhook_url),
+        ("discord_webhook_url", &discord_webhook_url),
+        ("webhook_url", &webhook_url),
+    ] {
+        if let Some(u) = url {
+            if !u.is_empty() {
+                if let Err(e) = crate::ssrf::validate_url(u) {
+                    tracing::warn!("SSRF blocked notification URL {}: {}", name, e);
+                    return Err(AppError::BadRequest(format!(
+                        "Invalid {}: {}",
+                        name, e
+                    )));
+                }
+            }
+        }
+    }
+
     sqlx::query(
         r#"INSERT INTO notification_preferences (customer_id, email_on_failure, email_on_dead_letter, email_on_success, slack_webhook_url, discord_webhook_url, webhook_url, updated_at)
            VALUES ($1, $2, $3, $4, $5, $6, $7, now())
