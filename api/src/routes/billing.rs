@@ -361,13 +361,31 @@ async fn get_invoices(
 // Webhook handlers for each provider
 // ──────────────────────────────────────────────────────────────
 
+/// Maximum billing webhook attempts per IP per minute.
+const BILLING_WEBHOOK_RATE_LIMIT: u32 = 30;
+
 /// POST /v1/billing/webhook — Stripe webhook handler
 async fn handle_stripe_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
+    // Rate limit billing webhooks per IP
+    let client_ip = headers
+        .get("x-real-ip")
+        .or_else(|| headers.get("x-forwarded-for"))
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
+    let rl_key = format!("billing_webhook:{}", client_ip);
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, BILLING_WEBHOOK_RATE_LIMIT)
+        .await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     let signature = headers
         .get("stripe-signature")
         .and_then(|v| v.to_str().ok())
@@ -397,9 +415,24 @@ async fn handle_stripe_webhook(
 /// POST /v1/billing/webhook/polar — Polar.sh webhook handler
 async fn handle_polar_webhook(
     Extension(pool): Extension<PgPool>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
+    // Rate limit billing webhooks per IP
+    let client_ip = headers
+        .get("x-real-ip")
+        .or_else(|| headers.get("x-forwarded-for"))
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
+    let rl_key = format!("billing_webhook:{}", client_ip);
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, BILLING_WEBHOOK_RATE_LIMIT)
+        .await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     let config = crate::billing::polar::PolarConfig::from_env()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar.sh not configured")))?;
 
@@ -414,9 +447,24 @@ async fn handle_polar_webhook(
 /// POST /v1/billing/webhook/iyzico — iyzico webhook handler
 async fn handle_iyzico_webhook(
     Extension(pool): Extension<PgPool>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
+    // Rate limit billing webhooks per IP
+    let client_ip = headers
+        .get("x-real-ip")
+        .or_else(|| headers.get("x-forwarded-for"))
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
+    let rl_key = format!("billing_webhook:{}", client_ip);
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, BILLING_WEBHOOK_RATE_LIMIT)
+        .await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     let config = crate::billing::iyzico::IyzicoConfig::from_env()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("iyzico not configured")))?;
 
