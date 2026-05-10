@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 15:10 GMT+8
+> Son güncelleme: 2026-05-10 15:15 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -1588,3 +1588,57 @@ Dashboard'daki localStorage fallback'lar artık bu endpoint'lere bağlanabilir:
 - Oturumlar 1 saat sürüyor, hafıza dosyaları GitHub'da kalıcı
 - Her oturum sonunda `.ai-context/` → GitHub push yapılacak
 - Çalışma dili: Türkçe
+
+### Site Görsel Denetimi (15:10 GMT+8)
+
+**Denetlenen URL:** `https://hooksniff.vercel.app/tr`
+**Tarayıcı:** OpenClaw browser (desktop 1440px + mobile 375px)
+
+#### 🔴 KRİTİK — 404 Sayfalar (Çalışmayan Linkler)
+Footer ve navigasyonda link verilen 5 sayfa 404 hatası veriyor:
+- `/tr/docs` → ❌ 404
+- `/tr/dashboard` → ❌ 404
+- `/tr/about` → ❌ 404
+- `/tr/faq` → ❌ 404
+- `/tr/contact` → ❌ 404
+- **Not:** Bu sayfalar `/en/` versiyonunda da yok, genel sorun
+- **Çalışan sayfalar:** Ana sayfa ✅, Durum ✅, Şartlar ✅, Gizlilik ✅, Get Started ✅
+
+#### 🟠 MOBİL UYUMLULUK SORUNLARI (375px)
+1. **Code block taşması** — `<pre>` bloğu mobilde yatay taşma (821px genişlik, 317px alan)
+2. **İstatistik kartları taşması** — "24,891 Deliveries" vb. kartlar mobilde `text-2xl` ile taşıyor
+3. **Footer taşması** — Footer link grubu mobilde 477px vs 367px yatay taşma
+4. **Adım numaraları çakışması** — "Nasıl çalışır" bölümünde 1,2,3 numaraları ikonlarla üst üste
+
+#### 🟡 ÇEVİRİ SORUNLARI
+**Ana sayfa (`/tr`):**
+- Nav "Get Started" → çevrilmemiş, "Başlayın" olmalı
+- Nav "Panel →" → kısmen çevrilmiş
+
+**Get Started sayfası (`/tr/get-started`) — NEREDEYSE TAMAMI İNGİLİZCE:**
+- H1: "Get Started with HookSniff" → "HookSniff ile Başlayın"
+- "Create your account" → "Hesabınızı oluşturun"
+- "Get your API key" → "API anahtarınızı alın"
+- "Install the SDK" → "SDK'yı kurun"
+- "Create an endpoint" → "Bir endpoint oluşturun"
+- "Send your first webhook" → "İlk webhook'unuzu gönderin"
+- "Monitor deliveries & go live" → "Teslimatları izleyin ve canlıya alın"
+- Tüm paragraflar, butonlar ("Copy", "Create Free Account →") çevrilmemiş
+
+#### 🟡 İÇERİK TUTARSIZLIĞI
+- Fiyat kartı Free plan: **1.000 webhook/ay** (ana sayfa)
+- Get Started + README: **10.000 webhook/ay**
+- Tutarlı olmalı
+
+#### 🟢 KÜÇÜK SORUNLAR
+- H1 typewriter cursor `|` karakteri metne yapışık görünüyor
+- Nav "Panel →" ve "Ücretsiz başlayın" linklerinde 4px taşma
+- Accessibility: img alt texts ✅, heading hierarchy ✅, empty buttons ✅
+
+#### DÜZELTME ÖNCELİK SIRASI
+1. 🔴 404 sayfalar — sayfaları oluştur veya linkleri kaldır
+2. 🟡 Get Started çevirisi — neredeyse tamamı İngilizce
+3. 🟡 Mobil code block taşması — responsive yap
+4. 🟡 Fiyat tutarsızlığı — 1.000 mü 10.000 mi?
+5. 🟢 Mobil istatistik kartları — font küçült
+6. 🟢 Nav "Get Started" çevirisi
