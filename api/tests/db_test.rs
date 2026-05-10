@@ -34,6 +34,48 @@ async fn raw_pool() -> PgPool {
         .expect("Failed to connect to test database")
 }
 
+/// Helper: Create prerequisite rows (customer, endpoint, delivery) for queue tests.
+async fn create_test_delivery(pool: &PgPool, delivery_id: uuid::Uuid, endpoint_id: uuid::Uuid) -> uuid::Uuid {
+    let customer_id = uuid::Uuid::new_v4();
+
+    sqlx::query(
+        "INSERT INTO customers (id, email, api_key_hash, api_key_prefix, plan, is_active) \
+         VALUES ($1, $2, 'test_hash', 'test_prefix', 'free', true) \
+         ON CONFLICT (id) DO NOTHING",
+    )
+    .bind(customer_id)
+    .bind(format!("test_{}@example.com", customer_id))
+    .execute(pool)
+    .await
+    .unwrap();
+
+    sqlx::query(
+        "INSERT INTO endpoints (id, customer_id, url, signing_secret, description) \
+         VALUES ($1, $2, $3, 'test_secret', 'test') \
+         ON CONFLICT (id) DO NOTHING",
+    )
+    .bind(endpoint_id)
+    .bind(customer_id)
+    .bind("https://test.example.com/webhook")
+    .execute(pool)
+    .await
+    .unwrap();
+
+    sqlx::query(
+        "INSERT INTO deliveries (id, customer_id, endpoint_id, payload, status) \
+         VALUES ($1, $2, $3, '{\"event\":\"test\"}', 'pending') \
+         ON CONFLICT (id) DO NOTHING",
+    )
+    .bind(delivery_id)
+    .bind(customer_id)
+    .bind(endpoint_id)
+    .execute(pool)
+    .await
+    .unwrap();
+
+    customer_id
+}
+
 // ═══════════════════════════════════════════════════════════════
 // Test: create_pool connects and runs all migrations
 // ═══════════════════════════════════════════════════════════════
@@ -48,7 +90,7 @@ async fn test_create_pool_success() {
         .expect("create_pool should succeed");
 
     // Pool should be usable
-    let row: (i64,) = sqlx::query_as("SELECT 1")
+    let row: (i32,) = sqlx::query_as("SELECT 1")
         .fetch_one(&pool)
         .await
         .expect("Should execute SELECT 1");
@@ -83,7 +125,7 @@ async fn test_create_pool_strips_channel_binding() {
         .await
         .expect("create_pool should strip channel_binding and succeed");
 
-    let row: (i64,) = sqlx::query_as("SELECT 1")
+    let row: (i32,) = sqlx::query_as("SELECT 1")
         .fetch_one(&pool)
         .await
         .unwrap();
@@ -248,6 +290,10 @@ async fn test_publish_to_queue_inserts_row() {
 
     let delivery_id = uuid::Uuid::new_v4();
     let endpoint_id = uuid::Uuid::new_v4();
+
+    // Create prerequisite rows (customer → endpoint → delivery)
+    create_test_delivery(&pool, delivery_id, endpoint_id).await;
+
     let endpoint_url = "https://test.example.com/webhook";
     let payload = r#"{"event":"test.publish","data":{"id":1}}"#;
     let custom_headers = serde_json::json!({"X-Custom": "value"});
@@ -304,6 +350,8 @@ async fn test_publish_to_queue_no_custom_headers() {
     let delivery_id = uuid::Uuid::new_v4();
     let endpoint_id = uuid::Uuid::new_v4();
 
+    create_test_delivery(&pool, delivery_id, endpoint_id).await;
+
     hooksniff_api::db::publish_to_queue(
         &pool,
         delivery_id,
@@ -349,6 +397,8 @@ async fn test_publish_to_queue_has_trace_id() {
     .expect("create_pool");
 
     let delivery_id = uuid::Uuid::new_v4();
+
+    create_test_delivery(&pool, delivery_id, uuid::Uuid::new_v4()).await;
 
     hooksniff_api::db::publish_to_queue(
         &pool,
@@ -642,6 +692,8 @@ async fn test_publish_to_queue_duplicate_delivery_fails() {
 
     let delivery_id = uuid::Uuid::new_v4();
     let endpoint_id = uuid::Uuid::new_v4();
+
+    create_test_delivery(&pool, delivery_id, endpoint_id).await;
 
     // First insert should succeed
     hooksniff_api::db::publish_to_queue(
