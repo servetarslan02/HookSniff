@@ -140,7 +140,7 @@
       $statusBadge.textContent = "Connecting…";
       $statusBadge.className = "status-badge status-pending";
 
-      api("/api/v1/webhooks?limit=50")
+      api("/v1/webhooks?limit=50")
         .then(function (data) {
           webhooks = (data && data.webhooks) ? data.webhooks : (Array.isArray(data) ? data : []);
           $statusBadge.textContent = "Live";

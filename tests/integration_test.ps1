@@ -1,5 +1,5 @@
 # ============================================================================
-# HookRelay Integration Test Suite (PowerShell)
+# HookSniff Integration Test Suite (PowerShell)
 # ============================================================================
 # Tests the API end-to-end against a local development server.
 #
@@ -9,16 +9,16 @@
 #   .\tests\integration_test.ps1
 #
 # Prerequisites:
-#   - HookRelay API running on http://localhost:3000
+#   - HookSniff API running on http://localhost:3000
 #   - PowerShell 7+ (pwsh) or Windows PowerShell 5.1+
 # ============================================================================
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-$BaseUrl = $env:HOOKRELAY_BASE_URL ?? "http://localhost:3000"
+$BaseUrl = $env:HOOKSNIFF_BASE_URL ?? "http://localhost:3000"
 $ApiBase = "$BaseUrl/v1"
-$TestEmail = "integration-test-$(Get-Date -UFormat '%s')@hookrelay.is-a.dev"
+$TestEmail = "integration-test-$(Get-Date -UFormat '%s')@hooksniff.is-a.dev"
 $TestPassword = "TestPass1234!"
 
 # Test counters
@@ -115,7 +115,7 @@ function Api-Request {
 # Pre-flight: Check API is reachable
 # ---------------------------------------------------------------------------
 Write-Host "╔══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║         HookRelay Integration Test Suite                ║" -ForegroundColor Cyan
+Write-Host "║         HookSniff Integration Test Suite                ║" -ForegroundColor Cyan
 Write-Host "╚══════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Base URL: $BaseUrl"
