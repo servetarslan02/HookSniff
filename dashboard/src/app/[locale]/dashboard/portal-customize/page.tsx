@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -36,6 +37,7 @@ const FONT_OPTIONS = [
 
 /* ─── Main Page ─── */
 export default function PortalCustomizationPage() {
+  const t = useTranslations('portalCustomize');
   const { token } = useAuth();
   const { toast } = useToast();
   const [config, setConfig] = useState<PortalConfig>(DEFAULT_CONFIG);
@@ -71,9 +73,9 @@ export default function PortalCustomizationPage() {
     setSaving(true);
     try {
       await apiFetch('/portal/config', { method: 'POST', body: config, token });
-      toast('Portal configuration saved!', 'success');
+      toast(t('portalSaved'), 'success');
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to save portal config', 'error');
+      toast(err instanceof Error ? err.message : t('portalSaveFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -82,7 +84,7 @@ export default function PortalCustomizationPage() {
   const addEvent = () => {
     if (!newEvent.trim()) return;
     if (config.allowed_events.includes(newEvent.trim())) {
-      toast('Event already added', 'error');
+      toast(t('eventAlreadyAdded'), 'error');
       return;
     }
     setConfig({ ...config, allowed_events: [...config.allowed_events, newEvent.trim()] });
@@ -115,9 +117,9 @@ export default function PortalCustomizationPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🖼️ Portal Customization</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-gray-500 dark:text-slate-400 mt-1">
-            Customize the look and feel of your embedded webhook portal.
+            {t('subtitle')}
           </p>
         </div>
         <button
@@ -134,30 +136,30 @@ export default function PortalCustomizationPage() {
         <div className="space-y-6">
           {/* Branding */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🎨 Branding</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('branding')}</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Company Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('companyName')}</label>
                 <input
                   type="text"
                   value={config.company_name}
                   onChange={(e) => setConfig({ ...config, company_name: e.target.value })}
-                  placeholder="My Company"
+                  placeholder={t('companyNamePlaceholder')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Logo URL</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('logoUrl')}</label>
                 <input
                   type="url"
                   value={config.logo_url}
                   onChange={(e) => setConfig({ ...config, logo_url: e.target.value })}
-                  placeholder="https://example.com/logo.png"
+                  placeholder={t('logoUrlPlaceholder')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Primary Color</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('primaryColor')}</label>
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
@@ -174,7 +176,7 @@ export default function PortalCustomizationPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Font Family</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('fontFamily')}</label>
                 <select
                   value={config.font_family}
                   onChange={(e) => setConfig({ ...config, font_family: e.target.value })}
@@ -190,12 +192,12 @@ export default function PortalCustomizationPage() {
 
           {/* Features */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">⚙️ Features</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('features')}</h2>
             <div className="space-y-4">
               <label className="flex items-center justify-between cursor-pointer">
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">Dark Mode</div>
-                  <div className="text-xs text-gray-500 dark:text-slate-400">Enable dark mode by default</div>
+                  <div className="font-medium text-gray-900 dark:text-white text-sm">{t('darkMode')}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-400">{t('darkModeDesc')}</div>
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.dark_mode ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.dark_mode ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
@@ -209,8 +211,8 @@ export default function PortalCustomizationPage() {
               </label>
               <label className="flex items-center justify-between cursor-pointer">
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">Show Events</div>
-                  <div className="text-xs text-gray-500 dark:text-slate-400">Allow users to view event types</div>
+                  <div className="font-medium text-gray-900 dark:text-white text-sm">{t('showEvents')}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-400">{t('showEventsDesc')}</div>
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.show_events ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_events ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
@@ -224,8 +226,8 @@ export default function PortalCustomizationPage() {
               </label>
               <label className="flex items-center justify-between cursor-pointer">
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">Show Deliveries</div>
-                  <div className="text-xs text-gray-500 dark:text-slate-400">Allow users to view delivery history</div>
+                  <div className="font-medium text-gray-900 dark:text-white text-sm">{t('showDeliveries')}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-400">{t('showDeliveriesDesc')}</div>
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.show_deliveries ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_deliveries ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
@@ -242,9 +244,9 @@ export default function PortalCustomizationPage() {
 
           {/* Allowed Events */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📋 Allowed Events</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('allowedEvents')}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              Leave empty to show all events. Add specific event types to filter what users can subscribe to.
+              {t('allowedEventsDesc')}
             </p>
             <div className="flex gap-2 mb-3">
               <input
@@ -279,7 +281,7 @@ export default function PortalCustomizationPage() {
                 </span>
               ))}
               {config.allowed_events.length === 0 && (
-                <span className="text-sm text-gray-400 dark:text-slate-500">All events allowed</span>
+                <span className="text-sm text-gray-400 dark:text-slate-500">{t('allEventsAllowed')}</span>
               )}
             </div>
           </div>
@@ -288,7 +290,7 @@ export default function PortalCustomizationPage() {
         {/* Preview Panel */}
         <div className="space-y-6">
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">👁️ Preview</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('preview')}</h2>
             <div
               className="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700"
               style={{ fontFamily: config.font_family }}
@@ -305,7 +307,7 @@ export default function PortalCustomizationPage() {
                     <span className="text-2xl">🪝</span>
                   )}
                   <span className="text-white font-semibold">
-                    {config.company_name || 'HookSniff'} Portal
+                    {config.company_name || 'HookSniff'} {t('portalLabel')}
                   </span>
                 </div>
               </div>
@@ -313,14 +315,14 @@ export default function PortalCustomizationPage() {
               <div className={`p-6 ${config.dark_mode ? 'bg-slate-900 text-white' : 'bg-white text-gray-900'}`}>
                 <div className="space-y-4">
                   <div className={`p-4 rounded-xl ${config.dark_mode ? 'bg-slate-800' : 'bg-gray-50'}`}>
-                    <div className="text-sm font-medium mb-2">Webhook Endpoints</div>
+                    <div className="text-sm font-medium mb-2">{t('webhookEndpoints')}</div>
                     <div className={`text-xs ${config.dark_mode ? 'text-slate-400' : 'text-gray-500'}`}>
-                      2 endpoints configured
+                      {t('endpointsConfigured', { count: 2 })}
                     </div>
                   </div>
                   {config.show_events && (
                     <div className={`p-4 rounded-xl ${config.dark_mode ? 'bg-slate-800' : 'bg-gray-50'}`}>
-                      <div className="text-sm font-medium mb-2">Event Subscriptions</div>
+                      <div className="text-sm font-medium mb-2">{t('eventSubscriptions')}</div>
                       <div className="flex gap-2">
                         <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: config.primary_color + '20', color: config.primary_color }}>
                           order.created
@@ -333,9 +335,9 @@ export default function PortalCustomizationPage() {
                   )}
                   {config.show_deliveries && (
                     <div className={`p-4 rounded-xl ${config.dark_mode ? 'bg-slate-800' : 'bg-gray-50'}`}>
-                      <div className="text-sm font-medium mb-2">Recent Deliveries</div>
+                      <div className="text-sm font-medium mb-2">{t('recentDeliveries')}</div>
                       <div className={`text-xs ${config.dark_mode ? 'text-slate-400' : 'text-gray-500'}`}>
-                        ✅ 47 delivered · ❌ 3 failed
+                        {t('deliveredFailed', { delivered: 47, failed: 3 })}
                       </div>
                     </div>
                   )}
@@ -346,13 +348,13 @@ export default function PortalCustomizationPage() {
 
           {/* Embed Code */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📋 Embed Code</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('embedCode')}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              Copy this code into your dashboard to embed the portal.
+              {t('embedCodeDesc')}
             </p>
             <div className="relative">
               <button
-                onClick={() => { navigator.clipboard.writeText(embedCode); toast('Copied!', 'success'); }}
+                onClick={() => { navigator.clipboard.writeText(embedCode); toast(t('copied'), 'success'); }}
                 className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
               >
                 Copy
@@ -365,7 +367,7 @@ export default function PortalCustomizationPage() {
 
           {/* React Integration */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">⚛️ React Integration</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('reactIntegration')}</h2>
             <div className="relative">
               <button
                 onClick={() => {
@@ -377,7 +379,7 @@ export default function PortalCustomizationPage() {
   darkMode={${config.dark_mode}}
   companyName="${config.company_name || 'My App'}"
 />`);
-                  toast('Copied!', 'success');
+                  toast(t('copied'), 'success');
                 }}
                 className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
               >

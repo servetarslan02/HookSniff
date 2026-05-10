@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -10,6 +11,8 @@ import { StatusBadge } from '@/components/StatusBadge';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function DeliveryDetailPage() {
+  const t = useTranslations('deliveryDetail');
+  const tCommon = useTranslations('common');
   const { id } = useParams<{ id: string }>();
   const { token } = useAuth();
   const { toast } = useToast();
@@ -37,7 +40,7 @@ export default function DeliveryDetailPage() {
       setDelivery(detail);
       setAttempts(attemptList);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load delivery';
+      const message = err instanceof Error ? err.message : t('loadFailed');
       setError(message);
     } finally {
       setLoading(false);
@@ -51,10 +54,10 @@ export default function DeliveryDetailPage() {
     setReplaying(true);
     try {
       await webhooksApi.replay(token, id);
-      toast('Webhook replayed successfully!', 'success');
+      toast(t('toastReplaySuccess'), 'success');
       fetchData();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Replay failed';
+      const message = err instanceof Error ? err.message : t('toastReplayFailed');
       toast(message, 'error');
     } finally {
       setReplaying(false);
@@ -68,7 +71,7 @@ export default function DeliveryDetailPage() {
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 2000);
     } catch {
-      toast('Failed to copy', 'error');
+      toast(t('toastCopyFailed'), 'error');
     }
   };
 
@@ -131,20 +134,20 @@ export default function DeliveryDetailPage() {
     return (
       <div className="glass-card p-12 text-center">
         <div className="text-5xl mb-4">⚠️</div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Failed to load delivery</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('loadFailed')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{error}</p>
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={fetchData}
             className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
           >
-            Try Again
+            {t('tryAgain')}
           </button>
           <button
             onClick={() => router.push('/dashboard/deliveries')}
             className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
-            Back to Deliveries
+            {t('backToDeliveries')}
           </button>
         </div>
       </div>
@@ -161,14 +164,14 @@ export default function DeliveryDetailPage() {
           <button
             onClick={() => router.push('/dashboard/deliveries')}
             className="p-2 -ml-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
-            title="Back to deliveries"
+            title={t('backToDeliveries')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Delivery Details</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 font-mono">{delivery.id}</p>
           </div>
         </div>
@@ -179,28 +182,28 @@ export default function DeliveryDetailPage() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          Replay Webhook
+          {t('replayWebhook')}
         </button>
       </div>
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="glass-card p-5">
-          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Status</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">{t('statusLabel')}</p>
           <StatusBadge status={delivery.status} size="lg" />
         </div>
         <div className="glass-card p-5">
-          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Event</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">{t('eventLabel')}</p>
           <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-100 dark:bg-slate-800 text-sm font-mono text-gray-700 dark:text-slate-300">
             {delivery.event || '—'}
           </span>
         </div>
         <div className="glass-card p-5">
-          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Attempts</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">{t('attemptsLabel')}</p>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{delivery.attempt_count}</p>
         </div>
         <div className="glass-card p-5">
-          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Response</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">{t('responseLabel')}</p>
           {delivery.response_status ? (
             <p className={`text-2xl font-bold font-mono ${getHttpStatusColor(delivery.response_status)}`}>
               {delivery.response_status}
@@ -216,27 +219,27 @@ export default function DeliveryDetailPage() {
         {/* Delivery Info */}
         <div className="glass-card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <span>📋</span> Delivery Information
+            <span>📋</span> {t('deliveryInfo')}
           </h3>
           <div className="space-y-4">
-            <DetailRow label="Delivery ID" value={delivery.id} mono copyable onCopy={() => copyToClipboard(delivery.id, 'id')} copied={copiedField === 'id'} />
-            <DetailRow label="Endpoint ID" value={delivery.endpoint_id} mono copyable onCopy={() => copyToClipboard(delivery.endpoint_id, 'endpoint')} copied={copiedField === 'endpoint'} />
+            <DetailRow label={t('deliveryId')} value={delivery.id} mono copyable onCopy={() => copyToClipboard(delivery.id, 'id')} copied={copiedField === 'id'} />
+            <DetailRow label={t('endpointId')} value={delivery.endpoint_id} mono copyable onCopy={() => copyToClipboard(delivery.endpoint_id, 'endpoint')} copied={copiedField === 'endpoint'} />
             {delivery.endpoint_url && (
-              <DetailRow label="Endpoint URL" value={delivery.endpoint_url} mono copyable onCopy={() => copyToClipboard(delivery.endpoint_url!, 'url')} copied={copiedField === 'url'} />
+              <DetailRow label={t('endpointUrl')} value={delivery.endpoint_url} mono copyable onCopy={() => copyToClipboard(delivery.endpoint_url!, 'url')} copied={copiedField === 'url'} />
             )}
-            <DetailRow label="Event Type" value={delivery.event || '—'} />
-            <DetailRow label="Status" value={delivery.status} />
-            <DetailRow label="Attempt Count" value={String(delivery.attempt_count)} />
+            <DetailRow label={t('eventType')} value={delivery.event || '—'} />
+            <DetailRow label={t('status')} value={delivery.status} />
+            <DetailRow label={t('attemptCount')} value={String(delivery.attempt_count)} />
             {delivery.response_status && (
-              <DetailRow label="Last Response" value={String(delivery.response_status)} />
+              <DetailRow label={t('lastResponse')} value={String(delivery.response_status)} />
             )}
-            <DetailRow label="Created" value={new Date(delivery.created_at).toLocaleString()} />
+            <DetailRow label={t('created')} value={new Date(delivery.created_at).toLocaleString()} />
             {delivery.updated_at && (
-              <DetailRow label="Updated" value={new Date(delivery.updated_at).toLocaleString()} />
+              <DetailRow label={t('updated')} value={new Date(delivery.updated_at).toLocaleString()} />
             )}
             {delivery.error_message && (
               <div className="pt-3 border-t border-gray-100 dark:border-slate-800">
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Error</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">{t('errorLabel')}</p>
                 <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-lg font-mono break-all">
                   {delivery.error_message}
                 </p>
@@ -248,7 +251,7 @@ export default function DeliveryDetailPage() {
         {/* Request Details */}
         <div className="glass-card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <span>📤</span> Request Details
+            <span>📤</span> {t('requestDetails')}
           </h3>
 
           {/* Request Headers */}
@@ -258,10 +261,10 @@ export default function DeliveryDetailPage() {
               className="flex items-center justify-between w-full text-left group"
             >
               <p className="text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-white transition">
-                Request Headers
+                {t('requestHeaders')}
                 {delivery.request_headers && (
                   <span className="ml-2 text-xs text-gray-400 dark:text-slate-500">
-                    ({Object.keys(delivery.request_headers).length} headers)
+                    ({Object.keys(delivery.request_headers).length} {tCommon('headers').toLowerCase()})
                   </span>
                 )}
               </p>
@@ -277,13 +280,13 @@ export default function DeliveryDetailPage() {
                 <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl p-4 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-64 overflow-y-auto">
                   {delivery.request_headers
                     ? formatHeaders(delivery.request_headers)
-                    : 'No headers captured'}
+                    : t('noHeaders')}
                 </pre>
                 {delivery.request_headers && (
                   <button
                     onClick={() => copyToClipboard(formatHeaders(delivery.request_headers!), 'req-headers')}
                     className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-                    title="Copy headers"
+                    title={t('copyHeaders')}
                   >
                     {copiedField === 'req-headers' ? (
                       <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -307,7 +310,7 @@ export default function DeliveryDetailPage() {
               className="flex items-center justify-between w-full text-left group"
             >
               <p className="text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-white transition">
-                Request Body (Payload)
+                {t('requestBody')}
               </p>
               <svg
                 className={`w-4 h-4 text-gray-400 dark:text-slate-500 transition-transform ${showRequestBody ? 'rotate-180' : ''}`}
@@ -321,13 +324,13 @@ export default function DeliveryDetailPage() {
                 <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl p-4 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-80 overflow-y-auto">
                   {delivery.request_body
                     ? formatJson(delivery.request_body)
-                    : 'No payload captured'}
+                    : t('noPayload')}
                 </pre>
                 {delivery.request_body != null && (
                   <button
                     onClick={() => copyToClipboard(formatJson(delivery.request_body), 'req-body')}
                     className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-                    title="Copy payload"
+                    title={t('copyPayload')}
                   >
                     {copiedField === 'req-body' ? (
                       <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -348,19 +351,19 @@ export default function DeliveryDetailPage() {
 
       {/* Attempt Timeline */}
       <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-          <span>⏱️</span> Attempt Timeline
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <span>⏱️</span> {t('attemptTimeline')}
           {attempts.length > 0 && (
             <span className="text-xs font-normal text-gray-400 dark:text-slate-500 ml-2">
-              ({attempts.length} {attempts.length === 1 ? 'attempt' : 'attempts'})
+              ({attempts.length} {tCommon('attempts').toLowerCase()})
             </span>
           )}
         </h3>
 
         {attempts.length === 0 ? (
           <div className="text-center py-8 text-gray-400 dark:text-slate-500">
-            <p className="text-sm">No attempt data available</p>
-            <p className="text-xs mt-1">Attempts will appear here once the delivery is processed</p>
+            <p className="text-sm">{t('noAttemptData')}</p>
+            <p className="text-xs mt-1">{t('noAttemptDataDesc')}</p>
           </div>
         ) : (
           <div className="relative">
@@ -383,7 +386,7 @@ export default function DeliveryDetailPage() {
                         <div className="flex items-center gap-2">
                           <span className="text-lg">{getAttemptStatusIcon(attempt.status)}</span>
                           <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            Attempt #{attempt.attempt_number}
+                            {t('attemptN', { n: attempt.attempt_number })}
                           </span>
                         </div>
                         <StatusBadge status={attempt.status} size="sm" />
@@ -417,7 +420,7 @@ export default function DeliveryDetailPage() {
                         {/* Error message */}
                         {attempt.error_message && (
                           <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">Error Message</p>
+                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">{t('errorMessage')}</p>
                             <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-lg font-mono break-all">
                               {attempt.error_message}
                             </p>
@@ -428,7 +431,7 @@ export default function DeliveryDetailPage() {
                         {attempt.response_headers && Object.keys(attempt.response_headers).length > 0 && (
                           <div>
                             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">
-                              Response Headers
+                              {t('responseHeaders')}
                               <span className="ml-1 text-gray-400 dark:text-slate-500">
                                 ({Object.keys(attempt.response_headers).length})
                               </span>
@@ -442,7 +445,7 @@ export default function DeliveryDetailPage() {
                         {/* Response Body */}
                         {attempt.response_body && (
                           <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">Response Body</p>
+                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">{t('responseBody')}</p>
                             <div className="relative">
                               <pre className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-64 overflow-y-auto">
                                 {(() => {
@@ -456,7 +459,7 @@ export default function DeliveryDetailPage() {
                                   copyToClipboard(attempt.response_body!, `resp-${attempt.id}`);
                                 }}
                                 className="absolute top-2 right-2 p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-                                title="Copy response body"
+                                title={t('copyResponseBody')}
                               >
                                 {copiedField === `resp-${attempt.id}` ? (
                                   <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,7 +478,7 @@ export default function DeliveryDetailPage() {
                         {/* No additional data */}
                         {!attempt.error_message && !attempt.response_headers && !attempt.response_body && (
                           <p className="text-xs text-gray-400 dark:text-slate-500 italic">
-                            No additional debug data captured for this attempt
+                            {t('noDebugData')}
                           </p>
                         )}
                       </div>
@@ -491,9 +494,9 @@ export default function DeliveryDetailPage() {
       {/* Replay Confirmation */}
       <ConfirmDialog
         open={showReplayConfirm}
-        title="Replay Webhook"
-        message={`Replay this webhook delivery to the same endpoint? This will create a new delivery attempt.`}
-        confirmLabel="Replay"
+        title={t('replayTitle')}
+        message={t('replayMessage')}
+        confirmLabel={t('replayConfirm')}
         onConfirm={handleReplay}
         onCancel={() => setShowReplayConfirm(false)}
         loading={replaying}

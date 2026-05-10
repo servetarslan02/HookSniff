@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 
@@ -38,6 +39,7 @@ const TEMPLATES = {
 };
 
 export default function WebhookBuilderPage() {
+  const t = useTranslations('webhookBuilder');
   const { token } = useAuth();
   const { toast } = useToast();
   const [eventType, setEventType] = useState('order.created');
@@ -82,7 +84,7 @@ export default function WebhookBuilderPage() {
 
   const handleSend = async () => {
     if (!token || !endpointId) {
-      toast('Select an endpoint first', 'error');
+      toast(t('selectEndpointFirst'), 'error');
       return;
     }
     setSending(true);
@@ -103,12 +105,12 @@ export default function WebhookBuilderPage() {
         body: JSON.stringify({ endpoint_id: endpointId, event: eventType, data: payload }),
       });
       if (res.ok) {
-        toast('Webhook sent!', 'success');
+        toast(t('webhookSent'), 'success');
       } else {
-        toast('Failed to send', 'error');
+        toast(t('sendFailed'), 'error');
       }
     } catch {
-      toast('Network error', 'error');
+      toast(t('networkError'), 'error');
     } finally {
       setSending(false);
     }
@@ -117,9 +119,9 @@ export default function WebhookBuilderPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🔧 Webhook Builder</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Visually create and send webhook payloads. No code required.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -128,7 +130,7 @@ export default function WebhookBuilderPage() {
         <div className="space-y-6">
           {/* Templates */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Templates</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('templates')}</h2>
             <div className="flex gap-2">
               {Object.keys(TEMPLATES).map((name) => (
                 <button
@@ -148,7 +150,7 @@ export default function WebhookBuilderPage() {
 
           {/* Event Type */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Event Type</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('eventType')}</h2>
             <input
               type="text"
               value={eventType}
@@ -161,8 +163,8 @@ export default function WebhookBuilderPage() {
           {/* Fields */}
           <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Payload Fields</h2>
-              <button onClick={addField} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">+ Add field</button>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('payloadFields')}</h2>
+              <button onClick={addField} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('addField')}</button>
             </div>
             <div className="space-y-3">
               {fields.map((field, i) => (
@@ -172,9 +174,9 @@ export default function WebhookBuilderPage() {
                     onChange={(e) => updateField(i, { type: e.target.value as WebhookField['type'] })}
                     className="px-2 py-3 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white w-24"
                   >
-                    <option value="string">str</option>
-                    <option value="number">num</option>
-                    <option value="boolean">bool</option>
+                    <option value="string">{t('typeStr')}</option>
+                    <option value="number">{t('typeNum')}</option>
+                    <option value="boolean">{t('typeBool')}</option>
                   </select>
                   <input
                     type="text"
@@ -203,12 +205,12 @@ export default function WebhookBuilderPage() {
 
           {/* Send */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Send To</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sendTo')}</h2>
             <input
               type="text"
               value={endpointId}
               onChange={(e) => setEndpointId(e.target.value)}
-              placeholder="ep_your_endpoint_id"
+              placeholder={t('endpointPlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm mb-3"
             />
             <button
@@ -216,7 +218,7 @@ export default function WebhookBuilderPage() {
               disabled={sending || !endpointId}
               className="w-full px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
             >
-              {sending ? 'Sending...' : '🚀 Send Webhook'}
+              {sending ? t('sending') : t('sendWebhook')}
             </button>
           </div>
         </div>
@@ -225,16 +227,16 @@ export default function WebhookBuilderPage() {
         <div className="space-y-6">
           <div className="glass-card p-6 sticky top-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Preview</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('preview')}</h2>
               <button
                 onClick={updatePreview}
                 className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
               >
-                🔄 Refresh
+                {t('refresh')}
               </button>
             </div>
             <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto min-h-[200px]">
-              <code>{preview || '// Click "Refresh" to preview the payload'}</code>
+              <code>{preview || t('previewHint')}</code>
             </pre>
           </div>
         </div>
