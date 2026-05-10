@@ -114,7 +114,7 @@ export default function AlertsPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
               <input
                 type="text"
                 value={form.name}
@@ -124,7 +124,7 @@ export default function AlertsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Condition</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('condition')}</label>
               <select
                 value={form.condition}
                 onChange={(e) => setForm({ ...form, condition: e.target.value })}
@@ -136,7 +136,7 @@ export default function AlertsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Threshold</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('threshold')}</label>
               <input
                 type="number"
                 value={form.threshold}
@@ -145,7 +145,7 @@ export default function AlertsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Channels</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('channels')}</label>
               <div className="flex gap-2">
                 {['slack', 'email', 'webhook'].map((ch) => (
                   <button

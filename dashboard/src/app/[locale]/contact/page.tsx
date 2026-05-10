@@ -39,15 +39,15 @@ export default function ContactPage() {
           <div className="flex items-center gap-3">
             <a href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</a>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Contact</span>
+            <span className="text-gray-600 dark:text-slate-400">{t('contact.title')}</span>
           </div>
           <LanguageSwitcher />
         </div>
       </nav>
 
       <main className="max-w-4xl mx-auto px-6 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Contact Us</h1>
-        <p className="text-gray-500 dark:text-slate-400 mb-12">Have a question or need help? We&apos;d love to hear from you.</p>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('contact.title')}</h1>
+        <p className="text-gray-500 dark:text-slate-400 mb-12">{t('contact.subtitle')}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Contact Info Cards */}
@@ -57,7 +57,7 @@ export default function ContactPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Email</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.email')}</h3>
             <a href="mailto:support@hooksniff.vercel.app" className="text-brand-600 dark:text-brand-400 hover:underline text-sm">support@hooksniff.vercel.app</a>
           </div>
 
@@ -68,7 +68,7 @@ export default function ContactPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Location</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.location')}</h3>
             <p className="text-gray-500 dark:text-slate-400 text-sm">Turkey 🇹🇷</p>
           </div>
 
@@ -78,14 +78,14 @@ export default function ContactPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Response Time</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.responseTime')}</h3>
             <p className="text-gray-500 dark:text-slate-400 text-sm">Usually within 24 hours</p>
           </div>
         </div>
 
         {/* Contact Form */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Send us a message</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">{t('contact.sendMessage')}</h2>
 
           {status === 'sent' && (
             <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl p-4 mb-6">
@@ -102,7 +102,7 @@ export default function ContactPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('contact.name')}</label>
                 <input
                   type="text"
                   value={form.name}
@@ -114,7 +114,7 @@ export default function ContactPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Email</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('contact.email')}</label>
                 <input
                   type="email"
                   value={form.email}
@@ -127,24 +127,24 @@ export default function ContactPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Subject</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('contact.subject')}</label>
               <select
                 value={form.subject}
                 onChange={e => setForm({ ...form, subject: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
                 required
               >
-                <option value="">Select a topic</option>
-                <option value="general">General question</option>
-                <option value="technical">Technical support</option>
-                <option value="billing">Billing & payments</option>
-                <option value="enterprise">Enterprise inquiry</option>
-                <option value="bug">Bug report</option>
-                <option value="feature">Feature request</option>
+                <option value="">{t('contact.selectTopic')}</option>
+                <option value="general">{t('contact.generalQuestion')}</option>
+                <option value="technical">{t('contact.technicalSupport')}</option>
+                <option value="billing">{t('contact.billingPayments')}</option>
+                <option value="enterprise">{t('contact.enterpriseInquiry')}</option>
+                <option value="bug">{t('contact.bugReport')}</option>
+                <option value="feature">{t('contact.featureRequest')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Message</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('contact.message')}</label>
               <textarea
                 value={form.message}
                 onChange={e => setForm({ ...form, message: e.target.value })}
