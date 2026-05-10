@@ -111,7 +111,7 @@ export default function SecurityPage() {
         <div className="mb-16 p-6 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🔍 Responsible Disclosure</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
-            Found a security vulnerability? We appreciate responsible disclosure. Please report to <span className="font-mono text-brand-600 dark:text-brand-400">security@hooksniff.com</span> with details.
+            Found a security vulnerability? We appreciate responsible disclosure. Please report to <span className="font-mono text-brand-600 dark:text-brand-400">security@hooksniff.vercel.app</span> with details.
           </p>
           <p className="text-sm text-gray-600 dark:text-slate-400">
             We commit to acknowledging reports within 24 hours and providing a fix timeline within 72 hours.
