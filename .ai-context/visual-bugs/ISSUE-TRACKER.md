@@ -39,7 +39,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-011 | Portal notification URL'lerinde SSRF | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-012 | Playground test endpoint'inde SSRF (DNS rebinding TOCTOU) | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — Endpoint URL'leri creation'da validate edilmiş |
 | HS-013 | CSP'de `unsafe-inline` + `unsafe-eval` — XSS riski | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 |
-| HS-014 | Git history'de OTEL credentials (base64 Grafana secrets) | `infra/DEEP-GIT-HISTORY.md` | ⚠️ 2026-05-10 — .env.example placeholder yapıldı. Grafana'da token rotation gerekli (operasyonel) |
+| HS-014 | Git history'de OTEL credentials (base64 Grafana secrets) | `infra/DEEP-GIT-HISTORY.md` | ⚠️ 2026-05-11 — .env.example placeholder yapıldı, Polar ID env var. Git history BFG gerektirir (operasyonel) |
 | HS-015 | Password reset token URL'de exposure | `backend/DEEP-RUST-API.md` | ⚠️ 2026-05-10 — Standart pratik (GitHub/Stripe/Google aynı sistemi kullanır). Tek kullanımlık, 1 saat geçerli |
 | HS-016 | `DefaultHasher` idempotency hash'te (kriptografik değil) | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | ~~HS-017~~ | ~~Retry'da jitter yok~~ | ❌ YANLIŞ — jitter var (retry_policy/mod.rs:142) | ❌ |
@@ -113,7 +113,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-064 | Response body PII içerebilir — trace'de loglanıyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
 | HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ⬜ (büyük iş) |
 | HS-066 | 71 sayfada metadata eksik (SEO) | `frontend/DEEP-A11Y-SEO.md` | ⚠️ 2026-05-10 — Client component, layout'tan geliyor |
-| HS-067 | Müşteri hikayeleri kurgusal — yasal risk | `infra/DEEP-LANDING-CONTENT.md` | ⬜ |
+| HS-067 | Müşteri hikayeleri kurgusal — yasal risk | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-11 — PayStack→PayFlow, disclaimer eklendi |
 | HS-068 | Türkçe çeviri hataları | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-10 (Oturum 93) |
 | HS-069 | FAQ eksik — SEO featured snippets kaybı | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-10 (Oturum 90) |
 | HS-070 | `next.config.js`'de `output: 'standalone'` eksik | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 83) |
