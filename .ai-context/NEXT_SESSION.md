@@ -184,6 +184,36 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/lo
 - Grafana token rotate (operasyonel — Servet yapacak)
 - BFG ile git history temizliği (opsiyonel)
 
+### 8. SDK Otomatik Güncelleme Sistemi (HS-090) — DETAYLI ARAŞTIRMA GEREKLİ
+**Durum:** ⬜ Araştırılacak, sonra implementasyon
+
+**Ne yapılacak:**
+- OpenAPI spec'den SDK otomatik üretimi (`openapi-generator` veya benzeri araç)
+- GitHub Actions CI: OpenAPI spec değişince → 11 SDK otomatik üretilir → commit + push
+- Admin panelde SDK yönetim sayfası (versiyon takibi, durum göstergesi)
+- SDK publish otomasyonu (npm, PyPI, crates.io, Maven, NuGet, Hex, RubyGems, Packagist)
+- Eski versiyon desteği + deprecation warning sistemi
+- Semver kuralları: minor/patch = güvenli, major = kırıcı değişiklik uyarısı
+
+**Neden ertelendi:**
+- Kimse SDK'yı indirmedi, acil değil
+- OpenAPI spec'in doğru ve güncel olması gerekiyor
+- Kurulum 1-2 saat sürüyor, dikkatli planlama lazım
+- Lansman sonrası öncelikli
+
+**Mevcut durum:**
+- 11 SDK elle yazılmış, 0.2.0 versiyonunda
+- Admin panelde SDK yönetim sayfası **yok** (sadece dokümantasyon sayfası var)
+- Otomatik güncelleme sistemi **yok**
+- Svix rakibi 1.93.0 versiyonunda, openapi-generator kullanıyor
+
+**Araştırma konuları:**
+1. OpenAPI spec güncel mi? Tüm endpoint'leri yansıtıyor mu?
+2. openapi-generator vs diğer araçlar (kiwi, swagger-codegen)
+3. GitHub Actions workflow tasarımı
+4. SDK backward compatibility stratejisi
+5. Admin panel SDK sayfası tasarımı
+
 ---
 
 ## 📊 İlerleme
