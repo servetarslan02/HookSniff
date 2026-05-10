@@ -303,7 +303,7 @@ describe('LoginPage Ultra', () => {
 
   // 20. Shows loading spinner during submit
   it('shows loading spinner during submit', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise((r) => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));
@@ -330,7 +330,7 @@ describe('LoginPage Ultra', () => {
 
   // 21. Sign in button disabled during loading
   it('sign in button disabled during loading', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise((r) => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));
@@ -499,7 +499,7 @@ describe('LoginPage Ultra', () => {
 
   // 36. Login button shows spinner and text together
   it('login button shows spinner and text together during loading', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise((r) => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));
