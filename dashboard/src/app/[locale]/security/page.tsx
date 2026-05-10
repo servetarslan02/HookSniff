@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -28,6 +29,7 @@ const compliance = [
 ];
 
 export default function SecurityPage() {
+  const t = useTranslations(\'security\');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -82,10 +84,10 @@ export default function SecurityPage() {
 
         {/* Architecture Security */}
         <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Architecture security</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t("architecture")}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Data at rest</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("dataAtRest")}</h3>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
                 <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>AES-256 encryption for stored data</li>
                 <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>Neon PostgreSQL with encrypted volumes</li>
@@ -94,7 +96,7 @@ export default function SecurityPage() {
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Data in transit</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("dataInTransit")}</h3>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
                 <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>TLS 1.3 for all connections</li>
                 <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>HSTS with preload</li>
@@ -122,7 +124,7 @@ export default function SecurityPage() {
           <p className="text-gray-400 dark:text-slate-400 mb-6">Our team is happy to discuss your security requirements.</p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/contact" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Contact us →</Link>
-            <a href="https://github.com/servetarslan02/HookSniff" target="_blank" rel="noopener noreferrer" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">View source code</a>
+            <a href="https://github.com/servetarslan02/HookSniff" target="_blank" rel="noopener noreferrer" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("viewSource")}</a>
           </div>
         </div>
       </main>

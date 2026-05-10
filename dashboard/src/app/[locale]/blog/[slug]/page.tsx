@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
@@ -232,15 +233,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {/* Share */}
         <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-800 flex items-center gap-4">
           <span className="text-sm text-gray-500 dark:text-slate-500">Share:</span>
-          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Twitter</a>
-          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">LinkedIn</a>
-          <a href={`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}&t=${encodeURIComponent(post.title)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Hacker News</a>
+          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">{t("twitter")}</a>
+          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">{t("linkedin")}</a>
+          <a href={`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}&t=${encodeURIComponent(post.title)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">{t("hackerNews")}</a>
         </div>
 
         {/* Related Posts */}
         {related.length > 0 && (
           <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-800">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Related Posts</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("relatedPosts")}</h3>
             <div className="grid gap-4">
               {related.map((r) => (
                 <Link key={r.slug} href={`/blog/${r.slug}`} className="block group">
@@ -284,7 +285,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       {hasTOC && (
         <nav className="hidden lg:block fixed right-4 top-24 w-56 max-h-[calc(100vh-8rem)] overflow-y-auto">
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4">
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-3">On This Page</h4>
+            <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-3">{t("onThisPage")}</h4>
             <ul className="space-y-1.5">
               {headings.map((h, i) => {
                 const headingId = h.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

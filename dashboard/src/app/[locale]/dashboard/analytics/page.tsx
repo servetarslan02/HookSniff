@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
       {/* Summary StatCards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
-          label="Success Rate"
+          label={t("analytics.successRate")}
           value={`${rate.toFixed(1)}%`}
           color="emerald"
           isPercent={false}
@@ -99,7 +99,7 @@ export default function AnalyticsPage() {
           }
         />
         <StatCard
-          label="Total Delivered"
+          label={t("analytics.totalDelivered")}
           value={successRateData?.successful?.toLocaleString() ?? '0'}
           color="blue"
           icon={
@@ -110,7 +110,7 @@ export default function AnalyticsPage() {
           }
         />
         <StatCard
-          label="Total Failed"
+          label={t("analytics.totalFailed")}
           value={successRateData?.failed?.toLocaleString() ?? '0'}
           color="red"
           icon={

@@ -1,16 +1,18 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function IntegrationsPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Integration Guides</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("integrationGuides")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Connect HookSniff with popular platforms. Use our inbound proxy to receive webhooks from third-party services, or send webhooks to your own endpoints.
       </p>
 
       {/* Stripe */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Stripe Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("stripeWebhooks")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Forward Stripe webhook events through HookSniff for reliable delivery and monitoring:
         </p>
@@ -48,7 +50,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 
       {/* GitHub */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">GitHub Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("githubWebhooks")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Route GitHub webhook events through HookSniff for reliable delivery:
         </p>
@@ -73,7 +75,7 @@ function verifyGitHubSignature(payload: string, signature: string, secret: strin
 
       {/* Shopify */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Shopify Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("shopifyWebhooks")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Forward Shopify webhook events for order tracking, inventory management, and more:
         </p>
@@ -88,7 +90,7 @@ function verifyGitHubSignature(payload: string, signature: string, secret: strin
 
       {/* Generic Receiver */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Generic Webhook Receiver</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("genericReceiver")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Build a universal webhook receiver that works with any provider:
         </p>
@@ -133,7 +135,7 @@ function normalizeEvent(provider: string, payload: any) {
 
       {/* Inbound Proxy */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Inbound Proxy</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("inboundProxy")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Use HookSniff's inbound proxy to receive webhooks from third-party services. The proxy:
         </p>

@@ -32,7 +32,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🔒</div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Access Denied</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("accessDenied")}</h2>
           <p className="text-gray-500 dark:text-slate-400 mb-4">You don&apos;t have admin privileges.</p>
           <Link
             href="/dashboard"
@@ -67,8 +67,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             ⚡
           </div>
           <div>
-            <div className="font-bold text-gray-900 dark:text-white">Admin Panel</div>
-            <div className="text-xs text-gray-500 dark:text-slate-400">HookSniff Management</div>
+            <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
           </div>
         </div>
         <nav className="px-3 py-4 space-y-1">
@@ -117,7 +117,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setSidebarOpen(true)}
               className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
-              aria-label="Open sidebar"
+              aria-label={t("openSidebar")}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

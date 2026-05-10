@@ -326,17 +326,17 @@ export default function LogsPage() {
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label={t('deliveryId')} value={selected.id} mono />
-              <DetailRow label="Event" value={selected.event || '—'} />
-              <DetailRow label="Endpoint" value={selected.endpoint_id} mono />
+              <DetailRow label={t("event")} value={selected.event || '—'} />
+              <DetailRow label={t("endpoint")} value={selected.endpoint_id} mono />
               <DetailRow
-                label="Status"
+                label={t("status")}
                 value={
                   <StatusBadge status={selected.status} />
                 }
               />
-              <DetailRow label="Attempts" value={String(selected.attempt_count)} />
+              <DetailRow label={t("attempts")} value={String(selected.attempt_count)} />
               <DetailRow label={t('httpResponse')} value={String(selected.response_status || '—')} mono />
-              <DetailRow label="Created" value={new Date(selected.created_at).toLocaleString()} />
+              <DetailRow label={t("created")} value={new Date(selected.created_at).toLocaleString()} />
 
               {/* Attempts Timeline */}
               <div className="pt-4 border-t border-gray-100 dark:border-slate-800">
