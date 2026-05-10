@@ -40,6 +40,14 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     });
 
     if (!res.ok) {
+      // Auto-logout on 401 (token expired or invalid)
+      if (res.status === 401) {
+        // Clear auth state and redirect to login
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('hooksniff_auth');
+          window.location.href = '/login';
+        }
+      }
       const error = await res.json().catch(() => ({ message: "Unknown error" }));
       throw new Error(error.error?.message || `API error: ${res.status}`);
     }
