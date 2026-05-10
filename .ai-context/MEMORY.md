@@ -49,7 +49,15 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 75: Infrastructure & Security Config (HS-006, HS-007, HS-010, HS-038c)
+- Oturum 76: Dashboard Routing (HS-030, HS-072, HS-075) — EN KRİTİK
+
+## 📝 Oturum 75 (2026-05-10 19:04 - 19:08 GMT+8) ✅
+1. Infrastructure & Security Config:
+   - `.env.production.example`: Grafana token placeholder (HS-006)
+   - `.gitignore`: `.env` pattern eklendi (HS-007)
+   - Worker: Semaphore concurrent limit max 10 (HS-010)
+   - Billing webhook: Rate limit 30/dakika/IP (HS-038c)
+2. Dosyalar: `.env.production.example`, `.gitignore`, `worker/src/main.rs`, `api/src/routes/billing.rs`
 
 ## 📝 Oturum 74 (2026-05-10 19:00 - 19:05 GMT+8) ✅
 1. Webhook verification & ownership düzeltildi:

@@ -111,7 +111,12 @@ async fn main() -> Result<()> {
         .pool_max_idle_per_host(10)
         .build()?;
 
+    // Concurrent delivery limit — prevents DDoS on target servers
+    // Max 10 HTTP deliveries at the same time
+    let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
+
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
+    tracing::info!("🔒 Concurrent delivery limit: 10");
 
     // Graceful shutdown: listen for SIGTERM/SIGINT
     let shutdown = shutdown_signal();
@@ -165,7 +170,7 @@ async fn main() -> Result<()> {
                     }
                 }
                 // Process immediately on NOTIFY (or after reconnect attempt)
-                match process_pending(&pool, &http_client, &cfg).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries", processed);
@@ -178,7 +183,7 @@ async fn main() -> Result<()> {
             }
             _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
                 // Fallback 1s poll — catches anything NOTIFY might have missed
-                match process_pending(&pool, &http_client, &cfg).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries (poll fallback)", processed);
@@ -257,6 +262,7 @@ async fn process_pending(
     pool: &PgPool,
     http_client: &reqwest::Client,
     _cfg: &config::WorkerConfig,
+    semaphore: std::sync::Arc<tokio::sync::Semaphore>,
 ) -> Result<usize> {
     // Fetch pending items (with FOR UPDATE SKIP LOCKED for concurrency)
     let items: Vec<WebhookQueueItem> = {
@@ -307,6 +313,9 @@ async fn process_pending(
         let secret_map = secret_map.clone();
 
         let handle = tokio::spawn(async move {
+            // Acquire semaphore permit — limits concurrent HTTP deliveries
+            let _permit = semaphore.acquire().await.expect("semaphore closed");
+
             let delivery_id = item.delivery_id;
             let attempt = item.attempt_count + 1;
 
