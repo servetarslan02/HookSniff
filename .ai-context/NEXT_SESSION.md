@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 15:36 GMT+8
+> Son güncelleme: 2026-05-10 15:48 GMT+8
 
 ---
 
@@ -39,22 +39,18 @@
 13. Startups %50 indirim $14→$24
 - GitHub push — `77faa60`
 
+### Get Started Çevirisi (1 dosya)
+14. Sayfa tamamen useTranslations ile yeniden yazıldı — 8 dilde destek
+- GitHub push — `f539f74`
+
 ---
 
 ## 🔴 ACİL — Sonraki Oturum Görevleri
 
 ### 1. 404 Sayfalar (Kritik)
-Footer'da link verilen 5 sayfa 404 dönüyor — build'den kaynaklanıyor olabilir, araştır:
-- `/tr/docs`
-- `/tr/dashboard`
-- `/tr/about`
-- `/tr/faq`
-- `/tr/contact`
+Footer'da link verilen 5 sayfa 404 dönüyor — Vercel limiti, build başarılı ama deploy edilemiyor
 
-### 2. Get Started Çevirisi (Orta)
-`/tr/get-started` sayfası neredeyse tamamen İngilizce
-
-### 3. Fiyat Sayfası Çeviri (Orta)
+### 2. Fiyat Sayfası Çeviri (Orta)
 `/pricing` sayfası İngilizce (hardcoded text, translation keys değil)
 
 ---
