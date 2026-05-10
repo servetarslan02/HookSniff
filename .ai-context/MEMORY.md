@@ -51,24 +51,26 @@
 ### Sonraki Oturum
 - Oturum 82: Auth & Crypto Security (HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l)
 
-## 📝 Oturum 82 (2026-05-10 19:52 - 20:25 GMT+8) ✅
+## 📝 Oturum 82 (2026-05-10 19:52 - 20:15 GMT+8) ✅
 1. Auth & Crypto Security düzeltmeleri (7 sorun):
-   - HS-038f: Timing attack — login her durumda password doğruluyor
+   - HS-038f: Timing attack — Lazy Argon2 dummy hash, login akışı yeniden yapılandırıldı
    - HS-038g: Serialization error detay sızıntısı önlendi
-   - HS-038h: Email enumeration önlendi
+   - HS-038h: Email enumeration önlendi (register + update_profile)
    - HS-038i: Auth cache deadlock düzeltildi
    - HS-038j: rate_limit.rs panic riski kaldırıldı
    - HS-038k: Alert condition validation eklendi
-   - HS-038l: Webhook hata mesajları sanitize edildi
-2. **Review düzeltmeleri** (aynı oturum):
-   - DUMMY_HASH: Lazy ile gerçek Argon2 hash (geçersiz PHC → timing sızıntısı)
-   - Login akışı yeniden yapılandırıldı (önce verify, sonra status)
-   - Register timing normalizasyonu (mevcut email'de de Argon2 hash)
-   - Alert validation generic mesaj
-   - Polar signature hata mesajları sanitize
-   - iyzico portal error generic
-3. Dosyalar: `auth.rs`, `error.rs`, `middleware/mod.rs`, `rate_limit.rs`, `alerts.rs`, `billing/polar.rs`, `billing/iyzico.rs`
-4. GitHub'a push edildi: 9a5da07
+   - HS-038l: Webhook hata mesajları sanitize edildi (Polar/iyzico/Stripe)
+2. Ek düzeltmeler (derin kontrol):
+   - refresh_token: Forbidden → Unauthorized
+   - verify_2fa_login: 2FA status leak → Unauthorized
+   - inbound.rs: verify_signature ham hata sızıntısı önlendi
+   - endpoints.rs: SSRF error detayları sanitize edildi
+   - webhook_verify.rs: timestamp age, header name sızıntısı önlendi
+   - transforms.rs: engine error sızıntısı önlendi
+   - customer_portal.rs: SSRF error sızıntısı önlendi
+   - schemas.rs: registration error sızıntısı önlendi
+3. Toplam 15 dosya değiştirildi, 5 commit
+4. GitHub push: 5f8cf13
 
 ## 📝 Oturum Geçmişi (2026-05-10)
 - **Oturum 73**: Rate Limiting (HS-001, HS-002, HS-003, HS-008) ✅
