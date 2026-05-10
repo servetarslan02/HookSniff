@@ -9,12 +9,13 @@
 
 | Agent | Kategori | 🔴 Crit | 🟠 High | 🟡 Med | 🟢 Low | **Toplam** |
 |-------|----------|---------|---------|--------|--------|-----------|
-| deep-db-migrations | DB Şeması | *(beklemede)* | | | | |
+| deep-db-migrations | DB Şeması | 0 | 3 | 5 | 2 | **10+** |
 | deep-api-endpoints | API Endpoint | 10 | 0 | 10 | 0 | **20+** |
 | deep-worker-billing | Worker/Billing | 0 | 5 | 15 | 18 | **38** |
+| deep-db-migrations | DB Şeması | 0 | 3 | 5 | 2 | **10+** |
 | deep-git-history | Git/Güvenlik | 0 | 3 | 3 | 2 | **8** |
 | deep-landing-content | İçerik Kalitesi | 0 | 2 | 5 | 0 | **7+** |
-| **TOPLAM** | | **10** | **10** | **33** | **20** | **~73+** |
+| **TOPLAM** | | **10** | **13** | **38** | **22** | **~83+** |
 
 ---
 
@@ -51,6 +52,13 @@
 | 1 | Git history'de OTEL credentials (base64 Grafana secrets) |
 | 2 | `.env.example` gerçek secret değerleri içeriyor |
 | 3 | `.gitignore`'da `.env` pattern eksik |
+
+### DB Migrations (3)
+| # | Sorun |
+|---|-------|
+| 1 | İki migration sistemi senkron değil (standalone SQL vs embedded Rust) |
+| 2 | CHECK constraint'ler eksik — invalid status değerleri girilebilir |
+| 3 | `amount_cents` INT — overflow riski, BIGINT olmalı |
 
 ### Landing Content (2)
 | # | Sorun |
@@ -103,4 +111,5 @@
 | DEEP-WORKER-BILLING.md | 22KB |
 | DEEP-LANDING-CONTENT.md | 22KB |
 | DEEP-GIT-HISTORY.md | 10KB |
-| DEEP-DB-MIGRATIONS.md | *(beklemede)* |
+| DEEP-DB-MIGRATIONS.md | 37KB |
+| ACTION-PLAN.md | 9KB |
