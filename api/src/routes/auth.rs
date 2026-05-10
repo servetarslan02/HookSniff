@@ -302,8 +302,20 @@ async fn login(
 async fn verify_2fa_login(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    headers: HeaderMap,
     Json(req): Json<Verify2faRequest>,
 ) -> Result<impl IntoResponse, AppError> {
+    // Rate limit: 5 TOTP attempts per IP per minute
+    let client_ip = extract_client_ip(&headers);
+    let rl_key = format!("verify_2fa:{}", client_ip);
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, VERIFY_2FA_RATE_LIMIT)
+        .await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     // Verify the temp token
     let claims = jwt::verify_token(&req.temp_token, &cfg.jwt_secret)?;
 
@@ -471,10 +483,31 @@ async fn reset_password(
 
 // ── Email Verification ──────────────────────────────────────
 
+/// Maximum email verification attempts per IP per minute.
+const VERIFY_EMAIL_RATE_LIMIT: u32 = 5;
+
+/// Maximum 2FA verification attempts per IP per minute.
+const VERIFY_2FA_RATE_LIMIT: u32 = 5;
+
+/// Maximum refresh token attempts per IP per minute.
+const REFRESH_RATE_LIMIT: u32 = 10;
+
 async fn verify_email(
     Extension(pool): Extension<PgPool>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    headers: HeaderMap,
     Json(req): Json<VerifyEmailRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // Rate limit: 5 verification attempts per IP per minute
+    let client_ip = extract_client_ip(&headers);
+    let rl_key = format!("verify_email:{}", client_ip);
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, VERIFY_EMAIL_RATE_LIMIT)
+        .await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     let token_hash = jwt::hash_token(&req.token);
 
     let record: Option<(Uuid, Uuid,)> = sqlx::query_as(
@@ -547,10 +580,21 @@ async fn resend_verification(
 async fn refresh_token(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: HeaderMap,
     // Accept refresh token from either cookie or JSON body (cookie takes priority)
     body: Option<Json<RefreshTokenRequest>>,
 ) -> Result<impl IntoResponse, AppError> {
+    // Rate limit: 10 refresh attempts per IP per minute
+    let client_ip = extract_client_ip(&headers);
+    let rl_key = format!("refresh:{}", client_ip);
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, REFRESH_RATE_LIMIT)
+        .await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
     // Try cookie first, then fall back to body
     let refresh_token_value = headers
         .get("cookie")
@@ -1118,6 +1162,9 @@ mod tests {
         assert_eq!(TOKEN_MAX_AGE, 86400);
         assert_eq!(REFRESH_TOKEN_MAX_AGE, 2592000);
         assert_eq!(RESET_RATE_LIMIT, 5);
+        assert_eq!(VERIFY_EMAIL_RATE_LIMIT, 5);
+        assert_eq!(VERIFY_2FA_RATE_LIMIT, 5);
+        assert_eq!(REFRESH_RATE_LIMIT, 10);
     }
 
     // ── extract_client_ip ───────────────────────────────────
