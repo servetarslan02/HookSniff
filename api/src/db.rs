@@ -992,6 +992,56 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 45: Migration 044 — FK + CHECK constraints + delivery index (HS-025, HS-026, HS-057)
+    run_migration(
+        pool,
+        "044_constraints_indexes",
+        r#"
+        -- HS-026: FK on webhook_queue.delivery_id
+        ALTER TABLE webhook_queue
+            ADD CONSTRAINT IF NOT EXISTS fk_webhook_queue_delivery
+            FOREIGN KEY (delivery_id) REFERENCES deliveries(id) ON DELETE CASCADE;
+
+        -- HS-025: CHECK constraints for status columns
+        ALTER TABLE deliveries
+            ADD CONSTRAINT IF NOT EXISTS chk_deliveries_status
+            CHECK (status IN ('pending', 'processing', 'delivered', 'failed'));
+
+        ALTER TABLE webhook_queue
+            ADD CONSTRAINT IF NOT EXISTS chk_webhook_queue_status
+            CHECK (status IN ('pending', 'processing', 'delivered', 'dead_letter'));
+
+        ALTER TABLE delivery_attempts
+            ADD CONSTRAINT IF NOT EXISTS chk_delivery_attempts_number
+            CHECK (attempt_number > 0);
+
+        ALTER TABLE deliveries
+            ADD CONSTRAINT IF NOT EXISTS chk_deliveries_attempt_count
+            CHECK (attempt_count >= 0);
+
+        ALTER TABLE deliveries
+            ADD CONSTRAINT IF NOT EXISTS chk_deliveries_max_attempts
+            CHECK (max_attempts > 0);
+
+        ALTER TABLE webhook_queue
+            ADD CONSTRAINT IF NOT EXISTS chk_webhook_queue_attempt_count
+            CHECK (attempt_count >= 0);
+
+        ALTER TABLE webhook_queue
+            ADD CONSTRAINT IF NOT EXISTS chk_webhook_queue_max_attempts
+            CHECK (max_attempts > 0);
+
+        ALTER TABLE dead_letters
+            ADD CONSTRAINT IF NOT EXISTS chk_dead_letters_attempts
+            CHECK (attempts > 0);
+
+        -- HS-057: Delivery index for common query pattern
+        CREATE INDEX IF NOT EXISTS idx_deliveries_customer_created
+            ON deliveries(customer_id, created_at DESC);
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }

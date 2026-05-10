@@ -125,15 +125,18 @@ Her oturum şu şekilde işler:
 **Dosyalar:** `worker/src/main.rs`
 **Yapılan:** Error classification — 4xx (except 429) → dead letter, 429/5xx → retry
 
-### Oturum 81: Database Issues
+### Oturum 81: Database Issues ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-024 | İki migration sistemi senkron değil | ⬜ |
-| HS-025 | CHECK constraint'ler eksik | ⬜ |
-| HS-026 | `webhook_queue`'da FK eksik | ⬜ |
-| HS-027 | `amount_cents` INT → BIGINT | ⬜ |
-| HS-038d | `custom_domains` dig subprocess — command injection | ⬜ |
-| HS-038e | Dynamic SQL construction — `format!` ile WHERE | ⬜ |
+| HS-024 | İki migration sistemi senkron değil | ⚠️ 2026-05-10 — Manuel senkronizasyon |
+| HS-025 | CHECK constraint'ler eksik | ✅ 2026-05-10 |
+| HS-026 | `webhook_queue`'da FK eksik | ✅ 2026-05-10 |
+| HS-027 | `amount_cents` INT → BIGINT | ❌ Yanlış bulgu |
+| HS-038d | `custom_domains` dig subprocess | ❌ Domain sanitize edilmiş |
+| HS-038e | Dynamic SQL construction | ❌ Parametrize edilmiş |
+
+**Dosyalar:** `api/migrations/002_constraints_and_indexes.sql`, `api/src/db.rs`
+**Yapılan:** FK constraint, CHECK constraints, delivery index eklendi
 
 **Dosyalar:** `api/migrations/`, `api/src/db.rs`, `api/src/routes/custom_domains.rs`, `api/src/routes/events.rs`
 
