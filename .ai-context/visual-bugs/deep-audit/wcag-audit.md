@@ -64,18 +64,23 @@
 
 ### Light Mode Renk Analizi
 
+> **Not:** Admin panelinde tüm `text-gray-*` ve `text-slate-*` sınıfları `dark:` variant ile birlikte kullanılır. Light mode'da düşük kontrastlı sınıflar sadece `text-gray-400` olarak tespit edildi. `text-slate-400` light mode'da hiç kullanılmıyor.
+
 | Sınıf | Hex | Beyaz zemin oranı | AA Normal (4.5:1) | AA Large (3:1) | Durum |
 |-------|-----|-------------------|-------------------|-----------------|-------|
 | `text-gray-400` | #9ca3af | 2.54:1 | ❌ | ❌ | **FAIL — hem normal hem large** |
 | `text-gray-500` | #6b7280 | 4.83:1 | ✅ | ✅ | Geçer |
-| `text-slate-400` | #94a3b8 | 2.56:1 | ❌ | ❌ | **FAIL — hem normal hem large** |
-| `text-slate-500` | #64748b | 4.76:1 | ✅ | ✅ | Geçer |
+| `text-gray-600` | #4b5563 | 7.47:1 | ✅ | ✅ | Geçer |
+| `text-gray-700` | #374151 | 10.34:1 | ✅ | ✅ | Geçer |
+| `text-slate-400` | #94a3b8 | — | — | — | Light mode'da kullanılmıyor |
+| `text-slate-500` | #64748b | — | — | — | Light mode'da kullanılmıyor |
 
-> **Not:** gray-400 ve slate-400 açık gri tonlarıdır — beyaz zeminde düşük kontrast. gray-500 ve slate-500 daha koyu — AA standardını geçer.
+**Etkilenen elementler (light mode — `text-gray-400`):**
+- System: Latency scale labels: `text-xs text-gray-400` → 2.54:1 ❌
+- System: Infrastructure label: `text-xs text-gray-400` → 2.54:1 ❌
+- Revenue: "(X users)" plan count: `text-xs text-gray-400` → 2.54:1 ❌
 
-**Etkilenen elementler:**
-- `text-gray-400`: Light mode'da beyaz zeminde kullanıldığında ciddi kontrast sorunu. (Dark mode'da farklı — bkz. Bölüm H)
-- `text-slate-400`: Sidebar link label'ları ("Overview", "Users", "Revenue", "System"), "Back to Dashboard" — light mode'da beyaz zeminde 2.56:1. **Kritik: Sidebar arka planı `bg-white` ve text `text-slate-400` → okunamaz.**
+> **Kritik:** `text-gray-400` light mode'da beyaz zeminde sadece 2.54:1 — AA Large standardını bile geçemiyor.
 
 ---
 
@@ -135,6 +140,9 @@
 | `ThemeToggle` aria-label | ✅ | `aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}` doğru tanımlanmış. |
 | Modal focus trap | ❌ | Plan Change Modal'ı açıkken focus modal dışına çıkabilir. `inert` attribute veya focus trap kütüphanesi yok. |
 | Modal kapatma (Escape) | ❌ | Modal sadece backdrop click ile kapanıyor. Escape tuşu ile kapatma desteği yok. |
+| StatCard trend SVG | ⚠️ | Trend ok ikonları (↗↘) decorative — `aria-hidden="true"` eksik. Screen reader anlamsız SVG path'i okuyabilir. |
+| StatCard trend label contrast | ❌ | `text-xs text-gray-400 dark:text-slate-500` trend.label metni — dark mode'da 3.75:1 (FAIL). WCAG 1.4.3 Level AA. |
+| StatusBadge | ✅ | Renkli dot + metinsel status birlikte kullanılıyor. Sadece renk bağımlı değil. |
 
 ---
 
@@ -250,7 +258,7 @@ Dark mode arka planları:
 6. **❌ Chart erişilebilirliği yok (Overview + Revenue)** — SVG chart'lar screen reader'a veri alternatifi sunmuyor. WCAG 1.1.1 Level A ihlali.
 7. **❌ Progress bar aria eksik (System)** — Latency bar'ı semantic role ve value attribute'larından yoksun. WCAG 4.1.2 Level A ihlali.
 8. **❌ Status dot sadece renk bağımlı (System)** — Renk körlüğü olan kullanıcılar durumu ayırt edemez. WCAG 1.4.1 Level A ihlali.
-9. **❌ Light mode: text-gray-400 / text-slate-400 kontrast KRİTİK (2.54:1 / 2.56:1)** — Beyaz zeminde okunamaz. Sidebar linkleri ve secondary text etkilenir. WCAG 1.4.3 Level AA ihlali.
+9. **❌ Light mode: text-gray-400 kontrast KRİTİK (2.54:1)** — Beyaz zeminde okunamaz. System/Revenue sayfalarında label ve scale text'leri etkilenir. WCAG 1.4.3 Level AA ihlali.
 10. **❌ Dark mode: text-slate-500 kontrast yetersiz (3.75:1)** — Loading/empty state text'leri okunamıyor. WCAG 1.4.3 Level AA ihlali.
 11. **❌ contentinfo/footer eksik** — Landmark yapısı eksik. WCAG 1.3.1 Level A.
 12. **❌ Skip navigation link'i yok** — Klavye kullanıcıları için erişim zorluğu. WCAG 2.4.1 Level A.
