@@ -5,9 +5,28 @@
 
 ---
 
-## 🚨 EN BÜYÜK SORUN: ROUTING TAMAMEN ÇÖKMÜŞ
+## ⚠️ DÜZELTME: Admin Paneli Çalışıyor
 
-**Dashboard sayfalarının çoğu yanlış içerik gösteriyor.** Bu ilk geçişte tespit edilen sorunun dashboard tarafında da aynısı var.
+Agent'lar demo hesabıyla (admin yetkisi yok) test ettiği için admin sayfaları "bozuk" raporlanmıştı. Admin hesabıyla (servetarslan02@gmail.com) yapılan testte **tüm 5 admin sayfasının doğru çalıştığı** tespit edildi.
+
+| Sayfa | Durum | İçerik |
+|-------|-------|--------|
+| `/tr/admin` | ✅ Çalışıyor | Overview — toplam kullanıcı, teslimat, gelir, aktif kullanıcı |
+| `/tr/admin/users` | ✅ Çalışıyor | 10 kullanıcı listeleniyor (plan, durum, tarih, aksiyonlar) |
+| `/tr/admin/revenue` | ✅ Çalışıyor | MRR, toplam gelir, kayıp oran, grafik |
+| `/tr/admin/system` | ✅ Çalışıyor | Sistem sağlık + altyapı (Oracle Cloud, Neon, Upstash, Cloudflare, Vercel, Grafana) |
+| `/tr/admin/settings` | ✅ Çalışıyor | Bakım modu, kayıt toggle, plan limitleri, retry ayarları |
+
+**Admin panelindeki küçük sorunlar:**
+- 🟡 Sidebar menü öğeleri İngilizce (Overview, Users, Revenue, System, Settings)
+- 🟡 Bazı açıklamalar İngilizce ("Financial metrics", "Manage users", "Configure platform-wide defaults")
+- 🟡 System sayfasında servis durumları "unknown" / "Checking..." (API bağlantısı yok)
+
+---
+
+## 🚨 EN BÜYÜK SORUN: ROUTING ÇÖKMÜŞ
+
+**Dashboard sayfalarının büyük kısmı yanlış içerik gösteriyor.**
 
 ### Dashboard Routing Failures (16 sayfa)
 
@@ -30,32 +49,22 @@
 | `/dashboard/routing` | Smart routing | Dashboard'a yönlendiriyor |
 | `/dashboard/schemas` | Schema registry | Dashboard'a yönlendiriyor |
 
-### Admin Routing Failures (5 sayfa)
+### Doğru Yüklenen Dashboard Sayfaları (12/32)
 
-| URL | Göstermesi Gereken | Gerçek Gösterdiği |
-|-----|-------------------|-------------------|
-| `/admin` | Admin genel bakış | Dashboard'a yönlendiriyor |
-| `/admin/users` | Kullanıcı yönetimi | **Schemas sayfasını gösteriyor** |
-| `/admin/revenue` | Gelir dashboard | Dashboard'a yönlendiriyor |
-| `/admin/system` | Sistem durumu | Dashboard'a yönlendiriyor |
-| `/admin/settings` | Admin ayarları | Dashboard'a yönlendiriyor |
-
-### Doğru Yüklenen Dashboard Sayfaları (Sadece 7/32)
-
-| URL | Durum | Sorunlar |
-|-----|-------|----------|
-| `/dashboard` | ✅ Yükleniyor | Çeviri tutarsızlığı, onboarding İngilizce |
-| `/dashboard/endpoints` | ✅ Yükleniyor | "+ New Endpoint" fiyat sayfasına gidiyor |
-| `/dashboard/api-keys` | ✅ Yükleniyor | Temiz |
-| `/dashboard/transforms` | ✅ Yükleniyor | Çeviri eksikliği |
-| `/dashboard/inbound` | ⚠️ Tutarsız | Bazen yükleniyor, bazen redirect |
-| `/dashboard/notifications` | ✅ Yükleniyor | Çeviri eksikliği |
-| `/dashboard/billing` | ✅ Yükleniyor | Ham translation key'ler görünüyor |
-| `/dashboard/team` | ✅ Yükleniyor | — |
-| `/dashboard/settings` | ✅ Yükleniyor | — |
-| `/dashboard/custom-domain` | ✅ Yükleniyor | Tamamen İngilizce |
-| `/dashboard/audit-log` | ✅ Yükleniyor | Tamamen İngilizce |
-| `/dashboard/sso` | ❌ Yanlış | **Retry Policy gösteriyor** |
+| URL | Durum |
+|-----|-------|
+| `/dashboard` | ✅ |
+| `/dashboard/endpoints` | ✅ |
+| `/dashboard/api-keys` | ✅ |
+| `/dashboard/transforms` | ✅ (çeviri eksik) |
+| `/dashboard/inbound` | ⚠️ Tutarsız |
+| `/dashboard/notifications` | ✅ (çeviri eksik) |
+| `/dashboard/billing` | ✅ (ham key'ler var) |
+| `/dashboard/team` | ✅ |
+| `/dashboard/settings` | ✅ |
+| `/dashboard/custom-domain` | ✅ (tamamen İngilizce) |
+| `/dashboard/audit-log` | ✅ (tamamen İngilizce) |
+| `/dashboard/sso` | ❌ Retry Policy gösteriyor |
 
 ---
 
@@ -63,40 +72,33 @@
 
 | Kategori | Adet |
 |----------|------|
-| 🔴 Critical (routing çökmesi) | ~25 |
-| 🔴 Critical (yanlış içerik) | ~15 |
+| 🔴 Critical (routing çökmesi) | ~16 |
 | 🔴 High (çeviri eksikliği) | ~30 |
-| 🔴 High (işlevsel sorun) | ~10 |
+| 🔴 High (işlevsel sorun) | ~5 |
 | 🟡 Medium (UI tutarsızlık) | ~25 |
 | 🟢 Low | ~10 |
-| **TOPLAM** | **~115** |
+| **TOPLAM** | **~86** |
 
 ---
 
 ## 🔴 KRİTİK BULGULAR
 
-### 1. Routing Faciaları (Toplam ~30 sayfa)
-Hem public hem dashboard sayfaları yanlış içerik gösteriyor. Next.js dynamic routing ciddi şekilde bozuk.
+### 1. Routing Faciaları (16 dashboard sayfası)
+Dashboard sayfaları yanlış içerik gösteriyor. Next.js dynamic routing ciddi şekilde bozuk.
 
-### 2. Admin Paneli Tamamen Çalışmıyor
-6 admin sayfasının hiçbiri doğru içerik göstermiyor. Admin paneli yok gibi.
+### 2. Ham Translation Key'ler (Billing)
+`billing.nextBilling`, `billing.webhooksThisMonth`, `billing.used` gibi ham key'ler kullanıcıya görünüyor.
 
-### 3. Ham Translation Key'ler Görünüyor
-Billing sayfasında `billing.nextBilling`, `billing.webhooksThisMonth`, `billing.used` gibi ham key'ler kullanıcıya görünüyor.
-
-### 4. Sidebar'da 27+ Menü Öğesi
-- 10+ öğede çift emoji (⚡ ⚡, 🔐 🔐, 📥 📥, vb.)
+### 3. Sidebar Sorunları
+- 27+ menü öğesi (çok fazla)
+- 10+ öğede çift emoji (⚡ ⚡, 🔐 🔐, 📥 📥)
 - Yarısı Türkçe, yarısı İngilizce
 - Aktif sayfa highlight'ı yok
-- Admin linki tüm kullanıcılara görünüyor
+- Admin linki herkese görünüyor
 
-### 5. Demo Hesap Oluşturuldu
-- Email: demo@hooksniff.com
-- Şifre: Demo1234!
-- Plan: Free
-- Ayrıca 8 tane daha test hesabı mevcut
+### 4. "+ New Endpoint" Butonu Fiyat Sayfasına Gidiyor
 
-### 6. Onboarding Wizard Karışık Dil
+### 5. Onboarding Wizard Karışık Dil
 - Türkçe: "HookSniff'e Hoş Geldiniz!"
 - İngilizce: "Welcome, Servet Arslan!", "Skip setup", "Let's go →"
 
@@ -104,17 +106,7 @@ Billing sayfasında `billing.nextBilling`, `billing.webhooksThisMonth`, `billing
 
 ## 🟡 ORTA SEVİYE BULGULAR
 
-### 7. Çift Dil Değiştirici
-Hem sidebar'da hem header bar'da "Switch language" butonu var.
-
-### 8. Setup Checklist Linklerinde Prefix Eksik
-Linkler `/dashboard` kullanıyor, `/tr/dashboard` değil.
-
-### 9. "+ New Endpoint" Fiyat Sayfasına Gidiyor
-Endpoint listesindeki "Yeni Endpoint" butonu fiyatlandırma sayfasına yönlendiriyor.
-
-### 10. Public Sayfa Çeviri Coverage
-
+### 6. Public Sayfa Çeviri Coverage
 | Sayfa | Türkçe % |
 |-------|----------|
 | `/faq` | %100 ✅ |
@@ -128,28 +120,39 @@ Endpoint listesindeki "Yeni Endpoint" butonu fiyatlandırma sayfasına yönlendi
 | `/use-cases` | %0 |
 | `/what-is-a-webhook` | %0 |
 
+### 7. Çift Dil Değiştirici
+Hem sidebar'da hem header bar'da "Switch language" butonu var.
+
+### 8. Setup Checklist Linklerinde Prefix Eksik
+Linkler `/dashboard` kullanıyor, `/tr/dashboard` değil.
+
+### 9. Footer Eksik (Tüm public sayfalar)
+
 ---
 
 ## ✅ OLAN ŞEYLER
 
 - ✅ Login/register çalışıyor
-- ✅ Admin erişim kontrolü çalışıyor
+- ✅ Admin paneli tamamen çalışıyor (5/5 sayfa)
+- ✅ Admin erişim kontrolü çalışıyor (demo hesabı göremiyor)
 - ✅ API keys sayfası temiz
 - ✅ Notifications sayfası yükleniyor
-- ✅ Dark mode doğru çalışıyor (açıksa)
+- ✅ Dark mode doğru çalışıyor
 - ✅ Sidebar nav yapısı iyi tasarlanmış
+- ✅ 10 kullanıcı listeleniyor
+- ✅ Sistem altyapı bilgileri doğru
 
 ---
 
-## 🎯 SONRAKI ADIMLAR (Öncelik Sırası)
+## 🎯 SONRAKI ADIMLAR
 
 | # | Görev | Öncelik | Tahmini |
 |---|-------|---------|---------|
-| 1 | **Routing düzeltmesi** — tüm sayfa yönlendirmelerini onar | 🔴 ACİL | 4-6 saat |
-| 2 | **Admin paneli** — 6 sayfayı oluştur/düzelt | 🔴 ACİL | 2-3 saat |
-| 3 | **Sidebar fix** — çift emoji, çeviri, aktif highlight | 🔴 Yüksek | 1-2 saat |
-| 4 | **Billing translation keys** — ham key'leri gizle | 🔴 Yüksek | 30 dk |
+| 1 | **Routing düzeltmesi** — 16 dashboard sayfasını onar | 🔴 ACİL | 4-6 saat |
+| 2 | **Sidebar fix** — çift emoji, çeviri, aktif highlight | 🔴 Yüksek | 1-2 saat |
+| 3 | **Billing translation keys** — ham key'leri düzelt | 🔴 Yüksek | 30 dk |
+| 4 | **"+ New Endpoint" fix** | 🟡 Orta | 30 dk |
 | 5 | **Public sayfa çevirisi** — 7 sayfayı Türkçeleştir | 🟡 Orta | 3-5 saat |
-| 6 | **Onboarding çevirisi** | 🟡 Orta | 1 saat |
-| 7 | **Footer ekleme** — tüm sayfalara | 🟡 Orta | 1-2 saat |
-| 8 | **"+ New Endpoint" fix** — fiyat sayfası yerine creation form | 🟡 Orta | 30 dk |
+| 6 | **Onboarding çeviri** | 🟡 Orta | 1 saat |
+| 7 | **Footer ekleme** | 🟡 Orta | 1-2 saat |
+| 8 | **Admin paneli çevirisi** — sidebar ve açıklamalar | 🟢 Düşük | 30 dk |
