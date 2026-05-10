@@ -27,7 +27,6 @@ export default function SearchPage() {
   const { token } = useAuth();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
-  const [event, _setEvent] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -42,7 +41,6 @@ export default function SearchPage() {
       const params = new URLSearchParams();
       if (query) params.set('q', query);
       if (status) params.set('status', status);
-      if (event) params.set('event', event);
       params.set('page', p.toString());
       params.set('per_page', '20');
 
@@ -56,7 +54,7 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, API, query, status, event]);
+  }, [token, API, query, status]);
 
   useEffect(() => {
     search(page);
