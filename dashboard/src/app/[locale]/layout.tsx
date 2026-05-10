@@ -7,6 +7,8 @@ import './globals.css';
 import { AuthProvider } from '@/lib/store';
 import { ToastProvider } from '@/components/Toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -127,6 +129,8 @@ export default async function LocaleLayout({
             <AuthProvider>
               <ToastProvider>
                 {children}
+                <Analytics />
+                <SpeedInsights />
               </ToastProvider>
             </AuthProvider>
           </ThemeProvider>
