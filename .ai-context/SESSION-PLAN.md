@@ -287,6 +287,12 @@ Her oturum şu şekilde işler:
 - `verify_generic`: Boş secret artık `Ok(())` dönmüyor
 - Dosyalar: `api/src/routes/inbound.rs`, `api/src/routes/billing.rs`, `api/src/routes/schemas.rs`
 
-### Oturum 75 — [TARIH]
-**Durum:** ⬜ Bekliyor
+### Oturum 75 — 2026-05-10
+**Durum:** ✅ Tamamlandı
 **Görev:** Infrastructure & Security Config (HS-006, HS-007, HS-010, HS-038c)
+**Yapılan:**
+- `.env.production.example`: Grafana token placeholder yapıldı
+- `.gitignore`: `.env` pattern eklendi
+- `worker/src/main.rs`: Semaphore ile concurrent delivery limit (max 10)
+- `api/src/routes/billing.rs`: Billing webhook'lara rate limit (30/dakika/IP)
+- Dosyalar: `.env.production.example`, `.gitignore`, `worker/src/main.rs`, `api/src/routes/billing.rs`
