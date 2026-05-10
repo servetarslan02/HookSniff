@@ -7,7 +7,7 @@ const quickstartTabs = [
     label: 'Node.js',
     code: `import { HookSniff } from '@hooksniff/sdk';
 
-const hr = new HookSniff({ apiKey: process.env.HOOKRELAY_KEY! });
+const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
 
 // 1. Create an endpoint
 const endpoint = await hr.endpoints.create({
@@ -28,7 +28,7 @@ console.log('Delivery ID:', delivery.id);`,
     label: 'Python',
     code: `import hooksniff, os
 
-client = hooksniff.Client(api_key=os.environ["HOOKRELAY_KEY"])
+client = hooksniff.Client(api_key=os.environ["HOOKSNIFF_API_KEY"])
 
 # 1. Create an endpoint
 endpoint = client.endpoints.create(
@@ -51,7 +51,7 @@ print(f"Delivery ID: {delivery.id}")`,
 req, _ := http.NewRequest("POST",
     "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks",
     strings.NewReader(body))
-req.Header.Set("Authorization", "Bearer "+os.Getenv("HOOKRELAY_KEY"))
+req.Header.Set("Authorization", "Bearer "+os.Getenv("HOOKSNIFF_API_KEY"))
 req.Header.Set("Content-Type", "application/json")
 
 resp, _ := http.DefaultClient.Do(req)
