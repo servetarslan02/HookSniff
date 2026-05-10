@@ -3,7 +3,7 @@
 import { getErrorMessage } from '@/lib/errors';
 
 import { useAuth } from '@/lib/store';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useRouter } from '@/i18n/navigation';
@@ -31,10 +31,30 @@ export default function SettingsPage() {
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  // Notification preferences
-  const [emailNotifs, setEmailNotifs] = useState(true);
-  const [failureAlerts, setFailureAlerts] = useState(true);
-  const [weeklyDigest, setWeeklyDigest] = useState(false);
+  // Notification preferences (persisted in localStorage until API supports them)
+  const [emailNotifs, setEmailNotifs] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('hooksniff_email_notifs') !== 'false';
+  });
+  const [failureAlerts, setFailureAlerts] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('hooksniff_failure_alerts') !== 'false';
+  });
+  const [weeklyDigest, setWeeklyDigest] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('hooksniff_weekly_digest') === 'true';
+  });
+
+  // Persist preferences on change
+  useEffect(() => {
+    localStorage.setItem('hooksniff_email_notifs', String(emailNotifs));
+  }, [emailNotifs]);
+  useEffect(() => {
+    localStorage.setItem('hooksniff_failure_alerts', String(failureAlerts));
+  }, [failureAlerts]);
+  useEffect(() => {
+    localStorage.setItem('hooksniff_weekly_digest', String(weeklyDigest));
+  }, [weeklyDigest]);
 
   const copyApiKey = () => {
     if (apiKey) {
