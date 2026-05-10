@@ -435,6 +435,7 @@ impl PaymentProviderImpl for IyzicoProvider {
             "BKM_POS_PAYMENT_FAILURE" | "CARD_PAYMENT_FAILURE" => {
                 Ok(WebhookResult::PaymentFailed {
                     provider_tx_id: notification.payment_id,
+                    customer_id: None, // Will be resolved by process_webhook_result
                 })
             }
             _ => {
