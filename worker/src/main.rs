@@ -1066,3 +1066,103 @@ async fn process_expired_grace_periods(pool: &PgPool) -> Result<usize> {
 
     Ok(count)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── calculate_backoff ───────────────────────────────────
+
+    #[test]
+    fn test_backoff_first_attempt() {
+        // attempt=1 → 30s
+        assert_eq!(calculate_backoff(1), 30);
+    }
+
+    #[test]
+    fn test_backoff_second_attempt() {
+        // attempt=2 → 60s
+        assert_eq!(calculate_backoff(2), 60);
+    }
+
+    #[test]
+    fn test_backoff_third_attempt() {
+        // attempt=3 → 120s
+        assert_eq!(calculate_backoff(3), 120);
+    }
+
+    #[test]
+    fn test_backoff_exponential_growth() {
+        assert_eq!(calculate_backoff(4), 240);
+        assert_eq!(calculate_backoff(5), 480);
+        assert_eq!(calculate_backoff(6), 960);
+    }
+
+    #[test]
+    fn test_backoff_capped_at_1800() {
+        // attempt=10 → 30 * 2^9 = 15360, but capped at 1800
+        assert_eq!(calculate_backoff(10), 1800);
+        assert_eq!(calculate_backoff(20), 1800);
+    }
+
+    #[test]
+    fn test_backoff_attempt_zero() {
+        // attempt=0 → 30 * 2^(-1).max(0) = 30 * 1 = 30
+        assert_eq!(calculate_backoff(0), 30);
+    }
+
+    // ── is_non_retryable ────────────────────────────────────
+
+    #[test]
+    fn test_non_retryable_400() {
+        assert!(is_non_retryable(400));
+    }
+
+    #[test]
+    fn test_non_retryable_401() {
+        assert!(is_non_retryable(401));
+    }
+
+    #[test]
+    fn test_non_retryable_403() {
+        assert!(is_non_retryable(403));
+    }
+
+    #[test]
+    fn test_non_retryable_404() {
+        assert!(is_non_retryable(404));
+    }
+
+    #[test]
+    fn test_retryable_429() {
+        // 429 SHOULD be retried (rate limited)
+        assert!(!is_non_retryable(429));
+    }
+
+    #[test]
+    fn test_retryable_500() {
+        assert!(!is_non_retryable(500));
+    }
+
+    #[test]
+    fn test_retryable_502() {
+        assert!(!is_non_retryable(502));
+    }
+
+    #[test]
+    fn test_retryable_503() {
+        assert!(!is_non_retryable(503));
+    }
+
+    #[test]
+    fn test_non_retryable_300() {
+        // 3xx is not in 400..500, so it's retryable (shouldn't happen in practice)
+        assert!(!is_non_retryable(300));
+    }
+
+    #[test]
+    fn test_non_retryable_200() {
+        // 200 is not in 400..500, so it's retryable (shouldn't happen in practice)
+        assert!(!is_non_retryable(200));
+    }
+}
