@@ -210,6 +210,8 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 68 | 2026-05-10 08:00 | **Dashboard refactor** — direct fetch → apiFetch (alerts, inbound, transforms, billing), workspace kurulumu |
+| 67 | 2026-05-10 07:49 | **Güvenlik düzeltmeleri** — OAuth CSRF, refresh token, XSS, Redis TLS, domain validation, IP spoofing |
 | 44 | 2026-05-10 01:20 | **Strateji raporları** — EMAIL_MARKETING + CONTENT_MARKETING (2 rapor, Öncelik 2 tamamlandı 5/5, toplam 10/19) |
 | 43 | 2026-05-10 01:02 | **Strateji raporları** — Financial Model, A/B Testing, SEO (3 rapor, internet araştırmasıyla doğrulanmış, Svix $10.5M/$5M verileri eklendi) |
 | 42 | 2026-05-10 00:21 | **Kritik fix oturumu** — 4 eksik tablo (refresh_tokens vb.), CSP hostname fix, vitest build fix, gcloud kurulumu, admin hesap, Vercel env var, deploy limiti tespit |
