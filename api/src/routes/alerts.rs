@@ -82,11 +82,7 @@ async fn create_alert(
     // HS-038k: Validate condition string against allowed values
     let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
     if !valid_conditions.contains(&req.condition.as_str()) {
-        return Err(AppError::BadRequest(format!(
-            "Invalid condition '{}'. Must be one of: {}",
-            req.condition,
-            valid_conditions.join(", ")
-        )));
+        return Err(AppError::BadRequest("Invalid alert condition".into()));
     }
 
     // Validate threshold is positive
@@ -100,11 +96,7 @@ async fn create_alert(
     let valid_channels = ["slack", "email", "webhook"];
     for ch in &req.channels {
         if !valid_channels.contains(&ch.as_str()) {
-            return Err(AppError::BadRequest(format!(
-                "Invalid channel '{}'. Must be one of: {}",
-                ch,
-                valid_channels.join(", ")
-            )));
+            return Err(AppError::BadRequest("Invalid notification channel".into()));
         }
     }
 
