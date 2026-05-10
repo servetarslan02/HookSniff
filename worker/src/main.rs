@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgListener, PgPoolOptions};
 use sqlx::PgPool;
 
+mod circuit_breaker;
 mod config;
 pub mod delivery;
 mod signing;
@@ -115,8 +116,17 @@ async fn main() -> Result<()> {
     // Max 10 HTTP deliveries at the same time
     let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
 
+    // HS-020: Circuit breaker — skip delivery for endpoints with consecutive failures
+    let circuit_breaker = circuit_breaker::CircuitBreaker::new(
+        circuit_breaker::CircuitBreakerConfig {
+            failure_threshold: 5,
+            cooldown_secs: 60,
+        },
+    );
+
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
     tracing::info!("🔒 Concurrent delivery limit: 10");
+    tracing::info!("⚡ Circuit breaker: 5 failures → 60s cooldown");
 
     // Graceful shutdown: listen for SIGTERM/SIGINT
     let shutdown = shutdown_signal();
@@ -174,7 +184,7 @@ async fn main() -> Result<()> {
                     }
                 }
                 // Process immediately on NOTIFY (or after reconnect attempt)
-                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone()).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries", processed);
@@ -187,7 +197,7 @@ async fn main() -> Result<()> {
             }
             _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
                 // Fallback 1s poll — catches anything NOTIFY might have missed
-                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone()).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries (poll fallback)", processed);
@@ -283,6 +293,7 @@ async fn process_pending(
     http_client: &reqwest::Client,
     _cfg: &config::WorkerConfig,
     semaphore: std::sync::Arc<tokio::sync::Semaphore>,
+    circuit_breaker: circuit_breaker::CircuitBreaker,
 ) -> Result<usize> {
     // Fetch pending items (with FOR UPDATE SKIP LOCKED for concurrency)
     let items: Vec<WebhookQueueItem> = {
@@ -332,13 +343,31 @@ async fn process_pending(
         let http_client = http_client.clone();
         let secret_map = secret_map.clone();
         let semaphore = semaphore.clone();
+        let cb = circuit_breaker.clone();
 
         let handle = tokio::spawn(async move {
             // Acquire semaphore permit — limits concurrent HTTP deliveries
             let _permit = semaphore.acquire().await.expect("semaphore closed");
 
             let delivery_id = item.delivery_id;
+            let endpoint_id = item.endpoint_id;
             let attempt = item.attempt_count + 1;
+
+            // HS-020: Circuit breaker — skip delivery if endpoint circuit is open
+            if !cb.allow_request(endpoint_id).await {
+                tracing::warn!(
+                    "⚡ Circuit OPEN — skipping delivery {} for endpoint {} (cooldown active)",
+                    delivery_id, endpoint_id
+                );
+                // Re-queue for later retry
+                let _ = sqlx::query::<sqlx::Postgres>(
+                    "UPDATE webhook_queue SET status = 'pending', next_retry_at = now() + interval '60 seconds' WHERE id = $1"
+                )
+                .bind(item.id)
+                .execute(&pool)
+                .await;
+                return Ok::<(), anyhow::Error>(());
+            }
 
             // Each delivery is processed inside a structured span (OTel-aware)
             let span = tracing::info_span!(
@@ -508,6 +537,9 @@ async fn process_pending(
                 .await?;
 
                 tx.commit().await?;
+
+                // HS-020: Record success in circuit breaker
+                cb.record_success(endpoint_id).await;
             } else if is_non_retryable(status_code) {
                 // ❌ Client error (4xx except 429) → dead letter, don't retry
                 tracing::error!(
@@ -575,6 +607,9 @@ async fn process_pending(
                 .await?;
 
                 tx.commit().await?;
+
+                // HS-020: Record failure in circuit breaker
+                cb.record_failure(endpoint_id).await;
             } else if attempt >= item.max_attempts {
                 // ❌ Max deneme aşıldı → dead letter
                 tracing::error!(
@@ -644,6 +679,9 @@ async fn process_pending(
                 .await?;
 
                 tx.commit().await?;
+
+                // HS-020: Record failure in circuit breaker
+                cb.record_failure(endpoint_id).await;
             } else {
                 // 🔄 Retry — exponential backoff
                 let delay = calculate_backoff(attempt);
@@ -689,6 +727,9 @@ async fn process_pending(
                 .await?;
 
                 tx.commit().await?;
+
+                // HS-020: Record failure in circuit breaker (retry = delivery failed)
+                cb.record_failure(endpoint_id).await;
             }
 
             Ok::<(), anyhow::Error>(())
