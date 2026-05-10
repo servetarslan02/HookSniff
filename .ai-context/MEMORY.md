@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 16:45 GMT+8
+> Son güncelleme: 2026-05-10 18:21 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -14,37 +14,40 @@
 - Her oturum sonunda MEMORY.md + NEXT_SESSION.md güncelle
 - Local dosyalar silinir, önemli bilgiler GitHub'a commit et
 
-## 📝 Oturum 71 (2026-05-10 15:51 - 16:45 GMT+8)
+## 📝 Oturum 72 (2026-05-10 17:30 - 18:21 GMT+8)
 
 ### Yapılan İşler
-1. OpenClaw workspace kuruldu — USER.md, MEMORY.md, SOUL.md güncellendi
-2. GitHub erişimi kuruldu — `gh` CLI kuruldu, token ile auth
-3. `.ai-context/` sistemi okundu — 70+ oturum geçmişi, proje durumu anlaşıldı
-4. İlk geçiş: 5 paralel agent ile ~100 sayfa genel inceleme
-5. İkinci geçiş: 5 paralel agent ile ~52 sayfa derin inceleme (kimlik doğrulamalı)
-6. Admin paneli manuel kontrol — 5/5 sayfa çalışıyor (agent'lar demo hesabıyla görememiş)
-7. Demo hesap oluşturuldu: demo@hooksniff.com / Demo1234!
-8. Görsel hata raporları GitHub'a kaydedildi: `.ai-context/visual-bugs/` (11 dosya)
-9. NEXT_SESSION.md güncellendi
+1. HookSniff repo klonlandı, `.ai-context/` sistemi okundu
+2. Demo hesap girişi test edildi — `demo@hooksniff.com / Demo1234!` çalışıyor
+3. 10 kayıtlı kullanıcı hesabı doğrulandı (1 business, 9 free)
+4. **5 tur, 29 agent ile tam proje denetimi yapıldı:**
+   - Tur 1: Dashboard sayfaları (5 agent)
+   - Tur 2: i18n, security, API flow, UX (4 agent)
+   - Tur 3: Backend, Worker, Database, SDK, İnfra (5 agent)
+   - Tur 4: OpenAPI, Tests, Code Quality, Error Handling, Portal (5 agent)
+   - Tur 5: Crypto, Async Rust, Rate Limiting, Email, Frontend Perf (5 agent)
+   - Tur 6: WebSocket, Payments, GDPR, React Patterns, DB Queries (5 agent)
+5. **30 rapor** yazıldı, `visual-bugs/` klasörüne taşındı ve GitHub'a push edildi
+6. **Master aksiyon planı** oluşturuldu
 
-### Tespit Edilen Kritik Sorunlar
-1. 🔴 Dashboard routing çökmüş — 16 sayfa yanlış içerik gösteriyor
-2. 🔴 Sidebar faciaları — çift emoji, karışık dil, aktif highlight yok
-3. 🔴 Ham translation key'ler — Billing'de görünüyor
-4. 🟡 Public sayfa çevirisi — 10 sayfanın 7'si %0-15 Türkçe
-5. 🟡 Onboarding karışık dil
-6. 🟡 Footer eksik (public sayfalar)
-
-### Düzeltmeler
-- Admin paneli "bozuk" raporu düzeltildi — demo hesabı admin yetkisi yok
-
-### Sonraki Oturum
-- Dashboard routing düzeltmesi (EN KRİTİK)
-- Sidebar fix
-- Billing translation key fix
-- Admin paneli derin inceleme devam edecek (2 agent bekliyor)
+### En Kritik Bulgular (Öncelik Sırası)
+1. 🔴 Dashboard routing çökmüş — 16 sayfa yanlış içerik
+2. 🔴 Frontend-Backend API uyumsuzluğu — 5+ sayfada
+3. 🔴 Abonelik iptal endpoint'i yok
+4. 🔴 Dashboard'dan hesap silme bozuk
+5. 🔴 Fiyat uyumsuzluğu (frontend vs backend)
+6. 🔴 std::sync::Mutex async'te deadlock
+7. 🔴 Auth cache OOM
+8. 🔴 Kritik delivery index eksik
+9. 🔴 CSRF koruması yok
+10. 🔴 Hardcoded DB credentials
 
 ### Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165 (business, admin)
 - Demo: demo@hooksniff.com / Demo1234! (free, non-admin)
-- 8+ test hesabı mevcut
+- API: hooksniff-api-1046140057667.europe-west1.run.app
+- Dashboard: https://hooksniff.vercel.app
+
+### Sonraki Oturum
+- ACTION-PLAN.md'deki acil maddeleri düzeltmeye başla
+- Dashboard routing en kritik — önce o düzeltilmeli
