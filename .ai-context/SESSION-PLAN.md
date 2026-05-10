@@ -206,12 +206,12 @@ Her oturum şu şekilde işler:
 | HS-056 | UNIQUE constraint'ler eksik | ✅ 2026-05-10 |
 | HS-057 | Delivery index eksik | ✅ 2026-05-10 (migration 044) |
 
-### Oturum 88: Billing Business Logic
+### Oturum 88: Billing Business Logic ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-058 | Proration yok | ⬜ |
-| HS-059 | Grace period yok | ⬜ |
-| HS-060 | Downgrade'de endpoint cleanup yok | ⬜ |
+| HS-058 | Proration yok | ✅ 2026-05-10 |
+| HS-059 | Grace period yok | ✅ 2026-05-10 |
+| HS-060 | Downgrade'de endpoint cleanup yok | ✅ 2026-05-10 |
 
 ### Oturum 89: Monitoring & Observability
 | ID | Sorun | Durum |
