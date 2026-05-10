@@ -157,7 +157,7 @@ function LoginForm() {
                 <div className="w-full border-t border-gray-200 dark:border-slate-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-slate-900 text-gray-500 dark:text-slate-400">Or continue with</span>
+                <span className="px-2 bg-white dark:bg-slate-900 text-gray-500 dark:text-slate-400">{t('orContinueWith')}</span>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
