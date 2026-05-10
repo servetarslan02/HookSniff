@@ -92,13 +92,14 @@
 8. Bug fix: PaymentFailed grace period condition IS NOT NULL → IS NULL
 9. Final doğrulama: cargo check API ✅, cargo check Worker ✅, tsc --noEmit ✅, Neon DB ✅
 
-## 📝 Oturum 90 (2026-05-10 21:53 - 22:00 GMT+8) ✅
+## 📝 Oturum 90 (2026-05-10 21:53 - 22:07 GMT+8) ✅
 1. i18n & Content: HS-069 (FAQ)
-2. 8 dosya, 1 commit (5c0a657)
+2. 8 dosya, 3 commit (5c0a657, 0006512, 118dc94)
 3. HS-069: FAQ sayfası için 40 çeviri anahtarı, 8 dile eklendi
    - 15 soru-cevap, 5 kategori (Genel, Başlarken, Faturalandırma, Teknik, Güvenlik)
    - Türkçe çeviriler native kalitede
-   - Diğer diller İngilizce placeholder (topluluk çevirisi için hazır)
+   - Almanca, Japonca, Fransızca, İspanyolca, Portekizce, Korece — gerçek çeviri (placeholder değil)
+   - Japonca/Korece "accepted" hatası düzeltildi
 4. HS-065/066: Dashboard sayfaları 'use client' — metadata layout'tan geliyor, doğrudan eklenemez
 5. Changelog page.tsx düzeltildi (kırık import)
 
