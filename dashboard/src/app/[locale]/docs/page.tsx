@@ -68,7 +68,7 @@ export default function DocsPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <tr><td className="px-4 py-3">{t('free')}</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000</td></tr>
-              <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">50,000</td></tr>
+              <tr><td className="px-4 py-3">{t('pro')}</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">50,000</td></tr>
               <tr><td className="px-4 py-3">{t('business')}</td><td className="px-4 py-3">10,000</td><td className="px-4 py-3">500,000</td></tr>
             </tbody>
           </table></div>

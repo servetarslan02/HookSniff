@@ -59,7 +59,7 @@ export default function AdminRevenuePage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Revenue Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
           Financial metrics and revenue breakdown
         </p>

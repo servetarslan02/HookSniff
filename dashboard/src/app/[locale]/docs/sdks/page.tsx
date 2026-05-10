@@ -13,7 +13,7 @@ export default function SdksPage() {
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-3xl">🐍</span>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Python SDK</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('pythonSdk')}</h2>
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('installation')}</h3>
@@ -96,15 +96,15 @@ except hooksniff.HookSniffError as e:
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-3xl">📦</span>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Node.js SDK</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('nodeSdk')}</h2>
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Installation</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('installation')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
 {`npm install @hooksniff/sdk`}
         </pre>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Start</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('quickStart')}</h3>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import { HookSniff } from '@hooksniff/sdk';
 

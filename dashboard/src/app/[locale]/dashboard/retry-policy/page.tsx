@@ -345,8 +345,8 @@ export default function RetryPolicyPage() {
 
             <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
               <p className="text-sm text-blue-700 dark:text-blue-400">
-                💡 <strong>Tip:</strong> Per-endpoint retry policies override these global defaults. 
-                Configure them in <a href="/dashboard/endpoints" className="underline">Endpoint Settings</a>.
+                💡 <strong>{t("tip")}</strong> Per-endpoint retry policies override these global defaults. 
+                Configure them in <a href="/dashboard/endpoints" className="underline">{t('endpointSettingsLink')}</a>.
               </p>
             </div>
           </div>

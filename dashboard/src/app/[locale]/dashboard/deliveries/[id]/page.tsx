@@ -531,7 +531,7 @@ function DetailRow({
           <button
             onClick={onCopy}
             className="flex-shrink-0 p-1 rounded text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-            title="Copy"
+            title={t('copyTitle')}
           >
             {copied ? (
               <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
