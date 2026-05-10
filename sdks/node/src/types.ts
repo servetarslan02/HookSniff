@@ -2,6 +2,8 @@ export interface HookSniffConfig {
   apiKey: string;
   baseUrl?: string;
   timeout?: number;
+  /** Maximum number of retries for transient failures (5xx, 429, network errors). Defaults to 3. */
+  maxRetries?: number;
 }
 
 export interface RetryPolicy {
