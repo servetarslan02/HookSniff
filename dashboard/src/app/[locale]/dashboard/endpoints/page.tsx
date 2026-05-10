@@ -6,10 +6,12 @@ import { useAuth } from '@/lib/store';
 import { endpointsApi, type Endpoint } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useToast } from '@/components/Toast';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -60,7 +62,7 @@ export default function EndpointsPage() {
       await endpointsApi.delete(token, deleteId);
       setEndpoints((prev) => prev.filter((ep) => ep.id !== deleteId));
     } catch (err: unknown) {
-      alert((err instanceof Error ? err.message : 'Unknown error') || 'Failed to delete');
+      toast((err instanceof Error ? err.message : 'Unknown error') || 'Failed to delete', 'error');
     } finally {
       setDeleteId(null);
     }
@@ -98,7 +100,7 @@ export default function EndpointsPage() {
     setEndpoints((prev) => prev.filter((ep) => !selected.has(ep.id)));
     setSelected(new Set());
     setBulkDeleting(false);
-    alert(`Deleted ${deleted} endpoints`);
+    toast(`Deleted ${deleted} endpoints`, 'success');
   };
 
   if (loading) {
