@@ -135,12 +135,12 @@ async fn upsert_sso_config(
                     "SAML requires either metadata_url or sso_url".into(),
                 ));
             }
-        } else if provider == "oidc" {
-            if req.issuer_url.is_none() || req.client_id.is_none() {
-                return Err(AppError::BadRequest(
-                    "OIDC requires issuer_url and client_id".into(),
-                ));
-            }
+        } else if provider == "oidc"
+            && (req.issuer_url.is_none() || req.client_id.is_none())
+        {
+            return Err(AppError::BadRequest(
+                "OIDC requires issuer_url and client_id".into(),
+            ));
         }
     }
 
