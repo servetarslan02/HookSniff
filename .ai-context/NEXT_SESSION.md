@@ -1,20 +1,53 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 04:59 GMT+8
+> Son güncelleme: 2026-05-11 05:47 GMT+8
 
 ---
 
-## ⚠️ KURAL: Servet'ten Giriş Bilgileri İste
+## ✅ Tüm Dış Servisler Tamamlandı (Oturum 102)
 
-Bazı servislerde ayar yapmak için **Servet'in Google hesabıyla oturum açması gerekiyor.** Oturum başında bunları iste:
+1. **Vercel** ✅ — Web Analytics aktif, Speed Insights kod eklendi
+2. **Resend** ✅ — API key Cloud Run'a eklendi, modül hazır
+3. **Neon DB** ✅ — Backup cron her gün 03:00 UTC
+4. **Grafana** ✅ — hookrelay.grafana.net, 7 alert rule + email
+5. **Polar.sh** ✅ — Checkout link hazır (Pro, 1 ay free trial)
 
-1. **Vercel** ✅ Yapıldı — Web Analytics aktif (Hobby plan, 50K events/ay), Speed Insights kod eklendi
-2. **Resend** — Opsiyonel, Gmail çalışıyorsa gerek yok
-3. **Neon DB** ✅ Yapıldı — Backup cron her gün 03:00 UTC, 30 gün retention
-4. **Grafana** ✅ Yapıldı — hookrelay.grafana.net, 7 alert rule + email contact point kuruldu
-5. **Polar.sh** ✅ Yapıldı — Checkout link (Pro, 1 ay free trial): https://buy.polar.sh/polar_cl_jtWjcvyy0m6ZOuOkEIa7i0agQmlpfJGsNwTJU4LNG8U
+---
 
-**Nasıl çalışır:** Servet Chrome'da bu servislere giriş yapar → OpenClaw Browser Relay ile oturumu devralır → Ayarları yapar.
+## 🟡 Sıradaki Oturum: #103
+
+### 1. Resend Entegrasyonu (EN ÖNEMLİ)
+- `resend_email.rs` modülü hazır, Cloud Run'da `RESEND_API_KEY` var
+- Gmail API yerine Resend kullanmak için:
+  - `routes/auth.rs` → `send_welcome_email`, `send_verification_email`, `send_password_reset_email`
+  - `routes/contact.rs` → `send_contact_email`
+  - Config'de `RESEND_API_KEY` varsa Resend, yoksa Gmail fallback
+- **compile + test zorunlu**
+
+### 2. Grafana OTEL Verisi Kontrol
+- Grafana Cloud'da 0 metrics/logs/traces görünüyor
+- OTEL exporter'ın düzgün çalışıp çalışmadığı kontrol edilmeli
+- `OTEL_EXPORTER_OTLP_HEADERS` formatı doğru mu?
+
+### 3. GitHub Actions Workflow'ları
+- Token'da `workflow` scope'u yok
+- `backup.yml` ve `deploy-alerts.yml` push edilemedi
+- Servet'ten yeni token (workflow scope'lu) istenecek
+
+### 4. Polar.sh Identity Verification
+- Servet'in yapması lazım (kimlik doğrulaması)
+- Para almak için gerekli
+
+### 5. Vercel Speed Insights Deploy
+- Kod eklendi, deploy limiti dolmuş
+- Yarın otomatik deploy olacak
+
+### 6. db.rs Test (HS-085)
+- Gerçek PostgreSQL gerekli (Neon test DB)
+- Düşük öncelik
+
+### 7. SDK Otomatik Güncelleme (HS-090)
+- Lansman sonrası, detaylı araştırma gerekli
 
 ---
 
