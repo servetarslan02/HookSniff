@@ -99,6 +99,17 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - tracing-opentelemetry vendor patch kaldırma (upstream 0.33 çıkınca)
 - Dependabot major PR'ları: TypeScript 6, Tailwind 4, Recharts 3, Next.js 16 (dikkatli olunmalı)
 
+## 📋 Yapılacaklar (Oturum 102 sonu)
+1. **Resend entegrasyonu** — `resend_email.rs` modülü hazır, Cloud Run'a API key eklendi. Gmail API yerine Resend kullanmak için Rust kodunda email provider seçimi yapılmalı (routes/auth.rs, routes/contact.rs). Bir sonraki oturumda yapılacak.
+2. **Polar.sh Identity Verification** — Kimlik doğrulaması gerekli (para almak için). Servet'in yapması lazım.
+3. **Polar.sh Stripe Payout** — Stripe bağlantısı kurulmamış. Servet şimdilik pasif dedi, şirketleşince aktif edilecek.
+4. **Resend Domain** — `hooksniff.is-a.dev` başarısız. `onboarding@resend.dev` (shared domain) ile başlanabilir, custom domain sonra kurulur.
+5. **Vercel Speed Insights** — Kod eklendi, deploy bekliyor. Vercel deploy limiti dolmuş, yarın sıfırlanır.
+6. **Neon Backup Test** — İlk backup başarılı (57.7 KB, 53 tablo). Cron 03:00 UTC'de çalışacak.
+7. **Grafana OTEL Verisi** — Grafana Cloud'da 0 metrics/logs/traces. OTEL exporter'ın düzgün çalışıp çalışmadığı kontrol edilmeli.
+8. **GitHub Actions Workflow'ları** — Token'da `workflow` scope'u yok, push edilemedi. Token yenilenmeli.
+9. **Google şifre** — `uku_21700987` (güncel, 2FA: Google Authenticator)
+
 ## Fiyatlandırma Kararı (Oturum 97)
 - Avrupa: USD ($29/$99), Türkiye: ₺ (₺149/₺449) — Polar.sh multi-currency
 - iyzico pasif kalacak, kod silinmeyecek
