@@ -62,14 +62,27 @@
 
 ## 📝 Oturum 87 (2026-05-10 21:16 - 21:30 GMT+8) ✅ KUSURSUZ
 1. Database Indexes & Triggers: HS-054, HS-055, HS-056
-2. 3 dosya, 2 commit (db7715b, 3a93f8c)
-3. HS-054: 19 yeni index eklendi (customers, endpoints, deliveries, dead_letters, webhook_queue, api_keys, invoices, notifications, ai_events, ai_actions, ai_agent_executions, team_members)
-4. HS-055: 10 updated_at trigger eklendi (customers, endpoints, api_keys, alert_rules, notification_preferences, inbound_configs, fifo_queue, transform_rules, retry_policies)
-5. HS-056: 2 UNIQUE constraint (api_keys.api_key_hash, webhook_queue.delivery_id)
-6. HS-057: Zaten migration 044'te tamamlanmıştı
-7. **Neon DB'de doğrulandı**: 189 index, 13 trigger, 134 constraint
-8. **Bug düzeltmesi**: `ADD CONSTRAINT IF NOT EXISTS` PostgreSQL'de FK/CHECK için desteklenmiyor → `DO $$ BEGIN IF NOT EXISTS ... END $$` pattern'ına çevrildi
-9. Migration: 044 + 045 Neon'da başarıyla uygulandı
+2. 3 dosya, 3 commit (db7715b, 3a93f8c, 1a15439)
+3. HS-054: 19 yeni index eklendi
+4. HS-055: 10 updated_at trigger eklendi
+5. HS-056: 2 UNIQUE constraint
+6. Neon DB'de doğrulandı: 189 index, 13 trigger, 134 constraint
+7. Bug fix: ADD CONSTRAINT IF NOT EXISTS → DO block pattern
+
+## 📝 Oturum 88 (2026-05-10 21:26 - 21:35 GMT+8) ✅
+1. Billing Business Logic: HS-058, HS-059, HS-060
+2. 3 dosya, 1 commit (8522705)
+3. HS-058: Proration — orta döngü upgrade'de kalan gün üzerinden fark hesaplama
+   - calculate_proration() fonksiyonu
+   - UpgradeResponse'a prorated_amount_cents ve days_remaining eklendi
+4. HS-059: Grace period — 7 gün ödeme gecikme toleransı
+   - payment_failed_at column (migration 046, Neon'da uygulandı)
+   - Stripe invoice.payment_failed → payment_failed_at set
+   - Stripe invoice.paid → payment_failed_at clear
+   - process_expired_grace_periods() public fonksiyon (worker çağırır)
+5. HS-060: Endpoint cleanup on downgrade
+   - cleanup_excess_endpoints() — en yeni endpoint'leri devre dışı bırakır
+   - Subscription created/updated/canceled/grace expiry'de çağırılır
 
 ## 📝 Oturum 86 (2026-05-10 21:10 - 21:15 GMT+8) ✅
 1. Accessibility & Dark Mode: 4 sorun
