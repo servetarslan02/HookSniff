@@ -271,6 +271,7 @@ export default function PortalCustomizationPage() {
                   {event}
                   <button
                     onClick={() => removeEvent(event)}
+                    aria-label={`Remove ${event} event`}
                     className="text-gray-400 hover:text-red-500 transition ml-1"
                   >
                     ✕
