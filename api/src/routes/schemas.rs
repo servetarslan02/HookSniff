@@ -84,11 +84,17 @@ async fn list_schemas(
 /// GET /v1/schemas/{id} — Get a schema by ID.
 async fn get_schema(
     Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Value>, AppError> {
     let registry = SchemaRegistry::new(pool);
 
     let schema = registry.get(id).await?.ok_or(AppError::NotFound)?;
+
+    // Ownership check — customers can only access their own schemas
+    if schema.customer_id != customer.id {
+        return Err(AppError::NotFound);
+    }
 
     Ok(Json(json!({
         "id": schema.id,
@@ -103,10 +109,17 @@ async fn get_schema(
 /// POST /v1/schemas/{id}/validate — Validate an event against a schema.
 async fn validate_event(
     Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
     Json(request): Json<ValidateEventRequest>,
 ) -> Result<Json<Value>, AppError> {
     let registry = SchemaRegistry::new(pool);
+
+    // Ownership check — customers can only validate against their own schemas
+    let schema = registry.get(id).await?.ok_or(AppError::NotFound)?;
+    if schema.customer_id != customer.id {
+        return Err(AppError::NotFound);
+    }
 
     let result = registry.validate(id, request).await?;
 
