@@ -51,6 +51,18 @@
 ### Sonraki Oturum
 - Oturum 82: Auth & Crypto Security (HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l)
 
+## 📝 Oturum 82 (2026-05-10 19:52 - 20:10 GMT+8) ✅
+1. Auth & Crypto Security düzeltmeleri:
+   - HS-038f: Timing attack — login her durumda password doğruluyor (dummy Argon2 hash), tüm hatalar generic Unauthorized
+   - HS-038g: Serialization error artık serde_json detayları sızdırmıyor
+   - HS-038h: Email enumeration — register aynı response'u dönüyor (email var/yok)
+   - HS-038i: Auth cache deadlock düzeltildi — std::sync::Mutex artık .await üzerinde tutulmuyor
+   - HS-038j: rate_limit.rs expect() → safe header insertion (panic yok)
+   - HS-038k: Alert condition validation (failure_rate, latency, consecutive_failures)
+   - HS-038l: Polar/iyzico webhook hata mesajları sanitize edildi
+2. Dosyalar: `auth.rs`, `error.rs`, `middleware/mod.rs`, `rate_limit.rs`, `alerts.rs`, `billing/polar.rs`, `billing/iyzico.rs`
+3. GitHub'a push edildi: 662f9d6
+
 ## 📝 Oturum Geçmişi (2026-05-10)
 - **Oturum 73**: Rate Limiting (HS-001, HS-002, HS-003, HS-008) ✅
 - **Oturum 74**: Webhook Verification (HS-004, HS-005, HS-009, HS-038a, HS-038b) ✅
