@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 19:12 GMT+8
+> Son güncelleme: 2026-05-10 19:18 GMT+8
 
 ---
 
@@ -16,37 +16,37 @@
 - HS-006, HS-007, HS-010, HS-038c
 
 ### Oturum 76 — Dashboard Routing ✅
-- HS-030: `getLocalizedHref` double-prefix düzeltildi
-- HS-072: ❌ Yanlış bulgu — guard ile korunuyor
-- HS-075: ❌ Yanlış bulgu — middleware atlıyor
+- HS-030: Double-prefix düzeltildi
+- HS-072, HS-075: Yanlış bulgu
+
+### Oturum 77 — Frontend-Backend API Uyumsuzluğu ✅
+- HS-031: Billing plan key fix (API'ye plan key gönderimi)
+- HS-034: $49/$149 → $29/$99 (13 dosya)
+- HS-028: Yanlış bulgu (cookie auth çalışıyor)
+- HS-029: Search'e 300ms debounce eklendi
 
 ---
 
-## 🔴 Sıradaki Oturum: #77 — Frontend-Backend API Uyumsuzluğu
+## 🔴 Sıradaki Oturum: #78 — Billing & Account Endpoints
 
 ### Görev
-Frontend-Backend API uyumsuzluklarını düzelt.
+Abonelik iptal ve hesap silme endpoint'lerini düzelt.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-031 | Revenue, Billing, Notifications format mismatch | `dashboard/src/app/[locale]/dashboard/` |
-| HS-034 | Fiyat uyumsuzluğu — Frontend $49/$149, Backend $29/$99 | `dashboard/` + `api/src/routes/billing.rs` |
-| HS-028 | Search sayfasında Authorization header eksik | `dashboard/src/app/[locale]/dashboard/search/page.tsx` |
-| HS-029 | Search'de debounce yok | `dashboard/src/app/[locale]/dashboard/search/page.tsx` |
+| HS-032 | Abonelik iptal endpoint'i yok — 405 | `api/src/routes/billing.rs` |
+| HS-033 | Hesap silme bozuk — yanlış endpoint | `dashboard/src/app/[locale]/dashboard/settings/page.tsx` |
+| HS-073 | Hardcoded `Authorization: 'Bearer YOUR_TOKEN'` | `dashboard/src/app/[locale]/dashboard/` |
+| HS-074 | `health/page.tsx` token kullanmıyor | `dashboard/src/app/[locale]/dashboard/health/page.tsx` |
+| HS-076 | `api-keys/page.tsx` credentials yanlış yerde | `dashboard/src/app/[locale]/dashboard/api-keys/page.tsx` |
 
 ### Yaklaşım
-1. Dashboard sayfalarındaki API çağrılarını incele
-2. Backend response format'ı ile eşle
-3. Fiyat sabitlerini düzelt ($49/$149 → $29/$99)
-4. Search'e Authorization header ve debounce ekle
-
-### Oturum Sonunda
-- [ ] ISSUE-TRACKER.md'de HS-031, HS-034, HS-028, HS-029'yi ✅ ile işaretle
-- [ ] SESSION-PLAN.md'de Oturum 77'yi ✅ ile işaretle
-- [ ] MEMORY.md'yi güncelle
-- [ ] NEXT_SESSION.md'yi güncelle (Oturum 78 planı)
-- [ ] GitHub'a push et
+1. `billing.rs` — `DELETE /billing/subscription` endpoint'i ekle
+2. `settings/page.tsx` — Hesap silme endpoint'ini düzelt (`/auth/account`)
+3. Hardcoded token'ları kaldır
+4. Health page'e auth ekle
+5. API keys credentials'ı düzelt
 
 ---
 
@@ -54,11 +54,11 @@ Frontend-Backend API uyumsuzluklarını düzelt.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 77 | **Frontend-Backend API Uyumsuzluğu** | HS-031, HS-034, HS-028, HS-029 |
-| 78 | Billing & Account Endpoints | HS-032, HS-033, HS-073, HS-074, HS-076 |
+| 78 | **Billing & Account Endpoints** | HS-032, HS-033, HS-073, HS-074, HS-076 |
 | 79 | SSRF & Security Hardening | HS-011, HS-012, HS-013, HS-014, HS-015, HS-016 |
 | 80 | Worker & Backend Core | HS-018, HS-019, HS-020, HS-021, HS-022, HS-023 |
 | 81 | Database Issues | HS-024, HS-025, HS-026, HS-027, HS-038d, HS-038e |
+| 82 | Auth & Crypto Security | HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l |
 
 ---
 
@@ -67,17 +67,7 @@ Frontend-Backend API uyumsuzluklarını düzelt.
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 1 (+2 yanlış) | 41 |
+| 🔴 P1 | 44 | 4 (+3 yanlış) | 37 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **14** | **89** |
-
----
-
-## 📝 Proje Bilgileri
-
-- **Repo:** https://github.com/servetarslan02/HookSniff
-- **API:** hooksniff-api-1046140057667.europe-west1.run.app
-- **Dashboard:** https://hooksniff.vercel.app
-- **Admin:** servetarslan02@gmail.com / Alayci_165 (business, admin)
-- **Demo:** demo@hooksniff.com / Demo1234! (free, non-admin)
+| **TOPLAM** | **103** | **17** | **86** |
