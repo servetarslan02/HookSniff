@@ -12,7 +12,7 @@
 | 1 | Fiyat $49/$149 yanlış — olmalı $29/$99 | `api/src/billing/mod.rs` | ~85 | ✅ Düzeltildi (2026-05-10) |
 | 2 | Admin revenue query de $49/$149 | `api/src/routes/admin.rs` | ~CASE | ✅ Düzeltildi (2026-05-10) |
 | 3 | Config Debug'da secret sızıntısı (hmac_secret, jwt_secret) | `api/src/config.rs` | struct | ✅ Düzeltildi (2026-05-10) |
-| 4 | GDPR delete_account 12+ tabloda veri bırakıyor | `api/src/routes/auth.rs` | delete_account() |
+| 4 | GDPR delete_account 12+ tabloda veri bırakıyor | `api/src/routes/auth.rs` | delete_account() | ✅ Düzeltildi (2026-05-10) |
 | 5 | Fanout feature işlevsiz (target config kullanılmıyor) | `worker/src/fanout.rs` | deliver_to_target() |
 
 ## 🟠 Yüksek
