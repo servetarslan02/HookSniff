@@ -21,7 +21,7 @@
 ### ❌ ÖNCEKİ AUDIT'TEN DÜZELTİLEN (YANLIŞ BULGULAR)
 | # | Önceki Bulgu | Gerçek Durum |
 |---|-------------|-------------|
-| ~~1~~ | Authorization bypass — API key sadece prefix | ❌ YANLIŞ — `verify_api_key()` Argon2 ile tam hash doğrulaması yapıyor. Prefix sadece lookup için. |
+| ~~1~~ | Authorization bypass — API key sadece prefix | ⚠️ KISMEN YANLIŞ — `handle_inbound` (satır 232) Argon2 kullanıyor ✅ ama `handle_inbound_to_endpoint` (satır 367) SADECE prefix lookup yapıyor, Argon2 yok ❌ |
 | ~~2~~ | Token her zaman 'cookie' | ❌ YANLIŞ — `setToken('cookie')` sentinel değer. Auth HttpOnly cookie ile yapılıyor. Kasıtlı tasarım. |
 | ~~3~~ | API keys cookie auth çalışmıyor | ❌ YANLIŞ — `credentials: 'include'` doğru yerde (fetch options). |
 | ~~4~~ | Playground token localStorage'da | ❌ YANLIŞ — localStorage sadece request HISTORY saklıyor, token değil. |

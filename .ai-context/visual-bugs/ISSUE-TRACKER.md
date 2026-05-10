@@ -64,6 +64,20 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-036 | Kotlin SDK generic crash (TypeToken erasure) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-037 | 6 SDK'da `X-Hookrelay-Signature` legacy header | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-038 | CLI `HOOKRELAY_*` env vars kullanıyor — `HOOKSNIFF_*` olmalı | `infra/DEEP-SDK-DOCS.md` | ⬜ |
+| HS-038a | `handle_inbound_to_endpoint` Authorization bypass — sadece prefix lookup, Argon2 yok | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038b | Prefix length mismatch — 20 char lookup ama DB'de 15 char prefix | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038c | Billing webhook'larında rate limiting yok (Stripe/Polar/iyzico) | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038d | `custom_domains` dig/nslookup subprocess — command injection riski | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038e | Dynamic SQL construction (events, admin) — `format!` ile WHERE clause | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038f | Timing attack — login hataları farklı mesajlar döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038g | `AppError::Serialization` serde_json hata mesajını kullanıcıya gösteriyor | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038h | Email enumeration — register "Email already registered" döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038i | Auth cache `std::sync::Mutex` — async context'te deadlock riski | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038j | `rate_limit.rs` unwrap() — header parse failure'da panic | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038k | Alert condition string validation eksik — whitelist yok | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
+| HS-038l | Polar/iyzico webhook error message'da internal config sızıntısı | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
+| HS-038m | `next.config.js` output:standalone eksik — Docker build başarısız | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
+| HS-038n | DATABASE_URL local credentials git history'de | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
 
 ---
 
@@ -124,6 +138,11 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-082 | Version mismatch (Kotlin 0.2.0 vs 0.3.0) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-083 | OpenAPI schema vs actual API mismatch | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-084 | Polar.sh/iyzico fatura handler'ı yok | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
+| HS-085 | `db.rs` (1029 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
+| HS-086 | `delivery/mod.rs` (404 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
+| HS-087 | `worker/main.rs` (807 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
+| HS-088 | AuthGuard component test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
+| HS-089 | SSO page test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
 
 ---
 
@@ -132,10 +151,10 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | Öncelik | Adet |
 |---------|------|
 | 🚨 P0 | 10 |
-| 🔴 P1 | 28 |
+| 🔴 P1 | 43 |
 | 🟡 P2 | 38 |
-| 🟢 P3 | 8 |
-| **TOPLAM** | **84 benzersiz sorun** |
+| 🟢 P3 | 13 |
+| **TOPLAM** | **104 benzersiz sorun** |
 
 ---
 
