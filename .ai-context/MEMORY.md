@@ -81,6 +81,15 @@
 5. HS-060: Endpoint cleanup — cleanup_excess_endpoints(), tüm senaryolarda çağırılır
 6. 5 açık sorun düzeltildi: worker entegrasyonu, proration verisi, polar/iyzico grace, cancel_at_period_end, endpoint cleanup
 
+## 📝 Oturum 89 (2026-05-10 21:43 - 21:50 GMT+8) ✅
+1. Monitoring & Observability: HS-061, HS-062, HS-063, HS-064
+2. 2 dosya, 1 commit (a73da60)
+3. HS-061: Custom metrics — atomic counters (deliveries, failures, api requests, rate limits)
+4. HS-062: Batch exporter — simple → batch (buffers spans, reduces network calls)
+5. HS-063: Sampling — zaten default parent-based sampling, değişiklik gerekmedi
+6. HS-064: PII redaction — worker'da 500 char truncation, API'de regex redaction (email, token, JWT)
+7. Ek düzeltmeler: 4 pre-existing compile hatası düzeltildi (inbound.rs, rate_limit.rs, worker semaphore, svix JSX)
+
 ## 📝 Oturum 86 (2026-05-10 21:10 - 21:15 GMT+8) ✅
 1. Accessibility & Dark Mode: 4 sorun
 2. 2 dosya, 1 commit (5c2e540)
