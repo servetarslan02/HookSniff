@@ -271,6 +271,6 @@ Admin panelinde tüm kullanımlar `text-gray-400 dark:text-slate-500` şeklinded
 16. **⚠️ Auto-refresh aria-live eksik (System)** — 15s otomatik yenileme screen reader'a bildirilmiyor.
 17. **⚠️ Emoji ikonları decorative değil** — Tüm sayfalarda emoji ikonlarına `aria-hidden="true"` eklenmeli.
 
-**Level A ihlali sayısı: 12** (chart Overview'e de eklendi)
-**Level AA ihlali sayısı: 4** (light mode kontrast eklendi)
-**Uyarı sayısı: 3**
+**Level A ihlali sayısı: 11** (form labels, toggle, scope, caption, h1, chart, progress bar, color-only, footer, skip nav, modal focus trap)
+**Level AA ihlali sayısı: 4** (light mode kontrast, dark mode kontrast, touch targets, focus indicator)
+**Uyarı sayısı: 3** (auto-refresh, emoji, focus doğrulama)
