@@ -85,12 +85,12 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 
 | ID | Sorun | Kaynak | Durum |
 |----|-------|--------|-------|
-| HS-039 | Dual onboarding modal — ikisi aynı anda açılıyor | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
-| HS-040 | Toast'ta dismiss/aria-live yok — erişilebilirlik | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
-| HS-041 | Client-side search + server-side pagination çelişkisi | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
-| HS-042 | Status count'lar sadece mevcut sayfadan hesaplanıyor | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
-| HS-043 | 63 useEffect'ten %75'inde cleanup eksik — memory leak | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
-| HS-044 | Stale closure riskleri (4 useEffect) | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
+| HS-039 | Dual onboarding modal — ikisi aynı anda açılıyor | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
+| HS-040 | Toast'ta dismiss/aria-live yok — erişilebilirlik | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
+| HS-041 | Client-side search + server-side pagination çelişkisi | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
+| HS-042 | Status count'lar sadece mevcut sayfadan hesaplanıyor | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
+| HS-043 | 63 useEffect'ten %75'inde cleanup eksik — memory leak | `frontend/DEEP-COMPONENT-LOGIC.md` | ⚠️ 2026-05-10 — Kritikler düzeltildi, kalanlar P2 |
+| HS-044 | Stale closure riskleri (4 useEffect) | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
 | HS-045 | `lucide-react` hiç kullanılmıyor (~150KB wasted) | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
 | HS-046 | 13 tablo `overflow-x-auto` olmadan — mobil taşma | `frontend/DEEP-CSS-STYLING.md` | ⬜ |
 | HS-047 | `blog/[slug]` 1922 satır mega component | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |

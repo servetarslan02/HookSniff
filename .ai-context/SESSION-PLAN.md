@@ -168,12 +168,12 @@ Her oturum şu şekilde işler:
 ### Oturum 84: Frontend Search & Component Logic
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-039 | Dual onboarding modal | ⬜ |
-| HS-040 | Toast'ta dismiss/aria-live yok | ⬜ |
-| HS-041 | Client-side search + server-side pagination çelişkisi | ⬜ |
-| HS-042 | Status count'lar sadece mevcut sayfadan | ⬜ |
-| HS-043 | 63 useEffect'ten %75'inde cleanup eksik | ⬜ |
-| HS-044 | Stale closure riskleri | ⬜ |
+| HS-039 | Dual onboarding modal | ✅ 2026-05-10 |
+| HS-040 | Toast'ta dismiss/aria-live yok | ✅ 2026-05-10 |
+| HS-041 | Client-side search + server-side pagination çelişkisi | ✅ 2026-05-10 |
+| HS-042 | Status count'lar sadece mevcut sayfadan | ✅ 2026-05-10 |
+| HS-043 | 63 useEffect'ten %75'inde cleanup eksik | ⚠️ 2026-05-10 — Kritikler düzeltildi |
+| HS-044 | Stale closure riskleri | ✅ 2026-05-10 |
 
 **Dosyalar:** `dashboard/src/app/[locale]/` sayfaları, `dashboard/src/components/`
 
@@ -269,10 +269,10 @@ Her oturum şu şekilde işler:
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 34 (+9 yanlış/notlu) | 1 |
+| 🔴 P1 | 44 | 40 (+9 yanlış/notlu) | 0 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **48** | **53** |
+| **TOPLAM** | **103** | **54** | **47** |
 
 ---
 
