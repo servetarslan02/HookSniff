@@ -49,7 +49,16 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 80: Worker & Backend Core (HS-018, HS-019, HS-020, HS-021, HS-022, HS-023)
+- Oturum 81: Database Issues + Worker Kalan (HS-024, HS-025, HS-026, HS-027, HS-038d, HS-038e)
+
+## 📝 Oturum 80 (2026-05-10 19:30 - 19:32 GMT+8) ✅ (kısmi)
+1. Error classification eklendi:
+   - 4xx (except 429) → dead letter, retry yok
+   - 429 (rate limited) → retry with backoff
+   - 5xx → retry with backoff
+   - Network error → retry with backoff
+2. Dosya: `worker/src/main.rs`
+3. HS-019-023: Sonraki oturumlara kaldı (büyük değişiklikler)
 
 ## 📝 Oturum 79 (2026-05-10 19:24 - 19:26 GMT+8) ✅
 1. SSRF & Security Hardening:
