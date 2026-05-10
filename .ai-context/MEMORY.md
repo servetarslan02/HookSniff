@@ -49,7 +49,16 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 79: SSRF & Security Hardening (HS-011, HS-012, HS-013, HS-014, HS-015, HS-016)
+- Oturum 80: Worker & Backend Core (HS-018, HS-019, HS-020, HS-021, HS-022, HS-023)
+
+## 📝 Oturum 79 (2026-05-10 19:24 - 19:26 GMT+8) ✅
+1. SSRF & Security Hardening:
+   - Notification URL'lerine SSRF validation eklendi (HS-011)
+   - CSP'den `unsafe-eval` kaldırıldı (HS-013)
+   - `DefaultHasher` → SHA-256 idempotency hash (HS-016)
+   - HSTS header eklendi
+   - HS-012, HS-014, HS-015: Yanlış/operasyonel bulgular
+2. Dosyalar: `customer_portal.rs`, `idempotency.rs`, `next.config.js`
 
 ## 📝 Oturum 78 (2026-05-10 19:20 - 19:22 GMT+8) ✅
 1. Billing & Account Endpoints:
