@@ -116,11 +116,7 @@ fn validate_role(role: &str) -> Result<(), AppError> {
     if VALID_ROLES.contains(&role) {
         Ok(())
     } else {
-        Err(AppError::BadRequest(format!(
-            "Invalid role '{}'. Must be one of: {}",
-            role,
-            VALID_ROLES.join(", ")
-        )))
+        Err(AppError::BadRequest("Invalid role".into()))
     }
 }
 
