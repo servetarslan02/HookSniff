@@ -484,6 +484,73 @@ async fn process_pending(
                 .await?;
 
                 tx.commit().await?;
+            } else if is_non_retryable(status_code) {
+                // ❌ Client error (4xx except 429) → dead letter, don't retry
+                tracing::error!(
+                    "❌ Delivery {} → {} — non-retryable client error (HTTP {}), moving to dead letter",
+                    delivery_id,
+                    error_msg,
+                    status_code
+                );
+
+                let mut tx = pool.begin().await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    r#"
+                    UPDATE webhook_queue
+                    SET status = 'dead_letter', processed_at = now(), attempt_count = $1
+                    WHERE id = $2
+                    "#,
+                )
+                .bind(attempt)
+                .bind(item.id)
+                .execute(&mut *tx)
+                .await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    r#"
+                    INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                    SELECT id, endpoint_id, customer_id, payload, $2, $3
+                    FROM deliveries WHERE id = $1
+                    "#,
+                )
+                .bind(delivery_id)
+                .bind(&format!("{} (HTTP {}, non-retryable)", error_msg, status_code))
+                .bind(attempt)
+                .execute(&mut *tx)
+                .await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
+                )
+                .bind(delivery_id)
+                .bind(&format!("{} (HTTP {})", error_msg, status_code))
+                .execute(&mut *tx)
+                .await?;
+
+                record_attempt(
+                    &mut tx,
+                    delivery_id,
+                    attempt,
+                    AttemptRecord {
+                        status_code: attempt_status,
+                        response_body: attempt_body,
+                        duration_ms,
+                        error_message: Some(&format!("{} — non-retryable (HTTP {})", error_msg, status_code)),
+                        trace_id: trace_id.as_deref(),
+                        response_headers: attempt_headers,
+                    },
+                )
+                .await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1"
+                )
+                .bind(item.endpoint_id)
+                .execute(&mut *tx)
+                .await?;
+
+                tx.commit().await?;
             } else if attempt >= item.max_attempts {
                 // ❌ Max deneme aşıldı → dead letter
                 tracing::error!(
@@ -813,4 +880,16 @@ fn calculate_backoff(attempt: i32) -> i64 {
     let base = 30_i64;
     let delay = base * 2_i64.pow((attempt - 1).max(0) as u32);
     delay.min(1800) // Max 30 dakika
+}
+
+/// Check if an HTTP status code is non-retryable (client error).
+/// 4xx errors (except 429 Too Many Requests) should not be retried.
+/// - 400 Bad Request → client mistake, retry won't help
+/// - 401 Unauthorized → auth issue, retry won't help
+/// - 403 Forbidden → permission issue, retry won't help
+/// - 404 Not Found → endpoint gone, retry won't help
+/// - 429 Too Many Requests → SHOULD be retried (rate limited)
+/// - 5xx → SHOULD be retried (server error)
+fn is_non_retryable(status_code: i32) -> bool {
+    (400..500).contains(&status_code) && status_code != 429
 }
