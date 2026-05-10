@@ -6,11 +6,8 @@ global.fetch = mockFetch;
 
 // Import after mocking
 const {
-  apiFetch,
   endpointsApi,
   webhooksApi,
-  authApi,
-  statsApi,
   adminApi,
   teamsApi,
   notificationsApi,

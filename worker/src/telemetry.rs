@@ -31,8 +31,8 @@ fn init_otel(
 ) {
     use opentelemetry::global;
     use opentelemetry::trace::TracerProvider as _;
-    use opentelemetry_otlp::WithExportConfig;
-    use opentelemetry_sdk::trace::TracerProvider;
+    use opentelemetry_otlp::{WithExportConfig, WithHttpConfig};
+    use opentelemetry_sdk::trace::SdkTracerProvider;
     use std::collections::HashMap;
 
     let otlp_endpoint = endpoint.unwrap_or("http://localhost:4318");
@@ -47,14 +47,14 @@ fn init_otel(
         }
     }
 
-    let exporter = opentelemetry_otlp::new_exporter()
-        .http()
+    let exporter = opentelemetry_otlp::SpanExporter::builder()
+        .with_http()
         .with_endpoint(otlp_endpoint)
         .with_headers(hdr_map)
-        .build_span_exporter()
+        .build()
         .expect("Failed to build OTLP exporter");
 
-    let provider = TracerProvider::builder()
+    let provider = SdkTracerProvider::builder()
         .with_simple_exporter(exporter)
         .build();
 

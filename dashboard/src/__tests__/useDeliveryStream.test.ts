@@ -9,10 +9,6 @@ const mockReader = {
   releaseLock: vi.fn(),
 };
 
-const mockBody = {
-  getReader: () => mockReader,
-};
-
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 

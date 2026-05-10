@@ -34,8 +34,8 @@ use crate::models::endpoint::Endpoint;
 
 pub fn router() -> Router {
     Router::new()
-        .route("/:provider", post(handle_inbound))
-        .route("/:provider/:endpoint_id", post(handle_inbound_to_endpoint))
+        .route("/{provider}", post(handle_inbound))
+        .route("/{provider}/{endpoint_id}", post(handle_inbound_to_endpoint))
 }
 
 /// Inbound provider configuration stored per customer.
@@ -212,7 +212,7 @@ fn verify_generic(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), 
 }
 
 fn compute_hmac_raw(key: &[u8], data: &[u8]) -> Vec<u8> {
-    use hmac::{Hmac, Mac};
+    use hmac::{Hmac, Mac, KeyInit};
     use sha2::Sha256;
     type HmacSha256 = Hmac<Sha256>;
 

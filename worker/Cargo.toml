@@ -14,18 +14,18 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
-axum = "0.7"
+axum = "0.8"
 sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid", "postgres", "json"] }
 dotenvy = "0.15"
-hmac = "0.12"
-sha2 = "0.10"
+hmac = "0.13"
+sha2 = "0.11"
 hex = "0.4"
 base64 = "0.22"
-jsonwebtoken = "9"
+jsonwebtoken = { version = "10", features = ["rust_crypto"] }
 
 # OpenTelemetry integration
-opentelemetry = "0.24"
-opentelemetry_sdk = { version = "0.24", features = ["rt-tokio"] }
-opentelemetry-otlp = { version = "0.17", features = ["http-proto"] }
-tonic = "0.12"
-tracing-opentelemetry = "0.25"
+opentelemetry = "0.32"
+opentelemetry_sdk = { version = "0.32", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.32", features = ["http-proto"] }
+tonic = "0.14"
+tracing-opentelemetry = "0.32"
