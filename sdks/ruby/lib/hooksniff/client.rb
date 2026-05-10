@@ -6,10 +6,11 @@ module HookSniff
   class Client
     attr_reader :endpoints, :webhooks
 
-    def initialize(api_key:, base_url: nil, timeout: nil)
+    def initialize(api_key:, base_url: nil, timeout: nil, max_retries: nil)
       @api_key = api_key
       @base_url = (base_url || DEFAULT_BASE_URL).chomp("/")
       @timeout = timeout || DEFAULT_TIMEOUT
+      @max_retries = max_retries || DEFAULT_MAX_RETRIES
       @endpoints = EndpointsResource.new(self)
       @webhooks = WebhooksResource.new(self)
     end
@@ -22,55 +23,91 @@ module HookSniff
 
     # @api internal
     def request(method, path, body: nil)
-      uri = URI("#{@base_url}#{path}")
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = (uri.scheme == "https")
-      http.open_timeout = @timeout
-      http.read_timeout = @timeout
+      last_error = nil
 
-      case method
-      when :get
-        req = Net::HTTP::Get.new(uri)
-      when :post
-        req = Net::HTTP::Post.new(uri)
-      when :delete
-        req = Net::HTTP::Delete.new(uri)
-      else
-        raise ArgumentError, "Unsupported HTTP method: #{method}"
-      end
+      (0..@max_retries).each do |attempt|
+        uri = URI("#{@base_url}#{path}")
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = (uri.scheme == "https")
+        http.open_timeout = @timeout
+        http.read_timeout = @timeout
 
-      req["Authorization"] = "Bearer #{@api_key}"
-      req["Content-Type"] = "application/json"
-      req["User-Agent"] = "hooksniff-ruby/#{VERSION}"
-
-      req.body = JSON.generate(body) if body
-
-      response = http.request(req)
-
-      case response.code.to_i
-      when 200..299
-        content_type = response["content-type"] || ""
-        if content_type.include?("text/csv")
-          response.body
+        case method
+        when :get
+          req = Net::HTTP::Get.new(uri)
+        when :post
+          req = Net::HTTP::Post.new(uri)
+        when :delete
+          req = Net::HTTP::Delete.new(uri)
         else
-          JSON.parse(response.body) rescue response.body
+          raise ArgumentError, "Unsupported HTTP method: #{method}"
         end
-      when 400
-        raise ValidationError, parse_error_message(response)
-      when 401
-        raise AuthenticationError, parse_error_message(response)
-      when 404
-        raise NotFoundError, parse_error_message(response)
-      when 413
-        raise PayloadTooLargeError, parse_error_message(response)
-      when 429
-        raise RateLimitError, parse_error_message(response)
-      else
-        raise Error, "HTTP #{response.code}: #{parse_error_message(response)}"
+
+        req["Authorization"] = "Bearer #{@api_key}"
+        req["Content-Type"] = "application/json"
+        req["User-Agent"] = "hooksniff-ruby/#{VERSION}"
+
+        req.body = JSON.generate(body) if body
+
+        begin
+          response = http.request(req)
+        rescue StandardError => e
+          last_error = e
+          if attempt < @max_retries
+            sleep(calculate_backoff(attempt))
+            next
+          end
+          raise Error, "Network error after #{attempt + 1} attempts: #{e.message}"
+        end
+
+        status = response.code.to_i
+
+        # Retry on 429 (respect Retry-After) and 5xx
+        if retryable?(status) && attempt < @max_retries
+          delay = if status == 429 && response["Retry-After"]
+                    response["Retry-After"].to_i
+                  else
+                    calculate_backoff(attempt)
+                  end
+          sleep(delay)
+          next
+        end
+
+        case status
+        when 200..299
+          content_type = response["content-type"] || ""
+          if content_type.include?("text/csv")
+            return response.body
+          else
+            return JSON.parse(response.body) rescue response.body
+          end
+        when 400
+          raise ValidationError, parse_error_message(response)
+        when 401
+          raise AuthenticationError, parse_error_message(response)
+        when 404
+          raise NotFoundError, parse_error_message(response)
+        when 413
+          raise PayloadTooLargeError, parse_error_message(response)
+        when 429
+          raise RateLimitError, parse_error_message(response)
+        else
+          raise Error, "HTTP #{response.code}: #{parse_error_message(response)}"
+        end
       end
+
+      raise Error, "Request failed after #{@max_retries + 1} attempts"
     end
 
     private
+
+    def retryable?(status)
+      status == 429 || status >= 500
+    end
+
+    def calculate_backoff(attempt)
+      [1.0 * (2 ** attempt), 30].min
+    end
 
     def parse_error_message(response)
       body = JSON.parse(response.body)
