@@ -190,9 +190,9 @@ fn verify_generic(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), 
         .and_then(|v| v.to_str().ok());
 
     let Some(sig) = sig_header else {
-        // No signature header — allow if no secret configured
+        // No signature header — reject if secret is configured
         if secret.is_empty() {
-            return Ok(());
+            return Err("No secret configured — cannot verify webhook authenticity");
         }
         return Err("No signature header found");
     };
@@ -246,7 +246,8 @@ async fn handle_inbound(
         .ok_or(AppError::BadRequest("Missing API key".into()))?;
 
     // Find customer by API key (prefix-based lookup + Argon2 verification)
-    let prefix = &api_key[..20.min(api_key.len())];
+    // Use 15-char prefix to match DB storage (api_key_prefix)
+    let prefix = &api_key[..15.min(api_key.len())];
     let candidates = sqlx::query_as::<_, Customer>(
         "SELECT * FROM customers WHERE api_key_prefix = $1",
     )
@@ -300,7 +301,18 @@ async fn handle_inbound(
         )));
     };
 
-    // Verify signature
+    // Verify signature — reject if secret is empty (signature verification must be configured)
+    if config.secret.is_empty() {
+        tracing::warn!(
+            "❌ Inbound config for provider '{}' has empty secret — rejecting request (customer={})",
+            provider,
+            customer.id
+        );
+        return Err(AppError::Forbidden(
+            "Webhook secret not configured. Set a secret in your inbound config.".into(),
+        ));
+    }
+
     provider
         .verify_signature(&config.secret, &headers, &body)
         .map_err(|e| AppError::Forbidden(e.to_string()))?;
@@ -380,13 +392,45 @@ async fn handle_inbound_to_endpoint(
         .and_then(|v| v.strip_prefix("Bearer "))
         .ok_or(AppError::BadRequest("Missing API key".into()))?;
 
-    // Find customer
-    let customer =
-        sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
-            .bind(&api_key[..20.min(api_key.len())])
-            .fetch_optional(&pool)
-            .await?
-            .ok_or(AppError::Unauthorized)?;
+    // Find customer by API key (prefix-based lookup + Argon2 verification)
+    // Use 15-char prefix to match DB storage (api_key_prefix)
+    let prefix = &api_key[..15.min(api_key.len())];
+    let candidates = sqlx::query_as::<_, Customer>(
+        "SELECT * FROM customers WHERE api_key_prefix = $1",
+    )
+    .bind(prefix)
+    .fetch_all(&pool)
+    .await?;
+
+    let mut customer = None;
+    for c in &candidates {
+        if crate::auth::jwt::verify_api_key(api_key, &c.api_key_hash) {
+            customer = Some(c.clone());
+            break;
+        }
+    }
+
+    // Also check api_keys table
+    if customer.is_none() {
+        let api_key_rows: Vec<(String, uuid::Uuid)> = sqlx::query_as(
+            "SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
+        )
+        .bind(prefix)
+        .fetch_all(&pool)
+        .await?;
+
+        for (hash, customer_id) in &api_key_rows {
+            if crate::auth::jwt::verify_api_key(api_key, hash) {
+                customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+                    .bind(customer_id)
+                    .fetch_optional(&pool)
+                    .await?;
+                break;
+            }
+        }
+    }
+
+    let customer = customer.ok_or(AppError::Unauthorized)?;
 
     // Find endpoint
     let endpoint = sqlx::query_as::<_, Endpoint>(
@@ -398,7 +442,7 @@ async fn handle_inbound_to_endpoint(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    // Verify signature if config exists — reject if invalid
+    // Verify signature if config exists — reject if secret is empty
     if let Ok(config) = sqlx::query_as::<_, InboundConfig>(
         "SELECT * FROM inbound_configs WHERE customer_id = $1 AND provider = $2 AND enabled = true",
     )
@@ -407,6 +451,16 @@ async fn handle_inbound_to_endpoint(
     .fetch_one(&pool)
     .await
     {
+        if config.secret.is_empty() {
+            tracing::warn!(
+                "❌ Inbound config for provider '{}' has empty secret — rejecting request (customer={})",
+                provider,
+                customer.id
+            );
+            return Err(AppError::Forbidden(
+                "Webhook secret not configured. Set a secret in your inbound config.".into(),
+            ));
+        }
         if let Err(e) = provider.verify_signature(&config.secret, &headers, &body) {
             tracing::warn!(
                 "❌ Inbound webhook signature verification failed for provider={} customer={}: {}",
@@ -416,6 +470,12 @@ async fn handle_inbound_to_endpoint(
             );
             return Err(AppError::Unauthorized);
         }
+    } else {
+        // No inbound config found — reject the request
+        return Err(AppError::BadRequest(format!(
+            "No inbound config for provider '{}' — configure at /dashboard/inbound",
+            provider
+        )));
     }
 
     // Create delivery
@@ -754,9 +814,13 @@ mod tests {
     #[test]
     fn test_verify_generic_no_header_no_secret() {
         let headers = HeaderMap::new();
-        // Empty secret means no verification needed
+        // Empty secret with no header — should fail (can't verify authenticity)
         let result = verify_generic("", &headers, b"body");
-        assert!(result.is_ok());
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            "No secret configured — cannot verify webhook authenticity"
+        );
     }
 
     #[test]

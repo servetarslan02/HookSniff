@@ -49,7 +49,16 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 74: Webhook Verification & Ownership (HS-004, HS-005, HS-009, HS-038a, HS-038b)
+- Oturum 75: Infrastructure & Security Config (HS-006, HS-007, HS-010, HS-038c)
+
+## 📝 Oturum 74 (2026-05-10 19:00 - 19:05 GMT+8) ✅
+1. Webhook verification & ownership düzeltildi:
+   - `inbound.rs`: Boş secret ile webhook reddedilir (HS-004)
+   - `billing.rs`: Stripe webhook secret boşsa reddedilir (HS-005)
+   - `schemas.rs`: Ownership check eklendi (HS-009)
+   - `inbound.rs`: Argon2 hash doğrulaması eklendi (HS-038a)
+   - `inbound.rs`: Prefix 20→15 karakter (HS-038b)
+2. Dosyalar: `api/src/routes/inbound.rs`, `api/src/routes/billing.rs`, `api/src/routes/schemas.rs`
 
 ## 📝 Oturum 73 (2026-05-10 18:57 - 19:00 GMT+8) ✅
 1. Rate limiting eklendi — 4 endpoint koruma altına:
