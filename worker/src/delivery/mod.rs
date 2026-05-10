@@ -402,3 +402,112 @@ async fn deliver_email(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── DeliveryTargetType parsing ──────────────────────────
+
+    #[test]
+    fn test_target_type_from_str_http() {
+        assert_eq!("http".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Http);
+    }
+
+    #[test]
+    fn test_target_type_from_str_email() {
+        assert_eq!("email".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Email);
+    }
+
+    #[test]
+    fn test_target_type_from_str_case_insensitive() {
+        assert_eq!("HTTP".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Http);
+        assert_eq!("Email".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Email);
+    }
+
+    #[test]
+    fn test_target_type_from_str_unknown() {
+        assert!("sms".parse::<DeliveryTargetType>().is_err());
+        assert!("".parse::<DeliveryTargetType>().is_err());
+    }
+
+    // ── DeliveryTargetType display ──────────────────────────
+
+    #[test]
+    fn test_target_type_display_http() {
+        assert_eq!(DeliveryTargetType::Http.to_string(), "http");
+    }
+
+    #[test]
+    fn test_target_type_display_email() {
+        assert_eq!(DeliveryTargetType::Email.to_string(), "email");
+    }
+
+    // ── DeliveryTargetType equality ─────────────────────────
+
+    #[test]
+    fn test_target_type_eq() {
+        assert_eq!(DeliveryTargetType::Http, DeliveryTargetType::Http);
+        assert_ne!(DeliveryTargetType::Http, DeliveryTargetType::Email);
+    }
+
+    // ── DeliveryTargetType serde ────────────────────────────
+
+    #[test]
+    fn test_target_type_serialize() {
+        let json = serde_json::to_string(&DeliveryTargetType::Http).unwrap();
+        assert_eq!(json, "\"http\"");
+    }
+
+    #[test]
+    fn test_target_type_deserialize() {
+        let t: DeliveryTargetType = serde_json::from_str("\"email\"").unwrap();
+        assert_eq!(t, DeliveryTargetType::Email);
+    }
+
+    // ── DeliveryResult serde ────────────────────────────────
+
+    #[test]
+    fn test_delivery_result_serialize() {
+        let result = DeliveryResult {
+            success: true,
+            status_code: 200,
+            response_body: "ok".to_string(),
+            response_headers: serde_json::json!({}),
+            duration_ms: 150,
+            error: String::new(),
+        };
+        let json = serde_json::to_string(&result).unwrap();
+        assert!(json.contains("\"success\":true"));
+        assert!(json.contains("\"status_code\":200"));
+    }
+
+    #[test]
+    fn test_delivery_result_clone() {
+        let result = DeliveryResult {
+            success: false,
+            status_code: 500,
+            response_body: "error".to_string(),
+            response_headers: serde_json::json!({}),
+            duration_ms: 300,
+            error: "Internal Server Error".to_string(),
+        };
+        let cloned = result.clone();
+        assert_eq!(cloned.status_code, 500);
+        assert!(!cloned.success);
+    }
+
+    // ── DeliveryTargetConfig serde ──────────────────────────
+
+    #[test]
+    fn test_delivery_target_config_roundtrip() {
+        let config = DeliveryTargetConfig {
+            target_type: DeliveryTargetType::Http,
+            config: serde_json::json!({"url": "https://example.com/hook"}),
+        };
+        let json = serde_json::to_string(&config).unwrap();
+        let parsed: DeliveryTargetConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.target_type, DeliveryTargetType::Http);
+        assert_eq!(parsed.config["url"], "https://example.com/hook");
+    }
+}
