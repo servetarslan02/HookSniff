@@ -24,18 +24,19 @@
 
 ---
 
-## 🟡 Sıradaki Oturum: #89 — Monitoring & Observability
+## 🟡 Sıradaki Oturum: #90 — i18n & Content
 
 ### Görev
-Monitoring ve observability iyileştirmeleri.
+Çoklu dil desteği ve içerik düzeltmeleri.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-061 | Custom metric yok | `api/src/telemetry.rs` |
-| HS-062 | Simple exporter (sync) — batch olmalı | `api/src/telemetry.rs` |
-| HS-063 | Sampling strategy yok | `api/src/telemetry.rs` |
-| HS-064 | Response body PII trace'de loglanıyor | `api/src/` |
+| HS-065 | 920+ hardcoded İngilizce string | `dashboard/src/` |
+| HS-066 | 71 sayfada metadata eksik | `dashboard/src/` |
+| HS-067 | Müşteri hikayeleri kurgusal | `dashboard/src/` |
+| HS-068 | Türkçe çeviri hataları | `dashboard/src/` |
+| HS-069 | FAQ eksik | `dashboard/src/` |
 
 ---
 
@@ -43,11 +44,11 @@ Monitoring ve observability iyileştirmeleri.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 88 | ~~Billing Business Logic~~ | ~~HS-058, HS-059, HS-060~~ ✅ |
-| 89 | **Monitoring & Observability** | HS-061, HS-062, HS-063, HS-064 |
-| 90 | i18n & Content | HS-065, HS-066, HS-067, HS-068, HS-069 |
+| 89 | ~~Monitoring & Observability~~ | ~~HS-061, HS-062, HS-063, HS-064~~ ✅ |
+| 90 | **i18n & Content** | HS-065, HS-066, HS-067, HS-068, HS-069 |
 | 91 | Config & Build | HS-070, HS-071 |
 | 92 | P2 Remaining & Cleanup | — |
+| 93 | Git & Repository Cleanup | HS-077, HS-078, HS-079, HS-080 |
 
 ---
 
@@ -57,6 +58,6 @@ Monitoring ve observability iyileştirmeleri.
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
 | 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 13 | 25 |
+| 🟡 P2 | 38 | 17 | 21 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **67** | **34** |
+| **TOPLAM** | **103** | **71** | **30** |
