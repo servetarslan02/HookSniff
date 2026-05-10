@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import React, { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -197,6 +198,7 @@ const testimonials = [
 ];
 
 export default function BlogPage() {
+  const t = useTranslations(\'blog\');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
@@ -277,7 +279,7 @@ export default function BlogPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Blog</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -286,7 +288,7 @@ export default function BlogPage() {
       <main className="max-w-5xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Blog</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Insights on webhooks, event-driven architecture, AI agents, and developer tools.</p>
         </div>
 
@@ -294,7 +296,7 @@ export default function BlogPage() {
         <div className="bg-gradient-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-6 mb-10">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Subscribe to our newsletter</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white">{t("subscribe")}</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400">Get webhook tips, product updates, and engineering insights. No spam.</p>
             </div>
             <form className="flex gap-2" onSubmit={handleNewsletterSubmit}>
@@ -337,7 +339,7 @@ export default function BlogPage() {
             {searchQuery && (
               <button
                 onClick={() => { setSearchQuery(''); setCurrentPage(1); }}
-                aria-label="Clear search"
+                aria-label={t("clearSearch")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
               >
                 ✕
@@ -441,7 +443,7 @@ export default function BlogPage() {
 
         {/* Testimonials */}
         <div className="mt-16 pt-10 border-t border-gray-200 dark:border-slate-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">What Users Say</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("whatUsersSay")}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">

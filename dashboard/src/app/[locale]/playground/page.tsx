@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -38,6 +39,7 @@ const samplePayloads = [
 /* ─── Main Page ─── */
 
 export default function PlaygroundPage() {
+  const t = useTranslations(\'playgroundPublic\');
   // State
   const [activeTab, setActiveTab] = useState<PlaygroundTab>('playground');
   const [state, setState] = useState<PlaygroundState>('idle');
@@ -257,7 +259,7 @@ export default function PlaygroundPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Playground</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -266,7 +268,7 @@ export default function PlaygroundPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Hero */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Webhook Playground</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("webhookPlayground")}</h1>
           <p className="text-gray-600 dark:text-slate-400">Get a unique URL, send webhooks, inspect requests in real-time. No signup required.</p>
         </div>
 
@@ -366,14 +368,14 @@ export default function PlaygroundPage() {
 
             {/* Send Test Webhook */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-4">
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Send a test webhook</h3>
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t("sendTest")}</h3>
               <div className="grid md:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">Event type</label>
+                  <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">{t("eventType")}</label>
                   <input type="text" value={sendEvent} onChange={(e) => setSendEvent(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">Quick samples</label>
+                  <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">{t("quickSamples")}</label>
                   <div className="flex flex-wrap gap-1.5">
                     {samplePayloads.map((s) => (
                       <button key={s.name} onClick={() => { setSendEvent(s.event); setSendPayload(s.payload); }} className={`px-2.5 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors ${sendEvent === s.event ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700'}`}>
@@ -403,15 +405,15 @@ export default function PlaygroundPage() {
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold text-gray-900 dark:text-white">Requests ({history.length})</h3>
                   {history.length > 0 && (
-                    <button onClick={handleClear} className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400">Clear all</button>
+                    <button onClick={handleClear} className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400">{t("clearAll")}</button>
                   )}
                 </div>
 
                 {history.length === 0 ? (
                   <div className="flex items-center justify-center h-48 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
                     <div className="text-center">
-                      <p className="text-gray-400 dark:text-slate-600 text-sm mb-1">No requests yet</p>
-                      <p className="text-gray-400 dark:text-slate-600 text-xs">Send a webhook to your URL above</p>
+                      <p className="text-gray-400 dark:text-slate-600 text-sm mb-1">{t("noRequests")}</p>
+                      <p className="text-gray-400 dark:text-slate-600 text-xs">{t("sendToUrl")}</p>
                     </div>
                   </div>
                 ) : (
@@ -440,11 +442,11 @@ export default function PlaygroundPage() {
 
               {/* Right: Request Detail */}
               <div className="lg:col-span-3">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Request Detail</h3>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t("requestDetail")}</h3>
 
                 {!selectedRecord ? (
                   <div className="flex items-center justify-center h-64 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
-                    <p className="text-gray-400 dark:text-slate-600 text-sm">Select a request to inspect</p>
+                    <p className="text-gray-400 dark:text-slate-600 text-sm">{t("selectRequest")}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -486,7 +488,7 @@ export default function PlaygroundPage() {
                     {/* Metadata */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
-                        <p className="text-xs text-gray-500 dark:text-slate-500">IP Address</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-500">{t("ipAddress")}</p>
                         <p className="text-sm font-mono text-gray-900 dark:text-white">{selectedRecord.ip}</p>
                       </div>
                       <div className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
@@ -701,16 +703,16 @@ func main() {
         <div className="flex items-start gap-4">
           <span className="text-3xl">⚡</span>
           <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Playground API</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{t("api")}</h2>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
               Use the playground programmatically — generate URLs, send webhooks, and inspect captured requests via API.
               No authentication required. Same endpoints that power the UI above.
             </p>
             <div className="flex flex-wrap gap-2">
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">No signup</span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">REST API</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">{t("noSignup")}</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">{t("restApi")}</span>
               <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400">24h TTL</span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300">Rate limited</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300">{t("rateLimited")}</span>
             </div>
           </div>
         </div>
@@ -773,7 +775,7 @@ func main() {
 
         {/* Query Parameters */}
         <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
-          <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Query Parameters</h4>
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t("queryParams")}</h4>
           <div className="space-y-2">
             <div className="flex items-start gap-3">
               <code className="text-xs font-mono text-brand-600 dark:text-brand-400 shrink-0">force_status_code</code>

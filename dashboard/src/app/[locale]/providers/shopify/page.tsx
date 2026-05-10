@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -7,6 +8,7 @@ export const metadata = {
 };
 
 export default function ShopifyWebhooksPage() {
+  const t = useTranslations(\'providers\');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -16,7 +18,7 @@ export default function ShopifyWebhooksPage() {
             <span className="text-gray-400">/</span>
             <Link href="/providers" className="text-gray-600 dark:text-slate-400">Providers</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Shopify</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("shopify")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -26,9 +28,9 @@ export default function ShopifyWebhooksPage() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-500/10 rounded-full border border-green-200 dark:border-green-500/20 mb-4">
             <span className="text-lg">🛍️</span>
-            <span className="text-sm font-medium text-green-700 dark:text-green-400">Shopify Integration</span>
+            <span className="text-sm font-medium text-green-700 dark:text-green-400">{t("shopifyIntegration")}</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Shopify Webhooks Guide</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("shopifyWebhooksGuide")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
             Integrate Shopify webhooks for orders, products, customers, and inventory. Keep your systems in sync with real-time events.
           </p>
@@ -39,15 +41,15 @@ export default function ShopifyWebhooksPage() {
           <ol className="space-y-4">
             <li className="flex gap-3">
               <span className="w-6 h-6 flex items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-bold shrink-0">1</span>
-              <div><p className="font-medium text-gray-900 dark:text-white">Create a HookSniff endpoint</p><p className="text-sm text-gray-600 dark:text-slate-400">Sign up and create an endpoint for Shopify webhooks.</p></div>
+              <div><p className="font-medium text-gray-900 dark:text-white">{t("createEndpoint")}</p><p className="text-sm text-gray-600 dark:text-slate-400">Sign up and create an endpoint for Shopify webhooks.</p></div>
             </li>
             <li className="flex gap-3">
               <span className="w-6 h-6 flex items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-bold shrink-0">2</span>
-              <div><p className="font-medium text-gray-900 dark:text-white">Configure Shopify</p><p className="text-sm text-gray-600 dark:text-slate-400">Settings → Notifications → Webhooks → Create webhook. Select event and paste your URL.</p></div>
+              <div><p className="font-medium text-gray-900 dark:text-white">{t("configureShopify")}</p><p className="text-sm text-gray-600 dark:text-slate-400">Settings → Notifications → Webhooks → Create webhook. Select event and paste your URL.</p></div>
             </li>
             <li className="flex gap-3">
               <span className="w-6 h-6 flex items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-bold shrink-0">3</span>
-              <div><p className="font-medium text-gray-900 dark:text-white">Verify HMAC</p><p className="text-sm text-gray-600 dark:text-slate-400">Shopify signs webhooks with HMAC-SHA256. HookSniff verifies this automatically.</p></div>
+              <div><p className="font-medium text-gray-900 dark:text-white">{t("verifyHmac")}</p><p className="text-sm text-gray-600 dark:text-slate-400">Shopify signs webhooks with HMAC-SHA256. HookSniff verifies this automatically.</p></div>
             </li>
           </ol>
         </div>
@@ -57,8 +59,8 @@ export default function ShopifyWebhooksPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-gray-200 dark:border-slate-800">
-                <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">Topic</th>
-                <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">When It Fires</th>
+                <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">{t("topic")}</th>
+                <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">{t("whenItFires")}</th>
               </tr></thead>
               <tbody>
                 {[
@@ -84,7 +86,7 @@ export default function ShopifyWebhooksPage() {
         </div>
 
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
-          <h2 className="text-2xl font-bold text-white mb-2">Start receiving Shopify webhooks</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{t("startReceivingShopify")}</h2>
           <p className="text-gray-400 dark:text-slate-400 mb-6">Keep your e-commerce systems in sync with real-time order and inventory events.</p>
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
         </div>

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -364,6 +365,7 @@ await hs.Webhooks.SendAsync(new WebhookRequest
 /* ─── Page ─── */
 
 export default function UseCasesPage() {
+  const t = useTranslations(\'useCases\');
   const [activeCase, setActiveCase] = useState(useCases[0].id);
   const current = useCases.find((u) => u.id === activeCase) ?? useCases[0];
 
@@ -375,7 +377,7 @@ export default function UseCasesPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Use Cases</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -452,7 +454,7 @@ export default function UseCasesPage() {
 
             {/* Example Events */}
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Common events</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t("commonEvents")}</h3>
               <div className="space-y-2">
                 {current.events.map((ev) => (
                   <div key={ev.name} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
@@ -467,7 +469,7 @@ export default function UseCasesPage() {
 
             {/* Code Example */}
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Code example</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t("codeExample")}</h3>
               <div className="bg-gray-900 dark:bg-slate-800 rounded-xl overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 dark:bg-slate-700 border-b border-gray-700 dark:border-slate-600">
                   <span className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -505,7 +507,7 @@ export default function UseCasesPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Metrics */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Key metrics</h3>
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">{t("keyMetrics")}</h3>
               <div className="space-y-4">
                 {current.metrics.map((m) => (
                   <div key={m.label} className="flex items-center justify-between">
@@ -532,7 +534,7 @@ export default function UseCasesPage() {
 
             {/* All Industries */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">All industries</h3>
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">{t("allIndustries")}</h3>
               <div className="space-y-2">
                 {useCases.map((uc) => (
                   <button

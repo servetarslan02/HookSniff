@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export const metadata = { title: 'HookSniff for Startups — Special Pricing' };
 
 export default function StartupsPage() {
+  const t = useTranslations(\'startups\');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -11,7 +13,7 @@ export default function StartupsPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Startups</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -20,7 +22,7 @@ export default function StartupsPage() {
       <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <span className="inline-block px-3 py-1 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 text-sm font-medium rounded-full mb-4">🚀 Startup Program</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Build faster with HookSniff</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t("buildFaster")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-xl mx-auto">Special pricing for early-stage startups. Focus on your product, not webhook infrastructure.</p>
         </div>
 
@@ -51,7 +53,7 @@ export default function StartupsPage() {
         </div>
 
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
-          <h2 className="text-2xl font-bold text-white mb-2">Apply for startup pricing</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{t("apply")}</h2>
           <p className="text-gray-400 dark:text-slate-400 mb-6">Tell us about your startup. We usually respond within 24 hours.</p>
           <Link href="/contact" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Apply now →</Link>
         </div>

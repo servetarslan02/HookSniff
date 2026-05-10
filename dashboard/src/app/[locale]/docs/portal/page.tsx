@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function PortalPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Embeddable Portal</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("embeddablePortal")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Let your customers manage their own webhook endpoints, view deliveries, and inspect payloads — embedded directly in your app.
       </p>
@@ -25,7 +27,7 @@ export default function PortalPage() {
 
       {/* How to Embed */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How to Embed</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("howToEmbed")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Add the portal to your app with a single script tag or iframe:
         </p>
@@ -60,7 +62,7 @@ export default function PortalPage() {
 
       {/* Customization */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Customization</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("customization")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Match the portal to your brand:
         </p>

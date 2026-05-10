@@ -77,7 +77,7 @@ export function NotificationCenter() {
       <button
         onClick={() => setOpen(!open)}
         className="relative p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
-        aria-label="Notifications"
+        aria-label={t("notifications")}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

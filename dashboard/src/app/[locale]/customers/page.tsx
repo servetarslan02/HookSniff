@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -142,6 +143,7 @@ const stats = [
 ];
 
 export default function CustomersPage() {
+  const t = useTranslations(\'customers\');
   const [activeFilter, setActiveFilter] = useState('All');
   const industries = ['All', ...new Set(stories.map((s) => s.industry))];
   const filtered = activeFilter === 'All' ? stories : stories.filter((s) => s.industry === activeFilter);
@@ -153,7 +155,7 @@ export default function CustomersPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Customers</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -182,7 +184,7 @@ export default function CustomersPage() {
 
         {/* Technology Logos */}
         <div className="mb-16">
-          <p className="text-center text-sm text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-6">Built on trusted infrastructure</p>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-6">{t("builtOn")}</p>
           <div className="flex flex-wrap justify-center gap-6">
             {techLogos.map((t) => (
               <div key={t.name} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
@@ -200,7 +202,7 @@ export default function CustomersPage() {
 
         {/* Featured Stories */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">Featured stories</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">{t("featuredStories")}</h2>
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">Illustrative usage scenarios based on common webhook patterns.</p>
           <div className="grid md:grid-cols-2 gap-6">
             {featured.map((f) => (
@@ -229,7 +231,7 @@ export default function CustomersPage() {
 
         {/* All Stories */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">All customer stories</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">{t("allStories")}</h2>
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">These are illustrative usage scenarios, not real customer testimonials.</p>
 
           {/* Filter */}
@@ -280,11 +282,11 @@ export default function CustomersPage() {
 
         {/* CTA */}
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
-          <h2 className="text-2xl font-bold text-white mb-2">Join thousands of developers</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{t("joinThousands")}</h2>
           <p className="text-gray-400 dark:text-slate-400 mb-6">Start sending webhooks in 5 minutes. No credit card required.</p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
-            <Link href="/contact" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">Talk to us</Link>
+            <Link href="/contact" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("talkToUs")}</Link>
           </div>
         </div>
       </main>
