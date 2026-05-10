@@ -128,6 +128,27 @@ impl SchemaRegistry {
         Ok(row.map(|r| r.into()))
     }
 
+    /// Get a schema by ID, filtered by customer_id for tenant isolation.
+    ///
+    /// Returns `None` if the schema doesn't exist or belongs to a different customer.
+    pub async fn get_for_customer(
+        &self,
+        id: Uuid,
+        customer_id: Uuid,
+    ) -> Result<Option<EventSchema>> {
+        let row: Option<EventSchemaRow> = sqlx::query_as(
+            "SELECT id, name, version, schema, customer_id, created_at \
+             FROM event_schemas WHERE id = $1 AND customer_id = $2",
+        )
+        .bind(id)
+        .bind(customer_id)
+        .fetch_optional(&self.pool)
+        .await
+        .context("Failed to get schema")?;
+
+        Ok(row.map(|r| r.into()))
+    }
+
     /// Get the latest version of a schema by name.
     pub async fn get_latest_by_name(
         &self,
