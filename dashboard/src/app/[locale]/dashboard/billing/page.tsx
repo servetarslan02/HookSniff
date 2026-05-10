@@ -2,7 +2,7 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -149,6 +149,24 @@ export default function BillingPage() {
   const [upgrading, setUpgrading] = useState(false);
 
   const [cancelling, setCancelling] = useState(false);
+  const upgradeModalRef = useRef<HTMLDivElement>(null);
+  const cancelModalRef = useRef<HTMLDivElement>(null);
+
+  // Escape key to close modals + focus trap
+  useEffect(() => {
+    if (!showUpgradeModal && !showCancelModal) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowUpgradeModal(null);
+        setShowCancelModal(false);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    // Focus the modal
+    const modalRef = showUpgradeModal ? upgradeModalRef : cancelModalRef;
+    modalRef.current?.focus();
+    return () => document.removeEventListener('keydown', handler);
+  }, [showUpgradeModal, showCancelModal]);
 
   const handleCancel = async () => {
     if (!token) return;
@@ -407,9 +425,9 @@ export default function BillingPage() {
 
       {/* Upgrade Confirmation Modal */}
       {showUpgradeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowUpgradeModal(null)} />
-          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+          <div ref={upgradeModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-none">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('upgradeTo', {
                 action: plans.findIndex((p) => t(p.nameKey).toLowerCase() === currentPlan) > plans.findIndex((p) => t(p.nameKey) === showUpgradeModal)
@@ -444,26 +462,26 @@ export default function BillingPage() {
 
       {/* Cancel Subscription Modal */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCancelModal(false)} />
-          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('cancel')}?</h3>
+          <div ref={cancelModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-none">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('cancelTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              Your plan will remain active until the end of the current billing period. After that, you&apos;ll be moved to the Free plan.
+              {t('cancelDesc')}
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowCancelModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
-                Keep Plan
+                {t('keepPlan')}
               </button>
               <button
                 onClick={handleCancel}
                 disabled={cancelling}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-60"
               >
-                {cancelling ? t('redirecting') : 'Cancel Subscription'}
+                {cancelling ? t('redirecting') : t('cancelSubscription')}
               </button>
             </div>
           </div>
