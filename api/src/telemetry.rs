@@ -65,9 +65,13 @@ fn init_otel(
         }
     };
 
+    // HS-062: Use batch exporter for production (buffers spans, reduces network calls)
     let provider = TracerProvider::builder()
-        .with_simple_exporter(exporter)
+        .with_batch_exporter(exporter, opentelemetry_sdk::runtime::Tokio)
         .build();
+
+    // HS-061: Register custom metrics
+    init_metrics();
 
     global::set_tracer_provider(provider.clone());
 
@@ -152,6 +156,88 @@ pub fn current_trace_id() -> String {
         // Fallback: generate a UUID so there's always something in the header
         uuid::Uuid::new_v4().to_string().replace('-', "")
     }
+}
+
+// ── HS-061: Custom Metrics ──────────────────────────────────────────
+
+/// Global metrics registry — initialized once at startup.
+/// Uses tracing counters/histograms (OTel metrics API varies by version).
+/// Actual OTel metric export happens via the tracing -> OTel bridge.
+
+// Metrics are recorded via tracing macros (info!/warn!) which are
+// captured by the OTel tracing layer. For structured counters, we
+// use lightweight atomic counters that can be queried by health endpoints.
+
+use std::sync::atomic::{AtomicU64, Ordering};
+
+/// Atomic counters for key business metrics.
+/// These are lightweight, lock-free, and always available.
+pub struct Metrics {
+    pub deliveries_total: AtomicU64,
+    pub delivery_failures: AtomicU64,
+    pub api_requests_total: AtomicU64,
+    pub rate_limit_rejected: AtomicU64,
+}
+
+static METRICS: std::sync::OnceLock<Metrics> = std::sync::OnceLock::new();
+
+fn init_metrics() {
+    let metrics = Metrics {
+        deliveries_total: AtomicU64::new(0),
+        delivery_failures: AtomicU64::new(0),
+        api_requests_total: AtomicU64::new(0),
+        rate_limit_rejected: AtomicU64::new(0),
+    };
+    let _ = METRICS.set(metrics);
+    tracing::info!("📊 Custom metrics initialized (atomic counters)");
+}
+
+/// Get the global metrics registry.
+pub fn metrics() -> Option<&'static Metrics> {
+    METRICS.get()
+}
+
+impl Metrics {
+    pub fn record_delivery(&self) {
+        self.deliveries_total.fetch_add(1, Ordering::Relaxed);
+    }
+    pub fn record_failure(&self) {
+        self.delivery_failures.fetch_add(1, Ordering::Relaxed);
+    }
+    pub fn record_api_request(&self) {
+        self.api_requests_total.fetch_add(1, Ordering::Relaxed);
+    }
+    pub fn record_rate_limit_rejected(&self) {
+        self.rate_limit_rejected.fetch_add(1, Ordering::Relaxed);
+    }
+}
+
+// ── HS-064: PII Redaction ───────────────────────────────────────────
+
+/// Truncate and redact potentially sensitive response bodies before logging.
+///
+/// - Truncates to 500 chars max
+/// - Redacts common PII patterns (emails, tokens, keys)
+pub fn redact_response_body(body: &str) -> String {
+    let truncated: &str = if body.len() > 500 {
+        &body[..500]
+    } else {
+        body
+    };
+
+    // Redact email addresses
+    let email_regex = regex::Regex::new(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}").unwrap();
+    let redacted = email_regex.replace_all(truncated, "[REDACTED_EMAIL]");
+
+    // Redact tokens/keys (Bearer, API keys, etc.)
+    let token_regex = regex::Regex::new(r"(?i)(bearer|token|key|secret|password|auth)[:=]\s*\S{8,}").unwrap();
+    let redacted = token_regex.replace_all(&redacted, "${1}: [REDACTED]");
+
+    // Redact JWT-like strings
+    let jwt_regex = regex::Regex::new(r"eyJ[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}").unwrap();
+    let redacted = jwt_regex.replace_all(&redacted, "[REDACTED_JWT]");
+
+    redacted.into_owned()
 }
 
 #[cfg(test)]
