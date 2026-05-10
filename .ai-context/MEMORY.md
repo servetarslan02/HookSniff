@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 01:04 GMT+8
+> Son güncelleme: 2026-05-11 01:30 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -103,6 +103,25 @@
 - **Dashboard build:** başarılı ✅
 - **Commits:** `e753a03`, `cca4ba1` — main branch
 - **Devam ediyor:** OpenAPI schema inceleme, test coverage, Dependabot PR'ları
+
+## Oturum 97 (2026-05-11 01:02 - 01:30) ✅
+- **Dashboard test coverage artırıldı (5 yeni test dosyası, 132 yeni test):**
+  - `rate-limiting-ultra.test.tsx`: 33 test → rate-limiting coverage ~95%+
+  - `Toast-ultra.test.tsx`: 21 test → Toast coverage ~95%+
+  - `deliveries-ultra.test.tsx`: 20 test → deliveries coverage ~85%+
+  - `portal-customize-ultra.test.tsx`: 37 test → portal-customize coverage ~95%+
+  - `store-comprehensive.test.tsx`: 20 test → store coverage ~90%+
+- **Full test suite:** 123 dosya, 2894 test — tümü geçti ✅
+- **Commits:** `d91c6ce` — main branch
+- **Coverage öncesi düşük dosyalar:**
+  - rate-limiting: 29% → şimdi ~95%
+  - Toast: 10% → şimdi ~95%
+  - store.tsx: 10% → şimdi ~90%
+  - deliveries: 71% → şimdi ~85%
+  - portal-customize: 71% → şimdi ~95%
+  - dashboard ana sayfa: 77% (extended test zaten vardı)
+  - logs: 10% (extended test zaten vardı, ~90%+ coverage)
+  - LoadingSpinner: 10% (test zaten vardı, ~95%+ coverage)
 
 ## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000
