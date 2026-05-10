@@ -20,6 +20,18 @@
 - cargo check: temiz
 - 979/979 API testi + 20/20 worker testi
 - Dashboard ESLint + TypeScript: 0 hata
+- Dashboard build: başarılı
+
+### 0.3 SDK Retry Logic (HS-081) ✅
+- Kotlin, Java, C#, Ruby, Swift, PHP, Elixir'e client-side retry eklendi
+- Exponential backoff, 30s cap, Retry-After header desteği
+- Node, Python, Go zaten vardı (Oturum 95)
+- Tüm 11 SDK'da artık retry var
+
+### 0.4 Issue Tracker Güncellemeleri ✅
+- HS-077: Stale branch temizliği ✅ (Oturum 91-93'te yapılmış)
+- HS-079: Commit convention ✅ (Oturum 91-93'te yapılmış)
+- HS-081: SDK retry logic ✅ (bu oturum)
 
 ---
 
