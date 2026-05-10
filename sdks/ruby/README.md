@@ -127,7 +127,7 @@ require "sinatra"
 
 post "/webhook" do
   payload = request.body.read
-  signature = request.env["HTTP_X_HOOKRELAY_SIGNATURE"]
+  signature = request.env["HTTP_X_HOOKSNIFF_SIGNATURE"]
   secret = "whsec_your_endpoint_signing_secret"
 
   unless HookSniff.verify_signature(payload, signature, secret)
