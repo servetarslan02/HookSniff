@@ -624,7 +624,8 @@
       "pricing": "Tarifs",
       "docs": "Documentation",
       "status": "Statut",
-      "dashboard": "Tableau de bord →"
+      "dashboard": "Tableau de bord →",
+      "getStarted": "Commencer"
     },
     "hero": {
       "uptime": "99,99% de disponibilité",

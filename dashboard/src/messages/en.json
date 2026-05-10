@@ -625,7 +625,8 @@
       "pricing": "Pricing",
       "docs": "Docs",
       "status": "Status",
-      "dashboard": "Dashboard →"
+      "dashboard": "Dashboard →",
+      "getStarted": "Get Started"
     },
     "hero": {
       "uptime": "99.99% delivery uptime",
