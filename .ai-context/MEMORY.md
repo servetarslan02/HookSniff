@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 01:50 GMT+8
+> Son güncelleme: 2026-05-11 02:12 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -29,9 +29,9 @@
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 14 | 0 |
 | 🔴 P1 | 44 | 46 | 0 |
-| 🟡 P2 | 38 | 29 | 9 |
+| 🟡 P2 | 38 | 31 | 7 |
 | 🟢 P3 | 13 | 7 | 6 |
-| **TOPLAM** | **103** | **96** | **7** |
+| **TOPLAM** | **103** | **98** | **5** |
 
 ## Oturum 94 (2026-05-10 22:58 - 23:54) ✅
 - **12 major dependency güncellendi:**
@@ -97,6 +97,17 @@
 - **Issue tracker:** HS-077/078/079/081/083/086/087 çözüldü (96/103)
 - **Commits:** `e753a03`→`eee1de6` (8 push)
 - **Kalan 7:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
+
+## Oturum 97 (2026-05-11 01:58 - 02:12) ✅
+- **HS-088: AuthGuard component test** — 16 test yazıldı (loading, redirect, authenticated, transition, edge cases)
+- **HS-082: SDK version mismatch** — tüm SDK'lar 0.2.0'a eşitlendi
+  - Node, Python, Ruby, PHP: 0.1.0 → 0.2.0
+  - Java, Kotlin: 0.3.0 → 0.2.0
+  - Rust, C#, Elixir: zaten 0.2.0
+  - Publish guide güncellendi
+- **Testler:** API 979/979, Worker 48/48, Dashboard 3132/3132 (137 dosya)
+- **Commit:** `425ce6c` — main branch
+- **Kalan 5:** HS-065 (i18n), HS-084 (iyzico), HS-085 (db.rs), HS-089 (SSO test - zaten var, 47 test), SDK publish
 
 ## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000
