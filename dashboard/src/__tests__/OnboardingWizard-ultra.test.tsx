@@ -516,17 +516,20 @@ describe('OnboardingWizard-ultra: completion and done step', () => {
     expect(stored.dismissed).toBe(true);
   });
 
-  // Test: Shows confetti on completion
-  it('shows confetti animation on completion', async () => {
+  // Test: Go to Dashboard saves state and calls router.push
+  it('go to dashboard button triggers dismissal and navigation', async () => {
     const { container } = render(<OnboardingWizard />);
     await navigateToStep(container, 'done');
 
     const dashBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('Go to Dashboard'));
     await act(async () => { fireEvent.click(dashBtn!); });
 
-    // Confetti uses fixed inset-0 class
-    const confetti = container.querySelector('.fixed.inset-0.pointer-events-none');
-    expect(confetti).toBeTruthy();
+    // After handleFinish: dismissed=true, router.push('/dashboard')
+    expect(mockPush).toHaveBeenCalledWith('/dashboard');
+    const stored = JSON.parse(localStorage.getItem('hooksniff_onboarding_state')!);
+    expect(stored.dismissed).toBe(true);
+    // Component hides itself after dismissal
+    expect(container.textContent).not.toContain("You're all set");
   });
 });
 
