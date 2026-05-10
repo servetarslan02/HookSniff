@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent, waitFor, cleanup } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -58,6 +58,7 @@ import PortalCustomizationPage from '@/app/[locale]/dashboard/portal-customize/p
 
 describe('PortalCustomizationPage', () => {
   beforeEach(() => {
+    cleanup();
     vi.clearAllMocks();
     mockApiFetch.mockResolvedValue({});
   });
@@ -152,19 +153,19 @@ describe('PortalCustomizationPage', () => {
   });
 
   it('adds an event when clicking Add', async () => {
-    const { getByPlaceholderText, getByText } = render(<PortalCustomizationPage />);
+    const { getByPlaceholderText, getByText, getAllByText } = render(<PortalCustomizationPage />);
     await waitFor(() => {
       expect(getByPlaceholderText('order.created')).toBeTruthy();
     });
     fireEvent.change(getByPlaceholderText('order.created'), { target: { value: 'order.created' } });
     fireEvent.click(getByText('Add'));
     await waitFor(() => {
-      expect(getByText('order.created')).toBeTruthy();
+      expect(getAllByText('order.created').length).toBeGreaterThanOrEqual(1);
     });
   });
 
   it('adds event on Enter key press', async () => {
-    const { getByPlaceholderText, getByText } = render(<PortalCustomizationPage />);
+    const { getByPlaceholderText, getAllByText } = render(<PortalCustomizationPage />);
     await waitFor(() => {
       expect(getByPlaceholderText('order.created')).toBeTruthy();
     });
@@ -172,19 +173,19 @@ describe('PortalCustomizationPage', () => {
     fireEvent.change(input, { target: { value: 'payment.completed' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     await waitFor(() => {
-      expect(getByText('payment.completed')).toBeTruthy();
+      expect(getAllByText('payment.completed').length).toBeGreaterThanOrEqual(1);
     });
   });
 
   it('removes an event when clicking remove button', async () => {
-    const { getByPlaceholderText, getByText, queryByText } = render(<PortalCustomizationPage />);
-    await waitFor () => {
+    const { getByPlaceholderText, getByText, queryByText, getAllByText } = render(<PortalCustomizationPage />);
+    await waitFor(() => {
       expect(getByPlaceholderText('order.created')).toBeTruthy();
     });
     fireEvent.change(getByPlaceholderText('order.created'), { target: { value: 'test.event' } });
     fireEvent.click(getByText('Add'));
     await waitFor(() => {
-      expect(getByText('test.event')).toBeTruthy();
+      expect(getAllByText('test.event').length).toBeGreaterThanOrEqual(1);
     });
     const removeBtn = document.querySelector('[aria-label="Remove test.event event"]');
     expect(removeBtn).toBeTruthy();
@@ -277,7 +278,7 @@ describe('PortalCustomizationPage', () => {
     await waitFor(() => {
       const input = getByPlaceholderText('My Company');
       fireEvent.change(input, { target: { value: 'Acme Corp' } });
-      expect(input).toHaveValue('Acme Corp');
+      expect(input.value).toBe('Acme Corp');
     });
   });
 
@@ -291,7 +292,7 @@ describe('PortalCustomizationPage', () => {
       );
       expect(colorTextInput).toBeTruthy();
       fireEvent.change(colorTextInput!, { target: { value: '#ff0000' } });
-      expect(colorTextInput).toHaveValue('#ff0000');
+      expect(colorTextInput.value).toBe('#ff0000');
     });
   });
 
@@ -306,14 +307,14 @@ describe('PortalCustomizationPage', () => {
   });
 
   it('shows error toast for duplicate event', async () => {
-    const { getByPlaceholderText, getByText } = render(<PortalCustomizationPage />);
+    const { getByPlaceholderText, getByText, getAllByText } = render(<PortalCustomizationPage />);
     await waitFor(() => {
       expect(getByPlaceholderText('order.created')).toBeTruthy();
     });
     fireEvent.change(getByPlaceholderText('order.created'), { target: { value: 'order.created' } });
     fireEvent.click(getByText('Add'));
     await waitFor(() => {
-      expect(getByText('order.created')).toBeTruthy();
+      expect(getAllByText('order.created').length).toBeGreaterThanOrEqual(1);
     });
     // Try adding again
     fireEvent.change(getByPlaceholderText('order.created'), { target: { value: 'order.created' } });

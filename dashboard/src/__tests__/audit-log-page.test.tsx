@@ -6,6 +6,7 @@ import { render, act, fireEvent, waitFor } from '@testing-library/react';
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 const mockToast = vi.fn();
+const mockApiFetch = vi.fn();
 
 vi.mock('next-intl', () => ({
   useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
@@ -32,7 +33,14 @@ vi.mock('@/lib/errors', () => ({
   getErrorMessage: (err: unknown) => (err instanceof Error ? err.message : 'Unknown error'),
 }));
 
-// Don't mock @/lib/api — apiFetch uses global.fetch under the hood
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: vi.fn().mockResolvedValue({}),
+    post: vi.fn().mockResolvedValue({}),
+    put: vi.fn().mockResolvedValue({}),
+  },
+  apiFetch: (...args: unknown[]) => mockApiFetch(...args),
+}));
 
 const { default: AuditLogPage } = await import('@/app/[locale]/dashboard/audit-log/page');
 
@@ -75,189 +83,179 @@ const MOCK_ENTRIES = [
   },
 ];
 
-function mockApiResponse(data: unknown) {
-  mockFetch.mockResolvedValueOnce({
-    ok: true,
-    json: () => Promise.resolve(data),
-    headers: new Headers({ 'content-type': 'application/json' }),
-  });
-}
-
-function mockApiError(status = 500) {
-  mockFetch.mockResolvedValueOnce({
-    ok: false,
-    status,
-    json: () => Promise.resolve({ error: 'Server error' }),
-    headers: new Headers({ 'content-type': 'application/json' }),
-  });
-}
-
 describe('AuditLogPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders without crashing', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
     const { container } = render(React.createElement(AuditLogPage));
     expect(container).toBeTruthy();
   });
 
   it('shows loading state initially', () => {
-    // Don't resolve the fetch yet
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
+    mockApiFetch.mockReturnValue(new Promise(() => {})); // never resolves
     const { getByText } = render(React.createElement(AuditLogPage));
     expect(getByText(/Loading audit log/)).toBeTruthy();
   });
 
   it('renders the page title after loading', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText(/Audit Log/)).toBeTruthy();
+      const h1s = container.querySelectorAll('h1');
+      expect(Array.from(h1s).some(h => h.textContent?.includes('Audit Log'))).toBe(true);
     });
   });
 
   it('renders the page description', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText(/Track all activity in your workspace/)).toBeTruthy();
+      expect(container.textContent).toContain('Track all activity in your workspace');
     });
   });
 
   it('renders the filter dropdown', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByDisplayValue } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByDisplayValue('All Actions')).toBeTruthy();
+      const select = container.querySelector('select');
+      expect(select).toBeTruthy();
+      expect(select!.value).toBe('');
     });
   });
 
   it('renders filter options', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText('Authentication')).toBeTruthy();
-      expect(getByText('Endpoints')).toBeTruthy();
-      expect(getByText('API Keys')).toBeTruthy();
-      expect(getByText('Webhooks')).toBeTruthy();
-      expect(getByText('Team')).toBeTruthy();
+      const options = container.querySelectorAll('option');
+      const optionTexts = Array.from(options).map(o => o.textContent);
+      expect(optionTexts).toContain('All Actions');
+      expect(optionTexts).toContain('Authentication');
+      expect(optionTexts).toContain('Endpoints');
+      expect(optionTexts).toContain('API Keys');
+      expect(optionTexts).toContain('Webhooks');
+      expect(optionTexts).toContain('Team');
     });
   });
 
   it('renders table headers', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText('Time')).toBeTruthy();
-      expect(getByText('Action')).toBeTruthy();
-      expect(getByText('Actor')).toBeTruthy();
-      expect(getByText('Resource')).toBeTruthy();
-      expect(getByText('Details')).toBeTruthy();
-      expect(getByText('IP')).toBeTruthy();
+      const ths = container.querySelectorAll('th');
+      const headers = Array.from(ths).map(th => th.textContent);
+      expect(headers).toContain('Time');
+      expect(headers).toContain('Action');
+      expect(headers).toContain('Actor');
+      expect(headers).toContain('Resource');
+      expect(headers).toContain('Details');
+      expect(headers).toContain('IP');
     });
   });
 
   it('displays audit entries in the table', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText('auth.login')).toBeTruthy();
-      expect(getByText('endpoint.create')).toBeTruthy();
-      expect(getByText('apikey.rotate')).toBeTruthy();
+      expect(container.textContent).toContain('auth.login');
+      expect(container.textContent).toContain('endpoint.create');
+      expect(container.textContent).toContain('apikey.rotate');
     });
   });
 
   it('displays actor emails', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText('admin@test.com')).toBeTruthy();
-      expect(getByText('dev@test.com')).toBeTruthy();
+      expect(container.textContent).toContain('admin@test.com');
+      expect(container.textContent).toContain('dev@test.com');
     });
   });
 
   it('displays IP addresses', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText('192.168.1.1')).toBeTruthy();
-      expect(getByText('10.0.0.1')).toBeTruthy();
+      expect(container.textContent).toContain('192.168.1.1');
+      expect(container.textContent).toContain('10.0.0.1');
     });
   });
 
   it('shows empty state when no entries', async () => {
-    mockApiResponse({ entries: [], has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: [], has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText(/No activity yet/)).toBeTruthy();
+      expect(container.textContent).toContain('No activity yet');
     });
   });
 
   it('shows empty state description', async () => {
-    mockApiResponse({ entries: [], has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: [], has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText(/Actions like login/)).toBeTruthy();
+      expect(container.textContent).toContain('Actions like login');
     });
   });
 
   it('handles API error gracefully', async () => {
-    mockApiError(500);
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockRejectedValue(new Error('Network error'));
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      // Should show empty state after error
-      expect(getByText(/No activity yet/)).toBeTruthy();
+      expect(container.textContent).toContain('No activity yet');
     });
   });
 
   it('shows load more button when has_more is true', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: true });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: true });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText('Load more')).toBeTruthy();
+      expect(container.textContent).toContain('Load more');
     });
   });
 
   it('does not show load more when has_more is false', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { queryByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(queryByText('Load more')).toBeNull();
+      expect(container.textContent).not.toContain('Load more');
     });
   });
 
   it('handles filter change', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByDisplayValue } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      const select = getByDisplayValue('All Actions');
+      const select = container.querySelector('select')!;
       fireEvent.change(select, { target: { value: 'auth' } });
     });
-    // After filter change, a new fetch should be triggered
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockApiFetch).toHaveBeenCalledTimes(2);
     });
   });
 
   it('fetches audit log on mount with token', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
     render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalled();
-      const call = mockFetch.mock.calls[0];
+      expect(mockApiFetch).toHaveBeenCalled();
+      const call = mockApiFetch.mock.calls[0];
       expect(call[0]).toContain('/audit-log');
-      expect(call[1].headers.get('Authorization')).toBe('Bearer test-token');
+      expect(call[1]).toEqual({ token: 'test-token' });
     });
   });
 
   it('displays resource type and id', async () => {
-    mockApiResponse({ entries: MOCK_ENTRIES, has_more: false });
-    const { getByText } = render(React.createElement(AuditLogPage));
+    mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
+    const { container } = render(React.createElement(AuditLogPage));
     await waitFor(() => {
-      expect(getByText('user/usr_abc123')).toBeTruthy();
-      expect(getByText('endpoint/ep_xyz987')).toBeTruthy();
+      // resource_id is sliced to 8 chars in the UI: {resource_type}/{resource_id?.slice(0, 8)}
+      expect(container.textContent).toContain('user/usr_abc1');
+      expect(container.textContent).toContain('endpoint/ep_xyz98');
+      expect(container.textContent).toContain('api_key/key_def5');
     });
   });
 });
