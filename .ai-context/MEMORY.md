@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 03:56 GMT+8
+> Son güncelleme: 2026-05-11 04:50 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -23,7 +23,19 @@
 - API: hooksniff-api-1046140057667.europe-west1.run.app
 - Dashboard: https://hooksniff.vercel.app
 
-## 📊 Güncel İlerleme (2026-05-11 00:52)
+## External Services (2026-05-11)
+Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
+- Vercel: `hooksniff.vercel.app` ✅
+- Neon DB: `ep-frosty-bar-al0hyt9d` eu-central-1 ✅
+- Upstash Redis: `integral-ostrich-98447.upstash.io` Free Tier ✅
+- Polar.sh: Pro ($49) + Business ($149), webhook bağlı ✅
+- Resend: shared domain `onboarding@resend.dev` ✅
+- Cloudflare R2: `hooksniff-storage` bucket ✅
+- Grafana OTEL: eu-west-2 ✅
+- hookrelay.com ve is-a.dev KULLANILMIYOR (Servet tercihi)
+- db.rs testleri: 16/16 passed ✅
+
+## 📊 Güncel İlerleme (2026-05-11 04:50)
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
