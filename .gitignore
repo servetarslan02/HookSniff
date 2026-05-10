@@ -69,3 +69,6 @@ sdks/java/target/
 
 # Gradle (global)
 .gradle/
+
+# Test environment (contains credentials)
+api/.env.test
