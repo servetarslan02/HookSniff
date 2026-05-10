@@ -1,25 +1,26 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 19:37 GMT+8
+> Son güncelleme: 2026-05-10 20:10 GMT+8
 
 ---
 
 ## ✅ Tamamlanan Oturumlar
 
-### Oturum 73-80 ✅
-- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu, Billing & Account, SSRF & Security, Worker Error Classification
+### Oturum 73-81 ✅
+- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu, Billing & Account, SSRF & Security, Worker Error Classification, Database Issues
 
-### Oturum 81 — Database Issues ✅
-- HS-025: CHECK constraints eklendi (status, attempt_count, max_attempts)
-- HS-026: webhook_queue.delivery_id FK eklendi
-- HS-024: ⚠️ Manuel senkronizasyon (standalone SQL + db.rs)
-- HS-027: ❌ Yanlış bulgu — `amount_cents` codebase'de yok
-- HS-038d: ❌ Domain sanitize edilmiş
-- HS-038e: ❌ Parametrize edilmiş SQL
+### Oturum 82 — Auth & Crypto Security ✅
+- HS-038f: Timing attack — login her durumda password doğruluyor (dummy hash)
+- HS-038g: Serialization error detay sızıntısı önlendi
+- HS-038h: Email enumeration önlendi (register aynı response)
+- HS-038i: Auth cache deadlock düzeltildi (Mutex .await üzerinde tutulmuyor)
+- HS-038j: rate_limit.rs panic riski kaldırıldı
+- HS-038k: Alert condition validation eklendi
+- HS-038l: Webhook hata mesajları sanitize edildi
 
 ---
 
-## 🔴 Sıradaki Oturum: #82 — Auth & Crypto Security
+## 🔴 Sıradaki Oturum: #83 — SDK & Config Fixes
 
 ### Görev
 Auth ve kriptografi güvenlik düzeltmeleri.
@@ -41,8 +42,8 @@ Auth ve kriptografi güvenlik düzeltmeleri.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 82 | **Auth & Crypto Security** | HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l |
-| 83 | SDK & Config Fixes | HS-035, HS-036, HS-037, HS-038, HS-038m, HS-038n |
+| 82 | ~~Auth & Crypto Security~~ | ~~HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l~~ ✅ |
+| 83 | **SDK & Config Fixes** | HS-035, HS-036, HS-037, HS-038, HS-038m, HS-038n |
 | 84 | Frontend Component Issues | HS-039, HS-040, HS-041, HS-042, HS-043, HS-044 |
 | 85 | Frontend Performance & Bundle | HS-045, HS-046, HS-047, HS-048 |
 | 86 | Accessibility & Dark Mode | HS-049, HS-050, HS-051, HS-052, HS-053 |
@@ -54,7 +55,7 @@ Auth ve kriptografi güvenlik düzeltmeleri.
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 14 (+9 yanlış/notlu) | 21 |
+| 🔴 P1 | 44 | 21 (+9 yanlış/notlu) | 14 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **28** | **72** |
+| **TOPLAM** | **103** | **35** | **65** |
