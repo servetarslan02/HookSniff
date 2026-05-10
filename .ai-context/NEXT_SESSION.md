@@ -1,10 +1,10 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 05:51 GMT+8
+> Son güncelleme: 2026-05-11 06:12 GMT+8
 
 ---
 
-## ✅ Tüm Dış Servisler Tamamlandı (Oturum 102)
+## ✅ Tüm Dış Servisler Tamamlandı (Oturum 102 + 103)
 
 | Servis | Durum | Detay |
 |--------|-------|-------|
@@ -13,7 +13,8 @@
 | Grafana Alerts | ✅ Aktif | 7 rule + email → servetarslan02@gmail.com |
 | Polar.sh Checkout | ✅ Link hazır | Pro $49/mo, 1 ay free trial |
 | Neon Backup | ✅ Cron aktif | Her gün 03:00 UTC, 30 gün retention |
-| Resend | ✅ Cloud Run'da | API key eklendi, modül hazır |
+| Resend | ✅ Entegre | EmailProvider: Resend → GCloud fallback |
+| Email Adresleri | ✅ Tutarlı | Tüm sayfalarda hooksniff.vercel.app |
 | Git Email | ✅ Düzeltildi | servetarslan02@users.noreply.github.com |
 
 ---
@@ -24,8 +25,7 @@
 
 | # | Görev | Kim | Açıklama |
 |---|-------|-----|----------|
-| 1 | **Resend entegrasyonu** | AI | `resend_email.rs` hazır, Gmail API yerine Resend kullan. Config'de `RESEND_API_KEY` varsa Resend, yoksa Gmail fallback. `routes/auth.rs` ve `routes/contact.rs` güncellenecek. compile + test zorunlu. |
-| 2 | **Grafana OTEL verisi kontrol** | AI | Grafana Cloud'da 0 metrics/logs/traces. `OTEL_EXPORTER_OTLP_HEADERS` formatı kontrol edilmeli. |
+| 1 | **Grafana OTEL verisi kontrol** | AI | Grafana Cloud'da 0 metrics/logs/traces. `OTEL_EXPORTER_OTLP_HEADERS` formatı kontrol edilmeli. |
 
 ### 🟡 Orta Öncelik
 
