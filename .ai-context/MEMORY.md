@@ -46,7 +46,7 @@
 - **Commits:** `7d89aa1`, `c7d6236`, `815705d` — main branch
 - **Paralel agent kullanımı:** 5 agent aynı anda çalıştırıldı (axum, otel, ts-fix, remaining-deps, test)
 
-## Güncel Bağımlılık Versiyonları (Oturum 94 sonrası)
+## Güncel Bağımlılık Versiyonları (Oturum 95 sonrası)
 | Paket | Versiyon | Durum |
 |---|---|---|
 | axum | 0.8 | ✅ en güncel |
@@ -61,18 +61,28 @@
 | sha2 | 0.11 | ✅ en güncel |
 | hmac | 0.13 | ✅ en güncel |
 | reqwest | 0.13 | ✅ en güncel |
-| sqlx | 0.7 | 🔴 0.8 mevcut (büyük migration) |
-| redis | 0.25 | 🔴 1.2 mevcut (büyük migration) |
-| rand | 0.8 | 🟡 0.10 mevcut |
-| prometheus | 0.13 | 🟡 0.14 mevcut |
+| sqlx | 0.8 | ✅ en güncel |
+| redis | 1.2 | ✅ en güncel |
+| rand | 0.10 | ✅ en güncel |
+| prometheus | 0.14 | ✅ en güncel |
 
 ## Ertelemeye Devam Edenler
-- sqlx 0.7→0.8 migration (büyük iş, dikkatli olunmalı)
-- redis 0.25→1.2 migration (büyük iş)
-- rand 0.8→0.10, prometheus 0.13→0.14
 - HS-065: 920+ hardcoded string (büyük iş)
 - HS-081-089: SDK/test coverage (P3)
 - tracing-opentelemetry vendor patch kaldırma (upstream 0.33 çıkınca)
+- Dependabot major PR'ları: TypeScript 6, Tailwind 4, Recharts 3, Next.js 16 (dikkatli olunmalı)
+
+## Oturum 95 (2026-05-11 00:00 - 00:20) ✅
+- **4 major dependency güncellendi:**
+  - sqlx 0.7→0.8 (encode_by_ref Result dönüş tipi değişti)
+  - redis 0.25→1.2 (sorunsuz geçti)
+  - rand 0.8→0.10 (OsRng→SysRng, RngCore→TryRng, thread_rng→rng, distributions→distr)
+  - prometheus zaten 0.14'müş (NEXT_SESSION.md'de yanlış yazılmış)
+- **Dashboard npm update:** react 19.2.6, next 15.5.18, next-intl 4.11.1, @types/node 20.19.40
+- **Testler:** 999/999 geçti (979 API + 20 worker)
+- **ESLint:** clean
+- **Commit:** `cb3ed64` — main branch
+- **Tüm Rust major bağımlılıkları artık en güncel!** 🎉
 
 ## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000
