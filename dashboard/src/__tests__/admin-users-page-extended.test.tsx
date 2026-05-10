@@ -175,11 +175,9 @@ describe('AdminUsersPage - Extended', () => {
 
   it('updates search value on typing', async () => {
     let container: HTMLElement;
-    let getByPlaceholderText: any;
     await act(async () => {
       const result = render(React.createElement(AdminUsersPage));
       container = result.container;
-      getByPlaceholderText = result.getByPlaceholderText;
     });
     const searchInput = container!.querySelector('input[type="text"]') as HTMLInputElement;
     await act(async () => {

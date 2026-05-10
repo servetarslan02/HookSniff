@@ -218,7 +218,7 @@ describe('SsoSettingsPage', () => {
       issuer_url: 'https://accounts.google.com',
       client_id: 'my-client-id',
     });
-    const { getByDisplayValue, getByText } = render(<SsoSettingsPage />);
+    const { getByDisplayValue } = render(<SsoSettingsPage />);
     await waitFor(() => {
       expect(getByDisplayValue('https://accounts.google.com')).toBeTruthy();
       expect(getByDisplayValue('my-client-id')).toBeTruthy();
