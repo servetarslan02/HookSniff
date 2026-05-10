@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent } from '@testing-library/react';
 
 const mockToast = vi.fn();
 const mockEndpointsList = vi.fn().mockResolvedValue([]);

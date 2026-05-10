@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent } from '@testing-library/react';
 
 const mockPush = vi.fn();
 const mockEndpointsCreate = vi.fn();
@@ -31,7 +31,7 @@ vi.mock('@/lib/store', () => ({
   useAuth: () => mockAuth,
 }));
 
-const { OnboardingWizard, SetupChecklist, SuccessToast } = await import('@/components/OnboardingWizard');
+const { OnboardingWizard } = await import('@/components/OnboardingWizard');
 
 // Helper: navigate to a specific step
 async function navigateToStep(container: HTMLElement, targetStep: string) {
