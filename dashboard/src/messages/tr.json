@@ -754,7 +754,8 @@
     "noScheduled": "Planlı bakım yok",
     "systemStatus": "Sistem Durumu",
     "overallUptime": "Genel Çalışma Süresi",
-    "scheduledMaintenance": "Planlı Bakım"
+    "scheduledMaintenance": "Planlı Bakım",
+    "docs": "Dokümanlar"
   },
   "terms": {
     "title": "Hizmet Şartları",
@@ -2086,7 +2087,8 @@
     "recommended": "Önerilen",
     "alternatives": "Alternatifler",
     "playground": "Webhook Alanı",
-    "buildVsBuy": "Yap mı Satın Al mı"
+    "buildVsBuy": "Yap mı Satın Al mı",
+    "comparePage": "Karşılaştırma Sayfası"
   },
   "customers": {
     "title": "Müşteriler",
@@ -2201,7 +2203,8 @@
     "rateLimited": "Hız sınırlı",
     "queryParams": "Sorgu Parametreleri",
     "python": "Python",
-    "svixPlay": "Svix Play"
+    "svixPlay": "Svix Play",
+    "feature": "Özellik"
   },
   "buildVsBuy": {
     "title": "Yap mı Satın Al mı",

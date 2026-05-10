@@ -55,7 +55,7 @@ export default function ArchitecturePage() {
 
       {/* Components */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Components</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("components")}</h2>
 
         <div className="space-y-6">
           <div className="p-5 border border-gray-200 dark:border-slate-700 rounded-xl">
@@ -73,7 +73,7 @@ export default function ArchitecturePage() {
           </div>
 
           <div className="p-5 border border-gray-200 dark:border-slate-700 rounded-xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Worker</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("worker")}</h3>
             <p className="text-gray-600 dark:text-slate-400 mb-3">
               Webhook delivery engine built with <strong>Rust + Tokio</strong>. Polls the queue and executes deliveries.
             </p>
@@ -87,7 +87,7 @@ export default function ArchitecturePage() {
           </div>
 
           <div className="p-5 border border-gray-200 dark:border-slate-700 rounded-xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Dashboard</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("dashboard")}</h3>
             <p className="text-gray-600 dark:text-slate-400 mb-3">
               Web UI built with <strong>Next.js 14 (App Router)</strong>, Tailwind CSS, Radix UI, and Tremor.
             </p>
@@ -127,12 +127,12 @@ export default function ArchitecturePage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <tr><td className="px-4 py-3">API</td><td className="px-4 py-3">Rust, Axum, SQLx</td><td className="px-4 py-3">{t("asyncRestApi")}</td></tr>
-              <tr><td className="px-4 py-3">Worker</td><td className="px-4 py-3">Rust, Tokio</td><td className="px-4 py-3">{t("deliveryEngine")}</td></tr>
-              <tr><td className="px-4 py-3">Dashboard</td><td className="px-4 py-3">Next.js 14, Tailwind CSS</td><td className="px-4 py-3">{t("webui")}</td></tr>
+              <tr><td className="px-4 py-3">{t("worker")}</td><td className="px-4 py-3">Rust, Tokio</td><td className="px-4 py-3">{t("deliveryEngine")}</td></tr>
+              <tr><td className="px-4 py-3">{t("dashboard")}</td><td className="px-4 py-3">Next.js 14, Tailwind CSS</td><td className="px-4 py-3">{t("webui")}</td></tr>
               <tr><td className="px-4 py-3">Database</td><td className="px-4 py-3">PostgreSQL (Neon)</td><td className="px-4 py-3">{t("persistentStorage")}</td></tr>
               <tr><td className="px-4 py-3">Queue</td><td className="px-4 py-3">PostgreSQL</td><td className="px-4 py-3">{t("asyncMessage")}</td></tr>
-              <tr><td className="px-4 py-3">Auth</td><td className="px-4 py-3">JWT + Argon2 + HMAC</td><td className="px-4 py-3">Multi-layer auth</td></tr>
-              <tr><td className="px-4 py-3">Billing</td><td className="px-4 py-3">Stripe</td><td className="px-4 py-3">Payments</td></tr>
+              <tr><td className="px-4 py-3">{t("auth")}</td><td className="px-4 py-3">JWT + Argon2 + HMAC</td><td className="px-4 py-3">Multi-layer auth</td></tr>
+              <tr><td className="px-4 py-3">{t("billing")}</td><td className="px-4 py-3">Stripe</td><td className="px-4 py-3">{t("payments")}</td></tr>
               <tr><td className="px-4 py-3">Deploy</td><td className="px-4 py-3">Fly.io</td><td className="px-4 py-3">{t("productionHosting")}</td></tr>
             </tbody>
           </table></div>

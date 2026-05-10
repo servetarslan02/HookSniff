@@ -28,7 +28,7 @@ make self-host`}
 
       {/* Services */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Services</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("services")}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
@@ -39,9 +39,9 @@ make self-host`}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">Dashboard</td><td className="px-4 py-3">3001</td><td className="px-4 py-3">Web UI</td></tr>
-              <tr><td className="px-4 py-3 font-medium">API</td><td className="px-4 py-3">3000</td><td className="px-4 py-3">REST API</td></tr>
-              <tr><td className="px-4 py-3 font-medium">PostgreSQL</td><td className="px-4 py-3">5432</td><td className="px-4 py-3">Database</td></tr>
+              <tr><td className="px-4 py-3 font-medium">{t("dashboard")}</td><td className="px-4 py-3">3001</td><td className="px-4 py-3">{t("webui")}</td></tr>
+              <tr><td className="px-4 py-3 font-medium">API</td><td className="px-4 py-3">3000</td><td className="px-4 py-3">{t("restApi")}</td></tr>
+              <tr><td className="px-4 py-3 font-medium">PostgreSQL</td><td className="px-4 py-3">5432</td><td className="px-4 py-3">{t("database")}</td></tr>
               <tr><td className="px-4 py-3 font-medium">Redis</td><td className="px-4 py-3">6379</td><td className="px-4 py-3">Cache + Queue</td></tr>
             </tbody>
           </table></div>
