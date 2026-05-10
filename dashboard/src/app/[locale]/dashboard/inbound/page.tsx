@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, inboundApi, type Endpoint } from '@/lib/api';
+import { endpointsApi, inboundApi, type Endpoint, type InboundConfig } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
 const PROVIDERS = [
@@ -12,6 +12,8 @@ const PROVIDERS = [
   { id: 'shopify', name: 'Shopify', icon: '🛒', docs: 'https://shopify.dev/docs/api/admin-rest/resources/webhook' },
   { id: 'generic', name: 'Generic', icon: '🔗', docs: '#' },
 ];
+
+const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
 
 export default function InboundPage() {
   const { token } = useAuth();

@@ -37,6 +37,7 @@ export default function AlertsPage() {
   });
 
   const fetchAlerts = useCallback(async () => {
+    if (!token) return;
     try {
       const data = await alertsApi.list(token);
       setAlerts(data);
@@ -50,6 +51,7 @@ export default function AlertsPage() {
   useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
 
   const createAlert = async () => {
+    if (!token) return;
     setCreating(true);
     try {
       await alertsApi.create(token, form);
@@ -68,7 +70,7 @@ export default function AlertsPage() {
   };
 
   const confirmDeleteAlert = async () => {
-    if (!deleteId) return;
+    if (!deleteId || !token) return;
     try {
       await alertsApi.delete(token, deleteId);
       fetchAlerts();
@@ -80,6 +82,7 @@ export default function AlertsPage() {
   };
 
   const testAlert = async (id: string) => {
+    if (!token) return;
     try {
       await alertsApi.test(token, id);
       toast(t('testSent'), 'success');
