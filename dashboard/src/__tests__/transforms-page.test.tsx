@@ -7,6 +7,9 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 const mockEndpointsList = vi.fn();
+const mockTransformsList = vi.fn();
+const mockTransformsCreate = vi.fn();
+const mockTransformsDelete = vi.fn();
 
 vi.mock('next-intl', () => ({
   useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
@@ -32,6 +35,11 @@ vi.mock('@/lib/errors', () => ({
 vi.mock('@/lib/api', () => ({
   endpointsApi: {
     list: (...args: any[]) => mockEndpointsList(...args),
+  },
+  transformsApi: {
+    list: (...args: any[]) => mockTransformsList(...args),
+    create: (...args: any[]) => mockTransformsCreate(...args),
+    delete: (...args: any[]) => mockTransformsDelete(...args),
   },
 }));
 
@@ -87,7 +95,9 @@ describe('TransformsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockEndpointsList.mockResolvedValue(mockEndpoints);
-    mockFetch.mockImplementation(defaultFetchHandler);
+    mockTransformsList.mockResolvedValue([]);
+    mockTransformsCreate.mockResolvedValue({ id: 'new' });
+    mockTransformsDelete.mockResolvedValue({});
   });
 
   // === Render tests ===
@@ -155,20 +165,11 @@ describe('TransformsPage', () => {
       fireEvent.change(select, { target: { value: 'ep1' } });
     });
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/endpoints/ep1/transforms'),
-      expect.anything()
-    );
+    expect(mockTransformsList).toHaveBeenCalledWith('test-token', 'ep1');
   });
 
   it('displays rules after loading', async () => {
-    // Override fetch to return rules for ep1
-    mockFetch.mockImplementation((url: string) => {
-      if (url.includes('/endpoints/ep1/transforms')) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRules) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsList.mockResolvedValueOnce(mockRules);
 
     let container: HTMLElement;
     await act(async () => {
@@ -189,12 +190,7 @@ describe('TransformsPage', () => {
   });
 
   it('displays enrich rule', async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url.includes('/endpoints/ep1/transforms')) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve([mockRules[2]]) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsList.mockResolvedValueOnce([mockRules[2]]);
 
     let container: HTMLElement;
     await act(async () => {
@@ -280,12 +276,9 @@ describe('TransformsPage', () => {
   // === Create rule ===
   it('creates rule with filter include', async () => {
     let createCallBody: any = null;
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'POST') {
-        createCallBody = JSON.parse(options.body);
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+      createCallBody = body;
+      return Promise.resolve({ id: 'new' });
     });
 
     let container: HTMLElement;
@@ -320,12 +313,9 @@ describe('TransformsPage', () => {
 
   it('creates rule with filter exclude', async () => {
     let createCallBody: any = null;
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'POST') {
-        createCallBody = JSON.parse(options.body);
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+      createCallBody = body;
+      return Promise.resolve({ id: 'new' });
     });
 
     let container: HTMLElement;
@@ -358,12 +348,9 @@ describe('TransformsPage', () => {
 
   it('creates rule with mapping', async () => {
     let createCallBody: any = null;
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'POST') {
-        createCallBody = JSON.parse(options.body);
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+      createCallBody = body;
+      return Promise.resolve({ id: 'new' });
     });
 
     let container: HTMLElement;
@@ -397,12 +384,9 @@ describe('TransformsPage', () => {
 
   it('creates rule with enrich fields', async () => {
     let createCallBody: any = null;
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'POST') {
-        createCallBody = JSON.parse(options.body);
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+      createCallBody = body;
+      return Promise.resolve({ id: 'new' });
     });
 
     let container: HTMLElement;
@@ -435,12 +419,7 @@ describe('TransformsPage', () => {
   });
 
   it('hides create form after successful creation', async () => {
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'POST') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsCreate.mockResolvedValueOnce({ id: 'new' });
 
     let container: HTMLElement;
     await act(async () => {
@@ -466,12 +445,7 @@ describe('TransformsPage', () => {
   });
 
   it('clears form fields after successful creation', async () => {
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'POST') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsCreate.mockResolvedValue({ id: 'new' });
 
     let container: HTMLElement;
     await act(async () => {
@@ -504,22 +478,14 @@ describe('TransformsPage', () => {
     await act(async () => { fireEvent.click(newRuleButton2!); });
 
     const newInputs = getCreateFormInputs(container!);
+    expect(newInputs.length).toBeGreaterThanOrEqual(1);
     expect((newInputs[0] as HTMLInputElement).value).toBe('');
   });
 
   // === Delete rule ===
   it('deletes a rule', async () => {
-    let deleteCallUrl = '';
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'DELETE') {
-        deleteCallUrl = url;
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
-      }
-      if (url.includes('/endpoints/ep1/transforms') && !options?.method) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRules) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsList.mockResolvedValueOnce(mockRules);
+    mockTransformsDelete.mockResolvedValueOnce({});
 
     let container: HTMLElement;
     await act(async () => {
@@ -536,25 +502,13 @@ describe('TransformsPage', () => {
 
     if (deleteButtons.length > 0) {
       await act(async () => { fireEvent.click(deleteButtons[0]); });
-      expect(deleteCallUrl).toContain('/endpoints/ep1/transforms/r1');
+      expect(mockTransformsDelete).toHaveBeenCalledWith('test-token', 'ep1', 'r1');
     }
   });
 
   it('removes deleted rule from list', async () => {
-    let deleteCount = 0;
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'DELETE') {
-        deleteCount++;
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
-      }
-      if (url.includes('/endpoints/ep1/transforms') && !options?.method) {
-        if (deleteCount === 0) {
-          return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRules) });
-        }
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRules.slice(1)) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsList.mockResolvedValueOnce(mockRules);
+    mockTransformsDelete.mockResolvedValueOnce({});
 
     let container: HTMLElement;
     await act(async () => {
@@ -573,10 +527,7 @@ describe('TransformsPage', () => {
 
     if (deleteButtons.length > 0) {
       await act(async () => { fireEvent.click(deleteButtons[0]); });
-      // After delete, the component re-fetches rules (now returns mockRules.slice(1))
-      await waitFor(() => {
-        expect(deleteCount).toBe(1);
-      });
+      expect(mockTransformsDelete).toHaveBeenCalled();
     }
   });
 
@@ -594,12 +545,7 @@ describe('TransformsPage', () => {
 
   // === Filter rule display ===
   it('displays filter include tag', async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url.includes('/endpoints/ep1/transforms')) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve([mockRules[0]]) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsList.mockResolvedValueOnce([mockRules[0]]);
 
     let container: HTMLElement;
     await act(async () => {
@@ -615,20 +561,12 @@ describe('TransformsPage', () => {
   });
 
   it('displays filter exclude tag', async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url.includes('/endpoints/ep1/transforms')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve([{
-            id: 'r_ex',
-            endpoint_id: 'ep1',
-            rule_json: { filter: { exclude: ['secret'] } },
-            created_at: '2024-01-20',
-          }]),
-        });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsList.mockResolvedValueOnce([{
+      id: 'r_ex',
+      endpoint_id: 'ep1',
+      rule_json: { filter: { exclude: ['secret'] } },
+      created_at: '2024-01-20',
+    }]);
 
     let container: HTMLElement;
     await act(async () => {
@@ -645,12 +583,7 @@ describe('TransformsPage', () => {
 
   // === Map rule display ===
   it('displays mapping arrow', async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url.includes('/endpoints/ep1/transforms')) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve([mockRules[1]]) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockTransformsList.mockResolvedValueOnce([mockRules[1]]);
 
     let container: HTMLElement;
     await act(async () => {
@@ -692,7 +625,7 @@ describe('TransformsPage', () => {
     await act(async () => { fireEvent.change(select, { target: { value: 'ep1' } }); });
     await act(async () => { fireEvent.change(select, { target: { value: 'ep2' } }); });
 
-    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(mockTransformsList).toHaveBeenCalledTimes(2);
   });
 
   // === Input changes in create form ===
@@ -791,12 +724,9 @@ describe('TransformsPage', () => {
   // === Combined rule creation ===
   it('creates rule with both filter and mapping', async () => {
     let createCallBody: any = null;
-    mockFetch.mockImplementation((url: string, options?: any) => {
-      if (options?.method === 'POST') {
-        createCallBody = JSON.parse(options.body);
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+      createCallBody = body;
+      return Promise.resolve({ id: 'new' });
     });
 
     let container: HTMLElement;
