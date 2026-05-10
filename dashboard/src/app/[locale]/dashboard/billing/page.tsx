@@ -179,9 +179,16 @@ export default function BillingPage() {
     try {
       const result = await billingApiExtended.upgrade(token, showUpgradeModal.toLowerCase());
       if (result.checkout_url) {
-        window.location.href = result.checkout_url;
+        // Validate checkout URL is from a trusted payment provider
+        const url = new URL(result.checkout_url);
+        const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'pay.stripe.com', 'sandbox-api.iyzipay.com', 'api.iyzipay.com'];
+        if (trustedHosts.some(h => url.hostname === h || url.hostname.endsWith(`.${h}`))) {
+          window.location.href = result.checkout_url;
+        } else {
+          toast('Invalid checkout URL', 'error');
+        }
       } else {
-        toast(data.message || 'Upgrade initiated', 'success');
+        toast('Upgrade initiated', 'success');
       }
     } catch (err: unknown) {
       toast(getErrorMessage(err) || 'Upgrade failed', 'error');
