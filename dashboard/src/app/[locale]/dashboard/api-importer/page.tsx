@@ -260,7 +260,7 @@ export default function ApiSpecImporterPage() {
                   onClick={toggleAll}
                   className="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                 >
-                  {parsed.endpoints.every((e) => e.selected) ? 'Deselect All' : 'Select All'}
+                  {parsed.endpoints.every((e) => e.selected) ? t('deselectAll') : t('selectAll')}
                 </button>
                 <button
                   onClick={importEndpoints}
