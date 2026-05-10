@@ -1,57 +1,43 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 23:54 GMT+8
+> Son güncelleme: 2026-05-11 00:18 GMT+8
 
 ---
 
 ## ✅ Tamamlanan Oturumlar
 
-### Oturum 73-93 ✅
+### Oturum 73-94 ✅
 - Tüm P0 + P1 tamamlandı
 
-### Oturum 94 ✅ (2026-05-10 22:58 - 23:54)
-**Major dependency güncellemeleri:**
-- sha2 0.10→0.11, hmac 0.12→0.13
-- thiserror 1→2, jsonwebtoken 9→10 (+ rust_crypto feature)
-- axum 0.7→0.8, tower 0.4→0.5, tower-http 0.5→0.6
-- opentelemetry 0.24→0.32, opentelemetry-otlp 0.17→0.32
-- tonic 0.12→0.14, reqwest 0.12→0.13
-- tracing-opentelemetry 0.25→0.32 (patched vendor — upstream 0.33 bekleniyor)
-**Dashboard:**
-- 63+85 TypeScript hataları düzeltildi (unused imports, type casts)
-- ESLint: 0 hata
+### Oturum 95 ✅ (2026-05-11 00:00 - 00:18)
+**Major dependency güncellemeleri (kalan 4):**
+- sqlx 0.7→0.8 ✅ (encode_by_ref Result dönüş tipi — fifo/mod.rs düzeltildi)
+- redis 0.25→1.2 ✅ (sorunsuz, API değişmemiş)
+- rand 0.8→0.10 ✅ (OsRng→SysRng, RngCore→TryRng, thread_rng→rng, distributions→distr)
+- prometheus zaten 0.14'müş ✅ (NEXT_SESSION.md'de yanlış yazılmış)
+**Dashboard npm update:**
+- react 19.2.5→19.2.6, next 15.5.15→15.5.18, next-intl 4.11.0→4.11.1, @types/node 20.19.39→20.19.40
 **Testler:** 999/999 (979 API + 20 worker)
-**Commits:** `7d89aa1`, `c7d6236`, `815705d` — main branch
+**ESLint:** clean
+**Commit:** `cb3ed64` — main branch
+
+🎉 **TÜM RUST MAJOR BAĞIMLILIKLARI ARTIK EN GÜNCEL!**
 
 ---
 
-## 🟡 Sıradaki Oturum: #95
+## 🟡 Sıradaki Oturum: #96
 
-### 1. Kalan Major Dependency Güncellemeleri
-| Paket | Mevcut | Güncel | Zorluk |
-|---|---|---|---|
-| sqlx | 0.7 | 0.8 | 🔴 Büyük — macro syntax, runtime değişiklikleri |
-| redis | 0.25 | 1.2 | 🔴 Büyük — API tamamen değişmiş |
-| rand | 0.8 | 0.10 | 🟡 Orta — `gen_range` API değişikliği |
-| prometheus | 0.13 | 0.14 | 🟡 Orta — metric API değişikliği |
-
-**⚠️ sqlx ve redis büyük migration — dikkatli ol, parça parça yap:**
-- sqlx 0.8: `sqlx::query!` macro'ları, `PgPool` API, `runtime-tokio` feature adı değişmiş olabilir
-- redis 1.x: `redis::Connection` → `redis::aio::Connection`, async API değişiklikleri
-- İkisini aynı anda yapma, birini bitir test et sonra diğerine geç
-
-### 2. Dependabot PR'ları (kalan)
-npm tarafı hâlâ bekliyor:
+### 1. Dependabot Major PR'ları (npm)
+Bunlar major version bump — dikkatli ol:
 ```
-dependabot/npm_and_yarn/dashboard/react-19.2.6        ← major, dikkatli ol
-dependabot/npm_and_yarn/dashboard/typescript-6.0.3     ← major
-dependabot/npm_and_yarn/dashboard/tailwindcss-4.2.4    ← major
-dependabot/npm_and_yarn/dashboard/recharts-3.8.1       ← minor, güvenli
-dependabot/npm_and_yarn/dashboard/types/node-25.6.2    ← minor, güvenli
+typescript 5.9.3 → 6.0.3      ← MAJOR, breaking changes bekleniyor
+tailwindcss 3.4.19 → 4.3.0    ← MAJOR, config değişiklikleri gerekli
+recharts 2.15.4 → 3.8.1       ← MAJOR, API değişiklikleri
+next 15.5.18 → 16.2.6         ← MAJOR, app router değişiklikleri
 ```
-**Dikkat:** Next.js 16, ESLint 10, React 19 major bump — şimdilik dokunma!
+**Strateji:** Her birini tek tek dene, compile et, test et. Olmazsa geri al.
 
-### 3. Kalan P2 Sorunları
+### 2. Kalan P2 Sorunları
 | ID | Sorun | Zorluk |
 |----|-------|--------|
 | HS-065 | 920+ hardcoded string (i18n) | 🔴 Büyük iş |
@@ -62,16 +48,21 @@ dependabot/npm_and_yarn/dashboard/types/node-25.6.2    ← minor, güvenli
 | HS-084 | Polar/iyzico fatura handler | 🟡 Orta |
 | HS-085-089 | Test coverage (5 modül) | 🔴 Büyük iş |
 
-### 4. Silinmeyen Branch'ler
+### 3. Silinmeyen Branch'ler
 - `feat/mobile-backend-features` — password reset, email verify, 2FA, push notifications
 - `ai-agent-layer` — PostgreSQL AI agents migration
 - Bu branch'lerdeki iş main'e merge edilmeli veya Servet'e sorulmalı
 
-### 5. tracing-opentelemetry Vendor Kaldırma
+### 4. tracing-opentelemetry Vendor Kaldırma
 - Upstream `tracing-opentelemetry 0.33` çıktığında vendor patch'ini kaldır
 - `vendor/tracing-opentelemetry/` klasörünü sil
 - `[patch.crates-io]` section'ını workspace Cargo.toml'dan kaldır
 - `tracing-opentelemetry = "0.33"` yap
+
+### 5. Unused Code Temizliği
+- `worker/src/circuit_breaker.rs` — `get_state`, `get_all` never used
+- `api/src/middleware/mod.rs` — `cleanup` never used
+- Bu warning'leri temizle (dead_code)
 
 ---
 
@@ -84,6 +75,13 @@ dependabot/npm_and_yarn/dashboard/types/node-25.6.2    ← minor, güvenli
 | 🟡 P2 | 38 | 21 | 17 |
 | 🟢 P3 | 13 | 1 | 12 |
 | **TOPLAM** | **103** | **81** | **22** |
+
+### Dependency Durumu
+| Kategori | Durum |
+|----------|-------|
+| Rust major deps | ✅ TAMAMI GÜNCEL |
+| npm semver-compatible | ✅ Güncellendi |
+| npm major deps | ⏳ Beklemede (TS6, TW4, Recharts3, Next16) |
 
 ---
 
