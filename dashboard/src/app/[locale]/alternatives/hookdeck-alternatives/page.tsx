@@ -49,7 +49,7 @@ export default function HookdeckAlternativesPage() {
               <tbody>
                 {[
                   { name: 'Hookdeck', price: '$39/mo+', oss: '❌', self: '❌', sdks: '8', routing: 'Advanced', soc2: 'Type 2', hl: false },
-                  { name: 'HookSniff', price: '$49/mo', oss: '✅', self: '✅', sdks: '11', routing: 'Basic', soc2: 'Ready', hl: true },
+                  { name: 'HookSniff', price: '$29/mo', oss: '✅', self: '✅', sdks: '11', routing: 'Basic', soc2: 'Ready', hl: true },
                   { name: 'Svix', price: '$490/mo', oss: '✅', self: '✅', sdks: '6', routing: 'Basic', soc2: 'Type 2', hl: false },
                   { name: 'Hook0', price: 'Free', oss: '✅', self: '✅', sdks: '4', routing: 'Basic', soc2: '❌', hl: false },
                   { name: 'Convoy', price: 'Free', oss: '✅', self: '✅', sdks: '1', routing: 'Basic', soc2: '❌', hl: false },
@@ -75,7 +75,7 @@ export default function HookdeckAlternativesPage() {
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Open source:</strong> HookSniff is MIT-licensed. Hookdeck is closed-source.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Self-hosted:</strong> Deploy HookSniff on your own infrastructure. Hookdeck is cloud-only.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Predictable pricing:</strong> $49/mo flat vs Hookdeck&apos;s usage-based billing.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Predictable pricing:</strong> $29/mo flat vs Hookdeck&apos;s usage-based billing.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>More SDKs:</strong> 11 SDKs vs Hookdeck&apos;s 8. FIFO delivery and CloudEvents support.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>CLI + MCP:</strong> Full CLI tool and MCP support included.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Smart routing:</strong> Round-robin, latency-based, and failover routing built-in.</li>
