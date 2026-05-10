@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 18:21 GMT+8
+> Son güncelleme: 2026-05-10 20:45 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -51,6 +51,17 @@
 ### Sonraki Oturum
 - Oturum 82: Auth & Crypto Security (HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l)
 
+## 📝 Oturum 83 (2026-05-10 20:31 - 20:45 GMT+8) ✅
+1. SDK & Config Fixes: 6 sorun
+2. 13 dosya, 1 commit (a3ba6e8)
+3. HS-035: API URL standardization (MCP api.hooksniff.dev → .com, CLI localhost → prod)
+4. HS-036: Kotlin TypeToken erasure crash — explicit Class<T> + Type overload
+5. HS-037: X-Hookrelay-Signature → X-Hooksniff-Signature (Python, Go, Java, Ruby, PHP)
+6. HS-038: CLI HOOKRELAY_* → HOOKSNIFF_* env vars
+7. HS-038m: next.config.js output:standalone eklendi
+8. HS-038n: Hardcoded DATABASE_URL kaldırıldı (run-migrations.js, fix-migrations.js)
+9. ⚠️ Git history'de hâlâ credentials var — BFG ile temizlenmeli
+
 ## 📝 Oturum 82 (2026-05-10 19:52 - 20:26 GMT+8) ✅ KUSURSUZ
 1. Auth & Crypto Security (HS-038f-l): 7 sorun
 2. Ek bilgi sızıntısı düzeltmeleri: 19 sorun
@@ -69,7 +80,7 @@
 - **Oturum 80**: Error Classification (HS-018) ✅
 - **Oturum 81**: Database Constraints (HS-025, HS-026, HS-057) ✅
 - **Oturum 82**: Auth & Crypto Security + Ek düzeltmeler (26 sorun) ✅ KUSURSUZ
-- **Toplam**: 54 tamamlandı, 8 yanlış bulgu, 3 notlu, 46 bekliyor
+- **Toplam**: 54 tamamlandı, 8 yanlış bulgu, 3 notlu, 40 bekliyor
 
 ## 📝 Oturum 81 (2026-05-10 19:35 - 19:37 GMT+8) ✅
 1. Database Issues:

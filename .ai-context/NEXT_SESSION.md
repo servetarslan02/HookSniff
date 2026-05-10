@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 20:26 GMT+8
+> Son güncelleme: 2026-05-10 20:45 GMT+8
 
 ---
 
@@ -14,23 +14,31 @@
 - Timing attack, email enumeration, auth cache deadlock, rate limit panic, alert validation, webhook error sanitize, register enumeration prevention, 19 ek bilgi sızıntısı
 - Kusursuz sistem onayı
 
+### Oturum 83 — SDK & Config Fixes ✅
+- 6 sorun düzeltildi, 13 dosya, 1 commit (a3ba6e8)
+- HS-035: API URL standardization (MCP + CLI)
+- HS-036: Kotlin TypeToken erasure crash fix
+- HS-037: X-Hookrelay-Signature → X-Hooksniff-Signature (5 SDK)
+- HS-038: CLI HOOKRELAY_* → HOOKSNIFF_* env vars
+- HS-038m: next.config.js output:standalone
+- HS-038n: Hardcoded DATABASE_URL removed (run-migrations.js, fix-migrations.js)
+
 ---
 
-## 🔴 Sıradaki Oturum: #83 — SDK & Config Fixes
+## 🔴 Sıradaki Oturum: #84 — Frontend Component Issues
 
 ### Görev
-Auth ve kriptografi güvenlik düzeltmeleri.
+Frontend bileşen sorunları ve UX düzeltmeleri.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-038f | Timing attack — login hataları farklı mesajlar | `api/src/routes/auth.rs` |
-| HS-038g | `AppError::Serialization` serde_json hata gösteriyor | `api/src/error.rs` |
-| HS-038h | Email enumeration — register mesajı | `api/src/routes/auth.rs` |
-| HS-038i | Auth cache `std::sync::Mutex` async'te deadlock | `api/src/` |
-| HS-038j | `rate_limit.rs` unwrap() — panic riski | `api/src/rate_limit.rs` |
-| HS-038k | Alert condition string validation eksik | `api/src/routes/alerts.rs` |
-| HS-038l | Polar/iyzico webhook error'da config sızıntısı | `api/src/routes/billing.rs` |
+| HS-039 | Dual onboarding modal | `dashboard/src/` |
+| HS-040 | Toast'ta dismiss/aria-live yok | `dashboard/src/components/` |
+| HS-041 | Client-side search + server-side pagination çelişkisi | `dashboard/src/` |
+| HS-042 | Status count'lar sadece mevcut sayfadan | `dashboard/src/` |
+| HS-043 | 63 useEffect'ten %75'inde cleanup eksik | `dashboard/src/` |
+| HS-044 | Stale closure riskleri | `dashboard/src/` |
 
 ---
 
@@ -39,8 +47,8 @@ Auth ve kriptografi güvenlik düzeltmeleri.
 | # | Görev | Sorunlar |
 |---|-------|----------|
 | 82 | ~~Auth & Crypto Security~~ | ~~HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l~~ ✅ KUSURSUZ |
-| 83 | **SDK & Config Fixes** | HS-035, HS-036, HS-037, HS-038, HS-038m, HS-038n |
-| 84 | Frontend Component Issues | HS-039, HS-040, HS-041, HS-042, HS-043, HS-044 |
+| 83 | ~~SDK & Config Fixes~~ | ~~HS-035, HS-036, HS-037, HS-038, HS-038m, HS-038n~~ ✅ |
+| 84 | **Frontend Component Issues** | HS-039, HS-040, HS-041, HS-042, HS-043, HS-044 |
 | 85 | Frontend Performance & Bundle | HS-045, HS-046, HS-047, HS-048 |
 | 86 | Accessibility & Dark Mode | HS-049, HS-050, HS-051, HS-052, HS-053 |
 
@@ -51,7 +59,7 @@ Auth ve kriptografi güvenlik düzeltmeleri.
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 28 (+9 yanlış/notlu) | 7 |
+| 🔴 P1 | 44 | 34 (+9 yanlış/notlu) | 1 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **42** | **59** |
+| **TOPLAM** | **103** | **48** | **53** |
