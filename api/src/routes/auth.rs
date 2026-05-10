@@ -1151,9 +1151,9 @@ async fn send_verification_email_for_customer(
 
 /// Generate a TOTP secret (base32 encoded).
 fn generate_totp_secret() -> String {
-    use rand::RngCore;
+    use rand::TryRng;
     let mut bytes = [0u8; 20];
-    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
     base32::encode(base32::Alphabet::Rfc4648 { padding: false }, &bytes)
 }
 
