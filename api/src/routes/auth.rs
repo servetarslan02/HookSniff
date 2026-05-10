@@ -150,27 +150,6 @@ async fn register(
         ));
     }
 
-    // Check if email exists
-    let existing: Option<(Uuid,)> = sqlx::query_as("SELECT id FROM customers WHERE email = $1")
-        .bind(&req.email)
-        .fetch_optional(&pool)
-        .await?;
-
-    if existing.is_some() {
-        // HS-038h: Prevent email enumeration.
-        // 1. Perform Argon2 hash to normalize timing (same cost as real registration)
-        // 2. Return same response structure as success
-        tracing::info!("Registration attempt for existing email: {}", req.email);
-        let _ = jwt::hash_password(&password);
-        // Return generic message — client cannot distinguish existing vs new email
-        return Ok((
-            HeaderMap::new(),
-            Json(serde_json::json!({
-                "message": "If this email is available, a verification email has been sent.",
-            })),
-        ));
-    }
-
     // Generate API key
     let api_key = generate_api_key();
     let api_key_hash = hash_api_key(&api_key);
@@ -178,6 +157,25 @@ async fn register(
 
     // Hash password
     let password_hash = jwt::hash_password(&password)?;
+
+    // Check if email already exists (after hashing to normalize timing)
+    let existing: Option<(Uuid,)> = sqlx::query_as("SELECT id FROM customers WHERE email = $1")
+        .bind(&req.email)
+        .fetch_optional(&pool)
+        .await?;
+
+    if existing.is_some() {
+        // HS-038h: Prevent email enumeration.
+        // Password already hashed above → timing normalized.
+        // Return same response as success to prevent body-based enumeration.
+        tracing::info!("Registration attempt for existing email: {}", req.email);
+        return Ok((
+            HeaderMap::new(),
+            Json(serde_json::json!({
+                "message": "If this email is available, a verification email has been sent.",
+            })),
+        ));
+    }
 
     let customer = sqlx::query_as::<_, Customer>(
         "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash, name, is_active) VALUES ($1, $2, $3, $4, $5, true) RETURNING *",
@@ -189,15 +187,6 @@ async fn register(
     .bind(&req.name)
     .fetch_one(&pool)
     .await?;
-
-    // Generate short-lived access token + refresh token
-    let token = jwt::generate_access_token(
-        customer.id,
-        &customer.email,
-        &customer.plan,
-        &cfg.jwt_secret,
-    )?;
-    let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
     tracing::info!("✅ New customer registered: {}", req.email);
 
@@ -215,11 +204,15 @@ async fn register(
     // Auto-send verification email
     send_verification_email_for_customer(&pool, &cfg, customer.id, &req.email).await;
 
-    Ok(auth_response_with_cookie(AuthResponse {
-        token,
-        customer: customer.to_response(Some(api_key)),
-        refresh_token: Some(refresh_token_value),
-    }))
+    // HS-038h: Return same generic message for all registrations.
+    // User must log in after verifying email to get tokens.
+    // This prevents email enumeration via response body.
+    Ok((
+        HeaderMap::new(),
+        Json(serde_json::json!({
+            "message": "If this email is available, a verification email has been sent.",
+        })),
+    ))
 }
 
 // ── Login ───────────────────────────────────────────────────
