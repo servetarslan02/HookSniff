@@ -47,7 +47,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/components/StatusBadge', () => ({
-  StatusBadge: ({ status, size }: any) => React.createElement('span', { 'data-testid': 'status-badge' }, status),
+  StatusBadge: ({ status, size: _size }: any) => React.createElement('span', { 'data-testid': 'status-badge' }, status),
 }));
 
 vi.mock('@/components/ConfirmDialog', () => ({

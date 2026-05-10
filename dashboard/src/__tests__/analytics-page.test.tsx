@@ -77,7 +77,6 @@ describe('AnalyticsPage', () => {
   });
 
   it('renders stat cards', async () => {
-    let container: HTMLElement;
     await act(async () => {
       render(React.createElement(AnalyticsPage));
     });

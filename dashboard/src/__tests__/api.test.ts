@@ -198,7 +198,7 @@ describe('statsApi', () => {
       json: () => Promise.resolve({ total_deliveries: 100 }),
     });
 
-    const result = await statsApi.get('token');
+    await statsApi.get('token');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/stats'),
       expect.anything()

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -74,14 +74,6 @@ const mockRules = [
     created_at: '2024-01-17',
   },
 ];
-
-// Default fetch handler - returns empty rules for any endpoint
-function defaultFetchHandler(url: string, options?: any) {
-  return Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve([]),
-  });
-}
 
 function getCreateFormInputs(container: HTMLElement) {
   const formCard = Array.from(container.querySelectorAll('.glass-card')).find(
@@ -276,7 +268,7 @@ describe('TransformsPage', () => {
   // === Create rule ===
   it('creates rule with filter include', async () => {
     let createCallBody: any = null;
-    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+    mockTransformsCreate.mockImplementation((_token: string, _endpointId: string, body: any) => {
       createCallBody = body;
       return Promise.resolve({ id: 'new' });
     });
@@ -313,7 +305,7 @@ describe('TransformsPage', () => {
 
   it('creates rule with filter exclude', async () => {
     let createCallBody: any = null;
-    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+    mockTransformsCreate.mockImplementation((_token: string, _endpointId: string, body: any) => {
       createCallBody = body;
       return Promise.resolve({ id: 'new' });
     });
@@ -348,7 +340,7 @@ describe('TransformsPage', () => {
 
   it('creates rule with mapping', async () => {
     let createCallBody: any = null;
-    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+    mockTransformsCreate.mockImplementation((_token: string, _endpointId: string, body: any) => {
       createCallBody = body;
       return Promise.resolve({ id: 'new' });
     });
@@ -384,7 +376,7 @@ describe('TransformsPage', () => {
 
   it('creates rule with enrich fields', async () => {
     let createCallBody: any = null;
-    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+    mockTransformsCreate.mockImplementation((_token: string, _endpointId: string, body: any) => {
       createCallBody = body;
       return Promise.resolve({ id: 'new' });
     });
@@ -724,7 +716,7 @@ describe('TransformsPage', () => {
   // === Combined rule creation ===
   it('creates rule with both filter and mapping', async () => {
     let createCallBody: any = null;
-    mockTransformsCreate.mockImplementation((token: string, endpointId: string, body: any) => {
+    mockTransformsCreate.mockImplementation((_token: string, _endpointId: string, body: any) => {
       createCallBody = body;
       return Promise.resolve({ id: 'new' });
     });

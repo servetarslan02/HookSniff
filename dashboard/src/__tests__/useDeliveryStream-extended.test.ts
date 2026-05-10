@@ -36,14 +36,14 @@ describe('useDeliveryStream — Extended Coverage', () => {
 
   // === Disabled state ===
   it('does not fetch when disabled', () => {
-    const { result } = renderHook(() =>
+    renderHook(() =>
       useDeliveryStream({ token: 'test-token', enabled: false })
     );
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it('does not fetch when token is empty', () => {
-    const { result } = renderHook(() =>
+    renderHook(() =>
       useDeliveryStream({ token: '', enabled: true })
     );
     expect(mockFetch).not.toHaveBeenCalled();
@@ -297,9 +297,6 @@ describe('useDeliveryStream — Extended Coverage', () => {
 
   // === Cleanup ===
   it('cleans up on unmount', () => {
-    const abortSpy = vi.fn();
-    const mockController = { abort: abortSpy, signal: {} };
-
     // We can't easily spy on AbortController, but we can verify the hook doesn't crash on unmount
     mockFetch.mockReturnValue(new Promise(() => {}));
 

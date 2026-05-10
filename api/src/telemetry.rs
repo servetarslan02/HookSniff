@@ -1,11 +1,24 @@
 use std::collections::HashMap;
 use tracing_subscriber::prelude::*;
 
+/// Guard that flushes OpenTelemetry traces on drop.
+pub struct TracerGuard(Option<opentelemetry_sdk::trace::SdkTracerProvider>);
+
+impl Drop for TracerGuard {
+    fn drop(&mut self) {
+        if let Some(provider) = self.0.take() {
+            let _ = provider.shutdown();
+        }
+    }
+}
+
 /// Initialize the global tracing subscriber with OpenTelemetry + structured logging.
 ///
 /// Call this once at startup. When `OTEL_ENABLED=true`, traces are exported via OTLP;
 /// otherwise only structured logging is configured.
-pub fn init(cfg: &crate::config::Config) {
+///
+/// Returns a `TracerGuard` that flushes traces on drop. Keep it alive until shutdown.
+pub fn init(cfg: &crate::config::Config) -> TracerGuard {
     let env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
     let use_json = env == "production"
         || env == "prod"
@@ -17,9 +30,10 @@ pub fn init(cfg: &crate::config::Config) {
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
 
     if cfg.otel_enabled {
-        init_otel(env_filter, use_json, cfg);
+        init_otel(env_filter, use_json, cfg)
     } else {
         init_plain(env_filter, use_json, &env);
+        TracerGuard(None)
     }
 }
 
@@ -28,11 +42,11 @@ fn init_otel(
     env_filter: tracing_subscriber::EnvFilter,
     use_json: bool,
     cfg: &crate::config::Config,
-) {
+) -> TracerGuard {
     use opentelemetry::global;
     use opentelemetry::trace::TracerProvider as _;
-    use opentelemetry_otlp::WithExportConfig;
-    use opentelemetry_sdk::trace::TracerProvider;
+    use opentelemetry_otlp::{WithExportConfig, WithHttpConfig};
+    use opentelemetry_sdk::trace::SdkTracerProvider;
 
     let otlp_endpoint = cfg
         .otel_exporter_otlp_endpoint
@@ -49,11 +63,11 @@ fn init_otel(
         }
     }
 
-    let exporter = match opentelemetry_otlp::new_exporter()
-        .http()
+    let exporter = match opentelemetry_otlp::SpanExporter::builder()
+        .with_http()
         .with_endpoint(otlp_endpoint)
         .with_headers(headers)
-        .build_span_exporter()
+        .build()
     {
         Ok(exporter) => exporter,
         Err(e) => {
@@ -61,13 +75,14 @@ fn init_otel(
                 "⚠️ Failed to build OTLP exporter ({}), falling back to plain logging",
                 e
             );
-            return init_plain(env_filter, use_json, "production");
+            init_plain(env_filter, use_json, "production");
+            return TracerGuard(None);
         }
     };
 
     // HS-062: Use batch exporter for production (buffers spans, reduces network calls)
-    let provider = TracerProvider::builder()
-        .with_batch_exporter(exporter, opentelemetry_sdk::runtime::Tokio)
+    let provider = SdkTracerProvider::builder()
+        .with_batch_exporter(exporter)
         .build();
 
     // HS-061: Register custom metrics
@@ -94,6 +109,8 @@ fn init_otel(
     }
 
     tracing::info!("OpenTelemetry enabled, endpoint: {}", otlp_endpoint);
+
+    TracerGuard(Some(provider))
 }
 
 /// Plain structured logging (no OTel).
@@ -246,11 +263,9 @@ mod tests {
 
     #[test]
     fn test_current_trace_id_returns_string() {
-        // Without OTel active, should return a UUID-v4 fallback (32 hex chars)
         let trace_id = current_trace_id();
         assert!(!trace_id.is_empty());
         assert_eq!(trace_id.len(), 32, "trace-id should be 32 hex chars");
-        // Should be valid hex
         assert!(
             trace_id.chars().all(|c| c.is_ascii_hexdigit()),
             "trace-id should be hex: {}",
@@ -260,16 +275,13 @@ mod tests {
 
     #[test]
     fn test_current_trace_id_unique_per_call() {
-        // Without OTel, each call generates a new UUID
         let id1 = current_trace_id();
         let id2 = current_trace_id();
-        // They should be different (statistically ~guaranteed with UUID v4)
         assert_ne!(id1, id2);
     }
 
     #[test]
     fn test_current_trace_id_no_dashes() {
-        // The fallback path strips dashes from UUID
         let trace_id = current_trace_id();
         assert!(
             !trace_id.contains('-'),

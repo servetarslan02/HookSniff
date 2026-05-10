@@ -135,7 +135,7 @@ pub async fn handle_connection(
         server_time: chrono::Utc::now(),
     };
     if let Ok(json) = serde_json::to_string(&connected_msg) {
-        let _ = ws_sender.send(Message::Text(json)).await;
+        let _ = ws_sender.send(Message::Text(json.into())).await;
     }
 
     // If initial filters were provided, send subscription confirmation
@@ -144,7 +144,7 @@ pub async fn handle_connection(
             event_types: initial_filters,
         };
         if let Ok(json) = serde_json::to_string(&subscribed_msg) {
-            let _ = ws_sender.send(Message::Text(json)).await;
+            let _ = ws_sender.send(Message::Text(json.into())).await;
         }
     }
 
@@ -166,7 +166,7 @@ pub async fn handle_connection(
             // Serialize and send
             match serde_json::to_string(&msg) {
                 Ok(json) => {
-                    if ws_sender.send(Message::Text(json)).await.is_err() {
+                    if ws_sender.send(Message::Text(json.into())).await.is_err() {
                         debug!("Connection {} closed during send", conn_id_for_fwd);
                         break;
                     }
