@@ -22,6 +22,7 @@ use sqlx::PgPool;
 mod circuit_breaker;
 mod config;
 pub mod delivery;
+mod fifo;
 mod signing;
 pub mod telemetry;
 
@@ -230,6 +231,17 @@ async fn main() -> Result<()> {
                         tracing::error!("❌ Orphaned delivery reaper error: {:?}", e);
                     }
                 }
+                // HS-023: Check FIFO timeouts
+                match fifo::check_fifo_timeouts(&pool).await {
+                    Ok(timed_out) => {
+                        if timed_out > 0 {
+                            tracing::warn!("📦 FIFO: {} items timed out", timed_out);
+                        }
+                    }
+                    Err(e) => {
+                        tracing::error!("❌ FIFO timeout checker error: {:?}", e);
+                    }
+                }
             }
             _ = grace_interval.tick() => {
                 // HS-059: Downgrade customers past their grace period (7 days)
@@ -362,6 +374,22 @@ async fn process_pending(
                 // Re-queue for later retry
                 let _ = sqlx::query::<sqlx::Postgres>(
                     "UPDATE webhook_queue SET status = 'pending', next_retry_at = now() + interval '60 seconds' WHERE id = $1"
+                )
+                .bind(item.id)
+                .execute(&pool)
+                .await;
+                return Ok::<(), anyhow::Error>(());
+            }
+
+            // HS-023: FIFO check — skip if endpoint is FIFO and previous item not completed
+            if !fifo::should_deliver_fifo(&pool, endpoint_id).await.unwrap_or(true) {
+                tracing::debug!(
+                    "📦 FIFO: delivery {} waiting for previous item (endpoint {})",
+                    delivery_id, endpoint_id
+                );
+                // Re-queue for later retry
+                let _ = sqlx::query::<sqlx::Postgres>(
+                    "UPDATE webhook_queue SET status = 'pending', next_retry_at = now() + interval '5 seconds' WHERE id = $1"
                 )
                 .bind(item.id)
                 .execute(&pool)
@@ -540,6 +568,9 @@ async fn process_pending(
 
                 // HS-020: Record success in circuit breaker
                 cb.record_success(endpoint_id).await;
+
+                // HS-023: Mark FIFO item as delivered
+                let _ = fifo::mark_fifo_delivered(&pool, endpoint_id, delivery_id).await;
             } else if is_non_retryable(status_code) {
                 // ❌ Client error (4xx except 429) → dead letter, don't retry
                 tracing::error!(
@@ -610,6 +641,9 @@ async fn process_pending(
 
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
+
+                // HS-023: Mark FIFO item as failed (blocks subsequent items)
+                let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else if attempt >= item.max_attempts {
                 // ❌ Max deneme aşıldı → dead letter
                 tracing::error!(
@@ -682,6 +716,9 @@ async fn process_pending(
 
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
+
+                // HS-023: Mark FIFO item as dead-lettered
+                let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else {
                 // 🔄 Retry — exponential backoff
                 let delay = calculate_backoff(attempt);
