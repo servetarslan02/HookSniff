@@ -49,7 +49,16 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 78: Billing & Account Endpoints (HS-032, HS-033, HS-073, HS-074, HS-076)
+- Oturum 79: SSRF & Security Hardening (HS-011, HS-012, HS-013, HS-014, HS-015, HS-016)
+
+## 📝 Oturum 78 (2026-05-10 19:20 - 19:22 GMT+8) ✅
+1. Billing & Account Endpoints:
+   - `DELETE /billing/subscription` endpoint'i eklendi (HS-032)
+   - Hesap silme `/auth/me` → `/auth/account` (HS-033)
+   - Playground hardcoded token → apiKey (HS-073)
+   - api-keys credentials headers içinden çıkarıldı (HS-076)
+   - HS-074: Yanlış bulgu — cookie auth çalışıyor
+2. Dosyalar: `api/src/routes/billing.rs`, `settings/page.tsx`, `playground/page.tsx`, `api-keys/page.tsx`
 
 ## 📝 Oturum 77 (2026-05-10 19:13 - 19:18 GMT+8) ✅
 1. Frontend-Backend API uyumsuzluğu düzeltildi:

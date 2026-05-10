@@ -15,7 +15,7 @@ use crate::models::customer::Customer;
 
 pub fn router() -> Router {
     Router::new()
-        .route("/subscription", get(get_subscription))
+        .route("/subscription", get(get_subscription).delete(cancel_subscription))
         .route("/upgrade", post(upgrade_plan))
         .route("/portal", post(open_portal))
         .route("/usage", get(get_usage))
@@ -62,6 +62,41 @@ async fn get_subscription(
         monthly_price_cents: plan.monthly_price_cents(),
         monthly_price_kurus: plan.monthly_price_kurus(),
     }))
+}
+
+// ──────────────────────────────────────────────────────────────
+// DELETE /v1/billing/subscription — Cancel subscription
+// ──────────────────────────────────────────────────────────────
+
+/// DELETE /v1/billing/subscription — Cancel the current subscription (downgrade to free at period end)
+async fn cancel_subscription(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    if customer.plan == "free" {
+        return Err(AppError::BadRequest(
+            "You are already on the free plan".into(),
+        ));
+    }
+
+    // Mark subscription for cancellation at period end
+    sqlx::query(
+        "UPDATE customers SET cancel_at_period_end = true, updated_at = NOW() WHERE id = $1",
+    )
+    .bind(customer.id)
+    .execute(&pool)
+    .await?;
+
+    tracing::info!(
+        "✅ Subscription cancellation requested for customer {} (plan: {})",
+        customer.id,
+        customer.plan
+    );
+
+    Ok(Json(serde_json::json!({
+        "message": "Your subscription will be cancelled at the end of the current billing period.",
+        "cancel_at_period_end": true,
+    })))
 }
 
 // ──────────────────────────────────────────────────────────────
