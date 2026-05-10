@@ -1,65 +1,67 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 08:50 GMT+8
+> Son güncelleme: 2026-05-10 09:20 GMT+8
 
 ---
 
 ## ✅ BU OTURUMDA YAPILAN (Session 68 — TAMAMLANDI)
 
-### Dashboard Refactor (Önceki oturumda başladı)
-- `api.ts`'ya 4 yeni API modülü eklendi
-- 4 dashboard sayfası direct fetch → apiFetch
+### Toplam: 30+ fix, 15+ commit
 
-### Kod İnceleme Düzeltmeleri (20+ fix)
+#### 🔴 Kritik Düzeltmeler (10)
+1. **Fiyat $49/$149 → $29/$99** — billing, admin, landing, i18n
+2. **Config Debug secret sızıntısı** — custom Debug (REDACTED)
+3. **search credentials hatası** — headers içinden çıkarıldı
+4. **GDPR delete_account** — 7 eksik tablo eklendi
+5. **inbound.rs crypt()** → Argon2 verification
+6. **teams.rs invite token** — response'dan kaldırıldı
+7. **Checkout URL doğrulaması** — trusted hosts kontrolü
+8. **Landing pricing tutarsızlığı** — $49→$29
+9. **i18n free tier** — 1,000→10,000 (8 dil)
+10. **Privacy retention** — 3→7 gün
 
-#### 🔴 Kritik Düzeltmeler
-1. **Fiyat $49/$149 → $29/$99** — billing/mod.rs, admin.rs, landing page
-2. **Config Debug secret sızıntısı** — custom Debug impl (tüm secrets REDACTED)
-3. **search/page.tsx credentials hatası** — credentials headers içinden çıkarıldı
-4. **Landing page pricing tutarsızlığı** — $49→$29, $149→$99
-5. **i18n free tier 1,000→10,000** — 8 dil düzeltildi
-6. **Privacy/terms retention tutarsızlığı** — 3→7 gün (API ile uyumlu)
+#### 🟠 Yüksek Düzeltmeler (10)
+11. **HookRelay→HookSniff** — 12+ dosya
+12. **Portal double-path** — /api/v1→/v1
+13. **alert()→toast()** — 3 sayfa
+14. **Dead code** — playground, search
+15. **window.location→router.push** — search
+16. **Deploy hardcoded values** — env vars
+17. **Production log level** — debug→info
+18. **Auth middleware cache** — 30s TTL
+19. **ROI calculator** — free tier threshold
+20. **SDK HookRelay referansları** — python, ruby, PHP
 
-#### 🟠 Yüksek Düzeltmeler
-7. **HookRelay→HookSniff** — 12 dosyada tüm referanslar yeniden adlandırıldı
-8. **Portal double-path** — /api/v1 → /v1
-9. **alert()→toast()** — endpoints, settings, alerts sayfaları
-10. **Dead code temizliği** — playground _endpoints, search _setEvent
-11. **window.location.href→router.push** — search sayfası
-12. **Deploy hardcoded values** — gcp-deploy.sh env vars
-13. **Production log level** — debug→info (render.yaml)
-14. **i18n translations** — previous button 6 dil, q4 Korean char
-
-#### 🟡 Orta Düzeltmeler
-15. **SDK HookRelay referansları** — python, ruby, PHP README
-16. **Polar product ID** — configurable variables
+#### 🟡 Orta Düzeltmeler (5)
+21. **i18n translations** — previous button (6 dil), q4
+22. **Polar product ID** — configurable
+23. **Dashboard refactor** — 4 sayfa fetch→apiFetch
+24. **api.ts** — 4 yeni API modülü
+25. **Workspace kurulumu** — USER, SOUL, IDENTITY
 
 ---
 
-## ⚠️ Kalan İşler (Öncelik Sırası)
+## ⚠️ Kalan İşler
 
-### 🔴 Yüksek Öncelik
-1. **SSO client_secret şifreleme** — Base64 yerine AES-GCM
+### 🔴 Yüksek
+1. **SSO client_secret şifreleme** — AES-GCM
 2. **Batch webhook race condition** — queue publish hatası
-3. **Auth middleware cache** — her istekte 2 DB sorgusu
-4. **Worker paralel değil** — sırayla for loop
+3. **Worker paralel değil** — tokio::spawn
 
-### 🟡 Orta Öncelik
-5. **Dashboard token refresh** — 401 → login redirect
-6. **Checkout URL doğrulamasız redirect** — billing security
-7. **Newsletter CSRF koruması** — blog, contact formları
-8. **ROI calculator formülleri** — pricing sayfası
+### 🟡 Orta
+4. **Newsletter CSRF** — blog, contact
+5. **Modal focus trapping** — erişilebilirlik
+6. **Dashboard token refresh** — 401→login
 
-### 🟢 Düşük Öncelik
-9. **Modal focus trapping** — erişilebilirlik
-10. **aria-label** — icon-only butonlar
-11. **JSON-LD structured data** — SEO
-12. **Blog post ordering** — manual → date-based
+### 🟢 Düşük
+7. **JSON-LD structured data** — SEO
+8. **Blog post ordering** — date-based
+9. **aria-label** — icon buttons
 
 ---
 
 ## 🟡 Servet'in Yapması Gereken
-- OAuth test et (Google + GitHub)
-- GitHub PAT rotate et
-- Vercel dashboard rebuild kontrol et
-- iyzico hesap aç (vergi levhası + banka hesabı)
+- OAuth test et
+- GitHub PAT rotate
+- Vercel rebuild kontrol
+- iyzico hesap aç

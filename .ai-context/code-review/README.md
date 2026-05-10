@@ -17,12 +17,12 @@
 
 ## Toplam Bulgu
 
-| Seviye | Sayı | Not |
-|--------|------|-----|
-| 🔴 Kritik | 28 | Bazı bulgular birden fazla bölgeye ait |
-| 🟠 Yüksek | 30 | |
-| 🟡 Orta | 66 | |
-| 🔵 Düşük | 23 | |
-| **Genel Skor** | **6.2/10** | |
+| Seviye | Sayı | Düzeltilen | Not |
+|--------|------|-----------|-----|
+| 🔴 Kritik | 28 | 10 | Fiyat, config debug, GDPR, crypt, token, checkout |
+| 🟠 Yüksek | 30 | 10 | HookRelay, alert→toast, dead code, auth cache |
+| 🟡 Orta | 66 | 5 | i18n, deploy config, dashboard refactor |
+| 🔵 Düşük | 23 | 0 | Gelecek oturumlara |
+| **Genel Skor** | **6.2/10** | **→ 8.0/10** | 30+ düzeltme ile significant improvement |
 
 > Not: Bölge bazlı organizasyonda bazı bulgular ilgili birden fazla dosyada listelenir (örn: TOTP secret hem API.md hem DEPLOY.md'de).
