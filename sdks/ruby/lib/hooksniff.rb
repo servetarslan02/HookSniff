@@ -16,4 +16,7 @@ module HookSniff
 
   # Default request timeout in seconds
   DEFAULT_TIMEOUT = 30
+
+  # Default maximum retries for transient failures
+  DEFAULT_MAX_RETRIES = 3
 end

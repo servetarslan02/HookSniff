@@ -139,13 +139,15 @@ public class HookSniff: @unchecked Sendable {
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
+    private let maxRetries: Int
 
     public let endpoints: EndpointsResource
     public let webhooks: WebhooksResource
 
-    public init(apiKey: String, baseUrl: String = "https://api.hooksniff.com/v1", timeout: TimeInterval = 30) {
+    public init(apiKey: String, baseUrl: String = "https://api.hooksniff.com/v1", timeout: TimeInterval = 30, maxRetries: Int = 3) {
         self.apiKey = apiKey
         self.baseUrl = baseUrl.hasSuffix("/") ? String(baseUrl.dropLast()) : baseUrl
+        self.maxRetries = maxRetries
 
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = timeout
@@ -159,66 +161,139 @@ public class HookSniff: @unchecked Sendable {
         self.webhooks = WebhooksResource(client: self)
     }
 
+    private func isRetryable(_ statusCode: Int) -> Bool {
+        return statusCode == 429 || statusCode >= 500
+    }
+
+    private func calculateBackoff(_ attempt: Int) -> UInt64 {
+        return min(1000 * UInt64(1 << attempt), 30_000) // milliseconds
+    }
+
     // MARK: - Internal API Request
 
     func request<T: Decodable>(_ method: String, path: String, body: [String: Any]? = nil) async throws -> T {
-        let url = URL(string: baseUrl + path)!
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("hooksniff-swift/0.2.0", forHTTPHeaderField: "User-Agent")
+        var lastError: Error?
 
-        if let body = body, ["POST", "PUT", "PATCH"].contains(method) {
-            request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        }
+        for attempt in 0...maxRetries {
+            let url = URL(string: baseUrl + path)!
+            var request = URLRequest(url: url)
+            request.httpMethod = method
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("hooksniff-swift/0.3.0", forHTTPHeaderField: "User-Agent")
 
-        let (data, response) = try await session.data(for: request)
-        let httpResponse = response as! HTTPURLResponse
-
-        if httpResponse.statusCode >= 400 {
-            let message: String
-            if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let error = errorJson["error"] as? [String: Any],
-               let msg = error["message"] as? String {
-                message = msg
-            } else {
-                message = "HTTP \(httpResponse.statusCode)"
+            if let body = body, ["POST", "PUT", "PATCH"].contains(method) {
+                request.httpBody = try JSONSerialization.data(withJSONObject: body)
             }
-            throw HookSniffError(statusCode: httpResponse.statusCode, code: nil, message: message)
+
+            let data: Data
+            let response: URLResponse
+            do {
+                (data, response) = try await session.data(for: request)
+            } catch {
+                lastError = error
+                if attempt < maxRetries {
+                    try await Task.sleep(nanoseconds: calculateBackoff(attempt) * 1_000_000)
+                    continue
+                }
+                throw HookSniffError(statusCode: 0, code: "NETWORK_ERROR", message: "Network error after \(attempt + 1) attempts: \(error.localizedDescription)")
+            }
+
+            let httpResponse = response as! HTTPURLResponse
+
+            if httpResponse.statusCode >= 400 {
+                let message: String
+                if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let error = errorJson["error"] as? [String: Any],
+                   let msg = error["message"] as? String {
+                    message = msg
+                } else {
+                    message = "HTTP \(httpResponse.statusCode)"
+                }
+
+                // Retry on 429 (respect Retry-After) and 5xx
+                if isRetryable(httpResponse.statusCode) && attempt < maxRetries {
+                    let delayMs: UInt64
+                    if httpResponse.statusCode == 429,
+                       let retryAfter = httpResponse.value(forHTTPHeaderField: "Retry-After"),
+                       let seconds = Int(retryAfter) {
+                        delayMs = UInt64(seconds) * 1000
+                    } else {
+                        delayMs = calculateBackoff(attempt)
+                    }
+                    try await Task.sleep(nanoseconds: delayMs * 1_000_000)
+                    continue
+                }
+
+                throw HookSniffError(statusCode: httpResponse.statusCode, code: nil, message: message)
+            }
+
+            return try decoder.decode(T.self, from: data)
         }
 
-        return try decoder.decode(T.self, from: data)
+        throw lastError ?? HookSniffError(statusCode: 0, code: "MAX_RETRIES", message: "Request failed after \(maxRetries + 1) retries")
     }
 
     func requestData(_ method: String, path: String, body: [String: Any]? = nil) async throws -> Data {
-        let url = URL(string: baseUrl + path)!
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("hooksniff-swift/0.2.0", forHTTPHeaderField: "User-Agent")
+        var lastError: Error?
 
-        if let body = body, ["POST", "PUT", "PATCH"].contains(method) {
-            request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        }
+        for attempt in 0...maxRetries {
+            let url = URL(string: baseUrl + path)!
+            var request = URLRequest(url: url)
+            request.httpMethod = method
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("hooksniff-swift/0.3.0", forHTTPHeaderField: "User-Agent")
 
-        let (data, response) = try await session.data(for: request)
-        let httpResponse = response as! HTTPURLResponse
-
-        if httpResponse.statusCode >= 400 {
-            let message: String
-            if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let error = errorJson["error"] as? [String: Any],
-               let msg = error["message"] as? String {
-                message = msg
-            } else {
-                message = "HTTP \(httpResponse.statusCode)"
+            if let body = body, ["POST", "PUT", "PATCH"].contains(method) {
+                request.httpBody = try JSONSerialization.data(withJSONObject: body)
             }
-            throw HookSniffError(statusCode: httpResponse.statusCode, code: nil, message: message)
+
+            let data: Data
+            let response: URLResponse
+            do {
+                (data, response) = try await session.data(for: request)
+            } catch {
+                lastError = error
+                if attempt < maxRetries {
+                    try await Task.sleep(nanoseconds: calculateBackoff(attempt) * 1_000_000)
+                    continue
+                }
+                throw HookSniffError(statusCode: 0, code: "NETWORK_ERROR", message: "Network error after \(attempt + 1) attempts: \(error.localizedDescription)")
+            }
+
+            let httpResponse = response as! HTTPURLResponse
+
+            if httpResponse.statusCode >= 400 {
+                let message: String
+                if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let error = errorJson["error"] as? [String: Any],
+                   let msg = error["message"] as? String {
+                    message = msg
+                } else {
+                    message = "HTTP \(httpResponse.statusCode)"
+                }
+
+                if isRetryable(httpResponse.statusCode) && attempt < maxRetries {
+                    let delayMs: UInt64
+                    if httpResponse.statusCode == 429,
+                       let retryAfter = httpResponse.value(forHTTPHeaderField: "Retry-After"),
+                       let seconds = Int(retryAfter) {
+                        delayMs = UInt64(seconds) * 1000
+                    } else {
+                        delayMs = calculateBackoff(attempt)
+                    }
+                    try await Task.sleep(nanoseconds: delayMs * 1_000_000)
+                    continue
+                }
+
+                throw HookSniffError(statusCode: httpResponse.statusCode, code: nil, message: message)
+            }
+
+            return data
         }
 
-        return data
+        throw lastError ?? HookSniffError(statusCode: 0, code: "MAX_RETRIES", message: "Request failed after \(maxRetries + 1) retries")
     }
 
     func requestRaw(_ method: String, path: String, body: [String: Any]? = nil) async throws -> Any {
