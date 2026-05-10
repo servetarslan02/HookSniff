@@ -24,17 +24,18 @@
 
 ---
 
-## 🟡 Sıradaki Oturum: #88 — Billing Business Logic
+## 🟡 Sıradaki Oturum: #89 — Monitoring & Observability
 
 ### Görev
-Billing iş mantığı düzeltmeleri.
+Monitoring ve observability iyileştirmeleri.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-058 | Proration yok | `api/src/routes/billing.rs` |
-| HS-059 | Grace period yok | `api/src/routes/billing.rs` |
-| HS-060 | Downgrade'de endpoint cleanup yok | `api/src/routes/billing.rs` |
+| HS-061 | Custom metric yok | `api/src/telemetry.rs` |
+| HS-062 | Simple exporter (sync) — batch olmalı | `api/src/telemetry.rs` |
+| HS-063 | Sampling strategy yok | `api/src/telemetry.rs` |
+| HS-064 | Response body PII trace'de loglanıyor | `api/src/` |
 
 ---
 
@@ -42,11 +43,11 @@ Billing iş mantığı düzeltmeleri.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 87 | ~~Database Indexes & Triggers~~ | ~~HS-054, HS-055, HS-056, HS-057~~ ✅ |
-| 88 | **Billing Business Logic** | HS-058, HS-059, HS-060 |
-| 89 | Monitoring & Observability | HS-061, HS-062, HS-063, HS-064 |
+| 88 | ~~Billing Business Logic~~ | ~~HS-058, HS-059, HS-060~~ ✅ |
+| 89 | **Monitoring & Observability** | HS-061, HS-062, HS-063, HS-064 |
 | 90 | i18n & Content | HS-065, HS-066, HS-067, HS-068, HS-069 |
 | 91 | Config & Build | HS-070, HS-071 |
+| 92 | P2 Remaining & Cleanup | — |
 
 ---
 
@@ -56,6 +57,6 @@ Billing iş mantığı düzeltmeleri.
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
 | 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 10 | 28 |
+| 🟡 P2 | 38 | 13 | 25 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **64** | **37** |
+| **TOPLAM** | **103** | **67** | **34** |
