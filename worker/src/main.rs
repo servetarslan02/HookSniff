@@ -297,289 +297,310 @@ async fn process_pending(
     let secret_map: std::collections::HashMap<uuid::Uuid, String> =
         secret_rows.into_iter().collect();
 
+    // Process all pending items concurrently using tokio::spawn
+    // Each delivery runs in its own task — one slow endpoint won't block others
+    let mut handles = Vec::with_capacity(items.len());
+
     for item in items {
-        let delivery_id = item.delivery_id;
-        let attempt = item.attempt_count + 1;
+        let pool = pool.clone();
+        let http_client = http_client.clone();
+        let secret_map = secret_map.clone();
 
-        // Each delivery is processed inside a structured span (OTel-aware)
-        let span = tracing::info_span!(
-            "delivery-attempt",
-            delivery_id = %delivery_id,
-            endpoint_id = %item.endpoint_id,
-            attempt = attempt,
-            endpoint_url = %item.endpoint_url
-        );
-        let _guard = span.enter();
+        let handle = tokio::spawn(async move {
+            let delivery_id = item.delivery_id;
+            let attempt = item.attempt_count + 1;
 
-        // Capture the trace_id for this span so we can store it in the DB
-        let trace_id = telemetry::current_trace_id();
+            // Each delivery is processed inside a structured span (OTel-aware)
+            let span = tracing::info_span!(
+                "delivery-attempt",
+                delivery_id = %delivery_id,
+                endpoint_id = %item.endpoint_id,
+                attempt = attempt,
+                endpoint_url = %item.endpoint_url
+            );
+            let _guard = span.enter();
 
-        tracing::info!(
-            "📤 Delivery {} (attempt {}/{})",
-            delivery_id,
-            attempt,
-            item.max_attempts
-        );
+            // Capture the trace_id for this span so we can store it in the DB
+            let trace_id = telemetry::current_trace_id();
 
-        // Get signing secret from batch-fetched map
-        let signing_secret = match secret_map.get(&item.endpoint_id) {
-            Some(s) if !s.is_empty() => s.clone(),
-            _ => {
-                tracing::error!(
-                    "❌ No signing_secret for endpoint {} — delivery {} will fail verification",
-                    item.endpoint_id,
-                    delivery_id
-                );
-                // Mark as dead letter since we can't sign the request
-                let mut tx = pool.begin().await?;
-                sqlx::query::<sqlx::Postgres>(
-                    "UPDATE webhook_queue SET status = 'dead_letter', processed_at = now() WHERE id = $1"
-                )
-                .bind(item.id)
-                .execute(&mut *tx)
-                .await?;
-
-                sqlx::query::<sqlx::Postgres>(
-                    "UPDATE deliveries SET status = 'failed', error_message = 'Endpoint signing secret missing' WHERE id = $1"
-                )
-                .bind(delivery_id)
-                .execute(&mut *tx)
-                .await?;
-
-                sqlx::query::<sqlx::Postgres>(
-                    r#"INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
-                       SELECT id, endpoint_id, customer_id, payload, 'Endpoint signing secret missing', $2
-                       FROM deliveries WHERE id = $1"#
-                )
-                .bind(delivery_id)
-                .bind(attempt)
-                .execute(&mut *tx)
-                .await?;
-
-                tx.commit().await?;
-                continue;
-            }
-        };
-
-        // Build WebhookMessage and delegate HTTP delivery to the delivery module
-        let webhook_msg = WebhookMessage {
-            delivery_id: delivery_id.to_string(),
-            endpoint_id: item.endpoint_id.to_string(),
-            endpoint_url: item.endpoint_url.clone(),
-            signing_secret,
-            payload: item.payload.clone(),
-            custom_headers: item.custom_headers.clone(),
-        };
-
-        let result = delivery::deliver_http(http_client, &webhook_msg, attempt).await?;
-
-        let status_code = result.status_code;
-        let response_body = &result.response_body;
-        let duration_ms = result.duration_ms;
-        let resp_headers = &result.response_headers;
-        let is_network_error = !result.error.is_empty();
-
-        // Derive error message and optional fields for record_attempt
-        let error_msg = if is_network_error {
-            result.error.clone()
-        } else {
-            format!("HTTP {}", status_code)
-        };
-        let attempt_status = if is_network_error {
-            None
-        } else {
-            Some(status_code)
-        };
-        let attempt_body = if is_network_error {
-            None
-        } else {
-            Some(response_body.as_str())
-        };
-        let attempt_headers = if is_network_error {
-            None
-        } else {
-            Some(resp_headers)
-        };
-
-        if result.success {
-            // ✅ Başarılı
             tracing::info!(
-                "✅ Delivery {} → HTTP {} ({}ms)",
+                "📤 Delivery {} (attempt {}/{})",
                 delivery_id,
-                status_code,
-                duration_ms
-            );
-
-            let mut tx = pool.begin().await?;
-
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                UPDATE webhook_queue
-                SET status = 'delivered', processed_at = now(), attempt_count = $1
-                WHERE id = $2
-                "#,
-            )
-            .bind(attempt)
-            .bind(item.id)
-            .execute(&mut *tx)
-            .await?;
-
-            // Update deliveries table
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                UPDATE deliveries
-                SET status = 'delivered', attempt_count = $1, response_status = $2,
-                    response_body = $3, last_attempt_at = now()
-                WHERE id = $4
-                "#,
-            )
-            .bind(attempt)
-            .bind(status_code)
-            .bind(response_body)
-            .bind(delivery_id)
-            .execute(&mut *tx)
-            .await?;
-
-            // Record attempt
-            record_attempt(
-                &mut tx,
-                delivery_id,
-                attempt,
-                AttemptRecord {
-                    status_code: attempt_status,
-                    response_body: attempt_body,
-                    duration_ms,
-                    error_message: None,
-                    trace_id: trace_id.as_deref(),
-                    response_headers: attempt_headers,
-                },
-            )
-            .await?;
-
-            // Reset endpoint failure streak on success
-            sqlx::query::<sqlx::Postgres>(
-                "UPDATE endpoints SET failure_streak = 0, avg_response_ms = $2 WHERE id = $1",
-            )
-            .bind(item.endpoint_id)
-            .bind(duration_ms)
-            .execute(&mut *tx)
-            .await?;
-
-            tx.commit().await?;
-        } else if attempt >= item.max_attempts {
-            // ❌ Max deneme aşıldı → dead letter
-            tracing::error!(
-                "❌ Delivery {} → {} — max attempts, moving to dead letter",
-                delivery_id,
-                error_msg
-            );
-
-            let mut tx = pool.begin().await?;
-
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                UPDATE webhook_queue
-                SET status = 'dead_letter', processed_at = now(), attempt_count = $1
-                WHERE id = $2
-                "#,
-            )
-            .bind(attempt)
-            .bind(item.id)
-            .execute(&mut *tx)
-            .await?;
-
-            // Move to dead_letters
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
-                SELECT id, endpoint_id, customer_id, payload, $2, $3
-                FROM deliveries WHERE id = $1
-                "#,
-            )
-            .bind(delivery_id)
-            .bind(&error_msg)
-            .bind(attempt)
-            .execute(&mut *tx)
-            .await?;
-
-            // Update delivery status
-            sqlx::query::<sqlx::Postgres>(
-                "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
-            )
-            .bind(delivery_id)
-            .bind(&error_msg)
-            .execute(&mut *tx)
-            .await?;
-
-            record_attempt(
-                &mut tx,
-                delivery_id,
-                attempt,
-                AttemptRecord {
-                    status_code: attempt_status,
-                    response_body: attempt_body,
-                    duration_ms,
-                    error_message: Some(&error_msg),
-                    trace_id: trace_id.as_deref(),
-                    response_headers: attempt_headers,
-                },
-            )
-            .await?;
-
-            // Increment endpoint failure streak on dead letter
-            sqlx::query::<sqlx::Postgres>(
-                "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1"
-            )
-            .bind(item.endpoint_id)
-            .execute(&mut *tx)
-            .await?;
-
-            tx.commit().await?;
-        } else {
-            // 🔄 Retry — exponential backoff
-            let delay = calculate_backoff(attempt);
-            let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
-
-            tracing::warn!(
-                "⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})",
-                delivery_id,
-                error_msg,
-                delay,
                 attempt,
                 item.max_attempts
             );
 
-            let mut tx = pool.begin().await?;
+            // Get signing secret from batch-fetched map
+            let signing_secret = match secret_map.get(&item.endpoint_id) {
+                Some(s) if !s.is_empty() => s.clone(),
+                _ => {
+                    tracing::error!(
+                        "❌ No signing_secret for endpoint {} — delivery {} will fail verification",
+                        item.endpoint_id,
+                        delivery_id
+                    );
+                    // Mark as dead letter since we can't sign the request
+                    let mut tx = pool.begin().await?;
+                    sqlx::query::<sqlx::Postgres>(
+                        "UPDATE webhook_queue SET status = 'dead_letter', processed_at = now() WHERE id = $1"
+                    )
+                    .bind(item.id)
+                    .execute(&mut *tx)
+                    .await?;
 
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                UPDATE webhook_queue
-                SET status = 'pending', attempt_count = $1, next_retry_at = $2
-                WHERE id = $3
-                "#,
-            )
-            .bind(attempt)
-            .bind(next_retry)
-            .bind(item.id)
-            .execute(&mut *tx)
-            .await?;
+                    sqlx::query::<sqlx::Postgres>(
+                        "UPDATE deliveries SET status = 'failed', error_message = 'Endpoint signing secret missing' WHERE id = $1"
+                    )
+                    .bind(delivery_id)
+                    .execute(&mut *tx)
+                    .await?;
 
-            record_attempt(
-                &mut tx,
-                delivery_id,
-                attempt,
-                AttemptRecord {
-                    status_code: attempt_status,
-                    response_body: attempt_body,
-                    duration_ms,
-                    error_message: Some(&format!("{} — retry scheduled", error_msg)),
-                    trace_id: trace_id.as_deref(),
-                    response_headers: attempt_headers,
-                },
-            )
-            .await?;
+                    sqlx::query::<sqlx::Postgres>(
+                        r#"INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                           SELECT id, endpoint_id, customer_id, payload, 'Endpoint signing secret missing', $2
+                           FROM deliveries WHERE id = $1"#
+                    )
+                    .bind(delivery_id)
+                    .bind(attempt)
+                    .execute(&mut *tx)
+                    .await?;
 
-            tx.commit().await?;
+                    tx.commit().await?;
+                    return Ok::<(), anyhow::Error>(());
+                }
+            };
+
+            // Build WebhookMessage and delegate HTTP delivery to the delivery module
+            let webhook_msg = WebhookMessage {
+                delivery_id: delivery_id.to_string(),
+                endpoint_id: item.endpoint_id.to_string(),
+                endpoint_url: item.endpoint_url.clone(),
+                signing_secret,
+                payload: item.payload.clone(),
+                custom_headers: item.custom_headers.clone(),
+            };
+
+            let result = delivery::deliver_http(&http_client, &webhook_msg, attempt).await?;
+
+            let status_code = result.status_code;
+            let response_body = &result.response_body;
+            let duration_ms = result.duration_ms;
+            let resp_headers = &result.response_headers;
+            let is_network_error = !result.error.is_empty();
+
+            // Derive error message and optional fields for record_attempt
+            let error_msg = if is_network_error {
+                result.error.clone()
+            } else {
+                format!("HTTP {}", status_code)
+            };
+            let attempt_status = if is_network_error {
+                None
+            } else {
+                Some(status_code)
+            };
+            let attempt_body = if is_network_error {
+                None
+            } else {
+                Some(response_body.as_str())
+            };
+            let attempt_headers = if is_network_error {
+                None
+            } else {
+                Some(resp_headers)
+            };
+
+            if result.success {
+                // ✅ Başarılı
+                tracing::info!(
+                    "✅ Delivery {} → HTTP {} ({}ms)",
+                    delivery_id,
+                    status_code,
+                    duration_ms
+                );
+
+                let mut tx = pool.begin().await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    r#"
+                    UPDATE webhook_queue
+                    SET status = 'delivered', processed_at = now(), attempt_count = $1
+                    WHERE id = $2
+                    "#,
+                )
+                .bind(attempt)
+                .bind(item.id)
+                .execute(&mut *tx)
+                .await?;
+
+                // Update deliveries table
+                sqlx::query::<sqlx::Postgres>(
+                    r#"
+                    UPDATE deliveries
+                    SET status = 'delivered', attempt_count = $1, response_status = $2,
+                        response_body = $3, last_attempt_at = now()
+                    WHERE id = $4
+                    "#,
+                )
+                .bind(attempt)
+                .bind(status_code)
+                .bind(response_body)
+                .bind(delivery_id)
+                .execute(&mut *tx)
+                .await?;
+
+                // Record attempt
+                record_attempt(
+                    &mut tx,
+                    delivery_id,
+                    attempt,
+                    AttemptRecord {
+                        status_code: attempt_status,
+                        response_body: attempt_body,
+                        duration_ms,
+                        error_message: None,
+                        trace_id: trace_id.as_deref(),
+                        response_headers: attempt_headers,
+                    },
+                )
+                .await?;
+
+                // Reset endpoint failure streak on success
+                sqlx::query::<sqlx::Postgres>(
+                    "UPDATE endpoints SET failure_streak = 0, avg_response_ms = $2 WHERE id = $1",
+                )
+                .bind(item.endpoint_id)
+                .bind(duration_ms)
+                .execute(&mut *tx)
+                .await?;
+
+                tx.commit().await?;
+            } else if attempt >= item.max_attempts {
+                // ❌ Max deneme aşıldı → dead letter
+                tracing::error!(
+                    "❌ Delivery {} → {} — max attempts, moving to dead letter",
+                    delivery_id,
+                    error_msg
+                );
+
+                let mut tx = pool.begin().await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    r#"
+                    UPDATE webhook_queue
+                    SET status = 'dead_letter', processed_at = now(), attempt_count = $1
+                    WHERE id = $2
+                    "#,
+                )
+                .bind(attempt)
+                .bind(item.id)
+                .execute(&mut *tx)
+                .await?;
+
+                // Move to dead_letters
+                sqlx::query::<sqlx::Postgres>(
+                    r#"
+                    INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+                    SELECT id, endpoint_id, customer_id, payload, $2, $3
+                    FROM deliveries WHERE id = $1
+                    "#,
+                )
+                .bind(delivery_id)
+                .bind(&error_msg)
+                .bind(attempt)
+                .execute(&mut *tx)
+                .await?;
+
+                // Update delivery status
+                sqlx::query::<sqlx::Postgres>(
+                    "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
+                )
+                .bind(delivery_id)
+                .bind(&error_msg)
+                .execute(&mut *tx)
+                .await?;
+
+                record_attempt(
+                    &mut tx,
+                    delivery_id,
+                    attempt,
+                    AttemptRecord {
+                        status_code: attempt_status,
+                        response_body: attempt_body,
+                        duration_ms,
+                        error_message: Some(&error_msg),
+                        trace_id: trace_id.as_deref(),
+                        response_headers: attempt_headers,
+                    },
+                )
+                .await?;
+
+                // Increment endpoint failure streak on dead letter
+                sqlx::query::<sqlx::Postgres>(
+                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1"
+                )
+                .bind(item.endpoint_id)
+                .execute(&mut *tx)
+                .await?;
+
+                tx.commit().await?;
+            } else {
+                // 🔄 Retry — exponential backoff
+                let delay = calculate_backoff(attempt);
+                let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
+
+                tracing::warn!(
+                    "⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})",
+                    delivery_id,
+                    error_msg,
+                    delay,
+                    attempt,
+                    item.max_attempts
+                );
+
+                let mut tx = pool.begin().await?;
+
+                sqlx::query::<sqlx::Postgres>(
+                    r#"
+                    UPDATE webhook_queue
+                    SET status = 'pending', attempt_count = $1, next_retry_at = $2
+                    WHERE id = $3
+                    "#,
+                )
+                .bind(attempt)
+                .bind(next_retry)
+                .bind(item.id)
+                .execute(&mut *tx)
+                .await?;
+
+                record_attempt(
+                    &mut tx,
+                    delivery_id,
+                    attempt,
+                    AttemptRecord {
+                        status_code: attempt_status,
+                        response_body: attempt_body,
+                        duration_ms,
+                        error_message: Some(&format!("{} — retry scheduled", error_msg)),
+                        trace_id: trace_id.as_deref(),
+                        response_headers: attempt_headers,
+                    },
+                )
+                .await?;
+
+                tx.commit().await?;
+            }
+
+            Ok::<(), anyhow::Error>(())
+        });
+
+        handles.push(handle);
+    }
+
+    // Wait for all concurrent deliveries to complete
+    for handle in handles {
+        if let Err(e) = handle.await {
+            tracing::error!("❌ Delivery task panicked: {:?}", e);
         }
     }
 
