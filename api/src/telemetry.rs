@@ -177,10 +177,10 @@ pub fn current_trace_id() -> String {
 
 // ── HS-061: Custom Metrics ──────────────────────────────────────────
 
-/// Global metrics registry — initialized once at startup.
-/// Uses tracing counters/histograms (OTel metrics API varies by version).
-/// Actual OTel metric export happens via the tracing -> OTel bridge.
-
+// Global metrics registry — initialized once at startup.
+// Uses tracing counters/histograms (OTel metrics API varies by version).
+// Actual OTel metric export happens via the tracing -> OTel bridge.
+//
 // Metrics are recorded via tracing macros (info!/warn!) which are
 // captured by the OTel tracing layer. For structured counters, we
 // use lightweight atomic counters that can be queried by health endpoints.
