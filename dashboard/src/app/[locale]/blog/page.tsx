@@ -198,7 +198,7 @@ const testimonials = [
 ];
 
 export default function BlogPage() {
-  const t = useTranslations(\'blog\');
+  const t = useTranslations('blog');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);

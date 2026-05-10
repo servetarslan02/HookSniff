@@ -108,7 +108,7 @@ const faq = [
 ];
 
 export default function BuildVsBuyContent() {
-  const t = useTranslations(\'buildVsBuy\');
+  const t = useTranslations('buildVsBuy');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   return (
