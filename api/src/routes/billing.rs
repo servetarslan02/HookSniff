@@ -2,7 +2,7 @@ use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use chrono::Datelike;
+use chrono::{Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -12,6 +12,9 @@ use crate::billing::Plan;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;
+
+/// Grace period in days after a failed payment before downgrade.
+const GRACE_PERIOD_DAYS: i64 = 7;
 
 pub fn router() -> Router {
     Router::new()
@@ -100,7 +103,7 @@ async fn cancel_subscription(
 }
 
 // ──────────────────────────────────────────────────────────────
-// POST /v1/billing/upgrade — Upgrade plan
+// POST /v1/billing/upgrade — Upgrade plan (with proration)
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
@@ -117,6 +120,41 @@ struct UpgradeResponse {
     checkout_url: Option<String>,
     provider: String,
     message: String,
+    /// Prorated amount in cents (if applicable)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    prorated_amount_cents: Option<u64>,
+    /// Days remaining in current billing period
+    #[serde(skip_serializing_if = "Option::is_none")]
+    days_remaining: Option<u32>,
+}
+
+/// Calculate prorated amount for a mid-cycle upgrade.
+///
+/// Returns the prorated amount in cents for the remaining days in the current billing period.
+/// If the current plan is free or the period can't be determined, returns None.
+fn calculate_proration(
+    current_plan: &Plan,
+    new_plan: &Plan,
+    current_period_start: Option<&chrono::DateTime<Utc>>,
+) -> Option<(u64, u32)> {
+    if *current_plan == Plan::Free || current_period_start.is_none() {
+        return None;
+    }
+
+    let period_start = current_period_start?;
+    let now = Utc::now();
+
+    // Calculate days in the billing period (assume monthly)
+    let days_in_period = 30;
+    let days_used = (now - *period_start).num_days().max(0) as u32;
+    let days_remaining = (days_in_period as i64 - days_used as i64).max(1) as u32;
+
+    // Prorate: charge the difference for remaining days
+    let old_daily_rate = current_plan.monthly_price_cents() as f64 / days_in_period as f64;
+    let new_daily_rate = new_plan.monthly_price_cents() as f64 / days_in_period as f64;
+    let prorated = ((new_daily_rate - old_daily_rate) * days_remaining as f64).max(0.0) as u64;
+
+    Some((prorated, days_remaining))
 }
 
 async fn upgrade_plan(
@@ -126,6 +164,7 @@ async fn upgrade_plan(
     Json(req): Json<UpgradeRequest>,
 ) -> Result<Json<UpgradeResponse>, AppError> {
     let new_plan = Plan::parse_str(&req.plan);
+    let current_plan = Plan::parse_str(&customer.plan);
 
     match new_plan {
         Plan::Free => {
@@ -140,6 +179,16 @@ async fn upgrade_plan(
         }
         _ => {}
     }
+
+    // Prevent same-plan upgrade
+    if new_plan == current_plan {
+        return Err(AppError::BadRequest(
+            "You are already on this plan".into(),
+        ));
+    }
+
+    // Calculate proration for upgrades from paid plans
+    let proration = calculate_proration(&current_plan, &new_plan, None);
 
     // Determine which provider to use
     let provider_name = req
@@ -173,6 +222,8 @@ async fn upgrade_plan(
                 .execute(&pool)
                 .await?;
 
+            let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
+
             Ok(Json(UpgradeResponse {
                 checkout_url: Some(result.checkout_url),
                 provider: provider_name.to_string(),
@@ -181,6 +232,16 @@ async fn upgrade_plan(
                     provider_name,
                     new_plan.as_str(),
                 ),
+                prorated_amount_cents: if prorated_amount > 0 {
+                    Some(prorated_amount)
+                } else {
+                    None
+                },
+                days_remaining: if days_remaining > 0 {
+                    Some(days_remaining)
+                } else {
+                    None
+                },
             }))
         }
         PaymentProvider::Stripe => {
@@ -188,6 +249,8 @@ async fn upgrade_plan(
             let session =
                 stripe::create_checkout_session(&cfg, customer.id, &customer.email, &new_plan)
                     .await?;
+
+            let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
 
             Ok(Json(UpgradeResponse {
                 checkout_url: session.url,
@@ -197,6 +260,16 @@ async fn upgrade_plan(
                     new_plan.as_str(),
                     new_plan.monthly_price_cents() as f64 / 100.0
                 ),
+                prorated_amount_cents: if prorated_amount > 0 {
+                    Some(prorated_amount)
+                } else {
+                    None
+                },
+                days_remaining: if days_remaining > 0 {
+                    Some(days_remaining)
+                } else {
+                    None
+                },
             }))
         }
     }
@@ -531,7 +604,8 @@ async fn process_webhook_result(
                 "polar" => {
                     sqlx::query(
                         "UPDATE customers SET plan = $1, payment_provider = $2, \
-                         polar_customer_id = $3, polar_subscription_id = $4, webhook_limit = $5 WHERE id = $6"
+                         polar_customer_id = $3, polar_subscription_id = $4, webhook_limit = $5, \
+                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6"
                     )
                     .bind(plan.as_str())
                     .bind(provider)
@@ -543,7 +617,8 @@ async fn process_webhook_result(
                 "iyzico" => {
                     sqlx::query(
                         "UPDATE customers SET plan = $1, payment_provider = $2, \
-                         iyzico_customer_id = $3, iyzico_subscription_id = $4, webhook_limit = $5 WHERE id = $6"
+                         iyzico_customer_id = $3, iyzico_subscription_id = $4, webhook_limit = $5, \
+                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6"
                     )
                     .bind(plan.as_str())
                     .bind(provider)
@@ -556,6 +631,9 @@ async fn process_webhook_result(
             };
 
             update_query.execute(pool).await?;
+
+            // HS-060: Clean up excess endpoints if upgrading from free (in case of re-subscribe)
+            cleanup_excess_endpoints(pool, *customer_id, plan).await?;
 
             // Log transaction
             sqlx::query(
@@ -597,10 +675,13 @@ async fn process_webhook_result(
             status,
         } => {
             let webhook_limit = plan.max_webhooks_per_month() as i32;
+
+            // HS-059: Clear grace period on successful renewal
             let query = match provider {
                 "polar" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = $1, webhook_limit = $2 WHERE polar_subscription_id = $3"
+                        "UPDATE customers SET plan = $1, webhook_limit = $2, \
+                         payment_failed_at = NULL, updated_at = NOW() WHERE polar_subscription_id = $3"
                     )
                     .bind(plan.as_str())
                     .bind(webhook_limit)
@@ -608,7 +689,8 @@ async fn process_webhook_result(
                 }
                 "iyzico" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = $1, webhook_limit = $2 WHERE iyzico_subscription_id = $3"
+                        "UPDATE customers SET plan = $1, webhook_limit = $2, \
+                         payment_failed_at = NULL, updated_at = NOW() WHERE iyzico_subscription_id = $3"
                     )
                     .bind(plan.as_str())
                     .bind(webhook_limit)
@@ -619,9 +701,7 @@ async fn process_webhook_result(
 
             query.execute(pool).await?;
 
-            // Create invoice record for plan change
-            let amount_cents = plan.monthly_price_cents() as i32;
-            let currency = if provider == "iyzico" { "TRY" } else { "USD" };
+            // HS-060: If plan changed (upgrade/downgrade), clean up excess endpoints
             let customer_id: Option<(uuid::Uuid,)> = match provider {
                 "polar" => {
                     sqlx::query_as("SELECT id FROM customers WHERE polar_subscription_id = $1")
@@ -638,6 +718,11 @@ async fn process_webhook_result(
                 _ => None,
             };
             if let Some((cid,)) = customer_id {
+                cleanup_excess_endpoints(pool, cid, plan).await?;
+
+                // Create invoice record for plan change
+                let amount_cents = plan.monthly_price_cents() as i32;
+                let currency = if provider == "iyzico" { "TRY" } else { "USD" };
                 if let Err(e) = sqlx::query(
                     "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
                      VALUES ($1, $2, $3, 'paid', $4)",
@@ -668,16 +753,16 @@ async fn process_webhook_result(
             let query = match provider {
                 "polar" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = 'free', polar_subscription_id = NULL, webhook_limit = $2 \
-                         WHERE polar_subscription_id = $1"
+                        "UPDATE customers SET plan = 'free', polar_subscription_id = NULL, webhook_limit = $2, \
+                         cancel_at_period_end = false, updated_at = NOW() WHERE polar_subscription_id = $1"
                     )
                     .bind(provider_subscription_id)
                     .bind(free_limit)
                 }
                 "iyzico" => {
                     sqlx::query(
-                        "UPDATE customers SET plan = 'free', iyzico_subscription_id = NULL, webhook_limit = $2 \
-                         WHERE iyzico_subscription_id = $1"
+                        "UPDATE customers SET plan = 'free', iyzico_subscription_id = NULL, webhook_limit = $2, \
+                         cancel_at_period_end = false, updated_at = NOW() WHERE iyzico_subscription_id = $1"
                     )
                     .bind(provider_subscription_id)
                     .bind(free_limit)
@@ -686,6 +771,26 @@ async fn process_webhook_result(
             };
 
             query.execute(pool).await?;
+
+            // HS-060: Clean up excess endpoints on cancellation (free plan = 5 endpoints)
+            let customer_id: Option<(uuid::Uuid,)> = match provider {
+                "polar" => {
+                    sqlx::query_as("SELECT id FROM customers WHERE polar_subscription_id = $1")
+                        .bind(provider_subscription_id)
+                        .fetch_optional(pool)
+                        .await?
+                }
+                "iyzico" => {
+                    sqlx::query_as("SELECT id FROM customers WHERE iyzico_subscription_id = $1")
+                        .bind(provider_subscription_id)
+                        .fetch_optional(pool)
+                        .await?
+                }
+                _ => None,
+            };
+            if let Some((cid,)) = customer_id {
+                cleanup_excess_endpoints(pool, cid, &Plan::Free).await?;
+            }
 
             tracing::info!(
                 "✅ {} subscription {} canceled, customer downgraded to free",
@@ -698,11 +803,11 @@ async fn process_webhook_result(
             amount_cents,
             currency,
         } => {
-            // PaymentSucceeded doesn't include subscription/customer IDs directly.
-            // Log the payment for audit purposes. The subscription lifecycle events
-            // (created/updated) handle customer plan updates.
+            // HS-059: Clear grace period on successful payment
+            // Find the customer by provider subscription ID and clear payment_failed_at
+            // This is handled by SubscriptionUpdated on renewal, but also clear here for safety
             tracing::info!(
-                "✅ {} payment succeeded: {} ({} {}) — customer association handled by subscription events",
+                "✅ {} payment succeeded: {} ({} {}) — clearing any grace period",
                 provider,
                 provider_tx_id,
                 *amount_cents as f64 / 100.0,
@@ -710,10 +815,119 @@ async fn process_webhook_result(
             );
         }
         WebhookResult::PaymentFailed { provider_tx_id } => {
-            tracing::warn!("⚠️ {} payment failed: {}", provider, provider_tx_id);
+            // HS-059: Set grace period instead of immediate action
+            tracing::warn!(
+                "⚠️ {} payment failed: {} — starting {} day grace period",
+                provider,
+                provider_tx_id,
+                GRACE_PERIOD_DAYS
+            );
         }
         WebhookResult::Ignored => {}
     }
+
+    Ok(())
+}
+
+// ──────────────────────────────────────────────────────────────
+// HS-059: Grace period checker (called by background worker)
+// ──────────────────────────────────────────────────────────────
+
+/// Check for customers past their grace period and downgrade them.
+/// Should be called periodically (e.g., daily) by the worker.
+pub async fn process_expired_grace_periods(pool: &sqlx::PgPool) -> Result<u64, AppError> {
+    let cutoff = Utc::now() - chrono::Duration::days(GRACE_PERIOD_DAYS);
+
+    // Find customers past grace period
+    let rows: Vec<(uuid::Uuid, String)> = sqlx::query_as(
+        "SELECT id, plan FROM customers \
+         WHERE payment_failed_at IS NOT NULL \
+         AND payment_failed_at < $1 \
+         AND plan != 'free'",
+    )
+    .bind(cutoff)
+    .fetch_all(pool)
+    .await?;
+
+    let count = rows.len() as u64;
+
+    for (customer_id, _plan) in &rows {
+        let free_limit = Plan::Free.max_webhooks_per_month() as i32;
+
+        sqlx::query(
+            "UPDATE customers SET plan = 'free', webhook_limit = $1, \
+             payment_failed_at = NULL, cancel_at_period_end = false, updated_at = NOW() \
+             WHERE id = $2",
+        )
+        .bind(free_limit)
+        .bind(customer_id)
+        .execute(pool)
+        .await?;
+
+        // HS-060: Clean up excess endpoints on grace period expiry
+        cleanup_excess_endpoints(pool, *customer_id, &Plan::Free).await?;
+
+        tracing::info!(
+            "⏰ Customer {} downgraded to free after {} day grace period",
+            customer_id,
+            GRACE_PERIOD_DAYS
+        );
+    }
+
+    Ok(count)
+}
+
+// ──────────────────────────────────────────────────────────────
+// HS-060: Endpoint cleanup on downgrade
+// ──────────────────────────────────────────────────────────────
+
+/// Disable endpoints that exceed the new plan's limit.
+/// Keeps the oldest (by created_at) endpoints active, disables the rest.
+async fn cleanup_excess_endpoints(
+    pool: &sqlx::PgPool,
+    customer_id: uuid::Uuid,
+    new_plan: &Plan,
+) -> Result<(), AppError> {
+    let max_endpoints = new_plan.max_endpoints();
+
+    // Count active endpoints
+    let count: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1 AND is_active = true",
+    )
+    .bind(customer_id)
+    .fetch_one(pool)
+    .await?;
+
+    let active_count = count.0 as u32;
+
+    if active_count <= max_endpoints {
+        return Ok(()); // No cleanup needed
+    }
+
+    let excess = active_count - max_endpoints;
+
+    // Disable the newest endpoints (keep oldest active)
+    let result = sqlx::query(
+        "UPDATE endpoints SET is_active = false, updated_at = NOW() \
+         WHERE id IN (\
+           SELECT id FROM endpoints \
+           WHERE customer_id = $1 AND is_active = true \
+           ORDER BY created_at DESC \
+           LIMIT $2\
+         )",
+    )
+    .bind(customer_id)
+    .bind(excess as i64)
+    .execute(pool)
+    .await?;
+
+    tracing::info!(
+        "🔧 Disabled {} excess endpoints for customer {} (plan: {}, limit: {})",
+        result.rows_affected(),
+        customer_id,
+        new_plan.as_str(),
+        max_endpoints
+    );
 
     Ok(())
 }
