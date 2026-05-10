@@ -14,7 +14,7 @@
 | 3 | Grafana admin password hardcoded | `monitoring/docker-compose.monitoring.yml` | GF_SECURITY_ADMIN_PASSWORD |
 | 4 | Grafana Cloud token hardcoded | `monitoring/otel-collector-config.yml` | authorization |
 | 5 | Helm default JWT_SECRET/HMAC_SECRET `"change-me-in-production"` | `deploy/helm/values.yaml` | env |
-| 6 | Polar product ID'leri hardcoded | `deploy/api-env.yaml` | POLAR_PRODUCT |
+| 6 | Polar product ID'leri hardcoded | `deploy/api-env.yaml` | POLAR_PRODUCT | ✅ Düzeltildi (2026-05-10) |
 | 7 | TOTP secret şifrelenmemiş | `migrations/033_totp_2fa.sql` | totp_secret |
 
 ## 🟠 Yüksek
