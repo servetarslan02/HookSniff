@@ -26,7 +26,7 @@
 | 3 | Terraform provider çalışmıyor (tüm CRUD stub) | `deploy/terraform-provider-hooksniff/endpoint_resource.go` |
 | 4 | Helm DB password inline (kubectl describe ile görünür) | `deploy/helm/templates/deployments.yaml` |
 | 5 | OTEL endpoint hardcoded (prod observability URL) | `deploy/api-env.yaml`, `worker-env.yaml` |
-| 6 | Production log level debug (`RUST_LOG=info,hooksniff=debug`) | `render.yaml` |
+| 6 | Production log level debug (`RUST_LOG=info,hooksniff=debug`) | `render.yaml` | ✅ Düzeltildi (2026-05-10) |
 
 ## 🟡 Orta
 
