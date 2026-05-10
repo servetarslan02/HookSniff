@@ -3,17 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, type Endpoint } from '@/lib/api';
+import { endpointsApi, inboundApi, type Endpoint } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-
-interface InboundConfig {
-  id: string;
-  provider: string;
-  endpoint_id: string | null;
-  enabled: boolean;
-  secret: string;
-  created_at: string;
-}
 
 const PROVIDERS = [
   { id: 'stripe', name: 'Stripe', icon: '💳', docs: 'https://stripe.com/docs/webhooks' },
@@ -35,41 +26,32 @@ export default function InboundPage() {
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
   const [webhookSecret, setWebhookSecret] = useState('');
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-
   useEffect(() => {
     if (!token) return;
     Promise.all([
       endpointsApi.list(token).catch(() => []),
-      fetch(`${API}/inbound/configs`, { headers: {}, credentials: 'include' as const }).then(r => r.ok ? r.json() : []).catch(() => []),
+      inboundApi.listConfigs(token).catch(() => []),
     ]).then(([eps, cfgs]) => {
       setEndpoints(eps);
       setConfigs(cfgs);
     }).finally(() => setLoading(false));
-  }, [token, API]);
+  }, [token]);
 
   const handleCreate = async () => {
     if (!token || !selectedProvider) return;
     try {
-      const res = await fetch(`${API}/inbound/configs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, credentials: 'include' as const,
-        body: JSON.stringify({
-          provider: selectedProvider,
-          endpoint_id: selectedEndpoint || null,
-          secret: webhookSecret,
-        }),
+      await inboundApi.createConfig(token, {
+        provider: selectedProvider,
+        endpoint_id: selectedEndpoint || null,
+        secret: webhookSecret,
       });
-      if (res.ok) {
-        toast(t('configCreated'), 'success');
-        setShowCreate(false);
-        // Reload
-        const cfgs = await fetch(`${API}/inbound/configs`, { headers: {}, credentials: 'include' as const }).then(r => r.json()).catch(() => []);
-        setConfigs(cfgs);
-      } else {
-        toast(t('configFailed'), 'error');
-      }
-    } catch { toast('Failed', 'error'); }
+      toast(t('configCreated'), 'success');
+      setShowCreate(false);
+      const cfgs = await inboundApi.listConfigs(token).catch(() => []);
+      setConfigs(cfgs);
+    } catch {
+      toast(t('configFailed'), 'error');
+    }
   };
 
   return (
