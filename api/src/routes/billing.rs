@@ -829,7 +829,7 @@ async fn process_webhook_result(
             if let Some(cid) = customer_id {
                 sqlx::query(
                     "UPDATE customers SET payment_failed_at = NOW(), updated_at = NOW() \
-                     WHERE id = $1 AND payment_failed_at IS NOT NULL",
+                     WHERE id = $1 AND payment_failed_at IS NULL",
                 )
                 .bind(cid)
                 .execute(pool)
