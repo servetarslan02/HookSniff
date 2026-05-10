@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 04:50 GMT+8
+> Son güncelleme: 2026-05-11 04:59 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -121,6 +121,19 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **HS-065 tamamlandı** — i18n: EN + TR dilleri aktif, 2083 anahtar senkron
 - 6 dil kaldırıldı (de/ja/pt-BR/es/fr/ko), sadece en + tr kaldı
 - Önceki oturumlarda 497→1 hardcoded string düşürülmüştü
+
+## Oturum 102 (2026-05-11 04:55 - 04:59) ✅
+- **Free tier optimizasyon araştırması** — Vercel, Resend, Neon, Grafana, Polar.sh limits
+- **Vercel Analytics + Speed Insights** — layout.tsx'a eklendi (paketler zaten kuruluymuş)
+- **Resend email provider** — `api/src/resend_email.rs` modülü eklendi (Gmail alternatıfı)
+  - RESEND_API_KEY ile aktif olur, yoksa Gmail API kullanılmaya devam
+  - Free: 100/gün, 3,000/ay
+- **Neon backup script** — `scripts/neon-backup.mjs` (Node.js, pg_dump gereksiz)
+  - pg modülü ile tüm tabloları INSERT olarak export eder
+- **Grafana alert'leri** — zaten hazırmış (5 kural: error rate, latency, delivery, API down, worker down)
+- **Polar.sh checkout** — zaten hazırmış (billing sayfası kodlanmış)
+- **Commits:** `5a6274c`, `8a79703` — main branch, push edildi
+- **Not:** Rust toolchain bu ortamda yok, compile test edilemedi (Servet'in ortamında doğrulanmalı)
 
 ## Oturum 99 (2026-05-11 03:10 - 03:50) ✅
 - **CSP hydration fix** — `script-src 'strict-dynamic'` (nonce yoktu) → `unsafe-inline` + `unsafe-eval`
