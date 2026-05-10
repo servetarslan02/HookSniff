@@ -295,10 +295,10 @@ async fn handle_inbound(
     .await?;
 
     let Some(config) = config else {
-        return Err(AppError::BadRequest(format!(
-            "No inbound config for provider '{}' — configure at /dashboard/inbound",
-            provider
-        )));
+        tracing::warn!("No inbound config for provider '{}'", provider);
+        return Err(AppError::BadRequest(
+            "No inbound configuration found for this provider".into(),
+        ));
     };
 
     // Verify signature — reject if secret is empty (signature verification must be configured)
@@ -475,10 +475,10 @@ async fn handle_inbound_to_endpoint(
         }
     } else {
         // No inbound config found — reject the request
-        return Err(AppError::BadRequest(format!(
-            "No inbound config for provider '{}' — configure at /dashboard/inbound",
-            provider
-        )));
+        tracing::warn!("No inbound config for provider '{}'", provider);
+        return Err(AppError::BadRequest(
+            "No inbound configuration found for this provider".into(),
+        ));
     }
 
     // Create delivery
