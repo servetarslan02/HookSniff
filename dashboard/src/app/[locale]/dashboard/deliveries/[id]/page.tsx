@@ -45,7 +45,7 @@ export default function DeliveryDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, id]);
+  }, [token, id, t]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
