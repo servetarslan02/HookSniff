@@ -1,36 +1,36 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 21:10 GMT+8
+> Son güncelleme: 2026-05-10 21:15 GMT+8
 
 ---
 
 ## ✅ Tamamlanan Oturumlar
 
-### Oturum 73-84 ✅
-- Rate Limiting → Frontend Component Issues (tüm P0 + P1 tamamlandı)
+### Oturum 73-86 ✅
+- Tüm P0 + P1 tamamlandı, P2 başlandı
 
-### Oturum 85 — Frontend Performance & Bundle ✅
-- 3 sorun düzeltildi, 14 dosya, 1 commit (afba344)
-- HS-045: lucide-react kaldırıldı (~150KB saved)
-- HS-046: 13 tabloya overflow-x-auto eklendi
-- HS-047: blog mega component not edildi (refactoring gerekli)
-- HS-048: dangerouslySetInnerHTML XSS güvenli (HTML-escape var)
+### Oturum 86 — Accessibility & Dark Mode ✅
+- 4 sorun düzeltildi, 2 dosya, 1 commit (5c2e540)
+- HS-049: ThemeToggle role="switch" + aria-checked
+- HS-050: ConfirmDialog focus trap — zaten mevcut
+- HS-051: Notification preferences localStorage persistence
+- HS-052: Dark mode 101/104 sayfa (3 redirect hariç)
+- HS-053: Footer docs + landing'de mevcut
 
 ---
 
-## 🔴 Sıradaki Oturum: #86 — Accessibility & Dark Mode
+## 🟡 Sıradaki Oturum: #87 — Database Indexes & Triggers
 
 ### Görev
-Erişilebilirlik ve karanlık mod düzeltmeleri.
+Veritabanı index ve trigger optimizasyonları.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-049 | Toggle accessibility — `role="switch"` eksik | `dashboard/src/components/` |
-| HS-050 | Delete modal'da focus trap yok | `dashboard/src/components/` |
-| HS-051 | `weeklyDigest` state local-only | `dashboard/src/app/` |
-| HS-052 | Dark mode eksik (birçok sayfa) | `dashboard/src/` |
-| HS-053 | Footer eksik (birçok sayfa) | `dashboard/src/` |
+| HS-054 | 20+ eksik DB index | `api/migrations/` |
+| HS-055 | `updated_at` trigger'ları eksik | `api/migrations/` |
+| HS-056 | UNIQUE constraint'ler eksik | `api/migrations/` |
+| HS-057 | Delivery index eksik | `api/migrations/` |
 
 ---
 
@@ -38,11 +38,11 @@ Erişilebilirlik ve karanlık mod düzeltmeleri.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 85 | ~~Frontend Performance & Bundle~~ | ~~HS-045, HS-046, HS-047, HS-048~~ ✅ |
-| 86 | **Accessibility & Dark Mode** | HS-049, HS-050, HS-051, HS-052, HS-053 |
-| 87 | Database Indexes & Triggers | HS-054, HS-055, HS-056, HS-057 |
+| 86 | ~~Accessibility & Dark Mode~~ | ~~HS-049, HS-050, HS-051, HS-052, HS-053~~ ✅ |
+| 87 | **Database Indexes & Triggers** | HS-054, HS-055, HS-056, HS-057 |
 | 88 | Billing Business Logic | HS-058, HS-059, HS-060 |
 | 89 | Monitoring & Observability | HS-061, HS-062, HS-063, HS-064 |
+| 90 | i18n & Content | HS-065, HS-066, HS-067, HS-068, HS-069 |
 
 ---
 
@@ -52,6 +52,6 @@ Erişilebilirlik ve karanlık mod düzeltmeleri.
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
 | 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 3 | 35 |
+| 🟡 P2 | 38 | 7 | 31 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **57** | **44** |
+| **TOPLAM** | **103** | **61** | **40** |

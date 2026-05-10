@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 21:10 GMT+8
+> Son güncelleme: 2026-05-10 21:15 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -51,6 +51,15 @@
 ### Sonraki Oturum
 - Oturum 82: Auth & Crypto Security (HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l)
 
+## 📝 Oturum 86 (2026-05-10 21:10 - 21:15 GMT+8) ✅
+1. Accessibility & Dark Mode: 4 sorun
+2. 2 dosya, 1 commit (5c2e540)
+3. HS-049: ThemeToggle role="switch" + aria-checked eklendi
+4. HS-050: ConfirmDialog focus trap zaten mevcut (doğrulandı)
+5. HS-051: Notification preferences localStorage persistence
+6. HS-052: Dark mode 101/104 sayfa (3 redirect/wrapper hariç)
+7. HS-053: Footer docs + landing'de mevcut, dashboard'da yok (beklendiği gibi)
+
 ## 📝 Oturum 85 (2026-05-10 21:07 - 21:10 GMT+8) ✅
 1. Frontend Performance & Bundle: 3 sorun
 2. 14 dosya, 1 commit (afba344)
@@ -98,7 +107,7 @@
 - **Oturum 80**: Error Classification (HS-018) ✅
 - **Oturum 81**: Database Constraints (HS-025, HS-026, HS-057) ✅
 - **Oturum 82**: Auth & Crypto Security + Ek düzeltmeler (26 sorun) ✅ KUSURSUZ
-- **Toplam**: 57 tamamlandı, 8 yanlış bulgu, 3 notlu, 35 bekliyor
+- **Toplam**: 61 tamamlandı, 8 yanlış bulgu, 3 notlu, 31 bekliyor
 
 ## 📝 Oturum 81 (2026-05-10 19:35 - 19:37 GMT+8) ✅
 1. Database Issues:
