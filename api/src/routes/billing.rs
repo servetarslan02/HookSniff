@@ -376,7 +376,10 @@ async fn handle_stripe_webhook(
     let webhook_secret = cfg.stripe_webhook_secret.as_deref().unwrap_or("");
 
     if webhook_secret.is_empty() {
-        tracing::warn!("Stripe webhook secret not configured, skipping verification");
+        tracing::error!("Stripe webhook secret not configured — rejecting webhook to prevent billing manipulation");
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "Billing webhook secret not configured"
+        )));
     }
 
     stripe::handle_webhook_event(
