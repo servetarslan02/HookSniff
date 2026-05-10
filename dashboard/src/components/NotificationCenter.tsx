@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { notificationsApi, type Notification } from '@/lib/api';
 
 export function NotificationCenter() {
   const { token } = useAuth();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -120,7 +121,7 @@ export function NotificationCenter() {
                   }`}
                   onClick={() => {
                     if (!n.read) handleMarkAsRead(n.id);
-                    if (n.link) window.location.href = n.link;
+                    if (n.link) router.push(n.link);
                   }}
                 >
                   <div className="flex items-start gap-3">

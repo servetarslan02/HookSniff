@@ -209,7 +209,7 @@ export default function DeliveriesPage() {
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('details')}</h3>
-              <button onClick={() => setSelected(null)} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
+              <button onClick={() => setSelected(null)} aria-label="Close details" className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label="ID" value={selected.id} mono />
