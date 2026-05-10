@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "hooksniff"
-  s.version     = "0.1.0"
+  s.version     = "0.2.0"
   s.summary     = "Official Ruby client for HookSniff webhook delivery service"
   s.description = "Ruby SDK for the HookSniff webhook delivery platform. Provides API client, webhook sending, delivery management, and signature verification."
   s.authors     = ["HookSniff"]
