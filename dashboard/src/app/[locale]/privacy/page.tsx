@@ -108,7 +108,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">7. Data Retention</h2>
             <div className="bg-gray-100 dark:bg-slate-800 rounded-xl p-4 my-4">
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto"><table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-slate-700">
                     <th className="text-left py-2 font-semibold text-gray-900 dark:text-white">Data Type</th>
@@ -137,7 +137,7 @@ export default function PrivacyPage() {
                     <td className="py-2">12 months (aggregated, non-identifying)</td>
                   </tr>
                 </tbody>
-              </table>
+              </table></div>
             </div>
           </section>
 

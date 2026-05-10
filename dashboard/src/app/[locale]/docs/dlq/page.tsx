@@ -101,7 +101,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
           DLQ entries are retained based on your plan:
         </p>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
@@ -114,7 +114,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">30 days</td><td className="px-4 py-3">5,000</td></tr>
               <tr><td className="px-4 py-3">Business</td><td className="px-4 py-3">90 days</td><td className="px-4 py-3">50,000</td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <p className="text-gray-600 dark:text-slate-400 mt-4">
           After retention expires, DLQ entries are permanently deleted. Export important data before it expires.
