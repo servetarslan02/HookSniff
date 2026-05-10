@@ -59,15 +59,15 @@ Her oturum şu şekilde işler:
 
 ## 🔴 P1 — YÜKSEK (Oturum 76-84)
 
-### Oturum 76: Dashboard Routing (EN KRİTİK FRONTEND)
+### Oturum 76: Dashboard Routing (EN KRİTİK FRONTEND) ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-030 | Dashboard routing çökmüş — 16 sayfa yanlış içerik | ⬜ |
-| HS-072 | `token!` non-null assertion → null token ile API çağrısı | ⬜ |
-| HS-075 | `store.tsx` token her zaman `'cookie'` → anlamsız Bearer | ⬜ |
+| HS-030 | Dashboard routing çökmüş — 16 sayfa yanlış içerik | ✅ 2026-05-10 |
+| HS-072 | `token!` non-null assertion → null token ile API çağrısı | ❌ Yanlış bulgu |
+| HS-075 | `store.tsx` token her zaman `'cookie'` → anlamsız Bearer | ❌ Yanlış bulgu |
 
-**Dosyalar:** `dashboard/src/app/[locale]/` route dosyaları, `dashboard/src/store.tsx`
-**Yaklaşım: Next.js route yapısını kontrol et, dynamic import'ları düzelt.
+**Dosyalar:** `dashboard/src/app/[locale]/dashboard/layout.tsx`
+**Yapılan:** `getLocalizedHref` double-prefix düzeltildi — `useLocale()` ile değiştirildi
 
 ### Oturum 77: Frontend-Backend API Uyumsuzluğu
 | ID | Sorun | Durum |
