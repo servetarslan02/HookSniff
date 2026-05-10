@@ -257,7 +257,7 @@ async fn handle_inbound(
 
     let mut customer = None;
     for c in &candidates {
-        if crate::auth::jwt::verify_api_key(api_key, &c.api_key_hash) {
+        if crate::middleware::verify_api_key(api_key, &c.api_key_hash) {
             customer = Some(c.clone());
             break;
         }
@@ -273,7 +273,7 @@ async fn handle_inbound(
         .await?;
 
         for (hash, customer_id) in &api_key_rows {
-            if crate::auth::jwt::verify_api_key(api_key, hash) {
+            if crate::middleware::verify_api_key(api_key, hash) {
                 customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
                     .bind(customer_id)
                     .fetch_optional(&pool)
@@ -407,7 +407,7 @@ async fn handle_inbound_to_endpoint(
 
     let mut customer = None;
     for c in &candidates {
-        if crate::auth::jwt::verify_api_key(api_key, &c.api_key_hash) {
+        if crate::middleware::verify_api_key(api_key, &c.api_key_hash) {
             customer = Some(c.clone());
             break;
         }
@@ -423,7 +423,7 @@ async fn handle_inbound_to_endpoint(
         .await?;
 
         for (hash, customer_id) in &api_key_rows {
-            if crate::auth::jwt::verify_api_key(api_key, hash) {
+            if crate::middleware::verify_api_key(api_key, hash) {
                 customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
                     .bind(customer_id)
                     .fetch_optional(&pool)
