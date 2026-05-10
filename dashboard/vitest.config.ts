@@ -2,8 +2,8 @@ import { defineConfig } from 'vitest/config';
 import path from 'path';
 
 export default defineConfig({
-  esbuild: {
-    jsx: 'automatic',
+  oxc: {
+    jsx: 'react-jsx',
     jsxImportSource: 'react',
   },
   test: {
