@@ -67,7 +67,7 @@ export default function EndpointSettingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, id, toast, router]);
+  }, [token, id, toast, router, t]);
 
   useEffect(() => { fetchEndpoint(); }, [fetchEndpoint]);
 
