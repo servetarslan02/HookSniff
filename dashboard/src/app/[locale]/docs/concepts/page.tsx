@@ -54,7 +54,7 @@ export default function ConceptsPage() {
           Failed deliveries are automatically retried using <strong>exponential backoff with jitter</strong>. The default schedule:
         </p>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 mb-4">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Attempt</th>
@@ -70,7 +70,7 @@ export default function ConceptsPage() {
               <tr><td className="px-4 py-3">5</td><td className="px-4 py-3">10 minutes</td><td className="px-4 py-3">~12.5m</td></tr>
               <tr><td className="px-4 py-3">6</td><td className="px-4 py-3">30 minutes</td><td className="px-4 py-3">~42.5m</td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <p className="text-gray-600 dark:text-slate-400">
           After <strong>6 failed attempts</strong>, the delivery is marked as failed and moved to the Dead Letter Queue. See <a href="/docs/retries" className="text-brand-600 hover:text-brand-700">Retries & DLQ</a> for details.

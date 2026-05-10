@@ -15,7 +15,7 @@ export default function RetriesPage() {
           Failed deliveries are retried up to <strong>6 times</strong> with increasing delays:
         </p>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 mb-6">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Attempt</th>
@@ -31,7 +31,7 @@ export default function RetriesPage() {
               <tr><td className="px-4 py-3 font-medium">5</td><td className="px-4 py-3">10 minutes</td><td className="px-4 py-3">~12.5 min</td></tr>
               <tr><td className="px-4 py-3 font-medium">6</td><td className="px-4 py-3">30 minutes</td><td className="px-4 py-3">~42.5 min</td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <p className="text-gray-600 dark:text-slate-400">
           Jitter (±25%) is applied to all delays to prevent <strong>thundering herd</strong> problems when many deliveries fail simultaneously.
@@ -67,7 +67,7 @@ export default function RetriesPage() {
 }`}
         />
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 mt-4">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Parameter</th>
@@ -81,7 +81,7 @@ export default function RetriesPage() {
               <tr><td className="px-4 py-3 font-mono text-sm">initial_delay_secs</td><td className="px-4 py-3">10</td><td className="px-4 py-3">Delay before first retry</td></tr>
               <tr><td className="px-4 py-3 font-mono text-sm">max_delay_secs</td><td className="px-4 py-3">3600</td><td className="px-4 py-3">Maximum delay between retries (1 hour)</td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </section>
 

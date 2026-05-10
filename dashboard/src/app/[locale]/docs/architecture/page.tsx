@@ -115,7 +115,7 @@ export default function ArchitecturePage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Technology Stack</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Layer</th>
@@ -133,7 +133,7 @@ export default function ArchitecturePage() {
               <tr><td className="px-4 py-3">Billing</td><td className="px-4 py-3">Stripe</td><td className="px-4 py-3">Payments</td></tr>
               <tr><td className="px-4 py-3">Deploy</td><td className="px-4 py-3">Fly.io</td><td className="px-4 py-3">Production hosting</td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </section>
 

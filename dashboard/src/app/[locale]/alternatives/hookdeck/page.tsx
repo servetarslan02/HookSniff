@@ -39,7 +39,7 @@ export default function HookdeckAlternativePage() {
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Looking for a Hookdeck alternative? HookSniff is open-source, self-hosted, and offers FIFO delivery and CloudEvents support.</p>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden mb-12">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead><tr className="border-b border-gray-200 dark:border-slate-800">
               <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">Feature</th>
               <th className="text-center py-3 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/30">🪝 HookSniff</th>
@@ -52,7 +52,7 @@ export default function HookdeckAlternativePage() {
                 <td className={`py-3 px-4 text-center ${r.winner === 'hookdeck' ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-gray-600 dark:text-slate-400'}`}>{r.hookdeck}</td>
               </tr>
             ))}</tbody>
-          </table>
+          </table></div>
         </div>
         <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20 mb-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">💰 Bottom line</h2>
