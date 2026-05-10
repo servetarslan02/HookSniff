@@ -122,7 +122,7 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - 6 dil kaldırıldı (de/ja/pt-BR/es/fr/ko), sadece en + tr kaldı
 - Önceki oturumlarda 497→1 hardcoded string düşürülmüştü
 
-## Oturum 102 (2026-05-11 04:55 - 04:59) ✅
+## Oturum 102 (2026-05-11 04:55 - 05:03) ✅
 - **Free tier optimizasyon araştırması** — Vercel, Resend, Neon, Grafana, Polar.sh limits
 - **Vercel Analytics + Speed Insights** — layout.tsx'a eklendi (paketler zaten kuruluymuş)
 - **Resend email provider** — `api/src/resend_email.rs` modülü eklendi (Gmail alternatıfı)
@@ -130,10 +130,17 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Free: 100/gün, 3,000/ay
 - **Neon backup script** — `scripts/neon-backup.mjs` (Node.js, pg_dump gereksiz)
   - pg modülü ile tüm tabloları INSERT olarak export eder
-- **Grafana alert'leri** — zaten hazırmış (5 kural: error rate, latency, delivery, API down, worker down)
+- **Grafana alert deploy script** — `scripts/deploy-grafana-alerts.sh`
+  - 9 alert rule + email contact point + notification policy
+  - GRAFANA_URL ve GRAFANA_API_KEY gerektirir
+- **GitHub Actions workflow'ları** — push edilemedi (token scope eksik)
+  - backup.yml: günlük 03:00 UTC, neon-backup.mjs kullanır
+  - deploy-alerts.yml: monitoring/alerts/ değişince otomatik deploy
+  - Token'a `workflow` scope'u eklenmeli
+- **Grafana alert'leri** — zaten hazırmış (9 kural: error rate, latency, delivery, API/worker down, queue, DB, memory, disk)
 - **Polar.sh checkout** — zaten hazırmış (billing sayfası kodlanmış)
-- **Commits:** `5a6274c`, `8a79703` — main branch, push edildi
-- **Not:** Rust toolchain bu ortamda yok, compile test edilemedi (Servet'in ortamında doğrulanmalı)
+- **Commits:** `5a6274c`, `8a79703`, `42f5c80` — main branch
+- **Not:** Rust toolchain bu ortamda yok, compile test edilemedi
 
 ## Oturum 99 (2026-05-11 03:10 - 03:50) ✅
 - **CSP hydration fix** — `script-src 'strict-dynamic'` (nonce yoktu) → `unsafe-inline` + `unsafe-eval`
