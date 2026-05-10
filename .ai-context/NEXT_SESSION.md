@@ -24,19 +24,16 @@
 
 ---
 
-## 🟡 Sıradaki Oturum: #90 — i18n & Content
+## 🟡 Sıradaki Oturum: #91 — Config & Build
 
 ### Görev
-Çoklu dil desteği ve içerik düzeltmeleri.
+Build ve konfigürasyon iyileştirmeleri.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-065 | 920+ hardcoded İngilizce string | `dashboard/src/` |
-| HS-066 | 71 sayfada metadata eksik | `dashboard/src/` |
-| HS-067 | Müşteri hikayeleri kurgusal | `dashboard/src/` |
-| HS-068 | Türkçe çeviri hataları | `dashboard/src/` |
-| HS-069 | FAQ eksik | `dashboard/src/` |
+| HS-070 | `next.config.js`'de `output: 'standalone'` eksik | `dashboard/next.config.js` |
+| HS-071 | HSTS header eksik | `dashboard/next.config.js` |
 
 ---
 
@@ -44,11 +41,11 @@
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 89 | ~~Monitoring & Observability~~ | ~~HS-061, HS-062, HS-063, HS-064~~ ✅ |
-| 90 | **i18n & Content** | HS-065, HS-066, HS-067, HS-068, HS-069 |
-| 91 | Config & Build | HS-070, HS-071 |
+| 90 | ~~i18n & Content~~ | ~~HS-065, HS-066, HS-067, HS-068, HS-069~~ ✅ (kısmi) |
+| 91 | **Config & Build** | HS-070, HS-071 |
 | 92 | P2 Remaining & Cleanup | — |
 | 93 | Git & Repository Cleanup | HS-077, HS-078, HS-079, HS-080 |
+| 94 | SDK & Test Coverage | HS-081, HS-082, HS-083, HS-084 |
 
 ---
 
@@ -58,6 +55,6 @@
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
 | 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 17 | 21 |
+| 🟡 P2 | 38 | 18 | 20 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **71** | **30** |
+| **TOPLAM** | **103** | **72** | **29** |
