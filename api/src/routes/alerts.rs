@@ -79,6 +79,35 @@ async fn create_alert(
     Extension(customer): Extension<Customer>,
     Json(req): Json<CreateAlertRequest>,
 ) -> Result<Json<AlertRule>, AppError> {
+    // HS-038k: Validate condition string against allowed values
+    let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
+    if !valid_conditions.contains(&req.condition.as_str()) {
+        return Err(AppError::BadRequest(format!(
+            "Invalid condition '{}'. Must be one of: {}",
+            req.condition,
+            valid_conditions.join(", ")
+        )));
+    }
+
+    // Validate threshold is positive
+    if req.threshold <= 0 {
+        return Err(AppError::BadRequest(
+            "Threshold must be a positive integer".into(),
+        ));
+    }
+
+    // Validate channels
+    let valid_channels = ["slack", "email", "webhook"];
+    for ch in &req.channels {
+        if !valid_channels.contains(&ch.as_str()) {
+            return Err(AppError::BadRequest(format!(
+                "Invalid channel '{}'. Must be one of: {}",
+                ch,
+                valid_channels.join(", ")
+            )));
+        }
+    }
+
     let channels_json = serde_json::json!(req.channels);
 
     let alert = sqlx::query_as::<_, (Uuid, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(

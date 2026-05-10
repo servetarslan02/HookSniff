@@ -292,8 +292,11 @@ impl PaymentProviderImpl for PolarProvider {
         Self::verify_signature(body, sig_header, &self.config.webhook_secret)?;
 
         // Parse event
-        let event: PolarWebhookEvent = serde_json::from_str(body)
-            .map_err(|e| AppError::BadRequest(format!("Invalid Polar event: {}", e)))?;
+        let event: PolarWebhookEvent = serde_json::from_str(body).map_err(|e| {
+            // HS-038l: Log details internally, return generic message to client
+            tracing::warn!("Invalid Polar webhook payload: {:?}", e);
+            AppError::BadRequest("Invalid webhook payload".into())
+        })?;
 
         tracing::info!("Polar webhook: {}", event.event_type);
 
@@ -301,7 +304,8 @@ impl PaymentProviderImpl for PolarProvider {
             "subscription.created" => {
                 let sub: PolarSubscription =
                     serde_json::from_value(event.data.clone()).map_err(|e| {
-                        AppError::BadRequest(format!("Invalid subscription data: {}", e))
+                        tracing::warn!("Invalid Polar subscription data: {:?}", e);
+                        AppError::BadRequest("Invalid webhook data".into())
                     })?;
 
                 let customer_id = sub
@@ -310,7 +314,8 @@ impl PaymentProviderImpl for PolarProvider {
                     .or(sub.customer_id.as_deref())
                     .and_then(|s| Uuid::parse_str(s).ok())
                     .ok_or_else(|| {
-                        AppError::BadRequest("Missing customer_id in Polar event".into())
+                        tracing::warn!("Missing customer_id in Polar subscription event");
+                        AppError::BadRequest("Invalid webhook data".into())
                     })?;
 
                 let plan = sub
@@ -329,7 +334,8 @@ impl PaymentProviderImpl for PolarProvider {
             "subscription.updated" => {
                 let sub: PolarSubscription =
                     serde_json::from_value(event.data.clone()).map_err(|e| {
-                        AppError::BadRequest(format!("Invalid subscription data: {}", e))
+                        tracing::warn!("Invalid Polar subscription update data: {:?}", e);
+                        AppError::BadRequest("Invalid webhook data".into())
                     })?;
 
                 let sub_id = sub.id.unwrap_or_default();
@@ -349,7 +355,8 @@ impl PaymentProviderImpl for PolarProvider {
             "subscription.canceled" | "subscription.revoked" => {
                 let sub: PolarSubscription =
                     serde_json::from_value(event.data.clone()).map_err(|e| {
-                        AppError::BadRequest(format!("Invalid subscription data: {}", e))
+                        tracing::warn!("Invalid Polar subscription cancel data: {:?}", e);
+                        AppError::BadRequest("Invalid webhook data".into())
                     })?;
 
                 Ok(WebhookResult::SubscriptionCanceled {
