@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 02:12 GMT+8
+> Son güncelleme: 2026-05-11 02:40 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -104,16 +104,18 @@
 - **Commits:** `e753a03`→`eee1de6` (8 push)
 - **Kalan 7:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
 
-## Oturum 97 (2026-05-11 01:58 - 02:12) ✅
-- **HS-088: AuthGuard component test** — 16 test yazıldı (loading, redirect, authenticated, transition, edge cases)
+## Oturum 97 (2026-05-11 01:58 - 02:40) ✅
+- **HS-088: AuthGuard component test** — 16 test yazıldı
 - **HS-082: SDK version mismatch** — tüm SDK'lar 0.2.0'a eşitlendi
-  - Node, Python, Ruby, PHP: 0.1.0 → 0.2.0
-  - Java, Kotlin: 0.3.0 → 0.2.0
-  - Rust, C#, Elixir: zaten 0.2.0
-  - Publish guide güncellendi
-- **Testler:** API 979/979, Worker 48/48, Dashboard 3132/3132 (137 dosya)
-- **Commit:** `425ce6c` — main branch
-- **Kalan 5:** HS-065 (i18n), HS-084 (iyzico), HS-085 (db.rs), HS-089 (SSO test - zaten var, 47 test), SDK publish
+- **HS-038: HOOKRELAY→HOOKSNIFF** — 6 referans temizlendi (docs sayfaları)
+- **HS-083: OpenAPI schema mismatch** — 29 endpoint eklendi (87→116)
+- **HS-084: iyzico iptal** — Polar.sh devam, kod pasif
+- **HS-090: SDK otomatik güncelleme** — backlog'a eklendi
+- **Clippy düzeltmeleri** — 7 uyarı sıfırlandı (telemetry, audit_log, auth, sso, worker)
+- **Fiyatlandırma kararı** — Polar.sh multi-currency, TR ₺, Avrupa $
+- **Testler:** API 979/979, Worker 48/48, Dashboard 3132/3132, Clippy 0 uyarı
+- **Commits:** `425ce6c`→`42a2eb1` (6 push)
+- **Kalan 3:** HS-065 (i18n), HS-085 (db.rs test), HS-090 (SDK otomatik güncelleme)
 
 ## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000
