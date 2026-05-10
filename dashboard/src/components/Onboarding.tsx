@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
 
 interface Step {
   title: string;
@@ -61,6 +62,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [visible, setVisible] = useState(false);
   const t = useTranslations('onboarding');
+  const router = useRouter();
 
   useEffect(() => {
     const completed = localStorage.getItem(STORAGE_KEY);
@@ -95,14 +97,14 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
       description: t('createEndpointDesc'),
       illustration: <EndpointIllustration />,
       cta: t('createEndpointCta'),
-      ctaAction: () => window.location.href = '/dashboard/endpoints',
+      ctaAction: () => router.push('/dashboard/endpoints'),
     },
     {
       title: t('sendWebhook'),
       description: t('sendWebhookDesc'),
       illustration: <WebhookIllustration />,
       cta: t('sendWebhookCta'),
-      ctaAction: () => window.location.href = '/dashboard/playground',
+      ctaAction: () => router.push('/dashboard/playground'),
     },
     {
       title: t('monitorDeliveries'),
