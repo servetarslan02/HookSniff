@@ -377,7 +377,7 @@ export default function BillingPage() {
           </div>
         ) : invoices.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <p className="text-sm text-gray-500 dark:text-slate-400">No invoices yet.</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t('noInvoices')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

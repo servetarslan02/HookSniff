@@ -110,7 +110,7 @@ export default function AboutPage() {
         {/* CTA */}
         <div className="text-center bg-gradient-to-r from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-8">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Ready to get started?</h2>
-          <p className="text-gray-600 dark:text-slate-400 mb-6">Join developers who trust HookSniff for their webhook delivery.</p>
+          <p className="text-gray-600 dark:text-slate-400 mb-6">{t('cta')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/dashboard" className="bg-brand-600 dark:bg-brand-500 text-white px-8 py-3 rounded-xl font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
               Start Free

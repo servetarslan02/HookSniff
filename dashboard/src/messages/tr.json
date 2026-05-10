@@ -109,7 +109,8 @@
       "24h": "24 Saat",
       "7d": "7 Gün",
       "30d": "30 Gün"
-    }
+    },
+    "webhookDashboard": "Webhook Paneli"
   },
   "endpoints": {
     "title": "Endpoint'ler",
@@ -137,7 +138,10 @@
       "active": "Aktif",
       "paused": "Duraklatılmış",
       "disabled": "Devre Dışı"
-    }
+    },
+    "urlLabel": "URL",
+    "descriptionLabel": "Açıklama",
+    "settingsTitle": "Ayarlar"
   },
   "deliveries": {
     "title": "Teslimatlar",
@@ -304,7 +308,10 @@
     "memberRemoved": "Üye kaldırıldı",
     "roleUpdated": "Rol güncellendi",
     "teamCreated": "Ekip oluşturuldu!",
-    "invitationSent": "Davet gönderildi!"
+    "invitationSent": "Davet gönderildi!",
+    "teamNameLabel": "Ekip Adı",
+    "emailLabel": "E-posta",
+    "roleLabel": "Rol"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -334,7 +341,9 @@
     "sendSuccess": "Webhook gönderildi!",
     "sendFailed": "Webhook gönderilemedi",
     "responseTitle": "Yanıt",
-    "sendToSeeResponse": "Yanıtı görmek için bir webhook gönderin"
+    "sendToSeeResponse": "Yanıtı görmek için bir webhook gönderin",
+    "endpointLabel": "Endpoint",
+    "eventTypeLabel": "Olay Türü"
   },
   "analytics": {
     "title": "Analitik",
@@ -385,7 +394,8 @@
     "language": "Dil",
     "theme": "Tema",
     "timezone": "Saat Dilimi",
-    "noApiKey": "API anahtarı yok — almak için kayıt olun"
+    "noApiKey": "API anahtarı yok — almak için kayıt olun",
+    "deletePlaceholder": "SİL"
   },
   "billing": {
     "title": "Faturalandırma",
@@ -428,7 +438,8 @@
     "plans.business": "İşletme",
     "plans.freeLimit": "10.000 webhook/ay",
     "plans.proLimit": "50.000 webhook/ay",
-    "plans.businessLimit": "500.000 webhook/ay"
+    "plans.businessLimit": "500.000 webhook/ay",
+    "noInvoices": "Henüz fatura yok."
   },
   "auth": {
     "login": "Giriş Yap",
@@ -450,7 +461,8 @@
     "name": "İsim",
     "namePlaceholder": "Adınız",
     "emailPlaceholder": "siz@ornek.com",
-    "passwordPlaceholder": "••••••••"
+    "passwordPlaceholder": "••••••••",
+    "orContinueWith": "Veya şununla devam edin"
   },
   "docs": {
     "gettingStarted": "Başlarken",
@@ -539,7 +551,9 @@
     "plan": "Plan",
     "free": "Ücretsiz",
     "pro": "Pro",
-    "business": "Business"
+    "business": "Business",
+    "pythonSdk": "Python SDK",
+    "nodeSdk": "Node.js SDK"
   },
   "status": {
     "title": "HookSniff Durumu",
@@ -572,12 +586,202 @@
   "terms": {
     "title": "Hizmet Şartları",
     "lastUpdated": "Son güncelleme: 6 Mayıs 2026",
-    "nav": "Hizmet Şartları"
+    "nav": "Hizmet Şartları",
+    "s1Title": "1. Şartların Kabulü",
+    "s1Text": "HookSniff'e (\"Hizmet\") erişerek veya kullanarak, bu Hizmet Şartları'na (\"Şartlar\") bağlı kalmayı kabul edersiniz. Kabul etmiyorsanız Hizmeti kullanmayın.",
+    "s2Title": "2. Hizmet Açıklaması",
+    "s2Text": "HookSniff, geliştiriciler için webhook teslimat altyapısı sağlar. Hizmet; webhook teslimatı, yeniden deneme mantığı, imza doğrulama, izleme paneli ve ilgili API'leri içerir.",
+    "s3Title": "3. Hesap Kaydı",
+    "s3Items": [
+      "Doğru kayıt bilgileri sağlamalısınız",
+      "Hesap bilgilerinizin güvenliğini sağlamak sizin sorumluluğunuzdadır",
+      "Hizmeti kullanmak için en az 18 yaşında olmalısınız",
+      "Kişi veya kuruluş başına bir hesap"
+    ],
+    "s4Title": "4. API Anahtarları ve Güvenlik",
+    "s4Items": [
+      "API anahtarları hesabınıza atanır ve gizli tutulmalıdır",
+      "API anahtarlarınız altında gerçekleşen tüm faaliyetlerden siz sorumlusunuzdur",
+      "API anahtarlarınızın yetkisiz kullanımından şüphelenirseniz hemen bize bildirin",
+      "Güvenlik nedenleriyle API anahtarlarını değiştirebilir veya iptal edebiliriz"
+    ],
+    "s5Title": "5. Kabul Edilebilir Kullanım",
+    "s5Intro": "ŞUNLARI yapmamayı kabul edersiniz:",
+    "s5Items": [
+      "Hizmeti herhangi bir yasadışı amaç için kullanmak",
+      "Dahili, özel veya kötü amaçlı endpointlere webhook göndermek (SSRF)",
+      "Hız limitlerini veya güvenlik önlemlerini aşmaya çalışmak",
+      "Hizmeti yetkisiz olarak yeniden satmak veya dağıtmak",
+      "Hizmeti spam, kötü amaçlı yazılım veya kimlik avı içeriği göndermek için kullanmak",
+      "Hizmete veya altyapısına müdahale etmek veya onu kesintiye uğratmak"
+    ],
+    "s6Title": "6. Webhook Payloadları",
+    "s6Items": [
+      "Hizmet aracılığıyla gönderdiğiniz tüm verilerin mülkiyeti size aittir",
+      "Webhook payloadlarını yalnızca teslimat amaçlı işleriz",
+      "Webhook verilerinizi incelemez, analiz etmez veya satmayız",
+      "Payloadlar teslimat ve yeniden deneme amacıyla geçici olarak saklanır, ardından saklama politikasına göre silinir"
+    ],
+    "s7Title": "7. Hizmet Seviyesi",
+    "s7Items": [
+      "Hizmet \"en iyi çaba\" temelinde sağlanır",
+      "%100 teslimat veya uptime garanti etmeyiz",
+      "Ücretli planlar, ilgili fiyatlandırma katmanında belirtilen SLA şartlarını içerir",
+      "Makul önceden bildirimle planlı bakım gerçekleştirebiliriz"
+    ],
+    "s8Title": "8. Veri Saklama",
+    "s8Items": [
+      "Webhook teslimat günlükleri planınızın saklama süresine göre tutulur",
+      "Ücretsiz plan: 7 gün",
+      "Pro plan: 30 gün",
+      "Business plan: 90 gün",
+      "Saklama süresinden sonra veriler otomatik olarak kalıcı olarak silinir"
+    ],
+    "s9Title": "9. Ödeme ve Faturalama",
+    "s9Items": [
+      "Ücretli planlar aylık olarak önceden faturalanır",
+      "Tüm ücretler yasanın gerektirdiği durumlar dışında iade edilmez",
+      "30 gün önceden bildirimle fiyat değişikliği yapabiliriz",
+      "Ödeme yapılmaması hesap askıya alınmasına veya Ücretsiz plana düşürülmeye yol açabilir",
+      "Plan limitlerinizi aşarsanız ek ücretler uygulanabilir"
+    ],
+    "s10Title": "10. Fikri Mülkiyet",
+    "s10Items": [
+      "Hizmet, kodu, tasarımı ve dokümantasyonu dahil olmak üzere bizim fikri mülkiyetimizdir",
+      "Verileriniz ve içeriğiniz üzerindeki tüm hakları saklı tutarsınız",
+      "Verilerinizi yalnızca Hizmeti sağlamak için işlemek üzere sınırlı bir lisans verirsiniz"
+    ],
+    "s11Title": "11. Sorumluluk Sınırlandırması",
+    "s11MaxExtent": "YASANIN İZİN VERDİĞİ AZAMİ ÖLÇÜDE:",
+    "s11Items": [
+      "HİÇBİR TÜRDE GARANTİ OLMAKSIZIN \"OLDUĞU GİBİ\" SAĞLANIR",
+      "HERHANGİ BİR DOLAYLI, ARIZİ, ÖZEL, SONUÇTA DOĞAN VEYA CEZAİ ZARARDAN SORUMLU OLMAYACAĞIZ",
+      "TOPLAM SORUMLULUĞUMUZ, İDDİADAN ÖNCEKİ 12 AY İÇİNDE BİZE ÖDEDİĞİNİZ TUTARI AŞMAYACAKTIR",
+      "VERİ KAYBI, KAR KAYBI VEYA İŞ KESINTISINDEN SORUMLU OLMAYACAĞIZ"
+    ],
+    "s12Title": "12. Tazminat",
+    "s12Intro": "Şu durumlardan kaynaklanan herhangi bir iddia, kayıp veya zarara karşı bizi tazmin etmeyi ve zararsız tutmayı kabul edersiniz:",
+    "s12Items": [
+      "Hizmeti kullanmanız",
+      "Bu Şartları ihlal etmeniz",
+      "Herhangi bir üçüncü tarafın haklarını ihlal etmeniz",
+      "Hizmet aracılığıyla gönderdiğiniz webhook payloadları"
+    ],
+    "s13Title": "13. Fesih",
+    "s13Items": [
+      "Hesabınızı istediğiniz zaman panel üzerinden sonlandırabilirsiniz",
+      "Bu Şartları ihlal etmeniz durumunda hesabınızı sonlandırabilir veya askıya alabiliriz",
+      "30 gün önceden bildirimle Hizmeti durdurabiliriz",
+      "Fesih üzerine verileriniz 30 gün içinde silinecektir"
+    ],
+    "s14Title": "14. Değişiklikler",
+    "s14Text": "Bu Şartları zaman zaman güncelleyebiliriz. Önemli değişiklikleri e-posta veya panel bildirimi ile size bildiririz. Değişikliklerden sonra kullanıma devam etmeniz kabul anlamına gelir.",
+    "s15Title": "15. Geçerli Hukuk",
+    "s15Text": "Bu Şartlar Türkiye yasalarına tabidir. Herhangi bir uyuşmazlık Türkiye mahkemelerinde çözülecektir.",
+    "s16Title": "16. İletişim",
+    "s16Text": "Bu Şartlarla ilgili sorularınız için iletişime geçin:"
   },
   "privacy": {
     "title": "Gizlilik Politikası",
     "lastUpdated": "Son güncelleme: 6 Mayıs 2026",
-    "nav": "Gizlilik Politikası"
+    "nav": "Gizlilik Politikası",
+    "s1Title": "1. Giriş",
+    "s1Text": "HookSniff (\"biz\", \"bize\", \"bizim\") gizliliğinizi korumayı taahhüt eder. Bu Gizlilik Politikası, webhook teslimat hizmetimizi (\"Hizmet\") kullandığınızda bilgilerinizi nasıl topladığımızı, kullandığımızı ve koruduğumuzu açıklar.",
+    "s2Title": "2. Topladığımız Bilgiler",
+    "s21Title": "2.1 Hesap Bilgileri",
+    "s21Items": [
+      "E-posta adresi",
+      "Ad (isteğe bağlı)",
+      "Şirket adı (isteğe bağlı)",
+      "Ödeme bilgileri (Stripe tarafından işlenir, bizde saklanmaz)"
+    ],
+    "s22Title": "2.2 Kullanım Verileri",
+    "s22Items": [
+      "API istek günlükleri (endpoint URLleri, zaman damgaları, yanıt kodları)",
+      "Webhook teslimat günlükleri (payloadlar, teslimat denemeleri, durum)",
+      "Panel aktivitesi (sayfa görüntülemeleri, özellik kullanımı)",
+      "IP adresleri (güvenlik ve hız sınırlama için)"
+    ],
+    "s23Title": "2.3 Teknik Veriler",
+    "s23Items": [
+      "Tarayıcı türü ve sürümü",
+      "İşletim sistemi",
+      "Cihaz bilgileri",
+      "Çerezler ve oturum tokenları"
+    ],
+    "s3Title": "3. Bilgilerinizi Nasıl Kullanıyoruz",
+    "s3Intro": "Bilgilerinizi şu amaçlarla kullanırız:",
+    "s3Items": [
+      "Hizmeti sağlamak ve sürdürmek",
+      "Webhook teslimatlarını ve yeniden denemeleri işlemek",
+      "API isteklerini doğrulamak ve yetkilendirmek",
+      "Hizmetle ilgili bildirimler göndermek (teslimat hataları, fatura uyarıları)",
+      "Hizmeti iyileştirmek ve hataları düzeltmek",
+      "Dolandırıcılığı ve suistimali önlemek",
+      "Yasal yükümlülüklere uymak"
+    ],
+    "s4Title": "4. Webhook Payloadları",
+    "s4Items": [
+      "Webhook payloadlarını yalnızca yapılandırılmış endpointlerinize teslim etmek için işleriz",
+      "Payloadlar teslimat, yeniden deneme ve günlükleme amacıyla geçici olarak saklanır",
+      "Payloadlar planınızın saklama süresine göre otomatik olarak silinir",
+      "Webhook verilerinizi incelemez, analiz etmez, madencilik yapmayız veya satmayız",
+      "Webhook verilerinizi reklam veya profilleme için kullanmayız"
+    ],
+    "s5Title": "5. Veri Paylaşımı",
+    "s5Intro": "Kişisel verilerinizi SATMAYIZ. Bilgileri şu taraflarla paylaşabiliriz:",
+    "s5Items": [
+      "Polar.sh: Ödeme işlemleri (Polar.sh'ın Gizlilik Politikasına tabidir)",
+      "iyzico: Türk müşteriler için ödeme işlemleri (iyzico'nun Gizlilik Politikasına tabidir)",
+      "Altyapı sağlayıcıları: Hizmet işletimi için bulut barındırma",
+      "Yasal makamlar: Yasa, mahkeme emri veya haklarımızı korumak için gerektiğinde",
+      "İş transferleri: Birleşme, devralma veya varlık satışı ile bağlantılı olarak"
+    ],
+    "s6Title": "6. Veri Güvenliği",
+    "s6Intro": "Sektör standardı güvenlik önlemleri uygularız:",
+    "s6Items": [
+      "Tüm veriler TLS/HTTPS üzerinden iletilir",
+      "API anahtarları depolamadan önce hashlenir (SHA-256)",
+      "Webhook doğrulama için HMAC-SHA256 imzaları",
+      "Düzenli güvenlik denetimleri ve güncellemeleri",
+      "Tüm sistemler için erişim kontrolleri ve kimlik doğrulama"
+    ],
+    "s6Disclaimer": "Ancak hiçbir iletim veya depolama yöntemi %100 güvenli değildir. Mutlak güvenlik garanti edemeyiz.",
+    "s7Title": "7. Veri Saklama",
+    "s7DataType": "Veri Türü",
+    "s7RetentionPeriod": "Saklama Süresi",
+    "s7Account": "Hesap verileri",
+    "s7AccountRetention": "Hesap silinene kadar",
+    "s7Webhook": "Webhook teslimat günlükleri",
+    "s7WebhookRetention": "7-365 gün (plana bağlı)",
+    "s7Api": "API istek günlükleri",
+    "s7ApiRetention": "30 gün",
+    "s7Analytics": "Analitik veriler",
+    "s7AnalyticsRetention": "90 gün",
+    "s7Payment": "Ödeme kayıtları",
+    "s7PaymentRetention": "Yasanın gerektirdiği süre",
+    "s7Note": "Saklama süresinden sonra veriler otomatik olarak kalıcı olarak silinir.",
+    "s8Title": "8. Haklarınız",
+    "s8Intro": "Şu haklara sahipsiniz:",
+    "s8Items": [
+      "Erişim: Kişisel verilerinizin bir kopyasını isteme",
+      "Düzeltme: Yanlış verilerin düzeltilmesini isteme",
+      "Silme: Kişisel verilerinizin silinmesini isteme",
+      "Dışa Aktarma: Verilerinizi taşınabilir formatta isteme",
+      "İtiraz: Kişisel verilerinizin işlenmesine itiraz etme",
+      "Onayı geri çekme: İşlem onaya dayandığında"
+    ],
+    "s8How": "Bu haklarınızı kullanmak için privacy@hooksniff.vercel.app adresinden bize ulaşın",
+    "s9Title": "9. Çerezler",
+    "s9Text": "Kimlik doğrulama ve oturum yönetimi için temel çerezler kullanırız. Çerezleri tarayıcı ayarlarınızdan kontrol edebilirsiniz.",
+    "s10Title": "10. Uluslararası Aktarımlar",
+    "s10Text": "Verileriniz kendi ülkeniz dışında işlenebilir. Uluslararası aktarımlar için uygun güvencelerin sağlanmasını sağlıyoruz, gerektiğinde Standart Sözleşmeli Maddeler dahil.",
+    "s11Title": "11. Çocukların Gizliliği",
+    "s11Text": "Hizmetimiz 16 yaş altı çocuklar için değildir. Bilerek çocuklardan kişisel bilgi toplamayız.",
+    "s12Title": "12. Bu Politikadaki Değişiklikler",
+    "s12Text": "Bu Gizlilik Politikasını zaman zaman güncelleyebiliriz. Önemli değişiklikleri e-posta veya panel bildirimi ile size bildiririz.",
+    "s13Title": "13. Bize Ulaşın",
+    "s13Text": "Gizlilikle ilgili sorularınız için privacy@hooksniff.vercel.app adresinden bize ulaşın"
   },
   "admin": {
     "overview": "Yönetici Genel Bakışı",
@@ -655,7 +859,9 @@
     "plan": "Plan",
     "status": "Durum",
     "created": "Oluşturuldu",
-    "actions": "İşlemler"
+    "actions": "İşlemler",
+    "overviewTitle": "Yönetici Genel Bakış",
+    "revenueTitle": "Gelir Paneli"
   },
   "landing": {
     "nav": {
@@ -870,7 +1076,7 @@
   "configFailed": "Yapılandırma oluşturulamadı",
   "deliveryRate": "Teslimat Oranı",
   "avgLatency": "Ort. Gecikme",
-  "faqTitle": "Sıkça Sorulan Sorular",
+  "faqTitle": "SSS",
   "faqSubtitle": "HookSniff hakkında bilmeniz gereken her şey",
   "catGeneral": "Genel",
   "catGettingStarted": "Başlarken",
@@ -1591,7 +1797,7 @@
     "delayPreviewDesc": "Mevcut ayarlarla gecikmeler nasıl görünecek:",
     "attempt": "Deneme {n}",
     "totalRetryTime": "Toplam yeniden deneme süresi (en kötü durum):",
-    "tip": "💡 Endpoint başına yeniden deneme politikaları bu global varsayılanları geçersiz kılar. Endpoint Ayarları'nda yapılandırın.",
+    "tip": "İpucu:",
     "endpointSettingsLink": "Endpoint Ayarları"
   },
   "inbound": {
