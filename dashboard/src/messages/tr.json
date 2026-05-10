@@ -1349,7 +1349,13 @@
     "toastSecretRotated": "Gizli anahtar döndürüldü! Eski anahtar 24 saat geçerli.",
     "toastRotationFailed": "Döndürme başarısız",
     "toastTestSent": "Test webhook'u gönderildi! Endpoint'inizi kontrol edin.",
-    "toastTestFailed": "Test gönderimi başarısız"
+    "toastTestFailed": "Test gönderimi başarısız",
+    "exponential": "Üstel",
+    "exponentialDesc": "Gecikme her denemede ikiye katlanır (10s → 20s → 40s → 80s...)",
+    "linear": "Doğrusal",
+    "linearDesc": "Gecikme doğrusal artar (10s → 20s → 30s → 40s...)",
+    "fixed": "Sabit",
+    "fixedDesc": "Her denemede aynı gecikme (10s → 10s → 10s...)"
   },
   "deliveryDetail": {
     "loadFailed": "Teslimat yüklenemedi",
