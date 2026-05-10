@@ -69,13 +69,16 @@ Her oturum şu şekilde işler:
 **Dosyalar:** `dashboard/src/app/[locale]/dashboard/layout.tsx`
 **Yapılan:** `getLocalizedHref` double-prefix düzeltildi — `useLocale()` ile değiştirildi
 
-### Oturum 77: Frontend-Backend API Uyumsuzluğu
+### Oturum 77: Frontend-Backend API Uyumsuzluğu ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-031 | Revenue, Billing, Notifications format mismatch | ⬜ |
-| HS-034 | Fiyat uyumsuzluğu — Frontend $49/$149, Backend $29/$99 | ⬜ |
-| HS-028 | Search sayfasında Authorization header eksik | ⬜ |
-| HS-029 | Search'de debounce yok | ⬜ |
+| HS-031 | Revenue, Billing, Notifications format mismatch | ✅ 2026-05-10 |
+| HS-034 | Fiyat uyumsuzluğu — Frontend $49/$149, Backend $29/$99 | ✅ 2026-05-10 |
+| HS-028 | Search sayfasında Authorization header eksik | ❌ Yanlış bulgu |
+| HS-029 | Search'de debounce yok | ✅ 2026-05-10 |
+
+**Dosyalar:** 13 dosya — fiyat düzeltmeleri, billing plan key fix, search debounce
+**Yapılan:** $49/$149 → $29/$99, billing API'ye plan key gönderimi, search'e 300ms debounce
 
 **Dosyalar:** `dashboard/src/app/[locale]/dashboard/` sayfaları, `api/src/routes/analytics.rs`, `api/src/routes/billing.rs`
 **Yaklaşım:** API response format'ını frontend ile eşle. Fiyat sabitlerini düzelt.

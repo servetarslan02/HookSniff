@@ -53,13 +53,13 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-025 | CHECK constraint'ler eksik — invalid status girilebilir | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
 | HS-026 | `webhook_queue`'da FK eksik | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
 | HS-027 | `amount_cents` INT — overflow, BIGINT olmalı | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-028 | Search sayfasında Authorization header eksik | `frontend/agent5-middleware-shared.md` | ⬜ |
-| HS-029 | Search'de debounce yok — her tuşta API çağrısı | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
+| HS-028 | Search sayfasında Authorization header eksik | `frontend/agent5-middleware-shared.md` | ❌ 2026-05-10 — `credentials: 'include'` cookie gönderiyor, middleware işliyor |
+| HS-029 | Search'de debounce yok — her tuşta API çağrısı | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
 | HS-030 | Dashboard routing çökmüş — 16 sayfa yanlış içerik | `frontend/agent1-core.md` | ✅ 2026-05-10 |
-| HS-031 | Frontend-Backend API uyumsuzluğu (Revenue, Billing, Notifications) | `frontend/agent2-analytics-billing.md` | ⬜ |
+| HS-031 | Frontend-Backend API uyumsuzluğu (Revenue, Billing, Notifications) | `frontend/agent2-analytics-billing.md` | ✅ 2026-05-10 |
 | HS-032 | Abonelik iptal endpoint'i yok — `DELETE /billing/subscription` → 405 | `frontend/agent2-analytics-billing.md` | ⬜ |
 | HS-033 | Hesap silme bozuk — `DELETE /auth/me` vs `DELETE /auth/account` | `frontend/agent4-settings-config.md` | ⬜ |
-| HS-034 | Fiyat uyumsuzluğu — Frontend $49/$149, Backend $29/$99 | `frontend/agent2-analytics-billing.md` | ⬜ |
+| HS-034 | Fiyat uyumsuzluğu — Frontend $49/$149, Backend $29/$99 | `frontend/agent2-analytics-billing.md` | ✅ 2026-05-10 |
 | HS-035 | 3 farklı API URL (SDK tutarsızlığı) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-036 | Kotlin SDK generic crash (TypeToken erasure) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-037 | 6 SDK'da `X-Hookrelay-Signature` legacy header | `infra/DEEP-SDK-DOCS.md` | ⬜ |

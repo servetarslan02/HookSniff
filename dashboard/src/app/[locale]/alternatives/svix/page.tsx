@@ -4,7 +4,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 export const metadata = { title: 'HookSniff vs Svix — Why Choose HookSniff' };
 
 const rows = [
-  { feature: 'Price (Pro)', hooksniff: '$49/mo', svix: '$490/mo', winner: 'hooksniff' },
+  { feature: 'Price (Pro)', hooksniff: '$29/mo', svix: '$490/mo', winner: 'hooksniff' },
   { feature: 'Free tier', hooksniff: '10,000 events', svix: 'Unlimited*', winner: 'svix' },
   { feature: 'SDK count', hooksniff: '11', svix: '6', winner: 'hooksniff' },
   { feature: 'FIFO delivery', hooksniff: '✅', svix: '❌', winner: 'hooksniff' },
@@ -56,7 +56,7 @@ export default function SvixAlternativePage() {
         </div>
         <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20 mb-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">💰 Bottom line</h2>
-          <p className="text-sm text-gray-600 dark:text-slate-400">HookSniff Pro is <strong>$49/mo</strong> vs Svix Professional at <strong>$490/mo</strong>. That&apos;s <strong>$5,532/year saved</strong> — with more features. If you don&apos;t need SOC 2 Type 2 or 99.99% SLA, HookSniff is the clear winner for startups and growing teams.</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">HookSniff', price: '$29/mo</strong> vs Svix Professional at <strong>$490/mo</strong>. That&apos;s <strong>$5,532/year saved</strong> — with more features. If you don&apos;t need SOC 2 Type 2 or 99.99% SLA, HookSniff is the clear winner for startups and growing teams.</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Try HookSniff free →</Link></div>
       </main>

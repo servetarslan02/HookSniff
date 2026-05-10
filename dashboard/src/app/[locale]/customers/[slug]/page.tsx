@@ -46,7 +46,7 @@ const stories: Record<string, {
     ],
     results: [
       { label: 'Engineering time saved', before: '3-6 months', after: '2 hours' },
-      { label: 'Infrastructure cost', before: '$2,500/mo', after: '$49/mo' },
+      { label: 'Infrastructure cost', before: '$2,500/mo', after: '$29/mo' },
       { label: 'Event loss rate', before: '5%', after: '0%' },
       { label: 'Delivery latency', before: '2-5 seconds', after: '<200ms' },
     ],
@@ -109,7 +109,7 @@ const stories: Record<string, {
     results: [
       { label: 'Polling eliminated', before: '5s intervals', after: 'Event-driven' },
       { label: 'Agent communication loss', before: '10%', after: '0%' },
-      { label: 'Compute cost', before: '$800/mo (polling)', after: '$49/mo' },
+      { label: 'Compute cost', before: '$800/mo (polling)', after: '$29/mo' },
       { label: 'Scale capacity', before: '50 agents', after: '200+ agents' },
     ],
     techStack: ['Python', 'Rust', 'OpenAI', 'LangChain', 'Redis'],
@@ -135,7 +135,7 @@ const stories: Record<string, {
       'HookSniff free tier handles our 8K events/month with zero cost',
       '5-minute integration with the Node.js SDK',
       'Dashboard gives us visibility into delivery success without building our own',
-      'Upgrade path to Pro ($49/mo) when we need more volume',
+      'Upgrade path to Pro ($29/mo) when we need more volume',
     ],
     results: [
       { label: 'Monthly cost', before: '$490 (Svix)', after: '$0' },
