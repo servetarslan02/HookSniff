@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 01:04 GMT+8
+> Son güncelleme: 2026-05-11 01:50 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -84,29 +84,19 @@
 - **Commit:** `cb3ed64` — main branch
 - **Tüm Rust major bağımlılıkları artık en güncel!** 🎉
 
-## Oturum 96 (2026-05-11 00:57 - devam ediyor) 🔄
-- **Staging testleri tamamlandı:**
-  - ✅ Health check: database healthy (36ms), queue healthy (108ms)
-  - ✅ Login: demo + admin JWT çalışıyor
-  - ✅ Rate limit: 25. istekte HTTP 429 tetiklendi
-  - ✅ Webhook veritabanına yazıldı (pending status)
-  - ⚠️ Worker delivery processing: "pending" kaldı — worker servisi 403 döndü, deployment kontrolü gerekli
-- **Kod kalitesi:**
-  - ✅ cargo check: temiz
-  - ✅ 979/979 API testi geçti
-  - ✅ 20/20 worker testi geçti
-  - ✅ Dashboard ESLint: clean
-  - ✅ Dashboard TypeScript: 0 hata
-- **Worker deprecation fix:** `clone_from_slice` → `try_from` (signing.rs, 4 yer)
-- **SDK retry logic (HS-081):** Kotlin, Java, C#, Ruby, Swift, PHP, Elixir'e eklendi ✅
-- **Issue tracker güncellendi:** HS-077, HS-079, HS-081 ✅
-- **Dashboard build:** başarılı ✅
-- **Commits:** `e753a03`, `cca4ba1` — main branch
-- **OpenAPI schema (HS-083):** Nested router pathleri uyumlu, gerçek mismatch yok ✅
-- **Dependabot PR'ları (HS-078):** Açık PR kalmamış ✅
-- **Test coverage:** Worker 48 test (12+16 yeni), Dashboard 2824 test ✅
-- **Commits:** `e753a03`, `cca4ba1`, `dffc665`, `d731c34`, `1ad7484` — main branch
-- **Kalan:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
+## Oturum 96 (2026-05-11 00:57 - 01:50) ✅
+- **Staging testleri:** Health, login, rate limit (429 @ 25), webhook DB write → 2/2 delivered ✅
+- **Worker sorunları çözüldü:**
+  - `channel_binding=require` sqlx 0.8 uyumsuz → strip edildi
+  - Cloud Run startup probe timeout → health server DB'den önce başlatıldı
+  - Worker'da DATABASE_URL/REDIS_URL eksik → Cloud Run API ile eklendi (GCP SA credentials ile)
+  - CI `cancel-in-progress: true` → false yapıldı
+- **Worker deprecation fix:** `clone_from_slice` → `try_from` (signing.rs)
+- **SDK retry (HS-081):** 7 SDK'ya eklendi → 11/11 SDK'da retry var
+- **Test coverage:** Worker 48 test (+28 yeni), Dashboard 2824 test, API 979 test
+- **Issue tracker:** HS-077/078/079/081/083/086/087 çözüldü (96/103)
+- **Commits:** `e753a03`→`eee1de6` (8 push)
+- **Kalan 7:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
 
 ## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000

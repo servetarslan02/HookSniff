@@ -1,10 +1,35 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 01:04 GMT+8
+> Son güncelleme: 2026-05-11 01:50 GMT+8
 
 ---
 
-## 🔄 Oturum 96 Devam Ediyor (2026-05-11 00:57 -)
+## ✅ Oturum 96 Tamamlandı (2026-05-11 00:57 - 01:50)
+
+### Worker Çözüldü ✅
+- DATABASE_URL/REDIS_URL Cloud Run'a eklendi (GCP SA credentials)
+- channel_binding=require strip edildi
+- Health server DB'den önce başlatılıyor
+- 2/2 webhook "delivered" — worker tam çalışıyor
+
+### SDK Retry (HS-081) ✅
+- Kotlin, Java, C#, Ruby, Swift, PHP, Elixir'e eklendi
+- 11/11 SDK'da client-side retry var
+
+### Test Coverage ✅
+- Worker: 48 test (+28 yeni)
+- Dashboard: 2824 test
+- API: 979 test
+
+### Kalan 7 Sorun
+| ID | Sorun | Not |
+|----|-------|-----|
+| HS-065 | 920+ hardcoded string (i18n) | Büyük iş |
+| HS-082 | SDK version mismatch | Version bump publishing gerektirir |
+| HS-084 | iyzico fatura handler | iyzico hesabı gerekli |
+| HS-085 | db.rs test | Gerçek PostgreSQL gerekli |
+| HS-088 | AuthGuard component test | Frontend test |
+| HS-089 | SSO page test | Frontend test |
 
 ### 0. Staging Test (BAŞARILI) ✅
 - ✅ Health check: database healthy, queue healthy
