@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -135,6 +135,7 @@ function StatusBadge({ status }: { status: string }) {
 
 // ─── Status Banner ───
 function StatusBanner({ status, checkedAt }: { status: string; checkedAt: string }) {
+  const router = useRouter();
   const configs: Record<string, { bg: string; border: string; text: string; icon: string; title: string }> = {
     operational: { bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/30', text: 'text-emerald-800 dark:text-emerald-300', icon: '✅', title: 'All Systems Operational' },
     degraded: { bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/30', text: 'text-amber-800 dark:text-amber-300', icon: '⚠️', title: 'Some Systems Degraded' },
@@ -153,7 +154,7 @@ function StatusBanner({ status, checkedAt }: { status: string; checkedAt: string
         </div>
         <button
           className="text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-          onClick={() => window.location.reload()}
+          onClick={() => router.refresh()}
         >
           ↻ Refresh
         </button>
