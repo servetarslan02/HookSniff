@@ -315,7 +315,10 @@ async fn handle_inbound(
 
     provider
         .verify_signature(&config.secret, &headers, &body)
-        .map_err(|e| AppError::Forbidden(e.to_string()))?;
+        .map_err(|e| {
+            tracing::warn!("Inbound webhook signature verification failed: {:?}", e);
+            AppError::Unauthorized
+        })?;
 
     // Find target endpoint
     let endpoint_id = config.endpoint_id.ok_or(AppError::BadRequest(

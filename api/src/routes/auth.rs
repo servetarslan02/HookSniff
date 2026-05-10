@@ -836,7 +836,8 @@ async fn update_profile(
                 .fetch_optional(&pool)
                 .await?;
         if existing.is_some() {
-            return Err(AppError::BadRequest("Email already in use".into()));
+            // HS-038h: Don't reveal whether the email is registered
+            return Err(AppError::BadRequest("Invalid email".into()));
         }
     }
 

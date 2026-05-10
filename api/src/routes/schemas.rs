@@ -42,7 +42,10 @@ async fn register_schema(
     let schema = registry
         .register(customer.id, request)
         .await
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| {
+            tracing::warn!("Schema registration error: {:?}", e);
+            AppError::BadRequest("Invalid schema".into())
+        })?;
 
     Ok(Json(json!({
         "id": schema.id,
