@@ -398,6 +398,105 @@ export const billingApi = {
     apiFetch<Invoice[]>('/billing/invoices', { token }),
 };
 
+// Alert types
+export interface AlertRule {
+  id: string;
+  name: string;
+  condition: string;
+  threshold: number;
+  channels: string[];
+  is_active: boolean;
+  created_at: string;
+}
+
+// Alert API
+export const alertsApi = {
+  list: (token?: string) =>
+    apiFetch<AlertRule[]>('/alerts', { token }),
+
+  create: (token: string | undefined, data: { name: string; condition: string; threshold: number; channels: string[] }) =>
+    apiFetch<AlertRule>('/alerts', { method: 'POST', body: data, token }),
+
+  delete: (token: string | undefined, id: string) =>
+    apiFetch<{ success: boolean }>(`/alerts/${id}`, { method: 'DELETE', token }),
+
+  test: (token: string | undefined, id: string) =>
+    apiFetch<{ success: boolean }>(`/alerts/${id}/test`, { method: 'POST', token }),
+};
+
+// Inbound types
+export interface InboundConfig {
+  id: string;
+  provider: string;
+  endpoint_id: string | null;
+  enabled: boolean;
+  secret: string;
+  created_at: string;
+}
+
+// Inbound API
+export const inboundApi = {
+  listConfigs: (token?: string) =>
+    apiFetch<InboundConfig[]>('/inbound/configs', { token }),
+
+  createConfig: (token: string | undefined, data: { provider: string; endpoint_id?: string | null; secret: string }) =>
+    apiFetch<InboundConfig>('/inbound/configs', { method: 'POST', body: data, token }),
+};
+
+// Transform types
+export interface TransformRule {
+  id: string;
+  endpoint_id: string;
+  rule_json: {
+    filter?: { include?: string[]; exclude?: string[] };
+    mappings?: { source: string; target: string }[];
+    enrich?: { fields: Record<string, unknown> };
+  };
+  created_at: string;
+}
+
+// Transform API
+export const transformsApi = {
+  list: (token: string, endpointId: string) =>
+    apiFetch<TransformRule[]>(`/endpoints/${endpointId}/transforms`, { token }),
+
+  create: (token: string, endpointId: string, data: { rule: TransformRule['rule_json'] }) =>
+    apiFetch<TransformRule>(`/endpoints/${endpointId}/transforms`, { method: 'POST', body: data, token }),
+
+  delete: (token: string, endpointId: string, ruleId: string) =>
+    apiFetch<{ success: boolean }>(`/endpoints/${endpointId}/transforms/${ruleId}`, { method: 'DELETE', token }),
+};
+
+// Billing usage types
+export interface BillingUsage {
+  deliveries_used: number;
+  deliveries_limit: number;
+  endpoints_count: number;
+  endpoints_limit: number;
+}
+
+export interface BillingSubscription {
+  plan: string;
+  status: string;
+  current_period_end?: string;
+  cancel_at_period_end?: boolean;
+}
+
+// Extended Billing API
+export const billingApiExtended = {
+  getInvoices: (token: string) =>
+    apiFetch<Invoice[]>('/billing/invoices', { token }),
+
+  getUsage: (token?: string) =>
+    apiFetch<BillingUsage>('/billing/usage', { token }),
+
+  getSubscription: (token?: string) =>
+    apiFetch<BillingSubscription>('/billing/subscription', { token }),
+
+  upgrade: (token: string, plan: string) =>
+    apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan }, token }),
+};
+
 // Analytics API
 export const analyticsApi = {
   deliveryTrend: (token: string, range: string = '24h') =>
