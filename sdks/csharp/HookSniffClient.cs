@@ -17,6 +17,7 @@ namespace HookSniff
         public string ApiKey { get; set; } = "";
         public string BaseUrl { get; set; } = "https://api.hooksniff.com/v1";
         public int Timeout { get; set; } = 30;
+        public int MaxRetries { get; set; } = 3;
     }
 
     public class RetryPolicy
@@ -188,6 +189,7 @@ namespace HookSniff
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
         private readonly string _baseUrl;
+        private readonly int _maxRetries;
         private readonly JsonSerializerOptions _jsonOptions;
 
         public EndpointsResource Endpoints { get; }
@@ -200,6 +202,7 @@ namespace HookSniff
         {
             _apiKey = config.ApiKey ?? throw new ArgumentNullException(nameof(config.ApiKey));
             _baseUrl = (config.BaseUrl ?? "https://api.hooksniff.com/v1").TrimEnd('/');
+            _maxRetries = config.MaxRetries >= 0 ? config.MaxRetries : 3;
 
             _httpClient = new HttpClient
             {
@@ -215,6 +218,12 @@ namespace HookSniff
             Endpoints = new EndpointsResource(this);
             Webhooks = new WebhooksResource(this);
         }
+
+        private static bool IsRetryable(int statusCode) =>
+            statusCode == 429 || statusCode >= 500;
+
+        private static long CalculateBackoff(int attempt) =>
+            Math.Min(1000L * (1L << attempt), 30_000L);
 
         /// <summary>
         /// Get platform statistics.
@@ -250,46 +259,89 @@ namespace HookSniff
 
         private async Task<HttpResponseMessage> SendRequestAsync(string method, string path, object? body)
         {
-            var url = $"{_baseUrl}{path}";
-            var request = new HttpRequestMessage(new HttpMethod(method), url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-            request.Headers.Add("User-Agent", "hooksniff-csharp/0.2.0");
+            Exception? lastException = null;
 
-            if (body != null && (method == "POST" || method == "PUT" || method == "PATCH"))
+            for (int attempt = 0; attempt <= _maxRetries; attempt++)
             {
-                var json = JsonSerializer.Serialize(body, _jsonOptions);
-                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-            }
+                var url = $"{_baseUrl}{path}";
+                var request = new HttpRequestMessage(new HttpMethod(method), url);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+                request.Headers.Add("User-Agent", "hooksniff-csharp/0.3.0");
 
-            var response = await _httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return response;
-            }
-
-            var errBody = await response.Content.ReadAsStringAsync();
-            var message = $"HTTP {(int)response.StatusCode}";
-            try
-            {
-                var errDoc = JsonDocument.Parse(errBody);
-                if (errDoc.RootElement.TryGetProperty("error", out var errObj) &&
-                    errObj.TryGetProperty("message", out var msgProp))
+                if (body != null && (method == "POST" || method == "PUT" || method == "PATCH"))
                 {
-                    message = msgProp.GetString() ?? message;
+                    var json = JsonSerializer.Serialize(body, _jsonOptions);
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
                 }
-            }
-            catch { }
 
-            throw ((int)response.StatusCode) switch
-            {
-                400 => new ValidationException(message),
-                401 => new AuthenticationException(message),
-                404 => new NotFoundException(message),
-                413 => new PayloadTooLargeException(message),
-                429 => new RateLimitException(message),
-                _ => new HookSniffException(message, (int)response.StatusCode)
-            };
+                HttpResponseMessage response;
+                try
+                {
+                    response = await _httpClient.SendAsync(request);
+                }
+                catch (HttpRequestException ex)
+                {
+                    lastException = ex;
+                    if (attempt < _maxRetries)
+                    {
+                        await Task.Delay((int)CalculateBackoff(attempt));
+                        continue;
+                    }
+                    throw new HookSniffException($"Network error after {attempt + 1} attempts: {ex.Message}", 0);
+                }
+                catch (TaskCanceledException ex)
+                {
+                    throw new HookSniffException($"Request timed out: {ex.Message}", 0);
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return response;
+                }
+
+                var statusCode = (int)response.StatusCode;
+
+                // Retry on 429 (respect Retry-After) and 5xx
+                if (IsRetryable(statusCode) && attempt < _maxRetries)
+                {
+                    int delayMs;
+                    if (statusCode == 429 && response.Headers.RetryAfter?.Delta != null)
+                    {
+                        delayMs = (int)response.Headers.RetryAfter.Delta.Value.TotalMilliseconds;
+                    }
+                    else
+                    {
+                        delayMs = (int)CalculateBackoff(attempt);
+                    }
+                    await Task.Delay(delayMs);
+                    continue;
+                }
+
+                var errBody = await response.Content.ReadAsStringAsync();
+                var message = $"HTTP {statusCode}";
+                try
+                {
+                    var errDoc = JsonDocument.Parse(errBody);
+                    if (errDoc.RootElement.TryGetProperty("error", out var errObj) &&
+                        errObj.TryGetProperty("message", out var msgProp))
+                    {
+                        message = msgProp.GetString() ?? message;
+                    }
+                }
+                catch { }
+
+                throw statusCode switch
+                {
+                    400 => new ValidationException(message),
+                    401 => new AuthenticationException(message),
+                    404 => new NotFoundException(message),
+                    413 => new PayloadTooLargeException(message),
+                    429 => new RateLimitException(message),
+                    _ => new HookSniffException(message, statusCode)
+                };
+            }
+
+            throw new HookSniffException($"Request failed after {_maxRetries + 1} attempts", 0);
         }
     }
 
