@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# HookRelay Integration Test Suite
+# HookSniff Integration Test Suite
 # ============================================================================
 # Tests the API end-to-end against a local development server.
 #
@@ -9,7 +9,7 @@
 #   ./tests/integration_test.sh
 #
 # Prerequisites:
-#   - HookRelay API running on http://localhost:3000
+#   - HookSniff API running on http://localhost:3000
 #   - curl installed
 #   - jq installed (for JSON parsing)
 # ============================================================================
@@ -19,9 +19,9 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-BASE_URL="${HOOKRELAY_BASE_URL:-http://localhost:3000}"
+BASE_URL="${HOOKSNIFF_BASE_URL:-http://localhost:3000}"
 API_BASE="${BASE_URL}/v1"
-TEST_EMAIL="integration-test-$(date +%s)@hookrelay.dev"
+TEST_EMAIL="integration-test-$(date +%s)@hooksniff.dev"
 TEST_PASSWORD="TestPass1234!"
 
 # Colors for output
@@ -131,7 +131,7 @@ api_request_noauth() {
 # Pre-flight: Check API is reachable
 # ---------------------------------------------------------------------------
 echo -e "${CYAN}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║         HookRelay Integration Test Suite                ║${NC}"
+echo -e "${CYAN}║         HookSniff Integration Test Suite                ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo "Base URL: $BASE_URL"

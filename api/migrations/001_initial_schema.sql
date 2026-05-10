@@ -1,4 +1,4 @@
--- HookRelay Database Schema
+-- HookSniff Database Schema
 -- Run against CockroachDB
 
 CREATE TABLE IF NOT EXISTS customers (

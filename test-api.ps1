@@ -1,4 +1,4 @@
-# HookRelay Test Scripti
+# HookSniff Test Scripti
 # API çalışırken bu scripti PowerShell'de çalıştır
 
 $BASE = "http://localhost:3000/v1"
@@ -7,7 +7,7 @@ $HEADERS = @{
     "Content-Type" = "application/json"
 }
 
-Write-Host "🧪 HookRelay Test Başlıyor..." -ForegroundColor Cyan
+Write-Host "🧪 HookSniff Test Başlıyor..." -ForegroundColor Cyan
 Write-Host ""
 
 # 1. Health Check
@@ -25,7 +25,7 @@ Write-Host ""
 Write-Host "2️⃣  Test kullanıcısı oluşturuluyor..." -ForegroundColor Yellow
 try {
     $register = Invoke-RestMethod -Uri "$BASE/auth/register" -Method POST -Headers $HEADERS -Body (@{
-        email = "test@hookrelay.is-a.dev"
+        email = "test@hooksniff.is-a.dev"
         password = "Test1234!"
     } | ConvertTo-Json)
     $TOKEN = $register.token
@@ -35,7 +35,7 @@ try {
     Write-Host "   ⚠️  Kayıt hatası (zaten var olabilir), login deneniyor..." -ForegroundColor Yellow
     try {
         $login = Invoke-RestMethod -Uri "$BASE/auth/login" -Method POST -Headers $HEADERS -Body (@{
-            email = "test@hookrelay.is-a.dev"
+            email = "test@hooksniff.is-a.dev"
             password = "Test1234!"
         } | ConvertTo-Json)
         $TOKEN = $login.token

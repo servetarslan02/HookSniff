@@ -1,6 +1,6 @@
 -- 005_event_mesh.sql
 -- Phase 4: Event Mesh — Multi-format Event Infrastructure
--- Extends HookRelay from webhook-only to a full event mesh with
+-- Extends HookSniff from webhook-only to a full event mesh with
 -- multi-protocol delivery, schema registry, fan-out rules, and
 -- WebSocket real-time streaming.
 
