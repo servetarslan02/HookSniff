@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 03:50 GMT+8
+> Son güncelleme: 2026-05-11 03:56 GMT+8
 
 ---
 
@@ -19,11 +19,16 @@
 - Locale fix ve API fallback fix — deploy bekliyor
 - Yarın bu saatlerde otomatik deploy olur
 
-### Kalan Sorunlar
+### Kalan Sorunlar (2)
 | ID | Sorun | Not |
 |----|-------|-----|
 | HS-085 | db.rs test | Gerçek PostgreSQL gerekli |
 | HS-090 | SDK otomatik güncelleme | Lansman sonrası |
+
+### HS-065: i18n ✅ Tamamlandı
+- EN + TR dilleri aktif, 2083 anahtar senkron
+- 6 dil kaldırıldı (de/ja/pt-BR/es/fr/ko)
+- Önceki oturumlarda 497→1 hardcoded string düşürülmüştü
 
 ---
 
