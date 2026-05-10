@@ -25,7 +25,7 @@
 | # | Sorun | Dosya |
 |---|-------|-------|
 | 1 | 17/23 dashboard sayfası hatayı sessizce yutuyor (`catch {}`) | Core dashboard pages |
-| 2 | Checkout URL doğrulamasız redirect | `billing/page.tsx` |
+| 2 | Checkout URL doğrulamasız redirect | `billing/page.tsx` | ✅ Düzeltildi (2026-05-10) |
 | 3 | `alert()` kullanımı (toast sistemi yerine) | endpoints, settings, alerts | ✅ Düzeltildi (2026-05-10) |
 | 4 | Newsletter form'da CSRF koruması yok | `blog/page.tsx`, `contact/page.tsx` |
 | 5 | ROI calculator yanlış Svix/Hookdeck formülleri | `pricing/page.tsx` |
