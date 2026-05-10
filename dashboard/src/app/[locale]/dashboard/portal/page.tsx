@@ -45,7 +45,7 @@ export default function PortalPage() {
         setError(err instanceof Error ? err.message : t('failedToLoad'));
       })
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, t]);
 
   if (loading) return <div className="p-8 text-gray-500">{t('loading')}</div>;
 
