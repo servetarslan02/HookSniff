@@ -362,7 +362,8 @@ async fn verify_2fa_login(
         .ok_or(AppError::Unauthorized)?;
 
     if !customer.totp_enabled {
-        return Err(AppError::BadRequest("2FA is not enabled".into()));
+        // HS-038f: Don't reveal 2FA status — treat as auth failure
+        return Err(AppError::Unauthorized);
     }
 
     let secret = customer
@@ -663,7 +664,7 @@ async fn refresh_token(
         .ok_or(AppError::Unauthorized)?;
 
     if !customer.is_active {
-        return Err(AppError::Forbidden("Account has been deactivated".into()));
+        return Err(AppError::Unauthorized);
     }
 
     // Revoke the old refresh token
