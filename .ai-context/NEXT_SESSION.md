@@ -45,6 +45,29 @@ d7c59a8 fix(security): harden CSP headers and add HSTS
 
 ## 🟡 Sıradaki Oturum: #96 — İLK SIRA BUNLAR
 
+### 0. ZORUNLU: Staging Test (Bağımlılık Doğrulaması)
+**Bağımlılıkları staging'de test etmeden başka işe geçme!**
+
+```bash
+# 1. API health check
+curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
+
+# 2. Login testi
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"demo@hooksniff.com","password":"Demo1234!"}'
+
+# 3. Dashboard aç — https://hooksniff.vercel.app
+# Login ol, endpoint oluştur, webhook gönder
+
+# 4. Rate limit testi — çok sayıda istek at, 429 dönmeli
+
+# 5. Redis kontrol — health endpoint'inde redis status "connected" olmalı
+```
+
+Eğer bir şey çalışmazsa → hemen düzelt, sonra diğer işlere geç.
+Eğer hepsi çalışırsa → aşağıdaki listeden devam et.
+
 ### 1. Kalan SDK Düzeltmeleri (sdks-fix agent'dan kalabilir)
 | ID | Sorun | Durum |
 |----|-------|-------|
