@@ -63,16 +63,25 @@ fn init_otel(
         }
     }
 
+    tracing::info!(
+        "🔧 OTEL config — endpoint: {}, headers count: {}",
+        otlp_endpoint,
+        headers.len()
+    );
+
     let exporter = match opentelemetry_otlp::SpanExporter::builder()
         .with_http()
         .with_endpoint(otlp_endpoint)
         .with_headers(headers)
         .build()
     {
-        Ok(exporter) => exporter,
+        Ok(exporter) => {
+            tracing::info!("✅ OTLP span exporter built successfully (HTTP/proto)");
+            exporter
+        }
         Err(e) => {
-            tracing::warn!(
-                "⚠️ Failed to build OTLP exporter ({}), falling back to plain logging",
+            tracing::error!(
+                "❌ Failed to build OTLP exporter: {:?} — falling back to plain logging",
                 e
             );
             init_plain(env_filter, use_json, "production");
@@ -81,14 +90,27 @@ fn init_otel(
     };
 
     // HS-062: Use batch exporter for production (buffers spans, reduces network calls)
+    // Set shorter timeout and max export batch for Cloud Run (30s SIGTERM grace)
     let provider = SdkTracerProvider::builder()
         .with_batch_exporter(exporter)
         .build();
+
+    tracing::info!("✅ OTel SdkTracerProvider created with batch exporter");
 
     // HS-061: Register custom metrics
     init_metrics();
 
     global::set_tracer_provider(provider.clone());
+
+    // Force a test span to verify exporter works
+    {
+        use opentelemetry::trace::{Tracer, TraceContextExt};
+        let tracer = provider.tracer("hooksniff-boot-test");
+        let span = tracer.start("otel_boot_test");
+        let cx = opentelemetry::Context::current().with_span(span);
+        cx.span().end();
+        tracing::info!("🔬 OTEL boot test span created — check Grafana for 'otel_boot_test' trace");
+    }
 
     if use_json {
         let tracer = provider.tracer("hooksniff");

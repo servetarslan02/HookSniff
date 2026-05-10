@@ -22,7 +22,7 @@ POLAR_PRODUCT_BUSINESS="${POLAR_PRODUCT_BUSINESS:?Set POLAR_PRODUCT_BUSINESS env
 APP_URL="${APP_URL:-https://hooksniff.is-a.dev}"
 CORS_ORIGINS="${CORS_ORIGINS:-https://hooksniff.is-a.dev}"
 NOTIFY_FROM_EMAIL="${NOTIFY_FROM_EMAIL:-noreply@hooksniff.is-a.dev}"
-OTEL_EXPORTER_OTLP_ENDPOINT="${OTEL_EXPORTER_OTLP_ENDPOINT:-https://otlp-gateway-prod-us-east-0.grafana.net/otlp}"
+OTEL_EXPORTER_OTLP_ENDPOINT="${OTEL_EXPORTER_OTLP_ENDPOINT:-https://otlp-gateway-prod-eu-west-2.grafana.net/otlp}"
 
 # ── Renkli output ──
 RED='\033[0;31m'
@@ -168,7 +168,7 @@ gcloud run deploy "$WORKER_SERVICE" \
     --cpu=1 \
     --min-instances=0 \
     --max-instances=2 \
-    --set-env-vars="APP_ENV=production,RUST_LOG=info,hooksniff=info,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp" \
+    --set-env-vars="APP_ENV=production,RUST_LOG=info,hooksniff=info,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp" \
     --set-secrets="DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest" \
     --quiet
 
