@@ -331,6 +331,7 @@ async fn process_pending(
         let pool = pool.clone();
         let http_client = http_client.clone();
         let secret_map = secret_map.clone();
+        let semaphore = semaphore.clone();
 
         let handle = tokio::spawn(async move {
             // Acquire semaphore permit — limits concurrent HTTP deliveries
