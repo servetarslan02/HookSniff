@@ -5,6 +5,8 @@ import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
 
+
+
 /* ─── ROI Calculator ─── */
 
 function RoiCalculator() {

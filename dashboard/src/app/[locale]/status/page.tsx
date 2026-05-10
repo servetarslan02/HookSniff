@@ -5,6 +5,8 @@ import { Link, useRouter } from '@/i18n/navigation';
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+
+
 // ─── Types ───
 interface ComponentStatus {
   name: string;
