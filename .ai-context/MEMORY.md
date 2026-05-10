@@ -98,7 +98,11 @@
   - ✅ Dashboard ESLint: clean
   - ✅ Dashboard TypeScript: 0 hata
 - **Worker deprecation fix:** `clone_from_slice` → `try_from` (signing.rs, 4 yer)
-- **Devam ediyor:** SDK düzeltmeleri, kalan işler
+- **SDK retry logic (HS-081):** Kotlin, Java, C#, Ruby, Swift, PHP, Elixir'e eklendi ✅
+- **Issue tracker güncellendi:** HS-077, HS-079, HS-081 ✅
+- **Dashboard build:** başarılı ✅
+- **Commits:** `e753a03`, `cca4ba1` — main branch
+- **Devam ediyor:** OpenAPI schema inceleme, test coverage, Dependabot PR'ları
 
 ## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000
