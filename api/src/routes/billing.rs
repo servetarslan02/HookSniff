@@ -644,7 +644,7 @@ async fn process_webhook_result_with_event_id(
     pool: &sqlx::PgPool,
     result: &crate::billing::provider::WebhookResult,
     provider: &str,
-    event_id: Option<&str>,
+    _event_id: Option<&str>,
 ) -> Result<(), AppError> {
     use crate::billing::provider::WebhookResult;
 
