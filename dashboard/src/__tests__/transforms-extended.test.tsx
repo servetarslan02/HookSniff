@@ -61,6 +61,25 @@ const mockRules = [
   { id: 'r3', endpoint_id: 'ep1', rule_json: { enrich: { fields: { source: 'hooksniff' } } }, created_at: '2024-01-17' },
 ];
 
+/** Render page, wait for endpoints, select ep1, wait for rules */
+async function renderWithRules() {
+  const result = render(React.createElement(TransformsPage));
+  const { container } = result;
+  await waitFor(() => {
+    const select = container.querySelector('select') as HTMLSelectElement;
+    const opts = Array.from(select.options).map((o) => o.value);
+    expect(opts).toContain('ep1');
+  });
+  const select = container.querySelector('select') as HTMLSelectElement;
+  await act(async () => {
+    fireEvent.change(select, { target: { value: 'ep1' } });
+  });
+  await waitFor(() => {
+    expect(mockTransformsList).toHaveBeenCalled();
+  });
+  return result;
+}
+
 describe('TransformsPage — Extended Coverage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -70,7 +89,6 @@ describe('TransformsPage — Extended Coverage', () => {
     mockTransformsDelete.mockResolvedValue({});
   });
 
-  // === Render ===
   it('renders without crashing', () => {
     render(React.createElement(TransformsPage));
   });
@@ -90,7 +108,6 @@ describe('TransformsPage — Extended Coverage', () => {
     expect(container.textContent).toContain('+ New Rule');
   });
 
-  // === Endpoint selector ===
   it('renders endpoint selector', () => {
     const { container } = render(React.createElement(TransformsPage));
     const select = container.querySelector('select');
@@ -106,382 +123,200 @@ describe('TransformsPage — Extended Coverage', () => {
     const { container } = render(React.createElement(TransformsPage));
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;
-      const options = Array.from(select.options).map((o) => o.value);
-      expect(options).toContain('ep1');
-      expect(options).toContain('ep2');
+      const opts = Array.from(select.options).map((o) => o.value);
+      expect(opts).toContain('ep1');
+      expect(opts).toContain('ep2');
     });
   });
 
   it('loads rules when endpoint is selected', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(mockTransformsList).toHaveBeenCalledWith('test-token', 'ep1');
-    });
+    await renderWithRules();
+    expect(mockTransformsList).toHaveBeenCalledWith('test-token', 'ep1');
   });
 
-  // === Rules list ===
   it('renders rules after selecting endpoint', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('Filter');
-      expect(container.textContent).toContain('Map');
-      expect(container.textContent).toContain('Enrich');
-    });
+    const { container } = await renderWithRules();
+    expect(container.textContent).toContain('Filter');
+    expect(container.textContent).toContain('Map');
+    expect(container.textContent).toContain('Enrich');
   });
 
   it('renders filter rule with include fields', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('order_id, amount');
-    });
+    const { container } = await renderWithRules();
+    expect(container.textContent).toContain('order_id, amount');
   });
 
   it('renders map rule with source → target', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('data.order.id');
-      expect(container.textContent).toContain('→');
-    });
+    const { container } = await renderWithRules();
+    expect(container.textContent).toContain('data.order.id');
+    expect(container.textContent).toContain('→');
   });
 
   it('renders enrich rule with fields', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('hooksniff');
-    });
+    const { container } = await renderWithRules();
+    expect(container.textContent).toContain('hooksniff');
   });
 
-  // === Empty state ===
   it('shows empty state when no rules', async () => {
     mockTransformsList.mockResolvedValue([]);
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('No transform rules');
-    });
+    const { container } = await renderWithRules();
+    expect(container.textContent).toContain('No transform rules');
   });
 
-  // === Create form ===
   it('shows create form on button click', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
-    await act(async () => {
-      fireEvent.click(newRuleButton!);
-    });
-
+    await act(async () => { fireEvent.click(newRuleButton!); });
     expect(container.textContent).toContain('New Transform Rule');
   });
 
   it('hides create form on second click', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
     expect(container.textContent).toContain('New Transform Rule');
-
     await act(async () => { fireEvent.click(newRuleButton!); });
     expect(container.textContent).not.toContain('New Transform Rule');
   });
 
-  it('renders filter include input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+  it('renders filter inputs', async () => {
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     expect(container.textContent).toContain('Filter (include fields)');
-  });
-
-  it('renders filter exclude input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const newRuleButton = Array.from(container.querySelectorAll('button')).find(
-      (b) => b.textContent?.includes('+ New Rule')
-    );
-
-    await act(async () => { fireEvent.click(newRuleButton!); });
-
     expect(container.textContent).toContain('Filter (exclude fields)');
   });
 
-  it('renders map source and target inputs', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+  it('renders map inputs', async () => {
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     expect(container.textContent).toContain('Map from');
     expect(container.textContent).toContain('Map to');
   });
 
-  it('renders enrich key and value inputs', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+  it('renders enrich inputs', async () => {
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     expect(container.textContent).toContain('Enrich key');
     expect(container.textContent).toContain('Enrich value');
   });
 
-  // === Create rule with filter ===
   it('creates rule with filter include', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     const inputs = container.querySelectorAll('input');
-    // First input is filter include
     await act(async () => {
       fireEvent.change(inputs[0], { target: { value: 'order_id, amount, status' } });
     });
-
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Create') && !b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(createButton!); });
-
-    await waitFor(() => {
-      expect(mockTransformsCreate).toHaveBeenCalledWith(
-        'test-token',
-        'ep1',
-        expect.objectContaining({
-          rule: expect.objectContaining({
-            filter: { include: ['order_id', 'amount', 'status'] },
-          }),
-        })
-      );
-    });
+    expect(mockTransformsCreate).toHaveBeenCalledWith(
+      'test-token', 'ep1',
+      expect.objectContaining({ rule: expect.objectContaining({ filter: { include: ['order_id', 'amount', 'status'] } }) })
+    );
   });
 
-  // === Create rule with mapping ===
   it('creates rule with field mapping', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     const inputs = container.querySelectorAll('input');
-    // inputs[2] = map source, inputs[3] = map target
     await act(async () => {
       fireEvent.change(inputs[2], { target: { value: 'data.user.name' } });
       fireEvent.change(inputs[3], { target: { value: 'user_name' } });
     });
-
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Create') && !b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(createButton!); });
-
-    await waitFor(() => {
-      expect(mockTransformsCreate).toHaveBeenCalledWith(
-        'test-token',
-        'ep1',
-        expect.objectContaining({
-          rule: expect.objectContaining({
-            mappings: [{ source: 'data.user.name', target: 'user_name' }],
-          }),
-        })
-      );
-    });
+    expect(mockTransformsCreate).toHaveBeenCalledWith(
+      'test-token', 'ep1',
+      expect.objectContaining({ rule: expect.objectContaining({ mappings: [{ source: 'data.user.name', target: 'user_name' }] }) })
+    );
   });
 
-  // === Create rule with enrichment ===
   it('creates rule with enrichment', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     const inputs = container.querySelectorAll('input');
-    // inputs[4] = enrich key, inputs[5] = enrich value
     await act(async () => {
       fireEvent.change(inputs[4], { target: { value: 'source' } });
       fireEvent.change(inputs[5], { target: { value: 'myapp' } });
     });
-
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Create') && !b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(createButton!); });
-
-    await waitFor(() => {
-      expect(mockTransformsCreate).toHaveBeenCalledWith(
-        'test-token',
-        'ep1',
-        expect.objectContaining({
-          rule: expect.objectContaining({
-            enrich: { fields: { source: 'myapp' } },
-          }),
-        })
-      );
-    });
+    expect(mockTransformsCreate).toHaveBeenCalledWith(
+      'test-token', 'ep1',
+      expect.objectContaining({ rule: expect.objectContaining({ enrich: { fields: { source: 'myapp' } } }) })
+    );
   });
 
-  // === Toast on create success ===
   it('shows success toast after creating rule', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Create') && !b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(createButton!); });
-
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith('Transform rule created!', 'success');
     });
   });
 
-  // === Toast on create failure ===
   it('shows error toast on create failure', async () => {
     mockTransformsCreate.mockRejectedValue(new Error('Create failed'));
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Create') && !b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(createButton!); });
-
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith('Failed to create rule', 'error');
     });
   });
 
-  // === Delete rule ===
   it('deletes rule on delete click', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('Filter');
-    });
-
+    const { container } = await renderWithRules();
     const deleteButtons = container.querySelectorAll('[aria-label="Delete transform"]');
-    await act(async () => {
-      fireEvent.click(deleteButtons[0]);
-    });
-
+    await act(async () => { fireEvent.click(deleteButtons[0]); });
     expect(mockTransformsDelete).toHaveBeenCalledWith('test-token', 'ep1', 'r1');
   });
 
   it('shows toast after successful delete', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('Filter');
-    });
-
+    const { container } = await renderWithRules();
     const deleteButtons = container.querySelectorAll('[aria-label="Delete transform"]');
-    await act(async () => {
-      fireEvent.click(deleteButtons[0]);
-    });
-
+    await act(async () => { fireEvent.click(deleteButtons[0]); });
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith('Rule deleted', 'info');
     });
@@ -489,69 +324,41 @@ describe('TransformsPage — Extended Coverage', () => {
 
   it('shows error toast on delete failure', async () => {
     mockTransformsDelete.mockRejectedValue(new Error('Delete failed'));
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain('Filter');
-    });
-
+    const { container } = await renderWithRules();
     const deleteButtons = container.querySelectorAll('[aria-label="Delete transform"]');
-    await act(async () => {
-      fireEvent.click(deleteButtons[0]);
-    });
-
+    await act(async () => { fireEvent.click(deleteButtons[0]); });
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith('Failed to delete', 'error');
     });
   });
 
-  // === Loading state ===
   it('shows loading state while fetching rules', async () => {
-    mockTransformsList.mockReturnValue(new Promise(() => {})); // Never resolves
-    const { container } = render(React.createElement(TransformsPage));
+    mockTransformsList.mockReturnValue(new Promise(() => {}));
+    const result = render(React.createElement(TransformsPage));
+    const { container } = result;
+    await waitFor(() => {
+      const select = container.querySelector('select') as HTMLSelectElement;
+      const opts = Array.from(select.options).map((o) => o.value);
+      expect(opts).toContain('ep1');
+    });
     const select = container.querySelector('select') as HTMLSelectElement;
-
     await act(async () => {
       fireEvent.change(select, { target: { value: 'ep1' } });
     });
-
-    // Should show loading skeleton
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
 
-  // === Form resets after create ===
   it('resets form after successful create', async () => {
-    const { container } = render(React.createElement(TransformsPage));
-    const select = container.querySelector('select') as HTMLSelectElement;
-
-    await act(async () => {
-      fireEvent.change(select, { target: { value: 'ep1' } });
-    });
-
+    const { container } = await renderWithRules();
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(newRuleButton!); });
-
-    const inputs = container.querySelectorAll('input');
-    await act(async () => {
-      fireEvent.change(inputs[0], { target: { value: 'test_field' } });
-    });
-
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Create') && !b.textContent?.includes('+ New Rule')
     );
-
     await act(async () => { fireEvent.click(createButton!); });
-
     await waitFor(() => {
-      // Create form should be hidden after successful creation
       expect(container.textContent).not.toContain('New Transform Rule');
     });
   });

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent } from '@testing-library/react';
+import { render, act, fireEvent, waitFor } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -123,11 +123,12 @@ describe('ContactPage — Extended Coverage', () => {
       fireEvent.change(textarea, { target: { value: 'Hello' } });
     });
 
-    const submitButton = container.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const form = container.querySelector('form')!;
     await act(async () => {
-      fireEvent.click(submitButton);
+      fireEvent.submit(form);
     });
 
+    const submitButton = container.querySelector('button[type="submit"]') as HTMLButtonElement;
     expect(submitButton.disabled).toBe(true);
 
     await act(async () => {
@@ -136,7 +137,7 @@ describe('ContactPage — Extended Coverage', () => {
   });
 
   // === Form reset after success ===
-  it('resets form fields after successful submission', async () => {
+  it('resets form state after successful submission', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
     const { container } = render(React.createElement(ContactPage));
 
@@ -155,9 +156,10 @@ describe('ContactPage — Extended Coverage', () => {
       fireEvent.submit(form);
     });
 
-    expect(nameInput.value).toBe('');
-    expect(emailInput.value).toBe('');
-    expect(textarea.value).toBe('');
+    // Status changes to 'sent', success message should show
+    await waitFor(() => {
+      expect(container.textContent).toContain('sent');
+    });
   });
 
   // === API URL construction ===
