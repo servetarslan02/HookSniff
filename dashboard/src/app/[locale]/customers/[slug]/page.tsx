@@ -236,7 +236,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <Link href="/customers" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Customers</Link>
+            <Link href="/customers" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{t("title")}</Link>
             <span className="text-gray-400">/</span>
             <span className="text-gray-600 dark:text-slate-400">{story.company}</span>
           </div>

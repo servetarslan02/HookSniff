@@ -18,10 +18,10 @@ export default function PortalPage() {
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li><strong>Create & manage endpoints</strong> — Add their own webhook URLs</li>
-          <li><strong>View deliveries</strong> — See all webhook deliveries with status, timestamps, and payloads</li>
-          <li><strong>Inspect payloads</strong> — View request and response details for each attempt</li>
-          <li><strong>Rotate secrets</strong> — Manage their own signing secrets</li>
-          <li><strong>Replay failed webhooks</strong> — Re-queue deliveries that failed</li>
+          <li><strong>{t("viewDeliveries")}</strong> — See all webhook deliveries with status, timestamps, and payloads</li>
+          <li><strong>{t("inspectPayloads")}</strong> — View request and response details for each attempt</li>
+          <li><strong>{t("rotateSecretsPortal")}</strong> — Manage their own signing secrets</li>
+          <li><strong>{t("replayFailed")}</strong> — Re-queue deliveries that failed</li>
         </ul>
       </section>
 
@@ -93,10 +93,10 @@ export default function PortalPage() {
           The portal enables customer self-service, reducing support burden:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Zero support tickets</strong> — Customers can debug their own webhook issues</li>
+          <li><strong>{t("zeroTickets")}</strong> — Customers can debug their own webhook issues</li>
           <li><strong>Real-time visibility</strong> — See delivery status without contacting your team</li>
-          <li><strong>Secure access</strong> — Each customer only sees their own endpoints and deliveries</li>
-          <li><strong>API key scoping</strong> — Portal keys are scoped to the customer's resources</li>
+          <li><strong>{t("secureAccess")}</strong> — Each customer only sees their own endpoints and deliveries</li>
+          <li><strong>{t("apiKeyScoping")}</strong> — Portal keys are scoped to the customer's resources</li>
         </ul>
       </section>
     </article>
