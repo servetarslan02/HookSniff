@@ -911,5 +911,211 @@
     "readyDesc": "Ücretsiz hesabınızı oluşturun ve dakikalar içinde ilk webhook'unuzu gönderin.",
     "tryPlaygroundBtn": "Playground'ı Dene",
     "goToDashboard": "Dashboard'a Git"
-  }
+  },
+  "pricing": {
+    "title": "Fiyatlandırma",
+    "badge": "Svix'ten 10x daha ucuz",
+    "heroTitle": "Sizinle birlikte büyüyen fiyatlandırma",
+    "heroSubtitle": "12 aydan fazla webhook altyapı geliştirme süresinden tasarruf edin. Ücretsiz başlayın, hazır olduğunuzda ölçekleyin.",
+    "heroNote": "Kredi kartı gerekmez. Sürpriz ücret yok. İstediğiniz zaman iptal edin.",
+    "mostPopular": "En Popüler",
+    "free": "Ücretsiz",
+    "pro": "Pro",
+    "business": "Business",
+    "month": "/ay",
+    "getStarted": "Başlayın",
+    "startTrial": "Ücretsiz Deneyin",
+    "contactSales": "Satışla İletişim",
+    "freeDesc": "Yan projeler ve deneyler için",
+    "proDesc": "Production uygulamaları için",
+    "businessDesc": "Garantiye ihtiyacı olan ekipler için",
+    "freeFeatures": [
+      "Ayda 10.000 webhook",
+      "1 endpoint",
+      "3 yeniden deneme",
+      "HMAC-SHA256 imzaları",
+      "Panel erişimi",
+      "Topluluk desteği",
+      "3 günlük log saklama",
+      "8 SDK erişimi"
+    ],
+    "proFeatures": [
+      "Ayda 50.000 webhook",
+      "10 endpoint",
+      "5 yeniden deneme",
+      "Özel yeniden deneme politikaları",
+      "Öncelikli destek",
+      "Özel alan adları",
+      "30 günlük log saklama",
+      "11 SDK erişimi",
+      "Webhook oyun alanı",
+      "Etiket ve filtreleme",
+      "E-posta uyarıları"
+    ],
+    "businessFeatures": [
+      "Ayda 500.000 webhook",
+      "Sınırsız endpoint",
+      "10 yeniden deneme",
+      "%99.9 SLA garantisi",
+      "Özel destek",
+      "90 günlük log saklama",
+      "Pro'daki her şey",
+      "Şema kayıt defteri",
+      "FIFO teslimat",
+      "CloudEvents desteği",
+      "Özel entegrasyonlar",
+      "SSO/SAML"
+    ],
+    "payWhatYouUse": "Sadece gerçekten gönderdiğiniz şey için ödeme yapın",
+    "payWhatYouUseDesc": "Yeniden denemeler ücretsizdir. Filtrelenen mesajlar ücretsizdir. 5 kez yeniden denediğimiz başarısız teslimatlar hâlâ 1 webhook olarak sayılır. Maliyeti biz üstleniyoruz çünkü güvenilir teslimat bizim sözümüz.",
+    "roiTitle": "ROI Hesaplayıcı",
+    "roiDesc": "HookSniff ile rakiplere göre ne kadar tasarruf ettiğinizi görün.",
+    "roiMonthlyWebhooks": "Aylık webhook sayısı",
+    "roiYouSave": "Tasarrufunuz",
+    "roiVsSvix": "Svix'e göre",
+    "roiLess": "daha az",
+    "roiPerYear": "Bu yılda {amount} cebinize geri döner.",
+    "compareTitle": "Tüm özellikleri karşılaştırın",
+    "feature": "Özellik",
+    "usage": "Kullanım",
+    "delivery": "Teslimat",
+    "security": "Güvenlik",
+    "monitoringLogs": "İzleme ve Loglar",
+    "support": "Destek",
+    "monthlyWebhooks": "Aylık webhook sayısı",
+    "endpoints": "Endpoint sayısı",
+    "rateLimit": "Dakika başına istek limiti",
+    "additionalEvents": "Ek etkinlikler",
+    "teamMembers": "Ekip üyeleri",
+    "deliveryMethods": "Teslimat yöntemleri",
+    "retryAttempts": "Yeniden deneme sayısı",
+    "customRetryPolicies": "Özel yeniden deneme politikaları",
+    "fifoDelivery": "Sıralı FIFO teslimat",
+    "exponentialBackoff": "Üstel geri çekilme",
+    "dlq": "Ölü mektup kuyruğu (DLQ)",
+    "hmacSignatures": "HMAC-SHA256 imzaları",
+    "secretRotation": "Webhook gizli anahtar rotasyonu",
+    "ipWhitelisting": "IP beyaz listesi",
+    "ssoSaml": "SSO / SAML",
+    "twoFactor": "İki faktörlü doğrulama",
+    "cloudevents": "CloudEvents v1.0",
+    "dashboard": "Kontrol paneli",
+    "logRetention": "Log saklama süresi",
+    "realtimeLogs": "Anlık teslimat logları",
+    "analyticsGraphs": "Analitik ve grafikler",
+    "schemaRegistry": "Şema kayıt defteri",
+    "webhookPlayground": "Webhook oyun alanı",
+    "communitySupport": "Topluluk desteği",
+    "emailSupport": "E-posta desteği",
+    "prioritySupport": "Öncelikli destek",
+    "dedicatedManager": "Özel hesap yöneticisi",
+    "slaGuarantee": "SLA garantisi",
+    "customIntegrations": "Özel entegrasyonlar",
+    "unlimited": "Sınırsız",
+    "securityTitle": "Güvenlik ve Uyumluluk",
+    "supportTitle": "Destek seviyeleri",
+    "supportResponse": "Yanıt süresi",
+    "supportBestEffort": "En iyi çaba",
+    "testimonialsTitle": "Kullanıcılar ne diyor",
+    "buildVsBuy": "Kendin yap mı, hazır al mı?",
+    "buildingOwn": "Kendin yapmak",
+    "usingHookSniff": "HookSniff kullanmak",
+    "buildOwnItems": [
+      "3-6 ay mühendislik süresi",
+      "$50K-150K geliştirici maliyeti",
+      "Sürekli bakım yükü",
+      "SLA veya uptime garantisi yok",
+      "Güvenlik açıkları",
+      "SDK ekosistemi yok",
+      "Yeniden deneme mantığı zordur"
+    ],
+    "useHookSniffItems": [
+      "5 dakikada hazır",
+      "$0/ay'dan başlar",
+      "Sıfır bakım",
+      "%99.9 SLA (Business)",
+      "HMAC, TLS, 2FA dahil",
+      "11 dilde SDK",
+      "Savaş testinden geçmiş yeniden deneme motoru"
+    ],
+    "startupTitle": "Erken aşama girişim misiniz?",
+    "startupDesc": "Büyümek için özel girişim planlarımız var. Seri A öncesi girişimler genişletilmiş ücretsiz katmanlar ve planlarda önemli indirimler alır.",
+    "startupCta": "Girişim indirimi için başvurun →",
+    "faqTitle": "Sıkça sorulan sorular",
+    "ctaTitle": "Başlamaya hazır mısınız?",
+    "ctaDesc": "Webhook teslimatı için HookSniff'e güvenen binlerce geliştiriciye katılın.",
+    "ctaStart": "Ücretsiz başlayın →",
+    "ctaContact": "Satışla iletişime geçin",
+    "days": "gün",
+    "http": "HTTP",
+    "ws": "WS",
+    "grpc": "gRPC",
+    "sqs": "SQS"
+  },
+  "pricingFaq": [
+    {
+      "q": "Webhook ne olarak sayılır?",
+      "a": "Webhook, endpoint'inize teslim edilen bir etkinliktir. Yeniden denenen başarısız teslimatlar ek webhook olarak sayılmaz — yeniden denemeler ücretsizdir. Filtrelenen mesajlar da ücretsizdir."
+    },
+    {
+      "q": "Başlamak için kredi kartı gerekli mi?",
+      "a": "Hayır. Ücretsiz plan ile kredi kartı olmadan kayıt olup webhook göndermeye başlayabilirsiniz. Daha fazla hacim veya özellik gerektiğinde yükseltebilirsiniz."
+    },
+    {
+      "q": "Plan limitini aşarsam ne olur?",
+      "a": "Webhook'ları asla düşürmeyiz. Aylık limitinizi aşarsanız, ek etkinlikler plan bazlı ücretlendirilir. Ayrıca panel ayarlarınızdan sabit bir sınır belirleyebilirsiniz."
+    },
+    {
+      "q": "Yeniden denemeler gerçekten ücretsiz mi?",
+      "a": "Evet. Bir webhook tüm yeniden denemelerini içerir. Bir teslimat başarısız olup 3 kez yeniden denense bile, bu hâlâ 1 webhook olarak sayılır. Yeniden deneme maliyetini biz üstleniyoruz çünkü güvenilir teslimat temel sözümüz."
+    },
+    {
+      "q": "Ay ortasında plan değiştirebilir miyim?",
+      "a": "Evet. Yükseltmeler anında geçerli olur ve orantılı olarak ücretlendirilir. Düşürmeler bir sonraki fatura döneminizin başında geçerli olur. Ceza yok, gizli ücret yok."
+    },
+    {
+      "q": "Girişim indirimi var mı?",
+      "a": "Evet! Erken aşama girişimseniz (Seri A öncesi), hello@hooksniff.com adresinden bize ulaşın. Önemli indirimler ve genişletilmiş ücretsiz katmanlar sunuyoruz."
+    },
+    {
+      "q": "Pro ile Business arasındaki fark ne?",
+      "a": "Pro, daha fazla hacim ve daha iyi izleme isteyen büyüyen ekipler içindir. Business, SLA garantileri, FIFO teslimat, SSO ve özel destek isteyen ekipler içindir."
+    },
+    {
+      "q": "Yıllık faturalandırma var mı?",
+      "a": "Evet. Yıllık faturalandırma, aylığa göre %20 tasarruf sağlar. Pro için yılda $278, Business için yılda $950."
+    },
+    {
+      "q": "Hangi ödeme yöntemlerini kabul ediyorsunuz?",
+      "a": "Stripe üzerinden tüm büyük kredi kartlarını kabul ediyoruz. Business ve Enterprise planları için fatura ve banka havalesi de desteklenir."
+    },
+    {
+      "q": "HookSniff'i kendi sunucumda çalıştırabilir miyim?",
+      "a": "Evet! HookSniff açık kaynaklıdır. Docker ile kendi sunucunuzda çalıştırabilirsiniz. Kendi sunucunuzda çalışan örnekler topluluk desteği alır."
+    },
+    {
+      "q": "Hangi SDK'ları destekliyorsunuz?",
+      "a": "11 SDK destekliyoruz: Node.js, Python, Rust, C#, Go, Swift, PHP, Elixir, Java, Kotlin ve Ruby."
+    },
+    {
+      "q": "Verilerim güvende mi?",
+      "a": "Evet. Tüm veriler aktarım sırasında (TLS 1.3) ve depolanırken şifrelenir. Webhook imzaları için HMAC-SHA256, parola hashleme için Argon2 kullanıyoruz ve 2FA/TOTP destekliyoruz."
+    },
+    {
+      "q": "GDPR uyumlu musunuz?",
+      "a": "Evet. GDPR uyumluyuz. Verileri AB bölgelerinde işliyoruz, veri dışa/içme/silme taleplerini destekliyoruz ve yayınlanmış bir gizlilik politikamız var."
+    },
+    {
+      "q": "Uptime SLA'nız nedir?",
+      "a": "Ücretsiz ve Pro planlarında %99.9 uptime hedefi (en iyi çaba) vardır. Business planları, kaçırdığımızda kredi ile %99.9 uptime SLA içerir."
+    },
+    {
+      "q": "HookSniff Svix ile nasıl karşılaştırılır?",
+      "a": "HookSniff, Svix'ten 10x daha düşük maliyetle benzer özellikler sunar. Svix $490/ay'dan başlar; HookSniff Pro $49/ay'dır. Ayrıca daha fazla SDK (11'e karşı 6), FIFO teslimat ve CloudEvents destekliyoruz."
+    },
+    {
+      "q": "Verilerimi dışa aktarabilir miyim?",
+      "a": "Evet. Tüm webhook loglarınızı, endpoint yapılandırmalarınızı ve teslimat geçmişinizi panelden JSON veya CSV olarak dışa aktarabilirsiniz."
+    }
+  ]
 }
