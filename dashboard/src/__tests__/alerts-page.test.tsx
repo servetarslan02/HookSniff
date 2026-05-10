@@ -192,13 +192,13 @@ describe('AlertsPage', () => {
     await act(async () => {
       fireEvent.change(nameInput!, { target: { value: 'My Alert' } });
     });
-    expect(nameInput!.value).toBe('My Alert');
+    expect((nameInput as HTMLInputElement).value).toBe('My Alert');
     // Fill threshold
     const thresholdInput = container!.querySelector('input[type="number"]');
     await act(async () => {
       fireEvent.change(thresholdInput!, { target: { value: '25' } });
     });
-    expect(thresholdInput!.value).toBe('25');
+    expect((thresholdInput as HTMLInputElement).value).toBe('25');
   });
 
   it('changes condition select', async () => {

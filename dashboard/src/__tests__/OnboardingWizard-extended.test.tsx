@@ -31,7 +31,7 @@ vi.mock('@/lib/store', () => ({
   useAuth: () => mockAuth,
 }));
 
-const { OnboardingWizard, SetupChecklist, SuccessToast } = await import('@/components/OnboardingWizard');
+const { OnboardingWizard } = await import('@/components/OnboardingWizard');
 
 // ─── Helper: navigate to a specific step ───
 async function navigateToStep(container: HTMLElement, targetStep: string) {
@@ -54,14 +54,14 @@ async function navigateToStep(container: HTMLElement, targetStep: string) {
   // Continue to SDK
   buttons = Array.from(container.querySelectorAll('button'));
   let continueBtn = buttons.find(b => b.textContent?.includes('Continue'));
-  if (continueBtn) await act(async () => { fireEvent.click(continueBtn); });
+  if (continueBtn) { const btn = continueBtn; await act(async () => { fireEvent.click(btn); }); }
 
   if (targetIndex === 2) return; // sdk
 
   // Continue to endpoint
   buttons = Array.from(container.querySelectorAll('button'));
   continueBtn = buttons.find(b => b.textContent?.includes('Continue'));
-  if (continueBtn) await act(async () => { fireEvent.click(continueBtn); });
+  if (continueBtn) { const btn2 = continueBtn; await act(async () => { fireEvent.click(btn2); }); }
 
   if (targetIndex === 3) return; // endpoint
 

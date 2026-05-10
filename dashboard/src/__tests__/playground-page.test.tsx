@@ -136,7 +136,7 @@ describe('PlaygroundPage', () => {
 
   it('changes path input', () => {
     const { container } = render(React.createElement(PlaygroundPage));
-    const pathInput = container.querySelector('input[type="text"]')!;
+    const pathInput = container.querySelector('input[type="text"]')! as HTMLInputElement;
     fireEvent.change(pathInput, { target: { value: '/v1/custom' } });
     expect(pathInput.value).toBe('/v1/custom');
   });
@@ -163,7 +163,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('sends request successfully', async () => {
-    const { container, getByText } = render(React.createElement(PlaygroundPage));
+    const { container } = render(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -262,7 +262,7 @@ describe('PlaygroundPage', () => {
     );
     expect(presetBtns.length).toBe(3);
     fireEvent.click(presetBtns[0]); // List Endpoints
-    const pathInput = container.querySelector('input[type="text"]')!;
+    const pathInput = container.querySelector('input[type="text"]')! as HTMLInputElement;
     expect(pathInput.value).toBe('/endpoints');
   });
 
@@ -440,7 +440,7 @@ describe('PlaygroundPage', () => {
     await act(async () => {
       fireEvent.click(historyBtn!);
     });
-    const pathInput = container.querySelector('input[type="text"]')!;
+    const pathInput = container.querySelector('input[type="text"]')! as HTMLInputElement;
     expect(pathInput.value).toBe('/saved-path');
   });
 
@@ -521,7 +521,7 @@ describe('PlaygroundPage', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: () => Promise.stringify ? Promise.resolve({ hello: 'world' }) : Promise.resolve({ hello: 'world' }),
+      json: () => Promise.resolve({ hello: 'world' }),
       headers: new Map([['content-type', 'application/json']]),
     });
     const { container } = render(React.createElement(PlaygroundPage));

@@ -1,6 +1,6 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
-use tower_http::cors::{AllowHeaders, AllowOrigin, Any, CorsLayer};
+use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
 use tower_http::trace::TraceLayer;
 
 use hooksniff_api::config;
@@ -18,7 +18,8 @@ async fn main() -> Result<()> {
     let cfg = config::Config::from_env()?;
 
     // Initialize tracing (OpenTelemetry + structured logging)
-    telemetry::init(&cfg);
+    // Guard flushes OTel traces on drop — keep alive until shutdown
+    let _tracer_guard = telemetry::init(&cfg);
 
     tracing::info!("Starting HookSniff API v{}", env!("CARGO_PKG_VERSION"));
 
@@ -201,8 +202,7 @@ async fn main() -> Result<()> {
 
     tracing::info!("👋 HookSniff API shut down gracefully");
 
-    // Flush OpenTelemetry traces before exit
-    opentelemetry::global::shutdown_tracer_provider();
+    // _tracer_guard drops here → OTel traces flushed automatically
 
     Ok(())
 }
