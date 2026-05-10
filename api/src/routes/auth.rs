@@ -365,7 +365,8 @@ async fn verify_2fa_login(
         .ok_or(AppError::Internal(anyhow::anyhow!("TOTP secret missing")))?;
 
     if !verify_totp_code(secret, &req.code) {
-        return Err(AppError::BadRequest("Invalid TOTP code".into()));
+        // HS-038f: Don't reveal TOTP validation failure — same as other auth failures
+        return Err(AppError::Unauthorized);
     }
 
     // Generate short-lived access token + refresh token
