@@ -429,10 +429,13 @@ async fn process_pending(
             } else {
                 Some(status_code)
             };
+            // HS-064: Truncate response body to prevent PII leakage in traces/storage
             let attempt_body = if is_network_error {
                 None
             } else {
-                Some(response_body.as_str())
+                let body = response_body.as_str();
+                let truncated = if body.len() > 500 { &body[..500] } else { body };
+                Some(truncated)
             };
             let attempt_headers = if is_network_error {
                 None
