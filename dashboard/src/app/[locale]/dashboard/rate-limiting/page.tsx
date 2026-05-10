@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
@@ -26,6 +27,7 @@ interface RateLimitStats {
 
 /* ─── Main Page ─── */
 export default function RateLimitingPage() {
+  const t = useTranslations('rateLimiting');
   const { token } = useAuth();
   const [stats, setStats] = useState<RateLimitStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,9 +80,9 @@ export default function RateLimitingPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">⚡ Rate Limiting</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Monitor and configure rate limits for your webhook endpoints.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -88,19 +90,19 @@ export default function RateLimitingPage() {
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="glass-card p-4">
-            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">Total Endpoints</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">{t('totalEndpoints')}</div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_endpoints}</div>
           </div>
           <div className="glass-card p-4">
-            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">Avg Requests/sec</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">{t('avgRequestsSec')}</div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.avg_rps.toFixed(1)}</div>
           </div>
           <div className="glass-card p-4">
-            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">Peak Requests/sec</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">{t('peakRequestsSec')}</div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.peak_rps.toFixed(1)}</div>
           </div>
           <div className="glass-card p-4">
-            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">Throttled Requests</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">{t('throttledRequests')}</div>
             <div className={`text-2xl font-bold ${stats.total_throttled > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}`}>
               {stats.total_throttled}
             </div>
@@ -112,18 +114,18 @@ export default function RateLimitingPage() {
       {stats && stats.limits.length > 0 && (
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Per-Endpoint Limits</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('perEndpointLimits')}</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Endpoint</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">RPS</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">RPM</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Burst</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Queue</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Throttled</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('endpoint')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('rps')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('rpm')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('burst')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('queue')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('throttled')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -157,26 +159,25 @@ export default function RateLimitingPage() {
       {!stats && (
         <div className="glass-card p-12 text-center">
           <div className="text-5xl mb-4">⚡</div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Rate Limiting</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('emptyTitle')}</h2>
           <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-            HookSniff automatically rate-limits webhook deliveries to protect your endpoints. 
-            Configure limits per endpoint in settings.
+            {t('emptyDesc')}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
             <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center">
               <div className="text-2xl mb-2">🔄</div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">Auto Retry</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">Exponential backoff</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('autoRetry')}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('exponentialBackoff')}</div>
             </div>
             <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center">
               <div className="text-2xl mb-2">📊</div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">Per-Endpoint</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">Custom limits</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('perEndpoint')}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('customLimits')}</div>
             </div>
             <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center">
               <div className="text-2xl mb-2">🔔</div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">Alerts</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">Throttle notifications</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('alerts')}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('throttleNotifications')}</div>
             </div>
           </div>
         </div>
@@ -184,15 +185,15 @@ export default function RateLimitingPage() {
 
       {/* How it works */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How Rate Limiting Works</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
         <div className="space-y-3">
           {[
-            { icon: '1️⃣', title: 'Token Bucket Algorithm', desc: 'Each endpoint has a token bucket that refills at the configured rate. Requests consume tokens.' },
-            { icon: '2️⃣', title: 'Burst Handling', desc: 'Short bursts are allowed up to the burst size, then requests are queued.' },
-            { icon: '3️⃣', title: 'Queue & Retry', desc: 'Excess requests are queued and delivered when capacity is available. Failed deliveries retry with exponential backoff.' },
-            { icon: '4️⃣', title: 'Per-Endpoint Config', desc: 'Each endpoint can have custom rate limits. Defaults: 10 req/sec, 600 req/min, burst 20.' },
+            { icon: '1️⃣', title: t('tokenBucket'), desc: t('tokenBucketDesc') },
+            { icon: '2️⃣', title: t('burstHandling'), desc: t('burstHandlingDesc') },
+            { icon: '3️⃣', title: t('queueRetry'), desc: t('queueRetryDesc') },
+            { icon: '4️⃣', title: t('perEndpointConfig'), desc: t('perEndpointConfigDesc') },
           ].map((item) => (
-            <div key={item.title} className="flex gap-3">
+            <div key={item.icon} className="flex gap-3">
               <span className="text-lg">{item.icon}</span>
               <div>
                 <div className="font-medium text-gray-900 dark:text-white text-sm">{item.title}</div>
