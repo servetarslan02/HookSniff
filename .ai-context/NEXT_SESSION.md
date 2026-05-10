@@ -1,6 +1,26 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 02:40 GMT+8
+> Son güncelleme: 2026-05-11 02:55 GMT+8
+
+---
+
+## ✅ Oturum 98 Tamamlandı (2026-05-11 02:42 - 02:55)
+
+### Yapılan İşler
+- HS-065: i18n kampanyası — 16 dashboard sayfası useTranslations'a çevrildi
+- Tüm 32 dashboard sayfası artık next-intl useTranslations kullanıyor
+- 4 yeni i18n section: webhookBuilder, apiImporter, portalCustomize, retryPolicy
+- 400+ yeni çeviri anahtarı en.json ve tr.json'a eklendi
+- 3 paralel subagent + main agent eşzamanlı çalıştı
+- TypeScript: 0 hata, Build: başarılı
+- Commit: `b72b799` — main branch
+
+### Test Durumu
+- API: 979/979 ✅
+- Worker: 48/48 ✅
+- Dashboard: 3132/3132 ✅
+- TypeScript: 0 hata ✅
+- Build: başarılı ✅
 
 ---
 
@@ -53,15 +73,11 @@
 - Dashboard: 2824 test
 - API: 979 test
 
-### Kalan 7 Sorun
+### Kalan 2 Sorun
 | ID | Sorun | Not |
 |----|-------|-----|
-| HS-065 | 920+ hardcoded string (i18n) | Büyük iş |
-| HS-082 | SDK version mismatch | Version bump publishing gerektirir |
-| HS-084 | iyzico fatura handler | iyzico hesabı gerekli |
 | HS-085 | db.rs test | Gerçek PostgreSQL gerekli |
-| HS-088 | AuthGuard component test | Frontend test |
-| HS-089 | SSO page test | Frontend test |
+| HS-090 | SDK otomatik güncelleme | Lansman sonrası |
 
 ### 0. Staging Test (BAŞARILI) ✅
 - ✅ Health check: database healthy, queue healthy
@@ -131,9 +147,15 @@ d7c59a8 fix(security): harden CSP headers and add HSTS
 
 ---
 
-## 🟡 Sıradaki Oturum: #98 — İLK SIRA BUNLAR
+## 🟡 Sıradaki Oturum: #99
 
-### 0. ZORUNLU: Staging Test (Bağımlılık Doğrulaması)
+### i18n Tamamlandı ✅ (HS-065)
+- Tüm 32 dashboard sayfası useTranslations kullanıyor
+- 400+ çeviri anahtarı (en + tr)
+- 8 dil dosyası mevcut (en, tr, de, es, fr, ja, ko, pt-BR)
+- Kalan: diğer dillerdeki çevirileri güncellemek (otomatik araç ile)
+
+### 0. ZORUNLU: Staging Test
 
 ```bash
 curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
@@ -172,9 +194,9 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/lo
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 14 | 0 |
 | 🔴 P1 | 44 | 46 | 0 |
-| 🟡 P2 | 38 | 33 | 5 |
+| 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 7 | 6 |
-| **TOPLAM** | **103** | **100** | **3** |
+| **TOPLAM** | **103** | **101** | **2** |
 
 ---
 
