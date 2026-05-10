@@ -9,9 +9,9 @@ import { useToast } from '@/components/Toast';
 import { endpointsApi, type Endpoint, type RetryPolicyConfig } from '@/lib/api';
 
 const BACKOFF_OPTIONS = [
-  { value: 'exponential', label: 'Exponential', desc: 'Delay doubles each attempt (10s → 20s → 40s → 80s...)' },
-  { value: 'linear', label: 'Linear', desc: 'Delay increases linearly (10s → 20s → 30s → 40s...)' },
-  { value: 'fixed', label: 'Fixed', desc: 'Same delay every attempt (10s → 10s → 10s...)' },
+  { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },
+  { value: 'linear', labelKey: 'linear', descKey: 'linearDesc' },
+  { value: 'fixed', labelKey: 'fixed', descKey: 'fixedDesc' },
 ] as const;
 
 export default function EndpointSettingsPage() {
@@ -244,8 +244,8 @@ export default function EndpointSettingsPage() {
                     className="mt-0.5 text-brand-600 focus:ring-brand-500"
                   />
                   <div>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{opt.label}</span>
-                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{t(opt.labelKey)}</span>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t(opt.descKey)}</p>
                   </div>
                 </label>
               ))}
