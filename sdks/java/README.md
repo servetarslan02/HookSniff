@@ -13,14 +13,14 @@ Official Java client for the [HookSniff](https://hooksniff.vercel.app) webhook d
 <dependency>
     <groupId>com.hooksniff</groupId>
     <artifactId>hooksniff-sdk</artifactId>
-    <version>0.1.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'com.hooksniff:hooksniff-sdk:0.1.0'
+implementation 'com.hooksniff:hooksniff-sdk:0.3.0'
 ```
 
 ## Quick Start
