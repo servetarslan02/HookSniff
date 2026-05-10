@@ -101,3 +101,12 @@ Eğer Rust yoksa kur: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs
 - "Daha sonra yaparız" → ❌ Hemen yap
 - "Riskli dokunmayalım" → ❌ Araştır, test et, yap
 - "Büyük iş" → ❌ Parçala, başla
+
+### İş Kalite Kuralları (ZORUNLU)
+- ❌ **Yarım iş yasak** — başladığın işi bitir, compile et, test et, push et
+- ❌ **Hızlıya kaçmak yasak** — "çabuk bitireyim" diye adım atlanmaz
+- ❌ **Üstün körü iş yasak** — "galiba doğru" yetmez, compile + test zorunlu
+- ❌ **Erteleme yasak** — "daha sonra", "büyük iş", "riskli" kabul edilmez
+- ✅ **Detaylı değerlendirme** — her iş titizlikle kontrol edilecek
+- ✅ **Parça parça ilerle** — büyük işleri böl, her parçayı doğrula
+- ✅ **Sor** — emin değilsen Servet'e sor, tahmin yürütme

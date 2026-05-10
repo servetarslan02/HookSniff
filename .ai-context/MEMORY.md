@@ -117,3 +117,12 @@ MEMEOF
 - ❌ "Bu riskli, dokunmayalım" YASAK (önce araştır, sonra karar ver)
 - ✅ Yapılabilen hemen yapılır
 - ✅ Büyük işler bile olsa başla, parça parça ilerle
+
+### İş Kalite Kuralları
+- ❌ **Yarım iş yasak** — başladığın işi bitir, compile et, test et, push et
+- ❌ **Hızlıya kaçmak yasak** — "çabuk bitireyim" diye atlanmaz, her adım düzgün yapılacak
+- ❌ **Üstün körü iş yasak** — gözle bakarak "galiba doğru" denmez, compile + test zorunlu
+- ❌ **Erteleme yasak** — "daha sonra yaparız", "büyük iş", "riskli dokunmayalım" kabul edilmez
+- ✅ **Detaylı değerlendirme** — yapılan her iş titizlikle kontrol edilecek
+- ✅ **Parça parça ilerle** — büyük işleri küçült, her parçayı test et
+- ✅ **Sor** — emin olmadığında Servet'e sor, tahmin yürütme
