@@ -41,6 +41,7 @@ impl AuthCache {
         self.entries.insert(prefix, (customer, Instant::now() + AUTH_CACHE_TTL));
     }
 
+    #[allow(dead_code)] // Cache eviction utility; will be called by periodic cleanup task
     fn cleanup(&mut self) {
         self.entries.retain(|_, (_, expiry)| Instant::now() < *expiry);
     }

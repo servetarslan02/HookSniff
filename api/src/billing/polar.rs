@@ -169,6 +169,14 @@ impl PolarProvider {
         signature_header: &str,
         webhook_secret: &str,
     ) -> Result<(), AppError> {
+        // Reject if webhook secret is not configured
+        if webhook_secret.is_empty() {
+            tracing::error!("Polar webhook secret is empty — rejecting webhook to prevent billing manipulation");
+            return Err(AppError::Internal(anyhow::anyhow!(
+                "Billing webhook secret not configured"
+            )));
+        }
+
         let mut timestamp: Option<i64> = None;
         let mut v1_sig: Option<&str> = None;
 
