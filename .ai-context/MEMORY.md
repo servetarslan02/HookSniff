@@ -29,9 +29,9 @@
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 14 | 0 |
 | 🔴 P1 | 44 | 46 | 0 |
-| 🟡 P2 | 38 | 27 | 11 |
-| 🟢 P3 | 13 | 5 | 8 |
-| **TOPLAM** | **103** | **92** | **11** |
+| 🟡 P2 | 38 | 29 | 9 |
+| 🟢 P3 | 13 | 7 | 6 |
+| **TOPLAM** | **103** | **96** | **7** |
 
 ## Oturum 94 (2026-05-10 22:58 - 23:54) ✅
 - **12 major dependency güncellendi:**
@@ -102,7 +102,11 @@
 - **Issue tracker güncellendi:** HS-077, HS-079, HS-081 ✅
 - **Dashboard build:** başarılı ✅
 - **Commits:** `e753a03`, `cca4ba1` — main branch
-- **Devam ediyor:** OpenAPI schema inceleme, test coverage, Dependabot PR'ları
+- **OpenAPI schema (HS-083):** Nested router pathleri uyumlu, gerçek mismatch yok ✅
+- **Dependabot PR'ları (HS-078):** Açık PR kalmamış ✅
+- **Test coverage:** Worker 48 test (12+16 yeni), Dashboard 2824 test ✅
+- **Commits:** `e753a03`, `cca4ba1`, `dffc665`, `d731c34`, `1ad7484` — main branch
+- **Kalan:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
 
 ## Oturum 97 (2026-05-11 01:02 - 01:30) ✅
 - **Dashboard test coverage artırıldı (5 yeni test dosyası, 132 yeni test):**
