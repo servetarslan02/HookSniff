@@ -271,7 +271,7 @@ export default function CompareContent() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Compare</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -308,7 +308,7 @@ export default function CompareContent() {
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
               <Image src="/screenshots/compare-hero.jpg" alt="HookSniff Compare — side-by-side webhook service comparison" width={800} height={450} className="w-full" />
               <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Compare Page</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("comparePage")}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">20 detailed sections with honest, side-by-side comparison.</p>
               </div>
             </div>
@@ -322,14 +322,14 @@ export default function CompareContent() {
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
               <Image src="/screenshots/playground.png" alt="HookSniff Playground — test webhooks in real-time" width={800} height={450} className="w-full" />
               <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Webhook Playground</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("playground")}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">Generate URLs, send webhooks, inspect payloads in real-time.</p>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
               <Image src="/screenshots/build-vs-buy.png" alt="HookSniff Build vs Buy — 12 dimension webhook infrastructure comparison" width={800} height={450} className="w-full" />
               <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Build vs Buy</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("buildVsBuy")}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">12 dimensions: cost, time, security, reliability, and more.</p>
               </div>
             </div>
@@ -338,7 +338,7 @@ export default function CompareContent() {
 
         {/* Scorecard */}
         <div className="mb-16 p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Scorecard</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t("scorecard")}</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -374,7 +374,7 @@ export default function CompareContent() {
 
         {/* Social Proof */}
         <div className="mb-16">
-          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-6">Trusted by developers who switched from building their own webhooks</p>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-6">{t('trustedBy')}</p>
           <div className="grid md:grid-cols-3 gap-4">
             {testimonials.map((t, i) => (
               <div key={i} className="p-5 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">

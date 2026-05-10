@@ -12,15 +12,15 @@ export default function ConceptsPage() {
 
       {/* Endpoints */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Endpoints</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("endpoints")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           An <strong>endpoint</strong> represents a URL where webhook payloads are delivered. Each endpoint has:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
           <li><strong>URL</strong> — The target URL that receives webhook POST requests</li>
-          <li><strong>Events</strong> — Optional event filter (e.g., only deliver <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code> events)</li>
+          <li><strong>{t("events")}</strong> — Optional event filter (e.g., only deliver <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code> events)</li>
           <li><strong>{t("signingSecret")}</strong> — HMAC-SHA256 secret for payload verification (<code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">whsec_</code> prefix)</li>
-          <li><strong>Status</strong> — Active or inactive; inactive endpoints skip delivery</li>
+          <li><strong>{t("status")}</strong> — Active or inactive; inactive endpoints skip delivery</li>
         </ul>
         <CodeBlock
           code={`{
@@ -51,7 +51,7 @@ export default function ConceptsPage() {
 
       {/* Retries */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Retries</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("retries")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Failed deliveries are automatically retried using <strong>exponential backoff with jitter</strong>. The default schedule:
         </p>
@@ -59,13 +59,13 @@ export default function ConceptsPage() {
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Attempt</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Delay</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Cumulative</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("attempt")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("delay")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("cumulative")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">1</td><td className="px-4 py-3">Immediate</td><td className="px-4 py-3">0</td></tr>
+              <tr><td className="px-4 py-3">1</td><td className="px-4 py-3">{t("immediate")}</td><td className="px-4 py-3">0</td></tr>
               <tr><td className="px-4 py-3">2</td><td className="px-4 py-3">10 seconds</td><td className="px-4 py-3">10s</td></tr>
               <tr><td className="px-4 py-3">3</td><td className="px-4 py-3">30 seconds</td><td className="px-4 py-3">40s</td></tr>
               <tr><td className="px-4 py-3">4</td><td className="px-4 py-3">2 minutes</td><td className="px-4 py-3">~2.5m</td></tr>
@@ -86,8 +86,8 @@ export default function ConceptsPage() {
           When a delivery exhausts all retry attempts, it's preserved in the <strong>{t("deadLetterQueue")}</strong>. DLQ entries include:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Original payload and event type</li>
-          <li>All delivery attempts with error details</li>
+          <li>{t("originalPayload")}</li>
+          <li>{t("allAttempts")}</li>
           <li>Ability to <strong>replay</strong> — re-queue the delivery for another attempt</li>
           <li>Configurable retention (default: 30 days)</li>
         </ul>
@@ -95,7 +95,7 @@ export default function ConceptsPage() {
 
       {/* API Keys */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">API Keys</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("apiKeys")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           API keys authenticate your requests. Keys use the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hr_live_</code> prefix and are sent via Bearer auth:
         </p>
@@ -113,7 +113,7 @@ export default function ConceptsPage() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("fifoDelivery")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          HookSniff delivers webhooks in <strong>FIFO order</strong> (first-in, first-out) per endpoint. Each delivery includes a sequence number:
+          HookSniff delivers webhooks in <strong>{t("fifoOrder")}</strong> (first-in, first-out) per endpoint. Each delivery includes a sequence number:
         </p>
         <CodeBlock
           code={`{

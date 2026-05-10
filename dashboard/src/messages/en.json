@@ -754,7 +754,8 @@
     "noScheduled": "No scheduled maintenance",
     "systemStatus": "System Status",
     "overallUptime": "Overall Uptime",
-    "scheduledMaintenance": "Scheduled Maintenance"
+    "scheduledMaintenance": "Scheduled Maintenance",
+    "docs": "Docs"
   },
   "terms": {
     "title": "Terms of Service",
@@ -2086,7 +2087,8 @@
     "recommended": "Recommended",
     "alternatives": "Alternatives",
     "playground": "Webhook Playground",
-    "buildVsBuy": "Build vs Buy"
+    "buildVsBuy": "Build vs Buy",
+    "comparePage": "Compare Page"
   },
   "customers": {
     "title": "Customers",
@@ -2201,7 +2203,8 @@
     "rateLimited": "Rate limited",
     "queryParams": "Query Parameters",
     "python": "Python",
-    "svixPlay": "Svix Play"
+    "svixPlay": "Svix Play",
+    "feature": "Feature"
   },
   "buildVsBuy": {
     "title": "Build vs Buy",
