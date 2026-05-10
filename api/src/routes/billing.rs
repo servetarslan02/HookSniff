@@ -188,7 +188,17 @@ async fn upgrade_plan(
     }
 
     // Calculate proration for upgrades from paid plans
-    let proration = calculate_proration(&current_plan, &new_plan, None);
+    // Fetch the customer's last payment date as period start approximation
+    let period_start: Option<chrono::DateTime<Utc>> = sqlx::query_scalar(
+        "SELECT MAX(paid_at) FROM invoices WHERE customer_id = $1 AND status = 'paid'",
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await
+    .ok()
+    .flatten();
+
+    let proration = calculate_proration(&current_plan, &new_plan, period_start.as_ref());
 
     // Determine which provider to use
     let provider_name = req
@@ -814,14 +824,30 @@ async fn process_webhook_result(
                 currency
             );
         }
-        WebhookResult::PaymentFailed { provider_tx_id } => {
-            // HS-059: Set grace period instead of immediate action
-            tracing::warn!(
-                "⚠️ {} payment failed: {} — starting {} day grace period",
-                provider,
-                provider_tx_id,
-                GRACE_PERIOD_DAYS
-            );
+        WebhookResult::PaymentFailed { provider_tx_id, customer_id } => {
+            // HS-059: Set grace period on payment failure (all providers)
+            if let Some(cid) = customer_id {
+                sqlx::query(
+                    "UPDATE customers SET payment_failed_at = NOW(), updated_at = NOW() \
+                     WHERE id = $1 AND payment_failed_at IS NOT NULL",
+                )
+                .bind(cid)
+                .execute(pool)
+                .await?;
+
+                tracing::warn!(
+                    "⚠️ {} payment failed: {} — grace period started for customer {}",
+                    provider,
+                    provider_tx_id,
+                    cid
+                );
+            } else {
+                tracing::warn!(
+                    "⚠️ {} payment failed: {} — no customer_id, grace period not set",
+                    provider,
+                    provider_tx_id
+                );
+            }
         }
         WebhookResult::Ignored => {}
     }
