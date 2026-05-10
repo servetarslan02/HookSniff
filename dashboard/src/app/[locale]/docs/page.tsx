@@ -37,7 +37,7 @@ export default function DocsPage() {
 
       {/* API Info */}
       <section className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">API Base URL</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('apiBaseUrl')}</h2>
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
           {`https://hooksniff-api-1046140057667.europe-west1.run.app/v1`}
         </pre>
@@ -45,7 +45,7 @@ export default function DocsPage() {
 
       {/* Authentication Quick Reference */}
       <section className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Authentication</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('authentication')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-3">
           All API requests require a Bearer token with an <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hr_live_</code> prefixed API key:
         </p>
@@ -56,20 +56,20 @@ export default function DocsPage() {
 
       {/* Rate Limits */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Rate Limits</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('rateLimits')}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('plan')}</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Requests/min</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Webhooks/month</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">Free</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000</td></tr>
+              <tr><td className="px-4 py-3">{t('free')}</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000</td></tr>
               <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">50,000</td></tr>
-              <tr><td className="px-4 py-3">Business</td><td className="px-4 py-3">10,000</td><td className="px-4 py-3">500,000</td></tr>
+              <tr><td className="px-4 py-3">{t('business')}</td><td className="px-4 py-3">10,000</td><td className="px-4 py-3">500,000</td></tr>
             </tbody>
           </table></div>
         </div>

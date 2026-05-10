@@ -153,18 +153,18 @@ export default function ApiReferencePage() {
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Code</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Meaning</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('errorCodes.code')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('errorCodes.meaning')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('errorCodes.description')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-mono">400</td><td className="px-4 py-3">Bad Request</td><td className="px-4 py-3">Invalid request body or parameters</td></tr>
-              <tr><td className="px-4 py-3 font-mono">401</td><td className="px-4 py-3">Unauthorized</td><td className="px-4 py-3">Missing or invalid API key</td></tr>
-              <tr><td className="px-4 py-3 font-mono">403</td><td className="px-4 py-3">Forbidden</td><td className="px-4 py-3">Insufficient permissions or plan limits exceeded</td></tr>
-              <tr><td className="px-4 py-3 font-mono">404</td><td className="px-4 py-3">Not Found</td><td className="px-4 py-3">Resource does not exist</td></tr>
-              <tr><td className="px-4 py-3 font-mono">429</td><td className="px-4 py-3">Rate Limited</td><td className="px-4 py-3">Too many requests — check Retry-After header</td></tr>
-              <tr><td className="px-4 py-3 font-mono">500</td><td className="px-4 py-3">Server Error</td><td className="px-4 py-3">Internal error — contact support if persistent</td></tr>
+              <tr><td className="px-4 py-3 font-mono">400</td><td className="px-4 py-3">{t('errorCodes.badRequest')}</td><td className="px-4 py-3">{t('errorCodes.invalidBody')}</td></tr>
+              <tr><td className="px-4 py-3 font-mono">401</td><td className="px-4 py-3">{t('errorCodes.unauthorized')}</td><td className="px-4 py-3">{t('errorCodes.missingKey')}</td></tr>
+              <tr><td className="px-4 py-3 font-mono">403</td><td className="px-4 py-3">{t('errorCodes.forbidden')}</td><td className="px-4 py-3">{t('errorCodes.insufficient')}</td></tr>
+              <tr><td className="px-4 py-3 font-mono">404</td><td className="px-4 py-3">{t('errorCodes.notFound')}</td><td className="px-4 py-3">{t('errorCodes.notFoundDesc')}</td></tr>
+              <tr><td className="px-4 py-3 font-mono">429</td><td className="px-4 py-3">{t('errorCodes.rateLimited')}</td><td className="px-4 py-3">Too many requests — check Retry-After header</td></tr>
+              <tr><td className="px-4 py-3 font-mono">500</td><td className="px-4 py-3">{t('errorCodes.serverError')}</td><td className="px-4 py-3">Internal error — contact support if persistent</td></tr>
             </tbody>
           </table></div>
         </div>

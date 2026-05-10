@@ -24,22 +24,22 @@ const footerLinks = [
 ];
 
 const compareLinks = [
-  { name: 'HookSniff vs Svix', href: '/alternatives/svix' },
-  { name: 'HookSniff vs Hookdeck', href: '/alternatives/hookdeck' },
-  { name: 'HookSniff vs Hook0', href: '/alternatives/hook0' },
-  { name: 'HookSniff vs Convoy', href: '/alternatives/convoy' },
-  { name: 'Svix Alternatives', href: '/alternatives/svix-alternatives' },
-  { name: 'Hookdeck Alternatives', href: '/alternatives/hookdeck-alternatives' },
-  { name: 'Convoy Alternatives', href: '/alternatives/convoy-alternatives' },
-  { name: 'Build vs Buy', href: '/build-vs-buy' },
+  { nameKey: 'compareLinks.hooksniffVsSvix', href: '/alternatives/svix' },
+  { nameKey: 'compareLinks.hooksniffVsHookdeck', href: '/alternatives/hookdeck' },
+  { nameKey: 'compareLinks.hooksniffVsHook0', href: '/alternatives/hook0' },
+  { nameKey: 'compareLinks.hooksniffVsConvoy', href: '/alternatives/convoy' },
+  { nameKey: 'compareLinks.svixAlternatives', href: '/alternatives/svix-alternatives' },
+  { nameKey: 'compareLinks.hookdeckAlternatives', href: '/alternatives/hookdeck-alternatives' },
+  { nameKey: 'compareLinks.convoyAlternatives', href: '/alternatives/convoy-alternatives' },
+  { nameKey: 'compareLinks.buildVsBuy', href: '/build-vs-buy' },
 ];
 
 const resourceLinks = [
-  { name: 'Webhook Guides', href: '/webhooks/guides' },
-  { name: 'Webhook Glossary', href: '/webhooks/glossary' },
-  { name: 'Stripe Webhooks', href: '/providers/stripe' },
-  { name: 'GitHub Webhooks', href: '/providers/github' },
-  { name: 'Shopify Webhooks', href: '/providers/shopify' },
+  { nameKey: 'resourceLinks.webhookGuides', href: '/webhooks/guides' },
+  { nameKey: 'resourceLinks.webhookGlossary', href: '/webhooks/glossary' },
+  { nameKey: 'resourceLinks.stripeWebhooks', href: '/providers/stripe' },
+  { nameKey: 'resourceLinks.githubWebhooks', href: '/providers/github' },
+  { nameKey: 'resourceLinks.shopifyWebhooks', href: '/providers/shopify' },
 ];
 
 export default function Footer() {
@@ -52,10 +52,10 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Product */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">Product</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">{t('product')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/get-started" className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Get Started</Link>
+                <Link href="/get-started" className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{t('getStarted')}</Link>
               </li>
               {['pricing', 'compare', 'playground', 'startups', 'security'].map((key) => {
                 const link = footerLinks.find((l) => l.nameKey === key);
@@ -70,11 +70,11 @@ export default function Footer() {
 
           {/* Compare */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">Compare</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">{t('compare')}</h3>
             <ul className="space-y-2">
               {compareLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{link.name}</Link>
+                  <Link href={link.href} className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{t(link.nameKey)}</Link>
                 </li>
               ))}
             </ul>
@@ -82,11 +82,11 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">Resources</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">{t('resources')}</h3>
             <ul className="space-y-2">
               {resourceLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{link.name}</Link>
+                  <Link href={link.href} className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{t(link.nameKey)}</Link>
                 </li>
               ))}
               {['blog', 'changelog', 'newsletter', 'docs'].map((key) => {
@@ -102,7 +102,7 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">Company</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">{t('company')}</h3>
             <ul className="space-y-2">
               {['about', 'contact', 'faq', 'status', 'terms', 'privacy'].map((key) => {
                 const link = footerLinks.find((l) => l.nameKey === key);
