@@ -68,7 +68,6 @@ export default function LogsPage() {
     failed: deliveries.filter((d) => d.status === 'failed').length,
     pending: deliveries.filter((d) => d.status === 'pending').length,
   };
-  const isFiltered = filter !== 'all';
 
   return (
     <div className="space-y-6">
