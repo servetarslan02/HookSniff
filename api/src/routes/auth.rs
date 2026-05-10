@@ -335,11 +335,11 @@ async fn verify_2fa_login(
     headers: HeaderMap,
     Json(req): Json<Verify2faRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Rate limit: 5 TOTP attempts per IP per minute
+    // Rate limit: 5 TOTP attempts per IP per 5 minutes
     let client_ip = extract_client_ip(&headers);
     let rl_key = format!("verify_2fa:{}", client_ip);
     let rl_result = rate_limiter
-        .check_with_headers(&rl_key, VERIFY_2FA_RATE_LIMIT)
+        .check_with_window(&rl_key, VERIFY_2FA_RATE_LIMIT, 300)
         .await;
     if !rl_result.allowed {
         return Err(AppError::RateLimitExceeded);
@@ -514,14 +514,14 @@ async fn reset_password(
 
 // ── Email Verification ──────────────────────────────────────
 
-/// Maximum email verification attempts per IP per minute.
-const VERIFY_EMAIL_RATE_LIMIT: u32 = 5;
+/// Maximum email verification attempts per IP per 15 minutes.
+const VERIFY_EMAIL_RATE_LIMIT: u32 = 10;
 
-/// Maximum 2FA verification attempts per IP per minute.
+/// Maximum 2FA verification attempts per IP per 5 minutes.
 const VERIFY_2FA_RATE_LIMIT: u32 = 5;
 
-/// Maximum refresh token attempts per IP per minute.
-const REFRESH_RATE_LIMIT: u32 = 10;
+/// Maximum refresh token attempts per IP per 15 minutes.
+const REFRESH_RATE_LIMIT: u32 = 30;
 
 async fn verify_email(
     Extension(pool): Extension<PgPool>,
@@ -529,11 +529,11 @@ async fn verify_email(
     headers: HeaderMap,
     Json(req): Json<VerifyEmailRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    // Rate limit: 5 verification attempts per IP per minute
+    // Rate limit: 10 verification attempts per IP per 15 minutes
     let client_ip = extract_client_ip(&headers);
     let rl_key = format!("verify_email:{}", client_ip);
     let rl_result = rate_limiter
-        .check_with_headers(&rl_key, VERIFY_EMAIL_RATE_LIMIT)
+        .check_with_window(&rl_key, VERIFY_EMAIL_RATE_LIMIT, 900)
         .await;
     if !rl_result.allowed {
         return Err(AppError::RateLimitExceeded);
@@ -616,11 +616,11 @@ async fn refresh_token(
     // Accept refresh token from either cookie or JSON body (cookie takes priority)
     body: Option<Json<RefreshTokenRequest>>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Rate limit: 10 refresh attempts per IP per minute
+    // Rate limit: 30 refresh attempts per IP per 15 minutes
     let client_ip = extract_client_ip(&headers);
     let rl_key = format!("refresh:{}", client_ip);
     let rl_result = rate_limiter
-        .check_with_headers(&rl_key, REFRESH_RATE_LIMIT)
+        .check_with_window(&rl_key, REFRESH_RATE_LIMIT, 900)
         .await;
     if !rl_result.allowed {
         return Err(AppError::RateLimitExceeded);
@@ -1194,9 +1194,9 @@ mod tests {
         assert_eq!(TOKEN_MAX_AGE, 86400);
         assert_eq!(REFRESH_TOKEN_MAX_AGE, 2592000);
         assert_eq!(RESET_RATE_LIMIT, 5);
-        assert_eq!(VERIFY_EMAIL_RATE_LIMIT, 5);
+        assert_eq!(VERIFY_EMAIL_RATE_LIMIT, 10);
         assert_eq!(VERIFY_2FA_RATE_LIMIT, 5);
-        assert_eq!(REFRESH_RATE_LIMIT, 10);
+        assert_eq!(REFRESH_RATE_LIMIT, 30);
     }
 
     // ── extract_client_ip ───────────────────────────────────
