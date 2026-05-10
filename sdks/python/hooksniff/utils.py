@@ -12,7 +12,7 @@ def verify_signature(payload: str, signature: str, secret: str) -> bool:
 
     Args:
         payload: The raw request body as a string.
-        signature: The signature from the X-Hookrelay-Signature header.
+        signature: The signature from the X-Hooksniff-Signature header.
                    Expected format: "sha256=<hex_digest>"
         secret: The endpoint's signing secret (starts with "whsec_").
 
@@ -21,7 +21,7 @@ def verify_signature(payload: str, signature: str, secret: str) -> bool:
 
     Example:
         >>> from hooksniff import verify_signature
-        >>> is_valid = verify_signature(request.body, request.headers["X-Hookrelay-Signature"], "whsec_...")
+        >>> is_valid = verify_signature(request.body, request.headers["X-Hooksniff-Signature"], "whsec_...")
     """
     if not payload or not signature or not secret:
         return False
@@ -66,7 +66,7 @@ def verify_webhook_signature(
         >>> from hooksniff import verify_webhook_signature
         >>> result = verify_webhook_signature(
         ...     request.body.decode(),
-        ...     request.headers.get("X-Hookrelay-Signature"),
+        ...     request.headers.get("X-Hooksniff-Signature"),
         ...     "whsec_..."
         ... )
         >>> if result["valid"]:
@@ -114,7 +114,7 @@ class WebhookHandler:
         def webhook():
             return handler.handle(
                 body=request.data.decode(),
-                signature=request.headers.get("X-Hookrelay-Signature"),
+                signature=request.headers.get("X-Hooksniff-Signature"),
             )
 
     Example (FastAPI):
@@ -127,7 +127,7 @@ class WebhookHandler:
         @app.post("/webhook")
         async def webhook(request: Request):
             body = (await request.body()).decode()
-            sig = request.headers.get("X-Hookrelay-Signature")
+            sig = request.headers.get("X-Hooksniff-Signature")
             return handler.handle(body=body, signature=sig)
     """
 
@@ -136,7 +136,7 @@ class WebhookHandler:
         secret: str,
         handlers: Optional[Dict[str, Callable]] = None,
         on_event: Optional[Callable] = None,
-        signature_header: str = "X-Hookrelay-Signature",
+        signature_header: str = "X-Hooksniff-Signature",
     ):
         self.secret = secret
         self.handlers = handlers or {}

@@ -4,7 +4,7 @@ module HookSniff
   # Verify a webhook signature using HMAC-SHA256.
   #
   # @param payload [String] The raw request body
-  # @param signature [String] The signature from the X-Hookrelay-Signature header
+  # @param signature [String] The signature from the X-Hooksniff-Signature header
   # @param secret [String] The endpoint's signing secret (starts with "whsec_")
   # @return [Boolean] true if the signature is valid
   def self.verify_signature(payload, signature, secret)
