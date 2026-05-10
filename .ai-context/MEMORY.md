@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 23:54 GMT+8
+> Son güncelleme: 2026-05-11 00:36 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -23,7 +23,7 @@
 - API: hooksniff-api-1046140057667.europe-west1.run.app
 - Dashboard: https://hooksniff.vercel.app
 
-## 📊 Güncel İlerleme (2026-05-10 23:54)
+## 📊 Güncel İlerleme (2026-05-11 00:36)
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
