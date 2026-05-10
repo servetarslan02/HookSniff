@@ -49,7 +49,16 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 81: Database Issues + Worker Kalan (HS-024, HS-025, HS-026, HS-027, HS-038d, HS-038e)
+- Oturum 82: Auth & Crypto Security (HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l)
+
+## 📝 Oturum 81 (2026-05-10 19:35 - 19:37 GMT+8) ✅
+1. Database Issues:
+   - CHECK constraints eklendi (status, attempt_count, max_attempts) (HS-025)
+   - webhook_queue.delivery_id FK eklendi (HS-026)
+   - Delivery index eklendi (customer_id, created_at DESC) (HS-057)
+   - HS-024: ⚠️ Manuel senkronizasyon notu
+   - HS-027, HS-038d, HS-038e: Yanlış bulgular
+2. Dosyalar: `api/migrations/002_constraints_and_indexes.sql`, `api/src/db.rs`
 
 ## 📝 Oturum 80 (2026-05-10 19:30 - 19:32 GMT+8) ✅ (kısmi)
 1. Error classification eklendi:

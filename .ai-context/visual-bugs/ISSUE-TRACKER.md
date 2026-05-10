@@ -49,10 +49,10 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-021 | Billing webhook'larda idempotency yok | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
 | HS-022 | Throttle state in-memory — restart'ta kaybolur | `backend/deep-rate-limiting.md` | ⬜ |
 | HS-023 | FIFO modülü var ama worker döngüsüne bağlanmamış | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-024 | İki migration sistemi senkron değil (standalone SQL vs embedded Rust) | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-025 | CHECK constraint'ler eksik — invalid status girilebilir | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-026 | `webhook_queue`'da FK eksik | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-027 | `amount_cents` INT — overflow, BIGINT olmalı | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
+| HS-024 | İki migration sistemi senkron değil (standalone SQL vs embedded Rust) | `backend/DEEP-DB-MIGRATIONS.md` | ⚠️ 2026-05-10 — Standalone SQL + db.rs embedded migrations, manuel senkronizasyon |
+| HS-025 | CHECK constraint'ler eksik — invalid status girilebilir | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 |
+| HS-026 | `webhook_queue`'da FK eksik | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 |
+| HS-027 | `amount_cents` INT — overflow, BIGINT olmalı | `backend/DEEP-DB-MIGRATIONS.md` | ❌ 2026-05-10 — `amount_cents` column codebase'de yok |
 | HS-028 | Search sayfasında Authorization header eksik | `frontend/agent5-middleware-shared.md` | ❌ 2026-05-10 — `credentials: 'include'` cookie gönderiyor, middleware işliyor |
 | HS-029 | Search'de debounce yok — her tuşta API çağrısı | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
 | HS-030 | Dashboard routing çökmüş — 16 sayfa yanlış içerik | `frontend/agent1-core.md` | ✅ 2026-05-10 |
@@ -67,8 +67,8 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-038a | `handle_inbound_to_endpoint` Authorization bypass — sadece prefix lookup, Argon2 yok | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038b | Prefix length mismatch — 20 char lookup ama DB'de 15 char prefix | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038c | Billing webhook'larında rate limiting yok (Stripe/Polar/iyzico) | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
-| HS-038d | `custom_domains` dig/nslookup subprocess — command injection riski | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-038e | Dynamic SQL construction (events, admin) — `format!` ile WHERE clause | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038d | `custom_domains` dig/nslookup subprocess — command injection riski | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — Domain sanitize edilmiş (sadece lowercase, digit, hyphen, dot) |
+| HS-038e | Dynamic SQL construction (events, admin) — `format!` ile WHERE clause | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — `format!` sadece bind index (`$1`), user input parametrize edilmiş |
 | HS-038f | Timing attack — login hataları farklı mesajlar döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
 | HS-038g | `AppError::Serialization` serde_json hata mesajını kullanıcıya gösteriyor | `backend/DEEP-RUST-API.md` | ⬜ |
 | HS-038h | Email enumeration — register "Email already registered" döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
