@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 04:59 GMT+8
+> Son güncelleme: 2026-05-11 06:12 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -59,6 +59,22 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
+
+## Oturum 103 (2026-05-11 05:56 - 06:12) ✅
+- **Resend email entegrasyonu** — `EmailProvider` enum oluşturuldu (Resend → GCloud → None)
+  - `api/src/email.rs`: EmailProvider eklendi, tüm email methodları destekliyor
+  - `api/src/main.rs`: `gcloud_email` → `email_provider` değişti
+  - `api/src/routes/auth.rs`: register, forgot_password, resend_verification güncellendi
+  - `api/src/routes/contact.rs`: `Option<GCloudEmailClient>` → `EmailProvider`
+  - `RESEND_API_KEY` varsa Resend kullanır, yoksa GCloud Gmail fallback
+- **Email adresleri düzeltildi** — tüm sayfalar `hooksniff.vercel.app` domain'inde tutarlı
+  - Security: `security@hooksniff.com` → `security@hooksniff.vercel.app`
+  - FAQ (8 dil): `hello@hooksniff.com` → `hello@hooksniff.vercel.app`
+  - Privacy: `privacy@hooksniff.vercel.app` ✅ (zaten doğru)
+  - Terms: `legal@hooksniff.vercel.app` ✅ (zaten doğru)
+  - Contact: `support@hooksniff.vercel.app` ✅ (zaten doğru)
+- **Testler:** API 983/983 ✅, Worker 48/48 ✅, TypeScript 0 hata ✅
+- **Commit:** `c637511` — main branch
 
 ## Oturum 94 (2026-05-10 22:58 - 23:54) ✅
 - **12 major dependency güncellendi:**
