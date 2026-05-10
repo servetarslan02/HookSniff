@@ -16,6 +16,7 @@
 - **Rust compile + test zorunlu** — gözle bakarak yetmez
 - **npm install çalıştır** — yarım iş bırakma
 - **Conventional commits** — "Oturum XX:" değil, "fix:", "feat:", "docs:" kullan
+- **⚠️ External servis ayarları için Servet'ten giriş bilgileri iste** — Vercel, Resend, Neon, Grafana, Polar.sh dashboard'ları Google hesabı gerektirir
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165 (business, admin)
