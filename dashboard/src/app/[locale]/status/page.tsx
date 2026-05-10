@@ -492,7 +492,7 @@ function unreachableData(): StatusData {
 
 // ─── Main Status Page ───
 export default function StatusPage() {
-  const t = useTranslations(\'status\');
+  const t = useTranslations('status');
   const [data, setData] = useState<StatusData>(unreachableData());
   const [history, setHistory] = useState<HistoryDay[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
