@@ -1,5 +1,5 @@
 {
-  "name": "hooksniff-sdk",
+  "name": "@hooksniff/sdk",
   "version": "0.1.0",
   "description": "Official Node.js client for HookSniff webhook delivery service",
   "main": "dist/index.js",
