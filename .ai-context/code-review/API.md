@@ -20,7 +20,7 @@
 | # | Sorun | Dosya | Satır |
 |---|-------|-------|-------|
 | 1 | Batch webhook race condition (queue publish hatası → stuck pending) | `api/src/routes/webhooks.rs` | batch_webhooks() |
-| 2 | Auth middleware her istekte 2 DB sorgusu (cache yok) | `api/src/middleware/mod.rs` | ~50 |
+| 2 | Auth middleware her istekte 2 DB sorgusu (cache yok) | `api/src/middleware/mod.rs` | ~50 | ✅ Düzeltildi (2026-05-10) |
 | 3 | Worker paralel değil (sırayla `for item in items`) | `worker/src/main.rs` | ~for |
 | 4 | Response header sızıntısı (Set-Cookie bile kaydediliyor) | `worker/src/delivery/http.rs` | delivery_attempts |
 | 5 | Custom header injection riski (Host, Content-Length enjekte edilebilir) | `worker/src/delivery/http.rs` | headers |
