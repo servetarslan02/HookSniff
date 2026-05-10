@@ -101,11 +101,16 @@ class HookSniffClient(
     private val apiKey: String,
     private val baseUrl: String = DEFAULT_BASE_URL,
     private val timeout: Long = DEFAULT_TIMEOUT,
+    private val maxRetries: Int = DEFAULT_MAX_RETRIES,
 ) : Closeable {
 
     companion object {
         private const val DEFAULT_BASE_URL = "https://api.hooksniff.com/v1"
         private const val DEFAULT_TIMEOUT = 30L
+        private const val DEFAULT_MAX_RETRIES = 3
+
+        private fun isRetryable(statusCode: Int): Boolean =
+            statusCode == 429 || statusCode >= 500
     }
 
     private val httpClient = OkHttpClient.Builder()
@@ -137,91 +142,150 @@ class HookSniffClient(
     internal fun <T> request(method: String, path: String, body: Any? = null, clazz: Class<T>): T {
         val url = "$baseUrl$path"
         val mediaType = "application/json".toMediaType()
+        var lastException: Exception? = null
 
-        val requestBuilder = Request.Builder()
-            .url(url)
-            .header("Authorization", "Bearer $apiKey")
-            .header("Content-Type", "application/json")
-            .header("User-Agent", "hooksniff-kotlin/0.3.0")
+        for (attempt in 0..maxRetries) {
+            val requestBuilder = Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer $apiKey")
+                .header("Content-Type", "application/json")
+                .header("User-Agent", "hooksniff-kotlin/0.3.0")
 
-        when (method) {
-            "POST", "PUT", "PATCH" -> {
-                val jsonBody = if (body != null) gson.toJson(body) else "{}"
-                requestBuilder.method(method, jsonBody.toRequestBody(mediaType))
+            when (method) {
+                "POST", "PUT", "PATCH" -> {
+                    val jsonBody = if (body != null) gson.toJson(body) else "{}"
+                    requestBuilder.method(method, jsonBody.toRequestBody(mediaType))
+                }
+                "GET" -> requestBuilder.get()
+                "DELETE" -> requestBuilder.delete()
             }
-            "GET" -> requestBuilder.get()
-            "DELETE" -> requestBuilder.delete()
+
+            val response = try {
+                httpClient.newCall(requestBuilder.build()).execute()
+            } catch (e: java.io.IOException) {
+                lastException = e
+                if (attempt < maxRetries) {
+                    Thread.sleep(calculateBackoff(attempt))
+                    continue
+                }
+                throw HookSniffException(null, "NETWORK_ERROR", "Network error after ${attempt + 1} attempts: ${e.message}")
+            }
+
+            val responseBody = response.body?.string() ?: ""
+
+            if (!response.isSuccessful) {
+                val message = try {
+                    val errorMap = gson.fromJson<Map<*, *>>(responseBody, Map::class.java)
+                    @Suppress("UNCHECKED_CAST")
+                    val error = errorMap["error"] as? Map<String, Any>
+                    error?.get("message") as? String ?: "HTTP ${response.code}"
+                } catch (_: Exception) {
+                    "HTTP ${response.code}"
+                }
+
+                // Retry on 429 (respect Retry-After) and 5xx
+                if (isRetryable(response.code) && attempt < maxRetries) {
+                    val retryAfter = response.header("Retry-After")?.toLongOrNull()
+                    val delayMs = if (response.code == 429 && retryAfter != null) {
+                        retryAfter * 1000
+                    } else {
+                        calculateBackoff(attempt)
+                    }
+                    Thread.sleep(delayMs)
+                    continue
+                }
+
+                throw when (response.code) {
+                    400 -> ValidationException(message)
+                    401 -> AuthenticationException(message)
+                    404 -> NotFoundException(message)
+                    413 -> PayloadTooLargeException(message)
+                    429 -> RateLimitException(message)
+                    else -> HookSniffException(response.code, "UNKNOWN", message)
+                }
+            }
+
+            return gson.fromJsonTyped(responseBody, clazz)
         }
 
-        val response = httpClient.newCall(requestBuilder.build()).execute()
-        val responseBody = response.body?.string() ?: ""
-
-        if (!response.isSuccessful) {
-            val message = try {
-                val errorMap = gson.fromJson<Map<*, *>>(responseBody, Map::class.java)
-                @Suppress("UNCHECKED_CAST")
-                val error = errorMap["error"] as? Map<String, Any>
-                error?.get("message") as? String ?: "HTTP ${response.code}"
-            } catch (_: Exception) {
-                "HTTP ${response.code}"
-            }
-
-            throw when (response.code) {
-                400 -> ValidationException(message)
-                401 -> AuthenticationException(message)
-                404 -> NotFoundException(message)
-                413 -> PayloadTooLargeException(message)
-                429 -> RateLimitException(message)
-                else -> HookSniffException(response.code, "UNKNOWN", message)
-            }
-        }
-
-        return gson.fromJsonTyped(responseBody, clazz)
+        throw lastException ?: HookSniffException(null, "MAX_RETRIES", "Request failed after $maxRetries retries")
     }
 
     @Suppress("UNCHECKED_CAST")
     internal fun <T> request(method: String, path: String, body: Any? = null, type: java.lang.reflect.Type): T {
         val url = "$baseUrl$path"
         val mediaType = "application/json".toMediaType()
+        var lastException: Exception? = null
 
-        val requestBuilder = Request.Builder()
-            .url(url)
-            .header("Authorization", "Bearer $apiKey")
-            .header("Content-Type", "application/json")
-            .header("User-Agent", "hooksniff-kotlin/0.3.0")
+        for (attempt in 0..maxRetries) {
+            val requestBuilder = Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer $apiKey")
+                .header("Content-Type", "application/json")
+                .header("User-Agent", "hooksniff-kotlin/0.3.0")
 
-        when (method) {
-            "POST", "PUT", "PATCH" -> {
-                val jsonBody = if (body != null) gson.toJson(body) else "{}"
-                requestBuilder.method(method, jsonBody.toRequestBody(mediaType))
+            when (method) {
+                "POST", "PUT", "PATCH" -> {
+                    val jsonBody = if (body != null) gson.toJson(body) else "{}"
+                    requestBuilder.method(method, jsonBody.toRequestBody(mediaType))
+                }
+                "GET" -> requestBuilder.get()
+                "DELETE" -> requestBuilder.delete()
             }
-            "GET" -> requestBuilder.get()
-            "DELETE" -> requestBuilder.delete()
+
+            val response = try {
+                httpClient.newCall(requestBuilder.build()).execute()
+            } catch (e: java.io.IOException) {
+                lastException = e
+                if (attempt < maxRetries) {
+                    Thread.sleep(calculateBackoff(attempt))
+                    continue
+                }
+                throw HookSniffException(null, "NETWORK_ERROR", "Network error after ${attempt + 1} attempts: ${e.message}")
+            }
+
+            val responseBody = response.body?.string() ?: ""
+
+            if (!response.isSuccessful) {
+                val message = try {
+                    val errorMap = gson.fromJson<Map<*, *>>(responseBody, Map::class.java)
+                    val error = errorMap["error"] as? Map<String, Any>
+                    error?.get("message") as? String ?: "HTTP ${response.code}"
+                } catch (_: Exception) {
+                    "HTTP ${response.code}"
+                }
+
+                if (isRetryable(response.code) && attempt < maxRetries) {
+                    val retryAfter = response.header("Retry-After")?.toLongOrNull()
+                    val delayMs = if (response.code == 429 && retryAfter != null) {
+                        retryAfter * 1000
+                    } else {
+                        calculateBackoff(attempt)
+                    }
+                    Thread.sleep(delayMs)
+                    continue
+                }
+
+                throw when (response.code) {
+                    400 -> ValidationException(message)
+                    401 -> AuthenticationException(message)
+                    404 -> NotFoundException(message)
+                    413 -> PayloadTooLargeException(message)
+                    429 -> RateLimitException(message)
+                    else -> HookSniffException(response.code, "UNKNOWN", message)
+                }
+            }
+
+            return gson.fromJson<T>(responseBody, type)
         }
 
-        val response = httpClient.newCall(requestBuilder.build()).execute()
-        val responseBody = response.body?.string() ?: ""
+        throw lastException ?: HookSniffException(null, "MAX_RETRIES", "Request failed after $maxRetries retries")
+    }
 
-        if (!response.isSuccessful) {
-            val message = try {
-                val errorMap = gson.fromJson<Map<*, *>>(responseBody, Map::class.java)
-                val error = errorMap["error"] as? Map<String, Any>
-                error?.get("message") as? String ?: "HTTP ${response.code}"
-            } catch (_: Exception) {
-                "HTTP ${response.code}"
-            }
-
-            throw when (response.code) {
-                400 -> ValidationException(message)
-                401 -> AuthenticationException(message)
-                404 -> NotFoundException(message)
-                413 -> PayloadTooLargeException(message)
-                429 -> RateLimitException(message)
-                else -> HookSniffException(response.code, "UNKNOWN", message)
-            }
-        }
-
-        return gson.fromJson<T>(responseBody, type)
+    /** Exponential backoff: 1s, 2s, 4s (capped at 30s) */
+    private fun calculateBackoff(attempt: Int): Long {
+        val base = 1000L
+        return (base * (1L shl attempt)).coerceAtMost(30_000L)
     }
 
     // ==================== Endpoints Resource ====================

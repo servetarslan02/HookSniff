@@ -130,11 +130,11 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 
 | ID | Sorun | Kaynak | Durum |
 |----|-------|--------|-------|
-| HS-077 | 6+ stale branch temizlenmemiş | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
+| HS-077 | 6+ stale branch temizlenmemiş | `infra/DEEP-GIT-HISTORY.md` | ✅ 2026-05-10 |
 | HS-078 | 20+ açık Dependabot PR merge edilmemiş | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
-| HS-079 | Commit convention tutarsız | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
+| HS-079 | Commit convention tutarsız | `infra/DEEP-GIT-HISTORY.md` | ✅ 2026-05-10 |
 | HS-080 | ESLint 8→9 migration | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 93) |
-| HS-081 | 11 SDK'da retry logic yok | `infra/DEEP-SDK-DOCS.md` | ⬜ |
+| HS-081 | 11 SDK'da retry logic yok | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-11 |
 | HS-082 | Version mismatch (Kotlin 0.2.0 vs 0.3.0) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-083 | OpenAPI schema vs actual API mismatch | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-084 | Polar.sh/iyzico fatura handler'ı yok | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
