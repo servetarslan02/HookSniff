@@ -74,6 +74,8 @@ pub struct CheckoutSessionResponse {
 /// Stripe webhook event
 #[derive(Debug, Deserialize)]
 pub struct StripeWebhookEvent {
+    /// HS-021: Stripe event ID for idempotency (e.g., "evt_abc123")
+    pub id: String,
     #[serde(rename = "type")]
     pub event_type: String,
     pub data: StripeEventData,
@@ -210,6 +212,22 @@ pub async fn handle_webhook_event(
         tracing::warn!("Invalid Stripe webhook payload: {:?}", e);
         AppError::BadRequest("Invalid webhook payload".into())
     })?;
+
+    // HS-021: Idempotency check — skip already-processed events
+    let already_processed: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider_event_id = $1)"
+    )
+    .bind(&event.id)
+    .fetch_one(pool)
+    .await
+    .unwrap_or(false);
+
+    if already_processed {
+        tracing::info!("♻️ Stripe event {} already processed, skipping", event.id);
+        return Ok(());
+    }
+
+    tracing::info!("📦 Processing Stripe event {} ({})", event.id, event.event_type);
 
     match event.event_type.as_str() {
         "checkout.session.completed" => {
