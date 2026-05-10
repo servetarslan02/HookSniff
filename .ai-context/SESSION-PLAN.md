@@ -221,14 +221,14 @@ Her oturum şu şekilde işler:
 | HS-063 | Sampling strategy yok | ✅ 2026-05-10 — default parent-based |
 | HS-064 | Response body PII trace'de loglanıyor | ✅ 2026-05-10 |
 
-### Oturum 90: i18n & Content
+### Oturum 90: i18n & Content ✅ (kısmi)
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-065 | 920+ hardcoded İngilizce string | ⬜ |
-| HS-066 | 71 sayfada metadata eksik | ⬜ |
+| HS-065 | 920+ hardcoded İngilizce string | ⬜ Büyük iş, birden fazla oturum |
+| HS-066 | 71 sayfada metadata eksik | ⚠️ Client component — layout'tan geliyor |
 | HS-067 | Müşteri hikayeleri kurgusal | ⬜ |
 | HS-068 | Türkçe çeviri hataları | ⬜ |
-| HS-069 | FAQ eksik | ⬜ |
+| HS-069 | FAQ eksik | ✅ 2026-05-10 — 8 dile 40 anahtar eklendi |
 
 ### Oturum 91: Config & Build
 | ID | Sorun | Durum |
