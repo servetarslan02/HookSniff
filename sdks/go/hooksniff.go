@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
+	defaultBaseURL = "https://api.hooksniff.com/v1"
 	userAgent      = "hooksniff-go/0.1.0"
 )
 
