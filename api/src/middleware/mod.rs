@@ -3,13 +3,51 @@ pub mod webhook_verify;
 
 use axum::{extract::Request, http::header::AUTHORIZATION, middleware::Next, response::Response};
 use sqlx::PgPool;
+use std::collections::HashMap;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
 use uuid::Uuid;
 
 const AUTH_COOKIE_NAME: &str = "hooksniff_token";
 const REFRESH_COOKIE_NAME: &str = "hooksniff_refresh";
+const AUTH_CACHE_TTL: Duration = Duration::from_secs(30);
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
+
+/// Simple in-memory cache for auth lookups (prefix → (customer, expiry))
+struct AuthCache {
+    entries: HashMap<String, (Customer, Instant)>,
+}
+
+impl AuthCache {
+    fn new() -> Self {
+        Self {
+            entries: HashMap::new(),
+        }
+    }
+
+    fn get(&self, prefix: &str) -> Option<Customer> {
+        self.entries.get(prefix).and_then(|(customer, expiry)| {
+            if Instant::now() < *expiry {
+                Some(customer.clone())
+            } else {
+                None
+            }
+        })
+    }
+
+    fn insert(&mut self, prefix: String, customer: Customer) {
+        self.entries.insert(prefix, (customer, Instant::now() + AUTH_CACHE_TTL));
+    }
+
+    fn cleanup(&mut self) {
+        self.entries.retain(|_, (_, expiry)| Instant::now() < *expiry);
+    }
+}
+
+static AUTH_CACHE: once_cell::sync::Lazy<Mutex<AuthCache>> =
+    once_cell::sync::Lazy::new(|| Mutex::new(AuthCache::new()));
 
 /// Indicates whether the current request was made with a test API key (hr_test_*).
 /// Handlers can check this to mark deliveries as test and skip real delivery.
@@ -90,53 +128,68 @@ pub async fn auth_middleware(
 
     let is_test = token.starts_with("hr_test_");
     let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
-        // API key authentication — lookup by prefix, then verify full key against Argon2 hash
-        let prefix = &token[..15.min(token.len())];
-        let candidates =
-            sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
-                .bind(prefix)
+        // API key authentication — check cache first, then DB
+        let prefix = token[..15.min(token.len())].to_string();
+
+        // Check cache first
+        {
+            let cache = AUTH_CACHE.lock().unwrap();
+            if let Some(cached) = cache.get(&prefix) {
+                cached
+            } else {
+                // Cache miss — query DB
+                let candidates =
+                    sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+                        .bind(&prefix)
+                        .fetch_all(&*pool)
+                        .await?;
+
+                // Also check api_keys table for additional keys
+                let api_key_candidates: Vec<(String,)> = sqlx::query_as(
+                    "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
+                )
+                .bind(&prefix)
                 .fetch_all(&*pool)
                 .await?;
 
-        // Also check api_keys table for additional keys
-        let api_key_candidates: Vec<(String,)> = sqlx::query_as(
-            "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
-        )
-        .bind(prefix)
-        .fetch_all(&*pool)
-        .await?;
-
-        // Try customers table first (legacy primary key)
-        let mut found: Option<Customer> = None;
-        for c in &candidates {
-            if verify_api_key(&token, &c.api_key_hash) {
-                found = Some(c.clone());
-                break;
-            }
-        }
-
-        // If not found in customers, try api_keys table
-        if found.is_none() {
-            for (hash,) in &api_key_candidates {
-                if verify_api_key(&token, hash) {
-                    // Found in api_keys — load the owning customer
-                    // We need the customer_id from the api_keys table
-                    let owner: Option<Customer> = sqlx::query_as(
-                        "SELECT c.* FROM customers c INNER JOIN api_keys ak ON ak.customer_id = c.id WHERE ak.api_key_prefix = $1 AND ak.api_key_hash = $2"
-                    )
-                    .bind(prefix)
-                    .bind(hash)
-                    .fetch_optional(&*pool)
-                    .await?;
-                    if let Some(c) = owner {
-                        found = Some(c);
+                // Try customers table first (legacy primary key)
+                let mut found: Option<Customer> = None;
+                for c in &candidates {
+                    if verify_api_key(&token, &c.api_key_hash) {
+                        found = Some(c.clone());
+                        break;
                     }
-                    break;
                 }
+
+                // If not found in customers, try api_keys table
+                if found.is_none() {
+                    for (hash,) in &api_key_candidates {
+                        if verify_api_key(&token, hash) {
+                            let owner: Option<Customer> = sqlx::query_as(
+                                "SELECT c.* FROM customers c INNER JOIN api_keys ak ON ak.customer_id = c.id WHERE ak.api_key_prefix = $1 AND ak.api_key_hash = $2"
+                            )
+                            .bind(&prefix)
+                            .bind(hash)
+                            .fetch_optional(&*pool)
+                            .await?;
+                            if let Some(c) = owner {
+                                found = Some(c);
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                let customer = found.ok_or(AppError::Unauthorized)?;
+
+                // Cache the result
+                if let Ok(mut cache) = AUTH_CACHE.lock() {
+                    cache.insert(prefix, customer.clone());
+                }
+
+                customer
             }
         }
-
-        found.ok_or(AppError::Unauthorized)?
     } else {
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
