@@ -68,7 +68,7 @@
 
 ## Ertelemeye Devam Edenler
 - HS-065: 920+ hardcoded string (büyük iş)
-- HS-081-089: SDK/test coverage (P3)
+- HS-090: SDK otomatik güncelleme sistemi (detaylı araştırma gerekli, lansman sonrası)
 - tracing-opentelemetry vendor patch kaldırma (upstream 0.33 çıkınca)
 - Dependabot major PR'ları: TypeScript 6, Tailwind 4, Recharts 3, Next.js 16 (dikkatli olunmalı)
 
