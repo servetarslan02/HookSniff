@@ -1,0 +1,278 @@
+# 📋 HookSniff — Oturum Planı (Session Tracker)
+
+> **Oluşturulma:** 2026-05-10 18:55 GMT+8
+> **Kural:** Her oturum sonunda bu dosyayı güncelle + GitHub'a push et
+> **Kaynak:** `.ai-context/visual-bugs/ISSUE-TRACKER.md` (103 sorun)
+
+---
+
+## 🎯 Oturum Akışı
+
+Her oturum şu şekilde işler:
+1. Bu dosyadan **sıradaki oturumu** oku
+2. İlgili **ISSUE-TRACKER.md** satırlarını düzelt
+3. Kod değişikliklerini yap
+4. Test et (mümkünse)
+5. GitHub'a push et
+6. Bu dosyada ilgili oturumu `✅` ile işaretle
+7. `NEXT_SESSION.md`'yi güncelle
+
+---
+
+## 🚨 P0 — ACİL (Oturum 73-75)
+
+### Oturum 73: Rate Limiting (Auth Endpoints)
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-001 | `verify_email` rate limit yok | ⬜ |
+| HS-002 | `verify_2fa` rate limit yok | ⬜ |
+| HS-003 | `refresh_token` rate limit yok | ⬜ |
+| HS-008 | Contact form rate limit yok | ⬜ |
+
+**Dosyalar:** `api/src/routes/auth.rs`, `api/src/routes/contact.rs`, `api/src/rate_limit.rs`
+**Yaklaşım:** Mevcut `rate_limit.rs` middleware'ini bu endpoint'lere ekle.
+
+### Oturum 74: Webhook Verification & Ownership
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-004 | Inbound webhook signature verification optional | ⬜ |
+| HS-005 | Billing webhook secret boşsa verification atlıyor | ⬜ |
+| HS-009 | Schema endpoint'lerinde ownership check yok | ⬜ |
+| HS-038a | `handle_inbound_to_endpoint` Authorization bypass | ⬜ |
+| HS-038b | Prefix length mismatch (20 vs 15 char) | ⬜ |
+
+**Dosyalar:** `api/src/routes/inbound.rs`, `api/src/routes/billing.rs`, `api/src/routes/schemas.rs`
+**Yaklaşım:** Secret boşsa 403 döndür. Schema endpoint'lerinde customer_id kontrolü ekle.
+
+### Oturum 75: Infrastructure & Security Config
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-006 | `.env.production.example`'da gerçek Grafana token | ⬜ |
+| HS-007 | `.gitignore`'da `.env` pattern eksik | ⬜ |
+| HS-010 | Concurrent delivery limit yok | ⬜ |
+| HS-038c | Billing webhook'larında rate limiting yok | ⬜ |
+
+**Dosyalar:** `.env.production.example`, `.gitignore`, `worker/src/main.rs`, `api/src/routes/billing.rs`
+**Yaklaşım:** Token'ı placeholder yap. `.gitignore`'a `.env` ekle. Worker'a semaphore ekle.
+
+---
+
+## 🔴 P1 — YÜKSEK (Oturum 76-84)
+
+### Oturum 76: Dashboard Routing (EN KRİTİK FRONTEND)
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-030 | Dashboard routing çökmüş — 16 sayfa yanlış içerik | ⬜ |
+| HS-072 | `token!` non-null assertion → null token ile API çağrısı | ⬜ |
+| HS-075 | `store.tsx` token her zaman `'cookie'` → anlamsız Bearer | ⬜ |
+
+**Dosyalar:** `dashboard/src/app/[locale]/` route dosyaları, `dashboard/src/store.tsx`
+**Yaklaşım: Next.js route yapısını kontrol et, dynamic import'ları düzelt.
+
+### Oturum 77: Frontend-Backend API Uyumsuzluğu
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-031 | Revenue, Billing, Notifications format mismatch | ⬜ |
+| HS-034 | Fiyat uyumsuzluğu — Frontend $49/$149, Backend $29/$99 | ⬜ |
+| HS-028 | Search sayfasında Authorization header eksik | ⬜ |
+| HS-029 | Search'de debounce yok | ⬜ |
+
+**Dosyalar:** `dashboard/src/app/[locale]/dashboard/` sayfaları, `api/src/routes/analytics.rs`, `api/src/routes/billing.rs`
+**Yaklaşım:** API response format'ını frontend ile eşle. Fiyat sabitlerini düzelt.
+
+### Oturum 78: Billing & Account Endpoints
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-032 | Abonelik iptal endpoint'i yok — 405 | ⬜ |
+| HS-033 | Hesap silme bozuk — yanlış endpoint | ⬜ |
+| HS-073 | Hardcoded `Authorization: 'Bearer YOUR_TOKEN'` | ⬜ |
+| HS-074 | `health/page.tsx` token kullanmıyor | ⬜ |
+| HS-076 | `api-keys/page.tsx` credentials yanlış yerde | ⬜ |
+
+**Dosyalar:** `api/src/routes/billing.rs`, `api/src/routes/auth.rs`, `dashboard/src/app/[locale]/dashboard/`
+
+### Oturum 79: SSRF & Security Hardening
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-011 | Portal notification URL'lerinde SSRF | ⬜ |
+| HS-012 | Playground test endpoint'inde SSRF | ⬜ |
+| HS-013 | CSP'de `unsafe-inline` + `unsafe-eval` | ⬜ |
+| HS-014 | Git history'de OTEL credentials | ⬜ |
+| HS-015 | Password reset token URL'de exposure | ⬜ |
+| HS-016 | `DefaultHasher` idempotency hash'te | ⬜ |
+
+**Dosyalar:** `api/src/ssrf.rs`, `api/src/routes/playground.rs`, `api/src/routes/inbound.rs`, `dashboard/next.config.js`
+
+### Oturum 80: Worker & Backend Core
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-018 | Error classification yok — 400/401/404 de retry | ⬜ |
+| HS-019 | WebSocket connection limit yok | ⬜ |
+| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | ⬜ |
+| HS-021 | Billing webhook'larda idempotency yok | ⬜ |
+| HS-022 | Throttle state in-memory | ⬜ |
+| HS-023 | FIFO modülü var ama worker'a bağlanmamış | ⬜ |
+
+**Dosyalar:** `worker/src/`, `api/src/circuit_breaker.rs`, `api/src/throttle/`, `api/src/fifo/`
+
+### Oturum 81: Database Issues
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-024 | İki migration sistemi senkron değil | ⬜ |
+| HS-025 | CHECK constraint'ler eksik | ⬜ |
+| HS-026 | `webhook_queue`'da FK eksik | ⬜ |
+| HS-027 | `amount_cents` INT → BIGINT | ⬜ |
+| HS-038d | `custom_domains` dig subprocess — command injection | ⬜ |
+| HS-038e | Dynamic SQL construction — `format!` ile WHERE | ⬜ |
+
+**Dosyalar:** `api/migrations/`, `api/src/db.rs`, `api/src/routes/custom_domains.rs`, `api/src/routes/events.rs`
+
+### Oturum 82: Auth & Crypto Security
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-038f | Timing attack — login hataları farklı mesajlar | ⬜ |
+| HS-038g | `AppError::Serialization` serde_json hata gösteriyor | ⬜ |
+| HS-038h | Email enumeration — register mesajı | ⬜ |
+| HS-038i | Auth cache `std::sync::Mutex` async'te deadlock | ⬜ |
+| HS-038j | `rate_limit.rs` unwrap() — panic riski | ⬜ |
+| HS-038k | Alert condition string validation eksik | ⬜ |
+| HS-038l | Polar/iyzico webhook error'da config sızıntısı | ⬜ |
+
+**Dosyalar:** `api/src/routes/auth.rs`, `api/src/rate_limit.rs`, `api/src/error.rs`, `api/src/routes/alerts.rs`, `api/src/routes/billing.rs`
+
+### Oturum 83: SDK & Config Fixes
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-035 | 3 farklı API URL (SDK tutarsızlığı) | ⬜ |
+| HS-036 | Kotlin SDK generic crash | ⬜ |
+| HS-037 | 6 SDK'da legacy header | ⬜ |
+| HS-038 | CLI `HOOKRELAY_*` env vars | ⬜ |
+| HS-038m | `next.config.js` output:standalone eksik | ⬜ |
+| HS-038n | DATABASE_URL git history'de | ⬜ |
+
+**Dosyalar:** `sdks/`, `cli/`, `dashboard/next.config.js`
+
+### Oturum 84: Frontend Search & Component Logic
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-039 | Dual onboarding modal | ⬜ |
+| HS-040 | Toast'ta dismiss/aria-live yok | ⬜ |
+| HS-041 | Client-side search + server-side pagination çelişkisi | ⬜ |
+| HS-042 | Status count'lar sadece mevcut sayfadan | ⬜ |
+| HS-043 | 63 useEffect'ten %75'inde cleanup eksik | ⬜ |
+| HS-044 | Stale closure riskleri | ⬜ |
+
+**Dosyalar:** `dashboard/src/app/[locale]/` sayfaları, `dashboard/src/components/`
+
+---
+
+## 🟡 P2 — ORTA (Oturum 85-92)
+
+### Oturum 85: Frontend Performance & Bundle
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-045 | `lucide-react` hiç kullanılmıyor (~150KB wasted) | ⬜ |
+| HS-046 | 13 tablo `overflow-x-auto` olmadan | ⬜ |
+| HS-047 | `blog/[slug]` 1922 satır mega component | ⬜ |
+| HS-048 | `dangerouslySetInnerHTML` (CSP bypass) | ⬜ |
+
+### Oturum 86: Accessibility & Dark Mode
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-049 | Toggle accessibility — `role="switch"` eksik | ⬜ |
+| HS-050 | Delete modal'da focus trap yok | ⬜ |
+| HS-051 | `weeklyDigest` state local-only | ⬜ |
+| HS-052 | Dark mode eksik (birçok sayfa) | ⬜ |
+| HS-053 | Footer eksik (birçok sayfa) | ⬜ |
+
+### Oturum 87: Database Indexes & Triggers
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-054 | 20+ eksik DB index | ⬜ |
+| HS-055 | `updated_at` trigger'ları eksik | ⬜ |
+| HS-056 | UNIQUE constraint'ler eksik | ⬜ |
+| HS-057 | Delivery index eksik | ⬜ |
+
+### Oturum 88: Billing Business Logic
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-058 | Proration yok | ⬜ |
+| HS-059 | Grace period yok | ⬜ |
+| HS-060 | Downgrade'de endpoint cleanup yok | ⬜ |
+
+### Oturum 89: Monitoring & Observability
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-061 | Custom metric yok | ⬜ |
+| HS-062 | Simple exporter (sync) — batch olmalı | ⬜ |
+| HS-063 | Sampling strategy yok | ⬜ |
+| HS-064 | Response body PII trace'de loglanıyor | ⬜ |
+
+### Oturum 90: i18n & Content
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-065 | 920+ hardcoded İngilizce string | ⬜ |
+| HS-066 | 71 sayfada metadata eksik | ⬜ |
+| HS-067 | Müşteri hikayeleri kurgusal | ⬜ |
+| HS-068 | Türkçe çeviri hataları | ⬜ |
+| HS-069 | FAQ eksik | ⬜ |
+
+### Oturum 91: Config & Build
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-070 | `next.config.js`'de `output: 'standalone'` eksik | ⬜ |
+| HS-071 | HSTS header eksik | ⬜ |
+
+### Oturum 92: P2 Remaining & Cleanup
+| ID | Sorun | Durum |
+|----|-------|-------|
+| — | P2 kalan sorunlar | ⬜ |
+
+---
+
+## 🟢 P3 — DÜŞÜK (Oturum 93-94)
+
+### Oturum 93: Git & Repository Cleanup
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-077 | 6+ stale branch temizlenmemiş | ⬜ |
+| HS-078 | 20+ açık Dependabot PR | ⬜ |
+| HS-079 | Commit convention tutarsız | ⬜ |
+| HS-080 | ESLint 8 + Next.js 15 uyumsuzluğu | ⬜ |
+
+### Oturum 94: SDK & Test Coverage
+| ID | Sorun | Durum |
+|----|-------|-------|
+| HS-081 | 11 SDK'da retry logic yok | ⬜ |
+| HS-082 | Version mismatch (Kotlin) | ⬜ |
+| HS-083 | OpenAPI schema vs actual API mismatch | ⬜ |
+| HS-084 | Polar.sh/iyzico fatura handler'ı yok | ⬜ |
+| HS-085-089 | Testsiz kritik modüller | ⬜ |
+
+---
+
+## 📊 İlerleme Takibi
+
+| Kategori | Toplam | Tamamlanan | Kalan |
+|----------|--------|-----------|-------|
+| 🚨 P0 | 14 | 0 | 14 |
+| 🔴 P1 | 44 | 0 | 44 |
+| 🟡 P2 | 38 | 0 | 38 |
+| 🟢 P3 | 13 | 0 | 13 |
+| **TOPLAM** | **103** | **0** | **103** |
+
+---
+
+## 📝 Oturum Logları
+
+### Oturum 73 — [TARIH]
+**Durum:** ⬜ Bekliyor
+**Görev:** Rate Limiting (HS-001, HS-002, HS-003, HS-008)
+
+### Oturum 74 — [TARIH]
+**Durum:** ⬜ Bekliyor
+**Görev:** Webhook Verification & Ownership (HS-004, HS-005, HS-009, HS-038a, HS-038b)
+
+### Oturum 75 — [TARIH]
+**Durum:** ⬜ Bekliyor
+**Görev:** Infrastructure & Security Config (HS-006, HS-007, HS-010, HS-038c)
