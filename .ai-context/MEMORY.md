@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 03:50 GMT+8
+> Son güncelleme: 2026-05-11 03:56 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -29,9 +29,9 @@
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 14 | 0 |
 | 🔴 P1 | 44 | 46 | 0 |
-| 🟡 P2 | 38 | 33 | 5 |
+| 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 7 | 6 |
-| **TOPLAM** | **103** | **100** | **3** |
+| **TOPLAM** | **103** | **101** | **2** |
 
 ## Oturum 94 (2026-05-10 22:58 - 23:54) ✅
 - **12 major dependency güncellendi:**
@@ -67,7 +67,7 @@
 | prometheus | 0.14 | ✅ en güncel |
 
 ## Ertelemeye Devam Edenler
-- HS-065: 920+ hardcoded string (büyük iş) — fiyatlandırma i18n ile birlikte yapılacak
+- HS-065: ✅ Tamamlandı — EN + TR aktif, 2083 anahtar
 - HS-084: iyzico iptal — Polar.sh devam, kod pasif kalsın, şirketleşince aktif edilir
 - HS-090: SDK otomatik güncelleme sistemi (detaylı araştırma gerekli, lansman sonrası)
 - tracing-opentelemetry vendor patch kaldırma (upstream 0.33 çıkınca)
@@ -103,6 +103,11 @@
 - **Issue tracker:** HS-077/078/079/081/083/086/087 çözüldü (96/103)
 - **Commits:** `e753a03`→`eee1de6` (8 push)
 - **Kalan 7:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
+
+## Oturum 100 (2026-05-11 03:54 - ) 🔄
+- **HS-065 tamamlandı** — i18n: EN + TR dilleri aktif, 2083 anahtar senkron
+- 6 dil kaldırıldı (de/ja/pt-BR/es/fr/ko), sadece en + tr kaldı
+- Önceki oturumlarda 497→1 hardcoded string düşürülmüştü
 
 ## Oturum 99 (2026-05-11 03:10 - 03:50) ✅
 - **CSP hydration fix** — `script-src 'strict-dynamic'` (nonce yoktu) → `unsafe-inline` + `unsafe-eval`
