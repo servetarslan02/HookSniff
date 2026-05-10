@@ -3,9 +3,14 @@ use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 
 pub async fn create_pool(database_url: &str) -> Result<PgPool> {
+    // Strip channel_binding=require — sqlx 0.8 doesn't support it (Neon compatibility)
+    let clean_url = database_url
+        .replace("?channel_binding=require&", "?")
+        .replace("&channel_binding=require", "")
+        .replace("?channel_binding=require", "");
     let pool = PgPoolOptions::new()
         .max_connections(20)
-        .connect(database_url)
+        .connect(&clean_url)
         .await?;
 
     run_migrations(&pool).await?;

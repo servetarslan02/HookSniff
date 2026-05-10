@@ -101,10 +101,14 @@ async fn main() -> Result<()> {
         .unwrap_or(8080);
     tokio::spawn(start_health_server(health_port));
 
-    // Database pool
+    // Database pool — strip channel_binding=require (sqlx 0.8 doesn't support it)
+    let db_url = cfg.database_url
+        .replace("?channel_binding=require&", "?")
+        .replace("&channel_binding=require", "")
+        .replace("?channel_binding=require", "");
     let pool = PgPoolOptions::new()
         .max_connections(10)
-        .connect(&cfg.database_url)
+        .connect(&db_url)
         .await?;
 
     // HTTP client (shared, connection pooling)
@@ -135,7 +139,7 @@ async fn main() -> Result<()> {
     tokio::pin!(shutdown);
 
     // Create a dedicated PgListener connection for NOTIFY
-    let mut listener = PgListener::connect(&cfg.database_url).await?;
+    let mut listener = PgListener::connect(&db_url).await?;
     listener.listen("new_webhook").await?;
     tracing::info!("🔔 Listening on 'new_webhook' channel for instant wake-up");
 
@@ -167,7 +171,7 @@ async fn main() -> Result<()> {
                     Err(e) => {
                         tracing::warn!("⚠️ PgListener error, reconnecting: {:?}", e);
                         // Reconnect listener on error
-                        match PgListener::connect(&cfg.database_url).await {
+                        match PgListener::connect(&db_url).await {
                             Ok(mut new_listener) => {
                                 if new_listener.listen("new_webhook").await.is_ok() {
                                     listener = new_listener;
