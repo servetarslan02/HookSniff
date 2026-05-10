@@ -60,7 +60,7 @@ export default function FAQPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">FAQ</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("faqTitle")}</span>
           </div>
           <LanguageSwitcher />
         </div>

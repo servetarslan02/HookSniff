@@ -78,7 +78,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
           <div>
             <div className="font-bold text-gray-900 dark:text-white">HookSniff</div>
-            <div className="text-xs text-gray-500 dark:text-slate-400">Webhook Dashboard</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">{t("webhookDashboard")}</div>
           </div>
         </Link>
         <nav className="px-3 py-4 space-y-1">

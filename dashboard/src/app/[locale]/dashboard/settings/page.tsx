@@ -401,7 +401,7 @@ export default function SettingsPage() {
               type="text"
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
-              placeholder="DELETE"
+              placeholder={t('deletePlaceholder')}
               className="w-full px-4 py-3 border border-red-300 dark:border-red-500/30 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
             <div className="flex gap-3 justify-end">

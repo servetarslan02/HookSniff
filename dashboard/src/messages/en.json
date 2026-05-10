@@ -109,7 +109,8 @@
       "24h": "24 Hours",
       "7d": "7 Days",
       "30d": "30 Days"
-    }
+    },
+    "webhookDashboard": "Webhook Dashboard"
   },
   "endpoints": {
     "title": "Endpoints",
@@ -137,7 +138,10 @@
       "active": "Active",
       "paused": "Paused",
       "disabled": "Disabled"
-    }
+    },
+    "urlLabel": "URL",
+    "descriptionLabel": "Description",
+    "settingsTitle": "Settings"
   },
   "deliveries": {
     "title": "Deliveries",
@@ -304,7 +308,10 @@
     "memberRemoved": "Member removed",
     "roleUpdated": "Role updated",
     "teamCreated": "Team created!",
-    "invitationSent": "Invitation sent!"
+    "invitationSent": "Invitation sent!",
+    "teamNameLabel": "Team Name",
+    "emailLabel": "Email",
+    "roleLabel": "Role"
   },
   "notifications": {
     "title": "Notifications",
@@ -334,7 +341,9 @@
     "sendSuccess": "Webhook sent!",
     "sendFailed": "Failed to send webhook",
     "responseTitle": "Response",
-    "sendToSeeResponse": "Send a webhook to see the response here"
+    "sendToSeeResponse": "Send a webhook to see the response here",
+    "endpointLabel": "Endpoint",
+    "eventTypeLabel": "Event Type"
   },
   "analytics": {
     "title": "Analytics",
@@ -385,7 +394,8 @@
     "language": "Language",
     "theme": "Theme",
     "timezone": "Timezone",
-    "noApiKey": "No API key — register to get one"
+    "noApiKey": "No API key — register to get one",
+    "deletePlaceholder": "DELETE"
   },
   "billing": {
     "title": "Billing",
@@ -428,7 +438,8 @@
     "plans.business": "Business",
     "plans.freeLimit": "10,000 webhooks/month",
     "plans.proLimit": "50,000 webhooks/month",
-    "plans.businessLimit": "500,000 webhooks/month"
+    "plans.businessLimit": "500,000 webhooks/month",
+    "noInvoices": "No invoices yet."
   },
   "auth": {
     "login": "Log In",
@@ -450,7 +461,8 @@
     "name": "Name",
     "namePlaceholder": "Your name",
     "emailPlaceholder": "you@example.com",
-    "passwordPlaceholder": "••••••••"
+    "passwordPlaceholder": "••••••••",
+    "orContinueWith": "Or continue with"
   },
   "docs": {
     "gettingStarted": "Getting Started",
@@ -539,7 +551,9 @@
     "plan": "Plan",
     "free": "Free",
     "pro": "Pro",
-    "business": "Business"
+    "business": "Business",
+    "pythonSdk": "Python SDK",
+    "nodeSdk": "Node.js SDK"
   },
   "status": {
     "title": "HookSniff Status",
@@ -572,12 +586,202 @@
   "terms": {
     "title": "Terms of Service",
     "lastUpdated": "Last updated: May 6, 2026",
-    "nav": "Terms of Service"
+    "nav": "Terms of Service",
+    "s1Title": "1. Acceptance of Terms",
+    "s1Text": "By accessing or using HookSniff (\"Service\"), you agree to be bound by these Terms of Service (\"Terms\"). If you do not agree, do not use the Service.",
+    "s2Title": "2. Description of Service",
+    "s2Text": "HookSniff provides webhook delivery infrastructure for developers. The Service includes webhook delivery, retry logic, signature verification, monitoring dashboard, and related APIs.",
+    "s3Title": "3. Account Registration",
+    "s3Items": [
+      "You must provide accurate registration information",
+      "You are responsible for maintaining the security of your account credentials",
+      "You must be at least 18 years old to use the Service",
+      "One account per person or entity"
+    ],
+    "s4Title": "4. API Keys and Security",
+    "s4Items": [
+      "API keys are issued to your account and must be kept confidential",
+      "You are responsible for all activity that occurs under your API keys",
+      "Notify us immediately if you suspect unauthorized use of your API keys",
+      "We may rotate or revoke API keys for security reasons"
+    ],
+    "s5Title": "5. Acceptable Use",
+    "s5Intro": "You agree NOT to:",
+    "s5Items": [
+      "Use the Service for any unlawful purpose",
+      "Send webhooks to internal, private, or malicious endpoints (SSRF)",
+      "Attempt to circumvent rate limits or security measures",
+      "Resell or redistribute the Service without authorization",
+      "Use the Service to send spam, malware, or phishing content",
+      "Interfere with or disrupt the Service or its infrastructure"
+    ],
+    "s6Title": "6. Webhook Payloads",
+    "s6Items": [
+      "You retain ownership of all data you send through the Service",
+      "We process webhook payloads solely for delivery purposes",
+      "We do not inspect, analyze, or sell your webhook data",
+      "Payloads are stored temporarily for delivery and retry purposes, then deleted per the retention policy"
+    ],
+    "s7Title": "7. Service Level",
+    "s7Items": [
+      "The Service is provided on a \"best effort\" basis",
+      "We do not guarantee 100% delivery or uptime",
+      "Paid plans include the SLA terms specified in the applicable pricing tier",
+      "We may perform scheduled maintenance with reasonable advance notice"
+    ],
+    "s8Title": "8. Data Retention",
+    "s8Items": [
+      "Webhook delivery logs are retained according to your plan's retention period",
+      "Free plan: 7 days",
+      "Pro plan: 30 days",
+      "Business plan: 90 days",
+      "After the retention period, data is automatically and permanently deleted"
+    ],
+    "s9Title": "9. Payment and Billing",
+    "s9Items": [
+      "Paid plans are billed monthly in advance",
+      "All fees are non-refundable except as required by applicable law",
+      "We may change pricing with 30 days' notice",
+      "Failure to pay may result in account suspension or downgrade to Free plan",
+      "Overage charges may apply if you exceed your plan limits"
+    ],
+    "s10Title": "10. Intellectual Property",
+    "s10Items": [
+      "The Service, including its code, design, and documentation, is our intellectual property",
+      "You retain all rights to your data and content",
+      "You grant us a limited license to process your data solely to provide the Service"
+    ],
+    "s11Title": "11. Limitation of Liability",
+    "s11MaxExtent": "TO THE MAXIMUM EXTENT PERMITTED BY LAW:",
+    "s11Items": [
+      "THE SERVICE IS PROVIDED \"AS IS\" WITHOUT WARRANTIES OF ANY KIND",
+      "WE SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES",
+      "OUR TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE 12 MONTHS PRECEDING THE CLAIM",
+      "WE SHALL NOT BE LIABLE FOR DATA LOSS, LOST PROFITS, OR BUSINESS INTERRUPTION"
+    ],
+    "s12Title": "12. Indemnification",
+    "s12Intro": "You agree to indemnify and hold us harmless from any claims, losses, or damages arising from:",
+    "s12Items": [
+      "Your use of the Service",
+      "Your violation of these Terms",
+      "Your violation of any third-party rights",
+      "Webhook payloads you send through the Service"
+    ],
+    "s13Title": "13. Termination",
+    "s13Items": [
+      "You may terminate your account at any time through the dashboard",
+      "We may terminate or suspend your account for violation of these Terms",
+      "We may discontinue the Service with 30 days' notice",
+      "Upon termination, your data will be deleted within 30 days"
+    ],
+    "s14Title": "14. Modifications",
+    "s14Text": "We may update these Terms from time to time. We will notify you of material changes via email or dashboard notification. Continued use after changes constitutes acceptance.",
+    "s15Title": "15. Governing Law",
+    "s15Text": "These Terms are governed by the laws of Turkey. Any disputes shall be resolved in the courts of Turkey.",
+    "s16Title": "16. Contact",
+    "s16Text": "For questions about these Terms, contact:"
   },
   "privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: May 6, 2026",
-    "nav": "Privacy Policy"
+    "nav": "Privacy Policy",
+    "s1Title": "1. Introduction",
+    "s1Text": "HookSniff (\"we\", \"us\", \"our\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our webhook delivery service (\"Service\").",
+    "s2Title": "2. Information We Collect",
+    "s21Title": "2.1 Account Information",
+    "s21Items": [
+      "Email address",
+      "Name (optional)",
+      "Company name (optional)",
+      "Payment information (processed by Stripe, not stored by us)"
+    ],
+    "s22Title": "2.2 Usage Data",
+    "s22Items": [
+      "API request logs (endpoint URLs, timestamps, response codes)",
+      "Webhook delivery logs (payloads, delivery attempts, status)",
+      "Dashboard activity (page views, feature usage)",
+      "IP addresses (for security and rate limiting)"
+    ],
+    "s23Title": "2.3 Technical Data",
+    "s23Items": [
+      "Browser type and version",
+      "Operating system",
+      "Device information",
+      "Cookies and session tokens"
+    ],
+    "s3Title": "3. How We Use Your Information",
+    "s3Intro": "We use your information to:",
+    "s3Items": [
+      "Provide and maintain the Service",
+      "Process webhook deliveries and retries",
+      "Authenticate and authorize API requests",
+      "Send service-related notifications (delivery failures, billing alerts)",
+      "Improve the Service and fix bugs",
+      "Prevent fraud and abuse",
+      "Comply with legal obligations"
+    ],
+    "s4Title": "4. Webhook Payloads",
+    "s4Items": [
+      "We process webhook payloads solely for delivery to your configured endpoints",
+      "Payloads are stored temporarily for delivery, retry, and logging purposes",
+      "Payloads are automatically deleted according to your plan's retention period",
+      "We do not inspect, analyze, mine, or sell your webhook data",
+      "We do not use your webhook data for advertising or profiling"
+    ],
+    "s5Title": "5. Data Sharing",
+    "s5Intro": "We do NOT sell your personal data. We may share information with:",
+    "s5Items": [
+      "Polar.sh: Payment processing (subject to Polar.sh's Privacy Policy)",
+      "iyzico: Payment processing for Turkish customers (subject to iyzico's Privacy Policy)",
+      "Infrastructure providers: Cloud hosting for Service operation",
+      "Legal authorities: When required by law, court order, or to protect our rights",
+      "Business transfers: In connection with a merger, acquisition, or sale of assets"
+    ],
+    "s6Title": "6. Data Security",
+    "s6Intro": "We implement industry-standard security measures:",
+    "s6Items": [
+      "All data transmitted over TLS/HTTPS",
+      "API keys are hashed before storage (SHA-256)",
+      "HMAC-SHA256 signatures for webhook verification",
+      "Regular security audits and updates",
+      "Access controls and authentication for all systems"
+    ],
+    "s6Disclaimer": "However, no method of transmission or storage is 100% secure. We cannot guarantee absolute security.",
+    "s7Title": "7. Data Retention",
+    "s7DataType": "Data Type",
+    "s7RetentionPeriod": "Retention Period",
+    "s7Account": "Account data",
+    "s7AccountRetention": "Until account deletion",
+    "s7Webhook": "Webhook delivery logs",
+    "s7WebhookRetention": "7-365 days (plan dependent)",
+    "s7Api": "API request logs",
+    "s7ApiRetention": "30 days",
+    "s7Analytics": "Analytics data",
+    "s7AnalyticsRetention": "90 days",
+    "s7Payment": "Payment records",
+    "s7PaymentRetention": "As required by law",
+    "s7Note": "After the retention period, data is automatically and permanently deleted.",
+    "s8Title": "8. Your Rights",
+    "s8Intro": "You have the right to:",
+    "s8Items": [
+      "Access: Request a copy of your personal data",
+      "Correct: Request correction of inaccurate data",
+      "Delete: Request deletion of your personal data",
+      "Export: Request your data in a portable format",
+      "Object: Object to processing of your personal data",
+      "Withdraw consent: Where processing is based on consent"
+    ],
+    "s8How": "To exercise these rights, contact us at privacy@hooksniff.vercel.app",
+    "s9Title": "9. Cookies",
+    "s9Text": "We use essential cookies for authentication and session management. You can control cookies through your browser settings.",
+    "s10Title": "10. International Transfers",
+    "s10Text": "Your data may be processed in countries outside your own. We ensure appropriate safeguards are in place for international transfers, including Standard Contractual Clauses where required.",
+    "s11Title": "11. Children's Privacy",
+    "s11Text": "Our Service is not intended for children under 16. We do not knowingly collect personal information from children.",
+    "s12Title": "12. Changes to This Policy",
+    "s12Text": "We may update this Privacy Policy from time to time. We will notify you of material changes via email or dashboard notification.",
+    "s13Title": "13. Contact Us",
+    "s13Text": "For privacy-related inquiries, contact us at privacy@hooksniff.vercel.app"
   },
   "admin": {
     "overview": "Admin Overview",
@@ -655,7 +859,9 @@
     "plan": "Plan",
     "status": "Status",
     "created": "Created",
-    "actions": "Actions"
+    "actions": "Actions",
+    "overviewTitle": "Admin Overview",
+    "revenueTitle": "Revenue Dashboard"
   },
   "landing": {
     "nav": {
@@ -870,7 +1076,7 @@
   "configFailed": "Failed to create config",
   "deliveryRate": "Delivery Rate",
   "avgLatency": "Avg Latency",
-  "faqTitle": "Frequently Asked Questions",
+  "faqTitle": "FAQ",
   "faqSubtitle": "Everything you need to know about HookSniff",
   "catGeneral": "General",
   "catGettingStarted": "Getting Started",
@@ -1591,7 +1797,7 @@
     "delayPreviewDesc": "How delays will look with current settings:",
     "attempt": "Attempt {n}",
     "totalRetryTime": "Total retry time (worst case):",
-    "tip": "💡 Per-endpoint retry policies override these global defaults. Configure them in Endpoint Settings.",
+    "tip": "Tip:",
     "endpointSettingsLink": "Endpoint Settings"
   },
   "inbound": {
