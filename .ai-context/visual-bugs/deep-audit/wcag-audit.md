@@ -94,30 +94,6 @@
 
 ---
 
-## F. TABLE ACCESSIBILITY (WCAG 1.3.1)
-
-### Users Sayfası Tablosu
-
-| Kriter | Durum | Açıklama |
-|--------|-------|----------|
-| `<th>` scope="col" | ❌ | **7 column header'ın hiçbirinde scope="col" yok** (ID, Email, Name, Plan, Status, Created, Actions). |
-| Table caption/aria-label | ❌ | Tablonun `<caption>` elementi veya `aria-label` attribute'u yok. |
-| Table role | ⚠️ | `<table>` elementi semantic HTML kullanıyor (role belirtilmemiş, bu doğru). |
-
----
-
-## G. EK BULGULAR
-
-| Kriter | Durum | Açıklama |
-|--------|-------|----------|
-| `<html lang>` | ✅ | `lang="tr"` doğru ayarlanmış. |
-| Page title | ✅ | "HookSniff — Webhook Delivery Service" — anlamlı ve tanımlayıcı. |
-| Image alt text | ✅ | Tüm img elementlerinde alt veya aria-label mevcut. |
-| Skip navigation link | ❌ | Hiçbir sayfada skip-to-content link'i yok. |
-| Focus indicators | ⚠️ | İlk odaklanabilir elementte outline tespit edilemedi — CSS ile kaldırılmış olabilir. Klavye navigasyonu için kritik. |
-
----
-
 ## F. TABLE ACCESSIBILITY (WCAG 1.3.1) — Tamamlanan
 
 ### Users Sayfası Tablosu
