@@ -137,8 +137,8 @@ describe('LandingPage', () => {
     const { container } = result;
     expect(container.textContent).toContain('landing.pricing');
     expect(container.textContent).toContain('$0');
-    expect(container.textContent).toContain('$49');
-    expect(container.textContent).toContain('$149');
+    expect(container.textContent).toContain('$29');
+    expect(container.textContent).toContain('$99');
     expect(container.textContent).toContain('landing.pricing.free');
     expect(container.textContent).toContain('landing.pricing.pro');
     expect(container.textContent).toContain('landing.pricing.business');
