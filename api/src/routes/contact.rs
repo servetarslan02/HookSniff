@@ -86,10 +86,12 @@ pub async fn handle_contact(
         body.name, body.email, body.subject, body.message
     );
 
-    // Send to admin
+    // Send to admin (use NOTIFY_EMAIL env var or fallback to logged warning)
+    let admin_email = std::env::var("NOTIFY_EMAIL")
+        .unwrap_or_else(|_| "servetarslan02@gmail.com".into());
     if let Err(e) = email_provider
         .send_contact_email(
-            "support@hooksniff.vercel.app",
+            &admin_email,
             &format!("Contact: {} — {}", body.subject, body.name),
             &admin_html,
         )
