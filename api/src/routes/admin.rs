@@ -313,11 +313,7 @@ async fn change_plan(
 
     let valid_plans = ["free", "pro", "business"];
     if !valid_plans.contains(&req.plan.as_str()) {
-        return Err(AppError::BadRequest(format!(
-            "Invalid plan '{}'. Must be one of: {}",
-            req.plan,
-            valid_plans.join(", ")
-        )));
+        return Err(AppError::BadRequest("Invalid plan".into()));
     }
 
     // Set webhook limits based on plan
