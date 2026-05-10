@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 21:15 GMT+8
+> Son güncelleme: 2026-05-10 21:30 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -59,6 +59,15 @@
 - Git history credential cleanup (BFG equivalent)
 - Kotlin brace balance fix
 - Sonraki: Oturum 87 — Database Indexes & Triggers
+
+## 📝 Oturum 87 (2026-05-10 21:16 - 21:30 GMT+8) ✅
+1. Database Indexes & Triggers: HS-054, HS-055, HS-056
+2. 2 dosya, 1 commit (db7715b)
+3. HS-054: 25+ eksik DB index eklendi (customers, endpoints, deliveries, dead_letters, webhook_queue, api_keys, invoices, notifications, ai_events, ai_actions, ai_agent_executions, team_members)
+4. HS-055: 10 updated_at trigger eklendi (customers, endpoints, api_keys, alert_rules, notification_preferences, inbound_configs, fifo_queue, transform_rules, retry_policies)
+5. HS-056: 2 UNIQUE constraint (api_keys.api_key_hash, webhook_queue.delivery_id)
+6. HS-057: Zaten migration 044'te tamamlanmıştı
+7. Migration: 045 (db.rs) + 003_indexes_triggers_constraints.sql (standalone)
 
 ## 📝 Oturum 86 (2026-05-10 21:10 - 21:15 GMT+8) ✅
 1. Accessibility & Dark Mode: 4 sorun
