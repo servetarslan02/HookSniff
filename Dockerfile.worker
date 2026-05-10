@@ -11,6 +11,7 @@ COPY Cargo.toml ./
 COPY Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
+COPY vendor/ vendor/
 
 # Build release binary
 RUN cargo build --release -p hooksniff-worker && \
