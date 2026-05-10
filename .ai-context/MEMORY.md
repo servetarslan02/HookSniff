@@ -69,20 +69,17 @@
 6. Neon DB'de doğrulandı: 189 index, 13 trigger, 134 constraint
 7. Bug fix: ADD CONSTRAINT IF NOT EXISTS → DO block pattern
 
-## 📝 Oturum 88 (2026-05-10 21:26 - 21:35 GMT+8) ✅
+## 📝 Oturum 88 (2026-05-10 21:26 - 21:38 GMT+8) ✅
 1. Billing Business Logic: HS-058, HS-059, HS-060
-2. 3 dosya, 1 commit (8522705)
-3. HS-058: Proration — orta döngü upgrade'de kalan gün üzerinden fark hesaplama
-   - calculate_proration() fonksiyonu
-   - UpgradeResponse'a prorated_amount_cents ve days_remaining eklendi
-4. HS-059: Grace period — 7 gün ödeme gecikme toleransı
-   - payment_failed_at column (migration 046, Neon'da uygulandı)
-   - Stripe invoice.payment_failed → payment_failed_at set
-   - Stripe invoice.paid → payment_failed_at clear
-   - process_expired_grace_periods() public fonksiyon (worker çağırır)
-5. HS-060: Endpoint cleanup on downgrade
-   - cleanup_excess_endpoints() — en yeni endpoint'leri devre dışı bırakır
-   - Subscription created/updated/canceled/grace expiry'de çağırılır
+2. 7 dosya, 2 commit (8522705, fe7c519)
+3. HS-058: Proration — calculate_proration(), gerçek dönem başlangıcı invoices tablosundan
+4. HS-059: Grace period — payment_failed_at, 7 gün tolerans, worker entegrasyonu (6 saatte bir)
+   - Stripe: handle_invoice_failed → payment_failed_at set
+   - Stripe: handle_invoice_paid → payment_failed_at clear
+   - Polar/iyzico: PaymentFailed customer_id eklendi, process_webhook_result handle ediyor
+   - Worker: process_expired_grace_periods() her 6 saatte çalışır
+5. HS-060: Endpoint cleanup — cleanup_excess_endpoints(), tüm senaryolarda çağırılır
+6. 5 açık sorun düzeltildi: worker entegrasyonu, proration verisi, polar/iyzico grace, cancel_at_period_end, endpoint cleanup
 
 ## 📝 Oturum 86 (2026-05-10 21:10 - 21:15 GMT+8) ✅
 1. Accessibility & Dark Mode: 4 sorun
