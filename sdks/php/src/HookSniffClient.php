@@ -23,7 +23,7 @@ use HookSniff\Models;
  */
 class HookSniffClient
 {
-    private const DEFAULT_BASE_URL = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
+    private const DEFAULT_BASE_URL = 'https://api.hooksniff.com/v1';
     private const DEFAULT_TIMEOUT = 30;
 
     private string $apiKey;
