@@ -198,13 +198,13 @@ Her oturum şu şekilde işler:
 | HS-052 | Dark mode eksik (birçok sayfa) | ✅ 2026-05-10 — 101/104 |
 | HS-053 | Footer eksik (birçok sayfa) | ✅ 2026-05-10 — Layout'larda |
 
-### Oturum 87: Database Indexes & Triggers
+### Oturum 87: Database Indexes & Triggers ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-054 | 20+ eksik DB index | ⬜ |
-| HS-055 | `updated_at` trigger'ları eksik | ⬜ |
-| HS-056 | UNIQUE constraint'ler eksik | ⬜ |
-| HS-057 | Delivery index eksik | ⬜ |
+| HS-054 | 20+ eksik DB index | ✅ 2026-05-10 |
+| HS-055 | `updated_at` trigger'ları eksik | ✅ 2026-05-10 |
+| HS-056 | UNIQUE constraint'ler eksik | ✅ 2026-05-10 |
+| HS-057 | Delivery index eksik | ✅ 2026-05-10 (migration 044) |
 
 ### Oturum 88: Billing Business Logic
 | ID | Sorun | Durum |
@@ -270,9 +270,9 @@ Her oturum şu şekilde işler:
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
 | 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 7 | 31 |
+| 🟡 P2 | 38 | 10 | 28 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **61** | **40** |
+| **TOPLAM** | **103** | **64** | **37** |
 
 ---
 
