@@ -58,7 +58,7 @@ export default function ContactPage() {
               </svg>
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.email')}</h3>
-            <a href="mailto:support@hooksniff.vercel.app" className="text-brand-600 dark:text-brand-400 hover:underline text-sm">support@hooksniff.vercel.app</a>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">Use the form below 👇</p>
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
@@ -95,7 +95,7 @@ export default function ContactPage() {
 
           {status === 'error' && (
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4 mb-6">
-              <p className="text-red-700 dark:text-red-400 font-medium">❌ Failed to send. Please email us directly at support@hooksniff.vercel.app</p>
+              <p className="text-red-700 dark:text-red-400 font-medium">❌ Failed to send. Please try again or reach us on GitHub Discussions.</p>
             </div>
           )}
 

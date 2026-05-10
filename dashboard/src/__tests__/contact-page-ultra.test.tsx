@@ -61,7 +61,7 @@ describe('ContactPage Ultra', () => {
   it('renders email info card', () => {
     const { container } = render(React.createElement(ContactPage));
     expect(container.textContent).toContain('Email');
-    expect(container.textContent).toContain('support@hooksniff.vercel.app');
+    expect(container.textContent).toContain('Use the form below');
   });
 
   // 5. Renders location info card
@@ -276,7 +276,7 @@ describe('ContactPage Ultra', () => {
       fireEvent.submit(form);
     });
 
-    expect(container.textContent).toContain('support@hooksniff.vercel.app');
+    expect(container.textContent).toContain('Failed to send');
   });
 
   // 20. Form clears after successful submit

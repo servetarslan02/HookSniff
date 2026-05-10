@@ -945,7 +945,7 @@
       "Object: Object to processing of your personal data",
       "Withdraw consent: Where processing is based on consent"
     ],
-    "s8How": "To exercise these rights, contact us at privacy@hooksniff.vercel.app",
+    "s8How": "To exercise these rights, contact us via the contact form",
     "s9Title": "9. Cookies",
     "s9Text": "We use essential cookies for authentication and session management. You can control cookies through your browser settings.",
     "s10Title": "10. International Transfers",
@@ -955,7 +955,7 @@
     "s12Title": "12. Changes to This Policy",
     "s12Text": "We may update this Privacy Policy from time to time. We will notify you of material changes via email or dashboard notification.",
     "s13Title": "13. Contact Us",
-    "s13Text": "For privacy-related inquiries, contact us at privacy@hooksniff.vercel.app"
+    "s13Text": "For privacy-related inquiries, contact us via the contact form"
   },
   "admin": {
     "overview": "Admin Overview",
@@ -1523,7 +1523,7 @@
     },
     {
       "q": "Is there a startup discount?",
-      "a": "Yes! If you're an early-stage startup (pre-Series A), contact us at hello@hooksniff.vercel.app with your details. We offer significant discounts and extended free tiers."
+      "a": "Yes! If you're an early-stage startup (pre-Series A), contact us via the contact form with your details. We offer significant discounts and extended free tiers."
     },
     {
       "q": "What's the difference between Pro and Business?",
