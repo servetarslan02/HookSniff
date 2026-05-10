@@ -1,41 +1,43 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 18:55 GMT+8
+> Son güncelleme: 2026-05-10 19:00 GMT+8
 
 ---
 
-## 🔴 Sıradaki Oturum: #73 — Rate Limiting
+## ✅ Tamamlanan Oturumlar
+
+### Oturum 73 — Rate Limiting ✅
+- HS-001: `verify_email` → 5/dakika/IP
+- HS-002: `verify_2fa` → 5/dakika/IP
+- HS-003: `refresh_token` → 10/dakika/IP
+- HS-008: `contact` → 3/dakika/IP
+
+---
+
+## 🔴 Sıradaki Oturum: #74 — Webhook Verification & Ownership
 
 ### Görev
-Auth endpoint'lerine rate limit ekle. 4 sorun tek oturumda çözülecek.
+Inbound webhook ve billing webhook'larda signature verification zorunlu kıl. Schema endpoint'lerinde ownership check ekle.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-001 | `verify_email` rate limit yok — brute force | `api/src/routes/auth.rs` |
-| HS-002 | `verify_2fa` rate limit yok — TOTP brute force | `api/src/routes/auth.rs` |
-| HS-003 | `refresh_token` rate limit yok — token stuffing | `api/src/routes/auth.rs` |
-| HS-008 | Contact form rate limit yok — spam/flood | `api/src/routes/contact.rs` |
+| HS-004 | Inbound webhook signature verification optional — secret boşsa `Ok(())` | `api/src/routes/inbound.rs` |
+| HS-005 | Billing webhook secret boşsa verification atlıyor | `api/src/routes/billing.rs` |
+| HS-009 | Schema endpoint'lerinde ownership check yok — cross-tenant leak | `api/src/routes/schemas.rs` |
+| HS-038a | `handle_inbound_to_endpoint` Authorization bypass — sadece prefix lookup | `api/src/routes/inbound.rs` |
+| HS-038b | Prefix length mismatch — 20 char lookup ama DB'de 15 char prefix | `api/src/routes/inbound.rs` |
 
 ### Yaklaşım
-1. `api/src/rate_limit.rs` dosyasını oku — mevcut rate limit yapısını anla
-2. `verify_email` endpoint'ine rate limit middleware ekle (5 deneme/dakika)
-3. `verify_2fa` endpoint'ine rate limit middleware ekle (5 deneme/dakika)
-4. `refresh_token` endpoint'ine rate limit middleware ekle (10 deneme/dakika)
-5. `contact` form endpoint'ine rate limit middleware ekle (3 deneme/dakika)
-6. Test et
-7. GitHub'a push et
-
-### Dosyalar
-- `api/src/routes/auth.rs` — verify_email, verify_2fa, refresh_token
-- `api/src/routes/contact.rs` — contact form
-- `api/src/rate_limit.rs` — mevcut rate limit modülü
+1. `api/src/routes/inbound.rs` — secret boşsa 403 döndür, full hash doğrulaması ekle
+2. `api/src/routes/billing.rs` — webhook secret boşsa verification atlama
+3. `api/src/routes/schemas.rs` — customer_id ownership kontrolü ekle
 
 ### Oturum Sonunda
-- [ ] ISSUE-TRACKER.md'de HS-001, HS-002, HS-003, HS-008'i ✅ ile işaretle
-- [ ] SESSION-PLAN.md'de Oturum 73'ü ✅ ile işaretle
+- [ ] ISSUE-TRACKER.md'de HS-004, HS-005, HS-009, HS-038a, HS-038b'yi ✅ ile işaretle
+- [ ] SESSION-PLAN.md'de Oturum 74'ü ✅ ile işaretle
 - [ ] MEMORY.md'yi güncelle
-- [ ] NEXT_SESSION.md'yi güncelle (Oturum 74 planı)
+- [ ] NEXT_SESSION.md'yi güncelle (Oturum 75 planı)
 - [ ] GitHub'a push et
 
 ---
@@ -44,11 +46,23 @@ Auth endpoint'lerine rate limit ekle. 4 sorun tek oturumda çözülecek.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 73 | **Rate Limiting** | HS-001, HS-002, HS-003, HS-008 |
-| 74 | Webhook Verification & Ownership | HS-004, HS-005, HS-009, HS-038a, HS-038b |
+| 74 | **Webhook Verification & Ownership** | HS-004, HS-005, HS-009, HS-038a, HS-038b |
 | 75 | Infrastructure & Security Config | HS-006, HS-007, HS-010, HS-038c |
 | 76 | Dashboard Routing (EN KRİTİK) | HS-030, HS-072, HS-075 |
 | 77 | Frontend-Backend API Uyumsuzluğu | HS-031, HS-034, HS-028, HS-029 |
+| 78 | Billing & Account Endpoints | HS-032, HS-033, HS-073, HS-074, HS-076 |
+
+---
+
+## 📊 İlerleme
+
+| Kategori | Toplam | Tamamlanan | Kalan |
+|----------|--------|-----------|-------|
+| 🚨 P0 | 14 | 4 | 10 |
+| 🔴 P1 | 44 | 0 | 44 |
+| 🟡 P2 | 38 | 0 | 38 |
+| 🟢 P3 | 13 | 0 | 13 |
+| **TOPLAM** | **103** | **4** | **99** |
 
 ---
 
@@ -59,9 +73,3 @@ Auth endpoint'lerine rate limit ekle. 4 sorun tek oturumda çözülecek.
 - **Dashboard:** https://hooksniff.vercel.app
 - **Admin:** servetarslan02@gmail.com / Alayci_165 (business, admin)
 - **Demo:** demo@hooksniff.com / Demo1234! (free, non-admin)
-
-## 📁 Tüm Raporlar
-- **ISSUE-TRACKER.md:** `.ai-context/visual-bugs/ISSUE-TRACKER.md` (103 sorun)
-- **SESSION-PLAN.md:** `.ai-context/SESSION-PLAN.md` (tüm oturum planı)
-- **ACTION-PLAN.md:** `.ai-context/visual-bugs/ACTION-PLAN.md`
-- **CONSOLIDATED-REPORT.md:** `.ai-context/visual-bugs/CONSOLIDATED-REPORT.md`
