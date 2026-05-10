@@ -43,7 +43,7 @@ export default function AdminSettingsPage() {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
 
   const handleSave = async () => {
     setSaving(true);
