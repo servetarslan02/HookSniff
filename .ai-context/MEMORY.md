@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 20:45 GMT+8
+> Son güncelleme: 2026-05-10 21:05 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -51,6 +51,16 @@
 ### Sonraki Oturum
 - Oturum 82: Auth & Crypto Security (HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l)
 
+## 📝 Oturum 84 (2026-05-10 20:58 - 21:05 GMT+8) ✅
+1. Frontend Component Issues: 6 sorun
+2. 6 dosya, 1 commit (1bba3ad)
+3. HS-039: Dual onboarding modal — Onboarding kaldırıldı
+4. HS-040: Toast dismiss butonu + aria-live + max 4 stack limit
+5. HS-041: Search + pagination çelişkisi — arama yapıldığında pagination gizlendi
+6. HS-042: Status count tooltip "on this page" eklendi
+7. HS-043: useEffect cleanup — mounted guard (dashboard stats + analytics), AbortController (EmailVerificationBanner)
+8. HS-044: Stale closure — completeStep functional update pattern
+
 ## 📝 Oturum 83 (2026-05-10 20:31 - 20:45 GMT+8) ✅
 1. SDK & Config Fixes: 6 sorun
 2. 13 dosya, 1 commit (a3ba6e8)
@@ -80,7 +90,7 @@
 - **Oturum 80**: Error Classification (HS-018) ✅
 - **Oturum 81**: Database Constraints (HS-025, HS-026, HS-057) ✅
 - **Oturum 82**: Auth & Crypto Security + Ek düzeltmeler (26 sorun) ✅ KUSURSUZ
-- **Toplam**: 54 tamamlandı, 8 yanlış bulgu, 3 notlu, 40 bekliyor
+- **Toplam**: 54 tamamlandı, 8 yanlış bulgu, 3 notlu, 38 bekliyor
 
 ## 📝 Oturum 81 (2026-05-10 19:35 - 19:37 GMT+8) ✅
 1. Database Issues:
