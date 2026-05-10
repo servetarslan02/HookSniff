@@ -49,7 +49,16 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 76: Dashboard Routing (HS-030, HS-072, HS-075) — EN KRİTİK
+- Oturum 77: Frontend-Backend API Uyumsuzluğu (HS-031, HS-034, HS-028, HS-029)
+
+## 📝 Oturum 76 (2026-05-10 19:08 - 19:12 GMT+8) ✅
+1. Dashboard routing double-prefix düzeltildi:
+   - `getLocalizedHref` kaldırıldı — `useLocale()` ile değiştirildi
+   - `Link` ve `router.push` artık doğrudan path alıyor (next-intl otomatik locale ekliyor)
+   - HS-030: ✅ Düzeltildi
+   - HS-072: ❌ Yanlış bulgu — `if (!token) return` guard'ı ile korunuyor
+   - HS-075: ❌ Yanlış bulgu — Middleware `"cookie"` değerini atlıyor
+2. Dosya: `dashboard/src/app/[locale]/dashboard/layout.tsx`
 
 ## 📝 Oturum 75 (2026-05-10 19:04 - 19:08 GMT+8) ✅
 1. Infrastructure & Security Config:
