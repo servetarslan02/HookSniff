@@ -8,7 +8,7 @@
 //! - Replay protection: reject if timestamp is >5 minutes old
 
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, Mac, KeyInit};
 use sha2::Sha256;
 
 type HmacSha256 = Hmac<Sha256>;

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -374,7 +374,6 @@ describe('SettingsPage', () => {
       fireEvent.change(passwordInputs[2], { target: { value: 'xyz12345' } });
     });
 
-    const callsBefore = mockApiPut.mock.calls.length;
     const forms = container.querySelectorAll('form');
     await act(async () => {
       fireEvent.submit(forms[1]);

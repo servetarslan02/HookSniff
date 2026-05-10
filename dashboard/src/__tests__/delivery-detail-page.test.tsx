@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -36,7 +36,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('@/components/StatusBadge', () => ({
-  StatusBadge: ({ status, size }: any) => React.createElement('span', { 'data-testid': 'status-badge' }, status),
+  StatusBadge: ({ status, size: _size }: any) => React.createElement('span', { 'data-testid': 'status-badge' }, status),
 }));
 
 vi.mock('@/components/ConfirmDialog', () => ({

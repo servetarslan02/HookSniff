@@ -15,7 +15,7 @@
 
 use async_trait::async_trait;
 use base64::Engine;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, Mac, KeyInit};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
