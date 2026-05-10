@@ -9,16 +9,16 @@
 
 | SDK | Versiyon | Platform | Durum | Publish Yöntemi |
 |-----|----------|----------|-------|-----------------|
-| Node.js | 0.1.0 | npm | ✅ Yayında | `npm publish` |
-| Python | 0.1.0 | PyPI | ✅ Yayında | `twine upload` |
+| Node.js | 0.2.0 | npm | ✅ Yayında | `npm publish` |
+| Python | 0.2.0 | PyPI | ✅ Yayında | `twine upload` |
 | Rust | 0.2.0 | crates.io | ✅ Yayında | `cargo publish` |
-| C# | 0.1.0 | NuGet | ✅ Yayında | `dotnet nuget push` |
+| C# | 0.2.0 | NuGet | ✅ Yayında | `dotnet nuget push` |
 | Go | v0.1.0 | pkg.go.dev | ✅ Yayında | `git tag` |
 | Swift | v0.1.0 | Swift Package Index | ✅ Yayında | `git tag` |
 | Java | 0.2.0 | Maven Central | ✅ Yayında | Maven + GPG |
-| Kotlin | 0.3.0 | Maven Central | ✅ Yayında | Gradle + GPG |
-| Ruby | 0.1.0 | RubyGems | ✅ Yayında | `gem push` |
-| **PHP** | 0.1.0 | Packagist | ✅ Yayında | GitHub submit |
+| Kotlin | 0.2.0 | Maven Central | ✅ Yayında | Gradle + GPG |
+| Ruby | 0.2.0 | RubyGems | ✅ Yayında | `gem push` |
+| **PHP** | 0.2.0 | Packagist | ✅ Yayında | GitHub submit |
 | **Elixir** | 0.2.0 | Hex.pm | ✅ Yayında | `mix hex.publish` |
 
 ---
