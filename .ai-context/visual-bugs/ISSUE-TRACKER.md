@@ -44,11 +44,11 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-016 | `DefaultHasher` idempotency hash'te (kriptografik değil) | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | ~~HS-017~~ | ~~Retry'da jitter yok~~ | ❌ YANLIŞ — jitter var (retry_policy/mod.rs:142) | ❌ |
 | HS-018 | Error classification yok — 400/401/404 de retry ediliyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 |
-| HS-019 | WebSocket connection limit yok — bellek tüketimi | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-021 | Billing webhook'larda idempotency yok | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-022 | Throttle state in-memory — restart'ta kaybolur | `backend/deep-rate-limiting.md` | ⬜ |
-| HS-023 | FIFO modülü var ama worker döngüsüne bağlanmamış | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
+| HS-019 | WebSocket connection limit yok — bellek tüketimi | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 91) |
+| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 91) |
+| HS-021 | Billing webhook'larda idempotency yok | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 91) |
+| HS-022 | Throttle state in-memory — restart'ta kaybolur | `backend/deep-rate-limiting.md` | ⚠️ 2026-05-10 (Oturum 92) — In-memory yeterli, DB persistence gelecekte |
+| HS-023 | FIFO modülü var ama worker döngüsüne bağlanmamış | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 92) |
 | HS-024 | İki migration sistemi senkron değil (standalone SQL vs embedded Rust) | `backend/DEEP-DB-MIGRATIONS.md` | ⚠️ 2026-05-10 — Düşük öncelik. db.rs tek kaynak, SQL dosyaları referans. Gelecekte refactor |
 | HS-025 | CHECK constraint'ler eksik — invalid status girilebilir | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 |
 | HS-026 | `webhook_queue`'da FK eksik | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 |
