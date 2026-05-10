@@ -144,11 +144,16 @@ async fn upsert_sso_config(
         }
     }
 
-    // Encrypt client secret if provided (simple base64 for now, should use proper encryption in production)
-    let client_secret_enc = req.client_secret.map(|s| {
-        use base64::Engine;
-        base64::engine::general_purpose::STANDARD.encode(s.as_bytes())
-    });
+    // Encrypt client secret using AES-256-GCM
+    let client_secret_enc = match req.client_secret {
+        Some(ref secret) if !secret.is_empty() => {
+            Some(crate::crypto::encrypt(secret).map_err(|e| {
+                tracing::error!("Failed to encrypt SSO client_secret: {}", e);
+                AppError::Internal(anyhow::anyhow!("Encryption failed"))
+            })?)
+        }
+        _ => None,
+    };
 
     sqlx::query(
         r#"INSERT INTO sso_configs (customer_id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted)

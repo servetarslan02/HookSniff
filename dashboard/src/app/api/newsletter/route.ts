@@ -8,6 +8,13 @@ const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 // In-memory subscriber store (production: replace with database)
 const subscribers = new Set<string>();
 
+// Allowed origins for CSRF protection
+const ALLOWED_ORIGINS = [
+  'https://hooksniff.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:3001',
+];
+
 function getRateLimitKey(request: Request): string {
   return request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
 }
@@ -24,8 +31,34 @@ function checkRateLimit(key: string): boolean {
   return true;
 }
 
+function validateOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+
+  // If origin is present, validate it
+  if (origin) {
+    return ALLOWED_ORIGINS.some((allowed) => origin.startsWith(allowed));
+  }
+
+  // Fallback: check referer
+  if (referer) {
+    return ALLOWED_ORIGINS.some((allowed) => referer.startsWith(allowed));
+  }
+
+  // No origin or referer — reject (likely direct curl/CSRF)
+  return false;
+}
+
 export async function POST(request: Request) {
   try {
+    // CSRF protection: validate origin/referer
+    if (!validateOrigin(request)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request origin' },
+        { status: 403 }
+      );
+    }
+
     // Rate limiting
     const rateLimitKey = getRateLimitKey(request);
     if (!checkRateLimit(rateLimitKey)) {
