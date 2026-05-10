@@ -8,6 +8,8 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
   return (
     <button
       onClick={toggle}
+      role="switch"
+      aria-checked={theme === 'dark'}
       className={`relative inline-flex h-9 w-16 items-center rounded-full transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
         theme === 'dark'
           ? 'bg-brand-600'
