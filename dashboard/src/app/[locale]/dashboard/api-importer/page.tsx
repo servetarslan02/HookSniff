@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi } from '@/lib/api';
@@ -57,6 +58,7 @@ function parseOpenApiSpec(content: string): ParsedSpec | null {
 
 /* ─── Main Page ─── */
 export default function ApiSpecImporterPage() {
+  const t = useTranslations('apiImporter');
   const { token } = useAuth();
   const { toast } = useToast();
   const [specUrl, setSpecUrl] = useState('');
@@ -76,9 +78,9 @@ export default function ApiSpecImporterPage() {
       const result = parseOpenApiSpec(text);
       if (result) {
         setParsed(result);
-        toast(`Found ${result.endpoints.length} endpoints`, 'success');
+        toast(t('parsedOk', { count: result.endpoints.length }), 'success');
       } else {
-        toast('Failed to parse OpenAPI spec', 'error');
+        toast(t('failedToParse'), 'error');
       }
     } catch (err) {
       toast(`Failed to fetch: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
@@ -90,9 +92,9 @@ export default function ApiSpecImporterPage() {
     const result = parseOpenApiSpec(specContent);
     if (result) {
       setParsed(result);
-      toast(`Found ${result.endpoints.length} endpoints`, 'success');
+      toast(t('parsedOk', { count: result.endpoints.length }), 'success');
     } else {
-      toast('Failed to parse. Make sure it\'s valid JSON.', 'error');
+      toast(t('failedToParseJson'), 'error');
     }
   };
 
@@ -117,7 +119,7 @@ export default function ApiSpecImporterPage() {
     if (!parsed || !token) return;
     const selected = parsed.endpoints.filter((e) => e.selected);
     if (selected.length === 0) {
-      toast('Select at least one endpoint', 'error');
+      toast(t('selectAtLeastOne'), 'error');
       return;
     }
 
@@ -139,7 +141,7 @@ export default function ApiSpecImporterPage() {
       }
     }
 
-    toast(`Imported ${success}/${selected.length} endpoints`, success > 0 ? 'success' : 'error');
+    toast(t('imported', { success, total: selected.length }), success > 0 ? 'success' : 'error');
     setImporting(false);
   }, [parsed, token, toast]);
 
@@ -171,9 +173,9 @@ export default function ApiSpecImporterPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📥 API Spec Importer</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Import endpoints from an OpenAPI/Swagger specification. Auto-create webhook endpoints from your existing API.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -187,7 +189,7 @@ export default function ApiSpecImporterPage() {
               : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'
           }`}
         >
-          🔗 From URL
+          {t('fromUrl')}
         </button>
         <button
           onClick={() => setMode('paste')}
@@ -197,7 +199,7 @@ export default function ApiSpecImporterPage() {
               : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'
           }`}
         >
-          📋 Paste JSON
+          {t('pasteJson')}
         </button>
       </div>
 
@@ -205,7 +207,7 @@ export default function ApiSpecImporterPage() {
       <div className="glass-card p-6">
         {mode === 'url' ? (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">OpenAPI Spec URL</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('specUrl')}</label>
             <div className="flex gap-3">
               <input
                 type="url"
@@ -219,13 +221,13 @@ export default function ApiSpecImporterPage() {
                 disabled={!specUrl}
                 className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
               >
-                Fetch
+                {t('fetch')}
               </button>
             </div>
           </div>
         ) : (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Paste OpenAPI JSON</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('pasteLabel')}</label>
             <textarea
               value={specContent}
               onChange={(e) => setSpecContent(e.target.value)}
@@ -238,7 +240,7 @@ export default function ApiSpecImporterPage() {
               disabled={!specContent}
               className="mt-3 px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
             >
-              Parse
+              {t('parse')}
             </button>
           </div>
         )}
@@ -251,7 +253,7 @@ export default function ApiSpecImporterPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{parsed.title} v{parsed.version}</h2>
-                <p className="text-sm text-gray-500 dark:text-slate-400">{parsed.endpoints.length} endpoints found</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">{t('endpointsFound', { count: parsed.endpoints.length })}</p>
               </div>
               <div className="flex gap-3">
                 <button
@@ -265,7 +267,7 @@ export default function ApiSpecImporterPage() {
                   disabled={importing || parsed.endpoints.filter((e) => e.selected).length === 0}
                   className="px-6 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition disabled:opacity-50"
                 >
-                  {importing ? `Importing ${imported}...` : `Import ${parsed.endpoints.filter((e) => e.selected).length} Endpoints`}
+                  {importing ? t('importing', { count: imported }) : t('importEndpoints', { count: parsed.endpoints.filter((e) => e.selected).length })}
                 </button>
               </div>
             </div>
@@ -305,8 +307,7 @@ export default function ApiSpecImporterPage() {
           {/* Usage tip */}
           <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
             <p className="text-sm text-blue-700 dark:text-blue-400">
-              💡 <strong>Tip:</strong> Imported endpoints will be created with the URL from your API spec. 
-              You can update the URL later to point to your actual webhook receiver.
+              {t('tip')}
             </p>
           </div>
         </>
@@ -314,11 +315,11 @@ export default function ApiSpecImporterPage() {
 
       {/* Supported Formats */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Supported Formats</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('supportedFormats')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { name: 'OpenAPI 3.0', ext: '.json / .yaml', icon: '📄' },
-            { name: 'Swagger 2.0', ext: '.json', icon: '📄' },
+            { name: t('openapi30'), ext: '.json / .yaml', icon: '📄' },
+            { name: t('swagger20'), ext: '.json', icon: '📄' },
             { name: 'URL', ext: 'https://...', icon: '🔗' },
           ].map((fmt) => (
             <div key={fmt.name} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-xl">
