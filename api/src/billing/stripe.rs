@@ -555,7 +555,7 @@ fn parse_stripe_signature(header: &str) -> Result<(i64, &str), AppError> {
         match key {
             "t" => {
                 timestamp = Some(value.parse::<i64>().map_err(|_| {
-                    AppError::BadRequest("Invalid timestamp in signature header".into())
+                    AppError::BadRequest("Invalid webhook signature".into())
                 })?);
             }
             "v1"
@@ -568,9 +568,9 @@ fn parse_stripe_signature(header: &str) -> Result<(i64, &str), AppError> {
     }
 
     let ts = timestamp
-        .ok_or_else(|| AppError::BadRequest("Missing timestamp in signature header".into()))?;
+        .ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
     let sig =
-        v1_sig.ok_or_else(|| AppError::BadRequest("Missing v1 signature in header".into()))?;
+        v1_sig.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
 
     Ok((ts, sig))
 }
@@ -602,7 +602,7 @@ fn verify_webhook_signature(
             age,
             tolerance_secs
         );
-        return Err(AppError::BadRequest("Webhook timestamp too old".into()));
+        return Err(AppError::BadRequest("Webhook signature expired".into()));
     }
 
     // 3. Extract the signing key (strip `whsec_` prefix, base64-decode)
@@ -611,7 +611,7 @@ fn verify_webhook_signature(
         .unwrap_or(webhook_secret);
     let key = base64::engine::general_purpose::STANDARD
         .decode(key_b64)
-        .map_err(|_| AppError::BadRequest("Invalid webhook secret format".into()))?;
+        .map_err(|_| AppError::BadRequest("Invalid webhook signature".into()))?;
 
     // 4. Compute HMAC-SHA256 over "{timestamp}.{payload}"
     let signed_payload = format!("{}.{}", timestamp, payload);
@@ -621,7 +621,7 @@ fn verify_webhook_signature(
 
     // 5. Decode the expected signature from hex and verify (constant-time)
     let expected_sig = hex::decode(expected_sig_hex)
-        .map_err(|_| AppError::BadRequest("Invalid signature hex encoding".into()))?;
+        .map_err(|_| AppError::BadRequest("Invalid webhook signature".into()))?;
 
     mac.verify_slice(&expected_sig)
         .map_err(|_| AppError::Unauthorized)?;
