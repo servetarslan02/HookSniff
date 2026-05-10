@@ -296,7 +296,7 @@ describe('PortalCustomizationPage', () => {
   });
 
   it('does not add empty event', async () => {
-    const { getByText, getByPlaceholderText } = render(<PortalCustomizationPage />);
+    const { getByText } = render(<PortalCustomizationPage />);
     await waitFor(() => {
       expect(getByText('Add')).toBeTruthy();
     });
