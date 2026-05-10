@@ -1,6 +1,6 @@
 {
   "name": "@hooksniff/sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Official Node.js client for HookSniff webhook delivery service",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
