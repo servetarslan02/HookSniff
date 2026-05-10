@@ -9,8 +9,8 @@
 
 | # | Sorun | Dosya | Satır |
 |---|-------|-------|-------|
-| 1 | `credentials: 'include'` headers İÇİNDE — auth cookie gönderilmiyor | `dashboard/.../settings/page.tsx` | ~82, ~106 |
-| 2 | Aynı hata api-keys sayfasında da var | `dashboard/.../api-keys/page.tsx` | ~72 |
+| 1 | `credentials: 'include'` headers İÇİNDE — auth cookie gönderilmiyor | `dashboard/.../settings/page.tsx` | ~82, ~106 | ✅ Düzeltildi (2026-05-10) |
+| 2 | Aynı hata api-keys sayfasında da var | `dashboard/.../api-keys/page.tsx` | ~72 | ✅ Düzeltildi (2026-05-10) |
 | 3 | Aynı hata search sayfasında da var | `dashboard/.../search/page.tsx` | ~65 | ✅ Düzeltildi (2026-05-10) |
 | 4 | 9+ sayfada Authorization header eksik (alerts, billing, health, inbound, transforms, analytics, logs, notifications, routing) | Çeşitli | fetch() |
 | 5 | Admin sayfalarında sunucu tarafı yetkilendirme yok (6 sayfa, sadece client-side token) | `admin/page.tsx`, `revenue/`, `settings/`, `system/`, `users/`, `users/[id]/` | - |
@@ -43,7 +43,7 @@
 | 5 | Form mesajlarında `role="alert"` yok | login, contact, newsletter |
 | 6 | SVG gradient ID collision riski | dashboard, analytics |
 | 7 | `attempts.sort()` state mutation | `deliveries/[id]/page.tsx` |
-| 8 | Notification preferences local state only | `settings/page.tsx` |
+| 8 | Notification preferences local state only | `settings/page.tsx` | ✅ Düzeltildi (2026-05-10) |
 | 9 | Inconsistent styling (`glass-card` vs plain `bg-white`) | portal, routing, schemas, templates |
 | 10 | Dashboard token refresh yok (401 → login) | `lib/api.ts` | ✅ Düzeltildi (2026-05-10) |
 | 11 | 5s/30s polling background tab'da devam ediyor | dashboard, health, status |
