@@ -412,8 +412,11 @@ impl PaymentProviderImpl for IyzicoProvider {
     ) -> Result<WebhookResult, AppError> {
         self.verify_webhook_signature(body, headers)?;
 
-        let notification: IyzicoWebhookNotification = serde_json::from_str(body)
-            .map_err(|e| AppError::BadRequest(format!("Invalid iyzico notification: {}", e)))?;
+        let notification: IyzicoWebhookNotification = serde_json::from_str(body).map_err(|e| {
+            // HS-038l: Log details internally, return generic message to client
+            tracing::warn!("Invalid iyzico webhook payload: {:?}", e);
+            AppError::BadRequest("Invalid webhook payload".into())
+        })?;
 
         tracing::info!(
             "iyzico webhook: event={}, payment={}",
