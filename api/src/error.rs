@@ -72,7 +72,7 @@ impl IntoResponse for AppError {
                 (
                     StatusCode::BAD_REQUEST,
                     "SERIALIZATION_ERROR",
-                    format!("Serialization error: {}", e),
+                    "Invalid request format".into(),
                 )
             }
         };
@@ -270,10 +270,8 @@ mod tests {
         let (status, body) = extract_status_and_body(resp).await;
         assert_eq!(status, StatusCode::BAD_REQUEST);
         assert_eq!(body["error"]["code"], "SERIALIZATION_ERROR");
-        assert!(body["error"]["message"]
-            .as_str()
-            .unwrap()
-            .starts_with("Serialization error:"));
+        // Should NOT leak internal serde_json error details
+        assert_eq!(body["error"]["message"], "Invalid request format");
     }
 
     // ── Debug trait ──
