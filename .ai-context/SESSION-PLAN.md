@@ -213,13 +213,13 @@ Her oturum şu şekilde işler:
 | HS-059 | Grace period yok | ✅ 2026-05-10 |
 | HS-060 | Downgrade'de endpoint cleanup yok | ✅ 2026-05-10 |
 
-### Oturum 89: Monitoring & Observability
+### Oturum 89: Monitoring & Observability ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-061 | Custom metric yok | ⬜ |
-| HS-062 | Simple exporter (sync) — batch olmalı | ⬜ |
-| HS-063 | Sampling strategy yok | ⬜ |
-| HS-064 | Response body PII trace'de loglanıyor | ⬜ |
+| HS-061 | Custom metric yok | ✅ 2026-05-10 |
+| HS-062 | Simple exporter (sync) — batch olmalı | ✅ 2026-05-10 |
+| HS-063 | Sampling strategy yok | ✅ 2026-05-10 — default parent-based |
+| HS-064 | Response body PII trace'de loglanıyor | ✅ 2026-05-10 |
 
 ### Oturum 90: i18n & Content
 | ID | Sorun | Durum |
