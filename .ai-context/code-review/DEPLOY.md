@@ -22,7 +22,7 @@
 | # | Sorun | Dosya |
 |---|-------|-------|
 | 1 | Portal API key URL'de (iframe src query param) | `portal/embed.js`, `portal/widget.html` |
-| 2 | Portal double-path bug (`/v1/api/v1/webhooks`) | `portal/widget.html` |
+| 2 | Portal double-path bug (`/v1/api/v1/webhooks`) | `portal/widget.html` | ✅ Düzeltildi (2026-05-10) |
 | 3 | Terraform provider çalışmıyor (tüm CRUD stub) | `deploy/terraform-provider-hooksniff/endpoint_resource.go` |
 | 4 | Helm DB password inline (kubectl describe ile görünür) | `deploy/helm/templates/deployments.yaml` |
 | 5 | OTEL endpoint hardcoded (prod observability URL) | `deploy/api-env.yaml`, `worker-env.yaml` |
@@ -42,22 +42,22 @@
 | 8 | CLI'da test yok, engines field yok | `cli/package.json` |
 | 9 | Publish script hardcoded version (`0.1.0`) | `scripts/publish-ruby.sh` |
 
-## hookrelay Artıkları
+## hookrelay Artıkları — ✅ Tümü Düzeltildi (2026-05-10)
 
-| Dosya | İçerik |
-|-------|--------|
-| `scripts/backup.sh` | `DB_NAME="${DB_NAME:-hookrelay}"` |
-| `cli/index.js` | `process.env.HOOKRELAY_API_URL`, `HOOKRELAY_API_KEY` |
-| `portal/style.css` | `/* ── HookRelay Widget — Dark & Light Theme ── */` |
-| `deploy/gcp-deploy.ps1` | hookrelay referansları |
-| `deploy/oracle-cloud-setup.sh` | 20+ hookrelay referansı |
-| `scripts/backup.sh` | 10+ hookrelay referansı |
-| `scripts/restore.sh` | 10+ hookrelay referansı |
-| `migrations/001_initial.sql` | hookrelay comment |
-| `migrations/002_security_features.sql` | `X-HookRelay-Signature` |
-| `migrations/005_event_mesh.sql` | hookrelay comment |
-| `tests/integration_test.sh` | hookrelay referansları |
-| `tests/integration/api_test.sh` | hookrelay referansları |
+| Dosya | İçerik | Durum |
+|-------|--------|-------|
+| `scripts/backup.sh` | `DB_NAME="${DB_NAME:-hookrelay}"` | ✅ |
+| `cli/index.js` | `process.env.HOOKRELAY_API_URL`, `HOOKRELAY_API_KEY` | ✅ |
+| `portal/style.css` | `/* ── HookRelay Widget — Dark & Light Theme ── */` | ✅ |
+| `deploy/gcp-deploy.ps1` | hookrelay referansları | ✅ |
+| `deploy/oracle-cloud-setup.sh` | 20+ hookrelay referansı | ✅ |
+| `scripts/backup.sh` | 10+ hookrelay referansı | ✅ |
+| `scripts/restore.sh` | 10+ hookrelay referansı | ✅ |
+| `migrations/001_initial.sql` | hookrelay comment | ✅ |
+| `migrations/002_security_features.sql` | `X-HookRelay-Signature` | ✅ |
+| `migrations/005_event_mesh.sql` | hookrelay comment | ✅ |
+| `tests/integration_test.sh` | hookrelay referansları | ✅ |
+| `tests/integration/api_test.sh` | hookrelay referansları | ✅ |
 
 ## 🟢 Güçlü Yönler
 
