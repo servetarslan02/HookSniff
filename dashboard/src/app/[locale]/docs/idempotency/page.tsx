@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function IdempotencyPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Idempotency</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("idempotency")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Safely retry webhook requests without creating duplicates.
       </p>
@@ -21,7 +23,7 @@ export default function IdempotencyPage() {
 
       {/* Idempotency Keys */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Idempotency Keys</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("idempotencyKeys")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Pass an <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">Idempotency-Key</code> header with your webhook requests:
         </p>
@@ -48,7 +50,7 @@ export default function IdempotencyPage() {
 
       {/* How HookSniff Handles Duplicates */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How HookSniff Handles Duplicates</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("howDuplicates")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           When you include an idempotency key:
         </p>
@@ -78,7 +80,7 @@ Idempotency-Key: order-12345-updated
 
       {/* Best Practices */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Best Practices</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("bestPractices")}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>Always use idempotency keys for critical webhooks (payments, orders)</li>
           <li>Generate keys from your business logic, not random UUIDs</li>

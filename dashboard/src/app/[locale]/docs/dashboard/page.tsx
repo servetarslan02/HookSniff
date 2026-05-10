@@ -1,8 +1,10 @@
+import { useTranslations } from 'next-intl';
 
 export default function DashboardPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Dashboard Guide</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("dashboardGuide")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         The HookSniff dashboard is your command center for managing webhooks, monitoring deliveries, and configuring your account.
       </p>
@@ -23,7 +25,7 @@ export default function DashboardPage() {
 
       {/* Endpoint Management */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Endpoint Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("endpointManagement")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Create, configure, and manage your webhook endpoints:
         </p>
@@ -38,7 +40,7 @@ export default function DashboardPage() {
 
       {/* Delivery Monitoring */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Delivery Monitoring</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("deliveryMonitoring")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Inspect every webhook delivery with full detail:
         </p>
@@ -66,7 +68,7 @@ export default function DashboardPage() {
 
       {/* Team Collaboration */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Team Collaboration</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("teamCollaboration")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Work together with your team:
         </p>

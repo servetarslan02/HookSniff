@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -107,6 +108,7 @@ const faq = [
 ];
 
 export default function BuildVsBuyContent() {
+  const t = useTranslations(\'buildVsBuy\');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   return (
@@ -116,7 +118,7 @@ export default function BuildVsBuyContent() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Build vs Buy</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -138,12 +140,12 @@ export default function BuildVsBuyContent() {
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 text-center">
             <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">1–2</p>
-            <p className="text-sm text-gray-600 dark:text-slate-400">Engineers to deploy HookSniff</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t("engineers")}</p>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">vs 3–5 to build in-house</p>
           </div>
           <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 text-center">
             <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">Days</p>
-            <p className="text-sm text-gray-600 dark:text-slate-400">Time to production</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t("timeToProduction")}</p>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">vs 6–12 months to build</p>
           </div>
           <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 text-center">
@@ -238,7 +240,7 @@ export default function BuildVsBuyContent() {
 
         {/* When to Build */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">When Building Still Makes Sense</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("whenBuilding")}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-4">Building in-house is defensible for a narrow set of cases:</p>
           <ul className="space-y-2">
             {[
@@ -262,7 +264,7 @@ export default function BuildVsBuyContent() {
 
         {/* FAQ */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("faq")}</h2>
           <div className="space-y-3 max-w-3xl mx-auto">
             {faq.map((item, i) => (
               <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
@@ -293,7 +295,7 @@ export default function BuildVsBuyContent() {
           <p className="text-gray-400 dark:text-slate-400 mb-6">Deploy HookSniff in under an hour. Free tier available. No credit card required.</p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
-            <Link href="/compare" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">Compare alternatives</Link>
+            <Link href="/compare" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("compareAlternatives")}</Link>
           </div>
         </div>
       </main>

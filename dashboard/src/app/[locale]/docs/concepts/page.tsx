@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function ConceptsPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Core Concepts</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("concepts")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Understand the fundamental building blocks of HookSniff.
       </p>
@@ -17,7 +19,7 @@ export default function ConceptsPage() {
         <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
           <li><strong>URL</strong> — The target URL that receives webhook POST requests</li>
           <li><strong>Events</strong> — Optional event filter (e.g., only deliver <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code> events)</li>
-          <li><strong>Signing Secret</strong> — HMAC-SHA256 secret for payload verification (<code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">whsec_</code> prefix)</li>
+          <li><strong>{t("signingSecret")}</strong> — HMAC-SHA256 secret for payload verification (<code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">whsec_</code> prefix)</li>
           <li><strong>Status</strong> — Active or inactive; inactive endpoints skip delivery</li>
         </ul>
         <CodeBlock
@@ -40,10 +42,10 @@ export default function ConceptsPage() {
           A <strong>webhook</strong> is an event you send via the API. A <strong>delivery</strong> is the attempt to deliver that webhook to an endpoint.
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
-          <li><strong>Event Types</strong> — String identifiers like <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">user.updated</code></li>
-          <li><strong>Payloads</strong> — JSON data sent as the request body</li>
-          <li><strong>Delivery Status</strong> — <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">pending</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">delivered</code>, or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">failed</code></li>
-          <li><strong>Attempt Tracking</strong> — Each delivery attempt is recorded with status code, response body, and duration</li>
+          <li><strong>{t("eventTypes")}</strong> — String identifiers like <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">user.updated</code></li>
+          <li><strong>{t("payloads")}</strong> — JSON data sent as the request body</li>
+          <li><strong>{t("deliveryStatus")}</strong> — <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">pending</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">delivered</code>, or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">failed</code></li>
+          <li><strong>{t("attemptTracking")}</strong> — Each delivery attempt is recorded with status code, response body, and duration</li>
         </ul>
       </section>
 
@@ -81,7 +83,7 @@ export default function ConceptsPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Dead Letter Queue (DLQ)</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          When a delivery exhausts all retry attempts, it's preserved in the <strong>Dead Letter Queue</strong>. DLQ entries include:
+          When a delivery exhausts all retry attempts, it's preserved in the <strong>{t("deadLetterQueue")}</strong>. DLQ entries include:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>Original payload and event type</li>
@@ -109,7 +111,7 @@ export default function ConceptsPage() {
 
       {/* FIFO Delivery */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">FIFO Delivery</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("fifoDelivery")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           HookSniff delivers webhooks in <strong>FIFO order</strong> (first-in, first-out) per endpoint. Each delivery includes a sequence number:
         </p>

@@ -78,7 +78,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
               {release.version}
             </span>
             {release.tag === 'latest' && (
-              <span className="text-xs font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full">Latest</span>
+              <span className="text-xs font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full">{t("latest")}</span>
             )}
             <span className="text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 px-2 py-0.5 rounded-full">
               {areaCfg.icon} {areaCfg.label}
