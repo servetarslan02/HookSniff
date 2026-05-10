@@ -960,6 +960,42 @@ async fn delete_account(
         .execute(&mut *tx)
         .await?;
 
+    // Additional tables with customer_id (GDPR compliance)
+    sqlx::query("DELETE FROM installed_agents WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM payment_transactions WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM invoices WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM audit_log WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM sso_configs WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM custom_domains WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM portal_configs WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&mut *tx)
+        .await?;
+
     // Finally delete the customer
     sqlx::query("DELETE FROM customers WHERE id = $1")
         .bind(customer.id)
