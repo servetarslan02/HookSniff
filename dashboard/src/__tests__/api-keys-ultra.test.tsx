@@ -76,7 +76,7 @@ async function renderPage(keys = mockKeys) {
 }
 
 function getCreateButton(container: HTMLElement) {
-  return Array.from(container.querySelectorAll('button')).find(
+  return (Array.from(container.querySelectorAll('button')) as Element[]).find(
     (b) => b.textContent?.includes('apiKeys.createKey')
   )!;
 }
@@ -165,7 +165,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     await act(async () => { fireEvent.click(getCreateButton(container)); });
     await waitFor(() => { expect(container.textContent).toContain('hk_new_secret_123'); });
 
-    const copyBtn = Array.from(container.querySelectorAll('button')).find(
+    const copyBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('common.copyToClipboard')
     )!;
     await act(async () => { fireEvent.click(copyBtn); });
@@ -187,7 +187,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     await act(async () => { fireEvent.click(getCreateButton(container)); });
     await waitFor(() => { expect(container.textContent).toContain('hk_copy_feedback'); });
 
-    const copyBtn = Array.from(container.querySelectorAll('button')).find(
+    const copyBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('common.copyToClipboard')
     )!;
     await act(async () => { fireEvent.click(copyBtn); });
@@ -200,7 +200,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     const { container } = await renderPage();
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 
-    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+    const deleteBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('🗑')
     )!;
     await act(async () => { fireEvent.click(deleteBtn); });
@@ -215,7 +215,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 
     // Open delete modal
-    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+    const deleteBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('🗑')
     )!;
     await act(async () => { fireEvent.click(deleteBtn); });
@@ -224,7 +224,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
 
     // Find confirm button in modal
-    const confirmBtn = Array.from(container.querySelectorAll('button')).find(
+    const confirmBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.closest('.fixed') && b.textContent?.includes('common.delete')
     )!;
     await act(async () => { fireEvent.click(confirmBtn); });
@@ -240,13 +240,13 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     const { container } = await renderPage();
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 
-    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+    const deleteBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('🗑')
     )!;
     await act(async () => { fireEvent.click(deleteBtn); });
     expect(container.textContent).toContain('apiKeys.deleteTitle');
 
-    const cancelBtn = Array.from(container.querySelectorAll('button')).find(
+    const cancelBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('common.cancel')
     )!;
     await act(async () => { fireEvent.click(cancelBtn); });
@@ -299,7 +299,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     await act(async () => { fireEvent.click(getCreateButton(container)); });
     await waitFor(() => { expect(container.textContent).toContain('hk_dismiss_test'); });
 
-    const dismissBtn = Array.from(container.querySelectorAll('button')).find(
+    const dismissBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('apiKeys.dismiss')
     );
     expect(dismissBtn).toBeTruthy();
@@ -319,7 +319,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     await act(async () => { fireEvent.click(getCreateButton(container)); });
     await waitFor(() => { expect(container.textContent).toContain('hk_hide_me'); });
 
-    const dismissBtn = Array.from(container.querySelectorAll('button')).find(
+    const dismissBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('apiKeys.dismiss')
     )!;
     await act(async () => { fireEvent.click(dismissBtn); });
@@ -388,12 +388,12 @@ describe('ApiKeysPage — Ultra Coverage', () => {
 
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
 
-    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+    const deleteBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('🗑')
     )!;
     await act(async () => { fireEvent.click(deleteBtn); });
 
-    const confirmBtn = Array.from(container.querySelectorAll('button')).find(
+    const confirmBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.closest('.fixed') && b.textContent?.includes('common.delete')
     )!;
     await act(async () => { fireEvent.click(confirmBtn); });
@@ -413,12 +413,12 @@ describe('ApiKeysPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ error: { message: 'Delete failed' } }),
     });
 
-    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+    const deleteBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('🗑')
     )!;
     await act(async () => { fireEvent.click(deleteBtn); });
 
-    const confirmBtn = Array.from(container.querySelectorAll('button')).find(
+    const confirmBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.closest('.fixed') && b.textContent?.includes('common.delete')
     )!;
     await act(async () => { fireEvent.click(confirmBtn); });
@@ -439,7 +439,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     });
     // Check that the prefix is in a code element
     const codeEls = container.querySelectorAll('code');
-    const prefixCode = Array.from(codeEls).find((c) => c.textContent?.includes('hk_live_abc'));
+    const prefixCode = (Array.from(codeEls) as Element[]).find((c) => c.textContent?.includes('hk_live_abc'));
     expect(prefixCode).toBeTruthy();
   });
 
@@ -518,7 +518,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     const { container } = await renderPage();
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 
-    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+    const deleteBtn = (Array.from(container.querySelectorAll('button')) as Element[]).find(
       (b) => b.textContent?.includes('🗑')
     )!;
     await act(async () => { fireEvent.click(deleteBtn); });
