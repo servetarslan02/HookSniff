@@ -625,7 +625,8 @@
       "pricing": "Fiyatlandırma",
       "docs": "Dokümanlar",
       "status": "Durum",
-      "dashboard": "Panel →"
+      "dashboard": "Panel →",
+      "getStarted": "Başlayın"
     },
     "hero": {
       "uptime": "%99.99 teslimat uptime",
