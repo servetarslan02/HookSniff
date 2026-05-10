@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# HookRelay API Integration Tests (Extended)
+# HookSniff API Integration Tests (Extended)
 # ============================================================================
 # Mevcut integration_test.sh'in üzerine eklenen daha kapsamlı testler.
 # API'nin tüm kritik endpointlerini, hata senaryolarını ve edge case'leri test eder.
@@ -19,9 +19,9 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-BASE_URL="${HOOKRELAY_BASE_URL:-http://localhost:3000}"
+BASE_URL="${HOOKSNIFF_BASE_URL:-http://localhost:3000}"
 API_BASE="${BASE_URL}/v1"
-TEST_EMAIL="api-test-$(date +%s)@hookrelay.dev"
+TEST_EMAIL="api-test-$(date +%s)@hooksniff.dev"
 TEST_PASSWORD="TestPass1234!"
 
 # Colors
@@ -156,7 +156,7 @@ extract_json() {
 # ===========================================================================
 echo -e "${CYAN}${BOLD}"
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║          HookRelay API Integration Test Suite (Extended)    ║"
+echo "║          HookSniff API Integration Test Suite (Extended)    ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 echo "  Base URL:    $BASE_URL"

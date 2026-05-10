@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────
-# HookRelay — PostgreSQL Backup Script
+# HookSniff — PostgreSQL Backup Script
 # Supports full backups with S3/GCS upload
 # ──────────────────────────────────────────────────────────────
 
@@ -9,20 +9,20 @@ set -euo pipefail
 # ── Configuration ──
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-hookrelay}"
-DB_USER="${DB_USER:-hookrelay}"
+DB_NAME="${DB_NAME:-hooksniff}"
+DB_USER="${DB_USER:-hooksniff}"
 
 # Storage backend: "local", "s3", or "gcs"
 BACKUP_STORAGE="${BACKUP_STORAGE:-local}"
-BACKUP_DIR="${BACKUP_DIR:-/var/backups/hookrelay}"
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/hooksniff}"
 
 # S3 configuration
-S3_BUCKET="${S3_BUCKET:-hookrelay-backups}"
+S3_BUCKET="${S3_BUCKET:-hooksniff-backups}"
 S3_PREFIX="${S3_PREFIX:-postgres}"
 S3_REGION="${S3_REGION:-us-east-1}"
 
 # GCS configuration
-GCS_BUCKET="${GCS_BUCKET:-hookrelay-backups}"
+GCS_BUCKET="${GCS_BUCKET:-hooksniff-backups}"
 GCS_PREFIX="${GCS_PREFIX:-postgres}"
 
 # Retention
@@ -48,7 +48,7 @@ get_timestamp() {
 backup_full() {
     local timestamp
     timestamp=$(get_timestamp)
-    local backup_file="hookrelay-${timestamp}.dump"
+    local backup_file="hooksniff-${timestamp}.dump"
 
     case "${BACKUP_STORAGE}" in
         local)
@@ -101,7 +101,7 @@ cleanup_old_backups() {
 
     case "${BACKUP_STORAGE}" in
         local)
-            find "${BACKUP_DIR}" -name "hookrelay-*.dump" -type f -mtime "+${RETENTION_DAYS}" -delete 2>/dev/null || true
+            find "${BACKUP_DIR}" -name "hooksniff-*.dump" -type f -mtime "+${RETENTION_DAYS}" -delete 2>/dev/null || true
             ;;
         s3)
             local cutoff
@@ -144,11 +144,11 @@ usage() {
     echo "Environment variables:"
     echo "  DB_HOST          PostgreSQL host (default: localhost)"
     echo "  DB_PORT          PostgreSQL port (default: 5432)"
-    echo "  DB_NAME          Database name (default: hookrelay)"
-    echo "  DB_USER          Database user (default: hookrelay)"
+    echo "  DB_NAME          Database name (default: hooksniff)"
+    echo "  DB_USER          Database user (default: hooksniff)"
     echo "  PGPASSWORD       Database password (or use .pgpass)"
     echo "  BACKUP_STORAGE   Storage backend: local, s3, gcs (default: local)"
-    echo "  BACKUP_DIR       Local backup directory (default: /var/backups/hookrelay)"
+    echo "  BACKUP_DIR       Local backup directory (default: /var/backups/hooksniff)"
     echo "  S3_BUCKET        S3 bucket name"
     echo "  GCS_BUCKET       GCS bucket name"
     echo "  RETENTION_DAYS   Days to keep backups (default: 30)"
