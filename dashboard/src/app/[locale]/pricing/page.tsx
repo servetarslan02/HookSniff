@@ -99,7 +99,7 @@ const comparisonRows = [
   ]},
   { category: 'Monitoring & Logs', items: [
     { feature: 'Dashboard', free: '✅', pro: '✅', business: '✅' },
-    { feature: 'Log retention', free: '3 days', pro: '30 days', business: '90 days' },
+    { feature: 'Log retention', free: '7 days', pro: '30 days', business: '90 days' },
     { feature: 'Real-time delivery logs', free: '✅', pro: '✅', business: '✅' },
     { feature: 'Analytics & graphs', free: '—', pro: '✅', business: '✅' },
     { feature: 'Schema registry', free: '—', pro: '—', business: '✅' },

@@ -17,7 +17,7 @@
 | 6 | Playground'ta hardcoded `Bearer YOUR_TOKEN` + SSRF riski | `dashboard/.../playground/page.tsx` | ~340 |
 | 7 | Blog'ta `dangerouslySetInnerHTML` (şu an güvenli ama tehlikeli pattern) | `dashboard/.../blog/[slug]/page.tsx` | ~highlight |
 | 8 | Blog tüm content (~600 satır) client'a bundle ediliyor | `dashboard/.../blog/[slug]/page.tsx` | posts objesi |
-| 9 | Landing page Pro $49, pricing page Pro $29 — tutarsız | `page.tsx` vs `pricing/page.tsx` | - |
+| 9 | Landing page Pro $49, pricing page Pro $29 — tutarsız | `page.tsx` vs `pricing/page.tsx` | - | ✅ Düzeltildi (2026-05-10) |
 | 10 | Privacy/terms 7 gün diyor, pricing 3 gün diyor (data retention) | `privacy/page.tsx` vs `pricing/page.tsx` | - |
 
 ## 🟠 Yüksek
