@@ -156,14 +156,14 @@ Her oturum şu şekilde işler:
 ### Oturum 83: SDK & Config Fixes
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-035 | 3 farklı API URL (SDK tutarsızlığı) | ⬜ |
-| HS-036 | Kotlin SDK generic crash | ⬜ |
-| HS-037 | 6 SDK'da legacy header | ⬜ |
-| HS-038 | CLI `HOOKRELAY_*` env vars | ⬜ |
-| HS-038m | `next.config.js` output:standalone eksik | ⬜ |
-| HS-038n | DATABASE_URL git history'de | ⬜ |
+| HS-035 | 3 farklı API URL (SDK tutarsızlığı) | ✅ 2026-05-10 |
+| HS-036 | Kotlin SDK generic crash | ✅ 2026-05-10 |
+| HS-037 | 6 SDK'da legacy header | ✅ 2026-05-10 |
+| HS-038 | CLI `HOOKRELAY_*` env vars | ✅ 2026-05-10 |
+| HS-038m | `next.config.js` output:standalone eksik | ✅ 2026-05-10 |
+| HS-038n | DATABASE_URL git history'de | ⚠️ 2026-05-10 — Kod düzeltildi, BFG gerekli |
 
-**Dosyalar:** `sdks/`, `cli/`, `dashboard/next.config.js`
+**Dosyalar:** `sdks/`, `cli/index.js`, `mcp/index.js`, `dashboard/next.config.js`, `run-migrations.js`, `fix-migrations.js`
 
 ### Oturum 84: Frontend Search & Component Logic
 | ID | Sorun | Durum |
@@ -268,11 +268,11 @@ Her oturum şu şekilde işler:
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
-| 🚨 P0 | 14 | 0 | 14 |
-| 🔴 P1 | 44 | 0 | 44 |
+| 🚨 P0 | 14 | 13 | 1 |
+| 🔴 P1 | 44 | 34 (+9 yanlış/notlu) | 1 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **0** | **103** |
+| **TOPLAM** | **103** | **48** | **53** |
 
 ---
 
