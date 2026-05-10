@@ -298,7 +298,7 @@ def verify_webhook_request(request, secret: str) -> WebhookEvent:
 
     Extracts the body and relevant headers automatically, verifies the signature,
     and returns a ``WebhookEvent``. Supports both Standard Webhooks headers and
-    legacy ``X-Hookrelay-Signature`` header.
+    legacy ``X-Hooksniff-Signature`` header.
 
     Args:
         request: A Flask, Django, or WSGI-like request object. Must have
@@ -362,7 +362,7 @@ def verify_webhook_request(request, secret: str) -> WebhookEvent:
 
         return event
 
-    # Legacy path: X-Hookrelay-Signature
+    # Legacy path: X-Hooksniff-Signature
     legacy_sig = _get_header(headers, "x-hooksniff-signature")
     if not legacy_sig:
         raise ValueError("No webhook signature headers found")
@@ -417,7 +417,7 @@ def _extract_headers(request) -> Dict[str, str]:
         headers = {}
         for key, value in request.META.items():
             if key.startswith("HTTP_"):
-                # HTTP_X_HOOKRELAY_SIGNATURE -> X-Hookrelay-Signature
+                # HTTP_X_HOOKSNIFF_SIGNATURE -> X-Hooksniff-Signature
                 header_name = key[5:].replace("_", "-")
                 headers[header_name] = value
             elif key == "CONTENT_TYPE":
@@ -447,7 +447,7 @@ class WebhookHandler:
     FastAPI, and other Python web frameworks.
 
     Supports both Standard Webhooks headers and legacy
-    ``X-Hookrelay-Signature`` header.
+    ``X-Hooksniff-Signature`` header.
 
     Args:
         secret: The endpoint's signing secret.
