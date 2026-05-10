@@ -69,7 +69,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-038c | Billing webhook'larında rate limiting yok (Stripe/Polar/iyzico) | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038d | `custom_domains` dig/nslookup subprocess — command injection riski | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — Domain sanitize edilmiş (sadece lowercase, digit, hyphen, dot) |
 | HS-038e | Dynamic SQL construction (events, admin) — `format!` ile WHERE clause | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — `format!` sadece bind index (`$1`), user input parametrize edilmiş |
-| HS-038f | Timing attack — login hataları farklı mesajlar döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038f | Timing attack — login hataları farklı mesajlar döndürüyor | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 (Oturum 82'de yapılmış) |
 | HS-038g | `AppError::Serialization` serde_json hata mesajını kullanıcıya gösteriyor | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038h | Email enumeration — register "Email already registered" döndürüyor | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038i | Auth cache `std::sync::Mutex` — async context'te deadlock riski | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
@@ -100,24 +100,24 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-051 | `weeklyDigest` state local-only — API'ye gönderilmiyor | `frontend/agent4-settings-config.md` | ✅ 2026-05-10 |
 | HS-052 | Dark mode eksik (birçok sayfa) | `frontend/DEEP-CSS-STYLING.md` | ✅ 2026-05-10 |
 | HS-053 | Footer eksik (birçok sayfa) | `frontend/DEEP-CSS-STYLING.md` | ✅ 2026-05-10 |
-| HS-054 | 20+ eksik DB index — yavaş query'ler | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-055 | `updated_at` trigger'ları eksik | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-056 | UNIQUE constraint'ler eksik | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-057 | Delivery index eksik (`customer_id, created_at DESC`) | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
-| HS-058 | Proration yok — mid-cycle upgrade adaletsiz | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-059 | Grace period yok — ödeme başarısızlığında anında downgrade | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-060 | Downgrade'de endpoint cleanup yok | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-061 | Custom metric yok — sadece trace var | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-062 | Simple exporter (sync) — batch exporter kullanılmalı | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-063 | Sampling strategy yok — tüm trace'ler export ediliyor | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-064 | Response body PII içerebilir — trace'de loglanıyor | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ⬜ |
-| HS-066 | 71 sayfada metadata eksik (SEO) | `frontend/DEEP-A11Y-SEO.md` | ⬜ |
+| HS-054 | 20+ eksik DB index — yavaş query'ler | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 (Oturum 87) |
+| HS-055 | `updated_at` trigger'ları eksik | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 (Oturum 87) |
+| HS-056 | UNIQUE constraint'ler eksik | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 (Oturum 87) |
+| HS-057 | Delivery index eksik (`customer_id, created_at DESC`) | `backend/DEEP-DB-MIGRATIONS.md` | ✅ 2026-05-10 (Oturum 87) |
+| HS-058 | Proration yok — mid-cycle upgrade adaletsiz | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 88) |
+| HS-059 | Grace period yok — ödeme başarısızlığında anında downgrade | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 88) |
+| HS-060 | Downgrade'de endpoint cleanup yok | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 88) |
+| HS-061 | Custom metric yok — sadece trace var | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
+| HS-062 | Simple exporter (sync) — batch exporter kullanılmalı | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
+| HS-063 | Sampling strategy yok — tüm trace'ler export ediliyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
+| HS-064 | Response body PII içerebilir — trace'de loglanıyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
+| HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ⬜ (büyük iş) |
+| HS-066 | 71 sayfada metadata eksik (SEO) | `frontend/DEEP-A11Y-SEO.md` | ⚠️ 2026-05-10 — Client component, layout'tan geliyor |
 | HS-067 | Müşteri hikayeleri kurgusal — yasal risk | `infra/DEEP-LANDING-CONTENT.md` | ⬜ |
 | HS-068 | Türkçe çeviri hataları ("APIimize", "Ölü Mektup Kuyruğu") | `infra/DEEP-LANDING-CONTENT.md` | ⬜ |
-| HS-069 | FAQ eksik — SEO featured snippets kaybı | `infra/DEEP-LANDING-CONTENT.md` | ⬜ |
-| HS-070 | `next.config.js`'de `output: 'standalone'` eksik | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
-| HS-071 | HSTS header eksik | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
+| HS-069 | FAQ eksik — SEO featured snippets kaybı | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-10 (Oturum 90) |
+| HS-070 | `next.config.js`'de `output: 'standalone'` eksik | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 83) |
+| HS-071 | HSTS header eksik | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 83) |
 | HS-072 | `token!` non-null assertion → null token ile API çağrısı | `frontend/agent1-core.md` | ❌ 2026-05-10 — `if (!token) return` guard'ı ile korunuyor |
 | HS-073 | Hardcoded `Authorization: 'Bearer YOUR_TOKEN'` | `frontend/agent3-tools.md` | ✅ 2026-05-10 |
 | HS-074 | `health/page.tsx` token kullanmıyor — herkes erişebilir | `frontend/agent5-middleware-shared.md` | ❌ 2026-05-10 — `credentials: 'include'` cookie gönderiyor, route protected |

@@ -111,6 +111,9 @@ pub struct CheckoutSession {
 /// Header: `polar-signature: t=<timestamp>,v1=<signature>`
 #[derive(Debug, Deserialize)]
 pub struct PolarWebhookEvent {
+    /// HS-021: Event ID for idempotency
+    #[serde(default)]
+    pub id: Option<String>,
     #[serde(rename = "type")]
     pub event_type: String,
     pub data: serde_json::Value,
