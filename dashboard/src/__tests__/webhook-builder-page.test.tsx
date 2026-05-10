@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent, waitFor, cleanup } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -53,6 +53,7 @@ import WebhookBuilderPage from '@/app/[locale]/dashboard/webhook-builder/page';
 
 describe('WebhookBuilderPage', () => {
   beforeEach(() => {
+    cleanup();
     vi.clearAllMocks();
   });
 
@@ -138,7 +139,7 @@ describe('WebhookBuilderPage', () => {
   it('send button is disabled when no endpoint is set', () => {
     const { getByText } = render(<WebhookBuilderPage />);
     const btn = getByText(/Send Webhook/).closest('button');
-    expect(btn).toBeDisabled();
+    expect(btn?.disabled).toBe(true);
   });
 
   it('shows error toast when sending without endpoint', async () => {
@@ -147,7 +148,7 @@ describe('WebhookBuilderPage', () => {
     // by setting an endpoint first
     const endpointInput = getByText(/Send Webhook/).closest('div')!.querySelector('input');
     // Actually let's just verify the button is disabled
-    expect(getByText(/Send Webhook/).closest('button')).toBeDisabled();
+    expect(getByText(/Send Webhook/).closest('button')?.disabled).toBe(true);
   });
 
   it('renders preview section', () => {
@@ -156,8 +157,8 @@ describe('WebhookBuilderPage', () => {
   });
 
   it('renders refresh preview button', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
-    expect(getByText(/Refresh/)).toBeTruthy();
+    const { getAllByText } = render(<WebhookBuilderPage />);
+    expect(getAllByText(/Refresh/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows placeholder text in preview initially', () => {
@@ -166,8 +167,9 @@ describe('WebhookBuilderPage', () => {
   });
 
   it('generates preview when refresh is clicked', () => {
-    const { getByText, container } = render(<WebhookBuilderPage />);
-    fireEvent.click(getByText(/Refresh/));
+    const { getAllByText, container } = render(<WebhookBuilderPage />);
+    const refreshButtons = getAllByText(/Refresh/);
+    fireEvent.click(refreshButtons[0]);
     const pre = container.querySelector('pre');
     expect(pre).toBeTruthy();
     expect(pre!.textContent).toContain('order.created');
@@ -177,14 +179,14 @@ describe('WebhookBuilderPage', () => {
     const { getByDisplayValue } = render(<WebhookBuilderPage />);
     const input = getByDisplayValue('order.created');
     fireEvent.change(input, { target: { value: 'custom.event' } });
-    expect(input).toHaveValue('custom.event');
+    expect(input.value).toBe('custom.event');
   });
 
   it('allows editing field values', () => {
     const { getByDisplayValue } = render(<WebhookBuilderPage />);
     const keyInput = getByDisplayValue('order_id');
     fireEvent.change(keyInput, { target: { value: 'new_key' } });
-    expect(keyInput).toHaveValue('new_key');
+    expect(keyInput.value).toBe('new_key');
   });
 
   it('renders field type selectors', () => {

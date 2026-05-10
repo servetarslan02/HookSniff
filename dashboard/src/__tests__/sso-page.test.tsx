@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react';
+import { render, act, fireEvent, waitFor, cleanup } from '@testing-library/react';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -54,6 +54,7 @@ import SsoSettingsPage from '@/app/[locale]/dashboard/sso/page';
 
 describe('SsoSettingsPage', () => {
   beforeEach(() => {
+    cleanup();
     vi.clearAllMocks();
     mockApiFetch.mockResolvedValue({});
   });
@@ -239,7 +240,7 @@ describe('SsoSettingsPage', () => {
     await waitFor(() => {
       const input = getByPlaceholderText('https://idp.example.com/metadata.xml');
       fireEvent.change(input, { target: { value: 'https://new-idp.com/metadata.xml' } });
-      expect(input).toHaveValue('https://new-idp.com/metadata.xml');
+      expect(input.value).toBe('https://new-idp.com/metadata.xml');
     });
   });
 
@@ -248,7 +249,7 @@ describe('SsoSettingsPage', () => {
     await waitFor(() => {
       const input = getByPlaceholderText('urn:hooksniff:sp');
       fireEvent.change(input, { target: { value: 'urn:custom:sp' } });
-      expect(input).toHaveValue('urn:custom:sp');
+      expect(input.value).toBe('urn:custom:sp');
     });
   });
 
