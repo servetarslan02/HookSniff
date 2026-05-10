@@ -62,9 +62,9 @@ pub fn generate_token_with_duration(
 
 /// Generate a random token string (for reset/verification/refresh).
 pub fn generate_random_token() -> String {
-    use rand::RngCore;
+    use rand::TryRng;
     let mut bytes = [0u8; 32];
-    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
     hex::encode(bytes)
 }
 

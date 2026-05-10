@@ -248,7 +248,7 @@ pub async fn admin_middleware(req: Request, next: Next) -> Result<Response, AppE
 pub fn hash_api_key(key: &str) -> String {
     use argon2::password_hash::SaltString;
     use argon2::{Argon2, PasswordHasher};
-    use rand::rngs::OsRng;
+    use argon2::password_hash::rand_core::OsRng;
     let salt = SaltString::generate(&mut OsRng);
     let argon2 = Argon2::default();
     argon2
@@ -271,18 +271,18 @@ pub fn verify_api_key(key: &str, hash: &str) -> bool {
 }
 
 pub fn generate_api_key() -> String {
-    use rand::RngCore;
+    use rand::TryRng;
     let mut bytes = [0u8; 32];
-    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
     format!("hr_live_{}", hex::encode(bytes))
 }
 
 /// Generate a test-mode API key (hr_test_*).
 /// Test keys deliver to a mock endpoint instead of real URLs.
 pub fn generate_test_api_key() -> String {
-    use rand::RngCore;
+    use rand::TryRng;
     let mut bytes = [0u8; 32];
-    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
     format!("hr_test_{}", hex::encode(bytes))
 }
 

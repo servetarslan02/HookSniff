@@ -221,10 +221,10 @@ impl IyzicoProvider {
     ///
     /// iyzico signature = HMAC-SHA256(secret_key, random_string + uri + body)
     fn generate_auth(&self, uri: &str, body: &str) -> IyzicoAuth {
-        use rand::Rng;
+        use rand::RngExt;
 
-        let random_string: String = rand::thread_rng()
-            .sample_iter(&rand::distributions::Alphanumeric)
+        let random_string: String = rand::rng()
+            .sample_iter(&rand::distr::Alphanumeric)
             .take(8)
             .map(char::from)
             .collect();
