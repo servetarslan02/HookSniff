@@ -193,7 +193,7 @@ class HookSniffClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1",
+        base_url: str = "https://api.hooksniff.com/v1",
         timeout: int = 30,
     ):
         self._api_key = api_key
