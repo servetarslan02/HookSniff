@@ -169,6 +169,9 @@ Dark mode arka planları:
 ### Etkilenen Elementler (Dark Mode)
 
 **`text-gray-400 dark:text-slate-500` (#64748b) — FAIL (3.75:1 on slate-950, 3.07:1 on slate-900):**
+
+Admin panelinde tüm kullanımlar `text-gray-400 dark:text-slate-500` şeklindedir (light mode'da gray-400, dark mode'da slate-500).
+
 - Loading spinner text: "Loading users..."
 - Empty state text: "No users found."
 - "No recent signups" mesajı
@@ -178,12 +181,12 @@ Dark mode arka planları:
 - System: Infrastructure label: `text-xs text-gray-400 dark:text-slate-500`
 - Revenue: "(X users)" plan count: `text-xs text-gray-400 dark:text-slate-500`
 
-**`text-gray-500` (dark mode'da dark variant yok, #6b7280) — FAIL (3.69:1 on slate-950):**
-- Bazı elementler `text-gray-500` kullanıp dark variant belirtmiyor → doğrudan #6b7280 kalıyor
+> **Not:** Bu elementler light mode'da da `text-gray-400` (#9ca3af) kullanır → 2.54:1 FAIL. Yani hem light hem dark mode'da kontrast sorunu var.
 
 **Düzeltme Önerisi:**
-- `dark:text-slate-500` (#64748b) yerine `dark:text-slate-400` (#94a3b8) kullanın → 6.96:1 kontrast sağlar.
-- Veya `text-gray-400 dark:text-slate-400` → dark mode'da 6.96:1, light mode'da da sorunsuz.
+- `text-gray-400 dark:text-slate-500` yerine `text-gray-500 dark:text-slate-400` kullanın:
+  - Light mode: gray-500 (#6b7280) on white = 4.83:1 ✅
+  - Dark mode: slate-400 (#94a3b8) on slate-950 = 6.96:1 ✅
 
 ---
 
