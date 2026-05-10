@@ -412,7 +412,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
     const { container } = render(React.createElement(PlaygroundPage));
     // toLocaleString output depends on locale, but the timestamp should render something
     // We check that the div with the timestamp class exists
-    const timeDivs = container.querySelectorAll('[class*="text-\\[10px\\]"]');
+    const _timeDivs = container.querySelectorAll('[class*="text-\\[10px\\]"]');
     // Alternatively just check container has some date-like content
     const text = container.textContent || '';
     // The component calls new Date(req.timestamp).toLocaleString() which should produce a non-empty string
