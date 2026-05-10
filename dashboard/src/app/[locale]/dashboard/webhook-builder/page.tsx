@@ -97,7 +97,7 @@ export default function WebhookBuilderPage() {
           else payload[f.key] = f.value;
         }
       });
-      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
       const res = await fetch(`${API}/webhooks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

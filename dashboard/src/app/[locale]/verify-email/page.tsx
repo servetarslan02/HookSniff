@@ -19,7 +19,7 @@ function VerifyEmailContent() {
       return;
     }
 
-    const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
     fetch(`${API}/auth/verify-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -87,7 +87,7 @@ function VerifyEmailContent() {
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <button
                 onClick={async () => {
-                  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+                  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
                   await fetch(`${API}/auth/resend-verification`, { method: 'POST', credentials: 'include' });
                   toast('Verification email sent!', 'success');
                 }}
