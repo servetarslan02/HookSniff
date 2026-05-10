@@ -244,6 +244,11 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
       </nav>
 
       <article className="max-w-4xl mx-auto px-6 py-16">
+        {/* HS-067: Disclaimer */}
+        <div className="mb-8 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-sm">
+          ⚠️ This is an illustrative usage scenario, not a real customer testimonial.
+        </div>
+
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-4 mb-6">
