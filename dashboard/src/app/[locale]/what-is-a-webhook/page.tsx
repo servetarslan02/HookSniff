@@ -29,7 +29,7 @@ export default function WhatIsWebhookPage() {
             <p className="text-gray-600 dark:text-slate-400 leading-relaxed">A webhook is a way for one application to send real-time data to another application when something happens. Instead of your app constantly asking &quot;Is there new data? Is there new data?&quot; (polling), the other app simply tells you when something changes.</p>
             <div className="p-4 bg-brand-50 dark:bg-brand-500/10 rounded-lg border border-brand-200 dark:border-brand-500/20 my-4">
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Think of it like this:</p>
-              <p className="text-sm text-gray-600 dark:text-slate-400"><strong>Polling</strong> = You keep calling the pizza place asking &quot;Is my pizza ready?&quot;</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400"><strong>{t("polling")}</strong> = You keep calling the pizza place asking &quot;Is my pizza ready?&quot;</p>
               <p className="text-sm text-gray-600 dark:text-slate-400"><strong>Webhook</strong> = The pizza place calls YOU when your pizza is ready.</p>
             </div>
           </section>
@@ -48,7 +48,7 @@ export default function WhatIsWebhookPage() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("comparison")}</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border border-gray-200 dark:border-slate-800 rounded-lg">
-                <thead><tr className="bg-gray-50 dark:bg-slate-800"><th className="p-3 text-left">{t("aspect")}</th><th className="p-3 text-left">Polling</th><th className="p-3 text-left">Webhook</th></tr></thead>
+                <thead><tr className="bg-gray-50 dark:bg-slate-800"><th className="p-3 text-left">{t("aspect")}</th><th className="p-3 text-left">{t("polling")}</th><th className="p-3 text-left">Webhook</th></tr></thead>
                 <tbody>
                   <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("direction")}</td><td className="p-3">You → Them</td><td className="p-3">Them → You</td></tr>
                   <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("timing")}</td><td className="p-3">{t("youCheck")}</td><td className="p-3">{t("instantNotification")}</td></tr>

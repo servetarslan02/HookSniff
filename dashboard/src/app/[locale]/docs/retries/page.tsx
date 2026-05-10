@@ -26,7 +26,7 @@ export default function RetriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">1</td><td className="px-4 py-3">Immediate</td><td className="px-4 py-3">0</td></tr>
+              <tr><td className="px-4 py-3 font-medium">1</td><td className="px-4 py-3">{t("immediate")}</td><td className="px-4 py-3">0</td></tr>
               <tr><td className="px-4 py-3 font-medium">2</td><td className="px-4 py-3">10 seconds</td><td className="px-4 py-3">10s</td></tr>
               <tr><td className="px-4 py-3 font-medium">3</td><td className="px-4 py-3">30 seconds</td><td className="px-4 py-3">40s</td></tr>
               <tr><td className="px-4 py-3 font-medium">4</td><td className="px-4 py-3">2 minutes</td><td className="px-4 py-3">~2.5 min</td></tr>
@@ -46,8 +46,8 @@ export default function RetriesPage() {
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>HTTP status code <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">4xx</code> or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">5xx</code></li>
           <li>Connection timeout (30 seconds default)</li>
-          <li>DNS resolution failure</li>
-          <li>TLS handshake failure</li>
+          <li>{t("dnsFailure")}</li>
+          <li>{t("tlsHandshakeFailure")}</li>
         </ul>
         <p className="text-gray-600 dark:text-slate-400 mt-4">
           Only <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">2xx</code> responses are considered successful.
@@ -78,9 +78,9 @@ export default function RetriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-mono text-sm">max_attempts</td><td className="px-4 py-3">3</td><td className="px-4 py-3">Maximum delivery attempts</td></tr>
+              <tr><td className="px-4 py-3 font-mono text-sm">max_attempts</td><td className="px-4 py-3">3</td><td className="px-4 py-3">{t("maxDeliveryAttempts")}</td></tr>
               <tr><td className="px-4 py-3 font-mono text-sm">backoff</td><td className="px-4 py-3">exponential</td><td className="px-4 py-3">Strategy: exponential, linear, fixed</td></tr>
-              <tr><td className="px-4 py-3 font-mono text-sm">initial_delay_secs</td><td className="px-4 py-3">10</td><td className="px-4 py-3">Delay before first retry</td></tr>
+              <tr><td className="px-4 py-3 font-mono text-sm">initial_delay_secs</td><td className="px-4 py-3">10</td><td className="px-4 py-3">{t("delayBeforeFirst")}</td></tr>
               <tr><td className="px-4 py-3 font-mono text-sm">max_delay_secs</td><td className="px-4 py-3">3600</td><td className="px-4 py-3">Maximum delay between retries (1 hour)</td></tr>
             </tbody>
           </table></div>
@@ -111,9 +111,9 @@ export default function RetriesPage() {
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>Delivery status is set to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">failed</code></li>
           <li>All attempt details (status codes, errors, timestamps) are preserved</li>
-          <li>The original payload is retained for replay</li>
+          <li>{t("originalRetained")}</li>
           <li>DLQ entries are retained for 30 days by default</li>
-          <li>You can inspect DLQ entries via the API or dashboard</li>
+          <li>{t("inspectDlqEntries")}</li>
         </ul>
       </section>
     </article>
