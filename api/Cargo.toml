@@ -24,7 +24,7 @@ tracing-opentelemetry = "0.32"
 axum = { version = "0.8", features = ["macros", "ws"] }
 tower = { version = "0.5", features = ["util"] }
 tower-http = { version = "0.6", features = ["cors", "trace", "limit"] }
-sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid", "postgres", "json"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid", "postgres", "json"] }
 dotenvy = "0.15"
 thiserror = "2"
 url = "2"
@@ -35,14 +35,14 @@ base64 = "0.22"
 prometheus = "0.14"
 jsonwebtoken = { version = "10", features = ["rust_crypto"] }
 argon2 = "0.5"
-rand = "0.8"
+rand = "0.10"
 once_cell = "1"
 regex = "1"
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls", "form"] }
 async-stream = "0.3"
 futures = "0.3"
 async-trait.workspace = true
-redis = { version = "0.25", default-features = false, features = ["tokio-rustls-comp", "connection-manager", "script"] }
+redis = { version = "1", default-features = false, features = ["tokio-rustls-comp", "connection-manager", "script"] }
 totp-rs = { version = "5", features = ["otpauth"] }
 base32 = "0.5"
 urlencoding = "2"

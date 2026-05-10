@@ -15,7 +15,7 @@ use axum::{
     Json, Router,
 };
 use chrono::{DateTime, Utc};
-use rand::Rng;
+use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -52,10 +52,10 @@ pub struct AddDomainRequest {
 
 /// Generate a random verification token
 fn generate_verification_token() -> String {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     (0..32)
         .map(|_| {
-            let idx = rng.gen_range(0..36);
+            let idx = rng.random_range(0..36);
             if idx < 10 {
                 (b'0' + idx) as char
             } else {

@@ -110,7 +110,7 @@ impl<'r> sqlx::Decode<'r, sqlx::Postgres> for FifoStatus {
 }
 
 impl sqlx::Encode<'_, sqlx::Postgres> for FifoStatus {
-    fn encode_by_ref(&self, buf: &mut sqlx::postgres::PgArgumentBuffer) -> sqlx::encode::IsNull {
+    fn encode_by_ref(&self, buf: &mut sqlx::postgres::PgArgumentBuffer) -> Result<sqlx::encode::IsNull, sqlx::error::BoxDynError> {
         <String as sqlx::Encode<sqlx::Postgres>>::encode_by_ref(&self.as_str().to_string(), buf)
     }
 }
