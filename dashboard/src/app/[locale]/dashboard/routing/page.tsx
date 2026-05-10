@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
@@ -18,6 +19,7 @@ interface RoutingInfo {
 }
 
 export default function RoutingPage() {
+  const t = useTranslations('routing');
   const { token } = useAuth();
   const [endpoints, setEndpoints] = useState<RoutingInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,13 +32,13 @@ export default function RoutingPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading) return <div className="p-8 text-gray-500">Loading...</div>;
+  if (loading) return <div className="p-8 text-gray-500">{t('loading')}</div>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">🔀 Routing</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
       <p className="text-gray-500 mb-6">
-        Configure how webhooks are routed to your endpoints. Choose between round-robin, latency-based, or failover strategies.
+        {t('subtitle')}
       </p>
       <div className="space-y-4">
         {endpoints.map((ep) => (
@@ -45,21 +47,21 @@ export default function RoutingPage() {
               <div>
                 <p className="font-mono text-sm">{ep.url}</p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Strategy: <span className="font-semibold">{ep.routing_strategy || 'round-robin'}</span>
-                  {ep.fallback_url && <> · Fallback: {ep.fallback_url}</>}
+                  {t('strategy')} <span className="font-semibold">{ep.routing_strategy || 'round-robin'}</span>
+                  {ep.fallback_url && <> · {t('fallback')} {ep.fallback_url}</>}
                 </p>
               </div>
               <div className="text-right">
                 <span className={`badge ${ep.failure_streak >= 3 ? 'badge-red' : 'badge-green'}`}>
-                  {ep.failure_streak >= 3 ? 'Unhealthy' : 'Healthy'}
+                  {ep.failure_streak >= 3 ? t('unhealthy') : t('healthy')}
                 </span>
-                <p className="text-xs text-gray-500 mt-1">{ep.avg_response_ms}ms avg</p>
+                <p className="text-xs text-gray-500 mt-1">{t('msAvg', { ms: ep.avg_response_ms })}</p>
               </div>
             </div>
           </div>
         ))}
         {endpoints.length === 0 && (
-          <div className="text-center py-12 text-gray-500">No endpoints configured yet.</div>
+          <div className="text-center py-12 text-gray-500">{t('noEndpoints')}</div>
         )}
       </div>
     </div>

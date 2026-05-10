@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 
 /* ─── SSO/SAML Configuration Page ─── */
 export default function SsoSettingsPage() {
+  const t = useTranslations('sso');
   const { token } = useAuth();
   const { toast } = useToast();
   const [provider, setProvider] = useState<'saml' | 'oidc'>('saml');
@@ -58,9 +60,9 @@ export default function SsoSettingsPage() {
         if (certificate) body.client_secret = certificate;
       }
       await apiFetch('/sso/config', { method: 'POST', body, token });
-      toast('SSO configuration saved!', 'success');
+      toast(t('saved'), 'success');
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to save SSO config', 'error');
+      toast(err instanceof Error ? err.message : t('saveFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -80,15 +82,15 @@ export default function SsoSettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🔐 SSO / SAML</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Configure Single Sign-On for your organization. Enterprise plan required.
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Provider Selection */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Provider</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('provider')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             { id: 'saml' as const, name: 'SAML 2.0', desc: 'Okta, OneLogin, Azure AD, Google Workspace', icon: '🏛️' },
@@ -118,10 +120,10 @@ export default function SsoSettingsPage() {
       {/* SAML Configuration */}
       {provider === 'saml' && (
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">SAML Configuration</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('samlConfiguration')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Metadata URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('metadataUrl')}</label>
               <input
                 type="url"
                 value={metadata}
@@ -131,7 +133,7 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Entity ID</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('entityId')}</label>
               <input
                 type="text"
                 value={entityId}
@@ -141,7 +143,7 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">SSO URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('ssoUrl')}</label>
               <input
                 type="url"
                 value={ssoUrl}
@@ -151,7 +153,7 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">X.509 Certificate</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('x509Certificate')}</label>
               <textarea
                 value={certificate}
                 onChange={(e) => setCertificate(e.target.value)}
@@ -167,10 +169,10 @@ export default function SsoSettingsPage() {
       {/* OIDC Configuration */}
       {provider === 'oidc' && (
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">OpenID Connect Configuration</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('oidcConfiguration')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Issuer URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('issuerUrl')}</label>
               <input
                 type="url"
                 value={metadata}
@@ -180,7 +182,7 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Client ID</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientId')}</label>
               <input
                 type="text"
                 value={entityId}
@@ -190,7 +192,7 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Client Secret</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientSecret')}</label>
               <input
                 type="password"
                 value={certificate}
@@ -208,8 +210,8 @@ export default function SsoSettingsPage() {
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="font-semibold text-gray-900 dark:text-white">Enable SSO</div>
-              <div className="text-sm text-gray-500 dark:text-slate-400">When enabled, all team members must authenticate via SSO.</div>
+              <div className="font-semibold text-gray-900 dark:text-white">{t('enableSso')}</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400">{t('enableSsoDesc')}</div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="sr-only peer" />
@@ -221,7 +223,7 @@ export default function SsoSettingsPage() {
             disabled={saving}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
           >
-            {saving ? 'Saving...' : 'Save Configuration'}
+            {saving ? t('saving') : t('saveConfiguration')}
           </button>
         </div>
       )}
@@ -229,7 +231,7 @@ export default function SsoSettingsPage() {
       {/* Info */}
       <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
         <p className="text-sm text-blue-700 dark:text-blue-400">
-          💡 SSO is available on the <strong>Business</strong> plan. <a href="/pricing" className="underline">Upgrade now</a> to enable SSO for your organization.
+          {t('upgradeHint1')}<strong>{t('upgradeHintBold')}</strong>{t('upgradeHint2')}<a href="/pricing" className="underline">{t('upgradeNow')}</a>{t('upgradeHintSuffix')}
         </p>
       </div>
     </div>

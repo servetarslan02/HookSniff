@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 
 export default function CustomDomainPage() {
+  const t = useTranslations('customDomain');
   const { token } = useAuth();
   const { toast } = useToast();
   const [domain, setDomain] = useState('');
@@ -29,9 +31,9 @@ export default function CustomDomainPage() {
         { type: 'CNAME', name: domain, value: data.cname_target },
         { type: 'TXT', name: `_hooksniff.${domain}`, value: data.txt_record },
       ]);
-      toast('Domain added! Add the DNS records below.', 'success');
+      toast(t('domainAdded'), 'success');
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to add domain', 'error');
+      toast(err instanceof Error ? err.message : t('failedToAdd'), 'error');
     } finally {
       setSaving(false);
     }
@@ -47,14 +49,14 @@ export default function CustomDomainPage() {
       });
       if (data.verified) {
         setStatus('verified');
-        toast(data.message || 'Domain verified!', 'success');
+        toast(data.message || t('domainVerified'), 'success');
       } else {
         setStatus('error');
-        const issues = data.issues?.join(', ') || 'Check DNS records';
-        toast(`Verification failed: ${issues}`, 'error');
+        const issues = data.issues?.join(', ') || t('verificationFailedCheck');
+        toast(`${t('verificationFailedPrefix')} ${issues}`, 'error');
       }
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Verification failed', 'error');
+      toast(err instanceof Error ? err.message : t('verificationFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -63,21 +65,21 @@ export default function CustomDomainPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🌐 Custom Domain</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Use your own domain for the webhook portal. White-label your customers&apos; experience.
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Add Domain */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Domain</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('addDomain')}</h2>
         <div className="flex gap-3">
           <input
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ''))}
-            placeholder="webhooks.yourcompany.com"
+            placeholder={t('placeholder')}
             className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
           />
           <button
@@ -85,7 +87,7 @@ export default function CustomDomainPage() {
             disabled={saving || !domain}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
           >
-            Add Domain
+            {t('addDomainBtn')}
           </button>
         </div>
       </div>
@@ -93,18 +95,18 @@ export default function CustomDomainPage() {
       {/* DNS Records */}
       {dnsRecords.length > 0 && (
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">DNS Records</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('dnsRecords')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-            Add these records to your DNS provider (Cloudflare, Route53, etc.)
+            {t('dnsRecordsDesc')}
           </p>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Value</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Copy</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('colType')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('colName')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('colValue')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('colCopy')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -115,10 +117,10 @@ export default function CustomDomainPage() {
                     <td className="px-4 py-3 font-mono text-sm text-gray-600 dark:text-slate-400 break-all">{rec.value}</td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => { navigator.clipboard.writeText(rec.value); toast('Copied!', 'success'); }}
+                        onClick={() => { navigator.clipboard.writeText(rec.value); toast(t('copied'), 'success'); }}
                         className="text-brand-600 dark:text-brand-400 text-sm hover:underline"
                       >
-                        📋 Copy
+                        {t('copy')}
                       </button>
                     </td>
                   </tr>
@@ -132,16 +134,16 @@ export default function CustomDomainPage() {
               disabled={saving}
               className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition disabled:opacity-50"
             >
-              {saving ? 'Verifying...' : '✓ Verify Domain'}
+              {saving ? t('verifying') : t('verifyDomain')}
             </button>
             {status === 'verified' && (
               <span className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
-                ✅ Verified! SSL provisioning...
+                ✅ {t('verified')}
               </span>
             )}
             {status === 'error' && (
               <span className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm font-medium">
-                ❌ Verification failed — check DNS records
+                ❌ {t('verificationFailedCheck')}
               </span>
             )}
           </div>
@@ -150,12 +152,12 @@ export default function CustomDomainPage() {
 
       {/* How it works */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How it works</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
         <div className="space-y-3">
           {[
-            { step: '1', title: 'Add your domain', desc: 'Enter the domain you want to use (e.g., webhooks.yourcompany.com)' },
-            { step: '2', title: 'Add DNS records', desc: 'We\'ll give you CNAME and TXT records to add to your DNS provider' },
-            { step: '3', title: 'Verify & go live', desc: 'We verify ownership and automatically provision an SSL certificate' },
+            { step: '1', title: t('step1Title'), desc: t('step1Desc') },
+            { step: '2', title: t('step2Title'), desc: t('step2Desc') },
+            { step: '3', title: t('step3Title'), desc: t('step3Desc') },
           ].map((item) => (
             <div key={item.step} className="flex gap-3">
               <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm flex-shrink-0">

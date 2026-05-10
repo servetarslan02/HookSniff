@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
@@ -29,9 +30,9 @@ const DEFAULT_POLICY: GlobalRetryPolicy = {
 };
 
 const BACKOFF_OPTIONS = [
-  { value: 'exponential', label: 'Exponential', desc: 'Delay doubles each attempt (10s → 20s → 40s → 80s...)' },
-  { value: 'linear', label: 'Linear', desc: 'Delay increases linearly (10s → 20s → 30s → 40s...)' },
-  { value: 'fixed', label: 'Fixed', desc: 'Same delay every attempt (10s → 10s → 10s...)' },
+  { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },
+  { value: 'linear', labelKey: 'linear', descKey: 'linearDesc' },
+  { value: 'fixed', labelKey: 'fixed', descKey: 'fixedDesc' },
 ];
 
 const STATUS_CODES = [
@@ -44,6 +45,7 @@ const STATUS_CODES = [
 ];
 
 export default function RetryPolicyPage() {
+  const t = useTranslations('retryPolicy');
   const { token } = useAuth();
   const { toast } = useToast();
   const [policy, setPolicy] = useState<GlobalRetryPolicy>(DEFAULT_POLICY);
@@ -98,12 +100,12 @@ export default function RetryPolicyPage() {
         }
       }
       if (errors.length === 0) {
-        toast('Retry policy saved for all endpoints!', 'success');
+        toast(t('saved'), 'success');
       } else {
-        toast(`Saved with ${errors.length} errors`, 'error');
+        toast(t('savedWithErrors', { count: errors.length }), 'error');
       }
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to save retry policy', 'error');
+      toast(err instanceof Error ? err.message : t('saveFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -145,9 +147,9 @@ export default function RetryPolicyPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🔄 Retry Policy</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-gray-500 dark:text-slate-400 mt-1">
-            Configure global retry behavior for webhook deliveries. Per-endpoint overrides take precedence.
+            {t('subtitle')}
           </p>
         </div>
         <button
@@ -155,7 +157,7 @@ export default function RetryPolicyPage() {
           disabled={saving}
           className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? t('saving') : t('saveChanges')}
         </button>
       </div>
 
@@ -164,10 +166,10 @@ export default function RetryPolicyPage() {
         <div className="space-y-6">
           {/* Retry Settings */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Retry Settings</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Max Attempts</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxAttempts')}</label>
                 <input
                   type="number"
                   min={1}
@@ -179,7 +181,7 @@ export default function RetryPolicyPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Backoff Strategy</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('backoffStrategy')}</label>
                 <div className="space-y-2">
                   {BACKOFF_OPTIONS.map((opt) => (
                     <label
@@ -199,8 +201,8 @@ export default function RetryPolicyPage() {
                         className="mt-1"
                       />
                       <div>
-                        <div className="font-medium text-gray-900 dark:text-white text-sm">{opt.label}</div>
-                        <div className="text-xs text-gray-500 dark:text-slate-400">{opt.desc}</div>
+                        <div className="font-medium text-gray-900 dark:text-white text-sm">{t(opt.labelKey)}</div>
+                        <div className="text-xs text-gray-500 dark:text-slate-400">{t(opt.descKey)}</div>
                       </div>
                     </label>
                   ))}
@@ -209,7 +211,7 @@ export default function RetryPolicyPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Initial Delay (sec)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('initialDelay')}</label>
                   <input
                     type="number"
                     min={1}
@@ -219,7 +221,7 @@ export default function RetryPolicyPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Max Delay (sec)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxDelay')}</label>
                   <input
                     type="number"
                     min={1}
@@ -231,7 +233,7 @@ export default function RetryPolicyPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Request Timeout (sec)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('requestTimeout')}</label>
                 <input
                   type="number"
                   min={5}
@@ -246,11 +248,11 @@ export default function RetryPolicyPage() {
 
           {/* Dead Letter Queue */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Dead Letter Queue</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('deadLetterQueue')}</h2>
             <label className="flex items-center justify-between cursor-pointer mb-4">
               <div>
-                <div className="font-medium text-gray-900 dark:text-white text-sm">Enable DLQ</div>
-                <div className="text-xs text-gray-500 dark:text-slate-400">Move permanently failed deliveries to DLQ</div>
+                <div className="font-medium text-gray-900 dark:text-white text-sm">{t('enableDlq')}</div>
+                <div className="text-xs text-gray-500 dark:text-slate-400">{t('enableDlqDesc')}</div>
               </div>
               <div className={`w-11 h-6 rounded-full transition-colors ${policy.dead_letter_queue_enabled ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
                 <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${policy.dead_letter_queue_enabled ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
@@ -264,7 +266,7 @@ export default function RetryPolicyPage() {
             </label>
             {policy.dead_letter_queue_enabled && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Max Age (hours)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxAge')}</label>
                 <input
                   type="number"
                   min={1}
@@ -278,9 +280,9 @@ export default function RetryPolicyPage() {
 
           {/* Retry on Status Codes */}
           <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Retry on Status Codes</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retryOnStatusCodes')}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              Webhooks that return these HTTP status codes will be retried.
+              {t('retryOnStatusCodesDesc')}
             </p>
             <div className="grid grid-cols-2 gap-2">
               {STATUS_CODES.map((sc) => (
@@ -308,14 +310,14 @@ export default function RetryPolicyPage() {
         {/* Preview */}
         <div className="space-y-6">
           <div className="glass-card p-6 sticky top-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Delay Preview</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('delayPreview')}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              How delays will look with current settings:
+              {t('delayPreviewDesc')}
             </p>
             <div className="space-y-2">
               {getDelayPreview().map((delay, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <span className="text-sm text-gray-500 dark:text-slate-400 w-20">Attempt {i + 1}</span>
+                  <span className="text-sm text-gray-500 dark:text-slate-400 w-20">{t('attempt', { n: i + 1 })}</span>
                   <div className="flex-1 bg-gray-100 dark:bg-slate-800 rounded-full h-6 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-brand-500 to-purple-500 rounded-full transition-all"
@@ -330,7 +332,7 @@ export default function RetryPolicyPage() {
             </div>
 
             <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-xl">
-              <div className="text-sm text-gray-500 dark:text-slate-400 mb-2">Total retry time (worst case):</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400 mb-2">{t('totalRetryTime')}</div>
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {(() => {
                   const total = getDelayPreview().reduce((a, b) => a + b, 0);
