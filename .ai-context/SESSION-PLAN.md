@@ -112,17 +112,18 @@ Her oturum şu şekilde işler:
 
 **Dosyalar:** `api/src/ssrf.rs`, `api/src/routes/playground.rs`, `api/src/routes/inbound.rs`, `dashboard/next.config.js`
 
-### Oturum 80: Worker & Backend Core
+### Oturum 80: Worker & Backend Core (kısmi)
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-018 | Error classification yok — 400/401/404 de retry | ⬜ |
-| HS-019 | WebSocket connection limit yok | ⬜ |
-| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | ⬜ |
-| HS-021 | Billing webhook'larda idempotency yok | ⬜ |
-| HS-022 | Throttle state in-memory | ⬜ |
-| HS-023 | FIFO modülü var ama worker'a bağlanmamış | ⬜ |
+| HS-018 | Error classification yok — 400/401/404 de retry | ✅ 2026-05-10 |
+| HS-019 | WebSocket connection limit yok | ⬜ Sonraki oturuma |
+| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | ⬜ Sonraki oturuma |
+| HS-021 | Billing webhook'larda idempotency yok | ⬜ Sonraki oturuma |
+| HS-022 | Throttle state in-memory | ⬜ Sonraki oturuma |
+| HS-023 | FIFO modülü var ama worker'a bağlanmamış | ⬜ Sonraki oturuma |
 
-**Dosyalar:** `worker/src/`, `api/src/circuit_breaker.rs`, `api/src/throttle/`, `api/src/fifo/`
+**Dosyalar:** `worker/src/main.rs`
+**Yapılan:** Error classification — 4xx (except 429) → dead letter, 429/5xx → retry
 
 ### Oturum 81: Database Issues
 | ID | Sorun | Durum |
