@@ -24,7 +24,7 @@ base64 = "0.22"
 jsonwebtoken = "9"
 
 # OpenTelemetry integration
-opentelemetry = "0.24"
+opentelemetry = "0.32"
 opentelemetry_sdk = { version = "0.24", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.17", features = ["http-proto"] }
 tonic = "0.12"
