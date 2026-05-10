@@ -122,3 +122,66 @@ pub fn truncate_str(s: &str, max_len: usize) -> String {
         format!("{}...", &s[..end])
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── truncate_str ──────────────────────────────────────────
+
+    #[test]
+    fn truncate_short_string_unchanged() {
+        assert_eq!(truncate_str("hello", 10), "hello");
+    }
+
+    #[test]
+    fn truncate_exact_length_unchanged() {
+        assert_eq!(truncate_str("hello", 5), "hello");
+    }
+
+    #[test]
+    fn truncate_long_string_adds_ellipsis() {
+        assert_eq!(truncate_str("hello world", 5), "hello...");
+    }
+
+    #[test]
+    fn truncate_empty_string() {
+        assert_eq!(truncate_str("", 10), "");
+    }
+
+    #[test]
+    fn truncate_zero_max_len() {
+        assert_eq!(truncate_str("hello", 0), "...");
+    }
+
+    #[test]
+    fn truncate_utf8_multibyte_chars() {
+        // Turkish: "merhaba" (7 bytes), emoji: "🪝" (4 bytes)
+        let s = "merhaba dünya 🪝";
+        let result = truncate_str(s, 10);
+        // Should not panic on char boundary
+        assert!(result.ends_with("..."));
+        assert!(result.len() <= 13); // 10 + "..."
+    }
+
+    #[test]
+    fn truncate_unicode_emoji() {
+        let s = "🪝🪝🪝🪝🪝";
+        let result = truncate_str(s, 8);
+        // Each emoji is 4 bytes, so 8 bytes = 2 emojis
+        assert!(result.ends_with("..."));
+    }
+
+    #[test]
+    fn truncate_one_byte_over() {
+        assert_eq!(truncate_str("abcdef", 5), "abcde...");
+    }
+
+    #[test]
+    fn truncate_preserves_utf8_validity() {
+        let s = "ğüşöçı"; // Turkish chars, 2 bytes each
+        let result = truncate_str(s, 3);
+        // Should be valid UTF-8
+        assert!(std::str::from_utf8(result.as_bytes()).is_ok());
+    }
+}
