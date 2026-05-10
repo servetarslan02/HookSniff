@@ -121,6 +121,7 @@ async fn register(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    Extension(email_provider): Extension<crate::email::EmailProvider>,
     headers: HeaderMap,
     Json(req): Json<CreateCustomerRequest>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -191,18 +192,19 @@ async fn register(
     tracing::info!("✅ New customer registered: {}", req.email);
 
     // Send welcome email + verification email (fire-and-forget)
-    if let Some(email_client) = crate::email::GCloudEmailClient::from_config(&cfg) {
+    {
+        let email_provider = email_provider.clone();
         let to = req.email.clone();
         let name = req.name.clone();
         tokio::spawn(async move {
-            if let Err(e) = email_client.send_welcome_email(&to, name.as_deref()).await {
+            if let Err(e) = email_provider.send_welcome_email(&to, name.as_deref()).await {
                 tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
             }
         });
     }
 
     // Auto-send verification email
-    send_verification_email_for_customer(&pool, &cfg, customer.id, &req.email).await;
+    send_verification_email_for_customer(&pool, &cfg, &email_provider, customer.id, &req.email).await;
 
     // HS-038h: Return same generic message for all registrations.
     // User must log in after verifying email to get tokens.
@@ -393,6 +395,7 @@ async fn forgot_password(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    Extension(email_provider): Extension<crate::email::EmailProvider>,
     headers: HeaderMap,
     Json(req): Json<ForgotPasswordRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -429,10 +432,11 @@ async fn forgot_password(
 
         let reset_url = format!("{}/reset-password?token={}", cfg.email_base_url, token);
 
-        if let Some(email_client) = crate::email::GCloudEmailClient::from_config(&cfg) {
+        {
+            let email_provider = email_provider.clone();
             let to = email.clone();
             tokio::spawn(async move {
-                if let Err(e) = email_client
+                if let Err(e) = email_provider
                     .send_password_reset_email(&to, &reset_url)
                     .await
                 {
@@ -575,6 +579,7 @@ async fn resend_verification(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    Extension(email_provider): Extension<crate::email::EmailProvider>,
     headers: HeaderMap,
     Json(req): Json<ResendVerificationRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -597,7 +602,7 @@ async fn resend_verification(
 
     if let Some((customer_id, email, verified)) = customer {
         if !verified {
-            send_verification_email_for_customer(&pool, &cfg, customer_id, &email).await;
+            send_verification_email_for_customer(&pool, &cfg, &email_provider, customer_id, &email).await;
         }
     }
 
@@ -1116,6 +1121,7 @@ async fn create_refresh_token(pool: &PgPool, customer_id: Uuid) -> Result<String
 async fn send_verification_email_for_customer(
     pool: &PgPool,
     cfg: &Config,
+    email_provider: &crate::email::EmailProvider,
     customer_id: Uuid,
     email: &str,
 ) {
@@ -1139,14 +1145,13 @@ async fn send_verification_email_for_customer(
 
     let verify_url = format!("{}/verify-email?token={}", cfg.email_base_url, token);
 
-    if let Some(email_client) = crate::email::GCloudEmailClient::from_config(cfg) {
-        let to = email.to_string();
-        tokio::spawn(async move {
-            if let Err(e) = email_client.send_verification_email(&to, &verify_url).await {
-                tracing::warn!("Failed to send verification email to {}: {:?}", to, e);
-            }
-        });
-    }
+    let email_provider = email_provider.clone();
+    let to = email.to_string();
+    tokio::spawn(async move {
+        if let Err(e) = email_provider.send_verification_email(&to, &verify_url).await {
+            tracing::warn!("Failed to send verification email to {}: {:?}", to, e);
+        }
+    });
 }
 
 /// Generate a TOTP secret (base32 encoded).

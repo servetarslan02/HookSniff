@@ -1,7 +1,7 @@
 use axum::{http::StatusCode, Extension, Json, Router};
 use serde::{Deserialize, Serialize};
 
-use crate::email::GCloudEmailClient;
+use crate::email::EmailProvider;
 
 /// Maximum contact form submissions per IP per hour.
 const CONTACT_RATE_LIMIT: u32 = 5;
@@ -22,7 +22,7 @@ pub struct ContactResponse {
 
 /// POST /v1/contact — Send a contact form message
 pub async fn handle_contact(
-    Extension(email_client): Extension<Option<GCloudEmailClient>>,
+    Extension(email_provider): Extension<EmailProvider>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: axum::http::HeaderMap,
     Json(body): Json<ContactRequest>,
@@ -65,11 +65,10 @@ pub async fn handle_contact(
         "Contact form submission"
     );
 
-    // Send email via GCloud Gmail API if configured
-    if let Some(client) = &email_client {
-        // Notify admin about the contact form submission
-        let admin_html = format!(
-            r#"<!DOCTYPE html>
+    // Send email via configured provider (Resend or GCloud)
+    // Notify admin about the contact form submission
+    let admin_html = format!(
+        r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
   <h2 style="color: #6d28d9;">New Contact Form Submission</h2>
@@ -84,24 +83,24 @@ pub async fn handle_contact(
   <p style="margin-top: 24px; color: #6b7280; font-size: 13px;">— HookSniff Contact System</p>
 </body>
 </html>"#,
-            body.name, body.email, body.subject, body.message
-        );
+        body.name, body.email, body.subject, body.message
+    );
 
-        // Send to admin
-        if let Err(e) = client
-            .send_contact_email(
-                "support@hooksniff.vercel.app",
-                &format!("Contact: {} — {}", body.subject, body.name),
-                &admin_html,
-            )
-            .await
-        {
-            tracing::warn!("Failed to send contact email to admin: {:?}", e);
-        }
+    // Send to admin
+    if let Err(e) = email_provider
+        .send_contact_email(
+            "support@hooksniff.vercel.app",
+            &format!("Contact: {} — {}", body.subject, body.name),
+            &admin_html,
+        )
+        .await
+    {
+        tracing::warn!("Failed to send contact email to admin: {:?}", e);
+    }
 
-        // Send confirmation to user
-        let user_html = format!(
-            r#"<!DOCTYPE html>
+    // Send confirmation to user
+    let user_html = format!(
+        r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
   <h1 style="color: #6d28d9;">Thanks for reaching out, {}! 📩</h1>
@@ -113,29 +112,22 @@ pub async fn handle_contact(
   <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
 </body>
 </html>"#,
-            body.name, body.subject
-        );
+        body.name, body.subject
+    );
 
-        if let Err(e) = client
-            .send_contact_email(
-                &body.email,
-                "We received your message — HookSniff",
-                &user_html,
-            )
-            .await
-        {
-            tracing::warn!(
-                "Failed to send contact confirmation to {}: {:?}",
-                body.email,
-                e
-            );
-        }
-    } else {
-        tracing::warn!("GCloud email not configured — contact form logged but no email sent");
-        return Ok(Json(ContactResponse {
-            success: true,
-            message: "Message received. Email delivery is currently unavailable — we'll still get back to you soon!".to_string(),
-        }));
+    if let Err(e) = email_provider
+        .send_contact_email(
+            &body.email,
+            "We received your message — HookSniff",
+            &user_html,
+        )
+        .await
+    {
+        tracing::warn!(
+            "Failed to send contact confirmation to {}: {:?}",
+            body.email,
+            e
+        );
     }
 
     Ok(Json(ContactResponse {

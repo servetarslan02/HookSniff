@@ -1,7 +1,118 @@
 use crate::config::Config;
 use crate::error::AppError;
+use crate::resend_email::ResendEmailClient;
 use base64::Engine;
 use serde::Deserialize;
+
+/// Unified email provider — tries Resend first, falls back to GCloud Gmail API.
+///
+/// Priority: Resend (simpler, free tier 100/day) → GCloud Gmail (OAuth2, more complex).
+/// If neither is configured, email sending is a no-op with a warning log.
+#[derive(Clone)]
+pub enum EmailProvider {
+    Resend(ResendEmailClient),
+    GCloud(GCloudEmailClient),
+    None,
+}
+
+impl EmailProvider {
+    /// Create from environment: Resend if RESEND_API_KEY is set, else GCloud, else None.
+    pub fn from_config(cfg: &Config) -> Self {
+        if let Some(resend) = ResendEmailClient::from_env() {
+            tracing::info!("📧 Email provider: Resend");
+            return Self::Resend(resend);
+        }
+        if let Some(gcloud) = GCloudEmailClient::from_config(cfg) {
+            tracing::info!("📧 Email provider: GCloud Gmail API");
+            return Self::GCloud(gcloud);
+        }
+        tracing::warn!("⚠️ No email provider configured (RESEND_API_KEY and GCP_SA_JSON both missing)");
+        Self::None
+    }
+
+    pub async fn send_contact_email(
+        &self,
+        to: &str,
+        subject: &str,
+        html: &str,
+    ) -> Result<(), AppError> {
+        match self {
+            Self::Resend(c) => c.send_contact_email(to, subject, html).await,
+            Self::GCloud(c) => c.send_contact_email(to, subject, html).await,
+            Self::None => {
+                tracing::warn!("Email not sent (no provider): to={}, subject={}", to, subject);
+                Ok(())
+            }
+        }
+    }
+
+    pub async fn send_welcome_email(&self, to: &str, name: Option<&str>) -> Result<(), AppError> {
+        match self {
+            Self::Resend(c) => c.send_welcome_email(to, name).await,
+            Self::GCloud(c) => c.send_welcome_email(to, name).await,
+            Self::None => {
+                tracing::warn!("Welcome email not sent (no provider): to={}", to);
+                Ok(())
+            }
+        }
+    }
+
+    pub async fn send_verification_email(
+        &self,
+        to: &str,
+        verification_url: &str,
+    ) -> Result<(), AppError> {
+        match self {
+            Self::Resend(c) => c.send_verification_email(to, verification_url).await,
+            Self::GCloud(c) => c.send_verification_email(to, verification_url).await,
+            Self::None => {
+                tracing::warn!("Verification email not sent (no provider): to={}", to);
+                Ok(())
+            }
+        }
+    }
+
+    pub async fn send_password_reset_email(
+        &self,
+        to: &str,
+        reset_url: &str,
+    ) -> Result<(), AppError> {
+        match self {
+            Self::Resend(c) => c.send_password_reset_email(to, reset_url).await,
+            Self::GCloud(c) => c.send_password_reset_email(to, reset_url).await,
+            Self::None => {
+                tracing::warn!("Password reset email not sent (no provider): to={}", to);
+                Ok(())
+            }
+        }
+    }
+
+    pub async fn send_delivery_failed_email(
+        &self,
+        to: &str,
+        endpoint_name: &str,
+        error_details: &str,
+    ) -> Result<(), AppError> {
+        match self {
+            Self::Resend(c) => {
+                c.send_delivery_failed_email(to, endpoint_name, error_details)
+                    .await
+            }
+            Self::GCloud(c) => {
+                c.send_delivery_failed_email(to, endpoint_name, error_details)
+                    .await
+            }
+            Self::None => {
+                tracing::warn!(
+                    "Delivery failed email not sent (no provider): to={}, endpoint={}",
+                    to,
+                    endpoint_name
+                );
+                Ok(())
+            }
+        }
+    }
+}
 
 /// Google Cloud Gmail API email client using service account credentials.
 #[derive(Clone)]
