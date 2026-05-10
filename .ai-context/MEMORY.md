@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 21:05 GMT+8
+> Son güncelleme: 2026-05-10 21:10 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -51,6 +51,14 @@
 ### Sonraki Oturum
 - Oturum 82: Auth & Crypto Security (HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l)
 
+## 📝 Oturum 85 (2026-05-10 21:07 - 21:10 GMT+8) ✅
+1. Frontend Performance & Bundle: 3 sorun
+2. 14 dosya, 1 commit (afba344)
+3. HS-045: lucide-react package.json'dan kaldırıldı (~150KB saved)
+4. HS-046: 13 tabloya overflow-x-auto eklendi (alternatives, docs, privacy)
+5. HS-047: blog/[slug] 1922 satır — mega component, refactoring gerekli
+6. HS-048: dangerouslySetInnerHTML güvenli — tokenizeCode HTML-escape yapıyor
+
 ## 📝 Oturum 84 (2026-05-10 20:58 - 21:05 GMT+8) ✅
 1. Frontend Component Issues: 6 sorun
 2. 6 dosya, 1 commit (1bba3ad)
@@ -90,7 +98,7 @@
 - **Oturum 80**: Error Classification (HS-018) ✅
 - **Oturum 81**: Database Constraints (HS-025, HS-026, HS-057) ✅
 - **Oturum 82**: Auth & Crypto Security + Ek düzeltmeler (26 sorun) ✅ KUSURSUZ
-- **Toplam**: 54 tamamlandı, 8 yanlış bulgu, 3 notlu, 38 bekliyor
+- **Toplam**: 57 tamamlandı, 8 yanlış bulgu, 3 notlu, 35 bekliyor
 
 ## 📝 Oturum 81 (2026-05-10 19:35 - 19:37 GMT+8) ✅
 1. Database Issues:

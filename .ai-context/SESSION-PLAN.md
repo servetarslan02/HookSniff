@@ -184,10 +184,10 @@ Her oturum şu şekilde işler:
 ### Oturum 85: Frontend Performance & Bundle
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-045 | `lucide-react` hiç kullanılmıyor (~150KB wasted) | ⬜ |
-| HS-046 | 13 tablo `overflow-x-auto` olmadan | ⬜ |
-| HS-047 | `blog/[slug]` 1922 satır mega component | ⬜ |
-| HS-048 | `dangerouslySetInnerHTML` (CSP bypass) | ⬜ |
+| HS-045 | `lucide-react` hiç kullanılmıyor (~150KB wasted) | ✅ 2026-05-10 |
+| HS-046 | 13 tablo `overflow-x-auto` olmadan | ✅ 2026-05-10 |
+| HS-047 | `blog/[slug]` 1922 satır mega component | ⚠️ 2026-05-10 — Refactoring gerekli |
+| HS-048 | `dangerouslySetInnerHTML` (CSP bypass) | ✅ 2026-05-10 — XSS güvenli |
 
 ### Oturum 86: Accessibility & Dark Mode
 | ID | Sorun | Durum |
@@ -269,10 +269,10 @@ Her oturum şu şekilde işler:
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 40 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 0 | 38 |
+| 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
+| 🟡 P2 | 38 | 3 | 35 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **54** | **47** |
+| **TOPLAM** | **103** | **57** | **44** |
 
 ---
 
