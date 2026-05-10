@@ -2,7 +2,11 @@ const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-const DATABASE_URL = 'postgresql://REDACTED:REDACTED@REDACTED.neon.tech/neondb?sslmode=require';
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error('❌ DATABASE_URL environment variable is required');
+  process.exit(1);
+}
 
 async function runMigrations() {
   const client = new Client({ 

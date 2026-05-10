@@ -11,7 +11,7 @@ Official Kotlin client for the [HookSniff](https://hooksniff.vercel.app) webhook
 
 ```kotlin
 dependencies {
-    implementation("com.hooksniff:hooksniff:0.2.0")
+    implementation("com.hooksniff:hooksniff:0.3.0")
 }
 ```
 
@@ -19,7 +19,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'com.hooksniff:hooksniff:0.2.0'
+    implementation 'com.hooksniff:hooksniff:0.3.0'
 }
 ```
 
@@ -29,7 +29,7 @@ dependencies {
 <dependency>
     <groupId>com.hooksniff</groupId>
     <artifactId>hooksniff</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 

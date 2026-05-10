@@ -122,7 +122,7 @@ class HookSniffClient(
     fun webhooks(): WebhooksResource = webhooksResource
 
     fun getStats(): Stats {
-        return request("GET", "/stats")
+        return request("GET", "/stats", clazz = Stats::class.java)
     }
 
     override fun close() {
@@ -130,7 +130,12 @@ class HookSniffClient(
         httpClient.connectionPool.evictAll()
     }
 
-    internal fun <T> request(method: String, path: String, body: Any? = null): T {
+        private fun <T> Gson.fromJsonTyped(json: String, clazz: Class<T>): T {
+            return fromJson(json, clazz)
+        }
+    }
+
+    internal fun <T> request(method: String, path: String, body: Any? = null, clazz: Class<T>): T {
         val url = "$baseUrl$path"
         val mediaType = "application/json".toMediaType()
 
@@ -138,7 +143,7 @@ class HookSniffClient(
             .url(url)
             .header("Authorization", "Bearer $apiKey")
             .header("Content-Type", "application/json")
-            .header("User-Agent", "hooksniff-kotlin/0.2.0")
+            .header("User-Agent", "hooksniff-kotlin/0.3.0")
 
         when (method) {
             "POST", "PUT", "PATCH" -> {
@@ -172,7 +177,52 @@ class HookSniffClient(
             }
         }
 
-        return gson.fromJson(responseBody, object : TypeToken<T>() {}.type)
+        return gson.fromJsonTyped(responseBody, clazz)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    internal fun <T> request(method: String, path: String, body: Any? = null, type: java.lang.reflect.Type): T {
+        val url = "$baseUrl$path"
+        val mediaType = "application/json".toMediaType()
+
+        val requestBuilder = Request.Builder()
+            .url(url)
+            .header("Authorization", "Bearer $apiKey")
+            .header("Content-Type", "application/json")
+            .header("User-Agent", "hooksniff-kotlin/0.3.0")
+
+        when (method) {
+            "POST", "PUT", "PATCH" -> {
+                val jsonBody = if (body != null) gson.toJson(body) else "{}"
+                requestBuilder.method(method, jsonBody.toRequestBody(mediaType))
+            }
+            "GET" -> requestBuilder.get()
+            "DELETE" -> requestBuilder.delete()
+        }
+
+        val response = httpClient.newCall(requestBuilder.build()).execute()
+        val responseBody = response.body?.string() ?: ""
+
+        if (!response.isSuccessful) {
+            val message = try {
+                val errorMap = gson.fromJson<Map<*, *>>(responseBody, Map::class.java)
+                val error = errorMap["error"] as? Map<String, Any>
+                error?.get("message") as? String ?: "HTTP ${response.code}"
+            } catch (_: Exception) {
+                "HTTP ${response.code}"
+            }
+
+            throw when (response.code) {
+                400 -> ValidationException(message)
+                401 -> AuthenticationException(message)
+                404 -> NotFoundException(message)
+                413 -> PayloadTooLargeException(message)
+                429 -> RateLimitException(message)
+                else -> HookSniffException(response.code, "UNKNOWN", message)
+            }
+        }
+
+        return gson.fromJson<T>(responseBody, type)
     }
 
     // ==================== Endpoints Resource ====================
@@ -182,24 +232,25 @@ class HookSniffClient(
             val body = mutableMapOf<String, Any>("url" to url)
             description?.let { body["description"] = it }
             retryPolicy?.let { body["retry_policy"] = it }
-            return request("POST", "/endpoints", body)
+            return request("POST", "/endpoints", body, Endpoint::class.java)
         }
 
         fun get(endpointId: String): Endpoint {
-            return request("GET", "/endpoints/$endpointId")
+            return request("GET", "/endpoints/$endpointId", clazz = Endpoint::class.java)
         }
 
         fun list(page: Int = 1, perPage: Int = 20): List<Endpoint> {
-            return request("GET", "/endpoints?page=$page&per_page=$perPage")
+            return request("GET", "/endpoints?page=$page&per_page=$perPage", type = object : TypeToken<List<Endpoint>>() {}.type)
         }
 
         fun delete(endpointId: String): Boolean {
-            val result: Map<String, Boolean> = request("DELETE", "/endpoints/$endpointId")
-            return result["deleted"] ?: true
+            val result = request("DELETE", "/endpoints/$endpointId", clazz = Map::class.java)
+            @Suppress("UNCHECKED_CAST")
+            return (result as? Map<String, Any>)?.get("deleted") as? Boolean ?: true
         }
 
         fun rotateSecret(endpointId: String): Map<String, Any> {
-            return request("POST", "/endpoints/$endpointId/rotate-secret")
+            return request("POST", "/endpoints/$endpointId/rotate-secret", clazz = Map::class.java) as Map<String, Any>
         }
     }
 
@@ -209,29 +260,29 @@ class HookSniffClient(
         fun send(endpointId: String, event: String? = null, data: Map<String, Any>): Delivery {
             val body = mutableMapOf<String, Any>("endpoint_id" to endpointId, "data" to data)
             event?.let { body["event"] = it }
-            return request("POST", "/webhooks", body)
+            return request("POST", "/webhooks", body, Delivery::class.java)
         }
 
         fun get(deliveryId: String): Delivery {
-            return request("GET", "/webhooks/$deliveryId")
+            return request("GET", "/webhooks/$deliveryId", clazz = Delivery::class.java)
         }
 
         fun list(status: String? = null, page: Int = 1, perPage: Int = 20): DeliveryList {
             var params = "page=$page&per_page=$perPage"
             status?.let { params += "&status=$it" }
-            return request("GET", "/webhooks?$params")
+            return request("GET", "/webhooks?$params", clazz = DeliveryList::class.java)
         }
 
         fun replay(deliveryId: String): Delivery {
-            return request("POST", "/webhooks/$deliveryId/replay")
+            return request("POST", "/webhooks/$deliveryId/replay", clazz = Delivery::class.java)
         }
 
         fun batch(webhooks: List<Map<String, Any>>): BatchResult {
-            return request("POST", "/webhooks/batch", mapOf("webhooks" to webhooks))
+            return request("POST", "/webhooks/batch", mapOf("webhooks" to webhooks), BatchResult::class.java)
         }
 
         fun attempts(deliveryId: String): List<DeliveryAttempt> {
-            return request("GET", "/webhooks/$deliveryId/attempts")
+            return request("GET", "/webhooks/$deliveryId/attempts", type = object : TypeToken<List<DeliveryAttempt>>() {}.type)
         }
 
         fun export(
@@ -246,7 +297,7 @@ class HookSniffClient(
             dateFrom?.let { params.add("date_from=$it") }
             dateTo?.let { params.add("date_to=$it") }
             val qs = if (params.isNotEmpty()) "?${params.joinToString("&")}" else ""
-            return request("GET", "/webhooks/export$qs")
+            return request("GET", "/webhooks/export$qs", clazz = Any::class.java)
         }
     }
 
@@ -265,7 +316,7 @@ class HookSniffClient(
             status?.let { params.add("status=$it") }
             endpointId?.let { params.add("endpoint_id=$it") }
             val qs = params.joinToString("&")
-            return request("GET", "/search?$qs")
+            return request("GET", "/search?$qs", clazz = Map::class.java) as Map<String, Any>
         }
     }
 
