@@ -7,6 +7,7 @@ import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { billingApi, billingApiExtended, type Invoice } from '@/lib/api';
 
 const plans = [
@@ -100,6 +101,7 @@ export default function BillingPage() {
   const { toast } = useToast();
   const t = useTranslations('billing');
   const tc = useTranslations('common');
+  const router = useRouter();
   const currentPlan = user?.plan || 'free';
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit, setUsageLimit] = useState(10000);
@@ -179,7 +181,7 @@ export default function BillingPage() {
       });
       toast(t('cancelledMsg'), 'info');
       setShowCancelModal(false);
-      window.location.reload();
+      router.refresh();
     } catch (err: unknown) {
       toast(getErrorMessage(err) || 'Cancel failed', 'error');
     } finally {
