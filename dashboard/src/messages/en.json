@@ -169,7 +169,10 @@
     "deliveredSuccessfully": "Delivered successfully",
     "failedWillRetry": "Failed — will retry",
     "failedWillRetryBackoff": "Failed — will retry with backoff",
-    "retriedBackoff": "Retried with exponential backoff"
+    "retriedBackoff": "Retried with exponential backoff",
+    "created": "Created",
+    "closeDetails": "Close details",
+    "status": "Status"
   },
   "logs": {
     "title": "Webhook Logs",
@@ -191,7 +194,12 @@
     "searching": "Searching...",
     "noResultsQuery": "No results found.",
     "enterQuery": "Enter a search query to find webhooks.",
-    "resultCount": "{total} result{plural}"
+    "resultCount": "{total} result{plural}",
+    "attempts": "Attempts",
+    "time": "Time",
+    "event": "Event",
+    "status": "Status",
+    "endpoint": "Endpoint"
   },
   "health": {
     "title": "Endpoint Health",
@@ -234,7 +242,10 @@
       "consecutiveFailures": "Consecutive Failures"
     },
     "deleteTitle": "Delete Alert",
-    "delete": "Delete"
+    "delete": "Delete",
+    "nameLabel": "Name",
+    "conditionLabel": "Condition",
+    "thresholdLabel": "Threshold"
   },
   "playground": {
     "title": "API Playground",
@@ -465,7 +476,23 @@
     "endpointsApi": "Endpoints",
     "webhooksApi": "Webhooks",
     "statsApi": "Stats",
-    "errorCodes": "Error Codes",
+    "errorCodes": {
+      "badRequest": "Bad Request",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Forbidden",
+      "notFound": "Not Found",
+      "rateLimited": "Rate Limited",
+      "serverError": "Server Error",
+      "invalidBody": "Invalid request body or parameters",
+      "missingKey": "Missing or invalid API key",
+      "insufficient": "Insufficient permissions or plan limits exceeded",
+      "notFoundDesc": "Resource does not exist",
+      "tooMany": "Too many requests — check Retry-After header",
+      "serverErrorDesc": "Internal error — contact support if persistent",
+      "code": "Code",
+      "meaning": "Meaning",
+      "description": "Description"
+    },
     "errorCode": "Code",
     "meaning": "Meaning",
     "errorDesc": "Description",
@@ -507,7 +534,12 @@
     "eventTypes": "Event Types",
     "idempotency": "Idempotency",
     "embeddablePortal": "Embeddable Portal",
-    "reference": "Reference"
+    "reference": "Reference",
+    "apiBaseUrl": "API Base URL",
+    "plan": "Plan",
+    "free": "Free",
+    "pro": "Pro",
+    "business": "Business"
   },
   "status": {
     "title": "HookSniff Status",
@@ -617,7 +649,13 @@
     "cache": "Cache",
     "cdn": "CDN",
     "dashboard": "Dashboard",
-    "monitoring": "Monitoring"
+    "monitoring": "Monitoring",
+    "email": "Email",
+    "name": "Name",
+    "plan": "Plan",
+    "status": "Status",
+    "created": "Created",
+    "actions": "Actions"
   },
   "landing": {
     "nav": {
@@ -725,7 +763,28 @@
       "startups": "Startups",
       "newsletter": "Newsletter",
       "blog": "Blog",
-      "whatIsAWebhook": "What is a Webhook?"
+      "whatIsAWebhook": "What is a Webhook?",
+      "product": "Product",
+      "company": "Company",
+      "resources": "Resources",
+      "getStarted": "Get Started",
+      "compareLinks": {
+        "hooksniffVsSvix": "HookSniff vs Svix",
+        "hooksniffVsHookdeck": "HookSniff vs Hookdeck",
+        "hooksniffVsHook0": "HookSniff vs Hook0",
+        "hooksniffVsConvoy": "HookSniff vs Convoy",
+        "svixAlternatives": "Svix Alternatives",
+        "hookdeckAlternatives": "Hookdeck Alternatives",
+        "convoyAlternatives": "Convoy Alternatives",
+        "buildVsBuy": "Build vs Buy"
+      },
+      "resourceLinks": {
+        "webhookGuides": "Webhook Guides",
+        "webhookGlossary": "Webhook Glossary",
+        "stripeWebhooks": "Stripe Webhooks",
+        "githubWebhooks": "GitHub Webhooks",
+        "shopifyWebhooks": "Shopify Webhooks"
+      }
     }
   },
   "apiKeys": {
@@ -1534,5 +1593,46 @@
     "totalRetryTime": "Total retry time (worst case):",
     "tip": "💡 Per-endpoint retry policies override these global defaults. Configure them in Endpoint Settings.",
     "endpointSettingsLink": "Endpoint Settings"
+  },
+  "inbound": {
+    "title": "Inbound Webhooks",
+    "subtitle": "Receive webhooks from Stripe, GitHub, Shopify and route them through HookSniff",
+    "howItWorks": "How it works",
+    "externalService": "External Service",
+    "verifySignature": "Verify Signature",
+    "yourEndpoint": "Your Endpoint",
+    "addProvider": "Add Inbound Provider",
+    "webhookSecret": "Webhook Secret",
+    "routeToEndpoint": "Route to Endpoint",
+    "save": "Save",
+    "cancel": "Cancel",
+    "yourUrls": "Your Inbound URLs",
+    "copy": "Copy",
+    "activeConfigs": "Active Configs",
+    "selectEndpoint": "Select endpoint..."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with our team",
+    "generalQuestion": "General question",
+    "technicalSupport": "Technical support",
+    "billingPayments": "Billing & payments",
+    "featureRequest": "Feature request",
+    "bugReport": "Bug report",
+    "enterpriseInquiry": "Enterprise inquiry",
+    "selectTopic": "Select a topic",
+    "sendMessage": "Send us a message",
+    "name": "Your name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "responseTime": "Response Time",
+    "location": "Location"
+  },
+  "about": {
+    "title": "About HookSniff",
+    "ourStory": "Our Story",
+    "ourMission": "Our Mission",
+    "cta": "Join developers who trust HookSniff for their webhook delivery."
   }
 }
