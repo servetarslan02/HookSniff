@@ -254,6 +254,14 @@ impl IyzicoProvider {
         body: &str,
         headers: &axum::http::HeaderMap,
     ) -> Result<(), AppError> {
+        // Reject if webhook secret is not configured
+        if self.config.secret_key.is_empty() {
+            tracing::error!("iyzico webhook secret is empty — rejecting webhook to prevent billing manipulation");
+            return Err(AppError::Internal(anyhow::anyhow!(
+                "Billing webhook secret not configured"
+            )));
+        }
+
         let signature = headers
             .get("x-iyzi-signature")
             .and_then(|v| v.to_str().ok())

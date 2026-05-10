@@ -129,12 +129,14 @@ impl CircuitBreaker {
     }
 
     /// Get the current state of an endpoint's circuit.
+    #[allow(dead_code)] // Used in integration tests; may be needed for admin API
     pub async fn get_state(&self, endpoint_id: Uuid) -> EndpointCircuit {
         let circuits = self.circuits.read().await;
         circuits.get(&endpoint_id).cloned().unwrap_or_default()
     }
 
     /// Get all circuit states (for monitoring/dashboard).
+    #[allow(dead_code)] // Reserved for future monitoring/dashboard endpoint
     pub async fn get_all(&self) -> HashMap<Uuid, EndpointCircuit> {
         let circuits = self.circuits.read().await;
         circuits.clone()
