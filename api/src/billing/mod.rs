@@ -88,8 +88,8 @@ impl Plan {
     pub fn monthly_price_cents(&self) -> u64 {
         match self {
             Plan::Free => 0,
-            Plan::Pro => 4900,       // $49/mo
-            Plan::Business => 14900, // $149/mo
+            Plan::Pro => 2900,       // $29/mo
+            Plan::Business => 9900, // $99/mo
             Plan::Enterprise => 0,   // Custom pricing
         }
     }
@@ -98,8 +98,8 @@ impl Plan {
     pub fn monthly_price_kurus(&self) -> i64 {
         match self {
             Plan::Free => 0,
-            Plan::Pro => 14900,      // ₺149.00
-            Plan::Business => 44900, // ₺449.00
+            Plan::Pro => 2900,      // ₺29.00
+            Plan::Business => 9900, // ₺99.00
             Plan::Enterprise => 0,
         }
     }
@@ -337,8 +337,8 @@ mod tests {
     #[test]
     fn monthly_price_cents_all() {
         assert_eq!(Plan::Free.monthly_price_cents(), 0);
-        assert_eq!(Plan::Pro.monthly_price_cents(), 4900);
-        assert_eq!(Plan::Business.monthly_price_cents(), 14900);
+        assert_eq!(Plan::Pro.monthly_price_cents(), 2900);
+        assert_eq!(Plan::Business.monthly_price_cents(), 9900);
         assert_eq!(Plan::Enterprise.monthly_price_cents(), 0);
     }
 
@@ -347,8 +347,8 @@ mod tests {
     #[test]
     fn monthly_price_kurus_all() {
         assert_eq!(Plan::Free.monthly_price_kurus(), 0);
-        assert_eq!(Plan::Pro.monthly_price_kurus(), 14900);
-        assert_eq!(Plan::Business.monthly_price_kurus(), 44900);
+        assert_eq!(Plan::Pro.monthly_price_kurus(), 2900);
+        assert_eq!(Plan::Business.monthly_price_kurus(), 9900);
         assert_eq!(Plan::Enterprise.monthly_price_kurus(), 0);
     }
 
