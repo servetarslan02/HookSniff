@@ -4,6 +4,8 @@ import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
 
+
+
 export default function AboutPage() {
   const t = useTranslations();
   return (

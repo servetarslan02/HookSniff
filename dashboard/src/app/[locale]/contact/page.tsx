@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
 
+
+
 export default function ContactPage() {
   const t = useTranslations();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
