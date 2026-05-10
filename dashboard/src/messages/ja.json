@@ -624,7 +624,8 @@
       "pricing": "料金",
       "docs": "ドキュメント",
       "status": "ステータス",
-      "dashboard": "ダッシュボード →"
+      "dashboard": "ダッシュボード →",
+      "getStarted": "始める"
     },
     "hero": {
       "uptime": "99.99%配信稼働率",

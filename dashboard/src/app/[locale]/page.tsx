@@ -194,7 +194,7 @@ function DashboardPreview() {
               { label: 'Avg Latency', value: '45ms', color: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' },
             ].map(s => (
               <div key={s.label} className={`rounded-xl p-4 ${s.color}`}>
-                <div className="text-2xl font-bold">{s.value}</div>
+                <div className="text-lg sm:text-2xl font-bold">{s.value}</div>
                 <div className="text-xs opacity-75">{s.label}</div>
               </div>
             ))}
@@ -231,7 +231,7 @@ function HowItWorks() {
           <div key={i} className="relative flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-6 relative z-10 border border-brand-100 dark:border-brand-500/20">
               {step.icon}
-              <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-brand-600 dark:bg-brand-500 text-white text-sm font-bold flex items-center justify-center">
+              <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-brand-600 dark:bg-brand-500 text-white text-sm font-bold flex items-center justify-center z-20">
                 {i + 1}
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-4">
             <a href="#features" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
             <a href="#pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
-            <Link href="/get-started" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Get Started</Link>
+            <Link href="/get-started" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('getStarted')}</Link>
             <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
             <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <LanguageSwitcherBtn />
@@ -297,7 +297,7 @@ export default function Home() {
             <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
             <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
             <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
-            <Link href="/get-started" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Get Started</Link>
+            <Link href="/get-started" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('getStarted')}</Link>
             <Link href="/status" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <div className="flex items-center gap-2 pt-2">
               <LanguageSwitcherBtn />
@@ -349,8 +349,8 @@ export default function Home() {
             <div className="w-3 h-3 rounded-full bg-green-400"></div>
             <span className="ml-4 text-sm text-gray-500 dark:text-slate-400 font-mono">send-webhook.sh</span>
           </div>
-          <pre className="p-6 text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-900">
-            <code>{`# Create an endpoint
+          <pre className="p-4 sm:p-6 text-xs sm:text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-900 max-w-full">
+            <code className="break-all sm:break-normal">{`# Create an endpoint
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
@@ -427,12 +427,12 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
 
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-6 border-t border-gray-200 dark:border-slate-800 py-12 mb-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
             <span className="text-xl">🪝</span>
             <span className="font-semibold text-gray-900 dark:text-white">HookSniff</span>
           </div>
-          <div className="flex gap-6 text-sm text-gray-500 dark:text-slate-400">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-500 dark:text-slate-400">
             <a href="https://github.com/servetarslan02/HookSniff" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('github')}</a>
             <Link href="/docs" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('docs')}</Link>
             <Link href="/status" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('status')}</Link>
