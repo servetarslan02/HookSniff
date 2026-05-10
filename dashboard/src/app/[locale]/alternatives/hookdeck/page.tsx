@@ -4,8 +4,8 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 export const metadata = { title: 'HookSniff vs Hookdeck — Why Choose HookSniff' };
 
 const rows = [
-  { feature: 'Price (Pro)', hooksniff: '$29/mo', hookdeck: '$39/mo + usage', winner: 'hooksniff' },
-  { feature: 'Free tier', hooksniff: '1,000 events', hookdeck: '10,000 events', winner: 'hookdeck' },
+  { feature: 'Price (Pro)', hooksniff: '$49/mo', hookdeck: '$39/mo + usage', winner: 'hooksniff' },
+  { feature: 'Free tier', hooksniff: '10,000 events', hookdeck: '10,000 events', winner: 'hookdeck' },
   { feature: 'SDK count', hooksniff: '11', hookdeck: '8', winner: 'hooksniff' },
   { feature: 'FIFO delivery', hooksniff: '✅', hookdeck: '❌', winner: 'hooksniff' },
   { feature: 'CloudEvents', hooksniff: '✅', hookdeck: '❌', winner: 'hooksniff' },
