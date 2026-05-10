@@ -64,18 +64,18 @@
 
 ### Light Mode Renk Analizi
 
-| Sınıf | RGB Değeri | Beyaz zemin oranı | AA Normal (4.5:1) | AA Large (3:1) | Durum |
-|-------|------------|-------------------|-------------------|-----------------|-------|
-| `text-gray-400` | rgb(100, 116, 139) | ~5.4:1 | ✅ | ✅ | Geçer |
-| `text-gray-500` | rgb(148, 163, 184) | ~3.5:1 | ❌ | ✅ | **Normal text için FAIL** |
-| `text-slate-400` | rgb(148, 163, 184) | ~3.5:1 | ❌ | ✅ | **Normal text için FAIL** |
-| `text-slate-500` | rgb(100, 116, 139) | ~5.4:1 | ✅ | ✅ | Geçer |
+| Sınıf | Hex | Beyaz zemin oranı | AA Normal (4.5:1) | AA Large (3:1) | Durum |
+|-------|-----|-------------------|-------------------|-----------------|-------|
+| `text-gray-400` | #9ca3af | 2.54:1 | ❌ | ❌ | **FAIL — hem normal hem large** |
+| `text-gray-500` | #6b7280 | 4.83:1 | ✅ | ✅ | Geçer |
+| `text-slate-400` | #94a3b8 | 2.56:1 | ❌ | ❌ | **FAIL — hem normal hem large** |
+| `text-slate-500` | #64748b | 4.76:1 | ✅ | ✅ | Geçer |
+
+> **Not:** gray-400 ve slate-400 açık gri tonlarıdır — beyaz zeminde düşük kontrast. gray-500 ve slate-500 daha koyu — AA standardını geçer.
 
 **Etkilenen elementler:**
-- `text-gray-500`: "HookSniff Management", form açıklamaları ("Tüm API endpoint'lerini geçici olarak devre dışı bırak", "Yeni kullanıcı kayıtlarına izin ver"), field label'ları ("Max Endpoints", "Max Webhooks/Month", "Rate Limit", "Retention"), email adresi
-- `text-slate-400`: Sidebar link label'ları ("Overview", "Users", "Revenue", "System"), "Back to Dashboard", "Configure platform-wide defaults..."
-
-**12px font-size'taki text-gray-500 elementleri özellikle riskli** — küçük metin + düşük kontrast birleşimi.
+- `text-gray-400`: Light mode'da beyaz zeminde kullanıldığında ciddi kontrast sorunu. (Dark mode'da farklı — bkz. Bölüm H)
+- `text-slate-400`: Sidebar link label'ları ("Overview", "Users", "Revenue", "System"), "Back to Dashboard" — light mode'da beyaz zeminde 2.56:1. **Kritik: Sidebar arka planı `bg-white` ve text `text-slate-400` → okunamaz.**
 
 ---
 
@@ -147,37 +147,35 @@ Dark mode arka planları:
 - **Card bg:** `#1e293b` (slate-900) — `<aside>`, `<header>`, `.glass-card`
 - **Input bg:** `#1e293b` (slate-800) — `dark:bg-slate-800`
 
-| Sınıf | RGB Değeri | slate-950 (#0f172a) oranı | slate-900 (#1e293b) oranı | AA Normal (4.5:1) | AA Large (3:1) | Durum |
-|-------|------------|---------------------------|---------------------------|-------------------|-----------------|-------|
-| `text-white` | #ffffff | ~15.4:1 | ~13.1:1 | ✅ | ✅ | Geçer |
-| `text-gray-900 dark:text-white` | #ffffff | ~15.4:1 | ~13.1:1 | ✅ | ✅ | Geçer |
-| `text-slate-300` | #cbd5e1 | ~9.4:1 | ~8.0:1 | ✅ | ✅ | Geçer |
-| `text-slate-400` | #94a3b8 | ~5.9:1 | ~5.0:1 | ✅ | ✅ | Geçer |
-| `text-gray-500 dark:text-slate-400` | #94a3b8 | ~5.9:1 | ~5.0:1 | ✅ | ✅ | Geçer |
-| `text-gray-400 dark:text-slate-500` | #64748b | ~3.5:1 | ~3.0:1 | ❌ | ✅ | **Normal text için FAIL** |
-| `text-slate-500` | #64748b | ~3.5:1 | ~3.0:1 | ❌ | ✅ | **Normal text için FAIL** |
-| `text-gray-400` (dark mode'da slate-500'e maplenmemiş) | #9ca3af | ~4.6:1 | ~3.9:1 | ⚠️ | ✅ | **Sınırda — kart bg üzerinde FAIL** |
+| Sınıf | Hex | slate-950 (#0f172a) oranı | slate-900 (#1e293b) oranı | AA Normal (4.5:1) | AA Large (3:1) | Durum |
+|-------|-----|---------------------------|---------------------------|-------------------|-----------------|-------|
+| `text-white` | #ffffff | 15.36:1 | 13.13:1 | ✅ | ✅ | Geçer |
+| `text-gray-900 dark:text-white` | #ffffff | 15.36:1 | 13.13:1 | ✅ | ✅ | Geçer |
+| `text-slate-300` | #cbd5e1 | 9.40:1 | 8.03:1 | ✅ | ✅ | Geçer |
+| `text-slate-400` | #94a3b8 | 6.96:1 | 5.71:1 | ✅ | ✅ | Geçer |
+| `text-gray-500 dark:text-slate-400` | #94a3b8 | 6.96:1 | 5.71:1 | ✅ | ✅ | Geçer |
+| `text-gray-400 dark:text-slate-500` | #64748b | 3.75:1 | 3.07:1 | ❌ | ✅ | **Normal text için FAIL** |
+| `text-slate-500` | #64748b | 3.75:1 | 3.07:1 | ❌ | ✅ | **Normal text için FAIL** |
+| `text-gray-500` (dark mode'da slate-400'e maplenmemiş) | #6b7280 | 3.69:1 | 3.03:1 | ❌ | ✅ | **Normal text için FAIL** |
 
 ### Etkilenen Elementler (Dark Mode)
 
-**`text-gray-400 dark:text-slate-500` (FAIL — ~3.5:1):**
+**`text-gray-400 dark:text-slate-500` (#64748b) — FAIL (3.75:1 on slate-950, 3.07:1 on slate-900):**
 - Loading spinner text: "Loading users..."
 - Empty state text: "No users found."
 - "No recent signups" mesajı
 - Retry açıklaması: `{t('retryDesc')}`
 - Tarih bilgisi (Recent Signups): `text-[11px] text-gray-400 dark:text-slate-500`
+- System: Latency scale labels: `text-xs text-gray-400 dark:text-slate-500`
+- System: Infrastructure label: `text-xs text-gray-400 dark:text-slate-500`
+- Revenue: "(X users)" plan count: `text-xs text-gray-400 dark:text-slate-500`
 
-**`text-slate-500` (FAIL — ~3.5:1):**
-- Logout butonu: `text-gray-400 dark:text-slate-500`
-- Pagination disabled durumu
-- Placeholder text'ler (bazı input'larda)
-
-**⚠️ Sınırda (card bg üzerinde ~3.9:1):**
-- `text-gray-400` dark mode'da slate-500'e maplenmemiş kullanımlar
+**`text-gray-500` (dark mode'da dark variant yok, #6b7280) — FAIL (3.69:1 on slate-950):**
+- Bazı elementler `text-gray-500` kullanıp dark variant belirtmiyor → doğrudan #6b7280 kalıyor
 
 **Düzeltme Önerisi:**
-- `text-slate-500` (#64748b) yerine `text-slate-400` (#94a3b8) kullanın → ~5.9:1 kontrast sağlar.
-- Veya custom renk: `text-[#7c8da4]` → ~4.5:1 minimum kontrastı karşılar.
+- `dark:text-slate-500` (#64748b) yerine `dark:text-slate-400` (#94a3b8) kullanın → 6.96:1 kontrast sağlar.
+- Veya `text-gray-400 dark:text-slate-400` → dark mode'da 6.96:1, light mode'da da sorunsuz.
 
 ---
 
@@ -249,19 +247,19 @@ Dark mode arka planları:
 3. **❌ scope="col" eksik (7 header)** — Tablo yapısı screen reader'a düzgün aktarılmaz. WCAG 1.3.1 Level A ihlali.
 4. **❌ Table caption/aria-label eksik** — Tablonun amacı screen reader'a aktarılamıyor. WCAG 1.3.1 Level A ihlali.
 5. **❌ İki h1 (tüm sayfalar — 5/5)** — Sayfa yapısı kafa karıştırıcı. WCAG 1.3.1 Level A ihlali.
-6. **❌ Chart erişilebilirliği yok (Revenue)** — SVG chart'lar screen reader'a veri alternatifi sunmuyor. WCAG 1.1.1 Level A ihlali.
+6. **❌ Chart erişilebilirliği yok (Overview + Revenue)** — SVG chart'lar screen reader'a veri alternatifi sunmuyor. WCAG 1.1.1 Level A ihlali.
 7. **❌ Progress bar aria eksik (System)** — Latency bar'ı semantic role ve value attribute'larından yoksun. WCAG 4.1.2 Level A ihlali.
 8. **❌ Status dot sadece renk bağımlı (System)** — Renk körlüğü olan kullanıcılar durumu ayırt edemez. WCAG 1.4.1 Level A ihlali.
-9. **❌ text-slate-500 dark mode kontrast yetersiz (~3.5:1)** — Loading/empty state text'leri okunamıyor. WCAG 1.4.3 Level AA ihlali.
-10. **❌ contentinfo/footer eksik** — Landmark yapısı eksik. WCAG 1.3.1 Level A.
-11. **❌ Skip navigation link'i yok** — Klavye kullanıcıları için erişim zorluğu. WCAG 2.4.1 Level A.
-12. **❌ Table action link/button touch target çok küçük (~20px)** — Mobilde tıklanması zor. WCAG 2.5.5 Level AA ihlali.
-13. **❌ Modal focus trap eksik** — Focus modal dışına çıkabilir. WCAG 2.4.3 Level A ihlali.
-14. **⚠️ Focus indicator — CSS mevcut ama doğrulanmalı** — `globals.css`'de `*:focus-visible` tanımlı. WCAG 2.4.7 Level AA.
-15. **⚠️ Auto-refresh aria-live eksik (System)** — 15s otomatik yenileme screen reader'a bildirilmiyor.
-16. **⚠️ Emoji ikonları decorative değil** — Tüm sayfalarda emoji ikonlarına `aria-hidden="true"` eklenmeli.
+9. **❌ Light mode: text-gray-400 / text-slate-400 kontrast KRİTİK (2.54:1 / 2.56:1)** — Beyaz zeminde okunamaz. Sidebar linkleri ve secondary text etkilenir. WCAG 1.4.3 Level AA ihlali.
+10. **❌ Dark mode: text-slate-500 kontrast yetersiz (3.75:1)** — Loading/empty state text'leri okunamıyor. WCAG 1.4.3 Level AA ihlali.
+11. **❌ contentinfo/footer eksik** — Landmark yapısı eksik. WCAG 1.3.1 Level A.
+12. **❌ Skip navigation link'i yok** — Klavye kullanıcıları için erişim zorluğu. WCAG 2.4.1 Level A.
+13. **❌ Table action link/button touch target çok küçük (~20px)** — Mobilde tıklanması zor. WCAG 2.5.5 Level AA ihlali.
+14. **❌ Modal focus trap eksik** — Focus modal dışına çıkabilir. WCAG 2.4.3 Level A ihlali.
+15. **⚠️ Focus indicator — CSS mevcut ama doğrulanmalı** — `globals.css`'de `*:focus-visible` tanımlı. WCAG 2.4.7 Level AA.
+16. **⚠️ Auto-refresh aria-live eksik (System)** — 15s otomatik yenileme screen reader'a bildirilmiyor.
+17. **⚠️ Emoji ikonları decorative değil** — Tüm sayfalarda emoji ikonlarına `aria-hidden="true"` eklenmeli.
 
-**Level A ihlali sayısı: 11** (önceki 8'e +3: chart, progress bar, color-only status)
-**Level AA ihlali sayısı: 3** (değişmedi)
-**Level AAA ihlali sayısı: 0** (toggle yüksekliği AA'ya düzeltildi — 24px minimum AA標準i)
+**Level A ihlali sayısı: 12** (chart Overview'e de eklendi)
+**Level AA ihlali sayısı: 4** (light mode kontrast eklendi)
 **Uyarı sayısı: 3**
