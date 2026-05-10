@@ -89,8 +89,18 @@
 5. HS-063: Sampling — zaten default parent-based sampling, değişiklik gerekmedi
 6. HS-064: PII redaction — worker'da 500 char truncation, API'de regex redaction (email, token, JWT)
 7. Ek düzeltmeler: 4 pre-existing compile hatası düzeltildi (inbound.rs, rate_limit.rs, worker semaphore, svix JSX)
-8. Bug fix: PaymentFailed grace period condition IS NOT NULL → IS NULL (ilk failure'da grace period başlamazdı)
+8. Bug fix: PaymentFailed grace period condition IS NOT NULL → IS NULL
 9. Final doğrulama: cargo check API ✅, cargo check Worker ✅, tsc --noEmit ✅, Neon DB ✅
+
+## 📝 Oturum 90 (2026-05-10 21:53 - 22:00 GMT+8) ✅
+1. i18n & Content: HS-069 (FAQ)
+2. 8 dosya, 1 commit (5c0a657)
+3. HS-069: FAQ sayfası için 40 çeviri anahtarı, 8 dile eklendi
+   - 15 soru-cevap, 5 kategori (Genel, Başlarken, Faturalandırma, Teknik, Güvenlik)
+   - Türkçe çeviriler native kalitede
+   - Diğer diller İngilizce placeholder (topluluk çevirisi için hazır)
+4. HS-065/066: Dashboard sayfaları 'use client' — metadata layout'tan geliyor, doğrudan eklenemez
+5. Changelog page.tsx düzeltildi (kırık import)
 
 ## 📝 Oturum 86 (2026-05-10 21:10 - 21:15 GMT+8) ✅
 1. Accessibility & Dark Mode: 4 sorun
