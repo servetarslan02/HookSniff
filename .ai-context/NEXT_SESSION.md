@@ -1,53 +1,57 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 05:47 GMT+8
+> Son güncelleme: 2026-05-11 05:51 GMT+8
 
 ---
 
 ## ✅ Tüm Dış Servisler Tamamlandı (Oturum 102)
 
-1. **Vercel** ✅ — Web Analytics aktif, Speed Insights kod eklendi
-2. **Resend** ✅ — API key Cloud Run'a eklendi, modül hazır
-3. **Neon DB** ✅ — Backup cron her gün 03:00 UTC
-4. **Grafana** ✅ — hookrelay.grafana.net, 7 alert rule + email
-5. **Polar.sh** ✅ — Checkout link hazır (Pro, 1 ay free trial)
+| Servis | Durum | Detay |
+|--------|-------|-------|
+| Vercel Analytics | ✅ Aktif | Hobby plan, 50K events/ay |
+| Vercel Speed Insights | ✅ Kod eklendi | Deploy yarın otomatik olur |
+| Grafana Alerts | ✅ Aktif | 7 rule + email → servetarslan02@gmail.com |
+| Polar.sh Checkout | ✅ Link hazır | Pro $49/mo, 1 ay free trial |
+| Neon Backup | ✅ Cron aktif | Her gün 03:00 UTC, 30 gün retention |
+| Resend | ✅ Cloud Run'da | API key eklendi, modül hazır |
+| Git Email | ✅ Düzeltildi | servetarslan02@users.noreply.github.com |
 
 ---
 
-## 🟡 Sıradaki Oturum: #103
+## 📋 Yapılacaklar (Sıralı)
 
-### 1. Resend Entegrasyonu (EN ÖNEMLİ)
-- `resend_email.rs` modülü hazır, Cloud Run'da `RESEND_API_KEY` var
-- Gmail API yerine Resend kullanmak için:
-  - `routes/auth.rs` → `send_welcome_email`, `send_verification_email`, `send_password_reset_email`
-  - `routes/contact.rs` → `send_contact_email`
-  - Config'de `RESEND_API_KEY` varsa Resend, yoksa Gmail fallback
-- **compile + test zorunlu**
+### 🔴 Yüksek Öncelik — Bir Sonraki Oturum
 
-### 2. Grafana OTEL Verisi Kontrol
-- Grafana Cloud'da 0 metrics/logs/traces görünüyor
-- OTEL exporter'ın düzgün çalışıp çalışmadığı kontrol edilmeli
-- `OTEL_EXPORTER_OTLP_HEADERS` formatı doğru mu?
+| # | Görev | Kim | Açıklama |
+|---|-------|-----|----------|
+| 1 | **Resend entegrasyonu** | AI | `resend_email.rs` hazır, Gmail API yerine Resend kullan. Config'de `RESEND_API_KEY` varsa Resend, yoksa Gmail fallback. `routes/auth.rs` ve `routes/contact.rs` güncellenecek. compile + test zorunlu. |
+| 2 | **Grafana OTEL verisi kontrol** | AI | Grafana Cloud'da 0 metrics/logs/traces. `OTEL_EXPORTER_OTLP_HEADERS` formatı kontrol edilmeli. |
 
-### 3. GitHub Actions Workflow'ları
-- Token'da `workflow` scope'u yok
-- `backup.yml` ve `deploy-alerts.yml` push edilemedi
-- Servet'ten yeni token (workflow scope'lu) istenecek
+### 🟡 Orta Öncelik
 
-### 4. Polar.sh Identity Verification
-- Servet'in yapması lazım (kimlik doğrulaması)
-- Para almak için gerekli
+| # | Görev | Kim | Açıklama |
+|---|-------|-----|----------|
+| 3 | **GitHub Actions workflow'ları** | AI + Servet | Token'da `workflow` scope'u yok. Servet'ten yeni token istenecek. `backup.yml` ve `deploy-alerts.yml` push edilemedi. |
+| 4 | **Polar.sh identity verification** | Servet | Kimlik doğrulaması gerekli. Para almak için zorunlu. |
+| 5 | **Vercel deploy limiti** | Otomatik | Yarın UTC 00:00'da sıfırlanır. Yeni commit'ler otomatik deploy olur. |
 
-### 5. Vercel Speed Insights Deploy
-- Kod eklendi, deploy limiti dolmuş
-- Yarın otomatik deploy olacak
+### 🟢 Düşük Öncelik — Lansman Sonrası
 
-### 6. db.rs Test (HS-085)
-- Gerçek PostgreSQL gerekli (Neon test DB)
-- Düşük öncelik
+| # | Görev | Kim | Açıklama |
+|---|-------|-----|----------|
+| 6 | **db.rs test (HS-085)** | AI | Gerçek PostgreSQL gerekli (Neon test DB). |
+| 7 | **SDK otomatik güncelleme (HS-090)** | AI | Lansman sonrası, detaylı araştırma gerekli. |
 
-### 7. SDK Otomatik Güncelleme (HS-090)
-- Lansman sonrası, detaylı araştırma gerekli
+---
+
+## 🔧 Teknik Notlar
+
+- **Git email:** `servetarslan02@users.noreply.github.com` kullan (Vercel `ai@hooksniff.dev`'i blokluyor)
+- **Grafana Stack:** `hookrelay.grafana.net` (adı "hooksniff" değil)
+- **Vercel Deploy:** Günlük 100 limit, AI commit'leri `servetarslan02` email'i ile yapılmalı
+- **Polar.sh Checkout:** `https://buy.polar.sh/polar_cl_jtWjcvyy0m6ZOuOkEIa7i0agQmlpfJGsNwTJU4LNG8U`
+- **Resend API Key:** Cloud Run'da `RESEND_API_KEY` olarak eklendi (revision 00053)
+- **Neon Backup Cron:** `0 3 * * *` → `/var/backups/hooksniff/`
 
 ---
 
