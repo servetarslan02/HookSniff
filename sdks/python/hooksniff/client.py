@@ -1,5 +1,7 @@
 """HookSniff API client."""
 
+import random
+import time
 from typing import Any, Dict, List, Optional
 from urllib.parse import urljoin
 
@@ -195,10 +197,12 @@ class HookSniffClient:
         api_key: str,
         base_url: str = "https://api.hooksniff.com/v1",
         timeout: int = 30,
+        max_retries: int = 3,
     ):
         self._api_key = api_key
         self._base_url = base_url.rstrip("/")
         self._timeout = timeout
+        self._max_retries = max_retries
         self._session = requests.Session()
         self._session.headers.update(
             {
@@ -211,6 +215,11 @@ class HookSniffClient:
         self.endpoints = _EndpointsResource(self)
         self.webhooks = _WebhooksResource(self)
 
+    @staticmethod
+    def _is_retryable(status_code: int) -> bool:
+        """Check if a status code is retryable (429 or 5xx)."""
+        return status_code == 429 or status_code >= 500
+
     def _request(
         self,
         method: str,
@@ -218,49 +227,82 @@ class HookSniffClient:
         json: Optional[Dict[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
     ) -> Any:
-        """Make an API request."""
+        """Make an API request with automatic retry on transient failures."""
         url = urljoin(self._base_url + "/", path.lstrip("/"))
 
-        try:
-            response = self._session.request(
-                method=method,
-                url=url,
-                json=json,
-                params=params,
-                timeout=self._timeout,
-            )
-        except requests.RequestException as e:
-            raise HookSniffError(f"Request failed: {e}") from e
+        last_error: Optional[Exception] = None
 
-        if response.status_code == 200:
-            # Handle CSV export
-            content_type = response.headers.get("content-type", "")
-            if "text/csv" in content_type:
-                return response.text
-            return response.json()
+        for attempt in range(self._max_retries + 1):
+            try:
+                response = self._session.request(
+                    method=method,
+                    url=url,
+                    json=json,
+                    params=params,
+                    timeout=self._timeout,
+                )
+            except requests.RequestException as e:
+                # Network errors — retry if we have attempts left
+                if attempt < self._max_retries:
+                    last_error = e
+                    base_delay = (2 ** attempt)
+                    jitter = random.random() * base_delay * 0.5
+                    time.sleep(base_delay + jitter)
+                    continue
+                raise HookSniffError(f"Request failed: {e}") from e
 
-        # Handle errors
-        try:
-            error_body = response.json()
-            message = error_body.get("error", {}).get("message", response.text)
-        except (ValueError, KeyError):
-            message = response.text or f"HTTP {response.status_code}"
+            if response.status_code == 200:
+                # Handle CSV export
+                content_type = response.headers.get("content-type", "")
+                if "text/csv" in content_type:
+                    return response.text
+                return response.json()
 
-        if response.status_code == 400:
-            raise ValidationError(message)
-        elif response.status_code == 401:
-            raise AuthenticationError(message)
-        elif response.status_code == 404:
-            raise NotFoundError(message)
-        elif response.status_code == 413:
-            raise PayloadTooLargeError(message)
-        elif response.status_code == 429:
-            raise RateLimitError(message)
-        else:
-            raise HookSniffError(
-                message,
-                status_code=response.status_code,
-            )
+            # Check if we should retry
+            if self._is_retryable(response.status_code) and attempt < self._max_retries:
+                # For 429, respect Retry-After header
+                if response.status_code == 429:
+                    retry_after = response.headers.get("retry-after")
+                    if retry_after:
+                        try:
+                            seconds = int(retry_after)
+                            time.sleep(seconds)
+                            continue
+                        except (ValueError, TypeError):
+                            pass
+                # Exponential backoff: 1s, 2s, 4s with jitter
+                base_delay = (2 ** attempt)
+                jitter = random.random() * base_delay * 0.5
+                time.sleep(base_delay + jitter)
+                continue
+
+            # Non-retryable errors
+            try:
+                error_body = response.json()
+                message = error_body.get("error", {}).get("message", response.text)
+            except (ValueError, KeyError):
+                message = response.text or f"HTTP {response.status_code}"
+
+            if response.status_code == 400:
+                raise ValidationError(message)
+            elif response.status_code == 401:
+                raise AuthenticationError(message)
+            elif response.status_code == 404:
+                raise NotFoundError(message)
+            elif response.status_code == 413:
+                raise PayloadTooLargeError(message)
+            elif response.status_code == 429:
+                raise RateLimitError(message)
+            else:
+                raise HookSniffError(
+                    message,
+                    status_code=response.status_code,
+                )
+
+        # Should not reach here
+        if last_error:
+            raise HookSniffError(f"Request failed after {self._max_retries} retries: {last_error}") from last_error
+        raise HookSniffError(f"Request failed after {self._max_retries} retries")
 
     def get_stats(self) -> Stats:
         """Get delivery statistics."""
