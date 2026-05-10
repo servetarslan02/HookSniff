@@ -11,3 +11,16 @@ monitoring/
 tests/
 scripts/
 *.rs
+.ai-context/
+*.md
+!dashboard/**/*.md
+.github/
+.vscode/
+*.ps1
+research/
+landing/
+portal/
+is-a-dev-registration/
+mcp/
+sdks/
+terraform/
