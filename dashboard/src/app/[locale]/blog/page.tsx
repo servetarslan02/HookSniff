@@ -31,6 +31,15 @@ const posts: BlogPost[] = [
     featured: true,
   },
   {
+    slug: 'may-2026-changelog',
+    title: 'HookSniff Changelog — May 2026 (Week 2)',
+    excerpt: 'Blog launch, 11/11 SDKs published, CSP fixes, 4 new DB tables, API deploy automation, admin dashboard, and 1,378 tests passing.',
+    date: '2026-05-10',
+    category: 'Changelog',
+    readTime: '4 min',
+    tags: ['changelog', 'product'],
+  },
+  {
     slug: 'why-ai-agents-need-webhooks',
     title: 'Why AI Agents Need Webhooks',
     excerpt: 'As AI agents become autonomous, they need real-time event delivery. Webhooks are the nervous system of the agent ecosystem.',
@@ -58,24 +67,6 @@ const posts: BlogPost[] = [
     tags: ['google', 'gemini', 'integration'],
   },
   {
-    slug: 'stripe-webhook-guide',
-    title: 'Complete Guide to Stripe Webhooks',
-    excerpt: 'Stripe sends dozens of event types. Learn how to set up, verify, and handle Stripe webhooks reliably in production.',
-    date: '2026-05-05',
-    category: 'Integration',
-    readTime: '8 min',
-    tags: ['stripe', 'payments', 'integration'],
-  },
-  {
-    slug: 'may-2026-changelog',
-    title: 'HookSniff Changelog — May 2026 (Week 2)',
-    excerpt: 'Blog launch, 11/11 SDKs published, CSP fixes, 4 new DB tables, API deploy automation, admin dashboard, and 1,378 tests passing.',
-    date: '2026-05-10',
-    category: 'Changelog',
-    readTime: '4 min',
-    tags: ['changelog', 'product'],
-  },
-  {
     slug: 'webhook-integration-tutorial',
     title: 'Complete Webhook Integration Tutorial: From Zero to Production',
     excerpt: 'A hands-on guide to integrating webhooks with HookSniff — from signing up and creating endpoints to verifying signatures and monitoring delivery.',
@@ -85,13 +76,13 @@ const posts: BlogPost[] = [
     tags: ['tutorial', 'getting-started', 'integration'],
   },
   {
-    slug: 'changelog-may-2026',
-    title: 'HookSniff Changelog — May 2026',
-    excerpt: 'Blog launch, CSP fixes, 4 new database tables, API deploy automation, and 11 SDK updates.',
-    date: '2026-05-01',
-    category: 'Changelog',
-    readTime: '3 min',
-    tags: ['changelog', 'product'],
+    slug: 'stripe-webhook-guide',
+    title: 'Complete Guide to Stripe Webhooks',
+    excerpt: 'Stripe sends dozens of event types. Learn how to set up, verify, and handle Stripe webhooks reliably in production.',
+    date: '2026-05-05',
+    category: 'Integration',
+    readTime: '8 min',
+    tags: ['stripe', 'payments', 'integration'],
   },
   {
     slug: 'webhook-architecture-deep-dive',
@@ -103,6 +94,24 @@ const posts: BlogPost[] = [
     tags: ['architecture', 'rust', 'engineering', 'infrastructure'],
   },
   {
+    slug: 'changelog-may-2026',
+    title: 'HookSniff Changelog — May 2026',
+    excerpt: 'Blog launch, CSP fixes, 4 new database tables, API deploy automation, and 11 SDK updates.',
+    date: '2026-05-01',
+    category: 'Changelog',
+    readTime: '3 min',
+    tags: ['changelog', 'product'],
+  },
+  {
+    slug: 'shopify-webhook-incident-analysis',
+    title: 'What the Shopify Webhook Incident Teaches Us About Resilience',
+    excerpt: 'Analysis of the Shopify webhook delivery latency incident (April 28, 2026) and lessons for building resilient webhook infrastructure.',
+    date: '2026-04-30',
+    category: 'Engineering',
+    readTime: '8 min',
+    tags: ['incident', 'resilience', 'shopify', 'engineering'],
+  },
+  {
     slug: 'introducing-hooksniff',
     title: 'Introducing HookSniff: Webhooks Made Simple',
     excerpt: 'We built HookSniff to solve a simple problem — webhook delivery should just work. No more missed events, no more complex retry logic.',
@@ -110,15 +119,6 @@ const posts: BlogPost[] = [
     category: 'Announcement',
     readTime: '3 min',
     tags: ['announcement', 'product'],
-  },
-  {
-    slug: 'customer-spotlight-ecommerce',
-    title: 'How an E-Commerce Platform Scaled Webhook Delivery with HookSniff',
-    excerpt: 'How an e-commerce platform processing 50K orders/day achieved 99.97% webhook delivery rate and cut infrastructure engineering time by 60%.',
-    date: '2026-04-18',
-    category: 'Announcement',
-    readTime: '6 min',
-    tags: ['customer', 'use-case', 'ecommerce'],
   },
   {
     slug: 'webhook-best-practices',
@@ -139,13 +139,13 @@ const posts: BlogPost[] = [
     tags: ['engineering', 'fifo', 'architecture'],
   },
   {
-    slug: 'shopify-webhook-incident-analysis',
-    title: 'What the Shopify Webhook Incident Teaches Us About Resilience',
-    excerpt: 'Analysis of the Shopify webhook delivery latency incident (April 28, 2026) and lessons for building resilient webhook infrastructure.',
-    date: '2026-04-30',
-    category: 'Engineering',
-    readTime: '8 min',
-    tags: ['incident', 'resilience', 'shopify', 'engineering'],
+    slug: 'customer-spotlight-ecommerce',
+    title: 'How an E-Commerce Platform Scaled Webhook Delivery with HookSniff',
+    excerpt: 'How an e-commerce platform processing 50K orders/day achieved 99.97% webhook delivery rate and cut infrastructure engineering time by 60%.',
+    date: '2026-04-18',
+    category: 'Announcement',
+    readTime: '6 min',
+    tags: ['customer', 'use-case', 'ecommerce'],
   },
   {
     slug: 'github-webhook-guide',
@@ -245,8 +245,31 @@ export default function BlogPage() {
     }
   };
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'HookSniff Blog',
+    description: 'Insights on webhooks, event-driven architecture, AI agents, and developer tools.',
+    url: 'https://hooksniff.vercel.app/blog',
+    blogPost: posts.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      abstract: post.excerpt,
+      datePublished: post.date,
+      url: `https://hooksniff.vercel.app/blog/${post.slug}`,
+      author: {
+        '@type': 'Organization',
+        name: 'HookSniff',
+      },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
@@ -312,6 +335,7 @@ export default function BlogPage() {
             {searchQuery && (
               <button
                 onClick={() => { setSearchQuery(''); setCurrentPage(1); }}
+                aria-label="Clear search"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
               >
                 ✕
