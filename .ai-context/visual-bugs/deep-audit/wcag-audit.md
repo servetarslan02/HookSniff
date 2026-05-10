@@ -1,7 +1,7 @@
 # WCAG Accessibility Audit — HookSniff Admin Panel
 
 **Tarih:** 2026-05-10  
-**Sayfalar:** Overview, Users, Settings  
+**Sayfalar:** Overview, Users, Revenue, System, Settings  
 **Mod:** Light mode + Dark mode (contrast analizi tamamlandı) + Mobil erişilebilirlik
 
 ---
@@ -85,7 +85,7 @@
 |--------|-------|----------|
 | Dark mode toggle: role="switch" | ❌ | Toggle butonu `<button>` olarak render ediliyor ama `role="switch"` yok. |
 | Dark mode toggle: aria-checked | ❌ | `aria-checked` attribute'u yok. Screen reader butonun durumunu (açık/kapalı) okuyamaz. |
-| Dark mode toggle: aria-label | ❌ | Buton boş text'e sahip ve `aria-label` yok. Sadece `img` child var (ikon). |
+| Dark mode toggle: aria-label | ✅ | `aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}` doğru tanımlanmış. |
 | Bakım Modu toggle: role="switch" | ❌ | Settings sayfasında toggle butonu `role="switch"` yok. |
 | Bakım Modu toggle: aria-checked | ❌ | `aria-checked` yok. |
 | Kayıtlar Etkin toggle: role="switch" | ❌ | Aynı sorun. |
@@ -217,21 +217,51 @@ Dark mode arka planları:
 
 ---
 
+## J. REVENUE SAYFASI (WCAG 1.3.1, 1.1.1)
+
+| Kriter | Durum | Açıklama |
+|--------|-------|----------|
+| İki h1 | ❌ | Layout header h1 ("Revenue") + sayfa h1 ("Revenue Dashboard"). Aynı sorun. |
+| Chart erişilebilirliği | ❌ | BarChart ve PieChart (Recharts) SVG olarak render ediliyor. Screen reader'a tablo/veri alternatifi sunulmuyor. `aria-label`, `<caption>` veya gizli `<table>` alternatifi yok. WCAG 1.1.1 Level A ihlali. |
+| Plan dağılımı text kontrastı | ❌ | `text-xs text-gray-400 dark:text-slate-500` "(X users)" metni — dark mode'da ~3.5:1. WCAG 1.4.3 Level AA. |
+| Tooltip erişilebilirliği | ⚠️ | Recharts Tooltip fare üzerine gelince gösteriliyor ama klavye ile erişilebilir değil. |
+| Emoji ikonları | ⚠️ | 💰📈📉 emoji ikonları decorative olmalı — `aria-hidden="true"` veya `role="img"` + `aria-label` yok. |
+
+---
+
+## K. SYSTEM SAYFASI (WCAG 1.3.1, 1.4.1, 4.1.2)
+
+| Kriter | Durum | Açıklama |
+|--------|-------|----------|
+| İki h1 | ❌ | Layout header h1 ("System") + sayfa h1 ("System Health"). Aynı sorun. |
+| Status dot: sadece renk | ❌ | Servis durumu sadece renkli nokta ile gösteriliyor (🟢🟡🔴). `text-green-700`, `text-yellow-700`, `text-red-700` renk bağımlı. Metinsel status etiketi var ("healthy"/"degraded") ama **dot renk bilgisi `aria-label` ile desteklenmemiş.** WCAG 1.4.1 Level A ihlali. |
+| Progress bar: aria eksik | ❌ | Latency bar'ı `<div>` ile render ediliyor. `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax` yok. WCAG 4.1.2 Level A ihlali. |
+| Auto-refresh bildirimi | ⚠️ | Sayfa 15 saniyede bir otomatik yenileniyor ama screen reader'a `aria-live` region ile bildirim yapılmıyor. İçerik değişikliği sessizce gerçekleşiyor. |
+| Emoji ikonları | ⚠️ | 🚀🐘⚡📬 emoji ikonları decorative — `aria-hidden="true"` eksik. |
+| Infrastructure kartları | ⚠️ | 6 altyapı kartında label/value/detail var ama yapılandırılmış tablo veya liste olarak sunulmuyor. |
+
+---
+
 ## GÜNCELLENMİŞ ÖZET — Kritik Sorunlar (Öncelik Sırasıyla)
 
 1. **❌ Form labels eksik (13+ input)** — Screen reader kullanıcıları form alanlarını kullanamaz. WCAG 3.3.2 Level A ihlali.
-2. **❌ Toggle role="switch" + aria-checked eksik (4 toggle)** — Screen reader buton durumunu okuyamaz. WCAG 4.1.2 Level A ihlali.
+2. **❌ Toggle role="switch" + aria-checked eksik (3 toggle)** — Screen reader buton durumunu okuyamaz. WCAG 4.1.2 Level A ihlali.
 3. **❌ scope="col" eksik (7 header)** — Tablo yapısı screen reader'a düzgün aktarılmaz. WCAG 1.3.1 Level A ihlali.
 4. **❌ Table caption/aria-label eksik** — Tablonun amacı screen reader'a aktarılamıyor. WCAG 1.3.1 Level A ihlali.
-5. **❌ İki h1 (tüm sayfalar)** — Sayfa yapısı kafa karıştırıcı. WCAG 1.3.1 Level A ihlali.
-6. **❌ text-slate-500 dark mode kontrast yetersiz (~3.5:1)** — Loading/empty state text'leri okunamıyor. WCAG 1.4.3 Level AA ihlali.
-7. **❌ contentinfo/footer eksik** — Landmark yapısı eksik. WCAG 1.3.1 Level A.
-8. **❌ Skip navigation link'i yok** — Klavye kullanıcıları için erişim zorluğu. WCAG 2.4.1 Level A.
-9. **❌ Table action link/button touch target çok küçük (~20px)** — Mobilde tıklanması zor. WCAG 2.5.5 Level AA ihlali.
-10. **❌ Settings toggle buton yüksekliği 24px** — AAA touch target karşılanmıyor. WCAG 2.5.5 Level AAA ihlali.
-11. **❌ Modal focus trap eksik** — Focus modal dışına çıkabilir. WCAG 2.4.3 Level A ihlali.
-12. **⚠️ Focus indicator — CSS mevcut ama doğrulanmalı** — `globals.css`'de `*:focus-visible` tanımlı. WCAG 2.4.7 Level AA.
+5. **❌ İki h1 (tüm sayfalar — 5/5)** — Sayfa yapısı kafa karıştırıcı. WCAG 1.3.1 Level A ihlali.
+6. **❌ Chart erişilebilirliği yok (Revenue)** — SVG chart'lar screen reader'a veri alternatifi sunmuyor. WCAG 1.1.1 Level A ihlali.
+7. **❌ Progress bar aria eksik (System)** — Latency bar'ı semantic role ve value attribute'larından yoksun. WCAG 4.1.2 Level A ihlali.
+8. **❌ Status dot sadece renk bağımlı (System)** — Renk körlüğü olan kullanıcılar durumu ayırt edemez. WCAG 1.4.1 Level A ihlali.
+9. **❌ text-slate-500 dark mode kontrast yetersiz (~3.5:1)** — Loading/empty state text'leri okunamıyor. WCAG 1.4.3 Level AA ihlali.
+10. **❌ contentinfo/footer eksik** — Landmark yapısı eksik. WCAG 1.3.1 Level A.
+11. **❌ Skip navigation link'i yok** — Klavye kullanıcıları için erişim zorluğu. WCAG 2.4.1 Level A.
+12. **❌ Table action link/button touch target çok küçük (~20px)** — Mobilde tıklanması zor. WCAG 2.5.5 Level AA ihlali.
+13. **❌ Modal focus trap eksik** — Focus modal dışına çıkabilir. WCAG 2.4.3 Level A ihlali.
+14. **⚠️ Focus indicator — CSS mevcut ama doğrulanmalı** — `globals.css`'de `*:focus-visible` tanımlı. WCAG 2.4.7 Level AA.
+15. **⚠️ Auto-refresh aria-live eksik (System)** — 15s otomatik yenileme screen reader'a bildirilmiyor.
+16. **⚠️ Emoji ikonları decorative değil** — Tüm sayfalarda emoji ikonlarına `aria-hidden="true"` eklenmeli.
 
-**Level A ihlali sayısı: 8** (önceki 6'ya +2: table caption, modal focus trap)
-**Level AA ihlali sayısı: 3** (önceki 2'ye +1: touch targets)
-**Level AAA ihlali sayısı: 1** (toggle buton yüksekliği)
+**Level A ihlali sayısı: 11** (önceki 8'e +3: chart, progress bar, color-only status)
+**Level AA ihlali sayısı: 3** (değişmedi)
+**Level AAA ihlali sayısı: 0** (toggle yüksekliği AA'ya düzeltildi — 24px minimum AA標準i)
+**Uyarı sayısı: 3**
