@@ -49,11 +49,13 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- SESSION-PLAN.md'deki sıraya göre Oturum 73: Rate Limiting
-- HS-001, HS-002, HS-003, HS-008 düzeltilecek
+- Oturum 74: Webhook Verification & Ownership (HS-004, HS-005, HS-009, HS-038a, HS-038b)
 
-## 📝 Oturum 73 Planı (2026-05-10 18:55 GMT+8)
-- Oturum planı oluşturuldu: `.ai-context/SESSION-PLAN.md`
-- 103 sorun, 22 oturuma bölündü
-- Sıralama: P0 → P1 → P2 → P3
-- Her oturum sonunda GitHub'a push edilecek
+## 📝 Oturum 73 (2026-05-10 18:57 - 19:00 GMT+8) ✅
+1. Rate limiting eklendi — 4 endpoint koruma altına:
+   - `verify_email` → 5/dakika/IP (HS-001)
+   - `verify_2fa_login` → 5/dakika/IP (HS-002)
+   - `refresh_token` → 10/dakika/IP (HS-003)
+   - `handle_contact` → 3/dakika/IP (HS-008)
+2. Dosyalar: `api/src/routes/auth.rs`, `api/src/routes/contact.rs`
+3. Oturum planı oluşturuldu: `.ai-context/SESSION-PLAN.md` (103 sorun, 22 oturum)

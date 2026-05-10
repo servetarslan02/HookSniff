@@ -265,9 +265,15 @@ Her oturum şu şekilde işler:
 
 ## 📝 Oturum Logları
 
-### Oturum 73 — [TARIH]
-**Durum:** ⬜ Bekliyor
+### Oturum 73 — 2026-05-10
+**Durum:** ✅ Tamamlandı
 **Görev:** Rate Limiting (HS-001, HS-002, HS-003, HS-008)
+**Yapılan:**
+- `verify_email` → 5 deneme/dakika/IP
+- `verify_2fa_login` → 5 deneme/dakika/IP
+- `refresh_token` → 10 deneme/dakika/IP
+- `handle_contact` → 3 deneme/dakika/IP
+- Dosyalar: `api/src/routes/auth.rs`, `api/src/routes/contact.rs`
 
 ### Oturum 74 — [TARIH]
 **Durum:** ⬜ Bekliyor
