@@ -13,7 +13,6 @@ const mockLocalStorage = {
 Object.defineProperty(globalThis, 'localStorage', { value: mockLocalStorage, writable: true });
 
 // Mock window object for 401 redirect
-const originalWindow = globalThis.window;
 Object.defineProperty(globalThis, 'window', {
   value: {
     location: { href: '/dashboard', assign: vi.fn() },
@@ -35,7 +34,6 @@ const {
   notificationsApi,
   billingApi,
   billingApiExtended,
-  analyticsApi,
   alertsApi,
   transformsApi,
   inboundApi,

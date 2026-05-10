@@ -70,7 +70,7 @@ vi.mock('@/components/OnboardingWizard', () => ({
 }));
 
 vi.mock('@/components/tremor', () => ({
-  StatCard: ({ label, value, isPercent }: { label: string; value: React.ReactNode; isPercent?: boolean }) =>
+  StatCard: ({ label, value, isPercent: _isPercent }: { label: string; value: React.ReactNode; isPercent?: boolean }) =>
     React.createElement('div', { 'data-testid': `stat-${label}` },
       React.createElement('span', null, label),
       React.createElement('span', null, typeof value === 'string' ? value : String(value)),

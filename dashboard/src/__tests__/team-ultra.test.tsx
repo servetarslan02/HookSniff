@@ -371,7 +371,7 @@ describe('TeamPage — Ultra Coverage', () => {
 
   it('handles team list fetch error', async () => {
     mockTeamsList.mockRejectedValue(new Error('Network error'));
-    const { container } = render(React.createElement(TeamPage));
+    render(React.createElement(TeamPage));
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith('Failed to load teams', 'error');
     });
