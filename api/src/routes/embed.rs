@@ -117,15 +117,17 @@ async fn embed_portal(
 /// GET /v1/embed/script — Returns a JavaScript snippet for embedding.
 async fn embed_script() -> Html<String> {
     let script = r#"(function() {
+  var container = document.getElementById('hooksniff-portal');
+  if (!container) return;
+  var baseUrl = container.getAttribute('data-api-url') || window.location.origin;
   var iframe = document.createElement('iframe');
-  iframe.src = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/embed/portal';
+  iframe.src = baseUrl + '/v1/embed/portal';
   iframe.style.width = '100%';
   iframe.style.border = 'none';
   iframe.style.minHeight = '300px';
   iframe.style.borderRadius = '12px';
   iframe.loading = 'lazy';
-  var container = document.getElementById('hooksniff-portal');
-  if (container) { container.appendChild(iframe); }
+  container.appendChild(iframe);
 })();"#;
     Html(format!(
         r#"<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><pre>{}</pre></body></html>"#,
@@ -195,18 +197,21 @@ mod tests {
     #[test]
     fn test_embed_script_contains_iframe() {
         let script = r#"(function() {
+  var container = document.getElementById('hooksniff-portal');
+  if (!container) return;
+  var baseUrl = container.getAttribute('data-api-url') || window.location.origin;
   var iframe = document.createElement('iframe');
-  iframe.src = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/embed/portal';
+  iframe.src = baseUrl + '/v1/embed/portal';
   iframe.style.width = '100%';
   iframe.style.border = 'none';
   iframe.style.minHeight = '300px';
   iframe.style.borderRadius = '12px';
   iframe.loading = 'lazy';
-  var container = document.getElementById('hooksniff-portal');
-  if (container) { container.appendChild(iframe); }
+  container.appendChild(iframe);
 })();"#;
         assert!(script.contains("iframe"));
         assert!(script.contains("hooksniff-portal"));
-        assert!(script.contains("hooksniff-api"));
+        assert!(script.contains("hooksniff-portal"));
+        assert!(script.contains("data-api-url"));
     }
 }
