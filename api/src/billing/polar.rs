@@ -14,7 +14,7 @@
 //!   POLAR_ENV — "sandbox" or "production" (default: production)
 
 use async_trait::async_trait;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, Mac, KeyInit};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
