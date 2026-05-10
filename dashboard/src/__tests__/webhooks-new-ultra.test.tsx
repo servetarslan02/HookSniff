@@ -113,7 +113,7 @@ describe('SendWebhookPage — Ultra Coverage', () => {
 
   it('loads endpoints on mount', async () => {
     mockEndpointsList.mockResolvedValue(mockEndpoints);
-    const { container } = render(React.createElement(SendWebhookPage));
+    render(React.createElement(SendWebhookPage));
     await waitFor(() => {
       expect(mockEndpointsList).toHaveBeenCalledWith('test-token');
     });

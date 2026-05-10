@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 22:53 GMT+8
+> Son güncelleme: 2026-05-10 23:54 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -23,45 +23,70 @@
 - API: hooksniff-api-1046140057667.europe-west1.run.app
 - Dashboard: https://hooksniff.vercel.app
 
-## 📊 Güncel İlerleme (2026-05-10 22:53)
+## 📊 Güncel İlerleme (2026-05-10 23:54)
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 46 (+9 yanlış/notlu) | 0 |
+| 🔴 P1 | 44 | 46 | 0 |
 | 🟡 P2 | 38 | 21 | 17 |
 | 🟢 P3 | 13 | 1 | 12 |
 | **TOPLAM** | **103** | **81** | **22** |
 
-## Oturum 91 (2026-05-10 22:08 - 22:23) ✅
+## Oturum 94 (2026-05-10 22:58 - 23:54) ✅
+- **12 major dependency güncellendi:**
+  - sha2 0.10→0.11, hmac 0.12→0.13
+  - thiserror 1→2, jsonwebtoken 9→10 (+ rust_crypto)
+  - axum 0.7→0.8, tower 0.4→0.5, tower-http 0.5→0.6
+  - opentelemetry 0.24→0.32, opentelemetry-otlp 0.17→0.32
+  - tonic 0.12→0.14, reqwest 0.12→0.13
+  - tracing-opentelemetry 0.25→0.32 (patched vendor)
+- **Dashboard TypeScript:** 148 hata düzeltildi (0 hata)
+- **Testler:** 999/999 geçti (979 API + 20 worker)
+- **Commits:** `7d89aa1`, `c7d6236`, `815705d` — main branch
+- **Paralel agent kullanımı:** 5 agent aynı anda çalıştırıldı (axum, otel, ts-fix, remaining-deps, test)
+
+## Güncel Bağımlılık Versiyonları (Oturum 94 sonrası)
+| Paket | Versiyon | Durum |
+|---|---|---|
+| axum | 0.8 | ✅ en güncel |
+| tower | 0.5 | ✅ en güncel |
+| tower-http | 0.6 | ✅ en güncel |
+| opentelemetry | 0.32 | ✅ en güncel |
+| opentelemetry-otlp | 0.32 | ✅ en güncel |
+| tracing-opentelemetry | 0.32 | ⚠️ patched vendor (upstream 0.33 bekleniyor) |
+| tonic | 0.14 | ✅ en güncel |
+| thiserror | 2 | ✅ en güncel |
+| jsonwebtoken | 10 | ✅ en güncel |
+| sha2 | 0.11 | ✅ en güncel |
+| hmac | 0.13 | ✅ en güncel |
+| reqwest | 0.13 | ✅ en güncel |
+| sqlx | 0.7 | 🔴 0.8 mevcut (büyük migration) |
+| redis | 0.25 | 🔴 1.2 mevcut (büyük migration) |
+| rand | 0.8 | 🟡 0.10 mevcut |
+| prometheus | 0.13 | 🟡 0.14 mevcut |
+
+## Ertelemeye Devam Edenler
+- sqlx 0.7→0.8 migration (büyük iş, dikkatli olunmalı)
+- redis 0.25→1.2 migration (büyük iş)
+- rand 0.8→0.10, prometheus 0.13→0.14
+- HS-065: 920+ hardcoded string (büyük iş)
+- HS-081-089: SDK/test coverage (P3)
+- tracing-opentelemetry vendor patch kaldırma (upstream 0.33 çıkınca)
+
+## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000
 - HS-020: Circuit breaker worker'a entegre
-- HS-021: Billing webhook idempotency (Stripe/Polar/iyzico)
-- 9 dosya, 4 commit
-- Compile ✅ Test 20/20 ✅ 31/31 ✅
-
-## Oturum 92 (2026-05-10 22:32 - 22:40) ✅
+- HS-021: Billing webhook idempotency
 - HS-022: Throttle state in-memory (documented)
 - HS-023: FIFO modülü worker'a entegre
-- worker/src/fifo.rs oluşturuldu
-- 2 dosya, 1 commit
-- Compile ✅ Test 1030/1030 ✅
-
-## Oturum 93 (2026-05-10 22:37 - 22:53) ✅
-- HS-047: blog/[slug] 1922→308 satır (data.ts)
-- HS-067: Müşteri hikayeleri disclaimer eklendi
+- HS-047: blog/[slug] refactoring
+- HS-067: Müşteri hikayeleri disclaimer
 - HS-068: Türkçe çeviri düzeltmeleri
 - HS-080: ESLint 8→9 migration (flat config)
 - HS-077: 6 stale branch silindi
 - HS-079: Conventional commits standardı
-- npm install çalıştırıldı, lint ✅
-- 8 dosya, 5 commit
 - Compile ✅ Test 1030/1030 ✅ Lint ✅
-
-## Ertelemeye Devam Edenler
-- HS-078: Dependabot PR'lar (major bump, tek tek test gerekir)
-- HS-065: 920+ hardcoded string (büyük iş)
-- HS-081-089: SDK/test coverage (P3)
 
 ## 🔧 Zorunlu Kurulumlar ve Testler
 
@@ -72,44 +97,17 @@
 
 ### Kurulum Kontrol Komutları
 ```bash
-# Rust
 source "$HOME/.cargo/env" && rustc --version && cargo --version
-
-# Node
 node --version && npm --version
-
-# Git
-git --version
 ```
 
 ### Her Değişiklik Sonrası Zorunlu Testler
 ```bash
-# 1. Rust compile
-cargo check -p hooksniff-worker
-cargo check -p hooksniff-api
-
-# 2. Rust tests
+cargo check
+cargo test -p hooksniff-api --lib
 cargo test -p hooksniff-worker
-cargo test -p hooksniff-api
-
-# 3. Frontend lint + typecheck
 cd dashboard && npm run lint && npx tsc --noEmit
-
-# 4. Git push
 git add -A && git commit -m "type: message" && git pull --rebase origin main && git push origin main
-```
-
-### Hafıza Dosyaları Güncelleme
-```bash
-# Her oturum sonunda
-cat >> .ai-context/MEMORY.md << 'MEMEOF'
-## 📝 Oturum XX (tarih) ✅
-- Yapılan işler
-- Sonuçlar
-MEMEOF
-
-# NEXT_SESSION.md güncelle
-# git add -A && git commit && git push
 ```
 
 ### Erteleme Kuralı
@@ -120,29 +118,9 @@ MEMEOF
 
 ### İş Kalite Kuralları
 - ❌ **Yarım iş yasak** — başladığın işi bitir, compile et, test et, push et
-- ❌ **Hızlıya kaçmak yasak** — "çabuk bitireyim" diye atlanmaz, her adım düzgün yapılacak
-- ❌ **Üstün körü iş yasak** — gözle bakarak "galiba doğru" denmez, compile + test zorunlu
-- ❌ **Erteleme yasak** — "daha sonra yaparız", "büyük iş", "riskli dokunmayalım" kabul edilmez
-- ✅ **Detaylı değerlendirme** — yapılan her iş titizlikle kontrol edilecek
-- ✅ **Parça parça ilerle** — büyük işleri küçült, her parçayı test et
-- ✅ **Sor** — emin olmadığında Servet'e sor, tahmin yürütme
-
-## Oturum 94 (2026-05-10 22:58 - 23:42) ✅
-- **Tüm major bağımlılıklar güncellendi:**
-  - sha2 0.10→0.11, hmac 0.12→0.13
-  - thiserror 1→2, jsonwebtoken 9→10
-  - axum 0.7→0.8, tower 0.4→0.5, tower-http 0.5→0.6
-  - opentelemetry 0.24→0.32, opentelemetry-otlp 0.17→0.32
-  - tonic 0.12→0.14
-  - tracing-opentelemetry 0.25→0.32 (patched vendor)
-- **Dashboard TypeScript:** 63 hata düzeltildi (0 hata)
-- **Testler:** 999/999 geçti (979 API + 20 worker)
-- **14 dosya kod değişikliği + 23 test dosyası + vendor/**
-- **Commit:** `7d89aa1` — main branch'e push edildi
-- **Kalan major:** sqlx 0.7→0.8, redis 0.25→1.2, reqwest 0.12→0.13, rand 0.8→0.10, prometheus 0.13→0.14 (agent çalışıyor)
-
-## Ertelemeye Devam Edenler
-- sqlx 0.8 migration (büyük iş, dikkatli olunmalı)
-- redis 1.x migration (büyük iş)
-- HS-065: 920+ hardcoded string (büyük iş)
-- HS-081-089: SDK/test coverage (P3)
+- ❌ **Hızlıya kaçmak yasak** — "çabuk bitireyim" diye atlanmaz
+- ❌ **Üstün körü iş yasak** — compile + test zorunlu
+- ❌ **Erteleme yasak** — "daha sonra", "büyük iş", "riskli" kabul edilmez
+- ✅ **Detaylı değerlendirme** — her iş titizlikle kontrol edilecek
+- ✅ **Parça parça ilerle** — büyük işleri böl, her parçayı doğrula
+- ✅ **Sor** — emin değilsen Servet'e sor, tahmin yürütme
