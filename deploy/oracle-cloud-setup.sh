@@ -1,9 +1,9 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════
-# HookRelay — Oracle Cloud Always Free Setup Script
+# HookSniff — Oracle Cloud Always Free Setup Script
 # ═══════════════════════════════════════════════════════════════════
 # Bu script, Oracle Cloud Always Free ARM (Ampere A1) instance'ı üzerinde
-# Docker kurulumu, firewall yapılandırması ve HookRelay servislerini
+# Docker kurulumu, firewall yapılandırması ve HookSniff servislerini
 # başlatmak için kullanılır.
 #
 # Desteklenen ortam: Ubuntu 22.04/24.04 ARM64 (aarch64)
@@ -37,9 +37,9 @@ if [[ "$ARCH" != "aarch64" ]]; then
     warn "Devam ediliyor ama ARM64 dışı ortamlarda sorunlar olabilir."
 fi
 
-# ── HookRelay dizini ──
-HOOKRELAY_DIR="${HOOKRELAY_DIR:-/opt/hookrelay}"
-info "HookRelay dizini: $HOOKRELAY_DIR"
+# ── HookSniff dizini ──
+HOOKSNIFF_DIR="${HOOKSNIFF_DIR:-/opt/hooksniff}"
+info "HookSniff dizini: $HOOKSNIFF_DIR"
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Sistem güncellemeleri
@@ -130,42 +130,42 @@ warn "de port 80, 443, 3000, 3001 için Ingress kuralı eklemeyi unutmayın!"
 warn "Kaynak: 0.0.0.0/0, Protokol: TCP, Hedef Port: 80,443,3000,3001"
 
 # ═══════════════════════════════════════════════════════════════════
-# 5. HookRelay dizinini oluştur ve dosyaları kopyala
+# 5. HookSniff dizinini oluştur ve dosyaları kopyala
 # ═══════════════════════════════════════════════════════════════════
-info "HookRelay dizini hazırlanıyor..."
+info "HookSniff dizini hazırlanıyor..."
 
-mkdir -p "$HOOKRELAY_DIR"
+mkdir -p "$HOOKSNIFF_DIR"
 
 # Bu script'in bulunduğu dizindeki dosyaları kopyala
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # deploy dizinindeki prod dosyalarını kopyala
-cp "$SCRIPT_DIR/docker-compose.prod.yml" "$HOOKRELAY_DIR/docker-compose.yml"
-cp "$SCRIPT_DIR/Dockerfile.api.prod" "$HOOKRELAY_DIR/Dockerfile.api.prod"
-cp "$SCRIPT_DIR/Dockerfile.worker.prod" "$HOOKRELAY_DIR/Dockerfile.worker.prod"
+cp "$SCRIPT_DIR/docker-compose.prod.yml" "$HOOKSNIFF_DIR/docker-compose.yml"
+cp "$SCRIPT_DIR/Dockerfile.api.prod" "$HOOKSNIFF_DIR/Dockerfile.api.prod"
+cp "$SCRIPT_DIR/Dockerfile.worker.prod" "$HOOKSNIFF_DIR/Dockerfile.worker.prod"
 
 # .env.production.example'dan .env oluştur (eğer yoksa)
-if [[ ! -f "$HOOKRELAY_DIR/.env" ]]; then
+if [[ ! -f "$HOOKSNIFF_DIR/.env" ]]; then
     if [[ -f "$SCRIPT_DIR/env.production.example" ]]; then
-        cp "$SCRIPT_DIR/env.production.example" "$HOOKRELAY_DIR/.env"
-        warn ".env dosyası oluşturuldu. Lütfen düzenleyin: $HOOKRELAY_DIR/.env"
+        cp "$SCRIPT_DIR/env.production.example" "$HOOKSNIFF_DIR/.env"
+        warn ".env dosyası oluşturuldu. Lütfen düzenleyin: $HOOKSNIFF_DIR/.env"
     else
         warn ".env.production.example bulunamadı. Elle .env oluşturmanız gerekiyor."
     fi
 fi
 
-ok "HookRelay dosyaları kopyalandı."
+ok "HookSniff dosyaları kopyalandı."
 
 # ═══════════════════════════════════════════════════════════════════
 # 6. Systemd servisi oluştur
 # ═══════════════════════════════════════════════════════════════════
 info "Systemd servisi oluşturuluyor..."
 
-cat > /etc/systemd/system/hookrelay.service << EOF
+cat > /etc/systemd/system/hooksniff.service << EOF
 [Unit]
-Description=HookRelay - Webhook Relay Service
-Documentation=https://github.com/hookrelay/hookrelay
+Description=HookSniff - Webhook Relay Service
+Documentation=https://github.com/hooksniff/hooksniff
 After=docker.service network-online.target
 Requires=docker.service
 Wants=network-online.target
@@ -173,7 +173,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=$HOOKRELAY_DIR
+WorkingDirectory=$HOOKSNIFF_DIR
 
 # Servisleri başlat
 ExecStart=/usr/bin/docker compose up -d --remove-orphans
@@ -183,7 +183,7 @@ ExecStop=/usr/bin/docker compose down
 ExecReload=/usr/bin/docker compose restart
 
 # Ortam değişkenleri
-EnvironmentFile=-$HOOKRELAY_DIR/.env
+EnvironmentFile=-$HOOKSNIFF_DIR/.env
 
 # Yeniden başlatma politikası
 Restart=on-failure
@@ -195,27 +195,27 @@ NoNewPrivileges=true
 # Loglama
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=hookrelay
+SyslogIdentifier=hooksniff
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable hookrelay.service
+systemctl enable hooksniff.service
 
 ok "Systemd servisi oluşturuldu ve etkinleştirildi."
 
 # ═══════════════════════════════════════════════════════════════════
 # 7. Servisleri başlat
 # ═══════════════════════════════════════════════════════════════════
-info "HookRelay servisleri başlatılıyor..."
+info "HookSniff servisleri başlatılıyor..."
 
-cd "$HOOKRELAY_DIR"
+cd "$HOOKSNIFF_DIR"
 
 # .env dosyası kontrolü
 if [[ ! -f ".env" ]]; then
-    error ".env dosyası bulunamadı! Lütfen oluşturun: $HOOKRELAY_DIR/.env"
+    error ".env dosyası bulunamadı! Lütfen oluşturun: $HOOKSNIFF_DIR/.env"
     error "Şablon: deploy/env.production.example"
     exit 1
 fi
@@ -250,20 +250,20 @@ fi
 # ═══════════════════════════════════════════════════════════════════
 info "Otomatik güncelleme scripti oluşturuluyor..."
 
-cat > "$HOOKRELAY_DIR/update.sh" << 'UPDATE_EOF'
+cat > "$HOOKSNIFF_DIR/update.sh" << 'UPDATE_EOF'
 #!/bin/bash
-# HookRelay otomatik güncelleme scripti
-# Kullanım: bash /opt/hookrelay/update.sh
+# HookSniff otomatik güncelleme scripti
+# Kullanım: bash /opt/hooksniff/update.sh
 
 set -euo pipefail
 
-HOOKRELAY_DIR="/opt/hookrelay"
-cd "$HOOKRELAY_DIR"
+HOOKSNIFF_DIR="/opt/hooksniff"
+cd "$HOOKSNIFF_DIR"
 
-echo "🔄 HookRelay güncelleniyor..."
+echo "🔄 HookSniff güncelleniyor..."
 
 # Mevcut image'ları yedekle (rollback için)
-docker compose ps --format json > /tmp/hookrelay-backup-$(date +%Y%m%d%H%M%S).json 2>/dev/null || true
+docker compose ps --format json > /tmp/hooksniff-backup-$(date +%Y%m%d%H%M%S).json 2>/dev/null || true
 
 # Yeni image'ları çek/build et
 docker compose pull 2>/dev/null || docker compose build --parallel
@@ -281,9 +281,9 @@ else
 fi
 UPDATE_EOF
 
-chmod +x "$HOOKRELAY_DIR/update.sh"
+chmod +x "$HOOKSNIFF_DIR/update.sh"
 
-ok "Güncelleme scripti oluşturuldu: $HOOKRELAY_DIR/update.sh"
+ok "Güncelleme scripti oluşturuldu: $HOOKSNIFF_DIR/update.sh"
 
 # ═══════════════════════════════════════════════════════════════════
 # 9. Log rotasyonu
@@ -309,17 +309,17 @@ ok "Docker log rotasyonu ayarlandı (10MB, 3 dosya)."
 # ═══════════════════════════════════════════════════════════════════
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
-echo -e "  ${GREEN}✅ HookRelay kurulumu tamamlandı!${NC}"
+echo -e "  ${GREEN}✅ HookSniff kurulumu tamamlandı!${NC}"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
-echo "  📁 Dizin:     $HOOKRELAY_DIR"
-echo "  🔧 Servis:    systemctl start/stop/restart hookrelay"
-echo "  📊 Durum:     docker compose -f $HOOKRELAY_DIR/docker-compose.yml ps"
-echo "  📝 Loglar:    journalctl -u hookrelay -f"
-echo "  🔄 Güncelleme: bash $HOOKRELAY_DIR/update.sh"
+echo "  📁 Dizin:     $HOOKSNIFF_DIR"
+echo "  🔧 Servis:    systemctl start/stop/restart hooksniff"
+echo "  📊 Durum:     docker compose -f $HOOKSNIFF_DIR/docker-compose.yml ps"
+echo "  📝 Loglar:    journalctl -u hooksniff -f"
+echo "  🔄 Güncelleme: bash $HOOKSNIFF_DIR/update.sh"
 echo ""
 echo "  ⚠️  Lütfen .env dosyasını düzenleyin:"
-echo "     nano $HOOKRELAY_DIR/.env"
+echo "     nano $HOOKSNIFF_DIR/.env"
 echo ""
 echo "  ⚠️  Oracle Cloud Security List'te portları açın:"
 echo "     80, 443, 3000, 3001 (Ingress, TCP, 0.0.0.0/0)"

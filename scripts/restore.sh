@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────
-# HookRelay — PostgreSQL Restore Script
+# HookSniff — PostgreSQL Restore Script
 # ──────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -8,17 +8,17 @@ set -euo pipefail
 # ── Configuration ──
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-hookrelay}"
-DB_USER="${DB_USER:-hookrelay}"
+DB_NAME="${DB_NAME:-hooksniff}"
+DB_USER="${DB_USER:-hooksniff}"
 
 # Storage backend
 BACKUP_STORAGE="${BACKUP_STORAGE:-local}"
-BACKUP_DIR="${BACKUP_DIR:-/var/backups/hookrelay}"
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/hooksniff}"
 
-S3_BUCKET="${S3_BUCKET:-hookrelay-backups}"
+S3_BUCKET="${S3_BUCKET:-hooksniff-backups}"
 S3_PREFIX="${S3_PREFIX:-postgres}"
 
-GCS_BUCKET="${GCS_BUCKET:-hookrelay-backups}"
+GCS_BUCKET="${GCS_BUCKET:-hooksniff-backups}"
 GCS_PREFIX="${GCS_PREFIX:-postgres}"
 
 # ── Helpers ──
@@ -39,7 +39,7 @@ list_backups() {
 
     case "${BACKUP_STORAGE}" in
         local)
-            ls -1t "${BACKUP_DIR}"/hookrelay-*.dump 2>/dev/null || echo "  (none)"
+            ls -1t "${BACKUP_DIR}"/hooksniff-*.dump 2>/dev/null || echo "  (none)"
             ;;
         s3)
             aws s3 ls "s3://${S3_BUCKET}/${S3_PREFIX}/" 2>/dev/null || echo "  (none)"
@@ -107,11 +107,11 @@ usage() {
     echo "Environment variables:"
     echo "  DB_HOST          PostgreSQL host (default: localhost)"
     echo "  DB_PORT          PostgreSQL port (default: 5432)"
-    echo "  DB_NAME          Database name (default: hookrelay)"
-    echo "  DB_USER          Database user (default: hookrelay)"
+    echo "  DB_NAME          Database name (default: hooksniff)"
+    echo "  DB_USER          Database user (default: hooksniff)"
     echo "  PGPASSWORD       Database password (or use .pgpass)"
     echo "  BACKUP_STORAGE   Storage backend: local, s3, gcs (default: local)"
-    echo "  BACKUP_DIR       Local backup directory (default: /var/backups/hookrelay)"
+    echo "  BACKUP_DIR       Local backup directory (default: /var/backups/hooksniff)"
     echo "  S3_BUCKET        S3 bucket name"
     echo "  GCS_BUCKET       GCS bucket name"
 }
