@@ -116,9 +116,9 @@ mod tests {
 
             if sig_bytes.len() == expected_bytes.len()
                 && hmac::digest::CtOutput::<HmacSha256>::new(
-                    hmac::digest::Output::<HmacSha256>::clone_from_slice(&sig_bytes),
+                    hmac::digest::Output::<HmacSha256>::try_from(sig_bytes.as_slice()).expect("valid HMAC output length"),
                 ) == hmac::digest::CtOutput::<HmacSha256>::new(
-                    hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
+                    hmac::digest::Output::<HmacSha256>::try_from(expected_bytes.as_slice()).expect("valid HMAC output length"),
                 )
             {
                 verified = true;
@@ -150,9 +150,9 @@ mod tests {
         }
 
         hmac::digest::CtOutput::<HmacSha256>::new(
-            hmac::digest::Output::<HmacSha256>::clone_from_slice(&expected_bytes),
+            hmac::digest::Output::<HmacSha256>::try_from(expected_bytes.as_slice()).expect("valid HMAC output length"),
         ) == hmac::digest::CtOutput::<HmacSha256>::new(
-            hmac::digest::Output::<HmacSha256>::clone_from_slice(&computed_bytes),
+            hmac::digest::Output::<HmacSha256>::try_from(computed_bytes.as_slice()).expect("valid HMAC output length"),
         )
     }
 
