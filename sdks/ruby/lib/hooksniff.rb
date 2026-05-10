@@ -12,7 +12,7 @@ require_relative "hooksniff/verification"
 
 module HookSniff
   # Default API base URL
-  DEFAULT_BASE_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
+  DEFAULT_BASE_URL = "https://api.hooksniff.com/v1"
 
   # Default request timeout in seconds
   DEFAULT_TIMEOUT = 30

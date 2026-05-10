@@ -376,7 +376,7 @@ export class HookSniff {
 
   constructor(config: HookSniffConfig) {
     this.apiKey = config.apiKey;
-    this.baseUrl = (config.baseUrl || "https://hooksniff-api-1046140057667.europe-west1.run.app/v1").replace(
+    this.baseUrl = (config.baseUrl || "https://api.hooksniff.com/v1").replace(
       /\/$/,
       ""
     );
