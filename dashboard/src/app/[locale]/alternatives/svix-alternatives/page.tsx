@@ -11,7 +11,7 @@ const alternatives = [
     name: 'HookSniff',
     emoji: '🪝',
     tagline: 'Best Svix alternative for startups',
-    price: '$29/mo',
+    price: '$49/mo',
     svixPrice: '$490/mo',
     pros: ['10x cheaper than Svix', 'FIFO ordered delivery', 'CloudEvents v1.0', 'Schema registry', 'Open source + self-hosted', '8-language dashboard', 'MCP support', 'CLI tool', 'Smart routing (round-robin, latency, failover)', 'Real-time SSE streaming'],
     cons: ['Newer (less enterprise trust)', 'SOC 2 ready (not Type 2 yet)', '99.9% SLA (vs Svix 99.99%)', 'No HIPAA/PCI-DSS yet', 'No components platform (Diom)'],
@@ -93,7 +93,7 @@ export default function SvixAlternativesPage() {
               <tbody>
                 {[
                   { name: 'Svix', price: '$490/mo', sdks: '11', oss: '✅', self: '✅', soc2: 'Type 2', sla: '99.99%', highlight: false },
-                  { name: 'HookSniff', price: '$29/mo', sdks: '11', oss: '✅', self: '✅', soc2: 'Ready', sla: '99.9%', highlight: true },
+                  { name: 'HookSniff', price: '$49/mo', sdks: '11', oss: '✅', self: '✅', soc2: 'Ready', sla: '99.9%', highlight: true },
                   { name: 'Hookdeck', price: '$39/mo+', sdks: '8', oss: '❌', self: '❌', soc2: 'Type 2', sla: '99.999%', highlight: false },
                   { name: 'Hook0', price: 'Free', sdks: '4', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
                   { name: 'Convoy', price: 'Free', sdks: '1 (Go)', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },

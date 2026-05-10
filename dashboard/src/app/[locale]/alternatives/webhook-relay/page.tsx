@@ -37,7 +37,7 @@ export default function WebhookRelayAlternativePage() {
               { feature: 'Managed hosting', hooksniff: '✅', relay: '✅' },
               { feature: 'Webhook routing', hooksniff: 'Basic', relay: 'Advanced' },
               { feature: 'Open source', hooksniff: '✅', relay: '❌' },
-              { feature: 'Free tier', hooksniff: '1,000 events', relay: 'Limited' },
+              { feature: 'Free tier', hooksniff: '10,000 events', relay: 'Limited' },
             ].map((r) => (
               <tr key={r.feature} className="border-b border-gray-100 dark:border-slate-800/50 last:border-0">
                 <td className="py-3 px-6 text-gray-700 dark:text-slate-300">{r.feature}</td>
