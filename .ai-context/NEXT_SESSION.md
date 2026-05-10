@@ -1,54 +1,60 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 22:54 GMT+8
+> Son güncelleme: 2026-05-10 23:54 GMT+8
 
 ---
 
 ## ✅ Tamamlanan Oturumlar
 
-### Oturum 73-90 ✅
+### Oturum 73-93 ✅
 - Tüm P0 + P1 tamamlandı
 
-### Oturum 91-93 ✅
-- HS-019, HS-020, HS-021, HS-022, HS-023, HS-047, HS-067, HS-068, HS-077, HS-079, HS-080
-- 15 commit, 1030/1030 test, ESLint v9, 6 branch silindi
+### Oturum 94 ✅ (2026-05-10 22:58 - 23:54)
+**Major dependency güncellemeleri:**
+- sha2 0.10→0.11, hmac 0.12→0.13
+- thiserror 1→2, jsonwebtoken 9→10 (+ rust_crypto feature)
+- axum 0.7→0.8, tower 0.4→0.5, tower-http 0.5→0.6
+- opentelemetry 0.24→0.32, opentelemetry-otlp 0.17→0.32
+- tonic 0.12→0.14, reqwest 0.12→0.13
+- tracing-opentelemetry 0.25→0.32 (patched vendor — upstream 0.33 bekleniyor)
+**Dashboard:**
+- 63+85 TypeScript hataları düzeltildi (unused imports, type casts)
+- ESLint: 0 hata
+**Testler:** 999/999 (979 API + 20 worker)
+**Commits:** `7d89aa1`, `c7d6236`, `815705d` — main branch
 
 ---
 
-## 🟡 Sıradaki Oturum: #94
+## 🟡 Sıradaki Oturum: #95
 
-### 1. Dependabot PR'ları (HS-078)
-Önce Cargo (Rust) — daha az riskli:
-```
-dependabot/cargo/thiserror-2.0.18      ← major bump, dikkatli ol
-dependabot/cargo/tower-http-0.6.10     ← major bump
-dependabot/cargo/sha2-0.11.0           ← minor bump
-dependabot/cargo/hmac-0.13.0           ← minor bump
-dependabot/cargo/jsonwebtoken-10.3.0   ← major bump
-dependabot/cargo/opentelemetry-0.31.0  ← major bump
-dependabot/cargo/opentelemetry-otlp-0.31.1
-dependabot/cargo/tracing-opentelemetry-0.32.1
-```
-Sonra npm (dashboard):
-```
-dependabot/npm_and_yarn/dashboard/eslint-10.3.0           ← ESLint 10, Next.js 15 uyumsuz!
-dependabot/npm_and_yarn/dashboard/eslint-config-next-16.2.6 ← Next.js 16, şimdilik dokunma
-dependabot/npm_and_yarn/dashboard/next-16.2.6              ← Next.js 16, şimdilik dokunma
-dependabot/npm_and_yarn/dashboard/next/eslint-plugin-next-16.2.6
-dependabot/npm_and_yarn/dashboard/react-19.2.6
-dependabot/npm_and_yarn/dashboard/typescript-6.0.3
-dependabot/npm_and_yarn/dashboard/tailwindcss-4.2.4
-```
+### 1. Kalan Major Dependency Güncellemeleri
+| Paket | Mevcut | Güncel | Zorluk |
+|---|---|---|---|
+| sqlx | 0.7 | 0.8 | 🔴 Büyük — macro syntax, runtime değişiklikleri |
+| redis | 0.25 | 1.2 | 🔴 Büyük — API tamamen değişmiş |
+| rand | 0.8 | 0.10 | 🟡 Orta — `gen_range` API değişikliği |
+| prometheus | 0.13 | 0.14 | 🟡 Orta — metric API değişikliği |
 
-**⚠️ DİKKAT:**
-- ESLint 10, Next.js 16, React 19 major bump — şimdilik dokunma
-- Cargo minor bump'ları (sha2, hmac) güvenli, önce onları dene
-- Her merge sonrası `cargo test` çalıştır
+**⚠️ sqlx ve redis büyük migration — dikkatli ol, parça parça yap:**
+- sqlx 0.8: `sqlx::query!` macro'ları, `PgPool` API, `runtime-tokio` feature adı değişmiş olabilir
+- redis 1.x: `redis::Connection` → `redis::aio::Connection`, async API değişiklikleri
+- İkisini aynı anda yapma, birini bitir test et sonra diğerine geç
 
-### 2. Kalan P2 Sorunları
+### 2. Dependabot PR'ları (kalan)
+npm tarafı hâlâ bekliyor:
+```
+dependabot/npm_and_yarn/dashboard/react-19.2.6        ← major, dikkatli ol
+dependabot/npm_and_yarn/dashboard/typescript-6.0.3     ← major
+dependabot/npm_and_yarn/dashboard/tailwindcss-4.2.4    ← major
+dependabot/npm_and_yarn/dashboard/recharts-3.8.1       ← minor, güvenli
+dependabot/npm_and_yarn/dashboard/types/node-25.6.2    ← minor, güvenli
+```
+**Dikkat:** Next.js 16, ESLint 10, React 19 major bump — şimdilik dokunma!
+
+### 3. Kalan P2 Sorunları
 | ID | Sorun | Zorluk |
 |----|-------|--------|
-| HS-065 | 920+ hardcoded string | 🔴 Büyük iş |
+| HS-065 | 920+ hardcoded string (i18n) | 🔴 Büyük iş |
 | HS-066 | 71 sayfada metadata eksik | 🟡 Orta |
 | HS-081 | 11 SDK'da retry logic yok | 🟡 Orta |
 | HS-082 | Kotlin version mismatch | 🟢 Kolay |
@@ -56,16 +62,16 @@ dependabot/npm_and_yarn/dashboard/tailwindcss-4.2.4
 | HS-084 | Polar/iyzico fatura handler | 🟡 Orta |
 | HS-085-089 | Test coverage (5 modül) | 🔴 Büyük iş |
 
-### 3. Silinmeyen Branch'ler
-- `feat/mobile-backend-features` — password reset, email verify, 2FA, push notifications var
-- `ai-agent-layer` — PostgreSQL AI agents migration var
+### 4. Silinmeyen Branch'ler
+- `feat/mobile-backend-features` — password reset, email verify, 2FA, push notifications
+- `ai-agent-layer` — PostgreSQL AI agents migration
 - Bu branch'lerdeki iş main'e merge edilmeli veya Servet'e sorulmalı
 
-### 4. Çalışma Kuralları (hatırlatma)
-- Conventional commits: `fix:`, `feat:`, `docs:`, `refactor:`, `test:`, `chore:`
-- Her değişiklik sonrası `cargo test` + `cargo check` + `npm run lint`
-- npm install çalıştırılmamışsa çalıştır
-- Erteleme — yapılabilen hemen yapılsın
+### 5. tracing-opentelemetry Vendor Kaldırma
+- Upstream `tracing-opentelemetry 0.33` çıktığında vendor patch'ini kaldır
+- `vendor/tracing-opentelemetry/` klasörünü sil
+- `[patch.crates-io]` section'ını workspace Cargo.toml'dan kaldır
+- `tracing-opentelemetry = "0.33"` yap
 
 ---
 
@@ -92,10 +98,9 @@ Eğer Rust yoksa kur: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs
 
 ### Her Değişiklik Sonrası Zorunlu
 1. `cargo check` (compile)
-2. `cargo test` (testler)
-3. `npm run lint` (frontend)
-4. `npx tsc --noEmit` (TypeScript)
-5. `git push` (GitHub)
+2. `cargo test -p hooksniff-api --lib && cargo test -p hooksniff-worker` (testler)
+3. `cd dashboard && npm run lint && npx tsc --noEmit` (frontend)
+4. `git push` (GitHub)
 
 ### Erteleme YASAK
 - "Daha sonra yaparız" → ❌ Hemen yap

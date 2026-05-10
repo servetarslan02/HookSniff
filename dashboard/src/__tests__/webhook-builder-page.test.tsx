@@ -146,7 +146,6 @@ describe('WebhookBuilderPage', () => {
     const { getByText } = render(<WebhookBuilderPage />);
     // The button is disabled, but let's test the handler indirectly
     // by setting an endpoint first
-    const endpointInput = getByText(/Send Webhook/).closest('div')!.querySelector('input');
     // Actually let's just verify the button is disabled
     expect(getByText(/Send Webhook/).closest('button')?.disabled).toBe(true);
   });

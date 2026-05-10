@@ -363,7 +363,7 @@ describe('LoginPage - Extended Tests', () => {
 
   // === Loading State ===
   it('shows loading spinner during login', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise(r => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));
@@ -386,7 +386,7 @@ describe('LoginPage - Extended Tests', () => {
   });
 
   it('disables submit button during loading', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise(r => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));
@@ -409,7 +409,7 @@ describe('LoginPage - Extended Tests', () => {
   });
 
   it('button has disabled opacity styling', async () => {
-    let resolveLogin: () => void;
+    let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise(r => { resolveLogin = r; }));
 
     const { container } = render(React.createElement(LoginPage));

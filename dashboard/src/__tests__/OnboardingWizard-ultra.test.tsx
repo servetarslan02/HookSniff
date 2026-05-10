@@ -42,23 +42,23 @@ async function navigateToStep(container: HTMLElement, targetStep: string) {
   // Step 0 → 1: click "Let's go"
   let buttons = Array.from(container.querySelectorAll('button'));
   const letsGoBtn = buttons.find(b => b.textContent?.includes("Let's go"));
-  if (letsGoBtn) await act(async () => { fireEvent.click(letsGoBtn); });
+  if (letsGoBtn) await act(async () => { fireEvent.click(letsGoBtn!); });
   if (targetIndex === 1) return;
 
   // Step 1 → 2: select use case, continue
   buttons = Array.from(container.querySelectorAll('button'));
   const paymentsBtn = buttons.find(b => b.textContent?.includes('Payments'));
-  if (paymentsBtn) await act(async () => { fireEvent.click(paymentsBtn); });
+  if (paymentsBtn) await act(async () => { fireEvent.click(paymentsBtn!); });
 
   buttons = Array.from(container.querySelectorAll('button'));
   let continueBtn = buttons.find(b => b.textContent?.includes('Continue'));
-  if (continueBtn) await act(async () => { fireEvent.click(continueBtn); });
+  if (continueBtn) await act(async () => { fireEvent.click(continueBtn!); });
   if (targetIndex === 2) return;
 
   // Step 2 → 3: continue
   buttons = Array.from(container.querySelectorAll('button'));
   continueBtn = buttons.find(b => b.textContent?.includes('Continue'));
-  if (continueBtn) await act(async () => { fireEvent.click(continueBtn); });
+  if (continueBtn) await act(async () => { fireEvent.click(continueBtn!); });
   if (targetIndex === 3) return;
 
   // Step 3 → 4: fill URL, create endpoint
@@ -71,7 +71,7 @@ async function navigateToStep(container: HTMLElement, targetStep: string) {
     const createBtn = buttons.find(b => b.textContent?.includes('Create Endpoint'));
     if (createBtn) {
       mockEndpointsCreate.mockResolvedValue({ id: 'ep-new' });
-      await act(async () => { fireEvent.click(createBtn); });
+      await act(async () => { fireEvent.click(createBtn!); });
     }
   }
   if (targetIndex === 4) return;
@@ -80,7 +80,7 @@ async function navigateToStep(container: HTMLElement, targetStep: string) {
   if (targetIndex === 5) {
     buttons = Array.from(container.querySelectorAll('button'));
     const sentBtn = buttons.find(b => b.textContent?.includes("I've sent a test"));
-    if (sentBtn) await act(async () => { fireEvent.click(sentBtn); });
+    if (sentBtn) await act(async () => { fireEvent.click(sentBtn!); });
   }
 }
 
