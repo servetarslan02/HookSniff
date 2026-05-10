@@ -97,15 +97,18 @@ Her oturum şu şekilde işler:
 
 **Dosyalar:** `api/src/routes/billing.rs`, `api/src/routes/auth.rs`, `dashboard/src/app/[locale]/dashboard/`
 
-### Oturum 79: SSRF & Security Hardening
+### Oturum 79: SSRF & Security Hardening ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-011 | Portal notification URL'lerinde SSRF | ⬜ |
-| HS-012 | Playground test endpoint'inde SSRF | ⬜ |
-| HS-013 | CSP'de `unsafe-inline` + `unsafe-eval` | ⬜ |
-| HS-014 | Git history'de OTEL credentials | ⬜ |
-| HS-015 | Password reset token URL'de exposure | ⬜ |
-| HS-016 | `DefaultHasher` idempotency hash'te | ⬜ |
+| HS-011 | Portal notification URL'lerinde SSRF | ✅ 2026-05-10 |
+| HS-012 | Playground test endpoint'inde SSRF | ❌ Yanlış bulgu |
+| HS-013 | CSP'de `unsafe-inline` + `unsafe-eval` | ✅ 2026-05-10 |
+| HS-014 | Git history'de OTEL credentials | ❌ Operasyonel |
+| HS-015 | Password reset token URL'de | ❌ Standart pratik |
+| HS-016 | `DefaultHasher` idempotency hash'te | ✅ 2026-05-10 |
+
+**Dosyalar:** `api/src/routes/customer_portal.rs`, `api/src/middleware/idempotency.rs`, `dashboard/next.config.js`
+**Yapılan:** SSRF validation on notification URLs, CSP unsafe-eval removed, SHA-256 idempotency hash, HSTS header added
 
 **Dosyalar:** `api/src/ssrf.rs`, `api/src/routes/playground.rs`, `api/src/routes/inbound.rs`, `dashboard/next.config.js`
 
