@@ -1,6 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -25,13 +26,83 @@ export default function ConfirmDialog({
   onCancel,
   loading,
 }: ConfirmDialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  // Trap focus inside dialog
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onCancel();
+        return;
+      }
+
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    },
+    [onCancel]
+  );
+
+  useEffect(() => {
+    if (!open) return;
+
+    // Save currently focused element to restore later
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    // Focus the dialog
+    dialogRef.current?.focus();
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+      // Restore focus to the element that opened the dialog
+      previousFocusRef.current?.focus();
+    };
+  }, [open, handleKeyDown]);
+
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onCancel}
+        aria-hidden="true"
+      />
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        tabIndex={-1}
+        className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6 outline-none"
+      >
+        <h3 id="confirm-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">
+          {title}
+        </h3>
         <p className="text-sm text-gray-600 mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <button
