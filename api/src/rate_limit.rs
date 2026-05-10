@@ -427,66 +427,28 @@ pub async fn rate_limit_middleware(
     let plan_limit = plan.max_requests_per_minute();
     let result = limiter.check_with_headers(&key, plan_limit).await;
 
+    // HS-038j: Use safe header insertion — skip if value is invalid instead of panicking.
+    fn insert_header(headers: &mut axum::http::HeaderMap, name: &str, value: &str) {
+        if let Ok(val) = value.parse() {
+            headers.insert(name, val);
+        }
+    }
+
     if result.allowed {
         let mut response = next.run(req).await;
         let headers = response.headers_mut();
-        headers.insert(
-            "X-RateLimit-Limit",
-            result
-                .limit
-                .to_string()
-                .parse()
-                .expect("valid header value"),
-        );
-        headers.insert(
-            "X-RateLimit-Remaining",
-            result
-                .remaining
-                .to_string()
-                .parse()
-                .expect("valid header value"),
-        );
-        headers.insert(
-            "X-RateLimit-Reset",
-            result
-                .reset_seconds
-                .to_string()
-                .parse()
-                .expect("valid header value"),
-        );
+        insert_header(headers, "X-RateLimit-Limit", &result.limit.to_string());
+        insert_header(headers, "X-RateLimit-Remaining", &result.remaining.to_string());
+        insert_header(headers, "X-RateLimit-Reset", &result.reset_seconds.to_string());
         Ok(response)
     } else {
         let mut response = Response::new(axum::body::Body::empty());
         *response.status_mut() = StatusCode::TOO_MANY_REQUESTS;
         let headers = response.headers_mut();
-        headers.insert(
-            "X-RateLimit-Limit",
-            result
-                .limit
-                .to_string()
-                .parse()
-                .expect("valid header value"),
-        );
-        headers.insert(
-            "X-RateLimit-Remaining",
-            "0".parse().expect("valid header value"),
-        );
-        headers.insert(
-            "X-RateLimit-Reset",
-            result
-                .reset_seconds
-                .to_string()
-                .parse()
-                .expect("valid header value"),
-        );
-        headers.insert(
-            "Retry-After",
-            result
-                .reset_seconds
-                .to_string()
-                .parse()
-                .expect("valid header value"),
-        );
+        insert_header(headers, "X-RateLimit-Limit", &result.limit.to_string());
+        insert_header(headers, "X-RateLimit-Remaining", "0");
+        insert_header(headers, "X-RateLimit-Reset", &result.reset_seconds.to_string());
+        insert_header(headers, "Retry-After", &result.reset_seconds.to_string());
         Ok(response)
     }
 }

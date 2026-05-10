@@ -131,64 +131,66 @@ pub async fn auth_middleware(
         // API key authentication — check cache first, then DB
         let prefix = token[..15.min(token.len())].to_string();
 
-        // Check cache first
-        {
+        // HS-038i: Check cache WITHOUT holding lock across .await
+        let cached = {
             let cache = AUTH_CACHE.lock().unwrap();
-            if let Some(cached) = cache.get(&prefix) {
-                cached
-            } else {
-                // Cache miss — query DB
-                let candidates =
-                    sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+            cache.get(&prefix)
+        };
+
+        if let Some(c) = cached {
+            c
+        } else {
+            // Cache miss — query DB (no lock held during async operations)
+            let candidates =
+                sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+                    .bind(&prefix)
+                    .fetch_all(&*pool)
+                    .await?;
+
+            // Also check api_keys table for additional keys
+            let api_key_candidates: Vec<(String,)> = sqlx::query_as(
+                "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
+            )
+            .bind(&prefix)
+            .fetch_all(&*pool)
+            .await?;
+
+            // Try customers table first (legacy primary key)
+            let mut found: Option<Customer> = None;
+            for c in &candidates {
+                if verify_api_key(&token, &c.api_key_hash) {
+                    found = Some(c.clone());
+                    break;
+                }
+            }
+
+            // If not found in customers, try api_keys table
+            if found.is_none() {
+                for (hash,) in &api_key_candidates {
+                    if verify_api_key(&token, hash) {
+                        let owner: Option<Customer> = sqlx::query_as(
+                            "SELECT c.* FROM customers c INNER JOIN api_keys ak ON ak.customer_id = c.id WHERE ak.api_key_prefix = $1 AND ak.api_key_hash = $2"
+                        )
                         .bind(&prefix)
-                        .fetch_all(&*pool)
+                        .bind(hash)
+                        .fetch_optional(&*pool)
                         .await?;
-
-                // Also check api_keys table for additional keys
-                let api_key_candidates: Vec<(String,)> = sqlx::query_as(
-                    "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
-                )
-                .bind(&prefix)
-                .fetch_all(&*pool)
-                .await?;
-
-                // Try customers table first (legacy primary key)
-                let mut found: Option<Customer> = None;
-                for c in &candidates {
-                    if verify_api_key(&token, &c.api_key_hash) {
-                        found = Some(c.clone());
+                        if let Some(c) = owner {
+                            found = Some(c);
+                        }
                         break;
                     }
                 }
-
-                // If not found in customers, try api_keys table
-                if found.is_none() {
-                    for (hash,) in &api_key_candidates {
-                        if verify_api_key(&token, hash) {
-                            let owner: Option<Customer> = sqlx::query_as(
-                                "SELECT c.* FROM customers c INNER JOIN api_keys ak ON ak.customer_id = c.id WHERE ak.api_key_prefix = $1 AND ak.api_key_hash = $2"
-                            )
-                            .bind(&prefix)
-                            .bind(hash)
-                            .fetch_optional(&*pool)
-                            .await?;
-                            if let Some(c) = owner {
-                                found = Some(c);
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                let customer = found.ok_or(AppError::Unauthorized)?;
-
-                // Cache the result
-                if let Ok(mut cache) = AUTH_CACHE.lock() {
-                    cache.insert(prefix, customer.clone());
-                }
-
-                customer
             }
+
+            let customer = found.ok_or(AppError::Unauthorized)?;
+
+            // Cache the result (lock acquired only for insert, not held across .await)
+            if let Ok(mut cache) = AUTH_CACHE.lock() {
+                cache.insert(prefix, customer.clone());
+            }
+
+            customer
         }
     } else {
         // JWT token authentication
