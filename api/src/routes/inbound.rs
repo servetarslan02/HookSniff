@@ -245,14 +245,44 @@ async fn handle_inbound(
         .and_then(|v| v.strip_prefix("Bearer "))
         .ok_or(AppError::BadRequest("Missing API key".into()))?;
 
-    // Find customer by API key
-    let customer = sqlx::query_as::<_, Customer>(
-        "SELECT * FROM customers WHERE api_key_prefix = $1 OR id IN (SELECT customer_id FROM api_keys WHERE key_hash = crypt($1, key_hash) AND is_active = true)",
+    // Find customer by API key (prefix-based lookup + Argon2 verification)
+    let prefix = &api_key[..20.min(api_key.len())];
+    let candidates = sqlx::query_as::<_, Customer>(
+        "SELECT * FROM customers WHERE api_key_prefix = $1",
     )
-    .bind(&api_key[..20.min(api_key.len())])
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::Unauthorized)?;
+    .bind(prefix)
+    .fetch_all(&pool)
+    .await?;
+
+    let mut customer = None;
+    for c in &candidates {
+        if crate::auth::jwt::verify_api_key(api_key, &c.api_key_hash) {
+            customer = Some(c.clone());
+            break;
+        }
+    }
+
+    // Also check api_keys table
+    if customer.is_none() {
+        let api_key_rows: Vec<(String, uuid::Uuid)> = sqlx::query_as(
+            "SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
+        )
+        .bind(prefix)
+        .fetch_all(&pool)
+        .await?;
+
+        for (hash, customer_id) in &api_key_rows {
+            if crate::auth::jwt::verify_api_key(api_key, hash) {
+                customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+                    .bind(customer_id)
+                    .fetch_optional(&pool)
+                    .await?;
+                break;
+            }
+        }
+    }
+
+    let customer = customer.ok_or(AppError::Unauthorized)?;
 
     // Find inbound config for this provider
     let config = sqlx::query_as::<_, InboundConfig>(
