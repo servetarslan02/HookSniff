@@ -133,7 +133,7 @@ export default function SettingsPage() {
       logout();
       router.push('/');
     } catch (e: unknown) {
-      alert(getErrorMessage(e));
+      toast(getErrorMessage(e), 'error');
     } finally {
       setDeletingAccount(false);
       setShowDeleteModal(false);

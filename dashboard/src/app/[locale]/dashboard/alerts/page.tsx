@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useToast } from '@/components/Toast';
 import { alertsApi, type AlertRule } from '@/lib/api';
 
 const CONDITION_LABELS: Record<string, string> = {
@@ -22,6 +23,7 @@ export default function AlertsPage() {
   const t = useTranslations('alerts');
   const tc = useTranslations('common');
   const { token } = useAuth();
+  const { toast } = useToast();
   const [alerts, setAlerts] = useState<AlertRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -80,7 +82,7 @@ export default function AlertsPage() {
   const testAlert = async (id: string) => {
     try {
       await alertsApi.test(token, id);
-      alert(t('testSent'));
+      toast(t('testSent'), 'success');
     } catch {
       // Error handled silently
     }
