@@ -118,6 +118,10 @@ impl Provider {
 // ── Signature Verification ──
 
 fn verify_stripe(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
     let sig_header = headers
         .get("stripe-signature")
         .and_then(|v| v.to_str().ok())
@@ -149,6 +153,10 @@ fn verify_stripe(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &
 }
 
 fn verify_github(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
     let sig_header = headers
         .get("x-hub-signature-256")
         .and_then(|v| v.to_str().ok())
@@ -165,6 +173,10 @@ fn verify_github(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &
 }
 
 fn verify_shopify(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
     let sig_header = headers
         .get("x-shopify-hmac-sha256")
         .and_then(|v| v.to_str().ok())

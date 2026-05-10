@@ -631,6 +631,14 @@ fn verify_webhook_signature(
     webhook_secret: &str,
     tolerance_secs: i64,
 ) -> Result<(), AppError> {
+    // Reject if webhook secret is not configured
+    if webhook_secret.is_empty() {
+        tracing::error!("Stripe webhook secret is empty — rejecting webhook to prevent billing manipulation");
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "Billing webhook secret not configured"
+        )));
+    }
+
     // 1. Parse the signature header
     let (timestamp, expected_sig_hex) = parse_stripe_signature(signature_header)?;
 
