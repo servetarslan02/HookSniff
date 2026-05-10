@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 06:54 GMT+8
+> Son güncelleme: 2026-05-11 07:08 GMT+8
 
 ---
 
@@ -20,44 +20,59 @@
 
 ## 📋 Yapılacaklar (Sıralı)
 
-### 🔴 Yüksek Öncelik — Bir Sonraki Oturum
+### 🔴 Kritik — Servet'in Yapması Gereken
 
 | # | Görev | Kim | Açıklama |
 |---|-------|-----|----------|
-| 1 | **Grafana OTEL trace debug** | AI | Auth düzeltildi (v5), endpoint doğru, direct test 200 ✅ ama API'den trace gitmiyor. Detaylı debug gerekli. |
-| 2 | **Email adreslerini sil** | AI | `@hooksniff.vercel.app` adresleri çalışmıyor (MX kaydı yok). Contact form'a çevir. |
+| 1 | **Cloud Run OTEL endpoint güncelle** | Servet | `OTEL_EXPORTER_OTLP_ENDPOINT` env var'ını Cloud Run'da `https://otlp-gateway-prod-eu-west-2.grafana.net/otlp` olarak güncelle. Deploy scriptlerinde düzeltildi ama mevcut Cloud Run revision hala eski endpoint'i kullanıyor olabilir. |
+| 2 | **OTEL headers secret kontrol** | Servet | Cloud Run'daki `hooksniff-otel-headers` secret'ının `Authorization=Basic base64(1625476:glc_...)` formatında olduğunu doğrula. |
+| 3 | **Deploy et** | Servet | `3f83bfb` commit'ini Cloud Run'a deploy et (CI/CD veya Cloud Build). |
+| 4 | **Grafana kontrol** | Servet | Deploy sonrası Grafana dashboard'da trace/metrics/logs gelip gelmediğini kontrol et. |
+
+### 🔴 Yüksek Öncelik — AI
+
+| # | Görev | Kim | Açıklama |
+|---|-------|-----|----------|
+| 5 | **Grafana OTEL doğrula** | AI | Servet deploy ettikten sonra `/health` endpoint'inden OTEL durumunu kontrol et. Boot test span'ı Grafana'da görünmeli. |
 
 ### 🟡 Orta Öncelik
 
 | # | Görev | Kim | Açıklama |
 |---|-------|-----|----------|
-| 3 | **GitHub Actions workflow'ları** | AI + Servet | Token'da `workflow` scope'u yok. Servet'ten yeni token istenecek. |
-| 4 | **Polar.sh identity verification** | Servet | Kimlik doğrulaması gerekli. Para almak için zorunlu. |
+| 6 | **GitHub Actions workflow'ları** | AI + Servet | Token'da `workflow` scope'u yok. Servet'ten yeni token istenecek. |
+| 7 | **Polar.sh identity verification** | Servet | Kimlik doğrulaması gerekli. Para almak için zorunlu. |
 
 ### 🟢 Düşük Öncelik — Lansman Sonrası
 
 | # | Görev | Kim | Açıklama |
 |---|-------|-----|----------|
-| 5 | **db.rs test (HS-085)** | AI | Gerçek PostgreSQL gerekli (Neon test DB). |
-| 6 | **SDK otomatik güncelleme (HS-090)** | AI | Lansman sonrası, detaylı araştırma gerekli. |
+| 8 | **db.rs test (HS-085)** | AI | Gerçek PostgreSQL gerekli (Neon test DB). |
+| 9 | **SDK otomatik güncelleme (HS-090)** | AI | Lansman sonrası, detaylı araştırma gerekli. |
 
 ---
 
-## 🔧 Grafana OTEL Durumu (Oturum 103)
+## 🔧 Grafana OTEL Durumu (Oturum 104)
 
-### Yapılan
+### KRİTİK BULGU
+- Deploy scriptlerinde **yanlış region** vardı: `us-east-0` → `eu-west-2` olarak düzeltildi
+- Cloud Run'daki mevcut revision hala eski endpoint'i kullanıyor olabilir
+- **Servet'in Cloud Run'dan manuel kontrol etmesi gerekiyor**
+
+### Yapılan (Oturum 103 + 104)
 - Grafana org adı `hookrelay` (hooksniff değilmiş)
 - OTLP endpoint: `https://otlp-gateway-prod-eu-west-2.grafana.net/otlp`
 - Auth format: `Authorization=Basic base64(1625476:glc_...)`
 - Yeni access policy token oluşturuldu: `hooksniff-otel`
 - Cloud Run `otel-headers` secret v5 ile güncellendi
-- Cloud Run revision 00057 deploy edildi
+- Deploy scriptleri eu-west-2'ye düzeltildi (4 dosya)
+- Boot test span eklendi (deploy sonrası Grafana'da görülecek)
+- Health endpoint'e OTEL durumu eklendi
 
-### Sonraki Adımlar
-1. API'nin OTEL exporter'ının trace gönderip göndermediğini kontrol et (silent failure olabilir)
-2. `opentelemetry-otlp` crate'inin `http-proto` feature'ı protobuf gönderir — Grafana JSON da kabul eder ama protobuf'u tercih eder
-3. Batch exporter flush sorunu olabilir — `TracerGuard` drop'ta flush eder ama Cloud Run graceful shutdown'da yeterli zaman olmayabilir
-4. Endpoint URL'inin `/v1/traces` suffix'iyle doğru oluştuğunu kontrol et
+### Sonraki Adımlar (Servet Deploy Ettikten Sonra)
+1. API'nin OTEL exporter'ının trace gönderip göndermediğini kontrol et
+2. `/health` endpoint'inden `otel` durumunu kontrol et
+3. Boot test span'ı Grafana'da ara (`otel_boot_test`)
+4. Sorun devam ederse: Cloud Run logs'da `OTEL config` ve `OTLP exporter` loglarını kontrol et
 
 ### Token Bilgileri
 - Grafana API Key: `glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f`
