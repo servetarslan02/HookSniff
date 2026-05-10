@@ -607,7 +607,7 @@ export default function StatusPage() {
             <span className="text-xl">🪝</span>
             <span className="font-bold text-gray-900 dark:text-white">HookSniff</span>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Status</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </Link>
           <div className="flex items-center gap-3">
             <button className="text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
@@ -693,7 +693,7 @@ export default function StatusPage() {
             Version {process.env.NEXT_PUBLIC_VERSION || '0.1.0'} •{' '}
             <Link href="/" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">hooksniff.vercel.app</Link>{' '}
             •{' '}
-            <Link href="/docs" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">Docs</Link>
+            <Link href="/docs" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">{t("docs")}</Link>
           </p>
           <p className="text-xs">Powered by HookSniff monitoring • Data refreshes every 30 seconds</p>
         </div>

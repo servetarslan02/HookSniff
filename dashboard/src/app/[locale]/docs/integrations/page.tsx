@@ -140,10 +140,10 @@ function normalizeEvent(provider: string, payload: any) {
           Use HookSniff's inbound proxy to receive webhooks from third-party services. The proxy:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Accepts incoming webhooks on your behalf</li>
-          <li>Validates payloads and logs delivery attempts</li>
+          <li>{t("acceptsIncoming")}</li>
+          <li>{t("validatesPayloads")}</li>
           <li>Forwards to your actual endpoint with HookSniff's signature</li>
-          <li>Provides retry logic and monitoring for inbound webhooks</li>
+          <li>{t("providesRetry")}</li>
         </ul>
       </section>
     </article>

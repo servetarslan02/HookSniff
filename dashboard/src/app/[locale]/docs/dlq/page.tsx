@@ -17,10 +17,10 @@ export default function DlqPage() {
           The DLQ is a holding area for webhook deliveries that have exhausted all retry attempts. Instead of being silently dropped, these deliveries are preserved with full context so you can:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Understand why delivery failed</li>
-          <li>Inspect the original payload and all retry attempts</li>
-          <li>Replay deliveries after fixing the issue</li>
-          <li>Audit failed deliveries for compliance</li>
+          <li>{t("understandWhy")}</li>
+          <li>{t("inspectPayload")}</li>
+          <li>{t("replayDeliveries")}</li>
+          <li>{t("auditFailed")}</li>
         </ul>
       </section>
 
@@ -32,7 +32,7 @@ export default function DlqPage() {
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>All retry attempts have been exhausted (default: 6 attempts)</li>
-          <li>The endpoint has been disabled or deleted</li>
+          <li>{t("endpointDisabled")}</li>
           <li>The delivery has been pending for too long (stale delivery timeout)</li>
         </ul>
         <p className="text-gray-600 dark:text-slate-400 mt-4">
@@ -41,7 +41,7 @@ export default function DlqPage() {
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">5xx</code> errors consistently</li>
           <li>Endpoint unreachable (DNS failure, connection timeout)</li>
-          <li>TLS certificate issues</li>
+          <li>{t("tlsIssues")}</li>
           <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">4xx</code> errors (client-side issue)</li>
         </ul>
       </section>
@@ -106,7 +106,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("plan")}</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("retention")}</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("maxDlq")}</th>
               </tr>

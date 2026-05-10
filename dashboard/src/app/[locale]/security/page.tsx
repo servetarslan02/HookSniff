@@ -37,7 +37,7 @@ export default function SecurityPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Security</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -90,8 +90,8 @@ export default function SecurityPage() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("dataAtRest")}</h3>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
                 <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>AES-256 encryption for stored data</li>
-                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>Neon PostgreSQL with encrypted volumes</li>
-                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>Upstash Redis with TLS</li>
+                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>{t("neonPostgres")}</li>
+                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>{t("upstashRedis")}</li>
                 <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>Cloudflare R2 with server-side encryption</li>
               </ul>
             </div>
@@ -99,9 +99,9 @@ export default function SecurityPage() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("dataInTransit")}</h3>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
                 <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>TLS 1.3 for all connections</li>
-                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>HSTS with preload</li>
-                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>Certificate pinning on API</li>
-                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>No HTTP fallback</li>
+                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>{t("hsts")}</li>
+                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>{t("certPinning")}</li>
+                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span>{t("noHttp")}</li>
               </ul>
             </div>
           </div>

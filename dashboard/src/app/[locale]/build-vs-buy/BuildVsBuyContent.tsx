@@ -144,13 +144,13 @@ export default function BuildVsBuyContent() {
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">vs 3–5 to build in-house</p>
           </div>
           <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 text-center">
-            <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">Days</p>
+            <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">{t("days")}</p>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t("timeToProduction")}</p>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">vs 6–12 months to build</p>
           </div>
           <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 text-center">
             <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">$29/mo</p>
-            <p className="text-sm text-gray-600 dark:text-slate-400">HookSniff Pro</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t("hooksniffPro")}</p>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">vs $300K–$1M+ to build</p>
           </div>
         </div>

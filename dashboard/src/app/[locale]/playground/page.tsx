@@ -461,7 +461,7 @@ export default function PlaygroundPage() {
 
                     {/* Headers */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Headers</h4>
+                      <h4 className="text-xs font-bold text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-wider">{t("headers")}</h4>
                       <div className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 max-h-48 overflow-y-auto">
                         <pre className="text-xs text-gray-300 dark:text-slate-400 font-mono whitespace-pre-wrap">{formatHeaders(selectedRecord.headers)}</pre>
                       </div>
@@ -469,7 +469,7 @@ export default function PlaygroundPage() {
 
                     {/* Body */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Body</h4>
+                      <h4 className="text-xs font-bold text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-wider">{t("body")}</h4>
                       <div className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto">
                         <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap">{formatBody(selectedRecord.body)}</pre>
                       </div>
@@ -872,8 +872,8 @@ func main() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 dark:border-slate-700">
-                <th className="text-left py-2 text-gray-500 dark:text-slate-500 font-medium">Feature</th>
-                <th className="text-center py-2 text-gray-500 dark:text-slate-500 font-medium">Svix Play</th>
+                <th className="text-left py-2 text-gray-500 dark:text-slate-500 font-medium">{t("feature")}</th>
+                <th className="text-center py-2 text-gray-500 dark:text-slate-500 font-medium">{t("svixPlay")}</th>
                 <th className="text-center py-2 text-gray-500 dark:text-slate-500 font-medium">HookSniff</th>
               </tr>
             </thead>
