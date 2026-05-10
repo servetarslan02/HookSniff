@@ -115,14 +115,14 @@ export default function AdminSettingsPage() {
             </button>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Default Plan</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('defaultPlan')}</label>
             <select
               value={settings.default_plan}
               onChange={(e) => update('default_plan', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
             >
-              <option value="free">Free</option>
-              <option value="pro">Pro</option>
+              <option value="free">{t('freePlan')}</option>
+              <option value="pro">{t('proPlan')}</option>
             </select>
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function AdminSettingsPage() {
             <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('freePlan')}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Max Endpoints</label>
+                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')}</label>
                 <input
                   type="number"
                   value={settings.max_endpoints_free}
@@ -177,7 +177,7 @@ export default function AdminSettingsPage() {
             <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('proPlan')}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Max Endpoints</label>
+                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')}</label>
                 <input
                   type="number"
                   value={settings.max_endpoints_pro}
@@ -221,7 +221,7 @@ export default function AdminSettingsPage() {
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Max Retry Attempts</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('maxRetryAttempts')}</label>
           <input
             type="number"
             value={settings.retry_max_attempts}

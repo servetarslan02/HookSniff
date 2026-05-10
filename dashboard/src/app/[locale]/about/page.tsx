@@ -15,7 +15,7 @@ export default function AboutPage() {
           <div className="flex items-center gap-3">
             <a href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</a>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">About</span>
+            <span className="text-gray-600 dark:text-slate-400">{t('about.title')}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -28,7 +28,7 @@ export default function AboutPage() {
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             Live & Operational
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">About HookSniff</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t('about.title')}</h1>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Reliable webhook delivery infrastructure built by developers, for developers.
           </p>
@@ -36,7 +36,7 @@ export default function AboutPage() {
 
         {/* Mission */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Our Mission</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('about.ourMission')}</h2>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-4">
             Webhooks are the backbone of modern integrations, but building reliable webhook infrastructure is hard. 
             We built HookSniff to make it simple — send webhooks, we deliver them. If they fail, we retry.
@@ -64,7 +64,7 @@ export default function AboutPage() {
 
         {/* Story */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Our Story</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('about.ourStory')}</h2>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-4">
             HookSniff started as a side project in 2026. We were tired of dealing with unreliable webhook deliveries 
             and expensive third-party services. So we built our own.
