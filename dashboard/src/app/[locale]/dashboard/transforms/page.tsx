@@ -3,18 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, type Endpoint } from '@/lib/api';
-
-interface TransformRule {
-  id: string;
-  endpoint_id: string;
-  rule_json: {
-    filter?: { include?: string[]; exclude?: string[] };
-    mappings?: { source: string; target: string }[];
-    enrich?: { fields: Record<string, unknown> };
-  };
-  created_at: string;
-}
+import { endpointsApi, transformsApi, type Endpoint, type TransformRule } from '@/lib/api';
 
 export default function TransformsPage() {
   const { token } = useAuth();
@@ -33,8 +22,6 @@ export default function TransformsPage() {
   const [enrichKey, setEnrichKey] = useState('');
   const [enrichValue, setEnrichValue] = useState('');
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-
   useEffect(() => {
     if (!token) return;
     endpointsApi.list(token).then(setEndpoints).catch(() => {});
@@ -43,12 +30,10 @@ export default function TransformsPage() {
   const loadRules = useCallback(async (endpointId: string) => {
     if (!token || !endpointId) return;
     try {
-      const res = await fetch(`${API}/endpoints/${endpointId}/transforms`, {
-        headers: {}, credentials: 'include' as const,
-      });
-      if (res.ok) setRules(await res.json());
+      const data = await transformsApi.list(token, endpointId);
+      setRules(data);
     } catch {} finally { setLoading(false); }
-  }, [token, API]);
+  }, [token]);
 
   useEffect(() => { if (selectedEndpoint) loadRules(selectedEndpoint); }, [selectedEndpoint, loadRules]);
 
@@ -62,29 +47,20 @@ export default function TransformsPage() {
     if (enrichKey && enrichValue) rule.enrich = { fields: { [enrichKey.trim()]: enrichValue.trim() } };
 
     try {
-      const res = await fetch(`${API}/endpoints/${selectedEndpoint}/transforms`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, credentials: 'include' as const,
-        body: JSON.stringify({ rule }),
-      });
-      if (res.ok) {
-        toast('Transform rule created!', 'success');
-        loadRules(selectedEndpoint);
-        setShowCreate(false);
-        setFilterInclude(''); setFilterExclude('');
-        setMapSource(''); setMapTarget('');
-        setEnrichKey(''); setEnrichValue('');
-      }
+      await transformsApi.create(token, selectedEndpoint, { rule });
+      toast('Transform rule created!', 'success');
+      loadRules(selectedEndpoint);
+      setShowCreate(false);
+      setFilterInclude(''); setFilterExclude('');
+      setMapSource(''); setMapTarget('');
+      setEnrichKey(''); setEnrichValue('');
     } catch { toast('Failed to create rule', 'error'); }
   };
 
   const handleDelete = async (ruleId: string) => {
     if (!token || !selectedEndpoint) return;
     try {
-      await fetch(`${API}/endpoints/${selectedEndpoint}/transforms/${ruleId}`, {
-        method: 'DELETE',
-        headers: {}, credentials: 'include' as const,
-      });
+      await transformsApi.delete(token, selectedEndpoint, ruleId);
       setRules(prev => prev.filter(r => r.id !== ruleId));
       toast('Rule deleted', 'info');
     } catch { toast('Failed to delete', 'error'); }
