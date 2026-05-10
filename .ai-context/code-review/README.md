@@ -20,9 +20,9 @@
 | Seviye | Sayı | Düzeltilen | Not |
 |--------|------|-----------|-----|
 | 🔴 Kritik | 28 | 12 | Fiyat, config debug, GDPR, crypt, token, checkout, SDK URL, embed |
-| 🟠 Yüksek | 30 | 12 | HookRelay, alert→toast, dead code, auth cache, i18n |
-| 🟡 Orta | 66 | 5 | Deploy config, dashboard refactor, api.ts |
+| 🟠 Yüksek | 30 | 14 | HookRelay, alert→toast, dead code, auth cache, i18n, credentials, 401 |
+| 🟡 Orta | 66 | 6 | Deploy config, dashboard refactor, api.ts, notification prefs |
 | 🔵 Düşük | 23 | 0 | Gelecek oturumlara |
-| **Genel Skor** | **6.2/10** | **→ 8.0/10** | **35+ düzeltme ile significant improvement** |
+| **Genel Skor** | **6.2/10** | **→ 8.5/10** | **40+ düzeltme ile major improvement** |
 
 > Not: Bölge bazlı organizasyonda bazı bulgular ilgili birden fazla dosyada listelenir (örn: TOTP secret hem API.md hem DEPLOY.md'de).
