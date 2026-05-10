@@ -1,57 +1,67 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 18:21 GMT+8
+> Son güncelleme: 2026-05-10 18:55 GMT+8
 
 ---
 
-## ✅ BU OTURUMDA YAPILAN (Session 72)
+## 🔴 Sıradaki Oturum: #73 — Rate Limiting
 
-### Tam Proje Denetimi
-- 5 tur, 29 agent, 30 rapor
-- ~35,000+ satır analiz
-- Tüm raporlar `.ai-context/visual-bugs/` klasöründe
+### Görev
+Auth endpoint'lerine rate limit ekle. 4 sorun tek oturumda çözülecek.
 
-### Bulgular
-- ~700+ sorun tespit edildi
-- 25+ kritik, 100+ yüksek, 200+ orta, 100+ düşük seviye
-- Master aksiyon planı: `.ai-context/ACTION-PLAN.md`
+### Düzeltilcek Sorunlar
+| ID | Sorun | Dosya |
+|----|-------|-------|
+| HS-001 | `verify_email` rate limit yok — brute force | `api/src/routes/auth.rs` |
+| HS-002 | `verify_2fa` rate limit yok — TOTP brute force | `api/src/routes/auth.rs` |
+| HS-003 | `refresh_token` rate limit yok — token stuffing | `api/src/routes/auth.rs` |
+| HS-008 | Contact form rate limit yok — spam/flood | `api/src/routes/contact.rs` |
 
----
+### Yaklaşım
+1. `api/src/rate_limit.rs` dosyasını oku — mevcut rate limit yapısını anla
+2. `verify_email` endpoint'ine rate limit middleware ekle (5 deneme/dakika)
+3. `verify_2fa` endpoint'ine rate limit middleware ekle (5 deneme/dakika)
+4. `refresh_token` endpoint'ine rate limit middleware ekle (10 deneme/dakika)
+5. `contact` form endpoint'ine rate limit middleware ekle (3 deneme/dakika)
+6. Test et
+7. GitHub'a push et
 
-## 🔴 ACİL — Sonraki Oturum Görevleri
+### Dosyalar
+- `api/src/routes/auth.rs` — verify_email, verify_2fa, refresh_token
+- `api/src/routes/contact.rs` — contact form
+- `api/src/rate_limit.rs` — mevcut rate limit modülü
 
-### 1. Dashboard Routing Düzeltmesi (EN KRİTİK)
-16 dashboard sayfası yanlış içerik gösteriyor. Next.js route'larını düzelt.
-
-### 2. Frontend-Backend API Uyumsuzluğu
-Revenue, Billing Usage, Notifications, Auth Login, Teams — format mismatch.
-
-### 3. Abonelik İptal Endpoint'i
-`DELETE /billing/subscription` endpoint'i yok, cancel butonu 405 veriyor.
-
-### 4. Dashboard'dan Hesap Silme
-`DELETE /auth/me` çağrılıyor ama endpoint `DELETE /auth/account`.
-
-### 5. Fiyat Uyumsuzluğu
-Frontend $49/$149, backend $29/$99.
-
-### 6. Kritik Delivery Index
-`deliveries(customer_id, created_at DESC)` composite index eksik.
-
-### 7. CSRF Koruması
-Frontend'de CSRF token yok.
-
-### 8. Hardcoded DB Credentials
-`fix-migrations.js` ve `run-migrations.js`'de plaintext şifre.
+### Oturum Sonunda
+- [ ] ISSUE-TRACKER.md'de HS-001, HS-002, HS-003, HS-008'i ✅ ile işaretle
+- [ ] SESSION-PLAN.md'de Oturum 73'ü ✅ ile işaretle
+- [ ] MEMORY.md'yi güncelle
+- [ ] NEXT_SESSION.md'yi güncelle (Oturum 74 planı)
+- [ ] GitHub'a push et
 
 ---
 
-## 📝 Demo Hesap Bilgileri
-- Email: demo@hooksniff.com
-- Şifre: Demo1234!
-- Plan: Free
-- Admin erişimi: Yok
+## 📋 Sıradaki 5 Oturum
 
-## 📝 API Bilgileri
-- API: hooksniff-api-1046140057667.europe-west1.run.app
-- Dashboard: https://hooksniff.vercel.app
+| # | Görev | Sorunlar |
+|---|-------|----------|
+| 73 | **Rate Limiting** | HS-001, HS-002, HS-003, HS-008 |
+| 74 | Webhook Verification & Ownership | HS-004, HS-005, HS-009, HS-038a, HS-038b |
+| 75 | Infrastructure & Security Config | HS-006, HS-007, HS-010, HS-038c |
+| 76 | Dashboard Routing (EN KRİTİK) | HS-030, HS-072, HS-075 |
+| 77 | Frontend-Backend API Uyumsuzluğu | HS-031, HS-034, HS-028, HS-029 |
+
+---
+
+## 📝 Proje Bilgileri
+
+- **Repo:** https://github.com/servetarslan02/HookSniff
+- **API:** hooksniff-api-1046140057667.europe-west1.run.app
+- **Dashboard:** https://hooksniff.vercel.app
+- **Admin:** servetarslan02@gmail.com / Alayci_165 (business, admin)
+- **Demo:** demo@hooksniff.com / Demo1234! (free, non-admin)
+
+## 📁 Tüm Raporlar
+- **ISSUE-TRACKER.md:** `.ai-context/visual-bugs/ISSUE-TRACKER.md` (103 sorun)
+- **SESSION-PLAN.md:** `.ai-context/SESSION-PLAN.md` (tüm oturum planı)
+- **ACTION-PLAN.md:** `.ai-context/visual-bugs/ACTION-PLAN.md`
+- **CONSOLIDATED-REPORT.md:** `.ai-context/visual-bugs/CONSOLIDATED-REPORT.md`
