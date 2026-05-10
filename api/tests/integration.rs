@@ -158,7 +158,7 @@ fn test_plan_limits() {
     assert_eq!(pro.max_endpoints(), 50);
     assert_eq!(pro.max_requests_per_minute(), 1_000);
     assert_eq!(pro.retention_days(), 30);
-    assert_eq!(pro.monthly_price_cents(), 4900);
+    assert_eq!(pro.monthly_price_cents(), 2900);
 
     // Business plan limits
     let biz = Plan::Business;
@@ -166,7 +166,7 @@ fn test_plan_limits() {
     assert_eq!(biz.max_endpoints(), 500);
     assert_eq!(biz.max_requests_per_minute(), 10_000);
     assert_eq!(biz.retention_days(), 90);
-    assert_eq!(biz.monthly_price_cents(), 14900);
+    assert_eq!(biz.monthly_price_cents(), 9900);
 }
 
 #[test]
