@@ -69,10 +69,10 @@ async fn create_endpoint(
 
     // SSRF protection: block internal IPs (with DNS resolution)
     if let Err(e) = crate::ssrf::validate_url(&req.url) {
-        return Err(AppError::Forbidden(format!(
-            "Internal URLs are not allowed: {}",
-            e
-        )));
+        tracing::warn!("SSRF blocked: {} — {:?}", req.url, e);
+        return Err(AppError::Forbidden(
+            "Internal URLs are not allowed".into(),
+        ));
     }
 
     // Validate custom headers if provided
@@ -200,10 +200,10 @@ async fn update_endpoint(
             ));
         }
         if let Err(e) = crate::ssrf::validate_url(url) {
-            return Err(AppError::Forbidden(format!(
-                "Internal URLs are not allowed: {}",
-                e
-            )));
+            tracing::warn!("SSRF blocked on update: {} — {:?}", url, e);
+            return Err(AppError::Forbidden(
+                "Internal URLs are not allowed".into(),
+            ));
         }
     }
 
