@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -18,9 +18,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const t = useTranslations('nav');
 
+  const locale = useLocale();
+
   // Strip locale prefix from pathname for navigation matching
-  const localePrefix = pathname.match(/^\/(tr|de|ja|pt-BR|es|fr|ko)(\/|$)/);
-  const cleanPath = localePrefix ? pathname.slice(localePrefix[1].length + 1) || '/' : pathname;
+  const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
   const navigation = [
     { name: '🚀 Get Started', href: '/get-started', icon: '🚀' },
@@ -51,13 +52,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('settings'), href: '/dashboard/settings', icon: '⚙️' },
   ];
 
-  // Helper to get locale-aware href
-  function getLocalizedHref(href: string) {
-    if (localePrefix) {
-      return `/${localePrefix[1]}${href}`;
-    }
-    return href;
-  }
+  // next-intl's Link and useRouter handle locale prefixing automatically
+  // No need for getLocalizedHref — just use paths directly
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
@@ -91,7 +87,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             return (
               <Link
                 key={item.href}
-                href={getLocalizedHref(item.href)}
+                href={item.href}
                 onClick={() => setSidebarOpen(false)}
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
@@ -107,7 +103,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           })}
           {user?.is_admin && (
             <Link
-              href={getLocalizedHref('/admin')}
+              href="/admin"
               onClick={() => setSidebarOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
             >
@@ -147,7 +143,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               {user?.email || 'User'}
             </div>
             <button
-              onClick={() => { logout(); router.push(getLocalizedHref('/login')); }}
+              onClick={() => { logout(); router.push('/login'); }}
               className="text-sm text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
             >
               {t('logout')}

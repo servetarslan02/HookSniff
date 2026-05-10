@@ -55,7 +55,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-027 | `amount_cents` INT — overflow, BIGINT olmalı | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
 | HS-028 | Search sayfasında Authorization header eksik | `frontend/agent5-middleware-shared.md` | ⬜ |
 | HS-029 | Search'de debounce yok — her tuşta API çağrısı | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
-| HS-030 | Dashboard routing çökmüş — 16 sayfa yanlış içerik | `frontend/agent1-core.md` | ⬜ |
+| HS-030 | Dashboard routing çökmüş — 16 sayfa yanlış içerik | `frontend/agent1-core.md` | ✅ 2026-05-10 |
 | HS-031 | Frontend-Backend API uyumsuzluğu (Revenue, Billing, Notifications) | `frontend/agent2-analytics-billing.md` | ⬜ |
 | HS-032 | Abonelik iptal endpoint'i yok — `DELETE /billing/subscription` → 405 | `frontend/agent2-analytics-billing.md` | ⬜ |
 | HS-033 | Hesap silme bozuk — `DELETE /auth/me` vs `DELETE /auth/account` | `frontend/agent4-settings-config.md` | ⬜ |
@@ -118,10 +118,10 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-069 | FAQ eksik — SEO featured snippets kaybı | `infra/DEEP-LANDING-CONTENT.md` | ⬜ |
 | HS-070 | `next.config.js`'de `output: 'standalone'` eksik | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
 | HS-071 | HSTS header eksik | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
-| HS-072 | `token!` non-null assertion → null token ile API çağrısı | `frontend/agent1-core.md` | ⬜ |
+| HS-072 | `token!` non-null assertion → null token ile API çağrısı | `frontend/agent1-core.md` | ❌ 2026-05-10 — `if (!token) return` guard'ı ile korunuyor |
 | HS-073 | Hardcoded `Authorization: 'Bearer YOUR_TOKEN'` | `frontend/agent3-tools.md` | ⬜ |
 | HS-074 | `health/page.tsx` token kullanmıyor — herkes erişebilir | `frontend/agent5-middleware-shared.md` | ⬜ |
-| HS-075 | `store.tsx` token her zaman `'cookie'` → anlamsız Bearer | `frontend/agent1-core.md` | ⬜ |
+| HS-075 | `store.tsx` token her zaman `'cookie'` → anlamsız Bearer | `frontend/agent1-core.md` | ❌ 2026-05-10 — Middleware `"cookie"` değerini atlıyor, kasıtlı sentinel |
 | HS-076 | `api-keys/page.tsx` credentials yanlış yerde | `frontend/agent4-settings-config.md` | ⬜ |
 
 ---
