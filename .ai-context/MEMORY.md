@@ -1569,76 +1569,52 @@ Dashboard'daki localStorage fallback'lar artık bu endpoint'lere bağlanabilir:
 - ⚠️ Build test edilemedi (Rust kurulu değil)
 - Dashboard Next.js buildпотен sorun: apiFetch response format mapping
 
-## 📝 Oturum 70 (2026-05-10 15:04 - ... GMT+8) — OpenClaw Entegrasyonu
+## 📝 Oturum 70 (2026-05-10 15:04 - 15:44 GMT+8) — Site Denetimi + Düzeltmeler
 
 ### Katılanlar
 - Servet Arslan (proje sahibi)
 - AI Asistan (OpenClaw — webchat, mimo-v2.5-pro model)
 
-### Yapılan İşler
+### Yapılan İşler (5 commit)
 
-**GitHub Hafıza Sistemi Kurulumu:**
-1. HookSniff reposu OpenClaw workspace'ine klonlandı
-2. `.ai-context/` sistemi incelendi — mevcut yapı korunuyor
-3. MEMORY.md + NEXT_SESSION.md güncelleme akışı kuruldu
-4. Otomatik GitHub push mekanizması çalıştırıldı
+**1. GitHub Hafıza Sistemi Kurulumu:**
+- HookSniff reposu OpenClaw workspace'ine klonlandı
+- `.ai-context/` sistemi incelendi, mevcut yapı korundu
+- MEMORY.md + NEXT_SESSION.md güncelleme akışı kuruldu
+- Commit: `03ddf64`
 
-**Notlar:**
-- Servet teknik bilgiye sahip değil, tüm kod işleri AI tarafından yürütülür
-- Oturumlar 1 saat sürüyor, hafıza dosyaları GitHub'da kalıcı
-- Her oturum sonunda `.ai-context/` → GitHub push yapılacak
-- Çalışma dili: Türkçe
+**2. Site Görsel Denetimi:**
+- Desktop (1440px) + Mobile (375px) tarayıcı denetimi
+- 5 sayfada 404, mobil taşma, çeviri eksiklikleri, fiyat tutarsızlığı tespit edildi
+- Commit: `8915ce3`
 
-### Site Görsel Denetimi (15:10 GMT+8)
+**3. Build Hataları Düzeltildi (4 dosya):**
+- `alerts/page.tsx` — token null check
+- `inbound/page.tsx` — InboundConfig import + API_BASE
+- `playground/page.tsx` — unused import kaldırıldı
+- `settings/page.tsx` — token null → undefined
+- Commit: `b5dab6b`
 
-**Denetlenen URL:** `https://hooksniff.vercel.app/tr`
-**Tarayıcı:** OpenClaw browser (desktop 1440px + mobile 375px)
+**4. Mobil Görsel Düzeltmeler:**
+- İstatistik kartları: text-2xl → text-lg sm:text-2xl
+- Code block: text-xs sm:text-sm + break-all
+- Footer: flex-wrap
+- Adım numaraları: z-20
+- Nav "Get Started": tNav('getStarted') + 8 dilde key eklendi
+- Commit: `b5dab6b`
 
-#### 🔴 KRİTİK — 404 Sayfalar (Çalışmayan Linkler)
-Footer ve navigasyonda link verilen 5 sayfa 404 hatası veriyor:
-- `/tr/docs` → ❌ 404
-- `/tr/dashboard` → ❌ 404
-- `/tr/about` → ❌ 404
-- `/tr/faq` → ❌ 404
-- `/tr/contact` → ❌ 404
-- **Not:** Bu sayfalar `/en/` versiyonunda da yok, genel sorun
-- **Çalışan sayfalar:** Ana sayfa ✅, Durum ✅, Şartlar ✅, Gizlilik ✅, Get Started ✅
+**5. Fiyat Tutarlılığı (12 dosya):**
+- Pro $29→$49, Business $99→$149, Free 1.000→10.000
+- ROI calculator güncellendi
+- Startups %50 indirim $14→$24
+- Commit: `77faa60`
 
-#### 🟠 MOBİL UYUMLULUK SORUNLARI (375px)
-1. **Code block taşması** — `<pre>` bloğu mobilde yatay taşma (821px genişlik, 317px alan)
-2. **İstatistik kartları taşması** — "24,891 Deliveries" vb. kartlar mobilde `text-2xl` ile taşıyor
-3. **Footer taşması** — Footer link grubu mobilde 477px vs 367px yatay taşma
-4. **Adım numaraları çakışması** — "Nasıl çalışır" bölümünde 1,2,3 numaraları ikonlarla üst üste
+### Kalan Sorunlar (Sonraki Oturum)
+- 404 sayfalar (Vercel limiti)
+- Get Started sayfası çevirisi (tamamı İngilizce)
+- Fiyat sayfası çevirisi (hardcoded text)
+- Görsel iyileştirmeler: hero kısaltma, feature kartları renklendirme, testimonials
 
-#### 🟡 ÇEVİRİ SORUNLARI
-**Ana sayfa (`/tr`):**
-- Nav "Get Started" → çevrilmemiş, "Başlayın" olmalı
-- Nav "Panel →" → kısmen çevrilmiş
-
-**Get Started sayfası (`/tr/get-started`) — NEREDEYSE TAMAMI İNGİLİZCE:**
-- H1: "Get Started with HookSniff" → "HookSniff ile Başlayın"
-- "Create your account" → "Hesabınızı oluşturun"
-- "Get your API key" → "API anahtarınızı alın"
-- "Install the SDK" → "SDK'yı kurun"
-- "Create an endpoint" → "Bir endpoint oluşturun"
-- "Send your first webhook" → "İlk webhook'unuzu gönderin"
-- "Monitor deliveries & go live" → "Teslimatları izleyin ve canlıya alın"
-- Tüm paragraflar, butonlar ("Copy", "Create Free Account →") çevrilmemiş
-
-#### 🟡 İÇERİK TUTARSIZLIĞI
-- Fiyat kartı Free plan: **1.000 webhook/ay** (ana sayfa)
-- Get Started + README: **10.000 webhook/ay**
-- Tutarlı olmalı
-
-#### 🟢 KÜÇÜK SORUNLAR
-- H1 typewriter cursor `|` karakteri metne yapışık görünüyor
-- Nav "Panel →" ve "Ücretsiz başlayın" linklerinde 4px taşma
-- Accessibility: img alt texts ✅, heading hierarchy ✅, empty buttons ✅
-
-#### DÜZELTME ÖNCELİK SIRASI
-1. 🔴 404 sayfalar — sayfaları oluştur veya linkleri kaldır
-2. 🟡 Get Started çevirisi — neredeyse tamamı İngilizce
-3. 🟡 Mobil code block taşması — responsive yap
-4. 🟡 Fiyat tutarsızlığı — 1.000 mü 10.000 mi?
-5. 🟢 Mobil istatistik kartları — font küçült
-6. 🟢 Nav "Get Started" çevirisi
+### Servet'in Tercihleri
+- Görsellik > çeviri önceliği
+- Fiyat: Free 10.000 webhook, Pro $49, Business $149
