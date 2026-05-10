@@ -26,7 +26,7 @@ export default function StartupsPage() {
 
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           {[
-            { icon: '💰', title: '50% off Pro', desc: 'Pre-Series A startups get Pro plan for $24/mo (instead of $49).' },
+            { icon: '💰', title: '50% off Pro', desc: 'Pre-Series A startups get Pro plan for $14.50/mo (instead of $29).' },
             { icon: '📈', title: 'Extended free tier', desc: '10,000 events/month on free tier.' },
             { icon: '🤝', title: 'Priority support', desc: 'Direct Slack channel with our engineering team for onboarding help.' },
           ].map((b) => (
