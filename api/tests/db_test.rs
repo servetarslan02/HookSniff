@@ -76,7 +76,7 @@ async fn create_test_delivery(pool: &PgPool, delivery_id: uuid::Uuid, endpoint_i
     customer_id
 }
 
-// ═══════════════════════════════════════════════════════════════
+
 // Test: create_pool connects and runs all migrations
 // ═══════════════════════════════════════════════════════════════
 
