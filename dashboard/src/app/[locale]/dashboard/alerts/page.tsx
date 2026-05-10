@@ -4,16 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
-
-interface AlertRule {
-  id: string;
-  name: string;
-  condition: string;
-  threshold: number;
-  channels: string[];
-  is_active: boolean;
-  created_at: string;
-}
+import { alertsApi, type AlertRule } from '@/lib/api';
 
 const CONDITION_LABELS: Record<string, string> = {
   failure_rate: 'Failure Rate >',
@@ -30,7 +21,7 @@ const CHANNEL_ICONS: Record<string, string> = {
 export default function AlertsPage() {
   const t = useTranslations('alerts');
   const tc = useTranslations('common');
-  const { } = useAuth();
+  const { token } = useAuth();
   const [alerts, setAlerts] = useState<AlertRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -43,40 +34,27 @@ export default function AlertsPage() {
     channels: ['email'] as string[],
   });
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-
   const fetchAlerts = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/alerts`, {
-        headers: {}, credentials: 'include' as const,
-      });
-      if (res.ok) setAlerts(await res.json());
-    } catch (e) {
+      const data = await alertsApi.list(token);
+      setAlerts(data);
+    } catch {
       // Error handled silently
     } finally {
       setLoading(false);
     }
-  }, [API]);
+  }, [token]);
 
   useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
 
   const createAlert = async () => {
     setCreating(true);
     try {
-      const res = await fetch(`${API}/alerts`, {
-        method: 'POST',
-        headers: {
-          credentials: 'include' as const,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(form),
-      });
-      if (res.ok) {
-        setShowCreate(false);
-        setForm({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] });
-        fetchAlerts();
-      }
-    } catch (e) {
+      await alertsApi.create(token, form);
+      setShowCreate(false);
+      setForm({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] });
+      fetchAlerts();
+    } catch {
       // Error handled silently
     } finally {
       setCreating(false);
@@ -90,12 +68,9 @@ export default function AlertsPage() {
   const confirmDeleteAlert = async () => {
     if (!deleteId) return;
     try {
-      await fetch(`${API}/alerts/${deleteId}`, {
-        method: 'DELETE',
-        headers: {}, credentials: 'include' as const,
-      });
+      await alertsApi.delete(token, deleteId);
       fetchAlerts();
-    } catch (e) {
+    } catch {
       // Error handled silently
     } finally {
       setDeleteId(null);
@@ -104,12 +79,9 @@ export default function AlertsPage() {
 
   const testAlert = async (id: string) => {
     try {
-      await fetch(`${API}/alerts/${id}/test`, {
-        method: 'POST',
-        headers: {}, credentials: 'include' as const,
-      });
+      await alertsApi.test(token, id);
       alert(t('testSent'));
-    } catch (e) {
+    } catch {
       // Error handled silently
     }
   };

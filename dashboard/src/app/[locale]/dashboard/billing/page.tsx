@@ -7,7 +7,7 @@ import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
-import { billingApi, type Invoice } from '@/lib/api';
+import { billingApi, billingApiExtended, type Invoice } from '@/lib/api';
 
 const plans = [
   {
@@ -108,24 +108,17 @@ export default function BillingPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loadingInvoices, setLoadingInvoices] = useState(true);
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-
   // Fetch real usage data
   useEffect(() => {
     if (!token) return;
-    fetch(`${API}/billing/usage`, {
-      headers: {}, credentials: 'include' as const,
-    })
-      .then((res) => res.json())
+    billingApiExtended
+      .getUsage(token)
       .then((data) => {
-        const used = data.webhooks?.used ?? 0;
-        const limit = data.webhooks?.limit ?? 10000;
+        const used = data.deliveries_used ?? 0;
+        const limit = data.deliveries_limit ?? 10000;
         setUsageCount(used);
         setUsageLimit(limit);
 
-        // Build chart data from real usage.
-        // The API returns current period only, so show this month as a single bar.
-        // When monthly history endpoints are added, expand this to multi-month.
         const now = new Date();
         const monthLabel = now.toLocaleString('en', { month: 'short' });
         setChartData([{ month: monthLabel, count: used }]);
@@ -134,7 +127,7 @@ export default function BillingPage() {
         // fallback to defaults
       })
       .finally(() => setLoadingUsage(false));
-  }, [token, API]);
+  }, [token]);
 
   // Fetch real invoice data
   useEffect(() => {
@@ -161,17 +154,13 @@ export default function BillingPage() {
     if (!token) return;
     setCancelling(true);
     try {
-      const res = await fetch(`${API}/billing/subscription`, {
-        method: 'DELETE',
-        headers: {}, credentials: 'include' as const,
+      await billingApiExtended.getSubscription(token).then(async () => {
+        // Cancel via API - using generic api client for DELETE
+        const { api } = await import('@/lib/api');
+        await api.delete('/billing/subscription', token);
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || 'Cancel failed');
-      }
       toast(t('cancelledMsg'), 'info');
       setShowCancelModal(false);
-      // Refresh page to show updated plan
       window.location.reload();
     } catch (err: unknown) {
       toast(getErrorMessage(err) || 'Cancel failed', 'error');
@@ -188,21 +177,9 @@ export default function BillingPage() {
     if (!showUpgradeModal || !token) return;
     setUpgrading(true);
     try {
-      const res = await fetch(`${API}/billing/upgrade`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          credentials: 'include' as const,
-        },
-        body: JSON.stringify({ plan: showUpgradeModal.toLowerCase() }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || 'Upgrade failed');
-      }
-      const data = await res.json();
-      if (data.checkout_url) {
-        window.location.href = data.checkout_url;
+      const result = await billingApiExtended.upgrade(token, showUpgradeModal.toLowerCase());
+      if (result.checkout_url) {
+        window.location.href = result.checkout_url;
       } else {
         toast(data.message || 'Upgrade initiated', 'success');
       }
