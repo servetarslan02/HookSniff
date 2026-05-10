@@ -96,7 +96,7 @@ export default function EndpointSettingsPage() {
     setRotating(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1'}/endpoints/${id}/rotate-secret`,
+        `${process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1')}/endpoints/${id}/rotate-secret`,
         { method: 'POST', headers: {}, credentials: 'include' as const }
       );
       if (!res.ok) throw new Error(t('toastRotationFailed'));
@@ -117,7 +117,7 @@ export default function EndpointSettingsPage() {
     setTestSending(true);
     setTestResult(null);
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
       const res = await fetch(`${API}/webhooks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
