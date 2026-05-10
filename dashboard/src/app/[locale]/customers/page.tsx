@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 /* ─── Customer Stories Data ─── */
+/* HS-067: These are illustrative usage scenarios, not real customer testimonials. */
 
 const featured = [
   {
@@ -199,7 +200,8 @@ export default function CustomersPage() {
 
         {/* Featured Stories */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">Featured stories</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">Featured stories</h2>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">Illustrative usage scenarios based on common webhook patterns.</p>
           <div className="grid md:grid-cols-2 gap-6">
             {featured.map((f) => (
               <Link key={f.slug} href={`/customers/${f.slug}`} className="group">
