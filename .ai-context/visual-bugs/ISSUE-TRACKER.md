@@ -95,11 +95,11 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-046 | 13 tablo `overflow-x-auto` olmadan — mobil taşma | `frontend/DEEP-CSS-STYLING.md` | ✅ 2026-05-10 |
 | HS-047 | `blog/[slug]` 1922 satır mega component | `frontend/DEEP-COMPONENT-LOGIC.md` | ⚠️ 2026-05-10 — Refactoring gerekli |
 | HS-048 | `dangerouslySetInnerHTML` (CSP bypass) | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 — XSS güvenli (HTML-escape var) |
-| HS-049 | Toggle accessibility — `role="switch"` eksik | `frontend/agent4-settings-config.md` | ⬜ |
-| HS-050 | Delete modal'da focus trap yok | `frontend/agent4-settings-config.md` | ⬜ |
-| HS-051 | `weeklyDigest` state local-only — API'ye gönderilmiyor | `frontend/agent4-settings-config.md` | ⬜ |
-| HS-052 | Dark mode eksik (birçok sayfa) | `frontend/DEEP-CSS-STYLING.md` | ⬜ |
-| HS-053 | Footer eksik (birçok sayfa) | `frontend/DEEP-CSS-STYLING.md` | ⬜ |
+| HS-049 | Toggle accessibility — `role="switch"` eksik | `frontend/agent4-settings-config.md` | ✅ 2026-05-10 |
+| HS-050 | Delete modal'da focus trap yok | `frontend/agent4-settings-config.md` | ✅ 2026-05-10 — Zaten mevcut |
+| HS-051 | `weeklyDigest` state local-only — API'ye gönderilmiyor | `frontend/agent4-settings-config.md` | ✅ 2026-05-10 |
+| HS-052 | Dark mode eksik (birçok sayfa) | `frontend/DEEP-CSS-STYLING.md` | ✅ 2026-05-10 |
+| HS-053 | Footer eksik (birçok sayfa) | `frontend/DEEP-CSS-STYLING.md` | ✅ 2026-05-10 |
 | HS-054 | 20+ eksik DB index — yavaş query'ler | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
 | HS-055 | `updated_at` trigger'ları eksik | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |
 | HS-056 | UNIQUE constraint'ler eksik | `backend/DEEP-DB-MIGRATIONS.md` | ⬜ |

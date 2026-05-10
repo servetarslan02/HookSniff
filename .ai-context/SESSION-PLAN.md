@@ -192,11 +192,11 @@ Her oturum şu şekilde işler:
 ### Oturum 86: Accessibility & Dark Mode
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-049 | Toggle accessibility — `role="switch"` eksik | ⬜ |
-| HS-050 | Delete modal'da focus trap yok | ⬜ |
-| HS-051 | `weeklyDigest` state local-only | ⬜ |
-| HS-052 | Dark mode eksik (birçok sayfa) | ⬜ |
-| HS-053 | Footer eksik (birçok sayfa) | ⬜ |
+| HS-049 | Toggle accessibility — `role="switch"` eksik | ✅ 2026-05-10 |
+| HS-050 | Delete modal'da focus trap yok | ✅ 2026-05-10 — Zaten mevcut |
+| HS-051 | `weeklyDigest` state local-only | ✅ 2026-05-10 |
+| HS-052 | Dark mode eksik (birçok sayfa) | ✅ 2026-05-10 — 101/104 |
+| HS-053 | Footer eksik (birçok sayfa) | ✅ 2026-05-10 — Layout'larda |
 
 ### Oturum 87: Database Indexes & Triggers
 | ID | Sorun | Durum |
@@ -270,9 +270,9 @@ Her oturum şu şekilde işler:
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
 | 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 3 | 35 |
+| 🟡 P2 | 38 | 7 | 31 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **57** | **44** |
+| **TOPLAM** | **103** | **61** | **40** |
 
 ---
 
