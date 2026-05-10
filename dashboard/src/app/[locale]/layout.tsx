@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
 });
 
-const locales = ['en', 'tr', 'de', 'ja', 'pt-BR', 'es', 'fr', 'ko'];
+const locales = ['en', 'tr'];
 
 export async function generateMetadata({
   params,
@@ -47,7 +47,7 @@ export async function generateMetadata({
       url: 'https://hooksniff.vercel.app',
       siteName: 'HookSniff',
       type: 'website',
-      locale: locale === 'pt-BR' ? 'pt_BR' : `${locale}_${locale.toUpperCase()}`,
+      locale: `${locale}_${locale.toUpperCase()}`,
       images: [
         {
           url: '/og-image.png',
@@ -70,7 +70,7 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://hooksniff.vercel.app/${locale}`,
       languages: Object.fromEntries(
-        ['en', 'tr', 'de', 'es', 'fr', 'pt-BR', 'ja', 'ko'].map((l) => [
+        ['en', 'tr'].map((l) => [
           l,
           `https://hooksniff.vercel.app/${l}`,
         ])
