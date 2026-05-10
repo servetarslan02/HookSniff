@@ -16,7 +16,7 @@ export default function AdminSystemPage() {
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const t = useTranslations('admin');
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
 
   const fetchHealth = useCallback(async () => {
     try {
