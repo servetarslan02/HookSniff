@@ -405,7 +405,6 @@ export default function PlaygroundPage() {
   useAuth();
   const { toast } = useToast();
   const t = useTranslations('playground');
-  const [_endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [method, setMethod] = useState<string>('POST');
   const [path, setPath] = useState('/webhooks');
   const [body, setBody] = useState('');
@@ -419,8 +418,6 @@ export default function PlaygroundPage() {
   const [_showAiGenerator, setShowAiGenerator] = useState(false);
 
   useEffect(() => {
-    
-    endpointsApi.list("").then(setEndpoints).catch(() => {});
     setHistory(loadHistory());
   }, []);
 
