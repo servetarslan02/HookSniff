@@ -9,7 +9,7 @@
 
 | # | Sorun | SDK | Dosya |
 |---|-------|-----|-------|
-| 1 | 11 SDK'da GCP Cloud Run URL hardcoded (proje ID `1046140057667` ifşa) | Tümü | Tüm client dosyaları |
+| 1 | 11 SDK'da GCP Cloud Run URL hardcoded (proje ID `1046140057667` ifşa) | Tümü | Tüm client dosyaları | ✅ Düzeltildi (2026-05-10) |
 
 ## 🟠 Yüksek
 
