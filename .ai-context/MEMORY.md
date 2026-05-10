@@ -33,6 +33,10 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Resend: shared domain `onboarding@resend.dev` ✅
 - Cloudflare R2: `hooksniff-storage` bucket ✅
 - Grafana OTEL: eu-west-2 ✅
+- Grafana Stack: hookrelay.grafana.net (stack ID: 1625476) ✅
+- Grafana Service Account Token: glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f
+- Grafana Contact Point: hooksniff-email → servetarslan02@gmail.com ✅
+- Grafana Alert Rules: 7 adet (4 critical, 3 warning) ✅
 - hookrelay.com ve is-a.dev KULLANILMIYOR (Servet tercihi)
 - db.rs testleri: 16/16 passed ✅
 
