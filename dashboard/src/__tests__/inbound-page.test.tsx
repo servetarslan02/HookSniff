@@ -6,6 +6,13 @@ import { render, act, fireEvent, waitFor } from '@testing-library/react';
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+const mockEndpointsList = vi.fn().mockResolvedValue([
+  { id: 'ep1', url: 'https://example.com', is_active: true, created_at: '2024-01-01' },
+]);
+const mockListConfigs = vi.fn().mockResolvedValue([]);
+const mockCreateConfig = vi.fn().mockResolvedValue({ id: 'new' });
+const mockDeleteConfig = vi.fn().mockResolvedValue({});
+
 vi.mock('next-intl', () => ({
   useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
 }));
@@ -25,9 +32,12 @@ vi.mock('@/components/Toast', () => ({
 
 vi.mock('@/lib/api', () => ({
   endpointsApi: {
-    list: vi.fn().mockResolvedValue([
-      { id: 'ep1', url: 'https://example.com', is_active: true, created_at: '2024-01-01' },
-    ]),
+    list: (...args: any[]) => mockEndpointsList(...args),
+  },
+  inboundApi: {
+    listConfigs: (...args: any[]) => mockListConfigs(...args),
+    createConfig: (...args: any[]) => mockCreateConfig(...args),
+    deleteConfig: (...args: any[]) => mockDeleteConfig(...args),
   },
 }));
 
@@ -41,12 +51,10 @@ const { default: InboundPage } = await import('@/app/[locale]/dashboard/inbound/
 describe('InboundPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockImplementation((url: string) => {
-      if (typeof url === 'string' && url.includes('/inbound/configs')) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockConfigs) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    });
+    mockEndpointsList.mockResolvedValue([
+      { id: 'ep1', url: 'https://example.com', is_active: true, created_at: '2024-01-01' },
+    ]);
+    mockListConfigs.mockResolvedValue(mockConfigs);
   });
 
   it('renders without crashing', async () => {
@@ -85,10 +93,7 @@ describe('InboundPage', () => {
 
   it('fetches configs on mount', async () => {
     await act(async () => { render(React.createElement(InboundPage)); });
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/inbound/configs'),
-      expect.anything()
-    );
+    expect(mockListConfigs).toHaveBeenCalledWith('test-token');
   });
 
   it('displays configured providers', async () => {
@@ -107,9 +112,7 @@ describe('InboundPage', () => {
   });
 
   it('shows empty state when no configs', async () => {
-    mockFetch.mockImplementation(() =>
-      Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
-    );
+    mockListConfigs.mockResolvedValueOnce([]);
     let container: HTMLElement;
     await act(async () => { container = render(React.createElement(InboundPage)).container; });
     expect(container!.textContent).toContain('Inbound Webhooks');
@@ -136,12 +139,7 @@ describe('InboundPage', () => {
   });
 
   it('creates inbound config', async () => {
-    mockFetch.mockImplementation((url: string, opts?: any) => {
-      if (opts?.method === 'POST') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'new' }) });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockConfigs) });
-    });
+    mockCreateConfig.mockResolvedValueOnce({ id: 'new' });
 
     let container: HTMLElement;
     await act(async () => { container = render(React.createElement(InboundPage)).container; });
@@ -157,9 +155,9 @@ describe('InboundPage', () => {
     const saveBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Save'));
     if (saveBtn) {
       await act(async () => { fireEvent.click(saveBtn); });
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/inbound/configs'),
-        expect.objectContaining({ method: 'POST' })
+      expect(mockCreateConfig).toHaveBeenCalledWith(
+        'test-token',
+        expect.objectContaining({ provider: 'stripe' })
       );
     }
   });
@@ -186,14 +184,16 @@ describe('InboundPage', () => {
   });
 
   it('handles fetch error gracefully', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    mockListConfigs.mockRejectedValueOnce(new Error('Network error'));
+    mockEndpointsList.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => { container = render(React.createElement(InboundPage)).container; });
     expect(container!.textContent).toContain('Inbound Webhooks');
   });
 
   it('shows loading state initially', async () => {
-    mockFetch.mockReturnValue(new Promise(() => {}));
+    mockListConfigs.mockReturnValue(new Promise(() => {}));
+    mockEndpointsList.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => { container = render(React.createElement(InboundPage)).container; });
     expect(container!.textContent).toContain('Inbound Webhooks');

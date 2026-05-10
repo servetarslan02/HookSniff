@@ -6,8 +6,10 @@ import { render, act } from '@testing-library/react';
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+const mockTAdmin = (key: string) => `admin.${key}`;
+const mockTCommon = (key: string) => `common.${key}`;
 vi.mock('next-intl', () => ({
-  useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
+  useTranslations: (ns?: string) => ns === 'common' ? mockTCommon : mockTAdmin,
 }));
 
 vi.mock('@/i18n/navigation', () => ({
