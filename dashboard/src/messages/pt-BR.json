@@ -624,7 +624,8 @@
       "pricing": "Preços",
       "docs": "Documentação",
       "status": "Status",
-      "dashboard": "Painel →"
+      "dashboard": "Painel →",
+      "getStarted": "Começar"
     },
     "hero": {
       "uptime": "99,99% de disponibilidade",

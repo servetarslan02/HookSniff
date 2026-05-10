@@ -624,7 +624,8 @@
       "pricing": "가격",
       "docs": "문서",
       "status": "상태",
-      "dashboard": "대시보드 →"
+      "dashboard": "대시보드 →",
+      "getStarted": "시작하기"
     },
     "hero": {
       "uptime": "99.99% 배송 가동률",
