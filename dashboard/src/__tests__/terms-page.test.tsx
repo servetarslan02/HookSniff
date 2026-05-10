@@ -89,7 +89,7 @@ describe('TermsPage', () => {
   it('renders contact section', () => {
     const { container } = render(React.createElement(TermsPage));
     expect(container.textContent).toContain('16. Contact');
-    expect(container.textContent).toContain('legal@hooksniff.vercel.app');
+    expect(container.textContent).toContain('contact form');
   });
 
   it('renders all 16 terms sections', () => {

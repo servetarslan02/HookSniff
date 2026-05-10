@@ -45,9 +45,9 @@ describe('ContactPage', () => {
     expect(container.textContent).toContain('Have a question or need help?');
   });
 
-  it('renders email link', () => {
+  it('renders contact info', () => {
     const { container } = render(React.createElement(ContactPage));
-    expect(container.textContent).toContain('support@hooksniff.vercel.app');
+    expect(container.textContent).toContain('Use the form below');
   });
 
   it('renders contact form with inputs', () => {
