@@ -243,7 +243,7 @@ function HistoryPanel({
   return (
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Request History</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('requestHistory')}</h3>
         <button
           onClick={onClear}
           className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 transition"

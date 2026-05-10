@@ -64,7 +64,7 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Overview</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
           Platform-wide metrics and recent activity
         </p>
