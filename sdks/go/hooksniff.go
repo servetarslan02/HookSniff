@@ -27,6 +27,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -83,6 +84,7 @@ type Client struct {
 	BaseURL    string
 	APIKey     string
 	HTTPClient *http.Client
+	MaxRetries int // Maximum retries for transient failures (5xx, 429, network errors). Defaults to 3.
 
 	Endpoints *EndpointsService
 	Webhooks  *WebhooksService
@@ -94,6 +96,7 @@ func New(apiKey string) *Client {
 		BaseURL:    defaultBaseURL,
 		APIKey:     apiKey,
 		HTTPClient: &http.Client{Timeout: 30 * time.Second},
+		MaxRetries: 3,
 	}
 	c.Endpoints = &EndpointsService{client: c}
 	c.Webhooks = &WebhooksService{client: c}
@@ -645,53 +648,112 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"received":true}`))
 }
 
+func isRetryableStatus(statusCode int) bool {
+	return statusCode == 429 || statusCode >= 500
+}
+
 func (c *Client) do(ctx context.Context, method, path string, body interface{}, result interface{}) error {
 	fullURL := c.BaseURL + path
+	maxRetries := c.MaxRetries
+	if maxRetries <= 0 {
+		maxRetries = 3
+	}
 
-	var bodyReader io.Reader
-	if body != nil {
-		jsonBody, err := json.Marshal(body)
+	var lastErr error
+
+	for attempt := 0; attempt <= maxRetries; attempt++ {
+		var bodyReader io.Reader
+		if body != nil {
+			jsonBody, err := json.Marshal(body)
+			if err != nil {
+				return fmt.Errorf("marshal request: %w", err)
+			}
+			bodyReader = bytes.NewReader(jsonBody)
+		}
+
+		req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
 		if err != nil {
-			return fmt.Errorf("marshal request: %w", err)
+			return fmt.Errorf("create request: %w", err)
 		}
-		bodyReader = bytes.NewReader(jsonBody)
-	}
 
-	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
-	if err != nil {
-		return fmt.Errorf("create request: %w", err)
-	}
+		req.Header.Set("Authorization", "Bearer "+c.APIKey)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("User-Agent", userAgent)
 
-	req.Header.Set("Authorization", "Bearer "+c.APIKey)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", userAgent)
-
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 400 {
-		var errResp struct {
-			Error struct {
-				Code    string `json:"code"`
-				Message string `json:"message"`
-			} `json:"error"`
+		resp, err := c.HTTPClient.Do(req)
+		if err != nil {
+			// Network errors — retry if we have attempts left
+			if attempt < maxRetries {
+				lastErr = err
+				baseDelay := time.Duration(1<<uint(attempt)) * time.Second
+				jitter := time.Duration(rand.Int63n(int64(baseDelay) / 2))
+				time.Sleep(baseDelay + jitter)
+				continue
+			}
+			return fmt.Errorf("execute request: %w", err)
 		}
-		json.NewDecoder(resp.Body).Decode(&errResp)
-		return &APIError{
-			StatusCode: resp.StatusCode,
-			Code:       errResp.Error.Code,
-			Message:    errResp.Error.Message,
+
+		// Read the full body so we can retry if needed
+		bodyBytes, readErr := io.ReadAll(resp.Body)
+		resp.Body.Close()
+
+		if readErr != nil {
+			if attempt < maxRetries {
+				lastErr = readErr
+				baseDelay := time.Duration(1<<uint(attempt)) * time.Second
+				jitter := time.Duration(rand.Int63n(int64(baseDelay) / 2))
+				time.Sleep(baseDelay + jitter)
+				continue
+			}
+			return fmt.Errorf("read response body: %w", readErr)
 		}
+
+		if resp.StatusCode >= 400 {
+			var errResp struct {
+				Error struct {
+					Code    string `json:"code"`
+					Message string `json:"message"`
+				} `json:"error"`
+			}
+			json.Unmarshal(bodyBytes, &errResp)
+
+			apiErr := &APIError{
+				StatusCode: resp.StatusCode,
+				Code:       errResp.Error.Code,
+				Message:    errResp.Error.Message,
+			}
+
+			// Check if we should retry
+			if isRetryableStatus(resp.StatusCode) && attempt < maxRetries {
+				// For 429, respect Retry-After header
+				if resp.StatusCode == 429 {
+					if retryAfter := resp.Header.Get("Retry-After"); retryAfter != "" {
+						if seconds, err := strconv.Atoi(retryAfter); err == nil {
+							time.Sleep(time.Duration(seconds) * time.Second)
+							continue
+						}
+					}
+				}
+				baseDelay := time.Duration(1<<uint(attempt)) * time.Second
+				jitter := time.Duration(rand.Int63n(int64(baseDelay) / 2))
+				time.Sleep(baseDelay + jitter)
+				continue
+			}
+
+			return apiErr
+		}
+
+		if result != nil {
+			if err := json.Unmarshal(bodyBytes, result); err != nil {
+				return fmt.Errorf("decode response: %w", err)
+			}
+		}
+
+		return nil
 	}
 
-	if result != nil {
-		if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-			return fmt.Errorf("decode response: %w", err)
-		}
+	if lastErr != nil {
+		return fmt.Errorf("request failed after %d retries: %w", maxRetries, lastErr)
 	}
-
-	return nil
+	return fmt.Errorf("request failed after %d retries", maxRetries)
 }
