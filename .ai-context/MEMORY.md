@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 15:36 GMT+8
+> Son güncelleme: 2026-05-10 15:48 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -1611,7 +1611,6 @@ Dashboard'daki localStorage fallback'lar artık bu endpoint'lere bağlanabilir:
 
 ### Kalan Sorunlar (Sonraki Oturum)
 - 404 sayfalar (Vercel limiti)
-- Get Started sayfası çevirisi (tamamı İngilizce)
 - Fiyat sayfası çevirisi (hardcoded text)
 - Görsel iyileştirmeler: hero kısaltma, feature kartları renklendirme, testimonials
 
