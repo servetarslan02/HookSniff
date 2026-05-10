@@ -240,9 +240,9 @@ describe('ContactPage — Extended Coverage', () => {
   });
 
   // === Contact info ===
-  it('renders email address', () => {
+  it('renders contact info', () => {
     const { container } = render(React.createElement(ContactPage));
-    expect(container.textContent).toContain('support@hooksniff.vercel.app');
+    expect(container.textContent).toContain('Use the form below');
   });
 
   it('renders Turkey location', () => {
