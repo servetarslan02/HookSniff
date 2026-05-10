@@ -84,7 +84,7 @@ async fn list_providers() -> Json<serde_json::Value> {
 /// GET /oauth/google — Redirect to Google OAuth consent screen
 async fn google_login(Extension(_cfg): Extension<Config>) -> Result<impl axum::response::IntoResponse, AppError> {
     let client_id = std::env::var("GOOGLE_CLIENT_ID").map_err(|_| {
-        AppError::BadRequest("Google OAuth not configured. Set GOOGLE_CLIENT_ID.".into())
+        AppError::BadRequest("Google OAuth not configured".into())
     })?;
 
     let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
@@ -182,7 +182,7 @@ async fn google_callback(
 /// GET /oauth/github — Redirect to GitHub OAuth consent screen
 async fn github_login() -> Result<impl axum::response::IntoResponse, AppError> {
     let client_id = std::env::var("GITHUB_CLIENT_ID").map_err(|_| {
-        AppError::BadRequest("GitHub OAuth not configured. Set GITHUB_CLIENT_ID.".into())
+        AppError::BadRequest("GitHub OAuth not configured".into())
     })?;
 
     let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
