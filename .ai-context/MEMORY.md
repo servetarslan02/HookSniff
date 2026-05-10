@@ -239,3 +239,18 @@
    - `handle_contact` → 3/dakika/IP (HS-008)
 2. Dosyalar: `api/src/routes/auth.rs`, `api/src/routes/contact.rs`
 3. Oturum planı oluşturuldu: `.ai-context/SESSION-PLAN.md` (103 sorun, 22 oturum)
+
+## 📝 Oturum 91 (2026-05-10 22:08 - 22:23 GMT+8) ✅
+1. Config & Build: HS-070, HS-071 zaten tamamlanmış (Oturum 83)
+2. Yeni düzeltmeler: HS-019, HS-020, HS-021
+3. 9 dosya, 1 commit (5d44407)
+4. HS-019: WebSocket max_connections=1000, graceful reject (1013 Try Again Later)
+5. HS-020: Circuit breaker worker delivery loop'a entegre edildi (5 failure → 60s cooldown)
+6. HS-021: Billing webhook idempotency — Stripe event ID, Polar/iyzico body ID check
+7. Migration 004: provider_event_id column + unique index
+8. ISSUE-TRACKER güncellendi (session 82-91 completions)
+9. HS-038f (timing attack) zaten Oturum 82'de yapılmış
+
+## Oturum 92+ için kalan P1:
+- HS-022: Throttle state in-memory (restart'ta kaybolur)
+- HS-023: FIFO modülü worker'a bağlanmamış
