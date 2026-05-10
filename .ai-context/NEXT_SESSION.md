@@ -8,11 +8,11 @@
 
 Bazı servislerde ayar yapmak için **Servet'in Google hesabıyla oturum açması gerekiyor.** Oturum başında bunları iste:
 
-1. **Vercel** — Analytics/Speed Insights toggle, Data Preferences
-2. **Resend** — Delivery webhook URL ayarı
-3. **Neon DB** — Backup schedule settings
+1. **Vercel** ✅ Yapıldı — Web Analytics aktif (Hobby plan, 50K events/ay), Speed Insights kod eklendi
+2. **Resend** — Opsiyonel, Gmail çalışıyorsa gerek yok
+3. **Neon DB** — Backup script hazır, DATABASE_URL ile cron kurulabilir
 4. **Grafana** ✅ Yapıldı — hookrelay.grafana.net, 7 alert rule + email contact point kuruldu
-5. **Polar.sh** — Go Live kontrol, checkout link'leri
+5. **Polar.sh** ✅ Yapıldı — Checkout link (Pro, 1 ay free trial): https://buy.polar.sh/polar_cl_jtWjcvyy0m6ZOuOkEIa7i0agQmlpfJGsNwTJU4LNG8U
 
 **Nasıl çalışır:** Servet Chrome'da bu servislere giriş yapar → OpenClaw Browser Relay ile oturumu devralır → Ayarları yapar.
 
