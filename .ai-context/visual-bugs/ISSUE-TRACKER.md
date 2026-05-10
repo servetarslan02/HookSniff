@@ -91,10 +91,10 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-042 | Status count'lar sadece mevcut sayfadan hesaplanıyor | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
 | HS-043 | 63 useEffect'ten %75'inde cleanup eksik — memory leak | `frontend/DEEP-COMPONENT-LOGIC.md` | ⚠️ 2026-05-10 — Kritikler düzeltildi, kalanlar P2 |
 | HS-044 | Stale closure riskleri (4 useEffect) | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
-| HS-045 | `lucide-react` hiç kullanılmıyor (~150KB wasted) | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
-| HS-046 | 13 tablo `overflow-x-auto` olmadan — mobil taşma | `frontend/DEEP-CSS-STYLING.md` | ⬜ |
-| HS-047 | `blog/[slug]` 1922 satır mega component | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
-| HS-048 | `dangerouslySetInnerHTML` (CSP bypass) | `frontend/DEEP-COMPONENT-LOGIC.md` | ⬜ |
+| HS-045 | `lucide-react` hiç kullanılmıyor (~150KB wasted) | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 |
+| HS-046 | 13 tablo `overflow-x-auto` olmadan — mobil taşma | `frontend/DEEP-CSS-STYLING.md` | ✅ 2026-05-10 |
+| HS-047 | `blog/[slug]` 1922 satır mega component | `frontend/DEEP-COMPONENT-LOGIC.md` | ⚠️ 2026-05-10 — Refactoring gerekli |
+| HS-048 | `dangerouslySetInnerHTML` (CSP bypass) | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 — XSS güvenli (HTML-escape var) |
 | HS-049 | Toggle accessibility — `role="switch"` eksik | `frontend/agent4-settings-config.md` | ⬜ |
 | HS-050 | Delete modal'da focus trap yok | `frontend/agent4-settings-config.md` | ⬜ |
 | HS-051 | `weeklyDigest` state local-only — API'ye gönderilmiyor | `frontend/agent4-settings-config.md` | ⬜ |
