@@ -16,6 +16,7 @@
 - **Rust compile + test zorunlu** — gözle bakarak yetmez
 - **npm install çalıştır** — yarım iş bırakma
 - **Conventional commits** — "Oturum XX:" değil, "fix:", "feat:", "docs:" kullan
+- **Git email** — `servetarslan02@users.noreply.github.com` kullan (Vercel `ai@hooksniff.dev`'i blokluyor)
 - **⚠️ External servis ayarları için Servet'ten giriş bilgileri iste** — Vercel, Resend, Neon, Grafana, Polar.sh dashboard'ları Google hesabı gerektirir
 
 ## Hesap Bilgileri
