@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 15:31 GMT+8
+> Son güncelleme: 2026-05-10 15:36 GMT+8
 
 ---
 
@@ -32,6 +32,13 @@
 9. Nav "Get Started" — tNav('getStarted') + 8 dilde key eklendi
 - GitHub push — `b5dab6b`
 
+### Fiyat Tutarlılık Düzeltmesi (12 dosya)
+10. Tüm sayfalarda Pro $29→$49, Business $99→$149
+11. Free tier 1,000→10,000 webhook (alternatives, compare sayfaları)
+12. ROI calculator güncellendi
+13. Startups %50 indirim $14→$24
+- GitHub push — `77faa60`
+
 ---
 
 ## 🔴 ACİL — Sonraki Oturum Görevleri
@@ -46,6 +53,9 @@ Footer'da link verilen 5 sayfa 404 dönüyor — build'den kaynaklanıyor olabil
 
 ### 2. Get Started Çevirisi (Orta)
 `/tr/get-started` sayfası neredeyse tamamen İngilizce
+
+### 3. Fiyat Sayfası Çeviri (Orta)
+`/pricing` sayfası İngilizce (hardcoded text, translation keys değil)
 
 ---
 
