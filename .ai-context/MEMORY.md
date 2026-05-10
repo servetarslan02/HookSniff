@@ -62,3 +62,58 @@
 - HS-078: Dependabot PR'lar (major bump, tek tek test gerekir)
 - HS-065: 920+ hardcoded string (büyük iş)
 - HS-081-089: SDK/test coverage (P3)
+
+## 🔧 Zorunlu Kurulumlar ve Testler
+
+### Her Yeni Oturumda Kurulu Olması Gereken Programlar
+1. **Rust toolchain** — `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`
+2. **Node.js + npm** — zaten kurulu olmalı
+3. **Git** — zaten kurulu olmalı
+
+### Kurulum Kontrol Komutları
+```bash
+# Rust
+source "$HOME/.cargo/env" && rustc --version && cargo --version
+
+# Node
+node --version && npm --version
+
+# Git
+git --version
+```
+
+### Her Değişiklik Sonrası Zorunlu Testler
+```bash
+# 1. Rust compile
+cargo check -p hooksniff-worker
+cargo check -p hooksniff-api
+
+# 2. Rust tests
+cargo test -p hooksniff-worker
+cargo test -p hooksniff-api
+
+# 3. Frontend lint + typecheck
+cd dashboard && npm run lint && npx tsc --noEmit
+
+# 4. Git push
+git add -A && git commit -m "type: message" && git pull --rebase origin main && git push origin main
+```
+
+### Hafıza Dosyaları Güncelleme
+```bash
+# Her oturum sonunda
+cat >> .ai-context/MEMORY.md << 'MEMEOF'
+## 📝 Oturum XX (tarih) ✅
+- Yapılan işler
+- Sonuçlar
+MEMEOF
+
+# NEXT_SESSION.md güncelle
+# git add -A && git commit && git push
+```
+
+### Erteleme Kuralı
+- ❌ "Daha sonra yaparız" YASAK
+- ❌ "Bu riskli, dokunmayalım" YASAK (önce araştır, sonra karar ver)
+- ✅ Yapılabilen hemen yapılır
+- ✅ Büyük işler bile olsa başla, parça parça ilerle

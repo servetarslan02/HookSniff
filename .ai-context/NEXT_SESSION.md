@@ -78,3 +78,26 @@ dependabot/npm_and_yarn/dashboard/tailwindcss-4.2.4
 | 🟡 P2 | 38 | 21 | 17 |
 | 🟢 P3 | 13 | 1 | 12 |
 | **TOPLAM** | **103** | **81** | **22** |
+
+---
+
+## 🔧 Zorunlu Kurallar (Her Oturum)
+
+### Kurulum Kontrolü
+```bash
+source "$HOME/.cargo/env" && rustc --version && cargo --version
+node --version && npm --version
+```
+Eğer Rust yoksa kur: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`
+
+### Her Değişiklik Sonrası Zorunlu
+1. `cargo check` (compile)
+2. `cargo test` (testler)
+3. `npm run lint` (frontend)
+4. `npx tsc --noEmit` (TypeScript)
+5. `git push` (GitHub)
+
+### Erteleme YASAK
+- "Daha sonra yaparız" → ❌ Hemen yap
+- "Riskli dokunmayalım" → ❌ Araştır, test et, yap
+- "Büyük iş" → ❌ Parçala, başla
