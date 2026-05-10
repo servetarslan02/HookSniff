@@ -630,7 +630,7 @@ async fn process_pending(
                     "#,
                 )
                 .bind(delivery_id)
-                .bind(&format!("{} (HTTP {}, non-retryable)", error_msg, status_code))
+                .bind(format!("{} (HTTP {}, non-retryable)", error_msg, status_code))
                 .bind(attempt)
                 .execute(&mut *tx)
                 .await?;
@@ -639,7 +639,7 @@ async fn process_pending(
                     "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
                 )
                 .bind(delivery_id)
-                .bind(&format!("{} (HTTP {})", error_msg, status_code))
+                .bind(format!("{} (HTTP {})", error_msg, status_code))
                 .execute(&mut *tx)
                 .await?;
 
