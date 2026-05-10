@@ -275,9 +275,17 @@ Her oturum şu şekilde işler:
 - `handle_contact` → 3 deneme/dakika/IP
 - Dosyalar: `api/src/routes/auth.rs`, `api/src/routes/contact.rs`
 
-### Oturum 74 — [TARIH]
-**Durum:** ⬜ Bekliyor
+### Oturum 74 — 2026-05-10
+**Durum:** ✅ Tamamlandı
 **Görev:** Webhook Verification & Ownership (HS-004, HS-005, HS-009, HS-038a, HS-038b)
+**Yapılan:**
+- `inbound.rs`: Boş secret ile webhook reddedilir (403)
+- `inbound.rs`: `handle_inbound_to_endpoint` — Argon2 hash doğrulaması eklendi
+- `inbound.rs`: Prefix uzunluğu 20→15 karakter düzeltildi
+- `billing.rs`: Stripe webhook secret boşsa request reddedilir
+- `schemas.rs`: `get_schema` ve `validate_event` — ownership check eklendi
+- `verify_generic`: Boş secret artık `Ok(())` dönmüyor
+- Dosyalar: `api/src/routes/inbound.rs`, `api/src/routes/billing.rs`, `api/src/routes/schemas.rs`
 
 ### Oturum 75 — [TARIH]
 **Durum:** ⬜ Bekliyor
