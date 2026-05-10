@@ -88,12 +88,12 @@ pub async fn store_idempotency(
 }
 
 /// Compute a hash of the request body for idempotency validation.
+/// Uses SHA-256 for cryptographic security (prevents hash collisions).
 pub fn compute_body_hash(body: &serde_json::Value) -> String {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-    let mut hasher = DefaultHasher::new();
-    body.to_string().hash(&mut hasher);
-    format!("{:016x}", hasher.finish())
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    hasher.update(body.to_string().as_bytes());
+    hex::encode(hasher.finalize())
 }
 
 // ── Replay Protection ──────────────────────────────────────────────────
@@ -374,10 +374,10 @@ mod tests {
     }
 
     #[test]
-    fn test_compute_body_hash_is_16_hex() {
+    fn test_compute_body_hash_is_64_hex() {
         let body = serde_json::json!({"test": true});
         let hash = compute_body_hash(&body);
-        assert_eq!(hash.len(), 16);
+        assert_eq!(hash.len(), 64); // SHA-256 = 32 bytes = 64 hex chars
         assert!(hash.chars().all(|c| c.is_ascii_hexdigit()));
     }
 
@@ -385,7 +385,7 @@ mod tests {
     fn test_compute_body_hash_empty_object() {
         let body = serde_json::json!({});
         let hash = compute_body_hash(&body);
-        assert_eq!(hash.len(), 16);
+        assert_eq!(hash.len(), 64); // SHA-256 = 32 bytes = 64 hex chars
     }
 
     // ── DEFAULT_TIMESTAMP_TOLERANCE_SECS ──────────────────────
