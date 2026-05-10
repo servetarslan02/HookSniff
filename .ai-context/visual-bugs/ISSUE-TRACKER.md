@@ -70,12 +70,12 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-038d | `custom_domains` dig/nslookup subprocess — command injection riski | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — Domain sanitize edilmiş (sadece lowercase, digit, hyphen, dot) |
 | HS-038e | Dynamic SQL construction (events, admin) — `format!` ile WHERE clause | `backend/DEEP-RUST-API.md` | ❌ 2026-05-10 — `format!` sadece bind index (`$1`), user input parametrize edilmiş |
 | HS-038f | Timing attack — login hataları farklı mesajlar döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-038g | `AppError::Serialization` serde_json hata mesajını kullanıcıya gösteriyor | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-038h | Email enumeration — register "Email already registered" döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-038i | Auth cache `std::sync::Mutex` — async context'te deadlock riski | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-038j | `rate_limit.rs` unwrap() — header parse failure'da panic | `backend/DEEP-RUST-API.md` | ⬜ |
-| HS-038k | Alert condition string validation eksik — whitelist yok | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
-| HS-038l | Polar/iyzico webhook error message'da internal config sızıntısı | `backend/DEEP-API-ENDPOINTS.md` | ⬜ |
+| HS-038g | `AppError::Serialization` serde_json hata mesajını kullanıcıya gösteriyor | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
+| HS-038h | Email enumeration — register "Email already registered" döndürüyor | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
+| HS-038i | Auth cache `std::sync::Mutex` — async context'te deadlock riski | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
+| HS-038j | `rate_limit.rs` unwrap() — header parse failure'da panic | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
+| HS-038k | Alert condition string validation eksik — whitelist yok | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
+| HS-038l | Polar/iyzico webhook error message'da internal config sızıntısı | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-038m | `next.config.js` output:standalone eksik — Docker build başarısız | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
 | HS-038n | DATABASE_URL local credentials git history'de | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
 
