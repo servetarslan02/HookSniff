@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-10 05:02 GMT+8
+> Son güncelleme: 2026-05-10 09:35 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -210,6 +210,7 @@ cd dashboard && npm install && npm run build
 
 | # | Tarih | Konu |
 |---|-------|------|
+| 69 | 2026-05-10 08:51 | **NEXT_SESSION fix oturumu** — 9/9 fix (SSO AES-GCM, batch race condition, worker concurrency, CSRF, focus trapping, token refresh, blog sort, JSON-LD, aria-label) |
 | 68 | 2026-05-10 08:00 | **Kod incelemesi mega-oturum** — 30+ fix (fiyat, config debug, GDPR, inbound crypt, teams token, HookRelay, i18n, auth cache, dashboard refactor) |
 | 67 | 2026-05-10 07:49 | **Güvenlik düzeltmeleri** — OAuth CSRF, refresh token, XSS, Redis TLS, domain validation, IP spoofing |
 | 44 | 2026-05-10 01:20 | **Strateji raporları** — EMAIL_MARKETING + CONTENT_MARKETING (2 rapor, Öncelik 2 tamamlandı 5/5, toplam 10/19) |
