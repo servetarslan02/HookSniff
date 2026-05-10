@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 02:40 GMT+8
+> Son güncelleme: 2026-05-11 02:55 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -103,6 +103,16 @@
 - **Issue tracker:** HS-077/078/079/081/083/086/087 çözüldü (96/103)
 - **Commits:** `e753a03`→`eee1de6` (8 push)
 - **Kalan 7:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
+
+## Oturum 98 (2026-05-11 02:42 - 02:55) ✅
+- **HS-065: i18n kampanyası** — 16 dashboard sayfası useTranslations'a çevrildi
+- **Tüm 32 dashboard sayfası** artık next-intl useTranslations kullanıyor
+- **4 yeni i18n section:** webhookBuilder, apiImporter, portalCustomize, retryPolicy
+- **400+ yeni çeviri anahtarı** en.json ve tr.json'a eklendi
+- **3 paralel subagent** + main agent eşzamanlı çalıştı
+- **TypeScript:** 0 hata, **Build:** başarılı
+- **Commit:** `b72b799` — main branch
+- **Kalan 2 sorun:** HS-085 (db.rs test), HS-090 (SDK otomatik güncelleme)
 
 ## Oturum 97 (2026-05-11 01:58 - 02:40) ✅
 - **HS-088: AuthGuard component test** — 16 test yazıldı
