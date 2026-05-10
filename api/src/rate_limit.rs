@@ -428,9 +428,11 @@ pub async fn rate_limit_middleware(
     let result = limiter.check_with_headers(&key, plan_limit).await;
 
     // HS-038j: Use safe header insertion — skip if value is invalid instead of panicking.
-    fn insert_header(headers: &mut axum::http::HeaderMap, name: &str, value: &str) {
+    fn insert_header(headers: &mut axum::http::HeaderMap, name: &'static str, value: &str) {
         if let Ok(val) = value.parse() {
-            headers.insert(name, val);
+            if let Ok(header_name) = name.parse::<axum::http::HeaderName>() {
+                headers.insert(header_name, val);
+            }
         }
     }
 
