@@ -27,7 +27,7 @@ export default function SdksPage() {
 import os
 
 # Initialize the client
-client = hooksniff.Client(api_key=os.environ["HOOKRELAY_KEY"])
+client = hooksniff.Client(api_key=os.environ["HOOKSNIFF_API_KEY"])
 
 # Create an endpoint
 endpoint = client.endpoints.create(
@@ -108,7 +108,7 @@ except hooksniff.HookSniffError as e:
         <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto mb-6">
 {`import { HookSniff } from '@hooksniff/sdk';
 
-const hr = new HookSniff({ apiKey: process.env.HOOKRELAY_KEY! });
+const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
 
 // Create an endpoint
 const endpoint = await hr.endpoints.create({

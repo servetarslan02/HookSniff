@@ -67,10 +67,16 @@
 | prometheus | 0.14 | ✅ en güncel |
 
 ## Ertelemeye Devam Edenler
-- HS-065: 920+ hardcoded string (büyük iş)
+- HS-065: 920+ hardcoded string (büyük iş) — fiyatlandırma i18n ile birlikte yapılacak
+- HS-084: iyzico iptal — Polar.sh devam, kod pasif kalsın, şirketleşince aktif edilir
 - HS-090: SDK otomatik güncelleme sistemi (detaylı araştırma gerekli, lansman sonrası)
 - tracing-opentelemetry vendor patch kaldırma (upstream 0.33 çıkınca)
 - Dependabot major PR'ları: TypeScript 6, Tailwind 4, Recharts 3, Next.js 16 (dikkatli olunmalı)
+
+## Fiyatlandırma Kararı (Oturum 97)
+- Avrupa: USD ($29/$99), Türkiye: ₺ (₺149/₺449) — Polar.sh multi-currency
+- iyzico pasif kalacak, kod silinmeyecek
+- Fiyat gösterimi i18n ile birlikte yapılacak (HS-065 kapsamında)
 
 ## Oturum 95 (2026-05-11 00:00 - 00:20) ✅
 - **4 major dependency güncellendi:**
