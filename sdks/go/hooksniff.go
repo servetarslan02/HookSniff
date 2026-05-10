@@ -494,7 +494,7 @@ type WebhookEvent struct {
 
 // VerifyHTTPRequest reads and verifies a webhook HTTP request.
 // It supports both Standard Webhooks headers (webhook-id, webhook-timestamp,
-// webhook-signature) and legacy headers (X-Hookrelay-Signature).
+// webhook-signature) and legacy headers (X-Hooksniff-Signature).
 //
 // For Standard Webhooks, it returns a fully populated WebhookEvent.
 // For legacy headers, only Data and RawBody are populated.
@@ -557,8 +557,8 @@ func VerifyHTTPRequest(r *http.Request, secret string) (*WebhookEvent, error) {
 		return event, nil
 	}
 
-	// Legacy path: X-Hookrelay-Signature
-	legacySig := r.Header.Get("X-Hookrelay-Signature")
+	// Legacy path: X-Hooksniff-Signature
+	legacySig := r.Header.Get("X-Hooksniff-Signature")
 	if legacySig == "" {
 		legacySig = r.Header.Get("x-hooksniff-signature")
 	}

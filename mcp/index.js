@@ -10,7 +10,7 @@
  * 
  * Environment:
  *   HOOKSNIFF_API_KEY  — Your HookSniff API key (required)
- *   HOOKSNIFF_BASE_URL — API base URL (default: https://api.hooksniff.dev/v1)
+ *   HOOKSNIFF_BASE_URL — API base URL (default: https://api.hooksniff.com/v1)
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -21,7 +21,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 const API_KEY = process.env.HOOKSNIFF_API_KEY;
-const BASE_URL = process.env.HOOKSNIFF_BASE_URL || 'https://api.hooksniff.dev/v1';
+const BASE_URL = process.env.HOOKSNIFF_BASE_URL || 'https://api.hooksniff.com/v1';
 
 if (!API_KEY) {
   console.error('Error: HOOKSNIFF_API_KEY environment variable is required');

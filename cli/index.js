@@ -39,12 +39,12 @@ function saveConfig(config) {
 
 function getApiBase() {
   const config = loadConfig();
-  return config.api_url || process.env.HOOKRELAY_API_URL || 'http://localhost:3000/v1';
+  return config.api_url || process.env.HOOKSNIFF_API_URL || 'https://api.hooksniff.com/v1';
 }
 
 function getApiKey() {
   const config = loadConfig();
-  const key = config.api_key || process.env.HOOKRELAY_API_KEY;
+  const key = config.api_key || process.env.HOOKSNIFF_API_KEY;
   if (!key) {
     console.error('❌ Not authenticated. Run: hooksniff auth login');
     process.exit(1);
@@ -54,7 +54,7 @@ function getApiKey() {
 
 function getToken() {
   const config = loadConfig();
-  return config.token || process.env.HOOKRELAY_TOKEN;
+  return config.token || process.env.HOOKSNIFF_TOKEN;
 }
 
 async function apiRequest(method, path, body = null) {
@@ -87,13 +87,13 @@ program
   .option('--api-key <key>', 'API key')
   .option('--api-url <url>', 'API base URL')
   .action(async (opts) => {
-    const apiKey = opts.apiKey || process.env.HOOKRELAY_API_KEY;
-    const apiUrl = opts.apiUrl || process.env.HOOKRELAY_API_URL || 'http://localhost:3000/v1';
+    const apiKey = opts.apiKey || process.env.HOOKSNIFF_API_KEY;
+    const apiUrl = opts.apiUrl || process.env.HOOKSNIFF_API_URL || 'https://api.hooksniff.com/v1';
 
     if (!apiKey) {
       console.log('Usage: hooksniff auth login --api-key hr_live_YOUR_KEY');
       console.log('');
-      console.log('Get your API key from: http://localhost:3001/dashboard/api-keys');
+      console.log('Get your API key from: https://hooksniff.vercel.app/dashboard/api-keys');
       return;
     }
 
