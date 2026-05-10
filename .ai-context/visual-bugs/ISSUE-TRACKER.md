@@ -24,11 +24,11 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-003 | `refresh_token` rate limit yok — token stuffing | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-004 | Inbound webhook signature verification optional — secret boşsa `Ok(())` | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-005 | Billing webhook secret boşsa verification atlıyor | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
-| HS-006 | `.env.production.example`'da gerçek Grafana token (base64) | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
-| HS-007 | `.gitignore`'da `.env` pattern eksik | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
+| HS-006 | `.env.production.example`'da gerçek Grafana token (base64) | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 |
+| HS-007 | `.gitignore`'da `.env` pattern eksik | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 |
 | HS-008 | Contact form rate limit yok | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-009 | Schema endpoint'lerinde ownership check yok — cross-tenant leak | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
-| HS-010 | Concurrent delivery limit yok — DDoS riski | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
+| HS-010 | Concurrent delivery limit yok — DDoS riski | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 |
 
 ---
 
@@ -66,7 +66,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-038 | CLI `HOOKRELAY_*` env vars kullanıyor — `HOOKSNIFF_*` olmalı | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-038a | `handle_inbound_to_endpoint` Authorization bypass — sadece prefix lookup, Argon2 yok | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038b | Prefix length mismatch — 20 char lookup ama DB'de 15 char prefix | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
-| HS-038c | Billing webhook'larında rate limiting yok (Stripe/Polar/iyzico) | `backend/DEEP-RUST-API.md` | ⬜ |
+| HS-038c | Billing webhook'larında rate limiting yok (Stripe/Polar/iyzico) | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038d | `custom_domains` dig/nslookup subprocess — command injection riski | `backend/DEEP-RUST-API.md` | ⬜ |
 | HS-038e | Dynamic SQL construction (events, admin) — `format!` ile WHERE clause | `backend/DEEP-RUST-API.md` | ⬜ |
 | HS-038f | Timing attack — login hataları farklı mesajlar döndürüyor | `backend/DEEP-RUST-API.md` | ⬜ |
