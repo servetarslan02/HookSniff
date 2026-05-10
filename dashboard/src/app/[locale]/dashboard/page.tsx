@@ -25,7 +25,6 @@ import {
   Area,
   Legend,
 } from 'recharts';
-import { Onboarding } from '@/components/Onboarding';
 import { OnboardingWizard, SetupChecklist } from '@/components/OnboardingWizard';
 import { StatCard, ChartCard, StatusBadge } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
@@ -346,6 +345,7 @@ export default function DashboardOverview() {
   // Load stats + recent deliveries
   useEffect(() => {
     if (!token) return;
+    let mounted = true;
 
     async function load() {
       try {
@@ -353,21 +353,24 @@ export default function DashboardOverview() {
           statsApi.get(token!).catch(() => null),
           webhooksApi.list(token!, { page: 1 }).catch(() => null),
         ]);
+        if (!mounted) return;
         if (statsData) setStats(statsData);
         if (deliveriesData) setRecentDeliveries(deliveriesData.deliveries.slice(0, 5));
       } catch (err) {
         // Error handled silently
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
     load();
+    return () => { mounted = false; };
   }, [token]);
 
   // Load analytics when time range changes
   useEffect(() => {
     if (!token) return;
+    let mounted = true;
     setChartLoading(true);
 
     async function loadAnalytics() {
@@ -376,16 +379,18 @@ export default function DashboardOverview() {
           analyticsApi.deliveryTrend(token!, timeRange).catch(() => null),
           analyticsApi.successRate(token!, timeRange).catch(() => null),
         ]);
+        if (!mounted) return;
         if (trend) setTrendData(trend);
         if (sr) setSuccessRateData(sr);
       } catch {
         // ignore
       } finally {
-        setChartLoading(false);
+        if (mounted) setChartLoading(false);
       }
     }
 
     loadAnalytics();
+    return () => { mounted = false; };
   }, [token, timeRange]);
 
   if (loading) {
@@ -478,7 +483,6 @@ export default function DashboardOverview() {
 
   return (
     <div className="space-y-8">
-      <Onboarding />
       <OnboardingWizard />
       <SetupChecklist />
       {/* Time Range Selector */}
