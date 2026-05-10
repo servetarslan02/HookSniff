@@ -44,7 +44,9 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Polar.sh Checkout Link (Pro): https://buy.polar.sh/polar_cl_jtWjcvyy0m6ZOuOkEIa7i0agQmlpfJGsNwTJU4LNG8U ✅
 - Polar.sh: Stripe payout + identity verification → Servet yapacak
 - Google şifre: uku_21700987 (güncel)
-- hookrelay.com ve is-a.dev KULLANILMIYOR (Servet tercihi)
+- Resend: re_2DkZjzTP_EwBEfofj6WMoxvLmqT8UDMCZ (hooksniff-production) ✅
+- Resend Domain: hooksniff.is-a.dev → FAILED, onboarding@resend.dev kullanılabilir
+- Resend → Cloud Run'a RESEND_API_KEY eklendi ✅ (revision 00053)
 - db.rs testleri: 16/16 passed ✅
 
 ## 📊 Güncel İlerleme (2026-05-11 04:50)
