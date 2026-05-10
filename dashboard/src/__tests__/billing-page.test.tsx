@@ -14,6 +14,10 @@ vi.mock('next-intl', () => ({
   },
 }));
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+}));
+
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
   Link: ({ children, ...props }: any) => React.createElement('a', props, children),
@@ -35,9 +39,23 @@ vi.mock('@/lib/errors', () => ({
 }));
 
 const mockGetInvoices = vi.fn();
+const mockGetUsage = vi.fn().mockResolvedValue({ deliveries_used: 50, deliveries_limit: 10000 });
+const mockGetSubscription = vi.fn().mockResolvedValue({});
+const mockUpgrade = vi.fn().mockResolvedValue({});
 vi.mock('@/lib/api', () => ({
   billingApi: {
     getInvoices: (...args: any[]) => mockGetInvoices(...args),
+  },
+  billingApiExtended: {
+    getUsage: (...args: any[]) => mockGetUsage(...args),
+    getSubscription: (...args: any[]) => mockGetSubscription(...args),
+    upgrade: (...args: any[]) => mockUpgrade(...args),
+  },
+  api: {
+    delete: vi.fn().mockResolvedValue({}),
+    put: vi.fn().mockResolvedValue({}),
+    post: vi.fn().mockResolvedValue({}),
+    get: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -46,8 +64,8 @@ vi.mock('clsx', () => ({
 }));
 
 const mockInvoices = [
-  { id: 'inv-1234-5678', date: '2024-01-01', plan: 'Pro', amount: 49.00, status: 'paid' },
-  { id: 'inv-9012-3456', date: '2024-02-01', plan: 'Pro', amount: 49.00, status: 'pending' },
+  { id: 'inv-1234-5678', date: '2024-01-01', plan: 'Pro', amount: 29.00, status: 'paid' },
+  { id: 'inv-9012-3456', date: '2024-02-01', plan: 'Pro', amount: 29.00, status: 'pending' },
 ];
 
 const { default: BillingPage } = await import('@/app/[locale]/dashboard/billing/page');
@@ -55,10 +73,7 @@ const { default: BillingPage } = await import('@/app/[locale]/dashboard/billing/
 describe('BillingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ webhooks: { used: 50, limit: 10000 } }),
-    });
+    mockGetUsage.mockResolvedValue({ deliveries_used: 50, deliveries_limit: 10000 });
     mockGetInvoices.mockResolvedValue(mockInvoices);
   });
 
@@ -74,10 +89,7 @@ describe('BillingPage', () => {
 
   it('fetches usage data on mount', async () => {
     await act(async () => { render(React.createElement(BillingPage)); });
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/billing/usage'),
-      expect.anything()
-    );
+    expect(mockGetUsage).toHaveBeenCalledWith('test-token');
   });
 
   it('fetches invoices on mount', async () => {
@@ -95,8 +107,8 @@ describe('BillingPage', () => {
     let container: HTMLElement;
     await act(async () => { container = render(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('$0');
-    expect(container!.textContent).toContain('$49');
-    expect(container!.textContent).toContain('$149');
+    expect(container!.textContent).toContain('$29');
+    expect(container!.textContent).toContain('$99');
   });
 
   it('displays plan features', async () => {
@@ -118,7 +130,7 @@ describe('BillingPage', () => {
     await act(async () => { container = render(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('inv-1234');
     expect(container!.textContent).toContain('Pro');
-    expect(container!.textContent).toContain('$49.00');
+    expect(container!.textContent).toContain('$29.00');
   });
 
   it('displays invoice status badges', async () => {
@@ -204,10 +216,9 @@ describe('BillingPage', () => {
   });
 
   it('handles usage fetch error gracefully', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    mockGetUsage.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => { container = render(React.createElement(BillingPage)).container; });
-    // Should still render with default values
     expect(container!.textContent).toContain('billing.title');
   });
 

@@ -14,6 +14,8 @@ Object.defineProperty(navigator, 'clipboard', {
 const mockToast = vi.fn();
 const mockLogout = vi.fn();
 const mockPush = vi.fn();
+const mockApiPut = vi.fn().mockResolvedValue({});
+const mockApiDelete = vi.fn().mockResolvedValue({});
 
 vi.mock('next-intl', () => ({
   useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
@@ -46,12 +48,22 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
+vi.mock('@/lib/api', () => ({
+  api: {
+    put: (...args: any[]) => mockApiPut(...args),
+    delete: (...args: any[]) => mockApiDelete(...args),
+    post: vi.fn().mockResolvedValue({}),
+    get: vi.fn().mockResolvedValue({}),
+  },
+}));
+
 const { default: SettingsPage } = await import('@/app/[locale]/dashboard/settings/page');
 
 describe('SettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValue({});
+    mockApiDelete.mockResolvedValue({});
   });
 
   // === Render tests ===
@@ -124,7 +136,7 @@ describe('SettingsPage', () => {
 
   // === Profile form tests ===
   it('submits profile form with current data', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form');
@@ -134,14 +146,15 @@ describe('SettingsPage', () => {
       fireEvent.submit(profileForm!);
     });
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/auth/profile'),
-      expect.objectContaining({ method: 'PUT' })
+    expect(mockApiPut).toHaveBeenCalledWith(
+      '/auth/profile',
+      { name: 'Test', email: 'test@test.com' },
+      'test-token'
     );
   });
 
   it('sends correct profile data in request body', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     // Change name
@@ -155,17 +168,15 @@ describe('SettingsPage', () => {
       fireEvent.submit(profileForm);
     });
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/auth/profile'),
-      expect.objectContaining({
-        method: 'PUT',
-        body: JSON.stringify({ name: 'New Name', email: 'test@test.com' }),
-      })
+    expect(mockApiPut).toHaveBeenCalledWith(
+      '/auth/profile',
+      { name: 'New Name', email: 'test@test.com' },
+      'test-token'
     );
   });
 
   it('shows success message after profile save', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
@@ -177,10 +188,7 @@ describe('SettingsPage', () => {
   });
 
   it('shows error message on profile save failure', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve({ error: { message: 'Update failed' } }),
-    });
+    mockApiPut.mockRejectedValueOnce(new Error('Update failed'));
     const { container } = render(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
@@ -192,7 +200,7 @@ describe('SettingsPage', () => {
   });
 
   it('handles network failure on profile save', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    mockApiPut.mockRejectedValueOnce(new Error('Network error'));
     const { container } = render(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
@@ -204,8 +212,8 @@ describe('SettingsPage', () => {
   });
 
   it('shows saving state during profile save', async () => {
-    let resolveFetch: (v: any) => void;
-    mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
+    let resolvePut: (v: any) => void;
+    mockApiPut.mockReturnValueOnce(new Promise((r) => { resolvePut = r; }));
     const { container } = render(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
@@ -217,16 +225,13 @@ describe('SettingsPage', () => {
     expect(container.textContent).toContain('common.saving');
 
     await act(async () => {
-      resolveFetch!({ ok: true, json: () => Promise.resolve({}) });
+      resolvePut!({});
     });
   });
 
   it('clears previous profile error on new submit', async () => {
     // First submit fails
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve({ error: { message: 'Fail 1' } }),
-    });
+    mockApiPut.mockRejectedValueOnce(new Error('Fail 1'));
     const { container } = render(React.createElement(SettingsPage));
     const profileForm = container.querySelector('form')!;
 
@@ -234,7 +239,7 @@ describe('SettingsPage', () => {
     expect(container.textContent).toContain('Fail 1');
 
     // Second submit succeeds
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     await act(async () => { fireEvent.submit(profileForm); });
     expect(container.textContent).not.toContain('Fail 1');
     expect(container.textContent).toContain('common.success');
@@ -252,7 +257,7 @@ describe('SettingsPage', () => {
 
   // === Password form tests ===
   it('submits password change form with valid data', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
@@ -268,16 +273,17 @@ describe('SettingsPage', () => {
         await act(async () => {
           fireEvent.submit(forms[1]);
         });
-        expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringContaining('/auth/password'),
-          expect.objectContaining({ method: 'PUT' })
+        expect(mockApiPut).toHaveBeenCalledWith(
+          '/auth/password',
+          { current_password: 'currentPass', new_password: 'newPassword123' },
+          'test-token'
         );
       }
     }
   });
 
   it('sends correct password data in request body', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
@@ -292,17 +298,15 @@ describe('SettingsPage', () => {
       fireEvent.submit(forms[1]);
     });
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/auth/password'),
-      expect.objectContaining({
-        method: 'PUT',
-        body: JSON.stringify({ current_password: 'oldPass123', new_password: 'newSecure123' }),
-      })
+    expect(mockApiPut).toHaveBeenCalledWith(
+      '/auth/password',
+      { current_password: 'oldPass123', new_password: 'newSecure123' },
+      'test-token'
     );
   });
 
   it('shows success after password change', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
@@ -321,7 +325,7 @@ describe('SettingsPage', () => {
   });
 
   it('clears password fields after successful change', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
@@ -370,15 +374,16 @@ describe('SettingsPage', () => {
       fireEvent.change(passwordInputs[2], { target: { value: 'xyz12345' } });
     });
 
-    const callsBefore = mockFetch.mock.calls.length;
+    const callsBefore = mockApiPut.mock.calls.length;
     const forms = container.querySelectorAll('form');
     await act(async () => {
       fireEvent.submit(forms[1]);
     });
 
-    // Only the initial mount fetch might have happened, no password API call
-    expect(mockFetch).not.toHaveBeenCalledWith(
-      expect.stringContaining('/auth/password'),
+    // No additional API call should have been made for password
+    expect(mockApiPut).not.toHaveBeenCalledWith(
+      '/auth/password',
+      expect.anything(),
       expect.anything()
     );
   });
@@ -402,10 +407,7 @@ describe('SettingsPage', () => {
   });
 
   it('shows error on password API failure', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve({ error: { message: 'Wrong current password' } }),
-    });
+    mockApiPut.mockRejectedValueOnce(new Error('Wrong current password'));
     const { container } = render(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
@@ -424,7 +426,7 @@ describe('SettingsPage', () => {
   });
 
   it('handles network failure on password change', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    mockApiPut.mockRejectedValueOnce(new Error('Network error'));
     const { container } = render(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
@@ -443,8 +445,8 @@ describe('SettingsPage', () => {
   });
 
   it('shows saving state during password change', async () => {
-    let resolveFetch: (v: any) => void;
-    mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
+    let resolvePut: (v: any) => void;
+    mockApiPut.mockReturnValueOnce(new Promise((r) => { resolvePut = r; }));
     const { container } = render(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
@@ -462,7 +464,7 @@ describe('SettingsPage', () => {
     expect(container.textContent).toContain('common.saving');
 
     await act(async () => {
-      resolveFetch!({ ok: true, json: () => Promise.resolve({}) });
+      resolvePut!({});
     });
   });
 
@@ -548,7 +550,7 @@ describe('SettingsPage', () => {
   });
 
   it('saves notification preferences', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     // Find the save button in notification section
@@ -562,19 +564,17 @@ describe('SettingsPage', () => {
         fireEvent.click(notifSaveButton);
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/portal/notifications'),
-        expect.objectContaining({ method: 'PUT' })
+      expect(mockApiPut).toHaveBeenCalledWith(
+        '/portal/notifications',
+        expect.anything(),
+        'test-token'
       );
       expect(mockToast).toHaveBeenCalled();
     }
   });
 
   it('handles notification save failure', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve({ error: 'Save failed' }),
-    });
+    mockApiPut.mockRejectedValueOnce(new Error('Save failed'));
     const { container } = render(React.createElement(SettingsPage));
 
     const buttons = Array.from(container.querySelectorAll('button'));
@@ -696,7 +696,7 @@ describe('SettingsPage', () => {
   });
 
   it('confirms account deletion with DELETE text', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiDelete.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
@@ -721,21 +721,14 @@ describe('SettingsPage', () => {
         fireEvent.click(confirmButton!);
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/auth/me'),
-        expect.objectContaining({ method: 'DELETE' })
-      );
+      expect(mockApiDelete).toHaveBeenCalledWith('/auth/account', 'test-token');
       expect(mockLogout).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith('/');
     }
   });
 
   it('handles delete account API failure', async () => {
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve({ error: { message: 'Delete failed' } }),
-    });
+    mockApiDelete.mockRejectedValueOnce(new Error('Delete failed'));
     const { container } = render(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
@@ -760,10 +753,8 @@ describe('SettingsPage', () => {
         fireEvent.click(confirmButton!);
       });
 
-      expect(alertSpy).toHaveBeenCalledWith('Delete failed');
+      expect(mockToast).toHaveBeenCalledWith(expect.stringContaining('Delete failed'), 'error');
     }
-
-    alertSpy.mockRestore();
   });
 
   it('cancels delete modal', async () => {
@@ -842,10 +833,7 @@ describe('SettingsPage', () => {
       });
 
       // Should not have called DELETE API
-      expect(mockFetch).not.toHaveBeenCalledWith(
-        expect.stringContaining('/auth/me'),
-        expect.objectContaining({ method: 'DELETE' })
-      );
+      expect(mockApiDelete).not.toHaveBeenCalled();
     }
   });
 
@@ -867,7 +855,7 @@ describe('SettingsPage', () => {
 
   // === Profile form email change ===
   it('profile form sends updated email', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+    mockApiPut.mockResolvedValueOnce({});
     const { container } = render(React.createElement(SettingsPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
@@ -880,11 +868,10 @@ describe('SettingsPage', () => {
       fireEvent.submit(profileForm);
     });
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/auth/profile'),
-      expect.objectContaining({
-        body: JSON.stringify({ name: 'Test', email: 'updated@test.com' }),
-      })
+    expect(mockApiPut).toHaveBeenCalledWith(
+      '/auth/profile',
+      { name: 'Test', email: 'updated@test.com' },
+      'test-token'
     );
   });
 
