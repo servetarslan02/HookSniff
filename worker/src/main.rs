@@ -28,6 +28,7 @@ pub mod telemetry;
 
 /// Start a minimal HTTP health check server for Cloud Run.
 /// Cloud Run requires containers to listen on PORT=8080.
+#[allow(dead_code)]
 async fn start_health_server(port: u16) {
     use axum::{routing::get, Router};
 
@@ -45,6 +46,19 @@ async fn start_health_server(port: u16) {
             return;
         }
     };
+
+    if let Err(e) = axum::serve(listener, app).await {
+        tracing::error!("❌ Health server error: {}", e);
+    }
+}
+
+/// Start health server with a pre-bound listener (for Cloud Run startup probe).
+async fn start_health_server_with_listener(listener: tokio::net::TcpListener) {
+    use axum::{routing::get, Router};
+
+    let app = Router::new()
+        .route("/health", get(|| async { "ok" }))
+        .route("/", get(|| async { "HookSniff Worker 🐝" }));
 
     if let Err(e) = axum::serve(listener, app).await {
         tracing::error!("❌ Health server error: {}", e);
@@ -89,27 +103,40 @@ async fn main() -> Result<()> {
     );
 
     tracing::info!("🔧 HookSniff Worker starting...");
-    tracing::info!(
-        "   Database: {}",
-        &cfg.database_url[..30.min(cfg.database_url.len())]
-    );
 
-    // Start health check HTTP server for Cloud Run (PORT env or 8080)
+    // ── CRITICAL: Start health server FIRST ──
+    // Cloud Run startup probe checks port 8080 within 240s.
+    // If DB/Redis is slow or down, health server must still respond.
     let health_port: u16 = std::env::var("PORT")
         .unwrap_or_else(|_| "8080".to_string())
         .parse()
         .unwrap_or(8080);
-    tokio::spawn(start_health_server(health_port));
+    // Bind synchronously so Cloud Run sees the port immediately
+    let health_listener = tokio::net::TcpListener::bind(
+        std::net::SocketAddr::from(([0, 0, 0, 0], health_port))
+    ).await?;
+    tokio::spawn(start_health_server_with_listener(health_listener));
+    tracing::info!("🏥 Health server bound on :{}", health_port);
 
     // Database pool — strip channel_binding=require (sqlx 0.8 doesn't support it)
     let db_url = cfg.database_url
         .replace("?channel_binding=require&", "?")
         .replace("&channel_binding=require", "")
         .replace("?channel_binding=require", "");
+    tracing::info!(
+        "   Database: {}",
+        &db_url[..30.min(db_url.len())]
+    );
     let pool = PgPoolOptions::new()
         .max_connections(10)
+        .acquire_timeout(std::time::Duration::from_secs(30))
         .connect(&db_url)
-        .await?;
+        .await
+        .map_err(|e| {
+            tracing::error!("❌ Database connection failed: {}", e);
+            tracing::error!("   URL prefix: {}", &db_url[..30.min(db_url.len())]);
+            e
+        })?;
 
     // HTTP client (shared, connection pooling)
     let http_client = reqwest::Client::builder()
