@@ -1,32 +1,42 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 02:12 GMT+8
+> Son güncelleme: 2026-05-11 02:40 GMT+8
 
 ---
 
-## ✅ Oturum 97 Tamamlandı (2026-05-11 01:58 - 02:12)
+## ✅ Oturum 97 Tamamlandı (2026-05-11 01:58 - 02:40)
 
-### HS-088: AuthGuard Component Test ✅
-- 16 test: loading spinner, redirect to login, authenticated rendering, state transitions, edge cases
-- `dashboard/src/__tests__/AuthGuard.test.tsx`
-
-### HS-082: SDK Version Alignment ✅
-- Tüm 9 SDK 0.2.0'a eşitlendi (Node, Python, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir)
-- Go ve Swift git tag ile yönetiliyor (0.1.0)
-- Publish guide güncellendi
+### Yapılan İşler
+- HS-088: AuthGuard component test (16 test) ✅
+- HS-082: SDK version alignment (9 SDK → 0.2.0) ✅
+- HS-038: HOOKRELAY→HOOKSNIFF (6 referans) ✅
+- HS-083: OpenAPI spec (29 endpoint eklendi, 87→116) ✅
+- HS-084: iyzico iptal kararı ✅
+- HS-090: SDK otomatik güncelleme backlog'a eklendi ✅
+- Clippy: 7 uyarı düzeltildi, 0 hata ✅
+- Fiyatlandırma: Polar.sh multi-currency kararı ✅
 
 ### Test Durumu
 - API: 979/979 ✅
 - Worker: 48/48 ✅
 - Dashboard: 3132/3132 (137 dosya) ✅
-- `cargo check` ✅
+- Clippy: 0 uyarı ✅
+- ESLint: 0 hata ✅
+- TypeScript: 0 hata ✅
 
-### Commit
-- `425ce6c` — main branch
+### Commits (6 push)
+```
+42a2eb1 fix: resolve all clippy warnings (7 fixes)
+6f6eb4e docs: update progress — 100/103, HS-038/083 done
+7dc5e5e fix(docs): add 29 missing endpoints to OpenAPI spec (HS-083)
+6811de1 fix(dashboard): replace HOOKRELAY_KEY with HOOKSNIFF_API_KEY in docs (HS-038)
+24d7da1 docs: update memory and next session for session 97
+425ce6c feat(dashboard): add AuthGuard component tests (HS-088)
+```
 
 ---
 
-## ✅ Oturum 96 Tamamlandı (2026-05-11 00:57 - 01:50)
+## 🟡 Sıradaki Oturum: #98
 
 ### Worker Çözüldü ✅
 - DATABASE_URL/REDIS_URL Cloud Run'a eklendi (GCP SA credentials)
@@ -124,95 +134,35 @@ d7c59a8 fix(security): harden CSP headers and add HSTS
 ## 🟡 Sıradaki Oturum: #98 — İLK SIRA BUNLAR
 
 ### 0. ZORUNLU: Staging Test (Bağımlılık Doğrulaması)
-**Bağımlılıkları staging'de test etmeden başka işe geçme!**
 
 ```bash
-# 1. API health check
 curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
-
-# 2. Login testi
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"demo@hooksniff.com","password":"Demo1234!"}'
-
-# 3. Dashboard aç — https://hooksniff.vercel.app
-# Login ol, endpoint oluştur, webhook gönder
-
-# 4. Rate limit testi — çok sayıda istek at, 429 dönmeli
-
-# 5. Redis kontrol — health endpoint'inde redis status "connected" olmalı
 ```
 
-### 1. Kalan SDK Düzeltmeleri
-| ID | Sorun | Durum |
-|----|-------|-------|
-| HS-082 | SDK version mismatch | ✅ Çözüldü (Oturum 97) |
-| HS-038 | CLI HOOKRELAY→HOOKSNIFF env vars | ⬜ |
-| HS-083 | OpenAPI schema vs actual API mismatch | ⬜ |
-
-### 2. iyzico Entegrasyonu (HS-084) — TÜRKİYE İÇİN KRİTİK
-- iyzico fatura handler yok
-- Servet'in iyzico hesabı açılacak (vergi levhası + banka hesabı)
-- Hesap açıldıktan sonra handler implementasyonu yapılacak
-
-### 3. i18n (HS-065) — EN BÜYÜK İŞ
+### 1. i18n (HS-065) — EN BÜYÜK İŞ
 - 920+ hardcoded İngilizce string
 - Dashboard sayfaları Türkçe/Almanca/Japonca gösterilmiyor
 - Parçalanması gerekiyor: sayfa sayfa veya component component
+- Fiyatlandırma i18n ile birlikte yapılacak (₺/$ gösterimi)
 
-### 4. Test Coverage (HS-085-089)
-| ID | Modül | Satır |
-|----|-------|-------|
-| HS-085 | db.rs | 1,029 |
-| HS-086 | delivery/mod.rs | 404 |
-| HS-087 | worker/main.rs | 807 |
-| HS-088 | AuthGuard component | — |
-| HS-089 | SSO page | — |
+### 2. db.rs Test (HS-085)
+- 1,273 satır veritabanı kodu
+- Gerçek PostgreSQL gerekli (Neon test DB veya local)
+- Test ortamı .env.test ile ayrılmalı
 
-### 5. Dependabot Major PR'ları
+### 3. SDK Otomatik Güncelleme (HS-090)
+- OpenAPI spec'den SDK otomatik üretimi
+- GitHub Actions CI kurulumu
+- Detaylı araştırma gerekli, lansman sonrası
+
+### 4. Dependabot Major PR'ları
 - TypeScript 5→6 (major)
 - Tailwind 3→4 (major)
 - Recharts 2→3 (major)
 - Next.js 15→16 (major)
-- Her biri tek tek denenmeli
-
-### 6. OpenAPI Schema Mismatch (HS-083)
-- SDK'ler ile OpenAPI spec arasında uyumsuzluk
-- Dokümantasyon güncellenmeli
-
-### 7. Git History Secret Temizliği (HS-014 devam)
-- Grafana token rotate (operasyonel — Servet yapacak)
-- BFG ile git history temizliği (opsiyonel)
-
-### 8. SDK Otomatik Güncelleme Sistemi (HS-090) — DETAYLI ARAŞTIRMA GEREKLİ
-**Durum:** ⬜ Araştırılacak, sonra implementasyon
-
-**Ne yapılacak:**
-- OpenAPI spec'den SDK otomatik üretimi (`openapi-generator` veya benzeri araç)
-- GitHub Actions CI: OpenAPI spec değişince → 11 SDK otomatik üretilir → commit + push
-- Admin panelde SDK yönetim sayfası (versiyon takibi, durum göstergesi)
-- SDK publish otomasyonu (npm, PyPI, crates.io, Maven, NuGet, Hex, RubyGems, Packagist)
-- Eski versiyon desteği + deprecation warning sistemi
-- Semver kuralları: minor/patch = güvenli, major = kırıcı değişiklik uyarısı
-
-**Neden ertelendi:**
-- Kimse SDK'yı indirmedi, acil değil
-- OpenAPI spec'in doğru ve güncel olması gerekiyor
-- Kurulum 1-2 saat sürüyor, dikkatli planlama lazım
-- Lansman sonrası öncelikli
-
-**Mevcut durum:**
-- 11 SDK elle yazılmış, 0.2.0 versiyonunda
-- Admin panelde SDK yönetim sayfası **yok** (sadece dokümantasyon sayfası var)
-- Otomatik güncelleme sistemi **yok**
-- Svix rakibi 1.93.0 versiyonunda, openapi-generator kullanıyor
-
-**Araştırma konuları:**
-1. OpenAPI spec güncel mi? Tüm endpoint'leri yansıtıyor mu?
-2. openapi-generator vs diğer araçlar (kiwi, swagger-codegen)
-3. GitHub Actions workflow tasarımı
-4. SDK backward compatibility stratejisi
-5. Admin panel SDK sayfası tasarımı
 
 ---
 
@@ -222,9 +172,9 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/lo
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 14 | 0 |
 | 🔴 P1 | 44 | 46 | 0 |
-| 🟡 P2 | 38 | 31 | 7 |
+| 🟡 P2 | 38 | 33 | 5 |
 | 🟢 P3 | 13 | 7 | 6 |
-| **TOPLAM** | **103** | **98** | **5** |
+| **TOPLAM** | **103** | **100** | **3** |
 
 ---
 
