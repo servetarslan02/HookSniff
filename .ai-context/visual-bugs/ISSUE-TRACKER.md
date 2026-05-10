@@ -93,7 +93,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-044 | Stale closure riskleri (4 useEffect) | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 |
 | HS-045 | `lucide-react` hiç kullanılmıyor (~150KB wasted) | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 |
 | HS-046 | 13 tablo `overflow-x-auto` olmadan — mobil taşma | `frontend/DEEP-CSS-STYLING.md` | ✅ 2026-05-10 |
-| HS-047 | `blog/[slug]` 1922 satır mega component | `frontend/DEEP-COMPONENT-LOGIC.md` | ⚠️ 2026-05-10 — Refactoring gerekli |
+| HS-047 | `blog/[slug]` 1922 satır mega component | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 (Oturum 93) — data.ts'a çıkarıldı, 308 satır |
 | HS-048 | `dangerouslySetInnerHTML` (CSP bypass) | `frontend/DEEP-COMPONENT-LOGIC.md` | ✅ 2026-05-10 — XSS güvenli (HTML-escape var) |
 | HS-049 | Toggle accessibility — `role="switch"` eksik | `frontend/agent4-settings-config.md` | ✅ 2026-05-10 |
 | HS-050 | Delete modal'da focus trap yok | `frontend/agent4-settings-config.md` | ✅ 2026-05-10 — Zaten mevcut |
@@ -114,7 +114,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ⬜ (büyük iş) |
 | HS-066 | 71 sayfada metadata eksik (SEO) | `frontend/DEEP-A11Y-SEO.md` | ⚠️ 2026-05-10 — Client component, layout'tan geliyor |
 | HS-067 | Müşteri hikayeleri kurgusal — yasal risk | `infra/DEEP-LANDING-CONTENT.md` | ⬜ |
-| HS-068 | Türkçe çeviri hataları ("APIimize", "Ölü Mektup Kuyruğu") | `infra/DEEP-LANDING-CONTENT.md` | ⬜ |
+| HS-068 | Türkçe çeviri hataları | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-10 (Oturum 93) |
 | HS-069 | FAQ eksik — SEO featured snippets kaybı | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-10 (Oturum 90) |
 | HS-070 | `next.config.js`'de `output: 'standalone'` eksik | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 83) |
 | HS-071 | HSTS header eksik | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 83) |
@@ -133,7 +133,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-077 | 6+ stale branch temizlenmemiş | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
 | HS-078 | 20+ açık Dependabot PR merge edilmemiş | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
 | HS-079 | Commit convention tutarsız | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
-| HS-080 | ESLint 8 + Next.js 15 uyumsuzluğu | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
+| HS-080 | ESLint 8→9 migration | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 93) |
 | HS-081 | 11 SDK'da retry logic yok | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-082 | Version mismatch (Kotlin 0.2.0 vs 0.3.0) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-083 | OpenAPI schema vs actual API mismatch | `infra/DEEP-SDK-DOCS.md` | ⬜ |
