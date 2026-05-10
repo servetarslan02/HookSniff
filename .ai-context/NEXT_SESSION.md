@@ -1,10 +1,24 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 03:56 GMT+8
+> Son güncelleme: 2026-05-11 04:54 GMT+8
 
 ---
 
-## ✅ Oturum 99 Tamamlandı (2026-05-11 03:10 - 03:50)
+## ⚠️ KURAL: Servet'ten Giriş Bilgileri İste
+
+Bazı servislerde ayar yapmak için **Servet'in Google hesabıyla oturum açması gerekiyor.** Oturum başında bunları iste:
+
+1. **Vercel** — Analytics/Speed Insights toggle, Data Preferences
+2. **Resend** — Delivery webhook URL ayarı
+3. **Neon DB** — Backup schedule settings
+4. **Grafana** — Dashboard ve alert oluşturma
+5. **Polar.sh** — Go Live kontrol, checkout link'leri
+
+**Nasıl çalışır:** Servet Chrome'da bu servislere giriş yapar → OpenClaw Browser Relay ile oturumu devralır → Ayarları yapar.
+
+---
+
+## ✅ Oturum 101 Tamamlandı (2026-05-11 04:23 - 04:54)
 
 ### Yapılan İşler
 - CSP hydration fix — `strict-dynamic` (nonce yok) → `unsafe-inline` + `unsafe-eval`
