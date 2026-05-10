@@ -16,7 +16,7 @@ const plans = [
     ctaStyle: 'outline',
     popular: false,
     features: [
-      '1,000 webhooks/month',
+      '10,000 webhooks/month',
       '1 endpoint',
       '3 retry attempts',
       'HMAC-SHA256 signatures',
@@ -28,7 +28,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: '$29',
+    price: '$49',
     period: '/month',
     desc: 'For production applications',
     cta: 'Start Free Trial',
@@ -50,7 +50,7 @@ const plans = [
   },
   {
     name: 'Business',
-    price: '$99',
+    price: '$149',
     period: '/month',
     desc: 'For teams that need guarantees',
     cta: 'Contact Sales',
@@ -174,7 +174,7 @@ const faqs = [
   },
   {
     q: 'How does HookSniff compare to Svix?',
-    a: 'HookSniff offers similar features at 10x lower cost. Svix starts at $490/month for Professional; HookSniff Pro is $29/month. We also support more SDKs (11 vs 6), FIFO delivery, and CloudEvents. See our full comparison page.',
+    a: 'HookSniff offers similar features at 10x lower cost. Svix starts at $490/month for Professional; HookSniff Pro is $49/month. We also support more SDKs (11 vs 6), FIFO delivery, and CloudEvents. See our full comparison page.',
   },
   {
     q: 'Can I export my data?',
@@ -211,7 +211,7 @@ function RoiCalculator() {
   // Cost comparison
   const svixCost = events <= 0 ? 0 : 490; // Svix Pro starts at $490
   const hookdeckCost = events <= 10000 ? 0 : 39 + Math.max(0, Math.ceil((events - 10000) / 100000)) * 1;
-  const hooksniffCost = events <= 10000 ? 0 : events <= 50000 ? 29 : 99;
+  const hooksniffCost = events <= 10000 ? 0 : events <= 50000 ? 49 : 149;
   const savingsVsSvix = svixCost - hooksniffCost;
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
