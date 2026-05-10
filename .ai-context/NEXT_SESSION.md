@@ -1,38 +1,34 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 19:26 GMT+8
+> Son güncelleme: 2026-05-10 19:32 GMT+8
 
 ---
 
 ## ✅ Tamamlanan Oturumlar
 
-### Oturum 73-78 ✅
-- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu, Billing & Account
+### Oturum 73-79 ✅
+- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu, Billing & Account, SSRF & Security
 
-### Oturum 79 — SSRF & Security Hardening ✅
-- HS-011: Notification URL'lerine SSRF validation eklendi
-- HS-012: ❌ Yanlış bulgu — endpoint URL'leri creation'da validate edilmiş
-- HS-013: CSP'den `unsafe-eval` kaldırıldı
-- HS-014: ❌ Operasyonel — credential rotation gerekli
-- HS-015: ❌ Standart pratik — token sadece email'de
-- HS-016: `DefaultHasher` → SHA-256
+### Oturum 80 — Worker & Backend Core (kısmi) ✅
+- HS-018: Error classification eklendi (4xx except 429 → dead letter, 429/5xx → retry)
+- HS-019-023: Sonraki oturumlara kaldı
 
 ---
 
-## 🔴 Sıradaki Oturum: #80 — Worker & Backend Core
+## 🔴 Sıradaki Oturum: #81 — Database Issues + Worker Kalan
 
 ### Görev
-Worker ve backend düzeltmeleri.
+DB düzeltmeleri + worker kalan sorunlar.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-018 | Error classification yok — 400/401/404 de retry ediliyor | `worker/src/delivery/mod.rs` |
-| HS-019 | WebSocket connection limit yok | `api/src/ws/` |
-| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | `api/src/circuit_breaker.rs` |
-| HS-021 | Billing webhook'larda idempotency yok | `api/src/routes/billing.rs` |
-| HS-022 | Throttle state in-memory | `api/src/throttle/` |
-| HS-023 | FIFO modülü var ama worker'a bağlanmamış | `worker/src/` |
+| HS-024 | İki migration sistemi senkron değil | `api/migrations/` |
+| HS-025 | CHECK constraint'ler eksik | `api/migrations/` |
+| HS-026 | `webhook_queue`'da FK eksik | `api/migrations/` |
+| HS-027 | `amount_cents` INT → BIGINT | `api/migrations/` |
+| HS-038d | `custom_domains` dig subprocess — command injection | `api/src/routes/custom_domains.rs` |
+| HS-038e | Dynamic SQL construction — `format!` ile WHERE | `api/src/routes/events.rs` |
 
 ---
 
@@ -40,11 +36,11 @@ Worker ve backend düzeltmeleri.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 80 | **Worker & Backend Core** | HS-018, HS-019, HS-020, HS-021, HS-022, HS-023 |
-| 81 | Database Issues | HS-024, HS-025, HS-026, HS-027, HS-038d, HS-038e |
+| 81 | **Database Issues** | HS-024, HS-025, HS-026, HS-027, HS-038d, HS-038e |
 | 82 | Auth & Crypto Security | HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l |
 | 83 | SDK & Config Fixes | HS-035, HS-036, HS-037, HS-038, HS-038m, HS-038n |
 | 84 | Frontend Component Issues | HS-039, HS-040, HS-041, HS-042, HS-043, HS-044 |
+| 85 | Frontend Performance & Bundle | HS-045, HS-046, HS-047, HS-048 |
 
 ---
 
@@ -53,7 +49,7 @@ Worker ve backend düzeltmeleri.
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 11 (+6 yanlış) | 27 |
+| 🔴 P1 | 44 | 12 (+7 yanlış/operasyonel) | 25 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **24** | **76** |
+| **TOPLAM** | **103** | **26** | **74** |
