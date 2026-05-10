@@ -9,7 +9,7 @@ import { useToast } from '@/components/Toast';
 import { useRouter } from '@/i18n/navigation';
 
 export default function SettingsPage() {
-  const { user, apiKey, logout } = useAuth();
+  const { user, token, apiKey, logout } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -51,7 +51,7 @@ export default function SettingsPage() {
     setProfileSuccess('');
     try {
       const { api } = await import('@/lib/api');
-      await api.put('/auth/profile', { name: profileName, email: profileEmail }, token);
+      await api.put('/auth/profile', { name: profileName, email: profileEmail }, token ?? undefined);
       setProfileSuccess(tc('success'));
       setTimeout(() => setProfileSuccess(''), 3000);
     } catch (e: unknown) {
@@ -78,7 +78,7 @@ export default function SettingsPage() {
     setPasswordSaving(true);
     try {
       const { api } = await import('@/lib/api');
-      await api.put('/auth/password', { current_password: currentPassword, new_password: newPassword }, token);
+      await api.put('/auth/password', { current_password: currentPassword, new_password: newPassword }, token ?? undefined);
       setPasswordSuccess(tc('success'));
       setCurrentPassword('');
       setNewPassword('');
@@ -101,7 +101,7 @@ export default function SettingsPage() {
     setDeletingAccount(true);
     try {
       const { api } = await import('@/lib/api');
-      await api.delete('/auth/me', token);
+      await api.delete('/auth/me', token ?? undefined);
       logout();
       router.push('/');
     } catch (e: unknown) {
@@ -121,7 +121,7 @@ export default function SettingsPage() {
         email_on_dead_letter: failureAlerts,
         email_on_success: emailNotifs,
         slack_webhook_url: null,
-      }, token);
+      }, token ?? undefined);
       toast(tc('success'), 'success');
     } catch (e: unknown) {
       toast(getErrorMessage(e), 'error');

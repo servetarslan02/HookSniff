@@ -624,7 +624,8 @@
       "pricing": "Preise",
       "docs": "Dokumentation",
       "status": "Status",
-      "dashboard": "Dashboard →"
+      "dashboard": "Dashboard →",
+      "getStarted": "Loslegen"
     },
     "hero": {
       "uptime": "99,99% Lieferverfügbarkeit",
