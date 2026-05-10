@@ -54,9 +54,9 @@ export default function ApiKeysPage() {
       const res = await fetch(`${API}/api-keys`, {
         method: 'POST',
         headers: {
-          credentials: 'include' as const,
           'Content-Type': 'application/json',
         },
+        credentials: 'include' as const,
         body: JSON.stringify({ name: keyName || undefined }),
       });
       if (!res.ok) {
