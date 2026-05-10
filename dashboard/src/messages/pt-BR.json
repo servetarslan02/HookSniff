@@ -820,5 +820,211 @@
   "cantFindAnswer": "Não encontrou a resposta? Estamos aqui para ajudar.",
   "contactSupport": "Contatar suporte",
   "sending": "Enviando...",
-  "sendMessage": "Enviar mensagem"
+  "sendMessage": "Enviar mensagem",
+  "pricing": {
+    "title": "Pricing",
+    "badge": "10x cheaper than Svix",
+    "heroTitle": "Pricing that grows with you",
+    "heroSubtitle": "Save 12+ months of webhook infrastructure development. Start free, scale when ready.",
+    "heroNote": "No credit card required. No surprise charges. Cancel anytime.",
+    "mostPopular": "Most Popular",
+    "free": "Free",
+    "pro": "Pro",
+    "business": "Business",
+    "month": "/month",
+    "getStarted": "Get Started",
+    "startTrial": "Start Free Trial",
+    "contactSales": "Contact Sales",
+    "freeDesc": "For side projects and experiments",
+    "proDesc": "For production applications",
+    "businessDesc": "For teams that need guarantees",
+    "freeFeatures": [
+      "10,000 webhooks/month",
+      "1 endpoint",
+      "3 retry attempts",
+      "HMAC-SHA256 signatures",
+      "Dashboard access",
+      "Community support",
+      "3-day log retention",
+      "8 SDK access"
+    ],
+    "proFeatures": [
+      "50,000 webhooks/month",
+      "10 endpoints",
+      "5 retry attempts",
+      "Custom retry policies",
+      "Priority support",
+      "Custom domains",
+      "30-day log retention",
+      "11 SDK access",
+      "Webhook playground",
+      "Event tags & filtering",
+      "Email alerts"
+    ],
+    "businessFeatures": [
+      "500,000 webhooks/month",
+      "Unlimited endpoints",
+      "10 retry attempts",
+      "99.9% SLA guarantee",
+      "Dedicated support",
+      "90-day log retention",
+      "Everything in Pro",
+      "Schema registry",
+      "FIFO delivery",
+      "CloudEvents support",
+      "Custom integrations",
+      "SSO/SAML"
+    ],
+    "payWhatYouUse": "Only pay for what you actually send",
+    "payWhatYouUseDesc": "Retries are free. Filtered messages are free. Failed deliveries that we retry 5 times still count as 1 webhook. We absorb the cost because reliable delivery is our promise.",
+    "roiTitle": "ROI Calculator",
+    "roiDesc": "See how much you save with HookSniff vs competitors.",
+    "roiMonthlyWebhooks": "Monthly webhooks",
+    "roiYouSave": "You save",
+    "roiVsSvix": "vs Svix",
+    "roiLess": "less",
+    "roiPerYear": "That's {amount}/year back in your pocket.",
+    "compareTitle": "Compare all features",
+    "feature": "Feature",
+    "usage": "Usage",
+    "delivery": "Delivery",
+    "security": "Security",
+    "monitoringLogs": "Monitoring & Logs",
+    "support": "Support",
+    "monthlyWebhooks": "Monthly webhooks",
+    "endpoints": "Endpoints",
+    "rateLimit": "Requests/min rate limit",
+    "additionalEvents": "Additional events",
+    "teamMembers": "Team members",
+    "deliveryMethods": "Delivery methods",
+    "retryAttempts": "Retry attempts",
+    "customRetryPolicies": "Custom retry policies",
+    "fifoDelivery": "FIFO ordered delivery",
+    "exponentialBackoff": "Exponential backoff",
+    "dlq": "Dead letter queue (DLQ)",
+    "hmacSignatures": "HMAC-SHA256 signatures",
+    "secretRotation": "Webhook secret rotation",
+    "ipWhitelisting": "IP whitelisting",
+    "ssoSaml": "SSO / SAML",
+    "twoFactor": "2FA / TOTP",
+    "cloudevents": "CloudEvents v1.0",
+    "dashboard": "Dashboard",
+    "logRetention": "Log retention",
+    "realtimeLogs": "Real-time delivery logs",
+    "analyticsGraphs": "Analytics & graphs",
+    "schemaRegistry": "Schema registry",
+    "webhookPlayground": "Webhook playground",
+    "communitySupport": "Community support",
+    "emailSupport": "Email support",
+    "prioritySupport": "Priority support",
+    "dedicatedManager": "Dedicated account manager",
+    "slaGuarantee": "SLA guarantee",
+    "customIntegrations": "Custom integrations",
+    "unlimited": "Unlimited",
+    "securityTitle": "Security & Compliance",
+    "supportTitle": "Support levels",
+    "supportResponse": "Response",
+    "supportBestEffort": "Best effort",
+    "testimonialsTitle": "What users say",
+    "buildVsBuy": "Build vs Buy",
+    "buildingOwn": "Building your own",
+    "usingHookSniff": "Using HookSniff",
+    "buildOwnItems": [
+      "3-6 months of engineering time",
+      "$50K-150K in developer costs",
+      "Ongoing maintenance burden",
+      "No SLA or uptime guarantee",
+      "Security vulnerabilities",
+      "No SDK ecosystem",
+      "Retry logic is hard to get right"
+    ],
+    "useHookSniffItems": [
+      "Up and running in 5 minutes",
+      "Starts at $0/month",
+      "Zero maintenance",
+      "99.9% SLA (Business)",
+      "HMAC, TLS, 2FA built-in",
+      "11 SDKs across all languages",
+      "Battle-tested retry engine"
+    ],
+    "startupTitle": "Early stage startup?",
+    "startupDesc": "We have special startup plans to help you grow. Pre-Series A startups get extended free tiers and significant discounts on paid plans.",
+    "startupCta": "Apply for startup discount →",
+    "faqTitle": "Frequently asked questions",
+    "ctaTitle": "Ready to get started?",
+    "ctaDesc": "Join thousands of developers who trust HookSniff for webhook delivery.",
+    "ctaStart": "Start for free →",
+    "ctaContact": "Contact sales",
+    "days": "days",
+    "http": "HTTP",
+    "ws": "WS",
+    "grpc": "gRPC",
+    "sqs": "SQS"
+  },
+  "pricingFaq": [
+    {
+      "q": "What counts as a webhook?",
+      "a": "A webhook is an event delivered to your endpoint. Failed deliveries that are retried do not count as additional webhooks — retries are free. Filtered messages are also free."
+    },
+    {
+      "q": "Do I need a credit card to start?",
+      "a": "No. You can sign up and start sending webhooks on the Free plan without a credit card. Upgrade when you need more volume or features."
+    },
+    {
+      "q": "What happens if I exceed my plan limit?",
+      "a": "We never drop webhooks. If you exceed your monthly limit, additional events are metered at the per-plan rate. You can also set a hard cap in your dashboard settings."
+    },
+    {
+      "q": "Are retries really free?",
+      "a": "Yes. A webhook includes all its retries. If a delivery fails and we retry it 3 times, that still counts as 1 webhook. We absorb the retry cost because reliable delivery is our core promise."
+    },
+    {
+      "q": "Can I change plans mid-month?",
+      "a": "Yes. Upgrades take effect immediately and are prorated. Downgrades take effect at the start of your next billing cycle. No penalties, no hidden fees."
+    },
+    {
+      "q": "Is there a startup discount?",
+      "a": "Yes! If you're an early-stage startup (pre-Series A), contact us at hello@hooksniff.com with your details. We offer significant discounts and extended free tiers."
+    },
+    {
+      "q": "What's the difference between Pro and Business?",
+      "a": "Pro is for growing teams that need more volume and better monitoring. Business is for teams that need SLA guarantees, FIFO delivery, SSO, and dedicated support."
+    },
+    {
+      "q": "Do you offer annual billing?",
+      "a": "Yes. Annual billing saves you 20% compared to monthly. That's $278/year for Pro and $950/year for Business."
+    },
+    {
+      "q": "What payment methods do you accept?",
+      "a": "We accept all major credit cards via Stripe. For Business and Enterprise plans, we also support invoicing and bank transfers."
+    },
+    {
+      "q": "Can I self-host HookSniff?",
+      "a": "Yes! HookSniff is open-source. You can self-host with Docker. Self-hosted instances get community support. Paid plans add priority support for self-hosted."
+    },
+    {
+      "q": "What SDKs do you support?",
+      "a": "We support 11 SDKs: Node.js, Python, Rust, C#, Go, Swift, PHP, Elixir, Java, Kotlin, and Ruby."
+    },
+    {
+      "q": "Is my data secure?",
+      "a": "Yes. All data is encrypted in transit (TLS 1.3) and at rest. We use HMAC-SHA256 for webhook signatures, Argon2 for password hashing, and support 2FA/TOTP."
+    },
+    {
+      "q": "Do you comply with GDPR?",
+      "a": "Yes. We are GDPR compliant. We process data in EU regions, support data export/deletion requests, and have a published privacy policy."
+    },
+    {
+      "q": "What's your uptime SLA?",
+      "a": "Free and Pro plans have a 99.9% uptime target (best effort). Business plans include a 99.9% uptime SLA with credits if we miss it."
+    },
+    {
+      "q": "How does HookSniff compare to Svix?",
+      "a": "HookSniff offers similar features at 10x lower cost. Svix starts at $490/month; HookSniff Pro is $49/month. We also support more SDKs (11 vs 6), FIFO delivery, and CloudEvents."
+    },
+    {
+      "q": "Can I export my data?",
+      "a": "Yes. You can export all your webhook logs, endpoint configurations, and delivery history as JSON or CSV from the dashboard."
+    }
+  ]
 }
