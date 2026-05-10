@@ -206,8 +206,10 @@ pub async fn handle_webhook_event(
     verify_webhook_signature(payload, signature, webhook_secret, tolerance_secs)?;
 
     // Step 2: Parse and process the event
-    let event: StripeWebhookEvent = serde_json::from_str(payload)
-        .map_err(|e| AppError::BadRequest(format!("Invalid event: {}", e)))?;
+    let event: StripeWebhookEvent = serde_json::from_str(payload).map_err(|e| {
+        tracing::warn!("Invalid Stripe webhook payload: {:?}", e);
+        AppError::BadRequest("Invalid webhook payload".into())
+    })?;
 
     match event.event_type.as_str() {
         "checkout.session.completed" => {
