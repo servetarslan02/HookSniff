@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 00:36 GMT+8
+> Son güncelleme: 2026-05-11 01:04 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -83,6 +83,22 @@
 - **ESLint:** clean
 - **Commit:** `cb3ed64` — main branch
 - **Tüm Rust major bağımlılıkları artık en güncel!** 🎉
+
+## Oturum 96 (2026-05-11 00:57 - devam ediyor) 🔄
+- **Staging testleri tamamlandı:**
+  - ✅ Health check: database healthy (36ms), queue healthy (108ms)
+  - ✅ Login: demo + admin JWT çalışıyor
+  - ✅ Rate limit: 25. istekte HTTP 429 tetiklendi
+  - ✅ Webhook veritabanına yazıldı (pending status)
+  - ⚠️ Worker delivery processing: "pending" kaldı — worker servisi 403 döndü, deployment kontrolü gerekli
+- **Kod kalitesi:**
+  - ✅ cargo check: temiz
+  - ✅ 979/979 API testi geçti
+  - ✅ 20/20 worker testi geçti
+  - ✅ Dashboard ESLint: clean
+  - ✅ Dashboard TypeScript: 0 hata
+- **Worker deprecation fix:** `clone_from_slice` → `try_from` (signing.rs, 4 yer)
+- **Devam ediyor:** SDK düzeltmeleri, kalan işler
 
 ## Oturum 91-93 (2026-05-10 22:08 - 22:53) ✅
 - HS-019: WebSocket max_connections=1000
