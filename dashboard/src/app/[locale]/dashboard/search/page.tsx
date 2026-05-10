@@ -47,7 +47,8 @@ export default function SearchPage() {
       params.set('per_page', '20');
 
       const res = await fetch(`${API}/search?${params}`, {
-        headers: { credentials: 'include' as const },
+        headers: {},
+        credentials: 'include' as const,
       });
       if (res.ok) setResults(await res.json());
     } catch (e) {

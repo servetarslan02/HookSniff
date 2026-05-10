@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
+use std::fmt;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Config {
     pub port: u16,
     pub database_url: String,
@@ -45,6 +46,39 @@ pub struct Config {
     pub fcm_server_key: Option<String>,
     /// Base URL for email links (password reset, verification)
     pub email_base_url: String,
+}
+
+/// Custom Debug implementation that masks secret fields.
+impl fmt::Debug for Config {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Config")
+            .field("port", &self.port)
+            .field("database_url", &"[REDACTED]")
+            .field("hmac_secret", &"[REDACTED]")
+            .field("max_webhook_payload_bytes", &self.max_webhook_payload_bytes)
+            .field("jwt_secret", &"[REDACTED]")
+            .field("retention_days", &self.retention_days)
+            .field("rust_log", &self.rust_log)
+            .field("webhook_format", &self.webhook_format)
+            .field("webhook_timestamp_tolerance_secs", &self.webhook_timestamp_tolerance_secs)
+            .field("stripe_secret_key", &self.stripe_secret_key.as_ref().map(|_| "[REDACTED]"))
+            .field("stripe_webhook_secret", &self.stripe_webhook_secret.as_ref().map(|_| "[REDACTED]"))
+            .field("app_url", &self.app_url)
+            .field("otel_enabled", &self.otel_enabled)
+            .field("otel_exporter_otlp_endpoint", &self.otel_exporter_otlp_endpoint)
+            .field("otel_exporter_otlp_headers", &self.otel_exporter_otlp_headers.as_ref().map(|_| "[REDACTED]"))
+            .field("polar_access_token", &self.polar_access_token.as_ref().map(|_| "[REDACTED]"))
+            .field("polar_webhook_secret", &self.polar_webhook_secret.as_ref().map(|_| "[REDACTED]"))
+            .field("iyzico_api_key", &self.iyzico_api_key.as_ref().map(|_| "[REDACTED]"))
+            .field("iyzico_secret_key", &self.iyzico_secret_key.as_ref().map(|_| "[REDACTED]"))
+            .field("gcp_service_account_path", &self.gcp_service_account_path)
+            .field("cors_origins", &self.cors_origins)
+            .field("notify_from_email", &"[REDACTED]")
+            .field("notify_email", &self.notify_email.as_ref().map(|_| "[REDACTED]"))
+            .field("fcm_server_key", &self.fcm_server_key.as_ref().map(|_| "[REDACTED]"))
+            .field("email_base_url", &self.email_base_url)
+            .finish()
+    }
 }
 
 /// Patterns that look like placeholder / throwaway secrets (case-insensitive).
