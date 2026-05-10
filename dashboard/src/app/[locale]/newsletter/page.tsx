@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -58,6 +59,7 @@ const faqs = [
 /* ─── Main Page ─── */
 
 export default function NewsletterPage() {
+  const t = useTranslations(\'newsletter\');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -97,7 +99,7 @@ export default function NewsletterPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Newsletter</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -107,7 +109,7 @@ export default function NewsletterPage() {
         {/* Hero */}
         <div className="text-center mb-12">
           <span className="text-5xl mb-4 block">📬</span>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">The Webhook Digest</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("theWebhookDigest")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-xl mx-auto">
             Webhook tips, product updates, and engineering insights. Delivered to your inbox. No spam. Unsubscribe anytime.
           </p>
@@ -187,7 +189,7 @@ export default function NewsletterPage() {
 
         {/* Past Issues */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Recent Issues</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t("recentIssues")}</h2>
 
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2 mb-6 justify-center">
@@ -245,24 +247,24 @@ export default function NewsletterPage() {
           <div className="inline-flex items-center gap-6 px-8 py-4 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">500+</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">Subscribers</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{t("subscribers")}</p>
             </div>
             <div className="w-px h-10 bg-gray-200 dark:bg-slate-800" />
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">48%</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">Open rate</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{t("openRate")}</p>
             </div>
             <div className="w-px h-10 bg-gray-200 dark:border-slate-800" />
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">17</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">Issues sent</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{t("issuesSent")}</p>
             </div>
           </div>
         </div>
 
         {/* Testimonials */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">What subscribers say</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t("whatSubscribersSay")}</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
               {
@@ -320,7 +322,7 @@ export default function NewsletterPage() {
 
         {/* FAQ */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t("faq")}</h2>
           <div className="max-w-2xl mx-auto space-y-2">
             {faqs.map((faq, i) => (
               <div key={i} className="border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden">
@@ -346,11 +348,11 @@ export default function NewsletterPage() {
         {/* Privacy */}
         <div className="text-center p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 mb-16">
           <span className="text-2xl mb-2 block">🔒</span>
-          <h3 className="font-bold text-gray-900 dark:text-white mb-2">Your privacy matters</h3>
+          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("privacyMatters")}</h3>
           <p className="text-sm text-gray-600 dark:text-slate-400 max-w-lg mx-auto">
             We use your email only for our newsletter. No spam, no selling, no sharing.
             Unsubscribe with one click anytime. Read our{' '}
-            <Link href="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">Privacy Policy</Link>.
+            <Link href="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">{t("privacyPolicy")}</Link>.
           </p>
         </div>
 

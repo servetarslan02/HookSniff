@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -221,7 +222,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Story not found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t("storyNotFound")}</h1>
           <Link href="/customers" className="text-brand-600 dark:text-brand-400 hover:underline">← Back to customers</Link>
         </div>
       </div>
@@ -272,7 +273,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
 
         {/* Problem */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The problem</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("theProblem")}</h2>
           <ul className="space-y-3">
             {story.problem.map((p) => (
               <li key={p} className="flex items-start gap-3 text-gray-600 dark:text-slate-400">
@@ -285,7 +286,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
 
         {/* Solution */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The solution</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("theSolution")}</h2>
           <ul className="space-y-3">
             {story.solution.map((s) => (
               <li key={s} className="flex items-start gap-3 text-gray-700 dark:text-slate-300">
@@ -298,19 +299,19 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
 
         {/* Results */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Results</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("results")}</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {story.results.map((r) => (
               <div key={r.label} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
                 <p className="text-sm text-gray-500 dark:text-slate-500 mb-2">{r.label}</p>
                 <div className="flex items-center gap-3">
                   <div>
-                    <p className="text-xs text-gray-400 dark:text-slate-600">Before</p>
+                    <p className="text-xs text-gray-400 dark:text-slate-600">{t("before")}</p>
                     <p className="text-sm text-red-600 dark:text-red-400 line-through">{r.before}</p>
                   </div>
                   <svg className="w-5 h-5 text-gray-400 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                   <div>
-                    <p className="text-xs text-gray-400 dark:text-slate-600">After</p>
+                    <p className="text-xs text-gray-400 dark:text-slate-600">{t("after")}</p>
                     <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{r.after}</p>
                   </div>
                 </div>
@@ -321,7 +322,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
 
         {/* Tech Stack */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Tech stack</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("techStack")}</h2>
           <div className="flex flex-wrap gap-2">
             {story.techStack.map((t) => (
               <span key={t} className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-full text-sm text-gray-700 dark:text-slate-300">{t}</span>
@@ -335,7 +336,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
           <p className="text-gray-400 dark:text-slate-400 mb-4">Join {story.company} and thousands of developers who trust HookSniff.</p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
-            <Link href="/customers" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">More stories</Link>
+            <Link href="/customers" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("moreStories")}</Link>
           </div>
         </div>
       </article>

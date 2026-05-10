@@ -1,6 +1,8 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function SelfHostingPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Self-Hosting Guide</h1>
@@ -10,7 +12,7 @@ export default function SelfHostingPage() {
 
       {/* Quick Setup */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Quick Setup</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("quickSetup")}</h2>
         <CodeBlock
           code={`# 1. Clone the repo
 git clone https://github.com/servetarslan02/HookSniff.git
@@ -31,9 +33,9 @@ make self-host`}
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Service</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Port</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("service")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("port")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("description")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -48,7 +50,7 @@ make self-host`}
 
       {/* Environment Variables */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Environment Variables</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("environmentVariables")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Configure via <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">.env</code> file:
         </p>
@@ -76,7 +78,7 @@ DASHBOARD_URL=http://localhost:3001`}
 
       {/* Docker Compose */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Docker Compose</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("dockerCompose")}</h2>
         <CodeBlock
           code={`# Start
 docker compose up -d --build
@@ -92,7 +94,7 @@ docker compose up -d --build`}
 
       {/* Management Commands */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Management Commands</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("managementCommands")}</h2>
         <CodeBlock
           code={`# Status check
 make self-host-status
@@ -115,11 +117,11 @@ make logs-db`}
 
       {/* Production Deployment */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Cloud Deployment</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("cloudDeployment")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           For production, set up a reverse proxy with SSL:
         </p>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Nginx Reverse Proxy</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("nginxReverseProxy")}</h3>
         <CodeBlock
           code={`server {
     server_name hooksniff.example.com;
@@ -145,7 +147,7 @@ server {
         <CodeBlock
           code={`sudo certbot --nginx -d hooksniff.example.com -d api.hooksniff.example.com`}
         />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">Firewall</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">{t("firewall")}</h3>
         <CodeBlock
           code={`sudo ufw allow 22/tcp
 sudo ufw allow 80/tcp
@@ -156,7 +158,7 @@ sudo ufw enable`}
 
       {/* Troubleshooting */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Troubleshooting</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("troubleshooting")}</h2>
         <CodeBlock
           code={`# Check service status
 make status

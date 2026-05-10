@@ -75,7 +75,7 @@ export default function AdminUserDetailPage() {
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">😕</div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">User Not Found</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("userNotFound")}</h2>
         <button
           onClick={() => router.push('/admin/users')}
           className="text-brand-600 dark:text-brand-400 text-sm font-medium"
@@ -100,14 +100,14 @@ export default function AdminUserDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {detail.user.name || detail.user.email}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">User Detail</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400">{t("userDetail")}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Info Card */}
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">User Info</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("userInfo")}</h2>
           <div className="space-y-4">
             <div>
               <label className="text-xs text-gray-500 dark:text-slate-400">ID</label>
@@ -138,7 +138,7 @@ export default function AdminUserDetailPage() {
 
         {/* Plan & Status Management */}
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Management</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("management")}</h2>
 
           <div className="space-y-6">
             {/* Plan Selector */}
@@ -190,13 +190,13 @@ export default function AdminUserDetailPage() {
               </label>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-slate-400">Total Deliveries</span>
+                  <span className="text-gray-500 dark:text-slate-400">{t("totalDeliveries")}</span>
                   <span className="font-medium text-gray-900 dark:text-white">
                     {detail.usage_stats?.total_deliveries?.toLocaleString() || '0'}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-slate-400">Success Rate</span>
+                  <span className="text-gray-500 dark:text-slate-400">{t("successRate")}</span>
                   <span className="font-medium text-gray-900 dark:text-white">
                     {detail.usage_stats?.success_rate || 0}%
                   </span>
@@ -236,7 +236,7 @@ export default function AdminUserDetailPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-slate-500">No endpoints</p>
+            <p className="text-sm text-gray-400 dark:text-slate-500">{t("noEndpoints")}</p>
           )}
         </div>
       </div>
@@ -244,7 +244,7 @@ export default function AdminUserDetailPage() {
       {/* Recent Deliveries */}
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Deliveries</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("recentDeliveries")}</h2>
         </div>
         {detail.recent_deliveries?.length ? (
           <div className="overflow-x-auto">
@@ -252,10 +252,10 @@ export default function AdminUserDetailPage() {
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Event</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Attempts</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Time</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("event")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("status")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("attempts")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("time")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">

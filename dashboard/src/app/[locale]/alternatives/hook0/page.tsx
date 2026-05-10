@@ -24,7 +24,7 @@ export default function Hook0AlternativePage() {
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden mb-12">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead><tr className="border-b border-gray-200 dark:border-slate-800">
-              <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">Feature</th>
+              <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">{t("compare.feature")}</th>
               <th className="text-center py-3 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/30">🪝 HookSniff</th>
               <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Hook0</th>
             </tr></thead>

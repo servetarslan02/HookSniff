@@ -276,7 +276,7 @@ export function OnboardingWizard() {
             {/* Step: SDK */}
             {currentStep.id === 'sdk' && (
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">Choose your SDK</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("chooseSdk")}</h2>
                 <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">Pick your language and copy the install command.</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-6 max-h-48 overflow-y-auto">
                   {SDKS.map((sdk) => (
@@ -298,7 +298,7 @@ export function OnboardingWizard() {
                 </div>
                 <div className="bg-gray-900 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-400 uppercase tracking-wider">Install Command</span>
+                    <span className="text-xs text-gray-400 uppercase tracking-wider">{t("installCommand")}</span>
                     <button
                       onClick={() => handleCopy(SDKS.find(s => s.id === selectedSdk)?.install || '', 'install')}
                       className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
@@ -316,7 +316,7 @@ export function OnboardingWizard() {
             {/* Step: Endpoint */}
             {currentStep.id === 'endpoint' && (
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">Create your first endpoint</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("createFirstEndpoint")}</h2>
                 <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">Enter the URL where you want to receive webhooks.</p>
 
                 {error && (
@@ -342,13 +342,13 @@ export function OnboardingWizard() {
                       type="text"
                       value={endpointDesc}
                       onChange={(e) => setEndpointDesc(e.target.value)}
-                      placeholder="My production webhook endpoint"
+                      placeholder={t("descPlaceholder")}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"
                     />
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-3">
                     <p className="text-xs text-blue-700 dark:text-blue-400">
-                      💡 <strong>No real URL yet?</strong> Use the <a href="/playground" target="_blank" className="underline">Playground</a> to get a temporary test URL, or enter any HTTPS URL to start.
+                      💡 <strong>No real URL yet?</strong> Use the <a href="/playground" target="_blank" className="underline">{t("playground")}</a> to get a temporary test URL, or enter any HTTPS URL to start.
                     </p>
                   </div>
                 </div>
@@ -358,12 +358,12 @@ export function OnboardingWizard() {
             {/* Step: Test */}
             {currentStep.id === 'test' && (
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">Send a test webhook</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("sendTestWebhook")}</h2>
                 <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">Copy this command and run it in your terminal.</p>
 
                 <div className="bg-gray-900 rounded-xl p-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-400 uppercase tracking-wider">Test Command</span>
+                    <span className="text-xs text-gray-400 uppercase tracking-wider">{t("testCommand")}</span>
                     <button
                       onClick={() => handleCopy(`curl -X POST https://api.hooksniff.dev/v1/webhooks \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"endpoint_id":"ep_YOUR_ID","event":"test.ping","data":{"hello":"world"}}'`, 'test')}
                       className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
@@ -416,19 +416,19 @@ export function OnboardingWizard() {
                 <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
                   <a href="/dashboard/endpoints" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">🔗</div>
-                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">Endpoints</div>
+                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("endpoints")}</div>
                   </a>
                   <a href="/dashboard/deliveries" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">📦</div>
-                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">Deliveries</div>
+                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("deliveries")}</div>
                   </a>
                   <a href="/dashboard/playground" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">🧪</div>
-                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">Playground</div>
+                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("playground")}</div>
                   </a>
                   <a href="/dashboard/api-keys" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">🔑</div>
-                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">API Keys</div>
+                    <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("apiKeys")}</div>
                   </a>
                 </div>
               </div>
@@ -568,7 +568,7 @@ export function SetupChecklist() {
         <div className="flex items-center gap-3">
           <div className="text-lg">🎯</div>
           <div className="text-left">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">Setup Progress</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">{t("setupProgress")}</div>
             <div className="text-xs text-gray-500 dark:text-slate-400">{completed.length}/{items.length} completed</div>
           </div>
         </div>

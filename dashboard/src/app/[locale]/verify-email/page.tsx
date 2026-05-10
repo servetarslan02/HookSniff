@@ -83,7 +83,7 @@ function VerifyEmailContent() {
           {status === 'expired' && (
             <>
               <div className="text-6xl mb-4">⏰</div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Link Expired</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("error.linkExpired")}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <button
                 onClick={async () => {
@@ -101,7 +101,7 @@ function VerifyEmailContent() {
           {status === 'error' && (
             <>
               <div className="text-6xl mb-4">❌</div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Verification Failed</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("error.verificationFailed")}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <Link
                 href="/login"

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -13,6 +14,7 @@ const providers = [
 ];
 
 export default function ProvidersPage() {
+  const t = useTranslations(\'providers\');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -20,7 +22,7 @@ export default function ProvidersPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Providers</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -28,7 +30,7 @@ export default function ProvidersPage() {
 
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Webhook Provider Guides</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t("guides")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">Step-by-step guides for receiving webhooks from popular providers. Set up, verify, and process events in minutes.</p>
         </div>
 

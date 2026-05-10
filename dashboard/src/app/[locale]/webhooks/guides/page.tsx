@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -44,6 +45,7 @@ const guides = [
 ];
 
 export default function WebhookGuidesPage() {
+  const t = useTranslations(\'webhooks\');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -53,7 +55,7 @@ export default function WebhookGuidesPage() {
             <span className="text-gray-400">/</span>
             <Link href="/webhooks" className="text-gray-600 dark:text-slate-400">Webhooks</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Guides</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("guides")}</span>
           </div>
           <LanguageSwitcher />
         </div>
