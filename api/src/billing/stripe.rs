@@ -434,8 +434,17 @@ async fn handle_invoice_paid(
         .execute(pool)
         .await?;
 
+        // HS-059: Clear grace period on successful payment
+        sqlx::query(
+            "UPDATE customers SET payment_failed_at = NULL, updated_at = NOW() \
+             WHERE id = $1 AND payment_failed_at IS NOT NULL",
+        )
+        .bind(customer_id)
+        .execute(pool)
+        .await?;
+
         tracing::info!(
-            "✅ Invoice recorded: {} (${} {})",
+            "✅ Invoice recorded: {} (${} {}) — grace period cleared",
             provider_invoice_id,
             amount_cents as f64 / 100.0,
             currency
@@ -495,6 +504,20 @@ async fn handle_invoice_failed(
         .bind(provider_invoice_id)
         .execute(pool)
         .await?;
+
+        // HS-059: Set grace period start on payment failure
+        sqlx::query(
+            "UPDATE customers SET payment_failed_at = NOW(), updated_at = NOW() \
+             WHERE id = $1 AND payment_failed_at IS NULL",
+        )
+        .bind(customer_id)
+        .execute(pool)
+        .await?;
+
+        tracing::warn!(
+            "⚠️ Invoice payment failed for customer {} — grace period started",
+            customer_id
+        );
     }
 
     tracing::warn!("⚠️ Invoice payment failed: {}", provider_invoice_id);
