@@ -1082,6 +1082,8 @@ mod tests {
             checkout_url: Some("https://checkout.stripe.com/xyz".to_string()),
             provider: "stripe".to_string(),
             message: "Redirecting".to_string(),
+            prorated_amount_cents: None,
+            days_remaining: None,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["checkout_url"], "https://checkout.stripe.com/xyz");
@@ -1094,9 +1096,13 @@ mod tests {
             checkout_url: None,
             provider: "stripe".to_string(),
             message: "Done".to_string(),
+            prorated_amount_cents: Some(1500),
+            days_remaining: Some(15),
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert!(json["checkout_url"].is_null());
+        assert_eq!(json["prorated_amount_cents"], 1500);
+        assert_eq!(json["days_remaining"], 15);
     }
 
     // ── PortalResponse ──────────────────────────────────────
