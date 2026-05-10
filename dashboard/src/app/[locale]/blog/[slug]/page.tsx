@@ -2,7 +2,7 @@ import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { posts, orderedSlugs, authors, categoryGradients, getRelatedPosts, getAdjacentPosts, tokenizeCode, type Post } from './data';
+import { posts, authors, categoryGradients, getRelatedPosts, getAdjacentPosts, tokenizeCode } from './data';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
   const { slug } = await params;
