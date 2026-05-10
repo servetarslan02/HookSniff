@@ -84,7 +84,7 @@ describe('PrivacyPage', () => {
   it('renders contact section', () => {
     const { container } = render(React.createElement(PrivacyPage));
     expect(container.textContent).toContain('13. Contact');
-    expect(container.textContent).toContain('privacy@hooksniff.vercel.app');
+    expect(container.textContent).toContain('contact form');
   });
 
   it('renders all 13 policy sections', () => {

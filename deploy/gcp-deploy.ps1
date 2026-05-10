@@ -120,7 +120,7 @@ Write-Host "OK: Worker image push edildi" -ForegroundColor Green
 # Step 8: Cloud Run API servisi deploy
 Write-Host "[9/9] API Cloud Run'a deploy ediliyor..." -ForegroundColor Blue
 
-$envVarsStr = "APP_ENV=production,RUST_LOG=info,hooksniff=info,LOG_FORMAT=json,CORS_ORIGINS=https://hooksniff.is-a.dev,APP_URL=https://hooksniff.is-a.dev,POLAR_PRODUCT_PRO=$env:POLAR_PRODUCT_PRO,POLAR_PRODUCT_BUSINESS=$env:POLAR_PRODUCT_BUSINESS,POLAR_ENV=production,RATE_LIMIT_STORE=redis,RETENTION_DAYS=7,WEBHOOK_FORMAT=standard,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp,MAX_PAYLOAD_BYTES=1048576,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300"
+$envVarsStr = "APP_ENV=production,RUST_LOG=info,hooksniff=info,LOG_FORMAT=json,CORS_ORIGINS=https://hooksniff.is-a.dev,APP_URL=https://hooksniff.is-a.dev,POLAR_PRODUCT_PRO=$env:POLAR_PRODUCT_PRO,POLAR_PRODUCT_BUSINESS=$env:POLAR_PRODUCT_BUSINESS,POLAR_ENV=production,RATE_LIMIT_STORE=redis,RETENTION_DAYS=7,WEBHOOK_FORMAT=standard,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp,MAX_PAYLOAD_BYTES=1048576,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300"
 
 $secretsStr = "HMAC_SECRET=hooksniff-hmac-secret:latest,JWT_SECRET=hooksniff-jwt-secret:latest,DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest"
 
@@ -137,7 +137,7 @@ Write-Host "OK: API deploy edildi: $API_URL" -ForegroundColor Green
 # Step 9: Cloud Run Worker servisi deploy
 Write-Host "[10] Worker Cloud Run'a deploy ediliyor..." -ForegroundColor Blue
 
-$workerEnvVars = "APP_ENV=production,RUST_LOG=info,hooksniff=info,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp"
+$workerEnvVars = "APP_ENV=production,RUST_LOG=info,hooksniff=info,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp"
 
 $workerSecrets = "DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest"
 

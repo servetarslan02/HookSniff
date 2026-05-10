@@ -945,7 +945,7 @@
       "İtiraz: Kişisel verilerinizin işlenmesine itiraz etme",
       "Onayı geri çekme: İşlem onaya dayandığında"
     ],
-    "s8How": "Bu haklarınızı kullanmak için privacy@hooksniff.vercel.app adresinden bize ulaşın",
+    "s8How": "Bu haklarınızı kullanmak için iletişim formundan bize ulaşın",
     "s9Title": "9. Çerezler",
     "s9Text": "Kimlik doğrulama ve oturum yönetimi için temel çerezler kullanırız. Çerezleri tarayıcı ayarlarınızdan kontrol edebilirsiniz.",
     "s10Title": "10. Uluslararası Aktarımlar",
@@ -955,7 +955,7 @@
     "s12Title": "12. Bu Politikadaki Değişiklikler",
     "s12Text": "Bu Gizlilik Politikasını zaman zaman güncelleyebiliriz. Önemli değişiklikleri e-posta veya panel bildirimi ile size bildiririz.",
     "s13Title": "13. Bize Ulaşın",
-    "s13Text": "Gizlilikle ilgili sorularınız için privacy@hooksniff.vercel.app adresinden bize ulaşın"
+    "s13Text": "Gizlilikle ilgili sorularınız için iletişim formundan bize ulaşın"
   },
   "admin": {
     "overview": "Yönetici Genel Bakışı",
@@ -1523,7 +1523,7 @@
     },
     {
       "q": "Girişim indirimi var mı?",
-      "a": "Evet! Erken aşama girişimseniz (Seri A öncesi), hello@hooksniff.vercel.app adresinden bize ulaşın. Önemli indirimler ve genişletilmiş ücretsiz katmanlar sunuyoruz."
+      "a": "Evet! Erken aşama girişimseniz (Seri A öncesi), iletişim formundan bize ulaşın. Önemli indirimler ve genişletilmiş ücretsiz katmanlar sunuyoruz."
     },
     {
       "q": "Pro ile Business arasındaki fark ne?",
