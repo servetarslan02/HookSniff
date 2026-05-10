@@ -169,7 +169,10 @@
     "deliveredSuccessfully": "Başarıyla teslim edildi",
     "failedWillRetry": "Başarısız — tekrar denenecek",
     "failedWillRetryBackoff": "Başarısız — geri çekilme ile tekrar denenecek",
-    "retriedBackoff": "Üstel geri çekilme ile tekrar denendi"
+    "retriedBackoff": "Üstel geri çekilme ile tekrar denendi",
+    "created": "Oluşturuldu",
+    "closeDetails": "Detayları kapat",
+    "status": "Durum"
   },
   "logs": {
     "title": "Webhook Logları",
@@ -191,7 +194,12 @@
     "searching": "Aranıyor...",
     "noResultsQuery": "Sonuç bulunamadı.",
     "enterQuery": "Webhook bulmak için bir arama sorgusu girin.",
-    "resultCount": "{total} sonuç{plural}"
+    "resultCount": "{total} sonuç{plural}",
+    "attempts": "Deneme",
+    "time": "Zaman",
+    "event": "Olay",
+    "status": "Durum",
+    "endpoint": "Endpoint"
   },
   "health": {
     "title": "Endpoint Sağlığı",
@@ -234,7 +242,10 @@
       "consecutiveFailures": "Ardışık Başarısızlıklar"
     },
     "deleteTitle": "Alarmı Sil",
-    "delete": "Sil"
+    "delete": "Sil",
+    "nameLabel": "Ad",
+    "conditionLabel": "Koşul",
+    "thresholdLabel": "Eşik"
   },
   "playground": {
     "title": "API Oyun Alanı",
@@ -465,7 +476,23 @@
     "endpointsApi": "Endpoint'ler",
     "webhooksApi": "Webhook'lar",
     "statsApi": "İstatistikler",
-    "errorCodes": "Hata Kodları",
+    "errorCodes": {
+      "badRequest": "Geçersiz İstek",
+      "unauthorized": "Yetkisiz",
+      "forbidden": "Yasak",
+      "notFound": "Bulunamadı",
+      "rateLimited": "Hız Sınırı",
+      "serverError": "Sunucu Hatası",
+      "invalidBody": "Geçersiz istek gövdesi veya parametreler",
+      "missingKey": "Eksik veya geçersiz API anahtarı",
+      "insufficient": "Yetersiz izin veya plan limiti aşıldı",
+      "notFoundDesc": "Kaynak mevcut değil",
+      "tooMany": "Çok fazla istek — Retry-After başlığını kontrol edin",
+      "serverErrorDesc": "İç hata — devam ederse destek ile iletişime geçin",
+      "code": "Kod",
+      "meaning": "Anlamı",
+      "description": "Açıklama"
+    },
     "errorCode": "Kod",
     "meaning": "Anlamı",
     "errorDesc": "Açıklama",
@@ -507,7 +534,12 @@
     "eventTypes": "Event Tipleri",
     "idempotency": "İdempotency",
     "embeddablePortal": "Gömülebilir Portal",
-    "reference": "Referans"
+    "reference": "Referans",
+    "apiBaseUrl": "API Taban URLsi",
+    "plan": "Plan",
+    "free": "Ücretsiz",
+    "pro": "Pro",
+    "business": "Business"
   },
   "status": {
     "title": "HookSniff Durumu",
@@ -617,7 +649,13 @@
     "cache": "Önbellek",
     "cdn": "CDN",
     "dashboard": "Panel",
-    "monitoring": "İzleme"
+    "monitoring": "İzleme",
+    "email": "E-posta",
+    "name": "Ad",
+    "plan": "Plan",
+    "status": "Durum",
+    "created": "Oluşturuldu",
+    "actions": "İşlemler"
   },
   "landing": {
     "nav": {
@@ -725,7 +763,28 @@
       "startups": "Startups",
       "newsletter": "Newsletter",
       "blog": "Blog",
-      "whatIsAWebhook": "Webhook Nedir?"
+      "whatIsAWebhook": "Webhook Nedir?",
+      "product": "Ürün",
+      "company": "Şirket",
+      "resources": "Kaynaklar",
+      "getStarted": "Başla",
+      "compareLinks": {
+        "hooksniffVsSvix": "HookSniff vs Svix",
+        "hooksniffVsHookdeck": "HookSniff vs Hookdeck",
+        "hooksniffVsHook0": "HookSniff vs Hook0",
+        "hooksniffVsConvoy": "HookSniff vs Convoy",
+        "svixAlternatives": "Svix Alternatifleri",
+        "hookdeckAlternatives": "Hookdeck Alternatifleri",
+        "convoyAlternatives": "Convoy Alternatifleri",
+        "buildVsBuy": "Yap mı Satın Al mı"
+      },
+      "resourceLinks": {
+        "webhookGuides": "Webhook Rehberleri",
+        "webhookGlossary": "Webhook Sözlüğü",
+        "stripeWebhooks": "Stripe Webhookları",
+        "githubWebhooks": "GitHub Webhookları",
+        "shopifyWebhooks": "Shopify Webhookları"
+      }
     }
   },
   "apiKeys": {
@@ -1534,5 +1593,46 @@
     "totalRetryTime": "Toplam yeniden deneme süresi (en kötü durum):",
     "tip": "💡 Endpoint başına yeniden deneme politikaları bu global varsayılanları geçersiz kılar. Endpoint Ayarları'nda yapılandırın.",
     "endpointSettingsLink": "Endpoint Ayarları"
+  },
+  "inbound": {
+    "title": "Gelen Webhooklar",
+    "subtitle": "Stripe, GitHub, Shopify gibi servislerden webhook alıp HookSniff üzerinden yönlendirin",
+    "howItWorks": "Nasıl çalışır",
+    "externalService": "Dış Servis",
+    "verifySignature": "İmzayı Doğrula",
+    "yourEndpoint": "Endpointiniz",
+    "addProvider": "Gelen Sağlayıcı Ekle",
+    "webhookSecret": "Webhook Gizli Anahtarı",
+    "routeToEndpoint": "Endpointe Yönlendir",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "yourUrls": "Gelen URLleriniz",
+    "copy": "Kopyala",
+    "activeConfigs": "Aktif Yapılandırmalar",
+    "selectEndpoint": "Endpoint seçin..."
+  },
+  "contact": {
+    "title": "Bize Ulaşın",
+    "subtitle": "Ekibimizle iletişime geçin",
+    "generalQuestion": "Genel soru",
+    "technicalSupport": "Teknik destek",
+    "billingPayments": "Fatura ve ödemeler",
+    "featureRequest": "Özellik isteği",
+    "bugReport": "Hata bildirimi",
+    "enterpriseInquiry": "Kurumsal başvuru",
+    "selectTopic": "Konu seçin",
+    "sendMessage": "Mesaj gönderin",
+    "name": "Adınız",
+    "email": "E-posta",
+    "subject": "Konu",
+    "message": "Mesaj",
+    "responseTime": "Yanıt Süresi",
+    "location": "Konum"
+  },
+  "about": {
+    "title": "HookSniff Hakkında",
+    "ourStory": "Hikayemiz",
+    "ourMission": "Misyonumuz",
+    "cta": "Webhook teslimatı için HookSniff'e güvenen geliştiricilere katılın."
   }
 }
