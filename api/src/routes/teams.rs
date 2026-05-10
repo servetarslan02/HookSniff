@@ -354,13 +354,13 @@ async fn invite_member(
 
     tracing::info!("✅ Invite sent to {} for team {}", req.email, id);
 
+    // Note: token is NOT returned in response — it's sent via email only
     Ok(Json(serde_json::json!({
         "id": invite.id,
         "email": invite.email,
         "role": invite.role,
-        "token": invite.token,
         "expires_at": invite.expires_at,
-        "message": "Invitation created successfully"
+        "message": "Invitation sent successfully"
     })))
 }
 
