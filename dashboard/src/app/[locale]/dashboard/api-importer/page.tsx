@@ -143,7 +143,7 @@ export default function ApiSpecImporterPage() {
 
     toast(t('imported', { success, total: selected.length }), success > 0 ? 'success' : 'error');
     setImporting(false);
-  }, [parsed, token, toast]);
+  }, [parsed, token, toast, t]);
 
   const sampleSpec = `{
   "openapi": "3.0.0",
