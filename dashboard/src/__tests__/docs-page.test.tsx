@@ -32,16 +32,14 @@ describe('DocsPage', () => {
     expect(container.textContent).toContain('docs.gettingStarted');
   });
 
-  it('renders quick start section', () => {
+  it('renders getting started section', () => {
     const { container } = render(React.createElement(DocsPage));
-    expect(container.textContent).toContain('docs.quickStart');
+    expect(container.textContent).toContain('docs.gettingStarted');
   });
 
-  it('renders code examples', () => {
+  it('renders quickstart link card', () => {
     const { container } = render(React.createElement(DocsPage));
-    expect(container.textContent).toContain('docs.codeExamples');
-    expect(container.textContent).toContain('Node.js');
-    expect(container.textContent).toContain('Python');
-    expect(container.textContent).toContain('Go');
+    expect(container.textContent).toContain('Quickstart');
+    expect(container.textContent).toContain('Send your first webhook');
   });
 });
