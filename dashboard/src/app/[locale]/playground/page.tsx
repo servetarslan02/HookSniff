@@ -652,6 +652,8 @@ print(f"Captured {history['count']} requests")`;
   const goExample = `package main
 
 import (
+
+
 	"bytes"
 	"encoding/json"
 	"fmt"
