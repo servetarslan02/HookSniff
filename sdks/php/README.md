@@ -125,7 +125,7 @@ Verify incoming webhook signatures in your handler:
 use HookSniff\WebhookVerification;
 
 $payload = file_get_contents('php://input');
-$signature = $_SERVER['HTTP_X_HOOKRELAY_SIGNATURE'] ?? '';
+$signature = $_SERVER['HTTP_X_HOOKSNIFF_SIGNATURE'] ?? '';
 $secret = 'whsec_your_endpoint_signing_secret';
 
 if (!WebhookVerification::verifySignature($payload, $signature, $secret)) {
