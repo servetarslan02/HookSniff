@@ -69,8 +69,10 @@
    - transforms.rs: engine error sızıntısı önlendi
    - customer_portal.rs: SSRF error sızıntısı önlendi
    - schemas.rs: registration error sızıntısı önlendi
-3. Toplam 15 dosya değiştirildi, 5 commit
-4. GitHub push: 5f8cf13
+   - stripe.rs: webhook imza hata mesajları sanitize edildi
+   - oauth.rs: env var adları (GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID) sızıntısı önlendi
+3. Toplam 17 dosya değiştirildi, 7 commit
+4. GitHub push: 7609dcb
 
 ## 📝 Oturum Geçmişi (2026-05-10)
 - **Oturum 73**: Rate Limiting (HS-001, HS-002, HS-003, HS-008) ✅
