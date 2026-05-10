@@ -143,13 +143,16 @@ async fn list_audit_entries(
     }))
 }
 
+/// Row type for audit log queries (id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)
+type AuditLogRow = (Uuid, String, String, Option<String>, Option<serde_json::Value>, Option<String>, Option<String>, DateTime<Utc>);
+
 /// GET /audit-log/:id — Get a single audit log entry
 async fn get_audit_entry(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(entry_id): Path<Uuid>,
 ) -> Result<Json<AuditEntry>, AppError> {
-    let row: Option<(Uuid, String, String, Option<String>, Option<serde_json::Value>, Option<String>, Option<String>, DateTime<Utc>)> = sqlx::query_as(
+    let row: Option<AuditLogRow> = sqlx::query_as(
         "SELECT id, action, resource_type, resource_id, details, ip_address, user_agent, created_at
          FROM audit_log WHERE id = $1 AND customer_id = $2"
     )
@@ -176,6 +179,7 @@ async fn get_audit_entry(
 // ── Helper: Insert audit log entry ──────────────────────────
 
 /// Insert an audit log entry. Call from other handlers.
+#[allow(clippy::too_many_arguments)]
 pub async fn log_action(
     pool: &PgPool,
     customer_id: Uuid,
