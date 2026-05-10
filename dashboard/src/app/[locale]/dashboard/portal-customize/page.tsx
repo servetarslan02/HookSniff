@@ -127,7 +127,7 @@ export default function PortalCustomizationPage() {
           disabled={saving}
           className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? t('saving') : t('saveChanges')}
         </button>
       </div>
 

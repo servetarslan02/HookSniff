@@ -1349,7 +1349,13 @@
     "toastSecretRotated": "Secret rotated! Old secret valid for 24 hours.",
     "toastRotationFailed": "Rotation failed",
     "toastTestSent": "Test webhook sent! Check your endpoint.",
-    "toastTestFailed": "Failed to send test"
+    "toastTestFailed": "Failed to send test",
+    "exponential": "Exponential",
+    "exponentialDesc": "Delay doubles each attempt (10s → 20s → 40s → 80s...)",
+    "linear": "Linear",
+    "linearDesc": "Delay increases linearly (10s → 20s → 30s → 40s...)",
+    "fixed": "Fixed",
+    "fixedDesc": "Same delay every attempt (10s → 10s → 10s...)"
   },
   "deliveryDetail": {
     "loadFailed": "Failed to load delivery",
