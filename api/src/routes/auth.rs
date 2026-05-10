@@ -80,7 +80,7 @@ fn extract_client_ip(headers: &HeaderMap) -> String {
     headers
         .get("x-forwarded-for")
         .and_then(|v| v.to_str().ok())
-        .and_then(|v| v.split(',').last())
+        .and_then(|v| v.split(',').next_back())
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty() && s != "unknown")
         .unwrap_or_else(|| "unknown".to_string())
