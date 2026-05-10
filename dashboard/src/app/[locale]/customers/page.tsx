@@ -143,7 +143,7 @@ const stats = [
 ];
 
 export default function CustomersPage() {
-  const t = useTranslations(\'customers\');
+  const t = useTranslations('customers');
   const [activeFilter, setActiveFilter] = useState('All');
   const industries = ['All', ...new Set(stories.map((s) => s.industry))];
   const filtered = activeFilter === 'All' ? stories : stories.filter((s) => s.industry === activeFilter);
