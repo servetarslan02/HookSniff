@@ -337,7 +337,7 @@ async fn batch_webhooks(
 
     let mut deliveries = Vec::new();
     let mut errors = Vec::new();
-    let mut queue_messages: Vec<(Delivery, Endpoint, String)> = Vec::new();
+    let mut created_count: i64 = 0;
 
     for (i, webhook_req) in req.webhooks.iter().enumerate() {
         let payload_size = serde_json::to_string(&webhook_req.data)
@@ -401,8 +401,38 @@ async fn batch_webhooks(
         .await
         {
             Ok(delivery) => {
-                queue_messages.push((delivery.clone(), endpoint, payload_str));
-                deliveries.push(delivery.to_response());
+                // Publish to queue immediately — fail the delivery if publish fails
+                if let Err(e) = db::publish_to_queue(
+                    &pool,
+                    delivery.id,
+                    endpoint.id,
+                    &endpoint.url,
+                    &payload_str,
+                    endpoint.custom_headers.as_ref(),
+                )
+                .await
+                {
+                    tracing::error!(
+                        "Failed to publish batch delivery {} to queue: {:?} — marking as failed",
+                        delivery.id,
+                        e
+                    );
+                    // Mark delivery as failed so it doesn't stay stuck in 'pending'
+                    let _ = sqlx::query(
+                        "UPDATE deliveries SET status = 'failed', error_message = 'Queue publish failed' WHERE id = $1"
+                    )
+                    .bind(delivery.id)
+                    .execute(&pool)
+                    .await;
+
+                    errors.push(BatchError {
+                        index: i,
+                        error: "Failed to queue delivery".to_string(),
+                    });
+                } else {
+                    created_count += 1;
+                    deliveries.push(delivery.to_response());
+                }
             }
             Err(e) => {
                 errors.push(BatchError {
@@ -413,24 +443,16 @@ async fn batch_webhooks(
         }
     }
 
-    // Batch publish all queued messages
-    for (delivery, endpoint, payload_str) in &queue_messages {
-        if let Err(e) = db::publish_to_queue(
-            &pool,
-            delivery.id,
-            endpoint.id,
-            &endpoint.url,
-            payload_str,
-            endpoint.custom_headers.as_ref(),
+    // Rollback excess webhook_count for failed/filtered items
+    let excess = batch_count - created_count;
+    if excess > 0 {
+        let _ = sqlx::query(
+            "UPDATE customers SET webhook_count = GREATEST(0, webhook_count - $1) WHERE id = $2"
         )
-        .await
-        {
-            tracing::error!(
-                "Failed to publish to queue for delivery {}: {:?}",
-                delivery.id,
-                e
-            );
-        }
+        .bind(excess)
+        .bind(customer.id)
+        .execute(&pool)
+        .await;
     }
 
     Ok(Json(BatchResponse { deliveries, errors }))

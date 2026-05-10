@@ -42,8 +42,30 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     if (!res.ok) {
       // Auto-logout on 401 (token expired or invalid)
       if (res.status === 401) {
-        // Clear auth state and redirect to login
+        // Try to refresh the session first
         if (typeof window !== 'undefined') {
+          try {
+            const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
+              method: 'POST',
+              credentials: 'include',
+            });
+            if (refreshRes.ok) {
+              // Refresh succeeded — retry the original request
+              const retryRes = await fetch(`${API_BASE}${path}`, {
+                method,
+                headers,
+                credentials: 'include',
+                body: body ? JSON.stringify(body) : undefined,
+                signal: controller.signal,
+              });
+              if (retryRes.ok) {
+                return retryRes.json();
+              }
+            }
+          } catch {
+            // Refresh failed — fall through to logout
+          }
+          // Both refresh and retry failed — clear auth and redirect
           localStorage.removeItem('hooksniff_auth');
           window.location.href = '/login';
         }
