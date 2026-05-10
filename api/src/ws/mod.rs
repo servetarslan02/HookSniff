@@ -28,6 +28,8 @@ pub struct WsGateway {
     pub event_tx: broadcast::Sender<WsEvent>,
     /// JWT secret for authenticating WebSocket connections.
     pub jwt_secret: String,
+    /// HS-019: Maximum concurrent WebSocket connections.
+    pub max_connections: usize,
 }
 
 /// A single WebSocket connection with its metadata and subscriptions.
@@ -87,16 +89,30 @@ impl WsGateway {
             connections: Arc::new(RwLock::new(HashMap::new())),
             event_tx,
             jwt_secret,
+            max_connections: 1000, // HS-019: Default limit
         }
     }
 
     /// Register a new WebSocket connection.
+    /// HS-019: Rejects new connections when max_connections is reached.
     pub async fn add_connection(
         &self,
         customer_id: Uuid,
         event_filters: Vec<String>,
         tx: tokio::sync::mpsc::UnboundedSender<WsMessage>,
-    ) -> String {
+    ) -> Result<String, &'static str> {
+        let mut connections = self.connections.write().await;
+
+        // HS-019: Check connection limit
+        if connections.len() >= self.max_connections {
+            warn!(
+                "⚠️ WebSocket connection limit reached ({}/{}), rejecting new connection",
+                connections.len(),
+                self.max_connections
+            );
+            return Err("Connection limit reached");
+        }
+
         let connection_id = Uuid::new_v4().to_string();
         let connection = WsConnection {
             connection_id: connection_id.clone(),
@@ -107,11 +123,10 @@ impl WsGateway {
             tx,
         };
 
-        let mut connections = self.connections.write().await;
         connections.insert(connection_id.clone(), connection);
 
-        info!("🔌 WebSocket connection {} established", connection_id);
-        connection_id
+        info!("🔌 WebSocket connection {} established ({}/{})", connection_id, connections.len(), self.max_connections);
+        Ok(connection_id)
     }
 
     /// Remove a WebSocket connection.

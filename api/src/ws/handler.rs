@@ -114,9 +114,20 @@ pub async fn handle_connection(
     let (tx, mut rx) = mpsc::unbounded_channel::<WsMessage>();
 
     // Register the connection
-    let connection_id = gateway
+    let connection_id = match gateway
         .add_connection(customer_id, initial_filters.clone(), tx)
-        .await;
+        .await
+    {
+        Ok(id) => id,
+        Err(e) => {
+            warn!("Failed to add WebSocket connection: {}", e);
+            let _ = ws_sender.send(Message::Close(Some(axum::extract::ws::CloseFrame {
+                code: 1013, // Try Again Later
+                reason: e.into(),
+            }))).await;
+            return;
+        }
+    };
 
     // Send connection confirmation
     let connected_msg = WsMessage::Connected {

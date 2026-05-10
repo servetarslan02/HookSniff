@@ -551,6 +551,24 @@ async fn handle_polar_webhook(
         return Err(AppError::RateLimitExceeded);
     }
 
+    // HS-021: Idempotency check — extract event ID from body and check if already processed
+    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&body) {
+        if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
+            let already_processed: bool = sqlx::query_scalar(
+                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = 'polar' AND provider_event_id = $1)"
+            )
+            .bind(event_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap_or(false);
+
+            if already_processed {
+                tracing::info!("♻️ Polar event {} already processed, skipping", event_id);
+                return Ok(StatusCode::OK);
+            }
+        }
+    }
+
     let config = crate::billing::polar::PolarConfig::from_env()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar.sh not configured")))?;
 
@@ -583,6 +601,24 @@ async fn handle_iyzico_webhook(
         return Err(AppError::RateLimitExceeded);
     }
 
+    // HS-021: Idempotency check — extract event ID from body and check if already processed
+    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&body) {
+        if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
+            let already_processed: bool = sqlx::query_scalar(
+                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = 'iyzico' AND provider_event_id = $1)"
+            )
+            .bind(event_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap_or(false);
+
+            if already_processed {
+                tracing::info!("♻️ iyzico event {} already processed, skipping", event_id);
+                return Ok(StatusCode::OK);
+            }
+        }
+    }
+
     let config = crate::billing::iyzico::IyzicoConfig::from_env()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("iyzico not configured")))?;
 
@@ -599,6 +635,16 @@ async fn process_webhook_result(
     pool: &sqlx::PgPool,
     result: &crate::billing::provider::WebhookResult,
     provider: &str,
+) -> Result<(), AppError> {
+    process_webhook_result_with_event_id(pool, result, provider, None).await
+}
+
+/// Process a webhook result with optional event ID for idempotency (HS-021).
+async fn process_webhook_result_with_event_id(
+    pool: &sqlx::PgPool,
+    result: &crate::billing::provider::WebhookResult,
+    provider: &str,
+    event_id: Option<&str>,
 ) -> Result<(), AppError> {
     use crate::billing::provider::WebhookResult;
 
