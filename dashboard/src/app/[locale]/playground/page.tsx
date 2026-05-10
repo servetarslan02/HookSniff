@@ -39,7 +39,7 @@ const samplePayloads = [
 /* ─── Main Page ─── */
 
 export default function PlaygroundPage() {
-  const t = useTranslations(\'playgroundPublic\');
+  const t = useTranslations('playgroundPublic');
   // State
   const [activeTab, setActiveTab] = useState<PlaygroundTab>('playground');
   const [state, setState] = useState<PlaygroundState>('idle');

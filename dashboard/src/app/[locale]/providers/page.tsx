@@ -14,7 +14,7 @@ const providers = [
 ];
 
 export default function ProvidersPage() {
-  const t = useTranslations(\'providers\');
+  const t = useTranslations('providers');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">

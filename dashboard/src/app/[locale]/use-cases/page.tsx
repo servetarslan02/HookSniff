@@ -365,7 +365,7 @@ await hs.Webhooks.SendAsync(new WebhookRequest
 /* ─── Page ─── */
 
 export default function UseCasesPage() {
-  const t = useTranslations(\'useCases\');
+  const t = useTranslations('useCases');
   const [activeCase, setActiveCase] = useState(useCases[0].id);
   const current = useCases.find((u) => u.id === activeCase) ?? useCases[0];
 
