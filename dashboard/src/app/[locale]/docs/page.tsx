@@ -58,7 +58,7 @@ export default function DocsPage() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Rate Limits</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
@@ -71,7 +71,7 @@ export default function DocsPage() {
               <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">50,000</td></tr>
               <tr><td className="px-4 py-3">Business</td><td className="px-4 py-3">10,000</td><td className="px-4 py-3">500,000</td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </section>
     </article>

@@ -150,7 +150,7 @@ export default function ApiReferencePage() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('errorCodes')}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Code</th>
@@ -166,7 +166,7 @@ export default function ApiReferencePage() {
               <tr><td className="px-4 py-3 font-mono">429</td><td className="px-4 py-3">Rate Limited</td><td className="px-4 py-3">Too many requests — check Retry-After header</td></tr>
               <tr><td className="px-4 py-3 font-mono">500</td><td className="px-4 py-3">Server Error</td><td className="px-4 py-3">Internal error — contact support if persistent</td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
 
         <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-950 rounded-xl">
