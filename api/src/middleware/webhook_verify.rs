@@ -83,16 +83,19 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
                     *req.body_mut() = Body::from(body_bytes);
                     Ok(next.run(req).await)
                 }
-                Err(signing::VerificationError::TimestampExpired { age_secs, .. }) => Err((
+                Err(signing::VerificationError::TimestampExpired { age_secs, .. }) => {
+                    tracing::warn!("Webhook timestamp expired: {}s", age_secs);
+                    Err((
                     StatusCode::BAD_REQUEST,
                     axum::Json(json!({
                         "error": {
                             "code": "TIMESTAMP_EXPIRED",
-                            "message": format!("Webhook timestamp expired ({}s old)", age_secs)
+                            "message": "Webhook timestamp expired"
                         }
                     })),
                 )
-                    .into_response()),
+                    .into_response())
+                }
                 Err(signing::VerificationError::SignatureMismatch) => Err((
                     StatusCode::UNAUTHORIZED,
                     axum::Json(json!({
@@ -108,21 +111,24 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
                     axum::Json(json!({
                         "error": {
                             "code": "INVALID_TIMESTAMP",
-                            "message": "Invalid webhook timestamp header"
+                            "message": "Invalid webhook timestamp"
                         }
                     })),
                 )
                     .into_response()),
-                Err(signing::VerificationError::MissingHeader(name)) => Err((
+                Err(signing::VerificationError::MissingHeader(name)) => {
+                    tracing::warn!("Missing webhook header: {}", name);
+                    Err((
                     StatusCode::BAD_REQUEST,
                     axum::Json(json!({
                         "error": {
                             "code": "MISSING_HEADER",
-                            "message": format!("Missing required header: {}", name)
+                            "message": "Missing required webhook header"
                         }
                     })),
                 )
-                    .into_response()),
+                    .into_response())
+                }
             }
         } else {
             // No signing secret available, pass through
