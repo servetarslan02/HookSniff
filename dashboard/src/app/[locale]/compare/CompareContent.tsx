@@ -261,7 +261,7 @@ function getBadgeVariant(winner: string, name: string): 'green' | 'red' | 'yello
 }
 
 export default function CompareContent() {
-  const t = useTranslations(\'compare\');
+  const t = useTranslations('compare');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   return (

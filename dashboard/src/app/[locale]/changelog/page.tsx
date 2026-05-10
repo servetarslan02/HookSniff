@@ -18,7 +18,7 @@ import {
 } from '@/lib/changelog-data';
 
 export default function ChangelogPage() {
-  const t = useTranslations(\'changelog\');
+  const t = useTranslations('changelog');
   const [activeType, setActiveType] = useState<ChangeType | 'all'>('all');
   const [activeArea, setActiveArea] = useState<ProductArea | 'all'>('all');
   const [expandedVersion, setExpandedVersion] = useState<string | null>(

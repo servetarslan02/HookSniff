@@ -59,7 +59,7 @@ const faqs = [
 /* ─── Main Page ─── */
 
 export default function NewsletterPage() {
-  const t = useTranslations(\'newsletter\');
+  const t = useTranslations('newsletter');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
