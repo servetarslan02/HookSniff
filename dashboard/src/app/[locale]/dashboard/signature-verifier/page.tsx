@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 
 /* ─── Signature Verifier Tool ─── */
 export default function SignatureVerifierPage() {
+  const t = useTranslations('signatureVerifier');
   const { toast } = useToast();
   const [payload, setPayload] = useState('');
   const [secret, setSecret] = useState('');
@@ -15,7 +17,7 @@ export default function SignatureVerifierPage() {
 
   const computeSignature = async () => {
     if (!payload || !secret) {
-      toast('Payload and secret are required', 'error');
+      toast(t('toastPayloadRequired'), 'error');
       return;
     }
     setComputing(true);
@@ -34,9 +36,9 @@ export default function SignatureVerifierPage() {
         .join('');
       const computed = `${algorithm}=${sigHex}`;
       setSignature(computed);
-      toast('Signature computed!', 'success');
+      toast(t('toastSignatureComputed'), 'success');
     } catch {
-      toast('Failed to compute signature', 'error');
+      toast(t('toastComputeFailed'), 'error');
     } finally {
       setComputing(false);
     }
@@ -44,7 +46,7 @@ export default function SignatureVerifierPage() {
 
   const verifySignature = async () => {
     if (!payload || !secret || !signature) {
-      toast('All fields are required', 'error');
+      toast(t('toastAllRequired'), 'error');
       return;
     }
     setComputing(true);
@@ -66,7 +68,7 @@ export default function SignatureVerifierPage() {
       const isValid = computed === provided;
       setResult(isValid ? 'valid' : 'invalid');
     } catch {
-      toast('Verification failed', 'error');
+      toast(t('toastVerificationFailed'), 'error');
     } finally {
       setComputing(false);
     }
@@ -102,15 +104,15 @@ if (!isValid) {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🔐 Signature Verifier</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Verify webhook signatures to ensure payloads are authentic. HookSniff signs every webhook with HMAC-SHA256.
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Algorithm Selector */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Algorithm</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('algorithm')}</h2>
         <div className="flex gap-3">
           {(['sha256', 'sha512'] as const).map((alg) => (
             <button
@@ -130,10 +132,10 @@ if (!isValid) {
 
       {/* Verify Tool */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Verify Signature</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('verifySignature')}</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Webhook Payload (raw body)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('payloadLabel')}</label>
             <textarea
               value={payload}
               onChange={(e) => { setPayload(e.target.value); setResult(null); }}
@@ -143,7 +145,7 @@ if (!isValid) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Webhook Secret</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('secretLabel')}</label>
             <input
               type="password"
               value={secret}
@@ -153,7 +155,7 @@ if (!isValid) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Signature (from x-hooksniff-signature header)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('signatureLabel')}</label>
             <input
               type="text"
               value={signature}
@@ -168,14 +170,14 @@ if (!isValid) {
               disabled={computing || !payload || !secret || !signature}
               className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
             >
-              {computing ? 'Verifying...' : '✓ Verify Signature'}
+              {computing ? t('verifying') : t('verifyBtn')}
             </button>
             <button
               onClick={computeSignature}
               disabled={computing || !payload || !secret}
               className="px-6 py-3 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-50"
             >
-              🔧 Compute Signature
+              {t('computeBtn')}
             </button>
           </div>
           {result && (
@@ -188,12 +190,12 @@ if (!isValid) {
                 <span className="text-2xl">{result === 'valid' ? '✅' : '❌'}</span>
                 <div>
                   <div className={`font-semibold ${result === 'valid' ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
-                    {result === 'valid' ? 'Signature Valid!' : 'Signature Invalid!'}
+                    {result === 'valid' ? t('signatureValid') : t('signatureInvalid')}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-slate-400">
                     {result === 'valid'
-                      ? 'The payload is authentic and has not been tampered with.'
-                      : 'The signature does not match. The payload may have been tampered with.'}
+                      ? t('validDesc')
+                      : t('invalidDesc')}
                   </div>
                 </div>
               </div>
@@ -204,13 +206,13 @@ if (!isValid) {
 
       {/* Code Example */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Code Example — Node.js</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('codeExample')}</h2>
         <div className="relative">
           <button
-            onClick={() => { navigator.clipboard.writeText(sampleCode); toast('Copied!', 'success'); }}
+            onClick={() => { navigator.clipboard.writeText(sampleCode); toast(t('toastCopied'), 'success'); }}
             className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
           >
-            Copy
+            {t('copy')}
           </button>
           <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
             <code>{sampleCode}</code>
@@ -220,12 +222,12 @@ if (!isValid) {
 
       {/* How it works */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How Webhook Signatures Work</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
         <div className="space-y-4">
           {[
-            { step: '1', title: 'HookSniff signs the payload', desc: 'When a webhook is delivered, HookSniff computes an HMAC hash of the raw request body using your endpoint\'s secret key.' },
-            { step: '2', title: 'Signature is included in headers', desc: 'The signature is sent in the x-hooksniff-signature header (format: sha256=<hex_digest>).' },
-            { step: '3', title: 'You verify on your server', desc: 'Compute the same HMAC hash on your server and compare it with the received signature. Use constant-time comparison to prevent timing attacks.' },
+            { step: '1', title: t('step1Title'), desc: t('step1Desc') },
+            { step: '2', title: t('step2Title'), desc: t('step2Desc') },
+            { step: '3', title: t('step3Title'), desc: t('step3Desc') },
           ].map((item) => (
             <div key={item.step} className="flex gap-4">
               <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm flex-shrink-0">

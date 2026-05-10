@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
@@ -12,6 +13,8 @@ interface Schema {
 }
 
 export default function SchemasPage() {
+  const t = useTranslations('schemasPage');
+  const tCommon = useTranslations('common');
   const { token } = useAuth();
   const [schemas, setSchemas] = useState<Schema[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,18 +27,18 @@ export default function SchemasPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading) return <div className="p-8 text-gray-500">Loading...</div>;
+  if (loading) return <div className="p-8 text-gray-500">{tCommon('loading')}</div>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">📋 Schemas</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
       <p className="text-gray-500 mb-6">
-        Define and validate event schemas. Ensure your webhooks conform to expected formats.
+        {t('subtitle')}
       </p>
       {schemas.length === 0 ? (
         <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-          <p className="text-gray-500 text-lg mb-2">No schemas registered yet</p>
-          <p className="text-gray-400 text-sm">Register a schema to start validating your webhook payloads.</p>
+          <p className="text-gray-500 text-lg mb-2">{t('noSchemas')}</p>
+          <p className="text-gray-400 text-sm">{t('noSchemasDesc')}</p>
         </div>
       ) : (
         <div className="space-y-4">
