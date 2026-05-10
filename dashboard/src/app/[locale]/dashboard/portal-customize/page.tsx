@@ -302,7 +302,7 @@ export default function PortalCustomizationPage() {
               >
                 <div className="flex items-center gap-3">
                   {config.logo_url ? (
-                    <Image src={config.logo_url} alt="Logo" width={32} height={32} className="w-8 h-8 rounded" />
+                    <Image src={config.logo_url} alt={t("logo")} width={32} height={32} className="w-8 h-8 rounded" />
                   ) : (
                     <span className="text-2xl">🪝</span>
                   )}

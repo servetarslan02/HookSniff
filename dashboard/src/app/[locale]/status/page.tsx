@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -252,7 +253,7 @@ function UptimeCalendar({ history }: { history: HistoryDay[] }) {
           <div className="w-2.5 h-2.5 rounded-sm bg-gray-600" />
         </div>
         <span>0%</span>
-        <span className="ml-2">No data</span>
+        <span className="ml-2">{t("noData")}</span>
       </div>
     </div>
   );
@@ -287,7 +288,7 @@ function UptimeBar({ history }: { history: HistoryDay[] }) {
       </div>
       <div className="flex justify-between mt-1">
         <span className="text-xs text-gray-400 dark:text-slate-500">30 days ago</span>
-        <span className="text-xs text-gray-400 dark:text-slate-500">Today</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">{t("today")}</span>
       </div>
     </div>
   );
@@ -312,7 +313,7 @@ function ComponentRow({ component, responseTimes }: { component: ComponentStatus
           {/* Uptime % */}
           {uptime !== undefined && uptime !== null && (
             <div className="text-right hidden sm:block">
-              <div className="text-xs text-gray-400 dark:text-slate-500">Uptime</div>
+              <div className="text-xs text-gray-400 dark:text-slate-500">{t("uptime")}</div>
               <div className={`text-sm font-semibold ${uptime >= 99.5 ? 'text-emerald-600 dark:text-emerald-400' : uptime >= 95 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
                 {uptime.toFixed(2)}%
               </div>
@@ -321,7 +322,7 @@ function ComponentRow({ component, responseTimes }: { component: ComponentStatus
           {/* Latency */}
           {currentLatency !== null && currentLatency > 0 && (
             <div className="text-right hidden sm:block">
-              <div className="text-xs text-gray-400 dark:text-slate-500">Latency</div>
+              <div className="text-xs text-gray-400 dark:text-slate-500">{t("latency")}</div>
               <div className={`text-sm font-semibold ${latencyColor(currentLatency)}`}>
                 {currentLatency}ms
               </div>
@@ -427,7 +428,7 @@ function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
     <div className="space-y-4">
       {upcoming.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 mb-3">Upcoming</h3>
+          <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 mb-3">{t("upcoming")}</h3>
           <div className="space-y-3">
             {upcoming.map((m) => (
               <div key={m.id} className="border border-blue-200 dark:border-blue-500/20 bg-blue-50/50 dark:bg-blue-500/5 rounded-lg p-4">
@@ -447,7 +448,7 @@ function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
       )}
       {past.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 mb-3">Past Maintenance</h3>
+          <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 mb-3">{t("pastMaintenance")}</h3>
           <div className="space-y-2">
             {past.map((m) => (
               <div key={m.id} className="flex items-center justify-between py-2 text-sm">
@@ -463,7 +464,7 @@ function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
       )}
       {upcoming.length === 0 && past.length === 0 && (
         <div className="text-center py-6 text-gray-400 dark:text-slate-500">
-          <p className="text-sm">No scheduled maintenance</p>
+          <p className="text-sm">{t("noScheduled")}</p>
         </div>
       )}
     </div>
@@ -491,6 +492,7 @@ function unreachableData(): StatusData {
 
 // ─── Main Status Page ───
 export default function StatusPage() {
+  const t = useTranslations(\'status\');
   const [data, setData] = useState<StatusData>(unreachableData());
   const [history, setHistory] = useState<HistoryDay[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -619,7 +621,7 @@ export default function StatusPage() {
       <div className="max-w-4xl mx-auto px-4 py-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">System Status</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("systemStatus")}</h1>
           <p className="text-gray-500 dark:text-slate-400 text-sm">
             Real-time monitoring of all HookSniff services
             {dataSource === 'static' && (
@@ -641,7 +643,7 @@ export default function StatusPage() {
 
         {/* 30-Day Uptime Bar */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Overall Uptime</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("overallUptime")}</h2>
           {history.length > 0 ? (
             <UptimeBar history={history} />
           ) : (
@@ -661,7 +663,7 @@ export default function StatusPage() {
 
         {/* Components */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Components</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("components")}</h2>
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
             {enrichedComponents.map((comp) => (
               <ComponentRow
@@ -675,13 +677,13 @@ export default function StatusPage() {
 
         {/* Incidents */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Incident History</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("incidentHistory")}</h2>
           <IncidentLog incidents={incidents} />
         </div>
 
         {/* Maintenance */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduled Maintenance</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("scheduledMaintenance")}</h2>
           <MaintenanceSection maintenance={maintenance} />
         </div>
 

@@ -1,6 +1,8 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function RetriesPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Retries & Retry Policy</h1>
@@ -10,7 +12,7 @@ export default function RetriesPage() {
 
       {/* Backoff Schedule */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Exponential Backoff Schedule</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("exponentialBackoff")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Failed deliveries are retried up to <strong>6 times</strong> with increasing delays:
         </p>
@@ -18,9 +20,9 @@ export default function RetriesPage() {
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Attempt</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Delay After Failure</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Cumulative Time</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("attempt")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("delayAfterFailure")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("cumulativeTime")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -54,7 +56,7 @@ export default function RetriesPage() {
 
       {/* Custom Retry Policy */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Custom Retry Policy</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("customRetryPolicy")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Configure retry behavior per endpoint:
         </p>
@@ -70,9 +72,9 @@ export default function RetriesPage() {
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Parameter</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Default</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("parameter")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("defaultVal")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("description")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -87,7 +89,7 @@ export default function RetriesPage() {
 
       {/* Replay */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Replaying Failed Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("replayingFailedWebhooks")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           After a delivery is moved to the DLQ, you can replay it:
         </p>
@@ -102,7 +104,7 @@ export default function RetriesPage() {
 
       {/* DLQ Behavior */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Dead Letter Queue Behavior</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("dlqBehavior")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           When max attempts are exhausted:
         </p>

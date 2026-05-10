@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function EventTypesPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Event Types</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("eventTypes")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Organize and filter webhooks by event type. Route specific events to specific endpoints.
       </p>
@@ -37,7 +39,7 @@ export default function EventTypesPage() {
 
       {/* Registering Event Types */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Registering Event Types</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("registeringEventTypes")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Event types are automatically registered when you send a webhook. No pre-registration required:
         </p>
@@ -58,7 +60,7 @@ export default function EventTypesPage() {
 
       {/* Filtering by Event Type */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Filtering by Event Type</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("filteringByEvent")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Configure endpoints to only receive specific event types using the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">event_filter</code> field:
         </p>
@@ -84,7 +86,7 @@ export default function EventTypesPage() {
 
       {/* Querying by Event Type */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Querying by Event Type</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("queryingByEvent")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Filter delivery logs by event type:
         </p>
@@ -96,7 +98,7 @@ export default function EventTypesPage() {
 
       {/* Schema Validation */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Schema Validation</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("schemaValidation")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Optionally define JSON schemas for event types to validate payloads:
         </p>

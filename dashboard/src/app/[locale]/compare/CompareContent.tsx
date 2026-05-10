@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -260,6 +261,7 @@ function getBadgeVariant(winner: string, name: string): 'green' | 'red' | 'yello
 }
 
 export default function CompareContent() {
+  const t = useTranslations(\'compare\');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   return (
@@ -301,7 +303,7 @@ export default function CompareContent() {
 
         {/* Screenshots */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">HookSniff in Action</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("inAction")}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
               <Image src="/screenshots/compare-hero.jpg" alt="HookSniff Compare — side-by-side webhook service comparison" width={800} height={450} className="w-full" />
@@ -313,7 +315,7 @@ export default function CompareContent() {
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
               <Image src="/screenshots/scorecard.jpg" alt="HookSniff Scorecard — feature comparison across 6 categories" width={800} height={450} className="w-full" />
               <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Scorecard</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("scorecard")}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">6 categories scored honestly. Svix: 51, HookSniff: 50.</p>
               </div>
             </div>
@@ -341,7 +343,7 @@ export default function CompareContent() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-slate-800">
-                  <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">Category</th>
+                  <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">{t("category")}</th>
                   <th className="text-center py-2 px-4 font-semibold text-brand-600 dark:text-brand-400">🪝 HookSniff</th>
                   <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white">📨 Svix</th>
                   <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white">🔗 Hookdeck</th>
@@ -359,7 +361,7 @@ export default function CompareContent() {
                   </tr>
                 ))}
                 <tr className="border-t-2 border-gray-300 dark:border-slate-700">
-                  <td className="py-2 px-4 text-gray-900 dark:text-white font-bold">Total</td>
+                  <td className="py-2 px-4 text-gray-900 dark:text-white font-bold">{t("total")}</td>
                   <td className="py-2 px-4 text-center font-bold text-brand-600 dark:text-brand-400 bg-brand-50/20 dark:bg-brand-500/5">{scorecard.reduce((s, r) => s + r.hooksniff, 0)}</td>
                   <td className="py-2 px-4 text-center font-bold text-gray-900 dark:text-white">{scorecard.reduce((s, r) => s + r.svix, 0)}</td>
                   <td className="py-2 px-4 text-center font-bold text-gray-900 dark:text-white">{scorecard.reduce((s, r) => s + r.hookdeck, 0)}</td>
@@ -388,7 +390,7 @@ export default function CompareContent() {
 
         {/* Detailed Sections */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">Detailed Comparison</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("detailedComparison")}</h2>
           <div className="space-y-6">
             {sections.map((section, idx) => (
               <div key={section.title} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
@@ -450,7 +452,7 @@ export default function CompareContent() {
 
         {/* FAQ */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("faq")}</h2>
           <div className="space-y-3 max-w-3xl mx-auto">
             {faq.map((item, i) => (
               <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
@@ -473,7 +475,7 @@ export default function CompareContent() {
 
         {/* Deep Dive Links */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">Deep Dive Comparisons</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("deepDive")}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { title: 'HookSniff vs Svix', desc: 'Detailed 1:1 comparison', href: '/alternatives/svix' },
@@ -497,7 +499,7 @@ export default function CompareContent() {
           <p className="text-gray-400 dark:text-slate-400 mb-6">Start free. Scale when ready. No credit card required.</p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
-            <Link href="/pricing" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">View pricing</Link>
+            <Link href="/pricing" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("viewPricing")}</Link>
           </div>
         </div>
       </main>

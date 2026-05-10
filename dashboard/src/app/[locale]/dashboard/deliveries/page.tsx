@@ -212,16 +212,16 @@ export default function DeliveriesPage() {
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('details')}</h3>
-              <button onClick={() => setSelected(null)} aria-label="Close details" className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
+              <button onClick={() => setSelected(null)} aria-label={t("closeDetails")} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label="ID" value={selected.id} mono />
-              <DetailRow label="Event" value={selected.event || '—'} />
-              <DetailRow label="Endpoint" value={selected.endpoint_id} mono />
-              <DetailRow label="Status" value={selected.status} />
-              <DetailRow label="Attempts" value={String(selected.attempt_count)} />
-              <DetailRow label="HTTP Status" value={String(selected.response_status || '—')} />
-              <DetailRow label="Created" value={new Date(selected.created_at).toLocaleString()} />
+              <DetailRow label={t("event")} value={selected.event || '—'} />
+              <DetailRow label={t("endpoint")} value={selected.endpoint_id} mono />
+              <DetailRow label={t("status")} value={selected.status} />
+              <DetailRow label={t("attempts")} value={String(selected.attempt_count)} />
+              <DetailRow label={t("httpStatus")} value={String(selected.response_status || '—')} />
+              <DetailRow label={t("created")} value={new Date(selected.created_at).toLocaleString()} />
 
               {/* Attempts Timeline */}
               <div className="pt-4 border-t border-gray-100">

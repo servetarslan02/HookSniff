@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function DlqPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Dead Letter Queue</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("deadLetterQueue")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Failed webhook deliveries are preserved in the Dead Letter Queue (DLQ) for inspection and replay.
       </p>
@@ -46,7 +48,7 @@ export default function DlqPage() {
 
       {/* Inspecting DLQ */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Inspecting DLQ Entries</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("inspectingDlq")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Query failed deliveries via the API:
         </p>
@@ -80,7 +82,7 @@ export default function DlqPage() {
 
       {/* Replaying from DLQ */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Replaying Failed Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("replayingFailed")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Once you've fixed the issue, replay the delivery:
         </p>
@@ -96,7 +98,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
 
       {/* DLQ Retention */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">DLQ Retention</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("dlqRetention")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           DLQ entries are retained based on your plan:
         </p>
@@ -105,14 +107,14 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Retention</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Max DLQ Entries</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("retention")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("maxDlq")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">Free</td><td className="px-4 py-3">7 days</td><td className="px-4 py-3">100</td></tr>
-              <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">30 days</td><td className="px-4 py-3">5,000</td></tr>
-              <tr><td className="px-4 py-3">Business</td><td className="px-4 py-3">90 days</td><td className="px-4 py-3">50,000</td></tr>
+              <tr><td className="px-4 py-3">{t("free")}</td><td className="px-4 py-3">7 days</td><td className="px-4 py-3">100</td></tr>
+              <tr><td className="px-4 py-3">{t("pro")}</td><td className="px-4 py-3">30 days</td><td className="px-4 py-3">5,000</td></tr>
+              <tr><td className="px-4 py-3">{t("business")}</td><td className="px-4 py-3">90 days</td><td className="px-4 py-3">50,000</td></tr>
             </tbody>
           </table></div>
         </div>
