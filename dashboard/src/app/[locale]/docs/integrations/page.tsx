@@ -97,7 +97,7 @@ function verifyGitHubSignature(payload: string, signature: string, secret: strin
 import { HookSniff } from '@hooksniff/sdk';
 
 const app = express();
-const hr = new HookSniff({ apiKey: process.env.HOOKRELAY_KEY! });
+const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
 
 app.post('/webhooks/:provider', express.raw({ type: 'application/json' }), async (req, res) => {
   const provider = req.params.provider;
