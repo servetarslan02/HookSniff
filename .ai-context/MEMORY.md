@@ -23,15 +23,15 @@
 - API: hooksniff-api-1046140057667.europe-west1.run.app
 - Dashboard: https://hooksniff.vercel.app
 
-## 📊 Güncel İlerleme (2026-05-11 00:36)
+## 📊 Güncel İlerleme (2026-05-11 00:52)
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
 | 🔴 P1 | 44 | 46 | 0 |
-| 🟡 P2 | 38 | 21 | 17 |
-| 🟢 P3 | 13 | 1 | 12 |
-| **TOPLAM** | **103** | **81** | **22** |
+| 🟡 P2 | 38 | 25 | 13 |
+| 🟢 P3 | 13 | 3 | 10 |
+| **TOPLAM** | **103** | **87** | **16** |
 
 ## Oturum 94 (2026-05-10 22:58 - 23:54) ✅
 - **12 major dependency güncellendi:**
