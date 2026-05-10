@@ -52,7 +52,7 @@ class WebhookVerification
      * Verify a webhook signature using HMAC-SHA256.
      *
      * @param string $payload   The raw request body
-     * @param string $signature The signature from the X-Hookrelay-Signature header
+     * @param string $signature The signature from the X-Hooksniff-Signature header
      * @param string $secret    The endpoint's signing secret (starts with "whsec_")
      * @return bool true if the signature is valid
      */
