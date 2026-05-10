@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -17,6 +18,7 @@ import {
 } from '@/lib/changelog-data';
 
 export default function ChangelogPage() {
+  const t = useTranslations(\'changelog\');
   const [activeType, setActiveType] = useState<ChangeType | 'all'>('all');
   const [activeArea, setActiveArea] = useState<ProductArea | 'all'>('all');
   const [expandedVersion, setExpandedVersion] = useState<string | null>(
@@ -67,7 +69,7 @@ export default function ChangelogPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Changelog</span>
+            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -76,7 +78,7 @@ export default function ChangelogPage() {
       <main className="max-w-6xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Changelog</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
             What&apos;s new in HookSniff. Follow our product updates, new features, and improvements.
           </p>
@@ -102,7 +104,7 @@ export default function ChangelogPage() {
             <>
               <form onSubmit={handleSubscribe} className="flex gap-2">
                 <input type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" required />
-                <button type="submit" className="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors shrink-0">Subscribe</button>
+                <button type="submit" className="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors shrink-0">{t("subscribe")}</button>
               </form>
               {subscribeError && <p className="text-xs text-red-500 dark:text-red-400 mt-2 text-center">{subscribeError}</p>}
             </>
@@ -111,7 +113,7 @@ export default function ChangelogPage() {
 
         {/* Filters — Type */}
         <div className="flex flex-wrap gap-2 mb-4 justify-center">
-          <button onClick={() => setActiveType('all')} className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${activeType === 'all' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-500'}`}>All types</button>
+          <button onClick={() => setActiveType('all')} className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${activeType === 'all' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-500'}`}>{t("allTypes")}</button>
           {allTypes.map((type) => {
             const cfg = typeConfig[type];
             const count = changelog.reduce((acc, r) => acc + r.entries.filter((e) => e.type === type).length, 0);
@@ -126,7 +128,7 @@ export default function ChangelogPage() {
 
         {/* Filters — Product Area */}
         <div className="flex flex-wrap gap-2 mb-10 justify-center">
-          <button onClick={() => setActiveArea('all')} className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors ${activeArea === 'all' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-500'}`}>All areas</button>
+          <button onClick={() => setActiveArea('all')} className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors ${activeArea === 'all' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-500'}`}>{t("allAreas")}</button>
           {allAreas.map((area) => {
             const cfg = areaConfig[area];
             const count = changelog.filter((r) => r.area === area).length;
@@ -144,7 +146,7 @@ export default function ChangelogPage() {
           {/* Year/Month Sidebar Nav */}
           <aside className="hidden lg:block">
             <div className="sticky top-8 space-y-4">
-              <p className="text-xs font-bold text-gray-400 dark:text-slate-600 uppercase tracking-wider">Navigate</p>
+              <p className="text-xs font-bold text-gray-400 dark:text-slate-600 uppercase tracking-wider">{t("navigate")}</p>
               {years.map((year) => {
                 const yearReleases = getReleasesByYear(year);
                 return (
@@ -203,7 +205,7 @@ export default function ChangelogPage() {
                                 {release.version}
                               </Link>
                               {release.tag === 'latest' && (
-                                <span className="text-xs font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full">Latest</span>
+                                <span className="text-xs font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full">{t("latest")}</span>
                               )}
                               <span className="text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 px-2 py-0.5 rounded-full">
                                 {areaCfg.icon} {areaCfg.label}

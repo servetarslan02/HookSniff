@@ -1,15 +1,17 @@
+import { useTranslations } from 'next-intl';
 
 export default function ArchitecturePage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Architecture</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("architecture")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         How HookSniff works under the hood — system components, data flow, and technology choices.
       </p>
 
       {/* System Overview */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">System Overview</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("systemOverview")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           HookSniff consists of four main components:
         </p>
@@ -57,7 +59,7 @@ export default function ArchitecturePage() {
 
         <div className="space-y-6">
           <div className="p-5 border border-gray-200 dark:border-slate-700 rounded-xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">API Server</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("apiServer")}</h3>
             <p className="text-gray-600 dark:text-slate-400 mb-3">
               Async REST API built with <strong>Axum (Rust)</strong>. Handles authentication, webhook ingestion, rate limiting, and idempotency.
             </p>
@@ -113,25 +115,25 @@ export default function ArchitecturePage() {
 
       {/* Tech Stack */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Technology Stack</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("technologyStack")}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Layer</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Technology</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Purpose</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("layer")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("technology")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("purpose")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">API</td><td className="px-4 py-3">Rust, Axum, SQLx</td><td className="px-4 py-3">Async REST API</td></tr>
-              <tr><td className="px-4 py-3">Worker</td><td className="px-4 py-3">Rust, Tokio</td><td className="px-4 py-3">Webhook delivery engine</td></tr>
-              <tr><td className="px-4 py-3">Dashboard</td><td className="px-4 py-3">Next.js 14, Tailwind CSS</td><td className="px-4 py-3">Web UI</td></tr>
-              <tr><td className="px-4 py-3">Database</td><td className="px-4 py-3">PostgreSQL (Neon)</td><td className="px-4 py-3">Persistent storage</td></tr>
-              <tr><td className="px-4 py-3">Queue</td><td className="px-4 py-3">PostgreSQL</td><td className="px-4 py-3">Async message delivery</td></tr>
+              <tr><td className="px-4 py-3">API</td><td className="px-4 py-3">Rust, Axum, SQLx</td><td className="px-4 py-3">{t("asyncRestApi")}</td></tr>
+              <tr><td className="px-4 py-3">Worker</td><td className="px-4 py-3">Rust, Tokio</td><td className="px-4 py-3">{t("deliveryEngine")}</td></tr>
+              <tr><td className="px-4 py-3">Dashboard</td><td className="px-4 py-3">Next.js 14, Tailwind CSS</td><td className="px-4 py-3">{t("webui")}</td></tr>
+              <tr><td className="px-4 py-3">Database</td><td className="px-4 py-3">PostgreSQL (Neon)</td><td className="px-4 py-3">{t("persistentStorage")}</td></tr>
+              <tr><td className="px-4 py-3">Queue</td><td className="px-4 py-3">PostgreSQL</td><td className="px-4 py-3">{t("asyncMessage")}</td></tr>
               <tr><td className="px-4 py-3">Auth</td><td className="px-4 py-3">JWT + Argon2 + HMAC</td><td className="px-4 py-3">Multi-layer auth</td></tr>
               <tr><td className="px-4 py-3">Billing</td><td className="px-4 py-3">Stripe</td><td className="px-4 py-3">Payments</td></tr>
-              <tr><td className="px-4 py-3">Deploy</td><td className="px-4 py-3">Fly.io</td><td className="px-4 py-3">Production hosting</td></tr>
+              <tr><td className="px-4 py-3">Deploy</td><td className="px-4 py-3">Fly.io</td><td className="px-4 py-3">{t("productionHosting")}</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -139,7 +141,7 @@ export default function ArchitecturePage() {
 
       {/* Data Flow */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Data Flow</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("dataFlow")}</h2>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">1. Webhook Ingestion</h3>
         <p className="text-gray-600 dark:text-slate-400 mb-4">

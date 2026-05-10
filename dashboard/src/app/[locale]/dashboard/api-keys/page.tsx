@@ -130,7 +130,7 @@ export default function ApiKeysPage() {
       {error && (
         <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 flex items-center justify-between">
           <span className="text-sm text-red-700 dark:text-red-400">{error}</span>
-          <button onClick={() => setError('')} aria-label="Dismiss error" className="text-red-400 hover:text-red-600 transition">✕</button>
+          <button onClick={() => setError('')} aria-label={t("dismissError")} className="text-red-400 hover:text-red-600 transition">✕</button>
         </div>
       )}
 

@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export const metadata = { title: 'What is a Webhook? A Complete Guide — HookSniff' };
 
 export default function WhatIsWebhookPage() {
+  const t = useTranslations(\'whatIsWebhook\');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -23,7 +25,7 @@ export default function WhatIsWebhookPage() {
 
         <div className="prose prose-gray dark:prose-invert max-w-none space-y-8">
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">The Simple Explanation</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("simpleExplanation")}</h2>
             <p className="text-gray-600 dark:text-slate-400 leading-relaxed">A webhook is a way for one application to send real-time data to another application when something happens. Instead of your app constantly asking &quot;Is there new data? Is there new data?&quot; (polling), the other app simply tells you when something changes.</p>
             <div className="p-4 bg-brand-50 dark:bg-brand-500/10 rounded-lg border border-brand-200 dark:border-brand-500/20 my-4">
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Think of it like this:</p>
@@ -33,7 +35,7 @@ export default function WhatIsWebhookPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">How Webhooks Work</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("howItWorks")}</h2>
             <ol className="space-y-3 text-gray-600 dark:text-slate-400">
               <li><strong>1. You register a URL</strong> — You tell a service &quot;When something happens, send data to this URL.&quot;</li>
               <li><strong>2. Something happens</strong> — A payment succeeds, a user signs up, an order ships.</li>
@@ -43,23 +45,23 @@ export default function WhatIsWebhookPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Webhook vs API vs Polling</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("comparison")}</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border border-gray-200 dark:border-slate-800 rounded-lg">
-                <thead><tr className="bg-gray-50 dark:bg-slate-800"><th className="p-3 text-left">Aspect</th><th className="p-3 text-left">Polling</th><th className="p-3 text-left">Webhook</th></tr></thead>
+                <thead><tr className="bg-gray-50 dark:bg-slate-800"><th className="p-3 text-left">{t("aspect")}</th><th className="p-3 text-left">Polling</th><th className="p-3 text-left">Webhook</th></tr></thead>
                 <tbody>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">Direction</td><td className="p-3">You → Them</td><td className="p-3">Them → You</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">Timing</td><td className="p-3">You check periodically</td><td className="p-3">Instant notification</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">Efficiency</td><td className="p-3">Wastes bandwidth</td><td className="p-3">Only sends when needed</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">Latency</td><td className="p-3">Seconds to minutes</td><td className="p-3">Milliseconds</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">Complexity</td><td className="p-3">Simple</td><td className="p-3">Needs endpoint setup</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("direction")}</td><td className="p-3">You → Them</td><td className="p-3">Them → You</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("timing")}</td><td className="p-3">{t("youCheck")}</td><td className="p-3">{t("instantNotification")}</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("efficiency")}</td><td className="p-3">{t("wastesBandwidth")}</td><td className="p-3">{t("onlySends")}</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("latency")}</td><td className="p-3">{t("secondsToMinutes")}</td><td className="p-3">{t("milliseconds")}</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("complexity")}</td><td className="p-3">{t("simple")}</td><td className="p-3">{t("needsEndpoint")}</td></tr>
                 </tbody>
               </table>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Common Use Cases</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("commonUseCases")}</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {[
                 { title: 'Payment notifications', desc: 'Stripe sends a webhook when a payment succeeds or fails.' },
@@ -78,18 +80,18 @@ export default function WhatIsWebhookPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Webhook Security</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("security")}</h2>
             <p className="text-gray-600 dark:text-slate-400 mb-3">Webhooks are sent over HTTP, so anyone can send a request to your URL. You need to verify that the request actually came from the expected service.</p>
             <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-              <li><strong>HMAC signatures</strong> — The sender signs the payload with a secret. You verify the signature.</li>
-              <li><strong>HTTPS only</strong> — Always use TLS to encrypt data in transit.</li>
-              <li><strong>IP whitelisting</strong> — Only accept requests from known IP addresses.</li>
-              <li><strong>Timestamp validation</strong> — Reject old requests to prevent replay attacks.</li>
+              <li><strong>{t("hmac")}</strong> — The sender signs the payload with a secret. You verify the signature.</li>
+              <li><strong>{t("https")}</strong> — Always use TLS to encrypt data in transit.</li>
+              <li><strong>{t("ipWhitelisting")}</strong> — Only accept requests from known IP addresses.</li>
+              <li><strong>{t("timestampValidation")}</strong> — Reject old requests to prevent replay attacks.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Getting Started with Webhooks</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("gettingStarted")}</h2>
             <p className="text-gray-600 dark:text-slate-400 mb-3">The easiest way to start with webhooks:</p>
             <ol className="space-y-2 text-gray-600 dark:text-slate-400">
               <li><strong>1.</strong> Create an endpoint on your server (a URL that accepts POST requests)</li>

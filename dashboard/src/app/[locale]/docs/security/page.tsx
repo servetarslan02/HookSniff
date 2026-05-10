@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
 export default function SecurityPage() {
+  const t = useTranslations(\'docs\');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Webhook Security Guide</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("webhookSecurityGuide")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Best practices for securing webhook deliveries — signature verification, IP whitelisting, and more.
       </p>
@@ -12,7 +14,7 @@ export default function SecurityPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">HMAC-SHA256 Signature Verification</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Every webhook is signed using <strong>Standard Webhooks</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook-signature</code> header.
+          Every webhook is signed using <strong>{t("standardWebhooks")}</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook-signature</code> header.
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Format: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">v1,{'{'}base64(hmac_signature){'}'}</code>
@@ -62,7 +64,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 });`}
         />
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">Python Verification</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">{t("pythonVerification")}</h3>
         <CodeBlock
           code={`import hmac
 import hashlib
@@ -111,7 +113,7 @@ def handle_webhook():
 
       {/* Timestamp Validation */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Timestamp Validation</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("timestampValidation")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Always validate the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook-timestamp</code> header to prevent replay attacks. Reject webhooks older than <strong>5 minutes</strong>:
         </p>
@@ -132,7 +134,7 @@ if (!isTimestampValid(timestamp)) {
 
       {/* IP Whitelisting */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">IP Whitelisting</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("ipWhitelisting")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           For additional security, restrict incoming webhooks to HookSniff's IP addresses:
         </p>
@@ -147,7 +149,7 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips`}
 
       {/* TLS */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">TLS Enforcement</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("tlsEnforcement")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           HookSniff only delivers webhooks to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">https://</code> endpoints. HTTP endpoints are rejected unless explicitly allowed. All API communication is encrypted via TLS.
         </p>
@@ -155,7 +157,7 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips`}
 
       {/* SSRF Protection */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">SSRF Protection</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("ssrfProtection")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           HookSniff blocks webhook delivery to internal/private networks to prevent SSRF attacks:
         </p>
