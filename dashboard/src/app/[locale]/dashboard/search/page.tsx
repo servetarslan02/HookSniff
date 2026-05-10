@@ -34,7 +34,7 @@ export default function SearchPage() {
   const [page, setPage] = useState(1);
   const t = useTranslations('search');
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const search = useCallback(async (p = 1) => {

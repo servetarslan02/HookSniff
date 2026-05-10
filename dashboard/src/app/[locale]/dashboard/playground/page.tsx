@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 
 const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] as const;
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
 
 const ENDPOINT_PATHS: Record<string, string> = {
   'List Endpoints': '/endpoints',
