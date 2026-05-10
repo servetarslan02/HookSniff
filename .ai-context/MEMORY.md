@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 06:12 GMT+8
+> Son güncelleme: 2026-05-11 06:54 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -35,10 +35,14 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Resend: shared domain `onboarding@resend.dev` ✅
 - Cloudflare R2: `hooksniff-storage` bucket ✅
 - Grafana OTEL: eu-west-2 ✅
-- Grafana Stack: hookrelay.grafana.net (stack ID: 1625476) ✅
+- Grafana Stack: hookrelay.grafana.net (stack ID: 1625476, org: hookrelay) ✅
 - Grafana Service Account Token: glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f
-- Grafana Contact Point: hooksniff-email → servetarslan02@gmail.com ✅
-- Grafana Alert Rules: 7 adet (4 critical, 3 warning) ✅
+- Grafana OTLP Endpoint: https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
+- Grafana OTLP Auth: `Authorization=Basic base64(1625476:glc_...)`
+- Grafana OTLP Token: glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0=
+- Grafana Access Policy: hooksniff (ID: b6aea6c9-bd32-4a2d-9184-a3d2da591a8a, region: us)
+- Cloud Run Secret: otel-headers (version 5, DOĞRU AUTH İLE)
+- Cloud Run OTEL env: OTEL_ENABLED=true, OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp, OTEL_EXPORTER_OTLP_HEADERS=secret:otel-headers:5
 - Vercel Web Analytics: aktif (Hobby plan, 50K events/ay) ✅
 - Vercel Speed Insights: kod eklendi, deploy bekliyor ✅
 - Polar.sh: test mode, account approved ✅
@@ -60,7 +64,7 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
 
-## Oturum 103 (2026-05-11 05:56 - 06:12) ✅
+## Oturum 103 (2026-05-11 05:56 - 06:54) ✅
 - **Resend email entegrasyonu** — `EmailProvider` enum oluşturuldu (Resend → GCloud → None)
   - `api/src/email.rs`: EmailProvider eklendi, tüm email methodları destekliyor
   - `api/src/main.rs`: `gcloud_email` → `email_provider` değişti
@@ -70,11 +74,19 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Email adresleri düzeltildi** — tüm sayfalar `hooksniff.vercel.app` domain'inde tutarlı
   - Security: `security@hooksniff.com` → `security@hooksniff.vercel.app`
   - FAQ (8 dil): `hello@hooksniff.com` → `hello@hooksniff.vercel.app`
-  - Privacy: `privacy@hooksniff.vercel.app` ✅ (zaten doğru)
-  - Terms: `legal@hooksniff.vercel.app` ✅ (zaten doğru)
-  - Contact: `support@hooksniff.vercel.app` ✅ (zaten doğru)
-- **Testler:** API 983/983 ✅, Worker 48/48 ✅, TypeScript 0 hata ✅
-- **Commit:** `c637511` — main branch
+- **6 kullanılmayan dil dosyası silindi** — sadece en + tr kaldı
+- **30 dosyadaki useTranslations quote hatası düzeltildi** — `\'` → `'`
+- **Grafana OTEL araştırması** — büyük sorun bulundu:
+  - OTEL_EXPORTER_OTLP_HEADERS secret'ı BOŞTU → düzeltildi (v5)
+  - Grafana org adı `hookrelay` (hooksniff değil!)
+  - OTLP auth format: `Authorization=Basic base64(1625476:glc_...)`
+  - Yeni access policy token oluşturuldu: `hooksniff-otel`
+  - Cloud Run revision 00057 deploy edildi
+  - **AMA: Trace'ler hala Grafana'ya ulaşmıyor** — sonraki oturumda debug edilecek
+  - Test: `curl https://otlp-gateway-prod-eu-west-2.grafana.net/otlp/v1/traces` → 200 ✅ (direct test works)
+  - Sorun: API'nin OTEL exporter'ı trace göndermiyor olabilir (silent failure, batch exporter flush sorunu, veya endpoint format mismatch)
+- **Commit:** `c637511`, `28f9dab`, `f994fbf`, `cbd039d`, `cbcc23b` — main branch
+- **⚠️ Email adresleri çalışmadığı not alındı** — MX kaydı yok, silinecek/contact form'a çevrilecek
 
 ## Oturum 94 (2026-05-10 22:58 - 23:54) ✅
 - **12 major dependency güncellendi:**
