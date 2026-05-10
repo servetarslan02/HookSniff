@@ -37,8 +37,8 @@
 | 6 | `npm audit` failure handling eksik | `.github/workflows/ci.yml` |
 | 7 | Docker image `latest` tag — rollback zor | `cloudbuild.yaml` |
 | 8 | Image vulnerability scanning yok | `cloudbuild.yaml` |
-| 9 | i18n'de Türkçe/Korean karışımı (`q4`) | `messages/tr.json`, `messages/ja.json` |
-| 10 | `common.previous` tüm dillerde İngilizce | `messages/*.json` |
+| 9 | i18n'de Türkçe/Korean karışımı (`q4`) | `messages/tr.json`, `messages/ja.json` | ✅ Düzeltildi (2026-05-10) |
+| 10 | `common.previous` tüm dillerde İngilizce | `messages/*.json` | ✅ Düzeltildi (2026-05-10) |
 | 11 | Duplicate key patterns (`billing.plans.free` vs `billing["plans.free"]`) | i18n JSON'ları |
 
 ## Migrations — Dosya Bazlı
