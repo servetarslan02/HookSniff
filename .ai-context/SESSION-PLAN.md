@@ -83,14 +83,17 @@ Her oturum şu şekilde işler:
 **Dosyalar:** `dashboard/src/app/[locale]/dashboard/` sayfaları, `api/src/routes/analytics.rs`, `api/src/routes/billing.rs`
 **Yaklaşım:** API response format'ını frontend ile eşle. Fiyat sabitlerini düzelt.
 
-### Oturum 78: Billing & Account Endpoints
+### Oturum 78: Billing & Account Endpoints ✅
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-032 | Abonelik iptal endpoint'i yok — 405 | ⬜ |
-| HS-033 | Hesap silme bozuk — yanlış endpoint | ⬜ |
-| HS-073 | Hardcoded `Authorization: 'Bearer YOUR_TOKEN'` | ⬜ |
-| HS-074 | `health/page.tsx` token kullanmıyor | ⬜ |
-| HS-076 | `api-keys/page.tsx` credentials yanlış yerde | ⬜ |
+| HS-032 | Abonelik iptal endpoint'i yok — 405 | ✅ 2026-05-10 |
+| HS-033 | Hesap silme bozuk — yanlış endpoint | ✅ 2026-05-10 |
+| HS-073 | Hardcoded `Authorization: 'Bearer YOUR_TOKEN'` | ✅ 2026-05-10 |
+| HS-074 | `health/page.tsx` token kullanmıyor | ❌ Yanlış bulgu |
+| HS-076 | `api-keys/page.tsx` credentials yanlış yerde | ✅ 2026-05-10 |
+
+**Dosyalar:** `api/src/routes/billing.rs`, `dashboard/src/app/[locale]/dashboard/settings/page.tsx`, `playground/page.tsx`, `api-keys/page.tsx`
+**Yapılan:** DELETE /billing/subscription eklendi, hesap silme endpoint düzeltildi, playground token fix, api-keys credentials fix
 
 **Dosyalar:** `api/src/routes/billing.rs`, `api/src/routes/auth.rs`, `dashboard/src/app/[locale]/dashboard/`
 

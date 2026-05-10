@@ -101,7 +101,7 @@ export default function SettingsPage() {
     setDeletingAccount(true);
     try {
       const { api } = await import('@/lib/api');
-      await api.delete('/auth/me', token ?? undefined);
+      await api.delete('/auth/account', token ?? undefined);
       logout();
       router.push('/');
     } catch (e: unknown) {
