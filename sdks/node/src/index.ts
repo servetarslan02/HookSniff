@@ -370,6 +370,7 @@ export class HookSniff {
   private apiKey: string;
   private baseUrl: string;
   private timeout: number;
+  private maxRetries: number;
 
   public endpoints: EndpointsResource;
   public webhooks: WebhooksResource;
@@ -381,9 +382,18 @@ export class HookSniff {
       ""
     );
     this.timeout = config.timeout || 30000;
+    this.maxRetries = config.maxRetries ?? 3;
 
     this.endpoints = new EndpointsResource(this);
     this.webhooks = new WebhooksResource(this);
+  }
+
+  private _isRetryable(status: number): boolean {
+    return status === 429 || status >= 500;
+  }
+
+  private _sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /** @internal */
@@ -399,50 +409,99 @@ export class HookSniff {
       "User-Agent": "hooksniff-node/0.1.0",
     };
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    let lastError: Error | undefined;
 
-    try {
-      const resp = await fetch(url, {
-        method,
-        headers,
-        body: body ? JSON.stringify(body) : undefined,
-        signal: controller.signal,
-      });
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-      if (resp.ok) {
-        const contentType = resp.headers.get("content-type") || "";
-        if (contentType.includes("text/csv")) {
-          return resp.text();
-        }
-        return resp.json();
-      }
-
-      let message: string;
       try {
-        const errBody = (await resp.json()) as ApiError;
-        message = errBody.error?.message || `HTTP ${resp.status}`;
-      } catch {
-        message = `HTTP ${resp.status}`;
-      }
+        const resp = await fetch(url, {
+          method,
+          headers,
+          body: body ? JSON.stringify(body) : undefined,
+          signal: controller.signal,
+        });
 
-      switch (resp.status) {
-        case 400:
-          throw new ValidationError(message);
-        case 401:
-          throw new AuthenticationError(message);
-        case 404:
-          throw new NotFoundError(message);
-        case 413:
-          throw new PayloadTooLargeError(message);
-        case 429:
-          throw new RateLimitError(message);
-        default:
-          throw new HookSniffError(message, resp.status);
+        if (resp.ok) {
+          const contentType = resp.headers.get("content-type") || "";
+          if (contentType.includes("text/csv")) {
+            return resp.text();
+          }
+          return resp.json();
+        }
+
+        let message: string;
+        try {
+          const errBody = (await resp.json()) as ApiError;
+          message = errBody.error?.message || `HTTP ${resp.status}`;
+        } catch {
+          message = `HTTP ${resp.status}`;
+        }
+
+        // Check if we should retry
+        if (this._isRetryable(resp.status) && attempt < this.maxRetries) {
+          // For 429, respect Retry-After header
+          if (resp.status === 429) {
+            const retryAfter = resp.headers.get("retry-after");
+            if (retryAfter) {
+              const seconds = parseInt(retryAfter, 10);
+              if (!isNaN(seconds)) {
+                await this._sleep(seconds * 1000);
+                continue;
+              }
+            }
+          }
+          // Exponential backoff: 1s, 2s, 4s with jitter
+          const baseDelay = Math.pow(2, attempt) * 1000;
+          const jitter = Math.random() * baseDelay * 0.5;
+          await this._sleep(baseDelay + jitter);
+          continue;
+        }
+
+        // Non-retryable errors
+        switch (resp.status) {
+          case 400:
+            throw new ValidationError(message);
+          case 401:
+            throw new AuthenticationError(message);
+          case 404:
+            throw new NotFoundError(message);
+          case 413:
+            throw new PayloadTooLargeError(message);
+          case 429:
+            throw new RateLimitError(message);
+          default:
+            throw new HookSniffError(message, resp.status);
+        }
+      } catch (err) {
+        clearTimeout(timeoutId);
+
+        // Network / abort errors — retry if we have attempts left
+        if (
+          attempt < this.maxRetries &&
+          err instanceof Error &&
+          (err.name === "AbortError" ||
+            err.name === "TypeError" ||
+            (err as any).code === "ECONNRESET" ||
+            (err as any).code === "ECONNREFUSED" ||
+            (err as any).code === "ETIMEDOUT")
+        ) {
+          lastError = err;
+          const baseDelay = Math.pow(2, attempt) * 1000;
+          const jitter = Math.random() * baseDelay * 0.5;
+          await this._sleep(baseDelay + jitter);
+          continue;
+        }
+
+        throw err;
+      } finally {
+        clearTimeout(timeoutId);
       }
-    } finally {
-      clearTimeout(timeoutId);
     }
+
+    // Should not reach here, but just in case
+    throw lastError || new HookSniffError("Max retries exceeded");
   }
 
   async getStats(): Promise<Stats> {
