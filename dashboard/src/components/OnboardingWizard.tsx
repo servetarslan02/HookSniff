@@ -129,9 +129,13 @@ export function OnboardingWizard() {
   }, [updateState]);
 
   const completeStep = useCallback((stepId: string) => {
-    const completed = [...new Set([...state.completedSteps, stepId])];
-    updateState({ completedSteps: completed });
-  }, [state.completedSteps, updateState]);
+    setState((prev) => {
+      const completed = [...new Set([...prev.completedSteps, stepId])];
+      const next = { ...prev, completedSteps: completed };
+      saveState(next);
+      return next;
+    });
+  }, []);
 
   const steps: WizardStep[] = [
     { id: 'welcome', title: 'Welcome to HookSniff! 🪝', description: 'Let\'s get your webhooks set up in under 5 minutes.', icon: '🎉' },
