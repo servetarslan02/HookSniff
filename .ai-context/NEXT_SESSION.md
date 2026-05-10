@@ -1,34 +1,39 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 19:32 GMT+8
+> Son güncelleme: 2026-05-10 19:37 GMT+8
 
 ---
 
 ## ✅ Tamamlanan Oturumlar
 
-### Oturum 73-79 ✅
-- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu, Billing & Account, SSRF & Security
+### Oturum 73-80 ✅
+- Rate Limiting, Webhook Verification, Infrastructure, Dashboard Routing, API Uyumsuzluğu, Billing & Account, SSRF & Security, Worker Error Classification
 
-### Oturum 80 — Worker & Backend Core (kısmi) ✅
-- HS-018: Error classification eklendi (4xx except 429 → dead letter, 429/5xx → retry)
-- HS-019-023: Sonraki oturumlara kaldı
+### Oturum 81 — Database Issues ✅
+- HS-025: CHECK constraints eklendi (status, attempt_count, max_attempts)
+- HS-026: webhook_queue.delivery_id FK eklendi
+- HS-024: ⚠️ Manuel senkronizasyon (standalone SQL + db.rs)
+- HS-027: ❌ Yanlış bulgu — `amount_cents` codebase'de yok
+- HS-038d: ❌ Domain sanitize edilmiş
+- HS-038e: ❌ Parametrize edilmiş SQL
 
 ---
 
-## 🔴 Sıradaki Oturum: #81 — Database Issues + Worker Kalan
+## 🔴 Sıradaki Oturum: #82 — Auth & Crypto Security
 
 ### Görev
-DB düzeltmeleri + worker kalan sorunlar.
+Auth ve kriptografi güvenlik düzeltmeleri.
 
 ### Düzeltilcek Sorunlar
 | ID | Sorun | Dosya |
 |----|-------|-------|
-| HS-024 | İki migration sistemi senkron değil | `api/migrations/` |
-| HS-025 | CHECK constraint'ler eksik | `api/migrations/` |
-| HS-026 | `webhook_queue`'da FK eksik | `api/migrations/` |
-| HS-027 | `amount_cents` INT → BIGINT | `api/migrations/` |
-| HS-038d | `custom_domains` dig subprocess — command injection | `api/src/routes/custom_domains.rs` |
-| HS-038e | Dynamic SQL construction — `format!` ile WHERE | `api/src/routes/events.rs` |
+| HS-038f | Timing attack — login hataları farklı mesajlar | `api/src/routes/auth.rs` |
+| HS-038g | `AppError::Serialization` serde_json hata gösteriyor | `api/src/error.rs` |
+| HS-038h | Email enumeration — register mesajı | `api/src/routes/auth.rs` |
+| HS-038i | Auth cache `std::sync::Mutex` async'te deadlock | `api/src/` |
+| HS-038j | `rate_limit.rs` unwrap() — panic riski | `api/src/rate_limit.rs` |
+| HS-038k | Alert condition string validation eksik | `api/src/routes/alerts.rs` |
+| HS-038l | Polar/iyzico webhook error'da config sızıntısı | `api/src/routes/billing.rs` |
 
 ---
 
@@ -36,11 +41,11 @@ DB düzeltmeleri + worker kalan sorunlar.
 
 | # | Görev | Sorunlar |
 |---|-------|----------|
-| 81 | **Database Issues** | HS-024, HS-025, HS-026, HS-027, HS-038d, HS-038e |
-| 82 | Auth & Crypto Security | HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l |
+| 82 | **Auth & Crypto Security** | HS-038f, HS-038g, HS-038h, HS-038i, HS-038j, HS-038k, HS-038l |
 | 83 | SDK & Config Fixes | HS-035, HS-036, HS-037, HS-038, HS-038m, HS-038n |
 | 84 | Frontend Component Issues | HS-039, HS-040, HS-041, HS-042, HS-043, HS-044 |
 | 85 | Frontend Performance & Bundle | HS-045, HS-046, HS-047, HS-048 |
+| 86 | Accessibility & Dark Mode | HS-049, HS-050, HS-051, HS-052, HS-053 |
 
 ---
 
@@ -49,7 +54,7 @@ DB düzeltmeleri + worker kalan sorunlar.
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 12 (+7 yanlış/operasyonel) | 25 |
+| 🔴 P1 | 44 | 14 (+9 yanlış/notlu) | 21 |
 | 🟡 P2 | 38 | 0 | 38 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **26** | **74** |
+| **TOPLAM** | **103** | **28** | **72** |
