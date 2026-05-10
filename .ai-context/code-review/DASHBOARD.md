@@ -45,7 +45,7 @@
 | 7 | `attempts.sort()` state mutation | `deliveries/[id]/page.tsx` |
 | 8 | Notification preferences local state only | `settings/page.tsx` |
 | 9 | Inconsistent styling (`glass-card` vs plain `bg-white`) | portal, routing, schemas, templates |
-| 10 | Dashboard token refresh yok (401 → login) | `lib/api.ts` |
+| 10 | Dashboard token refresh yok (401 → login) | `lib/api.ts` | ✅ Düzeltildi (2026-05-10) |
 | 11 | 5s/30s polling background tab'da devam ediyor | dashboard, health, status |
 | 12 | `window.location.href` yerine Next.js router | `search/page.tsx` | ✅ Düzeltildi (2026-05-10) |
 | 13 | Dead code (`selected` state, `_setEvent`, `_endpoints`) | deliveries, search, playground | ✅ Düzeltildi (2026-05-10) |

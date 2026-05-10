@@ -36,8 +36,6 @@ export default function SettingsPage() {
   const [failureAlerts, setFailureAlerts] = useState(true);
   const [weeklyDigest, setWeeklyDigest] = useState(false);
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-
   const copyApiKey = () => {
     if (apiKey) {
       navigator.clipboard.writeText(apiKey);
@@ -52,18 +50,8 @@ export default function SettingsPage() {
     setProfileError('');
     setProfileSuccess('');
     try {
-      const res = await fetch(`${API}/auth/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          credentials: 'include' as const,
-        },
-        body: JSON.stringify({ name: profileName, email: profileEmail }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || 'Failed to update profile');
-      }
+      const { api } = await import('@/lib/api');
+      await api.put('/auth/profile', { name: profileName, email: profileEmail }, token);
       setProfileSuccess(tc('success'));
       setTimeout(() => setProfileSuccess(''), 3000);
     } catch (e: unknown) {
@@ -89,18 +77,8 @@ export default function SettingsPage() {
 
     setPasswordSaving(true);
     try {
-      const res = await fetch(`${API}/auth/password`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          credentials: 'include' as const,
-        },
-        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || 'Failed to change password');
-      }
+      const { api } = await import('@/lib/api');
+      await api.put('/auth/password', { current_password: currentPassword, new_password: newPassword }, token);
       setPasswordSuccess(tc('success'));
       setCurrentPassword('');
       setNewPassword('');
@@ -122,14 +100,8 @@ export default function SettingsPage() {
     if (deleteConfirmText !== 'DELETE') return;
     setDeletingAccount(true);
     try {
-      const res = await fetch(`${API}/auth/me`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || 'Failed to delete account');
-      }
+      const { api } = await import('@/lib/api');
+      await api.delete('/auth/me', token);
       logout();
       router.push('/');
     } catch (e: unknown) {
@@ -143,23 +115,13 @@ export default function SettingsPage() {
   const handleNotificationSave = async () => {
     setNotificationSaving(true);
     try {
-      const res = await fetch(`${API}/portal/notifications`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          credentials: 'include' as const,
-        },
-        body: JSON.stringify({
-          email_on_failure: failureAlerts,
-          email_on_dead_letter: failureAlerts,
-          email_on_success: emailNotifs,
-          slack_webhook_url: null,
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to save notification preferences');
-      }
+      const { api } = await import('@/lib/api');
+      await api.put('/portal/notifications', {
+        email_on_failure: failureAlerts,
+        email_on_dead_letter: failureAlerts,
+        email_on_success: emailNotifs,
+        slack_webhook_url: null,
+      }, token);
       toast(tc('success'), 'success');
     } catch (e: unknown) {
       toast(getErrorMessage(e), 'error');
