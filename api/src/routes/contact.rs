@@ -3,6 +3,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::email::GCloudEmailClient;
 
+/// Maximum contact form submissions per IP per minute.
+const CONTACT_RATE_LIMIT: u32 = 3;
+
 #[derive(Deserialize)]
 pub struct ContactRequest {
     pub name: String,
@@ -20,8 +23,24 @@ pub struct ContactResponse {
 /// POST /v1/contact — Send a contact form message
 pub async fn handle_contact(
     Extension(email_client): Extension<Option<GCloudEmailClient>>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    headers: axum::http::HeaderMap,
     Json(body): Json<ContactRequest>,
 ) -> Result<Json<ContactResponse>, StatusCode> {
+    // Rate limit: 3 contact submissions per IP per minute
+    let client_ip = headers
+        .get("x-real-ip")
+        .or_else(|| headers.get("x-forwarded-for"))
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
+    let rl_key = format!("contact:{}", client_ip);
+    let rl_result = rate_limiter
+        .check_with_headers(&rl_key, CONTACT_RATE_LIMIT)
+        .await;
+    if !rl_result.allowed {
+        return Err(StatusCode::TOO_MANY_REQUESTS);
+    }
+
     // Validate input
     if body.name.trim().is_empty() || body.email.trim().is_empty() || body.message.trim().is_empty()
     {
