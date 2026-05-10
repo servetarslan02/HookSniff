@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 02:55 GMT+8
+> Son güncelleme: 2026-05-11 03:50 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -103,6 +103,24 @@
 - **Issue tracker:** HS-077/078/079/081/083/086/087 çözüldü (96/103)
 - **Commits:** `e753a03`→`eee1de6` (8 push)
 - **Kalan 7:** HS-065 (i18n), HS-082 (version), HS-084 (iyzico), HS-085 (db.rs), HS-088-089 (frontend test)
+
+## Oturum 99 (2026-05-11 03:10 - 03:50) ✅
+- **CSP hydration fix** — `script-src 'strict-dynamic'` (nonce yoktu) → `unsafe-inline` + `unsafe-eval`
+  - Site loading spinner'da kalıyordu, JS hiç çalışmıyordu
+  - Commit: `c058b34`
+- **Locale restriction** — sadece `en` + `tr` kaldı (de/ja/pt-BR/es/fr/ko kaldırıldı)
+  - routing.ts, layout.tsx, sitemap.ts, LanguageSwitcher güncellendi
+  - MISSING_MESSAGE build hatası 404'lere sebep oluyordu
+  - Commit: `f5f743e`
+- **API fallback fix** — 11 dosyada production'da `/api` fallback eklendi
+  - playground, webhook-builder, endpoints/[id], api-keys, health, search, admin/system, admin/settings, verify-email, EmailVerificationBanner, useDeliveryStream
+  - `localhost:3000/v1` fallback'i production'da çalışmıyordu
+  - Commit: `82f60af`
+- **Vercel deploy limiti** — free tier 100/gün dolmuş, deploy bekliyor
+- **Git email** — `ai@hooksniff.dev` kullanıldı (Vercel blok sebebi)
+- **Çeviriler:** EN 1281 / TR 1281 — mükemmel senkronize
+- **TypeScript:** 0 hata, **ESLint:** 0 hata, **Build:** başarılı
+- **Kalan 2 sorun:** HS-085 (db.rs test), HS-090 (SDK otomatik güncelleme)
 
 ## Oturum 98 (2026-05-11 02:42 - 02:55) ✅
 - **HS-065: i18n kampanyası** — 16 dashboard sayfası useTranslations'a çevrildi

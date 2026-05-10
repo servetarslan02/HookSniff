@@ -1,6 +1,29 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 02:55 GMT+8
+> Son güncelleme: 2026-05-11 03:50 GMT+8
+
+---
+
+## ✅ Oturum 99 Tamamlandı (2026-05-11 03:10 - 03:50)
+
+### Yapılan İşler
+- CSP hydration fix — `strict-dynamic` (nonce yok) → `unsafe-inline` + `unsafe-eval`
+- Locale restriction — sadece `en` + `tr` (6 dil kaldırıldı)
+- API fallback fix — 11 dosyada production `/api` fallback eklendi
+- TypeScript: 0 hata, ESLint: 0 hata, Build: başarılı
+- Çeviriler: EN 1281 / TR 1281 — tam senkron
+
+### Vercel Durumu
+- Free tier 100/gün deploy limiti dolmuş
+- Son deploy: CSP fix (`dpl_EDZ3i6hL`) — READY ✅
+- Locale fix ve API fallback fix — deploy bekliyor
+- Yarın bu saatlerde otomatik deploy olur
+
+### Kalan Sorunlar
+| ID | Sorun | Not |
+|----|-------|-----|
+| HS-085 | db.rs test | Gerçek PostgreSQL gerekli |
+| HS-090 | SDK otomatik güncelleme | Lansman sonrası |
 
 ---
 
