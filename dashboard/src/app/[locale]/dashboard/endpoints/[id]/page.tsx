@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -14,6 +15,8 @@ const BACKOFF_OPTIONS = [
 ] as const;
 
 export default function EndpointSettingsPage() {
+  const t = useTranslations('endpointSettings');
+  const tCommon = useTranslations('common');
   const { id } = useParams<{ id: string }>();
   const { token } = useAuth();
   const { toast } = useToast();
@@ -45,7 +48,7 @@ export default function EndpointSettingsPage() {
       const all = await endpointsApi.list(token);
       const ep = all.find((e) => e.id === id);
       if (!ep) {
-        toast('Endpoint not found', 'error');
+        toast(t('toastEndpointNotFound'), 'error');
         router.push('/dashboard/endpoints');
         return;
       }
@@ -59,7 +62,7 @@ export default function EndpointSettingsPage() {
         setMaxDelay(ep.retry_policy.max_delay_secs ?? 3600);
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to load endpoint';
+      const msg = err instanceof Error ? err.message : t('toastLoadFailed');
       toast(msg, 'error');
     } finally {
       setLoading(false);
@@ -79,9 +82,9 @@ export default function EndpointSettingsPage() {
         max_delay_secs: maxDelay,
       };
       await endpointsApi.updateRetryPolicy(token, id, policy);
-      toast('Retry policy updated!', 'success');
+      toast(t('toastRetryUpdated'), 'success');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to update';
+      const msg = err instanceof Error ? err.message : t('toastUpdateFailed');
       toast(msg, 'error');
     } finally {
       setSaving(false);
@@ -96,12 +99,12 @@ export default function EndpointSettingsPage() {
         `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1'}/endpoints/${id}/rotate-secret`,
         { method: 'POST', headers: {}, credentials: 'include' as const }
       );
-      if (!res.ok) throw new Error('Rotation failed');
+      if (!res.ok) throw new Error(t('toastRotationFailed'));
       const data = await res.json();
       setNewSecret(data.signing_secret);
-      toast('Secret rotated! Old secret valid for 24 hours.', 'success');
+      toast(t('toastSecretRotated'), 'success');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Rotation failed';
+      const msg = err instanceof Error ? err.message : t('toastRotationFailed');
       toast(msg, 'error');
     } finally {
       setRotating(false);
@@ -130,12 +133,12 @@ export default function EndpointSettingsPage() {
           },
         }),
       });
-      if (!res.ok) throw new Error('Failed to send');
+      if (!res.ok) throw new Error(t('toastTestFailed'));
       setTestResult('success');
-      toast('Test webhook sent! Check your endpoint.', 'success');
+      toast(t('toastTestSent'), 'success');
     } catch (err: unknown) {
       setTestResult('error');
-      const msg = err instanceof Error ? err.message : 'Failed to send test';
+      const msg = err instanceof Error ? err.message : t('toastTestFailed');
       toast(msg, 'error');
     } finally {
       setTestSending(false);
@@ -188,7 +191,7 @@ export default function EndpointSettingsPage() {
           </svg>
         </button>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Endpoint Settings</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm font-mono text-gray-500 dark:text-slate-400 mt-1">{endpoint.url}</p>
         </div>
       </div>
@@ -197,14 +200,14 @@ export default function EndpointSettingsPage() {
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-6">
           <span className="text-xl">🔄</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Retry Policy</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('retryPolicy')}</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Max Attempts */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-              Max Attempts
+              {t('maxAttempts')}
             </label>
             <input
               type="number"
@@ -214,13 +217,13 @@ export default function EndpointSettingsPage() {
               onChange={(e) => setMaxAttempts(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">1–20 attempts</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('maxAttemptsHint')}</p>
           </div>
 
           {/* Backoff Strategy */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-              Backoff Strategy
+              {t('backoffStrategy')}
             </label>
             <div className="space-y-2">
               {BACKOFF_OPTIONS.map((opt) => (
@@ -252,7 +255,7 @@ export default function EndpointSettingsPage() {
           {/* Initial Delay */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-              Initial Delay (seconds)
+              {t('initialDelay')}
             </label>
             <input
               type="number"
@@ -267,7 +270,7 @@ export default function EndpointSettingsPage() {
           {/* Max Delay */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-              Max Delay (seconds)
+              {t('maxDelay')}
             </label>
             <input
               type="number"
@@ -277,14 +280,14 @@ export default function EndpointSettingsPage() {
               onChange={(e) => setMaxDelay(Math.max(1, Math.min(86400, parseInt(e.target.value) || 1)))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Max 86400s (24h)</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('maxDelayHint')}</p>
           </div>
         </div>
 
         {/* Delay Preview */}
         <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
           <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
-            Retry Schedule Preview
+            {t('retrySchedulePreview')}
           </p>
           <div className="flex flex-wrap gap-2">
             {previewDelays().map((delay, i) => (
@@ -304,7 +307,7 @@ export default function EndpointSettingsPage() {
             disabled={saving}
             className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-60"
           >
-            {saving ? 'Saving...' : 'Save Retry Policy'}
+            {saving ? t('saving') : t('saveRetryPolicy')}
           </button>
         </div>
       </div>
@@ -313,16 +316,16 @@ export default function EndpointSettingsPage() {
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-4">
           <span className="text-xl">🔑</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Signing Secret</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('signingSecret')}</h3>
         </div>
 
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-          Rotate your signing secret. The old secret remains valid for 24 hours to allow seamless migration.
+          {t('rotateSecretDesc')}
         </p>
 
         {endpoint.signing_secret && (
           <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
-            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Current Secret</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">{t('currentSecret')}</p>
             <code className="text-sm font-mono text-gray-700 dark:text-slate-300 break-all">
               {endpoint.signing_secret.slice(0, 12)}{'*'.repeat(20)}
             </code>
@@ -331,7 +334,7 @@ export default function EndpointSettingsPage() {
 
         {newSecret && (
           <div className="mb-4 p-3 bg-green-50 dark:bg-green-500/10 rounded-xl border border-green-200 dark:border-green-500/20">
-            <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">New Secret (save this!)</p>
+            <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">{t('newSecret')}</p>
             <code className="text-sm font-mono text-green-800 dark:text-green-300 break-all">{newSecret}</code>
           </div>
         )}
@@ -340,7 +343,7 @@ export default function EndpointSettingsPage() {
           onClick={() => setShowRotateConfirm(true)}
           className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-amber-700 transition"
         >
-          Rotate Secret
+          {t('rotateSecret')}
         </button>
       </div>
 
@@ -348,26 +351,26 @@ export default function EndpointSettingsPage() {
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-4">
           <span className="text-xl">⚡</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Rate Limits</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('rateLimits')}</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
-            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">API Requests</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('apiRequests')}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {endpoint.routing_strategy === 'round-robin' ? '100' : '1,000'}
-              <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">/min</span>
+              <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">{t('perMin')}</span>
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
-            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">Avg Response</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('avgResponse')}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {endpoint.avg_response_ms ?? 0}
-              <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">ms</span>
+              <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">{t('msUnit')}</span>
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
-            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">Failure Streak</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('failureStreak')}</p>
             <p className={`text-2xl font-bold ${(endpoint.failure_streak ?? 0) >= 3 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
               {endpoint.failure_streak ?? 0}
             </p>
@@ -377,9 +380,9 @@ export default function EndpointSettingsPage() {
 
       {/* Send Test Webhook Card */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🧪 Test Webhook</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('testWebhookTitle')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-          Send a test webhook to this endpoint to verify it&apos;s working correctly.
+          {t('testWebhookDesc')}
         </p>
         <div className="flex items-center gap-4">
           <button
@@ -393,25 +396,25 @@ export default function EndpointSettingsPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Sending...
+                {t('sending')}
               </>
             ) : (
-              <>🚀 Send Test Webhook</>
+              <>{t('sendTestWebhook')}</>
             )}
           </button>
           {testResult === 'success' && (
             <span className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-1">
-              ✅ Sent! Check your endpoint logs.
+              {t('testSent')}
             </span>
           )}
           {testResult === 'error' && (
             <span className="text-red-600 dark:text-red-400 text-sm font-medium flex items-center gap-1">
-              ❌ Failed — check endpoint URL and try again.
+              {t('testFailed')}
             </span>
           )}
         </div>
         <div className="mt-3 text-xs text-gray-400 dark:text-slate-500">
-          Payload: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{"{"}&quot;event&quot;: &quot;test.ping&quot;, &quot;data&quot;: {"{"}&quot;message&quot;: &quot;Hello from HookSniff! 🪝&quot;{"}"}{"}"}</code>
+          {t('payloadLabel')} <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{"{"}&quot;event&quot;: &quot;test.ping&quot;, &quot;data&quot;: {"{"}&quot;message&quot;: &quot;Hello from HookSniff! 🪝&quot;{"}"}{"}"}</code>
         </div>
       </div>
 
@@ -419,23 +422,23 @@ export default function EndpointSettingsPage() {
       {showRotateConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Rotate Signing Secret?</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('rotateConfirmTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              The old secret will remain valid for 24 hours. Update your webhook consumers to use the new secret before then.
+              {t('rotateConfirmDesc')}
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowRotateConfirm(false)}
                 className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
-                Cancel
+                {tCommon('cancel')}
               </button>
               <button
                 onClick={handleRotateSecret}
                 disabled={rotating}
                 className="px-4 py-2.5 rounded-xl text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition disabled:opacity-60"
               >
-                {rotating ? 'Rotating...' : 'Rotate Secret'}
+                {rotating ? t('rotating') : t('rotateSecret')}
               </button>
             </div>
           </div>
