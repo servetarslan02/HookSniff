@@ -401,7 +401,7 @@ function LiveRequestViewer() {
 
 // ─── Main Playground Page ───
 export default function PlaygroundPage() {
-  useAuth();
+  const { apiKey } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('playground');
   const [method, setMethod] = useState<string>('POST');
@@ -422,7 +422,7 @@ export default function PlaygroundPage() {
 
   const headers = {
     'Content-Type': 'application/json',
-    Authorization: 'Bearer YOUR_TOKEN',
+    ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
   };
 
   const curlCommand = `curl -X ${method} ${API_BASE}${path} \\
