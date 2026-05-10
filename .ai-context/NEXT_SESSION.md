@@ -1,6 +1,25 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 00:52 GMT+8
+> Son güncelleme: 2026-05-11 01:04 GMT+8
+
+---
+
+## 🔄 Oturum 96 Devam Ediyor (2026-05-11 00:57 -)
+
+### 0. Staging Test (BAŞARILI) ✅
+- ✅ Health check: database healthy, queue healthy
+- ✅ Login: demo + admin JWT çalışıyor
+- ✅ Rate limit: 25. istekte HTTP 429 tetiklendi
+- ✅ Webhook veritabanına yazıldı
+- ⚠️ Worker delivery "pending" kaldı — servis 403, deployment kontrolü gerekli
+
+### 0.1 Worker Deprecation Fix ✅
+- `clone_from_slice` → `try_from` (worker/src/signing.rs, 4 yer)
+
+### 0.2 Kod Kalitesi ✅
+- cargo check: temiz
+- 979/979 API testi + 20/20 worker testi
+- Dashboard ESLint + TypeScript: 0 hata
 
 ---
 
