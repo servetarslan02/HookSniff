@@ -29,7 +29,7 @@ services:
       - key: PORT
         value: "3000"
       - key: RUST_LOG
-        value: info,hooksniff=debug
+        value: info,hooksniff=info
       - key: LOG_FORMAT
         value: json
       - key: DATABASE_URL
@@ -86,7 +86,7 @@ services:
       - key: APP_ENV
         value: production
       - key: RUST_LOG
-        value: info,hooksniff=debug
+        value: info,hooksniff=info
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
