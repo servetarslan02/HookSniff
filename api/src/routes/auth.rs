@@ -157,15 +157,16 @@ async fn register(
         .await?;
 
     if existing.is_some() {
-        // HS-038h: Return same response as success to prevent email enumeration.
-        // Don't reveal whether the email is registered.
+        // HS-038h: Prevent email enumeration.
+        // 1. Perform Argon2 hash to normalize timing (same cost as real registration)
+        // 2. Return same response structure as success
         tracing::info!("Registration attempt for existing email: {}", req.email);
-        // Still return 200 with generic response — client cannot distinguish.
+        let _ = jwt::hash_password(&password);
+        // Return generic message — client cannot distinguish existing vs new email
         return Ok((
             HeaderMap::new(),
             Json(serde_json::json!({
                 "message": "If this email is available, a verification email has been sent.",
-                "email": req.email,
             })),
         ));
     }
@@ -243,46 +244,48 @@ async fn login(
 
     // ── HS-038f: Timing attack mitigation ──
     // Always perform password hash verification to prevent timing-based user enumeration.
-    // If user not found or inactive, hash against a dummy bcrypt hash (constant-time compare).
+    // If user not found or inactive, hash against a dummy Argon2 hash (constant-time compare).
     let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE email = $1")
         .bind(&req.email)
         .fetch_optional(&pool)
         .await?;
 
-    // Dummy bcrypt hash used when user doesn't exist — prevents timing oracle.
-    // This is a pre-computed hash of "dummy_password_for_timing_attack_mitigation".
-    const DUMMY_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$dGVzdA$c2FsdA$c2FsdA";
+    // HS-038f: Lazy-initialized valid Argon2id hash for timing attack mitigation.
+    // Must be a real hash so `verify_password` performs actual Argon2 computation
+    // (not a fast reject from invalid PHC format).
+    static DUMMY_HASH: once_cell::sync::Lazy<String> = once_cell::sync::Lazy::new(|| {
+        jwt::hash_password("dummy_password_for_timing_mitigation_2026")
+            .unwrap_or_else(|_| "$argon2id$v=19$m=19456,t=2,p=1$c2FsdHNhbHRzYWx0$8KnGm7PqjUWh8vK7XpZ3J9vQZJ6wR8dLf5bNcVxWmYo".to_string())
+    });
 
-    match customer {
+    // Always verify password (against real hash or dummy) to normalize timing.
+    // Use `let _ =` to discard errors — we only care about constant-time execution.
+    let password_ok = match &customer {
         None => {
-            // User not found — still verify password against dummy hash to normalize timing.
-            let _ = jwt::verify_password(&req.password, DUMMY_HASH);
-            return Err(AppError::Unauthorized);
+            let _ = jwt::verify_password(&req.password, &DUMMY_HASH);
+            false
         }
-        Some(ref c) if !c.is_active => {
-            // Account deactivated — still verify password to normalize timing.
-            let hash = c.password_hash.as_deref().unwrap_or(DUMMY_HASH);
-            let _ = jwt::verify_password(&req.password, hash);
-            return Err(AppError::Unauthorized);
-        }
-        Some(ref c) => {
-            let hash = match c.password_hash.as_ref() {
-                Some(h) => h,
+        Some(c) => {
+            match c.password_hash.as_ref() {
+                Some(hash) => jwt::verify_password(&req.password, hash).unwrap_or(false),
                 None => {
-                    // No password set — verify against dummy to normalize timing.
-                    let _ = jwt::verify_password(&req.password, DUMMY_HASH);
-                    return Err(AppError::Unauthorized);
+                    let _ = jwt::verify_password(&req.password, &DUMMY_HASH);
+                    false
                 }
-            };
-
-            if !jwt::verify_password(&req.password, hash)? {
-                return Err(AppError::Unauthorized);
             }
         }
+    };
+
+    // Now check existence and status — timing is already normalized.
+    let customer = customer.ok_or(AppError::Unauthorized)?;
+
+    if !customer.is_active {
+        return Err(AppError::Unauthorized);
     }
 
-    // Unwrap is safe: we only reach here if customer is Some, active, and password matched.
-    let customer = customer.unwrap();
+    if !password_ok {
+        return Err(AppError::Unauthorized);
+    }
 
     // If 2FA is enabled, return partial response requiring TOTP code
     if customer.totp_enabled {

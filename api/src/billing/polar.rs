@@ -176,7 +176,8 @@ impl PolarProvider {
             match key.trim() {
                 "t" => {
                     timestamp = Some(value.trim().parse::<i64>().map_err(|_| {
-                        AppError::BadRequest("Invalid Polar signature timestamp".into())
+                        // HS-038l: Generic message — don't reveal signature format
+                        AppError::BadRequest("Invalid webhook signature".into())
                     })?);
                 }
                 "v1" if v1_sig.is_none() => {
@@ -187,16 +188,16 @@ impl PolarProvider {
         }
 
         let ts =
-            timestamp.ok_or_else(|| AppError::BadRequest("Missing t in Polar signature".into()))?;
+            timestamp.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
         let sig =
-            v1_sig.ok_or_else(|| AppError::BadRequest("Missing v1 in Polar signature".into()))?;
+            v1_sig.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
 
         // Check timestamp freshness (5 minutes)
         let now = chrono::Utc::now().timestamp();
         let age = (now - ts).abs();
         if age > 300 {
             return Err(AppError::BadRequest(
-                "Polar webhook timestamp too old".into(),
+                "Webhook signature expired".into(),
             ));
         }
 
@@ -207,7 +208,7 @@ impl PolarProvider {
         mac.update(signed_payload.as_bytes());
 
         let expected = hex::decode(sig)
-            .map_err(|_| AppError::BadRequest("Invalid Polar signature hex".into()))?;
+            .map_err(|_| AppError::BadRequest("Invalid webhook signature".into()))?;
 
         mac.verify_slice(&expected)
             .map_err(|_| AppError::Unauthorized)?;
