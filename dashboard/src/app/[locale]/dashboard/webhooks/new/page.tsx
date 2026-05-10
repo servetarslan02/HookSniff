@@ -71,7 +71,7 @@ export default function SendWebhookPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('configuration')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Endpoint</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('endpointLabel')}</label>
               <select
                 value={endpointId}
                 onChange={(e) => setEndpointId(e.target.value)}
@@ -84,7 +84,7 @@ export default function SendWebhookPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Event Type</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('eventTypeLabel')}</label>
               <input
                 type="text"
                 value={eventType}
