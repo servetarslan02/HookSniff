@@ -163,7 +163,7 @@ export default function TransformsPage() {
                     </div>
                   )}
                 </div>
-                <button onClick={() => handleDelete(rule.id)} className="text-gray-400 hover:text-red-600 transition p-2">✕</button>
+                <button onClick={() => handleDelete(rule.id)} aria-label="Delete transform" className="text-gray-400 hover:text-red-600 transition p-2">✕</button>
               </div>
             </div>
           ))}
