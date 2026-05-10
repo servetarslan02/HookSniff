@@ -37,7 +37,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/components/ConfirmDialog', () => ({
-  default: ({ open, title, message, confirmLabel, onConfirm, onCancel, variant }: any) =>
+  default: ({ open, title, message, confirmLabel, onConfirm, onCancel, variant: _variant }: any) =>
     open ? React.createElement('div', { 'data-testid': 'confirm-dialog' },
       React.createElement('span', null, title),
       React.createElement('span', null, message),
