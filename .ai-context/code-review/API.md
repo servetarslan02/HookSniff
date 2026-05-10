@@ -43,7 +43,7 @@
 | 9 | `inbound.rs` crypt() PostgreSQL extension gerektirir | `api/src/routes/inbound.rs` | ✅ Düzeltildi (2026-05-10) |
 | 10 | `teams.rs` invite token response'da dönüyor | `api/src/routes/teams.rs` | ✅ Düzeltildi (2026-05-10) |
 | 11 | `customer_portal.rs` duplicate API key management | `api/src/routes/customer_portal.rs` |
-| 12 | `embed.rs` hardcoded API URL | `api/src/routes/embed.rs` |
+| 12 | `embed.rs` hardcoded API URL | `api/src/routes/embed.rs` | ✅ Düzeltildi (2026-05-10) |
 
 ## 🟢 Güçlü Yönler
 
