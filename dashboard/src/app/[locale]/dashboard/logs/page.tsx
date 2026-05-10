@@ -68,6 +68,7 @@ export default function LogsPage() {
     failed: deliveries.filter((d) => d.status === 'failed').length,
     pending: deliveries.filter((d) => d.status === 'pending').length,
   };
+  const isFiltered = filter !== 'all';
 
   return (
     <div className="space-y-6">
@@ -141,9 +142,12 @@ export default function LogsPage() {
               <span>{icons[f]}</span>
               {f.charAt(0).toUpperCase() + f.slice(1)}
               {f !== 'all' && (
-                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${
-                  filter === f ? 'bg-white/20' : 'bg-gray-100 dark:bg-slate-800'
-                }`}>
+                <span
+                  title={`${statusCounts[f]} on this page`}
+                  className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${
+                    filter === f ? 'bg-white/20' : 'bg-gray-100 dark:bg-slate-800'
+                  }`}
+                >
                   {statusCounts[f]}
                 </span>
               )}

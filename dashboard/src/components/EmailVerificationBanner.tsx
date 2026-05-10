@@ -13,11 +13,15 @@ export function EmailVerificationBanner() {
 
   useEffect(() => {
     if (!token || !user) return;
+    const controller = new AbortController();
     const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-    fetch(`${API}/auth/me`, { credentials: 'include' })
+    fetch(`${API}/auth/me`, { credentials: 'include', signal: controller.signal })
       .then((r) => r.json())
       .then((data) => setVerified(data.email_verified ?? true))
-      .catch(() => setVerified(true)); // Assume verified on error
+      .catch((err) => {
+        if (err.name !== 'AbortError') setVerified(null); // Bilinmiyor durumu
+      });
+    return () => controller.abort();
   }, [token, user]);
 
   if (!user || dismissed || verified === null || verified) return null;

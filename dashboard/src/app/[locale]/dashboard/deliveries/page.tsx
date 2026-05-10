@@ -68,6 +68,7 @@ export default function DeliveriesPage() {
   );
 
   const totalPages = Math.ceil(total / perPage);
+  const isSearching = search.length > 0;
 
   return (
     <div className="space-y-6">
@@ -118,7 +119,9 @@ export default function DeliveriesPage() {
         {loading ? (
           <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">{t('loadingDeliveries')}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">{t('empty')}</div>
+          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
+            {isSearching ? `No results matching "${search}" on this page` : t('empty')}
+          </div>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -174,7 +177,7 @@ export default function DeliveriesPage() {
             </div>
 
             {/* Pagination */}
-            {total > perPage && (
+            {total > perPage && !isSearching && (
               <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-slate-400">
                   Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
