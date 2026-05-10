@@ -449,10 +449,9 @@ impl PaymentProviderImpl for IyzicoProvider {
         _iyzico_customer_id: &str,
         _app_url: &str,
     ) -> Result<String, AppError> {
-        // iyzico doesn't have a customer portal.
-        // We redirect to our own billing dashboard.
+        // HS-038l: Don't reveal provider implementation details
         Err(AppError::BadRequest(
-            "iyzico does not have a customer portal. Manage your subscription from the HookSniff dashboard.".into()
+            "Customer portal is not available for your payment provider. Please manage your subscription from the dashboard.".into()
         ))
     }
 
