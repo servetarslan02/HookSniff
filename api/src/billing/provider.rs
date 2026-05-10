@@ -71,7 +71,10 @@ pub enum WebhookResult {
         currency: String,
     },
     /// Payment failed.
-    PaymentFailed { provider_tx_id: String },
+    PaymentFailed {
+        provider_tx_id: String,
+        customer_id: Option<Uuid>,
+    },
     /// Event acknowledged but no action needed.
     Ignored,
 }
@@ -299,10 +302,12 @@ mod tests {
     fn webhook_result_payment_failed() {
         let result = WebhookResult::PaymentFailed {
             provider_tx_id: "tx_fail".to_string(),
+            customer_id: None,
         };
         match result {
-            WebhookResult::PaymentFailed { provider_tx_id } => {
+            WebhookResult::PaymentFailed { provider_tx_id, customer_id } => {
                 assert_eq!(provider_tx_id, "tx_fail");
+                assert!(customer_id.is_none());
             }
             _ => panic!("Expected PaymentFailed"),
         }

@@ -132,6 +132,10 @@ async fn main() -> Result<()> {
     let mut reaper_interval = tokio::time::interval(std::time::Duration::from_secs(30));
     reaper_interval.tick().await; // first tick completes immediately, skip it
 
+    // HS-059: Grace period checker — runs every 6 hours
+    let mut grace_interval = tokio::time::interval(std::time::Duration::from_secs(6 * 3600));
+    grace_interval.tick().await; // skip first immediate tick
+
     // Main loop: poll PostgreSQL queue with NOTIFY-based wake-up
     //
     // Flow: poll → if items found → process & loop immediately
@@ -214,6 +218,22 @@ async fn main() -> Result<()> {
                     }
                     Err(e) => {
                         tracing::error!("❌ Orphaned delivery reaper error: {:?}", e);
+                    }
+                }
+            }
+            _ = grace_interval.tick() => {
+                // HS-059: Downgrade customers past their grace period (7 days)
+                match process_expired_grace_periods(&pool).await {
+                    Ok(downgraded) => {
+                        if downgraded > 0 {
+                            tracing::warn!(
+                                "⏰ Grace period: downgraded {} customers to free plan",
+                                downgraded
+                            );
+                        }
+                    }
+                    Err(e) => {
+                        tracing::error!("❌ Grace period checker error: {:?}", e);
                     }
                 }
             }
@@ -892,4 +912,78 @@ fn calculate_backoff(attempt: i32) -> i64 {
 /// - 5xx → SHOULD be retried (server error)
 fn is_non_retryable(status_code: i32) -> bool {
     (400..500).contains(&status_code) && status_code != 429
+}
+
+// ──────────────────────────────────────────────────────────────
+// HS-059: Grace period — downgrade customers after 7 days
+// ──────────────────────────────────────────────────────────────
+
+/// Grace period in days after a failed payment before downgrade.
+const GRACE_PERIOD_DAYS: i64 = 7;
+
+/// Downgrade customers whose payment_failed_at is older than 7 days.
+/// Called every 6 hours by the worker's main loop.
+async fn process_expired_grace_periods(pool: &PgPool) -> Result<usize> {
+    let cutoff = chrono::Utc::now() - chrono::Duration::days(GRACE_PERIOD_DAYS);
+
+    // Find customers past grace period
+    let rows: Vec<(uuid::Uuid,)> = sqlx::query_as(
+        "SELECT id FROM customers \
+         WHERE payment_failed_at IS NOT NULL \
+         AND payment_failed_at < $1 \
+         AND plan != 'free'",
+    )
+    .bind(cutoff)
+    .fetch_all(pool)
+    .await?;
+
+    let count = rows.len();
+
+    for (customer_id,) in &rows {
+        let free_limit: i32 = 10_000; // Plan::Free.max_webhooks_per_month()
+
+        sqlx::query(
+            "UPDATE customers SET plan = 'free', webhook_limit = $1, \
+             payment_failed_at = NULL, cancel_at_period_end = false, updated_at = NOW() \
+             WHERE id = $2",
+        )
+        .bind(free_limit)
+        .bind(customer_id)
+        .execute(pool)
+        .await?;
+
+        // Disable excess endpoints (free plan = 5)
+        let max_endpoints: i64 = 5;
+        let active_count: (i64,) = sqlx::query_as(
+            "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1 AND is_active = true",
+        )
+        .bind(customer_id)
+        .fetch_one(pool)
+        .await?;
+
+        if active_count.0 > max_endpoints {
+            let excess = active_count.0 - max_endpoints;
+            sqlx::query(
+                "UPDATE endpoints SET is_active = false, updated_at = NOW() \
+                 WHERE id IN (\
+                   SELECT id FROM endpoints \
+                   WHERE customer_id = $1 AND is_active = true \
+                   ORDER BY created_at DESC \
+                   LIMIT $2\
+                 )",
+            )
+            .bind(customer_id)
+            .bind(excess)
+            .execute(pool)
+            .await?;
+        }
+
+        tracing::info!(
+            "⏰ Customer {} downgraded to free after {} day grace period",
+            customer_id,
+            GRACE_PERIOD_DAYS
+        );
+    }
+
+    Ok(count)
 }
