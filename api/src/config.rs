@@ -209,7 +209,7 @@ impl Config {
                 .filter(|s| !s.is_empty())
                 .collect(),
             notify_from_email: std::env::var("NOTIFY_FROM_EMAIL")
-                .unwrap_or_else(|_| "noreply@hooksniff.vercel.app".into()),
+                .unwrap_or_else(|_| "onboarding@resend.dev".into()),
             notify_email: std::env::var("NOTIFY_EMAIL").ok(),
             fcm_server_key: std::env::var("FCM_SERVER_KEY").ok(),
             email_base_url: std::env::var("EMAIL_BASE_URL")
@@ -510,7 +510,7 @@ mod tests {
         assert!(cfg.iyzico_api_key.is_none());
         assert!(cfg.gcp_service_account_path.is_none());
         assert!(cfg.cors_origins.is_empty());
-        assert_eq!(cfg.notify_from_email, "noreply@hooksniff.vercel.app");
+        assert_eq!(cfg.notify_from_email, "onboarding@resend.dev");
         assert!(cfg.notify_email.is_none());
         assert!(cfg.fcm_server_key.is_none());
         assert_eq!(cfg.email_base_url, "https://hooksniff.vercel.app");
