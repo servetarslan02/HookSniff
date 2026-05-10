@@ -60,10 +60,10 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-032 | Abonelik iptal endpoint'i yok — `DELETE /billing/subscription` → 405 | `frontend/agent2-analytics-billing.md` | ✅ 2026-05-10 |
 | HS-033 | Hesap silme bozuk — `DELETE /auth/me` vs `DELETE /auth/account` | `frontend/agent4-settings-config.md` | ✅ 2026-05-10 |
 | HS-034 | Fiyat uyumsuzluğu — Frontend $49/$149, Backend $29/$99 | `frontend/agent2-analytics-billing.md` | ✅ 2026-05-10 |
-| HS-035 | 3 farklı API URL (SDK tutarsızlığı) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
-| HS-036 | Kotlin SDK generic crash (TypeToken erasure) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
-| HS-037 | 6 SDK'da `X-Hookrelay-Signature` legacy header | `infra/DEEP-SDK-DOCS.md` | ⬜ |
-| HS-038 | CLI `HOOKRELAY_*` env vars kullanıyor — `HOOKSNIFF_*` olmalı | `infra/DEEP-SDK-DOCS.md` | ⬜ |
+| HS-035 | 3 farklı API URL (SDK tutarsızlığı) | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-10 |
+| HS-036 | Kotlin SDK generic crash (TypeToken erasure) | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-10 |
+| HS-037 | 6 SDK'da `X-Hookrelay-Signature` legacy header | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-10 |
+| HS-038 | CLI `HOOKRELAY_*` env vars kullanıyor — `HOOKSNIFF_*` olmalı | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-10 |
 | HS-038a | `handle_inbound_to_endpoint` Authorization bypass — sadece prefix lookup, Argon2 yok | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038b | Prefix length mismatch — 20 char lookup ama DB'de 15 char prefix | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038c | Billing webhook'larında rate limiting yok (Stripe/Polar/iyzico) | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
@@ -76,8 +76,8 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-038j | `rate_limit.rs` unwrap() — header parse failure'da panic | `backend/DEEP-RUST-API.md` | ✅ 2026-05-10 |
 | HS-038k | Alert condition string validation eksik — whitelist yok | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
 | HS-038l | Polar/iyzico webhook error message'da internal config sızıntısı | `backend/DEEP-API-ENDPOINTS.md` | ✅ 2026-05-10 |
-| HS-038m | `next.config.js` output:standalone eksik — Docker build başarısız | `infra/DEEP-DEPS-CONFIG.md` | ⬜ |
-| HS-038n | DATABASE_URL local credentials git history'de | `infra/DEEP-GIT-HISTORY.md` | ⬜ |
+| HS-038m | `next.config.js` output:standalone eksik — Docker build başarısız | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 |
+| HS-038n | DATABASE_URL local credentials git history'de | `infra/DEEP-GIT-HISTORY.md` | ⚠️ 2026-05-10 — Kod düzeltildi, git history BFG gerektirir |
 
 ---
 
