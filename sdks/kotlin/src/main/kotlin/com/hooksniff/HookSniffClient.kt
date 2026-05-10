@@ -130,9 +130,8 @@ class HookSniffClient(
         httpClient.connectionPool.evictAll()
     }
 
-        private fun <T> Gson.fromJsonTyped(json: String, clazz: Class<T>): T {
-            return fromJson(json, clazz)
-        }
+    private fun <T> Gson.fromJsonTyped(json: String, clazz: Class<T>): T {
+        return fromJson(json, clazz)
     }
 
     internal fun <T> request(method: String, path: String, body: Any? = null, clazz: Class<T>): T {
