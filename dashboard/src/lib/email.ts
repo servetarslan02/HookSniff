@@ -20,7 +20,7 @@ interface ServiceAccountKey {
   token_uri: string;
 }
 
-const DEFAULT_FROM = process.env.GCP_SENDER_EMAIL || 'noreply@hooksniff.vercel.app';
+const DEFAULT_FROM = process.env.GCP_SENDER_EMAIL || 'onboarding@resend.dev';
 const GMAIL_API_URL = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const SCOPES = 'https://www.googleapis.com/auth/gmail.send';
