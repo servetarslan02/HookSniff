@@ -1,62 +1,58 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-10 09:20 GMT+8
+> Son güncelleme: 2026-05-10 09:35 GMT+8
 
 ---
 
-## ✅ BU OTURUMDA YAPILAN (Session 68 — TAMAMLANDI)
+## ✅ BU OTURUMDA YAPILAN (Session 69 — TAMAMLANDI)
 
-### Toplam: 30+ fix, 15+ commit
+### Toplam: 9 fix, 3 commit
 
-#### 🔴 Kritik Düzeltmeler (10)
-1. **Fiyat $49/$149 → $29/$99** — billing, admin, landing, i18n
-2. **Config Debug secret sızıntısı** — custom Debug (REDACTED)
-3. **search credentials hatası** — headers içinden çıkarıldı
-4. **GDPR delete_account** — 7 eksik tablo eklendi
-5. **inbound.rs crypt()** → Argon2 verification
-6. **teams.rs invite token** — response'dan kaldırıldı
-7. **Checkout URL doğrulaması** — trusted hosts kontrolü
-8. **Landing pricing tutarsızlığı** — $49→$29
-9. **i18n free tier** — 1,000→10,000 (8 dil)
-10. **Privacy retention** — 3→7 gün
+#### 🔴 Yüksek Düzeltmeler (3)
+1. **SSO client_secret AES-GCM şifreleme** — base64 → AES-256-GCM (yeni `crypto.rs` modülü, `ENCRYPTION_KEY` env var)
+2. **Batch webhook race condition** — queue publish hatası düzeltildi (inline publish, webhook_count rollback)
+3. **Worker paralel processing** — sequential loop → `tokio::spawn` per delivery (eşzamanlı teslimat)
 
-#### 🟠 Yüksek Düzeltmeler (10)
-11. **HookRelay→HookSniff** — 12+ dosya
-12. **Portal double-path** — /api/v1→/v1
-13. **alert()→toast()** — 3 sayfa
-14. **Dead code** — playground, search
-15. **window.location→router.push** — search
-16. **Deploy hardcoded values** — env vars
-17. **Production log level** — debug→info
-18. **Auth middleware cache** — 30s TTL
-19. **ROI calculator** — free tier threshold
-20. **SDK HookRelay referansları** — python, ruby, PHP
+#### 🟡 Orta Düzeltmeler (3)
+4. **Newsletter CSRF** — Origin/Referer header doğrulaması eklendi
+5. **Modal focus trapping** — ConfirmDialog: role=dialog, aria-modal, focus trap, Escape key, body scroll lock
+6. **Dashboard token refresh** — 401 → /auth/refresh dene → retry → login redirect
 
-#### 🟡 Orta Düzeltmeler (5)
-21. **i18n translations** — previous button (6 dil), q4
-22. **Polar product ID** — configurable
-23. **Dashboard refactor** — 4 sayfa fetch→apiFetch
-24. **api.ts** — 4 yeni API modülü
-25. **Workspace kurulumu** — USER, SOUL, IDENTITY
+#### 🟢 Düşük Düzeltmeler (3)
+7. **Blog post ordering** — Tarih sırasına göre yeniden sıralandı (en yeniden en eskiye)
+8. **JSON-LD structured data** — Blog sayfasına BlogPosting schema eklendi (SEO)
+9. **aria-label** — Search clear butonuna aria-label eklendi
+
+### Teknik Detaylar
+- `api/Cargo.toml`: `aes-gcm = "0.10"` eklendi
+- `api/src/crypto.rs`: AES-256-GCM encrypt/decrypt modülü oluşturuldu
+- `api/src/lib.rs`: `pub mod crypto;` eklendi
+- `api/src/routes/sso.rs`: base64 → AES-GCM encryption
+- `api/src/routes/webhooks.rs`: batch inline publish + webhook_count rollback
+- `worker/src/main.rs`: sequential → tokio::spawn concurrent processing
+- `dashboard/src/app/api/newsletter/route.ts`: CSRF origin validation
+- `dashboard/src/lib/api.ts`: 401 → refresh → retry → login
+- `dashboard/src/components/ConfirmDialog.tsx`: full accessibility
+- `dashboard/src/app/[locale]/blog/page.tsx`: date sort + JSON-LD + aria-label
+
+### GitHub Push
+- `807a40b` — fix: SSO AES-GCM, batch race condition, worker concurrency, CSRF, token refresh
+- `9b60855` — fix: blog date sorting, JSON-LD, aria-label
+- `0a3c24d` — fix: ConfirmDialog focus trapping, ARIA, Escape key
 
 ---
 
-## ⚠️ Kalan İşler
-
-### 🔴 Yüksek
-1. **SSO client_secret şifreleme** — AES-GCM
-2. **Batch webhook race condition** — queue publish hatası
-3. **Worker paralel değil** — tokio::spawn
+## ⚠️ Kalan İşler (Yeni Tespit Edilen)
 
 ### 🟡 Orta
-4. **Newsletter CSRF** — blog, contact
-5. **Modal focus trapping** — erişilebilirlik
-6. **Dashboard token refresh** — 401→login
+1. **Billing modal focus trapping** — billing/page.tsx'teki upgrade ve cancel modalleri ConfirmDialog kullanmıyor, kendi inline modal'ı var
+2. **Onboarding window.location** — router.push ile değiştirilmeli
+3. **NotificationCenter window.location** — router.push ile değiştirilmeli
 
 ### 🟢 Düşük
-7. **JSON-LD structured data** — SEO
-8. **Blog post ordering** — date-based
-9. **aria-label** — icon buttons
+4. **Dashboard icon buttons** — Bazı dashboard sayfalarında icon-only butonlar (copy, remove) aria-label eksik
+5. **Portal customize aria-labels** — copy/remove butonları
+6. **Signature verifier aria-labels** — copy butonu
 
 ---
 
@@ -65,3 +61,4 @@
 - GitHub PAT rotate
 - Vercel rebuild kontrol
 - iyzico hesap aç
+- **ENCRYPTION_KEY env var** — production'da ayarlanmalı (64 hex karakter)
