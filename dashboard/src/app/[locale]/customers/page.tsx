@@ -21,14 +21,14 @@ const featured = [
   },
   {
     slug: 'fintech-startup',
-    company: 'PayStack',
-    logo: 'PS',
+    company: 'PayFlow',
+    logo: 'PF',
     industry: 'Fintech',
     quote: 'We needed zero event loss for compliance. HookSniff delivers. The HMAC signatures and delivery logs give us the audit trail we need.',
     author: 'Head of Engineering',
     metric: '0',
     metricLabel: 'Events lost',
-    desc: 'How PayStack achieved zero event loss for financial compliance with HookSniff\'s FIFO delivery.',
+    desc: 'How PayFlow achieved zero event loss for financial compliance with HookSniff\'s FIFO delivery.',
   },
   {
     slug: 'ai-agent-fleet',
@@ -68,8 +68,8 @@ const stories = [
   },
   {
     slug: 'fintech-startup',
-    company: 'PayStack',
-    logo: 'PS',
+    company: 'PayFlow',
+    logo: 'PF',
     industry: 'Fintech',
     author: 'Head of Engineering',
     authorRole: 'Head of Engineering',
@@ -229,7 +229,8 @@ export default function CustomersPage() {
 
         {/* All Stories */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">All customer stories</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">All customer stories</h2>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">These are illustrative usage scenarios, not real customer testimonials.</p>
 
           {/* Filter */}
           <div className="flex flex-wrap gap-2 mb-8 justify-center">
