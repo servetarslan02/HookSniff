@@ -53,11 +53,9 @@ async fn create_endpoint(
             .await?;
 
     if endpoint_count.0 as u32 >= plan.max_endpoints() {
-        return Err(AppError::BadRequest(format!(
-            "Endpoint limit reached ({}/{}). Upgrade your plan for more endpoints.",
-            endpoint_count.0,
-            plan.max_endpoints()
-        )));
+        return Err(AppError::BadRequest(
+            "Endpoint limit reached. Upgrade your plan for more endpoints.".into(),
+        ));
     }
 
     // Validate URL
