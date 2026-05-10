@@ -324,6 +324,11 @@ impl RateLimiter {
         self.store.check(key, limit, 60).await
     }
 
+    /// Check rate limit with a custom window duration in seconds.
+    pub async fn check_with_window(&self, key: &str, limit: u32, window_secs: u64) -> RateLimitResult {
+        self.store.check(key, limit, window_secs).await
+    }
+
     /// Legacy check method (backwards compatible, uses default limit).
     pub async fn check(&self, key: &str, limit: u32) -> bool {
         self.store.check(key, limit, 60).await.allowed
