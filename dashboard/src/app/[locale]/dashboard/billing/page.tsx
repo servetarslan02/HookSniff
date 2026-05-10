@@ -12,6 +12,7 @@ import { billingApi, billingApiExtended, type Invoice } from '@/lib/api';
 
 const plans = [
   {
+    key: 'free',
     nameKey: 'plans.free',
     price: 0,
     period: '/month',
@@ -20,16 +21,18 @@ const plans = [
     popular: false,
   },
   {
+    key: 'pro',
     nameKey: 'plans.pro',
-    price: 49,
+    price: 29,
     period: '/month',
     limitKey: 'plans.proLimit',
     features: ['1,000 requests/min', '5 retry attempts', 'Priority support', '50 endpoints', '30-day retention'],
     popular: true,
   },
   {
+    key: 'business',
     nameKey: 'plans.business',
-    price: 149,
+    price: 99,
     period: '/month',
     limitKey: 'plans.businessLimit',
     features: ['10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', '500 endpoints', '90-day retention'],
@@ -189,15 +192,15 @@ export default function BillingPage() {
     }
   };
 
-  const handleUpgrade = (planName: string) => {
-    setShowUpgradeModal(planName);
+  const handleUpgrade = (planKey: string) => {
+    setShowUpgradeModal(planKey);
   };
 
   const confirmUpgrade = async () => {
     if (!showUpgradeModal || !token) return;
     setUpgrading(true);
     try {
-      const result = await billingApiExtended.upgrade(token, showUpgradeModal.toLowerCase());
+      const result = await billingApiExtended.upgrade(token, showUpgradeModal);
       if (result.checkout_url) {
         // Validate checkout URL is from a trusted payment provider
         const url = new URL(result.checkout_url);
@@ -310,9 +313,8 @@ export default function BillingPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('currentPlan')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((plan) => {
-            const planId = t(plan.nameKey).toLowerCase();
-            const isCurrent = planId === currentPlan;
-            const isDowngrade = plans.findIndex((p) => t(p.nameKey).toLowerCase() === currentPlan) > plans.indexOf(plan);
+            const isCurrent = plan.key === currentPlan;
+            const isDowngrade = plans.findIndex((p) => p.key === currentPlan) > plans.indexOf(plan);
             return (
               <div
                 key={plan.nameKey}
@@ -345,7 +347,7 @@ export default function BillingPage() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => handleUpgrade(t(plan.nameKey))}
+                    onClick={() => handleUpgrade(plan.key)}
                     className={clsx(
                       'w-full py-2.5 rounded-xl text-sm font-medium transition',
                       plan.popular
@@ -432,14 +434,14 @@ export default function BillingPage() {
           <div ref={upgradeModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-none">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('upgradeTo', {
-                action: plans.findIndex((p) => t(p.nameKey).toLowerCase() === currentPlan) > plans.findIndex((p) => t(p.nameKey) === showUpgradeModal)
+                action: plans.findIndex((p) => p.key === currentPlan) > plans.findIndex((p) => p.key === showUpgradeModal)
                   ? t('downgrade')
                   : t('upgrade'),
-                plan: showUpgradeModal
+                plan: t(plans.find((p) => p.key === showUpgradeModal)?.nameKey || 'plans.free')
               })}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              {plans.findIndex((p) => t(p.nameKey).toLowerCase() === currentPlan) > plans.findIndex((p) => t(p.nameKey) === showUpgradeModal)
+              {plans.findIndex((p) => p.key === currentPlan) > plans.findIndex((p) => p.key === showUpgradeModal)
                 ? t('downgradeDesc')
                 : t('upgradeDesc')}
             </p>

@@ -49,7 +49,15 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ### Sonraki Oturum
-- Oturum 77: Frontend-Backend API Uyumsuzluğu (HS-031, HS-034, HS-028, HS-029)
+- Oturum 78: Billing & Account Endpoints (HS-032, HS-033, HS-073, HS-074, HS-076)
+
+## 📝 Oturum 77 (2026-05-10 19:13 - 19:18 GMT+8) ✅
+1. Frontend-Backend API uyumsuzluğu düzeltildi:
+   - Fiyat: $49/$149 → $29/$99 (13 dosya) (HS-034)
+   - Billing: API'ye plan key gönderimi (HS-031)
+   - Search: 300ms debounce eklendi (HS-029)
+   - HS-028: Yanlış bulgu — cookie auth çalışıyor
+2. Dosyalar: pricing, billing, search, alternatives, compare, customers, startups, build-vs-buy
 
 ## 📝 Oturum 76 (2026-05-10 19:08 - 19:12 GMT+8) ✅
 1. Dashboard routing double-prefix düzeltildi:

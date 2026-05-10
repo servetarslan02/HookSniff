@@ -258,8 +258,8 @@ export default function Home() {
 
   const plans = [
     { name: tPricing('free'), price: '$0', period: tPricing('month'), features: tPricing.raw('freeFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('pro'), price: '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('startTrial'), popular: true },
-    { name: tPricing('business'), price: '$149', period: tPricing('month'), features: tPricing.raw('businessFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+    { name: tPricing('pro'), price: '$29', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('startTrial'), popular: true },
+    { name: tPricing('business'), price: '$99', period: tPricing('month'), features: tPricing.raw('businessFeatures') as string[], cta: tPricing('contactSales'), popular: false },
   ];
 
   return (

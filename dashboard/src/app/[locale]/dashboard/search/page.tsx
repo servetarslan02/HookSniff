@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/store';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
@@ -35,6 +35,7 @@ export default function SearchPage() {
   const t = useTranslations('search');
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const search = useCallback(async (p = 1) => {
     if (!token) return;
@@ -58,9 +59,22 @@ export default function SearchPage() {
     }
   }, [token, API, query, status]);
 
+  // Debounce search on query/status change (300ms delay)
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setPage(1);
+      search(1);
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [query, status, search]);
+
+  // Immediate search on page change (no debounce)
   useEffect(() => {
     search(page);
-  }, [page, search]);
+  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
