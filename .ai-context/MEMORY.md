@@ -37,6 +37,12 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Grafana Service Account Token: glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f
 - Grafana Contact Point: hooksniff-email → servetarslan02@gmail.com ✅
 - Grafana Alert Rules: 7 adet (4 critical, 3 warning) ✅
+- Vercel Web Analytics: aktif (Hobby plan, 50K events/ay) ✅
+- Vercel Speed Insights: kod eklendi, deploy bekliyor ✅
+- Polar.sh: test mode, account approved ✅
+- Polar.sh Checkout Link (Pro): https://buy.polar.sh/polar_cl_jtWjcvyy0m6ZOuOkEIa7i0agQmlpfJGsNwTJU4LNG8U ✅
+- Polar.sh: Stripe payout + identity verification → Servet yapacak
+- Google şifre: uku_21700987 (güncel)
 - hookrelay.com ve is-a.dev KULLANILMIYOR (Servet tercihi)
 - db.rs testleri: 16/16 passed ✅
 
