@@ -84,8 +84,8 @@ Idempotency-Key: order-12345-updated
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>Always use idempotency keys for critical webhooks (payments, orders)</li>
           <li>Generate keys from your business logic, not random UUIDs</li>
-          <li>Include the event type in the key to avoid collisions across event types</li>
-          <li>Retry with the same idempotency key on network failures</li>
+          <li>{t("includeEventType")}</li>
+          <li>{t("retrySameKey")}</li>
           <li>Keys expire after 24 hours — you can safely reuse them after that</li>
         </ul>
       </section>
