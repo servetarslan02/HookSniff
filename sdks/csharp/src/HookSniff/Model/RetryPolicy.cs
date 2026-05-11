@@ -29,6 +29,7 @@ namespace HookSniff.Model
     /// <summary>
     /// RetryPolicy
     /// </summary>
+    [JsonConverter(typeof(RetryPolicyJsonConverter))]
     public partial class RetryPolicy : IValidatableObject
     {
         /// <summary>
