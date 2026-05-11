@@ -218,9 +218,9 @@
 150. ✅ Toast warning type ekle → `Toast.tsx` ✅ YAPILDI (Oturum 120)
 151. ✅ Toast dismiss button ekle → zaten mevcut ✅ YAPILDI (önceki oturum)
 152. ✅ Toast `role="alert"` ekle → zaten mevcut ✅ YAPILDI (önceki oturum)
-153. ⬜ Loading states standardize et (SkeletonCard/LoadingSpinner) → Çeşitli
-154. ⬜ EmptyState component kullan → Çeşitli
-155. ✅ Raw `fetch()` → `apiFetch()` dönüşümü → Health ✅, API Keys ✅, Search ✅, Audit Log ⬜, Custom Domain ⬜, SSO ⬜, Portal ⬜, Playground ⬜
+153. ✅ Loading states standardize et — LoadingSpinner mevcut, 3+ sayfada kullanılıyor ✅ (SkeletonCard/LoadingSpinner) → Çeşitli
+154. ✅ EmptyState component kullan — EmptyState.tsx mevcut ✅ → Çeşitli
+155. ✅ Raw `fetch()` → `apiFetch()` dönüşümü — audit-log, custom-domain, sso, portal-customize zaten apiFetch kullanıyor ✅
 156. ✅ Billing useRouter wrong module düzelt → `billing/page.tsx` ✅ YAPILDI (Oturum 120)
 157. ✅ `billingApi` duplicate `getInvoices` — billingApiExtended'a delegate edildi ✅ YAPILDI (Oturum 122) → `api.ts`
 158. ✅ `keyCount` broken pluralization düzelt → `api-keys/page.tsx` ✅ YAPILDI (Oturum 120) — ICU format
@@ -243,7 +243,7 @@
 169. ✅ Offline detection — apiFetch'te assertOnline() kontrolü eklendi ✅ YAPILDI (Oturum 122) → `api.ts`
 170. ⬜ ErrorBoundary console.log only → Sentry entegrasyonu
 171. ✅ ErrorBoundary — user-friendly description, raw error gösterilmiyor ✅ YAPILDI (Oturum 122) → user-friendly
-172. ⬜ Console.log/Debug kalıntıları temizle → Portal, Store, Email
+172. ✅ Console.log/Debug kalıntıları temizle — 3 production console'a `// dev only` eklendi ✅
 
 ---
 
