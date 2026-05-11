@@ -401,7 +401,7 @@ class SerializationTest < Minitest::Test
   # ========================================
 
   def test_routing_info_serialization
-    ri = HooksniffSdk::RoutingInfo.new(
+    ri = HooksniffSdk::RoutingInfo.new(avg_response_ms: 150, failure_streak: 0, 
       endpoint_id: 'ep_1', routing_strategy: 'failover',
       fallback_url: 'https://fallback.example.com', is_healthy: true
     )
@@ -535,7 +535,7 @@ class SerializationTest < Minitest::Test
   end
 
   def test_webhook_filter_serialization
-    wf = HooksniffSdk::WebhookFilter.new(
+    wf = HooksniffSdk::WebhookFilter.new(from_date: Time.now, to_date: Time.now, 
       status: 'delivered', endpoint_id: 'ep_1',
       event_type: 'order.created', page: 1, per_page: 20
     )
