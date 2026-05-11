@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 
+// Force redeploy — docs/api page fix
 export default function ApiReferencePage() {
   const t = useTranslations('docs');
   return (
