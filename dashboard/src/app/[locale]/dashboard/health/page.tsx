@@ -80,19 +80,19 @@ export default function EndpointHealthPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           {
-            label: 'Healthy',
+            label: t('healthy'),
             count: endpoints.filter((e) => e.health_status === 'healthy').length,
             color: 'text-green-600 dark:text-green-400',
             bg: 'bg-green-50 dark:bg-green-500/10',
           },
           {
-            label: 'Degraded',
+            label: t('degraded'),
             count: endpoints.filter((e) => e.health_status === 'degraded').length,
             color: 'text-yellow-600 dark:text-yellow-400',
             bg: 'bg-yellow-50 dark:bg-yellow-500/10',
           },
           {
-            label: 'Unhealthy',
+            label: t('unhealthy'),
             count: endpoints.filter((e) => e.health_status === 'unhealthy').length,
             color: 'text-red-600 dark:text-red-400',
             bg: 'bg-red-50 dark:bg-red-500/10',
