@@ -203,6 +203,25 @@ class TestDecodeSecret(unittest.TestCase):
         self.assertIsInstance(result, bytes)
 
 
+class TestStandaloneVerifySignature(unittest.TestCase):
+    """Test the standalone verify_signature function."""
+
+    def test_standalone_verify_works(self):
+        from hooksniff.webhook import verify_signature as standalone_verify
+
+        secret_raw = base64.b64encode(b"test-secret-key-1234").decode()
+        secret = f"whsec_{secret_raw}"
+        msg_id = "msg_standalone"
+        timestamp = int(time.time())
+        body = '{"event":"standalone_test"}'
+
+        sig = _make_signature(base64.b64decode(secret_raw), msg_id, timestamp, body)
+        headers = _make_headers(msg_id, timestamp, sig)
+
+        result = standalone_verify(body, headers, secret)
+        self.assertEqual(result["event"], "standalone_test")
+
+
 # === Serialization Tests ===
 from hooksniff.models.endpoint import Endpoint
 from hooksniff.models.retry_policy import RetryPolicy
@@ -220,7 +239,7 @@ class TestEndpointSerialization(unittest.TestCase):
             "url": "https://example.com/webhook",
             "description": "Test endpoint",
             "is_active": True,
-            "retry_policy": {"max_retries": 3, "backoff_ms": 1000},
+            "retry_policy": {"max_attempts": 3, "backoff": "exponential", "initial_delay_secs": 10, "max_delay_secs": 3600},
             "created_at": "2026-01-01T00:00:00Z",
             "allowed_ips": None,
             "event_filter": None,
@@ -238,6 +257,11 @@ class TestEndpointSerialization(unittest.TestCase):
         self.assertEqual(str(ep.id), "550e8400-e29b-41d4-a716-446655440000")
         self.assertEqual(ep.url, "https://example.com/webhook")
         self.assertTrue(ep.is_active)
+        # Verify retry_policy is correctly deserialized
+        self.assertEqual(ep.retry_policy.max_attempts, 3)
+        self.assertEqual(ep.retry_policy.backoff, "exponential")
+        self.assertEqual(ep.retry_policy.initial_delay_secs, 10)
+        self.assertEqual(ep.retry_policy.max_delay_secs, 3600)
 
     def test_to_json_valid(self):
         data = self._make_endpoint_dict()
