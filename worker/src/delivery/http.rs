@@ -14,6 +14,10 @@ use crate::WebhookMessage;
 
 use super::DeliveryResult;
 
+/// Maximum response body size to read (1 MB).
+/// Prevents memory exhaustion from malicious or buggy endpoints returning huge responses.
+const MAX_RESPONSE_BODY_BYTES: usize = 1_048_576;
+
 /// Deliver a webhook via HTTP POST.
 ///
 /// Generates a Standard Webhooks HMAC-SHA256 signature, attaches
@@ -75,7 +79,23 @@ pub async fn deliver_http(
                 .iter()
                 .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
                 .collect::<std::collections::HashMap<String, String>>());
-            let body = response.text().await.unwrap_or_default();
+
+            // Read response body with size limit to prevent memory exhaustion
+            let body = match response.bytes().await {
+                Ok(bytes) => {
+                    if bytes.len() > MAX_RESPONSE_BODY_BYTES {
+                        let truncated = &bytes[..MAX_RESPONSE_BODY_BYTES];
+                        format!(
+                            "{}...[TRUNCATED: {} bytes total]",
+                            String::from_utf8_lossy(truncated),
+                            bytes.len()
+                        )
+                    } else {
+                        String::from_utf8_lossy(&bytes).to_string()
+                    }
+                }
+                Err(e) => format!("[Failed to read body: {}]", e),
+            };
             let response_body = truncate_str(&body, 1000);
             let success = (200..300).contains(&status_code);
 
