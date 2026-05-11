@@ -50,14 +50,15 @@ const METADATA_IPS: &[&str] = &[
     "fd00:ec2::254",   // AWS IPv6
 ];
 
-/// URL'in SSRF saldırılarına karşı güvenli olup olmadığını kontrol et.
+/// Validate a URL and return the resolved IP address.
 ///
-/// Kontrol edilenler:
-/// 1. URL parse
-/// 2. Host adı metadata endpoint mi?
-/// 3. Host IP'ye resolve edilir, IP private mı?
-/// 4. localhost/loopback engelleme
-pub fn validate_url(url: &str) -> Result<(), SsrfError> {
+/// This is the DNS rebinding-safe version: callers should use the returned IP
+/// to make the HTTP request (instead of re-resolving the hostname), preventing
+/// an attacker from returning a public IP during validation and a private IP
+/// during the actual request.
+///
+/// Returns the first resolved IP if validation passes.
+pub fn validate_url_and_resolve(url: &str) -> Result<IpAddr, SsrfError> {
     let parsed =
         url::Url::parse(url).map_err(|e| SsrfError::InvalidUrl(format!("{}: {}", url, e)))?;
 
@@ -88,7 +89,8 @@ pub fn validate_url(url: &str) -> Result<(), SsrfError> {
 
     // IP adresi mi?
     if let Ok(ip) = host_str.parse::<IpAddr>() {
-        return check_ip(&ip);
+        check_ip(&ip)?;
+        return Ok(ip);
     }
 
     // DNS çözümleme
@@ -106,6 +108,19 @@ pub fn validate_url(url: &str) -> Result<(), SsrfError> {
         check_ip(ip)?;
     }
 
+    // Return first resolved IP for callers to use directly
+    Ok(addrs[0])
+}
+
+/// URL'in SSRF saldırılarına karşı güvenli olup olmadığını kontrol et.
+///
+/// Kontrol edilenler:
+/// 1. URL parse
+/// 2. Host adı metadata endpoint mi?
+/// 3. Host IP'ye resolve edilir, IP private mı?
+/// 4. localhost/loopback engelleme
+pub fn validate_url(url: &str) -> Result<(), SsrfError> {
+    validate_url_and_resolve(url)?;
     Ok(())
 }
 

@@ -171,6 +171,7 @@ async fn google_callback(
         &customer.email,
         &customer.plan,
         &cfg.jwt_secret,
+        customer.is_admin,
     )?;
     let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
@@ -289,6 +290,7 @@ async fn github_callback(
         &customer.email,
         &customer.plan,
         &cfg.jwt_secret,
+        customer.is_admin,
     )?;
     let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 

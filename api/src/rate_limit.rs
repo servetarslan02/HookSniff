@@ -261,10 +261,13 @@ impl RateLimitStore for RedisRateLimiter {
         {
             Ok(r) => r,
             Err(e) => {
-                tracing::error!("Redis rate limit error: {e}, allowing request");
+                // HS-273: Fail-closed — deny request when Redis is unavailable.
+                // Previously fail-open allowed unlimited requests during Redis outages,
+                // effectively disabling rate limiting. Now we deny and log.
+                tracing::error!("Redis rate limit error: {e}, denying request (fail-closed)");
                 return RateLimitResult {
-                    allowed: true,
-                    remaining: limit,
+                    allowed: false,
+                    remaining: 0,
                     limit,
                     reset_seconds: window_secs,
                 };
@@ -365,7 +368,15 @@ impl RateLimiter {
 /// - anything else (or unset) → uses `InMemoryRateLimiter`
 ///
 /// Falls back to in-memory if Redis is unavailable.
+///
+/// **SECURITY WARNING (HS-003):** In-memory rate limiter loses all state on restart.
+/// In production with multiple instances, each instance has independent counters,
+/// effectively multiplying the allowed rate by the number of instances.
+/// Always set `RATE_LIMIT_STORE=redis` and `REDIS_URL` in production.
 pub async fn create_rate_limiter() -> RateLimiter {
+    let is_production = std::env::var("ENVIRONMENT").as_deref() == Ok("production")
+        || std::env::var("RUST_ENV").as_deref() == Ok("production");
+
     let store: Arc<dyn RateLimitStore> = match std::env::var("RATE_LIMIT_STORE").as_deref() {
         Ok("redis") => match std::env::var("REDIS_URL") {
             Ok(url) => match RedisRateLimiter::new(&url).await {
@@ -374,6 +385,13 @@ pub async fn create_rate_limiter() -> RateLimiter {
                     tracing::warn!(
                         "Failed to connect to Redis ({e}), falling back to in-memory rate limiter"
                     );
+                    if is_production {
+                        tracing::error!(
+                            "⚠️  PRODUCTION WARNING: Using in-memory rate limiter! \
+                             Rate limits will be per-instance and lost on restart. \
+                             Fix Redis connection immediately."
+                        );
+                    }
                     Arc::new(InMemoryRateLimiter::new())
                 }
             },
@@ -381,10 +399,27 @@ pub async fn create_rate_limiter() -> RateLimiter {
                 tracing::warn!(
                         "RATE_LIMIT_STORE=redis but REDIS_URL not set, falling back to in-memory rate limiter"
                     );
+                if is_production {
+                    tracing::error!(
+                        "⚠️  PRODUCTION WARNING: REDIS_URL not set! \
+                         Using in-memory rate limiter — rate limits are per-instance and lost on restart."
+                    );
+                }
                 Arc::new(InMemoryRateLimiter::new())
             }
         },
-        _ => Arc::new(InMemoryRateLimiter::new()),
+        _ => {
+            if is_production {
+                tracing::error!(
+                    "⚠️  PRODUCTION WARNING: RATE_LIMIT_STORE not set to 'redis'. \
+                     Using in-memory rate limiter — rate limits are per-instance and lost on restart. \
+                     Set RATE_LIMIT_STORE=redis and REDIS_URL for production use."
+                );
+            } else {
+                tracing::info!("Using in-memory rate limiter (development mode)");
+            }
+            Arc::new(InMemoryRateLimiter::new())
+        }
     };
 
     RateLimiter::new(store)
