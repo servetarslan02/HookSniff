@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 17:27 GMT+8
+> Son güncelleme: 2026-05-11 18:12 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -71,7 +71,7 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
 
-## Oturum 109 (2026-05-11 17:27 - 18:05) 🔄
+## Oturum 109 (2026-05-11 17:27 - 18:12) ✅
 - **OpenClaw beşinci oturum** — Servet ile GCP deploy debug
 - **Rust 1.95.0 kuruldu** — cargo check başarılı
 - **Testler:** API 983/983 ✅, Worker 48/48 ✅
@@ -79,17 +79,18 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **cloudbuild.yaml güncellendi** — Cloud Run deploy adımı eklendi (push edildi ✅)
 - **deploy.yml güncellendi** — RESEND_API_KEY + NOTIFY_EMAIL eklendi (PAT workflow scope eksik, push edilemedi ❌)
 - **GCP Console'a giriş yapıldı** — browser ile Google auth (2FA onay)
-- **🔴 KRİTİK: Cloud Run API deploy SORUNU**
-  - hooksniff-api Unavailable — revision 00062 ve 00063 başarısız
-  - Hata: "container failed to start and listen on PORT=3000 within timeout"
-  - Revision 00058 (10 saat önce) hala %100 traffic alıyor, çalışıyor
-  - Cloud Build başarılı image build + push (7:44 UTC) ama deploy edilen revision başlamıyor
+- **🔴 KRİTİK BULGU: Cloud Run API deploy SORUNU**
+  - Son 5 revision (00059-00063) "container failed to start on PORT=3000 within timeout" hatasıyla başarısız
+  - Revision 00058 (10 saat önce) hala %100 traffic → API çalışıyor
+  - Cloud Build image build başarılı (7:44 UTC, 5 dk 29 sn)
   - Cloud Logging'de log YOK — container hiç başlamadan çöküyor
-  - **Muhtemel neden:** OTEL init hatası (boot test span veya exporter bağlantı sorunu)
-  - **Çözüm denemesi:** OTEL_ENABLED=false ile deploy edilmeli (test amaçlı)
+  - **Muhtemel neden:** OTEL init hatası (Grafana Cloud bağlantı/Auth sorunu)
+  - **Denenen:** OTEL_ENABLED=false ile deploy (oturum sona erdi, tamamlanamadı)
+- **OTEL_ENABLED=false ile deploy denemesi** — GCP Console'da env var değiştirildi, Deploy'a basıldı ama sonucu görülmedi
 - **Auto-sync cron** — her 10 dakikada .ai-context/ GitHub'a push
-- **API sağlık:** /health 200 OK (eski revizyon 00058'den), DB 784ms
+- **API sağlık:** /health 200 OK (eski revizyon 00058'den)
 - **GCP kredisi:** ₺87 / ₺13,516 kullanılmış, Ağustos 2026'ya kadar geçerli
+- **Sonraki oturumda:** OTEL_ENABLED=false deploy sonucunu kontrol et, başarısızsa Cloud Build loglarını incele
 
 ## Oturum 108 (2026-05-11 16:52 - 17:21) 🔄
 - **OpenClaw dördüncü oturum** — Servet Grafana OTEL durumunu sordu
