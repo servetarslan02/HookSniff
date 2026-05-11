@@ -51,16 +51,16 @@ import org.openapitools.client.JSON;
 /**
  * DeliveryAttempt
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class DeliveryAttempt {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_ATTEMPT_NUMBER = "attempt_number";
   @SerializedName(SERIALIZED_NAME_ATTEMPT_NUMBER)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer attemptNumber;
 
   public static final String SERIALIZED_NAME_STATUS_CODE = "status_code";
@@ -85,13 +85,13 @@ public class DeliveryAttempt {
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public DeliveryAttempt() {
   }
 
-  public DeliveryAttempt id(@javax.annotation.Nullable UUID id) {
+  public DeliveryAttempt id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -100,17 +100,17 @@ public class DeliveryAttempt {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public DeliveryAttempt attemptNumber(@javax.annotation.Nullable Integer attemptNumber) {
+  public DeliveryAttempt attemptNumber(@javax.annotation.Nonnull Integer attemptNumber) {
     this.attemptNumber = attemptNumber;
     return this;
   }
@@ -119,12 +119,12 @@ public class DeliveryAttempt {
    * Get attemptNumber
    * @return attemptNumber
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getAttemptNumber() {
     return attemptNumber;
   }
 
-  public void setAttemptNumber(@javax.annotation.Nullable Integer attemptNumber) {
+  public void setAttemptNumber(@javax.annotation.Nonnull Integer attemptNumber) {
     this.attemptNumber = attemptNumber;
   }
 
@@ -205,7 +205,7 @@ public class DeliveryAttempt {
   }
 
 
-  public DeliveryAttempt createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public DeliveryAttempt createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -214,12 +214,12 @@ public class DeliveryAttempt {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -291,7 +291,7 @@ public class DeliveryAttempt {
     openapiFields = new HashSet<String>(Arrays.asList("id", "attempt_number", "status_code", "response_body", "duration_ms", "error_message", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "attempt_number", "created_at"));
   }
 
   /**
@@ -314,8 +314,15 @@ public class DeliveryAttempt {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `DeliveryAttempt` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : DeliveryAttempt.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
       if ((jsonObj.get("response_body") != null && !jsonObj.get("response_body").isJsonNull()) && !jsonObj.get("response_body").isJsonPrimitive()) {

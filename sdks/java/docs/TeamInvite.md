@@ -7,10 +7,10 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**email** | **String** |  |  [optional] |
-|**role** | **String** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**email** | **String** |  |  |
+|**role** | **String** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

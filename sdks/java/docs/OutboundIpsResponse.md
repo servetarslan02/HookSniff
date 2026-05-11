@@ -7,8 +7,8 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**ips** | **List&lt;String&gt;** |  |  [optional] |
-|**updatedAt** | **String** |  |  [optional] |
+|**ips** | **List&lt;String&gt;** |  |  |
+|**updatedAt** | **String** |  |  |
 
 
 

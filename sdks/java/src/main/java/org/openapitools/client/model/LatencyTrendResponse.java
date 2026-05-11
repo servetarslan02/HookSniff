@@ -52,27 +52,27 @@ import org.openapitools.client.JSON;
 /**
  * LatencyTrendResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class LatencyTrendResponse {
   public static final String SERIALIZED_NAME_RANGE = "range";
   @SerializedName(SERIALIZED_NAME_RANGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String range;
 
   public static final String SERIALIZED_NAME_BUCKETS = "buckets";
   @SerializedName(SERIALIZED_NAME_BUCKETS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<LatencyTrendResponseBucketsInner> buckets = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_OVERALL_AVG_MS = "overall_avg_ms";
   @SerializedName(SERIALIZED_NAME_OVERALL_AVG_MS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private BigDecimal overallAvgMs;
 
   public LatencyTrendResponse() {
   }
 
-  public LatencyTrendResponse range(@javax.annotation.Nullable String range) {
+  public LatencyTrendResponse range(@javax.annotation.Nonnull String range) {
     this.range = range;
     return this;
   }
@@ -81,17 +81,17 @@ public class LatencyTrendResponse {
    * Get range
    * @return range
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getRange() {
     return range;
   }
 
-  public void setRange(@javax.annotation.Nullable String range) {
+  public void setRange(@javax.annotation.Nonnull String range) {
     this.range = range;
   }
 
 
-  public LatencyTrendResponse buckets(@javax.annotation.Nullable List<LatencyTrendResponseBucketsInner> buckets) {
+  public LatencyTrendResponse buckets(@javax.annotation.Nonnull List<LatencyTrendResponseBucketsInner> buckets) {
     this.buckets = buckets;
     return this;
   }
@@ -108,17 +108,17 @@ public class LatencyTrendResponse {
    * Get buckets
    * @return buckets
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<LatencyTrendResponseBucketsInner> getBuckets() {
     return buckets;
   }
 
-  public void setBuckets(@javax.annotation.Nullable List<LatencyTrendResponseBucketsInner> buckets) {
+  public void setBuckets(@javax.annotation.Nonnull List<LatencyTrendResponseBucketsInner> buckets) {
     this.buckets = buckets;
   }
 
 
-  public LatencyTrendResponse overallAvgMs(@javax.annotation.Nullable BigDecimal overallAvgMs) {
+  public LatencyTrendResponse overallAvgMs(@javax.annotation.Nonnull BigDecimal overallAvgMs) {
     this.overallAvgMs = overallAvgMs;
     return this;
   }
@@ -127,12 +127,12 @@ public class LatencyTrendResponse {
    * Get overallAvgMs
    * @return overallAvgMs
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public BigDecimal getOverallAvgMs() {
     return overallAvgMs;
   }
 
-  public void setOverallAvgMs(@javax.annotation.Nullable BigDecimal overallAvgMs) {
+  public void setOverallAvgMs(@javax.annotation.Nonnull BigDecimal overallAvgMs) {
     this.overallAvgMs = overallAvgMs;
   }
 
@@ -185,7 +185,7 @@ public class LatencyTrendResponse {
     openapiFields = new HashSet<String>(Arrays.asList("range", "buckets", "overall_avg_ms"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("range", "buckets", "overall_avg_ms"));
   }
 
   /**
@@ -208,22 +208,25 @@ public class LatencyTrendResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `LatencyTrendResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : LatencyTrendResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("range") != null && !jsonObj.get("range").isJsonNull()) && !jsonObj.get("range").isJsonPrimitive()) {
+      if (!jsonObj.get("range").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `range` to be a primitive type in the JSON string but got `%s`", jsonObj.get("range").toString()));
       }
-      if (jsonObj.get("buckets") != null && !jsonObj.get("buckets").isJsonNull()) {
+      if (jsonObj.get("buckets") != null) {
+        if (!jsonObj.get("buckets").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `buckets` to be an array in the JSON string but got `%s`", jsonObj.get("buckets").toString()));
+        }
         JsonArray jsonArraybuckets = jsonObj.getAsJsonArray("buckets");
-        if (jsonArraybuckets != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("buckets").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `buckets` to be an array in the JSON string but got `%s`", jsonObj.get("buckets").toString()));
-          }
-
-          // validate the optional field `buckets` (array)
-          for (int i = 0; i < jsonArraybuckets.size(); i++) {
-            LatencyTrendResponseBucketsInner.validateJsonElement(jsonArraybuckets.get(i));
-          };
+        // validate the required field `buckets` (array)
+        for (int i = 0; i < jsonArraybuckets.size(); i++) {
+          LatencyTrendResponseBucketsInner.validateJsonElement(jsonArraybuckets.get(i));
         }
       }
   }

@@ -4,19 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Plan** | Pointer to **string** |  | [optional] 
-**PeriodStart** | Pointer to **time.Time** |  | [optional] 
-**PeriodEnd** | Pointer to **time.Time** |  | [optional] 
-**WebhooksUsed** | Pointer to **int32** |  | [optional] 
-**WebhooksLimit** | Pointer to **int32** |  | [optional] 
-**EndpointsUsed** | Pointer to **int32** |  | [optional] 
-**EndpointsLimit** | Pointer to **int32** |  | [optional] 
+**Plan** | **string** |  | 
+**PeriodStart** | **time.Time** |  | 
+**PeriodEnd** | **time.Time** |  | 
+**WebhooksUsed** | **int32** |  | 
+**WebhooksLimit** | **int32** |  | 
+**EndpointsUsed** | **int32** |  | 
+**EndpointsLimit** | **int32** |  | 
 
 ## Methods
 
 ### NewUsageResponse
 
-`func NewUsageResponse() *UsageResponse`
+`func NewUsageResponse(plan string, periodStart time.Time, periodEnd time.Time, webhooksUsed int32, webhooksLimit int32, endpointsUsed int32, endpointsLimit int32, ) *UsageResponse`
 
 NewUsageResponse instantiates a new UsageResponse object
 This constructor will assign default values to properties that have it defined,
@@ -50,11 +50,6 @@ and a boolean to check if the value has been set.
 
 SetPlan sets Plan field to given value.
 
-### HasPlan
-
-`func (o *UsageResponse) HasPlan() bool`
-
-HasPlan returns a boolean if a field has been set.
 
 ### GetPeriodStart
 
@@ -75,11 +70,6 @@ and a boolean to check if the value has been set.
 
 SetPeriodStart sets PeriodStart field to given value.
 
-### HasPeriodStart
-
-`func (o *UsageResponse) HasPeriodStart() bool`
-
-HasPeriodStart returns a boolean if a field has been set.
 
 ### GetPeriodEnd
 
@@ -100,11 +90,6 @@ and a boolean to check if the value has been set.
 
 SetPeriodEnd sets PeriodEnd field to given value.
 
-### HasPeriodEnd
-
-`func (o *UsageResponse) HasPeriodEnd() bool`
-
-HasPeriodEnd returns a boolean if a field has been set.
 
 ### GetWebhooksUsed
 
@@ -125,11 +110,6 @@ and a boolean to check if the value has been set.
 
 SetWebhooksUsed sets WebhooksUsed field to given value.
 
-### HasWebhooksUsed
-
-`func (o *UsageResponse) HasWebhooksUsed() bool`
-
-HasWebhooksUsed returns a boolean if a field has been set.
 
 ### GetWebhooksLimit
 
@@ -150,11 +130,6 @@ and a boolean to check if the value has been set.
 
 SetWebhooksLimit sets WebhooksLimit field to given value.
 
-### HasWebhooksLimit
-
-`func (o *UsageResponse) HasWebhooksLimit() bool`
-
-HasWebhooksLimit returns a boolean if a field has been set.
 
 ### GetEndpointsUsed
 
@@ -175,11 +150,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointsUsed sets EndpointsUsed field to given value.
 
-### HasEndpointsUsed
-
-`func (o *UsageResponse) HasEndpointsUsed() bool`
-
-HasEndpointsUsed returns a boolean if a field has been set.
 
 ### GetEndpointsLimit
 
@@ -200,11 +170,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointsLimit sets EndpointsLimit field to given value.
 
-### HasEndpointsLimit
-
-`func (o *UsageResponse) HasEndpointsLimit() bool`
-
-HasEndpointsLimit returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

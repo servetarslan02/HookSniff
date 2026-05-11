@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**OverallStatus** | Pointer to **string** |  | [optional] 
-**Uptime30d** | Pointer to **float32** |  | [optional] 
-**Components** | Pointer to [**[]SystemStatusComponentsInner**](SystemStatusComponentsInner.md) |  | [optional] 
-**CheckedAt** | Pointer to **string** |  | [optional] 
+**OverallStatus** | **string** |  | 
+**Uptime30d** | **float32** |  | 
+**Components** | [**[]SystemStatusComponentsInner**](SystemStatusComponentsInner.md) |  | 
+**CheckedAt** | **string** |  | 
 
 ## Methods
 
 ### NewSystemStatus
 
-`func NewSystemStatus() *SystemStatus`
+`func NewSystemStatus(overallStatus string, uptime30d float32, components []SystemStatusComponentsInner, checkedAt string, ) *SystemStatus`
 
 NewSystemStatus instantiates a new SystemStatus object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetOverallStatus sets OverallStatus field to given value.
 
-### HasOverallStatus
-
-`func (o *SystemStatus) HasOverallStatus() bool`
-
-HasOverallStatus returns a boolean if a field has been set.
 
 ### GetUptime30d
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetUptime30d sets Uptime30d field to given value.
 
-### HasUptime30d
-
-`func (o *SystemStatus) HasUptime30d() bool`
-
-HasUptime30d returns a boolean if a field has been set.
 
 ### GetComponents
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetComponents sets Components field to given value.
 
-### HasComponents
-
-`func (o *SystemStatus) HasComponents() bool`
-
-HasComponents returns a boolean if a field has been set.
 
 ### GetCheckedAt
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetCheckedAt sets CheckedAt field to given value.
 
-### HasCheckedAt
-
-`func (o *SystemStatus) HasCheckedAt() bool`
-
-HasCheckedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

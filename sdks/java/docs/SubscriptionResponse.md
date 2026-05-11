@@ -7,13 +7,13 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**plan** | **String** |  |  [optional] |
-|**status** | **String** |  |  [optional] |
-|**paymentProvider** | **String** |  |  [optional] |
-|**webhookLimit** | **Integer** |  |  [optional] |
-|**endpointLimit** | **Integer** |  |  [optional] |
-|**retentionDays** | **Integer** |  |  [optional] |
-|**monthlyPriceCents** | **Integer** |  |  [optional] |
+|**plan** | **String** |  |  |
+|**status** | **String** |  |  |
+|**paymentProvider** | **String** |  |  |
+|**webhookLimit** | **Integer** |  |  |
+|**endpointLimit** | **Integer** |  |  |
+|**retentionDays** | **Integer** |  |  |
+|**monthlyPriceCents** | **Integer** |  |  |
 
 
 

@@ -7,10 +7,10 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**maxAttempts** | **Integer** |  |  [optional] |
-|**backoff** | [**BackoffEnum**](#BackoffEnum) |  |  [optional] |
-|**initialDelaySecs** | **Integer** |  |  [optional] |
-|**maxDelaySecs** | **Integer** |  |  [optional] |
+|**maxAttempts** | **Integer** |  |  |
+|**backoff** | [**BackoffEnum**](#BackoffEnum) |  |  |
+|**initialDelaySecs** | **Integer** |  |  |
+|**maxDelaySecs** | **Integer** |  |  |
 
 
 

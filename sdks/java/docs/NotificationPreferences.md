@@ -7,9 +7,9 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**emailOnFailure** | **Boolean** |  |  [optional] |
-|**emailOnDeadLetter** | **Boolean** |  |  [optional] |
-|**emailOnSuccess** | **Boolean** |  |  [optional] |
+|**emailOnFailure** | **Boolean** |  |  |
+|**emailOnDeadLetter** | **Boolean** |  |  |
+|**emailOnSuccess** | **Boolean** |  |  |
 |**slackWebhookUrl** | **String** |  |  [optional] |
 |**discordWebhookUrl** | **String** |  |  [optional] |
 |**webhookUrl** | **String** |  |  [optional] |

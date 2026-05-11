@@ -7,9 +7,9 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**endpointId** | **UUID** |  |  [optional] |
-|**status** | [**StatusEnum**](#StatusEnum) |  |  [optional] |
-|**limit** | **Integer** |  |  [optional] |
+|**endpointId** | **UUID** |  |  |
+|**status** | [**StatusEnum**](#StatusEnum) |  |  |
+|**limit** | **Integer** |  |  |
 
 
 

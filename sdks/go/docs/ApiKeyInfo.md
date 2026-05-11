@@ -4,17 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Prefix** | Pointer to **string** | Masked key prefix (e.g. \&quot;hs_abc1...\&quot;) | [optional] 
-**CreatedAt** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Prefix** | **string** | Masked key prefix (e.g. \&quot;hs_abc1...\&quot;) | 
+**CreatedAt** | **time.Time** |  | 
 **LastUsedAt** | Pointer to **NullableString** |  | [optional] 
-**IsActive** | Pointer to **bool** |  | [optional] 
+**IsActive** | **bool** |  | 
 
 ## Methods
 
 ### NewApiKeyInfo
 
-`func NewApiKeyInfo() *ApiKeyInfo`
+`func NewApiKeyInfo(id string, prefix string, createdAt time.Time, isActive bool, ) *ApiKeyInfo`
 
 NewApiKeyInfo instantiates a new ApiKeyInfo object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +48,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *ApiKeyInfo) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetPrefix
 
@@ -73,36 +68,26 @@ and a boolean to check if the value has been set.
 
 SetPrefix sets Prefix field to given value.
 
-### HasPrefix
-
-`func (o *ApiKeyInfo) HasPrefix() bool`
-
-HasPrefix returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
-`func (o *ApiKeyInfo) GetCreatedAt() string`
+`func (o *ApiKeyInfo) GetCreatedAt() time.Time`
 
 GetCreatedAt returns the CreatedAt field if non-nil, zero value otherwise.
 
 ### GetCreatedAtOk
 
-`func (o *ApiKeyInfo) GetCreatedAtOk() (*string, bool)`
+`func (o *ApiKeyInfo) GetCreatedAtOk() (*time.Time, bool)`
 
 GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetCreatedAt
 
-`func (o *ApiKeyInfo) SetCreatedAt(v string)`
+`func (o *ApiKeyInfo) SetCreatedAt(v time.Time)`
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *ApiKeyInfo) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 ### GetLastUsedAt
 
@@ -158,11 +143,6 @@ and a boolean to check if the value has been set.
 
 SetIsActive sets IsActive field to given value.
 
-### HasIsActive
-
-`func (o *ApiKeyInfo) HasIsActive() bool`
-
-HasIsActive returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

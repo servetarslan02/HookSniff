@@ -48,37 +48,37 @@ import org.openapitools.client.JSON;
 /**
  * SuccessRateResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class SuccessRateResponse {
   public static final String SERIALIZED_NAME_RANGE = "range";
   @SerializedName(SERIALIZED_NAME_RANGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String range;
 
   public static final String SERIALIZED_NAME_SUCCESSFUL = "successful";
   @SerializedName(SERIALIZED_NAME_SUCCESSFUL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer successful;
 
   public static final String SERIALIZED_NAME_FAILED = "failed";
   @SerializedName(SERIALIZED_NAME_FAILED)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer failed;
 
   public static final String SERIALIZED_NAME_PENDING = "pending";
   @SerializedName(SERIALIZED_NAME_PENDING)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer pending;
 
   public static final String SERIALIZED_NAME_SUCCESS_RATE = "success_rate";
   @SerializedName(SERIALIZED_NAME_SUCCESS_RATE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Double successRate;
 
   public SuccessRateResponse() {
   }
 
-  public SuccessRateResponse range(@javax.annotation.Nullable String range) {
+  public SuccessRateResponse range(@javax.annotation.Nonnull String range) {
     this.range = range;
     return this;
   }
@@ -87,17 +87,17 @@ public class SuccessRateResponse {
    * Get range
    * @return range
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getRange() {
     return range;
   }
 
-  public void setRange(@javax.annotation.Nullable String range) {
+  public void setRange(@javax.annotation.Nonnull String range) {
     this.range = range;
   }
 
 
-  public SuccessRateResponse successful(@javax.annotation.Nullable Integer successful) {
+  public SuccessRateResponse successful(@javax.annotation.Nonnull Integer successful) {
     this.successful = successful;
     return this;
   }
@@ -106,17 +106,17 @@ public class SuccessRateResponse {
    * Get successful
    * @return successful
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getSuccessful() {
     return successful;
   }
 
-  public void setSuccessful(@javax.annotation.Nullable Integer successful) {
+  public void setSuccessful(@javax.annotation.Nonnull Integer successful) {
     this.successful = successful;
   }
 
 
-  public SuccessRateResponse failed(@javax.annotation.Nullable Integer failed) {
+  public SuccessRateResponse failed(@javax.annotation.Nonnull Integer failed) {
     this.failed = failed;
     return this;
   }
@@ -125,17 +125,17 @@ public class SuccessRateResponse {
    * Get failed
    * @return failed
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getFailed() {
     return failed;
   }
 
-  public void setFailed(@javax.annotation.Nullable Integer failed) {
+  public void setFailed(@javax.annotation.Nonnull Integer failed) {
     this.failed = failed;
   }
 
 
-  public SuccessRateResponse pending(@javax.annotation.Nullable Integer pending) {
+  public SuccessRateResponse pending(@javax.annotation.Nonnull Integer pending) {
     this.pending = pending;
     return this;
   }
@@ -144,17 +144,17 @@ public class SuccessRateResponse {
    * Get pending
    * @return pending
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getPending() {
     return pending;
   }
 
-  public void setPending(@javax.annotation.Nullable Integer pending) {
+  public void setPending(@javax.annotation.Nonnull Integer pending) {
     this.pending = pending;
   }
 
 
-  public SuccessRateResponse successRate(@javax.annotation.Nullable Double successRate) {
+  public SuccessRateResponse successRate(@javax.annotation.Nonnull Double successRate) {
     this.successRate = successRate;
     return this;
   }
@@ -163,12 +163,12 @@ public class SuccessRateResponse {
    * Get successRate
    * @return successRate
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Double getSuccessRate() {
     return successRate;
   }
 
-  public void setSuccessRate(@javax.annotation.Nullable Double successRate) {
+  public void setSuccessRate(@javax.annotation.Nonnull Double successRate) {
     this.successRate = successRate;
   }
 
@@ -225,7 +225,7 @@ public class SuccessRateResponse {
     openapiFields = new HashSet<String>(Arrays.asList("range", "successful", "failed", "pending", "success_rate"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("range", "successful", "failed", "pending", "success_rate"));
   }
 
   /**
@@ -248,8 +248,15 @@ public class SuccessRateResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `SuccessRateResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : SuccessRateResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("range") != null && !jsonObj.get("range").isJsonNull()) && !jsonObj.get("range").isJsonPrimitive()) {
+      if (!jsonObj.get("range").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `range` to be a primitive type in the JSON string but got `%s`", jsonObj.get("range").toString()));
       }
   }

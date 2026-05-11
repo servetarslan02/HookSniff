@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the Notification type satisfies the MappedNullable interface at compile time
@@ -21,20 +23,27 @@ var _ MappedNullable = &Notification{}
 
 // Notification struct for Notification
 type Notification struct {
-	Id *string `json:"id,omitempty"`
-	Title *string `json:"title,omitempty"`
-	Body *string `json:"body,omitempty"`
-	IsRead *bool `json:"is_read,omitempty"`
+	Id string `json:"id"`
+	Title string `json:"title"`
+	Body string `json:"body"`
+	IsRead bool `json:"is_read"`
 	Link NullableString `json:"link,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _Notification Notification
 
 // NewNotification instantiates a new Notification object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewNotification() *Notification {
+func NewNotification(id string, title string, body string, isRead bool, createdAt time.Time) *Notification {
 	this := Notification{}
+	this.Id = id
+	this.Title = title
+	this.Body = body
+	this.IsRead = isRead
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -46,132 +55,100 @@ func NewNotificationWithDefaults() *Notification {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *Notification) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *Notification) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *Notification) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *Notification) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetTitle returns the Title field value if set, zero value otherwise.
+// GetTitle returns the Title field value
 func (o *Notification) GetTitle() string {
-	if o == nil || IsNil(o.Title) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Title
+
+	return o.Title
 }
 
-// GetTitleOk returns a tuple with the Title field value if set, nil otherwise
+// GetTitleOk returns a tuple with the Title field value
 // and a boolean to check if the value has been set.
 func (o *Notification) GetTitleOk() (*string, bool) {
-	if o == nil || IsNil(o.Title) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Title, true
+	return &o.Title, true
 }
 
-// HasTitle returns a boolean if a field has been set.
-func (o *Notification) HasTitle() bool {
-	if o != nil && !IsNil(o.Title) {
-		return true
-	}
-
-	return false
-}
-
-// SetTitle gets a reference to the given string and assigns it to the Title field.
+// SetTitle sets field value
 func (o *Notification) SetTitle(v string) {
-	o.Title = &v
+	o.Title = v
 }
 
-// GetBody returns the Body field value if set, zero value otherwise.
+// GetBody returns the Body field value
 func (o *Notification) GetBody() string {
-	if o == nil || IsNil(o.Body) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Body
+
+	return o.Body
 }
 
-// GetBodyOk returns a tuple with the Body field value if set, nil otherwise
+// GetBodyOk returns a tuple with the Body field value
 // and a boolean to check if the value has been set.
 func (o *Notification) GetBodyOk() (*string, bool) {
-	if o == nil || IsNil(o.Body) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Body, true
+	return &o.Body, true
 }
 
-// HasBody returns a boolean if a field has been set.
-func (o *Notification) HasBody() bool {
-	if o != nil && !IsNil(o.Body) {
-		return true
-	}
-
-	return false
-}
-
-// SetBody gets a reference to the given string and assigns it to the Body field.
+// SetBody sets field value
 func (o *Notification) SetBody(v string) {
-	o.Body = &v
+	o.Body = v
 }
 
-// GetIsRead returns the IsRead field value if set, zero value otherwise.
+// GetIsRead returns the IsRead field value
 func (o *Notification) GetIsRead() bool {
-	if o == nil || IsNil(o.IsRead) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsRead
+
+	return o.IsRead
 }
 
-// GetIsReadOk returns a tuple with the IsRead field value if set, nil otherwise
+// GetIsReadOk returns a tuple with the IsRead field value
 // and a boolean to check if the value has been set.
 func (o *Notification) GetIsReadOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsRead) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsRead, true
+	return &o.IsRead, true
 }
 
-// HasIsRead returns a boolean if a field has been set.
-func (o *Notification) HasIsRead() bool {
-	if o != nil && !IsNil(o.IsRead) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsRead gets a reference to the given bool and assigns it to the IsRead field.
+// SetIsRead sets field value
 func (o *Notification) SetIsRead(v bool) {
-	o.IsRead = &v
+	o.IsRead = v
 }
 
 // GetLink returns the Link field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -216,36 +193,28 @@ func (o *Notification) UnsetLink() {
 	o.Link.Unset()
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *Notification) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *Notification) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *Notification) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *Notification) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o Notification) MarshalJSON() ([]byte, error) {
@@ -258,25 +227,56 @@ func (o Notification) MarshalJSON() ([]byte, error) {
 
 func (o Notification) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Title) {
-		toSerialize["title"] = o.Title
-	}
-	if !IsNil(o.Body) {
-		toSerialize["body"] = o.Body
-	}
-	if !IsNil(o.IsRead) {
-		toSerialize["is_read"] = o.IsRead
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["title"] = o.Title
+	toSerialize["body"] = o.Body
+	toSerialize["is_read"] = o.IsRead
 	if o.Link.IsSet() {
 		toSerialize["link"] = o.Link.Get()
 	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *Notification) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"title",
+		"body",
+		"is_read",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varNotification := _Notification{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varNotification)
+
+	if err != nil {
+		return err
+	}
+
+	*o = Notification(varNotification)
+
+	return err
 }
 
 type NullableNotification struct {

@@ -4,19 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Plan** | Pointer to **string** |  | [optional] 
-**Status** | Pointer to **string** |  | [optional] 
-**PaymentProvider** | Pointer to **string** |  | [optional] 
-**WebhookLimit** | Pointer to **int32** |  | [optional] 
-**EndpointLimit** | Pointer to **int32** |  | [optional] 
-**RetentionDays** | Pointer to **int32** |  | [optional] 
-**MonthlyPriceCents** | Pointer to **int32** |  | [optional] 
+**Plan** | **string** |  | 
+**Status** | **string** |  | 
+**PaymentProvider** | **string** |  | 
+**WebhookLimit** | **int32** |  | 
+**EndpointLimit** | **int32** |  | 
+**RetentionDays** | **int32** |  | 
+**MonthlyPriceCents** | **int32** |  | 
 
 ## Methods
 
 ### NewSubscriptionResponse
 
-`func NewSubscriptionResponse() *SubscriptionResponse`
+`func NewSubscriptionResponse(plan string, status string, paymentProvider string, webhookLimit int32, endpointLimit int32, retentionDays int32, monthlyPriceCents int32, ) *SubscriptionResponse`
 
 NewSubscriptionResponse instantiates a new SubscriptionResponse object
 This constructor will assign default values to properties that have it defined,
@@ -50,11 +50,6 @@ and a boolean to check if the value has been set.
 
 SetPlan sets Plan field to given value.
 
-### HasPlan
-
-`func (o *SubscriptionResponse) HasPlan() bool`
-
-HasPlan returns a boolean if a field has been set.
 
 ### GetStatus
 
@@ -75,11 +70,6 @@ and a boolean to check if the value has been set.
 
 SetStatus sets Status field to given value.
 
-### HasStatus
-
-`func (o *SubscriptionResponse) HasStatus() bool`
-
-HasStatus returns a boolean if a field has been set.
 
 ### GetPaymentProvider
 
@@ -100,11 +90,6 @@ and a boolean to check if the value has been set.
 
 SetPaymentProvider sets PaymentProvider field to given value.
 
-### HasPaymentProvider
-
-`func (o *SubscriptionResponse) HasPaymentProvider() bool`
-
-HasPaymentProvider returns a boolean if a field has been set.
 
 ### GetWebhookLimit
 
@@ -125,11 +110,6 @@ and a boolean to check if the value has been set.
 
 SetWebhookLimit sets WebhookLimit field to given value.
 
-### HasWebhookLimit
-
-`func (o *SubscriptionResponse) HasWebhookLimit() bool`
-
-HasWebhookLimit returns a boolean if a field has been set.
 
 ### GetEndpointLimit
 
@@ -150,11 +130,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointLimit sets EndpointLimit field to given value.
 
-### HasEndpointLimit
-
-`func (o *SubscriptionResponse) HasEndpointLimit() bool`
-
-HasEndpointLimit returns a boolean if a field has been set.
 
 ### GetRetentionDays
 
@@ -175,11 +150,6 @@ and a boolean to check if the value has been set.
 
 SetRetentionDays sets RetentionDays field to given value.
 
-### HasRetentionDays
-
-`func (o *SubscriptionResponse) HasRetentionDays() bool`
-
-HasRetentionDays returns a boolean if a field has been set.
 
 ### GetMonthlyPriceCents
 
@@ -200,11 +170,6 @@ and a boolean to check if the value has been set.
 
 SetMonthlyPriceCents sets MonthlyPriceCents field to given value.
 
-### HasMonthlyPriceCents
-
-`func (o *SubscriptionResponse) HasMonthlyPriceCents() bool`
-
-HasMonthlyPriceCents returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

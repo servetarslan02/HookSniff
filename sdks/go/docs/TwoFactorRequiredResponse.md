@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Requires2fa** | Pointer to **bool** |  | [optional] 
-**TempToken** | Pointer to **string** |  | [optional] 
-**Message** | Pointer to **string** |  | [optional] 
+**Requires2fa** | **bool** |  | 
+**TempToken** | **string** |  | 
+**Message** | **string** |  | 
 
 ## Methods
 
 ### NewTwoFactorRequiredResponse
 
-`func NewTwoFactorRequiredResponse() *TwoFactorRequiredResponse`
+`func NewTwoFactorRequiredResponse(requires2fa bool, tempToken string, message string, ) *TwoFactorRequiredResponse`
 
 NewTwoFactorRequiredResponse instantiates a new TwoFactorRequiredResponse object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetRequires2fa sets Requires2fa field to given value.
 
-### HasRequires2fa
-
-`func (o *TwoFactorRequiredResponse) HasRequires2fa() bool`
-
-HasRequires2fa returns a boolean if a field has been set.
 
 ### GetTempToken
 
@@ -71,11 +66,6 @@ and a boolean to check if the value has been set.
 
 SetTempToken sets TempToken field to given value.
 
-### HasTempToken
-
-`func (o *TwoFactorRequiredResponse) HasTempToken() bool`
-
-HasTempToken returns a boolean if a field has been set.
 
 ### GetMessage
 
@@ -96,11 +86,6 @@ and a boolean to check if the value has been set.
 
 SetMessage sets Message field to given value.
 
-### HasMessage
-
-`func (o *TwoFactorRequiredResponse) HasMessage() bool`
-
-HasMessage returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Success** | Pointer to **bool** |  | [optional] 
-**StatusCode** | Pointer to **int32** |  | [optional] 
-**DurationMs** | Pointer to **int32** |  | [optional] 
-**ResponseBody** | Pointer to **string** |  | [optional] 
+**Success** | **bool** |  | 
+**StatusCode** | **int32** |  | 
+**DurationMs** | **int32** |  | 
+**ResponseBody** | **string** |  | 
 
 ## Methods
 
 ### NewTestWebhookResponse
 
-`func NewTestWebhookResponse() *TestWebhookResponse`
+`func NewTestWebhookResponse(success bool, statusCode int32, durationMs int32, responseBody string, ) *TestWebhookResponse`
 
 NewTestWebhookResponse instantiates a new TestWebhookResponse object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetSuccess sets Success field to given value.
 
-### HasSuccess
-
-`func (o *TestWebhookResponse) HasSuccess() bool`
-
-HasSuccess returns a boolean if a field has been set.
 
 ### GetStatusCode
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetStatusCode sets StatusCode field to given value.
 
-### HasStatusCode
-
-`func (o *TestWebhookResponse) HasStatusCode() bool`
-
-HasStatusCode returns a boolean if a field has been set.
 
 ### GetDurationMs
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetDurationMs sets DurationMs field to given value.
 
-### HasDurationMs
-
-`func (o *TestWebhookResponse) HasDurationMs() bool`
-
-HasDurationMs returns a boolean if a field has been set.
 
 ### GetResponseBody
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetResponseBody sets ResponseBody field to given value.
 
-### HasResponseBody
-
-`func (o *TestWebhookResponse) HasResponseBody() bool`
-
-HasResponseBody returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

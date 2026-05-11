@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the UpdateNotificationPreferences type satisfies the MappedNullable interface at compile time
@@ -20,20 +22,25 @@ var _ MappedNullable = &UpdateNotificationPreferences{}
 
 // UpdateNotificationPreferences struct for UpdateNotificationPreferences
 type UpdateNotificationPreferences struct {
-	EmailOnFailure *bool `json:"email_on_failure,omitempty"`
-	EmailOnDeadLetter *bool `json:"email_on_dead_letter,omitempty"`
-	EmailOnSuccess *bool `json:"email_on_success,omitempty"`
+	EmailOnFailure bool `json:"email_on_failure"`
+	EmailOnDeadLetter bool `json:"email_on_dead_letter"`
+	EmailOnSuccess bool `json:"email_on_success"`
 	SlackWebhookUrl NullableString `json:"slack_webhook_url,omitempty"`
 	DiscordWebhookUrl NullableString `json:"discord_webhook_url,omitempty"`
 	WebhookUrl NullableString `json:"webhook_url,omitempty"`
 }
 
+type _UpdateNotificationPreferences UpdateNotificationPreferences
+
 // NewUpdateNotificationPreferences instantiates a new UpdateNotificationPreferences object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUpdateNotificationPreferences() *UpdateNotificationPreferences {
+func NewUpdateNotificationPreferences(emailOnFailure bool, emailOnDeadLetter bool, emailOnSuccess bool) *UpdateNotificationPreferences {
 	this := UpdateNotificationPreferences{}
+	this.EmailOnFailure = emailOnFailure
+	this.EmailOnDeadLetter = emailOnDeadLetter
+	this.EmailOnSuccess = emailOnSuccess
 	return &this
 }
 
@@ -45,100 +52,76 @@ func NewUpdateNotificationPreferencesWithDefaults() *UpdateNotificationPreferenc
 	return &this
 }
 
-// GetEmailOnFailure returns the EmailOnFailure field value if set, zero value otherwise.
+// GetEmailOnFailure returns the EmailOnFailure field value
 func (o *UpdateNotificationPreferences) GetEmailOnFailure() bool {
-	if o == nil || IsNil(o.EmailOnFailure) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.EmailOnFailure
+
+	return o.EmailOnFailure
 }
 
-// GetEmailOnFailureOk returns a tuple with the EmailOnFailure field value if set, nil otherwise
+// GetEmailOnFailureOk returns a tuple with the EmailOnFailure field value
 // and a boolean to check if the value has been set.
 func (o *UpdateNotificationPreferences) GetEmailOnFailureOk() (*bool, bool) {
-	if o == nil || IsNil(o.EmailOnFailure) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EmailOnFailure, true
+	return &o.EmailOnFailure, true
 }
 
-// HasEmailOnFailure returns a boolean if a field has been set.
-func (o *UpdateNotificationPreferences) HasEmailOnFailure() bool {
-	if o != nil && !IsNil(o.EmailOnFailure) {
-		return true
-	}
-
-	return false
-}
-
-// SetEmailOnFailure gets a reference to the given bool and assigns it to the EmailOnFailure field.
+// SetEmailOnFailure sets field value
 func (o *UpdateNotificationPreferences) SetEmailOnFailure(v bool) {
-	o.EmailOnFailure = &v
+	o.EmailOnFailure = v
 }
 
-// GetEmailOnDeadLetter returns the EmailOnDeadLetter field value if set, zero value otherwise.
+// GetEmailOnDeadLetter returns the EmailOnDeadLetter field value
 func (o *UpdateNotificationPreferences) GetEmailOnDeadLetter() bool {
-	if o == nil || IsNil(o.EmailOnDeadLetter) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.EmailOnDeadLetter
+
+	return o.EmailOnDeadLetter
 }
 
-// GetEmailOnDeadLetterOk returns a tuple with the EmailOnDeadLetter field value if set, nil otherwise
+// GetEmailOnDeadLetterOk returns a tuple with the EmailOnDeadLetter field value
 // and a boolean to check if the value has been set.
 func (o *UpdateNotificationPreferences) GetEmailOnDeadLetterOk() (*bool, bool) {
-	if o == nil || IsNil(o.EmailOnDeadLetter) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EmailOnDeadLetter, true
+	return &o.EmailOnDeadLetter, true
 }
 
-// HasEmailOnDeadLetter returns a boolean if a field has been set.
-func (o *UpdateNotificationPreferences) HasEmailOnDeadLetter() bool {
-	if o != nil && !IsNil(o.EmailOnDeadLetter) {
-		return true
-	}
-
-	return false
-}
-
-// SetEmailOnDeadLetter gets a reference to the given bool and assigns it to the EmailOnDeadLetter field.
+// SetEmailOnDeadLetter sets field value
 func (o *UpdateNotificationPreferences) SetEmailOnDeadLetter(v bool) {
-	o.EmailOnDeadLetter = &v
+	o.EmailOnDeadLetter = v
 }
 
-// GetEmailOnSuccess returns the EmailOnSuccess field value if set, zero value otherwise.
+// GetEmailOnSuccess returns the EmailOnSuccess field value
 func (o *UpdateNotificationPreferences) GetEmailOnSuccess() bool {
-	if o == nil || IsNil(o.EmailOnSuccess) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.EmailOnSuccess
+
+	return o.EmailOnSuccess
 }
 
-// GetEmailOnSuccessOk returns a tuple with the EmailOnSuccess field value if set, nil otherwise
+// GetEmailOnSuccessOk returns a tuple with the EmailOnSuccess field value
 // and a boolean to check if the value has been set.
 func (o *UpdateNotificationPreferences) GetEmailOnSuccessOk() (*bool, bool) {
-	if o == nil || IsNil(o.EmailOnSuccess) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EmailOnSuccess, true
+	return &o.EmailOnSuccess, true
 }
 
-// HasEmailOnSuccess returns a boolean if a field has been set.
-func (o *UpdateNotificationPreferences) HasEmailOnSuccess() bool {
-	if o != nil && !IsNil(o.EmailOnSuccess) {
-		return true
-	}
-
-	return false
-}
-
-// SetEmailOnSuccess gets a reference to the given bool and assigns it to the EmailOnSuccess field.
+// SetEmailOnSuccess sets field value
 func (o *UpdateNotificationPreferences) SetEmailOnSuccess(v bool) {
-	o.EmailOnSuccess = &v
+	o.EmailOnSuccess = v
 }
 
 // GetSlackWebhookUrl returns the SlackWebhookUrl field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -277,15 +260,9 @@ func (o UpdateNotificationPreferences) MarshalJSON() ([]byte, error) {
 
 func (o UpdateNotificationPreferences) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.EmailOnFailure) {
-		toSerialize["email_on_failure"] = o.EmailOnFailure
-	}
-	if !IsNil(o.EmailOnDeadLetter) {
-		toSerialize["email_on_dead_letter"] = o.EmailOnDeadLetter
-	}
-	if !IsNil(o.EmailOnSuccess) {
-		toSerialize["email_on_success"] = o.EmailOnSuccess
-	}
+	toSerialize["email_on_failure"] = o.EmailOnFailure
+	toSerialize["email_on_dead_letter"] = o.EmailOnDeadLetter
+	toSerialize["email_on_success"] = o.EmailOnSuccess
 	if o.SlackWebhookUrl.IsSet() {
 		toSerialize["slack_webhook_url"] = o.SlackWebhookUrl.Get()
 	}
@@ -296,6 +273,45 @@ func (o UpdateNotificationPreferences) ToMap() (map[string]interface{}, error) {
 		toSerialize["webhook_url"] = o.WebhookUrl.Get()
 	}
 	return toSerialize, nil
+}
+
+func (o *UpdateNotificationPreferences) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"email_on_failure",
+		"email_on_dead_letter",
+		"email_on_success",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varUpdateNotificationPreferences := _UpdateNotificationPreferences{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varUpdateNotificationPreferences)
+
+	if err != nil {
+		return err
+	}
+
+	*o = UpdateNotificationPreferences(varUpdateNotificationPreferences)
+
+	return err
 }
 
 type NullableUpdateNotificationPreferences struct {

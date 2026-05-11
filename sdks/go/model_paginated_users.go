@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the PaginatedUsers type satisfies the MappedNullable interface at compile time
@@ -20,18 +22,24 @@ var _ MappedNullable = &PaginatedUsers{}
 
 // PaginatedUsers struct for PaginatedUsers
 type PaginatedUsers struct {
-	Users []UserSummary `json:"users,omitempty"`
-	Total *int32 `json:"total,omitempty"`
-	Page *int32 `json:"page,omitempty"`
-	PerPage *int32 `json:"per_page,omitempty"`
+	Users []UserSummary `json:"users"`
+	Total int32 `json:"total"`
+	Page int32 `json:"page"`
+	PerPage int32 `json:"per_page"`
 }
+
+type _PaginatedUsers PaginatedUsers
 
 // NewPaginatedUsers instantiates a new PaginatedUsers object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewPaginatedUsers() *PaginatedUsers {
+func NewPaginatedUsers(users []UserSummary, total int32, page int32, perPage int32) *PaginatedUsers {
 	this := PaginatedUsers{}
+	this.Users = users
+	this.Total = total
+	this.Page = page
+	this.PerPage = perPage
 	return &this
 }
 
@@ -43,132 +51,100 @@ func NewPaginatedUsersWithDefaults() *PaginatedUsers {
 	return &this
 }
 
-// GetUsers returns the Users field value if set, zero value otherwise.
+// GetUsers returns the Users field value
 func (o *PaginatedUsers) GetUsers() []UserSummary {
-	if o == nil || IsNil(o.Users) {
+	if o == nil {
 		var ret []UserSummary
 		return ret
 	}
+
 	return o.Users
 }
 
-// GetUsersOk returns a tuple with the Users field value if set, nil otherwise
+// GetUsersOk returns a tuple with the Users field value
 // and a boolean to check if the value has been set.
 func (o *PaginatedUsers) GetUsersOk() ([]UserSummary, bool) {
-	if o == nil || IsNil(o.Users) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Users, true
 }
 
-// HasUsers returns a boolean if a field has been set.
-func (o *PaginatedUsers) HasUsers() bool {
-	if o != nil && !IsNil(o.Users) {
-		return true
-	}
-
-	return false
-}
-
-// SetUsers gets a reference to the given []UserSummary and assigns it to the Users field.
+// SetUsers sets field value
 func (o *PaginatedUsers) SetUsers(v []UserSummary) {
 	o.Users = v
 }
 
-// GetTotal returns the Total field value if set, zero value otherwise.
+// GetTotal returns the Total field value
 func (o *PaginatedUsers) GetTotal() int32 {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Total
+
+	return o.Total
 }
 
-// GetTotalOk returns a tuple with the Total field value if set, nil otherwise
+// GetTotalOk returns a tuple with the Total field value
 // and a boolean to check if the value has been set.
 func (o *PaginatedUsers) GetTotalOk() (*int32, bool) {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Total, true
+	return &o.Total, true
 }
 
-// HasTotal returns a boolean if a field has been set.
-func (o *PaginatedUsers) HasTotal() bool {
-	if o != nil && !IsNil(o.Total) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotal gets a reference to the given int32 and assigns it to the Total field.
+// SetTotal sets field value
 func (o *PaginatedUsers) SetTotal(v int32) {
-	o.Total = &v
+	o.Total = v
 }
 
-// GetPage returns the Page field value if set, zero value otherwise.
+// GetPage returns the Page field value
 func (o *PaginatedUsers) GetPage() int32 {
-	if o == nil || IsNil(o.Page) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Page
+
+	return o.Page
 }
 
-// GetPageOk returns a tuple with the Page field value if set, nil otherwise
+// GetPageOk returns a tuple with the Page field value
 // and a boolean to check if the value has been set.
 func (o *PaginatedUsers) GetPageOk() (*int32, bool) {
-	if o == nil || IsNil(o.Page) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Page, true
+	return &o.Page, true
 }
 
-// HasPage returns a boolean if a field has been set.
-func (o *PaginatedUsers) HasPage() bool {
-	if o != nil && !IsNil(o.Page) {
-		return true
-	}
-
-	return false
-}
-
-// SetPage gets a reference to the given int32 and assigns it to the Page field.
+// SetPage sets field value
 func (o *PaginatedUsers) SetPage(v int32) {
-	o.Page = &v
+	o.Page = v
 }
 
-// GetPerPage returns the PerPage field value if set, zero value otherwise.
+// GetPerPage returns the PerPage field value
 func (o *PaginatedUsers) GetPerPage() int32 {
-	if o == nil || IsNil(o.PerPage) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.PerPage
+
+	return o.PerPage
 }
 
-// GetPerPageOk returns a tuple with the PerPage field value if set, nil otherwise
+// GetPerPageOk returns a tuple with the PerPage field value
 // and a boolean to check if the value has been set.
 func (o *PaginatedUsers) GetPerPageOk() (*int32, bool) {
-	if o == nil || IsNil(o.PerPage) {
+	if o == nil {
 		return nil, false
 	}
-	return o.PerPage, true
+	return &o.PerPage, true
 }
 
-// HasPerPage returns a boolean if a field has been set.
-func (o *PaginatedUsers) HasPerPage() bool {
-	if o != nil && !IsNil(o.PerPage) {
-		return true
-	}
-
-	return false
-}
-
-// SetPerPage gets a reference to the given int32 and assigns it to the PerPage field.
+// SetPerPage sets field value
 func (o *PaginatedUsers) SetPerPage(v int32) {
-	o.PerPage = &v
+	o.PerPage = v
 }
 
 func (o PaginatedUsers) MarshalJSON() ([]byte, error) {
@@ -181,19 +157,51 @@ func (o PaginatedUsers) MarshalJSON() ([]byte, error) {
 
 func (o PaginatedUsers) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Users) {
-		toSerialize["users"] = o.Users
-	}
-	if !IsNil(o.Total) {
-		toSerialize["total"] = o.Total
-	}
-	if !IsNil(o.Page) {
-		toSerialize["page"] = o.Page
-	}
-	if !IsNil(o.PerPage) {
-		toSerialize["per_page"] = o.PerPage
-	}
+	toSerialize["users"] = o.Users
+	toSerialize["total"] = o.Total
+	toSerialize["page"] = o.Page
+	toSerialize["per_page"] = o.PerPage
 	return toSerialize, nil
+}
+
+func (o *PaginatedUsers) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"users",
+		"total",
+		"page",
+		"per_page",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varPaginatedUsers := _PaginatedUsers{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varPaginatedUsers)
+
+	if err != nil {
+		return err
+	}
+
+	*o = PaginatedUsers(varPaginatedUsers)
+
+	return err
 }
 
 type NullablePaginatedUsers struct {
