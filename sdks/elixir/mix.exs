@@ -36,6 +36,8 @@ defmodule HookSniffAPI.Mixfile do
   defp deps do
     [
       {:tesla, "~> 1.14"},
+      {:httpoison, "~> 2.0"},
+      {:jason, "~> 1.4"},
       {:ex_doc, "~> 0.37.3", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
