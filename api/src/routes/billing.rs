@@ -472,7 +472,7 @@ async fn get_invoices(
 ) -> Result<Json<Vec<InvoiceResponse>>, AppError> {
     let rows: Vec<InvoiceRow> = sqlx::query_as(
         "SELECT id, amount_cents, currency, status, plan, paid_at, created_at \
-             FROM invoices WHERE customer_id = $1 ORDER BY created_at DESC",
+             FROM invoices WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
     )
     .bind(customer.id)
     .fetch_all(&pool)

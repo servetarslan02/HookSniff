@@ -41,7 +41,7 @@ export default function DeliveriesPage() {
       setDeliveries(data.deliveries);
       setTotal(data.total);
     } catch (err: unknown) {
-      setError(getErrorMessage(err) || tc('failedToLoadDeliveries'));
+      setError(getErrorMessage(err, tc('unknownError')) || tc('failedToLoadDeliveries'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ export default function DeliveriesPage() {
       toast(t('replaySuccess'), 'success');
       fetchData();
     } catch (err: unknown) {
-      toast(getErrorMessage(err) || tc('replayFailed'), 'error');
+      toast(getErrorMessage(err, tc('unknownError')) || tc('replayFailed'), 'error');
     } finally {
       setReplaying(false);
       setReplayTarget(null);

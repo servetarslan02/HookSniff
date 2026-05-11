@@ -20,6 +20,7 @@ export default function SendWebhookPage() {
   const [response, setResponse] = useState<unknown>(null);
   const [jsonError, setJsonError] = useState('');
   const t = useTranslations('webhooks');
+  const tc = useTranslations('common');
 
   useEffect(() => {
     if (!token) return;
@@ -31,7 +32,7 @@ export default function SendWebhookPage() {
       JSON.parse(val);
       setJsonError('');
     } catch (e: unknown) {
-      setJsonError(getErrorMessage(e));
+      setJsonError(getErrorMessage(e, tc('unknownError')));
     }
   };
 
@@ -54,7 +55,7 @@ export default function SendWebhookPage() {
       setResponse(res);
       toast(t('sendSuccess'), 'success');
     } catch (err: unknown) {
-      setResponse({ error: getErrorMessage(err) });
+      setResponse({ error: getErrorMessage(err, tc('unknownError')) });
       toast(t('sendFailed'), 'error');
     } finally {
       setSending(false);

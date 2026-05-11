@@ -38,7 +38,7 @@ async fn list_api_keys(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<ApiKeyInfo>>, AppError> {
     let keys = sqlx::query_as::<_, (Uuid, String, bool, chrono::DateTime<chrono::Utc>, Option<chrono::DateTime<chrono::Utc>>)>(
-        "SELECT id, api_key_prefix, is_active, created_at, last_used_at FROM api_keys WHERE customer_id = $1 ORDER BY created_at DESC"
+        "SELECT id, api_key_prefix, is_active, created_at, last_used_at FROM api_keys WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100"
     )
     .bind(customer.id)
     .fetch_all(&pool)

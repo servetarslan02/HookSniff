@@ -75,7 +75,7 @@ export default function SettingsPage() {
       setProfileSuccess(tc('success'));
       setTimeout(() => setProfileSuccess(''), 3000);
     } catch (e: unknown) {
-      setProfileError(getErrorMessage(e));
+      setProfileError(getErrorMessage(e, tc('unknownError')));
     } finally {
       setProfileSaving(false);
     }
@@ -105,7 +105,7 @@ export default function SettingsPage() {
       setConfirmPassword('');
       setTimeout(() => setPasswordSuccess(''), 3000);
     } catch (e: unknown) {
-      setPasswordError(getErrorMessage(e));
+      setPasswordError(getErrorMessage(e, tc('unknownError')));
     } finally {
       setPasswordSaving(false);
     }
@@ -125,7 +125,7 @@ export default function SettingsPage() {
       logout();
       router.push('/');
     } catch (e: unknown) {
-      toast(getErrorMessage(e), 'error');
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     } finally {
       setDeletingAccount(false);
       setShowDeleteModal(false);
@@ -144,7 +144,7 @@ export default function SettingsPage() {
       }, token ?? undefined);
       toast(tc('success'), 'success');
     } catch (e: unknown) {
-      toast(getErrorMessage(e), 'error');
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     } finally {
       setNotificationSaving(false);
     }
