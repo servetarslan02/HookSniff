@@ -1,0 +1,84 @@
+name: Container Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: trivy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -t hooksniff-api -f Dockerfile.api .
+
+      - name: Run Trivy (API)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'hooksniff-api'
+          format: 'sarif'
+          output: 'trivy-api.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload SARIF (API)
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-api.sarif'
+
+  scan-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Worker image
+        run: docker build -t hooksniff-worker -f Dockerfile.worker .
+
+      - name: Run Trivy (Worker)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'hooksniff-worker'
+          format: 'sarif'
+          output: 'trivy-worker.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload SARIF (Worker)
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-worker.sarif'
+
+  scan-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Dashboard image
+        run: docker build -t hooksniff-dashboard -f Dockerfile.dashboard .
+
+      - name: Run Trivy (Dashboard)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'hooksniff-dashboard'
+          format: 'sarif'
+          output: 'trivy-dashboard.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload SARIF (Dashboard)
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-dashboard.sarif'
