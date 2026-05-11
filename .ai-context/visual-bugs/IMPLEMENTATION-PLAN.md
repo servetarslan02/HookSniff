@@ -224,7 +224,7 @@
 156. ✅ Billing useRouter wrong module düzelt → `billing/page.tsx` ✅ YAPILDI (Oturum 120)
 157. ✅ `billingApi` duplicate `getInvoices` — billingApiExtended'a delegate edildi ✅ YAPILDI (Oturum 122) → `api.ts`
 158. ✅ `keyCount` broken pluralization düzelt → `api-keys/page.tsx` ✅ YAPILDI (Oturum 120) — ICU format
-159. ⬜ `weeklyDigest` state local-only — API'ye gönder → `settings/page.tsx`
+159. ✅ `weeklyDigest` state → API'ye gönderildi ✅ — API'ye gönder → `settings/page.tsx`
 
 ### 4.5 Sidebar İyileştirme
 160. ⬜ Sidebar 26 item gruplama (Core, Tools, Advanced, Account)
