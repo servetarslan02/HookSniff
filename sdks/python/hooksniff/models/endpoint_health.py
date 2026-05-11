@@ -19,8 +19,8 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, StrictBool, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt
+from typing import Any, ClassVar, Dict, List, Optional, Union
 from uuid import UUID
 from typing import Optional, Set
 from typing_extensions import Self
@@ -28,14 +28,19 @@ from pydantic_core import to_jsonable_python
 
 class EndpointHealth(BaseModel):
     """
-    EndpointHealth
+    Endpoint health metrics and status
     """ # noqa: E501
-    endpoint_id: Optional[UUID] = None
-    is_healthy: Optional[StrictBool] = None
+    endpoint_id: UUID
+    is_healthy: StrictBool
     failure_streak: Optional[StrictInt] = None
     avg_response_ms: Optional[StrictInt] = None
     last_failure_at: Optional[datetime] = None
-    __properties: ClassVar[List[str]] = ["endpoint_id", "is_healthy", "failure_streak", "avg_response_ms", "last_failure_at"]
+    success_rate: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Success rate as a fraction (0.0–1.0)")
+    avg_latency_ms: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Average delivery latency in milliseconds")
+    last_delivery_at: Optional[datetime] = None
+    total_deliveries: Optional[StrictInt] = None
+    failed_deliveries: Optional[StrictInt] = None
+    __properties: ClassVar[List[str]] = ["endpoint_id", "is_healthy", "failure_streak", "avg_response_ms", "last_failure_at", "success_rate", "avg_latency_ms", "last_delivery_at", "total_deliveries", "failed_deliveries"]
 
     model_config = ConfigDict(
         validate_by_name=True,
@@ -92,7 +97,12 @@ class EndpointHealth(BaseModel):
             "is_healthy": obj.get("is_healthy"),
             "failure_streak": obj.get("failure_streak"),
             "avg_response_ms": obj.get("avg_response_ms"),
-            "last_failure_at": obj.get("last_failure_at")
+            "last_failure_at": obj.get("last_failure_at"),
+            "success_rate": obj.get("success_rate"),
+            "avg_latency_ms": obj.get("avg_latency_ms"),
+            "last_delivery_at": obj.get("last_delivery_at"),
+            "total_deliveries": obj.get("total_deliveries"),
+            "failed_deliveries": obj.get("failed_deliveries")
         })
         return _obj
 
