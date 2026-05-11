@@ -60,7 +60,7 @@ async fn list_endpoint_health(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<EndpointHealth>>, AppError> {
     let endpoints = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC",
+        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
     .bind(customer.id)
     .fetch_all(&pool)

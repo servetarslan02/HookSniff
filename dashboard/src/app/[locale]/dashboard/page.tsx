@@ -336,6 +336,7 @@ function StatusDot({ status }: { status: string }) {
 export default function DashboardOverview() {
   const { token } = useAuth();
   const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
