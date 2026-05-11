@@ -123,8 +123,9 @@ export default function SsoSettingsPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('samlConfiguration')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('metadataUrl')}</label>
+              <label htmlFor="sso-metadata-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('metadataUrl')}</label>
               <input
+                id="sso-metadata-url"
                 type="url"
                 value={metadata}
                 onChange={(e) => setMetadata(e.target.value)}
@@ -133,8 +134,9 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('entityId')}</label>
+              <label htmlFor="sso-entity-id" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('entityId')}</label>
               <input
+                id="sso-entity-id"
                 type="text"
                 value={entityId}
                 onChange={(e) => setEntityId(e.target.value)}
@@ -143,8 +145,9 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('ssoUrl')}</label>
+              <label htmlFor="sso-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('ssoUrl')}</label>
               <input
+                id="sso-url"
                 type="url"
                 value={ssoUrl}
                 onChange={(e) => setSsoUrl(e.target.value)}
@@ -153,8 +156,9 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('x509Certificate')}</label>
+              <label htmlFor="sso-certificate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('x509Certificate')}</label>
               <textarea
+                id="sso-certificate"
                 value={certificate}
                 onChange={(e) => setCertificate(e.target.value)}
                 placeholder="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
@@ -172,8 +176,9 @@ export default function SsoSettingsPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('oidcConfiguration')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('issuerUrl')}</label>
+              <label htmlFor="sso-issuer-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('issuerUrl')}</label>
               <input
+                id="sso-issuer-url"
                 type="url"
                 value={metadata}
                 onChange={(e) => setMetadata(e.target.value)}
@@ -182,8 +187,9 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientId')}</label>
+              <label htmlFor="sso-client-id" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientId')}</label>
               <input
+                id="sso-client-id"
                 type="text"
                 value={entityId}
                 onChange={(e) => setEntityId(e.target.value)}
@@ -192,8 +198,9 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientSecret')}</label>
+              <label htmlFor="sso-client-secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientSecret')}</label>
               <input
+                id="sso-client-secret"
                 type="password"
                 value={certificate}
                 onChange={(e) => setCertificate(e.target.value)}

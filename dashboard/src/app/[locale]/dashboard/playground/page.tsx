@@ -155,6 +155,7 @@ function ResponseInspector({
   duration: number | null;
 }) {
   const t = useTranslations('playground');
+  const tc = useTranslations('common');
   const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
 
   if (!response && !status) {
@@ -495,7 +496,7 @@ ${Object.entries(headers)
       saveHistory(newHistory);
     } catch (err: unknown) {
       const duration = Math.round(performance.now() - startTime);
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof Error ? err.message : tc('unknownError');
       setResponse({ error: errorMessage });
       setResponseDuration(duration);
 

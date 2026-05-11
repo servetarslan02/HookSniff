@@ -4,6 +4,19 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 
+/** Constant-time string comparison to prevent timing attacks (Item 168) */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  const encoder = new TextEncoder();
+  const aBytes = encoder.encode(a);
+  const bBytes = encoder.encode(b);
+  let result = 0;
+  for (let i = 0; i < aBytes.length; i++) {
+    result |= aBytes[i] ^ bBytes[i];
+  }
+  return result === 0;
+}
+
 /* ─── Signature Verifier Tool ─── */
 export default function SignatureVerifierPage() {
   const t = useTranslations('signatureVerifier');
@@ -65,7 +78,8 @@ export default function SignatureVerifierPage() {
         .join('');
       const computed = `${algorithm}=${sigHex}`;
       const provided = signature.trim();
-      const isValid = computed === provided;
+      // Constant-time comparison to prevent timing attacks (Item 168)
+      const isValid = timingSafeEqual(computed, provided);
       setResult(isValid ? 'valid' : 'invalid');
     } catch {
       toast(t('toastVerificationFailed'), 'error');
