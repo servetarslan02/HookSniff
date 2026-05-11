@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UpdateProfileRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :name,
     :email

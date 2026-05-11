@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.PlaygroundGet200Response do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :endpoints,
     :sample_payloads

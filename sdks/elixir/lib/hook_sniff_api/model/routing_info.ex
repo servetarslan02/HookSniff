@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.RoutingInfo do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :endpoint_id,
     :routing_strategy,

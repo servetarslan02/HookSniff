@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.AuthLoginPost200Response do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :token,
     :customer,

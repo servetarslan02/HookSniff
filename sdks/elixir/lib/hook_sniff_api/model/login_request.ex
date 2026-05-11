@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.LoginRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :email,
     :password

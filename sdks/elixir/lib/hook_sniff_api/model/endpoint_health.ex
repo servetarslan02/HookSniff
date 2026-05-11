@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.EndpointHealth do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :endpoint_id,
     :is_healthy,

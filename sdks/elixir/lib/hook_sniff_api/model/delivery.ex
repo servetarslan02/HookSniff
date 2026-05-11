@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Delivery do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :id,
     :endpoint_id,

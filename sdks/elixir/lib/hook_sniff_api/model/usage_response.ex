@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UsageResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :plan,
     :period_start,
