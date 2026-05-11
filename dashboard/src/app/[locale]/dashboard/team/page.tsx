@@ -139,7 +139,7 @@ export default function TeamPage() {
           onClick={() => setShowCreateModal(true)}
           className="px-4 py-2.5 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
         >
-          + Create Team
+          {t('createTeam')}
         </button>
       </div>
 
@@ -151,7 +151,7 @@ export default function TeamPage() {
           </div>
           {loading ? (
             <div className="p-6 text-center text-gray-500 dark:text-slate-400 animate-pulse text-sm">
-              Loading teams...
+              {t('loadingTeams')}
             </div>
           ) : teams.length === 0 ? (
             <div className="p-6 text-center">
@@ -204,7 +204,7 @@ export default function TeamPage() {
               <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {members.length === 0 ? (
                   <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
-                    No members yet. Invite someone!
+                    {t('noMembers')}
                   </div>
                 ) : (
                   members.map((m) => (
@@ -244,7 +244,7 @@ export default function TeamPage() {
             <div className="glass-card p-12 text-center">
               <div className="text-4xl mb-3">👈</div>
               <p className="text-gray-500 dark:text-slate-400">
-                Select a team to view details
+                {t('selectTeam')}
               </p>
             </div>
           )}
