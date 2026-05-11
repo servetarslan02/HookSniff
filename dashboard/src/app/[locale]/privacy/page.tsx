@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import Footer from '@/components/Footer';
 
 function ListItems({ items }: { items: string[] }) {
   return (
@@ -148,6 +149,7 @@ export default function PrivacyPage() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

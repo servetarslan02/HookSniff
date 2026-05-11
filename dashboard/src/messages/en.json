@@ -1163,7 +1163,9 @@
       "docs": "Docs",
       "status": "Status",
       "dashboard": "Dashboard →",
-      "getStarted": "Get Started"
+      "getStarted": "Get Started",
+      "login": "Log In",
+      "register": "Sign Up Free"
     },
     "hero": {
       "uptime": "99.99% delivery uptime",
@@ -1177,7 +1179,8 @@
       ],
       "subtitle": "Send webhooks with confidence. Automatic retries, HMAC signatures, real-time monitoring. Built for developers who need reliability.",
       "cta": "Get started free",
-      "ctaSecondary": "Read the docs"
+      "ctaSecondary": "Read the docs",
+      "ctaDashboard": "Go to Dashboard →"
     },
     "code": {
       "filename": "send-webhook.sh",
@@ -1366,7 +1369,21 @@
     "checklistEndpoint": "Create first endpoint",
     "checklistWebhook": "Send first webhook",
     "checklistMonitor": "Check deliveries",
-    "checklistCompleted": "{count}/{total} completed"
+    "checklistCompleted": "{count}/{total} completed",
+    "freeForever": "Free forever",
+    "noRealUrlYet": "No real URL yet?",
+    "useCasePayments": "Payments",
+    "useCasePaymentsDesc": "Stripe, iyzico, payment events",
+    "useCaseEmail": "Email / Notifications",
+    "useCaseEmailDesc": "SendGrid, Resend, push notifications",
+    "useCaseEcommerce": "E-commerce",
+    "useCaseEcommerceDesc": "Order, shipping, inventory events",
+    "useCaseSaas": "SaaS Platform",
+    "useCaseSaasDesc": "User, subscription, usage events",
+    "useCaseAi": "AI / Agents",
+    "useCaseAiDesc": "Task completion, model events",
+    "useCaseOther": "Other",
+    "useCaseOtherDesc": "Custom webhook use case"
   },
   "chart": {
     "hours24": "24 Hours",
