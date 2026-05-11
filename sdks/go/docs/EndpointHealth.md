@@ -4,17 +4,22 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EndpointId** | Pointer to **string** |  | [optional] 
-**IsHealthy** | Pointer to **bool** |  | [optional] 
+**EndpointId** | **string** |  | 
+**IsHealthy** | **bool** |  | 
 **FailureStreak** | Pointer to **int32** |  | [optional] 
 **AvgResponseMs** | Pointer to **int32** |  | [optional] 
 **LastFailureAt** | Pointer to **time.Time** |  | [optional] 
+**SuccessRate** | Pointer to **float64** | Success rate as a fraction (0.0–1.0) | [optional] 
+**AvgLatencyMs** | Pointer to **float32** | Average delivery latency in milliseconds | [optional] 
+**LastDeliveryAt** | Pointer to **time.Time** |  | [optional] 
+**TotalDeliveries** | Pointer to **int32** |  | [optional] 
+**FailedDeliveries** | Pointer to **int32** |  | [optional] 
 
 ## Methods
 
 ### NewEndpointHealth
 
-`func NewEndpointHealth() *EndpointHealth`
+`func NewEndpointHealth(endpointId string, isHealthy bool, ) *EndpointHealth`
 
 NewEndpointHealth instantiates a new EndpointHealth object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +53,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointId sets EndpointId field to given value.
 
-### HasEndpointId
-
-`func (o *EndpointHealth) HasEndpointId() bool`
-
-HasEndpointId returns a boolean if a field has been set.
 
 ### GetIsHealthy
 
@@ -73,11 +73,6 @@ and a boolean to check if the value has been set.
 
 SetIsHealthy sets IsHealthy field to given value.
 
-### HasIsHealthy
-
-`func (o *EndpointHealth) HasIsHealthy() bool`
-
-HasIsHealthy returns a boolean if a field has been set.
 
 ### GetFailureStreak
 
@@ -153,6 +148,131 @@ SetLastFailureAt sets LastFailureAt field to given value.
 `func (o *EndpointHealth) HasLastFailureAt() bool`
 
 HasLastFailureAt returns a boolean if a field has been set.
+
+### GetSuccessRate
+
+`func (o *EndpointHealth) GetSuccessRate() float64`
+
+GetSuccessRate returns the SuccessRate field if non-nil, zero value otherwise.
+
+### GetSuccessRateOk
+
+`func (o *EndpointHealth) GetSuccessRateOk() (*float64, bool)`
+
+GetSuccessRateOk returns a tuple with the SuccessRate field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSuccessRate
+
+`func (o *EndpointHealth) SetSuccessRate(v float64)`
+
+SetSuccessRate sets SuccessRate field to given value.
+
+### HasSuccessRate
+
+`func (o *EndpointHealth) HasSuccessRate() bool`
+
+HasSuccessRate returns a boolean if a field has been set.
+
+### GetAvgLatencyMs
+
+`func (o *EndpointHealth) GetAvgLatencyMs() float32`
+
+GetAvgLatencyMs returns the AvgLatencyMs field if non-nil, zero value otherwise.
+
+### GetAvgLatencyMsOk
+
+`func (o *EndpointHealth) GetAvgLatencyMsOk() (*float32, bool)`
+
+GetAvgLatencyMsOk returns a tuple with the AvgLatencyMs field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAvgLatencyMs
+
+`func (o *EndpointHealth) SetAvgLatencyMs(v float32)`
+
+SetAvgLatencyMs sets AvgLatencyMs field to given value.
+
+### HasAvgLatencyMs
+
+`func (o *EndpointHealth) HasAvgLatencyMs() bool`
+
+HasAvgLatencyMs returns a boolean if a field has been set.
+
+### GetLastDeliveryAt
+
+`func (o *EndpointHealth) GetLastDeliveryAt() time.Time`
+
+GetLastDeliveryAt returns the LastDeliveryAt field if non-nil, zero value otherwise.
+
+### GetLastDeliveryAtOk
+
+`func (o *EndpointHealth) GetLastDeliveryAtOk() (*time.Time, bool)`
+
+GetLastDeliveryAtOk returns a tuple with the LastDeliveryAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetLastDeliveryAt
+
+`func (o *EndpointHealth) SetLastDeliveryAt(v time.Time)`
+
+SetLastDeliveryAt sets LastDeliveryAt field to given value.
+
+### HasLastDeliveryAt
+
+`func (o *EndpointHealth) HasLastDeliveryAt() bool`
+
+HasLastDeliveryAt returns a boolean if a field has been set.
+
+### GetTotalDeliveries
+
+`func (o *EndpointHealth) GetTotalDeliveries() int32`
+
+GetTotalDeliveries returns the TotalDeliveries field if non-nil, zero value otherwise.
+
+### GetTotalDeliveriesOk
+
+`func (o *EndpointHealth) GetTotalDeliveriesOk() (*int32, bool)`
+
+GetTotalDeliveriesOk returns a tuple with the TotalDeliveries field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTotalDeliveries
+
+`func (o *EndpointHealth) SetTotalDeliveries(v int32)`
+
+SetTotalDeliveries sets TotalDeliveries field to given value.
+
+### HasTotalDeliveries
+
+`func (o *EndpointHealth) HasTotalDeliveries() bool`
+
+HasTotalDeliveries returns a boolean if a field has been set.
+
+### GetFailedDeliveries
+
+`func (o *EndpointHealth) GetFailedDeliveries() int32`
+
+GetFailedDeliveries returns the FailedDeliveries field if non-nil, zero value otherwise.
+
+### GetFailedDeliveriesOk
+
+`func (o *EndpointHealth) GetFailedDeliveriesOk() (*int32, bool)`
+
+GetFailedDeliveriesOk returns a tuple with the FailedDeliveries field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetFailedDeliveries
+
+`func (o *EndpointHealth) SetFailedDeliveries(v int32)`
+
+SetFailedDeliveries sets FailedDeliveries field to given value.
+
+### HasFailedDeliveries
+
+`func (o *EndpointHealth) HasFailedDeliveries() bool`
+
+HasFailedDeliveries returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

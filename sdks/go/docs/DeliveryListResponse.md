@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Deliveries** | Pointer to [**[]Delivery**](Delivery.md) |  | [optional] 
-**Total** | Pointer to **int32** |  | [optional] 
-**Page** | Pointer to **int32** |  | [optional] 
-**PerPage** | Pointer to **int32** |  | [optional] 
+**Deliveries** | [**[]Delivery**](Delivery.md) |  | 
+**Total** | **int32** |  | 
+**Page** | **int32** |  | 
+**PerPage** | **int32** |  | 
 
 ## Methods
 
 ### NewDeliveryListResponse
 
-`func NewDeliveryListResponse() *DeliveryListResponse`
+`func NewDeliveryListResponse(deliveries []Delivery, total int32, page int32, perPage int32, ) *DeliveryListResponse`
 
 NewDeliveryListResponse instantiates a new DeliveryListResponse object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetDeliveries sets Deliveries field to given value.
 
-### HasDeliveries
-
-`func (o *DeliveryListResponse) HasDeliveries() bool`
-
-HasDeliveries returns a boolean if a field has been set.
 
 ### GetTotal
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetTotal sets Total field to given value.
 
-### HasTotal
-
-`func (o *DeliveryListResponse) HasTotal() bool`
-
-HasTotal returns a boolean if a field has been set.
 
 ### GetPage
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetPage sets Page field to given value.
 
-### HasPage
-
-`func (o *DeliveryListResponse) HasPage() bool`
-
-HasPage returns a boolean if a field has been set.
 
 ### GetPerPage
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetPerPage sets PerPage field to given value.
 
-### HasPerPage
-
-`func (o *DeliveryListResponse) HasPerPage() bool`
-
-HasPerPage returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

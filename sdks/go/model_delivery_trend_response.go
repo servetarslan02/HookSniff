@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the DeliveryTrendResponse type satisfies the MappedNullable interface at compile time
@@ -20,16 +22,20 @@ var _ MappedNullable = &DeliveryTrendResponse{}
 
 // DeliveryTrendResponse struct for DeliveryTrendResponse
 type DeliveryTrendResponse struct {
-	Range *string `json:"range,omitempty"`
-	Buckets []DeliveryTrendResponseBucketsInner `json:"buckets,omitempty"`
+	Range string `json:"range"`
+	Buckets []DeliveryTrendResponseBucketsInner `json:"buckets"`
 }
+
+type _DeliveryTrendResponse DeliveryTrendResponse
 
 // NewDeliveryTrendResponse instantiates a new DeliveryTrendResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeliveryTrendResponse() *DeliveryTrendResponse {
+func NewDeliveryTrendResponse(range_ string, buckets []DeliveryTrendResponseBucketsInner) *DeliveryTrendResponse {
 	this := DeliveryTrendResponse{}
+	this.Range = range_
+	this.Buckets = buckets
 	return &this
 }
 
@@ -41,66 +47,50 @@ func NewDeliveryTrendResponseWithDefaults() *DeliveryTrendResponse {
 	return &this
 }
 
-// GetRange returns the Range field value if set, zero value otherwise.
+// GetRange returns the Range field value
 func (o *DeliveryTrendResponse) GetRange() string {
-	if o == nil || IsNil(o.Range) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Range
+
+	return o.Range
 }
 
-// GetRangeOk returns a tuple with the Range field value if set, nil otherwise
+// GetRangeOk returns a tuple with the Range field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryTrendResponse) GetRangeOk() (*string, bool) {
-	if o == nil || IsNil(o.Range) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Range, true
+	return &o.Range, true
 }
 
-// HasRange returns a boolean if a field has been set.
-func (o *DeliveryTrendResponse) HasRange() bool {
-	if o != nil && !IsNil(o.Range) {
-		return true
-	}
-
-	return false
-}
-
-// SetRange gets a reference to the given string and assigns it to the Range field.
+// SetRange sets field value
 func (o *DeliveryTrendResponse) SetRange(v string) {
-	o.Range = &v
+	o.Range = v
 }
 
-// GetBuckets returns the Buckets field value if set, zero value otherwise.
+// GetBuckets returns the Buckets field value
 func (o *DeliveryTrendResponse) GetBuckets() []DeliveryTrendResponseBucketsInner {
-	if o == nil || IsNil(o.Buckets) {
+	if o == nil {
 		var ret []DeliveryTrendResponseBucketsInner
 		return ret
 	}
+
 	return o.Buckets
 }
 
-// GetBucketsOk returns a tuple with the Buckets field value if set, nil otherwise
+// GetBucketsOk returns a tuple with the Buckets field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryTrendResponse) GetBucketsOk() ([]DeliveryTrendResponseBucketsInner, bool) {
-	if o == nil || IsNil(o.Buckets) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Buckets, true
 }
 
-// HasBuckets returns a boolean if a field has been set.
-func (o *DeliveryTrendResponse) HasBuckets() bool {
-	if o != nil && !IsNil(o.Buckets) {
-		return true
-	}
-
-	return false
-}
-
-// SetBuckets gets a reference to the given []DeliveryTrendResponseBucketsInner and assigns it to the Buckets field.
+// SetBuckets sets field value
 func (o *DeliveryTrendResponse) SetBuckets(v []DeliveryTrendResponseBucketsInner) {
 	o.Buckets = v
 }
@@ -115,13 +105,47 @@ func (o DeliveryTrendResponse) MarshalJSON() ([]byte, error) {
 
 func (o DeliveryTrendResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Range) {
-		toSerialize["range"] = o.Range
-	}
-	if !IsNil(o.Buckets) {
-		toSerialize["buckets"] = o.Buckets
-	}
+	toSerialize["range"] = o.Range
+	toSerialize["buckets"] = o.Buckets
 	return toSerialize, nil
+}
+
+func (o *DeliveryTrendResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"range",
+		"buckets",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDeliveryTrendResponse := _DeliveryTrendResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDeliveryTrendResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = DeliveryTrendResponse(varDeliveryTrendResponse)
+
+	return err
 }
 
 type NullableDeliveryTrendResponse struct {

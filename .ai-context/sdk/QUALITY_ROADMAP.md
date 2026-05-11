@@ -25,6 +25,9 @@
 13. **Bir dili yapıp diğerini salmayacağız** — başlanan dil bitecek, tüm diller aynı anda tamamlanacak, parça parça bırakılmayacak
 14. **Gerektiğinde agent kullanılacak** — büyük işlerde paralel subagent ile çalışılacak, tek tek yapmak zorunda değiliz
 15. **İnternetten derin araştırma yapılacak** — her konuda referans bulunacak, GitHub repolardan destek alınacak, tahminle değil veriyle çalışılacak
+16. **Her iş sonrası detaylı denetim** — biten iş tekrar kontrol edilecek, eksik/hata varsa düzeltilecek, "yaptım bitti" yok
+17. **Agentlar çalışırken boş durmayacaksın** — ana agent da çalışacak, farklı işleri paralel yürütecek
+18. **Boşa çıkan agent yeni işe** — agent bitince yeni görev varsa hemen atanacak, diğerlerine de yardımcı olacak
 
 ---
 

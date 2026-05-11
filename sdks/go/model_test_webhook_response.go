@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the TestWebhookResponse type satisfies the MappedNullable interface at compile time
@@ -20,18 +22,24 @@ var _ MappedNullable = &TestWebhookResponse{}
 
 // TestWebhookResponse struct for TestWebhookResponse
 type TestWebhookResponse struct {
-	Success *bool `json:"success,omitempty"`
-	StatusCode *int32 `json:"status_code,omitempty"`
-	DurationMs *int32 `json:"duration_ms,omitempty"`
-	ResponseBody *string `json:"response_body,omitempty"`
+	Success bool `json:"success"`
+	StatusCode int32 `json:"status_code"`
+	DurationMs int32 `json:"duration_ms"`
+	ResponseBody string `json:"response_body"`
 }
+
+type _TestWebhookResponse TestWebhookResponse
 
 // NewTestWebhookResponse instantiates a new TestWebhookResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestWebhookResponse() *TestWebhookResponse {
+func NewTestWebhookResponse(success bool, statusCode int32, durationMs int32, responseBody string) *TestWebhookResponse {
 	this := TestWebhookResponse{}
+	this.Success = success
+	this.StatusCode = statusCode
+	this.DurationMs = durationMs
+	this.ResponseBody = responseBody
 	return &this
 }
 
@@ -43,132 +51,100 @@ func NewTestWebhookResponseWithDefaults() *TestWebhookResponse {
 	return &this
 }
 
-// GetSuccess returns the Success field value if set, zero value otherwise.
+// GetSuccess returns the Success field value
 func (o *TestWebhookResponse) GetSuccess() bool {
-	if o == nil || IsNil(o.Success) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.Success
+
+	return o.Success
 }
 
-// GetSuccessOk returns a tuple with the Success field value if set, nil otherwise
+// GetSuccessOk returns a tuple with the Success field value
 // and a boolean to check if the value has been set.
 func (o *TestWebhookResponse) GetSuccessOk() (*bool, bool) {
-	if o == nil || IsNil(o.Success) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Success, true
+	return &o.Success, true
 }
 
-// HasSuccess returns a boolean if a field has been set.
-func (o *TestWebhookResponse) HasSuccess() bool {
-	if o != nil && !IsNil(o.Success) {
-		return true
-	}
-
-	return false
-}
-
-// SetSuccess gets a reference to the given bool and assigns it to the Success field.
+// SetSuccess sets field value
 func (o *TestWebhookResponse) SetSuccess(v bool) {
-	o.Success = &v
+	o.Success = v
 }
 
-// GetStatusCode returns the StatusCode field value if set, zero value otherwise.
+// GetStatusCode returns the StatusCode field value
 func (o *TestWebhookResponse) GetStatusCode() int32 {
-	if o == nil || IsNil(o.StatusCode) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.StatusCode
+
+	return o.StatusCode
 }
 
-// GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
+// GetStatusCodeOk returns a tuple with the StatusCode field value
 // and a boolean to check if the value has been set.
 func (o *TestWebhookResponse) GetStatusCodeOk() (*int32, bool) {
-	if o == nil || IsNil(o.StatusCode) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StatusCode, true
+	return &o.StatusCode, true
 }
 
-// HasStatusCode returns a boolean if a field has been set.
-func (o *TestWebhookResponse) HasStatusCode() bool {
-	if o != nil && !IsNil(o.StatusCode) {
-		return true
-	}
-
-	return false
-}
-
-// SetStatusCode gets a reference to the given int32 and assigns it to the StatusCode field.
+// SetStatusCode sets field value
 func (o *TestWebhookResponse) SetStatusCode(v int32) {
-	o.StatusCode = &v
+	o.StatusCode = v
 }
 
-// GetDurationMs returns the DurationMs field value if set, zero value otherwise.
+// GetDurationMs returns the DurationMs field value
 func (o *TestWebhookResponse) GetDurationMs() int32 {
-	if o == nil || IsNil(o.DurationMs) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.DurationMs
+
+	return o.DurationMs
 }
 
-// GetDurationMsOk returns a tuple with the DurationMs field value if set, nil otherwise
+// GetDurationMsOk returns a tuple with the DurationMs field value
 // and a boolean to check if the value has been set.
 func (o *TestWebhookResponse) GetDurationMsOk() (*int32, bool) {
-	if o == nil || IsNil(o.DurationMs) {
+	if o == nil {
 		return nil, false
 	}
-	return o.DurationMs, true
+	return &o.DurationMs, true
 }
 
-// HasDurationMs returns a boolean if a field has been set.
-func (o *TestWebhookResponse) HasDurationMs() bool {
-	if o != nil && !IsNil(o.DurationMs) {
-		return true
-	}
-
-	return false
-}
-
-// SetDurationMs gets a reference to the given int32 and assigns it to the DurationMs field.
+// SetDurationMs sets field value
 func (o *TestWebhookResponse) SetDurationMs(v int32) {
-	o.DurationMs = &v
+	o.DurationMs = v
 }
 
-// GetResponseBody returns the ResponseBody field value if set, zero value otherwise.
+// GetResponseBody returns the ResponseBody field value
 func (o *TestWebhookResponse) GetResponseBody() string {
-	if o == nil || IsNil(o.ResponseBody) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.ResponseBody
+
+	return o.ResponseBody
 }
 
-// GetResponseBodyOk returns a tuple with the ResponseBody field value if set, nil otherwise
+// GetResponseBodyOk returns a tuple with the ResponseBody field value
 // and a boolean to check if the value has been set.
 func (o *TestWebhookResponse) GetResponseBodyOk() (*string, bool) {
-	if o == nil || IsNil(o.ResponseBody) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ResponseBody, true
+	return &o.ResponseBody, true
 }
 
-// HasResponseBody returns a boolean if a field has been set.
-func (o *TestWebhookResponse) HasResponseBody() bool {
-	if o != nil && !IsNil(o.ResponseBody) {
-		return true
-	}
-
-	return false
-}
-
-// SetResponseBody gets a reference to the given string and assigns it to the ResponseBody field.
+// SetResponseBody sets field value
 func (o *TestWebhookResponse) SetResponseBody(v string) {
-	o.ResponseBody = &v
+	o.ResponseBody = v
 }
 
 func (o TestWebhookResponse) MarshalJSON() ([]byte, error) {
@@ -181,19 +157,51 @@ func (o TestWebhookResponse) MarshalJSON() ([]byte, error) {
 
 func (o TestWebhookResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Success) {
-		toSerialize["success"] = o.Success
-	}
-	if !IsNil(o.StatusCode) {
-		toSerialize["status_code"] = o.StatusCode
-	}
-	if !IsNil(o.DurationMs) {
-		toSerialize["duration_ms"] = o.DurationMs
-	}
-	if !IsNil(o.ResponseBody) {
-		toSerialize["response_body"] = o.ResponseBody
-	}
+	toSerialize["success"] = o.Success
+	toSerialize["status_code"] = o.StatusCode
+	toSerialize["duration_ms"] = o.DurationMs
+	toSerialize["response_body"] = o.ResponseBody
 	return toSerialize, nil
+}
+
+func (o *TestWebhookResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"success",
+		"status_code",
+		"duration_ms",
+		"response_body",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varTestWebhookResponse := _TestWebhookResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varTestWebhookResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = TestWebhookResponse(varTestWebhookResponse)
+
+	return err
 }
 
 type NullableTestWebhookResponse struct {

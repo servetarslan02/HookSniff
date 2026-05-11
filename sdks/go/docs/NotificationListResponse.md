@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Notifications** | Pointer to [**[]Notification**](Notification.md) |  | [optional] 
-**Total** | Pointer to **int32** |  | [optional] 
-**UnreadCount** | Pointer to **int32** |  | [optional] 
+**Notifications** | [**[]Notification**](Notification.md) |  | 
+**Total** | **int32** |  | 
+**UnreadCount** | **int32** |  | 
 
 ## Methods
 
 ### NewNotificationListResponse
 
-`func NewNotificationListResponse() *NotificationListResponse`
+`func NewNotificationListResponse(notifications []Notification, total int32, unreadCount int32, ) *NotificationListResponse`
 
 NewNotificationListResponse instantiates a new NotificationListResponse object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetNotifications sets Notifications field to given value.
 
-### HasNotifications
-
-`func (o *NotificationListResponse) HasNotifications() bool`
-
-HasNotifications returns a boolean if a field has been set.
 
 ### GetTotal
 
@@ -71,11 +66,6 @@ and a boolean to check if the value has been set.
 
 SetTotal sets Total field to given value.
 
-### HasTotal
-
-`func (o *NotificationListResponse) HasTotal() bool`
-
-HasTotal returns a boolean if a field has been set.
 
 ### GetUnreadCount
 
@@ -96,11 +86,6 @@ and a boolean to check if the value has been set.
 
 SetUnreadCount sets UnreadCount field to given value.
 
-### HasUnreadCount
-
-`func (o *NotificationListResponse) HasUnreadCount() bool`
-
-HasUnreadCount returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

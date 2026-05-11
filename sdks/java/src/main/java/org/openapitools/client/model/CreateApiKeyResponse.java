@@ -49,32 +49,32 @@ import org.openapitools.client.JSON;
 /**
  * CreateApiKeyResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class CreateApiKeyResponse {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_KEY = "key";
   @SerializedName(SERIALIZED_NAME_KEY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String key;
 
   public static final String SERIALIZED_NAME_PREFIX = "prefix";
   @SerializedName(SERIALIZED_NAME_PREFIX)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String prefix;
 
   public static final String SERIALIZED_NAME_MESSAGE = "message";
   @SerializedName(SERIALIZED_NAME_MESSAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String message;
 
   public CreateApiKeyResponse() {
   }
 
-  public CreateApiKeyResponse id(@javax.annotation.Nullable UUID id) {
+  public CreateApiKeyResponse id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -83,17 +83,17 @@ public class CreateApiKeyResponse {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public CreateApiKeyResponse key(@javax.annotation.Nullable String key) {
+  public CreateApiKeyResponse key(@javax.annotation.Nonnull String key) {
     this.key = key;
     return this;
   }
@@ -102,17 +102,17 @@ public class CreateApiKeyResponse {
    * Full API key — only shown once
    * @return key
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getKey() {
     return key;
   }
 
-  public void setKey(@javax.annotation.Nullable String key) {
+  public void setKey(@javax.annotation.Nonnull String key) {
     this.key = key;
   }
 
 
-  public CreateApiKeyResponse prefix(@javax.annotation.Nullable String prefix) {
+  public CreateApiKeyResponse prefix(@javax.annotation.Nonnull String prefix) {
     this.prefix = prefix;
     return this;
   }
@@ -121,17 +121,17 @@ public class CreateApiKeyResponse {
    * Get prefix
    * @return prefix
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPrefix() {
     return prefix;
   }
 
-  public void setPrefix(@javax.annotation.Nullable String prefix) {
+  public void setPrefix(@javax.annotation.Nonnull String prefix) {
     this.prefix = prefix;
   }
 
 
-  public CreateApiKeyResponse message(@javax.annotation.Nullable String message) {
+  public CreateApiKeyResponse message(@javax.annotation.Nonnull String message) {
     this.message = message;
     return this;
   }
@@ -140,12 +140,12 @@ public class CreateApiKeyResponse {
    * Get message
    * @return message
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getMessage() {
     return message;
   }
 
-  public void setMessage(@javax.annotation.Nullable String message) {
+  public void setMessage(@javax.annotation.Nonnull String message) {
     this.message = message;
   }
 
@@ -200,7 +200,7 @@ public class CreateApiKeyResponse {
     openapiFields = new HashSet<String>(Arrays.asList("id", "key", "prefix", "message"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "key", "prefix", "message"));
   }
 
   /**
@@ -223,17 +223,24 @@ public class CreateApiKeyResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `CreateApiKeyResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : CreateApiKeyResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("key") != null && !jsonObj.get("key").isJsonNull()) && !jsonObj.get("key").isJsonPrimitive()) {
+      if (!jsonObj.get("key").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `key` to be a primitive type in the JSON string but got `%s`", jsonObj.get("key").toString()));
       }
-      if ((jsonObj.get("prefix") != null && !jsonObj.get("prefix").isJsonNull()) && !jsonObj.get("prefix").isJsonPrimitive()) {
+      if (!jsonObj.get("prefix").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `prefix` to be a primitive type in the JSON string but got `%s`", jsonObj.get("prefix").toString()));
       }
-      if ((jsonObj.get("message") != null && !jsonObj.get("message").isJsonNull()) && !jsonObj.get("message").isJsonPrimitive()) {
+      if (!jsonObj.get("message").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `message` to be a primitive type in the JSON string but got `%s`", jsonObj.get("message").toString()));
       }
   }

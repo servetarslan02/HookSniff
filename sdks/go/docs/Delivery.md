@@ -4,20 +4,20 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**EndpointId** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**EndpointId** | **string** |  | 
 **Event** | Pointer to **NullableString** |  | [optional] 
-**Status** | Pointer to **string** |  | [optional] 
-**AttemptCount** | Pointer to **int32** |  | [optional] 
+**Status** | **string** |  | 
+**AttemptCount** | **int32** |  | 
 **ResponseStatus** | Pointer to **NullableInt32** |  | [optional] 
-**ReplayCount** | Pointer to **int32** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**ReplayCount** | **int32** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewDelivery
 
-`func NewDelivery() *Delivery`
+`func NewDelivery(id string, endpointId string, status string, attemptCount int32, replayCount int32, createdAt time.Time, ) *Delivery`
 
 NewDelivery instantiates a new Delivery object
 This constructor will assign default values to properties that have it defined,
@@ -51,11 +51,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *Delivery) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetEndpointId
 
@@ -76,11 +71,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointId sets EndpointId field to given value.
 
-### HasEndpointId
-
-`func (o *Delivery) HasEndpointId() bool`
-
-HasEndpointId returns a boolean if a field has been set.
 
 ### GetEvent
 
@@ -136,11 +126,6 @@ and a boolean to check if the value has been set.
 
 SetStatus sets Status field to given value.
 
-### HasStatus
-
-`func (o *Delivery) HasStatus() bool`
-
-HasStatus returns a boolean if a field has been set.
 
 ### GetAttemptCount
 
@@ -161,11 +146,6 @@ and a boolean to check if the value has been set.
 
 SetAttemptCount sets AttemptCount field to given value.
 
-### HasAttemptCount
-
-`func (o *Delivery) HasAttemptCount() bool`
-
-HasAttemptCount returns a boolean if a field has been set.
 
 ### GetResponseStatus
 
@@ -221,11 +201,6 @@ and a boolean to check if the value has been set.
 
 SetReplayCount sets ReplayCount field to given value.
 
-### HasReplayCount
-
-`func (o *Delivery) HasReplayCount() bool`
-
-HasReplayCount returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -246,11 +221,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *Delivery) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

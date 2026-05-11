@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EndpointId** | Pointer to **string** |  | [optional] 
-**Status** | Pointer to **string** |  | [optional] 
-**Limit** | Pointer to **int32** |  | [optional] [default to 50]
+**EndpointId** | **string** |  | 
+**Status** | **string** |  | 
+**Limit** | **int32** |  | [default to 50]
 
 ## Methods
 
 ### NewStreamParams
 
-`func NewStreamParams() *StreamParams`
+`func NewStreamParams(endpointId string, status string, limit int32, ) *StreamParams`
 
 NewStreamParams instantiates a new StreamParams object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointId sets EndpointId field to given value.
 
-### HasEndpointId
-
-`func (o *StreamParams) HasEndpointId() bool`
-
-HasEndpointId returns a boolean if a field has been set.
 
 ### GetStatus
 
@@ -71,11 +66,6 @@ and a boolean to check if the value has been set.
 
 SetStatus sets Status field to given value.
 
-### HasStatus
-
-`func (o *StreamParams) HasStatus() bool`
-
-HasStatus returns a boolean if a field has been set.
 
 ### GetLimit
 
@@ -96,11 +86,6 @@ and a boolean to check if the value has been set.
 
 SetLimit sets Limit field to given value.
 
-### HasLimit
-
-`func (o *StreamParams) HasLimit() bool`
-
-HasLimit returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,16 +52,16 @@ import org.openapitools.client.JSON;
 /**
  * AlertRule
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class AlertRule {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_NAME = "name";
   @SerializedName(SERIALIZED_NAME_NAME)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String name;
 
   /**
@@ -119,12 +120,12 @@ public class AlertRule {
 
   public static final String SERIALIZED_NAME_CONDITION = "condition";
   @SerializedName(SERIALIZED_NAME_CONDITION)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private ConditionEnum condition;
 
   public static final String SERIALIZED_NAME_THRESHOLD = "threshold";
   @SerializedName(SERIALIZED_NAME_THRESHOLD)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer threshold;
 
   /**
@@ -183,23 +184,23 @@ public class AlertRule {
 
   public static final String SERIALIZED_NAME_CHANNELS = "channels";
   @SerializedName(SERIALIZED_NAME_CHANNELS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<ChannelsEnum> channels = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_IS_ACTIVE = "is_active";
   @SerializedName(SERIALIZED_NAME_IS_ACTIVE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean isActive;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
-  private String createdAt;
+  @javax.annotation.Nonnull
+  private OffsetDateTime createdAt;
 
   public AlertRule() {
   }
 
-  public AlertRule id(@javax.annotation.Nullable UUID id) {
+  public AlertRule id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -208,17 +209,17 @@ public class AlertRule {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public AlertRule name(@javax.annotation.Nullable String name) {
+  public AlertRule name(@javax.annotation.Nonnull String name) {
     this.name = name;
     return this;
   }
@@ -227,17 +228,17 @@ public class AlertRule {
    * Get name
    * @return name
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getName() {
     return name;
   }
 
-  public void setName(@javax.annotation.Nullable String name) {
+  public void setName(@javax.annotation.Nonnull String name) {
     this.name = name;
   }
 
 
-  public AlertRule condition(@javax.annotation.Nullable ConditionEnum condition) {
+  public AlertRule condition(@javax.annotation.Nonnull ConditionEnum condition) {
     this.condition = condition;
     return this;
   }
@@ -246,17 +247,17 @@ public class AlertRule {
    * Get condition
    * @return condition
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public ConditionEnum getCondition() {
     return condition;
   }
 
-  public void setCondition(@javax.annotation.Nullable ConditionEnum condition) {
+  public void setCondition(@javax.annotation.Nonnull ConditionEnum condition) {
     this.condition = condition;
   }
 
 
-  public AlertRule threshold(@javax.annotation.Nullable Integer threshold) {
+  public AlertRule threshold(@javax.annotation.Nonnull Integer threshold) {
     this.threshold = threshold;
     return this;
   }
@@ -265,17 +266,17 @@ public class AlertRule {
    * Get threshold
    * @return threshold
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getThreshold() {
     return threshold;
   }
 
-  public void setThreshold(@javax.annotation.Nullable Integer threshold) {
+  public void setThreshold(@javax.annotation.Nonnull Integer threshold) {
     this.threshold = threshold;
   }
 
 
-  public AlertRule channels(@javax.annotation.Nullable List<ChannelsEnum> channels) {
+  public AlertRule channels(@javax.annotation.Nonnull List<ChannelsEnum> channels) {
     this.channels = channels;
     return this;
   }
@@ -292,17 +293,17 @@ public class AlertRule {
    * Get channels
    * @return channels
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<ChannelsEnum> getChannels() {
     return channels;
   }
 
-  public void setChannels(@javax.annotation.Nullable List<ChannelsEnum> channels) {
+  public void setChannels(@javax.annotation.Nonnull List<ChannelsEnum> channels) {
     this.channels = channels;
   }
 
 
-  public AlertRule isActive(@javax.annotation.Nullable Boolean isActive) {
+  public AlertRule isActive(@javax.annotation.Nonnull Boolean isActive) {
     this.isActive = isActive;
     return this;
   }
@@ -311,17 +312,17 @@ public class AlertRule {
    * Get isActive
    * @return isActive
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getIsActive() {
     return isActive;
   }
 
-  public void setIsActive(@javax.annotation.Nullable Boolean isActive) {
+  public void setIsActive(@javax.annotation.Nonnull Boolean isActive) {
     this.isActive = isActive;
   }
 
 
-  public AlertRule createdAt(@javax.annotation.Nullable String createdAt) {
+  public AlertRule createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -330,12 +331,12 @@ public class AlertRule {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
-  public String getCreatedAt() {
+  @javax.annotation.Nonnull
+  public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable String createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -396,7 +397,7 @@ public class AlertRule {
     openapiFields = new HashSet<String>(Arrays.asList("id", "name", "condition", "threshold", "channels", "is_active", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "name", "condition", "threshold", "channels", "is_active", "created_at"));
   }
 
   /**
@@ -419,26 +420,30 @@ public class AlertRule {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `AlertRule` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : AlertRule.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("name") != null && !jsonObj.get("name").isJsonNull()) && !jsonObj.get("name").isJsonPrimitive()) {
+      if (!jsonObj.get("name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("name").toString()));
       }
-      if ((jsonObj.get("condition") != null && !jsonObj.get("condition").isJsonNull()) && !jsonObj.get("condition").isJsonPrimitive()) {
+      if (!jsonObj.get("condition").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `condition` to be a primitive type in the JSON string but got `%s`", jsonObj.get("condition").toString()));
       }
-      // validate the optional field `condition`
-      if (jsonObj.get("condition") != null && !jsonObj.get("condition").isJsonNull()) {
-        ConditionEnum.validateJsonElement(jsonObj.get("condition"));
-      }
-      // ensure the optional json data is an array if present
-      if (jsonObj.get("channels") != null && !jsonObj.get("channels").isJsonNull() && !jsonObj.get("channels").isJsonArray()) {
+      // validate the required field `condition`
+      ConditionEnum.validateJsonElement(jsonObj.get("condition"));
+      // ensure the required json array is present
+      if (jsonObj.get("channels") == null) {
+        throw new IllegalArgumentException("Expected the field `linkedContent` to be an array in the JSON string but got `null`");
+      } else if (!jsonObj.get("channels").isJsonArray()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `channels` to be an array in the JSON string but got `%s`", jsonObj.get("channels").toString()));
-      }
-      if ((jsonObj.get("created_at") != null && !jsonObj.get("created_at").isJsonNull()) && !jsonObj.get("created_at").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `created_at` to be a primitive type in the JSON string but got `%s`", jsonObj.get("created_at").toString()));
       }
   }
 

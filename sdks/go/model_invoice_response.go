@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the InvoiceResponse type satisfies the MappedNullable interface at compile time
@@ -21,19 +23,26 @@ var _ MappedNullable = &InvoiceResponse{}
 
 // InvoiceResponse struct for InvoiceResponse
 type InvoiceResponse struct {
-	Id *string `json:"id,omitempty"`
-	AmountCents *int32 `json:"amount_cents,omitempty"`
-	Currency *string `json:"currency,omitempty"`
-	Status *string `json:"status,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Id string `json:"id"`
+	AmountCents int32 `json:"amount_cents"`
+	Currency string `json:"currency"`
+	Status string `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _InvoiceResponse InvoiceResponse
 
 // NewInvoiceResponse instantiates a new InvoiceResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInvoiceResponse() *InvoiceResponse {
+func NewInvoiceResponse(id string, amountCents int32, currency string, status string, createdAt time.Time) *InvoiceResponse {
 	this := InvoiceResponse{}
+	this.Id = id
+	this.AmountCents = amountCents
+	this.Currency = currency
+	this.Status = status
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -45,164 +54,124 @@ func NewInvoiceResponseWithDefaults() *InvoiceResponse {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *InvoiceResponse) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *InvoiceResponse) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *InvoiceResponse) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *InvoiceResponse) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetAmountCents returns the AmountCents field value if set, zero value otherwise.
+// GetAmountCents returns the AmountCents field value
 func (o *InvoiceResponse) GetAmountCents() int32 {
-	if o == nil || IsNil(o.AmountCents) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.AmountCents
+
+	return o.AmountCents
 }
 
-// GetAmountCentsOk returns a tuple with the AmountCents field value if set, nil otherwise
+// GetAmountCentsOk returns a tuple with the AmountCents field value
 // and a boolean to check if the value has been set.
 func (o *InvoiceResponse) GetAmountCentsOk() (*int32, bool) {
-	if o == nil || IsNil(o.AmountCents) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AmountCents, true
+	return &o.AmountCents, true
 }
 
-// HasAmountCents returns a boolean if a field has been set.
-func (o *InvoiceResponse) HasAmountCents() bool {
-	if o != nil && !IsNil(o.AmountCents) {
-		return true
-	}
-
-	return false
-}
-
-// SetAmountCents gets a reference to the given int32 and assigns it to the AmountCents field.
+// SetAmountCents sets field value
 func (o *InvoiceResponse) SetAmountCents(v int32) {
-	o.AmountCents = &v
+	o.AmountCents = v
 }
 
-// GetCurrency returns the Currency field value if set, zero value otherwise.
+// GetCurrency returns the Currency field value
 func (o *InvoiceResponse) GetCurrency() string {
-	if o == nil || IsNil(o.Currency) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Currency
+
+	return o.Currency
 }
 
-// GetCurrencyOk returns a tuple with the Currency field value if set, nil otherwise
+// GetCurrencyOk returns a tuple with the Currency field value
 // and a boolean to check if the value has been set.
 func (o *InvoiceResponse) GetCurrencyOk() (*string, bool) {
-	if o == nil || IsNil(o.Currency) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Currency, true
+	return &o.Currency, true
 }
 
-// HasCurrency returns a boolean if a field has been set.
-func (o *InvoiceResponse) HasCurrency() bool {
-	if o != nil && !IsNil(o.Currency) {
-		return true
-	}
-
-	return false
-}
-
-// SetCurrency gets a reference to the given string and assigns it to the Currency field.
+// SetCurrency sets field value
 func (o *InvoiceResponse) SetCurrency(v string) {
-	o.Currency = &v
+	o.Currency = v
 }
 
-// GetStatus returns the Status field value if set, zero value otherwise.
+// GetStatus returns the Status field value
 func (o *InvoiceResponse) GetStatus() string {
-	if o == nil || IsNil(o.Status) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Status
+
+	return o.Status
 }
 
-// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
 func (o *InvoiceResponse) GetStatusOk() (*string, bool) {
-	if o == nil || IsNil(o.Status) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Status, true
+	return &o.Status, true
 }
 
-// HasStatus returns a boolean if a field has been set.
-func (o *InvoiceResponse) HasStatus() bool {
-	if o != nil && !IsNil(o.Status) {
-		return true
-	}
-
-	return false
-}
-
-// SetStatus gets a reference to the given string and assigns it to the Status field.
+// SetStatus sets field value
 func (o *InvoiceResponse) SetStatus(v string) {
-	o.Status = &v
+	o.Status = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *InvoiceResponse) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *InvoiceResponse) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *InvoiceResponse) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *InvoiceResponse) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o InvoiceResponse) MarshalJSON() ([]byte, error) {
@@ -215,22 +184,53 @@ func (o InvoiceResponse) MarshalJSON() ([]byte, error) {
 
 func (o InvoiceResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.AmountCents) {
-		toSerialize["amount_cents"] = o.AmountCents
-	}
-	if !IsNil(o.Currency) {
-		toSerialize["currency"] = o.Currency
-	}
-	if !IsNil(o.Status) {
-		toSerialize["status"] = o.Status
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["amount_cents"] = o.AmountCents
+	toSerialize["currency"] = o.Currency
+	toSerialize["status"] = o.Status
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *InvoiceResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"amount_cents",
+		"currency",
+		"status",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varInvoiceResponse := _InvoiceResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varInvoiceResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = InvoiceResponse(varInvoiceResponse)
+
+	return err
 }
 
 type NullableInvoiceResponse struct {

@@ -50,32 +50,32 @@ import org.openapitools.client.JSON;
 /**
  * DeviceTokenResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class DeviceTokenResponse {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_TOKEN = "token";
   @SerializedName(SERIALIZED_NAME_TOKEN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String token;
 
   public static final String SERIALIZED_NAME_PLATFORM = "platform";
   @SerializedName(SERIALIZED_NAME_PLATFORM)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String platform;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public DeviceTokenResponse() {
   }
 
-  public DeviceTokenResponse id(@javax.annotation.Nullable UUID id) {
+  public DeviceTokenResponse id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -84,17 +84,17 @@ public class DeviceTokenResponse {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public DeviceTokenResponse token(@javax.annotation.Nullable String token) {
+  public DeviceTokenResponse token(@javax.annotation.Nonnull String token) {
     this.token = token;
     return this;
   }
@@ -103,17 +103,17 @@ public class DeviceTokenResponse {
    * Get token
    * @return token
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getToken() {
     return token;
   }
 
-  public void setToken(@javax.annotation.Nullable String token) {
+  public void setToken(@javax.annotation.Nonnull String token) {
     this.token = token;
   }
 
 
-  public DeviceTokenResponse platform(@javax.annotation.Nullable String platform) {
+  public DeviceTokenResponse platform(@javax.annotation.Nonnull String platform) {
     this.platform = platform;
     return this;
   }
@@ -122,17 +122,17 @@ public class DeviceTokenResponse {
    * Get platform
    * @return platform
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPlatform() {
     return platform;
   }
 
-  public void setPlatform(@javax.annotation.Nullable String platform) {
+  public void setPlatform(@javax.annotation.Nonnull String platform) {
     this.platform = platform;
   }
 
 
-  public DeviceTokenResponse createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public DeviceTokenResponse createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -141,12 +141,12 @@ public class DeviceTokenResponse {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -201,7 +201,7 @@ public class DeviceTokenResponse {
     openapiFields = new HashSet<String>(Arrays.asList("id", "token", "platform", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "token", "platform", "created_at"));
   }
 
   /**
@@ -224,14 +224,21 @@ public class DeviceTokenResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `DeviceTokenResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : DeviceTokenResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("token") != null && !jsonObj.get("token").isJsonNull()) && !jsonObj.get("token").isJsonPrimitive()) {
+      if (!jsonObj.get("token").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("token").toString()));
       }
-      if ((jsonObj.get("platform") != null && !jsonObj.get("platform").isJsonNull()) && !jsonObj.get("platform").isJsonPrimitive()) {
+      if (!jsonObj.get("platform").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `platform` to be a primitive type in the JSON string but got `%s`", jsonObj.get("platform").toString()));
       }
   }

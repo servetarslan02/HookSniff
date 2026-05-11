@@ -52,31 +52,31 @@ import org.openapitools.client.JSON;
 /**
  * UpdateEndpointRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class UpdateEndpointRequest {
   public static final String SERIALIZED_NAME_URL = "url";
   @SerializedName(SERIALIZED_NAME_URL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private URI url;
 
   public static final String SERIALIZED_NAME_DESCRIPTION = "description";
   @SerializedName(SERIALIZED_NAME_DESCRIPTION)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String description;
 
   public static final String SERIALIZED_NAME_IS_ACTIVE = "is_active";
   @SerializedName(SERIALIZED_NAME_IS_ACTIVE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean isActive;
 
   public static final String SERIALIZED_NAME_ALLOWED_IPS = "allowed_ips";
   @SerializedName(SERIALIZED_NAME_ALLOWED_IPS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<String> allowedIps = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_EVENT_FILTER = "event_filter";
   @SerializedName(SERIALIZED_NAME_EVENT_FILTER)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<String> eventFilter = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_CUSTOM_HEADERS = "custom_headers";
@@ -86,7 +86,7 @@ public class UpdateEndpointRequest {
 
   public static final String SERIALIZED_NAME_RETRY_POLICY = "retry_policy";
   @SerializedName(SERIALIZED_NAME_RETRY_POLICY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private RetryPolicy retryPolicy;
 
   /**
@@ -145,12 +145,12 @@ public class UpdateEndpointRequest {
 
   public static final String SERIALIZED_NAME_ROUTING_STRATEGY = "routing_strategy";
   @SerializedName(SERIALIZED_NAME_ROUTING_STRATEGY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private RoutingStrategyEnum routingStrategy;
 
   public static final String SERIALIZED_NAME_FALLBACK_URL = "fallback_url";
   @SerializedName(SERIALIZED_NAME_FALLBACK_URL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private URI fallbackUrl;
 
   /**
@@ -207,13 +207,13 @@ public class UpdateEndpointRequest {
 
   public static final String SERIALIZED_NAME_FORMAT = "format";
   @SerializedName(SERIALIZED_NAME_FORMAT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private FormatEnum format;
 
   public UpdateEndpointRequest() {
   }
 
-  public UpdateEndpointRequest url(@javax.annotation.Nullable URI url) {
+  public UpdateEndpointRequest url(@javax.annotation.Nonnull URI url) {
     this.url = url;
     return this;
   }
@@ -222,17 +222,17 @@ public class UpdateEndpointRequest {
    * Get url
    * @return url
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public URI getUrl() {
     return url;
   }
 
-  public void setUrl(@javax.annotation.Nullable URI url) {
+  public void setUrl(@javax.annotation.Nonnull URI url) {
     this.url = url;
   }
 
 
-  public UpdateEndpointRequest description(@javax.annotation.Nullable String description) {
+  public UpdateEndpointRequest description(@javax.annotation.Nonnull String description) {
     this.description = description;
     return this;
   }
@@ -241,17 +241,17 @@ public class UpdateEndpointRequest {
    * Get description
    * @return description
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getDescription() {
     return description;
   }
 
-  public void setDescription(@javax.annotation.Nullable String description) {
+  public void setDescription(@javax.annotation.Nonnull String description) {
     this.description = description;
   }
 
 
-  public UpdateEndpointRequest isActive(@javax.annotation.Nullable Boolean isActive) {
+  public UpdateEndpointRequest isActive(@javax.annotation.Nonnull Boolean isActive) {
     this.isActive = isActive;
     return this;
   }
@@ -260,17 +260,17 @@ public class UpdateEndpointRequest {
    * Get isActive
    * @return isActive
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getIsActive() {
     return isActive;
   }
 
-  public void setIsActive(@javax.annotation.Nullable Boolean isActive) {
+  public void setIsActive(@javax.annotation.Nonnull Boolean isActive) {
     this.isActive = isActive;
   }
 
 
-  public UpdateEndpointRequest allowedIps(@javax.annotation.Nullable List<String> allowedIps) {
+  public UpdateEndpointRequest allowedIps(@javax.annotation.Nonnull List<String> allowedIps) {
     this.allowedIps = allowedIps;
     return this;
   }
@@ -287,17 +287,17 @@ public class UpdateEndpointRequest {
    * Get allowedIps
    * @return allowedIps
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<String> getAllowedIps() {
     return allowedIps;
   }
 
-  public void setAllowedIps(@javax.annotation.Nullable List<String> allowedIps) {
+  public void setAllowedIps(@javax.annotation.Nonnull List<String> allowedIps) {
     this.allowedIps = allowedIps;
   }
 
 
-  public UpdateEndpointRequest eventFilter(@javax.annotation.Nullable List<String> eventFilter) {
+  public UpdateEndpointRequest eventFilter(@javax.annotation.Nonnull List<String> eventFilter) {
     this.eventFilter = eventFilter;
     return this;
   }
@@ -314,12 +314,12 @@ public class UpdateEndpointRequest {
    * Get eventFilter
    * @return eventFilter
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<String> getEventFilter() {
     return eventFilter;
   }
 
-  public void setEventFilter(@javax.annotation.Nullable List<String> eventFilter) {
+  public void setEventFilter(@javax.annotation.Nonnull List<String> eventFilter) {
     this.eventFilter = eventFilter;
   }
 
@@ -343,7 +343,7 @@ public class UpdateEndpointRequest {
   }
 
 
-  public UpdateEndpointRequest retryPolicy(@javax.annotation.Nullable RetryPolicy retryPolicy) {
+  public UpdateEndpointRequest retryPolicy(@javax.annotation.Nonnull RetryPolicy retryPolicy) {
     this.retryPolicy = retryPolicy;
     return this;
   }
@@ -352,17 +352,17 @@ public class UpdateEndpointRequest {
    * Get retryPolicy
    * @return retryPolicy
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public RetryPolicy getRetryPolicy() {
     return retryPolicy;
   }
 
-  public void setRetryPolicy(@javax.annotation.Nullable RetryPolicy retryPolicy) {
+  public void setRetryPolicy(@javax.annotation.Nonnull RetryPolicy retryPolicy) {
     this.retryPolicy = retryPolicy;
   }
 
 
-  public UpdateEndpointRequest routingStrategy(@javax.annotation.Nullable RoutingStrategyEnum routingStrategy) {
+  public UpdateEndpointRequest routingStrategy(@javax.annotation.Nonnull RoutingStrategyEnum routingStrategy) {
     this.routingStrategy = routingStrategy;
     return this;
   }
@@ -371,17 +371,17 @@ public class UpdateEndpointRequest {
    * Get routingStrategy
    * @return routingStrategy
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public RoutingStrategyEnum getRoutingStrategy() {
     return routingStrategy;
   }
 
-  public void setRoutingStrategy(@javax.annotation.Nullable RoutingStrategyEnum routingStrategy) {
+  public void setRoutingStrategy(@javax.annotation.Nonnull RoutingStrategyEnum routingStrategy) {
     this.routingStrategy = routingStrategy;
   }
 
 
-  public UpdateEndpointRequest fallbackUrl(@javax.annotation.Nullable URI fallbackUrl) {
+  public UpdateEndpointRequest fallbackUrl(@javax.annotation.Nonnull URI fallbackUrl) {
     this.fallbackUrl = fallbackUrl;
     return this;
   }
@@ -390,17 +390,17 @@ public class UpdateEndpointRequest {
    * Get fallbackUrl
    * @return fallbackUrl
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public URI getFallbackUrl() {
     return fallbackUrl;
   }
 
-  public void setFallbackUrl(@javax.annotation.Nullable URI fallbackUrl) {
+  public void setFallbackUrl(@javax.annotation.Nonnull URI fallbackUrl) {
     this.fallbackUrl = fallbackUrl;
   }
 
 
-  public UpdateEndpointRequest format(@javax.annotation.Nullable FormatEnum format) {
+  public UpdateEndpointRequest format(@javax.annotation.Nonnull FormatEnum format) {
     this.format = format;
     return this;
   }
@@ -409,12 +409,12 @@ public class UpdateEndpointRequest {
    * Get format
    * @return format
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public FormatEnum getFormat() {
     return format;
   }
 
-  public void setFormat(@javax.annotation.Nullable FormatEnum format) {
+  public void setFormat(@javax.annotation.Nonnull FormatEnum format) {
     this.format = format;
   }
 
@@ -481,7 +481,7 @@ public class UpdateEndpointRequest {
     openapiFields = new HashSet<String>(Arrays.asList("url", "description", "is_active", "allowed_ips", "event_filter", "custom_headers", "retry_policy", "routing_strategy", "fallback_url", "format"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("url", "description", "is_active", "allowed_ips", "event_filter", "retry_policy", "routing_strategy", "fallback_url", "format"));
   }
 
   /**
@@ -504,42 +504,47 @@ public class UpdateEndpointRequest {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `UpdateEndpointRequest` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : UpdateEndpointRequest.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("url") != null && !jsonObj.get("url").isJsonNull()) && !jsonObj.get("url").isJsonPrimitive()) {
+      if (!jsonObj.get("url").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `url` to be a primitive type in the JSON string but got `%s`", jsonObj.get("url").toString()));
       }
-      if ((jsonObj.get("description") != null && !jsonObj.get("description").isJsonNull()) && !jsonObj.get("description").isJsonPrimitive()) {
+      if (!jsonObj.get("description").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `description` to be a primitive type in the JSON string but got `%s`", jsonObj.get("description").toString()));
       }
-      // ensure the optional json data is an array if present
-      if (jsonObj.get("allowed_ips") != null && !jsonObj.get("allowed_ips").isJsonNull() && !jsonObj.get("allowed_ips").isJsonArray()) {
+      // ensure the required json array is present
+      if (jsonObj.get("allowed_ips") == null) {
+        throw new IllegalArgumentException("Expected the field `linkedContent` to be an array in the JSON string but got `null`");
+      } else if (!jsonObj.get("allowed_ips").isJsonArray()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `allowed_ips` to be an array in the JSON string but got `%s`", jsonObj.get("allowed_ips").toString()));
       }
-      // ensure the optional json data is an array if present
-      if (jsonObj.get("event_filter") != null && !jsonObj.get("event_filter").isJsonNull() && !jsonObj.get("event_filter").isJsonArray()) {
+      // ensure the required json array is present
+      if (jsonObj.get("event_filter") == null) {
+        throw new IllegalArgumentException("Expected the field `linkedContent` to be an array in the JSON string but got `null`");
+      } else if (!jsonObj.get("event_filter").isJsonArray()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `event_filter` to be an array in the JSON string but got `%s`", jsonObj.get("event_filter").toString()));
       }
-      // validate the optional field `retry_policy`
-      if (jsonObj.get("retry_policy") != null && !jsonObj.get("retry_policy").isJsonNull()) {
-        RetryPolicy.validateJsonElement(jsonObj.get("retry_policy"));
-      }
-      if ((jsonObj.get("routing_strategy") != null && !jsonObj.get("routing_strategy").isJsonNull()) && !jsonObj.get("routing_strategy").isJsonPrimitive()) {
+      // validate the required field `retry_policy`
+      RetryPolicy.validateJsonElement(jsonObj.get("retry_policy"));
+      if (!jsonObj.get("routing_strategy").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `routing_strategy` to be a primitive type in the JSON string but got `%s`", jsonObj.get("routing_strategy").toString()));
       }
-      // validate the optional field `routing_strategy`
-      if (jsonObj.get("routing_strategy") != null && !jsonObj.get("routing_strategy").isJsonNull()) {
-        RoutingStrategyEnum.validateJsonElement(jsonObj.get("routing_strategy"));
-      }
-      if ((jsonObj.get("fallback_url") != null && !jsonObj.get("fallback_url").isJsonNull()) && !jsonObj.get("fallback_url").isJsonPrimitive()) {
+      // validate the required field `routing_strategy`
+      RoutingStrategyEnum.validateJsonElement(jsonObj.get("routing_strategy"));
+      if (!jsonObj.get("fallback_url").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `fallback_url` to be a primitive type in the JSON string but got `%s`", jsonObj.get("fallback_url").toString()));
       }
-      if ((jsonObj.get("format") != null && !jsonObj.get("format").isJsonNull()) && !jsonObj.get("format").isJsonPrimitive()) {
+      if (!jsonObj.get("format").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `format` to be a primitive type in the JSON string but got `%s`", jsonObj.get("format").toString()));
       }
-      // validate the optional field `format`
-      if (jsonObj.get("format") != null && !jsonObj.get("format").isJsonNull()) {
-        FormatEnum.validateJsonElement(jsonObj.get("format"));
-      }
+      // validate the required field `format`
+      FormatEnum.validateJsonElement(jsonObj.get("format"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

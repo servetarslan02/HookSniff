@@ -4,18 +4,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Title** | Pointer to **string** |  | [optional] 
-**Body** | Pointer to **string** |  | [optional] 
-**IsRead** | Pointer to **bool** |  | [optional] 
+**Id** | **string** |  | 
+**Title** | **string** |  | 
+**Body** | **string** |  | 
+**IsRead** | **bool** |  | 
 **Link** | Pointer to **NullableString** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewNotification
 
-`func NewNotification() *Notification`
+`func NewNotification(id string, title string, body string, isRead bool, createdAt time.Time, ) *Notification`
 
 NewNotification instantiates a new Notification object
 This constructor will assign default values to properties that have it defined,
@@ -49,11 +49,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *Notification) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetTitle
 
@@ -74,11 +69,6 @@ and a boolean to check if the value has been set.
 
 SetTitle sets Title field to given value.
 
-### HasTitle
-
-`func (o *Notification) HasTitle() bool`
-
-HasTitle returns a boolean if a field has been set.
 
 ### GetBody
 
@@ -99,11 +89,6 @@ and a boolean to check if the value has been set.
 
 SetBody sets Body field to given value.
 
-### HasBody
-
-`func (o *Notification) HasBody() bool`
-
-HasBody returns a boolean if a field has been set.
 
 ### GetIsRead
 
@@ -124,11 +109,6 @@ and a boolean to check if the value has been set.
 
 SetIsRead sets IsRead field to given value.
 
-### HasIsRead
-
-`func (o *Notification) HasIsRead() bool`
-
-HasIsRead returns a boolean if a field has been set.
 
 ### GetLink
 
@@ -184,11 +164,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *Notification) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

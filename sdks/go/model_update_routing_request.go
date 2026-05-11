@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the UpdateRoutingRequest type satisfies the MappedNullable interface at compile time
@@ -20,16 +22,20 @@ var _ MappedNullable = &UpdateRoutingRequest{}
 
 // UpdateRoutingRequest struct for UpdateRoutingRequest
 type UpdateRoutingRequest struct {
-	RoutingStrategy *string `json:"routing_strategy,omitempty"`
-	FallbackUrl *string `json:"fallback_url,omitempty"`
+	RoutingStrategy string `json:"routing_strategy"`
+	FallbackUrl string `json:"fallback_url"`
 }
+
+type _UpdateRoutingRequest UpdateRoutingRequest
 
 // NewUpdateRoutingRequest instantiates a new UpdateRoutingRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUpdateRoutingRequest() *UpdateRoutingRequest {
+func NewUpdateRoutingRequest(routingStrategy string, fallbackUrl string) *UpdateRoutingRequest {
 	this := UpdateRoutingRequest{}
+	this.RoutingStrategy = routingStrategy
+	this.FallbackUrl = fallbackUrl
 	return &this
 }
 
@@ -41,68 +47,52 @@ func NewUpdateRoutingRequestWithDefaults() *UpdateRoutingRequest {
 	return &this
 }
 
-// GetRoutingStrategy returns the RoutingStrategy field value if set, zero value otherwise.
+// GetRoutingStrategy returns the RoutingStrategy field value
 func (o *UpdateRoutingRequest) GetRoutingStrategy() string {
-	if o == nil || IsNil(o.RoutingStrategy) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.RoutingStrategy
+
+	return o.RoutingStrategy
 }
 
-// GetRoutingStrategyOk returns a tuple with the RoutingStrategy field value if set, nil otherwise
+// GetRoutingStrategyOk returns a tuple with the RoutingStrategy field value
 // and a boolean to check if the value has been set.
 func (o *UpdateRoutingRequest) GetRoutingStrategyOk() (*string, bool) {
-	if o == nil || IsNil(o.RoutingStrategy) {
+	if o == nil {
 		return nil, false
 	}
-	return o.RoutingStrategy, true
+	return &o.RoutingStrategy, true
 }
 
-// HasRoutingStrategy returns a boolean if a field has been set.
-func (o *UpdateRoutingRequest) HasRoutingStrategy() bool {
-	if o != nil && !IsNil(o.RoutingStrategy) {
-		return true
-	}
-
-	return false
-}
-
-// SetRoutingStrategy gets a reference to the given string and assigns it to the RoutingStrategy field.
+// SetRoutingStrategy sets field value
 func (o *UpdateRoutingRequest) SetRoutingStrategy(v string) {
-	o.RoutingStrategy = &v
+	o.RoutingStrategy = v
 }
 
-// GetFallbackUrl returns the FallbackUrl field value if set, zero value otherwise.
+// GetFallbackUrl returns the FallbackUrl field value
 func (o *UpdateRoutingRequest) GetFallbackUrl() string {
-	if o == nil || IsNil(o.FallbackUrl) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.FallbackUrl
+
+	return o.FallbackUrl
 }
 
-// GetFallbackUrlOk returns a tuple with the FallbackUrl field value if set, nil otherwise
+// GetFallbackUrlOk returns a tuple with the FallbackUrl field value
 // and a boolean to check if the value has been set.
 func (o *UpdateRoutingRequest) GetFallbackUrlOk() (*string, bool) {
-	if o == nil || IsNil(o.FallbackUrl) {
+	if o == nil {
 		return nil, false
 	}
-	return o.FallbackUrl, true
+	return &o.FallbackUrl, true
 }
 
-// HasFallbackUrl returns a boolean if a field has been set.
-func (o *UpdateRoutingRequest) HasFallbackUrl() bool {
-	if o != nil && !IsNil(o.FallbackUrl) {
-		return true
-	}
-
-	return false
-}
-
-// SetFallbackUrl gets a reference to the given string and assigns it to the FallbackUrl field.
+// SetFallbackUrl sets field value
 func (o *UpdateRoutingRequest) SetFallbackUrl(v string) {
-	o.FallbackUrl = &v
+	o.FallbackUrl = v
 }
 
 func (o UpdateRoutingRequest) MarshalJSON() ([]byte, error) {
@@ -115,13 +105,47 @@ func (o UpdateRoutingRequest) MarshalJSON() ([]byte, error) {
 
 func (o UpdateRoutingRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.RoutingStrategy) {
-		toSerialize["routing_strategy"] = o.RoutingStrategy
-	}
-	if !IsNil(o.FallbackUrl) {
-		toSerialize["fallback_url"] = o.FallbackUrl
-	}
+	toSerialize["routing_strategy"] = o.RoutingStrategy
+	toSerialize["fallback_url"] = o.FallbackUrl
 	return toSerialize, nil
+}
+
+func (o *UpdateRoutingRequest) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"routing_strategy",
+		"fallback_url",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varUpdateRoutingRequest := _UpdateRoutingRequest{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varUpdateRoutingRequest)
+
+	if err != nil {
+		return err
+	}
+
+	*o = UpdateRoutingRequest(varUpdateRoutingRequest)
+
+	return err
 }
 
 type NullableUpdateRoutingRequest struct {

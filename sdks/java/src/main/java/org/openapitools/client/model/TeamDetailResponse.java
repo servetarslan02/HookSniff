@@ -53,27 +53,27 @@ import org.openapitools.client.JSON;
 /**
  * TeamDetailResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class TeamDetailResponse {
   public static final String SERIALIZED_NAME_TEAM = "team";
   @SerializedName(SERIALIZED_NAME_TEAM)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Team team;
 
   public static final String SERIALIZED_NAME_MEMBERS = "members";
   @SerializedName(SERIALIZED_NAME_MEMBERS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<TeamMember> members = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_INVITES = "invites";
   @SerializedName(SERIALIZED_NAME_INVITES)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<TeamInvite> invites = new ArrayList<>();
 
   public TeamDetailResponse() {
   }
 
-  public TeamDetailResponse team(@javax.annotation.Nullable Team team) {
+  public TeamDetailResponse team(@javax.annotation.Nonnull Team team) {
     this.team = team;
     return this;
   }
@@ -82,17 +82,17 @@ public class TeamDetailResponse {
    * Get team
    * @return team
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Team getTeam() {
     return team;
   }
 
-  public void setTeam(@javax.annotation.Nullable Team team) {
+  public void setTeam(@javax.annotation.Nonnull Team team) {
     this.team = team;
   }
 
 
-  public TeamDetailResponse members(@javax.annotation.Nullable List<TeamMember> members) {
+  public TeamDetailResponse members(@javax.annotation.Nonnull List<TeamMember> members) {
     this.members = members;
     return this;
   }
@@ -109,17 +109,17 @@ public class TeamDetailResponse {
    * Get members
    * @return members
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<TeamMember> getMembers() {
     return members;
   }
 
-  public void setMembers(@javax.annotation.Nullable List<TeamMember> members) {
+  public void setMembers(@javax.annotation.Nonnull List<TeamMember> members) {
     this.members = members;
   }
 
 
-  public TeamDetailResponse invites(@javax.annotation.Nullable List<TeamInvite> invites) {
+  public TeamDetailResponse invites(@javax.annotation.Nonnull List<TeamInvite> invites) {
     this.invites = invites;
     return this;
   }
@@ -136,12 +136,12 @@ public class TeamDetailResponse {
    * Get invites
    * @return invites
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<TeamInvite> getInvites() {
     return invites;
   }
 
-  public void setInvites(@javax.annotation.Nullable List<TeamInvite> invites) {
+  public void setInvites(@javax.annotation.Nonnull List<TeamInvite> invites) {
     this.invites = invites;
   }
 
@@ -194,7 +194,7 @@ public class TeamDetailResponse {
     openapiFields = new HashSet<String>(Arrays.asList("team", "members", "invites"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("team", "members", "invites"));
   }
 
   /**
@@ -217,37 +217,34 @@ public class TeamDetailResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `TeamDetailResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      // validate the optional field `team`
-      if (jsonObj.get("team") != null && !jsonObj.get("team").isJsonNull()) {
-        Team.validateJsonElement(jsonObj.get("team"));
-      }
-      if (jsonObj.get("members") != null && !jsonObj.get("members").isJsonNull()) {
-        JsonArray jsonArraymembers = jsonObj.getAsJsonArray("members");
-        if (jsonArraymembers != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("members").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `members` to be an array in the JSON string but got `%s`", jsonObj.get("members").toString()));
-          }
 
-          // validate the optional field `members` (array)
-          for (int i = 0; i < jsonArraymembers.size(); i++) {
-            TeamMember.validateJsonElement(jsonArraymembers.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : TeamDetailResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
-      if (jsonObj.get("invites") != null && !jsonObj.get("invites").isJsonNull()) {
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      // validate the required field `team`
+      Team.validateJsonElement(jsonObj.get("team"));
+      if (jsonObj.get("members") != null) {
+        if (!jsonObj.get("members").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `members` to be an array in the JSON string but got `%s`", jsonObj.get("members").toString()));
+        }
+        JsonArray jsonArraymembers = jsonObj.getAsJsonArray("members");
+        // validate the required field `members` (array)
+        for (int i = 0; i < jsonArraymembers.size(); i++) {
+          TeamMember.validateJsonElement(jsonArraymembers.get(i));
+        }
+      }
+      if (jsonObj.get("invites") != null) {
+        if (!jsonObj.get("invites").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `invites` to be an array in the JSON string but got `%s`", jsonObj.get("invites").toString()));
+        }
         JsonArray jsonArrayinvites = jsonObj.getAsJsonArray("invites");
-        if (jsonArrayinvites != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("invites").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `invites` to be an array in the JSON string but got `%s`", jsonObj.get("invites").toString()));
-          }
-
-          // validate the optional field `invites` (array)
-          for (int i = 0; i < jsonArrayinvites.size(); i++) {
-            TeamInvite.validateJsonElement(jsonArrayinvites.get(i));
-          };
+        // validate the required field `invites` (array)
+        for (int i = 0; i < jsonArrayinvites.size(); i++) {
+          TeamInvite.validateJsonElement(jsonArrayinvites.get(i));
         }
       }
   }

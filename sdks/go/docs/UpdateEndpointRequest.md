@@ -4,22 +4,22 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Url** | Pointer to **string** |  | [optional] 
-**Description** | Pointer to **string** |  | [optional] 
-**IsActive** | Pointer to **bool** |  | [optional] 
-**AllowedIps** | Pointer to **[]string** |  | [optional] 
-**EventFilter** | Pointer to **[]string** |  | [optional] 
+**Url** | **string** |  | 
+**Description** | **string** |  | 
+**IsActive** | **bool** |  | 
+**AllowedIps** | **[]string** |  | 
+**EventFilter** | **[]string** |  | 
 **CustomHeaders** | Pointer to **map[string]interface{}** |  | [optional] 
-**RetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
-**RoutingStrategy** | Pointer to **string** |  | [optional] 
-**FallbackUrl** | Pointer to **string** |  | [optional] 
-**Format** | Pointer to **string** |  | [optional] 
+**RetryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  | 
+**RoutingStrategy** | **string** |  | 
+**FallbackUrl** | **string** |  | 
+**Format** | **string** |  | 
 
 ## Methods
 
 ### NewUpdateEndpointRequest
 
-`func NewUpdateEndpointRequest() *UpdateEndpointRequest`
+`func NewUpdateEndpointRequest(url string, description string, isActive bool, allowedIps []string, eventFilter []string, retryPolicy RetryPolicy, routingStrategy string, fallbackUrl string, format string, ) *UpdateEndpointRequest`
 
 NewUpdateEndpointRequest instantiates a new UpdateEndpointRequest object
 This constructor will assign default values to properties that have it defined,
@@ -53,11 +53,6 @@ and a boolean to check if the value has been set.
 
 SetUrl sets Url field to given value.
 
-### HasUrl
-
-`func (o *UpdateEndpointRequest) HasUrl() bool`
-
-HasUrl returns a boolean if a field has been set.
 
 ### GetDescription
 
@@ -78,11 +73,6 @@ and a boolean to check if the value has been set.
 
 SetDescription sets Description field to given value.
 
-### HasDescription
-
-`func (o *UpdateEndpointRequest) HasDescription() bool`
-
-HasDescription returns a boolean if a field has been set.
 
 ### GetIsActive
 
@@ -103,11 +93,6 @@ and a boolean to check if the value has been set.
 
 SetIsActive sets IsActive field to given value.
 
-### HasIsActive
-
-`func (o *UpdateEndpointRequest) HasIsActive() bool`
-
-HasIsActive returns a boolean if a field has been set.
 
 ### GetAllowedIps
 
@@ -128,11 +113,6 @@ and a boolean to check if the value has been set.
 
 SetAllowedIps sets AllowedIps field to given value.
 
-### HasAllowedIps
-
-`func (o *UpdateEndpointRequest) HasAllowedIps() bool`
-
-HasAllowedIps returns a boolean if a field has been set.
 
 ### GetEventFilter
 
@@ -153,11 +133,6 @@ and a boolean to check if the value has been set.
 
 SetEventFilter sets EventFilter field to given value.
 
-### HasEventFilter
-
-`func (o *UpdateEndpointRequest) HasEventFilter() bool`
-
-HasEventFilter returns a boolean if a field has been set.
 
 ### GetCustomHeaders
 
@@ -203,11 +178,6 @@ and a boolean to check if the value has been set.
 
 SetRetryPolicy sets RetryPolicy field to given value.
 
-### HasRetryPolicy
-
-`func (o *UpdateEndpointRequest) HasRetryPolicy() bool`
-
-HasRetryPolicy returns a boolean if a field has been set.
 
 ### GetRoutingStrategy
 
@@ -228,11 +198,6 @@ and a boolean to check if the value has been set.
 
 SetRoutingStrategy sets RoutingStrategy field to given value.
 
-### HasRoutingStrategy
-
-`func (o *UpdateEndpointRequest) HasRoutingStrategy() bool`
-
-HasRoutingStrategy returns a boolean if a field has been set.
 
 ### GetFallbackUrl
 
@@ -253,11 +218,6 @@ and a boolean to check if the value has been set.
 
 SetFallbackUrl sets FallbackUrl field to given value.
 
-### HasFallbackUrl
-
-`func (o *UpdateEndpointRequest) HasFallbackUrl() bool`
-
-HasFallbackUrl returns a boolean if a field has been set.
 
 ### GetFormat
 
@@ -278,11 +238,6 @@ and a boolean to check if the value has been set.
 
 SetFormat sets Format field to given value.
 
-### HasFormat
-
-`func (o *UpdateEndpointRequest) HasFormat() bool`
-
-HasFormat returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

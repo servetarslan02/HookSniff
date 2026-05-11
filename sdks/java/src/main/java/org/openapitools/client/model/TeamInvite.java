@@ -50,32 +50,32 @@ import org.openapitools.client.JSON;
 /**
  * TeamInvite
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class TeamInvite {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_EMAIL = "email";
   @SerializedName(SERIALIZED_NAME_EMAIL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String email;
 
   public static final String SERIALIZED_NAME_ROLE = "role";
   @SerializedName(SERIALIZED_NAME_ROLE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String role;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public TeamInvite() {
   }
 
-  public TeamInvite id(@javax.annotation.Nullable UUID id) {
+  public TeamInvite id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -84,17 +84,17 @@ public class TeamInvite {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public TeamInvite email(@javax.annotation.Nullable String email) {
+  public TeamInvite email(@javax.annotation.Nonnull String email) {
     this.email = email;
     return this;
   }
@@ -103,17 +103,17 @@ public class TeamInvite {
    * Get email
    * @return email
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getEmail() {
     return email;
   }
 
-  public void setEmail(@javax.annotation.Nullable String email) {
+  public void setEmail(@javax.annotation.Nonnull String email) {
     this.email = email;
   }
 
 
-  public TeamInvite role(@javax.annotation.Nullable String role) {
+  public TeamInvite role(@javax.annotation.Nonnull String role) {
     this.role = role;
     return this;
   }
@@ -122,17 +122,17 @@ public class TeamInvite {
    * Get role
    * @return role
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getRole() {
     return role;
   }
 
-  public void setRole(@javax.annotation.Nullable String role) {
+  public void setRole(@javax.annotation.Nonnull String role) {
     this.role = role;
   }
 
 
-  public TeamInvite createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public TeamInvite createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -141,12 +141,12 @@ public class TeamInvite {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -201,7 +201,7 @@ public class TeamInvite {
     openapiFields = new HashSet<String>(Arrays.asList("id", "email", "role", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "email", "role", "created_at"));
   }
 
   /**
@@ -224,14 +224,21 @@ public class TeamInvite {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `TeamInvite` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : TeamInvite.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("email") != null && !jsonObj.get("email").isJsonNull()) && !jsonObj.get("email").isJsonPrimitive()) {
+      if (!jsonObj.get("email").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `email` to be a primitive type in the JSON string but got `%s`", jsonObj.get("email").toString()));
       }
-      if ((jsonObj.get("role") != null && !jsonObj.get("role").isJsonNull()) && !jsonObj.get("role").isJsonPrimitive()) {
+      if (!jsonObj.get("role").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `role` to be a primitive type in the JSON string but got `%s`", jsonObj.get("role").toString()));
       }
   }

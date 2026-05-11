@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the DeviceTokenResponse type satisfies the MappedNullable interface at compile time
@@ -21,18 +23,24 @@ var _ MappedNullable = &DeviceTokenResponse{}
 
 // DeviceTokenResponse struct for DeviceTokenResponse
 type DeviceTokenResponse struct {
-	Id *string `json:"id,omitempty"`
-	Token *string `json:"token,omitempty"`
-	Platform *string `json:"platform,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Id string `json:"id"`
+	Token string `json:"token"`
+	Platform string `json:"platform"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _DeviceTokenResponse DeviceTokenResponse
 
 // NewDeviceTokenResponse instantiates a new DeviceTokenResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeviceTokenResponse() *DeviceTokenResponse {
+func NewDeviceTokenResponse(id string, token string, platform string, createdAt time.Time) *DeviceTokenResponse {
 	this := DeviceTokenResponse{}
+	this.Id = id
+	this.Token = token
+	this.Platform = platform
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -44,132 +52,100 @@ func NewDeviceTokenResponseWithDefaults() *DeviceTokenResponse {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *DeviceTokenResponse) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *DeviceTokenResponse) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *DeviceTokenResponse) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *DeviceTokenResponse) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetToken returns the Token field value if set, zero value otherwise.
+// GetToken returns the Token field value
 func (o *DeviceTokenResponse) GetToken() string {
-	if o == nil || IsNil(o.Token) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Token
+
+	return o.Token
 }
 
-// GetTokenOk returns a tuple with the Token field value if set, nil otherwise
+// GetTokenOk returns a tuple with the Token field value
 // and a boolean to check if the value has been set.
 func (o *DeviceTokenResponse) GetTokenOk() (*string, bool) {
-	if o == nil || IsNil(o.Token) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Token, true
+	return &o.Token, true
 }
 
-// HasToken returns a boolean if a field has been set.
-func (o *DeviceTokenResponse) HasToken() bool {
-	if o != nil && !IsNil(o.Token) {
-		return true
-	}
-
-	return false
-}
-
-// SetToken gets a reference to the given string and assigns it to the Token field.
+// SetToken sets field value
 func (o *DeviceTokenResponse) SetToken(v string) {
-	o.Token = &v
+	o.Token = v
 }
 
-// GetPlatform returns the Platform field value if set, zero value otherwise.
+// GetPlatform returns the Platform field value
 func (o *DeviceTokenResponse) GetPlatform() string {
-	if o == nil || IsNil(o.Platform) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Platform
+
+	return o.Platform
 }
 
-// GetPlatformOk returns a tuple with the Platform field value if set, nil otherwise
+// GetPlatformOk returns a tuple with the Platform field value
 // and a boolean to check if the value has been set.
 func (o *DeviceTokenResponse) GetPlatformOk() (*string, bool) {
-	if o == nil || IsNil(o.Platform) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Platform, true
+	return &o.Platform, true
 }
 
-// HasPlatform returns a boolean if a field has been set.
-func (o *DeviceTokenResponse) HasPlatform() bool {
-	if o != nil && !IsNil(o.Platform) {
-		return true
-	}
-
-	return false
-}
-
-// SetPlatform gets a reference to the given string and assigns it to the Platform field.
+// SetPlatform sets field value
 func (o *DeviceTokenResponse) SetPlatform(v string) {
-	o.Platform = &v
+	o.Platform = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *DeviceTokenResponse) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *DeviceTokenResponse) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *DeviceTokenResponse) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *DeviceTokenResponse) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o DeviceTokenResponse) MarshalJSON() ([]byte, error) {
@@ -182,19 +158,51 @@ func (o DeviceTokenResponse) MarshalJSON() ([]byte, error) {
 
 func (o DeviceTokenResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Token) {
-		toSerialize["token"] = o.Token
-	}
-	if !IsNil(o.Platform) {
-		toSerialize["platform"] = o.Platform
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["token"] = o.Token
+	toSerialize["platform"] = o.Platform
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *DeviceTokenResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"token",
+		"platform",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDeviceTokenResponse := _DeviceTokenResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDeviceTokenResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = DeviceTokenResponse(varDeviceTokenResponse)
+
+	return err
 }
 
 type NullableDeviceTokenResponse struct {

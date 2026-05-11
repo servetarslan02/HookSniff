@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Team** | Pointer to [**Team**](Team.md) |  | [optional] 
-**Members** | Pointer to [**[]TeamMember**](TeamMember.md) |  | [optional] 
-**Invites** | Pointer to [**[]TeamInvite**](TeamInvite.md) |  | [optional] 
+**Team** | [**Team**](Team.md) |  | 
+**Members** | [**[]TeamMember**](TeamMember.md) |  | 
+**Invites** | [**[]TeamInvite**](TeamInvite.md) |  | 
 
 ## Methods
 
 ### NewTeamDetailResponse
 
-`func NewTeamDetailResponse() *TeamDetailResponse`
+`func NewTeamDetailResponse(team Team, members []TeamMember, invites []TeamInvite, ) *TeamDetailResponse`
 
 NewTeamDetailResponse instantiates a new TeamDetailResponse object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetTeam sets Team field to given value.
 
-### HasTeam
-
-`func (o *TeamDetailResponse) HasTeam() bool`
-
-HasTeam returns a boolean if a field has been set.
 
 ### GetMembers
 
@@ -71,11 +66,6 @@ and a boolean to check if the value has been set.
 
 SetMembers sets Members field to given value.
 
-### HasMembers
-
-`func (o *TeamDetailResponse) HasMembers() bool`
-
-HasMembers returns a boolean if a field has been set.
 
 ### GetInvites
 
@@ -96,11 +86,6 @@ and a boolean to check if the value has been set.
 
 SetInvites sets Invites field to given value.
 
-### HasInvites
-
-`func (o *TeamDetailResponse) HasInvites() bool`
-
-HasInvites returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

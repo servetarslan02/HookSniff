@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the StatsResponse type satisfies the MappedNullable interface at compile time
@@ -20,22 +22,32 @@ var _ MappedNullable = &StatsResponse{}
 
 // StatsResponse struct for StatsResponse
 type StatsResponse struct {
-	TotalDeliveries *int32 `json:"total_deliveries,omitempty"`
-	SuccessfulDeliveries *int32 `json:"successful_deliveries,omitempty"`
-	FailedDeliveries *int32 `json:"failed_deliveries,omitempty"`
-	TotalEndpoints *int32 `json:"total_endpoints,omitempty"`
-	ActiveEndpoints *int32 `json:"active_endpoints,omitempty"`
-	Plan *string `json:"plan,omitempty"`
-	WebhookLimit *int32 `json:"webhook_limit,omitempty"`
-	WebhookCount *int32 `json:"webhook_count,omitempty"`
+	TotalDeliveries int32 `json:"total_deliveries"`
+	SuccessfulDeliveries int32 `json:"successful_deliveries"`
+	FailedDeliveries int32 `json:"failed_deliveries"`
+	TotalEndpoints int32 `json:"total_endpoints"`
+	ActiveEndpoints int32 `json:"active_endpoints"`
+	Plan string `json:"plan"`
+	WebhookLimit int32 `json:"webhook_limit"`
+	WebhookCount int32 `json:"webhook_count"`
 }
+
+type _StatsResponse StatsResponse
 
 // NewStatsResponse instantiates a new StatsResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewStatsResponse() *StatsResponse {
+func NewStatsResponse(totalDeliveries int32, successfulDeliveries int32, failedDeliveries int32, totalEndpoints int32, activeEndpoints int32, plan string, webhookLimit int32, webhookCount int32) *StatsResponse {
 	this := StatsResponse{}
+	this.TotalDeliveries = totalDeliveries
+	this.SuccessfulDeliveries = successfulDeliveries
+	this.FailedDeliveries = failedDeliveries
+	this.TotalEndpoints = totalEndpoints
+	this.ActiveEndpoints = activeEndpoints
+	this.Plan = plan
+	this.WebhookLimit = webhookLimit
+	this.WebhookCount = webhookCount
 	return &this
 }
 
@@ -47,260 +59,196 @@ func NewStatsResponseWithDefaults() *StatsResponse {
 	return &this
 }
 
-// GetTotalDeliveries returns the TotalDeliveries field value if set, zero value otherwise.
+// GetTotalDeliveries returns the TotalDeliveries field value
 func (o *StatsResponse) GetTotalDeliveries() int32 {
-	if o == nil || IsNil(o.TotalDeliveries) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.TotalDeliveries
+
+	return o.TotalDeliveries
 }
 
-// GetTotalDeliveriesOk returns a tuple with the TotalDeliveries field value if set, nil otherwise
+// GetTotalDeliveriesOk returns a tuple with the TotalDeliveries field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetTotalDeliveriesOk() (*int32, bool) {
-	if o == nil || IsNil(o.TotalDeliveries) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TotalDeliveries, true
+	return &o.TotalDeliveries, true
 }
 
-// HasTotalDeliveries returns a boolean if a field has been set.
-func (o *StatsResponse) HasTotalDeliveries() bool {
-	if o != nil && !IsNil(o.TotalDeliveries) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotalDeliveries gets a reference to the given int32 and assigns it to the TotalDeliveries field.
+// SetTotalDeliveries sets field value
 func (o *StatsResponse) SetTotalDeliveries(v int32) {
-	o.TotalDeliveries = &v
+	o.TotalDeliveries = v
 }
 
-// GetSuccessfulDeliveries returns the SuccessfulDeliveries field value if set, zero value otherwise.
+// GetSuccessfulDeliveries returns the SuccessfulDeliveries field value
 func (o *StatsResponse) GetSuccessfulDeliveries() int32 {
-	if o == nil || IsNil(o.SuccessfulDeliveries) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.SuccessfulDeliveries
+
+	return o.SuccessfulDeliveries
 }
 
-// GetSuccessfulDeliveriesOk returns a tuple with the SuccessfulDeliveries field value if set, nil otherwise
+// GetSuccessfulDeliveriesOk returns a tuple with the SuccessfulDeliveries field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetSuccessfulDeliveriesOk() (*int32, bool) {
-	if o == nil || IsNil(o.SuccessfulDeliveries) {
+	if o == nil {
 		return nil, false
 	}
-	return o.SuccessfulDeliveries, true
+	return &o.SuccessfulDeliveries, true
 }
 
-// HasSuccessfulDeliveries returns a boolean if a field has been set.
-func (o *StatsResponse) HasSuccessfulDeliveries() bool {
-	if o != nil && !IsNil(o.SuccessfulDeliveries) {
-		return true
-	}
-
-	return false
-}
-
-// SetSuccessfulDeliveries gets a reference to the given int32 and assigns it to the SuccessfulDeliveries field.
+// SetSuccessfulDeliveries sets field value
 func (o *StatsResponse) SetSuccessfulDeliveries(v int32) {
-	o.SuccessfulDeliveries = &v
+	o.SuccessfulDeliveries = v
 }
 
-// GetFailedDeliveries returns the FailedDeliveries field value if set, zero value otherwise.
+// GetFailedDeliveries returns the FailedDeliveries field value
 func (o *StatsResponse) GetFailedDeliveries() int32 {
-	if o == nil || IsNil(o.FailedDeliveries) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.FailedDeliveries
+
+	return o.FailedDeliveries
 }
 
-// GetFailedDeliveriesOk returns a tuple with the FailedDeliveries field value if set, nil otherwise
+// GetFailedDeliveriesOk returns a tuple with the FailedDeliveries field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetFailedDeliveriesOk() (*int32, bool) {
-	if o == nil || IsNil(o.FailedDeliveries) {
+	if o == nil {
 		return nil, false
 	}
-	return o.FailedDeliveries, true
+	return &o.FailedDeliveries, true
 }
 
-// HasFailedDeliveries returns a boolean if a field has been set.
-func (o *StatsResponse) HasFailedDeliveries() bool {
-	if o != nil && !IsNil(o.FailedDeliveries) {
-		return true
-	}
-
-	return false
-}
-
-// SetFailedDeliveries gets a reference to the given int32 and assigns it to the FailedDeliveries field.
+// SetFailedDeliveries sets field value
 func (o *StatsResponse) SetFailedDeliveries(v int32) {
-	o.FailedDeliveries = &v
+	o.FailedDeliveries = v
 }
 
-// GetTotalEndpoints returns the TotalEndpoints field value if set, zero value otherwise.
+// GetTotalEndpoints returns the TotalEndpoints field value
 func (o *StatsResponse) GetTotalEndpoints() int32 {
-	if o == nil || IsNil(o.TotalEndpoints) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.TotalEndpoints
+
+	return o.TotalEndpoints
 }
 
-// GetTotalEndpointsOk returns a tuple with the TotalEndpoints field value if set, nil otherwise
+// GetTotalEndpointsOk returns a tuple with the TotalEndpoints field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetTotalEndpointsOk() (*int32, bool) {
-	if o == nil || IsNil(o.TotalEndpoints) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TotalEndpoints, true
+	return &o.TotalEndpoints, true
 }
 
-// HasTotalEndpoints returns a boolean if a field has been set.
-func (o *StatsResponse) HasTotalEndpoints() bool {
-	if o != nil && !IsNil(o.TotalEndpoints) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotalEndpoints gets a reference to the given int32 and assigns it to the TotalEndpoints field.
+// SetTotalEndpoints sets field value
 func (o *StatsResponse) SetTotalEndpoints(v int32) {
-	o.TotalEndpoints = &v
+	o.TotalEndpoints = v
 }
 
-// GetActiveEndpoints returns the ActiveEndpoints field value if set, zero value otherwise.
+// GetActiveEndpoints returns the ActiveEndpoints field value
 func (o *StatsResponse) GetActiveEndpoints() int32 {
-	if o == nil || IsNil(o.ActiveEndpoints) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.ActiveEndpoints
+
+	return o.ActiveEndpoints
 }
 
-// GetActiveEndpointsOk returns a tuple with the ActiveEndpoints field value if set, nil otherwise
+// GetActiveEndpointsOk returns a tuple with the ActiveEndpoints field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetActiveEndpointsOk() (*int32, bool) {
-	if o == nil || IsNil(o.ActiveEndpoints) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ActiveEndpoints, true
+	return &o.ActiveEndpoints, true
 }
 
-// HasActiveEndpoints returns a boolean if a field has been set.
-func (o *StatsResponse) HasActiveEndpoints() bool {
-	if o != nil && !IsNil(o.ActiveEndpoints) {
-		return true
-	}
-
-	return false
-}
-
-// SetActiveEndpoints gets a reference to the given int32 and assigns it to the ActiveEndpoints field.
+// SetActiveEndpoints sets field value
 func (o *StatsResponse) SetActiveEndpoints(v int32) {
-	o.ActiveEndpoints = &v
+	o.ActiveEndpoints = v
 }
 
-// GetPlan returns the Plan field value if set, zero value otherwise.
+// GetPlan returns the Plan field value
 func (o *StatsResponse) GetPlan() string {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Plan
+
+	return o.Plan
 }
 
-// GetPlanOk returns a tuple with the Plan field value if set, nil otherwise
+// GetPlanOk returns a tuple with the Plan field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetPlanOk() (*string, bool) {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Plan, true
+	return &o.Plan, true
 }
 
-// HasPlan returns a boolean if a field has been set.
-func (o *StatsResponse) HasPlan() bool {
-	if o != nil && !IsNil(o.Plan) {
-		return true
-	}
-
-	return false
-}
-
-// SetPlan gets a reference to the given string and assigns it to the Plan field.
+// SetPlan sets field value
 func (o *StatsResponse) SetPlan(v string) {
-	o.Plan = &v
+	o.Plan = v
 }
 
-// GetWebhookLimit returns the WebhookLimit field value if set, zero value otherwise.
+// GetWebhookLimit returns the WebhookLimit field value
 func (o *StatsResponse) GetWebhookLimit() int32 {
-	if o == nil || IsNil(o.WebhookLimit) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WebhookLimit
+
+	return o.WebhookLimit
 }
 
-// GetWebhookLimitOk returns a tuple with the WebhookLimit field value if set, nil otherwise
+// GetWebhookLimitOk returns a tuple with the WebhookLimit field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetWebhookLimitOk() (*int32, bool) {
-	if o == nil || IsNil(o.WebhookLimit) {
+	if o == nil {
 		return nil, false
 	}
-	return o.WebhookLimit, true
+	return &o.WebhookLimit, true
 }
 
-// HasWebhookLimit returns a boolean if a field has been set.
-func (o *StatsResponse) HasWebhookLimit() bool {
-	if o != nil && !IsNil(o.WebhookLimit) {
-		return true
-	}
-
-	return false
-}
-
-// SetWebhookLimit gets a reference to the given int32 and assigns it to the WebhookLimit field.
+// SetWebhookLimit sets field value
 func (o *StatsResponse) SetWebhookLimit(v int32) {
-	o.WebhookLimit = &v
+	o.WebhookLimit = v
 }
 
-// GetWebhookCount returns the WebhookCount field value if set, zero value otherwise.
+// GetWebhookCount returns the WebhookCount field value
 func (o *StatsResponse) GetWebhookCount() int32 {
-	if o == nil || IsNil(o.WebhookCount) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WebhookCount
+
+	return o.WebhookCount
 }
 
-// GetWebhookCountOk returns a tuple with the WebhookCount field value if set, nil otherwise
+// GetWebhookCountOk returns a tuple with the WebhookCount field value
 // and a boolean to check if the value has been set.
 func (o *StatsResponse) GetWebhookCountOk() (*int32, bool) {
-	if o == nil || IsNil(o.WebhookCount) {
+	if o == nil {
 		return nil, false
 	}
-	return o.WebhookCount, true
+	return &o.WebhookCount, true
 }
 
-// HasWebhookCount returns a boolean if a field has been set.
-func (o *StatsResponse) HasWebhookCount() bool {
-	if o != nil && !IsNil(o.WebhookCount) {
-		return true
-	}
-
-	return false
-}
-
-// SetWebhookCount gets a reference to the given int32 and assigns it to the WebhookCount field.
+// SetWebhookCount sets field value
 func (o *StatsResponse) SetWebhookCount(v int32) {
-	o.WebhookCount = &v
+	o.WebhookCount = v
 }
 
 func (o StatsResponse) MarshalJSON() ([]byte, error) {
@@ -313,31 +261,59 @@ func (o StatsResponse) MarshalJSON() ([]byte, error) {
 
 func (o StatsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.TotalDeliveries) {
-		toSerialize["total_deliveries"] = o.TotalDeliveries
-	}
-	if !IsNil(o.SuccessfulDeliveries) {
-		toSerialize["successful_deliveries"] = o.SuccessfulDeliveries
-	}
-	if !IsNil(o.FailedDeliveries) {
-		toSerialize["failed_deliveries"] = o.FailedDeliveries
-	}
-	if !IsNil(o.TotalEndpoints) {
-		toSerialize["total_endpoints"] = o.TotalEndpoints
-	}
-	if !IsNil(o.ActiveEndpoints) {
-		toSerialize["active_endpoints"] = o.ActiveEndpoints
-	}
-	if !IsNil(o.Plan) {
-		toSerialize["plan"] = o.Plan
-	}
-	if !IsNil(o.WebhookLimit) {
-		toSerialize["webhook_limit"] = o.WebhookLimit
-	}
-	if !IsNil(o.WebhookCount) {
-		toSerialize["webhook_count"] = o.WebhookCount
-	}
+	toSerialize["total_deliveries"] = o.TotalDeliveries
+	toSerialize["successful_deliveries"] = o.SuccessfulDeliveries
+	toSerialize["failed_deliveries"] = o.FailedDeliveries
+	toSerialize["total_endpoints"] = o.TotalEndpoints
+	toSerialize["active_endpoints"] = o.ActiveEndpoints
+	toSerialize["plan"] = o.Plan
+	toSerialize["webhook_limit"] = o.WebhookLimit
+	toSerialize["webhook_count"] = o.WebhookCount
 	return toSerialize, nil
+}
+
+func (o *StatsResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"total_deliveries",
+		"successful_deliveries",
+		"failed_deliveries",
+		"total_endpoints",
+		"active_endpoints",
+		"plan",
+		"webhook_limit",
+		"webhook_count",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varStatsResponse := _StatsResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varStatsResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = StatsResponse(varStatsResponse)
+
+	return err
 }
 
 type NullableStatsResponse struct {

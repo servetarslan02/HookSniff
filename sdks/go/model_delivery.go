@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the Delivery type satisfies the MappedNullable interface at compile time
@@ -21,22 +23,30 @@ var _ MappedNullable = &Delivery{}
 
 // Delivery struct for Delivery
 type Delivery struct {
-	Id *string `json:"id,omitempty"`
-	EndpointId *string `json:"endpoint_id,omitempty"`
+	Id string `json:"id"`
+	EndpointId string `json:"endpoint_id"`
 	Event NullableString `json:"event,omitempty"`
-	Status *string `json:"status,omitempty"`
-	AttemptCount *int32 `json:"attempt_count,omitempty"`
+	Status string `json:"status"`
+	AttemptCount int32 `json:"attempt_count"`
 	ResponseStatus NullableInt32 `json:"response_status,omitempty"`
-	ReplayCount *int32 `json:"replay_count,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	ReplayCount int32 `json:"replay_count"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _Delivery Delivery
 
 // NewDelivery instantiates a new Delivery object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDelivery() *Delivery {
+func NewDelivery(id string, endpointId string, status string, attemptCount int32, replayCount int32, createdAt time.Time) *Delivery {
 	this := Delivery{}
+	this.Id = id
+	this.EndpointId = endpointId
+	this.Status = status
+	this.AttemptCount = attemptCount
+	this.ReplayCount = replayCount
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -48,68 +58,52 @@ func NewDeliveryWithDefaults() *Delivery {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *Delivery) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *Delivery) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *Delivery) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *Delivery) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetEndpointId returns the EndpointId field value if set, zero value otherwise.
+// GetEndpointId returns the EndpointId field value
 func (o *Delivery) GetEndpointId() string {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.EndpointId
+
+	return o.EndpointId
 }
 
-// GetEndpointIdOk returns a tuple with the EndpointId field value if set, nil otherwise
+// GetEndpointIdOk returns a tuple with the EndpointId field value
 // and a boolean to check if the value has been set.
 func (o *Delivery) GetEndpointIdOk() (*string, bool) {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EndpointId, true
+	return &o.EndpointId, true
 }
 
-// HasEndpointId returns a boolean if a field has been set.
-func (o *Delivery) HasEndpointId() bool {
-	if o != nil && !IsNil(o.EndpointId) {
-		return true
-	}
-
-	return false
-}
-
-// SetEndpointId gets a reference to the given string and assigns it to the EndpointId field.
+// SetEndpointId sets field value
 func (o *Delivery) SetEndpointId(v string) {
-	o.EndpointId = &v
+	o.EndpointId = v
 }
 
 // GetEvent returns the Event field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -154,68 +148,52 @@ func (o *Delivery) UnsetEvent() {
 	o.Event.Unset()
 }
 
-// GetStatus returns the Status field value if set, zero value otherwise.
+// GetStatus returns the Status field value
 func (o *Delivery) GetStatus() string {
-	if o == nil || IsNil(o.Status) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Status
+
+	return o.Status
 }
 
-// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
 func (o *Delivery) GetStatusOk() (*string, bool) {
-	if o == nil || IsNil(o.Status) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Status, true
+	return &o.Status, true
 }
 
-// HasStatus returns a boolean if a field has been set.
-func (o *Delivery) HasStatus() bool {
-	if o != nil && !IsNil(o.Status) {
-		return true
-	}
-
-	return false
-}
-
-// SetStatus gets a reference to the given string and assigns it to the Status field.
+// SetStatus sets field value
 func (o *Delivery) SetStatus(v string) {
-	o.Status = &v
+	o.Status = v
 }
 
-// GetAttemptCount returns the AttemptCount field value if set, zero value otherwise.
+// GetAttemptCount returns the AttemptCount field value
 func (o *Delivery) GetAttemptCount() int32 {
-	if o == nil || IsNil(o.AttemptCount) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.AttemptCount
+
+	return o.AttemptCount
 }
 
-// GetAttemptCountOk returns a tuple with the AttemptCount field value if set, nil otherwise
+// GetAttemptCountOk returns a tuple with the AttemptCount field value
 // and a boolean to check if the value has been set.
 func (o *Delivery) GetAttemptCountOk() (*int32, bool) {
-	if o == nil || IsNil(o.AttemptCount) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AttemptCount, true
+	return &o.AttemptCount, true
 }
 
-// HasAttemptCount returns a boolean if a field has been set.
-func (o *Delivery) HasAttemptCount() bool {
-	if o != nil && !IsNil(o.AttemptCount) {
-		return true
-	}
-
-	return false
-}
-
-// SetAttemptCount gets a reference to the given int32 and assigns it to the AttemptCount field.
+// SetAttemptCount sets field value
 func (o *Delivery) SetAttemptCount(v int32) {
-	o.AttemptCount = &v
+	o.AttemptCount = v
 }
 
 // GetResponseStatus returns the ResponseStatus field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -260,68 +238,52 @@ func (o *Delivery) UnsetResponseStatus() {
 	o.ResponseStatus.Unset()
 }
 
-// GetReplayCount returns the ReplayCount field value if set, zero value otherwise.
+// GetReplayCount returns the ReplayCount field value
 func (o *Delivery) GetReplayCount() int32 {
-	if o == nil || IsNil(o.ReplayCount) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.ReplayCount
+
+	return o.ReplayCount
 }
 
-// GetReplayCountOk returns a tuple with the ReplayCount field value if set, nil otherwise
+// GetReplayCountOk returns a tuple with the ReplayCount field value
 // and a boolean to check if the value has been set.
 func (o *Delivery) GetReplayCountOk() (*int32, bool) {
-	if o == nil || IsNil(o.ReplayCount) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ReplayCount, true
+	return &o.ReplayCount, true
 }
 
-// HasReplayCount returns a boolean if a field has been set.
-func (o *Delivery) HasReplayCount() bool {
-	if o != nil && !IsNil(o.ReplayCount) {
-		return true
-	}
-
-	return false
-}
-
-// SetReplayCount gets a reference to the given int32 and assigns it to the ReplayCount field.
+// SetReplayCount sets field value
 func (o *Delivery) SetReplayCount(v int32) {
-	o.ReplayCount = &v
+	o.ReplayCount = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *Delivery) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *Delivery) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *Delivery) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *Delivery) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o Delivery) MarshalJSON() ([]byte, error) {
@@ -334,31 +296,61 @@ func (o Delivery) MarshalJSON() ([]byte, error) {
 
 func (o Delivery) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.EndpointId) {
-		toSerialize["endpoint_id"] = o.EndpointId
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["endpoint_id"] = o.EndpointId
 	if o.Event.IsSet() {
 		toSerialize["event"] = o.Event.Get()
 	}
-	if !IsNil(o.Status) {
-		toSerialize["status"] = o.Status
-	}
-	if !IsNil(o.AttemptCount) {
-		toSerialize["attempt_count"] = o.AttemptCount
-	}
+	toSerialize["status"] = o.Status
+	toSerialize["attempt_count"] = o.AttemptCount
 	if o.ResponseStatus.IsSet() {
 		toSerialize["response_status"] = o.ResponseStatus.Get()
 	}
-	if !IsNil(o.ReplayCount) {
-		toSerialize["replay_count"] = o.ReplayCount
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["replay_count"] = o.ReplayCount
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *Delivery) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"endpoint_id",
+		"status",
+		"attempt_count",
+		"replay_count",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDelivery := _Delivery{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDelivery)
+
+	if err != nil {
+		return err
+	}
+
+	*o = Delivery(varDelivery)
+
+	return err
 }
 
 type NullableDelivery struct {

@@ -7,11 +7,11 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**range** | **String** |  |  [optional] |
-|**successful** | **Integer** |  |  [optional] |
-|**failed** | **Integer** |  |  [optional] |
-|**pending** | **Integer** |  |  [optional] |
-|**successRate** | **Double** |  |  [optional] |
+|**range** | **String** |  |  |
+|**successful** | **Integer** |  |  |
+|**failed** | **Integer** |  |  |
+|**pending** | **Integer** |  |  |
+|**successRate** | **Double** |  |  |
 
 
 

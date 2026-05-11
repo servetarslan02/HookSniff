@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Token** | Pointer to **string** |  | [optional] 
-**Platform** | Pointer to **string** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**Id** | **string** |  | 
+**Token** | **string** |  | 
+**Platform** | **string** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewDeviceTokenResponse
 
-`func NewDeviceTokenResponse() *DeviceTokenResponse`
+`func NewDeviceTokenResponse(id string, token string, platform string, createdAt time.Time, ) *DeviceTokenResponse`
 
 NewDeviceTokenResponse instantiates a new DeviceTokenResponse object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *DeviceTokenResponse) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetToken
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetToken sets Token field to given value.
 
-### HasToken
-
-`func (o *DeviceTokenResponse) HasToken() bool`
-
-HasToken returns a boolean if a field has been set.
 
 ### GetPlatform
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetPlatform sets Platform field to given value.
 
-### HasPlatform
-
-`func (o *DeviceTokenResponse) HasPlatform() bool`
-
-HasPlatform returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *DeviceTokenResponse) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -4,21 +4,21 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Email** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Email** | **string** |  | 
 **Name** | Pointer to **NullableString** |  | [optional] 
 **ApiKey** | Pointer to **NullableString** | Only returned on registration | [optional] 
-**Plan** | Pointer to **string** |  | [optional] 
-**WebhookLimit** | Pointer to **int32** |  | [optional] 
-**WebhookCount** | Pointer to **int32** |  | [optional] 
-**IsAdmin** | Pointer to **bool** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**Plan** | **string** |  | 
+**WebhookLimit** | **int32** |  | 
+**WebhookCount** | **int32** |  | 
+**IsAdmin** | **bool** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewCustomerResponse
 
-`func NewCustomerResponse() *CustomerResponse`
+`func NewCustomerResponse(id string, email string, plan string, webhookLimit int32, webhookCount int32, isAdmin bool, createdAt time.Time, ) *CustomerResponse`
 
 NewCustomerResponse instantiates a new CustomerResponse object
 This constructor will assign default values to properties that have it defined,
@@ -52,11 +52,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *CustomerResponse) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetEmail
 
@@ -77,11 +72,6 @@ and a boolean to check if the value has been set.
 
 SetEmail sets Email field to given value.
 
-### HasEmail
-
-`func (o *CustomerResponse) HasEmail() bool`
-
-HasEmail returns a boolean if a field has been set.
 
 ### GetName
 
@@ -172,11 +162,6 @@ and a boolean to check if the value has been set.
 
 SetPlan sets Plan field to given value.
 
-### HasPlan
-
-`func (o *CustomerResponse) HasPlan() bool`
-
-HasPlan returns a boolean if a field has been set.
 
 ### GetWebhookLimit
 
@@ -197,11 +182,6 @@ and a boolean to check if the value has been set.
 
 SetWebhookLimit sets WebhookLimit field to given value.
 
-### HasWebhookLimit
-
-`func (o *CustomerResponse) HasWebhookLimit() bool`
-
-HasWebhookLimit returns a boolean if a field has been set.
 
 ### GetWebhookCount
 
@@ -222,11 +202,6 @@ and a boolean to check if the value has been set.
 
 SetWebhookCount sets WebhookCount field to given value.
 
-### HasWebhookCount
-
-`func (o *CustomerResponse) HasWebhookCount() bool`
-
-HasWebhookCount returns a boolean if a field has been set.
 
 ### GetIsAdmin
 
@@ -247,11 +222,6 @@ and a boolean to check if the value has been set.
 
 SetIsAdmin sets IsAdmin field to given value.
 
-### HasIsAdmin
-
-`func (o *CustomerResponse) HasIsAdmin() bool`
-
-HasIsAdmin returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -272,11 +242,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *CustomerResponse) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

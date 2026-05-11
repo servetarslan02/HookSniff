@@ -48,47 +48,47 @@ import org.openapitools.client.JSON;
 /**
  * SubscriptionResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class SubscriptionResponse {
   public static final String SERIALIZED_NAME_PLAN = "plan";
   @SerializedName(SERIALIZED_NAME_PLAN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String plan;
 
   public static final String SERIALIZED_NAME_STATUS = "status";
   @SerializedName(SERIALIZED_NAME_STATUS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String status;
 
   public static final String SERIALIZED_NAME_PAYMENT_PROVIDER = "payment_provider";
   @SerializedName(SERIALIZED_NAME_PAYMENT_PROVIDER)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String paymentProvider;
 
   public static final String SERIALIZED_NAME_WEBHOOK_LIMIT = "webhook_limit";
   @SerializedName(SERIALIZED_NAME_WEBHOOK_LIMIT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer webhookLimit;
 
   public static final String SERIALIZED_NAME_ENDPOINT_LIMIT = "endpoint_limit";
   @SerializedName(SERIALIZED_NAME_ENDPOINT_LIMIT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer endpointLimit;
 
   public static final String SERIALIZED_NAME_RETENTION_DAYS = "retention_days";
   @SerializedName(SERIALIZED_NAME_RETENTION_DAYS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer retentionDays;
 
   public static final String SERIALIZED_NAME_MONTHLY_PRICE_CENTS = "monthly_price_cents";
   @SerializedName(SERIALIZED_NAME_MONTHLY_PRICE_CENTS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer monthlyPriceCents;
 
   public SubscriptionResponse() {
   }
 
-  public SubscriptionResponse plan(@javax.annotation.Nullable String plan) {
+  public SubscriptionResponse plan(@javax.annotation.Nonnull String plan) {
     this.plan = plan;
     return this;
   }
@@ -97,17 +97,17 @@ public class SubscriptionResponse {
    * Get plan
    * @return plan
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPlan() {
     return plan;
   }
 
-  public void setPlan(@javax.annotation.Nullable String plan) {
+  public void setPlan(@javax.annotation.Nonnull String plan) {
     this.plan = plan;
   }
 
 
-  public SubscriptionResponse status(@javax.annotation.Nullable String status) {
+  public SubscriptionResponse status(@javax.annotation.Nonnull String status) {
     this.status = status;
     return this;
   }
@@ -116,17 +116,17 @@ public class SubscriptionResponse {
    * Get status
    * @return status
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getStatus() {
     return status;
   }
 
-  public void setStatus(@javax.annotation.Nullable String status) {
+  public void setStatus(@javax.annotation.Nonnull String status) {
     this.status = status;
   }
 
 
-  public SubscriptionResponse paymentProvider(@javax.annotation.Nullable String paymentProvider) {
+  public SubscriptionResponse paymentProvider(@javax.annotation.Nonnull String paymentProvider) {
     this.paymentProvider = paymentProvider;
     return this;
   }
@@ -135,17 +135,17 @@ public class SubscriptionResponse {
    * Get paymentProvider
    * @return paymentProvider
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPaymentProvider() {
     return paymentProvider;
   }
 
-  public void setPaymentProvider(@javax.annotation.Nullable String paymentProvider) {
+  public void setPaymentProvider(@javax.annotation.Nonnull String paymentProvider) {
     this.paymentProvider = paymentProvider;
   }
 
 
-  public SubscriptionResponse webhookLimit(@javax.annotation.Nullable Integer webhookLimit) {
+  public SubscriptionResponse webhookLimit(@javax.annotation.Nonnull Integer webhookLimit) {
     this.webhookLimit = webhookLimit;
     return this;
   }
@@ -154,17 +154,17 @@ public class SubscriptionResponse {
    * Get webhookLimit
    * @return webhookLimit
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getWebhookLimit() {
     return webhookLimit;
   }
 
-  public void setWebhookLimit(@javax.annotation.Nullable Integer webhookLimit) {
+  public void setWebhookLimit(@javax.annotation.Nonnull Integer webhookLimit) {
     this.webhookLimit = webhookLimit;
   }
 
 
-  public SubscriptionResponse endpointLimit(@javax.annotation.Nullable Integer endpointLimit) {
+  public SubscriptionResponse endpointLimit(@javax.annotation.Nonnull Integer endpointLimit) {
     this.endpointLimit = endpointLimit;
     return this;
   }
@@ -173,17 +173,17 @@ public class SubscriptionResponse {
    * Get endpointLimit
    * @return endpointLimit
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getEndpointLimit() {
     return endpointLimit;
   }
 
-  public void setEndpointLimit(@javax.annotation.Nullable Integer endpointLimit) {
+  public void setEndpointLimit(@javax.annotation.Nonnull Integer endpointLimit) {
     this.endpointLimit = endpointLimit;
   }
 
 
-  public SubscriptionResponse retentionDays(@javax.annotation.Nullable Integer retentionDays) {
+  public SubscriptionResponse retentionDays(@javax.annotation.Nonnull Integer retentionDays) {
     this.retentionDays = retentionDays;
     return this;
   }
@@ -192,17 +192,17 @@ public class SubscriptionResponse {
    * Get retentionDays
    * @return retentionDays
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getRetentionDays() {
     return retentionDays;
   }
 
-  public void setRetentionDays(@javax.annotation.Nullable Integer retentionDays) {
+  public void setRetentionDays(@javax.annotation.Nonnull Integer retentionDays) {
     this.retentionDays = retentionDays;
   }
 
 
-  public SubscriptionResponse monthlyPriceCents(@javax.annotation.Nullable Integer monthlyPriceCents) {
+  public SubscriptionResponse monthlyPriceCents(@javax.annotation.Nonnull Integer monthlyPriceCents) {
     this.monthlyPriceCents = monthlyPriceCents;
     return this;
   }
@@ -211,12 +211,12 @@ public class SubscriptionResponse {
    * Get monthlyPriceCents
    * @return monthlyPriceCents
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getMonthlyPriceCents() {
     return monthlyPriceCents;
   }
 
-  public void setMonthlyPriceCents(@javax.annotation.Nullable Integer monthlyPriceCents) {
+  public void setMonthlyPriceCents(@javax.annotation.Nonnull Integer monthlyPriceCents) {
     this.monthlyPriceCents = monthlyPriceCents;
   }
 
@@ -277,7 +277,7 @@ public class SubscriptionResponse {
     openapiFields = new HashSet<String>(Arrays.asList("plan", "status", "payment_provider", "webhook_limit", "endpoint_limit", "retention_days", "monthly_price_cents"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("plan", "status", "payment_provider", "webhook_limit", "endpoint_limit", "retention_days", "monthly_price_cents"));
   }
 
   /**
@@ -300,14 +300,21 @@ public class SubscriptionResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `SubscriptionResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : SubscriptionResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("plan") != null && !jsonObj.get("plan").isJsonNull()) && !jsonObj.get("plan").isJsonPrimitive()) {
+      if (!jsonObj.get("plan").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `plan` to be a primitive type in the JSON string but got `%s`", jsonObj.get("plan").toString()));
       }
-      if ((jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) && !jsonObj.get("status").isJsonPrimitive()) {
+      if (!jsonObj.get("status").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("status").toString()));
       }
-      if ((jsonObj.get("payment_provider") != null && !jsonObj.get("payment_provider").isJsonNull()) && !jsonObj.get("payment_provider").isJsonPrimitive()) {
+      if (!jsonObj.get("payment_provider").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `payment_provider` to be a primitive type in the JSON string but got `%s`", jsonObj.get("payment_provider").toString()));
       }
   }

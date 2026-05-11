@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.UUID;
@@ -48,18 +49,18 @@ import java.util.Set;
 import org.openapitools.client.JSON;
 
 /**
- * EndpointHealth
+ * Endpoint health metrics and status
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class EndpointHealth {
   public static final String SERIALIZED_NAME_ENDPOINT_ID = "endpoint_id";
   @SerializedName(SERIALIZED_NAME_ENDPOINT_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID endpointId;
 
   public static final String SERIALIZED_NAME_IS_HEALTHY = "is_healthy";
   @SerializedName(SERIALIZED_NAME_IS_HEALTHY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean isHealthy;
 
   public static final String SERIALIZED_NAME_FAILURE_STREAK = "failure_streak";
@@ -77,10 +78,35 @@ public class EndpointHealth {
   @javax.annotation.Nullable
   private OffsetDateTime lastFailureAt;
 
+  public static final String SERIALIZED_NAME_SUCCESS_RATE = "success_rate";
+  @SerializedName(SERIALIZED_NAME_SUCCESS_RATE)
+  @javax.annotation.Nullable
+  private Double successRate;
+
+  public static final String SERIALIZED_NAME_AVG_LATENCY_MS = "avg_latency_ms";
+  @SerializedName(SERIALIZED_NAME_AVG_LATENCY_MS)
+  @javax.annotation.Nullable
+  private BigDecimal avgLatencyMs;
+
+  public static final String SERIALIZED_NAME_LAST_DELIVERY_AT = "last_delivery_at";
+  @SerializedName(SERIALIZED_NAME_LAST_DELIVERY_AT)
+  @javax.annotation.Nullable
+  private OffsetDateTime lastDeliveryAt;
+
+  public static final String SERIALIZED_NAME_TOTAL_DELIVERIES = "total_deliveries";
+  @SerializedName(SERIALIZED_NAME_TOTAL_DELIVERIES)
+  @javax.annotation.Nullable
+  private Integer totalDeliveries;
+
+  public static final String SERIALIZED_NAME_FAILED_DELIVERIES = "failed_deliveries";
+  @SerializedName(SERIALIZED_NAME_FAILED_DELIVERIES)
+  @javax.annotation.Nullable
+  private Integer failedDeliveries;
+
   public EndpointHealth() {
   }
 
-  public EndpointHealth endpointId(@javax.annotation.Nullable UUID endpointId) {
+  public EndpointHealth endpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
     return this;
   }
@@ -89,17 +115,17 @@ public class EndpointHealth {
    * Get endpointId
    * @return endpointId
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getEndpointId() {
     return endpointId;
   }
 
-  public void setEndpointId(@javax.annotation.Nullable UUID endpointId) {
+  public void setEndpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
   }
 
 
-  public EndpointHealth isHealthy(@javax.annotation.Nullable Boolean isHealthy) {
+  public EndpointHealth isHealthy(@javax.annotation.Nonnull Boolean isHealthy) {
     this.isHealthy = isHealthy;
     return this;
   }
@@ -108,12 +134,12 @@ public class EndpointHealth {
    * Get isHealthy
    * @return isHealthy
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getIsHealthy() {
     return isHealthy;
   }
 
-  public void setIsHealthy(@javax.annotation.Nullable Boolean isHealthy) {
+  public void setIsHealthy(@javax.annotation.Nonnull Boolean isHealthy) {
     this.isHealthy = isHealthy;
   }
 
@@ -175,6 +201,101 @@ public class EndpointHealth {
   }
 
 
+  public EndpointHealth successRate(@javax.annotation.Nullable Double successRate) {
+    this.successRate = successRate;
+    return this;
+  }
+
+  /**
+   * Success rate as a fraction (0.0–1.0)
+   * @return successRate
+   */
+  @javax.annotation.Nullable
+  public Double getSuccessRate() {
+    return successRate;
+  }
+
+  public void setSuccessRate(@javax.annotation.Nullable Double successRate) {
+    this.successRate = successRate;
+  }
+
+
+  public EndpointHealth avgLatencyMs(@javax.annotation.Nullable BigDecimal avgLatencyMs) {
+    this.avgLatencyMs = avgLatencyMs;
+    return this;
+  }
+
+  /**
+   * Average delivery latency in milliseconds
+   * @return avgLatencyMs
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getAvgLatencyMs() {
+    return avgLatencyMs;
+  }
+
+  public void setAvgLatencyMs(@javax.annotation.Nullable BigDecimal avgLatencyMs) {
+    this.avgLatencyMs = avgLatencyMs;
+  }
+
+
+  public EndpointHealth lastDeliveryAt(@javax.annotation.Nullable OffsetDateTime lastDeliveryAt) {
+    this.lastDeliveryAt = lastDeliveryAt;
+    return this;
+  }
+
+  /**
+   * Get lastDeliveryAt
+   * @return lastDeliveryAt
+   */
+  @javax.annotation.Nullable
+  public OffsetDateTime getLastDeliveryAt() {
+    return lastDeliveryAt;
+  }
+
+  public void setLastDeliveryAt(@javax.annotation.Nullable OffsetDateTime lastDeliveryAt) {
+    this.lastDeliveryAt = lastDeliveryAt;
+  }
+
+
+  public EndpointHealth totalDeliveries(@javax.annotation.Nullable Integer totalDeliveries) {
+    this.totalDeliveries = totalDeliveries;
+    return this;
+  }
+
+  /**
+   * Get totalDeliveries
+   * @return totalDeliveries
+   */
+  @javax.annotation.Nullable
+  public Integer getTotalDeliveries() {
+    return totalDeliveries;
+  }
+
+  public void setTotalDeliveries(@javax.annotation.Nullable Integer totalDeliveries) {
+    this.totalDeliveries = totalDeliveries;
+  }
+
+
+  public EndpointHealth failedDeliveries(@javax.annotation.Nullable Integer failedDeliveries) {
+    this.failedDeliveries = failedDeliveries;
+    return this;
+  }
+
+  /**
+   * Get failedDeliveries
+   * @return failedDeliveries
+   */
+  @javax.annotation.Nullable
+  public Integer getFailedDeliveries() {
+    return failedDeliveries;
+  }
+
+  public void setFailedDeliveries(@javax.annotation.Nullable Integer failedDeliveries) {
+    this.failedDeliveries = failedDeliveries;
+  }
+
+
 
   @Override
   public boolean equals(Object o) {
@@ -189,12 +310,17 @@ public class EndpointHealth {
         Objects.equals(this.isHealthy, endpointHealth.isHealthy) &&
         Objects.equals(this.failureStreak, endpointHealth.failureStreak) &&
         Objects.equals(this.avgResponseMs, endpointHealth.avgResponseMs) &&
-        Objects.equals(this.lastFailureAt, endpointHealth.lastFailureAt);
+        Objects.equals(this.lastFailureAt, endpointHealth.lastFailureAt) &&
+        Objects.equals(this.successRate, endpointHealth.successRate) &&
+        Objects.equals(this.avgLatencyMs, endpointHealth.avgLatencyMs) &&
+        Objects.equals(this.lastDeliveryAt, endpointHealth.lastDeliveryAt) &&
+        Objects.equals(this.totalDeliveries, endpointHealth.totalDeliveries) &&
+        Objects.equals(this.failedDeliveries, endpointHealth.failedDeliveries);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(endpointId, isHealthy, failureStreak, avgResponseMs, lastFailureAt);
+    return Objects.hash(endpointId, isHealthy, failureStreak, avgResponseMs, lastFailureAt, successRate, avgLatencyMs, lastDeliveryAt, totalDeliveries, failedDeliveries);
   }
 
   @Override
@@ -206,6 +332,11 @@ public class EndpointHealth {
     sb.append("    failureStreak: ").append(toIndentedString(failureStreak)).append("\n");
     sb.append("    avgResponseMs: ").append(toIndentedString(avgResponseMs)).append("\n");
     sb.append("    lastFailureAt: ").append(toIndentedString(lastFailureAt)).append("\n");
+    sb.append("    successRate: ").append(toIndentedString(successRate)).append("\n");
+    sb.append("    avgLatencyMs: ").append(toIndentedString(avgLatencyMs)).append("\n");
+    sb.append("    lastDeliveryAt: ").append(toIndentedString(lastDeliveryAt)).append("\n");
+    sb.append("    totalDeliveries: ").append(toIndentedString(totalDeliveries)).append("\n");
+    sb.append("    failedDeliveries: ").append(toIndentedString(failedDeliveries)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -224,10 +355,10 @@ public class EndpointHealth {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("endpoint_id", "is_healthy", "failure_streak", "avg_response_ms", "last_failure_at"));
+    openapiFields = new HashSet<String>(Arrays.asList("endpoint_id", "is_healthy", "failure_streak", "avg_response_ms", "last_failure_at", "success_rate", "avg_latency_ms", "last_delivery_at", "total_deliveries", "failed_deliveries"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("endpoint_id", "is_healthy"));
   }
 
   /**
@@ -250,8 +381,15 @@ public class EndpointHealth {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `EndpointHealth` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : EndpointHealth.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("endpoint_id") != null && !jsonObj.get("endpoint_id").isJsonNull()) && !jsonObj.get("endpoint_id").isJsonPrimitive()) {
+      if (!jsonObj.get("endpoint_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `endpoint_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("endpoint_id").toString()));
       }
   }

@@ -4,18 +4,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Token** | Pointer to **string** | JWT access token | [optional] 
-**Customer** | Pointer to [**CustomerResponse**](CustomerResponse.md) |  | [optional] 
+**Token** | **string** | JWT access token | 
+**Customer** | [**CustomerResponse**](CustomerResponse.md) |  | 
 **RefreshToken** | Pointer to **string** | Refresh token (when applicable) | [optional] 
-**Requires2fa** | Pointer to **bool** |  | [optional] 
-**TempToken** | Pointer to **string** |  | [optional] 
-**Message** | Pointer to **string** |  | [optional] 
+**Requires2fa** | **bool** |  | 
+**TempToken** | **string** |  | 
+**Message** | **string** |  | 
 
 ## Methods
 
 ### NewAuthLoginPost200Response
 
-`func NewAuthLoginPost200Response() *AuthLoginPost200Response`
+`func NewAuthLoginPost200Response(token string, customer CustomerResponse, requires2fa bool, tempToken string, message string, ) *AuthLoginPost200Response`
 
 NewAuthLoginPost200Response instantiates a new AuthLoginPost200Response object
 This constructor will assign default values to properties that have it defined,
@@ -49,11 +49,6 @@ and a boolean to check if the value has been set.
 
 SetToken sets Token field to given value.
 
-### HasToken
-
-`func (o *AuthLoginPost200Response) HasToken() bool`
-
-HasToken returns a boolean if a field has been set.
 
 ### GetCustomer
 
@@ -74,11 +69,6 @@ and a boolean to check if the value has been set.
 
 SetCustomer sets Customer field to given value.
 
-### HasCustomer
-
-`func (o *AuthLoginPost200Response) HasCustomer() bool`
-
-HasCustomer returns a boolean if a field has been set.
 
 ### GetRefreshToken
 
@@ -124,11 +114,6 @@ and a boolean to check if the value has been set.
 
 SetRequires2fa sets Requires2fa field to given value.
 
-### HasRequires2fa
-
-`func (o *AuthLoginPost200Response) HasRequires2fa() bool`
-
-HasRequires2fa returns a boolean if a field has been set.
 
 ### GetTempToken
 
@@ -149,11 +134,6 @@ and a boolean to check if the value has been set.
 
 SetTempToken sets TempToken field to given value.
 
-### HasTempToken
-
-`func (o *AuthLoginPost200Response) HasTempToken() bool`
-
-HasTempToken returns a boolean if a field has been set.
 
 ### GetMessage
 
@@ -174,11 +154,6 @@ and a boolean to check if the value has been set.
 
 SetMessage sets Message field to given value.
 
-### HasMessage
-
-`func (o *AuthLoginPost200Response) HasMessage() bool`
-
-HasMessage returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -4,17 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**AmountCents** | Pointer to **int32** |  | [optional] 
-**Currency** | Pointer to **string** |  | [optional] 
-**Status** | Pointer to **string** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**Id** | **string** |  | 
+**AmountCents** | **int32** |  | 
+**Currency** | **string** |  | 
+**Status** | **string** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewInvoiceResponse
 
-`func NewInvoiceResponse() *InvoiceResponse`
+`func NewInvoiceResponse(id string, amountCents int32, currency string, status string, createdAt time.Time, ) *InvoiceResponse`
 
 NewInvoiceResponse instantiates a new InvoiceResponse object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +48,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *InvoiceResponse) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetAmountCents
 
@@ -73,11 +68,6 @@ and a boolean to check if the value has been set.
 
 SetAmountCents sets AmountCents field to given value.
 
-### HasAmountCents
-
-`func (o *InvoiceResponse) HasAmountCents() bool`
-
-HasAmountCents returns a boolean if a field has been set.
 
 ### GetCurrency
 
@@ -98,11 +88,6 @@ and a boolean to check if the value has been set.
 
 SetCurrency sets Currency field to given value.
 
-### HasCurrency
-
-`func (o *InvoiceResponse) HasCurrency() bool`
-
-HasCurrency returns a boolean if a field has been set.
 
 ### GetStatus
 
@@ -123,11 +108,6 @@ and a boolean to check if the value has been set.
 
 SetStatus sets Status field to given value.
 
-### HasStatus
-
-`func (o *InvoiceResponse) HasStatus() bool`
-
-HasStatus returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -148,11 +128,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *InvoiceResponse) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the SearchResult type satisfies the MappedNullable interface at compile time
@@ -20,16 +22,20 @@ var _ MappedNullable = &SearchResult{}
 
 // SearchResult struct for SearchResult
 type SearchResult struct {
-	Deliveries []Delivery `json:"deliveries,omitempty"`
-	Total *int32 `json:"total,omitempty"`
+	Deliveries []Delivery `json:"deliveries"`
+	Total int32 `json:"total"`
 }
+
+type _SearchResult SearchResult
 
 // NewSearchResult instantiates a new SearchResult object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSearchResult() *SearchResult {
+func NewSearchResult(deliveries []Delivery, total int32) *SearchResult {
 	this := SearchResult{}
+	this.Deliveries = deliveries
+	this.Total = total
 	return &this
 }
 
@@ -41,68 +47,52 @@ func NewSearchResultWithDefaults() *SearchResult {
 	return &this
 }
 
-// GetDeliveries returns the Deliveries field value if set, zero value otherwise.
+// GetDeliveries returns the Deliveries field value
 func (o *SearchResult) GetDeliveries() []Delivery {
-	if o == nil || IsNil(o.Deliveries) {
+	if o == nil {
 		var ret []Delivery
 		return ret
 	}
+
 	return o.Deliveries
 }
 
-// GetDeliveriesOk returns a tuple with the Deliveries field value if set, nil otherwise
+// GetDeliveriesOk returns a tuple with the Deliveries field value
 // and a boolean to check if the value has been set.
 func (o *SearchResult) GetDeliveriesOk() ([]Delivery, bool) {
-	if o == nil || IsNil(o.Deliveries) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Deliveries, true
 }
 
-// HasDeliveries returns a boolean if a field has been set.
-func (o *SearchResult) HasDeliveries() bool {
-	if o != nil && !IsNil(o.Deliveries) {
-		return true
-	}
-
-	return false
-}
-
-// SetDeliveries gets a reference to the given []Delivery and assigns it to the Deliveries field.
+// SetDeliveries sets field value
 func (o *SearchResult) SetDeliveries(v []Delivery) {
 	o.Deliveries = v
 }
 
-// GetTotal returns the Total field value if set, zero value otherwise.
+// GetTotal returns the Total field value
 func (o *SearchResult) GetTotal() int32 {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Total
+
+	return o.Total
 }
 
-// GetTotalOk returns a tuple with the Total field value if set, nil otherwise
+// GetTotalOk returns a tuple with the Total field value
 // and a boolean to check if the value has been set.
 func (o *SearchResult) GetTotalOk() (*int32, bool) {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Total, true
+	return &o.Total, true
 }
 
-// HasTotal returns a boolean if a field has been set.
-func (o *SearchResult) HasTotal() bool {
-	if o != nil && !IsNil(o.Total) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotal gets a reference to the given int32 and assigns it to the Total field.
+// SetTotal sets field value
 func (o *SearchResult) SetTotal(v int32) {
-	o.Total = &v
+	o.Total = v
 }
 
 func (o SearchResult) MarshalJSON() ([]byte, error) {
@@ -115,13 +105,47 @@ func (o SearchResult) MarshalJSON() ([]byte, error) {
 
 func (o SearchResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Deliveries) {
-		toSerialize["deliveries"] = o.Deliveries
-	}
-	if !IsNil(o.Total) {
-		toSerialize["total"] = o.Total
-	}
+	toSerialize["deliveries"] = o.Deliveries
+	toSerialize["total"] = o.Total
 	return toSerialize, nil
+}
+
+func (o *SearchResult) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"deliveries",
+		"total",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varSearchResult := _SearchResult{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varSearchResult)
+
+	if err != nil {
+		return err
+	}
+
+	*o = SearchResult(varSearchResult)
+
+	return err
 }
 
 type NullableSearchResult struct {

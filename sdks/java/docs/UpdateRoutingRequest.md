@@ -7,8 +7,8 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**routingStrategy** | [**RoutingStrategyEnum**](#RoutingStrategyEnum) |  |  [optional] |
-|**fallbackUrl** | **URI** |  |  [optional] |
+|**routingStrategy** | [**RoutingStrategyEnum**](#RoutingStrategyEnum) |  |  |
+|**fallbackUrl** | **URI** |  |  |
 
 
 

@@ -7,9 +7,9 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**name** | **String** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**name** | **String** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

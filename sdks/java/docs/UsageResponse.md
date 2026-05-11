@@ -7,13 +7,13 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**plan** | **String** |  |  [optional] |
-|**periodStart** | **OffsetDateTime** |  |  [optional] |
-|**periodEnd** | **OffsetDateTime** |  |  [optional] |
-|**webhooksUsed** | **Integer** |  |  [optional] |
-|**webhooksLimit** | **Integer** |  |  [optional] |
-|**endpointsUsed** | **Integer** |  |  [optional] |
-|**endpointsLimit** | **Integer** |  |  [optional] |
+|**plan** | **String** |  |  |
+|**periodStart** | **OffsetDateTime** |  |  |
+|**periodEnd** | **OffsetDateTime** |  |  |
+|**webhooksUsed** | **Integer** |  |  |
+|**webhooksLimit** | **Integer** |  |  |
+|**endpointsUsed** | **Integer** |  |  |
+|**endpointsLimit** | **Integer** |  |  |
 
 
 

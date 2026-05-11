@@ -4,17 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Range** | Pointer to **string** |  | [optional] 
-**Successful** | Pointer to **int32** |  | [optional] 
-**Failed** | Pointer to **int32** |  | [optional] 
-**Pending** | Pointer to **int32** |  | [optional] 
-**SuccessRate** | Pointer to **float64** |  | [optional] 
+**Range** | **string** |  | 
+**Successful** | **int32** |  | 
+**Failed** | **int32** |  | 
+**Pending** | **int32** |  | 
+**SuccessRate** | **float64** |  | 
 
 ## Methods
 
 ### NewSuccessRateResponse
 
-`func NewSuccessRateResponse() *SuccessRateResponse`
+`func NewSuccessRateResponse(range_ string, successful int32, failed int32, pending int32, successRate float64, ) *SuccessRateResponse`
 
 NewSuccessRateResponse instantiates a new SuccessRateResponse object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +48,6 @@ and a boolean to check if the value has been set.
 
 SetRange sets Range field to given value.
 
-### HasRange
-
-`func (o *SuccessRateResponse) HasRange() bool`
-
-HasRange returns a boolean if a field has been set.
 
 ### GetSuccessful
 
@@ -73,11 +68,6 @@ and a boolean to check if the value has been set.
 
 SetSuccessful sets Successful field to given value.
 
-### HasSuccessful
-
-`func (o *SuccessRateResponse) HasSuccessful() bool`
-
-HasSuccessful returns a boolean if a field has been set.
 
 ### GetFailed
 
@@ -98,11 +88,6 @@ and a boolean to check if the value has been set.
 
 SetFailed sets Failed field to given value.
 
-### HasFailed
-
-`func (o *SuccessRateResponse) HasFailed() bool`
-
-HasFailed returns a boolean if a field has been set.
 
 ### GetPending
 
@@ -123,11 +108,6 @@ and a boolean to check if the value has been set.
 
 SetPending sets Pending field to given value.
 
-### HasPending
-
-`func (o *SuccessRateResponse) HasPending() bool`
-
-HasPending returns a boolean if a field has been set.
 
 ### GetSuccessRate
 
@@ -148,11 +128,6 @@ and a boolean to check if the value has been set.
 
 SetSuccessRate sets SuccessRate field to given value.
 
-### HasSuccessRate
-
-`func (o *SuccessRateResponse) HasSuccessRate() bool`
-
-HasSuccessRate returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the AuthResponse type satisfies the MappedNullable interface at compile time
@@ -21,18 +23,22 @@ var _ MappedNullable = &AuthResponse{}
 // AuthResponse struct for AuthResponse
 type AuthResponse struct {
 	// JWT access token
-	Token *string `json:"token,omitempty"`
-	Customer *CustomerResponse `json:"customer,omitempty"`
+	Token string `json:"token"`
+	Customer CustomerResponse `json:"customer"`
 	// Refresh token (when applicable)
 	RefreshToken *string `json:"refresh_token,omitempty"`
 }
+
+type _AuthResponse AuthResponse
 
 // NewAuthResponse instantiates a new AuthResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAuthResponse() *AuthResponse {
+func NewAuthResponse(token string, customer CustomerResponse) *AuthResponse {
 	this := AuthResponse{}
+	this.Token = token
+	this.Customer = customer
 	return &this
 }
 
@@ -44,68 +50,52 @@ func NewAuthResponseWithDefaults() *AuthResponse {
 	return &this
 }
 
-// GetToken returns the Token field value if set, zero value otherwise.
+// GetToken returns the Token field value
 func (o *AuthResponse) GetToken() string {
-	if o == nil || IsNil(o.Token) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Token
+
+	return o.Token
 }
 
-// GetTokenOk returns a tuple with the Token field value if set, nil otherwise
+// GetTokenOk returns a tuple with the Token field value
 // and a boolean to check if the value has been set.
 func (o *AuthResponse) GetTokenOk() (*string, bool) {
-	if o == nil || IsNil(o.Token) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Token, true
+	return &o.Token, true
 }
 
-// HasToken returns a boolean if a field has been set.
-func (o *AuthResponse) HasToken() bool {
-	if o != nil && !IsNil(o.Token) {
-		return true
-	}
-
-	return false
-}
-
-// SetToken gets a reference to the given string and assigns it to the Token field.
+// SetToken sets field value
 func (o *AuthResponse) SetToken(v string) {
-	o.Token = &v
+	o.Token = v
 }
 
-// GetCustomer returns the Customer field value if set, zero value otherwise.
+// GetCustomer returns the Customer field value
 func (o *AuthResponse) GetCustomer() CustomerResponse {
-	if o == nil || IsNil(o.Customer) {
+	if o == nil {
 		var ret CustomerResponse
 		return ret
 	}
-	return *o.Customer
+
+	return o.Customer
 }
 
-// GetCustomerOk returns a tuple with the Customer field value if set, nil otherwise
+// GetCustomerOk returns a tuple with the Customer field value
 // and a boolean to check if the value has been set.
 func (o *AuthResponse) GetCustomerOk() (*CustomerResponse, bool) {
-	if o == nil || IsNil(o.Customer) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Customer, true
+	return &o.Customer, true
 }
 
-// HasCustomer returns a boolean if a field has been set.
-func (o *AuthResponse) HasCustomer() bool {
-	if o != nil && !IsNil(o.Customer) {
-		return true
-	}
-
-	return false
-}
-
-// SetCustomer gets a reference to the given CustomerResponse and assigns it to the Customer field.
+// SetCustomer sets field value
 func (o *AuthResponse) SetCustomer(v CustomerResponse) {
-	o.Customer = &v
+	o.Customer = v
 }
 
 // GetRefreshToken returns the RefreshToken field value if set, zero value otherwise.
@@ -150,16 +140,50 @@ func (o AuthResponse) MarshalJSON() ([]byte, error) {
 
 func (o AuthResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Token) {
-		toSerialize["token"] = o.Token
-	}
-	if !IsNil(o.Customer) {
-		toSerialize["customer"] = o.Customer
-	}
+	toSerialize["token"] = o.Token
+	toSerialize["customer"] = o.Customer
 	if !IsNil(o.RefreshToken) {
 		toSerialize["refresh_token"] = o.RefreshToken
 	}
 	return toSerialize, nil
+}
+
+func (o *AuthResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"token",
+		"customer",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varAuthResponse := _AuthResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varAuthResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = AuthResponse(varAuthResponse)
+
+	return err
 }
 
 type NullableAuthResponse struct {

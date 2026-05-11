@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Range** | Pointer to **string** |  | [optional] 
-**Buckets** | Pointer to [**[]LatencyTrendResponseBucketsInner**](LatencyTrendResponseBucketsInner.md) |  | [optional] 
-**OverallAvgMs** | Pointer to **float32** |  | [optional] 
+**Range** | **string** |  | 
+**Buckets** | [**[]LatencyTrendResponseBucketsInner**](LatencyTrendResponseBucketsInner.md) |  | 
+**OverallAvgMs** | **float32** |  | 
 
 ## Methods
 
 ### NewLatencyTrendResponse
 
-`func NewLatencyTrendResponse() *LatencyTrendResponse`
+`func NewLatencyTrendResponse(range_ string, buckets []LatencyTrendResponseBucketsInner, overallAvgMs float32, ) *LatencyTrendResponse`
 
 NewLatencyTrendResponse instantiates a new LatencyTrendResponse object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetRange sets Range field to given value.
 
-### HasRange
-
-`func (o *LatencyTrendResponse) HasRange() bool`
-
-HasRange returns a boolean if a field has been set.
 
 ### GetBuckets
 
@@ -71,11 +66,6 @@ and a boolean to check if the value has been set.
 
 SetBuckets sets Buckets field to given value.
 
-### HasBuckets
-
-`func (o *LatencyTrendResponse) HasBuckets() bool`
-
-HasBuckets returns a boolean if a field has been set.
 
 ### GetOverallAvgMs
 
@@ -96,11 +86,6 @@ and a boolean to check if the value has been set.
 
 SetOverallAvgMs sets OverallAvgMs field to given value.
 
-### HasOverallAvgMs
-
-`func (o *LatencyTrendResponse) HasOverallAvgMs() bool`
-
-HasOverallAvgMs returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

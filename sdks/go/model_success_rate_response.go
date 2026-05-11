@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the SuccessRateResponse type satisfies the MappedNullable interface at compile time
@@ -20,19 +22,26 @@ var _ MappedNullable = &SuccessRateResponse{}
 
 // SuccessRateResponse struct for SuccessRateResponse
 type SuccessRateResponse struct {
-	Range *string `json:"range,omitempty"`
-	Successful *int32 `json:"successful,omitempty"`
-	Failed *int32 `json:"failed,omitempty"`
-	Pending *int32 `json:"pending,omitempty"`
-	SuccessRate *float64 `json:"success_rate,omitempty"`
+	Range string `json:"range"`
+	Successful int32 `json:"successful"`
+	Failed int32 `json:"failed"`
+	Pending int32 `json:"pending"`
+	SuccessRate float64 `json:"success_rate"`
 }
+
+type _SuccessRateResponse SuccessRateResponse
 
 // NewSuccessRateResponse instantiates a new SuccessRateResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSuccessRateResponse() *SuccessRateResponse {
+func NewSuccessRateResponse(range_ string, successful int32, failed int32, pending int32, successRate float64) *SuccessRateResponse {
 	this := SuccessRateResponse{}
+	this.Range = range_
+	this.Successful = successful
+	this.Failed = failed
+	this.Pending = pending
+	this.SuccessRate = successRate
 	return &this
 }
 
@@ -44,164 +53,124 @@ func NewSuccessRateResponseWithDefaults() *SuccessRateResponse {
 	return &this
 }
 
-// GetRange returns the Range field value if set, zero value otherwise.
+// GetRange returns the Range field value
 func (o *SuccessRateResponse) GetRange() string {
-	if o == nil || IsNil(o.Range) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Range
+
+	return o.Range
 }
 
-// GetRangeOk returns a tuple with the Range field value if set, nil otherwise
+// GetRangeOk returns a tuple with the Range field value
 // and a boolean to check if the value has been set.
 func (o *SuccessRateResponse) GetRangeOk() (*string, bool) {
-	if o == nil || IsNil(o.Range) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Range, true
+	return &o.Range, true
 }
 
-// HasRange returns a boolean if a field has been set.
-func (o *SuccessRateResponse) HasRange() bool {
-	if o != nil && !IsNil(o.Range) {
-		return true
-	}
-
-	return false
-}
-
-// SetRange gets a reference to the given string and assigns it to the Range field.
+// SetRange sets field value
 func (o *SuccessRateResponse) SetRange(v string) {
-	o.Range = &v
+	o.Range = v
 }
 
-// GetSuccessful returns the Successful field value if set, zero value otherwise.
+// GetSuccessful returns the Successful field value
 func (o *SuccessRateResponse) GetSuccessful() int32 {
-	if o == nil || IsNil(o.Successful) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Successful
+
+	return o.Successful
 }
 
-// GetSuccessfulOk returns a tuple with the Successful field value if set, nil otherwise
+// GetSuccessfulOk returns a tuple with the Successful field value
 // and a boolean to check if the value has been set.
 func (o *SuccessRateResponse) GetSuccessfulOk() (*int32, bool) {
-	if o == nil || IsNil(o.Successful) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Successful, true
+	return &o.Successful, true
 }
 
-// HasSuccessful returns a boolean if a field has been set.
-func (o *SuccessRateResponse) HasSuccessful() bool {
-	if o != nil && !IsNil(o.Successful) {
-		return true
-	}
-
-	return false
-}
-
-// SetSuccessful gets a reference to the given int32 and assigns it to the Successful field.
+// SetSuccessful sets field value
 func (o *SuccessRateResponse) SetSuccessful(v int32) {
-	o.Successful = &v
+	o.Successful = v
 }
 
-// GetFailed returns the Failed field value if set, zero value otherwise.
+// GetFailed returns the Failed field value
 func (o *SuccessRateResponse) GetFailed() int32 {
-	if o == nil || IsNil(o.Failed) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Failed
+
+	return o.Failed
 }
 
-// GetFailedOk returns a tuple with the Failed field value if set, nil otherwise
+// GetFailedOk returns a tuple with the Failed field value
 // and a boolean to check if the value has been set.
 func (o *SuccessRateResponse) GetFailedOk() (*int32, bool) {
-	if o == nil || IsNil(o.Failed) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Failed, true
+	return &o.Failed, true
 }
 
-// HasFailed returns a boolean if a field has been set.
-func (o *SuccessRateResponse) HasFailed() bool {
-	if o != nil && !IsNil(o.Failed) {
-		return true
-	}
-
-	return false
-}
-
-// SetFailed gets a reference to the given int32 and assigns it to the Failed field.
+// SetFailed sets field value
 func (o *SuccessRateResponse) SetFailed(v int32) {
-	o.Failed = &v
+	o.Failed = v
 }
 
-// GetPending returns the Pending field value if set, zero value otherwise.
+// GetPending returns the Pending field value
 func (o *SuccessRateResponse) GetPending() int32 {
-	if o == nil || IsNil(o.Pending) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Pending
+
+	return o.Pending
 }
 
-// GetPendingOk returns a tuple with the Pending field value if set, nil otherwise
+// GetPendingOk returns a tuple with the Pending field value
 // and a boolean to check if the value has been set.
 func (o *SuccessRateResponse) GetPendingOk() (*int32, bool) {
-	if o == nil || IsNil(o.Pending) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Pending, true
+	return &o.Pending, true
 }
 
-// HasPending returns a boolean if a field has been set.
-func (o *SuccessRateResponse) HasPending() bool {
-	if o != nil && !IsNil(o.Pending) {
-		return true
-	}
-
-	return false
-}
-
-// SetPending gets a reference to the given int32 and assigns it to the Pending field.
+// SetPending sets field value
 func (o *SuccessRateResponse) SetPending(v int32) {
-	o.Pending = &v
+	o.Pending = v
 }
 
-// GetSuccessRate returns the SuccessRate field value if set, zero value otherwise.
+// GetSuccessRate returns the SuccessRate field value
 func (o *SuccessRateResponse) GetSuccessRate() float64 {
-	if o == nil || IsNil(o.SuccessRate) {
+	if o == nil {
 		var ret float64
 		return ret
 	}
-	return *o.SuccessRate
+
+	return o.SuccessRate
 }
 
-// GetSuccessRateOk returns a tuple with the SuccessRate field value if set, nil otherwise
+// GetSuccessRateOk returns a tuple with the SuccessRate field value
 // and a boolean to check if the value has been set.
 func (o *SuccessRateResponse) GetSuccessRateOk() (*float64, bool) {
-	if o == nil || IsNil(o.SuccessRate) {
+	if o == nil {
 		return nil, false
 	}
-	return o.SuccessRate, true
+	return &o.SuccessRate, true
 }
 
-// HasSuccessRate returns a boolean if a field has been set.
-func (o *SuccessRateResponse) HasSuccessRate() bool {
-	if o != nil && !IsNil(o.SuccessRate) {
-		return true
-	}
-
-	return false
-}
-
-// SetSuccessRate gets a reference to the given float64 and assigns it to the SuccessRate field.
+// SetSuccessRate sets field value
 func (o *SuccessRateResponse) SetSuccessRate(v float64) {
-	o.SuccessRate = &v
+	o.SuccessRate = v
 }
 
 func (o SuccessRateResponse) MarshalJSON() ([]byte, error) {
@@ -214,22 +183,53 @@ func (o SuccessRateResponse) MarshalJSON() ([]byte, error) {
 
 func (o SuccessRateResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Range) {
-		toSerialize["range"] = o.Range
-	}
-	if !IsNil(o.Successful) {
-		toSerialize["successful"] = o.Successful
-	}
-	if !IsNil(o.Failed) {
-		toSerialize["failed"] = o.Failed
-	}
-	if !IsNil(o.Pending) {
-		toSerialize["pending"] = o.Pending
-	}
-	if !IsNil(o.SuccessRate) {
-		toSerialize["success_rate"] = o.SuccessRate
-	}
+	toSerialize["range"] = o.Range
+	toSerialize["successful"] = o.Successful
+	toSerialize["failed"] = o.Failed
+	toSerialize["pending"] = o.Pending
+	toSerialize["success_rate"] = o.SuccessRate
 	return toSerialize, nil
+}
+
+func (o *SuccessRateResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"range",
+		"successful",
+		"failed",
+		"pending",
+		"success_rate",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varSuccessRateResponse := _SuccessRateResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varSuccessRateResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = SuccessRateResponse(varSuccessRateResponse)
+
+	return err
 }
 
 type NullableSuccessRateResponse struct {
