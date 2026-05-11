@@ -26,10 +26,11 @@ defmodule HookSniff do
     api_key: String.t(),
     base_url: String.t(),
     timeout: pos_integer(),
-    num_retries: non_neg_integer()
+    num_retries: non_neg_integer(),
+    http_adapter: module()
   }
 
-  defstruct [:api_key, :base_url, :timeout, :num_retries]
+  defstruct [:api_key, :base_url, :timeout, :num_retries, :http_adapter]
 
   @doc """
   Create a new HookSniff client.
@@ -53,7 +54,8 @@ defmodule HookSniff do
       api_key: api_key,
       base_url: Keyword.get(opts, :base_url, @default_base_url),
       timeout: Keyword.get(opts, :timeout, 30_000),
-      num_retries: Keyword.get(opts, :num_retries, 2)
+      num_retries: Keyword.get(opts, :num_retries, 2),
+      http_adapter: Keyword.get(opts, :http_adapter, HookSniff.DefaultHttpAdapter)
     }
   end
 end
