@@ -9,7 +9,8 @@ import {
   type SuccessRateData,
 } from '@/lib/api';
 import {
-  AreaChart,
+  LazyAreaChart as AreaChart,
+  LazyPieChart as PieChart,
   Area,
   XAxis,
   YAxis,
@@ -17,10 +18,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-  PieChart,
   Pie,
   Cell,
-} from 'recharts';
+} from '@/components/LazyCharts';
 import { ChartCard, StatCard } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
 

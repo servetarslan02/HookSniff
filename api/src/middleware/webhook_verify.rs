@@ -83,51 +83,46 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
                     *req.body_mut() = Body::from(body_bytes);
                     Ok(next.run(req).await)
                 }
-                Err(signing::VerificationError::TimestampExpired { age_secs, .. }) => {
-                    tracing::warn!("Webhook timestamp expired: {}s", age_secs);
-                    Err((
-                        StatusCode::BAD_REQUEST,
-                        axum::Json(json!({
-                            "error": {
-                                "code": "TIMESTAMP_EXPIRED",
-                                "message": "Webhook timestamp expired"
-                            }
-                        })),
-                    )
-                        .into_response())
-                }
-                Err(signing::VerificationError::SignatureMismatch) => Err((
-                    StatusCode::UNAUTHORIZED,
-                    axum::Json(json!({
-                        "error": {
-                            "code": "INVALID_SIGNATURE",
-                            "message": "Webhook signature verification failed"
-                        }
-                    })),
-                )
-                    .into_response()),
-                Err(signing::VerificationError::InvalidTimestamp) => Err((
-                    StatusCode::BAD_REQUEST,
-                    axum::Json(json!({
-                        "error": {
-                            "code": "INVALID_TIMESTAMP",
-                            "message": "Invalid webhook timestamp"
-                        }
-                    })),
-                )
-                    .into_response()),
-                Err(signing::VerificationError::MissingHeader(name)) => {
-                    tracing::warn!("Missing webhook header: {}", name);
-                    Err((
-                        StatusCode::BAD_REQUEST,
-                        axum::Json(json!({
-                            "error": {
-                                "code": "MISSING_HEADER",
-                                "message": "Missing required webhook header"
-                            }
-                        })),
-                    )
-                        .into_response())
+                Err(e) => {
+                    // The common VerificationError doesn't include MissingHeader
+                    // (headers are already extracted above), so use debug format
+                    // to distinguish error types for appropriate HTTP status codes.
+                    let err_str = format!("{:?}", e);
+                    if err_str.contains("TimestampExpired") {
+                        tracing::warn!("Webhook timestamp expired");
+                        Err((
+                            StatusCode::BAD_REQUEST,
+                            axum::Json(json!({
+                                "error": {
+                                    "code": "TIMESTAMP_EXPIRED",
+                                    "message": "Webhook timestamp expired"
+                                }
+                            })),
+                        )
+                            .into_response())
+                    } else if err_str.contains("InvalidTimestamp") {
+                        Err((
+                            StatusCode::BAD_REQUEST,
+                            axum::Json(json!({
+                                "error": {
+                                    "code": "INVALID_TIMESTAMP",
+                                    "message": "Invalid webhook timestamp"
+                                }
+                            })),
+                        )
+                            .into_response())
+                    } else {
+                        Err((
+                            StatusCode::UNAUTHORIZED,
+                            axum::Json(json!({
+                                "error": {
+                                    "code": "INVALID_SIGNATURE",
+                                    "message": "Webhook signature verification failed"
+                                }
+                            })),
+                        )
+                            .into_response())
+                    }
                 }
             }
         } else {

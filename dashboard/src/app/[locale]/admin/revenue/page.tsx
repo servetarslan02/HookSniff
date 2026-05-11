@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/store';
 import { adminApi, type RevenueResponse } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
 
 const PLAN_COLORS: Record<string, string> = {
