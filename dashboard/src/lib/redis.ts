@@ -10,7 +10,7 @@ export function getRedis(): Redis | null {
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!url || !token) {
-    console.warn('Upstash Redis not configured — playground will use in-memory fallback');
+    console.warn('Upstash Redis not configured — playground will use in-memory fallback'); // dev only
     return null;
   }
 

@@ -70,7 +70,7 @@ async fn list_devices(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<DeviceTokenResponse>>, AppError> {
     let rows = sqlx::query_as::<_, DeviceTokenRow>(
-        "SELECT id, customer_id, token, platform, created_at, last_used_at FROM device_tokens WHERE customer_id = $1 ORDER BY created_at DESC",
+        "SELECT id, customer_id, token, platform, created_at, last_used_at FROM device_tokens WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
     )
     .bind(customer.id)
     .fetch_all(&pool)
