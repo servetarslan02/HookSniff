@@ -71,14 +71,19 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟢 P3 | 13 | 8 | 5 |
 | **TOPLAM** | **103** | **102** | **1** |
 
-## Oturum 115 (2026-05-12 00:10 - 00:15 GMT+8) ✅
+## Oturum 115 (2026-05-12 00:10 - 00:18 GMT+8) ✅
 - **OpenClaw on birinci oturum** — Servet Vercel 404 fix
 - **Sorun:** `docs/api`, `docs/portal`, `docs/sdks` sayfaları Vercel'de 404 veriyor, local build'de 210 sayfa üretiliyor
-- **Kök neden:** `outputFileTracingRoot: path.join(__dirname, '..')` → repo root'u (api/, portal/, sdks/ klasörleri) Vercel serverless bundling'i karıştırıyordu
-- **Fix:** `outputFileTracingRoot` + `path` import'u kaldırıldı (`dashboard/next.config.js`)
-- **Push:** `bb16a8e2` — main branch, Vercel deploy tetiklendi
-- **Plan B hazır:** Eğer hâlâ 404 ise, 3 sayfayı farklı yola taşı (api-reference, embed-portal, sdk-libraries)
-- **Sonraki oturumda:** Deploy sonucunu kontrol et, 404 devam ederse Plan B'yi uygula
+- **Kök neden:** Repo root'taki `api/`, `portal/`, `sdks/` klasörleri + next-intl `[locale]` segmenti + Vercel serverless function conflict
+- **Fix 1:** `outputFileTracingRoot` + `path` import'u kaldırıldı (`dashboard/next.config.js`) — yetmedi
+- **Fix 2 (Plan B):** 3 sayfa farklı yola taşındı:
+  - `docs/api` → `docs/api-reference`
+  - `docs/portal` → `docs/embed-portal`
+  - `docs/sdks` → `docs/sdk-libraries`
+  - Sidebar, sitemap, test imports, SDK README güncellendi
+- **TypeScript:** 0 hata ✅
+- **Push:** `c0aa9d7b` — main branch
+- **Sonraki oturumda:** Deploy sonrası 3 URL'yi kontrol et
 
 ## Oturum 109 (2026-05-11 17:27 - 18:12) ✅
 - **OpenClaw beşinci oturum** — Servet ile GCP deploy debug
