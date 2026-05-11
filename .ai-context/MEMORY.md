@@ -516,3 +516,20 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - Grafana'da OTEL verilerini kontrol et (metrics, logs, traces)
 - API endpoint'lerini test et (register, login, webhook delivery)
 - GCloud SA key `/tmp/gcp-sa.json` oturum sonunda silinir — yeni key gerekir
+
+## Oturum 112 (2026-05-11 19:58 - 20:40) ✅
+- **OpenClaw sekizinci oturum** — Servet SDK publish tamamlama
+- **Rust (crates.io):** Zaten 0.3.0'da yayındaymış ✅
+- **Java (Maven Central):** `io.github.servetarslan02:hooksniff-sdk:0.3.0` doğrulandı ✅
+- **Kotlin (Maven Central):** `io.github.servetarslan02:hooksniff-sdk-kotlin:0.3.0` staging'den release edildi
+  - Artifact ID değiştirildi: `hooksniff-sdk` → `hooksniff-sdk-kotlin` (Java ile çakışma)
+  - build.gradle.kts güncellendi
+  - GPG signing + Sonatype OSSRH credentials ile publish
+  - Staging release başarılı, 10-30 dk'da Maven Central'da olacak
+- **Swift (SPM):** Package.swift düzeltildi (kaynak path eklendi), ama ayrı repo gerekli
+  - Monorepo'dan SPM tag ile çalışmaz
+  - `hooksniff-swift` gibi ayrı repo oluşturulmalı
+- **Go:** Proxy cache düzeldi, v0.3.0 artık latest ✅
+- **Commit:** `015db33` — Kotlin artifact fix + Swift Package.swift fix
+- **10/11 SDK yayında** (Kotlin 10-30 dk içinde), Swift eksik (aynı repo gerekli)
+- **Credential'lar:** .gitignore'a gradle.properties eklendi (commit edilmedi)
