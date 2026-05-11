@@ -291,9 +291,9 @@ async fn deliver_email(
     };
 
     // HS-036: Use a shared HTTP client for email delivery (connection pooling)
-    // Instead of creating a new client per call, use a lazy-static shared client.
-    static EMAIL_HTTP_CLIENT: once_cell::sync::Lazy<reqwest::Client> =
-        once_cell::sync::Lazy::new(|| {
+    // Instead of creating a new client per call, use a LazyLock shared client.
+    static EMAIL_HTTP_CLIENT: std::sync::LazyLock<reqwest::Client> =
+        std::sync::LazyLock::new(|| {
             reqwest::Client::builder()
                 .timeout(std::time::Duration::from_secs(30))
                 .build()
