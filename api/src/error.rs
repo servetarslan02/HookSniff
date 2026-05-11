@@ -185,7 +185,9 @@ mod tests {
 
     // ── IntoResponse tests ──
 
-    async fn extract_status_and_body(resp: axum::response::Response) -> (StatusCode, serde_json::Value) {
+    async fn extract_status_and_body(
+        resp: axum::response::Response,
+    ) -> (StatusCode, serde_json::Value) {
         let status = resp.status();
         let body = to_bytes(resp.into_body(), usize::MAX).await.unwrap();
         let json: serde_json::Value = serde_json::from_slice(&body).unwrap();

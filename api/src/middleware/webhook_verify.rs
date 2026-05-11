@@ -86,15 +86,15 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
                 Err(signing::VerificationError::TimestampExpired { age_secs, .. }) => {
                     tracing::warn!("Webhook timestamp expired: {}s", age_secs);
                     Err((
-                    StatusCode::BAD_REQUEST,
-                    axum::Json(json!({
-                        "error": {
-                            "code": "TIMESTAMP_EXPIRED",
-                            "message": "Webhook timestamp expired"
-                        }
-                    })),
-                )
-                    .into_response())
+                        StatusCode::BAD_REQUEST,
+                        axum::Json(json!({
+                            "error": {
+                                "code": "TIMESTAMP_EXPIRED",
+                                "message": "Webhook timestamp expired"
+                            }
+                        })),
+                    )
+                        .into_response())
                 }
                 Err(signing::VerificationError::SignatureMismatch) => Err((
                     StatusCode::UNAUTHORIZED,
@@ -119,15 +119,15 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
                 Err(signing::VerificationError::MissingHeader(name)) => {
                     tracing::warn!("Missing webhook header: {}", name);
                     Err((
-                    StatusCode::BAD_REQUEST,
-                    axum::Json(json!({
-                        "error": {
-                            "code": "MISSING_HEADER",
-                            "message": "Missing required webhook header"
-                        }
-                    })),
-                )
-                    .into_response())
+                        StatusCode::BAD_REQUEST,
+                        axum::Json(json!({
+                            "error": {
+                                "code": "MISSING_HEADER",
+                                "message": "Missing required webhook header"
+                            }
+                        })),
+                    )
+                        .into_response())
                 }
             }
         } else {
@@ -225,7 +225,8 @@ mod tests {
         let msg_id = "msg_001";
         let timestamp = "1000000000"; // Year 2001 — definitely expired
         let body = r#"{"test": true}"#;
-        let signature_header = crate::signing::compute_standard_signature(secret, msg_id, timestamp, body);
+        let signature_header =
+            crate::signing::compute_standard_signature(secret, msg_id, timestamp, body);
 
         let response = app
             .oneshot(
@@ -277,7 +278,8 @@ mod tests {
         let msg_id = "msg_valid";
         let now = chrono::Utc::now().timestamp().to_string();
         let body = r#"{"webhook":"test"}"#;
-        let signature_header = crate::signing::compute_standard_signature(secret, msg_id, &now, body);
+        let signature_header =
+            crate::signing::compute_standard_signature(secret, msg_id, &now, body);
 
         let response = app
             .oneshot(

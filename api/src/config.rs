@@ -60,22 +60,58 @@ impl fmt::Debug for Config {
             .field("retention_days", &self.retention_days)
             .field("rust_log", &self.rust_log)
             .field("webhook_format", &self.webhook_format)
-            .field("webhook_timestamp_tolerance_secs", &self.webhook_timestamp_tolerance_secs)
-            .field("stripe_secret_key", &self.stripe_secret_key.as_ref().map(|_| "[REDACTED]"))
-            .field("stripe_webhook_secret", &self.stripe_webhook_secret.as_ref().map(|_| "[REDACTED]"))
+            .field(
+                "webhook_timestamp_tolerance_secs",
+                &self.webhook_timestamp_tolerance_secs,
+            )
+            .field(
+                "stripe_secret_key",
+                &self.stripe_secret_key.as_ref().map(|_| "[REDACTED]"),
+            )
+            .field(
+                "stripe_webhook_secret",
+                &self.stripe_webhook_secret.as_ref().map(|_| "[REDACTED]"),
+            )
             .field("app_url", &self.app_url)
             .field("otel_enabled", &self.otel_enabled)
-            .field("otel_exporter_otlp_endpoint", &self.otel_exporter_otlp_endpoint)
-            .field("otel_exporter_otlp_headers", &self.otel_exporter_otlp_headers.as_ref().map(|_| "[REDACTED]"))
-            .field("polar_access_token", &self.polar_access_token.as_ref().map(|_| "[REDACTED]"))
-            .field("polar_webhook_secret", &self.polar_webhook_secret.as_ref().map(|_| "[REDACTED]"))
-            .field("iyzico_api_key", &self.iyzico_api_key.as_ref().map(|_| "[REDACTED]"))
-            .field("iyzico_secret_key", &self.iyzico_secret_key.as_ref().map(|_| "[REDACTED]"))
+            .field(
+                "otel_exporter_otlp_endpoint",
+                &self.otel_exporter_otlp_endpoint,
+            )
+            .field(
+                "otel_exporter_otlp_headers",
+                &self
+                    .otel_exporter_otlp_headers
+                    .as_ref()
+                    .map(|_| "[REDACTED]"),
+            )
+            .field(
+                "polar_access_token",
+                &self.polar_access_token.as_ref().map(|_| "[REDACTED]"),
+            )
+            .field(
+                "polar_webhook_secret",
+                &self.polar_webhook_secret.as_ref().map(|_| "[REDACTED]"),
+            )
+            .field(
+                "iyzico_api_key",
+                &self.iyzico_api_key.as_ref().map(|_| "[REDACTED]"),
+            )
+            .field(
+                "iyzico_secret_key",
+                &self.iyzico_secret_key.as_ref().map(|_| "[REDACTED]"),
+            )
             .field("gcp_service_account_path", &self.gcp_service_account_path)
             .field("cors_origins", &self.cors_origins)
             .field("notify_from_email", &"[REDACTED]")
-            .field("notify_email", &self.notify_email.as_ref().map(|_| "[REDACTED]"))
-            .field("fcm_server_key", &self.fcm_server_key.as_ref().map(|_| "[REDACTED]"))
+            .field(
+                "notify_email",
+                &self.notify_email.as_ref().map(|_| "[REDACTED]"),
+            )
+            .field(
+                "fcm_server_key",
+                &self.fcm_server_key.as_ref().map(|_| "[REDACTED]"),
+            )
             .field("email_base_url", &self.email_base_url)
             .finish()
     }
@@ -243,7 +279,10 @@ mod tests {
         let secret = format!("change-me-{}", "x".repeat(25));
         let result = validate_secret(&secret, "TEST_SECRET");
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("placeholder pattern"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("placeholder pattern"));
     }
 
     #[test]
@@ -475,14 +514,32 @@ mod tests {
     // Helper: clear all config-related env vars
     fn clear_config_env() {
         let vars = [
-            "APP_ENV", "PORT", "DATABASE_URL", "HMAC_SECRET", "JWT_SECRET",
-            "RUST_LOG", "MAX_PAYLOAD_BYTES", "RETENTION_DAYS", "WEBHOOK_FORMAT",
-            "WEBHOOK_TIMESTAMP_TOLERANCE_SECS", "STRIPE_SECRET_KEY",
-            "STRIPE_WEBHOOK_SECRET", "APP_URL", "OTEL_ENABLED",
-            "OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_HEADERS",
-            "POLAR_ACCESS_TOKEN", "POLAR_WEBHOOK_SECRET", "IYZICO_API_KEY",
-            "IYZICO_SECRET_KEY", "GCP_SERVICE_ACCOUNT_PATH", "CORS_ORIGINS",
-            "NOTIFY_FROM_EMAIL", "NOTIFY_EMAIL", "FCM_SERVER_KEY", "EMAIL_BASE_URL",
+            "APP_ENV",
+            "PORT",
+            "DATABASE_URL",
+            "HMAC_SECRET",
+            "JWT_SECRET",
+            "RUST_LOG",
+            "MAX_PAYLOAD_BYTES",
+            "RETENTION_DAYS",
+            "WEBHOOK_FORMAT",
+            "WEBHOOK_TIMESTAMP_TOLERANCE_SECS",
+            "STRIPE_SECRET_KEY",
+            "STRIPE_WEBHOOK_SECRET",
+            "APP_URL",
+            "OTEL_ENABLED",
+            "OTEL_EXPORTER_OTLP_ENDPOINT",
+            "OTEL_EXPORTER_OTLP_HEADERS",
+            "POLAR_ACCESS_TOKEN",
+            "POLAR_WEBHOOK_SECRET",
+            "IYZICO_API_KEY",
+            "IYZICO_SECRET_KEY",
+            "GCP_SERVICE_ACCOUNT_PATH",
+            "CORS_ORIGINS",
+            "NOTIFY_FROM_EMAIL",
+            "NOTIFY_EMAIL",
+            "FCM_SERVER_KEY",
+            "EMAIL_BASE_URL",
         ];
         for var in &vars {
             std::env::remove_var(var);
@@ -543,7 +600,10 @@ mod tests {
         let cfg = Config::from_env().expect("from_env should succeed");
         assert_eq!(cfg.port, 8080);
         assert_eq!(cfg.database_url, "postgres://custom");
-        assert_eq!(cfg.hmac_secret, "my-hmac-secret-value-for-testing-1234567890");
+        assert_eq!(
+            cfg.hmac_secret,
+            "my-hmac-secret-value-for-testing-1234567890"
+        );
         assert_eq!(cfg.jwt_secret, "my-jwt-secret-value-for-testing-1234567890");
         assert_eq!(cfg.rust_log, "debug");
         assert_eq!(cfg.retention_days, 90);
@@ -553,7 +613,10 @@ mod tests {
         assert_eq!(cfg.stripe_secret_key, Some("sk_test_123".into()));
         assert_eq!(cfg.app_url, Some("https://example.com".into()));
         assert!(cfg.otel_enabled);
-        assert_eq!(cfg.otel_exporter_otlp_endpoint, Some("http://otel:4317".into()));
+        assert_eq!(
+            cfg.otel_exporter_otlp_endpoint,
+            Some("http://otel:4317".into())
+        );
         assert_eq!(cfg.cors_origins, vec!["https://a.com", "https://b.com"]);
         assert_eq!(cfg.notify_from_email, "hello@example.com");
         assert_eq!(cfg.notify_email, Some("admin@example.com".into()));
@@ -594,8 +657,14 @@ mod tests {
     fn test_from_env_production_accepts_valid_secrets() {
         clear_config_env();
         std::env::set_var("APP_ENV", "production");
-        std::env::set_var("HMAC_SECRET", "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2");
-        std::env::set_var("JWT_SECRET", "f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5");
+        std::env::set_var(
+            "HMAC_SECRET",
+            "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+        );
+        std::env::set_var(
+            "JWT_SECRET",
+            "f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5",
+        );
 
         let cfg = Config::from_env().expect("should accept valid production secrets");
         assert!(cfg.is_production());
@@ -637,7 +706,10 @@ mod tests {
 
         let result = Config::from_env();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("MAX_PAYLOAD_BYTES"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("MAX_PAYLOAD_BYTES"));
 
         clear_config_env();
     }
@@ -724,7 +796,10 @@ mod tests {
     fn test_from_env_otel_headers() {
         clear_config_env();
         std::env::set_var("APP_ENV", "development");
-        std::env::set_var("OTEL_EXPORTER_OTLP_HEADERS", "Authorization=Bearer token123");
+        std::env::set_var(
+            "OTEL_EXPORTER_OTLP_HEADERS",
+            "Authorization=Bearer token123",
+        );
 
         let cfg = Config::from_env().unwrap();
         assert_eq!(

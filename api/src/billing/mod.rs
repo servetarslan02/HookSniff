@@ -88,9 +88,9 @@ impl Plan {
     pub fn monthly_price_cents(&self) -> u64 {
         match self {
             Plan::Free => 0,
-            Plan::Pro => 2900,       // $29/mo
+            Plan::Pro => 2900,      // $29/mo
             Plan::Business => 9900, // $99/mo
-            Plan::Enterprise => 0,   // Custom pricing
+            Plan::Enterprise => 0,  // Custom pricing
         }
     }
 
@@ -358,7 +358,9 @@ mod tests {
     fn higher_tiers_have_higher_limits() {
         assert!(Plan::Free.max_requests_per_minute() < Plan::Pro.max_requests_per_minute());
         assert!(Plan::Pro.max_requests_per_minute() < Plan::Business.max_requests_per_minute());
-        assert!(Plan::Business.max_requests_per_minute() < Plan::Enterprise.max_requests_per_minute());
+        assert!(
+            Plan::Business.max_requests_per_minute() < Plan::Enterprise.max_requests_per_minute()
+        );
 
         assert!(Plan::Free.max_endpoints() < Plan::Pro.max_endpoints());
         assert!(Plan::Pro.max_endpoints() < Plan::Business.max_endpoints());
@@ -366,7 +368,9 @@ mod tests {
 
         assert!(Plan::Free.max_webhooks_per_month() < Plan::Pro.max_webhooks_per_month());
         assert!(Plan::Pro.max_webhooks_per_month() < Plan::Business.max_webhooks_per_month());
-        assert!(Plan::Business.max_webhooks_per_month() < Plan::Enterprise.max_webhooks_per_month());
+        assert!(
+            Plan::Business.max_webhooks_per_month() < Plan::Enterprise.max_webhooks_per_month()
+        );
     }
 
     // ── Usage ──────────────────────────────────────────────────
@@ -474,9 +478,18 @@ mod tests {
 
     #[test]
     fn plan_deserialize_from_json() {
-        assert_eq!(serde_json::from_str::<Plan>("\"free\"").unwrap(), Plan::Free);
+        assert_eq!(
+            serde_json::from_str::<Plan>("\"free\"").unwrap(),
+            Plan::Free
+        );
         assert_eq!(serde_json::from_str::<Plan>("\"pro\"").unwrap(), Plan::Pro);
-        assert_eq!(serde_json::from_str::<Plan>("\"business\"").unwrap(), Plan::Business);
-        assert_eq!(serde_json::from_str::<Plan>("\"enterprise\"").unwrap(), Plan::Enterprise);
+        assert_eq!(
+            serde_json::from_str::<Plan>("\"business\"").unwrap(),
+            Plan::Business
+        );
+        assert_eq!(
+            serde_json::from_str::<Plan>("\"enterprise\"").unwrap(),
+            Plan::Enterprise
+        );
     }
 }

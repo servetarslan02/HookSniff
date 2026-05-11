@@ -325,7 +325,12 @@ impl RateLimiter {
     }
 
     /// Check rate limit with a custom window duration in seconds.
-    pub async fn check_with_window(&self, key: &str, limit: u32, window_secs: u64) -> RateLimitResult {
+    pub async fn check_with_window(
+        &self,
+        key: &str,
+        limit: u32,
+        window_secs: u64,
+    ) -> RateLimitResult {
         self.store.check(key, limit, window_secs).await
     }
 
@@ -445,8 +450,16 @@ pub async fn rate_limit_middleware(
         let mut response = next.run(req).await;
         let headers = response.headers_mut();
         insert_header(headers, "X-RateLimit-Limit", &result.limit.to_string());
-        insert_header(headers, "X-RateLimit-Remaining", &result.remaining.to_string());
-        insert_header(headers, "X-RateLimit-Reset", &result.reset_seconds.to_string());
+        insert_header(
+            headers,
+            "X-RateLimit-Remaining",
+            &result.remaining.to_string(),
+        );
+        insert_header(
+            headers,
+            "X-RateLimit-Reset",
+            &result.reset_seconds.to_string(),
+        );
         Ok(response)
     } else {
         let mut response = Response::new(axum::body::Body::empty());
@@ -454,7 +467,11 @@ pub async fn rate_limit_middleware(
         let headers = response.headers_mut();
         insert_header(headers, "X-RateLimit-Limit", &result.limit.to_string());
         insert_header(headers, "X-RateLimit-Remaining", "0");
-        insert_header(headers, "X-RateLimit-Reset", &result.reset_seconds.to_string());
+        insert_header(
+            headers,
+            "X-RateLimit-Reset",
+            &result.reset_seconds.to_string(),
+        );
         insert_header(headers, "Retry-After", &result.reset_seconds.to_string());
         Ok(response)
     }
@@ -577,7 +594,10 @@ mod tests {
         let store = Arc::new(InMemoryRateLimiter::new());
         let limiter = RateLimiter::new(store);
         limiter.set_plan("apikey_prefix", Plan::Enterprise).await;
-        assert_eq!(limiter.get_plan("apikey_prefix").await, Some(Plan::Enterprise));
+        assert_eq!(
+            limiter.get_plan("apikey_prefix").await,
+            Some(Plan::Enterprise)
+        );
     }
 
     // ── extract_key ────────────────────────────────────────────
@@ -605,9 +625,7 @@ mod tests {
 
     #[test]
     fn extract_key_no_auth_no_forwarded_for() {
-        let req = Request::builder()
-            .body(axum::body::Body::empty())
-            .unwrap();
+        let req = Request::builder().body(axum::body::Body::empty()).unwrap();
         let key = extract_key(&req);
         assert_eq!(key, "unknown");
     }
@@ -658,9 +676,7 @@ mod tests {
 
     #[test]
     fn extract_api_key_prefix_no_auth() {
-        let req = Request::builder()
-            .body(axum::body::Body::empty())
-            .unwrap();
+        let req = Request::builder().body(axum::body::Body::empty()).unwrap();
         assert!(extract_api_key_prefix(&req).is_none());
     }
 

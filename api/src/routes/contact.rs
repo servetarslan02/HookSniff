@@ -87,8 +87,8 @@ pub async fn handle_contact(
     );
 
     // Send to admin (use NOTIFY_EMAIL env var or fallback to logged warning)
-    let admin_email = std::env::var("NOTIFY_EMAIL")
-        .unwrap_or_else(|_| "servetarslan02@gmail.com".into());
+    let admin_email =
+        std::env::var("NOTIFY_EMAIL").unwrap_or_else(|_| "servetarslan02@gmail.com".into());
     if let Err(e) = email_provider
         .send_contact_email(
             &admin_email,

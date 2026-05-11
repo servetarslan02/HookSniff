@@ -70,9 +70,21 @@ async fn list_domains(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<CustomDomainResponse>>, AppError> {
-    let rows = sqlx::query_as::<_, (Uuid, String, bool, bool, String, String, Option<DateTime<Utc>>, DateTime<Utc>)>(
+    let rows = sqlx::query_as::<
+        _,
+        (
+            Uuid,
+            String,
+            bool,
+            bool,
+            String,
+            String,
+            Option<DateTime<Utc>>,
+            DateTime<Utc>,
+        ),
+    >(
         "SELECT id, domain, verified, ssl_active, cname_target, txt_record, verified_at, created_at
-         FROM custom_domains WHERE customer_id = $1 ORDER BY created_at DESC"
+         FROM custom_domains WHERE customer_id = $1 ORDER BY created_at DESC",
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -80,8 +92,8 @@ async fn list_domains(
 
     let domains = rows
         .into_iter()
-        .map(|(id, domain, verified, ssl_active, cname_target, txt_record, verified_at, created_at)| {
-            CustomDomainResponse {
+        .map(
+            |(
                 id,
                 domain,
                 verified,
@@ -90,8 +102,19 @@ async fn list_domains(
                 txt_record,
                 verified_at,
                 created_at,
-            }
-        })
+            )| {
+                CustomDomainResponse {
+                    id,
+                    domain,
+                    verified,
+                    ssl_active,
+                    cname_target,
+                    txt_record,
+                    verified_at,
+                    created_at,
+                }
+            },
+        )
         .collect();
 
     Ok(Json(domains))
@@ -110,17 +133,32 @@ async fn add_domain(
         return Err(AppError::BadRequest("Invalid domain format".into()));
     }
     // Reject domains with invalid characters (only allow a-z, 0-9, hyphen, dot)
-    if !domain.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.') {
-        return Err(AppError::BadRequest("Domain contains invalid characters".into()));
+    if !domain
+        .chars()
+        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.')
+    {
+        return Err(AppError::BadRequest(
+            "Domain contains invalid characters".into(),
+        ));
     }
     // Reject domains starting/ending with hyphen
     if domain.starts_with('-') || domain.ends_with('-') {
-        return Err(AppError::BadRequest("Domain cannot start or end with hyphen".into()));
+        return Err(AppError::BadRequest(
+            "Domain cannot start or end with hyphen".into(),
+        ));
     }
 
     // Reject common domains
-    let blocked = ["hooksniff.com", "hooksniff.vercel.app", "localhost", "example.com"];
-    if blocked.iter().any(|b| domain == *b || domain.ends_with(&format!(".{}", b))) {
+    let blocked = [
+        "hooksniff.com",
+        "hooksniff.vercel.app",
+        "localhost",
+        "example.com",
+    ];
+    if blocked
+        .iter()
+        .any(|b| domain == *b || domain.ends_with(&format!(".{}", b)))
+    {
         return Err(AppError::BadRequest("Cannot use this domain".into()));
     }
 
@@ -151,7 +189,11 @@ async fn add_domain(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("🌐 Custom domain added: {} for customer {}", domain, customer.id);
+    tracing::info!(
+        "🌐 Custom domain added: {} for customer {}",
+        domain,
+        customer.id
+    );
 
     Ok(Json(serde_json::json!({
         "id": id.0,
@@ -172,13 +214,11 @@ async fn delete_domain(
     Extension(customer): Extension<Customer>,
     Path(domain_id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let result = sqlx::query(
-        "DELETE FROM custom_domains WHERE id = $1 AND customer_id = $2"
-    )
-    .bind(domain_id)
-    .bind(customer.id)
-    .execute(&pool)
-    .await?;
+    let result = sqlx::query("DELETE FROM custom_domains WHERE id = $1 AND customer_id = $2")
+        .bind(domain_id)
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);

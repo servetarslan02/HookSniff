@@ -18,7 +18,10 @@ const GRACE_PERIOD_DAYS: i64 = 7;
 
 pub fn router() -> Router {
     Router::new()
-        .route("/subscription", get(get_subscription).delete(cancel_subscription))
+        .route(
+            "/subscription",
+            get(get_subscription).delete(cancel_subscription),
+        )
         .route("/upgrade", post(upgrade_plan))
         .route("/portal", post(open_portal))
         .route("/usage", get(get_usage))
@@ -182,9 +185,7 @@ async fn upgrade_plan(
 
     // Prevent same-plan upgrade
     if new_plan == current_plan {
-        return Err(AppError::BadRequest(
-            "You are already on this plan".into(),
-        ));
+        return Err(AppError::BadRequest("You are already on this plan".into()));
     }
 
     // Calculate proration for upgrades from paid plans
@@ -657,32 +658,28 @@ async fn process_webhook_result_with_event_id(
         } => {
             let webhook_limit = plan.max_webhooks_per_month() as i32;
             let update_query = match provider {
-                "polar" => {
-                    sqlx::query(
-                        "UPDATE customers SET plan = $1, payment_provider = $2, \
+                "polar" => sqlx::query(
+                    "UPDATE customers SET plan = $1, payment_provider = $2, \
                          polar_customer_id = $3, polar_subscription_id = $4, webhook_limit = $5, \
-                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6"
-                    )
-                    .bind(plan.as_str())
-                    .bind(provider)
-                    .bind(provider_customer_id)
-                    .bind(provider_subscription_id)
-                    .bind(webhook_limit)
-                    .bind(customer_id)
-                }
-                "iyzico" => {
-                    sqlx::query(
-                        "UPDATE customers SET plan = $1, payment_provider = $2, \
+                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6",
+                )
+                .bind(plan.as_str())
+                .bind(provider)
+                .bind(provider_customer_id)
+                .bind(provider_subscription_id)
+                .bind(webhook_limit)
+                .bind(customer_id),
+                "iyzico" => sqlx::query(
+                    "UPDATE customers SET plan = $1, payment_provider = $2, \
                          iyzico_customer_id = $3, iyzico_subscription_id = $4, webhook_limit = $5, \
-                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6"
-                    )
-                    .bind(plan.as_str())
-                    .bind(provider)
-                    .bind(provider_customer_id)
-                    .bind(provider_subscription_id)
-                    .bind(webhook_limit)
-                    .bind(customer_id)
-                }
+                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6",
+                )
+                .bind(plan.as_str())
+                .bind(provider)
+                .bind(provider_customer_id)
+                .bind(provider_subscription_id)
+                .bind(webhook_limit)
+                .bind(customer_id),
                 _ => return Ok(()),
             };
 
@@ -870,7 +867,10 @@ async fn process_webhook_result_with_event_id(
                 currency
             );
         }
-        WebhookResult::PaymentFailed { provider_tx_id, customer_id } => {
+        WebhookResult::PaymentFailed {
+            provider_tx_id,
+            customer_id,
+        } => {
             // HS-059: Set grace period on payment failure (all providers)
             if let Some(cid) = customer_id {
                 sqlx::query(

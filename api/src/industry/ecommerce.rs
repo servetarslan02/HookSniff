@@ -223,7 +223,10 @@ mod tests {
         assert_eq!(reqs.len(), 1);
         assert_eq!(reqs[0].name, "PCI-DSS-lite");
         assert_eq!(reqs[0].masking_rules.len(), 2);
-        assert_eq!(reqs[0].masking_rules[0].field_path, "data.payment.card_number");
+        assert_eq!(
+            reqs[0].masking_rules[0].field_path,
+            "data.payment.card_number"
+        );
         assert_eq!(reqs[0].masking_rules[0].strategy, "partial");
         assert_eq!(reqs[0].masking_rules[1].field_path, "data.payment.card_cvv");
         assert_eq!(reqs[0].masking_rules[1].strategy, "full");
@@ -244,7 +247,11 @@ mod tests {
     #[test]
     fn test_ecommerce_inventory_optimizer_agent() {
         let pkg = EcommercePackage::new();
-        let agent = pkg.agents().into_iter().find(|a| a.name == "inventory_optimizer").unwrap();
+        let agent = pkg
+            .agents()
+            .into_iter()
+            .find(|a| a.name == "inventory_optimizer")
+            .unwrap();
         assert_eq!(agent.agent_type, "optimization");
         assert!(agent.event_types.contains(&"order.created".to_string()));
         assert!(agent.event_types.contains(&"inventory.low".to_string()));
@@ -258,7 +265,9 @@ mod tests {
         let chains = pkg.webhook_chains();
         assert_eq!(chains.len(), 3);
         assert_eq!(chains[0].trigger_event, "order.created");
-        assert!(chains[0].downstream_events.contains(&"inventory.low".to_string()));
+        assert!(chains[0]
+            .downstream_events
+            .contains(&"inventory.low".to_string()));
         assert_eq!(chains[1].trigger_event, "cart.abandoned");
         assert_eq!(chains[2].trigger_event, "order.delivered");
     }
@@ -276,7 +285,7 @@ mod tests {
 
     #[test]
     fn test_ecommerce_default() {
-        let pkg = EcommercePackage::default();
+        let pkg = EcommercePackage;
         assert_eq!(pkg.name(), "ecommerce");
     }
 

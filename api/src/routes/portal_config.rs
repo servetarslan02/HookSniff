@@ -73,38 +73,47 @@ async fn get_portal_config(
     .await?;
 
     match config {
-        Some((id, company_name, logo_url, primary_color, font_family, dark_mode, show_events, show_deliveries, allowed_events, custom_css, created_at, updated_at)) => {
-            Ok(Json(PortalConfigResponse {
-                id: Some(id),
-                company_name,
-                logo_url,
-                primary_color: primary_color.unwrap_or_else(|| "#6366f1".to_string()),
-                font_family: font_family.unwrap_or_else(|| "Inter".to_string()),
-                dark_mode: dark_mode.unwrap_or(true),
-                show_events: show_events.unwrap_or(true),
-                show_deliveries: show_deliveries.unwrap_or(true),
-                allowed_events: allowed_events.unwrap_or_default(),
-                custom_css,
-                created_at,
-                updated_at,
-            }))
-        }
-        None => {
-            Ok(Json(PortalConfigResponse {
-                id: None,
-                company_name: None,
-                logo_url: None,
-                primary_color: "#6366f1".to_string(),
-                font_family: "Inter".to_string(),
-                dark_mode: true,
-                show_events: true,
-                show_deliveries: true,
-                allowed_events: vec![],
-                custom_css: None,
-                created_at: None,
-                updated_at: None,
-            }))
-        }
+        Some((
+            id,
+            company_name,
+            logo_url,
+            primary_color,
+            font_family,
+            dark_mode,
+            show_events,
+            show_deliveries,
+            allowed_events,
+            custom_css,
+            created_at,
+            updated_at,
+        )) => Ok(Json(PortalConfigResponse {
+            id: Some(id),
+            company_name,
+            logo_url,
+            primary_color: primary_color.unwrap_or_else(|| "#6366f1".to_string()),
+            font_family: font_family.unwrap_or_else(|| "Inter".to_string()),
+            dark_mode: dark_mode.unwrap_or(true),
+            show_events: show_events.unwrap_or(true),
+            show_deliveries: show_deliveries.unwrap_or(true),
+            allowed_events: allowed_events.unwrap_or_default(),
+            custom_css,
+            created_at,
+            updated_at,
+        })),
+        None => Ok(Json(PortalConfigResponse {
+            id: None,
+            company_name: None,
+            logo_url: None,
+            primary_color: "#6366f1".to_string(),
+            font_family: "Inter".to_string(),
+            dark_mode: true,
+            show_events: true,
+            show_deliveries: true,
+            allowed_events: vec![],
+            custom_css: None,
+            created_at: None,
+            updated_at: None,
+        })),
     }
 }
 
@@ -132,22 +141,34 @@ async fn upsert_portal_config(
     // Validate custom CSS length and sanitize
     if let Some(ref css) = req.custom_css {
         if css.len() > 10_000 {
-            return Err(AppError::BadRequest(
-                "custom_css must be under 10KB".into(),
-            ));
+            return Err(AppError::BadRequest("custom_css must be under 10KB".into()));
         }
         // Reject CSS containing dangerous patterns (XSS prevention)
         let lower = css.to_lowercase();
         let dangerous = [
-            "<script", "</script", "javascript:", "expression(", "url(data:",
-            "behavior:", "-moz-binding", "vbscript:", "<iframe", "</iframe",
-            "<object", "<embed", "onerror", "onload", "onclick", "onmouseover",
+            "<script",
+            "</script",
+            "javascript:",
+            "expression(",
+            "url(data:",
+            "behavior:",
+            "-moz-binding",
+            "vbscript:",
+            "<iframe",
+            "</iframe",
+            "<object",
+            "<embed",
+            "onerror",
+            "onload",
+            "onclick",
+            "onmouseover",
         ];
         for pattern in &dangerous {
             if lower.contains(pattern) {
-                return Err(AppError::BadRequest(
-                    format!("custom_css contains forbidden pattern: {}", pattern),
-                ));
+                return Err(AppError::BadRequest(format!(
+                    "custom_css contains forbidden pattern: {}",
+                    pattern
+                )));
             }
         }
     }
@@ -188,9 +209,7 @@ async fn upsert_portal_config(
 }
 
 /// GET /portal/embed-code — Get the embed code snippet
-async fn get_embed_code(
-    Extension(customer): Extension<Customer>,
-) -> Json<serde_json::Value> {
+async fn get_embed_code(Extension(customer): Extension<Customer>) -> Json<serde_json::Value> {
     let portal_id = customer.id.to_string();
     let iframe_code = format!(
         r#"<iframe
