@@ -397,6 +397,12 @@ cd dashboard && npm run lint && npx tsc --noEmit
 git add -A && git commit -m "type: message" && git pull --rebase origin main && git push origin main
 ```
 
+### Subagent Kuralı (ZORUNLU)
+- **Her subagent = TEK İŞ.** İki SDK, iki task, iki sorumluluk VERME.
+- Subagent sayısını artır, işi böl. 8 limit var, 8'e kadar kullan.
+- Zaman aşımı = başarısızlık. 5 dakika yetmezse işi daha küçük parçalara böl.
+- Örnek: 11 SDK → 8 subagent (ilk 8'e birer SDK), kalan 3 → ikinci dalga.
+
 ### Erteleme Kuralı
 - ❌ "Daha sonra yaparız" YASAK
 - ❌ "Bu riskli, dokunmayalım" YASAK (önce araştır, sonra karar ver)
