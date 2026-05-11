@@ -30,8 +30,8 @@ struct ResendSendResponse {
 impl ResendEmailClient {
     pub fn from_env() -> Option<Self> {
         let api_key = std::env::var("RESEND_API_KEY").ok()?;
-        let from_email = std::env::var("NOTIFY_FROM_EMAIL")
-            .unwrap_or_else(|_| "onboarding@resend.dev".into());
+        let from_email =
+            std::env::var("NOTIFY_FROM_EMAIL").unwrap_or_else(|_| "onboarding@resend.dev".into());
 
         if api_key.is_empty() {
             return None;
@@ -78,7 +78,12 @@ impl ResendEmailClient {
             AppError::Internal(anyhow::anyhow!("Failed to parse Resend response: {}", e))
         })?;
 
-        tracing::info!("✅ Email sent via Resend to {}: {} (id={})", to, subject, result.id);
+        tracing::info!(
+            "✅ Email sent via Resend to {}: {} (id={})",
+            to,
+            subject,
+            result.id
+        );
         Ok(())
     }
 

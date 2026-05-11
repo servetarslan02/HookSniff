@@ -130,17 +130,35 @@ mod tests {
 
     #[test]
     fn parse_str_iyzico() {
-        assert_eq!(PaymentProvider::parse_str("iyzico"), PaymentProvider::Iyzico);
-        assert_eq!(PaymentProvider::parse_str("Iyzico"), PaymentProvider::Iyzico);
-        assert_eq!(PaymentProvider::parse_str("IYZICO"), PaymentProvider::Iyzico);
+        assert_eq!(
+            PaymentProvider::parse_str("iyzico"),
+            PaymentProvider::Iyzico
+        );
+        assert_eq!(
+            PaymentProvider::parse_str("Iyzico"),
+            PaymentProvider::Iyzico
+        );
+        assert_eq!(
+            PaymentProvider::parse_str("IYZICO"),
+            PaymentProvider::Iyzico
+        );
     }
 
     #[test]
     fn parse_str_stripe_default() {
-        assert_eq!(PaymentProvider::parse_str("stripe"), PaymentProvider::Stripe);
-        assert_eq!(PaymentProvider::parse_str("Stripe"), PaymentProvider::Stripe);
+        assert_eq!(
+            PaymentProvider::parse_str("stripe"),
+            PaymentProvider::Stripe
+        );
+        assert_eq!(
+            PaymentProvider::parse_str("Stripe"),
+            PaymentProvider::Stripe
+        );
         assert_eq!(PaymentProvider::parse_str(""), PaymentProvider::Stripe);
-        assert_eq!(PaymentProvider::parse_str("unknown"), PaymentProvider::Stripe);
+        assert_eq!(
+            PaymentProvider::parse_str("unknown"),
+            PaymentProvider::Stripe
+        );
     }
 
     // ── PaymentProvider::as_str ────────────────────────────────
@@ -305,7 +323,10 @@ mod tests {
             customer_id: None,
         };
         match result {
-            WebhookResult::PaymentFailed { provider_tx_id, customer_id } => {
+            WebhookResult::PaymentFailed {
+                provider_tx_id,
+                customer_id,
+            } => {
                 assert_eq!(provider_tx_id, "tx_fail");
                 assert!(customer_id.is_none());
             }

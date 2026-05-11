@@ -1293,17 +1293,25 @@ mod tests {
 
     #[test]
     fn test_clean_database_url_channel_binding_at_end() {
-        let url = "postgres://user:pass@ep-host.neon.tech/db?sslmode=require&channel_binding=require";
+        let url =
+            "postgres://user:pass@ep-host.neon.tech/db?sslmode=require&channel_binding=require";
         let cleaned = clean_database_url(url);
-        assert_eq!(cleaned, "postgres://user:pass@ep-host.neon.tech/db?sslmode=require");
+        assert_eq!(
+            cleaned,
+            "postgres://user:pass@ep-host.neon.tech/db?sslmode=require"
+        );
         assert!(!cleaned.contains("channel_binding"));
     }
 
     #[test]
     fn test_clean_database_url_channel_binding_in_middle() {
-        let url = "postgres://user:pass@ep-host.neon.tech/db?channel_binding=require&sslmode=require";
+        let url =
+            "postgres://user:pass@ep-host.neon.tech/db?channel_binding=require&sslmode=require";
         let cleaned = clean_database_url(url);
-        assert_eq!(cleaned, "postgres://user:pass@ep-host.neon.tech/db?sslmode=require");
+        assert_eq!(
+            cleaned,
+            "postgres://user:pass@ep-host.neon.tech/db?sslmode=require"
+        );
         assert!(!cleaned.contains("channel_binding"));
     }
 
@@ -1461,7 +1469,11 @@ mod tests {
         ];
         let mut sorted = migration_names.clone();
         sorted.dedup();
-        assert_eq!(sorted.len(), migration_names.len(), "Migration names must be unique");
+        assert_eq!(
+            sorted.len(),
+            migration_names.len(),
+            "Migration names must be unique"
+        );
     }
 
     // ════════════════════════════════════════════════════════
@@ -1471,8 +1483,8 @@ mod tests {
 
     /// Helper: create a test pool from DATABASE_URL
     async fn test_pool() -> Result<PgPool> {
-        let database_url = std::env::var("DATABASE_URL")
-            .expect("DATABASE_URL must be set for integration tests");
+        let database_url =
+            std::env::var("DATABASE_URL").expect("DATABASE_URL must be set for integration tests");
         create_pool(&database_url).await
     }
 
@@ -1486,19 +1498,36 @@ mod tests {
             .fetch_one(&pool)
             .await
             .expect("should query _migrations");
-        assert!(count.0 >= 46, "Expected at least 46 applied migrations, got {}", count.0);
+        assert!(
+            count.0 >= 46,
+            "Expected at least 46 applied migrations, got {}",
+            count.0
+        );
 
         // Verify core tables exist
         let tables = vec![
-            "customers", "endpoints", "deliveries", "delivery_attempts",
-            "dead_letters", "idempotency_keys", "webhook_queue", "api_keys",
-            "alert_rules", "teams", "team_members", "notifications",
-            "invoices", "payment_transactions", "password_reset_tokens",
-            "email_verification_tokens", "refresh_tokens", "device_tokens",
+            "customers",
+            "endpoints",
+            "deliveries",
+            "delivery_attempts",
+            "dead_letters",
+            "idempotency_keys",
+            "webhook_queue",
+            "api_keys",
+            "alert_rules",
+            "teams",
+            "team_members",
+            "notifications",
+            "invoices",
+            "payment_transactions",
+            "password_reset_tokens",
+            "email_verification_tokens",
+            "refresh_tokens",
+            "device_tokens",
         ];
         for table in tables {
             let exists: (bool,) = sqlx::query_as(
-                "SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name = $1)"
+                "SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name = $1)",
             )
             .bind(table)
             .fetch_one(&pool)
@@ -1519,7 +1548,7 @@ mod tests {
         // Create a test customer, endpoint, and delivery first
         let customer_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash)
-             VALUES ($1, $2, $3, $4) RETURNING id"
+             VALUES ($1, $2, $3, $4) RETURNING id",
         )
         .bind("db-test@example.com")
         .bind("test-hash")
@@ -1531,7 +1560,7 @@ mod tests {
 
         let endpoint_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO endpoints (customer_id, url, signing_secret)
-             VALUES ($1, $2, $3) RETURNING id"
+             VALUES ($1, $2, $3) RETURNING id",
         )
         .bind(customer_id.0)
         .bind("https://example.com/webhook")
@@ -1542,7 +1571,7 @@ mod tests {
 
         let delivery_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status)
-             VALUES ($1, $2, $3, $4, $5) RETURNING id"
+             VALUES ($1, $2, $3, $4, $5) RETURNING id",
         )
         .bind(endpoint_id.0)
         .bind(customer_id.0)
@@ -1566,13 +1595,12 @@ mod tests {
         .expect("publish_to_queue should succeed");
 
         // Verify the queue entry exists
-        let queue_entry: (uuid::Uuid,) = sqlx::query_as(
-            "SELECT id FROM webhook_queue WHERE delivery_id = $1"
-        )
-        .bind(delivery_id.0)
-        .fetch_one(&pool)
-        .await
-        .expect("queue entry should exist");
+        let queue_entry: (uuid::Uuid,) =
+            sqlx::query_as("SELECT id FROM webhook_queue WHERE delivery_id = $1")
+                .bind(delivery_id.0)
+                .fetch_one(&pool)
+                .await
+                .expect("queue entry should exist");
 
         assert_eq!(queue_entry.0, delivery_id.0);
 
@@ -1607,15 +1635,17 @@ mod tests {
 
         // Running migrations again should be a no-op (idempotent)
         let result = run_migrations(&pool).await;
-        assert!(result.is_ok(), "Running migrations twice should not fail (idempotent)");
+        assert!(
+            result.is_ok(),
+            "Running migrations twice should not fail (idempotent)"
+        );
 
         // Verify no duplicate migration records
-        let dupes: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) - COUNT(DISTINCT name) FROM _migrations"
-        )
-        .fetch_one(&pool)
-        .await
-        .expect("should count duplicates");
+        let dupes: (i64,) =
+            sqlx::query_as("SELECT COUNT(*) - COUNT(DISTINCT name) FROM _migrations")
+                .fetch_one(&pool)
+                .await
+                .expect("should count duplicates");
         assert_eq!(dupes.0, 0, "No duplicate migration names allowed");
 
         pool.close().await;
@@ -1631,7 +1661,7 @@ mod tests {
         // Create
         let customer_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash, plan)
-             VALUES ($1, $2, $3, $4, $5) RETURNING id"
+             VALUES ($1, $2, $3, $4, $5) RETURNING id",
         )
         .bind(&test_email)
         .bind("crud-hash")
@@ -1643,13 +1673,12 @@ mod tests {
         .expect("insert customer");
 
         // Read
-        let customer: (String, String) = sqlx::query_as(
-            "SELECT email, plan FROM customers WHERE id = $1"
-        )
-        .bind(customer_id.0)
-        .fetch_one(&pool)
-        .await
-        .expect("fetch customer");
+        let customer: (String, String) =
+            sqlx::query_as("SELECT email, plan FROM customers WHERE id = $1")
+                .bind(customer_id.0)
+                .fetch_one(&pool)
+                .await
+                .expect("fetch customer");
 
         assert_eq!(customer.0, test_email);
         assert_eq!(customer.1, "free");
@@ -1690,7 +1719,7 @@ mod tests {
         // Create customer
         let customer_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash)
-             VALUES ($1, $2, $3, $4) RETURNING id"
+             VALUES ($1, $2, $3, $4) RETURNING id",
         )
         .bind(&test_email)
         .bind("ep-hash")
@@ -1703,7 +1732,7 @@ mod tests {
         // Create endpoint
         let endpoint_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO endpoints (customer_id, url, signing_secret, description, is_active)
-             VALUES ($1, $2, $3, $4, $5) RETURNING id"
+             VALUES ($1, $2, $3, $4, $5) RETURNING id",
         )
         .bind(customer_id.0)
         .bind("https://example.com/hook")
@@ -1721,14 +1750,16 @@ mod tests {
             .await
             .expect("delete customer");
 
-        let endpoint_exists: (bool,) = sqlx::query_as(
-            "SELECT EXISTS(SELECT 1 FROM endpoints WHERE id = $1)"
-        )
-        .bind(endpoint_id.0)
-        .fetch_one(&pool)
-        .await
-        .unwrap_or((false,));
-        assert!(!endpoint_exists.0, "Endpoint should be cascade-deleted with customer");
+        let endpoint_exists: (bool,) =
+            sqlx::query_as("SELECT EXISTS(SELECT 1 FROM endpoints WHERE id = $1)")
+                .bind(endpoint_id.0)
+                .fetch_one(&pool)
+                .await
+                .unwrap_or((false,));
+        assert!(
+            !endpoint_exists.0,
+            "Endpoint should be cascade-deleted with customer"
+        );
 
         pool.close().await;
     }
@@ -1743,7 +1774,7 @@ mod tests {
         // Create customer + endpoint
         let customer_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash)
-             VALUES ($1, $2, $3, $4) RETURNING id"
+             VALUES ($1, $2, $3, $4) RETURNING id",
         )
         .bind(&test_email)
         .bind("c-hash")
@@ -1755,7 +1786,7 @@ mod tests {
 
         let endpoint_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO endpoints (customer_id, url, signing_secret)
-             VALUES ($1, $2, $3) RETURNING id"
+             VALUES ($1, $2, $3) RETURNING id",
         )
         .bind(customer_id.0)
         .bind("https://example.com/constraint")
@@ -1767,7 +1798,7 @@ mod tests {
         // Invalid status should fail (CHECK constraint)
         let bad_insert = sqlx::query(
             "INSERT INTO deliveries (endpoint_id, customer_id, payload, status)
-             VALUES ($1, $2, $3, 'invalid_status')"
+             VALUES ($1, $2, $3, 'invalid_status')",
         )
         .bind(endpoint_id.0)
         .bind(customer_id.0)
@@ -1775,13 +1806,16 @@ mod tests {
         .execute(&pool)
         .await;
 
-        assert!(bad_insert.is_err(), "Invalid delivery status should be rejected by CHECK constraint");
+        assert!(
+            bad_insert.is_err(),
+            "Invalid delivery status should be rejected by CHECK constraint"
+        );
 
         // Valid statuses should work
         for status in &["pending", "processing", "delivered", "failed"] {
             let result = sqlx::query(
                 "INSERT INTO deliveries (endpoint_id, customer_id, payload, status)
-                 VALUES ($1, $2, $3, $4)"
+                 VALUES ($1, $2, $3, $4)",
             )
             .bind(endpoint_id.0)
             .bind(customer_id.0)
@@ -1821,7 +1855,7 @@ mod tests {
         // Create customer
         let customer_id: (uuid::Uuid,) = sqlx::query_as(
             "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash)
-             VALUES ($1, $2, $3, $4) RETURNING id"
+             VALUES ($1, $2, $3, $4) RETURNING id",
         )
         .bind(&test_email)
         .bind("trig-hash")
@@ -1832,13 +1866,12 @@ mod tests {
         .expect("insert customer");
 
         // Get initial updated_at
-        let initial: (chrono::DateTime<chrono::Utc>,) = sqlx::query_as(
-            "SELECT updated_at FROM customers WHERE id = $1"
-        )
-        .bind(customer_id.0)
-        .fetch_one(&pool)
-        .await
-        .expect("fetch initial");
+        let initial: (chrono::DateTime<chrono::Utc>,) =
+            sqlx::query_as("SELECT updated_at FROM customers WHERE id = $1")
+                .bind(customer_id.0)
+                .fetch_one(&pool)
+                .await
+                .expect("fetch initial");
 
         // Small delay to ensure timestamp changes
         tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
@@ -1852,13 +1885,12 @@ mod tests {
             .expect("update customer");
 
         // Verify updated_at changed
-        let after: (chrono::DateTime<chrono::Utc>,) = sqlx::query_as(
-            "SELECT updated_at FROM customers WHERE id = $1"
-        )
-        .bind(customer_id.0)
-        .fetch_one(&pool)
-        .await
-        .expect("fetch after");
+        let after: (chrono::DateTime<chrono::Utc>,) =
+            sqlx::query_as("SELECT updated_at FROM customers WHERE id = $1")
+                .bind(customer_id.0)
+                .fetch_one(&pool)
+                .await
+                .expect("fetch after");
 
         assert!(
             after.0 > initial.0,

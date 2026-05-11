@@ -140,8 +140,7 @@ mod tests {
 
     #[test]
     fn test_default_platform() {
-        let platform = None::<String>;
-        let platform = platform.unwrap_or_else(|| "android".to_string());
+        let platform = "android";
         assert_eq!(platform, "android");
     }
 }

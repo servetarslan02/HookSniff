@@ -125,7 +125,12 @@ impl WsGateway {
 
         connections.insert(connection_id.clone(), connection);
 
-        info!("🔌 WebSocket connection {} established ({}/{})", connection_id, connections.len(), self.max_connections);
+        info!(
+            "🔌 WebSocket connection {} established ({}/{})",
+            connection_id,
+            connections.len(),
+            self.max_connections
+        );
         Ok(connection_id)
     }
 

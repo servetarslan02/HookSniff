@@ -258,13 +258,19 @@ mod tests {
     #[test]
     fn test_parse_date_from_str_datetime() {
         let dt = parse_date_from_str("2024-01-15T10:30:00").unwrap();
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T10:30:00"
+        );
     }
 
     #[test]
     fn test_parse_date_from_str_date_only() {
         let dt = parse_date_from_str("2024-01-15").unwrap();
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T00:00:00");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T00:00:00"
+        );
     }
 
     #[test]
@@ -278,13 +284,19 @@ mod tests {
     #[test]
     fn test_parse_date_to_str_datetime() {
         let dt = parse_date_to_str("2024-01-15T10:30:00").unwrap();
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T10:30:00"
+        );
     }
 
     #[test]
     fn test_parse_date_to_str_date_only_sets_end_of_day() {
         let dt = parse_date_to_str("2024-01-15").unwrap();
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T23:59:59");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T23:59:59"
+        );
     }
 
     #[test]

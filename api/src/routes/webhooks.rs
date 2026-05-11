@@ -447,7 +447,7 @@ async fn batch_webhooks(
     let excess = batch_count - created_count;
     if excess > 0 {
         let _ = sqlx::query(
-            "UPDATE customers SET webhook_count = GREATEST(0, webhook_count - $1) WHERE id = $2"
+            "UPDATE customers SET webhook_count = GREATEST(0, webhook_count - $1) WHERE id = $2",
         )
         .bind(excess)
         .bind(customer.id)
@@ -895,13 +895,19 @@ mod tests {
     #[test]
     fn test_parse_date_from_str_datetime() {
         let dt = parse_date_from_str("2024-01-15T10:30:00").unwrap();
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T10:30:00"
+        );
     }
 
     #[test]
     fn test_parse_date_from_str_date_only() {
         let dt = parse_date_from_str("2024-01-15").unwrap();
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T00:00:00");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T00:00:00"
+        );
     }
 
     #[test]
@@ -914,14 +920,20 @@ mod tests {
     #[test]
     fn test_parse_date_to_str_datetime() {
         let dt = parse_date_to_str("2024-01-15T10:30:00").unwrap();
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T10:30:00");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T10:30:00"
+        );
     }
 
     #[test]
     fn test_parse_date_to_str_date_only() {
         let dt = parse_date_to_str("2024-01-15").unwrap();
         // Date-only should set to end of day (23:59:59)
-        assert_eq!(dt.format("%Y-%m-%dT%H:%M:%S").to_string(), "2024-01-15T23:59:59");
+        assert_eq!(
+            dt.format("%Y-%m-%dT%H:%M:%S").to_string(),
+            "2024-01-15T23:59:59"
+        );
     }
 
     #[test]
@@ -993,10 +1005,9 @@ mod tests {
 
     #[test]
     fn test_pagination_defaults() {
-        let page = None::<i64>;
-        let per_page = None::<i64>;
-        let page = page.unwrap_or(1).max(1);
-        let per_page = per_page.unwrap_or(20).min(100);
+        // When no page/per_page provided, defaults are 1 and 20
+        let page = 1i64;
+        let per_page = 20i64;
         let offset = (page - 1) * per_page;
         assert_eq!(page, 1);
         assert_eq!(per_page, 20);
@@ -1005,11 +1016,14 @@ mod tests {
 
     #[test]
     fn test_pagination_clamping() {
-        let page = Some(-1i64);
-        let per_page = Some(500i64);
-        let page = page.unwrap_or(1).max(1);
-        let per_page = per_page.unwrap_or(20).min(100);
-        assert_eq!(page, 1); // Clamped to 1
-        assert_eq!(per_page, 100); // Clamped to 100
+        // Negative page should clamp to 1
+        let raw_page = -1i64;
+        let clamped_page = raw_page.max(1);
+        assert_eq!(clamped_page, 1);
+
+        // per_page over 100 should clamp to 100
+        let raw_per_page = 500i64;
+        let clamped_per_page = raw_per_page.min(100);
+        assert_eq!(clamped_per_page, 100);
     }
 }

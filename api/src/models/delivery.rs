@@ -228,7 +228,10 @@ mod tests {
     fn test_delivery_to_response() {
         let d = make_delivery();
         let resp = d.to_response();
-        assert_eq!(resp.id, Uuid::parse_str("22222222-2222-2222-2222-222222222222").unwrap());
+        assert_eq!(
+            resp.id,
+            Uuid::parse_str("22222222-2222-2222-2222-222222222222").unwrap()
+        );
         assert_eq!(resp.event, Some("order.created".to_string()));
         assert_eq!(resp.status, "pending");
         assert_eq!(resp.attempt_count, 0);
@@ -394,7 +397,10 @@ mod tests {
         let deserialized: DeliveryAttempt = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.attempt_number, 3);
         assert_eq!(deserialized.status_code, Some(500));
-        assert_eq!(deserialized.error_message, Some("upstream timeout".to_string()));
+        assert_eq!(
+            deserialized.error_message,
+            Some("upstream timeout".to_string())
+        );
     }
 
     #[test]
@@ -412,7 +418,10 @@ mod tests {
             response_headers: None,
         };
         let resp = attempt.to_response();
-        assert_eq!(resp.id, Uuid::parse_str("55555555-5555-5555-5555-555555555555").unwrap());
+        assert_eq!(
+            resp.id,
+            Uuid::parse_str("55555555-5555-5555-5555-555555555555").unwrap()
+        );
         assert_eq!(resp.attempt_number, 2);
         assert_eq!(resp.status_code, Some(201));
         assert_eq!(resp.duration_ms, Some(200));
@@ -491,7 +500,13 @@ mod tests {
         let json = serde_json::to_string(&d).unwrap();
         let deserialized: Delivery = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.payload["order"]["id"], 12345);
-        assert_eq!(deserialized.payload["order"]["items"].as_array().unwrap().len(), 2);
+        assert_eq!(
+            deserialized.payload["order"]["items"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
     }
 
     #[test]

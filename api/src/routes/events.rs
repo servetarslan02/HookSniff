@@ -244,14 +244,14 @@ mod tests {
 
     #[test]
     fn test_pagination_clamping() {
-        // page should be max(1)
-        let page = Some(0i64);
-        let page = page.unwrap_or(1).max(1);
-        assert_eq!(page, 1);
+        // page 0 should be clamped to 1
+        let page = 0i64;
+        let clamped = page.max(1);
+        assert_eq!(clamped, 1);
 
-        // per_page should be min(200)
-        let per_page = Some(500i64);
-        let per_page = per_page.unwrap_or(50).min(200);
-        assert_eq!(per_page, 200);
+        // per_page 500 should be clamped to 200
+        let per_page = 500i64;
+        let clamped = per_page.min(200);
+        assert_eq!(clamped, 200);
     }
 }

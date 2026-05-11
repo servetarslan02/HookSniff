@@ -38,12 +38,14 @@ impl AuthCache {
     }
 
     fn insert(&mut self, prefix: String, customer: Customer) {
-        self.entries.insert(prefix, (customer, Instant::now() + AUTH_CACHE_TTL));
+        self.entries
+            .insert(prefix, (customer, Instant::now() + AUTH_CACHE_TTL));
     }
 
     #[allow(dead_code)] // Cache eviction utility; will be called by periodic cleanup task
     fn cleanup(&mut self) {
-        self.entries.retain(|_, (_, expiry)| Instant::now() < *expiry);
+        self.entries
+            .retain(|_, (_, expiry)| Instant::now() < *expiry);
     }
 }
 
@@ -247,9 +249,9 @@ pub async fn admin_middleware(req: Request, next: Next) -> Result<Response, AppE
 /// Hash an API key using Argon2id with a random salt.
 /// The salt is embedded in the returned hash string (PHC format).
 pub fn hash_api_key(key: &str) -> String {
+    use argon2::password_hash::rand_core::OsRng;
     use argon2::password_hash::SaltString;
     use argon2::{Argon2, PasswordHasher};
-    use argon2::password_hash::rand_core::OsRng;
     let salt = SaltString::generate(&mut OsRng);
     let argon2 = Argon2::default();
     argon2
@@ -274,7 +276,9 @@ pub fn verify_api_key(key: &str, hash: &str) -> bool {
 pub fn generate_api_key() -> String {
     use rand::TryRng;
     let mut bytes = [0u8; 32];
-    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
+    rand::rngs::SysRng
+        .try_fill_bytes(&mut bytes)
+        .expect("SysRng fill failed");
     format!("hr_live_{}", hex::encode(bytes))
 }
 
@@ -283,7 +287,9 @@ pub fn generate_api_key() -> String {
 pub fn generate_test_api_key() -> String {
     use rand::TryRng;
     let mut bytes = [0u8; 32];
-    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
+    rand::rngs::SysRng
+        .try_fill_bytes(&mut bytes)
+        .expect("SysRng fill failed");
     format!("hr_test_{}", hex::encode(bytes))
 }
 

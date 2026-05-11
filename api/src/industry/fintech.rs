@@ -225,7 +225,11 @@ mod tests {
         assert_eq!(reqs[0].name, "PCI-DSS");
         assert_eq!(reqs[0].masking_rules.len(), 5);
 
-        let rule_paths: Vec<&str> = reqs[0].masking_rules.iter().map(|r| r.field_path.as_str()).collect();
+        let rule_paths: Vec<&str> = reqs[0]
+            .masking_rules
+            .iter()
+            .map(|r| r.field_path.as_str())
+            .collect();
         assert!(rule_paths.contains(&"data.card_number"));
         assert!(rule_paths.contains(&"data.card_cvv"));
         assert!(rule_paths.contains(&"data.account_number"));
@@ -237,7 +241,11 @@ mod tests {
     fn test_fintech_compliance_card_cvv_replacement() {
         let pkg = FintechPackage::new();
         let reqs = pkg.compliance_requirements();
-        let cvv_rule = reqs[0].masking_rules.iter().find(|r| r.field_path == "data.card_cvv").unwrap();
+        let cvv_rule = reqs[0]
+            .masking_rules
+            .iter()
+            .find(|r| r.field_path == "data.card_cvv")
+            .unwrap();
         assert_eq!(cvv_rule.strategy, "full");
         assert_eq!(cvv_rule.replacement, Some("***".to_string()));
         assert!(cvv_rule.pattern.is_some());
@@ -258,7 +266,11 @@ mod tests {
     #[test]
     fn test_fintech_fraud_detector_agent() {
         let pkg = FintechPackage::new();
-        let agent = pkg.agents().into_iter().find(|a| a.name == "fraud_detector").unwrap();
+        let agent = pkg
+            .agents()
+            .into_iter()
+            .find(|a| a.name == "fraud_detector")
+            .unwrap();
         assert_eq!(agent.agent_type, "anomaly_detection");
         assert!(agent.event_types.contains(&"payment.completed".to_string()));
         assert!(agent.event_types.contains(&"fraud.detected".to_string()));
@@ -272,9 +284,13 @@ mod tests {
         let chains = pkg.webhook_chains();
         assert_eq!(chains.len(), 2);
         assert_eq!(chains[0].trigger_event, "payment.completed");
-        assert!(chains[0].downstream_events.contains(&"fraud.detected".to_string()));
+        assert!(chains[0]
+            .downstream_events
+            .contains(&"fraud.detected".to_string()));
         assert_eq!(chains[1].trigger_event, "fraud.detected");
-        assert!(chains[1].downstream_events.contains(&"account.frozen".to_string()));
+        assert!(chains[1]
+            .downstream_events
+            .contains(&"account.frozen".to_string()));
     }
 
     #[test]
@@ -290,7 +306,7 @@ mod tests {
 
     #[test]
     fn test_fintech_default() {
-        let pkg = FintechPackage::default();
+        let pkg = FintechPackage;
         assert_eq!(pkg.name(), "fintech");
     }
 
