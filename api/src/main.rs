@@ -30,6 +30,13 @@ async fn main() -> Result<()> {
 
     tracing::info!("Starting HookSniff API v{}", env!("CARGO_PKG_VERSION"));
 
+    // HS-263: Warn if ENCRYPTION_KEY is not set (required for SSO secrets, etc.)
+    if std::env::var("ENCRYPTION_KEY").is_err() {
+        tracing::warn!(
+            "⚠️ ENCRYPTION_KEY not set — encrypted fields (SSO client_secret, etc.) will be unavailable.              Generate one with: openssl rand -hex 32"
+        );
+    }
+
     let pool = db::create_pool(&cfg.database_url).await?;
 
     // Initialize Prometheus metrics
@@ -222,7 +229,8 @@ async fn main() -> Result<()> {
         })
         .layer(TraceLayer::new_for_http())
         .layer(tower_http::limit::RequestBodyLimitLayer::new(2 * 1024 * 1024)) // 2MB global body limit
-        .layer(axum::middleware::from_fn(telemetry::trace_id_middleware));
+        .layer(axum::middleware::from_fn(telemetry::trace_id_middleware))
+        .layer(axum::middleware::from_fn(middleware::request_id_middleware));
 
     let addr = format!("0.0.0.0:{}", cfg.port);
     tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
