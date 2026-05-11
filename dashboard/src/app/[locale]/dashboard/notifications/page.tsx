@@ -49,7 +49,7 @@ export default function NotificationsPage() {
       setNotifications(data.notifications || []);
       setTotal(data.total || 0);
     } catch {
-      toast('Failed to load notifications', 'error');
+      toast(t("failedToLoad"), "error");
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ export default function NotificationsPage() {
       await notificationsApi.markAsRead(token, id);
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
     } catch {
-      toast('Failed to mark as read', 'error');
+      toast(t("failedToMarkRead"), "error");
     }
   };
 
@@ -76,7 +76,7 @@ export default function NotificationsPage() {
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       toast(t('allReadSuccess'), 'success');
     } catch {
-      toast('Failed to mark all as read', 'error');
+      toast(t("failedToMarkAllRead"), "error");
     }
   };
 
@@ -106,7 +106,7 @@ export default function NotificationsPage() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            Stay updated on webhook events, alerts, and system messages
+            {t("subtitle")}
           </p>
         </div>
         <button
