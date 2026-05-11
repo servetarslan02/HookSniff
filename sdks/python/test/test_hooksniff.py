@@ -592,6 +592,20 @@ class TestHookSniffRequestSend(unittest.TestCase):
         self.assertEqual(cm.exception.code, 502)
         self.assertIsInstance(cm.exception.body, str)
 
+    @patch("hooksniff.request.urllib.request.urlopen")
+    def test_send_empty_body_no_parser_returns_none(self, mock_urlopen):
+        """Empty response body without parser should return None (not crash)."""
+        mock_resp = MagicMock()
+        mock_resp.status = 200
+        mock_resp.read.return_value = b""
+        mock_resp.headers = {}
+        mock_urlopen.return_value = mock_resp
+
+        ctx = HookSniffRequestContext("https://api.test.com", "test-key")
+        req = HookSniffRequest("GET", "/v1/endpoints")
+        result = req.send(ctx)
+        self.assertIsNone(result)
+
 
 # === Client Tests ===
 from hooksniff.client import HookSniff
