@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 00:57 GMT+8
+> Son güncelleme: 2026-05-12 01:55 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -60,6 +60,49 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Resend Domain: hooksniff.is-a.dev → FAILED, onboarding@resend.dev kullanılabilir
 - Resend → Cloud Run'a RESEND_API_KEY eklendi ✅ (revision 00053)
 - db.rs testleri: 16/16 passed ✅
+
+## Oturum 117 (2026-05-12 01:41 - 02:00 GMT+8) ✅
+- **OpenClaw on üçüncü oturum** — Servet ile Python SDK kalite çalışması
+- **AŞAMA 3.2: Python unit testler** — 71 test yazıldı, tümü geçti
+  - 14 webhook signature testi (valid, invalid, expired, missing headers, svix headers, case-insensitive, multiple sigs)
+  - 10 Endpoint serialization testi (from_json, to_json, roundtrip, enum validation, optional fields)
+  - 2 Delivery serialization testi
+  - 1 RetryPolicy testi
+  - 1 DeliveryListResponse testi
+  - 7 request helper testi (path params, query params, headers, body)
+  - 2 ApiException testi
+  - 8 HTTP send testi (mocked: success, 204, 401, 500 retry, idempotency, auth header)
+  - 7 client initialization testi
+  - 10 pagination testi (single page, multi page, empty, max pages, offset, generator protocol)
+  - 3 resource testi (list, get, delete)
+- **Python pagination modülü** — `hooksniff/pagination.py` eklendi (paginate + collect_all)
+- **Python __init__.py** — pagination export eklendi
+- **Test düzeltmeleri** — Model şeması ile uyumsuz 8 test düzeltildi (UUID format, status enum, RetryPolicy field names, DeliveryListResponse field names, urllib header capitalization)
+
+## 📊 Güncel İlerleme (2026-05-12 01:55)
+
+| Kategori | Toplam | Tamamlanan | Kalan |
+|----------|--------|-----------|-------|
+| 🚨 P0 | 14 | 14 | 0 |
+| 🔴 P1 | 44 | 46 | 0 |
+| 🟡 P2 | 38 | 34 | 4 |
+| 🟢 P3 | 13 | 8 | 5 |
+| **TOPLAM** | **103** | **102** | **1** |
+
+**SDK Test Durumu:**
+| SDK | Wrapper | İmza | Serialization | Pagination | Testler |
+|-----|---------|------|---------------|------------|---------|
+| Node.js | ✅ | ✅ | ✅ | ✅ | 211 ✅ |
+| Python | ✅ | ✅ | ✅ | ✅ | 71 ✅ |
+| Go | ❌ | ❌ | ❌ | ❌ | 0 |
+| Rust | ❌ | ❌ | ❌ | ❌ | 0 |
+| Ruby | ❌ | ❌ | ❌ | ❌ | 0 |
+| Java | ❌ | ❌ | ❌ | ❌ | 0 |
+| Kotlin | ❌ | ❌ | ❌ | ❌ | 0 |
+| PHP | ❌ | ❌ | ❌ | ❌ | 0 |
+| C# | ❌ | ❌ | ❌ | ❌ | 0 |
+| Elixir | ❌ | ❌ | ❌ | ❌ | 0 |
+| Swift | ❌ | ❌ | ❌ | ❌ | 0 |
 
 ## Oturum 116 (2026-05-12 00:53 - 01:34 GMT+8) ✅
 - **OpenClaw on ikinci oturum** — Servet ile Node.js SDK kalite çalışması (QUALITY_ROADMAP)
