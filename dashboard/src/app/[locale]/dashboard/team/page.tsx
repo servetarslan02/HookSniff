@@ -35,7 +35,7 @@ export default function TeamPage() {
       const data = await teamsApi.list(token);
       setTeams(Array.isArray(data) ? data : []);
     } catch {
-      toast('Failed to load teams', 'error');
+      toast(t("failedToLoadTeams"), "error");
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ export default function TeamPage() {
       const data = await teamsApi.listMembers(token, teamId);
       setMembers(Array.isArray(data) ? data : []);
     } catch {
-      toast('Failed to load members', 'error');
+      toast(t("failedToLoadMembers"), "error");
     }
   }, [token, toast]);
 
@@ -70,7 +70,7 @@ export default function TeamPage() {
       setCreateDesc('');
       fetchTeams();
     } catch {
-      toast('Failed to create team', 'error');
+      toast(t("failedToCreateTeam"), "error");
     } finally {
       setCreating(false);
     }
@@ -87,7 +87,7 @@ export default function TeamPage() {
       setInviteRole('member');
       fetchMembers(selectedTeam.id);
     } catch {
-      toast('Failed to invite member', 'error');
+      toast(t("failedToInvite"), "error");
     } finally {
       setInviting(false);
     }
@@ -116,7 +116,7 @@ export default function TeamPage() {
       toast(t('roleUpdated'), 'success');
       fetchMembers(selectedTeam.id);
     } catch {
-      toast('Failed to update role', 'error');
+      toast(t("failedToUpdateRole"), "error");
     }
   };
 

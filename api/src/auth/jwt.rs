@@ -107,13 +107,13 @@ pub fn verify_token(token: &str, secret: &str) -> Result<Claims, AppError> {
 }
 
 /// OWASP-recommended Argon2id parameters for password hashing.
-/// - 46 MiB memory (above the 19 MiB minimum)
+/// - 46 MiB memory (47104 KiB, above the 19 MiB minimum)
 /// - 3 iterations
 /// - 1 degree of parallelism
 ///
 /// Note: API key hashing uses Argon2::default() (19 MiB) since keys are high-entropy.
 fn argon2_params() -> argon2::Params {
-    argon2::Params::new(46_080, 3, 1, None).expect("valid Argon2id params")
+    argon2::Params::new(47_104, 3, 1, None).expect("valid Argon2id params")
 }
 
 /// Hash password using Argon2id with OWASP-recommended parameters.
