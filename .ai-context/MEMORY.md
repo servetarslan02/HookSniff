@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 15:09 GMT+8
+> Son güncelleme: 2026-05-11 15:30 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -89,6 +89,16 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - API: `OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp` eklendi
   - Worker: aynı env var'lar eklendi
 - **Sonraki adım:** Servet CI/CD deploy tetiklemeli veya Cloud Run'a manuel deploy etmeli
+- **GitHub Actions billing sorunu** — tüm CI/CD workflow'ları blok ("payments have failed")
+- **deploy.yml workflow_dispatch eklendi** — manuel tetikleme mümkün ama billing engeli var
+- **Grafana giriş yapıldı** — Google auth ile hookrelay.grafana.net
+  - Metrics: 6 series, Logs: 0 bytes, Traces: 0 bytes (OTEL verisi ulaşmamış)
+  - Trial: 10 gün kaldı (May 20'ye kadar upgrade gerek)
+- **GCP Console giriş yapıldı** — hooksniff-app projesi
+  - hooksniff-api: Unavailable (revision 00060 başarısız — startup timeout)
+  - hooksniff-worker: Available
+  - OTEL env var'ları zaten mevcut (OTEL_ENABLED=true, endpoint, headers secret)
+  - Deploy tetiklendi — sonucu bekleniyor
 
 ## Oturum 104 (2026-05-11 06:57 - 07:12) ✅
 - **Grafana OTEL KRİTİK BULGU** — Deploy scriptlerinde yanlış region!
