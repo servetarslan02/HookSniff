@@ -1517,3 +1517,55 @@
 
 ================================================================================
 TOPLAM: 1222 bulgu, 49 dosya
+
+
+================================================================================
+📸 SCREENSHOT BULGULARI — Görsel Denetim (15 ekran görüntüsü)
+================================================================================
+
+  1. [admin-overview-dark.png] "Admin" badge'i İngilizce — header'da kırmızı badge
+  2. [admin-overview-dark.png] Logout butonu sol altta neredeyse görünmez — contrast fail (dark mode)
+  3. [admin-overview-dark.png] "Switch to dark mode" butonu İngilizce (sidebar altı)
+  4. [admin-overview-dark.png] "Plana Göre Kullanıcılar" kartı tamamen boş — sadece başlık + "Veri yok"
+  5. [admin-overview-light.png] "Admin" badge'i İngilizce — light mode'da da aynı sorun
+  6. [admin-overview-light.png] Logout butonu sol altta çok soluk — contrast fail (light mode)
+  7. [overview-tablet-blank.png] Sayfa TAMAMEN BOŞ — hiçbir content render edilmemiş
+  8. [overview-tablet-blank.png] Tablet layout bozuk — sidebar offset sorunu
+  9. [overview-tablet-blank.png] "Genel Bakış" başlığı sidebar'da var ama ana içerik alanı boş
+  10. [admin-users-fullpage.png] Tablo başlıkları İngilizce: ID, Email, Name, Plan, Status, Created, Actions
+  11. [admin-users-fullpage.png] Badge'ler İngilizce: "free" (gri), "active" (yeşil), "business" (mavi)
+  12. [admin-users-fullpage.png] Butonlar İngilizce: "View", "Plan", "Ban"
+  13. [admin-users-fullpage.png] Tarih formatı ABD: "5/10/2026" → DD.MM.YYYY olmalı
+  14. [admin-users-fullpage.png] Zebra renklendirme yok — tüm satırlar aynı renk
+  15. [admin-users-fullpage.png] "Admin" badge'i İngilizce
+  16. [admin-users-fullpage.png] "Yönetici Kullanıcılar" başlığı Türkçe ✅ ama alt başlık İngilizce
+  17. [admin-revenue-light-desktop.png] Grafik tamamen boş — eksen etiketleri yok, çizgi yok
+  18. [admin-revenue-light-desktop.png] Pie chart "Gelir verisi yok" — boş state Türkçe ✅
+  19. [admin-revenue-light-desktop.png] "Gelir Paneli" başlığı Türkçe ✅
+  20. [admin-revenue-light-desktop.png] KPI kartları Türkçe ✅ (Aylık Tekrarlayan Gelir, Toplam Gelir, Kayıp Oranı)
+  21. [admin-revenue-light-desktop.png] "Admin" badge'i İngilizce
+  22. [admin-revenue-dark-desktop.png] Dark mode'da grafik yine boş — aynı sorun
+  23. [admin-revenue-dark-desktop.png] "Switch to light mode" butonu İngilizce
+  24. [admin-revenue-light-mobile.png] Mobile layout kartlar düzgün stack'lenmiş ✅
+  25. [admin-revenue-light-mobile.png] Grafik boş — mobile'da da aynı sorun
+  26. [admin-revenue-light-mobile.png] "Admin" badge'i İngilizce
+  27. [admin-system-fullpage.png] 4 servis sürekli "Checking..." / "Bilinmiyor" — API sağlık endpoint'i çalışmıyor
+  28. [admin-system-fullpage.png] Servis rolleri İngilizce: "Database", "Cache", "Monitoring", "Queue"
+  29. [admin-system-fullpage.png] "Sistem Sorunları Tespit Edildi" uyarı banner'ı — dar, sıkışık layout
+  30. [admin-system-fullpage.png] Altyapı tablosu header eksik — sadece grid düzeni
+  31. [admin-system-fullpage.png] "Altyapı" başlığı Türkçe ✅ ama içerik İngilizce
+  32. [admin-system-fullpage.png] "Admin" badge'i İngilizce
+  33. [admin-system-after-refresh.png] 15s auto-refresh sonrası bile hala "Checking..." — API yanıt vermiyor
+  34. [settings-fullpage.png] Input label'ları İngilizce: "Max Endpoints", "Max Webhooks/Month", "Rate Limit", "Retention"
+  35. [settings-fullpage.png] "Default Plan" label'ı İngilizce
+  36. [settings-fullpage.png] Select seçeneği "Free" İngilizce → "Ücretsiz" olmalı
+  37. [settings-fullpage.png] "Max Retry Attempts" label'ı İngilizce
+  38. [settings-fullpage.png] "Admin" badge'i İngilizce
+  39. [settings-fullpage.png] Input stilleri tutarsız — bazıları py-2 rounded-lg, bazıları py-3 rounded-xl
+  40. [settings-error-state.png] "Failed to save settings" hata mesajı İngilizce → "Ayarlar kaydedilemedi"
+  41. [settings-error-state.png] Hata banner'ı kırmızı arka plan + beyaz metin — ✅ görünür
+  42. [settings-error-state.png] Input label'ları hâlâ İngilizce
+  43. [overview-light-desktop.png] "Admin" badge'i İngilizce (light mode)
+  44. [overview-light-desktop.png] "Platform-wide metrics and recent activity" İngilizce → "Platform genelinde metrikler ve son aktivite"
+  45. [overview-light-desktop.png] Logout butonu sol altta çok soluk — contrast fail
+
