@@ -1,9 +1,9 @@
 # ── Stage 1: Builder ──
-FROM rust:1-bookworm AS builder
+FROM rust:1.82.0-bookworm AS builder
 
-# Install build dependencies (no OpenSSL needed — using rustls)
+# Install build dependencies (aws-lc-sys needs cmake + C compiler)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends pkg-config && \
+    apt-get install -y --no-install-recommends pkg-config cmake && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -32,6 +32,8 @@ RUN groupadd -r hooksniff && \
     mkdir -p /app
 
 COPY --from=builder /app/target/release/hooksniff-api /usr/local/bin/hooksniff-api
+COPY entrypoint-api.sh /usr/local/bin/entrypoint-api.sh
+RUN chmod +x /usr/local/bin/entrypoint-api.sh
 
 RUN chown -R hooksniff:hooksniff /app
 
@@ -43,4 +45,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 
-CMD ["hooksniff-api"]
+CMD ["/usr/local/bin/entrypoint-api.sh"]
