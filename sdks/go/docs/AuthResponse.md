@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Token** | Pointer to **string** | JWT access token | [optional] 
-**Customer** | Pointer to [**CustomerResponse**](CustomerResponse.md) |  | [optional] 
+**Token** | **string** | JWT access token | 
+**Customer** | [**CustomerResponse**](CustomerResponse.md) |  | 
 **RefreshToken** | Pointer to **string** | Refresh token (when applicable) | [optional] 
 
 ## Methods
 
 ### NewAuthResponse
 
-`func NewAuthResponse() *AuthResponse`
+`func NewAuthResponse(token string, customer CustomerResponse, ) *AuthResponse`
 
 NewAuthResponse instantiates a new AuthResponse object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetToken sets Token field to given value.
 
-### HasToken
-
-`func (o *AuthResponse) HasToken() bool`
-
-HasToken returns a boolean if a field has been set.
 
 ### GetCustomer
 
@@ -71,11 +66,6 @@ and a boolean to check if the value has been set.
 
 SetCustomer sets Customer field to given value.
 
-### HasCustomer
-
-`func (o *AuthResponse) HasCustomer() bool`
-
-HasCustomer returns a boolean if a field has been set.
 
 ### GetRefreshToken
 

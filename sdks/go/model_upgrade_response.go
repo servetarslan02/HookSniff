@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the UpgradeResponse type satisfies the MappedNullable interface at compile time
@@ -21,16 +23,20 @@ var _ MappedNullable = &UpgradeResponse{}
 // UpgradeResponse struct for UpgradeResponse
 type UpgradeResponse struct {
 	CheckoutUrl NullableString `json:"checkout_url,omitempty"`
-	Provider *string `json:"provider,omitempty"`
-	Message *string `json:"message,omitempty"`
+	Provider string `json:"provider"`
+	Message string `json:"message"`
 }
+
+type _UpgradeResponse UpgradeResponse
 
 // NewUpgradeResponse instantiates a new UpgradeResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUpgradeResponse() *UpgradeResponse {
+func NewUpgradeResponse(provider string, message string) *UpgradeResponse {
 	this := UpgradeResponse{}
+	this.Provider = provider
+	this.Message = message
 	return &this
 }
 
@@ -84,68 +90,52 @@ func (o *UpgradeResponse) UnsetCheckoutUrl() {
 	o.CheckoutUrl.Unset()
 }
 
-// GetProvider returns the Provider field value if set, zero value otherwise.
+// GetProvider returns the Provider field value
 func (o *UpgradeResponse) GetProvider() string {
-	if o == nil || IsNil(o.Provider) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Provider
+
+	return o.Provider
 }
 
-// GetProviderOk returns a tuple with the Provider field value if set, nil otherwise
+// GetProviderOk returns a tuple with the Provider field value
 // and a boolean to check if the value has been set.
 func (o *UpgradeResponse) GetProviderOk() (*string, bool) {
-	if o == nil || IsNil(o.Provider) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Provider, true
+	return &o.Provider, true
 }
 
-// HasProvider returns a boolean if a field has been set.
-func (o *UpgradeResponse) HasProvider() bool {
-	if o != nil && !IsNil(o.Provider) {
-		return true
-	}
-
-	return false
-}
-
-// SetProvider gets a reference to the given string and assigns it to the Provider field.
+// SetProvider sets field value
 func (o *UpgradeResponse) SetProvider(v string) {
-	o.Provider = &v
+	o.Provider = v
 }
 
-// GetMessage returns the Message field value if set, zero value otherwise.
+// GetMessage returns the Message field value
 func (o *UpgradeResponse) GetMessage() string {
-	if o == nil || IsNil(o.Message) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Message
+
+	return o.Message
 }
 
-// GetMessageOk returns a tuple with the Message field value if set, nil otherwise
+// GetMessageOk returns a tuple with the Message field value
 // and a boolean to check if the value has been set.
 func (o *UpgradeResponse) GetMessageOk() (*string, bool) {
-	if o == nil || IsNil(o.Message) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Message, true
+	return &o.Message, true
 }
 
-// HasMessage returns a boolean if a field has been set.
-func (o *UpgradeResponse) HasMessage() bool {
-	if o != nil && !IsNil(o.Message) {
-		return true
-	}
-
-	return false
-}
-
-// SetMessage gets a reference to the given string and assigns it to the Message field.
+// SetMessage sets field value
 func (o *UpgradeResponse) SetMessage(v string) {
-	o.Message = &v
+	o.Message = v
 }
 
 func (o UpgradeResponse) MarshalJSON() ([]byte, error) {
@@ -161,13 +151,47 @@ func (o UpgradeResponse) ToMap() (map[string]interface{}, error) {
 	if o.CheckoutUrl.IsSet() {
 		toSerialize["checkout_url"] = o.CheckoutUrl.Get()
 	}
-	if !IsNil(o.Provider) {
-		toSerialize["provider"] = o.Provider
-	}
-	if !IsNil(o.Message) {
-		toSerialize["message"] = o.Message
-	}
+	toSerialize["provider"] = o.Provider
+	toSerialize["message"] = o.Message
 	return toSerialize, nil
+}
+
+func (o *UpgradeResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"provider",
+		"message",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varUpgradeResponse := _UpgradeResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varUpgradeResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = UpgradeResponse(varUpgradeResponse)
+
+	return err
 }
 
 type NullableUpgradeResponse struct {

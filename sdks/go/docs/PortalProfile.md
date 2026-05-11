@@ -4,17 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Email** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Email** | **string** |  | 
 **Name** | Pointer to **NullableString** |  | [optional] 
-**Plan** | Pointer to **string** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**Plan** | **string** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewPortalProfile
 
-`func NewPortalProfile() *PortalProfile`
+`func NewPortalProfile(id string, email string, plan string, createdAt time.Time, ) *PortalProfile`
 
 NewPortalProfile instantiates a new PortalProfile object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +48,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *PortalProfile) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetEmail
 
@@ -73,11 +68,6 @@ and a boolean to check if the value has been set.
 
 SetEmail sets Email field to given value.
 
-### HasEmail
-
-`func (o *PortalProfile) HasEmail() bool`
-
-HasEmail returns a boolean if a field has been set.
 
 ### GetName
 
@@ -133,11 +123,6 @@ and a boolean to check if the value has been set.
 
 SetPlan sets Plan field to given value.
 
-### HasPlan
-
-`func (o *PortalProfile) HasPlan() bool`
-
-HasPlan returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -158,11 +143,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *PortalProfile) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

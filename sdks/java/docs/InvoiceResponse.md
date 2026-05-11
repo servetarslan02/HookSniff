@@ -7,11 +7,11 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **String** |  |  [optional] |
-|**amountCents** | **Integer** |  |  [optional] |
-|**currency** | **String** |  |  [optional] |
-|**status** | **String** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**id** | **String** |  |  |
+|**amountCents** | **Integer** |  |  |
+|**currency** | **String** |  |  |
+|**status** | **String** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

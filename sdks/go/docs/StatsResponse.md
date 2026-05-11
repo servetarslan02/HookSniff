@@ -4,20 +4,20 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TotalDeliveries** | Pointer to **int32** |  | [optional] 
-**SuccessfulDeliveries** | Pointer to **int32** |  | [optional] 
-**FailedDeliveries** | Pointer to **int32** |  | [optional] 
-**TotalEndpoints** | Pointer to **int32** |  | [optional] 
-**ActiveEndpoints** | Pointer to **int32** |  | [optional] 
-**Plan** | Pointer to **string** |  | [optional] 
-**WebhookLimit** | Pointer to **int32** |  | [optional] 
-**WebhookCount** | Pointer to **int32** |  | [optional] 
+**TotalDeliveries** | **int32** |  | 
+**SuccessfulDeliveries** | **int32** |  | 
+**FailedDeliveries** | **int32** |  | 
+**TotalEndpoints** | **int32** |  | 
+**ActiveEndpoints** | **int32** |  | 
+**Plan** | **string** |  | 
+**WebhookLimit** | **int32** |  | 
+**WebhookCount** | **int32** |  | 
 
 ## Methods
 
 ### NewStatsResponse
 
-`func NewStatsResponse() *StatsResponse`
+`func NewStatsResponse(totalDeliveries int32, successfulDeliveries int32, failedDeliveries int32, totalEndpoints int32, activeEndpoints int32, plan string, webhookLimit int32, webhookCount int32, ) *StatsResponse`
 
 NewStatsResponse instantiates a new StatsResponse object
 This constructor will assign default values to properties that have it defined,
@@ -51,11 +51,6 @@ and a boolean to check if the value has been set.
 
 SetTotalDeliveries sets TotalDeliveries field to given value.
 
-### HasTotalDeliveries
-
-`func (o *StatsResponse) HasTotalDeliveries() bool`
-
-HasTotalDeliveries returns a boolean if a field has been set.
 
 ### GetSuccessfulDeliveries
 
@@ -76,11 +71,6 @@ and a boolean to check if the value has been set.
 
 SetSuccessfulDeliveries sets SuccessfulDeliveries field to given value.
 
-### HasSuccessfulDeliveries
-
-`func (o *StatsResponse) HasSuccessfulDeliveries() bool`
-
-HasSuccessfulDeliveries returns a boolean if a field has been set.
 
 ### GetFailedDeliveries
 
@@ -101,11 +91,6 @@ and a boolean to check if the value has been set.
 
 SetFailedDeliveries sets FailedDeliveries field to given value.
 
-### HasFailedDeliveries
-
-`func (o *StatsResponse) HasFailedDeliveries() bool`
-
-HasFailedDeliveries returns a boolean if a field has been set.
 
 ### GetTotalEndpoints
 
@@ -126,11 +111,6 @@ and a boolean to check if the value has been set.
 
 SetTotalEndpoints sets TotalEndpoints field to given value.
 
-### HasTotalEndpoints
-
-`func (o *StatsResponse) HasTotalEndpoints() bool`
-
-HasTotalEndpoints returns a boolean if a field has been set.
 
 ### GetActiveEndpoints
 
@@ -151,11 +131,6 @@ and a boolean to check if the value has been set.
 
 SetActiveEndpoints sets ActiveEndpoints field to given value.
 
-### HasActiveEndpoints
-
-`func (o *StatsResponse) HasActiveEndpoints() bool`
-
-HasActiveEndpoints returns a boolean if a field has been set.
 
 ### GetPlan
 
@@ -176,11 +151,6 @@ and a boolean to check if the value has been set.
 
 SetPlan sets Plan field to given value.
 
-### HasPlan
-
-`func (o *StatsResponse) HasPlan() bool`
-
-HasPlan returns a boolean if a field has been set.
 
 ### GetWebhookLimit
 
@@ -201,11 +171,6 @@ and a boolean to check if the value has been set.
 
 SetWebhookLimit sets WebhookLimit field to given value.
 
-### HasWebhookLimit
-
-`func (o *StatsResponse) HasWebhookLimit() bool`
-
-HasWebhookLimit returns a boolean if a field has been set.
 
 ### GetWebhookCount
 
@@ -226,11 +191,6 @@ and a boolean to check if the value has been set.
 
 SetWebhookCount sets WebhookCount field to given value.
 
-### HasWebhookCount
-
-`func (o *StatsResponse) HasWebhookCount() bool`
-
-HasWebhookCount returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

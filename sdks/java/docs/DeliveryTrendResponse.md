@@ -7,8 +7,8 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**range** | **String** |  |  [optional] |
-|**buckets** | [**List&lt;DeliveryTrendResponseBucketsInner&gt;**](DeliveryTrendResponseBucketsInner.md) |  |  [optional] |
+|**range** | **String** |  |  |
+|**buckets** | [**List&lt;DeliveryTrendResponseBucketsInner&gt;**](DeliveryTrendResponseBucketsInner.md) |  |  |
 
 
 

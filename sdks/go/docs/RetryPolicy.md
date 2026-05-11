@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**MaxAttempts** | Pointer to **int32** |  | [optional] [default to 3]
-**Backoff** | Pointer to **string** |  | [optional] [default to "exponential"]
-**InitialDelaySecs** | Pointer to **int32** |  | [optional] [default to 10]
-**MaxDelaySecs** | Pointer to **int32** |  | [optional] [default to 3600]
+**MaxAttempts** | **int32** |  | [default to 3]
+**Backoff** | **string** |  | [default to "exponential"]
+**InitialDelaySecs** | **int32** |  | [default to 10]
+**MaxDelaySecs** | **int32** |  | [default to 3600]
 
 ## Methods
 
 ### NewRetryPolicy
 
-`func NewRetryPolicy() *RetryPolicy`
+`func NewRetryPolicy(maxAttempts int32, backoff string, initialDelaySecs int32, maxDelaySecs int32, ) *RetryPolicy`
 
 NewRetryPolicy instantiates a new RetryPolicy object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetMaxAttempts sets MaxAttempts field to given value.
 
-### HasMaxAttempts
-
-`func (o *RetryPolicy) HasMaxAttempts() bool`
-
-HasMaxAttempts returns a boolean if a field has been set.
 
 ### GetBackoff
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetBackoff sets Backoff field to given value.
 
-### HasBackoff
-
-`func (o *RetryPolicy) HasBackoff() bool`
-
-HasBackoff returns a boolean if a field has been set.
 
 ### GetInitialDelaySecs
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetInitialDelaySecs sets InitialDelaySecs field to given value.
 
-### HasInitialDelaySecs
-
-`func (o *RetryPolicy) HasInitialDelaySecs() bool`
-
-HasInitialDelaySecs returns a boolean if a field has been set.
 
 ### GetMaxDelaySecs
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetMaxDelaySecs sets MaxDelaySecs field to given value.
 
-### HasMaxDelaySecs
-
-`func (o *RetryPolicy) HasMaxDelaySecs() bool`
-
-HasMaxDelaySecs returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

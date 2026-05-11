@@ -4,17 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TotalUsers** | Pointer to **int32** |  | [optional] 
-**ActiveUsers** | Pointer to **int32** |  | [optional] 
-**TotalEndpoints** | Pointer to **int32** |  | [optional] 
-**TotalDeliveries** | Pointer to **int32** |  | [optional] 
-**PlanBreakdown** | Pointer to [**[]SystemStatsPlanBreakdownInner**](SystemStatsPlanBreakdownInner.md) |  | [optional] 
+**TotalUsers** | **int32** |  | 
+**ActiveUsers** | **int32** |  | 
+**TotalEndpoints** | **int32** |  | 
+**TotalDeliveries** | **int32** |  | 
+**PlanBreakdown** | [**[]SystemStatsPlanBreakdownInner**](SystemStatsPlanBreakdownInner.md) |  | 
 
 ## Methods
 
 ### NewSystemStats
 
-`func NewSystemStats() *SystemStats`
+`func NewSystemStats(totalUsers int32, activeUsers int32, totalEndpoints int32, totalDeliveries int32, planBreakdown []SystemStatsPlanBreakdownInner, ) *SystemStats`
 
 NewSystemStats instantiates a new SystemStats object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +48,6 @@ and a boolean to check if the value has been set.
 
 SetTotalUsers sets TotalUsers field to given value.
 
-### HasTotalUsers
-
-`func (o *SystemStats) HasTotalUsers() bool`
-
-HasTotalUsers returns a boolean if a field has been set.
 
 ### GetActiveUsers
 
@@ -73,11 +68,6 @@ and a boolean to check if the value has been set.
 
 SetActiveUsers sets ActiveUsers field to given value.
 
-### HasActiveUsers
-
-`func (o *SystemStats) HasActiveUsers() bool`
-
-HasActiveUsers returns a boolean if a field has been set.
 
 ### GetTotalEndpoints
 
@@ -98,11 +88,6 @@ and a boolean to check if the value has been set.
 
 SetTotalEndpoints sets TotalEndpoints field to given value.
 
-### HasTotalEndpoints
-
-`func (o *SystemStats) HasTotalEndpoints() bool`
-
-HasTotalEndpoints returns a boolean if a field has been set.
 
 ### GetTotalDeliveries
 
@@ -123,11 +108,6 @@ and a boolean to check if the value has been set.
 
 SetTotalDeliveries sets TotalDeliveries field to given value.
 
-### HasTotalDeliveries
-
-`func (o *SystemStats) HasTotalDeliveries() bool`
-
-HasTotalDeliveries returns a boolean if a field has been set.
 
 ### GetPlanBreakdown
 
@@ -148,11 +128,6 @@ and a boolean to check if the value has been set.
 
 SetPlanBreakdown sets PlanBreakdown field to given value.
 
-### HasPlanBreakdown
-
-`func (o *SystemStats) HasPlanBreakdown() bool`
-
-HasPlanBreakdown returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

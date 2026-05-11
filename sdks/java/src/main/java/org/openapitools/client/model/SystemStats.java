@@ -51,37 +51,37 @@ import org.openapitools.client.JSON;
 /**
  * SystemStats
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class SystemStats {
   public static final String SERIALIZED_NAME_TOTAL_USERS = "total_users";
   @SerializedName(SERIALIZED_NAME_TOTAL_USERS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer totalUsers;
 
   public static final String SERIALIZED_NAME_ACTIVE_USERS = "active_users";
   @SerializedName(SERIALIZED_NAME_ACTIVE_USERS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer activeUsers;
 
   public static final String SERIALIZED_NAME_TOTAL_ENDPOINTS = "total_endpoints";
   @SerializedName(SERIALIZED_NAME_TOTAL_ENDPOINTS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer totalEndpoints;
 
   public static final String SERIALIZED_NAME_TOTAL_DELIVERIES = "total_deliveries";
   @SerializedName(SERIALIZED_NAME_TOTAL_DELIVERIES)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer totalDeliveries;
 
   public static final String SERIALIZED_NAME_PLAN_BREAKDOWN = "plan_breakdown";
   @SerializedName(SERIALIZED_NAME_PLAN_BREAKDOWN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<SystemStatsPlanBreakdownInner> planBreakdown = new ArrayList<>();
 
   public SystemStats() {
   }
 
-  public SystemStats totalUsers(@javax.annotation.Nullable Integer totalUsers) {
+  public SystemStats totalUsers(@javax.annotation.Nonnull Integer totalUsers) {
     this.totalUsers = totalUsers;
     return this;
   }
@@ -90,17 +90,17 @@ public class SystemStats {
    * Get totalUsers
    * @return totalUsers
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotalUsers() {
     return totalUsers;
   }
 
-  public void setTotalUsers(@javax.annotation.Nullable Integer totalUsers) {
+  public void setTotalUsers(@javax.annotation.Nonnull Integer totalUsers) {
     this.totalUsers = totalUsers;
   }
 
 
-  public SystemStats activeUsers(@javax.annotation.Nullable Integer activeUsers) {
+  public SystemStats activeUsers(@javax.annotation.Nonnull Integer activeUsers) {
     this.activeUsers = activeUsers;
     return this;
   }
@@ -109,17 +109,17 @@ public class SystemStats {
    * Get activeUsers
    * @return activeUsers
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getActiveUsers() {
     return activeUsers;
   }
 
-  public void setActiveUsers(@javax.annotation.Nullable Integer activeUsers) {
+  public void setActiveUsers(@javax.annotation.Nonnull Integer activeUsers) {
     this.activeUsers = activeUsers;
   }
 
 
-  public SystemStats totalEndpoints(@javax.annotation.Nullable Integer totalEndpoints) {
+  public SystemStats totalEndpoints(@javax.annotation.Nonnull Integer totalEndpoints) {
     this.totalEndpoints = totalEndpoints;
     return this;
   }
@@ -128,17 +128,17 @@ public class SystemStats {
    * Get totalEndpoints
    * @return totalEndpoints
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotalEndpoints() {
     return totalEndpoints;
   }
 
-  public void setTotalEndpoints(@javax.annotation.Nullable Integer totalEndpoints) {
+  public void setTotalEndpoints(@javax.annotation.Nonnull Integer totalEndpoints) {
     this.totalEndpoints = totalEndpoints;
   }
 
 
-  public SystemStats totalDeliveries(@javax.annotation.Nullable Integer totalDeliveries) {
+  public SystemStats totalDeliveries(@javax.annotation.Nonnull Integer totalDeliveries) {
     this.totalDeliveries = totalDeliveries;
     return this;
   }
@@ -147,17 +147,17 @@ public class SystemStats {
    * Get totalDeliveries
    * @return totalDeliveries
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotalDeliveries() {
     return totalDeliveries;
   }
 
-  public void setTotalDeliveries(@javax.annotation.Nullable Integer totalDeliveries) {
+  public void setTotalDeliveries(@javax.annotation.Nonnull Integer totalDeliveries) {
     this.totalDeliveries = totalDeliveries;
   }
 
 
-  public SystemStats planBreakdown(@javax.annotation.Nullable List<SystemStatsPlanBreakdownInner> planBreakdown) {
+  public SystemStats planBreakdown(@javax.annotation.Nonnull List<SystemStatsPlanBreakdownInner> planBreakdown) {
     this.planBreakdown = planBreakdown;
     return this;
   }
@@ -174,12 +174,12 @@ public class SystemStats {
    * Get planBreakdown
    * @return planBreakdown
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<SystemStatsPlanBreakdownInner> getPlanBreakdown() {
     return planBreakdown;
   }
 
-  public void setPlanBreakdown(@javax.annotation.Nullable List<SystemStatsPlanBreakdownInner> planBreakdown) {
+  public void setPlanBreakdown(@javax.annotation.Nonnull List<SystemStatsPlanBreakdownInner> planBreakdown) {
     this.planBreakdown = planBreakdown;
   }
 
@@ -236,7 +236,7 @@ public class SystemStats {
     openapiFields = new HashSet<String>(Arrays.asList("total_users", "active_users", "total_endpoints", "total_deliveries", "plan_breakdown"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("total_users", "active_users", "total_endpoints", "total_deliveries", "plan_breakdown"));
   }
 
   /**
@@ -259,19 +259,22 @@ public class SystemStats {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `SystemStats` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (jsonObj.get("plan_breakdown") != null && !jsonObj.get("plan_breakdown").isJsonNull()) {
-        JsonArray jsonArrayplanBreakdown = jsonObj.getAsJsonArray("plan_breakdown");
-        if (jsonArrayplanBreakdown != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("plan_breakdown").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `plan_breakdown` to be an array in the JSON string but got `%s`", jsonObj.get("plan_breakdown").toString()));
-          }
 
-          // validate the optional field `plan_breakdown` (array)
-          for (int i = 0; i < jsonArrayplanBreakdown.size(); i++) {
-            SystemStatsPlanBreakdownInner.validateJsonElement(jsonArrayplanBreakdown.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : SystemStats.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("plan_breakdown") != null) {
+        if (!jsonObj.get("plan_breakdown").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `plan_breakdown` to be an array in the JSON string but got `%s`", jsonObj.get("plan_breakdown").toString()));
+        }
+        JsonArray jsonArrayplanBreakdown = jsonObj.getAsJsonArray("plan_breakdown");
+        // validate the required field `plan_breakdown` (array)
+        for (int i = 0; i < jsonArrayplanBreakdown.size(); i++) {
+          SystemStatsPlanBreakdownInner.validateJsonElement(jsonArrayplanBreakdown.get(i));
         }
       }
   }

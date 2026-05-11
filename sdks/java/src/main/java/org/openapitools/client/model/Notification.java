@@ -51,26 +51,26 @@ import org.openapitools.client.JSON;
 /**
  * Notification
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class Notification {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_TITLE = "title";
   @SerializedName(SERIALIZED_NAME_TITLE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String title;
 
   public static final String SERIALIZED_NAME_BODY = "body";
   @SerializedName(SERIALIZED_NAME_BODY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String body;
 
   public static final String SERIALIZED_NAME_IS_READ = "is_read";
   @SerializedName(SERIALIZED_NAME_IS_READ)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean isRead;
 
   public static final String SERIALIZED_NAME_LINK = "link";
@@ -80,13 +80,13 @@ public class Notification {
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public Notification() {
   }
 
-  public Notification id(@javax.annotation.Nullable UUID id) {
+  public Notification id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -95,17 +95,17 @@ public class Notification {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public Notification title(@javax.annotation.Nullable String title) {
+  public Notification title(@javax.annotation.Nonnull String title) {
     this.title = title;
     return this;
   }
@@ -114,17 +114,17 @@ public class Notification {
    * Get title
    * @return title
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getTitle() {
     return title;
   }
 
-  public void setTitle(@javax.annotation.Nullable String title) {
+  public void setTitle(@javax.annotation.Nonnull String title) {
     this.title = title;
   }
 
 
-  public Notification body(@javax.annotation.Nullable String body) {
+  public Notification body(@javax.annotation.Nonnull String body) {
     this.body = body;
     return this;
   }
@@ -133,17 +133,17 @@ public class Notification {
    * Get body
    * @return body
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getBody() {
     return body;
   }
 
-  public void setBody(@javax.annotation.Nullable String body) {
+  public void setBody(@javax.annotation.Nonnull String body) {
     this.body = body;
   }
 
 
-  public Notification isRead(@javax.annotation.Nullable Boolean isRead) {
+  public Notification isRead(@javax.annotation.Nonnull Boolean isRead) {
     this.isRead = isRead;
     return this;
   }
@@ -152,12 +152,12 @@ public class Notification {
    * Get isRead
    * @return isRead
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getIsRead() {
     return isRead;
   }
 
-  public void setIsRead(@javax.annotation.Nullable Boolean isRead) {
+  public void setIsRead(@javax.annotation.Nonnull Boolean isRead) {
     this.isRead = isRead;
   }
 
@@ -181,7 +181,7 @@ public class Notification {
   }
 
 
-  public Notification createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public Notification createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -190,12 +190,12 @@ public class Notification {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -265,7 +265,7 @@ public class Notification {
     openapiFields = new HashSet<String>(Arrays.asList("id", "title", "body", "is_read", "link", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "title", "body", "is_read", "created_at"));
   }
 
   /**
@@ -288,14 +288,21 @@ public class Notification {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `Notification` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : Notification.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("title") != null && !jsonObj.get("title").isJsonNull()) && !jsonObj.get("title").isJsonPrimitive()) {
+      if (!jsonObj.get("title").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `title` to be a primitive type in the JSON string but got `%s`", jsonObj.get("title").toString()));
       }
-      if ((jsonObj.get("body") != null && !jsonObj.get("body").isJsonNull()) && !jsonObj.get("body").isJsonPrimitive()) {
+      if (!jsonObj.get("body").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `body` to be a primitive type in the JSON string but got `%s`", jsonObj.get("body").toString()));
       }
       if ((jsonObj.get("link") != null && !jsonObj.get("link").isJsonNull()) && !jsonObj.get("link").isJsonPrimitive()) {

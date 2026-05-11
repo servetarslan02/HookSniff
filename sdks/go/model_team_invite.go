@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the TeamInvite type satisfies the MappedNullable interface at compile time
@@ -21,18 +23,24 @@ var _ MappedNullable = &TeamInvite{}
 
 // TeamInvite struct for TeamInvite
 type TeamInvite struct {
-	Id *string `json:"id,omitempty"`
-	Email *string `json:"email,omitempty"`
-	Role *string `json:"role,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Id string `json:"id"`
+	Email string `json:"email"`
+	Role string `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _TeamInvite TeamInvite
 
 // NewTeamInvite instantiates a new TeamInvite object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTeamInvite() *TeamInvite {
+func NewTeamInvite(id string, email string, role string, createdAt time.Time) *TeamInvite {
 	this := TeamInvite{}
+	this.Id = id
+	this.Email = email
+	this.Role = role
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -44,132 +52,100 @@ func NewTeamInviteWithDefaults() *TeamInvite {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *TeamInvite) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *TeamInvite) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *TeamInvite) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *TeamInvite) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetEmail returns the Email field value if set, zero value otherwise.
+// GetEmail returns the Email field value
 func (o *TeamInvite) GetEmail() string {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Email
+
+	return o.Email
 }
 
-// GetEmailOk returns a tuple with the Email field value if set, nil otherwise
+// GetEmailOk returns a tuple with the Email field value
 // and a boolean to check if the value has been set.
 func (o *TeamInvite) GetEmailOk() (*string, bool) {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Email, true
+	return &o.Email, true
 }
 
-// HasEmail returns a boolean if a field has been set.
-func (o *TeamInvite) HasEmail() bool {
-	if o != nil && !IsNil(o.Email) {
-		return true
-	}
-
-	return false
-}
-
-// SetEmail gets a reference to the given string and assigns it to the Email field.
+// SetEmail sets field value
 func (o *TeamInvite) SetEmail(v string) {
-	o.Email = &v
+	o.Email = v
 }
 
-// GetRole returns the Role field value if set, zero value otherwise.
+// GetRole returns the Role field value
 func (o *TeamInvite) GetRole() string {
-	if o == nil || IsNil(o.Role) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Role
+
+	return o.Role
 }
 
-// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// GetRoleOk returns a tuple with the Role field value
 // and a boolean to check if the value has been set.
 func (o *TeamInvite) GetRoleOk() (*string, bool) {
-	if o == nil || IsNil(o.Role) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Role, true
+	return &o.Role, true
 }
 
-// HasRole returns a boolean if a field has been set.
-func (o *TeamInvite) HasRole() bool {
-	if o != nil && !IsNil(o.Role) {
-		return true
-	}
-
-	return false
-}
-
-// SetRole gets a reference to the given string and assigns it to the Role field.
+// SetRole sets field value
 func (o *TeamInvite) SetRole(v string) {
-	o.Role = &v
+	o.Role = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *TeamInvite) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *TeamInvite) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *TeamInvite) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *TeamInvite) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o TeamInvite) MarshalJSON() ([]byte, error) {
@@ -182,19 +158,51 @@ func (o TeamInvite) MarshalJSON() ([]byte, error) {
 
 func (o TeamInvite) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Email) {
-		toSerialize["email"] = o.Email
-	}
-	if !IsNil(o.Role) {
-		toSerialize["role"] = o.Role
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["email"] = o.Email
+	toSerialize["role"] = o.Role
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *TeamInvite) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"email",
+		"role",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varTeamInvite := _TeamInvite{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varTeamInvite)
+
+	if err != nil {
+		return err
+	}
+
+	*o = TeamInvite(varTeamInvite)
+
+	return err
 }
 
 type NullableTeamInvite struct {

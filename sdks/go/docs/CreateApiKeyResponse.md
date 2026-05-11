@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Key** | Pointer to **string** | Full API key — only shown once | [optional] 
-**Prefix** | Pointer to **string** |  | [optional] 
-**Message** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Key** | **string** | Full API key — only shown once | 
+**Prefix** | **string** |  | 
+**Message** | **string** |  | 
 
 ## Methods
 
 ### NewCreateApiKeyResponse
 
-`func NewCreateApiKeyResponse() *CreateApiKeyResponse`
+`func NewCreateApiKeyResponse(id string, key string, prefix string, message string, ) *CreateApiKeyResponse`
 
 NewCreateApiKeyResponse instantiates a new CreateApiKeyResponse object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *CreateApiKeyResponse) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetKey
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetKey sets Key field to given value.
 
-### HasKey
-
-`func (o *CreateApiKeyResponse) HasKey() bool`
-
-HasKey returns a boolean if a field has been set.
 
 ### GetPrefix
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetPrefix sets Prefix field to given value.
 
-### HasPrefix
-
-`func (o *CreateApiKeyResponse) HasPrefix() bool`
-
-HasPrefix returns a boolean if a field has been set.
 
 ### GetMessage
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetMessage sets Message field to given value.
 
-### HasMessage
-
-`func (o *CreateApiKeyResponse) HasMessage() bool`
-
-HasMessage returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

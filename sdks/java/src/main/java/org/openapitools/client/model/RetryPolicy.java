@@ -48,11 +48,11 @@ import org.openapitools.client.JSON;
 /**
  * RetryPolicy
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class RetryPolicy {
   public static final String SERIALIZED_NAME_MAX_ATTEMPTS = "max_attempts";
   @SerializedName(SERIALIZED_NAME_MAX_ATTEMPTS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer maxAttempts = 3;
 
   /**
@@ -111,23 +111,23 @@ public class RetryPolicy {
 
   public static final String SERIALIZED_NAME_BACKOFF = "backoff";
   @SerializedName(SERIALIZED_NAME_BACKOFF)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private BackoffEnum backoff = BackoffEnum.EXPONENTIAL;
 
   public static final String SERIALIZED_NAME_INITIAL_DELAY_SECS = "initial_delay_secs";
   @SerializedName(SERIALIZED_NAME_INITIAL_DELAY_SECS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer initialDelaySecs = 10;
 
   public static final String SERIALIZED_NAME_MAX_DELAY_SECS = "max_delay_secs";
   @SerializedName(SERIALIZED_NAME_MAX_DELAY_SECS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer maxDelaySecs = 3600;
 
   public RetryPolicy() {
   }
 
-  public RetryPolicy maxAttempts(@javax.annotation.Nullable Integer maxAttempts) {
+  public RetryPolicy maxAttempts(@javax.annotation.Nonnull Integer maxAttempts) {
     this.maxAttempts = maxAttempts;
     return this;
   }
@@ -136,17 +136,17 @@ public class RetryPolicy {
    * Get maxAttempts
    * @return maxAttempts
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getMaxAttempts() {
     return maxAttempts;
   }
 
-  public void setMaxAttempts(@javax.annotation.Nullable Integer maxAttempts) {
+  public void setMaxAttempts(@javax.annotation.Nonnull Integer maxAttempts) {
     this.maxAttempts = maxAttempts;
   }
 
 
-  public RetryPolicy backoff(@javax.annotation.Nullable BackoffEnum backoff) {
+  public RetryPolicy backoff(@javax.annotation.Nonnull BackoffEnum backoff) {
     this.backoff = backoff;
     return this;
   }
@@ -155,17 +155,17 @@ public class RetryPolicy {
    * Get backoff
    * @return backoff
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public BackoffEnum getBackoff() {
     return backoff;
   }
 
-  public void setBackoff(@javax.annotation.Nullable BackoffEnum backoff) {
+  public void setBackoff(@javax.annotation.Nonnull BackoffEnum backoff) {
     this.backoff = backoff;
   }
 
 
-  public RetryPolicy initialDelaySecs(@javax.annotation.Nullable Integer initialDelaySecs) {
+  public RetryPolicy initialDelaySecs(@javax.annotation.Nonnull Integer initialDelaySecs) {
     this.initialDelaySecs = initialDelaySecs;
     return this;
   }
@@ -174,17 +174,17 @@ public class RetryPolicy {
    * Get initialDelaySecs
    * @return initialDelaySecs
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getInitialDelaySecs() {
     return initialDelaySecs;
   }
 
-  public void setInitialDelaySecs(@javax.annotation.Nullable Integer initialDelaySecs) {
+  public void setInitialDelaySecs(@javax.annotation.Nonnull Integer initialDelaySecs) {
     this.initialDelaySecs = initialDelaySecs;
   }
 
 
-  public RetryPolicy maxDelaySecs(@javax.annotation.Nullable Integer maxDelaySecs) {
+  public RetryPolicy maxDelaySecs(@javax.annotation.Nonnull Integer maxDelaySecs) {
     this.maxDelaySecs = maxDelaySecs;
     return this;
   }
@@ -193,12 +193,12 @@ public class RetryPolicy {
    * Get maxDelaySecs
    * @return maxDelaySecs
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getMaxDelaySecs() {
     return maxDelaySecs;
   }
 
-  public void setMaxDelaySecs(@javax.annotation.Nullable Integer maxDelaySecs) {
+  public void setMaxDelaySecs(@javax.annotation.Nonnull Integer maxDelaySecs) {
     this.maxDelaySecs = maxDelaySecs;
   }
 
@@ -253,7 +253,7 @@ public class RetryPolicy {
     openapiFields = new HashSet<String>(Arrays.asList("max_attempts", "backoff", "initial_delay_secs", "max_delay_secs"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("max_attempts", "backoff", "initial_delay_secs", "max_delay_secs"));
   }
 
   /**
@@ -276,14 +276,19 @@ public class RetryPolicy {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `RetryPolicy` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : RetryPolicy.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("backoff") != null && !jsonObj.get("backoff").isJsonNull()) && !jsonObj.get("backoff").isJsonPrimitive()) {
+      if (!jsonObj.get("backoff").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `backoff` to be a primitive type in the JSON string but got `%s`", jsonObj.get("backoff").toString()));
       }
-      // validate the optional field `backoff`
-      if (jsonObj.get("backoff") != null && !jsonObj.get("backoff").isJsonNull()) {
-        BackoffEnum.validateJsonElement(jsonObj.get("backoff"));
-      }
+      // validate the required field `backoff`
+      BackoffEnum.validateJsonElement(jsonObj.get("backoff"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

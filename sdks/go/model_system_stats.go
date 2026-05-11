@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the SystemStats type satisfies the MappedNullable interface at compile time
@@ -20,19 +22,26 @@ var _ MappedNullable = &SystemStats{}
 
 // SystemStats struct for SystemStats
 type SystemStats struct {
-	TotalUsers *int32 `json:"total_users,omitempty"`
-	ActiveUsers *int32 `json:"active_users,omitempty"`
-	TotalEndpoints *int32 `json:"total_endpoints,omitempty"`
-	TotalDeliveries *int32 `json:"total_deliveries,omitempty"`
-	PlanBreakdown []SystemStatsPlanBreakdownInner `json:"plan_breakdown,omitempty"`
+	TotalUsers int32 `json:"total_users"`
+	ActiveUsers int32 `json:"active_users"`
+	TotalEndpoints int32 `json:"total_endpoints"`
+	TotalDeliveries int32 `json:"total_deliveries"`
+	PlanBreakdown []SystemStatsPlanBreakdownInner `json:"plan_breakdown"`
 }
+
+type _SystemStats SystemStats
 
 // NewSystemStats instantiates a new SystemStats object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSystemStats() *SystemStats {
+func NewSystemStats(totalUsers int32, activeUsers int32, totalEndpoints int32, totalDeliveries int32, planBreakdown []SystemStatsPlanBreakdownInner) *SystemStats {
 	this := SystemStats{}
+	this.TotalUsers = totalUsers
+	this.ActiveUsers = activeUsers
+	this.TotalEndpoints = totalEndpoints
+	this.TotalDeliveries = totalDeliveries
+	this.PlanBreakdown = planBreakdown
 	return &this
 }
 
@@ -44,162 +53,122 @@ func NewSystemStatsWithDefaults() *SystemStats {
 	return &this
 }
 
-// GetTotalUsers returns the TotalUsers field value if set, zero value otherwise.
+// GetTotalUsers returns the TotalUsers field value
 func (o *SystemStats) GetTotalUsers() int32 {
-	if o == nil || IsNil(o.TotalUsers) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.TotalUsers
+
+	return o.TotalUsers
 }
 
-// GetTotalUsersOk returns a tuple with the TotalUsers field value if set, nil otherwise
+// GetTotalUsersOk returns a tuple with the TotalUsers field value
 // and a boolean to check if the value has been set.
 func (o *SystemStats) GetTotalUsersOk() (*int32, bool) {
-	if o == nil || IsNil(o.TotalUsers) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TotalUsers, true
+	return &o.TotalUsers, true
 }
 
-// HasTotalUsers returns a boolean if a field has been set.
-func (o *SystemStats) HasTotalUsers() bool {
-	if o != nil && !IsNil(o.TotalUsers) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotalUsers gets a reference to the given int32 and assigns it to the TotalUsers field.
+// SetTotalUsers sets field value
 func (o *SystemStats) SetTotalUsers(v int32) {
-	o.TotalUsers = &v
+	o.TotalUsers = v
 }
 
-// GetActiveUsers returns the ActiveUsers field value if set, zero value otherwise.
+// GetActiveUsers returns the ActiveUsers field value
 func (o *SystemStats) GetActiveUsers() int32 {
-	if o == nil || IsNil(o.ActiveUsers) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.ActiveUsers
+
+	return o.ActiveUsers
 }
 
-// GetActiveUsersOk returns a tuple with the ActiveUsers field value if set, nil otherwise
+// GetActiveUsersOk returns a tuple with the ActiveUsers field value
 // and a boolean to check if the value has been set.
 func (o *SystemStats) GetActiveUsersOk() (*int32, bool) {
-	if o == nil || IsNil(o.ActiveUsers) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ActiveUsers, true
+	return &o.ActiveUsers, true
 }
 
-// HasActiveUsers returns a boolean if a field has been set.
-func (o *SystemStats) HasActiveUsers() bool {
-	if o != nil && !IsNil(o.ActiveUsers) {
-		return true
-	}
-
-	return false
-}
-
-// SetActiveUsers gets a reference to the given int32 and assigns it to the ActiveUsers field.
+// SetActiveUsers sets field value
 func (o *SystemStats) SetActiveUsers(v int32) {
-	o.ActiveUsers = &v
+	o.ActiveUsers = v
 }
 
-// GetTotalEndpoints returns the TotalEndpoints field value if set, zero value otherwise.
+// GetTotalEndpoints returns the TotalEndpoints field value
 func (o *SystemStats) GetTotalEndpoints() int32 {
-	if o == nil || IsNil(o.TotalEndpoints) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.TotalEndpoints
+
+	return o.TotalEndpoints
 }
 
-// GetTotalEndpointsOk returns a tuple with the TotalEndpoints field value if set, nil otherwise
+// GetTotalEndpointsOk returns a tuple with the TotalEndpoints field value
 // and a boolean to check if the value has been set.
 func (o *SystemStats) GetTotalEndpointsOk() (*int32, bool) {
-	if o == nil || IsNil(o.TotalEndpoints) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TotalEndpoints, true
+	return &o.TotalEndpoints, true
 }
 
-// HasTotalEndpoints returns a boolean if a field has been set.
-func (o *SystemStats) HasTotalEndpoints() bool {
-	if o != nil && !IsNil(o.TotalEndpoints) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotalEndpoints gets a reference to the given int32 and assigns it to the TotalEndpoints field.
+// SetTotalEndpoints sets field value
 func (o *SystemStats) SetTotalEndpoints(v int32) {
-	o.TotalEndpoints = &v
+	o.TotalEndpoints = v
 }
 
-// GetTotalDeliveries returns the TotalDeliveries field value if set, zero value otherwise.
+// GetTotalDeliveries returns the TotalDeliveries field value
 func (o *SystemStats) GetTotalDeliveries() int32 {
-	if o == nil || IsNil(o.TotalDeliveries) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.TotalDeliveries
+
+	return o.TotalDeliveries
 }
 
-// GetTotalDeliveriesOk returns a tuple with the TotalDeliveries field value if set, nil otherwise
+// GetTotalDeliveriesOk returns a tuple with the TotalDeliveries field value
 // and a boolean to check if the value has been set.
 func (o *SystemStats) GetTotalDeliveriesOk() (*int32, bool) {
-	if o == nil || IsNil(o.TotalDeliveries) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TotalDeliveries, true
+	return &o.TotalDeliveries, true
 }
 
-// HasTotalDeliveries returns a boolean if a field has been set.
-func (o *SystemStats) HasTotalDeliveries() bool {
-	if o != nil && !IsNil(o.TotalDeliveries) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotalDeliveries gets a reference to the given int32 and assigns it to the TotalDeliveries field.
+// SetTotalDeliveries sets field value
 func (o *SystemStats) SetTotalDeliveries(v int32) {
-	o.TotalDeliveries = &v
+	o.TotalDeliveries = v
 }
 
-// GetPlanBreakdown returns the PlanBreakdown field value if set, zero value otherwise.
+// GetPlanBreakdown returns the PlanBreakdown field value
 func (o *SystemStats) GetPlanBreakdown() []SystemStatsPlanBreakdownInner {
-	if o == nil || IsNil(o.PlanBreakdown) {
+	if o == nil {
 		var ret []SystemStatsPlanBreakdownInner
 		return ret
 	}
+
 	return o.PlanBreakdown
 }
 
-// GetPlanBreakdownOk returns a tuple with the PlanBreakdown field value if set, nil otherwise
+// GetPlanBreakdownOk returns a tuple with the PlanBreakdown field value
 // and a boolean to check if the value has been set.
 func (o *SystemStats) GetPlanBreakdownOk() ([]SystemStatsPlanBreakdownInner, bool) {
-	if o == nil || IsNil(o.PlanBreakdown) {
+	if o == nil {
 		return nil, false
 	}
 	return o.PlanBreakdown, true
 }
 
-// HasPlanBreakdown returns a boolean if a field has been set.
-func (o *SystemStats) HasPlanBreakdown() bool {
-	if o != nil && !IsNil(o.PlanBreakdown) {
-		return true
-	}
-
-	return false
-}
-
-// SetPlanBreakdown gets a reference to the given []SystemStatsPlanBreakdownInner and assigns it to the PlanBreakdown field.
+// SetPlanBreakdown sets field value
 func (o *SystemStats) SetPlanBreakdown(v []SystemStatsPlanBreakdownInner) {
 	o.PlanBreakdown = v
 }
@@ -214,22 +183,53 @@ func (o SystemStats) MarshalJSON() ([]byte, error) {
 
 func (o SystemStats) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.TotalUsers) {
-		toSerialize["total_users"] = o.TotalUsers
-	}
-	if !IsNil(o.ActiveUsers) {
-		toSerialize["active_users"] = o.ActiveUsers
-	}
-	if !IsNil(o.TotalEndpoints) {
-		toSerialize["total_endpoints"] = o.TotalEndpoints
-	}
-	if !IsNil(o.TotalDeliveries) {
-		toSerialize["total_deliveries"] = o.TotalDeliveries
-	}
-	if !IsNil(o.PlanBreakdown) {
-		toSerialize["plan_breakdown"] = o.PlanBreakdown
-	}
+	toSerialize["total_users"] = o.TotalUsers
+	toSerialize["active_users"] = o.ActiveUsers
+	toSerialize["total_endpoints"] = o.TotalEndpoints
+	toSerialize["total_deliveries"] = o.TotalDeliveries
+	toSerialize["plan_breakdown"] = o.PlanBreakdown
 	return toSerialize, nil
+}
+
+func (o *SystemStats) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"total_users",
+		"active_users",
+		"total_endpoints",
+		"total_deliveries",
+		"plan_breakdown",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varSystemStats := _SystemStats{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varSystemStats)
+
+	if err != nil {
+		return err
+	}
+
+	*o = SystemStats(varSystemStats)
+
+	return err
 }
 
 type NullableSystemStats struct {

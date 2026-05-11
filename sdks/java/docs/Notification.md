@@ -7,12 +7,12 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**title** | **String** |  |  [optional] |
-|**body** | **String** |  |  [optional] |
-|**isRead** | **Boolean** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**title** | **String** |  |  |
+|**body** | **String** |  |  |
+|**isRead** | **Boolean** |  |  |
 |**link** | **String** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

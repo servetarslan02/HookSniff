@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the WebhookTemplate type satisfies the MappedNullable interface at compile time
@@ -20,19 +22,25 @@ var _ MappedNullable = &WebhookTemplate{}
 
 // WebhookTemplate struct for WebhookTemplate
 type WebhookTemplate struct {
-	Id *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Category *string `json:"category,omitempty"`
+	Id string `json:"id"`
+	Name string `json:"name"`
+	Description string `json:"description"`
+	Category string `json:"category"`
 	PayloadTemplate map[string]interface{} `json:"payload_template,omitempty"`
 }
+
+type _WebhookTemplate WebhookTemplate
 
 // NewWebhookTemplate instantiates a new WebhookTemplate object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWebhookTemplate() *WebhookTemplate {
+func NewWebhookTemplate(id string, name string, description string, category string) *WebhookTemplate {
 	this := WebhookTemplate{}
+	this.Id = id
+	this.Name = name
+	this.Description = description
+	this.Category = category
 	return &this
 }
 
@@ -44,132 +52,100 @@ func NewWebhookTemplateWithDefaults() *WebhookTemplate {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *WebhookTemplate) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *WebhookTemplate) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *WebhookTemplate) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *WebhookTemplate) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value
 func (o *WebhookTemplate) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Name
+
+	return o.Name
 }
 
-// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
 func (o *WebhookTemplate) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return &o.Name, true
 }
 
-// HasName returns a boolean if a field has been set.
-func (o *WebhookTemplate) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
-		return true
-	}
-
-	return false
-}
-
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName sets field value
 func (o *WebhookTemplate) SetName(v string) {
-	o.Name = &v
+	o.Name = v
 }
 
-// GetDescription returns the Description field value if set, zero value otherwise.
+// GetDescription returns the Description field value
 func (o *WebhookTemplate) GetDescription() string {
-	if o == nil || IsNil(o.Description) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Description
+
+	return o.Description
 }
 
-// GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
+// GetDescriptionOk returns a tuple with the Description field value
 // and a boolean to check if the value has been set.
 func (o *WebhookTemplate) GetDescriptionOk() (*string, bool) {
-	if o == nil || IsNil(o.Description) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Description, true
+	return &o.Description, true
 }
 
-// HasDescription returns a boolean if a field has been set.
-func (o *WebhookTemplate) HasDescription() bool {
-	if o != nil && !IsNil(o.Description) {
-		return true
-	}
-
-	return false
-}
-
-// SetDescription gets a reference to the given string and assigns it to the Description field.
+// SetDescription sets field value
 func (o *WebhookTemplate) SetDescription(v string) {
-	o.Description = &v
+	o.Description = v
 }
 
-// GetCategory returns the Category field value if set, zero value otherwise.
+// GetCategory returns the Category field value
 func (o *WebhookTemplate) GetCategory() string {
-	if o == nil || IsNil(o.Category) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Category
+
+	return o.Category
 }
 
-// GetCategoryOk returns a tuple with the Category field value if set, nil otherwise
+// GetCategoryOk returns a tuple with the Category field value
 // and a boolean to check if the value has been set.
 func (o *WebhookTemplate) GetCategoryOk() (*string, bool) {
-	if o == nil || IsNil(o.Category) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Category, true
+	return &o.Category, true
 }
 
-// HasCategory returns a boolean if a field has been set.
-func (o *WebhookTemplate) HasCategory() bool {
-	if o != nil && !IsNil(o.Category) {
-		return true
-	}
-
-	return false
-}
-
-// SetCategory gets a reference to the given string and assigns it to the Category field.
+// SetCategory sets field value
 func (o *WebhookTemplate) SetCategory(v string) {
-	o.Category = &v
+	o.Category = v
 }
 
 // GetPayloadTemplate returns the PayloadTemplate field value if set, zero value otherwise.
@@ -214,22 +190,54 @@ func (o WebhookTemplate) MarshalJSON() ([]byte, error) {
 
 func (o WebhookTemplate) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
-	}
-	if !IsNil(o.Description) {
-		toSerialize["description"] = o.Description
-	}
-	if !IsNil(o.Category) {
-		toSerialize["category"] = o.Category
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["name"] = o.Name
+	toSerialize["description"] = o.Description
+	toSerialize["category"] = o.Category
 	if !IsNil(o.PayloadTemplate) {
 		toSerialize["payload_template"] = o.PayloadTemplate
 	}
 	return toSerialize, nil
+}
+
+func (o *WebhookTemplate) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"name",
+		"description",
+		"category",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varWebhookTemplate := _WebhookTemplate{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varWebhookTemplate)
+
+	if err != nil {
+		return err
+	}
+
+	*o = WebhookTemplate(varWebhookTemplate)
+
+	return err
 }
 
 type NullableWebhookTemplate struct {

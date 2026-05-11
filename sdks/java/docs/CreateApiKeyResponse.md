@@ -7,10 +7,10 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**key** | **String** | Full API key — only shown once |  [optional] |
-|**prefix** | **String** |  |  [optional] |
-|**message** | **String** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**key** | **String** | Full API key — only shown once |  |
+|**prefix** | **String** |  |  |
+|**message** | **String** |  |  |
 
 
 

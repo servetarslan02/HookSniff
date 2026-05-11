@@ -7,9 +7,9 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**requires2fa** | **Boolean** |  |  [optional] |
-|**tempToken** | **String** |  |  [optional] |
-|**message** | **String** |  |  [optional] |
+|**requires2fa** | **Boolean** |  |  |
+|**tempToken** | **String** |  |  |
+|**message** | **String** |  |  |
 
 
 

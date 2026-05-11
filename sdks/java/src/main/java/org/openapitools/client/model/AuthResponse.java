@@ -49,16 +49,16 @@ import org.openapitools.client.JSON;
 /**
  * AuthResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class AuthResponse {
   public static final String SERIALIZED_NAME_TOKEN = "token";
   @SerializedName(SERIALIZED_NAME_TOKEN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String token;
 
   public static final String SERIALIZED_NAME_CUSTOMER = "customer";
   @SerializedName(SERIALIZED_NAME_CUSTOMER)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private CustomerResponse customer;
 
   public static final String SERIALIZED_NAME_REFRESH_TOKEN = "refresh_token";
@@ -69,7 +69,7 @@ public class AuthResponse {
   public AuthResponse() {
   }
 
-  public AuthResponse token(@javax.annotation.Nullable String token) {
+  public AuthResponse token(@javax.annotation.Nonnull String token) {
     this.token = token;
     return this;
   }
@@ -78,17 +78,17 @@ public class AuthResponse {
    * JWT access token
    * @return token
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getToken() {
     return token;
   }
 
-  public void setToken(@javax.annotation.Nullable String token) {
+  public void setToken(@javax.annotation.Nonnull String token) {
     this.token = token;
   }
 
 
-  public AuthResponse customer(@javax.annotation.Nullable CustomerResponse customer) {
+  public AuthResponse customer(@javax.annotation.Nonnull CustomerResponse customer) {
     this.customer = customer;
     return this;
   }
@@ -97,12 +97,12 @@ public class AuthResponse {
    * Get customer
    * @return customer
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public CustomerResponse getCustomer() {
     return customer;
   }
 
-  public void setCustomer(@javax.annotation.Nullable CustomerResponse customer) {
+  public void setCustomer(@javax.annotation.Nonnull CustomerResponse customer) {
     this.customer = customer;
   }
 
@@ -174,7 +174,7 @@ public class AuthResponse {
     openapiFields = new HashSet<String>(Arrays.asList("token", "customer", "refresh_token"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("token", "customer"));
   }
 
   /**
@@ -197,14 +197,19 @@ public class AuthResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `AuthResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : AuthResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("token") != null && !jsonObj.get("token").isJsonNull()) && !jsonObj.get("token").isJsonPrimitive()) {
+      if (!jsonObj.get("token").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("token").toString()));
       }
-      // validate the optional field `customer`
-      if (jsonObj.get("customer") != null && !jsonObj.get("customer").isJsonNull()) {
-        CustomerResponse.validateJsonElement(jsonObj.get("customer"));
-      }
+      // validate the required field `customer`
+      CustomerResponse.validateJsonElement(jsonObj.get("customer"));
       if ((jsonObj.get("refresh_token") != null && !jsonObj.get("refresh_token").isJsonNull()) && !jsonObj.get("refresh_token").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `refresh_token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("refresh_token").toString()));
       }

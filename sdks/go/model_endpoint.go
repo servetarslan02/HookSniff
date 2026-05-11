@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the Endpoint type satisfies the MappedNullable interface at compile time
@@ -21,30 +23,41 @@ var _ MappedNullable = &Endpoint{}
 
 // Endpoint struct for Endpoint
 type Endpoint struct {
-	Id *string `json:"id,omitempty"`
-	Url *string `json:"url,omitempty"`
+	Id string `json:"id"`
+	Url string `json:"url"`
 	Description NullableString `json:"description,omitempty"`
-	IsActive *bool `json:"is_active,omitempty"`
-	RetryPolicy *RetryPolicy `json:"retry_policy,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	IsActive bool `json:"is_active"`
+	RetryPolicy RetryPolicy `json:"retry_policy"`
+	CreatedAt time.Time `json:"created_at"`
 	// CIDR blocks or exact IPs
 	AllowedIps []string `json:"allowed_ips,omitempty"`
 	// Wildcard patterns (e.g. \"order.*\")
 	EventFilter []string `json:"event_filter,omitempty"`
 	CustomHeaders map[string]interface{} `json:"custom_headers,omitempty"`
-	RoutingStrategy *string `json:"routing_strategy,omitempty"`
+	RoutingStrategy string `json:"routing_strategy"`
 	FallbackUrl NullableString `json:"fallback_url,omitempty"`
-	AvgResponseMs *int32 `json:"avg_response_ms,omitempty"`
-	FailureStreak *int32 `json:"failure_streak,omitempty"`
-	Format *string `json:"format,omitempty"`
+	AvgResponseMs int32 `json:"avg_response_ms"`
+	FailureStreak int32 `json:"failure_streak"`
+	Format string `json:"format"`
 }
+
+type _Endpoint Endpoint
 
 // NewEndpoint instantiates a new Endpoint object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEndpoint() *Endpoint {
+func NewEndpoint(id string, url string, isActive bool, retryPolicy RetryPolicy, createdAt time.Time, routingStrategy string, avgResponseMs int32, failureStreak int32, format string) *Endpoint {
 	this := Endpoint{}
+	this.Id = id
+	this.Url = url
+	this.IsActive = isActive
+	this.RetryPolicy = retryPolicy
+	this.CreatedAt = createdAt
+	this.RoutingStrategy = routingStrategy
+	this.AvgResponseMs = avgResponseMs
+	this.FailureStreak = failureStreak
+	this.Format = format
 	return &this
 }
 
@@ -56,68 +69,52 @@ func NewEndpointWithDefaults() *Endpoint {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *Endpoint) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *Endpoint) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *Endpoint) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetUrl returns the Url field value if set, zero value otherwise.
+// GetUrl returns the Url field value
 func (o *Endpoint) GetUrl() string {
-	if o == nil || IsNil(o.Url) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Url
+
+	return o.Url
 }
 
-// GetUrlOk returns a tuple with the Url field value if set, nil otherwise
+// GetUrlOk returns a tuple with the Url field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetUrlOk() (*string, bool) {
-	if o == nil || IsNil(o.Url) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Url, true
+	return &o.Url, true
 }
 
-// HasUrl returns a boolean if a field has been set.
-func (o *Endpoint) HasUrl() bool {
-	if o != nil && !IsNil(o.Url) {
-		return true
-	}
-
-	return false
-}
-
-// SetUrl gets a reference to the given string and assigns it to the Url field.
+// SetUrl sets field value
 func (o *Endpoint) SetUrl(v string) {
-	o.Url = &v
+	o.Url = v
 }
 
 // GetDescription returns the Description field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -162,100 +159,76 @@ func (o *Endpoint) UnsetDescription() {
 	o.Description.Unset()
 }
 
-// GetIsActive returns the IsActive field value if set, zero value otherwise.
+// GetIsActive returns the IsActive field value
 func (o *Endpoint) GetIsActive() bool {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsActive
+
+	return o.IsActive
 }
 
-// GetIsActiveOk returns a tuple with the IsActive field value if set, nil otherwise
+// GetIsActiveOk returns a tuple with the IsActive field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetIsActiveOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsActive, true
+	return &o.IsActive, true
 }
 
-// HasIsActive returns a boolean if a field has been set.
-func (o *Endpoint) HasIsActive() bool {
-	if o != nil && !IsNil(o.IsActive) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsActive gets a reference to the given bool and assigns it to the IsActive field.
+// SetIsActive sets field value
 func (o *Endpoint) SetIsActive(v bool) {
-	o.IsActive = &v
+	o.IsActive = v
 }
 
-// GetRetryPolicy returns the RetryPolicy field value if set, zero value otherwise.
+// GetRetryPolicy returns the RetryPolicy field value
 func (o *Endpoint) GetRetryPolicy() RetryPolicy {
-	if o == nil || IsNil(o.RetryPolicy) {
+	if o == nil {
 		var ret RetryPolicy
 		return ret
 	}
-	return *o.RetryPolicy
+
+	return o.RetryPolicy
 }
 
-// GetRetryPolicyOk returns a tuple with the RetryPolicy field value if set, nil otherwise
+// GetRetryPolicyOk returns a tuple with the RetryPolicy field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetRetryPolicyOk() (*RetryPolicy, bool) {
-	if o == nil || IsNil(o.RetryPolicy) {
+	if o == nil {
 		return nil, false
 	}
-	return o.RetryPolicy, true
+	return &o.RetryPolicy, true
 }
 
-// HasRetryPolicy returns a boolean if a field has been set.
-func (o *Endpoint) HasRetryPolicy() bool {
-	if o != nil && !IsNil(o.RetryPolicy) {
-		return true
-	}
-
-	return false
-}
-
-// SetRetryPolicy gets a reference to the given RetryPolicy and assigns it to the RetryPolicy field.
+// SetRetryPolicy sets field value
 func (o *Endpoint) SetRetryPolicy(v RetryPolicy) {
-	o.RetryPolicy = &v
+	o.RetryPolicy = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *Endpoint) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *Endpoint) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *Endpoint) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 // GetAllowedIps returns the AllowedIps field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -357,36 +330,28 @@ func (o *Endpoint) SetCustomHeaders(v map[string]interface{}) {
 	o.CustomHeaders = v
 }
 
-// GetRoutingStrategy returns the RoutingStrategy field value if set, zero value otherwise.
+// GetRoutingStrategy returns the RoutingStrategy field value
 func (o *Endpoint) GetRoutingStrategy() string {
-	if o == nil || IsNil(o.RoutingStrategy) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.RoutingStrategy
+
+	return o.RoutingStrategy
 }
 
-// GetRoutingStrategyOk returns a tuple with the RoutingStrategy field value if set, nil otherwise
+// GetRoutingStrategyOk returns a tuple with the RoutingStrategy field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetRoutingStrategyOk() (*string, bool) {
-	if o == nil || IsNil(o.RoutingStrategy) {
+	if o == nil {
 		return nil, false
 	}
-	return o.RoutingStrategy, true
+	return &o.RoutingStrategy, true
 }
 
-// HasRoutingStrategy returns a boolean if a field has been set.
-func (o *Endpoint) HasRoutingStrategy() bool {
-	if o != nil && !IsNil(o.RoutingStrategy) {
-		return true
-	}
-
-	return false
-}
-
-// SetRoutingStrategy gets a reference to the given string and assigns it to the RoutingStrategy field.
+// SetRoutingStrategy sets field value
 func (o *Endpoint) SetRoutingStrategy(v string) {
-	o.RoutingStrategy = &v
+	o.RoutingStrategy = v
 }
 
 // GetFallbackUrl returns the FallbackUrl field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -431,100 +396,76 @@ func (o *Endpoint) UnsetFallbackUrl() {
 	o.FallbackUrl.Unset()
 }
 
-// GetAvgResponseMs returns the AvgResponseMs field value if set, zero value otherwise.
+// GetAvgResponseMs returns the AvgResponseMs field value
 func (o *Endpoint) GetAvgResponseMs() int32 {
-	if o == nil || IsNil(o.AvgResponseMs) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.AvgResponseMs
+
+	return o.AvgResponseMs
 }
 
-// GetAvgResponseMsOk returns a tuple with the AvgResponseMs field value if set, nil otherwise
+// GetAvgResponseMsOk returns a tuple with the AvgResponseMs field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetAvgResponseMsOk() (*int32, bool) {
-	if o == nil || IsNil(o.AvgResponseMs) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AvgResponseMs, true
+	return &o.AvgResponseMs, true
 }
 
-// HasAvgResponseMs returns a boolean if a field has been set.
-func (o *Endpoint) HasAvgResponseMs() bool {
-	if o != nil && !IsNil(o.AvgResponseMs) {
-		return true
-	}
-
-	return false
-}
-
-// SetAvgResponseMs gets a reference to the given int32 and assigns it to the AvgResponseMs field.
+// SetAvgResponseMs sets field value
 func (o *Endpoint) SetAvgResponseMs(v int32) {
-	o.AvgResponseMs = &v
+	o.AvgResponseMs = v
 }
 
-// GetFailureStreak returns the FailureStreak field value if set, zero value otherwise.
+// GetFailureStreak returns the FailureStreak field value
 func (o *Endpoint) GetFailureStreak() int32 {
-	if o == nil || IsNil(o.FailureStreak) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.FailureStreak
+
+	return o.FailureStreak
 }
 
-// GetFailureStreakOk returns a tuple with the FailureStreak field value if set, nil otherwise
+// GetFailureStreakOk returns a tuple with the FailureStreak field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetFailureStreakOk() (*int32, bool) {
-	if o == nil || IsNil(o.FailureStreak) {
+	if o == nil {
 		return nil, false
 	}
-	return o.FailureStreak, true
+	return &o.FailureStreak, true
 }
 
-// HasFailureStreak returns a boolean if a field has been set.
-func (o *Endpoint) HasFailureStreak() bool {
-	if o != nil && !IsNil(o.FailureStreak) {
-		return true
-	}
-
-	return false
-}
-
-// SetFailureStreak gets a reference to the given int32 and assigns it to the FailureStreak field.
+// SetFailureStreak sets field value
 func (o *Endpoint) SetFailureStreak(v int32) {
-	o.FailureStreak = &v
+	o.FailureStreak = v
 }
 
-// GetFormat returns the Format field value if set, zero value otherwise.
+// GetFormat returns the Format field value
 func (o *Endpoint) GetFormat() string {
-	if o == nil || IsNil(o.Format) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Format
+
+	return o.Format
 }
 
-// GetFormatOk returns a tuple with the Format field value if set, nil otherwise
+// GetFormatOk returns a tuple with the Format field value
 // and a boolean to check if the value has been set.
 func (o *Endpoint) GetFormatOk() (*string, bool) {
-	if o == nil || IsNil(o.Format) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Format, true
+	return &o.Format, true
 }
 
-// HasFormat returns a boolean if a field has been set.
-func (o *Endpoint) HasFormat() bool {
-	if o != nil && !IsNil(o.Format) {
-		return true
-	}
-
-	return false
-}
-
-// SetFormat gets a reference to the given string and assigns it to the Format field.
+// SetFormat sets field value
 func (o *Endpoint) SetFormat(v string) {
-	o.Format = &v
+	o.Format = v
 }
 
 func (o Endpoint) MarshalJSON() ([]byte, error) {
@@ -537,24 +478,14 @@ func (o Endpoint) MarshalJSON() ([]byte, error) {
 
 func (o Endpoint) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Url) {
-		toSerialize["url"] = o.Url
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["url"] = o.Url
 	if o.Description.IsSet() {
 		toSerialize["description"] = o.Description.Get()
 	}
-	if !IsNil(o.IsActive) {
-		toSerialize["is_active"] = o.IsActive
-	}
-	if !IsNil(o.RetryPolicy) {
-		toSerialize["retry_policy"] = o.RetryPolicy
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["is_active"] = o.IsActive
+	toSerialize["retry_policy"] = o.RetryPolicy
+	toSerialize["created_at"] = o.CreatedAt
 	if o.AllowedIps != nil {
 		toSerialize["allowed_ips"] = o.AllowedIps
 	}
@@ -564,22 +495,59 @@ func (o Endpoint) ToMap() (map[string]interface{}, error) {
 	if o.CustomHeaders != nil {
 		toSerialize["custom_headers"] = o.CustomHeaders
 	}
-	if !IsNil(o.RoutingStrategy) {
-		toSerialize["routing_strategy"] = o.RoutingStrategy
-	}
+	toSerialize["routing_strategy"] = o.RoutingStrategy
 	if o.FallbackUrl.IsSet() {
 		toSerialize["fallback_url"] = o.FallbackUrl.Get()
 	}
-	if !IsNil(o.AvgResponseMs) {
-		toSerialize["avg_response_ms"] = o.AvgResponseMs
-	}
-	if !IsNil(o.FailureStreak) {
-		toSerialize["failure_streak"] = o.FailureStreak
-	}
-	if !IsNil(o.Format) {
-		toSerialize["format"] = o.Format
-	}
+	toSerialize["avg_response_ms"] = o.AvgResponseMs
+	toSerialize["failure_streak"] = o.FailureStreak
+	toSerialize["format"] = o.Format
 	return toSerialize, nil
+}
+
+func (o *Endpoint) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"url",
+		"is_active",
+		"retry_policy",
+		"created_at",
+		"routing_strategy",
+		"avg_response_ms",
+		"failure_streak",
+		"format",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varEndpoint := _Endpoint{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varEndpoint)
+
+	if err != nil {
+		return err
+	}
+
+	*o = Endpoint(varEndpoint)
+
+	return err
 }
 
 type NullableEndpoint struct {

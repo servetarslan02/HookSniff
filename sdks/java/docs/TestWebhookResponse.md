@@ -7,10 +7,10 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**success** | **Boolean** |  |  [optional] |
-|**statusCode** | **Integer** |  |  [optional] |
-|**durationMs** | **Integer** |  |  [optional] |
-|**responseBody** | **String** |  |  [optional] |
+|**success** | **Boolean** |  |  |
+|**statusCode** | **Integer** |  |  |
+|**durationMs** | **Integer** |  |  |
+|**responseBody** | **String** |  |  |
 
 
 

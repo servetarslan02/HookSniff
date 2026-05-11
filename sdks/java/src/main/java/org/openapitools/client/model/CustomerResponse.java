@@ -51,16 +51,16 @@ import org.openapitools.client.JSON;
 /**
  * CustomerResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class CustomerResponse {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_EMAIL = "email";
   @SerializedName(SERIALIZED_NAME_EMAIL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String email;
 
   public static final String SERIALIZED_NAME_NAME = "name";
@@ -129,33 +129,33 @@ public class CustomerResponse {
 
   public static final String SERIALIZED_NAME_PLAN = "plan";
   @SerializedName(SERIALIZED_NAME_PLAN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private PlanEnum plan;
 
   public static final String SERIALIZED_NAME_WEBHOOK_LIMIT = "webhook_limit";
   @SerializedName(SERIALIZED_NAME_WEBHOOK_LIMIT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer webhookLimit;
 
   public static final String SERIALIZED_NAME_WEBHOOK_COUNT = "webhook_count";
   @SerializedName(SERIALIZED_NAME_WEBHOOK_COUNT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer webhookCount;
 
   public static final String SERIALIZED_NAME_IS_ADMIN = "is_admin";
   @SerializedName(SERIALIZED_NAME_IS_ADMIN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean isAdmin;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public CustomerResponse() {
   }
 
-  public CustomerResponse id(@javax.annotation.Nullable UUID id) {
+  public CustomerResponse id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -164,17 +164,17 @@ public class CustomerResponse {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public CustomerResponse email(@javax.annotation.Nullable String email) {
+  public CustomerResponse email(@javax.annotation.Nonnull String email) {
     this.email = email;
     return this;
   }
@@ -183,12 +183,12 @@ public class CustomerResponse {
    * Get email
    * @return email
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getEmail() {
     return email;
   }
 
-  public void setEmail(@javax.annotation.Nullable String email) {
+  public void setEmail(@javax.annotation.Nonnull String email) {
     this.email = email;
   }
 
@@ -231,7 +231,7 @@ public class CustomerResponse {
   }
 
 
-  public CustomerResponse plan(@javax.annotation.Nullable PlanEnum plan) {
+  public CustomerResponse plan(@javax.annotation.Nonnull PlanEnum plan) {
     this.plan = plan;
     return this;
   }
@@ -240,17 +240,17 @@ public class CustomerResponse {
    * Get plan
    * @return plan
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public PlanEnum getPlan() {
     return plan;
   }
 
-  public void setPlan(@javax.annotation.Nullable PlanEnum plan) {
+  public void setPlan(@javax.annotation.Nonnull PlanEnum plan) {
     this.plan = plan;
   }
 
 
-  public CustomerResponse webhookLimit(@javax.annotation.Nullable Integer webhookLimit) {
+  public CustomerResponse webhookLimit(@javax.annotation.Nonnull Integer webhookLimit) {
     this.webhookLimit = webhookLimit;
     return this;
   }
@@ -259,17 +259,17 @@ public class CustomerResponse {
    * Get webhookLimit
    * @return webhookLimit
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getWebhookLimit() {
     return webhookLimit;
   }
 
-  public void setWebhookLimit(@javax.annotation.Nullable Integer webhookLimit) {
+  public void setWebhookLimit(@javax.annotation.Nonnull Integer webhookLimit) {
     this.webhookLimit = webhookLimit;
   }
 
 
-  public CustomerResponse webhookCount(@javax.annotation.Nullable Integer webhookCount) {
+  public CustomerResponse webhookCount(@javax.annotation.Nonnull Integer webhookCount) {
     this.webhookCount = webhookCount;
     return this;
   }
@@ -278,17 +278,17 @@ public class CustomerResponse {
    * Get webhookCount
    * @return webhookCount
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getWebhookCount() {
     return webhookCount;
   }
 
-  public void setWebhookCount(@javax.annotation.Nullable Integer webhookCount) {
+  public void setWebhookCount(@javax.annotation.Nonnull Integer webhookCount) {
     this.webhookCount = webhookCount;
   }
 
 
-  public CustomerResponse isAdmin(@javax.annotation.Nullable Boolean isAdmin) {
+  public CustomerResponse isAdmin(@javax.annotation.Nonnull Boolean isAdmin) {
     this.isAdmin = isAdmin;
     return this;
   }
@@ -297,17 +297,17 @@ public class CustomerResponse {
    * Get isAdmin
    * @return isAdmin
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getIsAdmin() {
     return isAdmin;
   }
 
-  public void setIsAdmin(@javax.annotation.Nullable Boolean isAdmin) {
+  public void setIsAdmin(@javax.annotation.Nonnull Boolean isAdmin) {
     this.isAdmin = isAdmin;
   }
 
 
-  public CustomerResponse createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public CustomerResponse createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -316,12 +316,12 @@ public class CustomerResponse {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -397,7 +397,7 @@ public class CustomerResponse {
     openapiFields = new HashSet<String>(Arrays.asList("id", "email", "name", "api_key", "plan", "webhook_limit", "webhook_count", "is_admin", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "email", "plan", "webhook_limit", "webhook_count", "is_admin", "created_at"));
   }
 
   /**
@@ -420,11 +420,18 @@ public class CustomerResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `CustomerResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : CustomerResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("email") != null && !jsonObj.get("email").isJsonNull()) && !jsonObj.get("email").isJsonPrimitive()) {
+      if (!jsonObj.get("email").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `email` to be a primitive type in the JSON string but got `%s`", jsonObj.get("email").toString()));
       }
       if ((jsonObj.get("name") != null && !jsonObj.get("name").isJsonNull()) && !jsonObj.get("name").isJsonPrimitive()) {
@@ -433,13 +440,11 @@ public class CustomerResponse {
       if ((jsonObj.get("api_key") != null && !jsonObj.get("api_key").isJsonNull()) && !jsonObj.get("api_key").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `api_key` to be a primitive type in the JSON string but got `%s`", jsonObj.get("api_key").toString()));
       }
-      if ((jsonObj.get("plan") != null && !jsonObj.get("plan").isJsonNull()) && !jsonObj.get("plan").isJsonPrimitive()) {
+      if (!jsonObj.get("plan").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `plan` to be a primitive type in the JSON string but got `%s`", jsonObj.get("plan").toString()));
       }
-      // validate the optional field `plan`
-      if (jsonObj.get("plan") != null && !jsonObj.get("plan").isJsonNull()) {
-        PlanEnum.validateJsonElement(jsonObj.get("plan"));
-      }
+      // validate the required field `plan`
+      PlanEnum.validateJsonElement(jsonObj.get("plan"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

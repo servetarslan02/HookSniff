@@ -50,26 +50,26 @@ import org.openapitools.client.JSON;
 /**
  * TransformRule
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class TransformRule {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_ENDPOINT_ID = "endpoint_id";
   @SerializedName(SERIALIZED_NAME_ENDPOINT_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID endpointId;
 
   public static final String SERIALIZED_NAME_NAME = "name";
   @SerializedName(SERIALIZED_NAME_NAME)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String name;
 
   public static final String SERIALIZED_NAME_RULE_TYPE = "rule_type";
   @SerializedName(SERIALIZED_NAME_RULE_TYPE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String ruleType;
 
   public static final String SERIALIZED_NAME_CONFIG = "config";
@@ -79,18 +79,18 @@ public class TransformRule {
 
   public static final String SERIALIZED_NAME_IS_ACTIVE = "is_active";
   @SerializedName(SERIALIZED_NAME_IS_ACTIVE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean isActive;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public TransformRule() {
   }
 
-  public TransformRule id(@javax.annotation.Nullable UUID id) {
+  public TransformRule id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -99,17 +99,17 @@ public class TransformRule {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public TransformRule endpointId(@javax.annotation.Nullable UUID endpointId) {
+  public TransformRule endpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
     return this;
   }
@@ -118,17 +118,17 @@ public class TransformRule {
    * Get endpointId
    * @return endpointId
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getEndpointId() {
     return endpointId;
   }
 
-  public void setEndpointId(@javax.annotation.Nullable UUID endpointId) {
+  public void setEndpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
   }
 
 
-  public TransformRule name(@javax.annotation.Nullable String name) {
+  public TransformRule name(@javax.annotation.Nonnull String name) {
     this.name = name;
     return this;
   }
@@ -137,17 +137,17 @@ public class TransformRule {
    * Get name
    * @return name
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getName() {
     return name;
   }
 
-  public void setName(@javax.annotation.Nullable String name) {
+  public void setName(@javax.annotation.Nonnull String name) {
     this.name = name;
   }
 
 
-  public TransformRule ruleType(@javax.annotation.Nullable String ruleType) {
+  public TransformRule ruleType(@javax.annotation.Nonnull String ruleType) {
     this.ruleType = ruleType;
     return this;
   }
@@ -156,12 +156,12 @@ public class TransformRule {
    * Get ruleType
    * @return ruleType
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getRuleType() {
     return ruleType;
   }
 
-  public void setRuleType(@javax.annotation.Nullable String ruleType) {
+  public void setRuleType(@javax.annotation.Nonnull String ruleType) {
     this.ruleType = ruleType;
   }
 
@@ -185,7 +185,7 @@ public class TransformRule {
   }
 
 
-  public TransformRule isActive(@javax.annotation.Nullable Boolean isActive) {
+  public TransformRule isActive(@javax.annotation.Nonnull Boolean isActive) {
     this.isActive = isActive;
     return this;
   }
@@ -194,17 +194,17 @@ public class TransformRule {
    * Get isActive
    * @return isActive
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getIsActive() {
     return isActive;
   }
 
-  public void setIsActive(@javax.annotation.Nullable Boolean isActive) {
+  public void setIsActive(@javax.annotation.Nonnull Boolean isActive) {
     this.isActive = isActive;
   }
 
 
-  public TransformRule createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public TransformRule createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -213,12 +213,12 @@ public class TransformRule {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -279,7 +279,7 @@ public class TransformRule {
     openapiFields = new HashSet<String>(Arrays.asList("id", "endpoint_id", "name", "rule_type", "config", "is_active", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "endpoint_id", "name", "rule_type", "is_active", "created_at"));
   }
 
   /**
@@ -302,17 +302,24 @@ public class TransformRule {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `TransformRule` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : TransformRule.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("endpoint_id") != null && !jsonObj.get("endpoint_id").isJsonNull()) && !jsonObj.get("endpoint_id").isJsonPrimitive()) {
+      if (!jsonObj.get("endpoint_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `endpoint_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("endpoint_id").toString()));
       }
-      if ((jsonObj.get("name") != null && !jsonObj.get("name").isJsonNull()) && !jsonObj.get("name").isJsonPrimitive()) {
+      if (!jsonObj.get("name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("name").toString()));
       }
-      if ((jsonObj.get("rule_type") != null && !jsonObj.get("rule_type").isJsonNull()) && !jsonObj.get("rule_type").isJsonPrimitive()) {
+      if (!jsonObj.get("rule_type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rule_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rule_type").toString()));
       }
   }

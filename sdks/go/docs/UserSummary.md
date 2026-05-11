@@ -4,18 +4,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Email** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Email** | **string** |  | 
 **Name** | Pointer to **NullableString** |  | [optional] 
-**Plan** | Pointer to **string** |  | [optional] 
-**IsActive** | Pointer to **bool** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**Plan** | **string** |  | 
+**IsActive** | **bool** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewUserSummary
 
-`func NewUserSummary() *UserSummary`
+`func NewUserSummary(id string, email string, plan string, isActive bool, createdAt time.Time, ) *UserSummary`
 
 NewUserSummary instantiates a new UserSummary object
 This constructor will assign default values to properties that have it defined,
@@ -49,11 +49,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *UserSummary) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetEmail
 
@@ -74,11 +69,6 @@ and a boolean to check if the value has been set.
 
 SetEmail sets Email field to given value.
 
-### HasEmail
-
-`func (o *UserSummary) HasEmail() bool`
-
-HasEmail returns a boolean if a field has been set.
 
 ### GetName
 
@@ -134,11 +124,6 @@ and a boolean to check if the value has been set.
 
 SetPlan sets Plan field to given value.
 
-### HasPlan
-
-`func (o *UserSummary) HasPlan() bool`
-
-HasPlan returns a boolean if a field has been set.
 
 ### GetIsActive
 
@@ -159,11 +144,6 @@ and a boolean to check if the value has been set.
 
 SetIsActive sets IsActive field to given value.
 
-### HasIsActive
-
-`func (o *UserSummary) HasIsActive() bool`
-
-HasIsActive returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -184,11 +164,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *UserSummary) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

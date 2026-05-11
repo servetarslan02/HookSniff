@@ -49,21 +49,21 @@ import org.openapitools.client.JSON;
 /**
  * NotificationPreferences
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class NotificationPreferences {
   public static final String SERIALIZED_NAME_EMAIL_ON_FAILURE = "email_on_failure";
   @SerializedName(SERIALIZED_NAME_EMAIL_ON_FAILURE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean emailOnFailure = true;
 
   public static final String SERIALIZED_NAME_EMAIL_ON_DEAD_LETTER = "email_on_dead_letter";
   @SerializedName(SERIALIZED_NAME_EMAIL_ON_DEAD_LETTER)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean emailOnDeadLetter = true;
 
   public static final String SERIALIZED_NAME_EMAIL_ON_SUCCESS = "email_on_success";
   @SerializedName(SERIALIZED_NAME_EMAIL_ON_SUCCESS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean emailOnSuccess = false;
 
   public static final String SERIALIZED_NAME_SLACK_WEBHOOK_URL = "slack_webhook_url";
@@ -84,7 +84,7 @@ public class NotificationPreferences {
   public NotificationPreferences() {
   }
 
-  public NotificationPreferences emailOnFailure(@javax.annotation.Nullable Boolean emailOnFailure) {
+  public NotificationPreferences emailOnFailure(@javax.annotation.Nonnull Boolean emailOnFailure) {
     this.emailOnFailure = emailOnFailure;
     return this;
   }
@@ -93,17 +93,17 @@ public class NotificationPreferences {
    * Get emailOnFailure
    * @return emailOnFailure
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getEmailOnFailure() {
     return emailOnFailure;
   }
 
-  public void setEmailOnFailure(@javax.annotation.Nullable Boolean emailOnFailure) {
+  public void setEmailOnFailure(@javax.annotation.Nonnull Boolean emailOnFailure) {
     this.emailOnFailure = emailOnFailure;
   }
 
 
-  public NotificationPreferences emailOnDeadLetter(@javax.annotation.Nullable Boolean emailOnDeadLetter) {
+  public NotificationPreferences emailOnDeadLetter(@javax.annotation.Nonnull Boolean emailOnDeadLetter) {
     this.emailOnDeadLetter = emailOnDeadLetter;
     return this;
   }
@@ -112,17 +112,17 @@ public class NotificationPreferences {
    * Get emailOnDeadLetter
    * @return emailOnDeadLetter
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getEmailOnDeadLetter() {
     return emailOnDeadLetter;
   }
 
-  public void setEmailOnDeadLetter(@javax.annotation.Nullable Boolean emailOnDeadLetter) {
+  public void setEmailOnDeadLetter(@javax.annotation.Nonnull Boolean emailOnDeadLetter) {
     this.emailOnDeadLetter = emailOnDeadLetter;
   }
 
 
-  public NotificationPreferences emailOnSuccess(@javax.annotation.Nullable Boolean emailOnSuccess) {
+  public NotificationPreferences emailOnSuccess(@javax.annotation.Nonnull Boolean emailOnSuccess) {
     this.emailOnSuccess = emailOnSuccess;
     return this;
   }
@@ -131,12 +131,12 @@ public class NotificationPreferences {
    * Get emailOnSuccess
    * @return emailOnSuccess
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getEmailOnSuccess() {
     return emailOnSuccess;
   }
 
-  public void setEmailOnSuccess(@javax.annotation.Nullable Boolean emailOnSuccess) {
+  public void setEmailOnSuccess(@javax.annotation.Nonnull Boolean emailOnSuccess) {
     this.emailOnSuccess = emailOnSuccess;
   }
 
@@ -263,7 +263,7 @@ public class NotificationPreferences {
     openapiFields = new HashSet<String>(Arrays.asList("email_on_failure", "email_on_dead_letter", "email_on_success", "slack_webhook_url", "discord_webhook_url", "webhook_url"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("email_on_failure", "email_on_dead_letter", "email_on_success"));
   }
 
   /**
@@ -284,6 +284,13 @@ public class NotificationPreferences {
       for (Map.Entry<String, JsonElement> entry : entries) {
         if (!NotificationPreferences.openapiFields.contains(entry.getKey())) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `NotificationPreferences` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
+        }
+      }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : NotificationPreferences.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();

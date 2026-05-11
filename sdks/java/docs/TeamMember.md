@@ -7,12 +7,12 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**userId** | **UUID** |  |  [optional] |
-|**email** | **String** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**userId** | **UUID** |  |  |
+|**email** | **String** |  |  |
 |**name** | **String** |  |  [optional] |
-|**role** | **String** |  |  [optional] |
-|**joinedAt** | **OffsetDateTime** |  |  [optional] |
+|**role** | **String** |  |  |
+|**joinedAt** | **OffsetDateTime** |  |  |
 
 
 
