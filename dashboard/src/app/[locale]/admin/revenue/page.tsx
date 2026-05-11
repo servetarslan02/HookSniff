@@ -150,7 +150,7 @@ export default function AdminRevenuePage() {
 
         {/* Revenue by Plan */}
         <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('revenueByPlan')}</h3>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('revenueByPlan')}</h2>
           {planData.length > 0 ? (
             <>
               <div className="h-48">

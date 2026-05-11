@@ -15,21 +15,28 @@ export default function AdminSystemPage() {
   const { token } = useAuth();
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
+  const tc = useTranslations('common');
   const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
 
   const fetchHealth = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch(`${API}/health`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) setHealth(await res.json());
+      if (res.ok) {
+        setHealth(await res.json());
+      } else {
+        setError(t('systemHealthDesc'));
+      }
     } catch {
-      // ignore
+      setError(t('systemHealthDesc'));
     } finally {
       setLoading(false);
     }
-  }, [token, API]);
+  }, [token, API, t]);
 
   useEffect(() => {
     fetchHealth();
@@ -63,6 +70,10 @@ export default function AdminSystemPage() {
   if (loading) {
     return (
       <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{tc('loading')}</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-6 animate-pulse">
@@ -70,6 +81,26 @@ export default function AdminSystemPage() {
               <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !health) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
+        </div>
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+          <button
+            type="button"
+            onClick={fetchHealth}
+            className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+          >
+            {tc('retry')}
+          </button>
         </div>
       </div>
     );
@@ -118,7 +149,7 @@ export default function AdminSystemPage() {
       </div>
 
       {/* Overall Status */}
-      <div className="glass-card p-6">
+      <div className="glass-card p-6" aria-live="polite" aria-atomic="true">
         <div className="flex items-center gap-3 mb-4">
           <div className={`w-3 h-3 rounded-full animate-pulse ${
             services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok')

@@ -41,7 +41,7 @@ async fn list_alerts(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<AlertRule>>, AppError> {
     let alerts = sqlx::query_as::<_, (Uuid, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, name, condition, threshold, channels, is_active, created_at FROM alert_rules WHERE customer_id = $1 ORDER BY created_at DESC"
+        "SELECT id, name, condition, threshold, channels, is_active, created_at FROM alert_rules WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100"
     )
     .bind(customer.id)
     .fetch_all(&pool)
