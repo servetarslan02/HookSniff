@@ -62,7 +62,7 @@ export default function EndpointsPage() {
       await endpointsApi.delete(token, deleteId);
       setEndpoints((prev) => prev.filter((ep) => ep.id !== deleteId));
     } catch (err: unknown) {
-      toast((err instanceof Error ? err.message : tc('unknownError')) || 'Failed to delete', 'error');
+      toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToDelete'), 'error');
     } finally {
       setDeleteId(null);
     }
