@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 15:30 GMT+8
+> Son güncelleme: 2026-05-11 15:35 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -99,6 +99,14 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - hooksniff-worker: Available
   - OTEL env var'ları zaten mevcut (OTEL_ENABLED=true, endpoint, headers secret)
   - Deploy tetiklendi — sonucu bekleniyor
+  - **Revision 00061-xd2 de BAŞARISIZ** — api:latest image bozuk (startup timeout)
+  - Son 3 revision (00059, 00060, 00061) aynı hatayla başarısız
+  - Revision 00058-kq6 (8 saat önce) hala %100 traffic alıyor ama API Unavailable
+  - **Sorun:** Docker registry'deki api:latest image'ı bozulmuş
+  - **Çözüm:** 00058'in image digest'ini bulup onunla deploy etmek gerek
+- **Yeni PAT:** `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` (repo + workflow scope)
+- **deploy.yml:** workflow_dispatch eklendi, OTEL env var'ları eklendi (cb043d4, 67c627b)
+- **MEMORY.md şifreleri:** Geri koyuldu (Servet'in isteğiyle)
 
 ## Oturum 104 (2026-05-11 06:57 - 07:12) ✅
 - **Grafana OTEL KRİTİK BULGU** — Deploy scriptlerinde yanlış region!
