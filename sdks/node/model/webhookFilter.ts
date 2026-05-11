@@ -19,16 +19,16 @@ export class WebhookFilter {
     /**
     * Filter by delivery status
     */
-    'status'?: WebhookFilter.StatusEnum;
-    'endpointId'?: string;
+    'status': WebhookFilter.StatusEnum;
+    'endpointId': string;
     /**
     * Filter by event type (e.g. order.created)
     */
-    'eventType'?: string;
-    'fromDate'?: Date;
-    'toDate'?: Date;
-    'page'?: number = 1;
-    'perPage'?: number = 20;
+    'eventType': string;
+    'fromDate': Date;
+    'toDate': Date;
+    'page': number = 1;
+    'perPage': number = 20;
 
     static discriminator: string | undefined = undefined;
 

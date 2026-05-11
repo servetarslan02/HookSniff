@@ -13,14 +13,14 @@
 import { RequestFile } from './models';
 
 export class StatsResponse {
-    'totalDeliveries'?: number;
-    'successfulDeliveries'?: number;
-    'failedDeliveries'?: number;
-    'totalEndpoints'?: number;
-    'activeEndpoints'?: number;
-    'plan'?: string;
-    'webhookLimit'?: number;
-    'webhookCount'?: number;
+    'totalDeliveries': number;
+    'successfulDeliveries': number;
+    'failedDeliveries': number;
+    'totalEndpoints': number;
+    'activeEndpoints': number;
+    'plan': string;
+    'webhookLimit': number;
+    'webhookCount': number;
 
     static discriminator: string | undefined = undefined;
 

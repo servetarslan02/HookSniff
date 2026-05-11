@@ -13,12 +13,12 @@
 import { RequestFile } from './models';
 
 export class TeamMember {
-    'id'?: string;
-    'userId'?: string;
-    'email'?: string;
+    'id': string;
+    'userId': string;
+    'email': string;
     'name'?: string | null;
-    'role'?: string;
-    'joinedAt'?: Date;
+    'role': string;
+    'joinedAt': Date;
 
     static discriminator: string | undefined = undefined;
 

@@ -13,11 +13,11 @@
 import { RequestFile } from './models';
 
 export class PortalProfile {
-    'id'?: string;
-    'email'?: string;
+    'id': string;
+    'email': string;
     'name'?: string | null;
-    'plan'?: string;
-    'createdAt'?: Date;
+    'plan': string;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

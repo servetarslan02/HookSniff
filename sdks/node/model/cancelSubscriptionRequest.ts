@@ -19,7 +19,7 @@ export class CancelSubscriptionRequest {
     /**
     * Optional reason for cancellation
     */
-    'reason'?: string;
+    'reason': string;
 
     static discriminator: string | undefined = undefined;
 

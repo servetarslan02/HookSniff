@@ -13,8 +13,8 @@
 import { RequestFile } from './models';
 
 export class ApplyTemplateResponse {
-    'success'?: boolean;
-    'message'?: string;
+    'success': boolean;
+    'message': string;
 
     static discriminator: string | undefined = undefined;
 

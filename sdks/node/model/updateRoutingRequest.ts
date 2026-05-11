@@ -13,8 +13,8 @@
 import { RequestFile } from './models';
 
 export class UpdateRoutingRequest {
-    'routingStrategy'?: UpdateRoutingRequest.RoutingStrategyEnum;
-    'fallbackUrl'?: string;
+    'routingStrategy': UpdateRoutingRequest.RoutingStrategyEnum;
+    'fallbackUrl': string;
 
     static discriminator: string | undefined = undefined;
 

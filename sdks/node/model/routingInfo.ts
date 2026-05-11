@@ -13,12 +13,12 @@
 import { RequestFile } from './models';
 
 export class RoutingInfo {
-    'endpointId'?: string;
-    'routingStrategy'?: string;
+    'endpointId': string;
+    'routingStrategy': string;
     'fallbackUrl'?: string | null;
-    'avgResponseMs'?: number;
-    'failureStreak'?: number;
-    'isHealthy'?: boolean;
+    'avgResponseMs': number;
+    'failureStreak': number;
+    'isHealthy': boolean;
 
     static discriminator: string | undefined = undefined;
 

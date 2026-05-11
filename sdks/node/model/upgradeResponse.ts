@@ -14,8 +14,8 @@ import { RequestFile } from './models';
 
 export class UpgradeResponse {
     'checkoutUrl'?: string | null;
-    'provider'?: string;
-    'message'?: string;
+    'provider': string;
+    'message': string;
 
     static discriminator: string | undefined = undefined;
 
