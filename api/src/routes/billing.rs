@@ -102,7 +102,7 @@ async fn cancel_subscription(
     // Audit log — SUBSCRIPTION_CANCEL
     {
         let rid = customer.id.to_string();
-        let _ = audit_event!(pool, customer.id, "SUBSCRIPTION_CANCEL", "billing", Some(&rid));
+        { let _ = crate::audit::log_action(&pool, customer.id, "SUBSCRIPTION_CANCEL", "billing", Some(&rid), None, None, None).await; }
     }
 
     Ok(Json(serde_json::json!({
@@ -244,8 +244,8 @@ async fn upgrade_plan(
             // Audit log — PLAN_CHANGE
             {
                 let rid = customer.id.to_string();
-                let _ = audit_event!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
-                    serde_json::json!({"new_plan": new_plan.as_str(), "provider": provider_name}));
+                let _ = crate::audit::log_action(&pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
+                    Some(serde_json::json!({"new_plan": new_plan.as_str(), "provider": provider_name})), None, None).await;
             }
 
             Ok(Json(UpgradeResponse {
@@ -279,8 +279,8 @@ async fn upgrade_plan(
             // Audit log — PLAN_CHANGE
             {
                 let rid = customer.id.to_string();
-                let _ = audit_event!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
-                    serde_json::json!({"new_plan": new_plan.as_str(), "provider": "stripe"}));
+                let _ = crate::audit::log_action(&pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
+                    Some(serde_json::json!({"new_plan": new_plan.as_str(), "provider": "stripe"})), None, None).await;
             }
 
             Ok(Json(UpgradeResponse {

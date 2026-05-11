@@ -194,7 +194,7 @@ async fn register(
     // Audit log — REGISTER
     {
         let rid = customer.id.to_string();
-        let _ = audit_event!(pool, customer.id, "REGISTER", "auth", Some(&rid));
+        { let _ = crate::audit::log_action(&pool, customer.id, "REGISTER", "auth", Some(&rid), None, None, None).await; }
     }
 
     // Send welcome email + verification email (fire-and-forget)
@@ -334,7 +334,7 @@ async fn login(
     // Audit log — LOGIN
     {
         let rid = customer.id.to_string();
-        let _ = audit_event!(pool, customer.id, "LOGIN", "auth", Some(&rid));
+        { let _ = crate::audit::log_action(&pool, customer.id, "LOGIN", "auth", Some(&rid), None, None, None).await; }
     }
 
     Ok(auth_response_with_cookie(AuthResponse {
@@ -402,7 +402,7 @@ async fn verify_2fa_login(
     // Audit log — LOGIN (2FA path)
     {
         let rid = customer.id.to_string();
-        let _ = audit_event!(pool, customer.id, "LOGIN", "auth", Some(&rid));
+        { let _ = crate::audit::log_action(&pool, customer.id, "LOGIN", "auth", Some(&rid), None, None, None).await; }
     }
 
     Ok(auth_response_with_cookie(AuthResponse {
@@ -795,7 +795,7 @@ async fn confirm_2fa(
     // Audit log — 2FA_ENABLE
     {
         let rid = customer.id.to_string();
-        let _ = audit_event!(pool, customer.id, "2FA_ENABLE", "auth", Some(&rid));
+        { let _ = crate::audit::log_action(&pool, customer.id, "2FA_ENABLE", "auth", Some(&rid), None, None, None).await; }
     }
 
     Ok(Json(
@@ -833,7 +833,7 @@ async fn disable_2fa(
     // Audit log — 2FA_DISABLE
     {
         let rid = customer.id.to_string();
-        let _ = audit_event!(pool, customer.id, "2FA_DISABLE", "auth", Some(&rid));
+        { let _ = crate::audit::log_action(&pool, customer.id, "2FA_DISABLE", "auth", Some(&rid), None, None, None).await; }
     }
 
     Ok(Json(
@@ -930,7 +930,7 @@ async fn change_password(
     // Audit log — PASSWORD_CHANGE
     {
         let rid = customer.id.to_string();
-        let _ = audit_event!(pool, customer.id, "PASSWORD_CHANGE", "auth", Some(&rid));
+        { let _ = crate::audit::log_action(&pool, customer.id, "PASSWORD_CHANGE", "auth", Some(&rid), None, None, None).await; }
     }
 
     Ok(Json(
