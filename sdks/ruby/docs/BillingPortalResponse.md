@@ -1,4 +1,4 @@
-# HookSniff::BillingPortalResponse
+# HooksniffSdk::BillingPortalResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::BillingPortalResponse.new(
+instance = HooksniffSdk::BillingPortalResponse.new(
   url: null
 )
 ```

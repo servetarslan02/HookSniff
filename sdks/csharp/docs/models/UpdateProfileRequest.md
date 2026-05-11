@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateProfileRequest
+# HookSniff.Sdk.Model.UpdateProfileRequest
 
 ## Properties
 

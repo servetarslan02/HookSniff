@@ -4,20 +4,20 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  [optional] |
-| **url** | [**java.net.URI**](java.net.URI.md) |  |  [optional] |
+| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  |
+| **url** | [**java.net.URI**](java.net.URI.md) |  |  |
+| **isActive** | **kotlin.Boolean** |  |  |
+| **retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  |
+| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  |
+| **routingStrategy** | [**inline**](#RoutingStrategy) |  |  |
+| **avgResponseMs** | **kotlin.Int** |  |  |
+| **failureStreak** | **kotlin.Int** |  |  |
+| **format** | [**inline**](#Format) |  |  |
 | **description** | **kotlin.String** |  |  [optional] |
-| **isActive** | **kotlin.Boolean** |  |  [optional] |
-| **retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  [optional] |
-| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  [optional] |
 | **allowedIps** | **kotlin.collections.List&lt;kotlin.String&gt;** | CIDR blocks or exact IPs |  [optional] |
 | **eventFilter** | **kotlin.collections.List&lt;kotlin.String&gt;** | Wildcard patterns (e.g. \&quot;order.*\&quot;) |  [optional] |
 | **customHeaders** | [**kotlin.Any**](.md) |  |  [optional] |
-| **routingStrategy** | [**inline**](#RoutingStrategy) |  |  [optional] |
 | **fallbackUrl** | [**java.net.URI**](java.net.URI.md) |  |  [optional] |
-| **avgResponseMs** | **kotlin.Int** |  |  [optional] |
-| **failureStreak** | **kotlin.Int** |  |  [optional] |
-| **format** | [**inline**](#Format) |  |  [optional] |
 
 
 <a id="RoutingStrategy"></a>

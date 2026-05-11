@@ -4,10 +4,10 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **maxAttempts** | **kotlin.Int** |  |  [optional] |
-| **backoff** | [**inline**](#Backoff) |  |  [optional] |
-| **initialDelaySecs** | **kotlin.Int** |  |  [optional] |
-| **maxDelaySecs** | **kotlin.Int** |  |  [optional] |
+| **maxAttempts** | **kotlin.Int** |  |  |
+| **backoff** | [**inline**](#Backoff) |  |  |
+| **initialDelaySecs** | **kotlin.Int** |  |  |
+| **maxDelaySecs** | **kotlin.Int** |  |  |
 
 
 <a id="Backoff"></a>

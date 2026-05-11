@@ -1,4 +1,4 @@
-# HookSniff.Model.LogoutRequest
+# HookSniff.Sdk.Model.LogoutRequest
 Optional request body for explicit refresh token invalidation
 
 ## Properties

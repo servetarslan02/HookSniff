@@ -1,4 +1,4 @@
-# HookSniff::AdminUsersIdPlanPutRequest
+# HooksniffSdk::AdminUsersIdPlanPutRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::AdminUsersIdPlanPutRequest.new(
+instance = HooksniffSdk::AdminUsersIdPlanPutRequest.new(
   plan: null
 )
 ```

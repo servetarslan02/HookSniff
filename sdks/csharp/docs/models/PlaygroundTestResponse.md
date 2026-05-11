@@ -1,4 +1,4 @@
-# HookSniff.Model.PlaygroundTestResponse
+# HookSniff.Sdk.Model.PlaygroundTestResponse
 Result of a playground test delivery
 
 ## Properties

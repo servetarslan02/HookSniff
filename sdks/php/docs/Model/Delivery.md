@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **string** |  | [optional]
-**endpoint_id** | **string** |  | [optional]
+**id** | **string** |  |
+**endpoint_id** | **string** |  |
 **event** | **string** |  | [optional]
-**status** | **string** |  | [optional]
-**attempt_count** | **int** |  | [optional]
+**status** | **string** |  |
+**attempt_count** | **int** |  |
 **response_status** | **int** |  | [optional]
-**replay_count** | **int** |  | [optional]
-**created_at** | **\DateTime** |  | [optional]
+**replay_count** | **int** |  |
+**created_at** | **\DateTime** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

@@ -1,4 +1,4 @@
-# HookSniff::TransformsApi
+# HooksniffSdk::TransformsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -21,21 +21,21 @@ List transform rules for endpoint
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TransformsApi.new
+api_instance = HooksniffSdk::TransformsApi.new
 endpoint_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # List transform rules for endpoint
   result = api_instance.endpoints_endpoint_id_transforms_get(endpoint_id)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_get: #{e}"
 end
 ```
@@ -53,7 +53,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<TransformRule>>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_get_with_http_info: #{e}"
 end
 ```
@@ -88,21 +88,21 @@ Delete transform rule
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TransformsApi.new
+api_instance = HooksniffSdk::TransformsApi.new
 endpoint_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Delete transform rule
   api_instance.endpoints_endpoint_id_transforms_id_delete(endpoint_id, id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_id_delete: #{e}"
 end
 ```
@@ -120,7 +120,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_id_delete_with_http_info: #{e}"
 end
 ```
@@ -156,14 +156,14 @@ Update transform rule
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TransformsApi.new
+api_instance = HooksniffSdk::TransformsApi.new
 endpoint_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 body = { ... } # Object | 
@@ -172,7 +172,7 @@ begin
   # Update transform rule
   result = api_instance.endpoints_endpoint_id_transforms_id_put(endpoint_id, id, body)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_id_put: #{e}"
 end
 ```
@@ -190,7 +190,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <TransformRule>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_id_put_with_http_info: #{e}"
 end
 ```
@@ -227,22 +227,22 @@ Create transform rule
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TransformsApi.new
+api_instance = HooksniffSdk::TransformsApi.new
 endpoint_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-create_transform_rule_request = HookSniff::CreateTransformRuleRequest.new({name: 'name_example', rule_type: 'rule_type_example', config: 3.56}) # CreateTransformRuleRequest | 
+create_transform_rule_request = HooksniffSdk::CreateTransformRuleRequest.new({name: 'name_example', rule_type: 'rule_type_example', config: 3.56}) # CreateTransformRuleRequest | 
 
 begin
   # Create transform rule
   result = api_instance.endpoints_endpoint_id_transforms_post(endpoint_id, create_transform_rule_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_post: #{e}"
 end
 ```
@@ -260,7 +260,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <TransformRule>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_post_with_http_info: #{e}"
 end
 ```
@@ -296,21 +296,21 @@ Test a transform rule
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TransformsApi.new
+api_instance = HooksniffSdk::TransformsApi.new
 endpoint_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-endpoints_endpoint_id_transforms_test_post_request = HookSniff::EndpointsEndpointIdTransformsTestPostRequest.new # EndpointsEndpointIdTransformsTestPostRequest | 
+endpoints_endpoint_id_transforms_test_post_request = HooksniffSdk::EndpointsEndpointIdTransformsTestPostRequest.new # EndpointsEndpointIdTransformsTestPostRequest | 
 
 begin
   # Test a transform rule
   api_instance.endpoints_endpoint_id_transforms_test_post(endpoint_id, endpoints_endpoint_id_transforms_test_post_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_test_post: #{e}"
 end
 ```
@@ -328,7 +328,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TransformsApi->endpoints_endpoint_id_transforms_test_post_with_http_info: #{e}"
 end
 ```

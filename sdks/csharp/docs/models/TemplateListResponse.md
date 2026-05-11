@@ -1,4 +1,4 @@
-# HookSniff.Model.TemplateListResponse
+# HookSniff.Sdk.Model.TemplateListResponse
 Paginated list of webhook payload templates
 
 ## Properties

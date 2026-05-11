@@ -1,4 +1,4 @@
-# HookSniff.Model.EndpointsIdRotateSecretPost200Response
+# HookSniff.Sdk.Model.EndpointsIdRotateSecretPost200Response
 
 ## Properties
 

@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**plan** | Option<**String**> |  | [optional]
-**status** | Option<**String**> |  | [optional]
-**payment_provider** | Option<**String**> |  | [optional]
-**webhook_limit** | Option<**i32**> |  | [optional]
-**endpoint_limit** | Option<**i32**> |  | [optional]
-**retention_days** | Option<**i32**> |  | [optional]
-**monthly_price_cents** | Option<**i32**> |  | [optional]
+**plan** | **String** |  | 
+**status** | **String** |  | 
+**payment_provider** | **String** |  | 
+**webhook_limit** | **i32** |  | 
+**endpoint_limit** | **i32** |  | 
+**retention_days** | **i32** |  | 
+**monthly_price_cents** | **i32** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

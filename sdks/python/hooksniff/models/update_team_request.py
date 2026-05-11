@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,8 +28,8 @@ class UpdateTeamRequest(BaseModel):
     """
     Fields to update on a team (all optional)
     """ # noqa: E501
-    name: Optional[StrictStr] = None
-    description: Optional[StrictStr] = None
+    name: StrictStr
+    description: StrictStr
     __properties: ClassVar[List[str]] = ["name", "description"]
 
     model_config = ConfigDict(

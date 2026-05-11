@@ -13,39 +13,39 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CustomerResponse {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "email", skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "email")]
+    pub email: String,
     #[serde(rename = "name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub name: Option<Option<String>>,
     /// Only returned on registration
     #[serde(rename = "api_key", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub api_key: Option<Option<String>>,
-    #[serde(rename = "plan", skip_serializing_if = "Option::is_none")]
-    pub plan: Option<Plan>,
-    #[serde(rename = "webhook_limit", skip_serializing_if = "Option::is_none")]
-    pub webhook_limit: Option<i32>,
-    #[serde(rename = "webhook_count", skip_serializing_if = "Option::is_none")]
-    pub webhook_count: Option<i32>,
-    #[serde(rename = "is_admin", skip_serializing_if = "Option::is_none")]
-    pub is_admin: Option<bool>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "plan")]
+    pub plan: Plan,
+    #[serde(rename = "webhook_limit")]
+    pub webhook_limit: i32,
+    #[serde(rename = "webhook_count")]
+    pub webhook_count: i32,
+    #[serde(rename = "is_admin")]
+    pub is_admin: bool,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl CustomerResponse {
-    pub fn new() -> CustomerResponse {
+    pub fn new(id: uuid::Uuid, email: String, plan: Plan, webhook_limit: i32, webhook_count: i32, is_admin: bool, created_at: chrono::DateTime<chrono::FixedOffset>) -> CustomerResponse {
         CustomerResponse {
-            id: None,
-            email: None,
+            id,
+            email,
             name: None,
             api_key: None,
-            plan: None,
-            webhook_limit: None,
-            webhook_count: None,
-            is_admin: None,
-            created_at: None,
+            plan,
+            webhook_limit,
+            webhook_count,
+            is_admin,
+            created_at,
         }
     }
 }

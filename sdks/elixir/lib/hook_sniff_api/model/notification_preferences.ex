@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.NotificationPreferences do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :email_on_failure,
     :email_on_dead_letter,
@@ -17,9 +17,9 @@ defmodule HookSniffAPI.Model.NotificationPreferences do
   ]
 
   @type t :: %__MODULE__{
-    :email_on_failure => boolean() | nil,
-    :email_on_dead_letter => boolean() | nil,
-    :email_on_success => boolean() | nil,
+    :email_on_failure => boolean(),
+    :email_on_dead_letter => boolean(),
+    :email_on_success => boolean(),
     :slack_webhook_url => String.t | nil,
     :discord_webhook_url => String.t | nil,
     :webhook_url => String.t | nil

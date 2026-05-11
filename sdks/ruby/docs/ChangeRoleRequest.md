@@ -1,4 +1,4 @@
-# HookSniff::ChangeRoleRequest
+# HooksniffSdk::ChangeRoleRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ChangeRoleRequest.new(
+instance = HooksniffSdk::ChangeRoleRequest.new(
   role: null
 )
 ```

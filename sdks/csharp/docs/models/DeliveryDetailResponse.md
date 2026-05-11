@@ -1,4 +1,4 @@
-# HookSniff.Model.DeliveryDetailResponse
+# HookSniff.Sdk.Model.DeliveryDetailResponse
 Full delivery detail including all retry attempts and endpoint info
 
 ## Properties

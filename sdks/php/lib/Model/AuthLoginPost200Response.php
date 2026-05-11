@@ -310,6 +310,21 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     {
         $invalidProperties = [];
 
+        if ($this->container['token'] === null) {
+            $invalidProperties[] = "'token' can't be null";
+        }
+        if ($this->container['customer'] === null) {
+            $invalidProperties[] = "'customer' can't be null";
+        }
+        if ($this->container['requires_2fa'] === null) {
+            $invalidProperties[] = "'requires_2fa' can't be null";
+        }
+        if ($this->container['temp_token'] === null) {
+            $invalidProperties[] = "'temp_token' can't be null";
+        }
+        if ($this->container['message'] === null) {
+            $invalidProperties[] = "'message' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -328,7 +343,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets token
      *
-     * @return string|null
+     * @return string
      */
     public function getToken()
     {
@@ -338,7 +353,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets token
      *
-     * @param string|null $token JWT access token
+     * @param string $token JWT access token
      *
      * @return self
      */
@@ -355,7 +370,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets customer
      *
-     * @return \OpenAPI\Client\Model\CustomerResponse|null
+     * @return \OpenAPI\Client\Model\CustomerResponse
      */
     public function getCustomer()
     {
@@ -365,7 +380,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets customer
      *
-     * @param \OpenAPI\Client\Model\CustomerResponse|null $customer customer
+     * @param \OpenAPI\Client\Model\CustomerResponse $customer customer
      *
      * @return self
      */
@@ -409,7 +424,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets requires_2fa
      *
-     * @return bool|null
+     * @return bool
      */
     public function getRequires2fa()
     {
@@ -419,7 +434,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets requires_2fa
      *
-     * @param bool|null $requires_2fa requires_2fa
+     * @param bool $requires_2fa requires_2fa
      *
      * @return self
      */
@@ -436,7 +451,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets temp_token
      *
-     * @return string|null
+     * @return string
      */
     public function getTempToken()
     {
@@ -446,7 +461,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets temp_token
      *
-     * @param string|null $temp_token temp_token
+     * @param string $temp_token temp_token
      *
      * @return self
      */
@@ -463,7 +478,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets message
      *
-     * @return string|null
+     * @return string
      */
     public function getMessage()
     {
@@ -473,7 +488,7 @@ class AuthLoginPost200Response implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets message
      *
-     * @param string|null $message message
+     * @param string $message message
      *
      * @return self
      */

@@ -1,4 +1,4 @@
-# HookSniff.Model.AuditLogListResponse
+# HookSniff.Sdk.Model.AuditLogListResponse
 Paginated list of audit log entries
 
 ## Properties

@@ -1,4 +1,4 @@
-# HookSniff::RateLimitUsage
+# HooksniffSdk::RateLimitUsage
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RateLimitUsage.new(
+instance = HooksniffSdk::RateLimitUsage.new(
   current_rps: null,
   limit_rps: null,
   remaining: null,

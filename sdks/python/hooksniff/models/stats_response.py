@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,14 +28,14 @@ class StatsResponse(BaseModel):
     """
     StatsResponse
     """ # noqa: E501
-    total_deliveries: Optional[StrictInt] = None
-    successful_deliveries: Optional[StrictInt] = None
-    failed_deliveries: Optional[StrictInt] = None
-    total_endpoints: Optional[StrictInt] = None
-    active_endpoints: Optional[StrictInt] = None
-    plan: Optional[StrictStr] = None
-    webhook_limit: Optional[StrictInt] = None
-    webhook_count: Optional[StrictInt] = None
+    total_deliveries: StrictInt
+    successful_deliveries: StrictInt
+    failed_deliveries: StrictInt
+    total_endpoints: StrictInt
+    active_endpoints: StrictInt
+    plan: StrictStr
+    webhook_limit: StrictInt
+    webhook_count: StrictInt
     __properties: ClassVar[List[str]] = ["total_deliveries", "successful_deliveries", "failed_deliveries", "total_endpoints", "active_endpoints", "plan", "webhook_limit", "webhook_count"]
 
     model_config = ConfigDict(

@@ -1,4 +1,4 @@
-# HookSniff.Model.ValidateEventResponse
+# HookSniff.Sdk.Model.ValidateEventResponse
 Result of validating an event payload against a schema
 
 ## Properties

@@ -1,4 +1,4 @@
-# HookSniff::Confirm2faRequest
+# HooksniffSdk::Confirm2faRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::Confirm2faRequest.new(
+instance = HooksniffSdk::Confirm2faRequest.new(
   code: null
 )
 ```

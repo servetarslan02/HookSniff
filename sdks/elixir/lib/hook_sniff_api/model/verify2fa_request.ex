@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Verify2faRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :temp_token,
     :code

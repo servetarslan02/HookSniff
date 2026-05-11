@@ -303,6 +303,21 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['total_users'] === null) {
+            $invalidProperties[] = "'total_users' can't be null";
+        }
+        if ($this->container['active_users'] === null) {
+            $invalidProperties[] = "'active_users' can't be null";
+        }
+        if ($this->container['total_endpoints'] === null) {
+            $invalidProperties[] = "'total_endpoints' can't be null";
+        }
+        if ($this->container['total_deliveries'] === null) {
+            $invalidProperties[] = "'total_deliveries' can't be null";
+        }
+        if ($this->container['plan_breakdown'] === null) {
+            $invalidProperties[] = "'plan_breakdown' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -321,7 +336,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets total_users
      *
-     * @return int|null
+     * @return int
      */
     public function getTotalUsers()
     {
@@ -331,7 +346,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets total_users
      *
-     * @param int|null $total_users total_users
+     * @param int $total_users total_users
      *
      * @return self
      */
@@ -348,7 +363,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets active_users
      *
-     * @return int|null
+     * @return int
      */
     public function getActiveUsers()
     {
@@ -358,7 +373,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets active_users
      *
-     * @param int|null $active_users active_users
+     * @param int $active_users active_users
      *
      * @return self
      */
@@ -375,7 +390,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets total_endpoints
      *
-     * @return int|null
+     * @return int
      */
     public function getTotalEndpoints()
     {
@@ -385,7 +400,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets total_endpoints
      *
-     * @param int|null $total_endpoints total_endpoints
+     * @param int $total_endpoints total_endpoints
      *
      * @return self
      */
@@ -402,7 +417,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets total_deliveries
      *
-     * @return int|null
+     * @return int
      */
     public function getTotalDeliveries()
     {
@@ -412,7 +427,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets total_deliveries
      *
-     * @param int|null $total_deliveries total_deliveries
+     * @param int $total_deliveries total_deliveries
      *
      * @return self
      */
@@ -429,7 +444,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets plan_breakdown
      *
-     * @return \OpenAPI\Client\Model\SystemStatsPlanBreakdownInner[]|null
+     * @return \OpenAPI\Client\Model\SystemStatsPlanBreakdownInner[]
      */
     public function getPlanBreakdown()
     {
@@ -439,7 +454,7 @@ class SystemStats implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets plan_breakdown
      *
-     * @param \OpenAPI\Client\Model\SystemStatsPlanBreakdownInner[]|null $plan_breakdown plan_breakdown
+     * @param \OpenAPI\Client\Model\SystemStatsPlanBreakdownInner[] $plan_breakdown plan_breakdown
      *
      * @return self
      */

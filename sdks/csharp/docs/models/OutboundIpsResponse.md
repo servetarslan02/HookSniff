@@ -1,4 +1,4 @@
-# HookSniff.Model.OutboundIpsResponse
+# HookSniff.Sdk.Model.OutboundIpsResponse
 
 ## Properties
 

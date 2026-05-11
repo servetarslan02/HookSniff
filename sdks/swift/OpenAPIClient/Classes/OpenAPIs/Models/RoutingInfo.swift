@@ -12,14 +12,14 @@ import AnyCodable
 
 public struct RoutingInfo: Codable, JSONEncodable, Hashable {
 
-    public var endpointId: UUID?
-    public var routingStrategy: String?
+    public var endpointId: UUID
+    public var routingStrategy: String
     public var fallbackUrl: String?
-    public var avgResponseMs: Int?
-    public var failureStreak: Int?
-    public var isHealthy: Bool?
+    public var avgResponseMs: Int
+    public var failureStreak: Int
+    public var isHealthy: Bool
 
-    public init(endpointId: UUID? = nil, routingStrategy: String? = nil, fallbackUrl: String? = nil, avgResponseMs: Int? = nil, failureStreak: Int? = nil, isHealthy: Bool? = nil) {
+    public init(endpointId: UUID, routingStrategy: String, fallbackUrl: String? = nil, avgResponseMs: Int, failureStreak: Int, isHealthy: Bool) {
         self.endpointId = endpointId
         self.routingStrategy = routingStrategy
         self.fallbackUrl = fallbackUrl
@@ -41,12 +41,12 @@ public struct RoutingInfo: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(endpointId, forKey: .endpointId)
-        try container.encodeIfPresent(routingStrategy, forKey: .routingStrategy)
+        try container.encode(endpointId, forKey: .endpointId)
+        try container.encode(routingStrategy, forKey: .routingStrategy)
         try container.encodeIfPresent(fallbackUrl, forKey: .fallbackUrl)
-        try container.encodeIfPresent(avgResponseMs, forKey: .avgResponseMs)
-        try container.encodeIfPresent(failureStreak, forKey: .failureStreak)
-        try container.encodeIfPresent(isHealthy, forKey: .isHealthy)
+        try container.encode(avgResponseMs, forKey: .avgResponseMs)
+        try container.encode(failureStreak, forKey: .failureStreak)
+        try container.encode(isHealthy, forKey: .isHealthy)
     }
 }
 

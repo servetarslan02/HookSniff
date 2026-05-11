@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**token** | **str** |  | [optional] 
-**platform** | **str** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**id** | **UUID** |  | 
+**token** | **str** |  | 
+**platform** | **str** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 

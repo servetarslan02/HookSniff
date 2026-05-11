@@ -1,4 +1,4 @@
-# HookSniff.Model.TeamMemberListResponse
+# HookSniff.Sdk.Model.TeamMemberListResponse
 List of members in a team
 
 ## Properties

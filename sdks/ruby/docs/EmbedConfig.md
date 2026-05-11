@@ -1,4 +1,4 @@
-# HookSniff::EmbedConfig
+# HooksniffSdk::EmbedConfig
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::EmbedConfig.new(
+instance = HooksniffSdk::EmbedConfig.new(
   allowed_origins: null,
   theme: null,
   features: null

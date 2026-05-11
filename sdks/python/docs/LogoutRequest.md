@@ -6,7 +6,7 @@ Optional request body for explicit refresh token invalidation
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**refresh_token** | **str** | Refresh token to invalidate | [optional] 
+**refresh_token** | **str** | Refresh token to invalidate | 
 
 ## Example
 

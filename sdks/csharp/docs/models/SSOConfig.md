@@ -1,4 +1,4 @@
-# HookSniff.Model.SSOConfig
+# HookSniff.Sdk.Model.SSOConfig
 Single Sign-On configuration (SAML or OIDC)
 
 ## Properties

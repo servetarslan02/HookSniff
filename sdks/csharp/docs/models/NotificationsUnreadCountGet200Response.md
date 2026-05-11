@@ -1,4 +1,4 @@
-# HookSniff.Model.NotificationsUnreadCountGet200Response
+# HookSniff.Sdk.Model.NotificationsUnreadCountGet200Response
 
 ## Properties
 

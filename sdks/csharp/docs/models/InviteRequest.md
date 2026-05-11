@@ -1,4 +1,4 @@
-# HookSniff.Model.InviteRequest
+# HookSniff.Sdk.Model.InviteRequest
 
 ## Properties
 

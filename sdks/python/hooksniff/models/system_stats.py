@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from hooksniff.models.system_stats_plan_breakdown_inner import SystemStatsPlanBreakdownInner
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,11 +29,11 @@ class SystemStats(BaseModel):
     """
     SystemStats
     """ # noqa: E501
-    total_users: Optional[StrictInt] = None
-    active_users: Optional[StrictInt] = None
-    total_endpoints: Optional[StrictInt] = None
-    total_deliveries: Optional[StrictInt] = None
-    plan_breakdown: Optional[List[SystemStatsPlanBreakdownInner]] = None
+    total_users: StrictInt
+    active_users: StrictInt
+    total_endpoints: StrictInt
+    total_deliveries: StrictInt
+    plan_breakdown: List[SystemStatsPlanBreakdownInner]
     __properties: ClassVar[List[str]] = ["total_users", "active_users", "total_endpoints", "total_deliveries", "plan_breakdown"]
 
     model_config = ConfigDict(

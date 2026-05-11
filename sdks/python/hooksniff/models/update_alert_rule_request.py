@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,18 +28,15 @@ class UpdateAlertRuleRequest(BaseModel):
     """
     Request to update an existing alert rule (all fields optional)
     """ # noqa: E501
-    name: Optional[StrictStr] = None
-    condition: Optional[StrictStr] = None
-    threshold: Optional[StrictInt] = None
-    channels: Optional[List[StrictStr]] = None
+    name: StrictStr
+    condition: StrictStr
+    threshold: StrictInt
+    channels: List[StrictStr]
     __properties: ClassVar[List[str]] = ["name", "condition", "threshold", "channels"]
 
     @field_validator('condition')
     def condition_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['failure_rate', 'latency', 'consecutive_failures']):
             raise ValueError("must be one of enum values ('failure_rate', 'latency', 'consecutive_failures')")
         return value
@@ -47,9 +44,6 @@ class UpdateAlertRuleRequest(BaseModel):
     @field_validator('channels')
     def channels_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         for i in value:
             if i not in set(['slack', 'email', 'webhook']):
                 raise ValueError("each list item must be one of ('slack', 'email', 'webhook')")

@@ -13,20 +13,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct LatencyTrendResponse {
-    #[serde(rename = "range", skip_serializing_if = "Option::is_none")]
-    pub range: Option<String>,
-    #[serde(rename = "buckets", skip_serializing_if = "Option::is_none")]
-    pub buckets: Option<Vec<models::LatencyTrendResponseBucketsInner>>,
-    #[serde(rename = "overall_avg_ms", skip_serializing_if = "Option::is_none")]
-    pub overall_avg_ms: Option<f64>,
+    #[serde(rename = "range")]
+    pub range: String,
+    #[serde(rename = "buckets")]
+    pub buckets: Vec<models::LatencyTrendResponseBucketsInner>,
+    #[serde(rename = "overall_avg_ms")]
+    pub overall_avg_ms: f64,
 }
 
 impl LatencyTrendResponse {
-    pub fn new() -> LatencyTrendResponse {
+    pub fn new(range: String, buckets: Vec<models::LatencyTrendResponseBucketsInner>, overall_avg_ms: f64) -> LatencyTrendResponse {
         LatencyTrendResponse {
-            range: None,
-            buckets: None,
-            overall_avg_ms: None,
+            range,
+            buckets,
+            overall_avg_ms,
         }
     }
 }

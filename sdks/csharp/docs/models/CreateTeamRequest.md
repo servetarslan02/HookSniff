@@ -1,4 +1,4 @@
-# HookSniff.Model.CreateTeamRequest
+# HookSniff.Sdk.Model.CreateTeamRequest
 
 ## Properties
 

@@ -6,15 +6,15 @@ defmodule HookSniffAPI.Model.ContactResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :success,
     :message
   ]
 
   @type t :: %__MODULE__{
-    :success => boolean() | nil,
-    :message => String.t | nil
+    :success => boolean(),
+    :message => String.t
   }
 
   def decode(value) do

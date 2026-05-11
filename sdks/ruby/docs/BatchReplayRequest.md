@@ -1,4 +1,4 @@
-# HookSniff::BatchReplayRequest
+# HooksniffSdk::BatchReplayRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::BatchReplayRequest.new(
+instance = HooksniffSdk::BatchReplayRequest.new(
   ids: null
 )
 ```

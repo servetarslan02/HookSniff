@@ -1,4 +1,4 @@
-# HookSniff::LatencyTrendResponseBucketsInner
+# HooksniffSdk::LatencyTrendResponseBucketsInner
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::LatencyTrendResponseBucketsInner.new(
+instance = HooksniffSdk::LatencyTrendResponseBucketsInner.new(
   timestamp: null,
   avg_ms: null,
   p95_ms: null

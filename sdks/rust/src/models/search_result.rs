@@ -13,17 +13,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SearchResult {
-    #[serde(rename = "deliveries", skip_serializing_if = "Option::is_none")]
-    pub deliveries: Option<Vec<models::Delivery>>,
-    #[serde(rename = "total", skip_serializing_if = "Option::is_none")]
-    pub total: Option<i32>,
+    #[serde(rename = "deliveries")]
+    pub deliveries: Vec<models::Delivery>,
+    #[serde(rename = "total")]
+    pub total: i32,
 }
 
 impl SearchResult {
-    pub fn new() -> SearchResult {
+    pub fn new(deliveries: Vec<models::Delivery>, total: i32) -> SearchResult {
         SearchResult {
-            deliveries: None,
-            total: None,
+            deliveries,
+            total,
         }
     }
 }

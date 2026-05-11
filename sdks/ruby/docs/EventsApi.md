@@ -1,4 +1,4 @@
-# HookSniff::EventsApi
+# HooksniffSdk::EventsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -17,19 +17,19 @@ List event types
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::EventsApi.new
+api_instance = HooksniffSdk::EventsApi.new
 
 begin
   # List event types
   api_instance.events_get
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling EventsApi->events_get: #{e}"
 end
 ```
@@ -47,7 +47,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling EventsApi->events_get_with_http_info: #{e}"
 end
 ```

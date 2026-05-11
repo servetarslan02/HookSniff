@@ -3,15 +3,15 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**email** | **String** |  | [optional] 
+**id** | **UUID** |  | 
+**email** | **String** |  | 
 **name** | **String** |  | [optional] 
 **apiKey** | **String** | Only returned on registration | [optional] 
-**plan** | **String** |  | [optional] 
-**webhookLimit** | **Int** |  | [optional] 
-**webhookCount** | **Int** |  | [optional] 
-**isAdmin** | **Bool** |  | [optional] 
-**createdAt** | **Date** |  | [optional] 
+**plan** | **String** |  | 
+**webhookLimit** | **Int** |  | 
+**webhookCount** | **Int** |  | 
+**isAdmin** | **Bool** |  | 
+**createdAt** | **Date** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

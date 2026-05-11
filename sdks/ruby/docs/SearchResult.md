@@ -1,4 +1,4 @@
-# HookSniff::SearchResult
+# HooksniffSdk::SearchResult
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SearchResult.new(
+instance = HooksniffSdk::SearchResult.new(
   deliveries: null,
   total: null
 )

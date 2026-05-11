@@ -5,13 +5,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**plan** | **str** |  | [optional] 
-**status** | **str** |  | [optional] 
-**payment_provider** | **str** |  | [optional] 
-**webhook_limit** | **int** |  | [optional] 
-**endpoint_limit** | **int** |  | [optional] 
-**retention_days** | **int** |  | [optional] 
-**monthly_price_cents** | **int** |  | [optional] 
+**plan** | **str** |  | 
+**status** | **str** |  | 
+**payment_provider** | **str** |  | 
+**webhook_limit** | **int** |  | 
+**endpoint_limit** | **int** |  | 
+**retention_days** | **int** |  | 
+**monthly_price_cents** | **int** |  | 
 
 ## Example
 

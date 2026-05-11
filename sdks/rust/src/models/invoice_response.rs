@@ -13,26 +13,26 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct InvoiceResponse {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
-    #[serde(rename = "amount_cents", skip_serializing_if = "Option::is_none")]
-    pub amount_cents: Option<i32>,
-    #[serde(rename = "currency", skip_serializing_if = "Option::is_none")]
-    pub currency: Option<String>,
-    #[serde(rename = "status", skip_serializing_if = "Option::is_none")]
-    pub status: Option<String>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "amount_cents")]
+    pub amount_cents: i32,
+    #[serde(rename = "currency")]
+    pub currency: String,
+    #[serde(rename = "status")]
+    pub status: String,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl InvoiceResponse {
-    pub fn new() -> InvoiceResponse {
+    pub fn new(id: String, amount_cents: i32, currency: String, status: String, created_at: chrono::DateTime<chrono::FixedOffset>) -> InvoiceResponse {
         InvoiceResponse {
-            id: None,
-            amount_cents: None,
-            currency: None,
-            status: None,
-            created_at: None,
+            id,
+            amount_cents,
+            currency,
+            status,
+            created_at,
         }
     }
 }

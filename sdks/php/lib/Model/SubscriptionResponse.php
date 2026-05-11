@@ -317,6 +317,27 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     {
         $invalidProperties = [];
 
+        if ($this->container['plan'] === null) {
+            $invalidProperties[] = "'plan' can't be null";
+        }
+        if ($this->container['status'] === null) {
+            $invalidProperties[] = "'status' can't be null";
+        }
+        if ($this->container['payment_provider'] === null) {
+            $invalidProperties[] = "'payment_provider' can't be null";
+        }
+        if ($this->container['webhook_limit'] === null) {
+            $invalidProperties[] = "'webhook_limit' can't be null";
+        }
+        if ($this->container['endpoint_limit'] === null) {
+            $invalidProperties[] = "'endpoint_limit' can't be null";
+        }
+        if ($this->container['retention_days'] === null) {
+            $invalidProperties[] = "'retention_days' can't be null";
+        }
+        if ($this->container['monthly_price_cents'] === null) {
+            $invalidProperties[] = "'monthly_price_cents' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -335,7 +356,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets plan
      *
-     * @return string|null
+     * @return string
      */
     public function getPlan()
     {
@@ -345,7 +366,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets plan
      *
-     * @param string|null $plan plan
+     * @param string $plan plan
      *
      * @return self
      */
@@ -362,7 +383,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets status
      *
-     * @return string|null
+     * @return string
      */
     public function getStatus()
     {
@@ -372,7 +393,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets status
      *
-     * @param string|null $status status
+     * @param string $status status
      *
      * @return self
      */
@@ -389,7 +410,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets payment_provider
      *
-     * @return string|null
+     * @return string
      */
     public function getPaymentProvider()
     {
@@ -399,7 +420,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets payment_provider
      *
-     * @param string|null $payment_provider payment_provider
+     * @param string $payment_provider payment_provider
      *
      * @return self
      */
@@ -416,7 +437,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets webhook_limit
      *
-     * @return int|null
+     * @return int
      */
     public function getWebhookLimit()
     {
@@ -426,7 +447,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets webhook_limit
      *
-     * @param int|null $webhook_limit webhook_limit
+     * @param int $webhook_limit webhook_limit
      *
      * @return self
      */
@@ -443,7 +464,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets endpoint_limit
      *
-     * @return int|null
+     * @return int
      */
     public function getEndpointLimit()
     {
@@ -453,7 +474,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets endpoint_limit
      *
-     * @param int|null $endpoint_limit endpoint_limit
+     * @param int $endpoint_limit endpoint_limit
      *
      * @return self
      */
@@ -470,7 +491,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets retention_days
      *
-     * @return int|null
+     * @return int
      */
     public function getRetentionDays()
     {
@@ -480,7 +501,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets retention_days
      *
-     * @param int|null $retention_days retention_days
+     * @param int $retention_days retention_days
      *
      * @return self
      */
@@ -497,7 +518,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets monthly_price_cents
      *
-     * @return int|null
+     * @return int
      */
     public function getMonthlyPriceCents()
     {
@@ -507,7 +528,7 @@ class SubscriptionResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets monthly_price_cents
      *
-     * @param int|null $monthly_price_cents monthly_price_cents
+     * @param int $monthly_price_cents monthly_price_cents
      *
      * @return self
      */

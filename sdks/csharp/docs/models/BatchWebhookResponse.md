@@ -1,4 +1,4 @@
-# HookSniff.Model.BatchWebhookResponse
+# HookSniff.Sdk.Model.BatchWebhookResponse
 Response for batch webhook delivery creation
 
 ## Properties

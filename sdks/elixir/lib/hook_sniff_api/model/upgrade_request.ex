@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UpgradeRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :plan,
     :provider

@@ -1,6 +1,6 @@
-# hooksniff
+# hooksniff-sdk
 
-HookSniff - the Ruby gem for the HookSniff API
+HooksniffSdk - the Ruby gem for the HookSniff API
 
 Webhook delivery, monitoring, and management API.
 All endpoints under `/v1` require authentication via `Authorization: Bearer <api_key>` header
@@ -22,28 +22,28 @@ For more information, please visit [https://hooksniff.vercel.app](https://hooksn
 To build the Ruby code into a gem:
 
 ```shell
-gem build hooksniff.gemspec
+gem build hooksniff-sdk.gemspec
 ```
 
 Then either install the gem locally:
 
 ```shell
-gem install ./hooksniff-0.3.0.gem
+gem install ./hooksniff-sdk-0.3.0.gem
 ```
 
-(for development, run `gem install --dev ./hooksniff-0.3.0.gem` to install the development dependencies)
+(for development, run `gem install --dev ./hooksniff-sdk-0.3.0.gem` to install the development dependencies)
 
 or publish the gem to a gem hosting service, e.g. [RubyGems](https://rubygems.org/).
 
 Finally add this to the Gemfile:
 
-    gem 'hooksniff', '~> 0.3.0'
+    gem 'hooksniff-sdk', '~> 0.3.0'
 
 ### Install from Git
 
 If the Ruby gem is hosted at a git repository: https://github.com/GIT_USER_ID/GIT_REPO_ID, then add the following in the Gemfile:
 
-    gem 'hooksniff', :git => 'https://github.com/GIT_USER_ID/GIT_REPO_ID.git'
+    gem 'hooksniff-sdk', :git => 'https://github.com/GIT_USER_ID/GIT_REPO_ID.git'
 
 ### Include the Ruby code directly
 
@@ -59,23 +59,23 @@ Please follow the [installation](#installation) procedure and then run the follo
 
 ```ruby
 # Load the gem
-require 'hooksniff'
+require 'hooksniff-sdk'
 
 # Setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
   # Configure a proc to get access tokens in lieu of the static access_token configuration
   config.access_token_getter = -> { 'YOUR TOKEN GETTER PROC' } 
 end
 
-api_instance = HookSniff::APIKeysApi.new
+api_instance = HooksniffSdk::APIKeysApi.new
 
 begin
   #List API keys
   result = api_instance.api_keys_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Exception when calling APIKeysApi->api_keys_get: #{e}"
 end
 
@@ -87,320 +87,320 @@ All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.a
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HookSniff::APIKeysApi* | [**api_keys_get**](docs/APIKeysApi.md#api_keys_get) | **GET** /api-keys | List API keys
-*HookSniff::APIKeysApi* | [**api_keys_id_delete**](docs/APIKeysApi.md#api_keys_id_delete) | **DELETE** /api-keys/{id} | Delete (revoke) an API key
-*HookSniff::APIKeysApi* | [**api_keys_id_rotate_post**](docs/APIKeysApi.md#api_keys_id_rotate_post) | **POST** /api-keys/{id}/rotate | Rotate an API key
-*HookSniff::APIKeysApi* | [**api_keys_post**](docs/APIKeysApi.md#api_keys_post) | **POST** /api-keys | Create a new API key
-*HookSniff::AdminApi* | [**admin_revenue_get**](docs/AdminApi.md#admin_revenue_get) | **GET** /admin/revenue | Revenue by month (admin)
-*HookSniff::AdminApi* | [**admin_sdk_update_post**](docs/AdminApi.md#admin_sdk_update_post) | **POST** /admin/sdk-update | Send SDK update notification to users
-*HookSniff::AdminApi* | [**admin_stats_get**](docs/AdminApi.md#admin_stats_get) | **GET** /admin/stats | System-wide statistics (admin)
-*HookSniff::AdminApi* | [**admin_users_get**](docs/AdminApi.md#admin_users_get) | **GET** /admin/users | List all users (admin)
-*HookSniff::AdminApi* | [**admin_users_id_get**](docs/AdminApi.md#admin_users_id_get) | **GET** /admin/users/{id} | Get user details (admin)
-*HookSniff::AdminApi* | [**admin_users_id_plan_put**](docs/AdminApi.md#admin_users_id_plan_put) | **PUT** /admin/users/{id}/plan | Change user plan (admin)
-*HookSniff::AdminApi* | [**admin_users_id_status_put**](docs/AdminApi.md#admin_users_id_status_put) | **PUT** /admin/users/{id}/status | Change user status (admin)
-*HookSniff::AlertsApi* | [**alerts_get**](docs/AlertsApi.md#alerts_get) | **GET** /alerts | List alert rules
-*HookSniff::AlertsApi* | [**alerts_id_delete**](docs/AlertsApi.md#alerts_id_delete) | **DELETE** /alerts/{id} | Delete alert rule
-*HookSniff::AlertsApi* | [**alerts_id_get**](docs/AlertsApi.md#alerts_id_get) | **GET** /alerts/{id} | Get alert rule
-*HookSniff::AlertsApi* | [**alerts_id_test_post**](docs/AlertsApi.md#alerts_id_test_post) | **POST** /alerts/{id}/test | Test an alert rule
-*HookSniff::AlertsApi* | [**alerts_post**](docs/AlertsApi.md#alerts_post) | **POST** /alerts | Create alert rule
-*HookSniff::AnalyticsApi* | [**analytics_deliveries_get**](docs/AnalyticsApi.md#analytics_deliveries_get) | **GET** /analytics/deliveries | Delivery trend over time
-*HookSniff::AnalyticsApi* | [**analytics_latency_get**](docs/AnalyticsApi.md#analytics_latency_get) | **GET** /analytics/latency | Latency trend over time
-*HookSniff::AnalyticsApi* | [**analytics_success_rate_get**](docs/AnalyticsApi.md#analytics_success_rate_get) | **GET** /analytics/success-rate | Success rate metrics
-*HookSniff::AuditLogApi* | [**audit_log_get**](docs/AuditLogApi.md#audit_log_get) | **GET** /audit-log | List audit log entries
-*HookSniff::AuditLogApi* | [**audit_log_id_get**](docs/AuditLogApi.md#audit_log_id_get) | **GET** /audit-log/{id} | Get audit entry detail
-*HookSniff::AuthApi* | [**auth2fa_confirm_post**](docs/AuthApi.md#auth2fa_confirm_post) | **POST** /auth/2fa/confirm | Confirm 2FA setup with a code
-*HookSniff::AuthApi* | [**auth2fa_disable_post**](docs/AuthApi.md#auth2fa_disable_post) | **POST** /auth/2fa/disable | Disable 2FA
-*HookSniff::AuthApi* | [**auth2fa_enable_post**](docs/AuthApi.md#auth2fa_enable_post) | **POST** /auth/2fa/enable | Enable 2FA (returns TOTP secret and QR URL)
-*HookSniff::AuthApi* | [**auth2fa_verify_post**](docs/AuthApi.md#auth2fa_verify_post) | **POST** /auth/2fa/verify | Verify 2FA code during login
-*HookSniff::AuthApi* | [**auth_account_delete**](docs/AuthApi.md#auth_account_delete) | **DELETE** /auth/account | Delete account (GDPR)
-*HookSniff::AuthApi* | [**auth_export_get**](docs/AuthApi.md#auth_export_get) | **GET** /auth/export | Export user data (GDPR)
-*HookSniff::AuthApi* | [**auth_forgot_password_post**](docs/AuthApi.md#auth_forgot_password_post) | **POST** /auth/forgot-password | Request password reset email
-*HookSniff::AuthApi* | [**auth_login_post**](docs/AuthApi.md#auth_login_post) | **POST** /auth/login | Login with email and password
-*HookSniff::AuthApi* | [**auth_logout_post**](docs/AuthApi.md#auth_logout_post) | **POST** /auth/logout | Logout (invalidate refresh token)
-*HookSniff::AuthApi* | [**auth_me_get**](docs/AuthApi.md#auth_me_get) | **GET** /auth/me | Get current user profile
-*HookSniff::AuthApi* | [**auth_password_put**](docs/AuthApi.md#auth_password_put) | **PUT** /auth/password | Change password
-*HookSniff::AuthApi* | [**auth_profile_put**](docs/AuthApi.md#auth_profile_put) | **PUT** /auth/profile | Update profile
-*HookSniff::AuthApi* | [**auth_refresh_post**](docs/AuthApi.md#auth_refresh_post) | **POST** /auth/refresh | Refresh access token
-*HookSniff::AuthApi* | [**auth_register_post**](docs/AuthApi.md#auth_register_post) | **POST** /auth/register | Register a new account
-*HookSniff::AuthApi* | [**auth_resend_verification_post**](docs/AuthApi.md#auth_resend_verification_post) | **POST** /auth/resend-verification | Resend verification email
-*HookSniff::AuthApi* | [**auth_reset_password_post**](docs/AuthApi.md#auth_reset_password_post) | **POST** /auth/reset-password | Reset password with token
-*HookSniff::AuthApi* | [**auth_verify_email_post**](docs/AuthApi.md#auth_verify_email_post) | **POST** /auth/verify-email | Verify email address
-*HookSniff::BillingApi* | [**billing_invoices_get**](docs/BillingApi.md#billing_invoices_get) | **GET** /billing/invoices | List invoices
-*HookSniff::BillingApi* | [**billing_portal_post**](docs/BillingApi.md#billing_portal_post) | **POST** /billing/portal | Open customer billing portal
-*HookSniff::BillingApi* | [**billing_subscription_get**](docs/BillingApi.md#billing_subscription_get) | **GET** /billing/subscription | Get current subscription
-*HookSniff::BillingApi* | [**billing_upgrade_post**](docs/BillingApi.md#billing_upgrade_post) | **POST** /billing/upgrade | Upgrade plan
-*HookSniff::BillingApi* | [**billing_usage_get**](docs/BillingApi.md#billing_usage_get) | **GET** /billing/usage | Get current usage
-*HookSniff::BillingApi* | [**billing_webhook_iyzico_post**](docs/BillingApi.md#billing_webhook_iyzico_post) | **POST** /billing/webhook/iyzico | iyzico webhook receiver
-*HookSniff::BillingApi* | [**billing_webhook_polar_post**](docs/BillingApi.md#billing_webhook_polar_post) | **POST** /billing/webhook/polar | Polar.sh webhook receiver
-*HookSniff::BillingApi* | [**billing_webhook_post**](docs/BillingApi.md#billing_webhook_post) | **POST** /billing/webhook | Stripe webhook receiver
-*HookSniff::ContactApi* | [**contact_post**](docs/ContactApi.md#contact_post) | **POST** /contact | Send contact form message
-*HookSniff::CustomDomainsApi* | [**custom_domains_get**](docs/CustomDomainsApi.md#custom_domains_get) | **GET** /custom-domains | List custom domains
-*HookSniff::CustomDomainsApi* | [**custom_domains_id_delete**](docs/CustomDomainsApi.md#custom_domains_id_delete) | **DELETE** /custom-domains/{id} | Delete custom domain
-*HookSniff::CustomDomainsApi* | [**custom_domains_id_verify_post**](docs/CustomDomainsApi.md#custom_domains_id_verify_post) | **POST** /custom-domains/{id}/verify | Verify domain ownership
-*HookSniff::CustomDomainsApi* | [**custom_domains_post**](docs/CustomDomainsApi.md#custom_domains_post) | **POST** /custom-domains | Add custom domain
-*HookSniff::CustomerPortalApi* | [**portal_api_keys_get**](docs/CustomerPortalApi.md#portal_api_keys_get) | **GET** /portal/api-keys | List API keys (portal)
-*HookSniff::CustomerPortalApi* | [**portal_api_keys_key_id_delete**](docs/CustomerPortalApi.md#portal_api_keys_key_id_delete) | **DELETE** /portal/api-keys/{key_id} | Revoke API key (portal)
-*HookSniff::CustomerPortalApi* | [**portal_api_keys_post**](docs/CustomerPortalApi.md#portal_api_keys_post) | **POST** /portal/api-keys | Create API key (portal)
-*HookSniff::CustomerPortalApi* | [**portal_config_get**](docs/CustomerPortalApi.md#portal_config_get) | **GET** /portal/config | Get portal configuration
-*HookSniff::CustomerPortalApi* | [**portal_config_post**](docs/CustomerPortalApi.md#portal_config_post) | **POST** /portal/config | Update portal configuration
-*HookSniff::CustomerPortalApi* | [**portal_embed_code_get**](docs/CustomerPortalApi.md#portal_embed_code_get) | **GET** /portal/embed-code | Get portal embed code
-*HookSniff::CustomerPortalApi* | [**portal_me_get**](docs/CustomerPortalApi.md#portal_me_get) | **GET** /portal/me | Get portal profile
-*HookSniff::CustomerPortalApi* | [**portal_me_put**](docs/CustomerPortalApi.md#portal_me_put) | **PUT** /portal/me | Update portal profile
-*HookSniff::CustomerPortalApi* | [**portal_notifications_get**](docs/CustomerPortalApi.md#portal_notifications_get) | **GET** /portal/notifications | Get notification preferences (portal)
-*HookSniff::CustomerPortalApi* | [**portal_notifications_put**](docs/CustomerPortalApi.md#portal_notifications_put) | **PUT** /portal/notifications | Update notification preferences (portal)
-*HookSniff::CustomerPortalApi* | [**portal_plan_get**](docs/CustomerPortalApi.md#portal_plan_get) | **GET** /portal/plan | Get plan info (portal)
-*HookSniff::CustomerPortalApi* | [**portal_usage_get**](docs/CustomerPortalApi.md#portal_usage_get) | **GET** /portal/usage | Get usage (portal)
-*HookSniff::DeliveryDetailsApi* | [**webhooks_id_attempts_attempt_id_get**](docs/DeliveryDetailsApi.md#webhooks_id_attempts_attempt_id_get) | **GET** /webhooks/{id}/attempts/{attempt_id} | Get specific attempt detail
-*HookSniff::DeliveryDetailsApi* | [**webhooks_id_details_get**](docs/DeliveryDetailsApi.md#webhooks_id_details_get) | **GET** /webhooks/{id}/details | Get detailed delivery info
-*HookSniff::DevicesApi* | [**devices_get**](docs/DevicesApi.md#devices_get) | **GET** /devices | List registered devices
-*HookSniff::DevicesApi* | [**devices_post**](docs/DevicesApi.md#devices_post) | **POST** /devices | Register device for push notifications
-*HookSniff::DevicesApi* | [**devices_token_delete**](docs/DevicesApi.md#devices_token_delete) | **DELETE** /devices/{token} | Remove device token
-*HookSniff::EmbedApi* | [**embed_get**](docs/EmbedApi.md#embed_get) | **GET** /embed | Embeddable portal HTML
-*HookSniff::EmbedApi* | [**embed_script_get**](docs/EmbedApi.md#embed_script_get) | **GET** /embed/script | Embeddable portal JavaScript
-*HookSniff::EndpointsApi* | [**endpoints_get**](docs/EndpointsApi.md#endpoints_get) | **GET** /endpoints | List all endpoints
-*HookSniff::EndpointsApi* | [**endpoints_id_delete**](docs/EndpointsApi.md#endpoints_id_delete) | **DELETE** /endpoints/{id} | Delete endpoint
-*HookSniff::EndpointsApi* | [**endpoints_id_get**](docs/EndpointsApi.md#endpoints_id_get) | **GET** /endpoints/{id} | Get endpoint by ID
-*HookSniff::EndpointsApi* | [**endpoints_id_put**](docs/EndpointsApi.md#endpoints_id_put) | **PUT** /endpoints/{id} | Update endpoint
-*HookSniff::EndpointsApi* | [**endpoints_id_retry_policy_put**](docs/EndpointsApi.md#endpoints_id_retry_policy_put) | **PUT** /endpoints/{id}/retry-policy | Update retry policy for an endpoint
-*HookSniff::EndpointsApi* | [**endpoints_id_rotate_secret_post**](docs/EndpointsApi.md#endpoints_id_rotate_secret_post) | **POST** /endpoints/{id}/rotate-secret | Rotate endpoint signing secret
-*HookSniff::EndpointsApi* | [**endpoints_post**](docs/EndpointsApi.md#endpoints_post) | **POST** /endpoints | Create a new endpoint
-*HookSniff::EventsApi* | [**events_get**](docs/EventsApi.md#events_get) | **GET** /events | List event types
-*HookSniff::HealthApi* | [**endpoint_health_get**](docs/HealthApi.md#endpoint_health_get) | **GET** /endpoint-health | List endpoint health statuses
-*HookSniff::HealthApi* | [**endpoint_health_id_get**](docs/HealthApi.md#endpoint_health_id_get) | **GET** /endpoint-health/{id} | Get specific endpoint health
-*HookSniff::HealthApi* | [**status_get**](docs/HealthApi.md#status_get) | **GET** /status | System status (public)
-*HookSniff::InboundApi* | [**inbound_provider_endpoint_id_post**](docs/InboundApi.md#inbound_provider_endpoint_id_post) | **POST** /inbound/{provider}/{endpoint_id} | Receive inbound webhook for a specific endpoint
-*HookSniff::InboundApi* | [**inbound_provider_post**](docs/InboundApi.md#inbound_provider_post) | **POST** /inbound/{provider} | Receive inbound webhook from a provider
-*HookSniff::NotificationsApi* | [**notifications_get**](docs/NotificationsApi.md#notifications_get) | **GET** /notifications | List notifications
-*HookSniff::NotificationsApi* | [**notifications_id_delete**](docs/NotificationsApi.md#notifications_id_delete) | **DELETE** /notifications/{id} | Delete notification
-*HookSniff::NotificationsApi* | [**notifications_id_read_put**](docs/NotificationsApi.md#notifications_id_read_put) | **PUT** /notifications/{id}/read | Mark notification as read
-*HookSniff::NotificationsApi* | [**notifications_read_all_put**](docs/NotificationsApi.md#notifications_read_all_put) | **PUT** /notifications/read-all | Mark all notifications as read
-*HookSniff::NotificationsApi* | [**notifications_unread_count_get**](docs/NotificationsApi.md#notifications_unread_count_get) | **GET** /notifications/unread-count | Get unread notification count
-*HookSniff::OAuthApi* | [**oauth_google_callback_get**](docs/OAuthApi.md#oauth_google_callback_get) | **GET** /oauth/google/callback | Google OAuth callback
-*HookSniff::OAuthApi* | [**oauth_google_get**](docs/OAuthApi.md#oauth_google_get) | **GET** /oauth/google | Google OAuth login redirect
-*HookSniff::OAuthApi* | [**oauth_providers_get**](docs/OAuthApi.md#oauth_providers_get) | **GET** /oauth/providers | List available OAuth providers
-*HookSniff::OutboundIPsApi* | [**outbound_ips_get**](docs/OutboundIPsApi.md#outbound_ips_get) | **GET** /outbound-ips | Get outbound IP addresses for firewall whitelisting
-*HookSniff::PlaygroundApi* | [**playground_get**](docs/PlaygroundApi.md#playground_get) | **GET** /playground | Get playground info (endpoints, sample payloads)
-*HookSniff::PlaygroundApi* | [**playground_test_post**](docs/PlaygroundApi.md#playground_test_post) | **POST** /playground/test | Test a webhook delivery
-*HookSniff::RateLimitsApi* | [**rate_limits_endpoint_id_delete**](docs/RateLimitsApi.md#rate_limits_endpoint_id_delete) | **DELETE** /rate-limits/{endpoint_id} | Delete rate limit for endpoint
-*HookSniff::RateLimitsApi* | [**rate_limits_endpoint_id_get**](docs/RateLimitsApi.md#rate_limits_endpoint_id_get) | **GET** /rate-limits/{endpoint_id} | Get rate limit for endpoint
-*HookSniff::RateLimitsApi* | [**rate_limits_endpoint_id_post**](docs/RateLimitsApi.md#rate_limits_endpoint_id_post) | **POST** /rate-limits/{endpoint_id} | Set rate limit for endpoint
-*HookSniff::RateLimitsApi* | [**rate_limits_get**](docs/RateLimitsApi.md#rate_limits_get) | **GET** /rate-limits | List rate limits
-*HookSniff::RoutingApi* | [**endpoints_id_health_get**](docs/RoutingApi.md#endpoints_id_health_get) | **GET** /endpoints/{id}/health | Get endpoint health status
-*HookSniff::RoutingApi* | [**endpoints_id_routing_get**](docs/RoutingApi.md#endpoints_id_routing_get) | **GET** /endpoints/{id}/routing | Get routing config for endpoint
-*HookSniff::RoutingApi* | [**endpoints_id_routing_put**](docs/RoutingApi.md#endpoints_id_routing_put) | **PUT** /endpoints/{id}/routing | Update routing config
-*HookSniff::RoutingApi* | [**routing_id_health_get**](docs/RoutingApi.md#routing_id_health_get) | **GET** /routing/{id}/health | Get endpoint health status
-*HookSniff::RoutingApi* | [**routing_id_routing_get**](docs/RoutingApi.md#routing_id_routing_get) | **GET** /routing/{id}/routing | Get routing config for endpoint
-*HookSniff::RoutingApi* | [**routing_id_routing_put**](docs/RoutingApi.md#routing_id_routing_put) | **PUT** /routing/{id}/routing | Update routing config
-*HookSniff::SSOApi* | [**sso_config_delete**](docs/SSOApi.md#sso_config_delete) | **DELETE** /sso/config | Delete SSO configuration
-*HookSniff::SSOApi* | [**sso_config_get**](docs/SSOApi.md#sso_config_get) | **GET** /sso/config | Get SSO configuration
-*HookSniff::SSOApi* | [**sso_config_post**](docs/SSOApi.md#sso_config_post) | **POST** /sso/config | Create/update SSO configuration
-*HookSniff::SSOApi* | [**sso_test_post**](docs/SSOApi.md#sso_test_post) | **POST** /sso/test | Test SSO connection
-*HookSniff::SchemasApi* | [**schemas_get**](docs/SchemasApi.md#schemas_get) | **GET** /schemas | List registered schemas
-*HookSniff::SchemasApi* | [**schemas_id_get**](docs/SchemasApi.md#schemas_id_get) | **GET** /schemas/{id} | Get schema by ID
-*HookSniff::SchemasApi* | [**schemas_id_validate_post**](docs/SchemasApi.md#schemas_id_validate_post) | **POST** /schemas/{id}/validate | Validate an event against a schema
-*HookSniff::SchemasApi* | [**schemas_post**](docs/SchemasApi.md#schemas_post) | **POST** /schemas | Register a new JSON Schema
-*HookSniff::SearchApi* | [**search_get**](docs/SearchApi.md#search_get) | **GET** /search | Search deliveries
-*HookSniff::SimulatorApi* | [**simulator_post**](docs/SimulatorApi.md#simulator_post) | **POST** /simulator | Simulate a webhook delivery
-*HookSniff::StatsApi* | [**stats_get**](docs/StatsApi.md#stats_get) | **GET** /stats | Get account statistics
-*HookSniff::StreamApi* | [**stream_deliveries_get**](docs/StreamApi.md#stream_deliveries_get) | **GET** /stream/deliveries | Real-time delivery event stream (SSE)
-*HookSniff::TeamsApi* | [**teams_get**](docs/TeamsApi.md#teams_get) | **GET** /teams | List teams
-*HookSniff::TeamsApi* | [**teams_id_get**](docs/TeamsApi.md#teams_id_get) | **GET** /teams/{id} | Get team details
-*HookSniff::TeamsApi* | [**teams_id_invite_post**](docs/TeamsApi.md#teams_id_invite_post) | **POST** /teams/{id}/invite | Invite a member to the team
-*HookSniff::TeamsApi* | [**teams_id_members_get**](docs/TeamsApi.md#teams_id_members_get) | **GET** /teams/{id}/members | List team members
-*HookSniff::TeamsApi* | [**teams_id_members_uid_delete**](docs/TeamsApi.md#teams_id_members_uid_delete) | **DELETE** /teams/{id}/members/{uid} | Remove member from team
-*HookSniff::TeamsApi* | [**teams_id_members_uid_role_put**](docs/TeamsApi.md#teams_id_members_uid_role_put) | **PUT** /teams/{id}/members/{uid}/role | Change member role
-*HookSniff::TeamsApi* | [**teams_post**](docs/TeamsApi.md#teams_post) | **POST** /teams | Create a team
-*HookSniff::TemplatesApi* | [**templates_get**](docs/TemplatesApi.md#templates_get) | **GET** /templates | List available templates
-*HookSniff::TemplatesApi* | [**templates_id_apply_post**](docs/TemplatesApi.md#templates_id_apply_post) | **POST** /templates/{id}/apply | Apply template to an endpoint
-*HookSniff::TemplatesApi* | [**templates_id_get**](docs/TemplatesApi.md#templates_id_get) | **GET** /templates/{id} | Get template by ID
-*HookSniff::TransformsApi* | [**endpoints_endpoint_id_transforms_get**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_get) | **GET** /endpoints/{endpoint_id}/transforms | List transform rules for endpoint
-*HookSniff::TransformsApi* | [**endpoints_endpoint_id_transforms_id_delete**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_id_delete) | **DELETE** /endpoints/{endpoint_id}/transforms/{id} | Delete transform rule
-*HookSniff::TransformsApi* | [**endpoints_endpoint_id_transforms_id_put**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_id_put) | **PUT** /endpoints/{endpoint_id}/transforms/{id} | Update transform rule
-*HookSniff::TransformsApi* | [**endpoints_endpoint_id_transforms_post**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_post) | **POST** /endpoints/{endpoint_id}/transforms | Create transform rule
-*HookSniff::TransformsApi* | [**endpoints_endpoint_id_transforms_test_post**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_test_post) | **POST** /endpoints/{endpoint_id}/transforms/test | Test a transform rule
-*HookSniff::WebhooksApi* | [**webhooks_batch_post**](docs/WebhooksApi.md#webhooks_batch_post) | **POST** /webhooks/batch | Send multiple webhooks in batch
-*HookSniff::WebhooksApi* | [**webhooks_batch_replay_post**](docs/WebhooksApi.md#webhooks_batch_replay_post) | **POST** /webhooks/batch/replay | Replay multiple deliveries by ID
-*HookSniff::WebhooksApi* | [**webhooks_export_get**](docs/WebhooksApi.md#webhooks_export_get) | **GET** /webhooks/export | Export deliveries as CSV
-*HookSniff::WebhooksApi* | [**webhooks_get**](docs/WebhooksApi.md#webhooks_get) | **GET** /webhooks | List webhook deliveries
-*HookSniff::WebhooksApi* | [**webhooks_id_attempts_get**](docs/WebhooksApi.md#webhooks_id_attempts_get) | **GET** /webhooks/{id}/attempts | Get delivery attempts
-*HookSniff::WebhooksApi* | [**webhooks_id_get**](docs/WebhooksApi.md#webhooks_id_get) | **GET** /webhooks/{id} | Get delivery by ID
-*HookSniff::WebhooksApi* | [**webhooks_id_replay_post**](docs/WebhooksApi.md#webhooks_id_replay_post) | **POST** /webhooks/{id}/replay | Replay a single delivery
-*HookSniff::WebhooksApi* | [**webhooks_post**](docs/WebhooksApi.md#webhooks_post) | **POST** /webhooks | Send a webhook
+*HooksniffSdk::APIKeysApi* | [**api_keys_get**](docs/APIKeysApi.md#api_keys_get) | **GET** /api-keys | List API keys
+*HooksniffSdk::APIKeysApi* | [**api_keys_id_delete**](docs/APIKeysApi.md#api_keys_id_delete) | **DELETE** /api-keys/{id} | Delete (revoke) an API key
+*HooksniffSdk::APIKeysApi* | [**api_keys_id_rotate_post**](docs/APIKeysApi.md#api_keys_id_rotate_post) | **POST** /api-keys/{id}/rotate | Rotate an API key
+*HooksniffSdk::APIKeysApi* | [**api_keys_post**](docs/APIKeysApi.md#api_keys_post) | **POST** /api-keys | Create a new API key
+*HooksniffSdk::AdminApi* | [**admin_revenue_get**](docs/AdminApi.md#admin_revenue_get) | **GET** /admin/revenue | Revenue by month (admin)
+*HooksniffSdk::AdminApi* | [**admin_sdk_update_post**](docs/AdminApi.md#admin_sdk_update_post) | **POST** /admin/sdk-update | Send SDK update notification to users
+*HooksniffSdk::AdminApi* | [**admin_stats_get**](docs/AdminApi.md#admin_stats_get) | **GET** /admin/stats | System-wide statistics (admin)
+*HooksniffSdk::AdminApi* | [**admin_users_get**](docs/AdminApi.md#admin_users_get) | **GET** /admin/users | List all users (admin)
+*HooksniffSdk::AdminApi* | [**admin_users_id_get**](docs/AdminApi.md#admin_users_id_get) | **GET** /admin/users/{id} | Get user details (admin)
+*HooksniffSdk::AdminApi* | [**admin_users_id_plan_put**](docs/AdminApi.md#admin_users_id_plan_put) | **PUT** /admin/users/{id}/plan | Change user plan (admin)
+*HooksniffSdk::AdminApi* | [**admin_users_id_status_put**](docs/AdminApi.md#admin_users_id_status_put) | **PUT** /admin/users/{id}/status | Change user status (admin)
+*HooksniffSdk::AlertsApi* | [**alerts_get**](docs/AlertsApi.md#alerts_get) | **GET** /alerts | List alert rules
+*HooksniffSdk::AlertsApi* | [**alerts_id_delete**](docs/AlertsApi.md#alerts_id_delete) | **DELETE** /alerts/{id} | Delete alert rule
+*HooksniffSdk::AlertsApi* | [**alerts_id_get**](docs/AlertsApi.md#alerts_id_get) | **GET** /alerts/{id} | Get alert rule
+*HooksniffSdk::AlertsApi* | [**alerts_id_test_post**](docs/AlertsApi.md#alerts_id_test_post) | **POST** /alerts/{id}/test | Test an alert rule
+*HooksniffSdk::AlertsApi* | [**alerts_post**](docs/AlertsApi.md#alerts_post) | **POST** /alerts | Create alert rule
+*HooksniffSdk::AnalyticsApi* | [**analytics_deliveries_get**](docs/AnalyticsApi.md#analytics_deliveries_get) | **GET** /analytics/deliveries | Delivery trend over time
+*HooksniffSdk::AnalyticsApi* | [**analytics_latency_get**](docs/AnalyticsApi.md#analytics_latency_get) | **GET** /analytics/latency | Latency trend over time
+*HooksniffSdk::AnalyticsApi* | [**analytics_success_rate_get**](docs/AnalyticsApi.md#analytics_success_rate_get) | **GET** /analytics/success-rate | Success rate metrics
+*HooksniffSdk::AuditLogApi* | [**audit_log_get**](docs/AuditLogApi.md#audit_log_get) | **GET** /audit-log | List audit log entries
+*HooksniffSdk::AuditLogApi* | [**audit_log_id_get**](docs/AuditLogApi.md#audit_log_id_get) | **GET** /audit-log/{id} | Get audit entry detail
+*HooksniffSdk::AuthApi* | [**auth2fa_confirm_post**](docs/AuthApi.md#auth2fa_confirm_post) | **POST** /auth/2fa/confirm | Confirm 2FA setup with a code
+*HooksniffSdk::AuthApi* | [**auth2fa_disable_post**](docs/AuthApi.md#auth2fa_disable_post) | **POST** /auth/2fa/disable | Disable 2FA
+*HooksniffSdk::AuthApi* | [**auth2fa_enable_post**](docs/AuthApi.md#auth2fa_enable_post) | **POST** /auth/2fa/enable | Enable 2FA (returns TOTP secret and QR URL)
+*HooksniffSdk::AuthApi* | [**auth2fa_verify_post**](docs/AuthApi.md#auth2fa_verify_post) | **POST** /auth/2fa/verify | Verify 2FA code during login
+*HooksniffSdk::AuthApi* | [**auth_account_delete**](docs/AuthApi.md#auth_account_delete) | **DELETE** /auth/account | Delete account (GDPR)
+*HooksniffSdk::AuthApi* | [**auth_export_get**](docs/AuthApi.md#auth_export_get) | **GET** /auth/export | Export user data (GDPR)
+*HooksniffSdk::AuthApi* | [**auth_forgot_password_post**](docs/AuthApi.md#auth_forgot_password_post) | **POST** /auth/forgot-password | Request password reset email
+*HooksniffSdk::AuthApi* | [**auth_login_post**](docs/AuthApi.md#auth_login_post) | **POST** /auth/login | Login with email and password
+*HooksniffSdk::AuthApi* | [**auth_logout_post**](docs/AuthApi.md#auth_logout_post) | **POST** /auth/logout | Logout (invalidate refresh token)
+*HooksniffSdk::AuthApi* | [**auth_me_get**](docs/AuthApi.md#auth_me_get) | **GET** /auth/me | Get current user profile
+*HooksniffSdk::AuthApi* | [**auth_password_put**](docs/AuthApi.md#auth_password_put) | **PUT** /auth/password | Change password
+*HooksniffSdk::AuthApi* | [**auth_profile_put**](docs/AuthApi.md#auth_profile_put) | **PUT** /auth/profile | Update profile
+*HooksniffSdk::AuthApi* | [**auth_refresh_post**](docs/AuthApi.md#auth_refresh_post) | **POST** /auth/refresh | Refresh access token
+*HooksniffSdk::AuthApi* | [**auth_register_post**](docs/AuthApi.md#auth_register_post) | **POST** /auth/register | Register a new account
+*HooksniffSdk::AuthApi* | [**auth_resend_verification_post**](docs/AuthApi.md#auth_resend_verification_post) | **POST** /auth/resend-verification | Resend verification email
+*HooksniffSdk::AuthApi* | [**auth_reset_password_post**](docs/AuthApi.md#auth_reset_password_post) | **POST** /auth/reset-password | Reset password with token
+*HooksniffSdk::AuthApi* | [**auth_verify_email_post**](docs/AuthApi.md#auth_verify_email_post) | **POST** /auth/verify-email | Verify email address
+*HooksniffSdk::BillingApi* | [**billing_invoices_get**](docs/BillingApi.md#billing_invoices_get) | **GET** /billing/invoices | List invoices
+*HooksniffSdk::BillingApi* | [**billing_portal_post**](docs/BillingApi.md#billing_portal_post) | **POST** /billing/portal | Open customer billing portal
+*HooksniffSdk::BillingApi* | [**billing_subscription_get**](docs/BillingApi.md#billing_subscription_get) | **GET** /billing/subscription | Get current subscription
+*HooksniffSdk::BillingApi* | [**billing_upgrade_post**](docs/BillingApi.md#billing_upgrade_post) | **POST** /billing/upgrade | Upgrade plan
+*HooksniffSdk::BillingApi* | [**billing_usage_get**](docs/BillingApi.md#billing_usage_get) | **GET** /billing/usage | Get current usage
+*HooksniffSdk::BillingApi* | [**billing_webhook_iyzico_post**](docs/BillingApi.md#billing_webhook_iyzico_post) | **POST** /billing/webhook/iyzico | iyzico webhook receiver
+*HooksniffSdk::BillingApi* | [**billing_webhook_polar_post**](docs/BillingApi.md#billing_webhook_polar_post) | **POST** /billing/webhook/polar | Polar.sh webhook receiver
+*HooksniffSdk::BillingApi* | [**billing_webhook_post**](docs/BillingApi.md#billing_webhook_post) | **POST** /billing/webhook | Stripe webhook receiver
+*HooksniffSdk::ContactApi* | [**contact_post**](docs/ContactApi.md#contact_post) | **POST** /contact | Send contact form message
+*HooksniffSdk::CustomDomainsApi* | [**custom_domains_get**](docs/CustomDomainsApi.md#custom_domains_get) | **GET** /custom-domains | List custom domains
+*HooksniffSdk::CustomDomainsApi* | [**custom_domains_id_delete**](docs/CustomDomainsApi.md#custom_domains_id_delete) | **DELETE** /custom-domains/{id} | Delete custom domain
+*HooksniffSdk::CustomDomainsApi* | [**custom_domains_id_verify_post**](docs/CustomDomainsApi.md#custom_domains_id_verify_post) | **POST** /custom-domains/{id}/verify | Verify domain ownership
+*HooksniffSdk::CustomDomainsApi* | [**custom_domains_post**](docs/CustomDomainsApi.md#custom_domains_post) | **POST** /custom-domains | Add custom domain
+*HooksniffSdk::CustomerPortalApi* | [**portal_api_keys_get**](docs/CustomerPortalApi.md#portal_api_keys_get) | **GET** /portal/api-keys | List API keys (portal)
+*HooksniffSdk::CustomerPortalApi* | [**portal_api_keys_key_id_delete**](docs/CustomerPortalApi.md#portal_api_keys_key_id_delete) | **DELETE** /portal/api-keys/{key_id} | Revoke API key (portal)
+*HooksniffSdk::CustomerPortalApi* | [**portal_api_keys_post**](docs/CustomerPortalApi.md#portal_api_keys_post) | **POST** /portal/api-keys | Create API key (portal)
+*HooksniffSdk::CustomerPortalApi* | [**portal_config_get**](docs/CustomerPortalApi.md#portal_config_get) | **GET** /portal/config | Get portal configuration
+*HooksniffSdk::CustomerPortalApi* | [**portal_config_post**](docs/CustomerPortalApi.md#portal_config_post) | **POST** /portal/config | Update portal configuration
+*HooksniffSdk::CustomerPortalApi* | [**portal_embed_code_get**](docs/CustomerPortalApi.md#portal_embed_code_get) | **GET** /portal/embed-code | Get portal embed code
+*HooksniffSdk::CustomerPortalApi* | [**portal_me_get**](docs/CustomerPortalApi.md#portal_me_get) | **GET** /portal/me | Get portal profile
+*HooksniffSdk::CustomerPortalApi* | [**portal_me_put**](docs/CustomerPortalApi.md#portal_me_put) | **PUT** /portal/me | Update portal profile
+*HooksniffSdk::CustomerPortalApi* | [**portal_notifications_get**](docs/CustomerPortalApi.md#portal_notifications_get) | **GET** /portal/notifications | Get notification preferences (portal)
+*HooksniffSdk::CustomerPortalApi* | [**portal_notifications_put**](docs/CustomerPortalApi.md#portal_notifications_put) | **PUT** /portal/notifications | Update notification preferences (portal)
+*HooksniffSdk::CustomerPortalApi* | [**portal_plan_get**](docs/CustomerPortalApi.md#portal_plan_get) | **GET** /portal/plan | Get plan info (portal)
+*HooksniffSdk::CustomerPortalApi* | [**portal_usage_get**](docs/CustomerPortalApi.md#portal_usage_get) | **GET** /portal/usage | Get usage (portal)
+*HooksniffSdk::DeliveryDetailsApi* | [**webhooks_id_attempts_attempt_id_get**](docs/DeliveryDetailsApi.md#webhooks_id_attempts_attempt_id_get) | **GET** /webhooks/{id}/attempts/{attempt_id} | Get specific attempt detail
+*HooksniffSdk::DeliveryDetailsApi* | [**webhooks_id_details_get**](docs/DeliveryDetailsApi.md#webhooks_id_details_get) | **GET** /webhooks/{id}/details | Get detailed delivery info
+*HooksniffSdk::DevicesApi* | [**devices_get**](docs/DevicesApi.md#devices_get) | **GET** /devices | List registered devices
+*HooksniffSdk::DevicesApi* | [**devices_post**](docs/DevicesApi.md#devices_post) | **POST** /devices | Register device for push notifications
+*HooksniffSdk::DevicesApi* | [**devices_token_delete**](docs/DevicesApi.md#devices_token_delete) | **DELETE** /devices/{token} | Remove device token
+*HooksniffSdk::EmbedApi* | [**embed_get**](docs/EmbedApi.md#embed_get) | **GET** /embed | Embeddable portal HTML
+*HooksniffSdk::EmbedApi* | [**embed_script_get**](docs/EmbedApi.md#embed_script_get) | **GET** /embed/script | Embeddable portal JavaScript
+*HooksniffSdk::EndpointsApi* | [**endpoints_get**](docs/EndpointsApi.md#endpoints_get) | **GET** /endpoints | List all endpoints
+*HooksniffSdk::EndpointsApi* | [**endpoints_id_delete**](docs/EndpointsApi.md#endpoints_id_delete) | **DELETE** /endpoints/{id} | Delete endpoint
+*HooksniffSdk::EndpointsApi* | [**endpoints_id_get**](docs/EndpointsApi.md#endpoints_id_get) | **GET** /endpoints/{id} | Get endpoint by ID
+*HooksniffSdk::EndpointsApi* | [**endpoints_id_put**](docs/EndpointsApi.md#endpoints_id_put) | **PUT** /endpoints/{id} | Update endpoint
+*HooksniffSdk::EndpointsApi* | [**endpoints_id_retry_policy_put**](docs/EndpointsApi.md#endpoints_id_retry_policy_put) | **PUT** /endpoints/{id}/retry-policy | Update retry policy for an endpoint
+*HooksniffSdk::EndpointsApi* | [**endpoints_id_rotate_secret_post**](docs/EndpointsApi.md#endpoints_id_rotate_secret_post) | **POST** /endpoints/{id}/rotate-secret | Rotate endpoint signing secret
+*HooksniffSdk::EndpointsApi* | [**endpoints_post**](docs/EndpointsApi.md#endpoints_post) | **POST** /endpoints | Create a new endpoint
+*HooksniffSdk::EventsApi* | [**events_get**](docs/EventsApi.md#events_get) | **GET** /events | List event types
+*HooksniffSdk::HealthApi* | [**endpoint_health_get**](docs/HealthApi.md#endpoint_health_get) | **GET** /endpoint-health | List endpoint health statuses
+*HooksniffSdk::HealthApi* | [**endpoint_health_id_get**](docs/HealthApi.md#endpoint_health_id_get) | **GET** /endpoint-health/{id} | Get specific endpoint health
+*HooksniffSdk::HealthApi* | [**status_get**](docs/HealthApi.md#status_get) | **GET** /status | System status (public)
+*HooksniffSdk::InboundApi* | [**inbound_provider_endpoint_id_post**](docs/InboundApi.md#inbound_provider_endpoint_id_post) | **POST** /inbound/{provider}/{endpoint_id} | Receive inbound webhook for a specific endpoint
+*HooksniffSdk::InboundApi* | [**inbound_provider_post**](docs/InboundApi.md#inbound_provider_post) | **POST** /inbound/{provider} | Receive inbound webhook from a provider
+*HooksniffSdk::NotificationsApi* | [**notifications_get**](docs/NotificationsApi.md#notifications_get) | **GET** /notifications | List notifications
+*HooksniffSdk::NotificationsApi* | [**notifications_id_delete**](docs/NotificationsApi.md#notifications_id_delete) | **DELETE** /notifications/{id} | Delete notification
+*HooksniffSdk::NotificationsApi* | [**notifications_id_read_put**](docs/NotificationsApi.md#notifications_id_read_put) | **PUT** /notifications/{id}/read | Mark notification as read
+*HooksniffSdk::NotificationsApi* | [**notifications_read_all_put**](docs/NotificationsApi.md#notifications_read_all_put) | **PUT** /notifications/read-all | Mark all notifications as read
+*HooksniffSdk::NotificationsApi* | [**notifications_unread_count_get**](docs/NotificationsApi.md#notifications_unread_count_get) | **GET** /notifications/unread-count | Get unread notification count
+*HooksniffSdk::OAuthApi* | [**oauth_google_callback_get**](docs/OAuthApi.md#oauth_google_callback_get) | **GET** /oauth/google/callback | Google OAuth callback
+*HooksniffSdk::OAuthApi* | [**oauth_google_get**](docs/OAuthApi.md#oauth_google_get) | **GET** /oauth/google | Google OAuth login redirect
+*HooksniffSdk::OAuthApi* | [**oauth_providers_get**](docs/OAuthApi.md#oauth_providers_get) | **GET** /oauth/providers | List available OAuth providers
+*HooksniffSdk::OutboundIPsApi* | [**outbound_ips_get**](docs/OutboundIPsApi.md#outbound_ips_get) | **GET** /outbound-ips | Get outbound IP addresses for firewall whitelisting
+*HooksniffSdk::PlaygroundApi* | [**playground_get**](docs/PlaygroundApi.md#playground_get) | **GET** /playground | Get playground info (endpoints, sample payloads)
+*HooksniffSdk::PlaygroundApi* | [**playground_test_post**](docs/PlaygroundApi.md#playground_test_post) | **POST** /playground/test | Test a webhook delivery
+*HooksniffSdk::RateLimitsApi* | [**rate_limits_endpoint_id_delete**](docs/RateLimitsApi.md#rate_limits_endpoint_id_delete) | **DELETE** /rate-limits/{endpoint_id} | Delete rate limit for endpoint
+*HooksniffSdk::RateLimitsApi* | [**rate_limits_endpoint_id_get**](docs/RateLimitsApi.md#rate_limits_endpoint_id_get) | **GET** /rate-limits/{endpoint_id} | Get rate limit for endpoint
+*HooksniffSdk::RateLimitsApi* | [**rate_limits_endpoint_id_post**](docs/RateLimitsApi.md#rate_limits_endpoint_id_post) | **POST** /rate-limits/{endpoint_id} | Set rate limit for endpoint
+*HooksniffSdk::RateLimitsApi* | [**rate_limits_get**](docs/RateLimitsApi.md#rate_limits_get) | **GET** /rate-limits | List rate limits
+*HooksniffSdk::RoutingApi* | [**endpoints_id_health_get**](docs/RoutingApi.md#endpoints_id_health_get) | **GET** /endpoints/{id}/health | Get endpoint health status
+*HooksniffSdk::RoutingApi* | [**endpoints_id_routing_get**](docs/RoutingApi.md#endpoints_id_routing_get) | **GET** /endpoints/{id}/routing | Get routing config for endpoint
+*HooksniffSdk::RoutingApi* | [**endpoints_id_routing_put**](docs/RoutingApi.md#endpoints_id_routing_put) | **PUT** /endpoints/{id}/routing | Update routing config
+*HooksniffSdk::RoutingApi* | [**routing_id_health_get**](docs/RoutingApi.md#routing_id_health_get) | **GET** /routing/{id}/health | Get endpoint health status
+*HooksniffSdk::RoutingApi* | [**routing_id_routing_get**](docs/RoutingApi.md#routing_id_routing_get) | **GET** /routing/{id}/routing | Get routing config for endpoint
+*HooksniffSdk::RoutingApi* | [**routing_id_routing_put**](docs/RoutingApi.md#routing_id_routing_put) | **PUT** /routing/{id}/routing | Update routing config
+*HooksniffSdk::SSOApi* | [**sso_config_delete**](docs/SSOApi.md#sso_config_delete) | **DELETE** /sso/config | Delete SSO configuration
+*HooksniffSdk::SSOApi* | [**sso_config_get**](docs/SSOApi.md#sso_config_get) | **GET** /sso/config | Get SSO configuration
+*HooksniffSdk::SSOApi* | [**sso_config_post**](docs/SSOApi.md#sso_config_post) | **POST** /sso/config | Create/update SSO configuration
+*HooksniffSdk::SSOApi* | [**sso_test_post**](docs/SSOApi.md#sso_test_post) | **POST** /sso/test | Test SSO connection
+*HooksniffSdk::SchemasApi* | [**schemas_get**](docs/SchemasApi.md#schemas_get) | **GET** /schemas | List registered schemas
+*HooksniffSdk::SchemasApi* | [**schemas_id_get**](docs/SchemasApi.md#schemas_id_get) | **GET** /schemas/{id} | Get schema by ID
+*HooksniffSdk::SchemasApi* | [**schemas_id_validate_post**](docs/SchemasApi.md#schemas_id_validate_post) | **POST** /schemas/{id}/validate | Validate an event against a schema
+*HooksniffSdk::SchemasApi* | [**schemas_post**](docs/SchemasApi.md#schemas_post) | **POST** /schemas | Register a new JSON Schema
+*HooksniffSdk::SearchApi* | [**search_get**](docs/SearchApi.md#search_get) | **GET** /search | Search deliveries
+*HooksniffSdk::SimulatorApi* | [**simulator_post**](docs/SimulatorApi.md#simulator_post) | **POST** /simulator | Simulate a webhook delivery
+*HooksniffSdk::StatsApi* | [**stats_get**](docs/StatsApi.md#stats_get) | **GET** /stats | Get account statistics
+*HooksniffSdk::StreamApi* | [**stream_deliveries_get**](docs/StreamApi.md#stream_deliveries_get) | **GET** /stream/deliveries | Real-time delivery event stream (SSE)
+*HooksniffSdk::TeamsApi* | [**teams_get**](docs/TeamsApi.md#teams_get) | **GET** /teams | List teams
+*HooksniffSdk::TeamsApi* | [**teams_id_get**](docs/TeamsApi.md#teams_id_get) | **GET** /teams/{id} | Get team details
+*HooksniffSdk::TeamsApi* | [**teams_id_invite_post**](docs/TeamsApi.md#teams_id_invite_post) | **POST** /teams/{id}/invite | Invite a member to the team
+*HooksniffSdk::TeamsApi* | [**teams_id_members_get**](docs/TeamsApi.md#teams_id_members_get) | **GET** /teams/{id}/members | List team members
+*HooksniffSdk::TeamsApi* | [**teams_id_members_uid_delete**](docs/TeamsApi.md#teams_id_members_uid_delete) | **DELETE** /teams/{id}/members/{uid} | Remove member from team
+*HooksniffSdk::TeamsApi* | [**teams_id_members_uid_role_put**](docs/TeamsApi.md#teams_id_members_uid_role_put) | **PUT** /teams/{id}/members/{uid}/role | Change member role
+*HooksniffSdk::TeamsApi* | [**teams_post**](docs/TeamsApi.md#teams_post) | **POST** /teams | Create a team
+*HooksniffSdk::TemplatesApi* | [**templates_get**](docs/TemplatesApi.md#templates_get) | **GET** /templates | List available templates
+*HooksniffSdk::TemplatesApi* | [**templates_id_apply_post**](docs/TemplatesApi.md#templates_id_apply_post) | **POST** /templates/{id}/apply | Apply template to an endpoint
+*HooksniffSdk::TemplatesApi* | [**templates_id_get**](docs/TemplatesApi.md#templates_id_get) | **GET** /templates/{id} | Get template by ID
+*HooksniffSdk::TransformsApi* | [**endpoints_endpoint_id_transforms_get**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_get) | **GET** /endpoints/{endpoint_id}/transforms | List transform rules for endpoint
+*HooksniffSdk::TransformsApi* | [**endpoints_endpoint_id_transforms_id_delete**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_id_delete) | **DELETE** /endpoints/{endpoint_id}/transforms/{id} | Delete transform rule
+*HooksniffSdk::TransformsApi* | [**endpoints_endpoint_id_transforms_id_put**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_id_put) | **PUT** /endpoints/{endpoint_id}/transforms/{id} | Update transform rule
+*HooksniffSdk::TransformsApi* | [**endpoints_endpoint_id_transforms_post**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_post) | **POST** /endpoints/{endpoint_id}/transforms | Create transform rule
+*HooksniffSdk::TransformsApi* | [**endpoints_endpoint_id_transforms_test_post**](docs/TransformsApi.md#endpoints_endpoint_id_transforms_test_post) | **POST** /endpoints/{endpoint_id}/transforms/test | Test a transform rule
+*HooksniffSdk::WebhooksApi* | [**webhooks_batch_post**](docs/WebhooksApi.md#webhooks_batch_post) | **POST** /webhooks/batch | Send multiple webhooks in batch
+*HooksniffSdk::WebhooksApi* | [**webhooks_batch_replay_post**](docs/WebhooksApi.md#webhooks_batch_replay_post) | **POST** /webhooks/batch/replay | Replay multiple deliveries by ID
+*HooksniffSdk::WebhooksApi* | [**webhooks_export_get**](docs/WebhooksApi.md#webhooks_export_get) | **GET** /webhooks/export | Export deliveries as CSV
+*HooksniffSdk::WebhooksApi* | [**webhooks_get**](docs/WebhooksApi.md#webhooks_get) | **GET** /webhooks | List webhook deliveries
+*HooksniffSdk::WebhooksApi* | [**webhooks_id_attempts_get**](docs/WebhooksApi.md#webhooks_id_attempts_get) | **GET** /webhooks/{id}/attempts | Get delivery attempts
+*HooksniffSdk::WebhooksApi* | [**webhooks_id_get**](docs/WebhooksApi.md#webhooks_id_get) | **GET** /webhooks/{id} | Get delivery by ID
+*HooksniffSdk::WebhooksApi* | [**webhooks_id_replay_post**](docs/WebhooksApi.md#webhooks_id_replay_post) | **POST** /webhooks/{id}/replay | Replay a single delivery
+*HooksniffSdk::WebhooksApi* | [**webhooks_post**](docs/WebhooksApi.md#webhooks_post) | **POST** /webhooks | Send a webhook
 
 
 ## Documentation for Models
 
- - [HookSniff::AdminRevenueEntry](docs/AdminRevenueEntry.md)
- - [HookSniff::AdminRevenueGet200ResponseInner](docs/AdminRevenueGet200ResponseInner.md)
- - [HookSniff::AdminRevenueResponse](docs/AdminRevenueResponse.md)
- - [HookSniff::AdminSdkUpdatePostRequest](docs/AdminSdkUpdatePostRequest.md)
- - [HookSniff::AdminSystemStatus](docs/AdminSystemStatus.md)
- - [HookSniff::AdminUserListResponse](docs/AdminUserListResponse.md)
- - [HookSniff::AdminUsersIdPlanPutRequest](docs/AdminUsersIdPlanPutRequest.md)
- - [HookSniff::AdminUsersIdStatusPutRequest](docs/AdminUsersIdStatusPutRequest.md)
- - [HookSniff::AlertNotificationListResponse](docs/AlertNotificationListResponse.md)
- - [HookSniff::AlertNotificationListResponseDataInner](docs/AlertNotificationListResponseDataInner.md)
- - [HookSniff::AlertRule](docs/AlertRule.md)
- - [HookSniff::AlertRuleListResponse](docs/AlertRuleListResponse.md)
- - [HookSniff::AnalyticsTrendPoint](docs/AnalyticsTrendPoint.md)
- - [HookSniff::AnalyticsTrendResponse](docs/AnalyticsTrendResponse.md)
- - [HookSniff::ApiKeyInfo](docs/ApiKeyInfo.md)
- - [HookSniff::ApplyTemplateRequest](docs/ApplyTemplateRequest.md)
- - [HookSniff::ApplyTemplateResponse](docs/ApplyTemplateResponse.md)
- - [HookSniff::AuditLogEntry](docs/AuditLogEntry.md)
- - [HookSniff::AuditLogListResponse](docs/AuditLogListResponse.md)
- - [HookSniff::Auth2faEnablePost200Response](docs/Auth2faEnablePost200Response.md)
- - [HookSniff::AuthLoginPost200Response](docs/AuthLoginPost200Response.md)
- - [HookSniff::AuthResponse](docs/AuthResponse.md)
- - [HookSniff::BatchReplayRequest](docs/BatchReplayRequest.md)
- - [HookSniff::BatchResponse](docs/BatchResponse.md)
- - [HookSniff::BatchResponseErrorsInner](docs/BatchResponseErrorsInner.md)
- - [HookSniff::BatchWebhookRequest](docs/BatchWebhookRequest.md)
- - [HookSniff::BatchWebhookResponse](docs/BatchWebhookResponse.md)
- - [HookSniff::BillingPortalPost200Response](docs/BillingPortalPost200Response.md)
- - [HookSniff::BillingPortalResponse](docs/BillingPortalResponse.md)
- - [HookSniff::CancelSubscriptionRequest](docs/CancelSubscriptionRequest.md)
- - [HookSniff::CancelSubscriptionResponse](docs/CancelSubscriptionResponse.md)
- - [HookSniff::ChangePasswordRequest](docs/ChangePasswordRequest.md)
- - [HookSniff::ChangeRoleRequest](docs/ChangeRoleRequest.md)
- - [HookSniff::Confirm2faRequest](docs/Confirm2faRequest.md)
- - [HookSniff::ContactRequest](docs/ContactRequest.md)
- - [HookSniff::ContactResponse](docs/ContactResponse.md)
- - [HookSniff::CreateAlertRequest](docs/CreateAlertRequest.md)
- - [HookSniff::CreateAlertRuleRequest](docs/CreateAlertRuleRequest.md)
- - [HookSniff::CreateApiKeyResponse](docs/CreateApiKeyResponse.md)
- - [HookSniff::CreateCustomDomainRequest](docs/CreateCustomDomainRequest.md)
- - [HookSniff::CreateEndpointRequest](docs/CreateEndpointRequest.md)
- - [HookSniff::CreateRoutingRuleRequest](docs/CreateRoutingRuleRequest.md)
- - [HookSniff::CreateSSOConfigRequest](docs/CreateSSOConfigRequest.md)
- - [HookSniff::CreateTeamRequest](docs/CreateTeamRequest.md)
- - [HookSniff::CreateTransformRuleRequest](docs/CreateTransformRuleRequest.md)
- - [HookSniff::CreateWebhookRequest](docs/CreateWebhookRequest.md)
- - [HookSniff::CustomDomain](docs/CustomDomain.md)
- - [HookSniff::CustomDomainListResponse](docs/CustomDomainListResponse.md)
- - [HookSniff::CustomDomainsPostRequest](docs/CustomDomainsPostRequest.md)
- - [HookSniff::CustomerResponse](docs/CustomerResponse.md)
- - [HookSniff::Delivery](docs/Delivery.md)
- - [HookSniff::DeliveryAttempt](docs/DeliveryAttempt.md)
- - [HookSniff::DeliveryAttemptListResponse](docs/DeliveryAttemptListResponse.md)
- - [HookSniff::DeliveryDetailResponse](docs/DeliveryDetailResponse.md)
- - [HookSniff::DeliveryListResponse](docs/DeliveryListResponse.md)
- - [HookSniff::DeliveryTrendResponse](docs/DeliveryTrendResponse.md)
- - [HookSniff::DeliveryTrendResponseBucketsInner](docs/DeliveryTrendResponseBucketsInner.md)
- - [HookSniff::DeviceListResponse](docs/DeviceListResponse.md)
- - [HookSniff::DeviceTokenResponse](docs/DeviceTokenResponse.md)
- - [HookSniff::Disable2faRequest](docs/Disable2faRequest.md)
- - [HookSniff::DomainDnsRecord](docs/DomainDnsRecord.md)
- - [HookSniff::EmbedConfig](docs/EmbedConfig.md)
- - [HookSniff::EmbedConfigTheme](docs/EmbedConfigTheme.md)
- - [HookSniff::Enable2faRequest](docs/Enable2faRequest.md)
- - [HookSniff::Enable2faResponse](docs/Enable2faResponse.md)
- - [HookSniff::Endpoint](docs/Endpoint.md)
- - [HookSniff::EndpointHealth](docs/EndpointHealth.md)
- - [HookSniff::EndpointListResponse](docs/EndpointListResponse.md)
- - [HookSniff::EndpointsEndpointIdTransformsTestPostRequest](docs/EndpointsEndpointIdTransformsTestPostRequest.md)
- - [HookSniff::EndpointsIdRotateSecretPost200Response](docs/EndpointsIdRotateSecretPost200Response.md)
- - [HookSniff::Error](docs/Error.md)
- - [HookSniff::EventType](docs/EventType.md)
- - [HookSniff::EventTypeListResponse](docs/EventTypeListResponse.md)
- - [HookSniff::ExportDataResponse](docs/ExportDataResponse.md)
- - [HookSniff::ForgotPasswordRequest](docs/ForgotPasswordRequest.md)
- - [HookSniff::InboundWebhookRequest](docs/InboundWebhookRequest.md)
- - [HookSniff::InboundWebhookResponse](docs/InboundWebhookResponse.md)
- - [HookSniff::InviteMemberRequest](docs/InviteMemberRequest.md)
- - [HookSniff::InviteRequest](docs/InviteRequest.md)
- - [HookSniff::InvoiceListResponse](docs/InvoiceListResponse.md)
- - [HookSniff::InvoiceResponse](docs/InvoiceResponse.md)
- - [HookSniff::LatencyResponse](docs/LatencyResponse.md)
- - [HookSniff::LatencyTrendResponse](docs/LatencyTrendResponse.md)
- - [HookSniff::LatencyTrendResponseBucketsInner](docs/LatencyTrendResponseBucketsInner.md)
- - [HookSniff::LoginRequest](docs/LoginRequest.md)
- - [HookSniff::LogoutRequest](docs/LogoutRequest.md)
- - [HookSniff::Notification](docs/Notification.md)
- - [HookSniff::NotificationListResponse](docs/NotificationListResponse.md)
- - [HookSniff::NotificationPreferences](docs/NotificationPreferences.md)
- - [HookSniff::NotificationsUnreadCountGet200Response](docs/NotificationsUnreadCountGet200Response.md)
- - [HookSniff::OAuthCallbackRequest](docs/OAuthCallbackRequest.md)
- - [HookSniff::OAuthProvider](docs/OAuthProvider.md)
- - [HookSniff::OAuthProviderListResponse](docs/OAuthProviderListResponse.md)
- - [HookSniff::OutboundIPsResponse](docs/OutboundIPsResponse.md)
- - [HookSniff::OutboundIpsResponse](docs/OutboundIpsResponse.md)
- - [HookSniff::PaginatedUsers](docs/PaginatedUsers.md)
- - [HookSniff::PlaygroundGet200Response](docs/PlaygroundGet200Response.md)
- - [HookSniff::PlaygroundTestRequest](docs/PlaygroundTestRequest.md)
- - [HookSniff::PlaygroundTestResponse](docs/PlaygroundTestResponse.md)
- - [HookSniff::PortalConfig](docs/PortalConfig.md)
- - [HookSniff::PortalNotificationsPut200Response](docs/PortalNotificationsPut200Response.md)
- - [HookSniff::PortalProfile](docs/PortalProfile.md)
- - [HookSniff::PortalSession](docs/PortalSession.md)
- - [HookSniff::RateLimitConfig](docs/RateLimitConfig.md)
- - [HookSniff::RateLimitUsage](docs/RateLimitUsage.md)
- - [HookSniff::RefreshTokenRequest](docs/RefreshTokenRequest.md)
- - [HookSniff::RegisterDeviceRequest](docs/RegisterDeviceRequest.md)
- - [HookSniff::RegisterRequest](docs/RegisterRequest.md)
- - [HookSniff::RegisterSchemaRequest](docs/RegisterSchemaRequest.md)
- - [HookSniff::ResendVerificationRequest](docs/ResendVerificationRequest.md)
- - [HookSniff::ResetPasswordRequest](docs/ResetPasswordRequest.md)
- - [HookSniff::RetryPolicy](docs/RetryPolicy.md)
- - [HookSniff::RotateSecretResponse](docs/RotateSecretResponse.md)
- - [HookSniff::RoutingInfo](docs/RoutingInfo.md)
- - [HookSniff::RoutingRuleListResponse](docs/RoutingRuleListResponse.md)
- - [HookSniff::RoutingRuleListResponseDataInner](docs/RoutingRuleListResponseDataInner.md)
- - [HookSniff::SSOConfig](docs/SSOConfig.md)
- - [HookSniff::SSOConfigListResponse](docs/SSOConfigListResponse.md)
- - [HookSniff::SchemaListResponse](docs/SchemaListResponse.md)
- - [HookSniff::SchemaResponse](docs/SchemaResponse.md)
- - [HookSniff::SearchRequest](docs/SearchRequest.md)
- - [HookSniff::SearchRequestFilters](docs/SearchRequestFilters.md)
- - [HookSniff::SearchResponse](docs/SearchResponse.md)
- - [HookSniff::SearchResult](docs/SearchResult.md)
- - [HookSniff::SimulatorPostRequest](docs/SimulatorPostRequest.md)
- - [HookSniff::SimulatorRequest](docs/SimulatorRequest.md)
- - [HookSniff::SimulatorResponse](docs/SimulatorResponse.md)
- - [HookSniff::SsoConfigPostRequest](docs/SsoConfigPostRequest.md)
- - [HookSniff::StatsResponse](docs/StatsResponse.md)
- - [HookSniff::StreamParams](docs/StreamParams.md)
- - [HookSniff::SubscriptionResponse](docs/SubscriptionResponse.md)
- - [HookSniff::SuccessRateResponse](docs/SuccessRateResponse.md)
- - [HookSniff::SystemStats](docs/SystemStats.md)
- - [HookSniff::SystemStatsPlanBreakdownInner](docs/SystemStatsPlanBreakdownInner.md)
- - [HookSniff::SystemStatus](docs/SystemStatus.md)
- - [HookSniff::SystemStatusComponentsInner](docs/SystemStatusComponentsInner.md)
- - [HookSniff::Team](docs/Team.md)
- - [HookSniff::TeamDetailResponse](docs/TeamDetailResponse.md)
- - [HookSniff::TeamInvite](docs/TeamInvite.md)
- - [HookSniff::TeamListResponse](docs/TeamListResponse.md)
- - [HookSniff::TeamMember](docs/TeamMember.md)
- - [HookSniff::TeamMemberListResponse](docs/TeamMemberListResponse.md)
- - [HookSniff::TemplateListResponse](docs/TemplateListResponse.md)
- - [HookSniff::TestWebhookRequest](docs/TestWebhookRequest.md)
- - [HookSniff::TestWebhookResponse](docs/TestWebhookResponse.md)
- - [HookSniff::TransformRule](docs/TransformRule.md)
- - [HookSniff::TransformRuleListResponse](docs/TransformRuleListResponse.md)
- - [HookSniff::TwoFactorRequiredResponse](docs/TwoFactorRequiredResponse.md)
- - [HookSniff::UpdateAlertRuleRequest](docs/UpdateAlertRuleRequest.md)
- - [HookSniff::UpdateEndpointRequest](docs/UpdateEndpointRequest.md)
- - [HookSniff::UpdateNotificationPreferences](docs/UpdateNotificationPreferences.md)
- - [HookSniff::UpdateProfileRequest](docs/UpdateProfileRequest.md)
- - [HookSniff::UpdateRoutingRequest](docs/UpdateRoutingRequest.md)
- - [HookSniff::UpdateRoutingRuleRequest](docs/UpdateRoutingRuleRequest.md)
- - [HookSniff::UpdateSSOConfigRequest](docs/UpdateSSOConfigRequest.md)
- - [HookSniff::UpdateSubscriptionRequest](docs/UpdateSubscriptionRequest.md)
- - [HookSniff::UpdateTeamRequest](docs/UpdateTeamRequest.md)
- - [HookSniff::UpdateTransformRuleRequest](docs/UpdateTransformRuleRequest.md)
- - [HookSniff::UpgradeRequest](docs/UpgradeRequest.md)
- - [HookSniff::UpgradeResponse](docs/UpgradeResponse.md)
- - [HookSniff::UsageResponse](docs/UsageResponse.md)
- - [HookSniff::UsageStatsResponse](docs/UsageStatsResponse.md)
- - [HookSniff::UserSummary](docs/UserSummary.md)
- - [HookSniff::ValidateEventRequest](docs/ValidateEventRequest.md)
- - [HookSniff::ValidateEventResponse](docs/ValidateEventResponse.md)
- - [HookSniff::ValidateEventResponseErrorsInner](docs/ValidateEventResponseErrorsInner.md)
- - [HookSniff::Verify2faRequest](docs/Verify2faRequest.md)
- - [HookSniff::VerifyCustomDomainResponse](docs/VerifyCustomDomainResponse.md)
- - [HookSniff::VerifyEmailRequest](docs/VerifyEmailRequest.md)
- - [HookSniff::WebhookFilter](docs/WebhookFilter.md)
- - [HookSniff::WebhookTemplate](docs/WebhookTemplate.md)
+ - [HooksniffSdk::AdminRevenueEntry](docs/AdminRevenueEntry.md)
+ - [HooksniffSdk::AdminRevenueGet200ResponseInner](docs/AdminRevenueGet200ResponseInner.md)
+ - [HooksniffSdk::AdminRevenueResponse](docs/AdminRevenueResponse.md)
+ - [HooksniffSdk::AdminSdkUpdatePostRequest](docs/AdminSdkUpdatePostRequest.md)
+ - [HooksniffSdk::AdminSystemStatus](docs/AdminSystemStatus.md)
+ - [HooksniffSdk::AdminUserListResponse](docs/AdminUserListResponse.md)
+ - [HooksniffSdk::AdminUsersIdPlanPutRequest](docs/AdminUsersIdPlanPutRequest.md)
+ - [HooksniffSdk::AdminUsersIdStatusPutRequest](docs/AdminUsersIdStatusPutRequest.md)
+ - [HooksniffSdk::AlertNotificationListResponse](docs/AlertNotificationListResponse.md)
+ - [HooksniffSdk::AlertNotificationListResponseDataInner](docs/AlertNotificationListResponseDataInner.md)
+ - [HooksniffSdk::AlertRule](docs/AlertRule.md)
+ - [HooksniffSdk::AlertRuleListResponse](docs/AlertRuleListResponse.md)
+ - [HooksniffSdk::AnalyticsTrendPoint](docs/AnalyticsTrendPoint.md)
+ - [HooksniffSdk::AnalyticsTrendResponse](docs/AnalyticsTrendResponse.md)
+ - [HooksniffSdk::ApiKeyInfo](docs/ApiKeyInfo.md)
+ - [HooksniffSdk::ApplyTemplateRequest](docs/ApplyTemplateRequest.md)
+ - [HooksniffSdk::ApplyTemplateResponse](docs/ApplyTemplateResponse.md)
+ - [HooksniffSdk::AuditLogEntry](docs/AuditLogEntry.md)
+ - [HooksniffSdk::AuditLogListResponse](docs/AuditLogListResponse.md)
+ - [HooksniffSdk::Auth2faEnablePost200Response](docs/Auth2faEnablePost200Response.md)
+ - [HooksniffSdk::AuthLoginPost200Response](docs/AuthLoginPost200Response.md)
+ - [HooksniffSdk::AuthResponse](docs/AuthResponse.md)
+ - [HooksniffSdk::BatchReplayRequest](docs/BatchReplayRequest.md)
+ - [HooksniffSdk::BatchResponse](docs/BatchResponse.md)
+ - [HooksniffSdk::BatchResponseErrorsInner](docs/BatchResponseErrorsInner.md)
+ - [HooksniffSdk::BatchWebhookRequest](docs/BatchWebhookRequest.md)
+ - [HooksniffSdk::BatchWebhookResponse](docs/BatchWebhookResponse.md)
+ - [HooksniffSdk::BillingPortalPost200Response](docs/BillingPortalPost200Response.md)
+ - [HooksniffSdk::BillingPortalResponse](docs/BillingPortalResponse.md)
+ - [HooksniffSdk::CancelSubscriptionRequest](docs/CancelSubscriptionRequest.md)
+ - [HooksniffSdk::CancelSubscriptionResponse](docs/CancelSubscriptionResponse.md)
+ - [HooksniffSdk::ChangePasswordRequest](docs/ChangePasswordRequest.md)
+ - [HooksniffSdk::ChangeRoleRequest](docs/ChangeRoleRequest.md)
+ - [HooksniffSdk::Confirm2faRequest](docs/Confirm2faRequest.md)
+ - [HooksniffSdk::ContactRequest](docs/ContactRequest.md)
+ - [HooksniffSdk::ContactResponse](docs/ContactResponse.md)
+ - [HooksniffSdk::CreateAlertRequest](docs/CreateAlertRequest.md)
+ - [HooksniffSdk::CreateAlertRuleRequest](docs/CreateAlertRuleRequest.md)
+ - [HooksniffSdk::CreateApiKeyResponse](docs/CreateApiKeyResponse.md)
+ - [HooksniffSdk::CreateCustomDomainRequest](docs/CreateCustomDomainRequest.md)
+ - [HooksniffSdk::CreateEndpointRequest](docs/CreateEndpointRequest.md)
+ - [HooksniffSdk::CreateRoutingRuleRequest](docs/CreateRoutingRuleRequest.md)
+ - [HooksniffSdk::CreateSSOConfigRequest](docs/CreateSSOConfigRequest.md)
+ - [HooksniffSdk::CreateTeamRequest](docs/CreateTeamRequest.md)
+ - [HooksniffSdk::CreateTransformRuleRequest](docs/CreateTransformRuleRequest.md)
+ - [HooksniffSdk::CreateWebhookRequest](docs/CreateWebhookRequest.md)
+ - [HooksniffSdk::CustomDomain](docs/CustomDomain.md)
+ - [HooksniffSdk::CustomDomainListResponse](docs/CustomDomainListResponse.md)
+ - [HooksniffSdk::CustomDomainsPostRequest](docs/CustomDomainsPostRequest.md)
+ - [HooksniffSdk::CustomerResponse](docs/CustomerResponse.md)
+ - [HooksniffSdk::Delivery](docs/Delivery.md)
+ - [HooksniffSdk::DeliveryAttempt](docs/DeliveryAttempt.md)
+ - [HooksniffSdk::DeliveryAttemptListResponse](docs/DeliveryAttemptListResponse.md)
+ - [HooksniffSdk::DeliveryDetailResponse](docs/DeliveryDetailResponse.md)
+ - [HooksniffSdk::DeliveryListResponse](docs/DeliveryListResponse.md)
+ - [HooksniffSdk::DeliveryTrendResponse](docs/DeliveryTrendResponse.md)
+ - [HooksniffSdk::DeliveryTrendResponseBucketsInner](docs/DeliveryTrendResponseBucketsInner.md)
+ - [HooksniffSdk::DeviceListResponse](docs/DeviceListResponse.md)
+ - [HooksniffSdk::DeviceTokenResponse](docs/DeviceTokenResponse.md)
+ - [HooksniffSdk::Disable2faRequest](docs/Disable2faRequest.md)
+ - [HooksniffSdk::DomainDnsRecord](docs/DomainDnsRecord.md)
+ - [HooksniffSdk::EmbedConfig](docs/EmbedConfig.md)
+ - [HooksniffSdk::EmbedConfigTheme](docs/EmbedConfigTheme.md)
+ - [HooksniffSdk::Enable2faRequest](docs/Enable2faRequest.md)
+ - [HooksniffSdk::Enable2faResponse](docs/Enable2faResponse.md)
+ - [HooksniffSdk::Endpoint](docs/Endpoint.md)
+ - [HooksniffSdk::EndpointHealth](docs/EndpointHealth.md)
+ - [HooksniffSdk::EndpointListResponse](docs/EndpointListResponse.md)
+ - [HooksniffSdk::EndpointsEndpointIdTransformsTestPostRequest](docs/EndpointsEndpointIdTransformsTestPostRequest.md)
+ - [HooksniffSdk::EndpointsIdRotateSecretPost200Response](docs/EndpointsIdRotateSecretPost200Response.md)
+ - [HooksniffSdk::Error](docs/Error.md)
+ - [HooksniffSdk::EventType](docs/EventType.md)
+ - [HooksniffSdk::EventTypeListResponse](docs/EventTypeListResponse.md)
+ - [HooksniffSdk::ExportDataResponse](docs/ExportDataResponse.md)
+ - [HooksniffSdk::ForgotPasswordRequest](docs/ForgotPasswordRequest.md)
+ - [HooksniffSdk::InboundWebhookRequest](docs/InboundWebhookRequest.md)
+ - [HooksniffSdk::InboundWebhookResponse](docs/InboundWebhookResponse.md)
+ - [HooksniffSdk::InviteMemberRequest](docs/InviteMemberRequest.md)
+ - [HooksniffSdk::InviteRequest](docs/InviteRequest.md)
+ - [HooksniffSdk::InvoiceListResponse](docs/InvoiceListResponse.md)
+ - [HooksniffSdk::InvoiceResponse](docs/InvoiceResponse.md)
+ - [HooksniffSdk::LatencyResponse](docs/LatencyResponse.md)
+ - [HooksniffSdk::LatencyTrendResponse](docs/LatencyTrendResponse.md)
+ - [HooksniffSdk::LatencyTrendResponseBucketsInner](docs/LatencyTrendResponseBucketsInner.md)
+ - [HooksniffSdk::LoginRequest](docs/LoginRequest.md)
+ - [HooksniffSdk::LogoutRequest](docs/LogoutRequest.md)
+ - [HooksniffSdk::Notification](docs/Notification.md)
+ - [HooksniffSdk::NotificationListResponse](docs/NotificationListResponse.md)
+ - [HooksniffSdk::NotificationPreferences](docs/NotificationPreferences.md)
+ - [HooksniffSdk::NotificationsUnreadCountGet200Response](docs/NotificationsUnreadCountGet200Response.md)
+ - [HooksniffSdk::OAuthCallbackRequest](docs/OAuthCallbackRequest.md)
+ - [HooksniffSdk::OAuthProvider](docs/OAuthProvider.md)
+ - [HooksniffSdk::OAuthProviderListResponse](docs/OAuthProviderListResponse.md)
+ - [HooksniffSdk::OutboundIPsResponse](docs/OutboundIPsResponse.md)
+ - [HooksniffSdk::OutboundIpsResponse](docs/OutboundIpsResponse.md)
+ - [HooksniffSdk::PaginatedUsers](docs/PaginatedUsers.md)
+ - [HooksniffSdk::PlaygroundGet200Response](docs/PlaygroundGet200Response.md)
+ - [HooksniffSdk::PlaygroundTestRequest](docs/PlaygroundTestRequest.md)
+ - [HooksniffSdk::PlaygroundTestResponse](docs/PlaygroundTestResponse.md)
+ - [HooksniffSdk::PortalConfig](docs/PortalConfig.md)
+ - [HooksniffSdk::PortalNotificationsPut200Response](docs/PortalNotificationsPut200Response.md)
+ - [HooksniffSdk::PortalProfile](docs/PortalProfile.md)
+ - [HooksniffSdk::PortalSession](docs/PortalSession.md)
+ - [HooksniffSdk::RateLimitConfig](docs/RateLimitConfig.md)
+ - [HooksniffSdk::RateLimitUsage](docs/RateLimitUsage.md)
+ - [HooksniffSdk::RefreshTokenRequest](docs/RefreshTokenRequest.md)
+ - [HooksniffSdk::RegisterDeviceRequest](docs/RegisterDeviceRequest.md)
+ - [HooksniffSdk::RegisterRequest](docs/RegisterRequest.md)
+ - [HooksniffSdk::RegisterSchemaRequest](docs/RegisterSchemaRequest.md)
+ - [HooksniffSdk::ResendVerificationRequest](docs/ResendVerificationRequest.md)
+ - [HooksniffSdk::ResetPasswordRequest](docs/ResetPasswordRequest.md)
+ - [HooksniffSdk::RetryPolicy](docs/RetryPolicy.md)
+ - [HooksniffSdk::RotateSecretResponse](docs/RotateSecretResponse.md)
+ - [HooksniffSdk::RoutingInfo](docs/RoutingInfo.md)
+ - [HooksniffSdk::RoutingRuleListResponse](docs/RoutingRuleListResponse.md)
+ - [HooksniffSdk::RoutingRuleListResponseDataInner](docs/RoutingRuleListResponseDataInner.md)
+ - [HooksniffSdk::SSOConfig](docs/SSOConfig.md)
+ - [HooksniffSdk::SSOConfigListResponse](docs/SSOConfigListResponse.md)
+ - [HooksniffSdk::SchemaListResponse](docs/SchemaListResponse.md)
+ - [HooksniffSdk::SchemaResponse](docs/SchemaResponse.md)
+ - [HooksniffSdk::SearchRequest](docs/SearchRequest.md)
+ - [HooksniffSdk::SearchRequestFilters](docs/SearchRequestFilters.md)
+ - [HooksniffSdk::SearchResponse](docs/SearchResponse.md)
+ - [HooksniffSdk::SearchResult](docs/SearchResult.md)
+ - [HooksniffSdk::SimulatorPostRequest](docs/SimulatorPostRequest.md)
+ - [HooksniffSdk::SimulatorRequest](docs/SimulatorRequest.md)
+ - [HooksniffSdk::SimulatorResponse](docs/SimulatorResponse.md)
+ - [HooksniffSdk::SsoConfigPostRequest](docs/SsoConfigPostRequest.md)
+ - [HooksniffSdk::StatsResponse](docs/StatsResponse.md)
+ - [HooksniffSdk::StreamParams](docs/StreamParams.md)
+ - [HooksniffSdk::SubscriptionResponse](docs/SubscriptionResponse.md)
+ - [HooksniffSdk::SuccessRateResponse](docs/SuccessRateResponse.md)
+ - [HooksniffSdk::SystemStats](docs/SystemStats.md)
+ - [HooksniffSdk::SystemStatsPlanBreakdownInner](docs/SystemStatsPlanBreakdownInner.md)
+ - [HooksniffSdk::SystemStatus](docs/SystemStatus.md)
+ - [HooksniffSdk::SystemStatusComponentsInner](docs/SystemStatusComponentsInner.md)
+ - [HooksniffSdk::Team](docs/Team.md)
+ - [HooksniffSdk::TeamDetailResponse](docs/TeamDetailResponse.md)
+ - [HooksniffSdk::TeamInvite](docs/TeamInvite.md)
+ - [HooksniffSdk::TeamListResponse](docs/TeamListResponse.md)
+ - [HooksniffSdk::TeamMember](docs/TeamMember.md)
+ - [HooksniffSdk::TeamMemberListResponse](docs/TeamMemberListResponse.md)
+ - [HooksniffSdk::TemplateListResponse](docs/TemplateListResponse.md)
+ - [HooksniffSdk::TestWebhookRequest](docs/TestWebhookRequest.md)
+ - [HooksniffSdk::TestWebhookResponse](docs/TestWebhookResponse.md)
+ - [HooksniffSdk::TransformRule](docs/TransformRule.md)
+ - [HooksniffSdk::TransformRuleListResponse](docs/TransformRuleListResponse.md)
+ - [HooksniffSdk::TwoFactorRequiredResponse](docs/TwoFactorRequiredResponse.md)
+ - [HooksniffSdk::UpdateAlertRuleRequest](docs/UpdateAlertRuleRequest.md)
+ - [HooksniffSdk::UpdateEndpointRequest](docs/UpdateEndpointRequest.md)
+ - [HooksniffSdk::UpdateNotificationPreferences](docs/UpdateNotificationPreferences.md)
+ - [HooksniffSdk::UpdateProfileRequest](docs/UpdateProfileRequest.md)
+ - [HooksniffSdk::UpdateRoutingRequest](docs/UpdateRoutingRequest.md)
+ - [HooksniffSdk::UpdateRoutingRuleRequest](docs/UpdateRoutingRuleRequest.md)
+ - [HooksniffSdk::UpdateSSOConfigRequest](docs/UpdateSSOConfigRequest.md)
+ - [HooksniffSdk::UpdateSubscriptionRequest](docs/UpdateSubscriptionRequest.md)
+ - [HooksniffSdk::UpdateTeamRequest](docs/UpdateTeamRequest.md)
+ - [HooksniffSdk::UpdateTransformRuleRequest](docs/UpdateTransformRuleRequest.md)
+ - [HooksniffSdk::UpgradeRequest](docs/UpgradeRequest.md)
+ - [HooksniffSdk::UpgradeResponse](docs/UpgradeResponse.md)
+ - [HooksniffSdk::UsageResponse](docs/UsageResponse.md)
+ - [HooksniffSdk::UsageStatsResponse](docs/UsageStatsResponse.md)
+ - [HooksniffSdk::UserSummary](docs/UserSummary.md)
+ - [HooksniffSdk::ValidateEventRequest](docs/ValidateEventRequest.md)
+ - [HooksniffSdk::ValidateEventResponse](docs/ValidateEventResponse.md)
+ - [HooksniffSdk::ValidateEventResponseErrorsInner](docs/ValidateEventResponseErrorsInner.md)
+ - [HooksniffSdk::Verify2faRequest](docs/Verify2faRequest.md)
+ - [HooksniffSdk::VerifyCustomDomainResponse](docs/VerifyCustomDomainResponse.md)
+ - [HooksniffSdk::VerifyEmailRequest](docs/VerifyEmailRequest.md)
+ - [HooksniffSdk::WebhookFilter](docs/WebhookFilter.md)
+ - [HooksniffSdk::WebhookTemplate](docs/WebhookTemplate.md)
 
 
 ## Documentation for Authorization

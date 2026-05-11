@@ -1,4 +1,4 @@
-# HookSniff.Model.SimulatorResponse
+# HookSniff.Sdk.Model.SimulatorResponse
 Result of a simulated webhook delivery
 
 ## Properties

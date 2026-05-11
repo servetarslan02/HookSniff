@@ -1,4 +1,4 @@
-# HookSniff::RegisterSchemaRequest
+# HooksniffSdk::RegisterSchemaRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RegisterSchemaRequest.new(
+instance = HooksniffSdk::RegisterSchemaRequest.new(
   name: null,
   schema: null
 )

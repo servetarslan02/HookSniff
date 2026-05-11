@@ -4,14 +4,14 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **totalDeliveries** | **kotlin.Int** |  |  [optional] |
-| **successfulDeliveries** | **kotlin.Int** |  |  [optional] |
-| **failedDeliveries** | **kotlin.Int** |  |  [optional] |
-| **totalEndpoints** | **kotlin.Int** |  |  [optional] |
-| **activeEndpoints** | **kotlin.Int** |  |  [optional] |
-| **plan** | **kotlin.String** |  |  [optional] |
-| **webhookLimit** | **kotlin.Int** |  |  [optional] |
-| **webhookCount** | **kotlin.Int** |  |  [optional] |
+| **totalDeliveries** | **kotlin.Int** |  |  |
+| **successfulDeliveries** | **kotlin.Int** |  |  |
+| **failedDeliveries** | **kotlin.Int** |  |  |
+| **totalEndpoints** | **kotlin.Int** |  |  |
+| **activeEndpoints** | **kotlin.Int** |  |  |
+| **plan** | **kotlin.String** |  |  |
+| **webhookLimit** | **kotlin.Int** |  |  |
+| **webhookCount** | **kotlin.Int** |  |  |
 
 
 

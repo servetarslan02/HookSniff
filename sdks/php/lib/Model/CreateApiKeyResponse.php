@@ -296,6 +296,18 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['key'] === null) {
+            $invalidProperties[] = "'key' can't be null";
+        }
+        if ($this->container['prefix'] === null) {
+            $invalidProperties[] = "'prefix' can't be null";
+        }
+        if ($this->container['message'] === null) {
+            $invalidProperties[] = "'message' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -314,7 +326,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -324,7 +336,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -341,7 +353,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets key
      *
-     * @return string|null
+     * @return string
      */
     public function getKey()
     {
@@ -351,7 +363,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets key
      *
-     * @param string|null $key Full API key — only shown once
+     * @param string $key Full API key — only shown once
      *
      * @return self
      */
@@ -368,7 +380,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets prefix
      *
-     * @return string|null
+     * @return string
      */
     public function getPrefix()
     {
@@ -378,7 +390,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets prefix
      *
-     * @param string|null $prefix prefix
+     * @param string $prefix prefix
      *
      * @return self
      */
@@ -395,7 +407,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets message
      *
-     * @return string|null
+     * @return string
      */
     public function getMessage()
     {
@@ -405,7 +417,7 @@ class CreateApiKeyResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets message
      *
-     * @param string|null $message message
+     * @param string $message message
      *
      * @return self
      */

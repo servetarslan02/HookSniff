@@ -1,4 +1,4 @@
-# HookSniff.Model.SchemaListResponse
+# HookSniff.Sdk.Model.SchemaListResponse
 Paginated list of registered schemas
 
 ## Properties

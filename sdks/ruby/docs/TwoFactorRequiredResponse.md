@@ -1,4 +1,4 @@
-# HookSniff::TwoFactorRequiredResponse
+# HooksniffSdk::TwoFactorRequiredResponse
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::TwoFactorRequiredResponse.new(
+instance = HooksniffSdk::TwoFactorRequiredResponse.new(
   requires_2fa: true,
   temp_token: null,
   message: null

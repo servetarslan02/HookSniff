@@ -4,11 +4,11 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **id** | **kotlin.String** |  |  [optional] |
-| **amountCents** | **kotlin.Int** |  |  [optional] |
-| **currency** | **kotlin.String** |  |  [optional] |
-| **status** | **kotlin.String** |  |  [optional] |
-| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  [optional] |
+| **id** | **kotlin.String** |  |  |
+| **amountCents** | **kotlin.Int** |  |  |
+| **currency** | **kotlin.String** |  |  |
+| **status** | **kotlin.String** |  |  |
+| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  |
 
 
 

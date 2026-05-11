@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.VerifyEmailRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :token
   ]

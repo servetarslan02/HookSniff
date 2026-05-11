@@ -313,6 +313,9 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['overall_status'] === null) {
+            $invalidProperties[] = "'overall_status' can't be null";
+        }
         $allowedValues = $this->getOverallStatusAllowableValues();
         if (!is_null($this->container['overall_status']) && !in_array($this->container['overall_status'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -322,6 +325,15 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
             );
         }
 
+        if ($this->container['uptime_30d'] === null) {
+            $invalidProperties[] = "'uptime_30d' can't be null";
+        }
+        if ($this->container['components'] === null) {
+            $invalidProperties[] = "'components' can't be null";
+        }
+        if ($this->container['checked_at'] === null) {
+            $invalidProperties[] = "'checked_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -340,7 +352,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets overall_status
      *
-     * @return string|null
+     * @return string
      */
     public function getOverallStatus()
     {
@@ -350,7 +362,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets overall_status
      *
-     * @param string|null $overall_status overall_status
+     * @param string $overall_status overall_status
      *
      * @return self
      */
@@ -377,7 +389,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets uptime_30d
      *
-     * @return float|null
+     * @return float
      */
     public function getUptime30d()
     {
@@ -387,7 +399,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets uptime_30d
      *
-     * @param float|null $uptime_30d uptime_30d
+     * @param float $uptime_30d uptime_30d
      *
      * @return self
      */
@@ -404,7 +416,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets components
      *
-     * @return \OpenAPI\Client\Model\SystemStatusComponentsInner[]|null
+     * @return \OpenAPI\Client\Model\SystemStatusComponentsInner[]
      */
     public function getComponents()
     {
@@ -414,7 +426,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets components
      *
-     * @param \OpenAPI\Client\Model\SystemStatusComponentsInner[]|null $components components
+     * @param \OpenAPI\Client\Model\SystemStatusComponentsInner[] $components components
      *
      * @return self
      */
@@ -431,7 +443,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets checked_at
      *
-     * @return string|null
+     * @return string
      */
     public function getCheckedAt()
     {
@@ -441,7 +453,7 @@ class SystemStatus implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets checked_at
      *
-     * @param string|null $checked_at checked_at
+     * @param string $checked_at checked_at
      *
      * @return self
      */

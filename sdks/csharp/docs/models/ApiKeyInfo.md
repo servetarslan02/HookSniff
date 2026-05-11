@@ -1,4 +1,4 @@
-# HookSniff.Model.ApiKeyInfo
+# HookSniff.Sdk.Model.ApiKeyInfo
 
 ## Properties
 

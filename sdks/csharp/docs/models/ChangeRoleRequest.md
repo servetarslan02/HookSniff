@@ -1,4 +1,4 @@
-# HookSniff.Model.ChangeRoleRequest
+# HookSniff.Sdk.Model.ChangeRoleRequest
 
 ## Properties
 

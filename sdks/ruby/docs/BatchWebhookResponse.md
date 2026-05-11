@@ -1,4 +1,4 @@
-# HookSniff::BatchWebhookResponse
+# HooksniffSdk::BatchWebhookResponse
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::BatchWebhookResponse.new(
+instance = HooksniffSdk::BatchWebhookResponse.new(
   delivery_ids: null,
   count: null
 )

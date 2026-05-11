@@ -1,4 +1,4 @@
-# HookSniff.Model.DomainDnsRecord
+# HookSniff.Sdk.Model.DomainDnsRecord
 A DNS record required for domain verification
 
 ## Properties

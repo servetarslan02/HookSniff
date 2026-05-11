@@ -4,10 +4,10 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **overallStatus** | [**inline**](#OverallStatus) |  |  [optional] |
-| **uptime30d** | [**java.math.BigDecimal**](java.math.BigDecimal.md) |  |  [optional] |
-| **components** | [**kotlin.collections.List&lt;SystemStatusComponentsInner&gt;**](SystemStatusComponentsInner.md) |  |  [optional] |
-| **checkedAt** | **kotlin.String** |  |  [optional] |
+| **overallStatus** | [**inline**](#OverallStatus) |  |  |
+| **uptime30d** | [**java.math.BigDecimal**](java.math.BigDecimal.md) |  |  |
+| **components** | [**kotlin.collections.List&lt;SystemStatusComponentsInner&gt;**](SystemStatusComponentsInner.md) |  |  |
+| **checkedAt** | **kotlin.String** |  |  |
 
 
 <a id="OverallStatus"></a>

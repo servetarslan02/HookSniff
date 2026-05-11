@@ -1,4 +1,4 @@
-# HookSniff::WebhookTemplate
+# HooksniffSdk::WebhookTemplate
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::WebhookTemplate.new(
+instance = HooksniffSdk::WebhookTemplate.new(
   id: null,
   name: null,
   description: null,

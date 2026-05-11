@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from hooksniff.models.delivery import Delivery
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,8 +29,8 @@ class SearchResult(BaseModel):
     """
     SearchResult
     """ # noqa: E501
-    deliveries: Optional[List[Delivery]] = None
-    total: Optional[StrictInt] = None
+    deliveries: List[Delivery]
+    total: StrictInt
     __properties: ClassVar[List[str]] = ["deliveries", "total"]
 
     model_config = ConfigDict(

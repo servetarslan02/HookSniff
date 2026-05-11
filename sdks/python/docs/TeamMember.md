@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**user_id** | **UUID** |  | [optional] 
-**email** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**user_id** | **UUID** |  | 
+**email** | **str** |  | 
 **name** | **str** |  | [optional] 
-**role** | **str** |  | [optional] 
-**joined_at** | **datetime** |  | [optional] 
+**role** | **str** |  | 
+**joined_at** | **datetime** |  | 
 
 ## Example
 

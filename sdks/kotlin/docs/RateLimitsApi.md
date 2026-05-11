@@ -19,8 +19,8 @@ Delete rate limit for endpoint
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = RateLimitsApi()
 val endpointId : kotlin.String = endpointId_example // kotlin.String | 
@@ -64,8 +64,8 @@ Get rate limit for endpoint
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = RateLimitsApi()
 val endpointId : kotlin.String = endpointId_example // kotlin.String | 
@@ -109,8 +109,8 @@ Set rate limit for endpoint
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = RateLimitsApi()
 val endpointId : kotlin.String = endpointId_example // kotlin.String | 
@@ -154,8 +154,8 @@ List rate limits
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = RateLimitsApi()
 try {

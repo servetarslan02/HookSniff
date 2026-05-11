@@ -1,4 +1,4 @@
-# HookSniff.Model.ExportDataResponse
+# HookSniff.Sdk.Model.ExportDataResponse
 GDPR data export containing all user data
 
 ## Properties

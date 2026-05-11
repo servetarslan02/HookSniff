@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,7 +28,7 @@ class CancelSubscriptionRequest(BaseModel):
     """
     Request to cancel current subscription
     """ # noqa: E501
-    reason: Optional[StrictStr] = Field(default=None, description="Optional reason for cancellation")
+    reason: StrictStr = Field(description="Optional reason for cancellation")
     __properties: ClassVar[List[str]] = ["reason"]
 
     model_config = ConfigDict(

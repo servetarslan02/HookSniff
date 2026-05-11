@@ -1,4 +1,4 @@
-# HookSniff::EndpointHealth
+# HooksniffSdk::EndpointHealth
 
 ## Properties
 
@@ -18,9 +18,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::EndpointHealth.new(
+instance = HooksniffSdk::EndpointHealth.new(
   endpoint_id: null,
   is_healthy: null,
   failure_streak: null,

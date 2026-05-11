@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.PaginatedUsers do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :users,
     :total,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.PaginatedUsers do
   ]
 
   @type t :: %__MODULE__{
-    :users => [HookSniffAPI.Model.UserSummary.t] | nil,
-    :total => integer() | nil,
-    :page => integer() | nil,
-    :per_page => integer() | nil
+    :users => [HookSniffAPI.Model.UserSummary.t],
+    :total => integer(),
+    :page => integer(),
+    :per_page => integer()
   }
 
   alias HookSniffAPI.Deserializer

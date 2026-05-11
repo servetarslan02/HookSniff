@@ -13,41 +13,41 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UpdateEndpointRequest {
-    #[serde(rename = "url", skip_serializing_if = "Option::is_none")]
-    pub url: Option<String>,
-    #[serde(rename = "description", skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-    #[serde(rename = "is_active", skip_serializing_if = "Option::is_none")]
-    pub is_active: Option<bool>,
-    #[serde(rename = "allowed_ips", skip_serializing_if = "Option::is_none")]
-    pub allowed_ips: Option<Vec<String>>,
-    #[serde(rename = "event_filter", skip_serializing_if = "Option::is_none")]
-    pub event_filter: Option<Vec<String>>,
+    #[serde(rename = "url")]
+    pub url: String,
+    #[serde(rename = "description")]
+    pub description: String,
+    #[serde(rename = "is_active")]
+    pub is_active: bool,
+    #[serde(rename = "allowed_ips")]
+    pub allowed_ips: Vec<String>,
+    #[serde(rename = "event_filter")]
+    pub event_filter: Vec<String>,
     #[serde(rename = "custom_headers", skip_serializing_if = "Option::is_none")]
     pub custom_headers: Option<serde_json::Value>,
-    #[serde(rename = "retry_policy", skip_serializing_if = "Option::is_none")]
-    pub retry_policy: Option<Box<models::RetryPolicy>>,
-    #[serde(rename = "routing_strategy", skip_serializing_if = "Option::is_none")]
-    pub routing_strategy: Option<RoutingStrategy>,
-    #[serde(rename = "fallback_url", skip_serializing_if = "Option::is_none")]
-    pub fallback_url: Option<String>,
-    #[serde(rename = "format", skip_serializing_if = "Option::is_none")]
-    pub format: Option<Format>,
+    #[serde(rename = "retry_policy")]
+    pub retry_policy: Box<models::RetryPolicy>,
+    #[serde(rename = "routing_strategy")]
+    pub routing_strategy: RoutingStrategy,
+    #[serde(rename = "fallback_url")]
+    pub fallback_url: String,
+    #[serde(rename = "format")]
+    pub format: Format,
 }
 
 impl UpdateEndpointRequest {
-    pub fn new() -> UpdateEndpointRequest {
+    pub fn new(url: String, description: String, is_active: bool, allowed_ips: Vec<String>, event_filter: Vec<String>, retry_policy: models::RetryPolicy, routing_strategy: RoutingStrategy, fallback_url: String, format: Format) -> UpdateEndpointRequest {
         UpdateEndpointRequest {
-            url: None,
-            description: None,
-            is_active: None,
-            allowed_ips: None,
-            event_filter: None,
+            url,
+            description,
+            is_active,
+            allowed_ips,
+            event_filter,
             custom_headers: None,
-            retry_policy: None,
-            routing_strategy: None,
-            fallback_url: None,
-            format: None,
+            retry_policy: Box::new(retry_policy),
+            routing_strategy,
+            fallback_url,
+            format,
         }
     }
 }

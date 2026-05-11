@@ -1,4 +1,4 @@
-# HookSniff.Model.ApplyTemplateResponse
+# HookSniff.Sdk.Model.ApplyTemplateResponse
 
 ## Properties
 

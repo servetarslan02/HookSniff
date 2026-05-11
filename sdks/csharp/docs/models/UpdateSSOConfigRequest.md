@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateSSOConfigRequest
+# HookSniff.Sdk.Model.UpdateSSOConfigRequest
 Update an SSO configuration (all fields optional)
 
 ## Properties

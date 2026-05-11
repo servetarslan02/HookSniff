@@ -12,13 +12,13 @@ import AnyCodable
 
 public struct SystemStats: Codable, JSONEncodable, Hashable {
 
-    public var totalUsers: Int?
-    public var activeUsers: Int?
-    public var totalEndpoints: Int?
-    public var totalDeliveries: Int?
-    public var planBreakdown: [SystemStatsPlanBreakdownInner]?
+    public var totalUsers: Int
+    public var activeUsers: Int
+    public var totalEndpoints: Int
+    public var totalDeliveries: Int
+    public var planBreakdown: [SystemStatsPlanBreakdownInner]
 
-    public init(totalUsers: Int? = nil, activeUsers: Int? = nil, totalEndpoints: Int? = nil, totalDeliveries: Int? = nil, planBreakdown: [SystemStatsPlanBreakdownInner]? = nil) {
+    public init(totalUsers: Int, activeUsers: Int, totalEndpoints: Int, totalDeliveries: Int, planBreakdown: [SystemStatsPlanBreakdownInner]) {
         self.totalUsers = totalUsers
         self.activeUsers = activeUsers
         self.totalEndpoints = totalEndpoints
@@ -38,11 +38,11 @@ public struct SystemStats: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(totalUsers, forKey: .totalUsers)
-        try container.encodeIfPresent(activeUsers, forKey: .activeUsers)
-        try container.encodeIfPresent(totalEndpoints, forKey: .totalEndpoints)
-        try container.encodeIfPresent(totalDeliveries, forKey: .totalDeliveries)
-        try container.encodeIfPresent(planBreakdown, forKey: .planBreakdown)
+        try container.encode(totalUsers, forKey: .totalUsers)
+        try container.encode(activeUsers, forKey: .activeUsers)
+        try container.encode(totalEndpoints, forKey: .totalEndpoints)
+        try container.encode(totalDeliveries, forKey: .totalDeliveries)
+        try container.encode(planBreakdown, forKey: .planBreakdown)
     }
 }
 

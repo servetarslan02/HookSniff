@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.NotificationsUnreadCountGet200Response do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :count
   ]

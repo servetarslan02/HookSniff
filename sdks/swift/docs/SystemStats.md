@@ -3,11 +3,11 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**totalUsers** | **Int** |  | [optional] 
-**activeUsers** | **Int** |  | [optional] 
-**totalEndpoints** | **Int** |  | [optional] 
-**totalDeliveries** | **Int** |  | [optional] 
-**planBreakdown** | [SystemStatsPlanBreakdownInner] |  | [optional] 
+**totalUsers** | **Int** |  | 
+**activeUsers** | **Int** |  | 
+**totalEndpoints** | **Int** |  | 
+**totalDeliveries** | **Int** |  | 
+**planBreakdown** | [SystemStatsPlanBreakdownInner] |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

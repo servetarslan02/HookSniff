@@ -2,7 +2,7 @@
 
 HookSniff API
 - API version: 1.0.0
-  - Build date: 2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]
+  - Build date: 2026-05-11T22:27:59.532401633+08:00[Asia/Shanghai]
   - Generator version: 7.22.0
 
 Webhook delivery, monitoring, and management API.
@@ -43,7 +43,7 @@ Add this dependency to your project's POM:
 
 ```xml
 <dependency>
-  <groupId>io.github.servetarslan02</groupId>
+  <groupId>org.openapitools</groupId>
   <artifactId>hooksniff-sdk</artifactId>
   <version>0.3.0</version>
   <scope>compile</scope>
@@ -61,7 +61,7 @@ Add this dependency to your project's build file:
   }
 
   dependencies {
-     implementation "io.github.servetarslan02:hooksniff-sdk:0.3.0"
+     implementation "org.openapitools:hooksniff-sdk:0.3.0"
   }
 ```
 

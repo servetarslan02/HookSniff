@@ -17,8 +17,8 @@ Get playground info (endpoints, sample payloads)
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = PlaygroundApi()
 try {
@@ -60,8 +60,8 @@ Test a webhook delivery
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = PlaygroundApi()
 val testWebhookRequest : TestWebhookRequest =  // TestWebhookRequest | 

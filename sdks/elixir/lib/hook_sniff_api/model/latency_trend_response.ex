@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.LatencyTrendResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :range,
     :buckets,
@@ -14,9 +14,9 @@ defmodule HookSniffAPI.Model.LatencyTrendResponse do
   ]
 
   @type t :: %__MODULE__{
-    :range => String.t | nil,
-    :buckets => [HookSniffAPI.Model.LatencyTrendResponseBucketsInner.t] | nil,
-    :overall_avg_ms => number() | nil
+    :range => String.t,
+    :buckets => [HookSniffAPI.Model.LatencyTrendResponseBucketsInner.t],
+    :overall_avg_ms => number()
   }
 
   alias HookSniffAPI.Deserializer

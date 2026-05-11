@@ -1,4 +1,4 @@
-# HookSniff::TestWebhookRequest
+# HooksniffSdk::TestWebhookRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::TestWebhookRequest.new(
+instance = HooksniffSdk::TestWebhookRequest.new(
   endpoint_id: null,
   payload: null,
   event: null

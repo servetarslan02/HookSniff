@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | Option<**uuid::Uuid**> |  | [optional]
-**endpoint_id** | Option<**uuid::Uuid**> |  | [optional]
-**name** | Option<**String**> |  | [optional]
-**rule_type** | Option<**String**> |  | [optional]
+**id** | **uuid::Uuid** |  | 
+**endpoint_id** | **uuid::Uuid** |  | 
+**name** | **String** |  | 
+**rule_type** | **String** |  | 
 **config** | Option<**serde_json::Value**> |  | [optional]
-**is_active** | Option<**bool**> |  | [optional]
-**created_at** | Option<**chrono::DateTime<chrono::FixedOffset>**> |  | [optional]
+**is_active** | **bool** |  | 
+**created_at** | **chrono::DateTime<chrono::FixedOffset>** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

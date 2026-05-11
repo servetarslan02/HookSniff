@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.RoutingInfo do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :endpoint_id,
     :routing_strategy,
@@ -17,12 +17,12 @@ defmodule HookSniffAPI.Model.RoutingInfo do
   ]
 
   @type t :: %__MODULE__{
-    :endpoint_id => String.t | nil,
-    :routing_strategy => String.t | nil,
+    :endpoint_id => String.t,
+    :routing_strategy => String.t,
     :fallback_url => String.t | nil,
-    :avg_response_ms => integer() | nil,
-    :failure_streak => integer() | nil,
-    :is_healthy => boolean() | nil
+    :avg_response_ms => integer(),
+    :failure_streak => integer(),
+    :is_healthy => boolean()
   }
 
   def decode(value) do

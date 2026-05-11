@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.BatchWebhookRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :webhooks
   ]

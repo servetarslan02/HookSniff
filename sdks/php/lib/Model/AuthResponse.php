@@ -289,6 +289,12 @@ class AuthResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['token'] === null) {
+            $invalidProperties[] = "'token' can't be null";
+        }
+        if ($this->container['customer'] === null) {
+            $invalidProperties[] = "'customer' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -307,7 +313,7 @@ class AuthResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets token
      *
-     * @return string|null
+     * @return string
      */
     public function getToken()
     {
@@ -317,7 +323,7 @@ class AuthResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets token
      *
-     * @param string|null $token JWT access token
+     * @param string $token JWT access token
      *
      * @return self
      */
@@ -334,7 +340,7 @@ class AuthResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets customer
      *
-     * @return \OpenAPI\Client\Model\CustomerResponse|null
+     * @return \OpenAPI\Client\Model\CustomerResponse
      */
     public function getCustomer()
     {
@@ -344,7 +350,7 @@ class AuthResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets customer
      *
-     * @param \OpenAPI\Client\Model\CustomerResponse|null $customer customer
+     * @param \OpenAPI\Client\Model\CustomerResponse $customer customer
      *
      * @return self
      */

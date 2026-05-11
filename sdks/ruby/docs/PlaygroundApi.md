@@ -1,4 +1,4 @@
-# HookSniff::PlaygroundApi
+# HooksniffSdk::PlaygroundApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -18,20 +18,20 @@ Get playground info (endpoints, sample payloads)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::PlaygroundApi.new
+api_instance = HooksniffSdk::PlaygroundApi.new
 
 begin
   # Get playground info (endpoints, sample payloads)
   result = api_instance.playground_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling PlaygroundApi->playground_get: #{e}"
 end
 ```
@@ -49,7 +49,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <PlaygroundGet200Response>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling PlaygroundApi->playground_get_with_http_info: #{e}"
 end
 ```
@@ -82,21 +82,21 @@ Test a webhook delivery
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::PlaygroundApi.new
-test_webhook_request = HookSniff::TestWebhookRequest.new({endpoint_id: 'endpoint_id_example', payload: 3.56}) # TestWebhookRequest | 
+api_instance = HooksniffSdk::PlaygroundApi.new
+test_webhook_request = HooksniffSdk::TestWebhookRequest.new({endpoint_id: 'endpoint_id_example', payload: 3.56}) # TestWebhookRequest | 
 
 begin
   # Test a webhook delivery
   result = api_instance.playground_test_post(test_webhook_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling PlaygroundApi->playground_test_post: #{e}"
 end
 ```
@@ -114,7 +114,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <TestWebhookResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling PlaygroundApi->playground_test_post_with_http_info: #{e}"
 end
 ```

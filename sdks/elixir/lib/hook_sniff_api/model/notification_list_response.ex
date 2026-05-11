@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.NotificationListResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :notifications,
     :total,
@@ -14,9 +14,9 @@ defmodule HookSniffAPI.Model.NotificationListResponse do
   ]
 
   @type t :: %__MODULE__{
-    :notifications => [HookSniffAPI.Model.Notification.t] | nil,
-    :total => integer() | nil,
-    :unread_count => integer() | nil
+    :notifications => [HookSniffAPI.Model.Notification.t],
+    :total => integer(),
+    :unread_count => integer()
   }
 
   alias HookSniffAPI.Deserializer

@@ -1,4 +1,4 @@
-# HookSniff.Model.DeviceTokenResponse
+# HookSniff.Sdk.Model.DeviceTokenResponse
 
 ## Properties
 

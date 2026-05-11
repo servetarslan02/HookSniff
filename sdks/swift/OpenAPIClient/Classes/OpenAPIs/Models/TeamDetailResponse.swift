@@ -12,11 +12,11 @@ import AnyCodable
 
 public struct TeamDetailResponse: Codable, JSONEncodable, Hashable {
 
-    public var team: Team?
-    public var members: [TeamMember]?
-    public var invites: [TeamInvite]?
+    public var team: Team
+    public var members: [TeamMember]
+    public var invites: [TeamInvite]
 
-    public init(team: Team? = nil, members: [TeamMember]? = nil, invites: [TeamInvite]? = nil) {
+    public init(team: Team, members: [TeamMember], invites: [TeamInvite]) {
         self.team = team
         self.members = members
         self.invites = invites
@@ -32,9 +32,9 @@ public struct TeamDetailResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(team, forKey: .team)
-        try container.encodeIfPresent(members, forKey: .members)
-        try container.encodeIfPresent(invites, forKey: .invites)
+        try container.encode(team, forKey: .team)
+        try container.encode(members, forKey: .members)
+        try container.encode(invites, forKey: .invites)
     }
 }
 

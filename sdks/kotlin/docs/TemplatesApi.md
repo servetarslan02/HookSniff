@@ -18,8 +18,8 @@ List available templates
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TemplatesApi()
 val category : kotlin.String = category_example // kotlin.String | 
@@ -64,8 +64,8 @@ Apply template to an endpoint
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TemplatesApi()
 val id : kotlin.String = id_example // kotlin.String | 
@@ -112,8 +112,8 @@ Get template by ID
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TemplatesApi()
 val id : kotlin.String = id_example // kotlin.String | 

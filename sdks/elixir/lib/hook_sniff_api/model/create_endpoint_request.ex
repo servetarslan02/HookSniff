@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.CreateEndpointRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :url,
     :description,

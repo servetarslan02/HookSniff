@@ -1,4 +1,4 @@
-# HookSniff::UpdateSubscriptionRequest
+# HooksniffSdk::UpdateSubscriptionRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::UpdateSubscriptionRequest.new(
+instance = HooksniffSdk::UpdateSubscriptionRequest.new(
   plan: null,
   proration: null
 )
