@@ -1,119 +1,113 @@
-openapi: "3.0.3"
-
+openapi: 3.0.3
 info:
   title: HookSniff API
-  version: "1.0.0"
-  description: |
-    Webhook delivery, monitoring, and management API.
+  version: 1.0.0
+  description: 'Webhook delivery, monitoring, and management API.
+
     All endpoints under `/v1` require authentication via `Authorization: Bearer <api_key>` header
+
     unless marked as **Public**.
+
+    '
   contact:
     name: HookSniff Support
     email: support@hooksniff.vercel.app
     url: https://hooksniff.vercel.app
   license:
     name: Proprietary
-
 servers:
-  - url: https://hooksniff-api-1046140057667.europe-west1.run.app/v1
-    description: Production (Google Cloud Run)
-  - url: http://localhost:3000/v1
-    description: Local development
-
+- url: https://hooksniff-api-1046140057667.europe-west1.run.app/v1
+  description: Production (Google Cloud Run)
+- url: http://localhost:3000/v1
+  description: Local development
 tags:
-  - name: Auth
-    description: Registration, login, password reset, email verification, 2FA
-  - name: Endpoints
-    description: Manage webhook destination endpoints
-  - name: Webhooks
-    description: Send and manage webhook deliveries
-  - name: API Keys
-    description: Manage API keys
-  - name: Alerts
-    description: Alert rules and notifications
-  - name: Analytics
-    description: Delivery trends, success rates, latency metrics
-  - name: Stats
-    description: Account usage statistics
-  - name: Search
-    description: Search webhook deliveries
-  - name: Inbound
-    description: Receive webhooks from external providers
-  - name: Notifications
-    description: In-app notification management
-  - name: Devices
-    description: Push notification device tokens
-  - name: Teams
-    description: Team management and invitations
-  - name: Billing
-    description: Subscription, usage, invoices, payment webhooks
-  - name: Templates
-    description: Webhook payload templates
-  - name: Schemas
-    description: JSON Schema registry and validation
-  - name: Routing
-    description: Smart routing configuration per endpoint
-  - name: Playground
-    description: Test webhooks in sandbox
-  - name: Transforms
-    description: Payload transformation rules
-  - name: Stream
-    description: Real-time delivery event stream (SSE)
-  - name: Admin
-    description: Admin-only user and system management
-  - name: Contact
-    description: Contact form submission
-  - name: Outbound IPs
-    description: Static IPs for firewall whitelisting
-  - name: Health
-    description: System health and status
-  - name: Customer Portal
-    description: Self-service customer portal
-  - name: Delivery Details
-    description: Detailed delivery and attempt info
-  - name: Audit Log
-    description: Audit trail for all account actions
-  - name: SSO
-    description: Single Sign-On configuration (SAML/OIDC)
-  - name: Custom Domains
-    description: Custom domain management
-  - name: OAuth
-    description: OAuth/SSO login providers
-  - name: Rate Limits
-    description: Per-endpoint rate limiting
-  - name: Embed
-    description: Embeddable customer portal widget
-  - name: Simulator
-    description: Webhook simulator for testing
-  - name: Events
-    description: Event type management
-
+- name: Auth
+  description: Registration, login, password reset, email verification, 2FA
+- name: Endpoints
+  description: Manage webhook destination endpoints
+- name: Webhooks
+  description: Send and manage webhook deliveries
+- name: API Keys
+  description: Manage API keys
+- name: Alerts
+  description: Alert rules and notifications
+- name: Analytics
+  description: Delivery trends, success rates, latency metrics
+- name: Stats
+  description: Account usage statistics
+- name: Search
+  description: Search webhook deliveries
+- name: Inbound
+  description: Receive webhooks from external providers
+- name: Notifications
+  description: In-app notification management
+- name: Devices
+  description: Push notification device tokens
+- name: Teams
+  description: Team management and invitations
+- name: Billing
+  description: Subscription, usage, invoices, payment webhooks
+- name: Templates
+  description: Webhook payload templates
+- name: Schemas
+  description: JSON Schema registry and validation
+- name: Routing
+  description: Smart routing configuration per endpoint
+- name: Playground
+  description: Test webhooks in sandbox
+- name: Transforms
+  description: Payload transformation rules
+- name: Stream
+  description: Real-time delivery event stream (SSE)
+- name: Admin
+  description: Admin-only user and system management
+- name: Contact
+  description: Contact form submission
+- name: Outbound IPs
+  description: Static IPs for firewall whitelisting
+- name: Health
+  description: System health and status
+- name: Customer Portal
+  description: Self-service customer portal
+- name: Delivery Details
+  description: Detailed delivery and attempt info
+- name: Audit Log
+  description: Audit trail for all account actions
+- name: SSO
+  description: Single Sign-On configuration (SAML/OIDC)
+- name: Custom Domains
+  description: Custom domain management
+- name: OAuth
+  description: OAuth/SSO login providers
+- name: Rate Limits
+  description: Per-endpoint rate limiting
+- name: Embed
+  description: Embeddable customer portal widget
+- name: Simulator
+  description: Webhook simulator for testing
+- name: Events
+  description: Event type management
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       description: API key passed as Bearer token
-
   schemas:
-    # ── Common ──
     Error:
       type: object
       properties:
         error:
           type: string
           description: Human-readable error message
-      required: [error]
-
+      required:
+      - error
     Uuid:
       type: string
       format: uuid
-
     DateTime:
       type: string
       format: date-time
-
-    # ── Auth ──
     RegisterRequest:
       type: object
       properties:
@@ -125,8 +119,8 @@ components:
           minLength: 8
         name:
           type: string
-      required: [email]
-
+      required:
+      - email
     LoginRequest:
       type: object
       properties:
@@ -135,8 +129,9 @@ components:
           format: email
         password:
           type: string
-      required: [email, password]
-
+      required:
+      - email
+      - password
     LogoutRequest:
       type: object
       description: Optional request body for explicit refresh token invalidation
@@ -144,7 +139,6 @@ components:
         refresh_token:
           type: string
           description: Refresh token to invalidate
-
     AuthResponse:
       type: object
       properties:
@@ -152,11 +146,10 @@ components:
           type: string
           description: JWT access token
         customer:
-          $ref: "#/components/schemas/CustomerResponse"
+          $ref: '#/components/schemas/CustomerResponse'
         refresh_token:
           type: string
           description: Refresh token (when applicable)
-
     TwoFactorRequiredResponse:
       type: object
       properties:
@@ -167,12 +160,11 @@ components:
           type: string
         message:
           type: string
-
     CustomerResponse:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         email:
           type: string
         name:
@@ -184,7 +176,10 @@ components:
           nullable: true
         plan:
           type: string
-          enum: [free, pro, business]
+          enum:
+          - free
+          - pro
+          - business
         webhook_limit:
           type: integer
         webhook_count:
@@ -192,16 +187,15 @@ components:
         is_admin:
           type: boolean
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     ForgotPasswordRequest:
       type: object
       properties:
         email:
           type: string
           format: email
-      required: [email]
-
+      required:
+      - email
     ResetPasswordRequest:
       type: object
       properties:
@@ -210,30 +204,31 @@ components:
         new_password:
           type: string
           minLength: 8
-      required: [token, new_password]
-
+      required:
+      - token
+      - new_password
     VerifyEmailRequest:
       type: object
       properties:
         token:
           type: string
-      required: [token]
-
+      required:
+      - token
     ResendVerificationRequest:
       type: object
       properties:
         email:
           type: string
           format: email
-      required: [email]
-
+      required:
+      - email
     RefreshTokenRequest:
       type: object
       properties:
         refresh_token:
           type: string
-      required: [refresh_token]
-
+      required:
+      - refresh_token
     Verify2faRequest:
       type: object
       properties:
@@ -243,15 +238,16 @@ components:
           type: string
           minLength: 6
           maxLength: 6
-      required: [temp_token, code]
-
+      required:
+      - temp_token
+      - code
     Enable2faRequest:
       type: object
       properties:
         password:
           type: string
-      required: [password]
-
+      required:
+      - password
     Confirm2faRequest:
       type: object
       properties:
@@ -259,15 +255,15 @@ components:
           type: string
           minLength: 6
           maxLength: 6
-      required: [code]
-
+      required:
+      - code
     Disable2faRequest:
       type: object
       properties:
         password:
           type: string
-      required: [password]
-
+      required:
+      - password
     Enable2faResponse:
       type: object
       description: TOTP secret and QR code URL returned after enabling 2FA
@@ -279,30 +275,31 @@ components:
           type: string
           format: uri
           description: QR code provisioning URL
-      required: [secret, qr_url]
-
+      required:
+      - secret
+      - qr_url
     ExportDataResponse:
       type: object
       description: GDPR data export containing all user data
       properties:
         user:
-          $ref: "#/components/schemas/CustomerResponse"
+          $ref: '#/components/schemas/CustomerResponse'
         endpoints:
           type: array
           items:
-            $ref: "#/components/schemas/Endpoint"
+            $ref: '#/components/schemas/Endpoint'
         deliveries:
           type: array
           items:
-            $ref: "#/components/schemas/Delivery"
+            $ref: '#/components/schemas/Delivery'
         teams:
           type: array
           items:
-            $ref: "#/components/schemas/Team"
+            $ref: '#/components/schemas/Team'
         exported_at:
-          $ref: "#/components/schemas/DateTime"
-      required: [exported_at]
-
+          $ref: '#/components/schemas/DateTime'
+      required:
+      - exported_at
     UpdateProfileRequest:
       type: object
       properties:
@@ -311,8 +308,9 @@ components:
         email:
           type: string
           format: email
-      required: [name, email]
-
+      required:
+      - name
+      - email
     ChangePasswordRequest:
       type: object
       properties:
@@ -321,14 +319,14 @@ components:
         new_password:
           type: string
           minLength: 8
-      required: [current_password, new_password]
-
-    # ── Endpoints ──
+      required:
+      - current_password
+      - new_password
     Endpoint:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         url:
           type: string
           format: uri
@@ -338,9 +336,9 @@ components:
         is_active:
           type: boolean
         retry_policy:
-          $ref: "#/components/schemas/RetryPolicy"
+          $ref: '#/components/schemas/RetryPolicy'
         created_at:
-          $ref: "#/components/schemas/DateTime"
+          $ref: '#/components/schemas/DateTime'
         allowed_ips:
           type: array
           items:
@@ -358,7 +356,10 @@ components:
           nullable: true
         routing_strategy:
           type: string
-          enum: [round-robin, latency, failover]
+          enum:
+          - round-robin
+          - latency
+          - failover
         fallback_url:
           type: string
           format: uri
@@ -369,8 +370,9 @@ components:
           type: integer
         format:
           type: string
-          enum: [standard, cloudevents]
-
+          enum:
+          - standard
+          - cloudevents
     EndpointListResponse:
       type: object
       description: Paginated list of endpoints
@@ -378,13 +380,15 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Endpoint"
+            $ref: '#/components/schemas/Endpoint'
         total:
           type: integer
         has_more:
           type: boolean
-      required: [data, total, has_more]
-
+      required:
+      - data
+      - total
+      - has_more
     CreateEndpointRequest:
       type: object
       properties:
@@ -404,19 +408,24 @@ components:
         custom_headers:
           type: object
         retry_policy:
-          $ref: "#/components/schemas/RetryPolicy"
+          $ref: '#/components/schemas/RetryPolicy'
         routing_strategy:
           type: string
-          enum: [round-robin, latency, failover]
+          enum:
+          - round-robin
+          - latency
+          - failover
         fallback_url:
           type: string
           format: uri
         format:
           type: string
-          enum: [standard, cloudevents]
+          enum:
+          - standard
+          - cloudevents
           default: standard
-      required: [url]
-
+      required:
+      - url
     UpdateEndpointRequest:
       type: object
       properties:
@@ -438,17 +447,21 @@ components:
         custom_headers:
           type: object
         retry_policy:
-          $ref: "#/components/schemas/RetryPolicy"
+          $ref: '#/components/schemas/RetryPolicy'
         routing_strategy:
           type: string
-          enum: [round-robin, latency, failover]
+          enum:
+          - round-robin
+          - latency
+          - failover
         fallback_url:
           type: string
           format: uri
         format:
           type: string
-          enum: [standard, cloudevents]
-
+          enum:
+          - standard
+          - cloudevents
     RetryPolicy:
       type: object
       properties:
@@ -457,7 +470,10 @@ components:
           default: 3
         backoff:
           type: string
-          enum: [exponential, linear, fixed]
+          enum:
+          - exponential
+          - linear
+          - fixed
           default: exponential
         initial_delay_secs:
           type: integer
@@ -465,7 +481,6 @@ components:
         max_delay_secs:
           type: integer
           default: 3600
-
     RotateSecretResponse:
       type: object
       description: New signing secret after rotation
@@ -473,44 +488,48 @@ components:
         secret:
           type: string
           description: New endpoint signing secret
-      required: [secret]
-
-    # ── Webhooks / Deliveries ──
+      required:
+      - secret
     CreateWebhookRequest:
       type: object
       properties:
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         event:
           type: string
           description: Event type (e.g. "order.created")
         data:
           type: object
           description: Webhook payload
-      required: [endpoint_id, data]
-
+      required:
+      - endpoint_id
+      - data
     BatchWebhookRequest:
       type: object
       properties:
         webhooks:
           type: array
           items:
-            $ref: "#/components/schemas/CreateWebhookRequest"
-      required: [webhooks]
-
+            $ref: '#/components/schemas/CreateWebhookRequest'
+      required:
+      - webhooks
     Delivery:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         event:
           type: string
           nullable: true
         status:
           type: string
-          enum: [pending, processing, delivered, failed]
+          enum:
+          - pending
+          - processing
+          - delivered
+          - failed
         attempt_count:
           type: integer
         response_status:
@@ -519,29 +538,27 @@ components:
         replay_count:
           type: integer
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     DeliveryListResponse:
       type: object
       properties:
         deliveries:
           type: array
           items:
-            $ref: "#/components/schemas/Delivery"
+            $ref: '#/components/schemas/Delivery'
         total:
           type: integer
         page:
           type: integer
         per_page:
           type: integer
-
     BatchResponse:
       type: object
       properties:
         deliveries:
           type: array
           items:
-            $ref: "#/components/schemas/Delivery"
+            $ref: '#/components/schemas/Delivery'
         errors:
           type: array
           items:
@@ -551,12 +568,11 @@ components:
                 type: integer
               error:
                 type: string
-
     DeliveryAttempt:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         attempt_number:
           type: integer
         status_code:
@@ -572,23 +588,21 @@ components:
           type: string
           nullable: true
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     BatchReplayRequest:
       type: object
       properties:
         ids:
           type: array
           items:
-            $ref: "#/components/schemas/Uuid"
-      required: [ids]
-
-    # ── API Keys ──
+            $ref: '#/components/schemas/Uuid'
+      required:
+      - ids
     ApiKeyInfo:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         prefix:
           type: string
           description: Masked key prefix (e.g. "hs_abc1...")
@@ -599,12 +613,11 @@ components:
           nullable: true
         is_active:
           type: boolean
-
     CreateApiKeyResponse:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         key:
           type: string
           description: Full API key — only shown once
@@ -612,30 +625,33 @@ components:
           type: string
         message:
           type: string
-
-    # ── Alerts ──
     AlertRule:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         name:
           type: string
         condition:
           type: string
-          enum: [failure_rate, latency, consecutive_failures]
+          enum:
+          - failure_rate
+          - latency
+          - consecutive_failures
         threshold:
           type: integer
         channels:
           type: array
           items:
             type: string
-            enum: [slack, email, webhook]
+            enum:
+            - slack
+            - email
+            - webhook
         is_active:
           type: boolean
         created_at:
           type: string
-
     CreateAlertRequest:
       type: object
       properties:
@@ -643,7 +659,10 @@ components:
           type: string
         condition:
           type: string
-          enum: [failure_rate, latency, consecutive_failures]
+          enum:
+          - failure_rate
+          - latency
+          - consecutive_failures
         threshold:
           type: integer
         channels:
@@ -651,10 +670,12 @@ components:
           items:
             type: string
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
-      required: [name, condition, threshold, channels]
-
-    # ── Analytics ──
+          $ref: '#/components/schemas/Uuid'
+      required:
+      - name
+      - condition
+      - threshold
+      - channels
     DeliveryTrendResponse:
       type: object
       properties:
@@ -673,7 +694,6 @@ components:
                 type: integer
               total:
                 type: integer
-
     SuccessRateResponse:
       type: object
       properties:
@@ -688,7 +708,6 @@ components:
         success_rate:
           type: number
           format: double
-
     LatencyTrendResponse:
       type: object
       properties:
@@ -707,8 +726,6 @@ components:
                 type: number
         overall_avg_ms:
           type: number
-
-    # ── Stats ──
     StatsResponse:
       type: object
       properties:
@@ -728,24 +745,20 @@ components:
           type: integer
         webhook_count:
           type: integer
-
-    # ── Search ──
     SearchResult:
       type: object
       properties:
         deliveries:
           type: array
           items:
-            $ref: "#/components/schemas/Delivery"
+            $ref: '#/components/schemas/Delivery'
         total:
           type: integer
-
-    # ── Notifications ──
     Notification:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         title:
           type: string
         body:
@@ -756,21 +769,18 @@ components:
           type: string
           nullable: true
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     NotificationListResponse:
       type: object
       properties:
         notifications:
           type: array
           items:
-            $ref: "#/components/schemas/Notification"
+            $ref: '#/components/schemas/Notification'
         total:
           type: integer
         unread_count:
           type: integer
-
-    # ── Devices ──
     RegisterDeviceRequest:
       type: object
       properties:
@@ -779,39 +789,39 @@ components:
           description: FCM device token
         platform:
           type: string
-          enum: [android, ios, web]
-      required: [token]
-
+          enum:
+          - android
+          - ios
+          - web
+      required:
+      - token
     DeviceTokenResponse:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         token:
           type: string
         platform:
           type: string
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
-    # ── Teams ──
+          $ref: '#/components/schemas/DateTime'
     Team:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         name:
           type: string
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     CreateTeamRequest:
       type: object
       properties:
         name:
           type: string
-      required: [name]
-
+      required:
+      - name
     InviteRequest:
       type: object
       properties:
@@ -820,38 +830,43 @@ components:
           format: email
         role:
           type: string
-          enum: [admin, member, viewer]
-      required: [email]
-
+          enum:
+          - admin
+          - member
+          - viewer
+      required:
+      - email
     ChangeRoleRequest:
       type: object
       properties:
         role:
           type: string
-          enum: [admin, member, viewer]
-      required: [role]
-
+          enum:
+          - admin
+          - member
+          - viewer
+      required:
+      - role
     TeamDetailResponse:
       type: object
       properties:
         team:
-          $ref: "#/components/schemas/Team"
+          $ref: '#/components/schemas/Team'
         members:
           type: array
           items:
-            $ref: "#/components/schemas/TeamMember"
+            $ref: '#/components/schemas/TeamMember'
         invites:
           type: array
           items:
-            $ref: "#/components/schemas/TeamInvite"
-
+            $ref: '#/components/schemas/TeamInvite'
     TeamMember:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         user_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         email:
           type: string
         name:
@@ -860,21 +875,18 @@ components:
         role:
           type: string
         joined_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     TeamInvite:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         email:
           type: string
         role:
           type: string
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
-    # ── Billing ──
+          $ref: '#/components/schemas/DateTime'
     SubscriptionResponse:
       type: object
       properties:
@@ -892,18 +904,22 @@ components:
           type: integer
         monthly_price_cents:
           type: integer
-
     UpgradeRequest:
       type: object
       properties:
         plan:
           type: string
-          enum: [pro, business]
+          enum:
+          - pro
+          - business
         provider:
           type: string
-          enum: [stripe, polar, iyzico]
-      required: [plan]
-
+          enum:
+          - stripe
+          - polar
+          - iyzico
+      required:
+      - plan
     UpgradeResponse:
       type: object
       properties:
@@ -914,16 +930,15 @@ components:
           type: string
         message:
           type: string
-
     UsageResponse:
       type: object
       properties:
         plan:
           type: string
         period_start:
-          $ref: "#/components/schemas/DateTime"
+          $ref: '#/components/schemas/DateTime'
         period_end:
-          $ref: "#/components/schemas/DateTime"
+          $ref: '#/components/schemas/DateTime'
         webhooks_used:
           type: integer
         webhooks_limit:
@@ -932,7 +947,6 @@ components:
           type: integer
         endpoints_limit:
           type: integer
-
     InvoiceResponse:
       type: object
       properties:
@@ -945,9 +959,7 @@ components:
         status:
           type: string
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
-    # ── Templates ──
+          $ref: '#/components/schemas/DateTime'
     WebhookTemplate:
       type: object
       properties:
@@ -961,16 +973,15 @@ components:
           type: string
         payload_template:
           type: object
-
     ApplyTemplateRequest:
       type: object
       properties:
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         variables:
           type: object
-      required: [endpoint_id]
-
+      required:
+      - endpoint_id
     ApplyTemplateResponse:
       type: object
       properties:
@@ -978,8 +989,6 @@ components:
           type: boolean
         message:
           type: string
-
-    # ── Schemas ──
     RegisterSchemaRequest:
       type: object
       properties:
@@ -988,21 +997,21 @@ components:
         schema:
           type: object
           description: JSON Schema document
-      required: [name, schema]
-
+      required:
+      - name
+      - schema
     ValidateEventRequest:
       type: object
       properties:
         event:
           type: object
-      required: [event]
-
-    # ── Routing ──
+      required:
+      - event
     RoutingInfo:
       type: object
       properties:
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         routing_strategy:
           type: string
         fallback_url:
@@ -1014,22 +1023,23 @@ components:
           type: integer
         is_healthy:
           type: boolean
-
     UpdateRoutingRequest:
       type: object
       properties:
         routing_strategy:
           type: string
-          enum: [round-robin, latency, failover]
+          enum:
+          - round-robin
+          - latency
+          - failover
         fallback_url:
           type: string
           format: uri
-
     EndpointHealth:
       type: object
       properties:
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         is_healthy:
           type: boolean
         failure_streak:
@@ -1037,21 +1047,20 @@ components:
         avg_response_ms:
           type: integer
         last_failure_at:
-          $ref: "#/components/schemas/DateTime"
+          $ref: '#/components/schemas/DateTime'
           nullable: true
-
-    # ── Playground ──
     TestWebhookRequest:
       type: object
       properties:
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         payload:
           type: object
         event:
           type: string
-      required: [endpoint_id, payload]
-
+      required:
+      - endpoint_id
+      - payload
     TestWebhookResponse:
       type: object
       properties:
@@ -1063,15 +1072,13 @@ components:
           type: integer
         response_body:
           type: string
-
-    # ── Transforms ──
     TransformRule:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         name:
           type: string
         rule_type:
@@ -1081,8 +1088,7 @@ components:
         is_active:
           type: boolean
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     CreateTransformRuleRequest:
       type: object
       properties:
@@ -1092,9 +1098,10 @@ components:
           type: string
         config:
           type: object
-      required: [name, rule_type, config]
-
-    # ── Contact ──
+      required:
+      - name
+      - rule_type
+      - config
     ContactRequest:
       type: object
       properties:
@@ -1107,8 +1114,11 @@ components:
           type: string
         message:
           type: string
-      required: [name, email, subject, message]
-
+      required:
+      - name
+      - email
+      - subject
+      - message
     ContactResponse:
       type: object
       properties:
@@ -1116,8 +1126,6 @@ components:
           type: boolean
         message:
           type: string
-
-    # ── Outbound IPs ──
     OutboundIpsResponse:
       type: object
       properties:
@@ -1127,14 +1135,15 @@ components:
             type: string
         updated_at:
           type: string
-
-    # ── Health ──
     SystemStatus:
       type: object
       properties:
         overall_status:
           type: string
-          enum: [operational, degraded, down]
+          enum:
+          - operational
+          - degraded
+          - down
         uptime_30d:
           type: number
         components:
@@ -1155,8 +1164,6 @@ components:
                 type: string
         checked_at:
           type: string
-
-    # ── Notification Preferences ──
     NotificationPreferences:
       type: object
       properties:
@@ -1178,7 +1185,6 @@ components:
         webhook_url:
           type: string
           nullable: true
-
     UpdateNotificationPreferences:
       type: object
       properties:
@@ -1197,13 +1203,11 @@ components:
         webhook_url:
           type: string
           nullable: true
-
-    # ── Customer Portal ──
     PortalProfile:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         email:
           type: string
         name:
@@ -1212,28 +1216,25 @@ components:
         plan:
           type: string
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
-    # ── Admin ──
+          $ref: '#/components/schemas/DateTime'
     PaginatedUsers:
       type: object
       properties:
         users:
           type: array
           items:
-            $ref: "#/components/schemas/UserSummary"
+            $ref: '#/components/schemas/UserSummary'
         total:
           type: integer
         page:
           type: integer
         per_page:
           type: integer
-
     UserSummary:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         email:
           type: string
         name:
@@ -1244,8 +1245,7 @@ components:
         is_active:
           type: boolean
         created_at:
-          $ref: "#/components/schemas/DateTime"
-
+          $ref: '#/components/schemas/DateTime'
     SystemStats:
       type: object
       properties:
@@ -1266,30 +1266,1222 @@ components:
                 type: string
               count:
                 type: integer
-
-    # ── Stream ──
     StreamParams:
       type: object
       properties:
         endpoint_id:
-          $ref: "#/components/schemas/Uuid"
+          $ref: '#/components/schemas/Uuid'
         status:
           type: string
-          enum: [pending, processing, delivered, failed]
+          enum:
+          - pending
+          - processing
+          - delivered
+          - failed
         limit:
           type: integer
           default: 50
-
+    DeliveryDetailResponse:
+      type: object
+      description: Full delivery detail including all retry attempts and endpoint info
+      properties:
+        delivery:
+          $ref: '#/components/schemas/Delivery'
+        attempts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryAttempt'
+        endpoint:
+          $ref: '#/components/schemas/Endpoint'
+        request_headers:
+          type: object
+          nullable: true
+          description: Original request headers sent with the delivery
+        request_body:
+          type: object
+          nullable: true
+          description: Original request body sent with the delivery
+        response_headers:
+          type: object
+          nullable: true
+          description: Response headers received from the endpoint
+      required:
+      - delivery
+      - attempts
+    WebhookFilter:
+      type: object
+      description: Query parameters for filtering webhook deliveries
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+          - processing
+          - delivered
+          - failed
+          description: Filter by delivery status
+        endpoint_id:
+          $ref: '#/components/schemas/Uuid'
+        event_type:
+          type: string
+          description: Filter by event type (e.g. order.created)
+        from_date:
+          $ref: '#/components/schemas/DateTime'
+        to_date:
+          $ref: '#/components/schemas/DateTime'
+        page:
+          type: integer
+          default: 1
+        per_page:
+          type: integer
+          default: 20
+    BatchWebhookResponse:
+      type: object
+      description: Response for batch webhook delivery creation
+      properties:
+        delivery_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Uuid'
+          description: List of created delivery IDs
+        count:
+          type: integer
+          description: Number of deliveries created
+      required:
+      - delivery_ids
+      - count
+    DeliveryAttemptListResponse:
+      type: object
+      description: Paginated list of delivery attempts
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryAttempt'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    BillingPortalResponse:
+      type: object
+      description: URL for the customer billing portal
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Stripe billing portal URL
+      required:
+      - url
+    CancelSubscriptionRequest:
+      type: object
+      description: Request to cancel current subscription
+      properties:
+        reason:
+          type: string
+          description: Optional reason for cancellation
+    CancelSubscriptionResponse:
+      type: object
+      description: Result of subscription cancellation
+      properties:
+        cancelled_at:
+          $ref: '#/components/schemas/DateTime'
+        ends_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Date when access ends (end of billing period)
+      required:
+      - cancelled_at
+      - ends_at
+    InvoiceListResponse:
+      type: object
+      description: Paginated list of invoices
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceResponse'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    UpdateSubscriptionRequest:
+      type: object
+      description: Request to change subscription plan
+      properties:
+        plan:
+          type: string
+          enum:
+          - free
+          - pro
+          - business
+          description: Target plan name
+        proration:
+          type: boolean
+          default: true
+          description: Whether to prorate charges for the current billing period
+      required:
+      - plan
+    AlertRuleListResponse:
+      type: object
+      description: Paginated list of alert rules
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertRule'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    CreateAlertRuleRequest:
+      type: object
+      description: Request to create a new alert rule
+      properties:
+        name:
+          type: string
+          description: Human-readable alert name
+        condition:
+          type: string
+          enum:
+          - failure_rate
+          - latency
+          - consecutive_failures
+          description: Condition that triggers the alert
+        threshold:
+          type: integer
+          description: Threshold value for the condition
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+            - slack
+            - email
+            - webhook
+          description: Notification channels to alert on
+      required:
+      - name
+      - condition
+      - threshold
+      - channels
+    UpdateAlertRuleRequest:
+      type: object
+      description: Request to update an existing alert rule (all fields optional)
+      properties:
+        name:
+          type: string
+        condition:
+          type: string
+          enum:
+          - failure_rate
+          - latency
+          - consecutive_failures
+        threshold:
+          type: integer
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+            - slack
+            - email
+            - webhook
+    AlertNotificationListResponse:
+      type: object
+      description: Paginated list of alert notifications
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            description: Alert notification entry
+            properties:
+              id:
+                $ref: '#/components/schemas/Uuid'
+              alert_rule_id:
+                $ref: '#/components/schemas/Uuid'
+              message:
+                type: string
+              channel:
+                type: string
+              status:
+                type: string
+                enum:
+                - sent
+                - failed
+                - pending
+              created_at:
+                $ref: '#/components/schemas/DateTime'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    AnalyticsTrendResponse:
+      type: object
+      description: Delivery trend data over a time period
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyticsTrendPoint'
+          description: Array of trend data points
+        period:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+          description: Time range of the data
+      required:
+      - data
+      - period
+    AnalyticsTrendPoint:
+      type: object
+      description: Single data point in a delivery trend
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date of the data point
+        total:
+          type: integer
+          description: Total deliveries on this date
+        successful:
+          type: integer
+          description: Successfully delivered on this date
+        failed:
+          type: integer
+          description: Failed deliveries on this date
+        avg_latency_ms:
+          type: number
+          format: float
+          description: Average delivery latency in milliseconds
+      required:
+      - date
+      - total
+      - successful
+      - failed
+    LatencyResponse:
+      type: object
+      description: Latency percentile breakdown for deliveries
+      properties:
+        p50:
+          type: number
+          format: float
+          description: 50th percentile (median) latency in ms
+        p90:
+          type: number
+          format: float
+          description: 90th percentile latency in ms
+        p95:
+          type: number
+          format: float
+          description: 95th percentile latency in ms
+        p99:
+          type: number
+          format: float
+          description: 99th percentile latency in ms
+        period:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+          description: Time range of the data
+      required:
+      - p50
+      - p90
+      - p95
+      - p99
+      - period
+    UsageStatsResponse:
+      type: object
+      description: Account usage statistics summary
+      properties:
+        endpoints_count:
+          type: integer
+          description: Number of active endpoints
+        deliveries_count:
+          type: integer
+          description: Total deliveries in current period
+        teams_count:
+          type: integer
+          description: Number of teams
+        storage_used_bytes:
+          type: integer
+          description: Storage used in bytes
+      required:
+      - endpoints_count
+      - deliveries_count
+      - teams_count
+      - storage_used_bytes
+    SearchRequest:
+      type: object
+      description: Search request for webhook deliveries
+      properties:
+        query:
+          type: string
+          description: Search query string
+        filters:
+          type: object
+          description: Additional filters (status, endpoint_id, etc.)
+          properties:
+            status:
+              type: string
+            endpoint_id:
+              $ref: '#/components/schemas/Uuid'
+        page:
+          type: integer
+          default: 1
+        per_page:
+          type: integer
+          default: 20
+      required:
+      - query
+    SearchResponse:
+      type: object
+      description: Search results for webhook deliveries
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Delivery'
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+        has_more:
+          type: boolean
+      required:
+      - deliveries
+      - total
+      - page
+      - per_page
+    InboundWebhookRequest:
+      type: object
+      description: Raw webhook payload received from an external provider (Stripe, GitHub, etc.)
+      properties:
+        provider:
+          type: string
+          description: Provider name (e.g. stripe, github, shopify)
+        payload:
+          type: object
+          description: Raw webhook payload body
+        headers:
+          type: object
+          description: HTTP headers from the incoming webhook request
+      required:
+      - provider
+      - payload
+    InboundWebhookResponse:
+      type: object
+      description: Result of processing an inbound webhook
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        status:
+          type: string
+          enum:
+          - accepted
+          - rejected
+          - processing
+          description: Processing status of the inbound webhook
+        endpoint_id:
+          $ref: '#/components/schemas/Uuid'
+          description: The endpoint this webhook was routed to
+        received_at:
+          $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - status
+      - endpoint_id
+      - received_at
+    TeamListResponse:
+      type: object
+      description: Paginated list of teams
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    UpdateTeamRequest:
+      type: object
+      description: Fields to update on a team (all optional)
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    TeamMemberListResponse:
+      type: object
+      description: List of members in a team
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+      required:
+      - data
+    InviteMemberRequest:
+      type: object
+      description: Invite a new member to a team
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+          - admin
+          - member
+          - viewer
+      required:
+      - email
+      - role
+    DeviceListResponse:
+      type: object
+      description: Paginated list of registered devices
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceTokenResponse'
+      required:
+      - data
+    TemplateListResponse:
+      type: object
+      description: Paginated list of webhook payload templates
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookTemplate'
+      required:
+      - data
+    SchemaResponse:
+      type: object
+      description: A registered JSON Schema for event validation
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        version:
+          type: integer
+        schema_json:
+          type: object
+          description: The JSON Schema document
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - name
+      - version
+      - schema_json
+      - created_at
+    SchemaListResponse:
+      type: object
+      description: Paginated list of registered schemas
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchemaResponse'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    ValidateEventResponse:
+      type: object
+      description: Result of validating an event payload against a schema
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: JSON pointer to the failing field
+              message:
+                type: string
+                description: Human-readable validation error
+      required:
+      - valid
+    RoutingRuleListResponse:
+      type: object
+      description: List of routing rules
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/Uuid'
+              name:
+                type: string
+              conditions:
+                type: object
+              transform:
+                type: object
+                nullable: true
+              target_endpoint_id:
+                $ref: '#/components/schemas/Uuid'
+              enabled:
+                type: boolean
+              created_at:
+                $ref: '#/components/schemas/DateTime'
+            required:
+            - id
+            - name
+            - conditions
+            - target_endpoint_id
+      required:
+      - data
+    CreateRoutingRuleRequest:
+      type: object
+      description: Create a new routing rule
+      properties:
+        name:
+          type: string
+        conditions:
+          type: object
+          description: Conditions that trigger this rule (e.g. event_type, header match)
+        transform:
+          type: object
+          nullable: true
+          description: Optional payload transformation config
+        target_endpoint_id:
+          $ref: '#/components/schemas/Uuid'
+      required:
+      - name
+      - conditions
+      - target_endpoint_id
+    UpdateRoutingRuleRequest:
+      type: object
+      description: Update an existing routing rule (all fields optional)
+      properties:
+        name:
+          type: string
+        conditions:
+          type: object
+        transform:
+          type: object
+          nullable: true
+    PortalConfig:
+      type: object
+      description: Customer-facing portal branding and configuration
+      properties:
+        logo_url:
+          type: string
+          format: uri
+          nullable: true
+        primary_color:
+          type: string
+          nullable: true
+          description: Hex color code (e.g.
+        custom_domain:
+          type: string
+          nullable: true
+        webhook_events:
+          type: array
+          items:
+            type: string
+          description: Event types to expose in the portal
+      required: []
+    PortalSession:
+      type: object
+      description: Temporary session token for the customer portal
+      properties:
+        token:
+          type: string
+        expires_at:
+          $ref: '#/components/schemas/DateTime'
+        url:
+          type: string
+          format: uri
+          description: Full URL to the portal with session token
+      required:
+      - token
+      - expires_at
+      - url
+    AdminUserListResponse:
+      type: object
+      description: Paginated list of users for admin management
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSummary'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    AdminSystemStatus:
+      type: object
+      description: System-level status for admin dashboard
+      properties:
+        version:
+          type: string
+        uptime_seconds:
+          type: integer
+        db_status:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - down
+        redis_status:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - down
+        queue_depth:
+          type: integer
+          description: Number of pending jobs in the delivery queue
+      required:
+      - version
+      - uptime_seconds
+      - db_status
+      - redis_status
+      - queue_depth
+    AdminRevenueEntry:
+      type: object
+      description: Monthly revenue data point
+      properties:
+        date:
+          type: string
+          format: date
+        mrr:
+          type: number
+          format: double
+          description: Monthly recurring revenue in dollars
+        new_subscriptions:
+          type: integer
+        churns:
+          type: integer
+      required:
+      - date
+      - mrr
+      - new_subscriptions
+      - churns
+    AdminRevenueResponse:
+      type: object
+      description: Revenue history for admin analytics
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminRevenueEntry'
+        total_mrr:
+          type: number
+          format: double
+          description: Current total MRR across all subscriptions
+      required:
+      - data
+      - total_mrr
+    AuditLogEntry:
+      type: object
+      description: A single audit log record
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        actor:
+          type: string
+          description: Who performed the action (user id or email)
+        action:
+          type: string
+          description: The action taken (e.g. endpoint.create, team.invite)
+        resource_type:
+          type: string
+          description: Type of resource affected (endpoint, team, api_key, etc.)
+        resource_id:
+          type: string
+          description: ID of the affected resource
+        timestamp:
+          $ref: '#/components/schemas/DateTime'
+        metadata:
+          type: object
+          nullable: true
+          description: Additional context (old_value, new_value, ip, etc.)
+      required:
+      - id
+      - actor
+      - action
+      - resource_type
+      - resource_id
+      - timestamp
+    AuditLogListResponse:
+      type: object
+      description: Paginated list of audit log entries
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    SSOConfig:
+      type: object
+      description: Single Sign-On configuration (SAML or OIDC)
+      properties:
+        provider:
+          type: string
+          enum:
+          - saml
+          - oidc
+        domain:
+          type: string
+          description: Email domain for SSO routing
+        entity_id:
+          type: string
+          nullable: true
+          description: SAML entity ID or OIDC issuer
+        sso_url:
+          type: string
+          format: uri
+          nullable: true
+        certificate:
+          type: string
+          nullable: true
+          description: PEM-encoded X.509 certificate (SAML)
+      required:
+      - provider
+      - domain
+    SSOConfigListResponse:
+      type: object
+      description: List of SSO configurations for the account
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SSOConfig'
+      required:
+      - data
+    CreateSSOConfigRequest:
+      type: object
+      description: Create a new SSO configuration
+      properties:
+        provider:
+          type: string
+          enum:
+          - saml
+          - oidc
+        domain:
+          type: string
+        metadata_url:
+          type: string
+          format: uri
+          description: URL to SAML metadata or OIDC discovery document
+      required:
+      - provider
+      - domain
+      - metadata_url
+    UpdateSSOConfigRequest:
+      type: object
+      description: Update an SSO configuration (all fields optional)
+      properties:
+        provider:
+          type: string
+          enum:
+          - saml
+          - oidc
+        domain:
+          type: string
+    CustomDomain:
+      type: object
+      description: A custom domain configured for the account
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        domain:
+          type: string
+          description: The custom domain (e.g. webhooks.example.com)
+        status:
+          type: string
+          enum:
+          - pending
+          - verifying
+          - verified
+          - failed
+        verification_token:
+          type: string
+          nullable: true
+          description: TXT record value to prove domain ownership
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - domain
+      - status
+      - created_at
+    CustomDomainListResponse:
+      type: object
+      description: List of custom domains
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDomain'
+      required:
+      - data
+    CreateCustomDomainRequest:
+      type: object
+      description: Register a new custom domain
+      properties:
+        domain:
+          type: string
+          description: Fully qualified domain name to register
+      required:
+      - domain
+    VerifyCustomDomainResponse:
+      type: object
+      description: Result of domain verification attempt
+      properties:
+        status:
+          type: string
+          enum:
+          - verified
+          - pending
+          - failed
+        dns_records:
+          type: array
+          items:
+            $ref: '#/components/schemas/DomainDnsRecord'
+          description: DNS records that need to be configured
+      required:
+      - status
+      - dns_records
+    DomainDnsRecord:
+      type: object
+      description: A DNS record required for domain verification
+      properties:
+        type:
+          type: string
+          enum:
+          - TXT
+          - CNAME
+          - A
+        name:
+          type: string
+          description: DNS record name/host
+        value:
+          type: string
+          description: DNS record value
+        status:
+          type: string
+          enum:
+          - pending
+          - verified
+          - failed
+      required:
+      - type
+      - name
+      - value
+      - status
+    RateLimitConfig:
+      type: object
+      description: Rate limiting configuration for an endpoint
+      properties:
+        requests_per_second:
+          type: integer
+          description: Maximum requests per second allowed
+        burst_size:
+          type: integer
+          description: Maximum burst above steady-state rate
+        enabled:
+          type: boolean
+      required:
+      - requests_per_second
+      - burst_size
+      - enabled
+    RateLimitUsage:
+      type: object
+      description: Current rate limit usage for an endpoint
+      properties:
+        current_rps:
+          type: number
+          format: double
+          description: Current requests per second being consumed
+        limit_rps:
+          type: number
+          format: double
+          description: Configured requests per second limit
+        remaining:
+          type: number
+          format: double
+          description: Remaining capacity
+        reset_at:
+          $ref: '#/components/schemas/DateTime'
+      required:
+      - current_rps
+      - limit_rps
+      - remaining
+      - reset_at
+    OAuthProvider:
+      type: object
+      description: An available OAuth identity provider
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+          description: Provider identifier (e.g. google, github)
+        client_id:
+          type: string
+        authorize_url:
+          type: string
+          format: uri
+        token_url:
+          type: string
+          format: uri
+      required:
+      - id
+      - name
+      - client_id
+      - authorize_url
+      - token_url
+    OAuthProviderListResponse:
+      type: object
+      description: List of available OAuth providers
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OAuthProvider'
+      required:
+      - data
+    OAuthCallbackRequest:
+      type: object
+      description: OAuth authorization callback parameters
+      properties:
+        code:
+          type: string
+          description: Authorization code from the provider
+        state:
+          type: string
+          description: CSRF state token
+        redirect_uri:
+          type: string
+          format: uri
+      required:
+      - code
+      - state
+    EventType:
+      type: object
+      description: A registered event type in the system
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+          description: Event type identifier (e.g. order.created)
+        description:
+          type: string
+          nullable: true
+        schema_id:
+          $ref: '#/components/schemas/Uuid'
+          nullable: true
+          description: Associated JSON Schema for payload validation
+      required:
+      - id
+      - name
+    EventTypeListResponse:
+      type: object
+      description: Paginated list of event types
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventType'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+      - data
+      - has_more
+      - total
+    EmbedConfig:
+      type: object
+      description: Configuration for embedded webhook dashboard
+      properties:
+        allowed_origins:
+          type: array
+          items:
+            type: string
+          description: CORS origins allowed to load the embed
+        theme:
+          type: object
+          properties:
+            primary_color:
+              type: string
+            background_color:
+              type: string
+            font_family:
+              type: string
+          description: Visual customization for the embed
+        features:
+          type: array
+          items:
+            type: string
+          description: Enabled features (e.g. [deliveries, endpoints, playground])
+      required:
+      - allowed_origins
+    SimulatorRequest:
+      type: object
+      description: Send a simulated webhook event
+      properties:
+        endpoint_id:
+          $ref: '#/components/schemas/Uuid'
+        event_type:
+          type: string
+          description: Event type to simulate (e.g. order.created)
+        payload:
+          type: object
+          description: The webhook payload to deliver
+        delay_ms:
+          type: integer
+          nullable: true
+          description: Artificial delay before delivery (for testing timeouts)
+      required:
+      - endpoint_id
+      - event_type
+      - payload
+    SimulatorResponse:
+      type: object
+      description: Result of a simulated webhook delivery
+      properties:
+        delivery_id:
+          $ref: '#/components/schemas/Uuid'
+        status:
+          type: string
+          enum:
+          - delivered
+          - failed
+          - pending
+        latency_ms:
+          type: integer
+          description: Response time from the endpoint
+      required:
+      - delivery_id
+      - status
+      - latency_ms
+    PlaygroundTestRequest:
+      type: object
+      description: Test a webhook payload against an endpoint in sandbox
+      properties:
+        endpoint_id:
+          $ref: '#/components/schemas/Uuid'
+        payload:
+          type: object
+          description: The payload to send
+        headers:
+          type: object
+          nullable: true
+          description: Custom headers to include with the request
+      required:
+      - endpoint_id
+      - payload
+    PlaygroundTestResponse:
+      type: object
+      description: Result of a playground test delivery
+      properties:
+        status_code:
+          type: integer
+          description: HTTP status code returned by the endpoint
+        response_body:
+          type: string
+          description: Raw response body from the endpoint
+        latency_ms:
+          type: integer
+        headers:
+          type: object
+          description: Response headers from the endpoint
+      required:
+      - status_code
+      - response_body
+      - latency_ms
+    TransformRuleListResponse:
+      type: object
+      description: Paginated list of transform rules
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransformRule'
+      required:
+      - data
+    UpdateTransformRuleRequest:
+      type: object
+      description: Update an existing transform rule (all fields optional)
+      properties:
+        name:
+          type: string
+        config:
+          type: object
+          description: Updated transformation configuration
+    OutboundIPsResponse:
+      type: object
+      description: List of static outbound IP addresses for firewall whitelisting
+      properties:
+        ips:
+          type: array
+          items:
+            type: string
+          description: IPv4 and IPv6 addresses used for outbound requests
+      required:
+      - ips
 security:
-  - BearerAuth: []
-
+- BearerAuth: []
 paths:
-  # ══════════════════════════════════════
-  # AUTH
-  # ══════════════════════════════════════
   /auth/register:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Register a new account
       security: []
       requestBody:
@@ -1297,26 +2489,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterRequest"
+              $ref: '#/components/schemas/RegisterRequest'
       responses:
-        "201":
+        '201':
           description: Account created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CustomerResponse"
-        "400":
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "409":
+                $ref: '#/components/schemas/Error'
+        '409':
           description: Email already exists
-
   /auth/login:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Login with email and password
       security: []
       requestBody:
@@ -1324,22 +2516,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginRequest"
+              $ref: '#/components/schemas/LoginRequest'
       responses:
-        "200":
+        '200':
           description: Login successful (or 2FA required)
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/AuthResponse"
-                  - $ref: "#/components/schemas/TwoFactorRequiredResponse"
-        "401":
+                - $ref: '#/components/schemas/AuthResponse'
+                - $ref: '#/components/schemas/TwoFactorRequiredResponse'
+        '401':
           description: Invalid credentials
-
   /auth/forgot-password:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Request password reset email
       security: []
       requestBody:
@@ -1347,14 +2539,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ForgotPasswordRequest"
+              $ref: '#/components/schemas/ForgotPasswordRequest'
       responses:
-        "200":
+        '200':
           description: Reset email sent (if account exists)
-
   /auth/reset-password:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Reset password with token
       security: []
       requestBody:
@@ -1362,16 +2554,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ResetPasswordRequest"
+              $ref: '#/components/schemas/ResetPasswordRequest'
       responses:
-        "200":
+        '200':
           description: Password reset successful
-        "400":
+        '400':
           description: Invalid or expired token
-
   /auth/verify-email:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Verify email address
       security: []
       requestBody:
@@ -1379,16 +2571,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/VerifyEmailRequest"
+              $ref: '#/components/schemas/VerifyEmailRequest'
       responses:
-        "200":
+        '200':
           description: Email verified
-        "400":
+        '400':
           description: Invalid token
-
   /auth/resend-verification:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Resend verification email
       security: []
       requestBody:
@@ -1396,14 +2588,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ResendVerificationRequest"
+              $ref: '#/components/schemas/ResendVerificationRequest'
       responses:
-        "200":
+        '200':
           description: Verification email sent (if account exists and unverified)
-
   /auth/refresh:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Refresh access token
       security: []
       requestBody:
@@ -1411,20 +2603,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RefreshTokenRequest"
+              $ref: '#/components/schemas/RefreshTokenRequest'
       responses:
-        "200":
+        '200':
           description: New tokens issued
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResponse"
-        "401":
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
           description: Invalid refresh token
-
   /auth/2fa/verify:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Verify 2FA code during login
       security: []
       requestBody:
@@ -1432,75 +2624,75 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Verify2faRequest"
+              $ref: '#/components/schemas/Verify2faRequest'
       responses:
-        "200":
+        '200':
           description: 2FA verified, full token issued
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResponse"
-        "401":
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
           description: Invalid code
-
   /auth/me:
     get:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Get current user profile
       responses:
-        "200":
+        '200':
           description: Current user
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CustomerResponse"
-
+                $ref: '#/components/schemas/CustomerResponse'
   /auth/profile:
     put:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Update profile
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateProfileRequest"
+              $ref: '#/components/schemas/UpdateProfileRequest'
       responses:
-        "200":
+        '200':
           description: Profile updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CustomerResponse"
-
+                $ref: '#/components/schemas/CustomerResponse'
   /auth/password:
     put:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Change password
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ChangePasswordRequest"
+              $ref: '#/components/schemas/ChangePasswordRequest'
       responses:
-        "200":
+        '200':
           description: Password changed
-        "400":
+        '400':
           description: Current password incorrect
-
   /auth/2fa/enable:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Enable 2FA (returns TOTP secret and QR URL)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Enable2faRequest"
+              $ref: '#/components/schemas/Enable2faRequest'
       responses:
-        "200":
+        '200':
           description: TOTP secret generated
           content:
             application/json:
@@ -1511,138 +2703,138 @@ paths:
                     type: string
                   qr_url:
                     type: string
-
   /auth/2fa/confirm:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Confirm 2FA setup with a code
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Confirm2faRequest"
+              $ref: '#/components/schemas/Confirm2faRequest'
       responses:
-        "200":
+        '200':
           description: 2FA enabled
-        "400":
+        '400':
           description: Invalid code
-
   /auth/2fa/disable:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Disable 2FA
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Disable2faRequest"
+              $ref: '#/components/schemas/Disable2faRequest'
       responses:
-        "200":
+        '200':
           description: 2FA disabled
-        "400":
+        '400':
           description: Invalid password
-
-  # ══════════════════════════════════════
-  # ENDPOINTS
-  # ══════════════════════════════════════
   /endpoints:
     get:
-      tags: [Endpoints]
+      tags:
+      - Endpoints
       summary: List all endpoints
       responses:
-        "200":
+        '200':
           description: Endpoint list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Endpoint"
+                  $ref: '#/components/schemas/Endpoint'
     post:
-      tags: [Endpoints]
+      tags:
+      - Endpoints
       summary: Create a new endpoint
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateEndpointRequest"
+              $ref: '#/components/schemas/CreateEndpointRequest'
       responses:
-        "201":
+        '201':
           description: Endpoint created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
-
+                $ref: '#/components/schemas/Endpoint'
   /endpoints/{id}:
     get:
-      tags: [Endpoints]
+      tags:
+      - Endpoints
       summary: Get endpoint by ID
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Endpoint details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
-        "404":
+                $ref: '#/components/schemas/Endpoint'
+        '404':
           description: Not found
     put:
-      tags: [Endpoints]
+      tags:
+      - Endpoints
       summary: Update endpoint
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateEndpointRequest"
+              $ref: '#/components/schemas/UpdateEndpointRequest'
       responses:
-        "200":
+        '200':
           description: Endpoint updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
+                $ref: '#/components/schemas/Endpoint'
     delete:
-      tags: [Endpoints]
+      tags:
+      - Endpoints
       summary: Delete endpoint
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Endpoint deleted
-
   /endpoints/{id}/rotate-secret:
     post:
-      tags: [Endpoints]
+      tags:
+      - Endpoints
       summary: Rotate endpoint signing secret
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Secret rotated
           content:
             application/json:
@@ -1653,487 +2845,488 @@ paths:
                     type: string
                   message:
                     type: string
-
   /endpoints/{id}/retry-policy:
     put:
-      tags: [Endpoints]
+      tags:
+      - Endpoints
       summary: Update retry policy for an endpoint
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RetryPolicy"
+              $ref: '#/components/schemas/RetryPolicy'
       responses:
-        "200":
+        '200':
           description: Retry policy updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
-
-  # ══════════════════════════════════════
-  # WEBHOOKS
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/Endpoint'
   /webhooks:
     get:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: List webhook deliveries
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: per_page
-          in: query
-          schema:
-            type: integer
-            default: 20
-        - name: status
-          in: query
-          schema:
-            type: string
-            enum: [pending, processing, delivered, failed]
-        - name: endpoint_id
-          in: query
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+          default: 20
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - processing
+          - delivered
+          - failed
+      - name: endpoint_id
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Paginated delivery list
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeliveryListResponse"
+                $ref: '#/components/schemas/DeliveryListResponse'
     post:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Send a webhook
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateWebhookRequest"
+              $ref: '#/components/schemas/CreateWebhookRequest'
       responses:
-        "201":
+        '201':
           description: Webhook queued
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Delivery"
-
+                $ref: '#/components/schemas/Delivery'
   /webhooks/batch:
     post:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Send multiple webhooks in batch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BatchWebhookRequest"
+              $ref: '#/components/schemas/BatchWebhookRequest'
       responses:
-        "201":
+        '201':
           description: Batch processed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BatchResponse"
-
+                $ref: '#/components/schemas/BatchResponse'
   /webhooks/batch/replay:
     post:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Replay multiple deliveries by ID
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BatchReplayRequest"
+              $ref: '#/components/schemas/BatchReplayRequest'
       responses:
-        "200":
+        '200':
           description: Batch replay initiated
-
   /webhooks/export:
     get:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Export deliveries as CSV
       parameters:
-        - name: range
-          in: query
-          schema:
-            type: string
-            enum: ["24h", "7d", "30d"]
-            default: "7d"
+      - name: range
+        in: query
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+          default: 7d
       responses:
-        "200":
+        '200':
           description: CSV file
           content:
             text/csv:
               schema:
                 type: string
-
   /webhooks/{id}:
     get:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Get delivery by ID
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Delivery details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Delivery"
-
+                $ref: '#/components/schemas/Delivery'
   /webhooks/{id}/replay:
     post:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Replay a single delivery
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Replay initiated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Delivery"
-
+                $ref: '#/components/schemas/Delivery'
   /webhooks/{id}/attempts:
     get:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Get delivery attempts
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Attempt list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DeliveryAttempt"
-
+                  $ref: '#/components/schemas/DeliveryAttempt'
   /webhooks/{id}/details:
     get:
-      tags: [Delivery Details]
+      tags:
+      - Delivery Details
       summary: Get detailed delivery info
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Full delivery details
-
   /webhooks/{id}/attempts/{attempt_id}:
     get:
-      tags: [Delivery Details]
+      tags:
+      - Delivery Details
       summary: Get specific attempt detail
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
-        - name: attempt_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: attempt_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Attempt details
-
-  # ══════════════════════════════════════
-  # API KEYS
-  # ══════════════════════════════════════
   /api-keys:
     get:
-      tags: [API Keys]
+      tags:
+      - API Keys
       summary: List API keys
       responses:
-        "200":
+        '200':
           description: API key list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ApiKeyInfo"
+                  $ref: '#/components/schemas/ApiKeyInfo'
     post:
-      tags: [API Keys]
+      tags:
+      - API Keys
       summary: Create a new API key
       responses:
-        "201":
+        '201':
           description: API key created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateApiKeyResponse"
-
+                $ref: '#/components/schemas/CreateApiKeyResponse'
   /api-keys/{id}:
     delete:
-      tags: [API Keys]
+      tags:
+      - API Keys
       summary: Delete (revoke) an API key
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: API key revoked
-
   /api-keys/{id}/rotate:
     post:
-      tags: [API Keys]
+      tags:
+      - API Keys
       summary: Rotate an API key
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: New key generated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateApiKeyResponse"
-
-  # ══════════════════════════════════════
-  # ALERTS
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/CreateApiKeyResponse'
   /alerts:
     get:
-      tags: [Alerts]
+      tags:
+      - Alerts
       summary: List alert rules
       responses:
-        "200":
+        '200':
           description: Alert list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/AlertRule"
+                  $ref: '#/components/schemas/AlertRule'
     post:
-      tags: [Alerts]
+      tags:
+      - Alerts
       summary: Create alert rule
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateAlertRequest"
+              $ref: '#/components/schemas/CreateAlertRequest'
       responses:
-        "201":
+        '201':
           description: Alert created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AlertRule"
-
+                $ref: '#/components/schemas/AlertRule'
   /alerts/{id}:
     get:
-      tags: [Alerts]
+      tags:
+      - Alerts
       summary: Get alert rule
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Alert details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AlertRule"
+                $ref: '#/components/schemas/AlertRule'
     delete:
-      tags: [Alerts]
+      tags:
+      - Alerts
       summary: Delete alert rule
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Alert deleted
-
   /alerts/{id}/test:
     post:
-      tags: [Alerts]
+      tags:
+      - Alerts
       summary: Test an alert rule
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Test notification sent
-
-  # ══════════════════════════════════════
-  # ANALYTICS
-  # ══════════════════════════════════════
   /analytics/deliveries:
     get:
-      tags: [Analytics]
+      tags:
+      - Analytics
       summary: Delivery trend over time
       parameters:
-        - name: range
-          in: query
-          schema:
-            type: string
-            enum: ["24h", "7d", "30d"]
-            default: "24h"
+      - name: range
+        in: query
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+          default: 24h
       responses:
-        "200":
+        '200':
           description: Delivery trend data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeliveryTrendResponse"
-
+                $ref: '#/components/schemas/DeliveryTrendResponse'
   /analytics/success-rate:
     get:
-      tags: [Analytics]
+      tags:
+      - Analytics
       summary: Success rate metrics
       parameters:
-        - name: range
-          in: query
-          schema:
-            type: string
-            enum: ["24h", "7d", "30d"]
-            default: "24h"
+      - name: range
+        in: query
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+          default: 24h
       responses:
-        "200":
+        '200':
           description: Success rate data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessRateResponse"
-
+                $ref: '#/components/schemas/SuccessRateResponse'
   /analytics/latency:
     get:
-      tags: [Analytics]
+      tags:
+      - Analytics
       summary: Latency trend over time
       parameters:
-        - name: range
-          in: query
-          schema:
-            type: string
-            enum: ["24h", "7d", "30d"]
-            default: "24h"
+      - name: range
+        in: query
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+          default: 24h
       responses:
-        "200":
+        '200':
           description: Latency trend data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LatencyTrendResponse"
-
-  # ══════════════════════════════════════
-  # STATS
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/LatencyTrendResponse'
   /stats:
     get:
-      tags: [Stats]
+      tags:
+      - Stats
       summary: Get account statistics
       responses:
-        "200":
+        '200':
           description: Account stats
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StatsResponse"
-
-  # ══════════════════════════════════════
-  # SEARCH
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/StatsResponse'
   /search:
     get:
-      tags: [Search]
+      tags:
+      - Search
       summary: Search deliveries
       parameters:
-        - name: q
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: status
-          in: query
-          schema:
-            type: string
-        - name: endpoint_id
-          in: query
-          schema:
-            $ref: "#/components/schemas/Uuid"
-        - name: page
-          in: query
-          schema:
-            type: integer
-        - name: per_page
-          in: query
-          schema:
-            type: integer
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: endpoint_id
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
       responses:
-        "200":
+        '200':
           description: Search results
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SearchResult"
-
-  # ══════════════════════════════════════
-  # INBOUND
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/SearchResult'
   /inbound/{provider}:
     post:
-      tags: [Inbound]
+      tags:
+      - Inbound
       summary: Receive inbound webhook from a provider
-      description: |
-        Accepts webhooks from external providers (Stripe, GitHub, etc.)
-        and routes them to the customer's endpoints.
+      description: 'Accepts webhooks from external providers (Stripe, GitHub, etc.)
+
+        and routes them to the customer''s endpoints.
+
+        '
       parameters:
-        - name: provider
-          in: path
-          required: true
-          schema:
-            type: string
-            description: Provider name (e.g. "stripe", "github")
+      - name: provider
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Provider name (e.g. "stripe", "github")
       requestBody:
         required: true
         content:
@@ -2141,26 +3334,26 @@ paths:
             schema:
               type: object
       responses:
-        "200":
+        '200':
           description: Webhook accepted
-        "400":
+        '400':
           description: Invalid payload
-
   /inbound/{provider}/{endpoint_id}:
     post:
-      tags: [Inbound]
+      tags:
+      - Inbound
       summary: Receive inbound webhook for a specific endpoint
       parameters:
-        - name: provider
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: endpoint_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: provider
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
@@ -2168,39 +3361,36 @@ paths:
             schema:
               type: object
       responses:
-        "200":
+        '200':
           description: Webhook accepted
-
-  # ══════════════════════════════════════
-  # NOTIFICATIONS
-  # ══════════════════════════════════════
   /notifications:
     get:
-      tags: [Notifications]
+      tags:
+      - Notifications
       summary: List notifications
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-        - name: per_page
-          in: query
-          schema:
-            type: integer
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
       responses:
-        "200":
+        '200':
           description: Notification list
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NotificationListResponse"
-
+                $ref: '#/components/schemas/NotificationListResponse'
   /notifications/unread-count:
     get:
-      tags: [Notifications]
+      tags:
+      - Notifications
       summary: Get unread notification count
       responses:
-        "200":
+        '200':
           description: Unread count
           content:
             application/json:
@@ -2209,264 +3399,257 @@ paths:
                 properties:
                   count:
                     type: integer
-
   /notifications/read-all:
     put:
-      tags: [Notifications]
+      tags:
+      - Notifications
       summary: Mark all notifications as read
       responses:
-        "200":
+        '200':
           description: All marked as read
-
   /notifications/{id}/read:
     put:
-      tags: [Notifications]
+      tags:
+      - Notifications
       summary: Mark notification as read
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Marked as read
-
   /notifications/{id}:
     delete:
-      tags: [Notifications]
+      tags:
+      - Notifications
       summary: Delete notification
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Notification deleted
-
-  # ══════════════════════════════════════
-  # DEVICES
-  # ══════════════════════════════════════
   /devices:
     get:
-      tags: [Devices]
+      tags:
+      - Devices
       summary: List registered devices
       responses:
-        "200":
+        '200':
           description: Device list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DeviceTokenResponse"
+                  $ref: '#/components/schemas/DeviceTokenResponse'
     post:
-      tags: [Devices]
+      tags:
+      - Devices
       summary: Register device for push notifications
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterDeviceRequest"
+              $ref: '#/components/schemas/RegisterDeviceRequest'
       responses:
-        "201":
+        '201':
           description: Device registered
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeviceTokenResponse"
-
+                $ref: '#/components/schemas/DeviceTokenResponse'
   /devices/{token}:
     delete:
-      tags: [Devices]
+      tags:
+      - Devices
       summary: Remove device token
       parameters:
-        - name: token
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Device removed
-
-  # ══════════════════════════════════════
-  # TEAMS
-  # ══════════════════════════════════════
   /teams:
     get:
-      tags: [Teams]
+      tags:
+      - Teams
       summary: List teams
       responses:
-        "200":
+        '200':
           description: Team list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Team"
+                  $ref: '#/components/schemas/Team'
     post:
-      tags: [Teams]
+      tags:
+      - Teams
       summary: Create a team
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateTeamRequest"
+              $ref: '#/components/schemas/CreateTeamRequest'
       responses:
-        "201":
+        '201':
           description: Team created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Team"
-
+                $ref: '#/components/schemas/Team'
   /teams/{id}:
     get:
-      tags: [Teams]
+      tags:
+      - Teams
       summary: Get team details
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Team details with members and invites
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TeamDetailResponse"
-
+                $ref: '#/components/schemas/TeamDetailResponse'
   /teams/{id}/invite:
     post:
-      tags: [Teams]
+      tags:
+      - Teams
       summary: Invite a member to the team
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InviteRequest"
+              $ref: '#/components/schemas/InviteRequest'
       responses:
-        "200":
+        '200':
           description: Invitation sent
-
   /teams/{id}/members:
     get:
-      tags: [Teams]
+      tags:
+      - Teams
       summary: List team members
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Member list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/TeamMember"
-
+                  $ref: '#/components/schemas/TeamMember'
   /teams/{id}/members/{uid}:
     delete:
-      tags: [Teams]
+      tags:
+      - Teams
       summary: Remove member from team
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: uid
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Member removed
-
   /teams/{id}/members/{uid}/role:
     put:
-      tags: [Teams]
+      tags:
+      - Teams
       summary: Change member role
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: uid
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ChangeRoleRequest"
+              $ref: '#/components/schemas/ChangeRoleRequest'
       responses:
-        "200":
+        '200':
           description: Role changed
-
-  # ══════════════════════════════════════
-  # BILLING
-  # ══════════════════════════════════════
   /billing/subscription:
     get:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: Get current subscription
       responses:
-        "200":
+        '200':
           description: Subscription details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SubscriptionResponse"
-
+                $ref: '#/components/schemas/SubscriptionResponse'
   /billing/upgrade:
     post:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: Upgrade plan
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpgradeRequest"
+              $ref: '#/components/schemas/UpgradeRequest'
       responses:
-        "200":
+        '200':
           description: Checkout URL or direct upgrade
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpgradeResponse"
-
+                $ref: '#/components/schemas/UpgradeResponse'
   /billing/portal:
     post:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: Open customer billing portal
       responses:
-        "200":
+        '200':
           description: Portal URL
           content:
             application/json:
@@ -2475,36 +3658,36 @@ paths:
                 properties:
                   url:
                     type: string
-
   /billing/usage:
     get:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: Get current usage
       responses:
-        "200":
+        '200':
           description: Usage data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UsageResponse"
-
+                $ref: '#/components/schemas/UsageResponse'
   /billing/invoices:
     get:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: List invoices
       responses:
-        "200":
+        '200':
           description: Invoice list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/InvoiceResponse"
-
+                  $ref: '#/components/schemas/InvoiceResponse'
   /billing/webhook:
     post:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: Stripe webhook receiver
       security: []
       requestBody:
@@ -2514,12 +3697,12 @@ paths:
             schema:
               type: object
       responses:
-        "200":
+        '200':
           description: Webhook processed
-
   /billing/webhook/polar:
     post:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: Polar.sh webhook receiver
       security: []
       requestBody:
@@ -2529,12 +3712,12 @@ paths:
             schema:
               type: object
       responses:
-        "200":
+        '200':
           description: Webhook processed
-
   /billing/webhook/iyzico:
     post:
-      tags: [Billing]
+      tags:
+      - Billing
       summary: iyzico webhook receiver
       security: []
       requestBody:
@@ -2544,202 +3727,192 @@ paths:
             schema:
               type: object
       responses:
-        "200":
+        '200':
           description: Webhook processed
-
-  # ══════════════════════════════════════
-  # TEMPLATES
-  # ══════════════════════════════════════
   /templates:
     get:
-      tags: [Templates]
+      tags:
+      - Templates
       summary: List available templates
       parameters:
-        - name: category
-          in: query
-          schema:
-            type: string
+      - name: category
+        in: query
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Template list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/WebhookTemplate"
-
+                  $ref: '#/components/schemas/WebhookTemplate'
   /templates/{id}:
     get:
-      tags: [Templates]
+      tags:
+      - Templates
       summary: Get template by ID
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Template details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WebhookTemplate"
-
+                $ref: '#/components/schemas/WebhookTemplate'
   /templates/{id}/apply:
     post:
-      tags: [Templates]
+      tags:
+      - Templates
       summary: Apply template to an endpoint
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ApplyTemplateRequest"
+              $ref: '#/components/schemas/ApplyTemplateRequest'
       responses:
-        "200":
+        '200':
           description: Template applied
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApplyTemplateResponse"
-
-  # ══════════════════════════════════════
-  # SCHEMAS
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/ApplyTemplateResponse'
   /schemas:
     get:
-      tags: [Schemas]
+      tags:
+      - Schemas
       summary: List registered schemas
       responses:
-        "200":
+        '200':
           description: Schema list
     post:
-      tags: [Schemas]
+      tags:
+      - Schemas
       summary: Register a new JSON Schema
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterSchemaRequest"
+              $ref: '#/components/schemas/RegisterSchemaRequest'
       responses:
-        "201":
+        '201':
           description: Schema registered
-
   /schemas/{id}:
     get:
-      tags: [Schemas]
+      tags:
+      - Schemas
       summary: Get schema by ID
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Schema details
-
   /schemas/{id}/validate:
     post:
-      tags: [Schemas]
+      tags:
+      - Schemas
       summary: Validate an event against a schema
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ValidateEventRequest"
+              $ref: '#/components/schemas/ValidateEventRequest'
       responses:
-        "200":
+        '200':
           description: Validation result
-        "422":
+        '422':
           description: Validation failed
-
-  # ══════════════════════════════════════
-  # ROUTING
-  # ══════════════════════════════════════
   /endpoints/{id}/routing:
     get:
-      tags: [Routing]
+      tags:
+      - Routing
       summary: Get routing config for endpoint
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Routing info
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RoutingInfo"
+                $ref: '#/components/schemas/RoutingInfo'
     put:
-      tags: [Routing]
+      tags:
+      - Routing
       summary: Update routing config
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateRoutingRequest"
+              $ref: '#/components/schemas/UpdateRoutingRequest'
       responses:
-        "200":
+        '200':
           description: Routing updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RoutingInfo"
-
+                $ref: '#/components/schemas/RoutingInfo'
   /endpoints/{id}/health:
     get:
-      tags: [Routing]
+      tags:
+      - Routing
       summary: Get endpoint health status
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Health status
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EndpointHealth"
-
-  # ══════════════════════════════════════
-  # PLAYGROUND
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/EndpointHealth'
   /playground:
     get:
-      tags: [Playground]
+      tags:
+      - Playground
       summary: Get playground info (endpoints, sample payloads)
       responses:
-        "200":
+        '200':
           description: Playground data
           content:
             application/json:
@@ -2754,85 +3927,83 @@ paths:
                     type: array
                     items:
                       type: object
-
   /playground/test:
     post:
-      tags: [Playground]
+      tags:
+      - Playground
       summary: Test a webhook delivery
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TestWebhookRequest"
+              $ref: '#/components/schemas/TestWebhookRequest'
       responses:
-        "200":
+        '200':
           description: Test result
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TestWebhookResponse"
-
-  # ══════════════════════════════════════
-  # TRANSFORMS
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/TestWebhookResponse'
   /endpoints/{endpoint_id}/transforms:
     get:
-      tags: [Transforms]
+      tags:
+      - Transforms
       summary: List transform rules for endpoint
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Transform rule list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/TransformRule"
+                  $ref: '#/components/schemas/TransformRule'
     post:
-      tags: [Transforms]
+      tags:
+      - Transforms
       summary: Create transform rule
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateTransformRuleRequest"
+              $ref: '#/components/schemas/CreateTransformRuleRequest'
       responses:
-        "201":
+        '201':
           description: Rule created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TransformRule"
-
+                $ref: '#/components/schemas/TransformRule'
   /endpoints/{endpoint_id}/transforms/{id}:
     put:
-      tags: [Transforms]
+      tags:
+      - Transforms
       summary: Update transform rule
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
@@ -2840,40 +4011,41 @@ paths:
             schema:
               type: object
       responses:
-        "200":
+        '200':
           description: Rule updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TransformRule"
+                $ref: '#/components/schemas/TransformRule'
     delete:
-      tags: [Transforms]
+      tags:
+      - Transforms
       summary: Delete transform rule
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Rule deleted
-
   /endpoints/{endpoint_id}/transforms/test:
     post:
-      tags: [Transforms]
+      tags:
+      - Transforms
       summary: Test a transform rule
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
@@ -2884,47 +4056,41 @@ paths:
                 payload:
                   type: object
                 rule_id:
-                  $ref: "#/components/schemas/Uuid"
+                  $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Transformed output
-
-  # ══════════════════════════════════════
-  # STREAM
-  # ══════════════════════════════════════
   /stream/deliveries:
     get:
-      tags: [Stream]
+      tags:
+      - Stream
       summary: Real-time delivery event stream (SSE)
       description: Server-Sent Events stream of webhook deliveries
       parameters:
-        - name: endpoint_id
-          in: query
-          schema:
-            $ref: "#/components/schemas/Uuid"
-        - name: status
-          in: query
-          schema:
-            type: string
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
+      - name: endpoint_id
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 50
       responses:
-        "200":
+        '200':
           description: SSE stream
           content:
             text/event-stream:
               schema:
                 type: string
-
-  # ══════════════════════════════════════
-  # CONTACT
-  # ══════════════════════════════════════
   /contact:
     post:
-      tags: [Contact]
+      tags:
+      - Contact
       summary: Send contact form message
       security: []
       requestBody:
@@ -2932,166 +4098,160 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ContactRequest"
+              $ref: '#/components/schemas/ContactRequest'
       responses:
-        "200":
+        '200':
           description: Message sent
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ContactResponse"
-        "400":
+                $ref: '#/components/schemas/ContactResponse'
+        '400':
           description: Validation error
-
-  # ══════════════════════════════════════
-  # OUTBOUND IPS
-  # ══════════════════════════════════════
   /outbound-ips:
     get:
-      tags: [Outbound IPs]
+      tags:
+      - Outbound IPs
       summary: Get outbound IP addresses for firewall whitelisting
       security: []
       responses:
-        "200":
+        '200':
           description: IP list
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutboundIpsResponse"
-
-  # ══════════════════════════════════════
-  # HEALTH / STATUS
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/OutboundIpsResponse'
   /status:
     get:
-      tags: [Health]
+      tags:
+      - Health
       summary: System status (public)
       security: []
       responses:
-        "200":
+        '200':
           description: System operational
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SystemStatus"
-        "503":
+                $ref: '#/components/schemas/SystemStatus'
+        '503':
           description: System degraded or down
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SystemStatus"
-
-  # ══════════════════════════════════════
-  # CUSTOMER PORTAL
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/SystemStatus'
   /portal/me:
     get:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Get portal profile
       responses:
-        "200":
+        '200':
           description: Profile
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PortalProfile"
+                $ref: '#/components/schemas/PortalProfile'
     put:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Update portal profile
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateProfileRequest"
+              $ref: '#/components/schemas/UpdateProfileRequest'
       responses:
-        "200":
+        '200':
           description: Profile updated
-
   /portal/api-keys:
     get:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: List API keys (portal)
       responses:
-        "200":
+        '200':
           description: API key list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ApiKeyInfo"
+                  $ref: '#/components/schemas/ApiKeyInfo'
     post:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Create API key (portal)
       responses:
-        "201":
+        '201':
           description: API key created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateApiKeyResponse"
-
+                $ref: '#/components/schemas/CreateApiKeyResponse'
   /portal/api-keys/{key_id}:
     delete:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Revoke API key (portal)
       parameters:
-        - name: key_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: key_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Key revoked
-
   /portal/usage:
     get:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Get usage (portal)
       responses:
-        "200":
+        '200':
           description: Usage data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UsageResponse"
-
+                $ref: '#/components/schemas/UsageResponse'
   /portal/plan:
     get:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Get plan info (portal)
       responses:
-        "200":
+        '200':
           description: Plan details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SubscriptionResponse"
-
+                $ref: '#/components/schemas/SubscriptionResponse'
   /portal/notifications:
     get:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Get notification preferences (portal)
       responses:
-        "200":
+        '200':
           description: Notification preferences
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NotificationPreferences"
+                $ref: '#/components/schemas/NotificationPreferences'
     put:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Update notification preferences (portal)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateNotificationPreferences"
+              $ref: '#/components/schemas/UpdateNotificationPreferences'
       responses:
-        "200":
+        '200':
           description: Preferences updated
           content:
             application/json:
@@ -3101,91 +4261,85 @@ paths:
                   updated:
                     type: boolean
                   preferences:
-                    $ref: "#/components/schemas/NotificationPreferences"
-
-  # ══════════════════════════════════════
-  # ENDPOINT HEALTH
-  # ══════════════════════════════════════
+                    $ref: '#/components/schemas/NotificationPreferences'
   /endpoint-health:
     get:
-      tags: [Health]
+      tags:
+      - Health
       summary: List endpoint health statuses
       responses:
-        "200":
+        '200':
           description: Health list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/EndpointHealth"
-
+                  $ref: '#/components/schemas/EndpointHealth'
   /endpoint-health/{id}:
     get:
-      tags: [Health]
+      tags:
+      - Health
       summary: Get specific endpoint health
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: Health status
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EndpointHealth"
-
-  # ══════════════════════════════════════
-  # ADMIN
-  # ══════════════════════════════════════
+                $ref: '#/components/schemas/EndpointHealth'
   /admin/users:
     get:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: List all users (admin)
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-        - name: per_page
-          in: query
-          schema:
-            type: integer
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
       responses:
-        "200":
+        '200':
           description: Paginated user list
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
-
+                $ref: '#/components/schemas/PaginatedUsers'
   /admin/users/{id}:
     get:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Get user details (admin)
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       responses:
-        "200":
+        '200':
           description: User details
-
   /admin/users/{id}/plan:
     put:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Change user plan (admin)
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
@@ -3195,21 +4349,24 @@ paths:
               properties:
                 plan:
                   type: string
-                  enum: [free, pro, business]
+                  enum:
+                  - free
+                  - pro
+                  - business
       responses:
-        "200":
+        '200':
           description: Plan changed
-
   /admin/users/{id}/status:
     put:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Change user status (admin)
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Uuid"
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
       requestBody:
         required: true
         content:
@@ -3220,27 +4377,27 @@ paths:
                 is_active:
                   type: boolean
       responses:
-        "200":
+        '200':
           description: Status changed
-
   /admin/stats:
     get:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: System-wide statistics (admin)
       responses:
-        "200":
+        '200':
           description: System stats
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SystemStats"
-
+                $ref: '#/components/schemas/SystemStats'
   /admin/revenue:
     get:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Revenue by month (admin)
       responses:
-        "200":
+        '200':
           description: Revenue data
           content:
             application/json:
@@ -3255,359 +4412,403 @@ paths:
                       type: integer
                     subscriber_count:
                       type: integer
-
-  # ── Auth (missing) ──────────────────────────────────────
   /auth/logout:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Logout (invalidate refresh token)
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Logged out
-
   /auth/export:
     get:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Export user data (GDPR)
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: User data export
-
   /auth/account:
     delete:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Delete account (GDPR)
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Account deleted
-
-  # ── OAuth ──────────────────────────────────────────────
   /oauth/providers:
     get:
-      tags: [OAuth]
+      tags:
+      - OAuth
       summary: List available OAuth providers
       responses:
-        "200":
+        '200':
           description: Provider list
-
   /oauth/google:
     get:
-      tags: [OAuth]
+      tags:
+      - OAuth
       summary: Google OAuth login redirect
       responses:
-        "302":
+        '302':
           description: Redirect to Google
-
   /oauth/google/callback:
     get:
-      tags: [OAuth]
+      tags:
+      - OAuth
       summary: Google OAuth callback
       responses:
-        "200":
+        '200':
           description: Authenticated
-
-  # ── Audit Log ──────────────────────────────────────────
   /audit-log:
     get:
-      tags: [Audit Log]
+      tags:
+      - Audit Log
       summary: List audit log entries
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: page
-          in: query
-          schema: {type: integer, default: 1}
-        - name: action
-          in: query
-          schema: {type: string}
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: action
+        in: query
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Audit entries
-
   /audit-log/{id}:
     get:
-      tags: [Audit Log]
+      tags:
+      - Audit Log
       summary: Get audit entry detail
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Audit entry detail
-
-  # ── SSO ────────────────────────────────────────────────
   /sso/config:
     get:
-      tags: [SSO]
+      tags:
+      - SSO
       summary: Get SSO configuration
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: SSO config
     post:
-      tags: [SSO]
+      tags:
+      - SSO
       summary: Create/update SSO configuration
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                provider: {type: string, enum: [saml, oidc]}
-                enabled: {type: boolean}
+                provider:
+                  type: string
+                  enum:
+                  - saml
+                  - oidc
+                enabled:
+                  type: boolean
       responses:
-        "200":
+        '200':
           description: SSO config saved
     delete:
-      tags: [SSO]
+      tags:
+      - SSO
       summary: Delete SSO configuration
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: SSO config deleted
-
   /sso/test:
     post:
-      tags: [SSO]
+      tags:
+      - SSO
       summary: Test SSO connection
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Connection test result
-
-  # ── Custom Domains ─────────────────────────────────────
   /custom-domains:
     get:
-      tags: [Custom Domains]
+      tags:
+      - Custom Domains
       summary: List custom domains
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Domain list
     post:
-      tags: [Custom Domains]
+      tags:
+      - Custom Domains
       summary: Add custom domain
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                domain: {type: string}
+                domain:
+                  type: string
       responses:
-        "201":
+        '201':
           description: Domain added
-
   /custom-domains/{id}:
     delete:
-      tags: [Custom Domains]
+      tags:
+      - Custom Domains
       summary: Delete custom domain
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Domain deleted
-
   /custom-domains/{id}/verify:
     post:
-      tags: [Custom Domains]
+      tags:
+      - Custom Domains
       summary: Verify domain ownership
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Verification result
-
-  # ── Rate Limits ────────────────────────────────────────
   /rate-limits:
     get:
-      tags: [Rate Limits]
+      tags:
+      - Rate Limits
       summary: List rate limits
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Rate limit list
-
   /rate-limits/{endpoint_id}:
     get:
-      tags: [Rate Limits]
+      tags:
+      - Rate Limits
       summary: Get rate limit for endpoint
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Rate limit config
     post:
-      tags: [Rate Limits]
+      tags:
+      - Rate Limits
       summary: Set rate limit for endpoint
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Rate limit set
     delete:
-      tags: [Rate Limits]
+      tags:
+      - Rate Limits
       summary: Delete rate limit for endpoint
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: endpoint_id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Rate limit deleted
-
-  # ── Embed ──────────────────────────────────────────────
   /embed:
     get:
-      tags: [Embed]
+      tags:
+      - Embed
       summary: Embeddable portal HTML
       responses:
-        "200":
+        '200':
           description: HTML page
-
   /embed/script:
     get:
-      tags: [Embed]
+      tags:
+      - Embed
       summary: Embeddable portal JavaScript
       responses:
-        "200":
+        '200':
           description: JavaScript file
-
-  # ── Events ─────────────────────────────────────────────
   /events:
     get:
-      tags: [Events]
+      tags:
+      - Events
       summary: List event types
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Event type list
-
-  # ── Simulator ──────────────────────────────────────────
   /simulator:
     post:
-      tags: [Simulator]
+      tags:
+      - Simulator
       summary: Simulate a webhook delivery
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                endpoint_id: {type: string}
-                event: {type: string}
-                data: {type: object}
+                endpoint_id:
+                  type: string
+                event:
+                  type: string
+                data:
+                  type: object
       responses:
-        "200":
+        '200':
           description: Simulation result
-
-  # ── Customer Portal (missing) ──────────────────────────
   /portal/config:
     get:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Get portal configuration
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Portal config
     post:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Update portal configuration
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Portal config saved
-
   /portal/embed-code:
     get:
-      tags: [Customer Portal]
+      tags:
+      - Customer Portal
       summary: Get portal embed code
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: Embed code snippet
-
-  # ── Admin (missing) ────────────────────────────────────
   /admin/sdk-update:
     post:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Send SDK update notification to users
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                version: {type: string}
-                message: {type: string}
+                version:
+                  type: string
+                message:
+                  type: string
       responses:
-        "200":
+        '200':
           description: Notification sent
-
-  # ── Routing (missing) ──────────────────────────────────
   /routing/{id}/routing:
     get:
-      tags: [Routing]
+      tags:
+      - Routing
       summary: Get routing config for endpoint
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Routing config
     put:
-      tags: [Routing]
+      tags:
+      - Routing
       summary: Update routing config
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Routing config updated
-
   /routing/{id}/health:
     get:
-      tags: [Routing]
+      tags:
+      - Routing
       summary: Get endpoint health status
-      security: [{BearerAuth: []}]
+      security:
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Health status
