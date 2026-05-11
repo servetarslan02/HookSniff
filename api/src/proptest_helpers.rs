@@ -66,6 +66,11 @@ pub fn delivery_format_strategy() -> impl Strategy<Value = String> {
     prop_oneof!["standard", "cloudevents"]
 }
 
+/// Arbitrary delivery status string.
+pub fn delivery_status_strategy() -> impl Strategy<Value = String> {
+    prop_oneof!["pending", "processing", "delivered", "failed", "expired"]
+}
+
 /// Generate a RetryPolicy tuple: (max_attempts, backoff, initial_delay, max_delay).
 pub fn retry_policy_strategy() -> impl Strategy<Value = (i32, String, i32, i32)> {
     (1..20i32, backoff_strategy(), 1..300i32, 60..86400i32).prop_map(
@@ -227,7 +232,7 @@ proptest! {
         requests_made in 0..100u32,
         limit in 1..200u32,
     ) {
-        use crate::rate_limit::InMemoryRateLimiter;
+        use crate::rate_limit::{InMemoryRateLimiter, RateLimitStore};
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
             let limiter = InMemoryRateLimiter::new();
@@ -351,7 +356,7 @@ proptest! {
         strategy in prop_oneof!["round-robin", "failover", "latency", "unknown", ""],
     ) {
         use crate::models::endpoint::RoutingStrategy;
-        let parsed = RoutingStrategy::parse_str(strategy);
+        let parsed = RoutingStrategy::parse_str(&strategy);
         let serialized = parsed.as_str();
         let re_parsed = RoutingStrategy::parse_str(serialized);
         prop_assert_eq!(parsed, re_parsed);
