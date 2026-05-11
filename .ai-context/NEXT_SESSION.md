@@ -1,69 +1,58 @@
-# NEXT_SESSION.md — Sonraki Oturum Planı
+# NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> Son güncelleme: 2026-05-12 02:20 GMT+8
+> **Son güncelleme:** 2026-05-12 02:41 GMT+8
+> **Son commit:** `71d2fee9` (main)
+> **Son oturum:** AŞAMA 1 Kritik Güvenlik (19/22 tamamlandı)
 
----
+## Hemen Başla
 
-## ✅ Tamamlanan
+1. `git pull origin main` — en son değişiklikleri al
+2. Bu dosyayı oku — kaldığın yeri öğren
+3. `IMPLEMENTATION-PLAN.md` — tam plan için bak
 
-### AŞAMA 2 — Wrapper Class + İmza Doğrulama (TAMAMLANDI)
+## Bir Sonraki Görev: AŞAMA 2 — YÜKSEK GÜVENLİK & ASYNC
 
-| # | Görev | Durum |
-|---|-------|-------|
-| 2.1 | Node.js referans implementasyonu | ✅ Oturum 116 |
-| 2.2 | Node.js imza doğrulama | ✅ Oturum 116 |
-| 2.3 | Node.js HTTP lib değişimi | ✅ Oturum 116 |
-| 2.4 | Node.js serialization | ✅ Oturum 116 |
-| 2.5 | Node.js pagination | ✅ Oturum 116 |
-| 2.6 | Python wrapper + imza + serialization | ✅ Oturum 117 |
-| 2.7 | Go wrapper + imza | ✅ Oturum 117 |
-| 2.8 | Kalan diller批量 wrapper | ❌ |
+### 2.1 Async Rust Yüksek (#23-26)
+- [ ] `reqwest::Client` per-request → shared client yap (`api/src/`, `worker/src/`)
+- [ ] Blocking file I/O in async → `tokio::task::spawn_blocking` (`worker/src/`)
+- [ ] Unbounded mpsc channel in WebSocket → bounded channel (`api/src/ws/`)
+- [ ] Poisoned mutex panics → `try_lock` veya graceful handling (`api/src/`)
 
-### AŞAMA 3 — Kalite ve Güvenilirlik (kısmen)
+### 2.2 Crypto & Auth Yüksek (#27-30)
+- [ ] Argon2id parametreleri OWASP altı → m=19456, t=2, p=1 kontrol et (`api/src/auth/jwt.rs`)
+- [ ] Admin authorization client-side only → backend admin check ekle (`admin/layout.tsx`)
+- [ ] Playground token localStorage'da → httpOnly cookie (`playground/page.tsx`)
+- [ ] Playground token URL path'te → query param veya header (`playground/page.tsx`)
 
-| # | Görev | Durum |
-|---|-------|-------|
-| 3.1 | Node.js unit testler (211 test) | ✅ Oturum 116 |
-| 3.2 | Python unit testler (77 test) | ✅ Oturum 117 |
-| 3.3 | Go unit testler | ❌ Sıradaki |
-| 3.4 | Rust unit testler | ❌ |
-| 3.5 | Kalan 7 dil testleri | ❌ |
-| 3.6 | CHANGELOG | ❌ |
-| 3.7 | Migration guide | ❌ |
+### 2.3 Rate Limiting Yüksek (#31-32)
+- [ ] API-level rate limit middleware gap → tüm endpoint'leri kapsa
+- [ ] Bazı endpoint'ler atlanıyor → middleware chain kontrol
 
----
+### 2.4 Worker Yüksek (#33-37)
+- [ ] Zombie reaper increments attempt count without delivery
+- [ ] No retry for DB commit failures
+- [ ] Email delivery uses blocking I/O in async
+- [ ] Email delivery creates new HTTP client per call
+- [ ] Fan-out bug — target config not used
 
-## 📋 Sonraki Adımlar — QUALITY_ROADMAP'a göre
+### 2.5 Infrastructure Yüksek (#38-42)
+- [ ] No rollback strategy
+- [ ] Hardcoded secrets in Helm values.yaml
+- [ ] Git history'de OTEL credentials (BFG ile temizle)
+- [ ] DATABASE_URL local credentials git history'de
+- [ ] DNS rebinding SSRF
 
-### AŞAMA 3 — Kalite ve Güvenilirlik (kalan)
+### 2.6 Destructive Actions (#43-44)
+- [ ] Destructive action'larda confirmation yok
+- [ ] No i18n in API Importer
 
-| # | Görev | Durum | Öncelik |
-|---|-------|-------|---------|
-| 3.3 | Go unit testler | ❌ | 🔴 |
-| 3.4 | Rust unit testler | ❌ | 🔴 |
-| 3.5 | Kalan 7 dil testleri | ❌ | 🟡 |
-| 3.6 | CHANGELOG oluştur (tüm SDK'lar) | ❌ | 🟡 |
-| 3.7 | Migration guide (0.1→0.2→0.3→0.4) | ❌ | 🟡 |
+## AŞAMA 1'de Kalanlar (3 madde)
+- [ ] #11: `password_hash` column NOT NULL yap
+- [ ] #12: Missing migration files (13 SQL)
+- [ ] #13: Hardcoded DB credentials temizle
 
-### AŞAMA 4 — Operasyonel Mükemmellik
-
-| # | Görev | Durum | Öncelik |
-|---|-------|-------|---------|
-| 4.1 | CI/CD pipeline (GitHub Actions) | ❌ | 🟡 |
-| 4.2 | Otomatik versiyon yönetimi | ❌ | 🟢 |
-| 4.3 | SDK dokümantasyon sitesi | ❌ | 🟢 |
-| 4.4 | Performance benchmarking | ❌ | 🟢 |
-
-### Kalan SDK'lar (Node.js + Python dışı)
-
-AŞAMA 2.3-2.5 düzeltmeleri sadece Node.js ve Python için yapıldı. Diğer 9 SDK'ya da aynı kalite standartları uygulanmalı:
-- Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
-
----
-
-## ⚠️ Notlar
-
-- GitHub Actions billing limiti dolmuş — CI/CD workflow'ları çalışmıyor
-- GCP Cloud Build alternatif olarak kullanılabilir
-- Servet'in GitHub billing güncellemesi gerekiyor
-- Her oturum sonunda GitHub'a push et — local dosyalar silinir
+## Kritik Hatırlatmalar
+- **GitHub PAT:** `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` (Servet rotate edecek)
+- **Oturum süresi:** 1 saat — işleri batch'le, sık commit yap
+- **Push etmeyi unutma!** Her oturum sonunda `git push origin main`
+- **İlerleme kaydı:** `.ai-context/logs/YYYY-MM-DD-session.md` dosyasını güncelle
