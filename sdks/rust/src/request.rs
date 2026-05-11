@@ -94,23 +94,23 @@ impl HookSniffRequest {
         Ok(())
     }
 
-    /// Test-only accessors for inspecting request state.
-    #[cfg(test)]
+    /// Read-only accessors for testing.
+    #[cfg(feature = "test-utils")]
     pub fn path(&self) -> &str {
         &self.path
     }
 
-    #[cfg(test)]
+    #[cfg(feature = "test-utils")]
     pub fn query_params(&self) -> &HashMap<String, String> {
         &self.query_params
     }
 
-    #[cfg(test)]
+    #[cfg(feature = "test-utils")]
     pub fn header_params(&self) -> &HashMap<String, String> {
         &self.header_params
     }
 
-    #[cfg(test)]
+    #[cfg(feature = "test-utils")]
     pub fn body_str(&self) -> Option<&str> {
         self.body.as_deref()
     }
