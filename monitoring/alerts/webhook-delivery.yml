@@ -1,0 +1,219 @@
+# ═══════════════════════════════════════════════════════════════════
+# HookSniff — Webhook Delivery Alert Rules (Prometheus)
+# ═══════════════════════════════════════════════════════════════════
+# Bu dosya webhook delivery süreçlerini izler ve anomali tespit
+# edildiğinde alert üretir.
+#
+# Yükleme:
+#   prometheus --config.file=prometheus.yml
+#   (prometheus.yml'de rule_files altında referans verilmeli)
+# ═══════════════════════════════════════════════════════════════════
+
+groups:
+  # ── Webhook Delivery — Kritik Alertler ──
+  - name: webhook_delivery_critical
+    rules:
+      # ── Webhook delivery hata oranı > %10 ──
+      - alert: WebhookDeliveryHighFailureRate
+        expr: |
+          (
+            sum(rate(webhook_deliveries_total{status="failed"}[5m]))
+            /
+            sum(rate(webhook_deliveries_total[5m]))
+          ) > 0.10
+        for: 3m
+        labels:
+          severity: critical
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Webhook delivery hata oranı kritik seviyede"
+          description: >-
+            Son 5 dakikada webhook delivery'lerin %{{ $value | humanizePercentage }}
+            'i başarısız oldu (eşik: %10). Worker durumunu ve müşteri
+            endpoint'lerini kontrol edin.
+
+      # ── Hiç webhook delivery yapılmıyor (Worker durmuş olabilir) ──
+      - alert: WebhookDeliveryStalled
+        expr: |
+          sum(rate(webhook_deliveries_total[5m])) == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Webhook delivery tamamen durdu"
+          description: >-
+            Son 5 dakikada hiç webhook delivery gerçekleştirilmedi.
+            Worker servisi durmuş veya queue boş olabilir.
+
+      # ── Worker servisi erişilemez ──
+      - alert: WorkerServiceDown
+        expr: up{job="hooksniff-worker"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "HookSniff Worker servisi erişilemez"
+          description: >-
+            Worker servisi 1 dakikadır yanıt vermiyor.
+            Cloud Run durumunu kontrol edin.
+
+      # ── Toplam delivery sayısı anormal düşük ──
+      - alert: WebhookDeliveryVolumeDrop
+        expr: |
+          (
+            sum(rate(webhook_deliveries_total[15m]))
+            /
+            sum(rate(webhook_deliveries_total[1h] offset 1d))
+          ) < 0.3
+        for: 10m
+        labels:
+          severity: critical
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Webhook delivery hacmi anormal düştü"
+          description: >-
+            Son 15 dakikanın delivery hızı, dün aynı saatteki
+            hızın %30'unun altında. Sistem veya müşteri tarafında
+            sorun olabilir.
+
+  # ── Webhook Delivery — Uyarı Alertleri ──
+  - name: webhook_delivery_warning
+    rules:
+      # ── Retry oranı yüksek ──
+      - alert: WebhookDeliveryHighRetryRate
+        expr: |
+          (
+            sum(rate(webhook_deliveries_total{status="retrying"}[5m]))
+            /
+            sum(rate(webhook_deliveries_total[5m]))
+          ) > 0.20
+        for: 5m
+        labels:
+          severity: warning
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Webhook delivery retry oranı yüksek"
+          description: >-
+            Son 5 dakikada delivery'lerin %{{ $value | humanizePercentage }}
+            'i retry edildi (eşik: %20). Müşteri endpoint'leri
+            yavaş veya erişilemez olabilir.
+
+      # ── Delivery latency yüksek (p95 > 5 saniye) ──
+      - alert: WebhookDeliveryHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(webhook_delivery_duration_seconds_bucket[5m])) by (le)
+          ) > 5
+        for: 3m
+        labels:
+          severity: warning
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Webhook delivery gecikmesi yüksek"
+          description: >-
+            P95 delivery süresi {{ $value }} saniye (eşik: 5s).
+            Müşteri endpoint'leri yavaş yanıt veriyor olabilir.
+
+      # ── Tekrarlayan başarısızlık (aynı endpoint) ──
+      - alert: WebhookEndpointRepeatedFailure
+        expr: |
+          sum by (endpoint_id) (
+            rate(webhook_deliveries_total{status="failed"}[10m])
+          ) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Endpoint bazlı tekrarlayan delivery hatası"
+          description: >-
+            Endpoint {{ $labels.endpoint_id }} için son 10 dakikada
+            5'ten fazla delivery başarısız oldu. Endpoint devre dışı
+            bırakılabilir.
+
+      # ── Dead letter queue büyüyor ──
+      - alert: DeadLetterQueueGrowing
+        expr: |
+          sum(webhook_dead_letter_queue_size) > 100
+        for: 10m
+        labels:
+          severity: warning
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Dead letter queue boyutu büyüyor"
+          description: >-
+            Dead letter queue'da {{ $value }} webhook var.
+            Kalıcı başarısızlıklar müşteri endpoint'lerinden
+            kaynaklanıyor olabilir.
+
+      # ── Webhook queue depth yüksek ──
+      - alert: WebhookQueueDepthHigh
+        expr: |
+          sum(webhook_queue_depth) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: hooksniff-worker
+          team: devops
+        annotations:
+          summary: "Webhook queue derinliği yüksek"
+          description: >-
+            Queue'da {{ $value }} webhook işlenmeyi bekliyor.
+            Worker kapasitesi yetersiz olabilir.
+
+  # ── Webhook Delivery — Bilgilendirme ──
+  - name: webhook_delivery_info
+    rules:
+      # ── Başarılı delivery oranı (dashboard metrik) ──
+      - record: webhook:success_rate:5m
+        expr: |
+          (
+            sum(rate(webhook_deliveries_total{status="delivered"}[5m]))
+            /
+            sum(rate(webhook_deliveries_total[5m]))
+          )
+
+      # ── Ortalama delivery süresi ──
+      - record: webhook:avg_duration:5m
+        expr: |
+          sum(rate(webhook_delivery_duration_seconds_sum[5m]))
+          /
+          sum(rate(webhook_delivery_duration_seconds_count[5m]))
+
+      # ── Toplam delivery throughput ──
+      - record: webhook:throughput:5m
+        expr: |
+          sum(rate(webhook_deliveries_total[5m]))
+
+      # ── Endpoint bazlı hata oranı ──
+      - record: webhook:endpoint_error_rate:5m
+        expr: |
+          (
+            sum by (endpoint_id) (rate(webhook_deliveries_total{status="failed"}[5m]))
+            /
+            sum by (endpoint_id) (rate(webhook_deliveries_total[5m]))
+          )
+
+      # ── P50 delivery latency ──
+      - record: webhook:latency_p50:5m
+        expr: |
+          histogram_quantile(0.50,
+            sum(rate(webhook_delivery_duration_seconds_bucket[5m])) by (le)
+          )
+
+      # ── P99 delivery latency ──
+      - record: webhook:latency_p99:5m
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(webhook_delivery_duration_seconds_bucket[5m])) by (le)
+          )
