@@ -126,7 +126,7 @@ pub async fn create_checkout_session(
         },
     };
 
-    let client = reqwest::Client::new();
+    let client = crate::http_client::get_client().clone();
     let resp = client
         .post("https://api.stripe.com/v1/checkout/sessions")
         .bearer_auth(stripe_secret)
@@ -164,7 +164,7 @@ pub async fn create_customer_portal(
 
     let base_url = cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
 
-    let client = reqwest::Client::new();
+    let client = crate::http_client::get_client().clone();
     let resp = client
         .post("https://api.stripe.com/v1/billing_portal/sessions")
         .bearer_auth(stripe_secret)
