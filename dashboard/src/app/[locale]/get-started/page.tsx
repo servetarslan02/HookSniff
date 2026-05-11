@@ -178,27 +178,7 @@ export default function GetStartedPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-brand-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
-      {/* Header */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🪝</span>
-            <span className="font-bold text-gray-900 dark:text-white text-lg">HookSniff</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <LanguageSwitcher />
-            {user ? (
-              <Link href="/dashboard" className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-                Dashboard →
-              </Link>
-            ) : (
-              <Link href="/login" className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-                {t('createFreeAccount')}
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
+      <PublicNavbar pageTitle={t('title')} />
 
       {/* Hero */}
       <div className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
