@@ -72,6 +72,15 @@ class HookSniffRequest:
         if response.status == 204:
             return None
         text = response.read().decode("utf-8")
+
+        # Empty body check — match Node.js behavior
+        if not text or len(text.strip()) == 0:
+            if parser:
+                raise ApiException(
+                    response.status, "Empty response body", dict(response.headers)
+                )
+            return None
+
         data = json.loads(text)
         return parser(data) if parser else data
 
