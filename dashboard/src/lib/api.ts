@@ -3,6 +3,36 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? "/api" : "http://localhost:3000/v1");
 
 const REQUEST_TIMEOUT_MS = 30_000;
+const MAX_RETRIES = 2;
+const RETRY_BASE_DELAY_MS = 1_000;
+
+// Shared refresh promise — prevents multiple concurrent 401s from
+// each firing their own refresh request (Item 138).
+let refreshPromise: Promise<boolean> | null = null;
+
+function doRefresh(): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { ...getCSRFHeaders('POST') },
+    })
+      .then((r) => r.ok)
+      .catch(() => false)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
+function isTransientError(status: number): boolean {
+  return status === 502 || status === 503 || status === 504;
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
 // CSRF protection: For mutating requests, ensure Origin matches the site.
 // This is a defense-in-depth measure alongside cookie-based auth.
@@ -45,60 +75,70 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     signal.addEventListener('abort', () => controller.abort(), { once: true });
   }
 
-  try {
-    const res = await fetch(`${API_BASE}${path}`, {
-      method,
-      headers,
-      credentials: 'include',
-      body: body ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    });
+  let lastError: unknown;
 
-    if (!res.ok) {
-      // Auto-logout on 401 (token expired or invalid)
-      if (res.status === 401) {
-        // Try to refresh the session first
-        if (typeof window !== 'undefined') {
-          try {
-            const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
-              method: 'POST',
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(`${API_BASE}${path}`, {
+        method,
+        headers,
+        credentials: 'include',
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        // Auto-logout on 401 (token expired or invalid)
+        if (res.status === 401 && typeof window !== 'undefined') {
+          const refreshed = await doRefresh();
+          if (refreshed) {
+            // Refresh succeeded — retry the original request once
+            const retryRes = await fetch(`${API_BASE}${path}`, {
+              method,
+              headers,
               credentials: 'include',
-              headers: { ...getCSRFHeaders('POST') },
+              body: body ? JSON.stringify(body) : undefined,
+              signal: controller.signal,
             });
-            if (refreshRes.ok) {
-              // Refresh succeeded — retry the original request
-              const retryRes = await fetch(`${API_BASE}${path}`, {
-                method,
-                headers,
-                credentials: 'include',
-                body: body ? JSON.stringify(body) : undefined,
-                signal: controller.signal,
-              });
-              if (retryRes.ok) {
-                return retryRes.json();
-              }
+            if (retryRes.ok) {
+              return retryRes.json();
             }
-          } catch {
-            // Refresh failed — fall through to logout
           }
-          // Both refresh and retry failed — clear auth and redirect
+          // Refresh failed — clear auth and redirect
           localStorage.removeItem('hooksniff_auth');
           window.location.href = '/login';
         }
-      }
-      const error = await res.json().catch(() => ({ message: "Unknown error" }));
-      throw new Error(error.error?.message || `API error: ${res.status}`);
-    }
 
-    return res.json();
-  } catch (err: unknown) {
-    if (err instanceof DOMException && err.name === 'AbortError') {
-      throw new Error('Request timed out. Please try again.');
+        // Retry transient errors (502, 503, 504) with exponential backoff
+        if (isTransientError(res.status) && attempt < MAX_RETRIES) {
+          await delay(RETRY_BASE_DELAY_MS * Math.pow(2, attempt));
+          continue;
+        }
+
+        const error = await res.json().catch(() => ({ message: "Unknown error" }));
+        throw new Error(error.error?.message || `API error: ${res.status}`);
+      }
+
+      return res.json();
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error('Request timed out. Please try again.');
+      }
+      lastError = err;
+      // Don't retry non-network errors (already parsed API errors)
+      if (err instanceof Error && err.message.startsWith('API error:')) {
+        throw err;
+      }
+      // Network error — retry with backoff
+      if (attempt < MAX_RETRIES) {
+        await delay(RETRY_BASE_DELAY_MS * Math.pow(2, attempt));
+        continue;
+      }
+      throw err;
     }
-    throw err;
-  } finally {
-    clearTimeout(timeout);
   }
+
+  throw lastError;
 }
 
 // Endpoint API

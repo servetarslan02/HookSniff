@@ -287,7 +287,11 @@
     "delete": "Sil",
     "nameLabel": "Ad",
     "conditionLabel": "Koşul",
-    "thresholdLabel": "Eşik"
+    "thresholdLabel": "Eşik",
+    "fetchFailed": "Alarmlar yüklenemedi",
+    "createFailed": "Alarm oluşturulamadı",
+    "deleteFailed": "Alarm silinemedi",
+    "testFailed": "Test başarısız — endpoint URL'sini kontrol edin"
   },
   "playground": {
     "title": "API Oyun Alanı",
