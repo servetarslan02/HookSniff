@@ -323,9 +323,9 @@ export default function PricingPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('supportTitle')}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { plan: t('free'), level: t('communitySupport'), features: ['GitHub Issues', 'Community Discord', 'Documentation', 'Stack Overflow'], response: t('supportBestEffort'), highlight: false },
-              { plan: t('pro'), level: t('prioritySupport'), features: [t('emailSupport'), '48h response time', 'Bug fix priority', 'Feature requests'], response: '< 48 hours', highlight: true },
-              { plan: t('business'), level: t('dedicatedManager'), features: [t('dedicatedManager'), 'Slack Connect channel', '24h response time', t('customIntegrations'), 'Onboarding call'], response: '< 24 hours', highlight: false },
+              { plan: t('free'), level: t('communitySupport'), features: t.raw('supportFreeFeatures') as string[], response: t('supportBestEffort'), highlight: false },
+              { plan: t('pro'), level: t('prioritySupport'), features: t.raw('supportProFeatures') as string[], response: '< 48 hours', highlight: true },
+              { plan: t('business'), level: t('dedicatedManager'), features: t.raw('supportBusinessFeatures') as string[], response: '< 24 hours', highlight: false },
             ].map((s) => (
               <div
                 key={s.plan}
@@ -360,14 +360,14 @@ export default function PricingPage() {
                 <svg className="w-8 h-8 text-brand-200 dark:text-brand-800 mb-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
                 </svg>
-                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{t_item.quote}</p>
+                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{t(t_item.quoteKey)}</p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
                     {t_item.avatar}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t_item.author}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-500">{t_item.company}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t(t_item.authorKey)}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-500">{t(t_item.companyKey)}</p>
                   </div>
                 </div>
               </div>
