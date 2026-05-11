@@ -24,6 +24,35 @@ use crate::models::customer::{
 /// Maximum login attempts per IP per 15-minute window.
 const LOGIN_RATE_LIMIT: u32 = 10;
 
+/// Validate password strength:
+/// - Minimum 8 characters
+/// - At least 1 uppercase letter
+/// - At least 1 lowercase letter
+/// - At least 1 digit
+fn validate_password_strength(password: &str) -> Result<(), AppError> {
+    if password.len() < 8 {
+        return Err(AppError::BadRequest(
+            "Password must be at least 8 characters".into(),
+        ));
+    }
+    if !password.chars().any(|c| c.is_ascii_uppercase()) {
+        return Err(AppError::BadRequest(
+            "Password must contain at least one uppercase letter".into(),
+        ));
+    }
+    if !password.chars().any(|c| c.is_ascii_lowercase()) {
+        return Err(AppError::BadRequest(
+            "Password must contain at least one lowercase letter".into(),
+        ));
+    }
+    if !password.chars().any(|c| c.is_ascii_digit()) {
+        return Err(AppError::BadRequest(
+            "Password must contain at least one digit".into(),
+        ));
+    }
+    Ok(())
+}
+
 /// Maximum registration attempts per IP per hour.
 const REGISTER_RATE_LIMIT: u32 = 5;
 
@@ -145,11 +174,7 @@ async fn register(
         .password
         .ok_or_else(|| AppError::BadRequest("Password is required".into()))?;
 
-    if password.len() < 8 {
-        return Err(AppError::BadRequest(
-            "Password must be at least 8 characters".into(),
-        ));
-    }
+    validate_password_strength(&password)?;
 
     // Generate API key
     let api_key = generate_api_key();
@@ -492,11 +517,7 @@ async fn reset_password(
         return Err(AppError::RateLimitExceeded);
     }
 
-    if req.new_password.len() < 8 {
-        return Err(AppError::BadRequest(
-            "Password must be at least 8 characters".into(),
-        ));
-    }
+    validate_password_strength(&req.new_password)?;
 
     let token_hash = jwt::hash_token(&req.token);
 
@@ -897,11 +918,7 @@ async fn change_password(
     Extension(customer): Extension<Customer>,
     Json(req): Json<ChangePasswordRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    if req.new_password.len() < 8 {
-        return Err(AppError::BadRequest(
-            "Password must be at least 8 characters".into(),
-        ));
-    }
+    validate_password_strength(&req.new_password)?;
 
     let hash = customer.password_hash.as_ref().ok_or(AppError::BadRequest(
         "Password login not set up for this account".into(),

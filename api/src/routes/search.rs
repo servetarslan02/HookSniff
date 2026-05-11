@@ -40,7 +40,7 @@ async fn search_deliveries(
     axum::extract::Query(params): axum::extract::Query<SearchParams>,
 ) -> Result<Json<SearchResult>, AppError> {
     let page = params.page.unwrap_or(1).max(1);
-    let per_page = params.per_page.unwrap_or(20).min(100);
+    let per_page = params.per_page.unwrap_or(20).min(200);
     let offset = (page - 1) * per_page;
 
     // Build dynamic WHERE clause based on filters
