@@ -1,11 +1,9 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-export const metadata = {
-  title: 'GitHub Webhooks — Setup, Events & Best Practices | HookSniff',
-  description: 'Complete guide to GitHub webhooks. Handle push, pull request, issue, deployment, and workflow events with HookSniff.',
-};
+import Footer from '@/components/Footer';
 
 export default function GitHubWebhooksPage() {
   const t = useTranslations('providers');
@@ -102,6 +100,7 @@ export default function GitHubWebhooksPage() {
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

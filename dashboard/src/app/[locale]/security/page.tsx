@@ -1,8 +1,9 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-export const metadata = { title: 'Security & Compliance — HookSniff' };
+import Footer from '@/components/Footer';
 
 const features = [
   { icon: '🔒', title: 'TLS 1.3 Everywhere', desc: 'All data encrypted in transit with TLS 1.3. No HTTP, no exceptions.' },
@@ -128,6 +129,7 @@ export default function SecurityPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

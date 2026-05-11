@@ -1,11 +1,9 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-export const metadata = {
-  title: 'Stripe Webhooks — Setup, Events & Best Practices | HookSniff',
-  description: 'Complete guide to Stripe webhooks. Receive payment events, verify signatures, handle subscriptions, disputes, and refunds with HookSniff.',
-};
+import Footer from '@/components/Footer';
 
 export default function StripeWebhooksPage() {
   const t = useTranslations('providers');
@@ -137,6 +135,7 @@ app.post('/webhooks/stripe', (req, res) => {
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

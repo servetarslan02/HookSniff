@@ -38,17 +38,7 @@ function saveState(state: OnboardingState) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
 }
 
-/* ─── Use Case Options ─── */
-const USE_CASES = [
-  { id: 'payments', icon: '💳', label: 'Payments', desc: 'Stripe, iyzico, payment events' },
-  { id: 'email', icon: '📧', label: 'Email / Notifications', desc: 'SendGrid, Resend, push notifications' },
-  { id: 'ecommerce', icon: '🛒', label: 'E-commerce', desc: 'Order, shipping, inventory events' },
-  { id: 'saas', icon: '📊', label: 'SaaS Platform', desc: 'User, subscription, usage events' },
-  { id: 'ai', icon: '🤖', label: 'AI / Agents', desc: 'Task completion, model events' },
-  { id: 'other', icon: '⚙️', label: 'Other', desc: 'Custom webhook use case' },
-];
-
-/* ─── SDK Options ─── */
+/* ─── SDK Options (constant, no translation needed for language names) ─── */
 const SDKS = [
   { id: 'nodejs', label: 'Node.js', install: 'npm install hooksniff-sdk' },
   { id: 'python', label: 'Python', install: 'pip install hooksniff' },
@@ -111,6 +101,16 @@ export function OnboardingWizard() {
   const [copied, setCopied] = useState('');
   const t = useTranslations('onboarding');
 
+  /* ─── Use Case Options (inside component for t()) ─── */
+  const USE_CASES = [
+    { id: 'payments', icon: '💳', label: t('useCasePayments'), desc: t('useCasePaymentsDesc') },
+    { id: 'email', icon: '📧', label: t('useCaseEmail'), desc: t('useCaseEmailDesc') },
+    { id: 'ecommerce', icon: '🛒', label: t('useCaseEcommerce'), desc: t('useCaseEcommerceDesc') },
+    { id: 'saas', icon: '📊', label: t('useCaseSaas'), desc: t('useCaseSaasDesc') },
+    { id: 'ai', icon: '🤖', label: t('useCaseAi'), desc: t('useCaseAiDesc') },
+    { id: 'other', icon: '⚙️', label: t('useCaseOther'), desc: t('useCaseOtherDesc') },
+  ];
+
   useEffect(() => {
     if (user && !state.dismissed) {
       setVisible(true);
@@ -140,12 +140,12 @@ export function OnboardingWizard() {
   }, []);
 
   const steps: WizardStep[] = [
-    { id: 'welcome', title: 'Welcome to HookSniff! 🪝', description: 'Let\'s get your webhooks set up in under 5 minutes.', icon: '🎉' },
-    { id: 'usecase', title: 'What are you building?', description: 'We\'ll customize your experience based on your use case.', icon: '🎯' },
-    { id: 'sdk', title: 'Choose your SDK', description: 'Pick your language and install the SDK.', icon: '📦' },
-    { id: 'endpoint', title: 'Create your first endpoint', description: 'This is where we\'ll deliver your webhooks.', icon: '🔗' },
-    { id: 'test', title: 'Send a test webhook', description: 'Let\'s make sure everything works.', icon: '🧪' },
-    { id: 'done', title: 'You\'re all set! 🎉', description: 'Start sending webhooks with confidence.', icon: '✅' },
+    { id: 'welcome', title: t('welcomeTitle'), description: t('welcomeWizardDesc'), icon: '🎉' },
+    { id: 'usecase', title: t('whatBuilding'), description: t('whatBuildingDesc'), icon: '🎯' },
+    { id: 'sdk', title: t('chooseSdk'), description: t('chooseSdkDesc'), icon: '📦' },
+    { id: 'endpoint', title: t('createFirstEndpoint'), description: t('createFirstEndpointDesc'), icon: '🔗' },
+    { id: 'test', title: t('sendTestWebhook'), description: t('sendTestWebhookDesc'), icon: '🧪' },
+    { id: 'done', title: t('allSetTitle'), description: t('allSetDesc'), icon: '✅' },
   ];
 
   const currentStep = steps[state.currentStep];
@@ -234,15 +234,15 @@ export function OnboardingWizard() {
               <div className="text-center">
                 <div className="text-6xl mb-4">🪝</div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                  Welcome, {user.name || user.email.split('@')[0]}!
+                  {t('welcome')} {user.name || user.email.split('@')[0]}!
                 </h2>
                 <p className="text-gray-600 dark:text-slate-400 max-w-md mx-auto mb-6">
-                  HookSniff handles webhook delivery, retries, monitoring, and security — so you can focus on building your product.
+                  {t('welcomeDesc')}
                 </p>
                 <div className="flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-slate-400">
-                  <span>✓ Free forever</span>
-                  <span>✓ 11 SDKs</span>
-                  <span>✓ 5 min setup</span>
+                  <span>✓ {t('freeForever')}</span>
+                  <span>✓ 11 SDK</span>
+                  <span>✓ 5 dk kurulum</span>
                 </div>
               </div>
             )}
@@ -250,8 +250,8 @@ export function OnboardingWizard() {
             {/* Step: Use Case */}
             {currentStep.id === 'usecase' && (
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">What are you building?</h2>
-                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">We&apos;ll suggest the best setup for your needs.</p>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t('whatBuilding')}</h2>
+                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">{t('whatBuildingDesc')}</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {USE_CASES.map((uc) => (
                     <button
@@ -279,7 +279,7 @@ export function OnboardingWizard() {
             {currentStep.id === 'sdk' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("chooseSdk")}</h2>
-                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">Pick your language and copy the install command.</p>
+                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">{t('chooseSdkDesc')}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-6 max-h-48 overflow-y-auto">
                   {SDKS.map((sdk) => (
                     <button
@@ -305,7 +305,7 @@ export function OnboardingWizard() {
                       onClick={() => handleCopy(SDKS.find(s => s.id === selectedSdk)?.install || '', 'install')}
                       className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
                     >
-                      {copied === 'install' ? '✓ Copied!' : 'Copy'}
+                      {copied === 'install' ? '✓ Kopyalandı!' : 'Kopyala'}
                     </button>
                   </div>
                   <code className="text-green-400 text-sm font-mono">
@@ -319,7 +319,7 @@ export function OnboardingWizard() {
             {currentStep.id === 'endpoint' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("createFirstEndpoint")}</h2>
-                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">Enter the URL where you want to receive webhooks.</p>
+                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">{t('createFirstEndpointDesc')}</p>
 
                 {error && (
                   <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm border border-red-200 dark:border-red-500/20">
@@ -329,17 +329,17 @@ export function OnboardingWizard() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Endpoint URL *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('endpointUrl')} *</label>
                     <input
                       type="url"
                       value={endpointUrl}
                       onChange={(e) => setEndpointUrl(e.target.value)}
-                      placeholder="https://myapp.com/webhooks"
+                      placeholder={t('endpointUrlPlaceholder')}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Description (optional)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('descriptionOptional')}</label>
                     <input
                       type="text"
                       value={endpointDesc}
@@ -350,7 +350,7 @@ export function OnboardingWizard() {
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-3">
                     <p className="text-xs text-blue-700 dark:text-blue-400">
-                      💡 <strong>No real URL yet?</strong> Use the <a href="/playground" target="_blank" className="underline">{t("playground")}</a> to get a temporary test URL, or enter any HTTPS URL to start.
+                      💡 <strong>{t('noRealUrl')}</strong> {t('usePlayground')}
                     </p>
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export function OnboardingWizard() {
             {currentStep.id === 'test' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("sendTestWebhook")}</h2>
-                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">Copy this command and run it in your terminal.</p>
+                <p className="text-gray-500 dark:text-slate-400 text-center mb-6 text-sm">{t('sendTestWebhookDesc')}</p>
 
                 <div className="bg-gray-900 rounded-xl p-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
@@ -370,7 +370,7 @@ export function OnboardingWizard() {
                       onClick={() => handleCopy(`curl -X POST https://api.hooksniff.dev/v1/webhooks \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"endpoint_id":"ep_YOUR_ID","event":"test.ping","data":{"hello":"world"}}'`, 'test')}
                       className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
                     >
-                      {copied === 'test' ? '✓ Copied!' : 'Copy'}
+                      {copied === 'test' ? '✓ Kopyalandı!' : 'Kopyala'}
                     </button>
                   </div>
                   <pre className="text-sm font-mono text-green-400 overflow-x-auto">
@@ -391,7 +391,7 @@ export function OnboardingWizard() {
                     target="_blank"
                     className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                   >
-                    🧪 Open Playground
+                    🧪 {t('playground')}
                   </a>
                   <button
                     onClick={() => {
@@ -401,7 +401,7 @@ export function OnboardingWizard() {
                     }}
                     className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
-                    ✓ I&apos;ve sent a test
+                    ✓ {t('iveSentTest')}
                   </button>
                 </div>
               </div>
@@ -411,9 +411,9 @@ export function OnboardingWizard() {
             {currentStep.id === 'done' && (
               <div className="text-center">
                 <div className="text-6xl mb-4">🎉</div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">You&apos;re all set!</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t('allSetTitle')}</h2>
                 <p className="text-gray-600 dark:text-slate-400 max-w-md mx-auto mb-6">
-                  Your HookSniff workspace is ready. Start sending webhooks with confidence — we handle delivery, retries, and monitoring.
+                  {t('allSetDesc')}
                 </p>
                 <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
                   <a href="/dashboard/endpoints" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
@@ -445,7 +445,7 @@ export function OnboardingWizard() {
                   onClick={goBack}
                   className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition"
                 >
-                  ← Back
+                  ← {t('back')}
                 </button>
               )}
             </div>
@@ -455,7 +455,7 @@ export function OnboardingWizard() {
                   onClick={dismiss}
                   className="text-sm text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
                 >
-                  Skip setup
+                  {t('skipSetup')}
                 </button>
               )}
               {currentStep.id === 'welcome' && (
@@ -463,7 +463,7 @@ export function OnboardingWizard() {
                   onClick={() => { completeStep('welcome'); goNext(); }}
                   className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                 >
-                  Let&apos;s go →
+                  {t('letsGo')}
                 </button>
               )}
               {currentStep.id === 'usecase' && (
@@ -472,7 +472,7 @@ export function OnboardingWizard() {
                   disabled={!state.useCase}
                   className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Continue →
+                  {t('continue')}
                 </button>
               )}
               {currentStep.id === 'sdk' && (
@@ -480,7 +480,7 @@ export function OnboardingWizard() {
                   onClick={goNext}
                   className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                 >
-                  Continue →
+                  {t('continue')}
                 </button>
               )}
               {currentStep.id === 'endpoint' && (
@@ -489,7 +489,7 @@ export function OnboardingWizard() {
                   disabled={creating || !endpointUrl}
                   className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {creating ? 'Creating...' : 'Create Endpoint →'}
+                  {creating ? t('creating') : t('createEndpointBtn')}
                 </button>
               )}
               {currentStep.id === 'test' && (
@@ -497,7 +497,7 @@ export function OnboardingWizard() {
                   onClick={goNext}
                   className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                 >
-                  Continue →
+                  {t('continue')}
                 </button>
               )}
               {currentStep.id === 'done' && (
@@ -505,7 +505,7 @@ export function OnboardingWizard() {
                   onClick={handleFinish}
                   className="px-6 py-2.5 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition"
                 >
-                  🚀 Go to Dashboard
+                  {t('goToDashboardBtn')}
                 </button>
               )}
             </div>
@@ -624,7 +624,7 @@ export function SetupChecklist() {
             onClick={() => setDismissed(true)}
             className="mt-3 text-xs text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
           >
-            Dismiss checklist
+            {t('dismissChecklist')}
           </button>
         </div>
       )}
@@ -634,6 +634,7 @@ export function SetupChecklist() {
 
 /* ─── Success Toast ─── */
 export function SuccessToast({ message, onClose }: { message: string; onClose: () => void }) {
+  const t = useTranslations('onboarding');
   useEffect(() => {
     const timer = setTimeout(onClose, 5000);
     return () => clearTimeout(timer);
@@ -644,7 +645,7 @@ export function SuccessToast({ message, onClose }: { message: string; onClose: (
       <div className="bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm">
         <span className="text-2xl">🎉</span>
         <div>
-          <div className="font-semibold text-sm">Success!</div>
+          <div className="font-semibold text-sm">{t('successTitle')}</div>
           <div className="text-sm opacity-90">{message}</div>
         </div>
         <button onClick={onClose} className="ml-4 text-white/70 hover:text-white transition">✕</button>

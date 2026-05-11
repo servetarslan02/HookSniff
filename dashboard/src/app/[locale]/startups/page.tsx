@@ -1,8 +1,9 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-export const metadata = { title: 'HookSniff for Startups — Special Pricing' };
+import Footer from '@/components/Footer';
 
 export default function StartupsPage() {
   const t = useTranslations('startups');
@@ -58,6 +59,7 @@ export default function StartupsPage() {
           <Link href="/contact" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Apply now →</Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
