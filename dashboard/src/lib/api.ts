@@ -583,7 +583,7 @@ export const billingApiExtended = {
     apiFetch<BillingSubscription>('/billing/subscription', { token }),
 
   upgrade: (token: string, plan: string) =>
-    apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan }, token }),
+    apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar' }, token }),
 };
 
 // Billing API — delegates to billingApiExtended to avoid duplication (Item 157)
