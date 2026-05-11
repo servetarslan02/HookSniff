@@ -1,6 +1,7 @@
 # 🎯 SDK Kalite Yol Haritası — Svix ile EŞİT Seviye Hedefi
 
 > Oluşturulma: 2026-05-11 21:48 GMT+8
+> Son güncelleme: 2026-05-12 02:27 GMT+8
 > Hedef: Tüm SDK'ları Svix ile AYNI kalite seviyesine çıkarmak
 > Referans: Svix v1.93.0 SDK'ları (MIT lisans, açık kaynak)
 > Kaynak: https://github.com/svix/svix-webhooks
@@ -50,7 +51,7 @@
 | Error classes | ✅ ApiException | ✅ ApiException + statusText | **✅** | Biz daha iyi |
 | Retry logic | ✅ Exponential | ✅ Exponential + jitter | **✅** | Biz daha iyi |
 | TypeScript types | ✅ | ✅ | **✅** | Aynı |
-| Unit testler | ✅ CI | ✅ 211 test | **✅** | Node.js tamam |
+| Unit testler | ✅ CI | ✅ 288 test (Node:211 + Python:77) | **✅** | Node+Python tamam |
 | CHANGELOG | ❌ | ❌ | **✅** | Biz daha iyi |
 | CI/CD | ✅ | ❌ | **✅** | GitHub Actions |
 | Dokümantasyon | ✅ docs.svix.com | ❌ | **✅** | docs.hooksniff.dev |
@@ -110,7 +111,9 @@ openapi-generator-cli generate \
 **AMAÇ:** `new HookSniff(key)` → `client.endpoints.create()` pattern
 
 > ✅ **Node.js TAMAMLANDI** (Oturum 116, 2026-05-12) — 211 test, 14 düzeltme
-> ⏳ Kalan diller: Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
+> ✅ **Python TAMAMLANDI** (Oturum 117, 2026-05-12) — 77 test, wrapper + imza + serialization + pagination
+> ✅ **Go TAMAMLANDI** (Oturum 117, 2026-05-12) — wrapper + imza + typed resources + 3 kritik bug düzeltildi
+> ⏳ Kalan diller: Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
 
 ### 2.1 Node.js Referans Implementasyonu (2 oturum)
 - **Dosya:** `sdks/node/src/hooksniff.ts` (yeni)
@@ -205,14 +208,27 @@ openapi-generator-cli generate \
   }
   ```
 
-### 2.6 Python Wrapper + İmza + Serialization (1 oturum)
-- `sdks/python/hooksniff/client.py` (yeni)
-- `sdks/python/hooksniff/webhook.py` (yeni)
-- Node.js kalıbını Python'a çevir
+### 2.6 Python Wrapper + İmza + Serialization (1 oturum) ✅
+- ✅ `sdks/python/hooksniff/client.py` — HookSniff wrapper (10 resource)
+- ✅ `sdks/python/hooksniff/webhook.py` — Webhook imza doğrulama (HMAC-SHA256, timing-safe)
+- ✅ `sdks/python/hooksniff/serialization.py` — _to_json/_from_json
+- ✅ `sdks/python/hooksniff/request.py` — HTTP helper (retry, timeout, idempotency)
+- ✅ `sdks/python/hooksniff/pagination.py` — paginate + collect_all
+- ✅ `sdks/python/test/test_hooksniff.py` — 77 test, tümü geçti
+- ✅ 4 bug düzeltildi (empty body, 5xx parse, send_void, ApiException message)
+- ✅ `__init__.py` exports: HookSniff, Webhook, ApiException, SerializationError, pagination
 
-### 2.7 Go Wrapper + İmza (1 oturum)
-- `sdks/go/hooksniff.go` (yeni)
-- `sdks/go/webhook.go` (yeni)
+### 2.7 Go Wrapper + İmza (1 oturum) ✅
+- ✅ `sdks/go/hooksniff.go` — Client wrapper (10 resource, retry, idempotency)
+- ✅ `sdks/go/webhook.go` — Webhook imza doğrulama (HMAC-SHA256, hmac.Equal)
+- ✅ `sdks/go/webhook_test.go` — Webhook testleri
+- ✅ `sdks/go/resource_all.go` — Typed resources (APIKeys, Alerts, Teams, Search, Billing, Health)
+- ✅ `sdks/go/resource_endpoints.go` — Endpoints resource
+- ✅ `sdks/go/resource_webhooks.go` — Webhooks resource
+- ✅ `sdks/go/go.mod` — Module name düzeltildi (GIT_USER_ID → servetarslan02)
+- ✅ 3 kritik bug düzeltildi (defer leak, bodyReader reuse, idempotency per attempt)
+- ✅ Generated type conflicts çözüldi (StatsResponse, AlertRule, TeamMember, SearchResult, SubscriptionResponse)
+- ✅ URL encoding eklendi (url.Values)
 
 ### 2.8 Rust, Java, Kotlin, Ruby, PHP, C#, Elixir, Swift (批量, 1-2 oturum)
 - Aynı kalıbı tüm dillere kopyala
@@ -222,23 +238,13 @@ openapi-generator-cli generate \
 
 ## 🟡 AŞAMA 3 — Kalite ve Güvenilirlik (8-10 oturum)
 
-### 3.1 Unit Testler — Node.js (2 oturum)
-- **Dosya:** `sdks/node/tests/` (yeni klasör)
-- **Test sayısı:** 25+ test
-- **Kapsam:**
-  - Wrapper class instantiation
-  - API method parametreleri
-  - Model serialization/deserialization
-  - İmza doğrulama (geçerli/geçersiz/expired)
-  - Pagination iterator
-  - Error handling (401, 404, 429, 500)
-  - Timeout behavior
-  - Retry logic
-  - User-Agent header
-  - Idempotency key
+### 3.1 Unit Testler — Node.js (2 oturum) ✅
+- ✅ `sdks/node/src/__tests__/` — 211 test, tümü geçti
+- ✅ Kapsam: webhook (14), serialization (114), request (51), pagination (32)
 
-### 3.2 Unit Testler — Python (1 oturum)
-- `sdks/python/tests/` — pytest ile 20+ test
+### 3.2 Unit Testler — Python (1 oturum) ✅
+- ✅ `sdks/python/test/test_hooksniff.py` — 77 test, tümü geçti
+- ✅ Kapsam: webhook (14+2+4), serialization (14), request (7), API exception (8), client (7), pagination (11), resource (3)
 
 ### 3.3 Unit Testler — Go (1 oturum)
 - `sdks/go/*_test.go` — testing ile 20+ test
