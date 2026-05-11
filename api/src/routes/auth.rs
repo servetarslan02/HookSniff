@@ -165,8 +165,8 @@ async fn register(
     }
 
     // Validate email
-    if !req.email.contains('@') {
-        return Err(AppError::BadRequest("Invalid email".into()));
+    if let Err(e) = crate::validation::validate_email(&req.email) {
+        return Err(AppError::BadRequest(e));
     }
 
     // Password is required
@@ -932,8 +932,8 @@ async fn update_profile(
     if req.name.trim().is_empty() {
         return Err(AppError::BadRequest("Name cannot be empty".into()));
     }
-    if !req.email.contains('@') {
-        return Err(AppError::BadRequest("Invalid email".into()));
+    if let Err(e) = crate::validation::validate_email(&req.email) {
+        return Err(AppError::BadRequest(e));
     }
 
     // Check if new email is taken by another user

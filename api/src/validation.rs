@@ -4,6 +4,34 @@ use regex::Regex;
 /// Maximum nesting depth for JSON payloads
 const MAX_JSON_DEPTH: usize = 10;
 
+
+/// Validate email format: must have exactly one @, non-empty local and domain parts,
+/// domain must contain at least one dot, no spaces, reasonable length.
+pub fn validate_email(email: &str) -> Result<(), String> {
+    let email = email.trim();
+    if email.is_empty() || email.len() > 254 {
+        return Err("Email must be between 1 and 254 characters".into());
+    }
+    if email.contains(' ') || email.contains('	') {
+        return Err("Email must not contain whitespace".into());
+    }
+    let parts: Vec<&str> = email.split('@').collect();
+    if parts.len() != 2 {
+        return Err("Email must contain exactly one @".into());
+    }
+    let (local, domain) = (parts[0], parts[1]);
+    if local.is_empty() || local.len() > 64 {
+        return Err("Email local part must be between 1 and 64 characters".into());
+    }
+    if domain.is_empty() || !domain.contains('.') {
+        return Err("Email domain must contain at least one dot".into());
+    }
+    if domain.starts_with('.') || domain.ends_with('.') {
+        return Err("Email domain must not start or end with a dot".into());
+    }
+    Ok(())
+}
+
 /// Validate event_type: alphanumeric + dots + underscores, max 100 chars
 pub fn validate_event_type(event: &str) -> Result<(), String> {
     static RE: Lazy<Regex> =
@@ -120,6 +148,22 @@ mod tests {
             too_deep = serde_json::json!({"inner": too_deep});
         }
         assert!(validate_json_depth(&too_deep).is_err());
+    }
+
+
+    #[test]
+    fn test_validate_email() {
+        assert!(validate_email("user@example.com").is_ok());
+        assert!(validate_email("test+tag@domain.co").is_ok());
+        assert!(validate_email("").is_err()); // empty
+        assert!(validate_email("no-at-sign").is_err());
+        assert!(validate_email("@no-local").is_err());
+        assert!(validate_email("no-domain@").is_err());
+        assert!(validate_email("no@dotindomain").is_err());
+        assert!(validate_email(" spaces@ex.com").is_err());
+        assert!(validate_email("a@.starts-with-dot").is_err());
+        assert!(validate_email("a@ends-with-dot.").is_err());
+        assert!(validate_email(&format!("{}@example.com", "a".repeat(65))).is_err()); // local too long
     }
 
     // ── Additional edge cases ────────────────────────────────
