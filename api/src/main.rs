@@ -97,6 +97,9 @@ async fn main() -> Result<()> {
         }
     });
 
+    // Start auth cache cleanup (evicts expired entries every 60s)
+    middleware::start_auth_cache_cleanup();
+
     let app = Router::new()
         // Health check
         .route("/health", get(routes::health::health_check))
