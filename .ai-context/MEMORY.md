@@ -20,8 +20,8 @@
 - **⚠️ External servis ayarları için Servet'ten giriş bilgileri iste** — Vercel, Resend, Neon, Grafana, Polar.sh dashboard'ları Google hesabı gerektirir
 
 ## Hesap Bilgileri
-- Admin: servetarslan02@gmail.com / Alayci_165 (business, admin)
-- Demo: demo@hooksniff.com / Demo1234! (free, non-admin)
+- Admin: servetarslan02@gmail.com — şifre için Servet'e sor
+- Demo: demo@hooksniff.com — şifre için Servet'e sor
 - API: hooksniff-api-1046140057667.europe-west1.run.app
 - Dashboard: https://hooksniff.vercel.app
 
@@ -36,10 +36,10 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Cloudflare R2: `hooksniff-storage` bucket ✅
 - Grafana OTEL: eu-west-2 ✅
 - Grafana Stack: hookrelay.grafana.net (stack ID: 1625476, org: hookrelay) ✅
-- Grafana Service Account Token: glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f
+- Grafana Service Account Token: [REDACTED]
 - Grafana OTLP Endpoint: https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
 - Grafana OTLP Auth: `Authorization=Basic base64(1625476:glc_...)`
-- Grafana OTLP Token: glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0=
+- Grafana OTLP Token: [REDACTED]
 - Grafana Access Policy: hooksniff (ID: b6aea6c9-bd32-4a2d-9184-a3d2da591a8a, region: us)
 - Cloud Run Secret: otel-headers (version 5, DOĞRU AUTH İLE)
 - Cloud Run OTEL env: OTEL_ENABLED=true, OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp, OTEL_EXPORTER_OTLP_HEADERS=secret:otel-headers:5
@@ -48,8 +48,8 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Polar.sh: test mode, account approved ✅
 - Polar.sh Checkout Link (Pro): https://buy.polar.sh/polar_cl_jtWjcvyy0m6ZOuOkEIa7i0agQmlpfJGsNwTJU4LNG8U ✅
 - Polar.sh: Stripe payout + identity verification → Servet yapacak
-- Google şifre: uku_21700987 (güncel)
-- Resend: re_2DkZjzTP_EwBEfofj6WMoxvLmqT8UDMCZ (hooksniff-production) ✅
+- Google şifre: [REDACTED — Servet'e sor]
+- Resend: [REDACTED] (hooksniff-production) ✅
 - Resend Domain: hooksniff.is-a.dev → FAILED, onboarding@resend.dev kullanılabilir
 - Resend → Cloud Run'a RESEND_API_KEY eklendi ✅ (revision 00053)
 - db.rs testleri: 16/16 passed ✅
