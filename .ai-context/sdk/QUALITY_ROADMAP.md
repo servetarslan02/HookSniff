@@ -35,22 +35,22 @@
 
 | Kriter | Svix | HookSniff (şimdi) | Hedef | Fark |
 |--------|------|-------------------|-------|------|
-| Unique model types | 218 | 97 | **218+** | +121 model |
-| Wrapper class | ✅ Svix() | ❌ | **✅** | Tüm diller |
-| İmza doğrulama | ✅ Webhook.verify() | ❌ | **✅** | Tüm diller |
-| HTTP library | native fetch+retry | request (deprecated) | **node-fetch** | Değiştir |
-| Serialization | ✅ _toJsonObject/_fromJsonObject | ❌ | **✅** | Tüm diller |
-| Deserialization | ✅ _fromJsonObject | ❌ | **✅** | Tüm diller |
-| Pagination | ✅ Iterator pattern | ❌ | **✅** | Tüm diller |
-| User-Agent header | ✅ svix-libs/version | ❌ | **✅** | Tüm diller |
-| SDK version header | ✅ | ❌ | **✅** | Tüm diller |
-| Idempotency key | ✅ Built-in | ❌ | **✅** | Tüm diller |
-| Injectable HTTP | ✅ Custom fetch | ❌ | **✅** | Tüm diller |
-| Timeout | ✅ Configurable | ❌ | **✅** | Tüm diller |
-| Error classes | ✅ ApiException | ✅ HttpError | **✅** | Aynı |
-| Retry logic | ✅ Exponential | ✅ Var | **✅** | Aynı |
+| Unique model types | 218 | 148 | **218+** | +70 model |
+| Wrapper class | ✅ Svix() | ✅ HookSniff() | **✅** | Tüm diller |
+| İmza doğrulama | ✅ Webhook.verify() | ✅ Webhook.verify() | **✅** | Tüm diller |
+| HTTP library | native fetch+retry | ✅ native fetch (zero-dep) | **✅** | Değiştirildi |
+| Serialization | ✅ _toJsonObject/_fromJsonObject | ✅ _toJsonObject/_fromJsonObject | **✅** | Tüm diller |
+| Deserialization | ✅ _fromJsonObject | ✅ _fromJsonObject | **✅** | Tüm diller |
+| Pagination | ✅ Iterator pattern | ✅ listAll() AsyncGenerator | **✅** | Biz daha iyi |
+| User-Agent header | ✅ svix-libs/version | ✅ hooksniff-sdk/0.4.0 (node) | **✅** | Tüm diller |
+| SDK version header | ✅ | ✅ | **✅** | Tüm diller |
+| Idempotency key | ✅ Built-in | ✅ Auto + custom override | **✅** | Tüm diller |
+| Injectable HTTP | ✅ Custom fetch | ✅ options.fetch | **✅** | Tüm diller |
+| Timeout | ✅ Configurable | ✅ Configurable (default 30s) | **✅** | Tüm diller |
+| Error classes | ✅ ApiException | ✅ ApiException + statusText | **✅** | Biz daha iyi |
+| Retry logic | ✅ Exponential | ✅ Exponential + jitter | **✅** | Biz daha iyi |
 | TypeScript types | ✅ | ✅ | **✅** | Aynı |
-| Unit testler | ✅ CI | ❌ | **✅** | Her dilde 20+ |
+| Unit testler | ✅ CI | ✅ 211 test | **✅** | Node.js tamam |
 | CHANGELOG | ❌ | ❌ | **✅** | Biz daha iyi |
 | CI/CD | ✅ | ❌ | **✅** | GitHub Actions |
 | Dokümantasyon | ✅ docs.svix.com | ❌ | **✅** | docs.hooksniff.dev |
@@ -108,6 +108,9 @@ openapi-generator-cli generate \
 ## 🟠 AŞAMA 2 — Wrapper Class + İmza Doğrulama (6-8 oturum)
 
 **AMAÇ:** `new HookSniff(key)` → `client.endpoints.create()` pattern
+
+> ✅ **Node.js TAMAMLANDI** (Oturum 116, 2026-05-12) — 211 test, 14 düzeltme
+> ⏳ Kalan diller: Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
 
 ### 2.1 Node.js Referans Implementasyonu (2 oturum)
 - **Dosya:** `sdks/node/src/hooksniff.ts` (yeni)

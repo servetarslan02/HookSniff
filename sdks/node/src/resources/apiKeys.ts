@@ -4,6 +4,7 @@
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
 import { ApiKeyModel, type ApiKeyCreateInput, type ApiKeyOutput } from "../models";
+import { paginate, collectAll, type PaginationOptions } from "../pagination";
 
 export type { ApiKeyCreateInput, ApiKeyOutput };
 
@@ -21,6 +22,25 @@ export class ApiKeys {
           : item
       );
     });
+  }
+
+  /** Iterate through all API keys with automatic pagination */
+  listAll(options?: PaginationOptions): AsyncGenerator<ApiKeyOutput, void, undefined> {
+    return paginate(async ({ limit, offset }) => {
+      const req = new HookSniffRequest(HttpMethod.GET, "/v1/api-keys");
+      req.setQueryParams({ limit, offset });
+      return req.send<{ data: ApiKeyOutput[]; has_more: boolean }>(this.ctx, (json) => {
+        const obj = json as Record<string, unknown>;
+        const data = Array.isArray(obj.data)
+          ? obj.data.map((item) =>
+              typeof item === "object" && item !== null
+                ? ApiKeyModel._fromJsonObject(item as Record<string, unknown>)
+                : item
+            )
+          : [];
+        return { data, has_more: Boolean(obj.has_more ?? false) };
+      });
+    }, options);
   }
 
   /** Create a new API key */
