@@ -239,7 +239,8 @@
     "time": "Zaman",
     "event": "Olay",
     "status": "Durum",
-    "endpoint": "Endpoint"
+    "endpoint": "Endpoint",
+    "searchFailed": "Arama başarısız"
   },
   "health": {
     "title": "Endpoint Sağlığı",
