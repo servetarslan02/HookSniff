@@ -128,9 +128,9 @@ export default function SearchPage() {
       {/* Results */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-400 dark:text-slate-500">{t('searching')}</div>
+          <div className="p-8 text-center text-gray-500 dark:text-slate-400">{t('searching')}</div>
         ) : !results || results.deliveries.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
+          <div className="p-12 text-center text-gray-500 dark:text-slate-400">
             {query ? t('noResultsQuery') : t('enterQuery')}
           </div>
         ) : (
@@ -173,7 +173,7 @@ export default function SearchPage() {
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
                         {d.attempt_count}
                         {d.response_status && (
-                          <span className="ml-1 text-xs text-gray-400 dark:text-slate-500">
+                          <span className="ml-1 text-xs text-gray-500 dark:text-slate-400">
                             ({d.response_status})
                           </span>
                         )}
