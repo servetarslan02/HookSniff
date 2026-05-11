@@ -90,7 +90,10 @@
     "failedToLoadLogs": "Failed to load logs",
     "somethingWentWrong": "Something went wrong",
     "networkError": "Network error. Please try again.",
-    "pleaseTryAgain": "Please try again."
+    "pleaseTryAgain": "Please try again.",
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode",
+    "redirecting": "Redirecting to login..."
   },
   "nav": {
     "dashboard": "Dashboard",
