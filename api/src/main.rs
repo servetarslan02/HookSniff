@@ -221,7 +221,7 @@ async fn main() -> Result<()> {
             }
         })
         .layer(TraceLayer::new_for_http())
-        .layer(tower_http::limit::DefaultBodyLimit::max(2 * 1024 * 1024)) // 2MB global body limit
+        .layer(tower_http::limit::RequestBodyLimitLayer::new(2 * 1024 * 1024)) // 2MB global body limit
         .layer(axum::middleware::from_fn(telemetry::trace_id_middleware));
 
     let addr = format!("0.0.0.0:{}", cfg.port);
