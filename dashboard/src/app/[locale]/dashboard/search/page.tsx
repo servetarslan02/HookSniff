@@ -31,7 +31,7 @@ export default function SearchPage() {
   const [status, setStatus] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const t = useTranslations('search');
 
