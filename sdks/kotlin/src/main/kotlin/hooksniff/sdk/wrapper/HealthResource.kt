@@ -13,7 +13,7 @@ class HealthResource(private val client: HookSniff) {
 
     /** Health check. */
     fun check(): Map<String, Any?> {
-        val json = client.get("/v1/health")
+        val json = client.get("/health")
         return gson.fromJson(json, mapType)
     }
 }

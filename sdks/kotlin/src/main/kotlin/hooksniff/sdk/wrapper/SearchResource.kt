@@ -11,9 +11,11 @@ class SearchResource(private val client: HookSniff) {
     private val gson = Gson()
     private val mapType = object : TypeToken<Map<String, Any?>>() {}.type
 
-    /** Search deliveries. */
-    fun query(input: Map<String, Any?>): Map<String, Any?> {
-        val json = client.post("/v1/search", gson.toJson(input))
+    /** Search deliveries by query string. */
+    fun query(q: String, limit: Int? = null): Map<String, Any?> {
+        val params = mutableListOf("q=${java.net.URLEncoder.encode(q, "UTF-8")}")
+        if (limit != null) params.add("limit=$limit")
+        val json = client.get("/v1/search?${params.joinToString("&")}")
         return gson.fromJson(json, mapType)
     }
 }
