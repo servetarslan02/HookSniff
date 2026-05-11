@@ -156,8 +156,8 @@ async fn register(
     let api_key_hash = hash_api_key(&api_key);
     let api_key_prefix = api_key[..15].to_string();
 
-    // Hash password
-    let password_hash = jwt::hash_password(&password)?;
+    // Hash password (CPU-intensive, offloaded to thread pool)
+    let password_hash = jwt::hash_password_async(password.clone()).await?;
 
     // Check if email already exists (after hashing to normalize timing)
     let existing: Option<(Uuid,)> = sqlx::query_as("SELECT id FROM customers WHERE email = $1")
@@ -258,16 +258,16 @@ async fn login(
     });
 
     // Always verify password (against real hash or dummy) to normalize timing.
-    // Use `let _ =` to discard errors — we only care about constant-time execution.
+    // Use async wrapper to avoid blocking the tokio runtime with CPU-intensive Argon2.
     let password_ok = match &customer {
         None => {
-            let _ = jwt::verify_password(&req.password, &DUMMY_HASH);
+            let _ = jwt::verify_password_async(req.password.clone(), DUMMY_HASH.clone()).await;
             false
         }
         Some(c) => match c.password_hash.as_ref() {
-            Some(hash) => jwt::verify_password(&req.password, hash).unwrap_or(false),
+            Some(hash) => jwt::verify_password_async(req.password.clone(), hash.clone()).await.unwrap_or(false),
             None => {
-                let _ = jwt::verify_password(&req.password, &DUMMY_HASH);
+                let _ = jwt::verify_password_async(req.password.clone(), DUMMY_HASH.clone()).await;
                 false
             }
         },
@@ -497,8 +497,8 @@ async fn reset_password(
         .execute(&pool)
         .await?;
 
-    // Update password
-    let new_hash = jwt::hash_password(&req.new_password)?;
+    // Update password (CPU-intensive, offloaded to thread pool)
+    let new_hash = jwt::hash_password_async(req.new_password.clone()).await?;
     sqlx::query("UPDATE customers SET password_hash = $1, updated_at = NOW() WHERE id = $2")
         .bind(&new_hash)
         .bind(customer_id)
@@ -721,7 +721,7 @@ async fn enable_2fa(
         .as_ref()
         .ok_or(AppError::BadRequest("Password not set".into()))?;
 
-    if !jwt::verify_password(&req.password, hash)? {
+    if !jwt::verify_password_async(req.password.clone(), hash.clone()).await? {
         return Err(AppError::BadRequest("Invalid password".into()));
     }
 
@@ -789,7 +789,7 @@ async fn disable_2fa(
         .as_ref()
         .ok_or(AppError::BadRequest("Password not set".into()))?;
 
-    if !jwt::verify_password(&req.password, hash)? {
+    if !jwt::verify_password_async(req.password.clone(), hash.clone()).await? {
         return Err(AppError::BadRequest("Invalid password".into()));
     }
 
@@ -873,11 +873,11 @@ async fn change_password(
         "Password login not set up for this account".into(),
     ))?;
 
-    if !jwt::verify_password(&req.current_password, hash)? {
+    if !jwt::verify_password_async(req.current_password.clone(), hash.clone()).await? {
         return Err(AppError::BadRequest("Current password is incorrect".into()));
     }
 
-    let new_hash = jwt::hash_password(&req.new_password)?;
+    let new_hash = jwt::hash_password_async(req.new_password.clone()).await?;
 
     sqlx::query("UPDATE customers SET password_hash = $1, updated_at = NOW() WHERE id = $2")
         .bind(&new_hash)
@@ -991,7 +991,7 @@ async fn delete_account(
         .as_ref()
         .ok_or(AppError::BadRequest("Password not set".into()))?;
 
-    if !jwt::verify_password(password, hash)? {
+    if !jwt::verify_password_async(password.to_string(), hash.clone()).await? {
         return Err(AppError::BadRequest("Invalid password".into()));
     }
 
