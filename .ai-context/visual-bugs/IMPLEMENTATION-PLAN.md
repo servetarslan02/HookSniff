@@ -558,3 +558,20 @@
 - ✅ Item 208: label htmlFor/id → SSO (7 input) + Settings (5 input) + autoComplete
 - ✅ Item 325: autoComplete="new-password" confirm password'a eklendi
 - 16 dosya değişti, 159 satır eklendi, 56 satır silindi
+
+## Oturum 122 İkinci Tarama (2026-05-12 06:13-06:16 GMT+8)
+- ✅ billing/page.tsx: 'Cancel failed', 'Upgrade failed' → tc() i18n
+- ✅ deliveries/page.tsx: 'Failed to load deliveries', 'Replay failed' → tc() i18n + tc scope eklendi
+- ✅ logs/page.tsx: 'Failed to load logs' → tc() i18n
+- ✅ en.json + tr.json: 5 key eklendi (cancelFailed, upgradeFailed, failedToLoadDeliveries, replayFailed, failedToLoadLogs)
+
+### ⚠️ Bilinen Kalan Eksik — Sonraki Oturuma
+- `getErrorMessage()` fallback parametresi 15 yerde kullanılmıyor:
+  - billing/page.tsx:189, 217
+  - settings/page.tsx:78, 108, 128, 147
+  - api-keys/page.tsx:60, 75, 92
+  - deliveries/page.tsx:43, 59
+  - logs/page.tsx:40
+  - webhooks/new/page.tsx:34, 57
+  - login/page.tsx:51
+  → Tüm bu satırlarda `getErrorMessage(e)` → `getErrorMessage(e, tc('unknownError'))` yapılmalı
