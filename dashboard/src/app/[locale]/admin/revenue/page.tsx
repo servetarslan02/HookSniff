@@ -30,7 +30,7 @@ export default function AdminRevenuePage() {
       const data = await adminApi.getRevenue(token);
       setRevenue(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load revenue data');
+      setError(err instanceof Error ? err.message : t("failedToLoadRevenue"));
     } finally {
       setLoading(false);
     }
@@ -115,7 +115,7 @@ export default function AdminRevenuePage() {
                       borderRadius: '12px',
                       color: 'white',
                     }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                    formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
                   />
                   <Bar
                     dataKey="revenue"
@@ -160,7 +160,7 @@ export default function AdminRevenuePage() {
                         borderRadius: '12px',
                         color: 'white',
                       }}
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
                     />
                   </PieChart>
                 </ResponsiveContainer>

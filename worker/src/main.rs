@@ -917,11 +917,13 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
             .await?;
         } else {
             // Reset to pending for retry
+            // HS-033: Do NOT increment attempt_count here — the actual delivery
+            // will increment it when the retry happens. Incrementing here inflates
+            // the count without a corresponding delivery attempt.
             sqlx::query::<sqlx::Postgres>(
                 r#"
                 UPDATE webhook_queue
-                SET status = 'pending',
-                    attempt_count = attempt_count + 1
+                SET status = 'pending'
                 WHERE id = $1
                 "#,
             )

@@ -206,7 +206,8 @@ async fn deliver_email(
         std::env::var("NOTIFY_FROM_EMAIL").unwrap_or_else(|_| "onboarding@resend.dev".to_string());
 
     // Read and parse service account key
-    let sa_json = match std::fs::read_to_string(&sa_path) {
+    // HS-024: Use tokio::fs for non-blocking I/O in async context
+    let sa_json = match tokio::fs::read_to_string(&sa_path).await {
         Ok(json) => json,
         Err(e) => {
             warn!("Failed to read service account file {}: {}", sa_path, e);
@@ -289,9 +290,18 @@ async fn deliver_email(
         }
     };
 
+    // HS-036: Use a shared HTTP client for email delivery (connection pooling)
+    // Instead of creating a new client per call, use a lazy-static shared client.
+    static EMAIL_HTTP_CLIENT: once_cell::sync::Lazy<reqwest::Client> =
+        once_cell::sync::Lazy::new(|| {
+            reqwest::Client::builder()
+                .timeout(std::time::Duration::from_secs(30))
+                .build()
+                .expect("Failed to build email HTTP client")
+        });
+
     // Exchange JWT for access token
-    let http_client = reqwest::Client::new();
-    let token_result = http_client
+    let token_result = EMAIL_HTTP_CLIENT
         .post(token_uri)
         .form(&[
             ("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer"),
@@ -349,7 +359,7 @@ async fn deliver_email(
 
     let msg_body = serde_json::json!({ "raw": raw });
 
-    let result = http_client
+    let result = EMAIL_HTTP_CLIENT
         .post("https://gmail.googleapis.com/gmail/v1/users/me/messages/send")
         .bearer_auth(&access_token)
         .json(&msg_body)

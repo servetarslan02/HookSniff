@@ -72,7 +72,9 @@
     "copy": "Copy",
     "backToDashboard": "Back to Dashboard",
     "logout": "Logout",
-    "user": "User"
+    "user": "User",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -345,7 +347,10 @@
     "invitationSent": "Invitation sent!",
     "teamNameLabel": "Team Name",
     "emailLabel": "Email",
-    "roleLabel": "Role"
+    "roleLabel": "Role",
+    "removeMember": "Remove Member",
+    "removeConfirm": "Are you sure you want to remove this member?",
+    "removeFailed": "Failed to remove member"
   },
   "notifications": {
     "title": "Notifications",
@@ -361,7 +366,11 @@
     "read": "Read",
     "loadingNotifications": "Loading notifications...",
     "noNotifications": "No notifications found.",
-    "allReadSuccess": "All notifications marked as read"
+    "allReadSuccess": "All notifications marked as read",
+    "deleteNotification": "Delete Notification",
+    "deleteConfirm": "Are you sure you want to delete this notification?",
+    "deleteFailed": "Failed to delete notification",
+    "deleted": "Notification deleted"
   },
   "webhooks": {
     "title": "Webhooks",
@@ -1012,7 +1021,7 @@
     "totalRevenueLabel": "Total Revenue",
     "churnRate": "Churn Rate",
     "monthlyRevenue": "Monthly Revenue",
-    "revenueOverTime": "Revenue over time",
+    "revenueOverTime": "Revenue Over Time",
     "revenueByPlan": "Revenue by Plan",
     "noRevenue": "No revenue data",
     "users": "users",
@@ -1035,7 +1044,7 @@
     "maxRetryAttempts": "Max Retry Attempts",
     "retryDesc": "Number of times to retry failed webhook deliveries (0-10)",
     "saveSettings": "Save Settings",
-    "settingsSaved": "Settings saved successfully",
+    "settingsSaved": "Settings saved",
     "systemHealth": "System Health",
     "systemHealthDesc": "Monitor infrastructure services and system status",
     "allOperational": "All Systems Operational",
@@ -1060,7 +1069,7 @@
     "revenueTitle": "Revenue Dashboard",
     "accessDenied": "Access Denied",
     "adminPanel": "Admin Panel",
-    "management": "HookSniff Management",
+    "management": "Management",
     "userNotFound": "User Not Found",
     "userDetail": "User Detail",
     "userInfo": "User Info",
@@ -1075,7 +1084,33 @@
       "settingsNav": "Settings"
     },
     "adminBadge": "Admin",
-    "noAdminPrivileges": "You don't have admin privileges."
+    "noAdminPrivileges": "You don't have admin privileges.",
+    "backToUsers": "← Back to Users",
+    "update": "Update",
+    "accountStatus": "Account Status",
+    "banUser": "Ban User",
+    "activateUser": "Activate User",
+    "usageStats": "Usage Stats",
+    "endpoints": "Endpoints",
+    "event": "Event",
+    "attempts": "Attempts",
+    "time": "Time",
+    "noDeliveries": "No deliveries",
+    "inactive": "Inactive",
+    "system": "System",
+    "systemDesc": "Monitor infrastructure services and system status",
+    "checking": "Checking...",
+    "healthy": "Healthy",
+    "unhealthy": "Unhealthy",
+    "unknown": "Unknown",
+    "service": "Service",
+    "provider": "Provider",
+    "details": "Details",
+    "saving": "Saving...",
+    "settingsSaveFailed": "Failed to save settings",
+    "failedToLoadRevenue": "Failed to load revenue data",
+    "failedToLoadStats": "Failed to load stats",
+    "queue": "Queue"
   },
   "landing": {
     "nav": {
@@ -1624,7 +1659,8 @@
     "filterTag": "Filter",
     "mapTag": "Map",
     "enrichTag": "Enrich",
-    "deleteTransform": "Delete transform"
+    "deleteTransform": "Delete Transform Rule",
+    "deleteConfirm": "Are you sure you want to delete this transform rule?"
   },
   "rateLimiting": {
     "title": "⚡ Rate Limiting",

@@ -11,6 +11,11 @@ pub struct Claims {
     pub email: String,
     pub plan: String,
     pub exp: usize,
+    /// HS-028: Server-side admin flag in JWT — enables admin authorization
+    /// verification without DB lookup. Frontend can read this from the token,
+    /// and the API middleware can verify it server-side.
+    #[serde(default)]
+    pub is_admin: bool,
 }
 
 /// Generate a long-lived JWT (24h) — used for legacy/backwards compatibility.
@@ -20,7 +25,17 @@ pub fn generate_token(
     plan: &str,
     secret: &str,
 ) -> Result<String, AppError> {
-    generate_token_with_duration(customer_id, email, plan, secret, Duration::hours(24))
+    generate_token_with_duration(customer_id, email, plan, secret, Duration::hours(24), false)
+}
+
+/// Generate a long-lived JWT with admin claim.
+pub fn generate_admin_token(
+    customer_id: Uuid,
+    email: &str,
+    plan: &str,
+    secret: &str,
+) -> Result<String, AppError> {
+    generate_token_with_duration(customer_id, email, plan, secret, Duration::hours(24), true)
 }
 
 /// Generate a short-lived JWT (15 min) — used with refresh token flow.
@@ -29,8 +44,9 @@ pub fn generate_access_token(
     email: &str,
     plan: &str,
     secret: &str,
+    is_admin: bool,
 ) -> Result<String, AppError> {
-    generate_token_with_duration(customer_id, email, plan, secret, Duration::minutes(15))
+    generate_token_with_duration(customer_id, email, plan, secret, Duration::minutes(15), is_admin)
 }
 
 pub fn generate_token_with_duration(
@@ -39,6 +55,7 @@ pub fn generate_token_with_duration(
     plan: &str,
     secret: &str,
     duration: Duration,
+    is_admin: bool,
 ) -> Result<String, AppError> {
     let expiration = Utc::now()
         .checked_add_signed(duration)
@@ -50,6 +67,7 @@ pub fn generate_token_with_duration(
         email: email.to_string(),
         plan: plan.to_string(),
         exp: expiration,
+        is_admin,
     };
 
     encode(
@@ -88,16 +106,26 @@ pub fn verify_token(token: &str, secret: &str) -> Result<Claims, AppError> {
     .map_err(|_| AppError::Unauthorized)
 }
 
-/// Hash password using Argon2id.
-/// This is CPU-intensive (~64ms) and MUST be called via spawn_blocking in async context.
+/// OWASP-recommended Argon2id parameters for password hashing.
+/// - 46 MiB memory (above the 19 MiB minimum)
+/// - 3 iterations
+/// - 1 degree of parallelism
+///
+/// Note: API key hashing uses Argon2::default() (19 MiB) since keys are high-entropy.
+fn argon2_params() -> argon2::Params {
+    argon2::Params::new(46_080, 3, 1, None).expect("valid Argon2id params")
+}
+
+/// Hash password using Argon2id with OWASP-recommended parameters.
+/// This is CPU-intensive (~100ms) and MUST be called via spawn_blocking in async context.
 pub fn hash_password(password: &str) -> Result<String, AppError> {
     use argon2::password_hash::rand_core::OsRng;
     use argon2::password_hash::SaltString;
     use argon2::{Argon2, PasswordHasher};
 
     let salt = SaltString::generate(&mut OsRng);
-    let argon2 = Argon2::default();
-
+    let params = argon2_params();
+    let argon2 = Argon2::new(argon2::Algorithm::Argon2id, argon2::Version::V0x13, params);
     argon2
         .hash_password(password.as_bytes(), &salt)
         .map(|hash| hash.to_string())
@@ -172,7 +200,7 @@ mod tests {
     fn test_access_token_roundtrip() {
         let secret = "access-secret";
         let id = Uuid::new_v4();
-        let token = generate_access_token(id, "user@test.com", "pro", secret).unwrap();
+        let token = generate_access_token(id, "user@test.com", "pro", secret, false).unwrap();
         let claims = verify_token(&token, secret).unwrap();
         assert_eq!(claims.sub, id);
         assert_eq!(claims.email, "user@test.com");
@@ -183,7 +211,7 @@ mod tests {
     fn test_access_token_has_short_expiry() {
         let secret = "secret";
         let before = Utc::now().timestamp() as usize;
-        let token = generate_access_token(Uuid::new_v4(), "a@b.com", "free", secret).unwrap();
+        let token = generate_access_token(Uuid::new_v4(), "a@b.com", "free", secret, false).unwrap();
         let claims = verify_token(&token, secret).unwrap();
         // 15 min = 900s, allow 5s tolerance
         assert!(claims.exp >= before + 895);
@@ -196,7 +224,7 @@ mod tests {
     fn test_custom_duration_token() {
         let secret = "secret";
         let id = Uuid::new_v4();
-        let token = generate_token_with_duration(id, "a@b.com", "free", secret, Duration::hours(1))
+        let token = generate_token_with_duration(id, "a@b.com", "free", secret, Duration::hours(1), false)
             .unwrap();
         let claims = verify_token(&token, secret).unwrap();
         assert_eq!(claims.sub, id);

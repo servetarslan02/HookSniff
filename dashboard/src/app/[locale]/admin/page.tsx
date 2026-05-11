@@ -30,7 +30,7 @@ export default function AdminOverviewPage() {
       const data = await adminApi.getStats(token);
       setStats(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load admin stats');
+      setError(err instanceof Error ? err.message : t("failedToLoadStats"));
     } finally {
       setLoading(false);
     }

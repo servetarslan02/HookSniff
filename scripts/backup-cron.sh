@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-export DATABASE_URL="postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+
+# SECURITY: DATABASE_URL must be set via environment variable or secret manager.
+# Never hardcode credentials in scripts.
+if [ -z "${DATABASE_URL:-}" ]; then
+    echo "[$(date)] ERROR: DATABASE_URL environment variable is not set." >&2
+    echo "Set it via: export DATABASE_URL='postgresql://...'" >&2
+    exit 1
+fi
+
 BACKUP_DIR="/var/backups/hooksniff"
 TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 cd /root/.openclaw/workspace/HookSniff
