@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 
+// Force redeploy — docs/sdks page fix
 const sdks = [
   {
     icon: '📦',

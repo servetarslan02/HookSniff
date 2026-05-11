@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
+// Force redeploy — docs/portal page fix
 export default function PortalPage() {
   const t = useTranslations('docs');
   return (
