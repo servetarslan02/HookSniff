@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the BatchResponse type satisfies the MappedNullable interface at compile time
@@ -20,16 +22,20 @@ var _ MappedNullable = &BatchResponse{}
 
 // BatchResponse struct for BatchResponse
 type BatchResponse struct {
-	Deliveries []Delivery `json:"deliveries,omitempty"`
-	Errors []BatchResponseErrorsInner `json:"errors,omitempty"`
+	Deliveries []Delivery `json:"deliveries"`
+	Errors []BatchResponseErrorsInner `json:"errors"`
 }
+
+type _BatchResponse BatchResponse
 
 // NewBatchResponse instantiates a new BatchResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewBatchResponse() *BatchResponse {
+func NewBatchResponse(deliveries []Delivery, errors []BatchResponseErrorsInner) *BatchResponse {
 	this := BatchResponse{}
+	this.Deliveries = deliveries
+	this.Errors = errors
 	return &this
 }
 
@@ -41,66 +47,50 @@ func NewBatchResponseWithDefaults() *BatchResponse {
 	return &this
 }
 
-// GetDeliveries returns the Deliveries field value if set, zero value otherwise.
+// GetDeliveries returns the Deliveries field value
 func (o *BatchResponse) GetDeliveries() []Delivery {
-	if o == nil || IsNil(o.Deliveries) {
+	if o == nil {
 		var ret []Delivery
 		return ret
 	}
+
 	return o.Deliveries
 }
 
-// GetDeliveriesOk returns a tuple with the Deliveries field value if set, nil otherwise
+// GetDeliveriesOk returns a tuple with the Deliveries field value
 // and a boolean to check if the value has been set.
 func (o *BatchResponse) GetDeliveriesOk() ([]Delivery, bool) {
-	if o == nil || IsNil(o.Deliveries) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Deliveries, true
 }
 
-// HasDeliveries returns a boolean if a field has been set.
-func (o *BatchResponse) HasDeliveries() bool {
-	if o != nil && !IsNil(o.Deliveries) {
-		return true
-	}
-
-	return false
-}
-
-// SetDeliveries gets a reference to the given []Delivery and assigns it to the Deliveries field.
+// SetDeliveries sets field value
 func (o *BatchResponse) SetDeliveries(v []Delivery) {
 	o.Deliveries = v
 }
 
-// GetErrors returns the Errors field value if set, zero value otherwise.
+// GetErrors returns the Errors field value
 func (o *BatchResponse) GetErrors() []BatchResponseErrorsInner {
-	if o == nil || IsNil(o.Errors) {
+	if o == nil {
 		var ret []BatchResponseErrorsInner
 		return ret
 	}
+
 	return o.Errors
 }
 
-// GetErrorsOk returns a tuple with the Errors field value if set, nil otherwise
+// GetErrorsOk returns a tuple with the Errors field value
 // and a boolean to check if the value has been set.
 func (o *BatchResponse) GetErrorsOk() ([]BatchResponseErrorsInner, bool) {
-	if o == nil || IsNil(o.Errors) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Errors, true
 }
 
-// HasErrors returns a boolean if a field has been set.
-func (o *BatchResponse) HasErrors() bool {
-	if o != nil && !IsNil(o.Errors) {
-		return true
-	}
-
-	return false
-}
-
-// SetErrors gets a reference to the given []BatchResponseErrorsInner and assigns it to the Errors field.
+// SetErrors sets field value
 func (o *BatchResponse) SetErrors(v []BatchResponseErrorsInner) {
 	o.Errors = v
 }
@@ -115,13 +105,47 @@ func (o BatchResponse) MarshalJSON() ([]byte, error) {
 
 func (o BatchResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Deliveries) {
-		toSerialize["deliveries"] = o.Deliveries
-	}
-	if !IsNil(o.Errors) {
-		toSerialize["errors"] = o.Errors
-	}
+	toSerialize["deliveries"] = o.Deliveries
+	toSerialize["errors"] = o.Errors
 	return toSerialize, nil
+}
+
+func (o *BatchResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"deliveries",
+		"errors",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varBatchResponse := _BatchResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varBatchResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = BatchResponse(varBatchResponse)
+
+	return err
 }
 
 type NullableBatchResponse struct {

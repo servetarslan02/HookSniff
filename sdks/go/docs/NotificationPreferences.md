@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EmailOnFailure** | Pointer to **bool** |  | [optional] [default to true]
-**EmailOnDeadLetter** | Pointer to **bool** |  | [optional] [default to true]
-**EmailOnSuccess** | Pointer to **bool** |  | [optional] [default to false]
+**EmailOnFailure** | **bool** |  | [default to true]
+**EmailOnDeadLetter** | **bool** |  | [default to true]
+**EmailOnSuccess** | **bool** |  | [default to false]
 **SlackWebhookUrl** | Pointer to **NullableString** |  | [optional] 
 **DiscordWebhookUrl** | Pointer to **NullableString** |  | [optional] 
 **WebhookUrl** | Pointer to **NullableString** |  | [optional] 
@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewNotificationPreferences
 
-`func NewNotificationPreferences() *NotificationPreferences`
+`func NewNotificationPreferences(emailOnFailure bool, emailOnDeadLetter bool, emailOnSuccess bool, ) *NotificationPreferences`
 
 NewNotificationPreferences instantiates a new NotificationPreferences object
 This constructor will assign default values to properties that have it defined,
@@ -49,11 +49,6 @@ and a boolean to check if the value has been set.
 
 SetEmailOnFailure sets EmailOnFailure field to given value.
 
-### HasEmailOnFailure
-
-`func (o *NotificationPreferences) HasEmailOnFailure() bool`
-
-HasEmailOnFailure returns a boolean if a field has been set.
 
 ### GetEmailOnDeadLetter
 
@@ -74,11 +69,6 @@ and a boolean to check if the value has been set.
 
 SetEmailOnDeadLetter sets EmailOnDeadLetter field to given value.
 
-### HasEmailOnDeadLetter
-
-`func (o *NotificationPreferences) HasEmailOnDeadLetter() bool`
-
-HasEmailOnDeadLetter returns a boolean if a field has been set.
 
 ### GetEmailOnSuccess
 
@@ -99,11 +89,6 @@ and a boolean to check if the value has been set.
 
 SetEmailOnSuccess sets EmailOnSuccess field to given value.
 
-### HasEmailOnSuccess
-
-`func (o *NotificationPreferences) HasEmailOnSuccess() bool`
-
-HasEmailOnSuccess returns a boolean if a field has been set.
 
 ### GetSlackWebhookUrl
 

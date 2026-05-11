@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the PortalProfile type satisfies the MappedNullable interface at compile time
@@ -21,19 +23,25 @@ var _ MappedNullable = &PortalProfile{}
 
 // PortalProfile struct for PortalProfile
 type PortalProfile struct {
-	Id *string `json:"id,omitempty"`
-	Email *string `json:"email,omitempty"`
+	Id string `json:"id"`
+	Email string `json:"email"`
 	Name NullableString `json:"name,omitempty"`
-	Plan *string `json:"plan,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Plan string `json:"plan"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _PortalProfile PortalProfile
 
 // NewPortalProfile instantiates a new PortalProfile object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewPortalProfile() *PortalProfile {
+func NewPortalProfile(id string, email string, plan string, createdAt time.Time) *PortalProfile {
 	this := PortalProfile{}
+	this.Id = id
+	this.Email = email
+	this.Plan = plan
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -45,68 +53,52 @@ func NewPortalProfileWithDefaults() *PortalProfile {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *PortalProfile) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *PortalProfile) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *PortalProfile) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *PortalProfile) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetEmail returns the Email field value if set, zero value otherwise.
+// GetEmail returns the Email field value
 func (o *PortalProfile) GetEmail() string {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Email
+
+	return o.Email
 }
 
-// GetEmailOk returns a tuple with the Email field value if set, nil otherwise
+// GetEmailOk returns a tuple with the Email field value
 // and a boolean to check if the value has been set.
 func (o *PortalProfile) GetEmailOk() (*string, bool) {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Email, true
+	return &o.Email, true
 }
 
-// HasEmail returns a boolean if a field has been set.
-func (o *PortalProfile) HasEmail() bool {
-	if o != nil && !IsNil(o.Email) {
-		return true
-	}
-
-	return false
-}
-
-// SetEmail gets a reference to the given string and assigns it to the Email field.
+// SetEmail sets field value
 func (o *PortalProfile) SetEmail(v string) {
-	o.Email = &v
+	o.Email = v
 }
 
 // GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -151,68 +143,52 @@ func (o *PortalProfile) UnsetName() {
 	o.Name.Unset()
 }
 
-// GetPlan returns the Plan field value if set, zero value otherwise.
+// GetPlan returns the Plan field value
 func (o *PortalProfile) GetPlan() string {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Plan
+
+	return o.Plan
 }
 
-// GetPlanOk returns a tuple with the Plan field value if set, nil otherwise
+// GetPlanOk returns a tuple with the Plan field value
 // and a boolean to check if the value has been set.
 func (o *PortalProfile) GetPlanOk() (*string, bool) {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Plan, true
+	return &o.Plan, true
 }
 
-// HasPlan returns a boolean if a field has been set.
-func (o *PortalProfile) HasPlan() bool {
-	if o != nil && !IsNil(o.Plan) {
-		return true
-	}
-
-	return false
-}
-
-// SetPlan gets a reference to the given string and assigns it to the Plan field.
+// SetPlan sets field value
 func (o *PortalProfile) SetPlan(v string) {
-	o.Plan = &v
+	o.Plan = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *PortalProfile) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *PortalProfile) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *PortalProfile) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *PortalProfile) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o PortalProfile) MarshalJSON() ([]byte, error) {
@@ -225,22 +201,54 @@ func (o PortalProfile) MarshalJSON() ([]byte, error) {
 
 func (o PortalProfile) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Email) {
-		toSerialize["email"] = o.Email
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["email"] = o.Email
 	if o.Name.IsSet() {
 		toSerialize["name"] = o.Name.Get()
 	}
-	if !IsNil(o.Plan) {
-		toSerialize["plan"] = o.Plan
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["plan"] = o.Plan
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *PortalProfile) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"email",
+		"plan",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varPortalProfile := _PortalProfile{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varPortalProfile)
+
+	if err != nil {
+		return err
+	}
+
+	*o = PortalProfile(varPortalProfile)
+
+	return err
 }
 
 type NullablePortalProfile struct {

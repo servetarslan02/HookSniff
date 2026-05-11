@@ -48,52 +48,52 @@ import org.openapitools.client.JSON;
 /**
  * StatsResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class StatsResponse {
   public static final String SERIALIZED_NAME_TOTAL_DELIVERIES = "total_deliveries";
   @SerializedName(SERIALIZED_NAME_TOTAL_DELIVERIES)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer totalDeliveries;
 
   public static final String SERIALIZED_NAME_SUCCESSFUL_DELIVERIES = "successful_deliveries";
   @SerializedName(SERIALIZED_NAME_SUCCESSFUL_DELIVERIES)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer successfulDeliveries;
 
   public static final String SERIALIZED_NAME_FAILED_DELIVERIES = "failed_deliveries";
   @SerializedName(SERIALIZED_NAME_FAILED_DELIVERIES)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer failedDeliveries;
 
   public static final String SERIALIZED_NAME_TOTAL_ENDPOINTS = "total_endpoints";
   @SerializedName(SERIALIZED_NAME_TOTAL_ENDPOINTS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer totalEndpoints;
 
   public static final String SERIALIZED_NAME_ACTIVE_ENDPOINTS = "active_endpoints";
   @SerializedName(SERIALIZED_NAME_ACTIVE_ENDPOINTS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer activeEndpoints;
 
   public static final String SERIALIZED_NAME_PLAN = "plan";
   @SerializedName(SERIALIZED_NAME_PLAN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String plan;
 
   public static final String SERIALIZED_NAME_WEBHOOK_LIMIT = "webhook_limit";
   @SerializedName(SERIALIZED_NAME_WEBHOOK_LIMIT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer webhookLimit;
 
   public static final String SERIALIZED_NAME_WEBHOOK_COUNT = "webhook_count";
   @SerializedName(SERIALIZED_NAME_WEBHOOK_COUNT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer webhookCount;
 
   public StatsResponse() {
   }
 
-  public StatsResponse totalDeliveries(@javax.annotation.Nullable Integer totalDeliveries) {
+  public StatsResponse totalDeliveries(@javax.annotation.Nonnull Integer totalDeliveries) {
     this.totalDeliveries = totalDeliveries;
     return this;
   }
@@ -102,17 +102,17 @@ public class StatsResponse {
    * Get totalDeliveries
    * @return totalDeliveries
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotalDeliveries() {
     return totalDeliveries;
   }
 
-  public void setTotalDeliveries(@javax.annotation.Nullable Integer totalDeliveries) {
+  public void setTotalDeliveries(@javax.annotation.Nonnull Integer totalDeliveries) {
     this.totalDeliveries = totalDeliveries;
   }
 
 
-  public StatsResponse successfulDeliveries(@javax.annotation.Nullable Integer successfulDeliveries) {
+  public StatsResponse successfulDeliveries(@javax.annotation.Nonnull Integer successfulDeliveries) {
     this.successfulDeliveries = successfulDeliveries;
     return this;
   }
@@ -121,17 +121,17 @@ public class StatsResponse {
    * Get successfulDeliveries
    * @return successfulDeliveries
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getSuccessfulDeliveries() {
     return successfulDeliveries;
   }
 
-  public void setSuccessfulDeliveries(@javax.annotation.Nullable Integer successfulDeliveries) {
+  public void setSuccessfulDeliveries(@javax.annotation.Nonnull Integer successfulDeliveries) {
     this.successfulDeliveries = successfulDeliveries;
   }
 
 
-  public StatsResponse failedDeliveries(@javax.annotation.Nullable Integer failedDeliveries) {
+  public StatsResponse failedDeliveries(@javax.annotation.Nonnull Integer failedDeliveries) {
     this.failedDeliveries = failedDeliveries;
     return this;
   }
@@ -140,17 +140,17 @@ public class StatsResponse {
    * Get failedDeliveries
    * @return failedDeliveries
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getFailedDeliveries() {
     return failedDeliveries;
   }
 
-  public void setFailedDeliveries(@javax.annotation.Nullable Integer failedDeliveries) {
+  public void setFailedDeliveries(@javax.annotation.Nonnull Integer failedDeliveries) {
     this.failedDeliveries = failedDeliveries;
   }
 
 
-  public StatsResponse totalEndpoints(@javax.annotation.Nullable Integer totalEndpoints) {
+  public StatsResponse totalEndpoints(@javax.annotation.Nonnull Integer totalEndpoints) {
     this.totalEndpoints = totalEndpoints;
     return this;
   }
@@ -159,17 +159,17 @@ public class StatsResponse {
    * Get totalEndpoints
    * @return totalEndpoints
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotalEndpoints() {
     return totalEndpoints;
   }
 
-  public void setTotalEndpoints(@javax.annotation.Nullable Integer totalEndpoints) {
+  public void setTotalEndpoints(@javax.annotation.Nonnull Integer totalEndpoints) {
     this.totalEndpoints = totalEndpoints;
   }
 
 
-  public StatsResponse activeEndpoints(@javax.annotation.Nullable Integer activeEndpoints) {
+  public StatsResponse activeEndpoints(@javax.annotation.Nonnull Integer activeEndpoints) {
     this.activeEndpoints = activeEndpoints;
     return this;
   }
@@ -178,17 +178,17 @@ public class StatsResponse {
    * Get activeEndpoints
    * @return activeEndpoints
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getActiveEndpoints() {
     return activeEndpoints;
   }
 
-  public void setActiveEndpoints(@javax.annotation.Nullable Integer activeEndpoints) {
+  public void setActiveEndpoints(@javax.annotation.Nonnull Integer activeEndpoints) {
     this.activeEndpoints = activeEndpoints;
   }
 
 
-  public StatsResponse plan(@javax.annotation.Nullable String plan) {
+  public StatsResponse plan(@javax.annotation.Nonnull String plan) {
     this.plan = plan;
     return this;
   }
@@ -197,17 +197,17 @@ public class StatsResponse {
    * Get plan
    * @return plan
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPlan() {
     return plan;
   }
 
-  public void setPlan(@javax.annotation.Nullable String plan) {
+  public void setPlan(@javax.annotation.Nonnull String plan) {
     this.plan = plan;
   }
 
 
-  public StatsResponse webhookLimit(@javax.annotation.Nullable Integer webhookLimit) {
+  public StatsResponse webhookLimit(@javax.annotation.Nonnull Integer webhookLimit) {
     this.webhookLimit = webhookLimit;
     return this;
   }
@@ -216,17 +216,17 @@ public class StatsResponse {
    * Get webhookLimit
    * @return webhookLimit
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getWebhookLimit() {
     return webhookLimit;
   }
 
-  public void setWebhookLimit(@javax.annotation.Nullable Integer webhookLimit) {
+  public void setWebhookLimit(@javax.annotation.Nonnull Integer webhookLimit) {
     this.webhookLimit = webhookLimit;
   }
 
 
-  public StatsResponse webhookCount(@javax.annotation.Nullable Integer webhookCount) {
+  public StatsResponse webhookCount(@javax.annotation.Nonnull Integer webhookCount) {
     this.webhookCount = webhookCount;
     return this;
   }
@@ -235,12 +235,12 @@ public class StatsResponse {
    * Get webhookCount
    * @return webhookCount
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getWebhookCount() {
     return webhookCount;
   }
 
-  public void setWebhookCount(@javax.annotation.Nullable Integer webhookCount) {
+  public void setWebhookCount(@javax.annotation.Nonnull Integer webhookCount) {
     this.webhookCount = webhookCount;
   }
 
@@ -303,7 +303,7 @@ public class StatsResponse {
     openapiFields = new HashSet<String>(Arrays.asList("total_deliveries", "successful_deliveries", "failed_deliveries", "total_endpoints", "active_endpoints", "plan", "webhook_limit", "webhook_count"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("total_deliveries", "successful_deliveries", "failed_deliveries", "total_endpoints", "active_endpoints", "plan", "webhook_limit", "webhook_count"));
   }
 
   /**
@@ -326,8 +326,15 @@ public class StatsResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `StatsResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : StatsResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("plan") != null && !jsonObj.get("plan").isJsonNull()) && !jsonObj.get("plan").isJsonPrimitive()) {
+      if (!jsonObj.get("plan").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `plan` to be a primitive type in the JSON string but got `%s`", jsonObj.get("plan").toString()));
       }
   }

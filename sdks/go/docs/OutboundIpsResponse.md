@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Ips** | Pointer to **[]string** |  | [optional] 
-**UpdatedAt** | Pointer to **string** |  | [optional] 
+**Ips** | **[]string** |  | 
+**UpdatedAt** | **string** |  | 
 
 ## Methods
 
 ### NewOutboundIpsResponse
 
-`func NewOutboundIpsResponse() *OutboundIpsResponse`
+`func NewOutboundIpsResponse(ips []string, updatedAt string, ) *OutboundIpsResponse`
 
 NewOutboundIpsResponse instantiates a new OutboundIpsResponse object
 This constructor will assign default values to properties that have it defined,
@@ -45,11 +45,6 @@ and a boolean to check if the value has been set.
 
 SetIps sets Ips field to given value.
 
-### HasIps
-
-`func (o *OutboundIpsResponse) HasIps() bool`
-
-HasIps returns a boolean if a field has been set.
 
 ### GetUpdatedAt
 
@@ -70,11 +65,6 @@ and a boolean to check if the value has been set.
 
 SetUpdatedAt sets UpdatedAt field to given value.
 
-### HasUpdatedAt
-
-`func (o *OutboundIpsResponse) HasUpdatedAt() bool`
-
-HasUpdatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

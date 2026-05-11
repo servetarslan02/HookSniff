@@ -51,32 +51,32 @@ import org.openapitools.client.JSON;
 /**
  * PaginatedUsers
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class PaginatedUsers {
   public static final String SERIALIZED_NAME_USERS = "users";
   @SerializedName(SERIALIZED_NAME_USERS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<UserSummary> users = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_TOTAL = "total";
   @SerializedName(SERIALIZED_NAME_TOTAL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer total;
 
   public static final String SERIALIZED_NAME_PAGE = "page";
   @SerializedName(SERIALIZED_NAME_PAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer page;
 
   public static final String SERIALIZED_NAME_PER_PAGE = "per_page";
   @SerializedName(SERIALIZED_NAME_PER_PAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer perPage;
 
   public PaginatedUsers() {
   }
 
-  public PaginatedUsers users(@javax.annotation.Nullable List<UserSummary> users) {
+  public PaginatedUsers users(@javax.annotation.Nonnull List<UserSummary> users) {
     this.users = users;
     return this;
   }
@@ -93,17 +93,17 @@ public class PaginatedUsers {
    * Get users
    * @return users
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<UserSummary> getUsers() {
     return users;
   }
 
-  public void setUsers(@javax.annotation.Nullable List<UserSummary> users) {
+  public void setUsers(@javax.annotation.Nonnull List<UserSummary> users) {
     this.users = users;
   }
 
 
-  public PaginatedUsers total(@javax.annotation.Nullable Integer total) {
+  public PaginatedUsers total(@javax.annotation.Nonnull Integer total) {
     this.total = total;
     return this;
   }
@@ -112,17 +112,17 @@ public class PaginatedUsers {
    * Get total
    * @return total
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotal() {
     return total;
   }
 
-  public void setTotal(@javax.annotation.Nullable Integer total) {
+  public void setTotal(@javax.annotation.Nonnull Integer total) {
     this.total = total;
   }
 
 
-  public PaginatedUsers page(@javax.annotation.Nullable Integer page) {
+  public PaginatedUsers page(@javax.annotation.Nonnull Integer page) {
     this.page = page;
     return this;
   }
@@ -131,17 +131,17 @@ public class PaginatedUsers {
    * Get page
    * @return page
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getPage() {
     return page;
   }
 
-  public void setPage(@javax.annotation.Nullable Integer page) {
+  public void setPage(@javax.annotation.Nonnull Integer page) {
     this.page = page;
   }
 
 
-  public PaginatedUsers perPage(@javax.annotation.Nullable Integer perPage) {
+  public PaginatedUsers perPage(@javax.annotation.Nonnull Integer perPage) {
     this.perPage = perPage;
     return this;
   }
@@ -150,12 +150,12 @@ public class PaginatedUsers {
    * Get perPage
    * @return perPage
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getPerPage() {
     return perPage;
   }
 
-  public void setPerPage(@javax.annotation.Nullable Integer perPage) {
+  public void setPerPage(@javax.annotation.Nonnull Integer perPage) {
     this.perPage = perPage;
   }
 
@@ -210,7 +210,7 @@ public class PaginatedUsers {
     openapiFields = new HashSet<String>(Arrays.asList("users", "total", "page", "per_page"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("users", "total", "page", "per_page"));
   }
 
   /**
@@ -233,19 +233,22 @@ public class PaginatedUsers {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `PaginatedUsers` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (jsonObj.get("users") != null && !jsonObj.get("users").isJsonNull()) {
-        JsonArray jsonArrayusers = jsonObj.getAsJsonArray("users");
-        if (jsonArrayusers != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("users").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `users` to be an array in the JSON string but got `%s`", jsonObj.get("users").toString()));
-          }
 
-          // validate the optional field `users` (array)
-          for (int i = 0; i < jsonArrayusers.size(); i++) {
-            UserSummary.validateJsonElement(jsonArrayusers.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : PaginatedUsers.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("users") != null) {
+        if (!jsonObj.get("users").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `users` to be an array in the JSON string but got `%s`", jsonObj.get("users").toString()));
+        }
+        JsonArray jsonArrayusers = jsonObj.getAsJsonArray("users");
+        // validate the required field `users` (array)
+        for (int i = 0; i < jsonArrayusers.size(); i++) {
+          UserSummary.validateJsonElement(jsonArrayusers.get(i));
         }
       }
   }

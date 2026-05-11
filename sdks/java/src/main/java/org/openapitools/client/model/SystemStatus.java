@@ -52,7 +52,7 @@ import org.openapitools.client.JSON;
 /**
  * SystemStatus
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class SystemStatus {
   /**
    * Gets or Sets overallStatus
@@ -110,28 +110,28 @@ public class SystemStatus {
 
   public static final String SERIALIZED_NAME_OVERALL_STATUS = "overall_status";
   @SerializedName(SERIALIZED_NAME_OVERALL_STATUS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OverallStatusEnum overallStatus;
 
   public static final String SERIALIZED_NAME_UPTIME30D = "uptime_30d";
   @SerializedName(SERIALIZED_NAME_UPTIME30D)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private BigDecimal uptime30d;
 
   public static final String SERIALIZED_NAME_COMPONENTS = "components";
   @SerializedName(SERIALIZED_NAME_COMPONENTS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<SystemStatusComponentsInner> components = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_CHECKED_AT = "checked_at";
   @SerializedName(SERIALIZED_NAME_CHECKED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String checkedAt;
 
   public SystemStatus() {
   }
 
-  public SystemStatus overallStatus(@javax.annotation.Nullable OverallStatusEnum overallStatus) {
+  public SystemStatus overallStatus(@javax.annotation.Nonnull OverallStatusEnum overallStatus) {
     this.overallStatus = overallStatus;
     return this;
   }
@@ -140,17 +140,17 @@ public class SystemStatus {
    * Get overallStatus
    * @return overallStatus
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OverallStatusEnum getOverallStatus() {
     return overallStatus;
   }
 
-  public void setOverallStatus(@javax.annotation.Nullable OverallStatusEnum overallStatus) {
+  public void setOverallStatus(@javax.annotation.Nonnull OverallStatusEnum overallStatus) {
     this.overallStatus = overallStatus;
   }
 
 
-  public SystemStatus uptime30d(@javax.annotation.Nullable BigDecimal uptime30d) {
+  public SystemStatus uptime30d(@javax.annotation.Nonnull BigDecimal uptime30d) {
     this.uptime30d = uptime30d;
     return this;
   }
@@ -159,17 +159,17 @@ public class SystemStatus {
    * Get uptime30d
    * @return uptime30d
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public BigDecimal getUptime30d() {
     return uptime30d;
   }
 
-  public void setUptime30d(@javax.annotation.Nullable BigDecimal uptime30d) {
+  public void setUptime30d(@javax.annotation.Nonnull BigDecimal uptime30d) {
     this.uptime30d = uptime30d;
   }
 
 
-  public SystemStatus components(@javax.annotation.Nullable List<SystemStatusComponentsInner> components) {
+  public SystemStatus components(@javax.annotation.Nonnull List<SystemStatusComponentsInner> components) {
     this.components = components;
     return this;
   }
@@ -186,17 +186,17 @@ public class SystemStatus {
    * Get components
    * @return components
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<SystemStatusComponentsInner> getComponents() {
     return components;
   }
 
-  public void setComponents(@javax.annotation.Nullable List<SystemStatusComponentsInner> components) {
+  public void setComponents(@javax.annotation.Nonnull List<SystemStatusComponentsInner> components) {
     this.components = components;
   }
 
 
-  public SystemStatus checkedAt(@javax.annotation.Nullable String checkedAt) {
+  public SystemStatus checkedAt(@javax.annotation.Nonnull String checkedAt) {
     this.checkedAt = checkedAt;
     return this;
   }
@@ -205,12 +205,12 @@ public class SystemStatus {
    * Get checkedAt
    * @return checkedAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getCheckedAt() {
     return checkedAt;
   }
 
-  public void setCheckedAt(@javax.annotation.Nullable String checkedAt) {
+  public void setCheckedAt(@javax.annotation.Nonnull String checkedAt) {
     this.checkedAt = checkedAt;
   }
 
@@ -265,7 +265,7 @@ public class SystemStatus {
     openapiFields = new HashSet<String>(Arrays.asList("overall_status", "uptime_30d", "components", "checked_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("overall_status", "uptime_30d", "components", "checked_at"));
   }
 
   /**
@@ -288,29 +288,30 @@ public class SystemStatus {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `SystemStatus` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("overall_status") != null && !jsonObj.get("overall_status").isJsonNull()) && !jsonObj.get("overall_status").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `overall_status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("overall_status").toString()));
-      }
-      // validate the optional field `overall_status`
-      if (jsonObj.get("overall_status") != null && !jsonObj.get("overall_status").isJsonNull()) {
-        OverallStatusEnum.validateJsonElement(jsonObj.get("overall_status"));
-      }
-      if (jsonObj.get("components") != null && !jsonObj.get("components").isJsonNull()) {
-        JsonArray jsonArraycomponents = jsonObj.getAsJsonArray("components");
-        if (jsonArraycomponents != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("components").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `components` to be an array in the JSON string but got `%s`", jsonObj.get("components").toString()));
-          }
 
-          // validate the optional field `components` (array)
-          for (int i = 0; i < jsonArraycomponents.size(); i++) {
-            SystemStatusComponentsInner.validateJsonElement(jsonArraycomponents.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : SystemStatus.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
-      if ((jsonObj.get("checked_at") != null && !jsonObj.get("checked_at").isJsonNull()) && !jsonObj.get("checked_at").isJsonPrimitive()) {
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (!jsonObj.get("overall_status").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `overall_status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("overall_status").toString()));
+      }
+      // validate the required field `overall_status`
+      OverallStatusEnum.validateJsonElement(jsonObj.get("overall_status"));
+      if (jsonObj.get("components") != null) {
+        if (!jsonObj.get("components").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `components` to be an array in the JSON string but got `%s`", jsonObj.get("components").toString()));
+        }
+        JsonArray jsonArraycomponents = jsonObj.getAsJsonArray("components");
+        // validate the required field `components` (array)
+        for (int i = 0; i < jsonArraycomponents.size(); i++) {
+          SystemStatusComponentsInner.validateJsonElement(jsonArraycomponents.get(i));
+        }
+      }
+      if (!jsonObj.get("checked_at").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `checked_at` to be a primitive type in the JSON string but got `%s`", jsonObj.get("checked_at").toString()));
       }
   }

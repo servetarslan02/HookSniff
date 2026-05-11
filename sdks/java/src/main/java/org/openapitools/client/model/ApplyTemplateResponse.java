@@ -48,22 +48,22 @@ import org.openapitools.client.JSON;
 /**
  * ApplyTemplateResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class ApplyTemplateResponse {
   public static final String SERIALIZED_NAME_SUCCESS = "success";
   @SerializedName(SERIALIZED_NAME_SUCCESS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean success;
 
   public static final String SERIALIZED_NAME_MESSAGE = "message";
   @SerializedName(SERIALIZED_NAME_MESSAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String message;
 
   public ApplyTemplateResponse() {
   }
 
-  public ApplyTemplateResponse success(@javax.annotation.Nullable Boolean success) {
+  public ApplyTemplateResponse success(@javax.annotation.Nonnull Boolean success) {
     this.success = success;
     return this;
   }
@@ -72,17 +72,17 @@ public class ApplyTemplateResponse {
    * Get success
    * @return success
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getSuccess() {
     return success;
   }
 
-  public void setSuccess(@javax.annotation.Nullable Boolean success) {
+  public void setSuccess(@javax.annotation.Nonnull Boolean success) {
     this.success = success;
   }
 
 
-  public ApplyTemplateResponse message(@javax.annotation.Nullable String message) {
+  public ApplyTemplateResponse message(@javax.annotation.Nonnull String message) {
     this.message = message;
     return this;
   }
@@ -91,12 +91,12 @@ public class ApplyTemplateResponse {
    * Get message
    * @return message
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getMessage() {
     return message;
   }
 
-  public void setMessage(@javax.annotation.Nullable String message) {
+  public void setMessage(@javax.annotation.Nonnull String message) {
     this.message = message;
   }
 
@@ -147,7 +147,7 @@ public class ApplyTemplateResponse {
     openapiFields = new HashSet<String>(Arrays.asList("success", "message"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("success", "message"));
   }
 
   /**
@@ -170,8 +170,15 @@ public class ApplyTemplateResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `ApplyTemplateResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : ApplyTemplateResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("message") != null && !jsonObj.get("message").isJsonNull()) && !jsonObj.get("message").isJsonPrimitive()) {
+      if (!jsonObj.get("message").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `message` to be a primitive type in the JSON string but got `%s`", jsonObj.get("message").toString()));
       }
   }

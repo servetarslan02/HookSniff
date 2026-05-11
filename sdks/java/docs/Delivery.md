@@ -7,14 +7,14 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**endpointId** | **UUID** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**endpointId** | **UUID** |  |  |
 |**event** | **String** |  |  [optional] |
-|**status** | [**StatusEnum**](#StatusEnum) |  |  [optional] |
-|**attemptCount** | **Integer** |  |  [optional] |
+|**status** | [**StatusEnum**](#StatusEnum) |  |  |
+|**attemptCount** | **Integer** |  |  |
 |**responseStatus** | **Integer** |  |  [optional] |
-|**replayCount** | **Integer** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**replayCount** | **Integer** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

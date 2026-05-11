@@ -4,19 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Name** | Pointer to **string** |  | [optional] 
-**Condition** | Pointer to **string** |  | [optional] 
-**Threshold** | Pointer to **int32** |  | [optional] 
-**Channels** | Pointer to **[]string** |  | [optional] 
-**IsActive** | Pointer to **bool** |  | [optional] 
-**CreatedAt** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Name** | **string** |  | 
+**Condition** | **string** |  | 
+**Threshold** | **int32** |  | 
+**Channels** | **[]string** |  | 
+**IsActive** | **bool** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewAlertRule
 
-`func NewAlertRule() *AlertRule`
+`func NewAlertRule(id string, name string, condition string, threshold int32, channels []string, isActive bool, createdAt time.Time, ) *AlertRule`
 
 NewAlertRule instantiates a new AlertRule object
 This constructor will assign default values to properties that have it defined,
@@ -50,11 +50,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *AlertRule) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetName
 
@@ -75,11 +70,6 @@ and a boolean to check if the value has been set.
 
 SetName sets Name field to given value.
 
-### HasName
-
-`func (o *AlertRule) HasName() bool`
-
-HasName returns a boolean if a field has been set.
 
 ### GetCondition
 
@@ -100,11 +90,6 @@ and a boolean to check if the value has been set.
 
 SetCondition sets Condition field to given value.
 
-### HasCondition
-
-`func (o *AlertRule) HasCondition() bool`
-
-HasCondition returns a boolean if a field has been set.
 
 ### GetThreshold
 
@@ -125,11 +110,6 @@ and a boolean to check if the value has been set.
 
 SetThreshold sets Threshold field to given value.
 
-### HasThreshold
-
-`func (o *AlertRule) HasThreshold() bool`
-
-HasThreshold returns a boolean if a field has been set.
 
 ### GetChannels
 
@@ -150,11 +130,6 @@ and a boolean to check if the value has been set.
 
 SetChannels sets Channels field to given value.
 
-### HasChannels
-
-`func (o *AlertRule) HasChannels() bool`
-
-HasChannels returns a boolean if a field has been set.
 
 ### GetIsActive
 
@@ -175,36 +150,26 @@ and a boolean to check if the value has been set.
 
 SetIsActive sets IsActive field to given value.
 
-### HasIsActive
-
-`func (o *AlertRule) HasIsActive() bool`
-
-HasIsActive returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
-`func (o *AlertRule) GetCreatedAt() string`
+`func (o *AlertRule) GetCreatedAt() time.Time`
 
 GetCreatedAt returns the CreatedAt field if non-nil, zero value otherwise.
 
 ### GetCreatedAtOk
 
-`func (o *AlertRule) GetCreatedAtOk() (*string, bool)`
+`func (o *AlertRule) GetCreatedAtOk() (*time.Time, bool)`
 
 GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetCreatedAt
 
-`func (o *AlertRule) SetCreatedAt(v string)`
+`func (o *AlertRule) SetCreatedAt(v time.Time)`
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *AlertRule) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

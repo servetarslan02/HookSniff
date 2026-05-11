@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the NotificationListResponse type satisfies the MappedNullable interface at compile time
@@ -20,17 +22,22 @@ var _ MappedNullable = &NotificationListResponse{}
 
 // NotificationListResponse struct for NotificationListResponse
 type NotificationListResponse struct {
-	Notifications []Notification `json:"notifications,omitempty"`
-	Total *int32 `json:"total,omitempty"`
-	UnreadCount *int32 `json:"unread_count,omitempty"`
+	Notifications []Notification `json:"notifications"`
+	Total int32 `json:"total"`
+	UnreadCount int32 `json:"unread_count"`
 }
+
+type _NotificationListResponse NotificationListResponse
 
 // NewNotificationListResponse instantiates a new NotificationListResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewNotificationListResponse() *NotificationListResponse {
+func NewNotificationListResponse(notifications []Notification, total int32, unreadCount int32) *NotificationListResponse {
 	this := NotificationListResponse{}
+	this.Notifications = notifications
+	this.Total = total
+	this.UnreadCount = unreadCount
 	return &this
 }
 
@@ -42,100 +49,76 @@ func NewNotificationListResponseWithDefaults() *NotificationListResponse {
 	return &this
 }
 
-// GetNotifications returns the Notifications field value if set, zero value otherwise.
+// GetNotifications returns the Notifications field value
 func (o *NotificationListResponse) GetNotifications() []Notification {
-	if o == nil || IsNil(o.Notifications) {
+	if o == nil {
 		var ret []Notification
 		return ret
 	}
+
 	return o.Notifications
 }
 
-// GetNotificationsOk returns a tuple with the Notifications field value if set, nil otherwise
+// GetNotificationsOk returns a tuple with the Notifications field value
 // and a boolean to check if the value has been set.
 func (o *NotificationListResponse) GetNotificationsOk() ([]Notification, bool) {
-	if o == nil || IsNil(o.Notifications) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Notifications, true
 }
 
-// HasNotifications returns a boolean if a field has been set.
-func (o *NotificationListResponse) HasNotifications() bool {
-	if o != nil && !IsNil(o.Notifications) {
-		return true
-	}
-
-	return false
-}
-
-// SetNotifications gets a reference to the given []Notification and assigns it to the Notifications field.
+// SetNotifications sets field value
 func (o *NotificationListResponse) SetNotifications(v []Notification) {
 	o.Notifications = v
 }
 
-// GetTotal returns the Total field value if set, zero value otherwise.
+// GetTotal returns the Total field value
 func (o *NotificationListResponse) GetTotal() int32 {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Total
+
+	return o.Total
 }
 
-// GetTotalOk returns a tuple with the Total field value if set, nil otherwise
+// GetTotalOk returns a tuple with the Total field value
 // and a boolean to check if the value has been set.
 func (o *NotificationListResponse) GetTotalOk() (*int32, bool) {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Total, true
+	return &o.Total, true
 }
 
-// HasTotal returns a boolean if a field has been set.
-func (o *NotificationListResponse) HasTotal() bool {
-	if o != nil && !IsNil(o.Total) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotal gets a reference to the given int32 and assigns it to the Total field.
+// SetTotal sets field value
 func (o *NotificationListResponse) SetTotal(v int32) {
-	o.Total = &v
+	o.Total = v
 }
 
-// GetUnreadCount returns the UnreadCount field value if set, zero value otherwise.
+// GetUnreadCount returns the UnreadCount field value
 func (o *NotificationListResponse) GetUnreadCount() int32 {
-	if o == nil || IsNil(o.UnreadCount) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.UnreadCount
+
+	return o.UnreadCount
 }
 
-// GetUnreadCountOk returns a tuple with the UnreadCount field value if set, nil otherwise
+// GetUnreadCountOk returns a tuple with the UnreadCount field value
 // and a boolean to check if the value has been set.
 func (o *NotificationListResponse) GetUnreadCountOk() (*int32, bool) {
-	if o == nil || IsNil(o.UnreadCount) {
+	if o == nil {
 		return nil, false
 	}
-	return o.UnreadCount, true
+	return &o.UnreadCount, true
 }
 
-// HasUnreadCount returns a boolean if a field has been set.
-func (o *NotificationListResponse) HasUnreadCount() bool {
-	if o != nil && !IsNil(o.UnreadCount) {
-		return true
-	}
-
-	return false
-}
-
-// SetUnreadCount gets a reference to the given int32 and assigns it to the UnreadCount field.
+// SetUnreadCount sets field value
 func (o *NotificationListResponse) SetUnreadCount(v int32) {
-	o.UnreadCount = &v
+	o.UnreadCount = v
 }
 
 func (o NotificationListResponse) MarshalJSON() ([]byte, error) {
@@ -148,16 +131,49 @@ func (o NotificationListResponse) MarshalJSON() ([]byte, error) {
 
 func (o NotificationListResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Notifications) {
-		toSerialize["notifications"] = o.Notifications
-	}
-	if !IsNil(o.Total) {
-		toSerialize["total"] = o.Total
-	}
-	if !IsNil(o.UnreadCount) {
-		toSerialize["unread_count"] = o.UnreadCount
-	}
+	toSerialize["notifications"] = o.Notifications
+	toSerialize["total"] = o.Total
+	toSerialize["unread_count"] = o.UnreadCount
 	return toSerialize, nil
+}
+
+func (o *NotificationListResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"notifications",
+		"total",
+		"unread_count",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varNotificationListResponse := _NotificationListResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varNotificationListResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = NotificationListResponse(varNotificationListResponse)
+
+	return err
 }
 
 type NullableNotificationListResponse struct {

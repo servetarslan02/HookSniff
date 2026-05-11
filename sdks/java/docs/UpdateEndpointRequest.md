@@ -7,16 +7,16 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**url** | **URI** |  |  [optional] |
-|**description** | **String** |  |  [optional] |
-|**isActive** | **Boolean** |  |  [optional] |
-|**allowedIps** | **List&lt;String&gt;** |  |  [optional] |
-|**eventFilter** | **List&lt;String&gt;** |  |  [optional] |
+|**url** | **URI** |  |  |
+|**description** | **String** |  |  |
+|**isActive** | **Boolean** |  |  |
+|**allowedIps** | **List&lt;String&gt;** |  |  |
+|**eventFilter** | **List&lt;String&gt;** |  |  |
 |**customHeaders** | **Object** |  |  [optional] |
-|**retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  [optional] |
-|**routingStrategy** | [**RoutingStrategyEnum**](#RoutingStrategyEnum) |  |  [optional] |
-|**fallbackUrl** | **URI** |  |  [optional] |
-|**format** | [**FormatEnum**](#FormatEnum) |  |  [optional] |
+|**retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  |
+|**routingStrategy** | [**RoutingStrategyEnum**](#RoutingStrategyEnum) |  |  |
+|**fallbackUrl** | **URI** |  |  |
+|**format** | [**FormatEnum**](#FormatEnum) |  |  |
 
 
 

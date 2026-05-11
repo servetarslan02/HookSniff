@@ -48,27 +48,27 @@ import org.openapitools.client.JSON;
 /**
  * TwoFactorRequiredResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class TwoFactorRequiredResponse {
   public static final String SERIALIZED_NAME_REQUIRES2FA = "requires_2fa";
   @SerializedName(SERIALIZED_NAME_REQUIRES2FA)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean requires2fa;
 
   public static final String SERIALIZED_NAME_TEMP_TOKEN = "temp_token";
   @SerializedName(SERIALIZED_NAME_TEMP_TOKEN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String tempToken;
 
   public static final String SERIALIZED_NAME_MESSAGE = "message";
   @SerializedName(SERIALIZED_NAME_MESSAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String message;
 
   public TwoFactorRequiredResponse() {
   }
 
-  public TwoFactorRequiredResponse requires2fa(@javax.annotation.Nullable Boolean requires2fa) {
+  public TwoFactorRequiredResponse requires2fa(@javax.annotation.Nonnull Boolean requires2fa) {
     this.requires2fa = requires2fa;
     return this;
   }
@@ -77,17 +77,17 @@ public class TwoFactorRequiredResponse {
    * Get requires2fa
    * @return requires2fa
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getRequires2fa() {
     return requires2fa;
   }
 
-  public void setRequires2fa(@javax.annotation.Nullable Boolean requires2fa) {
+  public void setRequires2fa(@javax.annotation.Nonnull Boolean requires2fa) {
     this.requires2fa = requires2fa;
   }
 
 
-  public TwoFactorRequiredResponse tempToken(@javax.annotation.Nullable String tempToken) {
+  public TwoFactorRequiredResponse tempToken(@javax.annotation.Nonnull String tempToken) {
     this.tempToken = tempToken;
     return this;
   }
@@ -96,17 +96,17 @@ public class TwoFactorRequiredResponse {
    * Get tempToken
    * @return tempToken
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getTempToken() {
     return tempToken;
   }
 
-  public void setTempToken(@javax.annotation.Nullable String tempToken) {
+  public void setTempToken(@javax.annotation.Nonnull String tempToken) {
     this.tempToken = tempToken;
   }
 
 
-  public TwoFactorRequiredResponse message(@javax.annotation.Nullable String message) {
+  public TwoFactorRequiredResponse message(@javax.annotation.Nonnull String message) {
     this.message = message;
     return this;
   }
@@ -115,12 +115,12 @@ public class TwoFactorRequiredResponse {
    * Get message
    * @return message
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getMessage() {
     return message;
   }
 
-  public void setMessage(@javax.annotation.Nullable String message) {
+  public void setMessage(@javax.annotation.Nonnull String message) {
     this.message = message;
   }
 
@@ -173,7 +173,7 @@ public class TwoFactorRequiredResponse {
     openapiFields = new HashSet<String>(Arrays.asList("requires_2fa", "temp_token", "message"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("requires_2fa", "temp_token", "message"));
   }
 
   /**
@@ -196,11 +196,18 @@ public class TwoFactorRequiredResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `TwoFactorRequiredResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : TwoFactorRequiredResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("temp_token") != null && !jsonObj.get("temp_token").isJsonNull()) && !jsonObj.get("temp_token").isJsonPrimitive()) {
+      if (!jsonObj.get("temp_token").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `temp_token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("temp_token").toString()));
       }
-      if ((jsonObj.get("message") != null && !jsonObj.get("message").isJsonNull()) && !jsonObj.get("message").isJsonPrimitive()) {
+      if (!jsonObj.get("message").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `message` to be a primitive type in the JSON string but got `%s`", jsonObj.get("message").toString()));
       }
   }

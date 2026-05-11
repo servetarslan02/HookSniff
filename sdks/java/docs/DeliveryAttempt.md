@@ -7,13 +7,13 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**attemptNumber** | **Integer** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**attemptNumber** | **Integer** |  |  |
 |**statusCode** | **Integer** |  |  [optional] |
 |**responseBody** | **String** |  |  [optional] |
 |**durationMs** | **Integer** |  |  [optional] |
 |**errorMessage** | **String** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

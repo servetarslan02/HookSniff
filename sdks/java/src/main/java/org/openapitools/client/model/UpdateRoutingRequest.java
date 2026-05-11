@@ -49,7 +49,7 @@ import org.openapitools.client.JSON;
 /**
  * UpdateRoutingRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class UpdateRoutingRequest {
   /**
    * Gets or Sets routingStrategy
@@ -107,18 +107,18 @@ public class UpdateRoutingRequest {
 
   public static final String SERIALIZED_NAME_ROUTING_STRATEGY = "routing_strategy";
   @SerializedName(SERIALIZED_NAME_ROUTING_STRATEGY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private RoutingStrategyEnum routingStrategy;
 
   public static final String SERIALIZED_NAME_FALLBACK_URL = "fallback_url";
   @SerializedName(SERIALIZED_NAME_FALLBACK_URL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private URI fallbackUrl;
 
   public UpdateRoutingRequest() {
   }
 
-  public UpdateRoutingRequest routingStrategy(@javax.annotation.Nullable RoutingStrategyEnum routingStrategy) {
+  public UpdateRoutingRequest routingStrategy(@javax.annotation.Nonnull RoutingStrategyEnum routingStrategy) {
     this.routingStrategy = routingStrategy;
     return this;
   }
@@ -127,17 +127,17 @@ public class UpdateRoutingRequest {
    * Get routingStrategy
    * @return routingStrategy
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public RoutingStrategyEnum getRoutingStrategy() {
     return routingStrategy;
   }
 
-  public void setRoutingStrategy(@javax.annotation.Nullable RoutingStrategyEnum routingStrategy) {
+  public void setRoutingStrategy(@javax.annotation.Nonnull RoutingStrategyEnum routingStrategy) {
     this.routingStrategy = routingStrategy;
   }
 
 
-  public UpdateRoutingRequest fallbackUrl(@javax.annotation.Nullable URI fallbackUrl) {
+  public UpdateRoutingRequest fallbackUrl(@javax.annotation.Nonnull URI fallbackUrl) {
     this.fallbackUrl = fallbackUrl;
     return this;
   }
@@ -146,12 +146,12 @@ public class UpdateRoutingRequest {
    * Get fallbackUrl
    * @return fallbackUrl
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public URI getFallbackUrl() {
     return fallbackUrl;
   }
 
-  public void setFallbackUrl(@javax.annotation.Nullable URI fallbackUrl) {
+  public void setFallbackUrl(@javax.annotation.Nonnull URI fallbackUrl) {
     this.fallbackUrl = fallbackUrl;
   }
 
@@ -202,7 +202,7 @@ public class UpdateRoutingRequest {
     openapiFields = new HashSet<String>(Arrays.asList("routing_strategy", "fallback_url"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("routing_strategy", "fallback_url"));
   }
 
   /**
@@ -225,15 +225,20 @@ public class UpdateRoutingRequest {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `UpdateRoutingRequest` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : UpdateRoutingRequest.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("routing_strategy") != null && !jsonObj.get("routing_strategy").isJsonNull()) && !jsonObj.get("routing_strategy").isJsonPrimitive()) {
+      if (!jsonObj.get("routing_strategy").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `routing_strategy` to be a primitive type in the JSON string but got `%s`", jsonObj.get("routing_strategy").toString()));
       }
-      // validate the optional field `routing_strategy`
-      if (jsonObj.get("routing_strategy") != null && !jsonObj.get("routing_strategy").isJsonNull()) {
-        RoutingStrategyEnum.validateJsonElement(jsonObj.get("routing_strategy"));
-      }
-      if ((jsonObj.get("fallback_url") != null && !jsonObj.get("fallback_url").isJsonNull()) && !jsonObj.get("fallback_url").isJsonPrimitive()) {
+      // validate the required field `routing_strategy`
+      RoutingStrategyEnum.validateJsonElement(jsonObj.get("routing_strategy"));
+      if (!jsonObj.get("fallback_url").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `fallback_url` to be a primitive type in the JSON string but got `%s`", jsonObj.get("fallback_url").toString()));
       }
   }

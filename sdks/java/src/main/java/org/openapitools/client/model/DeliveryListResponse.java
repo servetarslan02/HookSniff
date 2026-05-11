@@ -51,32 +51,32 @@ import org.openapitools.client.JSON;
 /**
  * DeliveryListResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class DeliveryListResponse {
   public static final String SERIALIZED_NAME_DELIVERIES = "deliveries";
   @SerializedName(SERIALIZED_NAME_DELIVERIES)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<Delivery> deliveries = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_TOTAL = "total";
   @SerializedName(SERIALIZED_NAME_TOTAL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer total;
 
   public static final String SERIALIZED_NAME_PAGE = "page";
   @SerializedName(SERIALIZED_NAME_PAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer page;
 
   public static final String SERIALIZED_NAME_PER_PAGE = "per_page";
   @SerializedName(SERIALIZED_NAME_PER_PAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer perPage;
 
   public DeliveryListResponse() {
   }
 
-  public DeliveryListResponse deliveries(@javax.annotation.Nullable List<Delivery> deliveries) {
+  public DeliveryListResponse deliveries(@javax.annotation.Nonnull List<Delivery> deliveries) {
     this.deliveries = deliveries;
     return this;
   }
@@ -93,17 +93,17 @@ public class DeliveryListResponse {
    * Get deliveries
    * @return deliveries
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<Delivery> getDeliveries() {
     return deliveries;
   }
 
-  public void setDeliveries(@javax.annotation.Nullable List<Delivery> deliveries) {
+  public void setDeliveries(@javax.annotation.Nonnull List<Delivery> deliveries) {
     this.deliveries = deliveries;
   }
 
 
-  public DeliveryListResponse total(@javax.annotation.Nullable Integer total) {
+  public DeliveryListResponse total(@javax.annotation.Nonnull Integer total) {
     this.total = total;
     return this;
   }
@@ -112,17 +112,17 @@ public class DeliveryListResponse {
    * Get total
    * @return total
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotal() {
     return total;
   }
 
-  public void setTotal(@javax.annotation.Nullable Integer total) {
+  public void setTotal(@javax.annotation.Nonnull Integer total) {
     this.total = total;
   }
 
 
-  public DeliveryListResponse page(@javax.annotation.Nullable Integer page) {
+  public DeliveryListResponse page(@javax.annotation.Nonnull Integer page) {
     this.page = page;
     return this;
   }
@@ -131,17 +131,17 @@ public class DeliveryListResponse {
    * Get page
    * @return page
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getPage() {
     return page;
   }
 
-  public void setPage(@javax.annotation.Nullable Integer page) {
+  public void setPage(@javax.annotation.Nonnull Integer page) {
     this.page = page;
   }
 
 
-  public DeliveryListResponse perPage(@javax.annotation.Nullable Integer perPage) {
+  public DeliveryListResponse perPage(@javax.annotation.Nonnull Integer perPage) {
     this.perPage = perPage;
     return this;
   }
@@ -150,12 +150,12 @@ public class DeliveryListResponse {
    * Get perPage
    * @return perPage
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getPerPage() {
     return perPage;
   }
 
-  public void setPerPage(@javax.annotation.Nullable Integer perPage) {
+  public void setPerPage(@javax.annotation.Nonnull Integer perPage) {
     this.perPage = perPage;
   }
 
@@ -210,7 +210,7 @@ public class DeliveryListResponse {
     openapiFields = new HashSet<String>(Arrays.asList("deliveries", "total", "page", "per_page"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("deliveries", "total", "page", "per_page"));
   }
 
   /**
@@ -233,19 +233,22 @@ public class DeliveryListResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `DeliveryListResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (jsonObj.get("deliveries") != null && !jsonObj.get("deliveries").isJsonNull()) {
-        JsonArray jsonArraydeliveries = jsonObj.getAsJsonArray("deliveries");
-        if (jsonArraydeliveries != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("deliveries").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `deliveries` to be an array in the JSON string but got `%s`", jsonObj.get("deliveries").toString()));
-          }
 
-          // validate the optional field `deliveries` (array)
-          for (int i = 0; i < jsonArraydeliveries.size(); i++) {
-            Delivery.validateJsonElement(jsonArraydeliveries.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : DeliveryListResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("deliveries") != null) {
+        if (!jsonObj.get("deliveries").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `deliveries` to be an array in the JSON string but got `%s`", jsonObj.get("deliveries").toString()));
+        }
+        JsonArray jsonArraydeliveries = jsonObj.getAsJsonArray("deliveries");
+        // validate the required field `deliveries` (array)
+        for (int i = 0; i < jsonArraydeliveries.size(); i++) {
+          Delivery.validateJsonElement(jsonArraydeliveries.get(i));
         }
       }
   }

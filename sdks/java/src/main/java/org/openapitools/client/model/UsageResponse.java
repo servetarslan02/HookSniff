@@ -49,47 +49,47 @@ import org.openapitools.client.JSON;
 /**
  * UsageResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class UsageResponse {
   public static final String SERIALIZED_NAME_PLAN = "plan";
   @SerializedName(SERIALIZED_NAME_PLAN)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String plan;
 
   public static final String SERIALIZED_NAME_PERIOD_START = "period_start";
   @SerializedName(SERIALIZED_NAME_PERIOD_START)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime periodStart;
 
   public static final String SERIALIZED_NAME_PERIOD_END = "period_end";
   @SerializedName(SERIALIZED_NAME_PERIOD_END)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime periodEnd;
 
   public static final String SERIALIZED_NAME_WEBHOOKS_USED = "webhooks_used";
   @SerializedName(SERIALIZED_NAME_WEBHOOKS_USED)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer webhooksUsed;
 
   public static final String SERIALIZED_NAME_WEBHOOKS_LIMIT = "webhooks_limit";
   @SerializedName(SERIALIZED_NAME_WEBHOOKS_LIMIT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer webhooksLimit;
 
   public static final String SERIALIZED_NAME_ENDPOINTS_USED = "endpoints_used";
   @SerializedName(SERIALIZED_NAME_ENDPOINTS_USED)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer endpointsUsed;
 
   public static final String SERIALIZED_NAME_ENDPOINTS_LIMIT = "endpoints_limit";
   @SerializedName(SERIALIZED_NAME_ENDPOINTS_LIMIT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer endpointsLimit;
 
   public UsageResponse() {
   }
 
-  public UsageResponse plan(@javax.annotation.Nullable String plan) {
+  public UsageResponse plan(@javax.annotation.Nonnull String plan) {
     this.plan = plan;
     return this;
   }
@@ -98,17 +98,17 @@ public class UsageResponse {
    * Get plan
    * @return plan
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPlan() {
     return plan;
   }
 
-  public void setPlan(@javax.annotation.Nullable String plan) {
+  public void setPlan(@javax.annotation.Nonnull String plan) {
     this.plan = plan;
   }
 
 
-  public UsageResponse periodStart(@javax.annotation.Nullable OffsetDateTime periodStart) {
+  public UsageResponse periodStart(@javax.annotation.Nonnull OffsetDateTime periodStart) {
     this.periodStart = periodStart;
     return this;
   }
@@ -117,17 +117,17 @@ public class UsageResponse {
    * Get periodStart
    * @return periodStart
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getPeriodStart() {
     return periodStart;
   }
 
-  public void setPeriodStart(@javax.annotation.Nullable OffsetDateTime periodStart) {
+  public void setPeriodStart(@javax.annotation.Nonnull OffsetDateTime periodStart) {
     this.periodStart = periodStart;
   }
 
 
-  public UsageResponse periodEnd(@javax.annotation.Nullable OffsetDateTime periodEnd) {
+  public UsageResponse periodEnd(@javax.annotation.Nonnull OffsetDateTime periodEnd) {
     this.periodEnd = periodEnd;
     return this;
   }
@@ -136,17 +136,17 @@ public class UsageResponse {
    * Get periodEnd
    * @return periodEnd
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getPeriodEnd() {
     return periodEnd;
   }
 
-  public void setPeriodEnd(@javax.annotation.Nullable OffsetDateTime periodEnd) {
+  public void setPeriodEnd(@javax.annotation.Nonnull OffsetDateTime periodEnd) {
     this.periodEnd = periodEnd;
   }
 
 
-  public UsageResponse webhooksUsed(@javax.annotation.Nullable Integer webhooksUsed) {
+  public UsageResponse webhooksUsed(@javax.annotation.Nonnull Integer webhooksUsed) {
     this.webhooksUsed = webhooksUsed;
     return this;
   }
@@ -155,17 +155,17 @@ public class UsageResponse {
    * Get webhooksUsed
    * @return webhooksUsed
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getWebhooksUsed() {
     return webhooksUsed;
   }
 
-  public void setWebhooksUsed(@javax.annotation.Nullable Integer webhooksUsed) {
+  public void setWebhooksUsed(@javax.annotation.Nonnull Integer webhooksUsed) {
     this.webhooksUsed = webhooksUsed;
   }
 
 
-  public UsageResponse webhooksLimit(@javax.annotation.Nullable Integer webhooksLimit) {
+  public UsageResponse webhooksLimit(@javax.annotation.Nonnull Integer webhooksLimit) {
     this.webhooksLimit = webhooksLimit;
     return this;
   }
@@ -174,17 +174,17 @@ public class UsageResponse {
    * Get webhooksLimit
    * @return webhooksLimit
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getWebhooksLimit() {
     return webhooksLimit;
   }
 
-  public void setWebhooksLimit(@javax.annotation.Nullable Integer webhooksLimit) {
+  public void setWebhooksLimit(@javax.annotation.Nonnull Integer webhooksLimit) {
     this.webhooksLimit = webhooksLimit;
   }
 
 
-  public UsageResponse endpointsUsed(@javax.annotation.Nullable Integer endpointsUsed) {
+  public UsageResponse endpointsUsed(@javax.annotation.Nonnull Integer endpointsUsed) {
     this.endpointsUsed = endpointsUsed;
     return this;
   }
@@ -193,17 +193,17 @@ public class UsageResponse {
    * Get endpointsUsed
    * @return endpointsUsed
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getEndpointsUsed() {
     return endpointsUsed;
   }
 
-  public void setEndpointsUsed(@javax.annotation.Nullable Integer endpointsUsed) {
+  public void setEndpointsUsed(@javax.annotation.Nonnull Integer endpointsUsed) {
     this.endpointsUsed = endpointsUsed;
   }
 
 
-  public UsageResponse endpointsLimit(@javax.annotation.Nullable Integer endpointsLimit) {
+  public UsageResponse endpointsLimit(@javax.annotation.Nonnull Integer endpointsLimit) {
     this.endpointsLimit = endpointsLimit;
     return this;
   }
@@ -212,12 +212,12 @@ public class UsageResponse {
    * Get endpointsLimit
    * @return endpointsLimit
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getEndpointsLimit() {
     return endpointsLimit;
   }
 
-  public void setEndpointsLimit(@javax.annotation.Nullable Integer endpointsLimit) {
+  public void setEndpointsLimit(@javax.annotation.Nonnull Integer endpointsLimit) {
     this.endpointsLimit = endpointsLimit;
   }
 
@@ -278,7 +278,7 @@ public class UsageResponse {
     openapiFields = new HashSet<String>(Arrays.asList("plan", "period_start", "period_end", "webhooks_used", "webhooks_limit", "endpoints_used", "endpoints_limit"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("plan", "period_start", "period_end", "webhooks_used", "webhooks_limit", "endpoints_used", "endpoints_limit"));
   }
 
   /**
@@ -301,8 +301,15 @@ public class UsageResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `UsageResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : UsageResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("plan") != null && !jsonObj.get("plan").isJsonNull()) && !jsonObj.get("plan").isJsonPrimitive()) {
+      if (!jsonObj.get("plan").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `plan` to be a primitive type in the JSON string but got `%s`", jsonObj.get("plan").toString()));
       }
   }

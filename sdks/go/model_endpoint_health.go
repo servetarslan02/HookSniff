@@ -14,26 +14,39 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the EndpointHealth type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &EndpointHealth{}
 
-// EndpointHealth struct for EndpointHealth
+// EndpointHealth Endpoint health metrics and status
 type EndpointHealth struct {
-	EndpointId *string `json:"endpoint_id,omitempty"`
-	IsHealthy *bool `json:"is_healthy,omitempty"`
+	EndpointId string `json:"endpoint_id"`
+	IsHealthy bool `json:"is_healthy"`
 	FailureStreak *int32 `json:"failure_streak,omitempty"`
 	AvgResponseMs *int32 `json:"avg_response_ms,omitempty"`
 	LastFailureAt *time.Time `json:"last_failure_at,omitempty"`
+	// Success rate as a fraction (0.0–1.0)
+	SuccessRate *float64 `json:"success_rate,omitempty"`
+	// Average delivery latency in milliseconds
+	AvgLatencyMs *float32 `json:"avg_latency_ms,omitempty"`
+	LastDeliveryAt *time.Time `json:"last_delivery_at,omitempty"`
+	TotalDeliveries *int32 `json:"total_deliveries,omitempty"`
+	FailedDeliveries *int32 `json:"failed_deliveries,omitempty"`
 }
+
+type _EndpointHealth EndpointHealth
 
 // NewEndpointHealth instantiates a new EndpointHealth object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEndpointHealth() *EndpointHealth {
+func NewEndpointHealth(endpointId string, isHealthy bool) *EndpointHealth {
 	this := EndpointHealth{}
+	this.EndpointId = endpointId
+	this.IsHealthy = isHealthy
 	return &this
 }
 
@@ -45,68 +58,52 @@ func NewEndpointHealthWithDefaults() *EndpointHealth {
 	return &this
 }
 
-// GetEndpointId returns the EndpointId field value if set, zero value otherwise.
+// GetEndpointId returns the EndpointId field value
 func (o *EndpointHealth) GetEndpointId() string {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.EndpointId
+
+	return o.EndpointId
 }
 
-// GetEndpointIdOk returns a tuple with the EndpointId field value if set, nil otherwise
+// GetEndpointIdOk returns a tuple with the EndpointId field value
 // and a boolean to check if the value has been set.
 func (o *EndpointHealth) GetEndpointIdOk() (*string, bool) {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EndpointId, true
+	return &o.EndpointId, true
 }
 
-// HasEndpointId returns a boolean if a field has been set.
-func (o *EndpointHealth) HasEndpointId() bool {
-	if o != nil && !IsNil(o.EndpointId) {
-		return true
-	}
-
-	return false
-}
-
-// SetEndpointId gets a reference to the given string and assigns it to the EndpointId field.
+// SetEndpointId sets field value
 func (o *EndpointHealth) SetEndpointId(v string) {
-	o.EndpointId = &v
+	o.EndpointId = v
 }
 
-// GetIsHealthy returns the IsHealthy field value if set, zero value otherwise.
+// GetIsHealthy returns the IsHealthy field value
 func (o *EndpointHealth) GetIsHealthy() bool {
-	if o == nil || IsNil(o.IsHealthy) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsHealthy
+
+	return o.IsHealthy
 }
 
-// GetIsHealthyOk returns a tuple with the IsHealthy field value if set, nil otherwise
+// GetIsHealthyOk returns a tuple with the IsHealthy field value
 // and a boolean to check if the value has been set.
 func (o *EndpointHealth) GetIsHealthyOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsHealthy) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsHealthy, true
+	return &o.IsHealthy, true
 }
 
-// HasIsHealthy returns a boolean if a field has been set.
-func (o *EndpointHealth) HasIsHealthy() bool {
-	if o != nil && !IsNil(o.IsHealthy) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsHealthy gets a reference to the given bool and assigns it to the IsHealthy field.
+// SetIsHealthy sets field value
 func (o *EndpointHealth) SetIsHealthy(v bool) {
-	o.IsHealthy = &v
+	o.IsHealthy = v
 }
 
 // GetFailureStreak returns the FailureStreak field value if set, zero value otherwise.
@@ -205,6 +202,166 @@ func (o *EndpointHealth) SetLastFailureAt(v time.Time) {
 	o.LastFailureAt = &v
 }
 
+// GetSuccessRate returns the SuccessRate field value if set, zero value otherwise.
+func (o *EndpointHealth) GetSuccessRate() float64 {
+	if o == nil || IsNil(o.SuccessRate) {
+		var ret float64
+		return ret
+	}
+	return *o.SuccessRate
+}
+
+// GetSuccessRateOk returns a tuple with the SuccessRate field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EndpointHealth) GetSuccessRateOk() (*float64, bool) {
+	if o == nil || IsNil(o.SuccessRate) {
+		return nil, false
+	}
+	return o.SuccessRate, true
+}
+
+// HasSuccessRate returns a boolean if a field has been set.
+func (o *EndpointHealth) HasSuccessRate() bool {
+	if o != nil && !IsNil(o.SuccessRate) {
+		return true
+	}
+
+	return false
+}
+
+// SetSuccessRate gets a reference to the given float64 and assigns it to the SuccessRate field.
+func (o *EndpointHealth) SetSuccessRate(v float64) {
+	o.SuccessRate = &v
+}
+
+// GetAvgLatencyMs returns the AvgLatencyMs field value if set, zero value otherwise.
+func (o *EndpointHealth) GetAvgLatencyMs() float32 {
+	if o == nil || IsNil(o.AvgLatencyMs) {
+		var ret float32
+		return ret
+	}
+	return *o.AvgLatencyMs
+}
+
+// GetAvgLatencyMsOk returns a tuple with the AvgLatencyMs field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EndpointHealth) GetAvgLatencyMsOk() (*float32, bool) {
+	if o == nil || IsNil(o.AvgLatencyMs) {
+		return nil, false
+	}
+	return o.AvgLatencyMs, true
+}
+
+// HasAvgLatencyMs returns a boolean if a field has been set.
+func (o *EndpointHealth) HasAvgLatencyMs() bool {
+	if o != nil && !IsNil(o.AvgLatencyMs) {
+		return true
+	}
+
+	return false
+}
+
+// SetAvgLatencyMs gets a reference to the given float32 and assigns it to the AvgLatencyMs field.
+func (o *EndpointHealth) SetAvgLatencyMs(v float32) {
+	o.AvgLatencyMs = &v
+}
+
+// GetLastDeliveryAt returns the LastDeliveryAt field value if set, zero value otherwise.
+func (o *EndpointHealth) GetLastDeliveryAt() time.Time {
+	if o == nil || IsNil(o.LastDeliveryAt) {
+		var ret time.Time
+		return ret
+	}
+	return *o.LastDeliveryAt
+}
+
+// GetLastDeliveryAtOk returns a tuple with the LastDeliveryAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EndpointHealth) GetLastDeliveryAtOk() (*time.Time, bool) {
+	if o == nil || IsNil(o.LastDeliveryAt) {
+		return nil, false
+	}
+	return o.LastDeliveryAt, true
+}
+
+// HasLastDeliveryAt returns a boolean if a field has been set.
+func (o *EndpointHealth) HasLastDeliveryAt() bool {
+	if o != nil && !IsNil(o.LastDeliveryAt) {
+		return true
+	}
+
+	return false
+}
+
+// SetLastDeliveryAt gets a reference to the given time.Time and assigns it to the LastDeliveryAt field.
+func (o *EndpointHealth) SetLastDeliveryAt(v time.Time) {
+	o.LastDeliveryAt = &v
+}
+
+// GetTotalDeliveries returns the TotalDeliveries field value if set, zero value otherwise.
+func (o *EndpointHealth) GetTotalDeliveries() int32 {
+	if o == nil || IsNil(o.TotalDeliveries) {
+		var ret int32
+		return ret
+	}
+	return *o.TotalDeliveries
+}
+
+// GetTotalDeliveriesOk returns a tuple with the TotalDeliveries field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EndpointHealth) GetTotalDeliveriesOk() (*int32, bool) {
+	if o == nil || IsNil(o.TotalDeliveries) {
+		return nil, false
+	}
+	return o.TotalDeliveries, true
+}
+
+// HasTotalDeliveries returns a boolean if a field has been set.
+func (o *EndpointHealth) HasTotalDeliveries() bool {
+	if o != nil && !IsNil(o.TotalDeliveries) {
+		return true
+	}
+
+	return false
+}
+
+// SetTotalDeliveries gets a reference to the given int32 and assigns it to the TotalDeliveries field.
+func (o *EndpointHealth) SetTotalDeliveries(v int32) {
+	o.TotalDeliveries = &v
+}
+
+// GetFailedDeliveries returns the FailedDeliveries field value if set, zero value otherwise.
+func (o *EndpointHealth) GetFailedDeliveries() int32 {
+	if o == nil || IsNil(o.FailedDeliveries) {
+		var ret int32
+		return ret
+	}
+	return *o.FailedDeliveries
+}
+
+// GetFailedDeliveriesOk returns a tuple with the FailedDeliveries field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EndpointHealth) GetFailedDeliveriesOk() (*int32, bool) {
+	if o == nil || IsNil(o.FailedDeliveries) {
+		return nil, false
+	}
+	return o.FailedDeliveries, true
+}
+
+// HasFailedDeliveries returns a boolean if a field has been set.
+func (o *EndpointHealth) HasFailedDeliveries() bool {
+	if o != nil && !IsNil(o.FailedDeliveries) {
+		return true
+	}
+
+	return false
+}
+
+// SetFailedDeliveries gets a reference to the given int32 and assigns it to the FailedDeliveries field.
+func (o *EndpointHealth) SetFailedDeliveries(v int32) {
+	o.FailedDeliveries = &v
+}
+
 func (o EndpointHealth) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -215,12 +372,8 @@ func (o EndpointHealth) MarshalJSON() ([]byte, error) {
 
 func (o EndpointHealth) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.EndpointId) {
-		toSerialize["endpoint_id"] = o.EndpointId
-	}
-	if !IsNil(o.IsHealthy) {
-		toSerialize["is_healthy"] = o.IsHealthy
-	}
+	toSerialize["endpoint_id"] = o.EndpointId
+	toSerialize["is_healthy"] = o.IsHealthy
 	if !IsNil(o.FailureStreak) {
 		toSerialize["failure_streak"] = o.FailureStreak
 	}
@@ -230,7 +383,60 @@ func (o EndpointHealth) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.LastFailureAt) {
 		toSerialize["last_failure_at"] = o.LastFailureAt
 	}
+	if !IsNil(o.SuccessRate) {
+		toSerialize["success_rate"] = o.SuccessRate
+	}
+	if !IsNil(o.AvgLatencyMs) {
+		toSerialize["avg_latency_ms"] = o.AvgLatencyMs
+	}
+	if !IsNil(o.LastDeliveryAt) {
+		toSerialize["last_delivery_at"] = o.LastDeliveryAt
+	}
+	if !IsNil(o.TotalDeliveries) {
+		toSerialize["total_deliveries"] = o.TotalDeliveries
+	}
+	if !IsNil(o.FailedDeliveries) {
+		toSerialize["failed_deliveries"] = o.FailedDeliveries
+	}
 	return toSerialize, nil
+}
+
+func (o *EndpointHealth) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"endpoint_id",
+		"is_healthy",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varEndpointHealth := _EndpointHealth{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varEndpointHealth)
+
+	if err != nil {
+		return err
+	}
+
+	*o = EndpointHealth(varEndpointHealth)
+
+	return err
 }
 
 type NullableEndpointHealth struct {

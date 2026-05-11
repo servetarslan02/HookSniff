@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the TransformRule type satisfies the MappedNullable interface at compile time
@@ -21,21 +23,29 @@ var _ MappedNullable = &TransformRule{}
 
 // TransformRule struct for TransformRule
 type TransformRule struct {
-	Id *string `json:"id,omitempty"`
-	EndpointId *string `json:"endpoint_id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	RuleType *string `json:"rule_type,omitempty"`
+	Id string `json:"id"`
+	EndpointId string `json:"endpoint_id"`
+	Name string `json:"name"`
+	RuleType string `json:"rule_type"`
 	Config map[string]interface{} `json:"config,omitempty"`
-	IsActive *bool `json:"is_active,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	IsActive bool `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _TransformRule TransformRule
 
 // NewTransformRule instantiates a new TransformRule object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransformRule() *TransformRule {
+func NewTransformRule(id string, endpointId string, name string, ruleType string, isActive bool, createdAt time.Time) *TransformRule {
 	this := TransformRule{}
+	this.Id = id
+	this.EndpointId = endpointId
+	this.Name = name
+	this.RuleType = ruleType
+	this.IsActive = isActive
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -47,132 +57,100 @@ func NewTransformRuleWithDefaults() *TransformRule {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *TransformRule) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *TransformRule) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *TransformRule) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *TransformRule) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetEndpointId returns the EndpointId field value if set, zero value otherwise.
+// GetEndpointId returns the EndpointId field value
 func (o *TransformRule) GetEndpointId() string {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.EndpointId
+
+	return o.EndpointId
 }
 
-// GetEndpointIdOk returns a tuple with the EndpointId field value if set, nil otherwise
+// GetEndpointIdOk returns a tuple with the EndpointId field value
 // and a boolean to check if the value has been set.
 func (o *TransformRule) GetEndpointIdOk() (*string, bool) {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EndpointId, true
+	return &o.EndpointId, true
 }
 
-// HasEndpointId returns a boolean if a field has been set.
-func (o *TransformRule) HasEndpointId() bool {
-	if o != nil && !IsNil(o.EndpointId) {
-		return true
-	}
-
-	return false
-}
-
-// SetEndpointId gets a reference to the given string and assigns it to the EndpointId field.
+// SetEndpointId sets field value
 func (o *TransformRule) SetEndpointId(v string) {
-	o.EndpointId = &v
+	o.EndpointId = v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value
 func (o *TransformRule) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Name
+
+	return o.Name
 }
 
-// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
 func (o *TransformRule) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return &o.Name, true
 }
 
-// HasName returns a boolean if a field has been set.
-func (o *TransformRule) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
-		return true
-	}
-
-	return false
-}
-
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName sets field value
 func (o *TransformRule) SetName(v string) {
-	o.Name = &v
+	o.Name = v
 }
 
-// GetRuleType returns the RuleType field value if set, zero value otherwise.
+// GetRuleType returns the RuleType field value
 func (o *TransformRule) GetRuleType() string {
-	if o == nil || IsNil(o.RuleType) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.RuleType
+
+	return o.RuleType
 }
 
-// GetRuleTypeOk returns a tuple with the RuleType field value if set, nil otherwise
+// GetRuleTypeOk returns a tuple with the RuleType field value
 // and a boolean to check if the value has been set.
 func (o *TransformRule) GetRuleTypeOk() (*string, bool) {
-	if o == nil || IsNil(o.RuleType) {
+	if o == nil {
 		return nil, false
 	}
-	return o.RuleType, true
+	return &o.RuleType, true
 }
 
-// HasRuleType returns a boolean if a field has been set.
-func (o *TransformRule) HasRuleType() bool {
-	if o != nil && !IsNil(o.RuleType) {
-		return true
-	}
-
-	return false
-}
-
-// SetRuleType gets a reference to the given string and assigns it to the RuleType field.
+// SetRuleType sets field value
 func (o *TransformRule) SetRuleType(v string) {
-	o.RuleType = &v
+	o.RuleType = v
 }
 
 // GetConfig returns the Config field value if set, zero value otherwise.
@@ -207,68 +185,52 @@ func (o *TransformRule) SetConfig(v map[string]interface{}) {
 	o.Config = v
 }
 
-// GetIsActive returns the IsActive field value if set, zero value otherwise.
+// GetIsActive returns the IsActive field value
 func (o *TransformRule) GetIsActive() bool {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsActive
+
+	return o.IsActive
 }
 
-// GetIsActiveOk returns a tuple with the IsActive field value if set, nil otherwise
+// GetIsActiveOk returns a tuple with the IsActive field value
 // and a boolean to check if the value has been set.
 func (o *TransformRule) GetIsActiveOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsActive, true
+	return &o.IsActive, true
 }
 
-// HasIsActive returns a boolean if a field has been set.
-func (o *TransformRule) HasIsActive() bool {
-	if o != nil && !IsNil(o.IsActive) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsActive gets a reference to the given bool and assigns it to the IsActive field.
+// SetIsActive sets field value
 func (o *TransformRule) SetIsActive(v bool) {
-	o.IsActive = &v
+	o.IsActive = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *TransformRule) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *TransformRule) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *TransformRule) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *TransformRule) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o TransformRule) MarshalJSON() ([]byte, error) {
@@ -281,28 +243,58 @@ func (o TransformRule) MarshalJSON() ([]byte, error) {
 
 func (o TransformRule) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.EndpointId) {
-		toSerialize["endpoint_id"] = o.EndpointId
-	}
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
-	}
-	if !IsNil(o.RuleType) {
-		toSerialize["rule_type"] = o.RuleType
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["endpoint_id"] = o.EndpointId
+	toSerialize["name"] = o.Name
+	toSerialize["rule_type"] = o.RuleType
 	if !IsNil(o.Config) {
 		toSerialize["config"] = o.Config
 	}
-	if !IsNil(o.IsActive) {
-		toSerialize["is_active"] = o.IsActive
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["is_active"] = o.IsActive
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *TransformRule) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"endpoint_id",
+		"name",
+		"rule_type",
+		"is_active",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varTransformRule := _TransformRule{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varTransformRule)
+
+	if err != nil {
+		return err
+	}
+
+	*o = TransformRule(varTransformRule)
+
+	return err
 }
 
 type NullableTransformRule struct {

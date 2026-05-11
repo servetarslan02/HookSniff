@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the SubscriptionResponse type satisfies the MappedNullable interface at compile time
@@ -20,21 +22,30 @@ var _ MappedNullable = &SubscriptionResponse{}
 
 // SubscriptionResponse struct for SubscriptionResponse
 type SubscriptionResponse struct {
-	Plan *string `json:"plan,omitempty"`
-	Status *string `json:"status,omitempty"`
-	PaymentProvider *string `json:"payment_provider,omitempty"`
-	WebhookLimit *int32 `json:"webhook_limit,omitempty"`
-	EndpointLimit *int32 `json:"endpoint_limit,omitempty"`
-	RetentionDays *int32 `json:"retention_days,omitempty"`
-	MonthlyPriceCents *int32 `json:"monthly_price_cents,omitempty"`
+	Plan string `json:"plan"`
+	Status string `json:"status"`
+	PaymentProvider string `json:"payment_provider"`
+	WebhookLimit int32 `json:"webhook_limit"`
+	EndpointLimit int32 `json:"endpoint_limit"`
+	RetentionDays int32 `json:"retention_days"`
+	MonthlyPriceCents int32 `json:"monthly_price_cents"`
 }
+
+type _SubscriptionResponse SubscriptionResponse
 
 // NewSubscriptionResponse instantiates a new SubscriptionResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSubscriptionResponse() *SubscriptionResponse {
+func NewSubscriptionResponse(plan string, status string, paymentProvider string, webhookLimit int32, endpointLimit int32, retentionDays int32, monthlyPriceCents int32) *SubscriptionResponse {
 	this := SubscriptionResponse{}
+	this.Plan = plan
+	this.Status = status
+	this.PaymentProvider = paymentProvider
+	this.WebhookLimit = webhookLimit
+	this.EndpointLimit = endpointLimit
+	this.RetentionDays = retentionDays
+	this.MonthlyPriceCents = monthlyPriceCents
 	return &this
 }
 
@@ -46,228 +57,172 @@ func NewSubscriptionResponseWithDefaults() *SubscriptionResponse {
 	return &this
 }
 
-// GetPlan returns the Plan field value if set, zero value otherwise.
+// GetPlan returns the Plan field value
 func (o *SubscriptionResponse) GetPlan() string {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Plan
+
+	return o.Plan
 }
 
-// GetPlanOk returns a tuple with the Plan field value if set, nil otherwise
+// GetPlanOk returns a tuple with the Plan field value
 // and a boolean to check if the value has been set.
 func (o *SubscriptionResponse) GetPlanOk() (*string, bool) {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Plan, true
+	return &o.Plan, true
 }
 
-// HasPlan returns a boolean if a field has been set.
-func (o *SubscriptionResponse) HasPlan() bool {
-	if o != nil && !IsNil(o.Plan) {
-		return true
-	}
-
-	return false
-}
-
-// SetPlan gets a reference to the given string and assigns it to the Plan field.
+// SetPlan sets field value
 func (o *SubscriptionResponse) SetPlan(v string) {
-	o.Plan = &v
+	o.Plan = v
 }
 
-// GetStatus returns the Status field value if set, zero value otherwise.
+// GetStatus returns the Status field value
 func (o *SubscriptionResponse) GetStatus() string {
-	if o == nil || IsNil(o.Status) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Status
+
+	return o.Status
 }
 
-// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
 func (o *SubscriptionResponse) GetStatusOk() (*string, bool) {
-	if o == nil || IsNil(o.Status) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Status, true
+	return &o.Status, true
 }
 
-// HasStatus returns a boolean if a field has been set.
-func (o *SubscriptionResponse) HasStatus() bool {
-	if o != nil && !IsNil(o.Status) {
-		return true
-	}
-
-	return false
-}
-
-// SetStatus gets a reference to the given string and assigns it to the Status field.
+// SetStatus sets field value
 func (o *SubscriptionResponse) SetStatus(v string) {
-	o.Status = &v
+	o.Status = v
 }
 
-// GetPaymentProvider returns the PaymentProvider field value if set, zero value otherwise.
+// GetPaymentProvider returns the PaymentProvider field value
 func (o *SubscriptionResponse) GetPaymentProvider() string {
-	if o == nil || IsNil(o.PaymentProvider) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.PaymentProvider
+
+	return o.PaymentProvider
 }
 
-// GetPaymentProviderOk returns a tuple with the PaymentProvider field value if set, nil otherwise
+// GetPaymentProviderOk returns a tuple with the PaymentProvider field value
 // and a boolean to check if the value has been set.
 func (o *SubscriptionResponse) GetPaymentProviderOk() (*string, bool) {
-	if o == nil || IsNil(o.PaymentProvider) {
+	if o == nil {
 		return nil, false
 	}
-	return o.PaymentProvider, true
+	return &o.PaymentProvider, true
 }
 
-// HasPaymentProvider returns a boolean if a field has been set.
-func (o *SubscriptionResponse) HasPaymentProvider() bool {
-	if o != nil && !IsNil(o.PaymentProvider) {
-		return true
-	}
-
-	return false
-}
-
-// SetPaymentProvider gets a reference to the given string and assigns it to the PaymentProvider field.
+// SetPaymentProvider sets field value
 func (o *SubscriptionResponse) SetPaymentProvider(v string) {
-	o.PaymentProvider = &v
+	o.PaymentProvider = v
 }
 
-// GetWebhookLimit returns the WebhookLimit field value if set, zero value otherwise.
+// GetWebhookLimit returns the WebhookLimit field value
 func (o *SubscriptionResponse) GetWebhookLimit() int32 {
-	if o == nil || IsNil(o.WebhookLimit) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WebhookLimit
+
+	return o.WebhookLimit
 }
 
-// GetWebhookLimitOk returns a tuple with the WebhookLimit field value if set, nil otherwise
+// GetWebhookLimitOk returns a tuple with the WebhookLimit field value
 // and a boolean to check if the value has been set.
 func (o *SubscriptionResponse) GetWebhookLimitOk() (*int32, bool) {
-	if o == nil || IsNil(o.WebhookLimit) {
+	if o == nil {
 		return nil, false
 	}
-	return o.WebhookLimit, true
+	return &o.WebhookLimit, true
 }
 
-// HasWebhookLimit returns a boolean if a field has been set.
-func (o *SubscriptionResponse) HasWebhookLimit() bool {
-	if o != nil && !IsNil(o.WebhookLimit) {
-		return true
-	}
-
-	return false
-}
-
-// SetWebhookLimit gets a reference to the given int32 and assigns it to the WebhookLimit field.
+// SetWebhookLimit sets field value
 func (o *SubscriptionResponse) SetWebhookLimit(v int32) {
-	o.WebhookLimit = &v
+	o.WebhookLimit = v
 }
 
-// GetEndpointLimit returns the EndpointLimit field value if set, zero value otherwise.
+// GetEndpointLimit returns the EndpointLimit field value
 func (o *SubscriptionResponse) GetEndpointLimit() int32 {
-	if o == nil || IsNil(o.EndpointLimit) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.EndpointLimit
+
+	return o.EndpointLimit
 }
 
-// GetEndpointLimitOk returns a tuple with the EndpointLimit field value if set, nil otherwise
+// GetEndpointLimitOk returns a tuple with the EndpointLimit field value
 // and a boolean to check if the value has been set.
 func (o *SubscriptionResponse) GetEndpointLimitOk() (*int32, bool) {
-	if o == nil || IsNil(o.EndpointLimit) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EndpointLimit, true
+	return &o.EndpointLimit, true
 }
 
-// HasEndpointLimit returns a boolean if a field has been set.
-func (o *SubscriptionResponse) HasEndpointLimit() bool {
-	if o != nil && !IsNil(o.EndpointLimit) {
-		return true
-	}
-
-	return false
-}
-
-// SetEndpointLimit gets a reference to the given int32 and assigns it to the EndpointLimit field.
+// SetEndpointLimit sets field value
 func (o *SubscriptionResponse) SetEndpointLimit(v int32) {
-	o.EndpointLimit = &v
+	o.EndpointLimit = v
 }
 
-// GetRetentionDays returns the RetentionDays field value if set, zero value otherwise.
+// GetRetentionDays returns the RetentionDays field value
 func (o *SubscriptionResponse) GetRetentionDays() int32 {
-	if o == nil || IsNil(o.RetentionDays) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.RetentionDays
+
+	return o.RetentionDays
 }
 
-// GetRetentionDaysOk returns a tuple with the RetentionDays field value if set, nil otherwise
+// GetRetentionDaysOk returns a tuple with the RetentionDays field value
 // and a boolean to check if the value has been set.
 func (o *SubscriptionResponse) GetRetentionDaysOk() (*int32, bool) {
-	if o == nil || IsNil(o.RetentionDays) {
+	if o == nil {
 		return nil, false
 	}
-	return o.RetentionDays, true
+	return &o.RetentionDays, true
 }
 
-// HasRetentionDays returns a boolean if a field has been set.
-func (o *SubscriptionResponse) HasRetentionDays() bool {
-	if o != nil && !IsNil(o.RetentionDays) {
-		return true
-	}
-
-	return false
-}
-
-// SetRetentionDays gets a reference to the given int32 and assigns it to the RetentionDays field.
+// SetRetentionDays sets field value
 func (o *SubscriptionResponse) SetRetentionDays(v int32) {
-	o.RetentionDays = &v
+	o.RetentionDays = v
 }
 
-// GetMonthlyPriceCents returns the MonthlyPriceCents field value if set, zero value otherwise.
+// GetMonthlyPriceCents returns the MonthlyPriceCents field value
 func (o *SubscriptionResponse) GetMonthlyPriceCents() int32 {
-	if o == nil || IsNil(o.MonthlyPriceCents) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.MonthlyPriceCents
+
+	return o.MonthlyPriceCents
 }
 
-// GetMonthlyPriceCentsOk returns a tuple with the MonthlyPriceCents field value if set, nil otherwise
+// GetMonthlyPriceCentsOk returns a tuple with the MonthlyPriceCents field value
 // and a boolean to check if the value has been set.
 func (o *SubscriptionResponse) GetMonthlyPriceCentsOk() (*int32, bool) {
-	if o == nil || IsNil(o.MonthlyPriceCents) {
+	if o == nil {
 		return nil, false
 	}
-	return o.MonthlyPriceCents, true
+	return &o.MonthlyPriceCents, true
 }
 
-// HasMonthlyPriceCents returns a boolean if a field has been set.
-func (o *SubscriptionResponse) HasMonthlyPriceCents() bool {
-	if o != nil && !IsNil(o.MonthlyPriceCents) {
-		return true
-	}
-
-	return false
-}
-
-// SetMonthlyPriceCents gets a reference to the given int32 and assigns it to the MonthlyPriceCents field.
+// SetMonthlyPriceCents sets field value
 func (o *SubscriptionResponse) SetMonthlyPriceCents(v int32) {
-	o.MonthlyPriceCents = &v
+	o.MonthlyPriceCents = v
 }
 
 func (o SubscriptionResponse) MarshalJSON() ([]byte, error) {
@@ -280,28 +235,57 @@ func (o SubscriptionResponse) MarshalJSON() ([]byte, error) {
 
 func (o SubscriptionResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Plan) {
-		toSerialize["plan"] = o.Plan
-	}
-	if !IsNil(o.Status) {
-		toSerialize["status"] = o.Status
-	}
-	if !IsNil(o.PaymentProvider) {
-		toSerialize["payment_provider"] = o.PaymentProvider
-	}
-	if !IsNil(o.WebhookLimit) {
-		toSerialize["webhook_limit"] = o.WebhookLimit
-	}
-	if !IsNil(o.EndpointLimit) {
-		toSerialize["endpoint_limit"] = o.EndpointLimit
-	}
-	if !IsNil(o.RetentionDays) {
-		toSerialize["retention_days"] = o.RetentionDays
-	}
-	if !IsNil(o.MonthlyPriceCents) {
-		toSerialize["monthly_price_cents"] = o.MonthlyPriceCents
-	}
+	toSerialize["plan"] = o.Plan
+	toSerialize["status"] = o.Status
+	toSerialize["payment_provider"] = o.PaymentProvider
+	toSerialize["webhook_limit"] = o.WebhookLimit
+	toSerialize["endpoint_limit"] = o.EndpointLimit
+	toSerialize["retention_days"] = o.RetentionDays
+	toSerialize["monthly_price_cents"] = o.MonthlyPriceCents
 	return toSerialize, nil
+}
+
+func (o *SubscriptionResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"plan",
+		"status",
+		"payment_provider",
+		"webhook_limit",
+		"endpoint_limit",
+		"retention_days",
+		"monthly_price_cents",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varSubscriptionResponse := _SubscriptionResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varSubscriptionResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = SubscriptionResponse(varSubscriptionResponse)
+
+	return err
 }
 
 type NullableSubscriptionResponse struct {

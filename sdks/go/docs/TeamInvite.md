@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Email** | Pointer to **string** |  | [optional] 
-**Role** | Pointer to **string** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**Id** | **string** |  | 
+**Email** | **string** |  | 
+**Role** | **string** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewTeamInvite
 
-`func NewTeamInvite() *TeamInvite`
+`func NewTeamInvite(id string, email string, role string, createdAt time.Time, ) *TeamInvite`
 
 NewTeamInvite instantiates a new TeamInvite object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *TeamInvite) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetEmail
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetEmail sets Email field to given value.
 
-### HasEmail
-
-`func (o *TeamInvite) HasEmail() bool`
-
-HasEmail returns a boolean if a field has been set.
 
 ### GetRole
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetRole sets Role field to given value.
 
-### HasRole
-
-`func (o *TeamInvite) HasRole() bool`
-
-HasRole returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *TeamInvite) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

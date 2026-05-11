@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Range** | Pointer to **string** |  | [optional] 
-**Buckets** | Pointer to [**[]DeliveryTrendResponseBucketsInner**](DeliveryTrendResponseBucketsInner.md) |  | [optional] 
+**Range** | **string** |  | 
+**Buckets** | [**[]DeliveryTrendResponseBucketsInner**](DeliveryTrendResponseBucketsInner.md) |  | 
 
 ## Methods
 
 ### NewDeliveryTrendResponse
 
-`func NewDeliveryTrendResponse() *DeliveryTrendResponse`
+`func NewDeliveryTrendResponse(range_ string, buckets []DeliveryTrendResponseBucketsInner, ) *DeliveryTrendResponse`
 
 NewDeliveryTrendResponse instantiates a new DeliveryTrendResponse object
 This constructor will assign default values to properties that have it defined,
@@ -45,11 +45,6 @@ and a boolean to check if the value has been set.
 
 SetRange sets Range field to given value.
 
-### HasRange
-
-`func (o *DeliveryTrendResponse) HasRange() bool`
-
-HasRange returns a boolean if a field has been set.
 
 ### GetBuckets
 
@@ -70,11 +65,6 @@ and a boolean to check if the value has been set.
 
 SetBuckets sets Buckets field to given value.
 
-### HasBuckets
-
-`func (o *DeliveryTrendResponse) HasBuckets() bool`
-
-HasBuckets returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

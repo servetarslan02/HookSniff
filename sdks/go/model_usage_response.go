@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the UsageResponse type satisfies the MappedNullable interface at compile time
@@ -21,21 +23,30 @@ var _ MappedNullable = &UsageResponse{}
 
 // UsageResponse struct for UsageResponse
 type UsageResponse struct {
-	Plan *string `json:"plan,omitempty"`
-	PeriodStart *time.Time `json:"period_start,omitempty"`
-	PeriodEnd *time.Time `json:"period_end,omitempty"`
-	WebhooksUsed *int32 `json:"webhooks_used,omitempty"`
-	WebhooksLimit *int32 `json:"webhooks_limit,omitempty"`
-	EndpointsUsed *int32 `json:"endpoints_used,omitempty"`
-	EndpointsLimit *int32 `json:"endpoints_limit,omitempty"`
+	Plan string `json:"plan"`
+	PeriodStart time.Time `json:"period_start"`
+	PeriodEnd time.Time `json:"period_end"`
+	WebhooksUsed int32 `json:"webhooks_used"`
+	WebhooksLimit int32 `json:"webhooks_limit"`
+	EndpointsUsed int32 `json:"endpoints_used"`
+	EndpointsLimit int32 `json:"endpoints_limit"`
 }
+
+type _UsageResponse UsageResponse
 
 // NewUsageResponse instantiates a new UsageResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUsageResponse() *UsageResponse {
+func NewUsageResponse(plan string, periodStart time.Time, periodEnd time.Time, webhooksUsed int32, webhooksLimit int32, endpointsUsed int32, endpointsLimit int32) *UsageResponse {
 	this := UsageResponse{}
+	this.Plan = plan
+	this.PeriodStart = periodStart
+	this.PeriodEnd = periodEnd
+	this.WebhooksUsed = webhooksUsed
+	this.WebhooksLimit = webhooksLimit
+	this.EndpointsUsed = endpointsUsed
+	this.EndpointsLimit = endpointsLimit
 	return &this
 }
 
@@ -47,228 +58,172 @@ func NewUsageResponseWithDefaults() *UsageResponse {
 	return &this
 }
 
-// GetPlan returns the Plan field value if set, zero value otherwise.
+// GetPlan returns the Plan field value
 func (o *UsageResponse) GetPlan() string {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Plan
+
+	return o.Plan
 }
 
-// GetPlanOk returns a tuple with the Plan field value if set, nil otherwise
+// GetPlanOk returns a tuple with the Plan field value
 // and a boolean to check if the value has been set.
 func (o *UsageResponse) GetPlanOk() (*string, bool) {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Plan, true
+	return &o.Plan, true
 }
 
-// HasPlan returns a boolean if a field has been set.
-func (o *UsageResponse) HasPlan() bool {
-	if o != nil && !IsNil(o.Plan) {
-		return true
-	}
-
-	return false
-}
-
-// SetPlan gets a reference to the given string and assigns it to the Plan field.
+// SetPlan sets field value
 func (o *UsageResponse) SetPlan(v string) {
-	o.Plan = &v
+	o.Plan = v
 }
 
-// GetPeriodStart returns the PeriodStart field value if set, zero value otherwise.
+// GetPeriodStart returns the PeriodStart field value
 func (o *UsageResponse) GetPeriodStart() time.Time {
-	if o == nil || IsNil(o.PeriodStart) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.PeriodStart
+
+	return o.PeriodStart
 }
 
-// GetPeriodStartOk returns a tuple with the PeriodStart field value if set, nil otherwise
+// GetPeriodStartOk returns a tuple with the PeriodStart field value
 // and a boolean to check if the value has been set.
 func (o *UsageResponse) GetPeriodStartOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.PeriodStart) {
+	if o == nil {
 		return nil, false
 	}
-	return o.PeriodStart, true
+	return &o.PeriodStart, true
 }
 
-// HasPeriodStart returns a boolean if a field has been set.
-func (o *UsageResponse) HasPeriodStart() bool {
-	if o != nil && !IsNil(o.PeriodStart) {
-		return true
-	}
-
-	return false
-}
-
-// SetPeriodStart gets a reference to the given time.Time and assigns it to the PeriodStart field.
+// SetPeriodStart sets field value
 func (o *UsageResponse) SetPeriodStart(v time.Time) {
-	o.PeriodStart = &v
+	o.PeriodStart = v
 }
 
-// GetPeriodEnd returns the PeriodEnd field value if set, zero value otherwise.
+// GetPeriodEnd returns the PeriodEnd field value
 func (o *UsageResponse) GetPeriodEnd() time.Time {
-	if o == nil || IsNil(o.PeriodEnd) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.PeriodEnd
+
+	return o.PeriodEnd
 }
 
-// GetPeriodEndOk returns a tuple with the PeriodEnd field value if set, nil otherwise
+// GetPeriodEndOk returns a tuple with the PeriodEnd field value
 // and a boolean to check if the value has been set.
 func (o *UsageResponse) GetPeriodEndOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.PeriodEnd) {
+	if o == nil {
 		return nil, false
 	}
-	return o.PeriodEnd, true
+	return &o.PeriodEnd, true
 }
 
-// HasPeriodEnd returns a boolean if a field has been set.
-func (o *UsageResponse) HasPeriodEnd() bool {
-	if o != nil && !IsNil(o.PeriodEnd) {
-		return true
-	}
-
-	return false
-}
-
-// SetPeriodEnd gets a reference to the given time.Time and assigns it to the PeriodEnd field.
+// SetPeriodEnd sets field value
 func (o *UsageResponse) SetPeriodEnd(v time.Time) {
-	o.PeriodEnd = &v
+	o.PeriodEnd = v
 }
 
-// GetWebhooksUsed returns the WebhooksUsed field value if set, zero value otherwise.
+// GetWebhooksUsed returns the WebhooksUsed field value
 func (o *UsageResponse) GetWebhooksUsed() int32 {
-	if o == nil || IsNil(o.WebhooksUsed) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WebhooksUsed
+
+	return o.WebhooksUsed
 }
 
-// GetWebhooksUsedOk returns a tuple with the WebhooksUsed field value if set, nil otherwise
+// GetWebhooksUsedOk returns a tuple with the WebhooksUsed field value
 // and a boolean to check if the value has been set.
 func (o *UsageResponse) GetWebhooksUsedOk() (*int32, bool) {
-	if o == nil || IsNil(o.WebhooksUsed) {
+	if o == nil {
 		return nil, false
 	}
-	return o.WebhooksUsed, true
+	return &o.WebhooksUsed, true
 }
 
-// HasWebhooksUsed returns a boolean if a field has been set.
-func (o *UsageResponse) HasWebhooksUsed() bool {
-	if o != nil && !IsNil(o.WebhooksUsed) {
-		return true
-	}
-
-	return false
-}
-
-// SetWebhooksUsed gets a reference to the given int32 and assigns it to the WebhooksUsed field.
+// SetWebhooksUsed sets field value
 func (o *UsageResponse) SetWebhooksUsed(v int32) {
-	o.WebhooksUsed = &v
+	o.WebhooksUsed = v
 }
 
-// GetWebhooksLimit returns the WebhooksLimit field value if set, zero value otherwise.
+// GetWebhooksLimit returns the WebhooksLimit field value
 func (o *UsageResponse) GetWebhooksLimit() int32 {
-	if o == nil || IsNil(o.WebhooksLimit) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WebhooksLimit
+
+	return o.WebhooksLimit
 }
 
-// GetWebhooksLimitOk returns a tuple with the WebhooksLimit field value if set, nil otherwise
+// GetWebhooksLimitOk returns a tuple with the WebhooksLimit field value
 // and a boolean to check if the value has been set.
 func (o *UsageResponse) GetWebhooksLimitOk() (*int32, bool) {
-	if o == nil || IsNil(o.WebhooksLimit) {
+	if o == nil {
 		return nil, false
 	}
-	return o.WebhooksLimit, true
+	return &o.WebhooksLimit, true
 }
 
-// HasWebhooksLimit returns a boolean if a field has been set.
-func (o *UsageResponse) HasWebhooksLimit() bool {
-	if o != nil && !IsNil(o.WebhooksLimit) {
-		return true
-	}
-
-	return false
-}
-
-// SetWebhooksLimit gets a reference to the given int32 and assigns it to the WebhooksLimit field.
+// SetWebhooksLimit sets field value
 func (o *UsageResponse) SetWebhooksLimit(v int32) {
-	o.WebhooksLimit = &v
+	o.WebhooksLimit = v
 }
 
-// GetEndpointsUsed returns the EndpointsUsed field value if set, zero value otherwise.
+// GetEndpointsUsed returns the EndpointsUsed field value
 func (o *UsageResponse) GetEndpointsUsed() int32 {
-	if o == nil || IsNil(o.EndpointsUsed) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.EndpointsUsed
+
+	return o.EndpointsUsed
 }
 
-// GetEndpointsUsedOk returns a tuple with the EndpointsUsed field value if set, nil otherwise
+// GetEndpointsUsedOk returns a tuple with the EndpointsUsed field value
 // and a boolean to check if the value has been set.
 func (o *UsageResponse) GetEndpointsUsedOk() (*int32, bool) {
-	if o == nil || IsNil(o.EndpointsUsed) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EndpointsUsed, true
+	return &o.EndpointsUsed, true
 }
 
-// HasEndpointsUsed returns a boolean if a field has been set.
-func (o *UsageResponse) HasEndpointsUsed() bool {
-	if o != nil && !IsNil(o.EndpointsUsed) {
-		return true
-	}
-
-	return false
-}
-
-// SetEndpointsUsed gets a reference to the given int32 and assigns it to the EndpointsUsed field.
+// SetEndpointsUsed sets field value
 func (o *UsageResponse) SetEndpointsUsed(v int32) {
-	o.EndpointsUsed = &v
+	o.EndpointsUsed = v
 }
 
-// GetEndpointsLimit returns the EndpointsLimit field value if set, zero value otherwise.
+// GetEndpointsLimit returns the EndpointsLimit field value
 func (o *UsageResponse) GetEndpointsLimit() int32 {
-	if o == nil || IsNil(o.EndpointsLimit) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.EndpointsLimit
+
+	return o.EndpointsLimit
 }
 
-// GetEndpointsLimitOk returns a tuple with the EndpointsLimit field value if set, nil otherwise
+// GetEndpointsLimitOk returns a tuple with the EndpointsLimit field value
 // and a boolean to check if the value has been set.
 func (o *UsageResponse) GetEndpointsLimitOk() (*int32, bool) {
-	if o == nil || IsNil(o.EndpointsLimit) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EndpointsLimit, true
+	return &o.EndpointsLimit, true
 }
 
-// HasEndpointsLimit returns a boolean if a field has been set.
-func (o *UsageResponse) HasEndpointsLimit() bool {
-	if o != nil && !IsNil(o.EndpointsLimit) {
-		return true
-	}
-
-	return false
-}
-
-// SetEndpointsLimit gets a reference to the given int32 and assigns it to the EndpointsLimit field.
+// SetEndpointsLimit sets field value
 func (o *UsageResponse) SetEndpointsLimit(v int32) {
-	o.EndpointsLimit = &v
+	o.EndpointsLimit = v
 }
 
 func (o UsageResponse) MarshalJSON() ([]byte, error) {
@@ -281,28 +236,57 @@ func (o UsageResponse) MarshalJSON() ([]byte, error) {
 
 func (o UsageResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Plan) {
-		toSerialize["plan"] = o.Plan
-	}
-	if !IsNil(o.PeriodStart) {
-		toSerialize["period_start"] = o.PeriodStart
-	}
-	if !IsNil(o.PeriodEnd) {
-		toSerialize["period_end"] = o.PeriodEnd
-	}
-	if !IsNil(o.WebhooksUsed) {
-		toSerialize["webhooks_used"] = o.WebhooksUsed
-	}
-	if !IsNil(o.WebhooksLimit) {
-		toSerialize["webhooks_limit"] = o.WebhooksLimit
-	}
-	if !IsNil(o.EndpointsUsed) {
-		toSerialize["endpoints_used"] = o.EndpointsUsed
-	}
-	if !IsNil(o.EndpointsLimit) {
-		toSerialize["endpoints_limit"] = o.EndpointsLimit
-	}
+	toSerialize["plan"] = o.Plan
+	toSerialize["period_start"] = o.PeriodStart
+	toSerialize["period_end"] = o.PeriodEnd
+	toSerialize["webhooks_used"] = o.WebhooksUsed
+	toSerialize["webhooks_limit"] = o.WebhooksLimit
+	toSerialize["endpoints_used"] = o.EndpointsUsed
+	toSerialize["endpoints_limit"] = o.EndpointsLimit
 	return toSerialize, nil
+}
+
+func (o *UsageResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"plan",
+		"period_start",
+		"period_end",
+		"webhooks_used",
+		"webhooks_limit",
+		"endpoints_used",
+		"endpoints_limit",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varUsageResponse := _UsageResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varUsageResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = UsageResponse(varUsageResponse)
+
+	return err
 }
 
 type NullableUsageResponse struct {

@@ -49,37 +49,37 @@ import org.openapitools.client.JSON;
 /**
  * InvoiceResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class InvoiceResponse {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String id;
 
   public static final String SERIALIZED_NAME_AMOUNT_CENTS = "amount_cents";
   @SerializedName(SERIALIZED_NAME_AMOUNT_CENTS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer amountCents;
 
   public static final String SERIALIZED_NAME_CURRENCY = "currency";
   @SerializedName(SERIALIZED_NAME_CURRENCY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String currency;
 
   public static final String SERIALIZED_NAME_STATUS = "status";
   @SerializedName(SERIALIZED_NAME_STATUS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String status;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public InvoiceResponse() {
   }
 
-  public InvoiceResponse id(@javax.annotation.Nullable String id) {
+  public InvoiceResponse id(@javax.annotation.Nonnull String id) {
     this.id = id;
     return this;
   }
@@ -88,17 +88,17 @@ public class InvoiceResponse {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable String id) {
+  public void setId(@javax.annotation.Nonnull String id) {
     this.id = id;
   }
 
 
-  public InvoiceResponse amountCents(@javax.annotation.Nullable Integer amountCents) {
+  public InvoiceResponse amountCents(@javax.annotation.Nonnull Integer amountCents) {
     this.amountCents = amountCents;
     return this;
   }
@@ -107,17 +107,17 @@ public class InvoiceResponse {
    * Get amountCents
    * @return amountCents
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getAmountCents() {
     return amountCents;
   }
 
-  public void setAmountCents(@javax.annotation.Nullable Integer amountCents) {
+  public void setAmountCents(@javax.annotation.Nonnull Integer amountCents) {
     this.amountCents = amountCents;
   }
 
 
-  public InvoiceResponse currency(@javax.annotation.Nullable String currency) {
+  public InvoiceResponse currency(@javax.annotation.Nonnull String currency) {
     this.currency = currency;
     return this;
   }
@@ -126,17 +126,17 @@ public class InvoiceResponse {
    * Get currency
    * @return currency
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getCurrency() {
     return currency;
   }
 
-  public void setCurrency(@javax.annotation.Nullable String currency) {
+  public void setCurrency(@javax.annotation.Nonnull String currency) {
     this.currency = currency;
   }
 
 
-  public InvoiceResponse status(@javax.annotation.Nullable String status) {
+  public InvoiceResponse status(@javax.annotation.Nonnull String status) {
     this.status = status;
     return this;
   }
@@ -145,17 +145,17 @@ public class InvoiceResponse {
    * Get status
    * @return status
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getStatus() {
     return status;
   }
 
-  public void setStatus(@javax.annotation.Nullable String status) {
+  public void setStatus(@javax.annotation.Nonnull String status) {
     this.status = status;
   }
 
 
-  public InvoiceResponse createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public InvoiceResponse createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -164,12 +164,12 @@ public class InvoiceResponse {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -226,7 +226,7 @@ public class InvoiceResponse {
     openapiFields = new HashSet<String>(Arrays.asList("id", "amount_cents", "currency", "status", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "amount_cents", "currency", "status", "created_at"));
   }
 
   /**
@@ -249,14 +249,21 @@ public class InvoiceResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `InvoiceResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : InvoiceResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("currency") != null && !jsonObj.get("currency").isJsonNull()) && !jsonObj.get("currency").isJsonPrimitive()) {
+      if (!jsonObj.get("currency").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `currency` to be a primitive type in the JSON string but got `%s`", jsonObj.get("currency").toString()));
       }
-      if ((jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) && !jsonObj.get("status").isJsonPrimitive()) {
+      if (!jsonObj.get("status").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("status").toString()));
       }
   }

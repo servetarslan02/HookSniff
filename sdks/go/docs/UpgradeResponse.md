@@ -5,14 +5,14 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CheckoutUrl** | Pointer to **NullableString** |  | [optional] 
-**Provider** | Pointer to **string** |  | [optional] 
-**Message** | Pointer to **string** |  | [optional] 
+**Provider** | **string** |  | 
+**Message** | **string** |  | 
 
 ## Methods
 
 ### NewUpgradeResponse
 
-`func NewUpgradeResponse() *UpgradeResponse`
+`func NewUpgradeResponse(provider string, message string, ) *UpgradeResponse`
 
 NewUpgradeResponse instantiates a new UpgradeResponse object
 This constructor will assign default values to properties that have it defined,
@@ -81,11 +81,6 @@ and a boolean to check if the value has been set.
 
 SetProvider sets Provider field to given value.
 
-### HasProvider
-
-`func (o *UpgradeResponse) HasProvider() bool`
-
-HasProvider returns a boolean if a field has been set.
 
 ### GetMessage
 
@@ -106,11 +101,6 @@ and a boolean to check if the value has been set.
 
 SetMessage sets Message field to given value.
 
-### HasMessage
-
-`func (o *UpgradeResponse) HasMessage() bool`
-
-HasMessage returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

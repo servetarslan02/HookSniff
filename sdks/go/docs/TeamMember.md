@@ -4,18 +4,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**UserId** | Pointer to **string** |  | [optional] 
-**Email** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**UserId** | **string** |  | 
+**Email** | **string** |  | 
 **Name** | Pointer to **NullableString** |  | [optional] 
-**Role** | Pointer to **string** |  | [optional] 
-**JoinedAt** | Pointer to **time.Time** |  | [optional] 
+**Role** | **string** |  | 
+**JoinedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewTeamMember
 
-`func NewTeamMember() *TeamMember`
+`func NewTeamMember(id string, userId string, email string, role string, joinedAt time.Time, ) *TeamMember`
 
 NewTeamMember instantiates a new TeamMember object
 This constructor will assign default values to properties that have it defined,
@@ -49,11 +49,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *TeamMember) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetUserId
 
@@ -74,11 +69,6 @@ and a boolean to check if the value has been set.
 
 SetUserId sets UserId field to given value.
 
-### HasUserId
-
-`func (o *TeamMember) HasUserId() bool`
-
-HasUserId returns a boolean if a field has been set.
 
 ### GetEmail
 
@@ -99,11 +89,6 @@ and a boolean to check if the value has been set.
 
 SetEmail sets Email field to given value.
 
-### HasEmail
-
-`func (o *TeamMember) HasEmail() bool`
-
-HasEmail returns a boolean if a field has been set.
 
 ### GetName
 
@@ -159,11 +144,6 @@ and a boolean to check if the value has been set.
 
 SetRole sets Role field to given value.
 
-### HasRole
-
-`func (o *TeamMember) HasRole() bool`
-
-HasRole returns a boolean if a field has been set.
 
 ### GetJoinedAt
 
@@ -184,11 +164,6 @@ and a boolean to check if the value has been set.
 
 SetJoinedAt sets JoinedAt field to given value.
 
-### HasJoinedAt
-
-`func (o *TeamMember) HasJoinedAt() bool`
-
-HasJoinedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

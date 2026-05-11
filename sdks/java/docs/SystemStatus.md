@@ -7,10 +7,10 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**overallStatus** | [**OverallStatusEnum**](#OverallStatusEnum) |  |  [optional] |
-|**uptime30d** | **BigDecimal** |  |  [optional] |
-|**components** | [**List&lt;SystemStatusComponentsInner&gt;**](SystemStatusComponentsInner.md) |  |  [optional] |
-|**checkedAt** | **String** |  |  [optional] |
+|**overallStatus** | [**OverallStatusEnum**](#OverallStatusEnum) |  |  |
+|**uptime30d** | **BigDecimal** |  |  |
+|**components** | [**List&lt;SystemStatusComponentsInner&gt;**](SystemStatusComponentsInner.md) |  |  |
+|**checkedAt** | **String** |  |  |
 
 
 

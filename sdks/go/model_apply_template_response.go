@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the ApplyTemplateResponse type satisfies the MappedNullable interface at compile time
@@ -20,16 +22,20 @@ var _ MappedNullable = &ApplyTemplateResponse{}
 
 // ApplyTemplateResponse struct for ApplyTemplateResponse
 type ApplyTemplateResponse struct {
-	Success *bool `json:"success,omitempty"`
-	Message *string `json:"message,omitempty"`
+	Success bool `json:"success"`
+	Message string `json:"message"`
 }
+
+type _ApplyTemplateResponse ApplyTemplateResponse
 
 // NewApplyTemplateResponse instantiates a new ApplyTemplateResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewApplyTemplateResponse() *ApplyTemplateResponse {
+func NewApplyTemplateResponse(success bool, message string) *ApplyTemplateResponse {
 	this := ApplyTemplateResponse{}
+	this.Success = success
+	this.Message = message
 	return &this
 }
 
@@ -41,68 +47,52 @@ func NewApplyTemplateResponseWithDefaults() *ApplyTemplateResponse {
 	return &this
 }
 
-// GetSuccess returns the Success field value if set, zero value otherwise.
+// GetSuccess returns the Success field value
 func (o *ApplyTemplateResponse) GetSuccess() bool {
-	if o == nil || IsNil(o.Success) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.Success
+
+	return o.Success
 }
 
-// GetSuccessOk returns a tuple with the Success field value if set, nil otherwise
+// GetSuccessOk returns a tuple with the Success field value
 // and a boolean to check if the value has been set.
 func (o *ApplyTemplateResponse) GetSuccessOk() (*bool, bool) {
-	if o == nil || IsNil(o.Success) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Success, true
+	return &o.Success, true
 }
 
-// HasSuccess returns a boolean if a field has been set.
-func (o *ApplyTemplateResponse) HasSuccess() bool {
-	if o != nil && !IsNil(o.Success) {
-		return true
-	}
-
-	return false
-}
-
-// SetSuccess gets a reference to the given bool and assigns it to the Success field.
+// SetSuccess sets field value
 func (o *ApplyTemplateResponse) SetSuccess(v bool) {
-	o.Success = &v
+	o.Success = v
 }
 
-// GetMessage returns the Message field value if set, zero value otherwise.
+// GetMessage returns the Message field value
 func (o *ApplyTemplateResponse) GetMessage() string {
-	if o == nil || IsNil(o.Message) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Message
+
+	return o.Message
 }
 
-// GetMessageOk returns a tuple with the Message field value if set, nil otherwise
+// GetMessageOk returns a tuple with the Message field value
 // and a boolean to check if the value has been set.
 func (o *ApplyTemplateResponse) GetMessageOk() (*string, bool) {
-	if o == nil || IsNil(o.Message) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Message, true
+	return &o.Message, true
 }
 
-// HasMessage returns a boolean if a field has been set.
-func (o *ApplyTemplateResponse) HasMessage() bool {
-	if o != nil && !IsNil(o.Message) {
-		return true
-	}
-
-	return false
-}
-
-// SetMessage gets a reference to the given string and assigns it to the Message field.
+// SetMessage sets field value
 func (o *ApplyTemplateResponse) SetMessage(v string) {
-	o.Message = &v
+	o.Message = v
 }
 
 func (o ApplyTemplateResponse) MarshalJSON() ([]byte, error) {
@@ -115,13 +105,47 @@ func (o ApplyTemplateResponse) MarshalJSON() ([]byte, error) {
 
 func (o ApplyTemplateResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Success) {
-		toSerialize["success"] = o.Success
-	}
-	if !IsNil(o.Message) {
-		toSerialize["message"] = o.Message
-	}
+	toSerialize["success"] = o.Success
+	toSerialize["message"] = o.Message
 	return toSerialize, nil
+}
+
+func (o *ApplyTemplateResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"success",
+		"message",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varApplyTemplateResponse := _ApplyTemplateResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varApplyTemplateResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ApplyTemplateResponse(varApplyTemplateResponse)
+
+	return err
 }
 
 type NullableApplyTemplateResponse struct {
