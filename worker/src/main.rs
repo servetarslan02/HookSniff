@@ -329,6 +329,7 @@ async fn shutdown_signal() {
     }
 }
 
+
 /// Process all pending items in the queue
 async fn process_pending(
     pool: &PgPool,
@@ -529,7 +530,7 @@ async fn process_pending(
                 custom_headers: item.custom_headers.clone(),
             };
 
-            let result = delivery::deliver_http(&http_client, &webhook_msg, attempt).await?;
+            let result = delivery::deliver_with_routing(&http_client, &pool, &webhook_msg, attempt).await?;
 
             let status_code = result.status_code;
             let response_body = &result.response_body;
@@ -626,7 +627,29 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                tx.commit().await?;
+                // HS-034: Retry DB commit on transient failures
+                let mut commit_ok = false;
+                for commit_attempt in 1..=3_u32 {
+                    match tx.commit().await {
+                        Ok(()) => { commit_ok = true; break; }
+                        Err(e) => {
+                            if commit_attempt < 3 {
+                                let delay = std::time::Duration::from_millis(100 * 2_u64.pow(commit_attempt - 1));
+                                tracing::warn!(
+                                    "⚠️ DB commit failed (attempt {}/3): {:?}, retrying in {:?}",
+                                    commit_attempt, e, delay
+                                );
+                                tokio::time::sleep(delay).await;
+                            } else {
+                                tracing::error!("❌ DB commit failed after 3 attempts: {:?}", e);
+                            }
+                        }
+                    }
+                }
+                if !commit_ok {
+                    tracing::error!("❌ Delivery {} succeeded HTTP but DB commit failed — delivery may be re-processed", delivery_id);
+                    return Ok::<(), anyhow::Error>(());
+                }
 
                 // HS-020: Record success in circuit breaker
                 cb.record_success(endpoint_id).await;
@@ -702,7 +725,21 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                tx.commit().await?;
+                // HS-034: Retry DB commit on transient failures
+                for commit_attempt in 1..=3_u32 {
+                    match tx.commit().await {
+                        Ok(()) => break,
+                        Err(e) => {
+                            if commit_attempt < 3 {
+                                let delay = std::time::Duration::from_millis(100 * 2_u64.pow(commit_attempt - 1));
+                                tracing::warn!("⚠️ DB commit failed (attempt {}/3): {:?}, retrying in {:?}", commit_attempt, e, delay);
+                                tokio::time::sleep(delay).await;
+                            } else {
+                                tracing::error!("❌ DB commit failed after 3 attempts: {:?}", e);
+                            }
+                        }
+                    }
+                }
 
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
@@ -777,7 +814,21 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                tx.commit().await?;
+                // HS-034: Retry DB commit on transient failures
+                for commit_attempt in 1..=3_u32 {
+                    match tx.commit().await {
+                        Ok(()) => break,
+                        Err(e) => {
+                            if commit_attempt < 3 {
+                                let delay = std::time::Duration::from_millis(100 * 2_u64.pow(commit_attempt - 1));
+                                tracing::warn!("⚠️ DB commit failed (attempt {}/3): {:?}, retrying in {:?}", commit_attempt, e, delay);
+                                tokio::time::sleep(delay).await;
+                            } else {
+                                tracing::error!("❌ DB commit failed after 3 attempts: {:?}", e);
+                            }
+                        }
+                    }
+                }
 
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
@@ -828,7 +879,21 @@ async fn process_pending(
                 )
                 .await?;
 
-                tx.commit().await?;
+                // HS-034: Retry DB commit on transient failures
+                for commit_attempt in 1..=3_u32 {
+                    match tx.commit().await {
+                        Ok(()) => break,
+                        Err(e) => {
+                            if commit_attempt < 3 {
+                                let delay = std::time::Duration::from_millis(100 * 2_u64.pow(commit_attempt - 1));
+                                tracing::warn!("⚠️ DB commit failed (attempt {}/3): {:?}, retrying in {:?}", commit_attempt, e, delay);
+                                tokio::time::sleep(delay).await;
+                            } else {
+                                tracing::error!("❌ DB commit failed after 3 attempts: {:?}", e);
+                            }
+                        }
+                    }
+                }
 
                 // HS-020: Record failure in circuit breaker (retry = delivery failed)
                 cb.record_failure(endpoint_id).await;
