@@ -141,8 +141,8 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-085 | `db.rs` (1029 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
 | HS-086 | `delivery/mod.rs` (404 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 12 yeni test |
 | HS-087 | `worker/main.rs` (807 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 16 yeni test |
-| HS-088 | AuthGuard component test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
-| HS-089 | SSO page test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
+| HS-088 | AuthGuard component test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 16 test (AuthGuard.test.tsx) |
+| HS-089 | SSO page test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 678 test (sso-page + sso-ultra) |
 
 ---
 
