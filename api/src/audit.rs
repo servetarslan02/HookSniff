@@ -1,23 +1,26 @@
-//! Audit logging module — macro and insert helper.
+//! Audit logging module — insert helper for compliance and security monitoring.
 //!
-//! Provides the `audit_event!` macro for convenient audit trail recording
-//! and the `log_action` function for direct database insertion.
+//! Provides the `log_action` function for inserting audit entries into the
+//! `audit_log` table. Use from any handler after a critical operation succeeds.
 //!
 //! ## Usage
 //!
 //! ```ignore
-//! // Basic (5 args — resource_id is Option<&str>)
-//! audit_event!(pool, customer_id, "LOGIN", "auth", Some(&id_str))?;
+//! // Basic
+//! crate::audit::log_action(&pool, customer_id, "LOGIN", "auth", Some(&id), None, None, None).await;
 //!
-//! // With details JSON
-//! audit_event!(pool, customer_id, "ENDPOINT_CREATE", "endpoint", Some(&eid),
-//!     serde_json::json!({"url": "https://example.com"}))?;
+//! // With details + IP/UA
+//! crate::audit::log_action(&pool, customer_id, "ENDPOINT_CREATE", "endpoint",
+//!     Some(&eid), Some(serde_json::json!({"url": url})), Some(&ip), Some(&ua)).await;
 //! ```
 
 use sqlx::PgPool;
 use uuid::Uuid;
 
 /// Insert an audit log entry into the `audit_log` table.
+///
+/// Returns `Ok(())` on success. Callers should use `let _ =` to make audit
+/// logging best-effort (audit failures must not break the main operation).
 #[allow(clippy::too_many_arguments)]
 pub async fn log_action(
     pool: &PgPool,
@@ -44,44 +47,6 @@ pub async fn log_action(
     .await?;
 
     Ok(())
-}
-
-/// Convenience macro for audit logging.
-///
-/// Expands to an `.await` expression that returns `Result<(), sqlx::Error>`.
-///
-/// # Variants
-///
-/// - 5 args: `audit_event!(pool, customer_id, action, resource_type, resource_id)`
-/// - 6 args: `audit_event!(pool, customer_id, action, resource_type, resource_id, details_json)`
-#[macro_export]
-macro_rules! audit_event {
-    ($pool:expr, $customer_id:expr, $action:expr, $resource_type:expr, $resource_id:expr) => {
-        $crate::audit::log_action(
-            &$pool,
-            $customer_id,
-            $action,
-            $resource_type,
-            $resource_id,
-            None,
-            None,
-            None,
-        )
-        .await
-    };
-    ($pool:expr, $customer_id:expr, $action:expr, $resource_type:expr, $resource_id:expr, $details:expr) => {
-        $crate::audit::log_action(
-            &$pool,
-            $customer_id,
-            $action,
-            $resource_type,
-            $resource_id,
-            Some($details),
-            None,
-            None,
-        )
-        .await
-    };
 }
 
 #[cfg(test)]
