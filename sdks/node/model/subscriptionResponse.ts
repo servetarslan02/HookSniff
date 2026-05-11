@@ -13,13 +13,13 @@
 import { RequestFile } from './models';
 
 export class SubscriptionResponse {
-    'plan'?: string;
-    'status'?: string;
-    'paymentProvider'?: string;
-    'webhookLimit'?: number;
-    'endpointLimit'?: number;
-    'retentionDays'?: number;
-    'monthlyPriceCents'?: number;
+    'plan': string;
+    'status': string;
+    'paymentProvider': string;
+    'webhookLimit': number;
+    'endpointLimit': number;
+    'retentionDays': number;
+    'monthlyPriceCents': number;
 
     static discriminator: string | undefined = undefined;
 

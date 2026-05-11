@@ -13,18 +13,18 @@
 import { RequestFile } from './models';
 
 export class CustomerResponse {
-    'id'?: string;
-    'email'?: string;
+    'id': string;
+    'email': string;
     'name'?: string | null;
     /**
     * Only returned on registration
     */
     'apiKey'?: string | null;
-    'plan'?: CustomerResponse.PlanEnum;
-    'webhookLimit'?: number;
-    'webhookCount'?: number;
-    'isAdmin'?: boolean;
-    'createdAt'?: Date;
+    'plan': CustomerResponse.PlanEnum;
+    'webhookLimit': number;
+    'webhookCount': number;
+    'isAdmin': boolean;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

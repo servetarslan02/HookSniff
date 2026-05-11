@@ -13,10 +13,10 @@
 import { RequestFile } from './models';
 
 export class TeamInvite {
-    'id'?: string;
-    'email'?: string;
-    'role'?: string;
-    'createdAt'?: Date;
+    'id': string;
+    'email': string;
+    'role': string;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

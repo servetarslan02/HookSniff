@@ -13,11 +13,11 @@
 import { RequestFile } from './models';
 
 export class InvoiceResponse {
-    'id'?: string;
-    'amountCents'?: number;
-    'currency'?: string;
-    'status'?: string;
-    'createdAt'?: Date;
+    'id': string;
+    'amountCents': number;
+    'currency': string;
+    'status': string;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

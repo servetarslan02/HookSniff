@@ -14,10 +14,10 @@ import { RequestFile } from './models';
 import { SystemStatusComponentsInner } from './systemStatusComponentsInner';
 
 export class SystemStatus {
-    'overallStatus'?: SystemStatus.OverallStatusEnum;
-    'uptime30d'?: number;
-    'components'?: Array<SystemStatusComponentsInner>;
-    'checkedAt'?: string;
+    'overallStatus': SystemStatus.OverallStatusEnum;
+    'uptime30d': number;
+    'components': Array<SystemStatusComponentsInner>;
+    'checkedAt': string;
 
     static discriminator: string | undefined = undefined;
 

@@ -14,9 +14,9 @@ import { RequestFile } from './models';
 import { Notification } from './notification';
 
 export class NotificationListResponse {
-    'notifications'?: Array<Notification>;
-    'total'?: number;
-    'unreadCount'?: number;
+    'notifications': Array<Notification>;
+    'total': number;
+    'unreadCount': number;
 
     static discriminator: string | undefined = undefined;
 

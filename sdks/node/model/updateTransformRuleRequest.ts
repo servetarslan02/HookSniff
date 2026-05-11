@@ -16,7 +16,7 @@ import { RequestFile } from './models';
 * Update an existing transform rule (all fields optional)
 */
 export class UpdateTransformRuleRequest {
-    'name'?: string;
+    'name': string;
     /**
     * Updated transformation configuration
     */

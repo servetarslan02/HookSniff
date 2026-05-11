@@ -13,9 +13,9 @@
 import { RequestFile } from './models';
 
 export class TwoFactorRequiredResponse {
-    'requires2fa'?: boolean;
-    'tempToken'?: string;
-    'message'?: string;
+    'requires2fa': boolean;
+    'tempToken': string;
+    'message': string;
 
     static discriminator: string | undefined = undefined;
 
