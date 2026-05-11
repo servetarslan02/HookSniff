@@ -44,6 +44,21 @@ pub async fn deliver_http(
 
     let start = std::time::Instant::now();
 
+    // HS-042: SSRF protection — resolve DNS and validate IP before delivery.
+    // Prevents DNS rebinding attacks where a domain resolves to a public IP during
+    // endpoint creation but to a private IP during actual delivery.
+    if let Err(e) = validate_delivery_url(&webhook.endpoint_url) {
+        warn!("🚫 SSRF blocked delivery {} to {}: {}", webhook.delivery_id, webhook.endpoint_url, e);
+        return Ok(DeliveryResult {
+            success: false,
+            status_code: 0,
+            response_body: String::new(),
+            response_headers: serde_json::json!({}),
+            duration_ms: 0,
+            error: format!("SSRF blocked: {}", e),
+        });
+    }
+
     let mut req_builder = http_client
         .post(&webhook.endpoint_url)
         .header("Content-Type", "application/json")
@@ -141,6 +156,105 @@ pub fn truncate_str(s: &str, max_len: usize) -> String {
         }
         format!("{}...", &s[..end])
     }
+}
+
+/// SSRF protection for webhook delivery.
+/// Resolves DNS and validates that the target IP is not private/internal.
+/// Prevents DNS rebinding attacks.
+fn validate_delivery_url(url: &str) -> Result<(), String> {
+    use std::net::IpAddr;
+
+    // Simple URL parsing without `url` crate
+    let (scheme, rest) = if let Some(r) = url.strip_prefix("https://") {
+        ("https", r)
+    } else if let Some(r) = url.strip_prefix("http://") {
+        ("http", r)
+    } else {
+        return Err(format!("URL scheme must be http or https"));
+    };
+    let _ = scheme; // scheme is valid at this point
+
+    // Extract host (before first / or : or ?)
+    let host_end = rest.find(|c: char| c == '/' || c == ':' || c == '?').unwrap_or(rest.len());
+    let host_str = &rest[..host_end];
+
+    if host_str.is_empty() {
+        return Err("No host in URL".into());
+    }
+
+    // Block localhost
+    if host_str == "localhost" || host_str == "0.0.0.0" || host_str == "[::1]" {
+        return Err("Blocked localhost/loopback".into());
+    }
+
+    // Block metadata endpoints
+    for metadata_host in &["metadata.google.internal", "metadata.goog"] {
+        if host_str == *metadata_host || host_str.ends_with(&format!(".{}", metadata_host)) {
+            return Err(format!("Blocked metadata endpoint: {}", host_str));
+        }
+    }
+
+    // If it's a direct IP, validate it
+    if let Ok(ip) = host_str.parse::<IpAddr>() {
+        return check_ip_not_private(ip);
+    }
+
+    // DNS resolution and IP validation
+    let addrs: Vec<IpAddr> = std::net::ToSocketAddrs::to_socket_addrs(&(host_str, 0))
+        .map_err(|_| format!("DNS resolution failed: {}", host_str))?
+        .map(|addr| addr.ip())
+        .collect();
+
+    if addrs.is_empty() {
+        return Err(format!("DNS resolution returned no addresses: {}", host_str));
+    }
+
+    for ip in &addrs {
+        check_ip_not_private(*ip)?;
+    }
+
+    Ok(())
+}
+
+/// Check that an IP is not private/internal/loopback.
+fn check_ip_not_private(ip: std::net::IpAddr) -> Result<(), String> {
+    match ip {
+        std::net::IpAddr::V4(v4) => {
+            if v4.is_loopback() || v4.is_unspecified() {
+                return Err(format!("Blocked loopback IP: {}", ip));
+            }
+            if v4.octets()[0] == 10 {
+                return Err(format!("Blocked private IP: {}", ip));
+            }
+            if v4.octets()[0] == 172 && (v4.octets()[1] & 0xF0) == 16 {
+                return Err(format!("Blocked private IP: {}", ip));
+            }
+            if v4.octets()[0] == 192 && v4.octets()[1] == 168 {
+                return Err(format!("Blocked private IP: {}", ip));
+            }
+            if v4.octets()[0] == 169 && v4.octets()[1] == 254 {
+                return Err(format!("Blocked link-local IP: {}", ip));
+            }
+            // Metadata IP
+            if v4.to_string() == "169.254.169.254" {
+                return Err(format!("Blocked metadata IP: {}", ip));
+            }
+        }
+        std::net::IpAddr::V6(v6) => {
+            if v6.is_loopback() || v6.is_unspecified() {
+                return Err(format!("Blocked loopback IP: {}", ip));
+            }
+            // Link-local: fe80::/10
+            if (v6.segments()[0] & 0xFFC0) == 0xFE80 {
+                return Err(format!("Blocked link-local IP: {}", ip));
+            }
+            // Unique local: fc00::/7
+            if (v6.segments()[0] & 0xFE00) == 0xFC00 {
+                return Err(format!("Blocked unique-local IP: {}", ip));
+            }
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
