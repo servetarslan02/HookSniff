@@ -8,7 +8,7 @@
 
 ## 🔴 KRİTİK (Hemen düzeltilmeli)
 
-### BUG-001: Global Request Body Size Limit Yok
+### BUG-001: Global Request Body Size Limit Yok ✅ DÜZELTİLDİ
 **Dosya:** `api/src/main.rs` (middleware stack)
 **Sorun:** `tower-http` Cargo.toml'da `"limit"` feature'ı aktif ama `DefaultBodyLimit` HİÇ kullanılmıyor. Sadece webhook endpoint'inde `max_webhook_payload_bytes` kontrolü var. Auth, admin, billing endpoint'leri limitsiz body kabul ediyor.
 **Risk:** DoS saldırısı — multi-GB body ile bellek tüketimi
@@ -20,7 +20,7 @@
 **Risk:** Health endpoint'i her yerden çağrılabilir, bilgi sızıntısı
 **Çözüm:** Config'deki CORS origins kullan veya health endpoint'i CORS'siz bırak
 
-### BUG-003: Email Validation Çok Zayıf
+### BUG-003: Email Validation Çok Zayıf ✅ DÜZELTİLDİ
 **Dosya:** `api/src/routes/auth.rs:139`
 **Sorun:** Email doğrulama sadece `@` karakteri içeriyor mu kontrol ediyor. Geçersiz format'lar kabul edilir (`@`, `a@`, `@.com`)
 **Risk:** Geçersiz emailler DB'ye yazılabilir
@@ -36,7 +36,7 @@
 
 ## 🟡 YÜKSEK (Bu oturumda düzeltilmeli)
 
-### BUG-005: Serde `deny_unknown_fields` Hiç Kullanılmıyor
+### BUG-005: Serde `deny_unknown_fields` Hiç Kullanılmıyor ✅ DÜZELTİLDİ
 **Dosya:** Tüm request struct'ları (`api/src/routes/*.rs`)
 **Sorun:** Hiçbir request struct'ında `#[serde(deny_unknown_fields)]` yok. Bilinmeyen field'lar sessizce ignore ediliyor.
 **Risk:** API tüketicileri yanlış field ismi kullanınca hata almaz, silent failure
@@ -48,7 +48,7 @@
 **Risk:** Spam
 **Çözüm:** Email bazlı rate limit de ekle
 
-### BUG-007: Pagination Per-Page Limit Tutarlı Değil
+### BUG-007: Pagination Per-Page Limit Tutarlı Değil ✅ DÜZELTİLDİ
 **Dosya:** `api/src/routes/events.rs`, `api/src/routes/audit_log.rs`, `api/src/routes/admin.rs`
 **Sorun:** Bazı endpoint'ler `min(200)`, bazıları `min(100)`, bazıları limitsiz. Standart bir max_per_page yok.
 **Risk:** Büyük sayfa boyutları yavaş query'ler
@@ -80,7 +80,7 @@
 **Risk:** Düşük — test kodu ama best practice değil
 **Çözüm:** Test fixture kullan veya env'den oku
 
-### BUG-012: Graceful Shutdown Belirsiz
+### BUG-012: Graceful Shutdown Belirsiz ✅ DÜZELTİLDİ
 **Dosya:** `api/src/main.rs`
 **Sorun:** SIGTERM handling'in doğru yapılıp yapılmadığı belirsiz
 **Risk:** Deploy sırasında connection drop
@@ -139,7 +139,7 @@
 **Risk:** Stored XSS, DOM-based XSS
 **Çözüm:** Nonce-based CSP veya hash-based CSP
 
-### BUG-023: Circuit Breaker State In-Memory
+### BUG-023: Circuit Breaker State In-Memory ✅ DÜZELTİLDİ (Redis persistence)
 **Dosya:** `worker/src/circuit_breaker.rs:65`
 **Sorun:** Circuit breaker state `HashMap<Uuid, EndpointCircuit>` in-memory. Worker restart'ta tüm state kaybolur.
 **Risk:** Restart sonrası hatalı endpoint'lere tekrar istek atılır
