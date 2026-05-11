@@ -155,7 +155,6 @@ function ResponseInspector({
   duration: number | null;
 }) {
   const t = useTranslations('playground');
-  const tc = useTranslations('common');
   const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
 
   if (!response && !status) {

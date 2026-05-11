@@ -208,7 +208,7 @@ async fn list_teams(
         r#"SELECT t.* FROM teams t
            INNER JOIN team_members tm ON tm.team_id = t.id
            WHERE tm.customer_id = $1
-           ORDER BY t.updated_at DESC"#,
+           ORDER BY t.updated_at DESC LIMIT 100"#,
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -254,7 +254,7 @@ async fn get_team(
            FROM team_members tm
            INNER JOIN customers c ON c.id = tm.customer_id
            WHERE tm.team_id = $1
-           ORDER BY tm.invited_at ASC"#,
+           ORDER BY tm.invited_at ASC LIMIT 500"#,
     )
     .bind(id)
     .fetch_all(&pool)
@@ -381,7 +381,7 @@ async fn list_members(
            FROM team_members tm
            INNER JOIN customers c ON c.id = tm.customer_id
            WHERE tm.team_id = $1
-           ORDER BY tm.invited_at ASC"#,
+           ORDER BY tm.invited_at ASC LIMIT 500"#,
     )
     .bind(id)
     .fetch_all(&pool)
