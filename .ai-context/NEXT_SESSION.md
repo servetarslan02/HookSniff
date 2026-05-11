@@ -1,24 +1,35 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-12 01:55 GMT+8
+> Son güncelleme: 2026-05-12 02:15 GMT+8
 
 ---
 
 ## ✅ Tamamlanan
 
-### Oturum 116 (2026-05-12 00:53 - 01:34 GMT+8)
-- ✅ AŞAMA 2 — Node.js SDK TAMAMLANDI (211 test)
-- ✅ 2.1 Wrapper Class
-- ✅ 2.2 İmza Doğrulama
-- ✅ 2.3 HTTP Library Değişimi (native fetch, 14 düzeltme)
-- ✅ 2.4 Serialization Katmanı (8 düzeltme, 114 test)
-- ✅ 2.5 Pagination Iterator (32 test)
+### AŞAMA 2 — Wrapper Class + İmza Doğrulama (TAMAMLANDI)
 
-### Oturum 117 (2026-05-12 01:41 - 02:00 GMT+8)
-- ✅ AŞAMA 3.2 — Python unit testler TAMAMLANDI (71 test)
-- ✅ Python pagination modülü eklendi (`hooksniff/pagination.py`)
-- ✅ Python `__init__.py` güncellendi (pagination export)
-- ✅ Testler: 14 webhook + 10 serialization + 7 request + 8 API exception + 7 client + 10 pagination + 3 resource + 12 model = **71 test**
+| # | Görev | Durum |
+|---|-------|-------|
+| 2.1 | Node.js referans implementasyonu | ✅ Oturum 116 |
+| 2.2 | Node.js imza doğrulama | ✅ Oturum 116 |
+| 2.3 | Node.js HTTP lib değişimi | ✅ Oturum 116 |
+| 2.4 | Node.js serialization | ✅ Oturum 116 |
+| 2.5 | Node.js pagination | ✅ Oturum 116 |
+| 2.6 | Python wrapper + imza + serialization | ✅ Oturum 117 |
+| 2.7 | Go wrapper + imza | ❌ Sıradaki |
+| 2.8 | Kalan diller批量 wrapper | ❌ |
+
+### AŞAMA 3 — Kalite ve Güvenilirlik (kısmen)
+
+| # | Görev | Durum |
+|---|-------|-------|
+| 3.1 | Node.js unit testler (211 test) | ✅ Oturum 116 |
+| 3.2 | Python unit testler (77 test) | ✅ Oturum 117 |
+| 3.3 | Go unit testler | ❌ Sıradaki |
+| 3.4 | Rust unit testler | ❌ |
+| 3.5 | Kalan 7 dil testleri | ❌ |
+| 3.6 | CHANGELOG | ❌ |
+| 3.7 | Migration guide | ❌ |
 
 ---
 
