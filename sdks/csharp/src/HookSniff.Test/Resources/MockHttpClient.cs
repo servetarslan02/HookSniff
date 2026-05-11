@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,7 +10,7 @@ namespace HookSniff.Test.Resources;
 
 /// <summary>
 /// Captures HTTP requests made by the SDK and returns configurable mock responses.
-/// Uses a DelegatingHandler to intercept the static HttpClient.
+/// Implements HttpMessageHandler to intercept requests in-process.
 /// </summary>
 public sealed class MockHandler : HttpMessageHandler
 {
@@ -58,33 +56,23 @@ public sealed class MockHandler : HttpMessageHandler
 }
 
 /// <summary>
-/// Replaces the SDK's static HttpClient with one backed by a MockHandler,
-/// and restores the original on disposal.
+/// Registers a mock HttpClient with the SDK for the lifetime of this object.
+/// Uses the SDK's SetTestHttpClient/ResetHttpClient API.
 /// </summary>
 public sealed class MockHttpClient : IDisposable
 {
-    private readonly HttpClient _original;
-    private static readonly Type RequestType = typeof(HookSniffClient)
-        .Assembly.GetType("HookSniff.Request")!;
-
     public MockHandler Handler { get; }
 
     public MockHttpClient()
     {
         Handler = new MockHandler();
         var mockClient = new HttpClient(Handler);
-
-        var field = RequestType.GetField("SharedHttpClient",
-            BindingFlags.Static | BindingFlags.NonPublic)!;
-        _original = (HttpClient)field.GetValue(null)!;
-        field.SetValue(null, mockClient);
+        Request.SetTestHttpClient(mockClient);
     }
 
     public void Dispose()
     {
-        var field = RequestType.GetField("SharedHttpClient",
-            BindingFlags.Static | BindingFlags.NonPublic)!;
-        field.SetValue(null, _original);
+        Request.ResetHttpClient();
     }
 }
 

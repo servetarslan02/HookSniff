@@ -29,6 +29,7 @@ namespace HookSniff.Model
     /// <summary>
     /// TeamMember
     /// </summary>
+    [JsonConverter(typeof(TeamMemberJsonConverter))]
     public partial class TeamMember : IValidatableObject
     {
         /// <summary>
