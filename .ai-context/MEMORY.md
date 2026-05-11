@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 15:35 GMT+8
+> Son güncelleme: 2026-05-11 15:42 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -104,6 +104,11 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Revision 00058-kq6 (8 saat önce) hala %100 traffic alıyor ama API Unavailable
   - **Sorun:** Docker registry'deki api:latest image'ı bozulmuş
   - **Çözüm:** 00058'in image digest'ini bulup onunla deploy etmek gerek
+  - **GitHub Actions billing bitti** — dakikalar dolmuş, CI/CD çalışmıyor
+  - **Alternatif CI/CD: GCP Cloud Build** — `cloudbuild.yaml` zaten var
+    - Komut: `gcloud builds submit --config=cloudbuild.yaml --substitutions=_IMAGE_TAG=latest`
+    -veya GCP Console > Cloud Build > Trigger
+    - GitHub Actions'a gerek yok, GCP'den deploy edilebilir
 - **Yeni PAT:** `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` (repo + workflow scope)
 - **deploy.yml:** workflow_dispatch eklendi, OTEL env var'ları eklendi (cb043d4, 67c627b)
 - **MEMORY.md şifreleri:** Geri koyuldu (Servet'in isteğiyle)
