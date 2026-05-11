@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { teamsApi, type Team, type TeamMember } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 const ROLE_OPTIONS = ['owner', 'admin', 'member'];
 
@@ -20,6 +21,7 @@ export default function TeamPage() {
   const [createName, setCreateName] = useState('');
   const [createDesc, setCreateDesc] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null);
   const [inviteRole, setInviteRole] = useState('member');
   const [creating, setCreating] = useState(false);
   const [inviting, setInviting] = useState(false);
@@ -92,14 +94,19 @@ export default function TeamPage() {
   };
 
   const handleRemoveMember = async (memberId: string) => {
-    if (!token || !selectedTeam) return;
+    setRemoveTarget(memberId);
+  };
+
+  const confirmRemoveMember = async () => {
+    if (!token || !selectedTeam || !removeTarget) return;
     try {
-      await teamsApi.removeMember(token, selectedTeam.id, memberId);
+      await teamsApi.removeMember(token, selectedTeam.id, removeTarget);
       toast(t('memberRemoved'), 'success');
       fetchMembers(selectedTeam.id);
     } catch {
-      toast('Failed to remove member', 'error');
+      toast(t('removeFailed'), 'error');
     }
+    setRemoveTarget(null);
   };
 
   const handleRoleChange = async (memberId: string, newRole: string) => {
@@ -334,6 +341,16 @@ export default function TeamPage() {
           </div>
         </div>
       )}
+
+      {/* HS-043: Remove member confirmation dialog */}
+      <ConfirmDialog
+        open={removeTarget !== null}
+        title={t('removeMember')}
+        message={t('removeConfirm')}
+        variant="danger"
+        onConfirm={confirmRemoveMember}
+        onCancel={() => setRemoveTarget(null)}
+      />
     </div>
   );
 }

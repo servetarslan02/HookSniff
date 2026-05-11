@@ -136,7 +136,7 @@ export default function AdminUsersPage() {
           </div>
         ) : users.length === 0 ? (
           <div className="p-12 text-center text-gray-400 dark:text-slate-500">
-            No users found.
+            {t("noUsers")}.
           </div>
         ) : (
           <>
@@ -194,7 +194,7 @@ export default function AdminUsersPage() {
                                 : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'
                             }`}
                           >
-                            {u.status === 'active' ? 'Ban' : 'Activate'}
+                            {u.status === 'active' ? t('banUser') : t('activateUser')}
                           </button>
                         </div>
                       </td>

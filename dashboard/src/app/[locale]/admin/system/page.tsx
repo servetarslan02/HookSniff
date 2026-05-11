@@ -84,21 +84,21 @@ export default function AdminSystemPage() {
       latency: null,
     },
     {
-      name: 'PostgreSQL Database',
+      name: t("database"),
       icon: '🐘',
       status: health?.database?.status || 'unknown',
       detail: health?.database?.latency_ms ? `Latency: ${health.database.latency_ms}ms` : 'Checking...',
       latency: health?.database?.latency_ms,
     },
     {
-      name: 'Redis Cache',
+      name: t("cache"),
       icon: '⚡',
       status: health?.redis?.status || 'unknown',
       detail: health?.redis?.latency_ms ? `Latency: ${health.redis.latency_ms}ms` : 'Checking...',
       latency: health?.redis?.latency_ms,
     },
     {
-      name: 'Webhook Queue',
+      name: t("queue"),
       icon: '📬',
       status: health?.queue ? (health.queue.failed > 10 ? 'degraded' : 'healthy') : 'unknown',
       detail: health?.queue
@@ -188,11 +188,11 @@ export default function AdminSystemPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             { label: 'API Server', value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },
-            { label: 'Database', value: 'Neon PostgreSQL', detail: 'Serverless, 0.5 GB' },
-            { label: 'Cache', value: 'Upstash Redis', detail: 'Serverless, 256 MB' },
-            { label: 'CDN', value: 'Cloudflare', detail: 'DNS, SSL, DDoS' },
-            { label: 'Dashboard', value: 'Vercel', detail: 'Next.js 15' },
-            { label: 'Monitoring', value: 'Grafana Cloud', detail: 'OpenTelemetry' },
+            { label: t("database"), value: "Neon PostgreSQL", detail: "Serverless, 0.5 GB" },
+            { label: t("cache"), value: "Upstash Redis", detail: "Serverless, 256 MB" },
+            { label: t("cdn"), value: "Cloudflare", detail: "DNS, SSL, DDoS" },
+            { label: t("dashboard"), value: "Vercel", detail: "Next.js 15" },
+            { label: t("monitoring"), value: "Grafana Cloud", detail: "OpenTelemetry" },
           ].map((item) => (
             <div key={item.label} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
               <div className="text-sm font-medium text-gray-900 dark:text-white">{item.value}</div>

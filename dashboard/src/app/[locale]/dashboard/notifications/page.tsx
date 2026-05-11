@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { notificationsApi, type Notification } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 type NotifType = 'all' | 'webhook_failed' | 'alert' | 'system' | 'billing';
 
@@ -32,6 +33,7 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<NotifType>('all');
   const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('all');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const t = useTranslations('notifications');
   const perPage = 20;
 
@@ -79,15 +81,20 @@ export default function NotificationsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token) return;
+    setDeleteTarget(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!token || !deleteTarget) return;
     try {
-      await notificationsApi.deleteNotification(token, id);
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      await notificationsApi.deleteNotification(token, deleteTarget);
+      setNotifications((prev) => prev.filter((n) => n.id !== deleteTarget));
       setTotal((t) => t - 1);
-      toast('Notification deleted', 'success');
+      toast(t('deleted'), 'success');
     } catch {
-      toast('Failed to delete notification', 'error');
+      toast(t('deleteFailed'), 'error');
     }
+    setDeleteTarget(null);
   };
 
   const totalPages = Math.ceil(total / perPage);
@@ -247,6 +254,16 @@ export default function NotificationsPage() {
           </>
         )}
       </div>
+
+      {/* HS-043: Delete confirmation dialog */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={t('deleteNotification')}
+        message={t('deleteConfirm')}
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
