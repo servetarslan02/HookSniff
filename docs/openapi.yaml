@@ -2682,8 +2682,12 @@ paths:
                 properties:
                   endpoints:
                     type: array
+                    items:
+                      type: object
                   sample_payloads:
                     type: array
+                    items:
+                      type: object
 
   /playground/test:
     post:

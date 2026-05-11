@@ -1,0 +1,16 @@
+
+
+# ContactRequest
+
+
+## Properties
+
+| Name | Type | Description | Notes |
+|------------ | ------------- | ------------- | -------------|
+|**name** | **String** |  |  |
+|**email** | **String** |  |  |
+|**subject** | **String** |  |  |
+|**message** | **String** |  |  |
+
+
+
