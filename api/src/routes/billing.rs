@@ -209,10 +209,16 @@ async fn upgrade_plan(
     let proration = calculate_proration(&current_plan, &new_plan, period_start.as_ref());
 
     // Determine which provider to use
-    let provider_name = req
+    let mut provider_name = req
         .provider
         .as_deref()
-        .unwrap_or(&customer.payment_provider);
+        .unwrap_or(&customer.payment_provider)
+        .to_string();
+
+    // If provider is "stripe" but Stripe is not configured, fall back to "polar"
+    if provider_name == "stripe" && std::env::var("STRIPE_SECRET_KEY").unwrap_or_default().is_empty() {
+        provider_name = "polar".to_string();
+    }
 
     let provider_enum = PaymentProvider::parse_str(provider_name);
 

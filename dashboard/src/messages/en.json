@@ -119,7 +119,8 @@
     "auditLog": "Audit Log",
     "ssoSaml": "SSO / SAML",
     "retryPolicy": "Retry Policy",
-    "customDomain": "Custom Domain"
+    "customDomain": "Custom Domain",
+    "webhookDashboard": "Webhook Dashboard"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1356,7 +1357,13 @@
     "apiKeys": "API Keys",
     "deliveries": "Deliveries",
     "endpoints": "Endpoints",
-    "playground": "Playground"
+    "playground": "Playground",
+    "checklistAccount": "Create account",
+    "checklistApikey": "Get API key",
+    "checklistEndpoint": "Create first endpoint",
+    "checklistWebhook": "Send first webhook",
+    "checklistMonitor": "Check deliveries",
+    "checklistCompleted": "{count}/{total} completed"
   },
   "chart": {
     "hours24": "24 Hours",
