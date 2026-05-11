@@ -16,7 +16,7 @@ function RoiCalculator() {
 
   const svixCost = events <= 0 ? 0 : 490;
   const hookdeckCost = events <= 10000 ? 0 : 39 + Math.max(0, Math.ceil((events - 10000) / 100000)) * 1;
-  const hooksniffCost = events <= 10000 ? 0 : events <= 50000 ? 49 : 149;
+  const hooksniffCost = events <= 10000 ? 0 : events <= 50000 ? 49 : 99;
   const savingsVsSvix = svixCost - hooksniffCost;
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
