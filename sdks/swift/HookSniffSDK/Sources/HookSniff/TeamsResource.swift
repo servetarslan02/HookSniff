@@ -1,6 +1,6 @@
 import Foundation
 
-/// Teams resource — manage teams and members.
+/// Teams resource — list members, invite, remove.
 public final class TeamsResource {
     private let client: HookSniff
 
@@ -8,36 +8,22 @@ public final class TeamsResource {
         self.client = client
     }
 
-    // MARK: - List
+    // MARK: - Members
 
-    /// List teams (first page, default limit).
-    public func list() async throws -> [[String: Any]] {
-        let body = try await client.requestJSON(method: "GET", path: "/v1/teams")
+    /// List team members. Returns bare array.
+    public func members() async throws -> [[String: Any]] {
+        let body = try await client.requestJSON(method: "GET", path: "/v1/teams/members")
         return JSONHelpers.dataArray(from: body)
     }
 
-    /// List teams with explicit pagination.
-    public func list(limit: Int, offset: Int) async throws -> Pagination.Page<[String: Any]> {
-        let path = "/v1/teams?limit=\(limit)&offset=\(offset)"
-        let body = try await client.requestJSON(method: "GET", path: path)
-        return Pagination.Page(
-            data: JSONHelpers.dataArray(from: body),
-            hasMore: JSONHelpers.hasMore(from: body)
-        )
-    }
-
-    /// Collect all teams across all pages.
-    public func listAll(limit: Int = Pagination.defaultLimit) async throws -> [[String: Any]] {
-        return try await Pagination.collectAll(limit: limit) { l, o in
-            try await self.list(limit: l, offset: o)
-        }
-    }
-
-    // MARK: - CRUD
-
-    /// Get team details.
-    public func get(_ teamId: String) async throws -> [String: Any] {
-        let body = try await client.requestJSON(method: "GET", path: "/v1/teams/\(teamId)")
+    /// Invite a team member.
+    public func invite(_ params: [String: Any]) async throws -> [String: Any] {
+        let body = try await client.requestJSON(method: "POST", path: "/v1/teams/invite", body: params)
         return JSONHelpers.dict(from: body)
+    }
+
+    /// Remove a team member.
+    public func removeMember(_ memberId: String) async throws {
+        _ = try await client.request(method: "DELETE", path: "/v1/teams/members/\(memberId)")
     }
 }

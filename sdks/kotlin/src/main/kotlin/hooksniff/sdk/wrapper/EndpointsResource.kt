@@ -10,12 +10,15 @@ class EndpointsResource(private val client: HookSniff) {
 
     private val gson = Gson()
     private val mapType = object : TypeToken<Map<String, Any?>>() {}.type
-    private val listType = object : TypeToken<List<Map<String, Any?>>>() {}.type
 
-    /** List all endpoints. */
-    fun list(): List<Map<String, Any?>> {
-        val json = client.get("/v1/endpoints")
-        return gson.fromJson(json, listType)
+    /** List endpoints (paginated). Returns raw API response with data, has_more, total. */
+    fun list(limit: Int? = null, offset: Int? = null): Map<String, Any?> {
+        val params = mutableListOf<String>()
+        if (limit != null) params.add("limit=$limit")
+        if (offset != null) params.add("offset=$offset")
+        val query = if (params.isNotEmpty()) "?${params.joinToString("&")}" else ""
+        val json = client.get("/v1/endpoints$query")
+        return gson.fromJson(json, mapType)
     }
 
     /** Create a new endpoint. */
@@ -50,13 +53,10 @@ class EndpointsResource(private val client: HookSniff) {
     /** List all endpoints with automatic pagination. */
     fun listAll(limit: Int = Pagination.DEFAULT_LIMIT): List<Map<String, Any?>> {
         return Pagination.collectAll(limit) { pageLimit, offset ->
-            val params = mutableListOf("limit=$pageLimit", "offset=$offset")
-            val json = client.get("/v1/endpoints?${params.joinToString("&")}")
-            val resultMap: Map<String, Any?> = gson.fromJson(json, mapType)
+            val result = list(pageLimit, offset)
             @Suppress("UNCHECKED_CAST")
-            val data = resultMap["data"] as? List<Map<String, Any?>> ?: emptyList()
-            val total = (resultMap["total"] as? Number)?.toInt() ?: 0
-            val hasMore = offset + data.size < total
+            val data = result["data"] as? List<Map<String, Any?>> ?: emptyList()
+            val hasMore = result["has_more"] as? Boolean ?: false
             Pair(data, hasMore)
         }
     }
