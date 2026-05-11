@@ -23,7 +23,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "node --import tsx src/__tests__/webhook.test.ts",
+    "test": "node --import tsx src/__tests__/webhook.test.ts && node --import tsx src/__tests__/models.test.ts",
     "clean": "rm -rf dist/",
     "prepublishOnly": "npm run build"
   },
