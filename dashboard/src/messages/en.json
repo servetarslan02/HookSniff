@@ -1264,7 +1264,7 @@
     "keyNamePlaceholder": "Key name (optional) — e.g., Production, Staging",
     "createKey": "Create Key",
     "yourKeys": "Your Keys",
-    "keyCount": "{count} key{plural}",
+    "keyCount": "{count, plural, one {# key} other {# keys}}",
     "loadingKeys": "Loading keys...",
     "noKeys": "No API keys yet. Create one above to get started.",
     "active": "Active",
