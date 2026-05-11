@@ -1,0 +1,3 @@
+[mutants]
+timeout = 300
+exclude = ["api/src/migrations/*", "worker/src/migrations/*"]
