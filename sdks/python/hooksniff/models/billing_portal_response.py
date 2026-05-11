@@ -24,6 +24,8 @@ from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
 
+from hooksniff.serialization import _to_json_static, _from_json_static, SerializationError
+
 class BillingPortalResponse(BaseModel):
     """
     URL for the customer billing portal
@@ -87,3 +89,14 @@ class BillingPortalResponse(BaseModel):
         return _obj
 
 
+
+
+    @staticmethod
+    def _to_json(obj: dict) -> dict:
+        """Serialize to JSON-safe dict. Validates required fields, strips extras."""
+        return _to_json_static(obj, BillingPortalResponse)
+
+    @staticmethod
+    def _from_json(data: dict) -> "BillingPortalResponse":
+        """Deserialize from JSON dict. Validates required, applies defaults, ignores extras."""
+        return _from_json_static(data, BillingPortalResponse)
