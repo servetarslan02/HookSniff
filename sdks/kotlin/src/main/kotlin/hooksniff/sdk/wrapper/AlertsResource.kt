@@ -10,12 +10,11 @@ class AlertsResource(private val client: HookSniff) {
 
     private val gson = Gson()
     private val mapType = object : TypeToken<Map<String, Any?>>() {}.type
-    private val listType = object : TypeToken<List<Map<String, Any?>>>() {}.type
 
-    /** List alert rules. */
-    fun listRules(): List<Map<String, Any?>> {
+    /** List alert rules. Returns paginated response { data, has_more, total }. */
+    fun listRules(): Map<String, Any?> {
         val json = client.get("/v1/alerts/rules")
-        return gson.fromJson(json, listType)
+        return gson.fromJson(json, mapType)
     }
 
     /** Create alert rule. */
@@ -35,9 +34,9 @@ class AlertsResource(private val client: HookSniff) {
         client.delete("/v1/alerts/rules/$id")
     }
 
-    /** List alert notifications. */
-    fun listNotifications(): List<Map<String, Any?>> {
+    /** List alert notifications. Returns paginated response { data, has_more, total }. */
+    fun listNotifications(): Map<String, Any?> {
         val json = client.get("/v1/alerts/notifications")
-        return gson.fromJson(json, listType)
+        return gson.fromJson(json, mapType)
     }
 }

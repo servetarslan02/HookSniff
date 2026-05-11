@@ -10,7 +10,7 @@ public final class HealthResource {
 
     /// Get system health status.
     public func getStatus() async throws -> [String: Any] {
-        let body = try await client.requestJSON(method: "GET", path: "/v1/health")
+        let body = try await client.requestJSON(method: "GET", path: "/health")
         return JSONHelpers.dict(from: body)
     }
 }

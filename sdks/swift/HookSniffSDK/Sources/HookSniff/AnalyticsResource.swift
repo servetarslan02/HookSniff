@@ -1,6 +1,6 @@
 import Foundation
 
-/// Analytics resource — delivery stats and trends.
+/// Analytics resource — delivery stats, trends, success rate, latency.
 public final class AnalyticsResource {
     private let client: HookSniff
 
@@ -9,26 +9,25 @@ public final class AnalyticsResource {
     }
 
     /// Get delivery trends.
-    public func deliveryTrends(endpointId: String? = nil) async throws -> [String: Any] {
-        var path = "/v1/analytics/delivery-trends"
-        if let id = endpointId { path += "?endpoint_id=\(id)" }
-        let body = try await client.requestJSON(method: "GET", path: path)
-        return JSONHelpers.dict(from: body)
-    }
-
-    /// Get latency trends.
-    public func latencyTrends(endpointId: String? = nil) async throws -> [String: Any] {
-        var path = "/v1/analytics/latency-trends"
-        if let id = endpointId { path += "?endpoint_id=\(id)" }
+    public func trends(since: String? = nil, until: String? = nil) async throws -> [String: Any] {
+        var path = "/v1/analytics/deliveries"
+        var params: [String] = []
+        if let s = since { params.append("since=\(s)") }
+        if let u = until { params.append("until=\(u)") }
+        if !params.isEmpty { path += "?" + params.joined(separator: "&") }
         let body = try await client.requestJSON(method: "GET", path: path)
         return JSONHelpers.dict(from: body)
     }
 
     /// Get success rate.
-    public func successRate(endpointId: String? = nil) async throws -> [String: Any] {
-        var path = "/v1/analytics/success-rate"
-        if let id = endpointId { path += "?endpoint_id=\(id)" }
-        let body = try await client.requestJSON(method: "GET", path: path)
+    public func successRate() async throws -> [String: Any] {
+        let body = try await client.requestJSON(method: "GET", path: "/v1/analytics/success-rate")
+        return JSONHelpers.dict(from: body)
+    }
+
+    /// Get latency stats.
+    public func latency() async throws -> [String: Any] {
+        let body = try await client.requestJSON(method: "GET", path: "/v1/analytics/latency")
         return JSONHelpers.dict(from: body)
     }
 }
