@@ -55,7 +55,7 @@ pub async fn log_action(
 /// - 5 args: `audit_log!(pool, customer_id, action, resource_type, resource_id)`
 /// - 6 args: `audit_log!(pool, customer_id, action, resource_type, resource_id, details_json)`
 #[macro_export]
-macro_rules! audit_log {
+macro_rules! hooksniff_audit_log {
     ($pool:expr, $customer_id:expr, $action:expr, $resource_type:expr, $resource_id:expr) => {
         $crate::audit::log_action(
             &$pool,
