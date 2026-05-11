@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 00:15 GMT+8
+> Son güncelleme: 2026-05-12 00:40 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -71,19 +71,18 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟢 P3 | 13 | 8 | 5 |
 | **TOPLAM** | **103** | **102** | **1** |
 
-## Oturum 115 (2026-05-12 00:10 - 00:18 GMT+8) ✅
+## Oturum 115 (2026-05-12 00:10 - 00:40 GMT+8) ✅
 - **OpenClaw on birinci oturum** — Servet Vercel 404 fix
-- **Sorun:** `docs/api`, `docs/portal`, `docs/sdks` sayfaları Vercel'de 404 veriyor, local build'de 210 sayfa üretiliyor
-- **Kök neden:** Repo root'taki `api/`, `portal/`, `sdks/` klasörleri + next-intl `[locale]` segmenti + Vercel serverless function conflict
-- **Fix 1:** `outputFileTracingRoot` + `path` import'u kaldırıldı (`dashboard/next.config.js`) — yetmedi
-- **Fix 2 (Plan B):** 3 sayfa farklı yola taşındı:
-  - `docs/api` → `docs/api-reference`
-  - `docs/portal` → `docs/embed-portal`
-  - `docs/sdks` → `docs/sdk-libraries`
-  - Sidebar, sitemap, test imports, SDK README güncellendi
-- **TypeScript:** 0 hata ✅
-- **Push:** `c0aa9d7b` — main branch
-- **Sonraki oturumda:** Deploy sonrası 3 URL'yi kontrol et
+- **Sorun:** `docs/api`, `docs/portal`, `docs/sdks` sayfaları Vercel'de 404 veriyor
+- **Kök neden:** Repo root'taki `api/`, `portal/`, `sdks/` klasörleri + next-intl `[locale]` + Vercel serverless conflict
+- **Fix 1:** `outputFileTracingRoot` kaldırıldı — yetmedi
+- **Fix 2 (Plan B):** 3 sayfa taşındı:
+  - `docs/api` → `docs/api-reference` ✅
+  - `docs/portal` → `docs/embed-portal` ✅
+  - `docs/sdks` → `docs/sdk-libraries` ✅
+- **Deploy:** GitHub push → Vercel webhook tetiklenmedi → dummy commit ile tetiklendi → build başarılı
+- **Sonuç:** Üç sayfa da Vercel'de çalışıyor, sidebar linkleri doğru
+- **Ders:** Vercel deploy hook bazen GitHub push'ını tetiklemiyor. Dummy commit ile tetiklenebilir.
 
 ## Oturum 109 (2026-05-11 17:27 - 18:12) ✅
 - **OpenClaw beşinci oturum** — Servet ile GCP deploy debug
