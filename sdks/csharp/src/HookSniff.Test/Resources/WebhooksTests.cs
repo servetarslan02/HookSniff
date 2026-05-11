@@ -5,18 +5,19 @@ using Xunit;
 
 namespace HookSniff.Test.Resources;
 
+[Collection("ResourceTests")]
 public class WebhooksTests : IDisposable
 {
-    private readonly MockServer _server;
+    private readonly MockHttpClient _mock;
     private readonly HookSniffClient _client;
 
     public WebhooksTests()
     {
-        _server = new MockServer();
-        _client = new HookSniffClient("test-api-key", baseUrl: _server.BaseUrl, numRetries: 0);
+        _mock = new MockHttpClient();
+        _client = new HookSniffClient("test-api-key", baseUrl: "https://mock.api", numRetries: 0);
     }
 
-    public void Dispose() => _server.Dispose();
+    public void Dispose() => _mock.Dispose();
 
     private static string DeliveryJson() => JsonSerializer.Serialize(new
     {
@@ -30,13 +31,13 @@ public class WebhooksTests : IDisposable
     [Fact]
     public async Task SendAsync_SendsPostToWebhooks()
     {
-        _server.ResponseQueue.Enqueue((200, DeliveryJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, DeliveryJson()));
 
         var body = new { endpoint_id = "ep_001", @event = "order.created", data = new { order_id = "12345" } };
         var result = await _client.Webhooks.SendAsync(body);
 
         Assert.NotNull(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("POST", req.Method);
         Assert.Equal("/v1/webhooks", req.Path);
         Assert.Contains("order.created", req.Body);
@@ -45,7 +46,7 @@ public class WebhooksTests : IDisposable
     [Fact]
     public async Task BatchAsync_SendsPostToWebhooksBatch()
     {
-        _server.ResponseQueue.Enqueue((200, JsonSerializer.Serialize(new { accepted = 3, batch_id = "batch_001" })));
+        _mock.Handler.ResponseQueue.Enqueue((200, JsonSerializer.Serialize(new { accepted = 3, batch_id = "batch_001" })));
 
         var body = new
         {
@@ -59,7 +60,7 @@ public class WebhooksTests : IDisposable
         var result = await _client.Webhooks.BatchAsync(body);
 
         Assert.NotNull(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("POST", req.Method);
         Assert.Equal("/v1/webhooks/batch", req.Path);
     }
@@ -68,12 +69,12 @@ public class WebhooksTests : IDisposable
     public async Task GetAsync_SendsGetWithPathParam()
     {
         var deliveryId = "dlv_xyz789";
-        _server.ResponseQueue.Enqueue((200, DeliveryJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, DeliveryJson()));
 
         var result = await _client.Webhooks.GetAsync(deliveryId);
 
         Assert.NotNull(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("GET", req.Method);
         Assert.Equal($"/v1/webhooks/{deliveryId}", req.Path);
     }
@@ -82,12 +83,12 @@ public class WebhooksTests : IDisposable
     public async Task ReplayAsync_SendsPostWithPathParam()
     {
         var deliveryId = "dlv_replay_me";
-        _server.ResponseQueue.Enqueue((200, DeliveryJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, DeliveryJson()));
 
         var result = await _client.Webhooks.ReplayAsync(deliveryId);
 
         Assert.NotNull(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("POST", req.Method);
         Assert.Equal($"/v1/webhooks/{deliveryId}/replay", req.Path);
     }

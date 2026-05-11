@@ -5,18 +5,19 @@ using Xunit;
 
 namespace HookSniff.Test.Resources;
 
+[Collection("ResourceTests")]
 public class TeamsTests : IDisposable
 {
-    private readonly MockServer _server;
+    private readonly MockHttpClient _mock;
     private readonly HookSniffClient _client;
 
     public TeamsTests()
     {
-        _server = new MockServer();
-        _client = new HookSniffClient("test-api-key", baseUrl: _server.BaseUrl, numRetries: 0);
+        _mock = new MockHttpClient();
+        _client = new HookSniffClient("test-api-key", baseUrl: "https://mock.api", numRetries: 0);
     }
 
-    public void Dispose() => _server.Dispose();
+    public void Dispose() => _mock.Dispose();
 
     private static string MemberListJson() => JsonSerializer.Serialize(new[]
     {
@@ -43,14 +44,14 @@ public class TeamsTests : IDisposable
     [Fact]
     public async Task MembersAsync_SendsGetToTeamsMembers()
     {
-        _server.ResponseQueue.Enqueue((200, MemberListJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, MemberListJson()));
 
         var result = await _client.Teams.MembersAsync();
 
         Assert.Equal(2, result.Count);
         Assert.Equal("alice@example.com", result[0].Email);
         Assert.Equal("bob@example.com", result[1].Email);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("GET", req.Method);
         Assert.Equal("/v1/teams/members", req.Path);
     }
@@ -58,7 +59,7 @@ public class TeamsTests : IDisposable
     [Fact]
     public async Task InviteAsync_SendsPostWithBody()
     {
-        _server.ResponseQueue.Enqueue((200, JsonSerializer.Serialize(new
+        _mock.Handler.ResponseQueue.Enqueue((200, JsonSerializer.Serialize(new
         {
             id = Guid.NewGuid().ToString(),
             email = "newuser@example.com",
@@ -70,7 +71,7 @@ public class TeamsTests : IDisposable
         var result = await _client.Teams.InviteAsync(body);
 
         Assert.NotNull(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("POST", req.Method);
         Assert.Equal("/v1/teams/invite", req.Path);
         Assert.Contains("newuser@example.com", req.Body);
@@ -80,11 +81,11 @@ public class TeamsTests : IDisposable
     public async Task RemoveMemberAsync_SendsDeleteWithPathParam()
     {
         var memberId = "member_to_remove";
-        _server.ResponseQueue.Enqueue((200, "{}"));
+        _mock.Handler.ResponseQueue.Enqueue((204, ""));
 
         await _client.Teams.RemoveMemberAsync(memberId);
 
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("DELETE", req.Method);
         Assert.Equal($"/v1/teams/members/{memberId}", req.Path);
     }

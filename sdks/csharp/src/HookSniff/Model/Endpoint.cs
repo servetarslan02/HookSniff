@@ -29,6 +29,7 @@ namespace HookSniff.Model
     /// <summary>
     /// Endpoint
     /// </summary>
+    [JsonConverter(typeof(EndpointJsonConverter))]
     public partial class Endpoint : IValidatableObject
     {
         /// <summary>

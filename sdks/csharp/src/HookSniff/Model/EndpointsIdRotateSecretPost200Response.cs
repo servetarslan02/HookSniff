@@ -29,6 +29,7 @@ namespace HookSniff.Model
     /// <summary>
     /// EndpointsIdRotateSecretPost200Response
     /// </summary>
+    [JsonConverter(typeof(EndpointsIdRotateSecretPost200ResponseJsonConverter))]
     public partial class EndpointsIdRotateSecretPost200Response : IValidatableObject
     {
         /// <summary>
