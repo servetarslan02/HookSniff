@@ -12,7 +12,7 @@
 ### 1.1 Edge & Dashboard Security
 1. ✅ Edge middleware auth yok — Dashboard HTML herkese servis ediliyor → `dashboard/src/middleware.ts` ✅ YAPILDI
 2. ✅ CSRF protection yok — POST/PUT/DELETE'de CSRF token yok → `dashboard/src/lib/api.ts` ✅ YAPILDI
-3. 🔴 In-memory rate limit default — restart'ta kaybolur → `api/src/rate_limit.rs`
+3. ✅ In-memory rate limit default — production warning added — restart'ta kaybolur → `api/src/rate_limit.rs`
 4. ✅ IP spoofing via X-Forwarded-For — rate limit bypass → `api/src/rate_limit.rs` ✅ YAPILDI
 5. ✅ Staging default fallback passwords → `docker-compose.staging.yml` ✅ YAPILDI
 
@@ -26,9 +26,9 @@
 10. ✅ No response body size limit — memory bomb → `worker/src/delivery/http.rs` ✅ YAPILDI
 
 ### 1.4 Database Kritik
-11. 🔴 `password_hash` column allows NULL — account takeover → `api/migrations/`
+11. ✅ `password_hash` column allows NULL — migration 005 — account takeover → `api/migrations/`
 12. 🔴 Missing migration files — 13 SQL files absent → `api/migrations/`
-13. 🔴 Hardcoded DB credentials in migration scripts → `api/migrations/`
+13. ✅ Hardcoded DB credentials — removed from backup-cron.sh → `api/migrations/`
 
 ### 1.5 Frontend Kritik
 14. ✅ Silent API failures — 7+ sayfada boş `catch {}` → Health, Alerts, Search, Schemas, Templates, Portal, Routing ✅ YAPILDI
@@ -54,8 +54,8 @@
 26. 🟡 Poisoned mutex panics crash server → `api/src/`
 
 ### 2.2 Crypto & Auth Yüksek
-27. 🟡 Argon2id parametreleri OWASP altı → `api/src/auth/jwt.rs`
-28. 🟡 Admin authorization client-side only → `dashboard/src/app/[locale]/admin/layout.tsx`
+27. ✅ Argon2id parametreleri OWASP altı → 46 MiB → `api/src/auth/jwt.rs`
+28. ✅ Admin authorization — JWT claim + server-side verify → `dashboard/src/app/[locale]/admin/layout.tsx`
 29. 🟡 Playground token localStorage'da → `dashboard/src/app/[locale]/dashboard/playground/page.tsx`
 30. 🟡 Playground token URL path'te → `dashboard/src/app/[locale]/dashboard/playground/page.tsx`
 
@@ -64,10 +64,10 @@
 32. 🟡 API rate limit middleware gap — bazÄ± endpoint'ler atlanıyor → `api/src/rate_limit.rs`
 
 ### 2.4 Worker Yüksek
-33. 🟡 Zombie reaper increments attempt count without delivery → `worker/src/main.rs`
+33. ✅ Zombie reaper increments attempt count without delivery → `worker/src/main.rs`
 34. 🟡 No retry for DB commit failures → `worker/src/main.rs`
-35. 🟡 Email delivery uses blocking I/O in async → `worker/src/delivery/mod.rs`
-36. 🟡 Email delivery creates new HTTP client per call → `worker/src/delivery/mod.rs`
+35. ✅ Email delivery uses blocking I/O in async → tokio::fs → `worker/src/delivery/mod.rs`
+36. ✅ Email delivery creates new HTTP client per call → shared → `worker/src/delivery/mod.rs`
 37. 🟡 Fan-out bug — target config not used → `worker/src/delivery/mod.rs`
 
 ### 2.5 Infrastructure Yüksek
@@ -75,11 +75,11 @@
 39. 🟡 Hardcoded secrets in Helm values.yaml → `deploy/helm/values.yaml`
 40. 🟡 Git history'de OTEL credentials — BFG ile temizlenmeli → Git history
 41. 🟡 DATABASE_URL local credentials git history'de → Git history
-42. 🟡 DNS rebinding SSRF → `api/src/ssrf.rs`
+42. ✅ DNS rebinding SSRF → validate_url_and_resolve() → `api/src/ssrf.rs`
 
 ### 2.6 Destructive Actions
-43. 🟡 Destructive action'larda confirmation yok (Transforms, Notifications, Team) → Çeşitli sayfalar
-44. 🟡 No i18n in API Importer → `dashboard/src/app/[locale]/dashboard/api-importer/page.tsx`
+43. ✅ Destructive action'larda confirmation yok → ConfirmDialog (Transforms, Notifications, Team) → Çeşitli sayfalar
+44. 🟡 No i18n in API Importer (partial — admin pages done) → `dashboard/src/app/[locale]/dashboard/api-importer/page.tsx`
 
 ---
 
@@ -401,7 +401,7 @@
 
 ### 11.3 Rate Limiting
 272. ⬜ Auth routes lack X-RateLimit headers
-273. ⬜ Redis failure = open floodgates
+273. ✅ Redis failure = open floodgates → fail-closed
 274. ⬜ Key collision risk with 15-char prefix
 275. ⬜ Monthly reset is day-based not period-based
 276. ⬜ Batch endpoint allows up to 100 webhooks per request
