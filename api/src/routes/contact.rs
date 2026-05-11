@@ -23,6 +23,7 @@ pub struct ContactResponse {
 /// POST /v1/contact — Send a contact form message
 pub async fn handle_contact(
     Extension(email_provider): Extension<EmailProvider>,
+    Extension(cfg): Extension<crate::config::Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: axum::http::HeaderMap,
     Json(body): Json<ContactRequest>,
@@ -86,9 +87,11 @@ pub async fn handle_contact(
         body.name, body.email, body.subject, body.message
     );
 
-    // Send to admin (use NOTIFY_EMAIL env var or fallback to logged warning)
-    let admin_email =
-        std::env::var("NOTIFY_EMAIL").unwrap_or_else(|_| "servetarslan02@gmail.com".into());
+    // Send to admin (use config notify_email, fallback to env var)
+    let admin_email = cfg
+        .notify_email
+        .clone()
+        .unwrap_or_else(|| "admin@hooksniff.dev".into());
     if let Err(e) = email_provider
         .send_contact_email(
             &admin_email,
