@@ -108,7 +108,6 @@ from hooksniff.models.o_auth_callback_request import OAuthCallbackRequest
 from hooksniff.models.o_auth_provider import OAuthProvider
 from hooksniff.models.o_auth_provider_list_response import OAuthProviderListResponse
 from hooksniff.models.outbound_ips_response import OutboundIPsResponse
-from hooksniff.models.outbound_ips_response import OutboundIpsResponse
 from hooksniff.models.paginated_users import PaginatedUsers
 from hooksniff.models.playground_get200_response import PlaygroundGet200Response
 from hooksniff.models.playground_test_request import PlaygroundTestRequest
