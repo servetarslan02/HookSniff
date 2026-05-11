@@ -160,3 +160,25 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Commits:** 6 commit, main branch
 - **c7c8c63, 17351e4, 343088a, e340718, dd1e845, 75515c1, 2d1a085**
 
+## Oturum 121 (2026-05-12 05:01 - 05:15 GMT+8) ✅
+- **OpenClaw on yedinci oturum** — Servet ile AŞAMA 4 api.ts + catch blocks çalışması
+- **api.ts büyük yenileme:**
+  - Item 138: Shared refresh promise — concurrent 401'lerde tek refresh request
+  - Item 137: Retry logic — 502, 503, 504 için exponential backoff (max 2 retry)
+  - Network error retry eklendi
+- **Silent catch blocks düzeltmeleri (Item 131):**
+  - Dashboard ActivityFeed: error state + error display eklendi
+  - Alerts: 4 catch bloğu → toast error messages (fetchFailed, createFailed, deleteFailed, testFailed)
+  - Rate-limiting: error toast eklendi
+  - Analytics: error toast eklendi (both API calls fail → show error)
+- **Raw fetch → apiFetch dönüşümleri (Item 155):**
+  - Playground live polling: raw fetch → apiFetch + token auth
+  - Webhook-builder: raw fetch → apiFetch
+  - Endpoints/[id] test webhook: raw fetch → apiFetch
+- **i18n düzeltmeleri:**
+  - Health page: hardcoded 'Healthy/Degraded/Unhealthy' → t('healthy')/t('degraded')/t('unhealthy')
+  - Alerts i18n keys: fetchFailed, createFailed, deleteFailed, testFailed (en + tr)
+- **Kalan kasıtlı fallback catch'ler:** audit-log, portal-customize, sso, retry-policy — bunlar config yoksa varsayılan kullanır, bozulmadı
+- **Commit:** e734a921 — main branch
+- **11 dosya değişti, 145 satır eklendi, 98 satır silindi**
+

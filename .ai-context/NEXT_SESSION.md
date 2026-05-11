@@ -1,8 +1,8 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 04:29 GMT+8
-> **Son commit:** `2d1a0859` (main)
-> **Son oturum:** AŞAMA 3-4 frontend düzeltmeleri
+> **Son güncelleme:** 2026-05-12 05:15 GMT+8
+> **Son commit:** `e734a921` (main)
+> **Son oturum:** AŞAMA 4 api.ts + catch blocks + raw fetch dönüşümleri
 
 ## Hemen Başla
 
@@ -10,36 +10,30 @@
 2. `MEMORY.md` oku — proje durumunu öğren
 3. `IMPLEMENTATION-PLAN.md` bak — yol haritası
 
-## ✅ Bu Oturum Tamamlananlar (Oturum 120)
+## ✅ Bu Oturum Tamamlananlar (Oturum 121)
 
 | Madde | Açıklama | Durum |
 |-------|----------|-------|
-| 3.1 | Sidebar 13 madde (i18n zaten var) | ✅ |
-| 3.2 | Overview contrast, i18n, emoji aria-hidden | ✅ |
-| 3.3 | Users i18n, scope=col, date format | ✅ |
-| 3.4 | Revenue i18n, ₺ currency, contrast | ✅ |
-| 3.5 | System i18n, date format, contrast | ✅ |
-| 3.6 | Settings i18n, htmlFor, toggle a11y, min/max | ✅ |
-| 4.1 | Health + API Keys + Search → apiFetch | ✅ |
-| 4.2 | Team owner demote guard | ✅ |
-| 4.4 | Toast warning type, ConfirmDialog dark mode | ✅ |
-| 4.6 | CSS overflow-x-auto (6 sayfa) | ✅ |
-| 156 | Billing router fix | ✅ |
-| 158 | keyCount pluralization | ✅ |
+| 137 | Retry logic for transient errors (502, 503, 504) — exponential backoff | ✅ |
+| 138 | 401 refresh loop risk — shared refresh promise (api.ts) | ✅ |
+| 131 | Silent catch blocks → error state/toast (dashboard, alerts, analytics, rate-limiting, health) | ✅ |
+| 155 | Raw fetch → apiFetch (playground live polling, webhook-builder, endpoints/[id] test webhook) | ✅ |
+| 142 | Health page hardcoded 'Healthy/Degraded/Unhealthy' → i18n keys | ✅ (kısmi) |
+| — | Alerts i18n: fetchFailed/createFailed/deleteFailed/testFailed keys eklendi (en/tr) | ✅ |
 
 ## 📋 Sonraki Adımlar — IMPLEMENTATION-PLAN.md göre
 
 ### AŞAMA 4 Kalan (öncelikli)
 | # | Görev | Öncelik |
 |---|-------|---------|
-| 131 | Silent API failures — catch bloklarına error state | 🔴 |
-| 132 | Error Boundary dashboard layout'a ekle | 🔴 |
-| 137 | Retry logic for transient errors (502, 503, 504) | 🟡 |
-| 138 | 401 refresh loop risk — shared refresh promise | 🟡 |
-| 142 | Hardcoded strings 14+ dashboard pages (i18n) | 🟡 |
+| 142 | Hardcoded strings — kalan sayfalar (portal-customize, sso provider desc'leri) | 🟡 |
 | 146 | getErrorMessage raw English → i18n | 🟡 |
-| 155 | Raw fetch → apiFetch (Audit Log, Custom Domain, SSO, Portal, Playground) | 🟡 |
 | 159 | weeklyDigest state → API'ye gönder | 🟡 |
+| 140 | No role-based permission checks → team/page.tsx | 🟡 |
+| 141 | Team member removal no confirmation → team/page.tsx | 🟡 |
+| 131 | Kalan kasıtlı fallback catch'ler (audit-log, portal-customize, sso, retry-policy) — düşük öncelik | 🟢 |
+| 153 | Loading states standardize et (SkeletonCard/LoadingSpinner) | 🟢 |
+| 157 | billingApi duplicate getInvoices düzelt | 🟢 |
 
 ### AŞAMA 5 — Database (22 madde)
 - Schema fixler, FK fixler, index eksikler, cleanup
