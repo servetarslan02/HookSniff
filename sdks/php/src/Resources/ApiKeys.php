@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HookSniff\Resources;
 
 use HookSniff\Request;
+use HookSniff\Pagination;
 
 /**
  * HookSniff API Resource: API Keys
@@ -17,15 +18,32 @@ class ApiKeys
     public function __construct(private readonly array $ctx) {}
 
     /**
-     * List all API keys.
+     * List API keys (paginated).
+     *
+     * @return array{data: array<int, array<string, mixed>>, has_more: bool}
+     * @throws \HookSniff\ApiException
+     */
+    public function list(?int $limit = null, ?int $offset = null): array
+    {
+        $req = new Request('GET', '/v1/api-keys');
+        $params = [];
+        if ($limit !== null) $params['limit'] = $limit;
+        if ($offset !== null) $params['offset'] = $offset;
+        if (!empty($params)) $req->setQueryParams($params);
+        return $req->send($this->ctx);
+    }
+
+    /**
+     * List all API keys (auto-paginate).
      *
      * @return array<int, array<string, mixed>>
      * @throws \HookSniff\ApiException
      */
-    public function list(): array
+    public function listAll(int $limit = Pagination::DEFAULT_LIMIT): array
     {
-        $req = new Request('GET', '/v1/api-keys');
-        return $req->send($this->ctx);
+        return Pagination::collectAll(function ($l, $o) {
+            return $this->list($l, $o);
+        }, $limit);
     }
 
     /**

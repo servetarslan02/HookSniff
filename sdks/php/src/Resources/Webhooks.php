@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HookSniff\Resources;
 
 use HookSniff\Request;
+use HookSniff\Pagination;
 
 /**
  * HookSniff API Resource: Webhooks
@@ -66,6 +67,19 @@ class Webhooks
         if ($offset !== null) $params['offset'] = $offset;
         if (!empty($params)) $req->setQueryParams($params);
         return $req->send($this->ctx);
+    }
+
+    /**
+     * List all deliveries (auto-paginate).
+     *
+     * @return array<int, array<string, mixed>>
+     * @throws \HookSniff\ApiException
+     */
+    public function listAll(int $limit = Pagination::DEFAULT_LIMIT): array
+    {
+        return Pagination::collectAll(function ($l, $o) {
+            return $this->list($l, $o);
+        }, $limit);
     }
 
     /**
