@@ -72,7 +72,9 @@
     "copy": "Kopyala",
     "backToDashboard": "Panele Dön",
     "logout": "Çıkış Yap",
-    "user": "Kullanıcı"
+    "user": "Kullanıcı",
+    "active": "Aktif",
+    "inactive": "Pasif"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -345,7 +347,10 @@
     "invitationSent": "Davet gönderildi!",
     "teamNameLabel": "Ekip Adı",
     "emailLabel": "E-posta",
-    "roleLabel": "Rol"
+    "roleLabel": "Rol",
+    "removeMember": "Üyeyi Çıkar",
+    "removeConfirm": "Bu üyeyi çıkarmak istediğinizden emin misiniz?",
+    "removeFailed": "Üye çıkarılamadı"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -361,7 +366,11 @@
     "read": "Okunmuş",
     "loadingNotifications": "Bildirimler yükleniyor...",
     "noNotifications": "Bildirim bulunamadı.",
-    "allReadSuccess": "Tüm bildirimler okundu olarak işaretlendi"
+    "allReadSuccess": "Tüm bildirimler okundu olarak işaretlendi",
+    "deleteNotification": "Bildirimi Sil",
+    "deleteConfirm": "Bu bildirimi silmek istediğinizden emin misiniz?",
+    "deleteFailed": "Bildirim silinemedi",
+    "deleted": "Bildirim silindi"
   },
   "webhooks": {
     "title": "Webhooklar",
@@ -1035,7 +1044,7 @@
     "maxRetryAttempts": "Maks Tekrar Deneme",
     "retryDesc": "Başarısız webhook teslimatlarını tekrar deneme sayısı (0-10)",
     "saveSettings": "Ayarları Kaydet",
-    "settingsSaved": "Ayarlar başarıyla kaydedildi",
+    "settingsSaved": "Ayarlar kaydedildi",
     "systemHealth": "Sistem Sağlığı",
     "systemHealthDesc": "Altyapı hizmetlerini ve sistem durumunu izleyin",
     "allOperational": "Tüm Sistemler Çalışıyor",
@@ -1051,21 +1060,21 @@
     "dashboard": "Panel",
     "monitoring": "İzleme",
     "email": "E-posta",
-    "name": "Ad",
+    "name": "İsim",
     "plan": "Plan",
     "status": "Durum",
-    "created": "Oluşturuldu",
+    "created": "Oluşturulma",
     "actions": "İşlemler",
     "overviewTitle": "Yönetici Genel Bakış",
     "revenueTitle": "Gelir Paneli",
     "accessDenied": "Erişim Reddedildi",
     "adminPanel": "Yönetim Paneli",
-    "management": "HookSniff Yönetimi",
+    "management": "Yönetim",
     "userNotFound": "Kullanıcı Bulunamadı",
     "userDetail": "Kullanıcı Detayı",
-    "userInfo": "Kullanıcı Bilgisi",
+    "userInfo": "Kullanıcı Bilgileri",
     "successRate": "Başarı Oranı",
-    "noEndpoints": "Endpoint yok",
+    "noEndpoints": "Uç nokta yok",
     "recentDeliveries": "Son Teslimatlar",
     "nav": {
       "overview": "Genel Bakış",
@@ -1075,7 +1084,33 @@
       "settingsNav": "Ayarlar"
     },
     "adminBadge": "Yönetici",
-    "noAdminPrivileges": "Yönetici yetkiniz yok."
+    "noAdminPrivileges": "Yönetici yetkiniz yok.",
+    "backToUsers": "← Kullanıcılara Dön",
+    "update": "Güncelle",
+    "accountStatus": "Hesap Durumu",
+    "banUser": "Kullanıcıyı Yasakla",
+    "activateUser": "Kullanıcıyı Aktifleştir",
+    "usageStats": "Kullanım İstatistikleri",
+    "endpoints": "Uç Noktalar",
+    "event": "Olay",
+    "attempts": "Deneme",
+    "time": "Zaman",
+    "noDeliveries": "Teslimat yok",
+    "inactive": "Pasif",
+    "system": "Sistem",
+    "systemDesc": "Altyapı hizmetlerini ve sistem durumunu izleyin",
+    "checking": "Kontrol ediliyor...",
+    "healthy": "Sağlıklı",
+    "unhealthy": "Sağlık Değil",
+    "unknown": "Bilinmiyor",
+    "service": "Hizmet",
+    "provider": "Sağlayıcı",
+    "details": "Detaylar",
+    "saving": "Kaydediliyor...",
+    "settingsSaveFailed": "Ayarlar kaydedilemedi",
+    "failedToLoadRevenue": "Gelir verisi yüklenemedi",
+    "failedToLoadStats": "İstatistikler yüklenemedi",
+    "queue": "Kuyruk"
   },
   "landing": {
     "nav": {
@@ -1719,7 +1754,8 @@
     "filterTag": "Filtre",
     "mapTag": "Eşle",
     "enrichTag": "Zenginleştir",
-    "deleteTransform": "Dönüşümü sil"
+    "deleteTransform": "Dönüşüm Kuralını Sil",
+    "deleteConfirm": "Bu dönüşüm kuralını silmek istediğinizden emin misiniz?"
   },
   "rateLimiting": {
     "title": "⚡ Hız Sınırı",
