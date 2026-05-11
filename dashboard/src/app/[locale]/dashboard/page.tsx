@@ -122,10 +122,10 @@ function DeliveryTrendChart({
       <div className="h-72">
         {loading ? (
           <div className="h-full flex items-center justify-center">
-            <div className="animate-pulse text-gray-400 dark:text-slate-500">{t('loadingChart')}</div>
+            <div className="animate-pulse text-gray-500 dark:text-slate-400">{t('loadingChart')}</div>
           </div>
         ) : chartData.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-gray-400 dark:text-slate-500">
+          <div className="h-full flex items-center justify-center text-gray-500 dark:text-slate-400">
             {t('noData')}
           </div>
         ) : (
@@ -212,7 +212,7 @@ function SuccessRateDonut({
     <ChartCard title={t('successRate')}>
       <div className="h-72 flex items-center justify-center">
         {loading ? (
-          <div className="animate-pulse text-gray-400 dark:text-slate-500">{tc('loading')}</div>
+          <div className="animate-pulse text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : (
           <div className="relative">
             <ResponsiveContainer width={220} height={220}>
@@ -278,12 +278,12 @@ function ActivityFeed({ token }: { token: string }) {
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('liveActivity')}</h3>
         </div>
-        <span className="text-xs text-gray-400 dark:text-slate-500">{t('autoRefresh5s')}</span>
+        <span className="text-xs text-gray-500 dark:text-slate-400">{t('autoRefresh5s')}</span>
       </div>
       {loading ? (
-        <div className="p-8 text-center text-gray-400 dark:text-slate-500 animate-pulse">{tc('loading')}</div>
+        <div className="p-8 text-center text-gray-500 dark:text-slate-400 animate-pulse">{tc('loading')}</div>
       ) : deliveries.length === 0 ? (
-        <div className="p-8 text-center text-gray-400 dark:text-slate-500">{t('noActivity')}</div>
+        <div className="p-8 text-center text-gray-500 dark:text-slate-400">{t('noActivity')}</div>
       ) : (
         <div className="divide-y divide-gray-100 dark:divide-slate-800">
           {deliveries.map((d, i) => (
@@ -298,16 +298,16 @@ function ActivityFeed({ token }: { token: string }) {
                   <div className="text-sm font-mono text-gray-700 dark:text-slate-300">
                     {d.event || 'webhook'}
                   </div>
-                  <div className="text-xs text-gray-400 dark:text-slate-500">
+                  <div className="text-xs text-gray-500 dark:text-slate-400">
                     {d.id.slice(0, 10)}…
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 dark:text-slate-500">
+                <span className="text-xs text-gray-500 dark:text-slate-400">
                   {d.attempt_count} attempt{d.attempt_count !== 1 ? 's' : ''}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-slate-500">
+                <span className="text-xs text-gray-500 dark:text-slate-400">
                   {new Date(d.created_at).toLocaleTimeString()}
                 </span>
               </div>
@@ -534,7 +534,7 @@ export default function DashboardOverview() {
             </Link>
           </div>
           {recentDeliveries.length === 0 ? (
-            <div className="p-12 text-center text-gray-400 dark:text-slate-500">
+            <div className="p-12 text-center text-gray-500 dark:text-slate-400">
               {t('noDeliveries')}
             </div>
           ) : (
