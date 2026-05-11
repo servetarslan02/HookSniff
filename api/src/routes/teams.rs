@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::audit_log;
+use crate::hooksniff_audit_log;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
@@ -354,7 +354,7 @@ async fn invite_member(
     // Audit log — MEMBER_INVITE
     {
         let tid = id.to_string();
-        let _ = audit_log!(pool, customer.id, "MEMBER_INVITE", "team", Some(&tid),
+        let _ = hooksniff_audit_log!pool, customer.id, "MEMBER_INVITE", "team", Some(&tid),
             serde_json::json!({"email": &req.email, "role": role}));
     }
 
@@ -424,7 +424,7 @@ async fn remove_member(
     // Audit log — MEMBER_REMOVE
     {
         let tid = team_id.to_string();
-        let _ = audit_log!(pool, customer.id, "MEMBER_REMOVE", "team", Some(&tid),
+        let _ = hooksniff_audit_log!pool, customer.id, "MEMBER_REMOVE", "team", Some(&tid),
             serde_json::json!({"removed_user_id": uid.to_string()}));
     }
 
@@ -476,7 +476,7 @@ async fn change_role(
     // Audit log — ROLE_CHANGE
     {
         let tid = team_id.to_string();
-        let _ = audit_log!(pool, customer.id, "ROLE_CHANGE", "team", Some(&tid),
+        let _ = hooksniff_audit_log!pool, customer.id, "ROLE_CHANGE", "team", Some(&tid),
             serde_json::json!({"user_id": uid.to_string(), "new_role": &req.role}));
     }
 
