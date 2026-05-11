@@ -48,32 +48,32 @@ import org.openapitools.client.JSON;
 /**
  * TestWebhookResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class TestWebhookResponse {
   public static final String SERIALIZED_NAME_SUCCESS = "success";
   @SerializedName(SERIALIZED_NAME_SUCCESS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Boolean success;
 
   public static final String SERIALIZED_NAME_STATUS_CODE = "status_code";
   @SerializedName(SERIALIZED_NAME_STATUS_CODE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer statusCode;
 
   public static final String SERIALIZED_NAME_DURATION_MS = "duration_ms";
   @SerializedName(SERIALIZED_NAME_DURATION_MS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer durationMs;
 
   public static final String SERIALIZED_NAME_RESPONSE_BODY = "response_body";
   @SerializedName(SERIALIZED_NAME_RESPONSE_BODY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String responseBody;
 
   public TestWebhookResponse() {
   }
 
-  public TestWebhookResponse success(@javax.annotation.Nullable Boolean success) {
+  public TestWebhookResponse success(@javax.annotation.Nonnull Boolean success) {
     this.success = success;
     return this;
   }
@@ -82,17 +82,17 @@ public class TestWebhookResponse {
    * Get success
    * @return success
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Boolean getSuccess() {
     return success;
   }
 
-  public void setSuccess(@javax.annotation.Nullable Boolean success) {
+  public void setSuccess(@javax.annotation.Nonnull Boolean success) {
     this.success = success;
   }
 
 
-  public TestWebhookResponse statusCode(@javax.annotation.Nullable Integer statusCode) {
+  public TestWebhookResponse statusCode(@javax.annotation.Nonnull Integer statusCode) {
     this.statusCode = statusCode;
     return this;
   }
@@ -101,17 +101,17 @@ public class TestWebhookResponse {
    * Get statusCode
    * @return statusCode
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getStatusCode() {
     return statusCode;
   }
 
-  public void setStatusCode(@javax.annotation.Nullable Integer statusCode) {
+  public void setStatusCode(@javax.annotation.Nonnull Integer statusCode) {
     this.statusCode = statusCode;
   }
 
 
-  public TestWebhookResponse durationMs(@javax.annotation.Nullable Integer durationMs) {
+  public TestWebhookResponse durationMs(@javax.annotation.Nonnull Integer durationMs) {
     this.durationMs = durationMs;
     return this;
   }
@@ -120,17 +120,17 @@ public class TestWebhookResponse {
    * Get durationMs
    * @return durationMs
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getDurationMs() {
     return durationMs;
   }
 
-  public void setDurationMs(@javax.annotation.Nullable Integer durationMs) {
+  public void setDurationMs(@javax.annotation.Nonnull Integer durationMs) {
     this.durationMs = durationMs;
   }
 
 
-  public TestWebhookResponse responseBody(@javax.annotation.Nullable String responseBody) {
+  public TestWebhookResponse responseBody(@javax.annotation.Nonnull String responseBody) {
     this.responseBody = responseBody;
     return this;
   }
@@ -139,12 +139,12 @@ public class TestWebhookResponse {
    * Get responseBody
    * @return responseBody
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getResponseBody() {
     return responseBody;
   }
 
-  public void setResponseBody(@javax.annotation.Nullable String responseBody) {
+  public void setResponseBody(@javax.annotation.Nonnull String responseBody) {
     this.responseBody = responseBody;
   }
 
@@ -199,7 +199,7 @@ public class TestWebhookResponse {
     openapiFields = new HashSet<String>(Arrays.asList("success", "status_code", "duration_ms", "response_body"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("success", "status_code", "duration_ms", "response_body"));
   }
 
   /**
@@ -222,8 +222,15 @@ public class TestWebhookResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `TestWebhookResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : TestWebhookResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("response_body") != null && !jsonObj.get("response_body").isJsonNull()) && !jsonObj.get("response_body").isJsonPrimitive()) {
+      if (!jsonObj.get("response_body").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `response_body` to be a primitive type in the JSON string but got `%s`", jsonObj.get("response_body").toString()));
       }
   }

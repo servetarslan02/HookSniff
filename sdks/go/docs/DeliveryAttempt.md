@@ -4,19 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**AttemptNumber** | Pointer to **int32** |  | [optional] 
+**Id** | **string** |  | 
+**AttemptNumber** | **int32** |  | 
 **StatusCode** | Pointer to **NullableInt32** |  | [optional] 
 **ResponseBody** | Pointer to **NullableString** |  | [optional] 
 **DurationMs** | Pointer to **NullableInt32** |  | [optional] 
 **ErrorMessage** | Pointer to **NullableString** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewDeliveryAttempt
 
-`func NewDeliveryAttempt() *DeliveryAttempt`
+`func NewDeliveryAttempt(id string, attemptNumber int32, createdAt time.Time, ) *DeliveryAttempt`
 
 NewDeliveryAttempt instantiates a new DeliveryAttempt object
 This constructor will assign default values to properties that have it defined,
@@ -50,11 +50,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *DeliveryAttempt) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetAttemptNumber
 
@@ -75,11 +70,6 @@ and a boolean to check if the value has been set.
 
 SetAttemptNumber sets AttemptNumber field to given value.
 
-### HasAttemptNumber
-
-`func (o *DeliveryAttempt) HasAttemptNumber() bool`
-
-HasAttemptNumber returns a boolean if a field has been set.
 
 ### GetStatusCode
 
@@ -240,11 +230,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *DeliveryAttempt) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -7,13 +7,13 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**name** | **String** |  |  [optional] |
-|**condition** | [**ConditionEnum**](#ConditionEnum) |  |  [optional] |
-|**threshold** | **Integer** |  |  [optional] |
-|**channels** | [**List&lt;ChannelsEnum&gt;**](#List&lt;ChannelsEnum&gt;) |  |  [optional] |
-|**isActive** | **Boolean** |  |  [optional] |
-|**createdAt** | **String** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**name** | **String** |  |  |
+|**condition** | [**ConditionEnum**](#ConditionEnum) |  |  |
+|**threshold** | **Integer** |  |  |
+|**channels** | [**List&lt;ChannelsEnum&gt;**](#List&lt;ChannelsEnum&gt;) |  |  |
+|**isActive** | **Boolean** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

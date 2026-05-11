@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Deliveries** | Pointer to [**[]Delivery**](Delivery.md) |  | [optional] 
-**Errors** | Pointer to [**[]BatchResponseErrorsInner**](BatchResponseErrorsInner.md) |  | [optional] 
+**Deliveries** | [**[]Delivery**](Delivery.md) |  | 
+**Errors** | [**[]BatchResponseErrorsInner**](BatchResponseErrorsInner.md) |  | 
 
 ## Methods
 
 ### NewBatchResponse
 
-`func NewBatchResponse() *BatchResponse`
+`func NewBatchResponse(deliveries []Delivery, errors []BatchResponseErrorsInner, ) *BatchResponse`
 
 NewBatchResponse instantiates a new BatchResponse object
 This constructor will assign default values to properties that have it defined,
@@ -45,11 +45,6 @@ and a boolean to check if the value has been set.
 
 SetDeliveries sets Deliveries field to given value.
 
-### HasDeliveries
-
-`func (o *BatchResponse) HasDeliveries() bool`
-
-HasDeliveries returns a boolean if a field has been set.
 
 ### GetErrors
 
@@ -70,11 +65,6 @@ and a boolean to check if the value has been set.
 
 SetErrors sets Errors field to given value.
 
-### HasErrors
-
-`func (o *BatchResponse) HasErrors() bool`
-
-HasErrors returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

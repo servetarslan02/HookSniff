@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the RoutingInfo type satisfies the MappedNullable interface at compile time
@@ -20,20 +22,27 @@ var _ MappedNullable = &RoutingInfo{}
 
 // RoutingInfo struct for RoutingInfo
 type RoutingInfo struct {
-	EndpointId *string `json:"endpoint_id,omitempty"`
-	RoutingStrategy *string `json:"routing_strategy,omitempty"`
+	EndpointId string `json:"endpoint_id"`
+	RoutingStrategy string `json:"routing_strategy"`
 	FallbackUrl NullableString `json:"fallback_url,omitempty"`
-	AvgResponseMs *int32 `json:"avg_response_ms,omitempty"`
-	FailureStreak *int32 `json:"failure_streak,omitempty"`
-	IsHealthy *bool `json:"is_healthy,omitempty"`
+	AvgResponseMs int32 `json:"avg_response_ms"`
+	FailureStreak int32 `json:"failure_streak"`
+	IsHealthy bool `json:"is_healthy"`
 }
+
+type _RoutingInfo RoutingInfo
 
 // NewRoutingInfo instantiates a new RoutingInfo object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRoutingInfo() *RoutingInfo {
+func NewRoutingInfo(endpointId string, routingStrategy string, avgResponseMs int32, failureStreak int32, isHealthy bool) *RoutingInfo {
 	this := RoutingInfo{}
+	this.EndpointId = endpointId
+	this.RoutingStrategy = routingStrategy
+	this.AvgResponseMs = avgResponseMs
+	this.FailureStreak = failureStreak
+	this.IsHealthy = isHealthy
 	return &this
 }
 
@@ -45,68 +54,52 @@ func NewRoutingInfoWithDefaults() *RoutingInfo {
 	return &this
 }
 
-// GetEndpointId returns the EndpointId field value if set, zero value otherwise.
+// GetEndpointId returns the EndpointId field value
 func (o *RoutingInfo) GetEndpointId() string {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.EndpointId
+
+	return o.EndpointId
 }
 
-// GetEndpointIdOk returns a tuple with the EndpointId field value if set, nil otherwise
+// GetEndpointIdOk returns a tuple with the EndpointId field value
 // and a boolean to check if the value has been set.
 func (o *RoutingInfo) GetEndpointIdOk() (*string, bool) {
-	if o == nil || IsNil(o.EndpointId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EndpointId, true
+	return &o.EndpointId, true
 }
 
-// HasEndpointId returns a boolean if a field has been set.
-func (o *RoutingInfo) HasEndpointId() bool {
-	if o != nil && !IsNil(o.EndpointId) {
-		return true
-	}
-
-	return false
-}
-
-// SetEndpointId gets a reference to the given string and assigns it to the EndpointId field.
+// SetEndpointId sets field value
 func (o *RoutingInfo) SetEndpointId(v string) {
-	o.EndpointId = &v
+	o.EndpointId = v
 }
 
-// GetRoutingStrategy returns the RoutingStrategy field value if set, zero value otherwise.
+// GetRoutingStrategy returns the RoutingStrategy field value
 func (o *RoutingInfo) GetRoutingStrategy() string {
-	if o == nil || IsNil(o.RoutingStrategy) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.RoutingStrategy
+
+	return o.RoutingStrategy
 }
 
-// GetRoutingStrategyOk returns a tuple with the RoutingStrategy field value if set, nil otherwise
+// GetRoutingStrategyOk returns a tuple with the RoutingStrategy field value
 // and a boolean to check if the value has been set.
 func (o *RoutingInfo) GetRoutingStrategyOk() (*string, bool) {
-	if o == nil || IsNil(o.RoutingStrategy) {
+	if o == nil {
 		return nil, false
 	}
-	return o.RoutingStrategy, true
+	return &o.RoutingStrategy, true
 }
 
-// HasRoutingStrategy returns a boolean if a field has been set.
-func (o *RoutingInfo) HasRoutingStrategy() bool {
-	if o != nil && !IsNil(o.RoutingStrategy) {
-		return true
-	}
-
-	return false
-}
-
-// SetRoutingStrategy gets a reference to the given string and assigns it to the RoutingStrategy field.
+// SetRoutingStrategy sets field value
 func (o *RoutingInfo) SetRoutingStrategy(v string) {
-	o.RoutingStrategy = &v
+	o.RoutingStrategy = v
 }
 
 // GetFallbackUrl returns the FallbackUrl field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -151,100 +144,76 @@ func (o *RoutingInfo) UnsetFallbackUrl() {
 	o.FallbackUrl.Unset()
 }
 
-// GetAvgResponseMs returns the AvgResponseMs field value if set, zero value otherwise.
+// GetAvgResponseMs returns the AvgResponseMs field value
 func (o *RoutingInfo) GetAvgResponseMs() int32 {
-	if o == nil || IsNil(o.AvgResponseMs) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.AvgResponseMs
+
+	return o.AvgResponseMs
 }
 
-// GetAvgResponseMsOk returns a tuple with the AvgResponseMs field value if set, nil otherwise
+// GetAvgResponseMsOk returns a tuple with the AvgResponseMs field value
 // and a boolean to check if the value has been set.
 func (o *RoutingInfo) GetAvgResponseMsOk() (*int32, bool) {
-	if o == nil || IsNil(o.AvgResponseMs) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AvgResponseMs, true
+	return &o.AvgResponseMs, true
 }
 
-// HasAvgResponseMs returns a boolean if a field has been set.
-func (o *RoutingInfo) HasAvgResponseMs() bool {
-	if o != nil && !IsNil(o.AvgResponseMs) {
-		return true
-	}
-
-	return false
-}
-
-// SetAvgResponseMs gets a reference to the given int32 and assigns it to the AvgResponseMs field.
+// SetAvgResponseMs sets field value
 func (o *RoutingInfo) SetAvgResponseMs(v int32) {
-	o.AvgResponseMs = &v
+	o.AvgResponseMs = v
 }
 
-// GetFailureStreak returns the FailureStreak field value if set, zero value otherwise.
+// GetFailureStreak returns the FailureStreak field value
 func (o *RoutingInfo) GetFailureStreak() int32 {
-	if o == nil || IsNil(o.FailureStreak) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.FailureStreak
+
+	return o.FailureStreak
 }
 
-// GetFailureStreakOk returns a tuple with the FailureStreak field value if set, nil otherwise
+// GetFailureStreakOk returns a tuple with the FailureStreak field value
 // and a boolean to check if the value has been set.
 func (o *RoutingInfo) GetFailureStreakOk() (*int32, bool) {
-	if o == nil || IsNil(o.FailureStreak) {
+	if o == nil {
 		return nil, false
 	}
-	return o.FailureStreak, true
+	return &o.FailureStreak, true
 }
 
-// HasFailureStreak returns a boolean if a field has been set.
-func (o *RoutingInfo) HasFailureStreak() bool {
-	if o != nil && !IsNil(o.FailureStreak) {
-		return true
-	}
-
-	return false
-}
-
-// SetFailureStreak gets a reference to the given int32 and assigns it to the FailureStreak field.
+// SetFailureStreak sets field value
 func (o *RoutingInfo) SetFailureStreak(v int32) {
-	o.FailureStreak = &v
+	o.FailureStreak = v
 }
 
-// GetIsHealthy returns the IsHealthy field value if set, zero value otherwise.
+// GetIsHealthy returns the IsHealthy field value
 func (o *RoutingInfo) GetIsHealthy() bool {
-	if o == nil || IsNil(o.IsHealthy) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsHealthy
+
+	return o.IsHealthy
 }
 
-// GetIsHealthyOk returns a tuple with the IsHealthy field value if set, nil otherwise
+// GetIsHealthyOk returns a tuple with the IsHealthy field value
 // and a boolean to check if the value has been set.
 func (o *RoutingInfo) GetIsHealthyOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsHealthy) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsHealthy, true
+	return &o.IsHealthy, true
 }
 
-// HasIsHealthy returns a boolean if a field has been set.
-func (o *RoutingInfo) HasIsHealthy() bool {
-	if o != nil && !IsNil(o.IsHealthy) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsHealthy gets a reference to the given bool and assigns it to the IsHealthy field.
+// SetIsHealthy sets field value
 func (o *RoutingInfo) SetIsHealthy(v bool) {
-	o.IsHealthy = &v
+	o.IsHealthy = v
 }
 
 func (o RoutingInfo) MarshalJSON() ([]byte, error) {
@@ -257,25 +226,56 @@ func (o RoutingInfo) MarshalJSON() ([]byte, error) {
 
 func (o RoutingInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.EndpointId) {
-		toSerialize["endpoint_id"] = o.EndpointId
-	}
-	if !IsNil(o.RoutingStrategy) {
-		toSerialize["routing_strategy"] = o.RoutingStrategy
-	}
+	toSerialize["endpoint_id"] = o.EndpointId
+	toSerialize["routing_strategy"] = o.RoutingStrategy
 	if o.FallbackUrl.IsSet() {
 		toSerialize["fallback_url"] = o.FallbackUrl.Get()
 	}
-	if !IsNil(o.AvgResponseMs) {
-		toSerialize["avg_response_ms"] = o.AvgResponseMs
-	}
-	if !IsNil(o.FailureStreak) {
-		toSerialize["failure_streak"] = o.FailureStreak
-	}
-	if !IsNil(o.IsHealthy) {
-		toSerialize["is_healthy"] = o.IsHealthy
-	}
+	toSerialize["avg_response_ms"] = o.AvgResponseMs
+	toSerialize["failure_streak"] = o.FailureStreak
+	toSerialize["is_healthy"] = o.IsHealthy
 	return toSerialize, nil
+}
+
+func (o *RoutingInfo) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"endpoint_id",
+		"routing_strategy",
+		"avg_response_ms",
+		"failure_streak",
+		"is_healthy",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varRoutingInfo := _RoutingInfo{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varRoutingInfo)
+
+	if err != nil {
+		return err
+	}
+
+	*o = RoutingInfo(varRoutingInfo)
+
+	return err
 }
 
 type NullableRoutingInfo struct {

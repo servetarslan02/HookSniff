@@ -4,26 +4,26 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Url** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Url** | **string** |  | 
 **Description** | Pointer to **NullableString** |  | [optional] 
-**IsActive** | Pointer to **bool** |  | [optional] 
-**RetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**IsActive** | **bool** |  | 
+**RetryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  | 
+**CreatedAt** | **time.Time** |  | 
 **AllowedIps** | Pointer to **[]string** | CIDR blocks or exact IPs | [optional] 
 **EventFilter** | Pointer to **[]string** | Wildcard patterns (e.g. \&quot;order.*\&quot;) | [optional] 
 **CustomHeaders** | Pointer to **map[string]interface{}** |  | [optional] 
-**RoutingStrategy** | Pointer to **string** |  | [optional] 
+**RoutingStrategy** | **string** |  | 
 **FallbackUrl** | Pointer to **NullableString** |  | [optional] 
-**AvgResponseMs** | Pointer to **int32** |  | [optional] 
-**FailureStreak** | Pointer to **int32** |  | [optional] 
-**Format** | Pointer to **string** |  | [optional] 
+**AvgResponseMs** | **int32** |  | 
+**FailureStreak** | **int32** |  | 
+**Format** | **string** |  | 
 
 ## Methods
 
 ### NewEndpoint
 
-`func NewEndpoint() *Endpoint`
+`func NewEndpoint(id string, url string, isActive bool, retryPolicy RetryPolicy, createdAt time.Time, routingStrategy string, avgResponseMs int32, failureStreak int32, format string, ) *Endpoint`
 
 NewEndpoint instantiates a new Endpoint object
 This constructor will assign default values to properties that have it defined,
@@ -57,11 +57,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *Endpoint) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetUrl
 
@@ -82,11 +77,6 @@ and a boolean to check if the value has been set.
 
 SetUrl sets Url field to given value.
 
-### HasUrl
-
-`func (o *Endpoint) HasUrl() bool`
-
-HasUrl returns a boolean if a field has been set.
 
 ### GetDescription
 
@@ -142,11 +132,6 @@ and a boolean to check if the value has been set.
 
 SetIsActive sets IsActive field to given value.
 
-### HasIsActive
-
-`func (o *Endpoint) HasIsActive() bool`
-
-HasIsActive returns a boolean if a field has been set.
 
 ### GetRetryPolicy
 
@@ -167,11 +152,6 @@ and a boolean to check if the value has been set.
 
 SetRetryPolicy sets RetryPolicy field to given value.
 
-### HasRetryPolicy
-
-`func (o *Endpoint) HasRetryPolicy() bool`
-
-HasRetryPolicy returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -192,11 +172,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *Endpoint) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 ### GetAllowedIps
 
@@ -322,11 +297,6 @@ and a boolean to check if the value has been set.
 
 SetRoutingStrategy sets RoutingStrategy field to given value.
 
-### HasRoutingStrategy
-
-`func (o *Endpoint) HasRoutingStrategy() bool`
-
-HasRoutingStrategy returns a boolean if a field has been set.
 
 ### GetFallbackUrl
 
@@ -382,11 +352,6 @@ and a boolean to check if the value has been set.
 
 SetAvgResponseMs sets AvgResponseMs field to given value.
 
-### HasAvgResponseMs
-
-`func (o *Endpoint) HasAvgResponseMs() bool`
-
-HasAvgResponseMs returns a boolean if a field has been set.
 
 ### GetFailureStreak
 
@@ -407,11 +372,6 @@ and a boolean to check if the value has been set.
 
 SetFailureStreak sets FailureStreak field to given value.
 
-### HasFailureStreak
-
-`func (o *Endpoint) HasFailureStreak() bool`
-
-HasFailureStreak returns a boolean if a field has been set.
 
 ### GetFormat
 
@@ -432,11 +392,6 @@ and a boolean to check if the value has been set.
 
 SetFormat sets Format field to given value.
 
-### HasFormat
-
-`func (o *Endpoint) HasFormat() bool`
-
-HasFormat returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -7,10 +7,10 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **String** |  |  [optional] |
-|**name** | **String** |  |  [optional] |
-|**description** | **String** |  |  [optional] |
-|**category** | **String** |  |  [optional] |
+|**id** | **String** |  |  |
+|**name** | **String** |  |  |
+|**description** | **String** |  |  |
+|**category** | **String** |  |  |
 |**payloadTemplate** | **Object** |  |  [optional] |
 
 

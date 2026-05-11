@@ -13,6 +13,9 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the ApiKeyInfo type satisfies the MappedNullable interface at compile time
@@ -20,20 +23,26 @@ var _ MappedNullable = &ApiKeyInfo{}
 
 // ApiKeyInfo struct for ApiKeyInfo
 type ApiKeyInfo struct {
-	Id *string `json:"id,omitempty"`
+	Id string `json:"id"`
 	// Masked key prefix (e.g. \"hs_abc1...\")
-	Prefix *string `json:"prefix,omitempty"`
-	CreatedAt *string `json:"created_at,omitempty"`
+	Prefix string `json:"prefix"`
+	CreatedAt time.Time `json:"created_at"`
 	LastUsedAt NullableString `json:"last_used_at,omitempty"`
-	IsActive *bool `json:"is_active,omitempty"`
+	IsActive bool `json:"is_active"`
 }
+
+type _ApiKeyInfo ApiKeyInfo
 
 // NewApiKeyInfo instantiates a new ApiKeyInfo object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewApiKeyInfo() *ApiKeyInfo {
+func NewApiKeyInfo(id string, prefix string, createdAt time.Time, isActive bool) *ApiKeyInfo {
 	this := ApiKeyInfo{}
+	this.Id = id
+	this.Prefix = prefix
+	this.CreatedAt = createdAt
+	this.IsActive = isActive
 	return &this
 }
 
@@ -45,100 +54,76 @@ func NewApiKeyInfoWithDefaults() *ApiKeyInfo {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *ApiKeyInfo) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *ApiKeyInfo) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *ApiKeyInfo) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *ApiKeyInfo) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetPrefix returns the Prefix field value if set, zero value otherwise.
+// GetPrefix returns the Prefix field value
 func (o *ApiKeyInfo) GetPrefix() string {
-	if o == nil || IsNil(o.Prefix) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Prefix
+
+	return o.Prefix
 }
 
-// GetPrefixOk returns a tuple with the Prefix field value if set, nil otherwise
+// GetPrefixOk returns a tuple with the Prefix field value
 // and a boolean to check if the value has been set.
 func (o *ApiKeyInfo) GetPrefixOk() (*string, bool) {
-	if o == nil || IsNil(o.Prefix) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Prefix, true
+	return &o.Prefix, true
 }
 
-// HasPrefix returns a boolean if a field has been set.
-func (o *ApiKeyInfo) HasPrefix() bool {
-	if o != nil && !IsNil(o.Prefix) {
-		return true
-	}
-
-	return false
-}
-
-// SetPrefix gets a reference to the given string and assigns it to the Prefix field.
+// SetPrefix sets field value
 func (o *ApiKeyInfo) SetPrefix(v string) {
-	o.Prefix = &v
+	o.Prefix = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
-func (o *ApiKeyInfo) GetCreatedAt() string {
-	if o == nil || IsNil(o.CreatedAt) {
-		var ret string
+// GetCreatedAt returns the CreatedAt field value
+func (o *ApiKeyInfo) GetCreatedAt() time.Time {
+	if o == nil {
+		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
-func (o *ApiKeyInfo) GetCreatedAtOk() (*string, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+func (o *ApiKeyInfo) GetCreatedAtOk() (*time.Time, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *ApiKeyInfo) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given string and assigns it to the CreatedAt field.
-func (o *ApiKeyInfo) SetCreatedAt(v string) {
-	o.CreatedAt = &v
+// SetCreatedAt sets field value
+func (o *ApiKeyInfo) SetCreatedAt(v time.Time) {
+	o.CreatedAt = v
 }
 
 // GetLastUsedAt returns the LastUsedAt field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -183,36 +168,28 @@ func (o *ApiKeyInfo) UnsetLastUsedAt() {
 	o.LastUsedAt.Unset()
 }
 
-// GetIsActive returns the IsActive field value if set, zero value otherwise.
+// GetIsActive returns the IsActive field value
 func (o *ApiKeyInfo) GetIsActive() bool {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsActive
+
+	return o.IsActive
 }
 
-// GetIsActiveOk returns a tuple with the IsActive field value if set, nil otherwise
+// GetIsActiveOk returns a tuple with the IsActive field value
 // and a boolean to check if the value has been set.
 func (o *ApiKeyInfo) GetIsActiveOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsActive, true
+	return &o.IsActive, true
 }
 
-// HasIsActive returns a boolean if a field has been set.
-func (o *ApiKeyInfo) HasIsActive() bool {
-	if o != nil && !IsNil(o.IsActive) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsActive gets a reference to the given bool and assigns it to the IsActive field.
+// SetIsActive sets field value
 func (o *ApiKeyInfo) SetIsActive(v bool) {
-	o.IsActive = &v
+	o.IsActive = v
 }
 
 func (o ApiKeyInfo) MarshalJSON() ([]byte, error) {
@@ -225,22 +202,54 @@ func (o ApiKeyInfo) MarshalJSON() ([]byte, error) {
 
 func (o ApiKeyInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Prefix) {
-		toSerialize["prefix"] = o.Prefix
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["prefix"] = o.Prefix
+	toSerialize["created_at"] = o.CreatedAt
 	if o.LastUsedAt.IsSet() {
 		toSerialize["last_used_at"] = o.LastUsedAt.Get()
 	}
-	if !IsNil(o.IsActive) {
-		toSerialize["is_active"] = o.IsActive
-	}
+	toSerialize["is_active"] = o.IsActive
 	return toSerialize, nil
+}
+
+func (o *ApiKeyInfo) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"prefix",
+		"created_at",
+		"is_active",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varApiKeyInfo := _ApiKeyInfo{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varApiKeyInfo)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ApiKeyInfo(varApiKeyInfo)
+
+	return err
 }
 
 type NullableApiKeyInfo struct {

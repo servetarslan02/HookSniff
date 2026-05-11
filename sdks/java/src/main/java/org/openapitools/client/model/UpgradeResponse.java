@@ -49,7 +49,7 @@ import org.openapitools.client.JSON;
 /**
  * UpgradeResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class UpgradeResponse {
   public static final String SERIALIZED_NAME_CHECKOUT_URL = "checkout_url";
   @SerializedName(SERIALIZED_NAME_CHECKOUT_URL)
@@ -58,12 +58,12 @@ public class UpgradeResponse {
 
   public static final String SERIALIZED_NAME_PROVIDER = "provider";
   @SerializedName(SERIALIZED_NAME_PROVIDER)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String provider;
 
   public static final String SERIALIZED_NAME_MESSAGE = "message";
   @SerializedName(SERIALIZED_NAME_MESSAGE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String message;
 
   public UpgradeResponse() {
@@ -88,7 +88,7 @@ public class UpgradeResponse {
   }
 
 
-  public UpgradeResponse provider(@javax.annotation.Nullable String provider) {
+  public UpgradeResponse provider(@javax.annotation.Nonnull String provider) {
     this.provider = provider;
     return this;
   }
@@ -97,17 +97,17 @@ public class UpgradeResponse {
    * Get provider
    * @return provider
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getProvider() {
     return provider;
   }
 
-  public void setProvider(@javax.annotation.Nullable String provider) {
+  public void setProvider(@javax.annotation.Nonnull String provider) {
     this.provider = provider;
   }
 
 
-  public UpgradeResponse message(@javax.annotation.Nullable String message) {
+  public UpgradeResponse message(@javax.annotation.Nonnull String message) {
     this.message = message;
     return this;
   }
@@ -116,12 +116,12 @@ public class UpgradeResponse {
    * Get message
    * @return message
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getMessage() {
     return message;
   }
 
-  public void setMessage(@javax.annotation.Nullable String message) {
+  public void setMessage(@javax.annotation.Nonnull String message) {
     this.message = message;
   }
 
@@ -185,7 +185,7 @@ public class UpgradeResponse {
     openapiFields = new HashSet<String>(Arrays.asList("checkout_url", "provider", "message"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("provider", "message"));
   }
 
   /**
@@ -208,14 +208,21 @@ public class UpgradeResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `UpgradeResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : UpgradeResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
       if ((jsonObj.get("checkout_url") != null && !jsonObj.get("checkout_url").isJsonNull()) && !jsonObj.get("checkout_url").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `checkout_url` to be a primitive type in the JSON string but got `%s`", jsonObj.get("checkout_url").toString()));
       }
-      if ((jsonObj.get("provider") != null && !jsonObj.get("provider").isJsonNull()) && !jsonObj.get("provider").isJsonPrimitive()) {
+      if (!jsonObj.get("provider").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `provider` to be a primitive type in the JSON string but got `%s`", jsonObj.get("provider").toString()));
       }
-      if ((jsonObj.get("message") != null && !jsonObj.get("message").isJsonNull()) && !jsonObj.get("message").isJsonPrimitive()) {
+      if (!jsonObj.get("message").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `message` to be a primitive type in the JSON string but got `%s`", jsonObj.get("message").toString()));
       }
   }

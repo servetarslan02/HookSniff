@@ -13,6 +13,9 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the AlertRule type satisfies the MappedNullable interface at compile time
@@ -20,21 +23,30 @@ var _ MappedNullable = &AlertRule{}
 
 // AlertRule struct for AlertRule
 type AlertRule struct {
-	Id *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Condition *string `json:"condition,omitempty"`
-	Threshold *int32 `json:"threshold,omitempty"`
-	Channels []string `json:"channels,omitempty"`
-	IsActive *bool `json:"is_active,omitempty"`
-	CreatedAt *string `json:"created_at,omitempty"`
+	Id string `json:"id"`
+	Name string `json:"name"`
+	Condition string `json:"condition"`
+	Threshold int32 `json:"threshold"`
+	Channels []string `json:"channels"`
+	IsActive bool `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _AlertRule AlertRule
 
 // NewAlertRule instantiates a new AlertRule object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAlertRule() *AlertRule {
+func NewAlertRule(id string, name string, condition string, threshold int32, channels []string, isActive bool, createdAt time.Time) *AlertRule {
 	this := AlertRule{}
+	this.Id = id
+	this.Name = name
+	this.Condition = condition
+	this.Threshold = threshold
+	this.Channels = channels
+	this.IsActive = isActive
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -46,228 +58,172 @@ func NewAlertRuleWithDefaults() *AlertRule {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *AlertRule) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *AlertRule) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *AlertRule) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *AlertRule) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value
 func (o *AlertRule) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Name
+
+	return o.Name
 }
 
-// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
 func (o *AlertRule) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return &o.Name, true
 }
 
-// HasName returns a boolean if a field has been set.
-func (o *AlertRule) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
-		return true
-	}
-
-	return false
-}
-
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName sets field value
 func (o *AlertRule) SetName(v string) {
-	o.Name = &v
+	o.Name = v
 }
 
-// GetCondition returns the Condition field value if set, zero value otherwise.
+// GetCondition returns the Condition field value
 func (o *AlertRule) GetCondition() string {
-	if o == nil || IsNil(o.Condition) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Condition
+
+	return o.Condition
 }
 
-// GetConditionOk returns a tuple with the Condition field value if set, nil otherwise
+// GetConditionOk returns a tuple with the Condition field value
 // and a boolean to check if the value has been set.
 func (o *AlertRule) GetConditionOk() (*string, bool) {
-	if o == nil || IsNil(o.Condition) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Condition, true
+	return &o.Condition, true
 }
 
-// HasCondition returns a boolean if a field has been set.
-func (o *AlertRule) HasCondition() bool {
-	if o != nil && !IsNil(o.Condition) {
-		return true
-	}
-
-	return false
-}
-
-// SetCondition gets a reference to the given string and assigns it to the Condition field.
+// SetCondition sets field value
 func (o *AlertRule) SetCondition(v string) {
-	o.Condition = &v
+	o.Condition = v
 }
 
-// GetThreshold returns the Threshold field value if set, zero value otherwise.
+// GetThreshold returns the Threshold field value
 func (o *AlertRule) GetThreshold() int32 {
-	if o == nil || IsNil(o.Threshold) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Threshold
+
+	return o.Threshold
 }
 
-// GetThresholdOk returns a tuple with the Threshold field value if set, nil otherwise
+// GetThresholdOk returns a tuple with the Threshold field value
 // and a boolean to check if the value has been set.
 func (o *AlertRule) GetThresholdOk() (*int32, bool) {
-	if o == nil || IsNil(o.Threshold) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Threshold, true
+	return &o.Threshold, true
 }
 
-// HasThreshold returns a boolean if a field has been set.
-func (o *AlertRule) HasThreshold() bool {
-	if o != nil && !IsNil(o.Threshold) {
-		return true
-	}
-
-	return false
-}
-
-// SetThreshold gets a reference to the given int32 and assigns it to the Threshold field.
+// SetThreshold sets field value
 func (o *AlertRule) SetThreshold(v int32) {
-	o.Threshold = &v
+	o.Threshold = v
 }
 
-// GetChannels returns the Channels field value if set, zero value otherwise.
+// GetChannels returns the Channels field value
 func (o *AlertRule) GetChannels() []string {
-	if o == nil || IsNil(o.Channels) {
+	if o == nil {
 		var ret []string
 		return ret
 	}
+
 	return o.Channels
 }
 
-// GetChannelsOk returns a tuple with the Channels field value if set, nil otherwise
+// GetChannelsOk returns a tuple with the Channels field value
 // and a boolean to check if the value has been set.
 func (o *AlertRule) GetChannelsOk() ([]string, bool) {
-	if o == nil || IsNil(o.Channels) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Channels, true
 }
 
-// HasChannels returns a boolean if a field has been set.
-func (o *AlertRule) HasChannels() bool {
-	if o != nil && !IsNil(o.Channels) {
-		return true
-	}
-
-	return false
-}
-
-// SetChannels gets a reference to the given []string and assigns it to the Channels field.
+// SetChannels sets field value
 func (o *AlertRule) SetChannels(v []string) {
 	o.Channels = v
 }
 
-// GetIsActive returns the IsActive field value if set, zero value otherwise.
+// GetIsActive returns the IsActive field value
 func (o *AlertRule) GetIsActive() bool {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsActive
+
+	return o.IsActive
 }
 
-// GetIsActiveOk returns a tuple with the IsActive field value if set, nil otherwise
+// GetIsActiveOk returns a tuple with the IsActive field value
 // and a boolean to check if the value has been set.
 func (o *AlertRule) GetIsActiveOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsActive) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsActive, true
+	return &o.IsActive, true
 }
 
-// HasIsActive returns a boolean if a field has been set.
-func (o *AlertRule) HasIsActive() bool {
-	if o != nil && !IsNil(o.IsActive) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsActive gets a reference to the given bool and assigns it to the IsActive field.
+// SetIsActive sets field value
 func (o *AlertRule) SetIsActive(v bool) {
-	o.IsActive = &v
+	o.IsActive = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
-func (o *AlertRule) GetCreatedAt() string {
-	if o == nil || IsNil(o.CreatedAt) {
-		var ret string
+// GetCreatedAt returns the CreatedAt field value
+func (o *AlertRule) GetCreatedAt() time.Time {
+	if o == nil {
+		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
-func (o *AlertRule) GetCreatedAtOk() (*string, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+func (o *AlertRule) GetCreatedAtOk() (*time.Time, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *AlertRule) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given string and assigns it to the CreatedAt field.
-func (o *AlertRule) SetCreatedAt(v string) {
-	o.CreatedAt = &v
+// SetCreatedAt sets field value
+func (o *AlertRule) SetCreatedAt(v time.Time) {
+	o.CreatedAt = v
 }
 
 func (o AlertRule) MarshalJSON() ([]byte, error) {
@@ -280,28 +236,57 @@ func (o AlertRule) MarshalJSON() ([]byte, error) {
 
 func (o AlertRule) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
-	}
-	if !IsNil(o.Condition) {
-		toSerialize["condition"] = o.Condition
-	}
-	if !IsNil(o.Threshold) {
-		toSerialize["threshold"] = o.Threshold
-	}
-	if !IsNil(o.Channels) {
-		toSerialize["channels"] = o.Channels
-	}
-	if !IsNil(o.IsActive) {
-		toSerialize["is_active"] = o.IsActive
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["name"] = o.Name
+	toSerialize["condition"] = o.Condition
+	toSerialize["threshold"] = o.Threshold
+	toSerialize["channels"] = o.Channels
+	toSerialize["is_active"] = o.IsActive
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *AlertRule) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"name",
+		"condition",
+		"threshold",
+		"channels",
+		"is_active",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varAlertRule := _AlertRule{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varAlertRule)
+
+	if err != nil {
+		return err
+	}
+
+	*o = AlertRule(varAlertRule)
+
+	return err
 }
 
 type NullableAlertRule struct {

@@ -51,27 +51,27 @@ import org.openapitools.client.JSON;
 /**
  * NotificationListResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class NotificationListResponse {
   public static final String SERIALIZED_NAME_NOTIFICATIONS = "notifications";
   @SerializedName(SERIALIZED_NAME_NOTIFICATIONS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<Notification> notifications = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_TOTAL = "total";
   @SerializedName(SERIALIZED_NAME_TOTAL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer total;
 
   public static final String SERIALIZED_NAME_UNREAD_COUNT = "unread_count";
   @SerializedName(SERIALIZED_NAME_UNREAD_COUNT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer unreadCount;
 
   public NotificationListResponse() {
   }
 
-  public NotificationListResponse notifications(@javax.annotation.Nullable List<Notification> notifications) {
+  public NotificationListResponse notifications(@javax.annotation.Nonnull List<Notification> notifications) {
     this.notifications = notifications;
     return this;
   }
@@ -88,17 +88,17 @@ public class NotificationListResponse {
    * Get notifications
    * @return notifications
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<Notification> getNotifications() {
     return notifications;
   }
 
-  public void setNotifications(@javax.annotation.Nullable List<Notification> notifications) {
+  public void setNotifications(@javax.annotation.Nonnull List<Notification> notifications) {
     this.notifications = notifications;
   }
 
 
-  public NotificationListResponse total(@javax.annotation.Nullable Integer total) {
+  public NotificationListResponse total(@javax.annotation.Nonnull Integer total) {
     this.total = total;
     return this;
   }
@@ -107,17 +107,17 @@ public class NotificationListResponse {
    * Get total
    * @return total
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getTotal() {
     return total;
   }
 
-  public void setTotal(@javax.annotation.Nullable Integer total) {
+  public void setTotal(@javax.annotation.Nonnull Integer total) {
     this.total = total;
   }
 
 
-  public NotificationListResponse unreadCount(@javax.annotation.Nullable Integer unreadCount) {
+  public NotificationListResponse unreadCount(@javax.annotation.Nonnull Integer unreadCount) {
     this.unreadCount = unreadCount;
     return this;
   }
@@ -126,12 +126,12 @@ public class NotificationListResponse {
    * Get unreadCount
    * @return unreadCount
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getUnreadCount() {
     return unreadCount;
   }
 
-  public void setUnreadCount(@javax.annotation.Nullable Integer unreadCount) {
+  public void setUnreadCount(@javax.annotation.Nonnull Integer unreadCount) {
     this.unreadCount = unreadCount;
   }
 
@@ -184,7 +184,7 @@ public class NotificationListResponse {
     openapiFields = new HashSet<String>(Arrays.asList("notifications", "total", "unread_count"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("notifications", "total", "unread_count"));
   }
 
   /**
@@ -207,19 +207,22 @@ public class NotificationListResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `NotificationListResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (jsonObj.get("notifications") != null && !jsonObj.get("notifications").isJsonNull()) {
-        JsonArray jsonArraynotifications = jsonObj.getAsJsonArray("notifications");
-        if (jsonArraynotifications != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("notifications").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `notifications` to be an array in the JSON string but got `%s`", jsonObj.get("notifications").toString()));
-          }
 
-          // validate the optional field `notifications` (array)
-          for (int i = 0; i < jsonArraynotifications.size(); i++) {
-            Notification.validateJsonElement(jsonArraynotifications.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : NotificationListResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("notifications") != null) {
+        if (!jsonObj.get("notifications").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `notifications` to be an array in the JSON string but got `%s`", jsonObj.get("notifications").toString()));
+        }
+        JsonArray jsonArraynotifications = jsonObj.getAsJsonArray("notifications");
+        // validate the required field `notifications` (array)
+        for (int i = 0; i < jsonArraynotifications.size(); i++) {
+          Notification.validateJsonElement(jsonArraynotifications.get(i));
         }
       }
   }

@@ -13,99 +13,64 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
-// checks if the OutboundIpsResponse type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &OutboundIpsResponse{}
+// checks if the OutboundIPsResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &OutboundIPsResponse{}
 
-// OutboundIpsResponse struct for OutboundIpsResponse
-type OutboundIpsResponse struct {
-	Ips []string `json:"ips,omitempty"`
-	UpdatedAt *string `json:"updated_at,omitempty"`
+// OutboundIPsResponse List of static outbound IP addresses for firewall whitelisting
+type OutboundIPsResponse struct {
+	// IPv4 and IPv6 addresses used for outbound requests
+	Ips []string `json:"ips"`
 }
 
-// NewOutboundIpsResponse instantiates a new OutboundIpsResponse object
+type _OutboundIPsResponse OutboundIPsResponse
+
+// NewOutboundIPsResponse instantiates a new OutboundIPsResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOutboundIpsResponse() *OutboundIpsResponse {
-	this := OutboundIpsResponse{}
+func NewOutboundIPsResponse(ips []string) *OutboundIPsResponse {
+	this := OutboundIPsResponse{}
+	this.Ips = ips
 	return &this
 }
 
-// NewOutboundIpsResponseWithDefaults instantiates a new OutboundIpsResponse object
+// NewOutboundIPsResponseWithDefaults instantiates a new OutboundIPsResponse object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewOutboundIpsResponseWithDefaults() *OutboundIpsResponse {
-	this := OutboundIpsResponse{}
+func NewOutboundIPsResponseWithDefaults() *OutboundIPsResponse {
+	this := OutboundIPsResponse{}
 	return &this
 }
 
-// GetIps returns the Ips field value if set, zero value otherwise.
-func (o *OutboundIpsResponse) GetIps() []string {
-	if o == nil || IsNil(o.Ips) {
+// GetIps returns the Ips field value
+func (o *OutboundIPsResponse) GetIps() []string {
+	if o == nil {
 		var ret []string
 		return ret
 	}
+
 	return o.Ips
 }
 
-// GetIpsOk returns a tuple with the Ips field value if set, nil otherwise
+// GetIpsOk returns a tuple with the Ips field value
 // and a boolean to check if the value has been set.
-func (o *OutboundIpsResponse) GetIpsOk() ([]string, bool) {
-	if o == nil || IsNil(o.Ips) {
+func (o *OutboundIPsResponse) GetIpsOk() ([]string, bool) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Ips, true
 }
 
-// HasIps returns a boolean if a field has been set.
-func (o *OutboundIpsResponse) HasIps() bool {
-	if o != nil && !IsNil(o.Ips) {
-		return true
-	}
-
-	return false
-}
-
-// SetIps gets a reference to the given []string and assigns it to the Ips field.
-func (o *OutboundIpsResponse) SetIps(v []string) {
+// SetIps sets field value
+func (o *OutboundIPsResponse) SetIps(v []string) {
 	o.Ips = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
-func (o *OutboundIpsResponse) GetUpdatedAt() string {
-	if o == nil || IsNil(o.UpdatedAt) {
-		var ret string
-		return ret
-	}
-	return *o.UpdatedAt
-}
-
-// GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OutboundIpsResponse) GetUpdatedAtOk() (*string, bool) {
-	if o == nil || IsNil(o.UpdatedAt) {
-		return nil, false
-	}
-	return o.UpdatedAt, true
-}
-
-// HasUpdatedAt returns a boolean if a field has been set.
-func (o *OutboundIpsResponse) HasUpdatedAt() bool {
-	if o != nil && !IsNil(o.UpdatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetUpdatedAt gets a reference to the given string and assigns it to the UpdatedAt field.
-func (o *OutboundIpsResponse) SetUpdatedAt(v string) {
-	o.UpdatedAt = &v
-}
-
-func (o OutboundIpsResponse) MarshalJSON() ([]byte, error) {
+func (o OutboundIPsResponse) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -113,49 +78,81 @@ func (o OutboundIpsResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o OutboundIpsResponse) ToMap() (map[string]interface{}, error) {
+func (o OutboundIPsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Ips) {
-		toSerialize["ips"] = o.Ips
-	}
-	if !IsNil(o.UpdatedAt) {
-		toSerialize["updated_at"] = o.UpdatedAt
-	}
+	toSerialize["ips"] = o.Ips
 	return toSerialize, nil
 }
 
-type NullableOutboundIpsResponse struct {
-	value *OutboundIpsResponse
+func (o *OutboundIPsResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"ips",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varOutboundIPsResponse := _OutboundIPsResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varOutboundIPsResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = OutboundIPsResponse(varOutboundIPsResponse)
+
+	return err
+}
+
+type NullableOutboundIPsResponse struct {
+	value *OutboundIPsResponse
 	isSet bool
 }
 
-func (v NullableOutboundIpsResponse) Get() *OutboundIpsResponse {
+func (v NullableOutboundIPsResponse) Get() *OutboundIPsResponse {
 	return v.value
 }
 
-func (v *NullableOutboundIpsResponse) Set(val *OutboundIpsResponse) {
+func (v *NullableOutboundIPsResponse) Set(val *OutboundIPsResponse) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableOutboundIpsResponse) IsSet() bool {
+func (v NullableOutboundIPsResponse) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableOutboundIpsResponse) Unset() {
+func (v *NullableOutboundIPsResponse) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableOutboundIpsResponse(val *OutboundIpsResponse) *NullableOutboundIpsResponse {
-	return &NullableOutboundIpsResponse{value: val, isSet: true}
+func NewNullableOutboundIPsResponse(val *OutboundIPsResponse) *NullableOutboundIPsResponse {
+	return &NullableOutboundIPsResponse{value: val, isSet: true}
 }
 
-func (v NullableOutboundIpsResponse) MarshalJSON() ([]byte, error) {
+func (v NullableOutboundIPsResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableOutboundIpsResponse) UnmarshalJSON(src []byte) error {
+func (v *NullableOutboundIPsResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

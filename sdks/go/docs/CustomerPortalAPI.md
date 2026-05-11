@@ -573,7 +573,7 @@ import (
 )
 
 func main() {
-	updateNotificationPreferences := *openapiclient.NewUpdateNotificationPreferences() // UpdateNotificationPreferences | 
+	updateNotificationPreferences := *openapiclient.NewUpdateNotificationPreferences(false, false, false) // UpdateNotificationPreferences | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)

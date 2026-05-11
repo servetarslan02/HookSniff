@@ -227,7 +227,7 @@ import (
 
 func main() {
 	id := "38400000-8cf0-11bd-b23e-10b96e4ef00d" // string | 
-	updateEndpointRequest := *openapiclient.NewUpdateEndpointRequest() // UpdateEndpointRequest | 
+	updateEndpointRequest := *openapiclient.NewUpdateEndpointRequest("Url_example", "Description_example", false, []string{"AllowedIps_example"}, []string{"EventFilter_example"}, *openapiclient.NewRetryPolicy(int32(123), "Backoff_example", int32(123), int32(123)), "RoutingStrategy_example", "FallbackUrl_example", "Format_example") // UpdateEndpointRequest | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
@@ -297,7 +297,7 @@ import (
 
 func main() {
 	id := "38400000-8cf0-11bd-b23e-10b96e4ef00d" // string | 
-	retryPolicy := *openapiclient.NewRetryPolicy() // RetryPolicy | 
+	retryPolicy := *openapiclient.NewRetryPolicy(int32(123), "Backoff_example", int32(123), int32(123)) // RetryPolicy | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)

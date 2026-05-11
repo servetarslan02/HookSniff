@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the SystemStatus type satisfies the MappedNullable interface at compile time
@@ -20,18 +22,24 @@ var _ MappedNullable = &SystemStatus{}
 
 // SystemStatus struct for SystemStatus
 type SystemStatus struct {
-	OverallStatus *string `json:"overall_status,omitempty"`
-	Uptime30d *float32 `json:"uptime_30d,omitempty"`
-	Components []SystemStatusComponentsInner `json:"components,omitempty"`
-	CheckedAt *string `json:"checked_at,omitempty"`
+	OverallStatus string `json:"overall_status"`
+	Uptime30d float32 `json:"uptime_30d"`
+	Components []SystemStatusComponentsInner `json:"components"`
+	CheckedAt string `json:"checked_at"`
 }
+
+type _SystemStatus SystemStatus
 
 // NewSystemStatus instantiates a new SystemStatus object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSystemStatus() *SystemStatus {
+func NewSystemStatus(overallStatus string, uptime30d float32, components []SystemStatusComponentsInner, checkedAt string) *SystemStatus {
 	this := SystemStatus{}
+	this.OverallStatus = overallStatus
+	this.Uptime30d = uptime30d
+	this.Components = components
+	this.CheckedAt = checkedAt
 	return &this
 }
 
@@ -43,132 +51,100 @@ func NewSystemStatusWithDefaults() *SystemStatus {
 	return &this
 }
 
-// GetOverallStatus returns the OverallStatus field value if set, zero value otherwise.
+// GetOverallStatus returns the OverallStatus field value
 func (o *SystemStatus) GetOverallStatus() string {
-	if o == nil || IsNil(o.OverallStatus) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.OverallStatus
+
+	return o.OverallStatus
 }
 
-// GetOverallStatusOk returns a tuple with the OverallStatus field value if set, nil otherwise
+// GetOverallStatusOk returns a tuple with the OverallStatus field value
 // and a boolean to check if the value has been set.
 func (o *SystemStatus) GetOverallStatusOk() (*string, bool) {
-	if o == nil || IsNil(o.OverallStatus) {
+	if o == nil {
 		return nil, false
 	}
-	return o.OverallStatus, true
+	return &o.OverallStatus, true
 }
 
-// HasOverallStatus returns a boolean if a field has been set.
-func (o *SystemStatus) HasOverallStatus() bool {
-	if o != nil && !IsNil(o.OverallStatus) {
-		return true
-	}
-
-	return false
-}
-
-// SetOverallStatus gets a reference to the given string and assigns it to the OverallStatus field.
+// SetOverallStatus sets field value
 func (o *SystemStatus) SetOverallStatus(v string) {
-	o.OverallStatus = &v
+	o.OverallStatus = v
 }
 
-// GetUptime30d returns the Uptime30d field value if set, zero value otherwise.
+// GetUptime30d returns the Uptime30d field value
 func (o *SystemStatus) GetUptime30d() float32 {
-	if o == nil || IsNil(o.Uptime30d) {
+	if o == nil {
 		var ret float32
 		return ret
 	}
-	return *o.Uptime30d
+
+	return o.Uptime30d
 }
 
-// GetUptime30dOk returns a tuple with the Uptime30d field value if set, nil otherwise
+// GetUptime30dOk returns a tuple with the Uptime30d field value
 // and a boolean to check if the value has been set.
 func (o *SystemStatus) GetUptime30dOk() (*float32, bool) {
-	if o == nil || IsNil(o.Uptime30d) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Uptime30d, true
+	return &o.Uptime30d, true
 }
 
-// HasUptime30d returns a boolean if a field has been set.
-func (o *SystemStatus) HasUptime30d() bool {
-	if o != nil && !IsNil(o.Uptime30d) {
-		return true
-	}
-
-	return false
-}
-
-// SetUptime30d gets a reference to the given float32 and assigns it to the Uptime30d field.
+// SetUptime30d sets field value
 func (o *SystemStatus) SetUptime30d(v float32) {
-	o.Uptime30d = &v
+	o.Uptime30d = v
 }
 
-// GetComponents returns the Components field value if set, zero value otherwise.
+// GetComponents returns the Components field value
 func (o *SystemStatus) GetComponents() []SystemStatusComponentsInner {
-	if o == nil || IsNil(o.Components) {
+	if o == nil {
 		var ret []SystemStatusComponentsInner
 		return ret
 	}
+
 	return o.Components
 }
 
-// GetComponentsOk returns a tuple with the Components field value if set, nil otherwise
+// GetComponentsOk returns a tuple with the Components field value
 // and a boolean to check if the value has been set.
 func (o *SystemStatus) GetComponentsOk() ([]SystemStatusComponentsInner, bool) {
-	if o == nil || IsNil(o.Components) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Components, true
 }
 
-// HasComponents returns a boolean if a field has been set.
-func (o *SystemStatus) HasComponents() bool {
-	if o != nil && !IsNil(o.Components) {
-		return true
-	}
-
-	return false
-}
-
-// SetComponents gets a reference to the given []SystemStatusComponentsInner and assigns it to the Components field.
+// SetComponents sets field value
 func (o *SystemStatus) SetComponents(v []SystemStatusComponentsInner) {
 	o.Components = v
 }
 
-// GetCheckedAt returns the CheckedAt field value if set, zero value otherwise.
+// GetCheckedAt returns the CheckedAt field value
 func (o *SystemStatus) GetCheckedAt() string {
-	if o == nil || IsNil(o.CheckedAt) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.CheckedAt
+
+	return o.CheckedAt
 }
 
-// GetCheckedAtOk returns a tuple with the CheckedAt field value if set, nil otherwise
+// GetCheckedAtOk returns a tuple with the CheckedAt field value
 // and a boolean to check if the value has been set.
 func (o *SystemStatus) GetCheckedAtOk() (*string, bool) {
-	if o == nil || IsNil(o.CheckedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CheckedAt, true
+	return &o.CheckedAt, true
 }
 
-// HasCheckedAt returns a boolean if a field has been set.
-func (o *SystemStatus) HasCheckedAt() bool {
-	if o != nil && !IsNil(o.CheckedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCheckedAt gets a reference to the given string and assigns it to the CheckedAt field.
+// SetCheckedAt sets field value
 func (o *SystemStatus) SetCheckedAt(v string) {
-	o.CheckedAt = &v
+	o.CheckedAt = v
 }
 
 func (o SystemStatus) MarshalJSON() ([]byte, error) {
@@ -181,19 +157,51 @@ func (o SystemStatus) MarshalJSON() ([]byte, error) {
 
 func (o SystemStatus) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.OverallStatus) {
-		toSerialize["overall_status"] = o.OverallStatus
-	}
-	if !IsNil(o.Uptime30d) {
-		toSerialize["uptime_30d"] = o.Uptime30d
-	}
-	if !IsNil(o.Components) {
-		toSerialize["components"] = o.Components
-	}
-	if !IsNil(o.CheckedAt) {
-		toSerialize["checked_at"] = o.CheckedAt
-	}
+	toSerialize["overall_status"] = o.OverallStatus
+	toSerialize["uptime_30d"] = o.Uptime30d
+	toSerialize["components"] = o.Components
+	toSerialize["checked_at"] = o.CheckedAt
 	return toSerialize, nil
+}
+
+func (o *SystemStatus) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"overall_status",
+		"uptime_30d",
+		"components",
+		"checked_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varSystemStatus := _SystemStatus{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varSystemStatus)
+
+	if err != nil {
+		return err
+	}
+
+	*o = SystemStatus(varSystemStatus)
+
+	return err
 }
 
 type NullableSystemStatus struct {

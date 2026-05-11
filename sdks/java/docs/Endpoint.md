@@ -7,20 +7,20 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**url** | **URI** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**url** | **URI** |  |  |
 |**description** | **String** |  |  [optional] |
-|**isActive** | **Boolean** |  |  [optional] |
-|**retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**isActive** | **Boolean** |  |  |
+|**retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 |**allowedIps** | **List&lt;String&gt;** | CIDR blocks or exact IPs |  [optional] |
 |**eventFilter** | **List&lt;String&gt;** | Wildcard patterns (e.g. \&quot;order.*\&quot;) |  [optional] |
 |**customHeaders** | **Object** |  |  [optional] |
-|**routingStrategy** | [**RoutingStrategyEnum**](#RoutingStrategyEnum) |  |  [optional] |
+|**routingStrategy** | [**RoutingStrategyEnum**](#RoutingStrategyEnum) |  |  |
 |**fallbackUrl** | **URI** |  |  [optional] |
-|**avgResponseMs** | **Integer** |  |  [optional] |
-|**failureStreak** | **Integer** |  |  [optional] |
-|**format** | [**FormatEnum**](#FormatEnum) |  |  [optional] |
+|**avgResponseMs** | **Integer** |  |  |
+|**failureStreak** | **Integer** |  |  |
+|**format** | [**FormatEnum**](#FormatEnum) |  |  |
 
 
 

@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**RoutingStrategy** | Pointer to **string** |  | [optional] 
-**FallbackUrl** | Pointer to **string** |  | [optional] 
+**RoutingStrategy** | **string** |  | 
+**FallbackUrl** | **string** |  | 
 
 ## Methods
 
 ### NewUpdateRoutingRequest
 
-`func NewUpdateRoutingRequest() *UpdateRoutingRequest`
+`func NewUpdateRoutingRequest(routingStrategy string, fallbackUrl string, ) *UpdateRoutingRequest`
 
 NewUpdateRoutingRequest instantiates a new UpdateRoutingRequest object
 This constructor will assign default values to properties that have it defined,
@@ -45,11 +45,6 @@ and a boolean to check if the value has been set.
 
 SetRoutingStrategy sets RoutingStrategy field to given value.
 
-### HasRoutingStrategy
-
-`func (o *UpdateRoutingRequest) HasRoutingStrategy() bool`
-
-HasRoutingStrategy returns a boolean if a field has been set.
 
 ### GetFallbackUrl
 
@@ -70,11 +65,6 @@ and a boolean to check if the value has been set.
 
 SetFallbackUrl sets FallbackUrl field to given value.
 
-### HasFallbackUrl
-
-`func (o *UpdateRoutingRequest) HasFallbackUrl() bool`
-
-HasFallbackUrl returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -52,22 +52,22 @@ import org.openapitools.client.JSON;
 /**
  * BatchResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class BatchResponse {
   public static final String SERIALIZED_NAME_DELIVERIES = "deliveries";
   @SerializedName(SERIALIZED_NAME_DELIVERIES)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<Delivery> deliveries = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_ERRORS = "errors";
   @SerializedName(SERIALIZED_NAME_ERRORS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<BatchResponseErrorsInner> errors = new ArrayList<>();
 
   public BatchResponse() {
   }
 
-  public BatchResponse deliveries(@javax.annotation.Nullable List<Delivery> deliveries) {
+  public BatchResponse deliveries(@javax.annotation.Nonnull List<Delivery> deliveries) {
     this.deliveries = deliveries;
     return this;
   }
@@ -84,17 +84,17 @@ public class BatchResponse {
    * Get deliveries
    * @return deliveries
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<Delivery> getDeliveries() {
     return deliveries;
   }
 
-  public void setDeliveries(@javax.annotation.Nullable List<Delivery> deliveries) {
+  public void setDeliveries(@javax.annotation.Nonnull List<Delivery> deliveries) {
     this.deliveries = deliveries;
   }
 
 
-  public BatchResponse errors(@javax.annotation.Nullable List<BatchResponseErrorsInner> errors) {
+  public BatchResponse errors(@javax.annotation.Nonnull List<BatchResponseErrorsInner> errors) {
     this.errors = errors;
     return this;
   }
@@ -111,12 +111,12 @@ public class BatchResponse {
    * Get errors
    * @return errors
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<BatchResponseErrorsInner> getErrors() {
     return errors;
   }
 
-  public void setErrors(@javax.annotation.Nullable List<BatchResponseErrorsInner> errors) {
+  public void setErrors(@javax.annotation.Nonnull List<BatchResponseErrorsInner> errors) {
     this.errors = errors;
   }
 
@@ -167,7 +167,7 @@ public class BatchResponse {
     openapiFields = new HashSet<String>(Arrays.asList("deliveries", "errors"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("deliveries", "errors"));
   }
 
   /**
@@ -190,33 +190,32 @@ public class BatchResponse {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `BatchResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (jsonObj.get("deliveries") != null && !jsonObj.get("deliveries").isJsonNull()) {
-        JsonArray jsonArraydeliveries = jsonObj.getAsJsonArray("deliveries");
-        if (jsonArraydeliveries != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("deliveries").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `deliveries` to be an array in the JSON string but got `%s`", jsonObj.get("deliveries").toString()));
-          }
 
-          // validate the optional field `deliveries` (array)
-          for (int i = 0; i < jsonArraydeliveries.size(); i++) {
-            Delivery.validateJsonElement(jsonArraydeliveries.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : BatchResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
-      if (jsonObj.get("errors") != null && !jsonObj.get("errors").isJsonNull()) {
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("deliveries") != null) {
+        if (!jsonObj.get("deliveries").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `deliveries` to be an array in the JSON string but got `%s`", jsonObj.get("deliveries").toString()));
+        }
+        JsonArray jsonArraydeliveries = jsonObj.getAsJsonArray("deliveries");
+        // validate the required field `deliveries` (array)
+        for (int i = 0; i < jsonArraydeliveries.size(); i++) {
+          Delivery.validateJsonElement(jsonArraydeliveries.get(i));
+        }
+      }
+      if (jsonObj.get("errors") != null) {
+        if (!jsonObj.get("errors").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `errors` to be an array in the JSON string but got `%s`", jsonObj.get("errors").toString()));
+        }
         JsonArray jsonArrayerrors = jsonObj.getAsJsonArray("errors");
-        if (jsonArrayerrors != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("errors").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `errors` to be an array in the JSON string but got `%s`", jsonObj.get("errors").toString()));
-          }
-
-          // validate the optional field `errors` (array)
-          for (int i = 0; i < jsonArrayerrors.size(); i++) {
-            BatchResponseErrorsInner.validateJsonElement(jsonArrayerrors.get(i));
-          };
+        // validate the required field `errors` (array)
+        for (int i = 0; i < jsonArrayerrors.size(); i++) {
+          BatchResponseErrorsInner.validateJsonElement(jsonArrayerrors.get(i));
         }
       }
   }

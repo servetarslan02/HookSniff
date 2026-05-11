@@ -51,21 +51,21 @@ import org.openapitools.client.JSON;
 /**
  * TeamMember
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class TeamMember {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_USER_ID = "user_id";
   @SerializedName(SERIALIZED_NAME_USER_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID userId;
 
   public static final String SERIALIZED_NAME_EMAIL = "email";
   @SerializedName(SERIALIZED_NAME_EMAIL)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String email;
 
   public static final String SERIALIZED_NAME_NAME = "name";
@@ -75,18 +75,18 @@ public class TeamMember {
 
   public static final String SERIALIZED_NAME_ROLE = "role";
   @SerializedName(SERIALIZED_NAME_ROLE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String role;
 
   public static final String SERIALIZED_NAME_JOINED_AT = "joined_at";
   @SerializedName(SERIALIZED_NAME_JOINED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime joinedAt;
 
   public TeamMember() {
   }
 
-  public TeamMember id(@javax.annotation.Nullable UUID id) {
+  public TeamMember id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -95,17 +95,17 @@ public class TeamMember {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public TeamMember userId(@javax.annotation.Nullable UUID userId) {
+  public TeamMember userId(@javax.annotation.Nonnull UUID userId) {
     this.userId = userId;
     return this;
   }
@@ -114,17 +114,17 @@ public class TeamMember {
    * Get userId
    * @return userId
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getUserId() {
     return userId;
   }
 
-  public void setUserId(@javax.annotation.Nullable UUID userId) {
+  public void setUserId(@javax.annotation.Nonnull UUID userId) {
     this.userId = userId;
   }
 
 
-  public TeamMember email(@javax.annotation.Nullable String email) {
+  public TeamMember email(@javax.annotation.Nonnull String email) {
     this.email = email;
     return this;
   }
@@ -133,12 +133,12 @@ public class TeamMember {
    * Get email
    * @return email
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getEmail() {
     return email;
   }
 
-  public void setEmail(@javax.annotation.Nullable String email) {
+  public void setEmail(@javax.annotation.Nonnull String email) {
     this.email = email;
   }
 
@@ -162,7 +162,7 @@ public class TeamMember {
   }
 
 
-  public TeamMember role(@javax.annotation.Nullable String role) {
+  public TeamMember role(@javax.annotation.Nonnull String role) {
     this.role = role;
     return this;
   }
@@ -171,17 +171,17 @@ public class TeamMember {
    * Get role
    * @return role
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getRole() {
     return role;
   }
 
-  public void setRole(@javax.annotation.Nullable String role) {
+  public void setRole(@javax.annotation.Nonnull String role) {
     this.role = role;
   }
 
 
-  public TeamMember joinedAt(@javax.annotation.Nullable OffsetDateTime joinedAt) {
+  public TeamMember joinedAt(@javax.annotation.Nonnull OffsetDateTime joinedAt) {
     this.joinedAt = joinedAt;
     return this;
   }
@@ -190,12 +190,12 @@ public class TeamMember {
    * Get joinedAt
    * @return joinedAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getJoinedAt() {
     return joinedAt;
   }
 
-  public void setJoinedAt(@javax.annotation.Nullable OffsetDateTime joinedAt) {
+  public void setJoinedAt(@javax.annotation.Nonnull OffsetDateTime joinedAt) {
     this.joinedAt = joinedAt;
   }
 
@@ -265,7 +265,7 @@ public class TeamMember {
     openapiFields = new HashSet<String>(Arrays.asList("id", "user_id", "email", "name", "role", "joined_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "user_id", "email", "role", "joined_at"));
   }
 
   /**
@@ -288,20 +288,27 @@ public class TeamMember {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `TeamMember` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : TeamMember.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("user_id") != null && !jsonObj.get("user_id").isJsonNull()) && !jsonObj.get("user_id").isJsonPrimitive()) {
+      if (!jsonObj.get("user_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `user_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("user_id").toString()));
       }
-      if ((jsonObj.get("email") != null && !jsonObj.get("email").isJsonNull()) && !jsonObj.get("email").isJsonPrimitive()) {
+      if (!jsonObj.get("email").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `email` to be a primitive type in the JSON string but got `%s`", jsonObj.get("email").toString()));
       }
       if ((jsonObj.get("name") != null && !jsonObj.get("name").isJsonNull()) && !jsonObj.get("name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("name").toString()));
       }
-      if ((jsonObj.get("role") != null && !jsonObj.get("role").isJsonNull()) && !jsonObj.get("role").isJsonPrimitive()) {
+      if (!jsonObj.get("role").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `role` to be a primitive type in the JSON string but got `%s`", jsonObj.get("role").toString()));
       }
   }

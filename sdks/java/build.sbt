@@ -1,8 +1,8 @@
 lazy val root = (project in file(".")).
   settings(
-    organization := "org.openapitools",
-    name := "openapi-java-client",
-    version := "1.0.0",
+    organization := "io.github.servetarslan02",
+    name := "hooksniff-sdk",
+    version := "0.3.0",
     scalaVersion := "2.11.12",
     scalacOptions ++= Seq("-feature"),
     compile / javacOptions ++= Seq("-Xlint:deprecation"),

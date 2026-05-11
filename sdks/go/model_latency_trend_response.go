@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the LatencyTrendResponse type satisfies the MappedNullable interface at compile time
@@ -20,17 +22,22 @@ var _ MappedNullable = &LatencyTrendResponse{}
 
 // LatencyTrendResponse struct for LatencyTrendResponse
 type LatencyTrendResponse struct {
-	Range *string `json:"range,omitempty"`
-	Buckets []LatencyTrendResponseBucketsInner `json:"buckets,omitempty"`
-	OverallAvgMs *float32 `json:"overall_avg_ms,omitempty"`
+	Range string `json:"range"`
+	Buckets []LatencyTrendResponseBucketsInner `json:"buckets"`
+	OverallAvgMs float32 `json:"overall_avg_ms"`
 }
+
+type _LatencyTrendResponse LatencyTrendResponse
 
 // NewLatencyTrendResponse instantiates a new LatencyTrendResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewLatencyTrendResponse() *LatencyTrendResponse {
+func NewLatencyTrendResponse(range_ string, buckets []LatencyTrendResponseBucketsInner, overallAvgMs float32) *LatencyTrendResponse {
 	this := LatencyTrendResponse{}
+	this.Range = range_
+	this.Buckets = buckets
+	this.OverallAvgMs = overallAvgMs
 	return &this
 }
 
@@ -42,100 +49,76 @@ func NewLatencyTrendResponseWithDefaults() *LatencyTrendResponse {
 	return &this
 }
 
-// GetRange returns the Range field value if set, zero value otherwise.
+// GetRange returns the Range field value
 func (o *LatencyTrendResponse) GetRange() string {
-	if o == nil || IsNil(o.Range) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Range
+
+	return o.Range
 }
 
-// GetRangeOk returns a tuple with the Range field value if set, nil otherwise
+// GetRangeOk returns a tuple with the Range field value
 // and a boolean to check if the value has been set.
 func (o *LatencyTrendResponse) GetRangeOk() (*string, bool) {
-	if o == nil || IsNil(o.Range) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Range, true
+	return &o.Range, true
 }
 
-// HasRange returns a boolean if a field has been set.
-func (o *LatencyTrendResponse) HasRange() bool {
-	if o != nil && !IsNil(o.Range) {
-		return true
-	}
-
-	return false
-}
-
-// SetRange gets a reference to the given string and assigns it to the Range field.
+// SetRange sets field value
 func (o *LatencyTrendResponse) SetRange(v string) {
-	o.Range = &v
+	o.Range = v
 }
 
-// GetBuckets returns the Buckets field value if set, zero value otherwise.
+// GetBuckets returns the Buckets field value
 func (o *LatencyTrendResponse) GetBuckets() []LatencyTrendResponseBucketsInner {
-	if o == nil || IsNil(o.Buckets) {
+	if o == nil {
 		var ret []LatencyTrendResponseBucketsInner
 		return ret
 	}
+
 	return o.Buckets
 }
 
-// GetBucketsOk returns a tuple with the Buckets field value if set, nil otherwise
+// GetBucketsOk returns a tuple with the Buckets field value
 // and a boolean to check if the value has been set.
 func (o *LatencyTrendResponse) GetBucketsOk() ([]LatencyTrendResponseBucketsInner, bool) {
-	if o == nil || IsNil(o.Buckets) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Buckets, true
 }
 
-// HasBuckets returns a boolean if a field has been set.
-func (o *LatencyTrendResponse) HasBuckets() bool {
-	if o != nil && !IsNil(o.Buckets) {
-		return true
-	}
-
-	return false
-}
-
-// SetBuckets gets a reference to the given []LatencyTrendResponseBucketsInner and assigns it to the Buckets field.
+// SetBuckets sets field value
 func (o *LatencyTrendResponse) SetBuckets(v []LatencyTrendResponseBucketsInner) {
 	o.Buckets = v
 }
 
-// GetOverallAvgMs returns the OverallAvgMs field value if set, zero value otherwise.
+// GetOverallAvgMs returns the OverallAvgMs field value
 func (o *LatencyTrendResponse) GetOverallAvgMs() float32 {
-	if o == nil || IsNil(o.OverallAvgMs) {
+	if o == nil {
 		var ret float32
 		return ret
 	}
-	return *o.OverallAvgMs
+
+	return o.OverallAvgMs
 }
 
-// GetOverallAvgMsOk returns a tuple with the OverallAvgMs field value if set, nil otherwise
+// GetOverallAvgMsOk returns a tuple with the OverallAvgMs field value
 // and a boolean to check if the value has been set.
 func (o *LatencyTrendResponse) GetOverallAvgMsOk() (*float32, bool) {
-	if o == nil || IsNil(o.OverallAvgMs) {
+	if o == nil {
 		return nil, false
 	}
-	return o.OverallAvgMs, true
+	return &o.OverallAvgMs, true
 }
 
-// HasOverallAvgMs returns a boolean if a field has been set.
-func (o *LatencyTrendResponse) HasOverallAvgMs() bool {
-	if o != nil && !IsNil(o.OverallAvgMs) {
-		return true
-	}
-
-	return false
-}
-
-// SetOverallAvgMs gets a reference to the given float32 and assigns it to the OverallAvgMs field.
+// SetOverallAvgMs sets field value
 func (o *LatencyTrendResponse) SetOverallAvgMs(v float32) {
-	o.OverallAvgMs = &v
+	o.OverallAvgMs = v
 }
 
 func (o LatencyTrendResponse) MarshalJSON() ([]byte, error) {
@@ -148,16 +131,49 @@ func (o LatencyTrendResponse) MarshalJSON() ([]byte, error) {
 
 func (o LatencyTrendResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Range) {
-		toSerialize["range"] = o.Range
-	}
-	if !IsNil(o.Buckets) {
-		toSerialize["buckets"] = o.Buckets
-	}
-	if !IsNil(o.OverallAvgMs) {
-		toSerialize["overall_avg_ms"] = o.OverallAvgMs
-	}
+	toSerialize["range"] = o.Range
+	toSerialize["buckets"] = o.Buckets
+	toSerialize["overall_avg_ms"] = o.OverallAvgMs
 	return toSerialize, nil
+}
+
+func (o *LatencyTrendResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"range",
+		"buckets",
+		"overall_avg_ms",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varLatencyTrendResponse := _LatencyTrendResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varLatencyTrendResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = LatencyTrendResponse(varLatencyTrendResponse)
+
+	return err
 }
 
 type NullableLatencyTrendResponse struct {

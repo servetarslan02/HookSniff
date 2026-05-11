@@ -169,7 +169,7 @@ import (
 
 func main() {
 	id := "38400000-8cf0-11bd-b23e-10b96e4ef00d" // string | 
-	updateRoutingRequest := *openapiclient.NewUpdateRoutingRequest() // UpdateRoutingRequest | 
+	updateRoutingRequest := *openapiclient.NewUpdateRoutingRequest("RoutingStrategy_example", "FallbackUrl_example") // UpdateRoutingRequest | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
