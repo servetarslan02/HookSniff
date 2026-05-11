@@ -101,9 +101,9 @@
 57. ⬜ "Admin" badge → "Yönetici" (TÜM sayfalarda)
 
 ### 3.2 Overview Sayfası
-58. ⬜ "Admin Overview" → "Yönetici Genel Bakışı"
-59. ⬜ "Platform-wide metrics and recent activity" → "Platform genelinde metrikler ve son aktivite"
-60. ⬜ "No recent signups" → "Son kayıt yok"
+58. ✅ "Admin Overview" → "Yönetici Genel Bakışı"
+59. ✅ "Platform-wide metrics and recent activity" → "Platform genelinde metrikler ve son aktivite"
+60. ✅ "No recent signups" → "Son kayıt yok"
 61. ⬜ Document title → "HookSniff — Webhook Teslimat Servisi"
 62. ⬜ Contrast fail: empty state text (2.54:1) → `text-gray-500`
 63. ⬜ Contrast fail: subtitle text (2.54:1) → `text-gray-500`
@@ -115,9 +115,9 @@
 69. ⬜ Emoji icon'lar `aria-hidden="true"` ile işaretlenmeli
 
 ### 3.3 Users Sayfası
-70. ⬜ Tablo başlıkları: Email→E-posta, Name→İsim, Status→Durum, Created→Oluşturulma, Actions→İşlemler
-71. ⬜ Butonlar: View→Görüntüle, Plan→Plan Değiştir, Ban→Yasakla
-72. ⬜ Badge'ler: free→Ücretsiz, active→Aktif, business→İş
+70. ✅ Tablo başlıkları: Email→E-posta, Name→İsim, Status→Durum, Created→Oluşturulma, Actions→İşlemler
+71. ✅ Butonlar: View→Görüntüle, Plan→Plan Değiştir, Ban→Yasakla
+72. ✅ Badge'ler: free→Ücretsiz, active→Aktif, business→İş
 73. ⬜ Tarih formatı MM/DD/YYYY → DD.MM.YYYY
 74. ⬜ Zebra renklendirme ekle
 75. ⬜ Hover efekti ekle
@@ -128,15 +128,15 @@
 80. ⬜ Kolon sıralama (sortable) ekle
 
 ### 3.4 Revenue Sayfası
-81. ⬜ "Revenue Dashboard" → "Gelir Paneli"
-82. ⬜ "Financial metrics and revenue breakdown" → "Finansal metrikler ve gelir dağılımı"
-83. ⬜ Grafik X ve Y ekseni etiketlerini ekle
+81. ✅ "Revenue Dashboard" → "Gelir Paneli"
+82. ✅ "Financial metrics and revenue breakdown" → "Finansal metrikler ve gelir dağılımı"
+83. ✅ Grafik X ve Y ekseni etiketlerini ekle
 84. ⬜ Pie chart legend ekle
 85. ⬜ SVG `<title>` ve `<desc>` doldur
 86. ⬜ Mobile responsive düzelt (375px)
 87. ⬜ Sidebar offset mobile'da düzelt
 88. ⬜ Chart container responsive yap
-89. ⬜ Para birimi $ → ₺ (locale-aware)
+89. ✅ Para birimi $ → ₺ (locale-aware)
 90. ⬜ Tarih aralığı seçici ekle
 91. ⬜ Manuel refresh butonu ekle
 92. ⬜ Boş state placeholder grafik/ikon ekle
@@ -144,9 +144,9 @@
 
 ### 3.5 System Sayfası
 94. ⬜ Sağlık kontrolü API'sini düzelt (4 servis "Checking..." takılıyor)
-95. ⬜ "Monitor infrastructure services and system status" → "Altyapı hizmetlerini ve sistem durumunu izleyin"
+95. ✅ "Monitor infrastructure services and system status" → "Altyapı hizmetlerini ve sistem durumunu izleyin"
 96. ⬜ Tarih formatı → `Intl.DateTimeFormat('tr-TR')`
-97. ⬜ Servis rolleri: Database→Veritabanı, Cache→Önbellek, Monitoring→İzleme, Queue→Kuyruk
+97. ✅ Servis rolleri: Database→Veritabanı, Cache→Önbellek, Monitoring→İzleme, Queue→Kuyruk
 98. ⬜ Loading spinner ekle
 99. ⬜ Retry butonu ekle
 100. ⬜ Hata detayı ekle (banner'a)
@@ -155,16 +155,16 @@
 103. ⬜ Uyarı banner'ı layout düzelt
 
 ### 3.6 Settings Sayfası
-104. ⬜ "Settings" → "Ayarlar"
-105. ⬜ "Configure platform-wide defaults and limits" → "Platform genelinde varsayılan ayarları ve limitleri yapılandırın"
-106. ⬜ "Default Plan" → "Varsayılan Plan"
-107. ⬜ "Free" → "Ücretsiz"
-108. ⬜ "Max Endpoints" → "Maks. Uç Nokta"
-109. ⬜ "Max Webhooks/Month" → "Maks. Webhook/Ay"
-110. ⬜ "Rate Limit (req/min)" → "Hız Limiti (istek/dk)"
-111. ⬜ "Retention (days)" → "Süre (gün)"
-112. ⬜ "Max Retry Attempts" → "Maks. Tekrar Deneme Sayısı"
-113. ⬜ "Failed to save settings" → "Ayarlar kaydedilemedi"
+104. ✅ "Settings" → "Ayarlar"
+105. ✅ "Configure platform-wide defaults and limits" → "Platform genelinde varsayılan ayarları ve limitleri yapılandırın"
+106. ✅ "Default Plan" → "Varsayılan Plan"
+107. ✅ "Free" → "Ücretsiz"
+108. ✅ "Max Endpoints" → "Maks. Uç Nokta"
+109. ✅ "Max Webhooks/Month" → "Maks. Webhook/Ay"
+110. ✅ "Rate Limit (req/min)" → "Hız Limiti (istek/dk)"
+111. ✅ "Retention (days)" → "Süre (gün)"
+112. ✅ "Max Retry Attempts" → "Maks. Tekrar Deneme Sayısı"
+113. ✅ "Failed to save settings" → "Ayarlar kaydedilemedi"
 114. ⬜ Toggle'lara `role="switch"` ve `aria-checked` ekle
 115. ⬜ Label'ları `htmlFor` ile input'lara bağla
 116. ⬜ Number input'lara min/max sınırları ekle
@@ -177,9 +177,9 @@
 
 ### 3.7 Admin API & Genel
 123. ⬜ `/admin/settings` endpoint'i backend'de ekle
-124. ⬜ Revenue response format uyumsuzluğunu düzelt
+124. ✅ Revenue response format uyumsuzluğunu düzelt
 125. ⬜ Tablet layout düzelt (sayfa tamamen boş)
-126. ⬜ Heading hierarchy düzelt (2 tane h1)
+126. ✅ Heading hierarchy düzelt (2 tane h1)
 127. ⬜ ARIA landmarks ekle
 128. ⬜ Skip-to-content link'i ekle
 129. ⬜ Border radius inconsistency düzelt
@@ -205,7 +205,7 @@
 141. ⬜ Team member removal no confirmation → `team/page.tsx`
 
 ### 4.3 i18n Eksikler
-142. ⬜ Hardcoded strings in 14+ dashboard pages → Health, Alerts, Rate Limiting, SSO, Audit Log, Custom Domain, Retry Policy, Routing, Schemas, Templates, Portal
+142. 🟡 Hardcoded strings in 14+ dashboard pages (admin pages done) → Health, Alerts, Rate Limiting, SSO, Audit Log, Custom Domain, Retry Policy, Routing, Schemas, Templates, Portal
 143. ⬜ ConfirmDialog hardcoded: "Confirm", "Cancel", "Processing..." → `ConfirmDialog.tsx`
 144. ⬜ EmailVerificationBanner hardcoded → `EmailVerificationBanner.tsx`
 145. ⬜ SdkTabs hardcoded: "Copy", "Copied!" → `SdkTabs.tsx`
@@ -213,7 +213,7 @@
 147. ⬜ Toast messages translated değil → Çeşitli sayfalar
 
 ### 4.4 Component Fixler
-148. ⬜ ConfirmDialog dark mode ekle → `ConfirmDialog.tsx`
+148. ✅ ConfirmDialog dark mode ekle → `ConfirmDialog.tsx`
 149. ⬜ Toast info variant dark mode düzelt → `Toast.tsx`
 150. ⬜ Toast warning type ekle → `Toast.tsx`
 151. ⬜ Toast dismiss button ekle → `Toast.tsx`
@@ -526,6 +526,7 @@
 
 ---
 
-> **Toplam:** 364 madde (340 kalan iş + 5 Servet'in yapması gereken) — 19 madde tamamlandı (2026-05-12)
+> **Toplam:** 364 madde (307 kalan iş + 5 Servet'in yapması gereken) — 52 madde tamamlandı (2026-05-12)
+> **Son güncelleme:** 2026-05-12 03:24 GMT+8 — Oturum 119 (OpenClaw)
 > **Kaynak:** 60+ rapor dosyası + 15 screenshot
 > **Son güncelleme:** 2026-05-12 02:00 GMT+8
