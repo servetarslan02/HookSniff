@@ -145,11 +145,11 @@ export default function TransformsPage() {
 
       {/* Rules list */}
       {!selectedEndpoint ? (
-        <div className="glass-card p-12 text-center text-gray-400 dark:text-slate-500">{t('selectEndpointHint')}</div>
+        <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-400">{t('selectEndpointHint')}</div>
       ) : loading ? (
         <div className="glass-card p-6 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2" /></div>
       ) : rules.length === 0 ? (
-        <div className="glass-card p-12 text-center text-gray-400 dark:text-slate-500">{t('empty')}</div>
+        <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-400">{t('empty')}</div>
       ) : (
         <div className="space-y-3">
           {rules.map((rule) => (
@@ -178,7 +178,7 @@ export default function TransformsPage() {
                     </div>
                   )}
                 </div>
-                <button onClick={() => handleDelete(rule.id)} aria-label={t("deleteTransform")} className="text-gray-400 hover:text-red-600 transition p-2">✕</button>
+                <button onClick={() => handleDelete(rule.id)} aria-label={t("deleteTransform")} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2">✕</button>
               </div>
             </div>
           ))}
