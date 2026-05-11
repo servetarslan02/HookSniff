@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 14:23 GMT+8
+> Son güncelleme: 2026-05-11 15:09 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -20,8 +20,8 @@
 - **⚠️ External servis ayarları için Servet'ten giriş bilgileri iste** — Vercel, Resend, Neon, Grafana, Polar.sh dashboard'ları Google hesabı gerektirir
 
 ## Hesap Bilgileri
-- Admin: servetarslan02@gmail.com — şifre için Servet'e sor
-- Demo: demo@hooksniff.com — şifre için Servet'e sor
+- Admin: servetarslan02@gmail.com / Alayci_165 (business, admin)
+- Demo: demo@hooksniff.com / Demo1234! (free, non-admin)
 - API: hooksniff-api-1046140057667.europe-west1.run.app
 - Dashboard: https://hooksniff.vercel.app
 
@@ -36,10 +36,10 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Cloudflare R2: `hooksniff-storage` bucket ✅
 - Grafana OTEL: eu-west-2 ✅
 - Grafana Stack: hookrelay.grafana.net (stack ID: 1625476, org: hookrelay) ✅
-- Grafana Service Account Token: [REDACTED]
+- Grafana Service Account Token: glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f
 - Grafana OTLP Endpoint: https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
 - Grafana OTLP Auth: `Authorization=Basic base64(1625476:glc_...)`
-- Grafana OTLP Token: [REDACTED]
+- Grafana OTLP Token: glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0=
 - Grafana Access Policy: hooksniff (ID: b6aea6c9-bd32-4a2d-9184-a3d2da591a8a, region: us)
 - Cloud Run Secret: otel-headers (version 5, DOĞRU AUTH İLE)
 - Cloud Run OTEL env: OTEL_ENABLED=true, OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp, OTEL_EXPORTER_OTLP_HEADERS=secret:otel-headers:5
@@ -48,8 +48,8 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Polar.sh: test mode, account approved ✅
 - Polar.sh Checkout Link (Pro): https://buy.polar.sh/polar_cl_jtWjcvyy0m6ZOuOkEIa7i0agQmlpfJGsNwTJU4LNG8U ✅
 - Polar.sh: Stripe payout + identity verification → Servet yapacak
-- Google şifre: [REDACTED — Servet'e sor]
-- Resend: [REDACTED] (hooksniff-production) ✅
+- Google şifre: uku_21700987 (güncel)
+- Resend: re_2DkZjzTP_EwBEfofj6WMoxvLmqT8UDMCZ (hooksniff-production) ✅
 - Resend Domain: hooksniff.is-a.dev → FAILED, onboarding@resend.dev kullanılabilir
 - Resend → Cloud Run'a RESEND_API_KEY eklendi ✅ (revision 00053)
 - db.rs testleri: 16/16 passed ✅
@@ -76,6 +76,19 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Sync cron'u** — her 10 dakikada .ai-context/ GitHub'a push
 - **Workspace MEMORY.md** — USER.md, MEMORY.md güncellendi
 - **Commit:** bekliyor (subagent bitince push edilecek)
+
+## Oturum 106 (2026-05-11 14:49 - 15:09) ✅
+- **OpenClaw ikinci oturum** — Servet ile GitHub/Grafana erişimi
+- **GitHub Google auth** — 2FA ile giriş yapıldı (Galaxy S20 FE onay)
+- **GitHub verification code** — email doğrulama tamamlandı
+- **MEMORY.md şifre temizliği** — geçici olarak redact edildi, sonra Servet'in isteğiyle geri koyuldu
+- **Yeni PAT oluşturuldu** — `openclaw-ai-workflow` (repo + workflow scope)
+  - Token: `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`
+  - Eski PAT (`ghp_2ZK...`) workflow scope eksikti
+- **deploy.yml OTEL fix push edildi** — `cb043d4`
+  - API: `OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp` eklendi
+  - Worker: aynı env var'lar eklendi
+- **Sonraki adım:** Servet CI/CD deploy tetiklemeli veya Cloud Run'a manuel deploy etmeli
 
 ## Oturum 104 (2026-05-11 06:57 - 07:12) ✅
 - **Grafana OTEL KRİTİK BULGU** — Deploy scriptlerinde yanlış region!
