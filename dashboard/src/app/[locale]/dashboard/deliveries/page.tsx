@@ -26,6 +26,7 @@ export default function DeliveriesPage() {
   const [replayTarget, setReplayTarget] = useState<Delivery | null>(null);
   const [replaying, setReplaying] = useState(false);
   const t = useTranslations('deliveries');
+  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchData = useCallback(async () => {
@@ -40,7 +41,7 @@ export default function DeliveriesPage() {
       setDeliveries(data.deliveries);
       setTotal(data.total);
     } catch (err: unknown) {
-      setError(getErrorMessage(err) || 'Failed to load deliveries');
+      setError(getErrorMessage(err) || tc('failedToLoadDeliveries'));
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ export default function DeliveriesPage() {
       toast(t('replaySuccess'), 'success');
       fetchData();
     } catch (err: unknown) {
-      toast(getErrorMessage(err) || 'Replay failed', 'error');
+      toast(getErrorMessage(err) || tc('replayFailed'), 'error');
     } finally {
       setReplaying(false);
       setReplayTarget(null);
