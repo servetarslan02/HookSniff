@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::audit_log;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
@@ -350,6 +351,13 @@ async fn invite_member(
 
     tracing::info!("✅ Invite sent to {} for team {}", req.email, id);
 
+    // Audit log — MEMBER_INVITE
+    {
+        let tid = id.to_string();
+        let _ = audit_log!(pool, customer.id, "MEMBER_INVITE", "team", Some(&tid),
+            serde_json::json!({"email": &req.email, "role": role}));
+    }
+
     // Note: token is NOT returned in response — it's sent via email only
     Ok(Json(serde_json::json!({
         "id": invite.id,
@@ -412,6 +420,14 @@ async fn remove_member(
     }
 
     tracing::info!("✅ Member {} removed from team {}", uid, team_id);
+
+    // Audit log — MEMBER_REMOVE
+    {
+        let tid = team_id.to_string();
+        let _ = audit_log!(pool, customer.id, "MEMBER_REMOVE", "team", Some(&tid),
+            serde_json::json!({"removed_user_id": uid.to_string()}));
+    }
+
     Ok(Json(serde_json::json!({"removed": true})))
 }
 
@@ -456,6 +472,13 @@ async fn change_role(
         uid,
         team_id
     );
+
+    // Audit log — ROLE_CHANGE
+    {
+        let tid = team_id.to_string();
+        let _ = audit_log!(pool, customer.id, "ROLE_CHANGE", "team", Some(&tid),
+            serde_json::json!({"user_id": uid.to_string(), "new_role": &req.role}));
+    }
 
     Ok(Json(serde_json::json!({
         "role": req.role,
