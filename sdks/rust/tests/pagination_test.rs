@@ -9,7 +9,6 @@ fn make_page<T>(data: Vec<T>, has_more: bool) -> Page<T> {
 
 #[test]
 fn test_single_page() {
-    let data = vec![1, 2, 3];
     let mut iter = PaginatedIterator::new(
         |_limit, _offset| Ok(make_page(vec![1, 2, 3], false)),
         10,
@@ -223,14 +222,6 @@ fn test_with_struct_items() {
         id: u32,
         name: String,
     }
-
-    let page = Page {
-        data: vec![
-            Item { id: 1, name: "a".into() },
-            Item { id: 2, name: "b".into() },
-        ],
-        has_more: false,
-    };
 
     let mut iter = PaginatedIterator::new(
         move |_limit, _offset| Ok(Page {
