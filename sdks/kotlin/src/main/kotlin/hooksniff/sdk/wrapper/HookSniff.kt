@@ -12,6 +12,7 @@ import java.time.Duration
  * Usage:
  *   val hs = HookSniff("your-api-key")
  *   val endpoints = hs.endpoints.list()
+ *   val me = hs.auth.me()
  */
 class HookSniff(
     private val apiKey: String,
@@ -21,6 +22,13 @@ class HookSniff(
 ) {
     val endpoints = EndpointsResource(this)
     val webhooks = WebhooksResource(this)
+    val auth = AuthResource(this)
+    val analytics = AnalyticsResource(this)
+    val apiKeys = ApiKeysResource(this)
+    val alerts = AlertsResource(this)
+    val teams = TeamsResource(this)
+    val search = SearchResource(this)
+    val billing = BillingResource(this)
     val health = HealthResource(this)
 
     internal fun get(path: String): String = request("GET", path)
@@ -73,31 +81,4 @@ class HookSniff(
     companion object {
         const val DEFAULT_BASE_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app"
     }
-}
-
-class EndpointsResource(private val client: HookSniff) {
-    fun list(): String = client.get("/v1/endpoints")
-    fun create(body: String): String = client.post("/v1/endpoints", body)
-    fun get(id: String): String = client.get("/v1/endpoints/$id")
-    fun update(id: String, body: String): String = client.put("/v1/endpoints/$id", body)
-    fun delete(id: String): String = client.delete("/v1/endpoints/$id")
-    fun rotateSecret(id: String): String = client.post("/v1/endpoints/$id/rotate-secret")
-}
-
-class WebhooksResource(private val client: HookSniff) {
-    fun send(body: String): String = client.post("/v1/webhooks", body)
-    fun batch(body: String): String = client.post("/v1/webhooks/batch", body)
-    fun list(limit: Int? = null, offset: Int? = null): String {
-        val params = mutableListOf<String>()
-        if (limit != null) params.add("limit=$limit")
-        if (offset != null) params.add("offset=$offset")
-        val query = if (params.isNotEmpty()) "?${params.joinToString("&")}" else ""
-        return client.get("/v1/webhooks$query")
-    }
-    fun get(id: String): String = client.get("/v1/webhooks/$id")
-    fun replay(id: String): String = client.post("/v1/webhooks/$id/replay")
-}
-
-class HealthResource(private val client: HookSniff) {
-    fun check(): String = client.get("/health")
 }
