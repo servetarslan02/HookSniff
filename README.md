@@ -192,8 +192,38 @@ cargo test --test integration
 k6 run tests/load/k6_load_test.js
 ```
 
+## Development
+
+### Quick Start (5 Steps)
+
+```bash
+# 1. Clone
+git clone https://github.com/servetarslan02/HookSniff.git && cd HookSniff
+
+# 2. Environment
+cp .env.example .env.local
+
+# 3. Start services
+docker compose up -d postgres redis
+
+# 4. Migrate + run API
+cd api && sqlx migrate run && cargo run
+
+# 5. Run dashboard
+cd ../dashboard && npm install && npm run dev
+```
+
+API → `http://localhost:3000` | Dashboard → `http://localhost:3001`
+
+📖 **Full developer guide:** [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)  
+🔧 **Troubleshooting:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)  
+📋 **Operations runbook:** [docs/RUNBOOK.md](docs/RUNBOOK.md)
+
 ## Documentation
 
+- [Developer Guide](docs/DEVELOPMENT.md)
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+- [Operations Runbook](docs/RUNBOOK.md)
 - [API Reference](docs/api-reference.md)
 - [Quickstart Guide](docs/quickstart.md)
 - [Architecture](docs/ARCHITECTURE.md)
