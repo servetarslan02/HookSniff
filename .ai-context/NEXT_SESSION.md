@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 17:21 GMT+8
+> Son güncelleme: 2026-05-11 17:27 GMT+8
 
 ---
 
@@ -11,14 +11,14 @@
 - **Çözüm: GCP Cloud Build kullan** — GitHub Actions'a gerek yok
 - **Komut:** `gcloud builds submit --config=cloudbuild.yaml --substitutions=_IMAGE_TAG=latest`
 - **veya:** GCP Console > Cloud Build > Triggers > tetikle
-- `cloudbuild.yaml` zaten repo'da mevcut
+- `cloudbuild.yaml` zaten repo'da mevcut **(Oturum 109: Cloud Run deploy adımı eklendi!)**
+- **⚠️ deploy.yml push edilemedi** — PAT `workflow` scope'u yok. Servet yeni PAT oluşturmalı veya deploy.yml'ı GitHub'da manuel düzenlemeli
 
-### 2. Cloud Run API — Revision 00063 Deploy Edildi ⏳
-- **Durum:** GCP Console üzerinden manuel deploy tetiklendi (Oturum 108)
-- **Önceki sorun:** Son 3 revision (00059/00060/00061) startup timeout ile başarısız olmuştu
-- **OTEL env var'ları doğrulandı:** OTEL_ENABLED=true, endpoint eu-west-2, headers secret mevcut
-- **Beklenen:** Revision 00063 başarılı olursa OTEL verisi akmaya başlayacak
-- **Kontrol:** `curl https://hooksniff-api-1046140057667.europe-west1.run.app/health` → otel objesi var mı?
+### 2. Cloud Run API — Eski Revision Çalışıyor ⏳
+- **Durum:** API sağlıklı ama OTEL health check yok → eski kod çalışıyor
+- **Oturum 109 doğrulama:** `/health` → `status: healthy` ama `otel` objesi YOK
+- **Beklenen:** Yeni deploy ile OTEL health check ve boot test span'ı aktif olacak
+- **Çözüm:** Servet Cloud Build ile deploy etmeli (aşağıya bak)
 
 ### 3. Grafana OTEL — Veri Akışı Kontrol Edilecek ⏳
 - **Durum:** Prometheus up series = 0 (Oturum 108 başında)
