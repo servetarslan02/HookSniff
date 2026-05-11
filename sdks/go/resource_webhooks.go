@@ -1,6 +1,9 @@
 package hooksniff
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
 
 // WebhooksResource manages webhook deliveries.
 type WebhooksResource struct {
@@ -70,9 +73,16 @@ func (r *WebhooksResource) Batch(input WebhookBatchInput) (*BatchOutput, error) 
 }
 
 func (r *WebhooksResource) List(limit, offset int) (*DeliveryListOutput, error) {
+	params := url.Values{}
+	if limit > 0 {
+		params.Set("limit", fmt.Sprintf("%d", limit))
+	}
+	if offset > 0 {
+		params.Set("offset", fmt.Sprintf("%d", offset))
+	}
 	path := "/v1/webhooks"
-	if limit > 0 || offset > 0 {
-		path += fmt.Sprintf("?limit=%d&offset=%d", limit, offset)
+	if len(params) > 0 {
+		path += "?" + params.Encode()
 	}
 	body, err := r.client.doGet(path)
 	if err != nil {

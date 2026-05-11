@@ -1,9 +1,12 @@
 package hooksniff
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
 
 // This file provides a clean wrapper API on top of the generated types.
-// It reuses existing model types and adds convenience methods.
+// It reuses existing model types from model_*.go files.
 
 // AuthResource manages authentication.
 type AuthResource struct {
@@ -59,18 +62,16 @@ type AnalyticsResource struct {
 }
 
 func (r *AnalyticsResource) Trends(since, until string) (map[string]interface{}, error) {
+	params := url.Values{}
+	if since != "" {
+		params.Set("since", since)
+	}
+	if until != "" {
+		params.Set("until", until)
+	}
 	path := "/v1/analytics/deliveries"
-	if since != "" || until != "" {
-		path += "?"
-		if since != "" {
-			path += fmt.Sprintf("since=%s", since)
-		}
-		if until != "" {
-			if since != "" {
-				path += "&"
-			}
-			path += fmt.Sprintf("until=%s", until)
-		}
+	if len(params) > 0 {
+		path += "?" + params.Encode()
 	}
 	body, err := r.client.doGet(path)
 	if err != nil {
@@ -107,16 +108,9 @@ func (r *AnalyticsResource) Latency() (map[string]interface{}, error) {
 	return result, nil
 }
 
-// APIKeysResource wrapper
+// APIKeysResource wrapper — uses generated ApiKeyInfo from model_api_key_info.go
 type APIKeysResource struct {
 	client *Client
-}
-
-type ApiKeyInfo struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"created_at"`
-	ExpiresAt string `json:"expires_at,omitempty"`
 }
 
 type ApiKeyCreateInputWrapper struct {
@@ -157,16 +151,9 @@ func (r *APIKeysResource) Delete(id string) error {
 	return r.client.doDelete("/v1/api-keys/" + id)
 }
 
-// AlertsResource wrapper
+// AlertsResource wrapper — uses generated AlertRule from model_alert_rule.go
 type AlertsResource struct {
 	client *Client
-}
-
-type AlertRule struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Enabled  bool   `json:"enabled"`
-	Endpoint string `json:"endpoint"`
 }
 
 func (r *AlertsResource) ListRules() ([]AlertRule, error) {
@@ -181,15 +168,9 @@ func (r *AlertsResource) ListRules() ([]AlertRule, error) {
 	return result, nil
 }
 
-// TeamsResource wrapper
+// TeamsResource wrapper — uses generated TeamMember from model_team_member.go
 type TeamsResource struct {
 	client *Client
-}
-
-type TeamMember struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
-	Role  string `json:"role"`
 }
 
 func (r *TeamsResource) List() ([]TeamMember, error) {
@@ -213,60 +194,48 @@ func (r *TeamsResource) Remove(memberID string) error {
 	return r.client.doDelete("/v1/teams/members/" + memberID)
 }
 
-// SearchResource wrapper
+// SearchResource wrapper — uses generated SearchResult from model_search_result.go
 type SearchResource struct {
 	client *Client
 }
 
-type SearchResult struct {
-	ID        string `json:"id"`
-	Endpoint  string `json:"endpoint"`
-	Event     string `json:"event"`
-	Status    string `json:"status"`
-	CreatedAt string `json:"created_at"`
-}
-
-func (r *SearchResource) Query(q string, limit int) ([]SearchResult, error) {
-	path := fmt.Sprintf("/v1/search?q=%s", q)
+func (r *SearchResource) Query(q string, limit int) (SearchResult, error) {
+	params := url.Values{}
+	params.Set("q", q)
 	if limit > 0 {
-		path += fmt.Sprintf("&limit=%d", limit)
+		params.Set("limit", fmt.Sprintf("%d", limit))
 	}
+	path := "/v1/search?" + params.Encode()
 	body, err := r.client.doGet(path)
 	if err != nil {
-		return nil, err
+		return SearchResult{}, err
 	}
-	var result []SearchResult
+	var result SearchResult
 	if err := jsonUnmarshal(body, &result); err != nil {
-		return nil, err
+		return SearchResult{}, err
 	}
 	return result, nil
 }
 
-// BillingResource wrapper
+// BillingResource wrapper — uses generated SubscriptionResponse from model_subscription_response.go
 type BillingResource struct {
 	client *Client
-}
-
-type SubscriptionResponse struct {
-	Plan     string `json:"plan"`
-	Status   string `json:"status"`
-	Interval string `json:"interval"`
 }
 
 type PortalOutputWrapper struct {
 	URL string `json:"url"`
 }
 
-func (r *BillingResource) GetPlan() (*SubscriptionResponse, error) {
+func (r *BillingResource) GetPlan() (SubscriptionResponse, error) {
 	body, err := r.client.doGet("/v1/billing/plan")
 	if err != nil {
-		return nil, err
+		return SubscriptionResponse{}, err
 	}
 	var result SubscriptionResponse
 	if err := jsonUnmarshal(body, &result); err != nil {
-		return nil, err
+		return SubscriptionResponse{}, err
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (r *BillingResource) Upgrade(plan string) (*PortalOutputWrapper, error) {
@@ -293,26 +262,19 @@ func (r *BillingResource) Portal() (*PortalOutputWrapper, error) {
 	return &result, nil
 }
 
-// HealthResource wrapper
+// HealthResource wrapper — uses generated StatsResponse from model_stats_response.go
 type HealthResource struct {
 	client *Client
 }
 
-type StatsResponse struct {
-	Status    string `json:"status"`
-	Uptime    int    `json:"uptime"`
-	Version   string `json:"version"`
-	Endpoints int    `json:"endpoints"`
-}
-
-func (r *HealthResource) Check() (*StatsResponse, error) {
+func (r *HealthResource) Check() (StatsResponse, error) {
 	body, err := r.client.doGet("/health")
 	if err != nil {
-		return nil, err
+		return StatsResponse{}, err
 	}
 	var result StatsResponse
 	if err := jsonUnmarshal(body, &result); err != nil {
-		return nil, err
+		return StatsResponse{}, err
 	}
-	return &result, nil
+	return result, nil
 }
