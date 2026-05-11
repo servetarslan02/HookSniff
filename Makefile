@@ -173,6 +173,16 @@ coverage: ## Test coverage report (cargo-tarpaulin)
 	@echo ""
 	@echo "📊 Coverage report: coverage/tarpaulin-report.html"
 
+# ── Benchmarks ──
+
+bench: ## API benchmark'lerini çalıştır
+	@PATH="$$HOME/.cargo/bin:$$PATH" bash scripts/benchmark.sh all
+
+bench-report: ## Benchmark HTML raporu oluştur
+	@PATH="$$HOME/.cargo/bin:$$PATH" bash scripts/benchmark.sh report
+	@echo ""
+	@echo "📊 Rapor: api/target/criterion/report/index.html"
+
 # ═══════════════════════════════════════════════════════════════════
 # Deployment Komutları (Production)
 # ═══════════════════════════════════════════════════════════════════
