@@ -8,6 +8,25 @@
 
 ---
 
+## ⚠️ TEMEL KURALLAR (Her oturumda uygulanacak)
+
+1. **Eksik iş bırakılmayacak** — başlanan iş bitecek, yarım kalmayacak
+2. **Yarım iş yapılmayacak** — compile + test + push olmadan iş bitmiş sayılmaz
+3. **Kolaya kaçılmayacak** — "çabuk bitireyim" diye kaliteden ödün verilmeyecek
+4. **Kusursuz olmazsa düzeltilecek** — test fail ederse veya kalite düşükse, geri dönüp düzeltilecek
+5. **Her dilde aynı standart** — ister Node.js ister Elixir, kalite farkı olmayacak
+6. **Backward compatibility** — mevcut kullanıcılar bozulmayacak
+7. **Test zorunlu** — test olmadan publish yok
+8. **Yanlış bulgu yok** — sorun varsa kanıtla, emin değilsen araştır, tahmin yürütme
+9. **Her oturum sonunda sync** — MEMORY.md + NEXT_SESSION.md güncelle, GitHub'a push et
+10. **Sor, tahmin yürütme** — emin olmadığın konuda Servet'e sor, varsayma
+11. **Tek seferde doğru yap** — "düzeltiriz sonra" yok, ilk seferde doğru çıkacak
+12. **Sadece görsel değil, işlev de tam olacak** — UI yapılıyorsa arkasındaki API/veri akışı da tamamlanacak, görsel güzel ama işlev eksik bırakılmayacak
+13. **Bir dili yapıp diğerini salmayacağız** — başlanan dil bitecek, tüm diller aynı anda tamamlanacak, parça parça bırakılmayacak
+14. **Gerektiğinde agent kullanılacak** — büyük işlerde paralel subagent ile çalışılacak, tek tek yapmak zorunda değiliz
+
+---
+
 ## 📊 Mevcut Durum vs Hedef
 
 | Kriter | Svix | HookSniff (şimdi) | Hedef | Fark |
@@ -264,7 +283,24 @@ openapi-generator-cli generate \
 
 ---
 
-## 📋 Oturum Uygulama Planı (Toplam: 22-30 oturum)
+## 📊 Dil Kapsamı (Karar: 2026-05-11)
+
+**Öncelikli 6 dil (Svix seviyesi hedefi):**
+| # | Dil | Registry | Neden öncelikli |
+|---|-----|----------|-----------------|
+| 1 | Node.js | npm | En yaygın webhook tüketicisi |
+| 2 | Python | PyPI | İkinci en yaygın |
+| 3 | Go | Go modules | DevOps/backend dünyası |
+| 4 | Java | Maven Central | Enterprise |
+| 5 | Ruby | RubyGems | Rails ekosistemi |
+| 6 | C# | NuGet | .NET ekosistemi |
+
+**Lansman sonrası (talep gelince):**
+Kotlin, PHP, Elixir, Swift, Rust — aynı kalıbı uygulayarak genişletilecek
+
+---
+
+## 📋 Oturum Uygulama Planı (Toplam: ~15 oturum — 6 dil)
 
 ### Hafta 1 (5 oturum) — Aşama 1 + Aşama 2 başlangıcı
 | Oturum | Görev | Aşama |
