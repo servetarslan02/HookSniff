@@ -529,11 +529,11 @@ export function SetupChecklist() {
   const { user, token } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const items: ChecklistItem[] = [
-    { id: 'account', label: 'Create account', href: '/dashboard', icon: '👤' },
-    { id: 'apikey', label: 'Get API key', href: '/dashboard/api-keys', icon: '🔑' },
-    { id: 'endpoint', label: 'Create first endpoint', href: '/dashboard/endpoints', icon: '🔗' },
-    { id: 'webhook', label: 'Send first webhook', href: '/dashboard/playground', icon: '🧪' },
-    { id: 'monitor', label: 'Check deliveries', href: '/dashboard/deliveries', icon: '📊' },
+    { id: 'account', label: t('checklistAccount'), href: '/dashboard', icon: '👤' },
+    { id: 'apikey', label: t('checklistApikey'), href: '/dashboard/api-keys', icon: '🔑' },
+    { id: 'endpoint', label: t('checklistEndpoint'), href: '/dashboard/endpoints', icon: '🔗' },
+    { id: 'webhook', label: t('checklistWebhook'), href: '/dashboard/playground', icon: '🧪' },
+    { id: 'monitor', label: t('checklistMonitor'), href: '/dashboard/deliveries', icon: '📊' },
   ];
   const [completed, setCompleted] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(true);
@@ -572,7 +572,7 @@ export function SetupChecklist() {
           <div className="text-lg">🎯</div>
           <div className="text-left">
             <div className="text-sm font-semibold text-gray-900 dark:text-white">{t("setupProgress")}</div>
-            <div className="text-xs text-gray-500 dark:text-slate-400">{completed.length}/{items.length} completed</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">{t('checklistCompleted', { count: completed.length, total: items.length })}</div>
           </div>
         </div>
         <div className="flex items-center gap-3">
