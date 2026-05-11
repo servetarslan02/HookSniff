@@ -153,18 +153,36 @@ async fn main() -> Result<()> {
     let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
 
     // HS-020: Circuit breaker — skip delivery for endpoints with consecutive failures
-    let circuit_breaker =
+    // BUG-023: Persist state to Redis when REDIS_URL is set, survives restarts
+    let circuit_breaker = if let Some(ref redis_url) = cfg.redis_url {
+        circuit_breaker::CircuitBreaker::with_redis(
+            circuit_breaker::CircuitBreakerConfig {
+                failure_threshold: 5,
+                cooldown_secs: 60,
+            },
+            redis_url,
+        )
+        .await
+    } else {
+        tracing::info!("⚡ Circuit breaker: no REDIS_URL, using in-memory only");
         circuit_breaker::CircuitBreaker::new(circuit_breaker::CircuitBreakerConfig {
             failure_threshold: 5,
             cooldown_secs: 60,
-        });
+        })
+    };
 
-    // BUG-024: Throttle manager — per-endpoint rate limiting and backoff
-    let throttle_manager = throttle::ThrottleManager::new(throttle::ThrottleConfig {
-        max_attempts_per_window: 10,
-        window_secs: 60,
-        base_backoff_secs: 5,
-    });
+    // BUG-024: Per-endpoint throttle — prevent overwhelming retrying endpoints
+    // Persists to Redis when available, falls back to in-memory
+    let throttle_manager = if let Some(ref redis_url) = cfg.redis_url {
+        throttle::ThrottleManager::with_redis(
+            throttle::ThrottleConfig::default(),
+            redis_url,
+        )
+        .await
+    } else {
+        tracing::info!("🚦 Throttle: no REDIS_URL, using in-memory only");
+        throttle::ThrottleManager::new(throttle::ThrottleConfig::default())
+    };
 
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
     tracing::info!("🔒 Concurrent delivery limit: 10");
