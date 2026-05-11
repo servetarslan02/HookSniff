@@ -153,7 +153,7 @@
                         <phase>verify</phase>
                         <goals><goal>sign</goal></goals>
                         <configuration>
-                            <keyname>C29025D09732425E</keyname>
+                            <keyname>E1AD09DC951D1FC23917FE3A0ABE364998532534</keyname>
                             <keyserver>keyserver.ubuntu.com</keyserver>
                         </configuration>
                     </execution>
