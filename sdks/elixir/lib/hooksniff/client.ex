@@ -88,7 +88,7 @@ defmodule HookSniff.Client do
 
   defp generate_idempotency_key do
     bytes = :crypto.strong_rand_bytes(16)
-    "auto_" <> Base.encode16(case: :lower, padding: false, binary: bytes)
+    "auto_" <> Base.encode16(bytes, case: :lower, padding: false)
   end
 
   defp do_request_with_retry(method, url, headers, body, retries, timeout, adapter) do

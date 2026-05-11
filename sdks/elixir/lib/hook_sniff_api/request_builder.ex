@@ -103,10 +103,11 @@ defmodule HookSniffAPI.RequestBuilder do
   end
 
   def add_param(request, :headers, key, value) do
+    normalized_key = key |> to_string() |> String.replace("_", "-")
     headers =
       request
       |> Map.get(:headers, [])
-      |> List.keystore(to_string(key), 0, {to_string(key), to_string(value)})
+      |> List.keystore(normalized_key, 0, {normalized_key, to_string(value)})
 
     Map.put(request, :headers, headers)
   end

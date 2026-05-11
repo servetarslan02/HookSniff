@@ -20,6 +20,7 @@ serde_repr = "0.1"
 serde_with = "3"
 
 [features]
+default = ["test-utils"]
 test-utils = []
 
 [dev-dependencies]
