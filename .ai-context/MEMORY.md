@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 17:02 GMT+8
+> Son güncelleme: 2026-05-11 17:21 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -70,6 +70,22 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
+
+## Oturum 108 (2026-05-11 16:52 - 17:21) 🔄
+- **OpenClaw dördüncü oturum** — Servet Grafana OTEL durumunu sordu
+- **API sağlık:** /health 200 OK, DB 23ms, queue 24ms, uptime ~15 dk
+- **Grafana OTEL:** Prometheus up series = 0 → veri akmıyor
+- **Grafana Alerts:** 57 rule tanımlı (7 HookSniff + 50 default), OTEL verisi gelince çalışacak
+- **Grafana Trial:** 20 Mayıs'ta bitiyor (9 gün kaldı)
+- **GCP Console browser ile açıldı** — hooksniff-app projesi, Servet Google girişi yapmış
+- **Cloud Run Edit & Deploy** — OTEL env var'ları zaten doğru:
+  - OTEL_ENABLED=true ✅
+  - OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp ✅
+  - OTEL_EXPORTER_OTLP_HEADERS → hooksniff-otel-headers secret ✅
+- **Revision 00063 deploy edildi** — GCP Console üzerinden manuel deploy
+- **SA key:** Git history'de bulundu (commit 12d1855), ama compromize olmuş → rotate edilmiş, geçersiz
+- **GitHub Actions billing:** Hâlâ dolu, workflow'lar skipped
+- **Sonraki adım:** Deploy tamamlandıktan sonra OTEL veri akışını kontrol et
 
 ## Oturum 107 (2026-05-11 15:47 - ) 🔄
 - **OpenClaw üçüncü oturum** — Servet yeni platform (OpenClaw) ile devam
