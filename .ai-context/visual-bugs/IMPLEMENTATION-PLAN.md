@@ -531,3 +531,15 @@
 > **Son güncelleme:** 2026-05-12 03:24 GMT+8 — Oturum 119 (OpenClaw)
 > **Kaynak:** 60+ rapor dosyası + 15 screenshot
 > **Son güncelleme:** 2026-05-12 02:00 GMT+8
+
+---
+## Oturum 120 Ek Düzeltmeler (2026-05-12 04:29-04:57 GMT+8)
+- ✅ Revenue ₺$ çift para birimi düzeltildi (sed hatası)
+- ✅ 9 dosyada text-gray-400 → text-gray-500 mass contrast fix
+- ✅ Team page: 4 hardcoded string → i18n (createTeam, loadingTeams, noMembers, selectTeam)
+- ✅ Plan select options i18n (free/pro/business → Ücretsiz Plan/Pro Plan/İş Planı)
+- ✅ businessPlan translation key eklendi (en/tr)
+- ✅ search.searchFailed translation key eklendi
+- ✅ Token consistency (search page || undefined)
+- ✅ Revenue error state display eklendi
+- ✅ Users/[id] tc import eklendi
