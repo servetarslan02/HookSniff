@@ -2,6 +2,7 @@
 
 import { clsx } from 'clsx';
 import { useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -19,13 +20,16 @@ export default function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   variant = 'default',
   onConfirm,
   onCancel,
   loading,
 }: ConfirmDialogProps) {
+  const t = useTranslations('common');
+  const tConfirm = confirmLabel ?? t('confirm');
+  const tCancel = cancelLabel ?? t('cancel');
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -110,7 +114,7 @@ export default function ConfirmDialog({
             disabled={loading}
             className="px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
           >
-            {cancelLabel}
+            {tCancel}
           </button>
           <button
             onClick={onConfirm}
@@ -123,7 +127,7 @@ export default function ConfirmDialog({
               loading && 'opacity-60 cursor-not-allowed'
             )}
           >
-            {loading ? 'Processing...' : confirmLabel}
+            {loading ? t('processing') : tConfirm}
           </button>
         </div>
       </div>
