@@ -42,7 +42,7 @@ impl ResendEmailClient {
         Some(Self {
             api_key,
             from_email,
-            client: reqwest::Client::new(),
+            client: crate::http_client::get_client().clone(),
         })
     }
 

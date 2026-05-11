@@ -145,7 +145,7 @@ impl PolarProvider {
     pub fn new(config: PolarConfig) -> Self {
         Self {
             config,
-            client: reqwest::Client::new(),
+            client: crate::http_client::get_client().clone(),
         }
     }
 

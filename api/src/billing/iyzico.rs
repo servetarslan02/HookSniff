@@ -213,7 +213,7 @@ impl IyzicoProvider {
     pub fn new(config: IyzicoConfig) -> Self {
         Self {
             config,
-            client: reqwest::Client::new(),
+            client: crate::http_client::get_client().clone(),
         }
     }
 
