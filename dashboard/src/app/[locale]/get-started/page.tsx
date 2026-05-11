@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
+import Footer from '@/components/Footer';
 
 /* ─── SDK Code Examples ─── */
 
@@ -467,6 +468,7 @@ hooksniff deliveries list --limit 10`}</code>
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

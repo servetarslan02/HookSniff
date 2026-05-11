@@ -1,11 +1,9 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-export const metadata = {
-  title: 'Shopify Webhooks — Setup, Events & Best Practices | HookSniff',
-  description: 'Complete guide to Shopify webhooks. Handle orders, products, customers, and inventory events with HookSniff.',
-};
+import Footer from '@/components/Footer';
 
 export default function ShopifyWebhooksPage() {
   const t = useTranslations('providers');
@@ -91,6 +89,7 @@ export default function ShopifyWebhooksPage() {
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

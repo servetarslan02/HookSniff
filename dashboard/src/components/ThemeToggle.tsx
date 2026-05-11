@@ -1,9 +1,11 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useTheme } from './ThemeProvider';
 
 export function ThemeToggle({ className = '' }: { className?: string }) {
   const { theme, toggle } = useTheme();
+  const t = useTranslations('common');
 
   return (
     <button
@@ -16,7 +18,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
           ? 'bg-brand-600'
           : 'bg-gray-200 hover:bg-gray-300'
       } ${className}`}
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      aria-label={theme === 'dark' ? t('switchToLight') : t('switchToDark')}
     >
       <span
         className={`inline-flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md transition-transform duration-300 ${
