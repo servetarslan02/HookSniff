@@ -1,258 +1,345 @@
-# 🎯 SDK Kalite Yol Haritası — Svix Seviyesi Hedefi
+# 🎯 SDK Kalite Yol Haritası — Svix ile EŞİT Seviye Hedefi
 
-> Oluşturulma: 2026-05-11 21:42 GMT+8
-> Hedef: Tüm SDK'ları Svix ile aynı kalite seviyesine çıkarmak
+> Oluşturulma: 2026-05-11 21:48 GMT+8
+> Hedef: Tüm SDK'ları Svix ile AYNI kalite seviyesine çıkarmak
 > Referans: Svix v1.93.0 SDK'ları (MIT lisans, açık kaynak)
 > Kaynak: https://github.com/svix/svix-webhooks
+> Kural: Eksik nokta kalmayacak
 
 ---
 
-## 📊 Mevcut Durum (2026-05-11)
+## 📊 Mevcut Durum vs Hedef
 
-| Kriter | Svix | HookSniff | Fark |
-|--------|------|-----------|------|
-| Unique model types | 218 | 97 | 2.2x |
-| HTTP library | native fetch + retry | request (deprecated) | 🔴 |
-| Serialization | ✅ _toJsonObject/_fromJsonObject | ❌ Ham JSON | 🔴 |
-| Pagination | ✅ Iterator pattern | ❌ Manuel | 🔴 |
-| Wrapper class | ✅ Svix() | ❌ Yok | 🔴 |
-| İmza doğrulama | ✅ Webhook.verify() | ❌ Yok | 🔴 |
-| User-Agent header | ✅ svix-libs/version | ❌ Yok | 🟡 |
-| Idempotency key | ✅ Built-in | ❌ Yok | 🟡 |
-| Injectable HTTP | ✅ Custom fetch | ❌ Sabit | 🟡 |
-| Timeout | ✅ Configurable | ❌ Sabit | 🟡 |
-| SDK version header | ✅ | ❌ | 🟡 |
-| Retry logic | ✅ Exponential | ✅ Var | 🟢 |
-| Error classes | ✅ ApiException | ✅ HttpError | 🟢 |
-| TypeScript types | ✅ | ✅ | 🟢 |
-| CHANGELOG | ❌ | ❌ | 🟢 |
+| Kriter | Svix | HookSniff (şimdi) | Hedef | Fark |
+|--------|------|-------------------|-------|------|
+| Unique model types | 218 | 97 | **218+** | +121 model |
+| Wrapper class | ✅ Svix() | ❌ | **✅** | Tüm diller |
+| İmza doğrulama | ✅ Webhook.verify() | ❌ | **✅** | Tüm diller |
+| HTTP library | native fetch+retry | request (deprecated) | **node-fetch** | Değiştir |
+| Serialization | ✅ _toJsonObject/_fromJsonObject | ❌ | **✅** | Tüm diller |
+| Deserialization | ✅ _fromJsonObject | ❌ | **✅** | Tüm diller |
+| Pagination | ✅ Iterator pattern | ❌ | **✅** | Tüm diller |
+| User-Agent header | ✅ svix-libs/version | ❌ | **✅** | Tüm diller |
+| SDK version header | ✅ | ❌ | **✅** | Tüm diller |
+| Idempotency key | ✅ Built-in | ❌ | **✅** | Tüm diller |
+| Injectable HTTP | ✅ Custom fetch | ❌ | **✅** | Tüm diller |
+| Timeout | ✅ Configurable | ❌ | **✅** | Tüm diller |
+| Error classes | ✅ ApiException | ✅ HttpError | **✅** | Aynı |
+| Retry logic | ✅ Exponential | ✅ Var | **✅** | Aynı |
+| TypeScript types | ✅ | ✅ | **✅** | Aynı |
+| Unit testler | ✅ CI | ❌ | **✅** | Her dilde 20+ |
+| CHANGELOG | ❌ | ❌ | **✅** | Biz daha iyi |
+| CI/CD | ✅ | ❌ | **✅** | GitHub Actions |
+| Dokümantasyon | ✅ docs.svix.com | ❌ | **✅** | docs.hooksniff.dev |
 
 ---
 
-## 🔴 AŞAMA 1 — Kritik (Hemen yapılmalı)
+## 🔴 AŞAMA 1 — OpenAPI Spec Genişletme (3-5 oturum)
 
-Her madde ayrı oturumda, ayrı commit ile yapılabilir.
+**AMAÇ:** Model sayısını 97'den 218+'ya çıkarmak
 
-### 1.1 Node.js: `request` → `node-fetch` Değişimi
-- **Dosya:** `sdks/node/` tüm API class'ları
-- **Sorun:** `request` library deprecated (2020'den beri)
-- **Çözüm:** `node-fetch` veya native `fetch` (Node 18+)
-- **Etki:** Güvenlik açığı kapanır, modern Node.js uyumluluğu
-- **Zorluk:** Orta — tüm API class'larındaki `request_1` import'u değişecek
-- **Referans:** Svix'in `request.js` dosyası (custom fetch wrapper)
-- **Oturum:** 1 oturum
+Her endpoint için In/Out/Patch/PatchResponse model'leri tanımlanacak.
 
-### 1.2 Wrapper Class Ekleme (Tüm Diller)
-- **Hedef:** `new HookSniff(key)` → `client.endpoints.create()` pattern
-- **Dosya:** Her SDK için yeni `hooksniff.js/ts/py/go/rs` vb.
+### 1.1 Mevcut Endpoint'lerin Model Eksikliklerini Tespit Et (1 oturum)
+- `docs/openapi.yaml`'ı analiz et
+- Her endpoint'in request/response model'lerini kontrol et
+- Eksik Patch, Filter, ListResponse model'lerini listele
+- **Çıktı:** Eksik model listesi (dosya: `.ai-context/sdk/MISSING_MODELS.md`)
+
+### 1.2 Eksik Model'leri Ekle (2-3 oturum)
+- Her endpoint kategorisi için:
+  - `*Request` model (create/update)
+  - `*Response` model (detail)
+  - `*PatchRequest` model (partial update)
+  - `*ListResponse` model (pagination wrapper)
+  - `*Filter` model (arama/filtre parametreleri)
+- **Kategoriler:**
+  - Auth (login, register, 2FA, password reset)
+  - Endpoints (CRUD, health, retry policy, secret rotation)
+  - Webhooks (send, batch, replay, export, attempts)
+  - Billing (subscription, usage, invoices, portal)
+  - Alerts (rules, notifications, conditions)
+  - Analytics (trends, success rate, latency)
+  - Teams (members, invites, roles)
+  - Notifications (preferences, read/unread)
+  - Schemas (register, validate)
+  - Admin (users, system, revenue)
+  - Search (query, filters, results)
+  - Routing (rules, transforms)
+  - Rate Limits (config, usage)
+  - Custom Domains (verify, DNS)
+  - SSO (config, providers)
+  - Templates (list, apply)
+
+### 1.3 SDK'ları Yeniden Üret (1 oturum)
+```bash
+openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g typescript-node \
+  -o sdks/node
+# Her dil için tekrarla
+```
+
+---
+
+## 🟠 AŞAMA 2 — Wrapper Class + İmza Doğrulama (6-8 oturum)
+
+**AMAÇ:** `new HookSniff(key)` → `client.endpoints.create()` pattern
+
+### 2.1 Node.js Referans Implementasyonu (2 oturum)
+- **Dosya:** `sdks/node/src/hooksniff.ts` (yeni)
 - **İçerik:**
-  - Constructor: `new HookSniff(apiKey, options?)`
-  - Servisler: `client.endpoints`, `client.webhooks`, `client.auth` vb.
-  - Her servis ilgili API class'ını wrap eder
-- **Referans:** Svix'in `index.js` → `Svix` class'ı
-- **Diller (sıra):**
-  1. Node.js (TypeScript)
-  2. Python
-  3. Go
-  4. Rust
-  5. Java
-  6. Kotlin
-  7. Ruby
-  8. PHP
-  9. C#
-  10. Elixir
-  11. Swift
-- **Oturum:** Her dil için 1 oturum (11 oturum toplam)
+  ```typescript
+  export class HookSniff {
+    constructor(apiKey: string, options?: { baseUrl?: string; timeout?: number; fetch?: typeof fetch })
+    
+    endpoints: {
+      create(req: CreateEndpointRequest): Promise<Endpoint>
+      get(id: string): Promise<Endpoint>
+      list(): Promise<Endpoint[]>
+      update(id: string, req: UpdateEndpointRequest): Promise<Endpoint>
+      delete(id: string): Promise<void>
+      rotateSecret(id: string): Promise<{ secret: string }>
+      updateRetryPolicy(id: string, policy: RetryPolicy): Promise<Endpoint>
+      getHealth(id: string): Promise<EndpointHealth>
+    }
+    
+    webhooks: {
+      send(req: CreateWebhookRequest): Promise<Delivery>
+      get(id: string): Promise<Delivery>
+      list(options?: { status?: string; page?: number }): Promise<DeliveryList>
+      replay(id: string): Promise<Delivery>
+      batch(req: BatchWebhookRequest): Promise<BatchResponse>
+      attempts(id: string): Promise<DeliveryAttempt[]>
+      export(range?: string): Promise<string>
+    }
+    
+    auth: { ... }
+    alerts: { ... }
+    analytics: { ... }
+    billing: { ... }
+    teams: { ... }
+    notifications: { ... }
+    schemas: { ... }
+    search: { ... }
+    admin: { ... }
+    auditLog: { ... }
+    inbound: { ... }
+    templates: { ... }
+    routing: { ... }
+    rateLimits: { ... }
+    customDomains: { ... }
+    sso: { ... }
+    // ... tüm API grupları
+  }
+  ```
 
-### 1.3 İmza Doğrulama Ekleme (Tüm Diller)
-- **Hedef:** `verifySignature(payload, headers, secret)` fonksiyonu
-- **Algoritma:** HMAC-SHA256 (Standard Webhooks uyumlu)
-- **Header:** `x-hooksniff-signature` veya `svix-id`, `svix-timestamp`, `svix-signature`
-- **Referans:** Svix'in `webhook.js` → `Webhook.verify()`
+### 2.2 Node.js İmza Doğrulama (1 oturum)
+- **Dosya:** `sdks/node/src/webhook.ts` (yeni)
 - **İçerik:**
-  - `verifySignature(payload, signatureHeader, secret)` → boolean
-  - `signPayload(payload, secret)` → signature string
-  - Timing-safe comparison (constant-time)
-  - Timestamp validation (5 dakika tolerance)
-- **Diller (sıra):** Wrapper class ile aynı anda yapılabilir
-- **Oturum:** Wrapper class oturumlarına dahil
+  ```typescript
+  export class Webhook {
+    constructor(secret: string)
+    verify(payload: string | Buffer, headers: Record<string, string>): boolean
+    static sign(payload: string | Buffer, secret: string): string
+  }
+  ```
+- **Algoritma:** HMAC-SHA256
+- **Header formatı:** `v1,<timestamp>,<signature>`
+- **Timestamp validation:** ±5 dakika tolerance
+- **Timing-safe comparison:** `crypto.timingSafeEqual()`
+
+### 2.3 Node.js HTTP Library Değişimi (1 oturum)
+- **Dosya:** Tüm `sdks/node/src/api/*.ts` dosyaları
+- **Değişiklik:** `request` → `node-fetch` veya native `fetch`
+- **User-Agent:** `hooksniff-sdk/0.3.0 (node)`
+- **Timeout:** Configurable, default 30s
+- **Retry:** Exponential backoff (zaten var, modernize et)
+
+### 2.4 Node.js Serialization Katmanı (1 oturum)
+- **Dosya:** Tüm `sdks/node/src/model/*.ts` dosyaları
+- **İçerik:** Her model için:
+  ```typescript
+  static _toJsonObject(obj: Endpoint): Record<string, unknown> { ... }
+  static _fromJsonObject(json: Record<string, unknown>): Endpoint { ... }
+  ```
+
+### 2.5 Node.js Pagination Iterator (1 oturum)
+- **Dosya:** `sdks/node/src/pagination.ts` (yeni)
+- **İçerik:**
+  ```typescript
+  async function* paginate<T>(fetchPage: (page: number) => Promise<{ data: T[]; hasMore: boolean }>): AsyncGenerator<T> {
+    let page = 1;
+    while (true) {
+      const { data, hasMore } = await fetchPage(page);
+      yield* data;
+      if (!hasMore) break;
+      page++;
+    }
+  }
+  ```
+
+### 2.6 Python Wrapper + İmza + Serialization (1 oturum)
+- `sdks/python/hooksniff/client.py` (yeni)
+- `sdks/python/hooksniff/webhook.py` (yeni)
+- Node.js kalıbını Python'a çevir
+
+### 2.7 Go Wrapper + İmza (1 oturum)
+- `sdks/go/hooksniff.go` (yeni)
+- `sdks/go/webhook.go` (yeni)
+
+### 2.8 Rust, Java, Kotlin, Ruby, PHP, C#, Elixir, Swift (批量, 1-2 oturum)
+- Aynı kalıbı tüm dillere kopyala
+- Her dilin idiomlarına uygun hale getir
 
 ---
 
-## 🟡 AŞAMA 2 — Yüksek Kalite (Lansman önce)
+## 🟡 AŞAMA 3 — Kalite ve Güvenilirlik (8-10 oturum)
 
-### 2.1 Serialization/Deserialization Katmanı
-- **Hedef:** Model tipleri için `_toJsonObject()` ve `_fromJsonObject()`
-- **Neden:** Ham JSON yerine tip güvenli dönüşüm
-- **Dosya:** Her model type için serializer
-- **Referans:** Svix model serializer'ları (ör. `EndpointInSerializer`)
-- **Oturum:** 2-3 oturum (tüm diller)
-
-### 2.2 Pagination Iterator Pattern
-- **Hedef:** `for await (const ep of client.endpoints.list())` pattern
-- **Neden:** Kullanıcı manuel page/perPage ile uğraşmamalı
-- **Referans:** Svix'in iterator pattern'i
-- **Metotlar:** `list()`, `listAll()`, `iterate()`
-- **Oturum:** 1-2 oturum
-
-### 2.3 User-Agent Header
-- **Hedef:** `User-Agent: hooksniff-sdk/0.3.0 (node)`
-- **Neden:** Analytics, debugging, version tracking
-- **Dosya:** Her SDK'nın HTTP wrapper'ı
-- **Oturum:** 1 oturum (tüm diller)
-
-### 2.4 Idempotency Key Desteği
-- **Hedef:** `client.webhooks.send(data, { idempotencyKey: 'xxx' })`
-- **Neden:** Duplicate webhook prevention
-- **Header:** `Idempotency-Key` header'ı otomatik ekle
-- **Oturum:** 1 oturum
-
-### 2.5 Injectable HTTP Client
-- **Hedef:** `new HookSniff({ fetch: customFetch })`
-- **Neden:** Test edilebilirlik, custom middleware
-- **Referans:** Svix'in injectable fetch pattern'i
-- **Oturum:** 1 oturum
-
-### 2.6 Configurable Timeout
-- **Hedef:** `new HookSniff({ timeout: 30000 })`
-- **Neden:** Farklı ortamlar farklı timeout gerektirir
-- **Varsayılan:** 30 saniye
-- **Oturum:** 1 oturum
-
----
-
-## 🟢 AŞAMA 3 — Mükemmellik (Lansman sonrası)
-
-### 3.1 Unit Testler (Her SDK)
-- **Hedef:** Her SDK'da en az 20 test
+### 3.1 Unit Testler — Node.js (2 oturum)
+- **Dosya:** `sdks/node/tests/` (yeni klasör)
+- **Test sayısı:** 25+ test
 - **Kapsam:**
-  - Model serialization/deserialization
+  - Wrapper class instantiation
   - API method parametreleri
-  - Error handling
-  - İmza doğrulama
-  - Pagination
-  - Retry logic
+  - Model serialization/deserialization
+  - İmza doğrulama (geçerli/geçersiz/expired)
+  - Pagination iterator
+  - Error handling (401, 404, 429, 500)
   - Timeout behavior
-- **Framework:**
-  - Node.js: Jest
-  - Python: pytest
-  - Go: testing
-  - Rust: #[test]
-  - Java/Kotlin: JUnit
-  - Ruby: RSpec
-  - PHP: PHPUnit
-  - C#: xUnit
-  - Elixir: ExUnit
-  - Swift: XCTest
-- **Oturum:** Her dil için 1-2 oturum (15-20 oturum toplam)
+  - Retry logic
+  - User-Agent header
+  - Idempotency key
 
-### 3.2 Model Sayısını Artırma
-- **Hedef:** 97 → 150+ model type
-- **Neden:** API coverage artmalı
-- **Yöntem:** OpenAPI spec'e yeni endpoint'ler ekle → SDK'ları yeniden üret
-- **Kapsam:**
-  - Webhook event types (daha detaylı)
-  - Error response models
-  - Pagination response models
-  - Filter/search models
-  - Bulk operation models
-- **Oturum:** 2-3 oturum
+### 3.2 Unit Testler — Python (1 oturum)
+- `sdks/python/tests/` — pytest ile 20+ test
 
-### 3.3 CHANGELOG Oluşturma
-- **Hedef:** Her SDK için CHANGELOG.md
-- **Format:** Keep a Changelog standardı
-- **İçerik:** Her versiyon için Added, Changed, Fixed, Removed
-- **Oturum:** 1 oturum
+### 3.3 Unit Testler — Go (1 oturum)
+- `sdks/go/*_test.go` — testing ile 20+ test
 
-### 3.4 CI/CD Pipeline
-- **Hedef:** GitHub Actions ile otomatik test + publish
-- **Workflow:**
-  1. PR → test çalıştır
-  2. Merge → version bump
-  3. Tag → publish to all registries
-- **Not:** GitHub Actions billing sorunu var, alternatif: GCP Cloud Build
-- **Oturum:** 2-3 oturum
+### 3.4 Unit Testler — Rust (1 oturum)
+- `sdks/rust/tests/` — #[test] ile 20+ test
 
-### 3.5 SDK Dokümantasyon Sitesi
-- **Hedef:** `docs.hooksniff.dev/sdk` veya benzeri
-- **İçerik:**
-  - Her dil için Quick Start
-  - API reference
-  - Code examples
-  - Migration guide (eski versiyondan yeniye)
-- **Araç:** Docusaurus veya Mintlify
-- **Oturum:** 3-5 oturum
+### 3.5 Unit Testler — Kalan 7 Dil (2-3 oturum)
+- Java: JUnit, Kotlin: JUnit, Ruby: RSpec, PHP: PHPUnit, C#: xUnit, Elixir: ExUnit, Swift: XCTest
+
+### 3.6 CHANGELOG Oluşturma (1 oturum)
+- Her SDK için `CHANGELOG.md`
+- Format: Keep a Changelog (https://keepachangelog.com/)
+- Mevcut versiyonlar: 0.1.0, 0.2.0, 0.3.0
+
+### 3.7 Eski Versiyon Dokümantasyonu (1 oturum)
+- Migration guide: 0.1.0 → 0.2.0 → 0.3.0
+- Breaking changes listesi
 
 ---
 
-## 📋 Oturum Bazlı Uygulama Planı
+## 🟢 AŞAMA 4 — Operasyonel Mükemmellik (5-7 oturum)
 
-### Kısa Vadeli (5 oturum)
-| Oturum | Görev | Aşama |
-|--------|-------|-------|
-| 1 | Node.js `request` → `node-fetch` | 1.1 |
-| 2 | Node.js wrapper class + imza verify | 1.2 + 1.3 |
-| 3 | Python wrapper class + imza verify | 1.2 + 1.3 |
-| 4 | Go wrapper class + imza verify | 1.2 + 1.3 |
-| 5 | Rust wrapper class + imza verify | 1.2 + 1.3 |
+### 4.1 CI/CD Pipeline (2 oturum)
+- `.github/workflows/sdk-test.yml` — PR'da test
+- `.github/workflows/sdk-publish.yml` — tag'de publish
+- Alternatif: GCP Cloud Build (GitHub Actions billing sorunu)
 
-### Orta Vadeli (10 oturum)
-| Oturum | Görev | Aşama |
-|--------|-------|-------|
-| 6 | Java wrapper class + imza verify | 1.2 + 1.3 |
-| 7 | Kotlin wrapper class + imza verify | 1.2 + 1.3 |
-| 8 | Ruby wrapper class + imza verify | 1.2 + 1.3 |
-| 9 | PHP wrapper class + imza verify | 1.2 + 1.3 |
-| 10 | C# wrapper class + imza verify | 1.2 + 1.3 |
-| 11 | Elixir + Swift wrapper class + imza verify | 1.2 + 1.3 |
-| 12 | Serialization/Deserialization (Node, Python, Go) | 2.1 |
-| 13 | Serialization/Deserialization (kalan 8 dil) | 2.1 |
-| 14 | Pagination iterator (tüm diller) | 2.2 |
-| 15 | User-Agent + Idempotency + Timeout (tüm diller) | 2.3-2.6 |
+### 4.2 Otomatik Versiyon Yönetimi (1 oturum)
+- OpenAPI spec değişince → SDK versiyonu otomatik art
+- Semver: PATCH (fix), MINOR (new endpoint), MAJOR (breaking)
 
-### Uzun Vadeli (lansman sonrası)
-| Oturum | Görev | Aşama |
-|--------|-------|-------|
-| 16-20 | Unit testler (Node, Python, Go, Rust, Java) | 3.1 |
-| 21-25 | Unit testler (kalan 6 dil) | 3.1 |
-| 26 | Model sayısı artırma | 3.2 |
-| 27 | CHANGELOG oluşturma | 3.3 |
-| 28-30 | CI/CD pipeline | 3.4 |
-| 31-35 | SDK dokümantasyon sitesi | 3.5 |
+### 4.3 SDK Dokümantasyon Sitesi (2-3 oturum)
+- Her dil için:
+  - Quick Start
+  - Full API reference
+  - Code examples (her endpoint için)
+  - Migration guide
+  - Error handling guide
+  - İmza doğrulama guide
+- Platform: Docusaurus veya Mintlify
+
+### 4.4 Performance Benchmarking (1 oturum)
+- Her SDK için:
+  - İlk bağlantı süresi
+  - Request/response latency
+  - Memory usage
+  - Bundle size (Node.js, Python)
 
 ---
 
-## 🔧 Teknik Referanslar
+## 📋 Oturum Uygulama Planı (Toplam: 22-30 oturum)
 
-### Svix Kaynak Kodu (MIT Lisans)
-- Node.js SDK: https://github.com/svix/svix-webhooks/tree/main/javascript
-- Python SDK: https://github.com/svix/svix-webhooks/tree/main/python
-- Go SDK: https://github.com/svix/svix-webhooks/tree/main/go
-- Rust SDK: https://github.com/svix/svix-webhooks/tree/main/rust
-- Java SDK: https://github.com/svix/svix-webhooks/tree/main/java
-- Ruby SDK: https://github.com/svix/svix-webhooks/tree/main/ruby
-- C# SDK: https://github.com/svix/svix-webhooks/tree/main/csharp
-- Kotlin SDK: https://github.com/svix/svix-webhooks/tree/main/kotlin
-- Webhook verify: https://github.com/svix/svix-webhooks/blob/main/javascript/src/webhook.ts
+### Hafta 1 (5 oturum) — Aşama 1 + Aşama 2 başlangıcı
+| Oturum | Görev | Aşama |
+|--------|-------|-------|
+| 1 | OpenAPI spec analizi — eksik model listesi | 1.1 |
+| 2 | OpenAPI spec — Auth + Endpoint modelleri | 1.2 |
+| 3 | OpenAPI spec — Webhook + Billing + kalan modeller | 1.2 |
+| 4 | SDK'ları yeniden üret (tüm diller) | 1.3 |
+| 5 | Node.js wrapper class (referans implementasyon) | 2.1 |
 
-### Standard Webhooks Spesifikasyonu
-- https://github.com/standard-webhooks/standard-webhooks
-- HMAC-SHA256 imza formatı
-- `svix-id`, `svix-timestamp`, `svix-signature` header'ları
+### Hafta 2 (5 oturum) — Aşama 2 devam
+| Oturum | Görev | Aşama |
+|--------|-------|-------|
+| 6 | Node.js imza doğrulama + serialization | 2.2 + 2.4 |
+| 7 | Node.js HTTP lib fix + pagination | 2.3 + 2.5 |
+| 8 | Python wrapper + imza + serialization | 2.6 |
+| 9 | Go wrapper + imza | 2.7 |
+| 10 | Rust, Java, Kotlin批量 wrapper | 2.8 |
 
-### OpenAPI Generator
-- https://openapi-generator.tech/
-- HookSniff spec: `docs/openapi.yaml`
-- Config: `openapitools.json`
+### Hafta 3 (5 oturum) — Aşama 2 bitiş + Aşama 3 başlangıcı
+| Oturum | Görev | Aşama |
+|--------|-------|-------|
+| 11 | Ruby, PHP, C#, Elixir, Swift批量 wrapper | 2.8 |
+| 12 | Node.js unit testler | 3.1 |
+| 13 | Python unit testler | 3.2 |
+| 14 | Go unit testler | 3.3 |
+| 15 | Rust unit testler | 3.4 |
+
+### Hafta 4 (5 oturum) — Aşama 3 bitiş + Aşama 4
+| Oturum | Görev | Aşama |
+|--------|-------|-------|
+| 16 | Kalan 7 dil testler (批量) | 3.5 |
+| 17 | CHANGELOG + migration guide | 3.6 + 3.7 |
+| 18 | CI/CD pipeline | 4.1 |
+| 19 | Otomatik versiyon yönetimi | 4.2 |
+| 20 | SDK dokümantasyon sitesi başlangıcı | 4.3 |
+
+### Hafta 5 (2-5 oturum) — Bitiş
+| Oturum | Görev | Aşama |
+|--------|-------|-------|
+| 21 | SDK dokümantasyon sitesi devam | 4.3 |
+| 22 | Performance benchmarking | 4.4 |
+| 23-25 | Buffer — eksik kalan, düzeltme, polish | - |
 
 ---
 
 ## ⚠️ Dikkat Edilecekler
 
-1. **Her SDK ayrı commit** — rollback kolaylığı
+1. **Her oturum sonunda GitHub'a push et** — yarım iş bırakma
 2. **Backward compatibility** — mevcut kullanıcılar bozulmamalı
-3. **Semver** — breaking change = major version bump
+3. **Semver** — breaking change = major version bump (0.3.0 → 1.0.0)
 4. **Test zorunlu** — test olmadan publish yok
-5. **CHANGELOG güncelle** — her değişikliklik kaydedilmeli
+5. **CHANGELOG güncelle** — her değişiklik kaydedilmeli
 6. **Svix kodunu doğrudan kopyalama** — mimariyi örnek al, kodu yaz
 7. **OpenAPI spec önce** — SDK'dan önce spec'i güncelle
+8. **Her dilin idiomlarına uy** — Pythonic, Go-style, Rust-idiomatic vb.
+9. **Bağımlılık minimal tut** — Svix'in 1 bağımlılık standardı
+10. **Publish sonrası smoke test** — her registry'de `install + import` test et
+
+---
+
+## 🔧 Teknik Referanslar
+
+### Svix Kaynak Kodu (MIT Lisans — mimari referans)
+- Node.js: https://github.com/svix/svix-webhooks/tree/main/javascript/src
+- Python: https://github.com/svix/svix-webhooks/tree/main/python/svix
+- Go: https://github.com/svix/svix-webhooks/tree/main/go
+- Rust: https://github.com/svix/svix-webhooks/tree/main/rust/src
+- Webhook verify: https://github.com/svix/svix-webhooks/blob/main/javascript/src/webhook.ts
+
+### Standard Webhooks
+- Spec: https://github.com/standard-webhooks/standard-webhooks
+- HMAC-SHA256, `svix-id`, `svix-timestamp`, `svix-signature` header'ları
+
+### OpenAPI Generator
+- Docs: https://openapi-generator.tech/
+- HookSniff spec: `docs/openapi.yaml`
+- Config: `openapitools.json`
