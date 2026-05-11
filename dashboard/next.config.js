@@ -3,8 +3,12 @@ const createNextIntlPlugin = require('next-intl/plugin');
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
+const path = require('path');
+
 const nextConfig = {
-  output: 'standalone',
+  // output: 'standalone' — REMOVED: Vercel handles its own serverless bundling.
+  // Standalone mode causes missing pages on Vercel due to outputFileTracing issues.
+  outputFileTracingRoot: path.join(__dirname, '..'),
   reactStrictMode: true,
   images: {
     formats: ['image/avif', 'image/webp'],

@@ -1,5 +1,8 @@
 import { useTranslations } from 'next-intl';
 
+// Force SSR — SSG output was missing on Vercel for this page
+export const dynamic = 'force-dynamic';
+
 // Force redeploy — docs/sdks page fix
 const sdks = [
   {
