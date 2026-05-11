@@ -5,39 +5,19 @@
  */
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
+import {
+  WebhookModel,
+  DeliveryModel,
+  DeliveryListModel,
+  BatchModel,
+  type WebhookSendInput,
+  type WebhookBatchInput,
+  type DeliveryOutput,
+  type DeliveryListOutput,
+  type BatchOutput,
+} from "../models";
 
-export interface WebhookSendInput {
-  endpoint_id: string;
-  event: string;
-  data: Record<string, unknown>;
-}
-
-export interface WebhookBatchInput {
-  endpoint_id: string;
-  events: Array<{ event: string; data: Record<string, unknown> }>;
-}
-
-export interface DeliveryOutput {
-  id: string;
-  endpoint_id: string;
-  event: string;
-  status: string;
-  response_code: number;
-  response_body: string;
-  created_at: string;
-  delivered_at: string | null;
-  attempt_count: number;
-}
-
-export interface DeliveryListOutput {
-  data: DeliveryOutput[];
-  has_more: boolean;
-}
-
-export interface BatchOutput {
-  batch_id: string;
-  count: number;
-}
+export type { WebhookSendInput, WebhookBatchInput, DeliveryOutput, DeliveryListOutput, BatchOutput };
 
 export class Webhooks {
   constructor(private readonly ctx: HookSniffRequestContext) {}
@@ -46,16 +26,20 @@ export class Webhooks {
   async send(input: WebhookSendInput, idempotencyKey?: string): Promise<DeliveryOutput> {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks");
     if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    req.setBody(input);
-    return req.send<DeliveryOutput>(this.ctx);
+    req.setBody(WebhookModel._toJsonObject(input));
+    return req.send<DeliveryOutput>(this.ctx, (json) =>
+      DeliveryModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Send batch webhooks */
   async batch(input: WebhookBatchInput, idempotencyKey?: string): Promise<BatchOutput> {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks/batch");
     if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    req.setBody(input);
-    return req.send<BatchOutput>(this.ctx);
+    req.setBody(WebhookModel._toBatchJsonObject(input));
+    return req.send<BatchOutput>(this.ctx, (json) =>
+      BatchModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** List deliveries */
@@ -63,14 +47,18 @@ export class Webhooks {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks");
     if (options?.limit) req.setQueryParams({ limit: options.limit });
     if (options?.offset) req.setQueryParams({ offset: options.offset });
-    return req.send<DeliveryListOutput>(this.ctx);
+    return req.send<DeliveryListOutput>(this.ctx, (json) =>
+      DeliveryListModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Get a specific delivery */
   async get(id: string): Promise<DeliveryOutput> {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks/{id}");
     req.setPathParam("id", id);
-    return req.send<DeliveryOutput>(this.ctx);
+    return req.send<DeliveryOutput>(this.ctx, (json) =>
+      DeliveryModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Replay a delivery */
@@ -78,6 +66,8 @@ export class Webhooks {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks/{id}/replay");
     req.setPathParam("id", id);
     if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    return req.send<DeliveryOutput>(this.ctx);
+    return req.send<DeliveryOutput>(this.ctx, (json) =>
+      DeliveryModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 }

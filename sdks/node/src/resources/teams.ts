@@ -3,13 +3,9 @@
  */
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
+import { TeamMemberModel, type TeamMember } from "../models";
 
-export interface TeamMember {
-  id: string;
-  email: string;
-  role: string;
-  joined_at: string;
-}
+export type { TeamMember };
 
 export class Teams {
   constructor(private readonly ctx: HookSniffRequestContext) {}
@@ -17,7 +13,14 @@ export class Teams {
   /** List team members */
   async list(): Promise<TeamMember[]> {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/teams/members");
-    return req.send<TeamMember[]>(this.ctx);
+    return req.send<TeamMember[]>(this.ctx, (json) => {
+      const arr = Array.isArray(json) ? json : [];
+      return arr.map((item) =>
+        typeof item === "object" && item !== null
+          ? TeamMemberModel._fromJsonObject(item as Record<string, unknown>)
+          : item
+      );
+    });
   }
 
   /** Invite a team member */
