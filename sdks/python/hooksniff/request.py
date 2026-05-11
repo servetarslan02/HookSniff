@@ -24,7 +24,12 @@ class ApiException(Exception):
         self.code = code
         self.body = body
         self.headers = headers or {}
-        super().__init__(f"HookSniff API Error {code}: {json.dumps(body)}")
+        # Safe serialization — body might be a string (non-JSON response)
+        try:
+            body_str = json.dumps(body) if not isinstance(body, str) else body
+        except (TypeError, ValueError):
+            body_str = str(body)
+        super().__init__(f"HookSniff API Error {code}: {body_str}")
 
 
 class HookSniffRequestContext:
@@ -71,7 +76,12 @@ class HookSniffRequest:
         return parser(data) if parser else data
 
     def send_void(self, ctx: HookSniffRequestContext):
-        self._send_with_retry(ctx)
+        response = self._send_with_retry(ctx)
+        # Consume response body to free the connection (matches Node.js behavior)
+        try:
+            response.read()
+        except Exception:
+            pass
 
     def _send_with_retry(self, ctx: HookSniffRequestContext) -> urllib.request.Request:
         url = ctx.base_url + self.path
@@ -103,14 +113,14 @@ class HookSniffRequest:
                 return response
 
             except urllib.error.HTTPError as e:
+                error_body = e.read().decode("utf-8", errors="replace")
+                try:
+                    parsed = json.loads(error_body)
+                except (json.JSONDecodeError, ValueError):
+                    parsed = error_body
                 if e.code < 500:
-                    error_body = e.read().decode("utf-8", errors="replace")
-                    try:
-                        parsed = json.loads(error_body)
-                    except (json.JSONDecodeError, ValueError):
-                        parsed = error_body
                     raise ApiException(e.code, parsed, dict(e.headers)) from e
-                last_error = ApiException(e.code, e.read().decode("utf-8", errors="replace"), dict(e.headers))
+                last_error = ApiException(e.code, parsed, dict(e.headers))
 
             except Exception as e:
                 last_error = e
