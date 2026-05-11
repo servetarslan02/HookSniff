@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-12 02:15 GMT+8
+> Son güncelleme: 2026-05-12 02:20 GMT+8
 
 ---
 
@@ -16,7 +16,7 @@
 | 2.4 | Node.js serialization | ✅ Oturum 116 |
 | 2.5 | Node.js pagination | ✅ Oturum 116 |
 | 2.6 | Python wrapper + imza + serialization | ✅ Oturum 117 |
-| 2.7 | Go wrapper + imza | ❌ Sıradaki |
+| 2.7 | Go wrapper + imza | ✅ Oturum 117 |
 | 2.8 | Kalan diller批量 wrapper | ❌ |
 
 ### AŞAMA 3 — Kalite ve Güvenilirlik (kısmen)
