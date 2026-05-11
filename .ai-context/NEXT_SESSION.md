@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 23:10 GMT+8
+> Son güncelleme: 2026-05-11 23:26 GMT+8
 
 ---
 
@@ -22,6 +22,17 @@
 
 ### Kalan İş: Test Yazımı (Java, Kotlin, PHP, C#, Elixir, Swift)
 Her SDK için `tests/webhook_test` dosyası yazılacak. Algoritma aynı, sadece dil syntax'ı farklı.
+
+## 🔧 Vercel 404 Fix (2026-05-11 23:10 - 23:26) — Oturum 110+ (OpenClaw)
+**Sorun:** docs/api, docs/portal, docs/sdks sayfaları Vercel'de 404 döndürüyor. 11 diğer docs sayfası çalışıyor.
+**Teşhis:** `output: 'standalone'` + outputFileTracingRoot eksik → Vercel build'inde dosya bağımlılık izleme hatası.
+**Yapılan:**
+1. `output: 'standalone'` kaldırıldı (Vercel kendi serverless bundling'ini kullanıyor)
+2. `outputFileTracingRoot: path.join(__dirname, '..')` eklendi (workspace root düzeltildi)
+3. 3 sayfaya `export const dynamic = 'force-dynamic'` eklendi (SSG → SSR fallback)
+4. Root `vercel.json` güncellendi (buildCommand, outputDirectory, framework, rewrites)
+5. Commit: `6331a06e` — push edildi ✅
+**Doğrulama:** Local build başarılı, 210 sayfa üretiliyor. Deploy sonrası Vercel'de kontrol et.
 
 ## 📋 Sonraki Adım: AŞAMA 2.3 — Test Tamamlama + AŞAMA 3 Publish
 
