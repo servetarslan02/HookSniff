@@ -9,7 +9,7 @@ use anyhow::Result;
 use reqwest::Client;
 use tracing::{info, warn};
 
-use crate::signing;
+use hooksniff_common::signing;
 use crate::WebhookMessage;
 
 use super::DeliveryResult;
