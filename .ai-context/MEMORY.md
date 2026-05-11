@@ -1,6 +1,13 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 15:42 GMT+8
+> Son güncelleme: 2026-05-11 15:48 GMT+8
+
+## Çalışma Platformu
+- **OpenClaw** — yeni platform, oturumlar 1 saat
+- **Kalıcı hafıza:** `.ai-context/` GitHub'da, her 10 dakikada otomatik sync
+- **Workspace:** `/root/.openclaw/workspace/HookSniff/` (oturum sonunda silinir)
+- **Oturum başı:** `git pull` → MEMORY.md oku → NEXT_SESSION.md oku → devam et
+- **Oturum sonu:** Değişiklikleri push et, MEMORY.md güncelle
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -63,6 +70,18 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
+
+## Oturum 107 (2026-05-11 15:47 - ) 🔄
+- **OpenClaw üçüncü oturum** — Servet yeni platform (OpenClaw) ile devam
+- **Rust 1.95.0 kuruldu** — cargo check başarılı
+- **Testler:** API 983/983 ✅, Worker 48/48 ✅
+- **Dashboard:** TypeScript 0 hata ✅, ESLint 0 uyarı ✅
+- **API sağlık:** /health 200 OK, DB 3244ms, queue 230ms, 1 pending
+- **OTEL health endpoint:** Kod mevcut ama deploy edilmemiş (eski revision çalışıyor)
+- **GCloud CLI:** Kurulu değil, doğrudan deploy yapılamıyor
+- **SA key:** Bu makinada mevcut değil
+- **Auto-sync cron:** Her 10 dakikada .ai-context/ GitHub'a push (OpenClaw cron)
+- **Workspace dosyaları:** USER.md, IDENTITY.md, BOOTSTRAP.md silindi
 
 ## Oturum 105 (2026-05-11 14:03 - ) 🔄
 - **OpenClaw ilk oturum** — Servet ile tanışma, proje incelendi
