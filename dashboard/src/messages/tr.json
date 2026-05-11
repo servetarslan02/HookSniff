@@ -2230,5 +2230,6 @@
     "pleaseEnter": "Lütfen girin",
     "successfully": "Başarıyla",
     "failedToLoad": "Yüklenemedi"
-  }
+  },
+  "cta": "Webhook teslimatı için HookSniff'e güvenen geliştiricilere katılın."
 }
