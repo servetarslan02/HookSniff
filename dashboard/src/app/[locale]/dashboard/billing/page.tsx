@@ -220,7 +220,7 @@ export default function BillingPage() {
           toast('Invalid checkout URL', 'error');
         }
       } else {
-        toast('Upgrade initiated', 'success');
+        toast(t('upgradeInitiated'), 'success');
       }
     } catch (err: unknown) {
       toast(getErrorMessage(err, tc('unknownError')) || tc('upgradeFailed'), 'error');
@@ -263,7 +263,7 @@ export default function BillingPage() {
               onClick={() => setShowCancelModal(true)}
               className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
             >
-              Cancel Subscription
+              {t('cancelSubscription')}
             </button>
           )}
         </div>

@@ -27,11 +27,11 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-brand-100 dark:border-brand-500/20">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            Live & Operational
+            {t('about.liveOperational')}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t('about.title')}</h1>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Reliable webhook delivery infrastructure built by developers, for developers.
+            {t('about.heroSubtitle')}
           </p>
         </div>
 
@@ -39,12 +39,10 @@ export default function AboutPage() {
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('about.ourMission')}</h2>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-4">
-            Webhooks are the backbone of modern integrations, but building reliable webhook infrastructure is hard. 
-            We built HookSniff to make it simple — send webhooks, we deliver them. If they fail, we retry.
+            {t('about.missionP1')}
           </p>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
-            We believe developers shouldn&apos;t have to pay enterprise prices for reliable webhook delivery. 
-            That&apos;s why HookSniff starts at $0/month with a generous free tier.
+            {t('about.missionP2')}
           </p>
         </div>
 
@@ -53,8 +51,8 @@ export default function AboutPage() {
           {[
             { value: '99.97%', label: t('deliveryRate') },
             { value: '<50ms', label: t('avgLatency') },
-            { value: '11', label: 'SDK Languages' },
-            { value: '$0', label: 'Starting Price' },
+            { value: '11', label: t('about.sdkLanguages') },
+            { value: '$0', label: t('about.startingPrice') },
           ].map(stat => (
             <div key={stat.label} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 text-center">
               <div className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-1">{stat.value}</div>
@@ -67,17 +65,13 @@ export default function AboutPage() {
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('about.ourStory')}</h2>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-4">
-            HookSniff started as a side project in 2026. We were tired of dealing with unreliable webhook deliveries 
-            and expensive third-party services. So we built our own.
+            {t('about.storyP1')}
           </p>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-4">
-            Today, HookSniff handles webhook delivery for developers worldwide, with support for HTTP, WebSocket, 
-            gRPC, and SQS delivery methods. Our infrastructure runs entirely on free-tier services, 
-            keeping costs at $0/month while maintaining enterprise-grade reliability.
+            {t('about.storyP2')}
           </p>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
-            We&apos;re committed to keeping HookSniff affordable and accessible. As we grow, 
-            we&apos;ll continue to offer a generous free tier and transparent pricing.
+            {t('about.storyP3')}
           </p>
         </div>
 
@@ -86,18 +80,18 @@ export default function AboutPage() {
           {[
             {
               icon: '🔒',
-              title: 'Security First',
-              desc: 'HMAC-SHA256 signatures, TLS encryption, and zero-knowledge payload processing.',
+              title: t('about.securityFirst'),
+              desc: t('about.securityFirstDesc'),
             },
             {
               icon: '💰',
-              title: 'Transparent Pricing',
-              desc: 'No hidden fees, no surprise charges. What you see is what you pay.',
+              title: t('about.transparentPricing'),
+              desc: t('about.transparentPricingDesc'),
             },
             {
               icon: '🌍',
-              title: 'Global Infrastructure',
-              desc: 'Deployed in EU (Frankfurt) with CDN coverage worldwide via Cloudflare.',
+              title: t('about.globalInfrastructure'),
+              desc: t('about.globalInfrastructureDesc'),
             },
           ].map(v => (
             <div key={v.title} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
@@ -110,14 +104,14 @@ export default function AboutPage() {
 
         {/* CTA */}
         <div className="text-center bg-gradient-to-r from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Ready to get started?</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{t('about.readyToStart')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-6">{t('cta')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/dashboard" className="bg-brand-600 dark:bg-brand-500 text-white px-8 py-3 rounded-xl font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
-              Start Free
+              {t('about.startFree')}
             </Link>
             <Link href="/contact" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-3 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition">
-              Contact Us
+              {t('about.contactUs')}
             </Link>
           </div>
         </div>
