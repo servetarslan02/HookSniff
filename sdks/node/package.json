@@ -1,6 +1,6 @@
 {
-  "name": "@hooksniff/sdk",
-  "version": "0.2.0",
+  "name": "hooksniff-sdk",
+  "version": "0.3.0",
   "description": "Official Node.js client for HookSniff webhook delivery service",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,12 @@
     "test": "jest --passWithNoTests",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["webhooks", "hooksniff", "sdk", "delivery"],
+  "keywords": [
+    "webhooks",
+    "hooksniff",
+    "sdk",
+    "delivery"
+  ],
   "author": "HookSniff",
   "license": "MIT",
   "engines": {
@@ -24,5 +29,9 @@
     "jest": "^29.0.0",
     "ts-jest": "^29.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@types/request": "^2.48.13",
+    "request": "^2.88.2"
   }
 }
