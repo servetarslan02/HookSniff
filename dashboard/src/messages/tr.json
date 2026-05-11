@@ -717,7 +717,13 @@
     "cloudDeployment": "Bulut Dağıtımı",
     "nginxReverseProxy": "Nginx Ters Proxy",
     "firewall": "Güvenlik Duvarı",
-    "troubleshooting": "Sorun Giderme"
+    "troubleshooting": "Sorun Giderme",
+    "rustSdk": "Rust SDK",
+    "goSdk": "Go SDK",
+    "rubySdk": "Ruby SDK",
+    "phpSdk": "PHP SDK",
+    "elixirSdk": "Elixir SDK",
+    "csharpSdk": "C# SDK"
   },
   "status": {
     "title": "HookSniff Durumu",
