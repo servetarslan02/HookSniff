@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
+import { useToast } from '@/components/Toast';
 import {
   analyticsApi,
   type DeliveryTrendResponse,
@@ -31,6 +32,7 @@ export default function AnalyticsPage() {
   const [trendData, setTrendData] = useState<DeliveryTrendResponse | null>(null);
   const [successRateData, setSuccessRateData] = useState<SuccessRateData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   const t = useTranslations('analytics');
   const tc = useTranslations('common');
 
@@ -44,8 +46,9 @@ export default function AnalyticsPage() {
       ]);
       if (trend) setTrendData(trend);
       if (sr) setSuccessRateData(sr);
-    } catch {
-      // ignore
+      if (!trend && !sr) toast(tc('error'), 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : tc('error'), 'error');
     } finally {
       setLoading(false);
     }

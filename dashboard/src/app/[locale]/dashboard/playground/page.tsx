@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
+import { apiFetch } from '@/lib/api';
 
 const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] as const;
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
@@ -311,21 +312,16 @@ function LiveRequestViewer() {
     // Poll for recent deliveries
     const poll = async () => {
       try {
-        const res = await fetch(`${API_BASE}/webhooks?page=1`, {
-          headers: {}, credentials: 'include' as const,
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const recent = (data.deliveries || []).slice(0, 5).map((d: Record<string, unknown>) => ({
-            id: String(d.id).slice(0, 10),
-            event: String(d.event || 'webhook'),
-            status: String(d.status),
-            time: new Date(String(d.created_at)).toLocaleTimeString(),
-          }));
-          setLiveDeliveries(recent);
-        }
+        const data = await apiFetch<{ deliveries?: Array<Record<string, unknown>> }>('/webhooks?page=1', { token: token || undefined });
+        const recent = (data.deliveries || []).slice(0, 5).map((d) => ({
+          id: String(d.id).slice(0, 10),
+          event: String(d.event || 'webhook'),
+          status: String(d.status),
+          time: new Date(String(d.created_at)).toLocaleTimeString(),
+        }));
+        setLiveDeliveries(recent);
       } catch {
-        // ignore
+        // Live polling — silently retry on next interval
       }
     };
     poll();
@@ -401,7 +397,7 @@ function LiveRequestViewer() {
 
 // ─── Main Playground Page ───
 export default function PlaygroundPage() {
-  const { apiKey } = useAuth();
+  const { apiKey, token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('playground');
   const [method, setMethod] = useState<string>('POST');

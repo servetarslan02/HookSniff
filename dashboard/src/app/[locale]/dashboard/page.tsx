@@ -253,17 +253,19 @@ function ActivityFeed({ token }: { token: string }) {
   const tc = useTranslations("common");
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchDeliveries = useCallback(async () => {
     try {
       const data = await webhooksApi.list(token, { page: 1 });
       setDeliveries(data.deliveries.slice(0, 10));
-    } catch {
-      // ignore
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : tc('error'));
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, tc]);
 
   useEffect(() => {
     fetchDeliveries();
@@ -282,6 +284,8 @@ function ActivityFeed({ token }: { token: string }) {
       </div>
       {loading ? (
         <div className="p-8 text-center text-gray-500 dark:text-slate-400 animate-pulse">{tc('loading')}</div>
+      ) : error ? (
+        <div className="p-8 text-center text-red-500 dark:text-red-400">{error}</div>
       ) : deliveries.length === 0 ? (
         <div className="p-8 text-center text-gray-500 dark:text-slate-400">{t('noActivity')}</div>
       ) : (

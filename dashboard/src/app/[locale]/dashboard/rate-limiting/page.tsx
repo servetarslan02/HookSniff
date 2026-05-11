@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
+import { useToast } from '@/components/Toast';
 
 /* ─── Types ─── */
 interface RateLimitInfo {
@@ -28,6 +29,8 @@ interface RateLimitStats {
 /* ─── Main Page ─── */
 export default function RateLimitingPage() {
   const t = useTranslations('rateLimiting');
+  const tc = useTranslations('common');
+  const { toast } = useToast();
   const { token } = useAuth();
   const [stats, setStats] = useState<RateLimitStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,8 +59,9 @@ export default function RateLimitingPage() {
           })),
         });
       }
-    } catch {
+    } catch (err) {
       setStats(null);
+      toast(err instanceof Error ? err.message : tc('error'), 'error');
     } finally {
       setLoading(false);
     }
