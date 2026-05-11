@@ -302,3 +302,11 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - ✅ **Detaylı değerlendirme** — her iş titizlikle kontrol edilecek
 - ✅ **Parça parça ilerle** — büyük işleri böl, her parçayı doğrula
 - ✅ **Sor** — emin değilsen Servet'e sor, tahmin yürütme
+
+## Grafana OTEL Bulgu (2026-05-11)
+- **Sorun**: Trace'ler Grafana Cloud'a ulaşmıyordu
+- **Kök neden**: `.github/workflows/deploy.yml`'de API ve Worker deploy'larında `OTEL_ENABLED=true` ve `OTEL_EXPORTER_OTLP_ENDPOINT` env var'ları eksikti
+- `gcp-deploy.sh` (manuel script) bunları içeriyordu ama CI/CD workflow'u içermiyordu
+- **Düzeltme**: deploy.yml'a eklendi (commit: c1f6511)
+- **Push başarısız**: GitHub PAT `workflow` scope'u yok
+- **Sonraki adım**: Servet deploy.yml'ı manuel güncelleyecek veya PAT'i yenileyecek. Deploy sonrası Grafana'da `otel_boot_test` span'ı kontrol et
