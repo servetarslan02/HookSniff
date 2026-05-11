@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Tab {
   label: string;
@@ -8,6 +9,7 @@ interface Tab {
 }
 
 export default function SdkTabs({ tabs }: { tabs: Tab[] }) {
+  const t = useTranslations('common');
   const [active, setActive] = useState(0);
   const [copied, setCopied] = useState(false);
 
@@ -38,7 +40,7 @@ export default function SdkTabs({ tabs }: { tabs: Tab[] }) {
           onClick={handleCopy}
           className="mr-2 px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
         >
-          {copied ? '✓ Copied!' : 'Copy'}
+          {copied ? `✓ ${t('copied')}` : t('copy')}
         </button>
       </div>
       <pre className="bg-gray-900 text-green-400 p-4 text-sm font-mono overflow-x-auto m-0">

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 
 export function EmailVerificationBanner() {
+  const t = useTranslations('emailVerification');
   const { user, token } = useAuth();
   const { toast } = useToast();
   const [dismissed, setDismissed] = useState(false);
@@ -35,12 +37,12 @@ export function EmailVerificationBanner() {
         credentials: 'include',
       });
       if (res.ok) {
-        toast('Verification email sent! Check your inbox.', 'success');
+        toast(t('sent'), 'success');
       } else {
-        toast('Failed to send. Try again later.', 'error');
+        toast(t('failed'), 'error');
       }
     } catch {
-      toast('Network error.', 'error');
+      toast(t('networkError'), 'error');
     } finally {
       setSending(false);
     }
@@ -53,10 +55,10 @@ export function EmailVerificationBanner() {
           <span className="text-xl">📧</span>
           <div>
             <div className="text-sm font-medium text-amber-800 dark:text-amber-400">
-              Please verify your email address
+              {t('title')}
             </div>
             <div className="text-xs text-amber-600 dark:text-amber-500">
-              We sent a verification link to <strong>{user.email}</strong>
+              {t('description')} <strong>{user.email}</strong>
             </div>
           </div>
         </div>
@@ -66,7 +68,7 @@ export function EmailVerificationBanner() {
             disabled={sending}
             className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition disabled:opacity-50"
           >
-            {sending ? 'Sending...' : 'Resend'}
+            {sending ? t('sending') : t('resend')}
           </button>
           <button
             onClick={() => setDismissed(true)}
