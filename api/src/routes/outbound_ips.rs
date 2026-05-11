@@ -2,10 +2,11 @@ use axum::routing::get;
 use axum::{Json, Router};
 use chrono::{DateTime, Utc};
 use serde::Serialize;
-use std::sync::OnceLock;
+use std::sync::{LazyLock, RwLock};
 
-/// Cached outbound IPs response, refreshed every hour.
-static CACHED_RESPONSE: OnceLock<CachedOutboundIps> = OnceLock::new();
+/// Cached outbound IPs response, refreshed every 5 minutes.
+static CACHED_RESPONSE: LazyLock<RwLock<CachedOutboundIps>> =
+    LazyLock::new(|| RwLock::new(CachedOutboundIps::load()));
 
 struct CachedOutboundIps {
     response: OutboundIpsResponse,
@@ -21,6 +22,27 @@ struct OutboundIpsResponse {
 /// Default outbound IPs — set OUTBOUND_IPS env var with comma-separated IPs.
 /// Returns empty list when not configured (warning logged at startup).
 const DEFAULT_IPS: &[&str] = &[];
+
+/// Cache TTL in seconds (5 minutes).
+const CACHE_TTL_SECS: i64 = 300;
+
+impl CachedOutboundIps {
+    fn load() -> Self {
+        let response = load_outbound_ips();
+        CachedOutboundIps {
+            response,
+            loaded_at: Utc::now(),
+        }
+    }
+
+    fn get(&mut self) -> OutboundIpsResponse {
+        let age = Utc::now().signed_duration_since(self.loaded_at);
+        if age.num_seconds() >= CACHE_TTL_SECS {
+            *self = Self::load();
+        }
+        self.response.clone()
+    }
+}
 
 fn load_outbound_ips() -> OutboundIpsResponse {
     let ips: Vec<String> = match std::env::var("OUTBOUND_IPS") {
@@ -43,24 +65,6 @@ fn load_outbound_ips() -> OutboundIpsResponse {
     }
 }
 
-fn get_cached_response() -> OutboundIpsResponse {
-    let cached = CACHED_RESPONSE.get_or_init(|| CachedOutboundIps {
-        response: load_outbound_ips(),
-        loaded_at: Utc::now(),
-    });
-
-    // Refresh cache if older than 1 hour
-    let age = Utc::now().signed_duration_since(cached.loaded_at);
-    if age.num_hours() >= 1 {
-        // OnceLock can't be updated, so we just return the cached value.
-        // For production, consider using tokio::sync::RwLock for dynamic refresh.
-        // For now, a restart picks up new env values.
-        return cached.response.clone();
-    }
-
-    cached.response.clone()
-}
-
 pub fn router() -> Router {
     Router::new().route("/", get(get_outbound_ips))
 }
@@ -70,7 +74,10 @@ pub fn router() -> Router {
 /// Returns the list of static IP addresses that HookSniff uses to deliver webhooks.
 /// Enterprise customers use this endpoint to configure firewall/WAF allowlists.
 async fn get_outbound_ips() -> Json<OutboundIpsResponse> {
-    Json(get_cached_response())
+    let mut cached = CACHED_RESPONSE
+        .write()
+        .expect("outbound_ips cache lock poisoned");
+    Json(cached.get())
 }
 
 #[cfg(test)]
@@ -103,5 +110,10 @@ mod tests {
         let resp = load_outbound_ips();
         assert!(resp.ips.is_empty());
         std::env::remove_var("OUTBOUND_IPS");
+    }
+
+    #[test]
+    fn test_cache_ttl_constant() {
+        assert_eq!(CACHE_TTL_SECS, 300, "Cache TTL should be 5 minutes");
     }
 }

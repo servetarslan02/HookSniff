@@ -28,6 +28,9 @@ jsonwebtoken = { version = "10", features = ["rust_crypto"] }
 # rustls 0.23+ requires explicit CryptoProvider — pin 'ring' backend
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "logging"] }
 
+# Redis for state persistence (circuit breaker, throttle)
+redis = { version = "0.28", features = ["tokio-comp", "connection-manager"] }
+
 # OpenTelemetry integration
 opentelemetry = "0.32"
 opentelemetry_sdk = { version = "0.32", features = ["rt-tokio"] }
