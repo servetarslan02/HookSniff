@@ -212,95 +212,106 @@
 
 ## 2.2 Admin Overview Sayfası
 
-| # | Sorun | Durum |
-|---|-------|-------|
-| 2.2.1 | Header "Admin" badge'i İngilizce → "Yönetici" | ⬜ |
-| 2.2.2 | "Admin Overview" → "Yönetici Genel Bakışı" | ⬜ |
-| 2.2.3 | "Platform-wide metrics and recent activity" → "Platform genelinde metrikler ve son aktivite" | ⬜ |
-| 2.2.4 | "No recent signups" → "Son kayıt yok" | ⬜ |
-| 2.2.5 | Document title Türkçe değil → "HookSniff — Webhook Teslimat Servisi" | ⬜ |
-| 2.2.6 | Contrast fail: empty state text `text-gray-400` (2.54:1) — WCAG AA fail | ⬜ |
-| 2.2.7 | Contrast fail: subtitle text `text-gray-400` (2.54:1) | ⬜ |
-| 2.2.8 | Contrast fail: logout butonu `text-gray-400` (2.54:1 light, 3.75:1 dark) | ⬜ |
-| 2.2.9 | Dark mode toggle `type="submit"` → `type="button"` | ⬜ |
-| 2.2.10 | Mobil menü butonu `type="submit"` → `type="button"` | ⬜ |
-| 2.2.11 | SVG icon'larda `aria-label` eksik | ⬜ |
-| 2.2.12 | Emoji icon'lar `aria-hidden="true"` ile işaretlenmeli | ⬜ |
+| # | Sorun | Durum | Kaynak |
+|---|-------|-------|--------|
+| 2.2.1 | Header "Admin" badge'i İngilizce → "Yönetici" | ⬜ | 📸 dark + light screenshot |
+| 2.2.2 | "Admin Overview" → "Yönetici Genel Bakışı" | ⬜ | 📝 rapor |
+| 2.2.3 | "Platform-wide metrics and recent activity" → "Platform genelinde metrikler ve son aktivite" | ⬜ | 📸 light screenshot |
+| 2.2.4 | "No recent signups" → "Son kayıt yok" | ⬜ | 📝 rapor |
+| 2.2.5 | Document title Türkçe değil → "HookSniff — Webhook Teslimat Servisi" | ⬜ | 📝 rapor |
+| 2.2.6 | Contrast fail: empty state text `text-gray-400` (2.54:1) — WCAG AA fail | ⬜ | 📸 dark screenshot |
+| 2.2.7 | Contrast fail: subtitle text `text-gray-400` (2.54:1) | ⬜ | 📸 light screenshot |
+| 2.2.8 | Contrast fail: logout butonu sol altta neredeyse görünmez (2.54:1 light, 3.75:1 dark) | ⬜ | 📸 dark + light screenshot |
+| 2.2.9 | Dark mode toggle `type="submit"` → `type="button"` | ⬜ | 📝 rapor |
+| 2.2.10 | Mobil menü butonu `type="submit"` → `type="button"` | ⬜ | 📝 rapor |
+| 2.2.11 | SVG icon'larda `aria-label` eksik | ⬜ | 📝 rapor |
+| 2.2.12 | Emoji icon'lar `aria-hidden="true"` ile işaretlenmeli | ⬜ | 📝 rapor |
+| 2.2.13 | **"Plana Göre Kullanıcılar" kartı tamamen boş** — sadece başlık + "Veri yok", placeholder grafik yok | ⬜ | 📸 dark screenshot |
+| 2.2.14 | **"Switch to dark mode" butonu İngilizce** (sidebar altı) | ⬜ | 📸 dark screenshot |
 
 ## 2.3 Admin Users Sayfası
 
-| # | Sorun | Durum |
-|---|-------|-------|
-| 2.3.1 | Tablo başlıkları İngilizce: Email, Name, Plan, Status, Created, Actions | ⬜ |
-| 2.3.2 | Butonlar İngilizce: View, Plan, Ban | ⬜ |
-| 2.3.3 | Badge'ler İngilizce: free, active, business | ⬜ |
-| 2.3.4 | Tarih formatı MM/DD/YYYY → DD.MM.YYYY | ⬜ |
-| 2.3.5 | Zebra renklendirme yok — tüm satırlar aynı renk | ⬜ |
-| 2.3.6 | Hover efekti belirsiz | ⬜ |
-| 2.3.7 | `scope="col"` eksik header'larda | ⬜ |
-| 2.3.8 | Arama input label eksik | ⬜ |
-| 2.3.9 | Combobox label eksik | ⬜ |
-| 2.3.10 | Sayfalama eksik | ⬜ |
-| 2.3.11 | Kolon sıralama (sortable) yok | ⬜ |
-| 2.3.12 | Butonlarda ikon yok | ⬜ |
+| # | Sorun | Durum | Kaynak |
+|---|-------|-------|--------|
+| 2.3.1 | Tablo başlıkları İngilizce: ID, Email, Name, Plan, Status, Created, Actions | ⬜ | 📸 screenshot |
+| 2.3.2 | Butonlar İngilizce: View, Plan, Ban | ⬜ | 📸 screenshot |
+| 2.3.3 | Badge'ler İngilizce: free (gri), active (yeşil), business (mavi) | ⬜ | 📸 screenshot |
+| 2.3.4 | Tarih formatı MM/DD/YYYY ("5/10/2026") → DD.MM.YYYY | ⬜ | 📸 screenshot |
+| 2.3.5 | Zebra renklendirme yok — tüm satırlar aynı renk | ⬜ | 📸 screenshot |
+| 2.3.6 | Hover efekti belirsiz | ⬜ | 📝 rapor |
+| 2.3.7 | `scope="col"` eksik header'larda | ⬜ | 📝 rapor |
+| 2.3.8 | Arama input label eksik | ⬜ | 📝 rapor |
+| 2.3.9 | Combobox label eksik | ⬜ | 📝 rapor |
+| 2.3.10 | Sayfalama eksik | ⬜ | 📝 rapor |
+| 2.3.11 | Kolon sıralama (sortable) yok | ⬜ | 📝 rapor |
+| 2.3.12 | Butonlarda ikon yok | ⬜ | 📝 rapor |
+| 2.3.13 | **"Admin" badge'i İngilizce** — users sayfasında da | ⬜ | 📸 screenshot |
 
 ## 2.4 Admin Revenue Sayfası (Puan: 4/10)
 
-| # | Sorun | Durum |
-|---|-------|-------|
-| 2.4.1 | "Revenue Dashboard" → "Gelir Paneli" | ⬜ |
-| 2.4.2 | "Financial metrics and revenue breakdown" → "Finansal metrikler ve gelir dağılımı" | ⬜ |
-| 2.4.3 | Grafik X ve Y ekseni etiketleri tamamen boş | ⬜ |
-| 2.4.4 | Pie chart legend yok | ⬜ |
-| 2.4.5 | SVG `<title>` ve `<desc>` boş — erişilebilirlik | ⬜ |
-| 2.4.6 | **Mobile responsive tamamen bozuk** — 375px'te kartlar taşıyor | ⬜ |
-| 2.4.7 | Sidebar offset mobile'da düzeltilmemiş | ⬜ |
-| 2.4.8 | Chart container 423px sabit genişlik — responsive değil | ⬜ |
-| 2.4.9 | Para birimi `$` → Türkçe locale'de `₺` olmalı | ⬜ |
-| 2.4.10 | Tarih aralığı seçici yok | ⬜ |
-| 2.4.11 | Veri yenileme mekanizması yok (manuel refresh butonu) | ⬜ |
-| 2.4.12 | Boş state için placeholder grafik/ikon yok | ⬜ |
-| 2.4.13 | H1 hierarchy — iki tane h1 var, biri h2 olmalı | ⬜ |
-| 2.4.14 | Alert element boş — kaldırılmalı veya doldurulmalı | ⬜ |
+| # | Sorun | Durum | Kaynak |
+|---|-------|-------|--------|
+| 2.4.1 | "Revenue Dashboard" → "Gelir Paneli" | ⬜ | 📝 rapor |
+| 2.4.2 | "Financial metrics and revenue breakdown" → "Finansal metrikler ve gelir dağılımı" | ⬜ | 📝 rapor |
+| 2.4.3 | **Grafik X ve Y ekseni etiketleri tamamen boş** — çizgi yok, eksen yok | ⬜ | 📸 light + dark desktop screenshot |
+| 2.4.4 | Pie chart legend yok | ⬜ | 📝 rapor |
+| 2.4.5 | SVG `<title>` ve `<desc>` boş — erişilebilirlik | ⬜ | 📝 rapor |
+| 2.4.6 | **Mobile responsive tamamen bozuk** — 375px'te kartlar taşıyor | ⬜ | 📸 mobile screenshot |
+| 2.4.7 | Sidebar offset mobile'da düzeltilmemiş | ⬜ | 📝 rapor |
+| 2.4.8 | Chart container 423px sabit genişlik — responsive değil | ⬜ | 📝 rapor |
+| 2.4.9 | Para birimi `$` → Türkçe locale'de `₺` olmalı | ⬜ | 📝 rapor |
+| 2.4.10 | Tarih aralığı seçici yok | ⬜ | 📝 rapor |
+| 2.4.11 | Veri yenileme mekanizması yok (manuel refresh butonu) | ⬜ | 📝 rapor |
+| 2.4.12 | Boş state için placeholder grafik/ikon yok | ⬜ | 📸 screenshot |
+| 2.4.13 | H1 hierarchy — iki tane h1 var, biri h2 olmalı | ⬜ | 📝 rapor |
+| 2.4.14 | Alert element boş — kaldırılmalı veya doldurulmalı | ⬜ | 📝 rapor |
+| 2.4.15 | **"Admin" badge'i İngilizce** — revenue sayfasında da | ⬜ | 📸 screenshot |
+| 2.4.16 | **"Switch to light mode" butonu İngilizce** (dark mode'da) | ⬜ | 📸 dark screenshot |
+| 2.4.17 | **Grafik dark mode'da da boş** — light/dark fark etmiyor | ⬜ | 📸 dark screenshot |
 
 ## 2.5 Admin System Sayfası
 
-| # | Sorun | Durum |
-|---|-------|-------|
-| 2.5.1 | **Sağlık kontrolü API çalışmıyor** — 4 servis sürekli "Checking..." / "Bilinmiyor" | ⬜ |
-| 2.5.2 | "Monitor infrastructure services and system status" → "Altyapı hizmetlerini ve sistem durumunu izleyin" | ⬜ |
-| 2.5.3 | Tarih formatı İngilizce: `5/10/2026, 4:59:33 PM` → `Intl.DateTimeFormat('tr-TR')` | ⬜ |
-| 2.5.4 | Servis rolleri İngilizce: Database, Cache, Monitoring, Queue → Veritabanı, Önbellek, İzleme, Kuyruk | ⬜ |
-| 2.5.5 | Loading spinner eksik — "Checking..." statik metin | ⬜ |
-| 2.5.6 | Retry butonu yok | ⬜ |
-| 2.5.7 | Hata detayı eksik — banner hangi servisin neden başarısız olduğunu açıklamıyor | ⬜ |
-| 2.5.8 | ARIA live region eksik — durum değişiklikleri screen reader'a bildirilmiyor | ⬜ |
-| 2.5.9 | Altyapı tablosu header eksik (Sağlayıcı, Kapasite, Rol) | ⬜ |
-| 2.5.10 | Renk bağımlı bilgi — sadece renk + metin, renk körlüğü sorunu | ⬜ |
+| # | Sorun | Durum | Kaynak |
+|---|-------|-------|--------|
+| 2.5.1 | **Sağlık kontrolü API çalışmıyor** — 4 servis sürekli "Checking..." / "Bilinmiyor" | ⬜ | 📸 screenshot (refresh sonrası bile) |
+| 2.5.2 | "Monitor infrastructure services and system status" → "Altyapı hizmetlerini ve sistem durumunu izleyin" | ⬜ | 📝 rapor |
+| 2.5.3 | Tarih formatı İngilizce: `5/10/2026, 4:59:33 PM` → `Intl.DateTimeFormat('tr-TR')` | ⬜ | 📝 rapor |
+| 2.5.4 | **Servis rolleri İngilizce: Database, Cache, Monitoring, Queue** → Veritabanı, Önbellek, İzleme, Kuyruk | ⬜ | 📸 screenshot |
+| 2.5.5 | Loading spinner eksik — "Checking..." statik metin | ⬜ | 📸 screenshot |
+| 2.5.6 | Retry butonu yok | ⬜ | 📝 rapor |
+| 2.5.7 | Hata detayı eksik — banner hangi servisin neden başarısız olduğunu açıklamıyor | ⬜ | 📸 screenshot |
+| 2.5.8 | ARIA live region eksik — durum değişiklikleri screen reader'a bildirilmiyor | ⬜ | 📝 rapor |
+| 2.5.9 | Altyapı tablosu header eksik (Sağlayıcı, Kapasite, Rol) | ⬜ | 📸 screenshot |
+| 2.5.10 | Renk bağımlı bilgi — sadece renk + metin, renk körlüğü sorunu | ⬜ | 📝 rapor |
+| 2.5.11 | **"Sistem Sorunları Tespit Edildi" uyarı banner'ı dar, sıkışık layout** | ⬜ | 📸 screenshot |
+| 2.5.12 | **15s auto-refresh sonrası bile hâlâ "Checking..."** — API hiç yanıt vermiyor | ⬜ | 📸 after-refresh screenshot |
+| 2.5.13 | **"Admin" badge'i İngilizce** — system sayfasında da | ⬜ | 📸 screenshot |
 
 ## 2.6 Admin Settings Sayfası
 
-| # | Sorun | Durum |
-|---|-------|-------|
-| 2.6.1 | "Settings" → "Ayarlar" (header) | ⬜ |
-| 2.6.2 | "Configure platform-wide defaults and limits" → "Platform genelinde varsayılan ayarları ve limitleri yapılandırın" | ⬜ |
-| 2.6.3 | "Default Plan" → "Varsayılan Plan" | ⬜ |
-| 2.6.4 | "Free" → "Ücretsiz" (select seçeneği) | ⬜ |
-| 2.6.5 | "Max Endpoints" → "Maks. Uç Nokta" | ⬜ |
-| 2.6.6 | "Max Webhooks/Month" → "Maks. Webhook/Ay" | ⬜ |
-| 2.6.7 | "Rate Limit (req/min)" → "Hız Limiti (istek/dk)" | ⬜ |
-| 2.6.8 | "Retention (days)" → "Süre (gün)" | ⬜ |
-| 2.6.9 | "Max Retry Attempts" → "Maks. Tekrar Deneme Sayısı" | ⬜ |
-| 2.6.10 | "Failed to save settings" → "Ayarlar kaydedilemedi" | ⬜ |
-| 2.6.11 | Toggle'larda `role="switch"` ve `aria-checked` eksik | ⬜ |
-| 2.6.12 | Label'lar `htmlFor` ile input'lara bağlı değil | ⬜ |
-| 2.6.13 | Number input'larda min/max sınırları yok (8 input'tan 7'sinde) | ⬜ |
-| 2.6.14 | Toggle butonları `type="submit"` → `type="button"` | ⬜ |
-| 2.6.15 | Input stilleri tutarsız (`py-2 rounded-lg` vs `py-3 rounded-xl`) | ⬜ |
-| 2.6.16 | Dark mode focus ring stilleri boş | ⬜ |
-| 2.6.17 | Success feedback mekanizması yok | ⬜ |
-| 2.6.18 | Loading state (spinner) yok | ⬜ |
-| 2.6.19 | Zorunlu alan işaretleri (*) yok | ⬜ |
+| # | Sorun | Durum | Kaynak |
+|---|-------|-------|--------|
+| 2.6.1 | "Settings" → "Ayarlar" (header) | ⬜ | 📸 screenshot |
+| 2.6.2 | "Configure platform-wide defaults and limits" → "Platform genelinde varsayılan ayarları ve limitleri yapılandırın" | ⬜ | 📝 rapor |
+| 2.6.3 | "Default Plan" → "Varsayılan Plan" | ⬜ | 📸 screenshot |
+| 2.6.4 | "Free" → "Ücretsiz" (select seçeneği) | ⬜ | 📸 screenshot |
+| 2.6.5 | "Max Endpoints" → "Maks. Uç Nokta" | ⬜ | 📸 screenshot |
+| 2.6.6 | "Max Webhooks/Month" → "Maks. Webhook/Ay" | ⬜ | 📸 screenshot |
+| 2.6.7 | "Rate Limit (req/min)" → "Hız Limiti (istek/dk)" | ⬜ | 📸 screenshot |
+| 2.6.8 | "Retention (days)" → "Süre (gün)" | ⬜ | 📸 screenshot |
+| 2.6.9 | "Max Retry Attempts" → "Maks. Tekrar Deneme Sayısı" | ⬜ | 📸 screenshot |
+| 2.6.10 | **"Failed to save settings" → "Ayarlar kaydedilemedi"** — hata mesajı İngilizce | ⬜ | 📸 error screenshot |
+| 2.6.11 | Toggle'larda `role="switch"` ve `aria-checked` eksik | ⬜ | 📝 rapor |
+| 2.6.12 | Label'lar `htmlFor` ile input'lara bağlı değil | ⬜ | 📝 rapor |
+| 2.6.13 | Number input'larda min/max sınırları yok (8 input'tan 7'sinde) | ⬜ | 📝 rapor |
+| 2.6.14 | Toggle butonları `type="submit"` → `type="button"` | ⬜ | 📝 rapor |
+| 2.6.15 | **Input stilleri tutarsız** — `py-2 rounded-lg` vs `py-3 rounded-xl` | ⬜ | 📸 screenshot |
+| 2.6.16 | Dark mode focus ring stilleri boş | ⬜ | 📝 rapor |
+| 2.6.17 | Success feedback mekanizması yok | ⬜ | 📝 rapor |
+| 2.6.18 | Loading state (spinner) yok | ⬜ | 📝 rapor |
+| 2.6.19 | Zorunlu alan işaretleri (*) yok | ⬜ | 📝 rapor |
+| 2.6.20 | **"Admin" badge'i İngilizce** — settings sayfasında da | ⬜ | 📸 screenshot |
+| 2.6.21 | **Hata banner'ı kırmızı arka plan + beyaz metin** — ✅ görünür ama `role="alert"` eksik | ⬜ | 📸 error screenshot |
 
 ## 2.7 Admin API & Data Flow
 
@@ -312,13 +323,16 @@
 
 ## 2.8 Admin Genel Sorunlar
 
-| # | Sorun | Durum |
-|---|-------|-------|
-| 2.8.1 | Tüm sayfalarda heading hierarchy sorunu — 2 tane h1 | ⬜ |
-| 2.8.2 | ARIA landmarks eksik | ⬜ |
-| 2.8.3 | Skip-to-content link'i yok | ⬜ |
-| 2.8.4 | Border radius inconsistency (input stilleri) | ⬜ |
-| 2.8.5 | Save button color mismatch | ⬜ |
+| # | Sorun | Durum | Kaynak |
+|---|-------|-------|--------|
+| 2.8.1 | Tüm sayfalarda heading hierarchy sorunu — 2 tane h1 | ⬜ | 📝 rapor |
+| 2.8.2 | ARIA landmarks eksik | ⬜ | 📝 rapor |
+| 2.8.3 | Skip-to-content link'i yok | ⬜ | 📝 rapor |
+| 2.8.4 | Border radius inconsistency (input stilleri) | ⬜ | 📝 rapor |
+| 2.8.5 | Save button color mismatch | ⬜ | 📝 rapor |
+| 2.8.6 | **Tablet'te sayfa TAMAMEN BOŞ** — hiçbir content render edilmiyor (overview-tablet-blank.png) | ⬜ | 📸 tablet screenshot |
+| 2.8.7 | **Tablet layout bozuk** — sidebar offset sorunu, içerik hizalanmamış | ⬜ | 📸 tablet screenshot |
+| 2.8.8 | **"Admin" badge'i TÜM sayfalarda İngilizce** — 5/5 sayfada tespit edildi | ⬜ | 📸 tüm screenshot'lar |
 
 ---
 
