@@ -1,20 +1,20 @@
-# OpenapiClient::SystemStatus
+# HookSniff::SystemStatus
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **overall_status** | **String** |  | [optional] |
-| **uptime_30d** | **Float** |  | [optional] |
-| **components** | [**Array&lt;SystemStatusComponentsInner&gt;**](SystemStatusComponentsInner.md) |  | [optional] |
-| **checked_at** | **String** |  | [optional] |
+| **overall_status** | **String** |  |  |
+| **uptime_30d** | **Float** |  |  |
+| **components** | [**Array&lt;SystemStatusComponentsInner&gt;**](SystemStatusComponentsInner.md) |  |  |
+| **checked_at** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SystemStatus.new(
+instance = HookSniff::SystemStatus.new(
   overall_status: null,
   uptime_30d: null,
   components: null,

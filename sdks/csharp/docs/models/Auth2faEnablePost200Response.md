@@ -1,4 +1,4 @@
-# hooksniff.Model.Auth2faEnablePost200Response
+# HookSniff.Model.Auth2faEnablePost200Response
 
 ## Properties
 

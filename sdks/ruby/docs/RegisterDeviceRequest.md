@@ -1,4 +1,4 @@
-# OpenapiClient::RegisterDeviceRequest
+# HookSniff::RegisterDeviceRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::RegisterDeviceRequest.new(
+instance = HookSniff::RegisterDeviceRequest.new(
   token: null,
   platform: null
 )

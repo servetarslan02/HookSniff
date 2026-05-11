@@ -1,4 +1,4 @@
-# OpenapiClient::CustomDomainsApi
+# HookSniff::CustomDomainsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -20,19 +20,19 @@ List custom domains
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomDomainsApi.new
+api_instance = HookSniff::CustomDomainsApi.new
 
 begin
   # List custom domains
   api_instance.custom_domains_get
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_get: #{e}"
 end
 ```
@@ -50,7 +50,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_get_with_http_info: #{e}"
 end
 ```
@@ -83,20 +83,20 @@ Delete custom domain
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomDomainsApi.new
+api_instance = HookSniff::CustomDomainsApi.new
 id = 'id_example' # String | 
 
 begin
   # Delete custom domain
   api_instance.custom_domains_id_delete(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_id_delete: #{e}"
 end
 ```
@@ -114,7 +114,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_id_delete_with_http_info: #{e}"
 end
 ```
@@ -149,20 +149,20 @@ Verify domain ownership
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomDomainsApi.new
+api_instance = HookSniff::CustomDomainsApi.new
 id = 'id_example' # String | 
 
 begin
   # Verify domain ownership
   api_instance.custom_domains_id_verify_post(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_id_verify_post: #{e}"
 end
 ```
@@ -180,7 +180,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_id_verify_post_with_http_info: #{e}"
 end
 ```
@@ -215,22 +215,22 @@ Add custom domain
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomDomainsApi.new
+api_instance = HookSniff::CustomDomainsApi.new
 opts = {
-  custom_domains_post_request: OpenapiClient::CustomDomainsPostRequest.new # CustomDomainsPostRequest | 
+  custom_domains_post_request: HookSniff::CustomDomainsPostRequest.new # CustomDomainsPostRequest | 
 }
 
 begin
   # Add custom domain
   api_instance.custom_domains_post(opts)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_post: #{e}"
 end
 ```
@@ -248,7 +248,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomDomainsApi->custom_domains_post_with_http_info: #{e}"
 end
 ```

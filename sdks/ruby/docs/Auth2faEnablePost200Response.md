@@ -1,4 +1,4 @@
-# OpenapiClient::Auth2faEnablePost200Response
+# HookSniff::Auth2faEnablePost200Response
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::Auth2faEnablePost200Response.new(
+instance = HookSniff::Auth2faEnablePost200Response.new(
   secret: null,
   qr_url: null
 )

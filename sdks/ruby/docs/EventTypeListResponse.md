@@ -1,0 +1,22 @@
+# HookSniff::EventTypeListResponse
+
+## Properties
+
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
+| **data** | [**Array&lt;EventType&gt;**](EventType.md) |  |  |
+| **has_more** | **Boolean** |  |  |
+| **total** | **Integer** |  |  |
+
+## Example
+
+```ruby
+require 'hooksniff'
+
+instance = HookSniff::EventTypeListResponse.new(
+  data: null,
+  has_more: null,
+  total: null
+)
+```
+

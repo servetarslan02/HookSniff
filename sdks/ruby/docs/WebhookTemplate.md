@@ -1,21 +1,21 @@
-# OpenapiClient::WebhookTemplate
+# HookSniff::WebhookTemplate
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **name** | **String** |  | [optional] |
-| **description** | **String** |  | [optional] |
-| **category** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **name** | **String** |  |  |
+| **description** | **String** |  |  |
+| **category** | **String** |  |  |
 | **payload_template** | **Object** |  | [optional] |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::WebhookTemplate.new(
+instance = HookSniff::WebhookTemplate.new(
   id: null,
   name: null,
   description: null,

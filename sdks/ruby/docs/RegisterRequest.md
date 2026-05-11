@@ -1,4 +1,4 @@
-# OpenapiClient::RegisterRequest
+# HookSniff::RegisterRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::RegisterRequest.new(
+instance = HookSniff::RegisterRequest.new(
   email: null,
   password: null,
   name: null

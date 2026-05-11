@@ -1,13 +1,13 @@
-# hooksniff.Model.TeamInvite
+# HookSniff.Model.TeamInvite
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **Guid** |  | [optional] 
-**Email** | **string** |  | [optional] 
-**Role** | **string** |  | [optional] 
-**CreatedAt** | **DateTime** |  | [optional] 
+**Id** | **Guid** |  | 
+**Email** | **string** |  | 
+**Role** | **string** |  | 
+**CreatedAt** | **DateTime** |  | 
 
 [[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
 

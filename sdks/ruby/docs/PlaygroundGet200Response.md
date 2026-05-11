@@ -1,4 +1,4 @@
-# OpenapiClient::PlaygroundGet200Response
+# HookSniff::PlaygroundGet200Response
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::PlaygroundGet200Response.new(
+instance = HookSniff::PlaygroundGet200Response.new(
   endpoints: null,
   sample_payloads: null
 )

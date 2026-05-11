@@ -1,12 +1,12 @@
-# hooksniff.Model.UpdateNotificationPreferences
+# HookSniff.Model.UpdateNotificationPreferences
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EmailOnFailure** | **bool** |  | [optional] 
-**EmailOnDeadLetter** | **bool** |  | [optional] 
-**EmailOnSuccess** | **bool** |  | [optional] 
+**EmailOnFailure** | **bool** |  | 
+**EmailOnDeadLetter** | **bool** |  | 
+**EmailOnSuccess** | **bool** |  | 
 **SlackWebhookUrl** | **string** |  | [optional] 
 **DiscordWebhookUrl** | **string** |  | [optional] 
 **WebhookUrl** | **string** |  | [optional] 

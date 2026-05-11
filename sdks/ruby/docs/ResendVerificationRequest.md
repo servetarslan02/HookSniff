@@ -1,4 +1,4 @@
-# OpenapiClient::ResendVerificationRequest
+# HookSniff::ResendVerificationRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ResendVerificationRequest.new(
+instance = HookSniff::ResendVerificationRequest.new(
   email: null
 )
 ```

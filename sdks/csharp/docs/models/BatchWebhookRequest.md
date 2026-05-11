@@ -1,4 +1,4 @@
-# hooksniff.Model.BatchWebhookRequest
+# HookSniff.Model.BatchWebhookRequest
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# hooksniff.Model.ContactRequest
+# HookSniff.Model.ContactRequest
 
 ## Properties
 

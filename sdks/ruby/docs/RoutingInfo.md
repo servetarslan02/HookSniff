@@ -1,22 +1,22 @@
-# OpenapiClient::RoutingInfo
+# HookSniff::RoutingInfo
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **endpoint_id** | **String** |  | [optional] |
-| **routing_strategy** | **String** |  | [optional] |
+| **endpoint_id** | **String** |  |  |
+| **routing_strategy** | **String** |  |  |
 | **fallback_url** | **String** |  | [optional] |
-| **avg_response_ms** | **Integer** |  | [optional] |
-| **failure_streak** | **Integer** |  | [optional] |
-| **is_healthy** | **Boolean** |  | [optional] |
+| **avg_response_ms** | **Integer** |  |  |
+| **failure_streak** | **Integer** |  |  |
+| **is_healthy** | **Boolean** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::RoutingInfo.new(
+instance = HookSniff::RoutingInfo.new(
   endpoint_id: null,
   routing_strategy: null,
   fallback_url: null,

@@ -1,4 +1,4 @@
-# hooksniff.Model.DeliveryTrendResponseBucketsInner
+# HookSniff.Model.DeliveryTrendResponseBucketsInner
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# hooksniff.Model.AdminRevenueGet200ResponseInner
+# HookSniff.Model.AdminRevenueGet200ResponseInner
 
 ## Properties
 

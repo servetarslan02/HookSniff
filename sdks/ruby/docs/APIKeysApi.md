@@ -1,4 +1,4 @@
-# OpenapiClient::APIKeysApi
+# HookSniff::APIKeysApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -20,20 +20,20 @@ List API keys
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::APIKeysApi.new
+api_instance = HookSniff::APIKeysApi.new
 
 begin
   # List API keys
   result = api_instance.api_keys_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_get: #{e}"
 end
 ```
@@ -51,7 +51,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<ApiKeyInfo>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_get_with_http_info: #{e}"
 end
 ```
@@ -84,20 +84,20 @@ Delete (revoke) an API key
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::APIKeysApi.new
+api_instance = HookSniff::APIKeysApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Delete (revoke) an API key
   api_instance.api_keys_id_delete(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_id_delete: #{e}"
 end
 ```
@@ -115,7 +115,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_id_delete_with_http_info: #{e}"
 end
 ```
@@ -150,21 +150,21 @@ Rotate an API key
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::APIKeysApi.new
+api_instance = HookSniff::APIKeysApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Rotate an API key
   result = api_instance.api_keys_id_rotate_post(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_id_rotate_post: #{e}"
 end
 ```
@@ -182,7 +182,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <CreateApiKeyResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_id_rotate_post_with_http_info: #{e}"
 end
 ```
@@ -217,20 +217,20 @@ Create a new API key
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::APIKeysApi.new
+api_instance = HookSniff::APIKeysApi.new
 
 begin
   # Create a new API key
   result = api_instance.api_keys_post
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_post: #{e}"
 end
 ```
@@ -248,7 +248,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <CreateApiKeyResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling APIKeysApi->api_keys_post_with_http_info: #{e}"
 end
 ```

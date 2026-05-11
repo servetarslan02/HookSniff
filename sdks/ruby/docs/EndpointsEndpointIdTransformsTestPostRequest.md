@@ -1,4 +1,4 @@
-# OpenapiClient::EndpointsEndpointIdTransformsTestPostRequest
+# HookSniff::EndpointsEndpointIdTransformsTestPostRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::EndpointsEndpointIdTransformsTestPostRequest.new(
+instance = HookSniff::EndpointsEndpointIdTransformsTestPostRequest.new(
   payload: null,
   rule_id: null
 )

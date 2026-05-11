@@ -1,4 +1,4 @@
-# hooksniff.Model.ResetPasswordRequest
+# HookSniff.Model.ResetPasswordRequest
 
 ## Properties
 

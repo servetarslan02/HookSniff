@@ -1,21 +1,21 @@
-# OpenapiClient::InvoiceResponse
+# HookSniff::InvoiceResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **amount_cents** | **Integer** |  | [optional] |
-| **currency** | **String** |  | [optional] |
-| **status** | **String** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **id** | **String** |  |  |
+| **amount_cents** | **Integer** |  |  |
+| **currency** | **String** |  |  |
+| **status** | **String** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::InvoiceResponse.new(
+instance = HookSniff::InvoiceResponse.new(
   id: null,
   amount_cents: null,
   currency: null,
