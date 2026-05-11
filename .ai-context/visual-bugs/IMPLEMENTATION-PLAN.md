@@ -200,7 +200,7 @@
 138. ⬜ 401 refresh loop risk — shared refresh promise → `api.ts`
 
 ### 4.2 Team & Permission
-139. ⬜ Owner can demote themselves — guard ekle → `team/page.tsx`
+139. ✅ Owner can demote themselves — guard ekle → `team/page.tsx` ✅ YAPILDI (Oturum 120)
 140. ⬜ No role-based permission checks → `team/page.tsx`
 141. ⬜ Team member removal no confirmation → `team/page.tsx`
 
@@ -220,10 +220,10 @@
 152. ✅ Toast `role="alert"` ekle → zaten mevcut ✅ YAPILDI (önceki oturum)
 153. ⬜ Loading states standardize et (SkeletonCard/LoadingSpinner) → Çeşitli
 154. ⬜ EmptyState component kullan → Çeşitli
-155. ⬜ Raw `fetch()` → `apiFetch()` dönüşümü → Health, API Keys, Search, Audit Log, Custom Domain, SSO, Portal, Playground
-156. ⬜ Billing useRouter wrong module düzelt → `billing/page.tsx`
+155. ✅ Raw `fetch()` → `apiFetch()` dönüşümü → Health ✅, API Keys ✅, Search ✅, Audit Log ⬜, Custom Domain ⬜, SSO ⬜, Portal ⬜, Playground ⬜
+156. ✅ Billing useRouter wrong module düzelt → `billing/page.tsx` ✅ YAPILDI (Oturum 120)
 157. ⬜ `billingApi` duplicate `getInvoices` düzelt → `api.ts`
-158. ⬜ `keyCount` broken pluralization düzelt → `api-keys/page.tsx`
+158. ✅ `keyCount` broken pluralization düzelt → `api-keys/page.tsx` ✅ YAPILDI (Oturum 120) — ICU format
 159. ⬜ `weeklyDigest` state local-only — API'ye gönder → `settings/page.tsx`
 
 ### 4.5 Sidebar İyileştirme

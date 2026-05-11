@@ -175,7 +175,7 @@ export default function ApiReferencePage() {
 
         <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-950 rounded-xl">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{t('errorFormat')}</h3>
-          <pre className="text-sm font-mono text-gray-700 dark:text-slate-300">
+          <pre className="text-sm font-mono text-gray-700 dark:text-slate-300 overflow-x-auto">
 {`{
   "error": {
     "code": "rate_limited",

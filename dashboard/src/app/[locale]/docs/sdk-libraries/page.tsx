@@ -309,7 +309,7 @@ export default function SdksPage() {
           </div>
 
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('installation')}</h3>
-          <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6">
+          <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono mb-6 overflow-x-auto">
             {sdk.install}
           </pre>
 
