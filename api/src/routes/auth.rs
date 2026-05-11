@@ -292,6 +292,7 @@ async fn login(
             &customer.plan,
             &cfg.jwt_secret,
             Duration::minutes(5),
+            customer.is_admin,
         )?;
         let mut headers = HeaderMap::new();
         // Clear any existing auth cookies for partial 2FA response
@@ -318,6 +319,7 @@ async fn login(
         &customer.email,
         &customer.plan,
         &cfg.jwt_secret,
+        customer.is_admin,
     )?;
     let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
@@ -379,6 +381,7 @@ async fn verify_2fa_login(
         &customer.email,
         &customer.plan,
         &cfg.jwt_secret,
+        customer.is_admin,
     )?;
     let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
@@ -681,6 +684,7 @@ async fn refresh_token(
         &customer.email,
         &customer.plan,
         &cfg.jwt_secret,
+        customer.is_admin,
     )?;
     let new_refresh = create_refresh_token(&pool, customer.id).await?;
 

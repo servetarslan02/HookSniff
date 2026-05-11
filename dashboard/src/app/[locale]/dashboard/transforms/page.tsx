@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, transformsApi, type Endpoint, type TransformRule } from '@/lib/api';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function TransformsPage() {
   const t = useTranslations('transforms');
@@ -16,6 +17,7 @@ export default function TransformsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   // New rule form
   const [filterInclude, setFilterInclude] = useState('');
@@ -66,12 +68,17 @@ export default function TransformsPage() {
   };
 
   const handleDelete = async (ruleId: string) => {
-    if (!token || !selectedEndpoint) return;
+    setDeleteTarget(ruleId);
+  };
+
+  const confirmDelete = async () => {
+    if (!token || !selectedEndpoint || !deleteTarget) return;
     try {
-      await transformsApi.delete(token, selectedEndpoint, ruleId);
-      setRules(prev => prev.filter(r => r.id !== ruleId));
+      await transformsApi.delete(token, selectedEndpoint, deleteTarget);
+      setRules(prev => prev.filter(r => r.id !== deleteTarget));
       toast(t('deleted'), 'info');
     } catch { toast(t('deleteFailed'), 'error'); }
+    setDeleteTarget(null);
   };
 
   return (
@@ -177,6 +184,15 @@ export default function TransformsPage() {
           ))}
         </div>
       )}
+      {/* HS-043: Delete confirmation dialog */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={t('deleteTransform')}
+        message={t('deleteConfirm')}
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
