@@ -310,3 +310,10 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - **Düzeltme**: deploy.yml'a eklendi (commit: c1f6511)
 - **Push başarısız**: GitHub PAT `workflow` scope'u yok
 - **Sonraki adım**: Servet deploy.yml'ı manuel güncelleyecek veya PAT'i yenileyecek. Deploy sonrası Grafana'da `otel_boot_test` span'ı kontrol et
+
+### GitHub deploy.yml Düzenleme Denemesi (2026-05-11 13:36-13:58)
+- Browser ile GitHub'a Google auth ile giriş yapıldı
+- Email doğrulama tamamlandı
+- CM6 editörü manipüle edilemedi, find/replace çalışmadı
+- **KALDIĞI YER**: Bir sonraki session'da ya PAT workflow scope ile push et ya da Servet manuel yapsın
+- Local branch `fix/otel-deploy-env-vars` hazır (değişiklikler kayıtlı)
