@@ -201,7 +201,7 @@
 
 ### 4.2 Team & Permission
 139. ✅ Owner can demote themselves — guard ekle → `team/page.tsx` ✅ YAPILDI (Oturum 120)
-140. ⬜ No role-based permission checks → `team/page.tsx`
+140. ✅ Role-based permission checks — canInvite (owner+admin), canRemove (owner+admin), canChangeRole (owner) ✅ → `team/page.tsx`
 141. ✅ Team member removal — ConfirmDialog zaten mevcut, hardcoded stringler i18n yapıldı ✅ YAPILDI (Oturum 122) → `team/page.tsx`
 
 ### 4.3 i18n Eksikler
