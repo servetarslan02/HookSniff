@@ -2,7 +2,7 @@ defmodule HookSniff.MixProject do
   use Mix.Project
 
   @version "0.3.0"
-  @source_url "https://github.com/servetarslan02/hooksniff"
+  @source_url "https://github.com/servetarslan02/HookSniff"
 
   def project do
     [
