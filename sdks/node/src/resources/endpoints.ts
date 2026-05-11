@@ -13,13 +13,14 @@ import {
   type EndpointOutput,
   type EndpointSecretOutput,
 } from "../models";
+import { paginate, collectAll, type PaginationOptions } from "../pagination";
 
 export type { EndpointCreateInput, EndpointUpdateInput, EndpointOutput, EndpointSecretOutput };
 
 export class Endpoints {
   constructor(private readonly ctx: HookSniffRequestContext) {}
 
-  /** List all endpoints */
+  /** List all endpoints (single page) */
   async list(): Promise<EndpointOutput[]> {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints");
     return req.send<EndpointOutput[]>(this.ctx, (json) => {
@@ -30,6 +31,26 @@ export class Endpoints {
           : item
       );
     });
+  }
+
+  /** Iterate through all endpoints with automatic pagination */
+  listAll(options?: PaginationOptions): AsyncGenerator<EndpointOutput, void, undefined> {
+    return paginate(async ({ limit, offset }) => {
+      const req = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints");
+      req.setQueryParams({ limit, offset });
+      const page = await req.send<{ data: EndpointOutput[]; has_more: boolean }>(this.ctx, (json) => {
+        const obj = json as Record<string, unknown>;
+        const data = Array.isArray(obj.data)
+          ? obj.data.map((item) =>
+              typeof item === "object" && item !== null
+                ? EndpointModel._fromJsonObject(item as Record<string, unknown>)
+                : item
+            )
+          : [];
+        return { data, has_more: Boolean(obj.has_more ?? false) };
+      });
+      return page;
+    }, options);
   }
 
   /** Create a new endpoint */

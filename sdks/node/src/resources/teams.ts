@@ -4,6 +4,7 @@
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
 import { TeamMemberModel, type TeamMember } from "../models";
+import { paginate, collectAll, type PaginationOptions } from "../pagination";
 
 export type { TeamMember };
 
@@ -21,6 +22,25 @@ export class Teams {
           : item
       );
     });
+  }
+
+  /** Iterate through all team members with automatic pagination */
+  listAll(options?: PaginationOptions): AsyncGenerator<TeamMember, void, undefined> {
+    return paginate(async ({ limit, offset }) => {
+      const req = new HookSniffRequest(HttpMethod.GET, "/v1/teams/members");
+      req.setQueryParams({ limit, offset });
+      return req.send<{ data: TeamMember[]; has_more: boolean }>(this.ctx, (json) => {
+        const obj = json as Record<string, unknown>;
+        const data = Array.isArray(obj.data)
+          ? obj.data.map((item) =>
+              typeof item === "object" && item !== null
+                ? TeamMemberModel._fromJsonObject(item as Record<string, unknown>)
+                : item
+            )
+          : [];
+        return { data, has_more: Boolean(obj.has_more ?? false) };
+      });
+    }, options);
   }
 
   /** Invite a team member */
