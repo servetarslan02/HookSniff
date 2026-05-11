@@ -17,6 +17,7 @@ pub fn router() -> Router {
         .route("/stats", get(system_stats))
         .route("/revenue", get(revenue_by_month))
         .route("/sdk-update", post(notify_sdk_update))
+        .route("/settings", get(get_settings).put(update_settings))
 }
 
 #[derive(Debug, Deserialize)]
@@ -250,7 +251,7 @@ async fn get_user_detail(
     .ok_or(AppError::NotFound)?;
 
     let endpoints = sqlx::query_as::<_, EndpointSummary>(
-        "SELECT id, url, description, is_active FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC",
+        "SELECT id, url, description, is_active FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
     .bind(id)
     .fetch_all(&pool)
@@ -578,6 +579,95 @@ async fn notify_sdk_update(
         "message": format!("Notification sent to {} admin(s)", count),
         "title": title,
         "updates_count": req.updates.len(),
+    })))
+}
+
+
+
+// ─────────────────────────────────────────────────────────
+// Platform Settings
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PlatformSettings {
+    pub default_plan: String,
+    pub max_endpoints_free: i32,
+    pub max_endpoints_pro: i32,
+    pub max_webhooks_free: i32,
+    pub max_webhooks_pro: i32,
+    pub rate_limit_free: i32,
+    pub rate_limit_pro: i32,
+    pub retry_max_attempts: i32,
+    pub retention_days_free: i32,
+    pub retention_days_pro: i32,
+    pub maintenance_mode: bool,
+    pub signup_enabled: bool,
+}
+
+impl Default for PlatformSettings {
+    fn default() -> Self {
+        Self {
+            default_plan: "free".into(),
+            max_endpoints_free: 5,
+            max_endpoints_pro: 50,
+            max_webhooks_free: 1000,
+            max_webhooks_pro: 50000,
+            rate_limit_free: 100,
+            rate_limit_pro: 1000,
+            retry_max_attempts: 3,
+            retention_days_free: 7,
+            retention_days_pro: 30,
+            maintenance_mode: false,
+            signup_enabled: true,
+        }
+    }
+}
+
+/// GET /v1/admin/settings — Get platform settings
+async fn get_settings(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<PlatformSettings>, AppError> {
+    require_admin(&customer)?;
+
+    let row: Option<(serde_json::Value,)> =
+        sqlx::query_as("SELECT value FROM platform_settings WHERE key = 'main'")
+            .fetch_optional(&pool)
+            .await?;
+
+    if let Some((value,)) = row {
+        if let Ok(settings) = serde_json::from_value::<PlatformSettings>(value) {
+            return Ok(Json(settings));
+        }
+    }
+
+    Ok(Json(PlatformSettings::default()))
+}
+
+/// PUT /v1/admin/settings — Update platform settings
+async fn update_settings(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(settings): Json<PlatformSettings>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    let value = serde_json::to_value(&settings)
+        .map_err(|e| AppError::BadRequest(format!("Invalid settings: {}", e)))?;
+
+    sqlx::query(
+        r#"INSERT INTO platform_settings (key, value, updated_at)
+           VALUES ('main', $1, NOW())
+           ON CONFLICT (key) DO UPDATE SET value = $1, updated_at = NOW()"#,
+    )
+    .bind(value)
+    .execute(&pool)
+    .await?;
+
+    tracing::info!("✅ Admin updated platform settings");
+
+    Ok(Json(serde_json::json!({
+        "message": "Settings updated",
     })))
 }
 

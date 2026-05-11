@@ -57,7 +57,7 @@ export default function ApiKeysPage() {
       setKeyName('');
       fetchKeys();
     } catch (e: unknown) {
-      setError(getErrorMessage(e));
+      setError(getErrorMessage(e, tc('unknownError')));
     } finally {
       setCreating(false);
     }
@@ -72,7 +72,7 @@ export default function ApiKeysPage() {
       });
       setKeys((prev) => prev.filter((k) => k.id !== id));
     } catch (e: unknown) {
-      setError(getErrorMessage(e));
+      setError(getErrorMessage(e, tc('unknownError')));
     } finally {
       setActionLoading(null);
       setDeleteTarget(null);
@@ -89,7 +89,7 @@ export default function ApiKeysPage() {
       setNewKey(data.key);
       fetchKeys();
     } catch (e: unknown) {
-      setError(getErrorMessage(e));
+      setError(getErrorMessage(e, tc('unknownError')));
     } finally {
       setActionLoading(null);
       setRotateTarget(null);
