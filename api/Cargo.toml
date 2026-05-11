@@ -14,6 +14,9 @@ anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
+# Shared crate
+hooksniff-common = { path = "../common" }
+
 # OpenTelemetry integration
 opentelemetry = "0.32"
 opentelemetry_sdk = { version = "0.32", features = ["rt-tokio"] }
