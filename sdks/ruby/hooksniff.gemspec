@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.description = "Ruby SDK for the HookSniff webhook delivery platform. Provides API client, webhook sending, delivery management, and signature verification."
   s.authors     = ["HookSniff"]
   s.email       = ["support@hooksniff.dev"]
-  s.homepage    = "https://github.com/hooksniff/hooksniff-ruby"
+  s.homepage    = "https://github.com/servetarslan02/HookSniff"
   s.license     = "MIT"
 
   s.required_ruby_version = ">= 2.7.0"
