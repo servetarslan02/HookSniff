@@ -1,3 +1,4 @@
+use crate::audit_event;
 use axum::extract::{Extension, Path};
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
@@ -124,7 +125,7 @@ async fn create_endpoint(
     // Audit log — ENDPOINT_CREATE
     {
         let eid = endpoint.id.to_string();
-        let _ = hooksniff_audit_event!(pool, customer.id, "ENDPOINT_CREATE", "endpoint", Some(&eid));
+        let _ = audit_event!(pool, customer.id, "ENDPOINT_CREATE", "endpoint", Some(&eid));
     }
 
     Ok(Json(endpoint.to_response()))
@@ -164,7 +165,7 @@ async fn delete_endpoint(
     // Audit log — ENDPOINT_DELETE
     {
         let eid = id.to_string();
-        let _ = hooksniff_audit_event!(pool, customer.id, "ENDPOINT_DELETE", "endpoint", Some(&eid));
+        let _ = audit_event!(pool, customer.id, "ENDPOINT_DELETE", "endpoint", Some(&eid));
     }
 
     Ok(Json(serde_json::json!({"deleted": true})))
@@ -275,7 +276,7 @@ async fn update_endpoint(
     // Audit log — ENDPOINT_UPDATE
     {
         let eid = endpoint.id.to_string();
-        let _ = hooksniff_audit_event!(pool, customer.id, "ENDPOINT_UPDATE", "endpoint", Some(&eid));
+        let _ = audit_event!(pool, customer.id, "ENDPOINT_UPDATE", "endpoint", Some(&eid));
     }
 
     Ok(Json(endpoint.to_response()))

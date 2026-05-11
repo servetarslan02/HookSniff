@@ -93,6 +93,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
+                aria-current={isActive ? "page" : undefined}
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
                   isActive
@@ -109,6 +110,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/admin"
               onClick={() => setSidebarOpen(false)}
+              aria-current={cleanPath.startsWith('/admin') ? "page" : undefined}
               className={clsx(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
                 cleanPath.startsWith('/admin')
@@ -136,6 +138,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               onClick={() => setSidebarOpen(true)}
               className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
               aria-label={t("openSidebar")}
+              aria-expanded={sidebarOpen}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
