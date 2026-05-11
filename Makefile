@@ -24,6 +24,23 @@ stop: ## Tüm servisleri durdur
 	docker compose down
 	@echo "⏹️  Durduruldu"
 
+# ── SDK Testler ──
+
+test: ## Tüm SDK testlerini çalıştır
+	@bash run-tests.sh all
+
+test-go: ## Go SDK testleri
+	@bash run-tests.sh go
+
+test-rust: ## Rust SDK testleri
+	@bash run-tests.sh rust
+
+test-node: ## Node.js SDK testleri
+	@bash run-tests.sh node
+
+test-python: ## Python SDK testleri
+	@bash run-tests.sh python
+
 restart: ## Yeniden başlat
 	docker compose restart
 	@echo "🔄 Yeniden başlatıldı"
