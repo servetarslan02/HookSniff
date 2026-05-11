@@ -38,7 +38,7 @@ impl FcmClient {
         }
         Some(Self {
             server_key: server_key.clone(),
-            client: reqwest::Client::new(),
+            client: crate::http_client::get_client().clone(),
         })
     }
 

@@ -409,7 +409,7 @@ async fn exchange_google_code(
     client_secret: &str,
     redirect_uri: &str,
 ) -> Result<GoogleTokenResponse, AppError> {
-    let client = reqwest::Client::new();
+    let client = crate::http_client::get_client().clone();
 
     let params = [
         ("code", code),
@@ -447,7 +447,7 @@ async fn exchange_google_code(
 }
 
 async fn get_google_user_info(access_token: &str) -> Result<GoogleUserInfo, AppError> {
-    let client = reqwest::Client::new();
+    let client = crate::http_client::get_client().clone();
 
     let resp = client
         .get("https://www.googleapis.com/oauth2/v2/userinfo")
@@ -481,7 +481,7 @@ async fn exchange_github_code(
     client_id: &str,
     client_secret: &str,
 ) -> Result<String, AppError> {
-    let client = reqwest::Client::new();
+    let client = crate::http_client::get_client().clone();
 
     let params = [
         ("code", code),
@@ -525,7 +525,7 @@ async fn exchange_github_code(
 }
 
 async fn get_github_user_info(access_token: &str) -> Result<GitHubUserInfo, AppError> {
-    let client = reqwest::Client::new();
+    let client = crate::http_client::get_client().clone();
 
     // First try to get email from /user
     let resp = client
