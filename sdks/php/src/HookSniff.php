@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HookSniff;
 
+use HookSniff\Pagination;
+
 /**
  * HookSniff SDK — Main Entry Point
  *
