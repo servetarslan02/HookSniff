@@ -541,3 +541,9 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - **Package.swift:** swift-tools-version:5.9, macOS 12+ / iOS 15+ / tvOS 15+ / watchOS 8+
 - **README.md:** Kurulum talimatları eklendi (SPM + Xcode)
 - **11/11 SDK TAMAMLANDI** 🎉
+
+## Oturum 113 (2026-05-11 22:43 GMT+8) ✅
+- **HookSniff sync** — oturum sonu otomatik senkronizasyon
+- **Commit:** `3f08d78` — `docs: add Node.js SDK README` (sdks/node/README.md)
+- **Push:** main branch, up to date with origin
+- **Sonraki adım:** AŞAMA 2 — Wrapper Class + İmza Doğrulama
