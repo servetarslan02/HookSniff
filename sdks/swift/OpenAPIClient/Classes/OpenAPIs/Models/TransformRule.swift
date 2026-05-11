@@ -12,15 +12,15 @@ import AnyCodable
 
 public struct TransformRule: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var endpointId: UUID?
-    public var name: String?
-    public var ruleType: String?
+    public var id: UUID
+    public var endpointId: UUID
+    public var name: String
+    public var ruleType: String
     public var config: AnyCodable?
-    public var isActive: Bool?
-    public var createdAt: Date?
+    public var isActive: Bool
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, endpointId: UUID? = nil, name: String? = nil, ruleType: String? = nil, config: AnyCodable? = nil, isActive: Bool? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, endpointId: UUID, name: String, ruleType: String, config: AnyCodable? = nil, isActive: Bool, createdAt: Date) {
         self.id = id
         self.endpointId = endpointId
         self.name = name
@@ -44,13 +44,13 @@ public struct TransformRule: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(endpointId, forKey: .endpointId)
-        try container.encodeIfPresent(name, forKey: .name)
-        try container.encodeIfPresent(ruleType, forKey: .ruleType)
+        try container.encode(id, forKey: .id)
+        try container.encode(endpointId, forKey: .endpointId)
+        try container.encode(name, forKey: .name)
+        try container.encode(ruleType, forKey: .ruleType)
         try container.encodeIfPresent(config, forKey: .config)
-        try container.encodeIfPresent(isActive, forKey: .isActive)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(isActive, forKey: .isActive)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

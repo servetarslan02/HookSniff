@@ -1,4 +1,4 @@
-# HookSniff.Model.OAuthProviderListResponse
+# HookSniff.Sdk.Model.OAuthProviderListResponse
 List of available OAuth providers
 
 ## Properties

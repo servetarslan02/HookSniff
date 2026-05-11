@@ -20,7 +20,7 @@ import json
 
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from uuid import UUID
 from typing import Optional, Set
 from typing_extensions import Self
@@ -30,10 +30,10 @@ class TeamInvite(BaseModel):
     """
     TeamInvite
     """ # noqa: E501
-    id: Optional[UUID] = None
-    email: Optional[StrictStr] = None
-    role: Optional[StrictStr] = None
-    created_at: Optional[datetime] = None
+    id: UUID
+    email: StrictStr
+    role: StrictStr
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "email", "role", "created_at"]
 
     model_config = ConfigDict(

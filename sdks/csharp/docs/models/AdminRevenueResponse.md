@@ -1,4 +1,4 @@
-# HookSniff.Model.AdminRevenueResponse
+# HookSniff.Sdk.Model.AdminRevenueResponse
 Revenue history for admin analytics
 
 ## Properties

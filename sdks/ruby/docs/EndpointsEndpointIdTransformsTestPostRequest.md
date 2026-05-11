@@ -1,4 +1,4 @@
-# HookSniff::EndpointsEndpointIdTransformsTestPostRequest
+# HooksniffSdk::EndpointsEndpointIdTransformsTestPostRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::EndpointsEndpointIdTransformsTestPostRequest.new(
+instance = HooksniffSdk::EndpointsEndpointIdTransformsTestPostRequest.new(
   payload: null,
   rule_id: null
 )

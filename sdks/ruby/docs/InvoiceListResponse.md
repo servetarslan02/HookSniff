@@ -1,4 +1,4 @@
-# HookSniff::InvoiceListResponse
+# HooksniffSdk::InvoiceListResponse
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::InvoiceListResponse.new(
+instance = HooksniffSdk::InvoiceListResponse.new(
   data: null,
   has_more: null,
   total: null

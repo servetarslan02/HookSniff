@@ -18,8 +18,8 @@ Delivery trend over time
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AnalyticsApi()
 val range : kotlin.String = range_example // kotlin.String | 
@@ -64,8 +64,8 @@ Latency trend over time
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AnalyticsApi()
 val range : kotlin.String = range_example // kotlin.String | 
@@ -110,8 +110,8 @@ Success rate metrics
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AnalyticsApi()
 val range : kotlin.String = range_example // kotlin.String | 

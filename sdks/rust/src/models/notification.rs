@@ -13,29 +13,29 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Notification {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "title", skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-    #[serde(rename = "body", skip_serializing_if = "Option::is_none")]
-    pub body: Option<String>,
-    #[serde(rename = "is_read", skip_serializing_if = "Option::is_none")]
-    pub is_read: Option<bool>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "title")]
+    pub title: String,
+    #[serde(rename = "body")]
+    pub body: String,
+    #[serde(rename = "is_read")]
+    pub is_read: bool,
     #[serde(rename = "link", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub link: Option<Option<String>>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl Notification {
-    pub fn new() -> Notification {
+    pub fn new(id: uuid::Uuid, title: String, body: String, is_read: bool, created_at: chrono::DateTime<chrono::FixedOffset>) -> Notification {
         Notification {
-            id: None,
-            title: None,
-            body: None,
-            is_read: None,
+            id,
+            title,
+            body,
+            is_read,
             link: None,
-            created_at: None,
+            created_at,
         }
     }
 }

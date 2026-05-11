@@ -1,4 +1,4 @@
-# HookSniff.Model.CreateApiKeyResponse
+# HookSniff.Sdk.Model.CreateApiKeyResponse
 
 ## Properties
 

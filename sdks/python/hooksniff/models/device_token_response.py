@@ -20,7 +20,7 @@ import json
 
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from uuid import UUID
 from typing import Optional, Set
 from typing_extensions import Self
@@ -30,10 +30,10 @@ class DeviceTokenResponse(BaseModel):
     """
     DeviceTokenResponse
     """ # noqa: E501
-    id: Optional[UUID] = None
-    token: Optional[StrictStr] = None
-    platform: Optional[StrictStr] = None
-    created_at: Optional[datetime] = None
+    id: UUID
+    token: StrictStr
+    platform: StrictStr
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "token", "platform", "created_at"]
 
     model_config = ConfigDict(

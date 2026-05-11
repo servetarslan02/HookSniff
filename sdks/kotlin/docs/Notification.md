@@ -4,12 +4,12 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  [optional] |
-| **title** | **kotlin.String** |  |  [optional] |
-| **body** | **kotlin.String** |  |  [optional] |
-| **isRead** | **kotlin.Boolean** |  |  [optional] |
+| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  |
+| **title** | **kotlin.String** |  |  |
+| **body** | **kotlin.String** |  |  |
+| **isRead** | **kotlin.Boolean** |  |  |
+| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  |
 | **link** | **kotlin.String** |  |  [optional] |
-| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  [optional] |
 
 
 

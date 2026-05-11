@@ -13,35 +13,35 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Delivery {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "endpoint_id", skip_serializing_if = "Option::is_none")]
-    pub endpoint_id: Option<uuid::Uuid>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "endpoint_id")]
+    pub endpoint_id: uuid::Uuid,
     #[serde(rename = "event", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub event: Option<Option<String>>,
-    #[serde(rename = "status", skip_serializing_if = "Option::is_none")]
-    pub status: Option<Status>,
-    #[serde(rename = "attempt_count", skip_serializing_if = "Option::is_none")]
-    pub attempt_count: Option<i32>,
+    #[serde(rename = "status")]
+    pub status: Status,
+    #[serde(rename = "attempt_count")]
+    pub attempt_count: i32,
     #[serde(rename = "response_status", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub response_status: Option<Option<i32>>,
-    #[serde(rename = "replay_count", skip_serializing_if = "Option::is_none")]
-    pub replay_count: Option<i32>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "replay_count")]
+    pub replay_count: i32,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl Delivery {
-    pub fn new() -> Delivery {
+    pub fn new(id: uuid::Uuid, endpoint_id: uuid::Uuid, status: Status, attempt_count: i32, replay_count: i32, created_at: chrono::DateTime<chrono::FixedOffset>) -> Delivery {
         Delivery {
-            id: None,
-            endpoint_id: None,
+            id,
+            endpoint_id,
             event: None,
-            status: None,
-            attempt_count: None,
+            status,
+            attempt_count,
             response_status: None,
-            replay_count: None,
-            created_at: None,
+            replay_count,
+            created_at,
         }
     }
 }

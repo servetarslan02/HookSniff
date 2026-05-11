@@ -1,4 +1,4 @@
-# HookSniff.Model.EndpointListResponse
+# HookSniff.Sdk.Model.EndpointListResponse
 Paginated list of endpoints
 
 ## Properties

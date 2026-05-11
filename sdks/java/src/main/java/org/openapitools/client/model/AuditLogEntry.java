@@ -51,7 +51,7 @@ import org.openapitools.client.JSON;
 /**
  * A single audit log record
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:27:59.532401633+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class AuditLogEntry {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)

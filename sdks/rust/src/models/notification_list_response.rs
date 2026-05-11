@@ -13,20 +13,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct NotificationListResponse {
-    #[serde(rename = "notifications", skip_serializing_if = "Option::is_none")]
-    pub notifications: Option<Vec<models::Notification>>,
-    #[serde(rename = "total", skip_serializing_if = "Option::is_none")]
-    pub total: Option<i32>,
-    #[serde(rename = "unread_count", skip_serializing_if = "Option::is_none")]
-    pub unread_count: Option<i32>,
+    #[serde(rename = "notifications")]
+    pub notifications: Vec<models::Notification>,
+    #[serde(rename = "total")]
+    pub total: i32,
+    #[serde(rename = "unread_count")]
+    pub unread_count: i32,
 }
 
 impl NotificationListResponse {
-    pub fn new() -> NotificationListResponse {
+    pub fn new(notifications: Vec<models::Notification>, total: i32, unread_count: i32) -> NotificationListResponse {
         NotificationListResponse {
-            notifications: None,
-            total: None,
-            unread_count: None,
+            notifications,
+            total,
+            unread_count,
         }
     }
 }

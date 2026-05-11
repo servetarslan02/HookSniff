@@ -1,4 +1,4 @@
-# HookSniff.Model.DeliveryAttemptListResponse
+# HookSniff.Sdk.Model.DeliveryAttemptListResponse
 Paginated list of delivery attempts
 
 ## Properties

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.ResetPasswordRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :token,
     :new_password

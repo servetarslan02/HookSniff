@@ -310,6 +310,21 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['endpoint_id'] === null) {
+            $invalidProperties[] = "'endpoint_id' can't be null";
+        }
+        if ($this->container['routing_strategy'] === null) {
+            $invalidProperties[] = "'routing_strategy' can't be null";
+        }
+        if ($this->container['avg_response_ms'] === null) {
+            $invalidProperties[] = "'avg_response_ms' can't be null";
+        }
+        if ($this->container['failure_streak'] === null) {
+            $invalidProperties[] = "'failure_streak' can't be null";
+        }
+        if ($this->container['is_healthy'] === null) {
+            $invalidProperties[] = "'is_healthy' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -328,7 +343,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets endpoint_id
      *
-     * @return string|null
+     * @return string
      */
     public function getEndpointId()
     {
@@ -338,7 +353,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets endpoint_id
      *
-     * @param string|null $endpoint_id endpoint_id
+     * @param string $endpoint_id endpoint_id
      *
      * @return self
      */
@@ -355,7 +370,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets routing_strategy
      *
-     * @return string|null
+     * @return string
      */
     public function getRoutingStrategy()
     {
@@ -365,7 +380,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets routing_strategy
      *
-     * @param string|null $routing_strategy routing_strategy
+     * @param string $routing_strategy routing_strategy
      *
      * @return self
      */
@@ -416,7 +431,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets avg_response_ms
      *
-     * @return int|null
+     * @return int
      */
     public function getAvgResponseMs()
     {
@@ -426,7 +441,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets avg_response_ms
      *
-     * @param int|null $avg_response_ms avg_response_ms
+     * @param int $avg_response_ms avg_response_ms
      *
      * @return self
      */
@@ -443,7 +458,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets failure_streak
      *
-     * @return int|null
+     * @return int
      */
     public function getFailureStreak()
     {
@@ -453,7 +468,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets failure_streak
      *
-     * @param int|null $failure_streak failure_streak
+     * @param int $failure_streak failure_streak
      *
      * @return self
      */
@@ -470,7 +485,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_healthy
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsHealthy()
     {
@@ -480,7 +495,7 @@ class RoutingInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_healthy
      *
-     * @param bool|null $is_healthy is_healthy
+     * @param bool $is_healthy is_healthy
      *
      * @return self
      */

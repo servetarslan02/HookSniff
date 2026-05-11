@@ -17,8 +17,8 @@ Receive inbound webhook for a specific endpoint
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = InboundApi()
 val provider : kotlin.String = provider_example // kotlin.String | 
@@ -68,8 +68,8 @@ Accepts webhooks from external providers (Stripe, GitHub, etc.) and routes them 
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = InboundApi()
 val provider : kotlin.String = provider_example // kotlin.String | 

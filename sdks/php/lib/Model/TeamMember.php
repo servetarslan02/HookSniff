@@ -310,6 +310,21 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['user_id'] === null) {
+            $invalidProperties[] = "'user_id' can't be null";
+        }
+        if ($this->container['email'] === null) {
+            $invalidProperties[] = "'email' can't be null";
+        }
+        if ($this->container['role'] === null) {
+            $invalidProperties[] = "'role' can't be null";
+        }
+        if ($this->container['joined_at'] === null) {
+            $invalidProperties[] = "'joined_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -328,7 +343,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -338,7 +353,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -355,7 +370,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets user_id
      *
-     * @return string|null
+     * @return string
      */
     public function getUserId()
     {
@@ -365,7 +380,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets user_id
      *
-     * @param string|null $user_id user_id
+     * @param string $user_id user_id
      *
      * @return self
      */
@@ -382,7 +397,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets email
      *
-     * @return string|null
+     * @return string
      */
     public function getEmail()
     {
@@ -392,7 +407,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets email
      *
-     * @param string|null $email email
+     * @param string $email email
      *
      * @return self
      */
@@ -443,7 +458,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets role
      *
-     * @return string|null
+     * @return string
      */
     public function getRole()
     {
@@ -453,7 +468,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets role
      *
-     * @param string|null $role role
+     * @param string $role role
      *
      * @return self
      */
@@ -470,7 +485,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets joined_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getJoinedAt()
     {
@@ -480,7 +495,7 @@ class TeamMember implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets joined_at
      *
-     * @param \DateTime|null $joined_at joined_at
+     * @param \DateTime $joined_at joined_at
      *
      * @return self
      */

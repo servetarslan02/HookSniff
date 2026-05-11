@@ -12,11 +12,11 @@ import AnyCodable
 
 public struct NotificationListResponse: Codable, JSONEncodable, Hashable {
 
-    public var notifications: [Notification]?
-    public var total: Int?
-    public var unreadCount: Int?
+    public var notifications: [Notification]
+    public var total: Int
+    public var unreadCount: Int
 
-    public init(notifications: [Notification]? = nil, total: Int? = nil, unreadCount: Int? = nil) {
+    public init(notifications: [Notification], total: Int, unreadCount: Int) {
         self.notifications = notifications
         self.total = total
         self.unreadCount = unreadCount
@@ -32,9 +32,9 @@ public struct NotificationListResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(notifications, forKey: .notifications)
-        try container.encodeIfPresent(total, forKey: .total)
-        try container.encodeIfPresent(unreadCount, forKey: .unreadCount)
+        try container.encode(notifications, forKey: .notifications)
+        try container.encode(total, forKey: .total)
+        try container.encode(unreadCount, forKey: .unreadCount)
     }
 }
 

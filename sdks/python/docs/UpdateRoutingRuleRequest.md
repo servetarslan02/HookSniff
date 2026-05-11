@@ -6,7 +6,7 @@ Update an existing routing rule (all fields optional)
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **str** |  | [optional] 
+**name** | **str** |  | 
 **conditions** | **object** |  | [optional] 
 **transform** | **object** |  | [optional] 
 

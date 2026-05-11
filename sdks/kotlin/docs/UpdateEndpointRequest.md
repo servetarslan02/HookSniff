@@ -4,16 +4,16 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **url** | [**java.net.URI**](java.net.URI.md) |  |  [optional] |
-| **description** | **kotlin.String** |  |  [optional] |
-| **isActive** | **kotlin.Boolean** |  |  [optional] |
-| **allowedIps** | **kotlin.collections.List&lt;kotlin.String&gt;** |  |  [optional] |
-| **eventFilter** | **kotlin.collections.List&lt;kotlin.String&gt;** |  |  [optional] |
+| **url** | [**java.net.URI**](java.net.URI.md) |  |  |
+| **description** | **kotlin.String** |  |  |
+| **isActive** | **kotlin.Boolean** |  |  |
+| **allowedIps** | **kotlin.collections.List&lt;kotlin.String&gt;** |  |  |
+| **eventFilter** | **kotlin.collections.List&lt;kotlin.String&gt;** |  |  |
+| **retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  |
+| **routingStrategy** | [**inline**](#RoutingStrategy) |  |  |
+| **fallbackUrl** | [**java.net.URI**](java.net.URI.md) |  |  |
+| **format** | [**inline**](#Format) |  |  |
 | **customHeaders** | [**kotlin.Any**](.md) |  |  [optional] |
-| **retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  |  [optional] |
-| **routingStrategy** | [**inline**](#RoutingStrategy) |  |  [optional] |
-| **fallbackUrl** | [**java.net.URI**](java.net.URI.md) |  |  [optional] |
-| **format** | [**inline**](#Format) |  |  [optional] |
 
 
 <a id="RoutingStrategy"></a>

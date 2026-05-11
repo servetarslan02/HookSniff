@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,13 +28,13 @@ class SubscriptionResponse(BaseModel):
     """
     SubscriptionResponse
     """ # noqa: E501
-    plan: Optional[StrictStr] = None
-    status: Optional[StrictStr] = None
-    payment_provider: Optional[StrictStr] = None
-    webhook_limit: Optional[StrictInt] = None
-    endpoint_limit: Optional[StrictInt] = None
-    retention_days: Optional[StrictInt] = None
-    monthly_price_cents: Optional[StrictInt] = None
+    plan: StrictStr
+    status: StrictStr
+    payment_provider: StrictStr
+    webhook_limit: StrictInt
+    endpoint_limit: StrictInt
+    retention_days: StrictInt
+    monthly_price_cents: StrictInt
     __properties: ClassVar[List[str]] = ["plan", "status", "payment_provider", "webhook_limit", "endpoint_limit", "retention_days", "monthly_price_cents"]
 
     model_config = ConfigDict(

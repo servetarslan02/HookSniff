@@ -12,15 +12,15 @@ import AnyCodable
 
 public struct UsageResponse: Codable, JSONEncodable, Hashable {
 
-    public var plan: String?
-    public var periodStart: Date?
-    public var periodEnd: Date?
-    public var webhooksUsed: Int?
-    public var webhooksLimit: Int?
-    public var endpointsUsed: Int?
-    public var endpointsLimit: Int?
+    public var plan: String
+    public var periodStart: Date
+    public var periodEnd: Date
+    public var webhooksUsed: Int
+    public var webhooksLimit: Int
+    public var endpointsUsed: Int
+    public var endpointsLimit: Int
 
-    public init(plan: String? = nil, periodStart: Date? = nil, periodEnd: Date? = nil, webhooksUsed: Int? = nil, webhooksLimit: Int? = nil, endpointsUsed: Int? = nil, endpointsLimit: Int? = nil) {
+    public init(plan: String, periodStart: Date, periodEnd: Date, webhooksUsed: Int, webhooksLimit: Int, endpointsUsed: Int, endpointsLimit: Int) {
         self.plan = plan
         self.periodStart = periodStart
         self.periodEnd = periodEnd
@@ -44,13 +44,13 @@ public struct UsageResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(plan, forKey: .plan)
-        try container.encodeIfPresent(periodStart, forKey: .periodStart)
-        try container.encodeIfPresent(periodEnd, forKey: .periodEnd)
-        try container.encodeIfPresent(webhooksUsed, forKey: .webhooksUsed)
-        try container.encodeIfPresent(webhooksLimit, forKey: .webhooksLimit)
-        try container.encodeIfPresent(endpointsUsed, forKey: .endpointsUsed)
-        try container.encodeIfPresent(endpointsLimit, forKey: .endpointsLimit)
+        try container.encode(plan, forKey: .plan)
+        try container.encode(periodStart, forKey: .periodStart)
+        try container.encode(periodEnd, forKey: .periodEnd)
+        try container.encode(webhooksUsed, forKey: .webhooksUsed)
+        try container.encode(webhooksLimit, forKey: .webhooksLimit)
+        try container.encode(endpointsUsed, forKey: .endpointsUsed)
+        try container.encode(endpointsLimit, forKey: .endpointsLimit)
     }
 }
 

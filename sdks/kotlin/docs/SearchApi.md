@@ -16,8 +16,8 @@ Search deliveries
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = SearchApi()
 val q : kotlin.String = q_example // kotlin.String | 

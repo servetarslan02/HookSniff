@@ -6,15 +6,15 @@ defmodule HookSniffAPI.Model.UpdateRoutingRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :routing_strategy,
     :fallback_url
   ]
 
   @type t :: %__MODULE__{
-    :routing_strategy => String.t | nil,
-    :fallback_url => Uri | nil
+    :routing_strategy => String.t,
+    :fallback_url => Uri
   }
 
   alias HookSniffAPI.Deserializer

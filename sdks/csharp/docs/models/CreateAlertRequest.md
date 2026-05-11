@@ -1,4 +1,4 @@
-# HookSniff.Model.CreateAlertRequest
+# HookSniff.Sdk.Model.CreateAlertRequest
 
 ## Properties
 

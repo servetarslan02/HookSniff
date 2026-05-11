@@ -1,4 +1,4 @@
-# HookSniff::DomainDnsRecord
+# HooksniffSdk::DomainDnsRecord
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::DomainDnsRecord.new(
+instance = HooksniffSdk::DomainDnsRecord.new(
   type: null,
   name: null,
   value: null,

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.PortalNotificationsPut200Response do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :updated,
     :preferences

@@ -12,13 +12,13 @@ import AnyCodable
 
 public struct SuccessRateResponse: Codable, JSONEncodable, Hashable {
 
-    public var range: String?
-    public var successful: Int?
-    public var failed: Int?
-    public var pending: Int?
-    public var successRate: Double?
+    public var range: String
+    public var successful: Int
+    public var failed: Int
+    public var pending: Int
+    public var successRate: Double
 
-    public init(range: String? = nil, successful: Int? = nil, failed: Int? = nil, pending: Int? = nil, successRate: Double? = nil) {
+    public init(range: String, successful: Int, failed: Int, pending: Int, successRate: Double) {
         self.range = range
         self.successful = successful
         self.failed = failed
@@ -38,11 +38,11 @@ public struct SuccessRateResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(range, forKey: .range)
-        try container.encodeIfPresent(successful, forKey: .successful)
-        try container.encodeIfPresent(failed, forKey: .failed)
-        try container.encodeIfPresent(pending, forKey: .pending)
-        try container.encodeIfPresent(successRate, forKey: .successRate)
+        try container.encode(range, forKey: .range)
+        try container.encode(successful, forKey: .successful)
+        try container.encode(failed, forKey: .failed)
+        try container.encode(pending, forKey: .pending)
+        try container.encode(successRate, forKey: .successRate)
     }
 }
 

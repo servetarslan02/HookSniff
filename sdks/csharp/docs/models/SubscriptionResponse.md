@@ -1,4 +1,4 @@
-# HookSniff.Model.SubscriptionResponse
+# HookSniff.Sdk.Model.SubscriptionResponse
 
 ## Properties
 

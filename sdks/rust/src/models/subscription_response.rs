@@ -13,32 +13,32 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SubscriptionResponse {
-    #[serde(rename = "plan", skip_serializing_if = "Option::is_none")]
-    pub plan: Option<String>,
-    #[serde(rename = "status", skip_serializing_if = "Option::is_none")]
-    pub status: Option<String>,
-    #[serde(rename = "payment_provider", skip_serializing_if = "Option::is_none")]
-    pub payment_provider: Option<String>,
-    #[serde(rename = "webhook_limit", skip_serializing_if = "Option::is_none")]
-    pub webhook_limit: Option<i32>,
-    #[serde(rename = "endpoint_limit", skip_serializing_if = "Option::is_none")]
-    pub endpoint_limit: Option<i32>,
-    #[serde(rename = "retention_days", skip_serializing_if = "Option::is_none")]
-    pub retention_days: Option<i32>,
-    #[serde(rename = "monthly_price_cents", skip_serializing_if = "Option::is_none")]
-    pub monthly_price_cents: Option<i32>,
+    #[serde(rename = "plan")]
+    pub plan: String,
+    #[serde(rename = "status")]
+    pub status: String,
+    #[serde(rename = "payment_provider")]
+    pub payment_provider: String,
+    #[serde(rename = "webhook_limit")]
+    pub webhook_limit: i32,
+    #[serde(rename = "endpoint_limit")]
+    pub endpoint_limit: i32,
+    #[serde(rename = "retention_days")]
+    pub retention_days: i32,
+    #[serde(rename = "monthly_price_cents")]
+    pub monthly_price_cents: i32,
 }
 
 impl SubscriptionResponse {
-    pub fn new() -> SubscriptionResponse {
+    pub fn new(plan: String, status: String, payment_provider: String, webhook_limit: i32, endpoint_limit: i32, retention_days: i32, monthly_price_cents: i32) -> SubscriptionResponse {
         SubscriptionResponse {
-            plan: None,
-            status: None,
-            payment_provider: None,
-            webhook_limit: None,
-            endpoint_limit: None,
-            retention_days: None,
-            monthly_price_cents: None,
+            plan,
+            status,
+            payment_provider,
+            webhook_limit,
+            endpoint_limit,
+            retention_days,
+            monthly_price_cents,
         }
     }
 }

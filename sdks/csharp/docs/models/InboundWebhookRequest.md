@@ -1,4 +1,4 @@
-# HookSniff.Model.InboundWebhookRequest
+# HookSniff.Sdk.Model.InboundWebhookRequest
 Raw webhook payload received from an external provider (Stripe, GitHub, etc.)
 
 ## Properties

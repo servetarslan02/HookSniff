@@ -1,4 +1,4 @@
-# HookSniff::RetryPolicy
+# HooksniffSdk::RetryPolicy
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RetryPolicy.new(
+instance = HooksniffSdk::RetryPolicy.new(
   max_attempts: null,
   backoff: null,
   initial_delay_secs: null,

@@ -1,4 +1,4 @@
-# HookSniff::DeliveryAttemptListResponse
+# HooksniffSdk::DeliveryAttemptListResponse
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::DeliveryAttemptListResponse.new(
+instance = HooksniffSdk::DeliveryAttemptListResponse.new(
   data: null,
   has_more: null,
   total: null

@@ -1,4 +1,4 @@
-# HookSniff::SuccessRateResponse
+# HooksniffSdk::SuccessRateResponse
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SuccessRateResponse.new(
+instance = HooksniffSdk::SuccessRateResponse.new(
   range: null,
   successful: null,
   failed: null,

@@ -13,17 +13,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ContactResponse {
-    #[serde(rename = "success", skip_serializing_if = "Option::is_none")]
-    pub success: Option<bool>,
-    #[serde(rename = "message", skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
+    #[serde(rename = "success")]
+    pub success: bool,
+    #[serde(rename = "message")]
+    pub message: String,
 }
 
 impl ContactResponse {
-    pub fn new() -> ContactResponse {
+    pub fn new(success: bool, message: String) -> ContactResponse {
         ContactResponse {
-            success: None,
-            message: None,
+            success,
+            message,
         }
     }
 }

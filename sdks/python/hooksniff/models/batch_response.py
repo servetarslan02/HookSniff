@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from hooksniff.models.batch_response_errors_inner import BatchResponseErrorsInner
 from hooksniff.models.delivery import Delivery
 from typing import Optional, Set
@@ -30,8 +30,8 @@ class BatchResponse(BaseModel):
     """
     BatchResponse
     """ # noqa: E501
-    deliveries: Optional[List[Delivery]] = None
-    errors: Optional[List[BatchResponseErrorsInner]] = None
+    deliveries: List[Delivery]
+    errors: List[BatchResponseErrorsInner]
     __properties: ClassVar[List[str]] = ["deliveries", "errors"]
 
     model_config = ConfigDict(

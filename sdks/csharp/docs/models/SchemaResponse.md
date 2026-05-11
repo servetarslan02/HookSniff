@@ -1,4 +1,4 @@
-# HookSniff.Model.SchemaResponse
+# HookSniff.Sdk.Model.SchemaResponse
 A registered JSON Schema for event validation
 
 ## Properties

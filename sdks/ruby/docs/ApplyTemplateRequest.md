@@ -1,4 +1,4 @@
-# HookSniff::ApplyTemplateRequest
+# HooksniffSdk::ApplyTemplateRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ApplyTemplateRequest.new(
+instance = HooksniffSdk::ApplyTemplateRequest.new(
   endpoint_id: null,
   variables: null
 )

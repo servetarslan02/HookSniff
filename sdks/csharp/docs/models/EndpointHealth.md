@@ -1,4 +1,4 @@
-# HookSniff.Model.EndpointHealth
+# HookSniff.Sdk.Model.EndpointHealth
 Endpoint health metrics and status
 
 ## Properties

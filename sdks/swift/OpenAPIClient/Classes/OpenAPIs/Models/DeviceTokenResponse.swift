@@ -12,12 +12,12 @@ import AnyCodable
 
 public struct DeviceTokenResponse: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var token: String?
-    public var platform: String?
-    public var createdAt: Date?
+    public var id: UUID
+    public var token: String
+    public var platform: String
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, token: String? = nil, platform: String? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, token: String, platform: String, createdAt: Date) {
         self.id = id
         self.token = token
         self.platform = platform
@@ -35,10 +35,10 @@ public struct DeviceTokenResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(token, forKey: .token)
-        try container.encodeIfPresent(platform, forKey: .platform)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(id, forKey: .id)
+        try container.encode(token, forKey: .token)
+        try container.encode(platform, forKey: .platform)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

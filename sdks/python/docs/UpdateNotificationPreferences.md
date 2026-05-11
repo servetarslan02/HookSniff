@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**email_on_failure** | **bool** |  | [optional] 
-**email_on_dead_letter** | **bool** |  | [optional] 
-**email_on_success** | **bool** |  | [optional] 
+**email_on_failure** | **bool** |  | 
+**email_on_dead_letter** | **bool** |  | 
+**email_on_success** | **bool** |  | 
 **slack_webhook_url** | **str** |  | [optional] 
 **discord_webhook_url** | **str** |  | [optional] 
 **webhook_url** | **str** |  | [optional] 

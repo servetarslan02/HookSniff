@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SystemStats do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :total_users,
     :active_users,
@@ -16,11 +16,11 @@ defmodule HookSniffAPI.Model.SystemStats do
   ]
 
   @type t :: %__MODULE__{
-    :total_users => integer() | nil,
-    :active_users => integer() | nil,
-    :total_endpoints => integer() | nil,
-    :total_deliveries => integer() | nil,
-    :plan_breakdown => [HookSniffAPI.Model.SystemStatsPlanBreakdownInner.t] | nil
+    :total_users => integer(),
+    :active_users => integer(),
+    :total_endpoints => integer(),
+    :total_deliveries => integer(),
+    :plan_breakdown => [HookSniffAPI.Model.SystemStatsPlanBreakdownInner.t]
   }
 
   alias HookSniffAPI.Deserializer

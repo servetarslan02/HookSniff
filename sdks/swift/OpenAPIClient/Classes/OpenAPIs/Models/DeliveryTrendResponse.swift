@@ -12,10 +12,10 @@ import AnyCodable
 
 public struct DeliveryTrendResponse: Codable, JSONEncodable, Hashable {
 
-    public var range: String?
-    public var buckets: [DeliveryTrendResponseBucketsInner]?
+    public var range: String
+    public var buckets: [DeliveryTrendResponseBucketsInner]
 
-    public init(range: String? = nil, buckets: [DeliveryTrendResponseBucketsInner]? = nil) {
+    public init(range: String, buckets: [DeliveryTrendResponseBucketsInner]) {
         self.range = range
         self.buckets = buckets
     }
@@ -29,8 +29,8 @@ public struct DeliveryTrendResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(range, forKey: .range)
-        try container.encodeIfPresent(buckets, forKey: .buckets)
+        try container.encode(range, forKey: .range)
+        try container.encode(buckets, forKey: .buckets)
     }
 }
 

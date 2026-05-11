@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,16 +28,13 @@ class UpdateSSOConfigRequest(BaseModel):
     """
     Update an SSO configuration (all fields optional)
     """ # noqa: E501
-    provider: Optional[StrictStr] = None
-    domain: Optional[StrictStr] = None
+    provider: StrictStr
+    domain: StrictStr
     __properties: ClassVar[List[str]] = ["provider", "domain"]
 
     @field_validator('provider')
     def provider_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['saml', 'oidc']):
             raise ValueError("must be one of enum values ('saml', 'oidc')")
         return value

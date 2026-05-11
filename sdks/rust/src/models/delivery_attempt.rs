@@ -13,10 +13,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DeliveryAttempt {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "attempt_number", skip_serializing_if = "Option::is_none")]
-    pub attempt_number: Option<i32>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "attempt_number")]
+    pub attempt_number: i32,
     #[serde(rename = "status_code", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub status_code: Option<Option<i32>>,
     #[serde(rename = "response_body", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
@@ -25,20 +25,20 @@ pub struct DeliveryAttempt {
     pub duration_ms: Option<Option<i32>>,
     #[serde(rename = "error_message", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub error_message: Option<Option<String>>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl DeliveryAttempt {
-    pub fn new() -> DeliveryAttempt {
+    pub fn new(id: uuid::Uuid, attempt_number: i32, created_at: chrono::DateTime<chrono::FixedOffset>) -> DeliveryAttempt {
         DeliveryAttempt {
-            id: None,
-            attempt_number: None,
+            id,
+            attempt_number,
             status_code: None,
             response_body: None,
             duration_ms: None,
             error_message: None,
-            created_at: None,
+            created_at,
         }
     }
 }

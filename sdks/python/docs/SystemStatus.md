@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**overall_status** | **str** |  | [optional] 
-**uptime_30d** | **float** |  | [optional] 
-**components** | [**List[SystemStatusComponentsInner]**](SystemStatusComponentsInner.md) |  | [optional] 
-**checked_at** | **str** |  | [optional] 
+**overall_status** | **str** |  | 
+**uptime_30d** | **float** |  | 
+**components** | [**List[SystemStatusComponentsInner]**](SystemStatusComponentsInner.md) |  | 
+**checked_at** | **str** |  | 
 
 ## Example
 

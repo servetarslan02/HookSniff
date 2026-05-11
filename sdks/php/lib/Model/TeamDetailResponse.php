@@ -289,6 +289,15 @@ class TeamDetailResponse implements ModelInterface, ArrayAccess, \JsonSerializab
     {
         $invalidProperties = [];
 
+        if ($this->container['team'] === null) {
+            $invalidProperties[] = "'team' can't be null";
+        }
+        if ($this->container['members'] === null) {
+            $invalidProperties[] = "'members' can't be null";
+        }
+        if ($this->container['invites'] === null) {
+            $invalidProperties[] = "'invites' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -307,7 +316,7 @@ class TeamDetailResponse implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Gets team
      *
-     * @return \OpenAPI\Client\Model\Team|null
+     * @return \OpenAPI\Client\Model\Team
      */
     public function getTeam()
     {
@@ -317,7 +326,7 @@ class TeamDetailResponse implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Sets team
      *
-     * @param \OpenAPI\Client\Model\Team|null $team team
+     * @param \OpenAPI\Client\Model\Team $team team
      *
      * @return self
      */
@@ -334,7 +343,7 @@ class TeamDetailResponse implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Gets members
      *
-     * @return \OpenAPI\Client\Model\TeamMember[]|null
+     * @return \OpenAPI\Client\Model\TeamMember[]
      */
     public function getMembers()
     {
@@ -344,7 +353,7 @@ class TeamDetailResponse implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Sets members
      *
-     * @param \OpenAPI\Client\Model\TeamMember[]|null $members members
+     * @param \OpenAPI\Client\Model\TeamMember[] $members members
      *
      * @return self
      */
@@ -361,7 +370,7 @@ class TeamDetailResponse implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Gets invites
      *
-     * @return \OpenAPI\Client\Model\TeamInvite[]|null
+     * @return \OpenAPI\Client\Model\TeamInvite[]
      */
     public function getInvites()
     {
@@ -371,7 +380,7 @@ class TeamDetailResponse implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Sets invites
      *
-     * @param \OpenAPI\Client\Model\TeamInvite[]|null $invites invites
+     * @param \OpenAPI\Client\Model\TeamInvite[] $invites invites
      *
      * @return self
      */

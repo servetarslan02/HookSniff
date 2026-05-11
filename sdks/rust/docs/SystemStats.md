@@ -4,11 +4,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**total_users** | Option<**i32**> |  | [optional]
-**active_users** | Option<**i32**> |  | [optional]
-**total_endpoints** | Option<**i32**> |  | [optional]
-**total_deliveries** | Option<**i32**> |  | [optional]
-**plan_breakdown** | Option<[**Vec<models::SystemStatsPlanBreakdownInner>**](SystemStatsPlanBreakdownInner.md)> |  | [optional]
+**total_users** | **i32** |  | 
+**active_users** | **i32** |  | 
+**total_endpoints** | **i32** |  | 
+**total_deliveries** | **i32** |  | 
+**plan_breakdown** | [**Vec<models::SystemStatsPlanBreakdownInner>**](SystemStatsPlanBreakdownInner.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

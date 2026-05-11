@@ -1,4 +1,4 @@
-# HookSniff.Model.StreamParams
+# HookSniff.Sdk.Model.StreamParams
 
 ## Properties
 

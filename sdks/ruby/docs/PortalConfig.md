@@ -1,4 +1,4 @@
-# HookSniff::PortalConfig
+# HooksniffSdk::PortalConfig
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::PortalConfig.new(
+instance = HooksniffSdk::PortalConfig.new(
   logo_url: null,
   primary_color: null,
   custom_domain: null,

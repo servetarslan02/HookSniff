@@ -1,4 +1,4 @@
-# HookSniff.Model.AnalyticsTrendResponse
+# HookSniff.Sdk.Model.AnalyticsTrendResponse
 Delivery trend data over a time period
 
 ## Properties

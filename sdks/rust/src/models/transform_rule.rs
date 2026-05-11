@@ -13,32 +13,32 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TransformRule {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "endpoint_id", skip_serializing_if = "Option::is_none")]
-    pub endpoint_id: Option<uuid::Uuid>,
-    #[serde(rename = "name", skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[serde(rename = "rule_type", skip_serializing_if = "Option::is_none")]
-    pub rule_type: Option<String>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "endpoint_id")]
+    pub endpoint_id: uuid::Uuid,
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "rule_type")]
+    pub rule_type: String,
     #[serde(rename = "config", skip_serializing_if = "Option::is_none")]
     pub config: Option<serde_json::Value>,
-    #[serde(rename = "is_active", skip_serializing_if = "Option::is_none")]
-    pub is_active: Option<bool>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "is_active")]
+    pub is_active: bool,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl TransformRule {
-    pub fn new() -> TransformRule {
+    pub fn new(id: uuid::Uuid, endpoint_id: uuid::Uuid, name: String, rule_type: String, is_active: bool, created_at: chrono::DateTime<chrono::FixedOffset>) -> TransformRule {
         TransformRule {
-            id: None,
-            endpoint_id: None,
-            name: None,
-            rule_type: None,
+            id,
+            endpoint_id,
+            name,
+            rule_type,
             config: None,
-            is_active: None,
-            created_at: None,
+            is_active,
+            created_at,
         }
     }
 }

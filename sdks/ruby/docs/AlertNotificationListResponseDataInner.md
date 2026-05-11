@@ -1,4 +1,4 @@
-# HookSniff::AlertNotificationListResponseDataInner
+# HooksniffSdk::AlertNotificationListResponseDataInner
 
 ## Properties
 
@@ -14,9 +14,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::AlertNotificationListResponseDataInner.new(
+instance = HooksniffSdk::AlertNotificationListResponseDataInner.new(
   id: null,
   alert_rule_id: null,
   message: null,

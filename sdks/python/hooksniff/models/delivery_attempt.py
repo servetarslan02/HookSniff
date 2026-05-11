@@ -30,13 +30,13 @@ class DeliveryAttempt(BaseModel):
     """
     DeliveryAttempt
     """ # noqa: E501
-    id: Optional[UUID] = None
-    attempt_number: Optional[StrictInt] = None
+    id: UUID
+    attempt_number: StrictInt
     status_code: Optional[StrictInt] = None
     response_body: Optional[StrictStr] = None
     duration_ms: Optional[StrictInt] = None
     error_message: Optional[StrictStr] = None
-    created_at: Optional[datetime] = None
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "attempt_number", "status_code", "response_body", "duration_ms", "error_message", "created_at"]
 
     model_config = ConfigDict(

@@ -1,4 +1,4 @@
-# HookSniff.Model.AlertRule
+# HookSniff.Sdk.Model.AlertRule
 
 ## Properties
 

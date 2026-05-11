@@ -1,4 +1,4 @@
-# HookSniff.Model.SearchRequest
+# HookSniff.Sdk.Model.SearchRequest
 Search request for webhook deliveries
 
 ## Properties

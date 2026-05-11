@@ -1,4 +1,4 @@
-# HookSniff::CreateEndpointRequest
+# HooksniffSdk::CreateEndpointRequest
 
 ## Properties
 
@@ -17,9 +17,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::CreateEndpointRequest.new(
+instance = HooksniffSdk::CreateEndpointRequest.new(
   url: null,
   description: null,
   allowed_ips: null,

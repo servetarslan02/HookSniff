@@ -1,4 +1,4 @@
-# HookSniff.Model.RetryPolicy
+# HookSniff.Sdk.Model.RetryPolicy
 
 ## Properties
 

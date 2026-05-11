@@ -1,4 +1,4 @@
-# HookSniff::InboundWebhookResponse
+# HooksniffSdk::InboundWebhookResponse
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::InboundWebhookResponse.new(
+instance = HooksniffSdk::InboundWebhookResponse.new(
   id: null,
   status: null,
   endpoint_id: null,

@@ -1,4 +1,4 @@
-# HookSniff.Model.SearchRequestFilters
+# HookSniff.Sdk.Model.SearchRequestFilters
 Additional filters (status, endpoint_id, etc.)
 
 ## Properties

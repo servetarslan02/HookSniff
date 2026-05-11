@@ -23,8 +23,8 @@ List invoices
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 try {
@@ -66,8 +66,8 @@ Open customer billing portal
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 try {
@@ -109,8 +109,8 @@ Get current subscription
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 try {
@@ -152,8 +152,8 @@ Upgrade plan
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 val upgradeRequest : UpgradeRequest =  // UpgradeRequest | 
@@ -198,8 +198,8 @@ Get current usage
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 try {
@@ -241,8 +241,8 @@ iyzico webhook receiver
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 val body : kotlin.Any = Object // kotlin.Any | 
@@ -284,8 +284,8 @@ Polar.sh webhook receiver
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 val body : kotlin.Any = Object // kotlin.Any | 
@@ -327,8 +327,8 @@ Stripe webhook receiver
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = BillingApi()
 val body : kotlin.Any = Object // kotlin.Any | 

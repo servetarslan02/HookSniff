@@ -1,4 +1,4 @@
-# HookSniff::Notification
+# HooksniffSdk::Notification
 
 ## Properties
 
@@ -14,9 +14,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::Notification.new(
+instance = HooksniffSdk::Notification.new(
   id: null,
   title: null,
   body: null,

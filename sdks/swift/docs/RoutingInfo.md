@@ -3,12 +3,12 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**endpointId** | **UUID** |  | [optional] 
-**routingStrategy** | **String** |  | [optional] 
+**endpointId** | **UUID** |  | 
+**routingStrategy** | **String** |  | 
 **fallbackUrl** | **String** |  | [optional] 
-**avgResponseMs** | **Int** |  | [optional] 
-**failureStreak** | **Int** |  | [optional] 
-**isHealthy** | **Bool** |  | [optional] 
+**avgResponseMs** | **Int** |  | 
+**failureStreak** | **Int** |  | 
+**isHealthy** | **Bool** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

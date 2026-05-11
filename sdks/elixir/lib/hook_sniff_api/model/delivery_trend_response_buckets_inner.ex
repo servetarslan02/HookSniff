@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.DeliveryTrendResponseBucketsInner do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :timestamp,
     :successful,

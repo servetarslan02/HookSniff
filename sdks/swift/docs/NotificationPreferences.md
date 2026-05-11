@@ -3,9 +3,9 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**emailOnFailure** | **Bool** |  | [optional] [default to true]
-**emailOnDeadLetter** | **Bool** |  | [optional] [default to true]
-**emailOnSuccess** | **Bool** |  | [optional] [default to false]
+**emailOnFailure** | **Bool** |  | [default to true]
+**emailOnDeadLetter** | **Bool** |  | [default to true]
+**emailOnSuccess** | **Bool** |  | [default to false]
 **slackWebhookUrl** | **String** |  | [optional] 
 **discordWebhookUrl** | **String** |  | [optional] 
 **webhookUrl** | **String** |  | [optional] 

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.AdminUsersIdStatusPutRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :is_active
   ]

@@ -1,4 +1,4 @@
-# HookSniff::UserSummary
+# HooksniffSdk::UserSummary
 
 ## Properties
 
@@ -14,9 +14,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::UserSummary.new(
+instance = HooksniffSdk::UserSummary.new(
   id: null,
   email: null,
   name: null,

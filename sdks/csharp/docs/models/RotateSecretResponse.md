@@ -1,4 +1,4 @@
-# HookSniff.Model.RotateSecretResponse
+# HookSniff.Sdk.Model.RotateSecretResponse
 New signing secret after rotation
 
 ## Properties

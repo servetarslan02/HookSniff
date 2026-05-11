@@ -13,10 +13,10 @@ import AnyCodable
 public struct UpgradeResponse: Codable, JSONEncodable, Hashable {
 
     public var checkoutUrl: String?
-    public var provider: String?
-    public var message: String?
+    public var provider: String
+    public var message: String
 
-    public init(checkoutUrl: String? = nil, provider: String? = nil, message: String? = nil) {
+    public init(checkoutUrl: String? = nil, provider: String, message: String) {
         self.checkoutUrl = checkoutUrl
         self.provider = provider
         self.message = message
@@ -33,8 +33,8 @@ public struct UpgradeResponse: Codable, JSONEncodable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(checkoutUrl, forKey: .checkoutUrl)
-        try container.encodeIfPresent(provider, forKey: .provider)
-        try container.encodeIfPresent(message, forKey: .message)
+        try container.encode(provider, forKey: .provider)
+        try container.encode(message, forKey: .message)
     }
 }
 

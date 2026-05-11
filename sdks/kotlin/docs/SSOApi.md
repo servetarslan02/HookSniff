@@ -19,8 +19,8 @@ Delete SSO configuration
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = SSOApi()
 try {
@@ -61,8 +61,8 @@ Get SSO configuration
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = SSOApi()
 try {
@@ -103,8 +103,8 @@ Create/update SSO configuration
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = SSOApi()
 val ssoConfigPostRequest : SsoConfigPostRequest =  // SsoConfigPostRequest | 
@@ -148,8 +148,8 @@ Test SSO connection
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = SSOApi()
 try {

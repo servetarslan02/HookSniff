@@ -310,6 +310,21 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['title'] === null) {
+            $invalidProperties[] = "'title' can't be null";
+        }
+        if ($this->container['body'] === null) {
+            $invalidProperties[] = "'body' can't be null";
+        }
+        if ($this->container['is_read'] === null) {
+            $invalidProperties[] = "'is_read' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -328,7 +343,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -338,7 +353,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -355,7 +370,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets title
      *
-     * @return string|null
+     * @return string
      */
     public function getTitle()
     {
@@ -365,7 +380,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets title
      *
-     * @param string|null $title title
+     * @param string $title title
      *
      * @return self
      */
@@ -382,7 +397,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets body
      *
-     * @return string|null
+     * @return string
      */
     public function getBody()
     {
@@ -392,7 +407,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets body
      *
-     * @param string|null $body body
+     * @param string $body body
      *
      * @return self
      */
@@ -409,7 +424,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_read
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsRead()
     {
@@ -419,7 +434,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_read
      *
-     * @param bool|null $is_read is_read
+     * @param bool $is_read is_read
      *
      * @return self
      */
@@ -470,7 +485,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -480,7 +495,7 @@ class Notification implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param \DateTime|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */

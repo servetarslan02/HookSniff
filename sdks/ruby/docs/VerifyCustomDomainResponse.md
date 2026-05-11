@@ -1,4 +1,4 @@
-# HookSniff::VerifyCustomDomainResponse
+# HooksniffSdk::VerifyCustomDomainResponse
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::VerifyCustomDomainResponse.new(
+instance = HooksniffSdk::VerifyCustomDomainResponse.new(
   status: null,
   dns_records: null
 )

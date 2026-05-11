@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.EndpointsEndpointIdTransformsTestPostRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :payload,
     :rule_id

@@ -30,23 +30,20 @@ class CustomerResponse(BaseModel):
     """
     CustomerResponse
     """ # noqa: E501
-    id: Optional[UUID] = None
-    email: Optional[StrictStr] = None
+    id: UUID
+    email: StrictStr
     name: Optional[StrictStr] = None
     api_key: Optional[StrictStr] = Field(default=None, description="Only returned on registration")
-    plan: Optional[StrictStr] = None
-    webhook_limit: Optional[StrictInt] = None
-    webhook_count: Optional[StrictInt] = None
-    is_admin: Optional[StrictBool] = None
-    created_at: Optional[datetime] = None
+    plan: StrictStr
+    webhook_limit: StrictInt
+    webhook_count: StrictInt
+    is_admin: StrictBool
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "email", "name", "api_key", "plan", "webhook_limit", "webhook_count", "is_admin", "created_at"]
 
     @field_validator('plan')
     def plan_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['free', 'pro', 'business']):
             raise ValueError("must be one of enum values ('free', 'pro', 'business')")
         return value

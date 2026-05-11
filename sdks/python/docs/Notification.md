@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**title** | **str** |  | [optional] 
-**body** | **str** |  | [optional] 
-**is_read** | **bool** |  | [optional] 
+**id** | **UUID** |  | 
+**title** | **str** |  | 
+**body** | **str** |  | 
+**is_read** | **bool** |  | 
 **link** | **str** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**created_at** | **datetime** |  | 
 
 ## Example
 

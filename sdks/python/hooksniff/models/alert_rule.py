@@ -18,8 +18,9 @@ import pprint
 import re  # noqa: F401
 import json
 
+from datetime import datetime
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from uuid import UUID
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,21 +30,18 @@ class AlertRule(BaseModel):
     """
     AlertRule
     """ # noqa: E501
-    id: Optional[UUID] = None
-    name: Optional[StrictStr] = None
-    condition: Optional[StrictStr] = None
-    threshold: Optional[StrictInt] = None
-    channels: Optional[List[StrictStr]] = None
-    is_active: Optional[StrictBool] = None
-    created_at: Optional[StrictStr] = None
+    id: UUID
+    name: StrictStr
+    condition: StrictStr
+    threshold: StrictInt
+    channels: List[StrictStr]
+    is_active: StrictBool
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "name", "condition", "threshold", "channels", "is_active", "created_at"]
 
     @field_validator('condition')
     def condition_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['failure_rate', 'latency', 'consecutive_failures']):
             raise ValueError("must be one of enum values ('failure_rate', 'latency', 'consecutive_failures')")
         return value
@@ -51,9 +49,6 @@ class AlertRule(BaseModel):
     @field_validator('channels')
     def channels_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         for i in value:
             if i not in set(['slack', 'email', 'webhook']):
                 raise ValueError("each list item must be one of ('slack', 'email', 'webhook')")

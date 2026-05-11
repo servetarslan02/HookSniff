@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from hooksniff.models.notification import Notification
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,9 +29,9 @@ class NotificationListResponse(BaseModel):
     """
     NotificationListResponse
     """ # noqa: E501
-    notifications: Optional[List[Notification]] = None
-    total: Optional[StrictInt] = None
-    unread_count: Optional[StrictInt] = None
+    notifications: List[Notification]
+    total: StrictInt
+    unread_count: StrictInt
     __properties: ClassVar[List[str]] = ["notifications", "total", "unread_count"]
 
     model_config = ConfigDict(

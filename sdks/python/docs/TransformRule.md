@@ -5,13 +5,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**endpoint_id** | **UUID** |  | [optional] 
-**name** | **str** |  | [optional] 
-**rule_type** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**endpoint_id** | **UUID** |  | 
+**name** | **str** |  | 
+**rule_type** | **str** |  | 
 **config** | **object** |  | [optional] 
-**is_active** | **bool** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**is_active** | **bool** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 
