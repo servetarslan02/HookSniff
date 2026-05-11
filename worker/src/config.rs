@@ -1,6 +1,7 @@
 use anyhow::Result;
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct WorkerConfig {
     pub database_url: String,
     /// Redis URL for state persistence (circuit breaker, throttle).
