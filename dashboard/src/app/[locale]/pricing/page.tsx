@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import Footer from '@/components/Footer';
+import PublicNavbar from '@/components/PublicNavbar';
 
 
 
@@ -169,17 +169,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      {/* Nav */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{t('title')}</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={t('title')} />
 
       <main className="max-w-6xl mx-auto px-6 py-16">
         {/* Hero */}
