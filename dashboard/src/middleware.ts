@@ -4,20 +4,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const handleI18nRouting = createMiddleware(routing);
 
-/**
- * Generate a cryptographic nonce for CSP script-src.
- * Used to replace 'unsafe-eval' with nonce-based script trust.
- */
-function generateNonce(): string {
-  const buffer = new Uint8Array(16);
-  crypto.getRandomValues(buffer);
-  // Base64-encode without padding (CSP nonce convention)
-  return btoa(String.fromCharCode(...buffer))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
-
 // Build locale regex from routing config (avoids hardcoding)
 const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})`);
 
@@ -50,24 +36,14 @@ export default function middleware(request: NextRequest) {
     }
   }
 
-  // BUG-022: Generate per-request nonce for CSP script-src.
-  // Replaces 'unsafe-eval' with nonce-based trust. Next.js automatically
-  // picks up the nonce from the 'x-nonce' request header for inline scripts.
-  const nonce = generateNonce();
-
   // Apply i18n routing for all other routes
   const response = handleI18nRouting(request);
 
-  // Set nonce as request header so Next.js can use it for inline scripts
-  response.headers.set('x-nonce', nonce);
-
-  // CSP header with nonce — 'unsafe-eval' removed (not needed in Next.js 15+ production).
-  // 'unsafe-inline' kept for style-src (required by Next.js CSS-in-JS / styled-jsx).
-  // 'strict-dynamic' ensures scripts loaded by a nonce-trusted script are also trusted.
-  // Older browsers that don't support 'strict-dynamic' fall back to 'unsafe-inline'.
+  // CSP header — 'unsafe-inline' required for Next.js inline scripts (hydration, RSC payload).
+  // 'unsafe-eval' removed (not needed in Next.js 15+ production).
   response.headers.set(
     'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hooksniff-api-1046140057667.europe-west1.run.app https://*.run.app https://*.vercel.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
+    `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hooksniff-api-1046140057667.europe-west1.run.app https://*.run.app https://*.vercel.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
   );
 
   return response;
