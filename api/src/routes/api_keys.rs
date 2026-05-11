@@ -159,6 +159,7 @@ async fn rotate_api_key(
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct CreateKeyRequest {
     name: Option<String>,
 }
