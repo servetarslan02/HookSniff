@@ -1,7 +1,7 @@
 namespace HookSniff.Resources;
 
 /// <summary>
-/// Webhooks resource — send and test webhooks.
+/// Webhooks resource — send, list, get, replay, and batch webhooks.
 /// </summary>
 public class Webhooks
 {
@@ -9,19 +9,11 @@ public class Webhooks
 
     internal Webhooks(RequestContext ctx) => _ctx = ctx;
 
-    /// <summary>Send a webhook event.</summary>
+    /// <summary>Send a single webhook event.</summary>
     public async Task<object> SendAsync(object body)
     {
-        var req = new Request("POST", "/v1/webhooks/send");
+        var req = new Request("POST", "/v1/webhooks");
         req.SetBody(body);
-        return (await req.SendAsync<object>(_ctx))!;
-    }
-
-    /// <summary>Test a webhook endpoint.</summary>
-    public async Task<object> TestAsync(string endpointId)
-    {
-        var req = new Request("POST", "/v1/webhooks/test/{endpoint_id}");
-        req.SetPathParam("endpoint_id", endpointId);
         return (await req.SendAsync<object>(_ctx))!;
     }
 
@@ -30,6 +22,29 @@ public class Webhooks
     {
         var req = new Request("POST", "/v1/webhooks/batch");
         req.SetBody(body);
+        return (await req.SendAsync<object>(_ctx))!;
+    }
+
+    /// <summary>List deliveries.</summary>
+    public async Task<object> ListAsync()
+    {
+        var req = new Request("GET", "/v1/webhooks");
+        return (await req.SendAsync<object>(_ctx))!;
+    }
+
+    /// <summary>Get a specific delivery.</summary>
+    public async Task<object> GetAsync(string id)
+    {
+        var req = new Request("GET", "/v1/webhooks/{id}");
+        req.SetPathParam("id", id);
+        return (await req.SendAsync<object>(_ctx))!;
+    }
+
+    /// <summary>Replay a delivery.</summary>
+    public async Task<object> ReplayAsync(string id)
+    {
+        var req = new Request("POST", "/v1/webhooks/{id}/replay");
+        req.SetPathParam("id", id);
         return (await req.SendAsync<object>(_ctx))!;
     }
 }

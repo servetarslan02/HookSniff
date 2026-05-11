@@ -23,7 +23,7 @@ public class Health {
 
     /** Health check */
     public Map<String, Object> check() throws ApiException, IOException, InterruptedException {
-        RequestHelper req = new RequestHelper("GET", "/v1/health");
+        RequestHelper req = new RequestHelper("GET", "/health");
         return req.send(config, MAP);
     }
 }
