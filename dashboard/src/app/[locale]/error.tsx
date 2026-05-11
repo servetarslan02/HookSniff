@@ -11,7 +11,6 @@ export default function Error({
   reset: () => void;
 }) {
   const t = useTranslations('error');
-  const tc = useTranslations('common');
 
   useEffect(() => {
     console.error('Page error:', error);

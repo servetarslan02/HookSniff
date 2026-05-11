@@ -182,7 +182,7 @@ function ResponseInspector({
                     : 'bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-400'
             }`}
           >
-            {status} {status < 300 ? 'OK' : status < 400 ? 'Redirect' : status < 500 ? 'Client Error' : 'Server Error'}
+            {status} {status < 300 ? t('statusOk') : status < 400 ? t('statusRedirect') : status < 500 ? t('statusClientError') : t('statusServerError')}
           </span>
         )}
         {duration !== null && (

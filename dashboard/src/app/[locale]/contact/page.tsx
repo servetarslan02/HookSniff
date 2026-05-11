@@ -59,7 +59,7 @@ export default function ContactPage() {
               </svg>
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.email')}</h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">Use the form below 👇</p>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('contact.useFormBelow')}</p>
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
@@ -70,7 +70,7 @@ export default function ContactPage() {
               </svg>
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.location')}</h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">Turkey 🇹🇷</p>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('contact.locationValue')}</p>
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
@@ -80,7 +80,7 @@ export default function ContactPage() {
               </svg>
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.responseTime')}</h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">Usually within 24 hours</p>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('contact.responseTimeValue')}</p>
           </div>
         </div>
 
@@ -90,13 +90,13 @@ export default function ContactPage() {
 
           {status === 'sent' && (
             <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl p-4 mb-6">
-              <p className="text-emerald-700 dark:text-emerald-400 font-medium">✅ Message sent! We&apos;ll get back to you soon.</p>
+              <p className="text-emerald-700 dark:text-emerald-400 font-medium">{t('contact.messageSent')}</p>
             </div>
           )}
 
           {status === 'error' && (
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4 mb-6">
-              <p className="text-red-700 dark:text-red-400 font-medium">❌ Failed to send. Please try again or reach us on GitHub Discussions.</p>
+              <p className="text-red-700 dark:text-red-400 font-medium">{t('contact.sendError')}</p>
             </div>
           )}
 
@@ -151,7 +151,7 @@ export default function ContactPage() {
                 onChange={e => setForm({ ...form, message: e.target.value })}
                 rows={6}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
-                placeholder="How can we help?"
+                placeholder={t('contact.howCanWeHelp')}
                 required
               />
             </div>
