@@ -1,4 +1,4 @@
-# hooksniff.Model.CreateTransformRuleRequest
+# HookSniff.Model.CreateTransformRuleRequest
 
 ## Properties
 

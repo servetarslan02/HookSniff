@@ -1,4 +1,4 @@
-# OpenapiClient::Confirm2faRequest
+# HookSniff::Confirm2faRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::Confirm2faRequest.new(
+instance = HookSniff::Confirm2faRequest.new(
   code: null
 )
 ```

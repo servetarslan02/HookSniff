@@ -1,4 +1,4 @@
-# OpenapiClient::CreateTransformRuleRequest
+# HookSniff::CreateTransformRuleRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CreateTransformRuleRequest.new(
+instance = HookSniff::CreateTransformRuleRequest.new(
   name: null,
   rule_type: null,
   config: null

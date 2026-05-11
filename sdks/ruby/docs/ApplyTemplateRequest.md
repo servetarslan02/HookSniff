@@ -1,4 +1,4 @@
-# OpenapiClient::ApplyTemplateRequest
+# HookSniff::ApplyTemplateRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ApplyTemplateRequest.new(
+instance = HookSniff::ApplyTemplateRequest.new(
   endpoint_id: null,
   variables: null
 )

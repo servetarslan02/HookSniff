@@ -1,20 +1,20 @@
-# OpenapiClient::DeliveryListResponse
+# HookSniff::DeliveryListResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **deliveries** | [**Array&lt;Delivery&gt;**](Delivery.md) |  | [optional] |
-| **total** | **Integer** |  | [optional] |
-| **page** | **Integer** |  | [optional] |
-| **per_page** | **Integer** |  | [optional] |
+| **deliveries** | [**Array&lt;Delivery&gt;**](Delivery.md) |  |  |
+| **total** | **Integer** |  |  |
+| **page** | **Integer** |  |  |
+| **per_page** | **Integer** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::DeliveryListResponse.new(
+instance = HookSniff::DeliveryListResponse.new(
   deliveries: null,
   total: null,
   page: null,

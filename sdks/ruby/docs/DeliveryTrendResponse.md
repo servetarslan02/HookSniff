@@ -1,18 +1,18 @@
-# OpenapiClient::DeliveryTrendResponse
+# HookSniff::DeliveryTrendResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **range** | **String** |  | [optional] |
-| **buckets** | [**Array&lt;DeliveryTrendResponseBucketsInner&gt;**](DeliveryTrendResponseBucketsInner.md) |  | [optional] |
+| **range** | **String** |  |  |
+| **buckets** | [**Array&lt;DeliveryTrendResponseBucketsInner&gt;**](DeliveryTrendResponseBucketsInner.md) |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::DeliveryTrendResponse.new(
+instance = HookSniff::DeliveryTrendResponse.new(
   range: null,
   buckets: null
 )

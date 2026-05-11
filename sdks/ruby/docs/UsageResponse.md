@@ -1,23 +1,23 @@
-# OpenapiClient::UsageResponse
+# HookSniff::UsageResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **plan** | **String** |  | [optional] |
-| **period_start** | **Time** |  | [optional] |
-| **period_end** | **Time** |  | [optional] |
-| **webhooks_used** | **Integer** |  | [optional] |
-| **webhooks_limit** | **Integer** |  | [optional] |
-| **endpoints_used** | **Integer** |  | [optional] |
-| **endpoints_limit** | **Integer** |  | [optional] |
+| **plan** | **String** |  |  |
+| **period_start** | **Time** |  |  |
+| **period_end** | **Time** |  |  |
+| **webhooks_used** | **Integer** |  |  |
+| **webhooks_limit** | **Integer** |  |  |
+| **endpoints_used** | **Integer** |  |  |
+| **endpoints_limit** | **Integer** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::UsageResponse.new(
+instance = HookSniff::UsageResponse.new(
   plan: null,
   period_start: null,
   period_end: null,

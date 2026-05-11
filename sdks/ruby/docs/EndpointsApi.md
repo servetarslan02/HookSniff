@@ -1,4 +1,4 @@
-# OpenapiClient::EndpointsApi
+# HookSniff::EndpointsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -23,20 +23,20 @@ List all endpoints
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::EndpointsApi.new
+api_instance = HookSniff::EndpointsApi.new
 
 begin
   # List all endpoints
   result = api_instance.endpoints_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_get: #{e}"
 end
 ```
@@ -54,7 +54,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<Endpoint>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_get_with_http_info: #{e}"
 end
 ```
@@ -87,20 +87,20 @@ Delete endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::EndpointsApi.new
+api_instance = HookSniff::EndpointsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Delete endpoint
   api_instance.endpoints_id_delete(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_delete: #{e}"
 end
 ```
@@ -118,7 +118,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_delete_with_http_info: #{e}"
 end
 ```
@@ -153,21 +153,21 @@ Get endpoint by ID
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::EndpointsApi.new
+api_instance = HookSniff::EndpointsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get endpoint by ID
   result = api_instance.endpoints_id_get(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_get: #{e}"
 end
 ```
@@ -185,7 +185,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Endpoint>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_get_with_http_info: #{e}"
 end
 ```
@@ -220,22 +220,22 @@ Update endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::EndpointsApi.new
+api_instance = HookSniff::EndpointsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-update_endpoint_request = OpenapiClient::UpdateEndpointRequest.new # UpdateEndpointRequest | 
+update_endpoint_request = HookSniff::UpdateEndpointRequest.new({url: 'url_example', description: 'description_example', is_active: false, allowed_ips: ['allowed_ips_example'], event_filter: ['event_filter_example'], retry_policy: HookSniff::RetryPolicy.new({max_attempts: 37, backoff: 'exponential', initial_delay_secs: 37, max_delay_secs: 37}), routing_strategy: 'round-robin', fallback_url: 'fallback_url_example', format: 'standard'}) # UpdateEndpointRequest | 
 
 begin
   # Update endpoint
   result = api_instance.endpoints_id_put(id, update_endpoint_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_put: #{e}"
 end
 ```
@@ -253,7 +253,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Endpoint>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_put_with_http_info: #{e}"
 end
 ```
@@ -289,22 +289,22 @@ Update retry policy for an endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::EndpointsApi.new
+api_instance = HookSniff::EndpointsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-retry_policy = OpenapiClient::RetryPolicy.new # RetryPolicy | 
+retry_policy = HookSniff::RetryPolicy.new({max_attempts: 37, backoff: 'exponential', initial_delay_secs: 37, max_delay_secs: 37}) # RetryPolicy | 
 
 begin
   # Update retry policy for an endpoint
   result = api_instance.endpoints_id_retry_policy_put(id, retry_policy)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_retry_policy_put: #{e}"
 end
 ```
@@ -322,7 +322,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Endpoint>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_retry_policy_put_with_http_info: #{e}"
 end
 ```
@@ -358,21 +358,21 @@ Rotate endpoint signing secret
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::EndpointsApi.new
+api_instance = HookSniff::EndpointsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Rotate endpoint signing secret
   result = api_instance.endpoints_id_rotate_secret_post(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_rotate_secret_post: #{e}"
 end
 ```
@@ -390,7 +390,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <EndpointsIdRotateSecretPost200Response>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_id_rotate_secret_post_with_http_info: #{e}"
 end
 ```
@@ -425,21 +425,21 @@ Create a new endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::EndpointsApi.new
-create_endpoint_request = OpenapiClient::CreateEndpointRequest.new({url: 'url_example'}) # CreateEndpointRequest | 
+api_instance = HookSniff::EndpointsApi.new
+create_endpoint_request = HookSniff::CreateEndpointRequest.new({url: 'url_example'}) # CreateEndpointRequest | 
 
 begin
   # Create a new endpoint
   result = api_instance.endpoints_post(create_endpoint_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_post: #{e}"
 end
 ```
@@ -457,7 +457,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Endpoint>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling EndpointsApi->endpoints_post_with_http_info: #{e}"
 end
 ```

@@ -1,30 +1,30 @@
-# OpenapiClient::Endpoint
+# HookSniff::Endpoint
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **url** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **url** | **String** |  |  |
 | **description** | **String** |  | [optional] |
-| **is_active** | **Boolean** |  | [optional] |
-| **retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **is_active** | **Boolean** |  |  |
+| **retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  |  |
+| **created_at** | **Time** |  |  |
 | **allowed_ips** | **Array&lt;String&gt;** | CIDR blocks or exact IPs | [optional] |
 | **event_filter** | **Array&lt;String&gt;** | Wildcard patterns (e.g. \&quot;order.*\&quot;) | [optional] |
 | **custom_headers** | **Object** |  | [optional] |
-| **routing_strategy** | **String** |  | [optional] |
+| **routing_strategy** | **String** |  |  |
 | **fallback_url** | **String** |  | [optional] |
-| **avg_response_ms** | **Integer** |  | [optional] |
-| **failure_streak** | **Integer** |  | [optional] |
-| **format** | **String** |  | [optional] |
+| **avg_response_ms** | **Integer** |  |  |
+| **failure_streak** | **Integer** |  |  |
+| **format** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::Endpoint.new(
+instance = HookSniff::Endpoint.new(
   id: null,
   url: null,
   description: null,

@@ -1,20 +1,20 @@
-# OpenapiClient::CreateApiKeyResponse
+# HookSniff::CreateApiKeyResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **key** | **String** | Full API key — only shown once | [optional] |
-| **prefix** | **String** |  | [optional] |
-| **message** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **key** | **String** | Full API key — only shown once |  |
+| **prefix** | **String** |  |  |
+| **message** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CreateApiKeyResponse.new(
+instance = HookSniff::CreateApiKeyResponse.new(
   id: null,
   key: null,
   prefix: null,

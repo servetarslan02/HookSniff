@@ -1,4 +1,4 @@
-# OpenapiClient::BatchResponseErrorsInner
+# HookSniff::BatchResponseErrorsInner
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::BatchResponseErrorsInner.new(
+instance = HookSniff::BatchResponseErrorsInner.new(
   index: null,
   error: null
 )

@@ -1,4 +1,4 @@
-# hooksniff.Model.CreateEndpointRequest
+# HookSniff.Model.CreateEndpointRequest
 
 ## Properties
 

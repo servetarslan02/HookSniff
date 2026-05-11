@@ -1,23 +1,23 @@
-# OpenapiClient::SubscriptionResponse
+# HookSniff::SubscriptionResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **plan** | **String** |  | [optional] |
-| **status** | **String** |  | [optional] |
-| **payment_provider** | **String** |  | [optional] |
-| **webhook_limit** | **Integer** |  | [optional] |
-| **endpoint_limit** | **Integer** |  | [optional] |
-| **retention_days** | **Integer** |  | [optional] |
-| **monthly_price_cents** | **Integer** |  | [optional] |
+| **plan** | **String** |  |  |
+| **status** | **String** |  |  |
+| **payment_provider** | **String** |  |  |
+| **webhook_limit** | **Integer** |  |  |
+| **endpoint_limit** | **Integer** |  |  |
+| **retention_days** | **Integer** |  |  |
+| **monthly_price_cents** | **Integer** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SubscriptionResponse.new(
+instance = HookSniff::SubscriptionResponse.new(
   plan: null,
   status: null,
   payment_provider: null,

@@ -1,4 +1,4 @@
-# OpenapiClient::AnalyticsApi
+# HookSniff::AnalyticsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -19,14 +19,14 @@ Delivery trend over time
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AnalyticsApi.new
+api_instance = HookSniff::AnalyticsApi.new
 opts = {
   range: '24h' # String | 
 }
@@ -35,7 +35,7 @@ begin
   # Delivery trend over time
   result = api_instance.analytics_deliveries_get(opts)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AnalyticsApi->analytics_deliveries_get: #{e}"
 end
 ```
@@ -53,7 +53,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <DeliveryTrendResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AnalyticsApi->analytics_deliveries_get_with_http_info: #{e}"
 end
 ```
@@ -88,14 +88,14 @@ Latency trend over time
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AnalyticsApi.new
+api_instance = HookSniff::AnalyticsApi.new
 opts = {
   range: '24h' # String | 
 }
@@ -104,7 +104,7 @@ begin
   # Latency trend over time
   result = api_instance.analytics_latency_get(opts)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AnalyticsApi->analytics_latency_get: #{e}"
 end
 ```
@@ -122,7 +122,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <LatencyTrendResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AnalyticsApi->analytics_latency_get_with_http_info: #{e}"
 end
 ```
@@ -157,14 +157,14 @@ Success rate metrics
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AnalyticsApi.new
+api_instance = HookSniff::AnalyticsApi.new
 opts = {
   range: '24h' # String | 
 }
@@ -173,7 +173,7 @@ begin
   # Success rate metrics
   result = api_instance.analytics_success_rate_get(opts)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AnalyticsApi->analytics_success_rate_get: #{e}"
 end
 ```
@@ -191,7 +191,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <SuccessRateResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AnalyticsApi->analytics_success_rate_get_with_http_info: #{e}"
 end
 ```
