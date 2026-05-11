@@ -71,7 +71,8 @@
     "processing": "Processing...",
     "copy": "Copy",
     "backToDashboard": "Back to Dashboard",
-    "logout": "Logout"
+    "logout": "Logout",
+    "user": "User"
   },
   "nav": {
     "dashboard": "Dashboard",
