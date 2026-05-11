@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 
 
@@ -84,13 +84,15 @@ export default function PricingPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const router = useRouter();
   const { token } = useAuth();
+  const locale = useLocale();
   const t = useTranslations('pricing');
   const tf = useTranslations('pricingFaq');
+  const isTr = locale === 'tr';
 
   const planData = [
-    { key: 'free', price: '$0', ctaStyle: 'outline', popular: false },
-    { key: 'pro', price: '$49', ctaStyle: 'filled', popular: true },
-    { key: 'business', price: '$149', ctaStyle: 'outline', popular: false },
+    { key: 'free', price: isTr ? '₺0' : '$0', ctaStyle: 'outline', popular: false },
+    { key: 'pro', price: isTr ? '₺999' : '$49', ctaStyle: 'filled', popular: true },
+    { key: 'business', price: isTr ? '₺1,999' : '$99', ctaStyle: 'outline', popular: false },
   ];
 
   const featureKeys: Record<string, string[]> = {

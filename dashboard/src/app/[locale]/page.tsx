@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import Footer from '@/components/Footer';
 
@@ -251,6 +251,7 @@ export default function Home() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const router = useRouter();
   const { token } = useAuth();
+  const locale = useLocale();
   const tNav = useTranslations('landing.nav');
   const tHero = useTranslations('landing.hero');
   const tFeatures = useTranslations('landing.features');
@@ -260,10 +261,11 @@ export default function Home() {
   const featureKeys = ['smartRetries', 'hmacSignatures', 'dashboard', 'lowLatency', 'dlq', 'global'] as const;
   const featureIcons = [icons.retry, icons.shield, icons.chart, icons.bolt, icons.queue, icons.globe];
 
+  const isTr = locale === 'tr';
   const plans = [
     { name: tPricing('free'), price: '$0', period: tPricing('month'), features: tPricing.raw('freeFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('pro'), price: '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('startTrial'), popular: true },
-    { name: tPricing('business'), price: '$149', period: tPricing('month'), features: tPricing.raw('businessFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+    { name: tPricing('pro'), price: isTr ? '₺999' : '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('startTrial'), popular: true },
+    { name: tPricing('business'), price: isTr ? '₺1,999' : '$99', period: tPricing('month'), features: tPricing.raw('businessFeatures') as string[], cta: tPricing('contactSales'), popular: false },
   ];
 
   return (
