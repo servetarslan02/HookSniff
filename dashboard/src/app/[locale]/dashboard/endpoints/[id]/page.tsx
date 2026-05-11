@@ -6,7 +6,7 @@ import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, type Endpoint, type RetryPolicyConfig } from '@/lib/api';
+import { endpointsApi, apiFetch, type Endpoint, type RetryPolicyConfig } from '@/lib/api';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },
@@ -117,12 +117,9 @@ export default function EndpointSettingsPage() {
     setTestSending(true);
     setTestResult(null);
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-      const res = await fetch(`${API}/webhooks`, {
+      await apiFetch('/webhooks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include' as const,
-        body: JSON.stringify({
+        body: {
           endpoint_id: id,
           event: 'test.ping',
           data: {
@@ -131,9 +128,9 @@ export default function EndpointSettingsPage() {
             timestamp: new Date().toISOString(),
             endpoint_url: endpoint.url,
           },
-        }),
+        },
+        token,
       });
-      if (!res.ok) throw new Error(t('toastTestFailed'));
       setTestResult('success');
       toast(t('toastTestSent'), 'success');
     } catch (err: unknown) {

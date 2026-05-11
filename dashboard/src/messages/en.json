@@ -287,7 +287,11 @@
     "delete": "Delete",
     "nameLabel": "Name",
     "conditionLabel": "Condition",
-    "thresholdLabel": "Threshold"
+    "thresholdLabel": "Threshold",
+    "fetchFailed": "Failed to load alerts",
+    "createFailed": "Failed to create alert",
+    "deleteFailed": "Failed to delete alert",
+    "testFailed": "Test failed — check endpoint URL and try again"
   },
   "playground": {
     "title": "API Playground",
