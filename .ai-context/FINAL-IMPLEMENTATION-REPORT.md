@@ -8,29 +8,29 @@
 
 ---
 
-## 📊 Genel Durum Özeti (Güncellenmiş)
+## 📊 Genel Durum Özeti (Final — Çapraz Kontrollü)
 
 | Kategori | Kritik | Yüksek | Orta | Düşük | Toplam |
 |----------|--------|--------|------|-------|--------|
 | 🚨 Güvenlik & Auth | 15 | 18 | 20 | 8 | **~61** |
 | 🖥️ Admin Panel | 5 | 20 | 15 | 10 | **~50** |
-| 🎨 Frontend (Dashboard) | 5 | 8 | 15 | 10 | **~38** |
+| 🎨 Frontend (Dashboard) | 14 | 16 | 25 | 15 | **~70** |
 | ⚙️ Backend Async/Crypto/Rate | 8 | 10 | 15 | 3 | **~36** |
 | 💳 Payments & Billing | 1 | 4 | 7 | 2 | **~14** |
 | 🗄️ Veritabanı | 5 | 6 | 10 | 5 | **~26** |
 | 🔧 Altyapı & Config | 3 | 3 | 6 | 2 | **~14** |
-| 🌍 i18n (Çeviri) | 1 | 6 | 6 | 0 | **~13** |
+| 🌍 i18n (Çeviri) | 4 | 6 | 6 | 0 | **~16** |
 | ♿ Erişilebilirlik | 13 | 8 | 6 | 0 | **~27** |
 | 🔒 GDPR | 2 | 2 | 3 | 0 | **~7** |
 | ⚡ Performans | 0 | 1 | 3 | 1 | **~5** |
 | 📧 Email Sistemi | 0 | 3 | 4 | 2 | **~9** |
 | 📦 SDK & OpenAPI | 0 | 0 | 3 | 1 | **~4** |
 | 📝 İçerik & SEO | 0 | 3 | 3 | 0 | **~6** |
-| 🏗️ Code Quality | 0 | 3 | 5 | 2 | **~10** |
-| **TOPLAM** | **~59** | **~95** | **~121** | **~46** | **~321** |
+| 🏗️ Code Quality & Deps | 0 | 3 | 8 | 3 | **~14** |
+| **TOPLAM** | **~70** | **~103** | **~134** | **~52** | **~359** |
 
 > **Not:** Bu tablo sadece KALAN (⬜) işleri gösterir. Önceki oturumlarda yapılan ~153 iş dahil değildir.
-> **Tekilleştirilmiş toplam:** ~321 benzersiz sorun (rapor bazlı çapraz kontrol ile).
+> **Çapraz kontrol:** Tüm 60+ rapor dosyası tarandı, agent raporları (1-5), deep-* raporları, admin raporları dahil.
 
 ---
 
@@ -348,52 +348,110 @@
 | 3.2.4 | Status count'lar sadece mevcut sayfadan hesaplanıyor | ✅ Yapıldı (Oturum 84) |
 | 3.2.5 | Stale closure riskleri (4 useEffect) | ✅ Yapıldı (Oturum 84) |
 
-## 3.3 ⬜ KALAN FRONTEND — Henüz Yapılmadı
+## 3.3 ⬜ KALAN FRONTEND — Kritik & Yüksek
 
 | # | Sorun | Dosya | Öncelik |
 |---|-------|-------|---------|
 | 3.3.1 | **Silent API failures** — 7+ sayfada boş `catch {}`, kullanıcı hata göremiyor | Health, Alerts, Search, Schemas, Templates, Portal, Routing | 🔴 Kritik |
 | 3.3.2 | **Error Boundary dashboard'da kullanılmamış** — Component crash → beyaz ekran | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🔴 Kritik |
 | 3.3.3 | **Destructive action'larda confirmation yok** — Transforms, Notifications, Team'de silme onaysız | Transforms, Notifications, Team pages | 🔴 Kritik |
-| 3.3.4 | **63 useEffect'ten %75'inde cleanup eksik** — memory leak riski | Çeşitli sayfalar | 🟡 Yüksek |
-| 3.3.5 | **Sidebar 26 item, gruplama yok** — yeni kullanıcı kayboluyor | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Yüksek |
-| 3.3.6 | **Sidebar active state sadece exact match** — `/endpoints/abc123` highlight etmiyor | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Yüksek |
-| 3.3.7 | **Schemas, Templates, Portal sidebar'da link yok** | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Yüksek |
-| 3.3.8 | **Sidebar bottom controls nav overlap** — 26+ item'da LanguageSwitcher/ThemeToggle content üstüne biniyor | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Orta |
-| 3.3.9 | **ConfirmDialog dark mode eksik** — `bg-white` ama `dark:bg-slate-900` yok | `dashboard/src/components/ConfirmDialog.tsx` | 🟡 Orta |
-| 3.3.10 | **Toast info variant dark mode** — `bg-gray-900` dark background'da düşük kontrast | `dashboard/src/components/Toast.tsx` | 🟡 Orta |
-| 3.3.11 | **Loading states tutarsız** — SkeletonCard/SkeletonTable/LoadingSpinner var ama çoğu sayfa plain text kullanıyor | Çeşitli sayfalar | 🟡 Orta |
-| 3.3.12 | **EmptyState component hiç kullanılmıyor** — her sayfa kendi empty state'ini yapmış | `dashboard/src/components/EmptyState.tsx` | 🟡 Orta |
-| 3.3.13 | **Multiple pages raw `fetch()` kullanıyor** — `apiFetch()` yerine | Health, API Keys, Search, Audit Log, Custom Domain, SSO, Portal, Playground | 🟡 Orta |
-| 3.3.14 | **Portal/Schemas/Routing/Templates double-padding** — farklı layout pattern | Portal, Schemas, Routing, Templates | 🟡 Orta |
-| 3.3.15 | **Billing useRouter wrong module** — `next/navigation` yerine `@/i18n/navigation` | `dashboard/src/app/[locale]/dashboard/billing/page.tsx` | 🟡 Orta |
-| 3.3.16 | **Inbound page unused loading variable** — `const [_loading, setLoading]` | `dashboard/src/app/[locale]/dashboard/inbound/page.tsx` | 🟢 Düşük |
-| 3.3.17 | **Duplicate StatusBadge** — `components/StatusBadge.tsx` + `components/tremor/StatusBadge.tsx` | Component duplication | 🟢 Düşük |
-| 3.3.18 | **Onboarding + OnboardingWizard overlap** — ikisi birden render ediliyor | Dashboard page | 🟢 Düşük |
-| 3.3.19 | **AnimatedCounter negative values** — ara değerler tuhaf görünebilir | `dashboard/src/components/` | 🟢 Düşük |
-| 3.3.20 | **Playground history localStorage size limit yok** | `dashboard/src/app/[locale]/dashboard/playground/page.tsx` | 🟢 Düşük |
-| 3.3.21 | **Route-level `loading.tsx` yok** — dashboard sayfa geçişlerinde indicator yok | `dashboard/src/app/[locale]/dashboard/` | 🟢 Düşük |
-| 3.3.22 | **Endpoints detail page hand-rolled modal** — ConfirmDialog kullanılmalı | `dashboard/src/app/[locale]/dashboard/endpoints/[id]/page.tsx` | 🟢 Düşük |
-| 3.3.23 | **Logs page status counts current page only** — yanıltıcı | `dashboard/src/app/[locale]/dashboard/logs/page.tsx` | 🟢 Düşük |
-| 3.3.24 | **Billing cancel modal state reset yok** — `cancelling` state kalmış | `dashboard/src/app/[locale]/dashboard/billing/page.tsx` | 🟢 Düşük |
+| 3.3.4 | **`router.push` navigations locale prefix içermiyor** — 3 sayfada locale kaybediliyor | Dashboard, Endpoints, Deliveries | 🔴 Kritik |
+| 3.3.5 | **Hardcoded locale list in regex** — bazı locale'leri kaçırıyor | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🔴 Kritik |
+| 3.3.6 | **No i18n in Webhook Builder** — tamamen İngilizce | `dashboard/src/app/[locale]/dashboard/webhook-builder/page.tsx` | 🔴 Kritik |
+| 3.3.7 | **No i18n in Signature Verifier** — tamamen İngilizce | `dashboard/src/app/[locale]/dashboard/signature-verifier/page.tsx` | 🔴 Kritik |
+| 3.3.8 | **No i18n in API Importer** — tamamen İngilizce | `dashboard/src/app/[locale]/dashboard/api-importer/page.tsx` | 🔴 Kritik |
+| 3.3.9 | **API Request Missing Authorization Header** (Health page) — API çağrısı auth header yok | `dashboard/src/app/[locale]/dashboard/health/page.tsx` | 🔴 Kritik |
+| 3.3.10 | **`credentials: 'include'` inside `headers` object** (API Keys createKey) — Cookie gönderilmiyor, 401 hatası | `dashboard/src/app/[locale]/dashboard/api-keys/page.tsx` | 🔴 Kritik |
+| 3.3.11 | **`billingApi` ve `billingApiExtended` duplicate `getInvoices`** — çakışma | `dashboard/src/lib/api.ts` | 🟡 Yüksek |
+| 3.3.12 | **No retry logic for transient errors** (502, 503, 504) — Kullanıcı error görür, recovery yok | `dashboard/src/lib/api.ts` | 🟡 Yüksek |
+| 3.3.13 | **401 refresh loop risk** — Concurrent requests refresh'i tetikleyebilir | `dashboard/src/lib/api.ts` | 🟡 Yüksek |
+| 3.3.14 | **Owner can demote themselves** — Role dropdown'da owner kendi rolünü değiştirebilir | `dashboard/src/app/[locale]/dashboard/team/page.tsx` | 🟡 Yüksek |
+| 3.3.15 | **No role-based permission checks** — Herkes (member dahil) rol değiştirebilir, üye atabilir | `dashboard/src/app/[locale]/dashboard/team/page.tsx` | 🟡 Yüksek |
+| 3.3.16 | **Signature comparison not constant-time** (Signature Verifier) — Timing attack | `dashboard/src/app/[locale]/dashboard/signature-verifier/page.tsx` | 🟡 Yüksek |
+| 3.3.17 | **Grid layout mobilde kırılıyor** — `grid-cols-2`/`grid-cols-3` responsive breakpoint yok | Portal page | 🟡 Yüksek |
+| 3.3.18 | **`vh` kullanımı mobilde address bar sorunu** — `max-h-[80vh]` → `max-h-[80dvh]` | Deliveries, Logs, Blog | 🟡 Orta |
+| 3.3.19 | **Suspense boundary eksik** — 29 dashboard sayfası data fetching ama Suspense yok | Çeşitli sayfalar | 🟡 Orta |
+| 3.3.20 | **Console.log/Debug kalıntıları** — Production'da console.error/warn | Portal, Store, Email | 🟡 Orta |
+| 3.3.21 | **Toast warning type eksik** — Sadece success/error/info | `dashboard/src/components/Toast.tsx` | 🟡 Orta |
+| 3.3.22 | **Toast messages translated değil** — Bazı sayfalar raw English gönderiyor | Çeşitli sayfalar | 🟡 Orta |
+| 3.3.23 | **Toast no dismiss button** — Kullanıcı 4 saniye beklemek zorunda | `dashboard/src/components/Toast.tsx` | 🟡 Orta |
+| 3.3.24 | **Toast no `role="alert"`** — Ekran okuyucu bildirimleri algılayamıyor | `dashboard/src/components/Toast.tsx` | 🟡 Orta |
+| 3.3.25 | **ErrorBoundary console.log only** — Production'da error tracking yok (Sentry vb.) | `dashboard/src/components/ErrorBoundary.tsx` | 🟡 Orta |
+| 3.3.26 | **No offline detection** — Kullanıcı offline olursa generic error | `dashboard/src/lib/api.ts` | 🟡 Orta |
 
-## 3.4 Mega Component Refactoring
+## 3.4 ⬜ KALAN FRONTEND — Orta & Düşük
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 3.4.1 | **63 useEffect'ten %75'inde cleanup eksik** — memory leak riski | Çeşitli sayfalar | 🟡 Orta |
+| 3.4.2 | **Sidebar 26 item, gruplama yok** — yeni kullanıcı kayboluyor | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Orta |
+| 3.4.3 | **Sidebar active state sadece exact match** — `/endpoints/abc123` highlight etmiyor | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Orta |
+| 3.4.4 | **Schemas, Templates, Portal sidebar'da link yok** | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Orta |
+| 3.4.5 | **Sidebar bottom controls nav overlap** — 26+ item'da LanguageSwitcher/ThemeToggle content üstüne biniyor | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟡 Orta |
+| 3.4.6 | **ConfirmDialog dark mode eksik** — `bg-white` ama `dark:bg-slate-900` yok | `dashboard/src/components/ConfirmDialog.tsx` | 🟡 Orta |
+| 3.4.7 | **Toast info variant dark mode** — `bg-gray-900` dark background'da düşük kontrast | `dashboard/src/components/Toast.tsx` | 🟡 Orta |
+| 3.4.8 | **Loading states tutarsız** — SkeletonCard/SkeletonTable/LoadingSpinner var ama çoğu sayfa plain text kullanıyor | Çeşitli sayfalar | 🟡 Orta |
+| 3.4.9 | **EmptyState component hiç kullanılmıyor** — her sayfa kendi empty state'ini yapmış | `dashboard/src/components/EmptyState.tsx` | 🟡 Orta |
+| 3.4.10 | **Multiple pages raw `fetch()` kullanıyor** — `apiFetch()` yerine | Health, API Keys, Search, Audit Log, Custom Domain, SSO, Portal, Playground | 🟡 Orta |
+| 3.4.11 | **Portal/Schemas/Routing/Templates double-padding** — farklı layout pattern | Portal, Schemas, Routing, Templates | 🟡 Orta |
+| 3.4.12 | **Billing useRouter wrong module** — `next/navigation` yerine `@/i18n/navigation` | `dashboard/src/app/[locale]/dashboard/billing/page.tsx` | 🟡 Orta |
+| 3.4.13 | **`getErrorMessage` inconsistent usage** — Bazı catch'ler inline, bazıları utility | `dashboard/src/lib/errors.ts` | 🟡 Orta |
+| 3.4.14 | **Error messages translated değil** — `getErrorMessage` raw English döndürüyor | `dashboard/src/lib/errors.ts` | 🟡 Orta |
+| 3.4.15 | **`weeklyDigest` state local-only** — API payload'a eklenmiyor, sessizce düşüyor | `dashboard/src/app/[locale]/dashboard/settings/page.tsx` | 🟡 Orta |
+| 3.4.16 | **`keyCount` translation broken pluralization** — `"3 key"` instead of `"3 keys"` | `dashboard/src/app/[locale]/dashboard/api-keys/page.tsx` | 🟡 Orta |
+| 3.4.17 | **13 tablo `overflow-x-auto` olmadan** — docs, alternatives, privacy sayfaları | docs/*, alternatives/*, privacy | 🟡 Orta |
+| 3.4.18 | **8 `<pre>` bloğu `overflow-x-auto` olmadan** — docs sayfaları | docs/* | 🟡 Orta |
+| 3.4.19 | **`any` type usage — 15+ production code** — Type safety eksik | Çeşitli | 🟡 Orta |
+| 3.4.20 | **useEffect dependency array eksiklikleri** — 4+ yerde boş `[]` ama dependency eksik | Onboarding, Playground | 🟡 Orta |
+| 3.4.21 | **Inbound page unused loading variable** — `const [_loading, setLoading]` | `dashboard/src/app/[locale]/dashboard/inbound/page.tsx` | 🟢 Düşük |
+| 3.4.22 | **Duplicate StatusBadge** — `components/StatusBadge.tsx` + `components/tremor/StatusBadge.tsx` | Component duplication | 🟢 Düşük |
+| 3.4.23 | **Onboarding + OnboardingWizard overlap** — ikisi birden render ediliyor | Dashboard page | 🟢 Düşük |
+| 3.4.24 | **AnimatedCounter negative values** — ara değerler tuhaf görünebilir | `dashboard/src/components/` | 🟢 Düşük |
+| 3.4.25 | **Playground history localStorage size limit yok** | `dashboard/src/app/[locale]/dashboard/playground/page.tsx` | 🟢 Düşük |
+| 3.4.26 | **Route-level `loading.tsx` yok** — dashboard sayfa geçişlerinde indicator yok | `dashboard/src/app/[locale]/dashboard/` | 🟢 Düşük |
+| 3.4.27 | **Endpoints detail page hand-rolled modal** — ConfirmDialog kullanılmalı | `dashboard/src/app/[locale]/dashboard/endpoints/[id]/page.tsx` | 🟢 Düşük |
+| 3.4.28 | **Logs page status counts current page only** — yanıltıcı | `dashboard/src/app/[locale]/dashboard/logs/page.tsx` | 🟢 Düşük |
+| 3.4.29 | **Billing cancel modal state reset yok** — `cancelling` state kalmış | `dashboard/src/app/[locale]/dashboard/billing/page.tsx` | 🟢 Düşük |
+| 3.4.30 | **Notification API field mismatch** — `email_on_success` generic toggle'a mapleniyor | `dashboard/src/app/[locale]/dashboard/settings/page.tsx` | 🟢 Düşük |
+| 3.4.31 | **Missing `autoComplete` on confirm password** — Password manager sorunu | `dashboard/src/app/[locale]/dashboard/settings/page.tsx` | 🟢 Düşük |
+| 3.4.32 | **Mobile sidebar toggle `aria-expanded` eksik** | `dashboard/src/app/[locale]/dashboard/layout.tsx` | 🟢 Düşük |
+| 3.4.33 | **Date formatting not locale-aware** — `toLocaleDateString()` browser locale kullanıyor | Team page | 🟢 Düşük |
+| 3.4.34 | **ErrorBoundary shows raw error message** — Technical details kullanıcıya gösteriliyor | `dashboard/src/components/ErrorBoundary.tsx` | 🟢 Düşük |
+| 3.4.35 | **Global error page generic message** — Client/server error ayrımı yok | `dashboard/src/app/[locale]/error.tsx` | 🟢 Düşük |
+
+## 3.5 Mega Component Refactoring
 
 | # | Sorun | Dosya | Durum |
 |---|-------|-------|-------|
-| 3.4.1 | `playground/page.tsx` — 695 satır | ⬜ |
-| 3.4.2 | `OnboardingWizard.tsx` — 649 satır | ⬜ |
-| 3.4.3 | `dashboard/page.tsx` — 586 satır | ⬜ |
-| 3.4.4 | `deliveries/[id]/page.tsx` — 547 satır | ⬜ |
-| 3.4.5 | `billing/page.tsx` — 494 satır | ⬜ |
-| 3.4.6 | `endpoints/[id]/page.tsx` — 446 satır | ⬜ |
-| 3.4.7 | `settings/page.tsx` — 441 satır | ⬜ |
-| 3.4.8 | `portal-customize/page.tsx` — 402 satır | ⬜ |
-| 3.4.9 | `retry-policy/page.tsx` — 355 satır | ⬜ |
-| 3.4.10 | `team/page.tsx` — 339 satır | ⬜ |
-| 3.4.11 | `api-importer/page.tsx` — 336 satır | ⬜ |
-| 3.4.12 | `api-keys/page.tsx` — 332 satır | ⬜ |
-| 3.4.13 | `blog/[slug]/page.tsx` — 308 satır (1922'den düşürüldü) | ✅ Yapıldı (Oturum 93) |
+| 3.5.1 | `playground/page.tsx` — 695 satır | ⬜ |
+| 3.5.2 | `OnboardingWizard.tsx` — 649 satır | ⬜ |
+| 3.5.3 | `dashboard/page.tsx` — 586 satır | ⬜ |
+| 3.5.4 | `deliveries/[id]/page.tsx` — 547 satır | ⬜ |
+| 3.5.5 | `billing/page.tsx` — 494 satır | ⬜ |
+| 3.5.6 | `endpoints/[id]/page.tsx` — 446 satır | ⬜ |
+| 3.5.7 | `settings/page.tsx` — 441 satır | ⬜ |
+| 3.5.8 | `portal-customize/page.tsx` — 402 satır | ⬜ |
+| 3.5.9 | `retry-policy/page.tsx` — 355 satır | ⬜ |
+| 3.5.10 | `team/page.tsx` — 339 satır | ⬜ |
+| 3.5.11 | `api-importer/page.tsx` — 336 satır | ⬜ |
+| 3.5.12 | `api-keys/page.tsx` — 332 satır | ⬜ |
+| 3.5.13 | `status/page.tsx` — 699 satır | ⬜ |
+| 3.5.14 | `playground/page.tsx` (public) — 911 satır | ⬜ |
+| 3.5.15 | `blog/[slug]/page.tsx` — 308 satır (1922'den düşürüldü) | ✅ Yapıldı (Oturum 93) |
+
+## 3.6 Dependencies & Config (DEEP-DEPS-CONFIG.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 3.6.1 | **Unused dependencies** — `cookie`, `async-stream`, `aes-gcm` kodda hiç kullanılmıyor | `api/Cargo.toml` | 🟡 Orta |
+| 3.6.2 | **`totp-rs` ve `base32` import yok** — 2FA implementasyonu eksik | `api/Cargo.toml` | 🟡 Orta |
+| 3.6.3 | **Docker dev image `rust:1-bookworm`** — sabit version yok | `Dockerfile.api` (dev) | 🟡 Orta |
+| 3.6.4 | **Worker dev Dockerfile `rust:slim`** — ne version ne distro belirtilmemiş | `Dockerfile.worker` (dev) | 🟡 Orta |
+| 3.6.5 | **`opentelemetry-otlp` duplicate transport** — http-proto + grpc-tonic ikisi birden | `api/Cargo.toml` | 🟡 Orta |
+| 3.6.6 | **`recharts` ~200KB gzipped** — D3 tabanlı, alternatif düşünülmeli | `dashboard/package.json` | 🟡 Orta |
+| 3.6.7 | **`lucide-react` unused ama install ediliyor** — ~150KB wasted | `dashboard/package.json` | ✅ Yapıldı (Oturum 85) |
+| 3.6.8 | **ESLint 8 + Next.js 15 uyumsuzluğu** — eslint-config-next 15 ile ESLint 8 çakışıyor | `dashboard/package.json` | ✅ Yapıldı (Oturum 93) |
+| 3.6.9 | **`@modelcontextprotocol/sdk` çok eski** — güncel sürüm 1.9+ | `mcp/package.json` | 🟢 Düşük |
 
 ---
 
@@ -815,17 +873,17 @@
 |-------|--------|-------------|--------|--------|------|-------|--------|
 | 1 | Güvenlik & Altyapı | 3-4 gün | 22 | 18 | 20 | 8 | **~68** |
 | 2 | Admin Panel | 2-3 gün | 5 | 20 | 15 | 10 | **~50** |
-| 3 | Frontend Dashboard | 2-3 gün | 5 | 8 | 15 | 10 | **~38** |
+| 3 | Frontend Dashboard | 3-4 gün | 14 | 16 | 25 | 15 | **~70** |
 | 4 | Database | 1-2 gün | 5 | 6 | 10 | 5 | **~26** |
-| 5 | i18n & Çeviri | 1-2 gün | 1 | 6 | 6 | 0 | **~13** |
+| 5 | i18n & Çeviri | 1-2 gün | 4 | 6 | 6 | 0 | **~16** |
 | 6 | A11Y & SEO | 2-3 gün | 13 | 8 | 6 | 0 | **~27** |
 | 7 | Performans | 1-2 gün | 0 | 1 | 3 | 1 | **~5** |
 | 8 | GDPR | 1 gün | 2 | 2 | 3 | 0 | **~7** |
 | 9 | Email | 1 gün | 0 | 3 | 4 | 2 | **~9** |
 | 10 | SDK & OpenAPI | 1 gün | 0 | 0 | 3 | 1 | **~4** |
 | 11 | Backend Derin | 2-3 gün | 1 | 7 | 12 | 4 | **~24** |
-| 12 | Polish & Code Quality | 1-2 gün | 0 | 3 | 5 | 2 | **~10** |
-| **TOPLAM** | | **~18-25 gün** | **~54** | **~82** | **~102** | **~43** | **~281** |
+| 12 | Polish & Code Quality | 1-2 gün | 0 | 3 | 8 | 3 | **~14** |
+| **TOPLAM** | | **~20-28 gün** | **~66** | **~90** | **~115** | **~49** | **~320** |
 
 ---
 
