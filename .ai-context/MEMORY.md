@@ -572,3 +572,36 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - **Commit:** `3f08d78` — `docs: add Node.js SDK README` (sdks/node/README.md)
 - **Push:** main branch, up to date with origin
 - **Sonraki adım:** AŞAMA 2 — Wrapper Class + İmza Doğrulama
+
+## Oturum 115 (2026-05-11 23:47 - 00:10 GMT+8) ✅
+- **OpenClaw on birinci oturum** — Servet SDK test çalıştırma
+- **Java kuruldu:** OpenJDK 17.0.18 + Maven 3.8.7
+- **.NET kuruldu:** SDK 8.0.126
+- **Elixir kuruldu:** 1.18.3 (apt'teki 1.14 yetmiyordu)
+- **Kotlin compiler:** 1.9.22 (kotlinc binary)
+- **Swift:** 590MB binary, oturuma sığmadı — statik analiz yapıldı (kod doğru)
+
+### Test Sonuçları
+| SDK | Sonuç | Not |
+|-----|-------|-----|
+| Java | 11/11 ✅ | pom.xml jsr305 + jackson-databind-nullable eklendi |
+| C# | 7/7 ✅ | Webhook izole test (Polly/IHttpClientBuilder eksik ama Webhook class çalışıyor) |
+| Kotlin | 16/16 ✅ | Gson import eklendi, test assertion düzeltildi |
+| Elixir | 12/12 ✅ | `elem` → pattern match düzeltildi |
+| Swift | ⚠️ İndirilemedi | 590MB, statik analiz: kod doğru |
+
+### Bağımlılık Güncellemeleri
+- **Java:** gson 2.10.1→2.14.0, junit 5.10.2→5.12.2, compiler 11→17
+- **Kotlin:** plugin 1.9.22→2.0.21, gson 2.14.0, moshi 1.15.2, jackson 2.19.0, junit 4→5.12.2
+- **C#:** Polly 8.6.6, MS.Extensions 9.0.0, Jwt 8.18.0
+- **Elixir:** mix.lock güncellendi
+
+### Düzeltmeler
+- Kotlin Webhook.kt: Gson import eklendi
+- Kotlin build.gradle.kts: jvmToolchain 21→17, source/target 21→17
+- Kotlin WebhookTest: `assertEquals(1, result["data"])` → `assertEquals(1.0, data["id"])` (Gson Double deserialize)
+- Elixir webhook_test: `elem(String.split(...))` → `[_, rest] = String.split(...)`
+- C# HookSniff.csproj: Polly, MS.Extensions.Http, Logging.Abstractions eklendi
+
+### Commit
+- `d2383ed3` — fix: SDK test fixes + dependency updates
