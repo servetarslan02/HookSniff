@@ -1,22 +1,22 @@
-# OpenapiClient::UserSummary
+# HookSniff::UserSummary
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **email** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **email** | **String** |  |  |
 | **name** | **String** |  | [optional] |
-| **plan** | **String** |  | [optional] |
-| **is_active** | **Boolean** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **plan** | **String** |  |  |
+| **is_active** | **Boolean** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::UserSummary.new(
+instance = HookSniff::UserSummary.new(
   id: null,
   email: null,
   name: null,

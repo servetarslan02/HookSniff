@@ -1,4 +1,4 @@
-# OpenapiClient::BatchReplayRequest
+# HookSniff::BatchReplayRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::BatchReplayRequest.new(
+instance = HookSniff::BatchReplayRequest.new(
   ids: null
 )
 ```

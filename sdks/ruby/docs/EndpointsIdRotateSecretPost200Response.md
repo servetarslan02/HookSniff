@@ -1,4 +1,4 @@
-# OpenapiClient::EndpointsIdRotateSecretPost200Response
+# HookSniff::EndpointsIdRotateSecretPost200Response
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::EndpointsIdRotateSecretPost200Response.new(
+instance = HookSniff::EndpointsIdRotateSecretPost200Response.new(
   signing_secret: null,
   message: null
 )

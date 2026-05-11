@@ -1,21 +1,21 @@
-# OpenapiClient::PortalProfile
+# HookSniff::PortalProfile
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **email** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **email** | **String** |  |  |
 | **name** | **String** |  | [optional] |
-| **plan** | **String** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **plan** | **String** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::PortalProfile.new(
+instance = HookSniff::PortalProfile.new(
   id: null,
   email: null,
   name: null,

@@ -1,4 +1,4 @@
-# hooksniff.Model.AdminUsersIdStatusPutRequest
+# HookSniff.Model.AdminUsersIdStatusPutRequest
 
 ## Properties
 

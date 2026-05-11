@@ -1,24 +1,24 @@
-# OpenapiClient::Delivery
+# HookSniff::Delivery
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **endpoint_id** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **endpoint_id** | **String** |  |  |
 | **event** | **String** |  | [optional] |
-| **status** | **String** |  | [optional] |
-| **attempt_count** | **Integer** |  | [optional] |
+| **status** | **String** |  |  |
+| **attempt_count** | **Integer** |  |  |
 | **response_status** | **Integer** |  | [optional] |
-| **replay_count** | **Integer** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **replay_count** | **Integer** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::Delivery.new(
+instance = HookSniff::Delivery.new(
   id: null,
   endpoint_id: null,
   event: null,

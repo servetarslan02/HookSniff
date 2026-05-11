@@ -1,4 +1,4 @@
-# OpenapiClient::AlertsApi
+# HookSniff::AlertsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -21,20 +21,20 @@ List alert rules
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AlertsApi.new
+api_instance = HookSniff::AlertsApi.new
 
 begin
   # List alert rules
   result = api_instance.alerts_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_get: #{e}"
 end
 ```
@@ -52,7 +52,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<AlertRule>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_get_with_http_info: #{e}"
 end
 ```
@@ -85,20 +85,20 @@ Delete alert rule
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AlertsApi.new
+api_instance = HookSniff::AlertsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Delete alert rule
   api_instance.alerts_id_delete(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_id_delete: #{e}"
 end
 ```
@@ -116,7 +116,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_id_delete_with_http_info: #{e}"
 end
 ```
@@ -151,21 +151,21 @@ Get alert rule
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AlertsApi.new
+api_instance = HookSniff::AlertsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get alert rule
   result = api_instance.alerts_id_get(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_id_get: #{e}"
 end
 ```
@@ -183,7 +183,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <AlertRule>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_id_get_with_http_info: #{e}"
 end
 ```
@@ -218,20 +218,20 @@ Test an alert rule
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AlertsApi.new
+api_instance = HookSniff::AlertsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Test an alert rule
   api_instance.alerts_id_test_post(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_id_test_post: #{e}"
 end
 ```
@@ -249,7 +249,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_id_test_post_with_http_info: #{e}"
 end
 ```
@@ -284,21 +284,21 @@ Create alert rule
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AlertsApi.new
-create_alert_request = OpenapiClient::CreateAlertRequest.new({name: 'name_example', condition: 'failure_rate', threshold: 37, channels: ['channels_example']}) # CreateAlertRequest | 
+api_instance = HookSniff::AlertsApi.new
+create_alert_request = HookSniff::CreateAlertRequest.new({name: 'name_example', condition: 'failure_rate', threshold: 37, channels: ['channels_example']}) # CreateAlertRequest | 
 
 begin
   # Create alert rule
   result = api_instance.alerts_post(create_alert_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_post: #{e}"
 end
 ```
@@ -316,7 +316,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <AlertRule>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AlertsApi->alerts_post_with_http_info: #{e}"
 end
 ```

@@ -1,4 +1,4 @@
-# OpenapiClient::DeliveryTrendResponseBucketsInner
+# HookSniff::DeliveryTrendResponseBucketsInner
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::DeliveryTrendResponseBucketsInner.new(
+instance = HookSniff::DeliveryTrendResponseBucketsInner.new(
   timestamp: null,
   successful: null,
   failed: null,

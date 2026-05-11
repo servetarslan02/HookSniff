@@ -1,25 +1,25 @@
-# OpenapiClient::CustomerResponse
+# HookSniff::CustomerResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **email** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **email** | **String** |  |  |
 | **name** | **String** |  | [optional] |
 | **api_key** | **String** | Only returned on registration | [optional] |
-| **plan** | **String** |  | [optional] |
-| **webhook_limit** | **Integer** |  | [optional] |
-| **webhook_count** | **Integer** |  | [optional] |
-| **is_admin** | **Boolean** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **plan** | **String** |  |  |
+| **webhook_limit** | **Integer** |  |  |
+| **webhook_count** | **Integer** |  |  |
+| **is_admin** | **Boolean** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CustomerResponse.new(
+instance = HookSniff::CustomerResponse.new(
   id: null,
   email: null,
   name: null,

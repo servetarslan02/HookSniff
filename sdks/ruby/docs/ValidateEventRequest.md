@@ -1,4 +1,4 @@
-# OpenapiClient::ValidateEventRequest
+# HookSniff::ValidateEventRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ValidateEventRequest.new(
+instance = HookSniff::ValidateEventRequest.new(
   event: null
 )
 ```

@@ -1,4 +1,4 @@
-# OpenapiClient::ForgotPasswordRequest
+# HookSniff::ForgotPasswordRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ForgotPasswordRequest.new(
+instance = HookSniff::ForgotPasswordRequest.new(
   email: null
 )
 ```

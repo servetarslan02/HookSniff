@@ -1,4 +1,4 @@
-# OpenapiClient::PortalNotificationsPut200Response
+# HookSniff::PortalNotificationsPut200Response
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::PortalNotificationsPut200Response.new(
+instance = HookSniff::PortalNotificationsPut200Response.new(
   updated: null,
   preferences: null
 )

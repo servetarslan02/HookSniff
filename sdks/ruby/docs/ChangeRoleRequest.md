@@ -1,4 +1,4 @@
-# OpenapiClient::ChangeRoleRequest
+# HookSniff::ChangeRoleRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ChangeRoleRequest.new(
+instance = HookSniff::ChangeRoleRequest.new(
   role: null
 )
 ```

@@ -1,13 +1,13 @@
-# hooksniff.Model.DeviceTokenResponse
+# HookSniff.Model.DeviceTokenResponse
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **Guid** |  | [optional] 
-**Token** | **string** |  | [optional] 
-**Platform** | **string** |  | [optional] 
-**CreatedAt** | **DateTime** |  | [optional] 
+**Id** | **Guid** |  | 
+**Token** | **string** |  | 
+**Platform** | **string** |  | 
+**CreatedAt** | **DateTime** |  | 
 
 [[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
 

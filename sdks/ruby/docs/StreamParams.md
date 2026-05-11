@@ -1,19 +1,19 @@
-# OpenapiClient::StreamParams
+# HookSniff::StreamParams
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **endpoint_id** | **String** |  | [optional] |
-| **status** | **String** |  | [optional] |
-| **limit** | **Integer** |  | [optional][default to 50] |
+| **endpoint_id** | **String** |  |  |
+| **status** | **String** |  |  |
+| **limit** | **Integer** |  | [default to 50] |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::StreamParams.new(
+instance = HookSniff::StreamParams.new(
   endpoint_id: null,
   status: null,
   limit: null

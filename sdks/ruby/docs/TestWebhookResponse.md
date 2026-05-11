@@ -1,20 +1,20 @@
-# OpenapiClient::TestWebhookResponse
+# HookSniff::TestWebhookResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **success** | **Boolean** |  | [optional] |
-| **status_code** | **Integer** |  | [optional] |
-| **duration_ms** | **Integer** |  | [optional] |
-| **response_body** | **String** |  | [optional] |
+| **success** | **Boolean** |  |  |
+| **status_code** | **Integer** |  |  |
+| **duration_ms** | **Integer** |  |  |
+| **response_body** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::TestWebhookResponse.new(
+instance = HookSniff::TestWebhookResponse.new(
   success: null,
   status_code: null,
   duration_ms: null,

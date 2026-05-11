@@ -1,18 +1,18 @@
-# OpenapiClient::UpdateRoutingRequest
+# HookSniff::UpdateRoutingRequest
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **routing_strategy** | **String** |  | [optional] |
-| **fallback_url** | **String** |  | [optional] |
+| **routing_strategy** | **String** |  |  |
+| **fallback_url** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::UpdateRoutingRequest.new(
+instance = HookSniff::UpdateRoutingRequest.new(
   routing_strategy: null,
   fallback_url: null
 )

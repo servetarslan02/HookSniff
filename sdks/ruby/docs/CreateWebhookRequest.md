@@ -1,4 +1,4 @@
-# OpenapiClient::CreateWebhookRequest
+# HookSniff::CreateWebhookRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CreateWebhookRequest.new(
+instance = HookSniff::CreateWebhookRequest.new(
   endpoint_id: null,
   event: null,
   data: null

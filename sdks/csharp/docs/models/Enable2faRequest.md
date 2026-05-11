@@ -1,4 +1,4 @@
-# hooksniff.Model.Enable2faRequest
+# HookSniff.Model.Enable2faRequest
 
 ## Properties
 

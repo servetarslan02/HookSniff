@@ -1,4 +1,4 @@
-# OpenapiClient::AuthLoginPost200Response
+# HookSniff::AuthLoginPost200Response
 
 ## Class instance methods
 
@@ -9,9 +9,9 @@ Returns the list of classes defined in oneOf.
 #### Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-OpenapiClient::AuthLoginPost200Response.openapi_one_of
+HookSniff::AuthLoginPost200Response.openapi_one_of
 # =>
 # [
 #   :'AuthResponse',
@@ -26,12 +26,12 @@ Find the appropriate object from the `openapi_one_of` list and casts the data in
 #### Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-OpenapiClient::AuthLoginPost200Response.build(data)
+HookSniff::AuthLoginPost200Response.build(data)
 # => #<AuthResponse:0x00007fdd4aab02a0>
 
-OpenapiClient::AuthLoginPost200Response.build(data_that_doesnt_match)
+HookSniff::AuthLoginPost200Response.build(data_that_doesnt_match)
 # => nil
 ```
 

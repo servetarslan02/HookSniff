@@ -1,4 +1,4 @@
-# OpenapiClient::SchemasApi
+# HookSniff::SchemasApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -20,19 +20,19 @@ List registered schemas
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::SchemasApi.new
+api_instance = HookSniff::SchemasApi.new
 
 begin
   # List registered schemas
   api_instance.schemas_get
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_get: #{e}"
 end
 ```
@@ -50,7 +50,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_get_with_http_info: #{e}"
 end
 ```
@@ -83,20 +83,20 @@ Get schema by ID
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::SchemasApi.new
+api_instance = HookSniff::SchemasApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get schema by ID
   api_instance.schemas_id_get(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_id_get: #{e}"
 end
 ```
@@ -114,7 +114,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_id_get_with_http_info: #{e}"
 end
 ```
@@ -149,21 +149,21 @@ Validate an event against a schema
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::SchemasApi.new
+api_instance = HookSniff::SchemasApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-validate_event_request = OpenapiClient::ValidateEventRequest.new({event: 3.56}) # ValidateEventRequest | 
+validate_event_request = HookSniff::ValidateEventRequest.new({event: 3.56}) # ValidateEventRequest | 
 
 begin
   # Validate an event against a schema
   api_instance.schemas_id_validate_post(id, validate_event_request)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_id_validate_post: #{e}"
 end
 ```
@@ -181,7 +181,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_id_validate_post_with_http_info: #{e}"
 end
 ```
@@ -217,20 +217,20 @@ Register a new JSON Schema
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::SchemasApi.new
-register_schema_request = OpenapiClient::RegisterSchemaRequest.new({name: 'name_example', schema: 3.56}) # RegisterSchemaRequest | 
+api_instance = HookSniff::SchemasApi.new
+register_schema_request = HookSniff::RegisterSchemaRequest.new({name: 'name_example', schema: 3.56}) # RegisterSchemaRequest | 
 
 begin
   # Register a new JSON Schema
   api_instance.schemas_post(register_schema_request)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_post: #{e}"
 end
 ```
@@ -248,7 +248,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling SchemasApi->schemas_post_with_http_info: #{e}"
 end
 ```

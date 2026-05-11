@@ -1,4 +1,4 @@
-# hooksniff.Api.StreamApi
+# HookSniff.Api.StreamApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 

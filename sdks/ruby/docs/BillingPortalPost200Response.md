@@ -1,4 +1,4 @@
-# OpenapiClient::BillingPortalPost200Response
+# HookSniff::BillingPortalPost200Response
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::BillingPortalPost200Response.new(
+instance = HookSniff::BillingPortalPost200Response.new(
   url: null
 )
 ```

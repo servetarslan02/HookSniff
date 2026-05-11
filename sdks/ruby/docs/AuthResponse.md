@@ -1,19 +1,19 @@
-# OpenapiClient::AuthResponse
+# HookSniff::AuthResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **token** | **String** | JWT access token | [optional] |
-| **customer** | [**CustomerResponse**](CustomerResponse.md) |  | [optional] |
+| **token** | **String** | JWT access token |  |
+| **customer** | [**CustomerResponse**](CustomerResponse.md) |  |  |
 | **refresh_token** | **String** | Refresh token (when applicable) | [optional] |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::AuthResponse.new(
+instance = HookSniff::AuthResponse.new(
   token: null,
   customer: null,
   refresh_token: null

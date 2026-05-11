@@ -1,20 +1,20 @@
-# OpenapiClient::TeamInvite
+# HookSniff::TeamInvite
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **email** | **String** |  | [optional] |
-| **role** | **String** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **id** | **String** |  |  |
+| **email** | **String** |  |  |
+| **role** | **String** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::TeamInvite.new(
+instance = HookSniff::TeamInvite.new(
   id: null,
   email: null,
   role: null,

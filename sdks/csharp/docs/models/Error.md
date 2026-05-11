@@ -1,4 +1,4 @@
-# hooksniff.Model.Error
+# HookSniff.Model.Error
 
 ## Properties
 

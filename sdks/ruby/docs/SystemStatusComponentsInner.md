@@ -1,4 +1,4 @@
-# OpenapiClient::SystemStatusComponentsInner
+# HookSniff::SystemStatusComponentsInner
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SystemStatusComponentsInner.new(
+instance = HookSniff::SystemStatusComponentsInner.new(
   name: null,
   status: null,
   latency_ms: null,

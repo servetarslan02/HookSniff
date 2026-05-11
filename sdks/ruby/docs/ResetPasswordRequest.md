@@ -1,4 +1,4 @@
-# OpenapiClient::ResetPasswordRequest
+# HookSniff::ResetPasswordRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ResetPasswordRequest.new(
+instance = HookSniff::ResetPasswordRequest.new(
   token: null,
   new_password: null
 )

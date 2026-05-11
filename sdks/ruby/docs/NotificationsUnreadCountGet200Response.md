@@ -1,4 +1,4 @@
-# OpenapiClient::NotificationsUnreadCountGet200Response
+# HookSniff::NotificationsUnreadCountGet200Response
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::NotificationsUnreadCountGet200Response.new(
+instance = HookSniff::NotificationsUnreadCountGet200Response.new(
   count: null
 )
 ```

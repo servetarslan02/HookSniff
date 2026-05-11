@@ -1,4 +1,4 @@
-# OpenapiClient::CreateEndpointRequest
+# HookSniff::CreateEndpointRequest
 
 ## Properties
 
@@ -17,9 +17,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CreateEndpointRequest.new(
+instance = HookSniff::CreateEndpointRequest.new(
   url: null,
   description: null,
   allowed_ips: null,
