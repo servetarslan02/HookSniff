@@ -81,7 +81,8 @@
     "failedToLoad": "Failed to load data",
     "failedToCreate": "Failed to create",
     "failedToLoadEndpoints": "Failed to load endpoints",
-    "failedToLoadTransforms": "Failed to load transforms"
+    "failedToLoadTransforms": "Failed to load transforms",
+    "failedToDelete": "Failed to delete"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -373,7 +374,7 @@
     "descriptionLabel": "Description (optional)",
     "inviteBtn": "+ Invite",
     "joinedPrefix": "Joined",
-    "membersCount": "{count} members · Created",
+    "membersCount": "{count} members",
     "roleOwner": "Owner",
     "roleAdmin": "Admin",
     "roleMember": "Member",

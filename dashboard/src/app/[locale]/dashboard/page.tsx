@@ -366,7 +366,7 @@ export default function DashboardOverview() {
           setError(tc('failedToLoad'));
         }
       } catch (err) {
-        if (mounted) setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+        if (mounted) setError(err instanceof Error ? err.message : tc('failedToLoad'));
       } finally {
         if (mounted) setLoading(false);
       }
