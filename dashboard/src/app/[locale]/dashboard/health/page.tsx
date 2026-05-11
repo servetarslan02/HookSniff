@@ -108,9 +108,9 @@ export default function EndpointHealthPage() {
       {/* Endpoint List */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-400 dark:text-slate-500">{tc('loading')}</div>
+          <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : endpoints.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
+          <div className="p-12 text-center text-gray-500 dark:text-slate-400">
             No endpoints yet. Create one to start monitoring health.
           </div>
         ) : (

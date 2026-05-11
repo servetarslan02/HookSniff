@@ -95,7 +95,7 @@ export default function AdminUserDetailPage() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.push('/admin/users')}
-          className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400 transition"
+          className="text-gray-500 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-400 transition"
         >
           {tc("back")}
         </button>
@@ -231,7 +231,7 @@ export default function AdminUserDetailPage() {
                     <span className="text-xs text-gray-500 dark:text-slate-400">
                       {ep.is_active ? t('active') : t('inactive')}
                     </span>
-                    <span className="text-xs text-gray-400 dark:text-slate-500">
+                    <span className="text-xs text-gray-500 dark:text-slate-400">
                       {new Date(ep.created_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -239,7 +239,7 @@ export default function AdminUserDetailPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-slate-500">{t("noEndpoints")}</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t("noEndpoints")}</p>
           )}
         </div>
       </div>
@@ -283,7 +283,7 @@ export default function AdminUserDetailPage() {
             </table>
           </div>
         ) : (
-          <div className="px-6 py-8 text-center text-gray-400 dark:text-slate-500 text-sm">
+          <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
             {t("noDeliveries")}
           </div>
         )}
