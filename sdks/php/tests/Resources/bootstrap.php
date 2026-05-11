@@ -29,7 +29,10 @@ class Request
     private ?string $body = null;
 
     /** @var mixed Next value to return from send() */
-    private static $nextResponse = null;
+    private static mixed $nextResponse = null;
+
+    /** @var list<mixed> Queue of responses for sequential send() calls */
+    private static array $responseQueue = [];
 
     public function __construct(string $method, string $path)
     {
@@ -82,6 +85,11 @@ class Request
             $this->body,
             $this->headerParams,
         );
+
+        // Return from queue first, then fall back to static value
+        if (!empty(self::$responseQueue)) {
+            return array_shift(self::$responseQueue);
+        }
         return self::$nextResponse ?? ['data' => [], 'has_more' => false];
     }
 
@@ -104,6 +112,18 @@ class Request
     {
         self::$nextResponse = $response;
     }
+
+    /**
+     * Set a queue of responses for sequential send() calls.
+     * Each call to send() pops the next response from the queue.
+     * When the queue is empty, falls back to $nextResponse.
+     *
+     * @param list<mixed> $responses
+     */
+    public static function setResponseQueue(array $responses): void
+    {
+        self::$responseQueue = $responses;
+    }
 }
 
 // ── Switch back to global namespace for the Composer autoloader ──
@@ -111,4 +131,4 @@ namespace;
 
 // Now load Composer autoloader. Classes already defined above (Request)
 // won't be overridden; everything else loads normally.
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
