@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 19:15 GMT+8
+> Son güncelleme: 2026-05-11 20:05 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -452,14 +452,52 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 
 ## Oturum 112 (2026-05-11 19:16 - 19:59) ✅
 - **OpenClaw sekizinci oturum** — Servet ile Cloud Run deploy debug (devam)
-- **Kök neden #1 (API):** `rustls` 0.23+ CryptoProvider panic — `quinn` (HTTP/3) transitively `aws-lc-rs` getiriyordu, `ring` ile çakışıyor
-  - Önceki fix (`Cargo.toml` feature) yetersizdi — Cargo feature unification sorunu
-  - Çözüm: `api/src/main.rs`'e `rustls::crypto::ring::default_provider().install_default()` eklendi
-- **Kök neden #2 (Worker):** `GLIBC_2.38 not found` — `Dockerfile.worker`'da `rust:slim` (1.97/trixie) kullanılmış, runtime `debian:bookworm-slim` (GLIBC 2.36)
-  - Çözüm: `Dockerfile.worker` → `rust:1.95-bookworm` (API ile aynı)
-- **Build `6acbdf97`:** SUCCESS ✅ — hem API hem Worker deploy edildi
+- **Tüm testler geçti:** API 983/983 ✅, Worker 48/48 ✅, Dashboard TS 0 ✅, ESLint 0 ✅
+
+### 🔴 HATA #1: `rustls CryptoProvider` panic (exit 101) — API
+- **Belirti:** Cloud Run'da container başlamadan ölüyor, `exit(101)`
+- **Log:** `Could not automatically determine the process-level CryptoProvider from Rustls crate features.`
+- **Oturum 110'da yapılan (işe yaramadı):** `Cargo.toml`'a `rustls = { features = ["ring"] }` eklendi
+- **Neden işe yaramadı:** Cargo feature unification — `reqwest` → `quinn` → `quinn-proto` → `aws-lc-rs` transitively getiriyordu. `Cargo.lock`'ta `rustls` hem `aws-lc-rs` hem `ring` ikisini birden taşıyordu. `default-features = false` işe yaramıyor çünkü Cargo tüm dependency tree'de features'ları birleştiriyor.
+- **Kesin çözüm (Oturum 112):** `api/src/main.rs` ve `worker/src/main.rs`'in en başına:
+  ```rust
+  rustls::crypto::ring::default_provider()
+      .install_default()
+      .expect("Failed to install rustls CryptoProvider");
+  ```
+  Bu, runtime'da hangi backend'in kullanılacağını açıkça belirtiyor — compile-time feature selection yetmiyordu.
+
+### 🔴 HATA #2: `GLIBC_2.38 not found` — Worker
+- **Belirti:** Worker container crash, `exit(1)`
+- **Log:** `hooksniff-worker: /lib/x86_64-linux-gnu/libc.so.6: version 'GLIBC_2.38' not found`
+- **Kök neden:** `Dockerfile.worker`'da builder image `rust:slim` idi (latest = 1.97/trixie, GLIBC 2.38 gerektiriyor). Runtime image `debian:bookworm-slim` (GLIBC 2.36). Binary yeni GLIBC ile compile edilmiş, eski GLIBC ile çalıştırılmaya çalışılmış.
+- **Dockerfile.api'de bu sorun yoktu** çünkü `rust:1.95-bookworm` ile pinlenmişti (GLIBC 2.36).
+- **Çözüm:** `Dockerfile.worker`'da `rust:slim` → `rust:1.95-bookworm` + `cmake` dependency eklendi (API ile aynı config).
+
+### 📋 Build Denemeleri Özeti
+| Build ID | Sonuç | Sorun |
+|----------|-------|-------|
+| `59462e6c` | FAILURE | CryptoProvider panic (API) |
+| `657e6d82` | FAILURE | CryptoProvider panic (API) → düzeltildi ama Worker GLIBC hatası |
+| `6acbdf97` | **SUCCESS** | Her iki fix uygulandı ✅ |
+
+### Deploy Edilen Revision'lar
 - **API:** `hooksniff-api-00069-l2s` → Healthy, OTEL enabled
 - **Worker:** `hooksniff-worker-00032-wzv` → Healthy
-- **Commits:** `fe22edd` (CryptoProvider fix), `2696244` (Dockerfile pin)
-- **GCloud kuruldu:** `/tmp/google-cloud-sdk/`, SA key `/tmp/gcp-sa.json`
-- **Sonraki oturum:** Grafana OTEL verilerini kontrol et, API endpoint'lerini test et
+
+### Commitler
+- `577eb27` — fix: explicit rustls CryptoProvider install (Oturum 110, yetersiz)
+- `fe22edd` — fix: explicit CryptoProvider in main() (Oturum 112, kesin çözüm)
+- `2696244` — fix: pin worker Dockerfile to rust:1.95-bookworm
+- `ed7a6a5` — docs: session 112 log
+
+### Alınan Dersler
+1. **Cargo.toml feature fix her zaman yetmez** — transitive dependency'ler feature'ları override edebilir. Runtime'da explicit install daha garantili.
+2. **Docker builder image pinleme kritik** — `:slim` = latest, GLIBC uyumsuzluğu yapar. Her zaman spesifik version pinle.
+3. **Her iki servis ayrı ayrı test et** — API fix'i worker'ı etkilemeyebilir, ayrı ayrı doğrula.
+4. **Cloud Build log'ları container log'larından farklı** — build step başarısızlığında `gcloud logging read` ile Cloud Run revision log'larını çek.
+
+### Sonraki Oturum
+- Grafana'da OTEL verilerini kontrol et (metrics, logs, traces)
+- API endpoint'lerini test et (register, login, webhook delivery)
+- GCloud SA key `/tmp/gcp-sa.json` oturum sonunda silinir — yeni key gerekir
