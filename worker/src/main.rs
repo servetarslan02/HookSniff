@@ -118,21 +118,19 @@ async fn main() -> Result<()> {
         .parse()
         .unwrap_or(8080);
     // Bind synchronously so Cloud Run sees the port immediately
-    let health_listener = tokio::net::TcpListener::bind(
-        std::net::SocketAddr::from(([0, 0, 0, 0], health_port))
-    ).await?;
+    let health_listener =
+        tokio::net::TcpListener::bind(std::net::SocketAddr::from(([0, 0, 0, 0], health_port)))
+            .await?;
     tokio::spawn(start_health_server_with_listener(health_listener));
     tracing::info!("🏥 Health server bound on :{}", health_port);
 
     // Database pool — strip channel_binding=require (sqlx 0.8 doesn't support it)
-    let db_url = cfg.database_url
+    let db_url = cfg
+        .database_url
         .replace("?channel_binding=require&", "?")
         .replace("&channel_binding=require", "")
         .replace("?channel_binding=require", "");
-    tracing::info!(
-        "   Database: {}",
-        &db_url[..30.min(db_url.len())]
-    );
+    tracing::info!("   Database: {}", &db_url[..30.min(db_url.len())]);
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .acquire_timeout(std::time::Duration::from_secs(30))
@@ -155,12 +153,11 @@ async fn main() -> Result<()> {
     let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
 
     // HS-020: Circuit breaker — skip delivery for endpoints with consecutive failures
-    let circuit_breaker = circuit_breaker::CircuitBreaker::new(
-        circuit_breaker::CircuitBreakerConfig {
+    let circuit_breaker =
+        circuit_breaker::CircuitBreaker::new(circuit_breaker::CircuitBreakerConfig {
             failure_threshold: 5,
             cooldown_secs: 60,
-        },
-    );
+        });
 
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
     tracing::info!("🔒 Concurrent delivery limit: 10");
@@ -403,7 +400,8 @@ async fn process_pending(
             if !cb.allow_request(endpoint_id).await {
                 tracing::warn!(
                     "⚡ Circuit OPEN — skipping delivery {} for endpoint {} (cooldown active)",
-                    delivery_id, endpoint_id
+                    delivery_id,
+                    endpoint_id
                 );
                 // Re-queue for later retry
                 let _ = sqlx::query::<sqlx::Postgres>(
@@ -416,10 +414,14 @@ async fn process_pending(
             }
 
             // HS-023: FIFO check — skip if endpoint is FIFO and previous item not completed
-            if !fifo::should_deliver_fifo(&pool, endpoint_id).await.unwrap_or(true) {
+            if !fifo::should_deliver_fifo(&pool, endpoint_id)
+                .await
+                .unwrap_or(true)
+            {
                 tracing::debug!(
                     "📦 FIFO: delivery {} waiting for previous item (endpoint {})",
-                    delivery_id, endpoint_id
+                    delivery_id,
+                    endpoint_id
                 );
                 // Re-queue for later retry
                 let _ = sqlx::query::<sqlx::Postgres>(
@@ -657,7 +659,10 @@ async fn process_pending(
                         status_code: attempt_status,
                         response_body: attempt_body,
                         duration_ms,
-                        error_message: Some(&format!("{} — non-retryable (HTTP {})", error_msg, status_code)),
+                        error_message: Some(&format!(
+                            "{} — non-retryable (HTTP {})",
+                            error_msg, status_code
+                        )),
                         trace_id: trace_id.as_deref(),
                         response_headers: attempt_headers,
                     },

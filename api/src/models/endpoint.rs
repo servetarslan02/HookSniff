@@ -538,10 +538,22 @@ mod tests {
 
     #[test]
     fn test_routing_strategy_parse_str() {
-        assert_eq!(RoutingStrategy::parse_str("round-robin"), RoutingStrategy::RoundRobin);
-        assert_eq!(RoutingStrategy::parse_str("failover"), RoutingStrategy::Failover);
-        assert_eq!(RoutingStrategy::parse_str("latency"), RoutingStrategy::Latency);
-        assert_eq!(RoutingStrategy::parse_str("unknown"), RoutingStrategy::RoundRobin);
+        assert_eq!(
+            RoutingStrategy::parse_str("round-robin"),
+            RoutingStrategy::RoundRobin
+        );
+        assert_eq!(
+            RoutingStrategy::parse_str("failover"),
+            RoutingStrategy::Failover
+        );
+        assert_eq!(
+            RoutingStrategy::parse_str("latency"),
+            RoutingStrategy::Latency
+        );
+        assert_eq!(
+            RoutingStrategy::parse_str("unknown"),
+            RoutingStrategy::RoundRobin
+        );
         assert_eq!(RoutingStrategy::parse_str(""), RoutingStrategy::RoundRobin);
     }
 
@@ -564,9 +576,18 @@ mod tests {
 
     #[test]
     fn test_delivery_format_parse_str() {
-        assert_eq!(DeliveryFormat::parse_str("standard"), DeliveryFormat::Standard);
-        assert_eq!(DeliveryFormat::parse_str("cloudevents"), DeliveryFormat::CloudEvents);
-        assert_eq!(DeliveryFormat::parse_str("unknown"), DeliveryFormat::Standard);
+        assert_eq!(
+            DeliveryFormat::parse_str("standard"),
+            DeliveryFormat::Standard
+        );
+        assert_eq!(
+            DeliveryFormat::parse_str("cloudevents"),
+            DeliveryFormat::CloudEvents
+        );
+        assert_eq!(
+            DeliveryFormat::parse_str("unknown"),
+            DeliveryFormat::Standard
+        );
         assert_eq!(DeliveryFormat::parse_str(""), DeliveryFormat::Standard);
     }
 

@@ -215,7 +215,9 @@ mod tests {
     fn test_metrics_new() {
         let m = Metrics::new();
         // Use each metric at least once so they appear in gather()
-        m.http_requests_total.with_label_values(&["GET", "/", "200"]).inc();
+        m.http_requests_total
+            .with_label_values(&["GET", "/", "200"])
+            .inc();
         m.http_request_duration_seconds.observe(0.01);
         m.active_connections.inc();
         m.webhook_deliveries_total.with_label_values(&["ok"]).inc();
@@ -228,8 +230,12 @@ mod tests {
 
         // Should have all expected metric families registered
         let families = m.registry.gather();
-        let names: Vec<&str> = families.iter().map(|f| f.get_name()).collect();
-        assert!(names.contains(&"http_requests_total"), "missing http_requests_total, got: {:?}", names);
+        let names: Vec<&str> = families.iter().map(|f| f.name()).collect();
+        assert!(
+            names.contains(&"http_requests_total"),
+            "missing http_requests_total, got: {:?}",
+            names
+        );
         assert!(names.contains(&"http_request_duration_seconds"));
         assert!(names.contains(&"active_connections"));
         assert!(names.contains(&"webhook_deliveries_total"));
@@ -269,7 +275,9 @@ mod tests {
         let empty_output = m.render();
         assert!(empty_output.is_empty() || !empty_output.contains("http_requests_total"));
         // After using at least one metric, it should appear
-        m.http_requests_total.with_label_values(&["GET", "/", "200"]).inc();
+        m.http_requests_total
+            .with_label_values(&["GET", "/", "200"])
+            .inc();
         let output = m.render();
         assert!(!output.is_empty());
         assert!(output.contains("http_requests_total"));
@@ -396,14 +404,22 @@ mod tests {
     fn test_render_contains_help_and_type() {
         let m = Metrics::new();
         // Use metrics so they appear in gather/render output
-        m.http_requests_total.with_label_values(&["GET", "/", "200"]).inc();
+        m.http_requests_total
+            .with_label_values(&["GET", "/", "200"])
+            .inc();
         m.http_request_duration_seconds.observe(0.01);
         m.active_connections.inc();
         m.active_endpoints.set(1.0);
         let output = m.render();
         // Prometheus format includes HELP and TYPE lines
-        assert!(output.contains("# HELP http_requests_total"), "missing HELP for http_requests_total");
-        assert!(output.contains("# TYPE http_requests_total counter"), "missing TYPE for http_requests_total");
+        assert!(
+            output.contains("# HELP http_requests_total"),
+            "missing HELP for http_requests_total"
+        );
+        assert!(
+            output.contains("# TYPE http_requests_total counter"),
+            "missing TYPE for http_requests_total"
+        );
         assert!(output.contains("# TYPE http_request_duration_seconds histogram"));
         assert!(output.contains("# TYPE active_connections gauge"));
     }

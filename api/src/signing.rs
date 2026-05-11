@@ -7,7 +7,7 @@
 //! Svix implementation: https://github.com/svix/svix-webhooks/blob/main/rust/src/webhooks.rs
 
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
-use hmac::{Hmac, Mac, KeyInit};
+use hmac::{Hmac, KeyInit, Mac};
 use sha2::Sha256;
 
 type HmacSha256 = Hmac<Sha256>;

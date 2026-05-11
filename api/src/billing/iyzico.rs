@@ -15,7 +15,7 @@
 
 use async_trait::async_trait;
 use base64::Engine;
-use hmac::{Hmac, Mac, KeyInit};
+use hmac::{Hmac, KeyInit, Mac};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
@@ -554,7 +554,8 @@ mod tests {
         let payload = format!("{}{}{}", auth.random_key, uri, body);
         let mut mac = HmacSha256::new_from_slice(b"test_secret_key").unwrap();
         mac.update(payload.as_bytes());
-        let expected = base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
+        let expected =
+            base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
 
         assert_eq!(auth.signature, expected);
     }

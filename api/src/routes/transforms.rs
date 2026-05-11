@@ -100,11 +100,10 @@ struct TestTransformRequest {
 async fn test_transform(
     Json(req): Json<TestTransformRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let result = transform::TransformEngine::apply(&req.payload, &req.config)
-        .map_err(|e| {
-            tracing::warn!("Transform error: {:?}", e);
-            AppError::BadRequest("Invalid transform configuration".into())
-        })?;
+    let result = transform::TransformEngine::apply(&req.payload, &req.config).map_err(|e| {
+        tracing::warn!("Transform error: {:?}", e);
+        AppError::BadRequest("Invalid transform configuration".into())
+    })?;
     Ok(Json(result))
 }
 

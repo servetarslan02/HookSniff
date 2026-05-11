@@ -8,7 +8,7 @@
 //! - Replay protection: reject if timestamp is >5 minutes old
 
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
-use hmac::{Hmac, Mac, KeyInit};
+use hmac::{Hmac, KeyInit, Mac};
 use sha2::Sha256;
 
 type HmacSha256 = Hmac<Sha256>;
@@ -116,9 +116,11 @@ mod tests {
 
             if sig_bytes.len() == expected_bytes.len()
                 && hmac::digest::CtOutput::<HmacSha256>::new(
-                    hmac::digest::Output::<HmacSha256>::try_from(sig_bytes.as_slice()).expect("valid HMAC output length"),
+                    hmac::digest::Output::<HmacSha256>::try_from(sig_bytes.as_slice())
+                        .expect("valid HMAC output length"),
                 ) == hmac::digest::CtOutput::<HmacSha256>::new(
-                    hmac::digest::Output::<HmacSha256>::try_from(expected_bytes.as_slice()).expect("valid HMAC output length"),
+                    hmac::digest::Output::<HmacSha256>::try_from(expected_bytes.as_slice())
+                        .expect("valid HMAC output length"),
                 )
             {
                 verified = true;
@@ -150,9 +152,11 @@ mod tests {
         }
 
         hmac::digest::CtOutput::<HmacSha256>::new(
-            hmac::digest::Output::<HmacSha256>::try_from(expected_bytes.as_slice()).expect("valid HMAC output length"),
+            hmac::digest::Output::<HmacSha256>::try_from(expected_bytes.as_slice())
+                .expect("valid HMAC output length"),
         ) == hmac::digest::CtOutput::<HmacSha256>::new(
-            hmac::digest::Output::<HmacSha256>::try_from(computed_bytes.as_slice()).expect("valid HMAC output length"),
+            hmac::digest::Output::<HmacSha256>::try_from(computed_bytes.as_slice())
+                .expect("valid HMAC output length"),
         )
     }
 

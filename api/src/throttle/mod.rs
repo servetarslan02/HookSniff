@@ -260,7 +260,10 @@ mod tests {
         let deserialized: ThrottleConfig = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.rate, Some(100));
         assert_eq!(deserialized.period_secs, 120);
-        assert!(matches!(deserialized.strategy, ThrottleStrategy::TokenBucket));
+        assert!(matches!(
+            deserialized.strategy,
+            ThrottleStrategy::TokenBucket
+        ));
     }
 
     // ── ThrottleManager::new ───────────────────────────────────
@@ -336,7 +339,9 @@ mod tests {
     async fn retry_after_returns_default_when_not_throttled() {
         let manager = ThrottleManager::new();
         let endpoint_id = Uuid::new_v4();
-        let retry = manager.retry_after(endpoint_id, 5, Duration::from_secs(60)).await;
+        let retry = manager
+            .retry_after(endpoint_id, 5, Duration::from_secs(60))
+            .await;
         assert_eq!(retry, 1);
     }
 
@@ -347,7 +352,9 @@ mod tests {
         for _ in 0..3 {
             manager.check(endpoint_id, 3, Duration::from_secs(60)).await;
         }
-        let retry = manager.retry_after(endpoint_id, 3, Duration::from_secs(60)).await;
+        let retry = manager
+            .retry_after(endpoint_id, 3, Duration::from_secs(60))
+            .await;
         assert!(retry > 0);
     }
 
