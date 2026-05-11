@@ -57,7 +57,8 @@ pub struct CreateTeamRequest {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct InviteRequest {
+#[serde(deny_unknown_fields)]
+struct InviteRequest {
     pub email: String,
     pub role: Option<String>,
 }

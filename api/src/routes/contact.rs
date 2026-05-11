@@ -7,6 +7,7 @@ use crate::email::EmailProvider;
 const CONTACT_RATE_LIMIT: u32 = 5;
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ContactRequest {
     pub name: String,
     pub email: String,
