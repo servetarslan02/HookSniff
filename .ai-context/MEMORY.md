@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 18:12 GMT+8
+> Son güncelleme: 2026-05-11 19:15 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -426,6 +426,16 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - CM6 editörü manipüle edilemedi, find/replace çalışmadı
 - **KALDIĞI YER**: Bir sonraki session'da ya PAT workflow scope ile push et ya da Servet manuel yapsın
 - Local branch `fix/otel-deploy-env-vars` hazır (değişiklikler kayıtlı)
+
+## Oturum 111 (2026-05-11 19:08 - 19:15) ✅
+- **OpenClaw yedinci oturum** — Servet SDK publish durumu + kalan işler
+- **Kotlin build.gradle.kts düzeltildi** — Maven Central OSSRH publishing, signing, jvmToolchain 11, Java SDK ile dependencies eşleştirildi
+- **PHP composer.json düzeltildi** — autoload path `lib/` (was `src/`), namespace `OpenAPI\\Client\\`, guzzle dependency, homepage monorepo
+- **Ruby hooksniff.gemspec** — homepage monorepo URL'ine düzeltildi
+- **Elixir mix.exs** — homepage_url `hooksniff.io` → `hooksniff.vercel.app`
+- **SDK-PUBLISH-STATUS.md güncellendi** — kalan 5 SDK için detaylı talimatlar
+- **Commit:** `7d37d85` — main branch, push başarılı
+- **Kalan işler:** Kotlin publish (Java+GPG gerekli), PHP Packagist webhook, Ruby/C#/Elixir Servet'in PC'sinde
 
 ## Oturum 110 (2026-05-11 18:10 - 18:25) 🔄
 - **OpenClaw altıncı oturum** — Servet SDK güncelleme istedi
