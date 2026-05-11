@@ -16,6 +16,7 @@ pub struct SearchResult {
     pub data: Option<serde_json::Value>,
 }
 
+#[derive(Debug)]
 pub struct Search {
     ctx: HookSniffRequestContext,
 }

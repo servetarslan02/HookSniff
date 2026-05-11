@@ -20,6 +20,7 @@ defmodule HookSniff.PaginationTest do
     ]
 
     call_count = :atomics.new(1, signed: true)
+    :atomics.put(call_count, 1, 1)
 
     fetch_page = fn _limit, _offset ->
       idx = :atomics.get(call_count, 1)
@@ -58,6 +59,7 @@ defmodule HookSniff.PaginationTest do
     ]
 
     call_count = :atomics.new(1, signed: true)
+    :atomics.put(call_count, 1, 1)
     offsets = :ets.new(:offsets, [:ordered_set])
 
     fetch_page = fn _limit, offset ->
@@ -83,6 +85,7 @@ defmodule HookSniff.PaginationTest do
     ]
 
     call_count = :atomics.new(1, signed: true)
+    :atomics.put(call_count, 1, 1)
 
     fetch_page = fn _limit, _offset ->
       idx = :atomics.get(call_count, 1)

@@ -17,7 +17,7 @@ pub struct PlanOutput {
     pub current_usage: Option<u64>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UpgradeInput {
     pub plan: String,
 }
@@ -27,6 +27,7 @@ pub struct PortalOutput {
     pub url: String,
 }
 
+#[derive(Debug)]
 pub struct Billing {
     ctx: HookSniffRequestContext,
 }

@@ -24,6 +24,7 @@ pub struct AlertNotification {
     pub created_at: String,
 }
 
+#[derive(Debug)]
 pub struct Alerts {
     ctx: HookSniffRequestContext,
 }

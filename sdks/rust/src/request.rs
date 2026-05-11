@@ -10,7 +10,6 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 const LIB_VERSION: &str = "0.4.0";
-const DEFAULT_BASE_URL: &str = "https://hooksniff-api-1046140057667.europe-west1.run.app";
 
 /// Error returned by the HookSniff API.
 #[derive(Debug)]
@@ -28,7 +27,7 @@ impl std::fmt::Display for ApiException {
 impl std::error::Error for ApiException {}
 
 /// Shared request context.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct HookSniffRequestContext {
     pub base_url: String,
     pub token: String,

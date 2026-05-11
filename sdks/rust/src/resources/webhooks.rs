@@ -53,6 +53,7 @@ pub struct BatchError {
     pub error: String,
 }
 
+#[derive(Debug)]
 pub struct Webhooks {
     ctx: HookSniffRequestContext,
 }

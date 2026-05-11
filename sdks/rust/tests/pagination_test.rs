@@ -1,3 +1,7 @@
+//! HookSniff Pagination Tests
+//!
+//! Comprehensive tests for the PaginatedIterator.
+
 use hooksniff::pagination::{Page, PaginatedIterator};
 
 /// Helper: build a Page with the given items and has_more flag.
@@ -16,7 +20,6 @@ fn test_single_page() {
     );
     let page = iter.next_page().unwrap();
     assert_eq!(page, vec![1, 2, 3]);
-    // No more pages
     assert!(iter.next_page().unwrap().is_empty());
 }
 
@@ -99,7 +102,6 @@ fn test_empty_page_mid_stream() {
             *c += 1;
             match *c {
                 1 => Ok(make_page(vec![1], true)),
-                // Server returns has_more=true but empty data — should stop
                 _ => Ok(make_page(Vec::<i32>::new(), true)),
             }
         },
@@ -108,7 +110,6 @@ fn test_empty_page_mid_stream() {
     );
 
     assert_eq!(iter.next_page().unwrap(), vec![1]);
-    // Empty page → iterator stops even though has_more was true
     assert!(iter.next_page().unwrap().is_empty());
 }
 
@@ -121,16 +122,15 @@ fn test_max_pages_limit() {
         |_limit, _offset| {
             let mut c = call.lock().unwrap();
             *c += 1;
-            Ok(make_page(vec![*c], true)) // always has_more
+            Ok(make_page(vec![*c], true))
         },
         1,
-        3, // stop after 3 pages
+        3,
     );
 
     assert_eq!(iter.next_page().unwrap(), vec![1]);
     assert_eq!(iter.next_page().unwrap(), vec![2]);
     assert_eq!(iter.next_page().unwrap(), vec![3]);
-    // 4th call should return empty because max_pages reached
     assert!(iter.next_page().unwrap().is_empty());
 }
 
@@ -142,6 +142,16 @@ fn test_max_pages_one() {
         1,
     );
     assert_eq!(iter.next_page().unwrap(), vec![42]);
+    assert!(iter.next_page().unwrap().is_empty());
+}
+
+#[test]
+fn test_max_pages_zero_returns_empty() {
+    let mut iter = PaginatedIterator::new(
+        |_limit, _offset| Ok(make_page(vec![1, 2, 3], true)),
+        10,
+        0,
+    );
     assert!(iter.next_page().unwrap().is_empty());
 }
 
@@ -164,7 +174,25 @@ fn test_offset_advances_correctly() {
 
     iter.collect_all().unwrap();
     let recorded = offsets.into_inner().unwrap();
-    assert_eq!(recorded, vec![0, 3]); // offset advances by page size
+    assert_eq!(recorded, vec![0, 3]);
+}
+
+#[test]
+fn test_offset_starts_at_zero() {
+    let first_offset = std::sync::Mutex::new(None);
+    let mut iter = PaginatedIterator::new(
+        |_limit, offset| {
+            let mut fo = first_offset.lock().unwrap();
+            if fo.is_none() {
+                *fo = Some(offset);
+            }
+            Ok(make_page(vec![1], false))
+        },
+        10,
+        10,
+    );
+    iter.next_page().unwrap();
+    assert_eq!(*first_offset.lock().unwrap(), Some(0));
 }
 
 // ── Error propagation ────────────────────────────────────────────────
@@ -200,6 +228,41 @@ fn test_error_stops_iteration() {
 
     assert_eq!(iter.next_page().unwrap(), vec![1]);
     assert!(iter.next_page().is_err());
+}
+
+#[test]
+fn test_error_on_first_page() {
+    let mut iter = PaginatedIterator::new(
+        |_limit, _offset| -> Result<Page<i32>, Box<dyn std::error::Error>> {
+            Err("auth failed".into())
+        },
+        10,
+        10,
+    );
+    let result = iter.next_page();
+    assert!(result.is_err());
+    assert!(result.unwrap_err().to_string().contains("auth failed"));
+}
+
+#[test]
+fn test_collect_all_stops_on_error() {
+    let call = std::sync::Mutex::new(0u32);
+    let mut iter = PaginatedIterator::new(
+        |_limit, _offset| -> Result<Page<i32>, Box<dyn std::error::Error>> {
+            let mut c = call.lock().unwrap();
+            *c += 1;
+            match *c {
+                1 => Ok(make_page(vec![1, 2], true)),
+                2 => Ok(make_page(vec![3], true)),
+                _ => Err("third page fails".into()),
+            }
+        },
+        2,
+        10,
+    );
+
+    let result = iter.collect_all();
+    assert!(result.is_err());
 }
 
 // ── Generic types ────────────────────────────────────────────────────
@@ -239,4 +302,99 @@ fn test_with_struct_items() {
     assert_eq!(all.len(), 2);
     assert_eq!(all[0].id, 1);
     assert_eq!(all[1].name, "b");
+}
+
+#[test]
+fn test_with_u64_items() {
+    let mut iter = PaginatedIterator::new(
+        |_limit, _offset| Ok(make_page(vec![100u64, 200, 300], false)),
+        10,
+        10,
+    );
+    let all = iter.collect_all().unwrap();
+    assert_eq!(all, vec![100, 200, 300]);
+}
+
+// ── Edge cases ────────────────────────────────────────────────────────
+
+#[test]
+fn test_single_item_pages() {
+    let call = std::sync::Mutex::new(0u32);
+    let mut iter = PaginatedIterator::new(
+        |_limit, _offset| {
+            let mut c = call.lock().unwrap();
+            *c += 1;
+            match *c {
+                1..=5 => Ok(make_page(vec![*c], true)),
+                _ => Ok(make_page(Vec::<u32>::new(), false)),
+            }
+        },
+        1,
+        100,
+    );
+
+    let all = iter.collect_all().unwrap();
+    assert_eq!(all, vec![1, 2, 3, 4, 5]);
+}
+
+#[test]
+fn test_large_page_size() {
+    let items: Vec<i32> = (0..1000).collect();
+    let mut iter = PaginatedIterator::new(
+        move |_limit, _offset| Ok(make_page(items.clone(), false)),
+        1000,
+        1,
+    );
+    let all = iter.collect_all().unwrap();
+    assert_eq!(all.len(), 1000);
+}
+
+#[test]
+fn test_next_page_after_collect_all_returns_empty() {
+    let mut iter = PaginatedIterator::new(
+        |_limit, _offset| Ok(make_page(vec![1, 2], false)),
+        10,
+        10,
+    );
+    let _all = iter.collect_all().unwrap();
+    // After collecting all, next_page should return empty
+    assert!(iter.next_page().unwrap().is_empty());
+}
+
+#[test]
+fn test_interleaved_next_page_and_collect() {
+    let mut iter = PaginatedIterator::new(
+        |_limit, _offset| Ok(make_page(vec![1, 2], false)),
+        10,
+        10,
+    );
+    // First page
+    let page = iter.next_page().unwrap();
+    assert_eq!(page, vec![1, 2]);
+    // Collect remaining (should be empty)
+    let rest = iter.collect_all().unwrap();
+    assert!(rest.is_empty());
+}
+
+// ── Page struct ──────────────────────────────────────────────────────
+
+#[test]
+fn test_page_has_more_true() {
+    let page = make_page(vec![1, 2, 3], true);
+    assert!(page.has_more);
+    assert_eq!(page.data.len(), 3);
+}
+
+#[test]
+fn test_page_has_more_false() {
+    let page = make_page(vec![1], false);
+    assert!(!page.has_more);
+    assert_eq!(page.data.len(), 1);
+}
+
+#[test]
+fn test_page_empty_data() {
+    let page: Page<i32> = make_page(vec![], false);
+    assert!(page.data.is_empty());
+    assert!(!page.has_more);
 }
