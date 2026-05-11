@@ -1124,7 +1124,8 @@
     "queue": "Kuyruk",
     "failedToLoadDetails": "Kullanıcı detayları yüklenemedi",
     "failedToUpdatePlan": "Plan güncellenemedi",
-    "failedToUpdateStatus": "Durum güncellenemedi"
+    "failedToUpdateStatus": "Durum güncellenemedi",
+    "businessPlan": "İş Planı"
   },
   "landing": {
     "nav": {

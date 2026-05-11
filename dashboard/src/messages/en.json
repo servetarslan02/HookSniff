@@ -1124,7 +1124,8 @@
     "queue": "Queue",
     "failedToLoadDetails": "Failed to load user details",
     "failedToUpdatePlan": "Failed to update plan",
-    "failedToUpdateStatus": "Failed to update status"
+    "failedToUpdateStatus": "Failed to update status",
+    "businessPlan": "Business Plan"
   },
   "landing": {
     "nav": {
