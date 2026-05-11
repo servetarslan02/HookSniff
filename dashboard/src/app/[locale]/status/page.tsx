@@ -192,6 +192,7 @@ function Sparkline({ data }: { data: number[] }) {
 
 // ─── 90-Day Uptime Calendar ───
 function UptimeCalendar({ history }: { history: HistoryDay[] }) {
+  const t = useTranslations('status');
   const [hoveredDay, setHoveredDay] = useState<HistoryDay | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
@@ -261,6 +262,7 @@ function UptimeCalendar({ history }: { history: HistoryDay[] }) {
 
 // ─── Uptime Bar (30-day) ───
 function UptimeBar({ history }: { history: HistoryDay[] }) {
+  const t = useTranslations('status');
   const last30 = history.slice(-30);
   const avgUptime = last30.reduce((s, d) => s + d.uptime, 0) / last30.length;
 
@@ -296,6 +298,7 @@ function UptimeBar({ history }: { history: HistoryDay[] }) {
 
 // ─── Component Row ───
 function ComponentRow({ component, responseTimes }: { component: ComponentStatus; responseTimes: number[] }) {
+  const t = useTranslations('status');
   const currentLatency = component.latency_ms;
   const uptime = component.uptime_30d;
 
@@ -421,6 +424,7 @@ function IncidentLog({ incidents }: { incidents: Incident[] }) {
 
 // ─── Maintenance Section ───
 function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
+  const t = useTranslations('status');
   const upcoming = maintenance.filter(m => m.status === 'scheduled' || m.status === 'in_progress');
   const past = maintenance.filter(m => m.status === 'completed');
 

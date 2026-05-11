@@ -46,21 +46,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         aria-live="assertive"
         aria-atomic="false"
       >
-        {toasts.map((t) => (
+        {toasts.map((toast) => (
           <div
-            key={t.id}
+            key={toast.id}
             className={clsx(
               'flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium animate-slide-up',
-              t.type === 'success' && 'bg-green-600 text-white',
-              t.type === 'error' && 'bg-red-600 text-white',
-              t.type === 'info' && 'bg-gray-900 text-white'
+              toast.type === 'success' && 'bg-green-600 text-white',
+              toast.type === 'error' && 'bg-red-600 text-white',
+              toast.type === 'info' && 'bg-gray-900 text-white'
             )}
           >
-            <span className="flex-1">{t.message}</span>
+            <span className="flex-1">{toast.message}</span>
             <button
-              onClick={() => dismiss(t.id)}
+              onClick={() => dismiss(toast.id)}
               className="flex-shrink-0 ml-2 opacity-70 hover:opacity-100 transition-opacity"
-              aria-label={t("dismiss")}
+              aria-label="Dismiss"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M1 1l12 12M13 1L1 13" />

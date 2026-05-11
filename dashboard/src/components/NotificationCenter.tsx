@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { notificationsApi, type Notification } from '@/lib/api';
 
 export function NotificationCenter() {
+  const t = useTranslations('nav');
   const { token } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
