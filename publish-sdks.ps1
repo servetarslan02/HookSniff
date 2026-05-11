@@ -46,11 +46,17 @@ function Publish-Ruby {
 # NuGet
 function Publish-NuGet {
     Write-Host "[4/7] C# (NuGet)..." -ForegroundColor Yellow
-    Set-Location sdks\csharp
-    dotnet pack -c Release 2>$null
-    dotnet nuget push bin\Release\*.nupkg --source https://api.nuget.org/v3/index.json 2>$null
-    if ($LASTEXITCODE -eq 0) { Write-Host "  ✅ NuGet yayinda" -ForegroundColor Green } else { Write-Host "  ❌ NuGet hata" -ForegroundColor Red }
-    Set-Location ..\..
+    Set-Location sdks\csharp\src\hooksniff
+    dotnet restore 2>$null
+    dotnet pack -c Release -o .\nupkg 2>$null
+    $nupkg = Get-ChildItem -Path .\nupkg -Filter *.nupkg | Select-Object -First 1
+    if ($nupkg) {
+        dotnet nuget push $nupkg.FullName --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY 2>$null
+        if ($LASTEXITCODE -eq 0) { Write-Host "  ✅ NuGet yayinda" -ForegroundColor Green } else { Write-Host "  ❌ NuGet hata - API key gerekli" -ForegroundColor Red }
+    } else {
+        Write-Host "  ❌ NuGet paket olusturulamadi" -ForegroundColor Red
+    }
+    Set-Location ..\..\..\..
 }
 
 # Hex (Elixir)
