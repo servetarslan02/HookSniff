@@ -21,34 +21,21 @@ public class Billing {
         this.config = config;
     }
 
-    /** Get current subscription */
-    public Map<String, Object> subscription() throws ApiException, IOException, InterruptedException {
-        RequestHelper req = new RequestHelper("GET", "/v1/billing/subscription");
+    /** Get current plan info. */
+    public Map<String, Object> plan() throws ApiException, IOException, InterruptedException {
+        RequestHelper req = new RequestHelper("GET", "/v1/billing/plan");
         return req.send(config, MAP);
     }
 
-    /** Get billing portal URL */
+    /** Get billing portal URL. */
     public Map<String, Object> portal() throws ApiException, IOException, InterruptedException {
         RequestHelper req = new RequestHelper("POST", "/v1/billing/portal");
         return req.send(config, MAP);
     }
 
-    /** Get invoices */
-    public Map<String, Object> invoices() throws ApiException, IOException, InterruptedException {
-        RequestHelper req = new RequestHelper("GET", "/v1/billing/invoices");
-        return req.send(config, MAP);
-    }
-
-    /** Upgrade subscription */
+    /** Upgrade subscription. */
     public Map<String, Object> upgrade(Map<String, Object> input) throws ApiException, IOException, InterruptedException {
         RequestHelper req = new RequestHelper("POST", "/v1/billing/upgrade");
-        req.setBody(input);
-        return req.send(config, MAP);
-    }
-
-    /** Cancel subscription */
-    public Map<String, Object> cancel(Map<String, Object> input) throws ApiException, IOException, InterruptedException {
-        RequestHelper req = new RequestHelper("POST", "/v1/billing/cancel");
         req.setBody(input);
         return req.send(config, MAP);
     }
