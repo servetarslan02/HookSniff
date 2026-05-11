@@ -16,6 +16,7 @@ import {
   type DeliveryListOutput,
   type BatchOutput,
 } from "../models";
+import { paginate, collectAll, type Page, type PaginationOptions } from "../pagination";
 
 export type { WebhookSendInput, WebhookBatchInput, DeliveryOutput, DeliveryListOutput, BatchOutput };
 
@@ -42,7 +43,7 @@ export class Webhooks {
     );
   }
 
-  /** List deliveries */
+  /** List deliveries (single page) */
   async list(options?: { limit?: number; offset?: number }): Promise<DeliveryListOutput> {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks");
     if (options?.limit) req.setQueryParams({ limit: options.limit });
@@ -50,6 +51,22 @@ export class Webhooks {
     return req.send<DeliveryListOutput>(this.ctx, (json) =>
       DeliveryListModel._fromJsonObject(json as Record<string, unknown>)
     );
+  }
+
+  /** Iterate through all deliveries with automatic pagination */
+  listAll(options?: PaginationOptions): AsyncGenerator<DeliveryOutput, void, undefined> {
+    return paginate(async ({ limit, offset }) => {
+      const page = await this.list({ limit, offset });
+      return { data: page.data, has_more: page.has_more };
+    }, options);
+  }
+
+  /** Collect all deliveries into an array */
+  async listAllArray(options?: PaginationOptions): Promise<DeliveryOutput[]> {
+    return collectAll(async ({ limit, offset }) => {
+      const page = await this.list({ limit, offset });
+      return { data: page.data, has_more: page.has_more };
+    }, options);
   }
 
   /** Get a specific delivery */
