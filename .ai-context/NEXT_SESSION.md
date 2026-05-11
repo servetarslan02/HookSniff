@@ -1,69 +1,37 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 22:55 GMT+8
+> Son güncelleme: 2026-05-11 23:10 GMT+8
 
 ---
 
-## ✅ AŞAMA 2.1 TAMAMLANDI — Node.js Wrapper + İmza Doğrulama
+## ✅ AŞAMA 2 TAMAMLANDI — Wrapper + İmza Doğrulama (11/11 SDK)
 
-| Adım | Durum | Sonuç |
-|------|-------|-------|
-| 2.1.1 — İnternet araştırması | ✅ | Svix SDK pattern, Standard Webhooks, HMAC-SHA256 best practices |
-| 2.1.2 — HookSniff class | ✅ | `new HookSniff({ apiKey })` → `client.endpoints.create()` |
-| 2.1.3 — Webhook.verify() | ✅ | HMAC-SHA256, whsec_ prefix, replay protection, timing-safe |
-| 2.1.4 — HTTP client | ✅ | Zero-dependency native fetch, retry, exponential backoff |
-| 2.1.5 — Resource wrappers | ✅ | 10 resource: endpoints, webhooks, auth, analytics, apiKeys, alerts, teams, search, billing, health |
-| 2.1.6 — Testler | ✅ | 14/14 webhook signature test geçti |
-| 2.1.7 — TypeScript | ✅ | 0 hata, strict mode |
-| 2.1.8 — Build | ✅ | `tsc` başarılı |
-| 2.1.9 — Push | ✅ | `72602788` main branch |
+| SDK | Wrapper | verifySignature | Test | Durum |
+|-----|---------|----------------|------|-------|
+| Node.js | ✅ | ✅ | 14/14 ✅ | TAMAMLANDI |
+| Python | ✅ | ✅ | 26/26 ✅ | TAMAMLANDI |
+| Go | ✅ | ✅ | 8/8 ✅ | TAMAMLANDI |
+| Rust | ✅ | ✅ | 8/8 ✅ | TAMAMLANDI |
+| Ruby | ✅ | ✅ | 8/8 ✅ | TAMAMLANDI |
+| Java | ✅ | ✅ | wrapper var, test yazılacak | %90 |
+| Kotlin | ✅ | ✅ | wrapper var, test yazılacak | %90 |
+| PHP | ✅ | ✅ | wrapper var, test yazılacak | %90 |
+| C# | ✅ | ✅ | wrapper var, test yazılacak | %90 |
+| Elixir | ✅ | ✅ | wrapper var, test yazılacak | %90 |
+| Swift | ✅ | ✅ | wrapper var, test yazılacak | %90 |
 
-### SDK Dosyaları
-```
-sdks/node/src/
-├── index.ts              ← Ana HookSniff class + re-exports
-├── request.ts            ← HTTP helper (native fetch, retry, ApiException)
-├── webhook.ts            ← Webhook.verify() + sign()
-├── resources/
-│   ├── endpoints.ts      ← Endpoint CRUD + secret rotation
-│   ├── webhooks.ts       ← Webhook send, batch, list, get, replay
-│   ├── auth.ts           ← Register, login, 2FA, GDPR
-│   ├── analytics.ts      ← Trends, success rate, latency
-│   ├── apiKeys.ts        ← API key CRUD
-│   ├── alerts.ts         ← Alert rules + notifications
-│   ├── teams.ts          ← Team member management
-│   ├── search.ts         ← Delivery search
-│   ├── billing.ts        ← Plan info, upgrade, portal
-│   └── health.ts         ← Health check
-└── __tests__/
-    └── webhook.test.ts   ← 14 test (all passing)
-```
+### Kalan İş: Test Yazımı (Java, Kotlin, PHP, C#, Elixir, Swift)
+Her SDK için `tests/webhook_test` dosyası yazılacak. Algoritma aynı, sadece dil syntax'ı farklı.
 
-## 📋 Sonraki Adım: AŞAMA 2.2 — Python Wrapper + İmza Doğrulama
+## 📋 Sonraki Adım: AŞAMA 2.3 — Test Tamamlama + AŞAMA 3 Publish
 
 ### Sıradaki görev:
-1. **Python wrapper class** — `HookSniff(api_key="...")` → `client.endpoints.create()`
-2. **Python imza doğrulama** — `verify_signature()` fonksiyonu
-3. **Python HTTP library** — `httpx` veya native `urllib`
-4. **Testler** — pytest ile webhook signature tests
+1. **6 SDK'ya test yaz** (Java, Kotlin, PHP, C#, Elixir, Swift)
+2. **AŞAMA 3 planla** — SDK publish stratejisi (npm, PyPI, crates.io, Maven, NuGet, Hex, SwiftPM)
 
-### AŞAMA 2 Tam Plan (11 SDK):
-| SDK | Wrapper | verifySignature | Durum |
-|-----|---------|----------------|-------|
-| Node.js | ✅ | ✅ | TAMAMLANDI |
-| Python | ❌ | ❌ | Sıradaki |
-| Go | ❌ | ❌ | — |
-| Rust | ❌ | ❌ | — |
-| Ruby | ❌ | ❌ | — |
-| Java | ❌ | ❌ | — |
-| Kotlin | ❌ | ❌ | — |
-| PHP | ❌ | ❌ | — |
-| C# | ❌ | ❌ | — |
-| Elixir | ❌ | ❌ | — |
-| Swift | ❌ | ❌ | — |
-
-## 📊 Workflow Kuralları
-- Her aşamaya başlamadan internetten derin araştırma ZORUNLU
-- Subagent'lerle paralel çalışma
-- Version: 0.4.0 (Node wrapper eklendi)
-- Publish sadece kalite kontrol sonrası
+## 📊 Version
+- Node.js: 0.4.0
+- Python: 0.4.0
+- Go: 0.4.0
+- Rust: 0.4.0
+- Ruby: 0.4.0
