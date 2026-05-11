@@ -5,6 +5,7 @@ import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
+import Footer from '@/components/Footer';
 
 // Lazy load ThemeToggle
 const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m => m.ThemeToggle), { ssr: false });
@@ -227,7 +228,7 @@ function HowItWorks() {
         <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{t('subtitle')}</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-        <div className="hidden md:block absolute top-12 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-600 dark:via-purple-600 dark:to-brand-600" />
+        <div className="hidden md:block absolute top-10 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-600 dark:via-purple-600 dark:to-brand-600 z-0" />
         {steps.map((step, i) => (
           <div key={i} className="relative flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-6 relative z-10 border border-brand-100 dark:border-brand-500/20">
@@ -254,7 +255,6 @@ export default function Home() {
   const tHero = useTranslations('landing.hero');
   const tFeatures = useTranslations('landing.features');
   const tPricing = useTranslations('landing.pricing');
-  const tFooter = useTranslations('landing.footer');
   const tCommon = useTranslations('common');
 
   const featureKeys = ['smartRetries', 'hmacSignatures', 'dashboard', 'lowLatency', 'dlq', 'global'] as const;
@@ -440,26 +440,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="max-w-7xl mx-auto px-6 border-t border-gray-200 dark:border-slate-800 py-12 mb-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🪝</span>
-            <span className="font-semibold text-gray-900 dark:text-white">HookSniff</span>
-          </div>
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-500 dark:text-slate-400">
-            <a href="https://github.com/servetarslan02/HookSniff" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('github')}</a>
-            <Link href="/docs" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('docs')}</Link>
-            <Link href="/status" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('status')}</Link>
-            <Link href="/about" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('about')}</Link>
-            <Link href="/faq" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('faq')}</Link>
-            <Link href="/contact" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('contact')}</Link>
-            <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('terms')}</Link>
-            <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition">{tFooter('privacy')}</Link>
-          </div>
-          <p className="text-sm text-gray-400 dark:text-slate-500">{tFooter('copyright')}</p>
-        </div>
-      </footer>
+            <Footer />
     </div>
   );
 }
