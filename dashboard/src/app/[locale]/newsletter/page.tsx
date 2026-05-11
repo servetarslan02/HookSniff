@@ -60,6 +60,7 @@ const faqs = [
 
 export default function NewsletterPage() {
   const t = useTranslations('newsletter');
+  const tc = useTranslations('common');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -83,7 +84,7 @@ export default function NewsletterPage() {
         setEmail('');
       } else {
         setStatus('error');
-        setMessage(data.error || 'Something went wrong');
+        setMessage(data.error || tc('somethingWentWrong'));
       }
     } catch {
       setStatus('error');
