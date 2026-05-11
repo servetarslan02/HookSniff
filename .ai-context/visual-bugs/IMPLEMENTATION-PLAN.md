@@ -7,23 +7,23 @@
 
 ---
 
-## AŞAMA 1 — KRİTİK GÜVENLİK (🔴 22 madde)
+## AŞAMA 1 — KRİTİK GÜVENLİK (19/22 tamamlandı ✅)
 
 ### 1.1 Edge & Dashboard Security
-1. 🔴 Edge middleware auth yok — Dashboard HTML herkese servis ediliyor → `dashboard/src/middleware.ts`
-2. 🔴 CSRF protection yok — POST/PUT/DELETE'de CSRF token yok → `dashboard/src/lib/api.ts`
+1. ✅ Edge middleware auth yok — Dashboard HTML herkese servis ediliyor → `dashboard/src/middleware.ts` ✅ YAPILDI
+2. ✅ CSRF protection yok — POST/PUT/DELETE'de CSRF token yok → `dashboard/src/lib/api.ts` ✅ YAPILDI
 3. 🔴 In-memory rate limit default — restart'ta kaybolur → `api/src/rate_limit.rs`
-4. 🔴 IP spoofing via X-Forwarded-For — rate limit bypass → `api/src/rate_limit.rs`
-5. 🔴 Staging default fallback passwords → `docker-compose.staging.yml`
+4. ✅ IP spoofing via X-Forwarded-For — rate limit bypass → `api/src/rate_limit.rs` ✅ YAPILDI
+5. ✅ Staging default fallback passwords → `docker-compose.staging.yml` ✅ YAPILDI
 
 ### 1.2 Async Rust Kritik
-6. 🔴 `std::sync::Mutex` held across `.await` — production hang → `api/src/middleware/mod.rs`
-7. 🔴 Unbounded auth cache growth — memory leak, OOM → `api/src/middleware/mod.rs`
-8. 🔴 Argon2 (CPU-bound) in async without `spawn_blocking` — thread starvation → `api/src/auth/jwt.rs`
+6. ✅ `std::sync::Mutex` held across `.await` — production hang → `api/src/middleware/mod.rs` ✅ YAPILDI
+7. ✅ Unbounded auth cache growth — memory leak, OOM → `api/src/middleware/mod.rs` ✅ YAPILDI
+8. ✅ Argon2 (CPU-bound) in async without `spawn_blocking` — thread starvation → `api/src/auth/jwt.rs` ✅ YAPILDI
 
 ### 1.3 Worker Kritik
-9. 🔴 No idempotency — webhooks can be duplicated → `worker/src/main.rs`
-10. 🔴 No response body size limit — memory bomb → `worker/src/delivery/http.rs`
+9. ✅ No idempotency — webhooks can be duplicated → `worker/src/main.rs` ✅ YAPILDI
+10. ✅ No response body size limit — memory bomb → `worker/src/delivery/http.rs` ✅ YAPILDI
 
 ### 1.4 Database Kritik
 11. 🔴 `password_hash` column allows NULL — account takeover → `api/migrations/`
@@ -31,17 +31,17 @@
 13. 🔴 Hardcoded DB credentials in migration scripts → `api/migrations/`
 
 ### 1.5 Frontend Kritik
-14. 🔴 Silent API failures — 7+ sayfada boş `catch {}` → Health, Alerts, Search, Schemas, Templates, Portal, Routing
-15. 🔴 Error Boundary dashboard'da kullanılmamış → `dashboard/src/app/[locale]/dashboard/layout.tsx`
-16. 🔴 `router.push` navigations locale prefix içermiyor → Dashboard, Endpoints, Deliveries
-17. 🔴 Hardcoded locale list in regex → `dashboard/src/app/[locale]/dashboard/layout.tsx`
-18. 🔴 API Request Missing Authorization Header → `dashboard/src/app/[locale]/dashboard/health/page.tsx`
-19. 🔴 `credentials: 'include'` inside headers object (API Keys) → `dashboard/src/app/[locale]/dashboard/api-keys/page.tsx`
+14. ✅ Silent API failures — 7+ sayfada boş `catch {}` → Health, Alerts, Search, Schemas, Templates, Portal, Routing ✅ YAPILDI
+15. ✅ Error Boundary dashboard'da kullanılmamış → `dashboard/src/app/[locale]/dashboard/layout.tsx` ✅ YAPILDI
+16. ✅ `router.push` navigations locale prefix içermiyor → Dashboard, Endpoints, Deliveries ✅ YAPILDI
+17. ✅ Hardcoded locale list in regex → `dashboard/src/app/[locale]/dashboard/layout.tsx` ✅ YAPILDI
+18. ✅ API Request Missing Authorization Header → `dashboard/src/app/[locale]/dashboard/health/page.tsx` ✅ YAPILDI
+19. ✅ `credentials: 'include'` inside headers object (API Keys) → `dashboard/src/app/[locale]/dashboard/api-keys/page.tsx` ✅ YAPILDI
 
 ### 1.6 i18n Kritik
-20. 🔴 Admin sidebar tamamen İngilizce (12 metin × 5 sayfa) → Admin layout
-21. 🔴 No i18n in Webhook Builder → `dashboard/src/app/[locale]/dashboard/webhook-builder/page.tsx`
-22. 🔴 No i18n in Signature Verifier → `dashboard/src/app/[locale]/dashboard/signature-verifier/page.tsx`
+20. ✅ Admin sidebar tamamen İngilizce (12 metin × 5 sayfa) → Admin layout ✅ YAPILDI
+21. ✅ No i18n in Webhook Builder → `dashboard/src/app/[locale]/dashboard/webhook-builder/page.tsx` ✅ YAPILDI
+22. ✅ No i18n in Signature Verifier → `dashboard/src/app/[locale]/dashboard/signature-verifier/page.tsx` ✅ YAPILDI
 
 ---
 
@@ -526,6 +526,6 @@
 
 ---
 
-> **Toplam:** 364 madde (359 kalan iş + 5 Servet'in yapması gereken)
+> **Toplam:** 364 madde (340 kalan iş + 5 Servet'in yapması gereken) — 19 madde tamamlandı (2026-05-12)
 > **Kaynak:** 60+ rapor dosyası + 15 screenshot
 > **Son güncelleme:** 2026-05-12 02:00 GMT+8
