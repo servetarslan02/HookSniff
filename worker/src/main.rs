@@ -24,6 +24,7 @@ mod config;
 pub mod delivery;
 mod fifo;
 pub mod telemetry;
+mod throttle;
 
 /// Start a minimal HTTP health check server for Cloud Run.
 /// Cloud Run requires containers to listen on PORT=8080.
@@ -158,6 +159,13 @@ async fn main() -> Result<()> {
             cooldown_secs: 60,
         });
 
+    // BUG-024: Throttle manager — per-endpoint rate limiting and backoff
+    let throttle_manager = throttle::ThrottleManager::new(throttle::ThrottleConfig {
+        max_attempts_per_window: 10,
+        window_secs: 60,
+        base_backoff_secs: 5,
+    });
+
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
     tracing::info!("🔒 Concurrent delivery limit: 10");
     tracing::info!("⚡ Circuit breaker: 5 failures → 60s cooldown");
@@ -218,7 +226,7 @@ async fn main() -> Result<()> {
                     }
                 }
                 // Process immediately on NOTIFY (or after reconnect attempt)
-                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone()).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries", processed);
@@ -231,7 +239,7 @@ async fn main() -> Result<()> {
             }
             _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
                 // Fallback 1s poll — catches anything NOTIFY might have missed
-                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone()).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries (poll fallback)", processed);
@@ -337,6 +345,7 @@ async fn process_pending(
     _cfg: &config::WorkerConfig,
     semaphore: std::sync::Arc<tokio::sync::Semaphore>,
     circuit_breaker: circuit_breaker::CircuitBreaker,
+    throttle_manager: throttle::ThrottleManager,
 ) -> Result<usize> {
     // Fetch pending items (with FOR UPDATE SKIP LOCKED for concurrency)
     let items: Vec<WebhookQueueItem> = {
@@ -387,6 +396,7 @@ async fn process_pending(
         let secret_map = secret_map.clone();
         let semaphore = semaphore.clone();
         let cb = circuit_breaker.clone();
+        let tm = throttle_manager.clone();
 
         let handle = tokio::spawn(async move {
             // Acquire semaphore permit — limits concurrent HTTP deliveries
@@ -744,6 +754,9 @@ async fn process_pending(
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
 
+                // BUG-024: Record attempt in throttle (may trigger backoff)
+                tm.record_attempt(endpoint_id).await;
+
                 // HS-023: Mark FIFO item as failed (blocks subsequent items)
                 let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else if attempt >= item.max_attempts {
@@ -833,6 +846,9 @@ async fn process_pending(
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
 
+                // BUG-024: Record attempt in throttle (may trigger backoff)
+                tm.record_attempt(endpoint_id).await;
+
                 // HS-023: Mark FIFO item as dead-lettered
                 let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else {
@@ -897,6 +913,9 @@ async fn process_pending(
 
                 // HS-020: Record failure in circuit breaker (retry = delivery failed)
                 cb.record_failure(endpoint_id).await;
+
+                // BUG-024: Record attempt in throttle (may trigger backoff)
+                tm.record_attempt(endpoint_id).await;
             }
 
             Ok::<(), anyhow::Error>(())
