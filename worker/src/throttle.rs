@@ -70,6 +70,7 @@ pub struct ThrottleManager {
 /// Redis key prefix for throttle state.
 const REDIS_KEY_PREFIX: &str = "hooksniff:throttle:";
 
+#[allow(dead_code)]
 impl ThrottleManager {
     /// Create a new throttle manager with in-memory-only state.
     pub fn new(config: ThrottleConfig) -> Self {
