@@ -29,6 +29,7 @@ namespace HookSniff.Model
     /// <summary>
     /// Paginated list of endpoints
     /// </summary>
+    [JsonConverter(typeof(EndpointListResponseJsonConverter))]
     public partial class EndpointListResponse : IValidatableObject
     {
         /// <summary>
