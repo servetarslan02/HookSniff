@@ -150,6 +150,9 @@ components:
         refresh_token:
           type: string
           description: Refresh token (when applicable)
+      required:
+      - token
+      - customer
     TwoFactorRequiredResponse:
       type: object
       properties:
@@ -373,6 +376,16 @@ components:
           enum:
           - standard
           - cloudevents
+      required:
+      - id
+      - url
+      - is_active
+      - retry_policy
+      - created_at
+      - routing_strategy
+      - avg_response_ms
+      - failure_streak
+      - format
     EndpointListResponse:
       type: object
       description: Paginated list of endpoints
@@ -607,7 +620,7 @@ components:
           type: string
           description: Masked key prefix (e.g. "hs_abc1...")
         created_at:
-          type: string
+          $ref: '#/components/schemas/DateTime'
         last_used_at:
           type: string
           nullable: true
@@ -651,7 +664,7 @@ components:
         is_active:
           type: boolean
         created_at:
-          type: string
+          $ref: '#/components/schemas/DateTime'
     CreateAlertRequest:
       type: object
       properties:
@@ -1064,7 +1077,9 @@ components:
           type: integer
         failed_deliveries:
           type: integer
-      required: [endpoint_id, is_healthy]
+      required:
+      - endpoint_id
+      - is_healthy
     TestWebhookRequest:
       type: object
       properties:
