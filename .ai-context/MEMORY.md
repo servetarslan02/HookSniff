@@ -435,7 +435,7 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - **Elixir mix.exs** — homepage_url `hooksniff.io` → `hooksniff.vercel.app`
 - **SDK-PUBLISH-STATUS.md güncellendi** — kalan 5 SDK için detaylı talimatlar
 - **Commit:** `7d37d85` — main branch, push başarılı
-- **Kalan işler:** Kotlin publish (Java+GPG gerekli), PHP Packagist webhook, Ruby/C#/Elixir Servet'in PC'sinde
+- **Kalan işler:** (Oturum 112'de tamamlandı — 11/11 SDK yayında)
 
 ## Oturum 110 (2026-05-11 18:10 - 18:25) 🔄
 - **OpenClaw altıncı oturum** — Servet SDK güncelleme istedi
@@ -521,17 +521,17 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - **OpenClaw sekizinci oturum** — Servet SDK publish tamamlama
 - **Rust (crates.io):** Zaten 0.3.0'da yayındaymış ✅
 - **Java (Maven Central):** `io.github.servetarslan02:hooksniff-sdk:0.3.0` doğrulandı ✅
-- **Kotlin (Maven Central):** `io.github.servetarslan02:hooksniff-sdk-kotlin:0.3.0` staging'den release edildi
+- **Kotlin (Maven Central):** `io.github.servetarslan02:hooksniff-sdk-kotlin:0.3.0` yayında ✅
   - Artifact ID değiştirildi: `hooksniff-sdk` → `hooksniff-sdk-kotlin` (Java ile çakışma)
   - build.gradle.kts güncellendi
   - GPG signing + Sonatype OSSRH credentials ile publish
-  - Staging release başarılı, 10-30 dk'da Maven Central'da olacak
+  - 2026-05-11 20:59'da `repo1.maven.org` üzerinden doğrulandı
 - **Swift (SPM):** Package.swift düzeltildi (kaynak path eklendi), ama ayrı repo gerekli
   - Monorepo'dan SPM tag ile çalışmaz
   - `hooksniff-swift` gibi ayrı repo oluşturulmalı
 - **Go:** Proxy cache düzeldi, v0.3.0 artık latest ✅
 - **Commit:** `015db33` — Kotlin artifact fix + Swift Package.swift fix
-- **10/11 SDK yayında** (Kotlin 10-30 dk içinde), Swift eksik (aynı repo gerekli)
+- **11/11 SDK yayında** ✅ (Kotlin Maven Central'da doğrulandı, Swift ayrı repo ile yayında)
 - **Credential'lar:** .gitignore'a gradle.properties eklendi (commit edilmedi)
 
 ## Swift SDK Tamamlandı (Oturum 112 devam)
