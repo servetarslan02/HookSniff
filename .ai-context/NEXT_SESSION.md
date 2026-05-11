@@ -12,18 +12,19 @@
 - **Hata mesajı:** "The user-provided container failed to start and listen on the port defined provided by the PORT=3000 environment variable within the allocated timeout"
 - **Cloud Logging:** Failed revision'da log YOK → container hiç başlamadan çöküyor
 - **Muhtemel nedenler (sırayla denenmeli):**
-  1. **OTEL init hatası** — `OTEL_ENABLED=true` iken Grafana Cloud'a bağlanırken crash olabilir
-     - Çözüm: `OTEL_ENABLED=false` ile deploy et (Oturum 109'da denendi ama tamamlanamadı)
-  2. **OTEL headers secret bozuk** — `otel-headers` secret'ı (v5) yanlış formatta olabilir
-     - Kontrol: Secret'ı GCP Secret Manager'dan oku, `Authorization=Basic <base64>` formatında olmalı
-  3. **Docker image build sorunu** — `rust:1-bookworm` builder image'ı farklı Rust sürümü kullanıyor olabilir
-     - Kontrol: Cloud Build loglarında `cargo build --release` adımını kontrol et
-  4. **Missing env var** — `NOTIFY_EMAIL` Cloud Run'da tanımlı değil ama kod Optional olarak handle ediyor (crash yapmamalı)
-- **Çözüm planı (öncelik sırası):**
-  1. OTEL_ENABLED=false ile yeni revision deploy et
-  2. Eğer bu çalışırsa → OTEL config'i debug et (headers, endpoint, secret)
-  3. Eğer çalışmazsa → Cloud Build loglarını kontrol et, Docker image'ı teşhis et
-  4. GCloud CLI kur → `gcloud run services describe hooksniff-api --region=europe-west1` ile detaylı bak
+  1. **OTEL init hatası** — ❌ ELENDİ (OTEL_ENABLED=false ile denendi, yine başarısız)
+  2. **Docker image build sorunu** — ✅ MUHTEMEL NEDEN
+     - Cloud Build `rust:1-bookworm` image'ı farklı Rust sürümü kullanıyor olabilir
+     - Runtime image `debian:bookworm-slim` eksik bağımlılık içerebilir
+     - Kontrol: Cloud Build loglarında `cargo build --release` adımını incele
+     - Kontrol: `Dockerfile.api`'deki `rust:1-bookworm` → spesifik sürüm kullan (örn: `rust:1.82-bookworm`)
+  3. **Missing env var** — ❌ ELENDİ (kod Optional handle ediyor)
+- **Çözüm planı (öncelik sırası — GÜNCELLENDİ):**
+  1. ✅ OTEL_ENABLED=false denendi → BAŞARISIZ (OTEL elendi)
+  2. **Cloud Build loglarını incele** — `build-api` adımında hata var mı?
+  3. **Dockerfile.api'de Rust sürümünü sabitle** — `rust:1-bookworm` → `rust:1.82.0-bookworm`
+  4. **Local Docker build dene** — `docker build -f Dockerfile.api -t test-api .` ile sorunu reproduce et
+  5. **00058'in image digest'ini bul** — çalışan image'ı tekrar deploy et (rollback)
 
 ### 2. GitHub Actions Billing — BİTTİ
 - **Sorun:** GitHub Actions dakikaları dolmuş, CI/CD çalışmıyor

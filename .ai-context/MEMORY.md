@@ -86,7 +86,11 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Cloud Logging'de log YOK — container hiç başlamadan çöküyor
   - **Muhtemel neden:** OTEL init hatası (Grafana Cloud bağlantı/Auth sorunu)
   - **Denenen:** OTEL_ENABLED=false ile deploy (oturum sona erdi, tamamlanamadı)
-- **OTEL_ENABLED=false ile deploy denemesi** — GCP Console'da env var değiştirildi, Deploy'a basıldı ama sonucu görülmedi
+- **OTEL_ENABLED=false ile deploy denemesi** — Revision 00064, OTEL_ENABLED=false ile deploy edildi, YİNE BAŞARISIZ
+  - **KESİN SONUÇ: OTEL sorun değil.** Docker image'ın kendisi bozuk.
+  - Cloud Build image build ediyor ama üretilen binary Cloud Run'da başlamıyor
+  - Muhtemel neden: Docker builder (`rust:1-bookworm`) farklı Rust sürümü veya runtime eksik bağımlılık
+  - **Sonraki oturumda:** Cloud Build loglarını incele, Docker image'ı localde build etmeyi dene
 - **Auto-sync cron** — her 10 dakikada .ai-context/ GitHub'a push
 - **API sağlık:** /health 200 OK (eski revizyon 00058'den)
 - **GCP kredisi:** ₺87 / ₺13,516 kullanılmış, Ağustos 2026'ya kadar geçerli
