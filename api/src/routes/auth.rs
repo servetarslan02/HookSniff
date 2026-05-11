@@ -770,6 +770,7 @@ async fn logout() -> impl IntoResponse {
 async fn enable_2fa(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    headers: HeaderMap,
     Json(req): Json<Enable2faRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Verify password
@@ -854,7 +855,9 @@ async fn confirm_2fa(
     // Audit log — 2FA_ENABLE
     {
         let rid = customer.id.to_string();
-        { let _ = crate::audit::log_action(&pool, customer.id, "2FA_ENABLE", "auth", Some(&rid), None, None, None).await; }
+        let ip = extract_client_ip(&headers);
+        let ua = headers.get("user-agent").and_then(|v| v.to_str().ok()).unwrap_or("unknown").to_string();
+        let _ = crate::audit::log_action(&pool, customer.id, "2FA_ENABLE", "auth", Some(&rid), None, Some(&ip), Some(&ua)).await;
     }
 
     Ok(Json(serde_json::json!({
