@@ -59,15 +59,17 @@ def _sign(secret: bytes, msg_id: str, timestamp: int, body: Union[str, bytes]) -
 
 def _verify_signature(expected: str, actual: str) -> bool:
     """Verify that a signature matches using timing-safe comparison."""
+    # Extract expected signature part (strip version prefix)
+    expected_parts = expected.split(",", 1)
+    expected_sig = expected_parts[1] if len(expected_parts) > 1 else expected_parts[0]
+
+    # Each signature can be comma-separated (v1 sig1, v1 sig2, ...)
     signatures = [s.strip() for s in actual.split(",")]
 
     for sig in signatures:
         # Handle "v1,signature" format
         parts = sig.split(",", 1)
         signature_part = parts[1] if len(parts) > 1 else parts[0]
-
-        expected_parts = expected.split(",", 1)
-        expected_sig = expected_parts[1] if len(expected_parts) > 1 else expected_parts[0]
 
         if len(expected_sig) != len(signature_part):
             continue
