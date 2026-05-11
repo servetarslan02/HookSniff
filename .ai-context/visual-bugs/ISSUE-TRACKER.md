@@ -111,7 +111,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-062 | Simple exporter (sync) — batch exporter kullanılmalı | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
 | HS-063 | Sampling strategy yok — tüm trace'ler export ediliyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
 | HS-064 | Response body PII içerebilir — trace'de loglanıyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
-| HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ⬜ (büyük iş) |
+| HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ⚠️ 2026-05-12 — EN=1829, TR=1829, 0 eksik. SEO sayfaları + 3 component'te ~20 hardcoded string kaldı |
 | HS-066 | 71 sayfada metadata eksik (SEO) | `frontend/DEEP-A11Y-SEO.md` | ⚠️ 2026-05-10 — Client component, layout'tan geliyor |
 | HS-067 | Müşteri hikayeleri kurgusal — yasal risk | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-11 — PayStack→PayFlow, disclaimer eklendi |
 | HS-068 | Türkçe çeviri hataları | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-10 (Oturum 93) |
@@ -135,9 +135,9 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-079 | Commit convention tutarsız | `infra/DEEP-GIT-HISTORY.md` | ✅ 2026-05-10 |
 | HS-080 | ESLint 8→9 migration | `infra/DEEP-DEPS-CONFIG.md` | ✅ 2026-05-10 (Oturum 93) |
 | HS-081 | 11 SDK'da retry logic yok | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-11 |
-| HS-082 | Version mismatch (Kotlin 0.2.0 vs 0.3.0) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
+| ~~HS-082~~ | ~~Version mismatch (Kotlin 0.2.0 vs 0.3.0)~~ | ✅ 2026-05-12 — Oturum 97'de düzeltildi, ISSUE-TRACKER güncellenmemiş | ✅ |
 | HS-083 | OpenAPI schema vs actual API mismatch | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-11 — Nested router pathleri uyumlu |
-| HS-084 | Polar.sh/iyzico fatura handler'ı yok | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
+| ~~HS-084~~ | ~~Polar.sh/iyzico fatura handler'ı yok~~ | ✅ 2026-05-12 — iyzico pasif kalacak, Polar.sh aktif | ✅ |
 | HS-085 | `db.rs` (1029 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 10 unit + 7 integration test |
 | HS-086 | `delivery/mod.rs` (404 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 12 yeni test |
 | HS-087 | `worker/main.rs` (807 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 16 yeni test |
