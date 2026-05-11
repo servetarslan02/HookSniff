@@ -1189,7 +1189,10 @@
       "subtitle": "Webhooklarınızı güvenle gönderin. Otomatik tekrar denemeler, HMAC imzaları, gerçek zamanlı izleme.",
       "cta": "Ücretsiz başlayın",
       "ctaSecondary": "Dokümanları okuyun",
-      "ctaDashboard": "Panele Git →"
+      "ctaDashboard": "Panele Git →",
+      "deliveries": "Teslimatlar",
+      "successRate": "Başarı Oranı",
+      "avgLatency": "Ort. Gecikme"
     },
     "code": {
       "filename": "webhook-gonder.sh",
