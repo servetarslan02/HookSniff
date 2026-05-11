@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SystemStats do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :total_users,
     :active_users,

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.InvoiceResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :id,
     :amount_cents,

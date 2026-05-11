@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.ContactRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :name,
     :email,

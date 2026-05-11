@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.EndpointsIdRotateSecretPost200Response do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :signing_secret,
     :message

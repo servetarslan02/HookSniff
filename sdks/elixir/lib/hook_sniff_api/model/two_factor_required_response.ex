@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.TwoFactorRequiredResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :requires_2fa,
     :temp_token,

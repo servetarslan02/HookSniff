@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.LatencyTrendResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :range,
     :buckets,

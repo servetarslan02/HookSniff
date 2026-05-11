@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SystemStatus do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :overall_status,
     :uptime_30d,

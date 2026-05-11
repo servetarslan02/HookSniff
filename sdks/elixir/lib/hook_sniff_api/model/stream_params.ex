@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.StreamParams do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :endpoint_id,
     :status,
