@@ -14,10 +14,10 @@ import { RequestFile } from './models';
 import { Delivery } from './delivery';
 
 export class DeliveryListResponse {
-    'deliveries'?: Array<Delivery>;
-    'total'?: number;
-    'page'?: number;
-    'perPage'?: number;
+    'deliveries': Array<Delivery>;
+    'total': number;
+    'page': number;
+    'perPage': number;
 
     static discriminator: string | undefined = undefined;
 

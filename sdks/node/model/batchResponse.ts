@@ -15,8 +15,8 @@ import { BatchResponseErrorsInner } from './batchResponseErrorsInner';
 import { Delivery } from './delivery';
 
 export class BatchResponse {
-    'deliveries'?: Array<Delivery>;
-    'errors'?: Array<BatchResponseErrorsInner>;
+    'deliveries': Array<Delivery>;
+    'errors': Array<BatchResponseErrorsInner>;
 
     static discriminator: string | undefined = undefined;
 

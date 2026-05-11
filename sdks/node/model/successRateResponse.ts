@@ -13,11 +13,11 @@
 import { RequestFile } from './models';
 
 export class SuccessRateResponse {
-    'range'?: string;
-    'successful'?: number;
-    'failed'?: number;
-    'pending'?: number;
-    'successRate'?: number;
+    'range': string;
+    'successful': number;
+    'failed': number;
+    'pending': number;
+    'successRate': number;
 
     static discriminator: string | undefined = undefined;
 

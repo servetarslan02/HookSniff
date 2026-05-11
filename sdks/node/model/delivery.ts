@@ -13,14 +13,14 @@
 import { RequestFile } from './models';
 
 export class Delivery {
-    'id'?: string;
-    'endpointId'?: string;
+    'id': string;
+    'endpointId': string;
     'event'?: string | null;
-    'status'?: Delivery.StatusEnum;
-    'attemptCount'?: number;
+    'status': Delivery.StatusEnum;
+    'attemptCount': number;
     'responseStatus'?: number | null;
-    'replayCount'?: number;
-    'createdAt'?: Date;
+    'replayCount': number;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 
