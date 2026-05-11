@@ -1,6 +1,9 @@
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 
+// Force SSR — SSG output was missing on Vercel for this page
+export const dynamic = 'force-dynamic';
+
 // Force redeploy — docs/portal page fix
 export default function PortalPage() {
   const t = useTranslations('docs');
