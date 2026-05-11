@@ -1,4 +1,3 @@
-use crate::audit_event;
 use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::routing::{get, post};

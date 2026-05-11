@@ -1,4 +1,3 @@
-use crate::audit_event;
 use axum::extract::Extension;
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
