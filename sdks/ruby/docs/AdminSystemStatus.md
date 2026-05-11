@@ -1,4 +1,4 @@
-# HookSniff::AdminSystemStatus
+# HooksniffSdk::AdminSystemStatus
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::AdminSystemStatus.new(
+instance = HooksniffSdk::AdminSystemStatus.new(
   version: null,
   uptime_seconds: null,
   db_status: null,

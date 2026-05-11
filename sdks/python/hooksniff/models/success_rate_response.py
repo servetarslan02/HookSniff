@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing import Any, ClassVar, Dict, List, Union
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,11 +28,11 @@ class SuccessRateResponse(BaseModel):
     """
     SuccessRateResponse
     """ # noqa: E501
-    range: Optional[StrictStr] = None
-    successful: Optional[StrictInt] = None
-    failed: Optional[StrictInt] = None
-    pending: Optional[StrictInt] = None
-    success_rate: Optional[Union[StrictFloat, StrictInt]] = None
+    range: StrictStr
+    successful: StrictInt
+    failed: StrictInt
+    pending: StrictInt
+    success_rate: Union[StrictFloat, StrictInt]
     __properties: ClassVar[List[str]] = ["range", "successful", "failed", "pending", "success_rate"]
 
     model_config = ConfigDict(

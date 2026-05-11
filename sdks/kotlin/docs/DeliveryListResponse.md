@@ -4,10 +4,10 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **deliveries** | [**kotlin.collections.List&lt;Delivery&gt;**](Delivery.md) |  |  [optional] |
-| **total** | **kotlin.Int** |  |  [optional] |
-| **page** | **kotlin.Int** |  |  [optional] |
-| **perPage** | **kotlin.Int** |  |  [optional] |
+| **deliveries** | [**kotlin.collections.List&lt;Delivery&gt;**](Delivery.md) |  |  |
+| **total** | **kotlin.Int** |  |  |
+| **page** | **kotlin.Int** |  |  |
+| **perPage** | **kotlin.Int** |  |  |
 
 
 

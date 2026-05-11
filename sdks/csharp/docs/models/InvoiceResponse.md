@@ -1,4 +1,4 @@
-# HookSniff.Model.InvoiceResponse
+# HookSniff.Sdk.Model.InvoiceResponse
 
 ## Properties
 

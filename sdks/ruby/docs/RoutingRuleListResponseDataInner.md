@@ -1,4 +1,4 @@
-# HookSniff::RoutingRuleListResponseDataInner
+# HooksniffSdk::RoutingRuleListResponseDataInner
 
 ## Properties
 
@@ -15,9 +15,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RoutingRuleListResponseDataInner.new(
+instance = HooksniffSdk::RoutingRuleListResponseDataInner.new(
   id: null,
   name: null,
   conditions: null,

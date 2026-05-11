@@ -30,12 +30,12 @@ class TeamMember(BaseModel):
     """
     TeamMember
     """ # noqa: E501
-    id: Optional[UUID] = None
-    user_id: Optional[UUID] = None
-    email: Optional[StrictStr] = None
+    id: UUID
+    user_id: UUID
+    email: StrictStr
     name: Optional[StrictStr] = None
-    role: Optional[StrictStr] = None
-    joined_at: Optional[datetime] = None
+    role: StrictStr
+    joined_at: datetime
     __properties: ClassVar[List[str]] = ["id", "user_id", "email", "name", "role", "joined_at"]
 
     model_config = ConfigDict(

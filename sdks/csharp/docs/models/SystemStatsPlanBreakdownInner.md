@@ -1,4 +1,4 @@
-# HookSniff.Model.SystemStatsPlanBreakdownInner
+# HookSniff.Sdk.Model.SystemStatsPlanBreakdownInner
 
 ## Properties
 

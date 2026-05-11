@@ -12,11 +12,11 @@ import AnyCodable
 
 public struct TwoFactorRequiredResponse: Codable, JSONEncodable, Hashable {
 
-    public var requires2fa: Bool?
-    public var tempToken: String?
-    public var message: String?
+    public var requires2fa: Bool
+    public var tempToken: String
+    public var message: String
 
-    public init(requires2fa: Bool? = nil, tempToken: String? = nil, message: String? = nil) {
+    public init(requires2fa: Bool, tempToken: String, message: String) {
         self.requires2fa = requires2fa
         self.tempToken = tempToken
         self.message = message
@@ -32,9 +32,9 @@ public struct TwoFactorRequiredResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(requires2fa, forKey: .requires2fa)
-        try container.encodeIfPresent(tempToken, forKey: .tempToken)
-        try container.encodeIfPresent(message, forKey: .message)
+        try container.encode(requires2fa, forKey: .requires2fa)
+        try container.encode(tempToken, forKey: .tempToken)
+        try container.encode(message, forKey: .message)
     }
 }
 

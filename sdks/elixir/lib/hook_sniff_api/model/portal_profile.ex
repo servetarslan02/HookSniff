@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.PortalProfile do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :email,
@@ -16,11 +16,11 @@ defmodule HookSniffAPI.Model.PortalProfile do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :email => String.t | nil,
+    :id => String.t,
+    :email => String.t,
     :name => String.t | nil,
-    :plan => String.t | nil,
-    :created_at => DateTime.t | nil
+    :plan => String.t,
+    :created_at => DateTime.t
   }
 
   def decode(value) do

@@ -1,4 +1,4 @@
-# HookSniff::Enable2faResponse
+# HooksniffSdk::Enable2faResponse
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::Enable2faResponse.new(
+instance = HooksniffSdk::Enable2faResponse.new(
   secret: null,
   qr_url: null
 )

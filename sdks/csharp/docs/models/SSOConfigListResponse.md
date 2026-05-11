@@ -1,4 +1,4 @@
-# HookSniff.Model.SSOConfigListResponse
+# HookSniff.Sdk.Model.SSOConfigListResponse
 List of SSO configurations for the account
 
 ## Properties

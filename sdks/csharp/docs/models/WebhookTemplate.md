@@ -1,4 +1,4 @@
-# HookSniff.Model.WebhookTemplate
+# HookSniff.Sdk.Model.WebhookTemplate
 
 ## Properties
 

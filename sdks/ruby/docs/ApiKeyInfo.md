@@ -1,4 +1,4 @@
-# HookSniff::ApiKeyInfo
+# HooksniffSdk::ApiKeyInfo
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ApiKeyInfo.new(
+instance = HooksniffSdk::ApiKeyInfo.new(
   id: null,
   prefix: null,
   created_at: null,

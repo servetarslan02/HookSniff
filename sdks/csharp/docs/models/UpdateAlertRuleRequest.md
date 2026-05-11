@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateAlertRuleRequest
+# HookSniff.Sdk.Model.UpdateAlertRuleRequest
 Request to update an existing alert rule (all fields optional)
 
 ## Properties

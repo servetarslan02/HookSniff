@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**key** | **str** | Full API key — only shown once | [optional] 
-**prefix** | **str** |  | [optional] 
-**message** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**key** | **str** | Full API key — only shown once | 
+**prefix** | **str** |  | 
+**message** | **str** |  | 
 
 ## Example
 

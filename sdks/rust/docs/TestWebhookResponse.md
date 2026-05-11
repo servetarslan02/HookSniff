@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**success** | Option<**bool**> |  | [optional]
-**status_code** | Option<**i32**> |  | [optional]
-**duration_ms** | Option<**i32**> |  | [optional]
-**response_body** | Option<**String**> |  | [optional]
+**success** | **bool** |  | 
+**status_code** | **i32** |  | 
+**duration_ms** | **i32** |  | 
+**response_body** | **String** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

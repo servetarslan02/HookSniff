@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.StatsResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :total_deliveries,
     :successful_deliveries,
@@ -19,14 +19,14 @@ defmodule HookSniffAPI.Model.StatsResponse do
   ]
 
   @type t :: %__MODULE__{
-    :total_deliveries => integer() | nil,
-    :successful_deliveries => integer() | nil,
-    :failed_deliveries => integer() | nil,
-    :total_endpoints => integer() | nil,
-    :active_endpoints => integer() | nil,
-    :plan => String.t | nil,
-    :webhook_limit => integer() | nil,
-    :webhook_count => integer() | nil
+    :total_deliveries => integer(),
+    :successful_deliveries => integer(),
+    :failed_deliveries => integer(),
+    :total_endpoints => integer(),
+    :active_endpoints => integer(),
+    :plan => String.t,
+    :webhook_limit => integer(),
+    :webhook_count => integer()
   }
 
   def decode(value) do

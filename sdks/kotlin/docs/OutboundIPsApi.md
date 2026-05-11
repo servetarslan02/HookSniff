@@ -16,8 +16,8 @@ Get outbound IP addresses for firewall whitelisting
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = OutboundIPsApi()
 try {

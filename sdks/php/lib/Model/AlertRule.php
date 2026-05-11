@@ -64,7 +64,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
         'threshold' => 'int',
         'channels' => 'string[]',
         'is_active' => 'bool',
-        'created_at' => 'string'
+        'created_at' => '\DateTime'
     ];
 
     /**
@@ -81,7 +81,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
         'threshold' => null,
         'channels' => null,
         'is_active' => null,
-        'created_at' => null
+        'created_at' => 'date-time'
     ];
 
     /**
@@ -351,6 +351,15 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['name'] === null) {
+            $invalidProperties[] = "'name' can't be null";
+        }
+        if ($this->container['condition'] === null) {
+            $invalidProperties[] = "'condition' can't be null";
+        }
         $allowedValues = $this->getConditionAllowableValues();
         if (!is_null($this->container['condition']) && !in_array($this->container['condition'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -360,6 +369,18 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
             );
         }
 
+        if ($this->container['threshold'] === null) {
+            $invalidProperties[] = "'threshold' can't be null";
+        }
+        if ($this->container['channels'] === null) {
+            $invalidProperties[] = "'channels' can't be null";
+        }
+        if ($this->container['is_active'] === null) {
+            $invalidProperties[] = "'is_active' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -378,7 +399,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -388,7 +409,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -405,7 +426,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets name
      *
-     * @return string|null
+     * @return string
      */
     public function getName()
     {
@@ -415,7 +436,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets name
      *
-     * @param string|null $name name
+     * @param string $name name
      *
      * @return self
      */
@@ -432,7 +453,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets condition
      *
-     * @return string|null
+     * @return string
      */
     public function getCondition()
     {
@@ -442,7 +463,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets condition
      *
-     * @param string|null $condition condition
+     * @param string $condition condition
      *
      * @return self
      */
@@ -469,7 +490,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets threshold
      *
-     * @return int|null
+     * @return int
      */
     public function getThreshold()
     {
@@ -479,7 +500,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets threshold
      *
-     * @param int|null $threshold threshold
+     * @param int $threshold threshold
      *
      * @return self
      */
@@ -496,7 +517,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets channels
      *
-     * @return string[]|null
+     * @return string[]
      */
     public function getChannels()
     {
@@ -506,7 +527,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets channels
      *
-     * @param string[]|null $channels channels
+     * @param string[] $channels channels
      *
      * @return self
      */
@@ -532,7 +553,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_active
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsActive()
     {
@@ -542,7 +563,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_active
      *
-     * @param bool|null $is_active is_active
+     * @param bool $is_active is_active
      *
      * @return self
      */
@@ -559,7 +580,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return string|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -569,7 +590,7 @@ class AlertRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param string|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */

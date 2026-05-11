@@ -12,14 +12,14 @@ import AnyCodable
 
 public struct TeamMember: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var userId: UUID?
-    public var email: String?
+    public var id: UUID
+    public var userId: UUID
+    public var email: String
     public var name: String?
-    public var role: String?
-    public var joinedAt: Date?
+    public var role: String
+    public var joinedAt: Date
 
-    public init(id: UUID? = nil, userId: UUID? = nil, email: String? = nil, name: String? = nil, role: String? = nil, joinedAt: Date? = nil) {
+    public init(id: UUID, userId: UUID, email: String, name: String? = nil, role: String, joinedAt: Date) {
         self.id = id
         self.userId = userId
         self.email = email
@@ -41,12 +41,12 @@ public struct TeamMember: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(userId, forKey: .userId)
-        try container.encodeIfPresent(email, forKey: .email)
+        try container.encode(id, forKey: .id)
+        try container.encode(userId, forKey: .userId)
+        try container.encode(email, forKey: .email)
         try container.encodeIfPresent(name, forKey: .name)
-        try container.encodeIfPresent(role, forKey: .role)
-        try container.encodeIfPresent(joinedAt, forKey: .joinedAt)
+        try container.encode(role, forKey: .role)
+        try container.encode(joinedAt, forKey: .joinedAt)
     }
 }
 

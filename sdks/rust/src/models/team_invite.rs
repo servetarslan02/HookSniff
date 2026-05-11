@@ -13,23 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TeamInvite {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "email", skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-    #[serde(rename = "role", skip_serializing_if = "Option::is_none")]
-    pub role: Option<String>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "email")]
+    pub email: String,
+    #[serde(rename = "role")]
+    pub role: String,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl TeamInvite {
-    pub fn new() -> TeamInvite {
+    pub fn new(id: uuid::Uuid, email: String, role: String, created_at: chrono::DateTime<chrono::FixedOffset>) -> TeamInvite {
         TeamInvite {
-            id: None,
-            email: None,
-            role: None,
-            created_at: None,
+            id,
+            email,
+            role,
+            created_at,
         }
     }
 }

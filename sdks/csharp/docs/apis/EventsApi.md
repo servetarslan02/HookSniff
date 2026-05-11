@@ -1,4 +1,4 @@
-# HookSniff.Api.EventsApi
+# HookSniff.Sdk.Api.EventsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 

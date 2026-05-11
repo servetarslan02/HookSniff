@@ -13,26 +13,26 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SystemStats {
-    #[serde(rename = "total_users", skip_serializing_if = "Option::is_none")]
-    pub total_users: Option<i32>,
-    #[serde(rename = "active_users", skip_serializing_if = "Option::is_none")]
-    pub active_users: Option<i32>,
-    #[serde(rename = "total_endpoints", skip_serializing_if = "Option::is_none")]
-    pub total_endpoints: Option<i32>,
-    #[serde(rename = "total_deliveries", skip_serializing_if = "Option::is_none")]
-    pub total_deliveries: Option<i32>,
-    #[serde(rename = "plan_breakdown", skip_serializing_if = "Option::is_none")]
-    pub plan_breakdown: Option<Vec<models::SystemStatsPlanBreakdownInner>>,
+    #[serde(rename = "total_users")]
+    pub total_users: i32,
+    #[serde(rename = "active_users")]
+    pub active_users: i32,
+    #[serde(rename = "total_endpoints")]
+    pub total_endpoints: i32,
+    #[serde(rename = "total_deliveries")]
+    pub total_deliveries: i32,
+    #[serde(rename = "plan_breakdown")]
+    pub plan_breakdown: Vec<models::SystemStatsPlanBreakdownInner>,
 }
 
 impl SystemStats {
-    pub fn new() -> SystemStats {
+    pub fn new(total_users: i32, active_users: i32, total_endpoints: i32, total_deliveries: i32, plan_breakdown: Vec<models::SystemStatsPlanBreakdownInner>) -> SystemStats {
         SystemStats {
-            total_users: None,
-            active_users: None,
-            total_endpoints: None,
-            total_deliveries: None,
-            plan_breakdown: None,
+            total_users,
+            active_users,
+            total_endpoints,
+            total_deliveries,
+            plan_breakdown,
         }
     }
 }

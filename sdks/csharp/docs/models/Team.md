@@ -1,4 +1,4 @@
-# HookSniff.Model.Team
+# HookSniff.Sdk.Model.Team
 
 ## Properties
 

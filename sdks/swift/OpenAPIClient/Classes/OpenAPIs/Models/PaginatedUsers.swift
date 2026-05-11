@@ -12,12 +12,12 @@ import AnyCodable
 
 public struct PaginatedUsers: Codable, JSONEncodable, Hashable {
 
-    public var users: [UserSummary]?
-    public var total: Int?
-    public var page: Int?
-    public var perPage: Int?
+    public var users: [UserSummary]
+    public var total: Int
+    public var page: Int
+    public var perPage: Int
 
-    public init(users: [UserSummary]? = nil, total: Int? = nil, page: Int? = nil, perPage: Int? = nil) {
+    public init(users: [UserSummary], total: Int, page: Int, perPage: Int) {
         self.users = users
         self.total = total
         self.page = page
@@ -35,10 +35,10 @@ public struct PaginatedUsers: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(users, forKey: .users)
-        try container.encodeIfPresent(total, forKey: .total)
-        try container.encodeIfPresent(page, forKey: .page)
-        try container.encodeIfPresent(perPage, forKey: .perPage)
+        try container.encode(users, forKey: .users)
+        try container.encode(total, forKey: .total)
+        try container.encode(page, forKey: .page)
+        try container.encode(perPage, forKey: .perPage)
     }
 }
 

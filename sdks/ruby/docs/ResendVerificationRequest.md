@@ -1,4 +1,4 @@
-# HookSniff::ResendVerificationRequest
+# HooksniffSdk::ResendVerificationRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ResendVerificationRequest.new(
+instance = HooksniffSdk::ResendVerificationRequest.new(
   email: null
 )
 ```

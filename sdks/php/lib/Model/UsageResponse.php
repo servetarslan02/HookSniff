@@ -317,6 +317,27 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['plan'] === null) {
+            $invalidProperties[] = "'plan' can't be null";
+        }
+        if ($this->container['period_start'] === null) {
+            $invalidProperties[] = "'period_start' can't be null";
+        }
+        if ($this->container['period_end'] === null) {
+            $invalidProperties[] = "'period_end' can't be null";
+        }
+        if ($this->container['webhooks_used'] === null) {
+            $invalidProperties[] = "'webhooks_used' can't be null";
+        }
+        if ($this->container['webhooks_limit'] === null) {
+            $invalidProperties[] = "'webhooks_limit' can't be null";
+        }
+        if ($this->container['endpoints_used'] === null) {
+            $invalidProperties[] = "'endpoints_used' can't be null";
+        }
+        if ($this->container['endpoints_limit'] === null) {
+            $invalidProperties[] = "'endpoints_limit' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -335,7 +356,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets plan
      *
-     * @return string|null
+     * @return string
      */
     public function getPlan()
     {
@@ -345,7 +366,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets plan
      *
-     * @param string|null $plan plan
+     * @param string $plan plan
      *
      * @return self
      */
@@ -362,7 +383,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets period_start
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getPeriodStart()
     {
@@ -372,7 +393,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets period_start
      *
-     * @param \DateTime|null $period_start period_start
+     * @param \DateTime $period_start period_start
      *
      * @return self
      */
@@ -389,7 +410,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets period_end
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getPeriodEnd()
     {
@@ -399,7 +420,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets period_end
      *
-     * @param \DateTime|null $period_end period_end
+     * @param \DateTime $period_end period_end
      *
      * @return self
      */
@@ -416,7 +437,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets webhooks_used
      *
-     * @return int|null
+     * @return int
      */
     public function getWebhooksUsed()
     {
@@ -426,7 +447,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets webhooks_used
      *
-     * @param int|null $webhooks_used webhooks_used
+     * @param int $webhooks_used webhooks_used
      *
      * @return self
      */
@@ -443,7 +464,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets webhooks_limit
      *
-     * @return int|null
+     * @return int
      */
     public function getWebhooksLimit()
     {
@@ -453,7 +474,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets webhooks_limit
      *
-     * @param int|null $webhooks_limit webhooks_limit
+     * @param int $webhooks_limit webhooks_limit
      *
      * @return self
      */
@@ -470,7 +491,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets endpoints_used
      *
-     * @return int|null
+     * @return int
      */
     public function getEndpointsUsed()
     {
@@ -480,7 +501,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets endpoints_used
      *
-     * @param int|null $endpoints_used endpoints_used
+     * @param int $endpoints_used endpoints_used
      *
      * @return self
      */
@@ -497,7 +518,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets endpoints_limit
      *
-     * @return int|null
+     * @return int
      */
     public function getEndpointsLimit()
     {
@@ -507,7 +528,7 @@ class UsageResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets endpoints_limit
      *
-     * @param int|null $endpoints_limit endpoints_limit
+     * @param int $endpoints_limit endpoints_limit
      *
      * @return self
      */

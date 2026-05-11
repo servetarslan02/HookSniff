@@ -1,4 +1,4 @@
-# HookSniff.Model.BillingPortalResponse
+# HookSniff.Sdk.Model.BillingPortalResponse
 URL for the customer billing portal
 
 ## Properties

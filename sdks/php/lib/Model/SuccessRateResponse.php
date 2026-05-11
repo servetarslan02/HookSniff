@@ -303,6 +303,21 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     {
         $invalidProperties = [];
 
+        if ($this->container['range'] === null) {
+            $invalidProperties[] = "'range' can't be null";
+        }
+        if ($this->container['successful'] === null) {
+            $invalidProperties[] = "'successful' can't be null";
+        }
+        if ($this->container['failed'] === null) {
+            $invalidProperties[] = "'failed' can't be null";
+        }
+        if ($this->container['pending'] === null) {
+            $invalidProperties[] = "'pending' can't be null";
+        }
+        if ($this->container['success_rate'] === null) {
+            $invalidProperties[] = "'success_rate' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -321,7 +336,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets range
      *
-     * @return string|null
+     * @return string
      */
     public function getRange()
     {
@@ -331,7 +346,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets range
      *
-     * @param string|null $range range
+     * @param string $range range
      *
      * @return self
      */
@@ -348,7 +363,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets successful
      *
-     * @return int|null
+     * @return int
      */
     public function getSuccessful()
     {
@@ -358,7 +373,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets successful
      *
-     * @param int|null $successful successful
+     * @param int $successful successful
      *
      * @return self
      */
@@ -375,7 +390,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets failed
      *
-     * @return int|null
+     * @return int
      */
     public function getFailed()
     {
@@ -385,7 +400,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets failed
      *
-     * @param int|null $failed failed
+     * @param int $failed failed
      *
      * @return self
      */
@@ -402,7 +417,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets pending
      *
-     * @return int|null
+     * @return int
      */
     public function getPending()
     {
@@ -412,7 +427,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets pending
      *
-     * @param int|null $pending pending
+     * @param int $pending pending
      *
      * @return self
      */
@@ -429,7 +444,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets success_rate
      *
-     * @return float|null
+     * @return float
      */
     public function getSuccessRate()
     {
@@ -439,7 +454,7 @@ class SuccessRateResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets success_rate
      *
-     * @param float|null $success_rate success_rate
+     * @param float $success_rate success_rate
      *
      * @return self
      */

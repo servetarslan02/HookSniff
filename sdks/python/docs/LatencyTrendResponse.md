@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**range** | **str** |  | [optional] 
-**buckets** | [**List[LatencyTrendResponseBucketsInner]**](LatencyTrendResponseBucketsInner.md) |  | [optional] 
-**overall_avg_ms** | **float** |  | [optional] 
+**range** | **str** |  | 
+**buckets** | [**List[LatencyTrendResponseBucketsInner]**](LatencyTrendResponseBucketsInner.md) |  | 
+**overall_avg_ms** | **float** |  | 
 
 ## Example
 

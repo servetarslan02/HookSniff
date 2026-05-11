@@ -1,4 +1,4 @@
-# HookSniff.Model.InboundWebhookResponse
+# HookSniff.Sdk.Model.InboundWebhookResponse
 Result of processing an inbound webhook
 
 ## Properties

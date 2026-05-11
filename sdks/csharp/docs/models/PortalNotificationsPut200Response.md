@@ -1,4 +1,4 @@
-# HookSniff.Model.PortalNotificationsPut200Response
+# HookSniff.Sdk.Model.PortalNotificationsPut200Response
 
 ## Properties
 

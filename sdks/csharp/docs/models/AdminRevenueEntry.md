@@ -1,4 +1,4 @@
-# HookSniff.Model.AdminRevenueEntry
+# HookSniff.Sdk.Model.AdminRevenueEntry
 Monthly revenue data point
 
 ## Properties

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.CreateApiKeyResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :key,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.CreateApiKeyResponse do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :key => String.t | nil,
-    :prefix => String.t | nil,
-    :message => String.t | nil
+    :id => String.t,
+    :key => String.t,
+    :prefix => String.t,
+    :message => String.t
   }
 
   def decode(value) do

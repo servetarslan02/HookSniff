@@ -12,12 +12,12 @@ import AnyCodable
 
 public struct DeliveryListResponse: Codable, JSONEncodable, Hashable {
 
-    public var deliveries: [Delivery]?
-    public var total: Int?
-    public var page: Int?
-    public var perPage: Int?
+    public var deliveries: [Delivery]
+    public var total: Int
+    public var page: Int
+    public var perPage: Int
 
-    public init(deliveries: [Delivery]? = nil, total: Int? = nil, page: Int? = nil, perPage: Int? = nil) {
+    public init(deliveries: [Delivery], total: Int, page: Int, perPage: Int) {
         self.deliveries = deliveries
         self.total = total
         self.page = page
@@ -35,10 +35,10 @@ public struct DeliveryListResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(deliveries, forKey: .deliveries)
-        try container.encodeIfPresent(total, forKey: .total)
-        try container.encodeIfPresent(page, forKey: .page)
-        try container.encodeIfPresent(perPage, forKey: .perPage)
+        try container.encode(deliveries, forKey: .deliveries)
+        try container.encode(total, forKey: .total)
+        try container.encode(page, forKey: .page)
+        try container.encode(perPage, forKey: .perPage)
     }
 }
 

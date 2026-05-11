@@ -1,4 +1,4 @@
-# HookSniff::SimulatorPostRequest
+# HooksniffSdk::SimulatorPostRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SimulatorPostRequest.new(
+instance = HooksniffSdk::SimulatorPostRequest.new(
   endpoint_id: null,
   event: null,
   data: null

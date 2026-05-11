@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.TwoFactorRequiredResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :requires_2fa,
     :temp_token,
@@ -14,9 +14,9 @@ defmodule HookSniffAPI.Model.TwoFactorRequiredResponse do
   ]
 
   @type t :: %__MODULE__{
-    :requires_2fa => boolean() | nil,
-    :temp_token => String.t | nil,
-    :message => String.t | nil
+    :requires_2fa => boolean(),
+    :temp_token => String.t,
+    :message => String.t
   }
 
   def decode(value) do

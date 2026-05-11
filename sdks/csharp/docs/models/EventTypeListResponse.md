@@ -1,4 +1,4 @@
-# HookSniff.Model.EventTypeListResponse
+# HookSniff.Sdk.Model.EventTypeListResponse
 Paginated list of event types
 
 ## Properties

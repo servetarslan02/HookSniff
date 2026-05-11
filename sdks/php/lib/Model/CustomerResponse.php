@@ -348,6 +348,15 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['email'] === null) {
+            $invalidProperties[] = "'email' can't be null";
+        }
+        if ($this->container['plan'] === null) {
+            $invalidProperties[] = "'plan' can't be null";
+        }
         $allowedValues = $this->getPlanAllowableValues();
         if (!is_null($this->container['plan']) && !in_array($this->container['plan'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -357,6 +366,18 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
             );
         }
 
+        if ($this->container['webhook_limit'] === null) {
+            $invalidProperties[] = "'webhook_limit' can't be null";
+        }
+        if ($this->container['webhook_count'] === null) {
+            $invalidProperties[] = "'webhook_count' can't be null";
+        }
+        if ($this->container['is_admin'] === null) {
+            $invalidProperties[] = "'is_admin' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -375,7 +396,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -385,7 +406,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -402,7 +423,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets email
      *
-     * @return string|null
+     * @return string
      */
     public function getEmail()
     {
@@ -412,7 +433,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets email
      *
-     * @param string|null $email email
+     * @param string $email email
      *
      * @return self
      */
@@ -497,7 +518,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets plan
      *
-     * @return string|null
+     * @return string
      */
     public function getPlan()
     {
@@ -507,7 +528,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets plan
      *
-     * @param string|null $plan plan
+     * @param string $plan plan
      *
      * @return self
      */
@@ -534,7 +555,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets webhook_limit
      *
-     * @return int|null
+     * @return int
      */
     public function getWebhookLimit()
     {
@@ -544,7 +565,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets webhook_limit
      *
-     * @param int|null $webhook_limit webhook_limit
+     * @param int $webhook_limit webhook_limit
      *
      * @return self
      */
@@ -561,7 +582,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets webhook_count
      *
-     * @return int|null
+     * @return int
      */
     public function getWebhookCount()
     {
@@ -571,7 +592,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets webhook_count
      *
-     * @param int|null $webhook_count webhook_count
+     * @param int $webhook_count webhook_count
      *
      * @return self
      */
@@ -588,7 +609,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_admin
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsAdmin()
     {
@@ -598,7 +619,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_admin
      *
-     * @param bool|null $is_admin is_admin
+     * @param bool $is_admin is_admin
      *
      * @return self
      */
@@ -615,7 +636,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -625,7 +646,7 @@ class CustomerResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param \DateTime|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */

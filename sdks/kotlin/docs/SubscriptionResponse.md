@@ -4,13 +4,13 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **plan** | **kotlin.String** |  |  [optional] |
-| **status** | **kotlin.String** |  |  [optional] |
-| **paymentProvider** | **kotlin.String** |  |  [optional] |
-| **webhookLimit** | **kotlin.Int** |  |  [optional] |
-| **endpointLimit** | **kotlin.Int** |  |  [optional] |
-| **retentionDays** | **kotlin.Int** |  |  [optional] |
-| **monthlyPriceCents** | **kotlin.Int** |  |  [optional] |
+| **plan** | **kotlin.String** |  |  |
+| **status** | **kotlin.String** |  |  |
+| **paymentProvider** | **kotlin.String** |  |  |
+| **webhookLimit** | **kotlin.Int** |  |  |
+| **endpointLimit** | **kotlin.Int** |  |  |
+| **retentionDays** | **kotlin.Int** |  |  |
+| **monthlyPriceCents** | **kotlin.Int** |  |  |
 
 
 

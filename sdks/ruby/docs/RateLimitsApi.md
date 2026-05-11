@@ -1,4 +1,4 @@
-# HookSniff::RateLimitsApi
+# HooksniffSdk::RateLimitsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -20,20 +20,20 @@ Delete rate limit for endpoint
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::RateLimitsApi.new
+api_instance = HooksniffSdk::RateLimitsApi.new
 endpoint_id = 'endpoint_id_example' # String | 
 
 begin
   # Delete rate limit for endpoint
   api_instance.rate_limits_endpoint_id_delete(endpoint_id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_endpoint_id_delete: #{e}"
 end
 ```
@@ -51,7 +51,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_endpoint_id_delete_with_http_info: #{e}"
 end
 ```
@@ -86,20 +86,20 @@ Get rate limit for endpoint
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::RateLimitsApi.new
+api_instance = HooksniffSdk::RateLimitsApi.new
 endpoint_id = 'endpoint_id_example' # String | 
 
 begin
   # Get rate limit for endpoint
   api_instance.rate_limits_endpoint_id_get(endpoint_id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_endpoint_id_get: #{e}"
 end
 ```
@@ -117,7 +117,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_endpoint_id_get_with_http_info: #{e}"
 end
 ```
@@ -152,20 +152,20 @@ Set rate limit for endpoint
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::RateLimitsApi.new
+api_instance = HooksniffSdk::RateLimitsApi.new
 endpoint_id = 'endpoint_id_example' # String | 
 
 begin
   # Set rate limit for endpoint
   api_instance.rate_limits_endpoint_id_post(endpoint_id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_endpoint_id_post: #{e}"
 end
 ```
@@ -183,7 +183,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_endpoint_id_post_with_http_info: #{e}"
 end
 ```
@@ -218,19 +218,19 @@ List rate limits
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::RateLimitsApi.new
+api_instance = HooksniffSdk::RateLimitsApi.new
 
 begin
   # List rate limits
   api_instance.rate_limits_get
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_get: #{e}"
 end
 ```
@@ -248,7 +248,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling RateLimitsApi->rate_limits_get_with_http_info: #{e}"
 end
 ```

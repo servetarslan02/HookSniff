@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ips** | **List[str]** |  | [optional] 
-**updated_at** | **str** |  | [optional] 
+**ips** | **List[str]** |  | 
+**updated_at** | **str** |  | 
 
 ## Example
 

@@ -296,6 +296,18 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     {
         $invalidProperties = [];
 
+        if ($this->container['deliveries'] === null) {
+            $invalidProperties[] = "'deliveries' can't be null";
+        }
+        if ($this->container['total'] === null) {
+            $invalidProperties[] = "'total' can't be null";
+        }
+        if ($this->container['page'] === null) {
+            $invalidProperties[] = "'page' can't be null";
+        }
+        if ($this->container['per_page'] === null) {
+            $invalidProperties[] = "'per_page' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -314,7 +326,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets deliveries
      *
-     * @return \OpenAPI\Client\Model\Delivery[]|null
+     * @return \OpenAPI\Client\Model\Delivery[]
      */
     public function getDeliveries()
     {
@@ -324,7 +336,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets deliveries
      *
-     * @param \OpenAPI\Client\Model\Delivery[]|null $deliveries deliveries
+     * @param \OpenAPI\Client\Model\Delivery[] $deliveries deliveries
      *
      * @return self
      */
@@ -341,7 +353,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets total
      *
-     * @return int|null
+     * @return int
      */
     public function getTotal()
     {
@@ -351,7 +363,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets total
      *
-     * @param int|null $total total
+     * @param int $total total
      *
      * @return self
      */
@@ -368,7 +380,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets page
      *
-     * @return int|null
+     * @return int
      */
     public function getPage()
     {
@@ -378,7 +390,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets page
      *
-     * @param int|null $page page
+     * @param int $page page
      *
      * @return self
      */
@@ -395,7 +407,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets per_page
      *
-     * @return int|null
+     * @return int
      */
     public function getPerPage()
     {
@@ -405,7 +417,7 @@ class DeliveryListResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets per_page
      *
-     * @param int|null $per_page per_page
+     * @param int $per_page per_page
      *
      * @return self
      */

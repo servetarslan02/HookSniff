@@ -1,4 +1,4 @@
-# HookSniff.Model.CustomDomainListResponse
+# HookSniff.Sdk.Model.CustomDomainListResponse
 List of custom domains
 
 ## Properties

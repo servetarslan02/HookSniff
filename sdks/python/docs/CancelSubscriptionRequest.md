@@ -6,7 +6,7 @@ Request to cancel current subscription
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reason** | **str** | Optional reason for cancellation | [optional] 
+**reason** | **str** | Optional reason for cancellation | 
 
 ## Example
 

@@ -29,24 +29,21 @@ class UpdateEndpointRequest(BaseModel):
     """
     UpdateEndpointRequest
     """ # noqa: E501
-    url: Optional[StrictStr] = None
-    description: Optional[StrictStr] = None
-    is_active: Optional[StrictBool] = None
-    allowed_ips: Optional[List[StrictStr]] = None
-    event_filter: Optional[List[StrictStr]] = None
+    url: StrictStr
+    description: StrictStr
+    is_active: StrictBool
+    allowed_ips: List[StrictStr]
+    event_filter: List[StrictStr]
     custom_headers: Optional[Dict[str, Any]] = None
-    retry_policy: Optional[RetryPolicy] = None
-    routing_strategy: Optional[StrictStr] = None
-    fallback_url: Optional[StrictStr] = None
-    format: Optional[StrictStr] = None
+    retry_policy: RetryPolicy
+    routing_strategy: StrictStr
+    fallback_url: StrictStr
+    format: StrictStr
     __properties: ClassVar[List[str]] = ["url", "description", "is_active", "allowed_ips", "event_filter", "custom_headers", "retry_policy", "routing_strategy", "fallback_url", "format"]
 
     @field_validator('routing_strategy')
     def routing_strategy_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['round-robin', 'latency', 'failover']):
             raise ValueError("must be one of enum values ('round-robin', 'latency', 'failover')")
         return value
@@ -54,9 +51,6 @@ class UpdateEndpointRequest(BaseModel):
     @field_validator('format')
     def format_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['standard', 'cloudevents']):
             raise ValueError("must be one of enum values ('standard', 'cloudevents')")
         return value

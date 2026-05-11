@@ -13,29 +13,29 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UserSummary {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "email", skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "email")]
+    pub email: String,
     #[serde(rename = "name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub name: Option<Option<String>>,
-    #[serde(rename = "plan", skip_serializing_if = "Option::is_none")]
-    pub plan: Option<String>,
-    #[serde(rename = "is_active", skip_serializing_if = "Option::is_none")]
-    pub is_active: Option<bool>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "plan")]
+    pub plan: String,
+    #[serde(rename = "is_active")]
+    pub is_active: bool,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl UserSummary {
-    pub fn new() -> UserSummary {
+    pub fn new(id: uuid::Uuid, email: String, plan: String, is_active: bool, created_at: chrono::DateTime<chrono::FixedOffset>) -> UserSummary {
         UserSummary {
-            id: None,
-            email: None,
+            id,
+            email,
             name: None,
-            plan: None,
-            is_active: None,
-            created_at: None,
+            plan,
+            is_active,
+            created_at,
         }
     }
 }

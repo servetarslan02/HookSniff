@@ -28,9 +28,9 @@ class UpdateNotificationPreferences(BaseModel):
     """
     UpdateNotificationPreferences
     """ # noqa: E501
-    email_on_failure: Optional[StrictBool] = None
-    email_on_dead_letter: Optional[StrictBool] = None
-    email_on_success: Optional[StrictBool] = None
+    email_on_failure: StrictBool
+    email_on_dead_letter: StrictBool
+    email_on_success: StrictBool
     slack_webhook_url: Optional[StrictStr] = None
     discord_webhook_url: Optional[StrictStr] = None
     webhook_url: Optional[StrictStr] = None

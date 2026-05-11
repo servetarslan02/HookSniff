@@ -18,8 +18,8 @@ Google OAuth callback
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = OAuthApi()
 try {
@@ -60,8 +60,8 @@ Google OAuth login redirect
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = OAuthApi()
 try {
@@ -102,8 +102,8 @@ List available OAuth providers
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = OAuthApi()
 try {

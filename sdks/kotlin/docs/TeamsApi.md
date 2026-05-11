@@ -22,8 +22,8 @@ List teams
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TeamsApi()
 try {
@@ -65,8 +65,8 @@ Get team details
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TeamsApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -111,8 +111,8 @@ Invite a member to the team
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TeamsApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -158,8 +158,8 @@ List team members
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TeamsApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -204,8 +204,8 @@ Remove member from team
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TeamsApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -251,8 +251,8 @@ Change member role
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TeamsApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -300,8 +300,8 @@ Create a team
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = TeamsApi()
 val createTeamRequest : CreateTeamRequest =  // CreateTeamRequest | 

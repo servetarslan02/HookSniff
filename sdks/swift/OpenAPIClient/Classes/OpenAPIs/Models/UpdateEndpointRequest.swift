@@ -21,18 +21,18 @@ public struct UpdateEndpointRequest: Codable, JSONEncodable, Hashable {
         case standard = "standard"
         case cloudevents = "cloudevents"
     }
-    public var url: String?
-    public var description: String?
-    public var isActive: Bool?
-    public var allowedIps: [String]?
-    public var eventFilter: [String]?
+    public var url: String
+    public var description: String
+    public var isActive: Bool
+    public var allowedIps: [String]
+    public var eventFilter: [String]
     public var customHeaders: AnyCodable?
-    public var retryPolicy: RetryPolicy?
-    public var routingStrategy: RoutingStrategy?
-    public var fallbackUrl: String?
-    public var format: Format?
+    public var retryPolicy: RetryPolicy
+    public var routingStrategy: RoutingStrategy
+    public var fallbackUrl: String
+    public var format: Format
 
-    public init(url: String? = nil, description: String? = nil, isActive: Bool? = nil, allowedIps: [String]? = nil, eventFilter: [String]? = nil, customHeaders: AnyCodable? = nil, retryPolicy: RetryPolicy? = nil, routingStrategy: RoutingStrategy? = nil, fallbackUrl: String? = nil, format: Format? = nil) {
+    public init(url: String, description: String, isActive: Bool, allowedIps: [String], eventFilter: [String], customHeaders: AnyCodable? = nil, retryPolicy: RetryPolicy, routingStrategy: RoutingStrategy, fallbackUrl: String, format: Format) {
         self.url = url
         self.description = description
         self.isActive = isActive
@@ -62,16 +62,16 @@ public struct UpdateEndpointRequest: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(url, forKey: .url)
-        try container.encodeIfPresent(description, forKey: .description)
-        try container.encodeIfPresent(isActive, forKey: .isActive)
-        try container.encodeIfPresent(allowedIps, forKey: .allowedIps)
-        try container.encodeIfPresent(eventFilter, forKey: .eventFilter)
+        try container.encode(url, forKey: .url)
+        try container.encode(description, forKey: .description)
+        try container.encode(isActive, forKey: .isActive)
+        try container.encode(allowedIps, forKey: .allowedIps)
+        try container.encode(eventFilter, forKey: .eventFilter)
         try container.encodeIfPresent(customHeaders, forKey: .customHeaders)
-        try container.encodeIfPresent(retryPolicy, forKey: .retryPolicy)
-        try container.encodeIfPresent(routingStrategy, forKey: .routingStrategy)
-        try container.encodeIfPresent(fallbackUrl, forKey: .fallbackUrl)
-        try container.encodeIfPresent(format, forKey: .format)
+        try container.encode(retryPolicy, forKey: .retryPolicy)
+        try container.encode(routingStrategy, forKey: .routingStrategy)
+        try container.encode(fallbackUrl, forKey: .fallbackUrl)
+        try container.encode(format, forKey: .format)
     }
 }
 

@@ -3,12 +3,12 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**userId** | **UUID** |  | [optional] 
-**email** | **String** |  | [optional] 
+**id** | **UUID** |  | 
+**userId** | **UUID** |  | 
+**email** | **String** |  | 
 **name** | **String** |  | [optional] 
-**role** | **String** |  | [optional] 
-**joinedAt** | **Date** |  | [optional] 
+**role** | **String** |  | 
+**joinedAt** | **Date** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

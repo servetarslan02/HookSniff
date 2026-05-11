@@ -29,8 +29,8 @@ class AuthResponse(BaseModel):
     """
     AuthResponse
     """ # noqa: E501
-    token: Optional[StrictStr] = Field(default=None, description="JWT access token")
-    customer: Optional[CustomerResponse] = None
+    token: StrictStr = Field(description="JWT access token")
+    customer: CustomerResponse
     refresh_token: Optional[StrictStr] = Field(default=None, description="Refresh token (when applicable)")
     __properties: ClassVar[List[str]] = ["token", "customer", "refresh_token"]
 

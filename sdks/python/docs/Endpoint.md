@@ -5,20 +5,20 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**url** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**url** | **str** |  | 
 **description** | **str** |  | [optional] 
-**is_active** | **bool** |  | [optional] 
-**retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**is_active** | **bool** |  | 
+**retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  | 
+**created_at** | **datetime** |  | 
 **allowed_ips** | **List[str]** | CIDR blocks or exact IPs | [optional] 
 **event_filter** | **List[str]** | Wildcard patterns (e.g. \&quot;order.*\&quot;) | [optional] 
 **custom_headers** | **object** |  | [optional] 
-**routing_strategy** | **str** |  | [optional] 
+**routing_strategy** | **str** |  | 
 **fallback_url** | **str** |  | [optional] 
-**avg_response_ms** | **int** |  | [optional] 
-**failure_streak** | **int** |  | [optional] 
-**format** | **str** |  | [optional] 
+**avg_response_ms** | **int** |  | 
+**failure_streak** | **int** |  | 
+**format** | **str** |  | 
 
 ## Example
 

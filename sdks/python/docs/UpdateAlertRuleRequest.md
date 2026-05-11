@@ -6,10 +6,10 @@ Request to update an existing alert rule (all fields optional)
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **str** |  | [optional] 
-**condition** | **str** |  | [optional] 
-**threshold** | **int** |  | [optional] 
-**channels** | **List[str]** |  | [optional] 
+**name** | **str** |  | 
+**condition** | **str** |  | 
+**threshold** | **int** |  | 
+**channels** | **List[str]** |  | 
 
 ## Example
 

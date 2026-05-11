@@ -1,4 +1,4 @@
-# HookSniff.Model.CreateAlertRuleRequest
+# HookSniff.Sdk.Model.CreateAlertRuleRequest
 Request to create a new alert rule
 
 ## Properties

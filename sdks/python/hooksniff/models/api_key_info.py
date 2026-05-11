@@ -18,6 +18,7 @@ import pprint
 import re  # noqa: F401
 import json
 
+from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from uuid import UUID
@@ -29,11 +30,11 @@ class ApiKeyInfo(BaseModel):
     """
     ApiKeyInfo
     """ # noqa: E501
-    id: Optional[UUID] = None
-    prefix: Optional[StrictStr] = Field(default=None, description="Masked key prefix (e.g. \"hs_abc1...\")")
-    created_at: Optional[StrictStr] = None
+    id: UUID
+    prefix: StrictStr = Field(description="Masked key prefix (e.g. \"hs_abc1...\")")
+    created_at: datetime
     last_used_at: Optional[StrictStr] = None
-    is_active: Optional[StrictBool] = None
+    is_active: StrictBool
     __properties: ClassVar[List[str]] = ["id", "prefix", "created_at", "last_used_at", "is_active"]
 
     model_config = ConfigDict(

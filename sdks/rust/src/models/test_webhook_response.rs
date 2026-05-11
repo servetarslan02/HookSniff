@@ -13,23 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TestWebhookResponse {
-    #[serde(rename = "success", skip_serializing_if = "Option::is_none")]
-    pub success: Option<bool>,
-    #[serde(rename = "status_code", skip_serializing_if = "Option::is_none")]
-    pub status_code: Option<i32>,
-    #[serde(rename = "duration_ms", skip_serializing_if = "Option::is_none")]
-    pub duration_ms: Option<i32>,
-    #[serde(rename = "response_body", skip_serializing_if = "Option::is_none")]
-    pub response_body: Option<String>,
+    #[serde(rename = "success")]
+    pub success: bool,
+    #[serde(rename = "status_code")]
+    pub status_code: i32,
+    #[serde(rename = "duration_ms")]
+    pub duration_ms: i32,
+    #[serde(rename = "response_body")]
+    pub response_body: String,
 }
 
 impl TestWebhookResponse {
-    pub fn new() -> TestWebhookResponse {
+    pub fn new(success: bool, status_code: i32, duration_ms: i32, response_body: String) -> TestWebhookResponse {
         TestWebhookResponse {
-            success: None,
-            status_code: None,
-            duration_ms: None,
-            response_body: None,
+            success,
+            status_code,
+            duration_ms,
+            response_body,
         }
     }
 }

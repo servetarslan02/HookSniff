@@ -1,4 +1,4 @@
-# HookSniff::TeamsApi
+# HooksniffSdk::TeamsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -23,20 +23,20 @@ List teams
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TeamsApi.new
+api_instance = HooksniffSdk::TeamsApi.new
 
 begin
   # List teams
   result = api_instance.teams_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_get: #{e}"
 end
 ```
@@ -54,7 +54,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<Team>>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_get_with_http_info: #{e}"
 end
 ```
@@ -87,21 +87,21 @@ Get team details
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TeamsApi.new
+api_instance = HooksniffSdk::TeamsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get team details
   result = api_instance.teams_id_get(id)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_get: #{e}"
 end
 ```
@@ -119,7 +119,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <TeamDetailResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_get_with_http_info: #{e}"
 end
 ```
@@ -154,21 +154,21 @@ Invite a member to the team
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TeamsApi.new
+api_instance = HooksniffSdk::TeamsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-invite_request = HookSniff::InviteRequest.new({email: 'email_example'}) # InviteRequest | 
+invite_request = HooksniffSdk::InviteRequest.new({email: 'email_example'}) # InviteRequest | 
 
 begin
   # Invite a member to the team
   api_instance.teams_id_invite_post(id, invite_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_invite_post: #{e}"
 end
 ```
@@ -186,7 +186,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_invite_post_with_http_info: #{e}"
 end
 ```
@@ -222,21 +222,21 @@ List team members
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TeamsApi.new
+api_instance = HooksniffSdk::TeamsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # List team members
   result = api_instance.teams_id_members_get(id)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_members_get: #{e}"
 end
 ```
@@ -254,7 +254,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<TeamMember>>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_members_get_with_http_info: #{e}"
 end
 ```
@@ -289,21 +289,21 @@ Remove member from team
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TeamsApi.new
+api_instance = HooksniffSdk::TeamsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 uid = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Remove member from team
   api_instance.teams_id_members_uid_delete(id, uid)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_members_uid_delete: #{e}"
 end
 ```
@@ -321,7 +321,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_members_uid_delete_with_http_info: #{e}"
 end
 ```
@@ -357,22 +357,22 @@ Change member role
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TeamsApi.new
+api_instance = HooksniffSdk::TeamsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 uid = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-change_role_request = HookSniff::ChangeRoleRequest.new({role: 'admin'}) # ChangeRoleRequest | 
+change_role_request = HooksniffSdk::ChangeRoleRequest.new({role: 'admin'}) # ChangeRoleRequest | 
 
 begin
   # Change member role
   api_instance.teams_id_members_uid_role_put(id, uid, change_role_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_members_uid_role_put: #{e}"
 end
 ```
@@ -390,7 +390,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_id_members_uid_role_put_with_http_info: #{e}"
 end
 ```
@@ -427,21 +427,21 @@ Create a team
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::TeamsApi.new
-create_team_request = HookSniff::CreateTeamRequest.new({name: 'name_example'}) # CreateTeamRequest | 
+api_instance = HooksniffSdk::TeamsApi.new
+create_team_request = HooksniffSdk::CreateTeamRequest.new({name: 'name_example'}) # CreateTeamRequest | 
 
 begin
   # Create a team
   result = api_instance.teams_post(create_team_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_post: #{e}"
 end
 ```
@@ -459,7 +459,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Team>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling TeamsApi->teams_post_with_http_info: #{e}"
 end
 ```

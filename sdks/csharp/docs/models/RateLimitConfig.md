@@ -1,4 +1,4 @@
-# HookSniff.Model.RateLimitConfig
+# HookSniff.Sdk.Model.RateLimitConfig
 Rate limiting configuration for an endpoint
 
 ## Properties

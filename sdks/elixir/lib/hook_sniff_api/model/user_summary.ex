@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UserSummary do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :email,
@@ -17,12 +17,12 @@ defmodule HookSniffAPI.Model.UserSummary do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :email => String.t | nil,
+    :id => String.t,
+    :email => String.t,
     :name => String.t | nil,
-    :plan => String.t | nil,
-    :is_active => boolean() | nil,
-    :created_at => DateTime.t | nil
+    :plan => String.t,
+    :is_active => boolean(),
+    :created_at => DateTime.t
   }
 
   def decode(value) do

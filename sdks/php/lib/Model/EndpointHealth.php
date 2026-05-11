@@ -36,6 +36,7 @@ use \OpenAPI\Client\ObjectSerializer;
  * EndpointHealth Class Doc Comment
  *
  * @category Class
+ * @description Endpoint health metrics and status
  * @package  OpenAPI\Client
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech
@@ -62,7 +63,12 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_healthy' => 'bool',
         'failure_streak' => 'int',
         'avg_response_ms' => 'int',
-        'last_failure_at' => '\DateTime'
+        'last_failure_at' => '\DateTime',
+        'success_rate' => 'float',
+        'avg_latency_ms' => 'float',
+        'last_delivery_at' => '\DateTime',
+        'total_deliveries' => 'int',
+        'failed_deliveries' => 'int'
     ];
 
     /**
@@ -77,7 +83,12 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_healthy' => null,
         'failure_streak' => null,
         'avg_response_ms' => null,
-        'last_failure_at' => 'date-time'
+        'last_failure_at' => 'date-time',
+        'success_rate' => 'double',
+        'avg_latency_ms' => null,
+        'last_delivery_at' => 'date-time',
+        'total_deliveries' => null,
+        'failed_deliveries' => null
     ];
 
     /**
@@ -90,7 +101,12 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_healthy' => false,
         'failure_streak' => false,
         'avg_response_ms' => false,
-        'last_failure_at' => false
+        'last_failure_at' => false,
+        'success_rate' => false,
+        'avg_latency_ms' => false,
+        'last_delivery_at' => false,
+        'total_deliveries' => false,
+        'failed_deliveries' => false
     ];
 
     /**
@@ -183,7 +199,12 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_healthy' => 'is_healthy',
         'failure_streak' => 'failure_streak',
         'avg_response_ms' => 'avg_response_ms',
-        'last_failure_at' => 'last_failure_at'
+        'last_failure_at' => 'last_failure_at',
+        'success_rate' => 'success_rate',
+        'avg_latency_ms' => 'avg_latency_ms',
+        'last_delivery_at' => 'last_delivery_at',
+        'total_deliveries' => 'total_deliveries',
+        'failed_deliveries' => 'failed_deliveries'
     ];
 
     /**
@@ -196,7 +217,12 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_healthy' => 'setIsHealthy',
         'failure_streak' => 'setFailureStreak',
         'avg_response_ms' => 'setAvgResponseMs',
-        'last_failure_at' => 'setLastFailureAt'
+        'last_failure_at' => 'setLastFailureAt',
+        'success_rate' => 'setSuccessRate',
+        'avg_latency_ms' => 'setAvgLatencyMs',
+        'last_delivery_at' => 'setLastDeliveryAt',
+        'total_deliveries' => 'setTotalDeliveries',
+        'failed_deliveries' => 'setFailedDeliveries'
     ];
 
     /**
@@ -209,7 +235,12 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_healthy' => 'getIsHealthy',
         'failure_streak' => 'getFailureStreak',
         'avg_response_ms' => 'getAvgResponseMs',
-        'last_failure_at' => 'getLastFailureAt'
+        'last_failure_at' => 'getLastFailureAt',
+        'success_rate' => 'getSuccessRate',
+        'avg_latency_ms' => 'getAvgLatencyMs',
+        'last_delivery_at' => 'getLastDeliveryAt',
+        'total_deliveries' => 'getTotalDeliveries',
+        'failed_deliveries' => 'getFailedDeliveries'
     ];
 
     /**
@@ -274,6 +305,11 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('failure_streak', $data ?? [], null);
         $this->setIfExists('avg_response_ms', $data ?? [], null);
         $this->setIfExists('last_failure_at', $data ?? [], null);
+        $this->setIfExists('success_rate', $data ?? [], null);
+        $this->setIfExists('avg_latency_ms', $data ?? [], null);
+        $this->setIfExists('last_delivery_at', $data ?? [], null);
+        $this->setIfExists('total_deliveries', $data ?? [], null);
+        $this->setIfExists('failed_deliveries', $data ?? [], null);
     }
 
     /**
@@ -303,6 +339,12 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['endpoint_id'] === null) {
+            $invalidProperties[] = "'endpoint_id' can't be null";
+        }
+        if ($this->container['is_healthy'] === null) {
+            $invalidProperties[] = "'is_healthy' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -321,7 +363,7 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets endpoint_id
      *
-     * @return string|null
+     * @return string
      */
     public function getEndpointId()
     {
@@ -331,7 +373,7 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets endpoint_id
      *
-     * @param string|null $endpoint_id endpoint_id
+     * @param string $endpoint_id endpoint_id
      *
      * @return self
      */
@@ -348,7 +390,7 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_healthy
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsHealthy()
     {
@@ -358,7 +400,7 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_healthy
      *
-     * @param bool|null $is_healthy is_healthy
+     * @param bool $is_healthy is_healthy
      *
      * @return self
      */
@@ -449,6 +491,141 @@ class EndpointHealth implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable last_failure_at cannot be null');
         }
         $this->container['last_failure_at'] = $last_failure_at;
+
+        return $this;
+    }
+
+    /**
+     * Gets success_rate
+     *
+     * @return float|null
+     */
+    public function getSuccessRate()
+    {
+        return $this->container['success_rate'];
+    }
+
+    /**
+     * Sets success_rate
+     *
+     * @param float|null $success_rate Success rate as a fraction (0.0–1.0)
+     *
+     * @return self
+     */
+    public function setSuccessRate($success_rate)
+    {
+        if (is_null($success_rate)) {
+            throw new \InvalidArgumentException('non-nullable success_rate cannot be null');
+        }
+        $this->container['success_rate'] = $success_rate;
+
+        return $this;
+    }
+
+    /**
+     * Gets avg_latency_ms
+     *
+     * @return float|null
+     */
+    public function getAvgLatencyMs()
+    {
+        return $this->container['avg_latency_ms'];
+    }
+
+    /**
+     * Sets avg_latency_ms
+     *
+     * @param float|null $avg_latency_ms Average delivery latency in milliseconds
+     *
+     * @return self
+     */
+    public function setAvgLatencyMs($avg_latency_ms)
+    {
+        if (is_null($avg_latency_ms)) {
+            throw new \InvalidArgumentException('non-nullable avg_latency_ms cannot be null');
+        }
+        $this->container['avg_latency_ms'] = $avg_latency_ms;
+
+        return $this;
+    }
+
+    /**
+     * Gets last_delivery_at
+     *
+     * @return \DateTime|null
+     */
+    public function getLastDeliveryAt()
+    {
+        return $this->container['last_delivery_at'];
+    }
+
+    /**
+     * Sets last_delivery_at
+     *
+     * @param \DateTime|null $last_delivery_at last_delivery_at
+     *
+     * @return self
+     */
+    public function setLastDeliveryAt($last_delivery_at)
+    {
+        if (is_null($last_delivery_at)) {
+            throw new \InvalidArgumentException('non-nullable last_delivery_at cannot be null');
+        }
+        $this->container['last_delivery_at'] = $last_delivery_at;
+
+        return $this;
+    }
+
+    /**
+     * Gets total_deliveries
+     *
+     * @return int|null
+     */
+    public function getTotalDeliveries()
+    {
+        return $this->container['total_deliveries'];
+    }
+
+    /**
+     * Sets total_deliveries
+     *
+     * @param int|null $total_deliveries total_deliveries
+     *
+     * @return self
+     */
+    public function setTotalDeliveries($total_deliveries)
+    {
+        if (is_null($total_deliveries)) {
+            throw new \InvalidArgumentException('non-nullable total_deliveries cannot be null');
+        }
+        $this->container['total_deliveries'] = $total_deliveries;
+
+        return $this;
+    }
+
+    /**
+     * Gets failed_deliveries
+     *
+     * @return int|null
+     */
+    public function getFailedDeliveries()
+    {
+        return $this->container['failed_deliveries'];
+    }
+
+    /**
+     * Sets failed_deliveries
+     *
+     * @param int|null $failed_deliveries failed_deliveries
+     *
+     * @return self
+     */
+    public function setFailedDeliveries($failed_deliveries)
+    {
+        if (is_null($failed_deliveries)) {
+            throw new \InvalidArgumentException('non-nullable failed_deliveries cannot be null');
+        }
+        $this->container['failed_deliveries'] = $failed_deliveries;
 
         return $this;
     }

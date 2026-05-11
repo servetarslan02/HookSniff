@@ -1,4 +1,4 @@
-# HookSniff.Model.RoutingRuleListResponseDataInner
+# HookSniff.Sdk.Model.RoutingRuleListResponseDataInner
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# HookSniff::UpdateRoutingRuleRequest
+# HooksniffSdk::UpdateRoutingRuleRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::UpdateRoutingRuleRequest.new(
+instance = HooksniffSdk::UpdateRoutingRuleRequest.new(
   name: null,
   conditions: null,
   transform: null

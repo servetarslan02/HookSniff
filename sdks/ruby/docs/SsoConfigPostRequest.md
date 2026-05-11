@@ -1,4 +1,4 @@
-# HookSniff::SsoConfigPostRequest
+# HooksniffSdk::SsoConfigPostRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SsoConfigPostRequest.new(
+instance = HooksniffSdk::SsoConfigPostRequest.new(
   provider: null,
   enabled: null
 )

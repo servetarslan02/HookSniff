@@ -303,6 +303,21 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['amount_cents'] === null) {
+            $invalidProperties[] = "'amount_cents' can't be null";
+        }
+        if ($this->container['currency'] === null) {
+            $invalidProperties[] = "'currency' can't be null";
+        }
+        if ($this->container['status'] === null) {
+            $invalidProperties[] = "'status' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -321,7 +336,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -331,7 +346,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -348,7 +363,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets amount_cents
      *
-     * @return int|null
+     * @return int
      */
     public function getAmountCents()
     {
@@ -358,7 +373,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets amount_cents
      *
-     * @param int|null $amount_cents amount_cents
+     * @param int $amount_cents amount_cents
      *
      * @return self
      */
@@ -375,7 +390,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets currency
      *
-     * @return string|null
+     * @return string
      */
     public function getCurrency()
     {
@@ -385,7 +400,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets currency
      *
-     * @param string|null $currency currency
+     * @param string $currency currency
      *
      * @return self
      */
@@ -402,7 +417,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets status
      *
-     * @return string|null
+     * @return string
      */
     public function getStatus()
     {
@@ -412,7 +427,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets status
      *
-     * @param string|null $status status
+     * @param string $status status
      *
      * @return self
      */
@@ -429,7 +444,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -439,7 +454,7 @@ class InvoiceResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param \DateTime|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */

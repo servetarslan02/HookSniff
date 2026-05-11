@@ -296,6 +296,18 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['users'] === null) {
+            $invalidProperties[] = "'users' can't be null";
+        }
+        if ($this->container['total'] === null) {
+            $invalidProperties[] = "'total' can't be null";
+        }
+        if ($this->container['page'] === null) {
+            $invalidProperties[] = "'page' can't be null";
+        }
+        if ($this->container['per_page'] === null) {
+            $invalidProperties[] = "'per_page' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -314,7 +326,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets users
      *
-     * @return \OpenAPI\Client\Model\UserSummary[]|null
+     * @return \OpenAPI\Client\Model\UserSummary[]
      */
     public function getUsers()
     {
@@ -324,7 +336,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets users
      *
-     * @param \OpenAPI\Client\Model\UserSummary[]|null $users users
+     * @param \OpenAPI\Client\Model\UserSummary[] $users users
      *
      * @return self
      */
@@ -341,7 +353,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets total
      *
-     * @return int|null
+     * @return int
      */
     public function getTotal()
     {
@@ -351,7 +363,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets total
      *
-     * @param int|null $total total
+     * @param int $total total
      *
      * @return self
      */
@@ -368,7 +380,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets page
      *
-     * @return int|null
+     * @return int
      */
     public function getPage()
     {
@@ -378,7 +390,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets page
      *
-     * @param int|null $page page
+     * @param int $page page
      *
      * @return self
      */
@@ -395,7 +407,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets per_page
      *
-     * @return int|null
+     * @return int
      */
     public function getPerPage()
     {
@@ -405,7 +417,7 @@ class PaginatedUsers implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets per_page
      *
-     * @param int|null $per_page per_page
+     * @param int $per_page per_page
      *
      * @return self
      */

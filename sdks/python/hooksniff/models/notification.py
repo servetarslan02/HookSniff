@@ -30,12 +30,12 @@ class Notification(BaseModel):
     """
     Notification
     """ # noqa: E501
-    id: Optional[UUID] = None
-    title: Optional[StrictStr] = None
-    body: Optional[StrictStr] = None
-    is_read: Optional[StrictBool] = None
+    id: UUID
+    title: StrictStr
+    body: StrictStr
+    is_read: StrictBool
     link: Optional[StrictStr] = None
-    created_at: Optional[datetime] = None
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "title", "body", "is_read", "link", "created_at"]
 
     model_config = ConfigDict(

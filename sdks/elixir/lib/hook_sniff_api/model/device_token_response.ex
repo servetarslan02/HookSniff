@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.DeviceTokenResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :token,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.DeviceTokenResponse do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :token => String.t | nil,
-    :platform => String.t | nil,
-    :created_at => DateTime.t | nil
+    :id => String.t,
+    :token => String.t,
+    :platform => String.t,
+    :created_at => DateTime.t
   }
 
   def decode(value) do

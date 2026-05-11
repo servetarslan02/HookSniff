@@ -28,7 +28,7 @@ class UpdateTransformRuleRequest(BaseModel):
     """
     Update an existing transform rule (all fields optional)
     """ # noqa: E501
-    name: Optional[StrictStr] = None
+    name: StrictStr
     config: Optional[Dict[str, Any]] = Field(default=None, description="Updated transformation configuration")
     __properties: ClassVar[List[str]] = ["name", "config"]
 

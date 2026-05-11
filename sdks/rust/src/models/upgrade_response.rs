@@ -15,18 +15,18 @@ use serde::{Deserialize, Serialize};
 pub struct UpgradeResponse {
     #[serde(rename = "checkout_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub checkout_url: Option<Option<String>>,
-    #[serde(rename = "provider", skip_serializing_if = "Option::is_none")]
-    pub provider: Option<String>,
-    #[serde(rename = "message", skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
+    #[serde(rename = "provider")]
+    pub provider: String,
+    #[serde(rename = "message")]
+    pub message: String,
 }
 
 impl UpgradeResponse {
-    pub fn new() -> UpgradeResponse {
+    pub fn new(provider: String, message: String) -> UpgradeResponse {
         UpgradeResponse {
             checkout_url: None,
-            provider: None,
-            message: None,
+            provider,
+            message,
         }
     }
 }

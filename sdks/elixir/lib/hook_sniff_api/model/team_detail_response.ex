@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.TeamDetailResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :team,
     :members,
@@ -14,9 +14,9 @@ defmodule HookSniffAPI.Model.TeamDetailResponse do
   ]
 
   @type t :: %__MODULE__{
-    :team => HookSniffAPI.Model.Team.t | nil,
-    :members => [HookSniffAPI.Model.TeamMember.t] | nil,
-    :invites => [HookSniffAPI.Model.TeamInvite.t] | nil
+    :team => HookSniffAPI.Model.Team.t,
+    :members => [HookSniffAPI.Model.TeamMember.t],
+    :invites => [HookSniffAPI.Model.TeamInvite.t]
   }
 
   alias HookSniffAPI.Deserializer

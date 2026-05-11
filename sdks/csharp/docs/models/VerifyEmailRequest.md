@@ -1,4 +1,4 @@
-# HookSniff.Model.VerifyEmailRequest
+# HookSniff.Sdk.Model.VerifyEmailRequest
 
 ## Properties
 

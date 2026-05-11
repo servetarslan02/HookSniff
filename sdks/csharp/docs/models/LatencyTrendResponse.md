@@ -1,4 +1,4 @@
-# HookSniff.Model.LatencyTrendResponse
+# HookSniff.Sdk.Model.LatencyTrendResponse
 
 ## Properties
 

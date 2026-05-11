@@ -13,32 +13,32 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UsageResponse {
-    #[serde(rename = "plan", skip_serializing_if = "Option::is_none")]
-    pub plan: Option<String>,
-    #[serde(rename = "period_start", skip_serializing_if = "Option::is_none")]
-    pub period_start: Option<chrono::DateTime<chrono::FixedOffset>>,
-    #[serde(rename = "period_end", skip_serializing_if = "Option::is_none")]
-    pub period_end: Option<chrono::DateTime<chrono::FixedOffset>>,
-    #[serde(rename = "webhooks_used", skip_serializing_if = "Option::is_none")]
-    pub webhooks_used: Option<i32>,
-    #[serde(rename = "webhooks_limit", skip_serializing_if = "Option::is_none")]
-    pub webhooks_limit: Option<i32>,
-    #[serde(rename = "endpoints_used", skip_serializing_if = "Option::is_none")]
-    pub endpoints_used: Option<i32>,
-    #[serde(rename = "endpoints_limit", skip_serializing_if = "Option::is_none")]
-    pub endpoints_limit: Option<i32>,
+    #[serde(rename = "plan")]
+    pub plan: String,
+    #[serde(rename = "period_start")]
+    pub period_start: chrono::DateTime<chrono::FixedOffset>,
+    #[serde(rename = "period_end")]
+    pub period_end: chrono::DateTime<chrono::FixedOffset>,
+    #[serde(rename = "webhooks_used")]
+    pub webhooks_used: i32,
+    #[serde(rename = "webhooks_limit")]
+    pub webhooks_limit: i32,
+    #[serde(rename = "endpoints_used")]
+    pub endpoints_used: i32,
+    #[serde(rename = "endpoints_limit")]
+    pub endpoints_limit: i32,
 }
 
 impl UsageResponse {
-    pub fn new() -> UsageResponse {
+    pub fn new(plan: String, period_start: chrono::DateTime<chrono::FixedOffset>, period_end: chrono::DateTime<chrono::FixedOffset>, webhooks_used: i32, webhooks_limit: i32, endpoints_used: i32, endpoints_limit: i32) -> UsageResponse {
         UsageResponse {
-            plan: None,
-            period_start: None,
-            period_end: None,
-            webhooks_used: None,
-            webhooks_limit: None,
-            endpoints_used: None,
-            endpoints_limit: None,
+            plan,
+            period_start,
+            period_end,
+            webhooks_used,
+            webhooks_limit,
+            endpoints_used,
+            endpoints_limit,
         }
     }
 }

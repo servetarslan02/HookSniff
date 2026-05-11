@@ -5,16 +5,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**url** | **str** |  | [optional] 
-**description** | **str** |  | [optional] 
-**is_active** | **bool** |  | [optional] 
-**allowed_ips** | **List[str]** |  | [optional] 
-**event_filter** | **List[str]** |  | [optional] 
+**url** | **str** |  | 
+**description** | **str** |  | 
+**is_active** | **bool** |  | 
+**allowed_ips** | **List[str]** |  | 
+**event_filter** | **List[str]** |  | 
 **custom_headers** | **object** |  | [optional] 
-**retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
-**routing_strategy** | **str** |  | [optional] 
-**fallback_url** | **str** |  | [optional] 
-**format** | **str** |  | [optional] 
+**retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  | 
+**routing_strategy** | **str** |  | 
+**fallback_url** | **str** |  | 
+**format** | **str** |  | 
 
 ## Example
 

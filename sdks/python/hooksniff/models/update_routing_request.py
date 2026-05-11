@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,16 +28,13 @@ class UpdateRoutingRequest(BaseModel):
     """
     UpdateRoutingRequest
     """ # noqa: E501
-    routing_strategy: Optional[StrictStr] = None
-    fallback_url: Optional[StrictStr] = None
+    routing_strategy: StrictStr
+    fallback_url: StrictStr
     __properties: ClassVar[List[str]] = ["routing_strategy", "fallback_url"]
 
     @field_validator('routing_strategy')
     def routing_strategy_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['round-robin', 'latency', 'failover']):
             raise ValueError("must be one of enum values ('round-robin', 'latency', 'failover')")
         return value

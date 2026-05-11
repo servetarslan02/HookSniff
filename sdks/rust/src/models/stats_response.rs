@@ -13,35 +13,35 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct StatsResponse {
-    #[serde(rename = "total_deliveries", skip_serializing_if = "Option::is_none")]
-    pub total_deliveries: Option<i32>,
-    #[serde(rename = "successful_deliveries", skip_serializing_if = "Option::is_none")]
-    pub successful_deliveries: Option<i32>,
-    #[serde(rename = "failed_deliveries", skip_serializing_if = "Option::is_none")]
-    pub failed_deliveries: Option<i32>,
-    #[serde(rename = "total_endpoints", skip_serializing_if = "Option::is_none")]
-    pub total_endpoints: Option<i32>,
-    #[serde(rename = "active_endpoints", skip_serializing_if = "Option::is_none")]
-    pub active_endpoints: Option<i32>,
-    #[serde(rename = "plan", skip_serializing_if = "Option::is_none")]
-    pub plan: Option<String>,
-    #[serde(rename = "webhook_limit", skip_serializing_if = "Option::is_none")]
-    pub webhook_limit: Option<i32>,
-    #[serde(rename = "webhook_count", skip_serializing_if = "Option::is_none")]
-    pub webhook_count: Option<i32>,
+    #[serde(rename = "total_deliveries")]
+    pub total_deliveries: i32,
+    #[serde(rename = "successful_deliveries")]
+    pub successful_deliveries: i32,
+    #[serde(rename = "failed_deliveries")]
+    pub failed_deliveries: i32,
+    #[serde(rename = "total_endpoints")]
+    pub total_endpoints: i32,
+    #[serde(rename = "active_endpoints")]
+    pub active_endpoints: i32,
+    #[serde(rename = "plan")]
+    pub plan: String,
+    #[serde(rename = "webhook_limit")]
+    pub webhook_limit: i32,
+    #[serde(rename = "webhook_count")]
+    pub webhook_count: i32,
 }
 
 impl StatsResponse {
-    pub fn new() -> StatsResponse {
+    pub fn new(total_deliveries: i32, successful_deliveries: i32, failed_deliveries: i32, total_endpoints: i32, active_endpoints: i32, plan: String, webhook_limit: i32, webhook_count: i32) -> StatsResponse {
         StatsResponse {
-            total_deliveries: None,
-            successful_deliveries: None,
-            failed_deliveries: None,
-            total_endpoints: None,
-            active_endpoints: None,
-            plan: None,
-            webhook_limit: None,
-            webhook_count: None,
+            total_deliveries,
+            successful_deliveries,
+            failed_deliveries,
+            total_endpoints,
+            active_endpoints,
+            plan,
+            webhook_limit,
+            webhook_count,
         }
     }
 }

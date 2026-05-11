@@ -1,4 +1,4 @@
-# HookSniff::CreateRoutingRuleRequest
+# HooksniffSdk::CreateRoutingRuleRequest
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::CreateRoutingRuleRequest.new(
+instance = HooksniffSdk::CreateRoutingRuleRequest.new(
   name: null,
   conditions: null,
   transform: null,

@@ -289,6 +289,15 @@ class TwoFactorRequiredResponse implements ModelInterface, ArrayAccess, \JsonSer
     {
         $invalidProperties = [];
 
+        if ($this->container['requires_2fa'] === null) {
+            $invalidProperties[] = "'requires_2fa' can't be null";
+        }
+        if ($this->container['temp_token'] === null) {
+            $invalidProperties[] = "'temp_token' can't be null";
+        }
+        if ($this->container['message'] === null) {
+            $invalidProperties[] = "'message' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -307,7 +316,7 @@ class TwoFactorRequiredResponse implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Gets requires_2fa
      *
-     * @return bool|null
+     * @return bool
      */
     public function getRequires2fa()
     {
@@ -317,7 +326,7 @@ class TwoFactorRequiredResponse implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Sets requires_2fa
      *
-     * @param bool|null $requires_2fa requires_2fa
+     * @param bool $requires_2fa requires_2fa
      *
      * @return self
      */
@@ -334,7 +343,7 @@ class TwoFactorRequiredResponse implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Gets temp_token
      *
-     * @return string|null
+     * @return string
      */
     public function getTempToken()
     {
@@ -344,7 +353,7 @@ class TwoFactorRequiredResponse implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Sets temp_token
      *
-     * @param string|null $temp_token temp_token
+     * @param string $temp_token temp_token
      *
      * @return self
      */
@@ -361,7 +370,7 @@ class TwoFactorRequiredResponse implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Gets message
      *
-     * @return string|null
+     * @return string
      */
     public function getMessage()
     {
@@ -371,7 +380,7 @@ class TwoFactorRequiredResponse implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Sets message
      *
-     * @param string|null $message message
+     * @param string $message message
      *
      * @return self
      */

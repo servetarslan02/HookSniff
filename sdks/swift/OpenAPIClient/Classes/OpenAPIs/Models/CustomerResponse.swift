@@ -17,18 +17,18 @@ public struct CustomerResponse: Codable, JSONEncodable, Hashable {
         case pro = "pro"
         case business = "business"
     }
-    public var id: UUID?
-    public var email: String?
+    public var id: UUID
+    public var email: String
     public var name: String?
     /** Only returned on registration */
     public var apiKey: String?
-    public var plan: Plan?
-    public var webhookLimit: Int?
-    public var webhookCount: Int?
-    public var isAdmin: Bool?
-    public var createdAt: Date?
+    public var plan: Plan
+    public var webhookLimit: Int
+    public var webhookCount: Int
+    public var isAdmin: Bool
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, email: String? = nil, name: String? = nil, apiKey: String? = nil, plan: Plan? = nil, webhookLimit: Int? = nil, webhookCount: Int? = nil, isAdmin: Bool? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, email: String, name: String? = nil, apiKey: String? = nil, plan: Plan, webhookLimit: Int, webhookCount: Int, isAdmin: Bool, createdAt: Date) {
         self.id = id
         self.email = email
         self.name = name
@@ -56,15 +56,15 @@ public struct CustomerResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(email, forKey: .email)
+        try container.encode(id, forKey: .id)
+        try container.encode(email, forKey: .email)
         try container.encodeIfPresent(name, forKey: .name)
         try container.encodeIfPresent(apiKey, forKey: .apiKey)
-        try container.encodeIfPresent(plan, forKey: .plan)
-        try container.encodeIfPresent(webhookLimit, forKey: .webhookLimit)
-        try container.encodeIfPresent(webhookCount, forKey: .webhookCount)
-        try container.encodeIfPresent(isAdmin, forKey: .isAdmin)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(plan, forKey: .plan)
+        try container.encode(webhookLimit, forKey: .webhookLimit)
+        try container.encode(webhookCount, forKey: .webhookCount)
+        try container.encode(isAdmin, forKey: .isAdmin)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

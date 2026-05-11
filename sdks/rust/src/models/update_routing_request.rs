@@ -13,17 +13,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UpdateRoutingRequest {
-    #[serde(rename = "routing_strategy", skip_serializing_if = "Option::is_none")]
-    pub routing_strategy: Option<RoutingStrategy>,
-    #[serde(rename = "fallback_url", skip_serializing_if = "Option::is_none")]
-    pub fallback_url: Option<String>,
+    #[serde(rename = "routing_strategy")]
+    pub routing_strategy: RoutingStrategy,
+    #[serde(rename = "fallback_url")]
+    pub fallback_url: String,
 }
 
 impl UpdateRoutingRequest {
-    pub fn new() -> UpdateRoutingRequest {
+    pub fn new(routing_strategy: RoutingStrategy, fallback_url: String) -> UpdateRoutingRequest {
         UpdateRoutingRequest {
-            routing_strategy: None,
-            fallback_url: None,
+            routing_strategy,
+            fallback_url,
         }
     }
 }

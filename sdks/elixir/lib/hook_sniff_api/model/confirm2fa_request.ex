@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Confirm2faRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :code
   ]

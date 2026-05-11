@@ -317,6 +317,24 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['endpoint_id'] === null) {
+            $invalidProperties[] = "'endpoint_id' can't be null";
+        }
+        if ($this->container['name'] === null) {
+            $invalidProperties[] = "'name' can't be null";
+        }
+        if ($this->container['rule_type'] === null) {
+            $invalidProperties[] = "'rule_type' can't be null";
+        }
+        if ($this->container['is_active'] === null) {
+            $invalidProperties[] = "'is_active' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -335,7 +353,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -345,7 +363,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -362,7 +380,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets endpoint_id
      *
-     * @return string|null
+     * @return string
      */
     public function getEndpointId()
     {
@@ -372,7 +390,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets endpoint_id
      *
-     * @param string|null $endpoint_id endpoint_id
+     * @param string $endpoint_id endpoint_id
      *
      * @return self
      */
@@ -389,7 +407,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets name
      *
-     * @return string|null
+     * @return string
      */
     public function getName()
     {
@@ -399,7 +417,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets name
      *
-     * @param string|null $name name
+     * @param string $name name
      *
      * @return self
      */
@@ -416,7 +434,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets rule_type
      *
-     * @return string|null
+     * @return string
      */
     public function getRuleType()
     {
@@ -426,7 +444,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets rule_type
      *
-     * @param string|null $rule_type rule_type
+     * @param string $rule_type rule_type
      *
      * @return self
      */
@@ -470,7 +488,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_active
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsActive()
     {
@@ -480,7 +498,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_active
      *
-     * @param bool|null $is_active is_active
+     * @param bool $is_active is_active
      *
      * @return self
      */
@@ -497,7 +515,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -507,7 +525,7 @@ class TransformRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param \DateTime|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */

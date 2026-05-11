@@ -28,7 +28,7 @@ class UpdateRoutingRuleRequest(BaseModel):
     """
     Update an existing routing rule (all fields optional)
     """ # noqa: E501
-    name: Optional[StrictStr] = None
+    name: StrictStr
     conditions: Optional[Dict[str, Any]] = None
     transform: Optional[Dict[str, Any]] = None
     __properties: ClassVar[List[str]] = ["name", "conditions", "transform"]

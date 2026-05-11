@@ -12,13 +12,13 @@ import AnyCodable
 
 public struct InvoiceResponse: Codable, JSONEncodable, Hashable {
 
-    public var id: String?
-    public var amountCents: Int?
-    public var currency: String?
-    public var status: String?
-    public var createdAt: Date?
+    public var id: String
+    public var amountCents: Int
+    public var currency: String
+    public var status: String
+    public var createdAt: Date
 
-    public init(id: String? = nil, amountCents: Int? = nil, currency: String? = nil, status: String? = nil, createdAt: Date? = nil) {
+    public init(id: String, amountCents: Int, currency: String, status: String, createdAt: Date) {
         self.id = id
         self.amountCents = amountCents
         self.currency = currency
@@ -38,11 +38,11 @@ public struct InvoiceResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(amountCents, forKey: .amountCents)
-        try container.encodeIfPresent(currency, forKey: .currency)
-        try container.encodeIfPresent(status, forKey: .status)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(id, forKey: .id)
+        try container.encode(amountCents, forKey: .amountCents)
+        try container.encode(currency, forKey: .currency)
+        try container.encode(status, forKey: .status)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

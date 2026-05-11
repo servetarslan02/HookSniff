@@ -1,4 +1,4 @@
-# HookSniff.Model.TwoFactorRequiredResponse
+# HookSniff.Sdk.Model.TwoFactorRequiredResponse
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# HookSniff::NotificationsUnreadCountGet200Response
+# HooksniffSdk::NotificationsUnreadCountGet200Response
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::NotificationsUnreadCountGet200Response.new(
+instance = HooksniffSdk::NotificationsUnreadCountGet200Response.new(
   count: null
 )
 ```

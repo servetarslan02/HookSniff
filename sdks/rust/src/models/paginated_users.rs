@@ -13,23 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PaginatedUsers {
-    #[serde(rename = "users", skip_serializing_if = "Option::is_none")]
-    pub users: Option<Vec<models::UserSummary>>,
-    #[serde(rename = "total", skip_serializing_if = "Option::is_none")]
-    pub total: Option<i32>,
-    #[serde(rename = "page", skip_serializing_if = "Option::is_none")]
-    pub page: Option<i32>,
-    #[serde(rename = "per_page", skip_serializing_if = "Option::is_none")]
-    pub per_page: Option<i32>,
+    #[serde(rename = "users")]
+    pub users: Vec<models::UserSummary>,
+    #[serde(rename = "total")]
+    pub total: i32,
+    #[serde(rename = "page")]
+    pub page: i32,
+    #[serde(rename = "per_page")]
+    pub per_page: i32,
 }
 
 impl PaginatedUsers {
-    pub fn new() -> PaginatedUsers {
+    pub fn new(users: Vec<models::UserSummary>, total: i32, page: i32, per_page: i32) -> PaginatedUsers {
         PaginatedUsers {
-            users: None,
-            total: None,
-            page: None,
-            per_page: None,
+            users,
+            total,
+            page,
+            per_page,
         }
     }
 }

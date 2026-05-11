@@ -14,20 +14,20 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AuthResponse {
     /// JWT access token
-    #[serde(rename = "token", skip_serializing_if = "Option::is_none")]
-    pub token: Option<String>,
-    #[serde(rename = "customer", skip_serializing_if = "Option::is_none")]
-    pub customer: Option<Box<models::CustomerResponse>>,
+    #[serde(rename = "token")]
+    pub token: String,
+    #[serde(rename = "customer")]
+    pub customer: Box<models::CustomerResponse>,
     /// Refresh token (when applicable)
     #[serde(rename = "refresh_token", skip_serializing_if = "Option::is_none")]
     pub refresh_token: Option<String>,
 }
 
 impl AuthResponse {
-    pub fn new() -> AuthResponse {
+    pub fn new(token: String, customer: models::CustomerResponse) -> AuthResponse {
         AuthResponse {
-            token: None,
-            customer: None,
+            token,
+            customer: Box::new(customer),
             refresh_token: None,
         }
     }

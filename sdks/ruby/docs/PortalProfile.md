@@ -1,4 +1,4 @@
-# HookSniff::PortalProfile
+# HooksniffSdk::PortalProfile
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::PortalProfile.new(
+instance = HooksniffSdk::PortalProfile.new(
   id: null,
   email: null,
   name: null,

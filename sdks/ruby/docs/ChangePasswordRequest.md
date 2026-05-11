@@ -1,4 +1,4 @@
-# HookSniff::ChangePasswordRequest
+# HooksniffSdk::ChangePasswordRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ChangePasswordRequest.new(
+instance = HooksniffSdk::ChangePasswordRequest.new(
   current_password: null,
   new_password: null
 )

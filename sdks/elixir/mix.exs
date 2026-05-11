@@ -1,53 +1,50 @@
-defmodule HookSniff.MixProject do
+defmodule HookSniffAPI.Mixfile do
   use Mix.Project
-
-  @version "0.3.0"
-  @source_url "https://github.com/servetarslan02/HookSniff"
 
   def project do
     [
       app: :hooksniff,
-      version: @version,
-      elixir: "~> 1.14",
+      version: "1.0.0",
+      elixir: "~> 1.18",
+      build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
-      name: "HookSniff",
-      description: "Official Elixir client for the HookSniff webhook delivery service",
-      source_url: @source_url,
-      homepage_url: "https://hooksniff.vercel.app",
       package: package(),
-      docs: docs()
+      description: """
+      Webhook delivery, monitoring, and management API. All endpoints under &#x60;/v1&#x60; require authentication via &#x60;Authorization: Bearer &lt;api_key&gt;&#x60; header unless marked as **Public**. 
+      """,
+      deps: deps()
     ]
   end
 
+  # Configuration for the OTP application
+  #
+  # Type "mix help compile.app" for more information
   def application do
-    [
-      extra_applications: [:logger, :inets, :ssl]
-    ]
+    # Specify extra applications you'll use from Erlang/Elixir
+    [extra_applications: [:logger]]
   end
 
+  # Dependencies can be Hex packages:
+  #
+  #   {:my_dep, "~> 0.3.0"}
+  #
+  # Or git/path repositories:
+  #
+  #   {:my_dep, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.3.0"}
+  #
+  # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:jason, "~> 1.4"},
-      {:plug_crypto, "~> 1.2"},
-      {:tesla, "~> 1.7"},
-      {:hackney, "~> 1.18"},
-      {:ex_doc, "~> 0.34", only: :dev, runtime: false}
+      {:tesla, "~> 1.14"},
+      {:ex_doc, "~> 0.37.3", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
-  defp package do
-    [
-      name: "hooksniff",
-      licenses: ["MIT"],
-      links: %{"GitHub" => @source_url}
-    ]
-  end
-
-  defp docs do
-    [
-      main: "HookSniff",
-      source_ref: "v#{@version}"
-    ]
+   defp package do
+      [
+        name: "hooksniff",
+        files: ~w(.formatter.exs config lib mix.exs README* LICENSE*),
+      ]
   end
 end

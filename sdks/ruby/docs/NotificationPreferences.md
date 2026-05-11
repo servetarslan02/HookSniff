@@ -1,4 +1,4 @@
-# HookSniff::NotificationPreferences
+# HooksniffSdk::NotificationPreferences
 
 ## Properties
 
@@ -14,9 +14,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::NotificationPreferences.new(
+instance = HooksniffSdk::NotificationPreferences.new(
   email_on_failure: null,
   email_on_dead_letter: null,
   email_on_success: null,

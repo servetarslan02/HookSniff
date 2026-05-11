@@ -20,8 +20,8 @@ List notifications
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = NotificationsApi()
 val page : kotlin.Int = 56 // kotlin.Int | 
@@ -68,8 +68,8 @@ Delete notification
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = NotificationsApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -113,8 +113,8 @@ Mark notification as read
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = NotificationsApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -158,8 +158,8 @@ Mark all notifications as read
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = NotificationsApi()
 try {
@@ -200,8 +200,8 @@ Get unread notification count
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = NotificationsApi()
 try {

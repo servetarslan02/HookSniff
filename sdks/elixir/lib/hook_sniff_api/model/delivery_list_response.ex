@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.DeliveryListResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :deliveries,
     :total,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.DeliveryListResponse do
   ]
 
   @type t :: %__MODULE__{
-    :deliveries => [HookSniffAPI.Model.Delivery.t] | nil,
-    :total => integer() | nil,
-    :page => integer() | nil,
-    :per_page => integer() | nil
+    :deliveries => [HookSniffAPI.Model.Delivery.t],
+    :total => integer(),
+    :page => integer(),
+    :per_page => integer()
   }
 
   alias HookSniffAPI.Deserializer
