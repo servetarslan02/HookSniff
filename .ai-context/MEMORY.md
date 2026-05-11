@@ -76,13 +76,9 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Sorun:** `docs/api`, `docs/portal`, `docs/sdks` sayfaları Vercel'de 404 veriyor
 - **Kök neden:** Repo root'taki `api/`, `portal/`, `sdks/` klasörleri + next-intl `[locale]` + Vercel serverless conflict
 - **Fix 1:** `outputFileTracingRoot` kaldırıldı — yetmedi
-- **Fix 2 (Plan B):** 3 sayfa taşındı:
-  - `docs/api` → `docs/api-reference` ✅
-  - `docs/portal` → `docs/embed-portal` ✅
-  - `docs/sdks` → `docs/sdk-libraries` ✅
-- **Deploy:** GitHub push → Vercel webhook tetiklenmedi → dummy commit ile tetiklendi → build başarılı
-- **Sonuç:** Üç sayfa da Vercel'de çalışıyor, sidebar linkleri doğru
-- **Ders:** Vercel deploy hook bazen GitHub push'ını tetiklemiyor. Dummy commit ile tetiklenebilir.
+- **Fix 2 (Plan B):** 3 docs sayfası taşındı: api→api-reference, portal→embed-portal, sdks→sdk-libraries
+- **Fix 3:** dashboard/portal → dashboard/portal-manage (aynı root portal/ çakışması)
+- **Deploy:** GitHub push → Vercel webhook tutarsız → dummy commit ile tetikleniyor
 
 ## Oturum 109 (2026-05-11 17:27 - 18:12) ✅
 - **OpenClaw beşinci oturum** — Servet ile GCP deploy debug
