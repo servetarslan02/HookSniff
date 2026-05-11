@@ -132,6 +132,19 @@ LIMIT 50;
 | `api_keys` | `idx_api_keys_key` | `(key_hash)` | API key lookup |
 | `users` | `idx_users_email` | `(email)` | Login lookup |
 
+
+### Recent Index Additions (AŞAMA 5)
+
+| Table | Index | Columns | Purpose |
+|-------|-------|---------|---------|
+| `deliveries` | `idx_deliveries_endpoint_status` | `(endpoint_id, status)` | Dashboard endpoint+status filtering |
+| `deliveries` | `idx_deliveries_created_at` | `(created_at DESC)` | Time-range queries |
+| `delivery_attempts` | `idx_delivery_attempts_created_at` | `(created_at DESC)` | Time-range cleanup and analytics |
+| `dead_letters` | `idx_dead_letters_endpoint` | `(endpoint_id)` | Endpoint failure analysis |
+| `password_reset_tokens` | `idx_password_reset_expires` | `(expires_at)` | Cleanup expired tokens |
+| `refresh_tokens` | `idx_refresh_expires` | `(expires_at)` | Cleanup expired/revoked tokens |
+| `email_verification_tokens` | `idx_email_verify_expires` | `(expires_at)` | Cleanup expired tokens |
+| `idempotency_keys` | `idx_idempotency_created` | `(created_at)` | Cleanup 24h+ old records |
 ### When to Add a New Index
 
 Add an index when:
