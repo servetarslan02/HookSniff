@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
 
 export default function WhatIsWebhookPage() {
