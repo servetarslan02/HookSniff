@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UpdateRoutingRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :routing_strategy,
     :fallback_url

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UpdateNotificationPreferences do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :email_on_failure,
     :email_on_dead_letter,

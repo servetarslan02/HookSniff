@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SimulatorPostRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :endpoint_id,
     :event,

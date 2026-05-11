@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.PaginatedUsers do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :users,
     :total,

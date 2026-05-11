@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.BillingPortalPost200Response do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :url
   ]

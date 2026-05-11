@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.ValidateEventRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :event
   ]

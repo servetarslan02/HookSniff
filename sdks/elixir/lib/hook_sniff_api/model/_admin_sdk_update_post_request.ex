@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.AdminSdkUpdatePostRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :version,
     :message

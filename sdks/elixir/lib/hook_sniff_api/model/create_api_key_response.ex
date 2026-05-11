@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.CreateApiKeyResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :id,
     :key,
