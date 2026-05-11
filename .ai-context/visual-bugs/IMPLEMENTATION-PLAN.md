@@ -543,3 +543,18 @@
 - ✅ Token consistency (search page || undefined)
 - ✅ Revenue error state display eklendi
 - ✅ Users/[id] tc import eklendi
+
+## Oturum 122 Ek Düzeltmeler (2026-05-12 05:21-06:06 GMT+8)
+- ✅ Item 131: Silent API failures → i18n error messages (playground, endpoints, transforms, dashboard)
+- ✅ Item 132: Error Boundary → i18n props (title/description/retryLabel), console.error sadece dev'de
+- ✅ Item 141: Team removal → ConfirmDialog mevcut, hardcoded stringler i18n (6 key)
+- ✅ Item 146: getErrorMessage → fallback parametre eklendi
+- ✅ Item 157: billingApi duplicate getInvoices → billingApiExtended'a delegate
+- ✅ Item 161: Sidebar active state → startsWith matching + admin link active state
+- ✅ Item 166: vh → dvh mobile — deliveries + logs modal max-h-[80dvh]
+- ✅ Item 168: Signature comparison → timingSafeEqual() byte-level XOR constant-time
+- ✅ Item 169: Offline detection → apiFetch'te assertOnline() kontrolü
+- ✅ Item 171: ErrorBoundary → user-friendly description, raw error gizlendi
+- ✅ Item 208: label htmlFor/id → SSO (7 input) + Settings (5 input) + autoComplete
+- ✅ Item 325: autoComplete="new-password" confirm password'a eklendi
+- 16 dosya değişti, 159 satır eklendi, 56 satır silindi
