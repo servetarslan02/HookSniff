@@ -94,8 +94,8 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Kalite kuralı eklendi** — Her SDK'da: webhook + serialization + pagination + resource test zorunlu
 - **Commits:** 12+ commit, main branch
 
-## Oturum 119 (2026-05-12 03:01 - 03:18 GMT+8) ✅
-- **OpenClaw on beşinci oturum** — Servet ile IMPLEMENTATION-PLAN.md düzeltmeleri
+## Oturum 119 (2026-05-12 03:01 - 03:46 GMT+8) ✅
+- **OpenClaw on beşinci oturum** — Servet ile IMPLEMENTATION-PLAN.md düzeltmeleri + derin kod kontrolü
 - **AŞAMA 1 kritik güvenlik düzeltmeleri:**
   - Item 3: Rate limiter production warning — in-memory fallback'ta uyarı log'u
   - Item 11: Migration 005 — password_hash NOT NULL constraint (OAuth hariç)
@@ -113,6 +113,17 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Admin i18n: Hardcoded stringler Users, Revenue, System, Overview sayfalarında düzeltildi
   - Türkçe + İngilizce çeviri anahtarları eklendi (admin section)
 - **Commit:** 516ac950 — main branch
+- **Derin kod kontrolü (cargo test ile):**
+  - 🔴 Migration 005 `google_id` kolonu yoktu — düzeltildi (sentinel value approach)
+  - 🔴 Argon2 m_cost 45 MiB idi, 46 MiB olmalı — düzeltildi (47104 KiB)
+  - 🔴 Worker'da SSRF kontrolü yok — `validate_delivery_url()` eklendi
+  - 🔴 `once_cell` worker Cargo.toml'da yok — `std::sync::LazyLock` ile değiştirildi
+  - 🔴 `middleware` import eksik main.rs — düzeltildi
+  - 🔴 `Claims` test'inde `is_admin` eksik — düzeltildi
+  - Toast mesajları hâlâ hardcoded (5 yer) — düzeltildi
+  - **cargo test --lib:** 993 API + 48 worker = **1041 test geçti, 0 hata**
+  - **cargo clippy:** 0 uyarı
+- **Commits:** f771eac1, ae15ecd6 — main branch
 - **19 dosya değişti, 359 satır eklendi, 87 satır silindi**
 
 ## 📊 Güncel İlerleme (2026-05-12 03:18)
