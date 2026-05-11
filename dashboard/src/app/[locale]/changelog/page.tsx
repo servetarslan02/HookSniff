@@ -19,6 +19,7 @@ import {
 
 export default function ChangelogPage() {
   const t = useTranslations('changelog');
+  const tc = useTranslations('common');
   const [activeType, setActiveType] = useState<ChangeType | 'all'>('all');
   const [activeArea, setActiveArea] = useState<ProductArea | 'all'>('all');
   const [expandedVersion, setExpandedVersion] = useState<string | null>(
@@ -54,7 +55,7 @@ export default function ChangelogPage() {
       if (res.ok) {
         setSubscribed(true);
       } else {
-        setSubscribeError('Something went wrong. Please try again.');
+        setSubscribeError(tc('somethingWentWrong'));
       }
     } catch {
       setSubscribeError('Network error — check your connection.');
