@@ -433,7 +433,7 @@ pub async fn deliver_with_routing(
         .map_err(|_| anyhow::anyhow!("Invalid endpoint_id UUID"))?;
 
     let targets: Vec<DeliveryTargetRow> = sqlx::query_as(
-        "SELECT id, endpoint_id, target_type, config, enabled          FROM delivery_targets WHERE endpoint_id = $1 ORDER BY created_at",
+        "SELECT id, endpoint_id, target_type, config, enabled FROM delivery_targets WHERE endpoint_id = $1 ORDER BY created_at",
     )
     .bind(ep_uuid)
     .fetch_all(pool)
