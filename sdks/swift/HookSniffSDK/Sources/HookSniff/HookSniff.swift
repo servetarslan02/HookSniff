@@ -127,7 +127,7 @@ public class HookSniff {
     }
 }
 
-// MARK: - HTTP Client Extension
+// MARK: - API Error
 
 extension HookSniff {
     /// API error type
@@ -138,85 +138,6 @@ extension HookSniff {
         public var errorDescription: String {
             "HookSniff API Error \(statusCode): \(String(describing: body))"
         }
-    }
-
-    /// Make an HTTP request to the HookSniff API.
-    func request(
-        method: String,
-        path: String,
-        body: [String: Any]? = nil
-    ) async throws -> (statusCode: Int, body: Any?) {
-        let url = URL(string: baseURL + path)!
-        var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = method
-        urlRequest.timeoutInterval = timeout
-
-        // Headers
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
-        urlRequest.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        urlRequest.setValue("hooksniff-sdk/1.0.0/swift", forHTTPHeaderField: "User-Agent")
-        urlRequest.setValue(autoIdempotencyKey(), forHTTPHeaderField: "Idempotency-Key")
-
-        // Body
-        if let body = body {
-            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
-        }
-
-        var lastError: Error?
-
-        for attempt in 0...numRetries {
-            if attempt > 0 {
-                // Exponential backoff: 50ms, 100ms, 200ms, ...
-                let delay = UInt64(50 * Int(pow(2.0, Double(attempt - 1)))) * 1_000_000
-                try await Task.sleep(nanoseconds: delay)
-            }
-
-            do {
-                let (data, response) = try await URLSession.shared.data(for: urlRequest)
-                let httpResponse = response as! HTTPURLResponse
-                let statusCode = httpResponse.statusCode
-
-                // Don't retry on 4xx
-                if statusCode < 500 {
-                    let parsedBody: Any?
-                    if let json = try? JSONSerialization.jsonObject(with: data) {
-                        parsedBody = json
-                    } else {
-                        parsedBody = String(data: data, encoding: .utf8)
-                    }
-
-                    if statusCode >= 400 {
-                        throw ApiError(statusCode: statusCode, body: parsedBody)
-                    }
-                    return (statusCode, parsedBody)
-                }
-
-                // 5xx — will retry
-                let bodyText = String(data: data, encoding: .utf8)
-                lastError = ApiError(statusCode: statusCode, body: bodyText)
-            } catch let error as ApiError where error.statusCode < 500 {
-                throw error
-            } catch {
-                lastError = error
-            }
-        }
-
-        throw lastError ?? NSError(domain: "HookSniff", code: -1, userInfo: [NSLocalizedDescriptionKey: "Request failed after retries"])
-    }
-
-    /// Convenience: request and parse JSON response
-    func requestJSON(
-        method: String,
-        path: String,
-        body: [String: Any]? = nil
-    ) async throws -> Any? {
-        let result = try await request(method: method, path: path, body: body)
-        return result.body
-    }
-
-    private func autoIdempotencyKey() -> String {
-        "auto_\(UUID().uuidString.lowercased())"
     }
 }
 
