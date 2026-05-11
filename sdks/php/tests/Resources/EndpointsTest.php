@@ -10,9 +10,9 @@ use PHPUnit\Framework\TestCase;
 class EndpointsTest extends TestCase
 {
     private const CTX = [
-        'baseUrl'  => 'https://api.hooksniff.test',
-        'token'    => 'test_tok_xxx',
-        'timeout'  => 5000,
+        'baseUrl'    => 'https://api.hooksniff.test',
+        'token'      => 'test_tok_xxx',
+        'timeout'    => 5000,
         'numRetries' => 0,
     ];
 
@@ -22,6 +22,7 @@ class EndpointsTest extends TestCase
     {
         RequestCapture::reset();
         \HookSniff\Request::setNextResponse(null);
+        \HookSniff\Request::setResponseQueue([]);
         $this->endpoints = new Endpoints(self::CTX);
     }
 
@@ -148,52 +149,57 @@ class EndpointsTest extends TestCase
 
     public function testListAllPaginatesThroughAllPages(): void
     {
-        // Simulate 3 pages: first two have has_more=true, last has has_more=false
-        $page1 = ['data' => [['id' => 'ep_1'], ['id' => 'ep_2']], 'has_more' => true];
-        $page2 = ['data' => [['id' => 'ep_3'], ['id' => 'ep_4']], 'has_more' => true];
-        $page3 = ['data' => [['id' => 'ep_5']], 'has_more' => false];
+        // Simulate 3 pages via response queue
+        \HookSniff\Request::setResponseQueue([
+            ['data' => [['id' => 'ep_1'], ['id' => 'ep_2']], 'has_more' => true],
+            ['data' => [['id' => 'ep_3'], ['id' => 'ep_4']], 'has_more' => true],
+            ['data' => [['id' => 'ep_5']], 'has_more' => false],
+        ]);
 
-        $callIndex = 0;
-        $pages = [$page1, $page2, $page3];
+        $result = $this->endpoints->listAll(2);
 
-        // Override send to return pages in sequence
-        // We need to set a callable response — but our mock only supports static values.
-        // Instead, set responses one at a time using a trick: we'll capture calls and
-        // verify the pagination structure after the fact.
-        //
-        // Since Pagination::collectAll calls list() which calls send(), and our mock
-        // always returns the same value, we need to set responses dynamically.
-        // The simplest approach: test listAll() returns merged data by pre-setting
-        // the response to simulate what Pagination would do.
+        // Should merge all pages
+        $this->assertCount(5, $result);
+        $this->assertSame('ep_1', $result[0]['id']);
+        $this->assertSame('ep_5', $result[4]['id']);
 
-        // For listAll, Pagination calls list($limit, $offset) repeatedly.
-        // Our mock returns the same response each time, so we can't simulate multi-page
-        // directly with the static mock. But we CAN verify that listAll calls list()
-        // with the correct limit, and that it returns the merged result.
+        // Should have made 3 GET calls
+        $calls = RequestCapture::getCalls();
+        $this->assertCount(3, $calls);
 
-        // Test single-page scenario:
-        RequestCapture::reset();
+        // Verify offsets: 0, 2, 4
+        $this->assertSame('0', $calls[0]['queryParams']['offset']);
+        $this->assertSame('2', $calls[1]['queryParams']['offset']);
+        $this->assertSame('4', $calls[2]['queryParams']['offset']);
+
+        // All calls go to the same path
+        foreach ($calls as $call) {
+            $this->assertSame('GET', $call['method']);
+            $this->assertSame('/v1/endpoints', $call['path']);
+            $this->assertSame('2', $call['queryParams']['limit']);
+        }
+    }
+
+    public function testListAllSinglePage(): void
+    {
         \HookSniff\Request::setNextResponse([
-            'data' => [['id' => 'ep_1'], ['id' => 'ep_2']],
+            'data' => [['id' => 'ep_a']],
             'has_more' => false,
         ]);
 
-        $result = $this->endpoints->listAll(10);
+        $result = $this->endpoints->listAll(50);
 
-        $this->assertSame([['id' => 'ep_1'], ['id' => 'ep_2']], $result);
+        $this->assertCount(1, $result);
+        $this->assertSame('ep_a', $result[0]['id']);
 
-        // Verify the call was made with the expected limit
-        $call = RequestCapture::firstCall();
-        $this->assertNotNull($call);
-        $this->assertSame('GET', $call['method']);
-        $this->assertSame('/v1/endpoints', $call['path']);
-        $this->assertSame('10', $call['queryParams']['limit']);
-        $this->assertSame('0', $call['queryParams']['offset']);
+        // Only 1 call
+        $calls = RequestCapture::getCalls();
+        $this->assertCount(1, $calls);
+        $this->assertSame('0', $calls[0]['queryParams']['offset']);
     }
 
-    public function testListAllWithEmptyResult(): void
+    public function testListAllEmptyResult(): void
     {
-        RequestCapture::reset();
         \HookSniff\Request::setNextResponse(['data' => [], 'has_more' => false]);
 
         $result = $this->endpoints->listAll();
