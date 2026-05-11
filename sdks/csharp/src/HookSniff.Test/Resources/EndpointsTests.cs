@@ -5,18 +5,19 @@ using Xunit;
 
 namespace HookSniff.Test.Resources;
 
+[Collection("ResourceTests")]
 public class EndpointsTests : IDisposable
 {
-    private readonly MockServer _server;
+    private readonly MockHttpClient _mock;
     private readonly HookSniffClient _client;
 
     public EndpointsTests()
     {
-        _server = new MockServer();
-        _client = new HookSniffClient("test-api-key", baseUrl: _server.BaseUrl, numRetries: 0);
+        _mock = new MockHttpClient();
+        _client = new HookSniffClient("test-api-key", baseUrl: "https://mock.api", numRetries: 0);
     }
 
-    public void Dispose() => _server.Dispose();
+    public void Dispose() => _mock.Dispose();
 
     private static string EndpointJson() => JsonSerializer.Serialize(new
     {
@@ -55,12 +56,12 @@ public class EndpointsTests : IDisposable
     [Fact]
     public async Task ListAsync_SendsGetToEndpoints()
     {
-        _server.ResponseQueue.Enqueue((200, EndpointListJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, EndpointListJson()));
 
         var result = await _client.Endpoints.ListAsync();
 
         Assert.Single(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("GET", req.Method);
         Assert.Equal("/v1/endpoints", req.Path);
     }
@@ -68,13 +69,13 @@ public class EndpointsTests : IDisposable
     [Fact]
     public async Task ListAsync_WithPagination_SendsQueryParams()
     {
-        _server.ResponseQueue.Enqueue((200, EndpointListJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, EndpointListJson()));
 
         var page = await _client.Endpoints.ListAsync(10, 20);
 
         Assert.Single(page.Data);
         Assert.False(page.HasMore);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("GET", req.Method);
         Assert.Contains("limit=10", req.Query);
         Assert.Contains("offset=20", req.Query);
@@ -83,13 +84,13 @@ public class EndpointsTests : IDisposable
     [Fact]
     public async Task CreateAsync_SendsPostWithBody()
     {
-        _server.ResponseQueue.Enqueue((200, EndpointJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, EndpointJson()));
 
         var body = new HookSniff.Model.CreateEndpointRequest("https://new.example.com/hook");
         var result = await _client.Endpoints.CreateAsync(body);
 
         Assert.NotNull(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("POST", req.Method);
         Assert.Equal("/v1/endpoints", req.Path);
         Assert.Contains("https://new.example.com/hook", req.Body);
@@ -99,12 +100,12 @@ public class EndpointsTests : IDisposable
     public async Task GetAsync_SendsGetWithPathParam()
     {
         var epId = "ep_abc123";
-        _server.ResponseQueue.Enqueue((200, EndpointJson()));
+        _mock.Handler.ResponseQueue.Enqueue((200, EndpointJson()));
 
         var result = await _client.Endpoints.GetAsync(epId);
 
         Assert.NotNull(result);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("GET", req.Method);
         Assert.Equal($"/v1/endpoints/{epId}", req.Path);
     }
@@ -113,11 +114,11 @@ public class EndpointsTests : IDisposable
     public async Task DeleteAsync_SendsDelete()
     {
         var epId = "ep_to_delete";
-        _server.ResponseQueue.Enqueue((200, "{}"));
+        _mock.Handler.ResponseQueue.Enqueue((204, ""));
 
         await _client.Endpoints.DeleteAsync(epId);
 
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("DELETE", req.Method);
         Assert.Equal($"/v1/endpoints/{epId}", req.Path);
     }
@@ -126,7 +127,7 @@ public class EndpointsTests : IDisposable
     public async Task RotateSecretAsync_SendsPost()
     {
         var epId = "ep_rotate";
-        _server.ResponseQueue.Enqueue((200, JsonSerializer.Serialize(new
+        _mock.Handler.ResponseQueue.Enqueue((200, JsonSerializer.Serialize(new
         {
             signing_secret = "whsec_new_secret_123",
             message = "Secret rotated successfully"
@@ -136,7 +137,7 @@ public class EndpointsTests : IDisposable
 
         Assert.NotNull(result);
         Assert.Equal("whsec_new_secret_123", result.SigningSecret);
-        var req = _server.Requests[0];
+        var req = _mock.Handler.Requests[0];
         Assert.Equal("POST", req.Method);
         Assert.Equal($"/v1/endpoints/{epId}/rotate-secret", req.Path);
     }
