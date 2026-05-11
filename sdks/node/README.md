@@ -1,6 +1,6 @@
 # HookSniff Node.js SDK
 
-[![npm version](https://img.shields.io/npm/v/@hooksniff/sdk.svg)](https://www.npmjs.com/package/@hooksniff/sdk)
+[![npm version](https://img.shields.io/npm/v/hooksniff-sdk.svg)](https://www.npmjs.com/package/hooksniff-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Official TypeScript/Node.js client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
@@ -8,7 +8,7 @@ Official TypeScript/Node.js client for the [HookSniff](https://hooksniff.vercel.
 ## Installation
 
 ```bash
-npm install @hooksniff/sdk
+npm install hooksniff-sdk
 ```
 
 Or install from source:
@@ -22,7 +22,7 @@ npm run build
 ## Quick Start
 
 ```typescript
-import { HookSniff } from '@hooksniff/sdk';
+import { HookSniff } from 'hooksniff-sdk';
 
 // Initialize client
 const client = new HookSniff({ apiKey: 'hr_live_your_api_key_here' });
@@ -137,7 +137,7 @@ fs.writeFileSync('webhooks.csv', csvData as string);
 Verify incoming webhook signatures in your handler:
 
 ```typescript
-import { verifySignature } from '@hooksniff/sdk';
+import { verifySignature } from 'hooksniff-sdk';
 import express from 'express';
 
 const app = express();
@@ -167,7 +167,7 @@ import {
   RateLimitError,
   ValidationError,
   PayloadTooLargeError,
-} from '@hooksniff/sdk';
+} from 'hooksniff-sdk';
 
 const client = new HookSniff({ apiKey: 'hr_live_...' });
 

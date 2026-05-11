@@ -717,7 +717,13 @@
     "cloudDeployment": "Cloud Deployment",
     "nginxReverseProxy": "Nginx Reverse Proxy",
     "firewall": "Firewall",
-    "troubleshooting": "Troubleshooting"
+    "troubleshooting": "Troubleshooting",
+    "rustSdk": "Rust SDK",
+    "goSdk": "Go SDK",
+    "rubySdk": "Ruby SDK",
+    "phpSdk": "PHP SDK",
+    "elixirSdk": "Elixir SDK",
+    "csharpSdk": "C# SDK"
   },
   "status": {
     "title": "HookSniff Status",
