@@ -10,6 +10,8 @@ package hooksniff
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -145,6 +147,11 @@ func (c *Client) doRequest(method, path string, body interface{}) ([]byte, http.
 			req.Header.Set("Content-Type", "application/json")
 		}
 
+		// Auto idempotency key for POST (matches Node.js/Python behavior)
+		if method == "POST" && req.Header.Get("Idempotency-Key") == "" {
+			req.Header.Set("Idempotency-Key", "auto_"+generateID())
+		}
+
 		resp, err := c.HTTPClient.Do(req)
 		if err != nil {
 			lastErr = err
@@ -200,4 +207,11 @@ func (c *Client) doPut(path string, reqBody interface{}) ([]byte, error) {
 func (c *Client) doDelete(path string) error {
 	_, _, err := c.doRequest("DELETE", path, nil)
 	return err
+}
+
+// generateID generates a random hex string for idempotency keys.
+func generateID() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	return hex.EncodeToString(b)
 }
