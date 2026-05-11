@@ -64,7 +64,9 @@ pub fn generate_token_with_duration(
 pub fn generate_random_token() -> String {
     use rand::TryRng;
     let mut bytes = [0u8; 32];
-    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
+    rand::rngs::SysRng
+        .try_fill_bytes(&mut bytes)
+        .expect("SysRng fill failed");
     hex::encode(bytes)
 }
 
@@ -178,9 +180,8 @@ mod tests {
     fn test_custom_duration_token() {
         let secret = "secret";
         let id = Uuid::new_v4();
-        let token =
-            generate_token_with_duration(id, "a@b.com", "free", secret, Duration::hours(1))
-                .unwrap();
+        let token = generate_token_with_duration(id, "a@b.com", "free", secret, Duration::hours(1))
+            .unwrap();
         let claims = verify_token(&token, secret).unwrap();
         assert_eq!(claims.sub, id);
     }

@@ -311,9 +311,7 @@ async fn update_notifications(
             if !u.is_empty() {
                 if let Err(e) = crate::ssrf::validate_url(u) {
                     tracing::warn!("SSRF blocked notification URL {}: {}", name, e);
-                    return Err(AppError::BadRequest(
-                        "Invalid notification URL".into(),
-                    ));
+                    return Err(AppError::BadRequest("Invalid notification URL".into()));
                 }
             }
         }

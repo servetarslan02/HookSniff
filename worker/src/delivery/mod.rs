@@ -202,8 +202,8 @@ async fn deliver_email(
         }
     };
 
-    let from_email = std::env::var("NOTIFY_FROM_EMAIL")
-        .unwrap_or_else(|_| "onboarding@resend.dev".to_string());
+    let from_email =
+        std::env::var("NOTIFY_FROM_EMAIL").unwrap_or_else(|_| "onboarding@resend.dev".to_string());
 
     // Read and parse service account key
     let sa_json = match std::fs::read_to_string(&sa_path) {
@@ -411,18 +411,30 @@ mod tests {
 
     #[test]
     fn test_target_type_from_str_http() {
-        assert_eq!("http".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Http);
+        assert_eq!(
+            "http".parse::<DeliveryTargetType>().unwrap(),
+            DeliveryTargetType::Http
+        );
     }
 
     #[test]
     fn test_target_type_from_str_email() {
-        assert_eq!("email".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Email);
+        assert_eq!(
+            "email".parse::<DeliveryTargetType>().unwrap(),
+            DeliveryTargetType::Email
+        );
     }
 
     #[test]
     fn test_target_type_from_str_case_insensitive() {
-        assert_eq!("HTTP".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Http);
-        assert_eq!("Email".parse::<DeliveryTargetType>().unwrap(), DeliveryTargetType::Email);
+        assert_eq!(
+            "HTTP".parse::<DeliveryTargetType>().unwrap(),
+            DeliveryTargetType::Http
+        );
+        assert_eq!(
+            "Email".parse::<DeliveryTargetType>().unwrap(),
+            DeliveryTargetType::Email
+        );
     }
 
     #[test]

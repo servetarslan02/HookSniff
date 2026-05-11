@@ -407,10 +407,20 @@ mod tests {
     #[test]
     fn test_overall_status_logic() {
         // All healthy => operational
-        let components = vec![
-            ComponentStatus { name: "API".into(), status: "healthy".into(), latency_ms: None, description: "".into(), last_checked: "".into() },
-            ComponentStatus { name: "DB".into(), status: "healthy".into(), latency_ms: None, description: "".into(), last_checked: "".into() },
-        ];
+        let components = [ComponentStatus {
+                name: "API".into(),
+                status: "healthy".into(),
+                latency_ms: None,
+                description: "".into(),
+                last_checked: "".into(),
+            },
+            ComponentStatus {
+                name: "DB".into(),
+                status: "healthy".into(),
+                latency_ms: None,
+                description: "".into(),
+                last_checked: "".into(),
+            }];
         let overall = if components.iter().any(|c| c.status == "unhealthy") {
             "down"
         } else if components.iter().any(|c| c.status == "degraded") {
@@ -421,10 +431,20 @@ mod tests {
         assert_eq!(overall, "operational");
 
         // One degraded => degraded
-        let components_degraded = vec![
-            ComponentStatus { name: "API".into(), status: "healthy".into(), latency_ms: None, description: "".into(), last_checked: "".into() },
-            ComponentStatus { name: "Worker".into(), status: "degraded".into(), latency_ms: None, description: "".into(), last_checked: "".into() },
-        ];
+        let components_degraded = [ComponentStatus {
+                name: "API".into(),
+                status: "healthy".into(),
+                latency_ms: None,
+                description: "".into(),
+                last_checked: "".into(),
+            },
+            ComponentStatus {
+                name: "Worker".into(),
+                status: "degraded".into(),
+                latency_ms: None,
+                description: "".into(),
+                last_checked: "".into(),
+            }];
         let overall = if components_degraded.iter().any(|c| c.status == "unhealthy") {
             "down"
         } else if components_degraded.iter().any(|c| c.status == "degraded") {
@@ -435,9 +455,13 @@ mod tests {
         assert_eq!(overall, "degraded");
 
         // One unhealthy => down
-        let components_down = vec![
-            ComponentStatus { name: "DB".into(), status: "unhealthy".into(), latency_ms: None, description: "".into(), last_checked: "".into() },
-        ];
+        let components_down = [ComponentStatus {
+            name: "DB".into(),
+            status: "unhealthy".into(),
+            latency_ms: None,
+            description: "".into(),
+            last_checked: "".into(),
+        }];
         let overall = if components_down.iter().any(|c| c.status == "unhealthy") {
             "down"
         } else if components_down.iter().any(|c| c.status == "degraded") {

@@ -35,7 +35,10 @@ use crate::models::endpoint::Endpoint;
 pub fn router() -> Router {
     Router::new()
         .route("/{provider}", post(handle_inbound))
-        .route("/{provider}/{endpoint_id}", post(handle_inbound_to_endpoint))
+        .route(
+            "/{provider}/{endpoint_id}",
+            post(handle_inbound_to_endpoint),
+        )
 }
 
 /// Inbound provider configuration stored per customer.
@@ -224,7 +227,7 @@ fn verify_generic(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), 
 }
 
 fn compute_hmac_raw(key: &[u8], data: &[u8]) -> Vec<u8> {
-    use hmac::{Hmac, Mac, KeyInit};
+    use hmac::{Hmac, KeyInit, Mac};
     use sha2::Sha256;
     type HmacSha256 = Hmac<Sha256>;
 
@@ -260,12 +263,11 @@ async fn handle_inbound(
     // Find customer by API key (prefix-based lookup + Argon2 verification)
     // Use 15-char prefix to match DB storage (api_key_prefix)
     let prefix = &api_key[..15.min(api_key.len())];
-    let candidates = sqlx::query_as::<_, Customer>(
-        "SELECT * FROM customers WHERE api_key_prefix = $1",
-    )
-    .bind(prefix)
-    .fetch_all(&pool)
-    .await?;
+    let candidates =
+        sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+            .bind(prefix)
+            .fetch_all(&pool)
+            .await?;
 
     let mut customer = None;
     for c in &candidates {
@@ -410,12 +412,11 @@ async fn handle_inbound_to_endpoint(
     // Find customer by API key (prefix-based lookup + Argon2 verification)
     // Use 15-char prefix to match DB storage (api_key_prefix)
     let prefix = &api_key[..15.min(api_key.len())];
-    let candidates = sqlx::query_as::<_, Customer>(
-        "SELECT * FROM customers WHERE api_key_prefix = $1",
-    )
-    .bind(prefix)
-    .fetch_all(&pool)
-    .await?;
+    let candidates =
+        sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+            .bind(prefix)
+            .fetch_all(&pool)
+            .await?;
 
     let mut customer = None;
     for c in &candidates {
@@ -715,10 +716,7 @@ mod tests {
     #[test]
     fn test_verify_github_invalid_format() {
         let mut headers = HeaderMap::new();
-        headers.insert(
-            "x-hub-signature-256",
-            HeaderValue::from_static("invalid"),
-        );
+        headers.insert("x-hub-signature-256", HeaderValue::from_static("invalid"));
         let result = verify_github("secret", &headers, b"body");
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), "Invalid format");
@@ -729,7 +727,9 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert(
             "x-hub-signature-256",
-            HeaderValue::from_static("sha256=0000000000000000000000000000000000000000000000000000000000000000"),
+            HeaderValue::from_static(
+                "sha256=0000000000000000000000000000000000000000000000000000000000000000",
+            ),
         );
         let result = verify_github("secret", &headers, b"body");
         assert!(result.is_err());
@@ -764,10 +764,7 @@ mod tests {
     #[test]
     fn test_verify_stripe_invalid_format() {
         let mut headers = HeaderMap::new();
-        headers.insert(
-            "stripe-signature",
-            HeaderValue::from_static("invalid"),
-        );
+        headers.insert("stripe-signature", HeaderValue::from_static("invalid"));
         let result = verify_stripe("secret", &headers, b"body");
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), "Invalid stripe-signature format");
@@ -869,10 +866,7 @@ mod tests {
         let sig = compute_hmac_hex(secret.as_bytes(), body);
 
         let mut headers = HeaderMap::new();
-        headers.insert(
-            "x-signature-256",
-            HeaderValue::from_str(&sig).unwrap(),
-        );
+        headers.insert("x-signature-256", HeaderValue::from_str(&sig).unwrap());
         let result = verify_generic(secret, &headers, body);
         assert!(result.is_ok());
     }

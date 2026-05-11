@@ -124,7 +124,7 @@ mod tests {
         assert_eq!(req.event.unwrap(), "order.created");
         assert_eq!(req.status_code.unwrap(), 201);
         assert_eq!(req.delay_ms.unwrap(), 100);
-        assert_eq!(req.fail.unwrap(), false);
+        assert!(!req.fail.unwrap());
     }
 
     #[test]
@@ -163,8 +163,7 @@ mod tests {
 
     #[test]
     fn test_fail_logic() {
-        let fail = Some(true);
-        let fail = fail.unwrap_or(false);
+        let fail = true;
         assert!(fail);
 
         let status_code = if fail { 500 } else { 200 };
@@ -178,12 +177,20 @@ mod tests {
     fn test_status_code_defaults() {
         // When fail=true and no status_code => 500
         let fail = true;
-        let status_code: u16 = if fail { None.unwrap_or(500) } else { None.unwrap_or(200) };
+        let status_code: u16 = if fail {
+            500
+        } else {
+            200
+        };
         assert_eq!(status_code, 500);
 
         // When fail=false and no status_code => 200
         let fail = false;
-        let status_code: u16 = if fail { None.unwrap_or(500) } else { None.unwrap_or(200) };
+        let status_code: u16 = if fail {
+            500
+        } else {
+            200
+        };
         assert_eq!(status_code, 200);
     }
 

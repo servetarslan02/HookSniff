@@ -102,13 +102,26 @@ async fn list_audit_entries(
     let total = count_query.fetch_one(&pool).await?;
 
     // Fetch entries
-    let data_sql = format!(
+    let data_sql =
+        format!(
         "SELECT id, action, resource_type, resource_id, details, ip_address, user_agent, created_at
          FROM audit_log WHERE {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
         where_sql, param_index, param_index + 1
     );
-    let mut data_query = sqlx::query_as::<_, (Uuid, String, String, Option<String>, Option<serde_json::Value>, Option<String>, Option<String>, DateTime<Utc>)>(&data_sql)
-        .bind(customer.id);
+    let mut data_query = sqlx::query_as::<
+        _,
+        (
+            Uuid,
+            String,
+            String,
+            Option<String>,
+            Option<serde_json::Value>,
+            Option<String>,
+            Option<String>,
+            DateTime<Utc>,
+        ),
+    >(&data_sql)
+    .bind(customer.id);
     if let Some(ref action) = query.action {
         data_query = data_query.bind(action);
     }
@@ -121,8 +134,8 @@ async fn list_audit_entries(
 
     let entries = rows
         .into_iter()
-        .map(|(id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)| {
-            AuditEntry {
+        .map(
+            |(
                 id,
                 action,
                 resource_type,
@@ -131,8 +144,19 @@ async fn list_audit_entries(
                 ip_address,
                 user_agent,
                 created_at,
-            }
-        })
+            )| {
+                AuditEntry {
+                    id,
+                    action,
+                    resource_type,
+                    resource_id,
+                    details,
+                    ip_address,
+                    user_agent,
+                    created_at,
+                }
+            },
+        )
         .collect();
 
     Ok(Json(AuditLogResponse {
@@ -144,7 +168,16 @@ async fn list_audit_entries(
 }
 
 /// Row type for audit log queries (id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)
-type AuditLogRow = (Uuid, String, String, Option<String>, Option<serde_json::Value>, Option<String>, Option<String>, DateTime<Utc>);
+type AuditLogRow = (
+    Uuid,
+    String,
+    String,
+    Option<String>,
+    Option<serde_json::Value>,
+    Option<String>,
+    Option<String>,
+    DateTime<Utc>,
+);
 
 /// GET /audit-log/:id — Get a single audit log entry
 async fn get_audit_entry(
@@ -154,7 +187,7 @@ async fn get_audit_entry(
 ) -> Result<Json<AuditEntry>, AppError> {
     let row: Option<AuditLogRow> = sqlx::query_as(
         "SELECT id, action, resource_type, resource_id, details, ip_address, user_agent, created_at
-         FROM audit_log WHERE id = $1 AND customer_id = $2"
+         FROM audit_log WHERE id = $1 AND customer_id = $2",
     )
     .bind(entry_id)
     .bind(customer.id)

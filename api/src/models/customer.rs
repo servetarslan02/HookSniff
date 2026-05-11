@@ -264,7 +264,10 @@ mod tests {
         let c = make_customer();
         let json = serde_json::to_string(&c).unwrap();
         assert!(!json.contains("SECRET123"), "totp_secret should be skipped");
-        assert!(!json.contains("totp_secret"), "totp_secret field should be omitted");
+        assert!(
+            !json.contains("totp_secret"),
+            "totp_secret field should be omitted"
+        );
     }
 
     #[test]

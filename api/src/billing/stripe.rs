@@ -7,7 +7,7 @@
 //! - Customer portal for self-service billing
 
 use base64::Engine;
-use hmac::{Hmac, Mac, KeyInit};
+use hmac::{Hmac, KeyInit, Mac};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
@@ -215,7 +215,7 @@ pub async fn handle_webhook_event(
 
     // HS-021: Idempotency check — skip already-processed events
     let already_processed: bool = sqlx::query_scalar(
-        "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider_event_id = $1)"
+        "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider_event_id = $1)",
     )
     .bind(&event.id)
     .fetch_one(pool)
@@ -227,7 +227,11 @@ pub async fn handle_webhook_event(
         return Ok(());
     }
 
-    tracing::info!("📦 Processing Stripe event {} ({})", event.id, event.event_type);
+    tracing::info!(
+        "📦 Processing Stripe event {} ({})",
+        event.id,
+        event.event_type
+    );
 
     match event.event_type.as_str() {
         "checkout.session.completed" => {
@@ -608,10 +612,8 @@ fn parse_stripe_signature(header: &str) -> Result<(i64, &str), AppError> {
         }
     }
 
-    let ts = timestamp
-        .ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
-    let sig =
-        v1_sig.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
+    let ts = timestamp.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
+    let sig = v1_sig.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
 
     Ok((ts, sig))
 }
@@ -633,7 +635,9 @@ fn verify_webhook_signature(
 ) -> Result<(), AppError> {
     // Reject if webhook secret is not configured
     if webhook_secret.is_empty() {
-        tracing::error!("Stripe webhook secret is empty — rejecting webhook to prevent billing manipulation");
+        tracing::error!(
+            "Stripe webhook secret is empty — rejecting webhook to prevent billing manipulation"
+        );
         return Err(AppError::Internal(anyhow::anyhow!(
             "Billing webhook secret not configured"
         )));
