@@ -1,6 +1,7 @@
 // Per-module allows removed — fix unused code instead of suppressing warnings.
 // If a specific module genuinely needs an allow, add it there with a reason.
 
+pub mod audit;
 pub mod auth;
 pub mod billing;
 pub mod cache;
