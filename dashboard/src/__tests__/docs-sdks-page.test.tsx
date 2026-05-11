@@ -42,8 +42,8 @@ describe('SdksPage', () => {
   it('renders Node.js SDK section', () => {
     const { container } = render(React.createElement(SdksPage));
     expect(container.textContent).toContain('Node.js SDK');
-    expect(container.textContent).toContain('npm install @hooksniff/sdk');
-    expect(container.textContent).toContain("import { HookSniff } from '@hooksniff/sdk'");
+    expect(container.textContent).toContain('npm install hooksniff-sdk');
+    expect(container.textContent).toContain("import { HookSniff } from 'hooksniff-sdk'");
   });
 
   it('renders Python SDK quick start code', () => {

@@ -167,7 +167,7 @@ HookSniff/
 
 | Language | Package | Status |
 |----------|---------|--------|
-| Node.js | `@hooksniff/sdk` | ✅ Ready |
+| Node.js | `hooksniff-sdk` | ✅ Ready |
 | Python | `hooksniff` | ✅ Ready |
 | Go | `hooksniff-go` | ✅ Ready |
 | Rust | `hooksniff` | ✅ Ready |
