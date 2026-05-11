@@ -6,21 +6,35 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "HookSniff",
-            "email": "support@hooksniff.vercel.app"
+            "name": "Servet Arslan",
+            "email": "support@hooksniff.dev",
+            "homepage": "https://github.com/servetarslan02"
         }
     ],
     "require": {
         "php": ">=8.0",
         "ext-json": "*",
         "ext-openssl": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
     },
     "autoload": {
         "psr-4": {
-            "HookSniff\\": "src/"
+            "OpenAPI\\Client\\": "lib/"
         }
     },
-    "keywords": ["webhooks", "hooksniff", "sdk", "delivery"],
-    "homepage": "https://github.com/hooksniff/hooksniff-php"
+    "autoload-dev": {
+        "psr-4": {
+            "OpenAPI\\Client\\Test\\": "test/"
+        }
+    },
+    "keywords": ["webhooks", "hooksniff", "sdk", "delivery", "api"],
+    "homepage": "https://github.com/servetarslan02/HookSniff",
+    "support": {
+        "issues": "https://github.com/servetarslan02/HookSniff/issues",
+        "source": "https://github.com/servetarslan02/HookSniff"
+    }
 }
