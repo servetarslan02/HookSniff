@@ -2,6 +2,7 @@ package com.hooksniff.resources;
 
 import com.hooksniff.ApiException;
 import com.hooksniff.HookSniffConfig;
+import com.hooksniff.Pagination;
 import com.hooksniff.RequestHelper;
 import com.google.gson.reflect.TypeToken;
 
@@ -63,6 +64,24 @@ public class Webhooks {
         if (offset != null) params.put("offset", offset);
         if (!params.isEmpty()) req.setQueryParams(params);
         return req.send(config, DELIVERY_LIST);
+    }
+
+    /** Collect all webhook deliveries across all pages */
+    @SuppressWarnings("unchecked")
+    public java.util.List<Map<String, Object>> listAll() throws ApiException, IOException, InterruptedException {
+        return listAll(Pagination.DEFAULT_LIMIT);
+    }
+
+    /** Collect all webhook deliveries across all pages with custom limit */
+    @SuppressWarnings("unchecked")
+    public java.util.List<Map<String, Object>> listAll(int limit) throws ApiException, IOException, InterruptedException {
+        return Pagination.collectAll((l, o) -> {
+            try {
+                return list(l, o);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, limit);
     }
 
     /** Get a specific delivery */
