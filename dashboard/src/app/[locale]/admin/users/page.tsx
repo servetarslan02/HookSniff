@@ -59,7 +59,7 @@ export default function AdminUsersPage() {
     if (!planChangeTarget || !newPlan || !token) return;
     try {
       await adminApi.updateUserPlan(token, planChangeTarget.id, newPlan);
-      toast(`Plan updated to ${newPlan}`, 'success');
+      toast(t('planUpdated', { plan: newPlan }), 'success');
       setPlanChangeTarget(null);
       fetchUsers();
     } catch {
@@ -72,7 +72,7 @@ export default function AdminUsersPage() {
     const newStatus = user.status === 'active' ? 'banned' : 'active';
     try {
       await adminApi.updateUserStatus(token, user.id, newStatus);
-      toast(`User ${newStatus === 'banned' ? 'banned' : 'activated'}`, 'success');
+      toast(newStatus === 'banned' ? t('userBanned') : t('userActivated'), 'success');
       fetchUsers();
     } catch {
       toast(tc('error'), 'error');
@@ -86,7 +86,7 @@ export default function AdminUsersPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('userManagement')}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-          Manage users, plans, and account status
+          {t('userManagementDesc')}
         </p>
       </div>
 
@@ -131,12 +131,12 @@ export default function AdminUsersPage() {
       {/* Users Table */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">
-            Loading users...
+          <div className="p-12 text-center text-gray-500 dark:text-slate-400 animate-pulse">
+            {t('loadingUsers')}
           </div>
         ) : users.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
-            {t("noUsers")}.
+          <div className="p-12 text-center text-gray-500 dark:text-slate-400">
+            {t("noUsers")}
           </div>
         ) : (
           <>
@@ -144,13 +144,13 @@ export default function AdminUsersPage() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('email')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('name')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('plan')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('created')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('actions')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('email')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('name')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('plan')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('status')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('created')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -170,7 +170,7 @@ export default function AdminUsersPage() {
                         <StatusBadge status={u.status} />
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
-                        {new Date(u.created_at).toLocaleDateString()}
+                        {new Date(u.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
@@ -178,13 +178,13 @@ export default function AdminUsersPage() {
                             href={`/admin/users/${u.id}`}
                             className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium"
                           >
-                            View
+                            {tc('view')}
                           </Link>
                           <button
                             onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan); }}
                             className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium"
                           >
-                            Plan
+                            {t('changePlan')}
                           </button>
                           <button
                             onClick={() => handleToggleStatus(u)}
@@ -208,7 +208,7 @@ export default function AdminUsersPage() {
             {total > perPage && (
               <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-slate-400">
-                  Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
+                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <div className="flex gap-2">
                   <button
@@ -216,17 +216,17 @@ export default function AdminUsersPage() {
                     disabled={page === 1}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
-                    Previous
+                    {tc('previous')}
                   </button>
                   <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">
-                    Page {page} of {totalPages}
+                    {tc('pageOf', { page, totalPages })}
                   </span>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
-                    Next
+                    {tc('next')}
                   </button>
                 </div>
               </div>
@@ -241,10 +241,10 @@ export default function AdminUsersPage() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setPlanChangeTarget(null)} />
           <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Change Plan
+              {t('changePlan')}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              Change plan for <span className="font-medium text-gray-900 dark:text-white">{planChangeTarget.email}</span>
+              {t('changePlanFor', { email: planChangeTarget.email })}
             </p>
             <select
               value={newPlan}
@@ -260,13 +260,13 @@ export default function AdminUsersPage() {
                 onClick={() => setPlanChangeTarget(null)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
-                Cancel
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleChangePlan}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition"
               >
-                Update Plan
+                {t('updatePlan')}
               </button>
             </div>
           </div>
