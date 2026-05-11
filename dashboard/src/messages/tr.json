@@ -87,7 +87,10 @@
     "upgradeFailed": "Yükseltme başarısız",
     "failedToLoadDeliveries": "Teslimatlar yüklenemedi",
     "replayFailed": "Tekrar oynatma başarısız",
-    "failedToLoadLogs": "Loglar yüklenemedi"
+    "failedToLoadLogs": "Loglar yüklenemedi",
+    "somethingWentWrong": "Bir şeyler yanlış gitti",
+    "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
+    "pleaseTryAgain": "Lütfen tekrar deneyin."
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -2149,9 +2152,13 @@
     "title": "Bir şeyler yanlış gitti",
     "loginFailed": "Giriş Başarısız",
     "redirecting": "Panele yönlendiriliyor",
-    "linkExpired": "Bağlantı Süresi Dolmuş",
-    "verificationFailed": "Doğrulama Başarısız",
-    "unexpected": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
+    "linkExpired": "Bu doğrulama bağlantısının süresi dolmuş.",
+    "verificationFailed": "Doğrulama başarısız oldu.",
+    "unexpected": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
+    "somethingWentWrong": "Bir şeyler yanlış gitti",
+    "unexpectedError": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
+    "tryAgain": "Tekrar dene",
+    "pleaseWait": "Lütfen bekleyin."
   },
   "blog": {
     "title": "Blog",
@@ -2350,5 +2357,15 @@
     "networkError": "Ağ hatası.",
     "sending": "Gönderiliyor...",
     "resend": "Tekrar Gönder"
+  },
+  "verifyEmail": {
+    "verifying": "E-postanız doğrulanıyor...",
+    "pleaseWait": "Lütfen bekleyin.",
+    "verified": "E-posta Doğrulandı!",
+    "goToDashboard": "Panele Git →",
+    "resendEmail": "Doğrulama E-postasını Tekrar Gönder",
+    "goToLogin": "Giriş Sayfasına Git",
+    "noToken": "Doğrulama tokeni sağlanmadı.",
+    "networkError": "Ağ hatası. Lütfen tekrar deneyin."
   }
 }

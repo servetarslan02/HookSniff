@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 
 function VerifyEmailContent() {
   const t = useTranslations('error');
+  const tv = useTranslations('verifyEmail');
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
@@ -17,7 +18,7 @@ function VerifyEmailContent() {
     const token = searchParams.get('token');
     if (!token) {
       setStatus('error');
-      setMessage('No verification token provided.');
+      setMessage(tv('noToken'));
       return;
     }
 
@@ -30,24 +31,24 @@ function VerifyEmailContent() {
       .then(async (res) => {
         if (res.ok) {
           setStatus('success');
-          setMessage('Your email has been verified successfully!');
-          toast('Email verified!', 'success');
+          setMessage(tv('verified'));
+          toast(tv('verified'), 'success');
         } else {
           const data = await res.json().catch(() => ({}));
           if (data.error?.message?.includes('expired')) {
             setStatus('expired');
-            setMessage('This verification link has expired.');
+            setMessage(t('linkExpired'));
           } else {
             setStatus('error');
-            setMessage(data.error?.message || 'Verification failed.');
+            setMessage(data.error?.message || t('verificationFailed'));
           }
         }
       })
       .catch(() => {
         setStatus('error');
-        setMessage('Network error. Please try again.');
+        setMessage(tv('networkError'));
       });
-  }, [searchParams, toast]);
+  }, [searchParams, toast, t, tv]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-brand-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 px-4">
@@ -63,21 +64,21 @@ function VerifyEmailContent() {
           {status === 'loading' && (
             <>
               <div className="animate-spin w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Verifying your email...</h2>
-              <p className="text-gray-500 dark:text-slate-400">Please wait.</p>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{tv('verifying')}</h2>
+              <p className="text-gray-500 dark:text-slate-400">{tv('pleaseWait')}</p>
             </>
           )}
 
           {status === 'success' && (
             <>
               <div className="text-6xl mb-4">✅</div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Email Verified!</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{tv('verified')}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <Link
                 href="/dashboard"
                 className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
               >
-                Go to Dashboard →
+                {tv('goToDashboard')}
               </Link>
             </>
           )}
@@ -85,17 +86,17 @@ function VerifyEmailContent() {
           {status === 'expired' && (
             <>
               <div className="text-6xl mb-4">⏰</div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("error.linkExpired")}</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('linkExpired')}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <button
                 onClick={async () => {
                   const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
                   await fetch(`${API}/auth/resend-verification`, { method: 'POST', credentials: 'include' });
-                  toast('Verification email sent!', 'success');
+                  toast(tv('resendEmail'), 'success');
                 }}
                 className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
               >
-                Resend Verification Email
+                {tv('resendEmail')}
               </button>
             </>
           )}
@@ -103,13 +104,13 @@ function VerifyEmailContent() {
           {status === 'error' && (
             <>
               <div className="text-6xl mb-4">❌</div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("error.verificationFailed")}</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('verificationFailed')}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <Link
                 href="/login"
                 className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
               >
-                Go to Login
+                {tv('goToLogin')}
               </Link>
             </>
           )}

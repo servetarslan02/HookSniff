@@ -87,7 +87,10 @@
     "upgradeFailed": "Upgrade failed",
     "failedToLoadDeliveries": "Failed to load deliveries",
     "replayFailed": "Replay failed",
-    "failedToLoadLogs": "Failed to load logs"
+    "failedToLoadLogs": "Failed to load logs",
+    "somethingWentWrong": "Something went wrong",
+    "networkError": "Network error. Please try again.",
+    "pleaseTryAgain": "Please try again."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -2149,9 +2152,13 @@
     "title": "Something went wrong",
     "loginFailed": "Login Failed",
     "redirecting": "Redirecting to dashboard",
-    "linkExpired": "Link Expired",
-    "verificationFailed": "Verification Failed",
-    "unexpected": "An unexpected error occurred. Please try again."
+    "linkExpired": "This verification link has expired.",
+    "verificationFailed": "Verification failed.",
+    "unexpected": "An unexpected error occurred. Please try again.",
+    "somethingWentWrong": "Something went wrong",
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try again",
+    "pleaseWait": "Please wait."
   },
   "blog": {
     "title": "Blog",
@@ -2350,5 +2357,15 @@
     "networkError": "Network error.",
     "sending": "Sending...",
     "resend": "Resend"
+  },
+  "verifyEmail": {
+    "verifying": "Verifying your email...",
+    "pleaseWait": "Please wait.",
+    "verified": "Email Verified!",
+    "goToDashboard": "Go to Dashboard →",
+    "resendEmail": "Resend Verification Email",
+    "goToLogin": "Go to Login",
+    "noToken": "No verification token provided.",
+    "networkError": "Network error. Please try again."
   }
 }
