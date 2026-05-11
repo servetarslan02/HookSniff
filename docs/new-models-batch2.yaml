@@ -1,0 +1,439 @@
+# ── Batch 2: Missing Models for Webhooks, Billing, Alerts, Analytics, Stats, Search, Inbound ──
+# These schemas should be merged into components/schemas in openapi.yaml
+# Generated: 2026-05-11
+
+# ── Webhooks / Deliveries ──
+
+    DeliveryDetailResponse:
+      type: object
+      description: Full delivery detail including all retry attempts and endpoint info
+      properties:
+        delivery:
+          $ref: "#/components/schemas/Delivery"
+        attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryAttempt"
+        endpoint:
+          $ref: "#/components/schemas/Endpoint"
+        request_headers:
+          type: object
+          nullable: true
+          description: Original request headers sent with the delivery
+        request_body:
+          type: object
+          nullable: true
+          description: Original request body sent with the delivery
+        response_headers:
+          type: object
+          nullable: true
+          description: Response headers received from the endpoint
+      required:
+        - delivery
+        - attempts
+
+    WebhookFilter:
+      type: object
+      description: Query parameters for filtering webhook deliveries
+      properties:
+        status:
+          type: string
+          enum: [pending, processing, delivered, failed]
+          description: Filter by delivery status
+        endpoint_id:
+          $ref: "#/components/schemas/Uuid"
+        event_type:
+          type: string
+          description: Filter by event type (e.g. order.created)
+        from_date:
+          $ref: "#/components/schemas/DateTime"
+        to_date:
+          $ref: "#/components/schemas/DateTime"
+        page:
+          type: integer
+          default: 1
+        per_page:
+          type: integer
+          default: 20
+
+    BatchWebhookResponse:
+      type: object
+      description: Response for batch webhook delivery creation
+      properties:
+        delivery_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Uuid"
+          description: List of created delivery IDs
+        count:
+          type: integer
+          description: Number of deliveries created
+      required:
+        - delivery_ids
+        - count
+
+    DeliveryAttemptListResponse:
+      type: object
+      description: Paginated list of delivery attempts
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryAttempt"
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+        - data
+        - has_more
+        - total
+
+    # ── Billing ──
+
+    BillingPortalResponse:
+      type: object
+      description: URL for the customer billing portal
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Stripe billing portal URL
+      required:
+        - url
+
+    CancelSubscriptionRequest:
+      type: object
+      description: Request to cancel current subscription
+      properties:
+        reason:
+          type: string
+          description: Optional reason for cancellation
+
+    CancelSubscriptionResponse:
+      type: object
+      description: Result of subscription cancellation
+      properties:
+        cancelled_at:
+          $ref: "#/components/schemas/DateTime"
+        ends_at:
+          $ref: "#/components/schemas/DateTime"
+          description: Date when access ends (end of billing period)
+      required:
+        - cancelled_at
+        - ends_at
+
+    InvoiceListResponse:
+      type: object
+      description: Paginated list of invoices
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceResponse"
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+        - data
+        - has_more
+        - total
+
+    UpdateSubscriptionRequest:
+      type: object
+      description: Request to change subscription plan
+      properties:
+        plan:
+          type: string
+          enum: [free, pro, business]
+          description: Target plan name
+        proration:
+          type: boolean
+          default: true
+          description: Whether to prorate charges for the current billing period
+      required:
+        - plan
+
+    # ── Alerts ──
+
+    AlertRuleListResponse:
+      type: object
+      description: Paginated list of alert rules
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlertRule"
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+        - data
+        - has_more
+        - total
+
+    CreateAlertRuleRequest:
+      type: object
+      description: Request to create a new alert rule
+      properties:
+        name:
+          type: string
+          description: Human-readable alert name
+        condition:
+          type: string
+          enum: [failure_rate, latency, consecutive_failures]
+          description: Condition that triggers the alert
+        threshold:
+          type: integer
+          description: Threshold value for the condition
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [slack, email, webhook]
+          description: Notification channels to alert on
+      required:
+        - name
+        - condition
+        - threshold
+        - channels
+
+    UpdateAlertRuleRequest:
+      type: object
+      description: Request to update an existing alert rule (all fields optional)
+      properties:
+        name:
+          type: string
+        condition:
+          type: string
+          enum: [failure_rate, latency, consecutive_failures]
+        threshold:
+          type: integer
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [slack, email, webhook]
+
+    AlertNotificationListResponse:
+      type: object
+      description: Paginated list of alert notifications
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            description: Alert notification entry
+            properties:
+              id:
+                $ref: "#/components/schemas/Uuid"
+              alert_rule_id:
+                $ref: "#/components/schemas/Uuid"
+              message:
+                type: string
+              channel:
+                type: string
+              status:
+                type: string
+                enum: [sent, failed, pending]
+              created_at:
+                $ref: "#/components/schemas/DateTime"
+        has_more:
+          type: boolean
+        total:
+          type: integer
+      required:
+        - data
+        - has_more
+        - total
+
+    # ── Analytics ──
+
+    AnalyticsTrendResponse:
+      type: object
+      description: Delivery trend data over a time period
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsTrendPoint"
+          description: Array of trend data points
+        period:
+          type: string
+          enum: ["24h", "7d", "30d"]
+          description: Time range of the data
+      required:
+        - data
+        - period
+
+    AnalyticsTrendPoint:
+      type: object
+      description: Single data point in a delivery trend
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date of the data point
+        total:
+          type: integer
+          description: Total deliveries on this date
+        successful:
+          type: integer
+          description: Successfully delivered on this date
+        failed:
+          type: integer
+          description: Failed deliveries on this date
+        avg_latency_ms:
+          type: number
+          format: float
+          description: Average delivery latency in milliseconds
+      required:
+        - date
+        - total
+        - successful
+        - failed
+
+    LatencyResponse:
+      type: object
+      description: Latency percentile breakdown for deliveries
+      properties:
+        p50:
+          type: number
+          format: float
+          description: 50th percentile (median) latency in ms
+        p90:
+          type: number
+          format: float
+          description: 90th percentile latency in ms
+        p95:
+          type: number
+          format: float
+          description: 95th percentile latency in ms
+        p99:
+          type: number
+          format: float
+          description: 99th percentile latency in ms
+        period:
+          type: string
+          enum: ["24h", "7d", "30d"]
+          description: Time range of the data
+      required:
+        - p50
+        - p90
+        - p95
+        - p99
+        - period
+
+    # ── Stats ──
+
+    UsageStatsResponse:
+      type: object
+      description: Account usage statistics summary
+      properties:
+        endpoints_count:
+          type: integer
+          description: Number of active endpoints
+        deliveries_count:
+          type: integer
+          description: Total deliveries in current period
+        teams_count:
+          type: integer
+          description: Number of teams
+        storage_used_bytes:
+          type: integer
+          description: Storage used in bytes
+      required:
+        - endpoints_count
+        - deliveries_count
+        - teams_count
+        - storage_used_bytes
+
+    # ── Search ──
+
+    SearchRequest:
+      type: object
+      description: Search request for webhook deliveries
+      properties:
+        query:
+          type: string
+          description: Search query string
+        filters:
+          type: object
+          description: Additional filters (status, endpoint_id, etc.)
+          properties:
+            status:
+              type: string
+            endpoint_id:
+              $ref: "#/components/schemas/Uuid"
+        page:
+          type: integer
+          default: 1
+        per_page:
+          type: integer
+          default: 20
+      required:
+        - query
+
+    SearchResponse:
+      type: object
+      description: Search results for webhook deliveries
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Delivery"
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+        has_more:
+          type: boolean
+      required:
+        - deliveries
+        - total
+        - page
+        - per_page
+
+    # ── Inbound ──
+
+    InboundWebhookRequest:
+      type: object
+      description: Raw webhook payload received from an external provider (Stripe, GitHub, etc.)
+      properties:
+        provider:
+          type: string
+          description: Provider name (e.g. stripe, github, shopify)
+        payload:
+          type: object
+          description: Raw webhook payload body
+        headers:
+          type: object
+          description: HTTP headers from the incoming webhook request
+      required:
+        - provider
+        - payload
+
+    InboundWebhookResponse:
+      type: object
+      description: Result of processing an inbound webhook
+      properties:
+        id:
+          $ref: "#/components/schemas/Uuid"
+        status:
+          type: string
+          enum: [accepted, rejected, processing]
+          description: Processing status of the inbound webhook
+        endpoint_id:
+          $ref: "#/components/schemas/Uuid"
+          description: The endpoint this webhook was routed to
+        received_at:
+          $ref: "#/components/schemas/DateTime"
+      required:
+        - id
+        - status
+        - endpoint_id
+        - received_at
