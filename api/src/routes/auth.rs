@@ -191,6 +191,12 @@ async fn register(
 
     tracing::info!("✅ New customer registered: {}", req.email);
 
+    // Audit log — REGISTER
+    {
+        let rid = customer.id.to_string();
+        let _ = audit_log!(pool, customer.id, "REGISTER", "auth", Some(&rid));
+    }
+
     // Send welcome email + verification email (fire-and-forget)
     {
         let email_provider = email_provider.clone();
@@ -325,6 +331,12 @@ async fn login(
 
     tracing::info!("✅ Customer logged in: {}", req.email);
 
+    // Audit log — LOGIN
+    {
+        let rid = customer.id.to_string();
+        let _ = audit_log!(pool, customer.id, "LOGIN", "auth", Some(&rid));
+    }
+
     Ok(auth_response_with_cookie(AuthResponse {
         token,
         customer: customer.to_response(None),
@@ -386,6 +398,12 @@ async fn verify_2fa_login(
     let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
     tracing::info!("✅ 2FA verified for customer: {}", customer.email);
+
+    // Audit log — LOGIN (2FA path)
+    {
+        let rid = customer.id.to_string();
+        let _ = audit_log!(pool, customer.id, "LOGIN", "auth", Some(&rid));
+    }
 
     Ok(auth_response_with_cookie(AuthResponse {
         token,
@@ -896,6 +914,12 @@ async fn change_password(
         .await?;
 
     tracing::info!("✅ Password changed for customer {}", customer.id);
+
+    // Audit log — PASSWORD_CHANGE
+    {
+        let rid = customer.id.to_string();
+        let _ = audit_log!(pool, customer.id, "PASSWORD_CHANGE", "auth", Some(&rid));
+    }
 
     Ok(Json(
         serde_json::json!({"message": "Password updated successfully"}),

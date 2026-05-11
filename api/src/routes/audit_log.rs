@@ -211,34 +211,8 @@ async fn get_audit_entry(
 
 // ── Helper: Insert audit log entry ──────────────────────────
 
-/// Insert an audit log entry. Call from other handlers.
-#[allow(clippy::too_many_arguments)]
-pub async fn log_action(
-    pool: &PgPool,
-    customer_id: Uuid,
-    action: &str,
-    resource_type: &str,
-    resource_id: Option<&str>,
-    details: Option<serde_json::Value>,
-    ip_address: Option<&str>,
-    user_agent: Option<&str>,
-) -> Result<(), sqlx::Error> {
-    sqlx::query(
-        "INSERT INTO audit_log (customer_id, action, resource_type, resource_id, details, ip_address, user_agent)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)"
-    )
-    .bind(customer_id)
-    .bind(action)
-    .bind(resource_type)
-    .bind(resource_id)
-    .bind(details)
-    .bind(ip_address)
-    .bind(user_agent)
-    .execute(pool)
-    .await?;
-
-    Ok(())
-}
+// Re-export from the top-level audit module (canonical location).
+pub use crate::audit::log_action;
 
 #[cfg(test)]
 mod tests {
