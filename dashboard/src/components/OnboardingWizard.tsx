@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useRouter } from '@/i18n/navigation';
 import { endpointsApi } from '@/lib/api';
@@ -108,6 +109,7 @@ export function OnboardingWizard() {
   const [error, setError] = useState('');
   const [selectedSdk, setSelectedSdk] = useState('nodejs');
   const [copied, setCopied] = useState('');
+  const t = useTranslations('onboarding');
 
   useEffect(() => {
     if (user && !state.dismissed) {
@@ -523,6 +525,7 @@ interface ChecklistItem {
 }
 
 export function SetupChecklist() {
+  const t = useTranslations('onboarding');
   const { user, token } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const items: ChecklistItem[] = [

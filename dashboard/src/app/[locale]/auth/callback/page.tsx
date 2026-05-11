@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 /**
  * OAuth callback page.
@@ -14,6 +15,7 @@ import { useRouter } from 'next/navigation';
  */
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const t = useTranslations('error');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function AuthCallbackPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
         <div className="glass-card p-8 max-w-md text-center">
           <div className="text-4xl mb-4">❌</div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("error.loginFailed")}</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("loginFailed")}</h1>
           <p className="text-gray-500 dark:text-slate-400 mb-6">{error}</p>
           <button
             onClick={() => router.push('/login')}
@@ -66,7 +68,7 @@ export default function AuthCallbackPage() {
       <div className="glass-card p-8 max-w-md text-center">
         <div className="animate-spin w-10 h-10 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
         <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Logging you in...</h1>
-        <p className="text-gray-500 dark:text-slate-400">{t("error.redirecting")}</p>
+        <p className="text-gray-500 dark:text-slate-400">{t("redirecting")}</p>
       </div>
     </div>
   );

@@ -1245,7 +1245,11 @@
     "setupProgress": "Setup Progress",
     "completed": "completed",
     "dismissChecklist": "Dismiss checklist",
-    "successTitle": "Success!"
+    "successTitle": "Success!",
+    "apiKeys": "API Keys",
+    "deliveries": "Deliveries",
+    "endpoints": "Endpoints",
+    "playground": "Playground"
   },
   "chart": {
     "hours24": "24 Hours",
