@@ -3,18 +3,9 @@
  */
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
+import { PlanInfoModel, PortalModel, type PlanInfo, type PortalOutput } from "../models";
 
-export interface PlanInfo {
-  plan: string;
-  webhooks_remaining: number;
-  webhooks_used: number;
-  endpoints_remaining: number;
-  current_period_end: string;
-}
-
-export interface PortalOutput {
-  url: string;
-}
+export type { PlanInfo, PortalOutput };
 
 export class Billing {
   constructor(private readonly ctx: HookSniffRequestContext) {}
@@ -22,7 +13,9 @@ export class Billing {
   /** Get current plan info */
   async getPlan(): Promise<PlanInfo> {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/billing/plan");
-    return req.send<PlanInfo>(this.ctx);
+    return req.send<PlanInfo>(this.ctx, (json) =>
+      PlanInfoModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Upgrade plan */
@@ -30,12 +23,16 @@ export class Billing {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/billing/upgrade");
     if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
     req.setBody({ plan });
-    return req.send<PortalOutput>(this.ctx);
+    return req.send<PortalOutput>(this.ctx, (json) =>
+      PortalModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Open customer portal */
   async portal(): Promise<PortalOutput> {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/billing/portal");
-    return req.send<PortalOutput>(this.ctx);
+    return req.send<PortalOutput>(this.ctx, (json) =>
+      PortalModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 }

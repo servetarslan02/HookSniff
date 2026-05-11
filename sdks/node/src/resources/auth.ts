@@ -5,30 +5,15 @@
  */
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
+import {
+  AuthModel,
+  type RegisterInput,
+  type LoginInput,
+  type AuthOutput,
+  type TwoFactorSetupOutput,
+} from "../models";
 
-export interface RegisterInput {
-  email: string;
-  password: string;
-}
-
-export interface LoginInput {
-  email: string;
-  password: string;
-  totp_code?: string;
-}
-
-export interface AuthOutput {
-  token: string;
-  user_id: string;
-  email: string;
-  plan: string;
-  is_admin: boolean;
-}
-
-export interface TwoFactorSetupOutput {
-  secret: string;
-  qr_code_url: string;
-}
+export type { RegisterInput, LoginInput, AuthOutput, TwoFactorSetupOutput };
 
 export class Auth {
   constructor(private readonly ctx: HookSniffRequestContext) {}
@@ -36,21 +21,27 @@ export class Auth {
   /** Register a new account */
   async register(input: RegisterInput): Promise<AuthOutput> {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/auth/register");
-    req.setBody(input);
-    return req.send<AuthOutput>(this.ctx);
+    req.setBody(AuthModel._toRegisterJsonObject(input));
+    return req.send<AuthOutput>(this.ctx, (json) =>
+      AuthModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Login and get a JWT token */
   async login(input: LoginInput): Promise<AuthOutput> {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/auth/login");
-    req.setBody(input);
-    return req.send<AuthOutput>(this.ctx);
+    req.setBody(AuthModel._toLoginJsonObject(input));
+    return req.send<AuthOutput>(this.ctx, (json) =>
+      AuthModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Enable two-factor authentication */
   async enable2fa(): Promise<TwoFactorSetupOutput> {
     const req = new HookSniffRequest(HttpMethod.POST, "/v1/auth/2fa/enable");
-    return req.send<TwoFactorSetupOutput>(this.ctx);
+    return req.send<TwoFactorSetupOutput>(this.ctx, (json) =>
+      AuthModel._from2faJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Verify email address */
