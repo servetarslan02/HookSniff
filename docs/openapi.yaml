@@ -137,6 +137,14 @@ components:
           type: string
       required: [email, password]
 
+    LogoutRequest:
+      type: object
+      description: Optional request body for explicit refresh token invalidation
+      properties:
+        refresh_token:
+          type: string
+          description: Refresh token to invalidate
+
     AuthResponse:
       type: object
       properties:
@@ -260,6 +268,41 @@ components:
           type: string
       required: [password]
 
+    Enable2faResponse:
+      type: object
+      description: TOTP secret and QR code URL returned after enabling 2FA
+      properties:
+        secret:
+          type: string
+          description: TOTP secret key
+        qr_url:
+          type: string
+          format: uri
+          description: QR code provisioning URL
+      required: [secret, qr_url]
+
+    ExportDataResponse:
+      type: object
+      description: GDPR data export containing all user data
+      properties:
+        user:
+          $ref: "#/components/schemas/CustomerResponse"
+        endpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/Endpoint"
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Delivery"
+        teams:
+          type: array
+          items:
+            $ref: "#/components/schemas/Team"
+        exported_at:
+          $ref: "#/components/schemas/DateTime"
+      required: [exported_at]
+
     UpdateProfileRequest:
       type: object
       properties:
@@ -327,6 +370,20 @@ components:
         format:
           type: string
           enum: [standard, cloudevents]
+
+    EndpointListResponse:
+      type: object
+      description: Paginated list of endpoints
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Endpoint"
+        total:
+          type: integer
+        has_more:
+          type: boolean
+      required: [data, total, has_more]
 
     CreateEndpointRequest:
       type: object
@@ -408,6 +465,15 @@ components:
         max_delay_secs:
           type: integer
           default: 3600
+
+    RotateSecretResponse:
+      type: object
+      description: New signing secret after rotation
+      properties:
+        secret:
+          type: string
+          description: New endpoint signing secret
+      required: [secret]
 
     # ── Webhooks / Deliveries ──
     CreateWebhookRequest:
