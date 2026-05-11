@@ -77,24 +77,24 @@ export default function AdminSystemPage() {
 
   const services = [
     {
-      name: 'API Server',
+      name: t('apiServer'),
       icon: '🚀',
       status: health?.api?.status || 'unknown',
-      detail: health?.api?.uptime_seconds ? `Uptime: ${formatUptime(health.api.uptime_seconds)}` : 'Checking...',
+      detail: health?.api?.uptime_seconds ? `Uptime: ${formatUptime(health.api.uptime_seconds)}` : t('checking'),
       latency: null,
     },
     {
       name: t("database"),
       icon: '🐘',
       status: health?.database?.status || 'unknown',
-      detail: health?.database?.latency_ms ? `Latency: ${health.database.latency_ms}ms` : 'Checking...',
+      detail: health?.database?.latency_ms ? `Latency: ${health.database.latency_ms}ms` : t('checking'),
       latency: health?.database?.latency_ms,
     },
     {
       name: t("cache"),
       icon: '⚡',
       status: health?.redis?.status || 'unknown',
-      detail: health?.redis?.latency_ms ? `Latency: ${health.redis.latency_ms}ms` : 'Checking...',
+      detail: health?.redis?.latency_ms ? `Latency: ${health.redis.latency_ms}ms` : t('checking'),
       latency: health?.redis?.latency_ms,
     },
     {
@@ -103,7 +103,7 @@ export default function AdminSystemPage() {
       status: health?.queue ? (health.queue.failed > 10 ? 'degraded' : 'healthy') : 'unknown',
       detail: health?.queue
         ? `${health.queue.pending} pending · ${health.queue.processing} processing · ${health.queue.failed} failed`
-        : 'Checking...',
+        : t('checking'),
       latency: null,
     },
   ];
@@ -113,7 +113,7 @@ export default function AdminSystemPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Monitor infrastructure services and system status
+          {t('systemHealthDesc')}
         </p>
       </div>
 
@@ -136,7 +136,7 @@ export default function AdminSystemPage() {
           </span>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400">
-          Last checked: {new Date().toLocaleString()} · Auto-refresh every 15s
+          {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh15s')}
         </p>
       </div>
 
@@ -170,7 +170,7 @@ export default function AdminSystemPage() {
                       style={{ width: `${Math.min((service.latency / 500) * 100, 100)}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-gray-400 dark:text-slate-500 mt-1">
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mt-1">
                     <span>0ms</span>
                     <span>{service.latency}ms</span>
                     <span>500ms</span>
@@ -187,7 +187,7 @@ export default function AdminSystemPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('infrastructure')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { label: 'API Server', value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },
+            { label: t('apiServer'), value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },
             { label: t("database"), value: "Neon PostgreSQL", detail: "Serverless, 0.5 GB" },
             { label: t("cache"), value: "Upstash Redis", detail: "Serverless, 256 MB" },
             { label: t("cdn"), value: "Cloudflare", detail: "DNS, SSL, DDoS" },
@@ -197,7 +197,7 @@ export default function AdminSystemPage() {
             <div key={item.label} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
               <div className="text-sm font-medium text-gray-900 dark:text-white">{item.value}</div>
               <div className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{item.detail}</div>
-              <div className="text-xs text-gray-400 dark:text-slate-500 mt-1">{item.label}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{item.label}</div>
             </div>
           ))}
         </div>

@@ -59,7 +59,7 @@ export default function AdminSettingsPage() {
       if (!res.ok) throw new Error(tc('error'));
       toast(t('settingsSaved'), 'success');
     } catch {
-      toast('Failed to save settings', 'error');
+      toast(t('settingsSaveFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -74,7 +74,7 @@ export default function AdminSettingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('platformSettings')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Configure platform-wide defaults and limits
+          {t('platformSettingsDesc')}
         </p>
       </div>
 
@@ -88,6 +88,9 @@ export default function AdminSettingsPage() {
               <div className="text-xs text-gray-500 dark:text-slate-400">{t('maintenanceDesc')}</div>
             </div>
             <button
+              type="button"
+              role="switch"
+              aria-checked={settings.maintenance_mode}
               onClick={() => update('maintenance_mode', !settings.maintenance_mode)}
               className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
                 settings.maintenance_mode ? 'bg-red-600' : 'bg-gray-300 dark:bg-slate-600'
@@ -104,6 +107,9 @@ export default function AdminSettingsPage() {
               <div className="text-xs text-gray-500 dark:text-slate-400">{t('signupsDesc')}</div>
             </div>
             <button
+              type="button"
+              role="switch"
+              aria-checked={settings.signup_enabled}
               onClick={() => update('signup_enabled', !settings.signup_enabled)}
               className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
                 settings.signup_enabled ? 'bg-green-600' : 'bg-gray-300 dark:bg-slate-600'
@@ -115,8 +121,9 @@ export default function AdminSettingsPage() {
             </button>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('defaultPlan')}</label>
+            <label htmlFor="default_plan" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('defaultPlan')}</label>
             <select
+              id="default_plan"
               value={settings.default_plan}
               onChange={(e) => update('default_plan', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
@@ -136,36 +143,48 @@ export default function AdminSettingsPage() {
             <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('freePlan')}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')}</label>
+                <label htmlFor="max_endpoints_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')}</label>
                 <input
+                  id="max_endpoints_free"
                   type="number"
+                  min={1}
+                  max={999}
                   value={settings.max_endpoints_free}
                   onChange={(e) => update('max_endpoints_free', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Max Webhooks/Month</label>
+                <label htmlFor="max_webhooks_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t("maxWebhooksMonth")}</label>
                 <input
+                  id="max_webhooks_free"
                   type="number"
+                  min={0}
+                  max={9999999}
                   value={settings.max_webhooks_free}
                   onChange={(e) => update('max_webhooks_free', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Rate Limit (req/min)</label>
+                <label htmlFor="rate_limit_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t("rateLimitReqMin")}</label>
                 <input
+                  id="rate_limit_free"
                   type="number"
+                  min={1}
+                  max={100000}
                   value={settings.rate_limit_free}
                   onChange={(e) => update('rate_limit_free', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Retention (days)</label>
+                <label htmlFor="retention_days_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t("retentionDays")}</label>
                 <input
+                  id="retention_days_free"
                   type="number"
+                  min={1}
+                  max={365}
                   value={settings.retention_days_free}
                   onChange={(e) => update('retention_days_free', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
@@ -177,36 +196,48 @@ export default function AdminSettingsPage() {
             <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('proPlan')}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')}</label>
+                <label htmlFor="max_endpoints_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')}</label>
                 <input
+                  id="max_endpoints_pro"
                   type="number"
+                  min={1}
+                  max={999}
                   value={settings.max_endpoints_pro}
                   onChange={(e) => update('max_endpoints_pro', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Max Webhooks/Month</label>
+                <label htmlFor="max_webhooks_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t("maxWebhooksMonth")}</label>
                 <input
+                  id="max_webhooks_pro"
                   type="number"
+                  min={0}
+                  max={9999999}
                   value={settings.max_webhooks_pro}
                   onChange={(e) => update('max_webhooks_pro', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Rate Limit (req/min)</label>
+                <label htmlFor="rate_limit_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t("rateLimitReqMin")}</label>
                 <input
+                  id="rate_limit_pro"
                   type="number"
+                  min={1}
+                  max={100000}
                   value={settings.rate_limit_pro}
                   onChange={(e) => update('rate_limit_pro', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Retention (days)</label>
+                <label htmlFor="retention_days_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t("retentionDays")}</label>
                 <input
+                  id="retention_days_pro"
                   type="number"
+                  min={1}
+                  max={365}
                   value={settings.retention_days_pro}
                   onChange={(e) => update('retention_days_pro', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
@@ -221,8 +252,9 @@ export default function AdminSettingsPage() {
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('maxRetryAttempts')}</label>
+          <label htmlFor="retry_max_attempts" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('maxRetryAttempts')}</label>
           <input
+            id="retry_max_attempts"
             type="number"
             value={settings.retry_max_attempts}
             onChange={(e) => update('retry_max_attempts', parseInt(e.target.value) || 0)}
@@ -230,7 +262,7 @@ export default function AdminSettingsPage() {
             max={10}
             className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
           />
-          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('retryDesc')}</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('retryDesc')}</p>
         </div>
       </div>
 
