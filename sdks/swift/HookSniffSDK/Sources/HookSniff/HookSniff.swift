@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// HookSniff SDK — Main entry point.
 ///
@@ -80,7 +83,7 @@ public class HookSniff {
             }
 
             do {
-                let (data, response) = try await URLSession.shared.data(for: urlRequest)
+                let (data, response) = try await URLSession.shared.dataCompat(for: urlRequest)
                 let httpResponse = response as! HTTPURLResponse
                 let statusCode = httpResponse.statusCode
 
@@ -147,3 +150,35 @@ extension HookSniff {
 public protocol LocalizedConvertible: Error {
     var errorDescription: String { get }
 }
+
+// MARK: - URLSession Linux Compatibility
+
+#if canImport(FoundationNetworking)
+extension URLSession {
+    func dataCompat(for request: URLRequest) async throws -> (Data, URLResponse) {
+        try await withCheckedThrowingContinuation { continuation in
+            let task = self.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard let data = data, let response = response else {
+                    continuation.resume(throwing: NSError(
+                        domain: "HookSniff", code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "No data or response"]
+                    ))
+                    return
+                }
+                continuation.resume(returning: (data, response))
+            }
+            task.resume()
+        }
+    }
+}
+#else
+extension URLSession {
+    func dataCompat(for request: URLRequest) async throws -> (Data, URLResponse) {
+        try await self.data(for: request)
+    }
+}
+#endif
