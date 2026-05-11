@@ -7,12 +7,12 @@ use axum::routing::get;
 use axum::{Json, Router};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
-use crate::models::delivery::Delivery;
 
 pub fn router() -> Router {
     Router::new().route("/", get(list_events))
@@ -26,6 +26,18 @@ struct EventsParams {
     event: Option<String>,
     page: Option<i64>,
     per_page: Option<i64>,
+}
+
+/// Lightweight struct for events query — only the columns we need from deliveries.
+#[derive(Debug, FromRow)]
+struct EventQuery {
+    id: Uuid,
+    endpoint_id: Uuid,
+    event_type: Option<String>,
+    status: String,
+    attempt_count: i32,
+    response_status: Option<i32>,
+    created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize)]
@@ -80,13 +92,13 @@ async fn list_events(
 
     let where_clause = format!("WHERE {}", conditions.join(" AND "));
     let query = format!(
-        "SELECT * FROM deliveries {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
+        "SELECT id, endpoint_id, event_type, status, attempt_count, response_status, created_at FROM deliveries {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
         where_clause,
         bind_idx,
         bind_idx + 1
     );
 
-    let mut q = sqlx::query_as::<_, Delivery>(&query).bind(customer.id);
+    let mut q = sqlx::query_as::<_, EventQuery>(&query).bind(customer.id);
 
     if let Some(ref since) = params.since {
         let parsed: DateTime<Utc> = since.parse().map_err(|_| {

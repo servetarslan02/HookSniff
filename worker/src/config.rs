@@ -3,6 +3,9 @@ use anyhow::Result;
 #[derive(Debug, Clone)]
 pub struct WorkerConfig {
     pub database_url: String,
+    /// Redis URL for state persistence (circuit breaker, throttle).
+    /// If None, falls back to in-memory-only state.
+    pub redis_url: Option<String>,
     /// OpenTelemetry: enable OTLP exporter
     pub otel_enabled: bool,
     /// OpenTelemetry: OTLP collector endpoint (e.g. http://localhost:4317)
@@ -26,6 +29,7 @@ impl WorkerConfig {
                 .unwrap_or_else(|_| {
                     "postgresql://hooksniff:hooksniff_local@localhost:5432/hooksniff?sslmode=disable".into()
                 }),
+            redis_url: std::env::var("REDIS_URL").ok(),
             otel_enabled,
             otel_exporter_otlp_endpoint,
             otel_exporter_otlp_headers,

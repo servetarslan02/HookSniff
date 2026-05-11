@@ -123,6 +123,9 @@ pub struct Disable2faRequest {
 pub struct Verify2faRequest {
     pub temp_token: String,
     pub code: String,
+    /// Optional backup code (8-char alphanumeric). If provided, used instead of TOTP code.
+    #[serde(default)]
+    pub backup_code: Option<String>,
 }
 
 // ── Push Notifications (Device Tokens) ─────────────────────

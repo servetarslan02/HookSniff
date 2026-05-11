@@ -157,12 +157,13 @@ proptest! {
         prop_assume!(secret != wrong_secret);
 
         let sig = signing::compute_standard_signature(&secret, &msg_id, &timestamp, &body);
-        prop_assert_eq!(
-            signing::verify_standard_signature(
-                &wrong_secret, &msg_id, &timestamp, &sig, &body, None
-            ),
-            Err(signing::VerificationError::SignatureMismatch),
-            "Wrong key should reject signature"
+        let result = signing::verify_standard_signature(
+            &wrong_secret, &msg_id, &timestamp, &sig, &body, None
+        );
+        prop_assert!(
+            matches!(result, Err(signing::VerificationError::SignatureMismatch)),
+            "Wrong key should reject signature, got: {:?}",
+            result
         );
     }
 
