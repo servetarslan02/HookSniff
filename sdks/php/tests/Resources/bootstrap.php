@@ -10,13 +10,14 @@ declare(strict_types=1);
  * modifying production code.
  */
 
+namespace HookSniff {
+
 // Load the capture helper first (its own namespace, no conflict).
 require_once __DIR__ . '/RequestCapture.php';
 
 // Define the mock Request in the real namespace. Because this file is
 // included before Composer's autoloader, PHP will use this definition
 // when any code does `new HookSniff\Request(...)`.
-namespace HookSniff;
 
 class Request
 {
@@ -126,9 +127,13 @@ class Request
     }
 }
 
+} // namespace HookSniff
+
 // ── Switch back to global namespace for the Composer autoloader ──
-namespace;
+namespace {
 
 // Now load Composer autoloader. Classes already defined above (Request)
 // won't be overridden; everything else loads normally.
 require_once __DIR__ . '/../../vendor/autoload.php';
+
+} // namespace
