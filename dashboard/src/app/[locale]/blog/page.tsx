@@ -199,6 +199,7 @@ const testimonials = [
 
 export default function BlogPage() {
   const t = useTranslations('blog');
+  const tc = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
@@ -241,11 +242,11 @@ export default function BlogPage() {
         setNewsletterEmail('');
       } else {
         setNewsletterStatus('error');
-        setNewsletterMessage(data.error || 'Something went wrong');
+        setNewsletterMessage(data.error || tc('somethingWentWrong'));
       }
     } catch {
       setNewsletterStatus('error');
-      setNewsletterMessage('Network error. Please try again.');
+      setNewsletterMessage(tc('networkError'));
     }
   };
 
