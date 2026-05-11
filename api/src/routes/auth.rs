@@ -219,7 +219,9 @@ async fn register(
     // Audit log — REGISTER
     {
         let rid = customer.id.to_string();
-        { let _ = crate::audit::log_action(&pool, customer.id, "REGISTER", "auth", Some(&rid), None, None, None).await; }
+        let ip = extract_client_ip(&headers);
+        let ua = headers.get("user-agent").and_then(|v| v.to_str().ok()).unwrap_or("unknown").to_string();
+        let _ = crate::audit::log_action(&pool, customer.id, "REGISTER", "auth", Some(&rid), None, Some(&ip), Some(&ua)).await;
     }
 
     // Send welcome email + verification email (fire-and-forget)
@@ -359,7 +361,9 @@ async fn login(
     // Audit log — LOGIN
     {
         let rid = customer.id.to_string();
-        { let _ = crate::audit::log_action(&pool, customer.id, "LOGIN", "auth", Some(&rid), None, None, None).await; }
+        let ip = extract_client_ip(&headers);
+        let ua = headers.get("user-agent").and_then(|v| v.to_str().ok()).unwrap_or("unknown").to_string();
+        let _ = crate::audit::log_action(&pool, customer.id, "LOGIN", "auth", Some(&rid), None, Some(&ip), Some(&ua)).await;
     }
 
     Ok(auth_response_with_cookie(AuthResponse {
@@ -435,7 +439,9 @@ async fn verify_2fa_login(
     // Audit log — LOGIN (2FA path)
     {
         let rid = customer.id.to_string();
-        { let _ = crate::audit::log_action(&pool, customer.id, "LOGIN", "auth", Some(&rid), None, None, None).await; }
+        let ip = extract_client_ip(&headers);
+        let ua = headers.get("user-agent").and_then(|v| v.to_str().ok()).unwrap_or("unknown").to_string();
+        let _ = crate::audit::log_action(&pool, customer.id, "LOGIN", "auth", Some(&rid), None, Some(&ip), Some(&ua)).await;
     }
 
     Ok(auth_response_with_cookie(AuthResponse {
