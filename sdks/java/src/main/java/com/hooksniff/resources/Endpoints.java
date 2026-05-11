@@ -2,6 +2,7 @@ package com.hooksniff.resources;
 
 import com.hooksniff.ApiException;
 import com.hooksniff.HookSniffConfig;
+import com.hooksniff.Pagination;
 import com.hooksniff.RequestHelper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
