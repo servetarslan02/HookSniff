@@ -402,13 +402,21 @@ async fn verify_2fa_login(
         return Err(AppError::Unauthorized);
     }
 
-    let secret = customer
-        .totp_secret
-        .as_ref()
-        .ok_or(AppError::Internal(anyhow::anyhow!("TOTP secret missing")))?;
+    // Determine authentication method: backup code or TOTP
+    let auth_ok = if let Some(ref backup_code) = req.backup_code {
+        // Try backup code authentication
+        verify_backup_code(&pool, customer.id, backup_code).await?
+    } else {
+        // TOTP authentication
+        let secret = customer
+            .totp_secret
+            .as_ref()
+            .ok_or(AppError::Internal(anyhow::anyhow!("TOTP secret missing")))?;
+        verify_totp_code(secret, &req.code)
+    };
 
-    if !verify_totp_code(secret, &req.code) {
-        // HS-038f: Don't reveal TOTP validation failure — same as other auth failures
+    if !auth_ok {
+        // HS-038f: Don't reveal TOTP/backup validation failure — same as other auth failures
         return Err(AppError::Unauthorized);
     }
 
@@ -806,6 +814,30 @@ async fn confirm_2fa(
         return Err(AppError::BadRequest("Invalid TOTP code".into()));
     }
 
+    // Generate 8 backup codes (8-char alphanumeric each)
+    let backup_codes = generate_backup_codes(8);
+    let mut backup_code_hashes: Vec<String> = Vec::with_capacity(backup_codes.len());
+    for code in &backup_codes {
+        let hash = jwt::hash_password_async(code.clone()).await?;
+        backup_code_hashes.push(hash);
+    }
+
+    // Store hashed backup codes in DB (delete old ones first)
+    sqlx::query("DELETE FROM tfa_backup_codes WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
+
+    for hash in &backup_code_hashes {
+        sqlx::query(
+            "INSERT INTO tfa_backup_codes (customer_id, code_hash) VALUES ($1, $2)",
+        )
+        .bind(customer.id)
+        .bind(hash)
+        .execute(&pool)
+        .await?;
+    }
+
     sqlx::query("UPDATE customers SET totp_enabled = true, updated_at = NOW() WHERE id = $1")
         .bind(customer.id)
         .execute(&pool)
@@ -819,9 +851,11 @@ async fn confirm_2fa(
         { let _ = crate::audit::log_action(&pool, customer.id, "2FA_ENABLE", "auth", Some(&rid), None, None, None).await; }
     }
 
-    Ok(Json(
-        serde_json::json!({"message": "Two-factor authentication has been enabled."}),
-    ))
+    Ok(Json(serde_json::json!({
+        "message": "Two-factor authentication has been enabled.",
+        "backup_codes": backup_codes,
+        "warning": "Store these backup codes in a safe place. They will only be shown once."
+    })))
 }
 
 async fn disable_2fa(
@@ -848,6 +882,12 @@ async fn disable_2fa(
     .bind(customer.id)
     .execute(&pool)
     .await?;
+
+    // Clean up backup codes
+    sqlx::query("DELETE FROM tfa_backup_codes WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
 
     tracing::info!("✅ 2FA disabled for customer {}", customer.id);
 
@@ -1225,6 +1265,54 @@ fn generate_totp_secret() -> String {
         .try_fill_bytes(&mut bytes)
         .expect("SysRng fill failed");
     base32::encode(base32::Alphabet::Rfc4648 { padding: false }, &bytes)
+}
+
+/// Generate `count` backup codes, each 8 characters alphanumeric (uppercase + digits).
+fn generate_backup_codes(count: usize) -> Vec<String> {
+    use rand::TryRng;
+    const CHARSET: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 to avoid confusion
+    let mut codes = Vec::with_capacity(count);
+    for _ in 0..count {
+        let mut bytes = [0u8; 8];
+        rand::rngs::SysRng
+            .try_fill_bytes(&mut bytes)
+            .expect("SysRng fill failed");
+        let code: String = bytes
+            .iter()
+            .map(|&b| CHARSET[(b as usize) % CHARSET.len()] as char)
+            .collect();
+        codes.push(code);
+    }
+    codes
+}
+
+/// Verify a backup code against stored hashes. Marks matched code as used.
+async fn verify_backup_code(
+    pool: &PgPool,
+    customer_id: Uuid,
+    backup_code: &str,
+) -> Result<bool, AppError> {
+    let rows: Vec<(Uuid, String)> = sqlx::query_as(
+        "SELECT id, code_hash FROM tfa_backup_codes WHERE customer_id = $1 AND used = false",
+    )
+    .bind(customer_id)
+    .fetch_all(pool)
+    .await?;
+
+    for (row_id, hash) in &rows {
+        if jwt::verify_password_async(backup_code.to_string(), hash.clone())
+            .await
+            .unwrap_or(false)
+        {
+            // Mark as used
+            sqlx::query("UPDATE tfa_backup_codes SET used = true WHERE id = $1")
+                .bind(row_id)
+                .execute(pool)
+                .await?;
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }
 
 /// Verify a TOTP code against a base32-encoded secret.
