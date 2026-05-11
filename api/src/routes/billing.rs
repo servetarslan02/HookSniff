@@ -1,3 +1,4 @@
+use crate::audit_event;
 use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::routing::{get, post};
@@ -102,7 +103,7 @@ async fn cancel_subscription(
     // Audit log — SUBSCRIPTION_CANCEL
     {
         let rid = customer.id.to_string();
-        let _ = hooksniff_audit_event!(pool, customer.id, "SUBSCRIPTION_CANCEL", "billing", Some(&rid));
+        let _ = audit_event!(pool, customer.id, "SUBSCRIPTION_CANCEL", "billing", Some(&rid));
     }
 
     Ok(Json(serde_json::json!({
@@ -244,7 +245,7 @@ async fn upgrade_plan(
             // Audit log — PLAN_CHANGE
             {
                 let rid = customer.id.to_string();
-                let _ = hooksniff_audit_event!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
+                let _ = audit_event!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
                     serde_json::json!({"new_plan": new_plan.as_str(), "provider": provider_name}));
             }
 
@@ -279,7 +280,7 @@ async fn upgrade_plan(
             // Audit log — PLAN_CHANGE
             {
                 let rid = customer.id.to_string();
-                let _ = hooksniff_audit_event!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
+                let _ = audit_event!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
                     serde_json::json!({"new_plan": new_plan.as_str(), "provider": "stripe"}));
             }
 
