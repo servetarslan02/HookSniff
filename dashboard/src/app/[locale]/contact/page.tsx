@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
+import Footer from '@/components/Footer';
 
 
 
@@ -164,6 +165,7 @@ export default function ContactPage() {
           </form>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

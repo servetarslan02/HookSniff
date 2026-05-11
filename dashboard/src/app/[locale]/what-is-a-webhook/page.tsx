@@ -1,8 +1,9 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-export const metadata = { title: 'What is a Webhook? A Complete Guide — HookSniff' };
+import Footer from '@/components/Footer';
 
 export default function WhatIsWebhookPage() {
   const t = useTranslations('whatIsWebhook');
@@ -112,6 +113,7 @@ export default function WhatIsWebhookPage() {
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Get started →</Link>
         </div>
       </article>
+      <Footer />
     </div>
   );
 }
