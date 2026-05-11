@@ -13,18 +13,18 @@ import {
   type SuccessRateData,
 } from '@/lib/api';
 import {
+  LazyPieChart as PieChart,
+  LazyAreaChart as AreaChart,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
   Pie,
   Cell,
-  AreaChart,
   Area,
   Legend,
-} from 'recharts';
+} from '@/components/LazyCharts';
 import { OnboardingWizard, SetupChecklist } from '@/components/OnboardingWizard';
 import { StatCard, ChartCard, StatusBadge } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
