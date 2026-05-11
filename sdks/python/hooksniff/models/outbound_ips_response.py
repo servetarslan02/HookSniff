@@ -18,19 +18,18 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
 
-class OutboundIpsResponse(BaseModel):
+class OutboundIPsResponse(BaseModel):
     """
-    OutboundIpsResponse
+    List of static outbound IP addresses for firewall whitelisting
     """ # noqa: E501
-    ips: Optional[List[StrictStr]] = None
-    updated_at: Optional[StrictStr] = None
-    __properties: ClassVar[List[str]] = ["ips", "updated_at"]
+    ips: List[StrictStr] = Field(description="IPv4 and IPv6 addresses used for outbound requests")
+    __properties: ClassVar[List[str]] = ["ips"]
 
     model_config = ConfigDict(
         validate_by_name=True,
@@ -50,7 +49,7 @@ class OutboundIpsResponse(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of OutboundIpsResponse from a JSON string"""
+        """Create an instance of OutboundIPsResponse from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -75,7 +74,7 @@ class OutboundIpsResponse(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of OutboundIpsResponse from a dict"""
+        """Create an instance of OutboundIPsResponse from a dict"""
         if obj is None:
             return None
 
@@ -83,8 +82,7 @@ class OutboundIpsResponse(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "ips": obj.get("ips"),
-            "updated_at": obj.get("updated_at")
+            "ips": obj.get("ips")
         })
         return _obj
 
