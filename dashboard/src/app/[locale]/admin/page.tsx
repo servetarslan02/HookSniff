@@ -194,7 +194,7 @@ export default function AdminOverviewPage() {
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300">
                         {user.plan}
                       </span>
-                      <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">
                         {new Date(user.created_at).toLocaleDateString()}
                       </p>
                     </div>
