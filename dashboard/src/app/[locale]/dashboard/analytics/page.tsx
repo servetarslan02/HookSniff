@@ -70,9 +70,9 @@ export default function AnalyticsPage() {
 
   const rate = successRateData?.success_rate ?? 0;
   const pieData = [
-    { name: 'Success', value: successRateData?.successful ?? 0 },
-    { name: 'Failed', value: successRateData?.failed ?? 0 },
-    { name: 'Pending', value: successRateData?.pending ?? 0 },
+    { name: tc('success'), value: successRateData?.successful ?? 0 },
+    { name: tc('failed'), value: successRateData?.failed ?? 0 },
+    { name: tc('pending'), value: successRateData?.pending ?? 0 },
   ];
   const PIE_COLORS = ['#10b981', '#ef4444', '#f59e0b'];
 
