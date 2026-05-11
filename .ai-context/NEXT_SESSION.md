@@ -1,24 +1,45 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 17:27 GMT+8
+> Son güncelleme: 2026-05-11 18:12 GMT+8
 
 ---
 
-## 🚨 KRİTİK BLOKLAR (Oturum 108)
+## 🚨 KRİTİK BLOKLAR (Oturum 109 SONU)
 
-### 1. GitHub Actions Billing — BİTTİ
+### 1. Cloud Run API — DEPLOY BAŞARISIZ (EN KRİTİK)
+- **Sorun:** Son 5 revision (00059–00063) "container failed to start" hatasıyla başarısız
+- **Etki:** hooksniff-api Unavailable olarak görünüyor ama eski revision 00058 hala %100 traffic alıyor → API çalışıyor
+- **Hata mesajı:** "The user-provided container failed to start and listen on the port defined provided by the PORT=3000 environment variable within the allocated timeout"
+- **Cloud Logging:** Failed revision'da log YOK → container hiç başlamadan çöküyor
+- **Muhtemel nedenler (sırayla denenmeli):**
+  1. **OTEL init hatası** — `OTEL_ENABLED=true` iken Grafana Cloud'a bağlanırken crash olabilir
+     - Çözüm: `OTEL_ENABLED=false` ile deploy et (Oturum 109'da denendi ama tamamlanamadı)
+  2. **OTEL headers secret bozuk** — `otel-headers` secret'ı (v5) yanlış formatta olabilir
+     - Kontrol: Secret'ı GCP Secret Manager'dan oku, `Authorization=Basic <base64>` formatında olmalı
+  3. **Docker image build sorunu** — `rust:1-bookworm` builder image'ı farklı Rust sürümü kullanıyor olabilir
+     - Kontrol: Cloud Build loglarında `cargo build --release` adımını kontrol et
+  4. **Missing env var** — `NOTIFY_EMAIL` Cloud Run'da tanımlı değil ama kod Optional olarak handle ediyor (crash yapmamalı)
+- **Çözüm planı (öncelik sırası):**
+  1. OTEL_ENABLED=false ile yeni revision deploy et
+  2. Eğer bu çalışırsa → OTEL config'i debug et (headers, endpoint, secret)
+  3. Eğer çalışmazsa → Cloud Build loglarını kontrol et, Docker image'ı teşhis et
+  4. GCloud CLI kur → `gcloud run services describe hooksniff-api --region=europe-west1` ile detaylı bak
+
+### 2. GitHub Actions Billing — BİTTİ
 - **Sorun:** GitHub Actions dakikaları dolmuş, CI/CD çalışmıyor
 - **Çözüm: GCP Cloud Build kullan** — GitHub Actions'a gerek yok
-- **Komut:** `gcloud builds submit --config=cloudbuild.yaml --substitutions=_IMAGE_TAG=latest`
+- **Komut:** `gcloud builds submit --config=cloudbuild.yaml`
 - **veya:** GCP Console > Cloud Build > Triggers > tetikle
-- `cloudbuild.yaml` zaten repo'da mevcut **(Oturum 109: Cloud Run deploy adımı eklendi!)**
-- **⚠️ deploy.yml push edilemedi** — PAT `workflow` scope'u yok. Servet yeni PAT oluşturmalı veya deploy.yml'ı GitHub'da manuel düzenlemeli
+- `cloudbuild.yaml`'a Cloud Run deploy adımı eklendi ✅ (Oturum 109)
+- **⚠️ deploy.yml push edilemedi** — PAT `workflow` scope'u yok. Servet yeni PAT oluşturmalı
 
-### 2. Cloud Run API — Eski Revision Çalışıyor ⏳
-- **Durum:** API sağlıklı ama OTEL health check yok → eski kod çalışıyor
-- **Oturum 109 doğrulama:** `/health` → `status: healthy` ama `otel` objesi YOK
-- **Beklenen:** Yeni deploy ile OTEL health check ve boot test span'ı aktif olacak
-- **Çözüm:** Servet Cloud Build ile deploy etmeli (aşağıya bak)
+### 3. Grafana OTEL — Veri Akışı Kontrol Edilecek ⏳
+- **Durum:** API deploy sorunu çözülmeden OTEL verisi akmaz
+- **Kontrol:** Deploy başarılı olduktan sonra Grafana'da `otel_boot_test` span'ı ve metrics ara
+
+### 4. Grafana Trial — 9 Gün Kaldı
+- **Deadline:** May 20, 2026
+- **Çözüm:** Upgrade veya alternatif bul
 
 ### 3. Grafana OTEL — Veri Akışı Kontrol Edilecek ⏳
 - **Durum:** Prometheus up series = 0 (Oturum 108 başında)
