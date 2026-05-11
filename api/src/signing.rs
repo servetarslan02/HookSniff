@@ -8,7 +8,7 @@ pub use hooksniff_common::signing::{
     compute_hmac, compute_standard_signature, decode_secret, verify_hmac, verify_standard_signature,
     verify_with_rotation, HEADER_SVIX_ID, HEADER_SVIX_SIGNATURE, HEADER_SVIX_TIMESTAMP,
     HEADER_WEBHOOK_ID, HEADER_WEBHOOK_SIGNATURE, HEADER_WEBHOOK_TIMESTAMP,
-    DEFAULT_TIMESTAMP_TOLERANCE_SECS, VerificationError,
+    DEFAULT_TIMESTAMP_TOLERANCE_SECS,
 };
 
 /// Errors from Standard Webhooks verification.
