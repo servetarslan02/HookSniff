@@ -172,6 +172,7 @@ const icons = {
 
 /* ─── Dashboard Preview Mockup ─── */
 function DashboardPreview() {
+  const tHero = useTranslations('landing.hero');
   return (
     <div className="relative max-w-3xl mx-auto mt-12">
       <div className="absolute -inset-4 bg-gradient-to-r from-brand-500/20 to-purple-500/20 rounded-3xl blur-2xl" />
@@ -191,9 +192,9 @@ function DashboardPreview() {
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: 'Deliveries', value: '24,891', color: 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400' },
-              { label: 'Success Rate', value: '99.97%', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
-              { label: 'Avg Latency', value: '45ms', color: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' },
+              { label: tHero('deliveries'), value: '24,891', color: 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400' },
+              { label: tHero('successRate'), value: '99.97%', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
+              { label: tHero('avgLatency'), value: '45ms', color: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' },
             ].map(s => (
               <div key={s.label} className={`rounded-xl p-4 ${s.color}`}>
                 <div className="text-lg sm:text-2xl font-bold">{s.value}</div>

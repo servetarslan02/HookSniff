@@ -1189,7 +1189,10 @@
       "subtitle": "Send webhooks with confidence. Automatic retries, HMAC signatures, real-time monitoring. Built for developers who need reliability.",
       "cta": "Get started free",
       "ctaSecondary": "Read the docs",
-      "ctaDashboard": "Go to Dashboard →"
+      "ctaDashboard": "Go to Dashboard →",
+      "deliveries": "Deliveries",
+      "successRate": "Success Rate",
+      "avgLatency": "Avg Latency"
     },
     "code": {
       "filename": "send-webhook.sh",
