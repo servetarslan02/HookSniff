@@ -2,8 +2,12 @@
 //!
 //! Manage webhook endpoints — create, list, update, delete, rotate secrets.
 
+use crate::pagination::{Page, PaginatedIterator};
 use crate::request::{HookSniffRequest, HookSniffRequestContext, HttpMethod};
 use serde::{Deserialize, Serialize};
+
+const DEFAULT_PAGE_LIMIT: u32 = 50;
+const DEFAULT_MAX_PAGES: u32 = 100;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EndpointCreateInput {
@@ -57,6 +61,22 @@ impl Endpoints {
     pub fn list(&self) -> Result<Vec<EndpointOutput>, Box<dyn std::error::Error>> {
         let req = HookSniffRequest::new(HttpMethod::Get, "/v1/endpoints");
         req.send(&self.ctx)
+    }
+
+    /// List all endpoints with pagination
+    pub fn list_all(&self) -> Result<Vec<EndpointOutput>, Box<dyn std::error::Error>> {
+        let ctx = self.ctx.clone();
+        let mut iter = PaginatedIterator::new(
+            move |limit, offset| {
+                let mut req = HookSniffRequest::new(HttpMethod::Get, "/v1/endpoints");
+                req.set_query_param("limit", &limit.to_string());
+                req.set_query_param("offset", &offset.to_string());
+                req.send::<Page<EndpointOutput>>(&ctx)
+            },
+            DEFAULT_PAGE_LIMIT,
+            DEFAULT_MAX_PAGES,
+        );
+        iter.collect_all()
     }
 
     /// Create a new endpoint

@@ -7,8 +7,19 @@ module HookSniff
         @client = client
       end
 
-      def list
-        @client.get('/v1/endpoints')
+      def list(limit: nil, offset: nil)
+        path = '/v1/endpoints'
+        params = []
+        params << "limit=#{limit}" if limit
+        params << "offset=#{offset}" if offset
+        path += "?#{params.join('&')}" unless params.empty?
+        @client.get(path)
+      end
+
+      def list_all(limit: 50)
+        HookSniff::Pagination.collect_all(limit: limit) do |l, o|
+          list(limit: l, offset: o)
+        end
       end
 
       def create(input)
@@ -52,6 +63,12 @@ module HookSniff
         params << "offset=#{offset}" if offset
         path += "?#{params.join('&')}" unless params.empty?
         @client.get(path)
+      end
+
+      def list_all(limit: 50)
+        HookSniff::Pagination.collect_all(limit: limit) do |l, o|
+          list(limit: l, offset: o)
+        end
       end
 
       def get(id)
@@ -125,8 +142,19 @@ module HookSniff
         @client = client
       end
 
-      def list
-        @client.get('/v1/api-keys')
+      def list(limit: nil, offset: nil)
+        path = '/v1/api-keys'
+        params = []
+        params << "limit=#{limit}" if limit
+        params << "offset=#{offset}" if offset
+        path += "?#{params.join('&')}" unless params.empty?
+        @client.get(path)
+      end
+
+      def list_all(limit: 50)
+        HookSniff::Pagination.collect_all(limit: limit) do |l, o|
+          list(limit: l, offset: o)
+        end
       end
 
       def create(input)
@@ -159,8 +187,19 @@ module HookSniff
         @client = client
       end
 
-      def list
-        @client.get('/v1/teams/members')
+      def list(limit: nil, offset: nil)
+        path = '/v1/teams/members'
+        params = []
+        params << "limit=#{limit}" if limit
+        params << "offset=#{offset}" if offset
+        path += "?#{params.join('&')}" unless params.empty?
+        @client.get(path)
+      end
+
+      def list_all(limit: 50)
+        HookSniff::Pagination.collect_all(limit: limit) do |l, o|
+          list(limit: l, offset: o)
+        end
       end
 
       def invite(email, role)

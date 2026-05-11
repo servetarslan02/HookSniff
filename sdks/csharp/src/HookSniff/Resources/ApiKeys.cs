@@ -19,6 +19,12 @@ public class ApiKeys
         return resp ?? new List<ApiKeyInfo>();
     }
 
+    /// <summary>Collect all API keys. This endpoint is not paginated; this method exists for consistency.</summary>
+    public async Task<List<ApiKeyInfo>> ListAllAsync()
+    {
+        return await ListAsync();
+    }
+
     /// <summary>Create a new API key.</summary>
     public async Task<CreateApiKeyResponse> CreateAsync(string? name = null)
     {

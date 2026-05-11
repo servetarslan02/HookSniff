@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,40 @@ public class Endpoints {
 
     /** List all endpoints */
     public List<Map<String, Object>> list() throws ApiException, IOException, InterruptedException {
+        return list(null, null);
+    }
+
+    /** List endpoints with pagination */
+    public List<Map<String, Object>> list(Integer limit, Integer offset) throws ApiException, IOException, InterruptedException {
         RequestHelper req = new RequestHelper("GET", "/v1/endpoints");
+        HashMap<String, Object> params = new HashMap<>();
+        if (limit != null) params.put("limit", limit);
+        if (offset != null) params.put("offset", offset);
+        if (!params.isEmpty()) req.setQueryParams(params);
         return req.send(config, ENDPOINT_LIST);
+    }
+
+    /** Collect all endpoints across all pages */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> listAll() throws ApiException, IOException, InterruptedException {
+        return listAll(Pagination.DEFAULT_LIMIT);
+    }
+
+    /** Collect all endpoints across all pages with custom limit */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> listAll(int limit) throws ApiException, IOException, InterruptedException {
+        return Pagination.collectAll((l, o) -> {
+            try {
+                Map<String, Object> result = new HashMap<>();
+                result.put("data", list(l, o));
+                // Assume no more if returned less than limit
+                List<Map<String, Object>> data = (List<Map<String, Object>>) result.get("data");
+                result.put("has_more", data != null && data.size() == l);
+                return result;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, limit);
     }
 
     /** Create a new endpoint */
