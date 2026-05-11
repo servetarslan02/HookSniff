@@ -69,7 +69,9 @@
     "deleteTransform": "Delete transform",
     "logo": "Logo",
     "processing": "Processing...",
-    "copy": "Copy"
+    "copy": "Copy",
+    "backToDashboard": "Back to Dashboard",
+    "logout": "Logout"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -90,7 +92,18 @@
     "docs": "Documentation",
     "logout": "Logout",
     "transforms": "Transforms",
-    "inbound": "Inbound"
+    "inbound": "Inbound",
+    "backToDashboard": "Back to Dashboard",
+    "getStarted": "Get Started",
+    "rateLimiting": "Rate Limiting",
+    "signatureTool": "Signature Tool",
+    "apiImporter": "API Importer",
+    "portalCustomize": "Portal Customize",
+    "webhookBuilder": "Webhook Builder",
+    "auditLog": "Audit Log",
+    "ssoSaml": "SSO / SAML",
+    "retryPolicy": "Retry Policy",
+    "customDomain": "Custom Domain"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1052,7 +1065,16 @@
     "userInfo": "User Info",
     "successRate": "Success Rate",
     "noEndpoints": "No endpoints",
-    "recentDeliveries": "Recent Deliveries"
+    "recentDeliveries": "Recent Deliveries",
+    "nav": {
+      "overview": "Overview",
+      "users": "Users",
+      "revenue": "Revenue",
+      "system": "System",
+      "settingsNav": "Settings"
+    },
+    "adminBadge": "Admin",
+    "noAdminPrivileges": "You don't have admin privileges."
   },
   "landing": {
     "nav": {

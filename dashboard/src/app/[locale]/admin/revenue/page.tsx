@@ -18,17 +18,19 @@ export default function AdminRevenuePage() {
   const { token } = useAuth();
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
   const fetchRevenue = useCallback(async () => {
     if (!token) return;
     setLoading(true);
+    setError(null);
     try {
       const data = await adminApi.getRevenue(token);
       setRevenue(data);
     } catch (err) {
-      // Error handled silently
+      setError(err instanceof Error ? err.message : 'Failed to load revenue data');
     } finally {
       setLoading(false);
     }
