@@ -5,6 +5,7 @@ use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::audit_log;
 use crate::billing::Plan;
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -121,6 +122,12 @@ async fn create_endpoint(
     .fetch_one(&pool)
     .await?;
 
+    // Audit log — ENDPOINT_CREATE
+    {
+        let eid = endpoint.id.to_string();
+        let _ = audit_log!(pool, customer.id, "ENDPOINT_CREATE", "endpoint", Some(&eid));
+    }
+
     Ok(Json(endpoint.to_response()))
 }
 
@@ -153,6 +160,12 @@ async fn delete_endpoint(
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
+    }
+
+    // Audit log — ENDPOINT_DELETE
+    {
+        let eid = id.to_string();
+        let _ = audit_log!(pool, customer.id, "ENDPOINT_DELETE", "endpoint", Some(&eid));
     }
 
     Ok(Json(serde_json::json!({"deleted": true})))
@@ -259,6 +272,12 @@ async fn update_endpoint(
     .bind(req.format.as_deref())
     .fetch_one(&pool)
     .await?;
+
+    // Audit log — ENDPOINT_UPDATE
+    {
+        let eid = endpoint.id.to_string();
+        let _ = audit_log!(pool, customer.id, "ENDPOINT_UPDATE", "endpoint", Some(&eid));
+    }
 
     Ok(Json(endpoint.to_response()))
 }

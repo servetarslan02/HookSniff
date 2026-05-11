@@ -13,6 +13,9 @@ anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
+# Shared crate
+hooksniff-common = { path = "../common" }
+
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls", "form"] }
 axum = "0.8"
 sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid", "postgres", "json"] }
