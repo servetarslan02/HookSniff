@@ -171,6 +171,40 @@ Her aşamanın sonunda:
 
 ---
 
+## 🔍 Aşama Başlangıcı Araştırma Kuralı
+
+**Her yeni aşamaya başlarken ZORUNLU:**
+
+1. **İnternetten derin araştırma yap**
+   - İlgili teknolojinin güncel sürümü
+   - Best practices (en iyi uygulamalar)
+   - Referans implementasyonlar (Svix, Stripe, Twilio SDK'ları)
+   - Yaygın hatalar ve çözümleri
+   
+2. **Bulguları özetle**
+   - `.ai-context/sdk/RESEARCH-{AŞAMA}.md` dosyasına kaydet
+   - Hangi sürüm kullanılacak?
+   - Hangi pattern takip edilecek?
+   - Dikkat edilecek noktalar neler?
+
+3. **Önce kullanıcıya göster**
+   - Araştırmanın özetini paylaş
+   - Onay al
+   - Sonra uygulamaya başla
+
+### Örnek Akış
+```
+Aşama 2 başlıyor →
+  1. "Wrapper class araştırması yapıyorum..."
+  2. Svix Node.js SDK'sını incele
+  3. Güncel node-fetch/undici sürümlerini kontrol et
+  4. TypeScript best practices araştır
+  5. Özet çıkar → kullanıcıya göster
+  6. Onay → uygula
+```
+
+---
+
 ## 🚨 Kritik Kurallar
 
 1. **openapi.yaml'ı ASLA manuel publish etme** — Önce regenerate, sonra publish
