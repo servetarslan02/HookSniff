@@ -1,16 +1,17 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 15:35 GMT+8
+> Son güncelleme: 2026-05-11 15:42 GMT+8
 
 ---
 
 ## 🚨 KRİTİK BLOKLAR (Oturum 106)
 
-### 1. GitHub Actions Billing — ACİL
-- **Sorun:** "The job was not started because recent account payments have failed"
-- **Etki:** Tüm CI/CD workflow'ları blok, deploy tetiklenemiyor
-- **Çözüm:** GitHub Settings > Billing & plans > ödeme yöntemini güncelle
-- **Link:** https://github.com/settings/billing
+### 1. GitHub Actions Billing — BİTTİ
+- **Sorun:** GitHub Actions dakikaları dolmuş, CI/CD çalışmıyor
+- **Çözüm: GCP Cloud Build kullan** — GitHub Actions'a gerek yok
+- **Komut:** `gcloud builds submit --config=cloudbuild.yaml --substitutions=_IMAGE_TAG=latest`
+- **veya:** GCP Console > Cloud Build > Triggers > tetikle
+- `cloudbuild.yaml` zaten repo'da mevcut
 
 ### 2. Cloud Run API Unavailable — ACİL
 - **Sorun:** `api:latest` image'ı bozulmuş, son 3 revision (00059/00060/00061) startup timeout
