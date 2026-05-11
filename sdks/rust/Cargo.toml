@@ -1,22 +1,19 @@
 [package]
 name = "hooksniff"
-version = "1.0.0"
-authors = ["support@hooksniff.vercel.app"]
-description = "Webhook delivery, monitoring, and management API. All endpoints under `/v1` require authentication via `Authorization: Bearer <api_key>` header unless marked as **Public**. "
-license = "Proprietary"
+version = "0.4.0"
 edition = "2021"
+description = "Official Rust SDK for the HookSniff webhook delivery API"
+license = "MIT"
+authors = ["HookSniff <support@hooksniff.com>"]
 
 [dependencies]
-serde = { version = "^1.0", features = ["derive"] }
-serde_with = { version = "^3.8", default-features = false, features = ["base64", "std", "macros"] }
-serde_json = "^1.0"
-serde_repr = "^0.1"
-url = "^2.5"
-uuid = { version = "^1.8", features = ["serde", "v4"] }
-chrono = { version = "^0.4",  features = ["serde"] }
-reqwest = { version = "^0.13", default-features = false, features = ["json", "multipart", "query", "form"] }
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hmac = "0.12"
+sha2 = "0.10"
+base64 = "0.22"
+uuid = { version = "1", features = ["v4"] }
+url = "2"
 
-[features]
-default = ["native-tls"]
-native-tls = ["reqwest/native-tls"]
-rustls = ["reqwest/rustls"]
+[dev-dependencies]
