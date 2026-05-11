@@ -148,3 +148,13 @@ b8490b47 docs: operational documentation
 ---
 
 *Son güncelleme: 2026-05-12 06:10 GMT+8*
+
+### Ek Düzeltmeler (06:45-06:52 arası)
+
+| # | İş | Durum | Commit |
+|---|---|-------|--------|
+| BUG-003 | Email validation (validate_email fonksiyonu) | ✅ | 322f2088 |
+| HS-018 | Error classification (is_retryable_status) | ✅ | 687eb814 |
+| — | Layout SVG aria-hidden fix | ✅ | 7be2a13f |
+| — | Notifications per_page limit standardizasyonu | ✅ | 7be2a13f |
+| — | IMPLEMENTATION-PLAN tracking güncellendi | ✅ | 907f2f35 |
