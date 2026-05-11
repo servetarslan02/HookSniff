@@ -37,7 +37,7 @@ export default function LogsPage() {
       setDeliveries(data.deliveries);
       setTotal(data.total);
     } catch (err: unknown) {
-      setError(getErrorMessage(err) || 'Failed to load logs');
+      setError(getErrorMessage(err) || tc('failedToLoadLogs'));
     } finally {
       setLoading(false);
     }

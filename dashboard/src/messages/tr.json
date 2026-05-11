@@ -82,7 +82,12 @@
     "failedToCreate": "Oluşturulamadı",
     "failedToLoadEndpoints": "Uç noktalar yüklenemedi",
     "failedToLoadTransforms": "Dönüşüm kuralları yüklenemedi",
-    "failedToDelete": "Silinemedi"
+    "failedToDelete": "Silinemedi",
+    "cancelFailed": "İptal başarısız",
+    "upgradeFailed": "Yükseltme başarısız",
+    "failedToLoadDeliveries": "Teslimatlar yüklenemedi",
+    "replayFailed": "Tekrar oynatma başarısız",
+    "failedToLoadLogs": "Loglar yüklenemedi"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
