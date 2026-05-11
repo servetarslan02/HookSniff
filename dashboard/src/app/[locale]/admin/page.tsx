@@ -88,7 +88,7 @@ export default function AdminOverviewPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-          Platform-wide metrics and recent activity
+          {t('overviewDesc')}
         </p>
       </div>
 
@@ -97,25 +97,25 @@ export default function AdminOverviewPage() {
         <StatCard
           label={t('totalUsers')}
           value={stats?.total_users?.toLocaleString() || '0'}
-          icon={<span className="text-lg">👥</span>}
+          icon={<span className="text-lg" aria-hidden="true">👥</span>}
           color="blue"
         />
         <StatCard
           label={t('totalDeliveries')}
           value={stats?.total_deliveries?.toLocaleString() || '0'}
-          icon={<span className="text-lg">📦</span>}
+          icon={<span className="text-lg" aria-hidden="true">📦</span>}
           color="emerald"
         />
         <StatCard
           label={t('totalRevenue')}
-          value={`$${(stats?.total_revenue || 0).toLocaleString()}`}
-          icon={<span className="text-lg">💰</span>}
+          value={`₺${(stats?.total_revenue || 0).toLocaleString()}`}
+          icon={<span className="text-lg" aria-hidden="true">💰</span>}
           color="violet"
         />
         <StatCard
           label={t('activeUsersToday')}
           value={stats?.active_users_today?.toLocaleString() || '0'}
-          icon={<span className="text-lg">🔥</span>}
+          icon={<span className="text-lg" aria-hidden="true">🔥</span>}
           color="amber"
         />
       </div>
@@ -170,7 +170,7 @@ export default function AdminOverviewPage() {
               </div>
             </div>
           ) : (
-            <p className="text-gray-400 dark:text-slate-500 text-sm">{t('noData')}</p>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noData')}</p>
           )}
         </div>
 
@@ -202,8 +202,8 @@ export default function AdminOverviewPage() {
                 </div>
               ))
             ) : (
-              <div className="px-6 py-8 text-center text-gray-400 dark:text-slate-500 text-sm">
-                No recent signups
+              <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
+                {t('noSignups')}
               </div>
             )}
           </div>

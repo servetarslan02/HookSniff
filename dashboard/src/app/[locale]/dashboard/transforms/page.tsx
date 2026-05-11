@@ -15,7 +15,7 @@ export default function TransformsPage() {
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
   const [rules, setRules] = useState<TransformRule[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
