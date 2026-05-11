@@ -19,4 +19,7 @@ chrono = { version = "0.4", features = ["serde"] }
 serde_repr = "0.1"
 serde_with = "3"
 
+[features]
+test-utils = []
+
 [dev-dependencies]
