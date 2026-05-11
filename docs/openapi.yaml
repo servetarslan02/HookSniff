@@ -139,6 +139,8 @@ components:
         refresh_token:
           type: string
           description: Refresh token to invalidate
+      required:
+      - refresh_token
     AuthResponse:
       type: object
       properties:
@@ -163,6 +165,10 @@ components:
           type: string
         message:
           type: string
+      required:
+      - requires_2fa
+      - temp_token
+      - message
     CustomerResponse:
       type: object
       properties:
@@ -191,6 +197,14 @@ components:
           type: boolean
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - email
+      - plan
+      - webhook_limit
+      - webhook_count
+      - is_admin
+      - created_at
     ForgotPasswordRequest:
       type: object
       properties:
@@ -475,6 +489,16 @@ components:
           enum:
           - standard
           - cloudevents
+      required:
+      - url
+      - description
+      - is_active
+      - allowed_ips
+      - event_filter
+      - retry_policy
+      - routing_strategy
+      - fallback_url
+      - format
     RetryPolicy:
       type: object
       properties:
@@ -494,6 +518,11 @@ components:
         max_delay_secs:
           type: integer
           default: 3600
+      required:
+      - max_attempts
+      - backoff
+      - initial_delay_secs
+      - max_delay_secs
     RotateSecretResponse:
       type: object
       description: New signing secret after rotation
@@ -552,6 +581,13 @@ components:
           type: integer
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - endpoint_id
+      - status
+      - attempt_count
+      - replay_count
+      - created_at
     DeliveryListResponse:
       type: object
       properties:
@@ -565,6 +601,11 @@ components:
           type: integer
         per_page:
           type: integer
+      required:
+      - deliveries
+      - total
+      - page
+      - per_page
     BatchResponse:
       type: object
       properties:
@@ -581,6 +622,9 @@ components:
                 type: integer
               error:
                 type: string
+      required:
+      - deliveries
+      - errors
     DeliveryAttempt:
       type: object
       properties:
@@ -602,6 +646,10 @@ components:
           nullable: true
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - attempt_number
+      - created_at
     BatchReplayRequest:
       type: object
       properties:
@@ -626,6 +674,11 @@ components:
           nullable: true
         is_active:
           type: boolean
+      required:
+      - id
+      - prefix
+      - created_at
+      - is_active
     CreateApiKeyResponse:
       type: object
       properties:
@@ -638,6 +691,11 @@ components:
           type: string
         message:
           type: string
+      required:
+      - id
+      - key
+      - prefix
+      - message
     AlertRule:
       type: object
       properties:
@@ -665,6 +723,14 @@ components:
           type: boolean
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - name
+      - condition
+      - threshold
+      - channels
+      - is_active
+      - created_at
     CreateAlertRequest:
       type: object
       properties:
@@ -707,6 +773,9 @@ components:
                 type: integer
               total:
                 type: integer
+      required:
+      - range
+      - buckets
     SuccessRateResponse:
       type: object
       properties:
@@ -721,6 +790,12 @@ components:
         success_rate:
           type: number
           format: double
+      required:
+      - range
+      - successful
+      - failed
+      - pending
+      - success_rate
     LatencyTrendResponse:
       type: object
       properties:
@@ -739,6 +814,10 @@ components:
                 type: number
         overall_avg_ms:
           type: number
+      required:
+      - range
+      - buckets
+      - overall_avg_ms
     StatsResponse:
       type: object
       properties:
@@ -758,6 +837,15 @@ components:
           type: integer
         webhook_count:
           type: integer
+      required:
+      - total_deliveries
+      - successful_deliveries
+      - failed_deliveries
+      - total_endpoints
+      - active_endpoints
+      - plan
+      - webhook_limit
+      - webhook_count
     SearchResult:
       type: object
       properties:
@@ -767,6 +855,9 @@ components:
             $ref: '#/components/schemas/Delivery'
         total:
           type: integer
+      required:
+      - deliveries
+      - total
     Notification:
       type: object
       properties:
@@ -783,6 +874,12 @@ components:
           nullable: true
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - title
+      - body
+      - is_read
+      - created_at
     NotificationListResponse:
       type: object
       properties:
@@ -794,6 +891,10 @@ components:
           type: integer
         unread_count:
           type: integer
+      required:
+      - notifications
+      - total
+      - unread_count
     RegisterDeviceRequest:
       type: object
       properties:
@@ -819,6 +920,11 @@ components:
           type: string
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - token
+      - platform
+      - created_at
     Team:
       type: object
       properties:
@@ -828,6 +934,10 @@ components:
           type: string
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - name
+      - created_at
     CreateTeamRequest:
       type: object
       properties:
@@ -873,6 +983,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TeamInvite'
+      required:
+      - team
+      - members
+      - invites
     TeamMember:
       type: object
       properties:
@@ -889,6 +1003,12 @@ components:
           type: string
         joined_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - user_id
+      - email
+      - role
+      - joined_at
     TeamInvite:
       type: object
       properties:
@@ -900,6 +1020,11 @@ components:
           type: string
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - email
+      - role
+      - created_at
     SubscriptionResponse:
       type: object
       properties:
@@ -917,6 +1042,14 @@ components:
           type: integer
         monthly_price_cents:
           type: integer
+      required:
+      - plan
+      - status
+      - payment_provider
+      - webhook_limit
+      - endpoint_limit
+      - retention_days
+      - monthly_price_cents
     UpgradeRequest:
       type: object
       properties:
@@ -943,6 +1076,9 @@ components:
           type: string
         message:
           type: string
+      required:
+      - provider
+      - message
     UsageResponse:
       type: object
       properties:
@@ -960,6 +1096,14 @@ components:
           type: integer
         endpoints_limit:
           type: integer
+      required:
+      - plan
+      - period_start
+      - period_end
+      - webhooks_used
+      - webhooks_limit
+      - endpoints_used
+      - endpoints_limit
     InvoiceResponse:
       type: object
       properties:
@@ -973,6 +1117,12 @@ components:
           type: string
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - amount_cents
+      - currency
+      - status
+      - created_at
     WebhookTemplate:
       type: object
       properties:
@@ -986,6 +1136,11 @@ components:
           type: string
         payload_template:
           type: object
+      required:
+      - id
+      - name
+      - description
+      - category
     ApplyTemplateRequest:
       type: object
       properties:
@@ -1002,6 +1157,9 @@ components:
           type: boolean
         message:
           type: string
+      required:
+      - success
+      - message
     RegisterSchemaRequest:
       type: object
       properties:
@@ -1036,6 +1194,12 @@ components:
           type: integer
         is_healthy:
           type: boolean
+      required:
+      - endpoint_id
+      - routing_strategy
+      - avg_response_ms
+      - failure_streak
+      - is_healthy
     UpdateRoutingRequest:
       type: object
       properties:
@@ -1048,6 +1212,9 @@ components:
         fallback_url:
           type: string
           format: uri
+      required:
+      - routing_strategy
+      - fallback_url
     EndpointHealth:
       type: object
       description: Endpoint health metrics and status
@@ -1103,6 +1270,11 @@ components:
           type: integer
         response_body:
           type: string
+      required:
+      - success
+      - status_code
+      - duration_ms
+      - response_body
     TransformRule:
       type: object
       properties:
@@ -1120,6 +1292,13 @@ components:
           type: boolean
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - endpoint_id
+      - name
+      - rule_type
+      - is_active
+      - created_at
     CreateTransformRuleRequest:
       type: object
       properties:
@@ -1157,6 +1336,9 @@ components:
           type: boolean
         message:
           type: string
+      required:
+      - success
+      - message
     OutboundIpsResponse:
       type: object
       properties:
@@ -1166,6 +1348,9 @@ components:
             type: string
         updated_at:
           type: string
+      required:
+      - ips
+      - updated_at
     SystemStatus:
       type: object
       properties:
@@ -1195,6 +1380,11 @@ components:
                 type: string
         checked_at:
           type: string
+      required:
+      - overall_status
+      - uptime_30d
+      - components
+      - checked_at
     NotificationPreferences:
       type: object
       properties:
@@ -1216,6 +1406,10 @@ components:
         webhook_url:
           type: string
           nullable: true
+      required:
+      - email_on_failure
+      - email_on_dead_letter
+      - email_on_success
     UpdateNotificationPreferences:
       type: object
       properties:
@@ -1234,6 +1428,10 @@ components:
         webhook_url:
           type: string
           nullable: true
+      required:
+      - email_on_failure
+      - email_on_dead_letter
+      - email_on_success
     PortalProfile:
       type: object
       properties:
@@ -1248,6 +1446,11 @@ components:
           type: string
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - email
+      - plan
+      - created_at
     PaginatedUsers:
       type: object
       properties:
@@ -1261,6 +1464,11 @@ components:
           type: integer
         per_page:
           type: integer
+      required:
+      - users
+      - total
+      - page
+      - per_page
     UserSummary:
       type: object
       properties:
@@ -1277,6 +1485,12 @@ components:
           type: boolean
         created_at:
           $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - email
+      - plan
+      - is_active
+      - created_at
     SystemStats:
       type: object
       properties:
@@ -1297,6 +1511,12 @@ components:
                 type: string
               count:
                 type: integer
+      required:
+      - total_users
+      - active_users
+      - total_endpoints
+      - total_deliveries
+      - plan_breakdown
     StreamParams:
       type: object
       properties:
@@ -1312,6 +1532,10 @@ components:
         limit:
           type: integer
           default: 50
+      required:
+      - endpoint_id
+      - status
+      - limit
     DeliveryDetailResponse:
       type: object
       description: Full delivery detail including all retry attempts and endpoint info
@@ -1366,6 +1590,14 @@ components:
         per_page:
           type: integer
           default: 20
+      required:
+      - status
+      - endpoint_id
+      - event_type
+      - from_date
+      - to_date
+      - page
+      - per_page
     BatchWebhookResponse:
       type: object
       description: Response for batch webhook delivery creation
@@ -1414,6 +1646,8 @@ components:
         reason:
           type: string
           description: Optional reason for cancellation
+      required:
+      - reason
     CancelSubscriptionResponse:
       type: object
       description: Result of subscription cancellation
@@ -1528,6 +1762,11 @@ components:
             - slack
             - email
             - webhook
+      required:
+      - name
+      - condition
+      - threshold
+      - channels
     AlertNotificationListResponse:
       type: object
       description: Paginated list of alert notifications
@@ -1768,6 +2007,9 @@ components:
           type: string
         description:
           type: string
+      required:
+      - name
+      - description
     TeamMemberListResponse:
       type: object
       description: List of members in a team
@@ -1931,6 +2173,8 @@ components:
         transform:
           type: object
           nullable: true
+      required:
+      - name
     PortalConfig:
       type: object
       description: Customer-facing portal branding and configuration
@@ -2162,6 +2406,9 @@ components:
           - oidc
         domain:
           type: string
+      required:
+      - provider
+      - domain
     CustomDomain:
       type: object
       description: A custom domain configured for the account
@@ -2495,6 +2742,8 @@ components:
         config:
           type: object
           description: Updated transformation configuration
+      required:
+      - name
     OutboundIPsResponse:
       type: object
       description: List of static outbound IP addresses for firewall whitelisting
