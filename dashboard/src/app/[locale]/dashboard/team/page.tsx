@@ -150,13 +150,13 @@ export default function TeamPage() {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('yourTeams')}</h3>
           </div>
           {loading ? (
-            <div className="p-6 text-center text-gray-400 dark:text-slate-500 animate-pulse text-sm">
+            <div className="p-6 text-center text-gray-500 dark:text-slate-400 animate-pulse text-sm">
               Loading teams...
             </div>
           ) : teams.length === 0 ? (
             <div className="p-6 text-center">
               <div className="text-3xl mb-2">👥</div>
-              <p className="text-sm text-gray-400 dark:text-slate-500">{t('noTeams')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('noTeams')}</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -174,7 +174,7 @@ export default function TeamPage() {
                       {team.description}
                     </p>
                   )}
-                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                     {team.member_count || 0} members · Created {new Date(team.created_at).toLocaleDateString()}
                   </p>
                 </button>
@@ -203,7 +203,7 @@ export default function TeamPage() {
               </div>
               <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {members.length === 0 ? (
-                  <div className="px-6 py-8 text-center text-gray-400 dark:text-slate-500 text-sm">
+                  <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
                     No members yet. Invite someone!
                   </div>
                 ) : (
@@ -214,7 +214,7 @@ export default function TeamPage() {
                           {m.name || m.email}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-slate-400">{m.email}</p>
-                        <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                           Joined {new Date(m.joined_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -243,7 +243,7 @@ export default function TeamPage() {
           ) : (
             <div className="glass-card p-12 text-center">
               <div className="text-4xl mb-3">👈</div>
-              <p className="text-gray-400 dark:text-slate-500">
+              <p className="text-gray-500 dark:text-slate-400">
                 Select a team to view details
               </p>
             </div>

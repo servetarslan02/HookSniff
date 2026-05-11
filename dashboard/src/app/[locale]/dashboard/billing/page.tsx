@@ -302,7 +302,7 @@ export default function BillingPage() {
             <UsageChart data={chartData} />
           </div>
         ) : (
-          <p className="text-sm text-gray-400 dark:text-slate-500 py-6 text-center">
+          <p className="text-sm text-gray-500 dark:text-slate-400 py-6 text-center">
             {t('noUsageData')}
           </p>
         )}
@@ -368,7 +368,7 @@ export default function BillingPage() {
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('invoiceHistory')}</h2>
-          <span className="text-sm text-gray-400 dark:text-slate-500">{invoices.length} {t('invoices')}</span>
+          <span className="text-sm text-gray-500 dark:text-slate-400">{invoices.length} {t('invoices')}</span>
         </div>
         {loadingInvoices ? (
           <div className="px-6 py-12 text-center">
