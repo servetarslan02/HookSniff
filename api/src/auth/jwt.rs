@@ -323,6 +323,7 @@ mod tests {
             email: "test@test.com".into(),
             plan: "pro".into(),
             exp: 1234567890,
+            is_admin: false,
         };
         let debug = format!("{:?}", claims);
         assert!(debug.contains("Claims"));
