@@ -164,26 +164,39 @@ pub fn truncate_str(s: &str, max_len: usize) -> String {
 fn validate_delivery_url(url: &str) -> Result<(), String> {
     use std::net::IpAddr;
 
-    // Simple URL parsing without `url` crate
-    let (scheme, rest) = if let Some(r) = url.strip_prefix("https://") {
-        ("https", r)
-    } else if let Some(r) = url.strip_prefix("http://") {
-        ("http", r)
-    } else {
-        return Err(format!("URL scheme must be http or https"));
-    };
-    let _ = scheme; // scheme is valid at this point
+    // Normalize to lowercase to prevent scheme bypass (e.g. HTTP://)
+    let url_lower = url.to_lowercase();
 
-    // Extract host (before first / or : or ?)
-    let host_end = rest.find(|c: char| c == '/' || c == ':' || c == '?').unwrap_or(rest.len());
-    let host_str = &rest[..host_end];
+    // Simple URL parsing without `url` crate
+    let rest = if let Some(r) = url_lower.strip_prefix("https://") {
+        r
+    } else if let Some(r) = url_lower.strip_prefix("http://") {
+        r
+    } else {
+        return Err("URL scheme must be http or https".into());
+    };
+
+    // Extract host — handle userinfo (@), port (:), IPv6 brackets ([)
+    let host_str = if rest.starts_with('[') {
+        // IPv6: extract until closing bracket
+        match rest.find(']') {
+            Some(end) => &rest[1..end],
+            None => return Err("Invalid IPv6 URL: missing closing bracket".into()),
+        }
+    } else {
+        // IPv4/hostname: strip userinfo (user@host), then port (:port)
+        let without_at = rest.split('@').last().unwrap_or(rest);
+        let host_end = without_at.find(|c: char| c == '/' || c == ':' || c == '?' || c == '#')
+            .unwrap_or(without_at.len());
+        &without_at[..host_end]
+    };
 
     if host_str.is_empty() {
         return Err("No host in URL".into());
     }
 
     // Block localhost
-    if host_str == "localhost" || host_str == "0.0.0.0" || host_str == "[::1]" {
+    if host_str == "localhost" || host_str == "0.0.0.0" || host_str == "[::1]" || host_str == "::1" {
         return Err("Blocked localhost/loopback".into());
     }
 
@@ -197,6 +210,16 @@ fn validate_delivery_url(url: &str) -> Result<(), String> {
     // If it's a direct IP, validate it
     if let Ok(ip) = host_str.parse::<IpAddr>() {
         return check_ip_not_private(ip);
+    }
+
+    // Block hex/octal/decimal IP representations that bypass parse::<IpAddr>
+    // These would go to DNS which might resolve to private IPs
+    if host_str.starts_with("0x") || host_str.starts_with("0X") {
+        return Err(format!("Blocked hex IP representation: {}", host_str));
+    }
+    // Pure numeric (decimal IP like 2130706433)
+    if host_str.chars().all(|c| c.is_ascii_digit()) && host_str.len() > 9 {
+        return Err(format!("Blocked decimal IP representation: {}", host_str));
     }
 
     // DNS resolution and IP validation
@@ -251,6 +274,23 @@ fn check_ip_not_private(ip: std::net::IpAddr) -> Result<(), String> {
             // Unique local: fc00::/7
             if (v6.segments()[0] & 0xFE00) == 0xFC00 {
                 return Err(format!("Blocked unique-local IP: {}", ip));
+            }
+            // IPv4-mapped IPv6: ::ffff:0:0/96 (e.g. ::ffff:127.0.0.1)
+            if v6.segments()[0] == 0
+                && v6.segments()[1] == 0
+                && v6.segments()[2] == 0
+                && v6.segments()[3] == 0
+                && v6.segments()[4] == 0
+                && v6.segments()[5] == 0xffff
+            {
+                // Extract embedded IPv4 and validate it
+                let embedded_v4 = std::net::Ipv4Addr::new(
+                    (v6.segments()[6] >> 8) as u8,
+                    (v6.segments()[6] & 0xff) as u8,
+                    (v6.segments()[7] >> 8) as u8,
+                    (v6.segments()[7] & 0xff) as u8,
+                );
+                return check_ip_not_private(std::net::IpAddr::V4(embedded_v4));
             }
         }
     }

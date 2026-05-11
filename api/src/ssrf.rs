@@ -198,6 +198,23 @@ fn check_ipv6(ip: &Ipv6Addr) -> Result<(), SsrfError> {
         return Err(SsrfError::BlockedIp(IpAddr::V6(*ip)));
     }
 
+    // IPv4-mapped IPv6: ::ffff:0:0/96 (e.g. ::ffff:127.0.0.1)
+    if ip.segments()[0] == 0
+        && ip.segments()[1] == 0
+        && ip.segments()[2] == 0
+        && ip.segments()[3] == 0
+        && ip.segments()[4] == 0
+        && ip.segments()[5] == 0xffff
+    {
+        let embedded_v4 = Ipv4Addr::new(
+            (ip.segments()[6] >> 8) as u8,
+            (ip.segments()[6] & 0xff) as u8,
+            (ip.segments()[7] >> 8) as u8,
+            (ip.segments()[7] & 0xff) as u8,
+        );
+        return check_ipv4(&embedded_v4);
+    }
+
     Ok(())
 }
 
