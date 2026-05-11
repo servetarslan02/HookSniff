@@ -1,4 +1,4 @@
-# OpenapiClient::SimulatorPostRequest
+# HookSniff::SimulatorPostRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SimulatorPostRequest.new(
+instance = HookSniff::SimulatorPostRequest.new(
   endpoint_id: null,
   event: null,
   data: null

@@ -1,4 +1,4 @@
-# OpenapiClient::SystemStatsPlanBreakdownInner
+# HookSniff::SystemStatsPlanBreakdownInner
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SystemStatsPlanBreakdownInner.new(
+instance = HookSniff::SystemStatsPlanBreakdownInner.new(
   plan: null,
   count: null
 )

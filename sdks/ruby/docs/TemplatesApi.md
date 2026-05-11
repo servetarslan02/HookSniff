@@ -1,4 +1,4 @@
-# OpenapiClient::TemplatesApi
+# HookSniff::TemplatesApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -19,14 +19,14 @@ List available templates
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::TemplatesApi.new
+api_instance = HookSniff::TemplatesApi.new
 opts = {
   category: 'category_example' # String | 
 }
@@ -35,7 +35,7 @@ begin
   # List available templates
   result = api_instance.templates_get(opts)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling TemplatesApi->templates_get: #{e}"
 end
 ```
@@ -53,7 +53,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<WebhookTemplate>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling TemplatesApi->templates_get_with_http_info: #{e}"
 end
 ```
@@ -88,22 +88,22 @@ Apply template to an endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::TemplatesApi.new
+api_instance = HookSniff::TemplatesApi.new
 id = 'id_example' # String | 
-apply_template_request = OpenapiClient::ApplyTemplateRequest.new({endpoint_id: 'endpoint_id_example'}) # ApplyTemplateRequest | 
+apply_template_request = HookSniff::ApplyTemplateRequest.new({endpoint_id: 'endpoint_id_example'}) # ApplyTemplateRequest | 
 
 begin
   # Apply template to an endpoint
   result = api_instance.templates_id_apply_post(id, apply_template_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling TemplatesApi->templates_id_apply_post: #{e}"
 end
 ```
@@ -121,7 +121,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <ApplyTemplateResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling TemplatesApi->templates_id_apply_post_with_http_info: #{e}"
 end
 ```
@@ -157,21 +157,21 @@ Get template by ID
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::TemplatesApi.new
+api_instance = HookSniff::TemplatesApi.new
 id = 'id_example' # String | 
 
 begin
   # Get template by ID
   result = api_instance.templates_id_get(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling TemplatesApi->templates_id_get: #{e}"
 end
 ```
@@ -189,7 +189,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <WebhookTemplate>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling TemplatesApi->templates_id_get_with_http_info: #{e}"
 end
 ```

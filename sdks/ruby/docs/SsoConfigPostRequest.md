@@ -1,4 +1,4 @@
-# OpenapiClient::SsoConfigPostRequest
+# HookSniff::SsoConfigPostRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SsoConfigPostRequest.new(
+instance = HookSniff::SsoConfigPostRequest.new(
   provider: null,
   enabled: null
 )

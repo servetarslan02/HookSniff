@@ -1,23 +1,23 @@
-# OpenapiClient::AlertRule
+# HookSniff::AlertRule
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **name** | **String** |  | [optional] |
-| **condition** | **String** |  | [optional] |
-| **threshold** | **Integer** |  | [optional] |
-| **channels** | **Array&lt;String&gt;** |  | [optional] |
-| **is_active** | **Boolean** |  | [optional] |
-| **created_at** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **name** | **String** |  |  |
+| **condition** | **String** |  |  |
+| **threshold** | **Integer** |  |  |
+| **channels** | **Array&lt;String&gt;** |  |  |
+| **is_active** | **Boolean** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::AlertRule.new(
+instance = HookSniff::AlertRule.new(
   id: null,
   name: null,
   condition: null,

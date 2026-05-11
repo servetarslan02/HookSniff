@@ -1,16 +1,16 @@
-# hooksniff.Model.SubscriptionResponse
+# HookSniff.Model.SubscriptionResponse
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Plan** | **string** |  | [optional] 
-**Status** | **string** |  | [optional] 
-**PaymentProvider** | **string** |  | [optional] 
-**WebhookLimit** | **int** |  | [optional] 
-**EndpointLimit** | **int** |  | [optional] 
-**RetentionDays** | **int** |  | [optional] 
-**MonthlyPriceCents** | **int** |  | [optional] 
+**Plan** | **string** |  | 
+**Status** | **string** |  | 
+**PaymentProvider** | **string** |  | 
+**WebhookLimit** | **int** |  | 
+**EndpointLimit** | **int** |  | 
+**RetentionDays** | **int** |  | 
+**MonthlyPriceCents** | **int** |  | 
 
 [[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
 

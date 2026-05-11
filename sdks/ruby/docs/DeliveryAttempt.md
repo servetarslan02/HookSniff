@@ -1,23 +1,23 @@
-# OpenapiClient::DeliveryAttempt
+# HookSniff::DeliveryAttempt
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **attempt_number** | **Integer** |  | [optional] |
+| **id** | **String** |  |  |
+| **attempt_number** | **Integer** |  |  |
 | **status_code** | **Integer** |  | [optional] |
 | **response_body** | **String** |  | [optional] |
 | **duration_ms** | **Integer** |  | [optional] |
 | **error_message** | **String** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::DeliveryAttempt.new(
+instance = HookSniff::DeliveryAttempt.new(
   id: null,
   attempt_number: null,
   status_code: null,

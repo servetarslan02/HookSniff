@@ -1,4 +1,4 @@
-# hooksniff.Api.BillingApi
+# HookSniff.Api.BillingApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 

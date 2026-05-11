@@ -1,4 +1,4 @@
-# OpenapiClient::ContactRequest
+# HookSniff::ContactRequest
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ContactRequest.new(
+instance = HookSniff::ContactRequest.new(
   name: null,
   email: null,
   subject: null,

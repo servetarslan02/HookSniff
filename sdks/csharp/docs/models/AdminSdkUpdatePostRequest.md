@@ -1,4 +1,4 @@
-# hooksniff.Model.AdminSdkUpdatePostRequest
+# HookSniff.Model.AdminSdkUpdatePostRequest
 
 ## Properties
 

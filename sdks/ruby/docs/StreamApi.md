@@ -1,4 +1,4 @@
-# OpenapiClient::StreamApi
+# HookSniff::StreamApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -19,14 +19,14 @@ Server-Sent Events stream of webhook deliveries
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::StreamApi.new
+api_instance = HookSniff::StreamApi.new
 opts = {
   endpoint_id: '38400000-8cf0-11bd-b23e-10b96e4ef00d', # String | 
   status: 'status_example', # String | 
@@ -37,7 +37,7 @@ begin
   # Real-time delivery event stream (SSE)
   result = api_instance.stream_deliveries_get(opts)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling StreamApi->stream_deliveries_get: #{e}"
 end
 ```
@@ -55,7 +55,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => String
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling StreamApi->stream_deliveries_get_with_http_info: #{e}"
 end
 ```

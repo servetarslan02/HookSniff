@@ -1,4 +1,4 @@
-# OpenapiClient::InviteRequest
+# HookSniff::InviteRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::InviteRequest.new(
+instance = HookSniff::InviteRequest.new(
   email: null,
   role: null
 )

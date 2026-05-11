@@ -1,24 +1,24 @@
-# OpenapiClient::StatsResponse
+# HookSniff::StatsResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **total_deliveries** | **Integer** |  | [optional] |
-| **successful_deliveries** | **Integer** |  | [optional] |
-| **failed_deliveries** | **Integer** |  | [optional] |
-| **total_endpoints** | **Integer** |  | [optional] |
-| **active_endpoints** | **Integer** |  | [optional] |
-| **plan** | **String** |  | [optional] |
-| **webhook_limit** | **Integer** |  | [optional] |
-| **webhook_count** | **Integer** |  | [optional] |
+| **total_deliveries** | **Integer** |  |  |
+| **successful_deliveries** | **Integer** |  |  |
+| **failed_deliveries** | **Integer** |  |  |
+| **total_endpoints** | **Integer** |  |  |
+| **active_endpoints** | **Integer** |  |  |
+| **plan** | **String** |  |  |
+| **webhook_limit** | **Integer** |  |  |
+| **webhook_count** | **Integer** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::StatsResponse.new(
+instance = HookSniff::StatsResponse.new(
   total_deliveries: null,
   successful_deliveries: null,
   failed_deliveries: null,

@@ -1,4 +1,4 @@
-# hooksniff.Model.AuthLoginPost200Response
+# HookSniff.Model.AuthLoginPost200Response
 
 ## Properties
 

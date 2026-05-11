@@ -1,4 +1,4 @@
-# OpenapiClient::UpgradeRequest
+# HookSniff::UpgradeRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::UpgradeRequest.new(
+instance = HookSniff::UpgradeRequest.new(
   plan: null,
   provider: null
 )

@@ -1,21 +1,21 @@
-# OpenapiClient::SuccessRateResponse
+# HookSniff::SuccessRateResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **range** | **String** |  | [optional] |
-| **successful** | **Integer** |  | [optional] |
-| **failed** | **Integer** |  | [optional] |
-| **pending** | **Integer** |  | [optional] |
-| **success_rate** | **Float** |  | [optional] |
+| **range** | **String** |  |  |
+| **successful** | **Integer** |  |  |
+| **failed** | **Integer** |  |  |
+| **pending** | **Integer** |  |  |
+| **success_rate** | **Float** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SuccessRateResponse.new(
+instance = HookSniff::SuccessRateResponse.new(
   range: null,
   successful: null,
   failed: null,

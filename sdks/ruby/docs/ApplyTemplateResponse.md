@@ -1,18 +1,18 @@
-# OpenapiClient::ApplyTemplateResponse
+# HookSniff::ApplyTemplateResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **success** | **Boolean** |  | [optional] |
-| **message** | **String** |  | [optional] |
+| **success** | **Boolean** |  |  |
+| **message** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ApplyTemplateResponse.new(
+instance = HookSniff::ApplyTemplateResponse.new(
   success: null,
   message: null
 )

@@ -1,4 +1,4 @@
-# OpenapiClient::AdminSdkUpdatePostRequest
+# HookSniff::AdminSdkUpdatePostRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::AdminSdkUpdatePostRequest.new(
+instance = HookSniff::AdminSdkUpdatePostRequest.new(
   version: null,
   message: null
 )

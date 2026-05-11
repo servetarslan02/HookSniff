@@ -1,4 +1,4 @@
-# OpenapiClient::CreateAlertRequest
+# HookSniff::CreateAlertRequest
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CreateAlertRequest.new(
+instance = HookSniff::CreateAlertRequest.new(
   name: null,
   condition: null,
   threshold: null,

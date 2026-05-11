@@ -1,14 +1,14 @@
-# hooksniff.Model.PortalProfile
+# HookSniff.Model.PortalProfile
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **Guid** |  | [optional] 
-**Email** | **string** |  | [optional] 
+**Id** | **Guid** |  | 
+**Email** | **string** |  | 
+**Plan** | **string** |  | 
+**CreatedAt** | **DateTime** |  | 
 **Name** | **string** |  | [optional] 
-**Plan** | **string** |  | [optional] 
-**CreatedAt** | **DateTime** |  | [optional] 
 
 [[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
 

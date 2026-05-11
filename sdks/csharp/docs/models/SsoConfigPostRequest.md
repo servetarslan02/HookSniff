@@ -1,4 +1,4 @@
-# hooksniff.Model.SsoConfigPostRequest
+# HookSniff.Model.SsoConfigPostRequest
 
 ## Properties
 
