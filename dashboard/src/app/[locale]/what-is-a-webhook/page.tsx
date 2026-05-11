@@ -9,16 +9,7 @@ export default function WhatIsWebhookPage() {
   const t = useTranslations('whatIsWebhook');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-slate-400">What is a Webhook?</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle="What is a Webhook?" />
 
       <article className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">What is a Webhook?</h1>
