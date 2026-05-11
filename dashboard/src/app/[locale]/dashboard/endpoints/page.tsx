@@ -45,7 +45,7 @@ export default function EndpointsPage() {
       setNewDesc('');
       setShowCreate(false);
     } catch (err: unknown) {
-      setError((err instanceof Error ? err.message : 'Unknown error') || 'Failed to create endpoint');
+      setError((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToCreate'));
     } finally {
       setCreating(false);
     }
@@ -62,7 +62,7 @@ export default function EndpointsPage() {
       await endpointsApi.delete(token, deleteId);
       setEndpoints((prev) => prev.filter((ep) => ep.id !== deleteId));
     } catch (err: unknown) {
-      toast((err instanceof Error ? err.message : 'Unknown error') || 'Failed to delete', 'error');
+      toast((err instanceof Error ? err.message : tc('unknownError')) || 'Failed to delete', 'error');
     } finally {
       setDeleteId(null);
     }

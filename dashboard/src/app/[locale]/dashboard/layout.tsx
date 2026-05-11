@@ -19,6 +19,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const t = useTranslations('nav');
   const tc = useTranslations('common');
+  const te = useTranslations('error');
 
   const locale = useLocale();
 
@@ -85,7 +86,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </Link>
         <nav className="px-3 py-4 space-y-1">
           {navigation.map((item) => {
-            const isActive = cleanPath === item.href;
+            // Item 161: Use startsWith for nested route highlighting
+            const isActive = cleanPath === item.href || (item.href !== '/dashboard' && cleanPath.startsWith(item.href + '/'));
             return (
               <Link
                 key={item.href}
@@ -107,7 +109,12 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/admin"
               onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
+              className={clsx(
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
+                cleanPath.startsWith('/admin')
+                  ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300'
+                  : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300'
+              )}
             >
               <span className="text-lg">⚡</span>
               {t('adminPanel')}
@@ -156,7 +163,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Page content */}
         <main className="p-4 md:p-8 page-enter">
           <EmailVerificationBanner />
-          <ErrorBoundary>
+          <ErrorBoundary
+            title={te('title')}
+            description={te('unexpected')}
+            retryLabel={tc('tryAgain')}
+          >
             {children}
           </ErrorBoundary>
         </main>

@@ -1,8 +1,8 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 05:15 GMT+8
-> **Son commit:** `e734a921` (main)
-> **Son oturum:** AŞAMA 4 api.ts + catch blocks + raw fetch dönüşümleri
+> **Son güncelleme:** 2026-05-12 06:06 GMT+8
+> **Son commit:** pending (main)
+> **Son oturum:** AŞAMA 4 Frontend — 12 madde tamamlandı
 
 ## Hemen Başla
 
@@ -10,36 +10,40 @@
 2. `MEMORY.md` oku — proje durumunu öğren
 3. `IMPLEMENTATION-PLAN.md` bak — yol haritası
 
-## ✅ Bu Oturum Tamamlananlar (Oturum 121)
+## ✅ Bu Oturum Tamamlananlar (Oturum 122)
 
-| Madde | Açıklama | Durum |
-|-------|----------|-------|
-| 137 | Retry logic for transient errors (502, 503, 504) — exponential backoff | ✅ |
-| 138 | 401 refresh loop risk — shared refresh promise (api.ts) | ✅ |
-| 131 | Silent catch blocks → error state/toast (dashboard, alerts, analytics, rate-limiting, health) | ✅ |
-| 155 | Raw fetch → apiFetch (playground live polling, webhook-builder, endpoints/[id] test webhook) | ✅ |
-| 142 | Health page hardcoded 'Healthy/Degraded/Unhealthy' → i18n keys | ✅ (kısmi) |
-| — | Alerts i18n: fetchFailed/createFailed/deleteFailed/testFailed keys eklendi (en/tr) | ✅ |
+| # | Madde | Açıklama | Durum |
+|---|-------|----------|-------|
+| 131 | Silent API failures | playground, endpoints, transforms, dashboard → i18n error messages | ✅ |
+| 132 | Error Boundary | i18n title/description/retryLabel props, raw error gizlendi | ✅ |
+| 141 | Team removal confirmation | ConfirmDialog mevcut, hardcoded stringler i18n | ✅ |
+| 146 | getErrorMessage | fallback parametre eklendi, UI i18n anahtarları | ✅ |
+| 157 | billingApi duplicate | billingApiExtended'a delegate edildi | ✅ |
+| 161 | Sidebar active state | startsWith matching + admin link active | ✅ |
+| 166 | vh → dvh mobile | deliveries + logs modal dvh desteği | ✅ |
+| 168 | Signature constant-time | timingSafeEqual() byte-level XOR | ✅ |
+| 169 | Offline detection | apiFetch'te assertOnline() | ✅ |
+| 171 | ErrorBoundary raw error | user-friendly description | ✅ |
+| 208 | label htmlFor/id | SSO (7) + Settings (5) input | ✅ kısmi |
+| 325 | autoComplete confirm | new-password eklendi | ✅ |
+| — | Team i18n | descriptionLabel, inviteBtn, joinedPrefix, roleLabel, removeBtn, cancel | ✅ |
 
 ## 📋 Sonraki Adımlar — IMPLEMENTATION-PLAN.md göre
 
-### AŞAMA 4 Kalan (öncelikli)
+### AŞAMA 4 Kalan
 | # | Görev | Öncelik |
 |---|-------|---------|
-| 142 | Hardcoded strings — kalan sayfalar (portal-customize, sso provider desc'leri) | 🟡 |
-| 146 | getErrorMessage raw English → i18n | 🟡 |
-| 159 | weeklyDigest state → API'ye gönder | 🟡 |
-| 140 | No role-based permission checks → team/page.tsx | 🟡 |
-| 141 | Team member removal no confirmation → team/page.tsx | 🟡 |
-| 131 | Kalan kasıtlı fallback catch'ler (audit-log, portal-customize, sso, retry-policy) — düşük öncelik | 🟢 |
-| 153 | Loading states standardize et (SkeletonCard/LoadingSpinner) | 🟢 |
-| 157 | billingApi duplicate getInvoices düzelt | 🟢 |
+| 140 | Role-based permission checks → team/page.tsx | 🟡 |
+| 142 | Hardcoded strings — kalan sayfalar (portal-customize, sso provider desc) | 🟡 |
+| 153 | Loading states standardize et (SkeletonCard/LoadingSpinner) | 🟡 |
+| 155 | Raw fetch → apiFetch (audit-log, custom-domain, sso, portal) | 🟡 |
+| 159 | weeklyDigest state → API'ye gönder (backend endpoint gerekli) | 🟡 |
+| 160 | Sidebar 26 item gruplama (Core, Tools, Advanced, Account) | 🟢 |
+| 167 | Grid layout mobilde kırılıyor (Portal page) | 🟢 |
+| 172 | Console.log/Debug kalıntıları temizle | 🟢 |
 
 ### AŞAMA 5 — Database (22 madde)
-- Schema fixler, FK fixler, index eksikler, cleanup
-
 ### AŞAMA 2 Kalan (12 madde)
-- Async Rust, crypto, rate limiting, worker, infrastructure
 
 ## Kritik Hatırlatmalar
 - **Oturum süresi:** 1 saat — işleri batch'le, sık commit yap
