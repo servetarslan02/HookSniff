@@ -2,8 +2,12 @@
 //!
 //! Manage API keys — create, list, delete.
 
+use crate::pagination::{Page, PaginatedIterator};
 use crate::request::{HookSniffRequest, HookSniffRequestContext, HttpMethod};
 use serde::{Deserialize, Serialize};
+
+const DEFAULT_PAGE_LIMIT: u32 = 50;
+const DEFAULT_MAX_PAGES: u32 = 100;
 
 #[derive(Debug, Serialize)]
 pub struct ApiKeyCreateInput {
@@ -35,6 +39,22 @@ impl ApiKeys {
     pub fn list(&self) -> Result<Vec<ApiKeyOutput>, Box<dyn std::error::Error>> {
         let req = HookSniffRequest::new(HttpMethod::Get, "/v1/api-keys");
         req.send(&self.ctx)
+    }
+
+    /// List all API keys with pagination
+    pub fn list_all(&self) -> Result<Vec<ApiKeyOutput>, Box<dyn std::error::Error>> {
+        let ctx = self.ctx.clone();
+        let mut iter = PaginatedIterator::new(
+            move |limit, offset| {
+                let mut req = HookSniffRequest::new(HttpMethod::Get, "/v1/api-keys");
+                req.set_query_param("limit", &limit.to_string());
+                req.set_query_param("offset", &offset.to_string());
+                req.send::<Page<ApiKeyOutput>>(&ctx)
+            },
+            DEFAULT_PAGE_LIMIT,
+            DEFAULT_MAX_PAGES,
+        );
+        iter.collect_all()
     }
 
     /// Create a new API key
