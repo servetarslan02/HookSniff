@@ -29,7 +29,7 @@ export default function AdminUserDetailPage() {
       setDetail(data);
       setNewPlan(data.user.plan);
     } catch {
-      toast('Failed to load user details', 'error');
+      toast(t("failedToLoadDetails"), "error");
     } finally {
       setLoading(false);
     }
@@ -43,10 +43,10 @@ export default function AdminUserDetailPage() {
     if (!token || !id || !newPlan) return;
     try {
       await adminApi.updateUserPlan(token, id, newPlan);
-      toast(`Plan updated to ${newPlan}`, 'success');
+      toast(t("planUpdated", { plan: newPlan }), "success");
       fetchDetail();
     } catch {
-      toast('Failed to update plan', 'error');
+      toast(t("failedToUpdatePlan"), "error");
     }
   };
 
@@ -55,10 +55,10 @@ export default function AdminUserDetailPage() {
     const newStatus = detail.user.status === 'active' ? 'banned' : 'active';
     try {
       await adminApi.updateUserStatus(token, id, newStatus);
-      toast(`User ${newStatus === 'banned' ? 'banned' : 'activated'}`, 'success');
+      toast(newStatus === "banned" ? t("userBanned") : t("userActivated"), "success");
       fetchDetail();
     } catch {
-      toast('Failed to update status', 'error');
+      toast(t("failedToUpdateStatus"), "error");
     }
   };
 
@@ -96,7 +96,7 @@ export default function AdminUserDetailPage() {
           onClick={() => router.push('/admin/users')}
           className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400 transition"
         >
-          ← {tc("back")}
+          {tc("back")}
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
