@@ -47,14 +47,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         { name: t('deadLetterQueue') || 'Dead Letter Queue', href: '/docs/dlq' },
         { name: t('eventTypes') || 'Event Types', href: '/docs/event-types' },
         { name: t('idempotency') || 'Idempotency', href: '/docs/idempotency' },
-        { name: t('embeddablePortal') || 'Embeddable Portal', href: '/docs/portal' },
+        { name: t('embeddablePortal') || 'Embeddable Portal', href: '/docs/embed-portal' },
       ],
     },
     {
       title: t('reference') || 'Reference',
       items: [
-        { name: t('apiReference'), href: '/docs/api' },
-        { name: 'SDKs', href: '/docs/sdks' },
+        { name: t('apiReference'), href: '/docs/api-reference' },
+        { name: 'SDKs', href: '/docs/sdk-libraries' },
       ],
     },
   ];

@@ -16,7 +16,7 @@ vi.mock('@/lib/store', () => ({
   useAuth: () => ({ token: 'test-token' }),
 }));
 
-const { default: ApiReferencePage } = await import('@/app/[locale]/docs/api/page');
+const { default: ApiReferencePage } = await import('@/app/[locale]/docs/api-reference/page');
 
 describe('ApiReferencePage', () => {
   beforeEach(() => {

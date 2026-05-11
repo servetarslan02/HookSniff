@@ -4,7 +4,7 @@ const BASE_URL = 'https://hooksniff.vercel.app';
 
 const locales = ['en', 'tr'];
 
-const publicPages = ['', '/about', '/faq', '/contact', '/privacy', '/terms', '/docs', '/docs/api', '/docs/sdks', '/status', '/login'];
+const publicPages = ['', '/about', '/faq', '/contact', '/privacy', '/terms', '/docs', '/docs/api-reference', '/docs/sdk-libraries', '/status', '/login'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];

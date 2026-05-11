@@ -20,7 +20,7 @@ export default function DocsPage() {
           { title: '🔌 Integrations', desc: 'Stripe, GitHub, Shopify, and generic guides.', href: '/docs/integrations' },
           { title: '🐳 Self-Hosting', desc: 'Run HookSniff on your own infrastructure.', href: '/docs/self-hosting' },
           { title: '🔄 Retries & DLQ', desc: 'Exponential backoff, replay failed webhooks.', href: '/docs/retries' },
-          { title: '📦 SDKs', desc: 'Official Node.js, Python, and Go SDKs.', href: '/docs/sdks' },
+          { title: '📦 SDKs', desc: 'Official Node.js, Python, and Go SDKs.', href: '/docs/sdk-libraries' },
         ].map((card) => (
           <Link
             key={card.href}

@@ -96,8 +96,8 @@ Key models include:
 
 ## Documentation
 
-- [HookSniff API Documentation](https://hooksniff.vercel.app/docs/api)
-- [HookSniff SDK Documentation](https://hooksniff.vercel.app/docs/sdks)
+- [HookSniff API Documentation](https://hooksniff.vercel.app/docs/api-reference)
+- [HookSniff SDK Documentation](https://hooksniff.vercel.app/docs/sdk-libraries)
 
 ## License
 
