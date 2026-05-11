@@ -27,6 +27,7 @@ struct AlertRule {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct CreateAlertRequest {
     name: String,
     condition: String, // "failure_rate", "latency", "consecutive_failures"
