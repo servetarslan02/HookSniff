@@ -6,15 +6,16 @@ import { useState, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { billingApi, billingApiExtended, type Invoice } from '@/lib/api';
 
-const plans = [
+const planDefaults = [
   {
     key: 'free',
     nameKey: 'plans.free',
-    price: 0,
+    priceUsd: 0,
+    priceTry: 0,
     period: '/month',
     limitKey: 'plans.freeLimit',
     features: ['100 requests/min', '3 retry attempts', 'Community support', '5 endpoints', '7-day retention'],
@@ -23,7 +24,8 @@ const plans = [
   {
     key: 'pro',
     nameKey: 'plans.pro',
-    price: 49,
+    priceUsd: 49,
+    priceTry: 999,
     period: '/month',
     limitKey: 'plans.proLimit',
     features: ['1,000 requests/min', '5 retry attempts', 'Priority support', '50 endpoints', '30-day retention'],
@@ -32,7 +34,8 @@ const plans = [
   {
     key: 'business',
     nameKey: 'plans.business',
-    price: 149,
+    priceUsd: 99,
+    priceTry: 1999,
     period: '/month',
     limitKey: 'plans.businessLimit',
     features: ['10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', '500 endpoints', '90-day retention'],
@@ -104,7 +107,13 @@ export default function BillingPage() {
   const { toast } = useToast();
   const t = useTranslations('billing');
   const tc = useTranslations('common');
+  const locale = useLocale();
   const router = useRouter();
+  const isTr = locale === 'tr';
+  const plans = planDefaults.map(p => ({
+    ...p,
+    price: p.key === 'free' ? 0 : isTr ? p.priceTry : p.priceUsd,
+  }));
   const currentPlan = user?.plan || 'free';
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit, setUsageLimit] = useState(10000);
@@ -330,7 +339,7 @@ export default function BillingPage() {
                 )}
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t(plan.nameKey)}</h3>
                 <div className="mt-2 mb-4">
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">{isTr ? `₺${plan.price.toLocaleString('tr-TR')}` : `$${plan.price}`}</span>
                   <span className="text-gray-500 dark:text-slate-400 text-sm">{plan.period}</span>
                 </div>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t(plan.limitKey)}</p>
