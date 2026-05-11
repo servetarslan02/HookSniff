@@ -83,7 +83,8 @@ defmodule HookSniff.WebhookTest do
   # Test 8: Multiple comma-separated signatures
   test "verifies with multiple comma-separated signatures" do
     sig = sign_payload(@test_secret, @test_msg_id, @test_timestamp, @test_body)
-    multi_sig = "v1,wrong_sig," <> elem(String.split(sig, ",", parts: 2), 1)
+    [_, sig_rest] = String.split(sig, ",", parts: 2)
+    multi_sig = "v1,wrong_sig," <> sig_rest
     headers = Map.put(valid_headers(), "webhook-signature", multi_sig)
     assert {:ok, _} = Webhook.verify(@test_body, headers, @test_secret)
   end
