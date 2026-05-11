@@ -17,7 +17,9 @@ UPDATE customers
 SET password_hash = '!NEEDS_PASSWORD_RESET!'
 WHERE password_hash IS NULL;
 
--- Step 2: Make password_hash NOT NULL
+-- Step 2: Set default value for new OAuth users and make NOT NULL
+-- OAuth users don't set password_hash, so they get the sentinel by default.
+ALTER TABLE customers ALTER COLUMN password_hash SET DEFAULT '!NEEDS_PASSWORD_RESET!';
 ALTER TABLE customers ALTER COLUMN password_hash SET NOT NULL;
 
 -- Step 3: Create indexes for token lookups (if tables exist)
