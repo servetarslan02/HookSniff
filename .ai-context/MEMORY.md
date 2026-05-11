@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 20:05 GMT+8
+> Son güncelleme: 2026-05-12 00:15 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -70,6 +70,15 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 8 | 5 |
 | **TOPLAM** | **103** | **102** | **1** |
+
+## Oturum 115 (2026-05-12 00:10 - 00:15 GMT+8) ✅
+- **OpenClaw on birinci oturum** — Servet Vercel 404 fix
+- **Sorun:** `docs/api`, `docs/portal`, `docs/sdks` sayfaları Vercel'de 404 veriyor, local build'de 210 sayfa üretiliyor
+- **Kök neden:** `outputFileTracingRoot: path.join(__dirname, '..')` → repo root'u (api/, portal/, sdks/ klasörleri) Vercel serverless bundling'i karıştırıyordu
+- **Fix:** `outputFileTracingRoot` + `path` import'u kaldırıldı (`dashboard/next.config.js`)
+- **Push:** `bb16a8e2` — main branch, Vercel deploy tetiklendi
+- **Plan B hazır:** Eğer hâlâ 404 ise, 3 sayfayı farklı yola taşı (api-reference, embed-portal, sdk-libraries)
+- **Sonraki oturumda:** Deploy sonucunu kontrol et, 404 devam ederse Plan B'yi uygula
 
 ## Oturum 109 (2026-05-11 17:27 - 18:12) ✅
 - **OpenClaw beşinci oturum** — Servet ile GCP deploy debug
