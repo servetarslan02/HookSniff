@@ -24,7 +24,7 @@ const defaultSettings: PlatformSettings = {
   default_plan: 'free',
   max_endpoints_free: 5,
   max_endpoints_pro: 50,
-  max_webhooks_free: 1000,
+  max_webhooks_free: 10000,
   max_webhooks_pro: 50000,
   rate_limit_free: 100,
   rate_limit_pro: 1000,
