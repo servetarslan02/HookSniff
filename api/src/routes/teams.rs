@@ -423,8 +423,8 @@ async fn remove_member(
     // Audit log — MEMBER_REMOVE
     {
         let tid = team_id.to_string();
-        let _ = crate::audit_event!(pool, customer.id, "MEMBER_REMOVE", "team", Some(&tid),
-            serde_json::json!({"removed_user_id": uid.to_string()}));
+        let _ = crate::audit::log_action(&pool, customer.id, "MEMBER_REMOVE", "team", Some(&tid),
+            Some(serde_json::json!({"removed_user_id": uid.to_string()})), None, None).await;
     }
 
     Ok(Json(serde_json::json!({"removed": true})))
