@@ -7,12 +7,12 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**endpointId** | **UUID** |  |  [optional] |
-|**routingStrategy** | **String** |  |  [optional] |
+|**endpointId** | **UUID** |  |  |
+|**routingStrategy** | **String** |  |  |
 |**fallbackUrl** | **String** |  |  [optional] |
-|**avgResponseMs** | **Integer** |  |  [optional] |
-|**failureStreak** | **Integer** |  |  [optional] |
-|**isHealthy** | **Boolean** |  |  [optional] |
+|**avgResponseMs** | **Integer** |  |  |
+|**failureStreak** | **Integer** |  |  |
+|**isHealthy** | **Boolean** |  |  |
 
 
 

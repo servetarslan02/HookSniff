@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Deliveries** | Pointer to [**[]Delivery**](Delivery.md) |  | [optional] 
-**Total** | Pointer to **int32** |  | [optional] 
+**Deliveries** | [**[]Delivery**](Delivery.md) |  | 
+**Total** | **int32** |  | 
 
 ## Methods
 
 ### NewSearchResult
 
-`func NewSearchResult() *SearchResult`
+`func NewSearchResult(deliveries []Delivery, total int32, ) *SearchResult`
 
 NewSearchResult instantiates a new SearchResult object
 This constructor will assign default values to properties that have it defined,
@@ -45,11 +45,6 @@ and a boolean to check if the value has been set.
 
 SetDeliveries sets Deliveries field to given value.
 
-### HasDeliveries
-
-`func (o *SearchResult) HasDeliveries() bool`
-
-HasDeliveries returns a boolean if a field has been set.
 
 ### GetTotal
 
@@ -70,11 +65,6 @@ and a boolean to check if the value has been set.
 
 SetTotal sets Total field to given value.
 
-### HasTotal
-
-`func (o *SearchResult) HasTotal() bool`
-
-HasTotal returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

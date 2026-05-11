@@ -7,10 +7,10 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**token** | **String** |  |  [optional] |
-|**platform** | **String** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**token** | **String** |  |  |
+|**platform** | **String** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

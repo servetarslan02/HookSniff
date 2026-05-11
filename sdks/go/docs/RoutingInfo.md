@@ -4,18 +4,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EndpointId** | Pointer to **string** |  | [optional] 
-**RoutingStrategy** | Pointer to **string** |  | [optional] 
+**EndpointId** | **string** |  | 
+**RoutingStrategy** | **string** |  | 
 **FallbackUrl** | Pointer to **NullableString** |  | [optional] 
-**AvgResponseMs** | Pointer to **int32** |  | [optional] 
-**FailureStreak** | Pointer to **int32** |  | [optional] 
-**IsHealthy** | Pointer to **bool** |  | [optional] 
+**AvgResponseMs** | **int32** |  | 
+**FailureStreak** | **int32** |  | 
+**IsHealthy** | **bool** |  | 
 
 ## Methods
 
 ### NewRoutingInfo
 
-`func NewRoutingInfo() *RoutingInfo`
+`func NewRoutingInfo(endpointId string, routingStrategy string, avgResponseMs int32, failureStreak int32, isHealthy bool, ) *RoutingInfo`
 
 NewRoutingInfo instantiates a new RoutingInfo object
 This constructor will assign default values to properties that have it defined,
@@ -49,11 +49,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointId sets EndpointId field to given value.
 
-### HasEndpointId
-
-`func (o *RoutingInfo) HasEndpointId() bool`
-
-HasEndpointId returns a boolean if a field has been set.
 
 ### GetRoutingStrategy
 
@@ -74,11 +69,6 @@ and a boolean to check if the value has been set.
 
 SetRoutingStrategy sets RoutingStrategy field to given value.
 
-### HasRoutingStrategy
-
-`func (o *RoutingInfo) HasRoutingStrategy() bool`
-
-HasRoutingStrategy returns a boolean if a field has been set.
 
 ### GetFallbackUrl
 
@@ -134,11 +124,6 @@ and a boolean to check if the value has been set.
 
 SetAvgResponseMs sets AvgResponseMs field to given value.
 
-### HasAvgResponseMs
-
-`func (o *RoutingInfo) HasAvgResponseMs() bool`
-
-HasAvgResponseMs returns a boolean if a field has been set.
 
 ### GetFailureStreak
 
@@ -159,11 +144,6 @@ and a boolean to check if the value has been set.
 
 SetFailureStreak sets FailureStreak field to given value.
 
-### HasFailureStreak
-
-`func (o *RoutingInfo) HasFailureStreak() bool`
-
-HasFailureStreak returns a boolean if a field has been set.
 
 ### GetIsHealthy
 
@@ -184,11 +164,6 @@ and a boolean to check if the value has been set.
 
 SetIsHealthy sets IsHealthy field to given value.
 
-### HasIsHealthy
-
-`func (o *RoutingInfo) HasIsHealthy() bool`
-
-HasIsHealthy returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

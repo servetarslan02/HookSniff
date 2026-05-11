@@ -7,12 +7,12 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**email** | **String** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**email** | **String** |  |  |
 |**name** | **String** |  |  [optional] |
-|**plan** | **String** |  |  [optional] |
-|**isActive** | **Boolean** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**plan** | **String** |  |  |
+|**isActive** | **Boolean** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

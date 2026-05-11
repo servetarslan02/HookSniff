@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the RetryPolicy type satisfies the MappedNullable interface at compile time
@@ -20,26 +22,24 @@ var _ MappedNullable = &RetryPolicy{}
 
 // RetryPolicy struct for RetryPolicy
 type RetryPolicy struct {
-	MaxAttempts *int32 `json:"max_attempts,omitempty"`
-	Backoff *string `json:"backoff,omitempty"`
-	InitialDelaySecs *int32 `json:"initial_delay_secs,omitempty"`
-	MaxDelaySecs *int32 `json:"max_delay_secs,omitempty"`
+	MaxAttempts int32 `json:"max_attempts"`
+	Backoff string `json:"backoff"`
+	InitialDelaySecs int32 `json:"initial_delay_secs"`
+	MaxDelaySecs int32 `json:"max_delay_secs"`
 }
+
+type _RetryPolicy RetryPolicy
 
 // NewRetryPolicy instantiates a new RetryPolicy object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRetryPolicy() *RetryPolicy {
+func NewRetryPolicy(maxAttempts int32, backoff string, initialDelaySecs int32, maxDelaySecs int32) *RetryPolicy {
 	this := RetryPolicy{}
-	var maxAttempts int32 = 3
-	this.MaxAttempts = &maxAttempts
-	var backoff string = "exponential"
-	this.Backoff = &backoff
-	var initialDelaySecs int32 = 10
-	this.InitialDelaySecs = &initialDelaySecs
-	var maxDelaySecs int32 = 3600
-	this.MaxDelaySecs = &maxDelaySecs
+	this.MaxAttempts = maxAttempts
+	this.Backoff = backoff
+	this.InitialDelaySecs = initialDelaySecs
+	this.MaxDelaySecs = maxDelaySecs
 	return &this
 }
 
@@ -49,142 +49,110 @@ func NewRetryPolicy() *RetryPolicy {
 func NewRetryPolicyWithDefaults() *RetryPolicy {
 	this := RetryPolicy{}
 	var maxAttempts int32 = 3
-	this.MaxAttempts = &maxAttempts
+	this.MaxAttempts = maxAttempts
 	var backoff string = "exponential"
-	this.Backoff = &backoff
+	this.Backoff = backoff
 	var initialDelaySecs int32 = 10
-	this.InitialDelaySecs = &initialDelaySecs
+	this.InitialDelaySecs = initialDelaySecs
 	var maxDelaySecs int32 = 3600
-	this.MaxDelaySecs = &maxDelaySecs
+	this.MaxDelaySecs = maxDelaySecs
 	return &this
 }
 
-// GetMaxAttempts returns the MaxAttempts field value if set, zero value otherwise.
+// GetMaxAttempts returns the MaxAttempts field value
 func (o *RetryPolicy) GetMaxAttempts() int32 {
-	if o == nil || IsNil(o.MaxAttempts) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.MaxAttempts
+
+	return o.MaxAttempts
 }
 
-// GetMaxAttemptsOk returns a tuple with the MaxAttempts field value if set, nil otherwise
+// GetMaxAttemptsOk returns a tuple with the MaxAttempts field value
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetMaxAttemptsOk() (*int32, bool) {
-	if o == nil || IsNil(o.MaxAttempts) {
+	if o == nil {
 		return nil, false
 	}
-	return o.MaxAttempts, true
+	return &o.MaxAttempts, true
 }
 
-// HasMaxAttempts returns a boolean if a field has been set.
-func (o *RetryPolicy) HasMaxAttempts() bool {
-	if o != nil && !IsNil(o.MaxAttempts) {
-		return true
-	}
-
-	return false
-}
-
-// SetMaxAttempts gets a reference to the given int32 and assigns it to the MaxAttempts field.
+// SetMaxAttempts sets field value
 func (o *RetryPolicy) SetMaxAttempts(v int32) {
-	o.MaxAttempts = &v
+	o.MaxAttempts = v
 }
 
-// GetBackoff returns the Backoff field value if set, zero value otherwise.
+// GetBackoff returns the Backoff field value
 func (o *RetryPolicy) GetBackoff() string {
-	if o == nil || IsNil(o.Backoff) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Backoff
+
+	return o.Backoff
 }
 
-// GetBackoffOk returns a tuple with the Backoff field value if set, nil otherwise
+// GetBackoffOk returns a tuple with the Backoff field value
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetBackoffOk() (*string, bool) {
-	if o == nil || IsNil(o.Backoff) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Backoff, true
+	return &o.Backoff, true
 }
 
-// HasBackoff returns a boolean if a field has been set.
-func (o *RetryPolicy) HasBackoff() bool {
-	if o != nil && !IsNil(o.Backoff) {
-		return true
-	}
-
-	return false
-}
-
-// SetBackoff gets a reference to the given string and assigns it to the Backoff field.
+// SetBackoff sets field value
 func (o *RetryPolicy) SetBackoff(v string) {
-	o.Backoff = &v
+	o.Backoff = v
 }
 
-// GetInitialDelaySecs returns the InitialDelaySecs field value if set, zero value otherwise.
+// GetInitialDelaySecs returns the InitialDelaySecs field value
 func (o *RetryPolicy) GetInitialDelaySecs() int32 {
-	if o == nil || IsNil(o.InitialDelaySecs) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.InitialDelaySecs
+
+	return o.InitialDelaySecs
 }
 
-// GetInitialDelaySecsOk returns a tuple with the InitialDelaySecs field value if set, nil otherwise
+// GetInitialDelaySecsOk returns a tuple with the InitialDelaySecs field value
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetInitialDelaySecsOk() (*int32, bool) {
-	if o == nil || IsNil(o.InitialDelaySecs) {
+	if o == nil {
 		return nil, false
 	}
-	return o.InitialDelaySecs, true
+	return &o.InitialDelaySecs, true
 }
 
-// HasInitialDelaySecs returns a boolean if a field has been set.
-func (o *RetryPolicy) HasInitialDelaySecs() bool {
-	if o != nil && !IsNil(o.InitialDelaySecs) {
-		return true
-	}
-
-	return false
-}
-
-// SetInitialDelaySecs gets a reference to the given int32 and assigns it to the InitialDelaySecs field.
+// SetInitialDelaySecs sets field value
 func (o *RetryPolicy) SetInitialDelaySecs(v int32) {
-	o.InitialDelaySecs = &v
+	o.InitialDelaySecs = v
 }
 
-// GetMaxDelaySecs returns the MaxDelaySecs field value if set, zero value otherwise.
+// GetMaxDelaySecs returns the MaxDelaySecs field value
 func (o *RetryPolicy) GetMaxDelaySecs() int32 {
-	if o == nil || IsNil(o.MaxDelaySecs) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.MaxDelaySecs
+
+	return o.MaxDelaySecs
 }
 
-// GetMaxDelaySecsOk returns a tuple with the MaxDelaySecs field value if set, nil otherwise
+// GetMaxDelaySecsOk returns a tuple with the MaxDelaySecs field value
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetMaxDelaySecsOk() (*int32, bool) {
-	if o == nil || IsNil(o.MaxDelaySecs) {
+	if o == nil {
 		return nil, false
 	}
-	return o.MaxDelaySecs, true
+	return &o.MaxDelaySecs, true
 }
 
-// HasMaxDelaySecs returns a boolean if a field has been set.
-func (o *RetryPolicy) HasMaxDelaySecs() bool {
-	if o != nil && !IsNil(o.MaxDelaySecs) {
-		return true
-	}
-
-	return false
-}
-
-// SetMaxDelaySecs gets a reference to the given int32 and assigns it to the MaxDelaySecs field.
+// SetMaxDelaySecs sets field value
 func (o *RetryPolicy) SetMaxDelaySecs(v int32) {
-	o.MaxDelaySecs = &v
+	o.MaxDelaySecs = v
 }
 
 func (o RetryPolicy) MarshalJSON() ([]byte, error) {
@@ -197,19 +165,51 @@ func (o RetryPolicy) MarshalJSON() ([]byte, error) {
 
 func (o RetryPolicy) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.MaxAttempts) {
-		toSerialize["max_attempts"] = o.MaxAttempts
-	}
-	if !IsNil(o.Backoff) {
-		toSerialize["backoff"] = o.Backoff
-	}
-	if !IsNil(o.InitialDelaySecs) {
-		toSerialize["initial_delay_secs"] = o.InitialDelaySecs
-	}
-	if !IsNil(o.MaxDelaySecs) {
-		toSerialize["max_delay_secs"] = o.MaxDelaySecs
-	}
+	toSerialize["max_attempts"] = o.MaxAttempts
+	toSerialize["backoff"] = o.Backoff
+	toSerialize["initial_delay_secs"] = o.InitialDelaySecs
+	toSerialize["max_delay_secs"] = o.MaxDelaySecs
 	return toSerialize, nil
+}
+
+func (o *RetryPolicy) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"max_attempts",
+		"backoff",
+		"initial_delay_secs",
+		"max_delay_secs",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varRetryPolicy := _RetryPolicy{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varRetryPolicy)
+
+	if err != nil {
+		return err
+	}
+
+	*o = RetryPolicy(varRetryPolicy)
+
+	return err
 }
 
 type NullableRetryPolicy struct {

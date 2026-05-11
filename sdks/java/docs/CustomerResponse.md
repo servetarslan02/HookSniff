@@ -7,15 +7,15 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**id** | **UUID** |  |  [optional] |
-|**email** | **String** |  |  [optional] |
+|**id** | **UUID** |  |  |
+|**email** | **String** |  |  |
 |**name** | **String** |  |  [optional] |
 |**apiKey** | **String** | Only returned on registration |  [optional] |
-|**plan** | [**PlanEnum**](#PlanEnum) |  |  [optional] |
-|**webhookLimit** | **Integer** |  |  [optional] |
-|**webhookCount** | **Integer** |  |  [optional] |
-|**isAdmin** | **Boolean** |  |  [optional] |
-|**createdAt** | **OffsetDateTime** |  |  [optional] |
+|**plan** | [**PlanEnum**](#PlanEnum) |  |  |
+|**webhookLimit** | **Integer** |  |  |
+|**webhookCount** | **Integer** |  |  |
+|**isAdmin** | **Boolean** |  |  |
+|**createdAt** | **OffsetDateTime** |  |  |
 
 
 

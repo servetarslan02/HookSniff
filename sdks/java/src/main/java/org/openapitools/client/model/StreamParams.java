@@ -49,11 +49,11 @@ import org.openapitools.client.JSON;
 /**
  * StreamParams
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class StreamParams {
   public static final String SERIALIZED_NAME_ENDPOINT_ID = "endpoint_id";
   @SerializedName(SERIALIZED_NAME_ENDPOINT_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID endpointId;
 
   /**
@@ -114,18 +114,18 @@ public class StreamParams {
 
   public static final String SERIALIZED_NAME_STATUS = "status";
   @SerializedName(SERIALIZED_NAME_STATUS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private StatusEnum status;
 
   public static final String SERIALIZED_NAME_LIMIT = "limit";
   @SerializedName(SERIALIZED_NAME_LIMIT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer limit = 50;
 
   public StreamParams() {
   }
 
-  public StreamParams endpointId(@javax.annotation.Nullable UUID endpointId) {
+  public StreamParams endpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
     return this;
   }
@@ -134,17 +134,17 @@ public class StreamParams {
    * Get endpointId
    * @return endpointId
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getEndpointId() {
     return endpointId;
   }
 
-  public void setEndpointId(@javax.annotation.Nullable UUID endpointId) {
+  public void setEndpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
   }
 
 
-  public StreamParams status(@javax.annotation.Nullable StatusEnum status) {
+  public StreamParams status(@javax.annotation.Nonnull StatusEnum status) {
     this.status = status;
     return this;
   }
@@ -153,17 +153,17 @@ public class StreamParams {
    * Get status
    * @return status
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public StatusEnum getStatus() {
     return status;
   }
 
-  public void setStatus(@javax.annotation.Nullable StatusEnum status) {
+  public void setStatus(@javax.annotation.Nonnull StatusEnum status) {
     this.status = status;
   }
 
 
-  public StreamParams limit(@javax.annotation.Nullable Integer limit) {
+  public StreamParams limit(@javax.annotation.Nonnull Integer limit) {
     this.limit = limit;
     return this;
   }
@@ -172,12 +172,12 @@ public class StreamParams {
    * Get limit
    * @return limit
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getLimit() {
     return limit;
   }
 
-  public void setLimit(@javax.annotation.Nullable Integer limit) {
+  public void setLimit(@javax.annotation.Nonnull Integer limit) {
     this.limit = limit;
   }
 
@@ -230,7 +230,7 @@ public class StreamParams {
     openapiFields = new HashSet<String>(Arrays.asList("endpoint_id", "status", "limit"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("endpoint_id", "status", "limit"));
   }
 
   /**
@@ -253,17 +253,22 @@ public class StreamParams {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `StreamParams` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : StreamParams.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("endpoint_id") != null && !jsonObj.get("endpoint_id").isJsonNull()) && !jsonObj.get("endpoint_id").isJsonPrimitive()) {
+      if (!jsonObj.get("endpoint_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `endpoint_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("endpoint_id").toString()));
       }
-      if ((jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) && !jsonObj.get("status").isJsonPrimitive()) {
+      if (!jsonObj.get("status").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("status").toString()));
       }
-      // validate the optional field `status`
-      if (jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) {
-        StatusEnum.validateJsonElement(jsonObj.get("status"));
-      }
+      // validate the required field `status`
+      StatusEnum.validateJsonElement(jsonObj.get("status"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

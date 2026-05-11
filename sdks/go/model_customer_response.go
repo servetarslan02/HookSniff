@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the CustomerResponse type satisfies the MappedNullable interface at compile time
@@ -21,24 +23,33 @@ var _ MappedNullable = &CustomerResponse{}
 
 // CustomerResponse struct for CustomerResponse
 type CustomerResponse struct {
-	Id *string `json:"id,omitempty"`
-	Email *string `json:"email,omitempty"`
+	Id string `json:"id"`
+	Email string `json:"email"`
 	Name NullableString `json:"name,omitempty"`
 	// Only returned on registration
 	ApiKey NullableString `json:"api_key,omitempty"`
-	Plan *string `json:"plan,omitempty"`
-	WebhookLimit *int32 `json:"webhook_limit,omitempty"`
-	WebhookCount *int32 `json:"webhook_count,omitempty"`
-	IsAdmin *bool `json:"is_admin,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Plan string `json:"plan"`
+	WebhookLimit int32 `json:"webhook_limit"`
+	WebhookCount int32 `json:"webhook_count"`
+	IsAdmin bool `json:"is_admin"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _CustomerResponse CustomerResponse
 
 // NewCustomerResponse instantiates a new CustomerResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCustomerResponse() *CustomerResponse {
+func NewCustomerResponse(id string, email string, plan string, webhookLimit int32, webhookCount int32, isAdmin bool, createdAt time.Time) *CustomerResponse {
 	this := CustomerResponse{}
+	this.Id = id
+	this.Email = email
+	this.Plan = plan
+	this.WebhookLimit = webhookLimit
+	this.WebhookCount = webhookCount
+	this.IsAdmin = isAdmin
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -50,68 +61,52 @@ func NewCustomerResponseWithDefaults() *CustomerResponse {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *CustomerResponse) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *CustomerResponse) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *CustomerResponse) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *CustomerResponse) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetEmail returns the Email field value if set, zero value otherwise.
+// GetEmail returns the Email field value
 func (o *CustomerResponse) GetEmail() string {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Email
+
+	return o.Email
 }
 
-// GetEmailOk returns a tuple with the Email field value if set, nil otherwise
+// GetEmailOk returns a tuple with the Email field value
 // and a boolean to check if the value has been set.
 func (o *CustomerResponse) GetEmailOk() (*string, bool) {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Email, true
+	return &o.Email, true
 }
 
-// HasEmail returns a boolean if a field has been set.
-func (o *CustomerResponse) HasEmail() bool {
-	if o != nil && !IsNil(o.Email) {
-		return true
-	}
-
-	return false
-}
-
-// SetEmail gets a reference to the given string and assigns it to the Email field.
+// SetEmail sets field value
 func (o *CustomerResponse) SetEmail(v string) {
-	o.Email = &v
+	o.Email = v
 }
 
 // GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -198,164 +193,124 @@ func (o *CustomerResponse) UnsetApiKey() {
 	o.ApiKey.Unset()
 }
 
-// GetPlan returns the Plan field value if set, zero value otherwise.
+// GetPlan returns the Plan field value
 func (o *CustomerResponse) GetPlan() string {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Plan
+
+	return o.Plan
 }
 
-// GetPlanOk returns a tuple with the Plan field value if set, nil otherwise
+// GetPlanOk returns a tuple with the Plan field value
 // and a boolean to check if the value has been set.
 func (o *CustomerResponse) GetPlanOk() (*string, bool) {
-	if o == nil || IsNil(o.Plan) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Plan, true
+	return &o.Plan, true
 }
 
-// HasPlan returns a boolean if a field has been set.
-func (o *CustomerResponse) HasPlan() bool {
-	if o != nil && !IsNil(o.Plan) {
-		return true
-	}
-
-	return false
-}
-
-// SetPlan gets a reference to the given string and assigns it to the Plan field.
+// SetPlan sets field value
 func (o *CustomerResponse) SetPlan(v string) {
-	o.Plan = &v
+	o.Plan = v
 }
 
-// GetWebhookLimit returns the WebhookLimit field value if set, zero value otherwise.
+// GetWebhookLimit returns the WebhookLimit field value
 func (o *CustomerResponse) GetWebhookLimit() int32 {
-	if o == nil || IsNil(o.WebhookLimit) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WebhookLimit
+
+	return o.WebhookLimit
 }
 
-// GetWebhookLimitOk returns a tuple with the WebhookLimit field value if set, nil otherwise
+// GetWebhookLimitOk returns a tuple with the WebhookLimit field value
 // and a boolean to check if the value has been set.
 func (o *CustomerResponse) GetWebhookLimitOk() (*int32, bool) {
-	if o == nil || IsNil(o.WebhookLimit) {
+	if o == nil {
 		return nil, false
 	}
-	return o.WebhookLimit, true
+	return &o.WebhookLimit, true
 }
 
-// HasWebhookLimit returns a boolean if a field has been set.
-func (o *CustomerResponse) HasWebhookLimit() bool {
-	if o != nil && !IsNil(o.WebhookLimit) {
-		return true
-	}
-
-	return false
-}
-
-// SetWebhookLimit gets a reference to the given int32 and assigns it to the WebhookLimit field.
+// SetWebhookLimit sets field value
 func (o *CustomerResponse) SetWebhookLimit(v int32) {
-	o.WebhookLimit = &v
+	o.WebhookLimit = v
 }
 
-// GetWebhookCount returns the WebhookCount field value if set, zero value otherwise.
+// GetWebhookCount returns the WebhookCount field value
 func (o *CustomerResponse) GetWebhookCount() int32 {
-	if o == nil || IsNil(o.WebhookCount) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WebhookCount
+
+	return o.WebhookCount
 }
 
-// GetWebhookCountOk returns a tuple with the WebhookCount field value if set, nil otherwise
+// GetWebhookCountOk returns a tuple with the WebhookCount field value
 // and a boolean to check if the value has been set.
 func (o *CustomerResponse) GetWebhookCountOk() (*int32, bool) {
-	if o == nil || IsNil(o.WebhookCount) {
+	if o == nil {
 		return nil, false
 	}
-	return o.WebhookCount, true
+	return &o.WebhookCount, true
 }
 
-// HasWebhookCount returns a boolean if a field has been set.
-func (o *CustomerResponse) HasWebhookCount() bool {
-	if o != nil && !IsNil(o.WebhookCount) {
-		return true
-	}
-
-	return false
-}
-
-// SetWebhookCount gets a reference to the given int32 and assigns it to the WebhookCount field.
+// SetWebhookCount sets field value
 func (o *CustomerResponse) SetWebhookCount(v int32) {
-	o.WebhookCount = &v
+	o.WebhookCount = v
 }
 
-// GetIsAdmin returns the IsAdmin field value if set, zero value otherwise.
+// GetIsAdmin returns the IsAdmin field value
 func (o *CustomerResponse) GetIsAdmin() bool {
-	if o == nil || IsNil(o.IsAdmin) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsAdmin
+
+	return o.IsAdmin
 }
 
-// GetIsAdminOk returns a tuple with the IsAdmin field value if set, nil otherwise
+// GetIsAdminOk returns a tuple with the IsAdmin field value
 // and a boolean to check if the value has been set.
 func (o *CustomerResponse) GetIsAdminOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsAdmin) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsAdmin, true
+	return &o.IsAdmin, true
 }
 
-// HasIsAdmin returns a boolean if a field has been set.
-func (o *CustomerResponse) HasIsAdmin() bool {
-	if o != nil && !IsNil(o.IsAdmin) {
-		return true
-	}
-
-	return false
-}
-
-// SetIsAdmin gets a reference to the given bool and assigns it to the IsAdmin field.
+// SetIsAdmin sets field value
 func (o *CustomerResponse) SetIsAdmin(v bool) {
-	o.IsAdmin = &v
+	o.IsAdmin = v
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *CustomerResponse) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *CustomerResponse) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *CustomerResponse) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *CustomerResponse) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o CustomerResponse) MarshalJSON() ([]byte, error) {
@@ -368,34 +323,63 @@ func (o CustomerResponse) MarshalJSON() ([]byte, error) {
 
 func (o CustomerResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.Email) {
-		toSerialize["email"] = o.Email
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["email"] = o.Email
 	if o.Name.IsSet() {
 		toSerialize["name"] = o.Name.Get()
 	}
 	if o.ApiKey.IsSet() {
 		toSerialize["api_key"] = o.ApiKey.Get()
 	}
-	if !IsNil(o.Plan) {
-		toSerialize["plan"] = o.Plan
-	}
-	if !IsNil(o.WebhookLimit) {
-		toSerialize["webhook_limit"] = o.WebhookLimit
-	}
-	if !IsNil(o.WebhookCount) {
-		toSerialize["webhook_count"] = o.WebhookCount
-	}
-	if !IsNil(o.IsAdmin) {
-		toSerialize["is_admin"] = o.IsAdmin
-	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["plan"] = o.Plan
+	toSerialize["webhook_limit"] = o.WebhookLimit
+	toSerialize["webhook_count"] = o.WebhookCount
+	toSerialize["is_admin"] = o.IsAdmin
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *CustomerResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"email",
+		"plan",
+		"webhook_limit",
+		"webhook_count",
+		"is_admin",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varCustomerResponse := _CustomerResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varCustomerResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = CustomerResponse(varCustomerResponse)
+
+	return err
 }
 
 type NullableCustomerResponse struct {

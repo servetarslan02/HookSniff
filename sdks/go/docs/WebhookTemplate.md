@@ -4,17 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**Name** | Pointer to **string** |  | [optional] 
-**Description** | Pointer to **string** |  | [optional] 
-**Category** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**Name** | **string** |  | 
+**Description** | **string** |  | 
+**Category** | **string** |  | 
 **PayloadTemplate** | Pointer to **map[string]interface{}** |  | [optional] 
 
 ## Methods
 
 ### NewWebhookTemplate
 
-`func NewWebhookTemplate() *WebhookTemplate`
+`func NewWebhookTemplate(id string, name string, description string, category string, ) *WebhookTemplate`
 
 NewWebhookTemplate instantiates a new WebhookTemplate object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +48,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *WebhookTemplate) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetName
 
@@ -73,11 +68,6 @@ and a boolean to check if the value has been set.
 
 SetName sets Name field to given value.
 
-### HasName
-
-`func (o *WebhookTemplate) HasName() bool`
-
-HasName returns a boolean if a field has been set.
 
 ### GetDescription
 
@@ -98,11 +88,6 @@ and a boolean to check if the value has been set.
 
 SetDescription sets Description field to given value.
 
-### HasDescription
-
-`func (o *WebhookTemplate) HasDescription() bool`
-
-HasDescription returns a boolean if a field has been set.
 
 ### GetCategory
 
@@ -123,11 +108,6 @@ and a boolean to check if the value has been set.
 
 SetCategory sets Category field to given value.
 
-### HasCategory
-
-`func (o *WebhookTemplate) HasCategory() bool`
-
-HasCategory returns a boolean if a field has been set.
 
 ### GetPayloadTemplate
 

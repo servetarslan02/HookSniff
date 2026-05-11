@@ -51,16 +51,16 @@ import org.openapitools.client.JSON;
 /**
  * Delivery
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T18:24:20.573864525+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class Delivery {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID id;
 
   public static final String SERIALIZED_NAME_ENDPOINT_ID = "endpoint_id";
   @SerializedName(SERIALIZED_NAME_ENDPOINT_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private UUID endpointId;
 
   public static final String SERIALIZED_NAME_EVENT = "event";
@@ -126,12 +126,12 @@ public class Delivery {
 
   public static final String SERIALIZED_NAME_STATUS = "status";
   @SerializedName(SERIALIZED_NAME_STATUS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private StatusEnum status;
 
   public static final String SERIALIZED_NAME_ATTEMPT_COUNT = "attempt_count";
   @SerializedName(SERIALIZED_NAME_ATTEMPT_COUNT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer attemptCount;
 
   public static final String SERIALIZED_NAME_RESPONSE_STATUS = "response_status";
@@ -141,18 +141,18 @@ public class Delivery {
 
   public static final String SERIALIZED_NAME_REPLAY_COUNT = "replay_count";
   @SerializedName(SERIALIZED_NAME_REPLAY_COUNT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private Integer replayCount;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public Delivery() {
   }
 
-  public Delivery id(@javax.annotation.Nullable UUID id) {
+  public Delivery id(@javax.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -161,17 +161,17 @@ public class Delivery {
    * Get id
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable UUID id) {
+  public void setId(@javax.annotation.Nonnull UUID id) {
     this.id = id;
   }
 
 
-  public Delivery endpointId(@javax.annotation.Nullable UUID endpointId) {
+  public Delivery endpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
     return this;
   }
@@ -180,12 +180,12 @@ public class Delivery {
    * Get endpointId
    * @return endpointId
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public UUID getEndpointId() {
     return endpointId;
   }
 
-  public void setEndpointId(@javax.annotation.Nullable UUID endpointId) {
+  public void setEndpointId(@javax.annotation.Nonnull UUID endpointId) {
     this.endpointId = endpointId;
   }
 
@@ -209,7 +209,7 @@ public class Delivery {
   }
 
 
-  public Delivery status(@javax.annotation.Nullable StatusEnum status) {
+  public Delivery status(@javax.annotation.Nonnull StatusEnum status) {
     this.status = status;
     return this;
   }
@@ -218,17 +218,17 @@ public class Delivery {
    * Get status
    * @return status
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public StatusEnum getStatus() {
     return status;
   }
 
-  public void setStatus(@javax.annotation.Nullable StatusEnum status) {
+  public void setStatus(@javax.annotation.Nonnull StatusEnum status) {
     this.status = status;
   }
 
 
-  public Delivery attemptCount(@javax.annotation.Nullable Integer attemptCount) {
+  public Delivery attemptCount(@javax.annotation.Nonnull Integer attemptCount) {
     this.attemptCount = attemptCount;
     return this;
   }
@@ -237,12 +237,12 @@ public class Delivery {
    * Get attemptCount
    * @return attemptCount
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getAttemptCount() {
     return attemptCount;
   }
 
-  public void setAttemptCount(@javax.annotation.Nullable Integer attemptCount) {
+  public void setAttemptCount(@javax.annotation.Nonnull Integer attemptCount) {
     this.attemptCount = attemptCount;
   }
 
@@ -266,7 +266,7 @@ public class Delivery {
   }
 
 
-  public Delivery replayCount(@javax.annotation.Nullable Integer replayCount) {
+  public Delivery replayCount(@javax.annotation.Nonnull Integer replayCount) {
     this.replayCount = replayCount;
     return this;
   }
@@ -275,17 +275,17 @@ public class Delivery {
    * Get replayCount
    * @return replayCount
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public Integer getReplayCount() {
     return replayCount;
   }
 
-  public void setReplayCount(@javax.annotation.Nullable Integer replayCount) {
+  public void setReplayCount(@javax.annotation.Nonnull Integer replayCount) {
     this.replayCount = replayCount;
   }
 
 
-  public Delivery createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public Delivery createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -294,12 +294,12 @@ public class Delivery {
    * Get createdAt
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -373,7 +373,7 @@ public class Delivery {
     openapiFields = new HashSet<String>(Arrays.asList("id", "endpoint_id", "event", "status", "attempt_count", "response_status", "replay_count", "created_at"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "endpoint_id", "status", "attempt_count", "replay_count", "created_at"));
   }
 
   /**
@@ -396,23 +396,28 @@ public class Delivery {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` in the JSON string is not defined in the `Delivery` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : Delivery.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("endpoint_id") != null && !jsonObj.get("endpoint_id").isJsonNull()) && !jsonObj.get("endpoint_id").isJsonPrimitive()) {
+      if (!jsonObj.get("endpoint_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `endpoint_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("endpoint_id").toString()));
       }
       if ((jsonObj.get("event") != null && !jsonObj.get("event").isJsonNull()) && !jsonObj.get("event").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `event` to be a primitive type in the JSON string but got `%s`", jsonObj.get("event").toString()));
       }
-      if ((jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) && !jsonObj.get("status").isJsonPrimitive()) {
+      if (!jsonObj.get("status").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("status").toString()));
       }
-      // validate the optional field `status`
-      if (jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) {
-        StatusEnum.validateJsonElement(jsonObj.get("status"));
-      }
+      // validate the required field `status`
+      StatusEnum.validateJsonElement(jsonObj.get("status"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

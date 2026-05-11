@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Users** | Pointer to [**[]UserSummary**](UserSummary.md) |  | [optional] 
-**Total** | Pointer to **int32** |  | [optional] 
-**Page** | Pointer to **int32** |  | [optional] 
-**PerPage** | Pointer to **int32** |  | [optional] 
+**Users** | [**[]UserSummary**](UserSummary.md) |  | 
+**Total** | **int32** |  | 
+**Page** | **int32** |  | 
+**PerPage** | **int32** |  | 
 
 ## Methods
 
 ### NewPaginatedUsers
 
-`func NewPaginatedUsers() *PaginatedUsers`
+`func NewPaginatedUsers(users []UserSummary, total int32, page int32, perPage int32, ) *PaginatedUsers`
 
 NewPaginatedUsers instantiates a new PaginatedUsers object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetUsers sets Users field to given value.
 
-### HasUsers
-
-`func (o *PaginatedUsers) HasUsers() bool`
-
-HasUsers returns a boolean if a field has been set.
 
 ### GetTotal
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetTotal sets Total field to given value.
 
-### HasTotal
-
-`func (o *PaginatedUsers) HasTotal() bool`
-
-HasTotal returns a boolean if a field has been set.
 
 ### GetPage
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetPage sets Page field to given value.
 
-### HasPage
-
-`func (o *PaginatedUsers) HasPage() bool`
-
-HasPage returns a boolean if a field has been set.
 
 ### GetPerPage
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetPerPage sets PerPage field to given value.
 
-### HasPerPage
-
-`func (o *PaginatedUsers) HasPerPage() bool`
-
-HasPerPage returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -4,19 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **string** |  | [optional] 
-**EndpointId** | Pointer to **string** |  | [optional] 
-**Name** | Pointer to **string** |  | [optional] 
-**RuleType** | Pointer to **string** |  | [optional] 
+**Id** | **string** |  | 
+**EndpointId** | **string** |  | 
+**Name** | **string** |  | 
+**RuleType** | **string** |  | 
 **Config** | Pointer to **map[string]interface{}** |  | [optional] 
-**IsActive** | Pointer to **bool** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** |  | [optional] 
+**IsActive** | **bool** |  | 
+**CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
 ### NewTransformRule
 
-`func NewTransformRule() *TransformRule`
+`func NewTransformRule(id string, endpointId string, name string, ruleType string, isActive bool, createdAt time.Time, ) *TransformRule`
 
 NewTransformRule instantiates a new TransformRule object
 This constructor will assign default values to properties that have it defined,
@@ -50,11 +50,6 @@ and a boolean to check if the value has been set.
 
 SetId sets Id field to given value.
 
-### HasId
-
-`func (o *TransformRule) HasId() bool`
-
-HasId returns a boolean if a field has been set.
 
 ### GetEndpointId
 
@@ -75,11 +70,6 @@ and a boolean to check if the value has been set.
 
 SetEndpointId sets EndpointId field to given value.
 
-### HasEndpointId
-
-`func (o *TransformRule) HasEndpointId() bool`
-
-HasEndpointId returns a boolean if a field has been set.
 
 ### GetName
 
@@ -100,11 +90,6 @@ and a boolean to check if the value has been set.
 
 SetName sets Name field to given value.
 
-### HasName
-
-`func (o *TransformRule) HasName() bool`
-
-HasName returns a boolean if a field has been set.
 
 ### GetRuleType
 
@@ -125,11 +110,6 @@ and a boolean to check if the value has been set.
 
 SetRuleType sets RuleType field to given value.
 
-### HasRuleType
-
-`func (o *TransformRule) HasRuleType() bool`
-
-HasRuleType returns a boolean if a field has been set.
 
 ### GetConfig
 
@@ -175,11 +155,6 @@ and a boolean to check if the value has been set.
 
 SetIsActive sets IsActive field to given value.
 
-### HasIsActive
-
-`func (o *TransformRule) HasIsActive() bool`
-
-HasIsActive returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -200,11 +175,6 @@ and a boolean to check if the value has been set.
 
 SetCreatedAt sets CreatedAt field to given value.
 
-### HasCreatedAt
-
-`func (o *TransformRule) HasCreatedAt() bool`
-
-HasCreatedAt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

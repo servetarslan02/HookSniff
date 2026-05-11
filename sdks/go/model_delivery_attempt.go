@@ -14,6 +14,8 @@ package hooksniff
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the DeliveryAttempt type satisfies the MappedNullable interface at compile time
@@ -21,21 +23,26 @@ var _ MappedNullable = &DeliveryAttempt{}
 
 // DeliveryAttempt struct for DeliveryAttempt
 type DeliveryAttempt struct {
-	Id *string `json:"id,omitempty"`
-	AttemptNumber *int32 `json:"attempt_number,omitempty"`
+	Id string `json:"id"`
+	AttemptNumber int32 `json:"attempt_number"`
 	StatusCode NullableInt32 `json:"status_code,omitempty"`
 	ResponseBody NullableString `json:"response_body,omitempty"`
 	DurationMs NullableInt32 `json:"duration_ms,omitempty"`
 	ErrorMessage NullableString `json:"error_message,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 }
+
+type _DeliveryAttempt DeliveryAttempt
 
 // NewDeliveryAttempt instantiates a new DeliveryAttempt object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeliveryAttempt() *DeliveryAttempt {
+func NewDeliveryAttempt(id string, attemptNumber int32, createdAt time.Time) *DeliveryAttempt {
 	this := DeliveryAttempt{}
+	this.Id = id
+	this.AttemptNumber = attemptNumber
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -47,68 +54,52 @@ func NewDeliveryAttemptWithDefaults() *DeliveryAttempt {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// GetId returns the Id field value
 func (o *DeliveryAttempt) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Id
+
+	return o.Id
 }
 
-// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryAttempt) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return &o.Id, true
 }
 
-// HasId returns a boolean if a field has been set.
-func (o *DeliveryAttempt) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
-		return true
-	}
-
-	return false
-}
-
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId sets field value
 func (o *DeliveryAttempt) SetId(v string) {
-	o.Id = &v
+	o.Id = v
 }
 
-// GetAttemptNumber returns the AttemptNumber field value if set, zero value otherwise.
+// GetAttemptNumber returns the AttemptNumber field value
 func (o *DeliveryAttempt) GetAttemptNumber() int32 {
-	if o == nil || IsNil(o.AttemptNumber) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.AttemptNumber
+
+	return o.AttemptNumber
 }
 
-// GetAttemptNumberOk returns a tuple with the AttemptNumber field value if set, nil otherwise
+// GetAttemptNumberOk returns a tuple with the AttemptNumber field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryAttempt) GetAttemptNumberOk() (*int32, bool) {
-	if o == nil || IsNil(o.AttemptNumber) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AttemptNumber, true
+	return &o.AttemptNumber, true
 }
 
-// HasAttemptNumber returns a boolean if a field has been set.
-func (o *DeliveryAttempt) HasAttemptNumber() bool {
-	if o != nil && !IsNil(o.AttemptNumber) {
-		return true
-	}
-
-	return false
-}
-
-// SetAttemptNumber gets a reference to the given int32 and assigns it to the AttemptNumber field.
+// SetAttemptNumber sets field value
 func (o *DeliveryAttempt) SetAttemptNumber(v int32) {
-	o.AttemptNumber = &v
+	o.AttemptNumber = v
 }
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -279,36 +270,28 @@ func (o *DeliveryAttempt) UnsetErrorMessage() {
 	o.ErrorMessage.Unset()
 }
 
-// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+// GetCreatedAt returns the CreatedAt field value
 func (o *DeliveryAttempt) GetCreatedAt() time.Time {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAt
+
+	return o.CreatedAt
 }
 
-// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryAttempt) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.CreatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CreatedAt, true
+	return &o.CreatedAt, true
 }
 
-// HasCreatedAt returns a boolean if a field has been set.
-func (o *DeliveryAttempt) HasCreatedAt() bool {
-	if o != nil && !IsNil(o.CreatedAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+// SetCreatedAt sets field value
 func (o *DeliveryAttempt) SetCreatedAt(v time.Time) {
-	o.CreatedAt = &v
+	o.CreatedAt = v
 }
 
 func (o DeliveryAttempt) MarshalJSON() ([]byte, error) {
@@ -321,12 +304,8 @@ func (o DeliveryAttempt) MarshalJSON() ([]byte, error) {
 
 func (o DeliveryAttempt) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.AttemptNumber) {
-		toSerialize["attempt_number"] = o.AttemptNumber
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["attempt_number"] = o.AttemptNumber
 	if o.StatusCode.IsSet() {
 		toSerialize["status_code"] = o.StatusCode.Get()
 	}
@@ -339,10 +318,47 @@ func (o DeliveryAttempt) ToMap() (map[string]interface{}, error) {
 	if o.ErrorMessage.IsSet() {
 		toSerialize["error_message"] = o.ErrorMessage.Get()
 	}
-	if !IsNil(o.CreatedAt) {
-		toSerialize["created_at"] = o.CreatedAt
-	}
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
+}
+
+func (o *DeliveryAttempt) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"attempt_number",
+		"created_at",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDeliveryAttempt := _DeliveryAttempt{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDeliveryAttempt)
+
+	if err != nil {
+		return err
+	}
+
+	*o = DeliveryAttempt(varDeliveryAttempt)
+
+	return err
 }
 
 type NullableDeliveryAttempt struct {

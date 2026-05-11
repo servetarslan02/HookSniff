@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the TwoFactorRequiredResponse type satisfies the MappedNullable interface at compile time
@@ -20,17 +22,22 @@ var _ MappedNullable = &TwoFactorRequiredResponse{}
 
 // TwoFactorRequiredResponse struct for TwoFactorRequiredResponse
 type TwoFactorRequiredResponse struct {
-	Requires2fa *bool `json:"requires_2fa,omitempty"`
-	TempToken *string `json:"temp_token,omitempty"`
-	Message *string `json:"message,omitempty"`
+	Requires2fa bool `json:"requires_2fa"`
+	TempToken string `json:"temp_token"`
+	Message string `json:"message"`
 }
+
+type _TwoFactorRequiredResponse TwoFactorRequiredResponse
 
 // NewTwoFactorRequiredResponse instantiates a new TwoFactorRequiredResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTwoFactorRequiredResponse() *TwoFactorRequiredResponse {
+func NewTwoFactorRequiredResponse(requires2fa bool, tempToken string, message string) *TwoFactorRequiredResponse {
 	this := TwoFactorRequiredResponse{}
+	this.Requires2fa = requires2fa
+	this.TempToken = tempToken
+	this.Message = message
 	return &this
 }
 
@@ -42,100 +49,76 @@ func NewTwoFactorRequiredResponseWithDefaults() *TwoFactorRequiredResponse {
 	return &this
 }
 
-// GetRequires2fa returns the Requires2fa field value if set, zero value otherwise.
+// GetRequires2fa returns the Requires2fa field value
 func (o *TwoFactorRequiredResponse) GetRequires2fa() bool {
-	if o == nil || IsNil(o.Requires2fa) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.Requires2fa
+
+	return o.Requires2fa
 }
 
-// GetRequires2faOk returns a tuple with the Requires2fa field value if set, nil otherwise
+// GetRequires2faOk returns a tuple with the Requires2fa field value
 // and a boolean to check if the value has been set.
 func (o *TwoFactorRequiredResponse) GetRequires2faOk() (*bool, bool) {
-	if o == nil || IsNil(o.Requires2fa) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Requires2fa, true
+	return &o.Requires2fa, true
 }
 
-// HasRequires2fa returns a boolean if a field has been set.
-func (o *TwoFactorRequiredResponse) HasRequires2fa() bool {
-	if o != nil && !IsNil(o.Requires2fa) {
-		return true
-	}
-
-	return false
-}
-
-// SetRequires2fa gets a reference to the given bool and assigns it to the Requires2fa field.
+// SetRequires2fa sets field value
 func (o *TwoFactorRequiredResponse) SetRequires2fa(v bool) {
-	o.Requires2fa = &v
+	o.Requires2fa = v
 }
 
-// GetTempToken returns the TempToken field value if set, zero value otherwise.
+// GetTempToken returns the TempToken field value
 func (o *TwoFactorRequiredResponse) GetTempToken() string {
-	if o == nil || IsNil(o.TempToken) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.TempToken
+
+	return o.TempToken
 }
 
-// GetTempTokenOk returns a tuple with the TempToken field value if set, nil otherwise
+// GetTempTokenOk returns a tuple with the TempToken field value
 // and a boolean to check if the value has been set.
 func (o *TwoFactorRequiredResponse) GetTempTokenOk() (*string, bool) {
-	if o == nil || IsNil(o.TempToken) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TempToken, true
+	return &o.TempToken, true
 }
 
-// HasTempToken returns a boolean if a field has been set.
-func (o *TwoFactorRequiredResponse) HasTempToken() bool {
-	if o != nil && !IsNil(o.TempToken) {
-		return true
-	}
-
-	return false
-}
-
-// SetTempToken gets a reference to the given string and assigns it to the TempToken field.
+// SetTempToken sets field value
 func (o *TwoFactorRequiredResponse) SetTempToken(v string) {
-	o.TempToken = &v
+	o.TempToken = v
 }
 
-// GetMessage returns the Message field value if set, zero value otherwise.
+// GetMessage returns the Message field value
 func (o *TwoFactorRequiredResponse) GetMessage() string {
-	if o == nil || IsNil(o.Message) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Message
+
+	return o.Message
 }
 
-// GetMessageOk returns a tuple with the Message field value if set, nil otherwise
+// GetMessageOk returns a tuple with the Message field value
 // and a boolean to check if the value has been set.
 func (o *TwoFactorRequiredResponse) GetMessageOk() (*string, bool) {
-	if o == nil || IsNil(o.Message) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Message, true
+	return &o.Message, true
 }
 
-// HasMessage returns a boolean if a field has been set.
-func (o *TwoFactorRequiredResponse) HasMessage() bool {
-	if o != nil && !IsNil(o.Message) {
-		return true
-	}
-
-	return false
-}
-
-// SetMessage gets a reference to the given string and assigns it to the Message field.
+// SetMessage sets field value
 func (o *TwoFactorRequiredResponse) SetMessage(v string) {
-	o.Message = &v
+	o.Message = v
 }
 
 func (o TwoFactorRequiredResponse) MarshalJSON() ([]byte, error) {
@@ -148,16 +131,49 @@ func (o TwoFactorRequiredResponse) MarshalJSON() ([]byte, error) {
 
 func (o TwoFactorRequiredResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Requires2fa) {
-		toSerialize["requires_2fa"] = o.Requires2fa
-	}
-	if !IsNil(o.TempToken) {
-		toSerialize["temp_token"] = o.TempToken
-	}
-	if !IsNil(o.Message) {
-		toSerialize["message"] = o.Message
-	}
+	toSerialize["requires_2fa"] = o.Requires2fa
+	toSerialize["temp_token"] = o.TempToken
+	toSerialize["message"] = o.Message
 	return toSerialize, nil
+}
+
+func (o *TwoFactorRequiredResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"requires_2fa",
+		"temp_token",
+		"message",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varTwoFactorRequiredResponse := _TwoFactorRequiredResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varTwoFactorRequiredResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = TwoFactorRequiredResponse(varTwoFactorRequiredResponse)
+
+	return err
 }
 
 type NullableTwoFactorRequiredResponse struct {

@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the DeliveryListResponse type satisfies the MappedNullable interface at compile time
@@ -20,18 +22,24 @@ var _ MappedNullable = &DeliveryListResponse{}
 
 // DeliveryListResponse struct for DeliveryListResponse
 type DeliveryListResponse struct {
-	Deliveries []Delivery `json:"deliveries,omitempty"`
-	Total *int32 `json:"total,omitempty"`
-	Page *int32 `json:"page,omitempty"`
-	PerPage *int32 `json:"per_page,omitempty"`
+	Deliveries []Delivery `json:"deliveries"`
+	Total int32 `json:"total"`
+	Page int32 `json:"page"`
+	PerPage int32 `json:"per_page"`
 }
+
+type _DeliveryListResponse DeliveryListResponse
 
 // NewDeliveryListResponse instantiates a new DeliveryListResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeliveryListResponse() *DeliveryListResponse {
+func NewDeliveryListResponse(deliveries []Delivery, total int32, page int32, perPage int32) *DeliveryListResponse {
 	this := DeliveryListResponse{}
+	this.Deliveries = deliveries
+	this.Total = total
+	this.Page = page
+	this.PerPage = perPage
 	return &this
 }
 
@@ -43,132 +51,100 @@ func NewDeliveryListResponseWithDefaults() *DeliveryListResponse {
 	return &this
 }
 
-// GetDeliveries returns the Deliveries field value if set, zero value otherwise.
+// GetDeliveries returns the Deliveries field value
 func (o *DeliveryListResponse) GetDeliveries() []Delivery {
-	if o == nil || IsNil(o.Deliveries) {
+	if o == nil {
 		var ret []Delivery
 		return ret
 	}
+
 	return o.Deliveries
 }
 
-// GetDeliveriesOk returns a tuple with the Deliveries field value if set, nil otherwise
+// GetDeliveriesOk returns a tuple with the Deliveries field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryListResponse) GetDeliveriesOk() ([]Delivery, bool) {
-	if o == nil || IsNil(o.Deliveries) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Deliveries, true
 }
 
-// HasDeliveries returns a boolean if a field has been set.
-func (o *DeliveryListResponse) HasDeliveries() bool {
-	if o != nil && !IsNil(o.Deliveries) {
-		return true
-	}
-
-	return false
-}
-
-// SetDeliveries gets a reference to the given []Delivery and assigns it to the Deliveries field.
+// SetDeliveries sets field value
 func (o *DeliveryListResponse) SetDeliveries(v []Delivery) {
 	o.Deliveries = v
 }
 
-// GetTotal returns the Total field value if set, zero value otherwise.
+// GetTotal returns the Total field value
 func (o *DeliveryListResponse) GetTotal() int32 {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Total
+
+	return o.Total
 }
 
-// GetTotalOk returns a tuple with the Total field value if set, nil otherwise
+// GetTotalOk returns a tuple with the Total field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryListResponse) GetTotalOk() (*int32, bool) {
-	if o == nil || IsNil(o.Total) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Total, true
+	return &o.Total, true
 }
 
-// HasTotal returns a boolean if a field has been set.
-func (o *DeliveryListResponse) HasTotal() bool {
-	if o != nil && !IsNil(o.Total) {
-		return true
-	}
-
-	return false
-}
-
-// SetTotal gets a reference to the given int32 and assigns it to the Total field.
+// SetTotal sets field value
 func (o *DeliveryListResponse) SetTotal(v int32) {
-	o.Total = &v
+	o.Total = v
 }
 
-// GetPage returns the Page field value if set, zero value otherwise.
+// GetPage returns the Page field value
 func (o *DeliveryListResponse) GetPage() int32 {
-	if o == nil || IsNil(o.Page) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.Page
+
+	return o.Page
 }
 
-// GetPageOk returns a tuple with the Page field value if set, nil otherwise
+// GetPageOk returns a tuple with the Page field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryListResponse) GetPageOk() (*int32, bool) {
-	if o == nil || IsNil(o.Page) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Page, true
+	return &o.Page, true
 }
 
-// HasPage returns a boolean if a field has been set.
-func (o *DeliveryListResponse) HasPage() bool {
-	if o != nil && !IsNil(o.Page) {
-		return true
-	}
-
-	return false
-}
-
-// SetPage gets a reference to the given int32 and assigns it to the Page field.
+// SetPage sets field value
 func (o *DeliveryListResponse) SetPage(v int32) {
-	o.Page = &v
+	o.Page = v
 }
 
-// GetPerPage returns the PerPage field value if set, zero value otherwise.
+// GetPerPage returns the PerPage field value
 func (o *DeliveryListResponse) GetPerPage() int32 {
-	if o == nil || IsNil(o.PerPage) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.PerPage
+
+	return o.PerPage
 }
 
-// GetPerPageOk returns a tuple with the PerPage field value if set, nil otherwise
+// GetPerPageOk returns a tuple with the PerPage field value
 // and a boolean to check if the value has been set.
 func (o *DeliveryListResponse) GetPerPageOk() (*int32, bool) {
-	if o == nil || IsNil(o.PerPage) {
+	if o == nil {
 		return nil, false
 	}
-	return o.PerPage, true
+	return &o.PerPage, true
 }
 
-// HasPerPage returns a boolean if a field has been set.
-func (o *DeliveryListResponse) HasPerPage() bool {
-	if o != nil && !IsNil(o.PerPage) {
-		return true
-	}
-
-	return false
-}
-
-// SetPerPage gets a reference to the given int32 and assigns it to the PerPage field.
+// SetPerPage sets field value
 func (o *DeliveryListResponse) SetPerPage(v int32) {
-	o.PerPage = &v
+	o.PerPage = v
 }
 
 func (o DeliveryListResponse) MarshalJSON() ([]byte, error) {
@@ -181,19 +157,51 @@ func (o DeliveryListResponse) MarshalJSON() ([]byte, error) {
 
 func (o DeliveryListResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Deliveries) {
-		toSerialize["deliveries"] = o.Deliveries
-	}
-	if !IsNil(o.Total) {
-		toSerialize["total"] = o.Total
-	}
-	if !IsNil(o.Page) {
-		toSerialize["page"] = o.Page
-	}
-	if !IsNil(o.PerPage) {
-		toSerialize["per_page"] = o.PerPage
-	}
+	toSerialize["deliveries"] = o.Deliveries
+	toSerialize["total"] = o.Total
+	toSerialize["page"] = o.Page
+	toSerialize["per_page"] = o.PerPage
 	return toSerialize, nil
+}
+
+func (o *DeliveryListResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"deliveries",
+		"total",
+		"page",
+		"per_page",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDeliveryListResponse := _DeliveryListResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDeliveryListResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = DeliveryListResponse(varDeliveryListResponse)
+
+	return err
 }
 
 type NullableDeliveryListResponse struct {

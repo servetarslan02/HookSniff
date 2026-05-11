@@ -13,6 +13,8 @@ package hooksniff
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the TeamDetailResponse type satisfies the MappedNullable interface at compile time
@@ -20,17 +22,22 @@ var _ MappedNullable = &TeamDetailResponse{}
 
 // TeamDetailResponse struct for TeamDetailResponse
 type TeamDetailResponse struct {
-	Team *Team `json:"team,omitempty"`
-	Members []TeamMember `json:"members,omitempty"`
-	Invites []TeamInvite `json:"invites,omitempty"`
+	Team Team `json:"team"`
+	Members []TeamMember `json:"members"`
+	Invites []TeamInvite `json:"invites"`
 }
+
+type _TeamDetailResponse TeamDetailResponse
 
 // NewTeamDetailResponse instantiates a new TeamDetailResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTeamDetailResponse() *TeamDetailResponse {
+func NewTeamDetailResponse(team Team, members []TeamMember, invites []TeamInvite) *TeamDetailResponse {
 	this := TeamDetailResponse{}
+	this.Team = team
+	this.Members = members
+	this.Invites = invites
 	return &this
 }
 
@@ -42,98 +49,74 @@ func NewTeamDetailResponseWithDefaults() *TeamDetailResponse {
 	return &this
 }
 
-// GetTeam returns the Team field value if set, zero value otherwise.
+// GetTeam returns the Team field value
 func (o *TeamDetailResponse) GetTeam() Team {
-	if o == nil || IsNil(o.Team) {
+	if o == nil {
 		var ret Team
 		return ret
 	}
-	return *o.Team
+
+	return o.Team
 }
 
-// GetTeamOk returns a tuple with the Team field value if set, nil otherwise
+// GetTeamOk returns a tuple with the Team field value
 // and a boolean to check if the value has been set.
 func (o *TeamDetailResponse) GetTeamOk() (*Team, bool) {
-	if o == nil || IsNil(o.Team) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Team, true
+	return &o.Team, true
 }
 
-// HasTeam returns a boolean if a field has been set.
-func (o *TeamDetailResponse) HasTeam() bool {
-	if o != nil && !IsNil(o.Team) {
-		return true
-	}
-
-	return false
-}
-
-// SetTeam gets a reference to the given Team and assigns it to the Team field.
+// SetTeam sets field value
 func (o *TeamDetailResponse) SetTeam(v Team) {
-	o.Team = &v
+	o.Team = v
 }
 
-// GetMembers returns the Members field value if set, zero value otherwise.
+// GetMembers returns the Members field value
 func (o *TeamDetailResponse) GetMembers() []TeamMember {
-	if o == nil || IsNil(o.Members) {
+	if o == nil {
 		var ret []TeamMember
 		return ret
 	}
+
 	return o.Members
 }
 
-// GetMembersOk returns a tuple with the Members field value if set, nil otherwise
+// GetMembersOk returns a tuple with the Members field value
 // and a boolean to check if the value has been set.
 func (o *TeamDetailResponse) GetMembersOk() ([]TeamMember, bool) {
-	if o == nil || IsNil(o.Members) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Members, true
 }
 
-// HasMembers returns a boolean if a field has been set.
-func (o *TeamDetailResponse) HasMembers() bool {
-	if o != nil && !IsNil(o.Members) {
-		return true
-	}
-
-	return false
-}
-
-// SetMembers gets a reference to the given []TeamMember and assigns it to the Members field.
+// SetMembers sets field value
 func (o *TeamDetailResponse) SetMembers(v []TeamMember) {
 	o.Members = v
 }
 
-// GetInvites returns the Invites field value if set, zero value otherwise.
+// GetInvites returns the Invites field value
 func (o *TeamDetailResponse) GetInvites() []TeamInvite {
-	if o == nil || IsNil(o.Invites) {
+	if o == nil {
 		var ret []TeamInvite
 		return ret
 	}
+
 	return o.Invites
 }
 
-// GetInvitesOk returns a tuple with the Invites field value if set, nil otherwise
+// GetInvitesOk returns a tuple with the Invites field value
 // and a boolean to check if the value has been set.
 func (o *TeamDetailResponse) GetInvitesOk() ([]TeamInvite, bool) {
-	if o == nil || IsNil(o.Invites) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Invites, true
 }
 
-// HasInvites returns a boolean if a field has been set.
-func (o *TeamDetailResponse) HasInvites() bool {
-	if o != nil && !IsNil(o.Invites) {
-		return true
-	}
-
-	return false
-}
-
-// SetInvites gets a reference to the given []TeamInvite and assigns it to the Invites field.
+// SetInvites sets field value
 func (o *TeamDetailResponse) SetInvites(v []TeamInvite) {
 	o.Invites = v
 }
@@ -148,16 +131,49 @@ func (o TeamDetailResponse) MarshalJSON() ([]byte, error) {
 
 func (o TeamDetailResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Team) {
-		toSerialize["team"] = o.Team
-	}
-	if !IsNil(o.Members) {
-		toSerialize["members"] = o.Members
-	}
-	if !IsNil(o.Invites) {
-		toSerialize["invites"] = o.Invites
-	}
+	toSerialize["team"] = o.Team
+	toSerialize["members"] = o.Members
+	toSerialize["invites"] = o.Invites
 	return toSerialize, nil
+}
+
+func (o *TeamDetailResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"team",
+		"members",
+		"invites",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varTeamDetailResponse := _TeamDetailResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varTeamDetailResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = TeamDetailResponse(varTeamDetailResponse)
+
+	return err
 }
 
 type NullableTeamDetailResponse struct {
