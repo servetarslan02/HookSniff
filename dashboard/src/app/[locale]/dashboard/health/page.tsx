@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
 interface EndpointHealth {
@@ -28,33 +29,24 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: strin
 };
 
 export default function EndpointHealthPage() {
-  const { } = useAuth();
+  const { token } = useAuth();
   const [endpoints, setEndpoints] = useState<EndpointHealth[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('health');
   const tc = useTranslations('common');
 
-  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-
   const fetchHealth = useCallback(async () => {
     try {
       setError(null);
-      const res = await fetch(`${API}/endpoint-health`, {
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include' as const,
-      });
-      if (res.ok) {
-        setEndpoints(await res.json());
-      } else {
-        setError(`Failed to load health data (${res.status})`);
-      }
+      const data = await apiFetch<EndpointHealth[]>('/endpoint-health', { token: token || undefined });
+      setEndpoints(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load health data');
+      setError(e instanceof Error ? e.message : t('failedToLoad'));
     } finally {
       setLoading(false);
     }
-  }, [API]);
+  }, [token, t]);
 
   useEffect(() => {
     fetchHealth();
@@ -67,7 +59,7 @@ export default function EndpointHealthPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
-          Monitor the health and performance of your webhook endpoints.
+          {t('subtitle')}
         </p>
       </div>
 

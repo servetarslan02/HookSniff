@@ -256,7 +256,8 @@
     "avgLatency": "Ort. Gecikme",
     "p95Latency": "P95 Gecikme",
     "consecutiveFailures": "{count} ardışık başarısızlık{plural}",
-    "lastFailure": "Son başarısızlık {time}"
+    "lastFailure": "Son başarısızlık {time}",
+    "failedToLoad": "Sağlık verileri yüklenemedi"
   },
   "alerts": {
     "title": "Uyarı Kuralları",
@@ -1275,7 +1276,8 @@
     "rotateTitle": "API Anahtarı Döndürülsün mü?",
     "rotateDesc": "Eski anahtar hemen çalışmayı durduracak. Yerine yeni bir anahtar alacaksınız.",
     "deleteTitle": "API Anahtarı Silinsin mi?",
-    "deleteDesc": "Bu işlem geri alınamaz. Bu anahtarı kullanan tüm hizmetler erişimini hemen kaybedecek."
+    "deleteDesc": "Bu işlem geri alınamaz. Bu anahtarı kullanan tüm hizmetler erişimini hemen kaybedecek.",
+    "failedToLoad": "API anahtarları yüklenemedi"
   },
   "onboarding": {
     "welcome": "HookSniff'e Hoş Geldiniz! 🪝",

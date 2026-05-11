@@ -4,6 +4,7 @@ import { getErrorMessage } from '@/lib/errors';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
 interface ApiKey {
@@ -18,7 +19,7 @@ interface ApiKey {
 export default function ApiKeysPage() {
   const t = useTranslations('apiKeys');
   const tc = useTranslations('common');
-  const { } = useAuth();
+  const { token } = useAuth();
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [newKey, setNewKey] = useState<string | null>(null);
@@ -30,24 +31,16 @@ export default function ApiKeysPage() {
   const [rotateTarget, setRotateTarget] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-
   const fetchKeys = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api-keys`, {
-        headers: {}, credentials: 'include' as const,
-      });
-      if (res.ok) {
-        setKeys(await res.json());
-      } else {
-        setError(`Failed to load API keys (${res.status})`);
-      }
+      const data = await apiFetch<ApiKey[]>('/api-keys', { token: token || undefined });
+      setKeys(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load API keys');
+      setError(e instanceof Error ? e.message : t('failedToLoad'));
     } finally {
       setLoading(false);
     }
-  }, [API]);
+  }, [token, t]);
 
   useEffect(() => { fetchKeys(); }, [fetchKeys]);
 
@@ -55,19 +48,11 @@ export default function ApiKeysPage() {
     setCreating(true);
     setError('');
     try {
-      const res = await fetch(`${API}/api-keys`, {
+      const data = await apiFetch<{ key: string }>('/api-keys', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include' as const,
-        body: JSON.stringify({ name: keyName || undefined }),
+        body: { name: keyName || undefined },
+        token: token || undefined,
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error?.message || tc('error'));
-      }
-      const data = await res.json();
       setNewKey(data.key);
       setKeyName('');
       fetchKeys();
@@ -81,11 +66,10 @@ export default function ApiKeysPage() {
   const deleteKey = async (id: string) => {
     setActionLoading(id);
     try {
-      const res = await fetch(`${API}/api-keys/${id}`, {
+      await apiFetch(`/api-keys/${id}`, {
         method: 'DELETE',
-        headers: {}, credentials: 'include' as const,
+        token: token || undefined,
       });
-      if (!res.ok) throw new Error(tc('error'));
       setKeys((prev) => prev.filter((k) => k.id !== id));
     } catch (e: unknown) {
       setError(getErrorMessage(e));
@@ -98,12 +82,10 @@ export default function ApiKeysPage() {
   const rotateKey = async (id: string) => {
     setActionLoading(id);
     try {
-      const res = await fetch(`${API}/api-keys/${id}/rotate`, {
+      const data = await apiFetch<{ key: string }>(`/api-keys/${id}/rotate`, {
         method: 'POST',
-        headers: {}, credentials: 'include' as const,
+        token: token || undefined,
       });
-      if (!res.ok) throw new Error(tc('error'));
-      const data = await res.json();
       setNewKey(data.key);
       fetchKeys();
     } catch (e: unknown) {
