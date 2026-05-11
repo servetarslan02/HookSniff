@@ -187,10 +187,8 @@ public class WebhookTest
     {
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var validSig = ComputeSignature(TestSecret, MsgId, timestamp, Payload);
-        var multiSig = $"v1,aW52YWxpZC1vbGUtc2ln,{validSig.Split(',')[1]}";
-
-        // Reconstruct the full "v1,<base>" format
-        var fullMultiSig = $"v1,aW52YWxpZC1vbGUtc2ln,{validSig.Split(',')[1]}";
+        var validSigPart = validSig.Split(',')[1];
+        var fullMultiSig = $"v1,aW52YWxpZC1vbGUtc2ln,{validSigPart}";
 
         var headers = MakeHeaders(MsgId, timestamp, fullMultiSig);
 
