@@ -8,7 +8,11 @@ import { adminApi, type AdminUser } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 
-const PLAN_OPTIONS = ['free', 'pro', 'business'];
+const PLAN_OPTIONS = [
+  { value: 'free', labelKey: 'freePlan' },
+  { value: 'pro', labelKey: 'proPlan' },
+  { value: 'business', labelKey: 'businessPlan' },
+];
 
 export default function AdminUsersPage() {
   const { token } = useAuth();
@@ -110,7 +114,7 @@ export default function AdminUsersPage() {
             >
               <option value="">{t('allPlans')}</option>
               {PLAN_OPTIONS.map((p) => (
-                <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
+                <option key={p.value} value={p.value}>{t(p.labelKey)}</option>
               ))}
             </select>
           </div>
@@ -252,7 +256,7 @@ export default function AdminUsersPage() {
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white mb-4"
             >
               {PLAN_OPTIONS.map((p) => (
-                <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
+                <option key={p.value} value={p.value}>{t(p.labelKey)}</option>
               ))}
             </select>
             <div className="flex gap-3 justify-end">
