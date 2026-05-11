@@ -31,18 +31,27 @@ MAJOR.MINOR.PATCH-prerelease
 ### Kural: Ne Zaman Publish?
 
 ```
+⚠️ DURUM: Şu an kullanıcı yok. Strateji buna göre ayarlandı.
+
 ❌ Publish ETME:
   - Schema değişikliği (openapi.yaml düzenleme)
   - SDK regeneration (openapi-generator ile yeniden üretme)
   - Audit fix (required field ekleme, type düzeltme)
   - Dokümantasyon değişikliği
   - Test ekleme
+  - Henüz kalite kontrol yapılmadıysa
 
 ✅ Publish ET:
   - Kalite kontrol tamamlandıktan sonra (Aşama 1.4+)
-  - Breaking change varsa major version bump
-  - Kullanıcı geri bildirimi sonrası patch release
+  - Kullanıcı yokken breaking change serbest → minor bump yeterli
+  - Kullanıcı olunca: breaking change → major bump
 ```
+
+### Kullanıcı Yokken Özel Kurallar
+- Version bump agresif olabilir (0.3.0 → 0.4.0 → 0.5.0 sorun değil)
+- Breaking change endişesi yok
+- Hızlı iterate et → publish et → geri bildirim al
+- Kalite kontrol sonrası tek seferde publish yeterli
 
 ---
 
