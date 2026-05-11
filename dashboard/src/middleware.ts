@@ -8,7 +8,10 @@ const handleI18nRouting = createMiddleware(routing);
 const PROTECTED_PATHS = ['/dashboard', '/admin'];
 
 function isProtectedRoute(pathname: string): boolean {
-  return PROTECTED_PATHS.some((path) => pathname.includes(path));
+  // Use startsWith to avoid false matches like "/something-dashboard"
+  // Strip locale prefix first (e.g. /tr/dashboard → /dashboard)
+  const withoutLocale = pathname.replace(/^\/(tr|en)/, '') || '/';
+  return PROTECTED_PATHS.some((path) => withoutLocale.startsWith(path));
 }
 
 export default function middleware(request: NextRequest) {
@@ -21,6 +24,7 @@ export default function middleware(request: NextRequest) {
     const refreshCookie = request.cookies.get('hooksniff_refresh');
 
     // If no auth cookie and no refresh cookie, redirect to login
+    // Note: having only refreshCookie is valid — the API will handle token refresh
     if (!authCookie && !refreshCookie) {
       const locale = pathname.match(/^\/(tr|en)/)?.[1] || 'en';
       const loginUrl = new URL(`/${locale}/login`, request.url);
@@ -35,8 +39,6 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all paths except: /api/*, /_next/*, /_vercel/*, and files with extensions
-    // Note: /docs/api is NOT excluded (only top-level /api is excluded)
     '/((?!api/|_next/|_vercel/|.*\\..*).*)',
   ],
 };
