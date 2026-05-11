@@ -233,8 +233,8 @@
 163. ⬜ Sidebar bottom controls overlap düzelt
 
 ### 4.6 CSS & Responsive
-164. ⬜ 13 tablo `overflow-x-auto` ekle (docs, alternatives, privacy)
-165. ⬜ 8 `<pre>` bloğu `overflow-x-auto` ekle
+164. ✅ 13 tablo `overflow-x-auto` ekle (docs, alternatives, privacy) ✅ YAPILDI (Oturum 120) — 3 alternatives sayfası
+165. ✅ 8 `<pre>` bloğu `overflow-x-auto` ekle ✅ YAPILDI (Oturum 120) — 3 docs sayfası
 166. ⬜ `vh` → `dvh` mobilde (Deliveries, Logs, Blog)
 167. ⬜ Grid layout mobilde kırılıyor (Portal page)
 168. ⬜ Signature comparison not constant-time → `signature-verifier/page.tsx`
