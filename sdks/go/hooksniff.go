@@ -122,20 +122,32 @@ func (e *APIError) Error() string {
 
 // doRequest performs an HTTP request with retry logic.
 func (c *Client) doRequest(method, path string, body interface{}) ([]byte, http.Header, error) {
-	var bodyReader io.Reader
+	var bodyBytes []byte
 	if body != nil {
-		jsonBytes, err := json.Marshal(body)
+		var err error
+		bodyBytes, err = json.Marshal(body)
 		if err != nil {
 			return nil, nil, fmt.Errorf("marshal body: %w", err)
 		}
-		bodyReader = bytes.NewReader(jsonBytes)
+	}
+
+	// Generate idempotency key once (reused across retries)
+	idempotencyKey := ""
+	if method == "POST" {
+		idempotencyKey = "auto_" + generateID()
 	}
 
 	var lastErr error
 	for attempt := 0; attempt <= c.NumRetries; attempt++ {
-		url := c.BaseURL + path
+		reqURL := c.BaseURL + path
 
-		req, err := http.NewRequest(method, url, bodyReader)
+		// Recreate body reader on each attempt (reader position resets)
+		var bodyReader io.Reader
+		if bodyBytes != nil {
+			bodyReader = bytes.NewReader(bodyBytes)
+		}
+
+		req, err := http.NewRequest(method, reqURL, bodyReader)
 		if err != nil {
 			return nil, nil, fmt.Errorf("create request: %w", err)
 		}
@@ -146,10 +158,8 @@ func (c *Client) doRequest(method, path string, body interface{}) ([]byte, http.
 		if body != nil {
 			req.Header.Set("Content-Type", "application/json")
 		}
-
-		// Auto idempotency key for POST (matches Node.js/Python behavior)
-		if method == "POST" && req.Header.Get("Idempotency-Key") == "" {
-			req.Header.Set("Idempotency-Key", "auto_"+generateID())
+		if idempotencyKey != "" {
+			req.Header.Set("Idempotency-Key", idempotencyKey)
 		}
 
 		resp, err := c.HTTPClient.Do(req)
@@ -161,12 +171,16 @@ func (c *Client) doRequest(method, path string, body interface{}) ([]byte, http.
 			}
 			return nil, nil, err
 		}
-		defer resp.Body.Close()
 
 		respBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close() // Close immediately, not with defer
 		if err != nil {
 			lastErr = err
-			continue
+			if attempt < c.NumRetries {
+				time.Sleep(50 * time.Millisecond * time.Duration(1<<uint(attempt)))
+				continue
+			}
+			return nil, nil, err
 		}
 
 		if resp.StatusCode >= 500 && attempt < c.NumRetries {
