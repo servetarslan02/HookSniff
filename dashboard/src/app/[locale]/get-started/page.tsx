@@ -421,7 +421,7 @@ export default function GetStartedPage() {
           </pre>
         </div>
         <p className="mt-3 text-sm text-gray-500 dark:text-slate-500">
-          {t('customizeColors')} <Link href="/dashboard/portal" className="text-brand-600 dark:text-brand-400 hover:underline">{t('portalSettings')}</Link>.
+          {t('customizeColors')} <Link href="/dashboard/portal-manage" className="text-brand-600 dark:text-brand-400 hover:underline">{t('portalSettings')}</Link>.
         </p>
       </div>
 

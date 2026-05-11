@@ -36,7 +36,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: any[]) => mockApiFetch(...args),
 }));
 
-const { default: PortalPage } = await import('@/app/[locale]/dashboard/portal/page');
+const { default: PortalPage } = await import('@/app/[locale]/dashboard/portal-manage/page');
 
 const mockProfile = {
   id: 'u1',
