@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 pub mod admin_revenue_entry;
 pub use self::admin_revenue_entry::AdminRevenueEntry;
 pub mod _admin_revenue_get_200_response_inner;

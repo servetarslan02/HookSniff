@@ -14,7 +14,7 @@ pub struct TeamMember {
     pub joined_at: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct InviteInput {
     pub email: String,
     pub role: String,
@@ -27,6 +27,7 @@ pub struct InviteOutput {
     pub invite_id: Option<String>,
 }
 
+#[derive(Debug)]
 pub struct Teams {
     ctx: HookSniffRequestContext,
 }

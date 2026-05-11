@@ -136,25 +136,30 @@ defmodule HookSniff.Webhook do
   end
 
   defp verify_signature(expected, actual) do
-    # Handle comma-separated multiple signatures
-    actual
-    |> String.split(",")
-    |> Enum.map(&String.trim/1)
-    |> Enum.any?(fn sig ->
-      # Strip version prefix
-      sig_part = case String.split(sig, ",", parts: 2) do
-        [_version, sig_val] -> sig_val
-        [sig_val] -> sig_val
-      end
+    expected_part = case String.split(expected, ",", parts: 2) do
+      [_version, val] -> val
+      [val] -> val
+    end
 
-      expected_part = case String.split(expected, ",", parts: 2) do
-        [_version, sig_val] -> sig_val
-        [sig_val] -> sig_val
-      end
+    # Get all base64 signature values to check.
+    # Handles: single "v1,base64", space-separated "v1,sig1 v1,sig2",
+    # and comma-separated "v1,sig1,sig2" formats.
+    sig_values =
+      actual
+      |> String.split(" ")
+      |> Enum.map(&String.trim/1)
+      |> Enum.filter(&(&1 != ""))
+      |> Enum.flat_map(fn entry ->
+        case String.split(entry, ",", parts: 2) do
+          ["v1", rest] -> String.split(rest, ",")
+          _ -> []
+        end
+      end)
 
-      # Timing-safe comparison
-      if byte_size(expected_part) == byte_size(sig_part) do
-        :crypto.hash_equals(expected_part, sig_part)
+    Enum.any?(sig_values, fn sig_val ->
+      sig_val = String.trim(sig_val)
+      if byte_size(expected_part) == byte_size(sig_val) do
+        :crypto.hash_equals(expected_part, sig_val)
       else
         false
       end

@@ -109,7 +109,7 @@ pub fn verify_signature(
     let secret_bytes = decode_secret(secret);
     let expected = sign(&secret_bytes, msg_id, timestamp, payload);
 
-    // Timing-safe comparison across all provided signatures
+    // Timing-safe comparison across all provided signatures (space-separated per Standard Webhooks)
     let expected_parts: Vec<&str> = expected.splitn(2, ',').collect();
     let expected_sig = if expected_parts.len() > 1 {
         expected_parts[1]
@@ -117,10 +117,16 @@ pub fn verify_signature(
         expected_parts[0]
     };
 
-    for sig_part in signature.split(',') {
+    for sig_part in signature.split(' ') {
         let sig_part = sig_part.trim();
-        let parts: Vec<&str> = sig_part.splitn(2, ',').collect();
-        let sig_value = if parts.len() > 1 { parts[1] } else { parts[0] };
+        if sig_part.is_empty() {
+            continue;
+        }
+        // Each signature must be in format "v1,<base64>"
+        if !sig_part.starts_with("v1,") {
+            continue;
+        }
+        let sig_value = &sig_part[3..];
 
         if timing_safe_eq(expected_sig.as_bytes(), sig_value.as_bytes()) {
             return Ok(());
@@ -282,7 +288,7 @@ mod tests {
         let msg_id = "msg_multi_001";
         let ts = current_timestamp();
         let sig = sign(&make_raw_secret(), msg_id, ts, payload);
-        let multi_sig = format!("v1,fakesig,{}", sig);
+        let multi_sig = format!("v1,fakesig {}", sig);
 
         let headers = make_headers(msg_id, &ts.to_string(), &multi_sig);
         assert!(verify_signature(secret, payload, &headers).is_ok());
