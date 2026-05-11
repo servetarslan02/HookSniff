@@ -141,7 +141,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <LanguageSwitcher />
             <NotificationCenter />
             <div className="text-sm text-gray-500 dark:text-slate-400 hidden sm:block">
-              {user?.email || 'User'}
+              {user?.email || tc('user')}
             </div>
             <button
               onClick={() => { logout(); router.push('/login'); }}
