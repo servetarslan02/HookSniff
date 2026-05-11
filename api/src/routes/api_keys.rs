@@ -1,3 +1,4 @@
+use crate::audit_event;
 use axum::extract::Extension;
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
@@ -85,7 +86,7 @@ async fn create_api_key(
     // Audit log — API_KEY_CREATE
     {
         let kid = id.0.to_string();
-        let _ = hooksniff_audit_event!(pool, customer.id, "API_KEY_CREATE", "api_key", Some(&kid));
+        let _ = audit_event!(pool, customer.id, "API_KEY_CREATE", "api_key", Some(&kid));
     }
 
     Ok(Json(CreateApiKeyResponse {
@@ -114,7 +115,7 @@ async fn delete_api_key(
     // Audit log — API_KEY_DELETE
     {
         let kid = id.to_string();
-        let _ = hooksniff_audit_event!(pool, customer.id, "API_KEY_DELETE", "api_key", Some(&kid));
+        let _ = audit_event!(pool, customer.id, "API_KEY_DELETE", "api_key", Some(&kid));
     }
 
     Ok(Json(serde_json::json!({"deleted": true})))
