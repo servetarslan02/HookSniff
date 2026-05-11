@@ -4,25 +4,26 @@ HookSniff API Resource: Auth
 Register, login, 2FA, email verification, password reset, GDPR.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from hooksniff.request import HookSniffRequest, HookSniffRequestContext
+from hooksniff.models.auth_response import AuthResponse
 
 
 class Auth:
     def __init__(self, ctx: HookSniffRequestContext):
         self._ctx = ctx
 
-    def register(self, data: Dict[str, str]) -> Any:
+    def register(self, data: Dict[str, str]) -> AuthResponse:
         """Register a new account."""
         req = HookSniffRequest("POST", "/v1/auth/register")
         req.set_body(data)
-        return req.send(self._ctx)
+        return req.send(self._ctx, parser=AuthResponse._from_json)
 
-    def login(self, data: Dict[str, str]) -> Any:
+    def login(self, data: Dict[str, str]) -> AuthResponse:
         """Login and get a JWT token."""
         req = HookSniffRequest("POST", "/v1/auth/login")
         req.set_body(data)
-        return req.send(self._ctx)
+        return req.send(self._ctx, parser=AuthResponse._from_json)
 
     def enable_2fa(self) -> Any:
         """Enable two-factor authentication."""

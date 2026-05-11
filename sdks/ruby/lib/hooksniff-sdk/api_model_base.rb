@@ -10,8 +10,31 @@ Generator version: 7.22.0
 
 =end
 
+require 'json'
+
 module HooksniffSdk
   class ApiModelBase
+    # Serialize this model instance to a JSON string.
+    # @return [String] JSON representation of the model
+    def to_json(*args)
+      JSON.generate(to_hash)
+    end
+
+    # Deserialize a JSON string into a model instance.
+    # @param json_string [String] JSON string
+    # @return [Object] Model instance
+    def self.from_json(json_string)
+      return nil if json_string.nil? || json_string.empty?
+      data = JSON.parse(json_string, symbolize_names: true)
+      build_from_hash(data)
+    end
+
+    # Serialize this model instance to a pretty-printed JSON string.
+    # @return [String] Pretty-printed JSON representation
+    def to_json_pretty
+      JSON.pretty_generate(to_hash)
+    end
+
     # Deserializes the data based on type
     # @param string type Data type
     # @param string value Value to be deserialized

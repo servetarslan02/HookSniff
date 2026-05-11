@@ -27,6 +27,8 @@ from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
 
+from hooksniff.serialization import _to_json_static, _from_json_static, SerializationError
+
 class DeliveryDetailResponse(BaseModel):
     """
     Full delivery detail including all retry attempts and endpoint info
@@ -128,3 +130,14 @@ class DeliveryDetailResponse(BaseModel):
         return _obj
 
 
+
+
+    @staticmethod
+    def _to_json(obj: dict) -> dict:
+        """Serialize to JSON-safe dict. Validates required fields, strips extras."""
+        return _to_json_static(obj, DeliveryDetailResponse)
+
+    @staticmethod
+    def _from_json(data: dict) -> "DeliveryDetailResponse":
+        """Deserialize from JSON dict. Validates required, applies defaults, ignores extras."""
+        return _from_json_static(data, DeliveryDetailResponse)

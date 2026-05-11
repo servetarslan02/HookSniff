@@ -2,18 +2,19 @@
 HookSniff API Resource: Teams
 """
 
-from typing import Any, Optional
+from typing import List, Optional
 from hooksniff.request import HookSniffRequest, HookSniffRequestContext
+from hooksniff.models.team import Team
 
 
 class Teams:
     def __init__(self, ctx: HookSniffRequestContext):
         self._ctx = ctx
 
-    def list(self) -> Any:
+    def list(self) -> List[Team]:
         """List team members."""
         req = HookSniffRequest("GET", "/v1/teams/members")
-        return req.send(self._ctx)
+        return req.send(self._ctx, parser=lambda data: [Team._from_json(item) for item in data] if isinstance(data, list) else [])
 
     def invite(self, email: str, role: str, idempotency_key: Optional[str] = None) -> None:
         """Invite a team member."""
