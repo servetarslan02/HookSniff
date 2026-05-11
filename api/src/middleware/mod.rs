@@ -74,18 +74,20 @@ static AUTH_CACHE: once_cell::sync::Lazy<Mutex<AuthCache>> =
 /// Start a background task that periodically cleans up expired auth cache entries.
 /// Call this once from main.rs during server startup.
 pub fn start_auth_cache_cleanup() {
-    tokio::spawn(async loop {
-        tokio::time::sleep(Duration::from_secs(60)).await;
-        let mut cache = AUTH_CACHE.lock().await;
-        let before = cache.entries.len();
-        cache.cleanup();
-        let after = cache.entries.len();
-        if before != after {
-            tracing::debug!(
-                "Auth cache cleanup: removed {} expired entries ({} remaining)",
-                before - after,
-                after
-            );
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(Duration::from_secs(60)).await;
+            let mut cache = AUTH_CACHE.lock().await;
+            let before = cache.entries.len();
+            cache.cleanup();
+            let after = cache.entries.len();
+            if before != after {
+                tracing::debug!(
+                    "Auth cache cleanup: removed {} expired entries ({} remaining)",
+                    before - after,
+                    after
+                );
+            }
         }
     });
 }

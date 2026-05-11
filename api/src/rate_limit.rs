@@ -626,13 +626,16 @@ mod tests {
     }
 
     #[test]
-    fn extract_key_from_forwarded_for() {
+    fn extract_key_from_forwarded_for_when_trusted() {
+        // X-Forwarded-For is only trusted when TRUST_PROXY_HEADERS=true
+        // Without that env var, it falls back to "unknown" to prevent spoofing
         let req = Request::builder()
             .header("x-forwarded-for", "192.168.1.1")
             .body(axum::body::Body::empty())
             .unwrap();
         let key = extract_key(&req);
-        assert_eq!(key, "192.168.1.1");
+        // Without TRUST_PROXY_HEADERS, should return "unknown"
+        assert_eq!(key, "unknown");
     }
 
     #[test]
@@ -670,7 +673,7 @@ mod tests {
             .body(axum::body::Body::empty())
             .unwrap();
         let key = extract_key(&req);
-        // No "Bearer " prefix, falls back to forwarded-for → "unknown"
+        // No "Bearer " prefix, falls back to "unknown" (no proxy trust)
         assert_eq!(key, "unknown");
     }
 
