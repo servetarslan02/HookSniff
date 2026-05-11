@@ -48,7 +48,7 @@ function LoginForm() {
       }
       router.push('/dashboard');
     } catch (err: unknown) {
-      setError(getErrorMessage(err) || tc('error'));
+      setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
     } finally {
       setLoading(false);
     }

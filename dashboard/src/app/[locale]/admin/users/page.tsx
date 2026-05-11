@@ -103,6 +103,7 @@ export default function AdminUsersPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('searchByEmail')}
+              aria-label={t('searchByEmail')}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 transition text-sm"
             />
           </div>
@@ -158,8 +159,8 @@ export default function AdminUsersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                  {users.map((u) => (
-                    <tr key={u.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
+                  {users.map((u, index) => (
+                    <tr key={u.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
                         {u.id.slice(0, 8)}…
                       </td>

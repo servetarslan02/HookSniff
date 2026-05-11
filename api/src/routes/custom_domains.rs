@@ -85,7 +85,7 @@ async fn list_domains(
         ),
     >(
         "SELECT id, domain, verified, ssl_active, cname_target, txt_record, verified_at, created_at
-         FROM custom_domains WHERE customer_id = $1 ORDER BY created_at DESC",
+         FROM custom_domains WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
     )
     .bind(customer.id)
     .fetch_all(&pool)

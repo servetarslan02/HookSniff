@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetch(`${API_BASE}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
-    }).catch((err) => console.warn('Logout request failed:', err));
+    }).catch((err) => console.warn('Logout request failed:', err)); // dev only
     setToken(null);
     setUser(null);
     setApiKeyState(null);
