@@ -201,7 +201,7 @@ export default function TeamPage() {
                   )}
                 </div>
                 <button
-                  onClick={() => setShowInviteModal(true)}
+                  onClick={() => setShowInviteModal(true)} disabled={!canInvite}
                   className="px-3 py-2 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
                 >
                   {t('inviteBtn')}
@@ -227,7 +227,7 @@ export default function TeamPage() {
                       <div className="flex items-center gap-3">
                         <select
                           value={m.role}
-                          onChange={(e) => handleRoleChange(m.id, e.target.value)}
+                          onChange={(e) => handleRoleChange(m.id, e.target.value)} disabled={!canChangeRole}
                           className="px-3 py-1.5 text-xs border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                         >
                           {ROLE_OPTIONS.map((r) => (
@@ -235,7 +235,7 @@ export default function TeamPage() {
                           ))}
                         </select>
                         <button
-                          onClick={() => handleRemoveMember(m.id)}
+                          onClick={() => handleRemoveMember(m.id)} disabled={!canRemove}
                           className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
                         >
                           {t('removeBtn')}
