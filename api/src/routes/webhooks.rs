@@ -53,7 +53,7 @@ async fn list_deliveries(
     Query(params): Query<ListParams>,
 ) -> Result<Json<DeliveryListResponse>, AppError> {
     let page = params.page.unwrap_or(1).max(1);
-    let per_page = params.per_page.unwrap_or(20).min(100);
+    let per_page = params.per_page.unwrap_or(20).min(200);
     let offset = (page - 1) * per_page;
 
     let (deliveries, total) = if let Some(status) = &params.status {
@@ -1023,7 +1023,7 @@ mod tests {
 
         // per_page over 100 should clamp to 100
         let raw_per_page = 500i64;
-        let clamped_per_page = raw_per_page.min(100);
+        let clamped_per_page = raw_per_page.min(200);
         assert_eq!(clamped_per_page, 100);
     }
 }

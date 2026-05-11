@@ -58,6 +58,7 @@ async fn get_profile(Extension(customer): Extension<Customer>) -> Json<ProfileRe
 
 /// Profil güncelleme
 #[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct UpdateProfileRequest {
     email: Option<String>,
 }
