@@ -41,12 +41,12 @@ export default function AlertsPage() {
     try {
       const data = await alertsApi.list(token);
       setAlerts(data);
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('fetchFailed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, toast, t]);
 
   useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
 
@@ -58,8 +58,8 @@ export default function AlertsPage() {
       setShowCreate(false);
       setForm({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] });
       fetchAlerts();
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('createFailed'), 'error');
     } finally {
       setCreating(false);
     }
@@ -74,8 +74,8 @@ export default function AlertsPage() {
     try {
       await alertsApi.delete(token, deleteId);
       fetchAlerts();
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('deleteFailed'), 'error');
     } finally {
       setDeleteId(null);
     }
@@ -86,8 +86,8 @@ export default function AlertsPage() {
     try {
       await alertsApi.test(token, id);
       toast(t('testSent'), 'success');
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('testFailed'), 'error');
     }
   };
 

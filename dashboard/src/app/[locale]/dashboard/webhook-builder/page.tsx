@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { apiFetch } from '@/lib/api';
 
 /* ─── Webhook Builder — Visual webhook creator ─── */
 interface WebhookField {
@@ -97,20 +98,14 @@ export default function WebhookBuilderPage() {
           else payload[f.key] = f.value;
         }
       });
-      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-      const res = await fetch(`${API}/webhooks`, {
+      await apiFetch('/webhooks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ endpoint_id: endpointId, event: eventType, data: payload }),
+        body: { endpoint_id: endpointId, event: eventType, data: payload },
+        token: token || undefined,
       });
-      if (res.ok) {
-        toast(t('webhookSent'), 'success');
-      } else {
-        toast(t('sendFailed'), 'error');
-      }
-    } catch {
-      toast(t('networkError'), 'error');
+      toast(t('webhookSent'), 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('sendFailed'), 'error');
     } finally {
       setSending(false);
     }
