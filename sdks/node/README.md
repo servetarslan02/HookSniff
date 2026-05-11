@@ -11,216 +11,231 @@ Official TypeScript/Node.js client for the [HookSniff](https://hooksniff.vercel.
 npm install hooksniff-sdk
 ```
 
-Or install from source:
-
-```bash
-cd sdks/node
-npm install
-npm run build
-```
-
 ## Quick Start
 
 ```typescript
-import { HookSniff } from 'hooksniff-sdk';
+import { EndpointsApi, WebhooksApi, HealthApi, ApiKeyAuth } from 'hooksniff-sdk';
 
-// Initialize client
-const client = new HookSniff({ apiKey: 'hr_live_your_api_key_here' });
+// Configure authentication
+const apiKey = new ApiKeyAuth('hr_live_your_api_key_here');
 
-// Create a webhook endpoint
-const endpoint = await client.endpoints.create({
+// Create an endpoint
+const endpointsApi = new EndpointsApi();
+endpointsApi.setDefaultAuthentication(apiKey);
+
+const { body: endpoint } = await endpointsApi.endpointsPost({
   url: 'https://myapp.com/webhook',
   description: 'Order notifications',
 });
 console.log(`Endpoint created: ${endpoint.id}`);
 
 // Send a webhook
-const delivery = await client.webhooks.send({
+const webhooksApi = new WebhooksApi();
+webhooksApi.setDefaultAuthentication(apiKey);
+
+const { body: delivery } = await webhooksApi.webhooksPost({
   endpointId: endpoint.id,
   event: 'order.created',
   data: { orderId: '12345', amount: 99.99 },
 });
 console.log(`Delivery queued: ${delivery.id}, status: ${delivery.status}`);
+```
 
-// Check delivery status
-const status = await client.webhooks.get(delivery.id);
-console.log(`Status: ${status.status}, attempts: ${status.attemptCount}`);
+## Available APIs
 
-// List deliveries
-const deliveries = await client.webhooks.list('failed', 1);
+Each API class maps to a group of endpoints:
+
+| Class | Description |
+|-------|-------------|
+| `EndpointsApi` | Manage webhook destination endpoints |
+| `WebhooksApi` | Send, list, replay, and export webhook deliveries |
+| `AuthApi` | Registration, login, password reset, 2FA |
+| `APIKeysApi` | Manage API keys |
+| `AlertsApi` | Alert rules and notifications |
+| `AnalyticsApi` | Delivery trends, success rates, latency metrics |
+| `BillingApi` | Subscription, usage, invoices |
+| `TeamsApi` | Team management and invitations |
+| `NotificationsApi` | In-app notification management |
+| `SchemasApi` | Event schema management |
+| `SearchApi` | Search webhook deliveries |
+| `HealthApi` | System status and endpoint health |
+| `AdminApi` | Admin operations |
+| `AuditLogApi` | Audit log access |
+| `InboundApi` | Receive webhooks from external providers |
+| `TemplatesApi` | Webhook templates |
+| `RoutingApi` | Delivery routing configuration |
+| `RateLimitsApi` | Rate limit management |
+| `CustomDomainsApi` | Custom domain management |
+| `CustomerPortalApi` | Customer portal operations |
+| `DeliveryDetailsApi` | Detailed delivery information |
+| `DevicesApi` | Push notification device tokens |
+| `EmbedApi` | Embed widget configuration |
+| `EventsApi` | Event management |
+| `OAuthApi` | OAuth configuration |
+| `OutboundIPsApi` | Outbound IP addresses |
+| `PlaygroundApi` | API playground |
+| `SimulatorApi` | Webhook simulator |
+| `SSOApi` | SSO configuration |
+| `StatsApi` | Account usage statistics |
+| `StreamApi` | Real-time event streaming |
+| `TransformsApi` | Transform rules |
+
+## Usage Examples
+
+### List Endpoints
+
+```typescript
+import { EndpointsApi, ApiKeyAuth } from 'hooksniff-sdk';
+
+const endpointsApi = new EndpointsApi();
+endpointsApi.setDefaultAuthentication(new ApiKeyAuth('hr_live_...'));
+
+const { body: endpoints } = await endpointsApi.endpointsGet();
+for (const ep of endpoints) {
+  console.log(`  ${ep.id}: ${ep.url} (${ep.status})`);
+}
+```
+
+### Send a Webhook
+
+```typescript
+import { WebhooksApi, ApiKeyAuth } from 'hooksniff-sdk';
+
+const webhooksApi = new WebhooksApi();
+webhooksApi.setDefaultAuthentication(new ApiKeyAuth('hr_live_...'));
+
+const { body: delivery } = await webhooksApi.webhooksPost({
+  endpointId: 'ep_abc123',
+  event: 'order.created',
+  data: { orderId: '12345', amount: 99.99 },
+});
+```
+
+### Batch Webhooks
+
+```typescript
+const { body: result } = await webhooksApi.webhooksBatchPost({
+  webhooks: [
+    { endpointId: 'ep_1', event: 'order.created', data: { orderId: '12345' } },
+    { endpointId: 'ep_2', event: 'payment.completed', data: { paymentId: 'pay_67890' } },
+  ],
+});
+console.log(`Delivered: ${result.deliveries.length}, Errors: ${result.errors?.length}`);
+```
+
+### List Deliveries
+
+```typescript
+const { body: deliveries } = await webhooksApi.webhooksGet(
+  1,       // page
+  20,      // perPage
+  'failed' // status filter
+);
 for (const d of deliveries.deliveries) {
   console.log(`  ${d.id}: ${d.status}`);
 }
+```
 
-// Replay a failed delivery
-const replayed = await client.webhooks.replay(delivery.id);
+### Get Delivery Details
+
+```typescript
+const { body: delivery } = await webhooksApi.webhooksIdGet('dlv_abc123');
+console.log(`Status: ${delivery.status}, Attempts: ${delivery.attemptCount}`);
+```
+
+### Replay a Delivery
+
+```typescript
+const { body: replayed } = await webhooksApi.webhooksIdReplayPost('dlv_abc123');
 console.log(`Replay queued: ${replayed.id}`);
 ```
 
-## Batch Webhooks
-
-Send multiple webhooks in a single request (max 100):
+### Get Delivery Attempts
 
 ```typescript
-const results = await client.webhooks.batch([
-  {
-    endpointId: 'ep_1',
-    event: 'order.created',
-    data: { orderId: '12345' },
-  },
-  {
-    endpointId: 'ep_2',
-    event: 'payment.completed',
-    data: { paymentId: 'pay_67890' },
-  },
-]);
-
-console.log(`Delivered: ${results.deliveries.length}`);
-console.log(`Errors: ${results.errors.length}`);
-for (const err of results.errors) {
-  console.log(`  Item ${err.index}: ${err.error}`);
-}
-```
-
-## Retry Policy
-
-Configure custom retry behavior when creating endpoints:
-
-```typescript
-const endpoint = await client.endpoints.create({
-  url: 'https://myapp.com/webhook',
-  description: 'Critical notifications',
-  retryPolicy: {
-    maxAttempts: 5,
-    backoff: 'exponential',
-    initialDelaySecs: 10,
-    maxDelaySecs: 3600,
-  },
-});
-```
-
-## Delivery Attempts
-
-Inspect individual delivery attempts:
-
-```typescript
-const attempts = await client.webhooks.attempts(delivery.id);
+const { body: attempts } = await webhooksApi.webhooksIdAttemptsGet('dlv_abc123');
 for (const attempt of attempts) {
-  console.log(
-    `  Attempt ${attempt.attemptNumber}: status=${attempt.statusCode}, ` +
-    `duration=${attempt.durationMs}ms`
-  );
-  if (attempt.errorMessage) {
-    console.log(`    Error: ${attempt.errorMessage}`);
-  }
+  console.log(`  Attempt ${attempt.attemptNumber}: ${attempt.statusCode} (${attempt.durationMs}ms)`);
 }
 ```
 
-## Export Logs
-
-Export webhook logs as JSON or CSV:
+### Export Logs
 
 ```typescript
-// JSON export
-const logs = await client.webhooks.export({ format: 'json', status: 'failed' });
-
-// CSV export
-const csvData = await client.webhooks.export({
-  format: 'csv',
-  dateFrom: '2024-01-01',
-});
-fs.writeFileSync('webhooks.csv', csvData as string);
+const { body: csvData } = await webhooksApi.webhooksExportGet('7d');
+// Returns CSV string
 ```
 
-## Signature Verification
-
-Verify incoming webhook signatures in your handler:
+### Check System Health
 
 ```typescript
-import { verifySignature } from 'hooksniff-sdk';
-import express from 'express';
+import { HealthApi } from 'hooksniff-sdk';
 
-const app = express();
+const healthApi = new HealthApi();
+const { body: status } = await healthApi.statusGet();
+console.log(`Overall: ${status.overallStatus}`);
+for (const c of status.components) {
+  console.log(`  ${c.name}: ${c.status}`);
+}
+```
 
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const payload = req.body.toString();
-  const signature = req.headers['x-hooksniff-signature'] as string;
-  const secret = 'whsec_your_endpoint_signing_secret';
+## Configuration
 
-  if (!verifySignature(payload, signature, secret)) {
-    return res.status(401).json({ error: 'Invalid signature' });
-  }
+Each API class accepts an optional `basePath` parameter:
 
-  const data = JSON.parse(payload);
-  console.log(`Received event: ${data.event}`);
-  res.json({ received: true });
-});
+```typescript
+const api = new EndpointsApi('https://custom-api.example.com/v1');
+```
+
+Default base URL: `https://hooksniff-api-1046140057667.europe-west1.run.app/v1`
+
+## Authentication
+
+Use `ApiKeyAuth` to set your API key:
+
+```typescript
+import { ApiKeyAuth } from 'hooksniff-sdk';
+
+const auth = new ApiKeyAuth('hr_live_your_api_key_here');
+
+const api = new EndpointsApi();
+api.setDefaultAuthentication(auth);
 ```
 
 ## Error Handling
 
-```typescript
-import {
-  HookSniff,
-  AuthenticationError,
-  NotFoundError,
-  RateLimitError,
-  ValidationError,
-  PayloadTooLargeError,
-} from 'hooksniff-sdk';
+The SDK throws `HttpError` for non-2xx responses:
 
-const client = new HookSniff({ apiKey: 'hr_live_...' });
+```typescript
+import { HttpError } from 'hooksniff-sdk';
 
 try {
-  const delivery = await client.webhooks.send({
-    endpointId: 'nonexistent',
-    data: { test: true },
-  });
+  const { body } = await endpointsApi.endpointsPost({ url: 'invalid' });
 } catch (error) {
-  if (error instanceof AuthenticationError) {
-    console.log('Invalid API key');
-  } else if (error instanceof NotFoundError) {
-    console.log('Endpoint not found');
-  } else if (error instanceof RateLimitError) {
-    console.log('Rate limit exceeded - try again later');
-  } else if (error instanceof ValidationError) {
-    console.log(`Invalid request: ${error.message}`);
-  } else if (error instanceof PayloadTooLargeError) {
-    console.log('Payload exceeds maximum size');
+  if (error instanceof HttpError) {
+    console.log(`HTTP ${error.statusCode}: ${error.message}`);
   }
 }
 ```
 
-## API Reference
+## TypeScript Support
 
-### `new HookSniff(config)`
+Full type definitions are included. All request/response types are exported:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `apiKey` | `string` | required | Your HookSniff API key |
-| `baseUrl` | `string` | `https://hooksniff-api-1046140057667.europe-west1.run.app/v1` | API base URL |
-| `timeout` | `number` | `30000` | Request timeout in ms |
-
-### `client.endpoints`
-
-- `.create(req)` → `Promise<Endpoint>`
-- `.get(endpointId)` → `Promise<Endpoint>`
-- `.list()` → `Promise<Endpoint[]>`
-- `.delete(endpointId)` → `Promise<boolean>`
-
-### `client.webhooks`
-
-- `.send(req)` → `Promise<Delivery>`
-- `.get(deliveryId)` → `Promise<Delivery>`
-- `.list(status?, page?, perPage?)` → `Promise<DeliveryList>`
-- `.replay(deliveryId)` → `Promise<Delivery>`
-- `.batch(webhooks)` → `Promise<BatchResult>`
-- `.attempts(deliveryId)` → `Promise<DeliveryAttempt[]>`
-- `.export(options?)` → `Promise<Delivery[] | string>`
-
-### `verifySignature(payload, signature, secret)` → `boolean`
-
-Verify a webhook signature using HMAC-SHA256.
+```typescript
+import {
+  Endpoint,
+  CreateEndpointRequest,
+  Delivery,
+  DeliveryListResponse,
+  DeliveryAttempt,
+  BatchWebhookRequest,
+  BatchResponse,
+  AlertRule,
+  SubscriptionResponse,
+  // ... and 90+ more model types
+} from 'hooksniff-sdk';
+```
 
 ## License
 
