@@ -186,7 +186,7 @@ export default function BillingPage() {
       setShowCancelModal(false);
       router.refresh();
     } catch (err: unknown) {
-      toast(getErrorMessage(err) || tc('cancelFailed'), 'error');
+      toast(getErrorMessage(err, tc('unknownError')) || tc('cancelFailed'), 'error');
     } finally {
       setCancelling(false);
     }
@@ -214,7 +214,7 @@ export default function BillingPage() {
         toast('Upgrade initiated', 'success');
       }
     } catch (err: unknown) {
-      toast(getErrorMessage(err) || tc('upgradeFailed'), 'error');
+      toast(getErrorMessage(err, tc('unknownError')) || tc('upgradeFailed'), 'error');
     } finally {
       setUpgrading(false);
       setShowUpgradeModal(null);
