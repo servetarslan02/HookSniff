@@ -356,7 +356,8 @@
     "failedToLoadMembers": "Failed to load members",
     "failedToCreateTeam": "Failed to create team",
     "failedToInvite": "Failed to invite member",
-    "failedToUpdateRole": "Failed to update role"
+    "failedToUpdateRole": "Failed to update role",
+    "cannotDemoteSelf": "You cannot demote yourself. Ask another owner."
   },
   "notifications": {
     "title": "Notifications",
