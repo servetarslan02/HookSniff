@@ -8,26 +8,29 @@
 
 ---
 
-## 📊 Genel Durum Özeti
+## 📊 Genel Durum Özeti (Güncellenmiş)
 
 | Kategori | Kritik | Yüksek | Orta | Düşük | Toplam |
 |----------|--------|--------|------|-------|--------|
-| 🚨 Güvenlik | 10 | 11 | 12 | 6 | **39** |
-| 🖥️ Admin Panel | 29 | 40 | 17 | 9 | **~95** |
-| 🎨 Frontend (Dashboard) | 8 | 15 | 25 | 15 | **63** |
-| ⚙️ Backend (Rust API/Worker) | 6 | 12 | 18 | 10 | **46** |
-| 🗄️ Veritabanı | 0 | 6 | 8 | 4 | **18** |
-| 📦 SDK & Dokümantasyon | 6 | 25 | 22 | 13 | **66** |
-| 🌍 i18n (Çeviri) | 8 | 15 | 10 | 5 | **38** |
-| 🔧 Altyapı & Config | 2 | 8 | 9 | 6 | **25** |
-| 📝 İçerik & SEO | 2 | 13 | 14 | 2 | **31** |
-| ♿ Erişilebilirlik | 13 | 44 | 55 | 25 | **137** |
-| 🔒 GDPR | 2 | 4 | 3 | 2 | **~11** |
-| ⚡ Performans | 1 | 3 | 5 | 3 | **~12** |
+| 🚨 Güvenlik & Auth | 15 | 18 | 20 | 8 | **~61** |
+| 🖥️ Admin Panel | 5 | 20 | 15 | 10 | **~50** |
+| 🎨 Frontend (Dashboard) | 5 | 8 | 15 | 10 | **~38** |
+| ⚙️ Backend Async/Crypto/Rate | 8 | 10 | 15 | 3 | **~36** |
+| 💳 Payments & Billing | 1 | 4 | 7 | 2 | **~14** |
+| 🗄️ Veritabanı | 5 | 6 | 10 | 5 | **~26** |
+| 🔧 Altyapı & Config | 3 | 3 | 6 | 2 | **~14** |
+| 🌍 i18n (Çeviri) | 1 | 6 | 6 | 0 | **~13** |
+| ♿ Erişilebilirlik | 13 | 8 | 6 | 0 | **~27** |
+| 🔒 GDPR | 2 | 2 | 3 | 0 | **~7** |
+| ⚡ Performans | 0 | 1 | 3 | 1 | **~5** |
 | 📧 Email Sistemi | 0 | 3 | 4 | 2 | **~9** |
-| **TOPLAM** | **~87** | **~199** | **~202** | **~102** | **~590** |
+| 📦 SDK & OpenAPI | 0 | 0 | 3 | 1 | **~4** |
+| 📝 İçerik & SEO | 0 | 3 | 3 | 0 | **~6** |
+| 🏗️ Code Quality | 0 | 3 | 5 | 2 | **~10** |
+| **TOPLAM** | **~59** | **~95** | **~121** | **~46** | **~321** |
 
-> **Not:** Bazı sorunlar birden fazla kategoride geçer. Tekilleştirilmiş toplam ~326 benzersiz sorun.
+> **Not:** Bu tablo sadece KALAN (⬜) işleri gösterir. Önceki oturumlarda yapılan ~153 iş dahil değildir.
+> **Tekilleştirilmiş toplam:** ~321 benzersiz sorun (rapor bazlı çapraz kontrol ile).
 
 ---
 
@@ -105,17 +108,83 @@
 
 ## 1.8 ⬜ KALAN KRİTİK — Henüz Yapılmadı
 
+### 1.8.A Edge & Dashboard Security
+
 | # | Sorun | Dosya | Öncelik |
 |---|-------|-------|---------|
 | 1.8.1 | **Edge middleware auth yok** — Dashboard HTML'i herkese servis ediliyor, middleware sadece i18n routing yapıyor | `dashboard/src/middleware.ts` | 🔴 Kritik |
-| 1.8.2 | **`std::sync::Mutex` async'te** — Auth middleware'de cache miss'te tüm requestleri bloklayabilir | `api/src/middleware/mod.rs` | 🔴 Kritik |
-| 1.8.3 | **In-memory rate limit default** — Production'da restart'ta kaybolur, multi-instance'da bypass | `api/src/rate_limit.rs` | 🔴 Kritik |
+| 1.8.2 | **No CSRF protection on state-changing API calls** — POST/PUT/DELETE'de CSRF token yok | `dashboard/src/lib/api.ts` | 🔴 Kritik |
+| 1.8.3 | **Admin authorization client-side only** — Server-side admin role doğrulaması yok | `dashboard/src/app/[locale]/admin/layout.tsx` | 🟡 Yüksek |
 | 1.8.4 | **Playground token localStorage'da** — XSS ile çalınabilir | `dashboard/src/app/[locale]/dashboard/playground/page.tsx` | 🟡 Yüksek |
-| 1.8.5 | **Argon2id parametreleri OWASP altı** — memory_cost, time_cost yetersiz | `api/src/auth/jwt.rs` | 🟡 Yüksek |
-| 1.8.6 | **DNS rebinding SSRF** — Endpoint creation'da validation, DNS rebinding ile bypass | `api/src/ssrf.rs` | 🟡 Yüksek |
-| 1.8.7 | **Connection pool config hardcoded** — `max_connections(10)` env'den okunmalı | `worker/src/main.rs` | 🟡 Orta |
-| 1.8.8 | **Git history'de OTEL credentials** — BFG ile temizlenmeli | Git history | 🟡 Orta |
-| 1.8.9 | **DATABASE_URL local credentials git history'de** — BFG ile temizlenmeli | Git history | 🟡 Orta |
+| 1.8.5 | **Playground token URL path'te** — Token URL'de görünüyor, loglanabilir | `dashboard/src/app/[locale]/dashboard/playground/page.tsx` | 🟡 Yüksek |
+| 1.8.6 | **Missing input sanitization on API parameters** — Search sayfası | `dashboard/src/app/[locale]/dashboard/search/page.tsx` | 🟡 Orta |
+| 1.8.7 | **Deprecated X-XSS-Protection header** — Modern tarayıcılarda gereksiz, CSP kullanılmalı | `dashboard/next.config.js` | 🟢 Düşük |
+| 1.8.8 | **Endpoint detail fetches all endpoints** — N+1 query, performans sorunu | `dashboard/src/app/[locale]/dashboard/endpoints/[id]/page.tsx` | 🟢 Düşük |
+
+### 1.8.B Async Rust Kritik Sorunlar (deep-async-rust.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 1.8.9 | **`std::sync::Mutex` held across `.await`** — Auth middleware'de cache miss'te tüm requestleri bloklayabilir, production hang | `api/src/middleware/mod.rs` | 🔴 Kritik |
+| 1.8.10 | **Unbounded auth cache growth** — Memory leak, OOM over time | `api/src/middleware/mod.rs` | 🔴 Kritik |
+| 1.8.11 | **Argon2 (CPU-bound) in async without `spawn_blocking`** — Thread starvation under load | `api/src/auth/jwt.rs` | 🔴 Kritik |
+| 1.8.12 | **`reqwest::Client` created per-request** — Connection leak, performance degradation (birden fazla modülde) | `api/src/`, `worker/src/` | 🟡 Yüksek |
+| 1.8.13 | **Blocking file I/O in async context** — Thread blocking | `worker/src/` | 🟡 Yüksek |
+| 1.8.14 | **Unbounded `mpsc::UnboundedChannel` in WebSocket** — Memory pressure under slow consumers | `api/src/ws/` | 🟡 Yüksek |
+| 1.8.15 | **Broadcast channel overflow silently drops events** — Event loss | `api/src/ws/` | 🟡 Orta |
+| 1.8.16 | **Poisoned mutex panics crash the server** — Server crash propagation | `api/src/` | 🟡 Orta |
+
+### 1.8.C Crypto & Auth (deep-crypto.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 1.8.17 | **Argon2id parametreleri OWASP altı** — memory_cost, time_cost yetersiz | `api/src/auth/jwt.rs` | 🟡 Yüksek |
+| 1.8.18 | **JWT uses HS256 (symmetric) — no asymmetric option** | `api/src/auth/jwt.rs` | 🟡 Orta |
+| 1.8.19 | **Access tokens cannot be revoked** — Token geçerlilik süresince revoke edilemiyor | `api/src/auth/jwt.rs` | 🟡 Orta |
+| 1.8.20 | **Endpoint signing secrets use UUID instead of cryptographic random** | `api/src/routes/endpoints.rs` | 🟡 Orta |
+| 1.8.21 | **ENCRYPTION_KEY not validated at startup** — Boş/yanlış key ile başlayabilir | `api/src/crypto.rs` | 🟡 Orta |
+| 1.8.22 | **No PKCE (Proof Key for Code Exchange)** — OAuth flow'da | `api/src/routes/oauth.rs` | 🟡 Orta |
+
+### 1.8.D Rate Limiting Bypass (deep-rate-limiting.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 1.8.23 | **In-memory rate limit default** — Production'da restart'ta kaybolur, multi-instance'da bypass | `api/src/rate_limit.rs` | 🔴 Kritik |
+| 1.8.24 | **IP spoofing via X-Forwarded-For header** — Rate limit bypass | `api/src/rate_limit.rs` | 🔴 Kritik |
+| 1.8.25 | **API-level rate limit middleware gap** — Bazı endpoint'ler atlanıyor | `api/src/rate_limit.rs` | 🟡 Yüksek |
+| 1.8.26 | **Auth routes lack X-RateLimit headers** — Client rate limit durumunu göremiyor | `api/src/routes/auth.rs` | 🟡 Orta |
+| 1.8.27 | **Redis failure = open floodgates** — Redis down olursa rate limit tamamen bypass | `api/src/rate_limit.rs` | 🟡 Orta |
+| 1.8.28 | **Key collision risk with 15-character prefix** — Rate limit key'lerinde | `api/src/rate_limit.rs` | 🟢 Düşük |
+
+### 1.8.E Worker Kritik Sorunlar (deep-worker.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 1.8.29 | **No idempotency — webhooks can be duplicated** | `worker/src/main.rs` | 🔴 Kritik |
+| 1.8.30 | **Zombie reaper increments attempt count without delivery** — Yanlış retry sayımı | `worker/src/main.rs` | 🟡 Yüksek |
+| 1.8.31 | **No retry for DB commit failures** — Veri kaybı riski | `worker/src/main.rs` | 🟡 Yüksek |
+| 1.8.32 | **`avg_response_ms` overwritten, not averaged** — Yanlış metrik | `worker/src/main.rs` | 🟡 Orta |
+| 1.8.33 | **Email delivery uses blocking I/O in async context** | `worker/src/delivery/mod.rs` | 🟡 Orta |
+| 1.8.34 | **Email delivery creates new HTTP client per call** — Connection leak | `worker/src/delivery/mod.rs` | 🟡 Orta |
+| 1.8.35 | **No response body size limit on receive** — Memory bomb riski | `worker/src/delivery/http.rs` | 🟡 Orta |
+| 1.8.36 | **Fan-out bug — target config not used** | `worker/src/delivery/mod.rs` | 🟡 Orta |
+| 1.8.37 | **Dead letter customer ID is `Uuid::nil()`** — İzlenebilirlik sorunu | `worker/src/delivery/mod.rs` | 🟢 Düşük |
+
+### 1.8.F Infrastructure (deep-infra.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 1.8.38 | **Staging has default fallback passwords** — Güvenlik açığı | `docker-compose.staging.yml` | 🔴 Kritik |
+| 1.8.39 | **No rollback strategy** — Deploy başarısız olursa geri dönüş yok | `.github/workflows/deploy.yml` | 🟡 Yüksek |
+| 1.8.40 | **Hardcoded secrets in Helm values.yaml** | `deploy/helm/values.yaml` | 🟡 Yüksek |
+| 1.8.41 | **No HPA (Horizontal Pod Autoscaler)** — Ölçeklenme yok | `deploy/helm/` | 🟡 Orta |
+| 1.8.42 | **Worker has no liveness/readiness probes** | `deploy/helm/` | 🟡 Orta |
+| 1.8.43 | **No `--start-period` in dev HEALTHCHECK** | `Dockerfile.api` | 🟡 Orta |
+| 1.8.44 | **Worker Dockerfile has no HEALTHCHECK** | `Dockerfile.worker` | 🟡 Orta |
+| 1.8.45 | **Connection pool config hardcoded** — `max_connections(10)` env'den okunmalı | `worker/src/main.rs` | 🟡 Orta |
+| 1.8.46 | **Git history'de OTEL credentials** — BFG ile temizlenmeli | Git history | 🟡 Orta |
+| 1.8.47 | **DATABASE_URL local credentials git history'de** — BFG ile temizlenmeli | Git history | 🟡 Orta |
+| 1.8.48 | **DNS rebinding SSRF** — Endpoint creation'da validation, DNS rebinding ile bypass | `api/src/ssrf.rs` | 🟡 Orta |
 
 ---
 
@@ -437,6 +506,9 @@
 | 6.1.11 | **Copy button `aria-label` eksik** | Clipboard icon text alternative yok | ⬜ |
 | 6.1.12 | **Heading hierarchy tutarsız** — bazı sayfalarda h2/h3 düzensiz | Sayfa yapısı belirsiz | ⬜ |
 | 6.1.13 | **Grafik SVG `<title>` ve `<desc>` boş** — Revenue, Analytics | Grafik erişilebilirliği yok | ⬜ |
+| 6.1.14 | **Forms `aria-describedby` eksik** — Hata mesajları input'a bağlı değil | Ekran okuyucu hata mesajını input ile ilişkilendiremiyor | ⬜ |
+| 6.1.15 | **Alert element boş render edilmiş** — `role="alert"` var ama içerik yok | Ekran okuyucu boş alert duyuruyor | ⬜ |
+| 6.1.16 | **Renk bağımlı bilgi (System sayfası)** — Durum sadece renk + badge | Renk körlüğü olan kullanıcılar ayırt edemiyor | ⬜ |
 
 ## 6.2 Yüksek A11Y Sorunları
 
@@ -605,17 +677,79 @@
 | 11.1.2 | Grace period yok — ödeme başarısızlığında anında downgrade | ✅ Yapıldı (Oturum 88) |
 | 11.1.3 | Downgrade'de endpoint cleanup yok | ✅ Yapıldı (Oturum 88) |
 
-## 11.2 ⬜ KALAN BACKEND — Henüz Yapılmadı
+## 11.2 ⬜ KALAN BACKEND — Payments (deep-payments.md)
 
 | # | Sorun | Dosya | Öncelik |
 |---|-------|-------|---------|
-| 11.2.1 | **Zombie reaper attempt count artırıyor** — delivery olmadan | `worker/src/main.rs` | 🟡 Yüksek |
-| 11.2.2 | **Single-queue design** — high-volume customers head-of-line blocking | `api/src/db.rs` | 🟡 Orta |
-| 11.2.3 | **No request ID / correlation ID** error responses'da | `api/src/error.rs` | 🟡 Orta |
-| 11.2.4 | **No error catalog/enum on frontend** — server-side error codes var ama shared schema yok | Frontend + Backend | 🟡 Orta |
-| 11.2.5 | **`BadRequest` messages developer-facing** — user-facing olmalı | `api/src/routes/` | 🟢 Düşük |
-| 11.2.6 | **No `409 Conflict` variant** — "Email already registered" 400 döndürüyor | `api/src/error.rs` | 🟢 Düşük |
-| 11.2.7 | **Retry policy default'ları aggressive** — max 10 attempt, exponential backoff | `api/src/retry_policy/` | 🟢 Düşük |
+| 11.2.1 | **Subscription status hardcoded to "active"** — Her zaman active döndürüyor | `api/src/routes/billing.rs` | 🔴 Kritik |
+| 11.2.2 | **Pricing page shows different limits than backend** — Frontend/backend tutarsız | `dashboard/src/app/[locale]/pricing/page.tsx` | 🟡 Yüksek |
+| 11.2.3 | **Provider switching doesn't cancel old subscription** — Stripe→Polar geçişinde eski abonelik kalmış | `api/src/routes/billing.rs` | 🟡 Yüksek |
+| 11.2.4 | **Polar.sh `create_customer_portal` is a stub** — Çalışmıyor | `api/src/billing/polar.rs` | 🟡 Yüksek |
+| 11.2.5 | **No chargeback/refund handling** | `api/src/routes/billing.rs` | 🟡 Orta |
+| 11.2.6 | **Admin revenue calculation is estimation only** — Gerçek hesaplama yok | `api/src/routes/admin.rs` | 🟡 Orta |
+| 11.2.7 | **`webhook_count` uses `i32` — overflow risk at 2.1B** | `api/src/db.rs` | 🟡 Orta |
+| 11.2.8 | **No webhook failure alerting** — Başarısız webhook'lar bildirilmiyor | `worker/src/` | 🟡 Orta |
+| 11.2.9 | **No annual billing option** — Sadece aylık | `api/src/routes/billing.rs` | 🟢 Düşük |
+| 11.2.10 | **Enterprise plan has no implementation** | `api/src/routes/billing.rs` | 🟢 Düşük |
+| 11.2.11 | **Missing `cancel_at_period_end` logic** — Dönem sonunda iptal yok | `api/src/routes/billing.rs` | 🟢 Düşük |
+| 11.2.12 | **Upgrade flow doesn't validate plan transition** — Herhangi bir plana geçiş yapılabilir | `api/src/routes/billing.rs` | 🟡 Orta |
+| 11.2.13 | **Checkout URL validation is client-side only** — Server-side doğrulama yok | `dashboard/src/app/[locale]/dashboard/billing/page.tsx` | 🟡 Orta |
+
+## 11.3 ⬜ KALAN BACKEND — Database (deep-database.md, deep-db-queries.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 11.3.1 | **`password_hash` column allows NULL** — Account takeover risk | `api/migrations/` | 🔴 Kritik |
+| 11.3.2 | **Missing migration files — 13 SQL files absent** — Embedded Rust'ta var ama disk'te yok | `api/migrations/` | 🔴 Kritik |
+| 11.3.3 | **Hardcoded DB credentials in migration scripts** | `api/migrations/` | 🔴 Kritik |
+| 11.3.4 | **TOTP secret exposure in `customers` table** — `totp_secret` column | `api/migrations/` | 🟡 Yüksek |
+| 11.3.5 | **`dead_letters` missing FK on `delivery_id`** | `api/migrations/` | 🟡 Yüksek |
+| 11.3.6 | **`webhook_queue` references `delivery_id` without FK** | `api/migrations/` | 🟡 Yüksek |
+| 11.3.7 | **`teams.owner_id` missing ON DELETE behavior** | `api/migrations/` | 🟡 Orta |
+| 11.3.8 | **`installed_agents` missing ON DELETE CASCADE** | `api/migrations/` | 🟡 Orta |
+| 11.3.9 | **`fanout_rules.target_ids` UUID array without FK validation** | `api/migrations/` | 🟡 Orta |
+| 11.3.10 | **`sso_configs.client_secret_encrypted` — encryption not verified** | `api/migrations/` | 🟡 Orta |
+| 11.3.11 | **Missing composite index on `deliveries(endpoint_id, status)`** | `api/migrations/` | 🟡 Orta |
+| 11.3.12 | **Missing index on `deliveries(created_at)` for time-range queries** | `api/migrations/` | 🟡 Orta |
+| 11.3.13 | **Missing index on `delivery_attempts(created_at)`** | `api/migrations/` | 🟡 Orta |
+| 11.3.14 | **`payment_transactions.amount_cents` uses INT** — overflow risk | `api/migrations/` | 🟡 Orta |
+| 11.3.15 | **`dead_letters` missing index on `endpoint_id`** | `api/migrations/` | 🟡 Orta |
+| 11.3.16 | **`idempotency_keys` — no automatic cleanup** — Tablo şişer | `api/migrations/` | 🟡 Orta |
+| 11.3.17 | **`password_reset_tokens` — no index on `expires_at`** — Cleanup yavaş | `api/migrations/` | 🟢 Düşük |
+| 11.3.18 | **`refresh_tokens` — no index on `expires_at`** — Cleanup yavaş | `api/migrations/` | 🟢 Düşük |
+| 11.3.19 | **`email_verification_tokens` — no index on `expires_at`** | `api/migrations/` | 🟢 Düşük |
+| 11.3.20 | **`notifications` — no cleanup strategy** — Tablo şişer | `api/migrations/` | 🟢 Düşük |
+| 11.3.21 | **İki migration sistemi senkron değil** — standalone SQL vs embedded Rust | `api/migrations/` + `api/src/db.rs` | 🟡 Orta |
+| 11.3.22 | **Unbounded queries** — LIMIT/OFFSET yok bazı sorgularda | `api/src/db.rs` | 🟡 Orta |
+
+## 11.4 ⬜ KALAN BACKEND — Code Quality (deep-code-quality.md)
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 11.4.1 | **Signing/crypto logic 6+ kez duplicated** — `api/src/signing.rs` + `worker/src/signing.rs` + 11 SDK | `api/src/`, `worker/src/`, `sdks/` | 🟡 Yüksek |
+| 11.4.2 | **Billing provider triplication** — Stripe, Polar, iyzico near-identical | `api/src/billing/` | 🟡 Yüksek |
+| 11.4.3 | **Tight coupling: `api/src/main.rs` monolith** — Tüm modüller tek dosyada | `api/src/main.rs` | 🟡 Orta |
+| 11.4.4 | **Missing shared crate between API and worker** — Kod tekrarı | Cargo workspace | 🟡 Orta |
+| 11.4.5 | **Excessive `clone()` — 190 occurrences** — Memory allocation overhead | `api/src/` | 🟡 Orta |
+| 11.4.6 | **`any` type usage — 15+ in production code** — Type safety eksik | `api/src/` | 🟡 Orta |
+| 11.4.7 | **67+ fonksiyon 100 satırı aşıyor** — en kötü 400-700+ satır | Çeşitli | 🟡 Orta |
+| 11.4.8 | **Magic numbers** — Sabit değerler named constant olmalı | Çeşitli | 🟢 Düşük |
+| 11.4.9 | **Excessive `unwrap()` in production code** — Panic riski | `api/src/` | 🟢 Düşük |
+
+## 11.5 ⬜ KALAN BACKEND — Genel
+
+| # | Sorun | Dosya | Öncelik |
+|---|-------|-------|---------|
+| 11.5.1 | **Single-queue design** — high-volume customers head-of-line blocking | `api/src/db.rs` | 🟡 Orta |
+| 11.5.2 | **No request ID / correlation ID** error responses'da | `api/src/error.rs` | 🟡 Orta |
+| 11.5.3 | **No error catalog/enum on frontend** — server-side error codes var ama shared schema yok | Frontend + Backend | 🟡 Orta |
+| 11.5.4 | **`BadRequest` messages developer-facing** — user-facing olmalı | `api/src/routes/` | 🟢 Düşük |
+| 11.5.5 | **No `409 Conflict` variant** — "Email already registered" 400 döndürüyor | `api/src/error.rs` | 🟢 Düşük |
+| 11.5.6 | **Retry policy default'ları aggressive** — max 10 attempt, exponential backoff | `api/src/retry_policy/` | 🟢 Düşük |
+| 11.5.7 | **OpenAPI spec eksik endpoint'ler** — Code'da var ama spec'te yok | `docs/openapi.yaml` | 🟡 Orta |
+| 11.5.8 | **OpenAPI wrong type definitions** — SDK'lar hatalı client üretebilir | `docs/openapi.yaml` | 🟡 Orta |
+| 11.5.9 | **No dashboard tests in CI** — Frontend testleri CI'da yok | `.github/workflows/ci.yml` | 🟡 Orta |
+| 11.5.10 | **Batch endpoint allows up to 100 webhooks per request** — Abuse riski | `api/src/routes/` | 🟡 Orta |
 
 ---
 
@@ -679,21 +813,19 @@
 
 | Aşama | İçerik | Tahmini Süre | Kritik | Yüksek | Orta | Düşük | Toplam |
 |-------|--------|-------------|--------|--------|------|-------|--------|
-| 1 | Güvenlik & Altyapı | 2-3 gün | 9 | 0 | 0 | 0 | 9 (çoğu yapıldı) |
-| 2 | Admin Panel | 2-3 gün | 5 | 20 | 15 | 10 | ~50 |
-| 3 | Frontend Dashboard | 2-3 gün | 3 | 5 | 10 | 6 | ~24 |
-| 4 | Database | 1 gün | 0 | 2 | 3 | 1 | ~6 |
-| 5 | i18n & Çeviri | 1-2 gün | 1 | 5 | 5 | 0 | ~11 |
-| 6 | A11Y & SEO | 2-3 gün | 13 | 8 | 6 | 0 | ~27 |
-| 7 | Performans | 1-2 gün | 0 | 1 | 3 | 1 | ~5 |
-| 8 | GDPR | 1 gün | 2 | 2 | 3 | 0 | ~7 |
-| 9 | Email | 1 gün | 0 | 3 | 4 | 2 | ~9 |
-| 10 | SDK | 1 gün | 0 | 0 | 1 | 1 | ~2 |
-| 11 | Backend Derin | 1-2 gün | 0 | 1 | 3 | 3 | ~7 |
-| 12 | Polish | 1 gün | 0 | 0 | 0 | 16 | ~16 |
-| **TOPLAM** | | **~15-20 gün** | **33** | **47** | **53** | **40** | **~173** |
-
-> **Not:** "Yapıldı" olarak işaretlenenler (~153 sorun) zaten önceki oturumlarda tamamlanmıştır. Yukarıdaki tablo sadece KALAN işleri gösterir.
+| 1 | Güvenlik & Altyapı | 3-4 gün | 22 | 18 | 20 | 8 | **~68** |
+| 2 | Admin Panel | 2-3 gün | 5 | 20 | 15 | 10 | **~50** |
+| 3 | Frontend Dashboard | 2-3 gün | 5 | 8 | 15 | 10 | **~38** |
+| 4 | Database | 1-2 gün | 5 | 6 | 10 | 5 | **~26** |
+| 5 | i18n & Çeviri | 1-2 gün | 1 | 6 | 6 | 0 | **~13** |
+| 6 | A11Y & SEO | 2-3 gün | 13 | 8 | 6 | 0 | **~27** |
+| 7 | Performans | 1-2 gün | 0 | 1 | 3 | 1 | **~5** |
+| 8 | GDPR | 1 gün | 2 | 2 | 3 | 0 | **~7** |
+| 9 | Email | 1 gün | 0 | 3 | 4 | 2 | **~9** |
+| 10 | SDK & OpenAPI | 1 gün | 0 | 0 | 3 | 1 | **~4** |
+| 11 | Backend Derin | 2-3 gün | 1 | 7 | 12 | 4 | **~24** |
+| 12 | Polish & Code Quality | 1-2 gün | 0 | 3 | 5 | 2 | **~10** |
+| **TOPLAM** | | **~18-25 gün** | **~54** | **~82** | **~102** | **~43** | **~281** |
 
 ---
 
