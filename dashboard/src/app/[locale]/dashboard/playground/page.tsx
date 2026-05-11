@@ -401,6 +401,7 @@ export default function PlaygroundPage() {
   const { apiKey } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('playground');
+  const tc = useTranslations('common');
   const [method, setMethod] = useState<string>('POST');
   const [path, setPath] = useState('/webhooks');
   const [body, setBody] = useState('');
