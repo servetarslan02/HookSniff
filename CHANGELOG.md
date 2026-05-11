@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed (DB — AŞAMA 5)
+- Performance indexes for deliveries, delivery_attempts, dead_letters, token tables, idempotency_keys (Items 182-191, 187)
+- ON DELETE CASCADE added to dead_letters, teams, installed_agents foreign keys (Items 177-181)
+- password_hash NOT NULL enforced with OAuth sentinel value (Item 173)
+- amount_cents upgraded from INT to BIGINT on payment_transactions and invoices (Item 186)
+- Unbounded list queries capped with LIMIT on 8 route handlers (Item 193)
+
 ### Added
 - GDPR endpoints: `GET /v1/auth/export` (data export) + `DELETE /v1/auth/account` (account deletion)
 - HttpOnly cookie authentication for refresh tokens (`hooksniff_refresh`)
