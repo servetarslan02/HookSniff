@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**team** | [**Team**](Team.md) |  | [optional] 
-**members** | [**List[TeamMember]**](TeamMember.md) |  | [optional] 
-**invites** | [**List[TeamInvite]**](TeamInvite.md) |  | [optional] 
+**team** | [**Team**](Team.md) |  | 
+**members** | [**List[TeamMember]**](TeamMember.md) |  | 
+**invites** | [**List[TeamInvite]**](TeamInvite.md) |  | 
 
 ## Example
 

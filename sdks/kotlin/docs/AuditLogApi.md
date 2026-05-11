@@ -17,8 +17,8 @@ List audit log entries
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuditLogApi()
 val page : kotlin.Int = 56 // kotlin.Int | 
@@ -64,8 +64,8 @@ Get audit entry detail
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuditLogApi()
 val id : kotlin.String = id_example // kotlin.String | 

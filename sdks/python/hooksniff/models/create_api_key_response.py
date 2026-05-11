@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from uuid import UUID
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,10 +29,10 @@ class CreateApiKeyResponse(BaseModel):
     """
     CreateApiKeyResponse
     """ # noqa: E501
-    id: Optional[UUID] = None
-    key: Optional[StrictStr] = Field(default=None, description="Full API key — only shown once")
-    prefix: Optional[StrictStr] = None
-    message: Optional[StrictStr] = None
+    id: UUID
+    key: StrictStr = Field(description="Full API key — only shown once")
+    prefix: StrictStr
+    message: StrictStr
     __properties: ClassVar[List[str]] = ["id", "key", "prefix", "message"]
 
     model_config = ConfigDict(

@@ -7,5 +7,5 @@ rvm:
 script:
   - bundle install --path vendor/bundle
   - bundle exec rspec
-  - gem build hooksniff.gemspec
-  - gem install ./hooksniff-0.3.0.gem
+  - gem build hooksniff-sdk.gemspec
+  - gem install ./hooksniff-sdk-0.3.0.gem

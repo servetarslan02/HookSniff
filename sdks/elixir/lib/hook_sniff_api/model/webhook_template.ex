@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.WebhookTemplate do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :name,
@@ -16,10 +16,10 @@ defmodule HookSniffAPI.Model.WebhookTemplate do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :name => String.t | nil,
-    :description => String.t | nil,
-    :category => String.t | nil,
+    :id => String.t,
+    :name => String.t,
+    :description => String.t,
+    :category => String.t,
     :payload_template => map() | nil
   }
 

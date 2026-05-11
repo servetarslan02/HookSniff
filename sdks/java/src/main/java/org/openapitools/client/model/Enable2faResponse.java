@@ -49,7 +49,7 @@ import org.openapitools.client.JSON;
 /**
  * TOTP secret and QR code URL returned after enabling 2FA
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:27:59.532401633+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class Enable2faResponse {
   public static final String SERIALIZED_NAME_SECRET = "secret";
   @SerializedName(SERIALIZED_NAME_SECRET)

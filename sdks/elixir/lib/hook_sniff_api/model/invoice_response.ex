@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.InvoiceResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :amount_cents,
@@ -16,11 +16,11 @@ defmodule HookSniffAPI.Model.InvoiceResponse do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :amount_cents => integer() | nil,
-    :currency => String.t | nil,
-    :status => String.t | nil,
-    :created_at => DateTime.t | nil
+    :id => String.t,
+    :amount_cents => integer(),
+    :currency => String.t,
+    :status => String.t,
+    :created_at => DateTime.t
   }
 
   def decode(value) do

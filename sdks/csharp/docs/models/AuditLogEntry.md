@@ -1,4 +1,4 @@
-# HookSniff.Model.AuditLogEntry
+# HookSniff.Sdk.Model.AuditLogEntry
 A single audit log record
 
 ## Properties

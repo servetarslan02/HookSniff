@@ -1,4 +1,4 @@
-# HookSniff::ValidateEventResponse
+# HooksniffSdk::ValidateEventResponse
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ValidateEventResponse.new(
+instance = HooksniffSdk::ValidateEventResponse.new(
   valid: null,
   errors: null
 )

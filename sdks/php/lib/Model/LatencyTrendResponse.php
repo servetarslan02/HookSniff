@@ -289,6 +289,15 @@ class LatencyTrendResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     {
         $invalidProperties = [];
 
+        if ($this->container['range'] === null) {
+            $invalidProperties[] = "'range' can't be null";
+        }
+        if ($this->container['buckets'] === null) {
+            $invalidProperties[] = "'buckets' can't be null";
+        }
+        if ($this->container['overall_avg_ms'] === null) {
+            $invalidProperties[] = "'overall_avg_ms' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -307,7 +316,7 @@ class LatencyTrendResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets range
      *
-     * @return string|null
+     * @return string
      */
     public function getRange()
     {
@@ -317,7 +326,7 @@ class LatencyTrendResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets range
      *
-     * @param string|null $range range
+     * @param string $range range
      *
      * @return self
      */
@@ -334,7 +343,7 @@ class LatencyTrendResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets buckets
      *
-     * @return \OpenAPI\Client\Model\LatencyTrendResponseBucketsInner[]|null
+     * @return \OpenAPI\Client\Model\LatencyTrendResponseBucketsInner[]
      */
     public function getBuckets()
     {
@@ -344,7 +353,7 @@ class LatencyTrendResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets buckets
      *
-     * @param \OpenAPI\Client\Model\LatencyTrendResponseBucketsInner[]|null $buckets buckets
+     * @param \OpenAPI\Client\Model\LatencyTrendResponseBucketsInner[] $buckets buckets
      *
      * @return self
      */
@@ -361,7 +370,7 @@ class LatencyTrendResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets overall_avg_ms
      *
-     * @return float|null
+     * @return float
      */
     public function getOverallAvgMs()
     {
@@ -371,7 +380,7 @@ class LatencyTrendResponse implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets overall_avg_ms
      *
-     * @param float|null $overall_avg_ms overall_avg_ms
+     * @param float $overall_avg_ms overall_avg_ms
      *
      * @return self
      */

@@ -1,4 +1,4 @@
-# HookSniff.Model.BatchReplayRequest
+# HookSniff.Sdk.Model.BatchReplayRequest
 
 ## Properties
 

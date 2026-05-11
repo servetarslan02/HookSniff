@@ -1,4 +1,4 @@
-# HookSniff::NotificationsApi
+# HooksniffSdk::NotificationsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -21,14 +21,14 @@ List notifications
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::NotificationsApi.new
+api_instance = HooksniffSdk::NotificationsApi.new
 opts = {
   page: 56, # Integer | 
   per_page: 56 # Integer | 
@@ -38,7 +38,7 @@ begin
   # List notifications
   result = api_instance.notifications_get(opts)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_get: #{e}"
 end
 ```
@@ -56,7 +56,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <NotificationListResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_get_with_http_info: #{e}"
 end
 ```
@@ -92,20 +92,20 @@ Delete notification
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::NotificationsApi.new
+api_instance = HooksniffSdk::NotificationsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Delete notification
   api_instance.notifications_id_delete(id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_id_delete: #{e}"
 end
 ```
@@ -123,7 +123,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_id_delete_with_http_info: #{e}"
 end
 ```
@@ -158,20 +158,20 @@ Mark notification as read
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::NotificationsApi.new
+api_instance = HooksniffSdk::NotificationsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Mark notification as read
   api_instance.notifications_id_read_put(id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_id_read_put: #{e}"
 end
 ```
@@ -189,7 +189,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_id_read_put_with_http_info: #{e}"
 end
 ```
@@ -224,19 +224,19 @@ Mark all notifications as read
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::NotificationsApi.new
+api_instance = HooksniffSdk::NotificationsApi.new
 
 begin
   # Mark all notifications as read
   api_instance.notifications_read_all_put
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_read_all_put: #{e}"
 end
 ```
@@ -254,7 +254,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_read_all_put_with_http_info: #{e}"
 end
 ```
@@ -287,20 +287,20 @@ Get unread notification count
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::NotificationsApi.new
+api_instance = HooksniffSdk::NotificationsApi.new
 
 begin
   # Get unread notification count
   result = api_instance.notifications_unread_count_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_unread_count_get: #{e}"
 end
 ```
@@ -318,7 +318,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <NotificationsUnreadCountGet200Response>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling NotificationsApi->notifications_unread_count_get_with_http_info: #{e}"
 end
 ```

@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from hooksniff.models.delivery_trend_response_buckets_inner import DeliveryTrendResponseBucketsInner
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,8 +29,8 @@ class DeliveryTrendResponse(BaseModel):
     """
     DeliveryTrendResponse
     """ # noqa: E501
-    range: Optional[StrictStr] = None
-    buckets: Optional[List[DeliveryTrendResponseBucketsInner]] = None
+    range: StrictStr
+    buckets: List[DeliveryTrendResponseBucketsInner]
     __properties: ClassVar[List[str]] = ["range", "buckets"]
 
     model_config = ConfigDict(

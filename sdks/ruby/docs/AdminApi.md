@@ -1,4 +1,4 @@
-# HookSniff::AdminApi
+# HooksniffSdk::AdminApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -23,20 +23,20 @@ Revenue by month (admin)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AdminApi.new
+api_instance = HooksniffSdk::AdminApi.new
 
 begin
   # Revenue by month (admin)
   result = api_instance.admin_revenue_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_revenue_get: #{e}"
 end
 ```
@@ -54,7 +54,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<AdminRevenueGet200ResponseInner>>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_revenue_get_with_http_info: #{e}"
 end
 ```
@@ -87,22 +87,22 @@ Send SDK update notification to users
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AdminApi.new
+api_instance = HooksniffSdk::AdminApi.new
 opts = {
-  admin_sdk_update_post_request: HookSniff::AdminSdkUpdatePostRequest.new # AdminSdkUpdatePostRequest | 
+  admin_sdk_update_post_request: HooksniffSdk::AdminSdkUpdatePostRequest.new # AdminSdkUpdatePostRequest | 
 }
 
 begin
   # Send SDK update notification to users
   api_instance.admin_sdk_update_post(opts)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_sdk_update_post: #{e}"
 end
 ```
@@ -120,7 +120,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_sdk_update_post_with_http_info: #{e}"
 end
 ```
@@ -155,20 +155,20 @@ System-wide statistics (admin)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AdminApi.new
+api_instance = HooksniffSdk::AdminApi.new
 
 begin
   # System-wide statistics (admin)
   result = api_instance.admin_stats_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_stats_get: #{e}"
 end
 ```
@@ -186,7 +186,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <SystemStats>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_stats_get_with_http_info: #{e}"
 end
 ```
@@ -219,14 +219,14 @@ List all users (admin)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AdminApi.new
+api_instance = HooksniffSdk::AdminApi.new
 opts = {
   page: 56, # Integer | 
   per_page: 56 # Integer | 
@@ -236,7 +236,7 @@ begin
   # List all users (admin)
   result = api_instance.admin_users_get(opts)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_get: #{e}"
 end
 ```
@@ -254,7 +254,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <PaginatedUsers>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_get_with_http_info: #{e}"
 end
 ```
@@ -290,20 +290,20 @@ Get user details (admin)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AdminApi.new
+api_instance = HooksniffSdk::AdminApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get user details (admin)
   api_instance.admin_users_id_get(id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_id_get: #{e}"
 end
 ```
@@ -321,7 +321,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_id_get_with_http_info: #{e}"
 end
 ```
@@ -356,21 +356,21 @@ Change user plan (admin)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AdminApi.new
+api_instance = HooksniffSdk::AdminApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-admin_users_id_plan_put_request = HookSniff::AdminUsersIdPlanPutRequest.new # AdminUsersIdPlanPutRequest | 
+admin_users_id_plan_put_request = HooksniffSdk::AdminUsersIdPlanPutRequest.new # AdminUsersIdPlanPutRequest | 
 
 begin
   # Change user plan (admin)
   api_instance.admin_users_id_plan_put(id, admin_users_id_plan_put_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_id_plan_put: #{e}"
 end
 ```
@@ -388,7 +388,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_id_plan_put_with_http_info: #{e}"
 end
 ```
@@ -424,21 +424,21 @@ Change user status (admin)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AdminApi.new
+api_instance = HooksniffSdk::AdminApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-admin_users_id_status_put_request = HookSniff::AdminUsersIdStatusPutRequest.new # AdminUsersIdStatusPutRequest | 
+admin_users_id_status_put_request = HooksniffSdk::AdminUsersIdStatusPutRequest.new # AdminUsersIdStatusPutRequest | 
 
 begin
   # Change user status (admin)
   api_instance.admin_users_id_status_put(id, admin_users_id_status_put_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_id_status_put: #{e}"
 end
 ```
@@ -456,7 +456,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AdminApi->admin_users_id_status_put_with_http_info: #{e}"
 end
 ```

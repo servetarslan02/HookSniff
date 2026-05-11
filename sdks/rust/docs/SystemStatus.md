@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**overall_status** | Option<**OverallStatus**> |  (enum: operational, degraded, down) | [optional]
-**uptime_30d** | Option<**f64**> |  | [optional]
-**components** | Option<[**Vec<models::SystemStatusComponentsInner>**](SystemStatusComponentsInner.md)> |  | [optional]
-**checked_at** | Option<**String**> |  | [optional]
+**overall_status** | **OverallStatus** |  (enum: operational, degraded, down) | 
+**uptime_30d** | **f64** |  | 
+**components** | [**Vec<models::SystemStatusComponentsInner>**](SystemStatusComponentsInner.md) |  | 
+**checked_at** | **String** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.RefreshTokenRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :refresh_token
   ]

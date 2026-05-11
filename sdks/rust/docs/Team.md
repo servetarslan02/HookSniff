@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | Option<**uuid::Uuid**> |  | [optional]
-**name** | Option<**String**> |  | [optional]
-**created_at** | Option<**chrono::DateTime<chrono::FixedOffset>**> |  | [optional]
+**id** | **uuid::Uuid** |  | 
+**name** | **String** |  | 
+**created_at** | **chrono::DateTime<chrono::FixedOffset>** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

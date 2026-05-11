@@ -1,4 +1,4 @@
-# HookSniff.Model.CustomerResponse
+# HookSniff.Sdk.Model.CustomerResponse
 
 ## Properties
 

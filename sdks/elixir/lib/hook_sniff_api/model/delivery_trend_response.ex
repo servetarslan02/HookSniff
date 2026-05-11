@@ -6,15 +6,15 @@ defmodule HookSniffAPI.Model.DeliveryTrendResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :range,
     :buckets
   ]
 
   @type t :: %__MODULE__{
-    :range => String.t | nil,
-    :buckets => [HookSniffAPI.Model.DeliveryTrendResponseBucketsInner.t] | nil
+    :range => String.t,
+    :buckets => [HookSniffAPI.Model.DeliveryTrendResponseBucketsInner.t]
   }
 
   alias HookSniffAPI.Deserializer

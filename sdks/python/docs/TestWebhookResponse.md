@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**success** | **bool** |  | [optional] 
-**status_code** | **int** |  | [optional] 
-**duration_ms** | **int** |  | [optional] 
-**response_body** | **str** |  | [optional] 
+**success** | **bool** |  | 
+**status_code** | **int** |  | 
+**duration_ms** | **int** |  | 
+**response_body** | **str** |  | 
 
 ## Example
 

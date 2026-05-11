@@ -31,28 +31,25 @@ class Endpoint(BaseModel):
     """
     Endpoint
     """ # noqa: E501
-    id: Optional[UUID] = None
-    url: Optional[StrictStr] = None
+    id: UUID
+    url: StrictStr
     description: Optional[StrictStr] = None
-    is_active: Optional[StrictBool] = None
-    retry_policy: Optional[RetryPolicy] = None
-    created_at: Optional[datetime] = None
+    is_active: StrictBool
+    retry_policy: RetryPolicy
+    created_at: datetime
     allowed_ips: Optional[List[StrictStr]] = Field(default=None, description="CIDR blocks or exact IPs")
     event_filter: Optional[List[StrictStr]] = Field(default=None, description="Wildcard patterns (e.g. \"order.*\")")
     custom_headers: Optional[Dict[str, Any]] = None
-    routing_strategy: Optional[StrictStr] = None
+    routing_strategy: StrictStr
     fallback_url: Optional[StrictStr] = None
-    avg_response_ms: Optional[StrictInt] = None
-    failure_streak: Optional[StrictInt] = None
-    format: Optional[StrictStr] = None
+    avg_response_ms: StrictInt
+    failure_streak: StrictInt
+    format: StrictStr
     __properties: ClassVar[List[str]] = ["id", "url", "description", "is_active", "retry_policy", "created_at", "allowed_ips", "event_filter", "custom_headers", "routing_strategy", "fallback_url", "avg_response_ms", "failure_streak", "format"]
 
     @field_validator('routing_strategy')
     def routing_strategy_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['round-robin', 'latency', 'failover']):
             raise ValueError("must be one of enum values ('round-robin', 'latency', 'failover')")
         return value
@@ -60,9 +57,6 @@ class Endpoint(BaseModel):
     @field_validator('format')
     def format_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['standard', 'cloudevents']):
             raise ValueError("must be one of enum values ('standard', 'cloudevents')")
         return value

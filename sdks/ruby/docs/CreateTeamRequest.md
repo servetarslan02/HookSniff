@@ -1,4 +1,4 @@
-# HookSniff::CreateTeamRequest
+# HooksniffSdk::CreateTeamRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::CreateTeamRequest.new(
+instance = HooksniffSdk::CreateTeamRequest.new(
   name: null
 )
 ```

@@ -1,4 +1,4 @@
-# HookSniff::EventTypeListResponse
+# HooksniffSdk::EventTypeListResponse
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::EventTypeListResponse.new(
+instance = HooksniffSdk::EventTypeListResponse.new(
   data: null,
   has_more: null,
   total: null

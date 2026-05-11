@@ -16,8 +16,8 @@ Send contact form message
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = ContactApi()
 val contactRequest : ContactRequest =  // ContactRequest | 

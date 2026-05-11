@@ -282,6 +282,12 @@ class ContactResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['success'] === null) {
+            $invalidProperties[] = "'success' can't be null";
+        }
+        if ($this->container['message'] === null) {
+            $invalidProperties[] = "'message' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -300,7 +306,7 @@ class ContactResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets success
      *
-     * @return bool|null
+     * @return bool
      */
     public function getSuccess()
     {
@@ -310,7 +316,7 @@ class ContactResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets success
      *
-     * @param bool|null $success success
+     * @param bool $success success
      *
      * @return self
      */
@@ -327,7 +333,7 @@ class ContactResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets message
      *
-     * @return string|null
+     * @return string
      */
     public function getMessage()
     {
@@ -337,7 +343,7 @@ class ContactResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets message
      *
-     * @param string|null $message message
+     * @param string $message message
      *
      * @return self
      */

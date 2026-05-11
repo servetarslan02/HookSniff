@@ -1,4 +1,4 @@
-# HookSniff.Model.WebhookFilter
+# HookSniff.Sdk.Model.WebhookFilter
 Query parameters for filtering webhook deliveries
 
 ## Properties

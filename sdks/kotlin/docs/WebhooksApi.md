@@ -23,8 +23,8 @@ Send multiple webhooks in batch
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val batchWebhookRequest : BatchWebhookRequest =  // BatchWebhookRequest | 
@@ -69,8 +69,8 @@ Replay multiple deliveries by ID
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val batchReplayRequest : BatchReplayRequest =  // BatchReplayRequest | 
@@ -114,8 +114,8 @@ Export deliveries as CSV
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val range : kotlin.String = range_example // kotlin.String | 
@@ -160,8 +160,8 @@ List webhook deliveries
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val page : kotlin.Int = 56 // kotlin.Int | 
@@ -212,8 +212,8 @@ Get delivery attempts
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -258,8 +258,8 @@ Get delivery by ID
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -304,8 +304,8 @@ Replay a single delivery
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val id : java.util.UUID = 38400000-8cf0-11bd-b23e-10b96e4ef00d // java.util.UUID | 
@@ -350,8 +350,8 @@ Send a webhook
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = WebhooksApi()
 val createWebhookRequest : CreateWebhookRequest =  // CreateWebhookRequest | 

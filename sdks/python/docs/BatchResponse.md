@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**deliveries** | [**List[Delivery]**](Delivery.md) |  | [optional] 
-**errors** | [**List[BatchResponseErrorsInner]**](BatchResponseErrorsInner.md) |  | [optional] 
+**deliveries** | [**List[Delivery]**](Delivery.md) |  | 
+**errors** | [**List[BatchResponseErrorsInner]**](BatchResponseErrorsInner.md) |  | 
 
 ## Example
 

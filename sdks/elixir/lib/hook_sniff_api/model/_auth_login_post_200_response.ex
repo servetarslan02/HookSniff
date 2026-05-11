@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.AuthLoginPost200Response do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :token,
     :customer,
@@ -17,12 +17,12 @@ defmodule HookSniffAPI.Model.AuthLoginPost200Response do
   ]
 
   @type t :: %__MODULE__{
-    :token => String.t | nil,
-    :customer => HookSniffAPI.Model.CustomerResponse.t | nil,
+    :token => String.t,
+    :customer => HookSniffAPI.Model.CustomerResponse.t,
     :refresh_token => String.t | nil,
-    :requires_2fa => boolean() | nil,
-    :temp_token => String.t | nil,
-    :message => String.t | nil
+    :requires_2fa => boolean(),
+    :temp_token => String.t,
+    :message => String.t
   }
 
   alias HookSniffAPI.Deserializer

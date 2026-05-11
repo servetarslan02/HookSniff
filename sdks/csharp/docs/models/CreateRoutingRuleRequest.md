@@ -1,4 +1,4 @@
-# HookSniff.Model.CreateRoutingRuleRequest
+# HookSniff.Sdk.Model.CreateRoutingRuleRequest
 Create a new routing rule
 
 ## Properties

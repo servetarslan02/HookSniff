@@ -29,12 +29,12 @@ class RoutingInfo(BaseModel):
     """
     RoutingInfo
     """ # noqa: E501
-    endpoint_id: Optional[UUID] = None
-    routing_strategy: Optional[StrictStr] = None
+    endpoint_id: UUID
+    routing_strategy: StrictStr
     fallback_url: Optional[StrictStr] = None
-    avg_response_ms: Optional[StrictInt] = None
-    failure_streak: Optional[StrictInt] = None
-    is_healthy: Optional[StrictBool] = None
+    avg_response_ms: StrictInt
+    failure_streak: StrictInt
+    is_healthy: StrictBool
     __properties: ClassVar[List[str]] = ["endpoint_id", "routing_strategy", "fallback_url", "avg_response_ms", "failure_streak", "is_healthy"]
 
     model_config = ConfigDict(

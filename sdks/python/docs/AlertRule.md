@@ -5,13 +5,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**name** | **str** |  | [optional] 
-**condition** | **str** |  | [optional] 
-**threshold** | **int** |  | [optional] 
-**channels** | **List[str]** |  | [optional] 
-**is_active** | **bool** |  | [optional] 
-**created_at** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**name** | **str** |  | 
+**condition** | **str** |  | 
+**threshold** | **int** |  | 
+**channels** | **List[str]** |  | 
+**is_active** | **bool** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 

@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**notifications** | [**List[Notification]**](Notification.md) |  | [optional] 
-**total** | **int** |  | [optional] 
-**unread_count** | **int** |  | [optional] 
+**notifications** | [**List[Notification]**](Notification.md) |  | 
+**total** | **int** |  | 
+**unread_count** | **int** |  | 
 
 ## Example
 

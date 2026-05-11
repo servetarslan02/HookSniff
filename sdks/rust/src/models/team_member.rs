@@ -13,29 +13,29 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TeamMember {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "user_id", skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<uuid::Uuid>,
-    #[serde(rename = "email", skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "user_id")]
+    pub user_id: uuid::Uuid,
+    #[serde(rename = "email")]
+    pub email: String,
     #[serde(rename = "name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub name: Option<Option<String>>,
-    #[serde(rename = "role", skip_serializing_if = "Option::is_none")]
-    pub role: Option<String>,
-    #[serde(rename = "joined_at", skip_serializing_if = "Option::is_none")]
-    pub joined_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "role")]
+    pub role: String,
+    #[serde(rename = "joined_at")]
+    pub joined_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl TeamMember {
-    pub fn new() -> TeamMember {
+    pub fn new(id: uuid::Uuid, user_id: uuid::Uuid, email: String, role: String, joined_at: chrono::DateTime<chrono::FixedOffset>) -> TeamMember {
         TeamMember {
-            id: None,
-            user_id: None,
-            email: None,
+            id,
+            user_id,
+            email,
             name: None,
-            role: None,
-            joined_at: None,
+            role,
+            joined_at,
         }
     }
 }

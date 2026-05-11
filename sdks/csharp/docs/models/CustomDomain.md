@@ -1,4 +1,4 @@
-# HookSniff.Model.CustomDomain
+# HookSniff.Sdk.Model.CustomDomain
 A custom domain configured for the account
 
 ## Properties

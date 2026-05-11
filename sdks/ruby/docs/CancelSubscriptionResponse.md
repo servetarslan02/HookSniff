@@ -1,4 +1,4 @@
-# HookSniff::CancelSubscriptionResponse
+# HooksniffSdk::CancelSubscriptionResponse
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::CancelSubscriptionResponse.new(
+instance = HooksniffSdk::CancelSubscriptionResponse.new(
   cancelled_at: null,
   ends_at: null
 )

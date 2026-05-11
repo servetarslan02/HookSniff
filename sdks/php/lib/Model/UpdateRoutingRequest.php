@@ -299,6 +299,9 @@ class UpdateRoutingRequest implements ModelInterface, ArrayAccess, \JsonSerializ
     {
         $invalidProperties = [];
 
+        if ($this->container['routing_strategy'] === null) {
+            $invalidProperties[] = "'routing_strategy' can't be null";
+        }
         $allowedValues = $this->getRoutingStrategyAllowableValues();
         if (!is_null($this->container['routing_strategy']) && !in_array($this->container['routing_strategy'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -308,6 +311,9 @@ class UpdateRoutingRequest implements ModelInterface, ArrayAccess, \JsonSerializ
             );
         }
 
+        if ($this->container['fallback_url'] === null) {
+            $invalidProperties[] = "'fallback_url' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -326,7 +332,7 @@ class UpdateRoutingRequest implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets routing_strategy
      *
-     * @return string|null
+     * @return string
      */
     public function getRoutingStrategy()
     {
@@ -336,7 +342,7 @@ class UpdateRoutingRequest implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets routing_strategy
      *
-     * @param string|null $routing_strategy routing_strategy
+     * @param string $routing_strategy routing_strategy
      *
      * @return self
      */
@@ -363,7 +369,7 @@ class UpdateRoutingRequest implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Gets fallback_url
      *
-     * @return string|null
+     * @return string
      */
     public function getFallbackUrl()
     {
@@ -373,7 +379,7 @@ class UpdateRoutingRequest implements ModelInterface, ArrayAccess, \JsonSerializ
     /**
      * Sets fallback_url
      *
-     * @param string|null $fallback_url fallback_url
+     * @param string $fallback_url fallback_url
      *
      * @return self
      */

@@ -1,4 +1,4 @@
-# HookSniff.Model.AlertNotificationListResponse
+# HookSniff.Sdk.Model.AlertNotificationListResponse
 Paginated list of alert notifications
 
 ## Properties

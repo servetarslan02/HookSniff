@@ -12,14 +12,14 @@ import AnyCodable
 
 public struct Notification: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var title: String?
-    public var body: String?
-    public var isRead: Bool?
+    public var id: UUID
+    public var title: String
+    public var body: String
+    public var isRead: Bool
     public var link: String?
-    public var createdAt: Date?
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, title: String? = nil, body: String? = nil, isRead: Bool? = nil, link: String? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, title: String, body: String, isRead: Bool, link: String? = nil, createdAt: Date) {
         self.id = id
         self.title = title
         self.body = body
@@ -41,12 +41,12 @@ public struct Notification: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(title, forKey: .title)
-        try container.encodeIfPresent(body, forKey: .body)
-        try container.encodeIfPresent(isRead, forKey: .isRead)
+        try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
+        try container.encode(body, forKey: .body)
+        try container.encode(isRead, forKey: .isRead)
         try container.encodeIfPresent(link, forKey: .link)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

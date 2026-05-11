@@ -1,4 +1,4 @@
-# HookSniff.Model.RateLimitUsage
+# HookSniff.Sdk.Model.RateLimitUsage
 Current rate limit usage for an endpoint
 
 ## Properties

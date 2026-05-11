@@ -13,23 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SystemStatus {
-    #[serde(rename = "overall_status", skip_serializing_if = "Option::is_none")]
-    pub overall_status: Option<OverallStatus>,
-    #[serde(rename = "uptime_30d", skip_serializing_if = "Option::is_none")]
-    pub uptime_30d: Option<f64>,
-    #[serde(rename = "components", skip_serializing_if = "Option::is_none")]
-    pub components: Option<Vec<models::SystemStatusComponentsInner>>,
-    #[serde(rename = "checked_at", skip_serializing_if = "Option::is_none")]
-    pub checked_at: Option<String>,
+    #[serde(rename = "overall_status")]
+    pub overall_status: OverallStatus,
+    #[serde(rename = "uptime_30d")]
+    pub uptime_30d: f64,
+    #[serde(rename = "components")]
+    pub components: Vec<models::SystemStatusComponentsInner>,
+    #[serde(rename = "checked_at")]
+    pub checked_at: String,
 }
 
 impl SystemStatus {
-    pub fn new() -> SystemStatus {
+    pub fn new(overall_status: OverallStatus, uptime_30d: f64, components: Vec<models::SystemStatusComponentsInner>, checked_at: String) -> SystemStatus {
         SystemStatus {
-            overall_status: None,
-            uptime_30d: None,
-            components: None,
-            checked_at: None,
+            overall_status,
+            uptime_30d,
+            components,
+            checked_at,
         }
     }
 }

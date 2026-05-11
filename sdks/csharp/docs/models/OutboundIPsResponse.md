@@ -1,4 +1,4 @@
-# HookSniff.Model.OutboundIPsResponse
+# HookSniff.Sdk.Model.OutboundIPsResponse
 List of static outbound IP addresses for firewall whitelisting
 
 ## Properties

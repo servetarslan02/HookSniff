@@ -1,4 +1,4 @@
-# HookSniff::AdminRevenueEntry
+# HooksniffSdk::AdminRevenueEntry
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::AdminRevenueEntry.new(
+instance = HooksniffSdk::AdminRevenueEntry.new(
   date: null,
   mrr: null,
   new_subscriptions: null,

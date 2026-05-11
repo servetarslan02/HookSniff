@@ -1,4 +1,4 @@
-# HookSniff::EmbedConfigTheme
+# HooksniffSdk::EmbedConfigTheme
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::EmbedConfigTheme.new(
+instance = HooksniffSdk::EmbedConfigTheme.new(
   primary_color: null,
   background_color: null,
   font_family: null

@@ -12,11 +12,11 @@ import AnyCodable
 
 public struct LatencyTrendResponse: Codable, JSONEncodable, Hashable {
 
-    public var range: String?
-    public var buckets: [LatencyTrendResponseBucketsInner]?
-    public var overallAvgMs: Double?
+    public var range: String
+    public var buckets: [LatencyTrendResponseBucketsInner]
+    public var overallAvgMs: Double
 
-    public init(range: String? = nil, buckets: [LatencyTrendResponseBucketsInner]? = nil, overallAvgMs: Double? = nil) {
+    public init(range: String, buckets: [LatencyTrendResponseBucketsInner], overallAvgMs: Double) {
         self.range = range
         self.buckets = buckets
         self.overallAvgMs = overallAvgMs
@@ -32,9 +32,9 @@ public struct LatencyTrendResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(range, forKey: .range)
-        try container.encodeIfPresent(buckets, forKey: .buckets)
-        try container.encodeIfPresent(overallAvgMs, forKey: .overallAvgMs)
+        try container.encode(range, forKey: .range)
+        try container.encode(buckets, forKey: .buckets)
+        try container.encode(overallAvgMs, forKey: .overallAvgMs)
     }
 }
 

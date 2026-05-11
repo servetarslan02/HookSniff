@@ -324,6 +324,30 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['total_deliveries'] === null) {
+            $invalidProperties[] = "'total_deliveries' can't be null";
+        }
+        if ($this->container['successful_deliveries'] === null) {
+            $invalidProperties[] = "'successful_deliveries' can't be null";
+        }
+        if ($this->container['failed_deliveries'] === null) {
+            $invalidProperties[] = "'failed_deliveries' can't be null";
+        }
+        if ($this->container['total_endpoints'] === null) {
+            $invalidProperties[] = "'total_endpoints' can't be null";
+        }
+        if ($this->container['active_endpoints'] === null) {
+            $invalidProperties[] = "'active_endpoints' can't be null";
+        }
+        if ($this->container['plan'] === null) {
+            $invalidProperties[] = "'plan' can't be null";
+        }
+        if ($this->container['webhook_limit'] === null) {
+            $invalidProperties[] = "'webhook_limit' can't be null";
+        }
+        if ($this->container['webhook_count'] === null) {
+            $invalidProperties[] = "'webhook_count' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -342,7 +366,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets total_deliveries
      *
-     * @return int|null
+     * @return int
      */
     public function getTotalDeliveries()
     {
@@ -352,7 +376,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets total_deliveries
      *
-     * @param int|null $total_deliveries total_deliveries
+     * @param int $total_deliveries total_deliveries
      *
      * @return self
      */
@@ -369,7 +393,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets successful_deliveries
      *
-     * @return int|null
+     * @return int
      */
     public function getSuccessfulDeliveries()
     {
@@ -379,7 +403,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets successful_deliveries
      *
-     * @param int|null $successful_deliveries successful_deliveries
+     * @param int $successful_deliveries successful_deliveries
      *
      * @return self
      */
@@ -396,7 +420,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets failed_deliveries
      *
-     * @return int|null
+     * @return int
      */
     public function getFailedDeliveries()
     {
@@ -406,7 +430,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets failed_deliveries
      *
-     * @param int|null $failed_deliveries failed_deliveries
+     * @param int $failed_deliveries failed_deliveries
      *
      * @return self
      */
@@ -423,7 +447,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets total_endpoints
      *
-     * @return int|null
+     * @return int
      */
     public function getTotalEndpoints()
     {
@@ -433,7 +457,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets total_endpoints
      *
-     * @param int|null $total_endpoints total_endpoints
+     * @param int $total_endpoints total_endpoints
      *
      * @return self
      */
@@ -450,7 +474,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets active_endpoints
      *
-     * @return int|null
+     * @return int
      */
     public function getActiveEndpoints()
     {
@@ -460,7 +484,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets active_endpoints
      *
-     * @param int|null $active_endpoints active_endpoints
+     * @param int $active_endpoints active_endpoints
      *
      * @return self
      */
@@ -477,7 +501,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets plan
      *
-     * @return string|null
+     * @return string
      */
     public function getPlan()
     {
@@ -487,7 +511,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets plan
      *
-     * @param string|null $plan plan
+     * @param string $plan plan
      *
      * @return self
      */
@@ -504,7 +528,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets webhook_limit
      *
-     * @return int|null
+     * @return int
      */
     public function getWebhookLimit()
     {
@@ -514,7 +538,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets webhook_limit
      *
-     * @param int|null $webhook_limit webhook_limit
+     * @param int $webhook_limit webhook_limit
      *
      * @return self
      */
@@ -531,7 +555,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets webhook_count
      *
-     * @return int|null
+     * @return int
      */
     public function getWebhookCount()
     {
@@ -541,7 +565,7 @@ class StatsResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets webhook_count
      *
-     * @param int|null $webhook_count webhook_count
+     * @param int $webhook_count webhook_count
      *
      * @return self
      */

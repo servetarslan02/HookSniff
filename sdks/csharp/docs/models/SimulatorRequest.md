@@ -1,4 +1,4 @@
-# HookSniff.Model.SimulatorRequest
+# HookSniff.Sdk.Model.SimulatorRequest
 Send a simulated webhook event
 
 ## Properties

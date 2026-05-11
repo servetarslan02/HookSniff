@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,10 +28,10 @@ class TestWebhookResponse(BaseModel):
     """
     TestWebhookResponse
     """ # noqa: E501
-    success: Optional[StrictBool] = None
-    status_code: Optional[StrictInt] = None
-    duration_ms: Optional[StrictInt] = None
-    response_body: Optional[StrictStr] = None
+    success: StrictBool
+    status_code: StrictInt
+    duration_ms: StrictInt
+    response_body: StrictStr
     __properties: ClassVar[List[str]] = ["success", "status_code", "duration_ms", "response_body"]
 
     model_config = ConfigDict(

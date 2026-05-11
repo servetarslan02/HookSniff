@@ -4,11 +4,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**token** | **string** | JWT access token | [optional]
-**customer** | [**\OpenAPI\Client\Model\CustomerResponse**](CustomerResponse.md) |  | [optional]
+**token** | **string** | JWT access token |
+**customer** | [**\OpenAPI\Client\Model\CustomerResponse**](CustomerResponse.md) |  |
 **refresh_token** | **string** | Refresh token (when applicable) | [optional]
-**requires_2fa** | **bool** |  | [optional]
-**temp_token** | **string** |  | [optional]
-**message** | **string** |  | [optional]
+**requires_2fa** | **bool** |  |
+**temp_token** | **string** |  |
+**message** | **string** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

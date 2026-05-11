@@ -20,7 +20,7 @@ import json
 
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -29,11 +29,11 @@ class InvoiceResponse(BaseModel):
     """
     InvoiceResponse
     """ # noqa: E501
-    id: Optional[StrictStr] = None
-    amount_cents: Optional[StrictInt] = None
-    currency: Optional[StrictStr] = None
-    status: Optional[StrictStr] = None
-    created_at: Optional[datetime] = None
+    id: StrictStr
+    amount_cents: StrictInt
+    currency: StrictStr
+    status: StrictStr
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "amount_cents", "currency", "status", "created_at"]
 
     model_config = ConfigDict(

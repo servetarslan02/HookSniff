@@ -1,4 +1,4 @@
-# HookSniff::TemplateListResponse
+# HooksniffSdk::TemplateListResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::TemplateListResponse.new(
+instance = HooksniffSdk::TemplateListResponse.new(
   data: null
 )
 ```

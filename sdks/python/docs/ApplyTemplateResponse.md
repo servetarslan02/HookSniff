@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**success** | **bool** |  | [optional] 
-**message** | **str** |  | [optional] 
+**success** | **bool** |  | 
+**message** | **str** |  | 
 
 ## Example
 

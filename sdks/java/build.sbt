@@ -1,6 +1,6 @@
 lazy val root = (project in file(".")).
   settings(
-    organization := "io.github.servetarslan02",
+    organization := "org.openapitools",
     name := "hooksniff-sdk",
     version := "0.3.0",
     scalaVersion := "2.11.12",

@@ -1,4 +1,4 @@
-# HookSniff::AdminUsersIdStatusPutRequest
+# HooksniffSdk::AdminUsersIdStatusPutRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::AdminUsersIdStatusPutRequest.new(
+instance = HooksniffSdk::AdminUsersIdStatusPutRequest.new(
   is_active: null
 )
 ```

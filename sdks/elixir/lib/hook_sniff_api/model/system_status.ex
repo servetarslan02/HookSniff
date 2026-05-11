@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SystemStatus do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :overall_status,
     :uptime_30d,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.SystemStatus do
   ]
 
   @type t :: %__MODULE__{
-    :overall_status => String.t | nil,
-    :uptime_30d => number() | nil,
-    :components => [HookSniffAPI.Model.SystemStatusComponentsInner.t] | nil,
-    :checked_at => String.t | nil
+    :overall_status => String.t,
+    :uptime_30d => number(),
+    :components => [HookSniffAPI.Model.SystemStatusComponentsInner.t],
+    :checked_at => String.t
   }
 
   alias HookSniffAPI.Deserializer

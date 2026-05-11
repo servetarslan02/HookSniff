@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**token** | **str** | JWT access token | [optional] 
-**customer** | [**CustomerResponse**](CustomerResponse.md) |  | [optional] 
+**token** | **str** | JWT access token | 
+**customer** | [**CustomerResponse**](CustomerResponse.md) |  | 
 **refresh_token** | **str** | Refresh token (when applicable) | [optional] 
-**requires_2fa** | **bool** |  | [optional] 
-**temp_token** | **str** |  | [optional] 
-**message** | **str** |  | [optional] 
+**requires_2fa** | **bool** |  | 
+**temp_token** | **str** |  | 
+**message** | **str** |  | 
 
 ## Example
 

@@ -1,4 +1,4 @@
-# HookSniff::PortalNotificationsPut200Response
+# HooksniffSdk::PortalNotificationsPut200Response
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::PortalNotificationsPut200Response.new(
+instance = HooksniffSdk::PortalNotificationsPut200Response.new(
   updated: null,
   preferences: null
 )

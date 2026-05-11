@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**requires_2fa** | **bool** |  | [optional] 
-**temp_token** | **str** |  | [optional] 
-**message** | **str** |  | [optional] 
+**requires_2fa** | **bool** |  | 
+**temp_token** | **str** |  | 
+**message** | **str** |  | 
 
 ## Example
 

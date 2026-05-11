@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.CustomDomainsPostRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :domain
   ]

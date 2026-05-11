@@ -12,15 +12,15 @@ import AnyCodable
 
 public struct DeliveryAttempt: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var attemptNumber: Int?
+    public var id: UUID
+    public var attemptNumber: Int
     public var statusCode: Int?
     public var responseBody: String?
     public var durationMs: Int?
     public var errorMessage: String?
-    public var createdAt: Date?
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, attemptNumber: Int? = nil, statusCode: Int? = nil, responseBody: String? = nil, durationMs: Int? = nil, errorMessage: String? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, attemptNumber: Int, statusCode: Int? = nil, responseBody: String? = nil, durationMs: Int? = nil, errorMessage: String? = nil, createdAt: Date) {
         self.id = id
         self.attemptNumber = attemptNumber
         self.statusCode = statusCode
@@ -44,13 +44,13 @@ public struct DeliveryAttempt: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(attemptNumber, forKey: .attemptNumber)
+        try container.encode(id, forKey: .id)
+        try container.encode(attemptNumber, forKey: .attemptNumber)
         try container.encodeIfPresent(statusCode, forKey: .statusCode)
         try container.encodeIfPresent(responseBody, forKey: .responseBody)
         try container.encodeIfPresent(durationMs, forKey: .durationMs)
         try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

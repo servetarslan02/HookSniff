@@ -1,4 +1,4 @@
-# HookSniff.Model.LatencyResponse
+# HookSniff.Sdk.Model.LatencyResponse
 Latency percentile breakdown for deliveries
 
 ## Properties

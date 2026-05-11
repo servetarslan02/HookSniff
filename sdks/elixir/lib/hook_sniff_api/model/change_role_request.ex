@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.ChangeRoleRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :role
   ]

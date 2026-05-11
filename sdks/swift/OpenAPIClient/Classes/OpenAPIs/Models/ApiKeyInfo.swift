@@ -12,14 +12,14 @@ import AnyCodable
 
 public struct ApiKeyInfo: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
+    public var id: UUID
     /** Masked key prefix (e.g. \"hs_abc1...\") */
-    public var _prefix: String?
-    public var createdAt: String?
+    public var _prefix: String
+    public var createdAt: Date
     public var lastUsedAt: String?
-    public var isActive: Bool?
+    public var isActive: Bool
 
-    public init(id: UUID? = nil, _prefix: String? = nil, createdAt: String? = nil, lastUsedAt: String? = nil, isActive: Bool? = nil) {
+    public init(id: UUID, _prefix: String, createdAt: Date, lastUsedAt: String? = nil, isActive: Bool) {
         self.id = id
         self._prefix = _prefix
         self.createdAt = createdAt
@@ -39,11 +39,11 @@ public struct ApiKeyInfo: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(_prefix, forKey: ._prefix)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(id, forKey: .id)
+        try container.encode(_prefix, forKey: ._prefix)
+        try container.encode(createdAt, forKey: .createdAt)
         try container.encodeIfPresent(lastUsedAt, forKey: .lastUsedAt)
-        try container.encodeIfPresent(isActive, forKey: .isActive)
+        try container.encode(isActive, forKey: .isActive)
     }
 }
 

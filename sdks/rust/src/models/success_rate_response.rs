@@ -13,26 +13,26 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SuccessRateResponse {
-    #[serde(rename = "range", skip_serializing_if = "Option::is_none")]
-    pub range: Option<String>,
-    #[serde(rename = "successful", skip_serializing_if = "Option::is_none")]
-    pub successful: Option<i32>,
-    #[serde(rename = "failed", skip_serializing_if = "Option::is_none")]
-    pub failed: Option<i32>,
-    #[serde(rename = "pending", skip_serializing_if = "Option::is_none")]
-    pub pending: Option<i32>,
-    #[serde(rename = "success_rate", skip_serializing_if = "Option::is_none")]
-    pub success_rate: Option<f64>,
+    #[serde(rename = "range")]
+    pub range: String,
+    #[serde(rename = "successful")]
+    pub successful: i32,
+    #[serde(rename = "failed")]
+    pub failed: i32,
+    #[serde(rename = "pending")]
+    pub pending: i32,
+    #[serde(rename = "success_rate")]
+    pub success_rate: f64,
 }
 
 impl SuccessRateResponse {
-    pub fn new() -> SuccessRateResponse {
+    pub fn new(range: String, successful: i32, failed: i32, pending: i32, success_rate: f64) -> SuccessRateResponse {
         SuccessRateResponse {
-            range: None,
-            successful: None,
-            failed: None,
-            pending: None,
-            success_rate: None,
+            range,
+            successful,
+            failed,
+            pending,
+            success_rate,
         }
     }
 }

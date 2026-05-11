@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Team do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :name,
@@ -14,9 +14,9 @@ defmodule HookSniffAPI.Model.Team do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :name => String.t | nil,
-    :created_at => DateTime.t | nil
+    :id => String.t,
+    :name => String.t,
+    :created_at => DateTime.t
   }
 
   def decode(value) do

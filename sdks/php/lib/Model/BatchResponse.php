@@ -282,6 +282,12 @@ class BatchResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['deliveries'] === null) {
+            $invalidProperties[] = "'deliveries' can't be null";
+        }
+        if ($this->container['errors'] === null) {
+            $invalidProperties[] = "'errors' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -300,7 +306,7 @@ class BatchResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets deliveries
      *
-     * @return \OpenAPI\Client\Model\Delivery[]|null
+     * @return \OpenAPI\Client\Model\Delivery[]
      */
     public function getDeliveries()
     {
@@ -310,7 +316,7 @@ class BatchResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets deliveries
      *
-     * @param \OpenAPI\Client\Model\Delivery[]|null $deliveries deliveries
+     * @param \OpenAPI\Client\Model\Delivery[] $deliveries deliveries
      *
      * @return self
      */
@@ -327,7 +333,7 @@ class BatchResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets errors
      *
-     * @return \OpenAPI\Client\Model\BatchResponseErrorsInner[]|null
+     * @return \OpenAPI\Client\Model\BatchResponseErrorsInner[]
      */
     public function getErrors()
     {
@@ -337,7 +343,7 @@ class BatchResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets errors
      *
-     * @param \OpenAPI\Client\Model\BatchResponseErrorsInner[]|null $errors errors
+     * @param \OpenAPI\Client\Model\BatchResponseErrorsInner[] $errors errors
      *
      * @return self
      */

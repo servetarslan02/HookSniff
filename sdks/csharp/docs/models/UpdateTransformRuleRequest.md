@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateTransformRuleRequest
+# HookSniff.Sdk.Model.UpdateTransformRuleRequest
 Update an existing transform rule (all fields optional)
 
 ## Properties

@@ -18,16 +18,16 @@ public struct Delivery: Codable, JSONEncodable, Hashable {
         case delivered = "delivered"
         case failed = "failed"
     }
-    public var id: UUID?
-    public var endpointId: UUID?
+    public var id: UUID
+    public var endpointId: UUID
     public var event: String?
-    public var status: Status?
-    public var attemptCount: Int?
+    public var status: Status
+    public var attemptCount: Int
     public var responseStatus: Int?
-    public var replayCount: Int?
-    public var createdAt: Date?
+    public var replayCount: Int
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, endpointId: UUID? = nil, event: String? = nil, status: Status? = nil, attemptCount: Int? = nil, responseStatus: Int? = nil, replayCount: Int? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, endpointId: UUID, event: String? = nil, status: Status, attemptCount: Int, responseStatus: Int? = nil, replayCount: Int, createdAt: Date) {
         self.id = id
         self.endpointId = endpointId
         self.event = event
@@ -53,14 +53,14 @@ public struct Delivery: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(endpointId, forKey: .endpointId)
+        try container.encode(id, forKey: .id)
+        try container.encode(endpointId, forKey: .endpointId)
         try container.encodeIfPresent(event, forKey: .event)
-        try container.encodeIfPresent(status, forKey: .status)
-        try container.encodeIfPresent(attemptCount, forKey: .attemptCount)
+        try container.encode(status, forKey: .status)
+        try container.encode(attemptCount, forKey: .attemptCount)
         try container.encodeIfPresent(responseStatus, forKey: .responseStatus)
-        try container.encodeIfPresent(replayCount, forKey: .replayCount)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(replayCount, forKey: .replayCount)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

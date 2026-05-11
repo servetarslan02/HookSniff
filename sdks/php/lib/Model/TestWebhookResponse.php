@@ -296,6 +296,18 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     {
         $invalidProperties = [];
 
+        if ($this->container['success'] === null) {
+            $invalidProperties[] = "'success' can't be null";
+        }
+        if ($this->container['status_code'] === null) {
+            $invalidProperties[] = "'status_code' can't be null";
+        }
+        if ($this->container['duration_ms'] === null) {
+            $invalidProperties[] = "'duration_ms' can't be null";
+        }
+        if ($this->container['response_body'] === null) {
+            $invalidProperties[] = "'response_body' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -314,7 +326,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets success
      *
-     * @return bool|null
+     * @return bool
      */
     public function getSuccess()
     {
@@ -324,7 +336,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets success
      *
-     * @param bool|null $success success
+     * @param bool $success success
      *
      * @return self
      */
@@ -341,7 +353,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets status_code
      *
-     * @return int|null
+     * @return int
      */
     public function getStatusCode()
     {
@@ -351,7 +363,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets status_code
      *
-     * @param int|null $status_code status_code
+     * @param int $status_code status_code
      *
      * @return self
      */
@@ -368,7 +380,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets duration_ms
      *
-     * @return int|null
+     * @return int
      */
     public function getDurationMs()
     {
@@ -378,7 +390,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets duration_ms
      *
-     * @param int|null $duration_ms duration_ms
+     * @param int $duration_ms duration_ms
      *
      * @return self
      */
@@ -395,7 +407,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets response_body
      *
-     * @return string|null
+     * @return string
      */
     public function getResponseBody()
     {
@@ -405,7 +417,7 @@ class TestWebhookResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets response_body
      *
-     * @param string|null $response_body response_body
+     * @param string $response_body response_body
      *
      * @return self
      */

@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **str** |  | [optional] 
-**name** | **str** |  | [optional] 
-**description** | **str** |  | [optional] 
-**category** | **str** |  | [optional] 
+**id** | **str** |  | 
+**name** | **str** |  | 
+**description** | **str** |  | 
+**category** | **str** |  | 
 **payload_template** | **object** |  | [optional] 
 
 ## Example

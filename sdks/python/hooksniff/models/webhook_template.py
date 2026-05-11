@@ -28,10 +28,10 @@ class WebhookTemplate(BaseModel):
     """
     WebhookTemplate
     """ # noqa: E501
-    id: Optional[StrictStr] = None
-    name: Optional[StrictStr] = None
-    description: Optional[StrictStr] = None
-    category: Optional[StrictStr] = None
+    id: StrictStr
+    name: StrictStr
+    description: StrictStr
+    category: StrictStr
     payload_template: Optional[Dict[str, Any]] = None
     __properties: ClassVar[List[str]] = ["id", "name", "description", "category", "payload_template"]
 

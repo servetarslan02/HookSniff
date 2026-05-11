@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing import Any, ClassVar, Dict, List, Union
 from hooksniff.models.latency_trend_response_buckets_inner import LatencyTrendResponseBucketsInner
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,9 +29,9 @@ class LatencyTrendResponse(BaseModel):
     """
     LatencyTrendResponse
     """ # noqa: E501
-    range: Optional[StrictStr] = None
-    buckets: Optional[List[LatencyTrendResponseBucketsInner]] = None
-    overall_avg_ms: Optional[Union[StrictFloat, StrictInt]] = None
+    range: StrictStr
+    buckets: List[LatencyTrendResponseBucketsInner]
+    overall_avg_ms: Union[StrictFloat, StrictInt]
     __properties: ClassVar[List[str]] = ["range", "buckets", "overall_avg_ms"]
 
     model_config = ConfigDict(

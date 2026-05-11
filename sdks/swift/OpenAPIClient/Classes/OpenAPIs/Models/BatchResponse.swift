@@ -12,10 +12,10 @@ import AnyCodable
 
 public struct BatchResponse: Codable, JSONEncodable, Hashable {
 
-    public var deliveries: [Delivery]?
-    public var errors: [BatchResponseErrorsInner]?
+    public var deliveries: [Delivery]
+    public var errors: [BatchResponseErrorsInner]
 
-    public init(deliveries: [Delivery]? = nil, errors: [BatchResponseErrorsInner]? = nil) {
+    public init(deliveries: [Delivery], errors: [BatchResponseErrorsInner]) {
         self.deliveries = deliveries
         self.errors = errors
     }
@@ -29,8 +29,8 @@ public struct BatchResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(deliveries, forKey: .deliveries)
-        try container.encodeIfPresent(errors, forKey: .errors)
+        try container.encode(deliveries, forKey: .deliveries)
+        try container.encode(errors, forKey: .errors)
     }
 }
 

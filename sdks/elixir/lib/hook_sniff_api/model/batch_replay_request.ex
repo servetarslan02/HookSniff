@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.BatchReplayRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :ids
   ]

@@ -30,22 +30,19 @@ class Delivery(BaseModel):
     """
     Delivery
     """ # noqa: E501
-    id: Optional[UUID] = None
-    endpoint_id: Optional[UUID] = None
+    id: UUID
+    endpoint_id: UUID
     event: Optional[StrictStr] = None
-    status: Optional[StrictStr] = None
-    attempt_count: Optional[StrictInt] = None
+    status: StrictStr
+    attempt_count: StrictInt
     response_status: Optional[StrictInt] = None
-    replay_count: Optional[StrictInt] = None
-    created_at: Optional[datetime] = None
+    replay_count: StrictInt
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "endpoint_id", "event", "status", "attempt_count", "response_status", "replay_count", "created_at"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['pending', 'processing', 'delivered', 'failed']):
             raise ValueError("must be one of enum values ('pending', 'processing', 'delivered', 'failed')")
         return value

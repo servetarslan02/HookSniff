@@ -1,4 +1,4 @@
-# HookSniff::LatencyResponse
+# HooksniffSdk::LatencyResponse
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::LatencyResponse.new(
+instance = HooksniffSdk::LatencyResponse.new(
   p50: null,
   p90: null,
   p95: null,

@@ -17,12 +17,12 @@ public struct SystemStatus: Codable, JSONEncodable, Hashable {
         case degraded = "degraded"
         case down = "down"
     }
-    public var overallStatus: OverallStatus?
-    public var uptime30d: Double?
-    public var components: [SystemStatusComponentsInner]?
-    public var checkedAt: String?
+    public var overallStatus: OverallStatus
+    public var uptime30d: Double
+    public var components: [SystemStatusComponentsInner]
+    public var checkedAt: String
 
-    public init(overallStatus: OverallStatus? = nil, uptime30d: Double? = nil, components: [SystemStatusComponentsInner]? = nil, checkedAt: String? = nil) {
+    public init(overallStatus: OverallStatus, uptime30d: Double, components: [SystemStatusComponentsInner], checkedAt: String) {
         self.overallStatus = overallStatus
         self.uptime30d = uptime30d
         self.components = components
@@ -40,10 +40,10 @@ public struct SystemStatus: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(overallStatus, forKey: .overallStatus)
-        try container.encodeIfPresent(uptime30d, forKey: .uptime30d)
-        try container.encodeIfPresent(components, forKey: .components)
-        try container.encodeIfPresent(checkedAt, forKey: .checkedAt)
+        try container.encode(overallStatus, forKey: .overallStatus)
+        try container.encode(uptime30d, forKey: .uptime30d)
+        try container.encode(components, forKey: .components)
+        try container.encode(checkedAt, forKey: .checkedAt)
     }
 }
 

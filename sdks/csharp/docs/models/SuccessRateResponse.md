@@ -1,4 +1,4 @@
-# HookSniff.Model.SuccessRateResponse
+# HookSniff.Sdk.Model.SuccessRateResponse
 
 ## Properties
 

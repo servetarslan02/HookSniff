@@ -1,4 +1,4 @@
-# HookSniff.Model.DeliveryAttempt
+# HookSniff.Sdk.Model.DeliveryAttempt
 
 ## Properties
 

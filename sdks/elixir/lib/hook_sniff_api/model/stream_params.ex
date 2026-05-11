@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.StreamParams do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :endpoint_id,
     :status,
@@ -14,9 +14,9 @@ defmodule HookSniffAPI.Model.StreamParams do
   ]
 
   @type t :: %__MODULE__{
-    :endpoint_id => String.t | nil,
-    :status => String.t | nil,
-    :limit => integer() | nil
+    :endpoint_id => String.t,
+    :status => String.t,
+    :limit => integer()
   }
 
   def decode(value) do

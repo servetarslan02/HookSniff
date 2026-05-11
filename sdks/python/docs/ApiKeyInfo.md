@@ -5,11 +5,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**prefix** | **str** | Masked key prefix (e.g. \&quot;hs_abc1...\&quot;) | [optional] 
-**created_at** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**prefix** | **str** | Masked key prefix (e.g. \&quot;hs_abc1...\&quot;) | 
+**created_at** | **datetime** |  | 
 **last_used_at** | **str** |  | [optional] 
-**is_active** | **bool** |  | [optional] 
+**is_active** | **bool** |  | 
 
 ## Example
 

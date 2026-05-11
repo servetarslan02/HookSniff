@@ -1,4 +1,4 @@
-# HookSniff::SSOApi
+# HooksniffSdk::SSOApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -20,19 +20,19 @@ Delete SSO configuration
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::SSOApi.new
+api_instance = HooksniffSdk::SSOApi.new
 
 begin
   # Delete SSO configuration
   api_instance.sso_config_delete
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_config_delete: #{e}"
 end
 ```
@@ -50,7 +50,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_config_delete_with_http_info: #{e}"
 end
 ```
@@ -83,19 +83,19 @@ Get SSO configuration
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::SSOApi.new
+api_instance = HooksniffSdk::SSOApi.new
 
 begin
   # Get SSO configuration
   api_instance.sso_config_get
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_config_get: #{e}"
 end
 ```
@@ -113,7 +113,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_config_get_with_http_info: #{e}"
 end
 ```
@@ -146,22 +146,22 @@ Create/update SSO configuration
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::SSOApi.new
+api_instance = HooksniffSdk::SSOApi.new
 opts = {
-  sso_config_post_request: HookSniff::SsoConfigPostRequest.new # SsoConfigPostRequest | 
+  sso_config_post_request: HooksniffSdk::SsoConfigPostRequest.new # SsoConfigPostRequest | 
 }
 
 begin
   # Create/update SSO configuration
   api_instance.sso_config_post(opts)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_config_post: #{e}"
 end
 ```
@@ -179,7 +179,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_config_post_with_http_info: #{e}"
 end
 ```
@@ -214,19 +214,19 @@ Test SSO connection
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::SSOApi.new
+api_instance = HooksniffSdk::SSOApi.new
 
 begin
   # Test SSO connection
   api_instance.sso_test_post
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_test_post: #{e}"
 end
 ```
@@ -244,7 +244,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SSOApi->sso_test_post_with_http_info: #{e}"
 end
 ```

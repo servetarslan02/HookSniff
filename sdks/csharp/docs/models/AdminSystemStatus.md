@@ -1,4 +1,4 @@
-# HookSniff.Model.AdminSystemStatus
+# HookSniff.Sdk.Model.AdminSystemStatus
 System-level status for admin dashboard
 
 ## Properties

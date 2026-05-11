@@ -1,4 +1,4 @@
-# HookSniff::InviteRequest
+# HooksniffSdk::InviteRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::InviteRequest.new(
+instance = HooksniffSdk::InviteRequest.new(
   email: null,
   role: null
 )

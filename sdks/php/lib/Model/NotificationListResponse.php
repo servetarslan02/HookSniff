@@ -289,6 +289,15 @@ class NotificationListResponse implements ModelInterface, ArrayAccess, \JsonSeri
     {
         $invalidProperties = [];
 
+        if ($this->container['notifications'] === null) {
+            $invalidProperties[] = "'notifications' can't be null";
+        }
+        if ($this->container['total'] === null) {
+            $invalidProperties[] = "'total' can't be null";
+        }
+        if ($this->container['unread_count'] === null) {
+            $invalidProperties[] = "'unread_count' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -307,7 +316,7 @@ class NotificationListResponse implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets notifications
      *
-     * @return \OpenAPI\Client\Model\Notification[]|null
+     * @return \OpenAPI\Client\Model\Notification[]
      */
     public function getNotifications()
     {
@@ -317,7 +326,7 @@ class NotificationListResponse implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets notifications
      *
-     * @param \OpenAPI\Client\Model\Notification[]|null $notifications notifications
+     * @param \OpenAPI\Client\Model\Notification[] $notifications notifications
      *
      * @return self
      */
@@ -334,7 +343,7 @@ class NotificationListResponse implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets total
      *
-     * @return int|null
+     * @return int
      */
     public function getTotal()
     {
@@ -344,7 +353,7 @@ class NotificationListResponse implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets total
      *
-     * @param int|null $total total
+     * @param int $total total
      *
      * @return self
      */
@@ -361,7 +370,7 @@ class NotificationListResponse implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets unread_count
      *
-     * @return int|null
+     * @return int
      */
     public function getUnreadCount()
     {
@@ -371,7 +380,7 @@ class NotificationListResponse implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets unread_count
      *
-     * @param int|null $unread_count unread_count
+     * @param int $unread_count unread_count
      *
      * @return self
      */

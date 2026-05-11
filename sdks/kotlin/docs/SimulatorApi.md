@@ -16,8 +16,8 @@ Simulate a webhook delivery
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = SimulatorApi()
 val simulatorPostRequest : SimulatorPostRequest =  // SimulatorPostRequest | 

@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateTeamRequest
+# HookSniff.Sdk.Model.UpdateTeamRequest
 Fields to update on a team (all optional)
 
 ## Properties

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Notification do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :title,
@@ -17,12 +17,12 @@ defmodule HookSniffAPI.Model.Notification do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :title => String.t | nil,
-    :body => String.t | nil,
-    :is_read => boolean() | nil,
+    :id => String.t,
+    :title => String.t,
+    :body => String.t,
+    :is_read => boolean(),
     :link => String.t | nil,
-    :created_at => DateTime.t | nil
+    :created_at => DateTime.t
   }
 
   def decode(value) do

@@ -3,24 +3,34 @@
 
 defmodule HookSniffAPI.Model.EndpointHealth do
   @moduledoc """
-  
+  Endpoint health metrics and status
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :endpoint_id,
     :is_healthy,
     :failure_streak,
     :avg_response_ms,
-    :last_failure_at
+    :last_failure_at,
+    :success_rate,
+    :avg_latency_ms,
+    :last_delivery_at,
+    :total_deliveries,
+    :failed_deliveries
   ]
 
   @type t :: %__MODULE__{
-    :endpoint_id => String.t | nil,
-    :is_healthy => boolean() | nil,
+    :endpoint_id => String.t,
+    :is_healthy => boolean(),
     :failure_streak => integer() | nil,
     :avg_response_ms => integer() | nil,
-    :last_failure_at => DateTime.t | nil
+    :last_failure_at => DateTime.t | nil,
+    :success_rate => float() | nil,
+    :avg_latency_ms => number() | nil,
+    :last_delivery_at => DateTime.t | nil,
+    :total_deliveries => integer() | nil,
+    :failed_deliveries => integer() | nil
   }
 
   def decode(value) do

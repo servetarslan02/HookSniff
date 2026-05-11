@@ -1,4 +1,4 @@
-# HookSniff::UpdateTransformRuleRequest
+# HooksniffSdk::UpdateTransformRuleRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::UpdateTransformRuleRequest.new(
+instance = HooksniffSdk::UpdateTransformRuleRequest.new(
   name: null,
   config: null
 )

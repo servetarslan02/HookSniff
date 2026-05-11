@@ -1,4 +1,4 @@
-# HookSniff.Model.AnalyticsTrendPoint
+# HookSniff.Sdk.Model.AnalyticsTrendPoint
 Single data point in a delivery trend
 
 ## Properties

@@ -13,23 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RetryPolicy {
-    #[serde(rename = "max_attempts", skip_serializing_if = "Option::is_none")]
-    pub max_attempts: Option<i32>,
-    #[serde(rename = "backoff", skip_serializing_if = "Option::is_none")]
-    pub backoff: Option<Backoff>,
-    #[serde(rename = "initial_delay_secs", skip_serializing_if = "Option::is_none")]
-    pub initial_delay_secs: Option<i32>,
-    #[serde(rename = "max_delay_secs", skip_serializing_if = "Option::is_none")]
-    pub max_delay_secs: Option<i32>,
+    #[serde(rename = "max_attempts")]
+    pub max_attempts: i32,
+    #[serde(rename = "backoff")]
+    pub backoff: Backoff,
+    #[serde(rename = "initial_delay_secs")]
+    pub initial_delay_secs: i32,
+    #[serde(rename = "max_delay_secs")]
+    pub max_delay_secs: i32,
 }
 
 impl RetryPolicy {
-    pub fn new() -> RetryPolicy {
+    pub fn new(max_attempts: i32, backoff: Backoff, initial_delay_secs: i32, max_delay_secs: i32) -> RetryPolicy {
         RetryPolicy {
-            max_attempts: None,
-            backoff: None,
-            initial_delay_secs: None,
-            max_delay_secs: None,
+            max_attempts,
+            backoff,
+            initial_delay_secs,
+            max_delay_secs,
         }
     }
 }

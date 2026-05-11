@@ -12,15 +12,15 @@ import AnyCodable
 
 public struct SubscriptionResponse: Codable, JSONEncodable, Hashable {
 
-    public var plan: String?
-    public var status: String?
-    public var paymentProvider: String?
-    public var webhookLimit: Int?
-    public var endpointLimit: Int?
-    public var retentionDays: Int?
-    public var monthlyPriceCents: Int?
+    public var plan: String
+    public var status: String
+    public var paymentProvider: String
+    public var webhookLimit: Int
+    public var endpointLimit: Int
+    public var retentionDays: Int
+    public var monthlyPriceCents: Int
 
-    public init(plan: String? = nil, status: String? = nil, paymentProvider: String? = nil, webhookLimit: Int? = nil, endpointLimit: Int? = nil, retentionDays: Int? = nil, monthlyPriceCents: Int? = nil) {
+    public init(plan: String, status: String, paymentProvider: String, webhookLimit: Int, endpointLimit: Int, retentionDays: Int, monthlyPriceCents: Int) {
         self.plan = plan
         self.status = status
         self.paymentProvider = paymentProvider
@@ -44,13 +44,13 @@ public struct SubscriptionResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(plan, forKey: .plan)
-        try container.encodeIfPresent(status, forKey: .status)
-        try container.encodeIfPresent(paymentProvider, forKey: .paymentProvider)
-        try container.encodeIfPresent(webhookLimit, forKey: .webhookLimit)
-        try container.encodeIfPresent(endpointLimit, forKey: .endpointLimit)
-        try container.encodeIfPresent(retentionDays, forKey: .retentionDays)
-        try container.encodeIfPresent(monthlyPriceCents, forKey: .monthlyPriceCents)
+        try container.encode(plan, forKey: .plan)
+        try container.encode(status, forKey: .status)
+        try container.encode(paymentProvider, forKey: .paymentProvider)
+        try container.encode(webhookLimit, forKey: .webhookLimit)
+        try container.encode(endpointLimit, forKey: .endpointLimit)
+        try container.encode(retentionDays, forKey: .retentionDays)
+        try container.encode(monthlyPriceCents, forKey: .monthlyPriceCents)
     }
 }
 
