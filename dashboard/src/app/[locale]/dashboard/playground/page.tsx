@@ -313,7 +313,7 @@ function LiveRequestViewer() {
     // Poll for recent deliveries
     const poll = async () => {
       try {
-        const data = await apiFetch<{ deliveries?: Array<Record<string, unknown>> }>('/webhooks?page=1', { token: token || undefined });
+        const data = await apiFetch<{ deliveries?: Array<Record<string, unknown>> }>('/webhooks?page=1');
         const recent = (data.deliveries || []).slice(0, 5).map((d) => ({
           id: String(d.id).slice(0, 10),
           event: String(d.event || 'webhook'),
@@ -398,7 +398,7 @@ function LiveRequestViewer() {
 
 // ─── Main Playground Page ───
 export default function PlaygroundPage() {
-  const { apiKey, token } = useAuth();
+  const { apiKey } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('playground');
   const [method, setMethod] = useState<string>('POST');

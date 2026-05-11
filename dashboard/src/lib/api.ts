@@ -77,7 +77,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  void setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   // If caller provided an external signal, forward its abort
   if (signal) {
