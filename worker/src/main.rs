@@ -94,6 +94,12 @@ pub struct WebhookQueueItem {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Install ring as the default CryptoProvider for rustls 0.23+
+    // Must happen before ANY TLS connection (HTTP clients, DB, Redis)
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .expect("Failed to install rustls CryptoProvider");
+
     // Initialize tracing (OpenTelemetry + structured logging)
     let cfg = config::WorkerConfig::from_env()?;
     telemetry::init(
