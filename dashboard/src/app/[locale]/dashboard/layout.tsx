@@ -6,7 +6,7 @@ import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
-import { ThemeToggle } from '@/components/ThemeToggle';
+
 import { NotificationCenter } from '@/components/NotificationCenter';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
@@ -27,7 +27,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
   const navigation = [
-    { name: t('getStarted'), href: '/get-started', icon: '🚀' },
     { name: t('dashboard'), href: '/dashboard', icon: '📊' },
     { name: t('endpoints'), href: '/dashboard/endpoints', icon: '🔗' },
     { name: t('deliveries'), href: '/dashboard/deliveries', icon: '📦' },
@@ -123,10 +122,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             </Link>
           )}
         </nav>
-        <div className="absolute bottom-4 left-0 right-0 px-6 flex flex-col gap-2">
-          <LanguageSwitcher className="w-full" />
-          <ThemeToggle className="w-full" />
-        </div>
       </aside>
 
       {/* Main content */}
