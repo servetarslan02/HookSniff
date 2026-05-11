@@ -70,7 +70,7 @@ async fn list_notifications(
     Query(params): Query<ListParams>,
 ) -> Result<Json<NotificationListResponse>, AppError> {
     let page = params.page.unwrap_or(1).max(1);
-    let per_page = params.per_page.unwrap_or(20).clamp(1, 100);
+    let per_page = params.per_page.unwrap_or(20).clamp(1, 200);
     let offset = (page - 1) * per_page;
     let unread_only = params.unread_only.unwrap_or(false);
 
