@@ -16,7 +16,7 @@ vi.mock('@/lib/store', () => ({
   useAuth: () => ({ token: 'test-token' }),
 }));
 
-const { default: SdksPage } = await import('@/app/[locale]/docs/sdks/page');
+const { default: SdksPage } = await import('@/app/[locale]/docs/sdk-libraries/page');
 
 describe('SdksPage', () => {
   beforeEach(() => {
