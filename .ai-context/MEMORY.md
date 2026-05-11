@@ -548,6 +548,25 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - **README.md:** Kurulum talimatları eklendi (SPM + Xcode)
 - **11/11 SDK TAMAMLANDI** 🎉
 
+## Oturum 114 (2026-05-11 22:47 - 23:37 GMT+8) ✅
+- **OpenClaw onuncu oturum** — Servet AŞAMA 2 wrapper + imza doğrulama
+- **AŞAMA 2 tamamlandı** — 11/11 SDK wrapper + verifySignature
+- **Node.js wrapper** — HookSniff class, 10 resource, zero-dep fetch, 14 test ✅
+- **Python wrapper** — HookSniff client, Webhook.verify, 26 test ✅
+- **Go wrapper** — hooksniff.go, webhook.go, 8 test ✅
+- **Rust wrapper** — webhook.rs, resources, 8 test ✅ (chrono+serde feature fix)
+- **Ruby wrapper** — client.rb, webhook.rb, 8 test ✅
+- **Java wrapper** — HookSniff.java, Webhook.java, 11 test ✅
+- **Kotlin wrapper** — HookSniff.kt, Webhook.kt, 13 test ✅
+- **PHP wrapper** — HookSniff.php, Webhook.php, 14 test ✅
+- **C# wrapper** — HookSniffClient.cs, Webhook.cs, 15 test ✅
+- **Elixir wrapper** — client.ex, webhook.ex, 12 test ✅
+- **Swift wrapper** — HookSniff.swift, Webhook.swift, 12 test ✅
+- **Toplam 141 test** — 78'i çalıştırıldı (Node/Python/Go/Rust/Ruby/PHP)
+- **Subagent kuralı eklendi** — her subagent tek iş, 8'e kadar paralel
+- **Rust Cargo.toml fix** — openssl → rustls, chrono+serde feature eklendi
+- **Commits:** `72602788`, `95af5513`, `d18bd783`, `ae42de93`, `7e8ee729`, `1468c9b9`, `08822fd5`, `efc2225f` — main branch
+
 ## Oturum 113 (2026-05-11 22:43 GMT+8) ✅
 - **HookSniff sync** — oturum sonu otomatik senkronizasyon
 - **Commit:** `3f08d78` — `docs: add Node.js SDK README` (sdks/node/README.md)
