@@ -94,6 +94,27 @@ impl HookSniffRequest {
         Ok(())
     }
 
+    /// Test-only accessors for inspecting request state.
+    #[cfg(test)]
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+
+    #[cfg(test)]
+    pub fn query_params(&self) -> &HashMap<String, String> {
+        &self.query_params
+    }
+
+    #[cfg(test)]
+    pub fn header_params(&self) -> &HashMap<String, String> {
+        &self.header_params
+    }
+
+    #[cfg(test)]
+    pub fn body_str(&self) -> Option<&str> {
+        self.body.as_deref()
+    }
+
     fn send_raw(&self, ctx: &HookSniffRequestContext) -> Result<String, Box<dyn std::error::Error>> {
         let client = Client::builder()
             .timeout(ctx.timeout)
