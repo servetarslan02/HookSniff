@@ -25,12 +25,16 @@ Usage:
 from hooksniff.client import HookSniff
 from hooksniff.webhook import Webhook, WebhookVerificationError
 from hooksniff.pagination import paginate, collect_all, Page
+from hooksniff.request import ApiException
+from hooksniff.serialization import SerializationError
 
 __version__ = "0.4.0"
 __all__ = [
     "HookSniff",
     "Webhook",
     "WebhookVerificationError",
+    "ApiException",
+    "SerializationError",
     "paginate",
     "collect_all",
     "Page",
