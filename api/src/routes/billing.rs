@@ -116,6 +116,7 @@ async fn cancel_subscription(
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct UpgradeRequest {
     plan: String,
     /// Payment provider: "stripe", "polar", or "iyzico"

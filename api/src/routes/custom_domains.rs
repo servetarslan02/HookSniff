@@ -46,7 +46,8 @@ pub struct CustomDomainResponse {
 
 /// Add custom domain request
 #[derive(Debug, Deserialize)]
-pub struct AddDomainRequest {
+#[serde(deny_unknown_fields)]
+struct AddDomainRequest {
     pub domain: String,
 }
 
