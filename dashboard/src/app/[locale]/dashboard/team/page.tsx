@@ -34,6 +34,12 @@ export default function TeamPage() {
   const t = useTranslations('team');
   const tc = useTranslations('common');
 
+  // Current user's role in the selected team
+  const currentRole = members.find((m) => m.user_id === user?.id)?.role || 'member';
+  const canInvite = currentRole === 'owner' || currentRole === 'admin';
+  const canRemove = currentRole === 'owner' || currentRole === 'admin';
+  const canChangeRole = currentRole === 'owner';
+
   const fetchTeams = useCallback(async () => {
     if (!token) return;
     setLoading(true);
