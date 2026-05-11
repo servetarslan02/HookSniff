@@ -1,18 +1,18 @@
-# OpenapiClient::SearchResult
+# HookSniff::SearchResult
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **deliveries** | [**Array&lt;Delivery&gt;**](Delivery.md) |  | [optional] |
-| **total** | **Integer** |  | [optional] |
+| **deliveries** | [**Array&lt;Delivery&gt;**](Delivery.md) |  |  |
+| **total** | **Integer** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::SearchResult.new(
+instance = HookSniff::SearchResult.new(
   deliveries: null,
   total: null
 )

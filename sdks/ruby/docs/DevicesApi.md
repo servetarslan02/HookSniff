@@ -1,4 +1,4 @@
-# OpenapiClient::DevicesApi
+# HookSniff::DevicesApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -19,20 +19,20 @@ List registered devices
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::DevicesApi.new
+api_instance = HookSniff::DevicesApi.new
 
 begin
   # List registered devices
   result = api_instance.devices_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling DevicesApi->devices_get: #{e}"
 end
 ```
@@ -50,7 +50,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<DeviceTokenResponse>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling DevicesApi->devices_get_with_http_info: #{e}"
 end
 ```
@@ -83,21 +83,21 @@ Register device for push notifications
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::DevicesApi.new
-register_device_request = OpenapiClient::RegisterDeviceRequest.new({token: 'token_example'}) # RegisterDeviceRequest | 
+api_instance = HookSniff::DevicesApi.new
+register_device_request = HookSniff::RegisterDeviceRequest.new({token: 'token_example'}) # RegisterDeviceRequest | 
 
 begin
   # Register device for push notifications
   result = api_instance.devices_post(register_device_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling DevicesApi->devices_post: #{e}"
 end
 ```
@@ -115,7 +115,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <DeviceTokenResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling DevicesApi->devices_post_with_http_info: #{e}"
 end
 ```
@@ -150,20 +150,20 @@ Remove device token
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::DevicesApi.new
+api_instance = HookSniff::DevicesApi.new
 token = 'token_example' # String | 
 
 begin
   # Remove device token
   api_instance.devices_token_delete(token)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling DevicesApi->devices_token_delete: #{e}"
 end
 ```
@@ -181,7 +181,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling DevicesApi->devices_token_delete_with_http_info: #{e}"
 end
 ```

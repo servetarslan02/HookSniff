@@ -1,4 +1,4 @@
-# hooksniff.Model.SystemStatusComponentsInner
+# HookSniff.Model.SystemStatusComponentsInner
 
 ## Properties
 

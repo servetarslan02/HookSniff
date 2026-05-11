@@ -1,4 +1,4 @@
-# OpenapiClient::InboundApi
+# HookSniff::InboundApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -18,14 +18,14 @@ Receive inbound webhook for a specific endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::InboundApi.new
+api_instance = HookSniff::InboundApi.new
 provider = 'provider_example' # String | 
 endpoint_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 body = { ... } # Object | 
@@ -33,7 +33,7 @@ body = { ... } # Object |
 begin
   # Receive inbound webhook for a specific endpoint
   api_instance.inbound_provider_endpoint_id_post(provider, endpoint_id, body)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling InboundApi->inbound_provider_endpoint_id_post: #{e}"
 end
 ```
@@ -51,7 +51,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling InboundApi->inbound_provider_endpoint_id_post_with_http_info: #{e}"
 end
 ```
@@ -90,21 +90,21 @@ Accepts webhooks from external providers (Stripe, GitHub, etc.) and routes them 
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::InboundApi.new
+api_instance = HookSniff::InboundApi.new
 provider = 'provider_example' # String | 
 body = { ... } # Object | 
 
 begin
   # Receive inbound webhook from a provider
   api_instance.inbound_provider_post(provider, body)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling InboundApi->inbound_provider_post: #{e}"
 end
 ```
@@ -122,7 +122,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling InboundApi->inbound_provider_post_with_http_info: #{e}"
 end
 ```

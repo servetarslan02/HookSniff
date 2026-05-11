@@ -1,22 +1,22 @@
-# OpenapiClient::Notification
+# HookSniff::Notification
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **title** | **String** |  | [optional] |
-| **body** | **String** |  | [optional] |
-| **is_read** | **Boolean** |  | [optional] |
+| **id** | **String** |  |  |
+| **title** | **String** |  |  |
+| **body** | **String** |  |  |
+| **is_read** | **Boolean** |  |  |
 | **link** | **String** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::Notification.new(
+instance = HookSniff::Notification.new(
   id: null,
   title: null,
   body: null,

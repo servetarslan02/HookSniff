@@ -1,4 +1,4 @@
-# OpenapiClient::BatchWebhookRequest
+# HookSniff::BatchWebhookRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::BatchWebhookRequest.new(
+instance = HookSniff::BatchWebhookRequest.new(
   webhooks: null
 )
 ```

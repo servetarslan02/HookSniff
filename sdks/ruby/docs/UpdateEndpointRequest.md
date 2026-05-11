@@ -1,26 +1,26 @@
-# OpenapiClient::UpdateEndpointRequest
+# HookSniff::UpdateEndpointRequest
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **url** | **String** |  | [optional] |
-| **description** | **String** |  | [optional] |
-| **is_active** | **Boolean** |  | [optional] |
-| **allowed_ips** | **Array&lt;String&gt;** |  | [optional] |
-| **event_filter** | **Array&lt;String&gt;** |  | [optional] |
+| **url** | **String** |  |  |
+| **description** | **String** |  |  |
+| **is_active** | **Boolean** |  |  |
+| **allowed_ips** | **Array&lt;String&gt;** |  |  |
+| **event_filter** | **Array&lt;String&gt;** |  |  |
 | **custom_headers** | **Object** |  | [optional] |
-| **retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  | [optional] |
-| **routing_strategy** | **String** |  | [optional] |
-| **fallback_url** | **String** |  | [optional] |
-| **format** | **String** |  | [optional] |
+| **retry_policy** | [**RetryPolicy**](RetryPolicy.md) |  |  |
+| **routing_strategy** | **String** |  |  |
+| **fallback_url** | **String** |  |  |
+| **format** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::UpdateEndpointRequest.new(
+instance = HookSniff::UpdateEndpointRequest.new(
   url: null,
   description: null,
   is_active: null,

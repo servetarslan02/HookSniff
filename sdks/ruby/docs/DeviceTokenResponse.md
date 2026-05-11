@@ -1,20 +1,20 @@
-# OpenapiClient::DeviceTokenResponse
+# HookSniff::DeviceTokenResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **token** | **String** |  | [optional] |
-| **platform** | **String** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **id** | **String** |  |  |
+| **token** | **String** |  |  |
+| **platform** | **String** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::DeviceTokenResponse.new(
+instance = HookSniff::DeviceTokenResponse.new(
   id: null,
   token: null,
   platform: null,

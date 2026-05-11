@@ -1,19 +1,19 @@
-# OpenapiClient::NotificationListResponse
+# HookSniff::NotificationListResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **notifications** | [**Array&lt;Notification&gt;**](Notification.md) |  | [optional] |
-| **total** | **Integer** |  | [optional] |
-| **unread_count** | **Integer** |  | [optional] |
+| **notifications** | [**Array&lt;Notification&gt;**](Notification.md) |  |  |
+| **total** | **Integer** |  |  |
+| **unread_count** | **Integer** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::NotificationListResponse.new(
+instance = HookSniff::NotificationListResponse.new(
   notifications: null,
   total: null,
   unread_count: null

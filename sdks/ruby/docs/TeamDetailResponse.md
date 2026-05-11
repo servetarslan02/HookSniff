@@ -1,19 +1,19 @@
-# OpenapiClient::TeamDetailResponse
+# HookSniff::TeamDetailResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **team** | [**Team**](Team.md) |  | [optional] |
-| **members** | [**Array&lt;TeamMember&gt;**](TeamMember.md) |  | [optional] |
-| **invites** | [**Array&lt;TeamInvite&gt;**](TeamInvite.md) |  | [optional] |
+| **team** | [**Team**](Team.md) |  |  |
+| **members** | [**Array&lt;TeamMember&gt;**](TeamMember.md) |  |  |
+| **invites** | [**Array&lt;TeamInvite&gt;**](TeamInvite.md) |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::TeamDetailResponse.new(
+instance = HookSniff::TeamDetailResponse.new(
   team: null,
   members: null,
   invites: null

@@ -1,4 +1,4 @@
-# OpenapiClient::BillingApi
+# HookSniff::BillingApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -24,20 +24,20 @@ List invoices
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::BillingApi.new
+api_instance = HookSniff::BillingApi.new
 
 begin
   # List invoices
   result = api_instance.billing_invoices_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_invoices_get: #{e}"
 end
 ```
@@ -55,7 +55,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<InvoiceResponse>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_invoices_get_with_http_info: #{e}"
 end
 ```
@@ -88,20 +88,20 @@ Open customer billing portal
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::BillingApi.new
+api_instance = HookSniff::BillingApi.new
 
 begin
   # Open customer billing portal
   result = api_instance.billing_portal_post
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_portal_post: #{e}"
 end
 ```
@@ -119,7 +119,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <BillingPortalPost200Response>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_portal_post_with_http_info: #{e}"
 end
 ```
@@ -152,20 +152,20 @@ Get current subscription
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::BillingApi.new
+api_instance = HookSniff::BillingApi.new
 
 begin
   # Get current subscription
   result = api_instance.billing_subscription_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_subscription_get: #{e}"
 end
 ```
@@ -183,7 +183,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <SubscriptionResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_subscription_get_with_http_info: #{e}"
 end
 ```
@@ -216,21 +216,21 @@ Upgrade plan
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::BillingApi.new
-upgrade_request = OpenapiClient::UpgradeRequest.new({plan: 'pro'}) # UpgradeRequest | 
+api_instance = HookSniff::BillingApi.new
+upgrade_request = HookSniff::UpgradeRequest.new({plan: 'pro'}) # UpgradeRequest | 
 
 begin
   # Upgrade plan
   result = api_instance.billing_upgrade_post(upgrade_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_upgrade_post: #{e}"
 end
 ```
@@ -248,7 +248,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <UpgradeResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_upgrade_post_with_http_info: #{e}"
 end
 ```
@@ -283,20 +283,20 @@ Get current usage
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::BillingApi.new
+api_instance = HookSniff::BillingApi.new
 
 begin
   # Get current usage
   result = api_instance.billing_usage_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_usage_get: #{e}"
 end
 ```
@@ -314,7 +314,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <UsageResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_usage_get_with_http_info: #{e}"
 end
 ```
@@ -347,15 +347,15 @@ iyzico webhook receiver
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 
-api_instance = OpenapiClient::BillingApi.new
+api_instance = HookSniff::BillingApi.new
 body = { ... } # Object | 
 
 begin
   # iyzico webhook receiver
   api_instance.billing_webhook_iyzico_post(body)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_webhook_iyzico_post: #{e}"
 end
 ```
@@ -373,7 +373,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_webhook_iyzico_post_with_http_info: #{e}"
 end
 ```
@@ -408,15 +408,15 @@ Polar.sh webhook receiver
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 
-api_instance = OpenapiClient::BillingApi.new
+api_instance = HookSniff::BillingApi.new
 body = { ... } # Object | 
 
 begin
   # Polar.sh webhook receiver
   api_instance.billing_webhook_polar_post(body)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_webhook_polar_post: #{e}"
 end
 ```
@@ -434,7 +434,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_webhook_polar_post_with_http_info: #{e}"
 end
 ```
@@ -469,15 +469,15 @@ Stripe webhook receiver
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 
-api_instance = OpenapiClient::BillingApi.new
+api_instance = HookSniff::BillingApi.new
 body = { ... } # Object | 
 
 begin
   # Stripe webhook receiver
   api_instance.billing_webhook_post(body)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_webhook_post: #{e}"
 end
 ```
@@ -495,7 +495,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling BillingApi->billing_webhook_post_with_http_info: #{e}"
 end
 ```

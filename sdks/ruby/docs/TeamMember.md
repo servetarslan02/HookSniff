@@ -1,22 +1,22 @@
-# OpenapiClient::TeamMember
+# HookSniff::TeamMember
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **user_id** | **String** |  | [optional] |
-| **email** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **user_id** | **String** |  |  |
+| **email** | **String** |  |  |
 | **name** | **String** |  | [optional] |
-| **role** | **String** |  | [optional] |
-| **joined_at** | **Time** |  | [optional] |
+| **role** | **String** |  |  |
+| **joined_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::TeamMember.new(
+instance = HookSniff::TeamMember.new(
   id: null,
   user_id: null,
   email: null,

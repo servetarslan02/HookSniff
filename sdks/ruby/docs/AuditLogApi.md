@@ -1,4 +1,4 @@
-# OpenapiClient::AuditLogApi
+# HookSniff::AuditLogApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -18,14 +18,14 @@ List audit log entries
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AuditLogApi.new
+api_instance = HookSniff::AuditLogApi.new
 opts = {
   page: 56, # Integer | 
   action: 'action_example' # String | 
@@ -34,7 +34,7 @@ opts = {
 begin
   # List audit log entries
   api_instance.audit_log_get(opts)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_get: #{e}"
 end
 ```
@@ -52,7 +52,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_get_with_http_info: #{e}"
 end
 ```
@@ -88,20 +88,20 @@ Get audit entry detail
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::AuditLogApi.new
+api_instance = HookSniff::AuditLogApi.new
 id = 'id_example' # String | 
 
 begin
   # Get audit entry detail
   api_instance.audit_log_id_get(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_id_get: #{e}"
 end
 ```
@@ -119,7 +119,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_id_get_with_http_info: #{e}"
 end
 ```

@@ -1,19 +1,19 @@
-# OpenapiClient::Team
+# HookSniff::Team
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **name** | **String** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **id** | **String** |  |  |
+| **name** | **String** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::Team.new(
+instance = HookSniff::Team.new(
   id: null,
   name: null,
   created_at: null
