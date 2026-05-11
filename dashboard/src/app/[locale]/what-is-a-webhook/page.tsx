@@ -9,30 +9,30 @@ export default function WhatIsWebhookPage() {
   const t = useTranslations('whatIsWebhook');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <PublicNavbar pageTitle="What is a Webhook?" />
+      <PublicNavbar pageTitle={t("title")} />
 
       <article className="max-w-3xl mx-auto px-6 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">What is a Webhook?</h1>
-        <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">A complete guide to webhooks — how they work, why they matter, and how to use them.</p>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+        <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">{t("subtitle")}</p>
 
         <div className="prose prose-gray dark:prose-invert max-w-none space-y-8">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("simpleExplanation")}</h2>
-            <p className="text-gray-600 dark:text-slate-400 leading-relaxed">A webhook is a way for one application to send real-time data to another application when something happens. Instead of your app constantly asking &quot;Is there new data? Is there new data?&quot; (polling), the other app simply tells you when something changes.</p>
+            <p className="text-gray-600 dark:text-slate-400 leading-relaxed">Bir webhook, bir şey olduğunda bir uygulamanın başka bir uygulamaya gerçek zamanlı veri gönderme yoludur. Uygulamanızın sürekli olarak &quot;Yeni veri var mı? Yeni veri var mı?&quot; diye sormak (polling) yerine, diğer uygulama bir şey değiştiğinde size söyler.</p>
             <div className="p-4 bg-brand-50 dark:bg-brand-500/10 rounded-lg border border-brand-200 dark:border-brand-500/20 my-4">
-              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Think of it like this:</p>
-              <p className="text-sm text-gray-600 dark:text-slate-400"><strong>{t("polling")}</strong> = You keep calling the pizza place asking &quot;Is my pizza ready?&quot;</p>
-              <p className="text-sm text-gray-600 dark:text-slate-400"><strong>Webhook</strong> = The pizza place calls YOU when your pizza is ready.</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t("thinkOfIt")}</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400"><strong>{t("polling")}</strong> {t("pizzaPollingDesc")}</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400"><strong>{t("pizzaWebhook")}</strong> {t("pizzaWebhookDesc")}</p>
             </div>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("howItWorks")}</h2>
             <ol className="space-y-3 text-gray-600 dark:text-slate-400">
-              <li><strong>1. You register a URL</strong> — You tell a service &quot;When something happens, send data to this URL.&quot;</li>
-              <li><strong>2. Something happens</strong> — A payment succeeds, a user signs up, an order ships.</li>
-              <li><strong>3. The service sends a POST request</strong> — It sends the event data (payload) to your URL.</li>
-              <li><strong>4. Your server processes it</strong> — You receive the data and take action (update database, send email, etc.).</li>
+              <li><strong>1. {t("step1")}</strong> — {t("step1Desc")}</li>
+              <li><strong>2. {t("step2")}</strong> — {t("step2Desc")}</li>
+              <li><strong>3. {t("step3")}</strong> — {t("step3Desc")}</li>
+              <li><strong>4. {t("step4")}</strong> — {t("step4Desc")}</li>
             </ol>
           </section>
 
@@ -56,16 +56,16 @@ export default function WhatIsWebhookPage() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("commonUseCases")}</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {[
-                { title: 'Payment notifications', desc: 'Stripe sends a webhook when a payment succeeds or fails.' },
-                { title: 'CI/CD pipelines', desc: 'GitHub sends a webhook when code is pushed, triggering a build.' },
-                { title: 'Chat bots', desc: 'Slack/Discord sends a webhook when a message is posted.' },
-                { title: 'E-commerce', desc: 'Order created, shipped, delivered — each triggers a webhook.' },
-                { title: 'AI agents', desc: 'An AI agent sends a webhook when a task completes.' },
-                { title: 'Monitoring', desc: 'An alert system sends a webhook when a server goes down.' },
+                { titleKey: 'ucPayment', descKey: 'ucPaymentDesc' },
+                { titleKey: 'ucCiCd', descKey: 'ucCiCdDesc' },
+                { titleKey: 'ucChatbots', descKey: 'ucChatbotsDesc' },
+                { titleKey: 'ucEcommerce', descKey: 'ucEcommerceDesc' },
+                { titleKey: 'ucAi', descKey: 'ucAiDesc' },
+                { titleKey: 'ucMonitoring', descKey: 'ucMonitoringDesc' },
               ].map((uc) => (
-                <div key={uc.title} className="p-4 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
-                  <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{uc.title}</h4>
-                  <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{uc.desc}</p>
+                <div key={uc.titleKey} className="p-4 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t(uc.titleKey)}</h4>
+                  <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{t(uc.descKey)}</p>
                 </div>
               ))}
             </div>
@@ -73,35 +73,35 @@ export default function WhatIsWebhookPage() {
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("security")}</h2>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">Webhooks are sent over HTTP, so anyone can send a request to your URL. You need to verify that the request actually came from the expected service.</p>
+            <p className="text-gray-600 dark:text-slate-400 mb-3">{t("securityDesc")}</p>
             <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-              <li><strong>{t("hmac")}</strong> — The sender signs the payload with a secret. You verify the signature.</li>
-              <li><strong>{t("https")}</strong> — Always use TLS to encrypt data in transit.</li>
-              <li><strong>{t("ipWhitelisting")}</strong> — Only accept requests from known IP addresses.</li>
-              <li><strong>{t("timestampValidation")}</strong> — Reject old requests to prevent replay attacks.</li>
+              <li><strong>{t("hmac")}</strong> — Gönderen payload'ı bir gizli anahtarla imzalar. Siz imzayı doğrularsınız.</li>
+              <li><strong>{t("https")}</strong> — İletimdeki verileri şifrelemek için her zaman TLS kullanın.</li>
+              <li><strong>{t("ipWhitelisting")}</strong> — Yalnızca bilinen IP adreslerinden gelen istekleri kabul edin.</li>
+              <li><strong>{t("timestampValidation")}</strong> — Tekrar saldırılarını önlemek için eski istekleri reddedin.</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("gettingStarted")}</h2>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">The easiest way to start with webhooks:</p>
+            <p className="text-gray-600 dark:text-slate-400 mb-3">{t("gettingStartedDesc")}</p>
             <ol className="space-y-2 text-gray-600 dark:text-slate-400">
-              <li><strong>1.</strong> Create an endpoint on your server (a URL that accepts POST requests)</li>
-              <li><strong>2.</strong> Register that URL with the service that will send webhooks</li>
-              <li><strong>3.</strong> Verify the webhook signature in your endpoint</li>
-              <li><strong>4.</strong> Process the event data and take action</li>
-              <li><strong>5.</strong> Return a 200 status code to acknowledge receipt</li>
+              <li><strong>1.</strong> {t("gsStep1")}</li>
+              <li><strong>2.</strong> {t("gsStep2")}</li>
+              <li><strong>3.</strong> {t("gsStep3")}</li>
+              <li><strong>4.</strong> {t("gsStep4")}</li>
+              <li><strong>5.</strong> {t("gsStep5")}</li>
             </ol>
             <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/20 mt-4">
-              <p className="text-sm text-gray-700 dark:text-slate-300"><strong>Pro tip:</strong> Use a webhook service like HookSniff to handle retries, security, and monitoring — so you can focus on your product.</p>
+              <p className="text-sm text-gray-700 dark:text-slate-300"><strong>{t("proTip")}</strong> {t("proTipDesc")}</p>
             </div>
           </section>
         </div>
 
         <div className="mt-12 text-center p-6 bg-gray-900 dark:bg-slate-800 rounded-xl">
-          <h2 className="text-xl font-bold text-white mb-2">Ready to use webhooks?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-4">HookSniff makes webhook delivery simple. Start free.</p>
-          <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Get started →</Link>
+          <h2 className="text-xl font-bold text-white mb-2">{t("ctaTitle")}</h2>
+          <p className="text-gray-400 dark:text-slate-400 mb-4">{t("ctaDesc")}</p>
+          <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t("ctaButton")}</Link>
         </div>
       </article>
       <Footer />
