@@ -126,12 +126,37 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Commits:** f771eac1, ae15ecd6 — main branch
 - **19 dosya değişti, 359 satır eklendi, 87 satır silindi**
 
-## 📊 Güncel İlerleme (2026-05-12 03:18)
+## 📊 Güncel İlerleme (2026-05-12 04:29)
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | 🚨 P0 (AŞAMA 1) | 22 | 19 | 3 |
 | 🔴 P1 (AŞAMA 2) | 44 | 32 | 12 |
-| 🟡 P2 (AŞAMA 3-6) | 103 | 15 | 88 |
+| 🟡 P2 (AŞAMA 3-6) | 103 | 25 | 78 |
 | 🟢 P3 (AŞAMA 7-13) | 195 | 0 | 195 |
+
+## Oturum 120 (2026-05-12 03:59 - 04:29 GMT+8) ✅
+- **OpenClaw on altıncı oturum** — Servet ile AŞAMA 3-4 düzeltmeleri
+- **AŞAMA 3: Admin Panel** — 20 madde tamamlandı
+  - Overview: hardcoded EN → i18n, kontrast düzeltmesi (text-gray-400 → 500), emoji aria-hidden, ₺ para birimi
+  - Revenue: hardcoded desc → i18n, ₺ para birimi, grafik tooltip'leri, kontrast düzeltmesi, error state display
+  - Users: tüm hardcoded string'ler → i18n (modal, pagination, butonlar, toast'lar), scope=col header'lar, tarih formatı tr-TR
+  - System: servis isimleri → i18n, tarih formatı Intl.DateTimeFormat, kontrast düzeltmeleri
+  - Settings: label'lar → i18n, htmlFor/id eşleştirmesi, toggle role=switch+aria-checked+type=button, min/max input'lar
+  - User detail: eksik common translations eklendi
+  - Sidebar: tüm 13 madde zaten i18n kullanıyormuş (önceki oturumlar)
+- **AŞAMA 4: Frontend Dashboard** — 10 madde tamamlandı
+  - Toast: warning type eklendi (amber), info dark mode düzeltildi
+  - ConfirmDialog: full dark mode desteği
+  - Health page: raw fetch → apiFetch + auth header eklendi
+  - API Keys: tüm 4 raw fetch → apiFetch + auth token
+  - Search: raw fetch → apiFetch + auth token
+  - Billing: useRouter wrong module düzeltildi (next/navigation → @/i18n/navigation)
+  - API Keys: keyCount pluralization ICU format'a düzeltildi
+  - Team: owner demote guard eklendi, hardcoded subtitle → i18n
+  - CSS: 3 alternatives sayfası tablo overflow-x-auto, 3 docs sayfası pre overflow-x-auto
+- **Pre-existing düzeltmeleri:** dashboard, search, transforms sayfalarında unused error variable fix
+- **Build:** Her değişiklik sonrası `next build` ile doğrulandı ✅
+- **Commits:** 6 commit, main branch
+- **c7c8c63, 17351e4, 343088a, e340718, dd1e845, 75515c1, 2d1a085**
 
