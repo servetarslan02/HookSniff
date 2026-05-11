@@ -111,7 +111,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-062 | Simple exporter (sync) — batch exporter kullanılmalı | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
 | HS-063 | Sampling strategy yok — tüm trace'ler export ediliyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
 | HS-064 | Response body PII içerebilir — trace'de loglanıyor | `backend/DEEP-WORKER-BILLING.md` | ✅ 2026-05-10 (Oturum 89) |
-| HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ⚠️ 2026-05-12 — EN=1829, TR=1829, 0 eksik. SEO sayfaları + 3 component'te ~20 hardcoded string kaldı |
+| HS-065 | 920+ hardcoded İngilizce string — i18n eksik | `frontend/DEEP-HARDCODED-STRINGS.md` | ✅ 2026-05-12 — EN=1829, TR=1829, 0 eksik. 3 component düzeltildi (ConfirmDialog, EmailVerificationBanner, SdkTabs). SEO sayfaları kasıtlı İngilizce |
 | HS-066 | 71 sayfada metadata eksik (SEO) | `frontend/DEEP-A11Y-SEO.md` | ⚠️ 2026-05-10 — Client component, layout'tan geliyor |
 | HS-067 | Müşteri hikayeleri kurgusal — yasal risk | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-11 — PayStack→PayFlow, disclaimer eklendi |
 | HS-068 | Türkçe çeviri hataları | `infra/DEEP-LANDING-CONTENT.md` | ✅ 2026-05-10 (Oturum 93) |
