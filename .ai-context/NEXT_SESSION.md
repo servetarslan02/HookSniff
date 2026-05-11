@@ -1,79 +1,58 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-12 00:57 GMT+8
+> Son güncelleme: 2026-05-12 01:34 GMT+8
 
 ---
 
-## ✅ Vercel 404 Sorunu ÇÖZÜLDÜ (Oturum 115)
+## ✅ Tamamlanan (Oturum 116)
 
-### Sorun
-Repo root'taki `api/`, `portal/`, `sdks/` klasörleri next-intl `[locale]` segmenti ile Vercel serverless function'da isim çakışması yapıyordu. Local build'de 210 sayfa üretiliyordu ama Vercel'de bu sayfalar 404 veriyordu.
+### AŞAMA 2 — Node.js SDK (TAMAMLANDI)
+- ✅ 2.1 Wrapper Class
+- ✅ 2.2 İmza Doğrulama
+- ✅ 2.3 HTTP Library Değişimi (native fetch, 14 düzeltme)
+- ✅ 2.4 Serialization Katmanı (8 düzeltme, 114 test)
+- ✅ 2.5 Pagination Iterator (32 test)
 
-### Yapılan Fixler
-1. `outputFileTracingRoot` kaldırıldı — `dashboard/next.config.js`
-2. 3 docs sayfası taşındı:
-   - `docs/api` → `docs/api-reference` ✅
-   - `docs/portal` → `docs/embed-portal` ✅
-   - `docs/sdks` → `docs/sdk-libraries` ✅
-3. Dashboard portal sayfası taşındı:
-   - `dashboard/portal` → `dashboard/portal-manage` ✅
-4. Sidebar, sitemap, test imports, SDK README, get-started link güncellendi
+### Node.js SDK Test Durumu
+- ✅ 14 webhook signature testi
+- ✅ 114 serialization model testi
+- ✅ 51 request helper testi
+- ✅ 32 pagination testi
+- **Toplam: 211 test, tümü geçti**
 
-### Doğrulama
-Tüm sayfalar Vercel'de 200 OK döndürüyor:
-- `/en/docs/api-reference` ✅
-- `/en/docs/embed-portal` ✅
-- `/en/docs/sdk-libraries` ✅
-- `/en/dashboard/portal-manage` ✅
+---
 
-### Alınan Ders
-- Vercel deploy hook bazen GitHub push'ını tetiklemiyor. Dummy commit ile tetiklenebiliyor.
-- Repo root'taki klasör isimleri ile Next.js route isimleri aynı olmamalı (Vercel serverless conflict).
+## 📋 Sonraki Adımlar — QUALITY_ROADMAP'a göre
 
-## 📋 Sonraki Adımlar
+### AŞAMA 3 — Kalite ve Güvenilirlik (kalan)
 
-### AŞAMA 3 — SDK Publish
-| SDK | Registry | Paket Adı | Durum |
-|-----|----------|-----------|-------|
-| Node.js | npm | hooksniff-sdk | ❌ Publish edilmedi |
-| Python | PyPI | hooksniff | ❌ Publish edilmedi |
-| Go | pkg.go.dev | github.com/servetarslan02/HookSniff/sdks/go | ❌ |
-| Rust | crates.io | hooksniff | ❌ |
-| Ruby | RubyGems | hooksniff | ❌ |
-| Java | Maven Central | io.github.servetarslan02:hooksniff-sdk | ✅ Yayında |
-| Kotlin | Maven Central | io.github.servetarslan02:hooksniff-sdk-kotlin | ✅ Yayında |
-| PHP | Packagist | hooksniff/hooksniff | ❌ |
-| C# | NuGet | HookSniff | ❌ |
-| Elixir | Hex | hooksniff | ❌ |
-| Swift | SwiftPM (ayrı repo) | hooksniff-swift | ✅ Yayında |
+| # | Görev | Durum | Öncelik |
+|---|-------|-------|---------|
+| 3.2 | Python unit testler | ❌ | 🟡 |
+| 3.3 | Go unit testler | ❌ | 🟡 |
+| 3.4 | Rust unit testler | ❌ | 🟡 |
+| 3.5 | Kalan 7 dil testleri | ❌ | 🟡 |
+| 3.6 | CHANGELOG oluştur (tüm SDK'lar) | ❌ | 🟡 |
+| 3.7 | Migration guide (0.1→0.2→0.3→0.4) | ❌ | 🟡 |
 
-### Publish İçin Gerekenler
-- npm: npm hesabı + npm publish
-- PyPI: PyPI hesabı + twine upload
-- Go: Git tag yeterli (go get otomatik)
-- Rust: crates.io token + cargo publish
-- Ruby: RubyGems hesabı + gem push
-- PHP: Packagist hesabı + composer publish
-- C#: NuGet hesabı + dotnet nuget push
-- Elixir: Hex hesabı + mix hex.publish
+### AŞAMA 4 — Operasyonel Mükemmellik
 
-## ✅ AŞAMA 2 TAMAMLANDI — Wrapper + İmza Doğrulama + Testler (11/11 SDK)
+| # | Görev | Durum | Öncelik |
+|---|-------|-------|---------|
+| 4.1 | CI/CD pipeline (GitHub Actions) | ❌ | 🟡 |
+| 4.2 | Otomatik versiyon yönetimi | ❌ | 🟢 |
+| 4.3 | SDK dokümantasyon sitesi | ❌ | 🟢 |
+| 4.4 | Performance benchmarking | ❌ | 🟢 |
 
-| SDK | Wrapper | verifySignature | Test | Çalıştırıldı |
-|-----|---------|----------------|------|-------------|
-| Node.js | ✅ | ✅ | 14/14 ✅ | ✅ Evet |
-| Python | ✅ | ✅ | 26/26 ✅ | ✅ Evet |
-| Go | ✅ | ✅ | 8/8 ✅ | ✅ Evet |
-| Rust | ✅ | ✅ | 8/8 ✅ | ✅ Evet |
-| Ruby | ✅ | ✅ | 8/8 ✅ | ✅ Evet |
-| PHP | ✅ | ✅ | 14/14 ✅ | ✅ Evet |
-| Java | ✅ | ✅ | 11 test | ❌ Maven bağımlılık |
-| Kotlin | ✅ | ✅ | 13 test | ❌ Gradle yok |
-| C# | ✅ | ✅ | 15 test | ❌ .NET yok |
-| Elixir | ✅ | ✅ | 12 test | ❌ Mix yok |
-| Swift | ✅ | ✅ | 12 test | ❌ Swift yok |
+### Kalan SDK'lar (Node.js dışı)
 
-### Toplam: 141 test yazıldı, 78'i çalıştırıldı (6 SDK bu ortamda desteklenmiyor)
+AŞAMA 2.3-2.5 düzeltmeleri sadece Node.js için yapıldı. Diğer 10 SDK'ya da aynı kalite standartları uygulanmalı:
+- Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
 
-## 📊 Version
-- Tüm SDK'lar: 0.4.0
+---
+
+## ⚠️ Notlar
+
+- GitHub Actions billing limiti dolmuş — CI/CD workflow'ları çalışmıyor
+- GCP Cloud Build alternatif olarak kullanılabilir
+- Servet'in GitHub billing güncellemesi gerekiyor
