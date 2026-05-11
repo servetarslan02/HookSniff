@@ -194,8 +194,8 @@
 132. ⬜ Error Boundary dashboard layout'a ekle
 133. ⬜ `router.push` locale prefix ekle (3 sayfa)
 134. ⬜ Hardcoded locale regex düzelt
-135. ⬜ Health page Authorization header ekle
-136. ⬜ API Keys createKey credentials düzelt
+135. ✅ Health page Authorization header ekle ✅ YAPILDI (Oturum 120) — apiFetch + token
+136. ✅ API Keys createKey credentials düzelt ✅ YAPILDI (Oturum 120) — apiFetch + token
 137. ⬜ No retry logic for transient errors (502, 503, 504) → `api.ts`
 138. ⬜ 401 refresh loop risk — shared refresh promise → `api.ts`
 
@@ -206,18 +206,18 @@
 
 ### 4.3 i18n Eksikler
 142. 🟡 Hardcoded strings in 14+ dashboard pages (admin pages done) → Health, Alerts, Rate Limiting, SSO, Audit Log, Custom Domain, Retry Policy, Routing, Schemas, Templates, Portal
-143. ⬜ ConfirmDialog hardcoded: "Confirm", "Cancel", "Processing..." → `ConfirmDialog.tsx`
-144. ⬜ EmailVerificationBanner hardcoded → `EmailVerificationBanner.tsx`
-145. ⬜ SdkTabs hardcoded: "Copy", "Copied!" → `SdkTabs.tsx`
+143. ✅ ConfirmDialog hardcoded: "Confirm", "Cancel", "Processing..." → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
+144. ✅ EmailVerificationBanner hardcoded → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
+145. ✅ SdkTabs hardcoded: "Copy", "Copied!" → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
 146. ⬜ `getErrorMessage` raw English döndürüyor → `errors.ts`
 147. ⬜ Toast messages translated değil → Çeşitli sayfalar
 
 ### 4.4 Component Fixler
-148. ✅ ConfirmDialog dark mode ekle → `ConfirmDialog.tsx`
-149. ⬜ Toast info variant dark mode düzelt → `Toast.tsx`
-150. ⬜ Toast warning type ekle → `Toast.tsx`
-151. ⬜ Toast dismiss button ekle → `Toast.tsx`
-152. ⬜ Toast `role="alert"` ekle → `Toast.tsx`
+148. ✅ ConfirmDialog dark mode ekle → `ConfirmDialog.tsx` ✅ YAPILDI (Oturum 120)
+149. ✅ Toast info variant dark mode düzelt → `Toast.tsx` ✅ YAPILDI (Oturum 120)
+150. ✅ Toast warning type ekle → `Toast.tsx` ✅ YAPILDI (Oturum 120)
+151. ✅ Toast dismiss button ekle → zaten mevcut ✅ YAPILDI (önceki oturum)
+152. ✅ Toast `role="alert"` ekle → zaten mevcut ✅ YAPILDI (önceki oturum)
 153. ⬜ Loading states standardize et (SkeletonCard/LoadingSpinner) → Çeşitli
 154. ⬜ EmptyState component kullan → Çeşitli
 155. ⬜ Raw `fetch()` → `apiFetch()` dönüşümü → Health, API Keys, Search, Audit Log, Custom Domain, SSO, Portal, Playground
