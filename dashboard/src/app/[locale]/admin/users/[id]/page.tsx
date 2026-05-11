@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, type AdminUserDetail } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
+import { useTranslations } from 'next-intl';
 
 const PLAN_OPTIONS = ['free', 'pro', 'business'];
 
@@ -15,6 +16,7 @@ export default function AdminUserDetailPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const t = useTranslations('admin');
   const [detail, setDetail] = useState<AdminUserDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [newPlan, setNewPlan] = useState('');

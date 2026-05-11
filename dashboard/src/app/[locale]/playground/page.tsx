@@ -547,6 +547,7 @@ function ApiAccessSection({
   apiCopied: string | null;
   onCopy: (text: string, id: string) => void;
 }) {
+  const t = useTranslations('playgroundPublic');
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://hooksniff.vercel.app';
   const exampleToken = token || 'hs_AbCdEfGhJkMnPqRsTuvw';
   const exampleUrl = webhookUrl || `${baseUrl}/api/playground/in/${exampleToken}`;

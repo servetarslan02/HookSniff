@@ -1245,7 +1245,11 @@
     "setupProgress": "Kurulum İlerlemesi",
     "completed": "tamamlandı",
     "dismissChecklist": "Kontrol listesini kapat",
-    "successTitle": "Başarılı!"
+    "successTitle": "Başarılı!",
+    "apiKeys": "API Anahtarları",
+    "deliveries": "Teslimatlar",
+    "endpoints": "Uç Noktalar",
+    "playground": "Oyun Alanı"
   },
   "chart": {
     "hours24": "24 Saat",

@@ -520,6 +520,7 @@ function DetailRow({
   onCopy?: () => void;
   copied?: boolean;
 }) {
+  const t = useTranslations('deliveryDetail');
   return (
     <div className="flex items-center justify-between gap-4">
       <span className="text-sm text-gray-500 dark:text-slate-400 flex-shrink-0">{label}</span>

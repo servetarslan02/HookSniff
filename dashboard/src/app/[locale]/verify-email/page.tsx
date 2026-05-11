@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/Toast';
 
 function VerifyEmailContent() {
+  const t = useTranslations('error');
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
