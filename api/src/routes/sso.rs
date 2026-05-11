@@ -79,35 +79,44 @@ async fn get_sso_config(
     .await?;
 
     match config {
-        Some((id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, created_at, updated_at)) => {
-            Ok(Json(serde_json::json!({
-                "id": id,
-                "provider": provider,
-                "enabled": enabled,
-                "metadata_url": metadata_url,
-                "entity_id": entity_id,
-                "sso_url": sso_url,
-                "certificate_set": certificate.is_some(),
-                "issuer_url": issuer_url,
-                "client_id": client_id,
-                "client_secret_set": client_secret_enc.is_some(),
-                "created_at": created_at,
-                "updated_at": updated_at,
-            })))
-        }
-        None => {
-            Ok(Json(serde_json::json!({
-                "provider": "saml",
-                "enabled": false,
-                "metadata_url": null,
-                "entity_id": null,
-                "sso_url": null,
-                "certificate_set": false,
-                "issuer_url": null,
-                "client_id": null,
-                "client_secret_set": false,
-            })))
-        }
+        Some((
+            id,
+            provider,
+            enabled,
+            metadata_url,
+            entity_id,
+            sso_url,
+            certificate,
+            issuer_url,
+            client_id,
+            client_secret_enc,
+            created_at,
+            updated_at,
+        )) => Ok(Json(serde_json::json!({
+            "id": id,
+            "provider": provider,
+            "enabled": enabled,
+            "metadata_url": metadata_url,
+            "entity_id": entity_id,
+            "sso_url": sso_url,
+            "certificate_set": certificate.is_some(),
+            "issuer_url": issuer_url,
+            "client_id": client_id,
+            "client_secret_set": client_secret_enc.is_some(),
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }))),
+        None => Ok(Json(serde_json::json!({
+            "provider": "saml",
+            "enabled": false,
+            "metadata_url": null,
+            "entity_id": null,
+            "sso_url": null,
+            "certificate_set": false,
+            "issuer_url": null,
+            "client_id": null,
+            "client_secret_set": false,
+        }))),
     }
 }
 
@@ -135,9 +144,7 @@ async fn upsert_sso_config(
                     "SAML requires either metadata_url or sso_url".into(),
                 ));
             }
-        } else if provider == "oidc"
-            && (req.issuer_url.is_none() || req.client_id.is_none())
-        {
+        } else if provider == "oidc" && (req.issuer_url.is_none() || req.client_id.is_none()) {
             return Err(AppError::BadRequest(
                 "OIDC requires issuer_url and client_id".into(),
             ));
@@ -183,7 +190,12 @@ async fn upsert_sso_config(
     .execute(&pool)
     .await?;
 
-    tracing::info!("✅ SSO config updated for customer {} (provider={}, enabled={})", customer.id, provider, enabled);
+    tracing::info!(
+        "✅ SSO config updated for customer {} (provider={}, enabled={})",
+        customer.id,
+        provider,
+        enabled
+    );
 
     Ok(Json(serde_json::json!({
         "updated": true,

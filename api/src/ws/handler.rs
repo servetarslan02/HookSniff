@@ -121,10 +121,12 @@ pub async fn handle_connection(
         Ok(id) => id,
         Err(e) => {
             warn!("Failed to add WebSocket connection: {}", e);
-            let _ = ws_sender.send(Message::Close(Some(axum::extract::ws::CloseFrame {
-                code: 1013, // Try Again Later
-                reason: e.into(),
-            }))).await;
+            let _ = ws_sender
+                .send(Message::Close(Some(axum::extract::ws::CloseFrame {
+                    code: 1013, // Try Again Later
+                    reason: e.into(),
+                })))
+                .await;
             return;
         }
     };
@@ -387,7 +389,8 @@ mod tests {
 
     #[test]
     fn test_client_message_subscribe_deserialization() {
-        let json = r#"{"type": "subscribe", "event_types": ["order.created", "payment.completed"]}"#;
+        let json =
+            r#"{"type": "subscribe", "event_types": ["order.created", "payment.completed"]}"#;
         let msg: ClientMessage = serde_json::from_str(json).unwrap();
         match msg {
             ClientMessage::Subscribe { event_types } => {

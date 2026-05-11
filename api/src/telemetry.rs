@@ -104,7 +104,7 @@ fn init_otel(
 
     // Force a test span to verify exporter works
     {
-        use opentelemetry::trace::{Tracer, TraceContextExt};
+        use opentelemetry::trace::{TraceContextExt, Tracer};
         let tracer = provider.tracer("hooksniff-boot-test");
         let span = tracer.start("otel_boot_test");
         let cx = opentelemetry::Context::current().with_span(span);
@@ -258,22 +258,22 @@ impl Metrics {
 /// - Truncates to 500 chars max
 /// - Redacts common PII patterns (emails, tokens, keys)
 pub fn redact_response_body(body: &str) -> String {
-    let truncated: &str = if body.len() > 500 {
-        &body[..500]
-    } else {
-        body
-    };
+    let truncated: &str = if body.len() > 500 { &body[..500] } else { body };
 
     // Redact email addresses
-    let email_regex = regex::Regex::new(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}").unwrap();
+    let email_regex =
+        regex::Regex::new(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}").unwrap();
     let redacted = email_regex.replace_all(truncated, "[REDACTED_EMAIL]");
 
     // Redact tokens/keys (Bearer, API keys, etc.)
-    let token_regex = regex::Regex::new(r"(?i)(bearer|token|key|secret|password|auth)[:=]\s*\S{8,}").unwrap();
+    let token_regex =
+        regex::Regex::new(r"(?i)(bearer|token|key|secret|password|auth)[:=]\s*\S{8,}").unwrap();
     let redacted = token_regex.replace_all(&redacted, "${1}: [REDACTED]");
 
     // Redact JWT-like strings
-    let jwt_regex = regex::Regex::new(r"eyJ[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}").unwrap();
+    let jwt_regex =
+        regex::Regex::new(r"eyJ[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}")
+            .unwrap();
     let redacted = jwt_regex.replace_all(&redacted, "[REDACTED_JWT]");
 
     redacted.into_owned()
@@ -325,10 +325,7 @@ mod tests {
             .route("/test", get(|| async { "ok" }))
             .layer(middleware::from_fn(trace_id_middleware));
 
-        let request = Request::builder()
-            .uri("/test")
-            .body(Body::empty())
-            .unwrap();
+        let request = Request::builder().uri("/test").body(Body::empty()).unwrap();
 
         let response = app.oneshot(request).await.unwrap();
         let trace_id = response

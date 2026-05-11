@@ -14,7 +14,7 @@
 //!   POLAR_ENV — "sandbox" or "production" (default: production)
 
 use async_trait::async_trait;
-use hmac::{Hmac, Mac, KeyInit};
+use hmac::{Hmac, KeyInit, Mac};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use uuid::Uuid;
@@ -171,7 +171,9 @@ impl PolarProvider {
     ) -> Result<(), AppError> {
         // Reject if webhook secret is not configured
         if webhook_secret.is_empty() {
-            tracing::error!("Polar webhook secret is empty — rejecting webhook to prevent billing manipulation");
+            tracing::error!(
+                "Polar webhook secret is empty — rejecting webhook to prevent billing manipulation"
+            );
             return Err(AppError::Internal(anyhow::anyhow!(
                 "Billing webhook secret not configured"
             )));
@@ -200,16 +202,13 @@ impl PolarProvider {
 
         let ts =
             timestamp.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
-        let sig =
-            v1_sig.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
+        let sig = v1_sig.ok_or_else(|| AppError::BadRequest("Invalid webhook signature".into()))?;
 
         // Check timestamp freshness (5 minutes)
         let now = chrono::Utc::now().timestamp();
         let age = (now - ts).abs();
         if age > 300 {
-            return Err(AppError::BadRequest(
-                "Webhook signature expired".into(),
-            ));
+            return Err(AppError::BadRequest("Webhook signature expired".into()));
         }
 
         // Compute HMAC-SHA256
@@ -471,7 +470,10 @@ mod tests {
     #[test]
     fn product_id_for_plan_business() {
         let config = test_config();
-        assert_eq!(config.product_id_for_plan(&Plan::Business), Some("prod_biz_456"));
+        assert_eq!(
+            config.product_id_for_plan(&Plan::Business),
+            Some("prod_biz_456")
+        );
     }
 
     #[test]
@@ -618,7 +620,8 @@ mod tests {
 
     #[test]
     fn deserialize_polar_webhook_event() {
-        let json = r#"{"type":"subscription.created","data":{"id":"sub_1","customer_id":"cust_1"}}"#;
+        let json =
+            r#"{"type":"subscription.created","data":{"id":"sub_1","customer_id":"cust_1"}}"#;
         let event: PolarWebhookEvent = serde_json::from_str(json).unwrap();
         assert_eq!(event.event_type, "subscription.created");
         assert_eq!(event.data["id"], "sub_1");

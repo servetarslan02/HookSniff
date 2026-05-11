@@ -292,14 +292,21 @@ mod tests {
     #[test]
     fn test_stripe_template() {
         let templates = all_templates();
-        let stripe = templates.iter().find(|t| t.id == "stripe-like-payments").unwrap();
+        let stripe = templates
+            .iter()
+            .find(|t| t.id == "stripe-like-payments")
+            .unwrap();
         assert_eq!(stripe.name, "Stripe-like Payments Webhooks");
         assert_eq!(stripe.industry, "fintech");
         assert!(!stripe.event_types.is_empty());
-        assert!(stripe.event_types.contains(&"payment_intent.created".to_string()));
+        assert!(stripe
+            .event_types
+            .contains(&"payment_intent.created".to_string()));
         assert!(stripe.event_types.contains(&"charge.succeeded".to_string()));
         assert!(stripe.event_types.contains(&"invoice.paid".to_string()));
-        assert!(stripe.event_types.contains(&"subscription.created".to_string()));
+        assert!(stripe
+            .event_types
+            .contains(&"subscription.created".to_string()));
         assert_eq!(stripe.endpoint_config.signing_algorithm, "hmac-sha256");
         assert_eq!(stripe.retry_policy.max_attempts, 5);
         assert_eq!(stripe.retry_policy.backoff, "exponential");
@@ -310,12 +317,19 @@ mod tests {
     #[test]
     fn test_shopify_template() {
         let templates = all_templates();
-        let shopify = templates.iter().find(|t| t.id == "shopify-like-orders").unwrap();
+        let shopify = templates
+            .iter()
+            .find(|t| t.id == "shopify-like-orders")
+            .unwrap();
         assert_eq!(shopify.name, "Shopify-like Order Webhooks");
         assert_eq!(shopify.industry, "ecommerce");
         assert!(shopify.event_types.contains(&"orders/create".to_string()));
-        assert!(shopify.event_types.contains(&"orders/fulfilled".to_string()));
-        assert!(shopify.event_types.contains(&"inventory_levels/update".to_string()));
+        assert!(shopify
+            .event_types
+            .contains(&"orders/fulfilled".to_string()));
+        assert!(shopify
+            .event_types
+            .contains(&"inventory_levels/update".to_string()));
         assert_eq!(shopify.retry_policy.max_attempts, 4);
         assert!(shopify.tags.contains(&"ecommerce".to_string()));
         assert!(shopify.tags.contains(&"inventory".to_string()));
@@ -324,13 +338,20 @@ mod tests {
     #[test]
     fn test_github_template() {
         let templates = all_templates();
-        let github = templates.iter().find(|t| t.id == "github-like-repos").unwrap();
+        let github = templates
+            .iter()
+            .find(|t| t.id == "github-like-repos")
+            .unwrap();
         assert_eq!(github.name, "GitHub-like Repository Webhooks");
         assert_eq!(github.industry, "devtools");
         assert!(github.event_types.contains(&"push".to_string()));
-        assert!(github.event_types.contains(&"pull_request.opened".to_string()));
+        assert!(github
+            .event_types
+            .contains(&"pull_request.opened".to_string()));
         assert!(github.event_types.contains(&"issues.opened".to_string()));
-        assert!(github.event_types.contains(&"workflow_run.completed".to_string()));
+        assert!(github
+            .event_types
+            .contains(&"workflow_run.completed".to_string()));
         assert_eq!(github.retry_policy.max_attempts, 3);
         assert!(github.tags.contains(&"devtools".to_string()));
         assert!(github.tags.contains(&"ci-cd".to_string()));
@@ -339,13 +360,21 @@ mod tests {
     #[test]
     fn test_twilio_template() {
         let templates = all_templates();
-        let twilio = templates.iter().find(|t| t.id == "twilio-like-messaging").unwrap();
+        let twilio = templates
+            .iter()
+            .find(|t| t.id == "twilio-like-messaging")
+            .unwrap();
         assert_eq!(twilio.name, "Twilio-like Messaging Webhooks");
         assert_eq!(twilio.industry, "communications");
         assert!(twilio.event_types.contains(&"message.sent".to_string()));
-        assert!(twilio.event_types.contains(&"message.delivered".to_string()));
+        assert!(twilio
+            .event_types
+            .contains(&"message.delivered".to_string()));
         assert!(twilio.event_types.contains(&"call.initiated".to_string()));
-        assert_eq!(twilio.endpoint_config.content_type, "application/x-www-form-urlencoded");
+        assert_eq!(
+            twilio.endpoint_config.content_type,
+            "application/x-www-form-urlencoded"
+        );
         assert_eq!(twilio.retry_policy.max_attempts, 5);
         assert_eq!(twilio.estimated_daily_volume, 50000);
         assert!(twilio.tags.contains(&"messaging".to_string()));
@@ -355,17 +384,37 @@ mod tests {
     #[test]
     fn test_templates_have_valid_retry_policies() {
         for template in all_templates() {
-            assert!(template.retry_policy.max_attempts > 0, "{}: max_attempts should be > 0", template.id);
-            assert!(template.retry_policy.initial_delay_secs > 0, "{}: initial_delay_secs should be > 0", template.id);
-            assert!(template.retry_policy.max_delay_secs > 0, "{}: max_delay_secs should be > 0", template.id);
-            assert!(!template.retry_policy.backoff.is_empty(), "{}: backoff should not be empty", template.id);
+            assert!(
+                template.retry_policy.max_attempts > 0,
+                "{}: max_attempts should be > 0",
+                template.id
+            );
+            assert!(
+                template.retry_policy.initial_delay_secs > 0,
+                "{}: initial_delay_secs should be > 0",
+                template.id
+            );
+            assert!(
+                template.retry_policy.max_delay_secs > 0,
+                "{}: max_delay_secs should be > 0",
+                template.id
+            );
+            assert!(
+                !template.retry_policy.backoff.is_empty(),
+                "{}: backoff should not be empty",
+                template.id
+            );
         }
     }
 
     #[test]
     fn test_templates_have_agents() {
         for template in all_templates() {
-            assert!(!template.agents.is_empty(), "{}: should have at least one agent", template.id);
+            assert!(
+                !template.agents.is_empty(),
+                "{}: should have at least one agent",
+                template.id
+            );
             for agent in &template.agents {
                 assert!(!agent.agent_name.is_empty());
                 assert!(!agent.description.is_empty());
@@ -386,14 +435,22 @@ mod tests {
     #[test]
     fn test_templates_have_non_zero_daily_volume() {
         for template in all_templates() {
-            assert!(template.estimated_daily_volume > 0, "{}: daily volume should be > 0", template.id);
+            assert!(
+                template.estimated_daily_volume > 0,
+                "{}: daily volume should be > 0",
+                template.id
+            );
         }
     }
 
     #[test]
     fn test_templates_have_tags() {
         for template in all_templates() {
-            assert!(!template.tags.is_empty(), "{}: should have at least one tag", template.id);
+            assert!(
+                !template.tags.is_empty(),
+                "{}: should have at least one tag",
+                template.id
+            );
         }
     }
 
@@ -413,7 +470,10 @@ mod tests {
     #[test]
     fn test_stripe_template_agents() {
         let templates = all_templates();
-        let stripe = templates.iter().find(|t| t.id == "stripe-like-payments").unwrap();
+        let stripe = templates
+            .iter()
+            .find(|t| t.id == "stripe-like-payments")
+            .unwrap();
         assert_eq!(stripe.agents.len(), 2);
         assert_eq!(stripe.agents[0].agent_name, "fraud_detector");
         assert!(stripe.agents[0].enabled_by_default);
@@ -424,25 +484,45 @@ mod tests {
     #[test]
     fn test_shopify_template_agents() {
         let templates = all_templates();
-        let shopify = templates.iter().find(|t| t.id == "shopify-like-orders").unwrap();
+        let shopify = templates
+            .iter()
+            .find(|t| t.id == "shopify-like-orders")
+            .unwrap();
         assert_eq!(shopify.agents.len(), 3);
-        let inventory_agent = shopify.agents.iter().find(|a| a.agent_name == "inventory_optimizer").unwrap();
+        let inventory_agent = shopify
+            .agents
+            .iter()
+            .find(|a| a.agent_name == "inventory_optimizer")
+            .unwrap();
         assert!(inventory_agent.enabled_by_default);
-        let cart_agent = shopify.agents.iter().find(|a| a.agent_name == "abandoned_cart_recovery").unwrap();
+        let cart_agent = shopify
+            .agents
+            .iter()
+            .find(|a| a.agent_name == "abandoned_cart_recovery")
+            .unwrap();
         assert!(!cart_agent.enabled_by_default);
     }
 
     #[test]
     fn test_twilio_content_type_is_form_encoded() {
         let templates = all_templates();
-        let twilio = templates.iter().find(|t| t.id == "twilio-like-messaging").unwrap();
-        assert_eq!(twilio.endpoint_config.content_type, "application/x-www-form-urlencoded");
+        let twilio = templates
+            .iter()
+            .find(|t| t.id == "twilio-like-messaging")
+            .unwrap();
+        assert_eq!(
+            twilio.endpoint_config.content_type,
+            "application/x-www-form-urlencoded"
+        );
     }
 
     #[test]
     fn test_stripe_max_delay_is_24h() {
         let templates = all_templates();
-        let stripe = templates.iter().find(|t| t.id == "stripe-like-payments").unwrap();
+        let stripe = templates
+            .iter()
+            .find(|t| t.id == "stripe-like-payments")
+            .unwrap();
         assert_eq!(stripe.retry_policy.max_delay_secs, 86400);
     }
 }

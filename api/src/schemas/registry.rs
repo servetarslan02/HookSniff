@@ -231,8 +231,8 @@ impl From<EventSchemaRow> for EventSchema {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::{CompatibilityResult, ValidationError};
+    use super::*;
     use serde_json::json;
 
     #[test]
@@ -298,14 +298,12 @@ mod tests {
     fn test_validation_result_with_errors() {
         let result = ValidationResult {
             valid: false,
-            errors: vec![
-                ValidationError {
-                    path: "data.email".to_string(),
-                    message: "Expected string, got number".to_string(),
-                    expected: Some("string".to_string()),
-                    actual: Some("number".to_string()),
-                },
-            ],
+            errors: vec![ValidationError {
+                path: "data.email".to_string(),
+                message: "Expected string, got number".to_string(),
+                expected: Some("string".to_string()),
+                actual: Some("number".to_string()),
+            }],
         };
         let json = serde_json::to_value(&result).unwrap();
         assert!(!json["valid"].as_bool().unwrap());
