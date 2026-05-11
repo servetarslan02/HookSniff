@@ -67,7 +67,9 @@
     "notifications": "Bildirimler",
     "toggleNav": "Gezintiyi aç/kapat",
     "deleteTransform": "Dönüşümü sil",
-    "logo": "Logo"
+    "logo": "Logo",
+    "processing": "İşleniyor...",
+    "copy": "Kopyala"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -2231,5 +2233,14 @@
     "successfully": "Başarıyla",
     "failedToLoad": "Yüklenemedi"
   },
-  "cta": "Webhook teslimatı için HookSniff'e güvenen geliştiricilere katılın."
+  "cta": "Webhook teslimatı için HookSniff'e güvenen geliştiricilere katılın.",
+  "emailVerification": {
+    "title": "Lütfen e-posta adresinizi doğrulayın",
+    "description": "Doğrulama bağlantısı gönderdik:",
+    "sent": "Doğrulama e-postası gönderildi! Gelen kutunuzu kontrol edin.",
+    "failed": "Gönderilemedi. Daha sonra tekrar deneyin.",
+    "networkError": "Ağ hatası.",
+    "sending": "Gönderiliyor...",
+    "resend": "Tekrar Gönder"
+  }
 }
