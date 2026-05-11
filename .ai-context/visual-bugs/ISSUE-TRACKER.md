@@ -138,7 +138,7 @@ Bir sorunu düzelttiğinde yanına `✅` koy ve tarih ekle:
 | HS-082 | Version mismatch (Kotlin 0.2.0 vs 0.3.0) | `infra/DEEP-SDK-DOCS.md` | ⬜ |
 | HS-083 | OpenAPI schema vs actual API mismatch | `infra/DEEP-SDK-DOCS.md` | ✅ 2026-05-11 — Nested router pathleri uyumlu |
 | HS-084 | Polar.sh/iyzico fatura handler'ı yok | `backend/DEEP-WORKER-BILLING.md` | ⬜ |
-| HS-085 | `db.rs` (1029 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ⬜ |
+| HS-085 | `db.rs` (1029 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 10 unit + 7 integration test |
 | HS-086 | `delivery/mod.rs` (404 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 12 yeni test |
 | HS-087 | `worker/main.rs` (807 satır) test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 16 yeni test |
 | HS-088 | AuthGuard component test yok | `backend/DEEP-TEST-COVERAGE.md` | ✅ 2026-05-11 — 16 test (AuthGuard.test.tsx) |
