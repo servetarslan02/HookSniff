@@ -7,7 +7,13 @@ import { teamsApi, type Team, type TeamMember } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
-const ROLE_OPTIONS = ['owner', 'admin', 'member'];
+const ROLE_OPTIONS = ['owner', 'admin', 'member'] as const;
+
+/** Map role key to i18n label */
+function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
+  const map: Record<string, string> = { owner: t('roleOwner'), admin: t('roleAdmin'), member: t('roleMember') };
+  return map[role] || role;
+}
 
 export default function TeamPage() {
   const { token, user } = useAuth();
@@ -175,7 +181,7 @@ export default function TeamPage() {
                     </p>
                   )}
                   <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                    {team.member_count || 0} members · Created {new Date(team.created_at).toLocaleDateString()}
+                    {t('membersCount', { count: team.member_count || 0 })} · {new Date(team.created_at).toLocaleDateString()}
                   </p>
                 </button>
               ))}
@@ -198,7 +204,7 @@ export default function TeamPage() {
                   onClick={() => setShowInviteModal(true)}
                   className="px-3 py-2 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
                 >
-                  + Invite
+                  {t('inviteBtn')}
                 </button>
               </div>
               <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -215,7 +221,7 @@ export default function TeamPage() {
                         </p>
                         <p className="text-xs text-gray-500 dark:text-slate-400">{m.email}</p>
                         <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-                          Joined {new Date(m.joined_at).toLocaleDateString()}
+                          {t('joinedPrefix')} {new Date(m.joined_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -225,14 +231,14 @@ export default function TeamPage() {
                           className="px-3 py-1.5 text-xs border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                         >
                           {ROLE_OPTIONS.map((r) => (
-                            <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                            <option key={r} value={r}>{roleLabel(t, r)}</option>
                           ))}
                         </select>
                         <button
                           onClick={() => handleRemoveMember(m.id)}
                           className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
                         >
-                          Remove
+                          {t('removeBtn')}
                         </button>
                       </div>
                     </div>
@@ -269,7 +275,7 @@ export default function TeamPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Description (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('descriptionLabel')}</label>
                 <input
                   type="text"
                   value={createDesc}
@@ -284,7 +290,7 @@ export default function TeamPage() {
                 onClick={() => setShowCreateModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
-                Cancel
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleCreate}
@@ -323,7 +329,7 @@ export default function TeamPage() {
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                 >
                   {ROLE_OPTIONS.filter((r) => r !== 'owner').map((r) => (
-                    <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                    <option key={r} value={r}>{roleLabel(t, r)}</option>
                   ))}
                 </select>
               </div>
@@ -333,7 +339,7 @@ export default function TeamPage() {
                 onClick={() => setShowInviteModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
-                Cancel
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleInvite}

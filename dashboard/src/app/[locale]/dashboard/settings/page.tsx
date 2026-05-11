@@ -191,8 +191,9 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('displayName')}</label>
+            <label htmlFor="profile-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('displayName')}</label>
             <input
+              id="profile-name"
               type="text" autoComplete="name"
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
@@ -202,8 +203,9 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('emailAddress')}</label>
+            <label htmlFor="profile-email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('emailAddress')}</label>
             <input
+              id="profile-email"
               type="email" autoComplete="email"
               value={profileEmail}
               onChange={(e) => setProfileEmail(e.target.value)}
@@ -242,8 +244,9 @@ export default function SettingsPage() {
 
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('currentPassword')}</label>
+            <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('currentPassword')}</label>
             <input
+              id="current-password"
               type="password" autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
@@ -254,8 +257,9 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('newPassword')}</label>
+            <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('newPassword')}</label>
             <input
+              id="new-password"
               type="password" autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -268,9 +272,10 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('confirmNewPassword')}</label>
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('confirmNewPassword')}</label>
             <input
-              type="password"
+              id="confirm-password"
+              type="password" autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
