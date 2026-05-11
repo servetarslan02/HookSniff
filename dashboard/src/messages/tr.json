@@ -74,7 +74,14 @@
     "logout": "Çıkış Yap",
     "user": "Kullanıcı",
     "active": "Aktif",
-    "inactive": "Pasif"
+    "inactive": "Pasif",
+    "unknownError": "Bilinmeyen hata",
+    "requestTimedOut": "İstek zaman aşımına uğradı. Lütfen tekrar deneyin.",
+    "offlineError": "Çevrimdışı görünüyoruz. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
+    "failedToLoad": "Veri yüklenemedi",
+    "failedToCreate": "Oluşturulamadı",
+    "failedToLoadEndpoints": "Uç noktalar yüklenemedi",
+    "failedToLoadTransforms": "Dönüşüm kuralları yüklenemedi"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -362,7 +369,15 @@
     "failedToCreateTeam": "Ekip oluşturulamadı",
     "failedToInvite": "Davet gönderilemedi",
     "failedToUpdateRole": "Rol güncellenemedi",
-    "cannotDemoteSelf": "Kendinizi alt rütbe düşüremezsiniz. Başka bir sahipten isteyin."
+    "cannotDemoteSelf": "Kendinizi alt rütbe düşüremezsiniz. Başka bir sahipten isteyin.",
+    "descriptionLabel": "Açıklama (isteğe bağlı)",
+    "inviteBtn": "+ Davet Et",
+    "joinedPrefix": "Katıldı",
+    "membersCount": "{count} üye · Oluşturuldu",
+    "roleOwner": "Sahip",
+    "roleAdmin": "Yönetici",
+    "roleMember": "Üye",
+    "removeBtn": "Kaldır"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -2122,7 +2137,8 @@
     "loginFailed": "Giriş Başarısız",
     "redirecting": "Panele yönlendiriliyor",
     "linkExpired": "Bağlantı Süresi Dolmuş",
-    "verificationFailed": "Doğrulama Başarısız"
+    "verificationFailed": "Doğrulama Başarısız",
+    "unexpected": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
   },
   "blog": {
     "title": "Blog",

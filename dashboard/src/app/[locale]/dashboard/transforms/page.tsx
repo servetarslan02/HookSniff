@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function TransformsPage() {
   const t = useTranslations('transforms');
+  const tc = useTranslations('common');
   const { token } = useAuth();
   const { toast } = useToast();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
@@ -30,7 +31,7 @@ export default function TransformsPage() {
   useEffect(() => {
     if (!token) return;
     endpointsApi.list(token).then(setEndpoints).catch((err) => {
-      setError(err instanceof Error ? err.message : 'Failed to load endpoints');
+      setError(err instanceof Error ? err.message : tc('failedToLoadEndpoints'));
     });
   }, [token]);
 
@@ -41,7 +42,7 @@ export default function TransformsPage() {
       const data = await transformsApi.list(token, endpointId);
       setRules(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load transforms');
+      setError(err instanceof Error ? err.message : tc('failedToLoadTransforms'));
     } finally { setLoading(false); }
   }, [token]);
 

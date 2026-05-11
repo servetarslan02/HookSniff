@@ -6,6 +6,13 @@ const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 2;
 const RETRY_BASE_DELAY_MS = 1_000;
 
+/** Check if the browser is offline before making requests (Item 169) */
+function assertOnline(): void {
+  if (typeof window !== 'undefined' && !navigator.onLine) {
+    throw new Error('You appear to be offline. Please check your connection and try again.');
+  }
+}
+
 // Shared refresh promise — prevents multiple concurrent 401s from
 // each firing their own refresh request (Item 138).
 let refreshPromise: Promise<boolean> | null = null;
@@ -57,6 +64,8 @@ export interface ApiOptions {
 
 export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const { method = "GET", body, token, signal } = options;
+
+  assertOnline(); // Item 169 — fail fast if offline
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -115,7 +124,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
           continue;
         }
 
-        const error = await res.json().catch(() => ({ message: "Unknown error" }));
+        const error = await res.json().catch(() => ({ message: `API error: ${res.status}` }));
         throw new Error(error.error?.message || `API error: ${res.status}`);
       }
 
@@ -478,12 +487,6 @@ export interface Invoice {
   plan: string;
 }
 
-// Billing API
-export const billingApi = {
-  getInvoices: (token: string) =>
-    apiFetch<Invoice[]>('/billing/invoices', { token }),
-};
-
 // Alert types
 export interface AlertRule {
   id: string;
@@ -581,6 +584,12 @@ export const billingApiExtended = {
 
   upgrade: (token: string, plan: string) =>
     apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan }, token }),
+};
+
+// Billing API — delegates to billingApiExtended to avoid duplication (Item 157)
+export const billingApi = {
+  getInvoices: (token: string) =>
+    billingApiExtended.getInvoices(token),
 };
 
 // Analytics API

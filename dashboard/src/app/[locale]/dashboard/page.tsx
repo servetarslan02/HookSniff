@@ -363,7 +363,7 @@ export default function DashboardOverview() {
         if (statsData) setStats(statsData);
         if (deliveriesData) setRecentDeliveries(deliveriesData.deliveries.slice(0, 5));
         if (!statsData && !deliveriesData) {
-          setError('Failed to load dashboard data');
+          setError(tc('failedToLoad'));
         }
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err.message : 'Failed to load dashboard');
