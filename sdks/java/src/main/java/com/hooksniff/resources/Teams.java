@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,8 +25,39 @@ public class Teams {
 
     /** List teams */
     public java.util.List<Map<String, Object>> list() throws ApiException, IOException, InterruptedException {
+        return list(null, null);
+    }
+
+    /** List teams with pagination */
+    public java.util.List<Map<String, Object>> list(Integer limit, Integer offset) throws ApiException, IOException, InterruptedException {
         RequestHelper req = new RequestHelper("GET", "/v1/teams");
+        HashMap<String, Object> params = new HashMap<>();
+        if (limit != null) params.put("limit", limit);
+        if (offset != null) params.put("offset", offset);
+        if (!params.isEmpty()) req.setQueryParams(params);
         return req.send(config, LIST);
+    }
+
+    /** Collect all teams across all pages */
+    @SuppressWarnings("unchecked")
+    public java.util.List<Map<String, Object>> listAll() throws ApiException, IOException, InterruptedException {
+        return listAll(Pagination.DEFAULT_LIMIT);
+    }
+
+    /** Collect all teams across all pages with custom limit */
+    @SuppressWarnings("unchecked")
+    public java.util.List<Map<String, Object>> listAll(int limit) throws ApiException, IOException, InterruptedException {
+        return Pagination.collectAll((l, o) -> {
+            try {
+                Map<String, Object> result = new HashMap<>();
+                result.put("data", list(l, o));
+                java.util.List<Map<String, Object>> data = (java.util.List<Map<String, Object>>) result.get("data");
+                result.put("has_more", data != null && data.size() == l);
+                return result;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, limit);
     }
 
     /** Create team */
