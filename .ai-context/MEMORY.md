@@ -133,6 +133,47 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Düzeltmeler:**
   - Item 131: Silent API failures → playground, endpoints, transforms, dashboard error messages i18n
   - Item 132: Error Boundary → i18n props (title/description/retryLabel), raw error gizlendi
+  - Item 141: Team removal → ConfirmDialog mevcut, hardcoded stringler i18n
+  - Item 146: getErrorMessage → fallback parametre eklendi
+  - Item 157: billingApi duplicate getInvoices → billingApiExtended'a delegate
+  - Item 161: Sidebar active state → startsWith matching + admin link active state
+  - Item 166: vh → dvh → deliveries + logs modal max-h-[80dvh]
+  - Item 168: Signature comparison → timingSafeEqual() byte-level XOR
+  - Item 169: Offline detection → apiFetch'te assertOnline()
+  - Item 171: ErrorBoundary → user-friendly description
+  - Item 208: label htmlFor/id → SSO + Settings + autoComplete
+  - Item 325: autoComplete confirm password → new-password eklendi
+- **16 dosya değişti, 159 satır eklendi, 56 satır silindi**
+
+## Oturum 123 (2026-05-12 06:10 - 06:50 GMT+8) ✅
+- **OpenClaw on dokuzuncu oturum** — 4 Paralel Agent (AŞAMA 2-3-4-5)
+- 4 yeni migration dosyası (039-043): indexes, FK, password_hash, amount_cents, platform_settings
+- getErrorMessage fallback: 15 yer düzeltildi
+- Admin panel: type="button", zebra, hover, aria-label, focus ring, settings API
+- Backend: request ID middleware, fan-out routing, ENCRYPTION_KEY warning
+- Circuit breaker + throttle Redis persistence
+
+## Oturum 124 (2026-05-12 07:12 - 07:35 GMT+8) ✅
+- **OpenClaw yirminci oturum** — Servet ile görsel & UX düzeltmeleri
+- **Footer eksikliği** — 13 public sayfaya Footer eklendi
+- **OnboardingWizard i18n** — Tüm hardcoded EN → Türkçe
+- **ThemeToggle i18n** — aria-label "Switch to dark/light mode" → Türkçe
+- **AuthGuard i18n** — "Loading..." / "Redirecting..." → Türkçe
+- **Homepage navbar** — Giriş durumuna göre conditional (Panel → / Giriş Yap / Kayıt Ol)
+- **Homepage hero CTA** — Conditional "Panele Git →" / "Ücretsiz başlayın"
+- **Footer çevirileri** — 10+ key Türkçe'ye çevrildi (pricing, security, compare vb.)
+- **Admin error messages** — Raw API error → i18n "İstatistikler yüklenemedi"
+- **Dashboard hardcoded strings** — Endpoints, Billing, Playground, Portal-customize
+- **About/Contact i18n** — Hardcoded EN → i18n (sub-agent)
+- **PublicNavbar** — Yeni shared component, pricing sayfasına uygulandı
+- **Sub-agent'lar:** 6 agent çalıştı (3 bug finder + 3 fixer)
+- **Commits:** 4 push, main branch
+- **Bulunan backend sorunu:** /v1/admin/stats ve /v1/admin/revenue → DATABASE_ERROR
+- **OpenClaw on sekizinci oturum** — Servet ile AŞAMA 4 Frontend düzeltmeleri
+- **12 madde tamamlandı** — IMPLEMENTATION-PLAN.md'de işaretlendi
+- **Düzeltmeler:**
+  - Item 131: Silent API failures → playground, endpoints, transforms, dashboard error messages i18n
+  - Item 132: Error Boundary → i18n props (title/description/retryLabel), raw error gizlendi
   - Item 141: Team removal → ConfirmDialog mevcut, hardcoded stringler i18n (descriptionLabel, inviteBtn, joinedPrefix, roleLabel, removeBtn, cancel)
   - Item 146: getErrorMessage → fallback parametre eklendi
   - Item 157: billingApi duplicate getInvoices → billingApiExtended'a delegate
