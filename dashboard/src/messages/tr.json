@@ -356,7 +356,8 @@
     "failedToLoadMembers": "Üyeler yüklenemedi",
     "failedToCreateTeam": "Ekip oluşturulamadı",
     "failedToInvite": "Davet gönderilemedi",
-    "failedToUpdateRole": "Rol güncellenemedi"
+    "failedToUpdateRole": "Rol güncellenemedi",
+    "cannotDemoteSelf": "Kendinizi alt rütbe düşüremezsiniz. Başka bir sahipten isteyin."
   },
   "notifications": {
     "title": "Bildirimler",
