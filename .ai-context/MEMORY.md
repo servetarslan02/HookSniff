@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 15:48 GMT+8
+> Son güncelleme: 2026-05-11 17:02 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
