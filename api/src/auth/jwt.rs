@@ -88,7 +88,8 @@ pub fn verify_token(token: &str, secret: &str) -> Result<Claims, AppError> {
     .map_err(|_| AppError::Unauthorized)
 }
 
-/// Hash password using Argon2id
+/// Hash password using Argon2id.
+/// This is CPU-intensive (~64ms) and MUST be called via spawn_blocking in async context.
 pub fn hash_password(password: &str) -> Result<String, AppError> {
     use argon2::password_hash::rand_core::OsRng;
     use argon2::password_hash::SaltString;
@@ -103,7 +104,8 @@ pub fn hash_password(password: &str) -> Result<String, AppError> {
         .map_err(|e| AppError::Internal(anyhow::anyhow!("Password hashing failed: {}", e)))
 }
 
-/// Verify password against Argon2 hash
+/// Verify password against Argon2 hash.
+/// This is CPU-intensive (~64ms) and MUST be called via spawn_blocking in async context.
 pub fn verify_password(password: &str, hash: &str) -> Result<bool, AppError> {
     use argon2::password_hash::PasswordHash;
     use argon2::{Argon2, PasswordVerifier};
@@ -114,6 +116,20 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool, AppError> {
     Ok(Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
         .is_ok())
+}
+
+/// Async wrapper for hash_password — uses spawn_blocking to avoid starving the tokio runtime.
+pub async fn hash_password_async(password: String) -> Result<String, AppError> {
+    tokio::task::spawn_blocking(move || hash_password(&password))
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Task join error: {}", e)))?
+}
+
+/// Async wrapper for verify_password — uses spawn_blocking to avoid starving the tokio runtime.
+pub async fn verify_password_async(password: String, hash: String) -> Result<bool, AppError> {
+    tokio::task::spawn_blocking(move || verify_password(&password, &hash))
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Task join error: {}", e)))?
 }
 
 #[cfg(test)]

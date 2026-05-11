@@ -17,17 +17,19 @@ export default function AdminOverviewPage() {
   const { token } = useAuth();
   const [stats, setStats] = useState<AdminStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
 
 
   const fetchStats = useCallback(async () => {
     if (!token) return;
     setLoading(true);
+    setError(null);
     try {
       const data = await adminApi.getStats(token);
       setStats(data);
     } catch (err) {
-      // Error handled silently
+      setError(err instanceof Error ? err.message : 'Failed to load admin stats');
     } finally {
       setLoading(false);
     }
@@ -51,6 +53,25 @@ export default function AdminOverviewPage() {
               <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-3/4" />
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('overview')}</h1>
+        </div>
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+          <button
+            onClick={fetchStats}
+            className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );

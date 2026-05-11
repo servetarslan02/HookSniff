@@ -335,6 +335,7 @@ export default function DashboardOverview() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<TimeRange>('24h');
 
   // Analytics state
@@ -349,6 +350,7 @@ export default function DashboardOverview() {
 
     async function load() {
       try {
+        setError(null);
         const [statsData, deliveriesData] = await Promise.all([
           statsApi.get(token!).catch(() => null),
           webhooksApi.list(token!, { page: 1 }).catch(() => null),
@@ -356,8 +358,11 @@ export default function DashboardOverview() {
         if (!mounted) return;
         if (statsData) setStats(statsData);
         if (deliveriesData) setRecentDeliveries(deliveriesData.deliveries.slice(0, 5));
+        if (!statsData && !deliveriesData) {
+          setError('Failed to load dashboard data');
+        }
       } catch (err) {
-        // Error handled silently
+        if (mounted) setError(err instanceof Error ? err.message : 'Failed to load dashboard');
       } finally {
         if (mounted) setLoading(false);
       }

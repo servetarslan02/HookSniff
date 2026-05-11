@@ -69,7 +69,9 @@
     "deleteTransform": "Dönüşümü sil",
     "logo": "Logo",
     "processing": "İşleniyor...",
-    "copy": "Kopyala"
+    "copy": "Kopyala",
+    "backToDashboard": "Panele Dön",
+    "logout": "Çıkış Yap"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -90,7 +92,18 @@
     "docs": "Dokümantasyon",
     "logout": "Çıkış",
     "transforms": "Dönüştürmeler",
-    "inbound": "Gelen"
+    "inbound": "Gelen",
+    "backToDashboard": "Panele Dön",
+    "getStarted": "Başla",
+    "rateLimiting": "Hız Sınırı",
+    "signatureTool": "İmza Aracı",
+    "apiImporter": "API İçe Aktarıcı",
+    "portalCustomize": "Portal Özelleştir",
+    "webhookBuilder": "Webhook Oluşturucu",
+    "auditLog": "Denetim Günlüğü",
+    "ssoSaml": "SSO / SAML",
+    "retryPolicy": "Tekrar Politikası",
+    "customDomain": "Özel Alan Adı"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -1052,7 +1065,16 @@
     "userInfo": "Kullanıcı Bilgisi",
     "successRate": "Başarı Oranı",
     "noEndpoints": "Endpoint yok",
-    "recentDeliveries": "Son Teslimatlar"
+    "recentDeliveries": "Son Teslimatlar",
+    "nav": {
+      "overview": "Genel Bakış",
+      "users": "Kullanıcılar",
+      "revenue": "Gelir",
+      "system": "Sistem",
+      "settingsNav": "Ayarlar"
+    },
+    "adminBadge": "Yönetici",
+    "noAdminPrivileges": "Yönetici yetkiniz yok."
   },
   "landing": {
     "nav": {

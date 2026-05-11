@@ -6,6 +6,9 @@
 # - Staging-specific secrets
 # - Rate limits matching production
 # - Verbose logging for debugging
+#
+# REQUIRED environment variables (set in .env or export before running):
+#   STAGING_DB_PASSWORD, STAGING_HMAC_SECRET, STAGING_JWT_SECRET
 
 services:
   # ── PostgreSQL (Staging) ──
@@ -14,7 +17,7 @@ services:
     container_name: hooksniff-staging-db
     environment:
       POSTGRES_USER: hooksniff_staging
-      POSTGRES_PASSWORD: "${STAGING_DB_PASSWORD:-hooksniff_staging_pass}"
+      POSTGRES_PASSWORD: "${STAGING_DB_PASSWORD:?STAGING_DB_PASSWORD must be set}"
       POSTGRES_DB: hooksniff_staging
     ports:
       - "5433:5432"
@@ -53,10 +56,10 @@ services:
     environment:
       APP_ENV: staging
       PORT: "3000"
-      DATABASE_URL: "postgresql://hooksniff_staging:${STAGING_DB_PASSWORD:-hooksniff_staging_pass}@postgres-staging:5432/hooksniff_staging?sslmode=disable"
+      DATABASE_URL: "postgresql://hooksniff_staging:${STAGING_DB_PASSWORD:?}@postgres-staging:5432/hooksniff_staging?sslmode=disable"
       REDIS_URL: "redis://redis-staging:6379"
-      HMAC_SECRET: "${STAGING_HMAC_SECRET:-staging-hmac-secret-change-me}"
-      JWT_SECRET: "${STAGING_JWT_SECRET:-staging-jwt-secret-change-me}"
+      HMAC_SECRET: "${STAGING_HMAC_SECRET:?STAGING_HMAC_SECRET must be set}"
+      JWT_SECRET: "${STAGING_JWT_SECRET:?STAGING_JWT_SECRET must be set}"
       RUST_LOG: "info,hooksniff=debug"
       MAX_PAYLOAD_BYTES: "1048576"
       RETENTION_DAYS: "7"
@@ -77,7 +80,7 @@ services:
     container_name: hooksniff-staging-worker
     environment:
       APP_ENV: staging
-      DATABASE_URL: "postgresql://hooksniff_staging:${STAGING_DB_PASSWORD:-hooksniff_staging_pass}@postgres-staging:5432/hooksniff_staging?sslmode=disable"
+      DATABASE_URL: "postgresql://hooksniff_staging:${STAGING_DB_PASSWORD:?}@postgres-staging:5432/hooksniff_staging?sslmode=disable"
       REDIS_URL: "redis://redis-staging:6379"
       RUST_LOG: "info,hooksniff=debug"
       WORKER_CONCURRENCY: "5"

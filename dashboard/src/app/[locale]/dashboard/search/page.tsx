@@ -31,6 +31,7 @@ export default function SearchPage() {
   const [status, setStatus] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const t = useTranslations('search');
 
@@ -40,6 +41,7 @@ export default function SearchPage() {
   const search = useCallback(async (p = 1) => {
     if (!token) return;
     setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams();
       if (query) params.set('q', query);
@@ -51,9 +53,13 @@ export default function SearchPage() {
         headers: {},
         credentials: 'include' as const,
       });
-      if (res.ok) setResults(await res.json());
+      if (res.ok) {
+        setResults(await res.json());
+      } else {
+        setError(`Search failed (${res.status})`);
+      }
     } catch (e) {
-      // Error handled silently
+      setError(e instanceof Error ? e.message : 'Search failed');
     } finally {
       setLoading(false);
     }
