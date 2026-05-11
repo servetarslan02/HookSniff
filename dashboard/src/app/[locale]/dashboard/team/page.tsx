@@ -10,7 +10,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 const ROLE_OPTIONS = ['owner', 'admin', 'member'];
 
 export default function TeamPage() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { toast } = useToast();
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
@@ -111,6 +111,11 @@ export default function TeamPage() {
 
   const handleRoleChange = async (memberId: string, newRole: string) => {
     if (!token || !selectedTeam) return;
+    // Prevent owner from demoting themselves
+    if (memberId === user?.id && newRole !== 'owner') {
+      toast(t('cannotDemoteSelf'), 'error');
+      return;
+    }
     try {
       await teamsApi.updateRole(token, selectedTeam.id, memberId, newRole);
       toast(t('roleUpdated'), 'success');
@@ -127,7 +132,7 @@ export default function TeamPage() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            Manage your teams and collaborate with others
+            {t('subtitle')}
           </p>
         </div>
         <button
