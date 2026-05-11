@@ -28,7 +28,7 @@ async fn list_endpoints(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<EndpointResponse>>, AppError> {
     let endpoints = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC",
+        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
     .bind(customer.id)
     .fetch_all(&pool)
