@@ -30,6 +30,9 @@ class Auth:
         req = HookSniffRequest("POST", "/v1/auth/2fa/enable")
         return req.send(self._ctx)
 
+    # Node.js compatibility alias
+    enable2fa = enable_2fa
+
     def verify_email(self, token: str) -> None:
         """Verify email address."""
         req = HookSniffRequest("GET", "/v1/auth/verify-email")
