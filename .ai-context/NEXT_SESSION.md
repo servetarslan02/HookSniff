@@ -1,6 +1,31 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 14:23 GMT+8
+> Son güncelleme: 2026-05-11 15:35 GMT+8
+
+---
+
+## 🚨 KRİTİK BLOKLAR (Oturum 106)
+
+### 1. GitHub Actions Billing — ACİL
+- **Sorun:** "The job was not started because recent account payments have failed"
+- **Etki:** Tüm CI/CD workflow'ları blok, deploy tetiklenemiyor
+- **Çözüm:** GitHub Settings > Billing & plans > ödeme yöntemini güncelle
+- **Link:** https://github.com/settings/billing
+
+### 2. Cloud Run API Unavailable — ACİL
+- **Sorun:** `api:latest` image'ı bozulmuş, son 3 revision (00059/00060/00061) startup timeout
+- **Son çalışan:** Revision `hooksniff-api-00058-kq6` (8 saat önce, %100 traffic ama Unavailable)
+- **Çözüm:** 00058'in image digest'ini bul, onunla yeni revision deploy et
+- **Veya:** GitHub Actions billing'i düzelt, CI/CD otomatik deploy etsin
+
+### 3. Grafana OTEL — Veri Yok
+- **Durum:** Metrics: 6 series, Logs: 0 bytes, Traces: 0 bytes
+- **Sebep:** API Unavailable olduğu için OTEL verisi gönderilemiyor
+- **Çözüm:** API'yi çalıştır, OTEL otomatik başlayacak (env var'lar mevcut)
+
+### 4. Grafana Trial — 10 Gün Kaldı
+- **Deadline:** May 20, 2026
+- **Çözüm:** Upgrade veya alternatif bul
 
 ---
 
