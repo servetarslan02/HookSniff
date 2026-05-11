@@ -413,6 +413,85 @@ async fn deliver_email(
     }
 }
 
+
+
+/// Route a webhook delivery through configured delivery targets.
+///
+/// Checks the `delivery_targets` table for the endpoint:
+/// - If targets exist, routes through the first enabled target
+/// - If no targets, falls back to default HTTP delivery
+///
+/// This fixes the fan-out bug where the worker always used direct HTTP,
+/// ignoring any custom delivery target configuration.
+pub async fn deliver_with_routing(
+    http_client: &reqwest::Client,
+    pool: &sqlx::PgPool,
+    webhook: &WebhookMessage,
+    attempt: i32,
+) -> anyhow::Result<DeliveryResult> {
+    let ep_uuid = uuid::Uuid::parse_str(&webhook.endpoint_id)
+        .map_err(|_| anyhow::anyhow!("Invalid endpoint_id UUID"))?;
+
+    let targets: Vec<DeliveryTargetRow> = sqlx::query_as(
+        "SELECT id, endpoint_id, target_type, config, enabled          FROM delivery_targets WHERE endpoint_id = $1 ORDER BY created_at",
+    )
+    .bind(ep_uuid)
+    .fetch_all(pool)
+    .await
+    .unwrap_or_default();
+
+    let active_targets: Vec<_> = targets.iter().filter(|t| t.enabled).collect();
+
+    if active_targets.is_empty() {
+        // No custom targets — use default HTTP delivery
+        return http::deliver_http(http_client, webhook, attempt).await;
+    }
+
+    // Route through the first enabled target
+    let target = active_targets[0];
+    match target.target_type.as_str() {
+        "http" => {
+            // Use target config for custom URL/headers if available
+            let target_url = target
+                .config
+                .get("url")
+                .and_then(|v| v.as_str())
+                .unwrap_or(&webhook.endpoint_url);
+
+            let mut msg = webhook.clone();
+            msg.endpoint_url = target_url.to_string();
+
+            // Merge custom headers from target config
+            if let Some(extra_headers) = target.config.get("headers").and_then(|v| v.as_object()) {
+                let existing = msg.custom_headers.clone().unwrap_or(serde_json::json!({}));
+                if let Some(mut map) = existing.as_object().cloned() {
+                    for (k, v) in extra_headers {
+                        map.insert(k.clone(), v.clone());
+                    }
+                    msg.custom_headers = Some(serde_json::Value::Object(map));
+                }
+            }
+
+            http::deliver_http(http_client, &msg, attempt).await
+        }
+        "email" => {
+            // Route to email delivery
+            deliver_email(&target.config, webhook).await
+        }
+        other => {
+            warn!("Unsupported delivery target type '{}' for target {}", other, target.id);
+            Ok(DeliveryResult {
+                success: false,
+                status_code: 0,
+                response_body: String::new(),
+                response_headers: serde_json::json!({}),
+                duration_ms: 0,
+                error: format!("Unsupported delivery target type: {}", other),
+            })
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
