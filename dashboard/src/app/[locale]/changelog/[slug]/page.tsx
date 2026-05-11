@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
@@ -45,6 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 /* ─── Page ─── */
 
 export default async function ChangelogEntryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const t = await getTranslations('changelog');
   const { slug } = await params;
   const release = getChangelogBySlug(slug);
   if (!release) notFound();
