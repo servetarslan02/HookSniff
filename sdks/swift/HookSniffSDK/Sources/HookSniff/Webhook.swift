@@ -1,5 +1,9 @@
 import Foundation
+#if canImport(CryptoKit)
 import CryptoKit
+#else
+import Crypto
+#endif
 
 /// Webhook signature verification for incoming HookSniff webhooks.
 ///
@@ -137,7 +141,7 @@ public final class Webhook {
             let parts = sig.split(separator: ",", maxSplits: 1)
             let sigPart = parts.count > 1 ? String(parts[1]) : String(parts[0])
 
-            let expectedParts = expected.split(separator: ",", maxSprints: 1)
+            let expectedParts = expected.split(separator: ",", maxSplits: 1)
             let expectedPart = expectedParts.count > 1 ? String(expectedParts[1]) : String(expectedParts[0])
 
             // Timing-safe comparison
