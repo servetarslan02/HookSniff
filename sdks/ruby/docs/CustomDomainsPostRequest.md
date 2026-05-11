@@ -1,4 +1,4 @@
-# OpenapiClient::CustomDomainsPostRequest
+# HookSniff::CustomDomainsPostRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CustomDomainsPostRequest.new(
+instance = HookSniff::CustomDomainsPostRequest.new(
   domain: null
 )
 ```

@@ -1,4 +1,4 @@
-# OpenapiClient::RegisterSchemaRequest
+# HookSniff::RegisterSchemaRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::RegisterSchemaRequest.new(
+instance = HookSniff::RegisterSchemaRequest.new(
   name: null,
   schema: null
 )

@@ -1,18 +1,18 @@
-# OpenapiClient::OutboundIpsResponse
+# HookSniff::OutboundIpsResponse
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **ips** | **Array&lt;String&gt;** |  | [optional] |
-| **updated_at** | **String** |  | [optional] |
+| **ips** | **Array&lt;String&gt;** |  |  |
+| **updated_at** | **String** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::OutboundIpsResponse.new(
+instance = HookSniff::OutboundIpsResponse.new(
   ips: null,
   updated_at: null
 )

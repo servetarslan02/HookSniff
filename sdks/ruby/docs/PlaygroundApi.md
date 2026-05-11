@@ -1,4 +1,4 @@
-# OpenapiClient::PlaygroundApi
+# HookSniff::PlaygroundApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -18,20 +18,20 @@ Get playground info (endpoints, sample payloads)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::PlaygroundApi.new
+api_instance = HookSniff::PlaygroundApi.new
 
 begin
   # Get playground info (endpoints, sample payloads)
   result = api_instance.playground_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling PlaygroundApi->playground_get: #{e}"
 end
 ```
@@ -49,7 +49,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <PlaygroundGet200Response>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling PlaygroundApi->playground_get_with_http_info: #{e}"
 end
 ```
@@ -82,21 +82,21 @@ Test a webhook delivery
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::PlaygroundApi.new
-test_webhook_request = OpenapiClient::TestWebhookRequest.new({endpoint_id: 'endpoint_id_example', payload: 3.56}) # TestWebhookRequest | 
+api_instance = HookSniff::PlaygroundApi.new
+test_webhook_request = HookSniff::TestWebhookRequest.new({endpoint_id: 'endpoint_id_example', payload: 3.56}) # TestWebhookRequest | 
 
 begin
   # Test a webhook delivery
   result = api_instance.playground_test_post(test_webhook_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling PlaygroundApi->playground_test_post: #{e}"
 end
 ```
@@ -114,7 +114,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <TestWebhookResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling PlaygroundApi->playground_test_post_with_http_info: #{e}"
 end
 ```

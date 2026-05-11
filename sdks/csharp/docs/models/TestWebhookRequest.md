@@ -1,4 +1,4 @@
-# hooksniff.Model.TestWebhookRequest
+# HookSniff.Model.TestWebhookRequest
 
 ## Properties
 

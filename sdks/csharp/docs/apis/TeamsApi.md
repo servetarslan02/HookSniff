@@ -1,4 +1,4 @@
-# hooksniff.Api.TeamsApi
+# HookSniff.Api.TeamsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 

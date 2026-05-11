@@ -1,4 +1,4 @@
-# OpenapiClient::Disable2faRequest
+# HookSniff::Disable2faRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::Disable2faRequest.new(
+instance = HookSniff::Disable2faRequest.new(
   password: null
 )
 ```

@@ -1,4 +1,4 @@
-# OpenapiClient::CustomerPortalApi
+# HookSniff::CustomerPortalApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -28,20 +28,20 @@ List API keys (portal)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # List API keys (portal)
   result = api_instance.portal_api_keys_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_api_keys_get: #{e}"
 end
 ```
@@ -59,7 +59,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<ApiKeyInfo>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_api_keys_get_with_http_info: #{e}"
 end
 ```
@@ -92,20 +92,20 @@ Revoke API key (portal)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 key_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Revoke API key (portal)
   api_instance.portal_api_keys_key_id_delete(key_id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_api_keys_key_id_delete: #{e}"
 end
 ```
@@ -123,7 +123,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_api_keys_key_id_delete_with_http_info: #{e}"
 end
 ```
@@ -158,20 +158,20 @@ Create API key (portal)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Create API key (portal)
   result = api_instance.portal_api_keys_post
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_api_keys_post: #{e}"
 end
 ```
@@ -189,7 +189,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <CreateApiKeyResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_api_keys_post_with_http_info: #{e}"
 end
 ```
@@ -222,19 +222,19 @@ Get portal configuration
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Get portal configuration
   api_instance.portal_config_get
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_config_get: #{e}"
 end
 ```
@@ -252,7 +252,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_config_get_with_http_info: #{e}"
 end
 ```
@@ -285,19 +285,19 @@ Update portal configuration
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Update portal configuration
   api_instance.portal_config_post
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_config_post: #{e}"
 end
 ```
@@ -315,7 +315,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_config_post_with_http_info: #{e}"
 end
 ```
@@ -348,19 +348,19 @@ Get portal embed code
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Get portal embed code
   api_instance.portal_embed_code_get
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_embed_code_get: #{e}"
 end
 ```
@@ -378,7 +378,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_embed_code_get_with_http_info: #{e}"
 end
 ```
@@ -411,20 +411,20 @@ Get portal profile
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Get portal profile
   result = api_instance.portal_me_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_me_get: #{e}"
 end
 ```
@@ -442,7 +442,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <PortalProfile>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_me_get_with_http_info: #{e}"
 end
 ```
@@ -475,20 +475,20 @@ Update portal profile
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
-update_profile_request = OpenapiClient::UpdateProfileRequest.new({name: 'name_example', email: 'email_example'}) # UpdateProfileRequest | 
+api_instance = HookSniff::CustomerPortalApi.new
+update_profile_request = HookSniff::UpdateProfileRequest.new({name: 'name_example', email: 'email_example'}) # UpdateProfileRequest | 
 
 begin
   # Update portal profile
   api_instance.portal_me_put(update_profile_request)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_me_put: #{e}"
 end
 ```
@@ -506,7 +506,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_me_put_with_http_info: #{e}"
 end
 ```
@@ -541,20 +541,20 @@ Get notification preferences (portal)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Get notification preferences (portal)
   result = api_instance.portal_notifications_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_notifications_get: #{e}"
 end
 ```
@@ -572,7 +572,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <NotificationPreferences>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_notifications_get_with_http_info: #{e}"
 end
 ```
@@ -605,21 +605,21 @@ Update notification preferences (portal)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
-update_notification_preferences = OpenapiClient::UpdateNotificationPreferences.new # UpdateNotificationPreferences | 
+api_instance = HookSniff::CustomerPortalApi.new
+update_notification_preferences = HookSniff::UpdateNotificationPreferences.new({email_on_failure: false, email_on_dead_letter: false, email_on_success: false}) # UpdateNotificationPreferences | 
 
 begin
   # Update notification preferences (portal)
   result = api_instance.portal_notifications_put(update_notification_preferences)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_notifications_put: #{e}"
 end
 ```
@@ -637,7 +637,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <PortalNotificationsPut200Response>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_notifications_put_with_http_info: #{e}"
 end
 ```
@@ -672,20 +672,20 @@ Get plan info (portal)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Get plan info (portal)
   result = api_instance.portal_plan_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_plan_get: #{e}"
 end
 ```
@@ -703,7 +703,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <SubscriptionResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_plan_get_with_http_info: #{e}"
 end
 ```
@@ -736,20 +736,20 @@ Get usage (portal)
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::CustomerPortalApi.new
+api_instance = HookSniff::CustomerPortalApi.new
 
 begin
   # Get usage (portal)
   result = api_instance.portal_usage_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_usage_get: #{e}"
 end
 ```
@@ -767,7 +767,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <UsageResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling CustomerPortalApi->portal_usage_get_with_http_info: #{e}"
 end
 ```

@@ -1,4 +1,4 @@
-# OpenapiClient::LatencyTrendResponseBucketsInner
+# HookSniff::LatencyTrendResponseBucketsInner
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::LatencyTrendResponseBucketsInner.new(
+instance = HookSniff::LatencyTrendResponseBucketsInner.new(
   timestamp: null,
   avg_ms: null,
   p95_ms: null

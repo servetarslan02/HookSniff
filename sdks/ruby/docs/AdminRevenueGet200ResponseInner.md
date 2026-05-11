@@ -1,4 +1,4 @@
-# OpenapiClient::AdminRevenueGet200ResponseInner
+# HookSniff::AdminRevenueGet200ResponseInner
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::AdminRevenueGet200ResponseInner.new(
+instance = HookSniff::AdminRevenueGet200ResponseInner.new(
   month: null,
   revenue_cents: null,
   subscriber_count: null

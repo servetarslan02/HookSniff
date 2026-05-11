@@ -1,4 +1,4 @@
-# OpenapiClient::UpdateProfileRequest
+# HookSniff::UpdateProfileRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::UpdateProfileRequest.new(
+instance = HookSniff::UpdateProfileRequest.new(
   name: null,
   email: null
 )

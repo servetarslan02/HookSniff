@@ -1,21 +1,21 @@
-# OpenapiClient::ApiKeyInfo
+# HookSniff::ApiKeyInfo
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **prefix** | **String** | Masked key prefix (e.g. \&quot;hs_abc1...\&quot;) | [optional] |
-| **created_at** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **prefix** | **String** | Masked key prefix (e.g. \&quot;hs_abc1...\&quot;) |  |
+| **created_at** | **Time** |  |  |
 | **last_used_at** | **String** |  | [optional] |
-| **is_active** | **Boolean** |  | [optional] |
+| **is_active** | **Boolean** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::ApiKeyInfo.new(
+instance = HookSniff::ApiKeyInfo.new(
   id: null,
   prefix: null,
   created_at: null,

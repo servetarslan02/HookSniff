@@ -1,4 +1,4 @@
-# hooksniff.Model.EndpointsEndpointIdTransformsTestPostRequest
+# HookSniff.Model.EndpointsEndpointIdTransformsTestPostRequest
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# OpenapiClient::AdminUsersIdStatusPutRequest
+# HookSniff::AdminUsersIdStatusPutRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::AdminUsersIdStatusPutRequest.new(
+instance = HookSniff::AdminUsersIdStatusPutRequest.new(
   is_active: null
 )
 ```

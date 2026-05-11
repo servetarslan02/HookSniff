@@ -1,4 +1,4 @@
-# OpenapiClient::RoutingApi
+# HookSniff::RoutingApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -22,21 +22,21 @@ Get endpoint health status
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::RoutingApi.new
+api_instance = HookSniff::RoutingApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get endpoint health status
   result = api_instance.endpoints_id_health_get(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->endpoints_id_health_get: #{e}"
 end
 ```
@@ -54,7 +54,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <EndpointHealth>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->endpoints_id_health_get_with_http_info: #{e}"
 end
 ```
@@ -89,21 +89,21 @@ Get routing config for endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::RoutingApi.new
+api_instance = HookSniff::RoutingApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get routing config for endpoint
   result = api_instance.endpoints_id_routing_get(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->endpoints_id_routing_get: #{e}"
 end
 ```
@@ -121,7 +121,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <RoutingInfo>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->endpoints_id_routing_get_with_http_info: #{e}"
 end
 ```
@@ -156,22 +156,22 @@ Update routing config
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::RoutingApi.new
+api_instance = HookSniff::RoutingApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
-update_routing_request = OpenapiClient::UpdateRoutingRequest.new # UpdateRoutingRequest | 
+update_routing_request = HookSniff::UpdateRoutingRequest.new({routing_strategy: 'round-robin', fallback_url: 'fallback_url_example'}) # UpdateRoutingRequest | 
 
 begin
   # Update routing config
   result = api_instance.endpoints_id_routing_put(id, update_routing_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->endpoints_id_routing_put: #{e}"
 end
 ```
@@ -189,7 +189,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <RoutingInfo>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->endpoints_id_routing_put_with_http_info: #{e}"
 end
 ```
@@ -225,20 +225,20 @@ Get endpoint health status
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::RoutingApi.new
+api_instance = HookSniff::RoutingApi.new
 id = 'id_example' # String | 
 
 begin
   # Get endpoint health status
   api_instance.routing_id_health_get(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->routing_id_health_get: #{e}"
 end
 ```
@@ -256,7 +256,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->routing_id_health_get_with_http_info: #{e}"
 end
 ```
@@ -291,20 +291,20 @@ Get routing config for endpoint
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::RoutingApi.new
+api_instance = HookSniff::RoutingApi.new
 id = 'id_example' # String | 
 
 begin
   # Get routing config for endpoint
   api_instance.routing_id_routing_get(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->routing_id_routing_get: #{e}"
 end
 ```
@@ -322,7 +322,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->routing_id_routing_get_with_http_info: #{e}"
 end
 ```
@@ -357,20 +357,20 @@ Update routing config
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::RoutingApi.new
+api_instance = HookSniff::RoutingApi.new
 id = 'id_example' # String | 
 
 begin
   # Update routing config
   api_instance.routing_id_routing_put(id)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->routing_id_routing_put: #{e}"
 end
 ```
@@ -388,7 +388,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling RoutingApi->routing_id_routing_put_with_http_info: #{e}"
 end
 ```

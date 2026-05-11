@@ -1,23 +1,23 @@
-# OpenapiClient::TransformRule
+# HookSniff::TransformRule
 
 ## Properties
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **id** | **String** |  | [optional] |
-| **endpoint_id** | **String** |  | [optional] |
-| **name** | **String** |  | [optional] |
-| **rule_type** | **String** |  | [optional] |
+| **id** | **String** |  |  |
+| **endpoint_id** | **String** |  |  |
+| **name** | **String** |  |  |
+| **rule_type** | **String** |  |  |
 | **config** | **Object** |  | [optional] |
-| **is_active** | **Boolean** |  | [optional] |
-| **created_at** | **Time** |  | [optional] |
+| **is_active** | **Boolean** |  |  |
+| **created_at** | **Time** |  |  |
 
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::TransformRule.new(
+instance = HookSniff::TransformRule.new(
   id: null,
   endpoint_id: null,
   name: null,

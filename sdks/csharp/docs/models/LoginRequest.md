@@ -1,4 +1,4 @@
-# hooksniff.Model.LoginRequest
+# HookSniff.Model.LoginRequest
 
 ## Properties
 

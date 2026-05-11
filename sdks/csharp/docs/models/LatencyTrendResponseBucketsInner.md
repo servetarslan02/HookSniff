@@ -1,4 +1,4 @@
-# hooksniff.Model.LatencyTrendResponseBucketsInner
+# HookSniff.Model.LatencyTrendResponseBucketsInner
 
 ## Properties
 

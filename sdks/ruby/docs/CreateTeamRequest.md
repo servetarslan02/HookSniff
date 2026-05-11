@@ -1,4 +1,4 @@
-# OpenapiClient::CreateTeamRequest
+# HookSniff::CreateTeamRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::CreateTeamRequest.new(
+instance = HookSniff::CreateTeamRequest.new(
   name: null
 )
 ```

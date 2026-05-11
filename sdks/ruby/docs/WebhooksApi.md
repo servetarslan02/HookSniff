@@ -1,4 +1,4 @@
-# OpenapiClient::WebhooksApi
+# HookSniff::WebhooksApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -24,21 +24,21 @@ Send multiple webhooks in batch
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
-batch_webhook_request = OpenapiClient::BatchWebhookRequest.new({webhooks: [OpenapiClient::CreateWebhookRequest.new({endpoint_id: 'endpoint_id_example', data: 3.56})]}) # BatchWebhookRequest | 
+api_instance = HookSniff::WebhooksApi.new
+batch_webhook_request = HookSniff::BatchWebhookRequest.new({webhooks: [HookSniff::CreateWebhookRequest.new({endpoint_id: 'endpoint_id_example', data: 3.56})]}) # BatchWebhookRequest | 
 
 begin
   # Send multiple webhooks in batch
   result = api_instance.webhooks_batch_post(batch_webhook_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_batch_post: #{e}"
 end
 ```
@@ -56,7 +56,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <BatchResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_batch_post_with_http_info: #{e}"
 end
 ```
@@ -91,20 +91,20 @@ Replay multiple deliveries by ID
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
-batch_replay_request = OpenapiClient::BatchReplayRequest.new({ids: ['ids_example']}) # BatchReplayRequest | 
+api_instance = HookSniff::WebhooksApi.new
+batch_replay_request = HookSniff::BatchReplayRequest.new({ids: ['ids_example']}) # BatchReplayRequest | 
 
 begin
   # Replay multiple deliveries by ID
   api_instance.webhooks_batch_replay_post(batch_replay_request)
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_batch_replay_post: #{e}"
 end
 ```
@@ -122,7 +122,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_batch_replay_post_with_http_info: #{e}"
 end
 ```
@@ -157,14 +157,14 @@ Export deliveries as CSV
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
+api_instance = HookSniff::WebhooksApi.new
 opts = {
   range: '24h' # String | 
 }
@@ -173,7 +173,7 @@ begin
   # Export deliveries as CSV
   result = api_instance.webhooks_export_get(opts)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_export_get: #{e}"
 end
 ```
@@ -191,7 +191,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => String
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_export_get_with_http_info: #{e}"
 end
 ```
@@ -226,14 +226,14 @@ List webhook deliveries
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
+api_instance = HookSniff::WebhooksApi.new
 opts = {
   page: 56, # Integer | 
   per_page: 56, # Integer | 
@@ -245,7 +245,7 @@ begin
   # List webhook deliveries
   result = api_instance.webhooks_get(opts)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_get: #{e}"
 end
 ```
@@ -263,7 +263,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <DeliveryListResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_get_with_http_info: #{e}"
 end
 ```
@@ -301,21 +301,21 @@ Get delivery attempts
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
+api_instance = HookSniff::WebhooksApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get delivery attempts
   result = api_instance.webhooks_id_attempts_get(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_id_attempts_get: #{e}"
 end
 ```
@@ -333,7 +333,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<DeliveryAttempt>>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_id_attempts_get_with_http_info: #{e}"
 end
 ```
@@ -368,21 +368,21 @@ Get delivery by ID
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
+api_instance = HookSniff::WebhooksApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get delivery by ID
   result = api_instance.webhooks_id_get(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_id_get: #{e}"
 end
 ```
@@ -400,7 +400,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Delivery>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_id_get_with_http_info: #{e}"
 end
 ```
@@ -435,21 +435,21 @@ Replay a single delivery
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
+api_instance = HookSniff::WebhooksApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Replay a single delivery
   result = api_instance.webhooks_id_replay_post(id)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_id_replay_post: #{e}"
 end
 ```
@@ -467,7 +467,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Delivery>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_id_replay_post_with_http_info: #{e}"
 end
 ```
@@ -502,21 +502,21 @@ Send a webhook
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 # setup authorization
-OpenapiClient.configure do |config|
+HookSniff.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = OpenapiClient::WebhooksApi.new
-create_webhook_request = OpenapiClient::CreateWebhookRequest.new({endpoint_id: 'endpoint_id_example', data: 3.56}) # CreateWebhookRequest | 
+api_instance = HookSniff::WebhooksApi.new
+create_webhook_request = HookSniff::CreateWebhookRequest.new({endpoint_id: 'endpoint_id_example', data: 3.56}) # CreateWebhookRequest | 
 
 begin
   # Send a webhook
   result = api_instance.webhooks_post(create_webhook_request)
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_post: #{e}"
 end
 ```
@@ -534,7 +534,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Delivery>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling WebhooksApi->webhooks_post_with_http_info: #{e}"
 end
 ```

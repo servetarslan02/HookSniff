@@ -1,4 +1,4 @@
-# OpenapiClient::OutboundIPsApi
+# HookSniff::OutboundIPsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -17,15 +17,15 @@ Get outbound IP addresses for firewall whitelisting
 
 ```ruby
 require 'time'
-require 'openapi_client'
+require 'hooksniff'
 
-api_instance = OpenapiClient::OutboundIPsApi.new
+api_instance = HookSniff::OutboundIPsApi.new
 
 begin
   # Get outbound IP addresses for firewall whitelisting
   result = api_instance.outbound_ips_get
   p result
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling OutboundIPsApi->outbound_ips_get: #{e}"
 end
 ```
@@ -43,7 +43,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <OutboundIpsResponse>
-rescue OpenapiClient::ApiError => e
+rescue HookSniff::ApiError => e
   puts "Error when calling OutboundIPsApi->outbound_ips_get_with_http_info: #{e}"
 end
 ```

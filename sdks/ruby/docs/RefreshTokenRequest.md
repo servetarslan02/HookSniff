@@ -1,4 +1,4 @@
-# OpenapiClient::RefreshTokenRequest
+# HookSniff::RefreshTokenRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'openapi_client'
+require 'hooksniff'
 
-instance = OpenapiClient::RefreshTokenRequest.new(
+instance = HookSniff::RefreshTokenRequest.new(
   refresh_token: null
 )
 ```

@@ -1,4 +1,4 @@
-# hooksniff.Model.RefreshTokenRequest
+# HookSniff.Model.RefreshTokenRequest
 
 ## Properties
 
