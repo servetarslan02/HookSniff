@@ -8,7 +8,7 @@ use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
 use crate::auth::jwt;
-use crate::audit_log;
+use crate::hooksniff_audit_log;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::middleware::{
@@ -195,7 +195,7 @@ async fn register(
     // Audit log — REGISTER
     {
         let rid = customer.id.to_string();
-        let _ = audit_log!(pool, customer.id, "REGISTER", "auth", Some(&rid));
+        let _ = hooksniff_audit_log!pool, customer.id, "REGISTER", "auth", Some(&rid));
     }
 
     // Send welcome email + verification email (fire-and-forget)
@@ -335,7 +335,7 @@ async fn login(
     // Audit log — LOGIN
     {
         let rid = customer.id.to_string();
-        let _ = audit_log!(pool, customer.id, "LOGIN", "auth", Some(&rid));
+        let _ = hooksniff_audit_log!pool, customer.id, "LOGIN", "auth", Some(&rid));
     }
 
     Ok(auth_response_with_cookie(AuthResponse {
@@ -403,7 +403,7 @@ async fn verify_2fa_login(
     // Audit log — LOGIN (2FA path)
     {
         let rid = customer.id.to_string();
-        let _ = audit_log!(pool, customer.id, "LOGIN", "auth", Some(&rid));
+        let _ = hooksniff_audit_log!pool, customer.id, "LOGIN", "auth", Some(&rid));
     }
 
     Ok(auth_response_with_cookie(AuthResponse {
@@ -796,7 +796,7 @@ async fn confirm_2fa(
     // Audit log — 2FA_ENABLE
     {
         let rid = customer.id.to_string();
-        let _ = audit_log!(pool, customer.id, "2FA_ENABLE", "auth", Some(&rid));
+        let _ = hooksniff_audit_log!pool, customer.id, "2FA_ENABLE", "auth", Some(&rid));
     }
 
     Ok(Json(
@@ -834,7 +834,7 @@ async fn disable_2fa(
     // Audit log — 2FA_DISABLE
     {
         let rid = customer.id.to_string();
-        let _ = audit_log!(pool, customer.id, "2FA_DISABLE", "auth", Some(&rid));
+        let _ = hooksniff_audit_log!pool, customer.id, "2FA_DISABLE", "auth", Some(&rid));
     }
 
     Ok(Json(
@@ -931,7 +931,7 @@ async fn change_password(
     // Audit log — PASSWORD_CHANGE
     {
         let rid = customer.id.to_string();
-        let _ = audit_log!(pool, customer.id, "PASSWORD_CHANGE", "auth", Some(&rid));
+        let _ = hooksniff_audit_log!pool, customer.id, "PASSWORD_CHANGE", "auth", Some(&rid));
     }
 
     Ok(Json(
