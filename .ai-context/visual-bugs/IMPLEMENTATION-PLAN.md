@@ -86,42 +86,42 @@
 ## AŞAMA 3 — ADMIN PANEL ÇEVİRİ (⬜ 50 madde)
 
 ### 3.1 Sidebar (Tüm Sayfalar)
-45. ⬜ "Admin Panel" → "Yönetim Paneli"
-46. ⬜ "HookSniff Management" → "HookSniff Yönetimi"
-47. ⬜ "Overview" → "Genel Bakış"
-48. ⬜ "Users" → "Kullanıcılar"
-49. ⬜ "Revenue" → "Gelir"
-50. ⬜ "System" → "Sistem"
-51. ⬜ "Settings" → "Ayarlar"
-52. ⬜ "Back to Dashboard" → "Panele Dön"
-53. ⬜ "Logout" → "Çıkış Yap"
-54. ⬜ "Switch to dark mode" → "Karanlık moda geç"
-55. ⬜ "Switch to light mode" → "Açık moda geç"
-56. ⬜ "Open sidebar" → "Yan menüyü aç"
-57. ⬜ "Admin" badge → "Yönetici" (TÜM sayfalarda)
+45. ✅ "Admin Panel" → "Yönetim Paneli" — i18n key ile ✅ YAPILDI (önceki oturum)
+46. ✅ "HookSniff Management" → "HookSniff Yönetimi" — i18n key ile ✅ YAPILDI (önceki oturum)
+47. ✅ "Overview" → "Genel Bakış" — i18n key ile ✅ YAPILDI (önceki oturum)
+48. ✅ "Users" → "Kullanıcılar" — i18n key ile ✅ YAPILDI (önceki oturum)
+49. ✅ "Revenue" → "Gelir" — i18n key ile ✅ YAPILDI (önceki oturum)
+50. ✅ "System" → "Sistem" — i18n key ile ✅ YAPILDI (önceki oturum)
+51. ✅ "Settings" → "Ayarlar" — i18n key ile ✅ YAPILDI (önceki oturum)
+52. ✅ "Back to Dashboard" → "Panele Dön" — i18n key ile ✅ YAPILDI (önceki oturum)
+53. ✅ "Logout" → "Çıkış Yap" — i18n key ile ✅ YAPILDI (önceki oturum)
+54. ✅ "Switch to dark mode" → "Karanlık moda geç" — ThemeToggle component ✅ YAPILDI (önceki oturum)
+55. ✅ "Switch to light mode" → "Açık moda geç" — ThemeToggle component ✅ YAPILDI (önceki oturum)
+56. ✅ "Open sidebar" → "Yan menüyü aç" — aria-label i18n key ile ✅ YAPILDI (önceki oturum)
+57. ✅ "Admin" badge → "Yönetici" — i18n key ile ✅ YAPILDI (önceki oturum)
 
 ### 3.2 Overview Sayfası
 58. ✅ "Admin Overview" → "Yönetici Genel Bakışı"
 59. ✅ "Platform-wide metrics and recent activity" → "Platform genelinde metrikler ve son aktivite"
 60. ✅ "No recent signups" → "Son kayıt yok"
 61. ⬜ Document title → "HookSniff — Webhook Teslimat Servisi"
-62. ⬜ Contrast fail: empty state text (2.54:1) → `text-gray-500`
-63. ⬜ Contrast fail: subtitle text (2.54:1) → `text-gray-500`
+62. ✅ Contrast fail: empty state text (2.54:1) → `text-gray-500` ✅ YAPILDI (Oturum 120)
+63. ✅ Contrast fail: subtitle text (2.54:1) → `text-gray-500` ✅ YAPILDI (Oturum 120) — hardcoded → i18n key
 64. ⬜ Contrast fail: logout butonu (2.54:1 light, 3.75:1 dark) → `text-gray-500`
 65. ⬜ Dark mode toggle `type="submit"` → `type="button"`
 66. ⬜ Mobil menü butonu `type="submit"` → `type="button"`
 67. ⬜ "Plana Göre Kullanıcılar" kartı boş — placeholder grafik ekle
 68. ⬜ SVG icon'larda `aria-label` eksik
-69. ⬜ Emoji icon'lar `aria-hidden="true"` ile işaretlenmeli
+69. ✅ Emoji icon'lar `aria-hidden="true"` ile işaretlenmeli ✅ YAPILDI (Oturum 120)
 
 ### 3.3 Users Sayfası
 70. ✅ Tablo başlıkları: Email→E-posta, Name→İsim, Status→Durum, Created→Oluşturulma, Actions→İşlemler
 71. ✅ Butonlar: View→Görüntüle, Plan→Plan Değiştir, Ban→Yasakla
 72. ✅ Badge'ler: free→Ücretsiz, active→Aktif, business→İş
-73. ⬜ Tarih formatı MM/DD/YYYY → DD.MM.YYYY
+73. ✅ Tarih formatı MM/DD/YYYY → DD.MM.YYYY ✅ YAPILDI (Oturum 120) — tr-TR locale
 74. ⬜ Zebra renklendirme ekle
 75. ⬜ Hover efekti ekle
-76. ⬜ `scope="col"` ekle header'lara
+76. ✅ `scope="col"` ekle header'lara ✅ YAPILDI (Oturum 120)
 77. ⬜ Arama input label ekle
 78. ⬜ Combobox label ekle
 79. ⬜ Sayfalama ekle
@@ -143,9 +143,9 @@
 93. ⬜ H1 hierarchy düzelt (ikinci H1 → H2)
 
 ### 3.5 System Sayfası
-94. ⬜ Sağlık kontrolü API'sini düzelt (4 servis "Checking..." takılıyor)
+94. ⬜ Sağlık kontrolü API'sini düzelt (4 servis "Checking..." takılıyor) — API endpoint sorunu, frontend fix edildi
 95. ✅ "Monitor infrastructure services and system status" → "Altyapı hizmetlerini ve sistem durumunu izleyin"
-96. ⬜ Tarih formatı → `Intl.DateTimeFormat('tr-TR')`
+96. ✅ Tarih formatı → `Intl.DateTimeFormat('tr-TR')` ✅ YAPILDI (Oturum 120)
 97. ✅ Servis rolleri: Database→Veritabanı, Cache→Önbellek, Monitoring→İzleme, Queue→Kuyruk
 98. ⬜ Loading spinner ekle
 99. ⬜ Retry butonu ekle
@@ -165,10 +165,10 @@
 111. ✅ "Retention (days)" → "Süre (gün)"
 112. ✅ "Max Retry Attempts" → "Maks. Tekrar Deneme Sayısı"
 113. ✅ "Failed to save settings" → "Ayarlar kaydedilemedi"
-114. ⬜ Toggle'lara `role="switch"` ve `aria-checked` ekle
-115. ⬜ Label'ları `htmlFor` ile input'lara bağla
-116. ⬜ Number input'lara min/max sınırları ekle
-117. ⬜ Toggle butonları `type="submit"` → `type="button"`
+114. ✅ Toggle'lara `role="switch"` ve `aria-checked` ekle ✅ YAPILDI (Oturum 120)
+115. ✅ Label'ları `htmlFor` ile input'lara bağla ✅ YAPILDI (Oturum 120)
+116. ✅ Number input'lara min/max sınırları ekle ✅ YAPILDI (Oturum 120)
+117. ✅ Toggle butonları `type="submit"` → `type="button"` ✅ YAPILDI (Oturum 120)
 118. ⬜ Input stillerini tutarlı yap (py-2 vs py-3)
 119. ⬜ Dark mode focus ring stillerini düzelt
 120. ⬜ Success feedback mekanizması ekle
