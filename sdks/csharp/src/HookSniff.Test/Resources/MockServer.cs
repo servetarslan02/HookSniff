@@ -74,7 +74,7 @@ public sealed class MockServer : IDisposable
         {
             Method = req.HttpMethod,
             Path = req.Url!.AbsolutePath,
-            Query = req.Url.Query,
+            Query = req.Url.Query ?? "",
             Body = body,
             Headers = new Dictionary<string, string>()
         };
