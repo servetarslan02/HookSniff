@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
+import Footer from '@/components/Footer';
 
 const faqKeys = [
   { cat: 'catGeneral', q: 'q1', a: 'a1' },
@@ -103,6 +104,7 @@ export default function FAQPage() {
           </Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

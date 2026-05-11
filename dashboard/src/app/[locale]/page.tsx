@@ -286,9 +286,20 @@ export default function Home() {
             <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <LanguageSwitcherBtn />
             <ThemeToggleBtn />
-            <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow">
-              {tNav('dashboard')}
-            </Link>
+            {token ? (
+              <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow">
+                {tNav('dashboard')}
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition font-medium">
+                  {tNav('login')}
+                </Link>
+                <Link href="/register" className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow">
+                  {tNav('register')}
+                </Link>
+              </>
+            )}
           </div>
           {/* Mobile hamburger */}
           <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="md:hidden p-2 -mr-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition" aria-label={tCommon("toggleNav")}>
@@ -310,7 +321,7 @@ export default function Home() {
               <ThemeToggleBtn />
             </div>
             <Link href="/dashboard" onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
-              {tNav('dashboard')}
+              {token ? tNav('dashboard') : tNav('register')}
             </Link>
           </div>
         )}
@@ -335,7 +346,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
-                {tHero('cta')}
+                {token ? tHero('ctaDashboard') : tHero('cta')}
               </Link>
               <Link href="/docs" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple">
                 {tHero('ctaSecondary')}
