@@ -22,6 +22,8 @@ sha2 = "0.11"
 hex = "0.4"
 base64 = "0.22"
 jsonwebtoken = { version = "10", features = ["rust_crypto"] }
+# rustls 0.23+ requires explicit CryptoProvider — pin 'ring' backend
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "logging"] }
 
 # OpenTelemetry integration
 opentelemetry = "0.32"
