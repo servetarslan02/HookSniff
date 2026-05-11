@@ -2230,5 +2230,6 @@
     "pleaseEnter": "Please enter",
     "successfully": "Successfully",
     "failedToLoad": "Failed to load"
-  }
+  },
+  "cta": "Join developers who trust HookSniff for their webhook delivery."
 }
