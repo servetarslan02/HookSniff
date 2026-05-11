@@ -1,41 +1,43 @@
 # PublicNavbar Migration Report
 
 **Date:** 2026-05-12  
-**Task:** Replace inline `<nav>` blocks with shared `<PublicNavbar>` component across 12 public pages.
+**Task:** Replace inline `<nav>` blocks with shared `<PublicNavbar />` component across 12 public pages.
+
+---
 
 ## Summary
 
-All 12 pages successfully migrated. Each page now uses `<PublicNavbar pageTitle={...} />` instead of its own inline navbar.
+All 12 public pages have been updated to use the shared `PublicNavbar` component instead of their own inline navbar markup.
 
 ## Changes Per Page
 
-| # | Page | pageTitle prop | Imports removed | Notes |
+| # | Page | pageTitle prop | Removed imports | Notes |
 |---|------|---------------|-----------------|-------|
-| 1 | `security/page.tsx` | `t("title")` | `LanguageSwitcher` | `Link` kept (used in body CTA) |
-| 2 | `faq/page.tsx` | `t("faqTitle")` | `LanguageSwitcher` | `Link` kept (used in body CTA) |
-| 3 | `what-is-a-webhook/page.tsx` | `"What is a Webhook?"` (hardcoded) | `LanguageSwitcher` | No translation key for title; `Link` kept (used in body CTA) |
-| 4 | `startups/page.tsx` | `t("title")` | `LanguageSwitcher` | `Link` kept (used in body CTA) |
-| 5 | `providers/stripe/page.tsx` | `t("stripe")` | `LanguageSwitcher` | `Link` kept (used in body CTA) |
-| 6 | `providers/github/page.tsx` | `t("github")` | `LanguageSwitcher` | `Link` kept (used in body CTA) |
-| 7 | `providers/shopify/page.tsx` | `t("shopify")` | `LanguageSwitcher` | `Link` kept (used in body CTA) |
-| 8 | `about/page.tsx` | `t('about.title')` | `LanguageSwitcher` | `Link` kept (used in body CTA) |
-| 9 | `contact/page.tsx` | `t('contact.title')` | `LanguageSwitcher` | No `Link` import existed (nav used `<a>` tags) |
-| 10 | `get-started/page.tsx` | `t('title')` | `LanguageSwitcher` | `useAuth` + `Link` kept (used extensively in body) |
-| 11 | `privacy/page.tsx` | `t('nav')` | `LanguageSwitcher` | No `Link` import existed (nav used `<a>` tags) |
-| 12 | `terms/page.tsx` | `t('nav')` | `LanguageSwitcher` | No `Link` import existed (nav used `<a>` tags) |
+| 1 | `security/page.tsx` | `t("title")` | `LanguageSwitcher` | Nav had Link+LanguageSwitcher |
+| 2 | `faq/page.tsx` | `t("faqTitle")` | `LanguageSwitcher` | Nav had Link+LanguageSwitcher |
+| 3 | `what-is-a-webhook/page.tsx` | `"What is a Webhook?"` | `LanguageSwitcher` | Hardcoded title (no i18n key) |
+| 4 | `startups/page.tsx` | `t("title")` | `LanguageSwitcher` | Nav had Link+LanguageSwitcher |
+| 5 | `providers/stripe/page.tsx` | `t("stripe")` | `LanguageSwitcher` | Had breadcrumb with /providers link |
+| 6 | `providers/github/page.tsx` | `t("github")` | `LanguageSwitcher` | Had breadcrumb with /providers link |
+| 7 | `providers/shopify/page.tsx` | `t("shopify")` | `LanguageSwitcher` | Had breadcrumb with /providers link |
+| 8 | `about/page.tsx` | `t('about.title')` | `LanguageSwitcher` | Nav used `<a>` not `<Link>` |
+| 9 | `contact/page.tsx` | `t('contact.title')` | `LanguageSwitcher` | Nav used `<a>` not `<Link>` |
+| 10 | `get-started/page.tsx` | `t('title')` | `LanguageSwitcher` | Complex nav with useAuth+user buttons |
+| 11 | `privacy/page.tsx` | `t('nav')` | `LanguageSwitcher` | Nav used `<a>` not `<Link>` |
+| 12 | `terms/page.tsx` | `t('nav')` | `LanguageSwitcher` | Nav used `<a>` not `<Link>` |
 
-## What was removed per page
-- **All 12:** `import { LanguageSwitcher } from '@/components/LanguageSwitcher'` removed
-- **All 12:** Inline `<nav className="...">...</nav>` block removed
-- **All 12:** Added `import PublicNavbar from '@/components/PublicNavbar'`
+## What was changed per file
 
-## What was preserved
-- `<main>` or content `<div>` blocks — untouched
-- `<Footer />` components — untouched
-- `Link` / `useAuth` imports where used in page body (not just nav)
-- All page logic, state, and content — untouched
+1. **Removed** `import { LanguageSwitcher } from '@/components/LanguageSwitcher';`
+2. **Added** `import PublicNavbar from '@/components/PublicNavbar';`
+3. **Replaced** entire `<nav>...</nav>` block with `<PublicNavbar pageTitle={...} />`
+4. **Kept** `import { Link } from '@/i18n/navigation';` where it's used in body content (all pages except about, contact, privacy, terms)
+5. **Kept** `useAuth` in `get-started/page.tsx` — it's used in page body for conditional rendering (signed-in state, dashboard buttons, etc.)
 
 ## Notes
-- `what-is-a-webhook/page.tsx`: Title is hardcoded as `"What is a Webhook?"` since no translation key was found for the nav title. Consider adding a `title` key to the `whatIsWebhook` translation namespace.
-- `privacy/page.tsx` and `terms/page.tsx`: Use `t('nav')` for the page title (matches their existing translation key pattern).
-- Provider pages (stripe/github/shopify): Use the provider-specific key (`t("stripe")`, `t("github")`, `t("shopify")`) instead of the parent `t("title")` which refers to "Providers".
+
+- **Providers pages** (stripe, github, shopify): The original nav had a deeper breadcrumb (`/providers / stripe`). Now they show a simple breadcrumb via PublicNavbar (`/ Stripe`). This is consistent with other pages.
+- **what-is-a-webhook**: Title is hardcoded `"What is a Webhook?"` since no i18n key was available for it in the nav.
+- **privacy/terms**: Used `t('nav')` as the pageTitle since that's the key they used in the original breadcrumb.
+- **No `useAuth` was removed** from any page — only `get-started` had it, and it's used in the page body, not just the nav.
+- **`<main>` and content blocks** were not touched in any file.
