@@ -3,31 +3,16 @@
  */
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
+import {
+  TrendResponseModel,
+  SuccessRateModel,
+  LatencyModel,
+  type TrendResponse,
+  type SuccessRateResponse,
+  type LatencyResponse,
+} from "../models";
 
-export interface TrendPoint {
-  date: string;
-  total: number;
-  delivered: number;
-  failed: number;
-}
-
-export interface TrendResponse {
-  data: TrendPoint[];
-}
-
-export interface SuccessRateResponse {
-  rate: number;
-  total: number;
-  delivered: number;
-  failed: number;
-}
-
-export interface LatencyResponse {
-  p50: number;
-  p95: number;
-  p99: number;
-  avg: number;
-}
+export type { TrendResponse, SuccessRateResponse, LatencyResponse };
 
 export class Analytics {
   constructor(private readonly ctx: HookSniffRequestContext) {}
@@ -37,7 +22,9 @@ export class Analytics {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/deliveries");
     if (options?.since) req.setQueryParams({ since: options.since });
     if (options?.until) req.setQueryParams({ until: options.until });
-    return req.send<TrendResponse>(this.ctx);
+    return req.send<TrendResponse>(this.ctx, (json) =>
+      TrendResponseModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Get success rate metrics */
@@ -45,7 +32,9 @@ export class Analytics {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/success-rate");
     if (options?.since) req.setQueryParams({ since: options.since });
     if (options?.until) req.setQueryParams({ until: options.until });
-    return req.send<SuccessRateResponse>(this.ctx);
+    return req.send<SuccessRateResponse>(this.ctx, (json) =>
+      SuccessRateModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 
   /** Get latency metrics */
@@ -53,6 +42,8 @@ export class Analytics {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/latency");
     if (options?.since) req.setQueryParams({ since: options.since });
     if (options?.until) req.setQueryParams({ until: options.until });
-    return req.send<LatencyResponse>(this.ctx);
+    return req.send<LatencyResponse>(this.ctx, (json) =>
+      LatencyModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 }

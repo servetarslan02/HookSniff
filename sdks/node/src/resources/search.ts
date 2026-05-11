@@ -3,13 +3,9 @@
  */
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
+import { SearchModel, type SearchResult } from "../models";
 
-export interface SearchResult {
-  id: string;
-  type: string;
-  data: unknown;
-  score: number;
-}
+export type { SearchResult };
 
 export class Search {
   constructor(private readonly ctx: HookSniffRequestContext) {}
@@ -18,6 +14,13 @@ export class Search {
   async query(q: string, options?: { limit?: number }): Promise<SearchResult[]> {
     const req = new HookSniffRequest(HttpMethod.GET, "/v1/search");
     req.setQueryParams({ q, ...options });
-    return req.send<SearchResult[]>(this.ctx);
+    return req.send<SearchResult[]>(this.ctx, (json) => {
+      const arr = Array.isArray(json) ? json : [];
+      return arr.map((item) =>
+        typeof item === "object" && item !== null
+          ? SearchModel._fromJsonObject(item as Record<string, unknown>)
+          : item
+      );
+    });
   }
 }

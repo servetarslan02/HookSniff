@@ -3,14 +3,9 @@
  */
 
 import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
+import { HealthModel, type HealthOutput } from "../models";
 
-export interface HealthOutput {
-  status: string;
-  db: { status: string; latency_ms: number };
-  queue: { status: string; latency_ms: number; pending: number };
-  otel?: { enabled: boolean; endpoint: string; headers_configured: boolean };
-  uptime_seconds: number;
-}
+export type { HealthOutput };
 
 export class Health {
   constructor(private readonly ctx: HookSniffRequestContext) {}
@@ -18,6 +13,8 @@ export class Health {
   /** Check API health */
   async check(): Promise<HealthOutput> {
     const req = new HookSniffRequest(HttpMethod.GET, "/health");
-    return req.send<HealthOutput>(this.ctx);
+    return req.send<HealthOutput>(this.ctx, (json) =>
+      HealthModel._fromJsonObject(json as Record<string, unknown>)
+    );
   }
 }

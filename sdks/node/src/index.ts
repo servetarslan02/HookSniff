@@ -51,6 +51,9 @@ export interface HookSniffOptions {
 
   /** Number of retries for 5xx errors (default: 2) */
   numRetries?: number;
+
+  /** Custom fetch implementation (default: globalThis.fetch) */
+  fetch?: typeof globalThis.fetch;
 }
 
 export class HookSniff {
@@ -111,20 +114,11 @@ export class HookSniff {
   }
 }
 
-// Re-export everything
+// Re-export core
 export { Webhook, WebhookVerificationError } from "./webhook";
 export type { WebhookHeaders, WebhookSvixHeaders } from "./webhook";
 export { ApiException } from "./request";
 export type { HookSniffRequestContext } from "./request";
 
-// Re-export resource types
-export type * from "./resources/endpoints";
-export type * from "./resources/webhooks";
-export type * from "./resources/auth";
-export type * from "./resources/analytics";
-export type * from "./resources/apiKeys";
-export type * from "./resources/alerts";
-export type * from "./resources/teams";
-export type * from "./resources/search";
-export type * from "./resources/billing";
-export type * from "./resources/health";
+// Re-export all models and types
+export * from "./models";
