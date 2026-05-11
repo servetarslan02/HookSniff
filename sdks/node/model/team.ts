@@ -13,9 +13,9 @@
 import { RequestFile } from './models';
 
 export class Team {
-    'id'?: string;
-    'name'?: string;
-    'createdAt'?: Date;
+    'id': string;
+    'name': string;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

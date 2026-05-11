@@ -14,8 +14,8 @@ import { RequestFile } from './models';
 import { DeliveryTrendResponseBucketsInner } from './deliveryTrendResponseBucketsInner';
 
 export class DeliveryTrendResponse {
-    'range'?: string;
-    'buckets'?: Array<DeliveryTrendResponseBucketsInner>;
+    'range': string;
+    'buckets': Array<DeliveryTrendResponseBucketsInner>;
 
     static discriminator: string | undefined = undefined;
 

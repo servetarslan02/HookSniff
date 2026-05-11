@@ -19,15 +19,15 @@ export class AuthLoginPost200Response {
     /**
     * JWT access token
     */
-    'token'?: string;
-    'customer'?: CustomerResponse;
+    'token': string;
+    'customer': CustomerResponse;
     /**
     * Refresh token (when applicable)
     */
     'refreshToken'?: string;
-    'requires2fa'?: boolean;
-    'tempToken'?: string;
-    'message'?: string;
+    'requires2fa': boolean;
+    'tempToken': string;
+    'message': string;
 
     static discriminator: string | undefined = undefined;
 

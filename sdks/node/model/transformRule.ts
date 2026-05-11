@@ -13,13 +13,13 @@
 import { RequestFile } from './models';
 
 export class TransformRule {
-    'id'?: string;
-    'endpointId'?: string;
-    'name'?: string;
-    'ruleType'?: string;
+    'id': string;
+    'endpointId': string;
+    'name': string;
+    'ruleType': string;
     'config'?: object;
-    'isActive'?: boolean;
-    'createdAt'?: Date;
+    'isActive': boolean;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

@@ -13,10 +13,10 @@
 import { RequestFile } from './models';
 
 export class RetryPolicy {
-    'maxAttempts'?: number = 3;
-    'backoff'?: RetryPolicy.BackoffEnum = RetryPolicy.BackoffEnum.Exponential;
-    'initialDelaySecs'?: number = 10;
-    'maxDelaySecs'?: number = 3600;
+    'maxAttempts': number = 3;
+    'backoff': RetryPolicy.BackoffEnum = RetryPolicy.BackoffEnum.Exponential;
+    'initialDelaySecs': number = 10;
+    'maxDelaySecs': number = 3600;
 
     static discriminator: string | undefined = undefined;
 

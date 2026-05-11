@@ -14,16 +14,16 @@ import { RequestFile } from './models';
 import { RetryPolicy } from './retryPolicy';
 
 export class UpdateEndpointRequest {
-    'url'?: string;
-    'description'?: string;
-    'isActive'?: boolean;
-    'allowedIps'?: Array<string>;
-    'eventFilter'?: Array<string>;
+    'url': string;
+    'description': string;
+    'isActive': boolean;
+    'allowedIps': Array<string>;
+    'eventFilter': Array<string>;
     'customHeaders'?: object;
-    'retryPolicy'?: RetryPolicy;
-    'routingStrategy'?: UpdateEndpointRequest.RoutingStrategyEnum;
-    'fallbackUrl'?: string;
-    'format'?: UpdateEndpointRequest.FormatEnum;
+    'retryPolicy': RetryPolicy;
+    'routingStrategy': UpdateEndpointRequest.RoutingStrategyEnum;
+    'fallbackUrl': string;
+    'format': UpdateEndpointRequest.FormatEnum;
 
     static discriminator: string | undefined = undefined;
 

@@ -13,10 +13,10 @@
 import { RequestFile } from './models';
 
 export class TestWebhookResponse {
-    'success'?: boolean;
-    'statusCode'?: number;
-    'durationMs'?: number;
-    'responseBody'?: string;
+    'success': boolean;
+    'statusCode': number;
+    'durationMs': number;
+    'responseBody': string;
 
     static discriminator: string | undefined = undefined;
 

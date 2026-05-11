@@ -13,13 +13,13 @@
 import { RequestFile } from './models';
 
 export class UsageResponse {
-    'plan'?: string;
-    'periodStart'?: Date;
-    'periodEnd'?: Date;
-    'webhooksUsed'?: number;
-    'webhooksLimit'?: number;
-    'endpointsUsed'?: number;
-    'endpointsLimit'?: number;
+    'plan': string;
+    'periodStart': Date;
+    'periodEnd': Date;
+    'webhooksUsed': number;
+    'webhooksLimit': number;
+    'endpointsUsed': number;
+    'endpointsLimit': number;
 
     static discriminator: string | undefined = undefined;
 

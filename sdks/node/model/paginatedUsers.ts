@@ -14,10 +14,10 @@ import { RequestFile } from './models';
 import { UserSummary } from './userSummary';
 
 export class PaginatedUsers {
-    'users'?: Array<UserSummary>;
-    'total'?: number;
-    'page'?: number;
-    'perPage'?: number;
+    'users': Array<UserSummary>;
+    'total': number;
+    'page': number;
+    'perPage': number;
 
     static discriminator: string | undefined = undefined;
 

@@ -14,11 +14,11 @@ import { RequestFile } from './models';
 import { SystemStatsPlanBreakdownInner } from './systemStatsPlanBreakdownInner';
 
 export class SystemStats {
-    'totalUsers'?: number;
-    'activeUsers'?: number;
-    'totalEndpoints'?: number;
-    'totalDeliveries'?: number;
-    'planBreakdown'?: Array<SystemStatsPlanBreakdownInner>;
+    'totalUsers': number;
+    'activeUsers': number;
+    'totalEndpoints': number;
+    'totalDeliveries': number;
+    'planBreakdown': Array<SystemStatsPlanBreakdownInner>;
 
     static discriminator: string | undefined = undefined;
 

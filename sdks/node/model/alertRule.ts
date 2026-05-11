@@ -13,13 +13,13 @@
 import { RequestFile } from './models';
 
 export class AlertRule {
-    'id'?: string;
-    'name'?: string;
-    'condition'?: AlertRule.ConditionEnum;
-    'threshold'?: number;
-    'channels'?: Array<AlertRule.ChannelsEnum>;
-    'isActive'?: boolean;
-    'createdAt'?: string;
+    'id': string;
+    'name': string;
+    'condition': AlertRule.ConditionEnum;
+    'threshold': number;
+    'channels': Array<AlertRule.ChannelsEnum>;
+    'isActive': boolean;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 
@@ -57,7 +57,7 @@ export class AlertRule {
         {
             "name": "createdAt",
             "baseName": "created_at",
-            "type": "string"
+            "type": "Date"
         }    ];
 
     static getAttributeTypeMap() {
