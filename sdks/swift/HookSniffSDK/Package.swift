@@ -16,16 +16,23 @@ let package = Package(
             targets: ["HookSniff"]
         ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.0.0"),
+    ],
     targets: [
         .target(
             name: "HookSniff",
-            dependencies: [],
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto"),
+            ],
             path: "Sources/HookSniff"
         ),
         .testTarget(
             name: "HookSniffTests",
-            dependencies: ["HookSniff"],
+            dependencies: [
+                "HookSniff",
+                .product(name: "Crypto", package: "swift-crypto"),
+            ],
             path: "Tests/HookSniffTests"
         ),
     ]
