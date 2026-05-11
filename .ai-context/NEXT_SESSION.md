@@ -1,10 +1,10 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 15:42 GMT+8
+> Son güncelleme: 2026-05-11 17:21 GMT+8
 
 ---
 
-## 🚨 KRİTİK BLOKLAR (Oturum 106)
+## 🚨 KRİTİK BLOKLAR (Oturum 108)
 
 ### 1. GitHub Actions Billing — BİTTİ
 - **Sorun:** GitHub Actions dakikaları dolmuş, CI/CD çalışmıyor
@@ -13,18 +13,20 @@
 - **veya:** GCP Console > Cloud Build > Triggers > tetikle
 - `cloudbuild.yaml` zaten repo'da mevcut
 
-### 2. Cloud Run API Unavailable — ACİL
-- **Sorun:** `api:latest` image'ı bozulmuş, son 3 revision (00059/00060/00061) startup timeout
-- **Son çalışan:** Revision `hooksniff-api-00058-kq6` (8 saat önce, %100 traffic ama Unavailable)
-- **Çözüm:** 00058'in image digest'ini bul, onunla yeni revision deploy et
-- **Veya:** GitHub Actions billing'i düzelt, CI/CD otomatik deploy etsin
+### 2. Cloud Run API — Revision 00063 Deploy Edildi ⏳
+- **Durum:** GCP Console üzerinden manuel deploy tetiklendi (Oturum 108)
+- **Önceki sorun:** Son 3 revision (00059/00060/00061) startup timeout ile başarısız olmuştu
+- **OTEL env var'ları doğrulandı:** OTEL_ENABLED=true, endpoint eu-west-2, headers secret mevcut
+- **Beklenen:** Revision 00063 başarılı olursa OTEL verisi akmaya başlayacak
+- **Kontrol:** `curl https://hooksniff-api-1046140057667.europe-west1.run.app/health` → otel objesi var mı?
 
-### 3. Grafana OTEL — Veri Yok
-- **Durum:** Metrics: 6 series, Logs: 0 bytes, Traces: 0 bytes
-- **Sebep:** API Unavailable olduğu için OTEL verisi gönderilemiyor
-- **Çözüm:** API'yi çalıştır, OTEL otomatik başlayacak (env var'lar mevcut)
+### 3. Grafana OTEL — Veri Akışı Kontrol Edilecek ⏳
+- **Durum:** Prometheus up series = 0 (Oturum 108 başında)
+- **Sebep:** API Unavailable + OTEL verisi gönderilemiyor
+- **Beklenen:** Revision 00063 başarılı olursa OTEL otomatik başlayacak
+- **Kontrol:** Grafana'da `otel_boot_test` span'ı ve metrics ara
 
-### 4. Grafana Trial — 10 Gün Kaldı
+### 4. Grafana Trial — 9 Gün Kaldı
 - **Deadline:** May 20, 2026
 - **Çözüm:** Upgrade veya alternatif bul
 
@@ -77,14 +79,14 @@
 
 ---
 
-## 🔧 Grafana OTEL Durumu (Oturum 104)
+## 🔧 Grafana OTEL Durumu (Oturum 108)
 
-### KRİTİK BULGU
-- Deploy scriptlerinde **yanlış region** vardı: `us-east-0` → `eu-west-2` olarak düzeltildi
-- Cloud Run'daki mevcut revision hala eski endpoint'i kullanıyor olabilir
-- **Servet'in Cloud Run'dan manuel kontrol etmesi gerekiyor**
+### GÜNCEL DURUM
+- **Revision 00063 deploy edildi** — GCP Console üzerinden manuel deploy (Oturum 108)
+- OTEL env var'ları doğru: OTEL_ENABLED=true, endpoint eu-west-2, headers secret mevcut
+- **Kontrol edilecek:** Deploy başarılı olduktan sonra OTEL veri akışı
 
-### Yapılan (Oturum 103 + 104)
+### Yapılan (Oturum 103 + 104 + 108)
 - Grafana org adı `hookrelay` (hooksniff değilmiş)
 - OTLP endpoint: `https://otlp-gateway-prod-eu-west-2.grafana.net/otlp`
 - Auth format: `Authorization=Basic base64(1625476:glc_...)`
@@ -93,10 +95,11 @@
 - Deploy scriptleri eu-west-2'ye düzeltildi (4 dosya)
 - Boot test span eklendi (deploy sonrası Grafana'da görülecek)
 - Health endpoint'e OTEL durumu eklendi
+- **Oturum 108:** GCP Console browser ile açıldı, OTEL env var'ları doğrulandı, revision 00063 deploy edildi
 
-### Sonraki Adımlar (Servet Deploy Ettikten Sonra)
-1. API'nin OTEL exporter'ının trace gönderip göndermediğini kontrol et
-2. `/health` endpoint'inden `otel` durumunu kontrol et
+### Sonraki Adımlar
+1. Deploy tamamlandıktan sonra `/health` endpoint'inden `otel` durumunu kontrol et
+2. Prometheus'ta `up` series sayısını kontrol et (şu an 0)
 3. Boot test span'ı Grafana'da ara (`otel_boot_test`)
 4. Sorun devam ederse: Cloud Run logs'da `OTEL config` ve `OTLP exporter` loglarını kontrol et
 
@@ -105,4 +108,5 @@
 - Grafana OTLP Token: `glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0=`
 - Grafana Access Policy ID: `b6aea6c9-bd32-4a2d-9184-a3d2da591a8a`
 - Instance ID: `1625476`
-- Cloud Run SA: `/tmp/hooksniff-sa.json` (hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com)
+- **SA key compromize:** Git history'de bulundu (commit 12d1855), rotate edilmiş, geçersiz
+- **Yeni SA key gerekli:** GCP Console > IAM > Service Accounts > hooksniff-deploy > Keys > Create
