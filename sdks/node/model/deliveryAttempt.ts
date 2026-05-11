@@ -13,13 +13,13 @@
 import { RequestFile } from './models';
 
 export class DeliveryAttempt {
-    'id'?: string;
-    'attemptNumber'?: number;
+    'id': string;
+    'attemptNumber': number;
     'statusCode'?: number | null;
     'responseBody'?: string | null;
     'durationMs'?: number | null;
     'errorMessage'?: string | null;
-    'createdAt'?: Date;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

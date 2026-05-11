@@ -14,8 +14,8 @@ import { RequestFile } from './models';
 import { Delivery } from './delivery';
 
 export class SearchResult {
-    'deliveries'?: Array<Delivery>;
-    'total'?: number;
+    'deliveries': Array<Delivery>;
+    'total': number;
 
     static discriminator: string | undefined = undefined;
 

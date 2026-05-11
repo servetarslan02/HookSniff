@@ -14,9 +14,9 @@ import { RequestFile } from './models';
 import { LatencyTrendResponseBucketsInner } from './latencyTrendResponseBucketsInner';
 
 export class LatencyTrendResponse {
-    'range'?: string;
-    'buckets'?: Array<LatencyTrendResponseBucketsInner>;
-    'overallAvgMs'?: number;
+    'range': string;
+    'buckets': Array<LatencyTrendResponseBucketsInner>;
+    'overallAvgMs': number;
 
     static discriminator: string | undefined = undefined;
 

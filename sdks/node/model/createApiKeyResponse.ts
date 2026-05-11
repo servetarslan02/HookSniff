@@ -13,13 +13,13 @@
 import { RequestFile } from './models';
 
 export class CreateApiKeyResponse {
-    'id'?: string;
+    'id': string;
     /**
     * Full API key — only shown once
     */
-    'key'?: string;
-    'prefix'?: string;
-    'message'?: string;
+    'key': string;
+    'prefix': string;
+    'message': string;
 
     static discriminator: string | undefined = undefined;
 

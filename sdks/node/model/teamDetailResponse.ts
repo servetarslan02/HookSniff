@@ -16,9 +16,9 @@ import { TeamInvite } from './teamInvite';
 import { TeamMember } from './teamMember';
 
 export class TeamDetailResponse {
-    'team'?: Team;
-    'members'?: Array<TeamMember>;
-    'invites'?: Array<TeamInvite>;
+    'team': Team;
+    'members': Array<TeamMember>;
+    'invites': Array<TeamInvite>;
 
     static discriminator: string | undefined = undefined;
 

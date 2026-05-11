@@ -13,12 +13,12 @@
 import { RequestFile } from './models';
 
 export class Notification {
-    'id'?: string;
-    'title'?: string;
-    'body'?: string;
-    'isRead'?: boolean;
+    'id': string;
+    'title': string;
+    'body': string;
+    'isRead': boolean;
     'link'?: string | null;
-    'createdAt'?: Date;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

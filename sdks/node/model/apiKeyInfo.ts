@@ -13,14 +13,14 @@
 import { RequestFile } from './models';
 
 export class ApiKeyInfo {
-    'id'?: string;
+    'id': string;
     /**
     * Masked key prefix (e.g. \"hs_abc1...\")
     */
-    'prefix'?: string;
-    'createdAt'?: string;
+    'prefix': string;
+    'createdAt': Date;
     'lastUsedAt'?: string | null;
-    'isActive'?: boolean;
+    'isActive': boolean;
 
     static discriminator: string | undefined = undefined;
 
@@ -38,7 +38,7 @@ export class ApiKeyInfo {
         {
             "name": "createdAt",
             "baseName": "created_at",
-            "type": "string"
+            "type": "Date"
         },
         {
             "name": "lastUsedAt",
