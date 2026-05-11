@@ -137,7 +137,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-500 dark:text-slate-400 hidden sm:block">
-              {user?.email || 'Admin'}
+              {user?.email || tc('user')}
             </div>
             <button
               onClick={() => { logout(); router.push('/login'); }}

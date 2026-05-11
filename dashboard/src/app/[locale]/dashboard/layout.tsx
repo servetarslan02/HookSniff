@@ -18,6 +18,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const t = useTranslations('nav');
+  const tc = useTranslations('common');
 
   const locale = useLocale();
 

@@ -19,6 +19,7 @@ export default function AdminOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
+  const tc = useTranslations('common');
 
 
   const fetchStats = useCallback(async () => {
