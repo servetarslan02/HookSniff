@@ -44,13 +44,18 @@ def paginate(
     while pages_fetched < max_pages:
         page = fetch_page(limit, offset)
 
+        # Safety: avoid infinite loop on empty pages with has_more=True
+        if not page.data:
+            break
+
         for item in page.data:
             yield item
 
         if not page.has_more:
             break
 
-        offset += limit
+        # Advance by actual items received (not limit) — matches Node.js behavior
+        offset += len(page.data)
         pages_fetched += 1
 
 

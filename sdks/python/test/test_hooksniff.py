@@ -712,7 +712,21 @@ class TestPagination(unittest.TestCase):
             return Page(data=[offset], has_more=True)
 
         list(paginate(fetch, limit=2))
-        self.assertEqual(offsets, [0, 2, 4])
+        # Each page has 1 item → offset advances by 1 each time
+        # Stops when fetch returns has_more=False at offset=4
+        self.assertEqual(offsets, [0, 1, 2, 3, 4])
+
+    def test_empty_page_stops_iteration(self):
+        """Empty page with has_more=True should stop (safety against infinite loop)."""
+        call_count = [0]
+
+        def fetch(limit, offset):
+            call_count[0] += 1
+            return Page(data=[], has_more=True)  # empty but says has_more
+
+        result = list(paginate(fetch))
+        self.assertEqual(result, [])
+        self.assertEqual(call_count[0], 1)  # only called once, then stopped
 
     def test_custom_limit(self):
         def fetch(limit, offset):
