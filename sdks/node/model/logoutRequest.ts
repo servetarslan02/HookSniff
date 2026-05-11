@@ -19,7 +19,7 @@ export class LogoutRequest {
     /**
     * Refresh token to invalidate
     */
-    'refreshToken'?: string;
+    'refreshToken': string;
 
     static discriminator: string | undefined = undefined;
 

@@ -13,9 +13,9 @@
 import { RequestFile } from './models';
 
 export class StreamParams {
-    'endpointId'?: string;
-    'status'?: StreamParams.StatusEnum;
-    'limit'?: number = 50;
+    'endpointId': string;
+    'status': StreamParams.StatusEnum;
+    'limit': number = 50;
 
     static discriminator: string | undefined = undefined;
 

@@ -13,10 +13,10 @@
 import { RequestFile } from './models';
 
 export class DeviceTokenResponse {
-    'id'?: string;
-    'token'?: string;
-    'platform'?: string;
-    'createdAt'?: Date;
+    'id': string;
+    'token': string;
+    'platform': string;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

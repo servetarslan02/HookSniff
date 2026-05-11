@@ -13,12 +13,12 @@
 import { RequestFile } from './models';
 
 export class UserSummary {
-    'id'?: string;
-    'email'?: string;
+    'id': string;
+    'email': string;
     'name'?: string | null;
-    'plan'?: string;
-    'isActive'?: boolean;
-    'createdAt'?: Date;
+    'plan': string;
+    'isActive': boolean;
+    'createdAt': Date;
 
     static discriminator: string | undefined = undefined;
 

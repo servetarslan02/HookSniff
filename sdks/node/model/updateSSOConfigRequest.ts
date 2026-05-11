@@ -16,8 +16,8 @@ import { RequestFile } from './models';
 * Update an SSO configuration (all fields optional)
 */
 export class UpdateSSOConfigRequest {
-    'provider'?: UpdateSSOConfigRequest.ProviderEnum;
-    'domain'?: string;
+    'provider': UpdateSSOConfigRequest.ProviderEnum;
+    'domain': string;
 
     static discriminator: string | undefined = undefined;
 

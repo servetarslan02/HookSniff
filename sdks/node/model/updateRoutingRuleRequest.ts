@@ -16,7 +16,7 @@ import { RequestFile } from './models';
 * Update an existing routing rule (all fields optional)
 */
 export class UpdateRoutingRuleRequest {
-    'name'?: string;
+    'name': string;
     'conditions'?: object;
     'transform'?: object | null;
 

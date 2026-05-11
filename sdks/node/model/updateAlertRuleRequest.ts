@@ -16,10 +16,10 @@ import { RequestFile } from './models';
 * Request to update an existing alert rule (all fields optional)
 */
 export class UpdateAlertRuleRequest {
-    'name'?: string;
-    'condition'?: UpdateAlertRuleRequest.ConditionEnum;
-    'threshold'?: number;
-    'channels'?: Array<UpdateAlertRuleRequest.ChannelsEnum>;
+    'name': string;
+    'condition': UpdateAlertRuleRequest.ConditionEnum;
+    'threshold': number;
+    'channels': Array<UpdateAlertRuleRequest.ChannelsEnum>;
 
     static discriminator: string | undefined = undefined;
 

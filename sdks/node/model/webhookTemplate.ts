@@ -13,10 +13,10 @@
 import { RequestFile } from './models';
 
 export class WebhookTemplate {
-    'id'?: string;
-    'name'?: string;
-    'description'?: string;
-    'category'?: string;
+    'id': string;
+    'name': string;
+    'description': string;
+    'category': string;
     'payloadTemplate'?: object;
 
     static discriminator: string | undefined = undefined;

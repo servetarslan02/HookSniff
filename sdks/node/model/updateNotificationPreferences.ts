@@ -13,9 +13,9 @@
 import { RequestFile } from './models';
 
 export class UpdateNotificationPreferences {
-    'emailOnFailure'?: boolean;
-    'emailOnDeadLetter'?: boolean;
-    'emailOnSuccess'?: boolean;
+    'emailOnFailure': boolean;
+    'emailOnDeadLetter': boolean;
+    'emailOnSuccess': boolean;
     'slackWebhookUrl'?: string | null;
     'discordWebhookUrl'?: string | null;
     'webhookUrl'?: string | null;

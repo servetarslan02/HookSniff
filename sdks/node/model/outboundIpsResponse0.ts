@@ -13,8 +13,8 @@
 import { RequestFile } from './models';
 
 export class OutboundIpsResponse {
-    'ips'?: Array<string>;
-    'updatedAt'?: string;
+    'ips': Array<string>;
+    'updatedAt': string;
 
     static discriminator: string | undefined = undefined;
 

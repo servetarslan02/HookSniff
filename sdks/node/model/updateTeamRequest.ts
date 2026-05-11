@@ -16,8 +16,8 @@ import { RequestFile } from './models';
 * Fields to update on a team (all optional)
 */
 export class UpdateTeamRequest {
-    'name'?: string;
-    'description'?: string;
+    'name': string;
+    'description': string;
 
     static discriminator: string | undefined = undefined;
 

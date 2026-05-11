@@ -17,8 +17,8 @@ export class AuthResponse {
     /**
     * JWT access token
     */
-    'token'?: string;
-    'customer'?: CustomerResponse;
+    'token': string;
+    'customer': CustomerResponse;
     /**
     * Refresh token (when applicable)
     */

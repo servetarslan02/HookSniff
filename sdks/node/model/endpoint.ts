@@ -14,12 +14,12 @@ import { RequestFile } from './models';
 import { RetryPolicy } from './retryPolicy';
 
 export class Endpoint {
-    'id'?: string;
-    'url'?: string;
+    'id': string;
+    'url': string;
     'description'?: string | null;
-    'isActive'?: boolean;
-    'retryPolicy'?: RetryPolicy;
-    'createdAt'?: Date;
+    'isActive': boolean;
+    'retryPolicy': RetryPolicy;
+    'createdAt': Date;
     /**
     * CIDR blocks or exact IPs
     */
@@ -29,11 +29,11 @@ export class Endpoint {
     */
     'eventFilter'?: Array<string> | null;
     'customHeaders'?: object | null;
-    'routingStrategy'?: Endpoint.RoutingStrategyEnum;
+    'routingStrategy': Endpoint.RoutingStrategyEnum;
     'fallbackUrl'?: string | null;
-    'avgResponseMs'?: number;
-    'failureStreak'?: number;
-    'format'?: Endpoint.FormatEnum;
+    'avgResponseMs': number;
+    'failureStreak': number;
+    'format': Endpoint.FormatEnum;
 
     static discriminator: string | undefined = undefined;
 
