@@ -1,357 +1,196 @@
-# HookSniff — Footer & Navigasyon Tutarlılık Raporu
+# HookSniff — Görsel QA Raporu (Footer & Navigasyon)
 
 **Tarih:** 2026-05-12  
-**Kontrol edilen sayfa sayısı:** 16  
-**Toplam bulunan sorun:** 47
+**Kontrol:** 16 sayfanın tamamı tarandı, screenshot ile doğrulandı
 
 ---
 
-## 📊 Özet
+## 🚨 SORUN 1: 14/16 Sayfada Footer Yok
 
-| Kategori | Sorun Sayısı |
-|---|---|
-| Footer eksik | 12 sayfa |
-| Footer tutarsız | 3 varyant |
-| Navbar tutarsız | 15 sayfa |
-| Dark mode eksik | 15 sayfa |
-| "Panel →" eksik/tutarsız | 15 sayfa |
-| Logo link tutarsızlığı | 8 sayfa |
-| Kırık link | 2 sayfa |
-| Dil sorunu (EN/TR karışık) | 10 sayfa |
+Sadece `/tr` (ana sayfa) ve `/tr/docs` sayfalarında footer var. Diğer 14 sayfada sayfa aniden bitiyor — boş beyaz alan, footer yok.
 
----
+**Etkilenen sayfalar:**
+- `/tr/pricing` — CTA'dan sonra boşluk, footer yok
+- `/tr/about` — "Start Free" butonundan sonra sayfa bitiyor
+- `/tr/contact` — Form'dan sonra sayfa bitiyor
+- `/tr/status` — "Version 0.1.0" tek satır, gerçek footer değil
+- `/tr/faq` — "Destek ile İletişim" linkinden sonra bitiyor
+- `/tr/terms` — 16. bölümden sonra bitiyor
+- `/tr/privacy` — 13. bölümden sonra bitiyor
+- `/tr/get-started` — "Playground'ı Dene" butonundan sonra bitiyor
+- `/tr/what-is-a-webhook` — "Get started →" linkinden sonra bitiyor
+- `/tr/startups` — "Apply now →" linkinden sonra bitiyor
+- `/tr/security` — "Kaynak kodu görüntüle" linkinden sonra bitiyor
+- `/tr/providers/stripe` — "Start for free →" linkinden sonra bitiyor
+- `/tr/providers/github` — "Start for free →" linkinden sonra bitiyor
+- `/tr/providers/shopify` — "Start for free →" linkinden sonra bitiyor
 
-## 🔴 KRİTİK: Footer Sorunları
-
-### Genel Durum
-- **Sadece 2 sayfada gerçek footer var** (ana sayfa ve docs)
-- **1 sayfada minimal footer var** (status)
-- **13 sayfada footer tamamen eksik**
-
-### `/tr` (Ana Sayfa) — REFERANS FOOTER
-- ✅ Footer var
-- ✅ Logo: 🪝 HookSniff
-- ✅ Link listesi: GitHub, Dokümantasyon, Durum, Hakkında, SSS, İletişim, Şartlar, Gizlilik
-- ✅ Copyright: © 2026 HookSniff. Tüm hakları saklıdır.
-- ❌ Sosyal medya ikonları yok (Twitter/X, LinkedIn, Discord)
-- ❌ "Panel →" linki footer'da yok
-
-### `/tr/docs` — FARKLI FOOTER
-- Açıklama: Docs sayfasının footer'ı ana sayfadan tamamen farklı yapıda
-- Beklenen: Ana sayfa ile aynı footer
-- Mevcut: 4 sütunlu ayrıntılı footer (Ürün, Compare, Kaynaklar, Şirket)
-- Farklar:
-  - Kategorize edilmiş link yapısı (ana sayfada düz liste)
-  - "Compare" kategorisi (alternatif karşılaştırma sayfaları)
-  - "Kaynaklar" kategorisi (webhook rehberleri, sözlük, blog)
-  - Farklı link seti
-
-### `/tr/status` — MİNİMAL FOOTER
-- Açıklama: Status sayfasında sadece alt bilgi var, gerçek footer yok
-- Beklenen: Ana sayfa ile aynı footer
-- Mevcut: "Version 0.1.0 • hooksniff.vercel.app • Dokümanlar • Powered by HookSniff monitoring"
-
-### Footer Olmayan Sayfalar (12 sayfa):
-1. `/tr/pricing`
-2. `/tr/about`
-3. `/tr/contact`
-4. `/tr/faq`
-5. `/tr/terms`
-6. `/tr/privacy`
-7. `/tr/get-started`
-8. `/tr/what-is-a-webhook`
-9. `/tr/startups`
-10. `/tr/security`
-11. `/tr/providers/stripe`
-12. `/tr/providers/github`
-13. `/tr/providers/shopify`
+**Sonuç:** Kullanıcı herhangi bir alt sayfaya gelirse site terk etme olasılığı yüksek. Footer'da iletişim, şartlar, gizlilik linkleri yok → güven düşürücü.
 
 ---
 
-## 🔴 KRİTİK: Navbar Tutarsızlığı
+## 🚨 SORUN 2: Navbar 3 Farklı Varyanta Bölünmüş
 
-### 3 Farklı Navbar Varyantı Mevcut:
-
-#### Varyant 1: Tam Navbar (sadece `/tr` ana sayfa)
+### Varyant A — Tam Navbar (sadece ana sayfa)
 ```
-🪝 HookSniff | Özellikler | Fiyatlandırma | Başlayın | Dokümanlar | Durum | [Dil değiştir] | [🌙 Dark Mode] | [Panel →]
+🪝 HookSniff | Özellikler | Fiyatlandırma | Başlayın | Dokümanlar | Durum | [Dil] | [🌙] | [Panel →]
 ```
+✅ Tüm navigasyon öğeleri mevcut
 
-#### Varyant 2: Docs Navbar (sadece `/tr/docs`)
+### Varyant B — Docs Navbar (sadece docs)
 ```
-🪝 HookSniff docs.docs | [Dil değiştir] | Kontrol Paneli | Ana Sayfa
+🪝 HookSniff docs.docs | [Dil] | Kontrol Paneli | Ana Sayfa
 ```
-- "docs.docs" yazısı garip/broken görünüyor
-- "Kontrol Paneli" → "Panel →" ile tutarsız
+⚠️ "docs.docs" yazısı stil kırığı — muhtemelen className sızıntısı
+⚠️ "Kontrol Paneli" → ana sayfadaki "Panel →" ile tutarsız
+❌ Özellikler, Fiyatlandırma, Başlayın, Durum linkleri yok
+❌ Dark mode toggle yok
 
-#### Varyant 3: Minimal Navbar (diğer 14 sayfa)
+### Varyant C — Minimal Navbar (14 diğer sayfa)
 ```
-🪝 HookSniff / [Sayfa Adı] | [Dil değiştir]
+🪝 HookSniff / [Sayfa Adı] | [Dil]
 ```
-
-### `/tr/docs` — Navbar Sorunu
-- Açıklama: Logo yanında "docs.docs" yazısı var
-- Beklenen: "Dokümanlar" veya "Docs" (Türkçe locale'de)
-- Mevcut: "docs.docs" (broken/stilize edilmemiş)
-
-### `/tr/pricing` — Navbar
-- Açıklama: Sadece logo + dil değiştirici
-- Beklenen: Tam navbar (ana sayfadaki gibi)
-- Mevcut: Minimal navbar
-
-### `/tr/about` — Navbar
-- Açıklama: Sadece logo + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Minimal navbar
-
-### `/tr/contact` — Navbar
-- Açıklama: Sadece logo + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Minimal navbar
-
-### `/tr/status` — Navbar
-- Açıklama: Logo + "🔔 Subscribe to updates" butonu + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Özel navbar (farklı yapı)
-
-### `/tr/faq` — Navbar
-- Açıklama: Sadece logo + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Minimal navbar
-
-### `/tr/get-started` — Navbar
-- Açıklama: Logo + dil değiştirici + "Ücretsiz Hesap Oluştur" linki
-- Beklenen: Tam navbar
-- Mevcut: Özel navbar
-
-### `/tr/what-is-a-webhook` — Navbar
-- Açıklama: Sadece logo + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Minimal navbar
-
-### `/tr/startups` — Navbar
-- Açıklama: Sadece logo + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Minimal navbar
-
-### `/tr/security` — Navbar
-- Açıklama: Sadece logo + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Minimal navbar
-
-### `/tr/providers/stripe` — Navbar
-- Açıklama: Logo + breadcrumb (Sağlayıcılar / Stripe) + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Breadcrumb'lı minimal navbar
-
-### `/tr/providers/github` — Navbar
-- Açıklama: Logo + breadcrumb (Sağlayıcılar / GitHub) + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Breadcrumb'lı minimal navbar
-
-### `/tr/providers/shopify` — Navbar
-- Açıklama: Logo + breadcrumb (Sağlayıcılar / Shopify) + dil değiştirici
-- Beklenen: Tam navbar
-- Mevcut: Breadcrumb'lı minimal navbar
+❌ Hiçbir navigasyon linki yok
+❌ Dark mode toggle yok
+❌ "Panel →" linki yok
+❌ Kullanıcı ana sayfaya geri dönmek için browser back'e mahkum
 
 ---
 
-## 🔴 Dark Mode Toggle
+## 🚨 SORUN 3: Logo Link Hedefi Tutarsız
 
-### Durum
-- **Sadece ana sayfada (`/tr`) dark mode toggle var**
-- **Diğer 15 sayfada dark mode toggle eksik**
+| Sayfa | Logo → | Durum |
+|-------|--------|-------|
+| `/tr` | `/tr` | ✅ |
+| `/tr/docs` | `/tr` | ✅ |
+| `/tr/status` | `/tr` | ✅ |
+| `/tr/faq` | `/tr` | ✅ |
+| `/tr/get-started` | `/tr` | ✅ |
+| `/tr/what-is-a-webhook` | `/tr` | ✅ |
+| `/tr/startups` | `/tr` | ✅ |
+| `/tr/security` | `/tr` | ✅ |
+| `/tr/providers/*` | `/tr` | ✅ |
+| `/tr/pricing` | `/` | ❌ Locale kaybolur |
+| `/tr/about` | `/` | ❌ Locale kaybolur |
+| `/tr/contact` | `/` | ❌ Locale kaybolur |
+| `/tr/terms` | `/` | ❌ Locale kaybolur |
+| `/tr/privacy` | `/` | ❌ Locale kaybolur |
 
-### Etkilenen Sayfalar:
-1. `/tr/docs`
-2. `/tr/pricing`
-3. `/tr/about`
-4. `/tr/contact`
-5. `/tr/status`
-6. `/tr/faq`
-7. `/tr/terms`
-8. `/tr/privacy`
-9. `/tr/get-started`
-10. `/tr/what-is-a-webhook`
-11. `/tr/startups`
-12. `/tr/security`
-13. `/tr/providers/stripe`
-14. `/tr/providers/github`
-15. `/tr/providers/shopify`
+**Etki:** Kullanıcı `/tr/terms` sayfasından logoya tıklarsa İngilizce ana sayfaya (`/`) gider, Türkçe locale kaybolur.
 
 ---
 
-## 🔴 "Panel →" Linki Tutarsızlığı
+## 🚨 SORUN 4: Kırık Linkler (Locale Eksik)
 
-### Durum
-- `/tr` (ana sayfa): ✅ "Panel →" → `/tr/dashboard`
-- `/tr/docs`: ⚠️ "Kontrol Paneli" → `/tr/dashboard` (farklı metin)
-- Diğer 14 sayfa: ❌ "Panel →" linki yok
+### `/tr/terms` — Sayfa sonu
+- Link metni: "contact form"
+- Gittiği yer: `/contact`
+- Olması gereken: `/tr/contact`
+- **Etki:** Türkçe sayfadan İngilizce sayfaya yönlendirme
 
----
+### `/tr/security` — Responsible Disclosure
+- Link metni: "contact form"  
+- Gittiği yer: `/contact`
+- Olması gereken: `/tr/contact`
+- **Etki:** Aynı sorun
 
-## 🔴 Logo Link Tutarsızlığı
-
-### `/tr` (ana sayfa) → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/docs` → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/pricing` → `/`
-- Açıklama: Logo `/` (root) linkine gidiyor
-- Beklenen: `/tr` (locale-aware)
-- Mevcut: `/` (locale kaybedilir)
-
-### `/tr/about` → `/`
-- Açıklama: Logo `/` linkine gidiyor
-- Beklenen: `/tr`
-- Mevcut: `/`
-
-### `/tr/contact` → `/`
-- Açıklama: Logo `/` linkine gidiyor
-- Beklenen: `/tr`
-- Mevcut: `/`
-
-### `/tr/terms` → `/`
-- Açıklama: Logo `/` linkine gidiyor
-- Beklenen: `/tr`
-- Mevcut: `/`
-
-### `/tr/privacy` → `/`
-- Açıklama: Logo `/` linkine gidiyor
-- Beklenen: `/tr`
-- Mevcut: `/`
-
-### `/tr/status` → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/faq` → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/get-started` → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/what-is-a-webhook` → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/startups` → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/security` → `/tr`
-- Logo linki locale-aware ✅
-
-### `/tr/providers/*` → `/tr`
-- Logo linki locale-aware ✅
+### `/tr/docs` — İçerik kartları
+- Kart linkleri: `/docs/quickstart`, `/docs/concepts`, `/docs/security` vb.
+- Olması gereken: `/tr/docs/quickstart`, `/tr/docs/concepts`, `/tr/docs/security`
+- **Etki:** 8 kart linkinin hepsinde locale kayboluyor
 
 ---
 
-## 🔴 Kırık Linkler
+## 🚨 SORUN 5: Dark Mode Toggle Yalnızca Ana Sayfada
 
-### `/tr/terms` — Kırık Link
-- Açıklama: Sayfa içinde "contact form" linki `/contact`'a gidiyor
-- Beklenen: `/tr/contact`
-- Mevcut: `/contact` (locale kaybedilir)
+Sadece `/tr` (ana sayfada) dark mode switch'i var. Diğer 15 sayfada yok.
 
-### `/tr/security` — Kırık Link
-- Açıklama: "Responsible Disclosure" bölümündeki "contact form" linki `/contact`'a gidiyor
-- Beklenen: `/tr/contact`
-- Mevcut: `/contact` (locale kaybedilir)
+**Etki:** Kullanıcı dark mode açıp başka sayfaya giderse toggle kaybolur. Tutarlı UX yok.
 
 ---
 
-## 🟡 Dil Sorunları (TR locale'de İngilizce İçerik)
+## 🟡 SORUN 6: Status Sayfası Farklı Layout Kullanıyor
 
-### `/tr/what-is-a-webhook` — Tamamen İngilizce
-- Açıklama: /tr/ altında olmasına rağmen neredeyse tamamen İngilizce içerik
-- Beklenen: Türkçe içerik
-- Mevcut: Başlık "What is a Webhook?", tüm paragraflar İngilizce
+`/tr/status` sayfası özel bir layout kullanıyor:
+- Navbar'da "🔔 Subscribe to updates" butonu var (diğer sayfalarda yok)
+- Footer yerine "Version 0.1.0 • hooksniff.vercel.app • Dokümanlar" satırı
+- "Powered by HookSniff monitoring" yazısı
+- Uptime grafiği sol/sağ kenarlara yapışık, padding yok
 
-### `/tr/security` — Büyük Oranda İngilizce
-- Açıklama: Başlıklar ve açıklamalar çoğunlukla İngilizce
-- Örnekler: "Enterprise-grade security, startup-friendly pricing", "TLS 1.3 Everywhere", "HMAC-SHA256 Signatures", "Contact us →"
-
-### `/tr/startups` — Büyük Oranda İngilizce
-- Açıklama: İçeriğin çoğu İngilizce
-- Örnekler: "Startup Program", "50% off Pro", "Extended free tier", "Who qualifies?", "Apply now →"
-
-### `/tr/about` — Karışık
-- Açıklama: Bazı başlıklar ve CTA'lar İngilizce
-- Örnekler: "Security First", "Transparent Pricing", "Start Free", "Contact Us"
-
-### `/tr/contact` — Karışık
-- Açıklama: Form placeholder ve bazı metinler İngilizce
-- Örnekler: "Use the form below 👇", "Usually within 24 hours", "How can we help?"
-
-### `/tr/get-started` — Karışık
-- Açıklama: Bazı başlıklar İngilizce
-- Örnekler: "Payments", "Users", "Orders", "Email", "Notifications" (olay türü referansı)
-
-### `/tr/pricing` — Karışık
-- Açıklama: Bazı metinler İngilizce
-- Örnekler: "All data encrypted in transit", "Security controls in place", "EU data processing"
-
-### `/tr/status` — Karışık
-- Açıklama: Durum mesajları ve butonlar İngilizce
-- Örnekler: "Subscribe to updates", "All Systems Operational", "Refresh", "Operational", "Resolved"
-
-### `/tr/providers/stripe` — Karışık
-- Açıklama: Section başlıkları İngilizce
-- Örnekler: "Quick Start", "Common Stripe Events", "Node.js Example", "Start for free →"
-
-### `/tr/providers/github` — Karışık
-- Açıklama: Section başlıkları İngilizce
-- Örnekler: "Quick Start", "Common GitHub Events", "Start for free →"
-
-### `/tr/providers/shopify` — Karışık
-- Açıklama: Section başlıkları İngilizce
-- Örnekler: "Quick Start", "Common Shopify Events", "Start for free →"
+**Beklenen:** Standart layout ile tutarlı footer
 
 ---
 
-## 🟡 Docs Sayfası İç Linkler — Locale Eksik
+## 🟡 SORUN 7: Pricing Sayfasında Navbar'da Geri Dönüş Yok
 
-### `/tr/docs` — İçerik Linkleri
-- Açıklama: Docs ana sayfasındaki kartlar `/docs/quickstart`, `/docs/concepts` gibi linklere gidiyor
-- Beklenen: `/tr/docs/quickstart`, `/tr/docs/concepts`
-- Mevcut: `/docs/quickstart` (locale kaybedilir)
+`/tr/pricing` sayfasında:
+- Navbar sadece: `🪝 HookSniff / Fiyatlandırma | [Dil]`
+- Hiçbir navigasyon linki yok
+- Kullanıcı başka bir sayfaya gitmek için URL'i manuel yazmak zorunda
 
----
-
-## ✅ Çalışan Özellikler
-
-### Dil Değiştirici
-- ✅ Tüm 15 sayfada mevcut (get-started hariç kontrol edildi)
-- ✅ "TR Türkçe" gösteriyor
-- ✅ Türkçe locale korunuyor
-
-### Locale Korunması
-- ✅ Navbar linklerindeki `/tr/` prefix'i tutarlı
-- ✅ Footer linklerinde `/tr/` prefix'i mevcut (docs sayfası)
-- ✅ Sayfalar arası geçişlerde `/tr/` korunuyor
+**Diğer sayfaların çoğunda da aynı sorun var.**
 
 ---
 
-## 📋 Öncelikli Aksiyon Listesi
+## 🟡 SORUN 8: About Sayfası Bottom-Heavy
 
-### P0 (Kritik — Hemen düzeltilmeli)
-1. **Tüm sayfalara footer ekle** — Tekrar kullanılabilir bir footer bileşeni oluştur
-2. **Tüm sayfalara tutarlı navbar ekle** — Tam navbar bileşeni (logo + nav linkleri + dil değiştirici + dark mode + Panel →)
-3. **Kırık linkleri düzelt** — `/contact` → `/tr/contact` (terms ve security sayfaları)
+`/tr/about` sayfası sonunda:
+- "Ready to get started?" CTA'sı var
+- "Start Free" ve "Contact Us" butonları var
+- Ama footer yok → CTA'dan sonra boşluk
+- Butonlar arasındaki renk farkı dikkat çekici (mor vs outline)
 
-### P1 (Yüksek — Kısa vadede)
-4. **Dark mode toggle'ı tüm sayfalara ekle**
-5. **"Panel →" linkini tüm sayfalara ekle** — Tutarlı metin kullan
-6. **Logo link tutarlılığı** — Tüm logolar `/tr`'ye linklenmeli
-7. **Docs iç linklerini düzelt** — `/docs/quickstart` → `/tr/docs/quickstart`
+---
 
-### P2 (Orta — Dil düzeltmeleri)
-8. **what-is-a-webhook sayfasını Türkçeleştir**
-9. **security sayfasını Türkçeleştir**
-10. **startups sayfasını Türkçeleştir**
-11. **Diğer sayfalardaki İngilizce metinleri Türkçeleştir**
+## 🟡 SORUN 9: Provider Sayfaları Kısa, Footer Eksikliği Belirgin
 
-### P3 (Düşük — İyileştirmeler)
-12. **Sosyal medya ikonlarını footer'a ekle** (Twitter/X, LinkedIn, Discord)
-13. **"docs.docs" yazısını düzelt** → "Dokümanlar"
-14. **Status sayfası footer'ını standartlaştır**
+`/tr/providers/stripe`, `/tr/providers/github`, `/tr/providers/shopify` sayfaları:
+- Kısa içerik (1 ekran dolusu)
+- Quick Start + tablo + kod örneği + CTA
+- Footer olmadığı için sayfa aniden bitiyor
+- "Start for free →" butonundan sonra beyaz boşluk
+
+---
+
+## 🟡 SORUN 10: Get-Started Sayfasında Scroll Sonu Boş
+
+`/tr/get-started` sayfası uzun (6 adım + event types + embed + CLI)
+- En altta "Ücretsiz Hesap Oluştur" + "Playground'ı Dene" CTA'sı var
+- Footer yok
+- CTA'dan sonra boşluk
+
+---
+
+## ✅ ÇALIŞAN ŞEYLER
+
+1. ✅ **Dil değiştirici** — Tüm sayfalarda mevcut ve çalışıyor
+2. ✅ **Locale korunması** — Navbar linklerinde `/tr/` prefix'i tutarlı (docs harici)
+3. ✅ **Responsive** — Tüm sayfalar mobilde düzgün render ediliyor (snapshot'larda kontrol edildi)
+4. ✅ **Tutarlı renk paleti** — Tüm sayfalarda mor/gradient tema tutarlı
+5. ✅ **CTA butonları** — Tüm sayfalarda çalışıyor, doğru sayfalara yönlendiriyor
+6. ✅ **Fiyatlandırma kartları** — 3 plan tutarlı, bilgiler doğru
+7. ✅ **İçerik yapısı** — Başlık → Açıklama → CTA pattern'i tutarlı
+
+---
+
+## 📋 DÜZELTME ÖNERİLERİ (Öncelik Sırasıyla)
+
+### P0 — Kritik (Hemen yapılmalı)
+1. **Ortak layout bileşeni oluştur** — Navbar + Footer her sayfada otomatik görünsün
+2. **Footer'ı tüm sayfalara ekle** — Tekrar kullanılabilir `<Footer />` bileşeni
+3. **Kırık linkleri düzelt** — `/contact` → `/tr/contact` (terms, security)
+4. **Docs iç linklerini düzelt** — `/docs/*` → `/tr/docs/*`
+
+### P1 — Yüksek
+5. **Dark mode toggle'ı layout'a taşı** — Her sayfada görünsün
+6. **"Panel →" linkini navbar'a ekle** — Tüm sayfalarda tutarlı
+7. **Logo link hedefini düzelt** — 5 sayfada `/` → `/tr`
+
+### P2 — Orta
+8. **"docs.docs" yazısını düzelt** — ClassName sızıntısı
+9. **Status sayfasını standart layout'a geçir**
+10. **Navbar navigasyon linklerini tüm sayfalara ekle**
+
+### P3 — Düşük
+11. **Footer'a sosyal medya ikonları ekle**
+12. **Provider sayfalarına breadcrumb navigasyon ekle**

@@ -189,7 +189,8 @@
     },
     "urlLabel": "URL",
     "descriptionLabel": "Açıklama",
-    "settingsTitle": "Ayarlar"
+    "settingsTitle": "Ayarlar",
+    "noEndpointsYet": "Henüz endpoint yok. Webhook almaya başlamak için bir tane oluşturun."
   },
   "deliveries": {
     "title": "Teslimatlar",
@@ -340,7 +341,11 @@
     "ok": "Tamam",
     "redirect": "Yönlendirme",
     "clientError": "İstemci Hatası",
-    "serverError": "Sunucu Hatası"
+    "serverError": "Sunucu Hatası",
+    "statusOk": "Tamam",
+    "statusRedirect": "Yönlendirme",
+    "statusClientError": "İstemci Hatası",
+    "statusServerError": "Sunucu Hatası"
   },
   "team": {
     "title": "Ekip Yönetimi",
@@ -527,7 +532,8 @@
     "plans.freeLimit": "10.000 webhook/ay",
     "plans.proLimit": "50.000 webhook/ay",
     "plans.businessLimit": "500.000 webhook/ay",
-    "noInvoices": "Henüz fatura yok."
+    "noInvoices": "Henüz fatura yok.",
+    "upgradeInitiated": "Yükseltme başlatıldı"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -2157,13 +2163,37 @@
     "subject": "Konu",
     "message": "Mesaj",
     "responseTime": "Yanıt Süresi",
-    "location": "Konum"
+    "location": "Konum",
+    "useFormBelow": "Aşağıdaki formu kullanın 👇",
+    "responseTimeValue": "Genellikle 24 saat içinde",
+    "locationValue": "Türkiye 🇹🇷",
+    "howCanWeHelp": "Size nasıl yardımcı olabiliriz?",
+    "messageSent": "✅ Mesaj gönderildi! En kısa sürede size geri dönüş yapacağız.",
+    "sendError": "❌ Gönderilemedi. Lütfen tekrar deneyin veya GitHub Discussions'tan bize ulaşın."
   },
   "about": {
     "title": "HookSniff Hakkında",
     "ourStory": "Hikayemiz",
     "ourMission": "Misyonumuz",
-    "cta": "Webhook teslimatı için HookSniff'e güvenen geliştiricilere katılın."
+    "cta": "Webhook teslimatı için HookSniff'e güvenen geliştiricilere katılın.",
+    "liveOperational": "Canlı & Operasyonel",
+    "heroSubtitle": "Geliştiriciler tarafından, geliştiriciler için oluşturulmuş güvenilir webhook teslimat altyapısı.",
+    "missionP1": "Webhooklar modern entegrasyonların temelidir, ancak güvenilir webhook altyapısı oluşturmak zordur. HookSniff'i bunu basit hale getirmek için inşa ettik — webhook gönderin, biz teslim edelim. Başarısız olursa, tekrar deneyelim.",
+    "missionP2": "Geliştiricilerin güvenilir webhook teslimatı için kurumsal fiyatlar ödemesi gerektiğine inanıyoruz. Bu yüzden HookSniff ayda $0'dan başlıyor ve cömert bir ücretsiz katman sunuyor.",
+    "sdkLanguages": "SDK Dili",
+    "startingPrice": "Başlangıç Fiyatı",
+    "storyP1": "HookSniff 2026'da yan proje olarak başladı. Güvenilmez webhook teslimatları ve pahalı üçüncü taraf hizmetlerinden bıkmıştık. Bu yüzden kendimizinkini inşa ettik.",
+    "storyP2": "Bugün HookSniff, HTTP, WebSocket, gRPC ve SQS teslimat yöntemleriyle dünya genelindeki geliştiriciler için webhook teslimatını yönetiyor. Altyapımız tamamen ücretsiz katman hizmetleri üzerinde çalışıyor, maliyetleri ayda $0'da tutarken kurumsal düzeyde güvenilirliği koruyor.",
+    "storyP3": "HookSniff'i uygun fiyatlı ve erişilebilir tutmaya kararlıyız. Büyüdükçe, cömert bir ücretsiz katman ve şeffaf fiyatlandırma sunmaya devam edeceğiz.",
+    "securityFirst": "Güvenlik Öncelikli",
+    "securityFirstDesc": "HMAC-SHA256 imzaları, TLS şifreleme ve sıfır bilgi yük işleme.",
+    "transparentPricing": "Şeffaf Fiyatlandırma",
+    "transparentPricingDesc": "Gizli ücret yok, sürpriz masraf yok. Ne görürseniz onu ödersiniz.",
+    "globalInfrastructure": "Küresel Altyapı",
+    "globalInfrastructureDesc": "EU'da (Frankfurt) konuşlandırılmış, Cloudflare aracılığıyla dünya çapında CDN kapsamı.",
+    "readyToStart": "Başlamaya hazır mısınız?",
+    "startFree": "Ücretsiz Başlayın",
+    "contactUs": "Bize Ulaşın"
   },
   "error": {
     "title": "Bir şeyler yanlış gitti",
