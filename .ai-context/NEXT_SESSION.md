@@ -1,8 +1,8 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 07:25 GMT+8
-> **Son commit:** pending
-> **Son oturum:** Oturum 124 — Görsel & UX Düzeltmeleri
+> **Son güncelleme:** 2026-05-12 07:40 GMT+8
+> **Son commit:** b4692f57 (main)
+> **Son oturum:** Oturum 124 — Görsel & UX Düzeltmeleri (8 commit)
 
 ## Hemen Başla
 
@@ -10,32 +10,32 @@
 2. `MEMORY.md` oku — proje durumunu öğren
 3. `IMPLEMENTATION-PLAN.md` bak — yol haritası
 
-## 📊 Güncel İlerleme (2026-05-12 07:25)
+## 📊 Güncel İlerleme (2026-05-12 07:40)
 
 | Kategori | Tamamlanan | Kalan | Yüzde |
 |----------|-----------|-------|-------|
 | AŞAMA 1 Kritik Güvenlik | 22 | 0 | 100% |
 | AŞAMA 2 Yüksek Güvenlik | 22 | 12 | 65% |
 | AŞAMA 3 Admin Panel | 30 | 20 | 60% |
-| AŞAMA 4 Frontend | 28 | 7 | 80% |
+| AŞAMA 4 Frontend | 32 | 5 | 86% |
 | AŞAMA 5 Database | 22 | 0 | 100% |
-| **Toplam** | **174** | **214** | **45%** |
+| **Toplam** | **178** | **210** | **46%** |
 
-## ✅ Son Oturumda Yapılanlar (Oturum 124)
+## ✅ Son Oturumda Yapılanlar (Oturum 124 — 8 commit)
 
-### Görsel & UX Düzeltmeleri
-1. **Footer eksikliği** — 13 public sayfaya Footer eklendi (pricing, about, contact, security, faq, terms, privacy, get-started, what-is-a-webhook, startups, providers/*)
-2. **OnboardingWizard i18n** — Tüm hardcoded İngilizce metinler Türkçe'ye çevrildi (wizard steps, use cases, buttons, checklist)
-3. **ThemeToggle i18n** — "Switch to dark/light mode" aria-label Türkçe'ye çevrildi
-4. **AuthGuard i18n** — "Loading..." ve "Redirecting..." Türkçe'ye çevrildi
-5. **Homepage navbar** — Giriş durumuna göre conditional rendering (giriş yapınca "Panel →", yapınca "Giriş Yap" / "Ücretsiz Kayıt Ol")
-6. **Homepage hero CTA** — Giriş yapınca "Panele Git →", yapınca "Ücretsiz başlayın"
-7. **Footer çevirileri** — Pricing, Compare, Security, Startups, Newsletter vb. Türkçe'ye çevrildi
-8. **Admin error messages** — "Internal server error" yerine Türkçe "İstatistikler yüklenemedi" kullanıldı
-9. **Admin revenue error** — Aynı düzeltme
-
-### Tespit Edilen Backend Sorunları (Düzeltilemedi)
-- `/v1/admin/stats` ve `/v1/admin/revenue` → DATABASE_ERROR (Neon DB query uyumsuzluğu)
+1. Footer eksikliği — 13 public sayfaya Footer eklendi
+2. OnboardingWizard i18n — Tüm hardcoded EN → Türkçe
+3. ThemeToggle i18n — aria-label Türkçe'ye çevrildi
+4. AuthGuard i18n — Loading/redirecting mesajları Türkçe
+5. Homepage navbar — Conditional rendering (login durumuna göre)
+6. Homepage hero CTA — Conditional "Panele Git →" / "Ücretsiz başlayın"
+7. Homepage stats — "Deliveries/Success Rate/Avg Latency" → i18n
+8. Footer çevirileri — 10+ key Türkçe'ye çevrildi
+9. Admin error messages — Raw API error → i18n Türkçe mesaj
+10. Dashboard hardcoded strings — Endpoints, Billing, Playground, Portal-customize
+11. About/Contact/Security/What-is-a-webhook/Startups i18n
+12. PublicNavbar — Yeni shared component, 12 sayfaya uygulandı
+13. Analytics pie chart labels i18n
 
 ## 📋 Sıradaki Öncelikler
 
@@ -44,7 +44,7 @@
 |---|-------|---------|
 | 133 | router.push locale prefix (3 sayfa) | 🔴 |
 | 134 | Hardcoded locale regex düzelt | 🔴 |
-| 142 | Hardcoded strings — kalan sayfalar (14+ sayfa) | 🟡 |
+| 142 | Hardcoded strings — kalan dashboard sayfaları | 🟡 |
 | 147 | Toast messages i18n | 🟡 |
 | 153 | Loading states standardize | 🟡 |
 
@@ -62,6 +62,9 @@
 | 67 | Plana Göre Kullanıcılar grafik | 🟡 |
 | 78-80 | Combobox, pagination, sortable | 🟡 |
 | 84-92 | Revenue chart improvements | 🟡 |
+
+### Backend Sorunları
+- `/v1/admin/stats` ve `/v1/admin/revenue` → DATABASE_ERROR (Neon DB query uyumsuzluğu)
 
 ## Kritik Hatırlatmalar
 - **Oturum süresi:** 1 saat — işleri batch'le, sık commit yap
