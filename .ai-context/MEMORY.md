@@ -426,3 +426,16 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - CM6 editörü manipüle edilemedi, find/replace çalışmadı
 - **KALDIĞI YER**: Bir sonraki session'da ya PAT workflow scope ile push et ya da Servet manuel yapsın
 - Local branch `fix/otel-deploy-env-vars` hazır (değişiklikler kayıtlı)
+
+## Oturum 110 (2026-05-11 18:10 - 18:25) 🔄
+- **OpenClaw altıncı oturum** — Servet SDK güncelleme istedi
+- **Java kuruldu** — JDK 17.0.12 (tarball, apt mirror çalışmıyor)
+- **OpenAPI spec fix** — `/playground` endpoint'inde array items eksikti, düzeltildi
+- **11 SDK yeniden üretildi** — openapi-generator-cli 7.22.0 ile
+  - Node: 132, Python: 270, Go: 166, Rust: 133, Ruby: 265
+  - Java: 276, Kotlin: 275, PHP: 265, C#: 284, Elixir: 137, Swift: 142
+  - Toplam: 2245 source file
+- **SDK kapsamı:** 0.2.0 (15 method) → 0.3.0 (116 endpoint全覆盖)
+  - auth, billing, alerts, analytics, teams, notifications, schemas, inbound, portal, custom-domains, admin, audit-log, templates, routing, rate-limits, sso, oauth, embed, simulator, status, events, endpoint-health
+- **Commit:** `cf14308` — main branch, push başarılı
+- **Kalan işler:** publish to registries (npm, PyPI, crates.io, etc.) — Servet'in registry erişimi gerek

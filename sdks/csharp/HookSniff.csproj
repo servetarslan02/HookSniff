@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <RootNamespace>HookSniff</RootNamespace>
         <AssemblyName>HookSniff</AssemblyName>
-        <Version>0.2.0</Version>
+        <Version>0.3.0</Version>
         <Description>Official C# client for HookSniff webhook delivery service</Description>
         <Authors>HookSniff</Authors>
         <Company>HookSniff</Company>
