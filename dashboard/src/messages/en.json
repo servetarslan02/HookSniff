@@ -256,7 +256,8 @@
     "avgLatency": "Avg Latency",
     "p95Latency": "P95 Latency",
     "consecutiveFailures": "{count} consecutive failure{plural}",
-    "lastFailure": "Last failure {time}"
+    "lastFailure": "Last failure {time}",
+    "failedToLoad": "Failed to load health data"
   },
   "alerts": {
     "title": "Alert Rules",
@@ -1275,7 +1276,8 @@
     "rotateTitle": "Rotate API Key?",
     "rotateDesc": "The old key will stop working immediately. You’ll receive a new key to replace it.",
     "deleteTitle": "Delete API Key?",
-    "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access."
+    "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access.",
+    "failedToLoad": "Failed to load API keys"
   },
   "onboarding": {
     "welcome": "Welcome to HookSniff! 🪝",
