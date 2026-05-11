@@ -1,5 +1,8 @@
 import { useTranslations } from 'next-intl';
 
+// Force SSR — SSG output was missing on Vercel for this page
+export const dynamic = 'force-dynamic';
+
 // Force redeploy — docs/api page fix
 export default function ApiReferencePage() {
   const t = useTranslations('docs');
