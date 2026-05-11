@@ -19,6 +19,29 @@ public class Endpoints
         return resp?.Data ?? new List<Endpoint>();
     }
 
+    /// <summary>List endpoints with pagination parameters.</summary>
+    public async Task<Page<Endpoint>> ListAsync(int limit, int offset)
+    {
+        var req = new Request("GET", "/v1/endpoints");
+        req.SetQueryParams(new Dictionary<string, object?>
+        {
+            ["limit"] = limit,
+            ["offset"] = offset
+        });
+        var resp = await req.SendAsync<EndpointListResponse>(_ctx);
+        return new Page<Endpoint>
+        {
+            Data = resp?.Data ?? new List<Endpoint>(),
+            HasMore = resp?.HasMore ?? false
+        };
+    }
+
+    /// <summary>Collect all endpoints across all pages.</summary>
+    public async Task<List<Endpoint>> ListAllAsync(int limit = Pagination.DefaultLimit)
+    {
+        return await Pagination.CollectAllAsync<Endpoint>(async (l, o) => await ListAsync(l, o), limit);
+    }
+
     /// <summary>Get a single endpoint by ID.</summary>
     public async Task<Endpoint> GetAsync(string endpointId)
     {

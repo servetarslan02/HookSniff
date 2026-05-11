@@ -2,9 +2,13 @@
 //!
 //! Send, list, get, replay, and batch webhooks.
 
+use crate::pagination::{Page, PaginatedIterator};
 use crate::request::{HookSniffRequest, HookSniffRequestContext, HttpMethod};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+const DEFAULT_PAGE_LIMIT: u32 = 50;
+const DEFAULT_MAX_PAGES: u32 = 100;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WebhookSendInput {
@@ -76,6 +80,22 @@ impl Webhooks {
     pub fn list(&self) -> Result<Vec<WebhookOutput>, Box<dyn std::error::Error>> {
         let req = HookSniffRequest::new(HttpMethod::Get, "/v1/webhooks");
         req.send(&self.ctx)
+    }
+
+    /// List all webhooks with pagination
+    pub fn list_all(&self) -> Result<Vec<WebhookOutput>, Box<dyn std::error::Error>> {
+        let ctx = self.ctx.clone();
+        let mut iter = PaginatedIterator::new(
+            move |limit, offset| {
+                let mut req = HookSniffRequest::new(HttpMethod::Get, "/v1/webhooks");
+                req.set_query_param("limit", &limit.to_string());
+                req.set_query_param("offset", &offset.to_string());
+                req.send::<Page<WebhookOutput>>(&ctx)
+            },
+            DEFAULT_PAGE_LIMIT,
+            DEFAULT_MAX_PAGES,
+        );
+        iter.collect_all()
     }
 
     /// Get a webhook by ID

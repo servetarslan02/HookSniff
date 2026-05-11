@@ -19,6 +19,29 @@ public class Teams
         return resp?.Data ?? new List<Team>();
     }
 
+    /// <summary>List teams with pagination parameters.</summary>
+    public async Task<Page<Team>> ListAsync(int limit, int offset)
+    {
+        var req = new Request("GET", "/v1/teams");
+        req.SetQueryParams(new Dictionary<string, object?>
+        {
+            ["limit"] = limit,
+            ["offset"] = offset
+        });
+        var resp = await req.SendAsync<TeamListResponse>(_ctx);
+        return new Page<Team>
+        {
+            Data = resp?.Data ?? new List<Team>(),
+            HasMore = resp?.HasMore ?? false
+        };
+    }
+
+    /// <summary>Collect all teams across all pages.</summary>
+    public async Task<List<Team>> ListAllAsync(int limit = Pagination.DefaultLimit)
+    {
+        return await Pagination.CollectAllAsync<Team>(async (l, o) => await ListAsync(l, o), limit);
+    }
+
     /// <summary>Get team details.</summary>
     public async Task<Team> GetAsync(string teamId)
     {
