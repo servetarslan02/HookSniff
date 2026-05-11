@@ -353,8 +353,8 @@ async fn invite_member(
     // Audit log — MEMBER_INVITE
     {
         let tid = id.to_string();
-        let _ = crate::audit_event!(pool, customer.id, "MEMBER_INVITE", "team", Some(&tid),
-            serde_json::json!({"email": &req.email, "role": role}));
+        let _ = crate::audit::log_action(&pool, customer.id, "MEMBER_INVITE", "team", Some(&tid),
+            Some(serde_json::json!({"email": &req.email, "role": role})), None, None).await;
     }
 
     // Note: token is NOT returned in response — it's sent via email only
