@@ -6,6 +6,7 @@ use chrono::{Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+use crate::audit_log;
 use crate::billing::provider::{PaymentProvider, PaymentProviderImpl};
 use crate::billing::stripe;
 use crate::billing::Plan;
@@ -98,6 +99,12 @@ async fn cancel_subscription(
         customer.id,
         customer.plan
     );
+
+    // Audit log — SUBSCRIPTION_CANCEL
+    {
+        let rid = customer.id.to_string();
+        let _ = audit_log!(pool, customer.id, "SUBSCRIPTION_CANCEL", "billing", Some(&rid));
+    }
 
     Ok(Json(serde_json::json!({
         "message": "Your subscription will be cancelled at the end of the current billing period.",
@@ -235,6 +242,13 @@ async fn upgrade_plan(
 
             let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
 
+            // Audit log — PLAN_CHANGE
+            {
+                let rid = customer.id.to_string();
+                let _ = audit_log!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
+                    serde_json::json!({"new_plan": new_plan.as_str(), "provider": provider_name}));
+            }
+
             Ok(Json(UpgradeResponse {
                 checkout_url: Some(result.checkout_url),
                 provider: provider_name.to_string(),
@@ -262,6 +276,13 @@ async fn upgrade_plan(
                     .await?;
 
             let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
+
+            // Audit log — PLAN_CHANGE
+            {
+                let rid = customer.id.to_string();
+                let _ = audit_log!(pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
+                    serde_json::json!({"new_plan": new_plan.as_str(), "provider": "stripe"}));
+            }
 
             Ok(Json(UpgradeResponse {
                 checkout_url: session.url,

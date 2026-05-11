@@ -8,6 +8,7 @@ use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
 use crate::auth::jwt;
+use crate::audit_log;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::middleware::{
@@ -792,6 +793,12 @@ async fn confirm_2fa(
 
     tracing::info!("✅ 2FA enabled for customer {}", customer.id);
 
+    // Audit log — 2FA_ENABLE
+    {
+        let rid = customer.id.to_string();
+        let _ = audit_log!(pool, customer.id, "2FA_ENABLE", "auth", Some(&rid));
+    }
+
     Ok(Json(
         serde_json::json!({"message": "Two-factor authentication has been enabled."}),
     ))
@@ -823,6 +830,12 @@ async fn disable_2fa(
     .await?;
 
     tracing::info!("✅ 2FA disabled for customer {}", customer.id);
+
+    // Audit log — 2FA_DISABLE
+    {
+        let rid = customer.id.to_string();
+        let _ = audit_log!(pool, customer.id, "2FA_DISABLE", "auth", Some(&rid));
+    }
 
     Ok(Json(
         serde_json::json!({"message": "Two-factor authentication has been disabled."}),

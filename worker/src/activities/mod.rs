@@ -12,8 +12,6 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::signing;
-
 // ---------------------------------------------------------------------------
 // Activity input/output types
 // ---------------------------------------------------------------------------
