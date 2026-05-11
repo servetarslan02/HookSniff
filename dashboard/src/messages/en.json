@@ -67,7 +67,9 @@
     "notifications": "Notifications",
     "toggleNav": "Toggle navigation",
     "deleteTransform": "Delete transform",
-    "logo": "Logo"
+    "logo": "Logo",
+    "processing": "Processing...",
+    "copy": "Copy"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -2231,5 +2233,14 @@
     "successfully": "Successfully",
     "failedToLoad": "Failed to load"
   },
-  "cta": "Join developers who trust HookSniff for their webhook delivery."
+  "cta": "Join developers who trust HookSniff for their webhook delivery.",
+  "emailVerification": {
+    "title": "Please verify your email address",
+    "description": "We sent a verification link to",
+    "sent": "Verification email sent! Check your inbox.",
+    "failed": "Failed to send. Try again later.",
+    "networkError": "Network error.",
+    "sending": "Sending...",
+    "resend": "Resend"
+  }
 }
