@@ -8,7 +8,7 @@ setup(
     long_description_content_type="text/markdown",
     author="HookSniff",
     author_email="support@hooksniff.dev",
-    url="https://github.com/hooksniff/hooksniff",
+    url="https://github.com/servetarslan02/HookSniff",
     license="MIT",
     packages=find_packages(),
     python_requires=">=3.8",
