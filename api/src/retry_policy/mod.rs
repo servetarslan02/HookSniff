@@ -445,6 +445,23 @@ fn format_duration(ms: i64) -> String {
 // Tests
 // ---------------------------------------------------------------------------
 
+
+/// Check if an HTTP status code is retryable.
+///
+/// - 429 (Too Many Requests) → always retry
+/// - 5xx (Server Errors) → always retry
+/// - 408 (Request Timeout) → retry
+/// - Other 4xx (Client Errors) → do NOT retry (400, 401, 403, 404, etc.)
+pub fn is_retryable_status(status: u16) -> bool {
+    match status {
+        429 => true,        // Rate limited — retry with backoff
+        408 => true,        // Timeout — retry
+        500..=599 => true,  // Server errors — retry
+        400..=499 => false, // Client errors — don't retry
+        _ => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
