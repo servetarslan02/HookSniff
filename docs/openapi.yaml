@@ -1037,6 +1037,7 @@ components:
           format: uri
     EndpointHealth:
       type: object
+      description: Endpoint health metrics and status
       properties:
         endpoint_id:
           $ref: '#/components/schemas/Uuid'
@@ -1049,6 +1050,21 @@ components:
         last_failure_at:
           $ref: '#/components/schemas/DateTime'
           nullable: true
+        success_rate:
+          type: number
+          format: double
+          description: Success rate as a fraction (0.0–1.0)
+        avg_latency_ms:
+          type: number
+          description: Average delivery latency in milliseconds
+        last_delivery_at:
+          $ref: '#/components/schemas/DateTime'
+          nullable: true
+        total_deliveries:
+          type: integer
+        failed_deliveries:
+          type: integer
+      required: [endpoint_id, is_healthy]
     TestWebhookRequest:
       type: object
       properties:
