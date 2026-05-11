@@ -15,5 +15,6 @@ landing/
 k8s/
 *.ps1
 *.sh
+!entrypoint-api.sh
 .gitignore
 .DS_Store
