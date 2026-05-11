@@ -770,7 +770,6 @@ async fn logout() -> impl IntoResponse {
 async fn enable_2fa(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-    headers: HeaderMap,
     Json(req): Json<Enable2faRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Verify password
@@ -811,6 +810,7 @@ async fn enable_2fa(
 async fn confirm_2fa(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    headers: HeaderMap,
     Json(req): Json<Confirm2faRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let secret = customer.totp_secret.as_ref().ok_or(AppError::BadRequest(
@@ -1000,7 +1000,9 @@ async fn change_password(
     // Audit log — PASSWORD_CHANGE
     {
         let rid = customer.id.to_string();
-        { let _ = crate::audit::log_action(&pool, customer.id, "PASSWORD_CHANGE", "auth", Some(&rid), None, None, None).await; }
+        let ip = extract_client_ip(&headers);
+        let ua = headers.get("user-agent").and_then(|v| v.to_str().ok()).unwrap_or("unknown").to_string();
+        let _ = crate::audit::log_action(&pool, customer.id, "PASSWORD_CHANGE", "auth", Some(&rid), None, Some(&ip), Some(&ua)).await;
     }
 
     Ok(Json(
