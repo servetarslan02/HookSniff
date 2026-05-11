@@ -8,8 +8,11 @@ extern crate url;
 extern crate reqwest;
 
 pub mod apis;
+pub mod client;
 pub mod models;
 pub mod webhook;
 pub mod request;
 pub mod pagination;
 pub mod resources;
+
+pub use client::HookSniff;

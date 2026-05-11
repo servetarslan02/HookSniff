@@ -11,10 +11,18 @@ defmodule HookSniff.Alerts do
   end
 
   @doc "List all alert rules (auto-paginate). Accepts `:limit` and `:max_pages` opts."
-  @spec list_all_rules(HookSniff.t(), keyword()) :: {:ok, list()} | {:error, term()}
-  def list_all_rules(client, opts \\ []) do
+  @spec list_all(HookSniff.t(), keyword()) :: {:ok, list()} | {:error, term()}
+  def list_all(client, opts \\ []) do
     HookSniff.Pagination.collect_all(fn limit, offset ->
-      list_rules(client, limit: limit, offset: offset)
+      case list_rules(client, limit: limit, offset: offset) do
+        {:ok, %{status: status, body: body}} when status in 200..299 ->
+          parsed = if is_binary(body), do: Jason.decode!(body), else: body
+          {:ok, %{data: Map.get(parsed, "data", []), has_more: Map.get(parsed, "has_more", false)}}
+        {:ok, %{status: status, body: body}} ->
+          {:error, "HTTP #{status}: #{inspect(body)}"}
+        {:error, _} = err ->
+          err
+      end
     end, opts)
   end
 
@@ -29,7 +37,15 @@ defmodule HookSniff.Alerts do
   @spec list_all_notifications(HookSniff.t(), keyword()) :: {:ok, list()} | {:error, term()}
   def list_all_notifications(client, opts \\ []) do
     HookSniff.Pagination.collect_all(fn limit, offset ->
-      list_notifications(client, limit: limit, offset: offset)
+      case list_notifications(client, limit: limit, offset: offset) do
+        {:ok, %{status: status, body: body}} when status in 200..299 ->
+          parsed = if is_binary(body), do: Jason.decode!(body), else: body
+          {:ok, %{data: Map.get(parsed, "data", []), has_more: Map.get(parsed, "has_more", false)}}
+        {:ok, %{status: status, body: body}} ->
+          {:error, "HTTP #{status}: #{inspect(body)}"}
+        {:error, _} = err ->
+          err
+      end
     end, opts)
   end
 

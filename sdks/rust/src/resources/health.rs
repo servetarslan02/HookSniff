@@ -12,6 +12,7 @@ pub struct HealthOutput {
     pub uptime: Option<u64>,
 }
 
+#[derive(Debug)]
 pub struct Health {
     ctx: HookSniffRequestContext,
 }

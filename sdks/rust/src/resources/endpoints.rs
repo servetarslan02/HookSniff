@@ -48,6 +48,7 @@ pub struct EndpointSecretOutput {
     pub key: String,
 }
 
+#[derive(Debug)]
 pub struct Endpoints {
     ctx: HookSniffRequestContext,
 }
