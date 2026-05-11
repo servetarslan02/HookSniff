@@ -51,6 +51,25 @@ export default function AdminRevenuePage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('revenue')}</h1>
+        </div>
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+          <button
+            onClick={fetchRevenue}
+            className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+          >
+            {tc('retry')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const monthlyData = revenue?.monthly_revenue || [];
   const planData = revenue?.revenue_by_plan?.map((item) => ({
     name: item.plan.charAt(0).toUpperCase() + item.plan.slice(1),
@@ -63,7 +82,7 @@ export default function AdminRevenuePage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-          Financial metrics and revenue breakdown
+          {t('revenueDesc')}
         </p>
       </div>
 
@@ -71,20 +90,20 @@ export default function AdminRevenuePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
           label={t('mrr')}
-          value={`$${(revenue?.mrr || 0).toLocaleString()}`}
-          icon={<span className="text-lg">💰</span>}
+          value={`₺${(revenue?.mrr || 0).toLocaleString()}`}
+          icon={<span className="text-lg" aria-hidden="true">💰</span>}
           color="violet"
         />
         <StatCard
           label={t('totalRevenueLabel')}
-          value={`$${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`}
-          icon={<span className="text-lg">📈</span>}
+          value={`₺${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`}
+          icon={<span className="text-lg" aria-hidden="true">📈</span>}
           color="emerald"
         />
         <StatCard
           label={t('churnRate')}
           value={revenue?.churn_rate?.toFixed(1) || '0'}
-          icon={<span className="text-lg">📉</span>}
+          icon={<span className="text-lg" aria-hidden="true">📉</span>}
           color="red"
           isPercent
         />
@@ -106,7 +125,7 @@ export default function AdminRevenuePage() {
                   <YAxis
                     tick={{ fontSize: 12 }}
                     className="text-gray-500 dark:text-slate-400"
-                    tickFormatter={(v) => `$${v}`}
+                    tickFormatter={(v) => `₺${v}`}
                   />
                   <Tooltip
                     contentStyle={{
@@ -115,7 +134,7 @@ export default function AdminRevenuePage() {
                       borderRadius: '12px',
                       color: 'white',
                     }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
+                    formatter={(value: number) => [`₺${value.toLocaleString()}`, t("revenue")]}
                   />
                   <Bar
                     dataKey="revenue"
@@ -160,7 +179,7 @@ export default function AdminRevenuePage() {
                         borderRadius: '12px',
                         color: 'white',
                       }}
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
+                      formatter={(value: number) => [`₺${value.toLocaleString()}`, t("revenue")]}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -177,10 +196,10 @@ export default function AdminRevenuePage() {
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        ${entry.value.toLocaleString()}
+                        ₺${entry.value.toLocaleString()}
                       </span>
-                      <span className="text-xs text-gray-400 dark:text-slate-500 ml-1">
-                        ({entry.count} users)
+                      <span className="text-xs text-gray-500 dark:text-slate-400 ml-1">
+                        ({entry.count} {t('users')})
                       </span>
                     </div>
                   </div>
@@ -188,7 +207,7 @@ export default function AdminRevenuePage() {
               </div>
             </>
           ) : (
-            <p className="text-gray-400 dark:text-slate-500 text-sm">{t('noRevenue')}</p>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noRevenue')}</p>
           )}
         </div>
       </div>
