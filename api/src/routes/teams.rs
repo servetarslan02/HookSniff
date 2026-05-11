@@ -475,8 +475,8 @@ async fn change_role(
     // Audit log — ROLE_CHANGE
     {
         let tid = team_id.to_string();
-        let _ = crate::audit_event!(pool, customer.id, "ROLE_CHANGE", "team", Some(&tid),
-            serde_json::json!({"user_id": uid.to_string(), "new_role": &req.role}));
+        let _ = crate::audit::log_action(&pool, customer.id, "ROLE_CHANGE", "team", Some(&tid),
+            Some(serde_json::json!({"user_id": uid.to_string(), "new_role": &req.role})), None, None).await;
     }
 
     Ok(Json(serde_json::json!({
