@@ -49,7 +49,7 @@ export default function SearchPage() {
       params.set('page', p.toString());
       params.set('per_page', '20');
 
-      const data = await apiFetch<SearchResponse>(`/search?${params}`, { token });
+      const data = await apiFetch<SearchResponse>(`/search?${params}`, { token: token || undefined });
       setResults(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : t('searchFailed'));
