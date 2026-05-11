@@ -1,5 +1,7 @@
 package hooksniff
 
+import "fmt"
+
 // WebhooksResource manages webhook deliveries.
 type WebhooksResource struct {
 	client *Client
@@ -70,16 +72,7 @@ func (r *WebhooksResource) Batch(input WebhookBatchInput) (*BatchOutput, error) 
 func (r *WebhooksResource) List(limit, offset int) (*DeliveryListOutput, error) {
 	path := "/v1/webhooks"
 	if limit > 0 || offset > 0 {
-		path += "?"
-		if limit > 0 {
-			path += "limit=" + itoa(limit)
-		}
-		if offset > 0 {
-			if limit > 0 {
-				path += "&"
-			}
-			path += "offset=" + itoa(offset)
-		}
+		path += fmt.Sprintf("?limit=%d&offset=%d", limit, offset)
 	}
 	body, err := r.client.doGet(path)
 	if err != nil {
