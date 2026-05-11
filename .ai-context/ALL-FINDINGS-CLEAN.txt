@@ -1,0 +1,1519 @@
+
+================================================================================
+📄 admin/ADMIN-DEEP-AUDIT-MASTER.md (3 bulgu)
+================================================================================
+
+  1. 🔴 Sağlık kontrolü API çalışmıyor — 4 servis sürekli "Checking..."/"unknown"
+  2. 🔴 Toggle'lar erişilebilir değil: `role="switch"`, `aria-checked` eksik
+  3. 🔴 Tüm label'lar boş `htmlFor` — screen reader bağlantı kuramıyor
+
+
+================================================================================
+📄 admin/admin-overview.md (1 bulgu)
+================================================================================
+
+  1. 1. **"Plana Göre Kullanıcılar" kartı çok boş** 🟡
+
+
+================================================================================
+📄 admin/admin-revenue.md (35 bulgu)
+================================================================================
+
+  1. 2 | Sidebar - Alt başlık | `HookSniff Management` | `HookSniff Yönetimi` | 🔴 Çevrilmedi
+  2. 3 | Sidebar - Nav link | `Overview` | `Genel Bakış` | 🔴 Çevrilmedi
+  3. 4 | Sidebar - Nav link | `Users` | `Kullanıcılar` | 🔴 Çevrilmedi
+  4. 5 | Sidebar - Nav link | `Revenue` | `Gelir` | 🔴 Çevrilmedi
+  5. 6 | Sidebar - Nav link | `System` | `Sistem` | 🔴 Çevrilmedi
+  6. 7 | Sidebar - Nav link | `Settings` | `Ayarlar` | 🔴 Çevrilmedi
+  7. 8 | Sidebar - Link | `Back to Dashboard` | `Kontrol Paneline Dön` | 🔴 Çevrilmedi
+  8. 9 | Header - Başlık | `Revenue` | `Gelir` | 🔴 Çevrilmedi
+  9. 10 | Header - Badge | `Admin` | `Yönetici` | 🔴 Çevrilmedi
+  10. 11 | Main - H1 | `Revenue Dashboard` | `Gelir Paneli` | 🔴 Çevrilmedi
+  11. 12 | Main - Açıklama | `Financial metrics and revenue breakdown` | `Finansal metrikler ve gelir dağılımı` | 🔴 Çevrilmedi
+  12. 13 | Button | `Logout` | `Çıkış Yap` | 🔴 Çevrilmedi
+  13. 14 | Button Aria Label | `Switch to dark mode` | `Karanlık moda geç` | 🔴 Çevrilmedi
+  14. 15 | Button Aria Label | `Open sidebar` | `Yan paneli aç` | 🔴 Çevrilmedi
+  15. 1 | **Mobile responsive bozuk** | 375px viewport'ta kartlar hala 230px genişliğinde ve viewport dışına taşıyor. `grid-cols-1` breakpoint'i çalışmıyor veya CSS override ediliyor. | 🔴 Kritik
+  16. 2 | **Sidebar mobile'da gizli ama içerik responsive değil** | Sidebar gizlenmiş (`left: -256px`) ama ana içerik hala `left: 288px`'den başlıyor - sol padding/sidebar offset'i mobile'da düzeltilmemiş. | 🔴 Kritik
+  17. 3 | **Chart container sabit genişlik** | Recharts container 423px sabit genişlikte, viewport küçüldüğünde responsive olmuyor. | 🔴 Kritik
+  18. 4 | **Pie chart "Gelir verisi yok" kartı** | Boş state mesajı kart içinde dikey olarak ortalanmamış, üst kısma yapışık. | 🟡 Orta
+  19. 5 | **H1 heading hierarchy** | Sayfada iki tane `h1` var (header "Revenue" + main "Revenue Dashboard"). Semantic HTML için biri `h2` olmalı. | 🟡 Orta
+  20. 1 | **Boş çizgi grafik** | Grafik area'sı tamamen boş, sadece grid çizgileri var. X ve Y ekseni etiketleri hiç render edilmemiş. Veri olsa bile eksensiz grafik anlamsız olur. | 🔴 Kritik
+  21. 2 | **Pie chart tamamen yok** | "Plana Göre Gelir" kartında sadece "Gelir verisi yok" yazısı var. Boş state için bir placeholder ikon/grafik olmalı. | 🟡 Orta
+  22. 3 | **Chart SVG `<title>` boş** | Erişilebilirlik için grafik başlığı boş bırakılmış. | 🟡 Orta
+  23. 4 | **Chart SVG `<desc>` boş** | Grafik açıklaması boş. | 🟡 Orta
+  24. 5 | **Legend yok** | Çizgi grafikte legend/anahtar bulunmuyor. Hangi veri serisinin gösterildiği belirsiz. | 🟡 Orta
+  25. 1 | **Grafik alt text yok** | SVG `<title>` ve `<desc>` boş. Screen reader kullanıcıları grafiği anlayamaz. | 🔴 Kritik
+  26. 2 | **KPI kartları aria-label yok** | Kartlar `role="generic"` olarak render edilmiş. Screen reader "$0 Aylık Tekrarlayan Gelir" gibi bir şey okuyabilir ama semantik yapı zayıf. | 🟡 Orta
+  27. 3 | **Aria labels İngilizce** | `aria-label="Switch to dark mode"` ve `aria-label="Open sidebar"` İngilizce kalmış. | 🔴 Kritik
+  28. 4 | **Pie chart erişilebilirliği** | Boş state mesajı sadece `<p>` içinde. ARIA live region veya role="status" yok. | 🟡 Orta
+  29. 5 | **Alert element boş** | `<div role="alert">` boş render edilmiş. Ya kaldırılmalı ya da anlamlı içerikle doldurulmalı. | 🟡 Orta
+  30. **A. Çeviri** | 3/10 | 🔴 Kritik - Sidebar, header ve ana içerik İngilizce
+  31. **B. Layout & Spacing** | 4/10 | 🔴 Kritik - Mobile responsive tamamen bozuk
+  32. **C. Görsel Hatalar** | 6/10 | 🟡 Orta - Boş grafikler, eksik axis etiketleri
+  33. **D. Erişilebilirlik** | 4/10 | 🔴 Kritik - Grafik alt text yok, aria labels İngilizce
+  34. **E. Fonksiyonel** | 3/10 | 🔴 Kritik - Tarih seçici, veri yenileme yok
+  35. **GENEL** | **4/10** | 🔴 **Kritik iyileştirmeler gerekli**
+
+
+================================================================================
+📄 admin/admin-settings.md (49 bulgu)
+================================================================================
+
+  1. Header başlık | "Settings" | "Ayarlar" | 🔴 Yüksek
+  2. Header rozet | "Admin" | "Yönetici" | 🟡 Orta
+  3. Logout butonu | "Logout" | "Çıkış" | 🟡 Orta
+  4. Sayfa açıklama | "Configure platform-wide defaults and limits" | "Platform genelinde varsayılan ayarları ve limitleri yapılandırın" | 🔴 Yüksek
+  5. Default Plan label | "Default Plan" | "Varsayılan Plan" | 🔴 Yüksek
+  6. Select seçeneği 1 | "Free" | "Ücretsiz" | 🔴 Yüksek
+  7. Plan Limitleri - label 1 | "Max Endpoints" | "Maksimum Uç Nokta" veya "Maks. Endpoint" | 🔴 Yüksek
+  8. Plan Limitleri - label 2 | "Max Webhooks/Month" | "Maks. Webhook/Ay" | 🔴 Yüksek
+  9. Plan Limitleri - label 3 | "Rate Limit (req/min)" | "Hız Limiti (istek/dk)" | 🔴 Yüksek
+  10. Plan Limitleri - label 4 | "Retention (days)" | "Süre (gün)" | 🔴 Yüksek
+  11. Tekrar Deneme - label | "Max Retry Attempts" | "Maks. Tekrar Deneme Sayısı" | 🔴 Yüksek
+  12. Hata mesajı | "Failed to save settings" | "Ayarlar kaydedilemedi" | 🔴 Yüksek
+  13. Label-input ilişkisi | Label'lar `<label>` elementi olarak tanımlanmış ama `htmlFor` attribute'u boş - input ile programatik bağlantı yok | 🔴 Yüksek
+  14. Toggle butonları | Toggle'lar `<button>` elementi, switch davranışı için `role="switch"` eksik | 🔴 Yüksek
+  15. Label-input arası: `mb-1` / `mb-1.5` - Küçük tutarsızlık 🟡
+  16. Number input (Max Retry) | `px-4 py-3 rounded-xl` | 🔴 Farklı padding ve radius!
+  17. Dark mode için `dark:focus-visible` kuralları tanımlı (ama boş!) 🔴
+  18. **Sorun:** `role="alert"` attribute'u boş alert elementinde var ama asıl hata mesajı içeren element'te yok 🔴
+  19. **Sorun:** Hata mesajı İngilizce 🔴
+  20. Success toast/banner elementi DOM'da görünmüyor 🔴
+  21. "Default Plan" | ❌ Boş | 🔴
+  22. "Max Endpoints" (x2) | ❌ Boş | 🔴
+  23. "Max Webhooks/Month" (x2) | ❌ Boş | 🔴
+  24. "Rate Limit (req/min)" (x2) | ❌ Boş | 🔴
+  25. "Retention (days)" (x2) | ❌ Boş | 🔴
+  26. "Max Retry Attempts" | ❌ Boş | 🔴
+  27. Toggle - Bakım Modu | ❌ Yok | ❌ Yok | ❌ Yok | 🔴 Kritik
+  28. Toggle - Kayıtlar Etkin | ❌ Yok | ❌ Yok | ❌ Yok | 🔴 Kritik
+  29. Number input'lar | - | ❌ Yok | ❌ Yok | 🔴
+  30. Select | - | ❌ Yok | ❌ Yok | 🟡
+  31. Skip-to-content link'i yok 🟡
+  32. Dark mode'da label metinleri (`text-slate-400`) kontrast oranı düşük olabilir 🟡
+  33. **Sorun:** Toggle durumu görsel olarak değişiyor ama `aria-checked` attribute'u güncellenmiyor 🔴
+  34. **Sorun:** Toggle'lar `type="submit"` olarak tanımlanmış - form submit tetikleyebilir! 🔴
+  35. **Sorun:** Seçenek metinleri İngilizce 🔴
+  36. Max Endpoints (Free) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  37. Max Webhooks/Month (Free) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  38. Rate Limit (Free) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  39. Retention (Free) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  40. Max Endpoints (Pro) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  41. Max Webhooks/Month (Pro) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  42. Rate Limit (Pro) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  43. Retention (Pro) | ❌ | ❌ | ❌ | 🔴 Sınır yok
+  44. **Sorun:** API hatası alınıyor ("Failed to save settings") 🔴
+  45. **Sorun:** Hata mesajı İngilizce 🔴
+  46. **Sorun:** Buton loading state'i görünmüyor (spinner yok) 🟡
+  47. **Sorun:** Mesaj İngilizce ("Failed to save settings") 🔴
+  48. **Sorun:** `role="alert"` eksik 🔴
+  49. **Sorun:** Otomatik kapanma süresi belirsiz 🟡
+
+
+================================================================================
+📄 admin/admin-system.md (37 bulgu)
+================================================================================
+
+  1. 1 | Sayfa alt başlığı | `Monitor infrastructure services and system status` | `Altyapı hizmetlerini ve sistem durumunu izleyin` | 🔴 Yüksek
+  2. 2 | Son kontrol timestamp | `Last checked: 5/10/2026, 4:59:33 PM · Auto-refresh every 15s` | `Son kontrol: 10.05.2026, 16:59:33 · Her 15s'de bir otomatik yenileme` | 🔴 Yüksek
+  3. 3 | Servis durumu (tüm kartlar) | `Checking...` | `Kontrol ediliyor...` | 🔴 Yüksek
+  4. 4 | Servis durumu badge (tüm kartlar) | `unknown` | `bilinmiyor` | 🔴 Yüksek
+  5. 5 | Sidebar link: Overview | `Overview` | `Genel Bakış` | 🟡 Orta
+  6. 6 | Sidebar link: Users | `Users` | `Kullanıcılar` | 🟡 Orta
+  7. 7 | Sidebar link: Revenue | `Revenue` | `Gelir` | 🟡 Orta
+  8. 8 | Sidebar link: System | `System` | `Sistem` | 🟡 Orta
+  9. 9 | Sidebar link: Settings | `Settings` | `Ayarlar` | 🟡 Orta
+  10. 10 | Sidebar: Admin Panel | `Admin Panel` | `Yönetim Paneli` | 🟡 Orta
+  11. 11 | Sidebar: HookSniff Management | `HookSniff Management` | `HookSniff Yönetimi` | 🟡 Orta
+  12. 12 | Back link | `← Back to Dashboard` | `← Gösterge Paneline Dön` | 🟡 Orta
+  13. 13 | Logout butonu | `Logout` | `Çıkış` | 🟡 Orta
+  14. 14 | Header badge | `Admin` | `Yönetici` | 🟢 Düşük
+  15. 15 | Light mode butonu | `Switch to light mode` | `Açık moda geç` (aria-label) | 🟢 Düşük
+  16. 1 | Uyarı banner'ı dar | "Sistem Sorunları Tespit Edildi" banner'ı sol üstte sıkışık, sağa uzanmıyor | 🟡 Orta
+  17. 2 | Altyapı tablosu header eksik | Tablo başlık satırı yok (Sağlayıcı, Kapasite, Rol) | 🟡 Orta
+  18. 3 | Sidebar genişliği sabit | Dar ekranlarda sidebar içerik alanı kısalmış olabilir | 🟢 Düşük
+  19. 4 | Kart yükseklikleri eşit değil | İçerik miktarına göre kart yükseklikleri değişebilir | 🟢 Düşük
+  20. 1 | Durum rengi belirsiz | "unknown" durumu için renk belirsiz - sarı/gri olmalı ama snapshot'tan doğrulanamadı | 🟡 Orta
+  21. 2 | Loading spinner eksik | "Checking..." durumunda spinner/animasyon yok, sadece statik metin | 🟡 Orta
+  22. 3 | Hata ikonu eksik | "Sistem Sorunları Tespit Edildi" banner'ında ⚠️ ikonu var ama yeterince belirgin değil | 🟢 Düşük
+  23. 4 | Uyarı banner'ı arka plan rengi | Koyu kırmızı/amber arka plan - yeterli kontrast sağlanmalı | 🟡 Orta
+  24. Operational | 🟢 Yeşil | - (servisler "unknown")
+  25. Degraded | 🟡 Sarı | -
+  26. Down | 🔴 Kırmızı | -
+  27. 1 | Renk bağımlı bilgi | Durum sadece renk + metin ile iletiliyor. Renk körlüğü olan kullanıcılar "unknown" badge'inin rengini ayırt edemeyebilir | 🔴 Yüksek
+  28. 2 | ARIA live region eksik | Servis durumu değişiklikleri screen reader'a bildirilmiyor (`aria-live="polite"` gerekli) | 🔴 Yüksek
+  29. 3 | Alert rolü eksik | "Sistem Sorunları Tespit Edildi" banner'ı `role="alert"` ile işaretlenmeli | 🟡 Orta
+  30. 4 | Tablo header eksik | Altyapı tablosu `<table>` elementi olarak oluşturulmamış, `<div>` grid. `<th>` header'lar eksik | 🟡 Orta
+  31. 5 | Servis kartı landmark | Her servis kartı `role="article"` veya uygun semantic element ile işaretlenmeli | 🟢 Düşük
+  32. 6 | Focus yönetimi | Tab ile navigasyon sırasında odak sırası mantıklı mı? (test edilemedi) | 🟢 Düşük
+  33. 1 | Sağlık kontrolü çalışmıyor | Tüm servisler sürekli "Checking..." ve "unknown" durumunda kalıyor. API sağlık endpoint'i yanıt vermiyor veya hata döndürüyor | 🔴 Kritik
+  34. 2 | Retry mekanizması görünmüyor | Sağlık kontrolü başarısız olduğunda kullanıcıya retry butonu sunulmuyor | 🟡 Orta
+  35. 3 | Hata detayı eksik | "Sistem Sorunları Tespit Edildi" banner'ı hangi servisin neden başarısız olduğunu açıklamıyor | 🟡 Orta
+  36. 4 | Loading süresi belirsiz | "Checking..." durumu ne kadar sürecek? Timeout var mı? | 🟡 Orta
+  37. 5 | Graceful degradation | Servis durumu alınamazsa, son bilinen durum gösterilmiyor | 🟡 Orta
+
+
+================================================================================
+📄 admin/api-data-flow-analysis.md (10 bulgu)
+================================================================================
+
+  1. `/v1/admin/settings` | PUT | ❌ YOK | ❌ | ❌ | 🔴 EKSIK | Frontend çağırıyor ama backend'de bu route yok!
+  2. 1 | 🔴 Eksik Route | `/admin/settings` PUT endpoint'i backend'de tanımlı değil | Settings sayfası çalışmaz | P0
+  3. 2 | 🔴 Format Uyumsuzluğu | `/admin/revenue` response formatı frontend ile uyumsuz | Revenue sayfası boş/grafik yok | P0
+  4. 3 | 🔴 Eksik Route | `/health` endpoint'i backend'de tanımlı değil (admin system page) | System health sayfası çalışmaz | P0
+  5. 4 | 🟡 Wrong localStorage Key | 401 handler'da `hooksniff_auth` siliniyor, `hooksniff_user` olmalı | Stale auth data kalabilir | P1
+  6. 5 | 🟡 Eksik Field | `EndpointSummary`'de `created_at` yok | User detail'de tarih gösterilemez | P1
+  7. 6 | 🟡 Hardcoded Revenue | `system_stats` revenue hesaplama hardcoded ($29/$99) | Gerçek fiyat farklıysa yanlış MRR | P1
+  8. 7 | 🟡 Silent Error | Admin sayfalarında boş catch blocks | Kullanıcı hata göremez | P2
+  9. 8 | 🟡 Raw fetch() | Settings/System pages raw `fetch()` kullanıyor, `apiFetch` değil | Tutarsız auth handling | P2
+  10. 9 | 🟡 No 429 Handling | Frontend'de rate limit response handling eksik | Rate limit'te UX bozulur | P2
+
+
+================================================================================
+📄 admin/css-styling-analysis.md (15 bulgu)
+================================================================================
+
+  1. 1 | 🟠 HIGH | Border radius inconsistency (5 scales mixed) | All admin pages
+  2. 2 | 🟠 HIGH | Input padding inconsistency (3 patterns) | settings/page.tsx
+  3. 3 | 🟠 HIGH | Save button color flip (gray→red) | settings/page.tsx
+  4. 4 | 🟡 MEDIUM | Gray/Slate palette minor inconsistencies | users/page.tsx
+  5. 5 | 🟡 MEDIUM | `text-[11px]` arbitrary value | admin/page.tsx
+  6. 6 | 🟡 MEDIUM | Recharts tooltip always dark | admin/page.tsx, revenue/page.tsx
+  7. 7 | 🟡 MEDIUM | Status card bg vs glass-card conflict | system/page.tsx
+  8. 8 | 🟡 MEDIUM | No max-width on wide screens (>1440px) | layout.tsx
+  9. 9 | 🟡 MEDIUM | glass-card dark mode removes blur | globals.css
+  10. 10 | 🟡 MEDIUM | Users table tight on 375px mobile | users/page.tsx
+  11. 11 | 🔵 LOW | Inline styles (acceptable — dynamic) | 3 files
+  12. 12 | 🔵 LOW | `!important` (acceptable — FOUC) | globals.css
+  13. 13 | 🔵 LOW | Transition duration inconsistency | All files
+  14. 14 | 🔵 LOW | Plan modal tight on 375px | users/page.tsx
+  15. 15 | 🔵 LOW | Recent signups may truncate on mobile | admin/page.tsx
+
+
+================================================================================
+📄 admin/performance-analysis.md (9 bulgu)
+================================================================================
+
+  1. 1 | Blog sayfasını parçala (1,922 satır → MDX) | 🔴 Yüksek | 🟡 Orta
+  2. 2 | Recharts'i dynamic import et | 🔴 Yüksek | 🟢 Kolay
+  3. 3 | 'use client' sayısını azalt (82 → ~40) | 🔴 Yüksek | 🟡 Orta
+  4. 4 | Screenshot görsellerini optimize et (WebP) | 🟡 Orta | 🟢 Kolay
+  5. 5 | Dashboard data fetching'i server'a taşı | 🟡 Orta | 🟡 Orta
+  6. 6 | Infinite animasyonları koşullu yap | 🟡 Orta | 🟢 Kolay
+  7. 7 | Admin sayfalarını route group'a al | 🟢 Düşük | 🟢 Kolay
+  8. 8 | Playground sayfasını dynamic import et | 🟢 Düşük | 🟢 Kolay
+  9. 9 | Count-up animasyonunu performans için optimize et | 🟢 Düşük | 🟢 Kolay
+
+
+================================================================================
+📄 admin/source-code-analysis.md (8 bulgu)
+================================================================================
+
+  1. 1. **🔴 P0 — Hardcode String'ler:** 84+ İngilizce string. i18n desteği var ama kullanılmamış. Locale değiştirince kırılır.
+  2. 2. **🔴 P0 — Error Boundary:** Hiçbir yerde yok. API hatası = beyaz ekran.
+  3. 3. **🔴 P1 — Settings Loading State:** Settings sayfası API'den veri çekmiyor, sadece default gösteriyor.
+  4. 4. **🟡 P2 — Sessiz Hata Yönetimi:** 3 dosyada catch bloğu boş. Kullanıcı hata olduğunu bilmiyor.
+  5. 5. **🟡 P2 — Negatif Sayı Input:** Settings'te tüm sayısal input'larda negatif değer girilebilir.
+  6. 6. **🟡 P3 — Revenue Skeleton:** Loading'de skeleton yok, sadece text.
+  7. 7. **🟡 P3 — useMemo Eksik:** Chart data her render'da yeniden oluşturuluyor.
+  8. 8. **🟡 P3 — Component Boyutu:** users/page.tsx 247 satır, bölünmeli.
+
+
+================================================================================
+📄 admin/wcag-audit.md (1 bulgu)
+================================================================================
+
+  1. Status dot: sadece renk | ❌ | Servis durumu sadece renkli nokta ile gösteriliyor (🟢🟡🔴). `text-green-700`, `text-yellow-700`, `text-red-700` renk bağımlı. Metinsel status etiketi var ("healthy"/"degraded") ama **dot renk bilgisi `aria-label` ile desteklenmemiş.** WCAG 1.4.1 Level A ihlali.
+
+
+================================================================================
+📄 backend/DEEP-API-ENDPOINTS.md (12 bulgu)
+================================================================================
+
+  1. POST | `/auth/verify-email` | ❌ Public | ❌ Rate limit YOK | ✅ token validation | 🔴 Rate limit eksik — brute force token attack
+  2. POST | `/auth/refresh` | ❌ Public (cookie/body) | ❌ Rate limit YOK | ✅ token validation | 🔴 Rate limit eksik — token brute force
+  3. POST | `/auth/2fa/verify` | ❌ Public (temp token) | ❌ Rate limit YOK | ✅ TOTP verification | 🔴 Rate limit eksik — TOTP brute force (6 digit = 1M kombinasyon)
+  4. POST | `/alerts/` | ✅ auth_middleware | ✅ Global | ⚠️ name/condition validation eksik | 🔴 `condition` string'i whitelist ile validate edilmemiş; `channels` validation eksik
+  5. POST | `/billing/webhook` | ❌ Public (Stripe) | ❌ Rate limit YOK | ⚠️ Signature verification optional (secret boşsa skip) | 🔴 Webhook secret boşsa verification bypass; brute force ile fake webhook gönderilebilir
+  6. POST | `/contact/` | ❌ Public | ❌ Rate limit YOK | ✅ basic validation (name/email/message) | 🔴 Rate limit eksik — spam attack; email validation sadece `@` ve `.` kontrolü; XSS riski yok (HTML escape)
+  7. DELETE | `/portal/api-keys/{key_id}` | ✅ auth_middleware | ✅ Global | ⚠️ key_id parametre hiç kullanılmıyor | 🔴 `_key_id` parametre ignore ediliyor — her zaman yeni key oluşturur
+  8. PUT | `/portal/notifications` | ✅ auth_middleware | ✅ Global | ⚠️ URL validation yok | 🔴 `slack_webhook_url`, `discord_webhook_url`, `webhook_url` — SSRF riski; internal URL'ler atanabilir
+  9. POST | `/inbound/:provider` | ✅ API key auth | ❌ Rate limit YOK | ✅ signature verification | 🔴 Rate limit eksik — external service flood; API key prefix lookup tek başına yeterli değil
+  10. POST | `/inbound/:provider/:endpoint_id` | ✅ API key auth | ❌ Rate limit YOK | ⚠️ Signature verification optional (config yoksa skip) | 🔴 Signature verification bypass riski — config yoksa verification atlanır
+  11. GET | `/schemas/{id}` | ✅ auth_middleware | ✅ Global | ⚠️ ownership check YOK | 🔴 Herhangi bir customer, başka customer'ın schema'sını okuyabilir
+  12. POST | `/schemas/{id}/validate` | ✅ auth_middleware | ✅ Global | ⚠️ ownership check YOK | 🔴 Same issue — cross-tenant data access
+
+
+================================================================================
+📄 backend/DEEP-DB-MIGRATIONS.md (6 bulgu)
+================================================================================
+
+  1. `customers` | `totp_secret` | **CRITICAL** — 2FA secret in plaintext
+  2. `endpoints` | `signing_secret` | **HIGH** — HMAC signing key in plaintext
+  3. `endpoints` | `old_signing_secret` | **HIGH** — Previous signing key in plaintext
+  4. `sso_configs` | `certificate` | **HIGH** — SAML certificate in plaintext
+  5. `notification_preferences` | `slack_webhook_url` | **MEDIUM** — Webhook URL could expose tokens
+  6. `notification_preferences` | `discord_webhook_url` | **MEDIUM** — Same
+
+
+================================================================================
+📄 backend/DEEP-RUST-API.md (52 bulgu)
+================================================================================
+
+  1. 1 | `routes/inbound.rs` | 385-388 | **Authorization bypass**: `handle_inbound_to_endpoint` fonksiyonu API key'i sadece prefix ile eşleştiriyor, tam hash doğrulaması yapmıyor. Saldırgan aynı prefix'e sahip farklı bir key ile erişebilir. | 🔴 Kritik | CWE-287 | `handle_inbound` fonksiyonundaki gibi Argon2 hash doğrulaması ekleyin
+  2. 2 | `routes/inbound.rs` | 385 | **Prefix-based lookup yetersiz**: `api_key[..20.min(api_key.len())]` — 20 karakter prefix, customers tablosundaki 15 karakterlik `api_key_prefix` ile eşleşmeyebilir, fazla karakter ekleniyor | 🔴 Kritik | CWE-287 | Prefix uzunluğunu 15 karakter ile sınırlayın ve hash doğrulama ekleyin
+  3. 3 | `routes/billing.rs` | 1-20 | **Billing webhook'ları auth bypass**: `/billing/webhook`, `/billing/webhook/polar`, `/billing/webhook/iyzico` endpoint'leri auth_middleware kullanmıyor — sadece signature doğrulaması var ama rate limiting yok | 🟡 Yüksek | CWE-306 | Rate limiting ekleyin (Stripe'ın önerdiği gibi)
+  4. 4 | `ssrf.rs` | 60-65 | **DNS rebinding koruması yok**: DNS çözümleme anında IP kontrolü yapılıyor ama HTTP bağlantısı sırasında IP değişebilir (TOCTOU) | 🟡 Yüksek | CWE-918 | HTTP client'ın DNS çözümlemesini kontrol edin veya connection pooling'de IP pinning uygulayın
+  5. 5 | `middleware/idempotency.rs` | 143-148 | **Zayıf hash fonksiyonu**: `compute_body_hash` `DefaultHasher` kullanıyor — kriptografik olarak güvenli değil, collision üretilebilir | 🟡 Yüksek | CWE-328 | SHA-256 kullanın
+  6. 6 | `routes/custom_domains.rs` | 219 | **Command injection riski**: `verify_dns_txt` ve `verify_dns_cname` fonksiyonları `tokio::process::Command` ile `dig`/`nslookup` çalıştırıyor. Domain validasyonu yapılmış olsa da, shell injection riski var | 🟡 Yüksek | CWE-78 | Domain input'unu sanitize edin veya DNS lookup kütüphanesi kullanın
+  7. 7 | `routes/events.rs` | 70-85 | **Dynamic SQL construction**: `format!` ile WHERE clause oluşturuluyor. Değerler bind ediliyor ama query string'in kendisi dinamik — gelecekte injection riski | 🟠 Orta | CWE-89 | Query builder kütüphanesi kullanın veya sorguyu sabit tutup optional filter'ları UNION ile yönetin
+  8. 8 | `routes/admin.rs` | 175-193 | **Dynamic SQL construction**: Admin user listesi için dinamik WHERE clause. Parametreler bind ediliyor ama format! ile SQL string oluşturuluyor | 🟠 Orta | CWE-89 | Query builder kütüphanesi kullanın
+  9. 9 | `routes/auth.rs` | 140-145 | **Timing attack**: `verify_password` Argon2 kullanıyor (constant-time ✅) ama login hataları farklı mesajlar döndürebilir — "Password login not set up" vs "Unauthorized" | 🟠 Orta | CWE-208 | Tüm hata durumlarında aynı mesajı döndürün
+  10. 10 | `error.rs` | 52-55 | **Serialization error sızıntısı**: `AppError::Serialization` serde_json hata mesajını kullanıcıya gösteriyor — internal bilgi sızıntısı | 🟠 Orta | CWE-209 | Serialization hatalarını generic mesajla gizleyin
+  11. 11 | `routes/auth.rs` | 96-100 | **Email enumeration**: `register` endpoint'i "Email already registered" hatası döndürüyor — email varlığını doğruluyor | 🟠 Orta | CWE-203 | Her durumda aynı mesajı döndürün
+  12. 12 | `routes/webhooks.rs` | 135-140 | **Batch replay N+1**: `batch_replay` her delivery için ayrı DB sorgusu yapıyor (loop içinde) | 🟢 Düşük | CWE-400 | Tek sorguyla tüm delivery'leri getirin
+  13. 13 | `config.rs` | 145-152 | **Development secret generation**: `HMAC_SECRET` ve `JWT_SECRET` env yoksa `dev-{uuid}` ile oluşturuluyor — restart'ta değişir, session'ları invalid eder | 🟢 Düşük | CWE-798 | Development'ta bile sabit bir secret kullanın veya warning'i daha belirgin yapın
+  14. 14 | `middleware/mod.rs` | 55 | **Auth cache race condition**: `AUTH_CACHE` `std::sync::Mutex` kullanıyor — async context'te bloklayabilir | 🟢 Düşük | CWE-362 | `tokio::sync::Mutex` kullanın
+  15. 1 | `rate_limit.rs` | 270-280 | **unwrap() in middleware**: `result.limit.to_string().parse().expect("valid header value")` — header parse failure'da panic | 🟡 Yüksek | CWE-400 | `unwrap_or_else` veya `unwrap_or_default` kullanın
+  16. 2 | `routes/auth.rs` | 50 | **unwrap_or_else with HeaderValue**: `HeaderValue::from_str(&access_cookie).unwrap_or_else(\ | _\ | HeaderValue::from_static(""))` — cookie value invalid ise empty header döndürmek yerine hata loglamalı | 🟠 Orta | CWE-400 | Hata loglayıp default değer döndürün
+  17. 3 | `config.rs` | 145-152 | **unwrap_or for secrets**: Development'ta secret yoksa random UUID ile oluşturuluyor — production'da validate_secret çalışsa bile development'ta session invalidation riski | 🟠 Orta | CWE-798 | Development'ta bile minimum entropy kontrolü ekleyin
+  18. 4 | `middleware/mod.rs` | 82 | **unwrap() on Mutex**: `AUTH_CACHE.lock().unwrap()` — poisoned mutex durumunda panic | 🟠 Orta | CWE-400 | `lock().unwrap_or_else(\ | e\ | e.into_inner())` kullanın
+  19. 5 | `auth/jwt.rs` | 41 | **expect() for timestamp**: `checked_add_signed(duration).expect("valid timestamp")` — extreme duration değerlerinde panic | 🟢 Düşük | CWE-400 | `ok_or` ile AppError'a çevirin
+  20. 6 | `error.rs` | 48 | **Error type tutarlılığı**: `AppError::Internal(#[from] anyhow::Error)` — tüm hataları Internal'a sarıyor, bazen daha spesifik hata tipi gerekli | 🟢 Düşük | CWE-400 | Spesifik hata varyantları ekleyin
+  21. 1 | `routes/admin.rs` | 220-240 | **N+1 query**: `list_teams` her team için ayrı `COUNT(*)` sorgusu yapıyor | 🟡 Yüksek | CWE-400 | JOIN ile tek sorguda team + member count getirin
+  22. 2 | `routes/webhooks.rs` | 380-420 | **Loop içinde DB sorgusu**: `batch_replay` her delivery için 2-3 ayrı sorgu yapıyor | 🟠 Orta | CWE-400 | Batch query ile toplu getirin
+  23. 3 | `routes/custom_domains.rs` | 250-300 | **Blocking DNS lookup**: `tokio::process::Command` ile `dig`/`nslookup` çalıştırılıyor — async context'te blocking | 🟠 Orta | CWE-400 | `tokio::task::spawn_blocking` kullanın veya DNS kütüphanesi (trust-dns) tercih edin
+  24. 4 | `rate_limit.rs` | 85-110 | **InMemory cleanup overhead**: 30 saniyede bir tüm HashMap'i tarıyor, 10k+ entry'de yavaşlayabilir | 🟠 Orta | CWE-400 | LRU cache veya probabilistic cleanup kullanın
+  25. 5 | `routes/webhooks.rs` | 200-250 | **Unnecessary clone**: `batch_webhooks`'da `endpoint.clone()` her iterasyonda yapılıyor | 🟢 Düşük | CWE-400 | Reference kullanın veya `Arc` ile sarın
+  26. 6 | `middleware/mod.rs` | 45-55 | **Auth cache cleanup**: Background task yok, cache sürekli büyüyor | 🟢 Düşük | CWE-400 | Periodic cleanup task ekleyin
+  27. 1 | `routes/webhooks.rs` | - | **Dosya uzunluğu**: 1015 satır — 300 satır limitini aşıyor | 🟠 Orta | - | `batch_webhooks`, `export_deliveries`, `replay_webhook` fonksiyonlarını ayrı modüllere taşıyın
+  28. 2 | `routes/auth.rs` | - | **Dosya uzunluğu**: 1285 satır — en büyük dosya | 🟠 Orta | - | 2FA, password reset, GDPR fonksiyonlarını ayrı modüllere taşıyın
+  29. 3 | `db.rs` | - | **Dosya uzunluğu**: 1029 satır — migration'lar inline | 🟠 Orta | - | Migration'ları ayrı dosyalara taşıyın (sqlx migrations veya embedded SQL)
+  30. 4 | `signing.rs` (api vs worker) | - | **Duplicate code**: API ve worker'da neredeyse aynı signing implementasyonu | 🟠 Orta | - | Ortak bir `hooksniff-signing` crate oluşturun
+  31. 5 | `admin.rs` | 115-120 | **Magic numbers**: Revenue calculation hardcoded (29.0, 99.0) | 🟢 Düşük | - | Plan.monthly_price_cents() kullanın
+  32. 6 | `rate_limit.rs` | 50-60 | **Magic numbers**: `max_entries: 10_000`, cleanup interval `30s` | 🟢 Düşük | - | Config'ten okuyun
+  33. 7 | `routes/webhooks.rs` | 15 | **Magic number**: Batch limit `100` hardcoded | 🟢 Düşük | - | Config constant olarak tanımlayın
+  34. 8 | `main.rs` | 40-60 | **Background job scheduling**: Retention ve cleanup job'ları hardcoded interval ile spawn ediliyor | 🟢 Düşük | - | Config'ten okuyun veya cron library kullanın
+  35. 9 | `lib.rs` | - | **Module structure**: 30+ modül tek `lib.rs`'de — büyük surface area | 🟢 Düşük | - | İlgili modülleri workspace crate'lere ayırın
+  36. 1 | `db.rs` | 50-100 | **Down migration yok**: Hiçbir migration geri alınamıyor | 🟡 Yüksek | CWE-400 | Her migration için `DOWN` SQL ekleyin veya `sqlx migrate` kullanın
+  37. 2 | `migrations/001_initial_schema.sql` | 1-10 | **CockroachDB syntax**: `STRING` tipi kullanılmış, PostgreSQL'de `TEXT` olmalı. Inline migration'da `TEXT` kullanılıyor ama .sql dosyası farklı | 🟠 Orta | CWE-400 | .sql dosyasını PostgreSQL syntax'ına güncelleyin
+  38. 3 | `db.rs` | 63-64 | **Duplicate index**: `idx_webhook_queue_trace_id` hem 009 hem 025 migration'ında tanımlanmış | 🟠 Orta | CWE-400 | Tek bir yerde tanımlayın
+  39. 4 | `db.rs` | 117-120 | **Idempotency key schema mismatch**: 001 migration'ında `PRIMARY KEY (key, customer_id)` ama inline migration'da `key TEXT PRIMARY KEY` | 🟠 Orta | CWE-400 | Schema'yı tutarlı hale getirin
+  40. 5 | `db.rs` | 43-44 | **Missing FK on dead_letters**: `dead_letters.delivery_id` FOREIGN KEY constraint'i yok (001 migration'da) ama inline migration'da var | 🟢 Düşük | CWE-400 | Tutarlı hale getirin
+  41. 6 | `db.rs` | 200-210 | **updated_at trigger eksik**: Bazı tablolarda `updated_at` var ama trigger yok (sadece webhook_queue ve deliveries'da var) | 🟢 Düşük | CWE-400 | Tüm updated_at kolonları için trigger ekleyin
+  42. 1. **🔴 routes/inbound.rs:385** — Authorization bypass'ı düzelt (hash doğrulama ekle)
+  43. 2. **🔴 routes/inbound.rs:385** — Prefix uzunluğunu düzelt (15 karakter)
+  44. 3. **🟡 rate_limit.rs:270** — unwrap() yerine güvenli alternatif kullan
+  45. 4. **🟡 routes/billing.rs** — Billing webhook'larına rate limiting ekle
+  46. 5. **🟡 middleware/idempotency.rs** — SHA-256 hash kullan
+  47. 6. **🟡 routes/custom_domains.rs** — DNS lookup'u async yap
+  48. 7. **🟡 error.rs** — Serialization error sızıntısını gizle
+  49. 8. **🟠 routes/admin.rs** — N+1 query'leri optimize et
+  50. 9. **🟠 routes/webhooks.rs** — Batch replay optimize et
+  51. 10. **🟠 db.rs** — Down migration'lar ekle
+  52. 11. **🟠 signing.rs** — Duplicate code'u ortak crate'e taşı
+
+
+================================================================================
+📄 backend/DEEP-TEST-COVERAGE.md (58 bulgu)
+================================================================================
+
+  1. **api/src/db.rs** | 1,029 | 🔴 **KRİTİK** | Veritabanı bağlantısı, query, transaction — hiçbir test yok
+  2. **api/src/main.rs** | 236 | 🟡 Orta | Uygulama başlatma, dependency injection
+  3. worker/src/main.rs | 807 | 🔴 **KRİTİK** | Worker başlatma, Temporal workflow registration
+  4. worker/src/delivery/mod.rs | 404 | 🔴 **KRİTİK** | Webhook delivery state machine — test yok
+  5. worker/src/delivery/http.rs | 124 | 🟡 Orta | HTTP delivery implementasyonu
+  6. worker/src/activities/mod.rs | 168 | 🟡 Orta | Temporal activity implementasyonları
+  7. worker/src/telemetry.rs | 118 | 🟢 Düşük | Telemetry setup
+  8. api/src/middleware/webhook_verify.rs | — | 🟡 Orta | `#[cfg(test)]` var ama `#[test]` fonksiyonu **0** — boş test modülü
+  9. analytics-page.test.tsx | 3 | 1 | 🔴 Çok az assertion, sadece render check
+  10. routing-page.test.tsx | 3 | 2 | 🔴 Temel render dışında test yok
+  11. schemas-page.test.tsx | 3 | 2 | 🔴 Temel render dışında test yok
+  12. admin-system-page.test.tsx | 4 | 3 | 🟡 Yetersiz assertion
+  13. admin-revenue-page.test.tsx | 4 | 4 | 🟡 Yetersiz assertion
+  14. **dashboard/sso/page.tsx** | 🔴 KRİTİK | SSO konfigürasyonu — auth güvenlik kritik
+  15. **dashboard/signature-verifier/page.tsx** | 🔴 KRİTİK | Signature doğrulama aracı
+  16. **dashboard/webhook-builder/page.tsx** | 🟡 Orta | Webhook builder UI
+  17. **dashboard/rate-limiting/page.tsx** | 🟡 Orta | Rate limit ayarları
+  18. **dashboard/retry-policy/page.tsx** | 🟡 Orta | Retry policy konfigürasyonu
+  19. **dashboard/custom-domain/page.tsx** | 🟡 Orta | Custom domain yönetimi
+  20. **dashboard/audit-log/page.tsx** | 🟡 Orta | Audit log görüntüleme
+  21. **dashboard/api-importer/page.tsx** | 🟡 Orta | API import aracı
+  22. **dashboard/portal-customize/page.tsx** | 🟢 Düşük | Portal customization
+  23. **auth/callback/page.tsx** | 🔴 KRİTİK | OAuth callback — auth akışı
+  24. **verify-email/page.tsx** | 🟡 Orta | Email verification
+  25. **pricing/page.tsx** | 🟢 Düşük | Statik sayfa
+  26. **AuthGuard.tsx** | 🔴 KRİTİK | Auth guard — erişim kontrolü
+  27. **EmailVerificationBanner.tsx** | 🟡 Orta | Email verification UI
+  28. **NotificationCenter.tsx** | 🟡 Orta | Bildirim yönetimi
+  29. **Onboarding.tsx** | 🟡 Orta | Onboarding akışı
+  30. **OnboardingWizard.tsx** | 🟡 Orta | Onboarding wizard
+  31. **CodeBlock.tsx** | 🟢 Düşük | Code display component
+  32. **SdkTabs.tsx** | 🟢 Düşük | SDK tab selector
+  33. **ThemeProvider.tsx** | 🟢 Düşük | Theme provider
+  34. tremor/ChartCard.tsx | 🟢 Düşük | Chart wrapper
+  35. tremor/StatCard.tsx | 🟢 Düşük | Stat display
+  36. lib/changelog-data.ts | 🟢 Düşük
+  37. lib/redis.ts | 🟡 Orta — Redis bağlantısı
+  38. api/newsletter/route.ts | 🟢 Düşük
+  39. api/playground/history/[id]/route.ts | 🟡 Orta
+  40. api/playground/in/[id]/route.ts | 🟡 Orta
+  41. api/playground/token/route.ts | 🟡 Orta
+  42. api/status/route.ts | 🟡 Orta
+  43. analytics-page.test.tsx | Sadece 1 assertion, render check yetersiz | 🔴 Yüksek
+  44. routing-page.test.tsx | 2 assertion — neredeyse boş test | 🔴 Yüksek
+  45. schemas-page.test.tsx | 2 assertion — neredeyse boş test | 🔴 Yüksek
+  46. admin-system-page.test.tsx | 3 assertion — yetersiz coverage | 🟡 Orta
+  47. admin-revenue-page.test.tsx | 4 assertion — yetersiz coverage | 🟡 Orta
+  48. admin-page.test.tsx | 4 assertion — yetersiz coverage | 🟡 Orta
+  49. endpoint-detail-page.test.tsx | 4 assertion — yetersiz coverage | 🟡 Orta
+  50. admin-users-page.test.tsx | 5 assertion — yetersiz coverage | 🟡 Orta
+  51. admin-user-detail-page.test.tsx | 5 assertion — yetersiz coverage | 🟡 Orta
+  52. portal-page.test.tsx | 5 assertion — yetersiz coverage | 🟡 Orta
+  53. **TÜM DOSYALAR** | **0 snapshot test** | 🟡 Orta
+  54. **TÜM DOSYALAR** | **User interaction test eksik** (click, type, submit) çoğu dosyada | 🟡 Orta
+  55. Loading state test eden dosyalar | 25/58 (43%) | 🟡 Orta
+  56. Snapshot test | 0/58 (0%) | 🔴 Eksik
+  57. Ortalama assertion/test | ~1.7 | 🟡 Düşük
+  58. Risk | 🔴 Yüksek — SDK kullanıcıları doğrudan etkilenir
+
+
+================================================================================
+📄 backend/DEEP-WORKER-BILLING.md (45 bulgu)
+================================================================================
+
+  1. W-01 | **Jitter yok** | 🔴 Yüksek | `calculate_backoff` sabit değer döner. 100 başarısız endpoint aynı anda retry'a girerse thundering herd olur.
+  2. W-02 | **retry_policy modülü entegre edilmemiş** | 🟡 Orta | `api/src/retry_policy/mod.rs`'de tam jitter'lı exponential backoff var ama worker tarafında kullanılmıyor.
+  3. W-03 | **Per-endpoint retry policy yok** | 🟡 Orta | Tüm endpoint'ler aynı 30s base delay kullanır. `retry_policies` tablosu var ama worker bunu okumuyor.
+  4. Redirect policy | ❌ Varsayılan (follow) | 🔴 SSRF riski — kötü niyetli endpoint redirect ile internal servislere erişebilir
+  5. TLS | ❌ Varsayılan | 🟡 Sertifika doğrulama aktif ama explicit değil
+  6. User-Agent | ❌ Yok | 🟡 Bazı servisler User-Agent header'ı bekler
+  7. Max response body | ❌ Yok | 🟡 Büyük response bellek tüketebilir
+  8. B-01 | `subscription.canceled`/`revoked` handler'ı sadece ID döndürüyor, DB güncelleme yapmıyor | 🟡 Orta
+  9. B-02 | Sandbox/production ayrımı `POLAR_ENV` ile yapılmış ama default product ID'ler hardcoded | 🟡 Orta
+  10. B-03 | **Hardcoded buyer bilgileri** | 🟡 Orta | `identity_number: "11111111111"`, `city: "Istanbul"`, `ip: "0.0.0.0"` — production'da PCI-DSS ihlali olabilir
+  11. B-04 | **Amount=0 webhook'ta** | 🟡 Orta | `CARD_PAYMENT_SUCCESS` event'inde `amount_cents: 0` — ödeme tutarı webhook'tan alınamıyor
+  12. B-05 | **3D Secure akışı eksik** | 🟡 Orta | `create_checkout` 3DS HTML döndürüyor ama callback URL'i eksik
+  13. B-06 | **Webhook URI hardcoded** | 🟠 Düşük | `verify_webhook_signature` içinde URI `/v1/billing/webhook/iyzico` olarak sabit — route değişirse kırılır
+  14. B-07 | `checkout.session.completed`'da `customer: None` — Stripe her seferinde yeni customer oluşturur | 🟡 Orta
+  15. B-08 | `handle_invoice_paid` plan belirleme sadece price ID eşleştirmesi — birden fazla price varsa kırılgan | 🟠 Düşük
+  16. B-09 | **Proration yok** | 🟡 Orta | Mid-cycle upgrade'de kalan gün için ücret iadesi/hesaplanması yok
+  17. B-10 | **Grace period yok** | 🟡 Orta | `subscription.deleted` → immediate downgrade. Ödeme başarısızlığında bile anında free'ye düşer
+  18. B-11 | **Downgrade'de endpoint cleanup yok** | 🟡 Orta | Free limiti 5 endpoint. Business'tan free'ye düşerken 50→5 geçişte mevcut endpoint'ler ne olacak?
+  19. Polar.sh | ❌ Fatura handler'ı yok | 🟡 Orta
+  20. iyzico | ❌ Fatura handler'ı yok, amount_cents=0 | 🟡 Orta
+  21. WS-01 | **Server-initiated ping yok** | 🟡 Orta | Sadece client'tan gelen ping'ler heartbeat'i güncelliyor. Client ping göndermezse bağlantı "dead" olarak algılanmaz
+  22. WS-02 | **Pong timeout yok** | 🟡 Orta | `pong_timeout_secs: 10` config'de var ama implementasyonda kullanılmıyor
+  23. WS-03 | **Heartbeat interval yok** | 🟡 Orta | `ping_interval_secs: 30` config'de var ama server otomatik ping göndermiyor
+  24. WS-04 | **Broadcast channel overflow** | 🟡 Orta | Capacity 1024 — ağır yük altında `send()` fail olur ama log'da sadece `debug!` var
+  25. WS-05 | **RateLimiter timestamps Vec** | 🟠 Düşük | `ConnectionRateLimiter.timestamps` per-connection Vec — window süresince büyür ama temizlenir
+  26. WS-06 | **Broadcast channel lagging** | 🟡 Orta | Slow receiver'lar `RecvError::Lagged` alır ama handler'da bu durum handle edilmiyor
+  27. M-01 | **Simple exporter** | 🟡 Orta | Her span同步 export ediliyor. Batch exporter kullanılmalı
+  28. M-02 | **Sampling yok** | 🟡 Orta | Tüm trace'ler export ediliyor. Production'da yüksek volume'de collector patlayabilir
+  29. M-04 | **Endpoint URL span'de** | 🟡 Orta | `endpoint_url` span attribute olarak ekleniyor — internal URL'ler sızabilir
+  30. M-05 | **Response body kaydediliyor** | 🟡 Orta | `response_body` delivery_attempts'a kaydediliyor (1000 char truncate) — PII içerebilir
+  31. F-01 | **`dequeue_next()` race condition** | 🟡 Orta | `SELECT` ve `UPDATE` arasında gap var. İki worker aynı anda aynı item'ı alabilir
+  32. F-02 | **`check_timeouts()` concurrent** | 🟠 Düşük | Timeout check atomic UPDATE ile yapılıyor — bu iyi
+  33. T-01 | **In-memory only** | 🔴 Yüksek | Restart'ta tüm throttle state kaybolur
+  34. T-02 | **Multi-instance uyumsuz** | 🔴 Yüksek | Birden fazla API instance varsa her biri ayrı state tutar — rate limit 2x-3x aşılabilir
+  35. T-03 | **FixedWindow implemente edilmemiş** | 🟡 Orta | Enum'da var ama check() sadece sliding window yapıyor
+  36. `enum` | ❌ | 🟡 Orta
+  37. `const` | ❌ | 🟠 Düşük
+  38. `oneOf` / `anyOf` / `allOf` | ❌ | 🟡 Orta
+  39. `not` | ❌ | 🟠 Düşük
+  40. `if` / `then` / `else` | ❌ | 🟠 Düşük
+  41. `format` (date-time, email, uri) | ❌ | 🟡 Orta
+  42. `minimum` / `maximum` | ❌ | 🟡 Orta
+  43. `minLength` / `maxLength` | ❌ | 🟡 Orta
+  44. `pattern` (regex) | ❌ | 🟡 Orta
+  45. `$ref` / `$defs` | ❌ | 🟡 Orta
+
+
+================================================================================
+📄 backend/deep-api-flow-audit.md (10 bulgu)
+================================================================================
+
+  1. 1 | Revenue page type mismatch | 🔴 Page-breaking | `admin/revenue/page.tsx` | `admin.rs` | BROKEN
+  2. 2 | Notifications filter params | 🔴 Feature-breaking | `notifications/page.tsx` | `notifications.rs` | BROKEN
+  3. 3 | Billing usage response shape | 🔴 Page-breaking | `billing/page.tsx` | `billing.rs` | BROKEN
+  4. 4 | Auth login response shape | 🔴 Auth-breaking | `api.ts` (authApi) | `auth.rs` | BROKEN
+  5. 5 | Search bypasses API client | 🟠 Security | `search/page.tsx` | — | FIXABLE
+  6. 6 | Dashboard 5s polling | 🟠 Performance | `dashboard/page.tsx` | — | FIXABLE
+  7. 7 | Client-side search on paginated data | 🟠 UX | `deliveries/page.tsx` | `webhooks.rs` | FIXABLE
+  8. 8 | Teams route/type misalignment | 🟠 Feature-breaking | `team/page.tsx` | `teams.rs` | BROKEN
+  9. 9 | 401 refresh race condition | 🟡 Reliability | `api.ts` | — | FIXABLE
+  10. 10 | Notification `is_read` vs `read` | 🟡 UI bug | `notifications/page.tsx` | `notifications.rs` | BROKEN
+
+
+================================================================================
+📄 backend/deep-async-rust.md (13 bulgu)
+================================================================================
+
+  1. C1 | 🔴 Critical | `middleware/mod.rs` | `std::sync::Mutex` held across `.await` | Thread starvation, potential deadlock
+  2. C2 | 🔴 Critical | `middleware/mod.rs` | Auth cache never cleaned up | Memory leak (OOM)
+  3. C3 | 🔴 Critical | `middleware/mod.rs` | Argon2 in async without `spawn_blocking` | Thread starvation under load
+  4. H1 | 🟠 High | Multiple files | `reqwest::Client::new()` per request | Connection leak, no reuse
+  5. H2 | 🟠 High | `delivery/mod.rs`, `email.rs` | `std::fs::read_to_string` in async | Thread blocking
+  6. H3 | 🟠 High | `ws/handler.rs` | Unbounded channel per WS connection | Memory pressure
+  7. H4 | 🟠 Medium-High | `ws/mod.rs` | Broadcast overflow silently drops events | Silent event loss
+  8. H5 | 🟠 High | `middleware/mod.rs` | Poisoned mutex `.unwrap()` panics | Server crash propagation
+  9. M1 | 🟡 Medium | `main.rs` | Background task panics silently lost | Jobs silently stop
+  10. M2 | 🟡 Medium | `worker/main.rs` | 50 concurrent tasks vs 10 DB connections | Connection pool bottleneck
+  11. M3 | 🟡 Medium | `worker/main.rs` | PgListener reconnect no backoff | Notification gaps
+  12. M4 | 🟡 Medium | `notifications/mod.rs` | Unbounded FCM spawns | Connection storms
+  13. M5 | 🟡 Low | `worker/main.rs` | `record_attempt` signature | Code quality
+
+
+================================================================================
+📄 backend/deep-backend-api.md (3 bulgu)
+================================================================================
+
+  1. **HIGH** | 3 | Auth cache race/deadlock, Stripe webhook bypass, Auth cache under mutex
+  2. **MEDIUM** | 8 | TOTP plaintext, weak email validation, N+1 queries, batch count rollback, auth cache no cleanup, test alert no-op, wrong column in export, GDPR delete incomplete
+  3. **LOW** | 8 | Duplicate date parsers, unused migration constants, silent error swallowing, export LIMIT 10000, JWT dev validation
+
+
+================================================================================
+📄 backend/deep-crypto.md (15 bulgu)
+================================================================================
+
+  1. F-01 | Argon2id parameters below OWASP recommendations | 🟡 Medium | Password Hashing
+  2. F-02 | Password minimum 8 chars (should be 12+) | 🟢 Low | Password Policy
+  3. F-04 | JWT uses HS256 (symmetric) | 🟡 Medium | JWT
+  4. F-06 | Access tokens cannot be revoked | 🟡 Medium | JWT
+  5. F-12 | Endpoint signing secrets use UUID, not crypto random | 🟡 Medium | Webhook Signing
+  6. F-15 | ENCRYPTION_KEY not validated at startup | 🟡 Medium | Encryption
+  7. F-18 | No PKCE for OAuth | 🟡 Medium | OAuth
+  8. F-23 | **No backup/recovery codes for 2FA** | 🔴 **Critical** | 2FA
+  9. F-27 | Auth cookies SameSite=None | 🟡 Medium | Cookies
+  10. 1. **🔴 Critical — F-23:** Implement 2FA backup codes immediately. Users without recovery codes will be permanently locked out if they lose their authenticator.
+  11. 2. **🟡 Medium — F-01:** Increase Argon2id memory to ≥19 MiB (ideally 45 MiB). Benchmark on production hardware first.
+  12. 3. **🟡 Medium — F-15:** Add `ENCRYPTION_KEY` validation to production startup checks.
+  13. 4. **🟡 Medium — F-12:** Use `OsRng` for endpoint signing secrets instead of UUID.
+  14. 5. **🟡 Medium — F-18:** Add PKCE to OAuth flows (both Google and GitHub).
+  15. 6. **🟡 Medium — F-27:** Evaluate whether SameSite=None is truly required; consider SameSite=Lax + Bearer token migration.
+
+
+================================================================================
+📄 backend/deep-database.md (15 bulgu)
+================================================================================
+
+  1. **Severity Scale:** 🔴 Critical | 🟠 High | 🟡 Medium | 🔵 Low
+  2. **Issue Count:** 🔴 5 Critical | 🟠 8 High | 🟡 10 Medium | 🔵 6 Low
+  3. `endpoints` | Has `ip_whitelist`, `rate_limit_per_minute`, `secret_rotation_at`, `signature_header` | Has `allowed_ips`, `event_filter`, `custom_headers`, `retry_policy`, `old_signing_secret`, `secret_rotated_at` | 🔴 Different columns
+  4. `deliveries` | Has `idempotency_key`, `source_ip`, `request_headers` | Has `sequence_num`, `fifo_group_id`, `is_test` | 🔴 Different columns
+  5. `delivery_attempts` | `status TEXT`, `response_headers JSONB` | `status_code INT`, `response_headers JSONB` | 🔴 Different types
+  6. `webhook_queue` | Created in fix-migrations.js with `customer_id`, `event_type` | Created in db.rs with `endpoint_url`, `processed_at` | 🔴 Different schema
+  7. `idempotency_keys` | Composite PK `(key, customer_id)` | Single PK `key` | 🔴 Different PK
+  8. `event_schemas` | `customer_id` nullable, `version` nullable | `customer_id` NOT NULL, `version` NOT NULL | 🟠 Constraints differ
+  9. `marketplace_agents` | `author` nullable | `author NOT NULL DEFAULT 'unknown'` | 🟠 Constraints differ
+  10. Hardcoded DB credentials | 🔴 Critical | Fix immediately
+  11. TOTP secret in customers table | 🔴 Critical | Encrypt at rest
+  12. `password_hash` nullable | 🔴 Critical | Add NOT NULL
+  13. `sso_configs.client_secret_encrypted` — no encryption verification | 🟠 High | Verify
+  14. `webhook_queue` has no FK constraints | 🟠 High | Add FKs
+  15. `fanout_rules.target_ids` UUID array — no FK validation | 🟠 High | Use junction table
+
+
+================================================================================
+📄 backend/deep-db-queries.md (3 bulgu)
+================================================================================
+
+  1. 🔴 Critical | 4 | Missing indexes on hot paths, unbounded queries
+  2. 🟠 High | 6 | SELECT *, N+1 patterns, OFFSET pagination
+  3. 🟡 Medium | 8 | Suboptimal queries, missing composite indexes
+
+
+================================================================================
+📄 backend/deep-openapi.md (11 bulgu)
+================================================================================
+
+  1. Error response format mismatch | 🔴 Critical | 1
+  2. HTTP status code mismatches (201 vs 200) | 🔴 High | 12+ create endpoints
+  3. Missing endpoints in spec | 🔴 High | 30+
+  4. Missing error code documentation | 🔴 High | All endpoints
+  5. Missing OAuth/SSO documentation | 🟡 Medium | 9 endpoints
+  6. Zero request/response examples | 🟡 Medium | All endpoints
+  7. WebSocket undocumented | 🟡 Medium | 1 feature
+  8. Schema field mismatches | 🟡 Medium | 3 schemas
+  9. Swagger UI not wired | 🟠 Low | 1
+  10. Missing auto_detect field | 🟠 Low | 1
+  11. No versioning strategy docs | 🟠 Low | 1
+
+
+================================================================================
+📄 backend/deep-payments.md (1 bulgu)
+================================================================================
+
+  1. **Severity Breakdown:** 🔴 Critical: 5 | 🟠 High: 6 | 🟡 Medium: 8 | 🔵 Low: 4
+
+
+================================================================================
+📄 backend/deep-rate-limiting.md (15 bulgu)
+================================================================================
+
+  1. **Storage** | In-memory only (`Arc<Mutex<HashMap>>`) | 🔴 Critical
+  2. **Survives restarts** | **NO** | 🔴 Critical
+  3. **Distributed** | **NO** | 🔴 Critical
+  4. `POST /contact` | **None visible** | — | 🟡 Medium risk
+  5. `POST /oauth/*` | **None visible** | — | 🟡 Medium risk
+  6. `X-RateLimit-Limit` | ✅ Set | ❌ Missing | 🟡
+  7. `X-RateLimit-Remaining` | ✅ Set | ❌ Missing | 🟡
+  8. `X-RateLimit-Reset` | ✅ Set | ❌ Missing | 🟡
+  9. `Retry-After` | ✅ Set on 429 | ❌ Missing | 🟡
+  10. Shows current usage | ❌ Hardcoded to 0 | 🔴
+  11. Shows throttled count | ❌ Always 0 | 🔴
+  12. Shows queue depth | ❌ Always 0 | 🔴
+  13. Warning before limits | ❌ No warnings | 🟡
+  14. Plan-based limit display | ❌ Not shown | 🟡
+  15. Edit limits inline | ❌ No edit UI | 🟡
+
+
+================================================================================
+📄 backend/deep-worker.md (3 bulgu)
+================================================================================
+
+  1. Worker crashes during HTTP call | Zombie reaper recovers after 5min | 🟡 5-min delay, attempt count inflated
+  2. Worker crashes after HTTP, before DB commit | Zombie reaper re-delivers (duplicate) | 🟠 Duplicate delivery
+  3. DB connection lost | `process_pending` returns error, logged | 🟡 Delivery delayed until reconnect
+
+
+================================================================================
+📄 frontend/AUDIT-ALTERNATIVES.md (5 bulgu)
+================================================================================
+
+  1. Translation | 13/13 pages | 🔴 CRITICAL
+  2. SEO | 2/13 pages | 🟠 HIGH
+  3. Content | 2/13 pages | 🟠 HIGH
+  4. Footer | 13/13 pages | 🟡 MEDIUM
+  5. Dark Mode | 13/13 pages | 🟡 MEDIUM
+
+
+================================================================================
+📄 frontend/DEEP-A11Y-SEO.md (173 bulgu)
+================================================================================
+
+  1. dashboard/portal-customize/page.tsx | 140-141 | `<label>` + `<input>` — `htmlFor`/`id` eşleşmesi yok | 🔴 Critical | A11Y | `<label htmlFor="company-name">` + `<input id="company-name">` ekle
+  2. dashboard/portal-customize/page.tsx | 150-151 | Logo URL input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  3. dashboard/portal-customize/page.tsx | 160-162 | Primary Color input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  4. dashboard/inbound/page.tsx | 103-104 | Webhook Secret input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  5. dashboard/inbound/page.tsx | 110-111 | Route to Endpoint input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  6. dashboard/sso/page.tsx | 124-125 | Metadata URL input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  7. dashboard/sso/page.tsx | 134-135 | Entity ID input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  8. dashboard/sso/page.tsx | 144-145 | SSO URL input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  9. dashboard/sso/page.tsx | 154-156 | X.509 Certificate textarea — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  10. dashboard/sso/page.tsx | 173-174 | Issuer URL input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  11. dashboard/sso/page.tsx | 183-184 | Client ID input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  12. dashboard/sso/page.tsx | 193-194 | Client Secret input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  13. dashboard/signature-verifier/page.tsx | 136-137 | Payload textarea — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  14. dashboard/signature-verifier/page.tsx | 146-147 | Webhook Secret input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  15. dashboard/signature-verifier/page.tsx | 156-157 | Signature input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  16. dashboard/webhook-builder/page.tsx | 152 | URL input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  17. dashboard/endpoints/[id]/page.tsx | 209 | URL input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  18. dashboard/endpoints/page.tsx | 143-144 | URL input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  19. dashboard/alerts/page.tsx | 118 | Email input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  20. dashboard/transforms/page.tsx | 99 | Filter input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  21. dashboard/retry-policy/page.tsx | 171-268 | 8 input — hiçbiri `htmlFor`/`id` yok | 🔴 Critical | A11Y | Tüm inputlara `htmlFor`/`id` ekle
+  22. dashboard/settings/page.tsx | 175 | Name input — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  23. dashboard/billing/page.tsx | — | Plan selection inputs — `htmlFor`/`id` yok | 🔴 Critical | A11Y | `htmlFor`/`id` eşleştir
+  24. dashboard/billing/page.tsx | 431 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | `<button>` kullan veya `role="button"` + `onKeyDown` ekle
+  25. dashboard/billing/page.tsx | 468 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  26. dashboard/settings/page.tsx | 371 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  27. dashboard/team/page.tsx | 245 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  28. dashboard/team/page.tsx | 292 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  29. dashboard/api-keys/page.tsx | 278 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  30. dashboard/api-keys/page.tsx | 306 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  31. dashboard/deliveries/page.tsx | 208 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  32. dashboard/logs/page.tsx | 313 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  33. admin/users/page.tsx | 241 | `<div onClick>` overlay — `role="button"` yok | 🟡 Medium | A11Y | Aynı
+  34. components/OnboardingWizard.tsx | 643 | `✕` close button — `aria-label` eksik | 🔴 Critical | A11Y | `aria-label="Close notification"` ekle
+  35. dashboard/portal-customize/page.tsx | 272 | `✕` remove event button — `aria-label` eksik (bazı durumlarda) | 🟠 High | A11Y | `aria-label` ekle
+  36. components/Onboarding.tsx | ~167 | Skip button — `aria-label` eksik | 🟡 Medium | A11Y | `aria-label="Skip onboarding tour"` ekle
+  37. components/NotificationCenter.tsx | — | Bildirim dropdown — `aria-live="polite"` eksik | 🟠 High | A11Y | `<div aria-live="polite">` ekle
+  38. components/Toast.tsx | — | Toast mesajları — `aria-live` eksik | 🟠 High | A11Y | `<div role="alert" aria-live="assertive">` ekle
+  39. dashboard/api-keys/page.tsx | 133 | Error mesajı — `role="alert"` eksik | 🟠 High | A11Y | `role="alert"` ekle
+  40. components/ErrorBoundary.tsx | — | Error state — `role="alert"` eksik | 🟠 High | A11Y | `role="alert"` ekle
+  41. dashboard/billing/page.tsx | 430 | Upgrade modal — focus trapping eksik (sadece `tabIndex={-1}` var) | 🟠 High | A11Y | ConfirmDialog.tsx'deki pattern'i uygula
+  42. dashboard/billing/page.tsx | 467 | Cancel modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  43. dashboard/settings/page.tsx | 371 | Delete modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  44. dashboard/team/page.tsx | 245 | Create team modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  45. dashboard/team/page.tsx | 292 | Invite modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  46. dashboard/api-keys/page.tsx | 278 | Delete key modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  47. dashboard/api-keys/page.tsx | 306 | Rotate key modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  48. dashboard/deliveries/page.tsx | 208 | Detail modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  49. dashboard/logs/page.tsx | 313 | Detail modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  50. admin/users/page.tsx | 241 | Plan change modal — focus trapping eksik | 🟠 High | A11Y | Aynı
+  51. dashboard/layout.tsx | 64-68 | Mobile sidebar — focus trapping eksik | 🟠 High | A11Y | Focus trap ekle
+  52. admin/layout.tsx | ~64 | Mobile sidebar — focus trapping eksik | 🟠 High | A11Y | Focus trap ekle
+  53. app/[locale]/layout.tsx | — | Ana layout — skip link yok | 🟡 Medium | A11Y | `<a href="#main-content" className="sr-only focus:not-sr-only">Skip to content</a>` ekle
+  54. dashboard/layout.tsx | — | Dashboard layout — skip link yok | 🟡 Medium | A11Y | Aynı
+  55. admin/layout.tsx | — | Admin layout — skip link yok | 🟡 Medium | A11Y | Aynı
+  56. components/NotificationCenter.tsx | 78 | Notification dropdown toggle — `aria-expanded` eksik | 🟡 Medium | A11Y | `aria-expanded={open}` ekle
+  57. dashboard/layout.tsx | 131 | Sidebar toggle button — `aria-expanded` eksik | 🟡 Medium | A11Y | `aria-expanded={sidebarOpen}` ekle
+  58. admin/layout.tsx | ~120 | Sidebar toggle button — `aria-expanded` eksik | 🟡 Medium | A11Y | Aynı
+  59. components/LanguageSwitcher.tsx | — | Language dropdown — `aria-expanded` eksik | 🟡 Medium | A11Y | `aria-expanded` ekle
+  60. components/NotificationCenter.tsx | — | Dropdown menü — `aria-expanded` attribute eksik (sadece `open` state var) | 🟡 Medium | A11Y | `aria-expanded={open}` ekle
+  61. dashboard/layout.tsx | 88-126 | Sidebar nav linkleri — aktif link için `aria-current="page"` eksik | 🟢 Low | A11Y | Aktif link'e `aria-current="page"` ekle
+  62. admin/layout.tsx | 74-100 | Sidebar nav linkleri — aktif link için `aria-current="page"` eksik | 🟢 Low | A11Y | Aynı
+  63. dashboard/sso/page.tsx | 97-99 | Provider tab'ları — `aria-selected` eksik | 🟢 Low | A11Y | `aria-selected={provider === p.id}` ekle
+  64. dashboard/playground/page.tsx | 197-199 | Tab'lar — `aria-selected` eksik | 🟢 Low | A11Y | `aria-selected={activeTab === tab}` ekle
+  65. dashboard/schemas/page.tsx | 38 | `text-gray-400` on white bg — kontrast yetersiz (~2.9:1) | 🟡 Medium | A11Y | `text-gray-500` veya `text-gray-600` kullan
+  66. dashboard/templates/page.tsx | 38 | `text-gray-400` on white bg — kontrast yetersiz | 🟡 Medium | A11Y | Aynı
+  67. dashboard/portal/page.tsx | 48 | `text-gray-500` loading text — kontrast sınırda | 🟢 Low | A11Y | `text-gray-600` kullan
+  68. components/Onboarding.tsx | 162 | `text-gray-400` skip button — kontrast yetersiz | 🟡 Medium | A11Y | `text-gray-500` kullan
+  69. components/OnboardingWizard.tsx | 297,362 | `text-gray-400` labels — kontrast yetersiz | 🟡 Medium | A11Y | `text-gray-500` kullan
+  70. components/AuthGuard.tsx | 22,33 | `text-gray-500` loading text — kontrast borderline | 🟢 Low | A11Y | `text-gray-600` kullan
+  71. dashboard/inbound/page.tsx | 63 | `<h2>` ile başlıyor, `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  72. dashboard/endpoints/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  73. dashboard/endpoints/[id]/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  74. dashboard/transforms/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  75. dashboard/settings/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  76. dashboard/team/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  77. dashboard/notifications/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  78. dashboard/deliveries/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  79. dashboard/deliveries/[id]/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  80. dashboard/logs/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  81. dashboard/page.tsx | — | `<h1>` yok (ana dashboard sayfası) | 🟡 Medium | A11Y | `<h1>` ekle
+  82. login/page.tsx | — | `<h1>` yok | 🟡 Medium | A11Y | `<h1>` ekle
+  83. what-is-a-webhook/page.tsx | 73 | `<h4>` kullanılmış ama `<h3` atlanmış | 🟢 Low | A11Y | `<h3>` kullan
+  84. dashboard/deliveries/page.tsx | 139 | `<tr onClick>` — `role="row"` + `tabIndex={0}` + `onKeyDown` eksik | 🟢 Low | A11Y | `tabIndex={0}` + `onKeyDown` + `role="row"` ekle
+  85. dashboard/templates/page.tsx | 43 | `<div cursor-pointer>` ama `onClick` yok — interaktif element eksik | 🟢 Low | A11Y | `<button>` veya `<a>` kullan
+  86. app/[locale]/page.tsx | — | Ana sayfa — `generateMetadata` eksik | 🔴 Critical | SEO | `export const metadata` ekle
+  87. dashboard/page.tsx | — | Dashboard ana sayfa — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  88. login/page.tsx | — | Login sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  89. pricing/page.tsx | — | Pricing sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  90. about/page.tsx | — | About sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  91. contact/page.tsx | — | Contact sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  92. faq/page.tsx | — | FAQ sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  93. terms/page.tsx | — | Terms sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  94. privacy/page.tsx | — | Privacy sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  95. status/page.tsx | — | Status sayfası — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  96. docs/page.tsx | — | Docs ana sayfa — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  97. docs/* (15 alt sayfa) | — | Tüm docs alt sayfaları — metadata eksik | 🟠 High | SEO | Her birine `export const metadata` ekle
+  98. use-cases/page.tsx | — | Use cases — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  99. customers/page.tsx | — | Customers — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  100. newsletter/page.tsx | — | Newsletter — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  101. playground/page.tsx | — | Playground — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  102. get-started/page.tsx | — | Get Started — metadata eksik | 🟠 High | SEO | `export const metadata` ekle
+  103. verify-email/page.tsx | — | Verify Email — metadata eksik | 🟢 Low | SEO | `export const metadata` ekle
+  104. auth/callback/page.tsx | — | Auth Callback — metadata eksik | 🟢 Low | SEO | Gerekli olmayabilir
+  105. app/[locale]/page.tsx | — | Ana sayfa — JSON-LD (Organization, WebApplication) eksik | 🟠 High | SEO | `<script type="application/ld+json">` ekle
+  106. pricing/page.tsx | — | Pricing sayfası — JSON-LD (Product, Offer) eksik | 🟠 High | SEO | Structured data ekle
+  107. about/page.tsx | — | About sayfası — JSON-LD (Organization) eksik | 🟠 High | SEO | Structured data ekle
+  108. faq/page.tsx | — | FAQ sayfası — JSON-LD (FAQPage) eksik | 🟠 High | SEO | FAQPage schema ekle
+  109. docs/* | — | Docs sayfaları — JSON-LD (TechArticle) eksik | 🟡 Medium | SEO | TechArticle schema ekle
+  110. alternatives/* | — | Alternatives sayfaları — JSON-LD (WebPage) eksik | 🟡 Medium | SEO | WebPage schema ekle
+  111. app/[locale]/layout.tsx | 71 | `alternates.languages` tanımlı ama `x-default` eksik | 🟡 Medium | SEO | `'x-default': 'https://hooksniff.vercel.app/en'` ekle
+  112. app/[locale]/layout.tsx | 71 | Canonical sadece locale bazında — alt sayfalar için dinamik canonical yok | 🟡 Medium | SEO | Her sayfada `generateMetadata` ile dinamik canonical ekle
+  113. changelog/[slug]/page.tsx | 21 | `generateMetadata` var ama canonical eksik | 🟡 Medium | SEO | `alternates.canonical` ekle
+  114. blog/[slug]/page.tsx | 1621 | `generateMetadata` var ama canonical eksik | 🟡 Medium | SEO | `alternates.canonical` ekle
+  115. changelog/[slug]/page.tsx | 21 | `generateMetadata` var ama OG tag'leri eksik | 🟡 Medium | SEO | `openGraph` objesi ekle
+  116. blog/[slug]/page.tsx | 1621 | `generateMetadata` var ama OG tag'leri eksik | 🟡 Medium | SEO | `openGraph` objesi ekle
+  117. alternatives/hookdeck-alternatives/page.tsx | 4 | `description` var ama `openGraph` eksik | 🟡 Medium | SEO | `openGraph` ekle
+  118. alternatives/svix-alternatives/page.tsx | 4 | `description` var ama `openGraph` eksik | 🟡 Medium | SEO | `openGraph` ekle
+  119. alternatives/convoy-alternatives/page.tsx | 4 | `description` var ama `openGraph` eksik | 🟡 Medium | SEO | `openGraph` ekle
+  120. dashboard/portal-customize/page.tsx | 303 | `alt="Logo"` — çok genel | 🟢 Low | SEO | `alt="Company logo"` veya dinamik alt
+  121. components/OnboardingWizard.tsx | — | Emoji tabanlı icon'lar — alt text eksik | 🟢 Low | SEO | `aria-hidden="true"` veya `alt` ekle
+  122. what-is-a-webhook/page.tsx | 48 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | `<th scope="col">` ekle
+  123. alternatives/webhook-relay/page.tsx | 25 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  124. alternatives/hookdeck-alternatives/page.tsx | 37 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  125. alternatives/hookdeck/page.tsx | 42 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  126. alternatives/svix/page.tsx | 42 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  127. alternatives/hook0/page.tsx | 25 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  128. alternatives/convoy/page.tsx | 25 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  129. alternatives/svix-alternatives/page.tsx | 81 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  130. alternatives/convoy-alternatives/page.tsx | 33 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  131. dashboard/rate-limiting/page.tsx | 118 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  132. dashboard/billing/page.tsx | 382 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  133. dashboard/page.tsx | 533 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  134. dashboard/audit-log/page.tsx | 120 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  135. dashboard/deliveries/page.tsx | 125 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  136. dashboard/custom-domain/page.tsx | 101 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  137. dashboard/logs/page.tsx | 191 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  138. dashboard/search/page.tsx | 131 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  139. admin/users/[id]/page.tsx | 251 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  140. admin/users/page.tsx | 144 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  141. docs/self-hosting/page.tsx | 31 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  142. docs/retries/page.tsx | 18,70 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  143. docs/architecture/page.tsx | 118 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  144. docs/api/page.tsx | 153 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  145. docs/concepts/page.tsx | 57 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  146. docs/page.tsx | 61 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  147. docs/dlq/page.tsx | 104 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  148. playground/page.tsx | 868 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  149. compare/CompareContent.tsx | 341 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  150. privacy/page.tsx | 111 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  151. pricing/page.tsx | 259 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  152. providers/shopify/page.tsx | 58 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  153. providers/github/page.tsx | 67 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  154. providers/stripe/page.tsx | 76 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  155. blog/[slug]/page.tsx | 1786 | `<th>` — `scope="col"` eksik | 🟠 High | HTML | Aynı
+  156. dashboard/layout.tsx | — | `<main>` elementi eksik — içerik `<div>` içinde | 🟡 Medium | HTML | `<main id="main-content">` ekle
+  157. admin/layout.tsx | — | `<main>` elementi eksik | 🟡 Medium | HTML | Aynı
+  158. dashboard/page.tsx | — | `<section>` kullanımı yok — tüm içerik `<div>` | 🟡 Medium | HTML | Anlamlı section'lar ekle
+  159. dashboard/analytics/page.tsx | — | `<section>` kullanımı yok | 🟡 Medium | HTML | Aynı
+  160. dashboard/settings/page.tsx | — | `<section>` kullanımı yok | 🟡 Medium | HTML | Aynı
+  161. dashboard/layout.tsx | 88 | Sidebar `<nav>` — `aria-label` eksik | 🟡 Medium | HTML | `<nav aria-label="Dashboard sidebar">` ekle
+  162. admin/layout.tsx | 74 | Sidebar `<nav>` — `aria-label` eksik | 🟡 Medium | HTML | `<nav aria-label="Admin sidebar">` ekle
+  163. docs/layout.tsx | 65 | Header `<nav>` — `aria-label` eksik | 🟡 Medium | HTML | `<nav aria-label="Main navigation">` ekle
+  164. docs/layout.tsx | 89 | Sidebar `<nav>` — `aria-label` eksik (2. nav!) | 🟡 Medium | HTML | `<nav aria-label="Documentation sidebar">` ekle
+  165. blog/[slug]/page.tsx | — | 2 `<nav>` elementi — `aria-label` eksik | 🟡 Medium | HTML | Her nav'a farklı `aria-label` ekle
+  166. what-is-a-webhook/page.tsx | 9 | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | `<nav aria-label="Main navigation">` ekle
+  167. alternatives/* (9 dosya) | — | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | Aynı
+  168. build-vs-buy/BuildVsBuyContent.tsx | 114 | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | Aynı
+  169. contact/page.tsx | 35 | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | Aynı
+  170. about/page.tsx | 11 | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | Aynı
+  171. use-cases/page.tsx | 371 | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | Aynı
+  172. customers/* | — | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | Aynı
+  173. startups/page.tsx | 9 | `<nav>` — `aria-label` eksik | 🟢 Low | HTML | Aynı
+
+
+================================================================================
+📄 frontend/DEEP-COMPONENT-LOGIC.md (35 bulgu)
+================================================================================
+
+  1. 🔴 Critical (Kritik) | 5
+  2. 🟠 High (Yüksek) | 12
+  3. 🟡 Medium (Orta) | 15
+  4. `lib/store.tsx` | 78 | **Token her zaman `'cookie'` string'i olarak ayarlanıyor.** `setToken('cookie')` çağrısı, tüm API isteklerine `Authorization: Bearer cookie` header'ı ekler. Bu anlamsız bir değer gönderir. Gerçek auth cookie üzerinden (`credentials: 'include'`) yapıldığı için çalışıyor ama header gereksiz ve yanıltıcı. | 🔴 Critical | Tüm API istekleri geçersiz Bearer token gönderiyor; gelecekte token-based auth'a geçişte kırılma | Token state'ini gerçek bir access token ile ayarla ya da Authorization header'ı cookie-based auth'da hiç ekleme
+  5. `app/[locale]/dashboard/api-keys/page.tsx` | 42 | **`credentials: 'include'` yanlış yerde.** `headers` objesi içinde `credentials: 'include'` tanımlanmış. Bu bir header değil, fetch option'ıdır. Hiçbir etkisi olmaz ve cookie-based auth çalışmaz. | 🔴 Critical | API key CRUD işlemleri authentication gerektirir ama cookie gönderilmez; tüm istekler 401 döner | `credentials: 'include'`'ı fetch options seviyesine taşı: `fetch(url, { headers: {}, credentials: 'include' })`
+  6. `app/[locale]/dashboard/playground/page.tsx` | ~280 | **Playground istekleri hardcoded `'Bearer YOUR_TOKEN'` gönderiyor.** Hiçbir zaman gerçek token ile çalışmaz. | 🔴 Critical | Playground'dan API'ye yapılan tüm istekler 401 döner; feature tamamen çalışmaz | Token'ı `useAuth()`'tan al ve dinamik olarak header'a ekle
+  7. `app/[locale]/dashboard/search/page.tsx` | 55-70 | **Search debounce yok + dual trigger.** `useEffect` her `query` değişiminde API çağrısı yapıyor (her tuş vuruşunda). Ayrıca form submit de ayrı tetikliyor. | 🔴 Critical | Her tuş vuruşunda API çağrısı → rate limit, yavaş UI, gereksiz network trafiği | Debounce ekle (300-500ms) VEYA useEffect'ten search tetiklemesini kaldır, sadece form submit ile çalıştır
+  8. `app/[locale]/dashboard/health/page.tsx` | 30 | **`useAuth()` destructure edilmiş ama hiç kullanılmıyor: `const { } = useAuth()`.** Token hiç alınmamış, fetch'te credentials var ama header'da auth yok. | 🔴 Critical | Health endpoint'i auth gerektiriyorsa 401 döner; gerektirmiyorsa bile token gereksiz yere context'e bağlanır | `const { token } = useAuth()` yap ve fetch header'ına ekle
+  9. `components/Toast.tsx` | 30-36 | **Toast'larda dismiss butonu yok.** Kullanıcı toast'ı kapatamaz, 4sn boyunca beklemek zorunda. Ayrıca `aria-live` region yok → screen reader erişimi yok. | 🟠 High | UX: Kullanıcı hata mesajını kapatamaz, ekran okuyucu toast'ları duyurmaz | Kapatma butonu ekle + `role="alert"` ve `aria-live="assertive"` ekle
+  10. `components/Toast.tsx` | 18-22 | **Toast stack limiti yok.** Hızlı ardışık hatalar onlarca toast biriktirebilir. | 🟠 High | Ekranın sağ alt köşesi toast'larla dolar, UI bozulur | Max 3-5 toast limiti koy, eski olanları otomatik kapat
+  11. `components/EmailVerificationBanner.tsx` | 16-21 | **Fetch hatasında `setVerified(true)` yapılıyor.** Network hatasında banner gizlenir, kullanıcı email doğrulamadan habersiz kalır. | 🟠 High | Kullanıcı email'ini doğrulamadan dashboard'u kullanmaya devam eder; email doğrulama akışı bypass edilir | Hata durumunda `setVerified(null)` yap (bilinmiyor durumu), banner'ı gösterme ama doğrulanmamış say
+  12. `components/CodeBlock.tsx` | 8-11 | **`navigator.clipboard.writeText` hata yakalaması yok.** Secure context olmayan durumlarda (HTTP, eski tarayıcı) throw eder. | 🟠 High | Copy butonuna basıldığında uygulama crash olabilir | try-catch ile sar, fallback olarak `document.execCommand('copy')` kullan
+  13. `app/[locale]/dashboard/deliveries/page.tsx` | 80-85 | **Client-side search + server-side pagination çelişkisi.** `filtered` dizisi API'den gelen 20 kaydı client-side'da filtreler ama `total` ve pagination API'den gelir. Arama yapıldığında sayfa 2'ye geçmek API'den farklı veri getirir. | 🟠 High | Pagination tutarsız: "Showing 1-20 of 150" ama arama sonucunda sadece 3 kayıt görünür | Arama API seviyesinde yapılmalı (query param olarak gönder), ya da client-side filtrede pagination'ı client-side hesapla
+  14. `app/[locale]/dashboard/logs/page.tsx` | 95-100 | **`statusCounts` sadece mevcut sayfadaki kayıtlardan hesaplanıyor.** "All: 150, Delivered: 5, Failed: 2" gibi gösteriyor ama 5 ve 2 sadece mevcut sayfadaki sayılar. | 🟠 High | Kullanıcı tüm sistemin durumunu yanlış anlar; "150 teslimattan sadece 5 başarılı" gibi yanlış bilgi | Status count'ları ayrı bir API endpoint'inden al veya "Bu sayfada" etiketi ekle
+  15. `app/[locale]/dashboard/page.tsx` | 260 | **`token!` non-null assertion.** Token null olabilir (auth yüklenirken) ama `!` ile zorlanmış. | 🟠 High | Auth yüklenirken crash olabilir; React render cycle'da undefined token ile API çağrısı | Guard ekle: `if (!token) return null` veya optional chaining
+  16. `app/[locale]/dashboard/page.tsx` | 245-249 | **Hem `Onboarding` hem `OnboardingWizard` aynı anda render ediliyor.** İkisi de `localStorage`'dan durum okuyor ve modal gösteriyor. | 🟠 High | Kullanıcıya aynı anda iki onboarding modal'ı görünebilir | Tek bir onboarding component'i kullan veya birbirini dışlayan mantık ekle
+  17. `lib/api.ts` | 50-65 | **401 refresh retry döngüsü.** Refresh başarılı olduğunda original isteği tekrarlıyor ama yeni token'ı saklamıyor. Refresh response'undan yeni token alınmalı. | 🟠 High | Refresh sonrası tekrarlanan istek yine 401 alabilir (token yenilenmemiş) | Refresh response'undan yeni token'ı al ve store'a kaydet
+  18. `app/[locale]/dashboard/settings/page.tsx` | 35-40 | **Notification preferences hardcoded.** `emailNotifs`, `failureAlerts`, `weeklyDigest` state'leri varsayılan değerlerle başlıor ama API'den yüklenmiyor. | 🟠 High | Kullanıcı tercihleri gösterilmiyor; her sayfa yenilemesinde sıfırlanır | Sayfa yüklendiğinde mevcut tercihleri API'den çek
+  19. `app/[locale]/dashboard/billing/page.tsx` | 105-115 | **`handleCancel` içinde nested async-await.** `getSubscription` sonucu `.then` ile `api.delete` çağrılıyor ama outer try-catch ile yakalanıyor. Hata yönetimi karmaşık. | 🟠 High | Cancel işlemi başarısız olursa kullanıcıya doğru hata gösterilemeyebilir | Flat async/await yapısına dönüştür
+  20. `app/[locale]/dashboard/endpoints/[id]/page.tsx` | 25-30 | **Endpoint listesinden tek endpoint bulma.** Tüm endpoint'leri çekip `find` ile arama yapılıyor — N+1 problemi yok ama gereksiz veri transferi. | 🟠 High | 100+ endpoint varsa gereksiz yere tüm liste çekilir; yavaş sayfa yükü | Dedicated GET endpoint'i ekle veya client'ta cache'le
+  21. `components/Onboarding.tsx` | 95 | **`steps` dizisi her render'da yeniden oluşturuluyor.** `useCallback` ile sarılı olmayan `steps` closure sorununa yol açabilir. | 🟡 Medium | Gereksiz re-render'lar; step geçişlerinde eski state kullanılabilir | `steps` dizisini `useMemo` ile sar
+  22. `components/OnboardingWizard.tsx` | 100 | **`completeStep` useCallback içinde `state.completedSteps` kullanıyor.** Dependency array'de `state.completedSteps` var ama `updateState` ile güncelleme yaparken stale closure riski. | 🟡 Medium | Hızlı step geçişlerinde son tamamlanan step kaybolabilir | Functional update kullan: `setState(prev => ...)`
+  23. `components/NotificationCenter.tsx` | 18-24 | **Silent failure.** `Promise.all` içinde `.catch(() => null)` var ama genel catch bloğu da boş. Kullanıcı bildirimler yüklenemediğinde hiçbir feedback almaz. | 🟡 Medium | Kullanıcı bildirimlerin yüklenemediğini anlamaz; boş liste görünür | En azından bir "Bildirimler yüklenemedi" mesajı göster
+  24. `components/ConfirmDialog.tsx` | 70 | **Dialog kapatıldığında body scroll restore ediliyor ama component unmount'ta edilmiyor.** Eğer dialog açıkken component unmount olursa body scroll locked kalır. | 🟡 Medium | Sayfa scroll edilemez hale gelir | Cleanup fonksiyonunda `document.body.style.overflow = ''` ekle
+  25. `app/[locale]/dashboard/page.tsx` | 120-135 | **`ActivityFeed` 5sn'de bir API çağrısı yapıyor.** Component unmount'ta interval temizleniyor ama bileşen görünmez olsa bile çalışmaya devam eder (tab değişikliği vs.). | 🟠 High | Gereksiz API çağrısı; rate limit riski; pil tüketimi | `document.visibilitychange` event'ini dinle, sekme görünmez olduğunda duraklat
+  26. `app/[locale]/dashboard/endpoints/page.tsx` | 40-50 | **Create endpoint'te double-click engeli yok.** `creating` state'i var ama buton disabled kontrolü `creating` ile yapılıyor — hızlı çift tıklamada iki istek gidebilir. | 🟡 Medium | Duplicate endpoint oluşturulabilir | `creating` true olduğunda butonu tamamen disable et (zaten yapılıyor ama optimistic update sonrası state sıfırlanmadan önce ikinci tıklama gelebilir)
+  27. `app/[locale]/dashboard/analytics/page.tsx` | 45-55 | **Analytics data fetch'de stale closure riski.** `loadData` useCallback içinde `token` ve `timeRange` var ama component unmount olursa state güncellenir. | 🟡 Medium | Unmount sonrası "Can't perform a React state update on an unmounted component" uyarısı | AbortController veya mounted flag kullan
+  28. `app/[locale]/dashboard/team/page.tsx` | 70-80 | **Role change'de owner rolü verilebilir.** `ROLE_OPTIONS = ['owner', 'admin', 'member']` ama owner rolü sadece bir kişi olabilir. UI'da owner seçilebilir. | 🟠 High | Takımda birden fazla owner olabilir; yetki çakışması | Owner seçeneğini filtrele veya sadece mevcut owner değiştirebilsin
+  29. `app/[locale]/dashboard/alerts/page.tsx` | 65-70 | **Threshold input'u negatif sayı kabul ediyor.** `parseInt(e.target.value) | 0` — negatif değerler mantıksız. | 🟡 Medium | "Failure rate > -10%" gibi anlamsız alert kuralı oluşturulabilir | `Math.max(0, ...)` ekle
+  30. `app/[locale]/dashboard/alerts/page.tsx` | 55-60 | **Create alert'te error handling yok.** `createAlert` catch bloğu boş. Kullanıcı alert oluşturulamadığında feedback almaz. | 🟡 Medium | Kullanıcı alert'in oluşturulup oluşturulmadığını bilmez | Toast ile hata göster
+  31. `app/[locale]/login/page.tsx` | 25-30 | **Password strength indicator'ı sadece register modunda gösteriliyor.** Login'de password alanı için hiçbir feedback yok. Bu iyi bir UX kararı ama password strength bar'ı register'da da zayıf: `score <= 2` = Weak ama 2/6 bile "Medium" yapabilir. | 🟡 Medium | Kullanıcı "Medium" güçlüklü şifreyle kayıt olabilir ama bu aslında zayıf olabilir | Eşikleri ayarla: score <= 3 = Weak, 4-5 = Medium, 6 = Strong
+  32. `components/StatusBadge.tsx` | 80-85 | **Bilinmeyen status için fallback `statusStyles.pending` kullanılıyor.** Ama status string'i doğrudan render ediliyor — "unknown_status" gibi şeyler görünebilir. | 🟡 Medium | Bilinmeyen status'lar için tutarsız UI | Bilinmeyen status için özel bir fallback style tanımla
+  33. `lib/store.tsx` | 45-55 | **`/auth/me` response yapısı ile `User` interface uyuşmazlığı.** API `data.id, data.email` döndürürken login/register `data.customer.id` bekliyor. Farklı response formatları. | 🟠 High | Login sonrası user bilgileri yanlış parse edilebilir | API response formatını standardize et veya her iki format için de handling ekle
+  34. `lib/api.ts` | 35-40 | **`AbortController` her çağrıda oluşturuluyor ama caller'ın signal'ı ile birleştiriliyor.** Eğer caller signal abort edilirse, hem caller hem internal controller abort olur ama `finally` bloğu sadece internal timeout'u temizler. | 🟠 High | Race condition: caller abort ettiğinde timeout hala çalışıyor olabilir | Tek bir controller kullan veya caller signal'ını doğrudan fetch'e geçir
+  35. `components/ThemeProvider.tsx` | 20-25 | **SSR/Client hydration mismatch.** `useState('light')` ile başlıyor ama client'ta `prefers-color-scheme: dark` olabilir. İlk render'da yanlış tema gösterilir (flash). | 🟡 Medium | Sayfa yüklendiğinde kısa bir light-mode flash'ı | Inline script ile `<html>` class'ını SSR'da ayarla
+
+
+================================================================================
+📄 frontend/DEEP-CSS-STYLING.md (98 bulgu)
+================================================================================
+
+  1. `app/[locale]/alternatives/webhook-relay/page.tsx` | 25 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  2. `app/[locale]/alternatives/hookdeck/page.tsx` | 42 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  3. `app/[locale]/alternatives/svix/page.tsx` | 42 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  4. `app/[locale]/alternatives/hook0/page.tsx` | 25 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  5. `app/[locale]/alternatives/convoy/page.tsx` | 25 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  6. `app/[locale]/docs/self-hosting/page.tsx` | 31 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  7. `app/[locale]/docs/retries/page.tsx` | 18, 70 | İki `<table>` de overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  8. `app/[locale]/docs/architecture/page.tsx` | 118 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  9. `app/[locale]/docs/api/page.tsx` | 153 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  10. `app/[locale]/docs/concepts/page.tsx` | 57 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  11. `app/[locale]/docs/page.tsx` | 61 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  12. `app/[locale]/docs/dlq/page.tsx` | 104 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  13. `app/[locale]/privacy/page.tsx` | 111 | `<table>` doğrudan render, overflow-x-auto yok | 🟡 Medium | `<div className="overflow-x-auto">` ile sar
+  14. `app/[locale]/docs/sdks/page.tsx` | 20 | `<pre>` overflow-x-auto yok | 🟡 Medium | `overflow-x-auto` class ekle
+  15. `app/[locale]/docs/sdks/page.tsx` | 103 | `<pre>` overflow-x-auto yok | 🟡 Medium | `overflow-x-auto` class ekle
+  16. `app/[locale]/docs/page.tsx` | 52 | `<pre>` overflow-x-auto yok | 🟡 Medium | `overflow-x-auto` class ekle
+  17. `app/[locale]/docs/api/page.tsx` | 174 | `<pre>` overflow-x-auto yok | 🟡 Medium | `overflow-x-auto` class ekle
+  18. `app/[locale]/playground/page.tsx` | 464, 472 | `<pre>` `whitespace-pre-wrap` var ama overflow-x-auto yok | 🟢 Low | `overflow-x-auto` ekle (pre-wrap zaten koruyor)
+  19. `app/[locale]/dashboard/deliveries/page.tsx` | 209 | `max-h-[80vh]` — mobilde address bar ile çakışır | 🟡 Medium | `max-h-[80dvh]` kullan
+  20. `app/[locale]/dashboard/logs/page.tsx` | 314 | `max-h-[80vh]` — mobilde address bar ile çakışır | 🟡 Medium | `max-h-[80dvh]` kullan
+  21. `app/[locale]/blog/[slug]/page.tsx` | 1899 | `max-h-[calc(100vh-8rem)]` — mobilde address bar ile çakışır | 🟡 Medium | `max-h-[calc(100dvh-8rem)]` kullan
+  22. `app/[locale]/status/page.tsx` | 226 | `style={{ width: \`${m.count * 14}px\` }}` — dinamik px genişlik | 🟡 Medium | Tailwind class veya `min-w` ile değiştir
+  23. `app/[locale]/status/page.tsx` | 210, 224 | `style={{ gap: '2px' }}` — inline style | 🟢 Low | `gap-0.5` Tailwind class kullan
+  24. `app/[locale]/dashboard/portal/page.tsx` | 68 | `grid grid-cols-2` — mobilde responsive breakpoint yok | 🟡 Medium | `grid-cols-1 sm:grid-cols-2` yap
+  25. `app/[locale]/dashboard/portal/page.tsx` | 92 | `grid grid-cols-3` — mobilde 3 sütun daralır | 🔴 High | `grid-cols-1 sm:grid-cols-2 md:grid-cols-3` yap
+  26. `app/[locale]/dashboard/retry-policy/page.tsx` | 210, 285 | `grid grid-cols-2` — mobilde responsive breakpoint yok | 🟡 Medium | `grid-cols-1 sm:grid-cols-2` yap
+  27. `app/[locale]/docs/event-types/page.tsx` | 17 | `grid grid-cols-2` — mobilde responsive breakpoint yok | 🟡 Medium | `grid-cols-1 sm:grid-cols-2` yap
+  28. `app/[locale]/login/page.tsx` | 163 | `grid grid-cols-2` — mobilde responsive breakpoint yok | 🟡 Medium | `grid-cols-1 sm:grid-cols-2` yap
+  29. `components/ConfirmDialog.tsx` | 101 | `bg-white` — dark mode'da parlak beyaz | 🔴 High | `bg-white dark:bg-slate-900`
+  30. `components/ConfirmDialog.tsx` | 103 | `text-gray-900` — dark mode'da koyu metin | 🔴 High | `text-gray-900 dark:text-white`
+  31. `components/ConfirmDialog.tsx` | 106 | `text-gray-600` — dark mode'da okunabilirlik düşük | 🔴 High | `text-gray-600 dark:text-slate-400`
+  32. `components/ConfirmDialog.tsx` | 111 | `border-gray-300 text-gray-700 hover:bg-gray-50` — dark mode'da kontrast düşük | 🔴 High | `dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800`
+  33. `components/AuthGuard.tsx` | 19, 30 | `bg-gray-50` — dark mode'da parlak arka plan | 🔴 High | `bg-gray-50 dark:bg-slate-950`
+  34. `components/AuthGuard.tsx` | 22, 33 | `text-gray-500` — dark mode'da okunabilirlik düşük | 🟡 Medium | `text-gray-500 dark:text-slate-400`
+  35. `components/ErrorBoundary.tsx` | 35 | `text-gray-900` — dark mode'da koyu metin | 🔴 High | `text-gray-900 dark:text-white`
+  36. `components/ErrorBoundary.tsx` | 36 | `text-gray-600` — dark mode'da okunabilirlik düşük | 🟡 Medium | `text-gray-600 dark:text-slate-400`
+  37. `components/LoadingSpinner.tsx` | 30-32, 41, 47 | `bg-gray-200` skeleton'lar — dark mode'da çok parlak | 🔴 High | `bg-gray-200 dark:bg-slate-700`
+  38. `components/LoadingSpinner.tsx` | 40 | `border-gray-200/50` — dark mode'da.border çizgisi | 🟡 Medium | `border-gray-200/50 dark:border-slate-700/50`
+  39. `components/LoadingSpinner.tsx` | 43 | `divide-gray-200/50` — dark mode'da divide çizgisi | 🟡 Medium | `divide-gray-200/50 dark:divide-slate-700/50`
+  40. `components/ThemeToggle.tsx` | 14 | `bg-gray-200 hover:bg-gray-300` — dark mode'da track rengi | 🟡 Medium | `bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600`
+  41. `components/ThemeToggle.tsx` | 19 | `bg-white` thumb — dark mode'da uyumlu olabilir ama shadow eksik | 🟢 Low | `bg-white dark:bg-slate-200`
+  42. `app/[locale]/docs/self-hosting/page.tsx` | 32 | `bg-gray-50` thead — dark mode'da parlak | 🟡 Medium | `bg-gray-50 dark:bg-slate-800`
+  43. `app/[locale]/docs/retries/page.tsx` | 19, 71 | `bg-gray-50` thead — dark mode'da parlak | 🟡 Medium | `bg-gray-50 dark:bg-slate-800`
+  44. `app/[locale]/docs/architecture/page.tsx` | 119 | `bg-gray-50` thead — dark mode'da parlak | 🟡 Medium | `bg-gray-50 dark:bg-slate-800`
+  45. `app/[locale]/docs/api/page.tsx` | 154 | `bg-gray-50` thead — dark mode'da parlak | 🟡 Medium | `bg-gray-50 dark:bg-slate-800`
+  46. `app/[locale]/docs/concepts/page.tsx` | 58 | `bg-gray-50` thead — dark mode'da parlak | 🟡 Medium | `bg-gray-50 dark:bg-slate-800`
+  47. `app/[locale]/docs/page.tsx` | 62 | `bg-gray-50` thead — dark mode'da parlak | 🟡 Medium | `bg-gray-50 dark:bg-slate-800`
+  48. `app/[locale]/docs/dlq/page.tsx` | 105 | `bg-gray-50` thead — dark mode'da parlak | 🟡 Medium | `bg-gray-50 dark:bg-slate-800`
+  49. `app/[locale]/dashboard/portal-customize/page.tsx` | 360, 386 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Kasıtlı olabilir, `dark:bg-slate-900` ile tutarlılaştır
+  50. `app/[locale]/dashboard/signature-verifier/page.tsx` | 215 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Aynı
+  51. `app/[locale]/dashboard/playground/page.tsx` | 212, 668 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Aynı
+  52. `app/[locale]/dashboard/webhook-builder/page.tsx` | 236 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Aynı
+  53. `app/[locale]/docs/architecture/page.tsx` | 16 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Aynı
+  54. `app/[locale]/docs/api/page.tsx` | 221, 228 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Aynı
+  55. `app/[locale]/docs/page.tsx` | 41 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Aynı
+  56. `app/[locale]/docs/sdks/page.tsx` | 20, 25, 55, 77, 103 | `bg-gray-900 text-green-400` hardcoded | 🟢 Low | Aynı
+  57. `components/ConfirmDialog.tsx` | 101 | `shadow-xl` — dark mode'da gölge fark edilmez | 🟡 Medium | `shadow-xl dark:shadow-2xl dark:shadow-black/30`
+  58. `components/Toast.tsx` | 38 | `shadow-lg` — dark mode'da gölge fark edilmez | 🟢 Low | `shadow-lg dark:shadow-black/30`
+  59. `globals.css` | 23 | `display: none !important` (FOUC prevention) | 🟢 Low | Kabul edilebilir — FOUC önlemi için gerekli
+  60. `globals.css` | 24 | `display: none !important` (FOUC prevention) | 🟢 Low | Kabul edilebilir — FOUC önlemi için gerekli
+  61. `app/[locale]/dashboard/portal-customize/page.tsx` | 294 | `style={{ fontFamily: config.font_family }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  62. `app/[locale]/dashboard/portal-customize/page.tsx` | 299, 325, 328 | `style={{ backgroundColor: config.primary_color }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  63. `app/[locale]/dashboard/billing/page.tsx` | 274 | `style={{ width: \`${usagePercent}%\` }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  64. `app/[locale]/dashboard/retry-policy/page.tsx` | 322 | `style={{ width: ... }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  65. `app/[locale]/dashboard/health/page.tsx` | 156 | `style={{ width: \`${ep.success_rate}%\` }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  66. `app/[locale]/admin/system/page.tsx` | 170 | `style={{ width: ... }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  67. `app/[locale]/admin/page.tsx` | 142 | `style={{ backgroundColor: PLAN_COLORS[...] }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  68. `app/[locale]/status/page.tsx` | 169, 181, 210, 224, 226, 235 | Birden fazla inline style | 🟡 Medium | Bazıları Tailwind class'a dönüştürülebilir
+  69. `app/[locale]/page.tsx` | 78, 204 | `style={{ height: ... }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  70. `components/Onboarding.tsx` | 129 | `style={{ width: \`${progress}%\` }}` | 🟢 Low | Dinamik değer — inline style kabul edilebilir
+  71. `components/OnboardingWizard.tsx` | 82, 203, 575 | Birden fazla inline style | 🟡 Medium | Bazıları Tailwind class'a dönüştürülebilir
+  72. `z-[60]` | OnboardingWizard progress bar | 🟡 Özel durum
+  73. `z-[100]` | Toast notifications | 🟡 Özel durum
+  74. `components/OnboardingWizard.tsx` | 77 | `z-[60]` — arbitrary value, config'de yok | 🟢 Low | `tailwind.config`'e `zIndex.onboarding: 60` ekle
+  75. `components/Toast.tsx` | 33 | `z-[100]` — arbitrary value, config'de yok | 🟢 Low | `tailwind.config`'e `zIndex.toast: 100` ekle
+  76. `globals.css` | - | `@font-face` tanımlı değil, sistem fontu kullanılıyor | 🟢 Low | Özel font kullanılacaksa `font-display: swap` ekle
+  77. `app/[locale]/layout.tsx` | - | Font loading stratejisi belirsiz | 🟢 Low | `next/font` kullanımı kontrol edilmeli
+  78. `bg-gray-900` code blocks her iki temada da aynı | 🟢 Low | Kasıtlı — code her zaman koyu arka plan
+  79. `text-green-400` code blocks dark mode'da yeterince kontrastlı | 🟢 Low | `green-400` yeterli kontrast sağlıyor
+  80. `app/[locale]/dashboard/portal/page.tsx` | 68 | `grid grid-cols-2` mobilde içeriği kırpar | 🟡 Medium | Responsive breakpoint ekle
+  81. `app/[locale]/dashboard/portal/page.tsx` | 92 | `grid grid-cols-3` mobilde içeriği kırpar | 🔴 High | Responsive breakpoint ekle
+  82. `app/[locale]/page.tsx` | 269, 316, 369, 388, 393, 429 | `max-w-7xl mx-auto px-6` — tutarlı ✅ | 🟢 Low | Sorun yok
+  83. `app/[locale]/dashboard/layout.tsx` | 143 | `p-4 md:p-8` — dashboard padding tutarlı ✅ | 🟢 Low | Sorun yok
+  84. `app/[locale]/docs/layout.tsx` | 65 | `sticky top-0 z-50` — docs nav bar | 🟢 Low | Sorun yok, doğru kullanım
+  85. `app/[locale]/page.tsx` | 268 | `sticky top-0 z-50` — ana sayfa nav bar | 🟢 Low | Sorun yok, doğru kullanım
+  86. `app/[locale]/dashboard/layout.tsx` | 67, 75 | `fixed` sidebar + overlay | 🟢 Low | Sorun yok, doğru kullanım
+  87. `globals.css` | 28 | `scroll-behavior: smooth` tanımlı ✅ | 🟢 Low | Sorun yok
+  88. 🔴 High | 8 | Dark mode'da kırık UI, responsive kırılma
+  89. 🟡 Medium | 28 | Okunabilirlik sorunları, responsive risk
+  90. 🟢 Low | 12 | İyileştirme önerileri, kabul edilebilir durumlar
+  91. 1. **ConfirmDialog Dark Mode** — `bg-white`, `text-gray-900`, `text-gray-600`, `border-gray-300` → dark variant'ları ekle (4 dosya, 🔴)
+  92. 2. **AuthGuard Dark Mode** — `bg-gray-50` → `dark:bg-slate-950` (1 dosya, 🔴)
+  93. 3. **ErrorBoundary Dark Mode** — `text-gray-900`, `text-gray-600` → dark variant'ları ekle (1 dosya, 🔴)
+  94. 4. **LoadingSpinner Skeleton Dark Mode** — `bg-gray-200` → `dark:bg-slate-700` (1 dosya, 🔴)
+  95. 5. **Portal page grid-cols-3** — Mobilde responsive breakpoint ekle (1 dosya, 🔴)
+  96. 6. **13 Tablo overflow-x-auto** — Wrapper ekle (13 dosya, 🟡)
+  97. 7. **8 Docs thead bg-gray-50** — Dark variant ekle (8 dosya, 🟡)
+  98. 8. **3 Modal vh kullanımı** — `dvh` ile değiştir (3 dosya, 🟡)
+
+
+================================================================================
+📄 frontend/DEEP-TYPESCRIPT.md (70 bulgu)
+================================================================================
+
+  1. `docs/integrations/page.tsx` | 119 | `payload: any` parametre kullanımı | 🟡 Medium | `Record<string, unknown>` veya spesifik interface tanımla
+  2. `blog/[slug]/page.tsx` | 556 | `event: any` parametre kullanımı | 🟡 Medium | Webhook event interface'i tanımla
+  3. `lib/api.ts` | 447,450,453 | `token: string \ | undefined` — API fonksiyonlarında optional token | 🟢 Low | Token zorunlu olmalı veya `null` kullanılmalı (undefined vs null tutarsızlığı)
+  4. `lib/api.ts` | 461,472 | `endpoint_id: string \ | null` ile `string \ | undefined` karışımı | 🟢 Low | Tutarlı null/undefined kullanımı belirle
+  5. `components/Onboarding.tsx` | 67 | `useEffect` boş dependency `[]` — `router` bağımlılığı eksik | 🟡 Medium | `[router]` ekle veya `router.push`'u useCallback ile sar
+  6. `components/Onboarding.tsx` | 203 | `useEffect` boş dependency `[]` — `localStorage` okuma | 🟢 Low | Mount'ta bir kez çalışması isteniyorsa `[]` doğru
+  7. `components/LanguageSwitcher.tsx` | 27 | `useEffect` boş dependency `[]` — click outside listener | 🟢 Low | Mount'ta bir kez çalışması isteniyorsa `[]` doğru
+  8. `dashboard/playground/page.tsx` | 343 | `useEffect` boş dependency `[]` — state okuma | 🟡 Medium | Gerekli dependency'leri ekle
+  9. Çeşitli dashboard sayfaları | - | 63 useEffect çağrısından sadece 16'sı cleanup function'a sahip | 🟡 Medium | Interval/timeout/event listener kullanılan useEffect'lerde cleanup ekle
+  10. 29 dashboard sayfası | - | Data fetching yapan sayfalar Suspense boundary kullanmıyor | 🟡 Medium | Her data-fetching sayfası için `<Suspense fallback={<LoadingSpinner />}>` ekle
+  11. `components/ErrorBoundary.tsx` | - | Error boundary tanımlı ama hiçbir sayfada kullanılmıyor | 🟡 Medium | Dashboard layout veya kritik sayfalara `<ErrorBoundary>` sar
+  12. `app/[locale]/error.tsx` | 13 | `console.error('Page error:', error)` | 🟢 Low | Error boundary'de kabul edilebilir
+  13. `dashboard/portal/page.tsx` | 42 | `console.error('Failed to load portal data:', err)` | 🟡 Medium | Logger servisi kullan veya kaldır
+  14. `components/ErrorBoundary.tsx` | 26 | `console.error('ErrorBoundary caught:', error, errorInfo)` | 🟢 Low | Error boundary'de kabul edilebilir
+  15. `lib/redis.ts` | 13 | `console.warn('Upstash Redis not configured...')` | 🟢 Low | Dev uyarısı — kabul edilebilir
+  16. `lib/store.tsx` | 123 | `console.warn('Logout request failed:', err)` | 🟢 Low | Logout hatası — kabul edilebilir
+  17. `lib/email.ts` | 182,189 | `console.error('Gmail API error:')` + `console.error('Email send failed:')` | 🟢 Low | Server-side logging — kabul edilebilir
+  18. `blog/[slug]/page.tsx` | **1922** | 🔴 Critical | Dosyayı parçala: blog data, blog renderer, blog page
+  19. `playground/page.tsx` (public) | **911** | 🔴 High | Alt bileşenlere ayır
+  20. `status/page.tsx` | **699** | 🟡 Medium | Status data ve UI'yı ayır
+  21. `dashboard/playground/page.tsx` | **695** | 🟡 Medium | Playground UI parçalarını çıkar
+  22. `components/OnboardingWizard.tsx` | **649** | 🟡 Medium | Step bileşenlerini ayrı dosyalara taşı
+  23. `dashboard/page.tsx` | **586** | 🟡 Medium | Dashboard widget'larını ayır
+  24. `use-cases/page.tsx` | **577** | 🟡 Medium | Use case kartlarını bileşene çıkar
+  25. `dashboard/deliveries/[id]/page.tsx` | **547** | 🟡 Medium | Detail view bileşenlerini ayır
+  26. `lib/api.ts` | **540** | 🟡 Medium | API modüllerini dosya bazında böl
+  27. `compare/CompareContent.tsx` | **506** | 🟡 Medium | Compare sections'ı parçala
+  28. `lib/store.tsx` | 35-70,77-96,100-115 | `API_BASE` tanımı 3 kez tekrarlanıyor (login, register, useEffect) | 🟡 Medium | Sabit olarak tanımla: `const API_BASE = process.env.NEXT_PUBLIC_API_URL | ...`
+  29. 25+ dosya | - | `process.env.NEXT_PUBLIC_API_URL \ | \ | (production ? '/api' : 'localhost:3000')` pattern'i 25+ yerde tekrarlanıyor | 🔴 High | `lib/api.ts`'deki `API_BASE` sabitini import et veya shared utility oluştur
+  30. `components/StatusBadge.tsx` + `components/tremor/StatusBadge.tsx` | - | tremor/StatusBadge sadece re-export — gereksiz dosya | 🟢 Low | Doğrudan `@/components/StatusBadge` import et
+  31. `dashboard/settings/page.tsx` | 43,56,86 | `setTimeout(() => ..., 2000)` / `3000` | 🟢 Low | Sabit olarak tanımla: `const TOAST_DURATION = 2000`
+  32. `dashboard/api-keys/page.tsx` | 117 | `setTimeout(() => ..., 2000)` | 🟢 Low | Aynı sabiti kullan
+  33. `dashboard/deliveries/[id]/page.tsx` | 69 | `setTimeout(() => ..., 2000)` | 🟢 Low | Aynı sabiti kullan
+  34. `playground/page.tsx` (public) | 146,155,163 | 3x `setTimeout(() => ..., 2000)` | 🟢 Low | Aynı sabiti kullan
+  35. `components/SdkTabs.tsx` | 17 | `setTimeout(() => ..., 2000)` | 🟢 Low | Aynı sabiti kullan
+  36. `components/OnboardingWizard.tsx` | 181 | `setTimeout(() => ..., 3000)` (confetti) | 🟢 Low | Sabit olarak tanımla
+  37. `lib/redis.ts` | 55 | `ttlSeconds = 86400` (1 gün) | 🟢 Low | Sabit olarak tanımla: `const DEFAULT_TTL = 86400`
+  38. `lib/redis.ts` | 77 | `arr.length > 100` — max liste boyutu | 🟢 Low | Sabit olarak tanımla: `const MAX_LIST_SIZE = 100`
+  39. `dashboard/page.tsx` | - | ~20 inline arrow function onClick handler'ları | 🟡 Medium | useCallback ile sar veya ayrı handler fonksiyonlarına çıkar
+  40. `dashboard/playground/page.tsx` | - | Birden fazla inline function | 🟡 Medium | useCallback kullan
+  41. `dashboard/billing/page.tsx` | - | Inline function'lar | 🟢 Low | Düşük priority
+  42. `components/OnboardingWizard.tsx` | - | Inline function'lar | 🟢 Low | Düşük priority
+  43. `dashboard/rate-limiting/page.tsx` | 57 | `catch {}` — boş catch | 🟡 Medium | En azından `console.error` veya user-facing hata mesajı
+  44. `dashboard/portal-customize/page.tsx` | 60 | `catch {}` — boş catch | 🟡 Medium | Aynı
+  45. `dashboard/inbound/page.tsx` | 54 | `catch {}` — boş catch | 🟡 Medium | Aynı
+  46. `dashboard/sso/page.tsx` | 33 | `catch {}` — boş catch | 🟡 Medium | Aynı
+  47. `dashboard/signature-verifier/page.tsx` | 38,68 | 2x `catch {}` — boş catch | 🟡 Medium | Aynı
+  48. `dashboard/playground/page.tsx` | 135,327 | 2x `catch {}` — boş catch | 🟡 Medium | Aynı
+  49. `dashboard/webhook-builder/page.tsx` | 110 | `catch {}` — boş catch | 🟡 Medium | Aynı
+  50. `dashboard/api-importer/page.tsx` | 53 | `catch {}` — boş catch | 🟡 Medium | Aynı
+  51. `blog/[slug]/page.tsx` | `generateStaticParams` **eksik** | 🟡 Medium | Blog postları için `generateStaticParams` ekle (build-time'da statik sayfalar oluşturur)
+  52. **90+ diğer sayfa** | `generateMetadata` **eksik** | 🟡 Medium | SEO için her sayfaya özel meta description/title ekle
+  53. `app/[locale]/dashboard/` alt loading/error | ❌ Eksik | 🟡 Medium
+  54. `blog/[slug]/page.tsx` | ❌ `<img>` tag kullanıyor (eğer varsa) | 🟡 Medium
+  55. `layout.tsx` | 110 | Theme detection script — XSS riski düşük (sabit string) | 🟢 Low | Kabul edilebilir — sabit script
+  56. `blog/[slug]/page.tsx` | 1676 | `<style dangerouslySetInnerHTML>` — inline CSS | 🟡 Medium | CSS module veya styled-component kullan
+  57. `blog/[slug]/page.tsx` | 1764 | Syntax highlighting için `dangerouslySetInnerHTML` | 🔴 High | DOMPurify veya `rehype-sanitize` ile sanitize et
+  58. `lib/store.tsx` | 35 | `useEffect` fetch çağrısı — cleanup yok | 🟡 Medium | AbortController kullan veya unmount check ekle
+  59. `components/EmailVerificationBanner.tsx` | 14 | fetch çağrısı — cleanup yok | 🟡 Medium | AbortController ekle
+  60. `dashboard/inbound/page.tsx` | 114,148 | `.map()` key kontrolü | 🟡 Medium | Key prop ekle
+  61. `dashboard/billing/page.tsx` | 50,58,312 | `.map()` key kontrolü | 🟡 Medium | Key prop ekle
+  62. `dashboard/signature-verifier/page.tsx` | 33,62 | `.map()` key kontrolü | 🟡 Medium | Key prop ekle
+  63. `dashboard/playground/page.tsx` | 216,319,430 | `.map()` key kontrolü | 🟡 Medium | Key prop ekle
+  64. `dashboard/api-importer/page.tsx` | 112 | `.map()` key kontrolü | 🟡 Medium | Key prop ekle
+  65. `dashboard/endpoints/page.tsx` | 84 | `.map()` key kontrolü | 🟡 Medium | Key prop ekle
+  66. `dashboard/alerts/page.tsx` | 213 | `.map()` key kontrolü | 🟡 Medium | Key prop ekle
+  67. `lib/store.tsx` | 35,77,100 | `API_BASE` 3 kez tanımlanıyor | 🟡 Medium | Dosya seviyesinde sabit tanımla
+  68. `components/EmailVerificationBanner.tsx` | 15,36 | `API_BASE` 2 kez tanımlanıyor | 🟡 Medium | `@/lib/api`'dan `API_BASE` import et
+  69. 25+ dosya | - | `process.env.NEXT_PUBLIC_API_URL \ | \ | ...` pattern'i tekrarlanıyor | 🔴 High | `lib/constants.ts` oluştur ve tek yerden yönet
+  70. `dashboard/` altı | 12 inline `style={{}}` objesi | 🟢 Low | Tailwind class veya CSS variable kullan
+
+
+================================================================================
+📄 frontend/agent2-analytics-billing.md (7 bulgu)
+================================================================================
+
+  1. Analytics | ✅ Yes | 🟡 Some (subtitle, stat labels)
+  2. Billing | ✅ Yes | 🟡 Many (table headers, plan features, buttons)
+  3. Alerts | ✅ Yes | 🟡 Many (labels, empty state, buttons)
+  4. Notifications | ✅ Yes | 🟡 Many (labels, buttons, error toasts)
+  5. Health | ✅ Yes | 🟡 Some (summary cards, empty state)
+  6. Rate Limiting | ❌ No | 🔴 **All strings hardcoded**
+  7. Audit Log | ❌ No | 🔴 **All strings hardcoded**
+
+
+================================================================================
+📄 frontend/agent4-settings-config.md (51 bulgu)
+================================================================================
+
+  1. 🟡 Medium | **Hardcoded English strings** | `'New passwords do not match'` (line ~76), `'Password must be at least 8 characters'` (line ~80), `'Sign Out'` button (line ~215), `'✓ Copied!'` (line ~183), `'Copy'` button (line ~182), `'Plan: '` prefix (line ~133). All should use `t()` or `tc()`.
+  2. 🟡 Medium | **Toggle accessibility** | `ToggleRow` component uses a `<button>` without `role="switch"` or `aria-checked` attribute. Screen readers won't announce toggle state.
+  3. 🟢 Low | **Delete modal has no focus trap** | The delete account modal doesn't trap keyboard focus. Tab can escape behind the backdrop.
+  4. 🟢 Low | **Notification API field mismatch** | `email_on_success` is mapped to `emailNotifs` toggle, but the toggle label is "Email notifications" (generic). The field name suggests it's only for success events, which may confuse users.
+  5. 🟢 Low | **Missing `autoComplete` on confirm password** | The confirm password field lacks `autoComplete="new-password"`, which prevents password managers from auto-filling consistently.
+  6. 🟢 Low | **`weeklyDigest` state is local-only** | The `weeklyDigest` toggle is saved to API via `handleNotificationSave`, but the API payload doesn't include a `weekly_digest` field — it's silently dropped.
+  7. 🔴 Critical | **No confirmation for member removal** | `handleRemoveMember` calls the API immediately on click. A misclick permanently removes a team member with no undo.
+  8. 🟡 Medium | **Hardcoded English strings (15+ instances)** | `'Manage your teams and collaborate with others'`, `'+ Create Team'`, `'Team Name'`, `'Description (optional)'`, `'Cancel'` (×2), `'Loading teams...'`, `'Email'`, `'Role'`, `'No members yet. Invite someone!'`, `'Select a team to view details'`, all error toast messages (`'Failed to load teams'`, `'Failed to create team'`, `'Failed to load members'`, `'Failed to invite member'`, `'Failed to remove member'`, `'Failed to update role'`).
+  9. 🟡 Medium | **Owner can demote themselves** | The role dropdown allows the owner to change their own role to `member` or `admin`, potentially locking themselves out. No guard checks `m.id === currentUser.id`.
+  10. 🟡 Medium | **No role-based permission checks** | Any member (even `member` role) can see and use the role change dropdown and remove button for other members. Should be restricted to `owner`/`admin`.
+  11. 🟢 Low | **Date formatting not locale-aware** | `new Date(team.created_at).toLocaleDateString()` uses browser locale, not the app's `[locale]` route param.
+  12. 🟢 Low | **No loading state for members panel** | When switching teams, members list has no loading indicator — it just shows stale data until new data arrives.
+  13. 🔴 Critical | **`credentials: 'include'` inside `headers` object in `createKey`** | Line ~54–58: `credentials: 'include'` is placed **inside the `headers` object** instead of at the top-level fetch options. This sends a literal HTTP header `credentials: include` (meaningless) and cookies are NOT sent. The create key request will fail with 401 for cookie-auth users. Other functions (`fetchKeys`, `deleteKey`, `rotateKey`) correctly place `credentials` at the top level.
+  14. 🟡 Medium | **`useAuth()` destructures nothing** | `const { } = useAuth();` — empty destructure. The page doesn't use the auth token at all. This means if the API requires a Bearer token (not just cookies), this page silently fails. Other pages use `const { token } = useAuth()`.
+  15. 🟡 Medium | **`keyCount` translation has broken pluralization** | Translation is `"{count} key{plural}"` but no `plural` variable is passed: `{ count: keys.length }`. Renders as `"3 key"` instead of `"3 keys"`. Should pass `{ count: keys.length, plural: keys.length !== 1 ? 's' : '' }`.
+  16. 🟡 Medium | **Silent error swallowing in `fetchKeys`** | `catch (e) { // Error handled silently }` — the user sees no error if key loading fails. They just see an empty list with no indication something went wrong.
+  17. 🟢 Low | **`NEXT_PUBLIC_API_URL` fallback inconsistency** | Falls back to `'http://localhost:3000/v1'` but `apiFetch` uses a different default (`/api` in production). Could cause issues in dev vs prod.
+  18. 🟢 Low | **No loading spinner for key creation** | While `creating` is true, button shows spinner text, but there's no visual feedback on the form itself (e.g., disabled inputs).
+  19. 🔴 Critical | **Zero i18n — no translations at all** | Does not import `useTranslations`. Every single string is hardcoded English: `'Loading...'`, `'👤 Customer Portal'`, `'Profile'`, `'Email'`, `'Plan'`, `'Member since'`, `'Webhook limit'`, `'/month'`, `'Usage'`, `'Webhooks used'`, `'Endpoints'`, `'API calls today'`. The `portal` translation namespace is **missing from ALL locale files**.
+  20. 🟡 Medium | **No dark mode for loading state** | Loading div uses `text-gray-500` without `dark:text-slate-400` variant.
+  21. 🟡 Medium | **Inconsistent card styling** | Uses raw `bg-white dark:bg-slate-800 rounded-xl p-6 border` instead of `glass-card` used by every other page in the app.
+  22. 🟡 Medium | **Missing responsive grid** | `grid grid-cols-2` (profile) and `grid grid-cols-3` (usage) will overflow on mobile. Should be `grid-cols-1 sm:grid-cols-2` and `grid-cols-1 sm:grid-cols-3`.
+  23. 🟢 Low | **`toLocaleDateString()` not locale-aware** | Uses browser locale instead of app locale.
+  24. 🟢 Low | **No empty state for zero usage** | If `webhooks_used` is `undefined`/`0`, shows `0` without context.
+  25. 🟢 Low | **Missing page title tag** | No `<title>` or `metadata` export for SEO.
+  26. 🔴 Critical | **Zero i18n — no translations at all** | Does not import `useTranslations`. ~40+ hardcoded English strings throughout: headers, labels, descriptions, button text, placeholder text, toast messages, embed code comments.
+  27. 🟡 Medium | **`next/image` for external logo URLs** | Uses `<Image src={config.logo_url}>` for arbitrary external URLs. Next.js requires domains to be configured in `next.config.js` `images.remotePatterns`. Unknown URLs will cause runtime errors. Should use `<img>` or add error boundary.
+  28. 🟡 Medium | **No unsaved changes warning** | User can make many changes and navigate away without any warning. No dirty-state tracking.
+  29. 🟡 Medium | **`embedCode` includes hardcoded domain** | `https://portal.hooksniff.dev/embed` is hardcoded. Should use an environment variable or the current domain.
+  30. 🟡 Medium | **React integration code uses `config.primary_color` directly in string template** | If `primary_color` contains a quote character, the generated JSX code will be malformed. Should escape or use a safer template.
+  31. 🟢 Low | **No font preview** | Font dropdown shows font names but the dropdown itself uses the default font, not the selected font.
+  32. 🟢 Low | **Toggle checkboxes use `sr-only` pattern** | The `<input type="checkbox" className="sr-only">` is inside a `<label>` but the visual toggle div is not the checkbox — accessibility is fragile. Should use `role="switch"` pattern.
+  33. 🟢 Low | **No reset to defaults** | No button to reset configuration to defaults.
+  34. 🔴 Critical | **Zero i18n — no translations at all** | Does not import `useTranslations`. All strings hardcoded: `'🔐 SSO / SAML'`, `'Configure Single Sign-On...'`, `'Provider'`, `'SAML 2.0'`, `'OpenID Connect'`, all field labels, button text, info banner text. The `sso` namespace is **missing from ALL locale files**.
+  35. 🟡 Medium | **Shared state between SAML and OIDC** | The `certificate` state serves double duty: X.509 certificate for SAML and client secret for OIDC. Switching providers doesn't clear the field, so a user switching from OIDC to SAML could accidentally save an OIDC client secret as a SAML certificate.
+  36. 🟡 Medium | **No field validation** | No validation before saving. User can save empty required fields (e.g., SAML with no metadata URL or entity ID). No URL format validation on SSO URL / Issuer URL.
+  37. 🟡 Medium | **No plan gate** | Info banner says "Business plan required" but there's no actual check. Users on free/starter plans can configure SSO and click Save, which will either silently fail or succeed when it shouldn't.
+  38. 🟡 Medium | **Hardcoded pricing link** | `<a href="/pricing">` doesn't include the locale prefix. Should use the i18n-aware `Link` component: `<Link href="/pricing">`.
+  39. 🟢 Low | **No test connection button** | No way to validate SSO config before enabling it for all team members.
+  40. 🟢 Low | **Certificate textarea has no monospace font hint** | Unlike other code-like inputs, the certificate textarea doesn't have a visual hint that it expects PEM format.
+  41. 🔴 Critical | **Zero i18n — no translations at all** | Does not import `useTranslations`. All strings hardcoded: `'🌐 Custom Domain'`, `'Use your own domain...'`, `'Add Domain'`, `'DNS Records'`, all table headers, step descriptions, button text, toast messages. The `customDomain` namespace is **missing from ALL locale files**.
+  42. 🟡 Medium | **No loading of existing domain on mount** | Page has no `useEffect` to fetch existing domain configuration. If user already added a domain and refreshes, they see an empty form with no record of their domain. Should fetch from `GET /custom-domains` on mount.
+  43. 🟡 Medium | **No domain deletion** | No way to remove/delete a custom domain once added.
+  44. 🟡 Medium | **No domain listing** | Only supports one domain at a time with no UI to show existing domains. If the API supports multiple domains, the UI doesn't reflect this.
+  45. 🟡 Medium | **`handleAddDomain` overwrites state without warning** | If a domain is already configured, calling `handleAddDomain` again silently overwrites `dnsRecords` and `domainId` without any confirmation.
+  46. 🟢 Low | **DNS record copy only copies value, not name** | The copy button copies `rec.value` but users might want to copy the `rec.name` field too.
+  47. 🟢 Low | **No loading state on initial mount** | Page doesn't show a loading state while checking for existing domains (because it doesn't check at all).
+  48. 🟢 Low | **`'Verify Domain'` button text inconsistent** | Uses `'✓ Verify Domain'` with checkmark prefix — other pages use emoji or plain text.
+  49. 🔴 Critical | 6 | `credentials` in headers bug, zero i18n on 4 pages, no removal confirmation
+  50. 🟡 Medium | 18 | Hardcoded strings in partially-translated pages, shared state bugs, missing validation
+  51. 🟢 Low | 14 | Date locale, focus traps, minor UX polish
+
+
+================================================================================
+📄 frontend/deep-code-quality.md (3 bulgu)
+================================================================================
+
+  1. 🔴 Critical: 4 issues
+  2. 🟠 High: 8 issues
+  3. 🟡 Medium: 12 issues
+
+
+================================================================================
+📄 frontend/deep-error-handling.md (49 bulgu)
+================================================================================
+
+  1. 1 | 🟡 Medium | **`Serialization` error leaks internal details** — `AppError::Serialization` returns `format!("Serialization error: {}", e)` to the client. While `serde_json` errors aren't as dangerous as DB errors, they can reveal internal field names and data structure. | Return a generic `"Invalid request format"` to the client; log the full error server-side.
+  2. 2 | 🟡 Medium | **No request ID / correlation ID** in error responses. When users report errors, there's no way to correlate client-side errors to server logs. | Add a `request_id` field to the error envelope (generated via middleware).
+  3. 3 | 🟡 Medium | **No error catalog/enum on the frontend**. Error codes exist server-side but there's no shared schema or TypeScript enum mapping error codes to user-friendly messages. | Create a shared error code enum and map each code to a translated user-facing message.
+  4. 4 | 🟢 Low | **`BadRequest` messages are developer-facing, not user-facing**. Messages like `"Password must be at least 8 characters"` are fine, but `"2FA setup not initiated. Call /2fa/enable first."` references API internals. | Clean up messages that reference API paths or internal concepts.
+  5. 5 | 🟢 Low | **No `409 Conflict` variant** — "Email already registered" returns 400 instead of 409. Semantically, 409 is more appropriate for duplicate resource conflicts. | Add `Conflict(String)` variant or use 409 for duplicate resource scenarios.
+  6. 6 | 🔴 High | **No retry logic for transient errors** (502, 503, 504, network errors). If the API is briefly unavailable, the user sees an error with no recovery path. | Add exponential backoff retry (1-2 attempts) for 5xx and network errors.
+  7. 7 | 🟡 Medium | **Generic error messages**: `"Request timed out. Please try again."` and `"Unknown error"` are the only fallback messages. No context about what the user was trying to do. | Include action context: `"Failed to load endpoints. Please try again."`
+  8. 8 | 🟡 Medium | **No offline detection**: If the user loses network, they get a generic error rather than an "offline" indicator. | Detect `navigator.onLine` and show an offline banner.
+  9. 9 | 🟡 Medium | **401 refresh loop risk**: If refresh endpoint itself returns 401, the code falls through to logout, but there's no guard against calling refresh multiple times in rapid succession (e.g., multiple concurrent requests all hitting 401). | Use a shared refresh promise or mutex to prevent concurrent refresh attempts.
+  10. 10 | 🟡 Medium | **`getErrorMessage` is used in some places but not consistently**. Many `catch` blocks use `err instanceof Error ? err.message : 'Failed to...'` inline instead of calling this utility. | Enforce consistent use of `getErrorMessage` everywhere.
+  11. 11 | 🟢 Low | **No error message translation**. The utility returns raw English strings. | Return i18n keys instead of raw messages, or wrap with `t()` at the call site.
+  12. 12 | 🟡 Medium | **No "warning" type**. Only success/error/info. Missing a yellow warning state for non-critical issues (e.g., "Rate limit approaching"). | Add `warning` type with appropriate styling.
+  13. 13 | 🟡 Medium | **Toast messages are not translated**. Some pages pass translated strings (`t('configCreated')`), but many pass raw English: `'Copied!'`, `'Portal configuration saved!'`, `'Signature computed!'`. | Ensure all toast messages use i18n.
+  14. 14 | 🟢 Low | **No dismiss button**. Users must wait 4 seconds. For error messages that might need reading, this is too short. | Add manual dismiss (X button) for error toasts, or increase timeout to 6-8s for errors.
+  15. 15 | 🟢 Low | **No accessibility**: No `role="alert"` or `aria-live` on toast container. | Add `role="alert"` and `aria-live="assertive"` for screen readers.
+  16. 16 | 🟡 Medium | **Logs to console only**: `console.error('ErrorBoundary caught:', error, errorInfo)` — in production, these errors are lost. | Send to error tracking service (Sentry, LogRocket, etc.).
+  17. 17 | 🟢 Low | **Shows raw error message to users**: `this.state.error?.message` might contain technical details. | Show a user-friendly message; log the technical details.
+  18. 18 | 🟡 Medium | **Logs to console only** — same as ErrorBoundary. | Send to error tracking.
+  19. 19 | 🟢 Low | **Generic message** — "An unexpected error occurred" doesn't help users understand if it's their fault or ours. | Differentiate between client errors and server errors if possible.
+  20. 20 | 🔴 High | **Silent error swallowing** in `rate-limiting/page.tsx`, `playground/page.tsx`, and others. `catch {}` with no toast or error display. | Every catch block must show user-facing feedback.
+  21. 21 | 🟡 Medium | **Inconsistent error display patterns**: Some pages use `toast()`, some use inline error state, some use `console.error` only. | Standardize on toast for transient errors, inline error state for form validation.
+  22. 22 | 🟡 Medium | **Error messages not translated on many pages**: Hardcoded English strings like `'Failed to save portal config'`, `'Failed to send webhook'`. | All user-facing error messages must go through i18n.
+  23. 23 | 🟡 Medium | **No response header redaction**: Response headers from target endpoints are stored in full, which could include sensitive headers (Set-Cookie, Authorization, etc.). | Redact sensitive headers before storing.
+  24. 24 | 🟢 Low | **Email delivery logs service account errors**: `warn!("Failed to read service account file {}: {}", sa_path, e)` — the `sa_path` could be sensitive in shared environments. | Log only the error, not the path.
+  25. 25 | 🟡 Medium | **No alerting on dead letter creation**: When a delivery hits max attempts and moves to dead letter, it's logged with `tracing::error!` but there's no webhook/email/pager notification to the customer. | Trigger customer-configured notifications (email, Slack, Discord) on dead letter.
+  26. 26 | 🟡 Medium | **No metrics export from worker**: The API has Prometheus metrics (`Metrics` struct) but the worker doesn't export delivery success/failure rates, latency histograms, or queue depth. | Add Prometheus metrics endpoint to worker.
+  27. 27 | 🟢 Low | **Task panics are logged but not alerted**: `tracing::error!("❌ Delivery task panicked: {:?}", e)` — a panic in delivery logic could go unnoticed. | Add panic counting metric and alert threshold.
+  28. 28 | 🟡 Medium | **`send_to_dead_letter` uses `Uuid::nil()` for customer_id**: The customer_id is hardcoded to nil instead of being passed from context. This breaks customer-specific dead letter queries. | Pass customer_id from the webhook context.
+  29. 29 | 🟡 Medium | **No JSON logging in API**: The API uses `tracing` but I don't see JSON format configuration (the worker has it). In production, text logs are harder to parse. | Add JSON logging config for production (like the worker does with `tracing_subscriber::fmt::layer().json()`).
+  30. 30 | 🟡 Medium | **No request ID propagation**: Logs don't include a request ID that could be correlated with the client's error response. | Add request ID middleware and include it in all log spans.
+  31. 31 | 🟡 Medium | **No alerting configuration**: Metrics are exported but there's no Prometheus alerting rules, Grafana dashboards, or PagerDuty/Opsgenie integration defined in the codebase. | Add alerting rules for: error rate > 5%, p99 latency > 5s, queue depth > 1000, dead letter rate > 10/hour.
+  32. 32 | 🟡 Medium | **Worker has no metrics endpoint**: Only the API exports Prometheus metrics. The worker's delivery success/failure rates, latency, and queue processing rates are not tracked. | Add `/metrics` endpoint to worker health server.
+  33. 33 | 🟢 Low | **`error_count` metric exists but I don't see it being incremented** in route handlers. The `metrics_middleware` records HTTP status codes but doesn't increment `error_count` by error type. | Wire `error_count` into the error handling path or middleware.
+  34. 34 | 🟢 Low | **Uptime is placeholder**: `uptime_30d: 100.0` is hardcoded. No historical uptime tracking. | Implement actual uptime tracking (store daily uptime percentage).
+  35. 35 | 🟡 Medium | **API error messages are NOT translated**: All `AppError::BadRequest("...")` messages are in English. When the dashboard displays these, they appear in English regardless of locale. | Either: (a) return error codes only and translate on frontend, or (b) add `Accept-Language` header support to API.
+  36. 36 | 🟡 Medium | **Toast messages are mixed**: Some pages use `t('configCreated')` (translated), others use hardcoded `'Copied!'`, `'Signature computed!'`. | Audit all toast messages for translation coverage.
+  37. 37 | 🟢 Low | **`errors.ts` returns English-only fallback**: `"Unknown error"` is not translated. | Use `t('unknownError')` or similar.
+  38. 🔴 P0 | Fix silent error swallowing in dashboard pages (catch {} with no user feedback) | 1-2h
+  39. 🔴 P0 | Add retry logic for transient 5xx errors in `apiFetch` | 2-3h
+  40. 🟡 P1 | Add request ID to API error responses and log correlation | 4-6h
+  41. 🟡 P1 | Wire error tracking (Sentry/LogRocket) for ErrorBoundary and global error page | 2-4h
+  42. 🟡 P1 | Standardize toast usage and ensure all error messages are translated | 4-8h
+  43. 🟡 P1 | Add Prometheus metrics to worker | 2-4h
+  44. 🟡 P1 | Add alerting rules for error rate, latency, dead letters | 2-4h
+  45. 🟡 P2 | Create shared error code enum (API ↔ Frontend) | 4-6h
+  46. 🟡 P2 | Fix `Serialization` error variant to not leak internal details | 30min
+  47. 🟢 P3 | Add `warning` toast type, dismiss button, accessibility | 2-4h
+  48. 🟢 P3 | Implement real uptime tracking (replace 100.0 placeholder) | 4-8h
+  49. 🟢 P3 | Redact sensitive headers in worker delivery response storage | 1-2h
+
+
+================================================================================
+📄 frontend/deep-i18n-audit.md (26 bulgu)
+================================================================================
+
+  1. **api-importer** | ❌ No | 20+ | 🔴 Critical
+  2. **audit-log** | ❌ No | 15+ | 🔴 Critical
+  3. **billing** | ✅ Partial | 10+ | 🟡 Medium
+  4. **custom-domain** | ❌ No | 30+ | 🔴 Critical
+  5. **deliveries/[id]** | ❌ No | 40+ | 🔴 Critical
+  6. **endpoints/[id]** | ❌ No | 30+ | 🔴 Critical
+  7. **inbound** | ✅ Partial | 10+ | 🟡 Medium
+  8. **notifications** | ✅ Partial | 10+ | 🟡 Medium
+  9. **portal** | ❌ No | 10+ | 🔴 Critical
+  10. **portal-customize** | ❌ No | 40+ | 🔴 Critical
+  11. **rate-limiting** | ❌ No | 25+ | 🔴 Critical
+  12. **retry-policy** | ❌ No | 30+ | 🔴 Critical
+  13. **routing** | ❌ No | 8+ | 🔴 Critical
+  14. **schemas** | ❌ No | 6+ | 🔴 Critical
+  15. **signature-verifier** | ❌ No | 25+ | 🔴 Critical
+  16. **sso** | ❌ No | 20+ | 🔴 Critical
+  17. **team** | ✅ Partial | 10+ | 🟡 Medium
+  18. **templates** | ❌ No | Unknown | 🟡 Medium
+  19. **transforms** | ❌ No | 15+ | 🔴 Critical
+  20. **webhook-builder** | ❌ No | 20+ | 🔴 Critical
+  21. **ConfirmDialog** | ❌ No | 1 | 🟢 Low
+  22. **EmailVerificationBanner** | ❌ No | 6+ | 🟡 Medium
+  23. **Footer** | ✅ Partial | 15+ | 🟡 Medium
+  24. **NotificationCenter** | ❌ No | 4+ | 🟡 Medium
+  25. **OnboardingWizard** | ❌ No | 50+ | 🔴 Critical
+  26. **StatusBadge** | ❌ Unknown | Unknown | 🟡 Medium
+
+
+================================================================================
+📄 frontend/deep-react-patterns.md (3 bulgu)
+================================================================================
+
+  1. Components >200 lines | 12/30+ pages | 🔴
+  2. Custom hooks | 1 (useDeliveryStream) | 🔴
+  3. Form library usage | None | 🔴
+
+
+================================================================================
+📄 frontend/deep-ux-audit.md (4 bulgu)
+================================================================================
+
+  1. 🔴 Critical (5): Silent failures, missing destructive confirmations, accessibility blockers
+  2. 🟠 High (12): Inconsistent patterns, missing states, i18n gaps
+  3. 🟡 Medium (11): Polish issues, minor UX friction
+  4. 🟢 Low (6): Nice-to-haves, minor inconsistencies
+
+
+================================================================================
+📄 infra/DEEP-DEPS-CONFIG.md (36 bulgu)
+================================================================================
+
+  1. `api/Cargo.toml` | `cookie = "0.18"` — kodda hiç `use cookie` yok, kullanılmıyor | 🟡 Medium | `Cargo.toml`'dan kaldır, `cargo check` ile doğrula
+  2. `api/Cargo.toml` | `async-stream = "0.3"` — kodda hiç kullanılmıyor | 🟡 Medium | Kaldır
+  3. `api/Cargo.toml` | `aes-gcm = "0.10"` — kodda hiç kullanılmıyor | 🟡 Medium | Kaldır veya ilgili feature implement et
+  4. `api/Cargo.toml` | `totp-rs` ve `base32` — TOTP/2FA implementasyonu yok (sadece import yok) | 🟡 Medium | Ya implement et ya da kaldır; 2FA feature planlanıyorsa tut
+  5. `Dockerfile.api` (dev) | `FROM rust:1-bookworm` — sabit major version yok, `1` tag'i her an değişebilir | 🟠 High | `rust:1.82-bookworm` gibi sabit version kullan (prod Dockerfile'da doğru yapılmış)
+  6. `Dockerfile.worker` (dev) | `FROM rust:slim` — ne sabit version ne de distro belirtilmemiş | 🟠 High | `rust:1.82-bookworm-slim` kullan
+  7. `api/Cargo.toml` | `rand = "0.8"` — güncel sürüm 0.9+, 0.8 bazı platformlarda weak entropy riski | 🟡 Medium | `rand = "0.9"`'a yükselt
+  8. `api/Cargo.toml` | `opentelemetry-otlp` features `["http-proto", "reqwest"]` ama `tonic` de bağımlılık olarak var — gRPC transportпотенstial conflict | 🟡 Medium | Tek transport seç: ya `http-proton` ya `grpc-tonic`, ikisi birden gereksiz
+  9. `dashboard/package.json` | `lucide-react` — `src/` dizininde hiçbir import yok | 🟠 High | Ya icon'ları implement et ya da dependency'yi kaldır (~150KB bundle etkisi)
+  10. `dashboard/package.json` | `eslint = "^8.0.0"` + `eslint-config-next = "^15.0.0"` — ESLint 8 + Next.js 15 eslint-config uyumsuzluğu riski | 🟠 High | `eslint = "^9.0.0"`'a yükselt veya `eslint-config-next` version'ını 8 ile uyumlu yap
+  11. `dashboard/package.json` | `@next/eslint-plugin-next = "^15.0.0"` — Next.js 15 plugin ama ESLint 8 | 🟠 High | ESLint 9'a yükselt
+  12. `mcp/package.json` | `@modelcontextprotocol/sdk = "^1.0.0"` — çok eski, güncel sürüm 1.9+ | 🟡 Medium | Güncelle: `"^1.9.0"`
+  13. `dashboard/package.json` | `recharts = "^2.15.0"` — ~200KB gzipped, D3 tabanlı | 🟡 Medium | Alternatif: `@tremor/react` veya lightweight chart lib düşün
+  14. `dashboard/package.json` | `lucide-react` unused ama yine de install ediliyor | 🟠 High | Kaldır (yukarıda belirtildi)
+  15. `cli/package.json` | Test script: `"test": "echo \"Error: no test specified\" && exit 1"` — test yok | 🟡 Minimum | En azından `--help` smoke test ekle
+  16. `dashboard/next.config.js` | `output: 'standalone'` ayarı yok ama `Dockerfile.dashboard` `.next/standalone` klasörünü kopyalıyor! **Docker build başarısız olur** | 🔴 Critical | `next.config.js`'ye `output: 'standalone'` ekle
+  17. `dashboard/next.config.js` | `Strict-Transport-Security` (HSTS) header eksik | 🟠 High | Ekle: `{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' }`
+  18. `dashboard/next.config.js` | CSP `script-src 'unsafe-inline' 'unsafe-eval'` — XSS riski | 🟠 High | Nonce-based CSP'ye geç veya `'unsafe-eval'`'i kaldır
+  19. `dashboard/next.config.js` | `remotePatterns: [{ protocol: 'https', hostname: '**' }]` — herhangi bir HTTPS image'a izin veriyor | 🟡 Medium | Sadece gerekli domain'leri whitelist'le
+  20. `dashboard/next.config.js` | API URL hardcoded: `hooksniff-api-1046140057667.europe-west1.run.app` | 🟡 Medium | Environment variable'dan oku: `process.env.NEXT_PUBLIC_API_URL`
+  21. `Dockerfile.api` (dev) | `FROM rust:1-bookworm` — tag unstable | 🟠 High | `rust:1.82-bookworm` kullan
+  22. `Dockerfile.worker` (dev) | `FROM rust:slim` — hem distro hem version belirsiz | 🟠 High | `rust:1.82-bookworm-slim` kullan
+  23. `Dockerfile.dashboard` | `FROM node:20-alpine` — LTS ama patch version sabit değil | 🟡 Medium | `node:20.x.y-alpine` pinle (CVE riski)
+  24. `Dockerfile.worker` (dev) | Healthcheck yok — container crash olsa bile fark edilmez | 🟡 Medium | Healthcheck ekle (API ve dashboard'da var)
+  25. `docker-compose.yml` | `HMAC_SECRET` ve `JWT_SECRET` plain text olarak env'de | 🟡 Medium | `.env` dosyasına taşı ve `.gitignore`'a ekle
+  26. `Dockerfile.worker` (dev) | `HEALTHCHECK` yok ❌ | 🟡 Medium | Worker için `/health` endpoint ekle veya process check
+  27. `docker-compose.yml` | `pgdata` volume tanımlı ama backup strategy yok | 🟡 Medium | Backup volume veya script ekle
+  28. `.env.production.example` | `OTEL_EXPORTER_OTLP_HEADERS` içinde **gerçek Grafana Cloud token** var (base64 encoded) | 🔴 Critical | **Hemen** token'ı revoke et ve placeholder yap: `OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic <YOUR_BASE64_ENCODED_TOKEN>`
+  29. `.env.production.example` | `REDIS_URL` ve `UPSTASH_REDIS_REST_URL/TOKEN` boş ama hangisinin gerektiği belirsiz | 🟡 Medium | Comment ekle: "Upstash REST API için URL+TOKEN, veya Redis direct için REDIS_URL"
+  30. `.env.production.example` | `RATE_LIMIT_STORE=memory` default'u production için güvenli değil | 🟡 Medium | Production'da `redis` default yap, comment ekle
+  31. `.github/workflows/ci.yml` | `security-audit` job'ı `continue-on-error: true` ile npm audit — vulnerability'ler göz ardı edilebilir | 🟡 Medium | `continue-on-error: false` yap veya sadece critical/high fail etsin
+  32. `.github/workflows/ci.yml` | Dashboard test step yok — sadece lint + build | 🟡 Medium | `npm test` step ekle (vitest konfigüre edilmiş)
+  33. `.github/workflows/ci.yml` | `build-api` ve `build-worker` parallel çalışıyor ama aynı cache key kullanıyor — cache conflict | 🟡 Medium | Farklı cache key'ler kullan: `cargo-release-api-v2-` vs `cargo-release-worker-v2-`
+  34. `.github/workflows/deploy.yml` | `--allow-unauthenticated` ile API deploy ediliyor — Cloud Run'da herkese açık | 🟡 Medium | Cloud IAM ile erişimi sınırla veya API gateway ekle
+  35. `.gitignore` | `.env.` pattern'i var (nokta sondaj) ama `.env` (noktasız) ignore edilmemiş | 🟠 High | `.env` satırı ekle (sadece `.env.production` ve `.env.*.local` ignore ediliyor)
+  36. `.gitignore` | `.env.example` ignore edilmiş ama `.env.production.example` edilmemiş | 🟠 High | `.env.production.example` de ignore edilmeli (gerçek secret içeriyor!)
+
+
+================================================================================
+📄 infra/DEEP-GIT-HISTORY.md (38 bulgu)
+================================================================================
+
+  1. `OTEL_EXPORTER_OTLP_HEADERS` (Base64 encoded Grafana credentials) | Git history'de | 🔴 YÜKSEK
+  2. `RESEND_API_KEY` | Git history'de (placeholder `re_xxxxxxxxxxxx` formatında) | 🟡 ORTA
+  3. `DATABASE_URL` (PostgreSQL credentials) | Git history'de (local dev credentials) | 🟡 ORTA
+  4. `RESEND_API_KEY=` (boş değer) | Git history'de | 🟢 DÜŞÜK
+  5. Git history'de secret | OTEL credentials (Base64), DATABASE_URL | 🔴 VAR
+  6. Silinmiş .env dosyaları | Secret kalıntıları | 🟡 VAR
+  7. Hardcoded secret pattern | OTEL headers pattern | 🔴 VAR
+  8. `remotes/origin/La` | 🟡 Anlamsız isim — silinmeli
+  9. `remotes/origin/ai-agent-layer` | 🟡 Eski feature branch
+  10. `remotes/origin/feat/mobile-backend-features` | 🟡 Eski feature branch
+  11. `remotes/origin/fix-grafana-filename` | 🟡 Eski fix branch
+  12. `remotes/origin/fix-hookrelay-branding` | 🟡 Eski fix branch
+  13. `remotes/origin/rename-to-hooksniff` | 🟡 Tamamlanmış rename branch
+  14. Commit Convention | `audit:`, `denetim:`, `update:` prefix'leri non-standard | 🟡 ORTA | CONTRIBUTING.md'de belirtilen conventional commits formatına dön (feat/fix/docs/chore)
+  15. Commit Convention | `feat: visual bugs audit report` 8 kez tekrarlanmış | 🟡 ORTA | Agent commit'lerinde unique identifier kullan
+  16. Secret Scan | OTEL credentials (Base64) git history'de | 🔴 YÜKSEK | Grafana credentials'ı rotate et, git history'den temizle (git filter-branch veya BFG)
+  17. Secret Scan | `.env.example` secret içeriyor | 🔴 YÜKSEK | `.env.example`'dan secret değerleri kaldır, sadece placeholder bırak
+  18. Secret Scan | `DATABASE_URL` local credentials git history'de | 🟡 ORTA | Local credentials rotate et, `.env.example`'da sadece format göster
+  19. .gitignore | `.env` pattern eksik (sadece `.env.*.local`) | 🔴 YÜKSEK | `.env` ve `.env.*` pattern'lerini ekle
+  20. .gitignore | Large binary ignore eksik | 🟡 ORTA | `*.zip`, `*.tar.gz`, `*.dmg`, `*.exe` ekle
+  21. .gitignore | `.env.example` tracked kalıyor | 🟡 ORTA | Secret içermediğinden emin olduktan sonra tracked kalabilir
+  22. Branch | 6+ stale branch | 🟢 DÜŞÜK | Eski branch'leri temizle (`La`, `ai-agent-layer`, eski fix/feat branch'leri)
+  23. Branch | 20+ açık Dependabot PR | 🟡 ORTA | Dependabot PR'larını merge et veya kapat
+  24. Branch | Protected branch ayarı bilinmiyor | 🟡 ORTA | GitHub'da `main` branch protection kur (force push engeli, PR requirement)
+  25. CI/CD | CodeQL/SAST scan yok | 🟡 ORTA | GitHub CodeQL workflow ekle
+  26. CI/CD | `npm audit` continue-on-error | 🟡 ORTA | `--audit-level=high` ile ciddi bulguları fail yap
+  27. CI/CD | Secret scanning yok | 🟡 ORTA | GitHub secret scanning veya `trufflehog` ekle
+  28. CI/CD | Dependency review action yok | 🟢 DÜŞÜK | `actions/dependency-review-action` ekle
+  29. Repo | Otomatik audit commit'leri git history'yi kirletiyor | 🟢 DÜŞÜK | Audit raporlarını ayrı branch'e veya `.ai-context/` klasörüne taşı, main'e squash et
+  30. 1. **🔴 ACİL:** Git history'deki secret'ları temizle (OTEL credentials, DATABASE_URL)
+  31. 2. **🔴 ACİL:** `.env.example`'dan gerçek secret değerlerini kaldır
+  32. 3. **🔴 ACİL:** `.gitignore`'a `.env` pattern ekle
+  33. 4. **🟡 ÖNEMLİ:** Grafana ve database credentials rotate et
+  34. 5. **🟡 ÖNEMLİ:** Stale branch'leri temizle
+  35. 6. **🟡 ÖNEMLİ:** GitHub branch protection kur
+  36. 7. **🟡 ÖNEMLİ:** CodeQL workflow ekle
+  37. 8. **🟢 İYİLEŞTİRME:** Commit convention standardizasyonu
+  38. 9. **🟢 İYİLEŞTİRME:** Dependabot PR'larını yönet
+
+
+================================================================================
+📄 infra/DEEP-LANDING-CONTENT.md (16 bulgu)
+================================================================================
+
+  1. **Impact** | 🔴 **CRITICAL** | Landing page has zero social proof. This is a major conversion killer.
+  2. **Impact** | 🔴 **CRITICAL** | FAQ is essential for SEO (featured snippets) and reducing support burden
+  3. **Impact** | 🟡 **HIGH** | Page ends with footer — no strong closing CTA
+  4. Testimonials are generic | 🟡 HIGH | "Startup CTO", "Lead Developer", "Engineering Manager" — no real names, companies, or avatars
+  5. Missing categories | 🟡 MED | No "Support" or "Documentation" category in scorecard
+  6. Overall bias | 🟡 HIGH | Every page is structured to favor HookSniff. Even when acknowledging competitor strengths, it's always in a secondary box.
+  7. Missing depth | 🟡 MED | Most alternatives pages are thin (just a table + one CTA). No detailed prose comparison.
+  8. No metadata export | 🟡 MED | `'use client'` component — no `generateMetadata()`. SEO relies on layout.tsx generic metadata
+  9. Testimonials generic | 🟡 MED | "CTO, SaaS Startup", "Lead Developer, E-commerce Platform", "Solo Founder, Indie Hacker"
+  10. **All companies are fictional** | 🔴 **CRITICAL** | ShopFlow, PayStack, NeuralOps, CloudSync, MedConnect, BuildKit — none appear to be real companies
+  11. **Stats are unrealistic** | 🔴 **CRITICAL** | "Engineering time saved: 3-6 months → 2 hours" — impossible. Even with SDK, integration takes days.
+  12. **"PayStack" name conflict** | 🔴 **CRITICAL** | PayStack is a real Nigerian fintech company (paystack.com). Using this name for a fictional story is legally risky.
+  13. **Stats inflation** | 🟡 HIGH | "Event loss: 5% → 0%" — 5% loss rate is extremely high for any production system
+  14. **"NeuralOps" 100K/day** | 🟡 HIGH | Claims 100K events/day on $49/mo plan — but Pro plan only includes 50K/mo, not 50K/day
+  15. **No verifiable quotes** | 🟡 HIGH | All quotes are from unnamed roles ("CTO", "Lead Developer") at fictional companies
+  16. **Metadata is generic** | 🟡 MED | `title: 'Customer Stories — HookSniff'` — same for all stories, not dynamic
+
+
+================================================================================
+📄 infra/DEEP-SECURITY-PERF.md (30 bulgu)
+================================================================================
+
+  1. `dashboard/src/app/[locale]/playground/page.tsx` | 75-76 | **Playground token localStorage'da saklanıyor** — `hooksniff_playground_token` ve `hooksniff_playground_url` açık metin olarak localStorage'a yazılır. XSS saldırısıyla bu token çalınabilir. | 🔴 Kritik | Hassas veri depolama | Token'ı yalnızca React state'te tut (zaten yapılıyor), localStorage'a yazma. Kullanıcı refresh sonrası yeni token istesin.
+  2. `dashboard/src/app/[locale]/layout.tsx` | 110-120 | **`dangerouslySetInnerHTML` ile inline script** — Theme initialization script'i doğrudan HTML'e inject ediliyor. CSP bypass vektörü olabilir. | 🟡 Yüksek | XSS riski / CSP bypass | Next.js `next-themes` kütüphanesinin yerleşik SSR theme detection yöntemini kullan. Inline script'i kaldır.
+  3. `dashboard/src/app/[locale]/blog/[slug]/page.tsx` | 1676 | **`dangerouslySetInnerHTML` ile CSS inject** — `<style>` tag'i doğrudan render ediliyor. CSS injection saldırısı mümkün olabilir. | 🟡 Yüksek | CSS injection | CSS modülleri veya Tailwind sınıfları kullan. Mutlaka gerekiyorsa DOMPurify ile sanitize et.
+  4. `dashboard/src/app/[locale]/blog/[slug]/page.tsx` | 1764 | **`dangerouslySetInnerHTML` ile code highlighting** — Highlighted HTML doğrudan render ediliyor. Zararlı script inject edilebilir. | 🟡 Orta | XSS riski | Syntax highlighting kütüphanesinin sanitization fonksiyonunu kullan veya DOMPurify uygula.
+  5. `dashboard/src/app/[locale]/blog/page.tsx` | 271 | **`dangerouslySetInnerHTML` ile JSON-LD** — SEO JSON-LD script tag'i inject ediliyor. Düşük risk çünkü veri kontrollü. | 🟢 Düşük | XSS riski | Veri kaynağı kontrollü, ancak yine de `JSON.stringify` çıktısını sanitize et.
+  6. `dashboard/src/app/[locale]/playground/page.tsx` | 75-76, 90-91 | **localStorage'da token saklanması** — `hooksniff_playground_token` localStorage'a yazılır. sessionStorage daha güvenli olurdu. | 🟡 Orta | Hassas veri depolama | Geçici token'lar için sessionStorage veya sadece state kullan.
+  7. `dashboard/src/lib/api.ts` | 68-69 | **401 hatasında localStorage temizliği** — `localStorage.removeItem('hooksniff_auth')` çağrısı, eski auth verisi varsa temizleniyor. İyi pratik. | 🟢 Düşük | — | Mevcut davranış doğru.
+  8. `dashboard/src/lib/store.tsx` | 37, 62 | **Kullanıcı bilgisi localStorage'da** — `hooksniff_user` key'i ile kullanıcı bilgisi saklanıyor, ama API key memory-only tutuluyor. Bu doğru bir ayrım. | 🟢 Düşük | — | API key'in memory-only tutulması iyi. Kullanıcı bilgisi localStorage'da kalabilir.
+  9. `dashboard/src/app/[locale]/auth/callback/page.tsx` | 9-34 | **OAuth callback — Open redirect riski** — Backend redirect sonrası session doğrulama yapılıyor. Ancak URL parametrelerinde `next` veya `return_to` parametresi yok, bu iyi. | 🟢 Düşük | Open redirect | Mevcut yapı güvenli. Gelecekte redirect param eklenirse mutlaka whitelist kontrolü ekle.
+  10. `api/src/routes/events.rs` | 82 | **`format!` ile dinamik SQL** — WHERE clause `format!` ile oluşturuluyor, ancak parametreler `$N` placeholder ile bind ediliyor. Bu güvenli bir pattern. | 🟡 Orta | SQL injection riski | Mevcut uygulama güvenli (parameterized queries). Ancak `format!` yerine query builder kullanmak daha bakım dostu olur.
+  11. `api/src/routes/search.rs` | 51-85 | **`format!` ile dinamik SQL + ILIKE** — Arama sorgusu `format!` ile oluşturuluyor. Parametreler `$N` ile bind ediliyor. ILIKE pattern'ı `%{}%` ile sarılıyor ama escaping yapılıyor (`\%`, `\_`). | 🟡 Orta | SQL injection riski | Mevcut escaping yeterli. Ancak `format!` yerine query builder (sqlx-compose veya benzeri) kullanmak daha güvenli.
+  12. `api/src/routes/admin.rs` | 170-193 | **Admin'de `format!` ile SQL** — Arama ve filtreleme için dinamik SQL. Parametreler `$N` ile bind ediliyor. | 🟡 Orta | SQL injection riski | Mevcut yapı güvenli. Query builder'a geçiş önerilir.
+  13. `api/src/db.rs` | 54 | **`sqlx::raw_sql` kullanımı** — Migration çalıştırırken `raw_sql` kullanılıyor. Migration SQL'i hardcoded, kullanıcı input almıyor. | 🟢 Düşük | SQL injection riski | Migration SQL'leri sabit. Risk yok.
+  14. `api/src/main.rs` | 109-150 | **CORS: Production'da default origins** — `CORS_ORIGINS` boşsa production'da dashboard origins'e izin veriliyor. Bu iyi bir fallback. Ancak dev modunda localhost'a izin verilmesi normal. | 🟢 Düşük | CORS | Mevcut yapı makul. Production'da `CORS_ORIGINS` env'inin zorunlu kılınması önerilir.
+  15. `api/src/middleware/mod.rs` | 121-200 | **Auth middleware — API key hash karşılaştırması** — Her istekte API key hash'i DB'den çekiliyor. Cache mekanizması var (30 s TTL). Rate limiting var. | 🟢 Düşük | Authentication bypass | Mevcut yapı güvenli. Cache TTL'inin artırılması performansı iyileştirir.
+  16. `api/src/routes/auth.rs` | 387 | **Password reset token URL'de** — Reset URL'si `?token=` parametresi ile oluşturuluyor. Token hash'i DB'de saklanıyor ve tek kullanımlık. | 🟡 Orta | Hassas veri URL'de | Token yerine kısa süreli kod (6 haneli) kullanmak daha güvenli olur. URL loglanırsa token sızabilir.
+  17. `api/src/routes/endpoints.rs` | 100, 318 | **Signing secret üretimi** — `whsec_` + UUID. UUID v4 cryptographically random. | 🟢 Düşük | Secret generation | Yeterli. Daha güçlü randomness için `OsRng` ile 32 byte random kullan.
+  18. `api/src/routes/admin.rs` | — | **Admin yetki kontrolü** — `require_admin` fonksiyonu tüm admin endpoint'lerinde çağrılıyor. `admin_middleware` layer olarak uygulanmış. | 🟢 Düşük | Authorization bypass | Mevcut yapı güvenli. Double-check mekanizması iyi.
+  19. `api/src/validation.rs` | — | **Input validation** — Event type regex, URL validation (SSRF koruması), description sanitization (HTML tag stripping), JSON depth limit (10 seviye). | 🟢 Düşük | Input validation | Kapsamlı validation mevcut.
+  20. `dashboard/src/app/[locale]/blog/[slug]/page.tsx` | 1-1922 | **1922 satırlık mega bileşen** — Tek dosyada tüm blog render mantığı. Code splitting eksik. | 🟡 Yüksek | Large component | Blog content'ini alt bileşenlere ayır. Dynamic import ile lazy load et.
+  21. `dashboard/src/app/[locale]/dashboard/playground/page.tsx` | 1-695 | **695 satırlık bileşen** — Playground sayfası çok büyük. Hem state yönetimi hem UI tek dosyada. | 🟡 Orta | Large component | Playground logic'ini custom hook'lara, UI'ı alt bileşenlere ayır.
+  22. `dashboard/src/components/OnboardingWizard.tsx` | 1-649 | **649 satırlık bileşen** — Onboarding wizard büyük. | 🟡 Orta | Large component | Her step'i ayrı bileşene çıkar.
+  23. `dashboard/src/app/[locale]/page.tsx` | 9-11 | **✅ Lazy loading uygulanmış** — `ThemeToggle` ve `LanguageSwitcher` dynamic import ile yükleniyor. | 🟢 İyi | Lazy loading | —
+  24. `dashboard/src/app/[locale]/dashboard/analytics/page.tsx` | 23 | **Recharts import** — `AreaChart`, `BarChart` vb. doğrudan import ediliyor. Tree-shaking etkili olmalı ama büyük library. | 🟡 Orta | Bundle size | Recharts yerine daha hafif alternatif (lightweight-charts, visx) düşünülebilir.
+  25. `dashboard/src/lib/store.tsx` | — | **API key memory-only** — `apiKey` state'te tutuluyor, localStorage'a yazılmıyor. Bu doğru bir güvenlik kararı. | 🟢 İyi | — | —
+  26. `api/src/routes/events.rs` | 82-83 | **`SELECT *` kullanımı** — Tüm delivery sütunlarını çekiyor. Gereksiz veri transferi. | 🟡 Orta | Large allocation | Sadece gerekli sütunları seç: `SELECT id, endpoint_id, event_type, status, attempt_count, response_status, created_at`
+  27. `api/src/middleware/mod.rs` | 30-50 | **Auth cache — Mutex ile koruma** — Her istekte mutex lock alınıyor. Yüksek concurrency'de contention olabilir. | 🟡 Orta | N+1 / Connection pool | `RwLock` veya `DashMap` kullan. Read-heavy workload'da daha iyi performans sağlar.
+  28. `api/src/routes/webhooks.rs` | 318 | **✅ N+1 önlenmiş** — Endpoint'ler toplu olarak tek sorguda çekiliyor. | 🟢 İyi | N+1 prevention | —
+  29. `api/src/routes/health_endpoints.rs` | 58 | **✅ Toplu sorgu** — Delivery istatistikleri tek sorguda çekiliyor. | 🟢 İyi | N+1 prevention | —
+  30. `api/src/db.rs` | 8 | **Connection pool: max 20** — Varsayılan 20 bağlantı. Production için yeterli olmayabilir. | 🟢 Düşük | Connection pool | `MAX_CONNECTIONS` env ile yapılandırılabilir. Production'da 50-100 arası önerilir.
+
+
+================================================================================
+📄 infra/deep-email-notifications.md (1 bulgu)
+================================================================================
+
+  1. `webhook_failed` | 🔴 | Webhook delivery failure
+
+
+================================================================================
+📄 infra/deep-gdpr.md (45 bulgu)
+================================================================================
+
+  1. **🔴 CRITICAL: No consent mechanism at registration.** The `register` endpoint (`POST /v1/auth/register`) creates accounts without:
+  2. **🔴 CRITICAL: No consent logging.** There is no `consent_records` table or any mechanism to track when/how consent was given.
+  3. **🔴 HIGH: Incomplete export.** Multiple tables with user data are not included. GDPR Article 15 requires a **complete** copy of all personal data.
+  4. **🟡 MEDIUM: Delivery limit.** 10,000 records / 90 days may not be sufficient for high-volume users. Should offer full export.
+  5. **🟡 MEDIUM: No dashboard UI.** Export is API-only. No "Download My Data" button in settings. Users must know the API.
+  6. **🟡 MEDIUM: Export format.** Returns JSON only. Should also offer CSV for portability (GDPR Article 20).
+  7. **🟡 LOW: No export request logging.** The export is logged (`tracing::info!`) but not in the audit_log table.
+  8. **🔴 CRITICAL: `dead_letters` not deleted.** This table stores webhook payloads (which may contain PII) and is NOT cleaned up on account deletion. The `archive_deliveries` function in `retention.rs` moves deliveries to `dead_letters` but the deletion handler doesn't touch it.
+  9. **🔴 HIGH: Dashboard calls wrong endpoint.** The settings page calls `api.delete('/auth/me')` but the backend route is `DELETE /v1/auth/account`. This means **account deletion from the dashboard is broken** (404 error).
+  10. **🟡 MEDIUM: No grace period.** Deletion is immediate and permanent. GDPR recommends a grace period (e.g., 30 days) for accidental deletions. The Terms of Service mention "within 30 days" but the code deletes immediately.
+  11. **🟡 MEDIUM: Backup handling.** No mention of how backups are handled. GDPR requires that deletion propagates to backups within a reasonable timeframe.
+  12. **🟡 MEDIUM: Legal retention conflict.** Payment transactions and invoices are deleted, but the privacy policy states "Payment records: As required by law (typically 7 years)." These should be anonymized, not deleted.
+  13. **🔴 HIGH: `dead_letters` never cleaned up.** The `archive_deliveries` function moves data TO `dead_letters` but there is NO function to clean up `dead_letters` itself. Data accumulates indefinitely.
+  14. **🔴 HIGH: No cleanup for auth tokens.** The following tables have no automatic cleanup:
+  15. **🟡 MEDIUM: `dead_letters` archival is counterproductive for GDPR.** Moving data to `dead_letters` before deletion creates a second copy of user data. The retention job should DELETE directly, not archive.
+  16. **🟡 MEDIUM: No per-user retention controls.** Users cannot configure their own retention period (despite the privacy policy implying plan-based retention).
+  17. **🔴 HIGH: No Data Processing Agreements (DPAs) visible in codebase.** GDPR Article 28 requires written agreements with all data processors.
+  18. **🟡 MEDIUM: International data transfers.** The privacy policy mentions "Standard Contractual Clauses" but there's no evidence of:
+  19. **🟡 MEDIUM: Email via Gmail API.** User PII (email, name) is sent through Google's Gmail API. This constitutes data transfer to a third party and requires a DPA with Google.
+  20. **🟡 MEDIUM: TOTP secrets stored in plaintext.** The `totp_secret` field in the `customers` table is not encrypted at rest. While excluded from API serialization, a database breach would expose all 2FA secrets.
+  21. **🟡 MEDIUM: Signing secrets stored in plaintext.** Endpoint `signing_secret` values are stored without encryption.
+  22. **🟡 MEDIUM: Webhook payloads stored in plaintext.** The `payload` JSONB field in `deliveries` and `dead_letters` may contain sensitive user data (PII, financial data, health data depending on use case).
+  23. **🟡 MEDIUM: Audit log exists but underused.** The `audit_log` table (migration 038) is created but there's no evidence it's populated for all sensitive operations. Auth events are logged via `tracing::info!` but not to the audit_log table.
+  24. **🔴 HIGH: No breach notification procedure.** GDPR Article 33/34 requires:
+  25. **🔴 HIGH: API key hashing claim is wrong.** Privacy policy states "API keys are hashed before storage (SHA-256)" but the code uses **Argon2id** (which is better, but the policy is inaccurate).
+  26. **🟡 MEDIUM: Retention policy claims vs. reality.** The privacy policy states different retention periods per plan (7/30/90 days) but the actual retention is controlled by a single `RETENTION_DAYS` env var, not per-plan.
+  27. **🟡 MEDIUM: "Analytics cookies" mentioned but no analytics implementation found.** The privacy policy mentions analytics cookies that "can be disabled" but there's no cookie consent UI or analytics opt-out mechanism.
+  28. **🟡 MEDIUM: Missing DPO information.** No Data Protection Officer is mentioned (may be required depending on scale).
+  29. **🟡 MEDIUM:** Export is JSON-only. GDPR recommends machine-readable, commonly used formats. CSV should be offered as an alternative.
+  30. **🟡 MEDIUM:** No DPO designated. May be required if processing is large-scale or involves special categories of data.
+  31. 1 | No consent mechanism at registration | 🔴 CRITICAL | Art. 6, 7
+  32. 2 | No consent logging | 🔴 CRITICAL | Art. 7
+  33. 3 | `dead_letters` not deleted on account deletion | 🔴 CRITICAL | Art. 17
+  34. 4 | Dashboard calls wrong deletion endpoint (`/auth/me` vs `/auth/account`) | 🔴 HIGH | Art. 17
+  35. 5 | Data export incomplete (missing 8+ tables) | 🔴 HIGH | Art. 15
+  36. 6 | `dead_letters` accumulates indefinitely | 🔴 HIGH | Art. 5(1)(e)
+  37. 7 | No cleanup for expired auth tokens | 🔴 HIGH | Art. 5(1)(e)
+  38. 8 | No Data Processing Agreements visible | 🔴 HIGH | Art. 28
+  39. 9 | No breach notification procedure | 🔴 HIGH | Art. 33, 34
+  40. 10 | Privacy policy inaccuracies (hashing algorithm) | 🟡 MEDIUM | Art. 12-14
+  41. 11 | TOTP secrets stored in plaintext | 🟡 MEDIUM | Art. 32
+  42. 12 | PII in application logs (emails) | 🟡 MEDIUM | Art. 5(1)(f)
+  43. 13 | No dashboard UI for data export | 🟡 MEDIUM | Art. 12
+  44. 14 | No cookie consent mechanism | 🟡 MEDIUM | Art. 6, ePrivacy
+  45. 15 | Teams not cleaned up on deletion | 🟡 MEDIUM | Art. 17
+
+
+================================================================================
+📄 infra/deep-review.md (3 bulgu)
+================================================================================
+
+  1. 🔴 Security hardening (SSRF, timing attacks, CORS)
+  2. 🟡 Operational maturity (migrations, monitoring, alerting)
+  3. 🟡 Scalability (circuit breakers, backpressure, caching)
+
+
+================================================================================
+📄 infra/deep-sdks.md (20 bulgu)
+================================================================================
+
+  1. **Auth** (register, login, 2FA, profile, password) | 15 | 🔴 High — needed for SDK-based auth flows
+  2. **API Keys** (list, create, delete, rotate) | 4 | 🔴 High — key management is core
+  3. **Alerts** (CRUD + test) | 4 | 🟡 Medium
+  4. **Analytics** (deliveries, success-rate, latency) | 3 | 🟡 Medium
+  5. **Notifications** (list, read, delete, prefs) | 5 | 🟡 Medium
+  6. **Devices** (register, list, delete) | 3 | 🟢 Low
+  7. **Teams** (CRUD + invite + members) | 6 | 🟡 Medium
+  8. **Billing** (subscription, upgrade, portal, usage, invoices) | 7 | 🟡 Medium
+  9. **Templates** (list, get, apply) | 3 | 🟢 Low
+  10. **Schemas** (register, get, validate) | 4 | 🟢 Low
+  11. **Routing** (get, update, health) | 3 | 🟢 Low
+  12. **Playground** (info, test) | 2 | 🟢 Low
+  13. **Transforms** (CRUD + test) | 5 | 🟢 Low
+  14. **Stream** (SSE delivery events) | 1 | 🟢 Low
+  15. **Inbound** (receive from providers) | 2 | 🟢 Low
+  16. **Contact** (submit form) | 1 | 🟢 Low
+  17. **Outbound IPs** (list) | 1 | 🟢 Low
+  18. **Health / Status** | 2 | 🟢 Low
+  19. **Customer Portal** (profile, keys, usage, plan, notifications) | 6 | 🟡 Medium
+  20. **Admin** (users, stats, revenue) | 5 | 🟢 Low
+
+
+================================================================================
+📄 infra/deep-security-audit.md (14 bulgu)
+================================================================================
+
+  1. 1 | 🔴 Critical | No edge middleware auth | `middleware.ts` | Needs fix
+  2. 2 | 🔴 Critical | No CSRF protection | `api.ts` | Needs fix
+  3. 3 | 🔴 Critical | Permissive CSP (unsafe-inline/eval) | `next.config.js` | Needs fix
+  4. 4 | 🟡 Medium | Client-only admin auth | `admin/layout.tsx` | Needs fix
+  5. 5 | 🟡 Medium | Playground token in localStorage | `playground/page.tsx` | Needs fix
+  6. 6 | 🟡 Medium | Playground token in URL path | `playground/page.tsx` | Needs fix
+  7. 7 | 🟡 Medium | Inconsistent API base URLs | Multiple files | Needs fix
+  8. 8 | 🟡 Medium | Missing input validation | `search/page.tsx` | Needs fix
+  9. 9 | 🟡 Medium | Missing HSTS header | `next.config.js` | Needs fix
+  10. 10 | 🟡 Medium | Deprecated X-XSS-Protection | `next.config.js` | Needs fix
+  11. 11 | 🟡 Medium | Endpoint list fetches all | `endpoints/[id]/page.tsx` | Needs fix
+  12. 12 | 🟢 Low | `is_admin` in localStorage | `store.tsx` | Improve
+  13. 13 | 🟢 Low | Hardcoded production API URL | `status/page.tsx` | Improve
+  14. 14 | 🟢 Low | No client-side login rate limit | `login/page.tsx` | Improve
+
+
+================================================================================
+📄 language-bugs/DIL_HATALARI_2026-05-10.md (43 bulgu)
+================================================================================
+
+  1. 🔴 Critical | `dashboard/deliveries/[id]` | 32
+  2. 🔴 Critical | `dashboard/endpoints/[id]` | 24
+  3. 🔴 Critical | `dashboard/portal` | 10
+  4. 🔴 Critical | `dashboard/transforms` | 11
+  5. 🔴 Critical | `dashboard/portal-customize` | 27
+  6. 🔴 Critical | `dashboard/rate-limiting` | 15
+  7. 🔴 Critical | `dashboard/signature-verifier` | 17
+  8. 🔴 Critical | `dashboard/api-importer` | 8
+  9. 🔴 Critical | `dashboard/routing` | 2
+  10. 🔴 Critical | `dashboard/templates` | 1
+  11. 🔴 Critical | `dashboard/schemas` | 1
+  12. 🔴 Critical | `get-started` | 34
+  13. 🟡 Medium | `pricing` | 104
+  14. 🟡 Medium | `security` | 36
+  15. 🟡 Medium | `contact` | 15
+  16. 🟡 Medium | `about` | 10
+  17. 🟡 Medium | `terms` | 50
+  18. 🟡 Medium | `privacy` | 61
+  19. 🟡 Medium | `startups` | 5
+  20. 🟡 Medium | `what-is-a-webhook` | 28
+  21. 🟡 Medium | `providers/stripe` | 26
+  22. 🟡 Medium | `providers/github` | 26
+  23. 🟡 Medium | `providers/shopify` | 26
+  24. 🟡 Medium | `providers` | 6
+  25. 🟢 Low | `use-cases` | 146
+  26. 🟢 Low | `compare/CompareContent` | 80
+  27. 🟢 Low | `build-vs-buy/BuildVsBuyContent` | 31
+  28. 🟢 Low | `customers` | 71
+  29. 🟢 Low | `customers/[slug]` | 108
+  30. 🟢 Low | `blog` | 47
+  31. 🟢 Low | `blog/[slug]` | 76
+  32. 🟢 Low | `newsletter` | 32
+  33. 🟢 Low | `changelog` | 7
+  34. 🟢 Low | `status` | 43
+  35. 🟢 Low | `playground` | 81
+  36. 🟢 Low | `webhooks` | 20
+  37. 🟢 Low | `webhooks/guides` | 28
+  38. 🟢 Low | `webhooks/glossary` | 32
+  39. 🟢 Low | `alternatives/*` (8 pages) | ~120
+  40. 🟢 Low | `docs/*` (11 pages) | ~120
+  41. 🟢 Low | `error.tsx` | 3
+  42. 🟢 Low | `not-found.tsx` | 3
+  43. 🟢 Low | `admin/*` (6 pages) | ~50
+
+
+================================================================================
+📄 waves/MEGA-AUDIT-2026-05-10.md (21 bulgu)
+================================================================================
+
+  1. Agent | Kategori | 🔴 Crit | 🟠 High | 🟡 Med | 🟢 Low | **Toplam**
+  2. 1. 🔴 Authorization bypass (inbound.rs)
+  3. 2. 🔴 Token her zaman 'cookie' (store.tsx)
+  4. 3. 🔴 API keys cookie auth çalışmıyor (api-keys/page.tsx)
+  5. 4. 🔴 Playground token localStorage'da (XSS)
+  6. 5. 🔴 Gerçek Grafana token .env.example'da
+  7. 6. 🔴 3 farklı API URL (SDK tutarsızlığı)
+  8. 7. 🔴 Kotlin generic crash
+  9. 8. 🔴 db.rs 1,029 satır — TEST YOK
+  10. 9. 🔴 worker/main.rs 807 satır — TEST YOK
+  11. 10. 🔴 71 sayfada metadata eksik (SEO)
+  12. 11. 🟠 920+ hardcoded İngilizce string
+  13. 12. 🟠 0 htmlFor kullanımı (23+ dosya)
+  14. 13. 🟠 63 useEffect'ten %75'inde cleanup eksik
+  15. 14. 🟠 blog/[slug] 1922 satır mega component
+  16. 15. 🟠 dangerouslySetInnerHTML (CSP bypass)
+  17. 16. 🟠 ErrorBoundary tanımlı ama kullanılmamış
+  18. 17. 🟠 13 tablo overflow-x-auto olmadan
+  19. 18. 🟠 Search debounce yok
+  20. 19. 🟠 Billing webhook rate limiting yok
+  21. 20. 🟠 DNS rebinding TOCTOU açığı
+
+
+================================================================================
+📄 waves/WAVE4-SUMMARY.md (1 bulgu)
+================================================================================
+
+  1. Agent | Kategori | 🔴 Crit | 🟠 High | 🟡 Med | 🟢 Low | **Toplam**
+
+
+================================================================================
+TOPLAM: 1222 bulgu, 49 dosya
