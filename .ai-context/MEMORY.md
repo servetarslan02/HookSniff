@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 17:21 GMT+8
+> Son güncelleme: 2026-05-11 17:27 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -70,6 +70,20 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
+
+## Oturum 109 (2026-05-11 17:27 - ) 🔄
+- **OpenClaw beşinci oturum** — Servet tekrar bağlandı, proje devam
+- **Rust 1.95.0 kuruldu** — cargo check başarılı
+- **Testler:** API 983/983 ✅, Worker 48/48 ✅
+- **Dashboard:** TypeScript 0 hata ✅, ESLint 0 uyarı ✅
+- **cloudbuild.yaml güncellendi** — Cloud Run deploy adımı eklendi (API + Worker)
+  - Artık `gcloud builds submit` ile tek komutla build + deploy yapılabilir
+  - RESEND_API_KEY ve NOTIFY_EMAIL env var'ları eklendi
+- **deploy.yml güncellendi** — RESEND_API_KEY + NOTIFY_EMAIL eklendi ama push edilemedi (PAT workflow scope eksik)
+- **Auto-sync cron** — her 10 dakikada .ai-context/ GitHub'a push (OpenClaw cron)
+- **API sağlık:** /health 200 OK, DB 784ms, queue 212ms, uptime ~7 dk
+- **OTEL durumu:** Health response'da `otel` objesi yok → deploy edilen revision eski kodu çalıştırıyor
+- **Sonraki adım:** Servet Cloud Build ile deploy etmeli, sonra OTEL veri akışını kontrol et
 
 ## Oturum 108 (2026-05-11 16:52 - 17:21) 🔄
 - **OpenClaw dördüncü oturum** — Servet Grafana OTEL durumunu sordu
