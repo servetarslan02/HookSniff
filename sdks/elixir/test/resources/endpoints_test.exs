@@ -125,6 +125,7 @@ defmodule HookSniff.EndpointsTest do
       page3 = %{"data" => [%{"id" => "ep_3"}], "has_more" => false}
 
       call_count = :atomics.new(1, signed: true)
+      :atomics.put(call_count, 1, 1)
 
       Mox.stub(MockHttpAdapter, :request, fn method, url, _headers, _body, _opts ->
         assert method == :get

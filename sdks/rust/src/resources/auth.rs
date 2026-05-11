@@ -5,14 +5,14 @@
 use crate::request::{HookSniffRequest, HookSniffRequestContext, HttpMethod};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RegisterInput {
     pub email: String,
     pub password: String,
     pub name: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LoginInput {
     pub email: String,
     pub password: String,
@@ -25,12 +25,12 @@ pub struct AuthOutput {
     pub user: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TwoFactorInput {
     pub code: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ForgotPasswordInput {
     pub email: String,
 }
@@ -40,6 +40,7 @@ pub struct MessageOutput {
     pub message: String,
 }
 
+#[derive(Debug)]
 pub struct Auth {
     ctx: HookSniffRequestContext,
 }

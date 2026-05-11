@@ -29,6 +29,7 @@ pub struct LatencyOutput {
     pub period: String,
 }
 
+#[derive(Debug)]
 pub struct Analytics {
     ctx: HookSniffRequestContext,
 }

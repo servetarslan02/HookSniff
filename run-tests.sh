@@ -56,7 +56,7 @@ fi
 if [[ "$1" == "all" || "$1" == "rust" ]]; then
     echo "🦀 Rust SDK"
     if command -v cargo &>/dev/null; then
-        run_test "rust" "tests" "cargo test --quiet" "$SDK_DIR/rust"
+        run_test "rust" "tests" "cargo test --quiet 2>&1" "$SDK_DIR/rust"
     else
         echo "  rust         tests                        ⏭ SKIP (cargo not installed)"
         SKIP=$((SKIP + 1))
@@ -104,7 +104,7 @@ fi
 if [[ "$1" == "all" || "$1" == "kotlin" ]]; then
     echo "🟣 Kotlin SDK"
     if command -v kotlinc &>/dev/null; then
-        run_test "kotlin" "compile check" "kotlinc src/main/kotlin/hooksniff/sdk/wrapper/*.kt -d /tmp/kotlin-check 2>/dev/null && rm -rf /tmp/kotlin-check" "$SDK_DIR/kotlin"
+        run_test "kotlin" "tests" "gradle test --no-daemon -q 2>&1 || mvn test -B -q 2>&1" "$SDK_DIR/kotlin"
     else
         echo "  kotlin       compile check                ⏭ SKIP (kotlinc not installed)"
         SKIP=$((SKIP + 1))
@@ -140,7 +140,7 @@ fi
 if [[ "$1" == "all" || "$1" == "csharp" ]]; then
     echo "🔷 C# SDK"
     if command -v dotnet &>/dev/null; then
-        run_test "csharp" "build check" "dotnet build --nologo -v q src/HookSniff.Sdk/HookSniff.Sdk.csproj 2>/dev/null" "$SDK_DIR/csharp"
+        run_test "csharp" "build check" "dotnet build --nologo -v q src/HookSniff/HookSniff.csproj 2>/dev/null" "$SDK_DIR/csharp"
     else
         echo "  csharp       build check                  ⏭ SKIP (dotnet not installed)"
         SKIP=$((SKIP + 1))
