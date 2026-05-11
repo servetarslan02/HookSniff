@@ -1,63 +1,69 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 22:44 GMT+8
+> Son güncelleme: 2026-05-11 22:55 GMT+8
 
 ---
 
-## ✅ AŞAMA 1 TAMAMLANDI
+## ✅ AŞAMA 2.1 TAMAMLANDI — Node.js Wrapper + İmza Doğrulama
 
 | Adım | Durum | Sonuç |
 |------|-------|-------|
-| 1.1 — Analiz | ✅ | 32 kategori, 76 eksik model tespit edildi |
-| 1.2 — Modeller | ✅ | 83 → 148 schema (+65 yeni model) |
-| 1.3 — SDK yeniden üretim | ✅ | 11 SDK yeniden üretildi (Node, Python, Go, Java, Ruby, C#, Kotlin, PHP, Rust, Swift, Elixir) |
-| 1.4 — Kalite kontrol | ✅ | 11/11 SDK doğrulandı, kritik sorun yok |
+| 2.1.1 — İnternet araştırması | ✅ | Svix SDK pattern, Standard Webhooks, HMAC-SHA256 best practices |
+| 2.1.2 — HookSniff class | ✅ | `new HookSniff({ apiKey })` → `client.endpoints.create()` |
+| 2.1.3 — Webhook.verify() | ✅ | HMAC-SHA256, whsec_ prefix, replay protection, timing-safe |
+| 2.1.4 — HTTP client | ✅ | Zero-dependency native fetch, retry, exponential backoff |
+| 2.1.5 — Resource wrappers | ✅ | 10 resource: endpoints, webhooks, auth, analytics, apiKeys, alerts, teams, search, billing, health |
+| 2.1.6 — Testler | ✅ | 14/14 webhook signature test geçti |
+| 2.1.7 — TypeScript | ✅ | 0 hata, strict mode |
+| 2.1.8 — Build | ✅ | `tsc` başarılı |
+| 2.1.9 — Push | ✅ | `72602788` main branch |
 
-### SDK Model Sayıları (Güncel)
-| SDK | Model | API | README |
-|-----|-------|-----|--------|
-| Node.js | 172 | 34 | ✅ |
-| Python | 171 | 33 | ✅ |
-| Go | 171 | 68 | ✅ |
-| Java | 344 | 427 | ✅ |
-| Ruby | 514 | 111 | ✅ |
-| C# | 684 | 154 | ✅ |
-| Kotlin | 534 | 146 | ✅ |
-| PHP | 344 | 71 | ✅ |
-| Rust | 171 | — | ✅ |
-| Swift | 173 | — | ✅ |
-| Elixir | 170 | — | ✅ |
-
-## 📋 Sonraki Adım: AŞAMA 2 — Wrapper Class + İmza Doğrulama
-
-### Önce İnternetten Araştırma Yap!
-Aşama 2'ye başlamadan önce ZORUNLU:
-1. Svix SDK'larını incele (Node.js, Python, Go referans)
-2. Webhook signature verification best practices araştır
-3. OpenAPI generated SDK wrapper pattern araştır
-4. Güncel dependency sürümlerini kontrol et
-5. Bulguları `.ai-context/sdk/RESEARCH-AŞAMA2.md`'ye kaydet
-6. Kullanıcıya özet göster → onay → uygula
-
-### Sıradaki görev (Aşama 2.1):
-1. **Node.js wrapper class** — `new HookSniff(key)` → `client.endpoints.create()`
-2. **Node.js imza doğrulama** — `verifySignature()` fonksiyonu
-3. **Node.js HTTP library** — native `fetch` veya `node-fetch`
-
-### Referans Implementasyon (Dashboard SDK Sayfası)
-Dashboard SDK sayfası zaten `HookSniff` class ve `verifySignature` referans ediyor:
-```typescript
-import { HookSniff } from 'hooksniff-sdk';
-const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
-const endpoint = await hr.endpoints.create({...});
+### SDK Dosyaları
+```
+sdks/node/src/
+├── index.ts              ← Ana HookSniff class + re-exports
+├── request.ts            ← HTTP helper (native fetch, retry, ApiException)
+├── webhook.ts            ← Webhook.verify() + sign()
+├── resources/
+│   ├── endpoints.ts      ← Endpoint CRUD + secret rotation
+│   ├── webhooks.ts       ← Webhook send, batch, list, get, replay
+│   ├── auth.ts           ← Register, login, 2FA, GDPR
+│   ├── analytics.ts      ← Trends, success rate, latency
+│   ├── apiKeys.ts        ← API key CRUD
+│   ├── alerts.ts         ← Alert rules + notifications
+│   ├── teams.ts          ← Team member management
+│   ├── search.ts         ← Delivery search
+│   ├── billing.ts        ← Plan info, upgrade, portal
+│   └── health.ts         ← Health check
+└── __tests__/
+    └── webhook.test.ts   ← 14 test (all passing)
 ```
 
-Bu implementasyon Aşama 2'de yapılacak.
+## 📋 Sonraki Adım: AŞAMA 2.2 — Python Wrapper + İmza Doğrulama
 
----
+### Sıradaki görev:
+1. **Python wrapper class** — `HookSniff(api_key="...")` → `client.endpoints.create()`
+2. **Python imza doğrulama** — `verify_signature()` fonksiyonu
+3. **Python HTTP library** — `httpx` veya native `urllib`
+4. **Testler** — pytest ile webhook signature tests
 
-## 📊 Workflow Kuralları (WORKFLOW.md)
-- Her aşamaya başlarken internetten derin araştırma ZORUNLU
+### AŞAMA 2 Tam Plan (11 SDK):
+| SDK | Wrapper | verifySignature | Durum |
+|-----|---------|----------------|-------|
+| Node.js | ✅ | ✅ | TAMAMLANDI |
+| Python | ❌ | ❌ | Sıradaki |
+| Go | ❌ | ❌ | — |
+| Rust | ❌ | ❌ | — |
+| Ruby | ❌ | ❌ | — |
+| Java | ❌ | ❌ | — |
+| Kotlin | ❌ | ❌ | — |
+| PHP | ❌ | ❌ | — |
+| C# | ❌ | ❌ | — |
+| Elixir | ❌ | ❌ | — |
+| Swift | ❌ | ❌ | — |
+
+## 📊 Workflow Kuralları
+- Her aşamaya başlamadan internetten derin araştırma ZORUNLU
 - Subagent'lerle paralel çalışma
-- Version: 0.3.0-beta.3 → 0.3.0-rc.1 (Aşama 1.4 sonrası)
+- Version: 0.4.0 (Node wrapper eklendi)
 - Publish sadece kalite kontrol sonrası
