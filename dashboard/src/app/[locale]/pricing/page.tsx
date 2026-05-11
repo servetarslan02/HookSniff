@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/lib/store';
 
 
 
@@ -81,13 +82,15 @@ function RoiCalculator() {
 
 export default function PricingPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const router = useRouter();
+  const { token } = useAuth();
   const t = useTranslations('pricing');
   const tf = useTranslations('pricingFaq');
 
   const planData = [
-    { key: 'free', price: '$0', ctaStyle: 'outline', popular: false, ctaHref: '/login' },
-    { key: 'pro', price: '$29', ctaStyle: 'filled', popular: true, ctaHref: '/login' },
-    { key: 'business', price: '$99', ctaStyle: 'outline', popular: false, ctaHref: '/contact' },
+    { key: 'free', price: '$0', ctaStyle: 'outline', popular: false },
+    { key: 'pro', price: '$29', ctaStyle: 'filled', popular: true },
+    { key: 'business', price: '$99', ctaStyle: 'outline', popular: false },
   ];
 
   const featureKeys: Record<string, string[]> = {
@@ -224,16 +227,24 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href={plan.ctaHref}
-                className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              <button
+                onClick={() => {
+                  if (plan.key === 'business') {
+                    router.push('/contact');
+                  } else if (token) {
+                    router.push('/dashboard/billing');
+                  } else {
+                    router.push('/register');
+                  }
+                }}
+                className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                   plan.ctaStyle === 'filled'
                     ? 'bg-brand-600 hover:bg-brand-700 text-white'
                     : 'border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:border-brand-400 dark:hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400'
                 }`}
               >
                 {plan.key === 'business' ? t('contactSales') : plan.key === 'pro' ? t('startTrial') : t('getStarted')}
-              </Link>
+              </button>
             </div>
           ))}
         </div>

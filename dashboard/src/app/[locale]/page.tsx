@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/lib/store';
 
 // Lazy load ThemeToggle
 const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m => m.ThemeToggle), { ssr: false });
@@ -247,6 +248,8 @@ function HowItWorks() {
 /* ─── Landing Page ─── */
 export default function Home() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const router = useRouter();
+  const { token } = useAuth();
   const tNav = useTranslations('landing.nav');
   const tHero = useTranslations('landing.hero');
   const tFeatures = useTranslations('landing.features');
@@ -418,7 +421,18 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
                   </li>
                 ))}
               </ul>
-              <button className={`w-full py-3 rounded-xl font-medium transition btn-ripple ${plan.popular ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'}`}>
+              <button
+                onClick={() => {
+                  if (plan.name === tPricing('business')) {
+                    router.push('/contact');
+                  } else if (token) {
+                    router.push('/dashboard/billing');
+                  } else {
+                    router.push('/register');
+                  }
+                }}
+                className={`w-full py-3 rounded-xl font-medium transition btn-ripple ${plan.popular ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'}`}
+              >
                 {plan.cta}
               </button>
             </div>
