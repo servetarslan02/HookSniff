@@ -5,6 +5,8 @@ import java.util.Locale
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import java.security.MessageDigest
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 /**
  * Webhook signature verification for incoming HookSniff webhooks.
@@ -64,7 +66,7 @@ class Webhook(secret: String) {
         // Parse payload
         return try {
             @Suppress("UNCHECKED_CAST")
-            com.google.gson.Gson().fromJson(payload, Map::class.java) as Map<String, Any>
+            Gson().fromJson(payload, Map::class.java) as Map<String, Any>
         } catch (e: Exception) {
             mapOf("_raw" to payload)
         }

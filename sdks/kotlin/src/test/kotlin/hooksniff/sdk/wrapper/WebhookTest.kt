@@ -226,7 +226,9 @@ class WebhookTest {
         )
         val result = webhook.verify(PAYLOAD, headers)
         assertNotNull(result)
-        assertEquals(1, result["data"])
+        @Suppress("UNCHECKED_CAST")
+        val data = result["data"] as Map<String, Any>
+        assertEquals(1.0, data["id"])
     }
 
     // ──────────────────────────────────────────────
