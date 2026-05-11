@@ -89,8 +89,8 @@ export default function PricingPage() {
 
   const planData = [
     { key: 'free', price: '$0', ctaStyle: 'outline', popular: false },
-    { key: 'pro', price: '$29', ctaStyle: 'filled', popular: true },
-    { key: 'business', price: '$99', ctaStyle: 'outline', popular: false },
+    { key: 'pro', price: '$49', ctaStyle: 'filled', popular: true },
+    { key: 'business', price: '$149', ctaStyle: 'outline', popular: false },
   ];
 
   const featureKeys: Record<string, string[]> = {
