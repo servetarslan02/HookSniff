@@ -11,7 +11,7 @@ class BillingResource(private val client: HookSniff) {
     private val gson = Gson()
     private val mapType = object : TypeToken<Map<String, Any?>>() {}.type
 
-    /** Get current subscription. */
+    /** Get current subscription details. */
     fun subscription(): Map<String, Any?> {
         val json = client.get("/v1/billing/subscription")
         return gson.fromJson(json, mapType)
@@ -23,7 +23,7 @@ class BillingResource(private val client: HookSniff) {
         return gson.fromJson(json, mapType)
     }
 
-    /** Get invoices. */
+    /** List invoices. */
     fun invoices(): Map<String, Any?> {
         val json = client.get("/v1/billing/invoices")
         return gson.fromJson(json, mapType)
@@ -32,12 +32,6 @@ class BillingResource(private val client: HookSniff) {
     /** Upgrade subscription. */
     fun upgrade(input: Map<String, Any?>): Map<String, Any?> {
         val json = client.post("/v1/billing/upgrade", gson.toJson(input))
-        return gson.fromJson(json, mapType)
-    }
-
-    /** Cancel subscription. */
-    fun cancel(input: Map<String, Any?>): Map<String, Any?> {
-        val json = client.post("/v1/billing/cancel", gson.toJson(input))
         return gson.fromJson(json, mapType)
     }
 }
