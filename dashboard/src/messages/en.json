@@ -1497,17 +1497,17 @@
     "businessDesc": "For teams that need guarantees",
     "freeFeatures": [
       "10,000 webhooks/month",
-      "1 endpoint",
+      "5 endpoints",
       "3 retry attempts",
       "HMAC-SHA256 signatures",
       "Dashboard access",
       "Community support",
-      "3-day log retention",
+      "7-day log retention",
       "8 SDK access"
     ],
     "proFeatures": [
       "50,000 webhooks/month",
-      "10 endpoints",
+      "50 endpoints",
       "5 retry attempts",
       "Custom retry policies",
       "Priority support",
@@ -1515,12 +1515,12 @@
       "30-day log retention",
       "11 SDK access",
       "Webhook playground",
-      "Event tags & filtering",
+      "Tags and filtering",
       "Email alerts"
     ],
     "businessFeatures": [
       "500,000 webhooks/month",
-      "Unlimited endpoints",
+      "500 endpoints",
       "10 retry attempts",
       "99.9% SLA guarantee",
       "Dedicated support",
