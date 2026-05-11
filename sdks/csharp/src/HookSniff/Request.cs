@@ -26,6 +26,22 @@ internal class Request
         Timeout = TimeSpan.FromSeconds(30)
     };
 
+    /// <summary>Override the shared HttpClient for testing. Call ResetHttpClient() when done.</summary>
+    internal static void SetTestHttpClient(HttpClient client)
+    {
+        _testHttpClient = client;
+    }
+
+    /// <summary>Reset to the default shared HttpClient after testing.</summary>
+    internal static void ResetHttpClient()
+    {
+        _testHttpClient = null;
+    }
+
+    private static HttpClient? _testHttpClient;
+
+    private static HttpClient GetHttpClient() => _testHttpClient ?? SharedHttpClient;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -103,8 +119,8 @@ internal class Request
                 using var request = new HttpRequestMessage(new HttpMethod(_method), url);
 
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.Token);
-                request.Headers.Add("accept", "application/json");
-                request.Headers.Add("user-agent", UserAgent);
+                request.Headers.TryAddWithoutValidation("accept", "application/json");
+                request.Headers.TryAddWithoutValidation("user-agent", UserAgent);
 
                 foreach (var (key, value) in _headerParams)
                 {
@@ -117,7 +133,7 @@ internal class Request
                 }
 
                 using var cts = new CancellationTokenSource(ctx.Timeout);
-                var response = await SharedHttpClient.SendAsync(request, cts.Token);
+                var response = await GetHttpClient().SendAsync(request, cts.Token);
                 var responseBody = await response.Content.ReadAsStringAsync(cts.Token);
                 var responseHeaders = response.Headers
                     .ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
