@@ -449,3 +449,17 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
   - auth, billing, alerts, analytics, teams, notifications, schemas, inbound, portal, custom-domains, admin, audit-log, templates, routing, rate-limits, sso, oauth, embed, simulator, status, events, endpoint-health
 - **Commit:** `cf14308` — main branch, push başarılı
 - **Kalan işler:** publish to registries (npm, PyPI, crates.io, etc.) — Servet'in registry erişimi gerek
+
+## Oturum 112 (2026-05-11 19:16 - 19:59) ✅
+- **OpenClaw sekizinci oturum** — Servet ile Cloud Run deploy debug (devam)
+- **Kök neden #1 (API):** `rustls` 0.23+ CryptoProvider panic — `quinn` (HTTP/3) transitively `aws-lc-rs` getiriyordu, `ring` ile çakışıyor
+  - Önceki fix (`Cargo.toml` feature) yetersizdi — Cargo feature unification sorunu
+  - Çözüm: `api/src/main.rs`'e `rustls::crypto::ring::default_provider().install_default()` eklendi
+- **Kök neden #2 (Worker):** `GLIBC_2.38 not found` — `Dockerfile.worker`'da `rust:slim` (1.97/trixie) kullanılmış, runtime `debian:bookworm-slim` (GLIBC 2.36)
+  - Çözüm: `Dockerfile.worker` → `rust:1.95-bookworm` (API ile aynı)
+- **Build `6acbdf97`:** SUCCESS ✅ — hem API hem Worker deploy edildi
+- **API:** `hooksniff-api-00069-l2s` → Healthy, OTEL enabled
+- **Worker:** `hooksniff-worker-00032-wzv` → Healthy
+- **Commits:** `fe22edd` (CryptoProvider fix), `2696244` (Dockerfile pin)
+- **GCloud kuruldu:** `/tmp/google-cloud-sdk/`, SA key `/tmp/gcp-sa.json`
+- **Sonraki oturum:** Grafana OTEL verilerini kontrol et, API endpoint'lerini test et
