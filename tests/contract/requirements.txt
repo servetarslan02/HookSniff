@@ -1,0 +1,2 @@
+schemathesis>=3.28
+pytest>=8.0

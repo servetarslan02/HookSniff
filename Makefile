@@ -166,6 +166,13 @@ self-host-update: ## Self-host güncellemesi (git pull + rebuild)
 	@docker compose up -d
 	@echo "✅ Güncellendi ve yeniden başlatıldı"
 
+# ── Coverage ──
+
+coverage: ## Test coverage report (cargo-tarpaulin)
+	@bash scripts/coverage.sh --html
+	@echo ""
+	@echo "📊 Coverage report: coverage/tarpaulin-report.html"
+
 # ═══════════════════════════════════════════════════════════════════
 # Deployment Komutları (Production)
 # ═══════════════════════════════════════════════════════════════════
