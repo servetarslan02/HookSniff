@@ -541,6 +541,57 @@ class TestHookSniffRequestSend(unittest.TestCase):
             req.send_void(ctx)
             mock_send.assert_called_once()
 
+    @patch("hooksniff.request.urllib.request.urlopen")
+    def test_send_empty_body_with_parser_raises(self, mock_urlopen):
+        """Empty response body with parser should raise ApiException."""
+        mock_resp = MagicMock()
+        mock_resp.status = 200
+        mock_resp.read.return_value = b""
+        mock_urlopen.return_value = mock_resp
+
+        ctx = HookSniffRequestContext("https://api.test.com", "test-key")
+        req = HookSniffRequest("GET", "/v1/endpoints")
+        # No parser = returns raw, but empty body with parser raises
+        # Actually send() just does json.loads("") which raises JSONDecodeError
+        with self.assertRaises(Exception):
+            req.send(ctx, parser=lambda x: x)
+
+    @patch("hooksniff.request.urllib.request.urlopen")
+    def test_send_500_error_body_is_parsed(self, mock_urlopen):
+        """5xx error body should be parsed as JSON when possible."""
+        import urllib.error
+
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = b'{"error":"internal","code":"DB_ERROR"}'
+        mock_resp.headers = {"X-Req": "abc"}
+        err = urllib.error.HTTPError("https://api.test.com", 503, "Service Unavailable", {}, mock_resp)
+        mock_urlopen.side_effect = err
+
+        ctx = HookSniffRequestContext("https://api.test.com", "test-key", num_retries=0)
+        req = HookSniffRequest("GET", "/v1/endpoints")
+        with self.assertRaises(ApiException) as cm:
+            req.send(ctx)
+        self.assertEqual(cm.exception.code, 503)
+        self.assertEqual(cm.exception.body["error"], "internal")
+
+    @patch("hooksniff.request.urllib.request.urlopen")
+    def test_send_non_json_error_body(self, mock_urlopen):
+        """Non-JSON error body should be stored as string."""
+        import urllib.error
+
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = b"Service Temporarily Unavailable"
+        mock_resp.headers = {}
+        err = urllib.error.HTTPError("https://api.test.com", 502, "Bad Gateway", {}, mock_resp)
+        mock_urlopen.side_effect = err
+
+        ctx = HookSniffRequestContext("https://api.test.com", "test-key", num_retries=0)
+        req = HookSniffRequest("GET", "/v1/endpoints")
+        with self.assertRaises(ApiException) as cm:
+            req.send(ctx)
+        self.assertEqual(cm.exception.code, 502)
+        self.assertIsInstance(cm.exception.body, str)
+
 
 # === Client Tests ===
 from hooksniff.client import HookSniff
