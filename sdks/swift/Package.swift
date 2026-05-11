@@ -15,11 +15,8 @@ let package = Package(
     targets: [
         .target(
             name: "HookSniff",
-            dependencies: []
-        ),
-        .testTarget(
-            name: "HookSniffTests",
-            dependencies: ["HookSniff"]
+            dependencies: [],
+            path: "OpenAPIClient/Classes/OpenAPIs"
         )
     ]
 )

@@ -72,3 +72,4 @@ sdks/java/target/
 
 # Test environment (contains credentials)
 api/.env.test
+sdks/kotlin/gradle.properties
