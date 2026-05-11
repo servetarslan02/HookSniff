@@ -1,58 +1,55 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 02:41 GMT+8
-> **Son commit:** `71d2fee9` (main)
-> **Son oturum:** AŞAMA 1 Kritik Güvenlik (19/22 tamamlandı)
+> **Son güncelleme:** 2026-05-12 02:47 GMT+8
+> **Son commit:** `c3639a62` (main)
+> **Son oturum:** AŞAMA 2.8 — Kalan diller批量 wrapper + pagination
 
 ## Hemen Başla
 
 1. `git pull origin main` — en son değişiklikleri al
-2. Bu dosyayı oku — kaldığın yeri öğren
-3. `IMPLEMENTATION-PLAN.md` — tam plan için bak
+2. `MEMORY.md` oku — proje durumunu öğren
+3. `QUALITY_ROADMAP.md` bak — yol haritası
 
-## Bir Sonraki Görev: AŞAMA 2 — YÜKSEK GÜVENLİK & ASYNC
+## ✅ AŞAMA 2.8 Tamamlandı (Bu Oturum)
 
-### 2.1 Async Rust Yüksek (#23-26)
-- [ ] `reqwest::Client` per-request → shared client yap (`api/src/`, `worker/src/`)
-- [ ] Blocking file I/O in async → `tokio::task::spawn_blocking` (`worker/src/`)
-- [ ] Unbounded mpsc channel in WebSocket → bounded channel (`api/src/ws/`)
-- [ ] Poisoned mutex panics → `try_lock` veya graceful handling (`api/src/`)
+Tüm 8 SDK'ya pagination eklendi:
 
-### 2.2 Crypto & Auth Yüksek (#27-30)
-- [ ] Argon2id parametreleri OWASP altı → m=19456, t=2, p=1 kontrol et (`api/src/auth/jwt.rs`)
-- [ ] Admin authorization client-side only → backend admin check ekle (`admin/layout.tsx`)
-- [ ] Playground token localStorage'da → httpOnly cookie (`playground/page.tsx`)
-- [ ] Playground token URL path'te → query param veya header (`playground/page.tsx`)
+| SDK | Pagination | listAll/Resources | Commit |
+|-----|-----------|-------------------|--------|
+| Rust | ✅ | ✅ endpoints, api_keys, webhooks | b3b2b2ef |
+| Ruby | ✅ | ✅ endpoints, webhooks, api_keys, teams | af25d1f9 |
+| Java | ✅ | ✅ endpoints, webhooks, api_keys, teams | af25d1f9 |
+| Kotlin | ✅ | ✅ 10 resource + Pagination.kt | (önceki oturum) |
+| PHP | ✅ | ✅ endpoints, webhooks, api_keys, teams, alerts | d44a242f |
+| C# | ✅ | ✅ endpoints, webhooks, api_keys, teams | d44a242f |
+| Elixir | ✅ | ✅ endpoints, webhooks, api_keys, teams, alerts | d44a242f |
+| Swift | ✅ | ✅ 10 resource + Pagination.swift + JSONHelpers.swift | e5a29f89 |
 
-### 2.3 Rate Limiting Yüksek (#31-32)
-- [ ] API-level rate limit middleware gap → tüm endpoint'leri kapsa
-- [ ] Bazı endpoint'ler atlanıyor → middleware chain kontrol
+## 📋 Sonraki Adımlar — QUALITY_ROADMAP'a göre
 
-### 2.4 Worker Yüksek (#33-37)
-- [ ] Zombie reaper increments attempt count without delivery
-- [ ] No retry for DB commit failures
-- [ ] Email delivery uses blocking I/O in async
-- [ ] Email delivery creates new HTTP client per call
-- [ ] Fan-out bug — target config not used
+### AŞAMA 3 — Kalite ve Güvenilirlik
 
-### 2.5 Infrastructure Yüksek (#38-42)
-- [ ] No rollback strategy
-- [ ] Hardcoded secrets in Helm values.yaml
-- [ ] Git history'de OTEL credentials (BFG ile temizle)
-- [ ] DATABASE_URL local credentials git history'de
-- [ ] DNS rebinding SSRF
+| # | Görev | Durum | Öncelik |
+|---|-------|-------|---------|
+| 3.1 | Node.js unit testler (211 test) | ✅ | — |
+| 3.2 | Python unit testler (77 test) | ✅ | — |
+| 3.3 | Go unit testler | ❌ | 🔴 |
+| 3.4 | Rust unit testler | ❌ | 🔴 |
+| 3.5 | Kalan 7 dil testleri | ❌ | 🟡 |
+| 3.6 | CHANGELOG oluştur (tüm SDK'lar) | ❌ | 🟡 |
+| 3.7 | Migration guide (0.1→0.2→0.3→0.4) | ❌ | 🟡 |
 
-### 2.6 Destructive Actions (#43-44)
-- [ ] Destructive action'larda confirmation yok
-- [ ] No i18n in API Importer
+### AŞAMA 4 — Operasyonel Mükemmellik
 
-## AŞAMA 1'de Kalanlar (3 madde)
-- [ ] #11: `password_hash` column NOT NULL yap
-- [ ] #12: Missing migration files (13 SQL)
-- [ ] #13: Hardcoded DB credentials temizle
+| # | Görev | Durum | Öncelik |
+|---|-------|-------|---------|
+| 4.1 | CI/CD pipeline (GitHub Actions) | ❌ | 🟡 |
+| 4.2 | Otomatik versiyon yönetimi | ❌ | 🟢 |
+| 4.3 | SDK dokümantasyon sitesi | ❌ | 🟢 |
+| 4.4 | Performance benchmarking | ❌ | 🟢 |
 
 ## Kritik Hatırlatmalar
-- **GitHub PAT:** `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` (Servet rotate edecek)
 - **Oturum süresi:** 1 saat — işleri batch'le, sık commit yap
 - **Push etmeyi unutma!** Her oturum sonunda `git push origin main`
-- **İlerleme kaydı:** `.ai-context/logs/YYYY-MM-DD-session.md` dosyasını güncelle
+- **GitHub Actions billing limiti dolmuş** — CI/CD çalışmıyor
+- **GCP Cloud Build** alternatif deploy yöntemi
