@@ -102,11 +102,13 @@ pub struct DeliverySummary {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PlanRequest {
     pub plan: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct StatusRequest {
     pub is_active: bool,
 }
@@ -160,7 +162,7 @@ async fn list_users(
     require_admin(&customer)?;
 
     let page = params.page.unwrap_or(1).max(1);
-    let per_page = params.per_page.unwrap_or(20).clamp(1, 100);
+    let per_page = params.per_page.unwrap_or(20).clamp(1, 200);
     let offset = (page - 1) * per_page;
 
     // Build dynamic WHERE clauses
@@ -515,11 +517,13 @@ async fn revenue_by_month(
 // ─────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SdkUpdateRequest {
     pub updates: Vec<SdkUpdateItem>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SdkUpdateItem {
     pub sdk: String,
     pub local_version: String,
@@ -589,6 +593,7 @@ async fn notify_sdk_update(
 // ─────────────────────────────────────────────────────────
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct PlatformSettings {
     pub default_plan: String,
     pub max_endpoints_free: i32,
