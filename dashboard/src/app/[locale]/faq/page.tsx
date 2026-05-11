@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Link } from '@/i18n/navigation';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
 

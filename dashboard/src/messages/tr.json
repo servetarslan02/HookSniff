@@ -90,7 +90,10 @@
     "failedToLoadLogs": "Loglar yüklenemedi",
     "somethingWentWrong": "Bir şeyler yanlış gitti",
     "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
-    "pleaseTryAgain": "Lütfen tekrar deneyin."
+    "pleaseTryAgain": "Lütfen tekrar deneyin.",
+    "switchToDark": "Karanlık moda geç",
+    "switchToLight": "Aydınlık moda geç",
+    "redirecting": "Yönlendiriliyor..."
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
