@@ -30,3 +30,8 @@ pub mod throttle;
 pub mod transform;
 pub mod validation;
 pub mod ws;
+
+/// Property-based test strategies and tests.
+/// Only compiled in test builds (proptest is a dev-dependency).
+#[cfg(test)]
+pub mod proptest_helpers;
