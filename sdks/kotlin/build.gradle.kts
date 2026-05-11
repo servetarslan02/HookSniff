@@ -13,22 +13,28 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("io.gsonfire:gson-fire:1.9.0")
+    implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
 
     testImplementation(kotlin("test"))
     testImplementation("junit:junit:4.13.2")
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
     withSourcesJar()
     withJavadocJar()
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(11)
 }
 
 publishing {
@@ -36,13 +42,13 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
             groupId = "io.github.servetarslan02"
-            artifactId = "hooksniff"
+            artifactId = "hooksniff-sdk"
             version = "0.3.0"
 
             pom {
                 name.set("HookSniff Kotlin SDK")
                 description.set("Official Kotlin client for HookSniff webhook delivery service")
-                url.set("https://github.com/servetarslan02/hooksniff-kotlin")
+                url.set("https://github.com/servetarslan02/HookSniff")
                 licenses {
                     license {
                         name.set("MIT License")
@@ -53,20 +59,25 @@ publishing {
                     developer {
                         name.set("Servet Arslan")
                         email.set("support@hooksniff.dev")
+                        url.set("https://github.com/servetarslan02")
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/servetarslan02/hooksniff-kotlin.git")
-                    developerConnection.set("scm:git:ssh://github.com:servetarslan02/hooksniff-kotlin.git")
-                    url.set("https://github.com/servetarslan02/hooksniff-kotlin")
+                    connection.set("scm:git:git://github.com/servetarslan02/HookSniff.git")
+                    developerConnection.set("scm:git:ssh://github.com:servetarslan02/HookSniff.git")
+                    url.set("https://github.com/servetarslan02/HookSniff")
                 }
             }
         }
     }
     repositories {
         maven {
-            name = "central"
-            url = uri(layout.buildDirectory.dir("repos/releases"))
+            name = "ossrh"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME") ?: ""
+                password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD") ?: ""
+            }
         }
     }
 }

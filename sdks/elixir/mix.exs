@@ -14,7 +14,7 @@ defmodule HookSniff.MixProject do
       name: "HookSniff",
       description: "Official Elixir client for the HookSniff webhook delivery service",
       source_url: @source_url,
-      homepage_url: "https://hooksniff.io",
+      homepage_url: "https://hooksniff.vercel.app",
       package: package(),
       docs: docs()
     ]
