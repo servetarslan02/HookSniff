@@ -106,3 +106,74 @@
 ---
 
 *Son güncelleme: 2026-05-12 05:55 GMT+8*
+
+---
+
+## 🔴 YENİ BULGULAR (05:57+ Tespit)
+
+### BUG-013: reqwest::Client Her İstek İçin Yeni Oluşturuluyor ✅ DÜZELTİLDİ
+**Dosya:** 12 dosya (oauth, billing, email, notifications)
+**Durum:** Shared HTTP client oluşturuldu (`api/src/http_client.rs`), 12 çağrı değiştirildi
+**Commit:** 7bbd9afc
+
+### BUG-017: Global Body Size Limit Yok ✅ DÜZELTİLDİ
+**Dosya:** `api/src/main.rs`
+**Durum:** `RequestBodyLimitLayer::new(2MB)` middleware eklendi
+**Commit:** 7bbd9afc
+
+### BUG-020: 2FA Backup Codes Yok
+**Dosya:** `api/src/routes/auth.rs`
+**Sorun:** 2FA etkinleştirildiğinde backup/recovery code üretilmiyor. Kullanıcı TOTP cihazını kaybederse hesabı kilitlenir.
+**Risk:** Hesap erişimi kalıcı kayıp
+**Çözüm:** 2FA aktifleştirme sırasında 8-10 backup code üret, DB'de hash'le sakla
+
+### BUG-021: Password Policy Çok Zayıf
+**Dosya:** `api/src/routes/auth.rs:148`
+**Sorun:** Sadece minimum 8 karakter kontrolü. Büyük/küçük harf, rakam, özel karakter zorunlu değil.
+**Risk:** Zayıf şifreler
+**Çözüm:** En az 1 büyük harf + 1 rakam + minimum 8 karakter
+
+### BUG-022: CSP'de unsafe-inline + unsafe-eval
+**Dosya:** `dashboard/next.config.js`
+**Sorun:** CSP'de `script-src 'unsafe-inline' 'unsafe-eval'` var. XSS saldırılarına karşı koruma zayıflıyor.
+**Risk:** Stored XSS, DOM-based XSS
+**Çözüm:** Nonce-based CSP veya hash-based CSP
+
+### BUG-023: Circuit Breaker State In-Memory
+**Dosya:** `worker/src/circuit_breaker.rs:65`
+**Sorun:** Circuit breaker state `HashMap<Uuid, EndpointCircuit>` in-memory. Worker restart'ta tüm state kaybolur.
+**Risk:** Restart sonrası hatalı endpoint'lere tekrar istek atılır
+**Çözüm:** Redis'e persist et veya PostgreSQL'de sakla
+
+### BUG-024: Webhook Retry State In-Memory  
+**Dosya:** `worker/src/` (IMPLEMENTATION-PLAN madde 22)
+**Sorun:** Throttle state in-memory, worker restart'ta kaybolur
+**Risk:** Retry sayacı sıfırlanır, duplicate delivery
+**Çözüm:** Redis tabanlı retry state
+
+### BUG-025: Events Endpoint SELECT * Kullanımı
+**Dosya:** `api/src/routes/events.rs:79`
+**Sorun:** `SELECT * FROM deliveries` — gereksiz kolon çekimi
+**Risk:** Performans, gizlilik (response body'de gereksiz alanlar)
+**Çözüm:** Spesifik kolon listele
+
+### BUG-026: NOTIFY_EMAIL Hardcoded Kişisel Email ✅ DÜZELTİLECEK
+**Dosya:** `api/src/routes/contact.rs:91`
+**Sorun:** Fallback `servetarslan02@gmail.com`
+**Çözüm:** Config'den oku
+
+### BUG-027: Outbound IP'ler Statik
+**Dosya:** `api/src/routes/outbound_ips.rs`
+**Sorun:** Cloud Run'da IP'ler değişebilir, statik env var'dan okunuyor
+**Çözüm:** Cache'le (TTL 5dk) veya Cloud Run metadata API'den dinamik çek
+
+### BUG-028: Pagination Per-Page Limit Tutarlı Değil
+**Dosya:** Çeşitli route handler'lar
+**Sorun:** Bazıları min(200), bazıları min(100), bazıları limitsiz
+**Çözüm:** Global `MAX_PER_PAGE = 200` sabiti
+
+### BUG-029: deny_unknown_fields Kullanılmıyor
+**Dosya:** Tüm request struct'ları
+**Sorun:** Bilinmeyen field'lar sessizce ignore ediliyor
+**Risk:** Silent failure
+**Çözüm:** Kritik request'lere `#[serde(deny_unknown_fields)]` ekle
