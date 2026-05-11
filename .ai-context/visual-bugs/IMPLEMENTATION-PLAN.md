@@ -27,7 +27,7 @@
 
 ### 1.4 Database Kritik
 11. ✅ `password_hash` column allows NULL — migration 005 — account takeover → `api/migrations/`
-12. 🔴 Missing migration files — 13 SQL files absent → `api/migrations/`
+12. 🟡 Missing migration files — migration 005 added (password_hash NOT NULL), remaining embedded migrations need export
 13. ✅ Hardcoded DB credentials — removed from backup-cron.sh → `api/migrations/`
 
 ### 1.5 Frontend Kritik
