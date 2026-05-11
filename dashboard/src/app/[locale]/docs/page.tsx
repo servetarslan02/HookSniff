@@ -49,7 +49,7 @@ export default function DocsPage() {
         <p className="text-gray-600 dark:text-slate-400 mb-3">
           All API requests require a Bearer token with an <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hr_live_</code> prefixed API key:
         </p>
-        <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-700 p-4 rounded-xl text-sm font-mono">
+        <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-700 p-4 rounded-xl text-sm font-mono overflow-x-auto">
           {`Authorization: Bearer hr_live_abc123xyz789`}
         </pre>
       </section>
