@@ -1,0 +1,756 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# New Models Batch 3 — Remaining Missing Models (Aşama 1.2)
+# ══════════════════════════════════════════════════════════════════════════════
+# These schemas are meant to be merged into components/schemas of openapi.yaml.
+# Each model has: description, type, properties, required.
+# Nested types use $ref where applicable.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Teams ──
+
+TeamListResponse:
+  type: object
+  description: Paginated list of teams
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/Team"
+    has_more:
+      type: boolean
+    total:
+      type: integer
+  required: [data, has_more, total]
+
+UpdateTeamRequest:
+  type: object
+  description: Fields to update on a team (all optional)
+  properties:
+    name:
+      type: string
+    description:
+      type: string
+
+TeamMemberListResponse:
+  type: object
+  description: List of members in a team
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/TeamMember"
+  required: [data]
+
+InviteMemberRequest:
+  type: object
+  description: Invite a new member to a team
+  properties:
+    email:
+      type: string
+      format: email
+    role:
+      type: string
+      enum: [admin, member, viewer]
+  required: [email, role]
+
+# ── Notifications (extras) ──
+
+NotificationPreferences:
+  type: object
+  description: User notification delivery preferences
+  properties:
+    email_enabled:
+      type: boolean
+    webhook_enabled:
+      type: boolean
+    frequency:
+      type: string
+      enum: [realtime, hourly, daily]
+  required: [email_enabled, webhook_enabled, frequency]
+
+# ── Devices ──
+
+DeviceListResponse:
+  type: object
+  description: Paginated list of registered devices
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/DeviceTokenResponse"
+  required: [data]
+
+# ── Templates ──
+
+TemplateListResponse:
+  type: object
+  description: Paginated list of webhook payload templates
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/WebhookTemplate"
+  required: [data]
+
+# ── Schemas ──
+
+SchemaResponse:
+  type: object
+  description: A registered JSON Schema for event validation
+  properties:
+    id:
+      $ref: "#/components/schemas/Uuid"
+    name:
+      type: string
+    version:
+      type: integer
+    schema_json:
+      type: object
+      description: The JSON Schema document
+    created_at:
+      $ref: "#/components/schemas/DateTime"
+  required: [id, name, version, schema_json, created_at]
+
+SchemaListResponse:
+  type: object
+  description: Paginated list of registered schemas
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/SchemaResponse"
+    has_more:
+      type: boolean
+    total:
+      type: integer
+  required: [data, has_more, total]
+
+ValidateEventResponse:
+  type: object
+  description: Result of validating an event payload against a schema
+  properties:
+    valid:
+      type: boolean
+    errors:
+      type: array
+      items:
+        type: object
+        properties:
+          path:
+            type: string
+            description: JSON pointer to the failing field
+          message:
+            type: string
+            description: Human-readable validation error
+  required: [valid]
+
+# ── Routing ──
+
+RoutingRuleListResponse:
+  type: object
+  description: List of routing rules
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            $ref: "#/components/schemas/Uuid"
+          name:
+            type: string
+          conditions:
+            type: object
+          transform:
+            type: object
+            nullable: true
+          target_endpoint_id:
+            $ref: "#/components/schemas/Uuid"
+          enabled:
+            type: boolean
+          created_at:
+            $ref: "#/components/schemas/DateTime"
+        required: [id, name, conditions, target_endpoint_id]
+  required: [data]
+
+CreateRoutingRuleRequest:
+  type: object
+  description: Create a new routing rule
+  properties:
+    name:
+      type: string
+    conditions:
+      type: object
+      description: Conditions that trigger this rule (e.g. event_type, header match)
+    transform:
+      type: object
+      nullable: true
+      description: Optional payload transformation config
+    target_endpoint_id:
+      $ref: "#/components/schemas/Uuid"
+  required: [name, conditions, target_endpoint_id]
+
+UpdateRoutingRuleRequest:
+  type: object
+  description: Update an existing routing rule (all fields optional)
+  properties:
+    name:
+      type: string
+    conditions:
+      type: object
+    transform:
+      type: object
+      nullable: true
+
+# ── Customer Portal ──
+
+PortalConfig:
+  type: object
+  description: Customer-facing portal branding and configuration
+  properties:
+    logo_url:
+      type: string
+      format: uri
+      nullable: true
+    primary_color:
+      type: string
+      nullable: true
+      description: Hex color code (e.g. #6366f1)
+    custom_domain:
+      type: string
+      nullable: true
+    webhook_events:
+      type: array
+      items:
+        type: string
+      description: Event types to expose in the portal
+  required: []
+
+PortalSession:
+  type: object
+  description: Temporary session token for the customer portal
+  properties:
+    token:
+      type: string
+    expires_at:
+      $ref: "#/components/schemas/DateTime"
+    url:
+      type: string
+      format: uri
+      description: Full URL to the portal with session token
+  required: [token, expires_at, url]
+
+# ── Admin ──
+
+AdminUserListResponse:
+  type: object
+  description: Paginated list of users for admin management
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/UserSummary"
+    has_more:
+      type: boolean
+    total:
+      type: integer
+  required: [data, has_more, total]
+
+AdminSystemStatus:
+  type: object
+  description: System-level status for admin dashboard
+  properties:
+    version:
+      type: string
+    uptime_seconds:
+      type: integer
+    db_status:
+      type: string
+      enum: [healthy, degraded, down]
+    redis_status:
+      type: string
+      enum: [healthy, degraded, down]
+    queue_depth:
+      type: integer
+      description: Number of pending jobs in the delivery queue
+  required: [version, uptime_seconds, db_status, redis_status, queue_depth]
+
+AdminRevenueEntry:
+  type: object
+  description: Monthly revenue data point
+  properties:
+    date:
+      type: string
+      format: date
+    mrr:
+      type: number
+      format: double
+      description: Monthly recurring revenue in dollars
+    new_subscriptions:
+      type: integer
+    churns:
+      type: integer
+  required: [date, mrr, new_subscriptions, churns]
+
+AdminRevenueResponse:
+  type: object
+  description: Revenue history for admin analytics
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminRevenueEntry"
+    total_mrr:
+      type: number
+      format: double
+      description: Current total MRR across all subscriptions
+  required: [data, total_mrr]
+
+# ── Audit Log ──
+
+AuditLogEntry:
+  type: object
+  description: A single audit log record
+  properties:
+    id:
+      $ref: "#/components/schemas/Uuid"
+    actor:
+      type: string
+      description: Who performed the action (user id or email)
+    action:
+      type: string
+      description: The action taken (e.g. endpoint.create, team.invite)
+    resource_type:
+      type: string
+      description: Type of resource affected (endpoint, team, api_key, etc.)
+    resource_id:
+      type: string
+      description: ID of the affected resource
+    timestamp:
+      $ref: "#/components/schemas/DateTime"
+    metadata:
+      type: object
+      nullable: true
+      description: Additional context (old_value, new_value, ip, etc.)
+  required: [id, actor, action, resource_type, resource_id, timestamp]
+
+AuditLogListResponse:
+  type: object
+  description: Paginated list of audit log entries
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/AuditLogEntry"
+    has_more:
+      type: boolean
+    total:
+      type: integer
+  required: [data, has_more, total]
+
+# ── SSO ──
+
+SSOConfig:
+  type: object
+  description: Single Sign-On configuration (SAML or OIDC)
+  properties:
+    provider:
+      type: string
+      enum: [saml, oidc]
+    domain:
+      type: string
+      description: Email domain for SSO routing
+    entity_id:
+      type: string
+      nullable: true
+      description: SAML entity ID or OIDC issuer
+    sso_url:
+      type: string
+      format: uri
+      nullable: true
+    certificate:
+      type: string
+      nullable: true
+      description: PEM-encoded X.509 certificate (SAML)
+  required: [provider, domain]
+
+SSOConfigListResponse:
+  type: object
+  description: List of SSO configurations for the account
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/SSOConfig"
+  required: [data]
+
+CreateSSOConfigRequest:
+  type: object
+  description: Create a new SSO configuration
+  properties:
+    provider:
+      type: string
+      enum: [saml, oidc]
+    domain:
+      type: string
+    metadata_url:
+      type: string
+      format: uri
+      description: URL to SAML metadata or OIDC discovery document
+  required: [provider, domain, metadata_url]
+
+UpdateSSOConfigRequest:
+  type: object
+  description: Update an SSO configuration (all fields optional)
+  properties:
+    provider:
+      type: string
+      enum: [saml, oidc]
+    domain:
+      type: string
+
+# ── Custom Domains ──
+
+CustomDomain:
+  type: object
+  description: A custom domain configured for the account
+  properties:
+    id:
+      $ref: "#/components/schemas/Uuid"
+    domain:
+      type: string
+      description: The custom domain (e.g. webhooks.example.com)
+    status:
+      type: string
+      enum: [pending, verifying, verified, failed]
+    verification_token:
+      type: string
+      nullable: true
+      description: TXT record value to prove domain ownership
+    created_at:
+      $ref: "#/components/schemas/DateTime"
+  required: [id, domain, status, created_at]
+
+CustomDomainListResponse:
+  type: object
+  description: List of custom domains
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/CustomDomain"
+  required: [data]
+
+CreateCustomDomainRequest:
+  type: object
+  description: Register a new custom domain
+  properties:
+    domain:
+      type: string
+      description: Fully qualified domain name to register
+  required: [domain]
+
+VerifyCustomDomainResponse:
+  type: object
+  description: Result of domain verification attempt
+  properties:
+    status:
+      type: string
+      enum: [verified, pending, failed]
+    dns_records:
+      type: array
+      items:
+        $ref: "#/components/schemas/DomainDnsRecord"
+      description: DNS records that need to be configured
+  required: [status, dns_records]
+
+DomainDnsRecord:
+  type: object
+  description: A DNS record required for domain verification
+  properties:
+    type:
+      type: string
+      enum: [TXT, CNAME, A]
+    name:
+      type: string
+      description: DNS record name/host
+    value:
+      type: string
+      description: DNS record value
+    status:
+      type: string
+      enum: [pending, verified, failed]
+  required: [type, name, value, status]
+
+# ── Rate Limits ──
+
+RateLimitConfig:
+  type: object
+  description: Rate limiting configuration for an endpoint
+  properties:
+    requests_per_second:
+      type: integer
+      description: Maximum requests per second allowed
+    burst_size:
+      type: integer
+      description: Maximum burst above steady-state rate
+    enabled:
+      type: boolean
+  required: [requests_per_second, burst_size, enabled]
+
+RateLimitUsage:
+  type: object
+  description: Current rate limit usage for an endpoint
+  properties:
+    current_rps:
+      type: number
+      format: double
+      description: Current requests per second being consumed
+    limit_rps:
+      type: number
+      format: double
+      description: Configured requests per second limit
+    remaining:
+      type: number
+      format: double
+      description: Remaining capacity
+    reset_at:
+      $ref: "#/components/schemas/DateTime"
+  required: [current_rps, limit_rps, remaining, reset_at]
+
+# ── OAuth ──
+
+OAuthProvider:
+  type: object
+  description: An available OAuth identity provider
+  properties:
+    id:
+      $ref: "#/components/schemas/Uuid"
+    name:
+      type: string
+      description: Provider identifier (e.g. google, github)
+    client_id:
+      type: string
+    authorize_url:
+      type: string
+      format: uri
+    token_url:
+      type: string
+      format: uri
+  required: [id, name, client_id, authorize_url, token_url]
+
+OAuthProviderListResponse:
+  type: object
+  description: List of available OAuth providers
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/OAuthProvider"
+  required: [data]
+
+OAuthCallbackRequest:
+  type: object
+  description: OAuth authorization callback parameters
+  properties:
+    code:
+      type: string
+      description: Authorization code from the provider
+    state:
+      type: string
+      description: CSRF state token
+    redirect_uri:
+      type: string
+      format: uri
+  required: [code, state]
+
+# ── Events ──
+
+EventType:
+  type: object
+  description: A registered event type in the system
+  properties:
+    id:
+      $ref: "#/components/schemas/Uuid"
+    name:
+      type: string
+      description: Event type identifier (e.g. order.created)
+    description:
+      type: string
+      nullable: true
+    schema_id:
+      $ref: "#/components/schemas/Uuid"
+      nullable: true
+      description: Associated JSON Schema for payload validation
+  required: [id, name]
+
+EventTypeListResponse:
+  type: object
+  description: Paginated list of event types
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/EventType"
+    has_more:
+      type: boolean
+    total:
+      type: integer
+  required: [data, has_more, total]
+
+# ── Embed ──
+
+EmbedConfig:
+  type: object
+  description: Configuration for embedded webhook dashboard
+  properties:
+    allowed_origins:
+      type: array
+      items:
+        type: string
+      description: CORS origins allowed to load the embed
+    theme:
+      type: object
+      properties:
+        primary_color:
+          type: string
+        background_color:
+          type: string
+        font_family:
+          type: string
+      description: Visual customization for the embed
+    features:
+      type: array
+      items:
+        type: string
+      description: Enabled features (e.g. [deliveries, endpoints, playground])
+  required: [allowed_origins]
+
+# ── Simulator ──
+
+SimulatorRequest:
+  type: object
+  description: Send a simulated webhook event
+  properties:
+    endpoint_id:
+      $ref: "#/components/schemas/Uuid"
+    event_type:
+      type: string
+      description: Event type to simulate (e.g. order.created)
+    payload:
+      type: object
+      description: The webhook payload to deliver
+    delay_ms:
+      type: integer
+      nullable: true
+      description: Artificial delay before delivery (for testing timeouts)
+  required: [endpoint_id, event_type, payload]
+
+SimulatorResponse:
+  type: object
+  description: Result of a simulated webhook delivery
+  properties:
+    delivery_id:
+      $ref: "#/components/schemas/Uuid"
+    status:
+      type: string
+      enum: [delivered, failed, pending]
+    latency_ms:
+      type: integer
+      description: Response time from the endpoint
+  required: [delivery_id, status, latency_ms]
+
+# ── Playground ──
+
+PlaygroundTestRequest:
+  type: object
+  description: Test a webhook payload against an endpoint in sandbox
+  properties:
+    endpoint_id:
+      $ref: "#/components/schemas/Uuid"
+    payload:
+      type: object
+      description: The payload to send
+    headers:
+      type: object
+      nullable: true
+      description: Custom headers to include with the request
+  required: [endpoint_id, payload]
+
+PlaygroundTestResponse:
+  type: object
+  description: Result of a playground test delivery
+  properties:
+    status_code:
+      type: integer
+      description: HTTP status code returned by the endpoint
+    response_body:
+      type: string
+      description: Raw response body from the endpoint
+    latency_ms:
+      type: integer
+    headers:
+      type: object
+      description: Response headers from the endpoint
+  required: [status_code, response_body, latency_ms]
+
+# ── Transforms (extras) ──
+
+TransformRuleListResponse:
+  type: object
+  description: Paginated list of transform rules
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/components/schemas/TransformRule"
+  required: [data]
+
+UpdateTransformRuleRequest:
+  type: object
+  description: Update an existing transform rule (all fields optional)
+  properties:
+    name:
+      type: string
+    config:
+      type: object
+      description: Updated transformation configuration
+
+# ── Other ──
+
+OutboundIPsResponse:
+  type: object
+  description: List of static outbound IP addresses for firewall whitelisting
+  properties:
+    ips:
+      type: array
+      items:
+        type: string
+      description: IPv4 and IPv6 addresses used for outbound requests
+  required: [ips]
+
+ContactRequest:
+  type: object
+  description: Submit a contact/support request
+  properties:
+    name:
+      type: string
+    email:
+      type: string
+      format: email
+    subject:
+      type: string
+    message:
+      type: string
+  required: [name, email, subject, message]
+
+ContactResponse:
+  type: object
+  description: Confirmation that the contact request was received
+  properties:
+    id:
+      $ref: "#/components/schemas/Uuid"
+    status:
+      type: string
+      enum: [received, pending, resolved]
+  required: [id, status]
