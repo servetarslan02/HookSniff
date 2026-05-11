@@ -82,7 +82,12 @@
     "failedToCreate": "Failed to create",
     "failedToLoadEndpoints": "Failed to load endpoints",
     "failedToLoadTransforms": "Failed to load transforms",
-    "failedToDelete": "Failed to delete"
+    "failedToDelete": "Failed to delete",
+    "cancelFailed": "Cancel failed",
+    "upgradeFailed": "Upgrade failed",
+    "failedToLoadDeliveries": "Failed to load deliveries",
+    "replayFailed": "Replay failed",
+    "failedToLoadLogs": "Failed to load logs"
   },
   "nav": {
     "dashboard": "Dashboard",
