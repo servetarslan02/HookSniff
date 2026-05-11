@@ -605,3 +605,8 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 
 ### Commit
 - `d2383ed3` — fix: SDK test fixes + dependency updates
+
+### ⚠️ GitHub Actions Billing Limiti Doldu (2026-05-11)
+- CI/CD workflow'ları çalışmıyor — "payments have failed" hatası
+- Manuel deploy veya GCP Cloud Build kullanılmalı
+- Servet'in GitHub billing'i güncellemesi gerekiyor
