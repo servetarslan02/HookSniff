@@ -191,7 +191,7 @@ export default function ApiKeysPage() {
         </div>
         {loading ? (
           <div className="p-12 text-center">
-            <div className="inline-flex items-center gap-2 text-gray-400 dark:text-slate-500">
+            <div className="inline-flex items-center gap-2 text-gray-500 dark:text-slate-400">
               <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -202,7 +202,7 @@ export default function ApiKeysPage() {
         ) : keys.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-4xl mb-3">🔐</div>
-            <p className="text-gray-400 dark:text-slate-500">{t('noKeys')}</p>
+            <p className="text-gray-500 dark:text-slate-400">{t('noKeys')}</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
@@ -229,7 +229,7 @@ export default function ApiKeysPage() {
                       {key.is_active ? t('active') : t('inactive')}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">
+                  <div className="text-xs text-gray-500 dark:text-slate-400 mt-1.5">
                     {t('createdDate', { date: new Date(key.created_at).toLocaleDateString() })}
                     {key.last_used_at && (
                       <> · {t('lastUsed', { date: new Date(key.last_used_at).toLocaleDateString() })}</>
