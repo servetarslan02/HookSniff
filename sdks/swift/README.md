@@ -13,77 +13,56 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/servetarslan02/hooksniff", from: "0.2.0")
+    .package(url: "https://github.com/servetarslan02/hooksniff-swift", from: "0.3.0")
 ]
 ```
 
-Or in Xcode: File → Add Package Dependencies → Enter the repo URL.
+Or in Xcode: File → Add Package Dependencies → Enter the URL above.
 
-## Usage
+## Quick Start
 
 ```swift
 import HookSniff
 
-// Default base URL is used automatically
-let client = HookSniff(apiKey: "hr_live_...")
+// Configure
+let config = OpenAPIClientAPI.basePath
+OpenAPIClientAPI.basePath = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
+// Set API key via custom headers or URLSession configuration
 
-// Or with custom base URL
-let client2 = HookSniff(apiKey: "hr_live_...",
-    baseUrl: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
+// Create an endpoint
+EndpointsAPI.endpointsPost(
+    createEndpointRequest: CreateEndpointRequest(
+        url: "https://myapp.com/webhook",
+        description: "Order notifications"
+    )
+) { endpoint, error in
+    if let endpoint = endpoint {
+        print("Endpoint created: \(endpoint.id)")
+    }
+}
 
-// Create endpoint
-let endpoint = try await client.endpoints.create(
-    url: "https://myapp.com/webhook",
-    description: "Orders"
-)
-
-// Send webhook
-let delivery = try await client.webhooks.send(
-    endpointId: endpoint.id,
-    event: "order.created",
-    data: ["order_id": "12345", "amount": 99.99]
-)
-
-// List deliveries
-let result = try await client.webhooks.list(status: "delivered", page: 1)
-print("Total: \(result.total)")
-```
-
-## Webhook Verification
-
-Verify incoming webhooks using Standard Webhooks headers:
-
-```swift
-let verifier = WebhookVerifier(secret: "whsec_...")
-
-// From headers dict
-let result = verifier.verifyFromHeaders(
-    body: requestBody,
-    headers: [
-        "webhook-id": request.headers["webhook-id"],
-        "webhook-timestamp": request.headers["webhook-timestamp"],
-        "webhook-signature": request.headers["webhook-signature"]
-    ]
-)
-
-if result.valid {
-    // Handle verified webhook
-    print("Payload: \(result.payload)")
-} else {
-    // Reject
-    print("Error: \(result.error)")
+// Send a webhook
+WebhooksAPI.webhooksPost(
+    createWebhookRequest: CreateWebhookRequest(
+        endpointId: "ep_abc123",
+        event: "order.created",
+        data: ["orderId": "12345"]
+    )
+) { delivery, error in
+    if let delivery = delivery {
+        print("Delivery: \(delivery.id)")
+    }
 }
 ```
 
-## Error Handling
+## Available APIs
 
-```swift
-do {
-    let endpoint = try await client.endpoints.create(url: "https://myapp.com/webhook")
-} catch let error as HookSniffError {
-    print("Error \(error.statusCode ?? 0): \(error.message)")
-}
-```
+`EndpointsAPI`, `WebhooksAPI`, `AuthAPI`, `APIKeysAPI`, `AlertsAPI`, `AnalyticsAPI`, `BillingAPI`, `TeamsAPI`, `NotificationsAPI`, `SchemasAPI`, `SearchAPI`, `HealthAPI`, `AdminAPI`, `AuditLogAPI`, `InboundAPI`, `TemplatesAPI`, `RoutingAPI`, `RateLimitsAPI`, `CustomDomainsAPI`, `CustomerPortalAPI`, `DeliveryDetailsAPI`, `DevicesAPI`, `EmbedAPI`, `EventsAPI`, `OAuthAPI`, `OutboundIPsAPI`, `PlaygroundAPI`, `SimulatorAPI`, `SsoAPI`, `StatsAPI`, `StreamAPI`, `TransformsAPI`, `ContactAPI`
+
+## Requirements
+
+- macOS 12+ / iOS 15+ / tvOS 15+ / watchOS 8+
+- Swift 5.9+
 
 ## License
 

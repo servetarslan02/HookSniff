@@ -7,79 +7,50 @@ Official Elixir client for the [HookSniff](https://hooksniff.vercel.app) webhook
 
 ## Installation
 
-Add `hooksniff` to your list of dependencies in `mix.exs`:
+Add `hooksniff` to your `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:hooksniff, "~> 0.2.0"}
+    {:hooksniff, "~> 0.3.0"}
   ]
 end
 ```
 
-## Usage
+Then run:
+
+```bash
+mix deps.get
+```
+
+## Quick Start
 
 ```elixir
-# Create client
-# Default base URL is used automatically
-client = HookSniff.new("hr_live_...")
+# Configure
+config = %HookSniffAPI.Configuration{
+  base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1",
+  api_key: %{"Authorization" => "Bearer hr_live_your_api_key_here"}
+}
 
-# Or specify a custom base URL
-client = HookSniff.new("hr_live_...", base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
-
-# Create endpoint
-{:ok, endpoint} = HookSniff.Endpoints.create(client, %{
+# Create an endpoint
+{:ok, endpoint} = HookSniffAPI.EndpointsApi.endpoints_post(config, %{
   url: "https://myapp.com/webhook",
-  description: "Orders"
+  description: "Order notifications"
 })
+IO.puts("Endpoint created: #{endpoint.id}")
 
-# Send webhook
-{:ok, delivery} = HookSniff.Webhooks.send(client, %{
-  endpoint_id: endpoint["id"],
+# Send a webhook
+{:ok, delivery} = HookSniffAPI.WebhooksApi.webhooks_post(config, %{
+  endpoint_id: endpoint.id,
   event: "order.created",
-  data: %{order_id: "12345", amount: 99.99}
+  data: %{order_id: "12345"}
 })
-
-# List deliveries
-{:ok, result} = HookSniff.Webhooks.list(client, status: "delivered", page: 1)
-
-# Get delivery attempts
-{:ok, attempts} = HookSniff.Webhooks.attempts(client, delivery["id"])
+IO.puts("Delivery: #{delivery.id}")
 ```
 
-## Webhook Verification
+## Available API Modules
 
-Verify incoming webhooks using Standard Webhooks headers:
-
-```elixir
-# From Plug/Phoenix conn
-result = HookSniff.WebhookVerification.verify_webhook_from_headers(
-  payload: conn.assigns[:raw_body],
-  headers: conn.req_headers |> Map.new(),
-  secret: "whsec_..."
-)
-
-case result do
-  {:ok, payload} ->
-    # Handle verified webhook
-    IO.puts("Event: #{payload["event"]}")
-
-  {:error, reason} ->
-    # Reject webhook
-    Logger.warning("Webhook verification failed: #{reason}")
-end
-```
-
-## Error Handling
-
-```elixir
-case HookSniff.Endpoints.create(client, %{url: "invalid"}) do
-  {:ok, endpoint} -> # Success
-  {:error, %HookSniff.Error{code: :validation_error, message: msg}} -> # 400
-  {:error, %HookSniff.Error{code: :rate_limit_error}} -> # 429
-  {:error, error} -> # Other error
-end
-```
+`EndpointsApi`, `WebhooksApi`, `AuthApi`, `APIKeysApi`, `AlertsApi`, `AnalyticsApi`, `BillingApi`, `TeamsApi`, `NotificationsApi`, `SchemasApi`, `SearchApi`, `HealthApi`, `AdminApi`, `AuditLogApi`, `InboundApi`, `TemplatesApi`, `RoutingApi`, `RateLimitsApi`, `CustomDomainsApi`, `CustomerPortalApi`, `DeliveryDetailsApi`, `DevicesApi`, `EmbedApi`, `EventsApi`, `OAuthApi`, `OutboundIPsApi`, `PlaygroundApi`, `SimulatorApi`, `SsoApi`, `StatsApi`, `StreamApi`, `TransformsApi`, `ContactApi`
 
 ## License
 

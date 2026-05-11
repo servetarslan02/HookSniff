@@ -4,7 +4,7 @@ version = "0.3.0"
 edition = "2021"
 description = "Official Rust client for the HookSniff webhook delivery service"
 license = "MIT"
-repository = "https://github.com/servetarslan02/hooksniff"
+repository = "https://github.com/servetarslan02/HookSniff"
 homepage = "https://hooksniff.vercel.app"
 
 [dependencies]
