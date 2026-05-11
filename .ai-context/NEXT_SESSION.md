@@ -1,8 +1,39 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 23:37 GMT+8
+> Son güncelleme: 2026-05-12 00:15 GMT+8
 
 ---
+
+## 🔴 ACİL: Vercel 404 Kontrol (Deploy sonrası)
+
+### Yapılan Fix
+- `dashboard/next.config.js`'den `outputFileTracingRoot: path.join(__dirname, '..')` **kaldırıldı**
+- `path` import'u da kaldırıldı (artık kullanılmıyor)
+- Push: `bb16a8e2` — main branch
+- Vercel deploy hook tetiklendi
+
+### Kontrol Adımları
+1. **Vercel deploy tamamlanmasını bekle** (2-3 dk)
+2. **Bu 3 sayfayı test et:**
+   - `https://hooksniff.vercel.app/en/docs/api`
+   - `https://hooksniff.vercel.app/en/docs/portal`
+   - `https://hooksniff.vercel.app/en/docs/sdks`
+3. **Eğer hâlâ 404 ise → Plan B'ye geç**
+
+### Plan B: Sayfaları Farklı Yola Taşı
+Eğer outputFileTracingRoot kaldırması yetmezse, muhtemel neden:
+- Repo kök dizinindeki `api/`, `portal/`, `sdks/` klasörleri (Rust API, HTML portal, SDK source)
+- next-intl + `[locale]` segmenti ile Vercel serverless function arasında uyumsuzluk
+
+**Çözüm:** Bu 3 docs sayfasını farklı yola taşı:
+- `[locale]/docs/api` → `[locale]/docs/api-reference`
+- `[locale]/docs/portal` → `[locale]/docs/embed-portal`
+- `[locale]/docs/sdks` → `[locale]/docs/sdk-libraries`
+
+**Ayrıca güncelle:**
+- Sidebar linkleri (docs layout)
+- Internal linkler (diğer sayfalardan bu sayfalara gelen linkler)
+- Sitemap (eğer varsa)
 
 ## ✅ AŞAMA 2 TAMAMLANDI — Wrapper + İmza Doğrulama + Testler (11/11 SDK)
 
