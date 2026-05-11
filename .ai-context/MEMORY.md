@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 00:40 GMT+8
+> Son güncelleme: 2026-05-12 00:57 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -71,14 +71,15 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟢 P3 | 13 | 8 | 5 |
 | **TOPLAM** | **103** | **102** | **1** |
 
-## Oturum 115 (2026-05-12 00:10 - 00:40 GMT+8) ✅
-- **OpenClaw on birinci oturum** — Servet Vercel 404 fix
-- **Sorun:** `docs/api`, `docs/portal`, `docs/sdks` sayfaları Vercel'de 404 veriyor
-- **Kök neden:** Repo root'taki `api/`, `portal/`, `sdks/` klasörleri + next-intl `[locale]` + Vercel serverless conflict
-- **Fix 1:** `outputFileTracingRoot` kaldırıldı — yetmedi
-- **Fix 2 (Plan B):** 3 docs sayfası taşındı: api→api-reference, portal→embed-portal, sdks→sdk-libraries
-- **Fix 3:** dashboard/portal → dashboard/portal-manage (aynı root portal/ çakışması)
-- **Deploy:** GitHub push → Vercel webhook tutarsız → dummy commit ile tetikleniyor
+## Oturum 115 (2026-05-12 00:10 - 00:57 GMT+8) ✅
+- **OpenClaw on birinci oturum** — Servet Vercel 404 sorunu tamamen çözüldü
+- **Sorun:** Repo root'taki `api/`, `portal/`, `sdks/` klasörleri next-intl `[locale]` ile Vercel serverless'ta çakışma yapıyordu
+- **Fix 1:** `outputFileTracingRoot` kaldırıldı (`dashboard/next.config.js`) — yetmedi
+- **Fix 2:** 3 docs sayfası taşındı: api→api-reference, portal→embed-portal, sdks→sdk-libraries
+- **Fix 3:** `dashboard/portal` → `dashboard/portal-manage` (aynı root portal/ çakışması)
+- **Deploy:** Vercel webhook tutarsız → dummy commit ile tetikleniyor
+- **Doğrulama:** Tüm sayfalar Vercel'de 200 OK ✅
+- **Alınan ders:** Repo root klasör isimleri ile Next.js route isimleri aynı olmamalı
 
 ## Oturum 109 (2026-05-11 17:27 - 18:12) ✅
 - **OpenClaw beşinci oturum** — Servet ile GCP deploy debug
