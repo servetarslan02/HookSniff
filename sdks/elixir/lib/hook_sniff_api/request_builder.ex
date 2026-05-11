@@ -96,7 +96,7 @@ defmodule HookSniffAPI.RequestBuilder do
       Tesla.Multipart.add_field(
         multipart,
         key,
-        JSON.encode!(value),
+        Jason.encode!(value),
         headers: [{:"Content-Type", "application/json"}]
       )
     end)

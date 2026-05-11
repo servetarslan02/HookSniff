@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Error do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :error
   ]

@@ -30,7 +30,9 @@ defmodule HookSniff.MixProject do
     [
       {:jason, "~> 1.4"},
       {:plug_crypto, "~> 1.2"},
-      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
+      {:tesla, "~> 1.7"},
+      {:hackney, "~> 1.18"},
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false}
     ]
   end
 

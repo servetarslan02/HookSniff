@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Enable2faRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :password
   ]

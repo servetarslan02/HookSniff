@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SuccessRateResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :range,
     :successful,
