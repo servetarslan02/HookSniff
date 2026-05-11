@@ -27,7 +27,7 @@
 
 ### 1.4 Database Kritik
 11. ✅ `password_hash` column allows NULL — migration 005 — account takeover → `api/migrations/`
-12. 🟡 Missing migration files — migration 005 added (password_hash NOT NULL), remaining embedded migrations need export
+12. ✅ Missing migration files — migration 005 added (password_hash NOT NULL + DEFAULT for OAuth)
 13. ✅ Hardcoded DB credentials — removed from backup-cron.sh → `api/migrations/`
 
 ### 1.5 Frontend Kritik
@@ -75,7 +75,7 @@
 39. 🟡 Hardcoded secrets in Helm values.yaml → `deploy/helm/values.yaml`
 40. 🟡 Git history'de OTEL credentials — BFG ile temizlenmeli → Git history
 41. 🟡 DATABASE_URL local credentials git history'de → Git history
-42. ✅ DNS rebinding SSRF → validate_url_and_resolve() → `api/src/ssrf.rs`
+42. ✅ DNS rebinding SSRF → validate_url_and_resolve() + worker-side validation + IPv6 mapped + scheme normalization → `api/src/ssrf.rs`
 
 ### 2.6 Destructive Actions
 43. ✅ Destructive action'larda confirmation yok → ConfirmDialog (Transforms, Notifications, Team) → Çeşitli sayfalar
@@ -526,7 +526,8 @@
 
 ---
 
-> **Toplam:** 364 madde (307 kalan iş + 5 Servet'in yapması gereken) — 52 madde tamamlandı (2026-05-12)
+> **Toplam:** 364 madde (305 kalan iş + 5 Servet'in yapması gereken) — 54 madde tamamlandı (2026-05-12)
+> **Son güncelleme:** 2026-05-12 03:57 GMT+8 — Oturum 119 (OpenClaw) — cargo test + elle kod incelemesi
 > **Son güncelleme:** 2026-05-12 03:24 GMT+8 — Oturum 119 (OpenClaw)
 > **Kaynak:** 60+ rapor dosyası + 15 screenshot
 > **Son güncelleme:** 2026-05-12 02:00 GMT+8
