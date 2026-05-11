@@ -23,7 +23,7 @@ const plans = [
   {
     key: 'pro',
     nameKey: 'plans.pro',
-    price: 29,
+    price: 49,
     period: '/month',
     limitKey: 'plans.proLimit',
     features: ['1,000 requests/min', '5 retry attempts', 'Priority support', '50 endpoints', '30-day retention'],
@@ -32,7 +32,7 @@ const plans = [
   {
     key: 'business',
     nameKey: 'plans.business',
-    price: 99,
+    price: 149,
     period: '/month',
     limitKey: 'plans.businessLimit',
     features: ['10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', '500 endpoints', '90-day retention'],
