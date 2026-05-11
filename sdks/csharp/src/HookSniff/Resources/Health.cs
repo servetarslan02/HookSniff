@@ -3,7 +3,7 @@ using HookSniff.Model;
 namespace HookSniff.Resources;
 
 /// <summary>
-/// Health resource — system health and status.
+/// Health resource — system health check.
 /// </summary>
 public class Health
 {
@@ -12,9 +12,9 @@ public class Health
     internal Health(RequestContext ctx) => _ctx = ctx;
 
     /// <summary>Get system health status.</summary>
-    public async Task<SystemStatus> GetStatusAsync()
+    public async Task<SystemStatus> CheckAsync()
     {
-        var req = new Request("GET", "/v1/health");
+        var req = new Request("GET", "/health");
         return (await req.SendAsync<SystemStatus>(_ctx))!;
     }
 }
