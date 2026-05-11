@@ -12,7 +12,7 @@ pub fn validate_email(email: &str) -> Result<(), String> {
     if email.is_empty() || email.len() > 254 {
         return Err("Email must be between 1 and 254 characters".into());
     }
-    if email.contains(' ') || email.contains('	') {
+    if email.contains(' ') || email.contains('\t') {
         return Err("Email must not contain whitespace".into());
     }
     let parts: Vec<&str> = email.split('@').collect();
