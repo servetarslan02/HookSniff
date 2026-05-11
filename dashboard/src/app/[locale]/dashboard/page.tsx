@@ -335,7 +335,7 @@ export default function DashboardOverview() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<TimeRange>('24h');
 
   // Analytics state

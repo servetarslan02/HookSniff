@@ -17,6 +17,7 @@ export default function AdminUserDetailPage() {
   const { toast } = useToast();
   const router = useRouter();
   const t = useTranslations('admin');
+  const tc = useTranslations('common');
   const [detail, setDetail] = useState<AdminUserDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [newPlan, setNewPlan] = useState('');
