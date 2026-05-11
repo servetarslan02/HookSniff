@@ -239,7 +239,8 @@
     "time": "Time",
     "event": "Event",
     "status": "Status",
-    "endpoint": "Endpoint"
+    "endpoint": "Endpoint",
+    "searchFailed": "Search failed"
   },
   "health": {
     "title": "Endpoint Health",
