@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SystemStatusComponentsInner do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :name,
     :status,

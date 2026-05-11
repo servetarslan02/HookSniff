@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UsageResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :plan,
     :period_start,
@@ -18,13 +18,13 @@ defmodule HookSniffAPI.Model.UsageResponse do
   ]
 
   @type t :: %__MODULE__{
-    :plan => String.t | nil,
-    :period_start => DateTime.t | nil,
-    :period_end => DateTime.t | nil,
-    :webhooks_used => integer() | nil,
-    :webhooks_limit => integer() | nil,
-    :endpoints_used => integer() | nil,
-    :endpoints_limit => integer() | nil
+    :plan => String.t,
+    :period_start => DateTime.t,
+    :period_end => DateTime.t,
+    :webhooks_used => integer(),
+    :webhooks_limit => integer(),
+    :endpoints_used => integer(),
+    :endpoints_limit => integer()
   }
 
   def decode(value) do

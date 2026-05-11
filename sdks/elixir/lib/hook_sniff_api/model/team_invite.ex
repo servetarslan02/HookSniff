@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.TeamInvite do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :email,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.TeamInvite do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :email => String.t | nil,
-    :role => String.t | nil,
-    :created_at => DateTime.t | nil
+    :id => String.t,
+    :email => String.t,
+    :role => String.t,
+    :created_at => DateTime.t
   }
 
   def decode(value) do

@@ -1,4 +1,4 @@
-# HookSniff.Model.PortalSession
+# HookSniff.Sdk.Model.PortalSession
 Temporary session token for the customer portal
 
 ## Properties

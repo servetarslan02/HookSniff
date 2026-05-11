@@ -12,16 +12,16 @@ import AnyCodable
 
 public struct StatsResponse: Codable, JSONEncodable, Hashable {
 
-    public var totalDeliveries: Int?
-    public var successfulDeliveries: Int?
-    public var failedDeliveries: Int?
-    public var totalEndpoints: Int?
-    public var activeEndpoints: Int?
-    public var plan: String?
-    public var webhookLimit: Int?
-    public var webhookCount: Int?
+    public var totalDeliveries: Int
+    public var successfulDeliveries: Int
+    public var failedDeliveries: Int
+    public var totalEndpoints: Int
+    public var activeEndpoints: Int
+    public var plan: String
+    public var webhookLimit: Int
+    public var webhookCount: Int
 
-    public init(totalDeliveries: Int? = nil, successfulDeliveries: Int? = nil, failedDeliveries: Int? = nil, totalEndpoints: Int? = nil, activeEndpoints: Int? = nil, plan: String? = nil, webhookLimit: Int? = nil, webhookCount: Int? = nil) {
+    public init(totalDeliveries: Int, successfulDeliveries: Int, failedDeliveries: Int, totalEndpoints: Int, activeEndpoints: Int, plan: String, webhookLimit: Int, webhookCount: Int) {
         self.totalDeliveries = totalDeliveries
         self.successfulDeliveries = successfulDeliveries
         self.failedDeliveries = failedDeliveries
@@ -47,14 +47,14 @@ public struct StatsResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(totalDeliveries, forKey: .totalDeliveries)
-        try container.encodeIfPresent(successfulDeliveries, forKey: .successfulDeliveries)
-        try container.encodeIfPresent(failedDeliveries, forKey: .failedDeliveries)
-        try container.encodeIfPresent(totalEndpoints, forKey: .totalEndpoints)
-        try container.encodeIfPresent(activeEndpoints, forKey: .activeEndpoints)
-        try container.encodeIfPresent(plan, forKey: .plan)
-        try container.encodeIfPresent(webhookLimit, forKey: .webhookLimit)
-        try container.encodeIfPresent(webhookCount, forKey: .webhookCount)
+        try container.encode(totalDeliveries, forKey: .totalDeliveries)
+        try container.encode(successfulDeliveries, forKey: .successfulDeliveries)
+        try container.encode(failedDeliveries, forKey: .failedDeliveries)
+        try container.encode(totalEndpoints, forKey: .totalEndpoints)
+        try container.encode(activeEndpoints, forKey: .activeEndpoints)
+        try container.encode(plan, forKey: .plan)
+        try container.encode(webhookLimit, forKey: .webhookLimit)
+        try container.encode(webhookCount, forKey: .webhookCount)
     }
 }
 

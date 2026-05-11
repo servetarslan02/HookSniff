@@ -12,14 +12,14 @@ import AnyCodable
 
 public struct UpdateNotificationPreferences: Codable, JSONEncodable, Hashable {
 
-    public var emailOnFailure: Bool?
-    public var emailOnDeadLetter: Bool?
-    public var emailOnSuccess: Bool?
+    public var emailOnFailure: Bool
+    public var emailOnDeadLetter: Bool
+    public var emailOnSuccess: Bool
     public var slackWebhookUrl: String?
     public var discordWebhookUrl: String?
     public var webhookUrl: String?
 
-    public init(emailOnFailure: Bool? = nil, emailOnDeadLetter: Bool? = nil, emailOnSuccess: Bool? = nil, slackWebhookUrl: String? = nil, discordWebhookUrl: String? = nil, webhookUrl: String? = nil) {
+    public init(emailOnFailure: Bool, emailOnDeadLetter: Bool, emailOnSuccess: Bool, slackWebhookUrl: String? = nil, discordWebhookUrl: String? = nil, webhookUrl: String? = nil) {
         self.emailOnFailure = emailOnFailure
         self.emailOnDeadLetter = emailOnDeadLetter
         self.emailOnSuccess = emailOnSuccess
@@ -41,9 +41,9 @@ public struct UpdateNotificationPreferences: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(emailOnFailure, forKey: .emailOnFailure)
-        try container.encodeIfPresent(emailOnDeadLetter, forKey: .emailOnDeadLetter)
-        try container.encodeIfPresent(emailOnSuccess, forKey: .emailOnSuccess)
+        try container.encode(emailOnFailure, forKey: .emailOnFailure)
+        try container.encode(emailOnDeadLetter, forKey: .emailOnDeadLetter)
+        try container.encode(emailOnSuccess, forKey: .emailOnSuccess)
         try container.encodeIfPresent(slackWebhookUrl, forKey: .slackWebhookUrl)
         try container.encodeIfPresent(discordWebhookUrl, forKey: .discordWebhookUrl)
         try container.encodeIfPresent(webhookUrl, forKey: .webhookUrl)

@@ -18,8 +18,8 @@ List registered devices
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = DevicesApi()
 try {
@@ -61,8 +61,8 @@ Register device for push notifications
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = DevicesApi()
 val registerDeviceRequest : RegisterDeviceRequest =  // RegisterDeviceRequest | 
@@ -107,8 +107,8 @@ Remove device token
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = DevicesApi()
 val token : kotlin.String = token_example // kotlin.String | 

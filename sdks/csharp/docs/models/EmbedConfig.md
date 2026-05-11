@@ -1,4 +1,4 @@
-# HookSniff.Model.EmbedConfig
+# HookSniff.Sdk.Model.EmbedConfig
 Configuration for embedded webhook dashboard
 
 ## Properties

@@ -1,4 +1,4 @@
-# HookSniff.Model.PlaygroundTestRequest
+# HookSniff.Sdk.Model.PlaygroundTestRequest
 Test a webhook payload against an endpoint in sandbox
 
 ## Properties

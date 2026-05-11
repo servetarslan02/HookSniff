@@ -6,8 +6,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **checkout_url** | **str** |  | [optional] 
-**provider** | **str** |  | [optional] 
-**message** | **str** |  | [optional] 
+**provider** | **str** |  | 
+**message** | **str** |  | 
 
 ## Example
 

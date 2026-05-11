@@ -6,13 +6,13 @@ Query parameters for filtering webhook deliveries
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **str** | Filter by delivery status | [optional] 
-**endpoint_id** | **UUID** |  | [optional] 
-**event_type** | **str** | Filter by event type (e.g. order.created) | [optional] 
-**from_date** | **datetime** |  | [optional] 
-**to_date** | **datetime** |  | [optional] 
-**page** | **int** |  | [optional] [default to 1]
-**per_page** | **int** |  | [optional] [default to 20]
+**status** | **str** | Filter by delivery status | 
+**endpoint_id** | **UUID** |  | 
+**event_type** | **str** | Filter by event type (e.g. order.created) | 
+**from_date** | **datetime** |  | 
+**to_date** | **datetime** |  | 
+**page** | **int** |  | [default to 1]
+**per_page** | **int** |  | [default to 20]
 
 ## Example
 

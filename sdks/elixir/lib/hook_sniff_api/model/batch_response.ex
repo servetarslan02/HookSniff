@@ -6,15 +6,15 @@ defmodule HookSniffAPI.Model.BatchResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :deliveries,
     :errors
   ]
 
   @type t :: %__MODULE__{
-    :deliveries => [HookSniffAPI.Model.Delivery.t] | nil,
-    :errors => [HookSniffAPI.Model.BatchResponseErrorsInner.t] | nil
+    :deliveries => [HookSniffAPI.Model.Delivery.t],
+    :errors => [HookSniffAPI.Model.BatchResponseErrorsInner.t]
   }
 
   alias HookSniffAPI.Deserializer

@@ -1,4 +1,4 @@
-# HookSniff.Model.ValidateEventRequest
+# HookSniff.Sdk.Model.ValidateEventRequest
 
 ## Properties
 

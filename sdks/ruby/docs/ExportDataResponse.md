@@ -1,4 +1,4 @@
-# HookSniff::ExportDataResponse
+# HooksniffSdk::ExportDataResponse
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ExportDataResponse.new(
+instance = HooksniffSdk::ExportDataResponse.new(
   user: null,
   endpoints: null,
   deliveries: null,

@@ -1,4 +1,4 @@
-# HookSniff::RefreshTokenRequest
+# HooksniffSdk::RefreshTokenRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RefreshTokenRequest.new(
+instance = HooksniffSdk::RefreshTokenRequest.new(
   refresh_token: null
 )
 ```

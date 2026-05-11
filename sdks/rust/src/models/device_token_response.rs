@@ -13,23 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DeviceTokenResponse {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "token", skip_serializing_if = "Option::is_none")]
-    pub token: Option<String>,
-    #[serde(rename = "platform", skip_serializing_if = "Option::is_none")]
-    pub platform: Option<String>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "token")]
+    pub token: String,
+    #[serde(rename = "platform")]
+    pub platform: String,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl DeviceTokenResponse {
-    pub fn new() -> DeviceTokenResponse {
+    pub fn new(id: uuid::Uuid, token: String, platform: String, created_at: chrono::DateTime<chrono::FixedOffset>) -> DeviceTokenResponse {
         DeviceTokenResponse {
-            id: None,
-            token: None,
-            platform: None,
-            created_at: None,
+            id,
+            token,
+            platform,
+            created_at,
         }
     }
 }

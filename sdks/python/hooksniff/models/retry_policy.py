@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,18 +28,15 @@ class RetryPolicy(BaseModel):
     """
     RetryPolicy
     """ # noqa: E501
-    max_attempts: Optional[StrictInt] = 3
-    backoff: Optional[StrictStr] = 'exponential'
-    initial_delay_secs: Optional[StrictInt] = 10
-    max_delay_secs: Optional[StrictInt] = 3600
+    max_attempts: StrictInt
+    backoff: StrictStr
+    initial_delay_secs: StrictInt
+    max_delay_secs: StrictInt
     __properties: ClassVar[List[str]] = ["max_attempts", "backoff", "initial_delay_secs", "max_delay_secs"]
 
     @field_validator('backoff')
     def backoff_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['exponential', 'linear', 'fixed']):
             raise ValueError("must be one of enum values ('exponential', 'linear', 'fixed')")
         return value

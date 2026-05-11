@@ -1,4 +1,4 @@
-# HookSniff.Model.InviteMemberRequest
+# HookSniff.Sdk.Model.InviteMemberRequest
 Invite a new member to a team
 
 ## Properties

@@ -13,27 +13,27 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ApiKeyInfo {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
     /// Masked key prefix (e.g. \"hs_abc1...\")
-    #[serde(rename = "prefix", skip_serializing_if = "Option::is_none")]
-    pub prefix: Option<String>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<String>,
+    #[serde(rename = "prefix")]
+    pub prefix: String,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
     #[serde(rename = "last_used_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub last_used_at: Option<Option<String>>,
-    #[serde(rename = "is_active", skip_serializing_if = "Option::is_none")]
-    pub is_active: Option<bool>,
+    #[serde(rename = "is_active")]
+    pub is_active: bool,
 }
 
 impl ApiKeyInfo {
-    pub fn new() -> ApiKeyInfo {
+    pub fn new(id: uuid::Uuid, prefix: String, created_at: chrono::DateTime<chrono::FixedOffset>, is_active: bool) -> ApiKeyInfo {
         ApiKeyInfo {
-            id: None,
-            prefix: None,
-            created_at: None,
+            id,
+            prefix,
+            created_at,
             last_used_at: None,
-            is_active: None,
+            is_active,
         }
     }
 }

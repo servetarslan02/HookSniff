@@ -6,7 +6,7 @@ Update an existing transform rule (all fields optional)
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **str** |  | [optional] 
+**name** | **str** |  | 
 **config** | **object** | Updated transformation configuration | [optional] 
 
 ## Example

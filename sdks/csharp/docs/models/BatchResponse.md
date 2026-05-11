@@ -1,4 +1,4 @@
-# HookSniff.Model.BatchResponse
+# HookSniff.Sdk.Model.BatchResponse
 
 ## Properties
 

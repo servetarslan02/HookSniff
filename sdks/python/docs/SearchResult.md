@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**deliveries** | [**List[Delivery]**](Delivery.md) |  | [optional] 
-**total** | **int** |  | [optional] 
+**deliveries** | [**List[Delivery]**](Delivery.md) |  | 
+**total** | **int** |  | 
 
 ## Example
 

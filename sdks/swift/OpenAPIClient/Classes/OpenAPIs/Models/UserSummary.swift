@@ -12,14 +12,14 @@ import AnyCodable
 
 public struct UserSummary: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var email: String?
+    public var id: UUID
+    public var email: String
     public var name: String?
-    public var plan: String?
-    public var isActive: Bool?
-    public var createdAt: Date?
+    public var plan: String
+    public var isActive: Bool
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, email: String? = nil, name: String? = nil, plan: String? = nil, isActive: Bool? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, email: String, name: String? = nil, plan: String, isActive: Bool, createdAt: Date) {
         self.id = id
         self.email = email
         self.name = name
@@ -41,12 +41,12 @@ public struct UserSummary: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(email, forKey: .email)
+        try container.encode(id, forKey: .id)
+        try container.encode(email, forKey: .email)
         try container.encodeIfPresent(name, forKey: .name)
-        try container.encodeIfPresent(plan, forKey: .plan)
-        try container.encodeIfPresent(isActive, forKey: .isActive)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(plan, forKey: .plan)
+        try container.encode(isActive, forKey: .isActive)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

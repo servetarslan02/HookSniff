@@ -13,20 +13,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TeamDetailResponse {
-    #[serde(rename = "team", skip_serializing_if = "Option::is_none")]
-    pub team: Option<Box<models::Team>>,
-    #[serde(rename = "members", skip_serializing_if = "Option::is_none")]
-    pub members: Option<Vec<models::TeamMember>>,
-    #[serde(rename = "invites", skip_serializing_if = "Option::is_none")]
-    pub invites: Option<Vec<models::TeamInvite>>,
+    #[serde(rename = "team")]
+    pub team: Box<models::Team>,
+    #[serde(rename = "members")]
+    pub members: Vec<models::TeamMember>,
+    #[serde(rename = "invites")]
+    pub invites: Vec<models::TeamInvite>,
 }
 
 impl TeamDetailResponse {
-    pub fn new() -> TeamDetailResponse {
+    pub fn new(team: models::Team, members: Vec<models::TeamMember>, invites: Vec<models::TeamInvite>) -> TeamDetailResponse {
         TeamDetailResponse {
-            team: None,
-            members: None,
-            invites: None,
+            team: Box::new(team),
+            members,
+            invites,
         }
     }
 }

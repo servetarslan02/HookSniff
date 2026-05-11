@@ -1,4 +1,4 @@
-# HookSniff::SystemStatus
+# HooksniffSdk::SystemStatus
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SystemStatus.new(
+instance = HooksniffSdk::SystemStatus.new(
   overall_status: null,
   uptime_30d: null,
   components: null,

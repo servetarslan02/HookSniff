@@ -1,4 +1,4 @@
-# HookSniff::AnalyticsTrendPoint
+# HooksniffSdk::AnalyticsTrendPoint
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::AnalyticsTrendPoint.new(
+instance = HooksniffSdk::AnalyticsTrendPoint.new(
   date: null,
   total: null,
   successful: null,

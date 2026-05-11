@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.CreateTeamRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :name
   ]

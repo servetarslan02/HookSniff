@@ -1,4 +1,4 @@
-# HookSniff::EndpointsIdRotateSecretPost200Response
+# HooksniffSdk::EndpointsIdRotateSecretPost200Response
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::EndpointsIdRotateSecretPost200Response.new(
+instance = HooksniffSdk::EndpointsIdRotateSecretPost200Response.new(
   signing_secret: null,
   message: null
 )

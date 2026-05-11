@@ -1,4 +1,4 @@
-# HookSniff.Model.DeliveryListResponse
+# HookSniff.Sdk.Model.DeliveryListResponse
 
 ## Properties
 

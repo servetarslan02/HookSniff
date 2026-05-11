@@ -21,24 +21,24 @@ public struct Endpoint: Codable, JSONEncodable, Hashable {
         case standard = "standard"
         case cloudevents = "cloudevents"
     }
-    public var id: UUID?
-    public var url: String?
+    public var id: UUID
+    public var url: String
     public var description: String?
-    public var isActive: Bool?
-    public var retryPolicy: RetryPolicy?
-    public var createdAt: Date?
+    public var isActive: Bool
+    public var retryPolicy: RetryPolicy
+    public var createdAt: Date
     /** CIDR blocks or exact IPs */
     public var allowedIps: [String]?
     /** Wildcard patterns (e.g. \"order.*\") */
     public var eventFilter: [String]?
     public var customHeaders: AnyCodable?
-    public var routingStrategy: RoutingStrategy?
+    public var routingStrategy: RoutingStrategy
     public var fallbackUrl: String?
-    public var avgResponseMs: Int?
-    public var failureStreak: Int?
-    public var format: Format?
+    public var avgResponseMs: Int
+    public var failureStreak: Int
+    public var format: Format
 
-    public init(id: UUID? = nil, url: String? = nil, description: String? = nil, isActive: Bool? = nil, retryPolicy: RetryPolicy? = nil, createdAt: Date? = nil, allowedIps: [String]? = nil, eventFilter: [String]? = nil, customHeaders: AnyCodable? = nil, routingStrategy: RoutingStrategy? = nil, fallbackUrl: String? = nil, avgResponseMs: Int? = nil, failureStreak: Int? = nil, format: Format? = nil) {
+    public init(id: UUID, url: String, description: String? = nil, isActive: Bool, retryPolicy: RetryPolicy, createdAt: Date, allowedIps: [String]? = nil, eventFilter: [String]? = nil, customHeaders: AnyCodable? = nil, routingStrategy: RoutingStrategy, fallbackUrl: String? = nil, avgResponseMs: Int, failureStreak: Int, format: Format) {
         self.id = id
         self.url = url
         self.description = description
@@ -76,20 +76,20 @@ public struct Endpoint: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(url, forKey: .url)
+        try container.encode(id, forKey: .id)
+        try container.encode(url, forKey: .url)
         try container.encodeIfPresent(description, forKey: .description)
-        try container.encodeIfPresent(isActive, forKey: .isActive)
-        try container.encodeIfPresent(retryPolicy, forKey: .retryPolicy)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(isActive, forKey: .isActive)
+        try container.encode(retryPolicy, forKey: .retryPolicy)
+        try container.encode(createdAt, forKey: .createdAt)
         try container.encodeIfPresent(allowedIps, forKey: .allowedIps)
         try container.encodeIfPresent(eventFilter, forKey: .eventFilter)
         try container.encodeIfPresent(customHeaders, forKey: .customHeaders)
-        try container.encodeIfPresent(routingStrategy, forKey: .routingStrategy)
+        try container.encode(routingStrategy, forKey: .routingStrategy)
         try container.encodeIfPresent(fallbackUrl, forKey: .fallbackUrl)
-        try container.encodeIfPresent(avgResponseMs, forKey: .avgResponseMs)
-        try container.encodeIfPresent(failureStreak, forKey: .failureStreak)
-        try container.encodeIfPresent(format, forKey: .format)
+        try container.encode(avgResponseMs, forKey: .avgResponseMs)
+        try container.encode(failureStreak, forKey: .failureStreak)
+        try container.encode(format, forKey: .format)
     }
 }
 

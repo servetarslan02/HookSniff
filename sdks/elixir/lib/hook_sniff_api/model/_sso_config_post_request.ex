@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SsoConfigPostRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :provider,
     :enabled

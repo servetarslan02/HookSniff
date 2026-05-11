@@ -1,4 +1,4 @@
-# HookSniff::PlaygroundTestResponse
+# HooksniffSdk::PlaygroundTestResponse
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::PlaygroundTestResponse.new(
+instance = HooksniffSdk::PlaygroundTestResponse.new(
   status_code: null,
   response_body: null,
   latency_ms: null,

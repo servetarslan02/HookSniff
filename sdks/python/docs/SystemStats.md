@@ -5,11 +5,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**total_users** | **int** |  | [optional] 
-**active_users** | **int** |  | [optional] 
-**total_endpoints** | **int** |  | [optional] 
-**total_deliveries** | **int** |  | [optional] 
-**plan_breakdown** | [**List[SystemStatsPlanBreakdownInner]**](SystemStatsPlanBreakdownInner.md) |  | [optional] 
+**total_users** | **int** |  | 
+**active_users** | **int** |  | 
+**total_endpoints** | **int** |  | 
+**total_deliveries** | **int** |  | 
+**plan_breakdown** | [**List[SystemStatsPlanBreakdownInner]**](SystemStatsPlanBreakdownInner.md) |  | 
 
 ## Example
 

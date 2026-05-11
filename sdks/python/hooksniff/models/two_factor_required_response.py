@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,9 +28,9 @@ class TwoFactorRequiredResponse(BaseModel):
     """
     TwoFactorRequiredResponse
     """ # noqa: E501
-    requires_2fa: Optional[StrictBool] = None
-    temp_token: Optional[StrictStr] = None
-    message: Optional[StrictStr] = None
+    requires_2fa: StrictBool
+    temp_token: StrictStr
+    message: StrictStr
     __properties: ClassVar[List[str]] = ["requires_2fa", "temp_token", "message"]
 
     model_config = ConfigDict(

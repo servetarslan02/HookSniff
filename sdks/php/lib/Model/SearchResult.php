@@ -282,6 +282,12 @@ class SearchResult implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['deliveries'] === null) {
+            $invalidProperties[] = "'deliveries' can't be null";
+        }
+        if ($this->container['total'] === null) {
+            $invalidProperties[] = "'total' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -300,7 +306,7 @@ class SearchResult implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets deliveries
      *
-     * @return \OpenAPI\Client\Model\Delivery[]|null
+     * @return \OpenAPI\Client\Model\Delivery[]
      */
     public function getDeliveries()
     {
@@ -310,7 +316,7 @@ class SearchResult implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets deliveries
      *
-     * @param \OpenAPI\Client\Model\Delivery[]|null $deliveries deliveries
+     * @param \OpenAPI\Client\Model\Delivery[] $deliveries deliveries
      *
      * @return self
      */
@@ -327,7 +333,7 @@ class SearchResult implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets total
      *
-     * @return int|null
+     * @return int
      */
     public function getTotal()
     {
@@ -337,7 +343,7 @@ class SearchResult implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets total
      *
-     * @param int|null $total total
+     * @param int $total total
      *
      * @return self
      */

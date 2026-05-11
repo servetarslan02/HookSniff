@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**email_on_failure** | Option<**bool**> |  | [optional][default to true]
-**email_on_dead_letter** | Option<**bool**> |  | [optional][default to true]
-**email_on_success** | Option<**bool**> |  | [optional][default to false]
+**email_on_failure** | **bool** |  | [default to true]
+**email_on_dead_letter** | **bool** |  | [default to true]
+**email_on_success** | **bool** |  | [default to false]
 **slack_webhook_url** | Option<**String**> |  | [optional]
 **discord_webhook_url** | Option<**String**> |  | [optional]
 **webhook_url** | Option<**String**> |  | [optional]

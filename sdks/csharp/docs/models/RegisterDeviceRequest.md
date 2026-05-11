@@ -1,4 +1,4 @@
-# HookSniff.Model.RegisterDeviceRequest
+# HookSniff.Sdk.Model.RegisterDeviceRequest
 
 ## Properties
 

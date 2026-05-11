@@ -3,18 +3,16 @@
 
 defmodule HookSniffAPI.Model.OutboundIpsResponse do
   @moduledoc """
-  
+  List of static outbound IP addresses for firewall whitelisting
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
-    :ips,
-    :updated_at
+    :ips
   ]
 
   @type t :: %__MODULE__{
-    :ips => [String.t] | nil,
-    :updated_at => String.t | nil
+    :ips => [String.t]
   }
 
   def decode(value) do

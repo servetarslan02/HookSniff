@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.Auth2faEnablePost200Response do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :secret,
     :qr_url

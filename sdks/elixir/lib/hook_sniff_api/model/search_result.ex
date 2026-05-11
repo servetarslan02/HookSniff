@@ -6,15 +6,15 @@ defmodule HookSniffAPI.Model.SearchResult do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :deliveries,
     :total
   ]
 
   @type t :: %__MODULE__{
-    :deliveries => [HookSniffAPI.Model.Delivery.t] | nil,
-    :total => integer() | nil
+    :deliveries => [HookSniffAPI.Model.Delivery.t],
+    :total => integer()
   }
 
   alias HookSniffAPI.Deserializer

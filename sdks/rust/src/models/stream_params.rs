@@ -13,20 +13,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct StreamParams {
-    #[serde(rename = "endpoint_id", skip_serializing_if = "Option::is_none")]
-    pub endpoint_id: Option<uuid::Uuid>,
-    #[serde(rename = "status", skip_serializing_if = "Option::is_none")]
-    pub status: Option<Status>,
-    #[serde(rename = "limit", skip_serializing_if = "Option::is_none")]
-    pub limit: Option<i32>,
+    #[serde(rename = "endpoint_id")]
+    pub endpoint_id: uuid::Uuid,
+    #[serde(rename = "status")]
+    pub status: Status,
+    #[serde(rename = "limit")]
+    pub limit: i32,
 }
 
 impl StreamParams {
-    pub fn new() -> StreamParams {
+    pub fn new(endpoint_id: uuid::Uuid, status: Status, limit: i32) -> StreamParams {
         StreamParams {
-            endpoint_id: None,
-            status: None,
-            limit: None,
+            endpoint_id,
+            status,
+            limit,
         }
     }
 }

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SubscriptionResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :plan,
     :status,
@@ -18,13 +18,13 @@ defmodule HookSniffAPI.Model.SubscriptionResponse do
   ]
 
   @type t :: %__MODULE__{
-    :plan => String.t | nil,
-    :status => String.t | nil,
-    :payment_provider => String.t | nil,
-    :webhook_limit => integer() | nil,
-    :endpoint_limit => integer() | nil,
-    :retention_days => integer() | nil,
-    :monthly_price_cents => integer() | nil
+    :plan => String.t,
+    :status => String.t,
+    :payment_provider => String.t,
+    :webhook_limit => integer(),
+    :endpoint_limit => integer(),
+    :retention_days => integer(),
+    :monthly_price_cents => integer()
   }
 
   def decode(value) do

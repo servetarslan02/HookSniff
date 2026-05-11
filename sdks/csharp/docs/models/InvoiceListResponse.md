@@ -1,4 +1,4 @@
-# HookSniff.Model.InvoiceListResponse
+# HookSniff.Sdk.Model.InvoiceListResponse
 Paginated list of invoices
 
 ## Properties

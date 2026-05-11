@@ -1,4 +1,4 @@
-# HookSniff::OutboundIPsResponse
+# HooksniffSdk::OutboundIPsResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::OutboundIPsResponse.new(
+instance = HooksniffSdk::OutboundIPsResponse.new(
   ips: null
 )
 ```

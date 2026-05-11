@@ -13,18 +13,18 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Endpoint {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "url", skip_serializing_if = "Option::is_none")]
-    pub url: Option<String>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "url")]
+    pub url: String,
     #[serde(rename = "description", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub description: Option<Option<String>>,
-    #[serde(rename = "is_active", skip_serializing_if = "Option::is_none")]
-    pub is_active: Option<bool>,
-    #[serde(rename = "retry_policy", skip_serializing_if = "Option::is_none")]
-    pub retry_policy: Option<Box<models::RetryPolicy>>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    #[serde(rename = "is_active")]
+    pub is_active: bool,
+    #[serde(rename = "retry_policy")]
+    pub retry_policy: Box<models::RetryPolicy>,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
     /// CIDR blocks or exact IPs
     #[serde(rename = "allowed_ips", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub allowed_ips: Option<Option<Vec<String>>>,
@@ -33,35 +33,35 @@ pub struct Endpoint {
     pub event_filter: Option<Option<Vec<String>>>,
     #[serde(rename = "custom_headers", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub custom_headers: Option<Option<serde_json::Value>>,
-    #[serde(rename = "routing_strategy", skip_serializing_if = "Option::is_none")]
-    pub routing_strategy: Option<RoutingStrategy>,
+    #[serde(rename = "routing_strategy")]
+    pub routing_strategy: RoutingStrategy,
     #[serde(rename = "fallback_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub fallback_url: Option<Option<String>>,
-    #[serde(rename = "avg_response_ms", skip_serializing_if = "Option::is_none")]
-    pub avg_response_ms: Option<i32>,
-    #[serde(rename = "failure_streak", skip_serializing_if = "Option::is_none")]
-    pub failure_streak: Option<i32>,
-    #[serde(rename = "format", skip_serializing_if = "Option::is_none")]
-    pub format: Option<Format>,
+    #[serde(rename = "avg_response_ms")]
+    pub avg_response_ms: i32,
+    #[serde(rename = "failure_streak")]
+    pub failure_streak: i32,
+    #[serde(rename = "format")]
+    pub format: Format,
 }
 
 impl Endpoint {
-    pub fn new() -> Endpoint {
+    pub fn new(id: uuid::Uuid, url: String, is_active: bool, retry_policy: models::RetryPolicy, created_at: chrono::DateTime<chrono::FixedOffset>, routing_strategy: RoutingStrategy, avg_response_ms: i32, failure_streak: i32, format: Format) -> Endpoint {
         Endpoint {
-            id: None,
-            url: None,
+            id,
+            url,
             description: None,
-            is_active: None,
-            retry_policy: None,
-            created_at: None,
+            is_active,
+            retry_policy: Box::new(retry_policy),
+            created_at,
             allowed_ips: None,
             event_filter: None,
             custom_headers: None,
-            routing_strategy: None,
+            routing_strategy,
             fallback_url: None,
-            avg_response_ms: None,
-            failure_streak: None,
-            format: None,
+            avg_response_ms,
+            failure_streak,
+            format,
         }
     }
 }

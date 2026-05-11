@@ -4,9 +4,9 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
+| **provider** | **kotlin.String** |  |  |
+| **message** | **kotlin.String** |  |  |
 | **checkoutUrl** | **kotlin.String** |  |  [optional] |
-| **provider** | **kotlin.String** |  |  [optional] |
-| **message** | **kotlin.String** |  |  [optional] |
 
 
 

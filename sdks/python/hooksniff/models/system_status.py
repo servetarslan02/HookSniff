@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictFloat, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing import Any, ClassVar, Dict, List, Union
 from hooksniff.models.system_status_components_inner import SystemStatusComponentsInner
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,18 +29,15 @@ class SystemStatus(BaseModel):
     """
     SystemStatus
     """ # noqa: E501
-    overall_status: Optional[StrictStr] = None
-    uptime_30d: Optional[Union[StrictFloat, StrictInt]] = None
-    components: Optional[List[SystemStatusComponentsInner]] = None
-    checked_at: Optional[StrictStr] = None
+    overall_status: StrictStr
+    uptime_30d: Union[StrictFloat, StrictInt]
+    components: List[SystemStatusComponentsInner]
+    checked_at: StrictStr
     __properties: ClassVar[List[str]] = ["overall_status", "uptime_30d", "components", "checked_at"]
 
     @field_validator('overall_status')
     def overall_status_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['operational', 'degraded', 'down']):
             raise ValueError("must be one of enum values ('operational', 'degraded', 'down')")
         return value

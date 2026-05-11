@@ -12,13 +12,13 @@ import AnyCodable
 
 public struct WebhookTemplate: Codable, JSONEncodable, Hashable {
 
-    public var id: String?
-    public var name: String?
-    public var description: String?
-    public var category: String?
+    public var id: String
+    public var name: String
+    public var description: String
+    public var category: String
     public var payloadTemplate: AnyCodable?
 
-    public init(id: String? = nil, name: String? = nil, description: String? = nil, category: String? = nil, payloadTemplate: AnyCodable? = nil) {
+    public init(id: String, name: String, description: String, category: String, payloadTemplate: AnyCodable? = nil) {
         self.id = id
         self.name = name
         self.description = description
@@ -38,10 +38,10 @@ public struct WebhookTemplate: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(name, forKey: .name)
-        try container.encodeIfPresent(description, forKey: .description)
-        try container.encodeIfPresent(category, forKey: .category)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(description, forKey: .description)
+        try container.encode(category, forKey: .category)
         try container.encodeIfPresent(payloadTemplate, forKey: .payloadTemplate)
     }
 }

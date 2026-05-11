@@ -1,4 +1,4 @@
-# HookSniff.Model.AdminUserListResponse
+# HookSniff.Sdk.Model.AdminUserListResponse
 Paginated list of users for admin management
 
 ## Properties

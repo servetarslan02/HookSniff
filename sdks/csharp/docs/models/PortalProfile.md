@@ -1,4 +1,4 @@
-# HookSniff.Model.PortalProfile
+# HookSniff.Sdk.Model.PortalProfile
 
 ## Properties
 

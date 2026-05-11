@@ -1,4 +1,4 @@
-# HookSniff.Model.VerifyCustomDomainResponse
+# HookSniff.Sdk.Model.VerifyCustomDomainResponse
 Result of domain verification attempt
 
 ## Properties

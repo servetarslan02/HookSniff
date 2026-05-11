@@ -1,4 +1,4 @@
-# HookSniff::SimulatorResponse
+# HooksniffSdk::SimulatorResponse
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SimulatorResponse.new(
+instance = HooksniffSdk::SimulatorResponse.new(
   delivery_id: null,
   status: null,
   latency_ms: null

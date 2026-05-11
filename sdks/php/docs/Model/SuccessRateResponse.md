@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**range** | **string** |  | [optional]
-**successful** | **int** |  | [optional]
-**failed** | **int** |  | [optional]
-**pending** | **int** |  | [optional]
-**success_rate** | **float** |  | [optional]
+**range** | **string** |  |
+**successful** | **int** |  |
+**failed** | **int** |  |
+**pending** | **int** |  |
+**success_rate** | **float** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

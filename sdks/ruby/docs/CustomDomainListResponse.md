@@ -1,4 +1,4 @@
-# HookSniff::CustomDomainListResponse
+# HooksniffSdk::CustomDomainListResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::CustomDomainListResponse.new(
+instance = HooksniffSdk::CustomDomainListResponse.new(
   data: null
 )
 ```

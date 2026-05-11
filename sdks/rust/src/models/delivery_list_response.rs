@@ -13,23 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DeliveryListResponse {
-    #[serde(rename = "deliveries", skip_serializing_if = "Option::is_none")]
-    pub deliveries: Option<Vec<models::Delivery>>,
-    #[serde(rename = "total", skip_serializing_if = "Option::is_none")]
-    pub total: Option<i32>,
-    #[serde(rename = "page", skip_serializing_if = "Option::is_none")]
-    pub page: Option<i32>,
-    #[serde(rename = "per_page", skip_serializing_if = "Option::is_none")]
-    pub per_page: Option<i32>,
+    #[serde(rename = "deliveries")]
+    pub deliveries: Vec<models::Delivery>,
+    #[serde(rename = "total")]
+    pub total: i32,
+    #[serde(rename = "page")]
+    pub page: i32,
+    #[serde(rename = "per_page")]
+    pub per_page: i32,
 }
 
 impl DeliveryListResponse {
-    pub fn new() -> DeliveryListResponse {
+    pub fn new(deliveries: Vec<models::Delivery>, total: i32, page: i32, per_page: i32) -> DeliveryListResponse {
         DeliveryListResponse {
-            deliveries: None,
-            total: None,
-            page: None,
-            per_page: None,
+            deliveries,
+            total,
+            page,
+            per_page,
         }
     }
 }

@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**url** | **string** |  | [optional]
-**description** | **string** |  | [optional]
-**is_active** | **bool** |  | [optional]
-**allowed_ips** | **string[]** |  | [optional]
-**event_filter** | **string[]** |  | [optional]
+**url** | **string** |  |
+**description** | **string** |  |
+**is_active** | **bool** |  |
+**allowed_ips** | **string[]** |  |
+**event_filter** | **string[]** |  |
 **custom_headers** | **object** |  | [optional]
-**retry_policy** | [**\OpenAPI\Client\Model\RetryPolicy**](RetryPolicy.md) |  | [optional]
-**routing_strategy** | **string** |  | [optional]
-**fallback_url** | **string** |  | [optional]
-**format** | **string** |  | [optional]
+**retry_policy** | [**\OpenAPI\Client\Model\RetryPolicy**](RetryPolicy.md) |  |
+**routing_strategy** | **string** |  |
+**fallback_url** | **string** |  |
+**format** | **string** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

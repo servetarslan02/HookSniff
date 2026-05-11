@@ -17,10 +17,10 @@ public struct UpdateRoutingRequest: Codable, JSONEncodable, Hashable {
         case latency = "latency"
         case failover = "failover"
     }
-    public var routingStrategy: RoutingStrategy?
-    public var fallbackUrl: String?
+    public var routingStrategy: RoutingStrategy
+    public var fallbackUrl: String
 
-    public init(routingStrategy: RoutingStrategy? = nil, fallbackUrl: String? = nil) {
+    public init(routingStrategy: RoutingStrategy, fallbackUrl: String) {
         self.routingStrategy = routingStrategy
         self.fallbackUrl = fallbackUrl
     }
@@ -34,8 +34,8 @@ public struct UpdateRoutingRequest: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(routingStrategy, forKey: .routingStrategy)
-        try container.encodeIfPresent(fallbackUrl, forKey: .fallbackUrl)
+        try container.encode(routingStrategy, forKey: .routingStrategy)
+        try container.encode(fallbackUrl, forKey: .fallbackUrl)
     }
 }
 

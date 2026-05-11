@@ -1,4 +1,4 @@
-# HookSniff::SSOConfigListResponse
+# HooksniffSdk::SSOConfigListResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SSOConfigListResponse.new(
+instance = HooksniffSdk::SSOConfigListResponse.new(
   data: null
 )
 ```

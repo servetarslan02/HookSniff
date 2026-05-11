@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.RegisterDeviceRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :token,
     :platform

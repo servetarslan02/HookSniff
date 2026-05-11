@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.RegisterSchemaRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :name,
     :schema

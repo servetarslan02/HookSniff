@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.DeliveryAttempt do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :attempt_number,
@@ -18,13 +18,13 @@ defmodule HookSniffAPI.Model.DeliveryAttempt do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :attempt_number => integer() | nil,
+    :id => String.t,
+    :attempt_number => integer(),
     :status_code => integer() | nil,
     :response_body => String.t | nil,
     :duration_ms => integer() | nil,
     :error_message => String.t | nil,
-    :created_at => DateTime.t | nil
+    :created_at => DateTime.t
   }
 
   def decode(value) do

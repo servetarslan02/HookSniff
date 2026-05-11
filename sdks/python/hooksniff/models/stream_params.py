@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from uuid import UUID
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,17 +29,14 @@ class StreamParams(BaseModel):
     """
     StreamParams
     """ # noqa: E501
-    endpoint_id: Optional[UUID] = None
-    status: Optional[StrictStr] = None
-    limit: Optional[StrictInt] = 50
+    endpoint_id: UUID
+    status: StrictStr
+    limit: StrictInt
     __properties: ClassVar[List[str]] = ["endpoint_id", "status", "limit"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['pending', 'processing', 'delivered', 'failed']):
             raise ValueError("must be one of enum values ('pending', 'processing', 'delivered', 'failed')")
         return value

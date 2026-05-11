@@ -5,11 +5,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **str** |  | [optional] 
-**amount_cents** | **int** |  | [optional] 
-**currency** | **str** |  | [optional] 
-**status** | **str** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**id** | **str** |  | 
+**amount_cents** | **int** |  | 
+**currency** | **str** |  | 
+**status** | **str** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 

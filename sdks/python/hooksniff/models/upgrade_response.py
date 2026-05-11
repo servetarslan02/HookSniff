@@ -29,8 +29,8 @@ class UpgradeResponse(BaseModel):
     UpgradeResponse
     """ # noqa: E501
     checkout_url: Optional[StrictStr] = None
-    provider: Optional[StrictStr] = None
-    message: Optional[StrictStr] = None
+    provider: StrictStr
+    message: StrictStr
     __properties: ClassVar[List[str]] = ["checkout_url", "provider", "message"]
 
     model_config = ConfigDict(

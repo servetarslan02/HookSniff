@@ -1,4 +1,4 @@
-# HookSniff.Model.ResendVerificationRequest
+# HookSniff.Sdk.Model.ResendVerificationRequest
 
 ## Properties
 

@@ -4,11 +4,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **string** |  | [optional]
-**email** | **string** |  | [optional]
+**id** | **string** |  |
+**email** | **string** |  |
 **name** | **string** |  | [optional]
-**plan** | **string** |  | [optional]
-**is_active** | **bool** |  | [optional]
-**created_at** | **\DateTime** |  | [optional]
+**plan** | **string** |  |
+**is_active** | **bool** |  |
+**created_at** | **\DateTime** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

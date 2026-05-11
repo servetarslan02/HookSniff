@@ -1,4 +1,4 @@
-# HookSniff.Model.EmbedConfigTheme
+# HookSniff.Sdk.Model.EmbedConfigTheme
 Visual customization for the embed
 
 ## Properties

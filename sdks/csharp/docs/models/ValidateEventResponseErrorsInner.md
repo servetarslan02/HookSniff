@@ -1,4 +1,4 @@
-# HookSniff.Model.ValidateEventResponseErrorsInner
+# HookSniff.Sdk.Model.ValidateEventResponseErrorsInner
 
 ## Properties
 

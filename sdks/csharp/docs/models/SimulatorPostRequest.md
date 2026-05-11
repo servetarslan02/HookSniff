@@ -1,4 +1,4 @@
-# HookSniff.Model.SimulatorPostRequest
+# HookSniff.Sdk.Model.SimulatorPostRequest
 
 ## Properties
 

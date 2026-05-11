@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**routing_strategy** | **str** |  | [optional] 
-**fallback_url** | **str** |  | [optional] 
+**routing_strategy** | **str** |  | 
+**fallback_url** | **str** |  | 
 
 ## Example
 

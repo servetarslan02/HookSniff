@@ -20,7 +20,7 @@ import json
 
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from uuid import UUID
 from typing import Optional, Set
 from typing_extensions import Self
@@ -30,21 +30,18 @@ class WebhookFilter(BaseModel):
     """
     Query parameters for filtering webhook deliveries
     """ # noqa: E501
-    status: Optional[StrictStr] = Field(default=None, description="Filter by delivery status")
-    endpoint_id: Optional[UUID] = None
-    event_type: Optional[StrictStr] = Field(default=None, description="Filter by event type (e.g. order.created)")
-    from_date: Optional[datetime] = None
-    to_date: Optional[datetime] = None
-    page: Optional[StrictInt] = 1
-    per_page: Optional[StrictInt] = 20
+    status: StrictStr = Field(description="Filter by delivery status")
+    endpoint_id: UUID
+    event_type: StrictStr = Field(description="Filter by event type (e.g. order.created)")
+    from_date: datetime
+    to_date: datetime
+    page: StrictInt
+    per_page: StrictInt
     __properties: ClassVar[List[str]] = ["status", "endpoint_id", "event_type", "from_date", "to_date", "page", "per_page"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['pending', 'processing', 'delivered', 'failed']):
             raise ValueError("must be one of enum values ('pending', 'processing', 'delivered', 'failed')")
         return value

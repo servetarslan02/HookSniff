@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.AdminRevenueGet200ResponseInner do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :month,
     :revenue_cents,

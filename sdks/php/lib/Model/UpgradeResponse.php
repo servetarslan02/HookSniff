@@ -289,6 +289,12 @@ class UpgradeResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['provider'] === null) {
+            $invalidProperties[] = "'provider' can't be null";
+        }
+        if ($this->container['message'] === null) {
+            $invalidProperties[] = "'message' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -341,7 +347,7 @@ class UpgradeResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets provider
      *
-     * @return string|null
+     * @return string
      */
     public function getProvider()
     {
@@ -351,7 +357,7 @@ class UpgradeResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets provider
      *
-     * @param string|null $provider provider
+     * @param string $provider provider
      *
      * @return self
      */
@@ -368,7 +374,7 @@ class UpgradeResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets message
      *
-     * @return string|null
+     * @return string
      */
     public function getMessage()
     {
@@ -378,7 +384,7 @@ class UpgradeResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets message
      *
-     * @param string|null $message message
+     * @param string $message message
      *
      * @return self
      */

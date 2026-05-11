@@ -1,4 +1,4 @@
-# HookSniff::SearchRequestFilters
+# HooksniffSdk::SearchRequestFilters
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SearchRequestFilters.new(
+instance = HooksniffSdk::SearchRequestFilters.new(
   status: null,
   endpoint_id: null
 )

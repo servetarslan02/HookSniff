@@ -1,4 +1,4 @@
-# HookSniff.Model.NotificationListResponse
+# HookSniff.Sdk.Model.NotificationListResponse
 
 ## Properties
 

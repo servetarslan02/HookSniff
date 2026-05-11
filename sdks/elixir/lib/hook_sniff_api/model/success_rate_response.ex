@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SuccessRateResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :range,
     :successful,
@@ -16,11 +16,11 @@ defmodule HookSniffAPI.Model.SuccessRateResponse do
   ]
 
   @type t :: %__MODULE__{
-    :range => String.t | nil,
-    :successful => integer() | nil,
-    :failed => integer() | nil,
-    :pending => integer() | nil,
-    :success_rate => float() | nil
+    :range => String.t,
+    :successful => integer(),
+    :failed => integer(),
+    :pending => integer(),
+    :success_rate => float()
   }
 
   def decode(value) do

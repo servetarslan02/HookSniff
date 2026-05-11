@@ -1,4 +1,4 @@
-# HookSniff.Model.BillingPortalPost200Response
+# HookSniff.Sdk.Model.BillingPortalPost200Response
 
 ## Properties
 

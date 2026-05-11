@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**plan** | Option<**String**> |  | [optional]
-**period_start** | Option<**chrono::DateTime<chrono::FixedOffset>**> |  | [optional]
-**period_end** | Option<**chrono::DateTime<chrono::FixedOffset>**> |  | [optional]
-**webhooks_used** | Option<**i32**> |  | [optional]
-**webhooks_limit** | Option<**i32**> |  | [optional]
-**endpoints_used** | Option<**i32**> |  | [optional]
-**endpoints_limit** | Option<**i32**> |  | [optional]
+**plan** | **String** |  | 
+**period_start** | **chrono::DateTime<chrono::FixedOffset>** |  | 
+**period_end** | **chrono::DateTime<chrono::FixedOffset>** |  | 
+**webhooks_used** | **i32** |  | 
+**webhooks_limit** | **i32** |  | 
+**endpoints_used** | **i32** |  | 
+**endpoints_limit** | **i32** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

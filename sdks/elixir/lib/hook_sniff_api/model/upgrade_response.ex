@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UpgradeResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :checkout_url,
     :provider,
@@ -15,8 +15,8 @@ defmodule HookSniffAPI.Model.UpgradeResponse do
 
   @type t :: %__MODULE__{
     :checkout_url => String.t | nil,
-    :provider => String.t | nil,
-    :message => String.t | nil
+    :provider => String.t,
+    :message => String.t
   }
 
   def decode(value) do

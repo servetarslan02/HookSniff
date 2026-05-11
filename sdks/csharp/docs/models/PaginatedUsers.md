@@ -1,4 +1,4 @@
-# HookSniff.Model.PaginatedUsers
+# HookSniff.Sdk.Model.PaginatedUsers
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# HookSniff.Model.CreateCustomDomainRequest
+# HookSniff.Sdk.Model.CreateCustomDomainRequest
 Register a new custom domain
 
 ## Properties

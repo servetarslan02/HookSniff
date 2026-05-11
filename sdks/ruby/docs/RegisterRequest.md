@@ -1,4 +1,4 @@
-# HookSniff::RegisterRequest
+# HooksniffSdk::RegisterRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RegisterRequest.new(
+instance = HooksniffSdk::RegisterRequest.new(
   email: null,
   password: null,
   name: null

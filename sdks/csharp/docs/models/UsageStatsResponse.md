@@ -1,4 +1,4 @@
-# HookSniff.Model.UsageStatsResponse
+# HookSniff.Sdk.Model.UsageStatsResponse
 Account usage statistics summary
 
 ## Properties

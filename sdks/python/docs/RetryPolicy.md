@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**max_attempts** | **int** |  | [optional] [default to 3]
-**backoff** | **str** |  | [optional] [default to 'exponential']
-**initial_delay_secs** | **int** |  | [optional] [default to 10]
-**max_delay_secs** | **int** |  | [optional] [default to 3600]
+**max_attempts** | **int** |  | [default to 3]
+**backoff** | **str** |  | [default to 'exponential']
+**initial_delay_secs** | **int** |  | [default to 10]
+**max_delay_secs** | **int** |  | [default to 3600]
 
 ## Example
 

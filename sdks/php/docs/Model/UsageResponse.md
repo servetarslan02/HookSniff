@@ -4,12 +4,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**plan** | **string** |  | [optional]
-**period_start** | **\DateTime** |  | [optional]
-**period_end** | **\DateTime** |  | [optional]
-**webhooks_used** | **int** |  | [optional]
-**webhooks_limit** | **int** |  | [optional]
-**endpoints_used** | **int** |  | [optional]
-**endpoints_limit** | **int** |  | [optional]
+**plan** | **string** |  |
+**period_start** | **\DateTime** |  |
+**period_end** | **\DateTime** |  |
+**webhooks_used** | **int** |  |
+**webhooks_limit** | **int** |  |
+**endpoints_used** | **int** |  |
+**endpoints_limit** | **int** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

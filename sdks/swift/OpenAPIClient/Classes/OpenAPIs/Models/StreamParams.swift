@@ -18,11 +18,11 @@ public struct StreamParams: Codable, JSONEncodable, Hashable {
         case delivered = "delivered"
         case failed = "failed"
     }
-    public var endpointId: UUID?
-    public var status: Status?
-    public var limit: Int? = 50
+    public var endpointId: UUID
+    public var status: Status
+    public var limit: Int = 50
 
-    public init(endpointId: UUID? = nil, status: Status? = nil, limit: Int? = 50) {
+    public init(endpointId: UUID, status: Status, limit: Int = 50) {
         self.endpointId = endpointId
         self.status = status
         self.limit = limit
@@ -38,9 +38,9 @@ public struct StreamParams: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(endpointId, forKey: .endpointId)
-        try container.encodeIfPresent(status, forKey: .status)
-        try container.encodeIfPresent(limit, forKey: .limit)
+        try container.encode(endpointId, forKey: .endpointId)
+        try container.encode(status, forKey: .status)
+        try container.encode(limit, forKey: .limit)
     }
 }
 

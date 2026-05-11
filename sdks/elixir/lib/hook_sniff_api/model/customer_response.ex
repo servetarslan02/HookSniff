@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.CustomerResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :email,
@@ -20,15 +20,15 @@ defmodule HookSniffAPI.Model.CustomerResponse do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :email => String.t | nil,
+    :id => String.t,
+    :email => String.t,
     :name => String.t | nil,
     :api_key => String.t | nil,
-    :plan => String.t | nil,
-    :webhook_limit => integer() | nil,
-    :webhook_count => integer() | nil,
-    :is_admin => boolean() | nil,
-    :created_at => DateTime.t | nil
+    :plan => String.t,
+    :webhook_limit => integer(),
+    :webhook_count => integer(),
+    :is_admin => boolean(),
+    :created_at => DateTime.t
   }
 
   def decode(value) do

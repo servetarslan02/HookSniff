@@ -370,6 +370,27 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     {
         $invalidProperties = [];
 
+        if ($this->container['url'] === null) {
+            $invalidProperties[] = "'url' can't be null";
+        }
+        if ($this->container['description'] === null) {
+            $invalidProperties[] = "'description' can't be null";
+        }
+        if ($this->container['is_active'] === null) {
+            $invalidProperties[] = "'is_active' can't be null";
+        }
+        if ($this->container['allowed_ips'] === null) {
+            $invalidProperties[] = "'allowed_ips' can't be null";
+        }
+        if ($this->container['event_filter'] === null) {
+            $invalidProperties[] = "'event_filter' can't be null";
+        }
+        if ($this->container['retry_policy'] === null) {
+            $invalidProperties[] = "'retry_policy' can't be null";
+        }
+        if ($this->container['routing_strategy'] === null) {
+            $invalidProperties[] = "'routing_strategy' can't be null";
+        }
         $allowedValues = $this->getRoutingStrategyAllowableValues();
         if (!is_null($this->container['routing_strategy']) && !in_array($this->container['routing_strategy'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -379,6 +400,12 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
             );
         }
 
+        if ($this->container['fallback_url'] === null) {
+            $invalidProperties[] = "'fallback_url' can't be null";
+        }
+        if ($this->container['format'] === null) {
+            $invalidProperties[] = "'format' can't be null";
+        }
         $allowedValues = $this->getFormatAllowableValues();
         if (!is_null($this->container['format']) && !in_array($this->container['format'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -406,7 +433,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets url
      *
-     * @return string|null
+     * @return string
      */
     public function getUrl()
     {
@@ -416,7 +443,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets url
      *
-     * @param string|null $url url
+     * @param string $url url
      *
      * @return self
      */
@@ -433,7 +460,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets description
      *
-     * @return string|null
+     * @return string
      */
     public function getDescription()
     {
@@ -443,7 +470,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets description
      *
-     * @param string|null $description description
+     * @param string $description description
      *
      * @return self
      */
@@ -460,7 +487,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets is_active
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsActive()
     {
@@ -470,7 +497,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets is_active
      *
-     * @param bool|null $is_active is_active
+     * @param bool $is_active is_active
      *
      * @return self
      */
@@ -487,7 +514,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets allowed_ips
      *
-     * @return string[]|null
+     * @return string[]
      */
     public function getAllowedIps()
     {
@@ -497,7 +524,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets allowed_ips
      *
-     * @param string[]|null $allowed_ips allowed_ips
+     * @param string[] $allowed_ips allowed_ips
      *
      * @return self
      */
@@ -514,7 +541,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets event_filter
      *
-     * @return string[]|null
+     * @return string[]
      */
     public function getEventFilter()
     {
@@ -524,7 +551,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets event_filter
      *
-     * @param string[]|null $event_filter event_filter
+     * @param string[] $event_filter event_filter
      *
      * @return self
      */
@@ -568,7 +595,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets retry_policy
      *
-     * @return \OpenAPI\Client\Model\RetryPolicy|null
+     * @return \OpenAPI\Client\Model\RetryPolicy
      */
     public function getRetryPolicy()
     {
@@ -578,7 +605,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets retry_policy
      *
-     * @param \OpenAPI\Client\Model\RetryPolicy|null $retry_policy retry_policy
+     * @param \OpenAPI\Client\Model\RetryPolicy $retry_policy retry_policy
      *
      * @return self
      */
@@ -595,7 +622,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets routing_strategy
      *
-     * @return string|null
+     * @return string
      */
     public function getRoutingStrategy()
     {
@@ -605,7 +632,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets routing_strategy
      *
-     * @param string|null $routing_strategy routing_strategy
+     * @param string $routing_strategy routing_strategy
      *
      * @return self
      */
@@ -632,7 +659,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets fallback_url
      *
-     * @return string|null
+     * @return string
      */
     public function getFallbackUrl()
     {
@@ -642,7 +669,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets fallback_url
      *
-     * @param string|null $fallback_url fallback_url
+     * @param string $fallback_url fallback_url
      *
      * @return self
      */
@@ -659,7 +686,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets format
      *
-     * @return string|null
+     * @return string
      */
     public function getFormat()
     {
@@ -669,7 +696,7 @@ class UpdateEndpointRequest implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets format
      *
-     * @param string|null $format format
+     * @param string $format format
      *
      * @return self
      */

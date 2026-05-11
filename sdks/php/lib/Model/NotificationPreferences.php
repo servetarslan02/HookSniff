@@ -310,6 +310,15 @@ class NotificationPreferences implements ModelInterface, ArrayAccess, \JsonSeria
     {
         $invalidProperties = [];
 
+        if ($this->container['email_on_failure'] === null) {
+            $invalidProperties[] = "'email_on_failure' can't be null";
+        }
+        if ($this->container['email_on_dead_letter'] === null) {
+            $invalidProperties[] = "'email_on_dead_letter' can't be null";
+        }
+        if ($this->container['email_on_success'] === null) {
+            $invalidProperties[] = "'email_on_success' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -328,7 +337,7 @@ class NotificationPreferences implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Gets email_on_failure
      *
-     * @return bool|null
+     * @return bool
      */
     public function getEmailOnFailure()
     {
@@ -338,7 +347,7 @@ class NotificationPreferences implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Sets email_on_failure
      *
-     * @param bool|null $email_on_failure email_on_failure
+     * @param bool $email_on_failure email_on_failure
      *
      * @return self
      */
@@ -355,7 +364,7 @@ class NotificationPreferences implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Gets email_on_dead_letter
      *
-     * @return bool|null
+     * @return bool
      */
     public function getEmailOnDeadLetter()
     {
@@ -365,7 +374,7 @@ class NotificationPreferences implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Sets email_on_dead_letter
      *
-     * @param bool|null $email_on_dead_letter email_on_dead_letter
+     * @param bool $email_on_dead_letter email_on_dead_letter
      *
      * @return self
      */
@@ -382,7 +391,7 @@ class NotificationPreferences implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Gets email_on_success
      *
-     * @return bool|null
+     * @return bool
      */
     public function getEmailOnSuccess()
     {
@@ -392,7 +401,7 @@ class NotificationPreferences implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Sets email_on_success
      *
-     * @param bool|null $email_on_success email_on_success
+     * @param bool $email_on_success email_on_success
      *
      * @return self
      */

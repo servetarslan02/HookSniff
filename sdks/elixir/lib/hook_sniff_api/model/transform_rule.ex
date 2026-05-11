@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.TransformRule do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :id,
     :endpoint_id,
@@ -18,13 +18,13 @@ defmodule HookSniffAPI.Model.TransformRule do
   ]
 
   @type t :: %__MODULE__{
-    :id => String.t | nil,
-    :endpoint_id => String.t | nil,
-    :name => String.t | nil,
-    :rule_type => String.t | nil,
+    :id => String.t,
+    :endpoint_id => String.t,
+    :name => String.t,
+    :rule_type => String.t,
     :config => map() | nil,
-    :is_active => boolean() | nil,
-    :created_at => DateTime.t | nil
+    :is_active => boolean(),
+    :created_at => DateTime.t
   }
 
   def decode(value) do

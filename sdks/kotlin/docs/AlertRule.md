@@ -4,13 +4,13 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  [optional] |
-| **name** | **kotlin.String** |  |  [optional] |
-| **condition** | [**inline**](#Condition) |  |  [optional] |
-| **threshold** | **kotlin.Int** |  |  [optional] |
-| **channels** | [**inline**](#kotlin.collections.List&lt;Channels&gt;) |  |  [optional] |
-| **isActive** | **kotlin.Boolean** |  |  [optional] |
-| **createdAt** | **kotlin.String** |  |  [optional] |
+| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  |
+| **name** | **kotlin.String** |  |  |
+| **condition** | [**inline**](#Condition) |  |  |
+| **threshold** | **kotlin.Int** |  |  |
+| **channels** | [**inline**](#kotlin.collections.List&lt;Channels&gt;) |  |  |
+| **isActive** | **kotlin.Boolean** |  |  |
+| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  |
 
 
 <a id="Condition"></a>

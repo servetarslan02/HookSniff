@@ -48,7 +48,7 @@ import org.openapitools.client.JSON;
 /**
  * Latency percentile breakdown for deliveries
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:20:44.323164867+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-05-11T22:27:59.532401633+08:00[Asia/Shanghai]", comments = "Generator version: 7.22.0")
 public class LatencyResponse {
   public static final String SERIALIZED_NAME_P50 = "p50";
   @SerializedName(SERIALIZED_NAME_P50)

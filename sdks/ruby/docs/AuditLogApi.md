@@ -1,4 +1,4 @@
-# HookSniff::AuditLogApi
+# HooksniffSdk::AuditLogApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -18,14 +18,14 @@ List audit log entries
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuditLogApi.new
+api_instance = HooksniffSdk::AuditLogApi.new
 opts = {
   page: 56, # Integer | 
   action: 'action_example' # String | 
@@ -34,7 +34,7 @@ opts = {
 begin
   # List audit log entries
   api_instance.audit_log_get(opts)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_get: #{e}"
 end
 ```
@@ -52,7 +52,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_get_with_http_info: #{e}"
 end
 ```
@@ -88,20 +88,20 @@ Get audit entry detail
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuditLogApi.new
+api_instance = HooksniffSdk::AuditLogApi.new
 id = 'id_example' # String | 
 
 begin
   # Get audit entry detail
   api_instance.audit_log_id_get(id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_id_get: #{e}"
 end
 ```
@@ -119,7 +119,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuditLogApi->audit_log_id_get_with_http_info: #{e}"
 end
 ```

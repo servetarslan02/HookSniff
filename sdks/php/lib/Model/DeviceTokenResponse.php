@@ -296,6 +296,18 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['token'] === null) {
+            $invalidProperties[] = "'token' can't be null";
+        }
+        if ($this->container['platform'] === null) {
+            $invalidProperties[] = "'platform' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -314,7 +326,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -324,7 +336,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -341,7 +353,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets token
      *
-     * @return string|null
+     * @return string
      */
     public function getToken()
     {
@@ -351,7 +363,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets token
      *
-     * @param string|null $token token
+     * @param string $token token
      *
      * @return self
      */
@@ -368,7 +380,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets platform
      *
-     * @return string|null
+     * @return string
      */
     public function getPlatform()
     {
@@ -378,7 +390,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets platform
      *
-     * @param string|null $platform platform
+     * @param string $platform platform
      *
      * @return self
      */
@@ -395,7 +407,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Gets created_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -405,7 +417,7 @@ class DeviceTokenResponse implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets created_at
      *
-     * @param \DateTime|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */

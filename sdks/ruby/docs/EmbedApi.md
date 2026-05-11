@@ -1,4 +1,4 @@
-# HookSniff::EmbedApi
+# HooksniffSdk::EmbedApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -18,19 +18,19 @@ Embeddable portal HTML
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::EmbedApi.new
+api_instance = HooksniffSdk::EmbedApi.new
 
 begin
   # Embeddable portal HTML
   api_instance.embed_get
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling EmbedApi->embed_get: #{e}"
 end
 ```
@@ -48,7 +48,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling EmbedApi->embed_get_with_http_info: #{e}"
 end
 ```
@@ -81,19 +81,19 @@ Embeddable portal JavaScript
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::EmbedApi.new
+api_instance = HooksniffSdk::EmbedApi.new
 
 begin
   # Embeddable portal JavaScript
   api_instance.embed_script_get
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling EmbedApi->embed_script_get: #{e}"
 end
 ```
@@ -111,7 +111,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling EmbedApi->embed_script_get_with_http_info: #{e}"
 end
 ```

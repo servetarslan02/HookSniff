@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **string** |  | [optional]
-**amount_cents** | **int** |  | [optional]
-**currency** | **string** |  | [optional]
-**status** | **string** |  | [optional]
-**created_at** | **\DateTime** |  | [optional]
+**id** | **string** |  |
+**amount_cents** | **int** |  |
+**currency** | **string** |  |
+**status** | **string** |  |
+**created_at** | **\DateTime** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

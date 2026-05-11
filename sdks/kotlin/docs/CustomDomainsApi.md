@@ -19,8 +19,8 @@ List custom domains
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = CustomDomainsApi()
 try {
@@ -61,8 +61,8 @@ Delete custom domain
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = CustomDomainsApi()
 val id : kotlin.String = id_example // kotlin.String | 
@@ -106,8 +106,8 @@ Verify domain ownership
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = CustomDomainsApi()
 val id : kotlin.String = id_example // kotlin.String | 
@@ -151,8 +151,8 @@ Add custom domain
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = CustomDomainsApi()
 val customDomainsPostRequest : CustomDomainsPostRequest =  // CustomDomainsPostRequest | 

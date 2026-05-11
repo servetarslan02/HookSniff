@@ -398,6 +398,24 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['url'] === null) {
+            $invalidProperties[] = "'url' can't be null";
+        }
+        if ($this->container['is_active'] === null) {
+            $invalidProperties[] = "'is_active' can't be null";
+        }
+        if ($this->container['retry_policy'] === null) {
+            $invalidProperties[] = "'retry_policy' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
+        if ($this->container['routing_strategy'] === null) {
+            $invalidProperties[] = "'routing_strategy' can't be null";
+        }
         $allowedValues = $this->getRoutingStrategyAllowableValues();
         if (!is_null($this->container['routing_strategy']) && !in_array($this->container['routing_strategy'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -407,6 +425,15 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
             );
         }
 
+        if ($this->container['avg_response_ms'] === null) {
+            $invalidProperties[] = "'avg_response_ms' can't be null";
+        }
+        if ($this->container['failure_streak'] === null) {
+            $invalidProperties[] = "'failure_streak' can't be null";
+        }
+        if ($this->container['format'] === null) {
+            $invalidProperties[] = "'format' can't be null";
+        }
         $allowedValues = $this->getFormatAllowableValues();
         if (!is_null($this->container['format']) && !in_array($this->container['format'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -434,7 +461,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -444,7 +471,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -461,7 +488,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets url
      *
-     * @return string|null
+     * @return string
      */
     public function getUrl()
     {
@@ -471,7 +498,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets url
      *
-     * @param string|null $url url
+     * @param string $url url
      *
      * @return self
      */
@@ -522,7 +549,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_active
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsActive()
     {
@@ -532,7 +559,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_active
      *
-     * @param bool|null $is_active is_active
+     * @param bool $is_active is_active
      *
      * @return self
      */
@@ -549,7 +576,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets retry_policy
      *
-     * @return \OpenAPI\Client\Model\RetryPolicy|null
+     * @return \OpenAPI\Client\Model\RetryPolicy
      */
     public function getRetryPolicy()
     {
@@ -559,7 +586,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets retry_policy
      *
-     * @param \OpenAPI\Client\Model\RetryPolicy|null $retry_policy retry_policy
+     * @param \OpenAPI\Client\Model\RetryPolicy $retry_policy retry_policy
      *
      * @return self
      */
@@ -576,7 +603,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -586,7 +613,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param \DateTime|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */
@@ -705,7 +732,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets routing_strategy
      *
-     * @return string|null
+     * @return string
      */
     public function getRoutingStrategy()
     {
@@ -715,7 +742,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets routing_strategy
      *
-     * @param string|null $routing_strategy routing_strategy
+     * @param string $routing_strategy routing_strategy
      *
      * @return self
      */
@@ -776,7 +803,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets avg_response_ms
      *
-     * @return int|null
+     * @return int
      */
     public function getAvgResponseMs()
     {
@@ -786,7 +813,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets avg_response_ms
      *
-     * @param int|null $avg_response_ms avg_response_ms
+     * @param int $avg_response_ms avg_response_ms
      *
      * @return self
      */
@@ -803,7 +830,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets failure_streak
      *
-     * @return int|null
+     * @return int
      */
     public function getFailureStreak()
     {
@@ -813,7 +840,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets failure_streak
      *
-     * @param int|null $failure_streak failure_streak
+     * @param int $failure_streak failure_streak
      *
      * @return self
      */
@@ -830,7 +857,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets format
      *
-     * @return string|null
+     * @return string
      */
     public function getFormat()
     {
@@ -840,7 +867,7 @@ class Endpoint implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets format
      *
-     * @param string|null $format format
+     * @param string $format format
      *
      * @return self
      */

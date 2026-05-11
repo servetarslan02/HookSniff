@@ -5,11 +5,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**range** | **str** |  | [optional] 
-**successful** | **int** |  | [optional] 
-**failed** | **int** |  | [optional] 
-**pending** | **int** |  | [optional] 
-**success_rate** | **float** |  | [optional] 
+**range** | **str** |  | 
+**successful** | **int** |  | 
+**failed** | **int** |  | 
+**pending** | **int** |  | 
+**success_rate** | **float** |  | 
 
 ## Example
 
