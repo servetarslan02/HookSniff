@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 20:20 GMT+8
+> Son güncelleme: 2026-05-11 21:44 GMT+8
 
 ---
 
@@ -13,21 +13,28 @@ Her iki servis Cloud Run'da çalışıyor, tüm testler geçiyor:
 - **API Tests:** 993/993 ✅ (10 yeni db.rs testi dahil)
 - **Worker Tests:** 48/48 ✅
 - **Dashboard:** TypeScript 0, ESLint 0 ✅
+- **SDK'lar:** 11/11 yayında ✅ (tüm registry'lerde doğrulandı)
 
 ## 📋 Sonraki Oturumda Yapılabilecekler
 
-### Öncelikli
-1. **Grafana'da OTEL verilerini kontrol et** — metrics, logs, traces gelmiş olmalı
-2. **API endpoint'lerini test et** — register, login, webhook delivery (canlı ortamda)
-3. **HS-082: SDK version mismatch** — Kotlin 0.2.0 vs 0.3.0 kontrol et
+### 🔴 Öncelikli — SDK Kalite Yol Haritası
+> Detaylı plan: `.ai-context/sdk/QUALITY_ROADMAP.md`
+> Hedef: Svix seviyesine çıkmak (35 oturum planı)
+
+**Sıradaki görev (Aşama 1):**
+1. **Node.js `request` → `node-fetch`** — deprecated library değişimi
+2. **Node.js wrapper class** — `new HookSniff(key)` → `client.endpoints.create()`
+3. **Node.js imza doğrulama** — `verifySignature()` fonksiyonu
+4. **Python wrapper class + imza** — aynı kalıp
+5. **Go wrapper class + imza** — aynı kalıp
 
 ### Servet'in Yapması Gereken
-4. **Polar.sh Stripe payout** — identity verification gerekli
-5. **Grafana trial** — 20 Mayıs'ta bitiyor (9 gün kaldı), upgrade gerekli
-6. **SDK publish** — npm, PyPI, crates.io'ya publish (registry erişimi gerek)
+6. **Polar.sh Stripe payout** — identity verification gerekli
+7. **Grafana trial** — 20 Mayıs'ta bitiyor (9 gün kaldı), upgrade gerekli
 
 ### Lansman Sonrası
-7. **HS-090: SDK otomatik güncelleme sistemi** — detaylı araştırma gerekli
+8. **Aşama 2:** Serialization, Pagination, User-Agent, Idempotency
+9. **Aşama 3:** Unit testler, CHANGELOG, CI/CD, dokümantasyon sitesi
 
 ## 🔧 Build Hatası Özeti (Gelecek Referans)
 
