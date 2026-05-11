@@ -71,19 +71,25 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
 
-## Oturum 109 (2026-05-11 17:27 - ) 🔄
-- **OpenClaw beşinci oturum** — Servet tekrar bağlandı, proje devam
+## Oturum 109 (2026-05-11 17:27 - 18:05) 🔄
+- **OpenClaw beşinci oturum** — Servet ile GCP deploy debug
 - **Rust 1.95.0 kuruldu** — cargo check başarılı
 - **Testler:** API 983/983 ✅, Worker 48/48 ✅
 - **Dashboard:** TypeScript 0 hata ✅, ESLint 0 uyarı ✅
-- **cloudbuild.yaml güncellendi** — Cloud Run deploy adımı eklendi (API + Worker)
-  - Artık `gcloud builds submit` ile tek komutla build + deploy yapılabilir
-  - RESEND_API_KEY ve NOTIFY_EMAIL env var'ları eklendi
-- **deploy.yml güncellendi** — RESEND_API_KEY + NOTIFY_EMAIL eklendi ama push edilemedi (PAT workflow scope eksik)
-- **Auto-sync cron** — her 10 dakikada .ai-context/ GitHub'a push (OpenClaw cron)
-- **API sağlık:** /health 200 OK, DB 784ms, queue 212ms, uptime ~7 dk
-- **OTEL durumu:** Health response'da `otel` objesi yok → deploy edilen revision eski kodu çalıştırıyor
-- **Sonraki adım:** Servet Cloud Build ile deploy etmeli, sonra OTEL veri akışını kontrol et
+- **cloudbuild.yaml güncellendi** — Cloud Run deploy adımı eklendi (push edildi ✅)
+- **deploy.yml güncellendi** — RESEND_API_KEY + NOTIFY_EMAIL eklendi (PAT workflow scope eksik, push edilemedi ❌)
+- **GCP Console'a giriş yapıldı** — browser ile Google auth (2FA onay)
+- **🔴 KRİTİK: Cloud Run API deploy SORUNU**
+  - hooksniff-api Unavailable — revision 00062 ve 00063 başarısız
+  - Hata: "container failed to start and listen on PORT=3000 within timeout"
+  - Revision 00058 (10 saat önce) hala %100 traffic alıyor, çalışıyor
+  - Cloud Build başarılı image build + push (7:44 UTC) ama deploy edilen revision başlamıyor
+  - Cloud Logging'de log YOK — container hiç başlamadan çöküyor
+  - **Muhtemel neden:** OTEL init hatası (boot test span veya exporter bağlantı sorunu)
+  - **Çözüm denemesi:** OTEL_ENABLED=false ile deploy edilmeli (test amaçlı)
+- **Auto-sync cron** — her 10 dakikada .ai-context/ GitHub'a push
+- **API sağlık:** /health 200 OK (eski revizyon 00058'den), DB 784ms
+- **GCP kredisi:** ₺87 / ₺13,516 kullanılmış, Ağustos 2026'ya kadar geçerli
 
 ## Oturum 108 (2026-05-11 16:52 - 17:21) 🔄
 - **OpenClaw dördüncü oturum** — Servet Grafana OTEL durumunu sordu
