@@ -350,11 +350,16 @@
     "roleLabel": "Rol",
     "removeMember": "Üyeyi Çıkar",
     "removeConfirm": "Bu üyeyi çıkarmak istediğinizden emin misiniz?",
-    "removeFailed": "Üye çıkarılamadı"
+    "removeFailed": "Üye çıkarılamadı",
+    "failedToLoadTeams": "Ekipler yüklenemedi",
+    "failedToLoadMembers": "Üyeler yüklenemedi",
+    "failedToCreateTeam": "Ekip oluşturulamadı",
+    "failedToInvite": "Davet gönderilemedi",
+    "failedToUpdateRole": "Rol güncellenemedi"
   },
   "notifications": {
     "title": "Bildirimler",
-    "subtitle": "Webhook olayları, uyarılar ve sistem mesajları hakkında güncel kalın",
+    "subtitle": "Webhook olayları, alarmlar ve sistem mesajlarından haberdar olun",
     "markAllRead": "Tümünü okundu işaretle",
     "markRead": "Okundu işaretle",
     "all": "Tümü",
@@ -370,7 +375,10 @@
     "deleteNotification": "Bildirimi Sil",
     "deleteConfirm": "Bu bildirimi silmek istediğinizden emin misiniz?",
     "deleteFailed": "Bildirim silinemedi",
-    "deleted": "Bildirim silindi"
+    "deleted": "Bildirim silindi",
+    "failedToLoad": "Bildirimler yüklenemedi",
+    "failedToMarkRead": "Okundu olarak işaretlenemedi",
+    "failedToMarkAllRead": "Tümü okundu olarak işaretlenemedi"
   },
   "webhooks": {
     "title": "Webhooklar",
@@ -1110,7 +1118,10 @@
     "settingsSaveFailed": "Ayarlar kaydedilemedi",
     "failedToLoadRevenue": "Gelir verisi yüklenemedi",
     "failedToLoadStats": "İstatistikler yüklenemedi",
-    "queue": "Kuyruk"
+    "queue": "Kuyruk",
+    "failedToLoadDetails": "Kullanıcı detayları yüklenemedi",
+    "failedToUpdatePlan": "Plan güncellenemedi",
+    "failedToUpdateStatus": "Durum güncellenemedi"
   },
   "landing": {
     "nav": {
