@@ -82,7 +82,7 @@ export default function AdminUserDetailPage() {
           onClick={() => router.push('/admin/users')}
           className="text-brand-600 dark:text-brand-400 text-sm font-medium"
         >
-          ← Back to Users
+          {t("backToUsers")}
         </button>
       </div>
     );
@@ -96,7 +96,7 @@ export default function AdminUserDetailPage() {
           onClick={() => router.push('/admin/users')}
           className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400 transition"
         >
-          ← Back
+          ← {tc("back")}
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -116,21 +116,21 @@ export default function AdminUserDetailPage() {
               <p className="text-sm font-mono text-gray-900 dark:text-white">{detail.user.id}</p>
             </div>
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400">Email</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400">{t("email")}</label>
               <p className="text-sm text-gray-900 dark:text-white">{detail.user.email}</p>
             </div>
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400">Name</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400">{t("name")}</label>
               <p className="text-sm text-gray-900 dark:text-white">{detail.user.name || '—'}</p>
             </div>
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400">Status</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400">{t("status")}</label>
               <div className="mt-1">
                 <StatusBadge status={detail.user.status} />
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400">Created</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400">{t("created")}</label>
               <p className="text-sm text-gray-900 dark:text-white">
                 {new Date(detail.user.created_at).toLocaleString()}
               </p>
@@ -146,7 +146,7 @@ export default function AdminUserDetailPage() {
             {/* Plan Selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                Plan
+                {t("plan")}
               </label>
               <div className="flex gap-2">
                 <select
@@ -163,7 +163,7 @@ export default function AdminUserDetailPage() {
                   disabled={newPlan === detail.user.plan}
                   className="px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition disabled:opacity-40"
                 >
-                  Update
+                  {t("update")}
                 </button>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function AdminUserDetailPage() {
             {/* Status Toggle */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                Account Status
+                {t("accountStatus")}
               </label>
               <button
                 onClick={handleToggleStatus}
@@ -181,14 +181,14 @@ export default function AdminUserDetailPage() {
                     : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20'
                 }`}
               >
-                {detail.user.status === 'active' ? 'Ban User' : 'Activate User'}
+                {detail.user.status === 'active' ? t('banUser') : t('activateUser')}
               </button>
             </div>
 
             {/* Usage Stats */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">
-                Usage Stats
+                {t("usageStats")}
               </label>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
@@ -204,7 +204,7 @@ export default function AdminUserDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-slate-400">Endpoints</span>
+                  <span className="text-gray-500 dark:text-slate-400">{t("endpoints")}</span>
                   <span className="font-medium text-gray-900 dark:text-white">
                     {detail.usage_stats?.endpoints_count || 0}
                   </span>
@@ -216,7 +216,7 @@ export default function AdminUserDetailPage() {
 
         {/* Endpoints List */}
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Endpoints</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("endpoints")}</h2>
           {detail.endpoints?.length ? (
             <div className="space-y-3">
               {detail.endpoints.map((ep) => (
@@ -228,7 +228,7 @@ export default function AdminUserDetailPage() {
                   <div className="flex items-center gap-2 mt-1">
                     <div className={`w-2 h-2 rounded-full ${ep.is_active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
                     <span className="text-xs text-gray-500 dark:text-slate-400">
-                      {ep.is_active ? 'Active' : 'Inactive'}
+                      {ep.is_active ? t('active') : t('inactive')}
                     </span>
                     <span className="text-xs text-gray-400 dark:text-slate-500">
                       {new Date(ep.created_at).toLocaleDateString()}
@@ -283,7 +283,7 @@ export default function AdminUserDetailPage() {
           </div>
         ) : (
           <div className="px-6 py-8 text-center text-gray-400 dark:text-slate-500 text-sm">
-            No deliveries
+            {t("noDeliveries")}
           </div>
         )}
       </div>
