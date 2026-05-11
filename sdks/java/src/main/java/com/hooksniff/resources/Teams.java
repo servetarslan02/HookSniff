@@ -1,0 +1,67 @@
+package com.hooksniff.resources;
+
+import com.hooksniff.ApiException;
+import com.hooksniff.HookSniffConfig;
+import com.hooksniff.RequestHelper;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Map;
+
+/**
+ * Team management.
+ */
+public class Teams {
+    private static final Type MAP = new TypeToken<Map<String, Object>>(){}.getType();
+    private static final Type LIST = new TypeToken<java.util.List<Map<String, Object>>>(){}.getType();
+
+    private final HookSniffConfig config;
+
+    public Teams(HookSniffConfig config) {
+        this.config = config;
+    }
+
+    /** List teams */
+    public java.util.List<Map<String, Object>> list() throws ApiException, IOException, InterruptedException {
+        RequestHelper req = new RequestHelper("GET", "/v1/teams");
+        return req.send(config, LIST);
+    }
+
+    /** Create team */
+    public Map<String, Object> create(Map<String, Object> input) throws ApiException, IOException, InterruptedException {
+        RequestHelper req = new RequestHelper("POST", "/v1/teams");
+        req.setBody(input);
+        return req.send(config, MAP);
+    }
+
+    /** Get team by ID */
+    public Map<String, Object> get(String id) throws ApiException, IOException, InterruptedException {
+        RequestHelper req = new RequestHelper("GET", "/v1/teams/{id}");
+        req.setPathParam("id", id);
+        return req.send(config, MAP);
+    }
+
+    /** Update team */
+    public Map<String, Object> update(String id, Map<String, Object> input) throws ApiException, IOException, InterruptedException {
+        RequestHelper req = new RequestHelper("PUT", "/v1/teams/{id}");
+        req.setPathParam("id", id);
+        req.setBody(input);
+        return req.send(config, MAP);
+    }
+
+    /** Delete team */
+    public void delete(String id) throws ApiException, IOException, InterruptedException {
+        RequestHelper req = new RequestHelper("DELETE", "/v1/teams/{id}");
+        req.setPathParam("id", id);
+        req.sendVoid(config);
+    }
+
+    /** Invite member to team */
+    public Map<String, Object> invite(String teamId, Map<String, Object> input) throws ApiException, IOException, InterruptedException {
+        RequestHelper req = new RequestHelper("POST", "/v1/teams/{id}/members");
+        req.setPathParam("id", teamId);
+        req.setBody(input);
+        return req.send(config, MAP);
+    }
+}
