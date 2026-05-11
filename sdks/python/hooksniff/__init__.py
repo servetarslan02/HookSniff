@@ -24,6 +24,14 @@ Usage:
 
 from hooksniff.client import HookSniff
 from hooksniff.webhook import Webhook, WebhookVerificationError
+from hooksniff.pagination import paginate, collect_all, Page
 
 __version__ = "0.4.0"
-__all__ = ["HookSniff", "Webhook", "WebhookVerificationError"]
+__all__ = [
+    "HookSniff",
+    "Webhook",
+    "WebhookVerificationError",
+    "paginate",
+    "collect_all",
+    "Page",
+]
