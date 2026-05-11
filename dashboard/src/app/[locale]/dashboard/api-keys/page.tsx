@@ -37,9 +37,13 @@ export default function ApiKeysPage() {
       const res = await fetch(`${API}/api-keys`, {
         headers: {}, credentials: 'include' as const,
       });
-      if (res.ok) setKeys(await res.json());
+      if (res.ok) {
+        setKeys(await res.json());
+      } else {
+        setError(`Failed to load API keys (${res.status})`);
+      }
     } catch (e) {
-      // Error handled silently
+      setError(e instanceof Error ? e.message : 'Failed to load API keys');
     } finally {
       setLoading(false);
     }

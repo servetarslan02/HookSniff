@@ -396,6 +396,33 @@ async fn process_pending(
             let endpoint_id = item.endpoint_id;
             let attempt = item.attempt_count + 1;
 
+            // Idempotency guard: check if this delivery was already successfully delivered.
+            // Prevents duplicate delivery if worker crashed after HTTP success but before DB commit.
+            {
+                let existing_status: Option<(String,)> = sqlx::query_as(
+                    "SELECT status::text FROM deliveries WHERE id = $1"
+                )
+                .bind(delivery_id)
+                .fetch_optional(&pool)
+                .await?;
+
+                if let Some((ref status,)) = existing_status {
+                    if status == "delivered" {
+                        tracing::info!(
+                            "⏭️ Delivery {} already delivered — marking queue as done (idempotency)",
+                            delivery_id
+                        );
+                        let _ = sqlx::query::<sqlx::Postgres>(
+                            "UPDATE webhook_queue SET status = 'delivered', processed_at = now() WHERE id = $1"
+                        )
+                        .bind(item.id)
+                        .execute(&pool)
+                        .await;
+                        return Ok::<(), anyhow::Error>(());
+                    }
+                }
+            }
+
             // HS-020: Circuit breaker — skip delivery if endpoint circuit is open
             if !cb.allow_request(endpoint_id).await {
                 tracing::warn!(
