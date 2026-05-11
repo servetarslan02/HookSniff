@@ -7,7 +7,7 @@ import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { billingApi, billingApiExtended, type Invoice } from '@/lib/api';
 
 const plans = [

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
@@ -35,7 +36,6 @@ export default function SearchPage() {
   const [page, setPage] = useState(1);
   const t = useTranslations('search');
 
-  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const search = useCallback(async (p = 1) => {
@@ -49,21 +49,14 @@ export default function SearchPage() {
       params.set('page', p.toString());
       params.set('per_page', '20');
 
-      const res = await fetch(`${API}/search?${params}`, {
-        headers: {},
-        credentials: 'include' as const,
-      });
-      if (res.ok) {
-        setResults(await res.json());
-      } else {
-        setError(`Search failed (${res.status})`);
-      }
+      const data = await apiFetch<SearchResponse>(`/search?${params}`, { token });
+      setResults(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Search failed');
+      setError(e instanceof Error ? e.message : t('searchFailed'));
     } finally {
       setLoading(false);
     }
-  }, [token, API, query, status]);
+  }, [token, query, status, t]);
 
   // Debounce search on query/status change (300ms delay)
   useEffect(() => {
