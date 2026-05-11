@@ -160,9 +160,9 @@ export default function PricingPage() {
   ];
 
   const testimonials = [
-    { quote: "We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time and $2K/month in infrastructure costs.", author: 'CTO', company: 'SaaS Startup', avatar: 'CS' },
-    { quote: "The FIFO delivery feature is a game-changer for our order processing pipeline. Events arrive in order, every time.", author: 'Lead Developer', company: 'E-commerce Platform', avatar: 'LD' },
-    { quote: "Free tier that actually works for startups. We process 8K webhooks/month without paying a cent. Svix wanted $490.", author: 'Solo Founder', company: 'Indie Hacker', avatar: 'SF' },
+    { quoteKey: 'testimonial1Quote', authorKey: 'testimonial1Author', companyKey: 'testimonial1Company', avatar: 'CS' },
+    { quoteKey: 'testimonial2Quote', authorKey: 'testimonial2Author', companyKey: 'testimonial2Company', avatar: 'LD' },
+    { quoteKey: 'testimonial3Quote', authorKey: 'testimonial3Author', companyKey: 'testimonial3Company', avatar: 'SF' },
   ];
 
   const faqCount = 16;
@@ -300,19 +300,19 @@ export default function PricingPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('securityTitle')}</h2>
           <div className="grid md:grid-cols-4 gap-4">
             {[
-              { icon: '🔒', title: 'TLS 1.3', desc: 'All data encrypted in transit' },
-              { icon: '🛡️', title: 'SOC 2 Ready', desc: 'Security controls in place' },
-              { icon: '🇪🇺', title: 'GDPR Compliant', desc: 'EU data processing (eu-central-1)' },
-              { icon: '🔑', title: 'HMAC-SHA256', desc: 'Every webhook signature verified' },
-              { icon: '🔐', title: '2FA / TOTP', desc: 'Two-factor authentication' },
-              { icon: '📋', title: 'Audit Logs', desc: 'Track every action' },
-              { icon: '🌐', title: 'SSO / SAML', desc: 'Enterprise single sign-on' },
-              { icon: '📍', title: 'IP Whitelisting', desc: 'Restrict by IP/CIDR' },
+              { icon: '🔒', titleKey: 'securityItem1Title', descKey: 'securityItem1Desc' },
+              { icon: '🛡️', titleKey: 'securityItem2Title', descKey: 'securityItem2Desc' },
+              { icon: '🇪🇺', titleKey: 'securityItem3Title', descKey: 'securityItem3Desc' },
+              { icon: '🔑', titleKey: 'securityItem4Title', descKey: 'securityItem4Desc' },
+              { icon: '🔐', titleKey: 'securityItem5Title', descKey: 'securityItem5Desc' },
+              { icon: '📋', titleKey: 'securityItem6Title', descKey: 'securityItem6Desc' },
+              { icon: '🌐', titleKey: 'securityItem7Title', descKey: 'securityItem7Desc' },
+              { icon: '📍', titleKey: 'securityItem8Title', descKey: 'securityItem8Desc' },
             ].map((item) => (
-              <div key={item.title} className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 text-center">
+              <div key={item.titleKey} className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 text-center">
                 <span className="text-2xl">{item.icon}</span>
-                <h4 className="font-semibold text-gray-900 dark:text-white text-sm mt-2">{item.title}</h4>
-                <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{item.desc}</p>
+                <h4 className="font-semibold text-gray-900 dark:text-white text-sm mt-2">{t(item.titleKey)}</h4>
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{t(item.descKey)}</p>
               </div>
             ))}
           </div>
