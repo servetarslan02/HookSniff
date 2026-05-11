@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.RetryPolicy do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :max_attempts,
     :backoff,

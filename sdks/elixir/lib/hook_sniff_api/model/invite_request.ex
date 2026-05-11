@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.InviteRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :email,
     :role
