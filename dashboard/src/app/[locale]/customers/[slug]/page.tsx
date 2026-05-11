@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -215,6 +215,7 @@ export function generateStaticParams() {
 }
 
 export default async function CustomerStoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const t = await getTranslations('customers');
   const { slug } = await params;
   const story = stories[slug];
 

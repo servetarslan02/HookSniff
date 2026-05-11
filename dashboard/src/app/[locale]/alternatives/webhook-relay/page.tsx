@@ -1,9 +1,11 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { getTranslations } from 'next-intl/server';
 
 export const metadata = { title: 'HookSniff vs Webhook Relay — Alternative' };
 
-export default function WebhookRelayAlternativePage() {
+export default async function WebhookRelayAlternativePage() {
+  const t = await getTranslations('compare');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
@@ -24,7 +26,7 @@ export default function WebhookRelayAlternativePage() {
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden mb-12">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead><tr className="border-b border-gray-200 dark:border-slate-800">
-              <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">{t("compare.feature")}</th>
+              <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">{t("feature")}</th>
               <th className="text-center py-3 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/30">🪝 HookSniff</th>
               <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Webhook Relay</th>
             </tr></thead>
