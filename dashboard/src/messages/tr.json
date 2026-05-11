@@ -81,7 +81,8 @@
     "failedToLoad": "Veri yüklenemedi",
     "failedToCreate": "Oluşturulamadı",
     "failedToLoadEndpoints": "Uç noktalar yüklenemedi",
-    "failedToLoadTransforms": "Dönüşüm kuralları yüklenemedi"
+    "failedToLoadTransforms": "Dönüşüm kuralları yüklenemedi",
+    "failedToDelete": "Silinemedi"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -373,7 +374,7 @@
     "descriptionLabel": "Açıklama (isteğe bağlı)",
     "inviteBtn": "+ Davet Et",
     "joinedPrefix": "Katıldı",
-    "membersCount": "{count} üye · Oluşturuldu",
+    "membersCount": "{count} üye",
     "roleOwner": "Sahip",
     "roleAdmin": "Yönetici",
     "roleMember": "Üye",
