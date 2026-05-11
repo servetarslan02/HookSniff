@@ -533,3 +533,11 @@ git add -A && git commit -m "type: message" && git pull --rebase origin main && 
 - **Commit:** `015db33` — Kotlin artifact fix + Swift Package.swift fix
 - **10/11 SDK yayında** (Kotlin 10-30 dk içinde), Swift eksik (aynı repo gerekli)
 - **Credential'lar:** .gitignore'a gradle.properties eklendi (commit edilmedi)
+
+## Swift SDK Tamamlandı (Oturum 112 devam)
+- **Ayrı repo oluşturuldu:** https://github.com/servetarslan02/hooksniff-swift
+- **v0.3.0 tag atıldı** — SPM ile uyumlu
+- **141 Swift source dosyası** — tüm 116 API endpoint'ini kapsıyor
+- **Package.swift:** swift-tools-version:5.9, macOS 12+ / iOS 15+ / tvOS 15+ / watchOS 8+
+- **README.md:** Kurulum talimatları eklendi (SPM + Xcode)
+- **11/11 SDK TAMAMLANDI** 🎉

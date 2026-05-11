@@ -177,7 +177,7 @@ HookSniff/
 | PHP | `hooksniff/hooksniff` | ✅ Ready |
 | C# | `HookSniff` | ✅ Ready |
 | Elixir | `hooksniff` | ✅ Ready |
-| Swift | `HookSniff` | ✅ Ready |
+| Swift | [`HookSniff`](https://github.com/servetarslan02/hooksniff-swift) | ✅ Ready |
 
 ## Testing
 
