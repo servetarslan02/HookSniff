@@ -1,4 +1,4 @@
-# HookSniff::ContactRequest
+# HooksniffSdk::ContactRequest
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::ContactRequest.new(
+instance = HooksniffSdk::ContactRequest.new(
   name: null,
   email: null,
   subject: null,

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.UpdateEndpointRequest do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :url,
     :description,
@@ -21,16 +21,16 @@ defmodule HookSniffAPI.Model.UpdateEndpointRequest do
   ]
 
   @type t :: %__MODULE__{
-    :url => Uri | nil,
-    :description => String.t | nil,
-    :is_active => boolean() | nil,
-    :allowed_ips => [String.t] | nil,
-    :event_filter => [String.t] | nil,
+    :url => Uri,
+    :description => String.t,
+    :is_active => boolean(),
+    :allowed_ips => [String.t],
+    :event_filter => [String.t],
     :custom_headers => map() | nil,
-    :retry_policy => HookSniffAPI.Model.RetryPolicy.t | nil,
-    :routing_strategy => String.t | nil,
-    :fallback_url => Uri | nil,
-    :format => String.t | nil
+    :retry_policy => HookSniffAPI.Model.RetryPolicy.t,
+    :routing_strategy => String.t,
+    :fallback_url => Uri,
+    :format => String.t
   }
 
   alias HookSniffAPI.Deserializer

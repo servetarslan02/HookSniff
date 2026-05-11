@@ -1,4 +1,4 @@
-# HookSniff.Model.UsageResponse
+# HookSniff.Sdk.Model.UsageResponse
 
 ## Properties
 

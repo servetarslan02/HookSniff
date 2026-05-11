@@ -1,4 +1,4 @@
-# HookSniff.Model.RoutingRuleListResponse
+# HookSniff.Sdk.Model.RoutingRuleListResponse
 List of routing rules
 
 ## Properties

@@ -1,4 +1,4 @@
-# HookSniff.Model.Confirm2faRequest
+# HookSniff.Sdk.Model.Confirm2faRequest
 
 ## Properties
 

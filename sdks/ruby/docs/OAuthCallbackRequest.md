@@ -1,4 +1,4 @@
-# HookSniff::OAuthCallbackRequest
+# HooksniffSdk::OAuthCallbackRequest
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::OAuthCallbackRequest.new(
+instance = HooksniffSdk::OAuthCallbackRequest.new(
   code: null,
   state: null,
   redirect_uri: null

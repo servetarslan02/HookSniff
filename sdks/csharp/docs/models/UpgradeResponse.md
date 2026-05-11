@@ -1,4 +1,4 @@
-# HookSniff.Model.UpgradeResponse
+# HookSniff.Sdk.Model.UpgradeResponse
 
 ## Properties
 

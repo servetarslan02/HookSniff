@@ -1,4 +1,4 @@
-# HookSniff.Model.CreateSSOConfigRequest
+# HookSniff.Sdk.Model.CreateSSOConfigRequest
 Create a new SSO configuration
 
 ## Properties

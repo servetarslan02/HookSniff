@@ -1,4 +1,4 @@
-# HookSniff.Model.StatsResponse
+# HookSniff.Sdk.Model.StatsResponse
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# HookSniff.Model.UserSummary
+# HookSniff.Sdk.Model.UserSummary
 
 ## Properties
 

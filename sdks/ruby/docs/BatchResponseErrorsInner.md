@@ -1,4 +1,4 @@
-# HookSniff::BatchResponseErrorsInner
+# HooksniffSdk::BatchResponseErrorsInner
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::BatchResponseErrorsInner.new(
+instance = HooksniffSdk::BatchResponseErrorsInner.new(
   index: null,
   error: null
 )

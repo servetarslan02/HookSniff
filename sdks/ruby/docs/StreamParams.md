@@ -1,4 +1,4 @@
-# HookSniff::StreamParams
+# HooksniffSdk::StreamParams
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::StreamParams.new(
+instance = HooksniffSdk::StreamParams.new(
   endpoint_id: null,
   status: null,
   limit: null

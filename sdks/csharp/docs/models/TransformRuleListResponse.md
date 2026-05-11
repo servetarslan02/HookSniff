@@ -1,4 +1,4 @@
-# HookSniff.Model.TransformRuleListResponse
+# HookSniff.Sdk.Model.TransformRuleListResponse
 Paginated list of transform rules
 
 ## Properties

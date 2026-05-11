@@ -1,4 +1,4 @@
-# HookSniff::StatsApi
+# HooksniffSdk::StatsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -17,20 +17,20 @@ Get account statistics
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::StatsApi.new
+api_instance = HooksniffSdk::StatsApi.new
 
 begin
   # Get account statistics
   result = api_instance.stats_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling StatsApi->stats_get: #{e}"
 end
 ```
@@ -48,7 +48,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <StatsResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling StatsApi->stats_get_with_http_info: #{e}"
 end
 ```

@@ -1,4 +1,4 @@
-# HookSniff.Model.DeviceListResponse
+# HookSniff.Sdk.Model.DeviceListResponse
 Paginated list of registered devices
 
 ## Properties

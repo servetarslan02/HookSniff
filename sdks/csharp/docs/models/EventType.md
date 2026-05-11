@@ -1,4 +1,4 @@
-# HookSniff.Model.EventType
+# HookSniff.Sdk.Model.EventType
 A registered event type in the system
 
 ## Properties

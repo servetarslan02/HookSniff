@@ -1,4 +1,4 @@
-# HookSniff::OAuthProviderListResponse
+# HooksniffSdk::OAuthProviderListResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::OAuthProviderListResponse.new(
+instance = HooksniffSdk::OAuthProviderListResponse.new(
   data: null
 )
 ```

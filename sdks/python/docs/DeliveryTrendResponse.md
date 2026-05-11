@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**range** | **str** |  | [optional] 
-**buckets** | [**List[DeliveryTrendResponseBucketsInner]**](DeliveryTrendResponseBucketsInner.md) |  | [optional] 
+**range** | **str** |  | 
+**buckets** | [**List[DeliveryTrendResponseBucketsInner]**](DeliveryTrendResponseBucketsInner.md) |  | 
 
 ## Example
 

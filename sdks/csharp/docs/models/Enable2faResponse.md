@@ -1,4 +1,4 @@
-# HookSniff.Model.Enable2faResponse
+# HookSniff.Sdk.Model.Enable2faResponse
 TOTP secret and QR code URL returned after enabling 2FA
 
 ## Properties

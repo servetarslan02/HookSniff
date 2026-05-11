@@ -13,12 +13,12 @@ import AnyCodable
 public struct AuthResponse: Codable, JSONEncodable, Hashable {
 
     /** JWT access token */
-    public var token: String?
-    public var customer: CustomerResponse?
+    public var token: String
+    public var customer: CustomerResponse
     /** Refresh token (when applicable) */
     public var refreshToken: String?
 
-    public init(token: String? = nil, customer: CustomerResponse? = nil, refreshToken: String? = nil) {
+    public init(token: String, customer: CustomerResponse, refreshToken: String? = nil) {
         self.token = token
         self.customer = customer
         self.refreshToken = refreshToken
@@ -34,8 +34,8 @@ public struct AuthResponse: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(token, forKey: .token)
-        try container.encodeIfPresent(customer, forKey: .customer)
+        try container.encode(token, forKey: .token)
+        try container.encode(customer, forKey: .customer)
         try container.encodeIfPresent(refreshToken, forKey: .refreshToken)
     }
 }

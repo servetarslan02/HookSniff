@@ -1,4 +1,4 @@
-# HookSniff::DeliveryListResponse
+# HooksniffSdk::DeliveryListResponse
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::DeliveryListResponse.new(
+instance = HooksniffSdk::DeliveryListResponse.new(
   deliveries: null,
   total: null,
   page: null,

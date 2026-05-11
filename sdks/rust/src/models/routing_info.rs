@@ -13,29 +13,29 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RoutingInfo {
-    #[serde(rename = "endpoint_id", skip_serializing_if = "Option::is_none")]
-    pub endpoint_id: Option<uuid::Uuid>,
-    #[serde(rename = "routing_strategy", skip_serializing_if = "Option::is_none")]
-    pub routing_strategy: Option<String>,
+    #[serde(rename = "endpoint_id")]
+    pub endpoint_id: uuid::Uuid,
+    #[serde(rename = "routing_strategy")]
+    pub routing_strategy: String,
     #[serde(rename = "fallback_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub fallback_url: Option<Option<String>>,
-    #[serde(rename = "avg_response_ms", skip_serializing_if = "Option::is_none")]
-    pub avg_response_ms: Option<i32>,
-    #[serde(rename = "failure_streak", skip_serializing_if = "Option::is_none")]
-    pub failure_streak: Option<i32>,
-    #[serde(rename = "is_healthy", skip_serializing_if = "Option::is_none")]
-    pub is_healthy: Option<bool>,
+    #[serde(rename = "avg_response_ms")]
+    pub avg_response_ms: i32,
+    #[serde(rename = "failure_streak")]
+    pub failure_streak: i32,
+    #[serde(rename = "is_healthy")]
+    pub is_healthy: bool,
 }
 
 impl RoutingInfo {
-    pub fn new() -> RoutingInfo {
+    pub fn new(endpoint_id: uuid::Uuid, routing_strategy: String, avg_response_ms: i32, failure_streak: i32, is_healthy: bool) -> RoutingInfo {
         RoutingInfo {
-            endpoint_id: None,
-            routing_strategy: None,
+            endpoint_id,
+            routing_strategy,
             fallback_url: None,
-            avg_response_ms: None,
-            failure_streak: None,
-            is_healthy: None,
+            avg_response_ms,
+            failure_streak,
+            is_healthy,
         }
     }
 }

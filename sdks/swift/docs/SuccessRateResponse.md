@@ -3,11 +3,11 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**range** | **String** |  | [optional] 
-**successful** | **Int** |  | [optional] 
-**failed** | **Int** |  | [optional] 
-**pending** | **Int** |  | [optional] 
-**successRate** | **Double** |  | [optional] 
+**range** | **String** |  | 
+**successful** | **Int** |  | 
+**failed** | **Int** |  | 
+**pending** | **Int** |  | 
+**successRate** | **Double** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**endpoint_id** | **UUID** |  | [optional] 
-**status** | **str** |  | [optional] 
-**limit** | **int** |  | [optional] [default to 50]
+**endpoint_id** | **UUID** |  | 
+**status** | **str** |  | 
+**limit** | **int** |  | [default to 50]
 
 ## Example
 

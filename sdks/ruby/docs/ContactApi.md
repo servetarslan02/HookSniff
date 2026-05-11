@@ -1,4 +1,4 @@
-# HookSniff::ContactApi
+# HooksniffSdk::ContactApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -17,16 +17,16 @@ Send contact form message
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::ContactApi.new
-contact_request = HookSniff::ContactRequest.new({name: 'name_example', email: 'email_example', subject: 'subject_example', message: 'message_example'}) # ContactRequest | 
+api_instance = HooksniffSdk::ContactApi.new
+contact_request = HooksniffSdk::ContactRequest.new({name: 'name_example', email: 'email_example', subject: 'subject_example', message: 'message_example'}) # ContactRequest | 
 
 begin
   # Send contact form message
   result = api_instance.contact_post(contact_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling ContactApi->contact_post: #{e}"
 end
 ```
@@ -44,7 +44,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <ContactResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling ContactApi->contact_post_with_http_info: #{e}"
 end
 ```

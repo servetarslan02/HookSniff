@@ -4,15 +4,15 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  [optional] |
-| **email** | **kotlin.String** |  |  [optional] |
+| **id** | [**java.util.UUID**](java.util.UUID.md) |  |  |
+| **email** | **kotlin.String** |  |  |
+| **plan** | [**inline**](#Plan) |  |  |
+| **webhookLimit** | **kotlin.Int** |  |  |
+| **webhookCount** | **kotlin.Int** |  |  |
+| **isAdmin** | **kotlin.Boolean** |  |  |
+| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  |
 | **name** | **kotlin.String** |  |  [optional] |
 | **apiKey** | **kotlin.String** | Only returned on registration |  [optional] |
-| **plan** | [**inline**](#Plan) |  |  [optional] |
-| **webhookLimit** | **kotlin.Int** |  |  [optional] |
-| **webhookCount** | **kotlin.Int** |  |  [optional] |
-| **isAdmin** | **kotlin.Boolean** |  |  [optional] |
-| **createdAt** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  [optional] |
 
 
 <a id="Plan"></a>

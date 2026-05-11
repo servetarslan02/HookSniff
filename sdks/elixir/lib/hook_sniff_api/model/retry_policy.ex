@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.RetryPolicy do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :max_attempts,
     :backoff,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.RetryPolicy do
   ]
 
   @type t :: %__MODULE__{
-    :max_attempts => integer() | nil,
-    :backoff => String.t | nil,
-    :initial_delay_secs => integer() | nil,
-    :max_delay_secs => integer() | nil
+    :max_attempts => integer(),
+    :backoff => String.t,
+    :initial_delay_secs => integer(),
+    :max_delay_secs => integer()
   }
 
   def decode(value) do

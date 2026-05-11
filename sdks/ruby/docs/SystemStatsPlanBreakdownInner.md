@@ -1,4 +1,4 @@
-# HookSniff::SystemStatsPlanBreakdownInner
+# HooksniffSdk::SystemStatsPlanBreakdownInner
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SystemStatsPlanBreakdownInner.new(
+instance = HooksniffSdk::SystemStatsPlanBreakdownInner.new(
   plan: null,
   count: null
 )

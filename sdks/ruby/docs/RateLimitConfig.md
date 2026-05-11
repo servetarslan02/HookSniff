@@ -1,4 +1,4 @@
-# HookSniff::RateLimitConfig
+# HooksniffSdk::RateLimitConfig
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RateLimitConfig.new(
+instance = HooksniffSdk::RateLimitConfig.new(
   requests_per_second: null,
   burst_size: null,
   enabled: null

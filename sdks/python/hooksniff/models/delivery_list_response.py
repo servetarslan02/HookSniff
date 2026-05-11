@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from hooksniff.models.delivery import Delivery
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,10 +29,10 @@ class DeliveryListResponse(BaseModel):
     """
     DeliveryListResponse
     """ # noqa: E501
-    deliveries: Optional[List[Delivery]] = None
-    total: Optional[StrictInt] = None
-    page: Optional[StrictInt] = None
-    per_page: Optional[StrictInt] = None
+    deliveries: List[Delivery]
+    total: StrictInt
+    page: StrictInt
+    per_page: StrictInt
     __properties: ClassVar[List[str]] = ["deliveries", "total", "page", "per_page"]
 
     model_config = ConfigDict(

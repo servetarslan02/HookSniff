@@ -3,16 +3,16 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**url** | **String** |  | [optional] 
-**description** | **String** |  | [optional] 
-**isActive** | **Bool** |  | [optional] 
-**allowedIps** | **[String]** |  | [optional] 
-**eventFilter** | **[String]** |  | [optional] 
+**url** | **String** |  | 
+**description** | **String** |  | 
+**isActive** | **Bool** |  | 
+**allowedIps** | **[String]** |  | 
+**eventFilter** | **[String]** |  | 
 **customHeaders** | **AnyCodable** |  | [optional] 
-**retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
-**routingStrategy** | **String** |  | [optional] 
-**fallbackUrl** | **String** |  | [optional] 
-**format** | **String** |  | [optional] 
+**retryPolicy** | [**RetryPolicy**](RetryPolicy.md) |  | 
+**routingStrategy** | **String** |  | 
+**fallbackUrl** | **String** |  | 
+**format** | **String** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -1,4 +1,4 @@
-# HookSniff::SystemStatusComponentsInner
+# HooksniffSdk::SystemStatusComponentsInner
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SystemStatusComponentsInner.new(
+instance = HooksniffSdk::SystemStatusComponentsInner.new(
   name: null,
   status: null,
   latency_ms: null,

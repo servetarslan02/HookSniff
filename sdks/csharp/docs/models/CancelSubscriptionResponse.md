@@ -1,4 +1,4 @@
-# HookSniff.Model.CancelSubscriptionResponse
+# HookSniff.Sdk.Model.CancelSubscriptionResponse
 Result of subscription cancellation
 
 ## Properties

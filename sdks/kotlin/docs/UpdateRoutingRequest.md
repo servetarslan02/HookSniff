@@ -4,8 +4,8 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **routingStrategy** | [**inline**](#RoutingStrategy) |  |  [optional] |
-| **fallbackUrl** | [**java.net.URI**](java.net.URI.md) |  |  [optional] |
+| **routingStrategy** | [**inline**](#RoutingStrategy) |  |  |
+| **fallbackUrl** | [**java.net.URI**](java.net.URI.md) |  |  |
 
 
 <a id="RoutingStrategy"></a>

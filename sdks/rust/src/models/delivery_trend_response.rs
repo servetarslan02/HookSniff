@@ -13,17 +13,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DeliveryTrendResponse {
-    #[serde(rename = "range", skip_serializing_if = "Option::is_none")]
-    pub range: Option<String>,
-    #[serde(rename = "buckets", skip_serializing_if = "Option::is_none")]
-    pub buckets: Option<Vec<models::DeliveryTrendResponseBucketsInner>>,
+    #[serde(rename = "range")]
+    pub range: String,
+    #[serde(rename = "buckets")]
+    pub buckets: Vec<models::DeliveryTrendResponseBucketsInner>,
 }
 
 impl DeliveryTrendResponse {
-    pub fn new() -> DeliveryTrendResponse {
+    pub fn new(range: String, buckets: Vec<models::DeliveryTrendResponseBucketsInner>) -> DeliveryTrendResponse {
         DeliveryTrendResponse {
-            range: None,
-            buckets: None,
+            range,
+            buckets,
         }
     }
 }

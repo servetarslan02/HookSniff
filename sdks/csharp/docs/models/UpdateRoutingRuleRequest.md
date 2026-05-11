@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateRoutingRuleRequest
+# HookSniff.Sdk.Model.UpdateRoutingRuleRequest
 Update an existing routing rule (all fields optional)
 
 ## Properties

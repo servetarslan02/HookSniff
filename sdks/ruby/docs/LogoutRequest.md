@@ -1,4 +1,4 @@
-# HookSniff::LogoutRequest
+# HooksniffSdk::LogoutRequest
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::LogoutRequest.new(
+instance = HooksniffSdk::LogoutRequest.new(
   refresh_token: null
 )
 ```

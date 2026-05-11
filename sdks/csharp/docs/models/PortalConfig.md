@@ -1,4 +1,4 @@
-# HookSniff.Model.PortalConfig
+# HookSniff.Sdk.Model.PortalConfig
 Customer-facing portal branding and configuration
 
 ## Properties

@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**users** | [**List[UserSummary]**](UserSummary.md) |  | [optional] 
-**total** | **int** |  | [optional] 
-**page** | **int** |  | [optional] 
-**per_page** | **int** |  | [optional] 
+**users** | [**List[UserSummary]**](UserSummary.md) |  | 
+**total** | **int** |  | 
+**page** | **int** |  | 
+**per_page** | **int** |  | 
 
 ## Example
 

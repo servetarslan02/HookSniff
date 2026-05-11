@@ -4,9 +4,9 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **endpointId** | [**java.util.UUID**](java.util.UUID.md) |  |  [optional] |
-| **status** | [**inline**](#Status) |  |  [optional] |
-| **limit** | **kotlin.Int** |  |  [optional] |
+| **endpointId** | [**java.util.UUID**](java.util.UUID.md) |  |  |
+| **status** | [**inline**](#Status) |  |  |
+| **limit** | **kotlin.Int** |  |  |
 
 
 <a id="Status"></a>

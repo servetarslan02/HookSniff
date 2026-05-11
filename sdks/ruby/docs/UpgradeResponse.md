@@ -1,4 +1,4 @@
-# HookSniff::UpgradeResponse
+# HooksniffSdk::UpgradeResponse
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::UpgradeResponse.new(
+instance = HooksniffSdk::UpgradeResponse.new(
   checkout_url: null,
   provider: null,
   message: null

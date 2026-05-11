@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**total_deliveries** | **int** |  | [optional]
-**successful_deliveries** | **int** |  | [optional]
-**failed_deliveries** | **int** |  | [optional]
-**total_endpoints** | **int** |  | [optional]
-**active_endpoints** | **int** |  | [optional]
-**plan** | **string** |  | [optional]
-**webhook_limit** | **int** |  | [optional]
-**webhook_count** | **int** |  | [optional]
+**total_deliveries** | **int** |  |
+**successful_deliveries** | **int** |  |
+**failed_deliveries** | **int** |  |
+**total_endpoints** | **int** |  |
+**active_endpoints** | **int** |  |
+**plan** | **string** |  |
+**webhook_limit** | **int** |  |
+**webhook_count** | **int** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

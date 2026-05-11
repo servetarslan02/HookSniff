@@ -282,6 +282,12 @@ class DeliveryTrendResponse implements ModelInterface, ArrayAccess, \JsonSeriali
     {
         $invalidProperties = [];
 
+        if ($this->container['range'] === null) {
+            $invalidProperties[] = "'range' can't be null";
+        }
+        if ($this->container['buckets'] === null) {
+            $invalidProperties[] = "'buckets' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -300,7 +306,7 @@ class DeliveryTrendResponse implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets range
      *
-     * @return string|null
+     * @return string
      */
     public function getRange()
     {
@@ -310,7 +316,7 @@ class DeliveryTrendResponse implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets range
      *
-     * @param string|null $range range
+     * @param string $range range
      *
      * @return self
      */
@@ -327,7 +333,7 @@ class DeliveryTrendResponse implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Gets buckets
      *
-     * @return \OpenAPI\Client\Model\DeliveryTrendResponseBucketsInner[]|null
+     * @return \OpenAPI\Client\Model\DeliveryTrendResponseBucketsInner[]
      */
     public function getBuckets()
     {
@@ -337,7 +343,7 @@ class DeliveryTrendResponse implements ModelInterface, ArrayAccess, \JsonSeriali
     /**
      * Sets buckets
      *
-     * @param \OpenAPI\Client\Model\DeliveryTrendResponseBucketsInner[]|null $buckets buckets
+     * @param \OpenAPI\Client\Model\DeliveryTrendResponseBucketsInner[] $buckets buckets
      *
      * @return self
      */

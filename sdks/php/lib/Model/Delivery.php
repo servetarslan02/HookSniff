@@ -343,6 +343,15 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['endpoint_id'] === null) {
+            $invalidProperties[] = "'endpoint_id' can't be null";
+        }
+        if ($this->container['status'] === null) {
+            $invalidProperties[] = "'status' can't be null";
+        }
         $allowedValues = $this->getStatusAllowableValues();
         if (!is_null($this->container['status']) && !in_array($this->container['status'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -352,6 +361,15 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
             );
         }
 
+        if ($this->container['attempt_count'] === null) {
+            $invalidProperties[] = "'attempt_count' can't be null";
+        }
+        if ($this->container['replay_count'] === null) {
+            $invalidProperties[] = "'replay_count' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -370,7 +388,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -380,7 +398,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -397,7 +415,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets endpoint_id
      *
-     * @return string|null
+     * @return string
      */
     public function getEndpointId()
     {
@@ -407,7 +425,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets endpoint_id
      *
-     * @param string|null $endpoint_id endpoint_id
+     * @param string $endpoint_id endpoint_id
      *
      * @return self
      */
@@ -458,7 +476,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets status
      *
-     * @return string|null
+     * @return string
      */
     public function getStatus()
     {
@@ -468,7 +486,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets status
      *
-     * @param string|null $status status
+     * @param string $status status
      *
      * @return self
      */
@@ -495,7 +513,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets attempt_count
      *
-     * @return int|null
+     * @return int
      */
     public function getAttemptCount()
     {
@@ -505,7 +523,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets attempt_count
      *
-     * @param int|null $attempt_count attempt_count
+     * @param int $attempt_count attempt_count
      *
      * @return self
      */
@@ -556,7 +574,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets replay_count
      *
-     * @return int|null
+     * @return int
      */
     public function getReplayCount()
     {
@@ -566,7 +584,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets replay_count
      *
-     * @param int|null $replay_count replay_count
+     * @param int $replay_count replay_count
      *
      * @return self
      */
@@ -583,7 +601,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return \DateTime|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -593,7 +611,7 @@ class Delivery implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param \DateTime|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */

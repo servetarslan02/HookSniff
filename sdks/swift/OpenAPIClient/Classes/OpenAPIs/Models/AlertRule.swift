@@ -22,15 +22,15 @@ public struct AlertRule: Codable, JSONEncodable, Hashable {
         case email = "email"
         case webhook = "webhook"
     }
-    public var id: UUID?
-    public var name: String?
-    public var condition: Condition?
-    public var threshold: Int?
-    public var channels: [Channels]?
-    public var isActive: Bool?
-    public var createdAt: String?
+    public var id: UUID
+    public var name: String
+    public var condition: Condition
+    public var threshold: Int
+    public var channels: [Channels]
+    public var isActive: Bool
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, name: String? = nil, condition: Condition? = nil, threshold: Int? = nil, channels: [Channels]? = nil, isActive: Bool? = nil, createdAt: String? = nil) {
+    public init(id: UUID, name: String, condition: Condition, threshold: Int, channels: [Channels], isActive: Bool, createdAt: Date) {
         self.id = id
         self.name = name
         self.condition = condition
@@ -54,13 +54,13 @@ public struct AlertRule: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(name, forKey: .name)
-        try container.encodeIfPresent(condition, forKey: .condition)
-        try container.encodeIfPresent(threshold, forKey: .threshold)
-        try container.encodeIfPresent(channels, forKey: .channels)
-        try container.encodeIfPresent(isActive, forKey: .isActive)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(condition, forKey: .condition)
+        try container.encode(threshold, forKey: .threshold)
+        try container.encode(channels, forKey: .channels)
+        try container.encode(isActive, forKey: .isActive)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

@@ -30,13 +30,13 @@ class TransformRule(BaseModel):
     """
     TransformRule
     """ # noqa: E501
-    id: Optional[UUID] = None
-    endpoint_id: Optional[UUID] = None
-    name: Optional[StrictStr] = None
-    rule_type: Optional[StrictStr] = None
+    id: UUID
+    endpoint_id: UUID
+    name: StrictStr
+    rule_type: StrictStr
     config: Optional[Dict[str, Any]] = None
-    is_active: Optional[StrictBool] = None
-    created_at: Optional[datetime] = None
+    is_active: StrictBool
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "endpoint_id", "name", "rule_type", "config", "is_active", "created_at"]
 
     model_config = ConfigDict(

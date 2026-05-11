@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,8 +28,8 @@ class OutboundIpsResponse(BaseModel):
     """
     OutboundIpsResponse
     """ # noqa: E501
-    ips: Optional[List[StrictStr]] = None
-    updated_at: Optional[StrictStr] = None
+    ips: List[StrictStr]
+    updated_at: StrictStr
     __properties: ClassVar[List[str]] = ["ips", "updated_at"]
 
     model_config = ConfigDict(

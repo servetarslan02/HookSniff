@@ -1,4 +1,4 @@
-# HookSniff.Model.OAuthProvider
+# HookSniff.Sdk.Model.OAuthProvider
 An available OAuth identity provider
 
 ## Properties

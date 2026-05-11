@@ -1,4 +1,4 @@
-# HookSniff::DeliveryDetailsApi
+# HooksniffSdk::DeliveryDetailsApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -18,21 +18,21 @@ Get specific attempt detail
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::DeliveryDetailsApi.new
+api_instance = HooksniffSdk::DeliveryDetailsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 attempt_id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get specific attempt detail
   api_instance.webhooks_id_attempts_attempt_id_get(id, attempt_id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling DeliveryDetailsApi->webhooks_id_attempts_attempt_id_get: #{e}"
 end
 ```
@@ -50,7 +50,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling DeliveryDetailsApi->webhooks_id_attempts_attempt_id_get_with_http_info: #{e}"
 end
 ```
@@ -86,20 +86,20 @@ Get detailed delivery info
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::DeliveryDetailsApi.new
+api_instance = HooksniffSdk::DeliveryDetailsApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get detailed delivery info
   api_instance.webhooks_id_details_get(id)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling DeliveryDetailsApi->webhooks_id_details_get: #{e}"
 end
 ```
@@ -117,7 +117,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling DeliveryDetailsApi->webhooks_id_details_get_with_http_info: #{e}"
 end
 ```

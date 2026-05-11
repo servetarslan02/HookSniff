@@ -30,12 +30,12 @@ class UserSummary(BaseModel):
     """
     UserSummary
     """ # noqa: E501
-    id: Optional[UUID] = None
-    email: Optional[StrictStr] = None
+    id: UUID
+    email: StrictStr
     name: Optional[StrictStr] = None
-    plan: Optional[StrictStr] = None
-    is_active: Optional[StrictBool] = None
-    created_at: Optional[datetime] = None
+    plan: StrictStr
+    is_active: StrictBool
+    created_at: datetime
     __properties: ClassVar[List[str]] = ["id", "email", "name", "plan", "is_active", "created_at"]
 
     model_config = ConfigDict(

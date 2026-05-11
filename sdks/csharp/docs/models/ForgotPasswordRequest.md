@@ -1,4 +1,4 @@
-# HookSniff.Model.ForgotPasswordRequest
+# HookSniff.Sdk.Model.ForgotPasswordRequest
 
 ## Properties
 

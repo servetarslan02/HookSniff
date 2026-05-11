@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**endpoint_id** | **UUID** |  | [optional] 
-**routing_strategy** | **str** |  | [optional] 
+**endpoint_id** | **UUID** |  | 
+**routing_strategy** | **str** |  | 
 **fallback_url** | **str** |  | [optional] 
-**avg_response_ms** | **int** |  | [optional] 
-**failure_streak** | **int** |  | [optional] 
-**is_healthy** | **bool** |  | [optional] 
+**avg_response_ms** | **int** |  | 
+**failure_streak** | **int** |  | 
+**is_healthy** | **bool** |  | 
 
 ## Example
 

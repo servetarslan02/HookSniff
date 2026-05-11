@@ -5,15 +5,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**email** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**email** | **str** |  | 
 **name** | **str** |  | [optional] 
 **api_key** | **str** | Only returned on registration | [optional] 
-**plan** | **str** |  | [optional] 
-**webhook_limit** | **int** |  | [optional] 
-**webhook_count** | **int** |  | [optional] 
-**is_admin** | **bool** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**plan** | **str** |  | 
+**webhook_limit** | **int** |  | 
+**webhook_count** | **int** |  | 
+**is_admin** | **bool** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 

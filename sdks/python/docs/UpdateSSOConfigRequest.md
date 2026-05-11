@@ -6,8 +6,8 @@ Update an SSO configuration (all fields optional)
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**provider** | **str** |  | [optional] 
-**domain** | **str** |  | [optional] 
+**provider** | **str** |  | 
+**domain** | **str** |  | 
 
 ## Example
 

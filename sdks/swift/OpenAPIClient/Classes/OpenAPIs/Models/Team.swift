@@ -12,11 +12,11 @@ import AnyCodable
 
 public struct Team: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var name: String?
-    public var createdAt: Date?
+    public var id: UUID
+    public var name: String
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, name: String? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, name: String, createdAt: Date) {
         self.id = id
         self.name = name
         self.createdAt = createdAt
@@ -32,9 +32,9 @@ public struct Team: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(name, forKey: .name)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

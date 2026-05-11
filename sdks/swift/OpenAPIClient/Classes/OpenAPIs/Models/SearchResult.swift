@@ -12,10 +12,10 @@ import AnyCodable
 
 public struct SearchResult: Codable, JSONEncodable, Hashable {
 
-    public var deliveries: [Delivery]?
-    public var total: Int?
+    public var deliveries: [Delivery]
+    public var total: Int
 
-    public init(deliveries: [Delivery]? = nil, total: Int? = nil) {
+    public init(deliveries: [Delivery], total: Int) {
         self.deliveries = deliveries
         self.total = total
     }
@@ -29,8 +29,8 @@ public struct SearchResult: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(deliveries, forKey: .deliveries)
-        try container.encodeIfPresent(total, forKey: .total)
+        try container.encode(deliveries, forKey: .deliveries)
+        try container.encode(total, forKey: .total)
     }
 }
 

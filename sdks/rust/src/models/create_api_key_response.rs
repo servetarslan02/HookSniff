@@ -13,24 +13,24 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CreateApiKeyResponse {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
     /// Full API key — only shown once
-    #[serde(rename = "key", skip_serializing_if = "Option::is_none")]
-    pub key: Option<String>,
-    #[serde(rename = "prefix", skip_serializing_if = "Option::is_none")]
-    pub prefix: Option<String>,
-    #[serde(rename = "message", skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
+    #[serde(rename = "key")]
+    pub key: String,
+    #[serde(rename = "prefix")]
+    pub prefix: String,
+    #[serde(rename = "message")]
+    pub message: String,
 }
 
 impl CreateApiKeyResponse {
-    pub fn new() -> CreateApiKeyResponse {
+    pub fn new(id: uuid::Uuid, key: String, prefix: String, message: String) -> CreateApiKeyResponse {
         CreateApiKeyResponse {
-            id: None,
-            key: None,
-            prefix: None,
-            message: None,
+            id,
+            key,
+            prefix,
+            message,
         }
     }
 }

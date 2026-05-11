@@ -1,4 +1,4 @@
-# HookSniff.Api.HealthApi
+# HookSniff.Sdk.Api.HealthApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 

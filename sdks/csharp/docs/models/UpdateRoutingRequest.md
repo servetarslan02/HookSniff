@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateRoutingRequest
+# HookSniff.Sdk.Model.UpdateRoutingRequest
 
 ## Properties
 

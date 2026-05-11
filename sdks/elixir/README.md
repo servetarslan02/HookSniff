@@ -1,57 +1,47 @@
-# HookSniff Elixir SDK
+# HookSniffAPI
 
-[![Hex.pm](https://img.shields.io/hexpm/v/hooksniff.svg)](https://hex.pm/packages/hooksniff)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+Webhook delivery, monitoring, and management API. All endpoints under &#x60;/v1&#x60; require authentication via &#x60;Authorization: Bearer &lt;api_key&gt;&#x60; header unless marked as **Public**. 
 
-Official Elixir client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
+## Building
+
+To install the required dependencies and to build the elixir project, run:
+
+```console
+mix local.hex --force
+mix do deps.get, compile
+```
 
 ## Installation
 
-Add `hooksniff` to your `mix.exs`:
+If [available in Hex][], the package can be installed by adding `hooksniff` to
+your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [
-    {:hooksniff, "~> 0.3.0"}
-  ]
+  [{:hooksniff, "~> 1.0.0"}]
 end
 ```
 
-Then run:
+Documentation can be generated with [ExDoc][] and published on [HexDocs][]. Once published, the docs can be found at
+[https://hexdocs.pm/hooksniff][docs].
 
-```bash
-mix deps.get
-```
+## Configuration
 
-## Quick Start
+You can override the URL of your server (e.g. if you have a separate development and production server in your
+configuration files).
 
 ```elixir
-# Configure
-config = %HookSniffAPI.Configuration{
-  base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1",
-  api_key: %{"Authorization" => "Bearer hr_live_your_api_key_here"}
-}
-
-# Create an endpoint
-{:ok, endpoint} = HookSniffAPI.EndpointsApi.endpoints_post(config, %{
-  url: "https://myapp.com/webhook",
-  description: "Order notifications"
-})
-IO.puts("Endpoint created: #{endpoint.id}")
-
-# Send a webhook
-{:ok, delivery} = HookSniffAPI.WebhooksApi.webhooks_post(config, %{
-  endpoint_id: endpoint.id,
-  event: "order.created",
-  data: %{order_id: "12345"}
-})
-IO.puts("Delivery: #{delivery.id}")
+config :hooksniff, base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
 ```
 
-## Available API Modules
+Multiple clients for the same API with different URLs can be created passing different `base_url`s when calling
+`HookSniffAPI.Connection.new/1`:
 
-`EndpointsApi`, `WebhooksApi`, `AuthApi`, `APIKeysApi`, `AlertsApi`, `AnalyticsApi`, `BillingApi`, `TeamsApi`, `NotificationsApi`, `SchemasApi`, `SearchApi`, `HealthApi`, `AdminApi`, `AuditLogApi`, `InboundApi`, `TemplatesApi`, `RoutingApi`, `RateLimitsApi`, `CustomDomainsApi`, `CustomerPortalApi`, `DeliveryDetailsApi`, `DevicesApi`, `EmbedApi`, `EventsApi`, `OAuthApi`, `OutboundIPsApi`, `PlaygroundApi`, `SimulatorApi`, `SsoApi`, `StatsApi`, `StreamApi`, `TransformsApi`, `ContactApi`
+```elixir
+client = HookSniffAPI.Connection.new(base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
+```
 
-## License
-
-MIT
+[exdoc]: https://github.com/elixir-lang/ex_doc
+[hexdocs]: https://hexdocs.pm
+[available in hex]: https://hex.pm/docs/publish
+[docs]: https://hexdocs.pm/hooksniff

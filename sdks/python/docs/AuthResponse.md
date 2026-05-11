@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**token** | **str** | JWT access token | [optional] 
-**customer** | [**CustomerResponse**](CustomerResponse.md) |  | [optional] 
+**token** | **str** | JWT access token | 
+**customer** | [**CustomerResponse**](CustomerResponse.md) |  | 
 **refresh_token** | **str** | Refresh token (when applicable) | [optional] 
 
 ## Example

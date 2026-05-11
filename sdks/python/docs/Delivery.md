@@ -5,14 +5,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**endpoint_id** | **UUID** |  | [optional] 
+**id** | **UUID** |  | 
+**endpoint_id** | **UUID** |  | 
 **event** | **str** |  | [optional] 
-**status** | **str** |  | [optional] 
-**attempt_count** | **int** |  | [optional] 
+**status** | **str** |  | 
+**attempt_count** | **int** |  | 
 **response_status** | **int** |  | [optional] 
-**replay_count** | **int** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**replay_count** | **int** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 

@@ -5,13 +5,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**attempt_number** | **int** |  | [optional] 
+**id** | **UUID** |  | 
+**attempt_number** | **int** |  | 
 **status_code** | **int** |  | [optional] 
 **response_body** | **str** |  | [optional] 
 **duration_ms** | **int** |  | [optional] 
 **error_message** | **str** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**created_at** | **datetime** |  | 
 
 ## Example
 

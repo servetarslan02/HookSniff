@@ -1,4 +1,4 @@
-# HookSniff::PaginatedUsers
+# HooksniffSdk::PaginatedUsers
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::PaginatedUsers.new(
+instance = HooksniffSdk::PaginatedUsers.new(
   users: null,
   total: null,
   page: null,

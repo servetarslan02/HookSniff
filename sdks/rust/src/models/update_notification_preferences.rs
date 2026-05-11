@@ -13,12 +13,12 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UpdateNotificationPreferences {
-    #[serde(rename = "email_on_failure", skip_serializing_if = "Option::is_none")]
-    pub email_on_failure: Option<bool>,
-    #[serde(rename = "email_on_dead_letter", skip_serializing_if = "Option::is_none")]
-    pub email_on_dead_letter: Option<bool>,
-    #[serde(rename = "email_on_success", skip_serializing_if = "Option::is_none")]
-    pub email_on_success: Option<bool>,
+    #[serde(rename = "email_on_failure")]
+    pub email_on_failure: bool,
+    #[serde(rename = "email_on_dead_letter")]
+    pub email_on_dead_letter: bool,
+    #[serde(rename = "email_on_success")]
+    pub email_on_success: bool,
     #[serde(rename = "slack_webhook_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub slack_webhook_url: Option<Option<String>>,
     #[serde(rename = "discord_webhook_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
@@ -28,11 +28,11 @@ pub struct UpdateNotificationPreferences {
 }
 
 impl UpdateNotificationPreferences {
-    pub fn new() -> UpdateNotificationPreferences {
+    pub fn new(email_on_failure: bool, email_on_dead_letter: bool, email_on_success: bool) -> UpdateNotificationPreferences {
         UpdateNotificationPreferences {
-            email_on_failure: None,
-            email_on_dead_letter: None,
-            email_on_success: None,
+            email_on_failure,
+            email_on_dead_letter,
+            email_on_success,
             slack_webhook_url: None,
             discord_webhook_url: None,
             webhook_url: None,

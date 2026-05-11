@@ -1,4 +1,4 @@
-# HookSniff::Endpoint
+# HooksniffSdk::Endpoint
 
 ## Properties
 
@@ -22,9 +22,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::Endpoint.new(
+instance = HooksniffSdk::Endpoint.new(
   id: null,
   url: null,
   description: null,

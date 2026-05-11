@@ -32,8 +32,8 @@ Confirm 2FA setup with a code
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val confirm2faRequest : Confirm2faRequest =  // Confirm2faRequest | 
@@ -77,8 +77,8 @@ Disable 2FA
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val disable2faRequest : Disable2faRequest =  // Disable2faRequest | 
@@ -122,8 +122,8 @@ Enable 2FA (returns TOTP secret and QR URL)
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val enable2faRequest : Enable2faRequest =  // Enable2faRequest | 
@@ -168,8 +168,8 @@ Verify 2FA code during login
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val verify2faRequest : Verify2faRequest =  // Verify2faRequest | 
@@ -212,8 +212,8 @@ Delete account (GDPR)
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 try {
@@ -254,8 +254,8 @@ Export user data (GDPR)
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 try {
@@ -296,8 +296,8 @@ Request password reset email
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val forgotPasswordRequest : ForgotPasswordRequest =  // ForgotPasswordRequest | 
@@ -339,8 +339,8 @@ Login with email and password
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val loginRequest : LoginRequest =  // LoginRequest | 
@@ -383,8 +383,8 @@ Logout (invalidate refresh token)
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 try {
@@ -425,8 +425,8 @@ Get current user profile
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 try {
@@ -468,8 +468,8 @@ Change password
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val changePasswordRequest : ChangePasswordRequest =  // ChangePasswordRequest | 
@@ -513,8 +513,8 @@ Update profile
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val updateProfileRequest : UpdateProfileRequest =  // UpdateProfileRequest | 
@@ -559,8 +559,8 @@ Refresh access token
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val refreshTokenRequest : RefreshTokenRequest =  // RefreshTokenRequest | 
@@ -603,8 +603,8 @@ Register a new account
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val registerRequest : RegisterRequest =  // RegisterRequest | 
@@ -647,8 +647,8 @@ Resend verification email
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val resendVerificationRequest : ResendVerificationRequest =  // ResendVerificationRequest | 
@@ -690,8 +690,8 @@ Reset password with token
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val resetPasswordRequest : ResetPasswordRequest =  // ResetPasswordRequest | 
@@ -733,8 +733,8 @@ Verify email address
 ### Example
 ```kotlin
 // Import classes:
-//import hooksniff.infrastructure.*
-//import hooksniff.models.*
+//import hooksniff.sdk.infrastructure.*
+//import hooksniff.sdk.models.*
 
 val apiInstance = AuthApi()
 val verifyEmailRequest : VerifyEmailRequest =  // VerifyEmailRequest | 

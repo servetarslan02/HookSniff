@@ -1,4 +1,4 @@
-# HookSniff.Model.CustomDomainsPostRequest
+# HookSniff.Sdk.Model.CustomDomainsPostRequest
 
 ## Properties
 

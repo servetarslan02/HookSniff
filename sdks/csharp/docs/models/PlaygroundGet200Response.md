@@ -1,4 +1,4 @@
-# HookSniff.Model.PlaygroundGet200Response
+# HookSniff.Sdk.Model.PlaygroundGet200Response
 
 ## Properties
 

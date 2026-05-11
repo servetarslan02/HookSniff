@@ -1,4 +1,4 @@
-# HookSniff::HealthApi
+# HooksniffSdk::HealthApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -19,20 +19,20 @@ List endpoint health statuses
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::HealthApi.new
+api_instance = HooksniffSdk::HealthApi.new
 
 begin
   # List endpoint health statuses
   result = api_instance.endpoint_health_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling HealthApi->endpoint_health_get: #{e}"
 end
 ```
@@ -50,7 +50,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Array<EndpointHealth>>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling HealthApi->endpoint_health_get_with_http_info: #{e}"
 end
 ```
@@ -83,21 +83,21 @@ Get specific endpoint health
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::HealthApi.new
+api_instance = HooksniffSdk::HealthApi.new
 id = '38400000-8cf0-11bd-b23e-10b96e4ef00d' # String | 
 
 begin
   # Get specific endpoint health
   result = api_instance.endpoint_health_id_get(id)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling HealthApi->endpoint_health_id_get: #{e}"
 end
 ```
@@ -115,7 +115,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <EndpointHealth>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling HealthApi->endpoint_health_id_get_with_http_info: #{e}"
 end
 ```
@@ -150,15 +150,15 @@ System status (public)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::HealthApi.new
+api_instance = HooksniffSdk::HealthApi.new
 
 begin
   # System status (public)
   result = api_instance.status_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling HealthApi->status_get: #{e}"
 end
 ```
@@ -176,7 +176,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <SystemStatus>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling HealthApi->status_get_with_http_info: #{e}"
 end
 ```

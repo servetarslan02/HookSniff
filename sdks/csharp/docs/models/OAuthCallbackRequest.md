@@ -1,4 +1,4 @@
-# HookSniff.Model.OAuthCallbackRequest
+# HookSniff.Sdk.Model.OAuthCallbackRequest
 OAuth authorization callback parameters
 
 ## Properties

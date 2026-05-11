@@ -1,4 +1,4 @@
-# HookSniff::Error
+# HooksniffSdk::Error
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::Error.new(
+instance = HooksniffSdk::Error.new(
   error: null
 )
 ```

@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -28,7 +28,7 @@ class LogoutRequest(BaseModel):
     """
     Optional request body for explicit refresh token invalidation
     """ # noqa: E501
-    refresh_token: Optional[StrictStr] = Field(default=None, description="Refresh token to invalidate")
+    refresh_token: StrictStr = Field(description="Refresh token to invalidate")
     __properties: ClassVar[List[str]] = ["refresh_token"]
 
     model_config = ConfigDict(

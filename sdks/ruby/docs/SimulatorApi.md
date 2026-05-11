@@ -1,4 +1,4 @@
-# HookSniff::SimulatorApi
+# HooksniffSdk::SimulatorApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -17,22 +17,22 @@ Simulate a webhook delivery
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::SimulatorApi.new
+api_instance = HooksniffSdk::SimulatorApi.new
 opts = {
-  simulator_post_request: HookSniff::SimulatorPostRequest.new # SimulatorPostRequest | 
+  simulator_post_request: HooksniffSdk::SimulatorPostRequest.new # SimulatorPostRequest | 
 }
 
 begin
   # Simulate a webhook delivery
   api_instance.simulator_post(opts)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SimulatorApi->simulator_post: #{e}"
 end
 ```
@@ -50,7 +50,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SimulatorApi->simulator_post_with_http_info: #{e}"
 end
 ```

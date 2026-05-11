@@ -13,17 +13,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct BatchResponse {
-    #[serde(rename = "deliveries", skip_serializing_if = "Option::is_none")]
-    pub deliveries: Option<Vec<models::Delivery>>,
-    #[serde(rename = "errors", skip_serializing_if = "Option::is_none")]
-    pub errors: Option<Vec<models::BatchResponseErrorsInner>>,
+    #[serde(rename = "deliveries")]
+    pub deliveries: Vec<models::Delivery>,
+    #[serde(rename = "errors")]
+    pub errors: Vec<models::BatchResponseErrorsInner>,
 }
 
 impl BatchResponse {
-    pub fn new() -> BatchResponse {
+    pub fn new(deliveries: Vec<models::Delivery>, errors: Vec<models::BatchResponseErrorsInner>) -> BatchResponse {
         BatchResponse {
-            deliveries: None,
-            errors: None,
+            deliveries,
+            errors,
         }
     }
 }

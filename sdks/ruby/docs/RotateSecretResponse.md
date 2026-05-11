@@ -1,4 +1,4 @@
-# HookSniff::RotateSecretResponse
+# HooksniffSdk::RotateSecretResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::RotateSecretResponse.new(
+instance = HooksniffSdk::RotateSecretResponse.new(
   secret: null
 )
 ```

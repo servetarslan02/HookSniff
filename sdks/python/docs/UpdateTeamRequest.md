@@ -6,8 +6,8 @@ Fields to update on a team (all optional)
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **str** |  | [optional] 
-**description** | **str** |  | [optional] 
+**name** | **str** |  | 
+**description** | **str** |  | 
 
 ## Example
 

@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateSubscriptionRequest
+# HookSniff.Sdk.Model.UpdateSubscriptionRequest
 Request to change subscription plan
 
 ## Properties

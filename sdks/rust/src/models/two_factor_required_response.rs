@@ -13,20 +13,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TwoFactorRequiredResponse {
-    #[serde(rename = "requires_2fa", skip_serializing_if = "Option::is_none")]
-    pub requires_2fa: Option<bool>,
-    #[serde(rename = "temp_token", skip_serializing_if = "Option::is_none")]
-    pub temp_token: Option<String>,
-    #[serde(rename = "message", skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
+    #[serde(rename = "requires_2fa")]
+    pub requires_2fa: bool,
+    #[serde(rename = "temp_token")]
+    pub temp_token: String,
+    #[serde(rename = "message")]
+    pub message: String,
 }
 
 impl TwoFactorRequiredResponse {
-    pub fn new() -> TwoFactorRequiredResponse {
+    pub fn new(requires_2fa: bool, temp_token: String, message: String) -> TwoFactorRequiredResponse {
         TwoFactorRequiredResponse {
-            requires_2fa: None,
-            temp_token: None,
-            message: None,
+            requires_2fa,
+            temp_token,
+            message,
         }
     }
 }

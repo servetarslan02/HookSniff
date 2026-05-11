@@ -1,4 +1,4 @@
-# HookSniff.Model.SearchResult
+# HookSniff.Sdk.Model.SearchResult
 
 ## Properties
 

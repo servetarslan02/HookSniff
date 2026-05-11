@@ -1,4 +1,4 @@
-# HookSniff.Model.TeamListResponse
+# HookSniff.Sdk.Model.TeamListResponse
 Paginated list of teams
 
 ## Properties

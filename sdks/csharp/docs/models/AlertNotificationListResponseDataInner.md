@@ -1,4 +1,4 @@
-# HookSniff.Model.AlertNotificationListResponseDataInner
+# HookSniff.Sdk.Model.AlertNotificationListResponseDataInner
 Alert notification entry
 
 ## Properties

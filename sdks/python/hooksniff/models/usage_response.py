@@ -20,7 +20,7 @@ import json
 
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 from pydantic_core import to_jsonable_python
@@ -29,13 +29,13 @@ class UsageResponse(BaseModel):
     """
     UsageResponse
     """ # noqa: E501
-    plan: Optional[StrictStr] = None
-    period_start: Optional[datetime] = None
-    period_end: Optional[datetime] = None
-    webhooks_used: Optional[StrictInt] = None
-    webhooks_limit: Optional[StrictInt] = None
-    endpoints_used: Optional[StrictInt] = None
-    endpoints_limit: Optional[StrictInt] = None
+    plan: StrictStr
+    period_start: datetime
+    period_end: datetime
+    webhooks_used: StrictInt
+    webhooks_limit: StrictInt
+    endpoints_used: StrictInt
+    endpoints_limit: StrictInt
     __properties: ClassVar[List[str]] = ["plan", "period_start", "period_end", "webhooks_used", "webhooks_limit", "endpoints_used", "endpoints_limit"]
 
     model_config = ConfigDict(

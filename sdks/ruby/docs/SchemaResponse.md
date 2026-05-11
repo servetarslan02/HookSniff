@@ -1,4 +1,4 @@
-# HookSniff::SchemaResponse
+# HooksniffSdk::SchemaResponse
 
 ## Properties
 
@@ -13,9 +13,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::SchemaResponse.new(
+instance = HooksniffSdk::SchemaResponse.new(
   id: null,
   name: null,
   version: null,

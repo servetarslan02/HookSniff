@@ -12,12 +12,12 @@ import AnyCodable
 
 public struct TeamInvite: Codable, JSONEncodable, Hashable {
 
-    public var id: UUID?
-    public var email: String?
-    public var role: String?
-    public var createdAt: Date?
+    public var id: UUID
+    public var email: String
+    public var role: String
+    public var createdAt: Date
 
-    public init(id: UUID? = nil, email: String? = nil, role: String? = nil, createdAt: Date? = nil) {
+    public init(id: UUID, email: String, role: String, createdAt: Date) {
         self.id = id
         self.email = email
         self.role = role
@@ -35,10 +35,10 @@ public struct TeamInvite: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        try container.encodeIfPresent(email, forKey: .email)
-        try container.encodeIfPresent(role, forKey: .role)
-        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encode(id, forKey: .id)
+        try container.encode(email, forKey: .email)
+        try container.encode(role, forKey: .role)
+        try container.encode(createdAt, forKey: .createdAt)
     }
 }
 

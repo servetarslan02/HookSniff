@@ -17,12 +17,12 @@ public struct RetryPolicy: Codable, JSONEncodable, Hashable {
         case linear = "linear"
         case fixed = "fixed"
     }
-    public var maxAttempts: Int? = 3
-    public var backoff: Backoff? = .exponential
-    public var initialDelaySecs: Int? = 10
-    public var maxDelaySecs: Int? = 3600
+    public var maxAttempts: Int = 3
+    public var backoff: Backoff = .exponential
+    public var initialDelaySecs: Int = 10
+    public var maxDelaySecs: Int = 3600
 
-    public init(maxAttempts: Int? = 3, backoff: Backoff? = .exponential, initialDelaySecs: Int? = 10, maxDelaySecs: Int? = 3600) {
+    public init(maxAttempts: Int = 3, backoff: Backoff = .exponential, initialDelaySecs: Int = 10, maxDelaySecs: Int = 3600) {
         self.maxAttempts = maxAttempts
         self.backoff = backoff
         self.initialDelaySecs = initialDelaySecs
@@ -40,10 +40,10 @@ public struct RetryPolicy: Codable, JSONEncodable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(maxAttempts, forKey: .maxAttempts)
-        try container.encodeIfPresent(backoff, forKey: .backoff)
-        try container.encodeIfPresent(initialDelaySecs, forKey: .initialDelaySecs)
-        try container.encodeIfPresent(maxDelaySecs, forKey: .maxDelaySecs)
+        try container.encode(maxAttempts, forKey: .maxAttempts)
+        try container.encode(backoff, forKey: .backoff)
+        try container.encode(initialDelaySecs, forKey: .initialDelaySecs)
+        try container.encode(maxDelaySecs, forKey: .maxDelaySecs)
     }
 }
 

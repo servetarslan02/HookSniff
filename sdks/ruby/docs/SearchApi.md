@@ -1,4 +1,4 @@
-# HookSniff::SearchApi
+# HooksniffSdk::SearchApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -17,14 +17,14 @@ Search deliveries
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::SearchApi.new
+api_instance = HooksniffSdk::SearchApi.new
 q = 'q_example' # String | 
 opts = {
   status: 'status_example', # String | 
@@ -37,7 +37,7 @@ begin
   # Search deliveries
   result = api_instance.search_get(q, opts)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SearchApi->search_get: #{e}"
 end
 ```
@@ -55,7 +55,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <SearchResult>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling SearchApi->search_get_with_http_info: #{e}"
 end
 ```

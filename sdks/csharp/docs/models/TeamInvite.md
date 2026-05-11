@@ -1,4 +1,4 @@
-# HookSniff.Model.TeamInvite
+# HookSniff.Sdk.Model.TeamInvite
 
 ## Properties
 

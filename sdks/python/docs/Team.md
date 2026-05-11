@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**name** | **str** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**id** | **UUID** |  | 
+**name** | **str** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 

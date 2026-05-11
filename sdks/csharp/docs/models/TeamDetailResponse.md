@@ -1,4 +1,4 @@
-# HookSniff.Model.TeamDetailResponse
+# HookSniff.Sdk.Model.TeamDetailResponse
 
 ## Properties
 

@@ -19,7 +19,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 from hooksniff.models.team import Team
 from hooksniff.models.team_invite import TeamInvite
 from hooksniff.models.team_member import TeamMember
@@ -31,9 +31,9 @@ class TeamDetailResponse(BaseModel):
     """
     TeamDetailResponse
     """ # noqa: E501
-    team: Optional[Team] = None
-    members: Optional[List[TeamMember]] = None
-    invites: Optional[List[TeamInvite]] = None
+    team: Team
+    members: List[TeamMember]
+    invites: List[TeamInvite]
     __properties: ClassVar[List[str]] = ["team", "members", "invites"]
 
     model_config = ConfigDict(

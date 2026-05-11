@@ -4,10 +4,10 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **id** | **kotlin.String** |  |  [optional] |
-| **name** | **kotlin.String** |  |  [optional] |
-| **description** | **kotlin.String** |  |  [optional] |
-| **category** | **kotlin.String** |  |  [optional] |
+| **id** | **kotlin.String** |  |  |
+| **name** | **kotlin.String** |  |  |
+| **description** | **kotlin.String** |  |  |
+| **category** | **kotlin.String** |  |  |
 | **payloadTemplate** | [**kotlin.Any**](.md) |  |  [optional] |
 
 

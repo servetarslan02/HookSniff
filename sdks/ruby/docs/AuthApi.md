@@ -1,4 +1,4 @@
-# HookSniff::AuthApi
+# HooksniffSdk::AuthApi
 
 All URIs are relative to *https://hooksniff-api-1046140057667.europe-west1.run.app/v1*
 
@@ -33,20 +33,20 @@ Confirm 2FA setup with a code
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
-confirm2fa_request = HookSniff::Confirm2faRequest.new({code: 'code_example'}) # Confirm2faRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+confirm2fa_request = HooksniffSdk::Confirm2faRequest.new({code: 'code_example'}) # Confirm2faRequest | 
 
 begin
   # Confirm 2FA setup with a code
   api_instance.auth2fa_confirm_post(confirm2fa_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_confirm_post: #{e}"
 end
 ```
@@ -64,7 +64,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_confirm_post_with_http_info: #{e}"
 end
 ```
@@ -99,20 +99,20 @@ Disable 2FA
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
-disable2fa_request = HookSniff::Disable2faRequest.new({password: 'password_example'}) # Disable2faRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+disable2fa_request = HooksniffSdk::Disable2faRequest.new({password: 'password_example'}) # Disable2faRequest | 
 
 begin
   # Disable 2FA
   api_instance.auth2fa_disable_post(disable2fa_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_disable_post: #{e}"
 end
 ```
@@ -130,7 +130,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_disable_post_with_http_info: #{e}"
 end
 ```
@@ -165,21 +165,21 @@ Enable 2FA (returns TOTP secret and QR URL)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
-enable2fa_request = HookSniff::Enable2faRequest.new({password: 'password_example'}) # Enable2faRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+enable2fa_request = HooksniffSdk::Enable2faRequest.new({password: 'password_example'}) # Enable2faRequest | 
 
 begin
   # Enable 2FA (returns TOTP secret and QR URL)
   result = api_instance.auth2fa_enable_post(enable2fa_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_enable_post: #{e}"
 end
 ```
@@ -197,7 +197,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <Auth2faEnablePost200Response>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_enable_post_with_http_info: #{e}"
 end
 ```
@@ -232,16 +232,16 @@ Verify 2FA code during login
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-verify2fa_request = HookSniff::Verify2faRequest.new({temp_token: 'temp_token_example', code: 'code_example'}) # Verify2faRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+verify2fa_request = HooksniffSdk::Verify2faRequest.new({temp_token: 'temp_token_example', code: 'code_example'}) # Verify2faRequest | 
 
 begin
   # Verify 2FA code during login
   result = api_instance.auth2fa_verify_post(verify2fa_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_verify_post: #{e}"
 end
 ```
@@ -259,7 +259,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <AuthResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth2fa_verify_post_with_http_info: #{e}"
 end
 ```
@@ -294,19 +294,19 @@ Delete account (GDPR)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
+api_instance = HooksniffSdk::AuthApi.new
 
 begin
   # Delete account (GDPR)
   api_instance.auth_account_delete
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_account_delete: #{e}"
 end
 ```
@@ -324,7 +324,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_account_delete_with_http_info: #{e}"
 end
 ```
@@ -357,19 +357,19 @@ Export user data (GDPR)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
+api_instance = HooksniffSdk::AuthApi.new
 
 begin
   # Export user data (GDPR)
   api_instance.auth_export_get
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_export_get: #{e}"
 end
 ```
@@ -387,7 +387,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_export_get_with_http_info: #{e}"
 end
 ```
@@ -420,15 +420,15 @@ Request password reset email
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-forgot_password_request = HookSniff::ForgotPasswordRequest.new({email: 'email_example'}) # ForgotPasswordRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+forgot_password_request = HooksniffSdk::ForgotPasswordRequest.new({email: 'email_example'}) # ForgotPasswordRequest | 
 
 begin
   # Request password reset email
   api_instance.auth_forgot_password_post(forgot_password_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_forgot_password_post: #{e}"
 end
 ```
@@ -446,7 +446,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_forgot_password_post_with_http_info: #{e}"
 end
 ```
@@ -481,16 +481,16 @@ Login with email and password
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-login_request = HookSniff::LoginRequest.new({email: 'email_example', password: 'password_example'}) # LoginRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+login_request = HooksniffSdk::LoginRequest.new({email: 'email_example', password: 'password_example'}) # LoginRequest | 
 
 begin
   # Login with email and password
   result = api_instance.auth_login_post(login_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_login_post: #{e}"
 end
 ```
@@ -508,7 +508,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <AuthLoginPost200Response>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_login_post_with_http_info: #{e}"
 end
 ```
@@ -543,19 +543,19 @@ Logout (invalidate refresh token)
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
+api_instance = HooksniffSdk::AuthApi.new
 
 begin
   # Logout (invalidate refresh token)
   api_instance.auth_logout_post
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_logout_post: #{e}"
 end
 ```
@@ -573,7 +573,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_logout_post_with_http_info: #{e}"
 end
 ```
@@ -606,20 +606,20 @@ Get current user profile
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
+api_instance = HooksniffSdk::AuthApi.new
 
 begin
   # Get current user profile
   result = api_instance.auth_me_get
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_me_get: #{e}"
 end
 ```
@@ -637,7 +637,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <CustomerResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_me_get_with_http_info: #{e}"
 end
 ```
@@ -670,20 +670,20 @@ Change password
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
-change_password_request = HookSniff::ChangePasswordRequest.new({current_password: 'current_password_example', new_password: 'new_password_example'}) # ChangePasswordRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+change_password_request = HooksniffSdk::ChangePasswordRequest.new({current_password: 'current_password_example', new_password: 'new_password_example'}) # ChangePasswordRequest | 
 
 begin
   # Change password
   api_instance.auth_password_put(change_password_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_password_put: #{e}"
 end
 ```
@@ -701,7 +701,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_password_put_with_http_info: #{e}"
 end
 ```
@@ -736,21 +736,21 @@ Update profile
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 # setup authorization
-HookSniff.configure do |config|
+HooksniffSdk.configure do |config|
   # Configure Bearer authorization: BearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
 end
 
-api_instance = HookSniff::AuthApi.new
-update_profile_request = HookSniff::UpdateProfileRequest.new({name: 'name_example', email: 'email_example'}) # UpdateProfileRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+update_profile_request = HooksniffSdk::UpdateProfileRequest.new({name: 'name_example', email: 'email_example'}) # UpdateProfileRequest | 
 
 begin
   # Update profile
   result = api_instance.auth_profile_put(update_profile_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_profile_put: #{e}"
 end
 ```
@@ -768,7 +768,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <CustomerResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_profile_put_with_http_info: #{e}"
 end
 ```
@@ -803,16 +803,16 @@ Refresh access token
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-refresh_token_request = HookSniff::RefreshTokenRequest.new({refresh_token: 'refresh_token_example'}) # RefreshTokenRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+refresh_token_request = HooksniffSdk::RefreshTokenRequest.new({refresh_token: 'refresh_token_example'}) # RefreshTokenRequest | 
 
 begin
   # Refresh access token
   result = api_instance.auth_refresh_post(refresh_token_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_refresh_post: #{e}"
 end
 ```
@@ -830,7 +830,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <AuthResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_refresh_post_with_http_info: #{e}"
 end
 ```
@@ -865,16 +865,16 @@ Register a new account
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-register_request = HookSniff::RegisterRequest.new({email: 'email_example'}) # RegisterRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+register_request = HooksniffSdk::RegisterRequest.new({email: 'email_example'}) # RegisterRequest | 
 
 begin
   # Register a new account
   result = api_instance.auth_register_post(register_request)
   p result
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_register_post: #{e}"
 end
 ```
@@ -892,7 +892,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <CustomerResponse>
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_register_post_with_http_info: #{e}"
 end
 ```
@@ -927,15 +927,15 @@ Resend verification email
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-resend_verification_request = HookSniff::ResendVerificationRequest.new({email: 'email_example'}) # ResendVerificationRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+resend_verification_request = HooksniffSdk::ResendVerificationRequest.new({email: 'email_example'}) # ResendVerificationRequest | 
 
 begin
   # Resend verification email
   api_instance.auth_resend_verification_post(resend_verification_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_resend_verification_post: #{e}"
 end
 ```
@@ -953,7 +953,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_resend_verification_post_with_http_info: #{e}"
 end
 ```
@@ -988,15 +988,15 @@ Reset password with token
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-reset_password_request = HookSniff::ResetPasswordRequest.new({token: 'token_example', new_password: 'new_password_example'}) # ResetPasswordRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+reset_password_request = HooksniffSdk::ResetPasswordRequest.new({token: 'token_example', new_password: 'new_password_example'}) # ResetPasswordRequest | 
 
 begin
   # Reset password with token
   api_instance.auth_reset_password_post(reset_password_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_reset_password_post: #{e}"
 end
 ```
@@ -1014,7 +1014,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_reset_password_post_with_http_info: #{e}"
 end
 ```
@@ -1049,15 +1049,15 @@ Verify email address
 
 ```ruby
 require 'time'
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-api_instance = HookSniff::AuthApi.new
-verify_email_request = HookSniff::VerifyEmailRequest.new({token: 'token_example'}) # VerifyEmailRequest | 
+api_instance = HooksniffSdk::AuthApi.new
+verify_email_request = HooksniffSdk::VerifyEmailRequest.new({token: 'token_example'}) # VerifyEmailRequest | 
 
 begin
   # Verify email address
   api_instance.auth_verify_email_post(verify_email_request)
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_verify_email_post: #{e}"
 end
 ```
@@ -1075,7 +1075,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => nil
-rescue HookSniff::ApiError => e
+rescue HooksniffSdk::ApiError => e
   puts "Error when calling AuthApi->auth_verify_email_post_with_http_info: #{e}"
 end
 ```

@@ -1,4 +1,4 @@
-# HookSniff.Model.ContactResponse
+# HookSniff.Sdk.Model.ContactResponse
 
 ## Properties
 

@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.TestWebhookResponse do
   
   """
 
-  @derive Jason.Encoder
+  @derive JSON.Encoder
   defstruct [
     :success,
     :status_code,
@@ -15,10 +15,10 @@ defmodule HookSniffAPI.Model.TestWebhookResponse do
   ]
 
   @type t :: %__MODULE__{
-    :success => boolean() | nil,
-    :status_code => integer() | nil,
-    :duration_ms => integer() | nil,
-    :response_body => String.t | nil
+    :success => boolean(),
+    :status_code => integer(),
+    :duration_ms => integer(),
+    :response_body => String.t
   }
 
   def decode(value) do

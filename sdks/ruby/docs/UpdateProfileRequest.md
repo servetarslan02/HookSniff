@@ -1,4 +1,4 @@
-# HookSniff::UpdateProfileRequest
+# HooksniffSdk::UpdateProfileRequest
 
 ## Properties
 
@@ -10,9 +10,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::UpdateProfileRequest.new(
+instance = HooksniffSdk::UpdateProfileRequest.new(
   name: null,
   email: null
 )

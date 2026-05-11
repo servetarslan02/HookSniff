@@ -60,7 +60,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     protected static $openAPITypes = [
         'id' => 'string',
         'prefix' => 'string',
-        'created_at' => 'string',
+        'created_at' => '\DateTime',
         'last_used_at' => 'string',
         'is_active' => 'bool'
     ];
@@ -75,7 +75,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     protected static $openAPIFormats = [
         'id' => 'uuid',
         'prefix' => null,
-        'created_at' => null,
+        'created_at' => 'date-time',
         'last_used_at' => null,
         'is_active' => null
     ];
@@ -303,6 +303,18 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
+        if ($this->container['prefix'] === null) {
+            $invalidProperties[] = "'prefix' can't be null";
+        }
+        if ($this->container['created_at'] === null) {
+            $invalidProperties[] = "'created_at' can't be null";
+        }
+        if ($this->container['is_active'] === null) {
+            $invalidProperties[] = "'is_active' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -321,7 +333,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets id
      *
-     * @return string|null
+     * @return string
      */
     public function getId()
     {
@@ -331,7 +343,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param string|null $id id
+     * @param string $id id
      *
      * @return self
      */
@@ -348,7 +360,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets prefix
      *
-     * @return string|null
+     * @return string
      */
     public function getPrefix()
     {
@@ -358,7 +370,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets prefix
      *
-     * @param string|null $prefix Masked key prefix (e.g. \"hs_abc1...\")
+     * @param string $prefix Masked key prefix (e.g. \"hs_abc1...\")
      *
      * @return self
      */
@@ -375,7 +387,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets created_at
      *
-     * @return string|null
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -385,7 +397,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets created_at
      *
-     * @param string|null $created_at created_at
+     * @param \DateTime $created_at created_at
      *
      * @return self
      */
@@ -436,7 +448,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets is_active
      *
-     * @return bool|null
+     * @return bool
      */
     public function getIsActive()
     {
@@ -446,7 +458,7 @@ class ApiKeyInfo implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets is_active
      *
-     * @param bool|null $is_active is_active
+     * @param bool $is_active is_active
      *
      * @return self
      */

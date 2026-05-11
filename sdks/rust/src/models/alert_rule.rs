@@ -13,32 +13,32 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AlertRule {
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[serde(rename = "name", skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[serde(rename = "condition", skip_serializing_if = "Option::is_none")]
-    pub condition: Option<Condition>,
-    #[serde(rename = "threshold", skip_serializing_if = "Option::is_none")]
-    pub threshold: Option<i32>,
-    #[serde(rename = "channels", skip_serializing_if = "Option::is_none")]
-    pub channels: Option<Vec<Channels>>,
-    #[serde(rename = "is_active", skip_serializing_if = "Option::is_none")]
-    pub is_active: Option<bool>,
-    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<String>,
+    #[serde(rename = "id")]
+    pub id: uuid::Uuid,
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "condition")]
+    pub condition: Condition,
+    #[serde(rename = "threshold")]
+    pub threshold: i32,
+    #[serde(rename = "channels")]
+    pub channels: Vec<Channels>,
+    #[serde(rename = "is_active")]
+    pub is_active: bool,
+    #[serde(rename = "created_at")]
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 
 impl AlertRule {
-    pub fn new() -> AlertRule {
+    pub fn new(id: uuid::Uuid, name: String, condition: Condition, threshold: i32, channels: Vec<Channels>, is_active: bool, created_at: chrono::DateTime<chrono::FixedOffset>) -> AlertRule {
         AlertRule {
-            id: None,
-            name: None,
-            condition: None,
-            threshold: None,
-            channels: None,
-            is_active: None,
-            created_at: None,
+            id,
+            name,
+            condition,
+            threshold,
+            channels,
+            is_active,
+            created_at,
         }
     }
 }

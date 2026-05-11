@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **UUID** |  | [optional] 
-**email** | **str** |  | [optional] 
+**id** | **UUID** |  | 
+**email** | **str** |  | 
 **name** | **str** |  | [optional] 
-**plan** | **str** |  | [optional] 
-**is_active** | **bool** |  | [optional] 
-**created_at** | **datetime** |  | [optional] 
+**plan** | **str** |  | 
+**is_active** | **bool** |  | 
+**created_at** | **datetime** |  | 
 
 ## Example
 

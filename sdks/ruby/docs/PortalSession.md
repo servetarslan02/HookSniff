@@ -1,4 +1,4 @@
-# HookSniff::PortalSession
+# HooksniffSdk::PortalSession
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::PortalSession.new(
+instance = HooksniffSdk::PortalSession.new(
   token: null,
   expires_at: null,
   url: null

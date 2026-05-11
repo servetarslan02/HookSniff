@@ -1,4 +1,4 @@
-# HookSniff.Model.UpdateNotificationPreferences
+# HookSniff.Sdk.Model.UpdateNotificationPreferences
 
 ## Properties
 

@@ -1,4 +1,4 @@
-# HookSniff::AdminRevenueGet200ResponseInner
+# HooksniffSdk::AdminRevenueGet200ResponseInner
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::AdminRevenueGet200ResponseInner.new(
+instance = HooksniffSdk::AdminRevenueGet200ResponseInner.new(
   month: null,
   revenue_cents: null,
   subscriber_count: null

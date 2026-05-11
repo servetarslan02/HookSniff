@@ -308,6 +308,12 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['endpoint_id'] === null) {
+            $invalidProperties[] = "'endpoint_id' can't be null";
+        }
+        if ($this->container['status'] === null) {
+            $invalidProperties[] = "'status' can't be null";
+        }
         $allowedValues = $this->getStatusAllowableValues();
         if (!is_null($this->container['status']) && !in_array($this->container['status'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -317,6 +323,9 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
             );
         }
 
+        if ($this->container['limit'] === null) {
+            $invalidProperties[] = "'limit' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -335,7 +344,7 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets endpoint_id
      *
-     * @return string|null
+     * @return string
      */
     public function getEndpointId()
     {
@@ -345,7 +354,7 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets endpoint_id
      *
-     * @param string|null $endpoint_id endpoint_id
+     * @param string $endpoint_id endpoint_id
      *
      * @return self
      */
@@ -362,7 +371,7 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets status
      *
-     * @return string|null
+     * @return string
      */
     public function getStatus()
     {
@@ -372,7 +381,7 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets status
      *
-     * @param string|null $status status
+     * @param string $status status
      *
      * @return self
      */
@@ -399,7 +408,7 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets limit
      *
-     * @return int|null
+     * @return int
      */
     public function getLimit()
     {
@@ -409,7 +418,7 @@ class StreamParams implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets limit
      *
-     * @param int|null $limit limit
+     * @param int $limit limit
      *
      * @return self
      */

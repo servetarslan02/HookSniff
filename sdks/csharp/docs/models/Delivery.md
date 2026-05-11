@@ -1,4 +1,4 @@
-# HookSniff.Model.Delivery
+# HookSniff.Sdk.Model.Delivery
 
 ## Properties
 

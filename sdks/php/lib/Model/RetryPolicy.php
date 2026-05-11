@@ -313,6 +313,12 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['max_attempts'] === null) {
+            $invalidProperties[] = "'max_attempts' can't be null";
+        }
+        if ($this->container['backoff'] === null) {
+            $invalidProperties[] = "'backoff' can't be null";
+        }
         $allowedValues = $this->getBackoffAllowableValues();
         if (!is_null($this->container['backoff']) && !in_array($this->container['backoff'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -322,6 +328,12 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
             );
         }
 
+        if ($this->container['initial_delay_secs'] === null) {
+            $invalidProperties[] = "'initial_delay_secs' can't be null";
+        }
+        if ($this->container['max_delay_secs'] === null) {
+            $invalidProperties[] = "'max_delay_secs' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -340,7 +352,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets max_attempts
      *
-     * @return int|null
+     * @return int
      */
     public function getMaxAttempts()
     {
@@ -350,7 +362,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets max_attempts
      *
-     * @param int|null $max_attempts max_attempts
+     * @param int $max_attempts max_attempts
      *
      * @return self
      */
@@ -367,7 +379,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets backoff
      *
-     * @return string|null
+     * @return string
      */
     public function getBackoff()
     {
@@ -377,7 +389,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets backoff
      *
-     * @param string|null $backoff backoff
+     * @param string $backoff backoff
      *
      * @return self
      */
@@ -404,7 +416,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets initial_delay_secs
      *
-     * @return int|null
+     * @return int
      */
     public function getInitialDelaySecs()
     {
@@ -414,7 +426,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets initial_delay_secs
      *
-     * @param int|null $initial_delay_secs initial_delay_secs
+     * @param int $initial_delay_secs initial_delay_secs
      *
      * @return self
      */
@@ -431,7 +443,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets max_delay_secs
      *
-     * @return int|null
+     * @return int
      */
     public function getMaxDelaySecs()
     {
@@ -441,7 +453,7 @@ class RetryPolicy implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets max_delay_secs
      *
-     * @param int|null $max_delay_secs max_delay_secs
+     * @param int $max_delay_secs max_delay_secs
      *
      * @return self
      */

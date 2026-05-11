@@ -1,4 +1,4 @@
-# HookSniff::EndpointListResponse
+# HooksniffSdk::EndpointListResponse
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'hooksniff'
+require 'hooksniff-sdk'
 
-instance = HookSniff::EndpointListResponse.new(
+instance = HooksniffSdk::EndpointListResponse.new(
   data: null,
   total: null,
   has_more: null

@@ -1,4 +1,4 @@
-# HookSniff.Model.CancelSubscriptionRequest
+# HookSniff.Sdk.Model.CancelSubscriptionRequest
 Request to cancel current subscription
 
 ## Properties

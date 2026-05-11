@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**deliveries** | [**List[Delivery]**](Delivery.md) |  | [optional] 
-**total** | **int** |  | [optional] 
-**page** | **int** |  | [optional] 
-**per_page** | **int** |  | [optional] 
+**deliveries** | [**List[Delivery]**](Delivery.md) |  | 
+**total** | **int** |  | 
+**page** | **int** |  | 
+**per_page** | **int** |  | 
 
 ## Example
 
