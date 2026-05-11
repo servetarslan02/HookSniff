@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::audit_log;
 use crate::error::AppError;
 use crate::middleware::{generate_api_key, hash_api_key};
 use crate::models::customer::Customer;
@@ -82,6 +83,12 @@ async fn create_api_key(
 
     tracing::info!("🔑 New API key created for customer {}", customer.id);
 
+    // Audit log — API_KEY_CREATE
+    {
+        let kid = id.0.to_string();
+        let _ = audit_log!(pool, customer.id, "API_KEY_CREATE", "api_key", Some(&kid));
+    }
+
     Ok(Json(CreateApiKeyResponse {
         id: id.0,
         key: api_key,
@@ -103,6 +110,12 @@ async fn delete_api_key(
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
+    }
+
+    // Audit log — API_KEY_DELETE
+    {
+        let kid = id.to_string();
+        let _ = audit_log!(pool, customer.id, "API_KEY_DELETE", "api_key", Some(&kid));
     }
 
     Ok(Json(serde_json::json!({"deleted": true})))

@@ -23,7 +23,6 @@ mod circuit_breaker;
 mod config;
 pub mod delivery;
 mod fifo;
-mod signing;
 pub mod telemetry;
 
 /// Start a minimal HTTP health check server for Cloud Run.
