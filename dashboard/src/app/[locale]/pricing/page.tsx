@@ -5,6 +5,7 @@ import { Link, useRouter } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
+import Footer from '@/components/Footer';
 
 
 
@@ -483,6 +484,7 @@ export default function PricingPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

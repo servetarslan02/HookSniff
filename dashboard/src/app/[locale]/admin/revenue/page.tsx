@@ -30,7 +30,7 @@ export default function AdminRevenuePage() {
       const data = await adminApi.getRevenue(token);
       setRevenue(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("failedToLoadRevenue"));
+      setError(t("failedToLoadRevenue"));
     } finally {
       setLoading(false);
     }
