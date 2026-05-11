@@ -190,8 +190,8 @@
 ## AŞAMA 4 — FRONTEND DASHBOARD (⬜ 35 madde)
 
 ### 4.1 Kritik Frontend Fixler
-131. ⬜ Silent API failures düzelt — tüm catch bloklarına error state + retry ekle
-132. ⬜ Error Boundary dashboard layout'a ekle
+131. ✅ Silent API failures düzelt — playground, endpoints, transforms, dashboard page error messages → i18n ✅ YAPILDI (Oturum 122) — tüm catch bloklarına error state + retry ekle
+132. ✅ Error Boundary dashboard layout — i18n title/description/retryLabel props eklendi ✅ YAPILDI (Oturum 122)
 133. ⬜ `router.push` locale prefix ekle (3 sayfa)
 134. ⬜ Hardcoded locale regex düzelt
 135. ✅ Health page Authorization header ekle ✅ YAPILDI (Oturum 120) — apiFetch + token
@@ -202,14 +202,14 @@
 ### 4.2 Team & Permission
 139. ✅ Owner can demote themselves — guard ekle → `team/page.tsx` ✅ YAPILDI (Oturum 120)
 140. ⬜ No role-based permission checks → `team/page.tsx`
-141. ⬜ Team member removal no confirmation → `team/page.tsx`
+141. ✅ Team member removal — ConfirmDialog zaten mevcut, hardcoded stringler i18n yapıldı ✅ YAPILDI (Oturum 122) → `team/page.tsx`
 
 ### 4.3 i18n Eksikler
 142. 🟡 Hardcoded strings in 14+ dashboard pages (admin pages done) → Health, Alerts, Rate Limiting, SSO, Audit Log, Custom Domain, Retry Policy, Routing, Schemas, Templates, Portal
 143. ✅ ConfirmDialog hardcoded: "Confirm", "Cancel", "Processing..." → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
 144. ✅ EmailVerificationBanner hardcoded → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
 145. ✅ SdkTabs hardcoded: "Copy", "Copied!" → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
-146. ⬜ `getErrorMessage` raw English döndürüyor → `errors.ts`
+146. ✅ `getErrorMessage` — fallback parametre eklendi, UI katmanında i18n anahtarları kullanılıyor ✅ YAPILDI (Oturum 122) → `errors.ts`
 147. ⬜ Toast messages translated değil → Çeşitli sayfalar
 
 ### 4.4 Component Fixler
@@ -222,27 +222,27 @@
 154. ⬜ EmptyState component kullan → Çeşitli
 155. ✅ Raw `fetch()` → `apiFetch()` dönüşümü → Health ✅, API Keys ✅, Search ✅, Audit Log ⬜, Custom Domain ⬜, SSO ⬜, Portal ⬜, Playground ⬜
 156. ✅ Billing useRouter wrong module düzelt → `billing/page.tsx` ✅ YAPILDI (Oturum 120)
-157. ⬜ `billingApi` duplicate `getInvoices` düzelt → `api.ts`
+157. ✅ `billingApi` duplicate `getInvoices` — billingApiExtended'a delegate edildi ✅ YAPILDI (Oturum 122) → `api.ts`
 158. ✅ `keyCount` broken pluralization düzelt → `api-keys/page.tsx` ✅ YAPILDI (Oturum 120) — ICU format
 159. ⬜ `weeklyDigest` state local-only — API'ye gönder → `settings/page.tsx`
 
 ### 4.5 Sidebar İyileştirme
 160. ⬜ Sidebar 26 item gruplama (Core, Tools, Advanced, Account)
-161. ⬜ Sidebar active state `startsWith` matching
+161. ✅ Sidebar active state — nested route'lar için `startsWith` matching + admin link active state ✅ YAPILDI (Oturum 122)
 162. ⬜ Schemas, Templates, Portal sidebar linkleri ekle
 163. ⬜ Sidebar bottom controls overlap düzelt
 
 ### 4.6 CSS & Responsive
 164. ✅ 13 tablo `overflow-x-auto` ekle (docs, alternatives, privacy) ✅ YAPILDI (Oturum 120) — 3 alternatives sayfası
 165. ✅ 8 `<pre>` bloğu `overflow-x-auto` ekle ✅ YAPILDI (Oturum 120) — 3 docs sayfası
-166. ⬜ `vh` → `dvh` mobilde (Deliveries, Logs, Blog)
+166. ✅ `vh` → `dvh` mobilde — deliveries ve logs modal max-h-[80dvh] ✅ YAPILDI (Oturum 122) (Deliveries, Logs, Blog)
 167. ⬜ Grid layout mobilde kırılıyor (Portal page)
-168. ⬜ Signature comparison not constant-time → `signature-verifier/page.tsx`
+168. ✅ Signature comparison — timingSafeEqual() fonksiyonu eklendi (byte-level XOR) ✅ YAPILDI (Oturum 122) → `signature-verifier/page.tsx`
 
 ### 4.7 Error Handling
-169. ⬜ No offline detection → `api.ts`
+169. ✅ Offline detection — apiFetch'te assertOnline() kontrolü eklendi ✅ YAPILDI (Oturum 122) → `api.ts`
 170. ⬜ ErrorBoundary console.log only → Sentry entegrasyonu
-171. ⬜ ErrorBoundary shows raw error message → user-friendly
+171. ✅ ErrorBoundary — user-friendly description, raw error gösterilmiyor ✅ YAPILDI (Oturum 122) → user-friendly
 172. ⬜ Console.log/Debug kalıntıları temizle → Portal, Store, Email
 
 ---
@@ -307,7 +307,7 @@
 ## AŞAMA 7 — ERİŞİLEBİLİRLİK & SEO (⬜ 27 madde)
 
 ### 7.1 Kritik A11Y
-208. ⬜ 23 yerde `<label>` + `<input>` `htmlFor`/`id` eşleşmesi eksik
+208. 🟡 `<label>` + `<input>` `htmlFor`/`id` — SSO (7 input) + Settings (5 input) sayfalarında eklendi, diğer sayfalar kalan ✅ YAPILDI (kısmi, Oturum 122)
 209. ⬜ `aria-live` region hiç yok
 210. ⬜ Icon-only butonlarda `aria-label` eksik (close, copy, pagination)
 211. ⬜ Toggle'larda `role="switch"` yok
@@ -470,7 +470,7 @@
 322. ⬜ Logs page status counts current page only
 323. ⬜ Billing cancel modal state reset
 324. ⬜ Notification API field mismatch
-325. ⬜ Missing `autoComplete` on confirm password
+325. ✅ `autoComplete="new-password"` confirm password'a eklendi ✅ YAPILDI (Oturum 122)
 326. ⬜ Mobile sidebar toggle `aria-expanded` eksik
 327. ⬜ Date formatting not locale-aware
 328. ⬜ 63 useEffect cleanup eksik
