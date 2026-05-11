@@ -99,6 +99,7 @@ export class HookSniff {
       token: options.apiKey,
       timeout: options.timeout ?? 30000,
       numRetries: options.numRetries ?? 2,
+      fetch: options.fetch,
     };
 
     this.endpoints = new Endpoints(this.ctx);
@@ -122,3 +123,7 @@ export type { HookSniffRequestContext } from "./request";
 
 // Re-export all models and types
 export * from "./models";
+
+// Re-export pagination utilities
+export { paginate, collectAll } from "./pagination";
+export type { Page, PaginationOptions } from "./pagination";
