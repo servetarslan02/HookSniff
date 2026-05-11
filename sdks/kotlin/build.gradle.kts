@@ -46,7 +46,7 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
             groupId = "io.github.servetarslan02"
-            artifactId = "hooksniff-sdk"
+            artifactId = "hooksniff-sdk-kotlin"
             version = "0.3.0"
 
             pom {
