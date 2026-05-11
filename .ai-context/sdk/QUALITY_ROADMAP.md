@@ -24,6 +24,7 @@
 12. **Sadece görsel değil, işlev de tam olacak** — UI yapılıyorsa arkasındaki API/veri akışı da tamamlanacak, görsel güzel ama işlev eksik bırakılmayacak
 13. **Bir dili yapıp diğerini salmayacağız** — başlanan dil bitecek, tüm diller aynı anda tamamlanacak, parça parça bırakılmayacak
 14. **Gerektiğinde agent kullanılacak** — büyük işlerde paralel subagent ile çalışılacak, tek tek yapmak zorunda değiliz
+15. **İnternetten derin araştırma yapılacak** — her konuda referans bulunacak, GitHub repolardan destek alınacak, tahminle değil veriyle çalışılacak
 
 ---
 
