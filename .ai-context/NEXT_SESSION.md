@@ -1,134 +1,48 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-11 18:12 GMT+8
+> Son güncelleme: 2026-05-11 19:15 GMT+8
 
 ---
 
-## 🚨 KRİTİK BLOKLAR (Oturum 109 SONU)
+## 📦 SDK Publish — Kalan 5 SDK
 
-### 1. Cloud Run API — DEPLOY BAŞARISIZ (EN KRİTİK)
-- **Sorun:** Son 5 revision (00059–00063) "container failed to start" hatasıyla başarısız
-- **Etki:** hooksniff-api Unavailable olarak görünüyor ama eski revision 00058 hala %100 traffic alıyor → API çalışıyor
-- **Hata mesajı:** "The user-provided container failed to start and listen on the port defined provided by the PORT=3000 environment variable within the allocated timeout"
-- **Cloud Logging:** Failed revision'da log YOK → container hiç başlamadan çöküyor
-- **Muhtemel nedenler (sırayla denenmeli):**
-  1. **OTEL init hatası** — ❌ ELENDİ (OTEL_ENABLED=false ile denendi, yine başarısız)
-  2. **Docker image build sorunu** — ✅ MUHTEMEL NEDEN
-     - Cloud Build `rust:1-bookworm` image'ı farklı Rust sürümü kullanıyor olabilir
-     - Runtime image `debian:bookworm-slim` eksik bağımlılık içerebilir
-     - Kontrol: Cloud Build loglarında `cargo build --release` adımını incele
-     - Kontrol: `Dockerfile.api`'deki `rust:1-bookworm` → spesifik sürüm kullan (örn: `rust:1.82-bookworm`)
-  3. **Missing env var** — ❌ ELENDİ (kod Optional handle ediyor)
-- **Çözüm planı (öncelik sırası — GÜNCELLENDİ):**
-  1. ✅ OTEL_ENABLED=false denendi → BAŞARISIZ (OTEL elendi)
-  2. **Cloud Build loglarını incele** — `build-api` adımında hata var mı?
-  3. **Dockerfile.api'de Rust sürümünü sabitle** — `rust:1-bookworm` → `rust:1.82.0-bookworm`
-  4. **Local Docker build dene** — `docker build -f Dockerfile.api -t test-api .` ile sorunu reproduce et
-  5. **00058'in image digest'ini bul** — çalışan image'ı tekrar deploy et (rollback)
+### Öncelik 1: Kotlin (Maven Central)
+- Build config düzeltildi ✅ (Oturum 111)
+- **Gerekli:** Java 11+, GPG key import, OSSRH credentials
+- **Komut:** `cd sdks/kotlin && ./gradlew publishMavenPublicationToOssrhRepository`
+- **Eğer Servet'te Java varsa** hemen publish edilebilir
+
+### Öncelik 2: PHP (Packagist)
+- composer.json düzeltildi ✅ (Oturum 111)
+- **Servet yapacak:** packagist.org'da `hooksniff/hooksniff-php` olarak repo bağla
+- Packagist webhook GitHub'a eklenmeli (auto-update için)
+
+### Öncelik 3: Ruby (RubyGems) — Servet'in PC'si
+- gemspec düzeltildi ✅
+- `gem build hooksniff.gemspec && gem push hooksniff-0.3.0.gem`
+
+### Öncelik 4: C# (NuGet) — Servet'in PC'si
+- .csproj doğru ✅
+- `dotnet pack -c Release && dotnet nuget push bin/Release/*.nupkg --source https://api.nuget.org/v3/index.json`
+
+### Öncelik 5: Elixir (Hex) — Servet'in PC'si
+- mix.exs düzeltildi ✅
+- `mix hex.publish --yes`
+
+---
+
+## 🚨 KRİTİK BLOKLAR (Oturum 109 SONU — hala geçerli)
+
+### 1. Cloud Run API — DEPLOY BAŞARISIZ
+- Son 5 revision başarısız, revision 00058 hala %100 traffic
+- Docker image build sorunu muhtemel neden
+- Cloud Build loglarını incele, Dockerfile.api'de Rust sürümünü sabitle
 
 ### 2. GitHub Actions Billing — BİTTİ
-- **Sorun:** GitHub Actions dakikaları dolmuş, CI/CD çalışmıyor
-- **Çözüm: GCP Cloud Build kullan** — GitHub Actions'a gerek yok
-- **Komut:** `gcloud builds submit --config=cloudbuild.yaml`
-- **veya:** GCP Console > Cloud Build > Triggers > tetikle
-- `cloudbuild.yaml`'a Cloud Run deploy adımı eklendi ✅ (Oturum 109)
-- **⚠️ deploy.yml push edilemedi** — PAT `workflow` scope'u yok. Servet yeni PAT oluşturmalı
+- GCP Cloud Build kullan (cloudbuild.yaml zaten var)
 
-### 3. Grafana OTEL — Veri Akışı Kontrol Edilecek ⏳
-- **Durum:** API deploy sorunu çözülmeden OTEL verisi akmaz
-- **Kontrol:** Deploy başarılı olduktan sonra Grafana'da `otel_boot_test` span'ı ve metrics ara
+### 3. Grafana OTEL — Veri Akışı
+- API deploy olmadan OTEL verisi akmaz
 
-### 4. Grafana Trial — 9 Gün Kaldı
-- **Deadline:** May 20, 2026
-- **Çözüm:** Upgrade veya alternatif bul
-
-### 3. Grafana OTEL — Veri Akışı Kontrol Edilecek ⏳
-- **Durum:** Prometheus up series = 0 (Oturum 108 başında)
-- **Sebep:** API Unavailable + OTEL verisi gönderilemiyor
-- **Beklenen:** Revision 00063 başarılı olursa OTEL otomatik başlayacak
-- **Kontrol:** Grafana'da `otel_boot_test` span'ı ve metrics ara
-
-### 4. Grafana Trial — 9 Gün Kaldı
-- **Deadline:** May 20, 2026
-- **Çözüm:** Upgrade veya alternatif bul
-
----
-
-## ✅ Tüm Dış Servisler Tamamlandı (Oturum 102 + 103)
-
-| Servis | Durum | Detay |
-|--------|-------|-------|
-| Vercel Analytics | ✅ Aktif | Hobby plan, 50K events/ay |
-| Vercel Speed Insights | ✅ Kod eklendi | Deploy yarın otomatik olur |
-| Grafana Alerts | ✅ Aktif | 7 rule + email → servetarslan02@gmail.com |
-| Polar.sh Checkout | ✅ Link hazır | Pro $49/mo, 1 ay free trial |
-| Neon Backup | ✅ Cron aktif | Her gün 03:00 UTC, 30 gün retention |
-| Resend | ✅ Entegre | EmailProvider: Resend → GCloud fallback |
-| Git Email | ✅ Düzeltildi | servetarslan02@users.noreply.github.com |
-
----
-
-## 📋 Yapılacaklar (Sıralı)
-
-### 🔴 Kritik — Servet'in Yapması Gereken
-
-| # | Görev | Kim | Açıklama |
-|---|-------|-----|----------|
-| 1 | **Cloud Run OTEL endpoint güncelle** | Servet | `OTEL_EXPORTER_OTLP_ENDPOINT` env var'ını Cloud Run'da `https://otlp-gateway-prod-eu-west-2.grafana.net/otlp` olarak güncelle. Deploy scriptlerinde düzeltildi ama mevcut Cloud Run revision hala eski endpoint'i kullanıyor olabilir. |
-| 2 | **OTEL headers secret kontrol** | Servet | Cloud Run'daki `hooksniff-otel-headers` secret'ının `Authorization=Basic base64(1625476:glc_...)` formatında olduğunu doğrula. |
-| 3 | **Deploy et** | Servet | `3f83bfb` commit'ini Cloud Run'a deploy et (CI/CD veya Cloud Build). |
-| 4 | **Grafana kontrol** | Servet | Deploy sonrası Grafana dashboard'da trace/metrics/logs gelip gelmediğini kontrol et. |
-
-### 🔴 Yüksek Öncelik — AI
-
-| # | Görev | Kim | Açıklama |
-|---|-------|-----|----------|
-| 5 | **Grafana OTEL doğrula** | AI | Servet deploy ettikten sonra `/health` endpoint'inden OTEL durumunu kontrol et. Boot test span'ı Grafana'da görünmeli. |
-
-### 🟡 Orta Öncelik
-
-| # | Görev | Kim | Açıklama |
-|---|-------|-----|----------|
-| 6 | **GitHub Actions workflow'ları** | AI + Servet | Token'da `workflow` scope'u yok. Servet'ten yeni token istenecek. |
-| 7 | **Polar.sh identity verification** | Servet | Kimlik doğrulaması gerekli. Para almak için zorunlu. |
-
-### 🟢 Düşük Öncelik — Lansman Sonrası
-
-| # | Görev | Kim | Açıklama |
-|---|-------|-----|----------|
-| 8 | **db.rs test (HS-085)** | AI | Gerçek PostgreSQL gerekli (Neon test DB). |
-| 9 | **SDK otomatik güncelleme (HS-090)** | AI | Lansman sonrası, detaylı araştırma gerekli. |
-
----
-
-## 🔧 Grafana OTEL Durumu (Oturum 108)
-
-### GÜNCEL DURUM
-- **Revision 00063 deploy edildi** — GCP Console üzerinden manuel deploy (Oturum 108)
-- OTEL env var'ları doğru: OTEL_ENABLED=true, endpoint eu-west-2, headers secret mevcut
-- **Kontrol edilecek:** Deploy başarılı olduktan sonra OTEL veri akışı
-
-### Yapılan (Oturum 103 + 104 + 108)
-- Grafana org adı `hookrelay` (hooksniff değilmiş)
-- OTLP endpoint: `https://otlp-gateway-prod-eu-west-2.grafana.net/otlp`
-- Auth format: `Authorization=Basic base64(1625476:glc_...)`
-- Yeni access policy token oluşturuldu: `hooksniff-otel`
-- Cloud Run `otel-headers` secret v5 ile güncellendi
-- Deploy scriptleri eu-west-2'ye düzeltildi (4 dosya)
-- Boot test span eklendi (deploy sonrası Grafana'da görülecek)
-- Health endpoint'e OTEL durumu eklendi
-- **Oturum 108:** GCP Console browser ile açıldı, OTEL env var'ları doğrulandı, revision 00063 deploy edildi
-
-### Sonraki Adımlar
-1. Deploy tamamlandıktan sonra `/health` endpoint'inden `otel` durumunu kontrol et
-2. Prometheus'ta `up` series sayısını kontrol et (şu an 0)
-3. Boot test span'ı Grafana'da ara (`otel_boot_test`)
-4. Sorun devam ederse: Cloud Run logs'da `OTEL config` ve `OTLP exporter` loglarını kontrol et
-
-### Token Bilgileri
-- Grafana API Key: `glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f`
-- Grafana OTLP Token: `glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0=`
-- Grafana Access Policy ID: `b6aea6c9-bd32-4a2d-9184-a3d2da591a8a`
-- Instance ID: `1625476`
-- **SA key compromize:** Git history'de bulundu (commit 12d1855), rotate edilmiş, geçersiz
-- **Yeni SA key gerekli:** GCP Console > IAM > Service Accounts > hooksniff-deploy > Keys > Create
+### 4. Grafana Trial — 9 Gün Kaldı (May 20)
+- Upgrade veya alternatif bul
