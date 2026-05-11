@@ -127,7 +127,7 @@ export default function EndpointsPage() {
           onClick={() => setShowCreate(!showCreate)}
           className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
         >
-          + New Endpoint
+          {t('newEndpoint')}
         </button>
       </div>
 
@@ -181,7 +181,7 @@ export default function EndpointsPage() {
 
       {endpoints.length === 0 ? (
         <div className="glass-card p-12 text-center text-gray-400 dark:text-slate-500">
-          No endpoints yet. Create one to start receiving webhooks.
+          {t('noEndpointsYet')}
         </div>
       ) : (
         <>

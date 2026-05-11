@@ -261,7 +261,7 @@ export default function PortalCustomizationPage() {
                 onClick={addEvent}
                 className="px-4 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
               >
-                Add
+                {t('add')}
               </button>
             </div>
             <div className="flex flex-wrap gap-2">

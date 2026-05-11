@@ -189,7 +189,8 @@
     },
     "urlLabel": "URL",
     "descriptionLabel": "Description",
-    "settingsTitle": "Settings"
+    "settingsTitle": "Settings",
+    "noEndpointsYet": "No endpoints yet. Create one to start receiving webhooks."
   },
   "deliveries": {
     "title": "Deliveries",
@@ -340,7 +341,11 @@
     "ok": "OK",
     "redirect": "Redirect",
     "clientError": "Client Error",
-    "serverError": "Server Error"
+    "serverError": "Server Error",
+    "statusOk": "OK",
+    "statusRedirect": "Redirect",
+    "statusClientError": "Client Error",
+    "statusServerError": "Server Error"
   },
   "team": {
     "title": "Team Management",
@@ -527,7 +532,8 @@
     "plans.freeLimit": "10,000 webhooks/month",
     "plans.proLimit": "50,000 webhooks/month",
     "plans.businessLimit": "500,000 webhooks/month",
-    "noInvoices": "No invoices yet."
+    "noInvoices": "No invoices yet.",
+    "upgradeInitiated": "Upgrade initiated"
   },
   "auth": {
     "login": "Log In",
@@ -2157,13 +2163,37 @@
     "subject": "Subject",
     "message": "Message",
     "responseTime": "Response Time",
-    "location": "Location"
+    "location": "Location",
+    "useFormBelow": "Use the form below 👇",
+    "responseTimeValue": "Usually within 24 hours",
+    "locationValue": "Turkey 🇹🇷",
+    "howCanWeHelp": "How can we help?",
+    "messageSent": "✅ Message sent! We'll get back to you soon.",
+    "sendError": "❌ Failed to send. Please try again or reach us on GitHub Discussions."
   },
   "about": {
     "title": "About HookSniff",
     "ourStory": "Our Story",
     "ourMission": "Our Mission",
-    "cta": "Join developers who trust HookSniff for their webhook delivery."
+    "cta": "Join developers who trust HookSniff for their webhook delivery.",
+    "liveOperational": "Live & Operational",
+    "heroSubtitle": "Reliable webhook delivery infrastructure built by developers, for developers.",
+    "missionP1": "Webhooks are the backbone of modern integrations, but building reliable webhook infrastructure is hard. We built HookSniff to make it simple — send webhooks, we deliver them. If they fail, we retry.",
+    "missionP2": "We believe developers shouldn't have to pay enterprise prices for reliable webhook delivery. That's why HookSniff starts at $0/month with a generous free tier.",
+    "sdkLanguages": "SDK Languages",
+    "startingPrice": "Starting Price",
+    "storyP1": "HookSniff started as a side project in 2026. We were tired of dealing with unreliable webhook deliveries and expensive third-party services. So we built our own.",
+    "storyP2": "Today, HookSniff handles webhook delivery for developers worldwide, with support for HTTP, WebSocket, gRPC, and SQS delivery methods. Our infrastructure runs entirely on free-tier services, keeping costs at $0/month while maintaining enterprise-grade reliability.",
+    "storyP3": "We're committed to keeping HookSniff affordable and accessible. As we grow, we'll continue to offer a generous free tier and transparent pricing.",
+    "securityFirst": "Security First",
+    "securityFirstDesc": "HMAC-SHA256 signatures, TLS encryption, and zero-knowledge payload processing.",
+    "transparentPricing": "Transparent Pricing",
+    "transparentPricingDesc": "No hidden fees, no surprise charges. What you see is what you pay.",
+    "globalInfrastructure": "Global Infrastructure",
+    "globalInfrastructureDesc": "Deployed in EU (Frankfurt) with CDN coverage worldwide via Cloudflare.",
+    "readyToStart": "Ready to get started?",
+    "startFree": "Start Free",
+    "contactUs": "Contact Us"
   },
   "error": {
     "title": "Something went wrong",
