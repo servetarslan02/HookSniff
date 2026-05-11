@@ -6,7 +6,7 @@ import { clsx } from 'clsx';
 interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
 }
 
 interface ToastContextType {
@@ -53,7 +53,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               'flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium animate-slide-up',
               toast.type === 'success' && 'bg-green-600 text-white',
               toast.type === 'error' && 'bg-red-600 text-white',
-              toast.type === 'info' && 'bg-gray-900 text-white'
+              toast.type === 'info' && 'bg-gray-900 dark:bg-slate-700 text-white',
+              toast.type === 'warning' && 'bg-amber-500 text-white'
             )}
           >
             <span className="flex-1">{toast.message}</span>
