@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-11 07:08 GMT+8
+> Son güncelleme: 2026-05-11 14:23 GMT+8
 
 ## Kullanıcı
 - **Servet Arslan** — servetarslan02 (GitHub)
@@ -63,6 +63,19 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 | 🟡 P2 | 38 | 34 | 4 |
 | 🟢 P3 | 13 | 7 | 6 |
 | **TOPLAM** | **103** | **101** | **2** |
+
+## Oturum 105 (2026-05-11 14:03 - ) 🔄
+- **OpenClaw ilk oturum** — Servet ile tanışma, proje incelendi
+- **Rust 1.95.0 kuruldu** — cargo check başarılı
+- **Testler:** API 983/983 ✅, Worker 48/48 ✅
+- **Dashboard TypeScript fix** — 15+ dosyada eksik `useTranslations` / `getTranslations` düzeltildi
+  - OnboardingWizard, Toast, ErrorBoundary, LanguageSwitcher, NotificationCenter
+  - playground, status, verify-email, blog, changelog, customers, delivery detail, landing page
+  - Eksik çeviri anahtarları eklendi (en.json + tr.json): apiKeys, deliveries, endpoints, playground
+- **Subagent** — kalan 8 dosya (admin, alternatives, auth/callback) toplu fix için subagent'a verildi
+- **Sync cron'u** — her 10 dakikada .ai-context/ GitHub'a push
+- **Workspace MEMORY.md** — USER.md, MEMORY.md güncellendi
+- **Commit:** bekliyor (subagent bitince push edilecek)
 
 ## Oturum 104 (2026-05-11 06:57 - 07:12) ✅
 - **Grafana OTEL KRİTİK BULGU** — Deploy scriptlerinde yanlış region!
