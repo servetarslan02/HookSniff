@@ -196,7 +196,7 @@ export default function AdminRevenuePage() {
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        ₺${entry.value.toLocaleString()}
+                        ₺{entry.value.toLocaleString()}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-slate-400 ml-1">
                         ({entry.count} {t('users')})
