@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.CreateTransformRuleRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :name,
     :rule_type,

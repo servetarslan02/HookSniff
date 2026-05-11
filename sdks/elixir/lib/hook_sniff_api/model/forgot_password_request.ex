@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.ForgotPasswordRequest do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :email
   ]

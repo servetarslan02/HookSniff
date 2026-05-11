@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.TestWebhookResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :success,
     :status_code,

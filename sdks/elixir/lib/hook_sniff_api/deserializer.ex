@@ -7,7 +7,7 @@ defmodule HookSniffAPI.Deserializer do
   """
 
   def json_decode(json) do
-    JSON.decode(json)
+    Jason.decode(json)
   end
 
   def json_decode(json, module) do

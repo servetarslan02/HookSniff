@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.BatchResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :deliveries,
     :errors

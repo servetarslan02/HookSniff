@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SubscriptionResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :plan,
     :status,

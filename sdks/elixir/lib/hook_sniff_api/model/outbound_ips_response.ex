@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.OutboundIpsResponse do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :ips,
     :updated_at

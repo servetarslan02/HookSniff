@@ -6,7 +6,7 @@ defmodule HookSniffAPI.Model.SystemStatsPlanBreakdownInner do
   
   """
 
-  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :plan,
     :count
