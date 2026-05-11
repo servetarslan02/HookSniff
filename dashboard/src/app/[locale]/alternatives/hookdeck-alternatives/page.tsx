@@ -34,7 +34,7 @@ export default function HookdeckAlternativesPage() {
 
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden mb-12">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-slate-800">
                   <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">Service</th>
@@ -65,7 +65,7 @@ export default function HookdeckAlternativesPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </div>
         </div>
 
