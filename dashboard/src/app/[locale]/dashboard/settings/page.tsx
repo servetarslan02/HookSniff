@@ -140,6 +140,7 @@ export default function SettingsPage() {
         email_on_failure: failureAlerts,
         email_on_dead_letter: failureAlerts,
         email_on_success: emailNotifs,
+        email_on_weekly_digest: weeklyDigest,
         slack_webhook_url: null,
       }, token ?? undefined);
       toast(tc('success'), 'success');
