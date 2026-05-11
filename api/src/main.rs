@@ -33,7 +33,8 @@ async fn main() -> Result<()> {
     // HS-263: Warn if ENCRYPTION_KEY is not set (required for SSO secrets, etc.)
     if std::env::var("ENCRYPTION_KEY").is_err() {
         tracing::warn!(
-            "⚠️ ENCRYPTION_KEY not set — encrypted fields (SSO client_secret, etc.) will be unavailable.              Generate one with: openssl rand -hex 32"
+            "⚠️ ENCRYPTION_KEY not set — encrypted fields (SSO client_secret, etc.) will be unavailable. \
+             Generate one with: openssl rand -hex 32"
         );
     }
 
