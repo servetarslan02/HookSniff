@@ -71,7 +71,8 @@
     "processing": "İşleniyor...",
     "copy": "Kopyala",
     "backToDashboard": "Panele Dön",
-    "logout": "Çıkış Yap"
+    "logout": "Çıkış Yap",
+    "user": "Kullanıcı"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",

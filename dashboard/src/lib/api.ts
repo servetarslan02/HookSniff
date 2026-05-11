@@ -63,6 +63,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
             const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
               method: 'POST',
               credentials: 'include',
+              headers: { ...getCSRFHeaders('POST') },
             });
             if (refreshRes.ok) {
               // Refresh succeeded — retry the original request
