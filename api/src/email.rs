@@ -26,7 +26,9 @@ impl EmailProvider {
             tracing::info!("📧 Email provider: GCloud Gmail API");
             return Self::GCloud(gcloud);
         }
-        tracing::warn!("⚠️ No email provider configured (RESEND_API_KEY and GCP_SA_JSON both missing)");
+        tracing::warn!(
+            "⚠️ No email provider configured (RESEND_API_KEY and GCP_SA_JSON both missing)"
+        );
         Self::None
     }
 
@@ -40,7 +42,11 @@ impl EmailProvider {
             Self::Resend(c) => c.send_contact_email(to, subject, html).await,
             Self::GCloud(c) => c.send_contact_email(to, subject, html).await,
             Self::None => {
-                tracing::warn!("Email not sent (no provider): to={}, subject={}", to, subject);
+                tracing::warn!(
+                    "Email not sent (no provider): to={}, subject={}",
+                    to,
+                    subject
+                );
                 Ok(())
             }
         }

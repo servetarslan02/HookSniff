@@ -197,14 +197,18 @@ async fn register(
         let to = req.email.clone();
         let name = req.name.clone();
         tokio::spawn(async move {
-            if let Err(e) = email_provider.send_welcome_email(&to, name.as_deref()).await {
+            if let Err(e) = email_provider
+                .send_welcome_email(&to, name.as_deref())
+                .await
+            {
                 tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
             }
         });
     }
 
     // Auto-send verification email
-    send_verification_email_for_customer(&pool, &cfg, &email_provider, customer.id, &req.email).await;
+    send_verification_email_for_customer(&pool, &cfg, &email_provider, customer.id, &req.email)
+        .await;
 
     // HS-038h: Return same generic message for all registrations.
     // User must log in after verifying email to get tokens.
@@ -260,15 +264,13 @@ async fn login(
             let _ = jwt::verify_password(&req.password, &DUMMY_HASH);
             false
         }
-        Some(c) => {
-            match c.password_hash.as_ref() {
-                Some(hash) => jwt::verify_password(&req.password, hash).unwrap_or(false),
-                None => {
-                    let _ = jwt::verify_password(&req.password, &DUMMY_HASH);
-                    false
-                }
+        Some(c) => match c.password_hash.as_ref() {
+            Some(hash) => jwt::verify_password(&req.password, hash).unwrap_or(false),
+            None => {
+                let _ = jwt::verify_password(&req.password, &DUMMY_HASH);
+                false
             }
-        }
+        },
     };
 
     // Now check existence and status — timing is already normalized.
@@ -602,7 +604,8 @@ async fn resend_verification(
 
     if let Some((customer_id, email, verified)) = customer {
         if !verified {
-            send_verification_email_for_customer(&pool, &cfg, &email_provider, customer_id, &email).await;
+            send_verification_email_for_customer(&pool, &cfg, &email_provider, customer_id, &email)
+                .await;
         }
     }
 
@@ -1148,7 +1151,10 @@ async fn send_verification_email_for_customer(
     let email_provider = email_provider.clone();
     let to = email.to_string();
     tokio::spawn(async move {
-        if let Err(e) = email_provider.send_verification_email(&to, &verify_url).await {
+        if let Err(e) = email_provider
+            .send_verification_email(&to, &verify_url)
+            .await
+        {
             tracing::warn!("Failed to send verification email to {}: {:?}", to, e);
         }
     });
@@ -1158,7 +1164,9 @@ async fn send_verification_email_for_customer(
 fn generate_totp_secret() -> String {
     use rand::TryRng;
     let mut bytes = [0u8; 20];
-    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("SysRng fill failed");
+    rand::rngs::SysRng
+        .try_fill_bytes(&mut bytes)
+        .expect("SysRng fill failed");
     base32::encode(base32::Alphabet::Rfc4648 { padding: false }, &bytes)
 }
 
@@ -1209,7 +1217,10 @@ mod tests {
     #[test]
     fn test_extract_client_ip_from_x_forwarded_for() {
         let mut headers = HeaderMap::new();
-        headers.insert("x-forwarded-for", HeaderValue::from_static("1.2.3.4, 5.6.7.8"));
+        headers.insert(
+            "x-forwarded-for",
+            HeaderValue::from_static("1.2.3.4, 5.6.7.8"),
+        );
         // Now takes LAST entry (most recent proxy)
         assert_eq!(extract_client_ip(&headers), "5.6.7.8");
     }

@@ -35,7 +35,11 @@ async fn raw_pool() -> PgPool {
 }
 
 /// Helper: Create prerequisite rows (customer, endpoint, delivery) for queue tests.
-async fn create_test_delivery(pool: &PgPool, delivery_id: uuid::Uuid, endpoint_id: uuid::Uuid) -> uuid::Uuid {
+async fn create_test_delivery(
+    pool: &PgPool,
+    delivery_id: uuid::Uuid,
+    endpoint_id: uuid::Uuid,
+) -> uuid::Uuid {
     let customer_id = uuid::Uuid::new_v4();
 
     sqlx::query(
@@ -76,7 +80,6 @@ async fn create_test_delivery(pool: &PgPool, delivery_id: uuid::Uuid, endpoint_i
     customer_id
 }
 
-
 // Test: create_pool connects and runs all migrations
 // ═══════════════════════════════════════════════════════════════
 
@@ -103,7 +106,10 @@ async fn test_create_pool_success() {
     .fetch_one(&pool)
     .await
     .expect("Should check _migrations table");
-    assert!(exists.0, "_migrations table should be created by create_pool");
+    assert!(
+        exists.0,
+        "_migrations table should be created by create_pool"
+    );
 
     pool.close().await;
 }
@@ -118,17 +124,21 @@ async fn test_create_pool_strips_channel_binding() {
     let base_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     // URL with channel_binding=require at different positions
-    let url_with_cb = format!("{}?channel_binding=require&sslmode=require", base_url.replace("?sslmode=require", "").replace("?channel_binding=require&", "").replace("&channel_binding=require", "").replace("?channel_binding=require", ""));
-    
+    let url_with_cb = format!(
+        "{}?channel_binding=require&sslmode=require",
+        base_url
+            .replace("?sslmode=require", "")
+            .replace("?channel_binding=require&", "")
+            .replace("&channel_binding=require", "")
+            .replace("?channel_binding=require", "")
+    );
+
     // Should not error — channel_binding is stripped
     let pool = hooksniff_api::db::create_pool(&url_with_cb)
         .await
         .expect("create_pool should strip channel_binding and succeed");
 
-    let row: (i32,) = sqlx::query_as("SELECT 1")
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+    let row: (i32,) = sqlx::query_as("SELECT 1").fetch_one(&pool).await.unwrap();
     assert_eq!(row.0, 1);
 
     pool.close().await;
@@ -371,7 +381,10 @@ async fn test_publish_to_queue_no_custom_headers() {
             .await
             .unwrap();
 
-    assert!(row.0.is_none(), "custom_headers should be NULL when None is passed");
+    assert!(
+        row.0.is_none(),
+        "custom_headers should be NULL when None is passed"
+    );
 
     // Cleanup
     sqlx::query("DELETE FROM webhook_queue WHERE delivery_id = $1")
@@ -448,11 +461,25 @@ async fn test_customers_table_columns() {
     .expect("create_pool");
 
     let expected_columns = vec![
-        "id", "email", "api_key_hash", "api_key_prefix", "plan",
-        "webhook_limit", "webhook_count", "created_at", "password_hash",
-        "is_active", "is_admin", "name", "email_verified", "totp_enabled",
-        "stripe_customer_id", "polar_customer_id", "payment_provider",
-        "payment_failed_at", "updated_at",
+        "id",
+        "email",
+        "api_key_hash",
+        "api_key_prefix",
+        "plan",
+        "webhook_limit",
+        "webhook_count",
+        "created_at",
+        "password_hash",
+        "is_active",
+        "is_admin",
+        "name",
+        "email_verified",
+        "totp_enabled",
+        "stripe_customer_id",
+        "polar_customer_id",
+        "payment_provider",
+        "payment_failed_at",
+        "updated_at",
     ];
 
     for col in expected_columns {
@@ -479,9 +506,20 @@ async fn test_webhook_queue_table_columns() {
     .expect("create_pool");
 
     let expected_columns = vec![
-        "id", "delivery_id", "endpoint_id", "endpoint_url", "payload",
-        "custom_headers", "attempt_count", "max_attempts", "next_retry_at",
-        "status", "trace_id", "created_at", "processed_at", "is_test",
+        "id",
+        "delivery_id",
+        "endpoint_id",
+        "endpoint_url",
+        "payload",
+        "custom_headers",
+        "attempt_count",
+        "max_attempts",
+        "next_retry_at",
+        "status",
+        "trace_id",
+        "created_at",
+        "processed_at",
+        "is_test",
         "updated_at",
     ];
 
@@ -524,13 +562,12 @@ async fn test_check_constraints_exist() {
     ];
 
     for constraint in expected_constraints {
-        let exists: (bool,) = sqlx::query_as(
-            "SELECT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = $1)",
-        )
-        .bind(constraint)
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+        let exists: (bool,) =
+            sqlx::query_as("SELECT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = $1)")
+                .bind(constraint)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
         assert!(exists.0, "Constraint '{}' should exist", constraint);
     }
 
@@ -566,7 +603,10 @@ async fn test_unique_constraints_exist() {
     .fetch_one(&pool)
     .await
     .unwrap();
-    assert!(exists.0, "uq_webhook_queue_delivery constraint should exist");
+    assert!(
+        exists.0,
+        "uq_webhook_queue_delivery constraint should exist"
+    );
 
     pool.close().await;
 }
@@ -594,13 +634,12 @@ async fn test_updated_at_triggers_exist() {
     ];
 
     for (table, trigger) in trigger_tables {
-        let exists: (bool,) = sqlx::query_as(
-            "SELECT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = $1)",
-        )
-        .bind(trigger)
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+        let exists: (bool,) =
+            sqlx::query_as("SELECT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = $1)")
+                .bind(trigger)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
         assert!(
             exists.0,
             "Trigger '{}' should exist on table '{}'",
@@ -637,13 +676,12 @@ async fn test_key_indexes_exist() {
     ];
 
     for idx in expected_indexes {
-        let exists: (bool,) = sqlx::query_as(
-            "SELECT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = $1)",
-        )
-        .bind(idx)
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+        let exists: (bool,) =
+            sqlx::query_as("SELECT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = $1)")
+                .bind(idx)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
         assert!(exists.0, "Index '{}' should exist", idx);
     }
 
@@ -718,7 +756,10 @@ async fn test_publish_to_queue_duplicate_delivery_fails() {
     )
     .await;
 
-    assert!(result.is_err(), "Duplicate delivery_id should fail due to UNIQUE constraint");
+    assert!(
+        result.is_err(),
+        "Duplicate delivery_id should fail due to UNIQUE constraint"
+    );
 
     // Cleanup
     sqlx::query("DELETE FROM webhook_queue WHERE delivery_id = $1")

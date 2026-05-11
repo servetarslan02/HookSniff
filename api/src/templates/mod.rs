@@ -156,7 +156,10 @@ mod tests {
         assert_eq!(deserialized.name, "Test Template");
         assert_eq!(deserialized.industry, "test");
         assert_eq!(deserialized.event_types, vec!["test.event"]);
-        assert_eq!(deserialized.endpoint_config.signing_algorithm, "hmac-sha256");
+        assert_eq!(
+            deserialized.endpoint_config.signing_algorithm,
+            "hmac-sha256"
+        );
         assert_eq!(deserialized.retry_policy.max_attempts, 3);
         assert_eq!(deserialized.agents.len(), 1);
         assert_eq!(deserialized.estimated_daily_volume, 100);

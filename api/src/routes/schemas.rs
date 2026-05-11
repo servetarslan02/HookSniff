@@ -39,13 +39,10 @@ async fn register_schema(
         return Err(AppError::BadRequest("Schema name is required".into()));
     }
 
-    let schema = registry
-        .register(customer.id, request)
-        .await
-        .map_err(|e| {
-            tracing::warn!("Schema registration error: {:?}", e);
-            AppError::BadRequest("Invalid schema".into())
-        })?;
+    let schema = registry.register(customer.id, request).await.map_err(|e| {
+        tracing::warn!("Schema registration error: {:?}", e);
+        AppError::BadRequest("Invalid schema".into())
+    })?;
 
     Ok(Json(json!({
         "id": schema.id,
@@ -135,7 +132,9 @@ async fn validate_event(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::schemas::{EventSchema, RegisterSchemaRequest, ValidateEventRequest, ValidationResult, ValidationError};
+    use crate::schemas::{
+        EventSchema, RegisterSchemaRequest, ValidateEventRequest, ValidationError, ValidationResult,
+    };
 
     // ── RegisterSchemaRequest ───────────────────────────────
 

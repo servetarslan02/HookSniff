@@ -255,7 +255,10 @@ mod tests {
         assert!(rule_paths.contains(&"data.user.phone"));
         assert!(rule_paths.contains(&"data.user.ip_address"));
 
-        let ip_rule = rules.iter().find(|r| r.field_path == "data.user.ip_address").unwrap();
+        let ip_rule = rules
+            .iter()
+            .find(|r| r.field_path == "data.user.ip_address")
+            .unwrap();
         assert_eq!(ip_rule.strategy, "full");
         assert_eq!(ip_rule.replacement, Some("[redacted]".to_string()));
     }
@@ -275,10 +278,16 @@ mod tests {
     #[test]
     fn test_saas_usage_anomaly_detector() {
         let pkg = SaaSvPackage::new();
-        let agent = pkg.agents().into_iter().find(|a| a.name == "usage_anomaly_detector").unwrap();
+        let agent = pkg
+            .agents()
+            .into_iter()
+            .find(|a| a.name == "usage_anomaly_detector")
+            .unwrap();
         assert_eq!(agent.agent_type, "anomaly_detection");
         assert!(agent.event_types.contains(&"usage.threshold".to_string()));
-        assert!(agent.event_types.contains(&"usage.limit_reached".to_string()));
+        assert!(agent
+            .event_types
+            .contains(&"usage.limit_reached".to_string()));
         assert!(agent.config["auto_throttle_on_abuse"] == true);
         assert!(agent.config["spike_factor_threshold"] == 5.0);
     }
@@ -289,8 +298,12 @@ mod tests {
         let chains = pkg.webhook_chains();
         assert_eq!(chains.len(), 3);
         assert_eq!(chains[0].trigger_event, "user.created");
-        assert!(chains[0].downstream_events.contains(&"subscription.created".to_string()));
-        assert!(chains[0].downstream_events.contains(&"tenant.created".to_string()));
+        assert!(chains[0]
+            .downstream_events
+            .contains(&"subscription.created".to_string()));
+        assert!(chains[0]
+            .downstream_events
+            .contains(&"tenant.created".to_string()));
         assert_eq!(chains[1].trigger_event, "subscription.trial_ending");
         assert_eq!(chains[2].trigger_event, "usage.limit_reached");
     }
@@ -312,7 +325,7 @@ mod tests {
 
     #[test]
     fn test_saas_default() {
-        let pkg = SaaSvPackage::default();
+        let pkg = SaaSvPackage;
         assert_eq!(pkg.name(), "saas");
     }
 

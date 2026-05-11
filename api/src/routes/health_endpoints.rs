@@ -8,6 +8,17 @@ use uuid::Uuid;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
+
+/// Determine health status based on failure streak and success rate.
+fn determine_health_status(failure_streak: i32, success_rate: f64) -> &'static str {
+    if failure_streak >= 5 {
+        "unhealthy"
+    } else if failure_streak >= 3 || success_rate < 95.0 {
+        "degraded"
+    } else {
+        "healthy"
+    }
+}
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_endpoint_health))
@@ -91,13 +102,7 @@ async fn list_endpoint_health(
             } else {
                 100.0
             };
-            let health_status = if ep.failure_streak >= 5 {
-                "unhealthy"
-            } else if ep.failure_streak >= 3 || success_rate < 95.0 {
-                "degraded"
-            } else {
-                "healthy"
-            };
+            let health_status = determine_health_status(ep.failure_streak, success_rate);
             EndpointHealth {
                 id: ep.id,
                 url: ep.url,
@@ -155,13 +160,7 @@ async fn get_endpoint_health(
         100.0
     };
 
-    let health_status = if ep.failure_streak >= 5 {
-        "unhealthy"
-    } else if ep.failure_streak >= 3 || success_rate < 95.0 {
-        "degraded"
-    } else {
-        "healthy"
-    };
+    let health_status = determine_health_status(ep.failure_streak, success_rate);
 
     Ok(Json(EndpointHealth {
         id: ep.id,
@@ -225,44 +224,20 @@ mod tests {
     #[test]
     fn test_health_status_logic() {
         // failure_streak >= 5 => unhealthy
-        let status = if 5i32 >= 5 {
-            "unhealthy"
-        } else if 5i32 >= 3 || 90.0f64 < 95.0 {
-            "degraded"
-        } else {
-            "healthy"
-        };
-        assert_eq!(status, "unhealthy");
+        assert_eq!(determine_health_status(5, 90.0), "unhealthy");
+        assert_eq!(determine_health_status(10, 99.0), "unhealthy");
 
         // failure_streak >= 3 => degraded
-        let status = if 3i32 >= 5 {
-            "unhealthy"
-        } else if 3i32 >= 3 || 99.0f64 < 95.0 {
-            "degraded"
-        } else {
-            "healthy"
-        };
-        assert_eq!(status, "degraded");
+        assert_eq!(determine_health_status(3, 99.0), "degraded");
+        assert_eq!(determine_health_status(4, 99.0), "degraded");
 
         // success_rate < 95 => degraded
-        let status = if 0i32 >= 5 {
-            "unhealthy"
-        } else if 0i32 >= 3 || 90.0f64 < 95.0 {
-            "degraded"
-        } else {
-            "healthy"
-        };
-        assert_eq!(status, "degraded");
+        assert_eq!(determine_health_status(0, 90.0), "degraded");
+        assert_eq!(determine_health_status(1, 50.0), "degraded");
 
         // All good => healthy
-        let status = if 0i32 >= 5 {
-            "unhealthy"
-        } else if 0i32 >= 3 || 99.0f64 < 95.0 {
-            "degraded"
-        } else {
-            "healthy"
-        };
-        assert_eq!(status, "healthy");
+        assert_eq!(determine_health_status(0, 99.0), "healthy");
+        assert_eq!(determine_health_status(2, 100.0), "healthy");
     }
 
     #[test]

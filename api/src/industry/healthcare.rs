@@ -293,10 +293,18 @@ mod tests {
     #[test]
     fn test_healthcare_critical_result_notifier() {
         let pkg = HealthcarePackage::new();
-        let agent = pkg.agents().into_iter().find(|a| a.name == "critical_result_notifier").unwrap();
+        let agent = pkg
+            .agents()
+            .into_iter()
+            .find(|a| a.name == "critical_result_notifier")
+            .unwrap();
         assert_eq!(agent.agent_type, "notification");
-        assert!(agent.event_types.contains(&"lab.result.critical".to_string()));
-        assert!(agent.event_types.contains(&"lab.result.abnormal".to_string()));
+        assert!(agent
+            .event_types
+            .contains(&"lab.result.critical".to_string()));
+        assert!(agent
+            .event_types
+            .contains(&"lab.result.abnormal".to_string()));
         assert!(agent.config["requires_acknowledgment"] == true);
         assert!(agent.config["audit_all_notifications"] == true);
         let chain = agent.config["escalation_chain"].as_array().unwrap();
@@ -311,8 +319,12 @@ mod tests {
         assert_eq!(chains[0].trigger_event, "lab.result.critical");
         assert_eq!(chains[1].trigger_event, "prescription.created");
         assert_eq!(chains[2].trigger_event, "patient.discharged");
-        assert!(chains[2].downstream_events.contains(&"prescription.created".to_string()));
-        assert!(chains[2].downstream_events.contains(&"appointment.scheduled".to_string()));
+        assert!(chains[2]
+            .downstream_events
+            .contains(&"prescription.created".to_string()));
+        assert!(chains[2]
+            .downstream_events
+            .contains(&"appointment.scheduled".to_string()));
     }
 
     #[test]
@@ -330,7 +342,7 @@ mod tests {
 
     #[test]
     fn test_healthcare_default() {
-        let pkg = HealthcarePackage::default();
+        let pkg = HealthcarePackage;
         assert_eq!(pkg.name(), "healthcare");
     }
 

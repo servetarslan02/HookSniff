@@ -48,7 +48,7 @@ pub async fn should_deliver_fifo(pool: &PgPool, endpoint_id: Uuid) -> Result<boo
 
     // Check if previous item is completed
     let prev_status: Option<String> = sqlx::query_scalar(
-        "SELECT status FROM fifo_queue WHERE endpoint_id = $1 AND sequence_num = $2"
+        "SELECT status FROM fifo_queue WHERE endpoint_id = $1 AND sequence_num = $2",
     )
     .bind(endpoint_id)
     .bind(seq - 1)
@@ -62,7 +62,11 @@ pub async fn should_deliver_fifo(pool: &PgPool, endpoint_id: Uuid) -> Result<boo
 }
 
 /// Mark a FIFO item as delivered (unblocks next item).
-pub async fn mark_fifo_delivered(pool: &PgPool, endpoint_id: Uuid, delivery_id: Uuid) -> Result<()> {
+pub async fn mark_fifo_delivered(
+    pool: &PgPool,
+    endpoint_id: Uuid,
+    delivery_id: Uuid,
+) -> Result<()> {
     // Find the FIFO item matching this delivery
     let item_id: Option<Uuid> = sqlx::query_scalar(
         "SELECT id FROM fifo_queue WHERE endpoint_id = $1 AND status = 'processing' ORDER BY sequence_num ASC LIMIT 1"
@@ -111,7 +115,7 @@ pub async fn check_fifo_timeouts(pool: &PgPool) -> Result<u64> {
         WHERE fq.endpoint_id = ep.id
           AND fq.status = 'pending'
           AND fq.created_at < now() - make_interval(secs => COALESCE(ep.fifo_max_wait_secs, 300))
-        "#
+        "#,
     )
     .execute(pool)
     .await?;

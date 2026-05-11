@@ -86,16 +86,18 @@ async fn list_rate_limits(
 
     let configs = rows
         .into_iter()
-        .map(|(endpoint_id, requests_per_second, burst_size, enabled, created_at, updated_at)| {
-            RateLimitConfigResponse {
-                endpoint_id,
-                requests_per_second,
-                burst_size,
-                enabled,
-                created_at,
-                updated_at,
-            }
-        })
+        .map(
+            |(endpoint_id, requests_per_second, burst_size, enabled, created_at, updated_at)| {
+                RateLimitConfigResponse {
+                    endpoint_id,
+                    requests_per_second,
+                    burst_size,
+                    enabled,
+                    created_at,
+                    updated_at,
+                }
+            },
+        )
         .collect();
 
     Ok(Json(configs))
@@ -111,32 +113,28 @@ async fn get_rate_limit(
 
     let config = sqlx::query_as::<_, (Uuid, i32, i32, bool, DateTime<Utc>, DateTime<Utc>)>(
         "SELECT endpoint_id, requests_per_second, burst_size, enabled, created_at, updated_at
-         FROM rate_limit_configs WHERE endpoint_id = $1"
+         FROM rate_limit_configs WHERE endpoint_id = $1",
     )
     .bind(endpoint_id)
     .fetch_optional(&pool)
     .await?;
 
     match config {
-        Some((eid, rps, burst, enabled, created_at, updated_at)) => {
-            Ok(Json(serde_json::json!({
-                "endpoint_id": eid,
-                "requests_per_second": rps,
-                "burst_size": burst,
-                "enabled": enabled,
-                "created_at": created_at,
-                "updated_at": updated_at,
-            })))
-        }
-        None => {
-            Ok(Json(serde_json::json!({
-                "endpoint_id": endpoint_id,
-                "requests_per_second": 10,
-                "burst_size": 20,
-                "enabled": true,
-                "is_default": true,
-            })))
-        }
+        Some((eid, rps, burst, enabled, created_at, updated_at)) => Ok(Json(serde_json::json!({
+            "endpoint_id": eid,
+            "requests_per_second": rps,
+            "burst_size": burst,
+            "enabled": enabled,
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }))),
+        None => Ok(Json(serde_json::json!({
+            "endpoint_id": endpoint_id,
+            "requests_per_second": 10,
+            "burst_size": 20,
+            "enabled": true,
+            "is_default": true,
+        }))),
     }
 }
 
@@ -160,7 +158,7 @@ async fn set_rate_limit(
                requests_per_second = EXCLUDED.requests_per_second,
                burst_size = EXCLUDED.burst_size,
                enabled = EXCLUDED.enabled,
-               updated_at = now()"#
+               updated_at = now()"#,
     )
     .bind(endpoint_id)
     .bind(rps)
@@ -171,7 +169,9 @@ async fn set_rate_limit(
 
     tracing::info!(
         "⚡ Rate limit set for endpoint {}: {} rps, burst {}",
-        endpoint_id, rps, burst
+        endpoint_id,
+        rps,
+        burst
     );
 
     Ok(Json(serde_json::json!({
