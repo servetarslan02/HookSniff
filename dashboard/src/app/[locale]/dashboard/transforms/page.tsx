@@ -14,6 +14,7 @@ export default function TransformsPage() {
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
   const [rules, setRules] = useState<TransformRule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
 
   // New rule form
@@ -26,15 +27,20 @@ export default function TransformsPage() {
 
   useEffect(() => {
     if (!token) return;
-    endpointsApi.list(token).then(setEndpoints).catch(() => {});
+    endpointsApi.list(token).then(setEndpoints).catch((err) => {
+      setError(err instanceof Error ? err.message : 'Failed to load endpoints');
+    });
   }, [token]);
 
   const loadRules = useCallback(async (endpointId: string) => {
     if (!token || !endpointId) return;
     try {
+      setError(null);
       const data = await transformsApi.list(token, endpointId);
       setRules(data);
-    } catch {} finally { setLoading(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load transforms');
+    } finally { setLoading(false); }
   }, [token]);
 
   useEffect(() => { if (selectedEndpoint) loadRules(selectedEndpoint); }, [selectedEndpoint, loadRules]);

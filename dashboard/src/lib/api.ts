@@ -4,6 +4,20 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'p
 
 const REQUEST_TIMEOUT_MS = 30_000;
 
+// CSRF protection: For mutating requests, ensure Origin matches the site.
+// This is a defense-in-depth measure alongside cookie-based auth.
+// Browsers send Origin automatically; attackers cannot spoof it cross-origin.
+function getCSRFHeaders(method: string): Record<string, string> {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method.toUpperCase())) {
+    if (typeof window !== 'undefined') {
+      return {
+        'Origin': window.location.origin,
+      };
+    }
+  }
+  return {};
+}
+
 export interface ApiOptions {
   method?: string;
   body?: unknown;
@@ -16,6 +30,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    ...getCSRFHeaders(method),
   };
 
   if (token) {

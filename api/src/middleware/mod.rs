@@ -4,18 +4,21 @@ pub mod webhook_verify;
 use axum::{extract::Request, http::header::AUTHORIZATION, middleware::Next, response::Response};
 use sqlx::PgPool;
 use std::collections::HashMap;
-use std::sync::Mutex;
 use std::time::{Duration, Instant};
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 const AUTH_COOKIE_NAME: &str = "hooksniff_token";
 const REFRESH_COOKIE_NAME: &str = "hooksniff_refresh";
 const AUTH_CACHE_TTL: Duration = Duration::from_secs(30);
+/// Maximum number of cached auth entries to prevent unbounded memory growth
+const AUTH_CACHE_MAX_ENTRIES: usize = 10_000;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
 /// Simple in-memory cache for auth lookups (prefix → (customer, expiry))
+/// Uses tokio::sync::Mutex to safely hold across .await points.
 struct AuthCache {
     entries: HashMap<String, (Customer, Instant)>,
 }
@@ -38,19 +41,54 @@ impl AuthCache {
     }
 
     fn insert(&mut self, prefix: String, customer: Customer) {
+        // Evict expired entries before inserting to bound memory usage
+        if self.entries.len() >= AUTH_CACHE_MAX_ENTRIES {
+            self.cleanup();
+        }
+        // If still at capacity after cleanup, evict oldest entry
+        if self.entries.len() >= AUTH_CACHE_MAX_ENTRIES {
+            if let Some(oldest_key) = self
+                .entries
+                .iter()
+                .min_by_key(|(_, (_, expiry))| *expiry)
+                .map(|(k, _)| k.clone())
+            {
+                self.entries.remove(&oldest_key);
+            }
+        }
         self.entries
             .insert(prefix, (customer, Instant::now() + AUTH_CACHE_TTL));
     }
 
-    #[allow(dead_code)] // Cache eviction utility; will be called by periodic cleanup task
+    /// Remove all expired entries from the cache
     fn cleanup(&mut self) {
         self.entries
             .retain(|_, (_, expiry)| Instant::now() < *expiry);
     }
 }
 
+/// Global auth cache — uses tokio::sync::Mutex for safe async access.
 static AUTH_CACHE: once_cell::sync::Lazy<Mutex<AuthCache>> =
     once_cell::sync::Lazy::new(|| Mutex::new(AuthCache::new()));
+
+/// Start a background task that periodically cleans up expired auth cache entries.
+/// Call this once from main.rs during server startup.
+pub fn start_auth_cache_cleanup() {
+    tokio::spawn(async loop {
+        tokio::time::sleep(Duration::from_secs(60)).await;
+        let mut cache = AUTH_CACHE.lock().await;
+        let before = cache.entries.len();
+        cache.cleanup();
+        let after = cache.entries.len();
+        if before != after {
+            tracing::debug!(
+                "Auth cache cleanup: removed {} expired entries ({} remaining)",
+                before - after,
+                after
+            );
+        }
+    });
+}
 
 /// Indicates whether the current request was made with a test API key (hr_test_*).
 /// Handlers can check this to mark deliveries as test and skip real delivery.
@@ -136,7 +174,7 @@ pub async fn auth_middleware(
 
         // HS-038i: Check cache WITHOUT holding lock across .await
         let cached = {
-            let cache = AUTH_CACHE.lock().unwrap();
+            let cache = AUTH_CACHE.lock().await;
             cache.get(&prefix)
         };
 
@@ -189,7 +227,8 @@ pub async fn auth_middleware(
             let customer = found.ok_or(AppError::Unauthorized)?;
 
             // Cache the result (lock acquired only for insert, not held across .await)
-            if let Ok(mut cache) = AUTH_CACHE.lock() {
+            {
+                let mut cache = AUTH_CACHE.lock().await;
                 cache.insert(prefix, customer.clone());
             }
 

@@ -8,11 +8,11 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTranslations } from 'next-intl';
 
 const adminNavigation = [
-  { name: 'Overview', href: '/admin', icon: '📊' },
-  { name: 'Users', href: '/admin/users', icon: '👥' },
-  { name: 'Revenue', href: '/admin/revenue', icon: '💰' },
-  { name: 'System', href: '/admin/system', icon: '🖥️' },
-  { name: 'Settings', href: '/admin/settings', icon: '⚙️' },
+  { nameKey: 'overview', href: '/admin', icon: '📊' },
+  { nameKey: 'users', href: '/admin/users', icon: '👥' },
+  { nameKey: 'revenue', href: '/admin/revenue', icon: '💰' },
+  { nameKey: 'system', href: '/admin/system', icon: '🖥️' },
+  { nameKey: 'settingsNav', href: '/admin/settings', icon: '⚙️' },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
@@ -36,12 +36,12 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="text-center">
           <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("accessDenied")}</h2>
-          <p className="text-gray-500 dark:text-slate-400 mb-4">You don&apos;t have admin privileges.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-4">{t("noAdminPrivileges")}</p>
           <Link
             href="/dashboard"
             className="inline-flex px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition"
           >
-            Back to Dashboard
+            {tc('backToDashboard')}
           </Link>
         </div>
       </div>
@@ -82,7 +82,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 : pathname.startsWith(item.href);
             return (
               <Link
-                key={item.name}
+                key={item.nameKey}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
                 className={clsx(
@@ -93,7 +93,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <span className="text-lg">{item.icon}</span>
-                {item.name}
+                {t(`nav.${item.nameKey}`)}
               </Link>
             );
           })}
@@ -104,7 +104,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
           >
             <span className="text-lg">←</span>
-            Back to Dashboard
+            {tc('backToDashboard')}
           </Link>
         </div>
         <div className="absolute bottom-4 left-0 right-0 px-6">
@@ -128,10 +128,10 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             </button>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {adminNavigation.find((n) => n.href === pathname)?.name || 'Admin'}
+                {adminNavigation.find((n) => n.href === pathname)?.nameKey ? t(`nav.${adminNavigation.find((n) => n.href === pathname)!.nameKey}`) : t('adminPanel')}
               </h1>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">
-                Admin
+                {t('adminBadge')}
               </span>
             </div>
           </div>
@@ -143,7 +143,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               onClick={() => { logout(); router.push('/login'); }}
               className="text-sm text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
             >
-              Logout
+              {tc('logout')}
             </button>
           </div>
         </header>

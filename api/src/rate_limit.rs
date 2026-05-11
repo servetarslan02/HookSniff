@@ -395,6 +395,11 @@ pub async fn create_rate_limiter() -> RateLimiter {
 // ──────────────────────────────────────────────────────────────
 
 /// Extract the rate limit key from the request (API key prefix or IP).
+///
+/// Security: X-Forwarded-For is user-controllable and MUST NOT be trusted directly.
+/// We only use it if TRUSTED_PROXY_COUNT is set (indicating a known proxy layer).
+/// Otherwise, fall back to "unknown" for unauthenticated requests without a real
+/// connection-level IP (which still rate-limits via the shared "unknown" bucket).
 fn extract_key(req: &Request) -> String {
     req.headers()
         .get("authorization")
@@ -402,11 +407,18 @@ fn extract_key(req: &Request) -> String {
         .and_then(|v| v.strip_prefix("Bearer "))
         .map(|k| k[..15.min(k.len())].to_string())
         .unwrap_or_else(|| {
-            req.headers()
-                .get("x-forwarded-for")
-                .and_then(|v| v.to_str().ok())
-                .unwrap_or("unknown")
-                .to_string()
+            // Only trust X-Forwarded-For if explicitly configured (behind a trusted proxy).
+            // Without proxy trust, spoofed X-Forwarded-For headers would allow rate-limit bypass.
+            if std::env::var("TRUST_PROXY_HEADERS").as_deref() == Ok("true") {
+                req.headers()
+                    .get("x-forwarded-for")
+                    .and_then(|v| v.to_str().ok())
+                    .and_then(|v| v.split(',').next())
+                    .map(|ip| ip.trim().to_string())
+                    .unwrap_or_else(|| "unknown".to_string())
+            } else {
+                "unknown".to_string()
+            }
         })
 }
 

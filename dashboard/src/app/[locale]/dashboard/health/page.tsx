@@ -31,6 +31,7 @@ export default function EndpointHealthPage() {
   const { } = useAuth();
   const [endpoints, setEndpoints] = useState<EndpointHealth[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const t = useTranslations('health');
   const tc = useTranslations('common');
 
@@ -38,12 +39,18 @@ export default function EndpointHealthPage() {
 
   const fetchHealth = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch(`${API}/endpoint-health`, {
-        headers: {}, credentials: 'include' as const,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include' as const,
       });
-      if (res.ok) setEndpoints(await res.json());
+      if (res.ok) {
+        setEndpoints(await res.json());
+      } else {
+        setError(`Failed to load health data (${res.status})`);
+      }
     } catch (e) {
-      // Error handled silently
+      setError(e instanceof Error ? e.message : 'Failed to load health data');
     } finally {
       setLoading(false);
     }
@@ -63,6 +70,19 @@ export default function EndpointHealthPage() {
           Monitor the health and performance of your webhook endpoints.
         </p>
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+          <button
+            onClick={fetchHealth}
+            className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+          >
+            {tc('retry') || 'Retry'}
+          </button>
+        </div>
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
