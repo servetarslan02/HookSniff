@@ -1,17 +1,23 @@
 # 📋 Fiyat ve Planlama — Sonraki Adımlar
 
-> Son güncelleme: 2026-05-13 01:06 GMT+8
+> Son güncelleme: 2026-05-13 01:26 GMT+8
 
-## Tüm 7 Aşama Tamamlandı ✅
+## Tüm Aşamalar Tamamlandı ✅
 
 ### Tamamlanan İşler
-1. ✅ Application Modeli — CRUD API + migration
+1. ✅ Application Modeli — CRUD API + migration (013)
 2. ✅ Event Type Limiti — plan bazlı kontrol
 3. ✅ Team Member Limiti — plan bazlı kontrol
-4. ✅ Never Blocked — overage sistemi + email bildirimleri
-5. ✅ Plan Tablosu — Developer/Startup/Pro/Enterprise
-6. ✅ Pricing Sayfası — dashboard güncellendi
-7. ✅ Son Kontroller — GitHub push
+4. ✅ Never Blocked — overage sistemi + email bildirimleri (migration 014)
+5. ✅ Plan Tablosu — Developer/Startup/Pro/Enterprise enum + tüm limit fonksiyonları
+6. ✅ Pricing Sayfası — 4 plan kartı, 12+ özellik, karşılaştırma tablosu, i18n EN+TR
+7. ✅ Son Kontroller — kod incelemesi, 5 hata düzeltildi, push edildi
+
+### Yapılan Son Düzeltmeler (Oturum 3)
+- Batch webhook overage mantığı eklendi
+- Frontend dead code temizlendi
+- Karşılaştırma tablosu 4 sütun yapıldı
+- Feature listeleri genişletildi (Developer 10, Startup 12, Pro 12, Enterprise 8)
 
 ## Kalan (Servet veya sonraki oturum)
 
