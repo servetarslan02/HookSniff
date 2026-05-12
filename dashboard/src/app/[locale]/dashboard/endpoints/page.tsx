@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { endpointsApi, type Endpoint } from '@/lib/api';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
   const router = useRouter();
+  const locale = useLocale();
   const { toast } = useToast();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -234,7 +235,7 @@ export default function EndpointsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => router.push(`/dashboard/endpoints/${ep.id}`)}
+                    onClick={() => router.push(`/${locale}/dashboard/endpoints/${ep.id}`)}
                     className="text-gray-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition p-2"
                     title={t('settingsTitle')}
                   >
