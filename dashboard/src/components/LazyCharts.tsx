@@ -25,6 +25,10 @@ function ChartSkeleton() {
   );
 }
 
+// Item 292: Recharts doesn't export clean prop types for dynamic imports.
+// TODO: Replace `any` with proper recharts prop types once available.
+// For now, `any` is intentional to avoid type errors with dynamic().
+
 // Lazy-loaded chart components
 export const LazyLineChart = dynamic(
   () => import("recharts").then((mod) => mod.LineChart as ComponentType<any>),
