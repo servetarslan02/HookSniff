@@ -23,6 +23,8 @@ export default function AdminOverviewPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [securityLogs, setSecurityLogs] = useState<AuditLogEntry[]>([]);
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
+  const [uptime24h, setUptime24h] = useState<number | null>(null);
+  const [uptime7d, setUptime7d] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
@@ -47,6 +49,19 @@ export default function AdminOverviewPage() {
       setSecurityLogs(allLogs.filter((log: AuditLogEntry) =>
         SECURITY_ACTIONS.some(sa => log.action.toUpperCase().includes(sa))
       ));
+
+      // Fetch uptime from health endpoint
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+        const healthRes = await fetch(`${API}/health`, { headers: { Authorization: `Bearer ${token}` } });
+        if (healthRes.ok) {
+          const healthData = await healthRes.json();
+          setUptime24h(healthData.uptime_24h ?? null);
+          setUptime7d(healthData.uptime_7d ?? null);
+        }
+      } catch {
+        // Uptime fetch failed, silently continue
+      }
     } catch {
       setError(t("failedToLoadStats"));
     } finally {
@@ -504,6 +519,200 @@ export default function AdminOverviewPage() {
               </div>
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* ── Uptime + Feature Flags + Last Deploy + Active Sessions ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Uptime 24h */}
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl" aria-hidden="true">🟢</span>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('uptime24h')}</h2>
+          </div>
+          {uptime24h != null ? (
+            <>
+              <p className={`text-3xl font-bold ${uptime24h >= 99.9 ? 'text-emerald-600 dark:text-emerald-400' : uptime24h >= 99 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                %{uptime24h.toFixed(2)}
+              </p>
+              <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                <div
+                  className={`h-full rounded-full ${uptime24h >= 99.9 ? 'bg-emerald-500' : uptime24h >= 99 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                  style={{ width: `${Math.min(uptime24h, 100)}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <p className="text-lg text-gray-400 dark:text-slate-500">{t('na')}</p>
+          )}
+        </div>
+
+        {/* Uptime 7d */}
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl" aria-hidden="true">📅</span>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('uptime7d')}</h2>
+          </div>
+          {uptime7d != null ? (
+            <>
+              <p className={`text-3xl font-bold ${uptime7d >= 99.9 ? 'text-emerald-600 dark:text-emerald-400' : uptime7d >= 99 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                %{uptime7d.toFixed(2)}
+              </p>
+              <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                <div
+                  className={`h-full rounded-full ${uptime7d >= 99.9 ? 'bg-emerald-500' : uptime7d >= 99 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                  style={{ width: `${Math.min(uptime7d, 100)}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <p className="text-lg text-gray-400 dark:text-slate-500">{t('na')}</p>
+          )}
+        </div>
+
+        {/* Feature Flags */}
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl" aria-hidden="true">🚩</span>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('featureFlagStatus')}</h2>
+          </div>
+          <p className="text-3xl font-bold text-gray-400 dark:text-slate-500">{t('na')}</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('comingSoon')}</p>
+        </div>
+
+        {/* Active Sessions */}
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl" aria-hidden="true">👤</span>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('activeSessionsNow')}</h2>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            {stats?.active_users_today?.toLocaleString() || '0'}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('activeUsersToday')}</p>
+        </div>
+      </div>
+
+      {/* ── Weekly Comparison ── */}
+      {stats?.trends && (
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('weekComparison')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {/* Users comparison */}
+            <div>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{t('totalUsers')}</p>
+              <div className="flex items-end gap-2">
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_users.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gray-500 dark:text-slate-400">{t('vsYesterday')}:</span>
+                <span className={`text-xs font-medium ${stats.total_users >= stats.trends.total_users_yesterday ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {stats.total_users >= stats.trends.total_users_yesterday ? '+' : ''}{stats.total_users - stats.trends.total_users_yesterday}
+                </span>
+              </div>
+            </div>
+            {/* Deliveries comparison */}
+            <div>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{t('totalDeliveries')}</p>
+              <div className="flex items-end gap-2">
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_deliveries.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gray-500 dark:text-slate-400">{t('vsYesterday')}:</span>
+                <span className={`text-xs font-medium ${stats.total_deliveries >= stats.trends.total_deliveries_yesterday ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {stats.total_deliveries >= stats.trends.total_deliveries_yesterday ? '+' : ''}{stats.total_deliveries - stats.trends.total_deliveries_yesterday}
+                </span>
+              </div>
+            </div>
+            {/* Revenue comparison */}
+            <div>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{t('totalRevenue')}</p>
+              <div className="flex items-end gap-2">
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">₺{stats.total_revenue.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gray-500 dark:text-slate-400">{t('vsYesterday')}:</span>
+                <span className={`text-xs font-medium ${stats.total_revenue >= stats.trends.revenue_yesterday ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {stats.total_revenue >= stats.trends.revenue_yesterday ? '+' : ''}₺{(stats.total_revenue - stats.trends.revenue_yesterday).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Standard Webhooks + Deduplication ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Standard Webhooks */}
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xl" aria-hidden="true">📐</span>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('standardWebhooks')}</h2>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('standardWebhooksDesc')}</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-slate-400">{t('webhookPrefix')}</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                webhook-
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-slate-400">{t('whsecSecret')}</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                whsec_
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
+                {t('comingSoon')}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Deduplication */}
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xl" aria-hidden="true">🔁</span>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deduplication')}</h2>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('deduplicationDesc')}</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-slate-400">{t('filteredEvents')}</span>
+              <span className="text-lg font-bold text-gray-400 dark:text-slate-500">{t('na')}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-slate-400">{t('dedupWindow')}</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                {t('notConfigured')}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
+                {t('comingSoon')}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Last Deploy ── */}
+      <div className="glass-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xl" aria-hidden="true">🚀</span>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('lastDeploy')}</h2>
+        </div>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('lastDeployDesc')}</p>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-sm text-gray-700 dark:text-slate-300">main</span>
+          </div>
+          <span className="text-sm text-gray-500 dark:text-slate-400">{t('comingSoon')}</span>
         </div>
       </div>
     </div>
