@@ -39,3 +39,28 @@ interface Schema {
 - Schema ile event eşleştirmesi
 - Schema versioning geçmişi
 - Schema test/validasyon aracı
+
+---
+
+## 🔧 Backend & Frontend Uyumsuzluğu (2026-05-13)
+
+### Backend'de Var, Frontend'de Yok
+| Özellik | Backend | Frontend | Durum |
+|---------|---------|----------|-------|
+| Schema oluşturma | `POST /v1/schemas` (register_schema) | ❌ Form yok | EKLENMELİ |
+| Schema silme | — (backend'de delete endpoint'i yok) | ❌ | Backend'e eklenmeli |
+| Event doğrulama | `POST /v1/schemas/{id}/validate` | ❌ Buton/form yok | EKLENMELİ |
+
+### Yapılacaklar
+1. **Schema Oluşturma Formu** — name, version, JSON Schema textarea
+   - Backend: `POST /v1/schemas` zaten var
+   - Frontend: `schemasApi.create(token, {name, version, schema})` çağrısı + form UI
+2. **Schema Silme** — ConfirmDialog ile silme butonu
+   - Backend: `DELETE /v1/schemas/{id}` endpoint'i eklenmeli (Rust)
+   - Frontend: `schemasApi.delete(token, id)` + silme butonu
+3. **Event Doğrulama** — Schema ile event test etme
+   - Backend: `POST /v1/schemas/{id}/validate` zaten var
+   - Frontend: payload textarea + "Validate" butonu + sonuç gösterimi
+4. **Schema Düzenleme** — Mevcut schema'yı güncelleme
+   - Backend: `PUT /v1/schemas/{id}` endpoint'i eklenmeli
+   - Frontend: düzenleme formu (modal veya inline)

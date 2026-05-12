@@ -91,3 +91,30 @@
 - Alert kopyalama
 - Toplu alert yönetimi
 - Webhook URL doğrulama (webhook kanalı için)
+
+---
+
+## 🔧 Backend & Frontend Uyumsuzluğu (2026-05-13)
+
+### Backend'de Var, Frontend'de Yok
+| Özellik | Backend | Frontend | Durum |
+|---------|---------|----------|-------|
+| Alert düzenleme | `PUT /v1/alerts/{id}` (update_alert) | ❌ Düzenleme butonu yok | EKLENMELİ |
+| Alert pause/resume | — (backend'de toggle endpoint'i yok) | ❌ Toggle yok | Backend'e eklenmeli |
+| Alert tetiklenme geçmişi | — (backend'de history endpoint'i yok) | ❌ Liste yok | Backend'e eklenmeli |
+
+### Yapılacaklar
+1. **Alert Düzenleme** — Mevcut alert kuralını güncelleme
+   - Backend: `PUT /v1/alerts/{id}` zaten var
+   - Frontend: Her alert kartında "Düzenle" butonu → mevcut değerlerle form
+   - Form: name, condition, threshold, channels (mevcut değerlerle dolu)
+2. **Alert Pause/Resume** — Alert'i geçici olarak durdurma
+   - Backend: `PUT /v1/alerts/{id}` ile `is_active` toggle (zaten destekliyor)
+   - Frontend: Her alert kartında toggle switch (aktif/pasif)
+3. **Alert Tetiklenme Geçmişi** — Ne zaman tetiklendi
+   - Backend: `GET /v1/alerts/{id}/history` endpoint'i eklenmeli
+   - Frontend: "Geçmiş" butonu → modal: tetiklenme listesi (tarih, değer, kanal)
+4. **Alert Kopyalama** — Mevcut alert'i kopyalama
+   - Frontend: "Kopyala" butonu → yeni alert formu (mevcut değerlerle)
+5. **Endpoint Bazlı Alert** — Belirli endpoint için alert
+   - Frontend: Form'a endpoint seçici ekle (opsiyonel)

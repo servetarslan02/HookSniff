@@ -39,3 +39,27 @@
 - Webhook test butonu yok
 - Provider bazlı rehber yok
 - Entegrasyon durumu gösterimi yok
+
+---
+
+## 🔧 Backend & Frontend Uyumsuzluğu (2026-05-13)
+
+### Backend'de Var, Frontend'de Yok
+| Özellik | Backend | Frontend | Durum |
+|---------|---------|----------|-------|
+| Konfigürasyon silme | — (backend'de delete endpoint'i yok) | ❌ Buton yok | Backend'e eklenmeli |
+| Konfigürasyon düzenleme | — (backend'de update endpoint'i yok) | ❌ Form yok | Backend'e eklenmeli |
+| Webhook test | — (backend'de test endpoint'i yok) | ❌ Buton yok | Backend'e eklenmeli |
+
+### Yapılacaklar
+1. **Konfigürasyon Silme** — Mevcut inbound yapılandırmasını kaldırma
+   - Backend: `DELETE /v1/inbound/configs/{id}` endpoint'i eklenmeli (Rust)
+   - Frontend: ConfirmDialog ile silme butonu
+2. **Konfigürasyon Düzenleme** — Secret, endpoint değiştirme
+   - Backend: `PUT /v1/inbound/configs/{id}` endpoint'i eklenmeli
+   - Frontend: "Düzenle" butonu → Modal: endpoint select, secret input
+3. **Webhook Test** — Inbound webhook test etme
+   - Backend: `POST /v1/inbound/{provider}/test` endpoint'i eklenmeli
+   - Frontend: "Test Et" butonu → örnek payload gönder → sonuç gösterimi
+4. **Entegrasyon Durumu** — Provider bağlantı durumu
+   - Frontend: Her provider kartında bağlantı durumu göstergesi (bağlı/bağlı değil)
