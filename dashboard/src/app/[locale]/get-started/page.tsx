@@ -255,7 +255,7 @@ export default function GetStartedPage() {
                   onClick={() => setActiveSdk(key)}
                   className={`px-4 py-2.5 text-sm font-medium transition-colors flex items-center gap-1.5 ${
                     activeSdk === key
-                      ? 'text-brand-700 dark:text-brand-400 border-b-2 border-brand-500 bg-white dark:bg-slate-900'
+                      ? 'text-brand-700 dark:text-brand-400 border-b-2 border-brand-500 bg-white dark:bg-slate-800'
                       : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
                   }`}
                 >
@@ -363,7 +363,7 @@ export default function GetStartedPage() {
       </div>
 
       {/* Event Types */}
-      <div className="bg-gray-50 dark:bg-slate-900/50 border-t border-gray-200 dark:border-slate-800">
+      <div className="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700">
         <div className="max-w-5xl mx-auto px-4 py-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">📋 {t('eventTypesTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-8">{t('eventTypesDesc')}</p>
@@ -407,7 +407,7 @@ export default function GetStartedPage() {
       </div>
 
       {/* CLI */}
-      <div className="bg-gray-50 dark:bg-slate-900/50 border-t border-gray-200 dark:border-slate-800">
+      <div className="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700">
         <div className="max-w-5xl mx-auto px-4 py-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">⌨️ {t('cliTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-8">{t('cliDesc')}</p>

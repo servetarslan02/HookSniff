@@ -17,7 +17,7 @@ export default function ProvidersPage() {
   const t = useTranslations('providers');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -36,7 +36,7 @@ export default function ProvidersPage() {
 
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           {providers.map((p) => (
-            <Link key={p.name} href={p.href} className="group p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-center">
+            <Link key={p.name} href={p.href} className="group p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-center">
               <span className="text-4xl mb-3 block">{p.emoji}</span>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-2">{p.name}</h2>
               <p className="text-sm text-gray-600 dark:text-slate-400">{p.desc}</p>

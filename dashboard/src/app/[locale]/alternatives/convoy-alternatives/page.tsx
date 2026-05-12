@@ -9,13 +9,13 @@ export const metadata = {
 export default function ConvoyAlternativesPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <Link href="/alternatives" className="text-gray-600 dark:text-slate-400">Alternatives</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">Convoy</span>
           </div>
           <LanguageSwitcher />
@@ -28,10 +28,10 @@ export default function ConvoyAlternativesPage() {
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">Convoy is a solid Go-based webhook service, but it&apos;s Go-only and lacks a managed cloud. Here are the best alternatives.</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden mb-12">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden mb-12">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead><tr className="border-b border-gray-200 dark:border-slate-800">
+              <thead><tr className="border-b border-gray-200 dark:border-slate-700">
                 <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">Service</th>
                 <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Price</th>
                 <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">SDKs</th>
@@ -47,7 +47,7 @@ export default function ConvoyAlternativesPage() {
                   { name: 'Hookdeck', price: '$39/mo+', sdks: '8', cloud: '✅', oss: '❌', portal: 'Full', hl: false },
                   { name: 'Hook0', price: 'Free', sdks: '4', cloud: '✅', oss: '✅', portal: 'Basic', hl: false },
                 ].map((row) => (
-                  <tr key={row.name} className={`border-b border-gray-100 dark:border-slate-800/50 last:border-0 ${row.hl ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
+                  <tr key={row.name} className={`border-b border-gray-100 dark:border-slate-700/50 last:border-0 ${row.hl ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                     <td className={`py-3 px-6 font-medium ${row.hl ? 'text-brand-600 dark:text-brand-400' : 'text-gray-900 dark:text-white'}`}>{row.name}</td>
                     <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{row.price}</td>
                     <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{row.sdks}</td>

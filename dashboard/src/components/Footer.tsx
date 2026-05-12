@@ -46,7 +46,7 @@ export default function Footer() {
   const t = useTranslations('landing.footer');
 
   return (
-    <footer className="border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300">
+    <footer className="border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Main Footer */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
@@ -120,7 +120,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="pt-8 border-t border-gray-200 dark:border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xl">🪝</span>
             <span className="font-semibold text-gray-900 dark:text-white">HookSniff</span>

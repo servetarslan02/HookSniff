@@ -24,7 +24,7 @@ export default function StripeWebhooksPage() {
         </div>
 
         {/* Quick Start */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 mb-8">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">⚡ Quick Start</h2>
           <ol className="space-y-4">
             <li className="flex gap-3">
@@ -59,12 +59,12 @@ export default function StripeWebhooksPage() {
         </div>
 
         {/* Common Events */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 mb-8">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">📋 Common Stripe Events</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-slate-800">
+                <tr className="border-b border-gray-200 dark:border-slate-700">
                   <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">{t("event")}</th>
                   <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">{t("whenItFires")}</th>
                 </tr>
@@ -82,7 +82,7 @@ export default function StripeWebhooksPage() {
                   ['charge.dispute.created', 'Customer initiated a dispute'],
                   ['checkout.session.completed', 'Stripe Checkout completed'],
                 ].map(([event, desc]) => (
-                  <tr key={event} className="border-b border-gray-100 dark:border-slate-800/50 last:border-0">
+                  <tr key={event} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                     <td className="py-2 px-4 font-mono text-xs text-brand-600 dark:text-brand-400">{event}</td>
                     <td className="py-2 px-4 text-gray-600 dark:text-slate-400">{desc}</td>
                   </tr>
@@ -93,7 +93,7 @@ export default function StripeWebhooksPage() {
         </div>
 
         {/* Code Example */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 mb-8">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">💻 Node.js Example</h2>
           <pre className="bg-gray-900 dark:bg-slate-800 text-gray-100 p-4 rounded-lg text-xs overflow-x-auto"><code>{`import { Webhook } from 'hooksniff-sdk';
 
