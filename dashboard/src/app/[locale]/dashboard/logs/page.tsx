@@ -135,7 +135,7 @@ export default function LogsPage() {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition ${
                 filter === f
                   ? 'bg-gray-900 dark:bg-brand-600 text-white shadow-sm'
-                  : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
+                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
             >
               <span>{icons[f]}</span>
@@ -314,7 +314,7 @@ export default function LogsPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelected(null)} />
-          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deliveryDetails')}</h3>
               <button
@@ -339,7 +339,7 @@ export default function LogsPage() {
               <DetailRow label={t("created")} value={new Date(selected.created_at).toLocaleString()} />
 
               {/* Attempts Timeline */}
-              <div className="pt-4 border-t border-gray-100 dark:border-slate-800">
+              <div className="pt-4 border-t border-gray-100 dark:border-slate-700">
                 <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('deliveryDetails')}</h4>
                 <div className="space-y-3">
                   {Array.from({ length: selected.attempt_count }).map((_, i) => {
