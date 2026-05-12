@@ -1388,7 +1388,8 @@
     "notConfigured": "Yapılandırılmamış",
     "comingSoon": "Yakında",
     "na": "—",
-    "percent": "%"
+    "percent": "%",
+    "more": "daha fazla"
   },
   "landing": {
     "nav": {

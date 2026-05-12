@@ -552,7 +552,32 @@ export const adminApi = {
 
   updateSettings: (token: string, settings: PlatformSettings) =>
     apiFetch<{ message: string }>('/admin/settings', { method: 'PUT', body: settings, token }),
+
+  // Feature Flags
+  listFeatureFlags: (token: string) =>
+    apiFetch<{ flags: FeatureFlag[] }>('/admin/feature-flags', { token }),
+
+  createFeatureFlag: (token: string, data: { name: string; description?: string; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
+    apiFetch<FeatureFlag>('/admin/feature-flags', { method: 'POST', body: data, token }),
+
+  updateFeatureFlag: (token: string, id: string, data: { name?: string; description?: string; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
+    apiFetch<FeatureFlag>(`/admin/feature-flags/${id}`, { method: 'PUT', body: data, token }),
+
+  deleteFeatureFlag: (token: string, id: string) =>
+    apiFetch<{ success: boolean }>(`/admin/feature-flags/${id}`, { method: 'DELETE', token }),
 };
+
+export interface FeatureFlag {
+  id: string;
+  name: string;
+  description: string | null;
+  is_enabled: boolean;
+  rollout_percentage: number;
+  enabled_for_plans: string[];
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface PlatformSettings {
   default_plan: string;
