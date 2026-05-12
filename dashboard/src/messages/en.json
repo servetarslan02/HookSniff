@@ -93,7 +93,20 @@
     "pleaseTryAgain": "Please try again.",
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
-    "redirecting": "Redirecting to login..."
+    "redirecting": "Redirecting to login...",
+    "skipToContent": "Skip to content",
+    "loadingChart": "Loading chart data...",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "copyToClipboard": "Copy to clipboard",
+    "closeModal": "Close dialog",
+    "openSidebar": "Open sidebar",
+    "chartDeliveryTrends": "Chart showing delivery trends over time",
+    "chartSuccessRate": "Chart showing success rate over time",
+    "chartErrorBreakdown": "Chart showing error breakdown by type",
+    "chartTopEndpoints": "Chart showing top endpoints by delivery volume",
+    "chartLatencyDistribution": "Chart showing latency distribution",
+    "loadingData": "Loading data..."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -418,7 +431,12 @@
     "deleted": "Notification deleted",
     "failedToLoad": "Failed to load notifications",
     "failedToMarkRead": "Failed to mark as read",
-    "failedToMarkAllRead": "Failed to mark all as read"
+    "failedToMarkAllRead": "Failed to mark all as read",
+    "typeAll": "All",
+    "typeWebhookFailed": "Webhook Failed",
+    "typeAlerts": "Alerts",
+    "typeSystem": "System",
+    "typeBilling": "Billing"
   },
   "webhooks": {
     "title": "Webhooks",
@@ -448,7 +466,11 @@
     "latencyDistribution": "Latency Distribution",
     "successRate": "Success Rate",
     "totalDelivered": "Total Delivered",
-    "totalFailed": "Total Failed"
+    "totalFailed": "Total Failed",
+    "subtitleDesc": "Delivery trends, success rates, and performance metrics",
+    "successfulLabel": "Successful",
+    "failedLabel": "Failed",
+    "successLabel": "success"
   },
   "settings": {
     "title": "Settings",
@@ -559,7 +581,15 @@
     "namePlaceholder": "Your name",
     "emailPlaceholder": "you@example.com",
     "passwordPlaceholder": "••••••••",
-    "orContinueWith": "Or continue with"
+    "orContinueWith": "Or continue with",
+    "consentPrefix": "I agree to the",
+    "consentTerms": "Terms of Service",
+    "consentAnd": "and",
+    "consentPrivacy": "Privacy Policy",
+    "consentRequired": "You must agree to the Terms of Service and Privacy Policy",
+    "passwordWeak": "Weak",
+    "passwordMedium": "Medium",
+    "passwordStrong": "Strong"
   },
   "docs": {
     "gettingStarted": "Getting Started",
@@ -1163,7 +1193,22 @@
     "failedToLoadDetails": "Failed to load user details",
     "failedToUpdatePlan": "Failed to update plan",
     "failedToUpdateStatus": "Failed to update status",
-    "businessPlan": "Business Plan"
+    "businessPlan": "Business Plan",
+    "loadingSettings": "Loading settings...",
+    "settingsLoaded": "Settings loaded",
+    "fetchingHealth": "Checking system status...",
+    "infrastructureTable": "Infrastructure Details",
+    "skipToContent": "Skip to content",
+    "errorDetails": "Error Details",
+    "retryingHealth": "Retrying system health check...",
+    "noChartData": "No chart data available",
+    "chartPlaceholder": "User distribution chart",
+    "serviceStatus": "Service Status",
+    "providerLabel": "Provider",
+    "statusLabel": "Status",
+    "loadSettingsFailed": "Failed to load settings",
+    "allServices": "All Services",
+    "infrastructureHeader": "Service"
   },
   "landing": {
     "nav": {
@@ -2178,6 +2223,7 @@
     "attempt": "Attempt {n}",
     "totalRetryTime": "Total retry time (worst case):",
     "tip": "Tip:",
+    "tipContent": "Per-endpoint retry policies override these global defaults. Configure them in",
     "endpointSettingsLink": "Endpoint Settings"
   },
   "inbound": {
