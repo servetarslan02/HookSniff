@@ -1259,7 +1259,7 @@ mod tests {
     #[test]
     fn test_subscription_response_clone_and_debug() {
         let resp = SubscriptionResponse {
-            plan: "free".to_string(),
+            plan: "developer".to_string(),
             status: "active".to_string(),
             payment_provider: "polar".to_string(),
             stripe_subscription_id: None,
@@ -1288,9 +1288,9 @@ mod tests {
 
     #[test]
     fn test_upgrade_request_deserialization_without_provider() {
-        let json = r#"{"plan":"business"}"#;
+        let json = r#"{"plan":"enterprise"}"#;
         let req: UpgradeRequest = serde_json::from_str(json).unwrap();
-        assert_eq!(req.plan, "business");
+        assert_eq!(req.plan, "enterprise");
         assert_eq!(req.provider, None);
         assert_eq!(req.billing_period, None);
     }
