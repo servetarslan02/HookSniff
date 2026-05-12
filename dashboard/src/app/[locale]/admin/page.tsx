@@ -130,8 +130,8 @@ export default function AdminOverviewPage() {
   const arr = mrr * 12;
 
   // Endpoint stats (from admin stats)
-  const totalEndpoints = (stats as Record<string, unknown>)?.total_endpoints as number | undefined;
-  const activeEndpoints = (stats as Record<string, unknown>)?.active_endpoints as number | undefined;
+  const totalEndpoints = (stats as unknown as Record<string, unknown>)?.total_endpoints as number | undefined;
+  const activeEndpoints = (stats as unknown as Record<string, unknown>)?.active_endpoints as number | undefined;
   const disabledEndpoints = totalEndpoints != null && activeEndpoints != null ? totalEndpoints - activeEndpoints : undefined;
 
   // Security warnings count
