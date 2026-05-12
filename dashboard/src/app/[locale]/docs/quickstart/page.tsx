@@ -1,6 +1,17 @@
 import { useTranslations } from 'next-intl';
 import SdkTabs from '@/components/SdkTabs';
 import CodeBlock from '@/components/CodeBlock';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Quickstart Guide',
+  description: 'Get started with HookSniff in 5 minutes',
+};
+
 
 const quickstartTabs = [
   {

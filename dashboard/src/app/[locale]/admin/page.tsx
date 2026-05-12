@@ -191,11 +191,11 @@ export default function AdminOverviewPage() {
                         style={{ height: `${bar.pct}%`, backgroundColor: bar.color, marginTop: 'auto' }}
                       />
                     </div>
-                    <span className="text-xs text-gray-400 dark:text-slate-500">{t(bar.labelKey)}</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-500">{t(bar.labelKey)}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 dark:text-slate-500 text-center">{t('noChartData')}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500 text-center">{t('noChartData')}</p>
             </div>
           )}
         </div>

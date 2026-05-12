@@ -41,7 +41,8 @@ pub struct WsConnection {
     pub last_heartbeat: chrono::DateTime<chrono::Utc>,
     pub metadata: Option<Value>,
     /// Channel for sending messages to this specific connection.
-    pub tx: tokio::sync::mpsc::UnboundedSender<WsMessage>,
+    /// BUG-025: Bounded channel (256) to prevent memory growth from slow consumers.
+    pub tx: tokio::sync::mpsc::Sender<WsMessage>,
 }
 
 /// An event broadcast to WebSocket subscribers.
@@ -84,7 +85,9 @@ pub struct SubscribeRequest {
 impl WsGateway {
     /// Create a new WebSocket gateway.
     pub fn new(jwt_secret: String) -> Self {
-        let (event_tx, _) = broadcast::channel(1024);
+        // Item 286: Larger broadcast channel to reduce overflow drops
+        // 4096 events buffered — should handle burst traffic
+        let (event_tx, _) = broadcast::channel(4096);
         Self {
             connections: Arc::new(RwLock::new(HashMap::new())),
             event_tx,
@@ -99,7 +102,7 @@ impl WsGateway {
         &self,
         customer_id: Uuid,
         event_filters: Vec<String>,
-        tx: tokio::sync::mpsc::UnboundedSender<WsMessage>,
+        tx: tokio::sync::mpsc::Sender<WsMessage>,
     ) -> Result<String, &'static str> {
         let mut connections = self.connections.write().await;
 
@@ -177,9 +180,11 @@ impl WsGateway {
             // Check if the event matches any of the connection's filters
             if event_matches_filters(&event.event_type, &conn.event_filters) {
                 let msg = WsMessage::Event(event.clone());
-                if conn.tx.send(msg).is_err() {
+                // BUG-025: Use try_send for bounded channel — drop events for slow consumers
+                // rather than blocking the broadcast loop.
+                if conn.tx.try_send(msg).is_err() {
                     warn!(
-                        "Failed to send event to connection {} (channel closed)",
+                        "Failed to send event to connection {} (channel full or closed)",
                         conn.connection_id
                     );
                 }
@@ -187,7 +192,14 @@ impl WsGateway {
         }
 
         // Also broadcast to the general channel for any subscribers
-        let _ = self.event_tx.send(event);
+        // Item 286: Log overflow instead of silently dropping
+        if let Err(e) = self.event_tx.send(event) {
+            match e {
+                tokio::sync::broadcast::error::SendError(_) => {
+                    debug!("Broadcast channel: no active receivers for event");
+                }
+            }
+        }
     }
 
     /// Get the count of active connections.

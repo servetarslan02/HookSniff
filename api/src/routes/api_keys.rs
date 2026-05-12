@@ -66,7 +66,7 @@ async fn create_api_key(
 ) -> Result<Json<CreateApiKeyResponse>, AppError> {
     let api_key = generate_api_key();
     let api_key_hash = hash_api_key(&api_key);
-    let api_key_prefix = api_key[..15].to_string();
+    let api_key_prefix = api_key[..24].to_string();
 
     let name = req.name.unwrap_or_else(|| "Default".to_string());
 
@@ -139,7 +139,7 @@ async fn rotate_api_key(
 
     let new_key = generate_api_key();
     let new_hash = hash_api_key(&new_key);
-    let new_prefix = new_key[..15].to_string();
+    let new_prefix = new_key[..24].to_string();
 
     sqlx::query("UPDATE api_keys SET api_key_hash = $1, api_key_prefix = $2, last_used_at = NULL WHERE id = $3")
         .bind(&new_hash)
@@ -234,7 +234,7 @@ mod tests {
     fn test_api_key_prefix_format() {
         // Prefix should be first 15 chars of the key
         let api_key = "hr_live_abc123def456ghi789";
-        let prefix = &api_key[..15];
+        let prefix = &api_key[..24];
         assert_eq!(prefix, "hr_live_abc123d");
     }
 }

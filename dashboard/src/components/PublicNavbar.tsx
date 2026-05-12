@@ -23,7 +23,7 @@ export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
           <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
           {pageTitle && (
             <>
-              <span className="text-gray-400">/</span>
+              <span className="text-gray-500">/</span>
               <span className="text-gray-600 dark:text-slate-400">{pageTitle}</span>
             </>
           )}

@@ -36,6 +36,7 @@ export default function SearchPage() {
   const [_error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const t = useTranslations('search');
+  const tc = useTranslations('common');
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -190,25 +191,27 @@ export default function SearchPage() {
 
             {/* Pagination */}
             {results.total > results.per_page && (
-              <div className="px-6 py-4 border-t border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
+              <nav aria-label={tc('pagination')} className="px-6 py-4 border-t border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
+                  aria-label={tc('previous')}
                   className="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg disabled:opacity-50 transition"
                 >
-                  Previous
+                  {tc('previous')}
                 </button>
-                <span className="text-sm text-gray-500 dark:text-slate-400">
+                <span className="text-sm text-gray-500 dark:text-slate-400" aria-live="polite">
                   Page {page} of {Math.ceil(results.total / results.per_page)}
                 </span>
                 <button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= Math.ceil(results.total / results.per_page)}
+                  aria-label={tc('next')}
                   className="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg disabled:opacity-50 transition"
                 >
-                  Next
+                  {tc('next')}
                 </button>
-              </div>
+              </nav>
             )}
           </>
         )}

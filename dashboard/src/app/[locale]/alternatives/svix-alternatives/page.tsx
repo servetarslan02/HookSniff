@@ -1,5 +1,8 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { getTranslations } from 'next-intl/server';
+
+export const revalidate = 3600;
 
 export const metadata = {
   title: 'Svix Alternatives — Best Webhook Services Compared (2026) | HookSniff',
@@ -10,55 +13,54 @@ const alternatives = [
   {
     name: 'HookSniff',
     emoji: '🪝',
-    tagline: 'Best Svix alternative for startups',
+    taglineKey: 'bestForStartups',
     price: '$29/mo',
-    svixPrice: '$490/mo',
-    pros: ['10x cheaper than Svix', 'FIFO ordered delivery', 'CloudEvents v1.0', 'Schema registry', 'Open source + self-hosted', '8-language dashboard', 'MCP support', 'CLI tool', 'Smart routing (round-robin, latency, failover)', 'Real-time SSE streaming'],
-    cons: ['Newer (less enterprise trust)', 'SOC 2 ready (not Type 2 yet)', '99.9% SLA (vs Svix 99.99%)', 'No HIPAA/PCI-DSS yet', 'No components platform (Diom)'],
-    bestFor: 'Startups and growing teams who want enterprise features at startup prices.',
+    pros: ['10x cheaper than Svix', 'FIFO ordered delivery', 'CloudEvents v1.0', 'Schema registry', 'Open source + self-hosted', '8-language dashboard', 'MCP support', 'CLI tool', 'Smart routing', 'Real-time SSE streaming'],
+    cons: ['Newer (less enterprise trust)', 'SOC 2 ready (not Type 2 yet)', '99.9% SLA (vs Svix 99.99%)', 'No HIPAA/PCI-DSS yet'],
+    bestForKey: 'bestForStartupsDesc',
   },
   {
     name: 'Hookdeck',
     emoji: '🔗',
-    tagline: 'Best for complex event routing',
+    taglineKey: 'bestForRouting',
     price: '$39/mo + usage',
-    svixPrice: '$490/mo',
     pros: ['Advanced event routing', 'Filtering and transformation', 'SOC 2 Type 2', '99.999% SLA', 'CLI for local dev'],
     cons: ['Not open source', 'No self-hosted option', 'Usage-based pricing (unpredictable)', 'Fewer SDKs (8)'],
-    bestFor: 'Teams with complex routing needs who don\'t need self-hosted.',
+    bestForKey: 'bestForRoutingDesc',
   },
   {
     name: 'Hook0',
     emoji: '🪝',
-    tagline: 'Best for self-hosted in Europe',
+    taglineKey: 'bestForEurope',
     price: 'Free (self-hosted)',
-    svixPrice: '$490/mo',
     pros: ['100% open source', 'European company (GDPR native)', 'No VC funding (bootstrapped)', 'Self-hosted or cloud'],
     cons: ['Fewer features', 'Smaller community', 'Only 4 SDKs', 'No SOC 2'],
-    bestFor: 'European teams who prioritize data sovereignty and self-hosting.',
+    bestForKey: 'bestForEuropeDesc',
   },
   {
     name: 'Convoy',
     emoji: '📦',
-    tagline: 'Best for Go-native teams',
+    taglineKey: 'bestForGo',
     price: 'Free (self-hosted)',
-    svixPrice: '$490/mo',
     pros: ['Written in Go', 'Open source', 'Good documentation', 'Active community'],
     cons: ['Go-only SDK', 'Smaller ecosystem', 'No managed cloud offering', 'Less mature portal'],
-    bestFor: 'Go teams who want a lightweight, self-hosted webhook solution.',
+    bestForKey: 'bestForGoDesc',
   },
 ];
 
-export default function SvixAlternativesPage() {
+export default async function SvixAlternativesPage() {
+  const t = await getTranslations('alternatives');
+  const tc = await getTranslations('compare');
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
-            <Link href="/alternatives" className="text-gray-600 dark:text-slate-400">Alternatives</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
+            <span className="text-gray-600 dark:text-slate-400">{tc("sdks")}</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">Svix</span>
           </div>
           <LanguageSwitcher />
@@ -68,10 +70,10 @@ export default function SvixAlternativesPage() {
       <main className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Svix Alternatives in 2026
+            {t('svixAlternativesTitle')}
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            Looking for a webhook service but Svix is too expensive? Here are the best alternatives compared honestly — features, pricing, and trade-offs.
+            {t('svixAlternativesIntro')}
           </p>
         </div>
 
@@ -81,22 +83,22 @@ export default function SvixAlternativesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-slate-700">
-                  <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">Service</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Price</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">SDKs</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Open Source</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Self-Hosted</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">SOC 2</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">SLA</th>
+                  <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">{t('service')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('price')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('sdks')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('openSourceCol')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('selfHostedCol')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('soc2Col')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('slaCol')}</th>
                 </tr>
               </thead>
               <tbody>
                 {[
                   { name: 'Svix', price: '$490/mo', sdks: '11', oss: '✅', self: '✅', soc2: 'Type 2', sla: '99.99%', highlight: false },
-                  { name: 'HookSniff', price: '$29/mo', sdks: '11', oss: '✅', self: '✅', soc2: 'Ready', sla: '99.9%', highlight: true },
+                  { name: 'HookSniff', price: '$29/mo', sdks: '11', oss: '✅', self: '✅', soc2: t('ready'), sla: '99.9%', highlight: true },
                   { name: 'Hookdeck', price: '$39/mo+', sdks: '8', oss: '❌', self: '❌', soc2: 'Type 2', sla: '99.999%', highlight: false },
-                  { name: 'Hook0', price: 'Free', sdks: '4', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
-                  { name: 'Convoy', price: 'Free', sdks: '1 (Go)', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
+                  { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '4', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
+                  { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '1 (Go)', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
                 ].map((row) => (
                   <tr key={row.name} className={`border-b border-gray-100 dark:border-slate-700/50 last:border-0 ${row.highlight ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                     <td className={`py-3 px-6 font-medium ${row.highlight ? 'text-brand-600 dark:text-brand-400' : 'text-gray-900 dark:text-white'}`}>{row.name}</td>
@@ -121,12 +123,12 @@ export default function SvixAlternativesPage() {
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-2xl">{alt.emoji}</span>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">{alt.name}</h2>
-                  {alt.name === 'HookSniff' && <span className="px-2 py-0.5 bg-brand-600 text-white text-xs rounded-full">Recommended</span>}
+                  {alt.name === 'HookSniff' && <span className="px-2 py-0.5 bg-brand-600 text-white text-xs rounded-full">{t('recommended')}</span>}
                 </div>
-                <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{alt.tagline}</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{alt.price}</p>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-2">✅ Pros</p>
+                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-2">✅ {t('pros')}</p>
                     <ul className="space-y-1">
                       {alt.pros.map((pro) => (
                         <li key={pro} className="text-sm text-gray-600 dark:text-slate-400 flex items-start gap-2">
@@ -137,7 +139,7 @@ export default function SvixAlternativesPage() {
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-red-700 dark:text-red-400 uppercase tracking-wider mb-2">❌ Cons</p>
+                    <p className="text-xs font-semibold text-red-700 dark:text-red-400 uppercase tracking-wider mb-2">❌ {t('cons')}</p>
                     <ul className="space-y-1">
                       {alt.cons.map((con) => (
                         <li key={con} className="text-sm text-gray-600 dark:text-slate-400 flex items-start gap-2">
@@ -148,7 +150,6 @@ export default function SvixAlternativesPage() {
                     </ul>
                   </div>
                 </div>
-                <p className="mt-4 text-sm"><span className="font-medium text-gray-900 dark:text-white">Best for:</span> <span className="text-gray-600 dark:text-slate-400">{alt.bestFor}</span></p>
               </div>
             </div>
           ))}
@@ -156,9 +157,9 @@ export default function SvixAlternativesPage() {
 
         {/* CTA */}
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
-          <h2 className="text-2xl font-bold text-white mb-2">Ready to switch from Svix?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-6">Get the same features at 10x lower cost. Start free, scale when ready.</p>
-          <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Try HookSniff free →</Link>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('readyToSwitch', { competitor: 'Svix' })}</h2>
+          <p className="text-gray-400 dark:text-slate-400 mb-6">{t('switchCta')}</p>
+          <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link>
         </div>
       </main>
     </div>

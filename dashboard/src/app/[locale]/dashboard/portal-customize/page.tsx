@@ -288,14 +288,14 @@ export default function PortalCustomizationPage() {
                   <button
                     onClick={() => removeEvent(event)}
                     aria-label={`Remove ${event} event`}
-                    className="text-gray-400 hover:text-red-500 transition ml-1"
+                    className="text-gray-500 hover:text-red-500 transition ml-1"
                   >
                     ✕
                   </button>
                 </span>
               ))}
               {config.allowed_events.length === 0 && (
-                <span className="text-sm text-gray-400 dark:text-slate-500">{t('allEventsAllowed')}</span>
+                <span className="text-sm text-gray-500 dark:text-slate-500">{t('allEventsAllowed')}</span>
               )}
             </div>
           </div>
@@ -379,7 +379,7 @@ export default function PortalCustomizationPage() {
                 onClick={() => { navigator.clipboard.writeText(displayEmbedCode); toast(t('copied'), 'success'); }}
                 className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
               >
-                Copy
+                {t('copy')}
               </button>
               <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
                 <code>{displayEmbedCode}</code>
@@ -405,7 +405,7 @@ export default function PortalCustomizationPage() {
                 }}
                 className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
               >
-                Copy
+                {t('copy')}
               </button>
               <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
                 <code>{`import { HookSniffPortal } from 'hooksniff-sdk/react';

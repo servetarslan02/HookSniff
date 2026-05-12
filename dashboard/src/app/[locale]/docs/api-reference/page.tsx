@@ -1,4 +1,15 @@
 import { useTranslations } from 'next-intl';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'API Reference',
+  description: 'Complete API reference for HookSniff webhook delivery service',
+};
+
 
 // Force SSR — SSG output was missing on Vercel for this page
 export const dynamic = 'force-dynamic';

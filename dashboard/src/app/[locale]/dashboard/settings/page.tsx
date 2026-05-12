@@ -270,7 +270,7 @@ export default function SettingsPage() {
               minLength={8}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">{t('passwordMinLength')}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-500 mt-1.5">{t('passwordMinLength')}</p>
           </div>
 
           <div>
@@ -311,11 +311,12 @@ export default function SettingsPage() {
               className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 font-mono text-sm text-gray-700 dark:text-slate-300"
             />
             <button
+              type="button"
               onClick={copyApiKey}
               disabled={!apiKey}
               className="bg-gray-900 dark:bg-slate-700 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-slate-600 transition disabled:opacity-40 whitespace-nowrap"
             >
-              {copied ? '✓ Copied!' : 'Copy'}
+              {copied ? `✓ ${tc('copied')}` : tc('copy')}
             </button>
           </div>
           <p className="text-xs text-gray-500 dark:text-slate-400">
@@ -352,6 +353,7 @@ export default function SettingsPage() {
           />
           <div className="pt-2">
             <button
+              type="button"
               onClick={handleNotificationSave}
               disabled={notificationSaving}
               className="px-4 py-2 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
@@ -372,10 +374,11 @@ export default function SettingsPage() {
               <div className="text-sm text-gray-500 dark:text-slate-400">{t('signOutDesc')}</div>
             </div>
             <button
+              type="button"
               onClick={logout}
               className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-700 transition"
             >
-              Sign Out
+              {t('signOut')}
             </button>
           </div>
           <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-500/10 rounded-xl">
@@ -384,6 +387,7 @@ export default function SettingsPage() {
               <div className="text-sm text-gray-500 dark:text-slate-400">{t('deleteAccountDesc')}</div>
             </div>
             <button
+              type="button"
               onClick={() => setShowDeleteModal(true)}
               className="border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-600 hover:text-white transition"
             >
@@ -413,12 +417,14 @@ export default function SettingsPage() {
             />
             <div className="flex gap-3 justify-end">
               <button
+                type="button"
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tc('cancel')}
               </button>
               <button
+                type="button"
                 onClick={handleDeleteAccount}
                 disabled={deleteConfirmText !== 'DELETE' || deletingAccount}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-40"
@@ -452,6 +458,9 @@ function ToggleRow({
         <div className="text-xs text-gray-500 dark:text-slate-400">{description}</div>
       </div>
       <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
           checked ? 'bg-brand-600 dark:bg-brand-500' : 'bg-gray-300 dark:bg-slate-600'

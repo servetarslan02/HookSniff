@@ -95,7 +95,7 @@ export default function SendWebhookPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Payload (JSON)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('payloadJson')}</label>
               <textarea
                 value={payload}
                 onChange={(e) => { setPayload(e.target.value); validateJson(e.target.value); }}
@@ -110,7 +110,7 @@ export default function SendWebhookPage() {
               disabled={sending || !endpointId || !!jsonError}
               className="w-full bg-brand-600 dark:bg-brand-500 text-white py-3 rounded-xl font-semibold hover:bg-brand-700 dark:hover:bg-brand-600 transition disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {sending ? <><LoadingSpinner size="sm" /> Sending...</> : t('sendWebhook')}
+              {sending ? <><LoadingSpinner size="sm" /> {tc('sending')}</> : t('sendWebhook')}
             </button>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function SendWebhookPage() {
               {JSON.stringify(response, null, 2)}
             </pre>
           ) : (
-            <div className="text-center text-gray-400 dark:text-slate-500 py-12">
+            <div className="text-center text-gray-500 dark:text-slate-500 py-12">
               <div className="text-4xl mb-3">📡</div>
               <p>{t('sendToSeeResponse')}</p>
             </div>

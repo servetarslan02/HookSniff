@@ -1,5 +1,16 @@
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Retry Strategies',
+  description: 'Configure automatic retry policies for failed webhook deliveries',
+};
+
 
 export default function RetriesPage() {
   const t = useTranslations('docs');

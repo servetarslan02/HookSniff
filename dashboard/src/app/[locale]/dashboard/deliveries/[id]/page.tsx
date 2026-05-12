@@ -90,7 +90,7 @@ export default function DeliveryDetailPage() {
   };
 
   const getHttpStatusColor = (code?: number): string => {
-    if (!code) return 'text-gray-400 dark:text-slate-500';
+    if (!code) return 'text-gray-500 dark:text-slate-500';
     if (code < 300) return 'text-emerald-600 dark:text-emerald-400';
     if (code < 400) return 'text-blue-600 dark:text-blue-400';
     if (code < 500) return 'text-amber-600 dark:text-amber-400';
@@ -164,7 +164,7 @@ export default function DeliveryDetailPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push(`/${locale}/dashboard/deliveries`)}
-            className="p-2 -ml-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
+            className="p-2 -ml-2 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
             title={t('backToDeliveries')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,13 +264,13 @@ export default function DeliveryDetailPage() {
               <p className="text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-white transition">
                 {t('requestHeaders')}
                 {delivery.request_headers && (
-                  <span className="ml-2 text-xs text-gray-400 dark:text-slate-500">
+                  <span className="ml-2 text-xs text-gray-500 dark:text-slate-500">
                     ({Object.keys(delivery.request_headers).length} {tCommon('headers').toLowerCase()})
                   </span>
                 )}
               </p>
               <svg
-                className={`w-4 h-4 text-gray-400 dark:text-slate-500 transition-transform ${showRequestHeaders ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 text-gray-500 dark:text-slate-500 transition-transform ${showRequestHeaders ? 'rotate-180' : ''}`}
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -286,7 +286,7 @@ export default function DeliveryDetailPage() {
                 {delivery.request_headers && (
                   <button
                     onClick={() => copyToClipboard(formatHeaders(delivery.request_headers!), 'req-headers')}
-                    className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+                    className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
                     title={t('copyHeaders')}
                   >
                     {copiedField === 'req-headers' ? (
@@ -314,7 +314,7 @@ export default function DeliveryDetailPage() {
                 {t('requestBody')}
               </p>
               <svg
-                className={`w-4 h-4 text-gray-400 dark:text-slate-500 transition-transform ${showRequestBody ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 text-gray-500 dark:text-slate-500 transition-transform ${showRequestBody ? 'rotate-180' : ''}`}
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -330,7 +330,7 @@ export default function DeliveryDetailPage() {
                 {delivery.request_body != null && (
                   <button
                     onClick={() => copyToClipboard(formatJson(delivery.request_body), 'req-body')}
-                    className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+                    className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
                     title={t('copyPayload')}
                   >
                     {copiedField === 'req-body' ? (
@@ -355,14 +355,14 @@ export default function DeliveryDetailPage() {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
           <span>⏱️</span> {t('attemptTimeline')}
           {attempts.length > 0 && (
-            <span className="text-xs font-normal text-gray-400 dark:text-slate-500 ml-2">
+            <span className="text-xs font-normal text-gray-500 dark:text-slate-500 ml-2">
               ({attempts.length} {tCommon('attempts').toLowerCase()})
             </span>
           )}
         </h3>
 
         {attempts.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 dark:text-slate-500">
+          <div className="text-center py-8 text-gray-500 dark:text-slate-500">
             <p className="text-sm">{t('noAttemptData')}</p>
             <p className="text-xs mt-1">{t('noAttemptDataDesc')}</p>
           </div>
@@ -403,11 +403,11 @@ export default function DeliveryDetailPage() {
                             {attempt.duration_ms}ms
                           </span>
                         )}
-                        <span className="text-xs text-gray-400 dark:text-slate-500">
+                        <span className="text-xs text-gray-500 dark:text-slate-500">
                           {new Date(attempt.created_at).toLocaleString()}
                         </span>
                         <svg
-                          className={`w-4 h-4 text-gray-400 dark:text-slate-500 transition-transform ${expandedAttempt === attempt.id ? 'rotate-180' : ''}`}
+                          className={`w-4 h-4 text-gray-500 dark:text-slate-500 transition-transform ${expandedAttempt === attempt.id ? 'rotate-180' : ''}`}
                           fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -433,7 +433,7 @@ export default function DeliveryDetailPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">
                               {t('responseHeaders')}
-                              <span className="ml-1 text-gray-400 dark:text-slate-500">
+                              <span className="ml-1 text-gray-500 dark:text-slate-500">
                                 ({Object.keys(attempt.response_headers).length})
                               </span>
                             </p>
@@ -459,7 +459,7 @@ export default function DeliveryDetailPage() {
                                   e.stopPropagation();
                                   copyToClipboard(attempt.response_body!, `resp-${attempt.id}`);
                                 }}
-                                className="absolute top-2 right-2 p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+                                className="absolute top-2 right-2 p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
                                 title={t('copyResponseBody')}
                               >
                                 {copiedField === `resp-${attempt.id}` ? (
@@ -478,7 +478,7 @@ export default function DeliveryDetailPage() {
 
                         {/* No additional data */}
                         {!attempt.error_message && !attempt.response_headers && !attempt.response_body && (
-                          <p className="text-xs text-gray-400 dark:text-slate-500 italic">
+                          <p className="text-xs text-gray-500 dark:text-slate-500 italic">
                             {t('noDebugData')}
                           </p>
                         )}
@@ -532,7 +532,7 @@ function DetailRow({
         {copyable && onCopy && (
           <button
             onClick={onCopy}
-            className="flex-shrink-0 p-1 rounded text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+            className="flex-shrink-0 p-1 rounded text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
             title={t('copyTitle')}
           >
             {copied ? (
