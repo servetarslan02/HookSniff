@@ -57,6 +57,12 @@
 - **IP whitelist** — Admin paneline erişim IP kısıtlaması
 - **Login history** — Giriş denemeleri kaydı (başarılı/başarısız)
 - **Anomali tespiti** — Olağandışı aktivite uyarısı
+- **SSRF attempt log** — Güvenlik olaylarını izleme
+- **Spoofing attempt log** — Sahte webhook tespit log'u
+- **Replay attempt log** — Replay saldırı tespit log'u
+- **Endpoint disable log** — Endpoint devre dışı kalma geçmişi
+- **Support Agent erişim log** — Destek ekibi portal erişim kaydı (Svix ✅)
+- **Quick filter** — Log listesinde tek tıkla filtre (Hookdeck ✅)
 - Export (CSV/JSON)
 - Tarih aralığı filtresi
 - Actor bazlı filtreleme
