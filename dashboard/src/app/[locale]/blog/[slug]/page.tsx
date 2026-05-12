@@ -78,7 +78,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <Link href="/blog" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">{t("title")}</Link>
           </div>
           <LanguageSwitcher />
