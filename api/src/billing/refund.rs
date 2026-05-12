@@ -71,7 +71,7 @@ pub async fn process_refund(
     .await?
     .ok_or_else(|| AppError::NotFound)?;
 
-    if customer.plan == "free" {
+    if customer.plan == "developer" {
         return Err(AppError::BadRequest(
             "Cannot refund a free plan".into(),
         ));
