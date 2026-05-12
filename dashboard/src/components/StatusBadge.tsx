@@ -72,6 +72,13 @@ const statusStyles: Record<string, { bg: string; text: string; ring: string; dot
     ring: 'ring-emerald-600/20 dark:ring-emerald-500/30',
     dot: 'bg-emerald-500',
   },
+  replayed: {
+    bg: 'bg-violet-50 dark:bg-violet-500/10',
+    text: 'text-violet-700 dark:text-violet-400',
+    ring: 'ring-violet-600/20 dark:ring-violet-500/30',
+    dot: 'bg-violet-500',
+    icon: '↩',
+  },
 };
 
 const sizeClasses = {
