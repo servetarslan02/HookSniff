@@ -23,7 +23,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   /* ── Hook0'ın 5 sekmesi ── */
   const tabs = [
-    { name: t('dashboard'), href: '/', icon: '📊' },
     { name: t('applications') || 'Uygulamalar', href: '/applications', icon: '📱' },
     { name: t('serviceTokens') || 'Hizmet Jetonları', href: '/api-keys', icon: '🔑' },
     { name: t('team'), href: '/team', icon: '👥' },
