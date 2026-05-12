@@ -111,7 +111,7 @@ async fn get_subscription(
         "canceled".to_string()
     } else if customer.payment_failed_at.is_some() {
         "past_due".to_string()
-    } else if plan == Plan::Free {
+    } else if plan == Plan::Developer {
         "inactive".to_string()
     } else {
         "active".to_string()
@@ -220,7 +220,7 @@ fn calculate_proration(
     new_plan: &Plan,
     current_period_start: Option<&chrono::DateTime<Utc>>,
 ) -> Option<(u64, u32)> {
-    if *current_plan == Plan::Free || current_period_start.is_none() {
+    if *current_plan == Plan::Developer || current_period_start.is_none() {
         return None;
     }
 
@@ -250,7 +250,7 @@ async fn upgrade_plan(
     let current_plan = Plan::parse_str(&customer.plan);
 
     match new_plan {
-        Plan::Free => {
+        Plan::Developer => {
             return Err(AppError::BadRequest(
                 "Use the customer portal to downgrade your plan".into(),
             ));
@@ -279,9 +279,9 @@ async fn upgrade_plan(
 
     // Item 258: Validate plan transition — only allow upgrading to a higher tier
     let plan_tier = |p: &Plan| match p {
-        Plan::Free => 0,
+        Plan::Developer => 0,
         Plan::Pro => 1,
-        Plan::Business => 2,
+        Plan::Enterprise => 2,
         Plan::Enterprise => 3,
     };
     if plan_tier(&new_plan) <= plan_tier(&current_plan) {
@@ -317,7 +317,7 @@ async fn upgrade_plan(
 
     // ── Item 249: Cancel old subscription if switching providers ──
     let old_provider = &customer.payment_provider;
-    if provider_name != *old_provider && current_plan != Plan::Free {
+    if provider_name != *old_provider && current_plan != Plan::Developer {
         // Customer is switching to a different provider with an active paid plan.
         // Cancel the old subscription at the old provider first.
         if let Some(old_sub_id) =
@@ -958,7 +958,7 @@ async fn process_webhook_result_with_event_id(
         WebhookResult::SubscriptionCanceled {
             provider_subscription_id,
         } => {
-            let free_limit = Plan::Free.max_webhooks_per_month() as i32;
+            let free_limit = Plan::Developer.max_webhooks_per_month() as i32;
             let query = match provider {
                 "polar" => {
                     sqlx::query(
@@ -998,7 +998,7 @@ async fn process_webhook_result_with_event_id(
                 _ => None,
             };
             if let Some((cid,)) = customer_id {
-                cleanup_excess_endpoints(pool, cid, &Plan::Free).await?;
+                cleanup_excess_endpoints(pool, cid, &Plan::Developer).await?;
             }
 
             tracing::info!(
@@ -1080,7 +1080,7 @@ pub async fn process_expired_grace_periods(pool: &sqlx::PgPool) -> Result<u64, A
     let count = rows.len() as u64;
 
     for (customer_id, _plan) in &rows {
-        let free_limit = Plan::Free.max_webhooks_per_month() as i32;
+        let free_limit = Plan::Developer.max_webhooks_per_month() as i32;
 
         sqlx::query(
             "UPDATE customers SET plan = 'free', webhook_limit = $1, \
@@ -1093,7 +1093,7 @@ pub async fn process_expired_grace_periods(pool: &sqlx::PgPool) -> Result<u64, A
         .await?;
 
         // HS-060: Clean up excess endpoints on grace period expiry
-        cleanup_excess_endpoints(pool, *customer_id, &Plan::Free).await?;
+        cleanup_excess_endpoints(pool, *customer_id, &Plan::Developer).await?;
 
         tracing::info!(
             "⏰ Customer {} downgraded to free after {} day grace period",

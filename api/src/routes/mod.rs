@@ -2,6 +2,7 @@ pub mod admin;
 pub mod alerts;
 pub mod analytics;
 pub mod api_keys;
+pub mod applications;
 pub mod audit_log;
 pub mod auth;
 pub mod billing;
@@ -59,6 +60,7 @@ pub fn create_routes(
 
 pub fn api_router() -> Router {
     let protected = Router::new()
+        .nest("/applications", applications::router())
         .nest("/endpoints", endpoints::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())

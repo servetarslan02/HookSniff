@@ -64,7 +64,7 @@ impl PolarConfig {
     fn product_id_for_plan(&self, plan: &Plan) -> Option<&str> {
         match plan {
             Plan::Pro => Some(&self.product_pro),
-            Plan::Business => Some(&self.product_business),
+            Plan::Enterprise => Some(&self.product_business),
             _ => None,
         }
     }
@@ -175,11 +175,11 @@ impl PolarProvider {
     /// Determine plan from Polar product ID.
     fn determine_plan(&self, product_id: &str) -> Plan {
         if product_id == self.config.product_business {
-            Plan::Business
+            Plan::Enterprise
         } else if product_id == self.config.product_pro {
             Plan::Pro
         } else {
-            Plan::Free
+            Plan::Developer
         }
     }
 
@@ -378,7 +378,7 @@ impl PaymentProviderImpl for PolarProvider {
                     .product_id
                     .as_deref()
                     .map(|pid| self.determine_plan(pid))
-                    .unwrap_or(Plan::Free);
+                    .unwrap_or(Plan::Developer);
 
                 Ok(WebhookResult::SubscriptionUpdated {
                     provider_subscription_id: sub_id,
@@ -553,7 +553,7 @@ mod tests {
     fn product_id_for_plan_business() {
         let config = test_config();
         assert_eq!(
-            config.product_id_for_plan(&Plan::Business),
+            config.product_id_for_plan(&Plan::Enterprise),
             Some("prod_biz_456")
         );
     }
@@ -561,7 +561,7 @@ mod tests {
     #[test]
     fn product_id_for_plan_free_returns_none() {
         let config = test_config();
-        assert_eq!(config.product_id_for_plan(&Plan::Free), None);
+        assert_eq!(config.product_id_for_plan(&Plan::Developer), None);
     }
 
     #[test]
@@ -575,7 +575,7 @@ mod tests {
     #[test]
     fn determine_plan_business_product() {
         let provider = PolarProvider::new(test_config());
-        assert_eq!(provider.determine_plan("prod_biz_456"), Plan::Business);
+        assert_eq!(provider.determine_plan("prod_biz_456"), Plan::Enterprise);
     }
 
     #[test]
@@ -587,13 +587,13 @@ mod tests {
     #[test]
     fn determine_plan_unknown_product_returns_free() {
         let provider = PolarProvider::new(test_config());
-        assert_eq!(provider.determine_plan("unknown_product"), Plan::Free);
+        assert_eq!(provider.determine_plan("unknown_product"), Plan::Developer);
     }
 
     #[test]
     fn determine_plan_empty_string_returns_free() {
         let provider = PolarProvider::new(test_config());
-        assert_eq!(provider.determine_plan(""), Plan::Free);
+        assert_eq!(provider.determine_plan(""), Plan::Developer);
     }
 
     // ── PolarProvider::verify_signature ────────────────────────
