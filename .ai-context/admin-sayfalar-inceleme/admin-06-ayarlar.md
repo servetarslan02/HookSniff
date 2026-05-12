@@ -145,3 +145,46 @@ interface AlertRule {
 - Deprecated versiyon uyarıları
 - Versiyon geçiş rehberi
 - Breaking change bildirimleri
+
+#### Standard Webhooks Ayarları
+- Standard Webhooks uyumluluğu toggle (webhook- prefix, whsec_ secret)
+- Custom ID generation (UUID v4/v7/nanoid)
+- Entity prefix ayarı (evt_, dst_, dlv_)
+- **Kaynak:** Hookdeck changelog — Standard Webhooks Support
+
+#### Retry Schedule Ayarları
+- Varsayılan retry schedule (exponential backoff)
+- Custom retry schedule (müşteri tanımlı: 5sn, 1dk, 10dk, 1sa)
+- Per-plan retry schedule farkı
+- **Kaynak:** Hookdeck changelog — Custom Retry Schedules
+
+#### Deduplication Ayarları
+- Exact deduplication toggle
+- Field-based matching kuralları
+- Time window ayarı (1sn - 1sa)
+- **Kaynak:** Hookdeck changelog — Deduplication
+
+#### Email Template Yönetimi
+- Endpoint disable email şablonu (whitelabel)
+- Welcome email şablonu
+- Billing hatırlatma şablonu
+- Maintenance bildirim şablonu
+- Feature announcement şablonu
+- **Kaynak:** Svix changelog — Email Notification
+
+#### Bildirim Kanal Ayarları
+- Slack webhook URL
+- Microsoft Teams webhook URL
+- Discord webhook URL
+- PagerDuty entegrasyonu
+- OpsGenie entegrasyonu
+- Custom webhook URL
+- **Kaynak:** Hookdeck changelog — Microsoft Teams Integration
+
+#### GDPR Ayarları
+- Data deletion request yönetimi
+- Consent log yönetimi
+- Data export (right to portability)
+- Breach notification şablonu (72 saat)
+- DPO (Data Protection Officer) atama
+- **Kaynak:** Compliance araştırması
