@@ -69,6 +69,7 @@ fn default_role() -> String {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateCustomerRequest {
     pub email: String,
     pub password: Option<String>,
@@ -76,18 +77,21 @@ pub struct CreateCustomerRequest {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateProfileRequest {
     pub name: String,
     pub email: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChangePasswordRequest {
     pub current_password: String,
     pub new_password: String,
@@ -95,11 +99,13 @@ pub struct ChangePasswordRequest {
 
 // ── Password Reset ──────────────────────────────────────────
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ForgotPasswordRequest {
     pub email: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ResetPasswordRequest {
     pub token: String,
     pub new_password: String,
@@ -107,38 +113,45 @@ pub struct ResetPasswordRequest {
 
 // ── Email Verification ─────────────────────────────────────
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct VerifyEmailRequest {
     pub token: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ResendVerificationRequest {
     pub email: String,
 }
 
 // ── Refresh Token ───────────────────────────────────────────
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RefreshTokenRequest {
     pub refresh_token: String,
 }
 
 // ── Two-Factor Auth (TOTP) ─────────────────────────────────
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Enable2faRequest {
     pub password: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Confirm2faRequest {
     pub code: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Disable2faRequest {
     pub password: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Verify2faRequest {
     pub temp_token: String,
     pub code: String,
@@ -149,6 +162,7 @@ pub struct Verify2faRequest {
 
 // ── Push Notifications (Device Tokens) ─────────────────────
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RegisterDeviceRequest {
     pub token: String,
     pub platform: Option<String>,
