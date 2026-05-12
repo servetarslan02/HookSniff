@@ -263,7 +263,7 @@ export function PricingPageContent() {
                 <div className="mt-2 mb-1">
                   <span className="text-4xl font-bold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
                   <span className="text-gray-500 dark:text-slate-500">{getPeriodLabel()}</span>
-                  {billingPeriod === 'annual' && plan.key !== 'free' && (
+                  {billingPeriod === 'annual' && plan.key !== 'developer' && (
                     <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
                       {t('billedAnnually')}
                     </p>
@@ -285,8 +285,6 @@ export function PricingPageContent() {
                 onClick={() => {
                   if (plan.key === 'enterprise') {
                     window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
-                  } else if (plan.key === 'business') {
-                    router.push('/contact');
                   } else if (token) {
                     router.push('/dashboard/billing');
                   } else {
@@ -327,27 +325,29 @@ export function PricingPageContent() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-slate-700">
-                    <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white w-2/5">{t('feature')}</th>
-                    <th className="text-center py-4 px-4 font-semibold text-gray-900 dark:text-white">{t('free')}</th>
-                    <th className="text-center py-4 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/50 dark:bg-brand-500/10">{t('pro')}</th>
-                    <th className="text-center py-4 px-4 font-semibold text-gray-900 dark:text-white">{t('business')}</th>
+                  <tr className="border-b-2 border-gray-200 dark:border-slate-700">
+                    <th className="py-3 px-6 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase">{t('feature')}</th>
+                    <th className="py-3 px-4 text-center text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase">Developer</th>
+                    <th className="py-3 px-4 text-center text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase">Startup</th>
+                    <th className="py-3 px-4 text-center text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase bg-brand-50/30 dark:bg-brand-500/5">Pro</th>
+                    <th className="py-3 px-4 text-center text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase">Enterprise</th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparisonSections.map((section) => (
                     <React.Fragment key={section.category}>
                       <tr className="bg-gray-50 dark:bg-slate-800/50">
-                        <td colSpan={4} className="py-2 px-6 text-xs font-bold text-gray-500 dark:text-slate-500 uppercase tracking-wider">
+                        <td colSpan={5} className="py-2 px-6 text-xs font-bold text-gray-500 dark:text-slate-500 uppercase tracking-wider">
                           {section.category}
                         </td>
                       </tr>
                       {section.items.map((item) => (
                         <tr key={item.feature} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                           <td className="py-3 px-6 text-gray-700 dark:text-slate-300">{item.feature}</td>
-                          <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{item.free}</td>
+                          <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{item.developer}</td>
+                          <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{item.startup}</td>
                           <td className="py-3 px-4 text-center text-gray-900 dark:text-white bg-brand-50/30 dark:bg-brand-500/5 font-medium">{item.pro}</td>
-                          <td className="py-3 px-4 text-center text-gray-900 dark:text-white">{item.business}</td>
+                          <td className="py-3 px-4 text-center text-gray-900 dark:text-white">{item.enterprise}</td>
                         </tr>
                       ))}
                     </React.Fragment>
