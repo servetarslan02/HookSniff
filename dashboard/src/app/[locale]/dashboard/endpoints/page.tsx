@@ -101,7 +101,7 @@ export default function EndpointsPage() {
     setEndpoints((prev) => prev.filter((ep) => !selected.has(ep.id)));
     setSelected(new Set());
     setBulkDeleting(false);
-    toast(`Deleted ${deleted} endpoints`, 'success');
+    toast(t('bulkDeleted', { count: deleted }), 'success');
   };
 
   if (loading) {
@@ -141,8 +141,9 @@ export default function EndpointsPage() {
           )}
           <form onSubmit={handleCreate} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('urlLabel')}</label>
+              <label htmlFor="endpoint-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('urlLabel')}</label>
               <input
+                id="endpoint-url"
                 type="url"
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
@@ -152,8 +153,9 @@ export default function EndpointsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('descriptionLabel')}</label>
+              <label htmlFor="endpoint-desc" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('descriptionLabel')}</label>
               <input
+                id="endpoint-desc"
                 type="text"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
@@ -174,7 +176,7 @@ export default function EndpointsPage() {
                 onClick={() => { setShowCreate(false); setError(''); }}
                 className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:bg-slate-700 transition"
               >
-                Cancel
+                {tc('cancel')}
               </button>
             </div>
           </form>
@@ -197,7 +199,7 @@ export default function EndpointsPage() {
                   onChange={toggleSelectAll}
                   className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
                 />
-                <span className="text-sm text-gray-600 dark:text-slate-400">Select all ({endpoints.length})</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('selectAllLabel', { count: endpoints.length })}</span>
               </label>
               {selected.size > 0 && (
                 <button
