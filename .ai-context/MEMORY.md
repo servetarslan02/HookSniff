@@ -339,3 +339,34 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Oturum 3: müşteri grafikleri, webhook test, churn analizi ✅
   - Oturum 128: alert thresholds backend bağlantısı ✅
 - **Commit:** 8184e787 — main branch (5 dosya, +529 -37)
+
+## Oturum 128 Ek — IMPLEMENTATION-PLAN Düzeltmeleri (2026-05-12 19:16-19:38 GMT+8) ✅
+- **OpenClaw** — Servet ile 4 paralel agent çalıştırıldı (~20 dakika)
+- **Agent 1 — Frontend i18n (41 dosya):**
+  - Item 142: Hardcoded strings → endpoints, inbound, api-importer i18n
+  - Item 147: Toast messages → billing, api-importer, endpoints, playground
+  - Item 208: label/input htmlFor/id → 9 dosya (alerts, endpoints, retry-policy, transforms, portal-customize, inbound, api-importer, team)
+  - Item 320: 28 loading.tsx dosyası oluşturuldu (tüm dashboard rotaları)
+- **Agent 2 — Backend Fixes (8 dosya):**
+  - Item 284: AppError::Conflict(409) varyantı eklendi (error.rs)
+  - Item 34: Worker DB commit failure classification (transient vs permanent)
+  - Item 343: Custom header RFC 7230 validasyonu (API + Worker)
+  - Item 344: unwrap_or_default() → explicit error handling
+  - Item 345: Secret decoding fallback warning
+  - Item 277: Head-of-line blocking dokümantasyonu
+- **Agent 3 — Code Quality (16 dosya):**
+  - Item 298: Docker image version pin (prometheus:v3.4.1, grafana:12.0.2)
+  - Item 299: OpenTelemetry deps workspace Cargo.toml'a taşındı
+  - Item 346: Dockerfile base image Rust 1.82→1.95
+  - Item 348: npm audit continue-on-error kaldırıldı
+  - Item 355: VENDOR.md dokümantasyonu
+  - Items 287-290: TODO comment'leri eklendi (gelecek refactor)
+- **Agent 4 — Frontend Refactoring (27 dosya):**
+  - Item 301: playground 716→308 satır (-57%)
+  - Item 303: dashboard 632→221 satır (-65%)
+  - Item 304: deliveries/[id] 552→180 satır (-67%)
+  - Item 305: billing 505→292 satır (-42%)
+  - Item 321: Endpoints modal → ConfirmDialog
+  - Item 322: Logs status counts tüm sayfaları sayıyor
+- **Genel İlerleme:** ~210/364 tamamlandı (%58)
+- **Commits:** e171a7bd, dc42e697, 8c1da0ca, ca286fa5, 535bb062 — main branch
