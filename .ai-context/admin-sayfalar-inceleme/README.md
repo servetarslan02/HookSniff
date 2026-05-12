@@ -72,3 +72,18 @@ admin-sayfalar-inceleme/
 8. 🧪 Webhook Araçları — `/admin/webhook-tools` (YENİ)
 9. 📊 Raporlar — `/admin/reports` (YENİ)
 10. 👥 Ekip — `/admin/team` (YENİ)
+
+## 📁 Derin Analiz Klasörü (2026-05-13)
+
+`derin-analiz/` klasöründe 37 uyumsuzluk detaylı olarak belgelendi:
+
+| Dosya | İçerik |
+|-------|--------|
+| `00-ozet.md` | Tam özet ve öncelik matrisi |
+| `01-kullanilmayan-metodlar.md` | api.ts'de 8 tanımlı ama kullanılmayan metod |
+| `02-localstorage-sorunlari.md` | localStorage'da saklanan veriler |
+| `03-eksik-sayfalar.md` | 5 eksik sayfa (backend var, frontend yok) |
+| `04-eksik-ozellikler.md` | 12 mevcut sayfada eksik özellik |
+| `05-admin-sorunlari.md` | 6 admin panel sorunu |
+| `06-guvenlik-aciklari.md` | 4 güvenlik açığı |
+| `07-cozum-plani.md` | Öncelikli çözüm planı (3 aşama) |
