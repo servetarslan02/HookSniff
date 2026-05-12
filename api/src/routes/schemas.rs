@@ -15,6 +15,7 @@ use serde_json::{json, Value};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::billing::Plan;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 use crate::schemas::registry::SchemaRegistry;
@@ -33,10 +34,37 @@ async fn register_schema(
     Extension(customer): Extension<Customer>,
     Json(request): Json<RegisterSchemaRequest>,
 ) -> Result<Json<Value>, AppError> {
-    let registry = SchemaRegistry::new(pool);
+    let registry = SchemaRegistry::new(pool.clone());
 
     if request.name.is_empty() {
         return Err(AppError::BadRequest("Schema name is required".into()));
+    }
+
+    // Plan-based event type limit check
+    // Only enforce limit for NEW event types (not new versions of existing ones)
+    let plan = Plan::parse_str(&customer.plan);
+    let max_types = plan.max_event_types();
+
+    let existing = registry
+        .get_latest_by_name(customer.id, &request.name)
+        .await
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+
+    if existing.is_none() {
+        // New event type — check limit
+        let distinct_count: (i64,) = sqlx::query_as(
+            "SELECT COUNT(DISTINCT name) FROM event_schemas WHERE customer_id = $1",
+        )
+        .bind(customer.id)
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+
+        if distinct_count.0 as u32 >= max_types {
+            return Err(AppError::BadRequest(format!(
+                "Event type limit reached ({max_types}). Upgrade your plan for more event types."
+            )));
+        }
     }
 
     let schema = registry.register(customer.id, request).await.map_err(|e| {
