@@ -9,9 +9,10 @@ import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } fro
 import { useTranslations } from 'next-intl';
 
 const PLAN_COLORS: Record<string, string> = {
-  free: '#94a3b8',
+  developer: '#94a3b8',
+  startup: '#10b981',
   pro: '#4c6ef5',
-  business: '#8b5cf6',
+  enterprise: '#8b5cf6',
 };
 
 export default function AdminOverviewPage() {
@@ -223,9 +224,10 @@ export default function AdminOverviewPage() {
             <div aria-label={t('chartPlaceholder')} role="img">
               <div className="flex items-end gap-3 h-32 mb-3">
                 {[
-                  { labelKey: 'freePlan', pct: 60, color: PLAN_COLORS.free },
-                  { labelKey: 'proPlan', pct: 30, color: PLAN_COLORS.pro },
-                  { labelKey: 'businessPlan', pct: 10, color: PLAN_COLORS.business },
+                  { labelKey: 'developerPlan', pct: 50, color: PLAN_COLORS.developer },
+                  { labelKey: 'startupPlan', pct: 25, color: PLAN_COLORS.startup },
+                  { labelKey: 'proPlan', pct: 15, color: PLAN_COLORS.pro },
+                  { labelKey: 'enterprisePlan', pct: 10, color: PLAN_COLORS.enterprise },
                 ].map((bar) => (
                   <div key={bar.labelKey} className="flex flex-col items-center gap-1 flex-1">
                     <div className="w-full rounded-t-lg bg-gray-100 dark:bg-slate-800 overflow-hidden" style={{ height: '100%' }}>
