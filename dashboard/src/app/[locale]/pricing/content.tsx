@@ -177,7 +177,7 @@ export function PricingPageContent() {
         { feature: t('prioritySupport'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
         { feature: t('dedicatedManager'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
         { feature: t('slaGuarantee'), developer: '—', startup: '—', pro: '—', enterprise: '99.9%' },
-        { feature: t('customIntegrations'), free: '—', pro: '—', business: '✅' },
+        { feature: t('customIntegrations'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
       ],
     },
   ];
@@ -386,9 +386,9 @@ export function PricingPageContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('supportTitle')}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { plan: t('free'), level: t('communitySupport'), features: t.raw('supportFreeFeatures') as string[], response: t('supportBestEffort'), highlight: false },
+              { plan: t('developer'), level: t('communitySupport'), features: t.raw('supportDeveloperFeatures') as string[], response: t('supportBestEffort'), highlight: false },
               { plan: t('pro'), level: t('prioritySupport'), features: t.raw('supportProFeatures') as string[], response: t('supportResponse48h'), highlight: true },
-              { plan: t('business'), level: t('dedicatedManager'), features: t.raw('supportBusinessFeatures') as string[], response: t('supportResponse24h'), highlight: false },
+              { plan: t('enterprise'), level: t('dedicatedManager'), features: t.raw('supportEnterpriseFeatures') as string[], response: t('supportResponse24h'), highlight: false },
             ].map((s) => (
               <div
                 key={s.plan}
