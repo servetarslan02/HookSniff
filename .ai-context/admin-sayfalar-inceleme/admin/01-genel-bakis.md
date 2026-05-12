@@ -70,11 +70,13 @@
 - ~~**Chart placeholder**~~ → ✅ CSS bar chart, veri yokken (tasarım tercihi)
 
 ### ✅ Eksiklikler (Tümü Tamamlandı)
-- ~~Dashboard widget özelleştirme yok~~ → 🔜 İleri aşama feature request
-- ~~Grafik zoom/drill-down yok~~ → 🔜 Chart library bağımlı
 - ~~Veri export yok~~ → ✅ Dashboard CSV export butonu eklendi
 - ~~Gerçek zamanlı güncelleme yok~~ → ✅ Auto-refresh toggle (30sn polling) eklendi
 - ~~Karşılaştırma (bu hafta vs geçen hafta) yok~~ → ✅ Günlük trend karşılaştırması (vs yesterday)
+
+### 🔜 Gelecek Özellikler (Henüz Yapılmadı)
+- ❌ **Dashboard widget özelleştirme** — Sürükle-bırak, gizle/göster, yeniden düzenleme. İleri aşama feature request.
+- ❌ **Grafik zoom/drill-down** — Chart library bağımlı, ayrı çalışma gerektirir.
 
 ### 🆕 Eklenecekler (Sektör Karşılaştırma) — TÜMÜ TAMAMLANDI
 - ✅ **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir → EKLENDİ
@@ -130,40 +132,56 @@
 
 ---
 
-## Kalan Durum
-- 🟢 **Tüm kritik ve orta sorunlar çözüldü**
-- 🔵 **Widget özelleştirme** — İleri aşama feature request (şu an scope dışı)
-- 🔵 **Grafik zoom/drill-down** — Chart library bağımlı (şu an scope dışı)
+## Kalan Durum (2026-05-13 Güncellendi)
+
+### ✅ Tamamlanan (24/24 madde)
+- ✅ MRR/ARR kartı
+- ✅ Uptime kartı
+- ✅ Feature flag durumu (listeleme)
+- ✅ Son deploy bilgisi
+- ✅ Aktif oturum sayısı
+- ✅ Günlük trend karşılaştırması
+- ✅ Güvenlik uyarıları (SSRF/Spoof/Replay)
+- ✅ Endpoint durumu + progress bar
+- ✅ Standard Webhooks durumu
+- ✅ Deduplication durumu
+- ✅ Hızlı işlemler paneli
+- ✅ CSV export
+- ✅ Auto-refresh toggle
+- ✅ ₺ format → i18n currencySymbol
+- ✅ Tooltip dark mode CSS vars
+- ✅ Locale-aware tarih
+- ✅ Hardcoded "Aktif" → t('active')
+- ✅ Uptime URL düzeltmesi (/health)
+- ✅ Backend: total_endpoints/active_endpoints
+- ✅ Backend: /v1/admin/deploy-info
+- ✅ i18n: 82/82 key (EN + TR)
+- ✅ NotificationCenter JSX hatası
+- ✅ Onboarding/OnboardingWizard syntax
+- ✅ Billing/endpoint/api_keys derleme hataları
+
+### ❌ Yapılmayan (2 madde)
+- ❌ **Widget özelleştirme** — Sürükle-bırak, gizle/göster. İleri aşama.
+- ❌ **Grafik zoom/drill-down** — Chart library bağımlı.
+
+### ⚠️ Kısmi (1 madde)
+- ⚠️ **Feature Flags CRUD** — Backend'de create/update/delete endpoint'leri var ama frontend'de sadece listeleme yapılmıyor. Admin flag oluşturamıyor/düzenleyemiyor/silemiyor.
+
+### 🟢 Build Durumu
 - 🟢 **TypeScript** — 0 hata
-- 🟢 **Next.js build** — Başarılı (pre-existing NotificationCenter hatası düzeltildi)
+- 🟢 **Next.js build** — Başarılı
 - 🟢 **Cargo test (admin)** — 32/32 geçti
 
 ---
 
 ## 🔧 Yapılacaklar (2026-05-13)
 
-### 🔴 Backend-Frontend Uyumsuzluğu
-
-#### BF-01: Feature Flags CRUD Eksik
-- **Dosya:** `dashboard/src/app/[locale]/admin/page.tsx`
-- **Backend:**
-  ```
-  POST   /v1/admin/feature-flags      → Oluşturma
-  PUT    /v1/admin/feature-flags/{id}  → Güncelleme
-  DELETE /v1/admin/feature-flags/{id}  → Silme
-  ```
-- **Sorun:** `adminApi.createFeatureFlag`, `updateFeatureFlag`, `deleteFeatureFlag` api.ts'de tanımlı ama hiçbir sayfa çağırmıyor. Admin sadece listeleyebiliyor.
-- **Adımlar:**
-  1. Feature Flags yönetim kartı ekle (admin/page.tsx)
-  2. Toggle ile enable/disable: `adminApi.updateFeatureFlag(token, id, { is_enabled: !current })`
-  3. "Yeni Flag" butonu + modal form (name, description, rollout_percentage, enabled_for_plans)
-  4. Silme butonu + ConfirmDialog
-  5. i18n key: `createFeatureFlag`, `editFeatureFlag`, `deleteFeatureFlag`, `rolloutPercentage`
+### ⚠️ Feature Flags CRUD (Frontend Eksik)
+- **Durum:** Backend hazır, frontend'de UI yok
+- **Backend:** POST/PUT/DELETE `/v1/admin/feature-flags` endpoint'leri mevcut
+- **Frontend:** `adminApi.createFeatureFlag`, `updateFeatureFlag`, `deleteFeatureFlag` api.ts'de tanımlı ama hiçbir sayfa çağırmıyor
+- **Yapılacak:** Admin sayfasına flag yönetim kartı ekle (toggle, create, edit, delete)
 
 ### 🔒 Güvenlik
+- **G-01:** `fetch()` → `apiFetch()` dönüşümü (1 yer, CSRF koruması)
 
-#### G-01: Raw Fetch Kullanımı (1 yer)
-- **Dosya:** `dashboard/src/app/[locale]/admin/page.tsx`
-- **Sorun:** 1 yerde `fetch()` kullanılıyor, CSRF koruması atlanıyor.
-- **Adımlar:**
-  1. `fetch()` → `apiFetch()` veya `adminApi` metodına çevir
