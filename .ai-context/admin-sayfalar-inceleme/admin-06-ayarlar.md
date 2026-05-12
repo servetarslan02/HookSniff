@@ -91,3 +91,57 @@ interface AlertRule {
 - API versiyon yönetimi
 - Whitelabel ayarları
 - Maintenance mode planlama (zamanlı)
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+
+#### Backup Yönetimi
+- Manuel backup tetikleme butonu
+- Backup geçmişi tablosu (tarih, boyut, durum)
+- Restore işlemi (seçili backup'a geri dönme)
+- Backup zamanlaması (cron: saatlik/günlük/haftalık)
+- Retention policy (gün sayısı)
+- Backup doğrulama (integrity check)
+
+#### Log Seviyesi Ayarı
+- Runtime log seviyesi değişimi (restart gerektirmez)
+- Debug / Info / Warn / Error seçici
+- Modül bazlı seviye (api, worker, db ayrı ayrı)
+- Log rotasyonu ayarı (max boyut, gün sayısı)
+
+#### Feature Flag Yönetimi
+- Feature listesi (ad, açıklama, durum)
+- Toggle ile açma/kapama
+- Percentage rollout (kullanıcı yüzdesine göre gradual rollout)
+- A/B testing (iki varyant karşılaştırma)
+- Feature flag geçmişi (kim, ne zaman, ne değiştirdi)
+
+#### 2FA Zorunlu (Admin)
+- Admin kullanıcılar için 2FA zorunluluğu toggle
+- TOTP destek (Google Authenticator, Authy)
+- Backup kod üretimi
+- 2FA sıfırlama (admin tarafından)
+
+#### Session Management
+- Aktif oturum listesi (cihaz, IP, son aktivite)
+- Oturum sonlandırma (tekli/toplu)
+- Oturum timeout ayarı (dakika)
+- Concurrent session limiti
+
+#### Whitelabel Ayarları
+- Logo yükleme (light/dark mode)
+- Renk teması (primary, secondary, accent)
+- Custom CSS injection
+- Footer metni özelleştirme
+- Favicon yükleme
+
+#### Uptime Monitoring
+- SLA hedefi ayarı (%99.9, %99.99, %99.999)
+- Status page URL'si
+- Incident bildirim kanalları (email, Slack, webhook)
+- Uptime raporu (aylık/haftalık otomatik rapor)
+
+#### API Versiyon Yönetimi
+- Desteklenen API versiyonları listesi
+- Deprecated versiyon uyarıları
+- Versiyon geçiş rehberi
+- Breaking change bildirimleri
