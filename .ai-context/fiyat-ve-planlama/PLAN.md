@@ -32,14 +32,16 @@
 
 ## 📋 Görev Takibi
 
-### Aşama 1: Application Modeli (Tablo + API) ⬜
-- [ ] Migration: `applications` tablosu oluştur
-- [ ] Migration: `endpoints` tablosuna `application_id` FK ekle
-- [ ] Model: `Application` struct (Rust)
-- [ ] API: CRUD endpoint'leri (create, list, get, update, delete)
-- [ ] API: Plan bazlı limit kontrolü (Developer:1, Startup:1, Pro:sınırsız)
-- [ ] API: Endpoint oluştururken application_id zorunlu
-- [ ] Test: Unit testler
+### Aşama 1: Application Modeli (Tablo + API) ✅
+- [x] Migration: `applications` tablosu oluştur (013_applications.sql)
+- [x] Migration: `endpoints` tablosuna `application_id` FK ekle
+- [x] Model: `Application` struct (Rust) — models/application.rs
+- [x] API: CRUD endpoint'leri (create, list, get, update, delete) — routes/applications.rs
+- [x] API: Plan bazlı limit kontrolü (Developer:1, Startup:1, Pro:sınırsız)
+- [x] API: Endpoint oluştururken application_id zorunlu + ownership doğrulama
+- [x] Plan enum güncellendi: Developer/Startup/Pro/Enterprise
+- [x] Yeni limit fonksiyonları: max_applications, max_event_types, max_team_members, max_subscriptions, max_events_per_day, overage_price, allows_overage
+- [ ] Test: Unit testler (cargo test — Rust toolchain gerekli)
 - [ ] `cargo test --lib` — tüm testler geçmeli
 - [ ] `cargo clippy` — 0 uyarı
 
@@ -101,7 +103,7 @@
 
 | Aşama | Durum | Başlangıç | Bitiş |
 |-------|-------|-----------|-------|
-| 1. Application Modeli | ⬜ | — | — |
+| 1. Application Modeli | ✅ | 2026-05-13 00:36 | 2026-05-13 00:50 |
 | 2. Event Type Limiti | ⬜ | — | — |
 | 3. Team Member Limiti | ⬜ | — | — |
 | 4. Never Blocked + Email | ⬜ | — | — |

@@ -1,6 +1,6 @@
 # 🧠 Fiyat ve Planlama — Hafıza
 
-> Son güncelleme: 2026-05-13 00:32 GMT+8
+> Son güncelleme: 2026-05-13 00:50 GMT+8
 
 ---
 
@@ -31,7 +31,9 @@
 
 ## Sorunlar / Notlar
 
-- (Henüz bir sorun yok)
+- Rust toolchain bu ortamda yok — cargo test/clippy çalıştırılamıyor
+- `transforms.rs` ve `webhooks.rs`'deki endpoint SELECT sorguları farklı kolon seti kullanıyor, compile'da sorun çıkabilir
+- Dashboard plan isimleri (Aşama 6'da güncellenecek)
 
 ---
 
@@ -43,3 +45,16 @@
 - Yeni plan yapısı belirlendi: Developer / Startup / Pro / Enterprise
 - Feature ekleme kararları alındı
 - Görev takip dosyası oluşturuldu (PLAN.md)
+
+### Oturum 2 (2026-05-13 00:36 - 00:50 GMT+8)
+- OpenClaw oturumu — Aşama 1: Application Modeli
+- `013_applications.sql` migration oluşturuldu
+- `models/application.rs` model dosyası oluşturuldu
+- `routes/applications.rs` CRUD endpoint'leri oluşturuldu
+- Plan enum güncellendi: Free→Developer, Business→Enterprise, Startup eklendi
+- Yeni limit fonksiyonları eklendi (max_applications, max_event_types, vb.)
+- Endpoint create'te application_id zorunlu kılındı
+- Tüm endpoint SELECT sorgularına application_id eklendi (8+ dosya)
+- `billing/mod.rs` test modülü yeni plan yapısına göre yeniden yazıldı
+- `routes/mod.rs`'ye applications route eklendi
+- `models/mod.rs`'ye application modülü eklendi
