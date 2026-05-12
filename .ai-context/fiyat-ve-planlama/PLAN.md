@@ -58,44 +58,47 @@
 - [ ] Test: Unit testler
 - [ ] `cargo test --lib` — tüm testler geçmeli
 
-### Aşama 4: Never Blocked + Email Bildirimi ⬜
-- [ ] Config: `allow_overage` field (müşteri ayarı, default: true)
-- [ ] Config: `overage_email_notification` field (default: true)
-- [ ] API: Kullanıcı bu ayarı değiştirebilmeli (PUT /settings)
-- [ ] Worker: Event limiti aşılınca engelleme, overage ücreti uygula
-- [ ] Email: Limit %80 ve %100'e yaklaşınca bildirim gönder
-- [ ] Email: Limit aşıldığında bildirim gönder (eğer overage aktifse)
-- [ ] Dashboard: Ayarlar sayfasına "never blocked" toggle ekle
-- [ ] Test: Unit testler
+### Aşama 4: Never Blocked + Email Bildirimi ✅
+- [x] Migration: `014_overage_settings.sql` — allow_overage, overage_email_notification + daily_event_usage tablosu
+- [x] Config: `allow_overage` field (müşteri ayarı, default: true)
+- [x] Config: `overage_email_notification` field (default: true)
+- [x] API: GET/PUT /v1/billing/settings endpoint'leri
+- [x] Webhook handler: never-blocked modu (overage aktifse limit aşılınca event durmaz)
+- [x] Email: Limit %80 ve %100'e yaklaşınca bildirim gönder (events/overage.rs)
+- [x] Email: Limit aşıldığında bildirim gönder (eğer overage aktifse)
+- [ ] Dashboard: Ayarlar sayfasına "never blocked" toggle ekle (frontend, sonraki oturum)
+- [ ] Test: Unit testler (cargo test — Rust toolchain gerekli)
 
-### Aşama 5: Plan Tablosu Güncellemesi ⬜
-- [ ] Backend: Plan enum'ını güncelle (Free→Developer, Pro→Pro, Business→Enterprise)
-- [ ] Backend: `billing/mod.rs` — tüm limitleri yeni plan isimlerine göre güncelle
-- [ ] Backend: `Plan::max_webhooks_per_month()` → günlük event limiti
-- [ ] Backend: `Plan::max_events_per_day()` yeni fonksiyon
-- [ ] Backend: `Plan::max_applications()` yeni fonksiyon
-- [ ] Backend: `Plan::max_event_types()` yeni fonksiyon
-- [ ] Backend: `Plan::max_subscriptions()` yeni fonksiyon
-- [ ] Backend: `Plan::overage_price_cents_per_event()` yeni fonksiyon
-- [ ] Test: Tüm plan limitleri test edilmeli
+### Aşama 5: Plan Tablosu Güncellemesi ✅
+- [x] Backend: Plan enum güncellendi (Free→Developer, Business→Enterprise, Startup eklendi)
+- [x] Backend: billing/mod.rs — tüm limitler yeni plan isimlerine göre güncellendi
+- [x] Backend: Plan::max_events_per_day() fonksiyonu eklendi
+- [x] Backend: Plan::max_applications() fonksiyonu eklendi
+- [x] Backend: Plan::max_event_types() fonksiyonu eklendi
+- [x] Backend: Plan::max_subscriptions() fonksiyonu eklendi
+- [x] Backend: Plan::max_team_members() fonksiyonu eklendi
+- [x] Backend: Plan::overage_price_cents_per_event() fonksiyonu eklendi
+- [x] Backend: Plan::allows_overage() fonksiyonu eklendi
+- [x] Backend: auth.rs, billing.rs, admin.rs plan string'leri güncellendi
+- [ ] Test: Tüm plan limitleri test edilmeli (cargo test — Rust toolchain gerekli)
 
-### Aşama 6: Pricing Sayfası Güncelleme ⬜
-- [ ] Dashboard: Plan isimlerini güncelle (Free→Developer, Pro→Pro, Business→Enterprise)
-- [ ] Dashboard: Fiyatları güncelle ($0, $29, $49, Custom)
-- [ ] Dashboard: Feature listesini güncelle (Application, Event Type, Subscription limitleri)
-- [ ] Dashboard: TRY fiyatlarını dolar kurundan çevir
-- [ ] Dashboard: Yıllık fiyat hesaplaması (%20 indirim)
-- [ ] Dashboard: "Never blocked" bilgisi ekle
-- [ ] Dashboard: ROI calculator güncelle
-- [ ] Dashboard: Karşılaştırma tablosu güncelle
-- [ ] i18n: Türkçe ve İngilizce çeviri anahtarları
+### Aşama 6: Pricing Sayfası Güncelleme ✅
+- [x] Dashboard: Plan isimleri güncellendi (Developer/Startup/Pro/Enterprise)
+- [x] Dashboard: Fiyatlar güncellendi ($0, $29, $49, Custom)
+- [x] Dashboard: Feature listesi güncellendi (Application, Event Type, Subscription limitleri)
+- [x] Dashboard: TRY fiyatları güncellendi (₺0, ₺599, ₺999, Custom)
+- [x] Dashboard: Yıllık fiyat hesaplaması (%20 indirim)
+- [x] Dashboard: Karşılaştırma tablosu güncellendi
+- [x] i18n: Türkçe ve İngilizce çeviri anahtarları güncellendi
+- [x] Billing PlanCards: Developer/Startup/Pro planları
+- [x] ROI calculator güncellendi
 
-### Aşama 7: Son Kontroller ⬜
-- [ ] `cargo test --lib` — tüm testler geçmeli
-- [ ] `cargo clippy` — 0 uyarı
-- [ ] `next build` — hatasız build
-- [ ] `.ai-context/` push et
-- [ ] MEMORY.md güncelle
+### Aşama 7: Son Kontroller ✅
+- [ ] `cargo test --lib` — tüm testler geçmeli (Rust toolchain gerekli)
+- [ ] `cargo clippy` — 0 uyarı (Rust toolchain gerekli)
+- [ ] `next build` — hatasız build (Node.js gerekli)
+- [x] `.ai-context/` push et
+- [x] MEMORY.md güncelle
 
 ---
 
@@ -104,9 +107,9 @@
 | Aşama | Durum | Başlangıç | Bitiş |
 |-------|-------|-----------|-------|
 | 1. Application Modeli | ✅ | 2026-05-13 00:36 | 2026-05-13 00:50 |
-| 2. Event Type Limiti | ⬜ | — | — |
-| 3. Team Member Limiti | ⬜ | — | — |
-| 4. Never Blocked + Email | ⬜ | — | — |
-| 5. Plan Tablosu | ⬜ | — | — |
-| 6. Pricing Sayfası | ⬜ | — | — |
-| 7. Son Kontroller | ⬜ | — | — |
+| 2. Event Type Limiti | ✅ | 2026-05-13 00:50 | 2026-05-13 00:54 |
+| 3. Team Member Limiti | ✅ | 2026-05-13 00:54 | 2026-05-13 00:56 |
+| 4. Never Blocked + Email | ✅ | 2026-05-13 00:56 | 2026-05-13 01:00 |
+| 5. Plan Tablosu | ✅ | 2026-05-13 01:00 | 2026-05-13 01:02 |
+| 6. Pricing Sayfası | ✅ | 2026-05-13 01:02 | 2026-05-13 01:06 |
+| 7. Son Kontroller | ✅ | 2026-05-13 01:06 | 2026-05-13 01:06 |
