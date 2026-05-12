@@ -110,7 +110,7 @@ export default function AdminRevenuePage() {
         </div>
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
           <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
-          <button
+          <button type="button"
             onClick={() => fetchRevenue()}
             className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
           >
@@ -146,7 +146,7 @@ export default function AdminRevenuePage() {
               <option key={opt.value} value={opt.value}>{t(opt.labelKey)}</option>
             ))}
           </select>
-          <button
+          <button type="button"
             onClick={() => fetchRevenue(true)}
             disabled={refreshing}
             aria-label={t('refreshData')}
@@ -181,7 +181,7 @@ export default function AdminRevenuePage() {
           color="red"
           isPercent
         />
-        <button
+        <button type="button"
           onClick={handleExportCSV}
           className="glass-card p-4 sm:p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 transition cursor-pointer border border-gray-200 dark:border-slate-700"
         >

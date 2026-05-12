@@ -202,27 +202,27 @@ export default function AdminUsersPage() {
                   <tr className="bg-gray-50/50 dark:bg-slate-800/50">
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</th>
                     <th scope="col">
-                      <button onClick={() => handleSort('email')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByEmail')}>
+                      <button type="button" onClick={() => handleSort('email')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByEmail')}>
                         {tc('email')} {sortField === 'email' && (sortDir === 'asc' ? '↑' : '↓')}
                       </button>
                     </th>
                     <th scope="col">
-                      <button onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByName')}>
+                      <button type="button" onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByName')}>
                         {tc('name')} {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
                       </button>
                     </th>
                     <th scope="col">
-                      <button onClick={() => handleSort('plan')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByPlan')}>
+                      <button type="button" onClick={() => handleSort('plan')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByPlan')}>
                         {tc('plan')} {sortField === 'plan' && (sortDir === 'asc' ? '↑' : '↓')}
                       </button>
                     </th>
                     <th scope="col">
-                      <button onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByStatus')}>
+                      <button type="button" onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByStatus')}>
                         {tc('status')} {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
                       </button>
                     </th>
                     <th scope="col">
-                      <button onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByCreated')}>
+                      <button type="button" onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByCreated')}>
                         {tc('created')} {sortField === 'created_at' && (sortDir === 'asc' ? '↑' : '↓')}
                       </button>
                     </th>
@@ -256,13 +256,13 @@ export default function AdminUsersPage() {
                           >
                             {tc('view')}
                           </Link>
-                          <button
+                          <button type="button"
                             onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan); }}
                             className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium"
                           >
                             {t('changePlan')}
                           </button>
-                          <button
+                          <button type="button"
                             onClick={() => handleToggleStatus(u)}
                             className={`text-xs font-medium ${
                               u.status === 'active'
@@ -272,7 +272,7 @@ export default function AdminUsersPage() {
                           >
                             {u.status === 'active' ? t('banUser') : t('activateUser')}
                           </button>
-                          <button
+                          <button type="button"
                             onClick={() => handleImpersonate(u)}
                             className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium"
                             title={t('viewAsUser')}
@@ -294,7 +294,7 @@ export default function AdminUsersPage() {
                   {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <div className="flex gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
@@ -304,7 +304,7 @@ export default function AdminUsersPage() {
                   <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">
                     {tc('pageOf', { page, totalPages })}
                   </span>
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
@@ -339,13 +339,13 @@ export default function AdminUsersPage() {
               ))}
             </select>
             <div className="flex gap-3 justify-end">
-              <button
+              <button type="button"
                 onClick={() => setPlanChangeTarget(null)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tc('cancel')}
               </button>
-              <button
+              <button type="button"
                 onClick={handleChangePlan}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition"
               >

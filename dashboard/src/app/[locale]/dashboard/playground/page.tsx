@@ -267,7 +267,7 @@ function HistoryPanel({
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('requestHistory')}</h3>
-        <button
+        <button type="button"
           onClick={onClear}
           className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 transition"
         >
@@ -368,7 +368,7 @@ function LiveRequestViewer() {
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('liveViewer')}</h3>
-        <button
+        <button type="button"
           onClick={isLive ? stopLive : startLive}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
             isLive
@@ -658,7 +658,7 @@ ${Object.entries(headers)
               </div>
             )}
 
-            <button
+            <button type="button"
               onClick={handleSend}
               disabled={loading}
               className="w-full bg-brand-600 text-white py-3 rounded-xl font-semibold hover:bg-brand-700 transition disabled:opacity-60 flex items-center justify-center gap-2"
@@ -677,7 +677,7 @@ ${Object.entries(headers)
           <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('curlCommand')}</h3>
-              <button
+              <button type="button"
                 onClick={copyCurl}
                 className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
               >

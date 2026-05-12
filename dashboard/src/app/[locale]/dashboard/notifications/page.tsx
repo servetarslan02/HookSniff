@@ -111,7 +111,7 @@ export default function NotificationsPage() {
             {t("subtitle")}
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={handleMarkAllAsRead}
           className="px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
         >
@@ -207,14 +207,14 @@ export default function NotificationsPage() {
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       {!n.read && (
-                        <button
+                        <button type="button"
                           onClick={() => handleMarkAsRead(n.id)}
                           className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium transition"
                         >
                           {t('markRead')}
                         </button>
                       )}
-                      <button
+                      <button type="button"
                         onClick={() => handleDelete(n.id)}
                         className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
                       >
@@ -233,7 +233,7 @@ export default function NotificationsPage() {
                   {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <div className="flex gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
@@ -243,7 +243,7 @@ export default function NotificationsPage() {
                   <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">
                     {tc('pageOf', { page, totalPages })}
                   </span>
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"

@@ -160,7 +160,7 @@ export default function WebhookBuilderPage() {
           <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('payloadFields')}</h2>
-              <button onClick={addField} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('addField')}</button>
+              <button type="button" onClick={addField} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('addField')}</button>
             </div>
             <div className="space-y-3">
               {fields.map((field, i) => (
@@ -188,7 +188,7 @@ export default function WebhookBuilderPage() {
                     placeholder="value"
                     className="flex-1 px-3 py-3 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
                   />
-                  <button
+                  <button type="button"
                     onClick={() => removeField(i)}
                     aria-label={tc('delete')}
                     className="px-3 py-3 text-red-500 hover:text-red-700 transition"
@@ -210,7 +210,7 @@ export default function WebhookBuilderPage() {
               placeholder={t('endpointPlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm mb-3"
             />
-            <button
+            <button type="button"
               onClick={handleSend}
               disabled={sending || !endpointId}
               className="w-full px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
@@ -225,7 +225,7 @@ export default function WebhookBuilderPage() {
           <div className="glass-card p-6 sticky top-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('preview')}</h2>
-              <button
+              <button type="button"
                 onClick={updatePreview}
                 className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
               >

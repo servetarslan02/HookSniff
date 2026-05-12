@@ -138,13 +138,13 @@ export default function DeliveryDetailPage() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('loadFailed')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{error}</p>
         <div className="flex items-center justify-center gap-3">
-          <button
+          <button type="button"
             onClick={fetchData}
             className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
           >
             {t('tryAgain')}
           </button>
-          <button
+          <button type="button"
             onClick={() => router.push(`/${locale}/dashboard/deliveries`)}
             className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
@@ -162,7 +162,7 @@ export default function DeliveryDetailPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <button
+          <button type="button"
             onClick={() => router.push(`/${locale}/dashboard/deliveries`)}
             className="p-2 -ml-2 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
             title={t('backToDeliveries')}
@@ -176,7 +176,7 @@ export default function DeliveryDetailPage() {
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 font-mono">{delivery.id}</p>
           </div>
         </div>
-        <button
+        <button type="button"
           onClick={() => setShowReplayConfirm(true)}
           className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition flex items-center gap-2"
         >
@@ -257,7 +257,7 @@ export default function DeliveryDetailPage() {
 
           {/* Request Headers */}
           <div className="mb-5">
-            <button
+            <button type="button"
               onClick={() => setShowRequestHeaders(!showRequestHeaders)}
               className="flex items-center justify-between w-full text-left group"
             >
@@ -284,7 +284,7 @@ export default function DeliveryDetailPage() {
                     : t('noHeaders')}
                 </pre>
                 {delivery.request_headers && (
-                  <button
+                  <button type="button"
                     onClick={() => copyToClipboard(formatHeaders(delivery.request_headers!), 'req-headers')}
                     className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
                     title={t('copyHeaders')}
@@ -306,7 +306,7 @@ export default function DeliveryDetailPage() {
 
           {/* Request Body */}
           <div>
-            <button
+            <button type="button"
               onClick={() => setShowRequestBody(!showRequestBody)}
               className="flex items-center justify-between w-full text-left group"
             >
@@ -328,7 +328,7 @@ export default function DeliveryDetailPage() {
                     : t('noPayload')}
                 </pre>
                 {delivery.request_body != null && (
-                  <button
+                  <button type="button"
                     onClick={() => copyToClipboard(formatJson(delivery.request_body), 'req-body')}
                     className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
                     title={t('copyPayload')}
@@ -454,7 +454,7 @@ export default function DeliveryDetailPage() {
                                   catch { return attempt.response_body; }
                                 })()}
                               </pre>
-                              <button
+                              <button type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   copyToClipboard(attempt.response_body!, `resp-${attempt.id}`);
@@ -530,7 +530,7 @@ function DetailRow({
           {value}
         </span>
         {copyable && onCopy && (
-          <button
+          <button type="button"
             onClick={onCopy}
             className="flex-shrink-0 p-1 rounded text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
             title={t('copyTitle')}
