@@ -71,16 +71,16 @@
 - Karşılaştırma (bu hafta vs geçen hafta) yok
 
 ### 🆕 Eklenecekler (Sektör Karşılaştırma)
-- **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir
-- **Uptime kartı** — Platform uptime yüzdesi + SLA durumu
-- **Feature flag durumu** — Aktif feature sayısı
-- **Son deploy** — Versiyon ve zaman bilgisi
-- **Aktif oturum sayısı** — Online admin kullanıcı sayısı
-- **Bu hafta vs geçen hafta** — Trend karşılaştırması
-- **Güvenlik uyarıları** — SSRF/spoofing/replay attempt sayısı
-- **Endpoint durumu** — Toplam endpoint, aktif, devre dışı sayısı
-- **Standard Webhooks durumu** — Uyumluluk yüzdesi
-- **Deduplication stats** — Filtrelenen tekrarlayan event sayısı
+- ✅ **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir → EKLENDİ (2026-05-13)
+- 🔴 **Uptime kartı** — Platform uptime yüzdesi + SLA durumu
+- 🔴 **Feature flag durumu** — Aktif feature sayısı
+- 🔴 **Son deploy** — Versiyon ve zaman bilgisi
+- 🔴 **Aktif oturum sayısı** — Online admin kullanıcı sayısı
+- 🔴 **Bu hafta vs geçen hafta** — Trend karşılaştırması
+- ✅ **Güvenlik uyarıları** — SSRF/spoofing/replay attempt sayısı → EKLENDİ (2026-05-13)
+- ✅ **Endpoint durumu** — Toplam endpoint, aktif, devre dışı sayısı → EKLENDİ (2026-05-13)
+- 🔴 **Standard Webhooks durumu** — Uyumluluk yüzdesi
+- 🔴 **Deduplication stats** — Filtrelenen tekrarlayan event sayısı
 
 ---
 
