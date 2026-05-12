@@ -2492,7 +2492,21 @@
     "desc": "See what's new in HookSniff — product updates, SDK releases, and infrastructure improvements.",
     "subscribeRss": "Subscribe via RSS",
     "searchPlaceholder": "Search changelog entries...",
-    "readMore": "Read more"
+    "readMore": "Read more",
+    "typeFeature": "Feature",
+    "typeFix": "Fix",
+    "typeImprovement": "Improvement",
+    "typeSecurity": "Security",
+    "typeBreaking": "Breaking",
+    "areaApi": "API",
+    "areaDashboard": "Dashboard",
+    "areaSdk": "SDK",
+    "areaWorker": "Worker",
+    "areaInfra": "Infra",
+    "areaDocs": "Docs",
+    "networkError": "Network error — check your connection.",
+    "subscribeSuccess": "Subscribed successfully!",
+    "emailPlaceholder": "your@email.com"
   },
   "newsletter": {
     "title": "Newsletter",
