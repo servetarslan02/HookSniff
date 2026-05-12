@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { notificationsApi, type Notification } from '@/lib/api';
 
 export function NotificationCenter() {
+  const username = useUsername();
   const t = useTranslations('nav');
   const { token } = useAuth();
   const router = useRouter();
@@ -149,7 +151,7 @@ export function NotificationCenter() {
           </div>
           <div className="px-4 py-2.5 border-t border-gray-200 dark:border-slate-700 text-center">
             <Link
-              href="/dashboard/notifications"
+              href={`/${username}/notifications`}
               onClick={() => setOpen(false)}
               className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
             >

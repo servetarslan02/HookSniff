@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -26,6 +27,8 @@ interface SearchResponse {
 }
 
 export default function SearchPage() {
+  const params = useParams();
+  const username = (params?.username as string) || 'dashboard';
   const { token } = useAuth();
   const router = useRouter();
   const [query, setQuery] = useState('');
@@ -156,7 +159,7 @@ export default function SearchPage() {
                 <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                   {results.deliveries.map((d) => (
                     <tr key={d.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer"
-                        onClick={() => router.push(`/dashboard/deliveries?id=${d.id}`)}>
+                        onClick={() => router.push(`/${username}/deliveries?id=${d.id}`)}>
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
                         {d.id.slice(0, 12)}…
                       </td>

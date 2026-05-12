@@ -1,6 +1,7 @@
 'use client';
 
 import { Link, usePathname } from '@/i18n/navigation';
+import { useUsername } from '@/hooks/useUsername';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -17,6 +18,7 @@ interface NavGroup {
 }
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
+  const username = useUsername();
   const pathname = usePathname();
   const t = useTranslations('docs');
   const tNav = useTranslations('nav');
@@ -73,7 +75,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <Link href="/dashboard" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
+            <Link href={`/${username}`} className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
               {tNav('dashboard')}
             </Link>
             <Link href="/" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
