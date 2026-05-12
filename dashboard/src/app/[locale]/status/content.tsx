@@ -660,7 +660,7 @@ export function StatusPageContent() {
           ) : (
             <div className="mt-4">
               <div className="flex items-baseline justify-between mb-2">
-                <span className="text-sm text-gray-500 dark:text-slate-400">Last 30 days</span>
+                <span className="text-sm text-gray-500 dark:text-slate-400">{t('last30Days')}</span>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">{data.uptime_30d}%</span>
               </div>
               <div className="flex gap-0.5 h-8">

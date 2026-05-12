@@ -439,7 +439,7 @@ export default function BillingPage() {
       {/* Upgrade Confirmation Modal */}
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowUpgradeModal(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} />
           <div ref={upgradeModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-none">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('upgradeTo', {
@@ -456,10 +456,10 @@ export default function BillingPage() {
             </p>
             <div className="flex gap-3 justify-end">
               <button type="button"
-                onClick={() => setShowUpgradeModal(null)}
+                onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
-                Cancel
+                {tc('cancel')}
               </button>
               <button type="button"
                 onClick={confirmUpgrade}
