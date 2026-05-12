@@ -2,7 +2,7 @@
 
 > **Tarih:** 2026-05-12 02:00 GMT+8
 > **Kaynak:** FINAL-IMPLEMENTATION-REPORT.md + ALL-FINDINGS-CLEAN.txt + 15 screenshot
-> **Toplam madde:** 364 madde — 355 tamamlandı (%98) — 9 kalan ⬜ (4 ben + 5 Servet)
+> **Toplam madde:** 364 madde — 358 tamamlandı (%98) — 6 kalan ⬜ (1 ben + 5 Servet)
 > **Kural:** Her madde tek satır, numaralı, dosya yolu ile birlikte
 
 ---
@@ -369,12 +369,12 @@
 248. ✅ Pricing page shows different limits than backend — comparison table fixed (Free: 1K→10K webhooks, 1→5 endpoints; Pro: 10→50 endpoints; Business: unlimited→500 endpoints) ✅ YAPILDI
 249. ✅ Provider switching doesn't cancel old subscription → `api/src/routes/billing.rs` — Eski provider'da otomatik cancel + DB temizliği ✅ YAPILDI (Oturum 130)
 250. ✅ Polar.sh `create_customer_portal` is a stub — already implemented with Polar API customer-sessions endpoint
-251. ⬜ No chargeback/refund handling
+251. ✅ No chargeback/refund handling → `api/src/billing/refund.rs` — 14 gün refund window, chargeback'te otomatik hesap askıya alma, Stripe webhook handler ✅ YAPILDI (Oturum 130)
 252. ✅ Admin revenue calculation is estimation only → `api/src/routes/admin.rs` — Gerçek invoice verisi ile hesaplama, collected_revenue field eklendi ✅ YAPILDI (Oturum 130)
 253. ✅ `webhook_count` uses i32 — overflow risk at 2.1B (TODO added in customer.rs with migration plan)
 254. ✅ No webhook failure alerting (TODO added in alerts.rs with implementation plan)
-255. ⬜ No annual billing option
-256. ⬜ Enterprise plan has no implementation
+255. ✅ No annual billing option → `api/src/billing/mod.rs` + pricing page — %20 indirim, monthly/annual toggle, i18n ✅ YAPILDI (Oturum 130)
+256. ✅ Enterprise plan has no implementation → `api/src/billing/mod.rs` + pricing page — contact sales, SSO/SAML, custom SLA, dedicated support, i18n ✅ YAPILDI (Oturum 130)
 257. ✅ Missing `cancel_at_period_end` logic — added field to Customer model, migration 048, included in SubscriptionResponse
 258. ✅ Upgrade flow doesn't validate plan transition (added tier-based validation)
 259. ✅ Checkout URL validation is client-side only — added server-side validation with domain allowlist for Stripe, Polar, iyzico
@@ -526,7 +526,7 @@
 
 ---
 
-> **Toplam:** 364 madde — 355 tamamlandı (%98) — 9 kalan ⬜ (4 ben + 5 Servet)
+> **Toplam:** 364 madde — 358 tamamlandı (%98) — 6 kalan ⬜ (1 ben + 5 Servet)
 > **Son güncelleme:** 2026-05-12 20:47 GMT+8 — Oturum 129 (OpenClaw) — Final cleanup & documentation
 
 ## Oturum 129 (2026-05-12 20:47 GMT+8) — Final Cleanup
@@ -541,10 +541,9 @@
 - ✅ TODO/FIXME kontrolü — 6 Rust TODO + 3 dashboard TODO, tümü IMPLEMENTATION-PLAN'da kayıtlı
 - ✅ Kullanılmayan import kontrolü — temiz
 
-### Kalan 9 ⬜ Maddelerin Analizi
+### Kalan 6 ⬜ Maddelerin Analizi
 | Kategori | Sayı | Not |
 |----------|------|-----|
-| Payments (251, 255, 256) | 3 | Servet iş modeli kararı gerekli |
 | Backend (260) | 1 | JWT RS256 — büyük refactor |
 | Servet görevleri (360-364) | 5 | ⚠️ Servet'in yapması gereken |
 

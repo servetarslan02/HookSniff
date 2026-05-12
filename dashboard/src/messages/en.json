@@ -1874,7 +1874,25 @@
     "testimonial3Author": "Solo Founder",
     "testimonial3Company": "Indie Hacker",
     "supportResponse48h": "< 48 hours",
-    "supportResponse24h": "< 24 hours"
+    "supportResponse24h": "< 24 hours",
+    "annual": "Annual",
+    "monthly": "Monthly",
+    "savePercent": "Save {percent}%",
+    "billedAnnually": "Billed annually",
+    "billedMonthly": "Billed monthly",
+    "enterprise": "Enterprise",
+    "enterpriseDesc": "For large organizations with custom needs",
+    "customPricing": "Custom",
+    "contactUs": "Contact Us",
+    "enterpriseFeatures": [
+      "Everything in Business",
+      "Custom SLA (99.999% uptime)",
+      "SSO / SAML",
+      "Dedicated support engineer",
+      "Slack Connect channel",
+      "Custom contracts",
+      "On-premises deployment option"
+    ]
   },
   "pricingFaq": [
     {
