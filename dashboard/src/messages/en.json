@@ -148,7 +148,9 @@
     "sectionTools": "Tools",
     "sectionAdvanced": "Advanced",
     "sectionAccount": "Account",
-    "routing": "Routing"
+    "routing": "Routing",
+    "applications": "Applications",
+    "serviceTokens": "Service Tokens"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -3107,5 +3109,30 @@
     "privacyPolicy": "Privacy Policy",
     "accept": "Accept",
     "reject": "Reject"
+  },
+  "applications": {
+    "title": "Applications",
+    "subtitle": "Isolated environments for your webhooks (events, subscriptions, and delivery logs)",
+    "create": "Create application",
+    "nameLabel": "Name",
+    "namePlaceholder": "My Application",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Optional description",
+    "endpoints": "Endpoints",
+    "actions": "Actions",
+    "delete": "Delete",
+    "deleteTitle": "Delete application",
+    "deleteConfirm": "Are you sure you want to delete this application? All endpoints and delivery logs will be permanently removed.",
+    "deleted": "Application deleted",
+    "empty": "No applications",
+    "notFound": "Application not found",
+    "backToList": "Back to list",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "event": "Event",
+    "time": "Time",
+    "noEndpoints": "No endpoints in this application yet",
+    "noDeliveries": "No deliveries yet"
   }
 }
