@@ -418,8 +418,8 @@ export interface AuditLogEntry {
 export interface AuditLogResponse {
   entries: AuditLogEntry[];
   total: number;
-  limit: number;
-  offset: number;
+  page: number;
+  per_page: number;
 }
 
 export interface UserAnalytics {
@@ -477,8 +477,12 @@ export const adminApi = {
   // New endpoints
   getAuditLogs: (token: string, params?: { limit?: number; offset?: number; action?: string }) => {
     const searchParams = new URLSearchParams();
-    if (params?.limit) searchParams.set('limit', params.limit.toString());
-    if (params?.offset) searchParams.set('offset', params.offset.toString());
+    if (params?.limit) {
+      searchParams.set('per_page', params.limit.toString());
+      // Calculate page from offset and limit
+      const page = params.offset ? Math.floor(params.offset / params.limit) + 1 : 1;
+      searchParams.set('page', page.toString());
+    }
     if (params?.action) searchParams.set('action', params.action);
     const qs = searchParams.toString();
     return apiFetch<AuditLogResponse>(`/admin/audit-logs${qs ? `?${qs}` : ''}`, { token });

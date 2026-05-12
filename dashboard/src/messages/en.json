@@ -1270,7 +1270,13 @@
     "testSending": "Sending...",
     "responseStatus": "Response Status",
     "responseTime": "Response Time",
-    "responseBody": "Response Body"
+    "responseBody": "Response Body",
+    "alertThresholdsDesc": "Set thresholds for automatic alerts when metrics exceed limits",
+    "failedDeliveryThreshold": "Failed Delivery Threshold",
+    "below": "below",
+    "above": "above",
+    "messages": "messages",
+    "perHour": "/hour"
   },
   "landing": {
     "nav": {
