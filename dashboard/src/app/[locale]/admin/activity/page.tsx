@@ -152,7 +152,7 @@ export default function AdminActivityPage() {
           <div className="p-6">
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
               <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
-              <button
+              <button type="button"
                 onClick={fetchLogs}
                 className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
               >
@@ -246,14 +246,14 @@ export default function AdminActivityPage() {
                   {t('page')} {page} / {totalPages}
                 </span>
                 <div className="flex gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
                     {tc('previous')}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
