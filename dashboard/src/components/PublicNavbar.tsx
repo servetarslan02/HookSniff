@@ -44,7 +44,7 @@ export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
           <LanguageSwitcher />
           <ThemeToggle />
           {token ? (
-            <Link href={`/${username}`} className="bg-gray-900 dark:bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">
+            <Link href="/" className="bg-gray-900 dark:bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">
               {tNav('dashboard')}
             </Link>
           ) : (

@@ -43,7 +43,7 @@ export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
         </div>
         <p className="text-xs text-gray-500 dark:text-slate-400">
           {t('keepSecret')}{' '}
-          <a href={`/${username}/api-keys`} className="text-brand-600 dark:text-brand-400 hover:underline">
+          <a href={`/api-keys`} className="text-brand-600 dark:text-brand-400 hover:underline">
             {t('manageApiKeys')} →
           </a>
         </p>

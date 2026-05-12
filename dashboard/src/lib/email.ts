@@ -237,7 +237,7 @@ export function passwordResetEmail(resetUrl: string) {
 
 export function deliveryFailedEmail(event: string, endpoint: string, attempts: number, username?: string) {
   const dashboardBase = username
-    ? `https://hooksniff.vercel.app/${username}/deliveries`
+    ? 'https://hooksniff.vercel.app/deliveries'
     : 'https://hooksniff.vercel.app/dashboard/deliveries';
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
@@ -266,7 +266,7 @@ export function deliveryFailedEmail(event: string, endpoint: string, attempts: n
 
 export function welcomeEmail(name: string, username?: string) {
   const dashboardUrl = username
-    ? `https://hooksniff.vercel.app/${username}`
+    ? 'https://hooksniff.vercel.app'
     : 'https://hooksniff.vercel.app/dashboard';
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
