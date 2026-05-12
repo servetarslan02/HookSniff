@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Architecture',
-  description: 'Understand HookSniff's system architecture and design decisions',
+  description: "Understand HookSniff's system architecture and design decisions",
 };
 
 

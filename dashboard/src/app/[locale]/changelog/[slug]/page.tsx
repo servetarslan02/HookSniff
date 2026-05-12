@@ -5,17 +5,6 @@ import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
-import type { Metadata } from 'next';
-
-// Revalidate every hour for ISR
-export const revalidate = 3600;
-
-
-export const metadata: Metadata = {
-  title: 'Changelog',
-  description: 'View detailed changelog entries for HookSniff',
-};
-
   changelog,
   getChangelogBySlug,
   typeConfig,
