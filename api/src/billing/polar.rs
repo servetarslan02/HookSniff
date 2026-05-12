@@ -565,9 +565,9 @@ mod tests {
     }
 
     #[test]
-    fn product_id_for_plan_enterprise_returns_none() {
+    fn product_id_for_plan_enterprise_returns_business_product() {
         let config = test_config();
-        assert_eq!(config.product_id_for_plan(&Plan::Enterprise), None);
+        assert_eq!(config.product_id_for_plan(&Plan::Enterprise), Some("prod_biz_456"));
     }
 
     // ── PolarProvider::determine_plan ──────────────────────────

@@ -507,9 +507,9 @@ mod tests {
     }
 
     #[test]
-    fn price_for_plan_enterprise_returns_none() {
+    fn price_for_plan_enterprise_returns_business_price() {
         let config = test_config();
-        assert_eq!(config.price_for_plan(&Plan::Enterprise), None);
+        assert_eq!(config.price_for_plan(&Plan::Enterprise), Some(44900));
     }
 
     // ── IyzicoProvider::generate_auth ──────────────────────────
