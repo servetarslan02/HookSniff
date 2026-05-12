@@ -122,7 +122,7 @@ export default function DeliveriesPage() {
           <div className="p-12 text-center text-gray-500 dark:text-slate-500 animate-pulse">{t('loadingDeliveries')}</div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-500">
-            {isSearching ? `No results matching "${search}" on this page` : t('empty')}
+            {isSearching ? t('noResults', { search }) : t('empty')}
           </div>
         ) : (
           <>
