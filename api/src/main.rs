@@ -1,3 +1,12 @@
+// TODO (Item 289): Split main.rs into focused modules.
+//   Current: 277-line main.rs handles config, DB pool, middleware, CORS,
+//   background jobs, and server startup all in one function.
+//   Proposed split:
+//   - api/src/startup.rs — server builder, listener, graceful shutdown
+//   - api/src/middleware_stack.rs — CORS, tracing, body limit, request ID
+//   - api/src/jobs.rs — background task spawning (retention, cleanup, etc.)
+//   - main.rs becomes a thin entrypoint that orchestrates the above
+
 use anyhow::Result;
 use axum::{routing::get, Router};
 use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
