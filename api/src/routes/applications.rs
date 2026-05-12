@@ -63,7 +63,7 @@ async fn get_application(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?
-    .ok_or_else(|| AppError::NotFound("Application not found".into()))?;
+    .ok_or(AppError::NotFound)?;
 
     let count: (i64,) = sqlx::query_as(
         "SELECT COUNT(*) FROM endpoints WHERE application_id = $1",
@@ -150,7 +150,7 @@ async fn update_application(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?
-    .ok_or_else(|| AppError::NotFound("Application not found".into()))?;
+    .ok_or(AppError::NotFound)?;
 
     // If name is being changed, check uniqueness
     if let Some(ref new_name) = req.name {
@@ -214,7 +214,7 @@ async fn delete_application(
     .await?;
 
     if result.rows_affected() == 0 {
-        return Err(AppError::NotFound("Application not found".into()));
+        return Err(AppError::NotFound);
     }
 
     Ok(Json(serde_json::json!({

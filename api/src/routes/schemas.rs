@@ -48,7 +48,7 @@ async fn register_schema(
     let existing = registry
         .get_latest_by_name(customer.id, &request.name)
         .await
-        .map_err(|e| AppError::Internal(e.to_string()))?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
 
     if existing.is_none() {
         // New event type — check limit
@@ -58,7 +58,7 @@ async fn register_schema(
         .bind(customer.id)
         .fetch_one(&pool)
         .await
-        .map_err(|e| AppError::Internal(e.to_string()))?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
 
         if distinct_count.0 as u32 >= max_types {
             return Err(AppError::BadRequest(format!(
