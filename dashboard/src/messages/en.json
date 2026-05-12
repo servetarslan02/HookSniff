@@ -98,9 +98,7 @@
     "loadingChart": "Loading chart data...",
     "previousPage": "Previous page",
     "nextPage": "Next page",
-    "copyToClipboard": "Copy to clipboard",
     "closeModal": "Close dialog",
-    "openSidebar": "Open sidebar",
     "chartDeliveryTrends": "Chart showing delivery trends over time",
     "chartSuccessRate": "Chart showing success rate over time",
     "chartErrorBreakdown": "Chart showing error breakdown by type",
@@ -206,7 +204,8 @@
     "urlLabel": "URL",
     "descriptionLabel": "Description",
     "settingsTitle": "Settings",
-    "noEndpointsYet": "No endpoints yet. Create one to start receiving webhooks."
+    "noEndpointsYet": "No endpoints yet. Create one to start receiving webhooks.",
+    "deletedEndpoints": "Deleted {count} endpoints"
   },
   "deliveries": {
     "title": "Deliveries",
@@ -361,7 +360,8 @@
     "statusOk": "OK",
     "statusRedirect": "Redirect",
     "statusClientError": "Client Error",
-    "statusServerError": "Server Error"
+    "statusServerError": "Server Error",
+    "generatedPayload": "Generated {eventType} payload"
   },
   "team": {
     "title": "Team Management",
@@ -558,7 +558,8 @@
     "plans.proLimit": "50,000 webhooks/month",
     "plans.businessLimit": "500,000 webhooks/month",
     "noInvoices": "No invoices yet.",
-    "upgradeInitiated": "Upgrade initiated"
+    "upgradeInitiated": "Upgrade initiated",
+    "invalidCheckoutUrl": "Invalid checkout URL"
   },
   "auth": {
     "login": "Log In",
@@ -2151,7 +2152,9 @@
     "tip": "💡 Tip: Imported endpoints will be created with the URL from your API spec. You can update the URL later to point to your actual webhook receiver.",
     "supportedFormats": "Supported Formats",
     "openapi30": "OpenAPI 3.0",
-    "swagger20": "Swagger 2.0"
+    "swagger20": "Swagger 2.0",
+    "importedApi": "Imported API",
+    "fetchFailed": "Failed to fetch: {error}"
   },
   "portalCustomize": {
     "title": "🖼️ Portal Customization",
@@ -2242,7 +2245,8 @@
     "yourUrls": "Your Inbound URLs",
     "copy": "Copy",
     "activeConfigs": "Active Configs",
-    "selectEndpoint": "Select endpoint..."
+    "selectEndpoint": "Select endpoint...",
+    "notSet": "Not set"
   },
   "contact": {
     "title": "Contact Us",

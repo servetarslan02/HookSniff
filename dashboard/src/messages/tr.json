@@ -204,7 +204,8 @@
     "urlLabel": "URL",
     "descriptionLabel": "Açıklama",
     "settingsTitle": "Ayarlar",
-    "noEndpointsYet": "Henüz endpoint yok. Webhook almaya başlamak için bir tane oluşturun."
+    "noEndpointsYet": "Henüz endpoint yok. Webhook almaya başlamak için bir tane oluşturun.",
+    "deletedEndpoints": "{count} endpoint silindi"
   },
   "deliveries": {
     "title": "Teslimatlar",
@@ -359,7 +360,8 @@
     "statusOk": "Tamam",
     "statusRedirect": "Yönlendirme",
     "statusClientError": "İstemci Hatası",
-    "statusServerError": "Sunucu Hatası"
+    "statusServerError": "Sunucu Hatası",
+    "generatedPayload": "{eventType} payload oluşturuldu"
   },
   "team": {
     "title": "Ekip Yönetimi",
@@ -556,7 +558,8 @@
     "plans.proLimit": "50.000 webhook/ay",
     "plans.businessLimit": "500.000 webhook/ay",
     "noInvoices": "Henüz fatura yok.",
-    "upgradeInitiated": "Yükseltme başlatıldı"
+    "upgradeInitiated": "Yükseltme başlatıldı",
+    "invalidCheckoutUrl": "Geçersiz ödeme URL'si"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -2149,7 +2152,9 @@
     "tip": "💡 İçe aktarılan endpoint'ler API spec'inizdeki URL ile oluşturulur. Daha sonra gerçek webhook alıcınızı指向 edecek şekilde güncelleyebilirsiniz.",
     "supportedFormats": "Desteklenen Formatlar",
     "openapi30": "OpenAPI 3.0",
-    "swagger20": "Swagger 2.0"
+    "swagger20": "Swagger 2.0",
+    "importedApi": "İçe Aktarılan API",
+    "fetchFailed": "Getirme başarısız: {error}"
   },
   "portalCustomize": {
     "title": "🖼️ Portal Özelleştirme",
@@ -2240,7 +2245,8 @@
     "yourUrls": "Gelen URLleriniz",
     "copy": "Kopyala",
     "activeConfigs": "Aktif Yapılandırmalar",
-    "selectEndpoint": "Endpoint seçin..."
+    "selectEndpoint": "Endpoint seçin...",
+    "notSet": "Ayarlanmamış"
   },
   "contact": {
     "title": "Bize Ulaşın",
