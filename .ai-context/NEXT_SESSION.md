@@ -1,8 +1,8 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 18:33 GMT+8
-> **Son commit:** 931ea296 (main)
-> **Son oturum:** Oturum 127 — Admin Panel Eksikleri (1 commit, 7 dosya)
+> **Son güncelleme:** 2026-05-12 19:32 GMT+8
+> **Son commit:** 8184e787 (main)
+> **Son oturum:** Oturum 128 — Alert Thresholds Backend Bağlantısı (1 commit, 5 dosya)
 
 ## Hemen Başla
 
@@ -20,7 +20,7 @@
 | Event Replay | ✅ Endpoint mevcut | ✅ User Detail buton | ✅ Tamam |
 | CSV Export | ✅ Endpoint mevcut | ✅ Users + Revenue buton | ✅ Tamam |
 | Impersonate | ✅ Endpoint mevcut | ✅ Users + User Detail buton | ✅ Tamam |
-| Alert Thresholds | ⚠️ DB tablosu var | ✅ Settings sayfası | ⚠️ Backend bağlanacak |
+| Alert Thresholds | ✅ CRUD API eklendi | ✅ Settings sayfası bağlandı | ✅ Tamam |
 | Customer Charts | ✅ Endpoint mevcut | ✅ User Detail grafikler | ✅ Tamam |
 | Webhook Test | ✅ Endpoint mevcut | ✅ System sayfası | ✅ Tamam |
 | Churn Analysis | ✅ Endpoint mevcut | ✅ Revenue sayfası | ✅ Tamam |
@@ -30,8 +30,8 @@
 ### Admin Panel Kalan
 | # | Görev | Öncelik |
 |---|-------|---------|
-| 1 | Alert Thresholds backend bağlantısı (settings → alert_rules CRUD) | 🟡 |
-| 2 | Settings API'den alert_rules okuma/yazma | 🟡 |
+| 1 | ~~Alert Thresholds backend bağlantısı~~ | ✅ Tamamlandı (Oturum 128) |
+| 2 | Migration 009 Neon DB'ye uygula | 🔴 |
 | 3 | `cargo test` + `cargo clippy` doğrulama (Rust toolchain gerekli) | 🔴 |
 | 4 | `next build` doğrulama | 🔴 |
 
