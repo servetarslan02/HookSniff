@@ -294,6 +294,10 @@ pub async fn handle_webhook_event(
         "invoice.payment_failed" => {
             handle_invoice_failed(pool, &event.data.object).await?;
         }
+        "charge.dispute.created" => {
+            // Item 251: Handle chargeback — suspend account
+            handle_chargeback_created(pool, &event.data.object).await?;
+        }
         _ => {
             tracing::debug!("Unhandled Stripe event type: {}", event.event_type);
         }
@@ -588,6 +592,89 @@ async fn handle_invoice_failed(
     }
 
     tracing::warn!("⚠️ Invoice payment failed: {}", provider_invoice_id);
+    Ok(())
+}
+
+/// Item 251: Handle Stripe chargeback (charge.dispute.created).
+///
+/// When a chargeback is received, we:
+/// 1. Find the customer by the disputed charge's customer ID
+/// 2. Downgrade them to free plan
+/// 3. Clear subscription IDs
+/// 4. Mark payment_failed_at for audit trail
+async fn handle_chargeback_created(
+    pool: &sqlx::PgPool,
+    dispute: &serde_json::Value,
+) -> Result<(), AppError> {
+    // The dispute object contains a "charge" field which references the original charge.
+    // We need to find the customer from the charge or from the subscription.
+    let charge_id = dispute
+        .get("charge")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+
+    // The payment_intent or customer might be available in the dispute
+    let stripe_customer_id = dispute
+        .get("customer")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+
+    if !stripe_customer_id.is_empty() {
+        let customer_row: Option<(uuid::Uuid,)> =
+            sqlx::query_as("SELECT id FROM customers WHERE stripe_customer_id = $1")
+                .bind(stripe_customer_id)
+                .fetch_optional(pool)
+                .await?;
+
+        if let Some((customer_id,)) = customer_row {
+            // Downgrade to free and clear subscription
+            let free_limit = crate::billing::Plan::Free.max_webhooks_per_month() as i32;
+            sqlx::query(
+                "UPDATE customers SET \
+                 plan = 'free', webhook_limit = $1, \
+                 stripe_subscription_id = NULL, \
+                 cancel_at_period_end = false, payment_failed_at = NOW(), \
+                 updated_at = NOW() \
+                 WHERE id = $2",
+            )
+            .bind(free_limit)
+            .bind(customer_id)
+            .execute(pool)
+            .await?;
+
+            // Mark invoice as refunded
+            sqlx::query(
+                "UPDATE invoices SET status = 'refunded' \
+                 WHERE id = (\
+                   SELECT id FROM invoices \
+                   WHERE customer_id = $1 AND status = 'paid' \
+                   ORDER BY created_at DESC LIMIT 1\
+                 )",
+            )
+            .bind(customer_id)
+            .execute(pool)
+            .await?;
+
+            tracing::warn!(
+                "🚨 Chargeback received for Stripe customer {} (charge: {}) — customer {} suspended",
+                stripe_customer_id,
+                charge_id,
+                customer_id
+            );
+        } else {
+            tracing::warn!(
+                "🚨 Chargeback received for unknown Stripe customer {} (charge: {})",
+                stripe_customer_id,
+                charge_id
+            );
+        }
+    } else {
+        tracing::warn!(
+            "🚨 Chargeback received but no customer ID in dispute (charge: {})",
+            charge_id
+        );
+    }
+
     Ok(())
 }
 
