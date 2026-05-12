@@ -1,16 +1,18 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { getTranslations } from 'next-intl/server';
 
-// Revalidate every hour for ISR
 export const revalidate = 3600;
-
 
 export const metadata = {
   title: 'Hookdeck Alternatives — Best Webhook Services Compared (2026) | HookSniff',
   description: 'Looking for Hookdeck alternatives? Compare HookSniff, Svix, Hook0, and Convoy. Open-source, self-hosted, and affordable options.',
 };
 
-export default function HookdeckAlternativesPage() {
+export default async function HookdeckAlternativesPage() {
+  const t = await getTranslations('alternatives');
+  const tc = await getTranslations('compare');
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
@@ -18,7 +20,7 @@ export default function HookdeckAlternativesPage() {
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-500 dark:text-slate-500">/</span>
-            <Link href="/alternatives" className="text-gray-600 dark:text-slate-400">Alternatives</Link>
+            <span className="text-gray-600 dark:text-slate-400">{tc("sdks")}</span>
             <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">Hookdeck</span>
           </div>
@@ -29,10 +31,10 @@ export default function HookdeckAlternativesPage() {
       <main className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Hookdeck Alternatives in 2026
+            {t('hookdeckAlternativesTitle')}
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            Hookdeck is great for routing, but it&apos;s closed-source and usage-based. Here are the best alternatives for teams who want open-source, self-hosted, or predictable pricing.
+            {t('hookdeckAlternativesIntro')}
           </p>
         </div>
 
@@ -41,22 +43,21 @@ export default function HookdeckAlternativesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-slate-700">
-                  <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">Service</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Price</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Open Source</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Self-Hosted</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">SDKs</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Routing</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">SOC 2</th>
+                  <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">{t('service')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('price')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('openSourceCol')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('selfHostedCol')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('sdks')}</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('soc2Col')}</th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { name: 'Hookdeck', price: '$39/mo+', oss: '❌', self: '❌', sdks: '8', routing: 'Advanced', soc2: 'Type 2', hl: false },
-                  { name: 'HookSniff', price: '$29/mo', oss: '✅', self: '✅', sdks: '11', routing: 'Basic', soc2: 'Ready', hl: true },
-                  { name: 'Svix', price: '$490/mo', oss: '✅', self: '✅', sdks: '6', routing: 'Basic', soc2: 'Type 2', hl: false },
-                  { name: 'Hook0', price: 'Free', oss: '✅', self: '✅', sdks: '4', routing: 'Basic', soc2: '❌', hl: false },
-                  { name: 'Convoy', price: 'Free', oss: '✅', self: '✅', sdks: '1', routing: 'Basic', soc2: '❌', hl: false },
+                  { name: 'Hookdeck', price: '$39/mo+', oss: '❌', self: '❌', sdks: '8', soc2: 'Type 2', hl: false },
+                  { name: 'HookSniff', price: '$29/mo', oss: '✅', self: '✅', sdks: '11', soc2: t('ready'), hl: true },
+                  { name: 'Svix', price: '$490/mo', oss: '✅', self: '✅', sdks: '6', soc2: 'Type 2', hl: false },
+                  { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: '✅', self: '✅', sdks: '4', soc2: '❌', hl: false },
+                  { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: '✅', self: '✅', sdks: '1', soc2: '❌', hl: false },
                 ].map((row) => (
                   <tr key={row.name} className={`border-b border-gray-100 dark:border-slate-700/50 last:border-0 ${row.hl ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                     <td className={`py-3 px-6 font-medium ${row.hl ? 'text-brand-600 dark:text-brand-400' : 'text-gray-900 dark:text-white'}`}>{row.name}</td>
@@ -64,7 +65,6 @@ export default function HookdeckAlternativesPage() {
                     <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{row.oss}</td>
                     <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{row.self}</td>
                     <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{row.sdks}</td>
-                    <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{row.routing}</td>
                     <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{row.soc2}</td>
                   </tr>
                 ))}
@@ -75,32 +75,29 @@ export default function HookdeckAlternativesPage() {
 
         <div className="space-y-6 mb-16">
           <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 Why Choose HookSniff Over Hookdeck?</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}?</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Open source:</strong> HookSniff is MIT-licensed. Hookdeck is closed-source.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Self-hosted:</strong> Deploy HookSniff on your own infrastructure. Hookdeck is cloud-only.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Predictable pricing:</strong> $29/mo flat vs Hookdeck&apos;s usage-based billing.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>More SDKs:</strong> 11 SDKs vs Hookdeck&apos;s 8. FIFO delivery and CloudEvents support.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>CLI + MCP:</strong> Full CLI tool and MCP support included.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Smart routing:</strong> Round-robin, latency-based, and failover routing built-in.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Open source:</strong> HookSniff MIT lisanslıdır. Hookdeck kapalı kaynaklıdır.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Self-hosted:</strong> HookSniff&apos;i kendi altyapınıza kurabilirsiniz. Hookdeck yalnızca bulut.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Sabit fiyat:</strong> Aylık $29 sabit vs Hookdeck&apos;in kullanıma dayalı faturalandırması.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Daha fazla SDK:</strong> 11 SDK vs Hookdeck&apos;in 8 SDK&apos;sı. FIFO teslimat ve CloudEvents desteği.</li>
             </ul>
           </div>
 
           <div className="p-6 bg-purple-50 dark:bg-purple-500/10 rounded-xl border border-purple-200 dark:border-purple-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🔗 Why Choose Hookdeck Over HookSniff?</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🔗 {t('whyChooseAlternative', { alternative: 'Hookdeck' })}?</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Advanced routing:</strong> Hookdeck has superior filtering, transformation, and routing rules.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Higher SLA:</strong> 99.999% uptime SLA vs HookSniff&apos;s 99.9%.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>SOC 2 Type 2:</strong> Already certified. HookSniff is SOC 2 ready.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Radar:</strong> Webhook latency alerts for third-party services.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Gelişmiş yönlendirme:</strong> Hookdeck üstün filtreleme, dönüştürme ve yönlendirme kurallarına sahiptir.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Daha yüksek SLA:</strong> %99,999 uptime SLA vs HookSniff&apos;in %99,9&apos;u.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>SOC 2 Tip 2:</strong> Zaten sertifikalı. HookSniff SOC 2 hazır.</li>
             </ul>
           </div>
         </div>
 
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
-          <h2 className="text-2xl font-bold text-white mb-2">Looking for an open-source Hookdeck alternative?</h2>
-          <p className="text-gray-500 dark:text-slate-400 mb-6">HookSniff gives you self-hosted control with managed convenience.</p>
-          <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Try HookSniff free →</Link>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('openSourceAlternative', { alternative: 'Hookdeck' })}</h2>
+          <p className="text-gray-400 dark:text-slate-400 mb-6">{t('switchCta')}</p>
+          <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link>
         </div>
       </main>
     </div>
