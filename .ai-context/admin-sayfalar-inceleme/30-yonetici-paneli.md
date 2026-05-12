@@ -190,6 +190,82 @@
 
 ---
 
+### 13. 🛡️ Güvenlik Dashboard (`/admin/security`)
+- SSRF attempt log'u (hangi müşteri, hangi URL denedi)
+- Webhook spoofing tespit log'u
+- Replay attack tespit log'u
+- Endpoint spam tespiti
+- Şüpheli aktivite listesi
+- IP reputation kontrolü
+- **Rakipler:** Svix ✅, Hookdeck ✅
+- **Kaynak:** Güvenlik araştırması — SSRF, spoofing, replay vektörleri
+
+### 14. 📧 Email Şablonları (`/admin/email-templates`)
+- Endpoint disable email şablonu (whitelabel)
+- Welcome email şablonu
+- Billing hatırlatma şablonu
+- Maintenance bildirim şablonu
+- Feature announcement şablonu
+- **Rakipler:** Svix ✅ (Ağustos 2025'te ekledi)
+- **Kaynak:** Svix changelog — Email Notifications
+
+### 15. 🔔 Bildirim Kanalları (`/admin/notification-channels`)
+- Slack entegrasyonu
+- Microsoft Teams entegrasyonu
+- Discord entegrasyonu
+- PagerDuty entegrasyonu
+- OpsGenie entegrasyonu
+- Custom webhook bildirim
+- **Rakipler:** Hookdeck ✅ (Teams, Slack, PagerDuty, OpsGenie)
+- **Kaynak:** Hookdeck changelog — Microsoft Teams Integration
+
+### 16. 📋 Compliance Dashboard (`/admin/compliance`)
+- SOC 2 durumu ve eksikler
+- GDPR uyumluluk durumu
+- Data deletion request yönetimi
+- Consent log yönetimi
+- Breatch notification şablonu
+- Audit log export (compliance için)
+- **Rakipler:** Svix ✅ (SOC 2, GDPR, HIPAA, PCI-DSS)
+- **Kaynak:** Compliance araştırması
+
+---
+
+## 🆕 Deep Research Ek Özellikler
+
+### Support Agent Rolü (Svix, Haziran 2025)
+- Yeni rol: "Support Agent" — Viewer + müşteri portalı önizleme
+- Destek ekibi müşteri portalını müşteri gözüyle görebilmeli
+- **Ek:** admin/roles sayfasına yeni rol ekle
+
+### Endpoint Disable Email (Svix, Ağustos 2025)
+- Endpoint otomatik devre dışı kalınca müşteriye whitelabel email
+- Admin'e de bildirim gönderilmeli
+- **Ek:** Email şablonları sayfasına ekle
+
+### Standard Webhooks Uyumluluğu (Hookdeck, Kasım 2025)
+- webhook- prefix, whsec_ secret format
+- OpenAI, Anthropic, Google kullanıyor
+- **Ek:** API ayarlarına Standard Webhooks toggle
+
+### Deduplication (Hookdeck, Ağustos 2025)
+- Exact deduplication (birebir aynı payload)
+- Field-based matching (belirli alanlarla eşleştirme)
+- Time window (1sn - 1sa)
+- **Ek:** Endpoint ayarlarına deduplication kuralları
+
+### Custom Retry Schedules (Hookdeck, Kasım 2025)
+- Müşteri tanımlı retry zamanlaması
+- Örnek: 5sn, 1dk, 10dk, 1sa
+- **Ek:** Retry policy sayfasına custom schedule
+
+### Quick Filters (Hookdeck, Kasım 2025)
+- Event detayından tek tıkla filtre oluşturma
+- Manuel filtre oluşturma hızlandırılmalı
+- **Ek:** Log ve teslimat sayfalarına quick filter
+
+---
+
 ## Admin Panel Genel Değerlendirme
 
 ### ✅ İyi Yönler
