@@ -55,6 +55,7 @@ export default function AdminActivityPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [actionFilter, setActionFilter] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const perPage = 20;
@@ -62,6 +63,7 @@ export default function AdminActivityPage() {
   const fetchLogs = useCallback(async () => {
     if (!token) return;
     setLoading(true);
+    setError(null);
     try {
       const data = await adminApi.getAuditLogs(token, {
         limit: perPage,
@@ -71,11 +73,11 @@ export default function AdminActivityPage() {
       setEntries(data.entries || []);
       setTotal(data.total || 0);
     } catch {
-      // silent
+      setError(tc('error'));
     } finally {
       setLoading(false);
     }
-  }, [token, page, actionFilter]);
+  }, [token, page, actionFilter, tc]);
 
   useEffect(() => {
     fetchLogs();
@@ -145,6 +147,18 @@ export default function AdminActivityPage() {
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-red-500 animate-spin" />
             </div>
             <p className="text-sm text-gray-500 dark:text-slate-400">{tc('loading')}</p>
+          </div>
+        ) : error ? (
+          <div className="p-6">
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+              <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+              <button
+                onClick={fetchLogs}
+                className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+              >
+                {tc('retry')}
+              </button>
+            </div>
           </div>
         ) : entries.length === 0 ? (
           <div className="px-6 py-12 text-center">
