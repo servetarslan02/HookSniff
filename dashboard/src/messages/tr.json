@@ -249,7 +249,8 @@
     "retriedBackoff": "Üstel geri çekilme ile tekrar denendi",
     "created": "Oluşturuldu",
     "closeDetails": "Detayları kapat",
-    "status": "Durum"
+    "status": "Durum",
+    "noResults": "Bu sayfada \"{search}\" ile eşleşen sonuç bulunamadı"
   },
   "logs": {
     "title": "Webhook Logları",
