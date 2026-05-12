@@ -195,6 +195,19 @@ async fn upgrade_plan(
         return Err(AppError::BadRequest("You are already on this plan".into()));
     }
 
+    // Item 258: Validate plan transition — only allow upgrading to a higher tier
+    let plan_tier = |p: &Plan| match p {
+        Plan::Free => 0,
+        Plan::Pro => 1,
+        Plan::Business => 2,
+        Plan::Enterprise => 3,
+    };
+    if plan_tier(&new_plan) <= plan_tier(&current_plan) {
+        return Err(AppError::BadRequest(
+            "This endpoint only supports plan upgrades. To downgrade, please use the customer portal or contact support.".into(),
+        ));
+    }
+
     // Calculate proration for upgrades from paid plans
     // Fetch the customer's last payment date as period start approximation
     let period_start: Option<chrono::DateTime<Utc>> = sqlx::query_scalar(

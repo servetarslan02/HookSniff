@@ -9,6 +9,12 @@ pub struct Customer {
     pub api_key_hash: String,
     pub api_key_prefix: String,
     pub plan: String,
+    // TODO (Item 253): Change webhook_limit and webhook_count from i32 to i64
+    // to prevent overflow at 2.1B webhooks. Requires:
+    // 1. Migration: ALTER TABLE customers ALTER COLUMN webhook_limit TYPE BIGINT,
+    //               ALTER TABLE customers ALTER COLUMN webhook_count TYPE BIGINT;
+    // 2. Update all references in billing.rs, webhooks.rs, admin.rs, customer_portal.rs
+    // 3. Update Plan::max_webhooks_per_month() return type from u64 to match
     pub webhook_limit: i32,
     pub webhook_count: i32,
     pub created_at: DateTime<Utc>,
