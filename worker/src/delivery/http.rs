@@ -73,9 +73,17 @@ pub async fn deliver_http(
         .body(webhook.payload.clone());
 
     // Attach custom headers if configured
+    // Item 343: Validate header names per RFC 7230 token rules
     if let Some(ref headers) = webhook.custom_headers {
         if let Some(obj) = headers.as_object() {
             for (key, value) in obj {
+                if !is_valid_header_name(key) {
+                    warn!(
+                        "⚠️ Skipping invalid custom header name '{}' for delivery {}",
+                        key, webhook.delivery_id
+                    );
+                    continue;
+                }
                 if let Some(val) = value.as_str() {
                     req_builder = req_builder.header(key.as_str(), val);
                 }
@@ -156,6 +164,32 @@ pub fn truncate_str(s: &str, max_len: usize) -> String {
         }
         format!("{}...", &s[..end])
     }
+}
+
+/// Item 343: Validate HTTP header name per RFC 7230, Section 3.2.6.
+///
+/// Header field names must be tokens: ASCII letters, digits, and
+/// `!#$%&'*+-.^_` ` ` |~`. No whitespace, colons, or control chars.
+///
+/// This prevents header injection and ensures compatibility with
+/// all HTTP intermediaries.
+fn is_valid_header_name(name: &str) -> bool {
+    if name.is_empty() {
+        return false;
+    }
+    // RFC 7230 token: visible ASCII chars except delimiters
+    // Delimiters: "(", ")", "<", ">", "@", ",", ";", ":", "\\", <">, "/", "[", "]", "?", "=", "{", "}", SP, HT
+    name.bytes().all(|b| {
+        matches!(
+            b,
+            b'A'..=b'Z'
+                | b'a'..=b'z'
+                | b'0'..=b'9'
+                | b'!' | b'#' | b'$' | b'%' | b'&'
+                | b'\'' | b'*' | b'+' | b'-' | b'.'
+                | b'^' | b'_' | b'`' | b'|' | b'~'
+        )
+    })
 }
 
 /// SSRF protection for webhook delivery.
@@ -357,5 +391,51 @@ mod tests {
         let result = truncate_str(s, 3);
         // Should be valid UTF-8
         assert!(std::str::from_utf8(result.as_bytes()).is_ok());
+    }
+
+    // ── is_valid_header_name (Item 343) ─────────────────────
+
+    #[test]
+    fn test_valid_header_names() {
+        assert!(is_valid_header_name("X-Custom-Header"));
+        assert!(is_valid_header_name("Content-Type"));
+        assert!(is_valid_header_name("Authorization"));
+        assert!(is_valid_header_name("X-Request-Id"));
+        assert!(is_valid_header_name("X")); // single char
+        assert!(is_valid_header_name("x")); // lowercase
+        assert!(is_valid_header_name("X-Custom_Header.Test"));
+        assert!(is_valid_header_name("Accept"));
+        assert!(is_valid_header_name("X-Api-Key"));
+    }
+
+    #[test]
+    fn test_invalid_header_names() {
+        assert!(!is_valid_header_name("")); // empty
+        assert!(!is_valid_header_name("Content-Type: value")); // colon
+        assert!(!is_valid_header_name("Header with space")); // space
+        assert!(!is_valid_header_name("Header\tTab")); // tab
+        assert!(!is_valid_header_name("Header\nNewline")); // newline
+        assert!(!is_valid_header_name("Header\rCarriage")); // carriage return
+        assert!(!is_valid_header_name("X-Header(value)")); // parens
+        assert!(!is_valid_header_name("X-Header<angle>")); // angle brackets
+        assert!(!is_valid_header_name("X-Header@at")); // @
+        assert!(!is_valid_header_name("X-Header,comma")); // comma
+        assert!(!is_valid_header_name("X-Header;semi")); // semicolon
+        assert!(!is_valid_header_name("X-Header\"quote")); // double quote
+        assert!(!is_valid_header_name("X-Header/slash")); // slash
+        assert!(!is_valid_header_name("X-Header[bracket]")); // brackets
+        assert!(!is_valid_header_name("X-Header?query")); // question mark
+        assert!(!is_valid_header_name("X-Header=equals")); // equals
+        assert!(!is_valid_header_name("X-Header{brace}")); // braces
+    }
+
+    #[test]
+    fn test_header_name_edge_cases() {
+        // All valid special chars
+        assert!(is_valid_header_name("!#$%&'*+-.^_`|~"));
+        // Digits
+        assert!(is_valid_header_name("X-123"));
+        // Mixed
+        assert!(is_valid_header_name("X-Custom-Header-2024_v1"));
     }
 }

@@ -72,6 +72,7 @@ async fn create_endpoint(
     }
 
     // Validate custom headers if provided
+    // Item 343: RFC 7230 header name validation + X- prefix requirement
     if let Some(ref headers) = req.custom_headers {
         if let Some(obj) = headers.as_object() {
             for (key, value) in obj {
@@ -79,6 +80,9 @@ async fn create_endpoint(
                     return Err(AppError::BadRequest(
                         "Custom header names must start with 'X-'".into(),
                     ));
+                }
+                if let Err(e) = crate::validation::validate_header_name(key) {
+                    return Err(AppError::BadRequest(e));
                 }
                 if !value.is_string() {
                     return Err(AppError::BadRequest(
@@ -214,6 +218,7 @@ async fn update_endpoint(
     }
 
     // Validate custom headers if provided
+    // Item 343: RFC 7230 header name validation + X- prefix requirement
     if let Some(ref headers) = req.custom_headers {
         if let Some(obj) = headers.as_object() {
             for (key, value) in obj {
@@ -221,6 +226,9 @@ async fn update_endpoint(
                     return Err(AppError::BadRequest(
                         "Custom header names must start with 'X-'".into(),
                     ));
+                }
+                if let Err(e) = crate::validation::validate_header_name(key) {
+                    return Err(AppError::BadRequest(e));
                 }
                 if !value.is_string() {
                     return Err(AppError::BadRequest(
