@@ -1711,7 +1711,7 @@ mod tests {
         .bind("crud-hash")
         .bind("crud")
         .bind("crud-pass")
-        .bind("free")
+        .bind("developer")
         .fetch_one(&pool)
         .await
         .expect("insert customer");
@@ -1725,7 +1725,7 @@ mod tests {
                 .expect("fetch customer");
 
         assert_eq!(customer.0, test_email);
-        assert_eq!(customer.1, "free");
+        assert_eq!(customer.1, "developer");
 
         // Update
         sqlx::query("UPDATE customers SET plan = $1 WHERE id = $2")

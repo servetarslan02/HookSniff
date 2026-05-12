@@ -41,7 +41,7 @@ export default function AdminUsersPage() {
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<'ban' | 'unban' | 'plan' | null>(null);
-  const [bulkPlan, setBulkPlan] = useState('free');
+  const [bulkPlan, setBulkPlan] = useState('developer');
   const [bulkProcessing, setBulkProcessing] = useState(false);
   // Ban reason dialog
   const [banTarget, setBanTarget] = useState<AdminUser | null>(null);

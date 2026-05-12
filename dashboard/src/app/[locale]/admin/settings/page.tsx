@@ -7,19 +7,19 @@ import { useTranslations } from 'next-intl';
 
 interface PlatformSettings {
   default_plan: string;
-  max_endpoints_free: number;
+  max_endpoints_developer: number;
   max_endpoints_pro: number;
-  max_webhooks_free: number;
+  max_webhooks_developer: number;
   max_webhooks_pro: number;
-  rate_limit_free: number;
+  rate_limit_developer: number;
   rate_limit_pro: number;
   retry_max_attempts: number;
-  retention_days_free: number;
+  retention_days_developer: number;
   retention_days_pro: number;
   maintenance_mode: boolean;
   signup_enabled: boolean;
   plan_price_pro: number;
-  plan_price_business: number;
+  plan_price_enterprise: number;
   resend_api_key: string | null;
   email_sender: string | null;
   webhook_secret: string | null;
@@ -42,19 +42,19 @@ interface AlertRule {
 
 const defaultSettings: PlatformSettings = {
   default_plan: 'developer',
-  max_endpoints_free: 5,
+  max_endpoints_developer: 5,
   max_endpoints_pro: 50,
-  max_webhooks_free: 10000,
+  max_webhooks_developer: 10000,
   max_webhooks_pro: 50000,
-  rate_limit_free: 100,
+  rate_limit_developer: 100,
   rate_limit_pro: 1000,
   retry_max_attempts: 3,
-  retention_days_free: 7,
+  retention_days_developer: 7,
   retention_days_pro: 30,
   maintenance_mode: false,
   signup_enabled: true,
   plan_price_pro: 29,
-  plan_price_business: 99,
+  plan_price_enterprise: 99,
   resend_api_key: null,
   email_sender: null,
   webhook_secret: null,
@@ -360,8 +360,10 @@ export default function AdminSettingsPage() {
               onChange={(e) => update('default_plan', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
             >
-              <option value="free">{t('freePlan')}</option>
+              <option value="developer">{t('developerPlan')}</option>
+              <option value="startup">{t('startupPlan')}</option>
               <option value="pro">{t('proPlan')}</option>
+              <option value="enterprise">{t('enterprisePlan')}</option>
             </select>
           </div>
         </div>
@@ -375,50 +377,50 @@ export default function AdminSettingsPage() {
             <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('freePlan')}</h3>
             <div className="space-y-3">
               <div>
-                <label htmlFor="max_endpoints_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
+                <label htmlFor="max_endpoints_developer" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
                 <input
-                  id="max_endpoints_free"
+                  id="max_endpoints_developer"
                   type="number"
                   min={1}
                   max={999}
-                  value={settings.max_endpoints_free}
-                  onChange={(e) => update('max_endpoints_free', parseInt(e.target.value) || 0)}
+                  value={settings.max_endpoints_developer}
+                  onChange={(e) => update('max_endpoints_developer', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
                 />
               </div>
               <div>
-                <label htmlFor="max_webhooks_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
+                <label htmlFor="max_webhooks_developer" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
                 <input
-                  id="max_webhooks_free"
+                  id="max_webhooks_developer"
                   type="number"
                   min={0}
                   max={9999999}
-                  value={settings.max_webhooks_free}
-                  onChange={(e) => update('max_webhooks_free', parseInt(e.target.value) || 0)}
+                  value={settings.max_webhooks_developer}
+                  onChange={(e) => update('max_webhooks_developer', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
                 />
               </div>
               <div>
-                <label htmlFor="rate_limit_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
+                <label htmlFor="rate_limit_developer" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
                 <input
-                  id="rate_limit_free"
+                  id="rate_limit_developer"
                   type="number"
                   min={1}
                   max={100000}
-                  value={settings.rate_limit_free}
-                  onChange={(e) => update('rate_limit_free', parseInt(e.target.value) || 0)}
+                  value={settings.rate_limit_developer}
+                  onChange={(e) => update('rate_limit_developer', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
                 />
               </div>
               <div>
-                <label htmlFor="retention_days_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
+                <label htmlFor="retention_days_developer" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
                 <input
-                  id="retention_days_free"
+                  id="retention_days_developer"
                   type="number"
                   min={1}
                   max={365}
-                  value={settings.retention_days_free}
-                  onChange={(e) => update('retention_days_free', parseInt(e.target.value) || 0)}
+                  value={settings.retention_days_developer}
+                  onChange={(e) => update('retention_days_developer', parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
                 />
               </div>
@@ -499,15 +501,15 @@ export default function AdminSettingsPage() {
             />
           </div>
           <div>
-            <label htmlFor="plan_price_business" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('businessPlan')} ($) <span className="text-red-500">*</span></label>
+            <label htmlFor="plan_price_enterprise" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('businessPlan')} ($) <span className="text-red-500">*</span></label>
             <input
-              id="plan_price_business"
+              id="plan_price_enterprise"
               type="number"
               min={0}
               max={99999}
               step={0.01}
-              value={settings.plan_price_business}
-              onChange={(e) => update('plan_price_business', parseFloat(e.target.value) || 0)}
+              value={settings.plan_price_enterprise}
+              onChange={(e) => update('plan_price_enterprise', parseFloat(e.target.value) || 0)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
             />
           </div>

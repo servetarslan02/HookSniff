@@ -83,7 +83,7 @@ export const AI_PAYLOAD_TEMPLATES: Record<string, () => object> = {
     data: {
       user_id: `usr_${Math.random().toString(36).slice(2, 10)}`,
       changes: {
-        plan: { old: 'free', new: 'pro' },
+        plan: { old: 'developer', new: 'pro' },
         email: { old: 'old@example.com', new: 'new@example.com' },
       },
       updated_at: new Date().toISOString(),
