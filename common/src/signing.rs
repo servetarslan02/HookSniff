@@ -42,11 +42,25 @@ pub enum VerificationError {
 ///
 /// Secrets may have a `whsec_` prefix. The remainder is base64-encoded.
 /// If decoding fails, returns the raw bytes (for backward compat with plain secrets).
+///
+/// Item 345: Logs a warning when falling back to raw bytes, as this may indicate
+/// a misconfigured secret. In production, all secrets should be `whsec_` + base64.
 pub fn decode_secret(secret: &str) -> Vec<u8> {
     let stripped = secret.strip_prefix(SECRET_PREFIX).unwrap_or(secret);
-    BASE64
-        .decode(stripped)
-        .unwrap_or_else(|_| secret.as_bytes().to_vec())
+    match BASE64.decode(stripped) {
+        Ok(bytes) => bytes,
+        Err(_) => {
+            // Item 345: Warn on fallback — likely a misconfigured or legacy secret.
+            // Don't log the actual secret value (security).
+            tracing::warn!(
+                "Secret decoding: base64 decode failed, falling back to raw bytes. \
+                 Ensure secrets use 'whsec_' + base64 format. \
+                 (secret length: {} chars)",
+                secret.len()
+            );
+            secret.as_bytes().to_vec()
+        }
+    }
 }
 
 /// Compute Standard Webhooks HMAC-SHA256 signature.
