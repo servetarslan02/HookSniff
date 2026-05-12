@@ -19,11 +19,11 @@ export function SetupChecklist() {
   const { user, token } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const items: ChecklistItem[] = [
-    { id: 'account', label: t('checklistAccount'), href: `/${username}`, icon: '👤' },
-    { id: 'apikey', label: t('checklistApikey'), href: `/${username}/api-keys`, icon: '🔑' },
-    { id: 'endpoint', label: t('checklistEndpoint'), href: `/${username}/endpoints`, icon: '🔗' },
-    { id: 'webhook', label: t('checklistWebhook'), href: `/${username}/playground`, icon: '🧪' },
-    { id: 'monitor', label: t('checklistMonitor'), href: `/${username}/deliveries`, icon: '📊' },
+    { id: 'account', label: t('checklistAccount'), href: "/", icon: '👤' },
+    { id: 'apikey', label: t('checklistApikey'), href: `/api-keys`, icon: '🔑' },
+    { id: 'endpoint', label: t('checklistEndpoint'), href: `/endpoints`, icon: '🔗' },
+    { id: 'webhook', label: t('checklistWebhook'), href: `/playground`, icon: '🧪' },
+    { id: 'monitor', label: t('checklistMonitor'), href: `/deliveries`, icon: '📊' },
   ];
   const [completed, setCompleted] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(true);
