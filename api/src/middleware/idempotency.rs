@@ -37,7 +37,7 @@ pub async fn check_idempotency(
     if let Some(hash) = body_hash {
         // Check with body hash — must match both key and body
         sqlx::query_as::<_, IdempotencyKey>(
-            "SELECT * FROM idempotency_keys WHERE key = $1 AND customer_id = $2 AND expires_at > now() AND (body_hash = $3 OR body_hash IS NULL)",
+            "SELECT key, customer_id, response_body, status_code, created_at, expires_at FROM idempotency_keys WHERE key = $1 AND customer_id = $2 AND expires_at > now() AND (body_hash = $3 OR body_hash IS NULL)",
         )
         .bind(key)
         .bind(customer_id)
@@ -49,7 +49,7 @@ pub async fn check_idempotency(
     } else {
         // Legacy check without body hash
         sqlx::query_as::<_, IdempotencyKey>(
-            "SELECT * FROM idempotency_keys WHERE key = $1 AND customer_id = $2 AND expires_at > now()",
+            "SELECT key, customer_id, response_body, status_code, created_at, expires_at FROM idempotency_keys WHERE key = $1 AND customer_id = $2 AND expires_at > now()",
         )
         .bind(key)
         .bind(customer_id)
@@ -165,7 +165,7 @@ pub async fn check_webhook_seen(
     webhook_id: &str,
 ) -> Result<bool, sqlx::Error> {
     let existing = sqlx::query_as::<_, SeenWebhook>(
-        "SELECT * FROM seen_webhooks WHERE webhook_id = $1 AND expires_at > now()",
+        "SELECT webhook_id, seen_at, expires_at FROM seen_webhooks WHERE webhook_id = $1 AND expires_at > now()",
     )
     .bind(webhook_id)
     .fetch_optional(pool)
