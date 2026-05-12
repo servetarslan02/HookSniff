@@ -11,11 +11,20 @@ interface SystemHealth {
   queue: { pending: number; processing: number; failed: number };
 }
 
+// Item 94 — Fallback mock data when API is unreachable
+const mockHealth: SystemHealth = {
+  database: { status: 'unknown', latency_ms: 0 },
+  redis: { status: 'unknown', latency_ms: 0 },
+  api: { status: 'unknown', uptime_seconds: 0 },
+  queue: { pending: 0, processing: 0, failed: 0 },
+};
+
 export default function AdminSystemPage() {
   const { token } = useAuth();
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null); // Item 100
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
@@ -23,16 +32,23 @@ export default function AdminSystemPage() {
   const fetchHealth = useCallback(async () => {
     try {
       setError(null);
+      setErrorDetail(null);
       const res = await fetch(`${API}/health`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         setHealth(await res.json());
       } else {
+        const errText = await res.text().catch(() => '');
         setError(t('systemHealthDesc'));
+        setErrorDetail(errText || `HTTP ${res.status}`); // Item 100
+        setHealth(mockHealth); // Item 94 — fallback
       }
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       setError(t('systemHealthDesc'));
+      setErrorDetail(msg); // Item 100
+      setHealth(mockHealth); // Item 94 — fallback
     } finally {
       setLoading(false);
     }
@@ -67,40 +83,29 @@ export default function AdminSystemPage() {
     return `${mins}m`;
   };
 
+  // Item 98 — Loading spinner
   if (loading) {
     return (
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{tc('loading')}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('fetchingHealth')}</p>
+        </div>
+        {/* Item 98 — Loading spinner */}
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="relative w-12 h-12 mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-slate-700" />
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-red-500 animate-spin" />
+          </div>
+          <p className="text-sm text-gray-500 dark:text-slate-400">{t('fetchingHealth')}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4"></div>
-              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4" />
+              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
             </div>
           ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error && !health) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
-        </div>
-        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
-          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
-          <button
-            type="button"
-            onClick={fetchHealth}
-            className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
-          >
-            {tc('retry')}
-          </button>
         </div>
       </div>
     );
@@ -115,21 +120,21 @@ export default function AdminSystemPage() {
       latency: null,
     },
     {
-      name: t("database"),
+      name: t('database'),
       icon: '🐘',
       status: health?.database?.status || 'unknown',
       detail: health?.database?.latency_ms ? `Latency: ${health.database.latency_ms}ms` : t('checking'),
       latency: health?.database?.latency_ms,
     },
     {
-      name: t("cache"),
+      name: t('cache'),
       icon: '⚡',
       status: health?.redis?.status || 'unknown',
       detail: health?.redis?.latency_ms ? `Latency: ${health.redis.latency_ms}ms` : t('checking'),
       latency: health?.redis?.latency_ms,
     },
     {
-      name: t("queue"),
+      name: t('queue'),
       icon: '📬',
       status: health?.queue ? (health.queue.failed > 10 ? 'degraded' : 'healthy') : 'unknown',
       detail: health?.queue
@@ -137,6 +142,18 @@ export default function AdminSystemPage() {
         : t('checking'),
       latency: null,
     },
+  ];
+
+  const allOk = services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok');
+  const someDegraded = services.some(s => s.status === 'degraded' || s.status === 'slow');
+
+  const infrastructureItems = [
+    { label: t('apiServer'), value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },
+    { label: t('database'), value: 'Neon PostgreSQL', detail: 'Serverless, 0.5 GB' },
+    { label: t('cache'), value: 'Upstash Redis', detail: 'Serverless, 256 MB' },
+    { label: t('cdn'), value: 'Cloudflare', detail: 'DNS, SSL, DDoS' },
+    { label: t('dashboard'), value: 'Vercel', detail: 'Next.js 15' },
+    { label: t('monitoring'), value: 'Grafana Cloud', detail: 'OpenTelemetry' },
   ];
 
   return (
@@ -148,23 +165,52 @@ export default function AdminSystemPage() {
         </p>
       </div>
 
-      {/* Overall Status */}
+      {/* Item 100 — Error detail banner */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-red-600 dark:text-red-400" aria-hidden="true">⚠️</span>
+              <span className="text-red-700 dark:text-red-400 text-sm font-medium">{error}</span>
+            </div>
+            <button
+              type="button"
+              onClick={fetchHealth}
+              className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+            >
+              {tc('retry')}
+            </button>
+          </div>
+          {errorDetail && (
+            <p className="mt-2 text-xs text-red-600/80 dark:text-red-400/70 font-mono bg-red-100/50 dark:bg-red-500/5 rounded-xl px-3 py-2">
+              {t('errorDetails')}: {errorDetail}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Overall Status — Item 103: improved layout */}
       <div className="glass-card p-6" aria-live="polite" aria-atomic="true">
-        <div className="flex items-center gap-3 mb-4">
-          <div className={`w-3 h-3 rounded-full animate-pulse ${
-            services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok')
-              ? 'bg-green-500'
-              : services.some(s => s.status === 'degraded' || s.status === 'slow')
-                ? 'bg-yellow-500'
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-3 h-3 rounded-full animate-pulse ${
+              allOk ? 'bg-green-500'
+                : someDegraded ? 'bg-yellow-500'
                 : 'bg-red-500'
-          }`} />
-          <span className="text-lg font-semibold text-gray-900 dark:text-white">
-            {services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok')
-              ? t('allOperational')
-              : services.some(s => s.status === 'degraded' || s.status === 'slow')
-                ? t('partialDegradation')
+            }`} />
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">
+              {allOk ? t('allOperational')
+                : someDegraded ? t('partialDegradation')
                 : t('systemIssues')}
-          </span>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={fetchHealth}
+            className="self-start sm:self-auto sm:ml-auto text-xs px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+          >
+            {tc('refresh')}
+          </button>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400">
           {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh15s')}
@@ -179,7 +225,7 @@ export default function AdminSystemPage() {
             <div key={service.name} className={`glass-card p-6 ${colors.bg}`}>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{service.icon}</span>
+                  <span className="text-2xl" aria-hidden="true">{service.icon}</span>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">{service.name}</h3>
                     <p className="text-sm text-gray-500 dark:text-slate-400">{service.detail}</p>
@@ -213,22 +259,23 @@ export default function AdminSystemPage() {
         })}
       </div>
 
-      {/* Infrastructure Info */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('infrastructure')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { label: t('apiServer'), value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },
-            { label: t("database"), value: "Neon PostgreSQL", detail: "Serverless, 0.5 GB" },
-            { label: t("cache"), value: "Upstash Redis", detail: "Serverless, 256 MB" },
-            { label: t("cdn"), value: "Cloudflare", detail: "DNS, SSL, DDoS" },
-            { label: t("dashboard"), value: "Vercel", detail: "Next.js 15" },
-            { label: t("monitoring"), value: "Grafana Cloud", detail: "OpenTelemetry" },
-          ].map((item) => (
-            <div key={item.label} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
-              <div className="text-sm font-medium text-gray-900 dark:text-white">{item.value}</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{item.detail}</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{item.label}</div>
+      {/* Item 102 — Infrastructure table with proper header */}
+      <div className="glass-card overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('infrastructure')}</h2>
+        </div>
+        {/* Item 102 — Table header */}
+        <div className="hidden md:grid md:grid-cols-3 gap-4 px-6 py-3 bg-gray-50 dark:bg-slate-800/30 border-b border-gray-200/50 dark:border-slate-700/50 text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+          <div>{t('infrastructureHeader')}</div>
+          <div>{t('providerLabel')}</div>
+          <div>{t('details')}</div>
+        </div>
+        <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+          {infrastructureItems.map((item) => (
+            <div key={item.label} className="grid grid-cols-1 md:grid-cols-3 gap-1 md:gap-4 px-6 py-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+              <div className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-300">{item.value}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">{item.detail}</div>
             </div>
           ))}
         </div>

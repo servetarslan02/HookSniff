@@ -7,10 +7,10 @@ import { useRouter, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
+function getPasswordStrength(pw: string): { score: number; color: string } {
   let score = 0;
   if (pw.length >= 8) score++;
   if (pw.length >= 12) score++;
@@ -19,9 +19,9 @@ function getPasswordStrength(pw: string): { score: number; label: string; color:
   if (/[0-9]/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
 
-  if (score <= 2) return { score, label: 'Weak', color: 'bg-red-500' };
-  if (score <= 4) return { score, label: 'Medium', color: 'bg-yellow-500' };
-  return { score, label: 'Strong', color: 'bg-green-500' };
+  if (score <= 2) return { score, color: 'bg-red-500' };
+  if (score <= 4) return { score, color: 'bg-yellow-500' };
+  return { score, color: 'bg-green-500' };
 }
 
 function LoginForm() {
@@ -33,8 +33,10 @@ function LoginForm() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
   const { login, register } = useAuth();
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('auth');
   const tc = useTranslations('common');
   const passwordStrength = mode === 'register' ? getPasswordStrength(password) : null;
@@ -42,6 +44,10 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (mode === 'register' && !consentChecked) {
+      setError(t('consentRequired'));
+      return;
+    }
     setLoading(true);
     try {
       if (mode === 'login') {
@@ -49,7 +55,7 @@ function LoginForm() {
       } else {
         await register(email, password, name || undefined);
       }
-      router.push('/dashboard');
+      router.push(`/${locale}/dashboard`);
     } catch (err: unknown) {
       setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
     } finally {
@@ -138,11 +144,29 @@ function LoginForm() {
                     passwordStrength.score <= 2 ? 'text-red-500' :
                     passwordStrength.score <= 4 ? 'text-yellow-500' : 'text-green-500'
                   }`}>
-                    {passwordStrength.label}
+                    {passwordStrength.score <= 2 ? t('passwordWeak') :
+                     passwordStrength.score <= 4 ? t('passwordMedium') : t('passwordStrong')}
                   </p>
                 </div>
               )}
             </div>
+            {mode === 'register' && (
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  checked={consentChecked}
+                  onChange={(e) => setConsentChecked(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500"
+                />
+                <label htmlFor="consent" className="text-sm text-gray-600 dark:text-slate-400">
+                  {t('consentPrefix')}{' '}
+                  <Link href="/terms" className="text-brand-600 dark:text-brand-400 hover:underline">{t('consentTerms')}</Link>
+                  {' '}{t('consentAnd')}{' '}
+                  <Link href="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">{t('consentPrivacy')}</Link>
+                </label>
+              </div>
+            )}
             <button
               type="submit"
               disabled={loading}
@@ -193,7 +217,7 @@ function LoginForm() {
             {mode === 'login' ? (
               <>
                 {t('noAccount')}{' '}
-                <button onClick={() => setMode('register')} className="text-brand-600 dark:text-brand-400 font-medium hover:text-brand-700 dark:hover:text-brand-300">
+                <button onClick={() => { setMode('register'); setConsentChecked(false); }} className="text-brand-600 dark:text-brand-400 font-medium hover:text-brand-700 dark:hover:text-brand-300">
                   {t('signUp')}
                 </button>
               </>
