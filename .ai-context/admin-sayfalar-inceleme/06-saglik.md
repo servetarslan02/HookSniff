@@ -82,6 +82,10 @@ interface EndpointHealth {
 - **Uptime grafikleri** — Tarih bazlı uptime trend grafiği
 - **Incident geçmişi** — Kesinti olaylarının kaydı
 - **Endpoint gruplama** — Kategori bazlı sağlık durumu
+- **Structured health checks** — Worker bazlı JSON sağlık durumu (Hookdeck ✅)
+- **Deduplication stats** — Filtrelenen tekrarlayan event sayısı
+- **Endpoint disable listesi** — Devre dışı endpoint'lerin listesi
+- **Circuit breaker durumu** — Hangi endpoint'ler circuit breaker'da
 - Sağlık trendi grafiği yok (son 24s/7g/30g)
 - Endpoint bazlı detay sayfası yok (tıklanabilir)
 - Sağlık durumu değişikliği geçmişi yok
