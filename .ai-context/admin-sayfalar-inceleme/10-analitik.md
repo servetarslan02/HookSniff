@@ -59,6 +59,14 @@
 - **Grafik zoom/drill-down yok**
 
 ### 🔴 Eksiklikler
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **MRR/ARR grafiği** — Aylık/yıllık tekrarlayan gelir trendi
+- **ARPU** — Kullanıcı başına ortalama gelir
+- **LTV** — Müşteri yaşam boyu değeri
+- **Churn rate grafiği** — Tarih bazlı churn trendi
+- **Cohort analizi** — Müşteri cohort karşılaştırması
+- **Gelir projeksiyonu** — Gelecek dönem gelir tahmini
 - Endpoint bazlı analitik
 - Event type bazlı analitik
 - Tarih aralığı özel seçici (custom range)
