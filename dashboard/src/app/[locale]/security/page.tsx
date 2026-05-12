@@ -43,7 +43,7 @@ export default function SecurityPage() {
             { icon: '⏱️', titleKey: 'featureRateLimit', descKey: 'featureRateLimitDesc' },
             { icon: '🔄', titleKey: 'featureSecretRotation', descKey: 'featureSecretRotationDesc' },
           ].map((f) => (
-            <div key={f.titleKey} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+            <div key={f.titleKey} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
               <span className="text-3xl mb-3 block">{f.icon}</span>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t(f.titleKey)}</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400">{t(f.descKey)}</p>
@@ -63,7 +63,7 @@ export default function SecurityPage() {
               { name: 'Standard Webhooks', statusKey: 'compliant', descKey: 'standardWebhooksDesc' },
               { name: 'CloudEvents v1.0', statusKey: 'supported', descKey: 'cloudeventsDesc' },
             ].map((c) => (
-              <div key={c.name} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+              <div key={c.name} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-gray-900 dark:text-white">{c.name}</h3>
                   <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-full">{t(c.statusKey)}</span>
@@ -75,7 +75,7 @@ export default function SecurityPage() {
         </div>
 
         {/* Architecture Security */}
-        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t("architecture")}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>

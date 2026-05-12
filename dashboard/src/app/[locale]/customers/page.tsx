@@ -150,11 +150,11 @@ export default function CustomersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
@@ -175,7 +175,7 @@ export default function CustomersPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {stats.map((s) => (
-            <div key={s.label} className="text-center p-4 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+            <div key={s.label} className="text-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
               <p className="text-3xl font-bold text-brand-600 dark:text-brand-400">{s.value}</p>
               <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{s.label}</p>
             </div>
@@ -187,7 +187,7 @@ export default function CustomersPage() {
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-6">{t("builtOn")}</p>
           <div className="flex flex-wrap justify-center gap-6">
             {techLogos.map((t) => (
-              <div key={t.name} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+              <div key={t.name} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-blue-100 dark:from-brand-900/30 dark:to-blue-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
                   {t.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
                 </div>
@@ -207,7 +207,7 @@ export default function CustomersPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {featured.map((f) => (
               <Link key={f.slug} href={`/customers/${f.slug}`} className="group">
-                <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
+                <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-lg">{f.logo}</div>
                     <div>
@@ -255,7 +255,7 @@ export default function CustomersPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((s) => (
               <Link key={s.slug} href={`/customers/${s.slug}`} className="group">
-                <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
+                <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-sm">{s.logo}</div>
                     <div>
@@ -267,7 +267,7 @@ export default function CustomersPage() {
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
                   </svg>
                   <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{s.quote}</p>
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-700">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{s.author}</p>
                     <div className="text-right">
                       <p className="text-lg font-bold text-brand-600 dark:text-brand-400">{s.metric}</p>

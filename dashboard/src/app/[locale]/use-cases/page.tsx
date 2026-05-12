@@ -372,11 +372,11 @@ export default function UseCasesPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Nav */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
@@ -457,7 +457,7 @@ export default function UseCasesPage() {
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t("commonEvents")}</h3>
               <div className="space-y-2">
                 {current.events.map((ev) => (
-                  <div key={ev.name} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
+                  <div key={ev.name} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                     <code className="text-sm font-mono text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-2 py-0.5 rounded shrink-0">
                       {ev.name}
                     </code>
@@ -485,7 +485,7 @@ export default function UseCasesPage() {
 
             {/* Testimonial */}
             {current.testimonial && (
-              <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
                 <svg className="w-8 h-8 text-brand-200 dark:text-brand-800 mb-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
                 </svg>
@@ -506,7 +506,7 @@ export default function UseCasesPage() {
           {/* Right: Sidebar */}
           <div className="lg:col-span-2 space-y-6">
             {/* Metrics */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">{t("keyMetrics")}</h3>
               <div className="space-y-4">
                 {current.metrics.map((m) => (
@@ -533,7 +533,7 @@ export default function UseCasesPage() {
             </div>
 
             {/* All Industries */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">{t("allIndustries")}</h3>
               <div className="space-y-2">
                 {useCases.map((uc) => (
