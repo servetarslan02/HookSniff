@@ -27,7 +27,7 @@ export default function SchemasPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading) return <div className="p-8 text-gray-500">{tCommon('loading')}</div>;
+  if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{tCommon('loading')}</div>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -45,7 +45,7 @@ export default function SchemasPage() {
           {schemas.map((s) => (
             <div key={s.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
               <h3 className="font-semibold">{s.name}</h3>
-              <p className="text-sm text-gray-500">v{s.version} · {s.created_at}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">v{s.version} · {s.created_at}</p>
             </div>
           ))}
         </div>
