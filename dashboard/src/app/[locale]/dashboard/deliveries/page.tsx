@@ -182,7 +182,7 @@ export default function DeliveriesPage() {
             {total > perPage && !isSearching && (
               <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-slate-400">
-                  Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
+                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <nav aria-label={tc('pagination')} className="flex gap-2">
                   <button type="button"
@@ -193,7 +193,7 @@ export default function DeliveriesPage() {
                   >
                     {tc('previous')}
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">Page {page} of {totalPages}</span>
+                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">{tc('pageOf', { page, totalPages })}</span>
                   <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}

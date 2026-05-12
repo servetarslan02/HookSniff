@@ -9,8 +9,8 @@
     "close": "Kapat",
     "confirm": "Onayla",
     "back": "Geri",
-    "next": "İleri",
-    "previous": "Önceki",
+    "next": "Sonraki →",
+    "previous": "← Önceki",
     "pageOf": "Sayfa {page} / {totalPages}",
     "loading": "Yükleniyor...",
     "search": "Ara",
@@ -2710,7 +2710,9 @@
     "commonEvents": "Yaygın olaylar",
     "codeExample": "Kod örneği",
     "keyMetrics": "Anahtar metrikler",
-    "allIndustries": "Tüm sektörler"
+    "allIndustries": "Tüm sektörler",
+    "startForFree": "Ücretsiz başla →",
+    "talkToUs": "Bize ulaşın →"
   },
   "whatIsWebhook": {
     "simpleExplanation": "Basit Açıklama",

@@ -529,7 +529,7 @@ export function UseCasesPageContent() {
                 href="/login"
                 className="block w-full text-center py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
-                Start for free →
+                {t('startForFree')}
               </Link>
             </div>
 
@@ -566,7 +566,7 @@ export function UseCasesPageContent() {
               href="/contact"
               className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors"
             >
-              Talk to us →
+              {t('talkToUs')}
             </Link>
             <Link
               href="/pricing"
