@@ -1042,6 +1042,7 @@ components:
           type: integer
         monthly_price_cents:
           type: integer
+          format: int64
       required:
       - plan
       - status
@@ -1111,6 +1112,7 @@ components:
           type: string
         amount_cents:
           type: integer
+          format: int64
         currency:
           type: string
         status:
@@ -2755,6 +2757,367 @@ components:
           description: IPv4 and IPv6 addresses used for outbound requests
       required:
       - ips
+    AdminAlertRule:
+      type: object
+      description: Admin alert rule with customer info
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        customer_id:
+          $ref: '#/components/schemas/Uuid'
+          nullable: true
+        customer_email:
+          type: string
+          nullable: true
+        name:
+          type: string
+        condition:
+          type: string
+          enum: [failure_rate, latency, consecutive_failures]
+        threshold:
+          type: integer
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [slack, email, webhook]
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - condition
+      - threshold
+      - channels
+      - is_active
+      - created_at
+    AdminCreateAlertRequest:
+      type: object
+      description: Create a platform alert rule (admin)
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/Uuid'
+          nullable: true
+        name:
+          type: string
+        condition:
+          type: string
+          enum: [failure_rate, latency, consecutive_failures]
+        threshold:
+          type: integer
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [slack, email, webhook]
+      required:
+      - name
+      - condition
+      - threshold
+      - channels
+    AdminUpdateAlertRequest:
+      type: object
+      description: Update an alert rule (admin, all fields optional)
+      properties:
+        name:
+          type: string
+        condition:
+          type: string
+          enum: [failure_rate, latency, consecutive_failures]
+        threshold:
+          type: integer
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [slack, email, webhook]
+        is_active:
+          type: boolean
+    AdminAuditLogResponse:
+      type: object
+      description: Paginated admin audit log response
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminAuditEntry'
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+      required:
+      - entries
+      - total
+      - page
+      - per_page
+    AdminAuditEntry:
+      type: object
+      description: A single admin audit log entry
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        customer_id:
+          $ref: '#/components/schemas/Uuid'
+        action:
+          type: string
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+          nullable: true
+        details:
+          type: object
+          nullable: true
+        ip_address:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - customer_id
+      - action
+      - resource_type
+      - created_at
+    ChurnResponse:
+      type: object
+      description: Churn report with list of recently churned users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChurnedUser'
+      required:
+      - users
+    ChurnedUser:
+      type: object
+      description: A user who churned (became inactive) recently
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        email:
+          type: string
+        name:
+          type: string
+          nullable: true
+        plan:
+          type: string
+        amount:
+          type: number
+          format: double
+        churn_date:
+          $ref: '#/components/schemas/DateTime'
+      required:
+      - id
+      - email
+      - plan
+      - amount
+      - churn_date
+    PlatformSettings:
+      type: object
+      description: Platform-wide configuration settings
+      properties:
+        default_plan:
+          type: string
+        max_endpoints_free:
+          type: integer
+        max_endpoints_pro:
+          type: integer
+        max_webhooks_free:
+          type: integer
+        max_webhooks_pro:
+          type: integer
+        rate_limit_free:
+          type: integer
+        rate_limit_pro:
+          type: integer
+        retry_max_attempts:
+          type: integer
+        retention_days_free:
+          type: integer
+        retention_days_pro:
+          type: integer
+        maintenance_mode:
+          type: boolean
+        signup_enabled:
+          type: boolean
+        plan_price_pro:
+          type: number
+          format: double
+        plan_price_business:
+          type: number
+          format: double
+        resend_api_key:
+          type: string
+          nullable: true
+        email_sender:
+          type: string
+          nullable: true
+      required:
+      - default_plan
+      - max_endpoints_free
+      - max_endpoints_pro
+      - max_webhooks_free
+      - max_webhooks_pro
+      - rate_limit_free
+      - rate_limit_pro
+      - retry_max_attempts
+      - retention_days_free
+      - retention_days_pro
+      - maintenance_mode
+      - signup_enabled
+      - plan_price_pro
+      - plan_price_business
+    UserAnalytics:
+      type: object
+      description: User analytics data for admin view
+      properties:
+        daily_deliveries:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyDeliveryCount'
+        top_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventTypeCount'
+        endpoint_health:
+          type: array
+          items:
+            $ref: '#/components/schemas/EndpointHealth'
+      required:
+      - daily_deliveries
+      - top_events
+      - endpoint_health
+    DailyDeliveryCount:
+      type: object
+      description: Daily delivery count breakdown
+      properties:
+        date:
+          type: string
+          format: date
+        total:
+          type: integer
+        success:
+          type: integer
+        failed:
+          type: integer
+      required:
+      - date
+      - total
+      - success
+      - failed
+    EventTypeCount:
+      type: object
+      description: Event type occurrence count
+      properties:
+        event:
+          type: string
+          nullable: true
+        count:
+          type: integer
+      required:
+      - count
+    RevenueResponse:
+      type: object
+      description: Full revenue analytics response
+      properties:
+        monthly_revenue:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+              revenue:
+                type: number
+                format: double
+        revenue_by_plan:
+          type: array
+          items:
+            type: object
+            properties:
+              plan:
+                type: string
+              revenue:
+                type: number
+                format: double
+              count:
+                type: integer
+        mrr:
+          type: number
+          format: double
+        churn_rate:
+          type: number
+          format: double
+        mrr_trend:
+          type: number
+          format: double
+      required:
+      - monthly_revenue
+      - revenue_by_plan
+      - mrr
+      - churn_rate
+      - mrr_trend
+    AdminTestWebhookRequest:
+      type: object
+      description: Send a test HTTP POST to a URL (admin)
+      properties:
+        endpoint_url:
+          type: string
+          format: uri
+        event_type:
+          type: string
+          nullable: true
+        payload:
+          type: object
+      required:
+      - endpoint_url
+      - payload
+    AdminTestWebhookResponse:
+      type: object
+      description: Result of a test webhook delivery
+      properties:
+        status_code:
+          type: integer
+        response_body:
+          type: string
+        duration_ms:
+          type: integer
+      required:
+      - status_code
+      - response_body
+      - duration_ms
+    ReplayDeliveryResponse:
+      type: object
+      description: Result of replaying a delivery
+      properties:
+        message:
+          type: string
+        original_id:
+          $ref: '#/components/schemas/Uuid'
+        new_delivery_id:
+          $ref: '#/components/schemas/Uuid'
+      required:
+      - message
+      - original_id
+      - new_delivery_id
+    OAuthLoginRedirect:
+      type: object
+      description: OAuth redirect information
+      properties:
+        redirect_url:
+          type: string
+          format: uri
+      required:
+      - redirect_url
 security:
 - BearerAuth: []
 paths:
@@ -4579,15 +4942,50 @@ paths:
       tags:
       - Admin
       summary: List all users (admin)
+      description: Returns paginated list of users with optional filters
+      security:
+      - BearerAuth: []
       parameters:
       - name: page
         in: query
         schema:
           type: integer
+          default: 1
       - name: per_page
         in: query
         schema:
           type: integer
+          default: 20
+          maximum: 200
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by email or name (ILIKE)
+      - name: plan
+        in: query
+        schema:
+          type: string
+          enum: [free, pro, business]
+        description: Filter by plan
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [active, banned]
+        description: Filter by status
+      - name: created_after
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter users created after this date (ISO 8601)
+      - name: created_before
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter users created before this date (ISO 8601)
       responses:
         '200':
           description: Paginated user list
@@ -4600,6 +4998,9 @@ paths:
       tags:
       - Admin
       summary: Get user details (admin)
+      description: Returns user details with endpoints, recent deliveries, and usage stats
+      security:
+      - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -4609,11 +5010,64 @@ paths:
       responses:
         '200':
           description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/UserSummary'
+                  endpoints:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '#/components/schemas/Uuid'
+                        url:
+                          type: string
+                        description:
+                          type: string
+                          nullable: true
+                        is_active:
+                          type: boolean
+                        created_at:
+                          $ref: '#/components/schemas/DateTime'
+                  recent_deliveries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '#/components/schemas/Uuid'
+                        endpoint_id:
+                          $ref: '#/components/schemas/Uuid'
+                        status:
+                          type: string
+                        event_type:
+                          type: string
+                          nullable: true
+                        created_at:
+                          $ref: '#/components/schemas/DateTime'
+                        attempt_count:
+                          type: integer
+                  usage_stats:
+                    type: object
+                    properties:
+                      total_deliveries:
+                        type: integer
+                      success_rate:
+                        type: number
+                        format: double
+                      endpoints_count:
+                        type: integer
   /admin/users/{id}/plan:
     put:
       tags:
       - Admin
       summary: Change user plan (admin)
+      security:
+      - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -4641,6 +5095,8 @@ paths:
       tags:
       - Admin
       summary: Change user status (admin)
+      security:
+      - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -4664,6 +5120,8 @@ paths:
       tags:
       - Admin
       summary: System-wide statistics (admin)
+      security:
+      - BearerAuth: []
       responses:
         '200':
           description: System stats
@@ -4675,23 +5133,17 @@ paths:
     get:
       tags:
       - Admin
-      summary: Revenue by month (admin)
+      summary: Revenue analytics (admin)
+      description: Returns monthly revenue, revenue by plan, MRR, churn rate, and MRR trend
+      security:
+      - BearerAuth: []
       responses:
         '200':
           description: Revenue data
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    month:
-                      type: string
-                    revenue_cents:
-                      type: integer
-                    subscriber_count:
-                      type: integer
+                $ref: '#/components/schemas/RevenueResponse'
   /auth/logout:
     post:
       tags:
@@ -5045,26 +5497,47 @@ paths:
       responses:
         '200':
           description: Notification sent
-  /routing/{id}/routing:
+  /admin/alerts:
     get:
       tags:
-      - Routing
-      summary: Get routing config for endpoint
+      - Admin
+      summary: List all alert rules (admin)
+      description: Returns all alert rules for the authenticated admin's account
       security:
       - BearerAuth: []
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
       responses:
         '200':
-          description: Routing config
+          description: List of alert rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminAlertRule'
+    post:
+      tags:
+      - Admin
+      summary: Create a platform alert rule (admin)
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminCreateAlertRequest'
+      responses:
+        '201':
+          description: Alert rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAlertRule'
+  /admin/alerts/{id}:
     put:
       tags:
-      - Routing
-      summary: Update routing config
+      - Admin
+      summary: Update an alert rule (admin)
       security:
       - BearerAuth: []
       parameters:
@@ -5072,15 +5545,98 @@ paths:
         in: path
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdateAlertRequest'
       responses:
         '200':
-          description: Routing config updated
-  /routing/{id}/health:
+          description: Alert rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAlertRule'
+    delete:
+      tags:
+      - Admin
+      summary: Delete an alert rule (admin)
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Alert rule deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+  /admin/audit-logs:
     get:
       tags:
-      - Routing
-      summary: Get endpoint health status
+      - Admin
+      summary: List audit logs (admin)
+      description: Returns all audit log entries across all users
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+          default: 50
+      - name: action
+        in: query
+        schema:
+          type: string
+          description: Filter by action type (e.g. IMPERSONATE, LOGIN)
+      - name: admin_id
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+          description: Filter by admin user ID
+      responses:
+        '200':
+          description: Paginated audit log entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAuditLogResponse'
+  /admin/churn:
+    get:
+      tags:
+      - Admin
+      summary: Get churn metrics (admin)
+      description: Lists users who became inactive in the last 30 days
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Churn report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChurnResponse'
+  /admin/deliveries/{id}/replay:
+    post:
+      tags:
+      - Admin
+      summary: Replay a delivery (admin)
+      description: Creates a new delivery with the same payload as the original
       security:
       - BearerAuth: []
       parameters:
@@ -5088,7 +5644,198 @@ paths:
         in: path
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/Uuid'
+        description: Original delivery ID to replay
       responses:
         '200':
-          description: Health status
+          description: Delivery replayed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplayDeliveryResponse'
+  /admin/revenue/export:
+    get:
+      tags:
+      - Admin
+      summary: Export revenue data as CSV (admin)
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: format
+        in: query
+        schema:
+          type: string
+          default: csv
+          enum: [csv]
+      - name: months
+        in: query
+        schema:
+          type: integer
+          default: 12
+          minimum: 1
+          maximum: 60
+        description: Number of months to include
+      responses:
+        '200':
+          description: Revenue CSV export
+          content:
+            text/csv:
+              schema:
+                type: string
+  /admin/settings:
+    get:
+      tags:
+      - Admin
+      summary: Get platform settings (admin)
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Platform settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformSettings'
+    put:
+      tags:
+      - Admin
+      summary: Update platform settings (admin)
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlatformSettings'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /admin/test-webhook:
+    post:
+      tags:
+      - Admin
+      summary: Send a test webhook to a URL (admin)
+      description: Sends an HTTP POST to the specified URL with SSRF protection
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminTestWebhookRequest'
+      responses:
+        '200':
+          description: Test webhook result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTestWebhookResponse'
+  /admin/users/export:
+    get:
+      tags:
+      - Admin
+      summary: Export users as CSV (admin)
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: format
+        in: query
+        schema:
+          type: string
+          default: csv
+          enum: [csv]
+      - name: plan
+        in: query
+        schema:
+          type: string
+          enum: [free, pro, business]
+        description: Filter by plan
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [active, banned]
+        description: Filter by status
+      responses:
+        '200':
+          description: Users CSV export
+          content:
+            text/csv:
+              schema:
+                type: string
+  /admin/users/{id}/analytics:
+    get:
+      tags:
+      - Admin
+      summary: Get user analytics (admin)
+      description: Returns delivery analytics for a specific user over a time period
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: days
+        in: query
+        schema:
+          type: integer
+          default: 30
+          minimum: 1
+          maximum: 365
+        description: Number of days to analyze
+      responses:
+        '200':
+          description: User analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAnalytics'
+  /oauth/github:
+    get:
+      tags:
+      - OAuth
+      summary: GitHub OAuth login redirect
+      description: Redirects to GitHub OAuth consent screen with CSRF state cookie
+      responses:
+        '302':
+          description: Redirect to GitHub OAuth
+  /oauth/github/callback:
+    get:
+      tags:
+      - OAuth
+      summary: GitHub OAuth callback
+      description: Handles GitHub OAuth callback, creates/links account, sets auth cookies
+      parameters:
+      - name: code
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Authorization code from GitHub
+      - name: state
+        in: query
+        required: true
+        schema:
+          type: string
+        description: CSRF state token (verified against cookie)
+      - name: error
+        in: query
+        schema:
+          type: string
+        description: Error from GitHub (e.g. access_denied)
+      responses:
+        '302':
+          description: Redirect to app with auth cookies set
+        '400':
+          description: Invalid or missing authorization code

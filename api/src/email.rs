@@ -4,6 +4,346 @@ use crate::resend_email::ResendEmailClient;
 use base64::Engine;
 use serde::Deserialize;
 
+/// Language for email templates. Defaults to Turkish (primary market).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Language {
+    Tr,
+    En,
+}
+
+impl Default for Language {
+    fn default() -> Self {
+        Self::Tr
+    }
+}
+
+impl Language {
+    pub fn from_str(s: &str) -> Self {
+        match s.to_lowercase().as_str() {
+            "en" | "english" => Self::En,
+            _ => Self::Tr,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Shared email template helpers (used by both GCloud and Resend clients)
+// ---------------------------------------------------------------------------
+
+pub(crate) fn tpl_welcome(display_name: &str, lang: Language) -> (&'static str, String) {
+    match lang {
+        Language::Tr => (
+            "HookSniff'e Hoş Geldiniz!",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">HookSniff'e Hoş Geldiniz, {display_name}! 🎉</h1>
+  <p>Hesabınız başarıyla oluşturuldu.</p>
+  <p>Artık uç noktalar oluşturabilir, webhook'lar kurabilir ve teslimatlarınızı izlemeye başlayabilirsiniz.</p>
+  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
+</body>
+</html>"#
+            ),
+        ),
+        Language::En => (
+            "Welcome to HookSniff!",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">Welcome to HookSniff, {display_name}! 🎉</h1>
+  <p>Your account has been created successfully.</p>
+  <p>You can now create endpoints, set up webhooks, and start monitoring your deliveries.</p>
+  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
+</body>
+</html>"#
+            ),
+        ),
+    }
+}
+
+pub(crate) fn tpl_verification(verification_url: &str, lang: Language) -> (&'static str, String) {
+    match lang {
+        Language::Tr => (
+            "HookSniff hesabınızı doğrulayın",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">E-posta adresinizi doğrulayın</h1>
+  <p>E-posta adresinizi doğrulamak için aşağıdaki bağlantıya tıklayın:</p>
+  <p>
+    <a href="{verification_url}"
+       style="display:inline-block;background:#6d28d9;color:#fff;
+              padding:12px 24px;border-radius:6px;text-decoration:none;
+              font-weight:bold;">
+      E-postayı Doğrula
+    </a>
+  </p>
+  <p style="color:#6b7280;font-size:14px;">
+    Bu bağlantı 24 saat içinde geçerliliğini yitirir. Bir hesap oluşturmadıysanız bu e-postayı görmezden gelebilirsiniz.
+  </p>
+  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
+</body>
+</html>"#
+            ),
+        ),
+        Language::En => (
+            "Verify your HookSniff account",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">Verify your email</h1>
+  <p>Click the link below to verify your email address:</p>
+  <p>
+    <a href="{verification_url}"
+       style="display:inline-block;background:#6d28d9;color:#fff;
+              padding:12px 24px;border-radius:6px;text-decoration:none;
+              font-weight:bold;">
+      Verify Email
+    </a>
+  </p>
+  <p style="color:#6b7280;font-size:14px;">
+    This link expires in 24 hours. If you didn't create an account, ignore this email.
+  </p>
+  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
+</body>
+</html>"#
+            ),
+        ),
+    }
+}
+
+pub(crate) fn tpl_password_reset(reset_url: &str, lang: Language) -> (&'static str, String) {
+    match lang {
+        Language::Tr => (
+            "HookSniff şifrenizi sıfırlayın",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">Şifre Sıfırlama Talebi</h1>
+  <p>Şifrenizi sıfırlamak istediniz. Aşağıdaki bağlantıya tıklayın:</p>
+  <p>
+    <a href="{reset_url}"
+       style="display:inline-block;background:#6d28d9;color:#fff;
+              padding:12px 24px;border-radius:6px;text-decoration:none;
+              font-weight:bold;">
+      Şifreyi Sıfırla
+    </a>
+  </p>
+  <p style="color:#6b7280;font-size:14px;">
+    Bu bağlantı 1 saat içinde geçerliliğini yitirir. Bu talebi siz yapmadıysanız bu e-postayı güvenle görmezden gelebilirsiniz.
+  </p>
+  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
+</body>
+</html>"#
+            ),
+        ),
+        Language::En => (
+            "Reset your HookSniff password",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">Password Reset Request</h1>
+  <p>You requested to reset your password. Click the link below:</p>
+  <p>
+    <a href="{reset_url}"
+       style="display:inline-block;background:#6d28d9;color:#fff;
+              padding:12px 24px;border-radius:6px;text-decoration:none;
+              font-weight:bold;">
+      Reset Password
+    </a>
+  </p>
+  <p style="color:#6b7280;font-size:14px;">
+    This link expires in 1 hour. If you didn't request this, you can safely ignore this email.
+  </p>
+  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
+</body>
+</html>"#
+            ),
+        ),
+    }
+}
+
+pub(crate) fn tpl_delivery_failed(endpoint_name: &str, error_details: &str, lang: Language) -> (String, String) {
+    match lang {
+        Language::Tr => (
+            format!("⚠️ Teslimat başarısız: {}", endpoint_name),
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #dc2626;">Webhook Teslimatı Başarısız ⚠️</h1>
+  <p><strong>{endpoint_name}</strong> adresine yapılan webhook teslimatı başarısız oldu.</p>
+  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;
+              padding:16px;margin:16px 0;">
+    <pre style="margin:0;white-space:pre-wrap;font-size:13px;color:#991b1b;">{error_details}</pre>
+  </div>
+  <p>HookSniff kontrol panelinizden teslimat günlüklerinizi kontrol edin.</p>
+  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
+</body>
+</html>"#
+            ),
+        ),
+        Language::En => (
+            format!("⚠️ Delivery failed: {}", endpoint_name),
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #dc2626;">Webhook Delivery Failed ⚠️</h1>
+  <p>A webhook delivery to <strong>{endpoint_name}</strong> has failed.</p>
+  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;
+              padding:16px;margin:16px 0;">
+    <pre style="margin:0;white-space:pre-wrap;font-size:13px;color:#991b1b;">{error_details}</pre>
+  </div>
+  <p>Check your delivery logs in the HookSniff dashboard for more details.</p>
+  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
+</body>
+</html>"#
+            ),
+        ),
+    }
+}
+
+pub(crate) fn tpl_invoice(
+    invoice_number: &str,
+    amount: &str,
+    plan_name: &str,
+    period_start: &str,
+    period_end: &str,
+    payment_url: Option<&str>,
+    lang: Language,
+) -> (&'static str, String) {
+    let payment_section = match (payment_url, lang) {
+        (Some(url), Language::Tr) => format!(
+            r#"<p>
+    <a href="{url}"
+       style="display:inline-block;background:#6d28d9;color:#fff;
+              padding:12px 24px;border-radius:6px;text-decoration:none;
+              font-weight:bold;">
+      Ödemeyi Tamamla
+    </a>
+  </p>"#
+        ),
+        (Some(url), Language::En) => format!(
+            r#"<p>
+    <a href="{url}"
+       style="display:inline-block;background:#6d28d9;color:#fff;
+              padding:12px 24px;border-radius:6px;text-decoration:none;
+              font-weight:bold;">
+      Complete Payment
+    </a>
+  </p>"#
+        ),
+        (None, _) => String::new(),
+    };
+
+    match lang {
+        Language::Tr => (
+            "HookSniff Fatura / Makbuz",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">Fatura / Makbuz 🧾</h1>
+  <p>HookSniff aboneliğiniz için faturanız hazır.</p>
+  <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Fatura No</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold;">{invoice_number}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Plan</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;">{plan_name}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Dönem</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;">{period_start} — {period_end}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Tutar</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold;font-size:18px;color:#059669;">{amount}</td>
+    </tr>
+  </table>
+  {payment_section}
+  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
+</body>
+</html>"#
+            ),
+        ),
+        Language::En => (
+            "HookSniff Invoice / Receipt",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6d28d9;">Invoice / Receipt 🧾</h1>
+  <p>Your invoice for the HookSniff subscription is ready.</p>
+  <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Invoice #</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold;">{invoice_number}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Plan</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;">{plan_name}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Period</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;">{period_start} — {period_end}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Amount</td>
+      <td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold;font-size:18px;color:#059669;">{amount}</td>
+    </tr>
+  </table>
+  {payment_section}
+  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
+</body>
+</html>"#
+            ),
+        ),
+    }
+}
+
+pub(crate) fn tpl_webhook_success(endpoint_name: &str, lang: Language) -> (&'static str, String) {
+    match lang {
+        Language::Tr => (
+            "✅ Webhook başarıyla teslim edildi",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #059669;">Webhook Başarıyla Teslim Edildi ✅</h1>
+  <p><strong>{endpoint_name}</strong> adresine yapılan webhook teslimatı başarıyla tamamlandı.</p>
+  <p>HookSniff kontrol panelinizden teslimat ayrıntılarını görüntüleyebilirsiniz.</p>
+  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
+</body>
+</html>"#
+            ),
+        ),
+        Language::En => (
+            "✅ Webhook delivered successfully",
+            format!(
+                r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #059669;">Webhook Delivered Successfully ✅</h1>
+  <p>The webhook delivery to <strong>{endpoint_name}</strong> completed successfully.</p>
+  <p>You can view the delivery details in your HookSniff dashboard.</p>
+  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
+</body>
+</html>"#
+            ),
+        ),
+    }
+}
+
 /// Unified email provider — tries Resend first, falls back to GCloud Gmail API.
 ///
 /// Priority: Resend (simpler, free tier 100/day) → GCloud Gmail (OAuth2, more complex).
@@ -52,10 +392,15 @@ impl EmailProvider {
         }
     }
 
-    pub async fn send_welcome_email(&self, to: &str, name: Option<&str>) -> Result<(), AppError> {
+    pub async fn send_welcome_email(
+        &self,
+        to: &str,
+        name: Option<&str>,
+        lang: Language,
+    ) -> Result<(), AppError> {
         match self {
-            Self::Resend(c) => c.send_welcome_email(to, name).await,
-            Self::GCloud(c) => c.send_welcome_email(to, name).await,
+            Self::Resend(c) => c.send_welcome_email(to, name, lang).await,
+            Self::GCloud(c) => c.send_welcome_email(to, name, lang).await,
             Self::None => {
                 tracing::warn!("Welcome email not sent (no provider): to={}", to);
                 Ok(())
@@ -67,10 +412,11 @@ impl EmailProvider {
         &self,
         to: &str,
         verification_url: &str,
+        lang: Language,
     ) -> Result<(), AppError> {
         match self {
-            Self::Resend(c) => c.send_verification_email(to, verification_url).await,
-            Self::GCloud(c) => c.send_verification_email(to, verification_url).await,
+            Self::Resend(c) => c.send_verification_email(to, verification_url, lang).await,
+            Self::GCloud(c) => c.send_verification_email(to, verification_url, lang).await,
             Self::None => {
                 tracing::warn!("Verification email not sent (no provider): to={}", to);
                 Ok(())
@@ -82,10 +428,11 @@ impl EmailProvider {
         &self,
         to: &str,
         reset_url: &str,
+        lang: Language,
     ) -> Result<(), AppError> {
         match self {
-            Self::Resend(c) => c.send_password_reset_email(to, reset_url).await,
-            Self::GCloud(c) => c.send_password_reset_email(to, reset_url).await,
+            Self::Resend(c) => c.send_password_reset_email(to, reset_url, lang).await,
+            Self::GCloud(c) => c.send_password_reset_email(to, reset_url, lang).await,
             Self::None => {
                 tracing::warn!("Password reset email not sent (no provider): to={}", to);
                 Ok(())
@@ -98,19 +445,89 @@ impl EmailProvider {
         to: &str,
         endpoint_name: &str,
         error_details: &str,
+        lang: Language,
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => {
-                c.send_delivery_failed_email(to, endpoint_name, error_details)
+                c.send_delivery_failed_email(to, endpoint_name, error_details, lang)
                     .await
             }
             Self::GCloud(c) => {
-                c.send_delivery_failed_email(to, endpoint_name, error_details)
+                c.send_delivery_failed_email(to, endpoint_name, error_details, lang)
                     .await
             }
             Self::None => {
                 tracing::warn!(
                     "Delivery failed email not sent (no provider): to={}, endpoint={}",
+                    to,
+                    endpoint_name
+                );
+                Ok(())
+            }
+        }
+    }
+
+    pub async fn send_invoice_email(
+        &self,
+        to: &str,
+        invoice_number: &str,
+        amount: &str,
+        plan_name: &str,
+        period_start: &str,
+        period_end: &str,
+        payment_url: Option<&str>,
+        lang: Language,
+    ) -> Result<(), AppError> {
+        match self {
+            Self::Resend(c) => {
+                c.send_invoice_email(
+                    to,
+                    invoice_number,
+                    amount,
+                    plan_name,
+                    period_start,
+                    period_end,
+                    payment_url,
+                    lang,
+                )
+                .await
+            }
+            Self::GCloud(c) => {
+                c.send_invoice_email(
+                    to,
+                    invoice_number,
+                    amount,
+                    plan_name,
+                    period_start,
+                    period_end,
+                    payment_url,
+                    lang,
+                )
+                .await
+            }
+            Self::None => {
+                tracing::warn!(
+                    "Invoice email not sent (no provider): to={}, invoice={}",
+                    to,
+                    invoice_number
+                );
+                Ok(())
+            }
+        }
+    }
+
+    pub async fn send_webhook_success_email(
+        &self,
+        to: &str,
+        endpoint_name: &str,
+        lang: Language,
+    ) -> Result<(), AppError> {
+        match self {
+            Self::Resend(c) => c.send_webhook_success_email(to, endpoint_name, lang).await,
+            Self::GCloud(c) => c.send_webhook_success_email(to, endpoint_name, lang).await,
+            Self::None => {
+                tracing::warn!(
+                    "Webhook success email not sent (no provider): to={}, endpoint={}",
                     to,
                     endpoint_name
                 );
@@ -309,8 +726,58 @@ impl GCloudEmailClient {
         base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(mime.as_bytes())
     }
 
-    /// Send an email via the Gmail API.
+    /// Send an email via the Gmail API with exponential backoff retry.
+    ///
+    /// Retries up to 3 times on transient errors (network failures, 5xx responses).
+    /// Does NOT retry on 4xx client errors.
     async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), AppError> {
+        let max_retries = 3u32;
+        let base_delay = std::time::Duration::from_secs(1);
+
+        for attempt in 0..=max_retries {
+            let result = self.send_once(to, subject, html).await;
+
+            match &result {
+                Ok(_) => return result,
+                Err(e) => {
+                    let is_retryable = match e {
+                        AppError::Internal(inner) => {
+                            let msg = format!("{:?}", inner);
+                            // Network errors are retryable
+                            msg.contains("connection")
+                                || msg.contains("timeout")
+                                || msg.contains("dns")
+                                || msg.contains("send")
+                                || msg.contains("request")
+                                ||
+                                // 5xx responses are retryable
+                                msg.contains("returned 5")
+                    };
+                        _ => false,
+                    };
+
+                    if !is_retryable || attempt == max_retries {
+                        return result;
+                    }
+
+                    let delay = base_delay * 2u32.pow(attempt);
+                    tracing::warn!(
+                        "Email send attempt {}/{} failed, retrying in {:?}: {}",
+                        attempt + 1,
+                        max_retries,
+                        delay,
+                        e
+                    );
+                    tokio::time::sleep(delay).await;
+                }
+            }
+        }
+
+        unreachable!()
+    }
+
+    /// Single attempt to send an email via the Gmail API.
+    async fn send_once(&self, to: &str, subject: &str, html: &str) -> Result<(), AppError> {
         let access_token = self.get_access_token().await?;
 
         tracing::debug!("Sending email to {} subject={}", to, subject);
@@ -356,20 +823,14 @@ impl GCloudEmailClient {
     }
 
     /// Send a welcome email to a newly registered user.
-    pub async fn send_welcome_email(&self, to: &str, name: Option<&str>) -> Result<(), AppError> {
-        let display_name = name.unwrap_or("there");
-        let subject = "Welcome to HookSniff!";
-        let html = format!(
-            r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">Welcome to HookSniff, {display_name}! 🎉</h1>
-  <p>Your account has been created successfully.</p>
-  <p>You can now create endpoints, set up webhooks, and start monitoring your deliveries.</p>
-  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
-</body>
-</html>"#
-        );
+    pub async fn send_welcome_email(
+        &self,
+        to: &str,
+        name: Option<&str>,
+        lang: Language,
+    ) -> Result<(), AppError> {
+        let display_name = name.unwrap_or(if lang == Language::Tr { "kullanıcı" } else { "there" });
+        let (subject, html) = tpl_welcome(display_name, lang);
         self.send(to, subject, &html).await
     }
 
@@ -378,29 +839,9 @@ impl GCloudEmailClient {
         &self,
         to: &str,
         verification_url: &str,
+        lang: Language,
     ) -> Result<(), AppError> {
-        let subject = "Verify your HookSniff account";
-        let html = format!(
-            r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">Verify your email</h1>
-  <p>Click the link below to verify your email address:</p>
-  <p>
-    <a href="{verification_url}"
-       style="display:inline-block;background:#6d28d9;color:#fff;
-              padding:12px 24px;border-radius:6px;text-decoration:none;
-              font-weight:bold;">
-      Verify Email
-    </a>
-  </p>
-  <p style="color:#6b7280;font-size:14px;">
-    This link expires in 24 hours. If you didn't create an account, ignore this email.
-  </p>
-  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
-</body>
-</html>"#
-        );
+        let (subject, html) = tpl_verification(verification_url, lang);
         self.send(to, subject, &html).await
     }
 
@@ -409,29 +850,9 @@ impl GCloudEmailClient {
         &self,
         to: &str,
         reset_url: &str,
+        lang: Language,
     ) -> Result<(), AppError> {
-        let subject = "Reset your HookSniff password";
-        let html = format!(
-            r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">Password Reset Request</h1>
-  <p>You requested to reset your password. Click the link below:</p>
-  <p>
-    <a href="{reset_url}"
-       style="display:inline-block;background:#6d28d9;color:#fff;
-              padding:12px 24px;border-radius:6px;text-decoration:none;
-              font-weight:bold;">
-      Reset Password
-    </a>
-  </p>
-  <p style="color:#6b7280;font-size:14px;">
-    This link expires in 1 hour. If you didn't request this, you can safely ignore this email.
-  </p>
-  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
-</body>
-</html>"#
-        );
+        let (subject, html) = tpl_password_reset(reset_url, lang);
         self.send(to, subject, &html).await
     }
 
@@ -441,24 +862,45 @@ impl GCloudEmailClient {
         to: &str,
         endpoint_name: &str,
         error_details: &str,
+        lang: Language,
     ) -> Result<(), AppError> {
-        let subject = format!("⚠️ Delivery failed: {}", endpoint_name);
-        let html = format!(
-            r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #dc2626;">Webhook Delivery Failed ⚠️</h1>
-  <p>A webhook delivery to <strong>{endpoint_name}</strong> has failed.</p>
-  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;
-              padding:16px;margin:16px 0;">
-    <pre style="margin:0;white-space:pre-wrap;font-size:13px;color:#991b1b;">{error_details}</pre>
-  </div>
-  <p>Check your delivery logs in the HookSniff dashboard for more details.</p>
-  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
-</body>
-</html>"#
-        );
+        let (subject, html) = tpl_delivery_failed(endpoint_name, error_details, lang);
         self.send(to, &subject, &html).await
+    }
+
+    /// Send an invoice/receipt email.
+    pub async fn send_invoice_email(
+        &self,
+        to: &str,
+        invoice_number: &str,
+        amount: &str,
+        plan_name: &str,
+        period_start: &str,
+        period_end: &str,
+        payment_url: Option<&str>,
+        lang: Language,
+    ) -> Result<(), AppError> {
+        let (subject, html) = tpl_invoice(
+            invoice_number,
+            amount,
+            plan_name,
+            period_start,
+            period_end,
+            payment_url,
+            lang,
+        );
+        self.send(to, subject, &html).await
+    }
+
+    /// Notify user of a successful webhook delivery.
+    pub async fn send_webhook_success_email(
+        &self,
+        to: &str,
+        endpoint_name: &str,
+        lang: Language,
+    ) -> Result<(), AppError> {
+        let (subject, html) = tpl_webhook_success(endpoint_name, lang);
+        self.send(to, subject, &html).await
     }
 }
 
