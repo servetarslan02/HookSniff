@@ -108,7 +108,7 @@ export default function AdminUserDetailPage() {
       <div className="text-center py-12">
         <div className="text-6xl mb-4">😕</div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("userNotFound")}</h2>
-        <button
+        <button type="button"
           onClick={() => router.push(`/${locale}/admin/users`)}
           className="text-brand-600 dark:text-brand-400 text-sm font-medium"
         >
@@ -122,7 +122,7 @@ export default function AdminUserDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button
+        <button type="button"
           onClick={() => router.push(`/${locale}/admin/users`)}
           className="text-gray-500 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-400 transition"
         >
@@ -194,7 +194,7 @@ export default function AdminUserDetailPage() {
                     <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
                   ))}
                 </select>
-                <button
+                <button type="button"
                   onClick={handleUpdatePlan}
                   disabled={newPlan === detail.user.plan}
                   className="px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition disabled:opacity-40"
@@ -209,7 +209,7 @@ export default function AdminUserDetailPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 {t("accountStatus")}
               </label>
-              <button
+              <button type="button"
                 onClick={handleToggleStatus}
                 className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium transition ${
                   detail.user.status === 'active'
@@ -314,7 +314,7 @@ export default function AdminUserDetailPage() {
                       {new Date(d.created_at).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <button
+                      <button type="button"
                         onClick={() => handleReplay(d.id)}
                         className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium"
                       >

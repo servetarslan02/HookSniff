@@ -147,7 +147,7 @@ export default function TeamPage() {
             {t('subtitle')}
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => setShowCreateModal(true)}
           className="px-4 py-2.5 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
         >
@@ -206,7 +206,7 @@ export default function TeamPage() {
                     <p className="text-sm text-gray-500 dark:text-slate-400">{selectedTeam.description}</p>
                   )}
                 </div>
-                <button
+                <button type="button"
                   onClick={() => setShowInviteModal(true)} disabled={!canInvite}
                   className="px-3 py-2 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
                 >
@@ -240,7 +240,7 @@ export default function TeamPage() {
                             <option key={r} value={r}>{roleLabel(t, r)}</option>
                           ))}
                         </select>
-                        <button
+                        <button type="button"
                           onClick={() => handleRemoveMember(m.id)} disabled={!canRemove}
                           className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
                         >
@@ -292,13 +292,13 @@ export default function TeamPage() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button
+              <button type="button"
                 onClick={() => setShowCreateModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tc('cancel')}
               </button>
-              <button
+              <button type="button"
                 onClick={handleCreate}
                 disabled={!createName.trim() || creating}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"
@@ -341,13 +341,13 @@ export default function TeamPage() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button
+              <button type="button"
                 onClick={() => setShowInviteModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tc('cancel')}
               </button>
-              <button
+              <button type="button"
                 onClick={handleInvite}
                 disabled={!inviteEmail.trim() || inviting}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"

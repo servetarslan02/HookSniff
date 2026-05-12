@@ -116,7 +116,7 @@ export default function ApiKeysPage() {
       {error && (
         <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 flex items-center justify-between">
           <span className="text-sm text-red-700 dark:text-red-400">{error}</span>
-          <button onClick={() => setError('')} aria-label={t("dismissError")} className="text-red-400 hover:text-red-600 transition">✕</button>
+          <button type="button" onClick={() => setError('')} aria-label={t("dismissError")} className="text-red-400 hover:text-red-600 transition">✕</button>
         </div>
       )}
 
@@ -136,14 +136,14 @@ export default function ApiKeysPage() {
             <code className="flex-1 p-3 bg-white dark:bg-slate-800 rounded-lg text-sm font-mono break-all border border-green-200 dark:border-green-500/30 text-gray-900 dark:text-white">
               {newKey}
             </code>
-            <button
+            <button type="button"
               onClick={copyKey}
               className="px-4 py-3 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition whitespace-nowrap"
             >
               {copied ? `✓ ${tc('copied')}` : tc('copyToClipboard')}
             </button>
           </div>
-          <button
+          <button type="button"
             onClick={() => setNewKey(null)}
             className="mt-3 text-sm text-green-700 dark:text-green-400 hover:underline"
           >
@@ -163,7 +163,7 @@ export default function ApiKeysPage() {
             placeholder={t('keyNamePlaceholder')}
             className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
           />
-          <button
+          <button type="button"
             onClick={createKey}
             disabled={creating}
             className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60 whitespace-nowrap"
@@ -237,14 +237,14 @@ export default function ApiKeysPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => setRotateTarget(key.id)}
                     disabled={actionLoading === key.id}
                     className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
                   >
                     🔄 {t('rotate')}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setDeleteTarget(key.id)}
                     disabled={actionLoading === key.id}
                     className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 border border-red-300 dark:border-red-500/30 rounded-lg transition disabled:opacity-50"
@@ -268,13 +268,13 @@ export default function ApiKeysPage() {
               {t('deleteDesc')}
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <button type="button"
                 onClick={() => setDeleteTarget(null)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tc('cancel')}
               </button>
-              <button
+              <button type="button"
                 onClick={() => deleteKey(deleteTarget)}
                 disabled={actionLoading === deleteTarget}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-60"
@@ -296,13 +296,13 @@ export default function ApiKeysPage() {
               {t('rotateDesc')}
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <button type="button"
                 onClick={() => setRotateTarget(null)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tc('cancel')}
               </button>
-              <button
+              <button type="button"
                 onClick={() => rotateKey(rotateTarget)}
                 disabled={actionLoading === rotateTarget}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition disabled:opacity-60"

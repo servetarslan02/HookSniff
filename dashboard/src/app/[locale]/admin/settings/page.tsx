@@ -420,7 +420,7 @@ export default function AdminSettingsPage() {
             <span aria-hidden="true">✓</span> {t('settingsSaved')}
           </span>
         )}
-        <button
+        <button type="button"
           onClick={handleSave}
           disabled={saving}
           className="px-6 py-3 bg-red-600 dark:bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 dark:hover:bg-red-700 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"

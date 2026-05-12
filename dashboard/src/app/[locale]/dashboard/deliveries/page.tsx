@@ -110,7 +110,7 @@ export default function DeliveriesPage() {
         <div className="glass-card p-6 text-center">
           <div className="text-4xl mb-3">⚠️</div>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
-          <button onClick={fetchData} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
+          <button type="button" onClick={fetchData} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
             Retry
           </button>
         </div>
@@ -165,7 +165,7 @@ export default function DeliveriesPage() {
                       {new Date(d.created_at).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <button
+                      <button type="button"
                         onClick={(e) => { e.stopPropagation(); router.push(`/${locale}/dashboard/deliveries/${d.id}`); }}
                         className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
                       >
@@ -185,7 +185,7 @@ export default function DeliveriesPage() {
                   Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
                 </span>
                 <nav aria-label={tc('pagination')} className="flex gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     aria-label={tc('previous')}
@@ -194,7 +194,7 @@ export default function DeliveriesPage() {
                     {tc('previous')}
                   </button>
                   <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">Page {page} of {totalPages}</span>
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
                     aria-label={tc('next')}
@@ -216,7 +216,7 @@ export default function DeliveriesPage() {
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('details')}</h3>
-              <button onClick={() => setSelected(null)} aria-label={t("closeDetails")} className="text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
+              <button type="button" onClick={() => setSelected(null)} aria-label={t("closeDetails")} className="text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label="ID" value={selected.id} mono />
