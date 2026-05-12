@@ -47,11 +47,11 @@ export default function PortalPage() {
       .finally(() => setLoading(false));
   }, [token, t]);
 
-  if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{t('loading')}</div>;
+  if (loading) return <div className="text-gray-500 dark:text-slate-400">{t('loading')}</div>;
 
   if (error) {
     return (
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
         <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400">
           {error}
@@ -61,7 +61,7 @@ export default function PortalPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
 
       {profile && (
