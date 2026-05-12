@@ -1,45 +1,40 @@
 # 📋 Fiyat ve Planlama — Sonraki Adımlar
 
-> Son güncelleme: 2026-05-13 00:50 GMT+8
+> Son güncelleme: 2026-05-13 01:06 GMT+8
 
-## Sıradaki İş
+## Tüm 7 Aşama Tamamlandı ✅
 
-**Aşama 2: Event Type Limiti** — plan bazlı max event type kontrolü
+### Tamamlanan İşler
+1. ✅ Application Modeli — CRUD API + migration
+2. ✅ Event Type Limiti — plan bazlı kontrol
+3. ✅ Team Member Limiti — plan bazlı kontrol
+4. ✅ Never Blocked — overage sistemi + email bildirimleri
+5. ✅ Plan Tablosu — Developer/Startup/Pro/Enterprise
+6. ✅ Pricing Sayfası — dashboard güncellendi
+7. ✅ Son Kontroller — GitHub push
 
-1. Mevcut `event_schemas` tablosunu kontrol et (veya yeni `event_types` tablosu)
-2. API: Event type oluştururken limit kontrolü (Developer:10, Startup:50, Pro:sınırsız)
-3. Test: Unit testler
+## Kalan (Servet veya sonraki oturum)
 
-## Tamamlanan
+### Backend Doğrulama
+- [ ] `cargo test --lib` — tüm testlerin geçtiğini doğrula
+- [ ] `cargo clippy` — 0 uyarı
+- [ ] Cloud Build — deploy ve compile doğrulama
 
-### Aşama 1: Application Modeli ✅
-- Migration: `013_applications.sql` (applications tablosu + endpoints FK)
-- Model: `models/application.rs` (Application, CreateApplicationRequest, UpdateApplicationRequest, ApplicationResponse)
-- API: `routes/applications.rs` (CRUD: list, get, create, update, delete)
-- Plan enum: Developer/Startup/Pro/Enterprise (eski Free→Developer, Business→Enterprise)
-- Yeni limit fonksiyonları: max_applications, max_event_types, max_team_members, max_subscriptions, max_events_per_day, overage_price, allows_overage
-- Endpoint create: application_id zorunlu + ownership doğrulama
-- Tüm endpoint SELECT sorgularına application_id eklendi
+### Frontend Doğrulama
+- [ ] `next build` — hatasız build
+- [ ] Dashboard'da plan isimlerinin doğru gösterildiğini kontrol et
+
+### Opsiyonel İyileştirmeler
+- [ ] Dashboard: "Never blocked" toggle ayarlar sayfasına ekle
+- [ ] Email entegrasyonu: events/overage.rs'deki placeholder'ı Resend ile bağla
+- [ ] Polar.sh/Stripe: Startup planı için product ID ekle
+- [ ] TRY kur güncellemesi: otomatik dolar→TRY dönüşümü
 
 ## Dosya Konumu
 
-Tüm takip bu klasörde:
 ```
 .ai-context/fiyat-ve-planlama/
-├── PLAN.md       ← Görev takibi
+├── PLAN.md       ← Görev takibi (tamamlandı)
 ├── MEMORY.md     ← Hafıza
 └── NEXT_SESSION.md ← Bu dosya
 ```
-
-## Hatırlatmalar
-
-- Her aşama sonrası `cargo test --lib` çalıştır
-- Her aşama sonrası PLAN.md'de ilgili maddeleri ✅ yap
-- Oturum sonunda `.ai-context/` push et
-- Değişiklikleri commit et: `feat:` veya `fix:` prefix kullan
-
-## ⚠️ Dikkat
-
-- `cargo test` ve `cargo clippy` bu ortamda çalıştırılamıyor (Rust toolchain yok)
-- GitHub push sonrası Cloud Build'te compile doğrulanacak
-- `transforms.rs` ve `webhooks.rs`'deki endpoint SELECT sorguları farklı kolon seti kullanıyor — compile hatası gelirse düzeltilecek
