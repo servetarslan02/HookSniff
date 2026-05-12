@@ -281,8 +281,8 @@ async fn upgrade_plan(
     // Item 258: Validate plan transition — only allow upgrading to a higher tier
     let plan_tier = |p: &Plan| match p {
         Plan::Developer => 0,
-        Plan::Pro => 1,
-        Plan::Enterprise => 2,
+        Plan::Startup => 1,
+        Plan::Pro => 2,
         Plan::Enterprise => 3,
     };
     if plan_tier(&new_plan) <= plan_tier(&current_plan) {
