@@ -25,7 +25,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: SsoSettingsPage } = await import('@/app/[locale]/dashboard/sso/page');
+const { default: SsoSettingsPage } = await import('@/app/[locale]/[username]/sso/page');
 
 const MOCK_SAML_CONFIG = {
   provider: 'saml',
@@ -328,7 +328,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
     vi.doMock('@/i18n/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
     vi.doMock('@/components/Toast', () => ({ useToast: () => ({ toast: mockToast }) }));
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/sso/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/sso/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

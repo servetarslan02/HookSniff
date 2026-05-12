@@ -64,7 +64,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: DeliveriesPage } = await import('@/app/[locale]/dashboard/deliveries/page');
+const { default: DeliveriesPage } = await import('@/app/[locale]/[username]/deliveries/page');
 
 const MOCK_DELIVERIES = [
   { id: 'd123456789012', endpoint_id: 'ep1', event: 'order.created', status: 'delivered', attempt_count: 1, created_at: '2024-01-01T10:00:00Z', response_status: 200 },

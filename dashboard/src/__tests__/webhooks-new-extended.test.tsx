@@ -48,7 +48,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
-const { default: SendWebhookPage } = await import('@/app/[locale]/dashboard/webhooks/new/page');
+const { default: SendWebhookPage } = await import('@/app/[locale]/[username]/webhooks/new/page');
 
 const mockEndpoints = [
   { id: 'ep1', url: 'https://example.com/webhook', is_active: true, created_at: '2024-01-01' },

@@ -24,7 +24,7 @@ vi.mock('@/components/StatusBadge', () => ({
     React.createElement('span', { 'data-testid': 'status-badge' }, status),
 }));
 
-const { default: SearchPage } = await import('@/app/[locale]/dashboard/search/page');
+const { default: SearchPage } = await import('@/app/[locale]/[username]/search/page');
 
 const MOCK_RESULTS = {
   deliveries: [
@@ -430,7 +430,7 @@ describe('SearchPage - Ultra Coverage', () => {
     vi.doMock('next-intl', () => ({ useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key }));
     vi.doMock('@/i18n/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
     vi.doMock('@/components/StatusBadge', () => ({ StatusBadge: ({ status }: any) => React.createElement('span', null, status) }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/search/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/search/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

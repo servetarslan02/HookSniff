@@ -22,7 +22,7 @@ vi.mock('@/components/Toast', () => ({
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-const { default: EndpointHealthPage } = await import('@/app/[locale]/dashboard/health/page');
+const { default: EndpointHealthPage } = await import('@/app/[locale]/[username]/health/page');
 
 const mockEndpoints = [
   {

@@ -22,7 +22,7 @@ vi.mock('@/components/Toast', () => ({
 
 const originalCrypto = globalThis.crypto;
 
-const { default: SignatureVerifierPage } = await import('@/app/[locale]/dashboard/signature-verifier/page');
+const { default: SignatureVerifierPage } = await import('@/app/[locale]/[username]/signature-verifier/page');
 
 describe('SignatureVerifierPage', () => {
   beforeEach(() => {

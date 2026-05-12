@@ -46,7 +46,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: EndpointsPage } = await import('@/app/[locale]/dashboard/endpoints/page');
+const { default: EndpointsPage } = await import('@/app/[locale]/[username]/endpoints/page');
 
 const MOCK_ENDPOINTS = [
   { id: 'ep1', url: 'https://api.example.com/webhook', description: 'Production webhook', status: 'active', created_at: '2024-01-15T10:00:00Z' },
@@ -160,7 +160,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({
       endpointsApi: { list: mockEndpointsList, delete: mockEndpointsDelete },
     }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/endpoints/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/endpoints/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

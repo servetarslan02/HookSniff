@@ -44,7 +44,7 @@ vi.mock('@/components/ConfirmDialog', () => ({
   },
 }));
 
-const { default: AlertsPage } = await import('@/app/[locale]/dashboard/alerts/page');
+const { default: AlertsPage } = await import('@/app/[locale]/[username]/alerts/page');
 
 const MOCK_ALERTS = [
   { id: 'a1', name: 'High failure rate', condition: 'failure_rate', threshold: 10, channels: ['email'], is_active: true, created_at: '2024-01-01' },

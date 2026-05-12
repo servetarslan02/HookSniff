@@ -36,7 +36,7 @@ vi.mock('@/components/Toast', () => ({
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-const { default: EndpointSettingsPage } = await import('@/app/[locale]/dashboard/endpoints/[id]/page');
+const { default: EndpointSettingsPage } = await import('@/app/[locale]/[username]/endpoints/[id]/page');
 
 const mockEndpoint = {
   id: 'ep_test_123',
