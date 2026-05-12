@@ -6,80 +6,83 @@
 
 ---
 
-## Ne Yapıyor?
+## Sayfada Ne Var?
 
-Admin panelinin layout bileşeni. Sidebar, header, auth guard ve sayfa container'ını sağlar.
+### Sidebar (sol, 64px, sabit)
+- Logo: ⚡ ikonu + "Admin Panel" başlığı
+- 6 menü linki (Overview, Users, Revenue, System, Settings, Activity)
+- "← Back to Dashboard" linki
+- Theme Toggle (dark/light)
 
-## Temel Özellikler
+### Header (üst, 64px)
+- Sol: Hamburger menü (mobil), sayfa başlığı, "Admin" badge
+- Orta: Quick Search input (Enter ile kullanıcı arar)
+- Sağ: Notification bell → system sayfası, Profile dropdown
 
-### Auth Guard
-```tsx
-useEffect(() => {
-  if (user && !user.is_admin) {
-    router.push(`/${locale}/dashboard');
-  }
-}, [user, router, locale]);
+### Main Content
+- Sayfa içeriği buraya render edilir
 
-if (!user?.is_admin) {
-  return <AccessDeniedScreen />;  // 🔒 kilit ikonu + "Admin yetkiniz yok" mesajı
-}
+### Mobile Overlay
+- Siyah yarı saydam, sidebar açıkken tıklanınca kapanır
+
+---
+
+## Kullanılan Sistemler
+
+| Sistem | Amaç |
+|--------|------|
+| `next-intl` (`useTranslations`) | i18n — tüm metinler TR/EN |
+| `clsx` | Koşullu CSS class birleştirme |
+| `useAuth()` (Zustand store) | Kullanıcı bilgisi, logout |
+| `usePathname()` | Aktif rota tespiti |
+| `useRouter()` | Programatik yönlendirme |
+| `ThemeToggle` | Dark/Light mode |
+| CSS `transition-transform` | Sidebar animasyonu |
+| CSS `group-hover` | Profile dropdown açılması |
+
+## Yapılan İşlemler
+
+1. **Auth Guard:** `user.is_admin` false ise erişim engeli gösterilir
+2. **Document Title:** "HookSniff — Webhook Teslimat Servisi" olarak ayarlanır
+3. **Quick Search:** Enter'a basılınca `/admin/users?search=...`'a yönlendirir
+4. **Logout:** `logout()` çağrılır, login sayfasına yönlendirilir
+
+## State
+
+```typescript
+const [sidebarOpen, setSidebarOpen] = useState(false);  // Mobil sidebar
 ```
-- `user.is_admin` kontrolü
-- Admin olmayan kullanıcı `/dashboard`'a yönlendirilir
-- Erişim engeli ekranı gösterilir
 
-### Sidebar Navigation
-```
-📊 Overview      → /admin
-👥 Users         → /admin/users
-💰 Revenue       → /admin/revenue
-🖥️ System        → /admin/system
-⚙️ Settings      → /admin/settings
-📋 Activity Log  → /admin/activity
-```
-- Aktif sayfa vurgusu (kırmızı arka plan)
-- Mobilde hamburger menü ile açılır/kapanır
-- `usePathname()` ile aktif rota tespiti
+## Erişilebilirlik
 
-### Header
-- **Sol:** Sayfa başlığı + Admin badge (kırmızı)
-- **Orta:** Quick Search input → Enter ile `/admin/users?search=...`
-- **Sağ:** Notification bell → `/admin/system`, Profile dropdown
-
-### Profile Dropdown
-- Kullanıcı email'i
-- "Back to Dashboard" linki
-- "Logout" butonu
-
-### Responsive Tasarım
-- Desktop: 64px genişliğinde sabit sidebar
-- Mobil: Overlay sidebar, dışarı tıklayınca kapanır
-- `md:translate-x-0` / `-translate-x-full` geçişleri
-
-### Erişilebilirlik (ARIA)
 - `aria-label` sidebar ve butonlarda
 - `role="banner"` header'da
 - `role="main"` içerik alanında
 - Skip-to-content linki (`#admin-main-content`)
 
-### Tema Desteği
-- Dark/Light mode toggle (sidebar altında)
-- `dark:` Tailwind sınıflarıyla kapsamlı destek
+---
 
-### i18n
-- Tüm metinler `useTranslations('admin')` ve `useTranslations('common')` ile
-- TR/EN destekli
+## 🔴 Kritik Sorunlar
 
-## Kullanılan Bileşenler
-- `ThemeToggle` — tema değiştirme
-- `Link` (next-intl) — i18n linkleri
-- `clsx` — koşullu class birleştirme
+1. **Client-side auth guard yetersiz** — `user.is_admin` sadece frontend'de kontrol ediliyor. Backend'de her `/admin/*` endpoint'inde ayrıca kontrol yapılmalı. Kullanıcı token'ı ile doğrudan API'ye istek atarak admin verilerine erişebilir.
 
-## State
-```typescript
-const [sidebarOpen, setSidebarOpen] = useState(false);  // Mobil sidebar
-```
+2. **Document title hardcoded** — `document.title = 'HookSniff — Webhook Teslimat Servisi'` her admin sayfasında aynı. Sayfa bazlı başlık olmalı (ör: "Admin | Kullanıcılar").
 
-## Güvenlik
-- Client-side auth guard (`is_admin` kontrolü)
-- Backend'de ayrıca her API endpoint'inde admin kontrolü yapılmalı
+3. **Quick Search sadece kullanıcı arıyor** — `router.push(/admin/users?search=...)` hardcoded. Endpoint, event, delivery araması yapılamıyor.
+
+## 🟡 Orta Seviye Sorunlar
+
+4. **Sidebar navigation statik** — `adminNavigation` array'i hardcoded. Plugin veya modüler yapı yok.
+
+5. **Profile dropdown hover ile açılıyor** — `group-hover` kullanılmış, mobilde touch cihazlarda sorun çıkarabilir. `click` event'i olmalı.
+
+6. **Notification bell sabit link** — `/admin/system`'a yönlendiriyor, gerçek notification sayısı gösterilmiyor.
+
+7. **Logout sonrası yönlendirme locale gerektiriyor** — `router.push(/${locale}/login)` — locale undefined olursa 404.
+
+## ✅ Olumlu
+
+- Skip-to-content erişilebilirlik linki
+- ARIA landmark'ları (banner, main, aside)
+- Dark mode tam destek
+- Mobil responsive sidebar
