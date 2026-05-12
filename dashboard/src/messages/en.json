@@ -1388,7 +1388,8 @@
     "notConfigured": "Not Configured",
     "comingSoon": "Coming Soon",
     "na": "—",
-    "percent": "%"
+    "percent": "%",
+    "more": "more"
   },
   "landing": {
     "nav": {

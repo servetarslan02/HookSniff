@@ -35,6 +35,8 @@ pub fn router() -> Router {
         .route("/settings", get(get_settings).put(update_settings))
         .route("/alerts", get(list_all_alerts).post(create_platform_alert))
         .route("/alerts/{id}", put(update_alert_admin).delete(delete_alert_admin))
+        .route("/feature-flags", get(list_feature_flags).post(create_feature_flag))
+        .route("/feature-flags/{id}", put(update_feature_flag).delete(delete_feature_flag))
 }
 
 #[derive(Debug, Deserialize)]
@@ -1481,6 +1483,154 @@ async fn admin_audit_logs(
         page,
         per_page,
     }))
+}
+
+// ─────────────────────────────────────────────────────────
+// Feature Flags
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+struct FeatureFlag {
+    id: Uuid,
+    name: String,
+    description: Option<String>,
+    is_enabled: bool,
+    rollout_percentage: i32,
+    enabled_for_plans: serde_json::Value,
+    created_by: Option<Uuid>,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize)]
+struct CreateFeatureFlagRequest {
+    name: String,
+    description: Option<String>,
+    is_enabled: Option<bool>,
+    rollout_percentage: Option<i32>,
+    enabled_for_plans: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct UpdateFeatureFlagRequest {
+    name: Option<String>,
+    description: Option<String>,
+    is_enabled: Option<bool>,
+    rollout_percentage: Option<i32>,
+    enabled_for_plans: Option<Vec<String>>,
+}
+
+async fn list_feature_flags(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<impl IntoResponse, AppError> {
+    require_admin(&customer)?;
+
+    let flags = sqlx::query_as::<_, FeatureFlag>(
+        "SELECT id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at
+         FROM feature_flags ORDER BY created_at DESC"
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    let _ = crate::audit::log_action(&pool, customer.id, "FEATURE_FLAG_LIST", "feature_flag", None, None, None, None).await;
+
+    Ok(Json(serde_json::json!({ "flags": flags })))
+}
+
+async fn create_feature_flag(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(body): Json<CreateFeatureFlagRequest>,
+) -> Result<impl IntoResponse, AppError> {
+    require_admin_write(&customer)?;
+
+    let plans_json = serde_json::to_value(&body.enabled_for_plans.unwrap_or_default())?;
+
+    let flag = sqlx::query_as::<_, FeatureFlag>(
+        "INSERT INTO feature_flags (name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at"
+    )
+    .bind(&body.name)
+    .bind(&body.description)
+    .bind(body.is_enabled.unwrap_or(false))
+    .bind(body.rollout_percentage.unwrap_or(0))
+    .bind(&plans_json)
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let _ = crate::audit::log_action(&pool, customer.id, "FEATURE_FLAG_CREATE", "feature_flag", Some(&flag.id.to_string()), None, None, None).await;
+
+    Ok(Json(serde_json::json!(flag)))
+}
+
+async fn update_feature_flag(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Json(body): Json<UpdateFeatureFlagRequest>,
+) -> Result<impl IntoResponse, AppError> {
+    require_admin_write(&customer)?;
+
+    // Fetch current flag first, then update individual fields
+    let current = sqlx::query_as::<_, FeatureFlag>(
+        "SELECT id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at FROM feature_flags WHERE id = $1"
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or_else(|| AppError::NotFound("Feature flag not found".to_string()))?;
+
+    let new_name = body.name.as_deref().unwrap_or(&current.name);
+    let new_desc = body.description.as_deref().or(current.description.as_deref());
+    let new_enabled = body.is_enabled.unwrap_or(current.is_enabled);
+    let new_pct = body.rollout_percentage.unwrap_or(current.rollout_percentage);
+    let new_plans = if let Some(ref plans) = body.enabled_for_plans {
+        serde_json::to_value(plans)?
+    } else {
+        current.enabled_for_plans.clone()
+    };
+
+    let flag = sqlx::query_as::<_, FeatureFlag>(
+        "UPDATE feature_flags SET name = $1, description = $2, is_enabled = $3, rollout_percentage = $4, enabled_for_plans = $5, updated_at = NOW()
+         WHERE id = $6
+         RETURNING id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at"
+    )
+    .bind(new_name)
+    .bind(new_desc)
+    .bind(new_enabled)
+    .bind(new_pct)
+    .bind(&new_plans)
+    .bind(id)
+    .fetch_one(&pool)
+    .await?;
+
+    let details = serde_json::json!({
+        "is_enabled": body.is_enabled,
+        "rollout_percentage": body.rollout_percentage,
+    });
+    let _ = crate::audit::log_action(&pool, customer.id, "FEATURE_FLAG_UPDATE", "feature_flag", Some(&id.to_string()), Some(details), None, None).await;
+
+    Ok(Json(serde_json::json!(flag)))
+}
+
+async fn delete_feature_flag(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+) -> Result<impl IntoResponse, AppError> {
+    require_admin_write(&customer)?;
+
+    sqlx::query("DELETE FROM feature_flags WHERE id = $1")
+        .bind(id)
+        .execute(&pool)
+        .await?;
+
+    let _ = crate::audit::log_action(&pool, customer.id, "FEATURE_FLAG_DELETE", "feature_flag", Some(&id.to_string()), None, None, None).await;
+
+    Ok(Json(serde_json::json!({ "success": true })))
 }
 
 // ─────────────────────────────────────────────────────────
