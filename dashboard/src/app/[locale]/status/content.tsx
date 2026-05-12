@@ -114,7 +114,11 @@ function sparkBarColor(ms: number): string {
   return 'bg-red-400';
 }
 
-// ─── Status Badge ───
+// ─── Status Badge (system health) ───
+// NOTE: This is intentionally separate from @/components/StatusBadge.
+// The shared StatusBadge handles delivery statuses (delivered, failed, pending, etc.)
+// while this one handles system/infra health statuses (healthy, degraded, down, investigating, etc.)
+// They share the same visual pattern but different status vocabularies.
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, { bg: string; text: string; dot: string; label: string }> = {
     healthy: { bg: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-500', label: 'Operational' },
@@ -140,10 +144,11 @@ function StatusBadge({ status }: { status: string }) {
 // ─── Status Banner ───
 function StatusBanner({ status, checkedAt }: { status: string; checkedAt: string }) {
   const router = useRouter();
+  const t = useTranslations('status');
   const configs: Record<string, { bg: string; border: string; text: string; icon: string; title: string }> = {
-    operational: { bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/30', text: 'text-emerald-800 dark:text-emerald-300', icon: '✅', title: 'All Systems Operational' },
-    degraded: { bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/30', text: 'text-amber-800 dark:text-amber-300', icon: '⚠️', title: 'Some Systems Degraded' },
-    down: { bg: 'bg-red-50 dark:bg-red-500/10', border: 'border-red-200 dark:border-red-500/30', text: 'text-red-800 dark:text-red-300', icon: '🔴', title: 'Major Outage Detected' },
+    operational: { bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/30', text: 'text-emerald-800 dark:text-emerald-300', icon: '✅', title: t('allOperational') },
+    degraded: { bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/30', text: 'text-amber-800 dark:text-amber-300', icon: '⚠️', title: t('someDegraded') },
+    down: { bg: 'bg-red-50 dark:bg-red-500/10', border: 'border-red-200 dark:border-red-500/30', text: 'text-red-800 dark:text-red-300', icon: '🔴', title: t('majorOutage') },
   };
   const c = configs[status] || configs.operational;
   return (
@@ -153,14 +158,14 @@ function StatusBanner({ status, checkedAt }: { status: string; checkedAt: string
         <div className="flex-1">
           <h2 className={`text-lg font-bold ${c.text}`}>{c.title}</h2>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-            Last checked {formatRelativeTime(checkedAt)} • Auto-refreshes every 30s
+            {t('lastChecked', { time: formatRelativeTime(checkedAt) })} • {t('autoRefresh')}
           </p>
         </div>
         <button
           className="text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
           onClick={() => router.refresh()}
         >
-          ↻ Refresh
+          ↻ {t('refresh')}
         </button>
       </div>
     </div>
@@ -270,7 +275,7 @@ function UptimeBar({ history }: { history: HistoryDay[] }) {
   return (
     <div className="mt-4">
       <div className="flex items-baseline justify-between mb-2">
-        <span className="text-sm text-gray-500 dark:text-slate-400">Last 30 days</span>
+        <span className="text-sm text-gray-500 dark:text-slate-400">{t('last30Days')}</span>
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-bold text-gray-900 dark:text-white">{avgUptime.toFixed(2)}%</span>
           {last30.length >= 2 && (
@@ -347,6 +352,7 @@ function ComponentRow({ component, responseTimes }: { component: ComponentStatus
 
 // ─── Incident Log ───
 function IncidentLog({ incidents }: { incidents: Incident[] }) {
+  const t = useTranslations('status');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Group by date
@@ -364,7 +370,7 @@ function IncidentLog({ incidents }: { incidents: Incident[] }) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-slate-500">
         <div className="text-3xl mb-2">🎉</div>
-        <p>No incidents in the past 30 days</p>
+        <p>{t('noIncidents')}</p>
       </div>
     );
   }
@@ -396,8 +402,8 @@ function IncidentLog({ incidents }: { incidents: Incident[] }) {
                 {expandedId === inc.id && (
                   <div className="px-4 pb-3 border-t border-gray-100 dark:border-slate-700">
                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-slate-500 mt-2 mb-3">
-                      <span>Affects: {inc.affected_components.join(', ')}</span>
-                      {inc.resolved_at && <span>• Resolved {formatRelativeTime(inc.resolved_at)}</span>}
+                      <span>{t('affects', { components: inc.affected_components.join(', ') })}</span>
+                      {inc.resolved_at && <span>• {t('resolvedAt', { time: formatRelativeTime(inc.resolved_at) })}</span>}
                     </div>
                     <div className="space-y-2">
                       {inc.updates.map((update, i) => (
@@ -598,7 +604,7 @@ export function StatusPageContent() {
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin text-3xl mb-3">🪝</div>
-          <p className="text-gray-500 dark:text-slate-400">Loading status...</p>
+          <p className="text-gray-500 dark:text-slate-400">{t('loadingStatus')}</p>
         </div>
       </div>
     );
@@ -616,7 +622,7 @@ export function StatusPageContent() {
           </Link>
           <div className="flex items-center gap-3">
             <button className="text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-              🔔 Subscribe to updates
+              🔔 {t('subscribeToUpdates')}
             </button>
             <LanguageSwitcher />
           </div>
@@ -628,9 +634,9 @@ export function StatusPageContent() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("systemStatus")}</h1>
           <p className="text-gray-500 dark:text-slate-400 text-sm">
-            Real-time monitoring of all HookSniff services
+            {t('realTimeMonitoring')}
             {dataSource === 'static' && (
-              <span className="ml-2 text-amber-500">(showing cached data)</span>
+              <span className="ml-2 text-amber-500">{t('showingCachedData')}</span>
             )}
           </p>
         </div>
@@ -641,7 +647,7 @@ export function StatusPageContent() {
         {/* 90-Day Uptime Calendar */}
         {history.length > 0 && (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Uptime — Last 90 Days</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('uptimeLast90Days')}</h2>
             <UptimeCalendar history={history.slice(-90)} />
           </div>
         )}
@@ -700,7 +706,7 @@ export function StatusPageContent() {
             •{' '}
             <Link href="/docs" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">{t("docs")}</Link>
           </p>
-          <p className="text-xs">Powered by HookSniff monitoring • Data refreshes every 30 seconds</p>
+          <p className="text-xs">{t('poweredBy')}</p>
         </div>
       </div>
     </div>
