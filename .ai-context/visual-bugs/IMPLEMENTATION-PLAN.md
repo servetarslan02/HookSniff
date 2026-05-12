@@ -451,7 +451,7 @@
 305. ✅ `billing/page.tsx` — 505→292 satır (-42%) ✅ YAPILDI (Oturum 128)
 306. ⬜ `endpoints/[id]/page.tsx` — 446 satır
 307. ✅ `settings/page.tsx` — 545→65 satır (-88%) ✅ YAPILDI
-308. ⬜ `portal-customize/page.tsx` — 402 satır
+308. ✅ `portal-customize/page.tsx` — 436→280 satır (-36%) ✅ YAPILDI
 309. ⬜ `retry-policy/page.tsx` — 355 satır
 310. ⬜ `team/page.tsx` — 339 satır
 311. ⬜ `api-importer/page.tsx` — 336 satır

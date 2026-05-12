@@ -297,7 +297,7 @@ async fn batch_webhooks(
     Json(req): Json<BatchWebhookRequest>,
 ) -> Result<Json<BatchResponse>, AppError> {
     if req.webhooks.len() > 100 {
-        return Err(AppError::BadRequest("Batch size cannot exceed 100".into()));
+        return Err(AppError::BadRequest("A batch cannot contain more than 100 webhooks".into()));
     }
 
     // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
@@ -480,7 +480,7 @@ async fn replay_webhook(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?
-    .ok_or(AppError::BadRequest("Endpoint no longer active".into()))?;
+    .ok_or(AppError::BadRequest("The endpoint is no longer active".into()))?;
 
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
@@ -575,11 +575,11 @@ async fn batch_replay(
     Json(req): Json<BatchReplayRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     if req.delivery_ids.is_empty() {
-        return Err(AppError::BadRequest("delivery_ids cannot be empty".into()));
+        return Err(AppError::BadRequest("Please provide at least one delivery ID to replay".into()));
     }
     if req.delivery_ids.len() > 100 {
         return Err(AppError::BadRequest(
-            "Max 100 deliveries per batch replay".into(),
+            "Cannot replay more than 100 deliveries at once".into(),
         ));
     }
 
