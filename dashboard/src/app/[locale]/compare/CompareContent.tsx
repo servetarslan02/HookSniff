@@ -217,12 +217,6 @@ const sections = [
   },
 ];
 
-const testimonials = [
-  { quote: 'We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time and $50K+ in development costs.', author: 'Startup CTO', company: 'SaaS Company' },
-  { quote: 'The 11 SDK coverage is unmatched. Our Python, Node, and Go teams all use the same webhook service now.', author: 'Lead Developer', company: 'API Platform' },
-  { quote: 'FIFO delivery was the deciding factor. No other webhook service guarantees ordered delivery out of the box.', author: 'Engineering Manager', company: 'Fintech Startup' },
-];
-
 const faq = [
   { q: 'Is HookSniff really cheaper than Svix?', a: 'Yes. HookSniff Pro is $29/mo vs Svix Professional at $490/mo. That\'s $5,532/year saved. HookSniff even offers a free tier with 10,000 events/month.' },
   { q: 'Why is HookSniff SOC 2 "Ready" but not "Type 2"?', a: 'SOC 2 Type 2 requires a 3–12 month audit period. HookSniff has implemented all required controls and is undergoing the audit. We expect Type 2 certification soon.' },
@@ -372,20 +366,9 @@ export default function CompareContent() {
           </div>
         </div>
 
-        {/* Social Proof */}
+        {/* Trust Statement */}
         <div className="mb-16">
-          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-6">{t('trustedBy')}</p>
-          <div className="grid md:grid-cols-3 gap-4">
-            {testimonials.map((t, i) => (
-              <div key={i} className="p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-                <p className="text-sm text-gray-600 dark:text-slate-400 mb-4 italic">&ldquo;{t.quote}&rdquo;</p>
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{t.author}</p>
-                  <p className="text-xs text-gray-500 dark:text-slate-500">{t.company}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500">{t('trustedBy')}</p>
         </div>
 
         {/* Detailed Sections */}
