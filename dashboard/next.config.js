@@ -5,7 +5,6 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig = {
   reactStrictMode: true,
-  reactStrictMode: true,
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -21,8 +20,6 @@ const nextConfig = {
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-        // CSP is set by middleware (src/middleware.ts) with per-request nonce.
-        // Do NOT duplicate Content-Security-Policy here — it would override the nonce.
       ],
     }];
   },
@@ -38,7 +35,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/:locale/dashboard',
+        destination: '/:locale/applications',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 module.exports = withNextIntl(nextConfig);
-// Force Vercel rebuild without stale standalone cache — Mon May 11 11:58:22 PM CST 2026
