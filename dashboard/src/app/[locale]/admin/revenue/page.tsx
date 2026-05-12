@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
-import { adminApi, type RevenueResponse, type ChurnUser } from '@/lib/api';
+import { adminApi, type RevenueResponse, type ChurnUser, type PlatformSettings } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
@@ -20,6 +20,7 @@ export default function AdminRevenuePage() {
   const { token } = useAuth();
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [churnUsers, setChurnUsers] = useState<ChurnUser[]>([]);
+  const [planPrices, setPlanPrices] = useState<{ pro: number; business: number }>({ pro: 29, business: 99 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,12 +34,16 @@ export default function AdminRevenuePage() {
     else setLoading(true);
     setError(null);
     try {
-      const [revenueData, churnData] = await Promise.all([
+      const [revenueData, churnData, settings] = await Promise.all([
         adminApi.getRevenue(token),
         adminApi.getChurn(token).catch(() => ({ users: [] })),
+        adminApi.getSettings(token).catch(() => null),
       ]);
       setRevenue(revenueData);
       setChurnUsers(churnData.users || []);
+      if (settings) {
+        setPlanPrices({ pro: settings.plan_price_pro, business: settings.plan_price_business });
+      }
     } catch {
       setError(t("failedToLoadRevenue"));
     } finally {
@@ -167,6 +172,11 @@ export default function AdminRevenuePage() {
           value={`₺${(revenue?.mrr || 0).toLocaleString()}`}
           icon={<span className="text-lg" aria-hidden="true">💰</span>}
           color="violet"
+          trend={revenue?.mrr_trend != null && revenue.mrr_trend !== 0 ? {
+            value: Math.abs(revenue.mrr_trend),
+            label: t('vsLastMonth') || 'vs last month',
+            direction: revenue.mrr_trend > 0 ? 'up' : 'down',
+          } : undefined}
         />
         <StatCard
           label={t('totalRevenueLabel')}
@@ -188,6 +198,18 @@ export default function AdminRevenuePage() {
           <span className="text-2xl" aria-hidden="true">⬇</span>
           <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300">{t('exportReport')}</span>
         </button>
+      </div>
+
+      {/* Plan Prices Info */}
+      <div className="glass-card p-4 flex flex-wrap items-center gap-4 text-sm">
+        <span className="text-gray-500 dark:text-slate-400 font-medium">💰 {t('planPrices') || 'Plan Prices'}:</span>
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-medium">
+          {t('proPlan') || 'Pro'}: ${planPrices.pro}/mo
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 text-xs font-medium">
+          {t('businessPlan') || 'Business'}: ${planPrices.business}/mo
+        </span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">{t('configurableFromSettings') || 'Configurable from Settings'}</span>
       </div>
 
       {hasRevenueData ? (
