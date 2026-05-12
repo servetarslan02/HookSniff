@@ -40,7 +40,7 @@ impl StripePrices {
     pub fn for_plan(&self, plan: &Plan) -> Option<&str> {
         match plan {
             Plan::Pro => Some(&self.pro_monthly),
-            Plan::Business => Some(&self.business_monthly),
+            Plan::Enterprise => Some(&self.business_monthly),
             _ => None,
         }
     }
@@ -628,7 +628,7 @@ async fn handle_chargeback_created(
 
         if let Some((customer_id,)) = customer_row {
             // Downgrade to free and clear subscription
-            let free_limit = crate::billing::Plan::Free.max_webhooks_per_month() as i32;
+            let free_limit = crate::billing::Plan::Developer.max_webhooks_per_month() as i32;
             sqlx::query(
                 "UPDATE customers SET \
                  plan = 'free', webhook_limit = $1, \
