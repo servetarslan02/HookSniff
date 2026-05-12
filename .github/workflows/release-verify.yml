@@ -1,0 +1,139 @@
+name: Release Verification
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-verify-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # --- Full test suite on release tags ---
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: hooksniff
+          POSTGRES_PASSWORD: hooksniff_test
+          POSTGRES_DB: hooksniff
+        options: >-
+          --health-cmd="pg_isready -U hooksniff -d hooksniff"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/cache@v4
+        with:
+          path: target/
+          key: ${{ runner.os }}-cargo-release-verify-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-release-verify-
+
+      - name: Run Rust tests
+        run: cargo test --workspace
+        env:
+          DATABASE_URL: postgresql://hooksniff:hooksniff_test@localhost:5432/hooksniff?sslmode=disable
+
+  # --- Dashboard tests on release tags ---
+  dashboard-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Install dependencies
+        working-directory: dashboard
+        run: npm ci
+
+      - name: Lint
+        working-directory: dashboard
+        run: npm run lint
+
+      - name: Test
+        working-directory: dashboard
+        run: npm test
+
+      - name: Build
+        working-directory: dashboard
+        run: npm run build
+
+  # --- Security audit ---
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Rust audit
+        run: cargo audit
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Node audit
+        working-directory: dashboard
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  # --- Build verification (all services) ---
+  build:
+    needs: [test, dashboard-test]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - service: api
+            package: hooksniff-api
+          - service: worker
+            package: hooksniff-worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/cache@v4
+        with:
+          path: target/
+          key: ${{ runner.os }}-cargo-release-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-release-build-
+
+      - name: Build ${{ matrix.service }}
+        run: cargo build --release -p ${{ matrix.package }}
+
+  # --- Tag format validation ---
+  tag-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate semver tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          if ! echo "$TAG" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$'; then
+            echo "❌ Invalid tag format: $TAG (expected semver like v1.2.3)"
+            exit 1
+          fi
+          echo "✅ Valid semver tag: v$TAG"

@@ -98,6 +98,18 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
                   key: HMAC_SECRET
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
 ---
