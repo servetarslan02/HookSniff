@@ -169,8 +169,9 @@ export default function RetryPolicyPage() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxAttempts')}</label>
+                <label htmlFor="retry-max-attempts" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxAttempts')}</label>
                 <input
+                  id="retry-max-attempts"
                   type="number"
                   min={1}
                   max={20}
@@ -211,8 +212,9 @@ export default function RetryPolicyPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('initialDelay')}</label>
+                  <label htmlFor="retry-initial-delay" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('initialDelay')}</label>
                   <input
+                    id="retry-initial-delay"
                     type="number"
                     min={1}
                     value={policy.default_initial_delay_secs}
@@ -221,8 +223,9 @@ export default function RetryPolicyPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxDelay')}</label>
+                  <label htmlFor="retry-max-delay" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxDelay')}</label>
                   <input
+                    id="retry-max-delay"
                     type="number"
                     min={1}
                     value={policy.default_max_delay_secs}
@@ -233,8 +236,9 @@ export default function RetryPolicyPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('requestTimeout')}</label>
+                <label htmlFor="retry-timeout" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('requestTimeout')}</label>
                 <input
+                  id="retry-timeout"
                   type="number"
                   min={5}
                   max={120}
@@ -266,8 +270,9 @@ export default function RetryPolicyPage() {
             </label>
             {policy.dead_letter_queue_enabled && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxAge')}</label>
+                <label htmlFor="retry-max-age" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('maxAge')}</label>
                 <input
+                  id="retry-max-age"
                   type="number"
                   min={1}
                   value={policy.dead_letter_queue_max_age_hours}
