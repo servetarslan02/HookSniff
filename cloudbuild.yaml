@@ -80,5 +80,6 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 availableSecrets:
-  - versionName: projects/hooksniff-app/secrets/neon-db-url/versions/latest
-    env: DATABASE_URL
+  secretManager:
+    - versionName: projects/hooksniff-app/secrets/neon-db-url/versions/latest
+      env: DATABASE_URL
