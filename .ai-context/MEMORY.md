@@ -452,8 +452,12 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **API image başarılı** — Step 0 geçti, Cloud Run deploy edildi
 - **Worker image başarısız** — 3 compile hatası kaldı
 
-## Oturum 132 (2026-05-12 23:00 GMT+8) — OpenClaw Yeni Platform
+## Oturum 132 (2026-05-12 23:00-23:05 GMT+8) — OpenClaw Yeni Platform
 - **Platform:** OpenClaw'a geçiş, yeni session başlatıldı
 - **GitHub hafıza:** `.ai-context/` üzerinden okuma yapıldı, context yüklendi
-- **Durum:** Worker build hatası düzeltilecek (NEXT_SESSION.md)
-- **Görev:** Worker'da `common::` → `hooksniff_common::` + `PgTransaction` lifetime fix
+- **Worker build hatası düzeltildi** ✅:
+  - `worker/src/delivery/http.rs`: `common::` → `hooksniff_common::`
+  - `worker/src/main.rs`: `PgTransaction` → `PgTransaction<'_>` (2 yer)
+  - Commit: `52a2e63a` — main branch
+- **Cloud Build worker image artık derlenebilir**
+- **Genel İlerleme: 359/364 (%99)** — 5 kalan ⬜ (hepsi Servet görevleri)
