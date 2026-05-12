@@ -70,6 +70,34 @@ pub fn validate_url(url: &str) -> Result<(), String> {
     crate::ssrf::validate_url(url).map_err(|e| e.to_string())
 }
 
+/// Item 343: Validate HTTP header name per RFC 7230, Section 3.2.6.
+///
+/// Header field names must be tokens: ASCII letters, digits, and
+/// `!#$%&'*+-.^_` ` ` |~`. No whitespace, colons, or control chars.
+pub fn validate_header_name(name: &str) -> Result<(), String> {
+    if name.is_empty() {
+        return Err("Header name must not be empty".into());
+    }
+    let valid = name.bytes().all(|b| {
+        matches!(
+            b,
+            b'A'..=b'Z'
+                | b'a'..=b'z'
+                | b'0'..=b'9'
+                | b'!' | b'#' | b'$' | b'%' | b'&'
+                | b'\'' | b'*' | b'+' | b'-' | b'.'
+                | b'^' | b'_' | b'`' | b'|' | b'~'
+        )
+    });
+    if !valid {
+        return Err(format!(
+            "Header name '{}' contains invalid characters (RFC 7230)",
+            name
+        ));
+    }
+    Ok(())
+}
+
 /// Validate JSON nesting depth. Returns error if depth exceeds MAX_JSON_DEPTH.
 pub fn validate_json_depth(value: &serde_json::Value) -> Result<(), String> {
     fn check_depth(value: &serde_json::Value, current: usize) -> Result<(), String> {
@@ -232,5 +260,44 @@ mod tests {
     fn test_validate_json_depth_nested_array() {
         let val = serde_json::json!({"items": [1, {"nested": true}]});
         assert!(validate_json_depth(&val).is_ok());
+    }
+
+    // ── validate_header_name (Item 343) ─────────────────────
+
+    #[test]
+    fn test_validate_header_name_valid() {
+        assert!(validate_header_name("X-Custom-Header").is_ok());
+        assert!(validate_header_name("Content-Type").is_ok());
+        assert!(validate_header_name("Authorization").is_ok());
+        assert!(validate_header_name("X-Request-Id").is_ok());
+        assert!(validate_header_name("X").is_ok());
+    }
+
+    #[test]
+    fn test_validate_header_name_invalid() {
+        assert!(validate_header_name("").is_err());
+        assert!(validate_header_name("Header:Value").is_err()); // colon
+        assert!(validate_header_name("Header With Space").is_err()); // space
+        assert!(validate_header_name("Header\tTab").is_err()); // tab
+        assert!(validate_header_name("Header\nNewline").is_err()); // newline
+        assert!(validate_header_name("Header(value)").is_err()); // parens
+        assert!(validate_header_name("Header<angle>").is_err()); // angle brackets
+        assert!(validate_header_name("Header@at").is_err()); // @
+        assert!(validate_header_name("Header,comma").is_err()); // comma
+        assert!(validate_header_name("Header;semi").is_err()); // semicolon
+        assert!(validate_header_name("Header\"quote").is_err()); // double quote
+        assert!(validate_header_name("Header/slash").is_err()); // slash
+        assert!(validate_header_name("Header[bracket]").is_err()); // brackets
+        assert!(validate_header_name("Header?query").is_err()); // question mark
+        assert!(validate_header_name("Header=equals").is_err()); // equals
+        assert!(validate_header_name("Header{brace}").is_err()); // braces
+    }
+
+    #[test]
+    fn test_validate_header_name_special_chars() {
+        // All RFC-allowed special chars
+        assert!(validate_header_name("!#$%&'*+-.^_`|~").is_ok());
+        // Digits
+        assert!(validate_header_name("X-123").is_ok());
     }
 }
