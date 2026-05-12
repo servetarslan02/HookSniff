@@ -9,15 +9,17 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations, useLocale } from 'next-intl';
 
 const PLAN_OPTIONS = [
-  { value: 'free', labelKey: 'freePlan' },
+  { value: 'developer', labelKey: 'developerPlan' },
+  { value: 'startup', labelKey: 'startupPlan' },
   { value: 'pro', labelKey: 'proPlan' },
-  { value: 'business', labelKey: 'businessPlan' },
+  { value: 'enterprise', labelKey: 'enterprisePlan' },
 ];
 
 const PLAN_BADGE_COLORS: Record<string, string> = {
-  free: 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300',
+  developer: 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300',
+  startup: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
   pro: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
-  business: 'bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400',
+  enterprise: 'bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400',
 };
 
 export default function AdminUsersPage() {
@@ -323,7 +325,7 @@ export default function AdminUsersPage() {
               ✅ {t('bulkUnban') || 'Unban Selected'}
             </button>
             <button type="button"
-              onClick={() => { setBulkAction('plan'); setBulkPlan('free'); }}
+              onClick={() => { setBulkAction('plan'); setBulkPlan('developer'); }}
               className="px-3 py-1.5 text-xs font-medium text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-500/10 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-500/20 transition"
             >
               📋 {t('bulkChangePlan') || 'Change Plan'}
@@ -465,7 +467,7 @@ export default function AdminUsersPage() {
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{u.name || '—'}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1.5">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${PLAN_BADGE_COLORS[u.plan] || PLAN_BADGE_COLORS.free}`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${PLAN_BADGE_COLORS[u.plan] || PLAN_BADGE_COLORS.developer}`}>
                             {u.plan}
                           </span>
                           {u.role && u.role !== 'member' && (

@@ -414,7 +414,7 @@ async fn change_plan(
     let limit = match req.plan.as_str() {
         "startup" => 30_000,
         "pro" => 100_000,
-        "enterprise" => u32::MAX as u64,
+        "enterprise" => u64::MAX,
         _ => 10_000, // developer
     };
 
@@ -429,7 +429,7 @@ async fn change_plan(
         let old_limit = match old_plan.0.as_str() {
             "startup" => 30_000,
             "pro" => 100_000,
-            "enterprise" => u32::MAX as u64,
+            "enterprise" => u64::MAX,
             _ => 10_000,
         };
         limit > old_limit // Reset only on upgrade
