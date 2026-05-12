@@ -112,3 +112,13 @@
 - **Adımlar:**
   1. i18n key'leri ekle: `loadingLogs`, `logsSubtitle`, `refresh`, `close`
   2. Tablo header'ları: `thId`, `thEvent`, `thEndpoint`, `thStatus`, `thAttempts`, `thResponse`, `thTime`
+
+### 🔴 Kod Kalitesi
+
+#### KK-01: useDeliveryStream Hook Kullanılmıyor
+- **Dosya:** `dashboard/src/hooks/useDeliveryStream.ts`
+- **Sorun:** Real-time SSE delivery stream hook'u tanımlı ve test ediliyor ama hiçbir sayfa kullanmıyor.
+- **Adımlar:**
+  1. Logs veya Deliveries sayfasına entegre et
+  2. Auto-refresh yerine SSE ile gerçek zamanlı güncelleme
+  3. Bağlantı durumu göstergesi (bağlı/bağlanıyor/koptu)
