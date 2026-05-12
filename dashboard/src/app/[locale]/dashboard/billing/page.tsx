@@ -134,7 +134,7 @@ export default function BillingPage() {
         setUsageLimit(limit);
 
         const now = new Date();
-        const monthLabel = now.toLocaleString('en', { month: 'short' });
+        const monthLabel = now.toLocaleString(locale, { month: 'short' });
         setChartData([{ month: monthLabel, count: used }]);
       })
       .catch(() => {
@@ -254,7 +254,7 @@ export default function BillingPage() {
                 {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
               </span>
               <span className="text-sm text-gray-500 dark:text-slate-400">
-                {t('nextBilling')}: {new Date(nextBillingDate).toLocaleDateString()}
+                {t('nextBilling')}: {new Date(nextBillingDate).toLocaleDateString(locale)}
               </span>
             </div>
           </div>
@@ -382,7 +382,7 @@ export default function BillingPage() {
         {loadingInvoices ? (
           <div className="px-6 py-12 text-center">
             <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
-            <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">Loading invoices…</p>
+            <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">{tc('loading')}</p>
           </div>
         ) : invoices.length === 0 ? (
           <div className="px-6 py-12 text-center">
@@ -394,19 +394,19 @@ export default function BillingPage() {
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    Invoice
+                    {t('invoice')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    Date
+                    {t('date')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    Plan
+                    {t('plan')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    Amount
+                    {t('amount')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    Status
+                    {t('status')}
                   </th>
                 </tr>
               </thead>
@@ -417,7 +417,7 @@ export default function BillingPage() {
                       {inv.id.slice(0, 8)}…
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
-                      {new Date(inv.date).toLocaleDateString()}
+                      {new Date(inv.date).toLocaleDateString(locale)}
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm font-medium text-gray-900 dark:text-white">{inv.plan}</span>

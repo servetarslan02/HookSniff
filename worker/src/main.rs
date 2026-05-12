@@ -209,8 +209,8 @@ async fn main() -> Result<()> {
     };
 
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
-    tracing::info!("🔒 Concurrent delivery limit: 10");
-    tracing::info!("⚡ Circuit breaker: 5 failures → 60s cooldown");
+    tracing::info!("🔒 Concurrent delivery limit: {}", DELIVERY_CONCURRENCY_LIMIT);
+    tracing::info!("⚡ Circuit breaker: {} failures → {}s cooldown", CIRCUIT_BREAKER_FAILURE_THRESHOLD, CIRCUIT_BREAKER_COOLDOWN_SECS);
 
     // Graceful shutdown: listen for SIGTERM/SIGINT
     let shutdown = shutdown_signal();
