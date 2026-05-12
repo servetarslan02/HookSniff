@@ -405,6 +405,7 @@ export interface LatencyTrendResponse {
 // Admin API types
 export interface AuditLogEntry {
   id: string;
+  customer_id?: string;
   action: string;
   resource_type: string;
   resource_id?: string;
@@ -500,7 +501,7 @@ export const adminApi = {
   getChurn: (token: string) =>
     apiFetch<{ users: ChurnUser[] }>('/admin/churn', { token }),
 
-  exportUsers: (token: string, params?: { format?: string; plan?: string; status?: string }) => {
+  exportUsers: (_token: string, params?: { format?: string; plan?: string; status?: string }) => {
     const searchParams = new URLSearchParams();
     searchParams.set('format', params?.format || 'csv');
     if (params?.plan) searchParams.set('plan', params.plan);
@@ -508,7 +509,7 @@ export const adminApi = {
     return `/v1/admin/users/export?${searchParams.toString()}`;
   },
 
-  exportRevenue: (token: string, months?: number) => {
+  exportRevenue: (_token: string, months?: number) => {
     const searchParams = new URLSearchParams();
     searchParams.set('format', 'csv');
     if (months) searchParams.set('months', months.toString());
