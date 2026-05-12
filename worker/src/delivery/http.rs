@@ -170,7 +170,7 @@ pub fn truncate_str(s: &str, max_len: usize) -> String {
 ///
 /// Delegates to common::header_validation to avoid duplication with api.
 fn is_valid_header_name(name: &str) -> bool {
-    common::header_validation::is_valid_header_name(name)
+    hooksniff_common::header_validation::is_valid_header_name(name)
 }
 
 /// SSRF protection for webhook delivery.
