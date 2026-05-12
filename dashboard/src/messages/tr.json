@@ -1423,6 +1423,43 @@
         "Özel destek",
         "SLA garantisi",
         "Özel entegrasyonlar"
+      ],
+      "enterpriseFeatures": [
+        "Sınırsız her şey",
+        "Özel SLA (%99,99 uptime)",
+        "SSO / SAML",
+        "Özel hesap yöneticisi",
+        "Özel entegrasyonlar",
+        "Yerinde kurulum",
+        "Öncelikli destek",
+        "Özel sözleşmeler"
+      ],
+      "developerFeatures": [
+        "Günlük 100 event",
+        "1 uygulama",
+        "5 endpoint",
+        "10 event tipi",
+        "10 abonelik",
+        "7 günlük log",
+        "HMAC imzası",
+        "2FA desteği",
+        "Üstel geri çekilme",
+        "Topluluk desteği"
+      ],
+      "startupFeatures": [
+        "Günlük 30.000 event",
+        "1 uygulama",
+        "50 endpoint",
+        "50 event tipi",
+        "300 abonelik",
+        "14 günlük log",
+        "Never-blocked modu",
+        "Event başına $0.003 overage",
+        "CloudEvents v1.0",
+        "Gizli anahtar rotasyonu",
+        "Ölü mektup kuyruğu",
+        "Özel yeniden deneme politikaları",
+        "E-posta desteği"
       ]
     },
     "footer": {
