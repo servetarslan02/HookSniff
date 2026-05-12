@@ -387,6 +387,7 @@ mod tests {
             throttle_rate: None,
             throttle_period_secs: None,
             throttle_strategy: None,
+            application_id: None,
         };
 
         assert!(ep.is_ip_allowed("192.168.1.1"));
@@ -426,6 +427,7 @@ mod tests {
             throttle_rate: None,
             throttle_period_secs: None,
             throttle_strategy: None,
+            application_id: None,
         };
 
         assert!(ep.matches_event_filter("order.created"));
@@ -488,6 +490,7 @@ mod tests {
             throttle_rate: None,
             throttle_period_secs: None,
             throttle_strategy: None,
+            application_id: None,
         }
     }
 
@@ -766,6 +769,7 @@ mod tests {
             avg_response_ms: 100,
             failure_streak: 0,
             format: "standard".to_string(),
+            application_id: None,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["url"], "https://example.com");
