@@ -364,6 +364,30 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Item 238: Privacy & Consent Management */}
+      <div className="glass-card p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('privacyConsent')}</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
+            <div>
+              <div className="font-medium text-gray-900 dark:text-white">{t('cookieAnalytics')}</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400">{t('cookieAnalyticsDesc')}</div>
+            </div>
+            <ConsentToggle consentKey="cookie_consent" storageKey="hooksniff_cookie_consent" />
+          </div>
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
+            <div>
+              <div className="font-medium text-gray-900 dark:text-white">{t('marketingEmails')}</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400">{t('marketingEmailsDesc')}</div>
+            </div>
+            <ConsentToggle consentKey="marketing_consent" storageKey="hooksniff_marketing_consent" />
+          </div>
+          <p className="text-xs text-gray-400 dark:text-slate-500">
+            {t('consentWithdrawNote')}
+          </p>
+        </div>
+      </div>
+
       {/* Danger Zone */}
       <div className="glass-card p-6 border-red-200 dark:border-red-500/20">
         <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">{t('dangerZone')}</h3>
@@ -473,5 +497,49 @@ function ToggleRow({
         />
       </button>
     </div>
+  );
+}
+
+/* ─── Item 238: Consent Toggle Component ─── */
+function ConsentToggle({
+  consentKey: _consentKey,
+  storageKey,
+}: {
+  consentKey: string;
+  storageKey: string;
+}) {
+  const [enabled, setEnabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(storageKey) === 'true';
+  });
+
+  const handleToggle = () => {
+    const newValue = !enabled;
+    setEnabled(newValue);
+    localStorage.setItem(storageKey, String(newValue));
+    // Also set/remove the cookie for backend consent tracking
+    if (newValue) {
+      document.cookie = `${storageKey}=true; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+    } else {
+      document.cookie = `${storageKey}=; path=/; max-age=0`;
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={enabled}
+      onClick={handleToggle}
+      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+        enabled ? 'bg-brand-600 dark:bg-brand-500' : 'bg-gray-300 dark:bg-slate-600'
+      }`}
+    >
+      <div
+        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+          enabled ? 'translate-x-5' : 'translate-x-0'
+        }`}
+      />
+    </button>
   );
 }
