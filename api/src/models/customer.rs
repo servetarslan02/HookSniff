@@ -49,6 +49,12 @@ pub struct Customer {
     pub totp_secret: Option<String>,
     #[serde(default)]
     pub totp_enabled: bool,
+    /// Whether the subscription should cancel at the end of the current billing period.
+    #[serde(default)]
+    pub cancel_at_period_end: bool,
+    /// Timestamp when payment last failed (for grace period tracking).
+    #[serde(default)]
+    pub payment_failed_at: Option<DateTime<Utc>>,
 }
 
 fn default_payment_provider() -> String {
@@ -224,6 +230,8 @@ mod tests {
             email_verified: true,
             totp_secret: Some("SECRET123".to_string()),
             totp_enabled: false,
+            cancel_at_period_end: false,
+            payment_failed_at: None,
         }
     }
 
@@ -300,6 +308,8 @@ mod tests {
         assert!(!c.totp_enabled);
         assert!(c.name.is_none());
         assert!(c.password_hash.is_none());
+        assert!(!c.cancel_at_period_end);
+        assert!(c.payment_failed_at.is_none());
     }
 
     #[test]

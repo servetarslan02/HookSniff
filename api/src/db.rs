@@ -1273,6 +1273,18 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 49: Migration 048 — cancel_at_period_end column (Item 257)
+    run_migration(
+        pool,
+        "048_cancel_at_period_end",
+        r#"
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS cancel_at_period_end BOOLEAN NOT NULL DEFAULT false;
+        CREATE INDEX IF NOT EXISTS idx_customers_cancel_at_period_end
+            ON customers(cancel_at_period_end) WHERE cancel_at_period_end = true;
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
