@@ -316,6 +316,7 @@ export interface AdminStatsResponse {
     total_deliveries_yesterday: number;
     revenue_yesterday: number;
     active_users_yesterday: number;
+    active_webhooks: number;
   };
 }
 
@@ -487,6 +488,12 @@ export const adminApi = {
   updateUserPlan: (token: string, id: string, plan: string) =>
     apiFetch<{ success: boolean }>(`/admin/users/${id}/plan`, { method: 'PUT', body: { plan }, token }),
 
+  getUserPlanHistory: (token: string, id: string) =>
+    apiFetch<{ history: Array<{ action: string; details: Record<string, unknown>; created_at: string }> }>(`/admin/users/${id}/plan-history`, { token }),
+
+  sendUserEmail: (token: string, id: string, subject: string, body: string) =>
+    apiFetch<{ message: string }>(`/admin/users/${id}/send-email`, { method: 'POST', body: { subject, body }, token }),
+
   updateUserStatus: (token: string, id: string, status: 'active' | 'banned') =>
     apiFetch<{ success: boolean }>(`/admin/users/${id}/status`, { method: 'PUT', body: { is_active: status === 'active' }, token }),
 
@@ -563,6 +570,10 @@ export interface PlatformSettings {
   plan_price_business: number;
   resend_api_key: string | null;
   email_sender: string | null;
+  webhook_secret: string | null;
+  backup_retention_days: number;
+  global_rate_limit: number;
+  cors_origins: string | null;
 }
 
 // Team API
