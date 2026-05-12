@@ -437,3 +437,17 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - RefreshTokenRequest, Enable2faRequest, Confirm2faRequest, Disable2faRequest
   - Verify2faRequest, RegisterDeviceRequest
 - **Genel İlerleme: 359/364 (%99)** — 5 kalan ⬜ (hepsi Servet görevleri)
+
+## Oturum 131 Ek — Cloud Build + GCP Kurulum (2026-05-12 22:23-22:58 GMT+8)
+- **GCP girişi** — Browser OAuth2 + 2FA ile tamamlandı
+- **RSA key pair** — Oluşturuldu, Secret Manager'a yüklendi
+- **Cloud Run güncellendi** — JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, JWT_KEY_ID eklendi
+- **Cloud Build denemeleri** — 4 deneme, 3 hata düzeltildi:
+  - Dockerfile: common/ dizini eksik → eklendi
+  - admin.rs: audit log_action signature uyumsuz → düzeltildi
+  - email.rs: syntax hatası (match arm) → düzeltildi
+  - validation.rs: common → hooksniff_common → düzeltildi
+  - clippy warnings: unused imports/vars → düzeltildi
+- **Worker build hatası kaldı** — hooksniff_common + PgTransaction lifetime (Oturum 132)
+- **API image başarılı** — Step 0 geçti, Cloud Run deploy edildi
+- **Worker image başarısız** — 3 compile hatası kaldı
