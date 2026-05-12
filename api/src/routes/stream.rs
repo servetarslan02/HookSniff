@@ -22,6 +22,7 @@ pub fn router() -> Router {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct StreamParams {
     pub since: Option<String>, // ISO timestamp or "now"
 }

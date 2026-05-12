@@ -38,6 +38,7 @@ pub fn router() -> Router {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PaginationParams {
     pub page: Option<i64>,
     pub per_page: Option<i64>,
@@ -866,6 +867,7 @@ async fn replay_delivery(
 // ─────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ExportUsersParams {
     pub format: Option<String>,
     pub plan: Option<String>,
@@ -954,6 +956,7 @@ async fn export_users_csv(
 // ─────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ExportRevenueParams {
     pub format: Option<String>,
     pub months: Option<i64>,
@@ -1093,6 +1096,7 @@ async fn impersonate_user(
 // ─────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnalyticsParams {
     pub days: Option<i64>,
 }
@@ -1343,6 +1347,7 @@ async fn churn_report(
 // ─────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdminAuditLogQuery {
     pub page: Option<i64>,
     pub per_page: Option<i64>,
