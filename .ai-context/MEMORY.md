@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 20:47 GMT+8
+> Son güncelleme: 2026-05-12 23:00 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -451,3 +451,9 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Worker build hatası kaldı** — hooksniff_common + PgTransaction lifetime (Oturum 132)
 - **API image başarılı** — Step 0 geçti, Cloud Run deploy edildi
 - **Worker image başarısız** — 3 compile hatası kaldı
+
+## Oturum 132 (2026-05-12 23:00 GMT+8) — OpenClaw Yeni Platform
+- **Platform:** OpenClaw'a geçiş, yeni session başlatıldı
+- **GitHub hafıza:** `.ai-context/` üzerinden okuma yapıldı, context yüklendi
+- **Durum:** Worker build hatası düzeltilecek (NEXT_SESSION.md)
+- **Görev:** Worker'da `common::` → `hooksniff_common::` + `PgTransaction` lifetime fix
