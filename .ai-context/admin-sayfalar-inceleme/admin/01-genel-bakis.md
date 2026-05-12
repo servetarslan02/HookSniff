@@ -81,3 +81,23 @@
 - **Endpoint durumu** — Toplam endpoint, aktif, devre dışı sayısı
 - **Standard Webhooks durumu** — Uyumluluk yüzdesi
 - **Deduplication stats** — Filtrelenen tekrarlayan event sayısı
+
+---
+
+## ✅ Yapılan Güncellemeler (2026-05-13)
+
+### Eklenen Özellikler
+1. **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir, trend gösterimi ile
+2. **Endpoint durumu** — Toplam, aktif, devre dışı endpoint sayısı + progress bar
+3. **Güvenlik uyarıları** — SSRF, spoofing, replay attempt sayıları (audit log'dan filtreleniyor)
+4. **Hızlı işlemler paneli** — Sistem sağlık, kullanıcılar, gelir, ayarlar sayfalarına hızlı erişim
+5. **i18n anahtarları** — 24 yeni Türkçe/İngilizce anahtar eklendi
+
+### Teknik Detaylar
+- `adminApi.getRevenue()` MRR/ARR hesaplaması için çağrılıyor
+- Audit log'dan güvenlik olayları filtreleniyor (SSRF, SPOOFING, REPLAY, ENDPOINT_DISABLE, RATE_LIMIT_EXCEEDED, ABUSE_DETECTED)
+- Endpoint verisi `AdminStatsResponse`'ta mevcut değilse güvenli şekilde `undefined` handle ediliyor
+- Tüm yeni bileşenler dark mode ve i18n destekli
+
+### Commit
+- `deb9fb28` — feat(admin): genel bakış sayfasına eksik özellikler eklendi
