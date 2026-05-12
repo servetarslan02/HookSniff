@@ -4,9 +4,9 @@
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
-- **Kalıcı hafıza:** `.ai-context/` GitHub'da, her 10 dakikada otomatik sync
+- **Kalıcı hafıza:** `.ai-context/` GitHub'da sync
 - **Workspace:** `/root/.openclaw/workspace/HookSniff/` (oturum sonunda silinir)
-- **Oturum başı:** `git pull` → MEMORY.md oku → NEXT_SESSION.md oku → devam et
+- **Oturum başı:** `git pull` → MEMORY.md oku → NEXT_SESSION.md oku 
 - **Oturum sonu:** Değişiklikleri push et, MEMORY.md güncelle
 
 ## Kullanıcı
