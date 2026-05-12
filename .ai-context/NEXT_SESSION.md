@@ -31,7 +31,7 @@
 | # | Görev | Öncelik |
 |---|-------|---------|
 | 1 | ~~Alert Thresholds backend bağlantısı~~ | ✅ Tamamlandı (Oturum 128) |
-| 2 | Migration 009 Neon DB'ye uygula | 🔴 |
+| 2 | ~~Migration 009 Neon DB'ye uygula~~ | ✅ | 46 migration zaten uygulanmış, 53 tablo mevcut (Oturum 128) |
 | 3 | `cargo test` + `cargo clippy` doğrulama (Rust toolchain gerekli) | 🔴 |
 | 4 | `next build` doğrulama | 🔴 |
 
