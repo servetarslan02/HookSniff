@@ -52,6 +52,7 @@ pub struct TeamInvite {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CreateTeamRequest {
     pub name: String,
 }
@@ -64,6 +65,7 @@ struct InviteRequest {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChangeRoleRequest {
     pub role: String,
 }
