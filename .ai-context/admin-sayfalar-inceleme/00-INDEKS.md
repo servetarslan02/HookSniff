@@ -1,7 +1,8 @@
 # 📋 Admin Sayfalar İnceleme — İndeks
 
 > Oluşturulma: 2026-05-12
-> Toplam: 30 sayfa + 1 admin panel (6 alt sayfa)
+> Son güncelleme: 2026-05-13
+> Toplam: 34 sayfa + 1 admin panel (6 alt sayfa)
 
 ## Sayfa Listesi
 
@@ -22,22 +23,27 @@
 | 13 | 🔐 İmza Aracı | /dashboard/signature-verifier | ✅ İncelendi |
 | 14 | 📥 API İçe Aktarıcı | /dashboard/api-importer | ✅ İncelendi |
 | 15 | 🔧 Webhook Oluşturucu | /dashboard/webhook-builder | ✅ İncelendi |
-| 16 | 📐 Şemalar | /dashboard/schemas | ✅ İncelendi |
-| 17 | 📄 Şablonlar | /dashboard/templates | ✅ İncelendi |
+| 16 | 📐 Şemalar | /dashboard/schemas | ✅ İncelendi + Uyumsuzluk |
+| 17 | 📄 Şablonlar | /dashboard/templates | ✅ İncelendi + Uyumsuzluk |
 | 18 | 🖼️ Portal Özelleştir | /dashboard/portal-customize | ✅ İncelendi |
 | 19 | 👤 Portal | /dashboard/portal-manage | ✅ İncelendi |
-| 20 | ⚡ Hız Sınırı | /dashboard/rate-limiting | ✅ İncelendi |
+| 20 | ⚡ Hız Sınırı | /dashboard/rate-limiting | ✅ İncelendi + Uyumsuzluk |
 | 21 | 📋 Denetim Günlüğü | /dashboard/audit-log | ✅ İncelendi |
 | 22 | 🔐 SSO / SAML | /dashboard/sso | ✅ İncelendi |
 | 23 | 🔄 Tekrar Politikası | /dashboard/retry-policy | ✅ İncelendi |
-| 24 | 🔀 Yönlendirme | /dashboard/routing | ✅ İncelendi |
+| 24 | 🔀 Yönlendirme | /dashboard/routing | ✅ İncelendi + Uyumsuzluk |
 | 25 | 🌐 Özel Alan Adı | /dashboard/custom-domain | ✅ İncelendi |
 | 26 | 👥 Ekip | /dashboard/team | ✅ İncelendi |
 | 27 | 🔔 Bildirimler | /dashboard/notifications | ✅ İncelendi |
 | 28 | 💳 Faturalandırma | /dashboard/billing | ✅ İncelendi |
 | 29 | ⚙️ Ayarlar | /dashboard/settings | ✅ İncelendi |
-| 30 | ⚡ Yönetici Paneli | /admin (6 alt sayfa) | ✅ İncelendi |
-| 31 | 🧪 Webhook Araçları | /admin/webhook-tools | 🔴 Eklenecek |
+| 30 | 📱 Uygulamalar | /dashboard/applications | 🔴 Yeni — Backend var, frontend yok |
+| 31 | 🧪 Simülatör | /dashboard/simulator | 🔴 Yeni — Backend var, frontend yok |
+| 32 | 📡 Stream | /dashboard/stream | 🔴 Yeni — Backend var, frontend yok |
+| 33 | 🌐 Çıkış IP'leri | /dashboard/outbound-ips | 🔴 Yeni — Backend var, frontend yok |
+| 34 | 📲 Cihazlar | /dashboard/devices | 🔴 Yeni — Backend var, frontend yok |
+| 35 | ⚡ Yönetici Paneli | /admin (6 alt sayfa) | ✅ İncelendi |
+| 36 | 🧪 Webhook Araçları | /admin/webhook-tools | 🔴 Eklenecek |
 
 ## 📄 Ek Analiz Dosyaları
 - `PATRON-NE-YAPABILMELI.md` — Kapsamlı admin yetenek analizi (sektör karşılaştırmalı)
@@ -46,6 +52,30 @@
 - /dashboard/deliveries/[id] — Teslimat detay
 - /dashboard/endpoints/[id] — Endpoint detay
 - /dashboard/webhooks/new — Yeni webhook
+- /dashboard/webhooks/glossary — Webhook terimleri sözlüğü
+- /dashboard/webhooks/guides — Webhook rehberleri
+
+## Backend-Frontend Uyumsuzluğu Özeti (2026-05-13)
+
+### 🔴 Backend'de VAR, Frontend'de YOK (5 sayfa)
+| # | Sayfa | Backend Route | Frontend Durum |
+|---|-------|---------------|----------------|
+| 30 | Uygulamalar | `/v1/applications` (CRUD) | ❌ Sayfa yok |
+| 31 | Simülatör | `/v1/simulator` (test) | ❌ Sayfa yok |
+| 32 | Stream | `/v1/stream` (SSE) | ❌ Sayfa yok |
+| 33 | Çıkış IP'leri | `/v1/outbound-ips` | ❌ Sayfa yok |
+| 34 | Cihazlar | `/v1/devices` (CRUD) | ❌ Sayfa yok |
+
+### 🟡 Backend'de VAR, Frontend'de EKSİK (7 sayfa)
+| # | Sayfa | Eksik Özellik | Backend Endpoint |
+|---|-------|---------------|------------------|
+| 07 | Uyarılar | Düzenleme, pause/resume | `PUT /v1/alerts/{id}` |
+| 11 | Dönüştürmeler | Düzenleme, sıralama, test | — (backend'e eklenmeli) |
+| 12 | Gelen | Silme, düzenleme, test | — (backend'e eklenmeli) |
+| 16 | Şemalar | Oluşturma, silme, doğrulama | `POST /v1/schemas`, `POST /v1/schemas/{id}/validate` |
+| 17 | Şablonlar | Kullan (apply), detay | `POST /v1/templates/{id}/apply` |
+| 20 | Hız Sınırı | Ayarlama, silme | `POST /v1/rate-limits/{id}`, `DELETE /v1/rate-limits/{id}` |
+| 24 | Yönlendirme | Düzenleme, fallback URL | `PUT /v1/endpoints/{id}/routing` |
 
 ## Genel İstatistikler
 
@@ -65,6 +95,8 @@
 - ⚠️ Export/indirme özellikleri eksik
 
 ### Kritik Eksiklikler
+- 🔴 5 sayfa tamamen eksik (backend var, frontend yok)
+- 🔴 7 sayfada düzenleme/yazma eksik (backend var, frontend sadece okuma)
 - 🔴 Düzenleme (update) çoğu sayfada yok
 - 🔴 Toplu işlem çoğu sayfada yok
 - 🔴 Export (CSV/JSON) hiçbir sayfada yok

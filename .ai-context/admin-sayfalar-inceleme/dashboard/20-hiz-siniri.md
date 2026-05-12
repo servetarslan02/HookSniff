@@ -32,3 +32,26 @@
 - Endpoint bazlı limit ayarlama
 - Throttle geçmişi grafiği
 - Rate limit alert entegrasyonu
+
+---
+
+## 🔧 Backend & Frontend Uyumsuzluğu (2026-05-13)
+
+### Backend'de Var, Frontend'de Yok
+| Özellik | Backend | Frontend | Durum |
+|---------|---------|----------|-------|
+| Rate limit ayarlama | `POST /v1/rate-limits/{endpoint_id}` (set_rate_limit) | ❌ Form yok | EKLENMELİ |
+| Rate limit silme | `DELETE /v1/rate-limits/{endpoint_id}` (delete_rate_limit) | ❌ Buton yok | EKLENMELİ |
+
+### Yapılacaklar
+1. **Rate Limit Ayarlama Formu** — Endpoint bazlı limit
+   - Backend: `POST /v1/rate-limits/{endpoint_id}` zaten var
+   - Frontend: "Limit Ayarla" butonu → Modal: endpoint seç, requests_per_second, burst_size input
+   - Mevcut limit varsa düzenleme modu
+2. **Rate Limit Silme** — Endpoint limitini kaldırma
+   - Backend: `DELETE /v1/rate-limits/{endpoint_id}` zaten var
+   - Frontend: ConfirmDialog ile silme butonu
+3. **Endpoint Bazlı Limit Düzenleme** — Mevcut limiti değiştirme
+   - Frontend: Her rate limit kartında "Düzenle" butonu → inline edit veya modal
+4. **Toplu Rate Limit** — Tüm endpoint'ler için varsayılan limit
+   - Frontend: "Varsayılan Limit" kartı + ayarlama formu
