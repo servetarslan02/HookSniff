@@ -115,7 +115,7 @@ const MOCK_SUCCESS_RATE = {
   success_rate: 90.8,
 };
 
-const { default: DashboardOverview } = await import('@/app/[locale]/dashboard/page');
+const { default: DashboardOverview } = await import('@/app/[locale]/[username]/page');
 
 describe('DashboardOverview - Extended', () => {
   beforeEach(() => {

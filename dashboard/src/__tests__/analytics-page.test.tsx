@@ -54,7 +54,7 @@ vi.mock('@/components/tremor', () => ({
   StatCard: ({ label }: { label: string }) => React.createElement('div', null, label),
 }));
 
-const { default: AnalyticsPage } = await import('@/app/[locale]/dashboard/analytics/page');
+const { default: AnalyticsPage } = await import('@/app/[locale]/[username]/analytics/page');
 
 describe('AnalyticsPage', () => {
   beforeEach(() => {

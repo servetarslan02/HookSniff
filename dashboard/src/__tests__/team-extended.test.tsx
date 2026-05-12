@@ -46,7 +46,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
-const { default: TeamPage } = await import('@/app/[locale]/dashboard/team/page');
+const { default: TeamPage } = await import('@/app/[locale]/[username]/team/page');
 
 const mockTeams = [
   { id: 't1', name: 'Engineering', description: 'Dev team', member_count: 3, created_at: '2024-01-01T00:00:00Z' },

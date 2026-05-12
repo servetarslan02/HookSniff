@@ -20,7 +20,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: RateLimitingPage } = await import('@/app/[locale]/dashboard/rate-limiting/page');
+const { default: RateLimitingPage } = await import('@/app/[locale]/[username]/rate-limiting/page');
 
 describe('RateLimitingPage', () => {
   beforeEach(() => {
@@ -99,7 +99,7 @@ describe('RateLimitingPage', () => {
     vi.doMock('@/lib/store', () => ({
       useAuth: () => ({ token: null }),
     }));
-    const { default: Page } = await import('@/app/[locale]/dashboard/rate-limiting/page');
+    const { default: Page } = await import('@/app/[locale]/[username]/rate-limiting/page');
     await act(async () => {
       render(React.createElement(Page));
     });

@@ -35,7 +35,7 @@ vi.mock('@/components/LoadingSpinner', () => ({
   default: () => React.createElement('div', { 'data-testid': 'loading-spinner' }, 'Loading'),
 }));
 
-const { default: SendWebhookPage } = await import('@/app/[locale]/dashboard/webhooks/new/page');
+const { default: SendWebhookPage } = await import('@/app/[locale]/[username]/webhooks/new/page');
 
 const MOCK_ENDPOINTS = [
   { id: 'ep1', url: 'https://api.example.com/webhook' },
@@ -232,7 +232,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
       webhooksApi: { create: mockWebhooksCreate },
     }));
     vi.doMock('@/components/LoadingSpinner', () => ({ default: () => null }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/webhooks/new/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/webhooks/new/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

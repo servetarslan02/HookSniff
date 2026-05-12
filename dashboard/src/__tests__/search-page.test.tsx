@@ -38,7 +38,7 @@ const mockResults = {
   query: 'order',
 };
 
-const { default: SearchPage } = await import('@/app/[locale]/dashboard/search/page');
+const { default: SearchPage } = await import('@/app/[locale]/[username]/search/page');
 
 describe('SearchPage', () => {
   beforeEach(() => {

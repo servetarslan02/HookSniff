@@ -18,7 +18,7 @@ vi.mock('@/lib/store', () => ({
   useAuth: () => ({ token: 'test-token' }),
 }));
 
-const { default: HealthPage } = await import('@/app/[locale]/dashboard/health/page');
+const { default: HealthPage } = await import('@/app/[locale]/[username]/health/page');
 
 describe('HealthPage', () => {
   beforeEach(() => {

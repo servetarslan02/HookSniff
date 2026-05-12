@@ -72,7 +72,7 @@ const MOCK_SEARCH_RESULTS = {
   query: 'order',
 };
 
-const { default: SearchPage } = await import('@/app/[locale]/dashboard/search/page');
+const { default: SearchPage } = await import('@/app/[locale]/[username]/search/page');
 
 describe('SearchPage - Extended', () => {
   let fetchSpy: ReturnType<typeof vi.fn>;

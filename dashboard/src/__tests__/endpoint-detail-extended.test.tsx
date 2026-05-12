@@ -59,7 +59,7 @@ const mockEndpoint = {
   },
 };
 
-const { default: EndpointSettingsPage } = await import('@/app/[locale]/dashboard/endpoints/[id]/page');
+const { default: EndpointSettingsPage } = await import('@/app/[locale]/[username]/endpoints/[id]/page');
 
 describe('EndpointSettingsPage', () => {
   beforeEach(() => {

@@ -32,7 +32,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: InboundPage } = await import('@/app/[locale]/dashboard/inbound/page');
+const { default: InboundPage } = await import('@/app/[locale]/[username]/inbound/page');
 
 const MOCK_ENDPOINTS = [
   { id: 'ep1', url: 'https://api.example.com/webhook' },
@@ -202,7 +202,7 @@ describe('InboundPage - Ultra Coverage', () => {
       endpointsApi: { list: mockEndpointsList },
       inboundApi: { listConfigs: mockInboundListConfigs, createConfig: mockInboundCreateConfig },
     }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/inbound/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/inbound/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

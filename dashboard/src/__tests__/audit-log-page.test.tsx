@@ -42,7 +42,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: AuditLogPage } = await import('@/app/[locale]/dashboard/audit-log/page');
+const { default: AuditLogPage } = await import('@/app/[locale]/[username]/audit-log/page');
 
 const MOCK_ENTRIES = [
   {

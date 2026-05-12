@@ -38,7 +38,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: ApiSpecImporterPage } = await import('@/app/[locale]/dashboard/api-importer/page');
+const { default: ApiSpecImporterPage } = await import('@/app/[locale]/[username]/api-importer/page');
 
 const validSpec = JSON.stringify({
   openapi: '3.0.0',
