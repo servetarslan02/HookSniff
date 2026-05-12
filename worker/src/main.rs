@@ -997,7 +997,7 @@ async fn process_pending(
 
 /// Commit a delivery transaction with transient vs permanent error classification.
 async fn commit_delivery_tx(
-    tx: sqlx::PgTransaction,
+    tx: sqlx::PgTransaction<'_>,
     delivery_id: uuid::Uuid,
     context: &str,
 ) -> Result<bool> {
@@ -1022,7 +1022,7 @@ async fn commit_delivery_tx(
 
 /// Record the delivery attempt in the delivery_attempts table.
 async fn record_delivery_attempt(
-    tx: &mut sqlx::PgTransaction,
+    tx: &mut sqlx::PgTransaction<'_>,
     delivery_id: uuid::Uuid,
     attempt: i32,
     attempt_status: Option<i32>,
