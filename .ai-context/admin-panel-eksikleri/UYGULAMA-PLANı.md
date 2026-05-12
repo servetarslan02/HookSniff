@@ -25,7 +25,7 @@ OTURUM 2 ✅ TAMAMLANDI
 │
 ├── 2.1  Audit log sayfası         ✅ (Oturum 126)
 ├── 2.2  Kullanıcı taklidi         ✅ Backend + Frontend (Users + User Detail)
-├── 2.3  Alert eşikleri (Settings) ⚠️ Frontend eklendi, backend bağlanacak
+├── 2.3  Alert eşikleri (Settings) ✅ Backend CRUD API + frontend bağlandı (Oturum 128)
 ├── 2.4  Test et + push            ✅ Push edildi
 └── 2.5  MEMORY.md güncelle        ✅
 
@@ -137,7 +137,7 @@ OTURUM 3 ✅ TAMAMLANDI
 **Dosya:** `dashboard/src/app/[locale]/admin/settings/page.tsx`
 **Ne yap:**
 - [x] Settings sayfasına "🚨 Alert Eşikleri" kartı ekle → Bu oturumda eklendi
-- [ ] Mevcut `alert_rules` backend'ini kullan → Frontend eklendi, backend bağlantısı sonraki oturum
+- [x] Mevcut `alert_rules` backend'ini kullan → Frontend eklendi, backend bağlantısı Oturum 128'de tamamlandı
 - [x] Eşikler: success_rate, latency, queue_depth → Eklendi (+ failed delivery)
 - [x] Bildirim kanalları: email, slack, webhook → Eklendi
 - [x] i18n key'leri ekle → EN/TR eklendi
