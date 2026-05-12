@@ -1,9 +1,66 @@
 use chrono::{Duration, Utc};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::error::AppError;
+
+// ── JWT Key Configuration ────────────────────────────────────
+// Item 260: RS256 support. If RSA keys are configured (JWT_PRIVATE_KEY / JWT_PUBLIC_KEY),
+// tokens are signed with RS256. Otherwise falls back to HS256 with JWT_SECRET.
+//
+// Key format: PEM-encoded RSA keys (set as env vars or Cloud Run secrets).
+//   JWT_PRIVATE_KEY: -----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----
+//   JWT_PUBLIC_KEY:  -----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----
+//
+// Backward compatibility: verify_token() tries RS256 first, falls back to HS256
+// so existing HS256 tokens remain valid during migration.
+
+/// Determine the signing algorithm based on available keys.
+/// Returns (algorithm, encoding_key, decoding_key).
+fn jwt_keys() -> Result<(Algorithm, EncodingKey, DecodingKey), AppError> {
+    // Prefer RS256 if RSA keys are configured
+    if let (Ok(private_key), Ok(public_key)) = (
+        std::env::var("JWT_PRIVATE_KEY"),
+        std::env::var("JWT_PUBLIC_KEY"),
+    ) {
+        if !private_key.is_empty() && !public_key.is_empty() {
+            let enc_key = EncodingKey::from_rsa_pem(private_key.as_bytes())
+                .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid JWT_PRIVATE_KEY: {}", e)))?;
+            let dec_key = DecodingKey::from_rsa_pem(public_key.as_bytes())
+                .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid JWT_PUBLIC_KEY: {}", e)))?;
+            return Ok((Algorithm::RS256, enc_key, dec_key));
+        }
+    }
+
+    // Fallback to HS256 with shared secret
+    let secret = std::env::var("JWT_SECRET")
+        .map_err(|_| AppError::Internal(anyhow::anyhow!("JWT_SECRET not set")))?;
+    Ok((
+        Algorithm::HS256,
+        EncodingKey::from_secret(secret.as_bytes()),
+        DecodingKey::from_secret(secret.as_bytes()),
+    ))
+}
+
+/// Get just the decoding key + algorithm for verification (used by middleware).
+/// Tries RS256 first, falls back to HS256.
+fn verification_keys() -> Result<(Algorithm, DecodingKey), AppError> {
+    if let Ok(public_key) = std::env::var("JWT_PUBLIC_KEY") {
+        if !public_key.is_empty() {
+            let dec_key = DecodingKey::from_rsa_pem(public_key.as_bytes())
+                .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid JWT_PUBLIC_KEY: {}", e)))?;
+            return Ok((Algorithm::RS256, dec_key));
+        }
+    }
+
+    let secret = std::env::var("JWT_SECRET")
+        .map_err(|_| AppError::Internal(anyhow::anyhow!("JWT_SECRET not set")))?;
+    Ok((
+        Algorithm::HS256,
+        DecodingKey::from_secret(secret.as_bytes()),
+    ))
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -82,12 +139,24 @@ pub fn generate_token_with_duration(
         iat: Some(now),
     };
 
-    encode(
-        &Header::default(),
-        &claims,
-        &EncodingKey::from_secret(secret.as_bytes()),
-    )
-    .map_err(|e| AppError::Internal(e.into()))
+    // Item 260: Use RS256 if RSA keys are configured, otherwise HS256
+    let (algorithm, enc_key, _dec_key) = jwt_keys().unwrap_or_else(|_| {
+        // Fallback: use the provided secret for HS256 (backward compat)
+        (
+            Algorithm::HS256,
+            EncodingKey::from_secret(secret.as_bytes()),
+            DecodingKey::from_secret(secret.as_bytes()),
+        )
+    });
+
+    let mut header = Header::new(algorithm);
+    // Set kid for RS256 key rotation support
+    if algorithm == Algorithm::RS256 {
+        header.kid = std::env::var("JWT_KEY_ID").ok().or_else(|| Some("hooksniff-1".into()));
+    }
+
+    encode(&header, &claims, &enc_key)
+        .map_err(|e| AppError::Internal(e.into()))
 }
 
 /// Check if an access token has been revoked (blacklisted).
@@ -155,6 +224,20 @@ pub fn hash_token(token: &str) -> String {
 }
 
 pub fn verify_token(token: &str, secret: &str) -> Result<Claims, AppError> {
+    // Item 260: Try RS256 first (if configured), fall back to HS256
+    // This ensures backward compatibility during migration
+    if let Ok((rs256_alg, rs256_key)) = verification_keys() {
+        if rs256_alg == Algorithm::RS256 {
+            let mut validation = Validation::new(Algorithm::RS256);
+            validation.set_audience::<&str>(&[]); // No audience check
+            if let Ok(data) = decode::<Claims>(token, &rs256_key, &validation) {
+                return Ok(data.claims);
+            }
+            // RS256 failed — might be an old HS256 token, try HS256 below
+        }
+    }
+
+    // HS256 fallback (for legacy tokens during migration window)
     decode::<Claims>(
         token,
         &DecodingKey::from_secret(secret.as_bytes()),
@@ -388,5 +471,62 @@ mod tests {
         let debug = format!("{:?}", claims);
         assert!(debug.contains("Claims"));
         assert!(debug.contains("test@test.com"));
+    }
+
+    // ── RS256 support (Item 260) ─────────────────────────────
+
+    #[test]
+    fn test_verify_token_hs256_still_works() {
+        // Existing HS256 tokens must continue to verify
+        let secret = "my-hs256-secret";
+        let id = Uuid::new_v4();
+        let token = generate_token(id, "legacy@test.com", "free", secret).unwrap();
+        let claims = verify_token(&token, secret).unwrap();
+        assert_eq!(claims.sub, id);
+        assert_eq!(claims.email, "legacy@test.com");
+    }
+
+    #[test]
+    fn test_jwt_keys_fallback_to_hs256() {
+        // When RSA keys are not set, should fall back to HS256
+        std::env::remove_var("JWT_PRIVATE_KEY");
+        std::env::remove_var("JWT_PUBLIC_KEY");
+        // This will fail if JWT_SECRET is also not set, which is expected
+        let result = jwt_keys();
+        // In test env JWT_SECRET might not be set
+        if std::env::var("JWT_SECRET").is_err() {
+            assert!(result.is_err());
+        }
+    }
+
+    #[test]
+    fn test_verification_keys_fallback_to_hs256() {
+        std::env::remove_var("JWT_PUBLIC_KEY");
+        // Will fail if JWT_SECRET not set
+        let result = verification_keys();
+        if std::env::var("JWT_SECRET").is_err() {
+            assert!(result.is_err());
+        }
+    }
+
+    #[test]
+    fn test_token_with_admin_claim() {
+        let secret = "admin-test-secret";
+        let id = Uuid::new_v4();
+        let token = generate_admin_token(id, "admin@test.com", "business", secret).unwrap();
+        let claims = verify_token(&token, secret).unwrap();
+        assert!(claims.is_admin);
+        assert_eq!(claims.plan, "business");
+    }
+
+    #[test]
+    fn test_token_jti_is_unique() {
+        let secret = "jti-test-secret";
+        let id = Uuid::new_v4();
+        let t1 = generate_token(id, "a@b.com", "free", secret).unwrap();
+        let t2 = generate_token(id, "a@b.com", "free", secret).unwrap();
+        let c1 = verify_token(&t1, secret).unwrap();
+        let c2 = verify_token(&t2, secret).unwrap();
+        assert_ne!(c1.jti, c2.jti, "Each token should have a unique jti");
     }
 }

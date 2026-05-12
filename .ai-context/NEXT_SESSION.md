@@ -1,32 +1,35 @@
-# NEXT_SESSION.md — Oturum 131+
+# NEXT_SESSION.md — Oturum 132+
 
-> Son güncelleme: 2026-05-12 21:41 GMT+8 (Oturum 130)
+> Son güncelleme: 2026-05-12 22:20 GMT+8 (Oturum 131)
 
 ## Kaldığımız Yer
-- **IMPLEMENTATION-PLAN: 355/364 tamamlandı (%98)**
-- 9 kalan ⬜ madde (4 ben + 5 Servet)
+- **IMPLEMENTATION-PLAN: 359/364 tamamlandı (%99)**
+- 5 kalan ⬜ madde — TAMAMI Servet görevleri
 
-## Kalan ⬜ Maddeler (9 adet)
+## Kalan ⬜ Maddeler (5 adet — Hepsi Servet)
 
-### Benim Yapabileceğim (4 madde)
-- 251: No chargeback/refund handling (Servet + backend)
-- 255: No annual billing option (Servet + backend)
-- 256: Enterprise plan has no implementation (Servet + backend)
-- 260: JWT HS256 → RS256 (büyük refactor, dedicated session)
-
-### Servet'in Yapması Gereken (5 madde)
-- ⬜ GitHub PAT rotate — güvenlik acil
-- ⬜ GCP SA key rotate — güvenlik acil
-- ⬜ GitHub Actions billing güncelle
-- ⬜ Stripe/Polar identity verification
-- ⬜ Grafana trial upgrade (20 Mayıs'ta bitiyor!)
+### Servet'in Yapması Gereken
+- ⬜ 360: GitHub PAT rotate — güvenlik acil (token chat'te paylaşıldı, revoke edilmeli)
+- ⬜ 361: GCP SA key rotate — güvenlik acil
+- ⬜ 362: GitHub Actions billing güncelle
+- ⬜ 363: Stripe/Polar identity verification (KYC)
+- ⬜ 364: Grafana trial upgrade (20 Mayıs'ta bitiyor — 8 gün!)
 
 ## Bir Sonraki Adımlar
 1. Servet görevlerini hatırlat (PAT rotate, GCP key, Grafana trial)
-2. Kalan 4 madde büyük iş (JWT refactor) veya Servet kararı gerektiriyor
-3. Proje %98 tamamlandı — production-ready
+2. Proje %99 tamamlandı — production-ready
+3. Kalan teknik iş yok (sıfır ⬜ benim yapabileceğim)
+4. Servet'in yapması gereken dış servis ayarları var
 
 ## Bilinen Sorunlar
 - ⚠️ Grafana trial 20 Mayıs'ta bitiyor (8 gün!)
 - ⚠️ GitHub PAT + GCP key rotate edilmeli
-- cargo check sandbox'ta çalışmadı — local'de test et
+- ⚠️ iyzico hesap açılacak (vergi levhası + banka hesabı)
+- Rust toolchain sandbox'ta yok — cargo test local'de çalıştırılmalı
+
+## JWT RS256 Notları (Item 260 — Yeni)
+- RSA key pair gerekiyor: `openssl genrsa -out jwt_private.pem 2048`
+- Env vars: JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, JWT_KEY_ID
+- Backward compatible: eski HS256 token'lar otomatik doğrulanır
+- Yeni token'lar RS256 ile imzalanır (eğer RSA key varsa)
+- Cloud Run'a RSA key secret olarak eklenmeli

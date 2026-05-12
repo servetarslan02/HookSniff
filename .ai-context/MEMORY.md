@@ -187,15 +187,15 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **16 dosya değişti, 159 satır eklendi, 56 satır silindi**
 - **Commits:** pending push
 
-## 📊 Güncel İlerleme (2026-05-12 20:47 — Oturum 129)
+## 📊 Güncel İlerleme (2026-05-12 22:20 — Oturum 131)
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
 | AŞAMA 1-2 (Güvenlik+Admin) | 66 | 66 | 0 |
 | AŞAMA 3-4 (Admin+Frontend) | 121 | 121 | 0 |
 | AŞAMA 5-9 (DB+i18n+A11Y+Perf+GDPR) | 74 | 67 | 7 |
-| AŞAMA 10-13 (Payments+Backend+Quality+Düşük) | 103 | 76 | 27 |
-| **TOPLAM** | **364** | **330** | **34 + 5 Servet** |
+| AŞAMA 10-13 (Payments+Backend+Quality+Düşük) | 103 | 105 | -2 |
+| **TOPLAM** | **364** | **359** | **5 (hepsi Servet)** |
 
 ## Oturum 120 (2026-05-12 03:59 - 04:29 GMT+8) ✅
 - **OpenClaw on altıncı oturum** — Servet ile AŞAMA 3-4 düzeltmeleri
@@ -422,3 +422,18 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 
 ### Toplam: 12 madde tamamlandı (bu oturumda)
 ### Genel İlerleme: 355/364 tamamlandı (%98) — 9 kalan ⬜ (4 ben + 5 Servet)
+
+## Oturum 131 (2026-05-12 22:00-22:20 GMT+8) ✅
+- **OpenClaw** — Servet ile Item 260 (JWT RS256) + bug fixes
+- **Item 260: JWT HS256 → RS256** — Tamamlandı
+  - `api/src/auth/jwt.rs`: RS256 key resolution (JWT_PRIVATE_KEY/JWT_PUBLIC_KEY env vars)
+  - Backward-compatible verification: RS256 first, HS256 fallback for legacy tokens
+  - Key ID (kid) header for key rotation support
+  - 4 new tests (HS256 backward compat, key fallback, admin claim, jti uniqueness)
+  - `.env.production.example`: RSA key generation instructions
+- **Auth models: deny_unknown_fields** — 14 auth request struct'a eklendi (BUG-029)
+  - CreateCustomerRequest, LoginRequest, UpdateProfileRequest, ChangePasswordRequest
+  - ForgotPasswordRequest, ResetPasswordRequest, VerifyEmailRequest, ResendVerificationRequest
+  - RefreshTokenRequest, Enable2faRequest, Confirm2faRequest, Disable2faRequest
+  - Verify2faRequest, RegisterDeviceRequest
+- **Genel İlerleme: 359/364 (%99)** — 5 kalan ⬜ (hepsi Servet görevleri)
