@@ -559,10 +559,16 @@
     "cancelledMsg": "Abonelik iptal edildi. Fatura döneminin sonuna kadar erişiminiz devam edecek.",
     "redirecting": "Yönlendiriliyor...",
     "plans": {
-      "free": "Ücretsiz",
+      "free": "Developer",
       "pro": "Pro",
-      "business": "İş",
-      "enterprise": "Kurumsal"
+      "business": "Enterprise",
+      "enterprise": "Enterprise",
+      "developer": "Developer",
+      "startup": "Startup",
+      "developerLimit": "Günlük 100 event",
+      "startupLimit": "Günlük 30.000 event",
+      "proLimit": "Günlük 100.000 event",
+      "enterpriseLimit": "Sınırsız"
     },
     "features": {
       "deliveries": "Ayda {count} teslimat",
@@ -1697,15 +1703,15 @@
     "heroSubtitle": "12 aydan fazla webhook altyapı geliştirme süresinden tasarruf edin. Ücretsiz başlayın, hazır olduğunuzda ölçekleyin.",
     "heroNote": "Kredi kartı gerekmez. Sürpriz ücret yok. İstediğiniz zaman iptal edin.",
     "mostPopular": "En Popüler",
-    "free": "Ücretsiz",
+    "free": "Developer",
     "pro": "Pro",
-    "business": "Business",
+    "business": "Enterprise",
     "month": "/ay",
     "getStarted": "Başlayın",
     "startTrial": "Ücretsiz Deneyin",
     "contactSales": "Satışla İletişim",
     "freeDesc": "Yan projeler ve deneyler için",
-    "proDesc": "Production uygulamaları için",
+    "proDesc": "Production iş yükleri için",
     "businessDesc": "Garantiye ihtiyacı olan ekipler için",
     "freeFeatures": [
       "Ayda 10.000 webhook",
@@ -1718,17 +1724,13 @@
       "8 SDK erişimi"
     ],
     "proFeatures": [
-      "Ayda 50.000 webhook",
-      "50 endpoint",
-      "5 yeniden deneme",
-      "Özel yeniden deneme politikaları",
-      "Öncelikli destek",
-      "Özel alan adları",
-      "30 günlük log saklama",
-      "11 SDK erişimi",
-      "Webhook oyun alanı",
-      "Etiket ve filtreleme",
-      "E-posta uyarıları"
+      "Günlük 100.000 event",
+      "Sınırsız uygulama",
+      "500 endpoint",
+      "Sınırsız event tipi",
+      "30 günlük log",
+      "FIFO teslimat",
+      "Öncelikli destek"
     ],
     "businessFeatures": [
       "Ayda 500.000 webhook",
@@ -1817,7 +1819,7 @@
       "Savaş testinden geçmiş yeniden deneme motoru"
     ],
     "startupTitle": "Erken aşama girişim misiniz?",
-    "startupDesc": "Büyümek için özel girişim planlarımız var. Seri A öncesi girişimler genişletilmiş ücretsiz katmanlar ve planlarda önemli indirimler alır.",
+    "startupDesc": "Büyüyen projeler için",
     "startupCta": "Girişim indirimi için başvurun →",
     "faqTitle": "Sıkça sorulan sorular",
     "ctaTitle": "Başlamaya hazır mısınız?",
@@ -1880,19 +1882,47 @@
     "savePercent": "%{percent} Tasarruf",
     "billedAnnually": "Yıllık faturalandırılır",
     "billedMonthly": "Aylık faturalandırılır",
-    "enterprise": "Kurumsal",
-    "enterpriseDesc": "Özel ihtiyaçları olan büyük kuruluşlar için",
+    "enterprise": "Enterprise",
+    "enterpriseDesc": "Özel ihtiyaçları olan büyük organizasyonlar için",
     "customPricing": "Özel Fiyat",
     "contactUs": "Bize Ulaşın",
     "enterpriseFeatures": [
-      "Business'teki her şey",
-      "Özel SLA (%99.999 uptime)",
+      "Sınırsız event",
+      "Her şey sınırsız",
+      "Özel SLA",
       "SSO / SAML",
-      "Özel destek mühendisi",
-      "Slack Connect kanalı",
-      "Özel sözleşmeler",
-      "Yerinde dağıtım seçeneği"
-    ]
+      "Özel hesap yöneticisi",
+      "Özel entegrasyonlar"
+    ],
+    "developer": "Developer",
+    "startup": "Startup",
+    "developerDesc": "Ücretsiz başlayın",
+    "developerFeatures": [
+      "Günlük 100 event",
+      "1 uygulama",
+      "5 endpoint",
+      "10 event tipi",
+      "7 günlük log",
+      "Topluluk desteği"
+    ],
+    "startupFeatures": [
+      "Günlük 30.000 event",
+      "1 uygulama",
+      "50 endpoint",
+      "50 event tipi",
+      "14 günlük log",
+      "Never-blocked modu",
+      "E-posta desteği"
+    ],
+    "ctaDeveloper": "Ücretsiz başla",
+    "ctaStartup": "Aylık ₺599'dan başla",
+    "ctaPro": "Aylık ₺999'dan başla",
+    "ctaEnterprise": "Satış ile iletişime geçin",
+    "dailyEvents": "Günlük event",
+    "applications": "Uygulamalar",
+    "eventTypes": "Event tipleri",
+    "subscriptions": "Abonelikler",
+    "overagePerEvent": "Event başına overage"
   },
   "pricingFaq": [
     {

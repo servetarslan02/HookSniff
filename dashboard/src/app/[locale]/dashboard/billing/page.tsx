@@ -20,7 +20,7 @@ export default function BillingPage() {
   const tc = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
-  const currentPlan = user?.plan || 'free';
+  const currentPlan = user?.plan || 'developer';
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit, setUsageLimit] = useState(10000);
   const [chartData, setChartData] = useState<UsageChartData[]>([]);
@@ -162,7 +162,7 @@ export default function BillingPage() {
               </span>
             </div>
           </div>
-          {currentPlan !== 'free' && (
+          {currentPlan !== 'developer' && (
             <button type="button"
               onClick={() => setShowCancelModal(true)}
               className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
