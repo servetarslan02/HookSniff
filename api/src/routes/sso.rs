@@ -51,6 +51,7 @@ pub struct SsoConfigResponse {
 
 /// SSO configuration create/update request
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpsertSsoRequest {
     pub provider: Option<String>,
     pub enabled: Option<bool>,
