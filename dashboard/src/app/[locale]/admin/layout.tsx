@@ -5,7 +5,7 @@ import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: '📊' },
@@ -21,12 +21,18 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const t = useTranslations('admin');
   const tc = useTranslations('common');
+  const locale = useLocale();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Item 61 — Set document title for admin pages
+  useEffect(() => {
+    document.title = 'HookSniff — Webhook Teslimat Servisi';
+  }, []);
 
   // Admin auth guard
   useEffect(() => {
     if (user && !user.is_admin) {
-      router.push('/dashboard');
+      router.push(`/${locale}/dashboard`);
     }
   }, [user, router]);
 
@@ -50,6 +56,14 @@ function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+      {/* Item 128 — Skip to content link */}
+      <a
+        href="#admin-main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-red-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+      >
+        {t('skipToContent')}
+      </a>
+
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -58,8 +72,10 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Item 127 — Sidebar with ARIA landmark */}
       <aside
+        role="navigation"
+        aria-label={t('adminPanel')}
         className={clsx(
           'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -114,13 +130,13 @@ function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="md:pl-64">
-        {/* Top bar */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
+        {/* Item 127 — Top bar with ARIA landmark */}
+        <header role="banner" className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
+              className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition"
               aria-label={tc("openSidebar")}
             >
               <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +157,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               {user?.email || tc('user')}
             </div>
             <button
-              onClick={() => { logout(); router.push('/login'); }}
+              onClick={() => { logout(); router.push(`/${locale}/login`); }}
               className="text-sm text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition"
             >
               {tc('logout')}
@@ -149,8 +165,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="p-4 md:p-8 page-enter">{children}</main>
+        {/* Item 127/128 — Page content with ARIA landmark and skip-to-content target */}
+        <main id="admin-main-content" role="main" className="p-4 md:p-8 page-enter">{children}</main>
       </div>
     </div>
   );

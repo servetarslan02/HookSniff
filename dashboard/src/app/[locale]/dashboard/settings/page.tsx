@@ -4,7 +4,7 @@ import { getErrorMessage } from '@/lib/errors';
 
 import { useAuth } from '@/lib/store';
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useRouter } from '@/i18n/navigation';
 
@@ -12,6 +12,7 @@ export default function SettingsPage() {
   const { user, token, apiKey, logout } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const locale = useLocale();
   const [copied, setCopied] = useState(false);
   const t = useTranslations('settings');
   const tc = useTranslations('common');
@@ -123,7 +124,7 @@ export default function SettingsPage() {
       const { api } = await import('@/lib/api');
       await api.delete('/auth/account', token ?? undefined);
       logout();
-      router.push('/');
+      router.push(`/${locale}/`);
     } catch (e: unknown) {
       toast(getErrorMessage(e, tc('unknownError')), 'error');
     } finally {

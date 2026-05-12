@@ -59,6 +59,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+      {/* Skip to content link — Item 214 */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-brand-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+      >
+        {tc('skipToContent')}
+      </a>
+
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -150,7 +158,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               {user?.email || tc('user')}
             </div>
             <button
-              onClick={() => { logout(); router.push('/login'); }}
+              onClick={() => { logout(); router.push(`/${locale}/login`); }}
               className="text-sm text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
             >
               {t('logout')}
@@ -158,8 +166,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="p-4 md:p-8 page-enter">
+        {/* Page content — Item 214: skip-to-content target */}
+        <main id="main-content" className="p-4 md:p-8 page-enter" aria-live="polite">
           <EmailVerificationBanner />
           <ErrorBoundary
             title={te('title')}

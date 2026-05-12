@@ -442,11 +442,11 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               <button
                 onClick={() => {
                   if (plan.name === tPricing('business')) {
-                    router.push('/contact');
+                    router.push(`/${locale}/contact`);
                   } else if (token) {
-                    router.push('/dashboard/billing');
+                    router.push(`/${locale}/dashboard/billing`);
                   } else {
-                    router.push('/register');
+                    router.push(`/${locale}/register`);
                   }
                 }}
                 className={`w-full py-3 rounded-xl font-medium transition cursor-pointer ${
