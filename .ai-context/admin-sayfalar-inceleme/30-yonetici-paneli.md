@@ -142,6 +142,54 @@
 
 ---
 
+## 🆕 Eksik Admin Sayfaları (Sektör Karşılaştırma)
+
+### 7. 🚩 Feature Flags (`/admin/feature-flags`)
+- Özellik açma/kapama toggle'ları
+- Percentage rollout (kullanıcı yüzdesine göre)
+- A/B testing desteği
+- Feature flag geçmişi
+- **Rakipler:** Svix ✅, Hookdeck ✅
+
+### 8. 💾 Backup Yönetimi (`/admin/backups`)
+- Manuel backup tetikleme
+- Backup geçmişi listesi
+- Restore işlemi
+- Backup zamanlaması (cron)
+- Retention policy ayarı
+- **Rakipler:** Convoy ✅, Hookdeck ✅
+
+### 9. 📊 Uptime Monitoring (`/admin/uptime`)
+- Platform uptime yüzdesi (24h/7d/30d)
+- SLA hedefi takibi
+- Incident geçmişi
+- Status page entegrasyonu
+- **Rakipler:** Svix ✅ (%99.999997), Hookdeck ✅
+
+### 10. 🧪 Webhook Test Konsolu (`/admin/webhook-test`)
+- Admin'den webhook test gönderme
+- Payload template seçici
+- Sonuç gösterimi (status, response, duration)
+- Geçmiş test kayıtları
+- **Rakipler:** Hookdeck ✅, Svix ✅
+
+### 11. 🔄 Bulk Replay (`/admin/bulk-replay`)
+- Tarih aralığı seçimi
+- Durum bazlı filtre (sadece failed'lar)
+- Endpoint bazlı seçim
+- İlerleme göstergesi
+- **Rakipler:** Svix ✅, Hookdeck ✅
+
+### 12. 📜 Sistem Log Viewer (`/admin/system-logs`)
+- Raw log görüntüleyici
+- Log seviyesi filtresi (Debug/Info/Warn/Error)
+- Tarih aralığı
+- Arama (keyword)
+- Streaming (canlı log akışı)
+- **Rakipler:** Convoy ✅, Hookdeck ✅
+
+---
+
 ## Admin Panel Genel Değerlendirme
 
 ### ✅ İyi Yönler
