@@ -153,8 +153,9 @@ export default function PortalCustomizationPage() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('branding')}</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('companyName')}</label>
+                <label htmlFor="portal-company-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('companyName')}</label>
                 <input
+                  id="portal-company-name"
                   type="text"
                   value={config.company_name}
                   onChange={(e) => setConfig({ ...config, company_name: e.target.value })}
@@ -163,8 +164,9 @@ export default function PortalCustomizationPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('logoUrl')}</label>
+                <label htmlFor="portal-logo-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('logoUrl')}</label>
                 <input
+                  id="portal-logo-url"
                   type="url"
                   value={config.logo_url}
                   onChange={(e) => setConfig({ ...config, logo_url: e.target.value })}
@@ -173,9 +175,10 @@ export default function PortalCustomizationPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('primaryColor')}</label>
+                <label htmlFor="portal-primary-color" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('primaryColor')}</label>
                 <div className="flex items-center gap-3">
                   <input
+                    id="portal-primary-color"
                     type="color"
                     value={config.primary_color}
                     onChange={(e) => setConfig({ ...config, primary_color: e.target.value })}
@@ -190,8 +193,9 @@ export default function PortalCustomizationPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('fontFamily')}</label>
+                <label htmlFor="portal-font-family" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('fontFamily')}</label>
                 <select
+                  id="portal-font-family"
                   value={config.font_family}
                   onChange={(e) => setConfig({ ...config, font_family: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
