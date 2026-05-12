@@ -36,7 +36,7 @@ async fn list_endpoints(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<EndpointResponse>>, AppError> {
     let endpoints = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -148,7 +148,7 @@ async fn get_endpoint(
     Path(id): Path<Uuid>,
 ) -> Result<Json<EndpointResponse>, AppError> {
     let endpoint =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -206,7 +206,7 @@ async fn update_endpoint(
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Verify ownership
     let _existing =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -307,7 +307,7 @@ async fn update_retry_policy(
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Verify ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -337,7 +337,7 @@ async fn rotate_secret(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Get current endpoint
     let endpoint =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
