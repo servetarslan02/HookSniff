@@ -6,6 +6,7 @@
 pub mod iyzico;
 pub mod polar;
 pub mod provider;
+pub mod refund;
 pub mod stripe;
 
 use crate::config::Config;
@@ -111,6 +112,21 @@ impl Plan {
             Plan::Business => 199900, // ₺1,999.00 (TR'ye özel, $99'dan ucuz)
             Plan::Enterprise => 0,
         }
+    }
+
+    /// Annual price in cents (USD) — 20% discount vs monthly
+    pub fn annual_price_cents(&self) -> u64 {
+        (self.monthly_price_cents() * 12 * 80) / 100
+    }
+
+    /// Annual price in kuruş (TRY) — 20% discount vs monthly
+    pub fn annual_price_kurus(&self) -> i64 {
+        (self.monthly_price_kurus() * 12 * 80) / 100
+    }
+
+    /// Enterprise requires contact — no self-service checkout
+    pub fn requires_contact(&self) -> bool {
+        matches!(self, Plan::Enterprise)
     }
 }
 
@@ -440,6 +456,7 @@ pub enum InvoiceStatus {
     Paid,
     Void,
     Uncollectible,
+    Refunded,
 }
 
 #[cfg(test)]
@@ -580,6 +597,44 @@ mod tests {
         assert_eq!(Plan::Enterprise.monthly_price_kurus(), 0);
     }
 
+    // ── annual_price_cents ────────────────────────────────────
+
+    #[test]
+    fn annual_price_cents_all() {
+        // Pro: $49/mo * 12 * 0.80 = $470.40 → 47040 cents
+        assert_eq!(Plan::Pro.annual_price_cents(), 47040);
+        // Business: $99/mo * 12 * 0.80 = $950.40 → 95040 cents
+        assert_eq!(Plan::Business.annual_price_cents(), 95040);
+        assert_eq!(Plan::Free.annual_price_cents(), 0);
+        assert_eq!(Plan::Enterprise.annual_price_cents(), 0);
+    }
+
+    // ── annual_price_kurus ────────────────────────────────────
+
+    #[test]
+    fn annual_price_kurus_all() {
+        // Pro: ₺999/mo * 12 * 0.80 = ₺9,590.40 → 959040 kuruş
+        assert_eq!(Plan::Pro.annual_price_kurus(), 959040);
+        // Business: ₺1,999/mo * 12 * 0.80 = ₺19,190.40 → 1919040 kuruş
+        assert_eq!(Plan::Business.annual_price_kurus(), 1919040);
+        assert_eq!(Plan::Free.annual_price_kurus(), 0);
+        assert_eq!(Plan::Enterprise.annual_price_kurus(), 0);
+    }
+
+    // ── requires_contact ──────────────────────────────────────
+
+    #[test]
+    fn requires_contact_enterprise() {
+        assert!(Plan::Enterprise.requires_contact());
+    }
+
+    #[test]
+    fn requires_contact_others() {
+        assert!(!Plan::Free.requires_contact());
+        assert!(!Plan::Pro.requires_contact());
+        assert!(!Plan::Business.requires_contact());
+    }
+
     // ── Plan ordering (higher tiers have higher limits) ────────
 
     #[test]
@@ -691,6 +746,8 @@ mod tests {
         assert_eq!(s, "\"paid\"");
         let s = serde_json::to_string(&InvoiceStatus::Draft).unwrap();
         assert_eq!(s, "\"draft\"");
+        let s = serde_json::to_string(&InvoiceStatus::Refunded).unwrap();
+        assert_eq!(s, "\"refunded\"");
     }
 
     // ── Plan serde ─────────────────────────────────────────────

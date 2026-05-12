@@ -1874,7 +1874,25 @@
     "testimonial3Author": "Solo Kurucu",
     "testimonial3Company": "Bağımsız Geliştirici",
     "supportResponse48h": "< 48 saat",
-    "supportResponse24h": "< 24 saat"
+    "supportResponse24h": "< 24 saat",
+    "annual": "Yıllık",
+    "monthly": "Aylık",
+    "savePercent": "%{percent} Tasarruf",
+    "billedAnnually": "Yıllık faturalandırılır",
+    "billedMonthly": "Aylık faturalandırılır",
+    "enterprise": "Kurumsal",
+    "enterpriseDesc": "Özel ihtiyaçları olan büyük kuruluşlar için",
+    "customPricing": "Özel Fiyat",
+    "contactUs": "Bize Ulaşın",
+    "enterpriseFeatures": [
+      "Business'teki her şey",
+      "Özel SLA (%99.999 uptime)",
+      "SSO / SAML",
+      "Özel destek mühendisi",
+      "Slack Connect kanalı",
+      "Özel sözleşmeler",
+      "Yerinde dağıtım seçeneği"
+    ]
   },
   "pricingFaq": [
     {
