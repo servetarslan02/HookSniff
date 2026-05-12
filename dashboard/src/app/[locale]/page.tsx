@@ -412,11 +412,15 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{tPricing('title')}</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {plans.map((plan, i) => (
-            <div key={i} className={`glass-card p-8 hover-lift card-tilt relative ${plan.popular ? 'ring-2 ring-brand-500 dark:ring-brand-400' : ''}`}>
+            <div key={i} className={`relative rounded-2xl p-8 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
+              plan.popular
+                ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
+                : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
+            }`}>
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-md">
                   {tPricing('mostPopular')}
                 </div>
               )}
@@ -427,8 +431,8 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               </div>
               <ul className="space-y-3 mb-8">
                 {plan.features.map((f, j) => (
-                  <li key={j} className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
-                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={j} className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                    <svg className="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     {f}
@@ -445,7 +449,11 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
                     router.push('/register');
                   }
                 }}
-                className={`w-full py-3 rounded-xl font-medium transition btn-ripple ${plan.popular ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'}`}
+                className={`w-full py-3 rounded-xl font-medium transition cursor-pointer ${
+                  plan.popular
+                    ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600 shadow-md'
+                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm'
+                }`}
               >
                 {plan.cta}
               </button>
