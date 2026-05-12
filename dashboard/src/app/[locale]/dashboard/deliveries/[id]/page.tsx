@@ -238,7 +238,7 @@ export default function DeliveryDetailPage() {
               <DetailRow label={t('updated')} value={new Date(delivery.updated_at).toLocaleString()} />
             )}
             {delivery.error_message && (
-              <div className="pt-3 border-t border-gray-100 dark:border-slate-800">
+              <div className="pt-3 border-t border-gray-100 dark:border-slate-700">
                 <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">{t('errorLabel')}</p>
                 <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-lg font-mono break-all">
                   {delivery.error_message}
@@ -277,7 +277,7 @@ export default function DeliveryDetailPage() {
             </button>
             {showRequestHeaders && (
               <div className="mt-3 relative">
-                <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl p-4 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-64 overflow-y-auto">
+                <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-64 overflow-y-auto">
                   {delivery.request_headers
                     ? formatHeaders(delivery.request_headers)
                     : t('noHeaders')}
@@ -321,7 +321,7 @@ export default function DeliveryDetailPage() {
             </button>
             {showRequestBody && (
               <div className="mt-3 relative">
-                <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl p-4 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-80 overflow-y-auto">
+                <pre className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-80 overflow-y-auto">
                   {delivery.request_body
                     ? formatJson(delivery.request_body)
                     : t('noPayload')}
@@ -377,7 +377,7 @@ export default function DeliveryDetailPage() {
                   <div className={`absolute left-3.5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 ${getAttemptStatusColor(attempt.status)} z-10`} />
 
                   <div
-                    className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-slate-700 transition"
+                    className="bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-slate-700 transition"
                     onClick={() => setExpandedAttempt(expandedAttempt === attempt.id ? null : attempt.id)}
                   >
                     {/* Attempt header */}
@@ -416,7 +416,7 @@ export default function DeliveryDetailPage() {
 
                     {/* Expanded details */}
                     {expandedAttempt === attempt.id && (
-                      <div className="border-t border-gray-200 dark:border-slate-800 p-4 space-y-4">
+                      <div className="border-t border-gray-200 dark:border-slate-700 p-4 space-y-4">
                         {/* Error message */}
                         {attempt.error_message && (
                           <div>
@@ -436,7 +436,7 @@ export default function DeliveryDetailPage() {
                                 ({Object.keys(attempt.response_headers).length})
                               </span>
                             </p>
-                            <pre className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-48 overflow-y-auto">
+                            <pre className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-48 overflow-y-auto">
                               {formatHeaders(attempt.response_headers)}
                             </pre>
                           </div>
@@ -447,7 +447,7 @@ export default function DeliveryDetailPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">{t('responseBody')}</p>
                             <div className="relative">
-                              <pre className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-64 overflow-y-auto">
+                              <pre className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-64 overflow-y-auto">
                                 {(() => {
                                   try { return JSON.stringify(JSON.parse(attempt.response_body), null, 2); }
                                   catch { return attempt.response_body; }
