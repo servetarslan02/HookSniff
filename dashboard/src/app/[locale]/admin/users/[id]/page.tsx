@@ -7,12 +7,13 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, type AdminUserDetail } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 const PLAN_OPTIONS = ['free', 'pro', 'business'];
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const locale = useLocale();
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -80,7 +81,7 @@ export default function AdminUserDetailPage() {
         <div className="text-6xl mb-4">😕</div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("userNotFound")}</h2>
         <button
-          onClick={() => router.push('/admin/users')}
+          onClick={() => router.push(`/${locale}/admin/users`)}
           className="text-brand-600 dark:text-brand-400 text-sm font-medium"
         >
           {t("backToUsers")}
@@ -94,7 +95,7 @@ export default function AdminUserDetailPage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <button
-          onClick={() => router.push('/admin/users')}
+          onClick={() => router.push(`/${locale}/admin/users`)}
           className="text-gray-500 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-400 transition"
         >
           {tc("back")}
