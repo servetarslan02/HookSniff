@@ -223,11 +223,11 @@ export default function PricingPage() {
               <button
                 onClick={() => {
                   if (plan.key === 'business') {
-                    router.push('/contact');
+                    router.push(`/${locale}/contact`);
                   } else if (token) {
-                    router.push('/dashboard/billing');
+                    router.push(`/${locale}/dashboard/billing`);
                   } else {
-                    router.push('/register');
+                    router.push(`/${locale}/register`);
                   }
                 }}
                 className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${

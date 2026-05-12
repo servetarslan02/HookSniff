@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 
 /**
  * OAuth callback page.
@@ -15,6 +15,7 @@ import { useTranslations } from 'next-intl';
  */
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('error');
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +36,7 @@ export default function AuthCallbackPage() {
         if (res.ok) {
           // Session is valid — redirect to dashboard
           // The AuthProvider's mount effect will pick up the cookie
-          router.replace('/dashboard');
+          router.replace(`/${locale}/dashboard`);
         } else {
           setError('Authentication failed. Please try logging in again.');
         }
@@ -53,7 +54,7 @@ export default function AuthCallbackPage() {
           <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("loginFailed")}</h1>
           <p className="text-gray-500 dark:text-slate-400 mb-6">{error}</p>
           <button
-            onClick={() => router.push('/login')}
+            onClick={() => router.push(`/${locale}/login`)}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
           >
             Back to Login
