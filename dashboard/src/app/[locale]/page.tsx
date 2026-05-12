@@ -414,7 +414,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {plans.map((plan, i) => (
-            <div key={i} className={`relative rounded-2xl p-8 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
+            <div key={i} className={`relative rounded-2xl p-8 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg flex flex-col ${
               plan.popular
                 ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
                 : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
@@ -429,7 +429,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
                 <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
                 <span className="text-gray-500 dark:text-slate-400">{plan.period}</span>
               </div>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-3 mb-8 flex-1">
                 {plan.features.map((f, j) => (
                   <li key={j} className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
                     <svg className="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
