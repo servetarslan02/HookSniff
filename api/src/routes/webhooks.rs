@@ -1021,9 +1021,9 @@ mod tests {
         let clamped_page = raw_page.max(1);
         assert_eq!(clamped_page, 1);
 
-        // per_page over 100 should clamp to 100
+        // per_page over 200 should clamp to 200
         let raw_per_page = 500i64;
         let clamped_per_page = raw_per_page.min(200);
-        assert_eq!(clamped_per_page, 100);
+        assert_eq!(clamped_per_page, 200);
     }
 }
