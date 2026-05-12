@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
@@ -23,6 +23,19 @@ function DashboardShell({ children, username }: { children: React.ReactNode; use
   const te = useTranslations('error');
 
   const locale = useLocale();
+
+  // Reconcile URL username with email-derived username
+  // Handles legacy usernames (e.g., "servet-arslan" → "servetarslan02")
+  useEffect(() => {
+    if (!user?.email) return;
+    const emailPrefix = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+    if (emailPrefix && emailPrefix !== username) {
+      // URL username is stale — redirect to correct username path
+      const escapedUsername = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const restOfPath = pathname.replace(new RegExp(`^/${escapedUsername}`), '') || '/';
+      router.replace(`/${emailPrefix}${restOfPath}`);
+    }
+  }, [user?.email, username, pathname, router]);
 
   // Strip locale prefix from pathname for navigation matching
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
