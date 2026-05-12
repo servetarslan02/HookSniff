@@ -263,6 +263,9 @@ mod tests {
             totp_enabled: false,
             cancel_at_period_end: false,
             payment_failed_at: None,
+            allow_overage: false,
+            overage_email_notification: false,
+            role: "user".to_string(),
         }
     }
 

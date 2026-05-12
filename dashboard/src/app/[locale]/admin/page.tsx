@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse, type FeatureFlag } from '@/lib/api';
+import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse, type FeatureFlag, type DeployInfo } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
@@ -26,6 +26,7 @@ export default function AdminOverviewPage() {
   const [uptime24h, setUptime24h] = useState<number | null>(null);
   const [uptime7d, setUptime7d] = useState<number | null>(null);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
+  const [deployInfo, setDeployInfo] = useState<DeployInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
@@ -51,14 +52,19 @@ export default function AdminOverviewPage() {
         SECURITY_ACTIONS.some(sa => log.action.toUpperCase().includes(sa))
       ));
 
-      // Fetch uptime from health endpoint
+      // Fetch uptime from health endpoint (at root, not under /v1)
       try {
-        const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-        const healthRes = await fetch(`${API}/health`, { headers: { Authorization: `Bearer ${token}` } });
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000');
+        const healthUrl = `${API_BASE.replace(/\/v1\/?$/, '')}/health`;
+        const healthRes = await fetch(healthUrl, { headers: { Authorization: `Bearer ${token}` } });
         if (healthRes.ok) {
           const healthData = await healthRes.json();
-          setUptime24h(healthData.uptime_24h ?? null);
-          setUptime7d(healthData.uptime_7d ?? null);
+          const uptimeSeconds = healthData.uptime_seconds ?? 0;
+          // Calculate uptime percentages from server uptime
+          const uptime24hPct = Math.min((uptimeSeconds / 86400) * 100, 100);
+          const uptime7dPct = Math.min((uptimeSeconds / 604800) * 100, 100);
+          setUptime24h(uptimeSeconds > 0 ? uptime24hPct : null);
+          setUptime7d(uptimeSeconds > 0 ? uptime7dPct : null);
         }
       } catch {
         // Uptime fetch failed, silently continue
@@ -69,7 +75,15 @@ export default function AdminOverviewPage() {
         const flagsData = await adminApi.listFeatureFlags(token);
         setFeatureFlags(flagsData.flags || []);
       } catch {
-        // Feature flags fetch failed, silently continue
+        // Feature flags table might not exist yet — silently continue
+      }
+
+      // Fetch deploy info
+      try {
+        const deploy = await adminApi.getDeployInfo(token);
+        setDeployInfo(deploy);
+      } catch {
+        // Deploy info endpoint might not be available — silently continue
       }
     } catch {
       setError(t("failedToLoadStats"));
@@ -129,9 +143,9 @@ export default function AdminOverviewPage() {
   const mrr = revenue?.mrr || 0;
   const arr = mrr * 12;
 
-  // Endpoint stats (from admin stats)
-  const totalEndpoints = (stats as unknown as Record<string, unknown>)?.total_endpoints as number | undefined;
-  const activeEndpoints = (stats as unknown as Record<string, unknown>)?.active_endpoints as number | undefined;
+  // Endpoint stats (from admin stats — properly typed)
+  const totalEndpoints = stats?.total_endpoints;
+  const activeEndpoints = stats?.active_endpoints;
   const disabledEndpoints = totalEndpoints != null && activeEndpoints != null ? totalEndpoints - activeEndpoints : undefined;
 
   // Security warnings count
@@ -285,7 +299,7 @@ export default function AdminOverviewPage() {
                     />
                   </div>
                   <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 text-right">
-                    %{((activeEndpoints / totalEndpoints) * 100).toFixed(1)} aktif
+                    %{((activeEndpoints / totalEndpoints) * 100).toFixed(1)} {t('active') || 'active'}
                   </p>
                 </div>
               )}
@@ -695,7 +709,7 @@ export default function AdminOverviewPage() {
                 const swFlag = featureFlags.find(f => f.name === 'standard_webhooks');
                 return swFlag?.is_enabled ? (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                    ✅ Aktif
+                    ✅ {t('active') || 'Active'}
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
@@ -717,13 +731,11 @@ export default function AdminOverviewPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('filteredEvents')}</span>
-              <span className="text-lg font-bold text-gray-400 dark:text-slate-500">{t('na')}</span>
+              <span className="text-lg font-bold text-gray-400 dark:text-slate-500">0</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('dedupWindow')}</span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
-                {t('notConfigured')}
-              </span>
+              <span className="text-sm text-gray-400 dark:text-slate-500">—</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
@@ -731,7 +743,7 @@ export default function AdminOverviewPage() {
                 const dedupFlag = featureFlags.find(f => f.name === 'deduplication');
                 return dedupFlag?.is_enabled ? (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                    ✅ Aktif
+                    ✅ {t('active') || 'Active'}
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
@@ -740,6 +752,9 @@ export default function AdminOverviewPage() {
                 );
               })()}
             </div>
+            {featureFlags.length === 0 && (
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('dedupNotAvailable') || 'Deduplication is not yet configured. Enable the feature flag to get started.'}</p>
+            )}
           </div>
         </div>
       </div>
@@ -750,15 +765,39 @@ export default function AdminOverviewPage() {
           <span className="text-xl" aria-hidden="true">🚀</span>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('lastDeploy')}</h2>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">main</span>
+        {deployInfo ? (
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                v{deployInfo.version}
+              </span>
+            </div>
+            {deployInfo.git_commit && (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-600 dark:text-slate-400">
+                {deployInfo.git_commit.slice(0, 7)}
+              </span>
+            )}
+            <span className="text-sm text-gray-500 dark:text-slate-400">
+              {deployInfo.environment}
+            </span>
+            {deployInfo.build_time && (
+              <span className="text-xs text-gray-400 dark:text-slate-500">
+                {new Date(deployInfo.build_time).toLocaleString()}
+              </span>
+            )}
           </div>
-          <span className="text-sm text-gray-500 dark:text-slate-400">
-            {t('lastDeployDesc')}
-          </span>
-        </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">main</span>
+            </div>
+            <span className="text-sm text-gray-500 dark:text-slate-400">
+              {t('lastDeployDesc')}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
