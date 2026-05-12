@@ -7,7 +7,7 @@ import { useRouter, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 function getPasswordStrength(pw: string): { score: number; color: string } {
@@ -36,7 +36,6 @@ function LoginForm() {
   const [consentChecked, setConsentChecked] = useState(false);
   const { login, register } = useAuth();
   const router = useRouter();
-  const locale = useLocale();
   const t = useTranslations('auth');
   const tc = useTranslations('common');
   const passwordStrength = mode === 'register' ? getPasswordStrength(password) : null;

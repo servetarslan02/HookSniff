@@ -9,13 +9,12 @@ import { useToast } from '@/components/Toast';
 import { webhooksApi, type Delivery } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export default function DeliveriesPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const locale = useLocale();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
