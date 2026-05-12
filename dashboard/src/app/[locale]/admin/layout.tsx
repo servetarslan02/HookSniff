@@ -34,7 +34,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     if (user && !user.is_admin) {
       router.push(`/${locale}/dashboard`);
     }
-  }, [user, router]);
+  }, [user, router, locale]);
 
   if (!user?.is_admin) {
     return (
@@ -74,7 +74,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Item 127 — Sidebar with ARIA landmark */}
       <aside
-        role="navigation"
         aria-label={t('adminPanel')}
         className={clsx(
           'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0',
