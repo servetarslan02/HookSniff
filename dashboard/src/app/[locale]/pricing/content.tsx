@@ -255,6 +255,7 @@ export function PricingPageContent() {
                 </span>
               )}
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t(plan.key)}</h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t(`${plan.key}Desc`)}</p>
               {plan.key === 'enterprise' ? (
                 <div className="mt-2 mb-1">
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">{t('customPricing')}</span>

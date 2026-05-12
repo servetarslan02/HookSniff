@@ -1406,35 +1406,28 @@
       "getStarted": "Başlayın",
       "startTrial": "Ücretsiz deneyin",
       "contactSales": "Satışla iletişime geçin",
-      "freeFeatures": [
-        "10.000 webhook/ay",
-        "100 istek/dakika",
-        "3 tekrar denemesi",
-        "Topluluk desteği"
-      ],
       "proFeatures": [
-        "50.000 webhook/ay",
-        "1.000 istek/dakika",
-        "5 tekrar denemesi",
-        "Öncelikli destek",
-        "Özel alan adları"
-      ],
-      "businessFeatures": [
-        "500.000 webhook/ay",
-        "10.000 istek/dakika",
-        "10 tekrar denemesi",
-        "Özel destek",
-        "SLA garantisi",
-        "Özel entegrasyonlar"
+        "Günde 100.000'e kadar olay",
+        "Sınırsız uygulama",
+        "500 endpoint",
+        "Sınırsız olay türü",
+        "Sınırsız abonelik",
+        "30 gün veri saklama",
+        "Olay başına $0.0001 overage",
+        "FIFO sıralı teslimat",
+        "IP beyaz liste",
+        "Analitik ve grafikler",
+        "Şema kayıt defteri",
+        "Webhook playground"
       ],
       "enterpriseFeatures": [
-        "Sınırsız her şey",
-        "Özel SLA (%99,99 uptime)",
-        "SSO / SAML",
-        "Özel hesap yöneticisi",
+        "Tamamen yönetilen — sahip olunması gereken altyapı yok",
+        "Her şey sınırsız",
+        "Özel günlük olay limitleri",
+        "Özel veri saklama süresi",
         "Özel entegrasyonlar",
-        "Yerinde kurulum",
-        "Öncelikli destek",
+        "SSO / SAML",
+        "Sunucu içi dağıtım seçeneği",
         "Özel sözleşmeler"
       ],
       "developerFeatures": [
@@ -1463,7 +1456,11 @@
         "Ölü mektup kuyruğu",
         "Özel yeniden deneme politikaları",
         "E-posta desteği"
-      ]
+      ],
+      "developerDesc": "HookSniff'ı denemek için mükemmel bir yol. Kurulum gerektirmez, yan projeler için sonsuza dek ücretsiz.",
+      "startupDesc": "Yeni özelliklerimizle webhook deneyiminizi geliştirin ve girişiminizi büyütün!",
+      "proDesc": "Kurumsal özellikleri ve daha iyi desteği ile veri bağlantınızı serbest bırakın.",
+      "enterpriseDesc": "Daha fazla mı ihtiyacınız var? Farklı bir şeye mi ihtiyacınız var? Bize bildirin, sizin için özel bir plan oluşturalım."
     },
     "footer": {
       "github": "GitHub",
@@ -1751,7 +1748,7 @@
     "startTrial": "Ücretsiz Deneyin",
     "contactSales": "Satışla İletişim",
     "freeDesc": "Yan projeler ve deneyler için",
-    "proDesc": "Production iş yükleri için",
+    "proDesc": "Kurumsal özellikleri ve daha iyi desteği ile veri bağlantınızı serbest bırakın.",
     "businessDesc": "Garantiye ihtiyacı olan ekipler için",
     "freeFeatures": [
       "Ayda 10.000 webhook",
@@ -1865,7 +1862,7 @@
       "Savaş testinden geçmiş yeniden deneme motoru"
     ],
     "startupTitle": "Erken aşama girişim misiniz?",
-    "startupDesc": "Büyüyen projeler için",
+    "startupDesc": "Yeni özelliklerimizle webhook deneyiminizi geliştirin ve girişiminizi büyütün!",
     "startupCta": "Girişim indirimi için başvurun →",
     "faqTitle": "Sıkça sorulan sorular",
     "ctaTitle": "Başlamaya hazır mısınız?",
@@ -1929,7 +1926,7 @@
     "billedAnnually": "Yıllık faturalandırılır",
     "billedMonthly": "Aylık faturalandırılır",
     "enterprise": "Enterprise",
-    "enterpriseDesc": "Özel ihtiyaçları olan büyük organizasyonlar için",
+    "enterpriseDesc": "Daha fazla mı ihtiyacınız var? Farklı bir şeye mi ihtiyacınız var? Bize bildirin, sizin için özel bir plan oluşturalım.",
     "customPricing": "Özel Fiyat",
     "contactUs": "Bize Ulaşın",
     "enterpriseFeatures": [
@@ -1944,7 +1941,7 @@
     ],
     "developer": "Developer",
     "startup": "Startup",
-    "developerDesc": "Ücretsiz başlayın",
+    "developerDesc": "HookSniff'ı denemek için mükemmel bir yol. Kurulum gerektirmez, yan projeler için sonsuza dek ücretsiz.",
     "developerFeatures": [
       "Günlük 100 event",
       "1 uygulama",
