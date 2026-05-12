@@ -37,6 +37,7 @@ pub fn router() -> Router {
         .route("/alerts/{id}", put(update_alert_admin).delete(delete_alert_admin))
         .route("/feature-flags", get(list_feature_flags).post(create_feature_flag))
         .route("/feature-flags/{id}", put(update_feature_flag).delete(delete_feature_flag))
+        .route("/deploy-info", get(deploy_info))
 }
 
 #[derive(Debug, Deserialize)]
@@ -157,6 +158,8 @@ pub struct SystemStats {
     pub total_deliveries: i64,
     pub total_revenue: f64,
     pub active_users_today: i64,
+    pub total_endpoints: i64,
+    pub active_endpoints: i64,
     pub users_by_plan: Vec<PlanCount>,
     pub recent_signups: Vec<RecentSignup>,
     /// Yesterday's values for trend comparison
@@ -699,11 +702,23 @@ async fn system_stats(
     .fetch_one(&pool)
     .await?;
 
+    // Endpoint counts (from the endpoints table)
+    let total_endpoints: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM endpoints")
+        .fetch_one(&pool)
+        .await?;
+
+    let active_endpoints: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE is_active = TRUE")
+            .fetch_one(&pool)
+            .await?;
+
     Ok(Json(SystemStats {
         total_users: total_users.0,
         total_deliveries: total_deliveries.0,
         total_revenue: revenue.0.unwrap_or(0.0),
         active_users_today: active_today.0,
+        total_endpoints: total_endpoints.0,
+        active_endpoints: active_endpoints.0,
         users_by_plan,
         recent_signups,
         trends: StatsTrends {
@@ -1634,6 +1649,37 @@ async fn delete_feature_flag(
 }
 
 // ─────────────────────────────────────────────────────────
+// Deploy Info
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Serialize)]
+pub struct DeployInfo {
+    pub version: String,
+    pub git_commit: Option<String>,
+    pub build_time: Option<String>,
+    pub environment: String,
+}
+
+/// GET /v1/admin/deploy-info — Returns current deployment version and metadata
+async fn deploy_info(
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<DeployInfo>, AppError> {
+    require_admin(&customer)?;
+
+    Ok(Json(DeployInfo {
+        version: env!("CARGO_PKG_VERSION").to_string(),
+        git_commit: std::env::var("GIT_SHA").ok().or_else(|| {
+            std::env::var("VERCEL_GIT_COMMIT_SHA")
+                .ok()
+                .or_else(|| std::env::var("CLOUD_BUILD_COMMIT").ok())
+        }),
+        build_time: std::env::var("BUILD_TIME").ok(),
+        environment: std::env::var("ENVIRONMENT")
+            .unwrap_or_else(|_| "production".to_string()),
+    }))
+}
+
+// ─────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────
 
@@ -2170,6 +2216,7 @@ mod tests {
             email: "test@example.com".to_string(),
             name: Some("Test User".to_string()),
             plan: "pro".to_string(),
+            role: "member".to_string(),
             is_active: true,
             is_admin: false,
             created_at: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
@@ -2188,6 +2235,7 @@ mod tests {
             email: "banned@x.com".to_string(),
             name: None,
             plan: "developer".to_string(),
+            role: "member".to_string(),
             is_active: false,
             is_admin: false,
             created_at: Utc::now(),
@@ -2289,12 +2337,24 @@ mod tests {
             total_deliveries: 10000,
             total_revenue: 25000.0,
             active_users_today: 50,
+            total_endpoints: 200,
+            active_endpoints: 180,
             users_by_plan: vec![],
             recent_signups: vec![],
+            trends: StatsTrends {
+                total_users_yesterday: 490,
+                total_deliveries_yesterday: 9800,
+                revenue_yesterday: 24000.0,
+                active_users_yesterday: 45,
+                active_webhooks: 12,
+            },
         };
         let json = serde_json::to_value(&stats).unwrap();
         assert_eq!(json["total_users"], 500);
         assert_eq!(json["total_revenue"], 25000.0);
+        assert_eq!(json["total_endpoints"], 200);
+        assert_eq!(json["active_endpoints"], 180);
+        assert_eq!(json["trends"]["active_webhooks"], 12);
     }
 
     // ── PlanCount ───────────────────────────────────────────
@@ -2393,6 +2453,7 @@ mod tests {
                 email: "a@b.com".to_string(),
                 name: None,
                 plan: "developer".to_string(),
+                role: "member".to_string(),
                 is_active: true,
                 is_admin: false,
                 created_at: Utc::now(),
