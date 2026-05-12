@@ -96,8 +96,8 @@ export default function TransformsPage() {
 
       {/* Endpoint selector */}
       <div className="glass-card p-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('selectEndpoint')}</label>
-        <select value={selectedEndpoint} onChange={e => setSelectedEndpoint(e.target.value)}
+        <label htmlFor="transform-endpoint" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('selectEndpoint')}</label>
+        <select id="transform-endpoint" value={selectedEndpoint} onChange={e => setSelectedEndpoint(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
           <option value="">{t('chooseEndpoint')}</option>
           {endpoints.map(ep => <option key={ep.id} value={ep.id}>{ep.url}</option>)}
@@ -111,33 +111,33 @@ export default function TransformsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('filterInclude')}</label>
-              <input value={filterInclude} onChange={e => setFilterInclude(e.target.value)} placeholder="order_id, amount" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
+              <label htmlFor="transform-filter-include" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('filterInclude')}</label>
+              <input id="transform-filter-include" value={filterInclude} onChange={e => setFilterInclude(e.target.value)} placeholder="order_id, amount" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('filterExclude')}</label>
-              <input value={filterExclude} onChange={e => setFilterExclude(e.target.value)} placeholder="internal_secret" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
+              <label htmlFor="transform-filter-exclude" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('filterExclude')}</label>
+              <input id="transform-filter-exclude" value={filterExclude} onChange={e => setFilterExclude(e.target.value)} placeholder="internal_secret" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
             </div>
             <div className="flex gap-2">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('mapFrom')}</label>
-                <input value={mapSource} onChange={e => setMapSource(e.target.value)} placeholder="data.order.id" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
+                <label htmlFor="transform-map-from" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('mapFrom')}</label>
+                <input id="transform-map-from" value={mapSource} onChange={e => setMapSource(e.target.value)} placeholder="data.order.id" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
               </div>
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('mapTo')}</label>
-                <input value={mapTarget} onChange={e => setMapTarget(e.target.value)} placeholder="order_id" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
+                <label htmlFor="transform-map-to" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('mapTo')}</label>
+                <input id="transform-map-to" value={mapTarget} onChange={e => setMapTarget(e.target.value)} placeholder="order_id" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
               </div>
             </div>
           </div>
 
           <div className="flex gap-2 items-end">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichKey')}</label>
-              <input value={enrichKey} onChange={e => setEnrichKey(e.target.value)} placeholder="source" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
+              <label htmlFor="transform-enrich-key" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichKey')}</label>
+              <input id="transform-enrich-key" value={enrichKey} onChange={e => setEnrichKey(e.target.value)} placeholder="source" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichValue')}</label>
-              <input value={enrichValue} onChange={e => setEnrichValue(e.target.value)} placeholder="hooksniff" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
+              <label htmlFor="transform-enrich-value" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichValue')}</label>
+              <input id="transform-enrich-value" value={enrichValue} onChange={e => setEnrichValue(e.target.value)} placeholder="hooksniff" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
             </div>
             <button type="button" onClick={handleCreate} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition">{t('create')}</button>
           </div>

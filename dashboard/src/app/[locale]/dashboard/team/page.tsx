@@ -272,8 +272,9 @@ export default function TeamPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('teamNameLabel')}</label>
+                <label htmlFor="team-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('teamNameLabel')}</label>
                 <input
+                  id="team-name"
                   type="text"
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
@@ -282,8 +283,9 @@ export default function TeamPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('descriptionLabel')}</label>
+                <label htmlFor="team-description" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('descriptionLabel')}</label>
                 <input
+                  id="team-description"
                   type="text"
                   value={createDesc}
                   onChange={(e) => setCreateDesc(e.target.value)}
@@ -319,8 +321,9 @@ export default function TeamPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('inviteTitle')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('emailLabel')}</label>
+                <label htmlFor="invite-email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('emailLabel')}</label>
                 <input
+                  id="invite-email"
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
@@ -329,8 +332,9 @@ export default function TeamPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('roleLabel')}</label>
+                <label htmlFor="invite-role" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('roleLabel')}</label>
                 <select
+                  id="invite-role"
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"

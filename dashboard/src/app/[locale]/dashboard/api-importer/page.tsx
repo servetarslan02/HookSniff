@@ -83,7 +83,7 @@ export default function ApiSpecImporterPage() {
         toast(t('failedToParse'), 'error');
       }
     } catch (err) {
-      toast(`Failed to fetch: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+      toast(t('failedToFetchError', { error: err instanceof Error ? err.message : 'Unknown error' }), 'error');
     }
   };
 
@@ -207,9 +207,10 @@ export default function ApiSpecImporterPage() {
       <div className="glass-card p-6">
         {mode === 'url' ? (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('specUrl')}</label>
+            <label htmlFor="api-importer-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('specUrl')}</label>
             <div className="flex gap-3">
               <input
+                id="api-importer-url"
                 type="url"
                 value={specUrl}
                 onChange={(e) => setSpecUrl(e.target.value)}
@@ -227,8 +228,9 @@ export default function ApiSpecImporterPage() {
           </div>
         ) : (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('pasteLabel')}</label>
+            <label htmlFor="api-importer-paste" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('pasteLabel')}</label>
             <textarea
+              id="api-importer-paste"
               value={specContent}
               onChange={(e) => setSpecContent(e.target.value)}
               placeholder={sampleSpec}
