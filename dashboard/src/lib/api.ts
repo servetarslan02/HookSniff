@@ -546,14 +546,14 @@ export const adminApi = {
     searchParams.set('format', params?.format || 'csv');
     if (params?.plan) searchParams.set('plan', params.plan);
     if (params?.status) searchParams.set('status', params.status);
-    return `/v1/admin/users/export?${searchParams.toString()}`;
+    return `/admin/users/export?${searchParams.toString()}`;
   },
 
   exportRevenue: (_token: string, months?: number) => {
     const searchParams = new URLSearchParams();
     searchParams.set('format', 'csv');
     if (months) searchParams.set('months', months.toString());
-    return `/v1/admin/revenue/export?${searchParams.toString()}`;
+    return `/admin/revenue/export?${searchParams.toString()}`;
   },
 
   getSettings: (token: string) =>
