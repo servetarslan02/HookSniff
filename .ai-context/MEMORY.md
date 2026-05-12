@@ -514,3 +514,21 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Commits:** 5+ commit push edildi
 - **Neon DB connection:** `postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require`
 - **⚠️ DB migration'ları otomatik uygulanmıyor** — Cloud Build'de migration step eklenmeli veya manuel uygulanmalı
+
+## Oturum 136 (2026-05-13 01:57 - 02:25 GMT+8) ✅
+- **OpenClaw** — Servet ile Cloud Build + compile fix + migration otomasyonu
+- **gcloud CLI kuruldu** — Google Cloud SDK 568.0.0
+- **Google OAuth girişi** — servetarslan02@gmail.com, 2FA SMS ile doğrulandı
+- **Cloud Build tetiklendi** — ilk deneme başarısız (10 compile hatası)
+- **10 compile hatası düzeltildi (4 dosya):**
+  - `admin.rs`: `u64` → `i64` (sqlx Postgres uyumluluğu, 4 bind çağrısı)
+  - `applications.rs`: `AppError::NotFound("...".into())` → `AppError::NotFound` (3 yer)
+  - `billing.rs`: `Plan::Startup` match arm eklendi, duplicate `Plan::Enterprise` kaldırıldı
+  - `schemas.rs`: `e.to_string()` → `anyhow::anyhow!(e)` (2 yer)
+- **İkinci Cloud Build başarılı** ✅ — 5m59s, API + Worker deploy edildi
+- **DB migration otomasyonu** — `cloudbuild.yaml`'a migration step eklendi:
+  - `node:20-slim` image, `npm install pg && node run-migrations.js`
+  - `availableSecrets` ile DATABASE_URL Neon DB'den okunuyor
+  - Deploy step'leri migration tamamlandıktan sonra çalışıyor
+- **Commits:** `efa82fdc`, `13d2f623` — main branch
+- **Güncel İlerleme: 359/364 (%99)** — 5 kalan ⬜ (hepsi Servet görevleri)
