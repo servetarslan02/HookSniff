@@ -261,30 +261,6 @@ export function BlogPageContent() {
           </div>
         )}
 
-        {/* Testimonials */}
-        <div className="mt-16 pt-10 border-t border-gray-200 dark:border-slate-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("whatUsersSay")}</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
-                <svg className="w-8 h-8 text-brand-200 dark:text-brand-800 mb-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
-                </svg>
-                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{t(`testimonial${i}Quote`)}</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
-                    {t(`testimonial${i}Author`)[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t(`testimonial${i}Author`)}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-500">{t(`testimonial${i}Company`)}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* RSS */}
         <div className="text-center mt-12">
           <a href="/blog/rss" className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
