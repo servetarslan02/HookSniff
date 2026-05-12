@@ -19,6 +19,8 @@ pub fn router() -> Router {
         .route("/users/export", get(export_users_csv))
         .route("/users/{id}", get(get_user_detail))
         .route("/users/{id}/plan", put(change_plan))
+        .route("/users/{id}/plan-history", get(user_plan_history))
+        .route("/users/{id}/send-email", post(send_user_email))
         .route("/users/{id}/status", put(change_status))
         .route("/users/{id}/impersonate", post(impersonate_user))
         .route("/users/{id}/analytics", get(user_analytics))
@@ -135,6 +137,13 @@ pub struct StatusRequest {
     pub is_active: bool,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SendEmailRequest {
+    pub subject: String,
+    pub body: String,
+}
+
 #[derive(Debug, Serialize)]
 pub struct SystemStats {
     pub total_users: i64,
@@ -153,6 +162,8 @@ pub struct StatsTrends {
     pub total_deliveries_yesterday: i64,
     pub revenue_yesterday: f64,
     pub active_users_yesterday: i64,
+    /// Number of deliveries currently being processed (active webhooks)
+    pub active_webhooks: i64,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -436,11 +447,116 @@ async fn change_plan(
 
     tracing::info!("✅ Admin changed plan for user {} to {}", id, req.plan);
 
+    // Log plan change to audit
+    let _ = crate::audit::log_action(
+        &pool,
+        Some(customer.id),
+        "plan.changed",
+        "customer",
+        Some(id),
+        Some(serde_json::json!({
+            "new_plan": req.plan,
+            "webhook_limit": limit,
+            "admin_email": customer.email,
+        })),
+    )
+    .await;
+
     Ok(Json(serde_json::json!({
         "message": format!("Plan updated to {}", req.plan),
         "plan": req.plan,
         "webhook_limit": limit,
     })))
+}
+
+/// GET /v1/admin/users/:id/plan-history — Get plan change history for a user
+async fn user_plan_history(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    let rows = sqlx::query_as::<_, (String, Option<serde_json::Value>, chrono::DateTime<chrono::Utc>)>(
+        r#"SELECT action, details, created_at FROM audit_log
+           WHERE resource_type = 'customer' AND resource_id = $1 AND action = 'plan.changed'
+           ORDER BY created_at DESC LIMIT 50"#,
+    )
+    .bind(id)
+    .fetch_all(&pool)
+    .await?;
+
+    let history: Vec<serde_json::Value> = rows
+        .iter()
+        .map(|(action, details, at)| {
+            serde_json::json!({
+                "action": action,
+                "details": details,
+                "created_at": at.to_rfc3339(),
+            })
+        })
+        .collect();
+
+    Ok(Json(serde_json::json!({ "history": history })))
+}
+
+/// POST /v1/admin/users/:id/send-email — Send email to a user
+async fn send_user_email(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Json(req): Json<SendEmailRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    // Get target user
+    let user: Option<(String, Option<String>)> =
+        sqlx::query_as("SELECT email, name FROM customers WHERE id = $1")
+            .bind(id)
+            .fetch_optional(&pool)
+            .await?;
+
+    let (email, _name) = user.ok_or(AppError::NotFound)?;
+
+    // Get settings for Resend config
+    let settings = fetch_platform_settings(&pool).await;
+
+    let api_key = settings.resend_api_key.as_ref()
+        .ok_or_else(|| AppError::BadRequest("Resend API key not configured".into()))?;
+    let sender = settings.email_sender.as_deref().unwrap_or("noreply@resend.dev");
+
+    // Send via Resend API
+    let client = reqwest::Client::new();
+    let resp = client
+        .post("https://api.resend.com/emails")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .json(&serde_json::json!({
+            "from": sender,
+            "to": [email],
+            "subject": req.subject,
+            "text": req.body,
+        }))
+        .send()
+        .await
+        .map_err(|e| AppError::BadRequest(format!("Failed to send email: {}", e)))?;
+
+    if !resp.status().is_success() {
+        let err_text = resp.text().await.unwrap_or_default();
+        return Err(AppError::BadRequest(format!("Email send failed: {}", err_text)));
+    }
+
+    // Log to audit
+    let _ = crate::audit::log_action(
+        &pool,
+        Some(customer.id),
+        "email.sent",
+        "customer",
+        Some(id),
+        Some(serde_json::json!({ "subject": req.subject, "admin_email": customer.email })),
+    )
+    .await;
+
+    Ok(Json(serde_json::json!({ "message": "Email sent" })))
 }
 
 /// PUT /v1/admin/users/:id/status — Ban/activate user
@@ -571,6 +687,12 @@ async fn system_stats(
     .fetch_one(&pool)
     .await?;
 
+    let active_webhooks: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE status = 'pending'",
+    )
+    .fetch_one(&pool)
+    .await?;
+
     Ok(Json(SystemStats {
         total_users: total_users.0,
         total_deliveries: total_deliveries.0,
@@ -583,6 +705,7 @@ async fn system_stats(
             total_deliveries_yesterday: deliveries_yesterday.0,
             revenue_yesterday: revenue_yesterday.0.unwrap_or(0.0),
             active_users_yesterday: active_yesterday.0,
+            active_webhooks: active_webhooks.0,
         },
     }))
 }
@@ -1496,10 +1619,24 @@ pub struct PlatformSettings {
     /// Sender email address (e.g. "noreply@hooksniff.dev")
     #[serde(default)]
     pub email_sender: Option<String>,
+    /// Default webhook signing secret
+    #[serde(default)]
+    pub webhook_secret: Option<String>,
+    /// Backup retention days
+    #[serde(default = "default_backup_retention")]
+    pub backup_retention_days: i32,
+    /// Global API rate limit (requests per minute)
+    #[serde(default = "default_global_rate_limit")]
+    pub global_rate_limit: i32,
+    /// Allowed CORS origins (comma-separated)
+    #[serde(default)]
+    pub cors_origins: Option<String>,
 }
 
 fn default_price_pro() -> f64 { 29.0 }
 fn default_price_business() -> f64 { 99.0 }
+fn default_backup_retention() -> i32 { 30 }
+fn default_global_rate_limit() -> i32 { 1000 }
 
 impl Default for PlatformSettings {
     fn default() -> Self {
@@ -1520,6 +1657,10 @@ impl Default for PlatformSettings {
             plan_price_business: 99.0,
             resend_api_key: None,
             email_sender: None,
+            webhook_secret: None,
+            backup_retention_days: 30,
+            global_rate_limit: 1000,
+            cors_origins: None,
         }
     }
 }
