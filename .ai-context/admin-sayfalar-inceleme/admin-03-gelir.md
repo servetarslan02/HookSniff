@@ -51,6 +51,16 @@
 - Lazy loading grafikler
 
 ### 🔴 Eksiklikler
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **MRR kartı** — Monthly Recurring Revenue (₺)
+- **ARR kartı** — Annual Recurring Revenue (₺)
+- **ARPU kartı** — Average Revenue Per User (₺)
+- **LTV kartı** — Customer Lifetime Value (₺)
+- **Gelir projeksiyonu** — 3/6/12 aylık tahmini gelir grafiği
+- **Cohort analizi** — Aylık müşteri cohort gelir karşılaştırması
+- **Net Revenue Retention** — Mevcut müşterilerden gelir tutma oranı
+- **Expansion Revenue** — Plan yükseltmelerden gelen ek gelir
 - MRR/ARR gösterimi yok
 - Cohort analizi yok
 - Gelir tahmini yok
