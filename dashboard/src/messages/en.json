@@ -1853,7 +1853,7 @@
     "securityItem7Desc": "Enterprise single sign-on",
     "securityItem8Title": "IP Whitelisting",
     "securityItem8Desc": "Restrict by IP/CIDR",
-    "supportFreeFeatures": [
+    "supportDeveloperFeatures": [
       "GitHub Issues",
       "Community Discord",
       "Documentation",
@@ -1865,7 +1865,7 @@
       "Bug fix priority",
       "Feature requests"
     ],
-    "supportBusinessFeatures": [
+    "supportEnterpriseFeatures": [
       "Dedicated account manager",
       "Slack Connect channel",
       "24h response time",

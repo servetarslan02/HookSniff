@@ -1329,7 +1329,7 @@ async fn churn_report(
             plan,
             CASE plan
                 WHEN 'pro' THEN {pro}
-                WHEN 'business' THEN {biz}
+                WHEN 'enterprise' THEN {biz}
                 ELSE 0.0
             END as amount,
             updated_at as churn_date
