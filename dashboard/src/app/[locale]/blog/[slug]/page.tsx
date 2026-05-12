@@ -284,7 +284,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         <div className="mt-8">
-          <Link href="/blog" className="text-brand-600 dark:text-brand-400 hover:underline">← Back to Blog</Link>
+          <Link href="/blog" className="text-brand-600 dark:text-brand-400 hover:underline">{t('backToList')}</Link>
         </div>
       </article>
 
