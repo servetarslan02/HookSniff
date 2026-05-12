@@ -230,18 +230,18 @@
 160. ✅ Sidebar 26 item gruplama (Core, Tools, Advanced, Account) → 4 section'a ayrıldı ✅ YAPILDI
 161. ✅ Sidebar active state — nested route'lar için `startsWith` matching + admin link active state ✅ YAPILDI (Oturum 122)
 162. ✅ Schemas, Templates, Portal sidebar linkleri ekle → Tools ve Advanced section'da mevcut ✅ YAPILDI
-163. ⬜ Sidebar bottom controls overlap düzelt
+163. ✅ Sidebar bottom controls overlap düzelt — ✅ YAPILDI (Oturum 124)
 
 ### 4.6 CSS & Responsive
 164. ✅ 13 tablo `overflow-x-auto` ekle (docs, alternatives, privacy) ✅ YAPILDI (Oturum 120) — 3 alternatives sayfası
 165. ✅ 8 `<pre>` bloğu `overflow-x-auto` ekle ✅ YAPILDI (Oturum 120) — 3 docs sayfası
 166. ✅ `vh` → `dvh` mobilde — deliveries ve logs modal max-h-[80dvh] ✅ YAPILDI (Oturum 122) (Deliveries, Logs, Blog)
-167. ⬜ Grid layout mobilde kırılıyor (Portal page)
+167. ✅ Grid layout mobilde kırılıyor (Portal page) — ✅ YAPILDI (Oturum 124)
 168. ✅ Signature comparison — timingSafeEqual() fonksiyonu eklendi (byte-level XOR) ✅ YAPILDI (Oturum 122) → `signature-verifier/page.tsx`
 
 ### 4.7 Error Handling
 169. ✅ Offline detection — apiFetch'te assertOnline() kontrolü eklendi ✅ YAPILDI (Oturum 122) → `api.ts`
-170. ⬜ ErrorBoundary console.log only → Sentry entegrasyonu
+170. ✅ ErrorBoundary console.log only → Sentry entegrasyonu — ✅ YAPILDI (Oturum 124)
 171. ✅ ErrorBoundary — user-friendly description, raw error gösterilmiyor ✅ YAPILDI (Oturum 122) → user-friendly
 172. ✅ Console.log/Debug kalıntıları temizle — 3 production console'a `// dev only` eklendi ✅
 
@@ -319,8 +319,8 @@
 217. ✅ Pagination `aria-label` eksik → blog pagination nav + aria-label eklendi, deliveries zaten vardı ✅ YAPILDI
 218. ✅ Copy button `aria-label` eksik → visible text ile erişilebilir ✅ YAPILDI
 219. ✅ Heading hierarchy tutarsız → portal-manage conditional h1 (OK), diğer sayfalar düzgün ✅ YAPILDI
-220. ⬜ Grafik SVG `<title>` ve `<desc>` boş
-221. ⬜ Forms `aria-describedby` eksik
+220. ✅ Grafik SVG `<title>` ve `<desc>` boş — ✅ YAPILDI (Oturum 124)
+221. ✅ Forms `aria-describedby` eksik — ✅ YAPILDI (Oturum 124)
 222. ✅ Alert element boş render edilmiş → Toast role=\"alert\" mevcut ✅ YAPILDI
 223. ✅ Renk bağımlı bilgi (System sayfası) → text label + color birlikte kullanılıyor ✅ YAPILDI
 
@@ -432,8 +432,8 @@
 292. ⬜ `any` type usage — 15+ production code
 293. ⬜ 67+ fonksiyon 100 satırı aşıyor
 294. ✅ Magic numbers — named constant yap → `worker/src/main.rs` ✅ YAPILDI (12 named constants)
-295. ⬜ Excessive `unwrap()` in production code
-296. ⬜ Unused dependencies (cookie, async-stream, aes-gcm)
+295. ✅ Excessive `unwrap()` in production code — ✅ YAPILDI (Oturum 124)
+296. ✅ Unused dependencies (cookie, async-stream, aes-gcm) — ✅ YAPILDI (Oturum 124)
 297. ⬜ `totp-rs` ve `base32` import yok
 298. ⬜ Docker dev image version pin yok
 299. ⬜ `opentelemetry-otlp` duplicate transport
@@ -460,29 +460,29 @@
 314. ⬜ `playground/page.tsx` (public) — 911 satır
 
 ### 13.2 Frontend Düşük
-315. ⬜ Inbound page unused loading variable
-316. ⬜ Duplicate StatusBadge component
-317. ⬜ Onboarding + OnboardingWizard overlap
-318. ⬜ AnimatedCounter negative values
-319. ⬜ Playground history localStorage size limit
+315. ✅ Inbound page unused loading variable — ✅ YAPILDI (Oturum 124)
+316. ✅ Duplicate StatusBadge component — ✅ YAPILDI (Oturum 124)
+317. ✅ Onboarding + OnboardingWizard overlap — ✅ YAPILDI (Oturum 124)
+318. ✅ AnimatedCounter negative values — ✅ YAPILDI (Oturum 124)
+319. ✅ Playground history localStorage size limit — ✅ YAPILDI (Oturum 124)
 320. ⬜ Route-level `loading.tsx` yok
 321. ⬜ Endpoints detail hand-rolled modal
 322. ⬜ Logs page status counts current page only
 323. ⬜ Billing cancel modal state reset
 324. ⬜ Notification API field mismatch
 325. ✅ `autoComplete="new-password"` confirm password'a eklendi ✅ YAPILDI (Oturum 122)
-326. ⬜ Mobile sidebar toggle `aria-expanded` eksik
-327. ⬜ Date formatting not locale-aware
-328. ⬜ 63 useEffect cleanup eksik
-329. ⬜ `useEffect` dependency array eksiklikleri
-330. ⬜ Portal/Schemas/Routing/Templates double-padding
-331. ⬜ `getErrorMessage` inconsistent usage
-332. ⬜ Schema registry'de enum/oneOf/format desteklenmiyor
-333. ⬜ WebSocket'te server-initiated ping eksik
+326. ✅ Mobile sidebar toggle `aria-expanded` eksik — ✅ YAPILDI (Oturum 124)
+327. ✅ Date formatting not locale-aware — ✅ YAPILDI (Oturum 124)
+328. ✅ 63 useEffect cleanup eksik — ✅ YAPILDI (Oturum 124)
+329. ✅ `useEffect` dependency array eksiklikleri — ✅ YAPILDI (Oturum 124)
+330. ✅ Portal/Schemas/Routing/Templates double-padding — ✅ YAPILDI (Oturum 124)
+331. ✅ `getErrorMessage` inconsistent usage — ✅ YAPILDI (Oturum 124)
+332. ✅ Schema registry'de enum/oneOf/format desteklenmiyor — ✅ YAPILDI (Oturum 124)
+333. ✅ WebSocket'te server-initiated ping eksik — ✅ YAPILDI (Oturum 124)
 334. ⬜ Inbound page unused loading variable (tekrar)
-335. ⬜ SuccessRateDonut fallback string
-336. ⬜ ActivityFeed polls every 5s unconditionally
-337. ⬜ StatusDot vs StatusBadge inconsistent
+335. ✅ SuccessRateDonut fallback string — ✅ YAPILDI (Oturum 124)
+336. ✅ ActivityFeed polls every 5s unconditionally — ✅ YAPILDI (Oturum 124)
+337. ✅ StatusDot vs StatusBadge inconsistent — ✅ YAPILDI (Oturum 124)
 
 ### 13.3 Backend Düşük
 338. ⬜ Retry policy default'ları aggressive
