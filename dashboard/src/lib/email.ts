@@ -235,7 +235,10 @@ export function passwordResetEmail(resetUrl: string) {
   `;
 }
 
-export function deliveryFailedEmail(event: string, endpoint: string, attempts: number) {
+export function deliveryFailedEmail(event: string, endpoint: string, attempts: number, username?: string) {
+  const dashboardBase = username
+    ? `https://hooksniff.vercel.app/${username}/deliveries`
+    : 'https://hooksniff.vercel.app/dashboard/deliveries';
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
@@ -253,7 +256,7 @@ export function deliveryFailedEmail(event: string, endpoint: string, attempts: n
         Webhook endpoint'inize teslimat yapılamadı. Lütfen endpoint durumunu kontrol edin.
       </p>
       <div style="text-align: center; margin: 24px 0;">
-        <a href="https://hooksniff.vercel.app/dashboard/deliveries" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="${dashboardBase}" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Teslimatları Görüntüle
         </a>
       </div>
@@ -261,7 +264,10 @@ export function deliveryFailedEmail(event: string, endpoint: string, attempts: n
   `;
 }
 
-export function welcomeEmail(name: string) {
+export function welcomeEmail(name: string, username?: string) {
+  const dashboardUrl = username
+    ? `https://hooksniff.vercel.app/${username}`
+    : 'https://hooksniff.vercel.app/dashboard';
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
@@ -273,7 +279,7 @@ export function welcomeEmail(name: string) {
         HookSniff'e kayıt olduğun için teşekkürler! Webhook teslimatlarını güvenilir bir şekilde yönetmeye hemen başlayabilirsin.
       </p>
       <div style="text-align: center; margin: 24px 0;">
-        <a href="https://hooksniff.vercel.app/dashboard" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="${dashboardUrl}" style="background: #4c6ef5; color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Dashboard'a Git
         </a>
       </div>

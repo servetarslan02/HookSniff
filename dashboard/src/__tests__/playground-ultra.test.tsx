@@ -60,7 +60,7 @@ vi.mock('@/lib/api', () => ({
   endpointsApi: { list: vi.fn().mockResolvedValue([]) },
 }));
 
-const { default: PlaygroundPage } = await import('@/app/[locale]/dashboard/playground/page');
+const { default: PlaygroundPage } = await import('@/app/[locale]/[username]/playground/page');
 
 // Helpers
 function getSendButton(container: HTMLElement) {

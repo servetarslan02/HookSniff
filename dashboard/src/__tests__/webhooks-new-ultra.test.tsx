@@ -44,7 +44,7 @@ vi.mock('@/components/LoadingSpinner', () => ({
   default: () => React.createElement('div', null, 'Loading...'),
 }));
 
-const { default: SendWebhookPage } = await import('@/app/[locale]/dashboard/webhooks/new/page');
+const { default: SendWebhookPage } = await import('@/app/[locale]/[username]/webhooks/new/page');
 
 const mockEndpoints = [
   { id: 'ep1', url: 'https://example.com/webhook', is_active: true, created_at: '2024-01-01' },

@@ -36,7 +36,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: any[]) => mockApiFetch(...args),
 }));
 
-const { default: RoutingPage } = await import('@/app/[locale]/dashboard/routing/page');
+const { default: RoutingPage } = await import('@/app/[locale]/[username]/routing/page');
 
 const mockEndpoints = [
   {

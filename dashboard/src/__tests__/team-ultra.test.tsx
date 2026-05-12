@@ -46,7 +46,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: TeamPage } = await import('@/app/[locale]/dashboard/team/page');
+const { default: TeamPage } = await import('@/app/[locale]/[username]/team/page');
 
 const mockTeams = [
   { id: 't1', name: 'Engineering', description: 'Dev team', created_at: '2024-01-01', member_count: 3 },

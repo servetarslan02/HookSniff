@@ -25,7 +25,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: RetryPolicyPage } = await import('@/app/[locale]/dashboard/retry-policy/page');
+const { default: RetryPolicyPage } = await import('@/app/[locale]/[username]/retry-policy/page');
 
 const MOCK_ENDPOINTS = [
   { id: 'ep_1', max_attempts: 3, base_delay_ms: 5000, max_delay_ms: 60000, multiplier: 2.0 },
@@ -314,7 +314,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
     vi.doMock('@/i18n/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
     vi.doMock('@/components/Toast', () => ({ useToast: () => ({ toast: mockToast }) }));
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/retry-policy/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/retry-policy/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

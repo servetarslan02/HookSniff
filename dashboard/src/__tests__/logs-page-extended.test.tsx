@@ -44,7 +44,7 @@ vi.mock('@/components/StatusBadge', () => ({
   StatusBadge: ({ status }: any) => React.createElement('span', { 'data-testid': 'status-badge' }, status),
 }));
 
-const { default: LogsPage } = await import('@/app/[locale]/dashboard/logs/page');
+const { default: LogsPage } = await import('@/app/[locale]/[username]/logs/page');
 
 const mockDeliveries = [
   { id: 'del_001aaaabbbbccccdd', event: 'order.created', status: 'delivered', attempt_count: 1, response_status: 200, endpoint_id: 'ep_001aaaabbbb', created_at: '2024-06-01T10:00:00Z' },
@@ -1175,7 +1175,7 @@ describe('LogsPage — Extended Coverage', () => {
       useToast: () => ({ toast: mockToast }),
     }));
 
-    const { default: LogsPageNoToken } = await import('@/app/[locale]/dashboard/logs/page');
+    const { default: LogsPageNoToken } = await import('@/app/[locale]/[username]/logs/page');
 
     await act(async () => {
       render(React.createElement(LogsPageNoToken));

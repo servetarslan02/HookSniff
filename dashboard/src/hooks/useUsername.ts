@@ -16,9 +16,10 @@ export function useUsername(): string {
     return params.username;
   }
 
-  // Fallback: generate from user data
-  if (user?.name || user?.email) {
-    return (user.name || user.email.split('@')[0])
+  // Fallback: always use email prefix (consistent with store)
+  if (user?.email) {
+    return user.email
+      .split('@')[0]
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '');

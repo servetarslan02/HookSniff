@@ -57,7 +57,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: SettingsPage } = await import('@/app/[locale]/dashboard/settings/page');
+const { default: SettingsPage } = await import('@/app/[locale]/[username]/settings/page');
 
 describe('SettingsPage', () => {
   beforeEach(() => {

@@ -50,7 +50,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
-const { default: AlertsPage } = await import('@/app/[locale]/dashboard/alerts/page');
+const { default: AlertsPage } = await import('@/app/[locale]/[username]/alerts/page');
 
 // --- Test Data ---
 const mockAlerts = [
