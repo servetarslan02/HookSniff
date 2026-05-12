@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-13 00:10 GMT+8
+> Son güncelleme: 2026-05-13 01:50 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -494,3 +494,23 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Google: servetarslan02@gmail.com / uku_21700987
 - gcloud auth: servetarslan02@gmail.com ile giriş yapıldı
 - Cloud Build: hooksniff-app projesi, global region
+
+## Oturum 135 (2026-05-13 01:00-01:50 GMT+8) ✅
+- **OpenClaw** — Servet ile API çökme sorunu + dashboard düzeltmeleri
+- **Kritik sorun: API tamamen çökmüş (500)** — tüm endpoint'ler çalışıyordu
+  - Sebep: Commit `1a1b82c3` (Aşama 1 — Application modeli) yeni DB kolonları gerektiriyordu ama Neon DB'ye migration uygulanmamıştı
+  - Eksik tablolar/kolonlar:
+    - `revoked_tokens` + `token_revocation_events` (migration 012)
+    - `applications` tablosu + `application_id` (migration 013)
+    - `customers.allow_overage` + `customers.overage_email_notification`
+    - `deliveries.event` + `deliveries.processed_at`
+  - Servet Neon connection string verdi, psycopg2 ile migration'lar uygulandı
+  - `STRING` → `TEXT` düzeltmesi (Neon PostgreSQL, CockroachDB değil)
+- **Locale double-prefix fix** — Vercel deploy edildi ✅
+- **Bearer token hatası** — `api.ts`'de `token !== 'cookie'` kontrolü eklendi
+- **queue_detail health fix** — `query_scalar` → `query_as` (3 sütunlu tuple)
+- **openSidebar i18n fix** — `t()` → `tc()` (common namespace)
+- **Dashboard tamamen çalışıyor** — login → dashboard akışı, tüm sayfalar, Türkçe
+- **Commits:** 5+ commit push edildi
+- **Neon DB connection:** `postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require`
+- **⚠️ DB migration'ları otomatik uygulanmıyor** — Cloud Build'de migration step eklenmeli veya manuel uygulanmalı
