@@ -123,23 +123,23 @@
 75. ✅ Hover efekti ekle
 76. ✅ `scope="col"` ekle header'lara ✅ YAPILDI (Oturum 120)
 77. ✅ Arama input label ekle
-78. ⬜ Combobox label ekle
-79. ⬜ Sayfalama ekle
-80. ⬜ Kolon sıralama (sortable) ekle
+78. ✅ Combobox label ekle
+79. ✅ Sayfalama ekle
+80. ✅ Kolon sıralama (sortable) ekle
 
 ### 3.4 Revenue Sayfası
 81. ✅ "Revenue Dashboard" → "Gelir Paneli"
 82. ✅ "Financial metrics and revenue breakdown" → "Finansal metrikler ve gelir dağılımı"
 83. ✅ Grafik X ve Y ekseni etiketlerini ekle
-84. ⬜ Pie chart legend ekle
+84. ✅ Pie chart legend ekle
 85. ⬜ SVG `<title>` ve `<desc>` doldur
-86. ⬜ Mobile responsive düzelt (375px)
+86. ✅ Mobile responsive düzelt (375px)
 87. ⬜ Sidebar offset mobile'da düzelt
-88. ⬜ Chart container responsive yap
+88. ✅ Chart container responsive yap
 89. ✅ Para birimi $ → ₺ (locale-aware)
-90. ⬜ Tarih aralığı seçici ekle
-91. ⬜ Manuel refresh butonu ekle
-92. ⬜ Boş state placeholder grafik/ikon ekle
+90. ✅ Tarih aralığı seçici ekle
+91. ✅ Manuel refresh butonu ekle
+92. ✅ Boş state placeholder grafik/ikon ekle
 93. ✅ H1 hierarchy düzelt (ikinci H1 → H2)
 
 ### 3.5 System Sayfası
@@ -193,7 +193,7 @@
 131. ✅ Silent API failures düzelt — playground, endpoints, transforms, dashboard page error messages → i18n ✅ YAPILDI (Oturum 122) — tüm catch bloklarına error state + retry ekle
 132. ✅ Error Boundary dashboard layout — i18n title/description/retryLabel props eklendi ✅ YAPILDI (Oturum 122)
 133. ✅ `router.push` locale prefix ekle — 13 dosya düzeltildi ✅ YAPILDI (Oturum 126)
-134. ⬜ Hardcoded locale regex düzelt
+134. ✅ Hardcoded locale regex düzelt
 135. ✅ Health page Authorization header ekle ✅ YAPILDI (Oturum 120) — apiFetch + token
 136. ✅ API Keys createKey credentials düzelt ✅ YAPILDI (Oturum 120) — apiFetch + token
 137. ✅ No retry logic for transient errors (502, 503, 504) → `api.ts`
@@ -227,16 +227,16 @@
 159. ✅ `weeklyDigest` state → API'ye gönderildi ✅ — API'ye gönder → `settings/page.tsx`
 
 ### 4.5 Sidebar İyileştirme
-160. ⬜ Sidebar 26 item gruplama (Core, Tools, Advanced, Account)
+160. ✅ Sidebar 26 item gruplama (Core, Tools, Advanced, Account)
 161. ✅ Sidebar active state — nested route'lar için `startsWith` matching + admin link active state ✅ YAPILDI (Oturum 122)
-162. ⬜ Schemas, Templates, Portal sidebar linkleri ekle
-163. ⬜ Sidebar bottom controls overlap düzelt
+162. ✅ Schemas, Templates, Portal sidebar linkleri ekle
+163. ✅ Sidebar bottom controls overlap düzelt
 
 ### 4.6 CSS & Responsive
 164. ✅ 13 tablo `overflow-x-auto` ekle (docs, alternatives, privacy) ✅ YAPILDI (Oturum 120) — 3 alternatives sayfası
 165. ✅ 8 `<pre>` bloğu `overflow-x-auto` ekle ✅ YAPILDI (Oturum 120) — 3 docs sayfası
 166. ✅ `vh` → `dvh` mobilde — deliveries ve logs modal max-h-[80dvh] ✅ YAPILDI (Oturum 122) (Deliveries, Logs, Blog)
-167. ⬜ Grid layout mobilde kırılıyor (Portal page)
+167. ✅ Grid layout mobilde kırılıyor (Portal page)
 168. ✅ Signature comparison — timingSafeEqual() fonksiyonu eklendi (byte-level XOR) ✅ YAPILDI (Oturum 122) → `signature-verifier/page.tsx`
 
 ### 4.7 Error Handling
@@ -287,8 +287,8 @@
 195. ⬜ Hardcoded strings in 14+ pages (Aşama 4.3'te)
 196. ⬜ Blog, changelog, docs content İngilizce — /tr/ altında
 197. ⬜ Alternatives sayfaları (8 sayfa) tamamen İngilizce
-198. ⬜ getStarted.* section — 56 key eksik
-199. ⬜ onboarding.* section — 32 key eksik
+198. ✅ getStarted section tamamlandı (57 key)
+199. ✅ onboarding section tamamlandı (69 key)
 
 ### 6.2 Email i18n
 200. ⬜ Email template'leri sadece İngilizce → `api/src/email.rs`
@@ -309,14 +309,14 @@
 ### 7.1 Kritik A11Y
 208. 🟡 `<label>` + `<input>` `htmlFor`/`id` — SSO (7 input) + Settings (5 input) sayfalarında eklendi, diğer sayfalar kalan ✅ YAPILDI (kısmi, Oturum 122)
 209. ✅ `aria-live` region eklendi — admin system, dashboard main ✅ YAPILDI (Oturum 126)
-210. ⬜ Icon-only butonlarda `aria-label` eksik (close, copy, pagination)
+210. ✅ Icon-only butonlarda aria-label eklendi (close, copy, pagination)
 211. ⬜ Toggle'larda `role="switch"` yok
 212. ⬜ Status dots text alternative yok
 213. ✅ Sidebar links `aria-current` eklendi ✅ YAPILDI (Oturum 126)
 214. ✅ Skip-to-content link eklendi ✅ YAPILDI (Oturum 126)
 215. ⬜ `<div onClick>` keyboard erişilebilirliği yok (10+ yer)
-216. ⬜ Modal close button `aria-label` eksik
-217. ⬜ Pagination `aria-label` eksik
+216. ✅ Modal close button aria-label eklendi
+217. ✅ Pagination aria-label eklendi
 218. ⬜ Copy button `aria-label` eksik
 219. ⬜ Heading hierarchy tutarsız
 220. ⬜ Grafik SVG `<title>` ve `<desc>` boş
@@ -325,7 +325,7 @@
 223. ⬜ Renk bağımlı bilgi (System sayfası)
 
 ### 7.2 Yüksek A11Y
-224. ⬜ Contrast fail: `text-gray-400` empty state'lerde
+224. ✅ Contrast fix: text-gray-400 → text-gray-500 (24 dashboard + 2 admin files)
 225. ⬜ Contrast fail: logout butonu dark mode
 226. ⬜ SkeletonCard/SkeletonTable dark mode desteği yok
 227. ⬜ Form input autoComplete eksik (password fields)
@@ -357,8 +357,8 @@
 
 242. ✅ Recharts lazy loaded — lazy load → `dashboard/src/app/[locale]/dashboard/page.tsx`
 243. ⬜ Tüm sayfalar 'use client' CSR — SSR/SSG düşün
-244. ⬜ Caching yok, prefetching yok
-245. ⬜ Suspense boundary eksik (29 sayfa)
+244. ✅ PrefetchRoutes component eklendi
+245. ✅ 30 loading.tsx Suspense fallback eklendi
 246. ⬜ Endpoint detail fetches all endpoints — N+1 query
 
 ---
@@ -463,10 +463,10 @@
 315. ⬜ Inbound page unused loading variable
 316. ⬜ Duplicate StatusBadge component
 317. ⬜ Onboarding + OnboardingWizard overlap
-318. ⬜ AnimatedCounter negative values
+318. ✅ AnimatedCounter negative values fix
 319. ⬜ Playground history localStorage size limit
-320. ⬜ Route-level `loading.tsx` yok
-321. ⬜ Endpoints detail hand-rolled modal
+320. ✅ 30 loading.tsx dosyası oluşturuldu
+321. ✅ ConfirmDialog ile değiştirildi
 322. ⬜ Logs page status counts current page only
 323. ⬜ Billing cancel modal state reset
 324. ⬜ Notification API field mismatch
@@ -475,14 +475,14 @@
 327. ⬜ Date formatting not locale-aware
 328. ⬜ 63 useEffect cleanup eksik
 329. ⬜ `useEffect` dependency array eksiklikleri
-330. ⬜ Portal/Schemas/Routing/Templates double-padding
+330. ✅ Double-padding düzeltildi (4 sayfa)
 331. ⬜ `getErrorMessage` inconsistent usage
 332. ⬜ Schema registry'de enum/oneOf/format desteklenmiyor
 333. ⬜ WebSocket'te server-initiated ping eksik
 334. ⬜ Inbound page unused loading variable (tekrar)
-335. ⬜ SuccessRateDonut fallback string
-336. ⬜ ActivityFeed polls every 5s unconditionally
-337. ⬜ StatusDot vs StatusBadge inconsistent
+335. ✅ SuccessRateDonut fallback string eklendi
+336. ✅ ActivityFeed visibility-based polling
+337. ✅ StatusDot standardize + aria-label
 
 ### 13.3 Backend Düşük
 338. ⬜ Retry policy default'ları aggressive
