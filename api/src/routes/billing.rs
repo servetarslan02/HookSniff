@@ -144,7 +144,7 @@ async fn cancel_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    if customer.plan == "free" {
+    if customer.plan == "developer" {
         return Err(AppError::BadRequest(
             "You are already on the free plan".into(),
         ));
@@ -612,7 +612,7 @@ async fn request_refund(
     Extension(customer): Extension<Customer>,
     Json(req): Json<RefundRequest>,
 ) -> Result<Json<RefundResponse>, AppError> {
-    if customer.plan == "free" {
+    if customer.plan == "developer" {
         return Err(AppError::BadRequest(
             "Cannot refund a free plan".into(),
         ));
