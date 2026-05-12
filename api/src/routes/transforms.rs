@@ -92,6 +92,7 @@ async fn delete_rule(
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct TestTransformRequest {
     payload: serde_json::Value,
     config: TransformRuleConfig,
