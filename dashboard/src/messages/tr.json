@@ -93,7 +93,20 @@
     "pleaseTryAgain": "Lütfen tekrar deneyin.",
     "switchToDark": "Karanlık moda geç",
     "switchToLight": "Aydınlık moda geç",
-    "redirecting": "Yönlendiriliyor..."
+    "redirecting": "Yönlendiriliyor...",
+    "skipToContent": "İçeriğe atla",
+    "loadingChart": "Grafik verisi yükleniyor...",
+    "previousPage": "Önceki sayfa",
+    "nextPage": "Sonraki sayfa",
+    "copyToClipboard": "Panoya kopyala",
+    "closeModal": "Pencereyi kapat",
+    "openSidebar": "Yan paneli aç",
+    "chartDeliveryTrends": "Teslimat trendlerini gösteren grafik",
+    "chartSuccessRate": "Başarı oranını gösteren grafik",
+    "chartErrorBreakdown": "Hata dağılımını gösteren grafik",
+    "chartTopEndpoints": "En çok kullanılan endpoint'leri gösteren grafik",
+    "chartLatencyDistribution": "Gecikme dağılımını gösteren grafik",
+    "loadingData": "Veriler yükleniyor..."
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -418,7 +431,12 @@
     "deleted": "Bildirim silindi",
     "failedToLoad": "Bildirimler yüklenemedi",
     "failedToMarkRead": "Okundu olarak işaretlenemedi",
-    "failedToMarkAllRead": "Tümü okundu olarak işaretlenemedi"
+    "failedToMarkAllRead": "Tümü okundu olarak işaretlenemedi",
+    "typeAll": "Tümü",
+    "typeWebhookFailed": "Webhook Başarısız",
+    "typeAlerts": "Uyarılar",
+    "typeSystem": "Sistem",
+    "typeBilling": "Faturalandırma"
   },
   "webhooks": {
     "title": "Webhooklar",
@@ -448,7 +466,11 @@
     "latencyDistribution": "Gecikme Dağılımı",
     "successRate": "Başarı Oranı",
     "totalDelivered": "Toplam Teslim Edilen",
-    "totalFailed": "Toplam Başarısız"
+    "totalFailed": "Toplam Başarısız",
+    "subtitleDesc": "Teslimat trendleri, başarı oranları ve performans metrikleri",
+    "successfulLabel": "Başarılı",
+    "failedLabel": "Başarısız",
+    "successLabel": "başarılı"
   },
   "settings": {
     "title": "Ayarlar",
@@ -559,7 +581,15 @@
     "namePlaceholder": "Adınız",
     "emailPlaceholder": "siz@ornek.com",
     "passwordPlaceholder": "••••••••",
-    "orContinueWith": "Veya şununla devam edin"
+    "orContinueWith": "Veya şununla devam edin",
+    "consentPrefix": "",
+    "consentTerms": "Kullanım Şartları",
+    "consentAnd": "ve",
+    "consentPrivacy": "Gizlilik Politikası",
+    "consentRequired": "Kullanım Şartları ve Gizlilik Politikası'nı kabul etmelisiniz",
+    "passwordWeak": "Zayıf",
+    "passwordMedium": "Orta",
+    "passwordStrong": "Güçlü"
   },
   "docs": {
     "gettingStarted": "Başlarken",
@@ -1163,7 +1193,22 @@
     "failedToLoadDetails": "Kullanıcı detayları yüklenemedi",
     "failedToUpdatePlan": "Plan güncellenemedi",
     "failedToUpdateStatus": "Durum güncellenemedi",
-    "businessPlan": "İş Planı"
+    "businessPlan": "İş Planı",
+    "loadingSettings": "Ayarlar yükleniyor...",
+    "settingsLoaded": "Ayarlar yüklendi",
+    "fetchingHealth": "Sistem durumu kontrol ediliyor...",
+    "infrastructureTable": "Altyapı Detayları",
+    "skipToContent": "İçeriğe atla",
+    "errorDetails": "Hata Detayı",
+    "retryingHealth": "Sistem durumu yeniden kontrol ediliyor...",
+    "noChartData": "Grafik verisi mevcut değil",
+    "chartPlaceholder": "Kullanıcı dağılımı grafiği",
+    "serviceStatus": "Hizmet Durumu",
+    "providerLabel": "Sağlayıcı",
+    "statusLabel": "Durum",
+    "loadSettingsFailed": "Ayarlar yüklenemedi",
+    "allServices": "Tüm Hizmetler",
+    "infrastructureHeader": "Hizmet"
   },
   "landing": {
     "nav": {
@@ -2178,6 +2223,7 @@
     "attempt": "Deneme {n}",
     "totalRetryTime": "Toplam yeniden deneme süresi (en kötü durum):",
     "tip": "İpucu:",
+    "tipContent": "Endpoint başına yeniden deneme politikaları bu global varsayılanları geçersiz kılar. Şuralardan yapılandırın:",
     "endpointSettingsLink": "Endpoint Ayarları"
   },
   "inbound": {
