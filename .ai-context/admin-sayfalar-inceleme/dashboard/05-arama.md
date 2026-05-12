@@ -88,3 +88,22 @@ interface SearchResult {
 - Gelişmiş filtre (attempt count, response status range) yok
 - Bulk işlem yok
 - Sonuç sıralama seçeneği yok
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/search/page.tsx`
+- **Sorun:** 3 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+### 🔒 Güvenlik
+
+#### G-01: Hardcoded Stringler
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/search/page.tsx`
+- **Sorun:** "Search", "Search and filter...", "Searching...", "results" hardcoded.
+- **Adımlar:**
+  1. i18n key'leri ekle: `searchButton`, `searchSubtitle`, `searching`, `results`

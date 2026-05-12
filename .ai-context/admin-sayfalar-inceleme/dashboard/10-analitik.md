@@ -79,3 +79,31 @@
 - Karşılaştırma (önceki dönem)
 - Heatmap (saat/gün bazlı)
 - Latency dağılım grafiği
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Latency Trend Grafiği Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/analytics/page.tsx`
+- **Backend:** `GET /v1/analytics/latency` — gecikme trendi verisi
+- **Sorun:** `analyticsApi.latencyTrend` api.ts'de tanımlı ama hiçbir sayfa çağırmıyor.
+- **Adımlar:**
+  1. `analyticsApi.latencyTrend(token, timeRange)` çağrısını ekle
+  2. Yeni grafik bileşeni: AreaChart (P50, P95, P99 gecikme)
+  3. i18n key: `latencyTrend`, `p50`, `p95`, `p99`
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/analytics/page.tsx`
+- **Sorun:** 2 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/analytics/page.tsx`
+- **Sorun:** Grafik verisi tek seferde yükleniyor.
+- **Adımlar:**
+  1. Lazy loading: Grafik viewport'a girdiğinde yükle

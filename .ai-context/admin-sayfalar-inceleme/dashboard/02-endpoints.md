@@ -86,3 +86,57 @@
 - Endpoint etiketi/label sistemi yok
 - Webhook başarı oranı endpoint kartında gösterilmiyor
 - Son teslimat tarihi endpoint kartında yok
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Secret Rotasyonu UI Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
+- **Backend:** `POST /v1/endpoints/{id}/rotate-secret` — endpoint secret'ını yeniler
+- **Sorun:** api.ts'de `endpointsApi.rotateSecret` tanımlı değil, UI'da buton yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     rotateSecret: (token: string, id: string) =>
+       apiFetch<{ secret: string }>(`/endpoints/${id}/rotate-secret`, { method: "POST", token }),
+     ```
+  2. Endpoint kartına "Secret Yenile" butonu ekle
+  3. ConfirmDialog: "Secret yenilenecek, eski secret geçersiz olacak"
+  4. Yeni secret'ı göster (bir kez)
+  5. i18n key: `rotateSecret`, `rotateSecretConfirm`, `newSecret`
+
+#### BF-02: Endpoint Durumu Toggle Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
+- **Sorun:** Endpoint aktif/pasif yapılamıyor.
+- **Adımlar:**
+  1. Endpoint kartına toggle switch ekle
+  2. `endpointsApi.update(token, id, { is_active: !current })` çağrısı
+  3. Toggle değişiminde optimistic UI update
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
+- **Sorun:** 2 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
+- **Sorun:** Tüm endpoint'ler tek seferde yükleniyor.
+- **Adımlar:**
+  1. `endpointsApi.list(token, { page, per_page: 20 })` kullan
+  2. Sayfalama butonları ekle
+  3. Loading skeleton göster
+
+### 🎨 Erişilebilirlik
+
+#### E-01: aria-label Eksik Butonlar
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
+- **Sorun:** Emoji-only butonlarda aria-label yok.
+- **Adımlar:**
+  1. Her `<button`'a `aria-label={t('actionName')}` ekle
+  2. Silme butonu: `aria-label={t('deleteEndpoint')}`
+  3. Düzenleme butonu: `aria-label={t('editEndpoint')}`

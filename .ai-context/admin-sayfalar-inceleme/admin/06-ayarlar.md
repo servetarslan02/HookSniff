@@ -188,3 +188,28 @@ interface AlertRule {
 - Breach notification şablonu (72 saat)
 - DPO (Data Protection Officer) atama
 - **Kaynak:** Compliance araştırması
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 KRİTİK: Güvenlik
+
+#### G-01: Raw Fetch Kullanımı (5 yer) ⚠️ EN KRİTİK
+- **Dosya:** `dashboard/src/app/[locale]/admin/settings/page.tsx`
+- **Sorun:** 5 yerde `fetch()` kullanılıyor. CSRF koruması atlanıyor, retry logic yok, timeout yok.
+- **Detay:**
+  ```
+  satır 104: fetch(`${API}/admin/settings`, { headers: { Authorization: ... } })
+  satır 122: fetch(`${API}/admin/alerts`, { headers: { Authorization: ... } })
+  satır 166: fetch(`${API}/admin/settings`, { method: 'PUT', ... })
+  satır 208: fetch(`${API}/admin/alerts/${existing.id}`, { method: 'PUT', ... })
+  satır 224: fetch(`${API}/admin/alerts`, { method: 'POST', ... })
+  ```
+- **Adımlar:**
+  1. `adminApi.getSettings(token)` → satır 104
+  2. `adminApi.listAlerts(token)` → satır 122 (api.ts'ye ekle)
+  3. `adminApi.updateSettings(token, settings)` → satır 166
+  4. `adminApi.updateAlert(token, id, data)` → satır 208 (api.ts'ye ekle)
+  5. `adminApi.createAlert(token, data)` → satır 224 (api.ts'ye ekle)
+  6. Her değişiklik sonrası `next build` ile doğrula

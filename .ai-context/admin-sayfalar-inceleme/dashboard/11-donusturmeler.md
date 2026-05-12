@@ -97,3 +97,41 @@
    - Frontend: Payload textarea + "Test Et" butonu + önce/sonra karşılaştırma
 5. **Kural Şablonları** — Önceden tanımlı transform şablonları
    - Frontend: "Şablonlardan Ekle" butonu → şablon seçimi
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Transform Düzenleme Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/transforms/page.tsx`
+- **Backend:** — (backend'de update endpoint'i yok)
+- **Sorun:** Sadece oluşturma ve silme var, düzenleme yok.
+- **Adımlar:**
+  1. Backend'e `PUT /v1/endpoints/{endpoint_id}/transforms/{id}` ekle (Rust)
+  2. `api.ts`'ye `transformsApi.update` ekle
+  3. Her transform kartına "Düzenle" butonu ekle
+  4. Mevcut değerlerle form
+
+#### BF-02: Transform Sıralama Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/transforms/page.tsx`
+- **Backend:** — (backend'de reorder endpoint'i yok)
+- **Sorun:** Kuralların çalışma sırası belirlenemiyor.
+- **Adımlar:**
+  1. Backend'e `PUT /v1/endpoints/{endpoint_id}/transforms/reorder` ekle
+  2. Sürükle-bırak (react-beautiful-dnd) veya yukarı/aşağı butonları
+  3. Sıra numarası gösterimi
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/transforms/page.tsx`
+- **Sorun:** 3 useEffect, 4 fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/transforms/page.tsx`
+- **Sorun:** Tüm kurallar tek seferde yükleniyor.
+- **Adımlar:**
+  1. Backend pagination desteği varsa ekle
