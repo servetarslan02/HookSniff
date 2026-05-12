@@ -39,12 +39,28 @@ async fn main() -> Result<()> {
 
     tracing::info!("Starting HookSniff API v{}", env!("CARGO_PKG_VERSION"));
 
-    // HS-263: Warn if ENCRYPTION_KEY is not set (required for SSO secrets, etc.)
+    // HS-263: Validate ENCRYPTION_KEY at startup
+    // In production, fail hard if missing. In dev, warn and continue.
     if std::env::var("ENCRYPTION_KEY").is_err() {
+        if cfg.is_production() {
+            anyhow::bail!(
+                "🚫 ENCRYPTION_KEY must be set in production — required for SSO secrets, API keys, etc. \
+                 Generate one with: openssl rand -hex 32"
+            );
+        }
         tracing::warn!(
             "⚠️ ENCRYPTION_KEY not set — encrypted fields (SSO client_secret, etc.) will be unavailable. \
              Generate one with: openssl rand -hex 32"
         );
+    } else {
+        // Validate the key format (must be 64 hex chars = 32 bytes)
+        let key_hex = std::env::var("ENCRYPTION_KEY").unwrap();
+        if hex::decode(&key_hex).map(|b| b.len() != 32).unwrap_or(true) {
+            anyhow::bail!(
+                "🚫 ENCRYPTION_KEY must be exactly 32 bytes (64 hex characters). \
+                 Generate one with: openssl rand -hex 32"
+            );
+        }
     }
 
     let pool = db::create_pool(&cfg.database_url).await?;

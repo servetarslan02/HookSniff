@@ -265,7 +265,8 @@ async fn get_team(
         r#"SELECT id, email, role, expires_at, created_at
            FROM team_invites
            WHERE team_id = $1 AND expires_at > NOW()
-           ORDER BY created_at DESC"#,
+           ORDER BY created_at DESC
+           LIMIT 100"#,
     )
     .bind(id)
     .fetch_all(&pool)
