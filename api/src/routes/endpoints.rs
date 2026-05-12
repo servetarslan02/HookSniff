@@ -10,6 +10,14 @@ use crate::error::AppError;
 use crate::models::customer::Customer;
 use crate::models::endpoint::{CreateEndpointRequest, Endpoint, EndpointResponse, RetryPolicy};
 
+/// Generate a cryptographically random signing secret (32 bytes, hex-encoded).
+fn generate_signing_secret() -> String {
+    use aes_gcm::aead::rand_core::RngCore;
+    let mut bytes = [0u8; 32];
+    aes_gcm::aead::OsRng.fill_bytes(&mut bytes);
+    format!("whsec_{}", hex::encode(bytes))
+}
+
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_endpoints).post(create_endpoint))
@@ -97,7 +105,7 @@ async fn create_endpoint(
         }
     }
 
-    let signing_secret = format!("whsec_{}", Uuid::new_v4().to_string().replace('-', ""));
+    let signing_secret = generate_signing_secret();
 
     // Convert allowed_ips to JSON
     let allowed_ips_json: Option<serde_json::Value> =
@@ -335,7 +343,7 @@ async fn rotate_secret(
             .await?
             .ok_or(AppError::NotFound)?;
 
-    let new_secret = format!("whsec_{}", Uuid::new_v4().to_string().replace('-', ""));
+    let new_secret = generate_signing_secret();
 
     sqlx::query(
         r#"UPDATE endpoints
@@ -464,9 +472,17 @@ mod tests {
 
     #[test]
     fn test_signing_secret_format() {
-        let id = Uuid::new_v4();
-        let secret = format!("whsec_{}", id.to_string().replace('-', ""));
+        let secret = generate_signing_secret();
         assert!(secret.starts_with("whsec_"));
         assert!(!secret.contains('-'));
+        // 32 bytes hex = 64 chars + "whsec_" prefix = 70 chars
+        assert_eq!(secret.len(), 70);
+    }
+
+    #[test]
+    fn test_signing_secret_uniqueness() {
+        let s1 = generate_signing_secret();
+        let s2 = generate_signing_secret();
+        assert_ne!(s1, s2);
     }
 }
