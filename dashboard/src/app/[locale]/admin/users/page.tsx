@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, type AdminUser } from '@/lib/api';
@@ -17,7 +17,6 @@ const PLAN_OPTIONS = [
 export default function AdminUsersPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const router = useRouter();
   const locale = useLocale();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [total, setTotal] = useState(0);
