@@ -1,43 +1,39 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 17:59 GMT+8
-> **Son commit:** 6869a1c2 (main)
-> **Son oturum:** Oturum 126 — Admin Panel Eksikleri (1 commit, 7 dosya)
+> **Son güncelleme:** 2026-05-12 18:33 GMT+8
+> **Son commit:** 931ea296 (main)
+> **Son oturum:** Oturum 127 — Admin Panel Eksikleri (1 commit, 7 dosya)
 
 ## Hemen Başla
 
 1. `git pull origin main` — en son değişiklikleri al
 2. `MEMORY.md` oku — proje durumunu öğren
-3. `IMPLEMENTATION-PLAN.md` bak — yol haritası
+3. `UYGULAMA-PLANı.md` bak — yol haritası
 
-## 📊 Güncel İlerleme (2026-05-12 07:40)
+## 📊 Admin Panel Durumu
 
-| Kategori | Tamamlanan | Kalan | Yüzde |
-|----------|-----------|-------|-------|
-| AŞAMA 1 Kritik Güvenlik | 22 | 0 | 100% |
-| AŞAMA 2 Yüksek Güvenlik | 22 | 12 | 65% |
-| AŞAMA 3 Admin Panel | 30 | 20 | 60% |
-| AŞAMA 4 Frontend | 32 | 5 | 86% |
-| AŞAMA 5 Database | 22 | 0 | 100% |
-| **Toplam** | **178** | **210** | **46%** |
-
-## ✅ Son Oturumda Yapılanlar (Oturum 124 — 8 commit)
-
-1. Footer eksikliği — 13 public sayfaya Footer eklendi
-2. OnboardingWizard i18n — Tüm hardcoded EN → Türkçe
-3. ThemeToggle i18n — aria-label Türkçe'ye çevrildi
-4. AuthGuard i18n — Loading/redirecting mesajları Türkçe
-5. Homepage navbar — Conditional rendering (login durumuna göre)
-6. Homepage hero CTA — Conditional "Panele Git →" / "Ücretsiz başlayın"
-7. Homepage stats — "Deliveries/Success Rate/Avg Latency" → i18n
-8. Footer çevirileri — 10+ key Türkçe'ye çevrildi
-9. Admin error messages — Raw API error → i18n Türkçe mesaj
-10. Dashboard hardcoded strings — Endpoints, Billing, Playground, Portal-customize
-11. About/Contact/Security/What-is-a-webhook/Startups i18n
-12. PublicNavbar — Yeni shared component, 12 sayfaya uygulandı
-13. Analytics pie chart labels i18n
+| Özellik | Backend | Frontend | Durum |
+|---------|---------|----------|-------|
+| Stats API (DATABASE_ERROR) | ✅ Migration 009 | ✅ Overview sayfası | ✅ Tamam |
+| Revenue API (Neon fix) | ✅ SQL düzeltildi | ✅ Revenue sayfası | ✅ Tamam |
+| Audit Log | ✅ Endpoint mevcut | ✅ Activity sayfası | ✅ Tamam |
+| Event Replay | ✅ Endpoint mevcut | ✅ User Detail buton | ✅ Tamam |
+| CSV Export | ✅ Endpoint mevcut | ✅ Users + Revenue buton | ✅ Tamam |
+| Impersonate | ✅ Endpoint mevcut | ✅ Users + User Detail buton | ✅ Tamam |
+| Alert Thresholds | ⚠️ DB tablosu var | ✅ Settings sayfası | ⚠️ Backend bağlanacak |
+| Customer Charts | ✅ Endpoint mevcut | ✅ User Detail grafikler | ✅ Tamam |
+| Webhook Test | ✅ Endpoint mevcut | ✅ System sayfası | ✅ Tamam |
+| Churn Analysis | ✅ Endpoint mevcut | ✅ Revenue sayfası | ✅ Tamam |
 
 ## 📋 Sıradaki Öncelikler
+
+### Admin Panel Kalan
+| # | Görev | Öncelik |
+|---|-------|---------|
+| 1 | Alert Thresholds backend bağlantısı (settings → alert_rules CRUD) | 🟡 |
+| 2 | Settings API'den alert_rules okuma/yazma | 🟡 |
+| 3 | `cargo test` + `cargo clippy` doğrulama (Rust toolchain gerekli) | 🔴 |
+| 4 | `next build` doğrulama | 🔴 |
 
 ### AŞAMA 4 Kalan (Frontend)
 | # | Görev | Öncelik |
@@ -56,19 +52,14 @@
 | 38 | No rollback strategy | 🟡 |
 | 39 | Hardcoded secrets in Helm | 🟡 |
 
-### AŞAMA 3 Kalan (Admin)
-| # | Görev | Öncelik |
-|---|-------|---------|
-| 67 | Plana Göre Kullanıcılar grafik | 🟡 |
-| 78-80 | Combobox, pagination, sortable | 🟡 |
-| 84-92 | Revenue chart improvements | 🟡 |
-
-### Backend Sorunları
-- `/v1/admin/stats` ve `/v1/admin/revenue` → DATABASE_ERROR (Neon DB query uyumsuzluğu)
-
 ## Kritik Hatırlatmalar
 - **Oturum süresi:** 1 saat — işleri batch'le, sık commit yap
 - **Push etmeyi unutma!** Her oturum sonunda `git push origin main`
 - **Rust compile + test zorunlu** — gözle bakarak yetmez
 - **Conventional commits** — "fix:", "feat:", "docs:" kullan
 - **Build doğrulama:** Her frontend değişikliği sonrası `next build`
+- **Migration 009** Neon DB'ye uygulanmalı (run-migrations.js)
+
+---
+
+*Bu dosya her oturum sonunda güncellenmeli.*
