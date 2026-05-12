@@ -148,7 +148,9 @@
     "sectionTools": "Araçlar",
     "sectionAdvanced": "Gelişmiş",
     "sectionAccount": "Hesap",
-    "routing": "Yönlendirme"
+    "routing": "Yönlendirme",
+    "applications": "Uygulamalar",
+    "serviceTokens": "Hizmet Jetonları"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -3106,5 +3108,30 @@
     "privacyPolicy": "Gizlilik Politikası",
     "accept": "Kabul Et",
     "reject": "Reddet"
+  },
+  "applications": {
+    "title": "Uygulamalar",
+    "subtitle": "Web kancalarınız (etkinlikler, abonelikler ve teslimat kayıtları) için yalıtılmış ortam",
+    "create": "Uygulama oluştur",
+    "nameLabel": "İsim",
+    "namePlaceholder": "Benim Uygulamam",
+    "descriptionLabel": "Açıklama",
+    "descriptionPlaceholder": "Opsiyonel açıklama",
+    "endpoints": "Endpoint'ler",
+    "actions": "Eylemler",
+    "delete": "Sil",
+    "deleteTitle": "Uygulamayı sil",
+    "deleteConfirm": "Bu uygulamayı silmek istediğinize emin misiniz? Tüm endpoint ve teslimat kayıtları kalıcı olarak silinecek.",
+    "deleted": "Uygulama silindi",
+    "empty": "Henüz uygulama yok",
+    "notFound": "Uygulama bulunamadı",
+    "backToList": "Geri dön",
+    "status": "Durum",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "event": "Olay",
+    "time": "Zaman",
+    "noEndpoints": "Bu uygulamada henüz endpoint yok",
+    "noDeliveries": "Henüz teslimat yok"
   }
 }
