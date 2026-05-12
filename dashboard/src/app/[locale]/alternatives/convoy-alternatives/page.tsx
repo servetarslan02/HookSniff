@@ -1,6 +1,10 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
 export const metadata = {
   title: 'Convoy Alternatives — Best Webhook Services Compared (2026) | HookSniff',
   description: 'Looking for Convoy alternatives? Convoy may be discontinued. Compare HookSniff, Svix, Hookdeck, and Hook0 as replacements.',
@@ -13,9 +17,9 @@ export default function ConvoyAlternativesPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <Link href="/alternatives" className="text-gray-600 dark:text-slate-400">Alternatives</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">Convoy</span>
           </div>
           <LanguageSwitcher />
@@ -73,7 +77,7 @@ export default function ConvoyAlternativesPage() {
 
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-2xl font-bold text-white mb-2">Looking for a Convoy alternative with more SDKs?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-6">HookSniff works with every major language. No Go required.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">HookSniff works with every major language. No Go required.</p>
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Try HookSniff free →</Link>
         </div>
       </main>

@@ -111,7 +111,7 @@ export function NotificationCenter() {
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-gray-400 dark:text-slate-500 text-sm">
+              <div className="p-6 text-center text-gray-500 dark:text-slate-500 text-sm">
                 No notifications
               </div>
             ) : (
@@ -135,7 +135,7 @@ export function NotificationCenter() {
                       <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5 truncate">
                         {n.message}
                       </p>
-                      <p className="text-[11px] text-gray-400 dark:text-slate-600 mt-1">
+                      <p className="text-[11px] text-gray-500 dark:text-slate-600 mt-1">
                         {new Date(n.created_at).toLocaleString()}
                       </p>
                     </div>

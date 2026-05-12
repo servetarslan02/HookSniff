@@ -23,7 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
 });
 
-const locales = ['en', 'tr'];
+import { routing } from '@/i18n/routing';
+
+const locales = routing.locales;
 
 export async function generateMetadata({
   params,
@@ -73,7 +75,7 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://hooksniff.vercel.app/${locale}`,
       languages: Object.fromEntries(
-        ['en', 'tr'].map((l) => [
+        locales.map((l) => [
           l,
           `https://hooksniff.vercel.app/${l}`,
         ])
@@ -121,6 +123,39 @@ export default async function LocaleLayout({
                 } catch(e) {}
               })();
             `,
+          }}
+        />
+        {/* JSON-LD Structured Data — Organization + WebApplication */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  name: 'HookSniff',
+                  url: 'https://hooksniff.vercel.app',
+                  logo: 'https://hooksniff.vercel.app/favicon.svg',
+                  description: 'Webhook delivery service with automatic retries, signature verification, and real-time monitoring',
+                  sameAs: [],
+                },
+                {
+                  '@type': 'WebApplication',
+                  name: 'HookSniff',
+                  url: 'https://hooksniff.vercel.app',
+                  description: 'Send, monitor, and manage webhooks with automatic retries, signature verification, and real-time delivery tracking',
+                  applicationCategory: 'DeveloperApplication',
+                  operatingSystem: 'Web',
+                  offers: {
+                    '@type': 'Offer',
+                    price: '0',
+                    priceCurrency: 'USD',
+                    description: 'Free tier available',
+                  },
+                },
+              ],
+            }),
           }}
         />
       </head>

@@ -2,6 +2,10 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
 export const metadata = {
   title: 'Webhook Glossary — Terms & Definitions | HookSniff',
   description: 'Comprehensive glossary of webhook and event-driven architecture terms. From HMAC signatures to dead letter queues, understand every concept.',
@@ -52,9 +56,9 @@ export default function GlossaryPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <Link href="/webhooks" className="text-gray-600 dark:text-slate-400">{t("title")}</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("glossary")}</span>
           </div>
           <LanguageSwitcher />
@@ -100,7 +104,7 @@ export default function GlossaryPage() {
         {/* CTA */}
         <div className="mt-16 text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-2xl font-bold text-white mb-2">Ready to implement webhooks?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-6">HookSniff handles all of these concepts out of the box. Start building in minutes.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">HookSniff handles all of these concepts out of the box. Start building in minutes.</p>
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
         </div>
       </main>

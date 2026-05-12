@@ -2,6 +2,10 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
 export const metadata = { title: 'Customer Stories — HookSniff' };
 
 /* ─── Customer Stories Database ─── */
@@ -236,9 +240,9 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <Link href="/customers" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{t("title")}</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{story.company}</span>
           </div>
           <LanguageSwitcher />
@@ -307,12 +311,12 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
                 <p className="text-sm text-gray-500 dark:text-slate-500 mb-2">{r.label}</p>
                 <div className="flex items-center gap-3">
                   <div>
-                    <p className="text-xs text-gray-400 dark:text-slate-600">{t("before")}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-600">{t("before")}</p>
                     <p className="text-sm text-red-600 dark:text-red-400 line-through">{r.before}</p>
                   </div>
-                  <svg className="w-5 h-5 text-gray-400 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                  <svg className="w-5 h-5 text-gray-500 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                   <div>
-                    <p className="text-xs text-gray-400 dark:text-slate-600">{t("after")}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-600">{t("after")}</p>
                     <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{r.after}</p>
                   </div>
                 </div>
@@ -334,7 +338,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
         {/* CTA */}
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-xl font-bold text-white mb-2">Ready to get started?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-4">Join {story.company} and thousands of developers who trust HookSniff.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-4">Join {story.company} and thousands of developers who trust HookSniff.</p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
             <Link href="/customers" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("moreStories")}</Link>

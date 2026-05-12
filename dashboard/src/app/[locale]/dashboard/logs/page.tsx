@@ -103,7 +103,7 @@ export default function LogsPage() {
       {/* Search + Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -173,7 +173,7 @@ export default function LogsPage() {
       <div className="glass-card overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="inline-flex items-center gap-2 text-gray-400 dark:text-slate-500">
+            <div className="inline-flex items-center gap-2 text-gray-500 dark:text-slate-500">
               <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -184,7 +184,7 @@ export default function LogsPage() {
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-4xl mb-3">📭</div>
-            <p className="text-gray-400 dark:text-slate-500">
+            <p className="text-gray-500 dark:text-slate-500">
               {search ? t('noLogsSearch') : t('noLogs')}
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function LogsPage() {
                             {d.response_status}
                           </span>
                         ) : (
-                          <span className="text-sm text-gray-400 dark:text-slate-500">—</span>
+                          <span className="text-sm text-gray-500 dark:text-slate-500">—</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
@@ -285,25 +285,27 @@ export default function LogsPage() {
                 <span className="text-sm text-gray-500 dark:text-slate-400">
                   Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
                 </span>
-                <div className="flex items-center gap-2">
+                <nav aria-label={tc('pagination')} className="flex items-center gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
+                    aria-label={tc('previous')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
                   >
                     ← Previous
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">
+                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">
                     Page {page} of {totalPages}
                   </span>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
+                    aria-label={tc('next')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
                   >
                     Next →
                   </button>
-                </div>
+                </nav>
               </div>
             )}
           </>
@@ -319,7 +321,8 @@ export default function LogsPage() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deliveryDetails')}</h3>
               <button
                 onClick={() => setSelected(null)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+                aria-label={tc('close')}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
               >
                 ✕
               </button>
