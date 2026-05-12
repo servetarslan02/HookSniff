@@ -1,14 +1,14 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 19:32 GMT+8
-> **Son commit:** 8184e787 (main)
-> **Son oturum:** Oturum 128 — Alert Thresholds Backend Bağlantısı (1 commit, 5 dosya)
+> **Son güncelleme:** 2026-05-12 19:38 GMT+8
+> **Son commit:** 535bb062 (main)
+> **Son oturum:** Oturum 128 Ek — 4 Paralel Agent (~50 madde tamamlandı)
 
 ## Hemen Başla
 
 1. `git pull origin main` — en son değişiklikleri al
 2. `MEMORY.md` oku — proje durumunu öğren
-3. `UYGULAMA-PLANı.md` bak — yol haritası
+3. `IMPLEMENTATION-PLAN.md` bak — ⬜ ve 🟡 maddeler kalan
 
 ## 📊 Admin Panel Durumu
 
@@ -38,16 +38,17 @@
 ### AŞAMA 4 Kalan (Frontend)
 | # | Görev | Öncelik |
 |---|-------|---------|
-| 133 | router.push locale prefix (3 sayfa) | 🔴 |
-| 134 | Hardcoded locale regex düzelt | 🔴 |
-| 142 | Hardcoded strings — kalan dashboard sayfaları | 🟡 |
-| 147 | Toast messages i18n | 🟡 |
-| 153 | Loading states standardize | 🟡 |
+| 301-314 | Mega component refactoring — kalan sayfalar (OnboardingWizard, endpoints, settings, portal-customize, retry-policy, team, api-importer, api-keys, playground public) | 🟡 |
+| 339 | BadRequest messages developer-facing | 🟡 |
 
-### AŞAMA 2 Kalan (Backend)
+### AŞAMA 10-13 Kalan (Düşük öncelik)
 | # | Görev | Öncelik |
 |---|-------|---------|
-| 25 | Unbounded mpsc channel in WebSocket | 🟡 |
+| 247-259 | Payments & Billing (13 madde) | 🟡 |
+| 260-264 | Crypto (5 madde) | 🟡 |
+| 287-290 | Shared crate, billing abstraction, main.rs modülerleştirme (TODO comment'leri eklendi) | 🟢 |
+| 356-359 | Content quality (4 madde) | 🟢 |
+| 360-364 | Servet'in yapması gerekenler (5 madde) | 🔴 |
 | 26 | Poisoned mutex panics | 🟡 |
 | 38 | No rollback strategy | 🟡 |
 | 39 | Hardcoded secrets in Helm | 🟡 |
