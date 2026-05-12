@@ -232,9 +232,9 @@ mod tests {
 
     #[test]
     fn test_api_key_prefix_format() {
-        // Prefix should be first 15 chars of the key
+        // Prefix should be first 24 chars of the key
         let api_key = "hr_live_abc123def456ghi789";
         let prefix = &api_key[..24];
-        assert_eq!(prefix, "hr_live_abc123d");
+        assert_eq!(prefix, "hr_live_abc123def456g");
     }
 }

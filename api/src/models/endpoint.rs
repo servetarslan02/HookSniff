@@ -145,8 +145,8 @@ pub struct CreateEndpointRequest {
     pub fallback_url: Option<String>,
     /// Event delivery format: "standard" (default) or "cloudevents".
     pub format: Option<String>,
-    /// Application this endpoint belongs to (required).
-    pub application_id: Uuid,
+    /// Application this endpoint belongs to (optional).
+    pub application_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize)]
