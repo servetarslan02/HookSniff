@@ -2,7 +2,7 @@
 
 > **Tarih:** 2026-05-12 02:00 GMT+8
 > **Kaynak:** FINAL-IMPLEMENTATION-REPORT.md + ALL-FINDINGS-CLEAN.txt + 15 screenshot
-> **Toplam madde:** 364 madde — 358 tamamlandı (%98) — 6 kalan ⬜ (1 ben + 5 Servet)
+> **Toplam madde:** 364 madde — 359 tamamlandı (%99) — 5 kalan ⬜ (0 ben + 5 Servet)
 > **Kural:** Her madde tek satır, numaralı, dosya yolu ile birlikte
 
 ---
@@ -384,7 +384,7 @@
 ## AŞAMA 11 — BACKEND DERİN (⬜ 24 madde)
 
 ### 11.1 Crypto
-260. ⬜ JWT uses HS256 — no asymmetric option → 📝 Oturum 130: Büyük refactor, dedicated session gerekli (RSA key rotation + client migration)
+260. ✅ JWT uses HS256 — no asymmetric option → ✅ YAPILDI (Oturum 131): RS256 support, JWT_PRIVATE_KEY/JWT_PUBLIC_KEY env vars, backward-compatible HS256 fallback, kid header for key rotation
 261. ✅ Access tokens cannot be revoked — jti+iat claims added, revoked_tokens+token_revocation_events tables, middleware blacklist check, /revoke-token and /revoke-all-tokens endpoints, logout+change_password integration, cleanup job ✅ YAPILDI
 262. ✅ Endpoint signing secrets use UUID not crypto random (changed to OsRng 32-byte random)
 263. ✅ ENCRYPTION_KEY not validated at startup (hard fail in production, validates key format)
@@ -526,7 +526,7 @@
 
 ---
 
-> **Toplam:** 364 madde — 358 tamamlandı (%98) — 6 kalan ⬜ (1 ben + 5 Servet)
+> **Toplam:** 364 madde — 359 tamamlandı (%99) — 5 kalan ⬜ (0 ben + 5 Servet)
 > **Son güncelleme:** 2026-05-12 21:58 GMT+8 — Oturum 130 (OpenClaw) — Billing + Email + Content + OpenAPI
 
 ## Oturum 130 (2026-05-12 21:22-21:58 GMT+8) — 4 Paralel Agent + Billing
@@ -554,7 +554,7 @@
 - ✅ Items 40-41, 202, 203, 206, 356: Dökümantasyon/iyileştirme tamamlandı
 
 ### Toplam: 23 madde tamamlandı (bu oturumda)
-### Genel İlerleme: 358/364 tamamlandı (%98) — 6 kalan ⬜
+### Genel İlerleme: 359/364 tamamlandı (%99) — 5 kalan ⬜
 
 ## Oturum 129 (2026-05-12 20:47 GMT+8) — Final Cleanup
 **Durum:** ✅ Tamamlandı
@@ -788,3 +788,14 @@
 - `api/migrations/012_token_revocation.sql` — new migration
 - `docs/sdk-coverage.md` — new documentation
 - `.ai-context/visual-bugs/IMPLEMENTATION-PLAN.md` — updated items
+
+## Oturum 131 (2026-05-12 22:00 GMT+8) ✅
+- **Item 260: JWT HS256 → RS256** — Asymmetric JWT signing implemented
+  - `jwt.rs`: RS256 key resolution (JWT_PRIVATE_KEY/JWT_PUBLIC_KEY env vars)
+  - `jwt.rs`: Backward-compatible verification (RS256 first, HS256 fallback)
+  - `jwt.rs`: Key ID (kid) header for key rotation support
+  - `jwt.rs`: 4 new tests for RS256 support
+  - `.env.production.example`: RSA key generation instructions added
+- **Auth models: deny_unknown_fields** — All 14 auth request structs now reject unknown fields
+  - BUG-029 partially fixed (auth.rs request structs)
+- **Known remaining:** 1 item (Servet tasks 360-364 = 5 Servet-only items)
