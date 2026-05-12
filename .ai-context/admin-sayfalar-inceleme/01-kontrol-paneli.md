@@ -65,3 +65,9 @@
 - Empty state tasarımı yok (hiç veri yoksa)
 - Grafik verisi yoksa placeholder mesajı eksik
 - Mobile responsive grid breakpoint'leri kontrol edilmeli
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir gösterimi
+- **Uptime göstergesi** — Platform uptime yüzdesi (SLA takibi)
+- **Feature flag durumu** — Aktif/pasif feature sayısı
+- **Son deploy bilgisi** — Son deployment zamanı ve versiyon
