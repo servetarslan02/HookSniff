@@ -282,7 +282,7 @@ export default function EndpointSettingsPage() {
         </div>
 
         {/* Delay Preview */}
-        <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
+        <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-700">
           <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
             {t('retrySchedulePreview')}
           </p>
@@ -321,7 +321,7 @@ export default function EndpointSettingsPage() {
         </p>
 
         {endpoint.signing_secret && (
-          <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
+          <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-700">
             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">{t('currentSecret')}</p>
             <code className="text-sm font-mono text-gray-700 dark:text-slate-300 break-all">
               {endpoint.signing_secret.slice(0, 12)}{'*'.repeat(20)}
@@ -352,21 +352,21 @@ export default function EndpointSettingsPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
+          <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-700">
             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('apiRequests')}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {endpoint.routing_strategy === 'round-robin' ? '100' : '1,000'}
               <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">{t('perMin')}</span>
             </p>
           </div>
-          <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
+          <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-700">
             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('avgResponse')}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {endpoint.avg_response_ms ?? 0}
               <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">{t('msUnit')}</span>
             </p>
           </div>
-          <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
+          <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-700">
             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('failureStreak')}</p>
             <p className={`text-2xl font-bold ${(endpoint.failure_streak ?? 0) >= 3 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
               {endpoint.failure_streak ?? 0}
@@ -418,7 +418,7 @@ export default function EndpointSettingsPage() {
       {/* Rotate Confirmation Modal */}
       {showRotateConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('rotateConfirmTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
               {t('rotateConfirmDesc')}

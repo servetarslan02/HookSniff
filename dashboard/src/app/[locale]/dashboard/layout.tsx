@@ -70,11 +70,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={clsx(
-          'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 z-40 transition-transform duration-200 md:translate-x-0',
+          'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <Link href="/" className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition">
+        <Link href="/" className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
             🪝
           </div>
@@ -127,7 +127,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="md:pl-64">
         {/* Top bar */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
