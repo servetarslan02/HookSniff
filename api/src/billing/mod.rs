@@ -1,16 +1,16 @@
-// TODO (Item 288): Refactor billing into a cleaner abstraction layer.
-//   Current state: Each provider (Stripe, Polar, Iyzico) has its own module
-//   with inconsistent error handling and response types.
-//   Refactoring goals:
-//   1. Define a unified BillingProvider trait with consistent error types
-//   2. Standardize webhook event handling across providers
-//   3. Create a single BillingService that routes to the correct provider
-//   4. Extract provider-specific logic behind the trait boundary
+// Item 288: BillingService abstraction layer.
+//   Each provider (Stripe, Polar, Iyzico) has its own module with a unified
+//   PaymentProviderImpl trait. BillingService wraps provider resolution so
+//   route handlers don't need to match on provider names themselves.
 
 pub mod iyzico;
 pub mod polar;
 pub mod provider;
 pub mod stripe;
+
+use crate::config::Config;
+use crate::error::AppError;
+use crate::models::customer::Customer;
 
 use serde::{Deserialize, Serialize};
 
@@ -130,6 +130,225 @@ pub fn resolve_provider(provider_name: &str) -> Option<Box<dyn provider::Payment
         _ => {
             // Stripe is always available (already in config)
             None // Caller should use the existing Stripe logic
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Item 288: BillingService — unified billing abstraction
+// ──────────────────────────────────────────────────────────────
+
+/// Result of a checkout operation.
+pub struct CheckoutOutcome {
+    pub checkout_url: Option<String>,
+    pub provider: String,
+}
+
+/// Result of a portal operation.
+pub struct PortalOutcome {
+    pub url: String,
+    pub provider: String,
+}
+
+/// Unified billing service that routes operations to the correct payment provider.
+///
+/// Wraps provider resolution so route handlers don't need to match on provider
+/// names themselves. Each method resolves the correct provider internally.
+pub struct BillingService {
+    pool: sqlx::PgPool,
+    cfg: Config,
+}
+
+impl BillingService {
+    pub fn new(pool: sqlx::PgPool, cfg: Config) -> Self {
+        Self { pool, cfg }
+    }
+
+    /// Create a checkout session for upgrading to a plan.
+    ///
+    /// If `provider_name` is None, uses the customer's existing payment provider.
+    pub async fn checkout(
+        &self,
+        customer: &Customer,
+        plan: &Plan,
+        provider_name: Option<&str>,
+    ) -> Result<CheckoutOutcome, AppError> {
+        let effective_provider = provider_name
+            .unwrap_or(&customer.payment_provider);
+
+        let provider_enum = provider::PaymentProvider::parse_str(effective_provider);
+
+        match provider_enum {
+            provider::PaymentProvider::Polar | provider::PaymentProvider::Iyzico => {
+                let provider_impl =
+                    resolve_provider(effective_provider).ok_or_else(|| {
+                        AppError::Internal(anyhow::anyhow!(
+                            "Payment provider '{}' not configured",
+                            effective_provider
+                        ))
+                    })?;
+
+                let base_url = self.cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
+
+                let result = provider_impl
+                    .create_checkout(customer.id, &customer.email, plan, base_url)
+                    .await?;
+
+                Ok(CheckoutOutcome {
+                    checkout_url: Some(result.checkout_url),
+                    provider: effective_provider.to_string(),
+                })
+            }
+            provider::PaymentProvider::Stripe => {
+                let session = stripe::create_checkout_session(
+                    &self.cfg,
+                    customer.id,
+                    &customer.email,
+                    plan,
+                )
+                .await?;
+
+                Ok(CheckoutOutcome {
+                    checkout_url: session.url,
+                    provider: "stripe".to_string(),
+                })
+            }
+        }
+    }
+
+    /// Cancel a subscription at the payment provider.
+    ///
+    /// For Polar/iyzico, calls the provider's cancel_subscription API.
+    /// For Stripe, cancels via the Stripe API.
+    /// The `provider_subscription_id` is the provider-specific subscription ID.
+    pub async fn cancel_at_provider(
+        &self,
+        provider_name: &str,
+        provider_subscription_id: &str,
+    ) -> Result<(), AppError> {
+        let provider_enum = provider::PaymentProvider::parse_str(provider_name);
+
+        match provider_enum {
+            provider::PaymentProvider::Polar | provider::PaymentProvider::Iyzico => {
+                let provider_impl =
+                    resolve_provider(provider_name).ok_or_else(|| {
+                        AppError::Internal(anyhow::anyhow!(
+                            "Payment provider '{}' not configured",
+                            provider_name
+                        ))
+                    })?;
+
+                provider_impl
+                    .cancel_subscription(provider_subscription_id)
+                    .await?;
+            }
+            provider::PaymentProvider::Stripe => {
+                stripe::cancel_subscription(&self.cfg, provider_subscription_id).await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Cancel a customer's subscription, resolving the provider and subscription ID
+    /// from the customer record automatically.
+    pub async fn cancel_customer_subscription(
+        &self,
+        customer: &Customer,
+    ) -> Result<(), AppError> {
+        let (provider_name, subscription_id) =
+            Self::resolve_subscription_ids(customer)?;
+
+        if let Some(ref sub_id) = subscription_id {
+            self.cancel_at_provider(&provider_name, sub_id).await?;
+        }
+
+        Ok(())
+    }
+
+    /// Open a customer portal for managing subscription.
+    pub async fn portal(
+        &self,
+        customer: &Customer,
+    ) -> Result<PortalOutcome, AppError> {
+        let provider_name = &customer.payment_provider;
+        let provider_enum = provider::PaymentProvider::parse_str(provider_name);
+
+        match provider_enum {
+            provider::PaymentProvider::Polar | provider::PaymentProvider::Iyzico => {
+                let provider_impl =
+                    resolve_provider(provider_name).ok_or_else(|| {
+                        AppError::Internal(anyhow::anyhow!(
+                            "Payment provider '{}' not configured",
+                            provider_name
+                        ))
+                    })?;
+
+                let provider_customer_id = match provider_name.as_str() {
+                    "polar" => customer.polar_customer_id.as_deref(),
+                    "iyzico" => customer.iyzico_customer_id.as_deref(),
+                    _ => None,
+                }
+                .unwrap_or("");
+
+                let base_url = self.cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
+
+                let url = provider_impl
+                    .create_customer_portal(provider_customer_id, base_url)
+                    .await?;
+
+                Ok(PortalOutcome {
+                    url,
+                    provider: provider_name.to_string(),
+                })
+            }
+            provider::PaymentProvider::Stripe => {
+                let stripe_customer_id = customer
+                    .stripe_customer_id
+                    .as_ref()
+                    .ok_or_else(|| {
+                        AppError::BadRequest(
+                            "No Stripe customer found. Upgrade your plan first.".into(),
+                        )
+                    })?;
+
+                let url = stripe::create_customer_portal(&self.cfg, stripe_customer_id).await?;
+
+                Ok(PortalOutcome {
+                    url,
+                    provider: "stripe".to_string(),
+                })
+            }
+        }
+    }
+
+    /// Resolve the (provider_name, subscription_id) pair from a customer record.
+    ///
+    /// Returns (provider_name, Some(subscription_id)) if an active subscription exists,
+    /// or (provider_name, None) if there is no subscription.
+    fn resolve_subscription_ids(
+        customer: &Customer,
+    ) -> Result<(String, Option<String>), AppError> {
+        let provider_name = &customer.payment_provider;
+
+        let subscription_id = match provider_name.as_str() {
+            "polar" => customer.polar_subscription_id.clone(),
+            "iyzico" => customer.iyzico_subscription_id.clone(),
+            _ => customer.stripe_subscription_id.clone(),
+        };
+
+        Ok((provider_name.clone(), subscription_id))
+    }
+
+    /// Get the subscription ID for a specific provider from the customer record.
+    pub fn subscription_id_for_provider<'a>(
+        customer: &'a Customer,
+        provider_name: &str,
+    ) -> Option<&'a str> {
+        match provider_name {
+            "polar" => customer.polar_subscription_id.as_deref(),
+            "iyzico" => customer.iyzico_subscription_id.as_deref(),
+            _ => customer.stripe_subscription_id.as_deref(),
         }
     }
 }

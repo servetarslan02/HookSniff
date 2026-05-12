@@ -206,6 +206,8 @@ pub struct RevenueResponse {
     pub churn_rate: f64,
     /// Percentage change in MRR compared to last month (e.g. 5.0 means +5%)
     pub mrr_trend: f64,
+    /// Item 252: Lifetime actual collected revenue from paid invoices (USD)
+    pub collected_revenue: f64,
 }
 
 /// Admin middleware — call this as a layer on admin routes, or check inline.
@@ -625,20 +627,11 @@ async fn system_stats(
         .fetch_one(&pool)
         .await?;
 
-    // Revenue: read plan prices from platform_settings
-    let settings = fetch_platform_settings(&pool).await;
+    // Item 252: Use actual invoice amounts for revenue, not plan price estimates.
+    // Sum all paid invoices (actual collected revenue).
     let revenue: (Option<f64>,) = sqlx::query_as(
-        &format!(
-            r#"SELECT COALESCE(SUM(
-            CASE plan
-                WHEN 'pro' THEN {pro}
-                WHEN 'business' THEN {biz}
-                ELSE 0.0
-            END
-        ), 0.0) as revenue FROM customers WHERE is_active = TRUE"#,
-            pro = settings.plan_price_pro,
-            biz = settings.plan_price_business,
-        ),
+        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as revenue \
+         FROM invoices WHERE status = 'paid'",
     )
     .fetch_one(&pool)
     .await?;
@@ -677,18 +670,10 @@ async fn system_stats(
     .fetch_one(&pool)
     .await?;
 
+    // Item 252: Revenue yesterday — sum of invoices paid before today
     let revenue_yesterday: (Option<f64>,) = sqlx::query_as(
-        &format!(
-            r#"SELECT COALESCE(SUM(
-            CASE plan
-                WHEN 'pro' THEN {pro}
-                WHEN 'business' THEN {biz}
-                ELSE 0.0
-            END
-        ), 0.0) as revenue FROM customers WHERE is_active = TRUE AND created_at < CURRENT_DATE"#,
-            pro = settings.plan_price_pro,
-            biz = settings.plan_price_business,
-        ),
+        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as revenue \
+         FROM invoices WHERE status = 'paid' AND paid_at < CURRENT_DATE",
     )
     .fetch_one(&pool)
     .await?;
@@ -729,79 +714,54 @@ async fn revenue_by_month(
 ) -> Result<Json<RevenueResponse>, AppError> {
     require_admin(&customer)?;
 
-    let settings = fetch_platform_settings(&pool).await;
-    let pro_price = settings.plan_price_pro;
-    let biz_price = settings.plan_price_business;
-
-    // 1. Monthly revenue (last 12 months) — Neon DB compatible
+    // Item 252: Use actual invoice data instead of plan price estimates.
+    // 1. Monthly revenue (last 12 months) from actual paid invoices
     let monthly_revenue = sqlx::query_as::<_, RevenueRow>(
-        &format!(
-            r#"SELECT
+        r#"SELECT
             TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
             COALESCE(
-                (SELECT SUM(
-                    CASE plan
-                        WHEN 'pro' THEN {pro}
-                        WHEN 'business' THEN {biz}
-                        ELSE 0.0
-                    END
-                )
-                FROM customers
-                WHERE is_active = TRUE
-                  AND created_at <= DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
+                (SELECT SUM(amount_cents::double precision / 100.0)
+                 FROM invoices
+                 WHERE status = 'paid'
+                   AND paid_at >= DATE_TRUNC('month', NOW()) - (n || ' months')::interval
+                   AND paid_at < DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
                 0.0
             ) as revenue
         FROM generate_series(0, 11) as n
         ORDER BY month"#,
-            pro = pro_price,
-            biz = biz_price,
-        ),
     )
     .fetch_all(&pool)
     .await?;
 
-    // 2. Revenue by plan (active customers only)
+    // 2. Revenue by plan from actual paid invoices (last 12 months)
     let revenue_by_plan = sqlx::query_as::<_, RevenueByPlan>(
-        &format!(
-            r#"SELECT
+        r#"SELECT
             plan,
-            COALESCE(SUM(
-                CASE plan
-                    WHEN 'pro' THEN {pro}
-                    WHEN 'business' THEN {biz}
-                    ELSE 0.0
-                END
-            ), 0.0) as revenue,
+            COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as revenue,
             COUNT(*) as count
-        FROM customers
-        WHERE is_active = TRUE
+        FROM invoices
+        WHERE status = 'paid'
+          AND paid_at >= DATE_TRUNC('month', NOW()) - INTERVAL '11 months'
         GROUP BY plan
         ORDER BY revenue DESC"#,
-            pro = pro_price,
-            biz = biz_price,
-        ),
     )
     .fetch_all(&pool)
     .await?;
 
-    // 3. MRR = sum of all active customer monthly revenue
+    // 3. MRR: sum of paid invoices in the current month
     let mrr: (Option<f64>,) = sqlx::query_as(
-        &format!(
-            r#"SELECT COALESCE(SUM(
-            CASE plan
-                WHEN 'pro' THEN {pro}
-                WHEN 'business' THEN {biz}
-                ELSE 0.0
-            END
-        ), 0.0) as mrr FROM customers WHERE is_active = TRUE"#,
-            pro = pro_price,
-            biz = biz_price,
-        ),
+        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as mrr \
+         FROM invoices \
+         WHERE status = 'paid' \
+           AND paid_at >= DATE_TRUNC('month', NOW())",
     )
     .fetch_one(&pool)
     .await?;
 
-    // 4. Churn rate: % of customers who became inactive in last 30 days
+    // 4. Actual collected revenue: sum of all paid invoices (lifetime)
+    //    Exposed via the mrr field combined with monthly_revenue for full picture.
+
+    // 5. Churn rate: % of customers who became inactive in last 30 days
     let total_customers: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM customers")
         .fetch_one(&pool)
         .await?;
@@ -818,7 +778,7 @@ async fn revenue_by_month(
         0.0
     };
 
-    // 5. MRR trend: compare current month to previous month
+    // 6. MRR trend: compare current month to previous month
     let mrr_trend = if monthly_revenue.len() >= 2 {
         let current = monthly_revenue.last().map(|r| r.revenue).unwrap_or(0.0);
         let previous = monthly_revenue[monthly_revenue.len() - 2].revenue;
@@ -833,12 +793,21 @@ async fn revenue_by_month(
         0.0
     };
 
+    // 7. Item 252: Lifetime collected revenue from all paid invoices
+    let collected_revenue: (Option<f64>,) = sqlx::query_as(
+        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) \
+         FROM invoices WHERE status = 'paid'",
+    )
+    .fetch_one(&pool)
+    .await?;
+
     Ok(Json(RevenueResponse {
         monthly_revenue,
         revenue_by_plan,
         mrr: mrr.0.unwrap_or(0.0),
         churn_rate,
         mrr_trend,
+        collected_revenue: collected_revenue.0.unwrap_or(0.0),
     }))
 }
 
@@ -1004,30 +973,21 @@ async fn export_revenue_csv(
     }
 
     let months = params.months.unwrap_or(12).clamp(1, 60);
-    let settings = fetch_platform_settings(&pool).await;
 
+    // Item 252: Use actual invoice data for revenue export
     let all_rows = sqlx::query_as::<_, RevenueRow>(
-        &format!(
-            r#"SELECT
+        r#"SELECT
             TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
             COALESCE(
-                (SELECT SUM(
-                    CASE plan
-                        WHEN 'pro' THEN {pro}
-                        WHEN 'business' THEN {biz}
-                        ELSE 0.0
-                    END
-                )
-                FROM customers
-                WHERE is_active = TRUE
-                  AND created_at <= DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
+                (SELECT SUM(amount_cents::double precision / 100.0)
+                 FROM invoices
+                 WHERE status = 'paid'
+                   AND paid_at >= DATE_TRUNC('month', NOW()) - (n || ' months')::interval
+                   AND paid_at < DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
                 0.0
             ) as revenue
         FROM generate_series(0, 11) as n
         ORDER BY month"#,
-            pro = settings.plan_price_pro,
-            biz = settings.plan_price_business,
-        ),
     )
     .fetch_all(&pool)
     .await?;
@@ -2232,12 +2192,16 @@ mod tests {
             ],
             mrr: 1280.0,
             churn_rate: 2.5,
+            mrr_trend: 5.0,
+            collected_revenue: 2500.0,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert!(json.get("monthly_revenue").is_some());
         assert!(json.get("revenue_by_plan").is_some());
         assert_eq!(json["mrr"], 1280.0);
         assert_eq!(json["churn_rate"], 2.5);
+        assert_eq!(json["mrr_trend"], 5.0);
+        assert_eq!(json["collected_revenue"], 2500.0);
         assert_eq!(json["monthly_revenue"].as_array().unwrap().len(), 2);
         assert_eq!(json["revenue_by_plan"].as_array().unwrap().len(), 2);
     }

@@ -1477,7 +1477,8 @@
       "testimonial3Quote": "The dead letter queue saved us from losing critical payment events. Production-grade tool.",
       "testimonial3Author": "Ayşe Yılmaz",
       "testimonial3Role": "Backend Lead, Trendyol",
-      "companies": "Used by teams at"
+      "companies": "Used by teams at",
+      "testimonialDisclaimer": "These are illustrative scenarios based on common user experiences, not real customer stories."
     }
   },
   "apiKeys": {
@@ -2895,6 +2896,24 @@
     "pros": "Pros",
     "cons": "Cons",
     "bestFor": "Best for",
+    "bestForStartups": "Best for startups & indie devs",
+    "bestForStartupsDesc": "Teams that want zero-cost webhook infrastructure with FIFO ordering and broad SDK coverage.",
+    "bestForRouting": "Best for complex routing",
+    "bestForRoutingDesc": "Teams that need advanced event filtering, transformation, and multi-destination routing.",
+    "bestForEurope": "Best for EU/GDPR-first teams",
+    "bestForEuropeDesc": "Teams in Europe that need a GDPR-native, open-source, self-hosted solution.",
+    "bestForGo": "Best for Go developers",
+    "bestForGoDesc": "Go teams that want a lightweight, self-hosted webhook service written in their language.",
+    "whenToChooseSvix": "When to choose Svix",
+    "whenToChooseSvixDesc": "Svix is the better choice if you need a battle-tested enterprise solution with SOC 2 Type 2 certification and a 99.99% uptime SLA. Svix has been around longer and has more enterprise trust. If compliance certifications and proven reliability at scale are your top priorities, Svix is a strong option — even at a higher price point.",
+    "whenToChooseHookdeck": "When to choose Hookdeck",
+    "whenToChooseHookdeckDesc": "Hookdeck excels at complex event routing with filtering and transformation rules. Their 99.999% uptime SLA is the highest in the industry. If you need advanced event routing, SOC 2 Type 2 certification, and are okay with usage-based pricing, Hookdeck is a solid choice.",
+    "whenToChooseHook0": "When to choose Hook0",
+    "whenToChooseHook0Desc": "Hook0 is ideal if you want a fully open-source, European-built webhook service. It's a good fit for teams that prefer self-hosting and want GDPR-native data processing. The smaller feature set can be an advantage if you prefer simplicity over breadth.",
+    "whenToChooseConvoy": "When to choose Convoy",
+    "whenToChooseConvoyDesc": "Convoy is a good fit for Go-native teams that want a lightweight, self-hosted webhook service. If your entire stack is Go and you prefer minimal dependencies, Convoy's single-language focus can be an advantage.",
+    "whenToChooseWebhookRelay": "When to choose Webhook Relay",
+    "whenToChooseWebhookRelayDesc": "Webhook Relay is useful if you need webhook forwarding/tunneling for local development or simple relay use cases. It serves a different niche than full webhook delivery platforms.",
     "readyToSwitch": "Ready to switch from {competitor}?",
     "switchCta": "Get the same features at 10x lower cost. Start free, scale when ready.",
     "migrateToHooksniff": "Migrate to HookSniff →"

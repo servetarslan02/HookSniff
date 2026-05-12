@@ -194,6 +194,51 @@ pub async fn create_customer_portal(
     Ok(portal.url)
 }
 
+/// Cancel a Stripe subscription immediately.
+///
+/// Calls the Stripe API to cancel the subscription by ID.
+pub async fn cancel_subscription(
+    cfg: &Config,
+    stripe_subscription_id: &str,
+) -> Result<(), AppError> {
+    let stripe_secret = cfg
+        .stripe_secret_key
+        .as_ref()
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Stripe not configured")))?;
+
+    let client = crate::http_client::get_client().clone();
+    let url = format!(
+        "https://api.stripe.com/v1/subscriptions/{}",
+        stripe_subscription_id
+    );
+
+    let resp = client
+        .delete(&url)
+        .bearer_auth(stripe_secret)
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Stripe cancel request failed: {}", e)))?;
+
+    if !resp.status().is_success() {
+        let body = resp.text().await.unwrap_or_default();
+        tracing::error!(
+            "Stripe subscription cancellation failed for {}: {}",
+            stripe_subscription_id,
+            body
+        );
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "Stripe subscription cancellation failed"
+        )));
+    }
+
+    tracing::info!(
+        "✅ Stripe subscription {} canceled",
+        stripe_subscription_id
+    );
+
+    Ok(())
+}
+
 /// Verify and process a Stripe webhook event.
 ///
 /// Verifies the webhook signature using HMAC-SHA256, then processes the event.
