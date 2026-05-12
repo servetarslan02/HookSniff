@@ -1406,35 +1406,28 @@
       "getStarted": "Get started",
       "startTrial": "Start free trial",
       "contactSales": "Contact sales",
-      "freeFeatures": [
-        "10,000 webhooks/month",
-        "100 requests/min",
-        "3 retry attempts",
-        "Community support"
-      ],
       "proFeatures": [
-        "50,000 webhooks/month",
-        "1,000 requests/min",
-        "5 retry attempts",
-        "Priority support",
-        "Custom domains"
-      ],
-      "businessFeatures": [
-        "500,000 webhooks/month",
-        "10,000 requests/min",
-        "10 retry attempts",
-        "Dedicated support",
-        "SLA guarantee",
-        "Custom integrations"
+        "100,000 events/day",
+        "Unlimited applications",
+        "500 endpoints",
+        "Unlimited event types",
+        "Unlimited subscriptions",
+        "30-day log retention",
+        "$0.0001/event overage",
+        "FIFO ordered delivery",
+        "IP whitelisting",
+        "Analytics & graphs",
+        "Schema registry",
+        "Webhook playground"
       ],
       "enterpriseFeatures": [
-        "Unlimited everything",
-        "Custom SLA (99.99% uptime)",
-        "SSO / SAML",
-        "Dedicated account manager",
+        "Fully managed — no infrastructure to own",
+        "Everything unlimited",
+        "Custom daily event limits",
+        "Custom data retention",
         "Custom integrations",
-        "On-premise deployment",
-        "Priority support",
+        "SSO / SAML",
+        "On-premise deployment option",
         "Custom contracts"
       ],
       "developerFeatures": [
@@ -1463,7 +1456,11 @@
         "Dead letter queue",
         "Custom retry policies",
         "Email support"
-      ]
+      ],
+      "developerDesc": "Perfect for trying out HookSniff. No setup needed, free forever for side projects.",
+      "startupDesc": "Enhance your webhook experience with new features and grow your startup!",
+      "proDesc": "Unleash your data connectivity with enterprise features and better support.",
+      "enterpriseDesc": "Need more? Need something different? Let us know, we will build a custom plan for you."
     },
     "footer": {
       "github": "GitHub",
@@ -1751,7 +1748,7 @@
     "startTrial": "Start Free Trial",
     "contactSales": "Contact Sales",
     "freeDesc": "For side projects and experiments",
-    "proDesc": "For production workloads",
+    "proDesc": "Unleash your data connectivity with enterprise features and better support.",
     "businessDesc": "For teams that need guarantees",
     "freeFeatures": [
       "10,000 webhooks/month",
@@ -1865,7 +1862,7 @@
       "Battle-tested retry engine"
     ],
     "startupTitle": "Early stage startup?",
-    "startupDesc": "For growing projects",
+    "startupDesc": "Enhance your webhook experience with new features and grow your startup!",
     "startupCta": "Apply for startup discount →",
     "faqTitle": "Frequently asked questions",
     "ctaTitle": "Ready to get started?",
@@ -1929,7 +1926,7 @@
     "billedAnnually": "Billed annually",
     "billedMonthly": "Billed monthly",
     "enterprise": "Enterprise",
-    "enterpriseDesc": "For large organizations with custom needs",
+    "enterpriseDesc": "Need more? Need something different? Let us know, we will build a custom plan for you.",
     "customPricing": "Custom",
     "contactUs": "Contact Us",
     "enterpriseFeatures": [
@@ -1944,7 +1941,7 @@
     ],
     "developer": "Developer",
     "startup": "Startup",
-    "developerDesc": "Get started for free",
+    "developerDesc": "Perfect for trying out HookSniff. No setup needed, free forever for side projects.",
     "developerFeatures": [
       "100 events/day",
       "1 application",
