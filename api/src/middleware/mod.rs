@@ -161,6 +161,47 @@ fn extract_token(req: &Request) -> Option<String> {
     None
 }
 
+/// HS-261: Check if a JWT has been revoked via blacklist or per-customer revocation.
+async fn check_token_revocation(
+    pool: &PgPool,
+    claims: &crate::auth::jwt::Claims,
+) -> Result<(), AppError> {
+    // Check individual token blacklist (by jti)
+    if let Some(ref jti) = claims.jti {
+        let revoked: (bool,) = sqlx::query_as(
+            "SELECT EXISTS(SELECT 1 FROM revoked_tokens WHERE jti = $1)",
+        )
+        .bind(jti)
+        .fetch_one(pool)
+        .await
+        .map_err(|e| AppError::Internal(e.into()))?;
+
+        if revoked.0 {
+            return Err(AppError::Unauthorized);
+        }
+    }
+
+    // Check per-customer revocation (revoke-all-tokens)
+    // If the token was issued before the customer's revocation event, reject it
+    if let Some(iat) = claims.iat {
+        let revoked_before: Option<(chrono::DateTime<chrono::Utc>,)> = sqlx::query_as(
+            "SELECT revoked_at FROM token_revocation_events WHERE customer_id = $1",
+        )
+        .bind(claims.sub)
+        .fetch_optional(pool)
+        .await
+        .map_err(|e| AppError::Internal(e.into()))?;
+
+        if let Some((revoked_at,)) = revoked_before {
+            if (iat as i64) < revoked_at.timestamp() {
+                return Err(AppError::Unauthorized);
+            }
+        }
+    }
+
+    Ok(())
+}
+
 pub async fn auth_middleware(
     pool: axum::extract::Extension<PgPool>,
     cfg: axum::extract::Extension<crate::config::Config>,
@@ -239,6 +280,10 @@ pub async fn auth_middleware(
     } else {
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
+
+        // HS-261: Check if token has been revoked (individual or all-tokens-for-customer)
+        check_token_revocation(&pool, &claims).await?;
+
         sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
             .bind(claims.sub)
             .fetch_optional(&*pool)
@@ -261,6 +306,9 @@ pub async fn jwt_auth_middleware(
     let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
 
     let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
+
+    // HS-261: Check if token has been revoked
+    check_token_revocation(&pool, &claims).await?;
 
     let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
         .bind(claims.sub)

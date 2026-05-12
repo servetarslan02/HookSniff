@@ -106,8 +106,8 @@ export function PricingPageContent() {
     {
       category: t('usage'),
       items: [
-        { feature: t('monthlyWebhooks'), free: '1,000', pro: '50,000', business: '500,000' },
-        { feature: t('endpoints'), free: '1', pro: '10', business: t('unlimited') },
+        { feature: t('monthlyWebhooks'), free: '10,000', pro: '50,000', business: '500,000' },
+        { feature: t('endpoints'), free: '5', pro: '50', business: '500' },
         { feature: t('rateLimit'), free: '100', pro: '1,000', business: '10,000' },
         { feature: t('additionalEvents'), free: '—', pro: '$0.50/100K', business: '$0.30/100K' },
         { feature: t('teamMembers'), free: '1', pro: '3', business: t('unlimited') },
@@ -324,8 +324,8 @@ export function PricingPageContent() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { plan: t('free'), level: t('communitySupport'), features: t.raw('supportFreeFeatures') as string[], response: t('supportBestEffort'), highlight: false },
-              { plan: t('pro'), level: t('prioritySupport'), features: t.raw('supportProFeatures') as string[], response: '< 48 hours', highlight: true },
-              { plan: t('business'), level: t('dedicatedManager'), features: t.raw('supportBusinessFeatures') as string[], response: '< 24 hours', highlight: false },
+              { plan: t('pro'), level: t('prioritySupport'), features: t.raw('supportProFeatures') as string[], response: t('supportResponse48h'), highlight: true },
+              { plan: t('business'), level: t('dedicatedManager'), features: t.raw('supportBusinessFeatures') as string[], response: t('supportResponse24h'), highlight: false },
             ].map((s) => (
               <div
                 key={s.plan}

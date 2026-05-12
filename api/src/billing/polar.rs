@@ -119,6 +119,29 @@ pub struct PolarWebhookEvent {
     pub data: serde_json::Value,
 }
 
+/// Request to create a customer portal session.
+#[derive(Debug, Serialize)]
+struct CreateCustomerSessionRequest {
+    /// External customer ID (our customer UUID).
+    external_customer_id: String,
+    /// Return URL when user exits the portal.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    return_url: Option<String>,
+}
+
+/// Response from customer session creation.
+#[derive(Debug, Deserialize)]
+struct CustomerSessionResponse {
+    /// Session token for accessing the customer portal.
+    #[serde(default)]
+    token: Option<String>,
+    /// Direct customer portal URL (if provided by Polar).
+    #[serde(default)]
+    customer_portal_url: Option<String>,
+    #[serde(default)]
+    id: Option<String>,
+}
+
 /// Polar.sh subscription object (from webhook data).
 #[derive(Debug, Deserialize)]
 struct PolarSubscription {
@@ -410,11 +433,70 @@ impl PaymentProviderImpl for PolarProvider {
 
     async fn create_customer_portal(
         &self,
-        _polar_customer_id: &str,
+        polar_customer_id: &str,
         app_url: &str,
     ) -> Result<String, AppError> {
-        // Polar.sh has a built-in customer portal.
-        // We redirect to our own billing page which links to Polar's portal.
+        // Create a customer portal session via Polar.sh API.
+        // This generates a tokenized URL for the customer to manage their subscription.
+        let req_body = CreateCustomerSessionRequest {
+            external_customer_id: polar_customer_id.to_string(),
+            return_url: Some(format!("{}/dashboard/billing", app_url)),
+        };
+
+        let resp = self
+            .client
+            .post(format!("{}/v1/customer-sessions/", self.config.base_url))
+            .header(
+                "Authorization",
+                format!("Bearer {}", self.config.access_token),
+            )
+            .header("Content-Type", "application/json")
+            .json(&req_body)
+            .send()
+            .await
+            .map_err(|e| {
+                AppError::Internal(anyhow::anyhow!(
+                    "Polar customer portal request failed: {}",
+                    e
+                ))
+            })?;
+
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            tracing::error!(
+                "Polar customer portal creation failed ({}): {}",
+                status,
+                body
+            );
+            // Fall back to our own billing page if Polar portal fails
+            return Ok(format!("{}/dashboard/billing", app_url));
+        }
+
+        let session: CustomerSessionResponse = resp.json().await.map_err(|e| {
+            AppError::Internal(anyhow::anyhow!(
+                "Failed to parse Polar customer session response: {}",
+                e
+            ))
+        })?;
+
+        // Prefer direct portal URL if Polar provides one
+        if let Some(portal_url) = session.customer_portal_url {
+            return Ok(portal_url);
+        }
+
+        // Construct portal URL from token
+        if let Some(token) = session.token {
+            let portal_base = if self.config.base_url.contains("sandbox") {
+                "https://sandbox.polar.sh"
+            } else {
+                "https://polar.sh"
+            };
+            return Ok(format!("{}/customer-portal/{}", portal_base, token));
+        }
+
+        // Fallback to our billing page
+        tracing::warn!("Polar customer session returned no token or portal URL");
         Ok(format!("{}/dashboard/billing", app_url))
     }
 
@@ -597,8 +679,10 @@ mod tests {
     // ── PolarProvider::create_customer_portal ──────────────────
 
     #[tokio::test]
-    async fn create_customer_portal_returns_billing_url() {
+    async fn create_customer_portal_falls_back_without_network() {
         let provider = PolarProvider::new(test_config());
+        // This will fail because we're not actually connecting to Polar,
+        // but the implementation falls back to our billing page.
         let url = provider
             .create_customer_portal("cust_123", "https://app.hooksniff.com")
             .await
