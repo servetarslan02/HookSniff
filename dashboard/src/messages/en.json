@@ -559,10 +559,16 @@
     "cancelledMsg": "Subscription cancelled. You'll keep access until the end of the billing period.",
     "redirecting": "Redirecting...",
     "plans": {
-      "free": "Free",
+      "free": "Developer",
       "pro": "Pro",
-      "business": "Business",
-      "enterprise": "Enterprise"
+      "business": "Enterprise",
+      "enterprise": "Enterprise",
+      "developer": "Developer",
+      "startup": "Startup",
+      "developerLimit": "100 events/day",
+      "startupLimit": "30,000 events/day",
+      "proLimit": "100,000 events/day",
+      "enterpriseLimit": "Unlimited"
     },
     "features": {
       "deliveries": "{count} deliveries/month",
@@ -1697,15 +1703,15 @@
     "heroSubtitle": "Save 12+ months of webhook infrastructure development. Start free, scale when ready.",
     "heroNote": "No credit card required. No surprise charges. Cancel anytime.",
     "mostPopular": "Most Popular",
-    "free": "Free",
+    "free": "Developer",
     "pro": "Pro",
-    "business": "Business",
+    "business": "Enterprise",
     "month": "/month",
     "getStarted": "Get Started",
     "startTrial": "Start Free Trial",
     "contactSales": "Contact Sales",
     "freeDesc": "For side projects and experiments",
-    "proDesc": "For production applications",
+    "proDesc": "For production workloads",
     "businessDesc": "For teams that need guarantees",
     "freeFeatures": [
       "10,000 webhooks/month",
@@ -1718,17 +1724,13 @@
       "8 SDK access"
     ],
     "proFeatures": [
-      "50,000 webhooks/month",
-      "50 endpoints",
-      "5 retry attempts",
-      "Custom retry policies",
-      "Priority support",
-      "Custom domains",
+      "100,000 events/day",
+      "Unlimited applications",
+      "500 endpoints",
+      "Unlimited event types",
       "30-day log retention",
-      "11 SDK access",
-      "Webhook playground",
-      "Tags and filtering",
-      "Email alerts"
+      "FIFO delivery",
+      "Priority support"
     ],
     "businessFeatures": [
       "500,000 webhooks/month",
@@ -1817,7 +1819,7 @@
       "Battle-tested retry engine"
     ],
     "startupTitle": "Early stage startup?",
-    "startupDesc": "We have special startup plans to help you grow. Pre-Series A startups get extended free tiers and significant discounts on paid plans.",
+    "startupDesc": "For growing projects",
     "startupCta": "Apply for startup discount →",
     "faqTitle": "Frequently asked questions",
     "ctaTitle": "Ready to get started?",
@@ -1885,14 +1887,42 @@
     "customPricing": "Custom",
     "contactUs": "Contact Us",
     "enterpriseFeatures": [
-      "Everything in Business",
-      "Custom SLA (99.999% uptime)",
+      "Unlimited events",
+      "Unlimited everything",
+      "Custom SLA",
       "SSO / SAML",
-      "Dedicated support engineer",
-      "Slack Connect channel",
-      "Custom contracts",
-      "On-premises deployment option"
-    ]
+      "Dedicated account manager",
+      "Custom integrations"
+    ],
+    "developer": "Developer",
+    "startup": "Startup",
+    "developerDesc": "Get started for free",
+    "developerFeatures": [
+      "100 events/day",
+      "1 application",
+      "5 endpoints",
+      "10 event types",
+      "7-day log retention",
+      "Community support"
+    ],
+    "startupFeatures": [
+      "30,000 events/day",
+      "1 application",
+      "50 endpoints",
+      "50 event types",
+      "14-day log retention",
+      "Never-blocked mode",
+      "Email support"
+    ],
+    "ctaDeveloper": "Start free",
+    "ctaStartup": "Start for $29/mo",
+    "ctaPro": "Start for $49/mo",
+    "ctaEnterprise": "Contact sales",
+    "dailyEvents": "Daily events",
+    "applications": "Applications",
+    "eventTypes": "Event types",
+    "subscriptions": "Subscriptions",
+    "overagePerEvent": "Overage per event"
   },
   "pricingFaq": [
     {
