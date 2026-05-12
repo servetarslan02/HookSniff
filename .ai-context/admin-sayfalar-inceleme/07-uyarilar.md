@@ -70,6 +70,14 @@
 - **Threshold validasyonu yok** — Negatif değer girilebilir
 
 ### 🔴 Eksiklikler
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **Admin bazlı alert yönetimi** — Tüm müşterilerin alert'lerini görme
+- **Global alert kuralları** — Platform genelinde alert tanımlama
+- **Alert şablonları** — Önceden tanımlı alert şablonları
+- **PagerDuty/OpsGenie entegrasyonu** — Enterprise alert kanalları
+- **Alert history** — Geçmiş alert olaylarının kaydı
+- **Escalation policy** — Alert yükseltme politikası
 - Alert düzenleme (update) endpoint'i
 - Alert pause/resume toggle
 - Alert tetiklenme geçmişi/log'u
