@@ -10,6 +10,19 @@
 //! - `GET /oauth/github/callback` — GitHub OAuth callback
 //! - `GET /oauth/providers` — List available OAuth providers
 //!
+//! ## TODO (Item 264): Add PKCE (Proof Key for Code Exchange)
+//!
+//! Currently using plain authorization code flow. Should add PKCE for defense-in-depth:
+//!
+//! 1. Generate `code_verifier` (43-128 char random string using [A-Z][a-z][0-9]-._~)
+//! 2. Compute `code_challenge = BASE64URL(SHA256(code_verifier))`
+//! 3. Add `code_challenge` and `code_challenge_method=S256` to auth URL
+//! 4. Store `code_verifier` in HttpOnly cookie (alongside state)
+//! 5. Send `code_verifier` in token exchange POST body
+//!
+//! This protects against authorization code interception attacks.
+//! Both Google and GitHub support PKCE.
+//!
 //! ## Configuration
 //!
 //! Set these environment variables:
