@@ -2190,7 +2190,8 @@
     "copied": "Copied!",
     "reactIntegration": "⚛️ React Integration",
     "portalSaved": "Portal configuration saved!",
-    "portalSaveFailed": "Failed to save portal config"
+    "portalSaveFailed": "Failed to save portal config",
+    "portalUrl": "Portal URL"
   },
   "retryPolicy": {
     "title": "🔄 Retry Policy",
