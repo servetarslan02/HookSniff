@@ -345,7 +345,7 @@ pub async fn health_check(
     checks.insert("recent_errors".to_string(), recent_errors);
 
     // Queue details (failed in last hour)
-    let queue_detail = match sqlx::query_scalar::<_, (i64, i64, i64)>(
+    let queue_detail = match sqlx::query_as::<_, (i64, i64, i64)>(
         "SELECT COUNT(*) FILTER (WHERE status = 'pending'), COUNT(*) FILTER (WHERE status = 'processing'), COUNT(*) FILTER (WHERE status = 'failed' AND created_at >= NOW() - INTERVAL '1 hour') FROM deliveries",
     )
     .fetch_one(&pool)
