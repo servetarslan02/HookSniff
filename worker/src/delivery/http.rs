@@ -168,28 +168,9 @@ pub fn truncate_str(s: &str, max_len: usize) -> String {
 
 /// Item 343: Validate HTTP header name per RFC 7230, Section 3.2.6.
 ///
-/// Header field names must be tokens: ASCII letters, digits, and
-/// `!#$%&'*+-.^_` ` ` |~`. No whitespace, colons, or control chars.
-///
-/// This prevents header injection and ensures compatibility with
-/// all HTTP intermediaries.
+/// Delegates to common::header_validation to avoid duplication with api.
 fn is_valid_header_name(name: &str) -> bool {
-    if name.is_empty() {
-        return false;
-    }
-    // RFC 7230 token: visible ASCII chars except delimiters
-    // Delimiters: "(", ")", "<", ">", "@", ",", ";", ":", "\\", <">, "/", "[", "]", "?", "=", "{", "}", SP, HT
-    name.bytes().all(|b| {
-        matches!(
-            b,
-            b'A'..=b'Z'
-                | b'a'..=b'z'
-                | b'0'..=b'9'
-                | b'!' | b'#' | b'$' | b'%' | b'&'
-                | b'\'' | b'*' | b'+' | b'-' | b'.'
-                | b'^' | b'_' | b'`' | b'|' | b'~'
-        )
-    })
+    common::header_validation::is_valid_header_name(name)
 }
 
 /// SSRF protection for webhook delivery.
