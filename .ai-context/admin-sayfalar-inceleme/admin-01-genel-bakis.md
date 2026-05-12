@@ -69,3 +69,11 @@
 - Veri export yok
 - Gerçek zamanlı güncelleme yok
 - Karşılaştırma (bu hafta vs geçen hafta) yok
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir
+- **Uptime kartı** — Platform uptime yüzdesi + SLA durumu
+- **Feature flag durumu** — Aktif feature sayısı
+- **Son deploy** — Versiyon ve zaman bilgisi
+- **Aktif oturum sayısı** — Online admin kullanıcı sayısı
+- **Bu hafta vs geçen hafta** — Trend karşılaştırması
