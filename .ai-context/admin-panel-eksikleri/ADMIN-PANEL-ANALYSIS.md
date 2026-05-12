@@ -191,7 +191,7 @@ GET /v1/admin/audit-logs?page=1&per_page=20&action=user.ban&admin_id=xxx
 - `update_settings()` → `action: 'settings.update'`
 - `upsert_portal_config()` → `action: 'portal.config_update'`
 
-#### 5.1.2 Audit Log — Frontend (Overview Sayfası)
+#### 5.1.2 Audit Log — Frontend (Overview Sayfası) ✅ YAPILDI (Oturum 126)
 
 **Overview sayfasına eklenecek:**
 ```
@@ -209,9 +209,9 @@ GET /v1/admin/audit-logs?page=1&per_page=20&action=user.ban&admin_id=xxx
 └─────────────────────────────────────────────┘
 ```
 
-**Yeni sayfa: `/admin/activity`** (Sidebar'a "Aktivite" menüsü ekle)
+**Yeni sayfa: `/admin/activity`** ✅ YAPILDI — tam sayfa + sidebar linki + filtre + sayfalama
 
-#### 5.1.3 Event Replay — Backend
+#### 5.1.3 Event Replay — Backend ✅ YAPILDI (önceki oturumlar — admin.rs mevcut)
 
 **Yeni Endpoint:**
 ```
@@ -224,7 +224,7 @@ POST /v1/admin/deliveries/:id/replay
 3. Yeni bir delivery attempt oluştur
 4. Worker'a yeniden gönder
 
-#### 5.1.4 Event Replay — Frontend (User Detail Sayfası)
+#### 5.1.4 Event Replay — Frontend (User Detail Sayfası) ✅ YAPILDI (önceki oturumlar — replay butonu mevcut)
 
 **User Detail sayfasındaki "Recent Deliveries" tablosuna buton ekle:**
 ```
@@ -234,7 +234,7 @@ POST /v1/admin/deliveries/:id/replay
 | d4e5f6.. | payment.fail | failed    | 3        | 14:25    | [↩ Tekrar Gönder] |
 ```
 
-#### 5.1.5 Export — Backend
+#### 5.1.5 Export — Backend ✅ YAPILDI (önceki oturumlar — CSV endpoint'leri mevcut)
 
 **Yeni Endpoint'ler:**
 ```
@@ -242,7 +242,7 @@ GET /v1/admin/users/export?format=csv&plan=pro&status=active
 GET /v1/admin/revenue/export?format=csv&months=12
 ```
 
-#### 5.1.6 Export — Frontend
+#### 5.1.6 Export — Frontend ✅ YAPILDI (önceki oturumlar — Users + Revenue sayfalarında CSV butonu)
 
 **Users sayfası:** Tablonun sağına "⬇ CSV" butonu
 **Revenue sayfası:** Başlığın sağına "⬇ Rapor İndir" butonu
@@ -378,7 +378,7 @@ GET /v1/admin/users/:id/analytics?days=30
 2. **Event Dağılımı** — Pie chart (en çok kullanılan event'ler)
 3. **Endpoint Sağlık** — Bar chart (başarı oranı)
 
-#### 5.3.3 Test Console — Backend
+#### 5.3.3 Test Console — Backend ✅ YAPILDI (önceki oturumlar — admin.rs mevcut)
 
 **Yeni Endpoint:**
 ```
@@ -390,7 +390,7 @@ POST /v1/admin/test-webhook
 2. Belirtilen endpoint'e gönder
 3. Sonucu döndür (status code, yanıt, süre)
 
-#### 5.3.4 Test Console — Frontend
+#### 5.3.4 Test Console — Frontend ✅ YAPILDI (Oturum 126) — System sayfasına eklendi
 
 **Yeni sayfa yok — System sayfasına "Webhook Test" kartı ekle:**
 ```
