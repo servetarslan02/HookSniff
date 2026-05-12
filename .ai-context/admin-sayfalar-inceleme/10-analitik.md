@@ -67,6 +67,10 @@
 - **Churn rate grafiği** — Tarih bazlı churn trendi
 - **Cohort analizi** — Müşteri cohort karşılaştırması
 - **Gelir projeksiyonu** — Gelecek dönem gelir tahmini
+- **Deduplication metrics** — Filtrelenen event sayısı ve oranı
+- **Standard Webhooks adoption** — Uyumluluk oranı
+- **Quick filter** — Grafiklerde tek tıkla filtre (Hookdeck ✅)
+- **Metrik export** — New Relic/Datadog/Grafana'ya export (Hookdeck ✅)
 - Endpoint bazlı analitik
 - Event type bazlı analitik
 - Tarih aralığı özel seçici (custom range)
