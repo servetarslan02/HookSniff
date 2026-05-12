@@ -188,7 +188,7 @@ export default function TeamPage() {
                     </p>
                   )}
                   <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                    {t('membersCount', { count: team.member_count || 0 })} · {new Date(team.created_at).toLocaleDateString()}
+                    {t('membersCount', { count: team.member_count || 0 })} · {new Date(team.created_at).toLocaleDateString(locale)}
                   </p>
                 </button>
               ))}
