@@ -249,7 +249,8 @@
     "retriedBackoff": "Retried with exponential backoff",
     "created": "Created",
     "closeDetails": "Close details",
-    "status": "Status"
+    "status": "Status",
+    "noResults": "No results matching \"{search}\" on this page"
   },
   "logs": {
     "title": "Webhook Logs",
