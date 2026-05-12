@@ -5,7 +5,7 @@ import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { adminApi, type AdminUserDetail, type UserAnalytics } from '@/lib/api';
+import { adminApi, webhooksApi, type AdminUserDetail, type UserAnalytics, type DeliveryDetail, type DeliveryAttempt } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { useTranslations, useLocale } from 'next-intl';
@@ -24,6 +24,10 @@ export default function AdminUserDetailPage() {
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [newPlan, setNewPlan] = useState('');
+  // Delivery detail modal
+  const [deliveryDetail, setDeliveryDetail] = useState<DeliveryDetail | null>(null);
+  const [deliveryAttempts, setDeliveryAttempts] = useState<DeliveryAttempt[]>([]);
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
 
   const fetchDetail = useCallback(async () => {
     if (!token || !id) return;
@@ -78,6 +82,23 @@ export default function AdminUserDetailPage() {
       fetchDetail();
     } catch {
       toast(t("replayFailed"), "error");
+    }
+  };
+
+  const handleViewDelivery = async (deliveryId: string) => {
+    if (!token) return;
+    setDeliveryLoading(true);
+    try {
+      const [detail, attempts] = await Promise.all([
+        webhooksApi.get(token, deliveryId),
+        webhooksApi.getAttempts(token, deliveryId).catch(() => []),
+      ]);
+      setDeliveryDetail(detail);
+      setDeliveryAttempts(attempts);
+    } catch {
+      toast(tc('error'), 'error');
+    } finally {
+      setDeliveryLoading(false);
     }
   };
 
@@ -299,7 +320,7 @@ export default function AdminUserDetailPage() {
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {detail.recent_deliveries.map((d, index) => (
-                  <tr key={d.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
+                  <tr key={d.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer`} onClick={() => handleViewDelivery(d.id)}>
                     <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 10)}…</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
@@ -314,12 +335,20 @@ export default function AdminUserDetailPage() {
                       {new Date(d.created_at).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <button type="button"
-                        onClick={() => handleReplay(d.id)}
-                        className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium"
-                      >
-                        ↩ {t("replayDelivery")}
-                      </button>
+                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button type="button"
+                          onClick={() => handleViewDelivery(d.id)}
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium"
+                        >
+                          🔍 {t("viewDetails") || "Details"}
+                        </button>
+                        <button type="button"
+                          onClick={() => handleReplay(d.id)}
+                          className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium"
+                        >
+                          ↩ {t("replayDelivery")}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -417,6 +446,118 @@ export default function AdminUserDetailPage() {
                 <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-8">{t("noEndpoints")}</p>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delivery Detail Modal */}
+      {deliveryDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setDeliveryDetail(null); setDeliveryAttempts([]); }} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                🔍 {t("deliveryDetails") || "Delivery Details"}
+              </h3>
+              <button type="button"
+                onClick={() => { setDeliveryDetail(null); setDeliveryAttempts([]); }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            {deliveryLoading ? (
+              <div className="py-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
+            ) : (
+              <div className="space-y-4">
+                {/* Basic Info */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-slate-400">ID</label>
+                    <p className="text-sm font-mono text-gray-900 dark:text-white break-all">{deliveryDetail.id}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-slate-400">{t("status")}</label>
+                    <div className="mt-1"><StatusBadge status={deliveryDetail.status} /></div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-slate-400">{t("event")}</label>
+                    <p className="text-sm text-gray-900 dark:text-white">{deliveryDetail.event || '—'}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-slate-400">{t("attempts")}</label>
+                    <p className="text-sm text-gray-900 dark:text-white">{deliveryDetail.attempt_count}</p>
+                  </div>
+                  {deliveryDetail.endpoint_url && (
+                    <div className="col-span-2">
+                      <label className="text-xs text-gray-500 dark:text-slate-400">{t("endpoint")}</label>
+                      <p className="text-sm font-mono text-gray-900 dark:text-white break-all">{deliveryDetail.endpoint_url}</p>
+                    </div>
+                  )}
+                  {deliveryDetail.error_message && (
+                    <div className="col-span-2">
+                      <label className="text-xs text-gray-500 dark:text-slate-400">{t("error")}</label>
+                      <p className="text-sm text-red-600 dark:text-red-400">{deliveryDetail.error_message}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Request Body */}
+                {deliveryDetail.request_body && (
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">{t("payload") || "Payload"}</label>
+                    <pre className="p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs font-mono text-gray-800 dark:text-slate-300 overflow-x-auto max-h-40">
+                      {typeof deliveryDetail.request_body === 'string'
+                        ? deliveryDetail.request_body
+                        : JSON.stringify(deliveryDetail.request_body, null, 2)}
+                    </pre>
+                  </div>
+                )}
+
+                {/* Request Headers */}
+                {deliveryDetail.request_headers && Object.keys(deliveryDetail.request_headers).length > 0 && (
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">{t("headers") || "Headers"}</label>
+                    <pre className="p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs font-mono text-gray-800 dark:text-slate-300 overflow-x-auto max-h-32">
+                      {JSON.stringify(deliveryDetail.request_headers, null, 2)}
+                    </pre>
+                  </div>
+                )}
+
+                {/* Attempts */}
+                {deliveryAttempts.length > 0 && (
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-slate-400 mb-2 block">{t("attempts") || "Attempts"}</label>
+                    <div className="space-y-2">
+                      {deliveryAttempts.map((a) => (
+                        <div key={a.id} className="p-3 bg-gray-50 dark:bg-slate-900 rounded-xl">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                              #{a.attempt_number} — <StatusBadge status={a.status} />
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-slate-400">
+                              {a.duration_ms ? `${a.duration_ms}ms` : ''} {new Date(a.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                          {a.response_status && (
+                            <p className="text-xs text-gray-600 dark:text-slate-400">HTTP {a.response_status}</p>
+                          )}
+                          {a.error_message && (
+                            <p className="text-xs text-red-600 dark:text-red-400 mt-1">{a.error_message}</p>
+                          )}
+                          {a.response_body && (
+                            <pre className="mt-2 p-2 bg-gray-100 dark:bg-slate-800 rounded text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-24">
+                              {a.response_body}
+                            </pre>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
