@@ -146,7 +146,8 @@
     "sectionCore": "Core",
     "sectionTools": "Tools",
     "sectionAdvanced": "Advanced",
-    "sectionAccount": "Account"
+    "sectionAccount": "Account",
+    "routing": "Routing"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -566,7 +567,12 @@
     "plans.proLimit": "50,000 webhooks/month",
     "plans.businessLimit": "500,000 webhooks/month",
     "noInvoices": "No invoices yet.",
-    "upgradeInitiated": "Upgrade initiated"
+    "upgradeInitiated": "Upgrade initiated",
+    "invoice": "Invoice",
+    "date": "Date",
+    "amount": "Amount",
+    "plan": "Plan",
+    "status": "Status"
   },
   "auth": {
     "login": "Log In",
@@ -2726,9 +2732,11 @@
     "webhookRelayTitle": "HookSniff vs Webhook Relay — Why Choose HookSniff",
     "webhookRelayDesc": "Looking for a Webhook Relay alternative? HookSniff offers a modern developer experience with SDKs, retries, and real-time monitoring.",
     "svixAlternativesTitle": "Best Svix Alternatives in 2026",
-    "svixAlternativesDesc": "Looking for Svix alternatives? Compare HookSniff, Hookdeck, Hook0, and Convoy. Features, pricing, and honest pros/cons for each.",
+    "svixAlternativesDesc": "Looking for Svix alternatives? Compare HookSniff, Hookdeck, Hook0, and Convoy.",
+    "svixAlternativesIntro": "Looking for a webhook service but Svix is too expensive? Here are the best alternatives compared honestly — features, pricing, and trade-offs.",
     "hookdeckAlternativesTitle": "Best Hookdeck Alternatives in 2026",
-    "hookdeckAlternativesDesc": "Looking for Hookdeck alternatives? Compare HookSniff, Svix, Hook0, and Convoy. Open-source, self-hosted, and affordable options.",
+    "hookdeckAlternativesDesc": "Looking for Hookdeck alternatives? Compare HookSniff, Svix, Hook0, and Convoy.",
+    "hookdeckAlternativesIntro": "Looking for a webhook service but Hookdeck doesn't fit? Here are the best alternatives compared honestly — features, pricing, and trade-offs.",
     "savedPerYear": "{amount}/year saved",
     "withMoreFeatures": "with more features",
     "pricePro": "Price (Pro)",
@@ -2761,8 +2769,13 @@
     "bestFor": "Best for",
     "readyToSwitch": "Ready to switch from {competitor}?",
     "switchCta": "Get the same features at 10x lower cost. Start free, scale when ready.",
-    "migrateToHooksniff": "Migrate to HookSniff →",
-    "svixAlternativesIntro": "Looking for a webhook service but Svix is too expensive? Here are the best alternatives compared honestly — features, pricing, and trade-offs.",
-    "hookdeckAlternativesIntro": "Looking for a webhook service but Hookdeck doesn't fit? Here are the best alternatives compared honestly — features, pricing, and trade-offs."
+    "migrateToHooksniff": "Migrate to HookSniff →"
+  },
+  "cookieConsent": {
+    "title": "Cookie Consent",
+    "description": "We use cookies to enhance your experience and analyze site traffic. By clicking \"Accept\", you consent to our use of cookies.",
+    "privacyPolicy": "Privacy Policy",
+    "accept": "Accept",
+    "reject": "Reject"
   }
 }
