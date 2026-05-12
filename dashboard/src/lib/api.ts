@@ -332,6 +332,7 @@ export interface AdminUser {
   email: string;
   name?: string;
   plan: string;
+  role: string;
   status: 'active' | 'banned';
   created_at: string;
 }
