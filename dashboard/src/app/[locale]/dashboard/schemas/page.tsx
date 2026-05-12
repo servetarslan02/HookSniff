@@ -38,7 +38,7 @@ export default function SchemasPage() {
       {schemas.length === 0 ? (
         <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <p className="text-gray-500 text-lg mb-2">{t('noSchemas')}</p>
-          <p className="text-gray-400 text-sm">{t('noSchemasDesc')}</p>
+          <p className="text-gray-500 text-sm">{t('noSchemasDesc')}</p>
         </div>
       ) : (
         <div className="space-y-4">

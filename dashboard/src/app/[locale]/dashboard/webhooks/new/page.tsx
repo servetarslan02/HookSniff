@@ -123,7 +123,7 @@ export default function SendWebhookPage() {
               {JSON.stringify(response, null, 2)}
             </pre>
           ) : (
-            <div className="text-center text-gray-400 dark:text-slate-500 py-12">
+            <div className="text-center text-gray-500 dark:text-slate-500 py-12">
               <div className="text-4xl mb-3">📡</div>
               <p>{t('sendToSeeResponse')}</p>
             </div>

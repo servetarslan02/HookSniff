@@ -95,7 +95,9 @@ function AnimatedCounter({ value, duration = 1200 }: { value: number; duration?:
     return () => cancelAnimationFrame(rafRef.current);
   }, [value, duration]);
 
-  return <>{display.toLocaleString()}</>;
+  // Item 318: Handle negative values with proper formatting
+  const formatted = Math.abs(display).toLocaleString();
+  return <>{display < 0 ? `-${formatted}` : formatted}</>;
 }
 
 /* ─── Delivery Trend Chart ─── */
@@ -202,7 +204,7 @@ function SuccessRateDonut({
   const tc = useTranslations("common");
   const rate = data?.success_rate ?? 0;
   const chartData = [
-    { name: tc('success'), value: data?.successful ?? 0 },
+    { name: tc('success') || 'Success', value: data?.successful ?? 0 },
     { name: tc('failed') || 'Failed', value: data?.failed ?? 0 },
     { name: tc('pending') || 'Pending', value: data?.pending ?? 0 },
   ];
@@ -267,10 +269,42 @@ function ActivityFeed({ token }: { token: string }) {
     }
   }, [token, tc]);
 
+  // Item 336: Pause polling when tab is not visible
   useEffect(() => {
     fetchDeliveries();
-    const interval = setInterval(fetchDeliveries, 5000);
-    return () => clearInterval(interval);
+    let interval: ReturnType<typeof setInterval> | null = null;
+
+    const startPolling = () => {
+      if (!interval) {
+        interval = setInterval(fetchDeliveries, 5000);
+      }
+    };
+
+    const stopPolling = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        fetchDeliveries();
+        startPolling();
+      }
+    };
+
+    if (!document.hidden) {
+      startPolling();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [fetchDeliveries]);
 
   return (
@@ -323,13 +357,18 @@ function ActivityFeed({ token }: { token: string }) {
   );
 }
 
+// Item 337: Reusable StatusDot — consistent with StatusBadge color scheme
 function StatusDot({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    delivered: 'bg-green-500',
+    delivered: 'bg-emerald-500',
+    success: 'bg-emerald-500',
     failed: 'bg-red-500',
-    pending: 'bg-yellow-500',
+    error: 'bg-red-500',
+    pending: 'bg-amber-500',
+    active: 'bg-blue-500',
+    inactive: 'bg-gray-500',
   };
-  return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || colors.pending}`} />;
+  return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || colors.pending}`} aria-label={status} />;
 }
 
 /* ─── Main Dashboard ─── */

@@ -159,7 +159,7 @@ export default function PortalCustomizationPage() {
                   value={config.company_name}
                   onChange={(e) => setConfig({ ...config, company_name: e.target.value })}
                   placeholder={t('companyNamePlaceholder')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 />
               </div>
               <div>
@@ -169,7 +169,7 @@ export default function PortalCustomizationPage() {
                   value={config.logo_url}
                   onChange={(e) => setConfig({ ...config, logo_url: e.target.value })}
                   placeholder={t('logoUrlPlaceholder')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 />
               </div>
               <div>
@@ -269,7 +269,7 @@ export default function PortalCustomizationPage() {
                 onChange={(e) => setNewEvent(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addEvent()}
                 placeholder="order.created"
-                className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
               />
               <button
                 onClick={addEvent}
@@ -288,14 +288,14 @@ export default function PortalCustomizationPage() {
                   <button
                     onClick={() => removeEvent(event)}
                     aria-label={`Remove ${event} event`}
-                    className="text-gray-400 hover:text-red-500 transition ml-1"
+                    className="text-gray-500 hover:text-red-500 transition ml-1"
                   >
                     ✕
                   </button>
                 </span>
               ))}
               {config.allowed_events.length === 0 && (
-                <span className="text-sm text-gray-400 dark:text-slate-500">{t('allEventsAllowed')}</span>
+                <span className="text-sm text-gray-500 dark:text-slate-500">{t('allEventsAllowed')}</span>
               )}
             </div>
           </div>

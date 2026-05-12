@@ -46,7 +46,7 @@ function parseOpenApiSpec(content: string): ParsedSpec | null {
     }
 
     return {
-      title: info.title || 'Imported API',
+      title: info.title || t('importedApi'),
       version: info.version || '1.0.0',
       baseUrl,
       endpoints,
@@ -59,6 +59,7 @@ function parseOpenApiSpec(content: string): ParsedSpec | null {
 /* ─── Main Page ─── */
 export default function ApiSpecImporterPage() {
   const t = useTranslations('apiImporter');
+  const tc = useTranslations('common');
   const { token } = useAuth();
   const { toast } = useToast();
   const [specUrl, setSpecUrl] = useState('');
@@ -83,7 +84,7 @@ export default function ApiSpecImporterPage() {
         toast(t('failedToParse'), 'error');
       }
     } catch (err) {
-      toast(`Failed to fetch: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+      toast(t('fetchFailed', { error: err instanceof Error ? err.message : tc('unknownError') }), 'error');
     }
   };
 
@@ -214,7 +215,7 @@ export default function ApiSpecImporterPage() {
                 value={specUrl}
                 onChange={(e) => setSpecUrl(e.target.value)}
                 placeholder="https://api.example.com/openapi.json"
-                className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
               />
               <button
                 onClick={fetchSpec}
@@ -233,7 +234,7 @@ export default function ApiSpecImporterPage() {
               onChange={(e) => setSpecContent(e.target.value)}
               placeholder={sampleSpec}
               rows={12}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
             <button
               onClick={parseContent}

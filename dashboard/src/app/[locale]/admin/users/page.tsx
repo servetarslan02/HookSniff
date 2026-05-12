@@ -26,6 +26,8 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [planChangeTarget, setPlanChangeTarget] = useState<AdminUser | null>(null);
   const [newPlan, setNewPlan] = useState('');
+  const [sortField, setSortField] = useState<string>('created_at');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const perPage = 20;
@@ -85,6 +87,39 @@ export default function AdminUsersPage() {
 
   const totalPages = Math.ceil(total / perPage);
 
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  };
+
+  const sortedUsers = [...users].sort((a, b) => {
+    const dir = sortDir === 'asc' ? 1 : -1;
+    switch (sortField) {
+      case 'email':
+        return a.email.localeCompare(b.email) * dir;
+      case 'name':
+        return (a.name || '').localeCompare(b.name || '') * dir;
+      case 'plan':
+        return a.plan.localeCompare(b.plan) * dir;
+      case 'status':
+        return a.status.localeCompare(b.status) * dir;
+      case 'created_at':
+        return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * dir;
+      default:
+        return 0;
+    }
+  });
+
+  const SortIcon = ({ field }: { field: string }) => (
+    <span className="ml-1 inline-block" aria-hidden="true">
+      {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}
+    </span>
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -104,13 +139,16 @@ export default function AdminUsersPage() {
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('searchByEmail')}
               aria-label={t('searchByEmail')}
-              className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 transition text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 transition text-sm"
             />
           </div>
           <div>
+            <label htmlFor="plan-filter" className="sr-only">{t('allPlans')}</label>
             <select
+              id="plan-filter"
               value={planFilter}
               onChange={(e) => { setPlanFilter(e.target.value); setPage(1); }}
+              aria-label={t('allPlans')}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
             >
               <option value="">{t('allPlans')}</option>
@@ -120,9 +158,12 @@ export default function AdminUsersPage() {
             </select>
           </div>
           <div>
+            <label htmlFor="status-filter" className="sr-only">{t('allStatuses')}</label>
             <select
+              id="status-filter"
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+              aria-label={t('allStatuses')}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
             >
               <option value="">{t('allStatuses')}</option>
@@ -251,9 +292,12 @@ export default function AdminUsersPage() {
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
               {t('changePlanFor', { email: planChangeTarget.email })}
             </p>
+            <label htmlFor="new-plan-select" className="sr-only">{t('changePlan')}</label>
             <select
+              id="new-plan-select"
               value={newPlan}
               onChange={(e) => setNewPlan(e.target.value)}
+              aria-label={t('changePlan')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white mb-4"
             >
               {PLAN_OPTIONS.map((p) => (

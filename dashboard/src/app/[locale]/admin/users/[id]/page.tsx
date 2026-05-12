@@ -151,9 +151,12 @@ export default function AdminUserDetailPage() {
                 {t("plan")}
               </label>
               <div className="flex gap-2">
+                <label htmlFor="user-plan-select" className="sr-only">{t("plan")}</label>
                 <select
+                  id="user-plan-select"
                   value={newPlan}
                   onChange={(e) => setNewPlan(e.target.value)}
+                  aria-label={t("plan")}
                   className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                 >
                   {PLAN_OPTIONS.map((p) => (

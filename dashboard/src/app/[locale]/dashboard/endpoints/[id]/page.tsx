@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, apiFetch, type Endpoint, type RetryPolicyConfig } from '@/lib/api';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },
@@ -182,7 +183,7 @@ export default function EndpointSettingsPage() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.push(`/${locale}/dashboard/endpoints`)}
-          className="p-2 -ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
+          className="p-2 -ml-2 text-gray-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -215,7 +216,7 @@ export default function EndpointSettingsPage() {
               onChange={(e) => setMaxAttempts(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('maxAttemptsHint')}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{t('maxAttemptsHint')}</p>
           </div>
 
           {/* Backoff Strategy */}
@@ -278,7 +279,7 @@ export default function EndpointSettingsPage() {
               onChange={(e) => setMaxDelay(Math.max(1, Math.min(86400, parseInt(e.target.value) || 1)))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('maxDelayHint')}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{t('maxDelayHint')}</p>
           </div>
         </div>
 
@@ -357,14 +358,14 @@ export default function EndpointSettingsPage() {
             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('apiRequests')}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {endpoint.routing_strategy === 'round-robin' ? '100' : '1,000'}
-              <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">{t('perMin')}</span>
+              <span className="text-sm font-normal text-gray-500 dark:text-slate-500 ml-1">{t('perMin')}</span>
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-700">
             <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t('avgResponse')}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {endpoint.avg_response_ms ?? 0}
-              <span className="text-sm font-normal text-gray-400 dark:text-slate-500 ml-1">{t('msUnit')}</span>
+              <span className="text-sm font-normal text-gray-500 dark:text-slate-500 ml-1">{t('msUnit')}</span>
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-700">
@@ -411,37 +412,23 @@ export default function EndpointSettingsPage() {
             </span>
           )}
         </div>
-        <div className="mt-3 text-xs text-gray-400 dark:text-slate-500">
+        <div className="mt-3 text-xs text-gray-500 dark:text-slate-500">
           {t('payloadLabel')} <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{"{"}&quot;event&quot;: &quot;test.ping&quot;, &quot;data&quot;: {"{"}&quot;message&quot;: &quot;Hello from HookSniff! 🪝&quot;{"}"}{"}"}</code>
         </div>
       </div>
 
-      {/* Rotate Confirmation Modal */}
-      {showRotateConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('rotateConfirmTitle')}</h3>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              {t('rotateConfirmDesc')}
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowRotateConfirm(false)}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-              >
-                {tCommon('cancel')}
-              </button>
-              <button
-                onClick={handleRotateSecret}
-                disabled={rotating}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition disabled:opacity-60"
-              >
-                {rotating ? t('rotating') : t('rotateSecret')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Item 321: Use shared ConfirmDialog instead of hand-rolled modal */}
+      <ConfirmDialog
+        open={showRotateConfirm}
+        title={t('rotateConfirmTitle')}
+        message={t('rotateConfirmDesc')}
+        confirmLabel={rotating ? t('rotating') : t('rotateSecret')}
+        cancelLabel={tCommon('cancel')}
+        variant="danger"
+        onConfirm={handleRotateSecret}
+        onCancel={() => setShowRotateConfirm(false)}
+        loading={rotating}
+      />
     </div>
   );
 }

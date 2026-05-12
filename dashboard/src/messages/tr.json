@@ -98,9 +98,7 @@
     "loadingChart": "Grafik verisi yükleniyor...",
     "previousPage": "Önceki sayfa",
     "nextPage": "Sonraki sayfa",
-    "copyToClipboard": "Panoya kopyala",
     "closeModal": "Pencereyi kapat",
-    "openSidebar": "Yan paneli aç",
     "chartDeliveryTrends": "Teslimat trendlerini gösteren grafik",
     "chartSuccessRate": "Başarı oranını gösteren grafik",
     "chartErrorBreakdown": "Hata dağılımını gösteren grafik",
@@ -2190,7 +2188,8 @@
     "copied": "Kopyalandı!",
     "reactIntegration": "⚛️ React Entegrasyonu",
     "portalSaved": "Portal yapılandırması kaydedildi!",
-    "portalSaveFailed": "Portal yapılandırması kaydedilemedi"
+    "portalSaveFailed": "Portal yapılandırması kaydedilemedi",
+    "portalUrl": "Portal URL"
   },
   "retryPolicy": {
     "title": "🔄 Yeniden Deneme Politikası",

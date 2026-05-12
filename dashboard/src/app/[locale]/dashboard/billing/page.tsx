@@ -217,7 +217,7 @@ export default function BillingPage() {
         if (trustedHosts.some(h => url.hostname === h || url.hostname.endsWith(`.${h}`))) {
           window.location.href = result.checkout_url;
         } else {
-          toast('Invalid checkout URL', 'error');
+          toast(t('invalidCheckoutUrl'), 'error');
         }
       } else {
         toast(t('upgradeInitiated'), 'success');

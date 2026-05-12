@@ -91,7 +91,7 @@ export default function PortalPage() {
       {usage && (
         <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
           <h2 className="text-lg font-semibold mb-4">{t('usage')}</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('webhooksUsed')}</p>
               <p className="text-2xl font-bold text-purple-500">{usage.webhooks_used?.toLocaleString() || 0}</p>

@@ -159,7 +159,7 @@ function ResponseInspector({
 
   if (!response && !status) {
     return (
-      <div className="text-center text-gray-400 dark:text-slate-500 py-16">
+      <div className="text-center text-gray-500 dark:text-slate-500 py-16">
         <div className="text-4xl mb-3">🧪</div>
         <p>{t('sendToInspect')}</p>
       </div>
@@ -236,7 +236,7 @@ function HistoryPanel({
     return (
       <div className="glass-card p-6">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('requestHistory')}</h3>
-        <p className="text-xs text-gray-400 dark:text-slate-500">{t('noRequests')}</p>
+        <p className="text-xs text-gray-500 dark:text-slate-500">{t('noRequests')}</p>
       </div>
     );
   }
@@ -288,7 +288,7 @@ function HistoryPanel({
                 {req.status ?? '—'}
               </span>
             </div>
-            <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">
+            <div className="text-[10px] text-gray-500 dark:text-slate-500 mt-1">
               {new Date(req.timestamp).toLocaleString()} • {req.duration_ms}ms
             </div>
           </button>
@@ -382,12 +382,12 @@ function LiveRequestViewer() {
                 />
                 <span className="text-xs font-mono text-gray-700 dark:text-slate-300">{d.event}</span>
               </div>
-              <span className="text-[10px] text-gray-400 dark:text-slate-500">{d.time}</span>
+              <span className="text-[10px] text-gray-500 dark:text-slate-500">{d.time}</span>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-gray-400 dark:text-slate-500">
+        <p className="text-xs text-gray-500 dark:text-slate-500">
           {isLive ? t('waitingRequests') : t('clickStart')}
         </p>
       )}
@@ -445,7 +445,7 @@ ${Object.entries(headers)
       setBody(JSON.stringify(payload, null, 2));
       setMethod('POST');
       setShowAiGenerator(false);
-      toast(`Generated ${eventType} payload`, 'success');
+      toast(t('generatedPayload', { eventType }), 'success');
     }
   };
 

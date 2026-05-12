@@ -101,7 +101,7 @@ export default function EndpointsPage() {
     setEndpoints((prev) => prev.filter((ep) => !selected.has(ep.id)));
     setSelected(new Set());
     setBulkDeleting(false);
-    toast(`Deleted ${deleted} endpoints`, 'success');
+    toast(t('deletedEndpoints', { count: deleted }), 'success');
   };
 
   if (loading) {
@@ -181,7 +181,7 @@ export default function EndpointsPage() {
       )}
 
       {endpoints.length === 0 ? (
-        <div className="glass-card p-12 text-center text-gray-400 dark:text-slate-500">
+        <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-500">
           {t('noEndpointsYet')}
         </div>
       ) : (
@@ -236,7 +236,7 @@ export default function EndpointsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => router.push(`/${locale}/dashboard/endpoints/${ep.id}`)}
-                    className="text-gray-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition p-2"
+                    className="text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition p-2"
                     title={t('settingsTitle')}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +246,7 @@ export default function EndpointsPage() {
                   </button>
                   <button
                     onClick={() => handleDelete(ep.id)}
-                    className="text-gray-400 dark:text-slate-500 hover:text-red-600 transition p-2"
+                    className="text-gray-500 dark:text-slate-500 hover:text-red-600 transition p-2"
                     title={t('deleteTitle')}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

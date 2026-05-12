@@ -38,7 +38,7 @@ export default function TemplatesPage() {
       {templates.length === 0 ? (
         <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <p className="text-gray-500 text-lg mb-2">{t('noTemplates')}</p>
-          <p className="text-gray-400 text-sm">{t('noTemplatesDesc')}</p>
+          <p className="text-gray-500 text-sm">{t('noTemplatesDesc')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
