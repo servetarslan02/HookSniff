@@ -33,6 +33,7 @@ pub fn router() -> Router {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct ListParams {
     page: Option<i64>,
     per_page: Option<i64>,
@@ -40,6 +41,7 @@ struct ListParams {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct ExportParams {
     format: Option<String>,
     status: Option<String>,
@@ -564,6 +566,7 @@ fn escape_csv_cell(value: &str) -> String {
 // ── Batch Replay ──
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct BatchReplayRequest {
     delivery_ids: Vec<Uuid>,
 }
