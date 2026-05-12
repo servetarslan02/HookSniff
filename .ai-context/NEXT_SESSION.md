@@ -37,6 +37,19 @@ Bu sayfalar çalışıyor ama eski style:
 - Test URL assertion'ları kırık
 - Grafana trial 20 Mayıs'ta bitiyor
 
+## Bu Oturumda Yapılanlar (Oturum 139 — OpenClaw)
+- **Vercel build hatası düzeltildi** ✅
+  - Hata: `ENOENT: page_client-reference-manifest.js` — (dashboard)/page route group
+  - Sebep: `'use client'` page.tsx → Next.js client-reference-manifest üretmiyor → Vercel tracing crash
+  - Çözüm: `DashboardOverview.tsx` ayrı client component, `page.tsx` server wrapper
+  - Commit: `b3443212`
+- **Vercel rate limit** ⚠️
+  - 14 açık dependabot PR'ı → her biri preview deploy → 100/gün limit aşıldı
+  - `dependabot.yml` PR limitleri: cargo 10→3, npm 10→3, actions 5→2
+  - Commit: `cb2b5296`
+  - **Limit 24 saat sonra sıfırlanır** — sonraki deploy otomatik başarılı olmalı
+- **Google 2FA ile Vercel'e giriş yapıldı** — browser OAuth
+
 ## Bu Oturumda Yapılanlar (Oturum 138)
 - Hook0 ekran görüntüleri analiz edildi (9 screenshot)
 - Hook0 vs HookSniff karşılaştırması yapıldı
