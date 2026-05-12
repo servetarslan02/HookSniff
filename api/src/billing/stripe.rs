@@ -383,12 +383,12 @@ async fn handle_subscription_updated(
 
             let prices = StripePrices::from_env();
             if price_id == prices.business_monthly {
-                "business"
+                "enterprise"
             } else {
                 "pro"
             }
         }
-        _ => "free",
+        _ => "developer",
     };
 
     sqlx::query("UPDATE customers SET plan = $1 WHERE stripe_subscription_id = $2")
@@ -416,16 +416,16 @@ async fn handle_subscription_deleted(
         .and_then(|v| v.as_str())
         .unwrap_or_default();
 
-    // Downgrade to free plan
+    // Downgrade to developer plan
     sqlx::query(
-        "UPDATE customers SET plan = 'free', stripe_subscription_id = NULL WHERE stripe_subscription_id = $1"
+        "UPDATE customers SET plan = 'developer', stripe_subscription_id = NULL WHERE stripe_subscription_id = $1"
     )
     .bind(stripe_subscription_id)
     .execute(pool)
     .await?;
 
     tracing::info!(
-        "✅ Subscription {} canceled, customer downgraded to free",
+        "✅ Subscription {} canceled, customer downgraded to developer",
         stripe_subscription_id
     );
 
@@ -471,7 +471,7 @@ async fn handle_invoice_paid(
         .map(|price_id| {
             let prices = StripePrices::from_env();
             if price_id == prices.business_monthly {
-                "business".to_string()
+                "enterprise".to_string()
             } else {
                 "pro".to_string()
             }

@@ -1,6 +1,6 @@
 # 🧠 Fiyat ve Planlama — Hafıza
 
-> Son güncelleme: 2026-05-13 01:34 GMT+8
+> Son güncelleme: 2026-05-13 01:47 GMT+8
 
 ---
 
@@ -89,3 +89,18 @@
   6. ⚠️ docs/page.tsx rate limit tablosu 3 plan → 4 plan
 - **Commits:** 2 commit, main branch
 - **Sonraki oturum:** cargo test çalıştır, Cloud Build doğrula
+
+### Oturum 5 (2026-05-13 01:43 - 01:50 GMT+8)
+- **Eski plan ismi kalıntıları temizlendi** — 7 dosyada düzeltme:
+  1. ⚠️ Pricing `customIntegrations` satırı hâlâ `free`/`business` → `developer`/`enterprise` yapıldı
+  2. ⚠️ Pricing support section `t('free')`/`t('business')` → `t('developer')`/`t('enterprise')`
+  3. ⚠️ i18n EN: `supportFreeFeatures` → `supportDeveloperFeatures`, `supportBusinessFeatures` → `supportEnterpriseFeatures`
+  4. ⚠️ i18n TR: Aynı key rename
+  5. ⚠️ `refund.rs`: `plan == "free"` → `plan == "developer"`
+  6. ⚠️ `stripe.rs`: plan mapping `"business"` → `"enterprise"`, `"free"` → `"developer"` (3 yer)
+  7. ⚠️ `admin.rs` churn SQL: `WHEN 'business'` → `WHEN 'enterprise'`
+- **Düzeltildi — PLAN.md ve NEXT_SESSION.md tutarlılığı:**
+  - PLAN.md Aşama 3: ⬜ → ✅ (MEMORY.md ile uyumlu)
+  - Test/clippy items'a toolchain notu eklendi
+  - İlerleme tablosu ve istatistikler eklendi
+- **Commits:** 2 commit, main branch
