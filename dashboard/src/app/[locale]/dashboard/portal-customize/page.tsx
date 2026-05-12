@@ -221,16 +221,9 @@ export default function PortalCustomizationPage() {
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.dark_mode ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
                     role="switch"
-<input
                     aria-checked={config.dark_mode}
-<input
-                    role="switch"
-
-                    aria-checked={                    }
-
                     type="checkbox"
-
-                    checked={                    }
+                    checked={config.dark_mode}
                     onChange={(e) => setConfig({ ...config, dark_mode: e.target.checked })}
                     className="sr-only"
                   />
@@ -245,16 +238,9 @@ export default function PortalCustomizationPage() {
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_events ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
                     role="switch"
-<input
-                    aria-checked={config.dark_mode}
-<input
-                    role="switch"
-
-                    aria-checked={                    }
-
+                    aria-checked={config.show_events}
                     type="checkbox"
-
-                    checked={                    }
+                    checked={config.show_events}
                     onChange={(e) => setConfig({ ...config, show_events: e.target.checked })}
                     className="sr-only"
                   />
@@ -269,16 +255,9 @@ export default function PortalCustomizationPage() {
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_deliveries ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
                     role="switch"
-<input
-                    aria-checked={config.dark_mode}
-<input
-                    role="switch"
-
-                    aria-checked={                    }
-
+                    aria-checked={config.show_deliveries}
                     type="checkbox"
-
-                    checked={                    }
+                    checked={config.show_deliveries}
                     onChange={(e) => setConfig({ ...config, show_deliveries: e.target.checked })}
                     className="sr-only"
                   />

@@ -6,7 +6,6 @@
 
 // Allowed HTML tags for syntax highlighting output
 const ALLOWED_TAGS = ['span', 'pre', 'code', 'br', 'em', 'strong', 'b', 'i'];
-const ALLOWED_ATTRS = ['class', 'className'];
 
 /**
  * Strip any tags not in the allowlist.
