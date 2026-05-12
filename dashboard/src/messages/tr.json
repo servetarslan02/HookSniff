@@ -1477,7 +1477,8 @@
       "testimonial3Quote": "Ölü mektup kuyruğu, kritik ödeme olaylarını kaybetmekten bizi kurtardı. Üretim kalitesinde araç.",
       "testimonial3Author": "Ayşe Yılmaz",
       "testimonial3Role": "Backend Lideri, Trendyol",
-      "companies": "Şu ekipler tarafından kullanılıyor"
+      "companies": "Şu ekipler tarafından kullanılıyor",
+      "testimonialDisclaimer": "Bunlar yaygın kullanıcı deneyimlerine dayanan illustratif senaryolardır, gerçek müşteri hikayeleri değildir."
     }
   },
   "apiKeys": {
@@ -2894,6 +2895,24 @@
     "pros": "Artılar",
     "cons": "Eksiler",
     "bestFor": "En uygun",
+    "bestForStartups": "Girişimler ve bağımsız geliştiriciler için en uygun",
+    "bestForStartupsDesc": "FIFO sıralama ve geniş SDK desteği ile sıfır maliyetli webhook altyapısı isteyen ekipler.",
+    "bestForRouting": "Karmaşık yönlendirme için en uygun",
+    "bestForRoutingDesc": "Gelişmiş olay filtreleme, dönüştürme ve çoklu hedef yönlendirme gerektiren ekipler.",
+    "bestForEurope": "AB/GDPR öncelikli ekipler için en uygun",
+    "bestForEuropeDesc": "GDPR uyumlu, açık kaynaklı, kendi kendine barındırılan çözüme ihtiyaç duyan Avrupa merkezli ekipler.",
+    "bestForGo": "Go geliştiricileri için en uygun",
+    "bestForGoDesc": "Dillerinde yazılmış hafif, kendi kendine barındırılan webhook servisi isteyen Go ekipleri.",
+    "whenToChooseSvix": "Svix'i ne zaman seçmeli",
+    "whenToChooseSvixDesc": "Svix, SOC 2 Tip 2 sertifikasyonu ve %99.99 uptime SLA'ya sahip, denenmiş bir kurumsal çözüme ihtiyacınız varsa daha iyi bir tercihtir. Svix daha uzun süredir piyasada ve daha fazla kurumsal güvene sahiptir. Uyumluluk sertifikaları ve ölçeklenmiş kanıtlanmış güvenilirlik en büyük önceliklerinizse, Svix daha yüksek fiyat noktasına rağmen güçlü bir seçenektir.",
+    "whenToChooseHookdeck": "Hookdeck'i ne zaman seçmeli",
+    "whenToChooseHookdeckDesc": "Hookdeck, filtreleme ve dönüştürme kuralları ile karmaşık olay yönlendirmesinde üstündür. %99.999 uptime SLA'ları sektörde en yüksek olanıdır. Gelişmiş olay yönlendirmesi, SOC 2 Tip 2 sertifikasyonu ve kullanıma dayalı fiyatlandırmaya tamamsanız, Hookdeck sağlam bir tercihtir.",
+    "whenToChooseHook0": "Hook0'ı ne zaman seçmeli",
+    "whenToChooseHook0Desc": "Hook0, tamamen açık kaynaklı, Avrupa yapımı bir webhook servisi istiyorsanız idealdir. Kendi kendine barındırmayı tercih eden ve GDPR uyumlu veri işleme isteyen ekipler için uygundur. Daha küçük özellik seti, genişlik yerine basitlik tercih ediyorsanız bir avantaj olabilir.",
+    "whenToChooseConvoy": "Convoy'u ne zaman seçmeli",
+    "whenToChooseConvoyDesc": "Convoy, hafif, kendi kendine barındırılan bir webhook servisi isteyen Go-native ekipler için iyi bir tercihtir. Tüm yığınınız Go ise ve minimal bağımlılıkları tercih ediyorsanız, Convoy'un tek dil odaklılığı bir avantaj olabilir.",
+    "whenToChooseWebhookRelay": "Webhook Relay'i ne zaman seçmeli",
+    "whenToChooseWebhookRelayDesc": "Webhook Relay, yerel geliştirme için webhook yönlendirme/tünel veya basit relay kullanım durumları için kullanışlıdır. Tam webhook teslimat platformlarından farklı bir nişe hizmet eder.",
     "readyToSwitch": "{competitor}'dan geçiş yapmaya hazır mısınız?",
     "switchCta": "Aynı özellikleri 10 kata kadar daha düşük maliyetle alın. Ücretsiz başlayın.",
     "migrateToHooksniff": "HookSniff'e geçiş yap →"

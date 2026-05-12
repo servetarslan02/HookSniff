@@ -246,7 +246,7 @@ function SocialProof() {
         </div>
 
         {/* Testimonials */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
           {testimonials.map((testimonial, i) => (
             <div key={i} className="glass-card p-6 hover-lift">
               <div className="flex items-center gap-1 mb-3">
@@ -269,6 +269,7 @@ function SocialProof() {
             </div>
           ))}
         </div>
+        <p className="text-center text-xs text-gray-400 dark:text-slate-500 mb-12">{t('testimonialDisclaimer')}</p>
 
         {/* Company Logos */}
         <div className="text-center">
