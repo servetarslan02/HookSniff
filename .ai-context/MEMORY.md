@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 13:55 GMT+8
+> Son güncelleme: 2026-05-12 14:31 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -242,4 +242,28 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Kalan kasıtlı fallback catch'ler:** audit-log, portal-customize, sso, retry-policy — bunlar config yoksa varsayılan kullanır, bozulmadı
 - **Commit:** e734a921 — main branch
 - **11 dosya değişti, 145 satır eklendi, 98 satır silindi**
+
+## Oturum 125 (2026-05-12 13:51 - 14:31 GMT+8) ✅
+- **OpenClaw yirmi birinci oturum** — Servet ile görsel tutarlılık çalışması
+- **Kritik düzeltmeler:**
+  - Register sayfası oluşturuldu (`/register` → `/login?mode=register` redirect)
+  - Login sayfası `mode=register` search param desteği eklendi
+  - "Sign Up Free" → "Sign Up" (en), "Ücretsiz Kayıt Ol" → "Kayıt Ol" (tr)
+  - Dark mode plan kartları görünmezliği düzeltildi (40+ sayfa)
+  - Card background: `dark:bg-slate-900` → `dark:bg-slate-800` (tüm public sayfalar)
+  - Card border: `dark:border-slate-800` → `dark:border-slate-700` (tüm sayfalar)
+  - Breadcrumb separator contrast: 25 sayfa düzeltildi
+  - Dashboard modal dark mode: 10 sayfa düzeltildi
+  - Dashboard layout sidebar/header border contrast
+  - Admin layout border contrast
+  - Footer dark mode background + border
+  - PublicNavbar border contrast
+  - Homepage navbar + mobile nav dark mode
+  - glass-card border opacity artırıldı
+  - Plan kartları flexbox equal height (buton hizalama)
+  - Support kartları flexbox equal height
+  - Homepage pricing kartları flexbox equal height
+  - Portal-manage, schemas, routing, templates text contrast
+- **Commits:** 7 commit, main branch
+- **60+ dosya değişti**
 
