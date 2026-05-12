@@ -98,15 +98,15 @@ export default function InboundPage() {
           {selectedProvider && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('inbound.webhookSecret')}</label>
-                <input value={webhookSecret} onChange={e => setWebhookSecret(e.target.value)} placeholder="whsec_..." type="password" autoComplete="off"
+                <label htmlFor="inbound-webhook-secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('inbound.webhookSecret')}</label>
+                <input id="inbound-webhook-secret" value={webhookSecret} onChange={e => setWebhookSecret(e.target.value)} placeholder="whsec_..." type="password" autoComplete="off"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-mono" />
-                <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">From {selectedProvider} dashboard → Webhooks → Signing secret</p>
+                <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{t('inbound.secretHint', { provider: selectedProvider })}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('inbound.routeToEndpoint')}</label>
-                <select value={selectedEndpoint} onChange={e => setSelectedEndpoint(e.target.value)}
+                <label htmlFor="inbound-route-endpoint" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('inbound.routeToEndpoint')}</label>
+                <select id="inbound-route-endpoint" value={selectedEndpoint} onChange={e => setSelectedEndpoint(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
                   <option value="">{t('inbound.selectEndpoint')}</option>
                   {endpoints.map(ep => <option key={ep.id} value={ep.id}>{ep.url}</option>)}
@@ -152,7 +152,7 @@ export default function InboundPage() {
                     <span className="text-lg">{provider?.icon || '🔗'}</span>
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">{provider?.name || cfg.provider}</div>
-                      <div className="text-xs text-gray-500 dark:text-slate-400">→ {endpoint?.url || 'Not set'}</div>
+                      <div className="text-xs text-gray-500 dark:text-slate-400">→ {endpoint?.url || t('inbound.notSet')}</div>
                     </div>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.enabled ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-500'}`}>

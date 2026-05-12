@@ -214,7 +214,10 @@
     "urlLabel": "URL",
     "descriptionLabel": "Description",
     "settingsTitle": "Settings",
-    "noEndpointsYet": "No endpoints yet. Create one to start receiving webhooks."
+    "noEndpointsYet": "No endpoints yet. Create one to start receiving webhooks.",
+    "cancelBtn": "Cancel",
+    "selectAllLabel": "Select all ({count})",
+    "bulkDeleted": "Deleted {count} endpoints"
   },
   "deliveries": {
     "title": "Deliveries",
@@ -328,7 +331,7 @@
     },
     "deleteTitle": "Delete Alert",
     "delete": "Delete",
-    "nameLabel": "Name",
+    "nameLabel": "Alert Name",
     "conditionLabel": "Condition",
     "thresholdLabel": "Threshold",
     "fetchFailed": "Failed to load alerts",
@@ -370,7 +373,8 @@
     "statusOk": "OK",
     "statusRedirect": "Redirect",
     "statusClientError": "Client Error",
-    "statusServerError": "Server Error"
+    "statusServerError": "Server Error",
+    "generatedPayload": "Generated {type} payload"
   },
   "team": {
     "title": "Team Management",
@@ -579,7 +583,8 @@
     "date": "Date",
     "amount": "Amount",
     "plan": "Plan",
-    "status": "Status"
+    "status": "Status",
+    "invalidCheckoutUrl": "Invalid checkout URL"
   },
   "auth": {
     "login": "Log In",
@@ -2279,7 +2284,8 @@
     "tip": "💡 Tip: Imported endpoints will be created with the URL from your API spec. You can update the URL later to point to your actual webhook receiver.",
     "supportedFormats": "Supported Formats",
     "openapi30": "OpenAPI 3.0",
-    "swagger20": "Swagger 2.0"
+    "swagger20": "Swagger 2.0",
+    "failedToFetchError": "Failed to fetch: {error}"
   },
   "portalCustomize": {
     "title": "🖼️ Portal Customization",
@@ -2370,7 +2376,9 @@
     "yourUrls": "Your Inbound URLs",
     "copy": "Copy",
     "activeConfigs": "Active Configs",
-    "selectEndpoint": "Select endpoint..."
+    "selectEndpoint": "Select endpoint...",
+    "notSet": "Not set",
+    "secretHint": "From {provider} dashboard → Webhooks → Signing secret"
   },
   "contact": {
     "title": "Contact Us",

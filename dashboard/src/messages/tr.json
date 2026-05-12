@@ -214,7 +214,10 @@
     "urlLabel": "URL",
     "descriptionLabel": "Açıklama",
     "settingsTitle": "Ayarlar",
-    "noEndpointsYet": "Henüz endpoint yok. Webhook almaya başlamak için bir tane oluşturun."
+    "noEndpointsYet": "Henüz endpoint yok. Webhook almaya başlamak için bir tane oluşturun.",
+    "cancelBtn": "İptal",
+    "selectAllLabel": "Tümünü seç ({count})",
+    "bulkDeleted": "{count} endpoint silindi"
   },
   "deliveries": {
     "title": "Teslimatlar",
@@ -328,7 +331,7 @@
     },
     "deleteTitle": "Alarmı Sil",
     "delete": "Sil",
-    "nameLabel": "Ad",
+    "nameLabel": "Uyarı Adı",
     "conditionLabel": "Koşul",
     "thresholdLabel": "Eşik",
     "fetchFailed": "Alarmlar yüklenemedi",
@@ -370,7 +373,8 @@
     "statusOk": "Tamam",
     "statusRedirect": "Yönlendirme",
     "statusClientError": "İstemci Hatası",
-    "statusServerError": "Sunucu Hatası"
+    "statusServerError": "Sunucu Hatası",
+    "generatedPayload": "{type} payload oluşturuldu"
   },
   "team": {
     "title": "Ekip Yönetimi",
@@ -579,7 +583,8 @@
     "date": "Tarih",
     "amount": "Tutar",
     "plan": "Plan",
-    "status": "Durum"
+    "status": "Durum",
+    "invalidCheckoutUrl": "Geçersiz ödeme URL'si"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -2279,7 +2284,8 @@
     "tip": "💡 İçe aktarılan endpoint'ler API spec'inizdeki URL ile oluşturulur. Daha sonra gerçek webhook alıcınızı指向 edecek şekilde güncelleyebilirsiniz.",
     "supportedFormats": "Desteklenen Formatlar",
     "openapi30": "OpenAPI 3.0",
-    "swagger20": "Swagger 2.0"
+    "swagger20": "Swagger 2.0",
+    "failedToFetchError": "Getirilemedi: {error}"
   },
   "portalCustomize": {
     "title": "🖼️ Portal Özelleştirme",
@@ -2369,7 +2375,9 @@
     "yourUrls": "Gelen URLleriniz",
     "copy": "Kopyala",
     "activeConfigs": "Aktif Yapılandırmalar",
-    "selectEndpoint": "Endpoint seçin..."
+    "selectEndpoint": "Endpoint seçin...",
+    "notSet": "Ayarlanmamış",
+    "secretHint": "{provider} panosu → Webhooks → İmza gizli anahtarı"
   },
   "contact": {
     "title": "Bize Ulaşın",
