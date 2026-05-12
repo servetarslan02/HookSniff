@@ -16,6 +16,14 @@ pub struct Claims {
     /// and the API middleware can verify it server-side.
     #[serde(default)]
     pub is_admin: bool,
+    /// HS-261: JWT ID for token revocation support.
+    /// Each access token gets a unique `jti` that can be blacklisted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub jti: Option<String>,
+    /// HS-261: Issued-at timestamp for revoke-all-tokens support.
+    /// Tokens issued before a customer's revocation event are rejected.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub iat: Option<usize>,
 }
 
 /// Generate a long-lived JWT (24h) — used for legacy/backwards compatibility.
@@ -62,12 +70,16 @@ pub fn generate_token_with_duration(
         .expect("valid timestamp")
         .timestamp() as usize;
 
+    let now = Utc::now().timestamp() as usize;
     let claims = Claims {
         sub: customer_id,
         email: email.to_string(),
         plan: plan.to_string(),
         exp: expiration,
         is_admin,
+        // HS-261: Include jti and iat for token revocation support
+        jti: Some(Uuid::new_v4().to_string()),
+        iat: Some(now),
     };
 
     encode(
@@ -76,6 +88,52 @@ pub fn generate_token_with_duration(
         &EncodingKey::from_secret(secret.as_bytes()),
     )
     .map_err(|e| AppError::Internal(e.into()))
+}
+
+/// Check if an access token has been revoked (blacklisted).
+/// Returns `Ok(true)` if revoked, `Ok(false)` if still valid, `Err` on DB error.
+pub async fn is_token_revoked(pool: &sqlx::PgPool, jti: &str) -> Result<bool, AppError> {
+    let exists: (bool,) = sqlx::query_as(
+        "SELECT EXISTS(SELECT 1 FROM revoked_tokens WHERE jti = $1)",
+    )
+    .bind(jti)
+    .fetch_one(pool)
+    .await
+    .map_err(|e| AppError::Internal(e.into()))?;
+    Ok(exists.0)
+}
+
+/// Revoke an access token by its JTI.
+/// The token's `exp` is stored so the blacklist entry can be cleaned up after expiry.
+pub async fn revoke_token(pool: &sqlx::PgPool, jti: &str, exp: i64) -> Result<(), AppError> {
+    sqlx::query(
+        "INSERT INTO revoked_tokens (jti, expires_at) VALUES ($1, to_timestamp($2)) \
+         ON CONFLICT (jti) DO NOTHING",
+    )
+    .bind(jti)
+    .bind(exp)
+    .execute(pool)
+    .await
+    .map_err(|e| AppError::Internal(e.into()))?;
+    Ok(())
+}
+
+/// Revoke all access tokens for a customer (e.g., on password change or account compromise).
+pub async fn revoke_all_tokens_for_customer(
+    pool: &sqlx::PgPool,
+    customer_id: Uuid,
+) -> Result<u64, AppError> {
+    // We can't enumerate all JTIs, but we can record a "revoked_before" timestamp.
+    // The middleware checks this and rejects tokens issued before the revocation time.
+    let result = sqlx::query(
+        "INSERT INTO token_revocation_events (customer_id, revoked_at) VALUES ($1, now()) \
+         ON CONFLICT (customer_id) DO UPDATE SET revoked_at = now()",
+    )
+    .bind(customer_id)
+    .execute(pool)
+    .await
+    .map_err(|e| AppError::Internal(e.into()))?;
+    Ok(result.rows_affected())
 }
 
 /// Generate a random token string (for reset/verification/refresh).
@@ -324,6 +382,8 @@ mod tests {
             plan: "pro".into(),
             exp: 1234567890,
             is_admin: false,
+            jti: None,
+            iat: None,
         };
         let debug = format!("{:?}", claims);
         assert!(debug.contains("Claims"));

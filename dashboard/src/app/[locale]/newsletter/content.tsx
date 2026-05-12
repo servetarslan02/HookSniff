@@ -239,7 +239,7 @@ export function NewsletterPageContent() {
           </div>
           <div className="text-center mt-4">
             <Link href="/blog" className="text-sm text-brand-600 dark:text-brand-400 hover:underline">
-              View all posts →
+              {t('viewAllPosts')}
             </Link>
           </div>
         </div>
