@@ -282,11 +282,11 @@ export function PricingPageContent() {
                   if (plan.key === 'enterprise') {
                     window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
                   } else if (plan.key === 'business') {
-                    router.push(`/${locale}/contact`);
+                    router.push('/contact');
                   } else if (token) {
-                    router.push(`/${locale}/dashboard/billing`);
+                    router.push('/dashboard/billing');
                   } else {
-                    router.push(`/${locale}/register`);
+                    router.push('/register');
                   }
                 }}
                 className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
