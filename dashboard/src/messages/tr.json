@@ -146,7 +146,8 @@
     "sectionCore": "Temel",
     "sectionTools": "Araçlar",
     "sectionAdvanced": "Gelişmiş",
-    "sectionAccount": "Hesap"
+    "sectionAccount": "Hesap",
+    "routing": "Yönlendirme"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -566,7 +567,12 @@
     "plans.proLimit": "50.000 webhook/ay",
     "plans.businessLimit": "500.000 webhook/ay",
     "noInvoices": "Henüz fatura yok.",
-    "upgradeInitiated": "Yükseltme başlatıldı"
+    "upgradeInitiated": "Yükseltme başlatıldı",
+    "invoice": "Fatura",
+    "date": "Tarih",
+    "amount": "Tutar",
+    "plan": "Plan",
+    "status": "Durum"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -2715,19 +2721,21 @@
     "openSourceAlternative": "Açık kaynaklı bir {alternative} alternatifi mı arıyorsunuz?",
     "migratingFrom": "{alternative}'dan geçiş yapıyorsanız, HookSniff aktif geliştirme, daha fazla SDK ve yönetilen barındırma ile en yakın açık kaynak alternatifidir.",
     "svixTitle": "HookSniff vs Svix — Neden HookSniff",
-    "svixDesc": "Svix alternatifi mi arıyorsunuz? HookSniff, 10 kata kadar daha düşük maliyetle benzer özellikler sunar, daha fazla SDK ve FIFO teslimat gibi benzersiz özelliklere sahiptir.",
+    "svixDesc": "Svix alternatifi mi arıyorsunuz? HookSniff, 10 kata kadar daha düşük maliyetle benzer özellikler sunar.",
     "hookdeckTitle": "HookSniff vs Hookdeck — Neden HookSniff",
     "hookdeckDesc": "Hookdeck alternatifi mi arıyorsunuz? HookSniff açık kaynaklı, kendi kendine barındırılabilir ve FIFO teslimat ve CloudEvents desteği sunar.",
     "hook0Title": "HookSniff vs Hook0 — Neden HookSniff",
     "hook0Desc": "Hook0 alternatifi mi arıyorsunuz? HookSniff daha fazla SDK, daha iyi tekrar mantığı ve üretime hazır yönetilen platform sunar.",
     "convoyTitle": "HookSniff vs Convoy — Neden HookSniff",
-    "convoyDesc": "Convoy alternatifi mi arıyorsunuz? Convoy'un GitHub deposu artık aktif olarak sürdürülmemektedir. HookSniff aktif geliştirme ve yönetilen barındırma sunar.",
+    "convoyDesc": "Convoy alternatifi mi arıyorsunuz? HookSniff aktif geliştirme ve yönetilen barındırma sunar.",
     "webhookRelayTitle": "HookSniff vs Webhook Relay — Neden HookSniff",
     "webhookRelayDesc": "Webhook Relay alternatifi mi arıyorsunuz? HookSniff SDK'lar, tekrar denemeleri ve gerçek zamanlı izleme ile modern bir geliştirici deneyimi sunar.",
     "svixAlternativesTitle": "2026'nın En İyi Svix Alternatifleri",
-    "svixAlternativesDesc": "Svix alternatifleri mi arıyorsunuz? HookSniff, Hookdeck, Hook0 ve Convoy'u karşılaştırın. Her biri için özellikler, fiyatlandırma ve dürüst artılar/eksiler.",
+    "svixAlternativesDesc": "Svix alternatifleri mi arıyorsunuz? HookSniff, Hookdeck, Hook0 ve Convoy'u karşılaştırın.",
+    "svixAlternativesIntro": "Bir webhook hizmeti mi arıyorsunuz ama Svix çok mu pahalı? İşte dürüstçe karşılaştırılan en iyi alternatifler.",
     "hookdeckAlternativesTitle": "2026'nın En İyi Hookdeck Alternatifleri",
-    "hookdeckAlternativesDesc": "Hookdeck alternatifleri mi arıyorsunuz? HookSniff, Svix, Hook0 ve Convoy'u karşılaştırın. Açık kaynaklı, kendi kendine barındırılabilir ve uygun fiyatlı seçenekler.",
+    "hookdeckAlternativesDesc": "Hookdeck alternatifleri mi arıyorsunuz? HookSniff, Svix, Hook0 ve Convoy'u karşılaştırın.",
+    "hookdeckAlternativesIntro": "Bir webhook hizmeti mi arıyorsunuz ama Hookdeck uygun mu değil? İşte dürüstçe karşılaştırılan en iyi alternatifler.",
     "savedPerYear": "yılda {amount} tasarruf",
     "withMoreFeatures": "daha fazla özellikle",
     "pricePro": "Fiyat (Pro)",
@@ -2759,9 +2767,7 @@
     "cons": "Eksiler",
     "bestFor": "En uygun",
     "readyToSwitch": "{competitor}'dan geçiş yapmaya hazır mısınız?",
-    "switchCta": "Aynı özellikleri 10 kata kadar daha düşük maliyetle alın. Ücretsiz başlayın, hazır olduğunuzda ölçeklendirin.",
-    "migrateToHooksniff": "HookSniff'e geçiş yap →",
-    "svixAlternativesIntro": "Bir webhook hizmeti mi arıyorsunuz ama Svix çok mu pahalı? İşte dürüstçe karşılaştırılan en iyi alternatifler — özellikler, fiyatlandırma ve tavizler.",
-    "hookdeckAlternativesIntro": "Bir webhook hizmeti mi arıyorsunuz ama Hookdeck uygun mu değil? İşte dürüstçe karşılaştırılan en iyi alternatifler — özellikler, fiyatlandırma ve tavizler."
+    "switchCta": "Aynı özellikleri 10 kata kadar daha düşük maliyetle alın. Ücretsiz başlayın.",
+    "migrateToHooksniff": "HookSniff'e geçiş yap →"
   }
 }
