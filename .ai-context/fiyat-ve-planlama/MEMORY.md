@@ -104,3 +104,24 @@
   - Test/clippy items'a toolchain notu eklendi
   - İlerleme tablosu ve istatistikler eklendi
 - **Commits:** 2 commit, main branch
+
+### Oturum 6 (2026-05-13 01:50 - 01:55 GMT+8)
+- **Tüm eski plan ismi kalıntıları temizlendi** — 15 dosya, 113 satır eklendi, 97 silindi
+- **Backend düzeltmeleri:**
+  - PlatformSettings struct: alan isimleri güncellendi (`max_endpoints_free`→`max_endpoints_developer`, `plan_price_business`→`plan_price_enterprise` vb.) — `serde(alias)` ile backward-compat
+  - auth.rs, jwt.rs, customer.rs, db.rs, billing.rs: test verileri `free`→`developer`, `business`→`enterprise`
+  - admin.rs churn SQL + settings field refs güncellendi
+- **Frontend düzeltmeleri:**
+  - admin/page.tsx: PLAN_COLORS 4 plan, chart bar'ları developer/startup/pro/enterprise
+  - admin/revenue/page.tsx: planPrices state `enterprise` olarak güncellendi
+  - admin/settings/page.tsx: TypeScript interface, defaults, form field isimleri güncellendi
+  - admin/users/page.tsx: bulkPlan default `'developer'`
+  - store.tsx: User plan type `'developer' | 'startup' | 'pro' | 'enterprise'`
+  - playground/constants.ts: mock data `'developer'` → `'pro'`
+  - docs/dlq/page.tsx: 4 plan tablosu (developer/startup/pro/enterprise)
+  - pricing/content.tsx: customIntegrations + support section düzeltildi
+- **i18n:**
+  - `supportFreeFeatures`→`supportDeveloperFeatures`, `supportBusinessFeatures`→`supportEnterpriseFeatures` (EN+TR)
+  - `developerPlan`, `startupPlan`, `enterprisePlan` key'leri eklendi (EN+TR)
+  - Pricing section: `free`→`developer`, `business`→`enterprise` display names
+- **Commits:** 2 commit, main branch
