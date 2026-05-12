@@ -77,3 +77,7 @@
 - **Son deploy** — Versiyon ve zaman bilgisi
 - **Aktif oturum sayısı** — Online admin kullanıcı sayısı
 - **Bu hafta vs geçen hafta** — Trend karşılaştırması
+- **Güvenlik uyarıları** — SSRF/spoofing/replay attempt sayısı
+- **Endpoint durumu** — Toplam endpoint, aktif, devre dışı sayısı
+- **Standard Webhooks durumu** — Uyumluluk yüzdesi
+- **Deduplication stats** — Filtrelenen tekrarlayan event sayısı
