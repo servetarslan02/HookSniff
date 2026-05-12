@@ -457,7 +457,7 @@ async fn process_pending(
         .await?
     };
 
-    let count = items.len();
+    let _count = items.len();
 
     // Batch-fetch signing secrets to avoid N+1 queries
     let endpoint_ids: Vec<uuid::Uuid> = items.iter().map(|i| i.endpoint_id).collect();
