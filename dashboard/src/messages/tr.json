@@ -1853,7 +1853,7 @@
     "securityItem7Desc": "Kurumsal tek oturum açma",
     "securityItem8Title": "IP Beyaz Liste",
     "securityItem8Desc": "IP/CIDR ile kısıtlayın",
-    "supportFreeFeatures": [
+    "supportDeveloperFeatures": [
       "GitHub Issues",
       "Topluluk Discord'u",
       "Dokümantasyon",
@@ -1865,7 +1865,7 @@
       "Hata düzeltme önceliği",
       "Özellik istekleri"
     ],
-    "supportBusinessFeatures": [
+    "supportEnterpriseFeatures": [
       "Özel hesap yöneticisi",
       "Slack Connect kanalı",
       "24 saat yanıt süresi",
