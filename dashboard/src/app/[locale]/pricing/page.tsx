@@ -193,7 +193,7 @@ export default function PricingPage() {
           {planData.map((plan) => (
             <div
               key={plan.key}
-              className={`relative rounded-xl p-6 transition-all duration-300 hover:shadow-lg ${
+              className={`relative rounded-xl p-6 transition-all duration-300 hover:shadow-lg flex flex-col ${
                 plan.popular
                   ? 'bg-white dark:bg-slate-800 border-2 border-brand-400 dark:border-brand-500 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
                   : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
@@ -210,7 +210,7 @@ export default function PricingPage() {
                 <span className="text-gray-500 dark:text-slate-500">{t('month')}</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">{t(`${plan.key}Desc`)}</p>
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-3 mb-6 flex-1">
                 {featureKeys[plan.key].map((f: string) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-gray-700 dark:text-slate-300">
                     <svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -329,14 +329,14 @@ export default function PricingPage() {
             ].map((s) => (
               <div
                 key={s.plan}
-                className={`bg-white dark:bg-slate-800 rounded-xl border p-6 ${
+                className={`bg-white dark:bg-slate-800 rounded-xl border p-6 flex flex-col ${
                   s.highlight ? 'border-brand-400 dark:border-brand-500 ring-1 ring-brand-400 dark:ring-brand-500' : 'border-gray-200 dark:border-slate-700'
                 }`}
               >
                 <p className="text-xs font-medium text-gray-500 dark:text-slate-500 uppercase tracking-wider">{s.plan}</p>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-1">{s.level}</h3>
                 <p className="text-sm text-brand-600 dark:text-brand-400 font-medium mb-4">{t('supportResponse')}: {s.response}</p>
-                <ul className="space-y-2">
+                <ul className="space-y-2 flex-1">
                   {s.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300">
                       <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
