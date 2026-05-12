@@ -286,3 +286,21 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - ✅ Test webhook: SSRF koruması eklendi (`crate::ssrf::validate_url`)
 - ✅ TR i18n çevirileri düzeltildi (10 test webhook key)
 - **Commits:** 98b45c31, aa22b599 — main branch
+
+## Oturum 127 (2026-05-12 18:18 - 18:33 GMT+8) ✅
+- **OpenClaw yirmi üçüncü oturum** — Servet ile Admin Panel eksikleri (devam)
+- **Kritik Backend Düzeltmeleri:**
+  - ✅ Migration 009: customers tablosuna eksik kolonlar eklendi (name, is_admin, is_active, updated_at, stripe/polar/iyzico_customer_id)
+  - ✅ Revenue API: generate_series Neon DB uyumsuzluğu düzeltildi (integer-based series)
+  - ✅ Churn endpoint: name field eklendi, response {users: [...]} formatına sarıldı
+  - ✅ UserAnalytics: top_event_types → top_events (frontend uyumluluk)
+  - ✅ EndpointHealth: success_rate ve avg_latency_ms computed field eklendi
+  - ✅ EventTypeCount: event_type → event (frontend uyumluluk)
+- **Frontend Düzeltmeleri:**
+  - ✅ User Detail sayfasına impersonate butonu eklendi (header)
+  - ✅ Settings sayfasına Alert Thresholds kartı eklendi (success rate, latency, queue depth, failed delivery)
+  - ✅ i18n: EN/TR eksik key'ler eklendi (alertThresholdsDesc, failedDeliveryThreshold, below, above, messages, perHour)
+  - ✅ api.ts: AuditLogResponse type düzeltildi (page/per_page)
+  - ✅ api.ts: getAuditLogs parametreleri düzeltildi (per_page/page)
+- **Commit:** 931ea296 — main branch
+- **7 dosya değişti, 176 satır eklendi, 31 satır silindi**
