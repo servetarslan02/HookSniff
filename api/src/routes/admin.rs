@@ -64,12 +64,16 @@ pub struct UserSummary {
     pub email: String,
     pub name: Option<String>,
     pub plan: String,
+    #[serde(default = "default_role_summary")]
+    pub role: String,
     #[sqlx(rename = "is_active")]
     #[serde(rename = "status", serialize_with = "serialize_status")]
     is_active: bool,
     pub is_admin: bool,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
+
+fn default_role_summary() -> String { "member".to_string() }
 
 fn serialize_status<S: serde::Serializer>(is_active: &bool, s: S) -> Result<S::Ok, S::Error> {
     s.serialize_str(if *is_active { "active" } else { "banned" })
@@ -207,8 +211,16 @@ pub struct RevenueResponse {
 /// Admin middleware — call this as a layer on admin routes, or check inline.
 /// Returns 403 if the customer is not an admin.
 fn require_admin(customer: &Customer) -> Result<(), AppError> {
-    if !customer.is_admin {
+    if !customer.is_admin && !matches!(customer.role.as_str(), "admin" | "support") {
         return Err(AppError::Forbidden("Admin access required".into()));
+    }
+    Ok(())
+}
+
+/// Require admin role (not support) for write operations
+fn require_admin_write(customer: &Customer) -> Result<(), AppError> {
+    if !customer.is_admin && customer.role != "admin" {
+        return Err(AppError::Forbidden("Admin write access required".into()));
     }
     Ok(())
 }
@@ -258,7 +270,7 @@ async fn list_users(
     };
 
     let base_query = format!(
-        "SELECT id, email, name, plan, is_active, is_admin, created_at FROM customers {} ORDER BY created_at DESC",
+        "SELECT id, email, name, plan, COALESCE(role, 'member') as role, is_active, is_admin, created_at FROM customers {} ORDER BY created_at DESC",
         where_clause
     );
     let count_query = format!("SELECT COUNT(*) FROM customers {}", where_clause);
@@ -321,7 +333,7 @@ async fn get_user_detail(
     require_admin(&customer)?;
 
     let user = sqlx::query_as::<_, UserSummary>(
-        "SELECT id, email, name, plan, is_active, is_admin, created_at FROM customers WHERE id = $1",
+        "SELECT id, email, name, plan, COALESCE(role, 'member') as role, is_active, is_admin, created_at FROM customers WHERE id = $1",
     )
     .bind(id)
     .fetch_optional(&pool)
@@ -388,7 +400,7 @@ async fn change_plan(
     Path(id): Path<Uuid>,
     Json(req): Json<PlanRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     let valid_plans = ["free", "pro", "business"];
     if !valid_plans.contains(&req.plan.as_str()) {
@@ -507,7 +519,7 @@ async fn send_user_email(
     Path(id): Path<Uuid>,
     Json(req): Json<SendEmailRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     // Get target user
     let user: Option<(String, Option<String>)> =
@@ -566,7 +578,7 @@ async fn change_status(
     Path(id): Path<Uuid>,
     Json(req): Json<StatusRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     // Prevent self-deactivation
     if id == customer.id && !req.is_active {
@@ -840,7 +852,7 @@ async fn replay_delivery(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     // Find the original delivery
     let original = sqlx::query_as::<_, (Uuid, Uuid, serde_json::Value, Option<String>, i32)>(
@@ -1054,7 +1066,7 @@ async fn impersonate_user(
     Extension(config): Extension<Config>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     // Prevent self-impersonation
     if id == customer.id {
@@ -1261,7 +1273,7 @@ async fn test_webhook(
     Extension(customer): Extension<Customer>,
     Json(req): Json<TestWebhookRequest>,
 ) -> Result<Json<TestWebhookResponse>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     // Validate URL scheme
     if !req.endpoint_url.starts_with("http://") && !req.endpoint_url.starts_with("https://") {
@@ -1537,7 +1549,7 @@ async fn notify_sdk_update(
     Extension(customer): Extension<Customer>,
     Json(req): Json<SdkUpdateRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     if req.updates.is_empty() {
         return Ok(Json(
@@ -1709,7 +1721,7 @@ async fn update_settings(
     Extension(customer): Extension<Customer>,
     Json(settings): Json<PlatformSettings>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    require_admin(&customer)?;
+    require_admin_write(&customer)?;
 
     let value = serde_json::to_value(&settings)
         .map_err(|e| AppError::BadRequest(format!("Invalid settings: {}", e)))?;
@@ -1810,6 +1822,7 @@ async fn create_platform_alert(
     Extension(customer): Extension<Customer>,
     Json(req): Json<AdminCreateAlertRequest>,
 ) -> Result<Json<AdminAlertRule>, AppError> {
+    require_admin_write(&customer)?;
     let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
     if !valid_conditions.contains(&req.condition.as_str()) {
         return Err(AppError::BadRequest("Invalid alert condition".into()));
@@ -1862,6 +1875,7 @@ async fn update_alert_admin(
     Path(id): Path<Uuid>,
     Json(req): Json<AdminUpdateAlertRequest>,
 ) -> Result<Json<AdminAlertRule>, AppError> {
+    require_admin_write(&customer)?;
     if let Some(ref cond) = req.condition {
         let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
         if !valid_conditions.contains(&cond.as_str()) {
@@ -1928,6 +1942,7 @@ async fn delete_alert_admin(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin_write(&customer)?;
     let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND customer_id = $2")
         .bind(id)
         .bind(customer.id)

@@ -42,6 +42,9 @@ pub struct Customer {
     pub is_active: bool,
     #[serde(default)]
     pub is_admin: bool,
+    /// RBAC role: "admin", "support", "viewer", "member"
+    #[serde(default = "default_role")]
+    pub role: String,
     pub updated_at: DateTime<Utc>,
     #[serde(default)]
     pub email_verified: bool,
@@ -59,6 +62,10 @@ pub struct Customer {
 
 fn default_payment_provider() -> String {
     "stripe".to_string()
+}
+
+fn default_role() -> String {
+    "member".to_string()
 }
 
 #[derive(Debug, Deserialize)]
