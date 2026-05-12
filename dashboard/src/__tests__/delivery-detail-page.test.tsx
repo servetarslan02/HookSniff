@@ -61,7 +61,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: DeliveryDetailPage } = await import('@/app/[locale]/dashboard/deliveries/[id]/page');
+const { default: DeliveryDetailPage } = await import('@/app/[locale]/[username]/deliveries/[id]/page');
 
 const mockDelivery = {
   id: 'delivery-123',

@@ -46,7 +46,7 @@ vi.mock('@/lib/api', () => ({
   }),
 }));
 
-const { default: PortalPage } = await import('@/app/[locale]/dashboard/portal-manage/page');
+const { default: PortalPage } = await import('@/app/[locale]/[username]/portal-manage/page');
 
 describe('PortalPage', () => {
   beforeEach(() => {

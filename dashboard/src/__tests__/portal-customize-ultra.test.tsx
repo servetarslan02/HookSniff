@@ -29,7 +29,7 @@ vi.mock('next/image', () => ({
   default: (props: any) => React.createElement('img', props),
 }));
 
-const { default: PortalCustomizationPage } = await import('@/app/[locale]/dashboard/portal-customize/page');
+const { default: PortalCustomizationPage } = await import('@/app/[locale]/[username]/portal-customize/page');
 
 const MOCK_CONFIG = {
   primary_color: '#6366f1',
@@ -550,7 +550,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
       default: (props: any) => React.createElement('img', props),
     }));
 
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/portal-customize/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/portal-customize/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

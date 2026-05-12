@@ -34,7 +34,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: NotificationsPage } = await import('@/app/[locale]/dashboard/notifications/page');
+const { default: NotificationsPage } = await import('@/app/[locale]/[username]/notifications/page');
 
 const MOCK_NOTIFICATIONS = [
   { id: 'n1', type: 'webhook_failed', title: 'Webhook Failed', message: 'Delivery to endpoint failed', read: false, created_at: '2024-06-01T10:00:00Z' },
@@ -391,7 +391,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({
       notificationsApi: { list: mockList, markAsRead: mockMarkAsRead, markAllAsRead: mockMarkAllAsRead, deleteNotification: mockDeleteNotification },
     }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/notifications/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/notifications/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

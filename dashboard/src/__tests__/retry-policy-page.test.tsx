@@ -54,7 +54,7 @@ vi.mock('next/image', () => ({
   default: (props: any) => React.createElement('img', props),
 }));
 
-import RetryPolicyPage from '@/app/[locale]/dashboard/retry-policy/page';
+import RetryPolicyPage from '@/app/[locale]/[username]/retry-policy/page';
 
 describe('RetryPolicyPage', () => {
   beforeEach(() => {

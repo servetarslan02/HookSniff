@@ -63,7 +63,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
-const { default: DeliveryDetailPage } = await import('@/app/[locale]/dashboard/deliveries/[id]/page');
+const { default: DeliveryDetailPage } = await import('@/app/[locale]/[username]/deliveries/[id]/page');
 
 const mockDelivery = {
   id: 'del_test_123',

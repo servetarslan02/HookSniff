@@ -45,7 +45,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: AnalyticsPage } = await import('@/app/[locale]/dashboard/analytics/page');
+const { default: AnalyticsPage } = await import('@/app/[locale]/[username]/analytics/page');
 
 const MOCK_TREND = {
   range: '7d',
@@ -194,7 +194,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
         successRate: (...args: unknown[]) => mockSuccessRate(...args),
       },
     }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/analytics/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/analytics/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });
