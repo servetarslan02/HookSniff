@@ -5,8 +5,9 @@ import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { adminApi, type AdminUserDetail } from '@/lib/api';
+import { adminApi, type AdminUserDetail, type UserAnalytics } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
+import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { useTranslations, useLocale } from 'next-intl';
 
 const PLAN_OPTIONS = ['free', 'pro', 'business'];
@@ -20,6 +21,7 @@ export default function AdminUserDetailPage() {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const [detail, setDetail] = useState<AdminUserDetail | null>(null);
+  const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [newPlan, setNewPlan] = useState('');
 
@@ -27,9 +29,13 @@ export default function AdminUserDetailPage() {
     if (!token || !id) return;
     setLoading(true);
     try {
-      const data = await adminApi.getUserDetail(token, id);
-      setDetail(data);
-      setNewPlan(data.user.plan);
+      const [detailData, analyticsData] = await Promise.all([
+        adminApi.getUserDetail(token, id),
+        adminApi.getUserAnalytics(token, id, 30).catch(() => null),
+      ]);
+      setDetail(detailData);
+      setAnalytics(analyticsData);
+      setNewPlan(detailData.user.plan);
     } catch {
       toast(t("failedToLoadDetails"), "error");
     } finally {
@@ -61,6 +67,17 @@ export default function AdminUserDetailPage() {
       fetchDetail();
     } catch {
       toast(t("failedToUpdateStatus"), "error");
+    }
+  };
+
+  const handleReplay = async (deliveryId: string) => {
+    if (!token) return;
+    try {
+      await adminApi.replayDelivery(token, deliveryId);
+      toast(t("replaySuccess"), "success");
+      fetchDetail();
+    } catch {
+      toast(t("replayFailed"), "error");
     }
   };
 
@@ -260,6 +277,7 @@ export default function AdminUserDetailPage() {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("status")}</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("attempts")}</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("time")}</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{tc("actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -278,6 +296,14 @@ export default function AdminUserDetailPage() {
                     <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
                       {new Date(d.created_at).toLocaleString()}
                     </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleReplay(d.id)}
+                        className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium"
+                      >
+                        ↩ {t("replayDelivery")}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -289,6 +315,94 @@ export default function AdminUserDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Customer Analytics Charts */}
+      {analytics && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Daily Deliveries Chart */}
+          <div className="glass-card p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("dailyDeliveries")}</h2>
+            <div className="h-48">
+              {analytics.daily_deliveries?.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.daily_deliveries.slice(-14)}>
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
+                    <YAxis tick={{ fontSize: 10 }} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'rgb(15 23 42)', border: 'none', borderRadius: '12px', color: 'white' }}
+                    />
+                    <Bar dataKey="success" fill="#10b981" radius={[4, 4, 0, 0]} stackId="a" />
+                    <Bar dataKey="failed" fill="#ef4444" radius={[4, 4, 0, 0]} stackId="a" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-8">{t("noData")}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Event Distribution */}
+          <div className="glass-card p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("eventDistribution")}</h2>
+            <div className="h-48">
+              {analytics.top_events?.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={analytics.top_events}
+                      dataKey="count"
+                      nameKey="event"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={30}
+                      outerRadius={60}
+                      paddingAngle={4}
+                    >
+                      {analytics.top_events.map((_, i) => (
+                        <Cell key={i} fill={['#4c6ef5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][i % 5]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'rgb(15 23 42)', border: 'none', borderRadius: '12px', color: 'white' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-8">{t("noData")}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Endpoint Health */}
+          <div className="glass-card p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("endpointHealth")}</h2>
+            <div className="space-y-3">
+              {analytics.endpoint_health?.length > 0 ? (
+                analytics.endpoint_health.map((ep, i) => (
+                  <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                    <p className="text-xs font-mono text-gray-900 dark:text-white truncate">{ep.url}</p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <div className="flex-1">
+                        <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${ep.success_rate >= 99 ? 'bg-green-500' : ep.success_rate >= 95 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                            style={{ width: `${ep.success_rate}%` }}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-xs text-gray-600 dark:text-slate-400 w-12 text-right">{ep.success_rate}%</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1">avg {ep.avg_latency_ms}ms</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-8">{t("noEndpoints")}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
