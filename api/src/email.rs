@@ -752,7 +752,7 @@ impl GCloudEmailClient {
                                 ||
                                 // 5xx responses are retryable
                                 msg.contains("returned 5")
-                    };
+                        }
                         _ => false,
                     };
 
