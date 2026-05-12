@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-13 01:50 GMT+8
+> Son güncelleme: 2026-05-13 07:20 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -625,3 +625,16 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 ### IMPLEMENTATION-PLAN İlerleme
 - 359/364 madde tamamlandı (%99)
 - 5 kalan ⬜ (hepsi Servet görevleri)
+
+## Oturum 139 (2026-05-13 07:16 - 07:25 GMT+8) ✅
+- **OpenClaw yirmi beşinci oturum** — Servet ile Vercel build hatası düzeltmesi
+- **Vercel build hatası:** `ENOENT: page_client-reference-manifest.js`
+  - Sebep: `(dashboard)/page.tsx` `'use client'` → Next.js manifest dosyası üretmiyor → Vercel post-build tracing crash
+  - Çözüm: `DashboardOverview.tsx` ayrı client component, `page.tsx` server wrapper
+  - Local build başarılı ✅, commit `b3443212`
+- **Vercel rate limit:** 100 deploy/gün aşılmış (14 dependabot PR'ı + main)
+  - `dependabot.yml` PR limitleri: cargo 10→3, npm 10→3, actions 5→2
+  - Commit `cb2b5296`
+  - **Limit ~24 saat sonra sıfırlanır**
+- **Google 2FA ile Vercel'e giriş yapıldı** — servetarslan02@gmail.com
+- **Vercel projesi:** hooksniff-dash (Hobby plan)
