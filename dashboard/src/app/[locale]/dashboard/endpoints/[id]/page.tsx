@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, apiFetch, type Endpoint, type RetryPolicyConfig } from '@/lib/api';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },
@@ -415,32 +416,18 @@ export default function EndpointSettingsPage() {
         </div>
       </div>
 
-      {/* Rotate Confirmation Modal */}
-      {showRotateConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('rotateConfirmTitle')}</h3>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              {t('rotateConfirmDesc')}
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button type="button"
-                onClick={() => setShowRotateConfirm(false)}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-              >
-                {tCommon('cancel')}
-              </button>
-              <button type="button"
-                onClick={handleRotateSecret}
-                disabled={rotating}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition disabled:opacity-60"
-              >
-                {rotating ? t('rotating') : t('rotateSecret')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Rotate Confirmation Dialog */}
+      <ConfirmDialog
+        open={showRotateConfirm}
+        title={t('rotateConfirmTitle')}
+        message={t('rotateConfirmDesc')}
+        confirmLabel={rotating ? t('rotating') : t('rotateSecret')}
+        cancelLabel={tCommon('cancel')}
+        variant="danger"
+        onConfirm={handleRotateSecret}
+        onCancel={() => setShowRotateConfirm(false)}
+        loading={rotating}
+      />
     </div>
   );
 }
