@@ -6,6 +6,7 @@ interface User {
   id: string;
   email: string;
   name?: string;
+  username?: string;
   plan: 'developer' | 'startup' | 'pro' | 'enterprise';
   is_admin?: boolean;
 }
@@ -24,6 +25,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const STORAGE_KEY = 'hooksniff_user';
+
+// Generate URL-friendly slug from name or email
+function toSlug(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 50);
+}
+
+function setUsernameCookie(username: string) {
+  document.cookie = `hooksniff_username=${username}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+}
+
+function clearUsernameCookie() {
+  document.cookie = 'hooksniff_username=; path=/; max-age=0';
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -74,10 +92,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const persistAuth = useCallback((u: User, k?: string) => {
-    setUser(u);
+    // Generate username slug from name or email
+    const slug = toSlug(u.name || u.email.split('@')[0]);
+    const userWithUsername = { ...u, username: slug };
+    setUser(userWithUsername);
     setApiKeyState(k || null); // Keep in memory only for one-time display
     setToken('cookie'); // Token is in HttpOnly cookie
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: userWithUsername }));
+    setUsernameCookie(slug);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -125,6 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setApiKeyState(null);
     localStorage.removeItem(STORAGE_KEY);
+    clearUsernameCookie();
   }, []);
 
   const setApiKey = useCallback((key: string) => {

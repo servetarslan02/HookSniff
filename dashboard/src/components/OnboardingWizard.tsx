@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useRouter } from '@/i18n/navigation';
@@ -15,6 +16,7 @@ export { SetupChecklist, SuccessToast };
 
 /* ─── Main Wizard Component ─── */
 export function OnboardingWizard() {
+  const username = useUsername();
   const { user, token } = useAuth();
   const router = useRouter();
   const [visible, setVisible] = useState(false);
@@ -112,7 +114,7 @@ export function OnboardingWizard() {
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
     dismiss();
-    router.push('/dashboard');
+    router.push(`/${username}`);
   };
 
   const handleCopy = async (text: string, id: string) => {
@@ -308,7 +310,7 @@ export function OnboardingWizard() {
 
                 <div className="flex gap-3 justify-center">
                   <a
-                    href="/dashboard/playground"
+                    href={`/${username}/playground`}
                     target="_blank"
                     className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                   >
@@ -336,19 +338,19 @@ export function OnboardingWizard() {
                   {t('allSetDesc')}
                 </p>
                 <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
-                  <a href="/dashboard/endpoints" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                  <a href={`/${username}/endpoints`} className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">🔗</div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("endpoints")}</div>
                   </a>
-                  <a href="/dashboard/deliveries" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                  <a href={`/${username}/deliveries`} className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">📦</div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("deliveries")}</div>
                   </a>
-                  <a href="/dashboard/playground" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                  <a href={`/${username}/playground`} className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">🧪</div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("playground")}</div>
                   </a>
-                  <a href="/dashboard/api-keys" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                  <a href={`/${username}/api-keys`} className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">🔑</div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("apiKeys")}</div>
                   </a>

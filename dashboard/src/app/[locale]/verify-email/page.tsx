@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/Toast';
 
 function VerifyEmailContent() {
+  const username = useUsername();
   const t = useTranslations('error');
   const tv = useTranslations('verifyEmail');
   const searchParams = useSearchParams();
@@ -75,7 +77,7 @@ function VerifyEmailContent() {
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{tv('verified')}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <Link
-                href="/dashboard"
+                href={`/${username}`}
                 className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
               >
                 {tv('goToDashboard')}
