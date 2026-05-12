@@ -72,6 +72,7 @@ pub fn router() -> Router {
         .route("/portal", post(open_portal))
         .route("/usage", get(get_usage))
         .route("/invoices", get(get_invoices))
+        .route("/refund", post(request_refund))
         .route("/webhook", post(handle_stripe_webhook))
         .route("/webhook/polar", post(handle_polar_webhook))
         .route("/webhook/iyzico", post(handle_iyzico_webhook))
@@ -96,6 +97,8 @@ struct SubscriptionResponse {
     monthly_price_kurus: i64,
     /// Whether the subscription will cancel at the end of the current billing period.
     cancel_at_period_end: bool,
+    /// Billing period: "monthly" or "annual"
+    billing_period: String,
 }
 
 async fn get_subscription(
@@ -127,6 +130,7 @@ async fn get_subscription(
         monthly_price_cents: plan.monthly_price_cents(),
         monthly_price_kurus: plan.monthly_price_kurus(),
         cancel_at_period_end: customer.cancel_at_period_end,
+        billing_period: "monthly".to_string(), // Default; annual tracked via provider
     }))
 }
 
@@ -183,6 +187,9 @@ struct UpgradeRequest {
     /// If not specified, uses the customer's existing provider or defaults to Stripe.
     #[serde(default)]
     provider: Option<String>,
+    /// Billing period: "monthly" (default) or "annual"
+    #[serde(default)]
+    billing_period: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -196,6 +203,12 @@ struct UpgradeResponse {
     /// Days remaining in current billing period
     #[serde(skip_serializing_if = "Option::is_none")]
     days_remaining: Option<u32>,
+    /// Whether this plan requires contacting sales
+    #[serde(skip_serializing_if = "Option::is_none")]
+    requires_contact: Option<bool>,
+    /// Contact URL for enterprise plans
+    #[serde(skip_serializing_if = "Option::is_none")]
+    contact_url: Option<String>,
 }
 
 /// Calculate prorated amount for a mid-cycle upgrade.
@@ -243,9 +256,18 @@ async fn upgrade_plan(
             ));
         }
         Plan::Enterprise => {
-            return Err(AppError::BadRequest(
-                "Enterprise plans require contacting sales".into(),
-            ));
+            // Item 256: Enterprise requires contact — return contact info instead of checkout
+            return Ok(Json(UpgradeResponse {
+                checkout_url: None,
+                provider: customer.payment_provider.clone(),
+                message: "Enterprise plan requires a custom agreement. Contact us to get started.".into(),
+                prorated_amount_cents: None,
+                days_remaining: None,
+                requires_contact: Some(true),
+                contact_url: Some(
+                    "mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry".into(),
+                ),
+            }));
         }
         _ => {}
     }
@@ -390,9 +412,14 @@ async fn upgrade_plan(
         checkout_url: result.checkout_url,
         provider: result.provider,
         message: format!(
-            "Redirecting to {} Checkout for {} plan",
+            "Redirecting to {} Checkout for {} plan{}",
             provider_name,
             new_plan.as_str(),
+            if req.billing_period.as_deref() == Some("annual") {
+                " (annual billing — 20% discount)"
+            } else {
+                ""
+            },
         ),
         prorated_amount_cents: if prorated_amount > 0 {
             Some(prorated_amount)
@@ -404,6 +431,8 @@ async fn upgrade_plan(
         } else {
             None
         },
+        requires_contact: None,
+        contact_url: None,
     }))
 }
 
@@ -559,6 +588,48 @@ async fn get_invoices(
         .collect();
 
     Ok(Json(invoices))
+}
+
+// ──────────────────────────────────────────────────────────────
+// POST /v1/billing/refund — Request a refund (Item 251)
+// ──────────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+struct RefundRequest {
+    reason: String,
+}
+
+#[derive(Serialize)]
+struct RefundResponse {
+    message: String,
+    status: String,
+}
+
+async fn request_refund(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<RefundRequest>,
+) -> Result<Json<RefundResponse>, AppError> {
+    if customer.plan == "free" {
+        return Err(AppError::BadRequest(
+            "Cannot refund a free plan".into(),
+        ));
+    }
+
+    // Check 14-day refund window
+    if !crate::billing::refund::is_within_refund_window(&pool, customer.id).await? {
+        return Err(AppError::BadRequest(
+            "Refund window has expired. Refunds are only available within 14 days of purchase.".into(),
+        ));
+    }
+
+    crate::billing::refund::process_refund(&pool, &cfg, customer.id, &req.reason).await?;
+
+    Ok(Json(RefundResponse {
+        message: "Refund processed successfully. Your plan has been downgraded to Free.".into(),
+        status: "refunded".into(),
+    }))
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -1110,6 +1181,7 @@ mod tests {
             monthly_price_cents: 4900,
             monthly_price_kurus: 0,
             cancel_at_period_end: false,
+            billing_period: "monthly".to_string(),
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["plan"], "pro");
@@ -1117,6 +1189,7 @@ mod tests {
         assert_eq!(json["webhook_limit"], 50_000);
         assert_eq!(json["monthly_price_cents"], 4900);
         assert_eq!(json["cancel_at_period_end"], false);
+        assert_eq!(json["billing_period"], "monthly");
     }
 
     #[test]
@@ -1134,6 +1207,7 @@ mod tests {
             monthly_price_cents: 0,
             monthly_price_kurus: 0,
             cancel_at_period_end: false,
+            billing_period: "monthly".to_string(),
         };
         let _debug = format!("{:?}", resp);
     }
@@ -1154,6 +1228,15 @@ mod tests {
         let req: UpgradeRequest = serde_json::from_str(json).unwrap();
         assert_eq!(req.plan, "business");
         assert_eq!(req.provider, None);
+        assert_eq!(req.billing_period, None);
+    }
+
+    #[test]
+    fn test_upgrade_request_deserialization_with_billing_period() {
+        let json = r#"{"plan":"pro","billing_period":"annual"}"#;
+        let req: UpgradeRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.plan, "pro");
+        assert_eq!(req.billing_period, Some("annual".to_string()));
     }
 
     #[test]
@@ -1172,6 +1255,8 @@ mod tests {
             message: "Redirecting".to_string(),
             prorated_amount_cents: None,
             days_remaining: None,
+            requires_contact: None,
+            contact_url: None,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["checkout_url"], "https://checkout.stripe.com/xyz");
@@ -1186,11 +1271,30 @@ mod tests {
             message: "Done".to_string(),
             prorated_amount_cents: Some(1500),
             days_remaining: Some(15),
+            requires_contact: None,
+            contact_url: None,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert!(json["checkout_url"].is_null());
         assert_eq!(json["prorated_amount_cents"], 1500);
         assert_eq!(json["days_remaining"], 15);
+    }
+
+    #[test]
+    fn test_upgrade_response_enterprise_contact() {
+        let resp = UpgradeResponse {
+            checkout_url: None,
+            provider: "stripe".to_string(),
+            message: "Enterprise plan requires a custom agreement.".into(),
+            prorated_amount_cents: None,
+            days_remaining: None,
+            requires_contact: Some(true),
+            contact_url: Some("mailto:enterprise@hooksniff.dev".into()),
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert!(json["checkout_url"].is_null());
+        assert_eq!(json["requires_contact"], true);
+        assert_eq!(json["contact_url"], "mailto:enterprise@hooksniff.dev");
     }
 
     // ── PortalResponse ──────────────────────────────────────
@@ -1350,6 +1454,7 @@ mod tests {
             monthly_price_cents: 4900,
             monthly_price_kurus: 0,
             cancel_at_period_end: true,
+            billing_period: "monthly".to_string(),
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["cancel_at_period_end"], true);
