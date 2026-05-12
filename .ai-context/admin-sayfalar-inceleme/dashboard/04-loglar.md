@@ -85,3 +85,30 @@
 - Toplu işlem yok
 - Request/response body gösterimi yok
 - Auto-refresh hızı ayarlanamıyor
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/logs/page.tsx`
+- **Sorun:** 3 useEffect, 4 paralel API çağrısı ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: 4 Paralel API Çağrısı — Gereksiz
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/logs/page.tsx`
+- **Sorun:** Her fetchData'da 4 ayrı API çağrısı (1 liste + 3 status count).
+- **Adımlar:**
+  1. Backend'de status count'ları ana response'a ekle (tek istek)
+  2. Veya: Status count'ları lazy load et (sekme tıklandığında)
+
+### 🔒 Güvenlik
+
+#### G-01: Hardcoded Stringler
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/logs/page.tsx`
+- **Sorun:** "Loading logs...", "Full delivery history...", "Refresh", "Close", tablo header'ları hardcoded.
+- **Adımlar:**
+  1. i18n key'leri ekle: `loadingLogs`, `logsSubtitle`, `refresh`, `close`
+  2. Tablo header'ları: `thId`, `thEvent`, `thEndpoint`, `thStatus`, `thAttempts`, `thResponse`, `thTime`

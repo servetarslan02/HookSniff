@@ -80,3 +80,40 @@
 - Response karşılaştırma yok
 - Mock server yok
 - WebSocket test desteği yok
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Kod Kalitesi
+
+#### KK-01: Raw Fetch Kullanımı (7 yer)
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/playground/content.tsx`
+- **Sorun:** 7 yerde `fetch('/api/playground/...')` kullanılıyor. Auth, CSRF, retry, timeout koruması yok.
+- **Adımlar:**
+  1. `fetch('/api/playground/token', { method: 'POST' })` → `apiFetch('/playground/token', { method: 'POST', token })`
+  2. `fetch('/api/playground/history/${token}')` → `apiFetch('/playground/history/${token}', { token })`
+  3. `fetch('/api/playground/history/${token}', { method: 'DELETE' })` → `apiFetch('/playground/history/${token}', { method: 'DELETE', token })`
+  4. Tüm fetch çağrılarını apiFetch'e çevir
+  5. Hardcoded `/api/playground/` URL'lerini `/playground/` olarak değiştir
+
+#### KK-02: console.log Production'da
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/playground/content.tsx` — satır 634
+- **Sorun:** `console.log('Captured requests:', data)` production'da kalmış.
+- **Adımlar:**
+  1. `console.log` satırını kaldır
+  2. Veya `process.env.NODE_ENV === 'development'` kontrolü ekle
+
+#### KK-03: localStorage-Only Geçmiş
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/playground/content.tsx`
+- **Sorun:** Playground geçmişi sadece localStorage'da.
+- **Adımlar:**
+  1. Backend'de playground geçmişi endpoint'i varsa kullan
+  2. Yoksa localStorage kalabilir ama "Geçmiş temizlendi" mesajı göster
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/playground/playground/page.tsx`
+- **Sorun:** 2 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)

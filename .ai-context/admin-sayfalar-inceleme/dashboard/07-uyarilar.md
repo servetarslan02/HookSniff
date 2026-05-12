@@ -118,3 +118,46 @@
    - Frontend: "Kopyala" butonu → yeni alert formu (mevcut değerlerle)
 5. **Endpoint Bazlı Alert** — Belirli endpoint için alert
    - Frontend: Form'a endpoint seçici ekle (opsiyonel)
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Alert Düzenleme Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`
+- **Backend:** `PUT /v1/alerts/{id}` — alert güncelleme
+- **Sorun:** `alertsApi.update` api.ts'de tanımlı değil, düzenleme butonu yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     update: (token: string, id: string, data: Partial<CreateAlertRequest>) =>
+       apiFetch<Alert>(`/alerts/${id}`, { method: 'PUT', body: data, token }),
+     ```
+  2. Her alert kartına "Düzenle" butonu ekle
+  3. Mevcut değerlerle form (name, condition, threshold, channels)
+  4. `alertsApi.update(token, id, formData)` çağrısı
+  5. i18n key: `editAlert`, `updateAlert`
+
+#### BF-02: Alert Pause/Resume Toggle Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`
+- **Sorun:** Alert aktif/pasif yapılamıyor.
+- **Adımlar:**
+  1. Her alert kartına toggle switch ekle
+  2. `alertsApi.update(token, id, { is_active: !current })` çağrısı
+  3. Toggle değişiminde optimistic UI update
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`
+- **Sorun:** 2 useEffect, 9 fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`
+- **Sorun:** Tüm alert'ler tek seferde yükleniyor.
+- **Adımlar:**
+  1. Backend pagination desteği varsa ekle
+  2. "Daha Fazla Yükle" butonu ekle

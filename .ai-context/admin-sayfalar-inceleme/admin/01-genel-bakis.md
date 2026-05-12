@@ -137,3 +137,33 @@
 - 🟢 **TypeScript** — 0 hata
 - 🟢 **Next.js build** — Başarılı (pre-existing NotificationCenter hatası düzeltildi)
 - 🟢 **Cargo test (admin)** — 32/32 geçti
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Feature Flags CRUD Eksik
+- **Dosya:** `dashboard/src/app/[locale]/admin/page.tsx`
+- **Backend:**
+  ```
+  POST   /v1/admin/feature-flags      → Oluşturma
+  PUT    /v1/admin/feature-flags/{id}  → Güncelleme
+  DELETE /v1/admin/feature-flags/{id}  → Silme
+  ```
+- **Sorun:** `adminApi.createFeatureFlag`, `updateFeatureFlag`, `deleteFeatureFlag` api.ts'de tanımlı ama hiçbir sayfa çağırmıyor. Admin sadece listeleyebiliyor.
+- **Adımlar:**
+  1. Feature Flags yönetim kartı ekle (admin/page.tsx)
+  2. Toggle ile enable/disable: `adminApi.updateFeatureFlag(token, id, { is_enabled: !current })`
+  3. "Yeni Flag" butonu + modal form (name, description, rollout_percentage, enabled_for_plans)
+  4. Silme butonu + ConfirmDialog
+  5. i18n key: `createFeatureFlag`, `editFeatureFlag`, `deleteFeatureFlag`, `rolloutPercentage`
+
+### 🔒 Güvenlik
+
+#### G-01: Raw Fetch Kullanımı (1 yer)
+- **Dosya:** `dashboard/src/app/[locale]/admin/page.tsx`
+- **Sorun:** 1 yerde `fetch()` kullanılıyor, CSRF koruması atlanıyor.
+- **Adımlar:**
+  1. `fetch()` → `apiFetch()` veya `adminApi` metodına çevir
