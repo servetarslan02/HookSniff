@@ -142,127 +142,139 @@
 
 ---
 
-## 🆕 Eksik Admin Sayfaları (Sektör Karşılaştırma)
+## 🆕 Eksik Admin Sayfaları — 10 Sayfa Yapısı
 
-### 7. 🚩 Feature Flags (`/admin/feature-flags`)
-- Özellik açma/kapama toggle'ları
-- Percentage rollout (kullanıcı yüzdesine göre)
-- A/B testing desteği
-- Feature flag geçmişi
-- **Rakipler:** Svix ✅, Hookdeck ✅
+Tüm özellikler aşağıdaki 10 sayfaya toplanmıştır (özellik kaybı yok):
 
-### 8. 💾 Backup Yönetimi (`/admin/backups`)
-- Manuel backup tetikleme
-- Backup geçmişi listesi
-- Restore işlemi
-- Backup zamanlaması (cron)
-- Retention policy ayarı
-- **Rakipler:** Convoy ✅, Hookdeck ✅
+### 1. 📊 Genel Bakış (`/admin`) — Mevcut + Genişletilmiş
+**Mevcut:** 4 istatistik kartı, plan dağılımı, son aktivite, recent signups
+**Eklenecek:**
+- MRR/ARR kartı — Aylık/yıllık tekrarlayan gelir
+- Uptime kartı — Platform uptime yüzdesi + SLA durumu
+- Feature flag durumu — Aktif/pasif feature sayısı
+- Son deploy — Versiyon ve zaman bilgisi
+- Güvenlik uyarıları — SSRF/spoofing/replay attempt sayısı
+- Endpoint durumu — Toplam, aktif, devre dışı
+- Standard Webhooks durumu — Uyumluluk yüzdesi
+- Deduplication stats — Filtrelenen tekrarlayan event
 
-### 9. 📊 Uptime Monitoring (`/admin/uptime`)
-- Platform uptime yüzdesi (24h/7d/30d)
-- SLA hedefi takibi
-- Incident geçmişi
-- Status page entegrasyonu
-- **Rakipler:** Svix ✅ (%99.999997), Hookdeck ✅
+### 2. 👤 Kullanıcılar (`/admin/users`) — Mevcut + Genişletilmiş
+**Mevcut:** Arama, filtre, sıralama, toplu işlem, impersonate, CSV export
+**Eklenecek:**
+- Müşteri notları ve etiketleri
+- Müşteri geçmişi (plan değişiklik, ban, impersonate)
+- Müşteri sağlık skoru
+- Support Agent rolü (Svix ✅)
+- Müşteri segmentasyonu
+- Müşteri iletişim geçmişi
+- Müşteri dashboard'u (admin gözünden)
 
-### 10. 🧪 Webhook Test Konsolu (`/admin/webhook-test`)
-- Admin'den webhook test gönderme
-- Payload template seçici
-- Sonuç gösterimi (status, response, duration)
-- Geçmiş test kayıtları
-- **Rakipler:** Hookdeck ✅, Svix ✅
+### 3. 💰 Gelir (`/admin/revenue`) — Mevcut + Genişletilmiş
+**Mevcut:** Gelir istatistikleri, tarih aralığı, churn analizi
+**Eklenecek:**
+- MRR/ARR kartı
+- ARPU kartı
+- LTV kartı
+- Gelir projeksiyonu (3/6/12 ay)
+- Cohort analizi
+- Net Revenue Retention
+- Expansion Revenue
+- Fatura yönetimi (oluşturma, düzenleme, iptal)
+- Ödeme geçmişi
+- Promosyon/kupon yönetimi
+- Fiyatlandırma planı yönetimi
 
-### 11. 🔄 Bulk Replay (`/admin/bulk-replay`)
-- Tarih aralığı seçimi
-- Durum bazlı filtre (sadece failed'lar)
-- Endpoint bazlı seçim
-- İlerleme göstergesi
-- **Rakipler:** Svix ✅, Hookdeck ✅
+### 4. 🖥️ Sistem (`/admin/system`) — Mevcut + Genişletilmiş
+**Mevcut:** DB/Redis/API durumu, queue, son hatalar
+**Eklenecek:**
+- Backup yönetimi (manuel tetikleme, geçmişi, restore, cron, retention)
+- Uptime monitoring (24h/7d/30d, SLA hedefi, incident geçmişi)
+- Log seviyesi ayarı (Debug/Info/Warn/Error, modül bazlı)
+- Feature flags (toggle, percentage rollout, A/B testing, geçmişi)
+- Canlı log akışı (WebSocket streaming)
+- Servis restart (API/Worker/DB)
+- Bağlantı havuzu durumu (DB, Redis)
+- Disk kullanımı
+- Structured health checks (worker bazlı JSON)
+- Deploy yönetimi (rollback, versiyon geçmişi)
+- Environment yönetimi (staging/production)
+- Cache yönetimi (Redis temizleme, TTL)
+- Rate limit yönetimi (global + per-customer)
 
-### 12. 📜 Sistem Log Viewer (`/admin/system-logs`)
-- Raw log görüntüleyici
-- Log seviyesi filtresi (Debug/Info/Warn/Error)
-- Tarih aralığı
-- Arama (keyword)
-- Streaming (canlı log akışı)
-- **Rakipler:** Convoy ✅, Hookdeck ✅
+### 5. 📋 Aktivite (`/admin/activity`) — Mevcut + Genişletilmiş
+**Mevcut:** Audit log, aksiyon filtreleme, sayfalama
+**Eklenecek:**
+- SSRF attempt log (hangi müşteri, hangi URL)
+- Spoofing attempt log (sahte webhook tespit)
+- Replay attempt log (replay saldırı tespit)
+- Endpoint disable log (devre dışı kalma geçmişi)
+- Support Agent erişim log (destek ekibi portal erişimi)
+- Session management (aktif oturum listesi, sonlandırma)
+- 2FA zorunlu (admin kullanıcılar için)
+- IP whitelist (admin paneline erişim kısıtlaması)
+- Login history (başarılı/başarısız giriş denemeleri)
+- Anomali tespiti (olağandışı aktivite uyarısı)
+- Quick filter (tek tıkla filtre oluşturma)
 
----
+### 6. ⚙️ Ayarlar (`/admin/settings`) — Mevcut + Genişletilmiş
+**Mevcut:** Platform ayarları (20+), alert kuralları
+**Eklenecek:**
+- Standard Webhooks ayarları (toggle, custom ID, prefix)
+- Retry schedule ayarları (varsayılan + custom: 5sn, 1dk, 10dk, 1sa)
+- Deduplication ayarları (exact, field-based, time window)
+- Email template yönetimi (endpoint disable, welcome, billing, maintenance, feature)
+- Bildirim kanal ayarları (Slack, Teams, Discord, PagerDuty, OpsGenie, custom webhook)
+- GDPR ayarları (data deletion, consent log, data export, breach notification, DPO)
+- Whitelabel ayarları (logo, renk, CSS, footer, favicon)
+- Password policy (minimum uzunluk, karmaşıklık)
+- API key rotasyonu ayarları
+- API versiyon yönetimi
 
-### 13. 🛡️ Güvenlik Dashboard (`/admin/security`)
-- SSRF attempt log'u (hangi müşteri, hangi URL denedi)
-- Webhook spoofing tespit log'u
-- Replay attack tespit log'u
+### 7. 🛡️ Güvenlik (`/admin/security`) — YENİ
+**Eklenecek:**
+- SSRF attempt dashboard (hangi müşteri, hangi URL, zaman)
+- Webhook spoofing tespit dashboard
+- Replay attack tespit dashboard
 - Endpoint spam tespiti
-- Şüpheli aktivite listesi
+- Abuse tespit dashboard (anormal kullanım pattern)
+- Rate limit ihlali takibi
 - IP reputation kontrolü
-- **Rakipler:** Svix ✅, Hookdeck ✅
-- **Kaynak:** Güvenlik araştırması — SSRF, spoofing, replay vektörleri
-
-### 14. 📧 Email Şablonları (`/admin/email-templates`)
-- Endpoint disable email şablonu (whitelabel)
-- Welcome email şablonu
-- Billing hatırlatma şablonu
-- Maintenance bildirim şablonu
-- Feature announcement şablonu
-- **Rakipler:** Svix ✅ (Ağustos 2025'te ekledi)
-- **Kaynak:** Svix changelog — Email Notifications
-
-### 15. 🔔 Bildirim Kanalları (`/admin/notification-channels`)
-- Slack entegrasyonu
-- Microsoft Teams entegrasyonu
-- Discord entegrasyonu
-- PagerDuty entegrasyonu
-- OpsGenie entegrasyonu
-- Custom webhook bildirim
-- **Rakipler:** Hookdeck ✅ (Teams, Slack, PagerDuty, OpsGenie)
-- **Kaynak:** Hookdeck changelog — Microsoft Teams Integration
-
-### 16. 📋 Compliance Dashboard (`/admin/compliance`)
+- Hesap kilidi yönetimi
+- Toplu hesap oluşturma tespiti
 - SOC 2 durumu ve eksikler
 - GDPR uyumluluk durumu
-- Data deletion request yönetimi
-- Consent log yönetimi
-- Breatch notification şablonu
-- Audit log export (compliance için)
-- **Rakipler:** Svix ✅ (SOC 2, GDPR, HIPAA, PCI-DSS)
-- **Kaynak:** Compliance araştırması
+- Compliance dashboard
 
----
+### 8. 🧪 Webhook Araçları (`/admin/webhook-tools`) — YENİ
+**Eklenecek:**
+- Webhook test konsolu (admin'den test gönderme, payload template, sonuç)
+- Bulk replay (tarih aralığı, durum bazlı filtre, endpoint bazlı, ilerleme)
+- Quick filters (tek tıkla filtre)
+- Payload analizi (şüpheli içerik tespiti)
+- Custom retry schedule test
+- Deduplication test
 
-## 🆕 Deep Research Ek Özellikler
+### 9. 📊 Raporlar (`/admin/reports`) — YENİ
+**Eklenecek:**
+- Haftalık/aylık otomatik rapor
+- Platform metrikleri raporu
+- Kullanım projeksiyonu (kapasite planlama)
+- Maliyet analizi (altyapı maliyeti vs gelir)
+- Performans raporu (P50/P95/P99 latency, error rate)
+- Müşteri segment raporu
+- Metrik export (New Relic/Datadog/Grafana)
+- Custom dashboard (widget sürükle-bırak)
 
-### Support Agent Rolü (Svix, Haziran 2025)
-- Yeni rol: "Support Agent" — Viewer + müşteri portalı önizleme
-- Destek ekibi müşteri portalını müşteri gözüyle görebilmeli
-- **Ek:** admin/roles sayfasına yeni rol ekle
-
-### Endpoint Disable Email (Svix, Ağustos 2025)
-- Endpoint otomatik devre dışı kalınca müşteriye whitelabel email
-- Admin'e de bildirim gönderilmeli
-- **Ek:** Email şablonları sayfasına ekle
-
-### Standard Webhooks Uyumluluğu (Hookdeck, Kasım 2025)
-- webhook- prefix, whsec_ secret format
-- OpenAI, Anthropic, Google kullanıyor
-- **Ek:** API ayarlarına Standard Webhooks toggle
-
-### Deduplication (Hookdeck, Ağustos 2025)
-- Exact deduplication (birebir aynı payload)
-- Field-based matching (belirli alanlarla eşleştirme)
-- Time window (1sn - 1sa)
-- **Ek:** Endpoint ayarlarına deduplication kuralları
-
-### Custom Retry Schedules (Hookdeck, Kasım 2025)
-- Müşteri tanımlı retry zamanlaması
-- Örnek: 5sn, 1dk, 10dk, 1sa
-- **Ek:** Retry policy sayfasına custom schedule
-
-### Quick Filters (Hookdeck, Kasım 2025)
-- Event detayından tek tıkla filtre oluşturma
-- Manuel filtre oluşturma hızlandırılmalı
-- **Ek:** Log ve teslimat sayfalarına quick filter
+### 10. 👥 Ekip (`/admin/team`) — YENİ
+**Eklenecek:**
+- Admin kullanıcı listesi
+- Rol yönetimi (Admin, Member, Viewer, Support Agent)
+- Support Agent rolü (müşteri portalı önizleme yetkisi)
+- Davet yönetimi
+- 2FA zorunluluk ayarı
+- IP whitelist ayarı
+- Session timeout ayarı
+- Password policy ayarı
 
 ---
 
