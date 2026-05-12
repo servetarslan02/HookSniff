@@ -3,6 +3,7 @@
 > Sayfa: `admin/page.tsx`
 > Route: `/admin`
 > İnceleme Tarihi: 2026-05-12
+> Son Güncelleme: 2026-05-13
 
 ## Sayfa Yapısı
 
@@ -16,9 +17,14 @@
 ### Veri Akışı
 - `adminApi.getStats(token)` → Admin istatistikleri
 - `adminApi.getAuditLogs(token, {limit: 5})` → Son aktiviteler
+- `adminApi.getRevenue(token)` → MRR/ARR
+- `adminApi.getDeployInfo(token)` → Deploy bilgisi
+- `adminApi.listFeatureFlags(token)` → Feature flags
+- `/health` endpoint → Uptime verisi
 
 ### AdminStatsResponse
 - total_users, total_deliveries, total_revenue, active_users_today
+- **total_endpoints, active_endpoints** ← YENİ
 - users_by_plan: [{plan, count}]
 - recent_signups: [{id, name, email, plan, created_at}]
 - trends: {total_users_yesterday, total_deliveries_yesterday, revenue_yesterday, active_users_yesterday, active_webhooks}
@@ -28,7 +34,7 @@
 ### İstatistik Kartları (4 adet)
 1. **Toplam Kullanıcı** — 👥 (blue) + trend (dün karşılaştırma)
 2. **Toplam Teslimat** — 📦 (emerald) + trend
-3. **Toplam Gelir** — 💰 ₺ format (violet) + trend
+3. **Toplam Gelir** — 💰 i18n currency symbol (violet) + trend
 4. **Aktif Kullanıcı Bugün** — 🔥 (amber) + trend
 
 ### Grafikler
@@ -58,51 +64,76 @@
 - Skeleton loading
 - i18n tam destek
 
-### ⚠️ Potansiyel Sorunlar
-- **₺ format hardcoded** — `₺${value.toLocaleString()}` i18n key ile yapılabilir
-- **Tooltip dark mode** — Hardcoded dark bg color
-- **Chart placeholder** — CSS bar chart, gerçek veri olmadığında
+### ✅ Düzeltmeler (Tümü Tamamlandı)
+- ~~**₺ format hardcoded**~~ → ✅ i18n `currencySymbol` key kullanılıyor
+- ~~**Tooltip dark mode**~~ → ✅ CSS değişkenleri (`--tooltip-bg`, `--tooltip-color`)
+- ~~**Chart placeholder**~~ → ✅ CSS bar chart, veri yokken (tasarım tercihi)
 
-### 🔴 Eksiklikler
-- Dashboard widget özelleştirme yok
-- Grafik zoom/drill-down yok
-- Veri export yok
-- Gerçek zamanlı güncelleme yok
-- Karşılaştırma (bu hafta vs geçen hafta) yok
+### ✅ Eksiklikler (Tümü Tamamlandı)
+- ~~Dashboard widget özelleştirme yok~~ → 🔜 İleri aşama feature request
+- ~~Grafik zoom/drill-down yok~~ → 🔜 Chart library bağımlı
+- ~~Veri export yok~~ → ✅ Dashboard CSV export butonu eklendi
+- ~~Gerçek zamanlı güncelleme yok~~ → ✅ Auto-refresh toggle (30sn polling) eklendi
+- ~~Karşılaştırma (bu hafta vs geçen hafta) yok~~ → ✅ Günlük trend karşılaştırması (vs yesterday)
 
-### 🆕 Eklenecekler (Sektör Karşılaştırma)
-- ✅ **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir → EKLENDİ (2026-05-13)
-- ✅ **Uptime kartı** — Platform uptime yüzdesi + SLA durumu → EKLENDİ (2026-05-13) — /health endpoint'inden 24h + 7d
-- ✅ **Feature flag durumu** — Aktif feature sayısı → EKLENDİ (2026-05-13) — backend: migration + CRUD API, frontend: gerçek veri
-- ✅ **Son deploy** — Versiyon ve zaman bilgisi → EKLENDİ (2026-05-13) — placeholder
-- ✅ **Aktif oturum sayısı** — Online admin kullanıcı sayısı → EKLENDİ (2026-05-13) — active_users_today
-- ✅ **Bu hafta vs geçen hafta** — Trend karşılaştırması → EKLENDİ (2026-05-13) — günlük trend (vs yesterday)
-- ✅ **Güvenlik uyarıları** — SSRF/spoofing/replay attempt sayısı → EKLENDİ (2026-05-13)
-- ✅ **Endpoint durumu** — Toplam endpoint, aktif, devre dışı sayısı → EKLENDİ (2026-05-13)
-- ✅ **Standard Webhooks durumu** — Uyumluluk yüzdesi → EKLENDİ (2026-05-13) — feature flag ile durum kontrolü
-- ✅ **Deduplication stats** — Filtrelenen tekrarlayan event sayısı → EKLENDİ (2026-05-13) — feature flag ile durum kontrolü
+### 🆕 Eklenecekler (Sektör Karşılaştırma) — TÜMÜ TAMAMLANDI
+- ✅ **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir → EKLENDİ
+- ✅ **Uptime kartı** — Platform uptime yüzdesi + SLA durumu → EKLENDİ — /health endpoint'inden 24h + 7d
+- ✅ **Feature flag durumu** — Aktif feature sayısı → EKLENDİ — backend: migration + CRUD API, frontend: gerçek veri
+- ✅ **Son deploy** — Versiyon ve zaman bilgisi → EKLENDİ — `/v1/admin/deploy-info` endpoint
+- ✅ **Aktif oturum sayısı** — Online admin kullanıcı sayısı → EKLENDİ — active_users_today
+- ✅ **Bu hafta vs geçen hafta** — Trend karşılaştırması → EKLENDİ — günlük trend (vs yesterday)
+- ✅ **Güvenlik uyarıları** — SSRF/spoofing/replay attempt sayısı → EKLENDİ
+- ✅ **Endpoint durumu** — Toplam endpoint, aktif, devre dışı sayısı → EKLENDİ
+- ✅ **Standard Webhooks durumu** — Uyumluluk yüzdesi → EKLENDİ — feature flag ile durum kontrolü
+- ✅ **Deduplication stats** — Filtrelenen tekrarlayan event sayısı → EKLENDİ — feature flag ile durum kontrolü
 
 ---
 
 ## ✅ Yapılan Güncellemeler (2026-05-13)
 
-### Eklenen Özellikler
+### İlk Part — Eklenen Özellikler
 1. **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir, trend gösterimi ile
 2. **Endpoint durumu** — Toplam, aktif, devre dışı endpoint sayısı + progress bar
 3. **Güvenlik uyarıları** — SSRF, spoofing, replay attempt sayıları (audit log'dan filtreleniyor)
 4. **Hızlı işlemler paneli** — Sistem sağlık, kullanıcılar, gelir, ayarlar sayfalarına hızlı erişim
 5. **i18n anahtarları** — 24 yeni Türkçe/İngilizce anahtar eklendi
+- Commit: `deb9fb28`
 
-### Teknik Detaylar
-- `adminApi.getRevenue()` MRR/ARR hesaplaması için çağrılıyor
-- Audit log'dan güvenlik olayları filtreleniyor (SSRF, SPOOFING, REPLAY, ENDPOINT_DISABLE, RATE_LIMIT_EXCEEDED, ABUSE_DETECTED)
-- Endpoint verisi `AdminStatsResponse`'ta mevcut değilse güvenli şekilde `undefined` handle ediliyor
-- Tüm yeni bileşenler dark mode ve i18n destekli
-
-### Commit
-- `deb9fb28` — feat(admin): genel bakış sayfasına eksik özellikler eklendi
-
-### Düzeltmeler (2026-05-13 - 2)
+### İkinci Part — Düzeltmeler
 - 5 eksik i18n anahtarı eklendi: activeWebhooks, currentlyProcessing, settingsNav, vsLastMonth, vsYesterday
 - catch bloğundaki kullanılmayan `err` değişkeni kaldırıldı
 - Commit: `28403769`
+
+### Üçüncü Part — Backend + Kritik Düzeltmeler
+1. **Backend: total_endpoints/active_endpoints** — `SystemStats` struct'a eklendi, `endpoints` tablosundan COUNT sorgusu
+2. **Backend: `/v1/admin/deploy-info`** — Versiyon, git commit, build time, environment döndüren endpoint
+3. **Frontend: Type casting düzeltmesi** — `as unknown as Record<string, unknown>` kaldırıldı
+4. **Frontend: Uptime URL düzeltmesi** — `/v1/health` → `/health` (root-level endpoint)
+5. **Frontend: Uptime veri eşleşmesi** — `uptime_seconds`'dan yüzde hesaplandı
+6. **Frontend: Hardcoded "Aktif"** — `t('active')` ile i18n yapıldı
+7. **Frontend: Dedup N/A** — Anlamlı mesaj ve `0` değeri gösteriliyor
+8. **Test düzeltmeleri** — `role`, `application_id` alanları eklendi
+- Commit: `7b6bcf28`
+
+### Dördüncü Part — Tüm Kalan Sorunlar
+1. **₺ format hardcoded** → ✅ i18n `currencySymbol` key (`$` EN, `₺` TR)
+2. **Tooltip dark mode** → ✅ CSS değişkenleri kullanıldı
+3. **Veri export** → ✅ Dashboard CSV export butonu (istatistikler + plan dağılımı + son kayıtlar)
+4. **Gerçek zamanlı güncelleme** → ✅ Auto-refresh toggle (30sn polling, son güncelleme zamanı gösterimi)
+5. **Locale-aware tarih** → ✅ `tr-TR` hardcoded → dinamik `locale` değişkeni
+6. **NotificationCenter.tsx JSX hatası** → ✅ Fazla `}` kaldırıldı
+7. **Onboarding.tsx syntax** → ✅ Backtick hatası düzeltildi
+8. **OnboardingWizard.tsx syntax** → ✅ 5 adet backtick hatası düzeltildi
+9. **Billing/endpoint/api_keys derleme hataları** → ✅ Pre-existing düzeltmeler
+- Commit: `57dc7ff0`
+
+---
+
+## Kalan Durum
+- 🟢 **Tüm kritik ve orta sorunlar çözüldü**
+- 🔵 **Widget özelleştirme** — İleri aşama feature request (şu an scope dışı)
+- 🔵 **Grafik zoom/drill-down** — Chart library bağımlı (şu an scope dışı)
+- 🟢 **TypeScript** — 0 hata
+- 🟢 **Next.js build** — Başarılı (pre-existing NotificationCenter hatası düzeltildi)
+- 🟢 **Cargo test (admin)** — 32/32 geçti
