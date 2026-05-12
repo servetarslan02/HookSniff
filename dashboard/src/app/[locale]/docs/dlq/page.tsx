@@ -123,9 +123,10 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">{t("free")}</td><td className="px-4 py-3">7 days</td><td className="px-4 py-3">100</td></tr>
+              <tr><td className="px-4 py-3">{t("developer")}</td><td className="px-4 py-3">7 days</td><td className="px-4 py-3">100</td></tr>
+              <tr><td className="px-4 py-3">{t("startup")}</td><td className="px-4 py-3">14 days</td><td className="px-4 py-3">1,000</td></tr>
               <tr><td className="px-4 py-3">{t("pro")}</td><td className="px-4 py-3">30 days</td><td className="px-4 py-3">5,000</td></tr>
-              <tr><td className="px-4 py-3">{t("business")}</td><td className="px-4 py-3">90 days</td><td className="px-4 py-3">50,000</td></tr>
+              <tr><td className="px-4 py-3">{t("enterprise")}</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Custom</td></tr>
             </tbody>
           </table></div>
         </div>

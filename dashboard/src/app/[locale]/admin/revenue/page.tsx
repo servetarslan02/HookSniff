@@ -9,9 +9,10 @@ import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, 
 import { useTranslations } from 'next-intl';
 
 const PLAN_COLORS: Record<string, string> = {
-  free: '#94a3b8',
+  developer: '#94a3b8',
+  startup: '#10b981',
   pro: '#4c6ef5',
-  business: '#8b5cf6',
+  enterprise: '#8b5cf6',
 };
 
 type DateRange = '7d' | '30d' | '90d' | '12m' | 'all';
@@ -20,7 +21,7 @@ export default function AdminRevenuePage() {
   const { token } = useAuth();
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [churnUsers, setChurnUsers] = useState<ChurnUser[]>([]);
-  const [planPrices, setPlanPrices] = useState<{ pro: number; business: number }>({ pro: 29, business: 99 });
+  const [planPrices, setPlanPrices] = useState<{ pro: number; enterprise: number }>({ pro: 29, enterprise: 99 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +43,7 @@ export default function AdminRevenuePage() {
       setRevenue(revenueData);
       setChurnUsers(churnData.users || []);
       if (settings) {
-        setPlanPrices({ pro: settings.plan_price_pro, business: settings.plan_price_business });
+        setPlanPrices({ pro: settings.plan_price_pro, enterprise: settings.plan_price_enterprise });
       }
     } catch {
       setError(t("failedToLoadRevenue"));
@@ -207,7 +208,7 @@ export default function AdminRevenuePage() {
           {t('proPlan') || 'Pro'}: ${planPrices.pro}/mo
         </span>
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 text-xs font-medium">
-          {t('businessPlan') || 'Business'}: ${planPrices.business}/mo
+          {t('enterprisePlan') || 'Enterprise'}: ${planPrices.enterprise}/mo
         </span>
         <span className="text-xs text-gray-400 dark:text-slate-500">{t('configurableFromSettings') || 'Configurable from Settings'}</span>
       </div>
