@@ -200,7 +200,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
 
         {/* Back link */}
         <div className="mt-8 text-center">
-          <Link href="/changelog" className="text-sm text-brand-600 dark:text-brand-400 hover:underline">← Back to all changelogs</Link>
+          <Link href="/changelog" className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('backToList')}</Link>
         </div>
       </main>
     </div>

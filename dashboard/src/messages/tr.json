@@ -106,7 +106,8 @@
     "chartTopEndpoints": "En çok kullanılan endpoint'leri gösteren grafik",
     "chartLatencyDistribution": "Gecikme dağılımını gösteren grafik",
     "loadingData": "Veriler yükleniyor...",
-    "pagination": "Sayfalama"
+    "pagination": "Sayfalama",
+    "invalidCheckoutUrl": "Geçersiz ödeme URL'si"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -1870,7 +1871,9 @@
     "testimonial2Company": "E-ticaret Platformu",
     "testimonial3Quote": "Girişimler için gerçekten çalışan ücretsiz katman. Ayda 8K webhook işliyoruz tek kuruş ödemeden. Svix $490 istiyordu.",
     "testimonial3Author": "Solo Kurucu",
-    "testimonial3Company": "Bağımsız Geliştirici"
+    "testimonial3Company": "Bağımsız Geliştirici",
+    "supportResponse48h": "< 48 saat",
+    "supportResponse24h": "< 24 saat"
   },
   "pricingFaq": [
     {
@@ -2437,7 +2440,13 @@
     "somethingWentWrong": "Bir şeyler yanlış gitti",
     "unexpectedError": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
     "tryAgain": "Tekrar dene",
-    "pleaseWait": "Lütfen bekleyin."
+    "pleaseWait": "Lütfen bekleyin.",
+    "oauthCancelled": "OAuth girişi iptal edildi.",
+    "authFailed": "Kimlik doğrulama başarısız. Lütfen tekrar giriş yapmayı deneyin.",
+    "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
+    "backToLogin": "Girişe Dön",
+    "loggingIn": "Giriş yapılıyor...",
+    "loginFailedMessage": "Giriş başarısız: {error}"
   },
   "blog": {
     "title": "Blog",
@@ -2508,7 +2517,8 @@
     "testimonial2Company": "E-Ticaret Platformu",
     "testimonial3Quote": "Gerçekten girişimler için çalışan ücretsiz katman. Ayda 8K webhook işliyoruz, tek kuruş ödemeden.",
     "testimonial3Author": "Solo Kurucu",
-    "testimonial3Company": "Bağımsız Geliştirici"
+    "testimonial3Company": "Bağımsız Geliştirici",
+    "backToList": "← Bloga Dön"
   },
   "changelog": {
     "title": "Değişiklik Günlüğü",
@@ -2534,7 +2544,8 @@
     "areaDocs": "Dokümantasyon",
     "networkError": "Ağ hatası — bağlantınızı kontrol edin.",
     "subscribeSuccess": "Başarıyla abone olundu!",
-    "emailPlaceholder": "eposta@adresiniz.com"
+    "emailPlaceholder": "eposta@adresiniz.com",
+    "backToList": "← Tüm değişiklik günlüğüne dön"
   },
   "newsletter": {
     "title": "Bülten",
@@ -2546,7 +2557,8 @@
     "whatSubscribersSay": "Aboneler ne diyor",
     "faq": "Sıkça Sorulan Sorular",
     "privacyMatters": "Gizliliğiniz önemli",
-    "privacyPolicy": "Gizlilik Politikası"
+    "privacyPolicy": "Gizlilik Politikası",
+    "viewAllPosts": "Tüm gönderileri görüntüle →"
   },
   "compare": {
     "title": "Karşılaştır",
@@ -2588,7 +2600,8 @@
     "allStories": "Tüm müşteri hikayeleri",
     "joinThousands": "Binlerce geliştiriciye katılın",
     "talkToUs": "Bizimle konuşun",
-    "builtOn": "Güvenilir altyapı üzerine inşa edildi"
+    "builtOn": "Güvenilir altyapı üzerine inşa edildi",
+    "backToList": "← Müşterilere dön"
   },
   "providers": {
     "title": "Sağlayıcılar",
