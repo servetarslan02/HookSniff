@@ -1581,7 +1581,7 @@ async fn update_feature_flag(
     .bind(id)
     .fetch_optional(&pool)
     .await?
-    .ok_or_else(|| AppError::NotFound("Feature flag not found".to_string()))?;
+    .ok_or(AppError::NotFound)?;
 
     let new_name = body.name.as_deref().unwrap_or(&current.name);
     let new_desc = body.description.as_deref().or(current.description.as_deref());
