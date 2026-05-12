@@ -1158,7 +1158,8 @@
       "users": "Users",
       "revenue": "Revenue",
       "system": "System",
-      "settingsNav": "Settings"
+      "settingsNav": "Settings",
+      "activityLog": "Activity Log"
     },
     "adminBadge": "Admin",
     "noAdminPrivileges": "You don't have admin privileges.",
@@ -1209,7 +1210,7 @@
     "infrastructureHeader": "Service",
     "recentActivity": "Recent Activity",
     "viewAll": "View All",
-    "noActivity": "No recent activity",
+    "noActivity": "No activity recorded yet",
     "auditLog": "Audit Log",
     "exportCSV": "Export CSV",
     "impersonateUser": "Impersonate",
@@ -1252,7 +1253,24 @@
     "createAlert": "Create Alert",
     "deleteAlert": "Delete Alert",
     "alertCreated": "Alert created",
-    "alertDeleted": "Alert deleted"
+    "alertDeleted": "Alert deleted",
+    "activityLog": "Activity Log",
+    "allActivities": "All Activities",
+    "action": "Action",
+    "resource": "Resource",
+    "adminUser": "Admin",
+    "timestamp": "Time",
+    "activityDesc": "View all admin actions and system events",
+    "filterByAction": "Filter by action",
+    "allActions": "All Actions",
+    "page": "Page",
+    "testWebhookTitle": "🧪 Test Webhook",
+    "testWebhookDesc": "Send a test webhook to any endpoint URL",
+    "endpointUrl": "Endpoint URL",
+    "testSending": "Sending...",
+    "responseStatus": "Response Status",
+    "responseTime": "Response Time",
+    "responseBody": "Response Body"
   },
   "landing": {
     "nav": {
