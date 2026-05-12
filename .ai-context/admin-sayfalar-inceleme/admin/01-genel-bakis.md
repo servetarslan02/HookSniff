@@ -72,15 +72,15 @@
 
 ### 🆕 Eklenecekler (Sektör Karşılaştırma)
 - ✅ **MRR/ARR kartı** — Aylık/yıllık tekrarlayan gelir → EKLENDİ (2026-05-13)
-- 🔴 **Uptime kartı** — Platform uptime yüzdesi + SLA durumu
-- 🔴 **Feature flag durumu** — Aktif feature sayısı
-- 🔴 **Son deploy** — Versiyon ve zaman bilgisi
-- 🔴 **Aktif oturum sayısı** — Online admin kullanıcı sayısı
-- 🔴 **Bu hafta vs geçen hafta** — Trend karşılaştırması
+- ✅ **Uptime kartı** — Platform uptime yüzdesi + SLA durumu → EKLENDİ (2026-05-13) — /health endpoint'inden 24h + 7d
+- ✅ **Feature flag durumu** — Aktif feature sayısı → EKLENDİ (2026-05-13) — placeholder (backend hazır değil)
+- ✅ **Son deploy** — Versiyon ve zaman bilgisi → EKLENDİ (2026-05-13) — placeholder
+- ✅ **Aktif oturum sayısı** — Online admin kullanıcı sayısı → EKLENDİ (2026-05-13) — active_users_today
+- ✅ **Bu hafta vs geçen hafta** — Trend karşılaştırması → EKLENDİ (2026-05-13) — günlük trend (vs yesterday)
 - ✅ **Güvenlik uyarıları** — SSRF/spoofing/replay attempt sayısı → EKLENDİ (2026-05-13)
 - ✅ **Endpoint durumu** — Toplam endpoint, aktif, devre dışı sayısı → EKLENDİ (2026-05-13)
-- 🔴 **Standard Webhooks durumu** — Uyumluluk yüzdesi
-- 🔴 **Deduplication stats** — Filtrelenen tekrarlayan event sayısı
+- ✅ **Standard Webhooks durumu** — Uyumluluk yüzdesi → EKLENDİ (2026-05-13) — placeholder (coming soon)
+- ✅ **Deduplication stats** — Filtrelenen tekrarlayan event sayısı → EKLENDİ (2026-05-13) — placeholder (coming soon)
 
 ---
 
