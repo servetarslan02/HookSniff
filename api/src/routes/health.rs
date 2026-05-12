@@ -315,6 +315,52 @@ pub async fn health_check(
     };
     checks.insert("last_delivery".to_string(), last_delivery_status);
 
+    // DB size check
+    let db_size_status = match sqlx::query_scalar::<_, String>(
+        "SELECT pg_size_pretty(pg_database_size(current_database()))",
+    )
+    .fetch_one(&pool)
+    .await
+    {
+        Ok(size) => json!({ "status": "healthy", "size": size }),
+        Err(e) => json!({ "status": "degraded", "error": e.to_string() }),
+    };
+    checks.insert("db_size".to_string(), db_size_status);
+
+    // Recent error logs (last 10 failed deliveries)
+    let recent_errors = match sqlx::query_as::<_, (String, Option<String>, Option<String>, chrono::DateTime<chrono::Utc>)>(
+        "SELECT id::text, event, error_message, created_at FROM deliveries WHERE status = 'failed' ORDER BY created_at DESC LIMIT 10",
+    )
+    .fetch_all(&pool)
+    .await
+    {
+        Ok(rows) => {
+            let errors: Vec<Value> = rows.iter().map(|(id, event, err, at)| {
+                json!({ "id": id, "event": event, "error": err, "created_at": at.to_rfc3339() })
+            }).collect();
+            json!({ "status": "healthy", "errors": errors })
+        }
+        Err(e) => json!({ "status": "degraded", "error": e.to_string() }),
+    };
+    checks.insert("recent_errors".to_string(), recent_errors);
+
+    // Queue details (failed in last hour)
+    let queue_detail = match sqlx::query_scalar::<_, (i64, i64, i64)>(
+        "SELECT COUNT(*) FILTER (WHERE status = 'pending'), COUNT(*) FILTER (WHERE status = 'processing'), COUNT(*) FILTER (WHERE status = 'failed' AND created_at >= NOW() - INTERVAL '1 hour') FROM deliveries",
+    )
+    .fetch_one(&pool)
+    .await
+    {
+        Ok((pending, processing, failed_1h)) => json!({
+            "status": "healthy",
+            "pending": pending,
+            "processing": processing,
+            "failed_last_hour": failed_1h
+        }),
+        Err(e) => json!({ "status": "degraded", "error": e.to_string() }),
+    };
+    checks.insert("queue_detail".to_string(), queue_detail);
+
     let status_code = if overall_healthy {
         StatusCode::OK
     } else {

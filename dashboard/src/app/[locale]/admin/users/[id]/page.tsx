@@ -28,18 +28,27 @@ export default function AdminUserDetailPage() {
   const [deliveryDetail, setDeliveryDetail] = useState<DeliveryDetail | null>(null);
   const [deliveryAttempts, setDeliveryAttempts] = useState<DeliveryAttempt[]>([]);
   const [deliveryLoading, setDeliveryLoading] = useState(false);
+  // Plan history
+  const [planHistory, setPlanHistory] = useState<Array<{ action: string; details: Record<string, unknown>; created_at: string }>>([]);
+  // Email modal
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
 
   const fetchDetail = useCallback(async () => {
     if (!token || !id) return;
     setLoading(true);
     try {
-      const [detailData, analyticsData] = await Promise.all([
+      const [detailData, analyticsData, planHistoryData] = await Promise.all([
         adminApi.getUserDetail(token, id),
         adminApi.getUserAnalytics(token, id, 30).catch(() => null),
+        adminApi.getUserPlanHistory(token, id).catch(() => ({ history: [] })),
       ]);
       setDetail(detailData);
       setAnalytics(analyticsData);
       setNewPlan(detailData.user.plan);
+      setPlanHistory(planHistoryData.history || []);
     } catch {
       toast(t("failedToLoadDetails"), "error");
     } finally {
@@ -113,6 +122,22 @@ export default function AdminUserDetailPage() {
     }
   };
 
+  const handleSendEmail = async () => {
+    if (!token || !id || !emailSubject.trim() || !emailBody.trim()) return;
+    setEmailSending(true);
+    try {
+      await adminApi.sendUserEmail(token, id, emailSubject, emailBody);
+      toast(t('emailSent') || 'Email sent successfully', 'success');
+      setShowEmailModal(false);
+      setEmailSubject('');
+      setEmailBody('');
+    } catch {
+      toast(t('emailSendFailed') || 'Failed to send email', 'error');
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -155,12 +180,20 @@ export default function AdminUserDetailPage() {
           </h1>
           <p className="text-sm text-gray-500 dark:text-slate-400">{t("userDetail")}</p>
         </div>
-        <button
-          onClick={handleImpersonate}
-          className="px-4 py-2 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-500/20 border border-amber-200 dark:border-amber-500/20 transition"
-        >
-          👁️ {t('impersonateUser')}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowEmailModal(true)}
+            className="px-4 py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 rounded-xl text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition"
+          >
+            📧 {t('sendEmail') || 'Send Email'}
+          </button>
+          <button
+            onClick={handleImpersonate}
+            className="px-4 py-2 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-500/20 border border-amber-200 dark:border-amber-500/20 transition"
+          >
+            👁️ {t('impersonateUser')}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -299,6 +332,34 @@ export default function AdminUserDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Plan History */}
+      {planHistory.length > 0 && (
+        <div className="glass-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📋 {t("planHistory") || "Plan History"}</h2>
+          </div>
+          <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+            {planHistory.map((entry, i) => (
+              <div key={i} className="px-6 py-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {String(entry.details?.new_plan || '—')}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-slate-400">
+                      {t("changedBy") || "Changed by"}: {String(entry.details?.admin_email || 'system')}
+                    </p>
+                  </div>
+                  <span className="text-xs text-gray-500 dark:text-slate-400">
+                    {new Date(entry.created_at).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Deliveries */}
       <div className="glass-card overflow-hidden">
@@ -445,6 +506,58 @@ export default function AdminUserDetailPage() {
               ) : (
                 <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-8">{t("noEndpoints")}</p>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Email Modal */}
+      {showEmailModal && detail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowEmailModal(false)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              📧 {t('sendEmail') || 'Send Email'}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              {t('sendEmailTo', { email: detail.user.email }) || `Send email to ${detail.user.email}`}
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="email-subject" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('subject') || 'Subject'}</label>
+                <input
+                  id="email-subject"
+                  type="text"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                />
+              </div>
+              <div>
+                <label htmlFor="email-body" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('message') || 'Message'}</label>
+                <textarea
+                  id="email-body"
+                  value={emailBody}
+                  onChange={(e) => setEmailBody(e.target.value)}
+                  rows={5}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end mt-4">
+              <button type="button"
+                onClick={() => setShowEmailModal(false)}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+              >
+                {tc('cancel')}
+              </button>
+              <button type="button"
+                onClick={handleSendEmail}
+                disabled={emailSending || !emailSubject.trim() || !emailBody.trim()}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition disabled:opacity-60"
+              >
+                {emailSending ? tc('saving') : t('send') || 'Send'}
+              </button>
             </div>
           </div>
         </div>

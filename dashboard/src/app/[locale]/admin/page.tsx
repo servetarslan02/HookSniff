@@ -158,6 +158,17 @@ export default function AdminOverviewPage() {
         />
       </div>
 
+      {/* Live Webhooks Indicator */}
+      {stats?.trends?.active_webhooks != null && stats.trends.active_webhooks > 0 && (
+        <div className="glass-card p-4 flex items-center gap-3 border-l-4 border-emerald-500">
+          <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-sm font-medium text-gray-900 dark:text-white">
+            {t('activeWebhooks') || 'Active webhooks'}: <strong>{stats.trends.active_webhooks}</strong>
+          </span>
+          <span className="text-xs text-gray-500 dark:text-slate-400">{t('currentlyProcessing') || 'currently processing'}</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Users by Plan Chart */}
         <div className="glass-card p-6">
