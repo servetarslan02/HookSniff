@@ -476,9 +476,9 @@ pub async fn rate_limit_middleware(
 
     // Try to determine the customer's plan
     let plan = if let Some(prefix) = extract_api_key_prefix(&req) {
-        limiter.get_plan(&prefix).await.unwrap_or(Plan::Free)
+        limiter.get_plan(&prefix).await.unwrap_or(Plan::Developer)
     } else {
-        Plan::Free
+        Plan::Developer
     };
 
     let plan_limit = plan.max_requests_per_minute();
@@ -613,9 +613,9 @@ mod tests {
     #[tokio::test]
     async fn set_plan_overwrites() {
         let limiter = InMemoryRateLimiter::new();
-        limiter.set_plan("prefix_xyz", Plan::Free).await;
-        limiter.set_plan("prefix_xyz", Plan::Business).await;
-        assert_eq!(limiter.get_plan("prefix_xyz").await, Some(Plan::Business));
+        limiter.set_plan("prefix_xyz", Plan::Developer).await;
+        limiter.set_plan("prefix_xyz", Plan::Enterprise).await;
+        assert_eq!(limiter.get_plan("prefix_xyz").await, Some(Plan::Enterprise));
     }
 
     // ── RateLimiter wrapper ────────────────────────────────────

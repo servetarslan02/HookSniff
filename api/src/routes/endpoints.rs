@@ -36,7 +36,7 @@ async fn list_endpoints(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<EndpointResponse>>, AppError> {
     let endpoints = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -63,6 +63,21 @@ async fn create_endpoint(
     if endpoint_count.0 as u32 >= plan.max_endpoints() {
         return Err(AppError::BadRequest(
             "Endpoint limit reached. Upgrade your plan for more endpoints.".into(),
+        ));
+    }
+
+    // Validate that the application belongs to this customer
+    let app_exists: (bool,) = sqlx::query_as(
+        "SELECT EXISTS(SELECT 1 FROM applications WHERE id = $1 AND customer_id = $2)",
+    )
+    .bind(req.application_id)
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    if !app_exists.0 {
+        return Err(AppError::BadRequest(
+            "Application not found or does not belong to your account".into(),
         ));
     }
 
@@ -117,8 +132,8 @@ async fn create_endpoint(
         .and_then(|rp| serde_json::to_value(rp).ok());
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers, retry_policy, routing_strategy, fallback_url)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *"#,
+        r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers, retry_policy, routing_strategy, fallback_url, application_id)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *"#,
     )
     .bind(customer.id)
     .bind(&req.url)
@@ -130,6 +145,7 @@ async fn create_endpoint(
     .bind(&retry_policy_json)
     .bind(req.routing_strategy.as_deref().unwrap_or("round-robin"))
     .bind(&req.fallback_url)
+    .bind(req.application_id)
     .fetch_one(&pool)
     .await?;
 
@@ -148,7 +164,7 @@ async fn get_endpoint(
     Path(id): Path<Uuid>,
 ) -> Result<Json<EndpointResponse>, AppError> {
     let endpoint =
-        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -206,7 +222,7 @@ async fn update_endpoint(
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Verify ownership
     let _existing =
-        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -307,7 +323,7 @@ async fn update_retry_policy(
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Verify ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -337,7 +353,7 @@ async fn rotate_secret(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Get current endpoint
     let endpoint =
-        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)

@@ -69,7 +69,7 @@ impl IyzicoConfig {
     fn price_for_plan(&self, plan: &Plan) -> Option<i64> {
         match plan {
             Plan::Pro => Some(self.price_pro_kurus),
-            Plan::Business => Some(self.price_business_kurus),
+            Plan::Enterprise => Some(self.price_business_kurus),
             _ => None,
         }
     }
@@ -497,13 +497,13 @@ mod tests {
     #[test]
     fn price_for_plan_business() {
         let config = test_config();
-        assert_eq!(config.price_for_plan(&Plan::Business), Some(44900));
+        assert_eq!(config.price_for_plan(&Plan::Enterprise), Some(44900));
     }
 
     #[test]
     fn price_for_plan_free_returns_none() {
         let config = test_config();
-        assert_eq!(config.price_for_plan(&Plan::Free), None);
+        assert_eq!(config.price_for_plan(&Plan::Developer), None);
     }
 
     #[test]

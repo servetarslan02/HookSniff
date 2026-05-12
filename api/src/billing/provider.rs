@@ -242,7 +242,7 @@ mod tests {
     fn webhook_result_subscription_created_with_none_fields() {
         let result = WebhookResult::SubscriptionCreated {
             customer_id: Uuid::new_v4(),
-            plan: Plan::Free,
+            plan: Plan::Developer,
             provider_customer_id: None,
             provider_subscription_id: None,
         };
@@ -263,7 +263,7 @@ mod tests {
     fn webhook_result_subscription_updated() {
         let result = WebhookResult::SubscriptionUpdated {
             provider_subscription_id: "sub_789".to_string(),
-            plan: Plan::Business,
+            plan: Plan::Enterprise,
             status: "active".to_string(),
         };
         match result {
@@ -273,7 +273,7 @@ mod tests {
                 status,
             } => {
                 assert_eq!(provider_subscription_id, "sub_789");
-                assert_eq!(plan, Plan::Business);
+                assert_eq!(plan, Plan::Enterprise);
                 assert_eq!(status, "active");
             }
             _ => panic!("Expected SubscriptionUpdated"),
