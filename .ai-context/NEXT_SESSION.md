@@ -1,8 +1,8 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 14:31 GMT+8
-> **Son commit:** f572c263 (main)
-> **Son oturum:** Oturum 125 — Görsel Tutarlılık (7 commit, 60+ dosya)
+> **Son güncelleme:** 2026-05-12 17:59 GMT+8
+> **Son commit:** 6869a1c2 (main)
+> **Son oturum:** Oturum 126 — Admin Panel Eksikleri (1 commit, 7 dosya)
 
 ## Hemen Başla
 
