@@ -1,71 +1,39 @@
-# NEXT_SESSION.md — Sonraki Oturum Rehberi
+# NEXT_SESSION.md — Oturum 129+
 
-> **Son güncelleme:** 2026-05-12 19:38 GMT+8
-> **Son commit:** 535bb062 (main)
-> **Son oturum:** Oturum 128 Ek — 4 Paralel Agent (~50 madde tamamlandı)
+> Son güncelleme: 2026-05-12 20:42 GMT+8 (Oturum 128+)
 
-## Hemen Başla
+## Kaldığımız Yer
+4 paralel agent çalıştırıldı, 3'ü tamamlandı:
+- ✅ Content & Docs — OpenAPI audit, email templates, git history cleanup, Servet notları
+- ✅ Code Quality — CI pipeline, worker health probes, release verification, Terraform/HPA docs
+- ✅ Backend Fixes — Tüm items zaten önceki oturumlarda yapılmış, doğrulandı
+- 🔄 Frontend Refactor — 9 mega component dosyası küçültülüyor (hâlâ çalışıyor)
 
-1. `git pull origin main` — en son değişiklikleri al
-2. `MEMORY.md` oku — proje durumunu öğren
-3. `IMPLEMENTATION-PLAN.md` bak — ⬜ ve 🟡 maddeler kalan
+## Bir Sonraki Adımlar
+1. Frontend refactor agent tamamlanacak, commit edilecek
+2. `next build` ile doğrulanacak
+3. `cargo test --lib` ile Rust testleri doğrulanacak
+4. Tüm değişiklikler GitHub'a push edilecek
+5. IMPLEMENTATION-PLAN.md güncellenecek
 
-## 📊 Admin Panel Durumu
+## Kalan Önemli Maddeler (⬜)
+- Items 200-206: Email template'leri (7 madde — büyük iş)
+- Items 247-259: Payments & Billing (13 madde — büyük iş)
+- Item 260: JWT HS256 → asymmetric
+- Item 302: OnboardingWizard refactoring (649 satır)
+- Items 306-314: Mega component refactoring (8 dosya)
+- Items 353-354: SDK coverage
 
-| Özellik | Backend | Frontend | Durum |
-|---------|---------|----------|-------|
-| Stats API (DATABASE_ERROR) | ✅ Migration 009 | ✅ Overview sayfası | ✅ Tamam |
-| Revenue API (Neon fix) | ✅ SQL düzeltildi | ✅ Revenue sayfası | ✅ Tamam |
-| Audit Log | ✅ Endpoint mevcut | ✅ Activity sayfası | ✅ Tamam |
-| Event Replay | ✅ Endpoint mevcut | ✅ User Detail buton | ✅ Tamam |
-| CSV Export | ✅ Endpoint mevcut | ✅ Users + Revenue buton | ✅ Tamam |
-| Impersonate | ✅ Endpoint mevcut | ✅ Users + User Detail buton | ✅ Tamam |
-| Alert Thresholds | ✅ CRUD API eklendi | ✅ Settings sayfası bağlandı | ✅ Tamam |
-| Customer Charts | ✅ Endpoint mevcut | ✅ User Detail grafikler | ✅ Tamam |
-| Webhook Test | ✅ Endpoint mevcut | ✅ System sayfası | ✅ Tamam |
-| Churn Analysis | ✅ Endpoint mevcut | ✅ Revenue sayfası | ✅ Tamam |
+## Bilinen Sorunlar
+- Alternatives sayfaları taraflı (HookSniff her kategoride kazanıyor)
+- Testimonial'lar sahte (ShopFlow, PayFlow fictional)
+- Blog teknik iddiaları doğrulanmalı
+- Grafana trial 20 Mayıs'ta bitiyor
+- GitHub PAT + GCP SA key rotate edilmeli
 
-## 📋 Sıradaki Öncelikler
-
-### Admin Panel Kalan
-| # | Görev | Öncelik |
-|---|-------|---------|
-| 1 | ~~Alert Thresholds backend bağlantısı~~ | ✅ Tamamlandı (Oturum 128) |
-| 2 | ~~Migration 009 Neon DB'ye uygula~~ | ✅ | 46 migration zaten uygulanmış, 53 tablo mevcut (Oturum 128) |
-| 3 | `cargo test` + `cargo clippy` doğrulama (Rust toolchain gerekli) | 🔴 |
-| 4 | `next build` doğrulama | 🔴 |
-
-### AŞAMA 4 Kalan (Frontend)
-| # | Görev | Öncelik |
-|---|-------|---------|
-| 301-314 | Mega component refactoring — kalan sayfalar (OnboardingWizard, endpoints, settings, portal-customize, retry-policy, team, api-importer, api-keys, playground public) | 🟡 |
-| 339 | BadRequest messages developer-facing | 🟡 |
-
-### AŞAMA 10-13 Kalan (Düşük öncelik)
-| # | Görev | Öncelik |
-|---|-------|---------|
-| 247-259 | Payments & Billing (13 madde) | 🟡 |
-| 260-264 | Crypto (5 madde) | 🟡 |
-| 287-290 | Shared crate, billing abstraction, main.rs modülerleştirme (TODO comment'leri eklendi) | 🟢 |
-| 356-359 | Content quality (4 madde) | 🟢 |
-| 360-364 | Servet'in yapması gerekenler (5 madde) | 🔴 |
-| 26 | Poisoned mutex panics | 🟡 |
-| 38 | No rollback strategy | 🟡 |
-| 39 | Hardcoded secrets in Helm | 🟡 |
-
-## Kritik Hatırlatmalar
-- **Oturum süresi:** 1 saat — işleri batch'le, sık commit yap
-- **Push etmeyi unutma!** Her oturum sonunda `git push origin main`
-- **Rust compile + test zorunlu** — gözle bakarak yetmez
-- **Conventional commits** — "fix:", "feat:", "docs:" kullan
-- **Build doğrulama:** Her frontend değişikliği sonrası `next build`
-- **Migration 009** Neon DB'ye uygulanmalı (run-migrations.js)
-
-## ✅ Doğrulama Durumu
-- `cargo test --lib` → 1019 test geçti, 0 hata ✅
-- `cargo clippy` → 0 uyarı ✅
-- `next build` → 214 sayfa, 6.6s ✅
-
----
-
-*Bu dosya her oturum sonunda güncellenmeli.*
+## Servet'in Yapması Gereken
+- GitHub PAT rotate (chat'te paylaşıldı)
+- GCP SA key rotate
+- GitHub Actions billing güncelle
+- Stripe payout + identity verification (Polar.sh)
+- Grafana trial upgrade kararı
