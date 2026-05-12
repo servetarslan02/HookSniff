@@ -95,7 +95,7 @@
 - [ ] Payload transformation (webhook payload'ı dönüştürme)
 
 ### Backend Teknik Borç
-- [ ] Plan fiyatlarını DB'den oku (hardcoded → platform_settings) ✅ TAMAMLANDI
+- [x] Plan fiyatlarını DB'den oku (hardcoded → platform_settings) ✅ TAMAMLANDI
 - [ ] `deny_unknown_fields` kritik request struct'larına ekle
 - [ ] `SELECT *` → spesifik kolon listele (events.rs)
 - [ ] Outbound IP'leri dinamik çek (cache TTL ile)
