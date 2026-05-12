@@ -60,7 +60,7 @@ async fn list_endpoint_health(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<EndpointHealth>>, AppError> {
     let endpoints = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -134,7 +134,7 @@ async fn get_endpoint_health(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<EndpointHealth>, AppError> {
     let ep = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
