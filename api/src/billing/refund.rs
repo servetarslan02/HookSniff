@@ -77,7 +77,7 @@ pub async fn process_refund(
         ));
     }
 
-    // 3. Cancel subscription at provider
+    // 3. Cancel subscription at provider (before DB transaction — external call)
     let billing_svc = BillingService::new(pool.clone(), cfg.clone());
     if let Err(e) = billing_svc.cancel_customer_subscription(&customer).await {
         tracing::warn!(
@@ -88,7 +88,10 @@ pub async fn process_refund(
         );
     }
 
-    // 4. Update most recent invoice to "refunded"
+    // 4. DB transaction: update invoice + downgrade customer (atomic)
+    let mut tx = pool.begin().await?;
+
+    // Update most recent invoice to "refunded"
     sqlx::query(
         "UPDATE invoices SET status = 'refunded' \
          WHERE id = (\
@@ -98,10 +101,10 @@ pub async fn process_refund(
          )",
     )
     .bind(customer_id)
-    .execute(pool)
+    .execute(&mut *tx)
     .await?;
 
-    // 5. Downgrade to Free plan
+    // Downgrade to Free plan
     let free_limit = Plan::Free.max_webhooks_per_month() as i32;
     sqlx::query(
         "UPDATE customers SET \
@@ -113,10 +116,12 @@ pub async fn process_refund(
     )
     .bind(free_limit)
     .bind(customer_id)
-    .execute(pool)
+    .execute(&mut *tx)
     .await?;
 
-    // 6. Log the refund event
+    tx.commit().await?;
+
+    // 5. Log the refund event (after commit — best effort)
     crate::audit::log_action(
         pool,
         customer_id,
@@ -186,7 +191,9 @@ pub async fn handle_chargeback(
     let (customer_id,) =
         customer_id.ok_or(AppError::NotFound)?;
 
-    // 2. Suspend account — downgrade to free and mark as suspended
+    // 2. Suspend account — downgrade to free and mark as suspended (in transaction)
+    let mut tx = pool.begin().await?;
+
     let free_limit = Plan::Free.max_webhooks_per_month() as i32;
     let clear_sub_col = match provider {
         "polar" => "polar_subscription_id = NULL",
@@ -204,10 +211,25 @@ pub async fn handle_chargeback(
     ))
     .bind(free_limit)
     .bind(customer_id)
-    .execute(pool)
+    .execute(&mut *tx)
     .await?;
 
-    // 3. Cancel subscription at provider (best-effort)
+    // Update latest invoice to "refunded"
+    sqlx::query(
+        "UPDATE invoices SET status = 'refunded' \
+         WHERE id = (\
+           SELECT id FROM invoices \
+           WHERE customer_id = $1 AND status = 'paid' \
+           ORDER BY created_at DESC LIMIT 1\
+         )",
+    )
+    .bind(customer_id)
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    // 3. Cancel subscription at provider (best-effort, after commit)
     let billing_svc = BillingService::new(pool.clone(), cfg.clone());
     if let Err(e) = billing_svc
         .cancel_at_provider(provider, provider_subscription_id)
@@ -221,20 +243,7 @@ pub async fn handle_chargeback(
         );
     }
 
-    // 4. Update latest invoice to "refunded"
-    sqlx::query(
-        "UPDATE invoices SET status = 'refunded' \
-         WHERE id = (\
-           SELECT id FROM invoices \
-           WHERE customer_id = $1 AND status = 'paid' \
-           ORDER BY created_at DESC LIMIT 1\
-         )",
-    )
-    .bind(customer_id)
-    .execute(pool)
-    .await?;
-
-    // 5. Log chargeback event
+    // 4. Log chargeback event
     crate::audit::log_action(
         pool,
         customer_id,
