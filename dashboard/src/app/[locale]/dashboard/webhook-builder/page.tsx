@@ -40,7 +40,8 @@ const TEMPLATES = {
 };
 
 export default function WebhookBuilderPage() {
-  const t = useTranslations('webhookBuilder');
+  const t = useTranslations("webhookBuilder");
+  const tc = useTranslations("common");
   const { token } = useAuth();
   const { toast } = useToast();
   const [eventType, setEventType] = useState('order.created');
@@ -189,7 +190,7 @@ export default function WebhookBuilderPage() {
                   />
                   <button
                     onClick={() => removeField(i)}
-                    aria-label="Kaldır"
+                    aria-label={tc("remove")}
                     className="px-3 py-3 text-red-500 hover:text-red-700 transition"
                   >
                     ✕
