@@ -1390,7 +1390,18 @@
     "na": "—",
     "percent": "%",
     "more": "daha fazla",
-    "dedupNotAvailable": "Tekrar algılama henüz yapılandırılmadı. Başlamak için özellik bayrağını etkinleştirin."
+    "dedupNotAvailable": "Tekrar algılama henüz yapılandırılmadı. Başlamak için özellik bayrağını etkinleştirin.",
+    "currencySymbol": "₺",
+    "autoRefresh": "Otomatik yenileme",
+    "autoRefreshEnabled": "Otomatik yenileme etkin",
+    "autoRefreshDisabled": "Otomatik yenileme devre dışı",
+    "exportDashboard": "Paneli Dışa Aktar",
+    "exporting": "Dışa aktarılıyor...",
+    "exportSuccess": "Panel başarıyla dışa aktarıldı",
+    "widgetCustomization": "Widget Özelleştirme",
+    "weekVsLastWeek": "Bu hafta vs geçen hafta",
+    "drillDown": "Detaya İn",
+    "realTimeUpdates": "Gerçek Zamanlı Güncelleme"
   },
   "landing": {
     "nav": {
