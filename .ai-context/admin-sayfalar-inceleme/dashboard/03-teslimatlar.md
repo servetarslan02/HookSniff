@@ -91,3 +91,68 @@
 - Endpoint bazlı filtreleme yok
 - Event type bazlı filtreleme yok
 - Teslimat detayında request/response body gösterimi yok (modalda)
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Webhook Export Butonu Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`
+- **Backend:** `GET /v1/webhooks/export?status=...&format=csv|json` — teslimatları dışa aktarır
+- **Sorun:** api.ts'de `webhooksApi.export` tanımlı değil, UI'da buton yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     exportDeliveries: (token: string, params?: { status?: string; format?: string }) => {
+       const qs = new URLSearchParams(params).toString();
+       return apiFetch<string>(`/webhooks/export${qs ? `?${qs}` : ''}`, { token });
+     },
+     ```
+  2. Sayfa header'ına "Dışa Aktar" butonu ekle
+  3. Format seçici: CSV / JSON dropdown
+  4. Mevcut filtre durumunu export'a aktar
+  5. Dosya indirme: `Blob` + `URL.createObjectURL` + `<a download>`
+  6. i18n key: `exportDeliveries`, `exportCSV`, `exportJSON`, `exporting`
+
+#### BF-02: Batch Replay Butonu Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`
+- **Backend:** `POST /v1/webhooks/batch/replay` — toplu tekrar gönderme
+- **Sorun:** api.ts'de `webhooksApi.batchReplay` tanımlı değil, UI'da buton yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     batchReplay: (token: string, deliveryIds: string[]) =>
+       apiFetch<{ replayed: number }>('/webhooks/batch/replay', { method: 'POST', body: { delivery_ids: deliveryIds }, token }),
+     ```
+  2. Tablo satırlarına checkbox ekle
+  3. "Seçilenleri Tekrar Gönder" butonu (toplu işlem bar'ında)
+  4. ConfirmDialog: "X teslimat tekrar gönderilecek"
+  5. Progress göstergesi (başarı/hata sayısı)
+  6. i18n key: `batchReplay`, `batchReplayConfirm`, `replayProgress`
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`
+- **Sorun:** 2 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+### 🔒 Güvenlik
+
+#### G-01: "View Details" Hardcoded
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`
+- **Sorun:** `View Details` metni i18n key kullanılmamış.
+- **Adımlar:**
+  1. i18n key ekle: `viewDetails`
+  2. `t('viewDetails')` kullan
+
+### 🔒 Memory Leak
+
+#### ML-01: deliveries/[id] — setTimeout Cleanup Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/[id]/page.tsx`
+- **Sorun:** `setTimeout` kullanılıyor ama `clearTimeout` yok.
+- **Adımlar:**
+  1. useEffect içinde timer oluştur
+  2. Return'de `clearTimeout(timer)` ekle

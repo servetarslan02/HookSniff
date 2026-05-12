@@ -64,3 +64,45 @@ interface Schema {
 4. **Schema Düzenleme** — Mevcut schema'yı güncelleme
    - Backend: `PUT /v1/schemas/{id}` endpoint'i eklenmeli
    - Frontend: düzenleme formu (modal veya inline)
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Schema Oluşturma Formu Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/schemas/page.tsx`
+- **Backend:** `POST /v1/schemas` — schema oluşturma
+- **Sorun:** Sadece listeleme var, oluşturma formu yok.
+- **Adımlar:**
+  1. "Yeni Schema" butonu ekle
+  2. Modal form: name (input), version (input), schema (JSON textarea)
+  3. `apiFetch('/schemas', { method: 'POST', body: { name, version, schema }, token })` çağrısı
+  4. Başarı sonrası listeyi yenile
+  5. i18n key: `createSchema`, `schemaName`, `schemaVersion`, `schemaBody`
+
+#### BF-02: Schema Doğrulama Aracı Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/schemas/page.tsx`
+- **Backend:** `POST /v1/schemas/{id}/validate` — event doğrulama
+- **Sorun:** api.ts'de tanımlı değil, UI'da buton yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     validateEvent: (token: string, schemaId: string, event: unknown) =>
+       apiFetch<{ valid: boolean; errors?: string[] }>(`/schemas/${schemaId}/validate`, { method: 'POST', body: event, token }),
+     ```
+  2. Her schema kartına "Doğrula" butonu ekle
+  3. Modal: Event payload textarea + "Doğrula" butonu + sonuç gösterimi
+  4. i18n key: `validateEvent`, `validEvent`, `invalidEvent`, `validationErrors`
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/schemas/page.tsx`
+- **Sorun:** 2 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/schemas/page.tsx`
+- **Sorun:** Tüm şemalar tek seferde yükleniyor.

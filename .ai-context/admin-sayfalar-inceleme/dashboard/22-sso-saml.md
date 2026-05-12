@@ -41,3 +41,30 @@
 - Sertifika geçerlilik kontrolü
 - SSO kullanıcı eşleştirmesi
 - SSO activity log
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: SSO Test Butonu Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/sso/page.tsx`
+- **Backend:** `POST /v1/sso/test` — SSO bağlantı testi
+- **Sorun:** api.ts'de tanımlı değil, UI'da buton yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     testSso: (token: string) =>
+       apiFetch<{ success: boolean; message: string }>('/sso/test', { method: 'POST', token }),
+     ```
+  2. SSO yapılandırma formuna "Bağlantıyı Test Et" butonu ekle
+  3. Sonuç: ✅ Başarılı / ❌ Başarısız + hata mesajı
+  4. i18n key: `testSsoConnection`, `ssoTestSuccess`, `ssoTestFailed`
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/sso/page.tsx`
+- **Sorun:** 2 useEffect, 5 fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)

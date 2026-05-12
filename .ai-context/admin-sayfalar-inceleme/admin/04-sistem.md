@@ -70,3 +70,15 @@ interface SystemHealth {
 - Servis restart butonu yok
 - Alert entegrasyonu yok
 - Geçmiş sağlık verisi yok
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔒 Güvenlik
+
+#### G-01: Raw Fetch Kullanımı (2 yer)
+- **Dosya:** `dashboard/src/app/[locale]/admin/system/page.tsx`
+- **Sorun:** 2 yerde `fetch()` kullanılıyor.
+- **Adımlar:**
+  1. `fetch()` → `apiFetch()` veya `adminApi` metodına çevir

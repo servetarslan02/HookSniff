@@ -71,3 +71,44 @@
 - **Uptime göstergesi** — Platform uptime yüzdesi (SLA takibi)
 - **Feature flag durumu** — Aktif/pasif feature sayısı
 - **Son deploy bilgisi** — Son deployment zamanı ve versiyon
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
+- **Sorun:** 3 `useEffect` var ama AbortController yok. Kullanıcı sayfadan çıkınca API yanıtı gelirse state güncellenir.
+- **Adımlar:**
+  1. Her useEffect başında `const controller = new AbortController()` oluştur
+  2. `apiFetch` çağrısına `{ signal: controller.signal }` ekle
+  3. useEffect return'ünde `return () => controller.abort()` ekle
+  4. Fetch callback'inde `if (!controller.signal.aborted)` kontrolü ekle
+
+#### P-02: Pagination Eksik — Recent Deliveries
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
+- **Sorun:** Son teslimatlar sadece ilk 5 kayıt. Tüm liste tek seferde yükleniyor.
+- **Adımlar:**
+  1. `webhooksApi.list(token, { page: 1 })` çağrısını pagination'lı yap
+  2. "Tüm Teslimatları Gör" linki ekle → `/deliveries` sayfasına yönlendir
+
+### 🔒 Güvenlik
+
+#### G-01: Error State UI'da Gösterilmiyor
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
+- **Sorun:** `_error` state tanımlanmış ama UI'da gösterilmiyor (sadece console).
+- **Adımlar:**
+  1. Error banner bileşeni ekle (kapatılabilir)
+  2. `{error && <ErrorBanner message={error} onRetry={fetchData} />}` ekle
+  3. i18n key: `dashboardError`, `dashboardErrorDesc`
+
+### 🎨 Erişilebilirlik
+
+#### E-01: type="button" Eksik Butonlar
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
+- **Sorun:** Butonlarda `type="button"` yok. Form içinde yanlışlıkla submit olabilir.
+- **Adımlar:**
+  1. Tüm `<button` etiketlerine `type="button"` ekle (form submit butonları hariç)
+  2. `aria-label` ekle (emoji-only butonlar için)
