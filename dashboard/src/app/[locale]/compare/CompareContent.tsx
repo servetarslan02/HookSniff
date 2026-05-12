@@ -496,7 +496,7 @@ export default function CompareContent() {
         {/* CTA */}
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-2xl font-bold text-white mb-2">Ready to try HookSniff?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-6">Start free. Scale when ready. No credit card required.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">Start free. Scale when ready. No credit card required.</p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
             <Link href="/pricing" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("viewPricing")}</Link>

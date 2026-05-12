@@ -104,7 +104,8 @@
     "chartErrorBreakdown": "Chart showing error breakdown by type",
     "chartTopEndpoints": "Chart showing top endpoints by delivery volume",
     "chartLatencyDistribution": "Chart showing latency distribution",
-    "loadingData": "Loading data..."
+    "loadingData": "Loading data...",
+    "pagination": "Pagination"
   },
   "nav": {
     "dashboard": "Dashboard",

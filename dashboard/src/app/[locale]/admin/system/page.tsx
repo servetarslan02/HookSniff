@@ -159,7 +159,7 @@ export default function AdminSystemPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
           {t('systemHealthDesc')}
         </p>
@@ -197,7 +197,7 @@ export default function AdminSystemPage() {
               allOk ? 'bg-green-500'
                 : someDegraded ? 'bg-yellow-500'
                 : 'bg-red-500'
-            }`} />
+            }`} aria-hidden="true" />
             <span className="text-lg font-semibold text-gray-900 dark:text-white">
               {allOk ? t('allOperational')
                 : someDegraded ? t('partialDegradation')
@@ -218,7 +218,7 @@ export default function AdminSystemPage() {
       </div>
 
       {/* Service Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {services.map((service) => {
           const colors = statusColor(service.status);
           return (
@@ -232,13 +232,13 @@ export default function AdminSystemPage() {
                   </div>
                 </div>
                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
-                  <span className={`w-2 h-2 rounded-full ${colors.dot}`} />
+                  <span className={`w-2 h-2 rounded-full ${colors.dot}`} aria-hidden="true" />
                   {service.status}
                 </span>
               </div>
               {service.latency !== null && service.latency !== undefined && (
                 <div className="mt-3">
-                  <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden" role="progressbar" aria-valuenow={service.latency} aria-valuemin={0} aria-valuemax={500} aria-label={`${service.name}: ${service.latency}ms`}>
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         service.latency < 50 ? 'bg-green-500' :

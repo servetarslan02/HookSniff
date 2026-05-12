@@ -127,10 +127,10 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="md:pl-64">
+      {/* Main content — Item 87: full width on mobile, offset on desktop */}
+      <div className="min-w-0 md:pl-64">
         {/* Item 127 — Top bar with ARIA landmark */}
-        <header role="banner" className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
+        <header role="banner" className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-3 sm:px-4 md:px-8 transition-colors duration-300">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -140,13 +140,14 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               aria-expanded={sidebarOpen}
             >
               <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <title>{tc("openSidebar")}</title>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <div className="text-lg font-semibold text-gray-900 dark:text-white">
                 {adminNavigation.find((n) => n.href === pathname)?.nameKey ? t(`nav.${adminNavigation.find((n) => n.href === pathname)!.nameKey}`) : t('adminPanel')}
-              </h1>
+              </div>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">
                 {t('adminBadge')}
               </span>
@@ -166,7 +167,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Item 127/128 — Page content with ARIA landmark and skip-to-content target */}
-        <main id="admin-main-content" role="main" className="p-4 md:p-8 page-enter">{children}</main>
+        <main id="admin-main-content" role="main" className="p-3 sm:p-4 md:p-8 page-enter overflow-x-hidden">{children}</main>
       </div>
     </div>
   );

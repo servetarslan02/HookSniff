@@ -190,7 +190,7 @@ export default function SearchPage() {
 
             {/* Pagination */}
             {results.total > results.per_page && (
-              <div className="px-6 py-4 border-t border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
+              <nav aria-label={tc("pagination")} role="navigation" className="px-6 py-4 border-t border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}

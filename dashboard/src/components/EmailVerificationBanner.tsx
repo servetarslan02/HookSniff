@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 
 export function EmailVerificationBanner() {
   const t = useTranslations('emailVerification');
+  const tc = useTranslations('common');
   const { user, token } = useAuth();
   const { toast } = useToast();
   const [dismissed, setDismissed] = useState(false);
@@ -72,6 +73,7 @@ export function EmailVerificationBanner() {
           </button>
           <button
             onClick={() => setDismissed(true)}
+            aria-label={tc('dismiss')}
             className="text-amber-400 hover:text-amber-600 transition p-1"
           >
             ✕

@@ -361,7 +361,7 @@ function IncidentLog({ incidents }: { incidents: Incident[] }) {
 
   if (incidents.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-400 dark:text-slate-500">
+      <div className="text-center py-8 text-gray-500 dark:text-slate-400">
         <div className="text-3xl mb-2">🎉</div>
         <p>No incidents in the past 30 days</p>
       </div>
@@ -467,7 +467,7 @@ function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
         </div>
       )}
       {upcoming.length === 0 && past.length === 0 && (
-        <div className="text-center py-6 text-gray-400 dark:text-slate-500">
+        <div className="text-center py-6 text-gray-500 dark:text-slate-400">
           <p className="text-sm">{t("noScheduled")}</p>
         </div>
       )}
@@ -692,7 +692,7 @@ export default function StatusPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-sm text-gray-400 dark:text-slate-500 space-y-1">
+        <div className="text-center text-sm text-gray-500 dark:text-slate-400 space-y-1">
           <p>
             Version {process.env.NEXT_PUBLIC_VERSION || '0.1.0'} •{' '}
             <Link href="/" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300">hooksniff.vercel.app</Link>{' '}

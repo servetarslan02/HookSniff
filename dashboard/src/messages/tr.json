@@ -104,7 +104,8 @@
     "chartErrorBreakdown": "Hata dağılımını gösteren grafik",
     "chartTopEndpoints": "En çok kullanılan endpoint'leri gösteren grafik",
     "chartLatencyDistribution": "Gecikme dağılımını gösteren grafik",
-    "loadingData": "Veriler yükleniyor..."
+    "loadingData": "Veriler yükleniyor...",
+    "pagination": "Sayfalama"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",

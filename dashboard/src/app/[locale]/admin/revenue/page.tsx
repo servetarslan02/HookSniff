@@ -5,8 +5,9 @@ import { useAuth } from '@/lib/store';
 import { adminApi, type RevenueResponse } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
-import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
+import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell, Legend } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
+import EmptyState from '@/components/EmptyState';
 
 const PLAN_COLORS: Record<string, string> = {
   free: '#94a3b8',
@@ -19,6 +20,7 @@ export default function AdminRevenuePage() {
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<string>('all');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
@@ -70,7 +72,10 @@ export default function AdminRevenuePage() {
     );
   }
 
-  const monthlyData = revenue?.monthly_revenue || [];
+  const allMonthlyData = revenue?.monthly_revenue || [];
+  const monthlyData = dateRange === 'all'
+    ? allMonthlyData
+    : allMonthlyData.slice(-parseInt(dateRange));
   const planData = revenue?.revenue_by_plan?.map((item) => ({
     name: item.plan.charAt(0).toUpperCase() + item.plan.slice(1),
     value: item.revenue,
@@ -79,15 +84,42 @@ export default function AdminRevenuePage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-          {t('revenueDesc')}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            {t('revenueDesc')}
+          </p>
+        </div>
+        <button
+          onClick={fetchRevenue}
+          disabled={loading}
+          className="self-start px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition disabled:opacity-50 flex items-center gap-2"
+          aria-label={tc('refresh')}
+        >
+          <span className={loading ? 'animate-spin' : ''} aria-hidden="true">🔄</span>
+          {tc('refresh')}
+        </button>
+      </div>
+
+      {/* Date range filter — Item 90 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <label htmlFor="date-range-select" className="text-sm text-gray-500 dark:text-slate-400">{t('dateRange')}:</label>
+        <select
+          id="date-range-select"
+          value={dateRange}
+          onChange={(e) => setDateRange(e.target.value)}
+          className="px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
+        >
+          <option value="all">{t('allTime')}</option>
+          <option value="3">{t('lastMonths', { count: 3 })}</option>
+          <option value="6">{t('lastMonths', { count: 6 })}</option>
+          <option value="12">{t('lastMonths', { count: 12 })}</option>
+        </select>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <StatCard
           label={t('mrr')}
           value={`₺${(revenue?.mrr || 0).toLocaleString()}`}
@@ -109,11 +141,11 @@ export default function AdminRevenuePage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Monthly Revenue Chart */}
         <div className="lg:col-span-2">
           <ChartCard title={t('monthlyRevenue')} subtitle={t('revenueOverTime')}>
-            <div className="h-80">
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -153,7 +185,7 @@ export default function AdminRevenuePage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('revenueByPlan')}</h2>
           {planData.length > 0 ? (
             <>
-              <div className="h-48">
+              <div className="h-40 sm:h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -181,6 +213,12 @@ export default function AdminRevenuePage() {
                       }}
                       formatter={(value: number) => [`₺${value.toLocaleString()}`, t("revenue")]}
                     />
+                    <Legend
+                      verticalAlign="bottom"
+                      iconType="circle"
+                      iconSize={8}
+                      formatter={(value: string) => <span className="text-xs text-gray-600 dark:text-slate-400">{value}</span>}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -207,7 +245,7 @@ export default function AdminRevenuePage() {
               </div>
             </>
           ) : (
-            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noRevenue')}</p>
+            <EmptyState icon="💰" title={t('noRevenue')} description={t('noRevenueDesc')} />
           )}
         </div>
       </div>

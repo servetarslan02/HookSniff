@@ -123,15 +123,15 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('userManagement')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('userManagement')}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
           {t('userManagementDesc')}
         </p>
       </div>
 
       {/* Search & Filters */}
-      <form onSubmit={handleSearch} className="glass-card p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <form onSubmit={handleSearch} className="glass-card p-3 sm:p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <div className="md:col-span-2">
             <input
               type="text"
@@ -191,16 +191,36 @@ export default function AdminUsersPage() {
                 <thead>
                   <tr className="bg-gray-50/50 dark:bg-slate-800/50">
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('email')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('name')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('plan')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('status')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('created')}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <button onClick={() => handleSort('email')} className="hover:text-gray-700 dark:hover:text-slate-300 transition cursor-pointer" aria-label={`${tc('email')} — ${t('sortByEmail')}`}>
+                        {tc('email')}<SortIcon field="email" />
+                      </button>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <button onClick={() => handleSort('name')} className="hover:text-gray-700 dark:hover:text-slate-300 transition cursor-pointer" aria-label={`${tc('name')} — ${t('sortByName')}`}>
+                        {tc('name')}<SortIcon field="name" />
+                      </button>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <button onClick={() => handleSort('plan')} className="hover:text-gray-700 dark:hover:text-slate-300 transition cursor-pointer" aria-label={`${tc('plan')} — ${t('sortByPlan')}`}>
+                        {tc('plan')}<SortIcon field="plan" />
+                      </button>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <button onClick={() => handleSort('status')} className="hover:text-gray-700 dark:hover:text-slate-300 transition cursor-pointer" aria-label={`${tc('status')} — ${t('sortByStatus')}`}>
+                        {tc('status')}<SortIcon field="status" />
+                      </button>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <button onClick={() => handleSort('created_at')} className="hover:text-gray-700 dark:hover:text-slate-300 transition cursor-pointer" aria-label={`${tc('created')} — ${t('sortByDate')}`}>
+                        {tc('created')}<SortIcon field="created_at" />
+                      </button>
+                    </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                  {users.map((u, index) => (
+                  {sortedUsers.map((u, index) => (
                     <tr key={u.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
                         {u.id.slice(0, 8)}…
@@ -252,8 +272,8 @@ export default function AdminUsersPage() {
 
             {/* Pagination */}
             {total > perPage && (
-              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-slate-400">
+              <div className="px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                   {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <div className="flex gap-2">
@@ -284,7 +304,7 @@ export default function AdminUsersPage() {
       {/* Plan Change Modal */}
       {planChangeTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setPlanChangeTarget(null)} />
+          <div aria-hidden="true" className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setPlanChangeTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('changePlan')}

@@ -189,6 +189,7 @@ export default function WebhookBuilderPage() {
                   />
                   <button
                     onClick={() => removeField(i)}
+                    aria-label="Kaldır"
                     className="px-3 py-3 text-red-500 hover:text-red-700 transition"
                   >
                     ✕

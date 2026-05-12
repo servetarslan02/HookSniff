@@ -81,7 +81,8 @@ export function NotificationCenter() {
         className="relative p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
         aria-label={t("notifications")}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <title>{t("notifications")}</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -111,19 +112,28 @@ export function NotificationCenter() {
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-gray-400 dark:text-slate-500 text-sm">
+              <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">
                 No notifications
               </div>
             ) : (
               notifications.slice(0, 8).map((n) => (
                 <div
                   key={n.id}
+                  role="button"
+                  tabIndex={0}
                   className={`px-4 py-3 border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer ${
                     !n.read ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''
                   }`}
                   onClick={() => {
                     if (!n.read) handleMarkAsRead(n.id);
                     if (n.link) router.push(n.link);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      if (!n.read) handleMarkAsRead(n.id);
+                      if (n.link) router.push(n.link);
+                    }
                   }}
                 >
                   <div className="flex items-start gap-3">

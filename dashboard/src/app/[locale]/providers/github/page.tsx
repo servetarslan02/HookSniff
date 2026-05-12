@@ -85,7 +85,7 @@ export default function GitHubWebhooksPage() {
 
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-2xl font-bold text-white mb-2">{t("startReceivingGitHub")}</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-6">Automate your CI/CD pipeline with reliable webhook delivery.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">Automate your CI/CD pipeline with reliable webhook delivery.</p>
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
         </div>
       </main>

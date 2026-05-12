@@ -122,7 +122,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('platformSettings')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('platformSettings')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
           {t('platformSettingsDesc')}
         </p>
@@ -200,7 +200,7 @@ export default function AdminSettingsPage() {
       {/* Plan Limits */}
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('planLimits')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('freePlan')}</h3>
             <div className="space-y-3">

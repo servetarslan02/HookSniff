@@ -100,7 +100,7 @@ export default function WhatIsWebhookPage() {
 
         <div className="mt-12 text-center p-6 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-xl font-bold text-white mb-2">{t("ctaTitle")}</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-4">{t("ctaDesc")}</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-4">{t("ctaDesc")}</p>
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t("ctaButton")}</Link>
         </div>
       </article>

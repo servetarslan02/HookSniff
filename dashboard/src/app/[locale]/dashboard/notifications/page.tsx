@@ -228,7 +228,7 @@ export default function NotificationsPage() {
 
             {/* Pagination */}
             {total > perPage && (
-              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
+              <nav aria-label={tc("pagination")} role="navigation" className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-slate-400">
                   {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>

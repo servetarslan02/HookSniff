@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { adminApi, type AdminStatsResponse } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
-import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
+import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
 
 const PLAN_COLORS: Record<string, string> = {
@@ -47,7 +47,7 @@ export default function AdminOverviewPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('overview')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('loadingDashboard')}</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="glass-card p-6 animate-pulse">
               <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2 mb-4" />
@@ -86,14 +86,14 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
           {t('overviewDesc')}
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label={t('totalUsers')}
           value={stats?.total_users?.toLocaleString() || '0'}
@@ -120,12 +120,12 @@ export default function AdminOverviewPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Users by Plan Chart */}
-        <div className="glass-card p-6">
+        <div className="glass-card p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usersByPlan')}</h2>
           {pieData.length > 0 ? (
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <div className="w-48 h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -152,6 +152,12 @@ export default function AdminOverviewPage() {
                         borderRadius: '12px',
                         color: 'white',
                       }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      iconType="circle"
+                      iconSize={8}
+                      formatter={(value: string) => <span className="text-xs text-gray-600 dark:text-slate-400">{value}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>

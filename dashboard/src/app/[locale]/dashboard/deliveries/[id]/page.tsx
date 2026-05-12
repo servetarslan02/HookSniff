@@ -166,6 +166,7 @@ export default function DeliveryDetailPage() {
             onClick={() => router.push(`/${locale}/dashboard/deliveries`)}
             className="p-2 -ml-2 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
             title={t('backToDeliveries')}
+            aria-label={t('backToDeliveries')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -287,7 +288,7 @@ export default function DeliveryDetailPage() {
                   <button
                     onClick={() => copyToClipboard(formatHeaders(delivery.request_headers!), 'req-headers')}
                     className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-                    title={t('copyHeaders')}
+                    title={t('copyHeaders')} aria-label={t('copyHeaders')}
                   >
                     {copiedField === 'req-headers' ? (
                       <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,7 +332,7 @@ export default function DeliveryDetailPage() {
                   <button
                     onClick={() => copyToClipboard(formatJson(delivery.request_body), 'req-body')}
                     className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-                    title={t('copyPayload')}
+                    title={t('copyPayload')} aria-label={t('copyPayload')}
                   >
                     {copiedField === 'req-body' ? (
                       <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,7 +461,7 @@ export default function DeliveryDetailPage() {
                                   copyToClipboard(attempt.response_body!, `resp-${attempt.id}`);
                                 }}
                                 className="absolute top-2 right-2 p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-                                title={t('copyResponseBody')}
+                                title={t('copyResponseBody')} aria-label={t('copyResponseBody')}
                               >
                                 {copiedField === `resp-${attempt.id}` ? (
                                   <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from 'react';
 import { clsx } from 'clsx';
+import { useTranslations } from 'next-intl';
 
 interface Toast {
   id: number;
@@ -20,6 +21,7 @@ const MAX_TOASTS = 4;
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const nextIdRef = useRef(0);
+  const tc = useTranslations('common');
 
   const dismiss = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -62,9 +64,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <button
               onClick={() => dismiss(toast.id)}
               className="flex-shrink-0 ml-2 opacity-70 hover:opacity-100 transition-opacity"
-              aria-label="Dismiss"
+              aria-label={tc('dismiss')}
             >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <title>{tc('dismiss')}</title>
                 <path d="M1 1l12 12M13 1L1 13" />
               </svg>
             </button>

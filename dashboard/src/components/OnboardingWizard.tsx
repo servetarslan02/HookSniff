@@ -648,7 +648,7 @@ export function SuccessToast({ message, onClose }: { message: string; onClose: (
           <div className="font-semibold text-sm">{t('successTitle')}</div>
           <div className="text-sm opacity-90">{message}</div>
         </div>
-        <button onClick={onClose} className="ml-4 text-white/70 hover:text-white transition">✕</button>
+        <button onClick={onClose} aria-label="Kapat" className="ml-4 text-white/70 hover:text-white transition">✕</button>
       </div>
     </div>
   );
