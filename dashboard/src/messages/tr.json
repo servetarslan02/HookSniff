@@ -1389,7 +1389,8 @@
     "comingSoon": "Yakında",
     "na": "—",
     "percent": "%",
-    "more": "daha fazla"
+    "more": "daha fazla",
+    "dedupNotAvailable": "Tekrar algılama henüz yapılandırılmadı. Başlamak için özellik bayrağını etkinleştirin."
   },
   "landing": {
     "nav": {

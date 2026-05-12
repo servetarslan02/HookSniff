@@ -309,6 +309,8 @@ export interface AdminStatsResponse {
   total_deliveries: number;
   total_revenue: number;
   active_users_today: number;
+  total_endpoints: number;
+  active_endpoints: number;
   users_by_plan: { plan: string; count: number }[];
   recent_signups: { id: string; email: string; name?: string; plan: string; created_at: string }[];
   trends: {
@@ -318,6 +320,13 @@ export interface AdminStatsResponse {
     active_users_yesterday: number;
     active_webhooks: number;
   };
+}
+
+export interface DeployInfo {
+  version: string;
+  git_commit?: string;
+  build_time?: string;
+  environment: string;
 }
 
 export interface AdminUsersResponse {
@@ -565,6 +574,9 @@ export const adminApi = {
 
   deleteFeatureFlag: (token: string, id: string) =>
     apiFetch<{ success: boolean }>(`/admin/feature-flags/${id}`, { method: 'DELETE', token }),
+
+  getDeployInfo: (token: string) =>
+    apiFetch<DeployInfo>('/admin/deploy-info', { token }),
 };
 
 export interface FeatureFlag {
