@@ -316,14 +316,24 @@ async fn batch_webhooks(
 
     // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
     let batch_count = req.webhooks.len() as i64;
-    let updated: Option<Customer> = sqlx::query_as(
-        "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING *",
-    )
-    .bind(batch_count)
-    .bind(customer.id)
-    .bind(customer.webhook_limit as i64)
-    .fetch_optional(&pool)
-    .await?;
+    let updated: Option<Customer> = if customer.allow_overage {
+        sqlx::query_as(
+            "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING *",
+        )
+        .bind(batch_count)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+    } else {
+        sqlx::query_as(
+            "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING *",
+        )
+        .bind(batch_count)
+        .bind(customer.id)
+        .bind(customer.webhook_limit as i64)
+        .fetch_optional(&pool)
+        .await?
+    };
 
     if updated.is_none() {
         return Err(AppError::RateLimitExceeded);
