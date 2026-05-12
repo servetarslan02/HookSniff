@@ -328,6 +328,91 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
+      {/* Alert Thresholds */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚨 {t('alertThresholds')}</h2>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('alertThresholdsDesc')}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="alert_success_rate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('successRateThreshold')}</label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500 dark:text-slate-400">{t('below')}</span>
+              <input
+                id="alert_success_rate"
+                type="number"
+                min={0}
+                max={100}
+                defaultValue={95}
+                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+              />
+              <span className="text-sm text-gray-500 dark:text-slate-400">%</span>
+            </div>
+          </div>
+          <div>
+            <label htmlFor="alert_latency" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('latencyThreshold')}</label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
+              <input
+                id="alert_latency"
+                type="number"
+                min={0}
+                max={60000}
+                defaultValue={5000}
+                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+              />
+              <span className="text-sm text-gray-500 dark:text-slate-400">ms</span>
+            </div>
+          </div>
+          <div>
+            <label htmlFor="alert_queue" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('queueDepthThreshold')}</label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
+              <input
+                id="alert_queue"
+                type="number"
+                min={0}
+                max={100000}
+                defaultValue={100}
+                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+              />
+              <span className="text-sm text-gray-500 dark:text-slate-400">{t('messages')}</span>
+            </div>
+          </div>
+          <div>
+            <label htmlFor="alert_failed" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('failedDeliveryThreshold')}</label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
+              <input
+                id="alert_failed"
+                type="number"
+                min={0}
+                max={10000}
+                defaultValue={10}
+                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+              />
+              <span className="text-sm text-gray-500 dark:text-slate-400">{t('perHour')}</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('notificationChannels')}</h3>
+          <div className="flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <span className="text-sm text-gray-700 dark:text-slate-300">📧 Email</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <span className="text-sm text-gray-700 dark:text-slate-300">💬 Slack</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <span className="text-sm text-gray-700 dark:text-slate-300">🔗 Webhook</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
       {/* Item 130 — Save button: consistent color in both modes */}
       <div className="flex items-center gap-3 justify-end">
         {showSuccess && (
