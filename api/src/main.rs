@@ -128,6 +128,19 @@ async fn main() -> Result<()> {
                 }
                 Err(e) => tracing::error!("❌ idempotency_keys cleanup failed: {:?}", e),
             }
+            // HS-261: Clean expired revoked_tokens
+            match sqlx::query("DELETE FROM revoked_tokens WHERE expires_at < now()")
+                .execute(&cleanup_pool)
+                .await
+            {
+                Ok(r) => {
+                    let deleted = r.rows_affected();
+                    if deleted > 0 {
+                        tracing::info!("🧹 Cleaned {} expired revoked_tokens", deleted);
+                    }
+                }
+                Err(e) => tracing::error!("❌ revoked_tokens cleanup failed: {:?}", e),
+            }
         }
     });
 

@@ -24,7 +24,7 @@ export default function AuthCallbackPage() {
     const errorParam = params.get('error');
 
     if (errorParam) {
-      setError(errorParam === 'oauth_denied' ? 'OAuth login was cancelled.' : `Login failed: ${errorParam}`);
+      setError(errorParam === 'oauth_denied' ? t('oauthCancelled') : t('loginFailedMessage', { error: errorParam }));
       return;
     }
 
@@ -38,11 +38,11 @@ export default function AuthCallbackPage() {
           // The AuthProvider's mount effect will pick up the cookie
           router.replace(`/${locale}/dashboard`);
         } else {
-          setError('Authentication failed. Please try logging in again.');
+          setError(t('authFailed'));
         }
       })
       .catch(() => {
-        setError('Network error. Please try again.');
+        setError(t('networkError'));
       });
   }, [router]);
 
@@ -57,7 +57,7 @@ export default function AuthCallbackPage() {
             onClick={() => router.push(`/${locale}/login`)}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
           >
-            Back to Login
+            {t('backToLogin')}
           </button>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function AuthCallbackPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
       <div className="glass-card p-8 max-w-md text-center">
         <div className="animate-spin w-10 h-10 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Logging you in...</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('loggingIn')}</h1>
         <p className="text-gray-500 dark:text-slate-400">{t("redirecting")}</p>
       </div>
     </div>

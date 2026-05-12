@@ -134,6 +134,9 @@ pub fn router() -> Router {
         .route("/2fa/enable", post(enable_2fa))
         .route("/2fa/confirm", post(confirm_2fa))
         .route("/2fa/disable", post(disable_2fa))
+        // HS-261: Token revocation endpoints
+        .route("/revoke-token", post(revoke_current_token))
+        .route("/revoke-all-tokens", post(revoke_all_tokens))
         // GDPR endpoints
         .route("/export", get(export_data))
         .route("/account", axum::routing::delete(delete_account))
@@ -750,7 +753,31 @@ async fn refresh_token(
 
 // ── Logout ──────────────────────────────────────────────────
 
-async fn logout() -> impl IntoResponse {
+async fn logout(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    Extension(customer): Extension<Customer>,
+    headers: HeaderMap,
+) -> impl IntoResponse {
+    // HS-261: Revoke the current access token
+    let token = headers
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .unwrap_or("");
+
+    if let Ok(claims) = jwt::verify_token(token, &cfg.jwt_secret) {
+        if let Some(ref jti) = claims.jti {
+            let _ = jwt::revoke_token(&pool, jti, claims.exp as i64).await;
+        }
+    }
+
+    // Revoke refresh tokens for this customer
+    let _ = sqlx::query("UPDATE refresh_tokens SET revoked = true WHERE customer_id = $1")
+        .bind(customer.id)
+        .execute(&pool)
+        .await;
+
     let mut headers = HeaderMap::new();
     headers.insert(
         "set-cookie",
@@ -763,6 +790,50 @@ async fn logout() -> impl IntoResponse {
             .unwrap_or_else(|_| HeaderValue::from_static("")),
     );
     (headers, Json(serde_json::json!({ "ok": true })))
+}
+
+// ── Token Revocation (HS-261) ────────────────────────────────
+
+/// Revoke the current access token (by JTI).
+/// The token will be rejected on subsequent requests.
+async fn revoke_current_token(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    headers: HeaderMap,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Extract the token to get its JTI
+    let token = headers
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .unwrap_or("");
+
+    let claims = jwt::verify_token(token, &cfg.jwt_secret)?;
+
+    if let Some(ref jti) = claims.jti {
+        jwt::revoke_token(&pool, jti, claims.exp as i64).await?;
+        tracing::info!("🔑 Token revoked: jti={}", jti);
+    }
+
+    Ok(Json(serde_json::json!({
+        "revoked": true,
+        "message": "Token has been revoked."
+    })))
+}
+
+/// Revoke ALL access tokens for the authenticated customer.
+/// Useful for password changes or suspected account compromise.
+async fn revoke_all_tokens(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    jwt::revoke_all_tokens_for_customer(&pool, customer.id).await?;
+    tracing::info!("🔑 All tokens revoked for customer {}", customer.id);
+
+    Ok(Json(serde_json::json!({
+        "revoked": true,
+        "message": "All access tokens have been revoked. You will need to log in again."
+    })))
 }
 
 // ── 2FA Endpoints ───────────────────────────────────────────
@@ -994,6 +1065,9 @@ async fn change_password(
         .bind(customer.id)
         .execute(&pool)
         .await?;
+
+    // HS-261: Revoke all access tokens on password change
+    let _ = jwt::revoke_all_tokens_for_customer(&pool, customer.id).await;
 
     tracing::info!("✅ Password changed for customer {}", customer.id);
 
