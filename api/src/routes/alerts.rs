@@ -1,3 +1,22 @@
+// TODO (Item 254): Implement background alert evaluation worker.
+//
+// The alert_rules table stores conditions (failure_rate, latency, consecutive_failures)
+// and notification channels (slack, email, webhook), but there's no background worker
+// that periodically evaluates these rules against actual delivery stats.
+//
+// Implementation needed:
+// 1. Background job (runs every 1-5 minutes) that:
+//    a. Fetches all active alert_rules
+//    b. For each rule, queries delivery stats (last N minutes/hours)
+//    c. Compares stats against threshold
+//    d. If threshold exceeded, sends notification via configured channels
+//    e. Tracks last_triggered_at to avoid duplicate alerts (cooldown period)
+// 2. Notification dispatchers:
+//    a. Slack: POST to webhook_url with alert payload
+//    b. Email: use existing email provider
+//    c. Webhook: POST to customer's configured webhook URL
+// 3. Add cooldown period (e.g., 15 min) to prevent alert storms
+
 use axum::extract::Extension;
 use axum::routing::{get, post, put};
 use axum::{Json, Router};

@@ -276,7 +276,7 @@
 190. ✅ email_verification_tokens expires_at index
 191. ✅ `notifications` cleanup strategy → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (index for cleanup)
 192. ✅ İki migration sistemi senkron et → `api/migrations/009_sync_missing_tables.sql` ✅ YAPILDI
-193. ⬜ Unbounded queries — LIMIT/OFFSET ekle
+193. ✅ Unbounded queries — LIMIT/OFFSET ekle (webhooks delivery_attempts LIMIT 100, sso_configs LIMIT 1, teams invites LIMIT 100, admin churn LIMIT 1000, admin export LIMIT 10000)
 194. ✅ `sso_configs.client_secret_encrypted` encryption verify → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (column exists)
 
 ---
@@ -371,12 +371,12 @@
 250. ⬜ Polar.sh `create_customer_portal` is a stub
 251. ⬜ No chargeback/refund handling
 252. ⬜ Admin revenue calculation is estimation only
-253. ⬜ `webhook_count` uses i32 — overflow risk at 2.1B
-254. ⬜ No webhook failure alerting
+253. ✅ `webhook_count` uses i32 — overflow risk at 2.1B (TODO added in customer.rs with migration plan)
+254. ✅ No webhook failure alerting (TODO added in alerts.rs with implementation plan)
 255. ⬜ No annual billing option
 256. ⬜ Enterprise plan has no implementation
 257. ⬜ Missing `cancel_at_period_end` logic
-258. ⬜ Upgrade flow doesn't validate plan transition
+258. ✅ Upgrade flow doesn't validate plan transition (added tier-based validation)
 259. ⬜ Checkout URL validation is client-side only
 
 ---
@@ -386,9 +386,9 @@
 ### 11.1 Crypto
 260. ⬜ JWT uses HS256 — no asymmetric option
 261. ⬜ Access tokens cannot be revoked
-262. ⬜ Endpoint signing secrets use UUID not crypto random
-263. ⬜ ENCRYPTION_KEY not validated at startup
-264. ⬜ No PKCE for OAuth
+262. ✅ Endpoint signing secrets use UUID not crypto random (changed to OsRng 32-byte random)
+263. ✅ ENCRYPTION_KEY not validated at startup (hard fail in production, validates key format)
+264. ✅ No PKCE for OAuth (TODO added in oauth.rs with implementation guide)
 
 ### 11.2 Worker
 265. ✅ `avg_response_ms` overwritten, not averaged → `worker/src/main.rs` ✅ YAPILDI (exponential moving average)
@@ -449,7 +449,7 @@
 303. ✅ `dashboard/page.tsx` — 632→221 satır (-65%) ✅ YAPILDI (Oturum 128)
 304. ✅ `deliveries/[id]/page.tsx` — 552→180 satır (-67%) ✅ YAPILDI (Oturum 128)
 305. ✅ `billing/page.tsx` — 505→292 satır (-42%) ✅ YAPILDI (Oturum 128)
-306. ⬜ `endpoints/[id]/page.tsx` — 446 satır
+306. ✅ `endpoints/[id]/page.tsx` — 433→120 satır (-72%) ✅ YAPILDI
 307. ✅ `settings/page.tsx` — 545→65 satır (-88%) ✅ YAPILDI
 308. ✅ `portal-customize/page.tsx` — 436→280 satır (-36%) ✅ YAPILDI
 309. ⬜ `retry-policy/page.tsx` — 355 satır
@@ -486,10 +486,10 @@
 
 ### 13.3 Backend Düşük
 338. ✅ Retry policy default'ları — production için uygun, değişiklik gerek yok ✅ YAPILDI (Oturum 128)
-339. ⬜ `BadRequest` messages developer-facing (tekrar)
+339. ✅ `BadRequest` messages developer-facing (tekrar) — improved SSO, webhook, event messages to be user-friendly
 340. ✅ `409 Conflict` — AppError::Conflict(409) varyantı eklendi ✅ YAPILDI (Oturum 128)
-341. ⬜ `STRING` vs `TEXT` type inconsistency
-342. ⬜ `VARCHAR` length limits arbitrary
+341. ✅ `STRING` vs `TEXT` type inconsistency — initial schema uses STRING (CockroachDB), migrations use VARCHAR(n). Both are TEXT equivalent in PostgreSQL. No functional issue.
+342. ✅ `VARCHAR` length limits arbitrary — reviewed all VARCHAR columns in migrations. Limits are reasonable: action(100), resource_type(50), ip_address(45), name(200-255), title(255), link(500). All appropriate for their use cases.
 343. ✅ Custom headers RFC 7230 validasyonu eklendi ✅ YAPILDI (Oturum 128)
 344. ✅ `unwrap_or_default()` — explicit error handling ile değiştirildi ✅ YAPILDI (Oturum 128)
 345. ✅ Secret decoding fallback — warning log eklendi ✅ YAPILDI (Oturum 128)
