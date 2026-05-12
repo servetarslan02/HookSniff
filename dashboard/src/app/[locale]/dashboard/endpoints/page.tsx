@@ -4,14 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { endpointsApi, type Endpoint } from '@/lib/api';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
   const router = useRouter();
-  const locale = useLocale();
   const { toast } = useToast();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [loading, setLoading] = useState(true);
