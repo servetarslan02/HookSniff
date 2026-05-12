@@ -1315,7 +1315,11 @@
     "perHour": "/hour",
     "fast": "Fast",
     "moderate": "Moderate",
-    "slow": "Slow"
+    "slow": "Slow",
+    "alertSettingsSaved": "Alert settings saved successfully",
+    "alertSettingsFailed": "Failed to save alert settings",
+    "activeAlertRules": "active alert rule(s) configured",
+    "saveAlertSettings": "🚨 Save Alert Settings"
   },
   "landing": {
     "nav": {

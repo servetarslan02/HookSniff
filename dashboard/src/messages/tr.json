@@ -1315,7 +1315,11 @@
     "perHour": "/saat",
     "fast": "Hızlı",
     "moderate": "Normal",
-    "slow": "Yavaş"
+    "slow": "Yavaş",
+    "alertSettingsSaved": "Alert ayarları başarıyla kaydedildi",
+    "alertSettingsFailed": "Alert ayarları kaydedilemedi",
+    "activeAlertRules": "aktif alert kuralı yapılandırıldı",
+    "saveAlertSettings": "🚨 Alert Ayarlarını Kaydet"
   },
   "landing": {
     "nav": {
