@@ -100,7 +100,7 @@ export default function EndpointHealthPage() {
         ].map((card) => (
           <div key={card.label} className={`glass-card p-5 ${card.bg}`}>
             <div className={`text-3xl font-bold ${card.color}`}>{card.count}</div>
-            <div className="text-sm text-gray-500 dark:text-slate-400">{card.label} Endpoints</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400">{card.label} {t('endpoints')}</div>
           </div>
         ))}
       </div>
@@ -111,7 +111,7 @@ export default function EndpointHealthPage() {
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : endpoints.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
-            No endpoints yet. Create one to start monitoring health.
+            {t('noEndpoints')}
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
@@ -172,8 +172,8 @@ export default function EndpointHealthPage() {
 
                   {ep.consecutive_failures > 0 && (
                     <div className="mt-2 text-xs text-red-600 dark:text-red-400">
-                      ⚠️ {ep.consecutive_failures} consecutive failure{ep.consecutive_failures > 1 ? 's' : ''}
-                      {ep.last_failure_at && ` · Last failure ${new Date(ep.last_failure_at).toLocaleString()}`}
+                      ⚠️ {t('consecutiveFailures', { count: ep.consecutive_failures, plural: ep.consecutive_failures > 1 ? 's' : '' })}
+                      {ep.last_failure_at && ` · ${t('lastFailure', { time: new Date(ep.last_failure_at).toLocaleString() })}`}
                     </div>
                   )}
                 </div>

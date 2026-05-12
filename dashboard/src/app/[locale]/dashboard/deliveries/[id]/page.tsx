@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -14,6 +14,7 @@ export default function DeliveryDetailPage() {
   const t = useTranslations('deliveryDetail');
   const tCommon = useTranslations('common');
   const { id } = useParams<{ id: string }>();
+  const locale = useLocale();
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -144,7 +145,7 @@ export default function DeliveryDetailPage() {
             {t('tryAgain')}
           </button>
           <button
-            onClick={() => router.push('/dashboard/deliveries')}
+            onClick={() => router.push(`/${locale}/dashboard/deliveries`)}
             className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
             {t('backToDeliveries')}
@@ -162,7 +163,7 @@ export default function DeliveryDetailPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => router.push('/dashboard/deliveries')}
+            onClick={() => router.push(`/${locale}/dashboard/deliveries`)}
             className="p-2 -ml-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
             title={t('backToDeliveries')}
           >
