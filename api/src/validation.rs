@@ -8,6 +8,10 @@ const MAX_JSON_DEPTH: usize = 10;
 /// Validate email format: must have exactly one @, non-empty local and domain parts,
 /// domain must contain at least one dot, no spaces, reasonable length.
 pub fn validate_email(email: &str) -> Result<(), String> {
+    // Reject emails with leading/trailing whitespace before trimming
+    if email != email.trim() {
+        return Err("Email must not have leading or trailing whitespace".into());
+    }
     let email = email.trim();
     if email.is_empty() || email.len() > 254 {
         return Err("Email must be between 1 and 254 characters".into());
