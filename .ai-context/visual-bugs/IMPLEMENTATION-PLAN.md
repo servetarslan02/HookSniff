@@ -468,8 +468,8 @@
 320. ⬜ Route-level `loading.tsx` yok
 321. ⬜ Endpoints detail hand-rolled modal
 322. ⬜ Logs page status counts current page only
-323. ⬜ Billing cancel modal state reset
-324. ⬜ Notification API field mismatch
+323. ✅ Billing cancel modal state reset — ✅ YAPILDI (Oturum 124) — cancelling state reset
+324. ✅ Notification API field mismatch — ✅ YAPILDI (Oturum 124) — field'lar eşleşiyor
 325. ✅ `autoComplete="new-password"` confirm password'a eklendi ✅ YAPILDI (Oturum 122)
 326. ✅ Mobile sidebar toggle `aria-expanded` eksik — ✅ YAPILDI (Oturum 124)
 327. ✅ Date formatting not locale-aware — ✅ YAPILDI (Oturum 124)
