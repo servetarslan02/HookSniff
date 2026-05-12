@@ -9,18 +9,18 @@ export default async function SvixAlternativePage() {
   const tc = await getTranslations('compare');
 
   const rows = [
-    { featureKey: 'pricePro', hooksniff: '$29/mo', svix: '$490/mo', winner: 'hooksniff' },
-    { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, svix: 'Unlimited*', winner: 'svix' },
-    { featureKey: 'sdkCount', hooksniff: '11', svix: '6', winner: 'hooksniff' },
-    { featureKey: 'fifoDelivery', hooksniff: '✅', svix: '❌', winner: 'hooksniff' },
-    { featureKey: 'cloudEvents', hooksniff: '✅', svix: '❌', winner: 'hooksniff' },
-    { featureKey: 'schemaRegistry', hooksniff: '✅', svix: '❌', winner: 'hooksniff' },
-    { featureKey: 'deliveryMethods', hooksniff: t('httpWsGrpc'), svix: t('httpOnly'), winner: 'hooksniff' },
-    { featureKey: 'selfHosted', hooksniff: '✅', svix: '✅', winner: 'tie' },
-    { featureKey: 'soc2', hooksniff: t('ready'), svix: t('type2'), winner: 'svix' },
-    { featureKey: 'uptimeSla', hooksniff: '99.9%', svix: '99.99%', winner: 'svix' },
-    { featureKey: 'openSource', hooksniff: '✅', svix: '✅', winner: 'tie' },
-    { featureKey: 'i18n', hooksniff: '✅', svix: '❌', winner: 'hooksniff' },
+    { featureKey: 'pricePro', hooksniff: '$29/mo', svix: '$490/mo', bestFor: 'hooksniff' },
+    { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, svix: `Unlimited ${t('events')}`, bestFor: 'svix' },
+    { featureKey: 'sdkCount', hooksniff: '11', svix: '6', bestFor: 'hooksniff' },
+    { featureKey: 'fifoDelivery', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
+    { featureKey: 'cloudEvents', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
+    { featureKey: 'schemaRegistry', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
+    { featureKey: 'deliveryMethods', hooksniff: t('httpWsGrpc'), svix: t('httpOnly'), bestFor: 'hooksniff' },
+    { featureKey: 'selfHosted', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
+    { featureKey: 'soc2', hooksniff: t('ready'), svix: t('type2'), bestFor: 'svix' },
+    { featureKey: 'uptimeSla', hooksniff: '99.9%', svix: '99.99%', bestFor: 'svix' },
+    { featureKey: 'openSource', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
+    { featureKey: 'i18n', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
   ];
 
   return (
@@ -52,15 +52,33 @@ export default async function SvixAlternativePage() {
             <tbody>{rows.map((r) => (
               <tr key={r.featureKey} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                 <td className="py-3 px-6 text-gray-700 dark:text-slate-300">{t(r.featureKey)}</td>
-                <td className={`py-3 px-4 text-center font-medium ${r.winner === 'hooksniff' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'} bg-brand-50/20`}>{r.hooksniff}</td>
-                <td className={`py-3 px-4 text-center ${r.winner === 'svix' ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-gray-600 dark:text-slate-400'}`}>{r.svix}</td>
+                <td className={`py-3 px-4 text-center font-medium ${r.bestFor === 'hooksniff' ? 'text-emerald-600 dark:text-emerald-400' : r.bestFor === 'tie' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'} bg-brand-50/20`}>{r.hooksniff}</td>
+                <td className={`py-3 px-4 text-center ${r.bestFor === 'svix' ? 'text-emerald-600 dark:text-emerald-400 font-medium' : r.bestFor === 'tie' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-slate-400'}`}>{r.svix}</td>
               </tr>
             ))}</tbody>
           </table></div>
         </div>
-        <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">💰 {t('bottomLine')}</h2>
-          <p className="text-sm text-gray-600 dark:text-slate-400">HookSniff Pro <strong>$29/mo</strong> vs Svix Professional <strong>$490/mo</strong>. <strong>{t('savedPerYear', { amount: '$5,532' })}</strong> — {t('withMoreFeatures')}.</p>
+
+        {/* When to choose each */}
+        <div className="space-y-6 mb-12">
+          <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>{t('pricePro')}:</strong> $29/mo vs Svix at $490/mo — {t('savedPerYear', { amount: '$5,532' })}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>FIFO + Schema Registry:</strong> Ordered delivery and payload validation — features Svix doesn&apos;t offer</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>{t('i18n')}:</strong> 8-language dashboard for international teams</li>
+            </ul>
+          </div>
+
+          <div className="p-6 bg-purple-50 dark:bg-purple-500/10 rounded-xl border border-purple-200 dark:border-purple-500/20">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🏢 {t('whenToChooseSvix')}</h2>
+            <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('whenToChooseSvixDesc')}</p>
+          </div>
+        </div>
+
+        <div className="p-6 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20 mb-8">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">💡 {t('bottomLine')}</h2>
+          <p className="text-sm text-gray-600 dark:text-slate-400">Both are solid webhook services. HookSniff is better for cost-conscious teams that need FIFO and broad SDK coverage. Svix is better for enterprises that need proven SOC 2 Type 2 compliance and a 99.99% SLA. Choose based on your priorities.</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>
       </main>
