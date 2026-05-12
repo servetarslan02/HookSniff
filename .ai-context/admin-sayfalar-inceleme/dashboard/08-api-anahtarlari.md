@@ -79,3 +79,23 @@ interface ApiKey {
 - Key IP whitelist yok
 - Toplu key yönetimi yok
 - Key kullanım grafiği yok
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/api-keys/page.tsx`
+- **Sorun:** 2 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+### 🔒 Memory Leak
+
+#### ML-01: NewKeyAlert — setTimeout Cleanup Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/api-keys/components/NewKeyAlert.tsx`
+- **Sorun:** `setTimeout` kullanılıyor ama `clearTimeout` yok.
+- **Adımlar:**
+  1. useEffect içinde timer oluştur
+  2. Return'de `clearTimeout(timer)` ekle

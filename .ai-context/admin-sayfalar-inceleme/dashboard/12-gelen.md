@@ -63,3 +63,37 @@
    - Frontend: "Test Et" butonu → örnek payload gönder → sonuç gösterimi
 4. **Entegrasyon Durumu** — Provider bağlantı durumu
    - Frontend: Her provider kartında bağlantı durumu göstergesi (bağlı/bağlı değil)
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Konfigürasyon Silme Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/inbound/page.tsx`
+- **Backend:** — (backend'de delete endpoint'i yok)
+- **Sorun:** Oluşturulan konfigürasyon silinemiyor.
+- **Adımlar:**
+  1. Backend'e `DELETE /v1/inbound/configs/{id}` ekle (Rust)
+  2. `api.ts`'ye `inboundApi.deleteConfig` ekle
+  3. Her konfigürasyon kartına silme butonu + ConfirmDialog
+
+#### BF-02: Konfigürasyon Düzenleme Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/inbound/page.tsx`
+- **Backend:** — (backend'de update endpoint'i yok)
+- **Sorun:** Secret veya endpoint değiştirilemiyor.
+- **Adımlar:**
+  1. Backend'e `PUT /v1/inbound/configs/{id}` ekle
+  2. "Düzenle" butonu + form (endpoint select, secret input)
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/inbound/page.tsx`
+- **Sorun:** 2 useEffect, 4 fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/inbound/page.tsx`
+- **Sorun:** Tüm konfigürasyonlar tek seferde yükleniyor.

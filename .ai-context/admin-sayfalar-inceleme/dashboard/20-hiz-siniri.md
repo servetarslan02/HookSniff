@@ -55,3 +55,40 @@
    - Frontend: Her rate limit kartında "Düzenle" butonu → inline edit veya modal
 4. **Toplu Rate Limit** — Tüm endpoint'ler için varsayılan limit
    - Frontend: "Varsayılan Limit" kartı + ayarlama formu
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: Rate Limit Ayarlama Formu Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/rate-limiting/page.tsx`
+- **Backend:** `POST /v1/rate-limits/{endpoint_id}` — rate limit ayarlama
+- **Sorun:** Sadece okuma var, ayarlama formu yok.
+- **Adımlar:**
+  1. "Limit Ayarla" butonu ekle
+  2. Modal form: endpoint seçici, requests_per_second (input), burst_size (input)
+  3. `apiFetch('/rate-limits/${endpointId}', { method: 'POST', body: { requests_per_second, burst_size }, token })` çağrısı
+  4. Mevcut limit varsa düzenleme modu
+  5. i18n key: `setRateLimit`, `requestsPerSecond`, `burstSize`, `rateLimitSet`
+
+#### BF-02: Rate Limit Silme Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/rate-limiting/page.tsx`
+- **Backend:** `DELETE /v1/rate-limits/{endpoint_id}` — rate limit silme
+- **Sorun:** Silme butonu yok.
+- **Adımlar:**
+  1. Her rate limit kartına silme butonu ekle
+  2. ConfirmDialog: "Rate limit silinecek"
+  3. `apiFetch('/rate-limits/${endpointId}', { method: 'DELETE', token })` çağrısı
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/rate-limiting/page.tsx`
+- **Sorun:** 2 useEffect, 4 fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/rate-limiting/page.tsx`
+- **Sorun:** Tüm limitler tek seferde yükleniyor.
