@@ -89,7 +89,7 @@ export default function TransformsPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
-        <button onClick={() => setShowCreate(!showCreate)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+        <button type="button" onClick={() => setShowCreate(!showCreate)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
           {t('newRule')}
         </button>
       </div>
@@ -139,7 +139,7 @@ export default function TransformsPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichValue')}</label>
               <input value={enrichValue} onChange={e => setEnrichValue(e.target.value)} placeholder="hooksniff" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
             </div>
-            <button onClick={handleCreate} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition">{t('create')}</button>
+            <button type="button" onClick={handleCreate} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition">{t('create')}</button>
           </div>
         </div>
       )}
@@ -179,7 +179,7 @@ export default function TransformsPage() {
                     </div>
                   )}
                 </div>
-                <button onClick={() => handleDelete(rule.id)} aria-label={t("deleteTransform")} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2">✕</button>
+                <button type="button" onClick={() => handleDelete(rule.id)} aria-label={t("deleteTransform")} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2">✕</button>
               </div>
             </div>
           ))}

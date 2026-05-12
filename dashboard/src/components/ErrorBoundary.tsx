@@ -27,9 +27,21 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log to console in dev; in production this would go to Sentry/OTEL
+    // Log to console in dev
     if (process.env.NODE_ENV === 'development') {
       console.error('ErrorBoundary caught:', error, errorInfo);
+    }
+
+    // Report to Sentry if available (Item 170)
+    try {
+      const Sentry = (window as unknown as { __SENTRY__?: { captureException?: (err: Error, opts?: { contexts?: { react?: ErrorInfo } }) => void } }).__SENTRY__;
+      if (Sentry?.captureException) {
+        Sentry.captureException(error, {
+          contexts: { react: errorInfo },
+        });
+      }
+    } catch {
+      // Sentry not available — silently ignore
     }
   }
 

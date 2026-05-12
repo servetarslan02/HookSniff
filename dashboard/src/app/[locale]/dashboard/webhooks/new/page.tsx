@@ -105,7 +105,7 @@ export default function SendWebhookPage() {
               />
               {jsonError && <p className="text-xs text-red-600 mt-1">⚠️ {jsonError}</p>}
             </div>
-            <button
+            <button type="button"
               onClick={handleSend}
               disabled={sending || !endpointId || !!jsonError}
               className="w-full bg-brand-600 dark:bg-brand-500 text-white py-3 rounded-xl font-semibold hover:bg-brand-700 dark:hover:bg-brand-600 transition disabled:opacity-60 flex items-center justify-center gap-2"

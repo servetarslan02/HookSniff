@@ -2769,5 +2769,12 @@
     "readyToSwitch": "{competitor}'dan geçiş yapmaya hazır mısınız?",
     "switchCta": "Aynı özellikleri 10 kata kadar daha düşük maliyetle alın. Ücretsiz başlayın.",
     "migrateToHooksniff": "HookSniff'e geçiş yap →"
+  },
+  "cookieConsent": {
+    "title": "Çerez Onayı",
+    "description": "Deneyiminizi geliştirmek ve site trafiğini analiz etmek için çerezler kullanıyoruz. \"Kabul Et\" butonuna tıklayarak çerez kullanımını onaylamış olursunuz.",
+    "privacyPolicy": "Gizlilik Politikası",
+    "accept": "Kabul Et",
+    "reject": "Reddet"
   }
 }

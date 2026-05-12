@@ -82,7 +82,7 @@ export default function CustomDomainPage() {
             placeholder={t('placeholder')}
             className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
           />
-          <button
+          <button type="button"
             onClick={handleAddDomain}
             disabled={saving || !domain}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
@@ -116,7 +116,7 @@ export default function CustomDomainPage() {
                     <td className="px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">{rec.name}</td>
                     <td className="px-4 py-3 font-mono text-sm text-gray-600 dark:text-slate-400 break-all">{rec.value}</td>
                     <td className="px-4 py-3">
-                      <button
+                      <button type="button"
                         onClick={() => { navigator.clipboard.writeText(rec.value); toast(t('copied'), 'success'); }}
                         className="text-brand-600 dark:text-brand-400 text-sm hover:underline"
                       >
@@ -129,7 +129,7 @@ export default function CustomDomainPage() {
             </table>
           </div>
           <div className="mt-4 flex gap-3">
-            <button
+            <button type="button"
               onClick={handleVerify}
               disabled={saving}
               className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition disabled:opacity-50"

@@ -17,6 +17,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const te = useTranslations('error');
@@ -26,32 +27,65 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   // Strip locale prefix from pathname for navigation matching
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
-  const navigation = [
-    { name: t('dashboard'), href: '/dashboard', icon: '📊' },
-    { name: t('endpoints'), href: '/dashboard/endpoints', icon: '🔗' },
-    { name: t('deliveries'), href: '/dashboard/deliveries', icon: '📦' },
-    { name: t('logs'), href: '/dashboard/logs', icon: '📋' },
-    { name: t('search'), href: '/dashboard/search', icon: '🔍' },
-    { name: t('health'), href: '/dashboard/health', icon: '💓' },
-    { name: t('alerts'), href: '/dashboard/alerts', icon: '🔔' },
-    { name: t('apiKeys'), href: '/dashboard/api-keys', icon: '🔑' },
-    { name: t('playground'), href: '/dashboard/playground', icon: '🧪' },
-    { name: t('analytics'), href: '/dashboard/analytics', icon: '📈' },
-    { name: t('transforms'), href: '/dashboard/transforms', icon: '🔄' },
-    { name: t('inbound'), href: '/dashboard/inbound', icon: '📨' },
-    { name: t('rateLimiting'), href: '/dashboard/rate-limiting', icon: '⚡' },
-    { name: t('signatureTool'), href: '/dashboard/signature-verifier', icon: '🔐' },
-    { name: t('apiImporter'), href: '/dashboard/api-importer', icon: '📥' },
-    { name: t('portalCustomize'), href: '/dashboard/portal-customize', icon: '🖼️' },
-    { name: t('webhookBuilder'), href: '/dashboard/webhook-builder', icon: '🔧' },
-    { name: t('auditLog'), href: '/dashboard/audit-log', icon: '📋' },
-    { name: t('ssoSaml'), href: '/dashboard/sso', icon: '🔐' },
-    { name: t('retryPolicy'), href: '/dashboard/retry-policy', icon: '🔄' },
-    { name: t('customDomain'), href: '/dashboard/custom-domain', icon: '🌐' },
-    { name: t('team'), href: '/dashboard/team', icon: '👥' },
-    { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
-    { name: t('billing'), href: '/dashboard/billing', icon: '💳' },
-    { name: t('settings'), href: '/dashboard/settings', icon: '⚙️' },
+  const toggleSection = (key: string) => {
+    setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Sidebar sections — Item 160: Grouped navigation
+  const sections = [
+    {
+      key: 'core',
+      label: t('sectionCore'),
+      items: [
+        { name: t('dashboard'), href: '/dashboard', icon: '📊' },
+        { name: t('endpoints'), href: '/dashboard/endpoints', icon: '🔗' },
+        { name: t('deliveries'), href: '/dashboard/deliveries', icon: '📦' },
+        { name: t('logs'), href: '/dashboard/logs', icon: '📋' },
+        { name: t('search'), href: '/dashboard/search', icon: '🔍' },
+        { name: t('health'), href: '/dashboard/health', icon: '💓' },
+        { name: t('alerts'), href: '/dashboard/alerts', icon: '🔔' },
+        { name: t('apiKeys'), href: '/dashboard/api-keys', icon: '🔑' },
+      ],
+    },
+    {
+      key: 'tools',
+      label: t('sectionTools'),
+      items: [
+        { name: t('playground'), href: '/dashboard/playground', icon: '🧪' },
+        { name: t('analytics'), href: '/dashboard/analytics', icon: '📈' },
+        { name: t('transforms'), href: '/dashboard/transforms', icon: '🔄' },
+        { name: t('inbound'), href: '/dashboard/inbound', icon: '📨' },
+        { name: t('signatureTool'), href: '/dashboard/signature-verifier', icon: '🔐' },
+        { name: t('apiImporter'), href: '/dashboard/api-importer', icon: '📥' },
+        { name: t('webhookBuilder'), href: '/dashboard/webhook-builder', icon: '🔧' },
+        { name: t('schemas'), href: '/dashboard/schemas', icon: '📐' },
+        { name: t('templates'), href: '/dashboard/templates', icon: '📄' },
+      ],
+    },
+    {
+      key: 'advanced',
+      label: t('sectionAdvanced'),
+      items: [
+        { name: t('portalCustomize'), href: '/dashboard/portal-customize', icon: '🖼️' },
+        { name: t('portalManage'), href: '/dashboard/portal-manage', icon: '👤' },
+        { name: t('rateLimiting'), href: '/dashboard/rate-limiting', icon: '⚡' },
+        { name: t('auditLog'), href: '/dashboard/audit-log', icon: '📋' },
+        { name: t('ssoSaml'), href: '/dashboard/sso', icon: '🔐' },
+        { name: t('retryPolicy'), href: '/dashboard/retry-policy', icon: '🔄' },
+        { name: t('routing'), href: '/dashboard/routing', icon: '🔀' },
+        { name: t('customDomain'), href: '/dashboard/custom-domain', icon: '🌐' },
+      ],
+    },
+    {
+      key: 'account',
+      label: t('sectionAccount'),
+      items: [
+        { name: t('team'), href: '/dashboard/team', icon: '👥' },
+        { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
+        { name: t('billing'), href: '/dashboard/billing', icon: '💳' },
+        { name: t('settings'), href: '/dashboard/settings', icon: '⚙️' },
+      ],
+    },
   ];
 
   // next-intl's Link and useRouter handle locale prefixing automatically
@@ -91,26 +125,52 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="text-xs text-gray-500 dark:text-slate-400">{t("webhookDashboard")}</div>
           </div>
         </Link>
-        <nav className="px-3 py-4 space-y-1">
-          {navigation.map((item) => {
-            // Item 161: Use startsWith for nested route highlighting
-            const isActive = cleanPath === item.href || (item.href !== '/dashboard' && cleanPath.startsWith(item.href + '/'));
+        {/* Item 163: overflow-y-auto + bottom padding to prevent overlap with controls */}
+        <nav className="px-3 py-4 space-y-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+          {sections.map((section) => {
+            const isCollapsed = collapsedSections[section.key];
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                aria-current={isActive ? "page" : undefined}
-                className={clsx(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
-                  isActive
-                    ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400'
-                    : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
+              <div key={section.key}>
+                <button
+                  onClick={() => toggleSection(section.key)}
+                  className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+                  aria-expanded={!isCollapsed}
+                >
+                  {section.label}
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {!isCollapsed && (
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => {
+                      const isActive = cleanPath === item.href || (item.href !== '/dashboard' && cleanPath.startsWith(item.href + '/'));
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          aria-current={isActive ? "page" : undefined}
+                          className={clsx(
+                            'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition',
+                            isActive
+                              ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400'
+                              : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
+                          )}
+                        >
+                          <span className="text-lg">{item.icon}</span>
+                          {item.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                <span className="text-lg">{item.icon}</span>
-                {item.name}
-              </Link>
+              </div>
             );
           })}
           {user?.is_admin && (
@@ -148,7 +208,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               </svg>
             </button>
             <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {navigation.find((n) => n.href === cleanPath)?.name || t('dashboard')}
+              {sections.flatMap((s) => s.items).find((n) => n.href === cleanPath)?.name || t('dashboard')}
             </h1>
           </div>
           <div className="flex items-center gap-4">
