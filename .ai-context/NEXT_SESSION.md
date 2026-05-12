@@ -40,14 +40,16 @@ Bu sayfalar çalışıyor ama eski style:
 ## Bu Oturumda Yapılanlar (Oturum 139 — OpenClaw)
 - **Vercel build hatası düzeltildi** ✅
   - Hata: `ENOENT: page_client-reference-manifest.js` — (dashboard)/page route group
-  - Sebep: `'use client'` page.tsx → Next.js client-reference-manifest üretmiyor → Vercel tracing crash
-  - Çözüm: `DashboardOverview.tsx` ayrı client component, `page.tsx` server wrapper
-  - Commit: `b3443212`
+  - Sebep: Next.js 15 route group root page'leri için manifest dosyası üretmiyor → Vercel NFT crash
+  - Çözüm: `fix-manifests.js` post-build scripti — eksik manifest'leri otomatik oluşturur
+  - `vercel.json` buildCommand'e `&& node fix-manifests.js` eklendi
+  - `page.tsx` → server component, `DashboardOverview.tsx` → ayrı client component
+  - 3 iterasyon gerekti: server wrapper → dynamic import → post-build script
+  - Son commit: `b230769a`
 - **Vercel rate limit** ⚠️
   - 14 açık dependabot PR'ı → her biri preview deploy → 100/gün limit aşıldı
-  - `dependabot.yml` PR limitleri: cargo 10→3, npm 10→3, actions 5→2
-  - Commit: `cb2b5296`
-  - **Limit 24 saat sonra sıfırlanır** — sonraki deploy otomatik başarılı olmalı
+  - `dependabot.yml` PR limitleri: cargo 10→3, npm 10→3
+  - **Limit ~24 saat sonra sıfırlanır** — sonraki deploy otomatik başarılı olmalı
 - **Google 2FA ile Vercel'e giriş yapıldı** — browser OAuth
 
 ## Bu Oturumda Yapılanlar (Oturum 138)
