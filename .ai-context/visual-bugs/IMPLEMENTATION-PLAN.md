@@ -2,7 +2,7 @@
 
 > **Tarih:** 2026-05-12 02:00 GMT+8
 > **Kaynak:** FINAL-IMPLEMENTATION-REPORT.md + ALL-FINDINGS-CLEAN.txt + 15 screenshot
-> **Toplam madde:** 364 madde — 330 tamamlandı (%91) — 34 kalan ⬜ + 5 Servet görevi
+> **Toplam madde:** 364 madde — 340 tamamlandı (%93) — 24 kalan ⬜ + 5 Servet görevi
 > **Kural:** Her madde tek satır, numaralı, dosya yolu ile birlikte
 
 ---
@@ -291,12 +291,12 @@
 199. ✅ onboarding.* section — 32 key eksik — Zaten tüm key'ler mevcut (en.json: 69 key, tr.json: 69 key, hepsi Türkçe çevrilmiş) ✅ YAPILDI (önceki oturum)
 
 ### 6.2 Email i18n
-200. ⬜ Email template'leri sadece İngilizce → `api/src/email.rs` — 📝 `docs/email-templates.md` oluşturuldu
-201. ⬜ Email retry yok → `api/src/email.rs` — 📝 retry + dead-letter önerileri dokümante edildi
+200. ✅ Email template'leri sadece İngilizce → `api/src/email.rs` — Language enum (Tr/En), 6 shared template fonksiyonu, tüm template'ler Türkçe+İngilizce ✅ YAPILDI (Oturum 130)
+201. ✅ Email retry yok → `api/src/email.rs` — Exponential backoff (max 3 retry, 1s/2s/4s), sadece transient error'larda ✅ YAPILDI (Oturum 130)
 202. ⬜ Dead-letter queue yok failed emails için — 📝 `docs/email-templates.md`'de çözüm önerisi
 203. ⬜ Email-level rate limiting yok — 📝 per-recipient + global limit önerileri
-204. ⬜ Billing/Invoice email template'i yok — 📝 7 eksik template listelendi
-205. ⬜ Webhook Success email template'i yok — 📝 düşük öncelikli olarak dokümante edildi
+204. ✅ Billing/Invoice email template'i yok → `api/src/email.rs` — send_invoice_email() eklendi (fatura no, tutar, plan, dönem) ✅ YAPILDI (Oturum 130)
+205. ✅ Webhook Success email template'i yok → `api/src/email.rs` — send_webhook_success_email() eklendi ✅ YAPILDI (Oturum 130)
 206. ⬜ Email template'leri mobile-optimized değil — 📝 responsive önerileri eklendi
 
 ### 6.3 Content
@@ -367,10 +367,10 @@
 
 247. ✅ Subscription status hardcoded to "active" → made dynamic based on cancel_at_period_end, payment_failed_at, and plan state
 248. ✅ Pricing page shows different limits than backend — comparison table fixed (Free: 1K→10K webhooks, 1→5 endpoints; Pro: 10→50 endpoints; Business: unlimited→500 endpoints) ✅ YAPILDI
-249. ⬜ Provider switching doesn't cancel old subscription
+249. ✅ Provider switching doesn't cancel old subscription → `api/src/routes/billing.rs` — Eski provider'da otomatik cancel + DB temizliği ✅ YAPILDI (Oturum 130)
 250. ✅ Polar.sh `create_customer_portal` is a stub — already implemented with Polar API customer-sessions endpoint
 251. ⬜ No chargeback/refund handling
-252. ⬜ Admin revenue calculation is estimation only
+252. ✅ Admin revenue calculation is estimation only → `api/src/routes/admin.rs` — Gerçek invoice verisi ile hesaplama, collected_revenue field eklendi ✅ YAPILDI (Oturum 130)
 253. ✅ `webhook_count` uses i32 — overflow risk at 2.1B (TODO added in customer.rs with migration plan)
 254. ✅ No webhook failure alerting (TODO added in alerts.rs with implementation plan)
 255. ⬜ No annual billing option
@@ -384,7 +384,7 @@
 ## AŞAMA 11 — BACKEND DERİN (⬜ 24 madde)
 
 ### 11.1 Crypto
-260. ⬜ JWT uses HS256 — no asymmetric option
+260. ⬜ JWT uses HS256 — no asymmetric option → 📝 Oturum 130: Büyük refactor, dedicated session gerekli (RSA key rotation + client migration)
 261. ✅ Access tokens cannot be revoked — jti+iat claims added, revoked_tokens+token_revocation_events tables, middleware blacklist check, /revoke-token and /revoke-all-tokens endpoints, logout+change_password integration, cleanup job ✅ YAPILDI
 262. ✅ Endpoint signing secrets use UUID not crypto random (changed to OsRng 32-byte random)
 263. ✅ ENCRYPTION_KEY not validated at startup (hard fail in production, validates key format)
@@ -409,8 +409,8 @@
 ### 11.4 Database
 277. ✅ Single-queue design — dokümantasyon eklendi, mevcut mitigations (SKIP LOCKED, circuit breaker) ✅ YAPILDI (Oturum 128)
 278. ✅ `webhook_count` INT overflow risk → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (BIGINT)
-279. ⬜ OpenAPI spec eksik endpoint'ler — 📝 `docs/openapi-audit.md` oluşturuldu: 13 eksik endpoint (11 admin + 2 OAuth), 2 batch YAML merge gerekli
-280. ⬜ OpenAPI wrong type definitions — 📝 `amount_cents` format: int64 eksik, duplicate /routing/ paths, eksik response schemas
+279. ✅ OpenAPI spec eksik endpoint'ler → `docs/openapi.yaml` — 13 endpoint eklendi (11 admin + 2 OAuth), 16 yeni schema, batch YAML'lar merge edildi ✅ YAPILDI (Oturum 130)
+280. ✅ OpenAPI wrong type definitions → `docs/openapi.yaml` — amount_cents/monthly_price_cents format:int64, duplicate /routing/ paths kaldırıldı ✅ YAPILDI (Oturum 130)
 
 ### 11.5 Genel Backend
 281. ✅ Request ID middleware — X-Request-Id header / correlation ID
@@ -425,8 +425,8 @@
 ## AŞAMA 12 — CODE QUALITY & DEPS (⬜ 14 madde)
 
 287. ✅ Signing/crypto logic 6+ kez duplicated — shared crate oluştur → TODO comment eklendi ✅ KISMİ (Oturum 128 + TODO added to inbound.rs)
-288. ⬜ Billing provider triplication — abstraction ekle → TODO comment eklendi ✅ KISMİ (Oturum 128)
-289. ⬜ Tight coupling: `api/src/main.rs` monolith — modüllere böl → TODO comment eklendi ✅ KISMİ (Oturum 128)
+288. ✅ Billing provider triplication — abstraction ekle → `api/src/billing/mod.rs` — BillingService struct: checkout(), cancel_at_provider(), portal() ✅ YAPILDI (Oturum 130)
+289. ✅ Tight coupling: `api/src/main.rs` monolith — modüllere böl → main.rs 315 satır, lib.rs 30+ modül, zaten modular ✅ YAPILDI (Oturum 130 — doğrulandı)
 290. ✅ Shared crate between API and worker between API and worker
 291. ✅ Excessive `clone()` — sağlık kontrolünde gerekli, fazlalık yok ✅ YAPILDI (Oturum 128)
 292. ✅ `any` type usage — sadece 2 non-test kullanım (dokümantasyon amaçlı) ✅ YAPILDI (Oturum 128)
@@ -510,9 +510,9 @@
 
 ### 13.6 Content Düşük
 356. ⬜ Content quality score: 6.5/10 — 📝 Blog: 17 post, i18n mevcut. Alternatives: 8 sayfa, i18n mevcut. Testimonials: illustrative scenarios (HS-067), gerçek değil
-357. ⬜ Blog factual errors — 📝 Blog post'lar `data.ts`'de markdown content olarak tutuluyor, inline HTML. Teknik doğruluk kontrolü gerekli (svix comparison, webhook architecture claims)
-358. ⬜ Alternatives pages biased — 📝 8 sayfa incelendi: HookSniff her kategoride kazanıyor gösterilmiş, rakiplerin güçlü yönleri yeterince vurgulanmıyor. "winner" column'u her satırda HookSniff
-359. ⬜ Generic testimonials — 📝 `content.tsx` line 10: "These are illustrative usage scenarios, not real customer testimonials" — ShopFlow, PayFlow, NeuralOps, CloudSync şirketleri gerçek değil, placeholder
+357. ✅ Blog factual errors → `blog/[slug]/data.ts` — HookSniff/Svix/Hookdeck fiyat düzeltmeleri, ücretsiz katman açıklamaları güncellendi ✅ YAPILDI (Oturum 130)
+358. ✅ Alternatives pages biased → 8 sayfa — "winner" kolonu kaldırıldı, "bestFor" eklendi, her rakip için "Ne zaman seçmeli" bölümü eklendi ✅ YAPILDI (Oturum 130)
+359. ✅ Generic testimonials → `content.tsx` — illustratif senaryo disclaimer eklendi (TR+EN) ✅ YAPILDI (Oturum 130)
 
 ---
 

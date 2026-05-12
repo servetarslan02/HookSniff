@@ -30,8 +30,8 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 
 | Feature | HookSniff | Svix | Hookdeck | Hook0 |
 |---------|-----------|------|----------|-------|
-| **Price (free tier)** | $0/mo forever | $0 (limited) | $0 (limited) | Free (self-hosted) |
-| **Paid plans** | None needed | $50–500/mo | $50–500/mo | N/A |
+| **Price (free tier)** | 10,000 events/mo | Unlimited events* | 10,000 events/mo | Free (self-hosted) |
+| **Paid plans** | $29–99/mo | Custom pricing | $39/mo+ | N/A |
 | **SDKs** | 11 | 6 | 8 | 3 |
 | **FIFO delivery** | ✅ | ❌ | ❌ | ❌ |
 | **Schema registry** | ✅ | ❌ | ❌ | ❌ |
@@ -43,11 +43,11 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 
 ### Pricing Deep-Dive
 
-**HookSniff** runs entirely on free-tier infrastructure — Cloud Run, Upstash Redis, Cloudflare R2, and Vercel. The result: 10,000 webhooks per month at $0. No credit card, no trial period, no surprise charges. For startups and indie developers, this is a game-changer.
+**HookSniff** offers a generous free tier with 10,000 webhooks per month at $0. For higher volumes, Pro ($29/mo) and Business ($99/mo) plans are available. For startups and indie developers, the free tier is a great starting point.
 
-**Svix** offers a managed cloud starting at $50/month for 10,000 webhooks. Enterprise plans scale to $500+/month. They also offer an open-source self-hosted version, but you need to manage your own infrastructure.
+**Svix** offers a managed cloud with pricing that scales based on usage. Their Professional plan starts around $490/month for higher volumes. They also offer an open-source self-hosted version, but you need to manage your own infrastructure.
 
-**Hookdeck** is a developer-focused platform with a generous free tier (100K events/month), but advanced features like transformations and filters require paid plans starting at $50/month.
+**Hookdeck** is a developer-focused platform with a free tier (10,000 events/month), but advanced features like transformations and filters require paid plans starting at $39/month.
 
 **Hook0** is fully open-source and self-hosted. You pay only for your own infrastructure. However, this means you own the operational burden — deployments, scaling, monitoring, and incident response.
 
@@ -123,7 +123,7 @@ HookSniff was built by developers who were frustrated with existing options. Our
 
 The webhook service market has matured significantly. All four options are solid — the right choice depends on your specific needs around pricing, ordering guarantees, SDK coverage, and operational preferences.
 
-HookSniff's bet is simple: most teams don't need to pay $50-500/month for reliable webhook delivery. With the right architecture (Rust/Axum, PostgreSQL queues, Redis rate limiting), you can deliver enterprise-grade reliability on free-tier infrastructure.
+HookSniff's bet is simple: most teams don't need to pay $50-500/month for reliable webhook delivery. With the right architecture (Rust/Axum, PostgreSQL queues, Redis rate limiting), you can deliver enterprise-grade reliability starting at $0/month on our free tier.
 
 We think that is worth trying.`,
   },
