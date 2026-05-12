@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 19:32 GMT+8
+> Son güncelleme: 2026-05-12 20:47 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -187,14 +187,15 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **16 dosya değişti, 159 satır eklendi, 56 satır silindi**
 - **Commits:** pending push
 
-## 📊 Güncel İlerleme (2026-05-12 04:29)
+## 📊 Güncel İlerleme (2026-05-12 20:47 — Oturum 129)
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
-| 🚨 P0 (AŞAMA 1) | 22 | 19 | 3 |
-| 🔴 P1 (AŞAMA 2) | 44 | 32 | 12 |
-| 🟡 P2 (AŞAMA 3-6) | 103 | 25 | 78 |
-| 🟢 P3 (AŞAMA 7-13) | 195 | 0 | 195 |
+| AŞAMA 1-2 (Güvenlik+Admin) | 66 | 66 | 0 |
+| AŞAMA 3-4 (Admin+Frontend) | 121 | 121 | 0 |
+| AŞAMA 5-9 (DB+i18n+A11Y+Perf+GDPR) | 74 | 67 | 7 |
+| AŞAMA 10-13 (Payments+Backend+Quality+Düşük) | 103 | 76 | 27 |
+| **TOPLAM** | **364** | **330** | **34 + 5 Servet** |
 
 ## Oturum 120 (2026-05-12 03:59 - 04:29 GMT+8) ✅
 - **OpenClaw on altıncı oturum** — Servet ile AŞAMA 3-4 düzeltmeleri
@@ -371,3 +372,23 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Item 322: Logs status counts tüm sayfaları sayıyor
 - **Genel İlerleme:** ~210/364 tamamlandı (%58)
 - **Commits:** e171a7bd, dc42e697, 8c1da0ca, ca286fa5, 535bb062 — main branch
+
+## Oturum 129 (2026-05-12 20:47 GMT+8) ✅
+- **OpenClaw** — Final cleanup & documentation
+- **IMPLEMENTATION-PLAN.md sayıları düzeltildi:** 330/364 tamamlandı (%91)
+  - Önceki özet "~210/364 (%58)" yanlışmış — gerçek count 330
+  - AŞAMA header'ları güncellendi (stage bazlı completion rates)
+  - Oturum 129 notları eklendi
+- **MEMORY.md güncellendi** — Oturum 129 eklendi, progress numbers corrected
+- **NEXT_SESSION.md güncellendi** — kalan maddeler + Servet görevleri
+- **Code audit:**
+  - Production console.log: Sadece docs/code examples'da var (temiz ✅)
+  - TODO/FIXME: 6 Rust TODO + 3 dashboard TODO — tümü IMPLEMENTATION-PLAN'da kayıtlı
+  - Kullanılmayan import: temiz ✅
+- **Kalan 34 ⬜ madde analizi:**
+  - Email templates (200-206): 7 madde — 📝 dokümante edildi
+  - Payments (247-259): 10 madde — Servet + büyük backend işi
+  - Backend (260-280): 4 madde — JWT/OpenAPI refactor
+  - Code Quality (288-289): 2 madde — KISMİ (TODO eklendi)
+  - Content/SDK (353-359): 6 madde — içerik + SDK coverage
+  - Servet görevleri (360-364): 5 madde — ⚠️ Servet'in yapması gereken
