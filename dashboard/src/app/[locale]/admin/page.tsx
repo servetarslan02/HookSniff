@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { adminApi, type AdminStatsResponse } from '@/lib/api';
+import { adminApi, type AdminStatsResponse, type AuditLogEntry } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
@@ -16,6 +17,7 @@ const PLAN_COLORS: Record<string, string> = {
 export default function AdminOverviewPage() {
   const { token } = useAuth();
   const [stats, setStats] = useState<AdminStatsResponse | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
@@ -27,8 +29,12 @@ export default function AdminOverviewPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminApi.getStats(token);
-      setStats(data);
+      const [statsData, auditData] = await Promise.all([
+        adminApi.getStats(token),
+        adminApi.getAuditLogs(token, { limit: 5 }).catch(() => ({ entries: [], total: 0, limit: 5, offset: 0 })),
+      ]);
+      setStats(statsData);
+      setAuditLogs(auditData.entries || []);
     } catch (err) {
       setError(t("failedToLoadStats"));
     } finally {
@@ -194,6 +200,43 @@ export default function AdminOverviewPage() {
           )}
         </div>
 
+        {/* Recent Activity (Audit Log) */}
+        <div className="glass-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recentActivity')}</h2>
+            <Link href="/admin/activity" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">
+              {t('viewAll')} →
+            </Link>
+          </div>
+          <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+            {auditLogs.length > 0 ? (
+              auditLogs.map((entry) => (
+                <div key={entry.id} className="px-6 py-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {entry.action.replace(/[._]/g, ' ')}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">
+                        {entry.resource_type}{entry.resource_id ? ` · ${entry.resource_id.slice(0, 8)}…` : ''}
+                      </p>
+                    </div>
+                    <span className="text-[11px] text-gray-500 dark:text-slate-400">
+                      {new Date(entry.created_at).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
+                {t('noActivity')}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Signups */}
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">

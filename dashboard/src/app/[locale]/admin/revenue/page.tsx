@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
-import { adminApi, type RevenueResponse } from '@/lib/api';
+import { adminApi, type RevenueResponse, type ChurnUser } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
@@ -17,6 +17,7 @@ const PLAN_COLORS: Record<string, string> = {
 export default function AdminRevenuePage() {
   const { token } = useAuth();
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
+  const [churnUsers, setChurnUsers] = useState<ChurnUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
@@ -27,14 +28,25 @@ export default function AdminRevenuePage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminApi.getRevenue(token);
-      setRevenue(data);
+      const [revenueData, churnData] = await Promise.all([
+        adminApi.getRevenue(token),
+        adminApi.getChurn(token).catch(() => ({ users: [] })),
+      ]);
+      setRevenue(revenueData);
+      setChurnUsers(churnData.users || []);
     } catch (err) {
       setError(t("failedToLoadRevenue"));
     } finally {
       setLoading(false);
     }
   }, [token]);
+
+  const handleExportCSV = () => {
+    if (!token) return;
+    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    const url = adminApi.exportRevenue(token, 12);
+    window.open(`${API}${url}&token=${token}`, '_blank');
+  };
 
   useEffect(() => {
     fetchRevenue();
@@ -87,7 +99,7 @@ export default function AdminRevenuePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label={t('mrr')}
           value={`₺${(revenue?.mrr || 0).toLocaleString()}`}
@@ -107,6 +119,13 @@ export default function AdminRevenuePage() {
           color="red"
           isPercent
         />
+        <button
+          onClick={handleExportCSV}
+          className="glass-card p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 transition cursor-pointer border border-gray-200 dark:border-slate-700"
+        >
+          <span className="text-2xl" aria-hidden="true">⬇</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('exportReport')}</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -210,6 +229,49 @@ export default function AdminRevenuePage() {
             <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noRevenue')}</p>
           )}
         </div>
+      </div>
+
+      {/* Churn Analysis */}
+      <div className="glass-card overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('churnAnalysis')}</h2>
+        </div>
+        {churnUsers.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{tc('email')}</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{tc('name')}</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('plan')}</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('amount')}</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('churnDate')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+                {churnUsers.map((u, index) => (
+                  <tr key={u.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{u.email}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{u.name || '—'}</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300">
+                        {u.plan}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">₺{u.amount.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
+                      {new Date(u.churn_date).toLocaleDateString('tr-TR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
+            {t('noChurn')}
+          </div>
+        )}
       </div>
     </div>
   );
