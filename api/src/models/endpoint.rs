@@ -34,6 +34,8 @@ pub struct Endpoint {
     pub throttle_rate: Option<i32>,
     pub throttle_period_secs: Option<i32>,
     pub throttle_strategy: Option<String>,
+    // Application grouping (migration 013)
+    pub application_id: Option<Uuid>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -143,6 +145,8 @@ pub struct CreateEndpointRequest {
     pub fallback_url: Option<String>,
     /// Event delivery format: "standard" (default) or "cloudevents".
     pub format: Option<String>,
+    /// Application this endpoint belongs to (required).
+    pub application_id: Uuid,
 }
 
 #[derive(Debug, Serialize)]
@@ -162,6 +166,8 @@ pub struct EndpointResponse {
     pub failure_streak: i32,
     /// Event delivery format: "standard" or "cloudevents".
     pub format: String,
+    /// Application this endpoint belongs to.
+    pub application_id: Option<Uuid>,
 }
 
 impl Endpoint {
@@ -181,6 +187,7 @@ impl Endpoint {
             avg_response_ms: self.avg_response_ms,
             failure_streak: self.failure_streak,
             format: self.format,
+            application_id: self.application_id,
         }
     }
 

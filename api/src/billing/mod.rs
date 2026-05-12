@@ -16,40 +16,116 @@ use crate::models::customer::Customer;
 use serde::{Deserialize, Serialize};
 
 /// Subscription plan definitions with limits
+/// New plan structure: Developer ($0) / Startup ($29) / Pro ($49) / Enterprise (Custom)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Plan {
-    Free,
+    /// Formerly "Free" — renamed to Developer
+    Developer,
+    /// New plan — $29/mo
+    Startup,
+    /// $49/mo (was Pro at $49)
     Pro,
-    Business,
+    /// Custom pricing (was Business)
     Enterprise,
 }
 
 impl Plan {
     pub fn parse_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
+            "startup" => Plan::Startup,
             "pro" => Plan::Pro,
-            "business" => Plan::Business,
             "enterprise" => Plan::Enterprise,
-            _ => Plan::Free,
+            // Backward compat: old "free" maps to Developer
+            "free" | "developer" | _ => Plan::Developer,
         }
     }
 
     pub fn as_str(&self) -> &'static str {
         match self {
-            Plan::Free => "free",
+            Plan::Developer => "developer",
+            Plan::Startup => "startup",
             Plan::Pro => "pro",
-            Plan::Business => "business",
             Plan::Enterprise => "enterprise",
+        }
+    }
+
+    /// Max applications per plan
+    pub fn max_applications(&self) -> u32 {
+        match self {
+            Plan::Developer => 1,
+            Plan::Startup => 1,
+            Plan::Pro => u32::MAX, // unlimited
+            Plan::Enterprise => u32::MAX,
+        }
+    }
+
+    /// Max event types per plan
+    pub fn max_event_types(&self) -> u32 {
+        match self {
+            Plan::Developer => 10,
+            Plan::Startup => 50,
+            Plan::Pro => u32::MAX,
+            Plan::Enterprise => u32::MAX,
+        }
+    }
+
+    /// Max team members per plan
+    pub fn max_team_members(&self) -> u32 {
+        match self {
+            Plan::Developer => 1,
+            Plan::Startup => 25,
+            Plan::Pro => u32::MAX,
+            Plan::Enterprise => u32::MAX,
+        }
+    }
+
+    /// Max subscriptions per plan (webhook subscriptions / event routing rules)
+    pub fn max_subscriptions(&self) -> u32 {
+        match self {
+            Plan::Developer => 10,
+            Plan::Startup => 300,
+            Plan::Pro => u32::MAX,
+            Plan::Enterprise => u32::MAX,
+        }
+    }
+
+    /// Max events per day
+    pub fn max_events_per_day(&self) -> u64 {
+        match self {
+            Plan::Developer => 100,
+            Plan::Startup => 30_000,
+            Plan::Pro => 100_000,
+            Plan::Enterprise => u64::MAX,
+        }
+    }
+
+    /// Overage price per event in cents (USD) — charged when daily limit exceeded
+    pub fn overage_price_cents_per_event(&self) -> f64 {
+        match self {
+            Plan::Developer => 0.0,  // blocked at limit
+            Plan::Startup => 0.003,  // $0.003/event
+            Plan::Pro => 0.0001,     // $0.0001/event
+            Plan::Enterprise => 0.0, // custom
+        }
+    }
+
+    /// Whether overage is allowed (never-blocked mode)
+    pub fn allows_overage(&self) -> bool {
+        match self {
+            Plan::Developer => false, // blocked at limit
+            Plan::Startup => true,
+            Plan::Pro => true,
+            Plan::Enterprise => true,
         }
     }
 
     /// Max webhook deliveries per month
     pub fn max_webhooks_per_month(&self) -> u64 {
         match self {
-            Plan::Free => 10_000,
-            Plan::Pro => 50_000,
-            Plan::Business => 500_000,
+            Plan::Developer => 10_000,
+            Plan::Startup => 30_000,
+            Plan::Pro => 100_000,
             Plan::Enterprise => u64::MAX,
         }
     }
@@ -57,9 +133,9 @@ impl Plan {
     /// Max API requests per minute
     pub fn max_requests_per_minute(&self) -> u32 {
         match self {
-            Plan::Free => 100,
-            Plan::Pro => 1_000,
-            Plan::Business => 10_000,
+            Plan::Developer => 100,
+            Plan::Startup => 1_000,
+            Plan::Pro => 10_000,
             Plan::Enterprise => u32::MAX,
         }
     }
@@ -67,9 +143,9 @@ impl Plan {
     /// Max endpoints
     pub fn max_endpoints(&self) -> u32 {
         match self {
-            Plan::Free => 5,
-            Plan::Pro => 50,
-            Plan::Business => 500,
+            Plan::Developer => 5,
+            Plan::Startup => 50,
+            Plan::Pro => 500,
             Plan::Enterprise => u32::MAX,
         }
     }
@@ -77,19 +153,19 @@ impl Plan {
     /// Max payload size in bytes
     pub fn max_payload_bytes(&self) -> usize {
         match self {
-            Plan::Free => 256 * 1024,             // 256 KB
-            Plan::Pro => 1024 * 1024,             // 1 MB
-            Plan::Business => 5 * 1024 * 1024,    // 5 MB
-            Plan::Enterprise => 10 * 1024 * 1024, // 10 MB
+            Plan::Developer => 256 * 1024,          // 256 KB
+            Plan::Startup => 1024 * 1024,           // 1 MB
+            Plan::Pro => 5 * 1024 * 1024,           // 5 MB
+            Plan::Enterprise => 10 * 1024 * 1024,   // 10 MB
         }
     }
 
     /// Retention days for delivery logs
     pub fn retention_days(&self) -> i64 {
         match self {
-            Plan::Free => 7,
+            Plan::Developer => 7,
+            Plan::Startup => 14,
             Plan::Pro => 30,
-            Plan::Business => 90,
             Plan::Enterprise => 365,
         }
     }
@@ -97,19 +173,19 @@ impl Plan {
     /// Monthly price in cents (USD) — used for Stripe and Polar.sh
     pub fn monthly_price_cents(&self) -> u64 {
         match self {
-            Plan::Free => 0,
-            Plan::Pro => 4900,      // $49/mo
-            Plan::Business => 9900, // $99/mo
-            Plan::Enterprise => 0,  // Custom pricing
+            Plan::Developer => 0,
+            Plan::Startup => 2900,    // $29/mo
+            Plan::Pro => 4900,        // $49/mo
+            Plan::Enterprise => 0,    // Custom pricing
         }
     }
 
     /// Monthly price in kuruş (TRY) — used for iyzico
     pub fn monthly_price_kurus(&self) -> i64 {
         match self {
-            Plan::Free => 0,
-            Plan::Pro => 99900,      // ₺999.00 (TR'ye özel, $49'dan ucuz)
-            Plan::Business => 199900, // ₺1,999.00 (TR'ye özel, $99'dan ucuz)
+            Plan::Developer => 0,
+            Plan::Startup => 59900,   // ₺599.00
+            Plan::Pro => 99900,       // ₺999.00
             Plan::Enterprise => 0,
         }
     }
@@ -466,6 +542,23 @@ mod tests {
     // ── Plan::parse_str ────────────────────────────────────────
 
     #[test]
+    fn parse_str_developer() {
+        assert_eq!(Plan::parse_str("developer"), Plan::Developer);
+        assert_eq!(Plan::parse_str("Developer"), Plan::Developer);
+        assert_eq!(Plan::parse_str("DEVELOPER"), Plan::Developer);
+        // Backward compat: old "free" maps to Developer
+        assert_eq!(Plan::parse_str("free"), Plan::Developer);
+        assert_eq!(Plan::parse_str("Free"), Plan::Developer);
+    }
+
+    #[test]
+    fn parse_str_startup() {
+        assert_eq!(Plan::parse_str("startup"), Plan::Startup);
+        assert_eq!(Plan::parse_str("Startup"), Plan::Startup);
+        assert_eq!(Plan::parse_str("STARTUP"), Plan::Startup);
+    }
+
+    #[test]
     fn parse_str_pro() {
         assert_eq!(Plan::parse_str("pro"), Plan::Pro);
         assert_eq!(Plan::parse_str("Pro"), Plan::Pro);
@@ -473,35 +566,29 @@ mod tests {
     }
 
     #[test]
-    fn parse_str_business() {
-        assert_eq!(Plan::parse_str("business"), Plan::Business);
-        assert_eq!(Plan::parse_str("Business"), Plan::Business);
-        assert_eq!(Plan::parse_str("BUSINESS"), Plan::Business);
-    }
-
-    #[test]
     fn parse_str_enterprise() {
         assert_eq!(Plan::parse_str("enterprise"), Plan::Enterprise);
         assert_eq!(Plan::parse_str("Enterprise"), Plan::Enterprise);
         assert_eq!(Plan::parse_str("ENTERPRISE"), Plan::Enterprise);
+        // Backward compat: old "business" maps to Enterprise
+        assert_eq!(Plan::parse_str("business"), Plan::Enterprise);
+        assert_eq!(Plan::parse_str("Business"), Plan::Enterprise);
     }
 
     #[test]
-    fn parse_str_free_default() {
-        assert_eq!(Plan::parse_str("free"), Plan::Free);
-        assert_eq!(Plan::parse_str("Free"), Plan::Free);
-        assert_eq!(Plan::parse_str(""), Plan::Free);
-        assert_eq!(Plan::parse_str("unknown"), Plan::Free);
-        assert_eq!(Plan::parse_str("random_string"), Plan::Free);
+    fn parse_str_default_is_developer() {
+        assert_eq!(Plan::parse_str(""), Plan::Developer);
+        assert_eq!(Plan::parse_str("unknown"), Plan::Developer);
+        assert_eq!(Plan::parse_str("random_string"), Plan::Developer);
     }
 
     // ── Plan::as_str ───────────────────────────────────────────
 
     #[test]
     fn as_str_all_variants() {
-        assert_eq!(Plan::Free.as_str(), "free");
+        assert_eq!(Plan::Developer.as_str(), "developer");
+        assert_eq!(Plan::Startup.as_str(), "startup");
         assert_eq!(Plan::Pro.as_str(), "pro");
-        assert_eq!(Plan::Business.as_str(), "business");
         assert_eq!(Plan::Enterprise.as_str(), "enterprise");
     }
 
@@ -509,31 +596,89 @@ mod tests {
 
     #[test]
     fn parse_str_as_str_roundtrip() {
-        for variant in &[Plan::Free, Plan::Pro, Plan::Business, Plan::Enterprise] {
+        for variant in &[Plan::Developer, Plan::Startup, Plan::Pro, Plan::Enterprise] {
             let s = variant.as_str();
             assert_eq!(Plan::parse_str(s), *variant);
         }
     }
 
+    // ── max_applications ───────────────────────────────────────
+
+    #[test]
+    fn max_applications_all() {
+        assert_eq!(Plan::Developer.max_applications(), 1);
+        assert_eq!(Plan::Startup.max_applications(), 1);
+        assert_eq!(Plan::Pro.max_applications(), u32::MAX);
+        assert_eq!(Plan::Enterprise.max_applications(), u32::MAX);
+    }
+
+    // ── max_event_types ────────────────────────────────────────
+
+    #[test]
+    fn max_event_types_all() {
+        assert_eq!(Plan::Developer.max_event_types(), 10);
+        assert_eq!(Plan::Startup.max_event_types(), 50);
+        assert_eq!(Plan::Pro.max_event_types(), u32::MAX);
+        assert_eq!(Plan::Enterprise.max_event_types(), u32::MAX);
+    }
+
+    // ── max_team_members ───────────────────────────────────────
+
+    #[test]
+    fn max_team_members_all() {
+        assert_eq!(Plan::Developer.max_team_members(), 1);
+        assert_eq!(Plan::Startup.max_team_members(), 25);
+        assert_eq!(Plan::Pro.max_team_members(), u32::MAX);
+        assert_eq!(Plan::Enterprise.max_team_members(), u32::MAX);
+    }
+
+    // ── max_subscriptions ──────────────────────────────────────
+
+    #[test]
+    fn max_subscriptions_all() {
+        assert_eq!(Plan::Developer.max_subscriptions(), 10);
+        assert_eq!(Plan::Startup.max_subscriptions(), 300);
+        assert_eq!(Plan::Pro.max_subscriptions(), u32::MAX);
+        assert_eq!(Plan::Enterprise.max_subscriptions(), u32::MAX);
+    }
+
+    // ── max_events_per_day ─────────────────────────────────────
+
+    #[test]
+    fn max_events_per_day_all() {
+        assert_eq!(Plan::Developer.max_events_per_day(), 100);
+        assert_eq!(Plan::Startup.max_events_per_day(), 30_000);
+        assert_eq!(Plan::Pro.max_events_per_day(), 100_000);
+        assert_eq!(Plan::Enterprise.max_events_per_day(), u64::MAX);
+    }
+
+    // ── overage_price_cents_per_event ──────────────────────────
+
+    #[test]
+    fn overage_price_all() {
+        assert_eq!(Plan::Developer.overage_price_cents_per_event(), 0.0);
+        assert_eq!(Plan::Startup.overage_price_cents_per_event(), 0.003);
+        assert_eq!(Plan::Pro.overage_price_cents_per_event(), 0.0001);
+        assert_eq!(Plan::Enterprise.overage_price_cents_per_event(), 0.0);
+    }
+
+    // ── allows_overage ─────────────────────────────────────────
+
+    #[test]
+    fn allows_overage_all() {
+        assert!(!Plan::Developer.allows_overage());
+        assert!(Plan::Startup.allows_overage());
+        assert!(Plan::Pro.allows_overage());
+        assert!(Plan::Enterprise.allows_overage());
+    }
+
     // ── max_webhooks_per_month ─────────────────────────────────
 
     #[test]
-    fn max_webhooks_per_month_free() {
-        assert_eq!(Plan::Free.max_webhooks_per_month(), 10_000);
-    }
-
-    #[test]
-    fn max_webhooks_per_month_pro() {
-        assert_eq!(Plan::Pro.max_webhooks_per_month(), 50_000);
-    }
-
-    #[test]
-    fn max_webhooks_per_month_business() {
-        assert_eq!(Plan::Business.max_webhooks_per_month(), 500_000);
-    }
-
-    #[test]
-    fn max_webhooks_per_month_enterprise() {
+    fn max_webhooks_per_month_all() {
+        assert_eq!(Plan::Developer.max_webhooks_per_month(), 10_000);
+        assert_eq!(Plan::Startup.max_webhooks_per_month(), 30_000);
+        assert_eq!(Plan::Pro.max_webhooks_per_month(), 100_000);
         assert_eq!(Plan::Enterprise.max_webhooks_per_month(), u64::MAX);
     }
 
@@ -541,9 +686,9 @@ mod tests {
 
     #[test]
     fn max_requests_per_minute_all() {
-        assert_eq!(Plan::Free.max_requests_per_minute(), 100);
-        assert_eq!(Plan::Pro.max_requests_per_minute(), 1_000);
-        assert_eq!(Plan::Business.max_requests_per_minute(), 10_000);
+        assert_eq!(Plan::Developer.max_requests_per_minute(), 100);
+        assert_eq!(Plan::Startup.max_requests_per_minute(), 1_000);
+        assert_eq!(Plan::Pro.max_requests_per_minute(), 10_000);
         assert_eq!(Plan::Enterprise.max_requests_per_minute(), u32::MAX);
     }
 
@@ -551,9 +696,9 @@ mod tests {
 
     #[test]
     fn max_endpoints_all() {
-        assert_eq!(Plan::Free.max_endpoints(), 5);
-        assert_eq!(Plan::Pro.max_endpoints(), 50);
-        assert_eq!(Plan::Business.max_endpoints(), 500);
+        assert_eq!(Plan::Developer.max_endpoints(), 5);
+        assert_eq!(Plan::Startup.max_endpoints(), 50);
+        assert_eq!(Plan::Pro.max_endpoints(), 500);
         assert_eq!(Plan::Enterprise.max_endpoints(), u32::MAX);
     }
 
@@ -561,9 +706,9 @@ mod tests {
 
     #[test]
     fn max_payload_bytes_all() {
-        assert_eq!(Plan::Free.max_payload_bytes(), 256 * 1024);
-        assert_eq!(Plan::Pro.max_payload_bytes(), 1024 * 1024);
-        assert_eq!(Plan::Business.max_payload_bytes(), 5 * 1024 * 1024);
+        assert_eq!(Plan::Developer.max_payload_bytes(), 256 * 1024);
+        assert_eq!(Plan::Startup.max_payload_bytes(), 1024 * 1024);
+        assert_eq!(Plan::Pro.max_payload_bytes(), 5 * 1024 * 1024);
         assert_eq!(Plan::Enterprise.max_payload_bytes(), 10 * 1024 * 1024);
     }
 
@@ -571,9 +716,9 @@ mod tests {
 
     #[test]
     fn retention_days_all() {
-        assert_eq!(Plan::Free.retention_days(), 7);
+        assert_eq!(Plan::Developer.retention_days(), 7);
+        assert_eq!(Plan::Startup.retention_days(), 14);
         assert_eq!(Plan::Pro.retention_days(), 30);
-        assert_eq!(Plan::Business.retention_days(), 90);
         assert_eq!(Plan::Enterprise.retention_days(), 365);
     }
 
@@ -581,9 +726,9 @@ mod tests {
 
     #[test]
     fn monthly_price_cents_all() {
-        assert_eq!(Plan::Free.monthly_price_cents(), 0);
+        assert_eq!(Plan::Developer.monthly_price_cents(), 0);
+        assert_eq!(Plan::Startup.monthly_price_cents(), 2900);
         assert_eq!(Plan::Pro.monthly_price_cents(), 4900);
-        assert_eq!(Plan::Business.monthly_price_cents(), 9900);
         assert_eq!(Plan::Enterprise.monthly_price_cents(), 0);
     }
 
@@ -591,9 +736,9 @@ mod tests {
 
     #[test]
     fn monthly_price_kurus_all() {
-        assert_eq!(Plan::Free.monthly_price_kurus(), 0);
+        assert_eq!(Plan::Developer.monthly_price_kurus(), 0);
+        assert_eq!(Plan::Startup.monthly_price_kurus(), 59900);
         assert_eq!(Plan::Pro.monthly_price_kurus(), 99900);
-        assert_eq!(Plan::Business.monthly_price_kurus(), 199900);
         assert_eq!(Plan::Enterprise.monthly_price_kurus(), 0);
     }
 
@@ -601,11 +746,11 @@ mod tests {
 
     #[test]
     fn annual_price_cents_all() {
+        // Startup: $29/mo * 12 * 0.80 = $278.40 → 27840 cents
+        assert_eq!(Plan::Startup.annual_price_cents(), 27840);
         // Pro: $49/mo * 12 * 0.80 = $470.40 → 47040 cents
         assert_eq!(Plan::Pro.annual_price_cents(), 47040);
-        // Business: $99/mo * 12 * 0.80 = $950.40 → 95040 cents
-        assert_eq!(Plan::Business.annual_price_cents(), 95040);
-        assert_eq!(Plan::Free.annual_price_cents(), 0);
+        assert_eq!(Plan::Developer.annual_price_cents(), 0);
         assert_eq!(Plan::Enterprise.annual_price_cents(), 0);
     }
 
@@ -613,47 +758,39 @@ mod tests {
 
     #[test]
     fn annual_price_kurus_all() {
+        // Startup: ₺599/mo * 12 * 0.80 = ₺5,750.40 → 575040 kuruş
+        assert_eq!(Plan::Startup.annual_price_kurus(), 575040);
         // Pro: ₺999/mo * 12 * 0.80 = ₺9,590.40 → 959040 kuruş
         assert_eq!(Plan::Pro.annual_price_kurus(), 959040);
-        // Business: ₺1,999/mo * 12 * 0.80 = ₺19,190.40 → 1919040 kuruş
-        assert_eq!(Plan::Business.annual_price_kurus(), 1919040);
-        assert_eq!(Plan::Free.annual_price_kurus(), 0);
+        assert_eq!(Plan::Developer.annual_price_kurus(), 0);
         assert_eq!(Plan::Enterprise.annual_price_kurus(), 0);
     }
 
     // ── requires_contact ──────────────────────────────────────
 
     #[test]
-    fn requires_contact_enterprise() {
-        assert!(Plan::Enterprise.requires_contact());
-    }
-
-    #[test]
-    fn requires_contact_others() {
-        assert!(!Plan::Free.requires_contact());
+    fn requires_contact_enterprise_only() {
+        assert!(!Plan::Developer.requires_contact());
+        assert!(!Plan::Startup.requires_contact());
         assert!(!Plan::Pro.requires_contact());
-        assert!(!Plan::Business.requires_contact());
+        assert!(Plan::Enterprise.requires_contact());
     }
 
     // ── Plan ordering (higher tiers have higher limits) ────────
 
     #[test]
     fn higher_tiers_have_higher_limits() {
-        assert!(Plan::Free.max_requests_per_minute() < Plan::Pro.max_requests_per_minute());
-        assert!(Plan::Pro.max_requests_per_minute() < Plan::Business.max_requests_per_minute());
-        assert!(
-            Plan::Business.max_requests_per_minute() < Plan::Enterprise.max_requests_per_minute()
-        );
+        assert!(Plan::Developer.max_requests_per_minute() < Plan::Startup.max_requests_per_minute());
+        assert!(Plan::Startup.max_requests_per_minute() < Plan::Pro.max_requests_per_minute());
+        assert!(Plan::Pro.max_requests_per_minute() < Plan::Enterprise.max_requests_per_minute());
 
-        assert!(Plan::Free.max_endpoints() < Plan::Pro.max_endpoints());
-        assert!(Plan::Pro.max_endpoints() < Plan::Business.max_endpoints());
-        assert!(Plan::Business.max_endpoints() < Plan::Enterprise.max_endpoints());
+        assert!(Plan::Developer.max_endpoints() < Plan::Startup.max_endpoints());
+        assert!(Plan::Startup.max_endpoints() < Plan::Pro.max_endpoints());
+        assert!(Plan::Pro.max_endpoints() < Plan::Enterprise.max_endpoints());
 
-        assert!(Plan::Free.max_webhooks_per_month() < Plan::Pro.max_webhooks_per_month());
-        assert!(Plan::Pro.max_webhooks_per_month() < Plan::Business.max_webhooks_per_month());
-        assert!(
-            Plan::Business.max_webhooks_per_month() < Plan::Enterprise.max_webhooks_per_month()
-        );
+        assert!(Plan::Developer.max_webhooks_per_month() < Plan::Startup.max_webhooks_per_month());
+        assert!(Plan::Startup.max_webhooks_per_month() < Plan::Pro.max_webhooks_per_month());
+        assert!(Plan::Pro.max_webhooks_per_month() < Plan::Enterprise.max_webhooks_per_month());
     }
 
     // ── Usage ──────────────────────────────────────────────────
@@ -672,61 +809,61 @@ mod tests {
 
     #[test]
     fn usage_webhook_limit_not_exceeded() {
-        let usage = make_usage(Plan::Free, 5000, 2);
+        let usage = make_usage(Plan::Developer, 5000, 2);
         assert!(!usage.is_webhook_limit_exceeded());
     }
 
     #[test]
     fn usage_webhook_limit_exceeded_at_boundary() {
-        let usage = make_usage(Plan::Free, 10_000, 2);
+        let usage = make_usage(Plan::Developer, 10_000, 2);
         assert!(usage.is_webhook_limit_exceeded());
     }
 
     #[test]
     fn usage_webhook_limit_exceeded_over() {
-        let usage = make_usage(Plan::Free, 15_000, 2);
+        let usage = make_usage(Plan::Developer, 15_000, 2);
         assert!(usage.is_webhook_limit_exceeded());
     }
 
     #[test]
     fn usage_endpoint_limit_not_exceeded() {
-        let usage = make_usage(Plan::Free, 0, 3);
+        let usage = make_usage(Plan::Developer, 0, 3);
         assert!(!usage.is_endpoint_limit_exceeded());
     }
 
     #[test]
     fn usage_endpoint_limit_exceeded_at_boundary() {
-        let usage = make_usage(Plan::Free, 0, 5);
+        let usage = make_usage(Plan::Developer, 0, 5);
         assert!(usage.is_endpoint_limit_exceeded());
     }
 
     #[test]
     fn usage_endpoint_limit_exceeded_over() {
-        let usage = make_usage(Plan::Free, 0, 10);
+        let usage = make_usage(Plan::Developer, 0, 10);
         assert!(usage.is_endpoint_limit_exceeded());
     }
 
     #[test]
     fn usage_remaining_webhooks_normal() {
         let usage = make_usage(Plan::Pro, 20_000, 0);
-        assert_eq!(usage.remaining_webhooks(), 30_000);
+        assert_eq!(usage.remaining_webhooks(), 80_000);
     }
 
     #[test]
     fn usage_remaining_webhooks_saturates_at_zero() {
-        let usage = make_usage(Plan::Free, 20_000, 0);
+        let usage = make_usage(Plan::Developer, 20_000, 0);
         assert_eq!(usage.remaining_webhooks(), 0);
     }
 
     #[test]
     fn usage_remaining_endpoints_normal() {
         let usage = make_usage(Plan::Pro, 0, 10);
-        assert_eq!(usage.remaining_endpoints(), 40);
+        assert_eq!(usage.remaining_endpoints(), 490);
     }
 
     #[test]
     fn usage_remaining_endpoints_saturates_at_zero() {
-        let usage = make_usage(Plan::Free, 0, 100);
+        let usage = make_usage(Plan::Developer, 0, 100);
         assert_eq!(usage.remaining_endpoints(), 0);
     }
 
@@ -754,7 +891,7 @@ mod tests {
 
     #[test]
     fn plan_serde_roundtrip() {
-        for variant in &[Plan::Free, Plan::Pro, Plan::Business, Plan::Enterprise] {
+        for variant in &[Plan::Developer, Plan::Startup, Plan::Pro, Plan::Enterprise] {
             let json = serde_json::to_string(variant).unwrap();
             let deserialized: Plan = serde_json::from_str(&json).unwrap();
             assert_eq!(*variant, deserialized);
@@ -764,16 +901,25 @@ mod tests {
     #[test]
     fn plan_deserialize_from_json() {
         assert_eq!(
-            serde_json::from_str::<Plan>("\"free\"").unwrap(),
-            Plan::Free
+            serde_json::from_str::<Plan>("\"developer\"").unwrap(),
+            Plan::Developer
+        );
+        assert_eq!(
+            serde_json::from_str::<Plan>("\"startup\"").unwrap(),
+            Plan::Startup
         );
         assert_eq!(serde_json::from_str::<Plan>("\"pro\"").unwrap(), Plan::Pro);
         assert_eq!(
-            serde_json::from_str::<Plan>("\"business\"").unwrap(),
-            Plan::Business
+            serde_json::from_str::<Plan>("\"enterprise\"").unwrap(),
+            Plan::Enterprise
+        );
+        // Backward compat
+        assert_eq!(
+            serde_json::from_str::<Plan>("\"free\"").unwrap(),
+            Plan::Developer
         );
         assert_eq!(
-            serde_json::from_str::<Plan>("\"enterprise\"").unwrap(),
+            serde_json::from_str::<Plan>("\"business\"").unwrap(),
             Plan::Enterprise
         );
     }
