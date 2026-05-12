@@ -1,36 +1,28 @@
-# NEXT_SESSION.md — Oturum 134+
+# NEXT_SESSION.md — Oturum 135+
 
-> Son güncelleme: 2026-05-13 00:10 GMT+8 (Oturum 133)
+> Son güncelleme: 2026-05-13 00:56 GMT+8 (Oturum 134)
 
 ## Kaldığımız Yer
-- **IMPLEMENTATION-PLAN: 359/364 tamamlandı (%99)**
-- 5 kalan ⬜ madde — TAMAMI Servet görevleri
-- **Worker build hatası DÜZELTİLDİ ✅ (Oturum 133)**
+- **Worker build hatası düzeltildi ✅** — Cloud Build SUCCESS
+- **Login DATABASE_ERROR düzeltildi ✅** — role kolonu eklendi
+- **404 after login düzeltildi ✅** — locale double-prefix fix push edildi
+- **Vercel deploy bekleniyor** — son commit `d34c0398`
 
-## ~~ACİL — Build Düzeltmeleri~~ ✅ TAMAMLANDI
-
-### Worker Build Hataları — Düzeltildi (2026-05-13 00:10 GMT+8)
-1. ✅ `worker/src/delivery/mod.rs:244`: `drop(cached)` → `let _ = &cache` (Oturum 133)
-2. ✅ `worker/src/main.rs:460`: `count` → `_count` (Oturum 133)
-3. ✅ `worker/src/delivery/http.rs`: `common::` → `hooksniff_common::` (Oturum 132)
-4. ✅ `worker/src/main.rs`: `PgTransaction` → `PgTransaction<'_>` (Oturum 132)
-5. ✅ Commit: `c603b97a` + `998c75be` — main branch
-6. ✅ `cargo build -p hooksniff-worker` — **lokalde doğrulandı**
-7. ✅ `cargo build -p hooksniff-api` — **lokalde doğrulandı**
-
-### Cloud Build Durumu (Güncel)
-- API image: ✅ BUILD BAŞARILI
-- Worker image: ✅ ARTIK DERLENECEK (düzeltildi)
-- Cloud Run API: ✅ Deploy edildi
-- **Servet yeni Cloud Build tetiklemeli** → https://console.cloud.google.com/cloud-build/builds
-
-## Kalan ⬜ Maddeler (5 adet — Hepsi Servet)
-- ⬜ 360: GitHub PAT rotate
-- ⬜ 361: GCP SA key rotate
-- ⬜ 362: GitHub Actions billing güncelle
-- ⬜ 363: Stripe/Polar identity verification
-- ⬜ 364: Grafana trial upgrade (20 Mayıs'ta bitiyor!)
+## Yapılacaklar (Oturum 135)
+1. **Vercel deploy kontrol et** — build başarılı mı?
+2. **Login + dashboard test et** — 404 düzeldi mi?
+3. **Kalan 5 ⬜ madde** — Servet görevleri (bkz. MEMORY.md)
 
 ## Bilinen Sorunlar
-- ⚠️ Grafana trial 20 Mayıs'ta bitiyor
-- ⚠️ GitHub PAT + GCP key rotate edilmeli
+- Cloud Run health check'te `queue_detail` ve `recent_errors` degraded (DB sorgu hatası)
+- Grafana trial 20 Mayıs'ta bitiyor
+- GitHub PAT + GCP key rotate edilmeli
+
+## Bu Oturumda Yapılanlar
+- Worker: `cached` → `cache` değişken hatası düzeltildi
+- gcloud CLI kuruldu, Servet Google hesabıyla 2FA ile giriş yapıldı
+- Cloud Build tetiklendi → SUCCESS
+- Migration 013: `role` kolonu eklendi (login DATABASE_ERROR fix)
+- 13 dosyada locale double-prefix düzeltildi
+- 7 dosyada unused `locale` değişkeni kaldırıldı
+- 5+ commit push edildi
