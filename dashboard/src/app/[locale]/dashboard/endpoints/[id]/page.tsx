@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -15,7 +15,6 @@ import { TestWebhookCard } from './components/TestWebhookCard';
 export default function EndpointSettingsPage() {
   const t = useTranslations('endpointSettings');
   const { id } = useParams<{ id: string }>();
-  const locale = useLocale();
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
