@@ -1728,8 +1728,14 @@
       "Sınırsız uygulama",
       "500 endpoint",
       "Sınırsız event tipi",
+      "Sınırsız abonelik",
       "30 günlük log",
-      "FIFO teslimat",
+      "Event başına $0.0001 overage",
+      "FIFO sıralı teslimat",
+      "IP beyaz liste",
+      "Analitik ve grafikler",
+      "Şema kayıt merkezi",
+      "Webhook oyun alanı",
       "Öncelikli destek"
     ],
     "businessFeatures": [
@@ -1887,12 +1893,14 @@
     "customPricing": "Özel Fiyat",
     "contactUs": "Bize Ulaşın",
     "enterpriseFeatures": [
-      "Sınırsız event",
       "Her şey sınırsız",
-      "Özel SLA",
+      "Özel SLA (%99,99 uptime)",
       "SSO / SAML",
       "Özel hesap yöneticisi",
-      "Özel entegrasyonlar"
+      "Özel entegrasyonlar",
+      "Özel veri saklama",
+      "Özel altyapı",
+      "Nöbetçi destek"
     ],
     "developer": "Developer",
     "startup": "Startup",
@@ -1902,7 +1910,11 @@
       "1 uygulama",
       "5 endpoint",
       "10 event tipi",
+      "10 abonelik",
       "7 günlük log",
+      "HMAC imzası",
+      "2FA desteği",
+      "Üstel geri çekilme",
       "Topluluk desteği"
     ],
     "startupFeatures": [
@@ -1910,8 +1922,14 @@
       "1 uygulama",
       "50 endpoint",
       "50 event tipi",
+      "300 abonelik",
       "14 günlük log",
       "Never-blocked modu",
+      "Event başına $0.003 overage",
+      "CloudEvents v1.0",
+      "Gizli anahtar rotasyonu",
+      "Ölü mektup kuyruğu",
+      "Özel yeniden deneme politikaları",
       "E-posta desteği"
     ],
     "ctaDeveloper": "Ücretsiz başla",

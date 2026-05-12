@@ -297,7 +297,7 @@ export function PricingPageContent() {
                     : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm'
                 }`}
               >
-                {plan.key === 'enterprise' ? t('contactUs') : plan.key === 'business' ? t('contactSales') : plan.key === 'pro' ? t('startTrial') : t('getStarted')}
+                {plan.key === 'enterprise' ? t('contactSales') : t('getStarted')}
               </button>
             </div>
           ))}
