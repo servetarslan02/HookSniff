@@ -42,6 +42,7 @@
 | 32 | 📡 Stream | /dashboard/stream | 🔴 Yeni — Backend var, frontend yok |
 | 33 | 🌐 Çıkış IP'leri | /dashboard/outbound-ips | 🔴 Yeni — Backend var, frontend yok |
 | 34 | 📲 Cihazlar | /dashboard/devices | 🔴 Yeni — Backend var, frontend yok |
+| 35 | 🔬 Derin Analiz | — | 🔴 Backend-Frontend uyumsuzluk raporu |
 | 35 | ⚡ Yönetici Paneli | /admin (6 alt sayfa) | ✅ İncelendi |
 | 36 | 🧪 Webhook Araçları | /admin/webhook-tools | 🔴 Eklenecek |
 
