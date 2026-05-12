@@ -162,6 +162,9 @@ export const endpointsApi = {
   list: (token: string) =>
     apiFetch<Endpoint[]>("/endpoints", { token }),
 
+  get: (token: string, id: string) =>
+    apiFetch<Endpoint>(`/endpoints/${id}`, { token }),
+
   create: (token: string, data: { url: string; description?: string }) =>
     apiFetch<Endpoint>("/endpoints", { method: "POST", body: data, token }),
 

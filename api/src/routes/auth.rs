@@ -179,7 +179,7 @@ async fn register(
     // Generate API key
     let api_key = generate_api_key();
     let api_key_hash = hash_api_key(&api_key);
-    let api_key_prefix = api_key[..15].to_string();
+    let api_key_prefix = api_key[..24].to_string();
 
     // Hash password (CPU-intensive, offloaded to thread pool)
     let password_hash = jwt::hash_password_async(password.clone()).await?;

@@ -2,6 +2,10 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
 export const metadata = {
   title: 'Webhook Provider Guides — Stripe, GitHub, Shopify & More | HookSniff',
   description: 'Step-by-step guides for integrating webhooks from popular providers. Stripe, GitHub, Shopify, and more with HookSniff.',
@@ -21,7 +25,7 @@ export default function ProvidersPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
@@ -46,7 +50,7 @@ export default function ProvidersPage() {
 
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-2xl font-bold text-white mb-2">Don&apos;t see your provider?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-6">HookSniff works with any webhook provider. Use the inbound proxy to receive and normalize webhooks from any source.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">HookSniff works with any webhook provider. Use the inbound proxy to receive and normalize webhooks from any source.</p>
           <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
         </div>
       </main>

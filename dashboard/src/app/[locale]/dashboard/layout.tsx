@@ -159,7 +159,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
             <button
               onClick={() => { logout(); router.push(`/${locale}/login`); }}
-              className="text-sm text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
+              className="text-sm text-gray-500 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition"
             >
               {t('logout')}
             </button>

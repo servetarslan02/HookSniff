@@ -27,9 +27,27 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [planChangeTarget, setPlanChangeTarget] = useState<AdminUser | null>(null);
   const [newPlan, setNewPlan] = useState('');
+  const [sortField, setSortField] = useState<'email' | 'name' | 'plan' | 'status' | 'created_at'>('created_at');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const perPage = 20;
+
+  const handleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  };
+
+  const sortedUsers = [...users].sort((a, b) => {
+    const aVal = a[sortField] || '';
+    const bVal = b[sortField] || '';
+    const cmp = String(aVal).localeCompare(String(bVal));
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
 
   const handleExportCSV = () => {
     if (!token) return;
@@ -128,9 +146,12 @@ export default function AdminUsersPage() {
             />
           </div>
           <div>
+            <label htmlFor="plan-filter" className="sr-only">{t('filterByPlan')}</label>
             <select
+              id="plan-filter"
               value={planFilter}
               onChange={(e) => { setPlanFilter(e.target.value); setPage(1); }}
+              aria-label={t('filterByPlan')}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
             >
               <option value="">{t('allPlans')}</option>
@@ -140,9 +161,12 @@ export default function AdminUsersPage() {
             </select>
           </div>
           <div>
+            <label htmlFor="status-filter" className="sr-only">{t('filterByStatus')}</label>
             <select
+              id="status-filter"
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+              aria-label={t('filterByStatus')}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
             >
               <option value="">{t('allStatuses')}</option>
@@ -177,16 +201,36 @@ export default function AdminUsersPage() {
                 <thead>
                   <tr className="bg-gray-50/50 dark:bg-slate-800/50">
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('email')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('name')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('plan')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('status')}</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('created')}</th>
+                    <th scope="col">
+                      <button onClick={() => handleSort('email')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByEmail')}>
+                        {tc('email')} {sortField === 'email' && (sortDir === 'asc' ? '↑' : '↓')}
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <button onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByName')}>
+                        {tc('name')} {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <button onClick={() => handleSort('plan')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByPlan')}>
+                        {tc('plan')} {sortField === 'plan' && (sortDir === 'asc' ? '↑' : '↓')}
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <button onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByStatus')}>
+                        {tc('status')} {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <button onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByCreated')}>
+                        {tc('created')} {sortField === 'created_at' && (sortDir === 'asc' ? '↑' : '↓')}
+                      </button>
+                    </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                  {users.map((u, index) => (
+                  {sortedUsers.map((u, index) => (
                     <tr key={u.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
                         {u.id.slice(0, 8)}…

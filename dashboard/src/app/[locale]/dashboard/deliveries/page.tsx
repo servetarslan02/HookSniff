@@ -119,9 +119,9 @@ export default function DeliveriesPage() {
       {/* Table */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">{t('loadingDeliveries')}</div>
+          <div className="p-12 text-center text-gray-500 dark:text-slate-500 animate-pulse">{t('loadingDeliveries')}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
+          <div className="p-12 text-center text-gray-500 dark:text-slate-500">
             {isSearching ? `No results matching "${search}" on this page` : t('empty')}
           </div>
         ) : (
@@ -141,7 +141,7 @@ export default function DeliveriesPage() {
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {filtered.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" onClick={() => router.push(`/${locale}/dashboard/deliveries/${d.id}`)}>
+                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" tabIndex={0} role="link" aria-label={`Delivery ${d.id.slice(0, 12)}`} onClick={() => router.push(`/${locale}/dashboard/deliveries/${d.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/${locale}/dashboard/deliveries/${d.id}`); } }}>
                     <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
@@ -158,7 +158,7 @@ export default function DeliveriesPage() {
                           {d.response_status}
                         </span>
                       ) : (
-                        <span className="text-sm text-gray-400 dark:text-slate-500">—</span>
+                        <span className="text-sm text-gray-500 dark:text-slate-500">—</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
@@ -184,23 +184,25 @@ export default function DeliveriesPage() {
                 <span className="text-sm text-gray-500 dark:text-slate-400">
                   Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
                 </span>
-                <div className="flex gap-2">
+                <nav aria-label={tc('pagination')} className="flex gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
+                    aria-label={tc('previous')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
                   >
-                    Previous
+                    {tc('previous')}
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">Page {page} of {totalPages}</span>
+                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">Page {page} of {totalPages}</span>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
+                    aria-label={tc('next')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
                   >
-                    Next
+                    {tc('next')}
                   </button>
-                </div>
+                </nav>
               </div>
             )}
           </>
@@ -214,7 +216,7 @@ export default function DeliveriesPage() {
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('details')}</h3>
-              <button onClick={() => setSelected(null)} aria-label={t("closeDetails")} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
+              <button onClick={() => setSelected(null)} aria-label={t("closeDetails")} className="text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label="ID" value={selected.id} mono />

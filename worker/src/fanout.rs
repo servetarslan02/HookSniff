@@ -251,6 +251,20 @@ impl FanoutEngine {
         webhook: &WebhookMessage,
         reason: &str,
     ) {
+        // Item 266: Look up actual customer_id from deliveries instead of Uuid::nil()
+        let delivery_uuid = Uuid::parse_str(&webhook.delivery_id).unwrap_or_else(|_| Uuid::nil());
+        let customer_id: Uuid = sqlx::query_scalar(
+            "SELECT customer_id FROM deliveries WHERE id = $1"
+        )
+        .bind(delivery_uuid)
+        .fetch_optional(&self.pool)
+        .await
+        .unwrap_or(None)
+        .unwrap_or_else(|| {
+            warn!("Could not find customer_id for delivery {}, using endpoint lookup", webhook.delivery_id);
+            Uuid::nil()
+        });
+
         // Insert into dead_letters table
         if let Err(e) = sqlx::query(
             "INSERT INTO dead_letters \
@@ -259,7 +273,7 @@ impl FanoutEngine {
         )
         .bind(&webhook.delivery_id)
         .bind(dead_letter_endpoint_id)
-        .bind(Uuid::nil()) // customer_id from webhook context
+        .bind(customer_id)
         .bind(&webhook.payload)
         .bind(reason)
         .execute(&self.pool)

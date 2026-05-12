@@ -172,7 +172,7 @@ pub async fn auth_middleware(
     let is_test = token.starts_with("hr_test_");
     let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
         // API key authentication — check cache first, then DB
-        let prefix = token[..15.min(token.len())].to_string();
+        let prefix = token[..24.min(token.len())].to_string();
 
         // HS-038i: Check cache WITHOUT holding lock across .await
         let cached = {

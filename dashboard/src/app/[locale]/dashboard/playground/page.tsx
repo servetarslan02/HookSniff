@@ -127,6 +127,7 @@ interface PlaygroundRequest {
 
 const HISTORY_KEY = 'hooksniff_playground_history';
 const MAX_HISTORY = 10;
+const MAX_HISTORY_SIZE_BYTES = 500 * 1024; // 500KB limit for localStorage
 
 function loadHistory(): PlaygroundRequest[] {
   if (typeof window === 'undefined') return [];
@@ -139,7 +140,28 @@ function loadHistory(): PlaygroundRequest[] {
 }
 
 function saveHistory(history: PlaygroundRequest[]) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
+  try {
+    const trimmed = history.slice(0, MAX_HISTORY);
+    const json = JSON.stringify(trimmed);
+    if (new Blob([json]).size > MAX_HISTORY_SIZE_BYTES) {
+      // Remove oldest entries until size is under limit
+      while (trimmed.length > 1) {
+        trimmed.pop();
+        const reduced = JSON.stringify(trimmed);
+        if (new Blob([reduced]).size <= MAX_HISTORY_SIZE_BYTES) {
+          localStorage.setItem(HISTORY_KEY, reduced);
+          return;
+        }
+      }
+      // If even one entry is too large, store empty
+      localStorage.setItem(HISTORY_KEY, '[]');
+    } else {
+      localStorage.setItem(HISTORY_KEY, json);
+    }
+  } catch {
+    // localStorage full — clear history
+    try { localStorage.removeItem(HISTORY_KEY); } catch {}
+  }
 }
 
 // ─── Response Inspector ───
@@ -159,7 +181,7 @@ function ResponseInspector({
 
   if (!response && !status) {
     return (
-      <div className="text-center text-gray-400 dark:text-slate-500 py-16">
+      <div className="text-center text-gray-500 dark:text-slate-500 py-16">
         <div className="text-4xl mb-3">🧪</div>
         <p>{t('sendToInspect')}</p>
       </div>
@@ -236,7 +258,7 @@ function HistoryPanel({
     return (
       <div className="glass-card p-6">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('requestHistory')}</h3>
-        <p className="text-xs text-gray-400 dark:text-slate-500">{t('noRequests')}</p>
+        <p className="text-xs text-gray-500 dark:text-slate-500">{t('noRequests')}</p>
       </div>
     );
   }
@@ -288,7 +310,7 @@ function HistoryPanel({
                 {req.status ?? '—'}
               </span>
             </div>
-            <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">
+            <div className="text-[10px] text-gray-500 dark:text-slate-500 mt-1">
               {new Date(req.timestamp).toLocaleString()} • {req.duration_ms}ms
             </div>
           </button>
@@ -382,12 +404,12 @@ function LiveRequestViewer() {
                 />
                 <span className="text-xs font-mono text-gray-700 dark:text-slate-300">{d.event}</span>
               </div>
-              <span className="text-[10px] text-gray-400 dark:text-slate-500">{d.time}</span>
+              <span className="text-[10px] text-gray-500 dark:text-slate-500">{d.time}</span>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-gray-400 dark:text-slate-500">
+        <p className="text-xs text-gray-500 dark:text-slate-500">
           {isLive ? t('waitingRequests') : t('clickStart')}
         </p>
       )}
@@ -643,7 +665,7 @@ ${Object.entries(headers)
             >
               {loading ? (
                 <>
-                  <LoadingSpinner size="sm" /> Sending...
+                  <LoadingSpinner size="sm" /> {tc('sending')}
                 </>
               ) : (
                 t('sendRequest')

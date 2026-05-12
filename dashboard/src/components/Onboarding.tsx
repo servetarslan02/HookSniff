@@ -162,7 +162,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
           <div className="flex items-center justify-between">
             <button
               onClick={dismiss}
-              className="text-sm text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+              className="text-sm text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
             >
               {t('skipTour')}
             </button>

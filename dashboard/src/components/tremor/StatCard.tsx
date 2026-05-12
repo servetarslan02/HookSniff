@@ -114,7 +114,7 @@ export function StatCard({
               {Math.abs(trend.value)}%
             </span>
             {trend.label && (
-              <span className="text-xs text-gray-400 dark:text-slate-500 ml-1">{trend.label}</span>
+              <span className="text-xs text-gray-500 dark:text-slate-500 ml-1">{trend.label}</span>
             )}
           </div>
         )}
