@@ -76,6 +76,14 @@ async fn start_health_server(port: u16) {
 
     let app = Router::new()
         .route("/health", get(|| async { "ok" }))
+        .route("/livez", get(|| async { "ok" }))
+        .route("/readyz", get(|| async {
+            if READY.load(std::sync::atomic::Ordering::Relaxed) {
+                (axum::http::StatusCode::OK, "ready")
+            } else {
+                (axum::http::StatusCode::SERVICE_UNAVAILABLE, "not ready")
+            }
+        }))
         .route("/", get(|| async { "HookSniff Worker 🐝" }));
 
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
@@ -94,12 +102,27 @@ async fn start_health_server(port: u16) {
     }
 }
 
+/// Shared readiness state — set to true once DB pool is connected.
+static READY: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
 /// Start health server with a pre-bound listener (for Cloud Run startup probe).
+/// Provides Kubernetes-compatible health endpoints:
+/// - `/health`  — legacy Cloud Run health check (always 200)
+/// - `/livez`   — liveness probe: process is alive (always 200)
+/// - `/readyz`  — readiness probe: ready to serve traffic (checks DB connectivity)
 async fn start_health_server_with_listener(listener: tokio::net::TcpListener) {
     use axum::{routing::get, Router};
 
     let app = Router::new()
         .route("/health", get(|| async { "ok" }))
+        .route("/livez", get(|| async { "ok" }))
+        .route("/readyz", get(|| async {
+            if READY.load(std::sync::atomic::Ordering::Relaxed) {
+                (axum::http::StatusCode::OK, "ready")
+            } else {
+                (axum::http::StatusCode::SERVICE_UNAVAILABLE, "not ready")
+            }
+        }))
         .route("/", get(|| async { "HookSniff Worker 🐝" }));
 
     if let Err(e) = axum::serve(listener, app).await {
@@ -183,6 +206,10 @@ async fn main() -> Result<()> {
             tracing::error!("   URL prefix: {}", &db_url[..30.min(db_url.len())]);
             e
         })?;
+
+    // Mark readiness — DB pool connected, ready to serve traffic
+    READY.store(true, std::sync::atomic::Ordering::Relaxed);
+    tracing::info!("✅ Readiness probe: ready (DB connected)");
 
     // HTTP client (shared, connection pooling)
     let http_client = reqwest::Client::builder()
@@ -984,6 +1011,61 @@ async fn process_pending(
     }
 
     Ok(processed)
+}
+
+// ── Delivery outcome helpers (Item 293: reduce function length) ──────
+
+/// Commit a delivery transaction with transient vs permanent error classification.
+async fn commit_delivery_tx(
+    tx: sqlx::PgTransaction,
+    delivery_id: uuid::Uuid,
+    context: &str,
+) -> Result<bool> {
+    match tx.commit().await {
+        Ok(()) => Ok(true),
+        Err(e) => {
+            if is_transient_db_error(&e) {
+                tracing::warn!(
+                    "⚠️ Delivery {} — transient DB commit failure ({}): {:?}",
+                    delivery_id, context, e
+                );
+            } else {
+                tracing::error!(
+                    "❌ Delivery {} — permanent DB commit failure ({}): {:?}",
+                    delivery_id, context, e
+                );
+            }
+            Ok(false)
+        }
+    }
+}
+
+/// Record the delivery attempt in the delivery_attempts table.
+async fn record_delivery_attempt(
+    tx: &mut sqlx::PgTransaction,
+    delivery_id: uuid::Uuid,
+    attempt: i32,
+    attempt_status: Option<i32>,
+    attempt_body: Option<&str>,
+    duration_ms: i32,
+    error_message: Option<&str>,
+    trace_id: Option<&str>,
+    attempt_headers: Option<&serde_json::Value>,
+) -> Result<()> {
+    record_attempt(
+        tx,
+        delivery_id,
+        attempt,
+        AttemptRecord {
+            status_code: attempt_status,
+            response_body: attempt_body,
+            duration_ms,
+            error_message,
+            trace_id,
+            response_headers: attempt_headers,
+        },
+    )
+    .await
 }
 
 /// Recover webhook_queue records stuck in "processing" for more than 5 minutes.

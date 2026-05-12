@@ -1113,7 +1113,8 @@ async fn churn_report(
         FROM customers
         WHERE is_active = FALSE
           AND updated_at >= NOW() - INTERVAL '30 days'
-        ORDER BY updated_at DESC"#,
+        ORDER BY updated_at DESC
+        LIMIT 1000"#,
     )
     .fetch_all(&pool)
     .await?;

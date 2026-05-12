@@ -3,6 +3,8 @@
 //! Harici servislerden (Stripe, GitHub, Shopify vb.) gelen webhook'ları
 //! alır, doğrular ve HookSniff endpoint'lerine yönlendirir.
 //!
+// TODO (Item 287): Local compute_hmac_raw/compute_hmac_hex duplicate hooksniff_common::signing.
+//                 Refactor inbound providers to use the shared signing crate.
 //! ## Akış
 //!
 //! ```text
