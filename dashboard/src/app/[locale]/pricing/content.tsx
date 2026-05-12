@@ -83,6 +83,7 @@ function RoiCalculator() {
 
 export function PricingPageContent() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const router = useRouter();
   const { token } = useAuth();
   const locale = useLocale();
@@ -90,16 +91,34 @@ export function PricingPageContent() {
   const tf = useTranslations('pricingFaq');
   const isTr = locale === 'tr';
 
+  const monthlyPrices = { free: 0, pro: isTr ? 999 : 49, business: isTr ? 1999 : 99 };
+  const annualPrices = {
+    free: 0,
+    pro: isTr ? Math.round(999 * 12 * 0.8) : Math.round(49 * 12 * 0.8),
+    business: isTr ? Math.round(1999 * 12 * 0.8) : Math.round(99 * 12 * 0.8),
+  };
+
+  const getPrice = (plan: string) => {
+    if (plan === 'free') return isTr ? '₺0' : '$0';
+    const prices = billingPeriod === 'annual' ? annualPrices : monthlyPrices;
+    const val = prices[plan as keyof typeof prices];
+    return isTr ? `₺${val.toLocaleString()}` : `$${val}`;
+  };
+
+  const getPeriodLabel = () => billingPeriod === 'annual' ? t('billedAnnually') : t('month');
+
   const planData = [
-    { key: 'free', price: isTr ? '₺0' : '$0', ctaStyle: 'outline', popular: false },
-    { key: 'pro', price: isTr ? '₺999' : '$49', ctaStyle: 'filled', popular: true },
-    { key: 'business', price: isTr ? '₺1,999' : '$99', ctaStyle: 'outline', popular: false },
+    { key: 'free', ctaStyle: 'outline', popular: false },
+    { key: 'pro', ctaStyle: 'filled', popular: true },
+    { key: 'business', ctaStyle: 'outline', popular: false },
+    { key: 'enterprise', ctaStyle: 'outline', popular: false },
   ];
 
   const featureKeys: Record<string, string[]> = {
     free: t.raw('freeFeatures') as string[],
     pro: t.raw('proFeatures') as string[],
     business: t.raw('businessFeatures') as string[],
+    enterprise: t.raw('enterpriseFeatures') as string[],
   };
 
   const comparisonSections = [
@@ -183,13 +202,40 @@ export function PricingPageContent() {
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-2">
             {t('heroSubtitle')}
           </p>
-          <p className="text-sm text-gray-500 dark:text-slate-500">
+          <p className="text-sm text-gray-500 dark:text-slate-500 mb-8">
             {t('heroNote')}
           </p>
+
+          {/* Billing Period Toggle */}
+          <div className="inline-flex items-center gap-3 p-1 bg-gray-100 dark:bg-slate-800 rounded-full">
+            <button
+              onClick={() => setBillingPeriod('monthly')}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                billingPeriod === 'monthly'
+                  ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t('monthly')}
+            </button>
+            <button
+              onClick={() => setBillingPeriod('annual')}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-2 ${
+                billingPeriod === 'annual'
+                  ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t('annual')}
+              <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
+                {t('savePercent', { percent: 20 })}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Plan Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-4 gap-6 mb-12">
           {planData.map((plan) => (
             <div
               key={plan.key}
@@ -205,10 +251,21 @@ export function PricingPageContent() {
                 </span>
               )}
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t(plan.key)}</h3>
-              <div className="mt-2 mb-1">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
-                <span className="text-gray-500 dark:text-slate-500">{t('month')}</span>
-              </div>
+              {plan.key === 'enterprise' ? (
+                <div className="mt-2 mb-1">
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{t('customPricing')}</span>
+                </div>
+              ) : (
+                <div className="mt-2 mb-1">
+                  <span className="text-4xl font-bold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
+                  <span className="text-gray-500 dark:text-slate-500">{getPeriodLabel()}</span>
+                  {billingPeriod === 'annual' && plan.key !== 'free' && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                      {t('billedAnnually')}
+                    </p>
+                  )}
+                </div>
+              )}
               <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">{t(`${plan.key}Desc`)}</p>
               <ul className="space-y-3 mb-6 flex-1">
                 {featureKeys[plan.key].map((f: string) => (
@@ -222,7 +279,9 @@ export function PricingPageContent() {
               </ul>
               <button
                 onClick={() => {
-                  if (plan.key === 'business') {
+                  if (plan.key === 'enterprise') {
+                    window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
+                  } else if (plan.key === 'business') {
                     router.push(`/${locale}/contact`);
                   } else if (token) {
                     router.push(`/${locale}/dashboard/billing`);
@@ -236,7 +295,7 @@ export function PricingPageContent() {
                     : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm'
                 }`}
               >
-                {plan.key === 'business' ? t('contactSales') : plan.key === 'pro' ? t('startTrial') : t('getStarted')}
+                {plan.key === 'enterprise' ? t('contactUs') : plan.key === 'business' ? t('contactSales') : plan.key === 'pro' ? t('startTrial') : t('getStarted')}
               </button>
             </div>
           ))}
