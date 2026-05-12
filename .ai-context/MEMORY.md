@@ -583,3 +583,12 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Font smoothing:** antialiased
 - **Build başarılı** ✅ — push edildi (commit 93a22d8)
 - **2 dosya değişti, 41 satır eklendi, 264 satır silindi**
+
+## Oturum 138 Ek 5 (2026-05-13 07:25 - 07:35 GMT+8) ✅
+- **Admin layout** — Sidebar → üstte yatay tabs (6 sekme, kırmızı aksan)
+  - Overview, Users, Revenue, System, Activity Log, Settings
+- **Admin overview** — Sadeleştirildi: 4 metric kart + aktivite tablosu + son kayıtlar
+  - Kaldırılan: grafikler, feature flags, deploy info, haftalık karşılaştırma, quick actions
+  - -792 satır kod azalması
+- **Build başarılı** ✅ — push edildi (commit aeb486a)
+- **2 dosya değişti, 165 satır eklendi, 957 satır silindi**
