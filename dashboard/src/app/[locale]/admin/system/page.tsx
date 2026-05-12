@@ -26,6 +26,7 @@ export default function AdminSystemPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorDetail, setErrorDetail] = useState<string | null>(null); // Item 100
+  const [activeAlerts, setActiveAlerts] = useState<number>(0);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
@@ -42,16 +43,21 @@ export default function AdminSystemPage() {
     try {
       setError(null);
       setErrorDetail(null);
-      const res = await fetch(`${API}/health`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const [res, alertsRes] = await Promise.all([
+        fetch(`${API}/health`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API}/admin/alerts`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+      ]);
       if (res.ok) {
         setHealth(await res.json());
       } else {
         const errText = await res.text().catch(() => '');
         setError(t('systemHealthDesc'));
-        setErrorDetail(errText || `HTTP ${res.status}`); // Item 100
-        setHealth(mockHealth); // Item 94 — fallback
+        setErrorDetail(errText || `HTTP ${res.status}`);
+        setHealth(mockHealth);
+      }
+      if (alertsRes?.ok) {
+        const alerts = await alertsRes.json();
+        setActiveAlerts(Array.isArray(alerts) ? alerts.filter((a: { is_active: boolean }) => a.is_active).length : 0);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -252,6 +258,21 @@ export default function AdminSystemPage() {
         <p className="text-sm text-gray-500 dark:text-slate-400">
           {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh15s')}
         </p>
+      </div>
+
+      {/* Active Alerts Summary */}
+      <div className={`glass-card p-4 flex items-center gap-3 ${activeAlerts > 0 ? 'border-l-4 border-amber-500' : ''}`}>
+        <span className="text-2xl" aria-hidden="true">{activeAlerts > 0 ? '🚨' : '✅'}</span>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-900 dark:text-white">
+            {activeAlerts > 0
+              ? `${activeAlerts} ${t('activeAlertRules') || 'active alert rule(s)'}`
+              : t('noActiveAlerts') || 'No active alerts'}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-slate-400">
+            {t('alertThresholdsDesc') || 'Monitoring thresholds configured in Settings'}
+          </p>
+        </div>
       </div>
 
       {/* Service Cards */}
