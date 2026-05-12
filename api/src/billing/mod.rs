@@ -21,12 +21,14 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "lowercase")]
 pub enum Plan {
     /// Formerly "Free" — renamed to Developer
+    #[serde(alias = "free")]
     Developer,
     /// New plan — $29/mo
     Startup,
     /// $49/mo (was Pro at $49)
     Pro,
     /// Custom pricing (was Business)
+    #[serde(alias = "business")]
     Enterprise,
 }
 
