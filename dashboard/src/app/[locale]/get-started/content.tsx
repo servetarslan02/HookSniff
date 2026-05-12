@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import PublicNavbar from '@/components/PublicNavbar';
@@ -169,6 +170,7 @@ function Step({ number, title, children }: { number: number; title: string; chil
 }
 
 export function GetStartedPageContent() {
+  const username = useUsername();
   const { user } = useAuth();
   const t = useTranslations('getStarted');
   const [activeSdk, setActiveSdk] = useState<SdkKey>('nodejs');
@@ -224,7 +226,7 @@ export function GetStartedPageContent() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-500 dark:text-slate-500">{t('yourApiKey')}</span>
               {user && (
-                <Link href="/dashboard/api-keys" className="text-brand-400 text-xs hover:text-brand-300">
+                <Link href={`/${username}/api-keys`} className="text-brand-400 text-xs hover:text-brand-300">
                   {t('manageKeys')} →
                 </Link>
               )}
@@ -327,10 +329,10 @@ export function GetStartedPageContent() {
             </pre>
           </div>
           <div className="flex gap-3">
-            <Link href="/dashboard/playground" className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            <Link href={`/${username}/playground`} className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
               🧪 {t('tryPlayground')}
             </Link>
-            <Link href="/dashboard/deliveries" className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition">
+            <Link href={`/${username}/deliveries`} className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition">
               📦 {t('viewDeliveries')}
             </Link>
           </div>
@@ -356,7 +358,7 @@ export function GetStartedPageContent() {
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('alertsDesc')}</p>
             </div>
           </div>
-          <Link href="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">
+          <Link href={`/${username}`} className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">
             {t('openDashboard')} →
           </Link>
         </Step>
@@ -402,7 +404,7 @@ export function GetStartedPageContent() {
           </pre>
         </div>
         <p className="mt-3 text-sm text-gray-500 dark:text-slate-500">
-          {t('customizeColors')} <Link href="/dashboard/portal-manage" className="text-brand-600 dark:text-brand-400 hover:underline">{t('portalSettings')}</Link>.
+          {t('customizeColors')} <Link href={`/${username}/portal-manage`} className="text-brand-600 dark:text-brand-400 hover:underline">{t('portalSettings')}</Link>.
         </p>
       </div>
 
@@ -442,7 +444,7 @@ hooksniff deliveries list --limit 10`}</code>
               </Link>
             </>
           ) : (
-            <Link href="/dashboard" className="px-8 py-3 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition">
+            <Link href={`/${username}`} className="px-8 py-3 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition">
               {t('goToDashboard')} →
             </Link>
           )}

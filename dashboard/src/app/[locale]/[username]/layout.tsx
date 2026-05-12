@@ -12,7 +12,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
-function DashboardShell({ children }: { children: React.ReactNode }) {
+function DashboardShell({ children, username }: { children: React.ReactNode; username: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -26,6 +26,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   // Strip locale prefix from pathname for navigation matching
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
+  // For active state matching, strip the username prefix too
+  const pathWithoutUser = cleanPath.replace(new RegExp(`^/${username}`), '') || '/';
 
   const toggleSection = (key: string) => {
     setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -37,53 +39,53 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'core',
       label: t('sectionCore'),
       items: [
-        { name: t('dashboard'), href: '/dashboard', icon: '📊' },
-        { name: t('endpoints'), href: '/dashboard/endpoints', icon: '🔗' },
-        { name: t('deliveries'), href: '/dashboard/deliveries', icon: '📦' },
-        { name: t('logs'), href: '/dashboard/logs', icon: '📋' },
-        { name: t('search'), href: '/dashboard/search', icon: '🔍' },
-        { name: t('health'), href: '/dashboard/health', icon: '💓' },
-        { name: t('alerts'), href: '/dashboard/alerts', icon: '🔔' },
-        { name: t('apiKeys'), href: '/dashboard/api-keys', icon: '🔑' },
+        { name: t('dashboard'), href: `/${username}`, icon: '📊' },
+        { name: t('endpoints'), href: `/${username}/endpoints`, icon: '🔗' },
+        { name: t('deliveries'), href: `/${username}/deliveries`, icon: '📦' },
+        { name: t('logs'), href: `/${username}/logs`, icon: '📋' },
+        { name: t('search'), href: `/${username}/search`, icon: '🔍' },
+        { name: t('health'), href: `/${username}/health`, icon: '💓' },
+        { name: t('alerts'), href: `/${username}/alerts`, icon: '🔔' },
+        { name: t('apiKeys'), href: `/${username}/api-keys`, icon: '🔑' },
       ],
     },
     {
       key: 'tools',
       label: t('sectionTools'),
       items: [
-        { name: t('playground'), href: '/dashboard/playground', icon: '🧪' },
-        { name: t('analytics'), href: '/dashboard/analytics', icon: '📈' },
-        { name: t('transforms'), href: '/dashboard/transforms', icon: '🔄' },
-        { name: t('inbound'), href: '/dashboard/inbound', icon: '📨' },
-        { name: t('signatureTool'), href: '/dashboard/signature-verifier', icon: '🔐' },
-        { name: t('apiImporter'), href: '/dashboard/api-importer', icon: '📥' },
-        { name: t('webhookBuilder'), href: '/dashboard/webhook-builder', icon: '🔧' },
-        { name: t('schemas'), href: '/dashboard/schemas', icon: '📐' },
-        { name: t('templates'), href: '/dashboard/templates', icon: '📄' },
+        { name: t('playground'), href: `/${username}/playground`, icon: '🧪' },
+        { name: t('analytics'), href: `/${username}/analytics`, icon: '📈' },
+        { name: t('transforms'), href: `/${username}/transforms`, icon: '🔄' },
+        { name: t('inbound'), href: `/${username}/inbound`, icon: '📨' },
+        { name: t('signatureTool'), href: `/${username}/signature-verifier`, icon: '🔐' },
+        { name: t('apiImporter'), href: `/${username}/api-importer`, icon: '📥' },
+        { name: t('webhookBuilder'), href: `/${username}/webhook-builder`, icon: '🔧' },
+        { name: t('schemas'), href: `/${username}/schemas`, icon: '📐' },
+        { name: t('templates'), href: `/${username}/templates`, icon: '📄' },
       ],
     },
     {
       key: 'advanced',
       label: t('sectionAdvanced'),
       items: [
-        { name: t('portalCustomize'), href: '/dashboard/portal-customize', icon: '🖼️' },
-        { name: t('portalManage'), href: '/dashboard/portal-manage', icon: '👤' },
-        { name: t('rateLimiting'), href: '/dashboard/rate-limiting', icon: '⚡' },
-        { name: t('auditLog'), href: '/dashboard/audit-log', icon: '📋' },
-        { name: t('ssoSaml'), href: '/dashboard/sso', icon: '🔐' },
-        { name: t('retryPolicy'), href: '/dashboard/retry-policy', icon: '🔄' },
-        { name: t('routing'), href: '/dashboard/routing', icon: '🔀' },
-        { name: t('customDomain'), href: '/dashboard/custom-domain', icon: '🌐' },
+        { name: t('portalCustomize'), href: `/${username}/portal-customize`, icon: '🖼️' },
+        { name: t('portalManage'), href: `/${username}/portal-manage`, icon: '👤' },
+        { name: t('rateLimiting'), href: `/${username}/rate-limiting`, icon: '⚡' },
+        { name: t('auditLog'), href: `/${username}/audit-log`, icon: '📋' },
+        { name: t('ssoSaml'), href: `/${username}/sso`, icon: '🔐' },
+        { name: t('retryPolicy'), href: `/${username}/retry-policy`, icon: '🔄' },
+        { name: t('routing'), href: `/${username}/routing`, icon: '🔀' },
+        { name: t('customDomain'), href: `/${username}/custom-domain`, icon: '🌐' },
       ],
     },
     {
       key: 'account',
       label: t('sectionAccount'),
       items: [
-        { name: t('team'), href: '/dashboard/team', icon: '👥' },
-        { name: t('notifications'), href: '/dashboard/notifications', icon: '🔔' },
-        { name: t('billing'), href: '/dashboard/billing', icon: '💳' },
-        { name: t('settings'), href: '/dashboard/settings', icon: '⚙️' },
+        { name: t('team'), href: `/${username}/team`, icon: '👥' },
+        { name: t('notifications'), href: `/${username}/notifications`, icon: '🔔' },
+        { name: t('billing'), href: `/${username}/billing`, icon: '💳' },
+        { name: t('settings'), href: `/${username}/settings`, icon: '⚙️' },
       ],
     },
   ];
@@ -149,7 +151,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 {!isCollapsed && (
                   <div className="space-y-0.5">
                     {section.items.map((item) => {
-                      const isActive = cleanPath === item.href || (item.href !== '/dashboard' && cleanPath.startsWith(item.href + '/'));
+                      const isActive = pathWithoutUser === item.href.replace(`/${username}`, '') || (item.href !== `/${username}` && pathWithoutUser.startsWith(item.href.replace(`/${username}`, '') + '/'));
                       return (
                         <Link
                           key={item.href}
@@ -177,7 +179,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/admin"
               onClick={() => setSidebarOpen(false)}
-              aria-current={cleanPath.startsWith('/admin') ? "page" : undefined}
+              aria-current={pathWithoutUser.startsWith('/admin') ? "page" : undefined}
               className={clsx(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
                 cleanPath.startsWith('/admin')
@@ -242,14 +244,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string; username: string }>;
 }) {
+  const { username } = await params;
   return (
     <AuthGuard>
-      <DashboardShell>{children}</DashboardShell>
+      <DashboardShell username={username}>{children}</DashboardShell>
     </AuthGuard>
   );
 }
