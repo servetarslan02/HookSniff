@@ -71,3 +71,29 @@
 - Kural test etme
 - Toplu kural yönetimi
 - Kural şablonları
+
+---
+
+## 🔧 Backend & Frontend Uyumsuzluğu (2026-05-13)
+
+### Backend'de Var, Frontend'de Yok
+| Özellik | Backend | Frontend | Durum |
+|---------|---------|----------|-------|
+| Transform düzenleme | — (backend'de update endpoint'i yok) | ❌ Form yok | Backend'e eklenmeli |
+| Transform sıralama | — (backend'de reorder endpoint'i yok) | ❌ Sürükleme yok | Backend'e eklenmeli |
+| Transform test | — (backend'de test endpoint'i yok) | ❌ Buton yok | Backend'e eklenmeli |
+
+### Yapılacaklar
+1. **Transform Düzenleme** — Mevcut kuralı güncelleme
+   - Backend: `PUT /v1/endpoints/{endpoint_id}/transforms/{id}` endpoint'i eklenmeli
+   - Frontend: "Düzenle" butonu → mevcut değerlerle form
+2. **Transform Sıralama** — Kuralların çalışma sırası
+   - Backend: `PUT /v1/endpoints/{endpoint_id}/transforms/reorder` endpoint'i eklenmeli
+   - Frontend: Sürükle-bırak veya yukarı/aşağı butonları
+3. **Transform Önizleme** — Kuralın etkisini göster
+   - Frontend: "Önizle" butonu → örnek veri ile transform sonucu
+4. **Transform Test** — Kuralı test etme
+   - Backend: `POST /v1/endpoints/{endpoint_id}/transforms/test` endpoint'i eklenmeli
+   - Frontend: Payload textarea + "Test Et" butonu + önce/sonra karşılaştırma
+5. **Kural Şablonları** — Önceden tanımlı transform şablonları
+   - Frontend: "Şablonlardan Ekle" butonu → şablon seçimi
