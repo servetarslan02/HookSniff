@@ -280,7 +280,7 @@ async fn login(
     // ── HS-038f: Timing attack mitigation ──
     // Always perform password hash verification to prevent timing-based user enumeration.
     // If user not found or inactive, hash against a dummy Argon2 hash (constant-time compare).
-    let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE email = $1")
+    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at FROM customers WHERE email = $1")
         .bind(&req.email)
         .fetch_optional(&pool)
         .await?;
@@ -398,7 +398,7 @@ async fn verify_2fa_login(
     // Verify the temp token
     let claims = jwt::verify_token(&req.temp_token, &cfg.jwt_secret)?;
 
-    let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at FROM customers WHERE id = $1")
         .bind(claims.sub)
         .fetch_optional(&pool)
         .await?
@@ -737,7 +737,7 @@ async fn refresh_token(
 
     let (token_id, customer_id, _expires_at) = record.ok_or(AppError::Unauthorized)?;
 
-    let customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at FROM customers WHERE id = $1")
         .bind(customer_id)
         .fetch_optional(&pool)
         .await?
@@ -1112,7 +1112,7 @@ async fn export_data(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Fetch user's endpoints
     let endpoints: Vec<serde_json::Value> = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE customer_id = $1 ORDER BY created_at",
     )
     .bind(customer.id)
     .fetch_all(&pool)
