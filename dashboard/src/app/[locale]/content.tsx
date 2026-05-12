@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations, useLocale } from 'next-intl';
@@ -283,7 +282,6 @@ function HowItWorks() {
 
 /* ─── Landing Page ─── */
 export function HomeContent() {
-  const username = useUsername();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const router = useRouter();
   const { token } = useAuth();

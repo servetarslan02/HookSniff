@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 
@@ -64,7 +63,6 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
   const [visible, setVisible] = useState(false);
   const t = useTranslations('onboarding');
   const router = useRouter();
-  const username = useUsername();
 
   useEffect(() => {
     const completed = localStorage.getItem(STORAGE_KEY);

@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/Toast';
 
 function VerifyEmailContent() {
-  const username = useUsername();
   const t = useTranslations('error');
   const tv = useTranslations('verifyEmail');
   const searchParams = useSearchParams();

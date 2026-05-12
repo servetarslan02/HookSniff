@@ -13,8 +13,6 @@ import { RateLimitCard } from './components/RateLimitCard';
 import { TestWebhookCard } from './components/TestWebhookCard';
 
 export default function EndpointSettingsPage() {
-  const params = useParams();
-  const username = (params?.username as string) || 'dashboard';
   const t = useTranslations('endpointSettings');
   const { id } = useParams<{ id: string }>();
   const { token } = useAuth();

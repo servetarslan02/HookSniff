@@ -14,8 +14,6 @@ import { RequestDetailsPanel } from './components/RequestDetailsPanel';
 import { AttemptTimeline } from './components/AttemptTimeline';
 
 export default function DeliveryDetailPage() {
-  const params = useParams();
-  const username = (params?.username as string) || 'dashboard';
   const t = useTranslations('deliveryDetail');
   const { id } = useParams<{ id: string }>();
   const { token } = useAuth();
