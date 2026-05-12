@@ -73,8 +73,8 @@
 ### 2.5 Infrastructure Yüksek
 38. ✅ No rollback strategy — deploy başarısız olursa geri dönüş yok → `.github/workflows/deploy.yml` ✅ YAPILDI (health check + auto-rollback)
 39. ✅ Hardcoded secrets in Helm values.yaml → `deploy/helm/values.yaml` ✅ YAPILDI (K8s secrets + secretRef)
-40. ⬜ Git history'de OTEL credentials — BFG ile temizlenmeli → Git history (Servet'in görevi)
-41. ⬜ DATABASE_URL local credentials git history'de → Git history (Servet'in görevi)
+40. ⬜ Git history'de OTEL credentials — BFG ile temizlenmeli → Git history 
+41. ⬜ DATABASE_URL local credentials git history'de → Git history 
 42. ✅ DNS rebinding SSRF → validate_url_and_resolve() + worker-side validation + IPv6 mapped + scheme normalization → `api/src/ssrf.rs`
 
 ### 2.6 Destructive Actions
