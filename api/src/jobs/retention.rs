@@ -1,5 +1,5 @@
 use anyhow::Result;
-use chrono::{DateTime, Datelike, Utc};
+use chrono::{DateTime, Utc};
 use sqlx::PgPool;
 
 /// Archive delivered deliveries to dead_letters before deleting them.
@@ -83,7 +83,7 @@ async fn cleanup_webhook_queue(pool: &PgPool) -> Result<u64> {
 /// This ensures customers who signed up on the 15th get their count reset
 /// on the 15th of each month, not the 1st.
 pub async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
-    let now = Utc::now();
+    let _now = Utc::now();
 
     // Reset customers whose billing anniversary has arrived this month
     // and who haven't been reset yet this period.
@@ -158,7 +158,7 @@ mod tests {
     #[test]
     fn test_cutoff_date_calculation() {
         // The retention logic: cutoff = Utc::now() - Duration::days(retention_days)
-        let now = Utc::now();
+        let _now = Utc::now();
         let retention_days = 30i64;
         let cutoff = now - chrono::Duration::days(retention_days);
 
@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_cutoff_date_zero_days() {
-        let now = Utc::now();
+        let _now = Utc::now();
         let cutoff = now - chrono::Duration::days(0);
         // With 0 retention, cutoff ≈ now
         let diff = now - cutoff;
@@ -178,7 +178,7 @@ mod tests {
 
     #[test]
     fn test_cutoff_date_large_retention() {
-        let now = Utc::now();
+        let _now = Utc::now();
         let retention_days = 365i64;
         let cutoff = now - chrono::Duration::days(retention_days);
         let diff = now - cutoff;
@@ -248,7 +248,7 @@ mod tests {
     #[test]
     fn test_chrono_now_minus_duration() {
         // Simulates the cutoff calculation in run_retention
-        let now = Utc::now();
+        let _now = Utc::now();
         let retention_days = 7i64;
         let cutoff = now - chrono::Duration::days(retention_days);
         assert!(cutoff < now);

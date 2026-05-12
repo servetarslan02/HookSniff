@@ -18,7 +18,7 @@
 // 3. Add cooldown period (e.g., 15 min) to prevent alert storms
 
 use axum::extract::Extension;
-use axum::routing::{get, post, put};
+use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -167,7 +167,7 @@ async fn update_alert(
     Json(req): Json<UpdateAlertRequest>,
 ) -> Result<Json<AlertRule>, AppError> {
     // Verify ownership
-    let existing: (Uuid,) =
+    let _existing: (Uuid,) =
         sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
