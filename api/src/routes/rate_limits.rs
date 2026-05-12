@@ -43,6 +43,7 @@ pub struct RateLimitConfigResponse {
 
 /// Set rate limit request
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SetRateLimitRequest {
     pub requests_per_second: Option<i32>,
     pub burst_size: Option<i32>,

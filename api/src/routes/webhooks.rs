@@ -58,7 +58,7 @@ async fn list_deliveries(
 
     let (deliveries, total) = if let Some(status) = &params.status {
         let deliveries = sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4",
+            "SELECT id, endpoint_id, customer_id, event, status, attempt_count, response_status, created_at, updated_at, processed_at, error_message FROM deliveries WHERE customer_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4",
         )
         .bind(customer.id)
         .bind(status)
@@ -78,7 +78,7 @@ async fn list_deliveries(
         (deliveries, total.0)
     } else {
         let deliveries = sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+            "SELECT id, endpoint_id, customer_id, event, status, attempt_count, response_status, created_at, updated_at, processed_at, error_message FROM deliveries WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
         )
         .bind(customer.id)
         .bind(per_page)
@@ -156,7 +156,7 @@ async fn create_webhook(
 
     // Verify endpoint exists and belongs to customer
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(req.endpoint_id)
     .bind(customer.id)
@@ -325,7 +325,7 @@ async fn batch_webhooks(
         .collect();
 
     let endpoints: Vec<Endpoint> = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
     )
     .bind(&endpoint_ids)
     .bind(customer.id)
@@ -465,7 +465,7 @@ async fn replay_webhook(
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     let original = sqlx::query_as::<_, Delivery>(
-        "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+        "SELECT id, endpoint_id, customer_id, event, status, attempt_count, response_status, created_at, updated_at, processed_at, error_message FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
@@ -474,7 +474,7 @@ async fn replay_webhook(
     .ok_or(AppError::NotFound)?;
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(original.endpoint_id)
     .bind(customer.id)
@@ -589,7 +589,7 @@ async fn batch_replay(
     for id in &req.delivery_ids {
         // Get original delivery
         let original = sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+            "SELECT id, endpoint_id, customer_id, event, status, attempt_count, response_status, created_at, updated_at, processed_at, error_message FROM deliveries WHERE id = $1 AND customer_id = $2",
         )
         .bind(id)
         .bind(customer.id)
@@ -603,7 +603,7 @@ async fn batch_replay(
 
         // Get endpoint
         let endpoint = sqlx::query_as::<_, Endpoint>(
-            "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+            "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
         )
         .bind(original.endpoint_id)
         .bind(customer.id)
@@ -783,7 +783,7 @@ async fn get_delivery(
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     let delivery = sqlx::query_as::<_, Delivery>(
-        "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+        "SELECT id, endpoint_id, customer_id, event, status, attempt_count, response_status, created_at, updated_at, processed_at, error_message FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
@@ -800,7 +800,7 @@ async fn get_delivery_attempts(
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<DeliveryAttempt>>, AppError> {
     let _delivery = sqlx::query_as::<_, Delivery>(
-        "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+        "SELECT id, endpoint_id, customer_id, event, status, attempt_count, response_status, created_at, updated_at, processed_at, error_message FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
