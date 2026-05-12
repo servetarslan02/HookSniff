@@ -4,6 +4,7 @@ import { getErrorMessage } from '@/lib/errors';
 
 import { useState } from 'react';
 import { useRouter, Link } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
@@ -24,7 +25,9 @@ function getPasswordStrength(pw: string): { score: number; label: string; color:
 }
 
 function LoginForm() {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const searchParams = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login';
+  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
