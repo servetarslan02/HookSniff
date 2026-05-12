@@ -1401,7 +1401,15 @@
     "widgetCustomization": "Widget Customization",
     "weekVsLastWeek": "This week vs last week",
     "drillDown": "Drill Down",
-    "realTimeUpdates": "Real-time Updates"
+    "realTimeUpdates": "Real-time Updates",
+    "allSystemsOperational": "All Systems Operational",
+    "basedOnHealthCheck": "Based on health check endpoint",
+    "serverUptime": "Server uptime since last restart",
+    "dedupWindowDefault": "60s",
+    "dedupActiveDesc": "Duplicate events are being filtered automatically.",
+    "standardWebhooksActiveDesc": "Standard Webhooks spec is active. All new webhooks use the standard format.",
+    "standardWebhooksInactiveDesc": "Enable the feature flag to switch to Standard Webhooks format (webhook- prefix, whsec_ secrets).",
+    "deployInfoUnavailable": "Deploy info unavailable — showing last known branch"
   },
   "landing": {
     "nav": {
