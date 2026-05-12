@@ -2491,7 +2491,21 @@
     "desc": "HookSniff'deki yenilikler — ürün güncellemeleri, SDK sürümleri ve altyapı iyileştirmeleri.",
     "subscribeRss": "RSS ile Abone Ol",
     "searchPlaceholder": "Değişiklik günlüklerinde ara...",
-    "readMore": "Devamını oku"
+    "readMore": "Devamını oku",
+    "typeFeature": "Özellik",
+    "typeFix": "Düzeltme",
+    "typeImprovement": "İyileştirme",
+    "typeSecurity": "Güvenlik",
+    "typeBreaking": "Kırıcı Değişiklik",
+    "areaApi": "API",
+    "areaDashboard": "Panel",
+    "areaSdk": "SDK",
+    "areaWorker": "İşleyici",
+    "areaInfra": "Altyapı",
+    "areaDocs": "Dokümantasyon",
+    "networkError": "Ağ hatası — bağlantınızı kontrol edin.",
+    "subscribeSuccess": "Başarıyla abone olundu!",
+    "emailPlaceholder": "eposta@adresiniz.com"
   },
   "newsletter": {
     "title": "Bülten",
