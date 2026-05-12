@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { teamsApi, type Team, type TeamMember } from '@/lib/api';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 const ROLE_OPTIONS = ['owner', 'admin', 'member'] as const;
@@ -33,6 +33,7 @@ export default function TeamPage() {
   const [inviting, setInviting] = useState(false);
   const t = useTranslations('team');
   const tc = useTranslations('common');
+  const locale = useLocale();
 
   // Current user's role in the selected team
   const currentRole = members.find((m) => m.user_id === user?.id)?.role || 'member';
