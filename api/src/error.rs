@@ -21,6 +21,9 @@ pub enum AppError {
     #[error("Payload too large")]
     PayloadTooLarge,
 
+    #[error("Conflict: {0}")]
+    Conflict(String),
+
     #[error("Rate limit exceeded")]
     RateLimitExceeded,
 
@@ -46,6 +49,7 @@ impl IntoResponse for AppError {
                 "PAYLOAD_TOO_LARGE",
                 self.to_string(),
             ),
+            AppError::Conflict(msg) => (StatusCode::CONFLICT, "CONFLICT", msg.clone()),
             AppError::RateLimitExceeded => (
                 StatusCode::TOO_MANY_REQUESTS,
                 "RATE_LIMIT_EXCEEDED",
@@ -130,6 +134,12 @@ mod tests {
     fn test_display_rate_limit_exceeded() {
         let err = AppError::RateLimitExceeded;
         assert_eq!(err.to_string(), "Rate limit exceeded");
+    }
+
+    #[test]
+    fn test_display_conflict() {
+        let err = AppError::Conflict("duplicate entry".into());
+        assert_eq!(err.to_string(), "Conflict: duplicate entry");
     }
 
     #[test]
@@ -244,6 +254,15 @@ mod tests {
         let (status, body) = extract_status_and_body(resp).await;
         assert_eq!(status, StatusCode::TOO_MANY_REQUESTS);
         assert_eq!(body["error"]["code"], "RATE_LIMIT_EXCEEDED");
+    }
+
+    #[tokio::test]
+    async fn test_into_response_conflict() {
+        let resp = AppError::Conflict("duplicate endpoint name".into()).into_response();
+        let (status, body) = extract_status_and_body(resp).await;
+        assert_eq!(status, StatusCode::CONFLICT);
+        assert_eq!(body["error"]["code"], "CONFLICT");
+        assert_eq!(body["error"]["message"], "duplicate endpoint name");
     }
 
     #[tokio::test]
