@@ -210,7 +210,7 @@ OTURUM 3 ✅ TAMAMLANDI
 
 | # | Görev | Öncelik | Not |
 |---|-------|---------|-----|
-| 1 | Alert Thresholds backend bağlantısı | 🟡 | Frontend eklendi, alert_rules CRUD API'si bağlanacak |
+| 1 | ~~Alert Thresholds backend bağlantısı~~ | ✅ | **TAMAMLANDI** — admin alerts CRUD API + frontend bağlandı (Oturum 128) |
 | 2 | `cargo test --lib` doğrulama | ✅ | 1019 test geçti, 0 hata |
 | 3 | `cargo clippy` doğrulama | ✅ | 0 uyarı |
 | 4 | `next build` doğrulama | ✅ | 214 sayfa, 6.6s |
