@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 
@@ -63,6 +64,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
   const [visible, setVisible] = useState(false);
   const t = useTranslations('onboarding');
   const router = useRouter();
+  const username = useUsername();
 
   useEffect(() => {
     const completed = localStorage.getItem(STORAGE_KEY);
@@ -97,14 +99,14 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
       description: t('createEndpointDesc'),
       illustration: <EndpointIllustration />,
       cta: t('createEndpointCta'),
-      ctaAction: () => router.push('/dashboard/endpoints'),
+      ctaAction: () => router.push(`/${username}/endpoints`),
     },
     {
       title: t('sendWebhook'),
       description: t('sendWebhookDesc'),
       illustration: <WebhookIllustration />,
       cta: t('sendWebhookCta'),
-      ctaAction: () => router.push('/dashboard/playground'),
+      ctaAction: () => router.push(`/${username}/playground`),
     },
     {
       title: t('monitorDeliveries'),

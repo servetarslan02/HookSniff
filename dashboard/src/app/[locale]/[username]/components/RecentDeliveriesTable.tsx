@@ -1,5 +1,6 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { StatusBadge } from '@/components/tremor';
@@ -8,13 +9,15 @@ import type { Delivery } from '@/lib/api';
 export function RecentDeliveriesTable({ deliveries }: { deliveries: Delivery[] }) {
   const t = useTranslations('dashboard');
   const locale = useLocale();
+  const params = useParams();
+  const username = (params?.username as string) || 'dashboard';
 
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recentDeliveries')}</h2>
         <Link
-          href="/dashboard/deliveries"
+          href={`/${username}/deliveries`}
           className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
         >
           {t('viewAll')}

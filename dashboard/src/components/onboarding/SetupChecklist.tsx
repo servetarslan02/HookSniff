@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { loadState } from './types';
@@ -13,15 +14,16 @@ interface ChecklistItem {
 }
 
 export function SetupChecklist() {
+  const username = useUsername();
   const t = useTranslations('onboarding');
   const { user, token } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const items: ChecklistItem[] = [
-    { id: 'account', label: t('checklistAccount'), href: '/dashboard', icon: '👤' },
-    { id: 'apikey', label: t('checklistApikey'), href: '/dashboard/api-keys', icon: '🔑' },
-    { id: 'endpoint', label: t('checklistEndpoint'), href: '/dashboard/endpoints', icon: '🔗' },
-    { id: 'webhook', label: t('checklistWebhook'), href: '/dashboard/playground', icon: '🧪' },
-    { id: 'monitor', label: t('checklistMonitor'), href: '/dashboard/deliveries', icon: '📊' },
+    { id: 'account', label: t('checklistAccount'), href: `/${username}`, icon: '👤' },
+    { id: 'apikey', label: t('checklistApikey'), href: `/${username}/api-keys`, icon: '🔑' },
+    { id: 'endpoint', label: t('checklistEndpoint'), href: `/${username}/endpoints`, icon: '🔗' },
+    { id: 'webhook', label: t('checklistWebhook'), href: `/${username}/playground`, icon: '🧪' },
+    { id: 'monitor', label: t('checklistMonitor'), href: `/${username}/deliveries`, icon: '📊' },
   ];
   const [completed, setCompleted] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(true);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
@@ -82,6 +83,7 @@ function RoiCalculator() {
 /* ─── Main Page ─── */
 
 export function PricingPageContent() {
+  const username = useUsername();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const router = useRouter();
@@ -281,7 +283,7 @@ export function PricingPageContent() {
                   if (plan.key === 'enterprise') {
                     window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
                   } else if (token) {
-                    router.push('/dashboard/billing');
+                    router.push(`/${username}/billing`);
                   } else {
                     router.push('/register');
                   }
