@@ -352,8 +352,35 @@ async fn deliver_email(
     let access_token = match token_result {
         Ok(resp) if resp.status().is_success() => {
             let text = resp.text().await.unwrap_or_default();
-            let body: serde_json::Value = serde_json::from_str(&text).unwrap_or_default();
-            body["access_token"].as_str().unwrap_or("").to_string()
+            // Item 344: Log JSON parse failures instead of silently swallowing
+            let body: serde_json::Value = match serde_json::from_str(&text) {
+                Ok(v) => v,
+                Err(e) => {
+                    warn!("Failed to parse GCloud token response as JSON: {} (response: {})", e, truncate_str(&text, 200));
+                    return Ok(DeliveryResult {
+                        success: false,
+                        status_code: 0,
+                        response_body: String::new(),
+                        response_headers: serde_json::json!({}),
+                        duration_ms: start.elapsed().as_millis() as i32,
+                        error: format!("Invalid token response JSON: {}", e),
+                    });
+                }
+            };
+            match body["access_token"].as_str() {
+                Some(token) if !token.is_empty() => token.to_string(),
+                _ => {
+                    warn!("GCloud token response missing access_token field: {}", truncate_str(&text, 200));
+                    return Ok(DeliveryResult {
+                        success: false,
+                        status_code: 0,
+                        response_body: String::new(),
+                        response_headers: serde_json::json!({}),
+                        duration_ms: start.elapsed().as_millis() as i32,
+                        error: "Token response missing access_token".to_string(),
+                    });
+                }
+            }
         }
         Ok(resp) => {
             let status = resp.status().as_u16() as i32;
@@ -471,13 +498,20 @@ pub async fn deliver_with_routing(
     let ep_uuid = uuid::Uuid::parse_str(&webhook.endpoint_id)
         .map_err(|_| anyhow::anyhow!("Invalid endpoint_id UUID"))?;
 
-    let targets: Vec<DeliveryTargetRow> = sqlx::query_as(
+    // Item 344: Don't swallow DB errors — log and fall back to default HTTP
+    let targets: Vec<DeliveryTargetRow> = match sqlx::query_as(
         "SELECT id, endpoint_id, target_type, config, enabled FROM delivery_targets WHERE endpoint_id = $1 ORDER BY created_at",
     )
     .bind(ep_uuid)
     .fetch_all(pool)
     .await
-    .unwrap_or_default();
+    {
+        Ok(rows) => rows,
+        Err(e) => {
+            warn!("Failed to load delivery targets for endpoint {}: {:?}, falling back to default HTTP", webhook.endpoint_id, e);
+            Vec::new()
+        }
+    };
 
     let active_targets: Vec<_> = targets.iter().filter(|t| t.enabled).collect();
 
