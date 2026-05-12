@@ -1021,11 +1021,17 @@ async fn test_webhook(
 ) -> Result<Json<TestWebhookResponse>, AppError> {
     require_admin(&customer)?;
 
-    // Validate URL
+    // Validate URL scheme
     if !req.endpoint_url.starts_with("http://") && !req.endpoint_url.starts_with("https://") {
         return Err(AppError::BadRequest(
             "URL must start with http:// or https://".into(),
         ));
+    }
+
+    // SSRF protection — block private/internal IPs
+    if let Err(e) = crate::ssrf::validate_url(&req.endpoint_url) {
+        tracing::warn!("SSRF blocked on test-webhook: {} — {:?}", req.endpoint_url, e);
+        return Err(AppError::BadRequest(format!("URL not allowed: {}", e)));
     }
 
     let client = reqwest::Client::new();
