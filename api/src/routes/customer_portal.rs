@@ -129,7 +129,7 @@ async fn create_api_key(
 ) -> Result<Json<serde_json::Value>, AppError> {
     let api_key = crate::middleware::generate_api_key();
     let api_key_hash = crate::middleware::hash_api_key(&api_key);
-    let api_key_prefix = api_key[..15].to_string();
+    let api_key_prefix = api_key[..24].to_string();
 
     sqlx::query("UPDATE customers SET api_key_hash = $1, api_key_prefix = $2 WHERE id = $3")
         .bind(&api_key_hash)
@@ -154,7 +154,7 @@ async fn revoke_api_key(
     // Yeni bir key oluştur (eskiyi geçersiz kılar)
     let new_key = crate::middleware::generate_api_key();
     let new_hash = crate::middleware::hash_api_key(&new_key);
-    let new_prefix = new_key[..15].to_string();
+    let new_prefix = new_key[..24].to_string();
 
     sqlx::query("UPDATE customers SET api_key_hash = $1, api_key_prefix = $2 WHERE id = $3")
         .bind(&new_hash)

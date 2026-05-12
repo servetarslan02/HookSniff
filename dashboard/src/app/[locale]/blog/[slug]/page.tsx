@@ -4,6 +4,12 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { posts, authors, categoryGradients, getRelatedPosts, getAdjacentPosts, tokenizeCode } from './data';
+import { sanitizeHighlightHtml } from '@/lib/sanitize';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -78,7 +84,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <Link href="/blog" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">{t("title")}</Link>
           </div>
           <LanguageSwitcher />
@@ -110,7 +116,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="text-sm text-gray-500 dark:text-slate-500">{post.date}</span>
-            <span className="text-sm text-gray-400 dark:text-slate-600">·</span>
+            <span className="text-sm text-gray-500 dark:text-slate-600">·</span>
             <span className="text-sm text-gray-500 dark:text-slate-500">{post.readTime}</span>
           </div>
           {/* Author */}
@@ -146,10 +152,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <div key={i} className="my-4 rounded-lg overflow-hidden">
                   <div className="bg-gray-200 dark:bg-slate-700 px-4 py-1.5 flex items-center justify-between">
                     <span className="text-xs font-mono text-gray-600 dark:text-slate-400">{language}</span>
-                    <span className="text-xs text-gray-400 dark:text-slate-500">{lines.length} lines</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-500">{lines.length} lines</span>
                   </div>
                   <pre className="bg-gray-100 dark:bg-slate-800 p-4 overflow-x-auto text-sm">
-                    <code className="text-gray-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: highlighted }} />
+                    <code className="text-gray-800 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: sanitizeHighlightHtml(highlighted) }} />
                   </pre>
                 </div>
               );

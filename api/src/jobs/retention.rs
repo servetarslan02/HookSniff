@@ -78,21 +78,36 @@ async fn cleanup_webhook_queue(pool: &PgPool) -> Result<u64> {
 
 /// Reset monthly webhook counters for all customers.
 ///
-/// Runs on the 1st of each month. Uses a marker to avoid running twice.
+/// Item 275: Period-based reset — resets on each customer's billing anniversary
+/// (based on created_at), not on the 1st of every calendar month.
+/// This ensures customers who signed up on the 15th get their count reset
+/// on the 15th of each month, not the 1st.
 pub async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
     let now = Utc::now();
-    // Only reset on the 1st of the month, within the first 24 hours
-    if now.day() != 1 {
-        return Ok(());
-    }
 
-    let result = sqlx::query("UPDATE customers SET webhook_count = 0 WHERE webhook_count > 0")
-        .execute(pool)
-        .await?;
+    // Reset customers whose billing anniversary has arrived this month
+    // and who haven't been reset yet this period.
+    // Logic: created_at's day-of-month <= today AND last reset was before this period start
+    let result = sqlx::query(
+        r#"UPDATE customers
+           SET webhook_count = 0, updated_at = NOW()
+           WHERE webhook_count > 0
+             AND (
+               -- Customer's billing day-of-month has arrived
+               EXTRACT(DAY FROM created_at)::int <= EXTRACT(DAY FROM NOW())::int
+               -- And we haven't already reset this period
+               AND (
+                 updated_at < DATE_TRUNC('month', NOW()) + (EXTRACT(DAY FROM created_at) - 1) * INTERVAL '1 day'
+                 OR updated_at IS NULL
+               )
+             )"#,
+    )
+    .execute(pool)
+    .await?;
 
     if result.rows_affected() > 0 {
         tracing::info!(
-            "🔄 Reset monthly webhook counters for {} customers",
+            "🔄 Reset monthly webhook counters for {} customers (period-based)",
             result.rows_affected()
         );
     }

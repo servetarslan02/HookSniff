@@ -125,7 +125,7 @@ export default function Footer() {
             <span className="text-xl">🪝</span>
             <span className="font-semibold text-gray-900 dark:text-white">HookSniff</span>
           </div>
-          <p className="text-sm text-gray-400 dark:text-slate-500">{t('copyright')}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-500">{t('copyright')}</p>
         </div>
       </div>
     </footer>

@@ -69,7 +69,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               🪝
             </div>
             <span className="text-lg font-bold text-gray-900 dark:text-white">HookSniff</span>
-            <span className="text-sm text-gray-400 dark:text-slate-500 ml-2">{t('docs')}</span>
+            <span className="text-sm text-gray-500 dark:text-slate-500 ml-2">{t('docs')}</span>
           </Link>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
@@ -89,7 +89,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <nav className="sticky top-24">
             {sidebarNav.map((group) => (
               <div key={group.title} className="mb-6">
-                <h3 className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+                <h3 className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-500">
                   {group.title}
                 </h3>
                 <div className="space-y-0.5">

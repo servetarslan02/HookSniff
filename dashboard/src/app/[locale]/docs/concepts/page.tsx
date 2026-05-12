@@ -1,5 +1,16 @@
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Core Concepts',
+  description: 'Learn the core concepts behind HookSniff's webhook delivery system',
+};
+
 
 export default function ConceptsPage() {
   const t = useTranslations('docs');

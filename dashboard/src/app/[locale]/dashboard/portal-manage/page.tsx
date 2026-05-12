@@ -41,7 +41,6 @@ export default function PortalPage() {
     ])
       .then(([p, u]) => { setProfile(p); setUsage(u); })
       .catch((err) => {
-        console.error('Failed to load portal data:', err);
         setError(err instanceof Error ? err.message : t('failedToLoad'));
       })
       .finally(() => setLoading(false));
@@ -51,7 +50,7 @@ export default function PortalPage() {
 
   if (error) {
     return (
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
         <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400">
           {error}
@@ -61,13 +60,13 @@ export default function PortalPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
 
       {profile && (
         <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 mb-6">
           <h2 className="text-lg font-semibold mb-4">{t('profile')}</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('email')}</p>
               <p className="font-medium">{profile.email}</p>
@@ -91,7 +90,7 @@ export default function PortalPage() {
       {usage && (
         <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
           <h2 className="text-lg font-semibold mb-4">{t('usage')}</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('webhooksUsed')}</p>
               <p className="text-2xl font-bold text-purple-500">{usage.webhooks_used?.toLocaleString() || 0}</p>

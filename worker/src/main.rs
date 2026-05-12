@@ -646,9 +646,12 @@ async fn process_pending(
                 )
                 .await?;
 
-                // Reset endpoint failure streak on success
+                // Item 265: Use running average for avg_response_ms instead of overwrite
                 sqlx::query::<sqlx::Postgres>(
-                    "UPDATE endpoints SET failure_streak = 0, avg_response_ms = $2 WHERE id = $1",
+                    "UPDATE endpoints SET failure_streak = 0, avg_response_ms = CASE \
+                     WHEN avg_response_ms IS NULL OR avg_response_ms = 0 THEN $2 \
+                     ELSE ((avg_response_ms * 0.8) + ($2 * 0.2))::int \
+                     END WHERE id = $1",
                 )
                 .bind(item.endpoint_id)
                 .bind(duration_ms)
@@ -892,13 +895,23 @@ async fn process_pending(
     }
 
     // Wait for all concurrent deliveries to complete
+    // Item 269: Track actual processed count (not just fetched)
+    let mut processed = 0usize;
     for handle in handles {
-        if let Err(e) = handle.await {
-            tracing::error!("❌ Delivery task panicked: {:?}", e);
+        match handle.await {
+            Ok(Ok(())) => processed += 1,
+            Ok(Err(e)) => {
+                tracing::error!("❌ Delivery task error: {:?}", e);
+                processed += 1; // Still counts as processed (attempted)
+            }
+            Err(e) => {
+                tracing::error!("❌ Delivery task panicked: {:?}", e);
+                // Panicked tasks don't count as processed
+            }
         }
     }
 
-    Ok(count)
+    Ok(processed)
 }
 
 /// Recover webhook_queue records stuck in "processing" for more than 5 minutes.
@@ -907,6 +920,8 @@ async fn process_pending(
 /// This reaper checks max_attempts:
 ///   - If attempt_count >= max_attempts → dead letter (don't retry forever)
 ///   - If attempt_count < max_attempts → reset to pending for retry
+///
+/// Item 267: Wrapped in a transaction for atomicity.
 async fn reap_zombies(pool: &PgPool) -> Result<usize> {
     // Find stuck records with their max_attempts
     let stuck: Vec<(uuid::Uuid, uuid::Uuid, uuid::Uuid, i32, i32)> = sqlx::query_as(
@@ -924,6 +939,9 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
         return Ok(0);
     }
 
+    // Item 267: Wrap all zombie reaper operations in a single transaction
+    let mut tx = pool.begin().await?;
+
     for (id, delivery_id, _endpoint_id, attempt, max_attempts) in &stuck {
         if *attempt >= *max_attempts {
             // Max attempts exceeded → dead letter
@@ -940,7 +958,7 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
                 "#,
             )
             .bind(id)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
             // Insert into dead_letters table
@@ -954,7 +972,7 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
             .bind(delivery_id)
             .bind("zombie reaper: max attempts exceeded")
             .bind(attempt + 1)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
             // Update delivery status to failed
@@ -963,13 +981,10 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
             )
             .bind(delivery_id)
             .bind("zombie reaper: max attempts exceeded")
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
         } else {
             // Reset to pending for retry
-            // HS-033: Do NOT increment attempt_count here — the actual delivery
-            // will increment it when the retry happens. Incrementing here inflates
-            // the count without a corresponding delivery attempt.
             sqlx::query::<sqlx::Postgres>(
                 r#"
                 UPDATE webhook_queue
@@ -978,7 +993,7 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
                 "#,
             )
             .bind(id)
-            .execute(pool)
+            .execute(&mut *tx)
             .await?;
 
             tracing::warn!(
@@ -990,72 +1005,63 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
         }
     }
 
+    tx.commit().await?;
     Ok(stuck.len())
 }
 
 /// Also recover deliveries stuck in 'pending' with no active queue entry.
 /// These are orphaned records from crashed workers.
+///
+/// Item 268: Uses a single JOIN query instead of N+1 per-delivery queries.
 async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
-    let orphaned: Vec<(uuid::Uuid,)> = sqlx::query_as(
-        r#"
-        SELECT d.id FROM deliveries d
-        WHERE d.status = 'pending'
-          AND d.created_at < now() - interval '10 minutes'
-          AND NOT EXISTS (
-              SELECT 1 FROM webhook_queue wq
-              WHERE wq.delivery_id = d.id
-                AND wq.status IN ('pending', 'processing')
-          )
-        "#,
-    )
-    .fetch_all(pool)
-    .await?;
+    // Single query: find orphaned deliveries with their endpoint URLs
+    let orphaned: Vec<(uuid::Uuid, uuid::Uuid, uuid::Uuid, serde_json::Value, Option<serde_json::Value>, String)> =
+        sqlx::query_as(
+            r#"
+            SELECT d.id, d.endpoint_id, d.customer_id, d.payload, d.custom_headers, e.url
+            FROM deliveries d
+            JOIN endpoints e ON e.id = d.endpoint_id
+            WHERE d.status = 'pending'
+              AND d.created_at < now() - interval '10 minutes'
+              AND NOT EXISTS (
+                  SELECT 1 FROM webhook_queue wq
+                  WHERE wq.delivery_id = d.id
+                    AND wq.status IN ('pending', 'processing')
+              )
+            LIMIT 100
+            "#,
+        )
+        .fetch_all(pool)
+        .await?;
 
     if orphaned.is_empty() {
         return Ok(0);
     }
 
-    for (delivery_id,) in &orphaned {
-        // Re-insert into queue for retry
-        let delivery: Option<(uuid::Uuid, uuid::Uuid, uuid::Uuid, serde_json::Value, Option<serde_json::Value>)> =
-            sqlx::query_as(
-                "SELECT id, endpoint_id, customer_id, payload, custom_headers FROM deliveries WHERE id = $1"
-            )
-            .bind(delivery_id)
-            .fetch_optional(pool)
-            .await?;
+    let count = orphaned.len();
 
-        if let Some((id, endpoint_id, _customer_id, payload, custom_headers)) = delivery {
-            let endpoint_url: Option<(String,)> =
-                sqlx::query_as("SELECT url FROM endpoints WHERE id = $1")
-                    .bind(endpoint_id)
-                    .fetch_optional(pool)
-                    .await?;
+    for (id, endpoint_id, _customer_id, payload, custom_headers, url) in &orphaned {
+        sqlx::query::<sqlx::Postgres>(
+            r#"INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, payload, custom_headers, status, attempt_count)
+               VALUES ($1, $2, $3, $4, $5, 'pending', 0)
+               ON CONFLICT (delivery_id) DO NOTHING"#,
+        )
+        .bind(id)
+        .bind(endpoint_id)
+        .bind(url)
+        .bind(payload)
+        .bind(custom_headers)
+        .execute(pool)
+        .await?;
 
-            if let Some((url,)) = endpoint_url {
-                sqlx::query::<sqlx::Postgres>(
-                    r#"INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, payload, custom_headers, status, attempt_count)
-                       VALUES ($1, $2, $3, $4, $5, 'pending', 0)
-                       ON CONFLICT (delivery_id) DO NOTHING"#
-                )
-                .bind(id)
-                .bind(endpoint_id)
-                .bind(&url)
-                .bind(&payload)
-                .bind(&custom_headers)
-                .execute(pool)
-                .await?;
-
-                tracing::warn!(
-                    "🧟 Re-queued orphaned delivery: {} (endpoint={})",
-                    id,
-                    endpoint_id
-                );
-            }
-        }
+        tracing::warn!(
+            "🧟 Re-queued orphaned delivery: {} (endpoint={})",
+            id,
+            endpoint_id
+        );
     }
 
-    Ok(orphaned.len())
+    Ok(count)
 }
 
 /// Delivery attempt data for recording

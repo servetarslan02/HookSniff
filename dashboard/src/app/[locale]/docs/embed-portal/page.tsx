@@ -1,5 +1,16 @@
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Embed Portal',
+  description: 'Embed the HookSniff customer portal in your application',
+};
+
 
 // Force SSR — SSG output was missing on Vercel for this page
 export const dynamic = 'force-dynamic';

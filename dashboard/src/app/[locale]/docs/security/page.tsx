@@ -69,6 +69,17 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
           code={`import hmac
 import hashlib
 import base64
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Security',
+  description: 'How HookSniff secures your webhook deliveries with signatures and encryption',
+};
+
 
 def verify_webhook_signature(
     payload: bytes,
