@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 14:31 GMT+8
+> Son güncelleme: 2026-05-12 17:59 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -267,3 +267,16 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Commits:** 7 commit, main branch
 - **60+ dosya değişti**
 
+
+## Oturum 126 (2026-05-12 17:16 - 17:59 GMT+8) ✅
+- **OpenClaw yirmi ikinci oturum** — Servet ile Admin Panel eksikleri
+- **ADMIN-PANEL-ANALYSIS.md çalışması:**
+  - ✅ Activity Log sayfası oluşturuldu (`/admin/activity`) — audit log viewer + filtre + sayfalama
+  - ✅ Test Webhook Console — System sayfasına eklendi (endpoint URL, event type, payload, sonuç gösterimi)
+  - ✅ Sidebar'a Activity linki eklendi (📋 ikonu)
+  - ✅ AuditLogEntry type güncellendi (`customer_id` eklendi)
+  - ✅ i18n anahtarları eklendi (activity log + test webhook, en/tr toplam 25+ key)
+  - ✅ Pre-existing düzeltmeler: unused `router` import users page, unused `token` params api.ts
+- **Build doğrulama:** `next build` hatasız geçti ✅
+- **Commit:** 6869a1c2 — main branch
+- **7 dosya değişti, 445 satır eklendi, 14 satır silindi**
