@@ -97,6 +97,17 @@ function verifyGitHubSignature(payload: string, signature: string, secret: strin
         <CodeBlock
           code={`import express from 'express';
 import { HookSniff } from 'hooksniff-sdk';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Integrations',
+  description: 'Connect HookSniff with your favorite tools and services',
+};
+
 
 const app = express();
 const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });

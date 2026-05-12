@@ -1,4 +1,15 @@
 import { useTranslations } from 'next-intl';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Architecture',
+  description: 'Understand HookSniff's system architecture and design decisions',
+};
+
 
 export default function ArchitecturePage() {
   const t = useTranslations('docs');

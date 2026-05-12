@@ -105,3 +105,81 @@ jobs:
             --region ${{ env.REGION }} \
             --format 'value(status.url)' \
             --project ${{ env.PROJECT_ID }}
+
+      # ── Item 38: Health check + automatic rollback on failure ──
+      - name: Verify API health after deploy
+        id: health_check
+        run: |
+          API_URL=$(gcloud run services describe hooksniff-api \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)' \
+            --project ${{ env.PROJECT_ID }})
+          
+          echo "Waiting 30s for new revision to stabilize..."
+          sleep 30
+          
+          MAX_RETRIES=5
+          RETRY_DELAY=10
+          for i in $(seq 1 $MAX_RETRIES); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${API_URL}/health" || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ API health check passed (attempt $i)"
+              exit 0
+            fi
+            echo "⚠️ API health check failed: HTTP $HTTP_CODE (attempt $i/$MAX_RETRIES)"
+            if [ $i -lt $MAX_RETRIES ]; then
+              sleep $RETRY_DELAY
+            fi
+          done
+          
+          echo "❌ API health check failed after $MAX_RETRIES attempts"
+          echo "rollback_needed=true" >> $GITHUB_OUTPUT
+
+      - name: Rollback API on health check failure
+        if: steps.health_check.outputs.rollback_needed == 'true'
+        run: |
+          echo "🔄 Rolling back API to previous revision..."
+          PREVIOUS_REVISION=$(gcloud run services describe hooksniff-api \
+            --region ${{ env.REGION }} \
+            --format 'value(status.latestReadyRevisionName)' \
+            --project ${{ env.PROJECT_ID }} | head -2 | tail -1)
+          
+          if [ -n "$PREVIOUS_REVISION" ]; then
+            gcloud run services update-traffic hooksniff-api \
+              --region ${{ env.REGION }} \
+              --to-revisions "$PREVIOUS_REVISION=100" \
+              --project ${{ env.PROJECT_ID }}
+            echo "✅ Rolled back API to $PREVIOUS_REVISION"
+          else
+            echo "❌ No previous revision found for rollback"
+          fi
+          exit 1
+
+      - name: Verify Worker health after deploy
+        run: |
+          WORKER_URL=$(gcloud run services describe hooksniff-worker \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)' \
+            --project ${{ env.PROJECT_ID }})
+          
+          echo "Waiting 15s for worker to stabilize..."
+          sleep 15
+          
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${WORKER_URL}/health" || echo "000")
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "⚠️ Worker health check failed: HTTP $HTTP_CODE"
+            echo "🔄 Rolling back Worker to previous revision..."
+            PREVIOUS_REVISION=$(gcloud run services describe hooksniff-worker \
+              --region ${{ env.REGION }} \
+              --format 'value(status.latestReadyRevisionName)' \
+              --project ${{ env.PROJECT_ID }} | head -2 | tail -1)
+            if [ -n "$PREVIOUS_REVISION" ]; then
+              gcloud run services update-traffic hooksniff-worker \
+                --region ${{ env.REGION }} \
+                --to-revisions "$PREVIOUS_REVISION=100" \
+                --project ${{ env.PROJECT_ID }}
+              echo "✅ Rolled back Worker to $PREVIOUS_REVISION"
+              exit 1
+            fi
+          fi
+          echo "✅ Worker health check passed"

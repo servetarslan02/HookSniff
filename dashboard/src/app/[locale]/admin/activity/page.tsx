@@ -227,10 +227,10 @@ export default function AdminActivityPage() {
                         {typeof entry.details === 'string' ? entry.details : JSON.stringify(entry.details, null, 2)}
                       </pre>
                     ) : (
-                      <span className="text-xs text-gray-400 dark:text-slate-500">—</span>
+                      <span className="text-xs text-gray-500 dark:text-slate-500">—</span>
                     )}
                     {entry.ip_address && (
-                      <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">
+                      <p className="text-[11px] text-gray-500 dark:text-slate-500 mt-1">
                         IP: {entry.ip_address}
                       </p>
                     )}

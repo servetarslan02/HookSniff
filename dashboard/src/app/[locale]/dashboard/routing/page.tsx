@@ -35,7 +35,7 @@ export default function RoutingPage() {
   if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{t('loading')}</div>;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
       <p className="text-gray-500 mb-6">
         {t('subtitle')}

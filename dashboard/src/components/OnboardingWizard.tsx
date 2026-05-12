@@ -300,7 +300,7 @@ export function OnboardingWizard() {
                 </div>
                 <div className="bg-gray-900 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-400 uppercase tracking-wider">{t("installCommand")}</span>
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">{t("installCommand")}</span>
                     <button
                       onClick={() => handleCopy(SDKS.find(s => s.id === selectedSdk)?.install || '', 'install')}
                       className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
@@ -365,7 +365,7 @@ export function OnboardingWizard() {
 
                 <div className="bg-gray-900 rounded-xl p-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-400 uppercase tracking-wider">{t("testCommand")}</span>
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">{t("testCommand")}</span>
                     <button
                       onClick={() => handleCopy(`curl -X POST https://api.hooksniff.dev/v1/webhooks \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"endpoint_id":"ep_YOUR_ID","event":"test.ping","data":{"hello":"world"}}'`, 'test')}
                       className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
@@ -453,7 +453,7 @@ export function OnboardingWizard() {
               {currentStep.id !== 'done' && (
                 <button
                   onClick={dismiss}
-                  className="text-sm text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+                  className="text-sm text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
                 >
                   {t('skipSetup')}
                 </button>
@@ -583,7 +583,7 @@ export function SetupChecklist() {
             />
           </div>
           <span className="text-xs font-medium text-gray-500 dark:text-slate-400">{percentage}%</span>
-          <span className="text-gray-400 dark:text-slate-500 text-sm">{expanded ? '▲' : '▼'}</span>
+          <span className="text-gray-500 dark:text-slate-500 text-sm">{expanded ? '▲' : '▼'}</span>
         </div>
       </button>
 
@@ -622,7 +622,7 @@ export function SetupChecklist() {
           </div>
           <button
             onClick={() => setDismissed(true)}
-            className="mt-3 text-xs text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+            className="mt-3 text-xs text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
           >
             {t('dismissChecklist')}
           </button>
@@ -635,6 +635,7 @@ export function SetupChecklist() {
 /* ─── Success Toast ─── */
 export function SuccessToast({ message, onClose }: { message: string; onClose: () => void }) {
   const t = useTranslations('onboarding');
+  const tc = useTranslations('common');
   useEffect(() => {
     const timer = setTimeout(onClose, 5000);
     return () => clearTimeout(timer);
@@ -648,7 +649,7 @@ export function SuccessToast({ message, onClose }: { message: string; onClose: (
           <div className="font-semibold text-sm">{t('successTitle')}</div>
           <div className="text-sm opacity-90">{message}</div>
         </div>
-        <button onClick={onClose} className="ml-4 text-white/70 hover:text-white transition">✕</button>
+        <button onClick={onClose} aria-label={tc('close')} className="ml-4 text-white/70 hover:text-white transition">✕</button>
       </div>
     </div>
   );

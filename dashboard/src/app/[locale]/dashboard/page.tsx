@@ -64,15 +64,16 @@ function TimeRangeSelector({
 
 /* ─── Animated Counter ─── */
 function AnimatedCounter({ value, duration = 1200 }: { value: number; duration?: number }) {
+  const safeValue = Math.max(0, Math.round(value));
   const [display, setDisplay] = useState(0);
   const prevRef = useRef<number>(0);
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const start = prevRef.current;
-    const diff = value - start;
+    const diff = safeValue - start;
     if (diff === 0) {
-      setDisplay(value);
+      setDisplay(safeValue);
       return;
     }
     const startTime = performance.now();
@@ -87,13 +88,13 @@ function AnimatedCounter({ value, duration = 1200 }: { value: number; duration?:
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(animate);
       } else {
-        prevRef.current = value;
+        prevRef.current = safeValue;
       }
     }
 
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [value, duration]);
+  }, [safeValue, duration]);
 
   return <>{display.toLocaleString()}</>;
 }
@@ -203,8 +204,8 @@ function SuccessRateDonut({
   const rate = data?.success_rate ?? 0;
   const chartData = [
     { name: tc('success'), value: data?.successful ?? 0 },
-    { name: tc('failed') || 'Failed', value: data?.failed ?? 0 },
-    { name: tc('pending') || 'Pending', value: data?.pending ?? 0 },
+    { name: tc('failed'), value: data?.failed ?? 0 },
+    { name: tc('pending'), value: data?.pending ?? 0 },
   ];
   const COLORS = ['#10b981', '#ef4444', '#f59e0b'];
 
@@ -269,8 +270,28 @@ function ActivityFeed({ token }: { token: string }) {
 
   useEffect(() => {
     fetchDeliveries();
-    const interval = setInterval(fetchDeliveries, 5000);
-    return () => clearInterval(interval);
+
+    // Only poll when tab is visible to save resources (Item 336)
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const startPolling = () => {
+      if (!interval) interval = setInterval(fetchDeliveries, 5000);
+    };
+    const stopPolling = () => {
+      if (interval) { clearInterval(interval); interval = null; }
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) stopPolling();
+      else { fetchDeliveries(); startPolling(); }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    if (!document.hidden) startPolling();
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [fetchDeliveries]);
 
   return (
@@ -325,11 +346,20 @@ function ActivityFeed({ token }: { token: string }) {
 
 function StatusDot({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    delivered: 'bg-green-500',
+    delivered: 'bg-emerald-500',
+    success: 'bg-emerald-500',
     failed: 'bg-red-500',
-    pending: 'bg-yellow-500',
+    error: 'bg-red-500',
+    pending: 'bg-amber-500',
+    active: 'bg-blue-500',
   };
-  return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || colors.pending}`} />;
+  return (
+    <span
+      className={`w-2.5 h-2.5 rounded-full ${colors[status] || colors.pending}`}
+      role="img"
+      aria-label={status}
+    />
+  );
 }
 
 /* ─── Main Dashboard ─── */

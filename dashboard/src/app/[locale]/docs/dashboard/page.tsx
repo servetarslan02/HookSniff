@@ -1,4 +1,15 @@
 import { useTranslations } from 'next-intl';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Dashboard Guide',
+  description: 'Learn how to use the HookSniff dashboard to manage webhooks',
+};
+
 
 export default function DashboardPage() {
   const t = useTranslations('docs');

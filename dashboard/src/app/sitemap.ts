@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
+import { routing } from '@/i18n/routing';
 
 const BASE_URL = 'https://hooksniff.vercel.app';
 
-const locales = ['en', 'tr'];
+const locales = routing.locales;
 
 const publicPages = ['', '/about', '/faq', '/contact', '/privacy', '/terms', '/docs', '/docs/api-reference', '/docs/sdk-libraries', '/status', '/login'];
 

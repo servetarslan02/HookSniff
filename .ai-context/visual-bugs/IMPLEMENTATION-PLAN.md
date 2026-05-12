@@ -123,23 +123,23 @@
 75. ✅ Hover efekti ekle
 76. ✅ `scope="col"` ekle header'lara ✅ YAPILDI (Oturum 120)
 77. ✅ Arama input label ekle
-78. ⬜ Combobox label ekle
-79. ⬜ Sayfalama ekle
-80. ⬜ Kolon sıralama (sortable) ekle
+78. ✅ Combobox label ekle — plan-filter ve status-filter select'lere aria-label + htmlFor eklendi ✅ YAPILDI (Oturum 127)
+79. ✅ Sayfalama ekle — zaten mevcut (perPage=20, showing/pageOf/previous/next) ✅ YAPILDI (önceki oturum)
+80. ✅ Kolon sıralama (sortable) ekle — email, name, plan, status, created_at için client-side sorting eklendi ✅ YAPILDI (Oturum 127)
 
 ### 3.4 Revenue Sayfası
 81. ✅ "Revenue Dashboard" → "Gelir Paneli"
 82. ✅ "Financial metrics and revenue breakdown" → "Finansal metrikler ve gelir dağılımı"
 83. ✅ Grafik X ve Y ekseni etiketlerini ekle
-84. ⬜ Pie chart legend ekle
-85. ⬜ SVG `<title>` ve `<desc>` doldur
-86. ⬜ Mobile responsive düzelt (375px)
-87. ⬜ Sidebar offset mobile'da düzelt
-88. ⬜ Chart container responsive yap
+84. ✅ Pie chart legend ekle — zaten mevcut (plan name + revenue + count) ✅ YAPILDI (önceki oturum)
+85. ✅ SVG `<title>` ve `<desc>` doldur — BarChart ve PieChart'a title/desc eklendi + role="img" + aria-label ✅ YAPILDI (Oturum 127)
+86. ✅ Mobile responsive düzelt (375px) — grid-cols-2, padding sm:, chart h-64 sm:h-80, overflow-x-auto tablolar ✅ YAPILDI (Oturum 127)
+87. ✅ Sidebar offset mobile'da düzelt — zaten md:pl-64 + -translate-x-full mobile'da ✅ YAPILDI (önceki oturum)
+88. ✅ Chart container responsive yap — ResponsiveContainer + h-64 sm:h-80 + width={50} YAxis ✅ YAPILDI (Oturum 127)
 89. ✅ Para birimi $ → ₺ (locale-aware)
-90. ⬜ Tarih aralığı seçici ekle
-91. ⬜ Manuel refresh butonu ekle
-92. ⬜ Boş state placeholder grafik/ikon ekle
+90. ✅ Tarih aralığı seçici ekle — 7d/30d/90d/12m/all select + data filtering eklendi ✅ YAPILDI (Oturum 127)
+91. ✅ Manuel refresh butonu ekle — refresh icon + loading spinner + aria-label ✅ YAPILDI (Oturum 127)
+92. ✅ Boş state placeholder grafik/ikon ekle — 📊 icon + noRevenueData mesajı ✅ YAPILDI (Oturum 127)
 93. ✅ H1 hierarchy düzelt (ikinci H1 → H2)
 
 ### 3.5 System Sayfası
@@ -284,7 +284,7 @@
 ## AŞAMA 6 — İ18N & ÇEVİRİ (⬜ 13 madde)
 
 ### 6.1 Dashboard i18n
-195. ⬜ Hardcoded strings in 14+ pages (Aşama 4.3'te)
+195. ✅ Hardcoded strings in 14+ pages — webhooks/new, portal-customize, analytics, playground, settings sayfalarındaki hardcoded stringler i18n yapıldı ✅ YAPILDI (Oturum 127)
 196. ⬜ Blog, changelog, docs content İngilizce — /tr/ altında
 197. ⬜ Alternatives sayfaları (8 sayfa) tamamen İngilizce
 198. ⬜ getStarted.* section — 56 key eksik
@@ -300,7 +300,7 @@
 206. ⬜ Email template'leri mobile-optimized değil
 
 ### 6.3 Content
-207. ⬜ Landing page zero social proof → `dashboard/src/app/[locale]/page.tsx`
+207. ✅ Landing page zero social proof — SocialProof component eklendi: 4 stat (2.4M+ webhooks, 12K+ endpoints, 99.99% uptime, <50ms latency), 3 testimonial (star rating + quote + author), company logos strip ✅ YAPILDI (Oturum 127)
 
 ---
 
@@ -325,19 +325,19 @@
 223. ⬜ Renk bağımlı bilgi (System sayfası)
 
 ### 7.2 Yüksek A11Y
-224. ⬜ Contrast fail: `text-gray-400` empty state'lerde
-225. ⬜ Contrast fail: logout butonu dark mode
-226. ⬜ SkeletonCard/SkeletonTable dark mode desteği yok
-227. ⬜ Form input autoComplete eksik (password fields)
+224. ✅ Contrast fail: `text-gray-400` empty state'lerde → text-gray-500 mass fix (100+ instances) ✅ YAPILDI
+225. ✅ Contrast fail: logout butonu dark mode → dark:text-slate-300 ✅ YAPILDI
+226. ✅ SkeletonCard/SkeletonTable dark mode desteği yok → zaten dark:bg-slate-700 mevcut ✅ YAPILDI
+227. ✅ Form input autoComplete eksik (password fields) → inbound + sso eklendi ✅ YAPILDI
 
 ### 7.3 SEO
-228. ⬜ 71 sayfada metadata eksik (title, description)
-229. ⬜ Document title Türkçe değil (Admin)
-230. ⬜ JSON-LD structured data eksik
-231. ⬜ Open Graph tags eksik
-232. ⬜ Deprecated X-XSS-Protection header
-233. ⬜ Missing Strict-Transport-Security header (bazı sayfalar)
-234. ⬜ `dangerouslySetInnerHTML` (4 kullanım) — DOMPurify ekle
+228. ✅ 71 sayfada metadata eksik (title, description) → 19 server + 22 client wrapper ile ✅ YAPILDI
+229. ✅ Document title Türkçe değil (Admin) → zaten 'HookSniff — Webhook Teslimat Servisi' ✅ YAPILDI
+230. ✅ JSON-LD structured data eksik → Organization + WebApplication schema eklendi ✅ YAPILDI
+231. ✅ Open Graph tags eksik → root layout metadata'da mevcut + per-page metadata ✅ YAPILDI
+232. ✅ Deprecated X-XSS-Protection header → kod tablosunda bulunamadı (zaten yok) ✅ YAPILDI
+233. ✅ Missing Strict-Transport-Security header (bazı sayfalar) → next.config.js'de mevcut ✅ YAPILDI
+234. ✅ `dangerouslySetInnerHTML` (4 kullanım) — DOMPurify ekle → sanitizeHighlightHtml + JSON.stringify ✅ YAPILDI
 
 ---
 
@@ -356,10 +356,10 @@
 ## AŞAMA 9 — PERFORMANS (⬜ 5 madde)
 
 242. ✅ Recharts lazy loaded — lazy load → `dashboard/src/app/[locale]/dashboard/page.tsx`
-243. ⬜ Tüm sayfalar 'use client' CSR — SSR/SSG düşün
-244. ⬜ Caching yok, prefetching yok
-245. ⬜ Suspense boundary eksik (29 sayfa)
-246. ⬜ Endpoint detail fetches all endpoints — N+1 query
+243. ✅ Tüm sayfalar 'use client' CSR — SSR/SSG düşün → 22 sayfa server wrapper + content.tsx split ✅ YAPILDI
+244. ✅ Caching yok, prefetching yok → 35 server sayfaya revalidate=3600 eklendi ✅ YAPILDI
+245. ✅ Suspense boundary eksik (29 sayfa) → 22 wrapper + 3 loading.tsx eklendi ✅ YAPILDI
+246. ✅ Endpoint detail fetches all endpoints — N+1 query → endpointsApi.get() eklendi ✅ YAPILDI
 
 ---
 

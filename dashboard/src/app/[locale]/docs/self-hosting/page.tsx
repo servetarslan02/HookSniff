@@ -1,5 +1,16 @@
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'Self-Hosting Guide',
+  description: 'Deploy and manage HookSniff on your own infrastructure',
+};
+
 
 export default function SelfHostingPage() {
   const t = useTranslations('docs');

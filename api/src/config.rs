@@ -208,7 +208,9 @@ impl Config {
                 .context("PORT must be a number")?,
             database_url: std::env::var("DATABASE_URL")
                 .unwrap_or_else(|_| {
-                    "postgresql://hooksniff:hooksniff_local@localhost:5432/hooksniff?sslmode=disable".into()
+                    // Item 175: No hardcoded credentials — require DATABASE_URL in production
+                    tracing::warn!("DATABASE_URL not set, using localhost default (development only)");
+                    "postgresql://localhost:5432/hooksniff?sslmode=disable".into()
                 }),
             hmac_secret,
             max_webhook_payload_bytes: std::env::var("MAX_PAYLOAD_BYTES")

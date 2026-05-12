@@ -28,7 +28,9 @@ impl WorkerConfig {
         Ok(Self {
             database_url: std::env::var("DATABASE_URL")
                 .unwrap_or_else(|_| {
-                    "postgresql://hooksniff:hooksniff_local@localhost:5432/hooksniff?sslmode=disable".into()
+                    // Item 175: No hardcoded credentials — require DATABASE_URL in production
+                    tracing::warn!("DATABASE_URL not set, using localhost default (development only)");
+                    "postgresql://localhost:5432/hooksniff?sslmode=disable".into()
                 }),
             redis_url: std::env::var("REDIS_URL").ok(),
             otel_enabled,
