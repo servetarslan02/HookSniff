@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse, type FeatureFlag, type DeployInfo } from '@/lib/api';
@@ -41,18 +41,17 @@ export default function AdminOverviewPage() {
     setLoading(true);
     setError(null);
     try {
-      const [statsData, auditData, revenueData, securityData] = await Promise.all([
+      const [statsData, allLogs, revenueData] = await Promise.all([
         adminApi.getStats(token),
-        adminApi.getAuditLogs(token, { limit: 5 }).catch(() => ({ entries: [], total: 0, limit: 5, offset: 0 })),
-        adminApi.getRevenue(token).catch(() => null),
         adminApi.getAuditLogs(token, { limit: 50 }).catch(() => ({ entries: [], total: 0, limit: 50, offset: 0 })),
+        adminApi.getRevenue(token).catch(() => null),
       ]);
       setStats(statsData);
-      setAuditLogs(auditData.entries || []);
+      const entries = allLogs.entries || [];
+      setAuditLogs(entries.slice(0, 5));
       setRevenue(revenueData);
       // Filter security-related logs
-      const allLogs = securityData.entries || [];
-      setSecurityLogs(allLogs.filter((log: AuditLogEntry) =>
+      setSecurityLogs(entries.filter((log: AuditLogEntry) =>
         SECURITY_ACTIONS.some(sa => log.action.toUpperCase().includes(sa))
       ));
 
@@ -164,6 +163,29 @@ export default function AdminOverviewPage() {
     }
   }, [stats, mrr, arr, uptime24h]);
 
+  // Memoized computations — her render'da yeniden hesaplama
+  const pieData = useMemo(() =>
+    stats?.users_by_plan?.map((item) => ({
+      name: item.plan.charAt(0).toUpperCase() + item.plan.slice(1),
+      value: item.count,
+    })) || [],
+    [stats?.users_by_plan]
+  );
+
+  const totalEndpoints = stats?.total_endpoints;
+  const activeEndpoints = stats?.active_endpoints;
+  const disabledEndpoints = useMemo(() =>
+    totalEndpoints != null && activeEndpoints != null ? totalEndpoints - activeEndpoints : undefined,
+    [totalEndpoints, activeEndpoints]
+  );
+
+  const { ssrfCount, spoofingCount, replayCount, totalSecurityWarnings } = useMemo(() => {
+    const ssrf = securityLogs.filter(l => l.action.toUpperCase().includes('SSRF')).length;
+    const spoof = securityLogs.filter(l => l.action.toUpperCase().includes('SPOOF')).length;
+    const replay = securityLogs.filter(l => l.action.toUpperCase().includes('REPLAY')).length;
+    return { ssrfCount: ssrf, spoofingCount: spoof, replayCount: replay, totalSecurityWarnings: ssrf + spoof + replay };
+  }, [securityLogs]);
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -201,22 +223,6 @@ export default function AdminOverviewPage() {
       </div>
     );
   }
-
-  const pieData = stats?.users_by_plan?.map((item) => ({
-    name: item.plan.charAt(0).toUpperCase() + item.plan.slice(1),
-    value: item.count,
-  })) || [];
-
-  // Endpoint stats (from admin stats — properly typed)
-  const totalEndpoints = stats?.total_endpoints;
-  const activeEndpoints = stats?.active_endpoints;
-  const disabledEndpoints = totalEndpoints != null && activeEndpoints != null ? totalEndpoints - activeEndpoints : undefined;
-
-  // Security warnings count
-  const ssrfCount = securityLogs.filter(l => l.action.toUpperCase().includes('SSRF')).length;
-  const spoofingCount = securityLogs.filter(l => l.action.toUpperCase().includes('SPOOF')).length;
-  const replayCount = securityLogs.filter(l => l.action.toUpperCase().includes('REPLAY')).length;
-  const totalSecurityWarnings = ssrfCount + spoofingCount + replayCount;
 
   return (
     <div className="space-y-8">
@@ -642,8 +648,8 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* ── Uptime + Feature Flags + Last Deploy + Active Sessions ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ── Uptime + Feature Flags ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Uptime */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-2">
@@ -709,17 +715,6 @@ export default function AdminOverviewPage() {
           )}
         </div>
 
-        {/* Active Sessions */}
-        <div className="glass-card p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl" aria-hidden="true">👤</span>
-            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('activeSessionsNow')}</h2>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">
-            {stats?.active_users_today?.toLocaleString() || '0'}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('activeUsersToday')}</p>
-        </div>
       </div>
 
       {/* ── Weekly Comparison ── */}
