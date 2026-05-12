@@ -9,8 +9,8 @@
     "close": "Close",
     "confirm": "Confirm",
     "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
+    "next": "Next →",
+    "previous": "← Previous",
     "pageOf": "Page {page} of {totalPages}",
     "loading": "Loading...",
     "search": "Search",
@@ -2711,7 +2711,9 @@
     "commonEvents": "Common events",
     "codeExample": "Code example",
     "keyMetrics": "Key metrics",
-    "allIndustries": "All industries"
+    "allIndustries": "All industries",
+    "startForFree": "Start for free →",
+    "talkToUs": "Talk to us →"
   },
   "whatIsWebhook": {
     "simpleExplanation": "The Simple Explanation",

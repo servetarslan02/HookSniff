@@ -293,7 +293,7 @@ export default function LogsPage() {
             {total > perPage && (
               <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-slate-400">
-                  Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
+                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <nav aria-label={tc('pagination')} className="flex items-center gap-2">
                   <button type="button"
@@ -302,10 +302,10 @@ export default function LogsPage() {
                     aria-label={tc('previous')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
                   >
-                    ← Previous
+                    {tc('previous')}
                   </button>
                   <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">
-                    Page {page} of {totalPages}
+                    {tc('pageOf', { page, totalPages })}
                   </span>
                   <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
@@ -313,7 +313,7 @@ export default function LogsPage() {
                     aria-label={tc('next')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
                   >
-                    Next →
+                    {tc('next')}
                   </button>
                 </nav>
               </div>
