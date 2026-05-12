@@ -49,7 +49,7 @@ const mockEndpoints = [
   { id: 'ep-3', url: 'https://dev.example.com/hook', description: '', is_active: true, created_at: '2024-03-01' },
 ];
 
-const { default: EndpointsPage } = await import('@/app/[locale]/dashboard/endpoints/page');
+const { default: EndpointsPage } = await import('@/app/[locale]/[username]/endpoints/page');
 
 describe('EndpointsPage — Extended', () => {
   beforeEach(() => {

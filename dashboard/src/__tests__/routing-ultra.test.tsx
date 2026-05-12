@@ -20,7 +20,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: RoutingPage } = await import('@/app/[locale]/dashboard/routing/page');
+const { default: RoutingPage } = await import('@/app/[locale]/[username]/routing/page');
 
 const MOCK_ENDPOINTS = [
   { id: 'ep1', url: 'https://api.example.com/webhook', endpoint_id: 'ep1', routing_strategy: 'round-robin', fallback_url: null, avg_response_ms: 120, failure_streak: 0, is_healthy: true, resolved_url: 'https://api.example.com/webhook', using_fallback: false },
@@ -151,7 +151,7 @@ describe('RoutingPage - Ultra Coverage', () => {
     vi.doMock('next-intl', () => ({ useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key }));
     vi.doMock('@/i18n/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/routing/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/routing/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

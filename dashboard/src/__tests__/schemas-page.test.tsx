@@ -22,7 +22,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn().mockResolvedValue({ schemas: [] }),
 }));
 
-const { default: SchemasPage } = await import('@/app/[locale]/dashboard/schemas/page');
+const { default: SchemasPage } = await import('@/app/[locale]/[username]/schemas/page');
 
 describe('SchemasPage', () => {
   beforeEach(() => {

@@ -90,7 +90,7 @@ const mockInvoices = [
 
 async function renderPage() {
   // Dynamic import so each test gets a fresh component instance
-  const { default: BillingPage } = await import('@/app/[locale]/dashboard/billing/page');
+  const { default: BillingPage } = await import('@/app/[locale]/[username]/billing/page');
   let result: ReturnType<typeof render>;
   await act(async () => {
     result = render(React.createElement(BillingPage));

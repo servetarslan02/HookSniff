@@ -60,7 +60,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-const { default: PlaygroundPage } = await import('@/app/[locale]/dashboard/playground/page');
+const { default: PlaygroundPage } = await import('@/app/[locale]/[username]/playground/page');
 
 describe('PlaygroundPage', () => {
   beforeEach(() => {

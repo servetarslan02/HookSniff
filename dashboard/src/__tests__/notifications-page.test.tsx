@@ -45,7 +45,7 @@ const mockNotifs = [
   { id: 'n4', type: 'billing', title: 'Invoice ready', message: 'Your invoice is ready', read: true, created_at: '2024-01-04T10:00:00Z' },
 ];
 
-const { default: NotificationsPage } = await import('@/app/[locale]/dashboard/notifications/page');
+const { default: NotificationsPage } = await import('@/app/[locale]/[username]/notifications/page');
 
 describe('NotificationsPage', () => {
   beforeEach(() => {

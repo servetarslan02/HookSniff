@@ -50,7 +50,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-import SsoSettingsPage from '@/app/[locale]/dashboard/sso/page';
+import SsoSettingsPage from '@/app/[locale]/[username]/sso/page';
 
 describe('SsoSettingsPage', () => {
   beforeEach(() => {

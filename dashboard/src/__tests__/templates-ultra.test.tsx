@@ -20,7 +20,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: TemplatesPage } = await import('@/app/[locale]/dashboard/templates/page');
+const { default: TemplatesPage } = await import('@/app/[locale]/[username]/templates/page');
 
 const MOCK_TEMPLATES = [
   { id: 't1', name: 'E-commerce Order', description: 'Order created webhook template', tags: ['ecommerce', 'orders'] },
@@ -111,7 +111,7 @@ describe('TemplatesPage - Ultra Coverage', () => {
     vi.doMock('next-intl', () => ({ useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key }));
     vi.doMock('@/i18n/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/templates/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/templates/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

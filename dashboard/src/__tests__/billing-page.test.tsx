@@ -68,7 +68,7 @@ const mockInvoices = [
   { id: 'inv-9012-3456', date: '2024-02-01', plan: 'Pro', amount: 29.00, status: 'pending' },
 ];
 
-const { default: BillingPage } = await import('@/app/[locale]/dashboard/billing/page');
+const { default: BillingPage } = await import('@/app/[locale]/[username]/billing/page');
 
 describe('BillingPage', () => {
   beforeEach(() => {
