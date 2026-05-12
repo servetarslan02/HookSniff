@@ -69,10 +69,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Not authenticated');
       })
       .then((data) => {
+        const username = toSlug(data.email.split('@')[0]);
         const u: User = {
           id: data.id,
           email: data.email,
           name: data.name,
+          username,
           plan: data.plan,
           is_admin: data.is_admin ?? false,
         };
@@ -80,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setApiKeyState(null); // Don't persist API key in localStorage
         setToken('cookie'); // Indicates session is active via cookie
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
+        setUsernameCookie(username);
       })
       .catch(() => {
         // Not authenticated — clear stale data
@@ -92,8 +95,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const persistAuth = useCallback((u: User, k?: string) => {
-    // Generate username slug from name or email
-    const slug = toSlug(u.name || u.email.split('@')[0]);
+    // Generate username slug from email prefix (unique per user)
+    const slug = toSlug(u.email.split('@')[0]);
     const userWithUsername = { ...u, username: slug };
     setUser(userWithUsername);
     setApiKeyState(k || null); // Keep in memory only for one-time display
