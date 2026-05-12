@@ -22,7 +22,7 @@ function RoiCalculator() {
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 md:p-8">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg p-6 md:p-8">
       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">💰 {t('roiTitle')}</h3>
       <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">{t('roiDesc')}</p>
 
@@ -189,14 +189,14 @@ export default function PricingPage() {
         </div>
 
         {/* Plan Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
           {planData.map((plan) => (
             <div
               key={plan.key}
-              className={`relative bg-white dark:bg-slate-900 rounded-xl border p-6 transition-all hover:shadow-lg ${
+              className={`relative rounded-xl p-6 transition-all duration-300 hover:shadow-lg ${
                 plan.popular
-                  ? 'border-brand-400 dark:border-brand-500 shadow-brand-100 dark:shadow-brand-500/10 ring-1 ring-brand-400 dark:ring-brand-500'
-                  : 'border-gray-200 dark:border-slate-800'
+                  ? 'bg-white dark:bg-slate-800 border-2 border-brand-400 dark:border-brand-500 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
+                  : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
               }`}
             >
               {plan.popular && (
@@ -232,8 +232,8 @@ export default function PricingPage() {
                 }}
                 className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                   plan.ctaStyle === 'filled'
-                    ? 'bg-brand-600 hover:bg-brand-700 text-white'
-                    : 'border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:border-brand-400 dark:hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400'
+                    ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-md'
+                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm'
                 }`}
               >
                 {plan.key === 'business' ? t('contactSales') : plan.key === 'pro' ? t('startTrial') : t('getStarted')}
@@ -258,16 +258,16 @@ export default function PricingPage() {
         </div>
 
         {/* Comparison Table */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('compareTitle')}</h2>
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">{t('compareTitle')}</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden shadow-sm dark:shadow-lg">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-slate-800">
+                  <tr className="border-b border-gray-200 dark:border-slate-700">
                     <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white w-2/5">{t('feature')}</th>
                     <th className="text-center py-4 px-4 font-semibold text-gray-900 dark:text-white">{t('free')}</th>
-                    <th className="text-center py-4 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/50 dark:bg-brand-500/5">{t('pro')}</th>
+                    <th className="text-center py-4 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/50 dark:bg-brand-500/10">{t('pro')}</th>
                     <th className="text-center py-4 px-4 font-semibold text-gray-900 dark:text-white">{t('business')}</th>
                   </tr>
                 </thead>
@@ -356,7 +356,7 @@ export default function PricingPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('testimonialsTitle')}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((t_item, i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+              <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg p-6">
                 <svg className="w-8 h-8 text-brand-200 dark:text-brand-800 mb-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
                 </svg>
@@ -376,7 +376,7 @@ export default function PricingPage() {
         </div>
 
         {/* Build vs Buy */}
-        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">{t('buildVsBuy')}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
