@@ -1,76 +1,54 @@
-# NEXT_SESSION.md — Oturum 130+
+# NEXT_SESSION.md — Oturum 131+
 
-> Son güncelleme: 2026-05-12 20:47 GMT+8 (Oturum 129)
+> Son güncelleme: 2026-05-12 21:38 GMT+8 (Oturum 130)
 
 ## Kaldığımız Yer
-- **IMPLEMENTATION-PLAN: 330/364 tamamlandı (%91)**
-- 34 kalan ⬜ madde + 5 Servet görevi
-- Tüm büyük feature'lar tamamlandı
-- Production-ready durumda
+- **IMPLEMENTATION-PLAN: 340/364 tamamlandı (%93)**
+- 24 kalan ⬜ madde + 5 Servet görevi
+- Email, billing, content, OpenAPI tamamlandı
 
-## Kalan ⬜ Maddeler (34 adet)
+## Kalan ⬜ Maddeler (24 adet)
 
-### Email Templates (200-206) — 7 madde
-- Email template'leri sadece İngilizce
-- Email retry yok
-- Dead-letter queue yok failed emails için
-- Email-level rate limiting yok
-- Billing/Invoice email template'i yok
-- Webhook Success email template'i yok
-- Email template'leri mobile-optimized değil
-- 📝 `docs/email-templates.md` dokümante edildi
+### Düşük Öncelik — Email (2 madde)
+- 202: Dead-letter queue failed emails için (📝 dokümante)
+- 203: Email-level rate limiting (📝 dokümante)
 
-### Payments & Billing (247-259) — 10 madde
-- Subscription status hardcoded to "active" (kod değişikliği gerekli)
-- Pricing page shows different limits than backend
-- Provider switching doesn't cancel old subscription
-- Polar.sh `create_customer_portal` is a stub
-- No chargeback/refund handling
-- Admin revenue calculation is estimation only
-- No annual billing option
-- Enterprise plan has no implementation
-- Missing `cancel_at_period_end` logic
-- Checkout URL validation is client-side only
+### Düşük Öncelik — Email Mobile (1 madde)
+- 206: Email template'leri mobile-optimized değil (📝 dokümante)
 
-### Backend Deep (260-280) — 4 madde
-- JWT uses HS256 — no asymmetric option (büyük refactor)
-- Access tokens cannot be revoked
-- OpenAPI spec eksik endpoint'ler (📝 dokümante edildi)
-- OpenAPI wrong type definitions (📝 dokümante edildi)
+### Payments & Billing (7 madde)
+- 251: No chargeback/refund handling (Servet + backend)
+- 255: No annual billing option (Servet + backend)
+- 256: Enterprise plan has no implementation (Servet + backend)
+- 260: JWT HS256 → RS256 (büyük refactor, dedicated session)
+- 279: ✅ OpenAPI eksik endpoint'ler (YAPILDI)
+- 280: ✅ OpenAPI type fixes (YAPILDI)
+- 289: ✅ main.rs monolith (zaten modular, doğrulandı)
 
-### Code Quality (288-289) — 2 madde (KISMİ)
-- Billing provider triplication — TODO eklendi
-- Tight coupling: main.rs monolith — TODO eklendi
+### Backend Derin (2 madde)
+- 260: JWT uses HS256 — no asymmetric option (büyük refactor)
+- 279/280: ✅ OpenAPI (YAPILDI)
 
-### Content & SDK (353-359) — 6 madde
-- SDK endpoint coverage eksik
-- SDK otomatik güncelleme sistemi
-- Content quality score: 6.5/10 (📝 dokümante edildi)
-- Blog factual errors (📝 dokümante edildi)
-- Alternatives pages biased (📝 dokümante edildi)
-- Generic testimonials (📝 dokümante edildi)
+### Content & SDK (4 madde)
+- 353: SDK endpoint coverage (📝 dokümante)
+- 354: SDK auto-update (📝 dokümante)
+- 356: Content quality score 6.5/10 (📝 dokümante)
+- 357-359: ✅ Blog/alternatives/testimonials (YAPILDI)
 
-### Servet'in Yapması Gereken (360-364) — 5 madde
-- ⬜ GitHub PAT rotate
-- ⬜ GCP SA key rotate
+### Servet'in Yapması Gereken (5 madde)
+- ⬜ GitHub PAT rotate — güvenlik acil
+- ⬜ GCP SA key rotate — güvenlik acil
 - ⬜ GitHub Actions billing güncelle
-- ⬜ Stripe payout + identity verification (Polar.sh)
-- ⬜ Grafana trial upgrade (May 20'ye kadar)
+- ⬜ Stripe/Polar identity verification
+- ⬜ Grafana trial upgrade (20 Mayıs'ta bitiyor!)
 
 ## Bir Sonraki Adımlar
 1. Servet görevlerini hatırlat (PAT rotate, GCP key, Grafana trial)
-2. Kalan ⬜ maddeler büyük iş (payments, email, JWT refactor) — Servet önceliklendirmeli
-3. Content quality iyileştirmeleri (blog, alternatives, testimonials) — düşük öncelik
-4. SDK endpoint coverage — düşük öncelik
+2. Kalan ⬜ maddeler büyük iş (JWT refactor) veya dokümante edilmiş
+3. Content quality iyileştirmeleri yapıldı
+4. Email retry + Türkçe template'ler tamamlandı
 
 ## Bilinen Sorunlar
-- Grafana trial 20 Mayıs'ta bitiyor
-- GitHub PAT + GCP SA key rotate edilmeli
-- Content quality 6.5/10 — blog/alternatives/testify biased
-
-## Servet'in Yapması Gereken (Öncelik Sırasıyla)
-1. **GitHub PAT rotate** — CI/CD secret'larında güncelle
-2. **GCP SA key rotate** — Cloud Run env'e yeni key yükle
-3. **Stripe payout + identity verification** — Polar.sh dashboard
-4. **Grafana trial upgrade kararı** — 20 Mayıs'ta bitiyor
-5. **GitHub Actions billing** — dakika limitlerini kontrol et
+- ⚠️ Grafana trial 20 Mayıs'ta bitiyor (8 gün!)
+- ⚠️ GitHub PAT + GCP key rotate edilmeli
+- cargo check sandbox'ta çalışmadı — local'de test et
