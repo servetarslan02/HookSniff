@@ -556,19 +556,19 @@ export const adminApi = {
 
 export interface PlatformSettings {
   default_plan: string;
-  max_endpoints_free: number;
+  max_endpoints_developer: number;
   max_endpoints_pro: number;
-  max_webhooks_free: number;
+  max_webhooks_developer: number;
   max_webhooks_pro: number;
-  rate_limit_free: number;
+  rate_limit_developer: number;
   rate_limit_pro: number;
   retry_max_attempts: number;
-  retention_days_free: number;
+  retention_days_developer: number;
   retention_days_pro: number;
   maintenance_mode: boolean;
   signup_enabled: boolean;
   plan_price_pro: number;
-  plan_price_business: number;
+  plan_price_enterprise: number;
   resend_api_key: string | null;
   email_sender: string | null;
   webhook_secret: string | null;
