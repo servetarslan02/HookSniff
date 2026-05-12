@@ -465,15 +465,17 @@ async fn change_plan(
     // Log plan change to audit
     let _ = crate::audit::log_action(
         &pool,
-        Some(customer.id),
+        customer.id,
         "plan.changed",
         "customer",
-        Some(id),
+        Some(&id.to_string()),
         Some(serde_json::json!({
             "new_plan": req.plan,
             "webhook_limit": limit,
             "admin_email": customer.email,
         })),
+        None,
+        None,
     )
     .await;
 
@@ -563,11 +565,13 @@ async fn send_user_email(
     // Log to audit
     let _ = crate::audit::log_action(
         &pool,
-        Some(customer.id),
+        customer.id,
         "email.sent",
         "customer",
-        Some(id),
+        Some(&id.to_string()),
         Some(serde_json::json!({ "subject": req.subject, "admin_email": customer.email })),
+        None,
+        None,
     )
     .await;
 
