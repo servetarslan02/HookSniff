@@ -100,7 +100,7 @@ export default function AlertsPage() {
             {t('subtitle')}
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => setShowCreate(!showCreate)}
           className="px-4 py-2 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition"
         >
@@ -171,7 +171,7 @@ export default function AlertsPage() {
             </div>
           </div>
           <div className="mt-4 flex justify-end">
-            <button
+            <button type="button"
               onClick={createAlert}
               disabled={creating || !form.name}
               className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
@@ -214,13 +214,13 @@ export default function AlertsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => testAlert(alert.id)}
                     className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition"
                   >
                     {t('test')}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => deleteAlert(alert.id)}
                     className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/30 rounded-lg transition"
                   >

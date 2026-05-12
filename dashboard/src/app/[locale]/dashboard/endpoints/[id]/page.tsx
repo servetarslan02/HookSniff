@@ -179,7 +179,7 @@ export default function EndpointSettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button
+        <button type="button"
           onClick={() => router.push(`/${locale}/dashboard/endpoints`)}
           className="p-2 -ml-2 text-gray-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
         >
@@ -299,7 +299,7 @@ export default function EndpointSettingsPage() {
         </div>
 
         <div className="mt-6">
-          <button
+          <button type="button"
             onClick={handleSaveRetryPolicy}
             disabled={saving}
             className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-60"
@@ -336,7 +336,7 @@ export default function EndpointSettingsPage() {
           </div>
         )}
 
-        <button
+        <button type="button"
           onClick={() => setShowRotateConfirm(true)}
           className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-amber-700 transition"
         >
@@ -382,7 +382,7 @@ export default function EndpointSettingsPage() {
           {t('testWebhookDesc')}
         </p>
         <div className="flex items-center gap-4">
-          <button
+          <button type="button"
             onClick={handleSendTestWebhook}
             disabled={testSending}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50 flex items-center gap-2"
@@ -424,13 +424,13 @@ export default function EndpointSettingsPage() {
               {t('rotateConfirmDesc')}
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <button type="button"
                 onClick={() => setShowRotateConfirm(false)}
                 className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tCommon('cancel')}
               </button>
-              <button
+              <button type="button"
                 onClick={handleRotateSecret}
                 disabled={rotating}
                 className="px-4 py-2.5 rounded-xl text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition disabled:opacity-60"

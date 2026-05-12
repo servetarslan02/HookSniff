@@ -156,7 +156,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="text-sm text-gray-500 dark:text-slate-400 hidden sm:block">
               {user?.email || tc('user')}
             </div>
-            <button
+            <button type="button"
               onClick={() => { logout(); router.push(`/${locale}/login`); }}
               className="text-sm text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition"
             >
