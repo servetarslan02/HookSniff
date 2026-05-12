@@ -1,21 +1,34 @@
 use axum::extract::{Extension, Path, Query};
+use axum::http::{HeaderMap, HeaderValue};
+use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::auth::jwt;
+use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
 pub fn router() -> Router {
     Router::new()
         .route("/users", get(list_users))
+        .route("/users/export", get(export_users_csv))
         .route("/users/{id}", get(get_user_detail))
         .route("/users/{id}/plan", put(change_plan))
         .route("/users/{id}/status", put(change_status))
+        .route("/users/{id}/impersonate", post(impersonate_user))
+        .route("/users/{id}/analytics", get(user_analytics))
         .route("/stats", get(system_stats))
         .route("/revenue", get(revenue_by_month))
+        .route("/revenue/export", get(export_revenue_csv))
+        .route("/churn", get(churn_report))
+        .route("/audit-logs", get(admin_audit_logs))
+        .route("/deliveries/{id}/replay", post(replay_delivery))
+        .route("/test-webhook", post(test_webhook))
         .route("/sdk-update", post(notify_sdk_update))
         .route("/settings", get(get_settings).put(update_settings))
 }
@@ -90,6 +103,7 @@ pub struct EndpointSummary {
     pub url: String,
     pub description: Option<String>,
     pub is_active: bool,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -97,8 +111,10 @@ pub struct DeliverySummary {
     pub id: Uuid,
     pub endpoint_id: Uuid,
     pub status: String,
+    #[serde(alias = "event")]
     pub event_type: Option<String>,
     pub created_at: chrono::DateTime<chrono::Utc>,
+    pub attempt_count: i32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -142,6 +158,21 @@ pub struct RecentSignup {
 pub struct RevenueRow {
     pub month: String,
     pub revenue: f64,
+}
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct RevenueByPlan {
+    pub plan: String,
+    pub revenue: f64,
+    pub count: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RevenueResponse {
+    pub monthly_revenue: Vec<RevenueRow>,
+    pub revenue_by_plan: Vec<RevenueByPlan>,
+    pub mrr: f64,
+    pub churn_rate: f64,
 }
 
 /// Admin middleware — call this as a layer on admin routes, or check inline.
@@ -253,14 +284,14 @@ async fn get_user_detail(
     .ok_or(AppError::NotFound)?;
 
     let endpoints = sqlx::query_as::<_, EndpointSummary>(
-        "SELECT id, url, description, is_active FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
+        "SELECT id, url, description, is_active, created_at FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
     .bind(id)
     .fetch_all(&pool)
     .await?;
 
     let recent_deliveries = sqlx::query_as::<_, DeliverySummary>(
-        "SELECT id, endpoint_id, status, event_type, created_at \
+        "SELECT id, endpoint_id, status, event_type, created_at, attempt_count \
          FROM deliveries WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 50",
     )
     .bind(id)
@@ -476,14 +507,15 @@ async fn system_stats(
     }))
 }
 
-/// GET /v1/admin/revenue — Revenue by month (last 12 months)
+/// GET /v1/admin/revenue — Full revenue response with monthly, by-plan, MRR, and churn
 async fn revenue_by_month(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-) -> Result<Json<Vec<RevenueRow>>, AppError> {
+) -> Result<Json<RevenueResponse>, AppError> {
     require_admin(&customer)?;
 
-    let rows = sqlx::query_as::<_, RevenueRow>(
+    // 1. Monthly revenue (last 12 months) — simplified, Neon-compatible
+    let monthly_revenue = sqlx::query_as::<_, RevenueRow>(
         r#"SELECT
             TO_CHAR(month_series, 'YYYY-MM') as month,
             COALESCE(
@@ -496,7 +528,7 @@ async fn revenue_by_month(
                 )
                 FROM customers
                 WHERE is_active = TRUE
-                  AND created_at <= month_series + INTERVAL '1 month'),
+                  AND created_at < month_series + INTERVAL '1 month'),
                 0.0
             ) as revenue
         FROM generate_series(
@@ -509,7 +541,718 @@ async fn revenue_by_month(
     .fetch_all(&pool)
     .await?;
 
-    Ok(Json(rows))
+    // 2. Revenue by plan (active customers only)
+    let revenue_by_plan = sqlx::query_as::<_, RevenueByPlan>(
+        r#"SELECT
+            plan,
+            COALESCE(SUM(
+                CASE plan
+                    WHEN 'pro' THEN 29.0
+                    WHEN 'business' THEN 99.0
+                    ELSE 0.0
+                END
+            ), 0.0) as revenue,
+            COUNT(*) as count
+        FROM customers
+        WHERE is_active = TRUE
+        GROUP BY plan
+        ORDER BY revenue DESC"#,
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    // 3. MRR = sum of all active customer monthly revenue
+    let mrr: (Option<f64>,) = sqlx::query_as(
+        r#"SELECT COALESCE(SUM(
+            CASE plan
+                WHEN 'pro' THEN 29.0
+                WHEN 'business' THEN 99.0
+                ELSE 0.0
+            END
+        ), 0.0) as mrr FROM customers WHERE is_active = TRUE"#,
+    )
+    .fetch_one(&pool)
+    .await?;
+
+    // 4. Churn rate: % of customers who became inactive in last 30 days
+    let total_customers: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM customers")
+        .fetch_one(&pool)
+        .await?;
+
+    let churned: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM customers WHERE is_active = FALSE AND updated_at >= NOW() - INTERVAL '30 days'",
+    )
+    .fetch_one(&pool)
+    .await?;
+
+    let churn_rate = if total_customers.0 > 0 {
+        (churned.0 as f64 / total_customers.0 as f64) * 100.0
+    } else {
+        0.0
+    };
+
+    Ok(Json(RevenueResponse {
+        monthly_revenue,
+        revenue_by_plan,
+        mrr: mrr.0.unwrap_or(0.0),
+        churn_rate,
+    }))
+}
+
+// ─────────────────────────────────────────────────────────
+// Delivery Replay
+// ─────────────────────────────────────────────────────────
+
+/// POST /v1/admin/deliveries/:id/replay — Replay a delivery
+async fn replay_delivery(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    // Find the original delivery
+    let original = sqlx::query_as::<_, (Uuid, Uuid, serde_json::Value, Option<String>, i32)>(
+        "SELECT id, endpoint_id, payload, event_type, replay_count FROM deliveries WHERE id = $1",
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    let (orig_id, endpoint_id, payload, event_type, replay_count) = original;
+
+    // Create a new delivery with the same payload, reset status
+    let new_delivery = sqlx::query_as::<_, (Uuid,)>(
+        r#"INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, replay_count, is_test)
+           VALUES ($1, $2, $3, $4, 'pending', 3, $5, FALSE)
+           RETURNING id"#,
+    )
+    .bind(endpoint_id)
+    .bind(customer.id)
+    .bind(&payload)
+    .bind(&event_type)
+    .bind(replay_count + 1)
+    .fetch_one(&pool)
+    .await?;
+
+    tracing::info!(
+        "🔁 Admin replayed delivery {} → new delivery {}",
+        orig_id,
+        new_delivery.0
+    );
+
+    Ok(Json(serde_json::json!({
+        "message": "Delivery replayed successfully",
+        "original_id": orig_id,
+        "new_delivery_id": new_delivery.0,
+    })))
+}
+
+// ─────────────────────────────────────────────────────────
+// CSV Export: Users
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct ExportUsersParams {
+    pub format: Option<String>,
+    pub plan: Option<String>,
+    pub status: Option<String>,
+}
+
+/// GET /v1/admin/users/export — Export users as CSV
+async fn export_users_csv(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Query(params): Query<ExportUsersParams>,
+) -> Result<impl IntoResponse, AppError> {
+    require_admin(&customer)?;
+
+    let format = params.format.unwrap_or_else(|| "csv".to_string());
+    if format != "csv" {
+        return Err(AppError::BadRequest("Only format=csv is supported".into()));
+    }
+
+    // Build query with optional filters
+    let mut conditions: Vec<String> = Vec::new();
+    let mut bind_idx = 1;
+
+    if params.plan.is_some() {
+        conditions.push(format!("plan = ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.status.is_some() {
+        conditions.push(format!("is_active = ${}", bind_idx));
+        let _ = bind_idx;
+    }
+
+    let where_clause = if conditions.is_empty() {
+        String::new()
+    } else {
+        format!("WHERE {}", conditions.join(" AND "))
+    };
+
+    let query_str = format!(
+        "SELECT id, email, name, plan, is_active, created_at FROM customers {} ORDER BY created_at DESC",
+        where_clause
+    );
+
+    let mut query = sqlx::query_as::<_, (Uuid, String, Option<String>, String, bool, DateTime<Utc>)>(
+        &query_str,
+    );
+
+    if let Some(ref plan) = params.plan {
+        query = query.bind(plan);
+    }
+    if let Some(ref status) = params.status {
+        let is_active = status == "active";
+        query = query.bind(is_active);
+    }
+
+    let rows = query.fetch_all(&pool).await?;
+
+    // Build CSV manually
+    let mut csv = String::from("id,email,name,plan,status,created_at\n");
+    for (id, email, name, plan, is_active, created_at) in &rows {
+        let status = if *is_active { "active" } else { "banned" };
+        let name_escaped = name.as_deref().unwrap_or("");
+        csv.push_str(&format!(
+            "{},{},{},{},{},{}\n",
+            id,
+            escape_csv(email),
+            escape_csv(name_escaped),
+            escape_csv(plan),
+            status,
+            created_at.to_rfc3339()
+        ));
+    }
+
+    let mut headers = HeaderMap::new();
+    headers.insert("Content-Type", HeaderValue::from_static("text/csv; charset=utf-8"));
+    headers.insert(
+        "Content-Disposition",
+        HeaderValue::from_static("attachment; filename=\"users_export.csv\""),
+    );
+
+    Ok((headers, csv))
+}
+
+// ─────────────────────────────────────────────────────────
+// CSV Export: Revenue
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct ExportRevenueParams {
+    pub format: Option<String>,
+    pub months: Option<i64>,
+}
+
+/// GET /v1/admin/revenue/export — Export revenue as CSV
+async fn export_revenue_csv(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Query(params): Query<ExportRevenueParams>,
+) -> Result<impl IntoResponse, AppError> {
+    require_admin(&customer)?;
+
+    let format = params.format.unwrap_or_else(|| "csv".to_string());
+    if format != "csv" {
+        return Err(AppError::BadRequest("Only format=csv is supported".into()));
+    }
+
+    let months = params.months.unwrap_or(12).clamp(1, 60);
+
+    let all_rows = sqlx::query_as::<_, RevenueRow>(
+        r#"SELECT
+            TO_CHAR(month_series, 'YYYY-MM') as month,
+            COALESCE(
+                (SELECT SUM(
+                    CASE plan
+                        WHEN 'pro' THEN 29.0
+                        WHEN 'business' THEN 99.0
+                        ELSE 0.0
+                    END
+                )
+                FROM customers
+                WHERE is_active = TRUE
+                  AND created_at < month_series + INTERVAL '1 month'),
+                0.0
+            ) as revenue
+        FROM generate_series(
+            DATE_TRUNC('month', NOW() - INTERVAL '11 months'),
+            DATE_TRUNC('month', NOW()),
+            INTERVAL '1 month'
+        ) as month_series
+        ORDER BY month_series"#,
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    // Trim to requested number of months
+    let skip = if all_rows.len() > months as usize {
+        all_rows.len() - months as usize
+    } else {
+        0
+    };
+    let rows: Vec<RevenueRow> = all_rows.into_iter().skip(skip).collect();
+
+    let mut csv = String::from("month,revenue\n");
+    for row in &rows {
+        csv.push_str(&format!("{},{:.2}\n", row.month, row.revenue));
+    }
+
+    let mut headers = HeaderMap::new();
+    headers.insert("Content-Type", HeaderValue::from_static("text/csv; charset=utf-8"));
+    headers.insert(
+        "Content-Disposition",
+        HeaderValue::from_static("attachment; filename=\"revenue_export.csv\""),
+    );
+
+    Ok((headers, csv))
+}
+
+// ─────────────────────────────────────────────────────────
+// Impersonate User
+// ─────────────────────────────────────────────────────────
+
+/// POST /v1/admin/users/:id/impersonate — Generate a short-lived JWT for the target user
+async fn impersonate_user(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Extension(config): Extension<Config>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    // Prevent self-impersonation
+    if id == customer.id {
+        return Err(AppError::BadRequest("Cannot impersonate yourself".into()));
+    }
+
+    // Look up the target user
+    let target = sqlx::query_as::<_, (Uuid, String, String, bool)>(
+        "SELECT id, email, plan, is_active FROM customers WHERE id = $1",
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    let (target_id, target_email, target_plan, is_active) = target;
+
+    if !is_active {
+        return Err(AppError::BadRequest("Cannot impersonate an inactive user".into()));
+    }
+
+    // Generate a short-lived JWT (15 min) for the target user
+    let token = jwt::generate_access_token(
+        target_id,
+        &target_email,
+        &target_plan,
+        &config.jwt_secret,
+        false, // not admin
+    )?;
+
+    // Log to audit_log
+    let _ = crate::audit::log_action(
+        &pool,
+        customer.id,
+        "IMPERSONATE",
+        "user",
+        Some(&id.to_string()),
+        Some(serde_json::json!({
+            "target_email": target_email,
+            "admin_id": customer.id,
+        })),
+        None,
+        None,
+    )
+    .await;
+
+    tracing::warn!(
+        "⚠️ Admin {} impersonating user {} ({})",
+        customer.email,
+        target_id,
+        target_email
+    );
+
+    Ok(Json(serde_json::json!({
+        "token": token,
+        "user_id": target_id,
+        "email": target_email,
+        "expires_in": 900,
+    })))
+}
+
+// ─────────────────────────────────────────────────────────
+// User Analytics
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct AnalyticsParams {
+    pub days: Option<i64>,
+}
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct DailyDeliveryCount {
+    pub date: String,
+    pub total: i64,
+    pub success: i64,
+    pub failed: i64,
+}
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct EventTypeCount {
+    pub event_type: Option<String>,
+    pub count: i64,
+}
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct EndpointHealth {
+    pub endpoint_id: Uuid,
+    pub url: String,
+    pub total: i64,
+    pub success: i64,
+    pub failed: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct UserAnalytics {
+    pub daily_deliveries: Vec<DailyDeliveryCount>,
+    pub top_event_types: Vec<EventTypeCount>,
+    pub endpoint_health: Vec<EndpointHealth>,
+}
+
+/// GET /v1/admin/users/:id/analytics — Get user analytics for last N days
+async fn user_analytics(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Query(params): Query<AnalyticsParams>,
+) -> Result<Json<UserAnalytics>, AppError> {
+    require_admin(&customer)?;
+
+    let days = params.days.unwrap_or(30).clamp(1, 365);
+
+    // Daily delivery counts
+    let daily_deliveries = sqlx::query_as::<_, DailyDeliveryCount>(
+        r#"SELECT
+            TO_CHAR(DATE(created_at), 'YYYY-MM-DD') as date,
+            COUNT(*) as total,
+            COUNT(*) FILTER (WHERE status = 'delivered') as success,
+            COUNT(*) FILTER (WHERE status = 'failed') as failed
+        FROM deliveries
+        WHERE customer_id = $1
+          AND created_at >= NOW() - INTERVAL '1 day' * $2::int
+        GROUP BY DATE(created_at)
+        ORDER BY DATE(created_at)"#,
+    )
+    .bind(id)
+    .bind(days)
+    .fetch_all(&pool)
+    .await?;
+
+    // Top event types
+    let top_event_types = sqlx::query_as::<_, EventTypeCount>(
+        r#"SELECT
+            event_type,
+            COUNT(*) as count
+        FROM deliveries
+        WHERE customer_id = $1
+          AND created_at >= NOW() - INTERVAL '1 day' * $2::int
+        GROUP BY event_type
+        ORDER BY count DESC
+        LIMIT 10"#,
+    )
+    .bind(id)
+    .bind(days)
+    .fetch_all(&pool)
+    .await?;
+
+    // Endpoint health
+    let endpoint_health = sqlx::query_as::<_, EndpointHealth>(
+        r#"SELECT
+            e.id as endpoint_id,
+            e.url,
+            COUNT(d.id) as total,
+            COUNT(d.id) FILTER (WHERE d.status = 'delivered') as success,
+            COUNT(d.id) FILTER (WHERE d.status = 'failed') as failed
+        FROM endpoints e
+        LEFT JOIN deliveries d ON d.endpoint_id = e.id
+          AND d.created_at >= NOW() - INTERVAL '1 day' * $2::int
+        WHERE e.customer_id = $1
+        GROUP BY e.id, e.url
+        ORDER BY total DESC"#,
+    )
+    .bind(id)
+    .bind(days)
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(UserAnalytics {
+        daily_deliveries,
+        top_event_types,
+        endpoint_health,
+    }))
+}
+
+// ─────────────────────────────────────────────────────────
+// Test Webhook
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct TestWebhookRequest {
+    pub endpoint_url: String,
+    pub event_type: Option<String>,
+    pub payload: serde_json::Value,
+}
+
+#[derive(Debug, Serialize)]
+pub struct TestWebhookResponse {
+    pub status_code: u16,
+    pub response_body: String,
+    pub duration_ms: u64,
+}
+
+/// POST /v1/admin/test-webhook — Send a test HTTP POST to a URL
+async fn test_webhook(
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<TestWebhookRequest>,
+) -> Result<Json<TestWebhookResponse>, AppError> {
+    require_admin(&customer)?;
+
+    // Validate URL
+    if !req.endpoint_url.starts_with("http://") && !req.endpoint_url.starts_with("https://") {
+        return Err(AppError::BadRequest(
+            "URL must start with http:// or https://".into(),
+        ));
+    }
+
+    let client = reqwest::Client::new();
+    let start = std::time::Instant::now();
+
+    let mut request = client
+        .post(&req.endpoint_url)
+        .header("Content-Type", "application/json");
+
+    if let Some(ref event_type) = req.event_type {
+        request = request.header("X-HookSniff-Event", event_type.as_str());
+    }
+
+    let response = request
+        .json(&req.payload)
+        .send()
+        .await
+        .map_err(|e| AppError::BadRequest(format!("Request failed: {}", e)))?;
+
+    let duration_ms = start.elapsed().as_millis() as u64;
+    let status_code = response.status().as_u16();
+    let response_body = response
+        .text()
+        .await
+        .unwrap_or_else(|_| "<unreadable>".to_string());
+
+    // Truncate response body to 4KB
+    let response_body = if response_body.len() > 4096 {
+        format!("{}...[truncated]", &response_body[..4096])
+    } else {
+        response_body
+    };
+
+    Ok(Json(TestWebhookResponse {
+        status_code,
+        response_body,
+        duration_ms,
+    }))
+}
+
+// ─────────────────────────────────────────────────────────
+// Churn Report
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct ChurnedUser {
+    pub id: Uuid,
+    pub email: String,
+    pub plan: String,
+    pub amount: f64,
+    pub churn_date: DateTime<Utc>,
+}
+
+/// GET /v1/admin/churn — List users who became inactive in last 30 days
+async fn churn_report(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<Vec<ChurnedUser>>, AppError> {
+    require_admin(&customer)?;
+
+    let churned = sqlx::query_as::<_, ChurnedUser>(
+        r#"SELECT
+            id,
+            email,
+            plan,
+            CASE plan
+                WHEN 'pro' THEN 29.0
+                WHEN 'business' THEN 99.0
+                ELSE 0.0
+            END as amount,
+            updated_at as churn_date
+        FROM customers
+        WHERE is_active = FALSE
+          AND updated_at >= NOW() - INTERVAL '30 days'
+        ORDER BY updated_at DESC"#,
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(churned))
+}
+
+// ─────────────────────────────────────────────────────────
+// Admin Audit Logs
+// ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct AdminAuditLogQuery {
+    pub page: Option<i64>,
+    pub per_page: Option<i64>,
+    pub action: Option<String>,
+    pub admin_id: Option<Uuid>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AdminAuditLogResponse {
+    pub entries: Vec<AdminAuditEntry>,
+    pub total: i64,
+    pub page: i64,
+    pub per_page: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AdminAuditEntry {
+    pub id: Uuid,
+    pub customer_id: Uuid,
+    pub action: String,
+    pub resource_type: String,
+    pub resource_id: Option<String>,
+    pub details: Option<serde_json::Value>,
+    pub ip_address: Option<String>,
+    pub user_agent: Option<String>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// GET /v1/admin/audit-logs — Admin-only audit log (all users)
+async fn admin_audit_logs(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Query(query): Query<AdminAuditLogQuery>,
+) -> Result<Json<AdminAuditLogResponse>, AppError> {
+    require_admin(&customer)?;
+
+    let page = query.page.unwrap_or(1).max(1);
+    let per_page = query.per_page.unwrap_or(50).clamp(1, 200);
+    let offset = (page - 1) * per_page;
+
+    // Build dynamic WHERE
+    let mut conditions: Vec<String> = Vec::new();
+    let mut bind_idx = 1;
+
+    if query.action.is_some() {
+        conditions.push(format!("action = ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if query.admin_id.is_some() {
+        conditions.push(format!("customer_id = ${}", bind_idx));
+        bind_idx += 1;
+    }
+
+    let where_clause = if conditions.is_empty() {
+        String::new()
+    } else {
+        format!("WHERE {}", conditions.join(" AND "))
+    };
+
+    // Count
+    let count_sql = format!("SELECT COUNT(*) FROM audit_log {}", where_clause);
+    let mut count_q = sqlx::query_scalar::<_, i64>(&count_sql);
+    if let Some(ref action) = query.action {
+        count_q = count_q.bind(action);
+    }
+    if let Some(ref admin_id) = query.admin_id {
+        count_q = count_q.bind(admin_id);
+    }
+    let total = count_q.fetch_one(&pool).await?;
+
+    // Data
+    let data_sql = format!(
+        "SELECT id, customer_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at \
+         FROM audit_log {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
+        where_clause, bind_idx, bind_idx + 1
+    );
+
+    let mut data_q = sqlx::query_as::<
+        _,
+        (
+            Uuid,
+            Uuid,
+            String,
+            String,
+            Option<String>,
+            Option<serde_json::Value>,
+            Option<String>,
+            Option<String>,
+            DateTime<Utc>,
+        ),
+    >(&data_sql);
+
+    if let Some(ref action) = query.action {
+        data_q = data_q.bind(action);
+    }
+    if let Some(ref admin_id) = query.admin_id {
+        data_q = data_q.bind(admin_id);
+    }
+    data_q = data_q.bind(per_page).bind(offset);
+
+    let rows = data_q.fetch_all(&pool).await?;
+
+    let entries = rows
+        .into_iter()
+        .map(
+            |(id, customer_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)| {
+                AdminAuditEntry {
+                    id,
+                    customer_id,
+                    action,
+                    resource_type,
+                    resource_id,
+                    details,
+                    ip_address,
+                    user_agent,
+                    created_at,
+                }
+            },
+        )
+        .collect();
+
+    Ok(Json(AdminAuditLogResponse {
+        entries,
+        total,
+        page,
+        per_page,
+    }))
+}
+
+// ─────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────
+
+/// Escape a string for CSV (wrap in quotes if it contains comma, quote, or newline)
+fn escape_csv(s: &str) -> String {
+    if s.contains(',') || s.contains('"') || s.contains('\n') {
+        format!("\"{}\"", s.replace('"', "\"\""))
+    } else {
+        s.to_string()
+    }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -820,10 +1563,12 @@ mod tests {
             url: "https://example.com/webhook".to_string(),
             description: Some("Main endpoint".to_string()),
             is_active: true,
+            created_at: Utc::now(),
         };
         let json = serde_json::to_value(&ep).unwrap();
         assert_eq!(json["url"], "https://example.com/webhook");
         assert!(json["is_active"].as_bool().unwrap());
+        assert!(json.get("created_at").is_some());
     }
 
     // ── DeliverySummary ─────────────────────────────────────
@@ -836,10 +1581,29 @@ mod tests {
             status: "delivered".to_string(),
             event_type: Some("order.created".to_string()),
             created_at: Utc::now(),
+            attempt_count: 1,
         };
         let json = serde_json::to_value(&d).unwrap();
         assert_eq!(json["status"], "delivered");
         assert_eq!(json["event_type"], "order.created");
+        assert_eq!(json["attempt_count"], 1);
+    }
+
+    #[test]
+    fn test_delivery_summary_event_alias() {
+        let d = DeliverySummary {
+            id: Uuid::new_v4(),
+            endpoint_id: Uuid::new_v4(),
+            status: "pending".to_string(),
+            event_type: Some("user.signup".to_string()),
+            created_at: Utc::now(),
+            attempt_count: 0,
+        };
+        let json = serde_json::to_value(&d).unwrap();
+        // Both "event_type" and "event" should work when deserializing
+        let json_str = json.to_string();
+        let from_json: serde_json::Value = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(from_json["event_type"], "user.signup");
     }
 
     // ── UsageStats ──────────────────────────────────────────
@@ -916,6 +1680,46 @@ mod tests {
         assert_eq!(json["revenue"], 5000.0);
     }
 
+    // ── RevenueResponse ─────────────────────────────────────
+
+    #[test]
+    fn test_revenue_response_serialization() {
+        let resp = RevenueResponse {
+            monthly_revenue: vec![
+                RevenueRow { month: "2024-01".to_string(), revenue: 1000.0 },
+                RevenueRow { month: "2024-02".to_string(), revenue: 1500.0 },
+            ],
+            revenue_by_plan: vec![
+                RevenueByPlan { plan: "pro".to_string(), revenue: 290.0, count: 10 },
+                RevenueByPlan { plan: "business".to_string(), revenue: 990.0, count: 10 },
+            ],
+            mrr: 1280.0,
+            churn_rate: 2.5,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert!(json.get("monthly_revenue").is_some());
+        assert!(json.get("revenue_by_plan").is_some());
+        assert_eq!(json["mrr"], 1280.0);
+        assert_eq!(json["churn_rate"], 2.5);
+        assert_eq!(json["monthly_revenue"].as_array().unwrap().len(), 2);
+        assert_eq!(json["revenue_by_plan"].as_array().unwrap().len(), 2);
+    }
+
+    // ── RevenueByPlan ───────────────────────────────────────
+
+    #[test]
+    fn test_revenue_by_plan_serialization() {
+        let rbp = RevenueByPlan {
+            plan: "pro".to_string(),
+            revenue: 580.0,
+            count: 20,
+        };
+        let json = serde_json::to_value(&rbp).unwrap();
+        assert_eq!(json["plan"], "pro");
+        assert_eq!(json["revenue"], 580.0);
+        assert_eq!(json["count"], 20);
+    }
+
     // ── UserDetailResponse ──────────────────────────────────
 
     #[test]
@@ -963,6 +1767,112 @@ mod tests {
         let json = serde_json::to_value(&detail).unwrap();
         assert_eq!(json["webhook_limit"], 500_000);
         assert_eq!(json["webhook_count"], 1234);
+    }
+
+    // ── ChurnedUser ─────────────────────────────────────────
+
+    #[test]
+    fn test_churned_user_serialization() {
+        let user = ChurnedUser {
+            id: Uuid::new_v4(),
+            email: "churned@x.com".to_string(),
+            plan: "pro".to_string(),
+            amount: 29.0,
+            churn_date: Utc::now(),
+        };
+        let json = serde_json::to_value(&user).unwrap();
+        assert_eq!(json["email"], "churned@x.com");
+        assert_eq!(json["amount"], 29.0);
+    }
+
+    // ── TestWebhookResponse ─────────────────────────────────
+
+    #[test]
+    fn test_test_webhook_response_serialization() {
+        let resp = TestWebhookResponse {
+            status_code: 200,
+            response_body: "OK".to_string(),
+            duration_ms: 42,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["status_code"], 200);
+        assert_eq!(json["response_body"], "OK");
+        assert_eq!(json["duration_ms"], 42);
+    }
+
+    // ── UserAnalytics ───────────────────────────────────────
+
+    #[test]
+    fn test_user_analytics_serialization() {
+        let analytics = UserAnalytics {
+            daily_deliveries: vec![],
+            top_event_types: vec![],
+            endpoint_health: vec![],
+        };
+        let json = serde_json::to_value(&analytics).unwrap();
+        assert!(json.get("daily_deliveries").is_some());
+        assert!(json.get("top_event_types").is_some());
+        assert!(json.get("endpoint_health").is_some());
+    }
+
+    // ── AdminAuditEntry ─────────────────────────────────────
+
+    #[test]
+    fn test_admin_audit_entry_serialization() {
+        let entry = AdminAuditEntry {
+            id: Uuid::new_v4(),
+            customer_id: Uuid::new_v4(),
+            action: "LOGIN".to_string(),
+            resource_type: "auth".to_string(),
+            resource_id: None,
+            details: None,
+            ip_address: Some("1.2.3.4".to_string()),
+            user_agent: None,
+            created_at: Utc::now(),
+        };
+        let json = serde_json::to_value(&entry).unwrap();
+        assert_eq!(json["action"], "LOGIN");
+        assert!(json.get("customer_id").is_some());
+    }
+
+    // ── CSV Export Params ───────────────────────────────────
+
+    #[test]
+    fn test_export_users_params_defaults() {
+        let params = ExportUsersParams {
+            format: None,
+            plan: None,
+            status: None,
+        };
+        assert!(params.format.is_none());
+        assert!(params.plan.is_none());
+    }
+
+    #[test]
+    fn test_export_revenue_params_defaults() {
+        let params = ExportRevenueParams {
+            format: None,
+            months: None,
+        };
+        assert!(params.format.is_none());
+        assert!(params.months.is_none());
+    }
+
+    // ── Escape CSV ──────────────────────────────────────────
+
+    #[test]
+    fn test_escape_csv_simple() {
+        assert_eq!(escape_csv("hello"), "hello");
+    }
+
+    #[test]
+    fn test_escape_csv_with_comma() {
+        assert_eq!(escape_csv("hello, world"), "\"hello, world\"");
+    }
+
+    #[test]
+    fn test_escape_csv_with_quote() {
+        assert_eq!(escape_csv("say \"hi\""), "\"say \"\"hi\"\"\"");
     }
 
     // ── Router construction ─────────────────────────────────
