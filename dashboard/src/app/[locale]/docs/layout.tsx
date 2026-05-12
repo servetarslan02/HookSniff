@@ -75,7 +75,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <Link href={`/${username}`} className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
+            <Link href={"/"} className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">
               {tNav('dashboard')}
             </Link>
             <Link href="/" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:text-white transition">

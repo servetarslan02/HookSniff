@@ -36,11 +36,9 @@ function toSlug(input: string): string {
 }
 
 function setUsernameCookie(username: string) {
-  document.cookie = `hooksniff_username=${username}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
 }
 
 function clearUsernameCookie() {
-  document.cookie = 'hooksniff_username=; path=/; max-age=0';
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

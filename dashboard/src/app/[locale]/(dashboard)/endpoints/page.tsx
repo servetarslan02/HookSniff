@@ -242,7 +242,7 @@ export default function EndpointsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => router.push(`/${username}/endpoints/${ep.id}`)}
+                    onClick={() => router.push(`/endpoints/${ep.id}`)}
                     className="text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition p-2"
                     aria-label={t('settingsTitle')}
                   >
