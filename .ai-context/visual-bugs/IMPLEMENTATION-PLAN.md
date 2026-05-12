@@ -527,7 +527,7 @@
 ---
 
 > **Toplam:** 364 madde — ~210 madde tamamlandı (%58) — Oturum 128 itibarıyla
-> **Son güncelleme:** 2026-05-12 19:38 GMT+8 — Oturum 128 (OpenClaw) — 4 paralel agent
+> **Son güncelleme:** 2026-05-12 20:12 GMT+8 — Oturum 128 (OpenClaw) — 4 paralel agent + kod incelemesi
 
 ## Oturum 128 (2026-05-12 19:16-19:38 GMT+8) — 4 Paralel Agent
 **Durum:** ✅ Tamamlandı
@@ -571,6 +571,34 @@
 
 ### Toplam: ~50 madde tamamlandı (bu oturumda)
 ### Genel İlerleme: ~210/364 tamamlandı (%58)
+
+## Oturum 128 Ek — Kod İncelemesi (2026-05-12 19:43-20:12 GMT+8) ✅
+**Durum:** ✅ Tamamlandı — 7 kritik build hatası düzeltildi
+
+### Dead Code Temizliği (worker/src/main.rs)
+- ✅ `commit_tx_with_retry` fonksiyonu silindi (hiç çağrılmıyordu)
+- ✅ `commit_with_retry_inner` fonksiyonu silindi (hiç çağrılmıyordu)
+- ✅ `DB_COMMIT_MAX_RETRIES` sabiti silindi (kullanılmıyordu)
+- ✅ `DB_COMMIT_RETRY_BASE_DELAY_MS` sabiti silindi (kullanılmıyordu)
+- ✅ Orphaned doc comment'leri temizlendi
+
+### Header Validasyon Duplikasyonu
+- ✅ `common/src/header_validation.rs` oluşturuldu (shared module)
+- ✅ `api/src/validation.rs` → common'a delegate edildi
+- ✅ `worker/src/delivery/http.rs` → common'a delegate edildi
+
+### Build Hataları (5 syntax error + 2 type error)
+- ✅ `Toast.tsx`: Fazla `)}` parantez silindi
+- ✅ `changelog/[slug]/page.tsx`: Çift import + bozuk import bloğu düzeltildi
+- ✅ `api-importer/page.tsx`: `aria-checked={ }` ve `checked={ }` → `ep.selected`
+- ✅ `portal-customize/page.tsx`: 3x duplike `<input` + boş `{ }` düzeltildi
+- ✅ `docs/architecture/page.tsx`: Apostrophe → double quotes
+- ✅ `docs/concepts/page.tsx`: Apostrophe → double quotes
+- ✅ `layout.tsx`: Locale type error (`readonly string[]` cast)
+- ✅ `sanitize.ts`: Kullanılmayan `ALLOWED_ATTRS` silindi
+
+### Toplam: 9 dosya değişti, 28 satır eklendi, 48 satır silindi
+### `next build` → BAŞARILI ✅
 
 ---
 ## Oturum 120 Ek Düzeltmeler (2026-05-12 04:29-04:57 GMT+8)
