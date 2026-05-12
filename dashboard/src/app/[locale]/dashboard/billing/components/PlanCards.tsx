@@ -5,13 +5,23 @@ import { useTranslations, useLocale } from 'next-intl';
 
 const planDefaults = [
   {
-    key: 'free',
-    nameKey: 'plans.free',
+    key: 'developer',
+    nameKey: 'plans.developer',
     priceUsd: 0,
     priceTry: 0,
     period: '/month',
-    limitKey: 'plans.freeLimit',
-    features: ['100 requests/min', '3 retry attempts', 'Community support', '5 endpoints', '7-day retention'],
+    limitKey: 'plans.developerLimit',
+    features: ['100 events/day', '1 application', '5 endpoints', '10 event types', '7-day retention', 'Community support'],
+    popular: false,
+  },
+  {
+    key: 'startup',
+    nameKey: 'plans.startup',
+    priceUsd: 29,
+    priceTry: 599,
+    period: '/month',
+    limitKey: 'plans.startupLimit',
+    features: ['30,000 events/day', '1 application', '50 endpoints', '50 event types', '14-day retention', 'Never-blocked mode'],
     popular: false,
   },
   {
@@ -21,18 +31,8 @@ const planDefaults = [
     priceTry: 999,
     period: '/month',
     limitKey: 'plans.proLimit',
-    features: ['1,000 requests/min', '5 retry attempts', 'Priority support', '50 endpoints', '30-day retention'],
+    features: ['100,000 events/day', 'Unlimited applications', '500 endpoints', 'Unlimited event types', '30-day retention', 'Priority support'],
     popular: true,
-  },
-  {
-    key: 'business',
-    nameKey: 'plans.business',
-    priceUsd: 99,
-    priceTry: 1999,
-    period: '/month',
-    limitKey: 'plans.businessLimit',
-    features: ['10,000 requests/min', '10 retry attempts', 'Dedicated support', 'SLA guarantee', '500 endpoints', '90-day retention'],
-    popular: false,
   },
 ];
 
@@ -48,7 +48,7 @@ export function PlanCards({
   const isTr = locale === 'tr';
   const plans = planDefaults.map(p => ({
     ...p,
-    price: p.key === 'free' ? 0 : isTr ? p.priceTry : p.priceUsd,
+    price: p.key === 'developer' ? 0 : isTr ? p.priceTry : p.priceUsd,
   }));
 
   return (
