@@ -280,3 +280,9 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Build doğrulama:** `next build` hatasız geçti ✅
 - **Commit:** 6869a1c2 — main branch
 - **7 dosya değişti, 445 satır eklendi, 14 satır silindi**
+
+## Oturum 126 Ek Düzeltmeler (2026-05-12 18:06 GMT+8)
+- ✅ Activity sayfası: silent catch → error state + retry butonu
+- ✅ Test webhook: SSRF koruması eklendi (`crate::ssrf::validate_url`)
+- ✅ TR i18n çevirileri düzeltildi (10 test webhook key)
+- **Commits:** 98b45c31, aa22b599 — main branch
