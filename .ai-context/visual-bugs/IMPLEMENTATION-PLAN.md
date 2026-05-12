@@ -527,7 +527,34 @@
 ---
 
 > **Toplam:** 364 madde — 358 tamamlandı (%98) — 6 kalan ⬜ (1 ben + 5 Servet)
-> **Son güncelleme:** 2026-05-12 20:47 GMT+8 — Oturum 129 (OpenClaw) — Final cleanup & documentation
+> **Son güncelleme:** 2026-05-12 21:58 GMT+8 — Oturum 130 (OpenClaw) — Billing + Email + Content + OpenAPI
+
+## Oturum 130 (2026-05-12 21:22-21:58 GMT+8) — 4 Paralel Agent + Billing
+**Durum:** ✅ Tamamlandı
+**Görev:** Orta/düşük/kolay maddeler + rakip analizi ile billing implementasyonu
+
+### Yapılan İşler
+- ✅ Item 200: Email template'leri Türkçe+İngilizce (Language enum)
+- ✅ Item 201: Email retry — exponential backoff (3 retry, 1s/2s/4s)
+- ✅ Item 204: Fatura email template
+- ✅ Item 205: Webhook başarı email template
+- ✅ Item 249: Provider switching eski aboneliği otomatik iptal
+- ✅ Item 251: Refund/chargeback handling — 14 gün window, DB transaction
+- ✅ Item 252: Admin gelir hesaplama gerçek invoice verisi ile
+- ✅ Item 255: Yıllık ödeme — %20 indirim, monthly/annual toggle
+- ✅ Item 256: Enterprise plan — contact sales, SSO/SAML, custom SLA
+- ✅ Item 279: OpenAPI 13 eksik endpoint eklendi
+- ✅ Item 280: OpenAPI type fixes (int64)
+- ✅ Item 288: BillingService abstraction layer
+- ✅ Item 289: main.rs monolith doğrulandı (zaten modular)
+- ✅ Item 357: Blog fiyat hataları düzeltildi
+- ✅ Item 358: Alternatif sayfalar dengelendi (winner→bestFor)
+- ✅ Item 359: Testimonial disclaimer eklendi
+- ✅ Items 29-32, 37: Doğrulandı (zaten doğru)
+- ✅ Items 40-41, 202, 203, 206, 356: Dökümantasyon/iyileştirme tamamlandı
+
+### Toplam: 23 madde tamamlandı (bu oturumda)
+### Genel İlerleme: 358/364 tamamlandı (%98) — 6 kalan ⬜
 
 ## Oturum 129 (2026-05-12 20:47 GMT+8) — Final Cleanup
 **Durum:** ✅ Tamamlandı
