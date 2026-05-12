@@ -1,6 +1,6 @@
 # 🧠 Fiyat ve Planlama — Hafıza
 
-> Son güncelleme: 2026-05-13 01:10 GMT+8
+> Son güncelleme: 2026-05-13 01:26 GMT+8
 
 ---
 
@@ -59,3 +59,21 @@
 - **Aşama 7:** Son Kontroller — GitHub push, PLAN.md güncellendi
 - **Commits:** 7+ commit, main branch
 - **Not:** Rust toolchain yok, cargo test/clippy çalıştırılamadı — Cloud Build'te doğrulanacak
+
+### Oturum 3 (2026-05-13 01:10 - 01:26 GMT+8)
+- **Kod incelemesi** — satır satır tüm değişiklikler kontrol edildi
+- **5 hata bulundu ve düzeltildi:**
+  1. Batch webhook handler'da overage mantığı eklenmemişti
+  2. Pricing'de `plan.key !== 'free'` kalmış → `'developer'` yapıldı
+  3. Pricing'de `plan.key === 'business'` dead code kaldırıldı
+  4. Karşılaştırma tablosu 3 sütun → 4 sütun (Developer/Startup/Pro/Enterprise)
+  5. Çift `<thead>` tag'ı kaldırıldı
+- **Pricing kartları güncellendi** — yeni özellikler eklendi:
+  - Developer: 10 özellik (HMAC, 2FA, exponential backoff, subscriptions)
+  - Startup: 12 özellik (never-blocked, overage, CloudEvents, secret rotation, DLQ)
+  - Pro: 12 özellik (FIFO, IP whitelist, analytics, schema registry)
+  - Enterprise: 8 özellik (custom SLA, SSO, dedicated manager, on-call)
+- **Billing PlanCards** aynı feature listeleriyle güncellendi
+- **CTA buton metinleri** düzeltildi (dead code kaldırıldı)
+- **i18n EN+TR** comprehensive feature listeleri güncellendi
+- **Commits:** 2 commit (fix + feat), main branch
