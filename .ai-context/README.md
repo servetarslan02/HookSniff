@@ -58,6 +58,10 @@ Tüm dosyalar GitHub'da saklanır — workspace silinse bile korunur.
 │   ├── 06-analytics/
 │   └── 07-legal/
 │
+├── admin-panel-eksikleri/ ← Admin panel detaylı analiz
+│   ├── ADMIN-PANEL-ANALYSIS.md
+│   └── ADMIN-PANEL-PAGE-DETAIL.md
+│
 └── README.md              ← Bu dosya
 ```
 
