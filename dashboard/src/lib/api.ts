@@ -402,6 +402,50 @@ export interface LatencyTrendResponse {
   overall_avg_ms: number;
 }
 
+// Admin API types
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  resource_type: string;
+  resource_id?: string;
+  details?: Record<string, unknown>;
+  ip_address?: string;
+  user_agent?: string;
+  created_at: string;
+}
+
+export interface AuditLogResponse {
+  entries: AuditLogEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface UserAnalytics {
+  daily_deliveries: { date: string; total: number; success: number; failed: number }[];
+  top_events: { event: string; count: number }[];
+  endpoint_health: { url: string; success_rate: number; avg_latency_ms: number }[];
+}
+
+export interface ChurnUser {
+  id: string;
+  email: string;
+  name?: string;
+  plan: string;
+  amount: number;
+  churn_date: string;
+}
+
+export interface AlertRuleAdmin {
+  id: string;
+  name: string;
+  condition: string;
+  threshold: number;
+  channels: string[];
+  is_active: boolean;
+  created_at: string;
+}
+
 // Admin API
 export const adminApi = {
   getStats: (token: string) =>
@@ -428,7 +472,70 @@ export const adminApi = {
 
   getRevenue: (token: string) =>
     apiFetch<RevenueResponse>('/admin/revenue', { token }),
+
+  // New endpoints
+  getAuditLogs: (token: string, params?: { limit?: number; offset?: number; action?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.offset) searchParams.set('offset', params.offset.toString());
+    if (params?.action) searchParams.set('action', params.action);
+    const qs = searchParams.toString();
+    return apiFetch<AuditLogResponse>(`/admin/audit-logs${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  replayDelivery: (token: string, deliveryId: string) =>
+    apiFetch<{ message: string }>(`/admin/deliveries/${deliveryId}/replay`, { method: 'POST', token }),
+
+  impersonateUser: (token: string, userId: string) =>
+    apiFetch<{ token: string; expires_in: number }>(`/admin/users/${userId}/impersonate`, { method: 'POST', token }),
+
+  getUserAnalytics: (token: string, userId: string, days?: number) => {
+    const qs = days ? `?days=${days}` : '';
+    return apiFetch<UserAnalytics>(`/admin/users/${userId}/analytics${qs}`, { token });
+  },
+
+  testWebhook: (token: string, data: { endpoint_url: string; event_type: string; payload: Record<string, unknown> }) =>
+    apiFetch<{ status_code: number; response_body: string; duration_ms: number }>(`/admin/test-webhook`, { method: 'POST', body: data, token }),
+
+  getChurn: (token: string) =>
+    apiFetch<{ users: ChurnUser[] }>('/admin/churn', { token }),
+
+  exportUsers: (token: string, params?: { format?: string; plan?: string; status?: string }) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set('format', params?.format || 'csv');
+    if (params?.plan) searchParams.set('plan', params.plan);
+    if (params?.status) searchParams.set('status', params.status);
+    return `/v1/admin/users/export?${searchParams.toString()}`;
+  },
+
+  exportRevenue: (token: string, months?: number) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set('format', 'csv');
+    if (months) searchParams.set('months', months.toString());
+    return `/v1/admin/revenue/export?${searchParams.toString()}`;
+  },
+
+  getSettings: (token: string) =>
+    apiFetch<PlatformSettings>('/admin/settings', { token }),
+
+  updateSettings: (token: string, settings: PlatformSettings) =>
+    apiFetch<{ message: string }>('/admin/settings', { method: 'PUT', body: settings, token }),
 };
+
+export interface PlatformSettings {
+  default_plan: string;
+  max_endpoints_free: number;
+  max_endpoints_pro: number;
+  max_webhooks_free: number;
+  max_webhooks_pro: number;
+  rate_limit_free: number;
+  rate_limit_pro: number;
+  retry_max_attempts: number;
+  retention_days_free: number;
+  retention_days_pro: number;
+  maintenance_mode: boolean;
+  signup_enabled: boolean;
+}
 
 // Team API
 export const teamsApi = {
