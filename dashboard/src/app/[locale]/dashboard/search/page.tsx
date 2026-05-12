@@ -193,6 +193,7 @@ export default function SearchPage() {
             {results.total > results.per_page && (
               <nav aria-label={tc('pagination')} className="px-6 py-4 border-t border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
                 <button
+                  type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   aria-label={tc('previous')}
@@ -201,9 +202,10 @@ export default function SearchPage() {
                   {tc('previous')}
                 </button>
                 <span className="text-sm text-gray-500 dark:text-slate-400" aria-live="polite">
-                  Page {page} of {Math.ceil(results.total / results.per_page)}
+                  {tc('pageOf', { page, total: Math.ceil(results.total / results.per_page) })}
                 </span>
                 <button
+                  type="button"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= Math.ceil(results.total / results.per_page)}
                   aria-label={tc('next')}
