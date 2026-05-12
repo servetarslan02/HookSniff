@@ -266,7 +266,7 @@ export default function CompareContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -289,7 +289,7 @@ export default function CompareContent() {
         </div>
 
         {/* TL;DR */}
-        <div className="mb-16 p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+        <div className="mb-16 p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">TL;DR</h2>
           <ul className="space-y-2">
             {tlDr.map((item, i) => (
@@ -305,28 +305,28 @@ export default function CompareContent() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("inAction")}</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
               <Image src="/screenshots/compare-hero.jpg" alt="HookSniff Compare — side-by-side webhook service comparison" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("comparePage")}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">20 detailed sections with honest, side-by-side comparison.</p>
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
               <Image src="/screenshots/scorecard.jpg" alt="HookSniff Scorecard — feature comparison across 6 categories" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("scorecard")}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">6 categories scored honestly. Svix: 51, HookSniff: 50.</p>
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
               <Image src="/screenshots/playground.png" alt="HookSniff Playground — test webhooks in real-time" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("playground")}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-500">Generate URLs, send webhooks, inspect payloads in real-time.</p>
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
               <Image src="/screenshots/build-vs-buy.png" alt="HookSniff Build vs Buy — 12 dimension webhook infrastructure comparison" width={800} height={450} className="w-full" />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("buildVsBuy")}</h3>
@@ -337,12 +337,12 @@ export default function CompareContent() {
         </div>
 
         {/* Scorecard */}
-        <div className="mb-16 p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+        <div className="mb-16 p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t("scorecard")}</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-slate-800">
+                <tr className="border-b border-gray-200 dark:border-slate-700">
                   <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">{t("category")}</th>
                   <th className="text-center py-2 px-4 font-semibold text-brand-600 dark:text-brand-400">🪝 HookSniff</th>
                   <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white">📨 Svix</th>
@@ -352,7 +352,7 @@ export default function CompareContent() {
               </thead>
               <tbody>
                 {scorecard.map((row) => (
-                  <tr key={row.category} className="border-b border-gray-100 dark:border-slate-800/50 last:border-0">
+                  <tr key={row.category} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                     <td className="py-2 px-4 text-gray-700 dark:text-slate-300 font-medium">{row.category}</td>
                     <td className="py-2 px-4 text-center font-bold text-gray-900 dark:text-white bg-brand-50/20 dark:bg-brand-500/5">{row.hooksniff}/10</td>
                     <td className="py-2 px-4 text-center text-gray-600 dark:text-slate-400">{row.svix}/10</td>
@@ -377,7 +377,7 @@ export default function CompareContent() {
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-6">{t('trustedBy')}</p>
           <div className="grid md:grid-cols-3 gap-4">
             {testimonials.map((t, i) => (
-              <div key={i} className="p-5 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+              <div key={i} className="p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
                 <p className="text-sm text-gray-600 dark:text-slate-400 mb-4 italic">&ldquo;{t.quote}&rdquo;</p>
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{t.author}</p>
@@ -393,8 +393,8 @@ export default function CompareContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("detailedComparison")}</h2>
           <div className="space-y-6">
             {sections.map((section, idx) => (
-              <div key={section.title} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-800">
+              <div key={section.title} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
                   <div className="flex items-center gap-3">
                     <span className="w-7 h-7 flex items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-bold">{idx + 1}</span>
                     <div>
@@ -435,7 +435,7 @@ export default function CompareContent() {
               { when: 'Choose Hookdeck if...', items: ['You need complex event routing rules', 'You need 99.999% uptime SLA', 'You want webhook latency alerts (Radar)', 'You need advanced inbound webhook handling', 'You want a fully managed solution'] },
               { when: 'Choose Hook0 if...', items: ['You want 100% self-hosted control', 'You need European data sovereignty', 'Budget is the #1 priority', 'You want a bootstrapped, no-VC company'] },
             ].map((section) => (
-              <div key={section.when} className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+              <div key={section.when} className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-3">{section.when}</h3>
                 <ul className="space-y-2">
                   {section.items.map((item) => (
@@ -455,7 +455,7 @@ export default function CompareContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("faq")}</h2>
           <div className="space-y-3 max-w-3xl mx-auto">
             {faq.map((item, i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden">
+              <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
                 <button
                   type="button"
                   aria-expanded={expandedFaq === i}
@@ -485,7 +485,7 @@ export default function CompareContent() {
               { title: 'Hookdeck Alternatives', desc: 'All Hookdeck alternatives ranked', href: '/alternatives/hookdeck-alternatives' },
               { title: 'Build vs Buy', desc: 'Should you build your own?', href: '/build-vs-buy' },
             ].map((link) => (
-              <Link key={link.title} href={link.href} className="group p-5 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+              <Link key={link.title} href={link.href} className="group p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
                 <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-1">{link.title}</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400">{link.desc}</p>
               </Link>

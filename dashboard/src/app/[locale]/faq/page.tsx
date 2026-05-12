@@ -27,7 +27,7 @@ const faqKeys = [
 function FAQAccordion({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden">
+    <div className="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition"
@@ -41,7 +41,7 @@ function FAQAccordion({ question, answer }: { question: string; answer: string }
         </svg>
       </button>
       {open && (
-        <div className="px-6 pb-4 text-gray-600 dark:text-slate-400 leading-relaxed border-t border-gray-100 dark:border-slate-800 pt-4">
+        <div className="px-6 pb-4 text-gray-600 dark:text-slate-400 leading-relaxed border-t border-gray-100 dark:border-slate-700 pt-4">
           {answer}
         </div>
       )}
@@ -71,7 +71,7 @@ export default function FAQPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                 activeCategory === cat
                   ? 'bg-brand-600 dark:bg-brand-500 text-white'
-                  : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-600'
+                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600'
               }`}
             >
               {t(cat)}
@@ -87,7 +87,7 @@ export default function FAQPage() {
         </div>
 
         {/* Still have questions */}
-        <div className="mt-16 text-center bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8">
+        <div className="mt-16 text-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('stillHaveQuestions')}</h2>
           <p className="text-gray-500 dark:text-slate-400 mb-6">{t('cantFindAnswer')}</p>
           <Link href="/contact" className="inline-flex bg-brand-600 dark:bg-brand-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">

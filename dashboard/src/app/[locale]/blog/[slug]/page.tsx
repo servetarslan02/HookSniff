@@ -74,7 +74,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         .dark .code-number { color: #d19a66; }
       `}} />
 
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -232,7 +232,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* Share */}
-        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-800 flex items-center gap-4">
+        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-700 flex items-center gap-4">
           <span className="text-sm text-gray-500 dark:text-slate-500">Share:</span>
           <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">{t("twitter")}</a>
           <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://hooksniff.vercel.app/blog/${slug}`)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">{t("linkedin")}</a>
@@ -241,12 +241,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Related Posts */}
         {related.length > 0 && (
-          <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-800">
+          <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("relatedPosts")}</h3>
             <div className="grid gap-4">
               {related.map((r) => (
                 <Link key={r.slug} href={`/blog/${r.slug}`} className="block group">
-                  <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+                  <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
                     <span className="text-xs text-brand-600 dark:text-brand-400">{r.category}</span>
                     <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mt-1">{r.title}</h4>
                     <p className="text-sm text-gray-500 dark:text-slate-500 mt-1">{r.date} · {r.readTime}</p>
@@ -258,17 +258,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         )}
 
         {/* Previous / Next Navigation */}
-        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-800">
+        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-700">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {prev ? (
-              <Link href={`/blog/${prev.slug}`} className="group block bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+              <Link href={`/blog/${prev.slug}`} className="group block bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
                 <span className="text-xs text-gray-500 dark:text-slate-500">← Previous</span>
                 <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mt-1 text-sm">{prev.title}</h4>
                 <span className="text-xs text-brand-600 dark:text-brand-400">{prev.category}</span>
               </Link>
             ) : <div />}
             {next && (
-              <Link href={`/blog/${next.slug}`} className="group block bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-right">
+              <Link href={`/blog/${next.slug}`} className="group block bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-right">
                 <span className="text-xs text-gray-500 dark:text-slate-500">Next →</span>
                 <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mt-1 text-sm">{next.title}</h4>
                 <span className="text-xs text-brand-600 dark:text-brand-400">{next.category}</span>
@@ -285,7 +285,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       {/* Floating Table of Contents (desktop only) */}
       {hasTOC && (
         <nav className="hidden lg:block fixed right-4 top-24 w-56 max-h-[calc(100vh-8rem)] overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
             <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-3">{t("onThisPage")}</h4>
             <ul className="space-y-1.5">
               {headings.map((h, i) => {
