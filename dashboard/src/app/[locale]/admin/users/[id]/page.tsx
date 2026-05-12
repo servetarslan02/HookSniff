@@ -10,7 +10,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { useTranslations, useLocale } from 'next-intl';
 
-const PLAN_OPTIONS = ['free', 'pro', 'business'];
+const PLAN_OPTIONS = ['developer', 'startup', 'pro', 'enterprise'];
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
