@@ -162,13 +162,13 @@ export default function NotificationsPage() {
       {/* Notification List */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">
+          <div className="p-12 text-center text-gray-500 dark:text-slate-500 animate-pulse">
             {t('loadingNotifications')}
           </div>
         ) : notifications.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-4xl mb-3">🔔</div>
-            <p className="text-gray-400 dark:text-slate-500">{t('noNotifications')}</p>
+            <p className="text-gray-500 dark:text-slate-500">{t('noNotifications')}</p>
           </div>
         ) : (
           <>
@@ -197,7 +197,7 @@ export default function NotificationsPage() {
                       </div>
                       <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{n.message}</p>
                       <div className="flex items-center gap-3 mt-2">
-                        <span className="text-xs text-gray-400 dark:text-slate-500">
+                        <span className="text-xs text-gray-500 dark:text-slate-500">
                           {new Date(n.created_at).toLocaleString()}
                         </span>
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400">

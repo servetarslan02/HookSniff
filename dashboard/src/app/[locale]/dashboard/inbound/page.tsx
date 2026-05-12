@@ -21,8 +21,6 @@ export default function InboundPage() {
   const t = useTranslations();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [configs, setConfigs] = useState<InboundConfig[]>([]);
-  const [_loading, setLoading] = useState(true);
-  
   const [showCreate, setShowCreate] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState('');
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
@@ -36,7 +34,7 @@ export default function InboundPage() {
     ]).then(([eps, cfgs]) => {
       setEndpoints(eps);
       setConfigs(cfgs);
-    }).finally(() => setLoading(false));
+    });
   }, [token]);
 
   const handleCreate = async () => {
@@ -101,9 +99,9 @@ export default function InboundPage() {
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('inbound.webhookSecret')}</label>
-                <input value={webhookSecret} onChange={e => setWebhookSecret(e.target.value)} placeholder="whsec_..." type="password"
+                <input value={webhookSecret} onChange={e => setWebhookSecret(e.target.value)} placeholder="whsec_..." type="password" autoComplete="off"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-mono" />
-                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">From {selectedProvider} dashboard → Webhooks → Signing secret</p>
+                <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">From {selectedProvider} dashboard → Webhooks → Signing secret</p>
               </div>
 
               <div>

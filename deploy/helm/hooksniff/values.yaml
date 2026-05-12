@@ -68,11 +68,25 @@ redis:
       size: 1Gi
 
 # ── Environment ──
+# Item 39: Secrets moved to Kubernetes Secret resource.
+# Create secrets via: kubectl create secret generic hooksniff-secrets --from-literal=...
+# Or use: deploy/helm/hooksniff/templates/secrets.yaml (external secret manager recommended)
 env:
-  JWT_SECRET: "change-me-in-production"
-  HMAC_SECRET: "change-me-in-production"
   API_BASE_URL: "http://localhost:3000"
   DASHBOARD_URL: "http://localhost:3001"
+  # JWT_SECRET, HMAC_SECRET — referenced from K8s Secret via envFrom
+  # See templates/secrets.yaml for secret injection
+
+# ── Kubernetes Secrets Reference ──
+# Injects secrets from the 'hooksniff-secrets' K8s Secret into env vars.
+# Create the secret before deploying:
+#   kubectl create secret generic hooksniff-secrets \
+#     --from-literal=JWT_SECRET=<your-jwt-secret> \
+#     --from-literal=HMAC_SECRET=<your-hmac-secret> \
+#     --from-literal=DATABASE_URL=<your-db-url> \
+#     --from-literal=REDIS_URL=<your-redis-url>
+secretRef:
+  name: hooksniff-secrets
 
 # ── Ingress ──
 ingress:

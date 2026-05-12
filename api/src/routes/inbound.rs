@@ -261,8 +261,8 @@ async fn handle_inbound(
         .ok_or(AppError::BadRequest("Missing API key".into()))?;
 
     // Find customer by API key (prefix-based lookup + Argon2 verification)
-    // Use 15-char prefix to match DB storage (api_key_prefix)
-    let prefix = &api_key[..15.min(api_key.len())];
+    // Use 24-char prefix to match DB storage (api_key_prefix)
+    let prefix = &api_key[..24.min(api_key.len())];
     let candidates =
         sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
             .bind(prefix)
@@ -410,8 +410,8 @@ async fn handle_inbound_to_endpoint(
         .ok_or(AppError::BadRequest("Missing API key".into()))?;
 
     // Find customer by API key (prefix-based lookup + Argon2 verification)
-    // Use 15-char prefix to match DB storage (api_key_prefix)
-    let prefix = &api_key[..15.min(api_key.len())];
+    // Use 24-char prefix to match DB storage (api_key_prefix)
+    let prefix = &api_key[..24.min(api_key.len())];
     let candidates =
         sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
             .bind(prefix)

@@ -205,20 +205,59 @@ async fn deliver_email(
     let from_email =
         std::env::var("NOTIFY_FROM_EMAIL").unwrap_or_else(|_| "onboarding@resend.dev".to_string());
 
-    // Read and parse service account key
-    // HS-024: Use tokio::fs for non-blocking I/O in async context
-    let sa_json = match tokio::fs::read_to_string(&sa_path).await {
-        Ok(json) => json,
-        Err(e) => {
-            warn!("Failed to read service account file {}: {}", sa_path, e);
-            return Ok(DeliveryResult {
-                success: false,
-                status_code: 0,
-                response_body: String::new(),
-                response_headers: serde_json::json!({}),
-                duration_ms: 0,
-                error: format!("Failed to read service account: {}", e),
-            });
+    // Item 271: Cache service account JSON — read once, reuse across deliveries
+    static SA_CACHE: std::sync::OnceLock<std::sync::RwLock<Option<(String, String)>>> =
+        std::sync::OnceLock::new();
+    let cache = SA_CACHE.get_or_init(|| std::sync::RwLock::new(None));
+
+    let sa_json = {
+        // Try cache first
+        let cached = cache.read().unwrap();
+        if let Some((ref path, ref json)) = *cached {
+            if path == &sa_path {
+                json.clone()
+            } else {
+                drop(cached);
+                // Path changed — re-read
+                match tokio::fs::read_to_string(&sa_path).await {
+                    Ok(json) => {
+                        let mut w = cache.write().unwrap();
+                        *w = Some((sa_path.clone(), json.clone()));
+                        json
+                    }
+                    Err(e) => {
+                        warn!("Failed to read service account file {}: {}", sa_path, e);
+                        return Ok(DeliveryResult {
+                            success: false,
+                            status_code: 0,
+                            response_body: String::new(),
+                            response_headers: serde_json::json!({}),
+                            duration_ms: 0,
+                            error: format!("Failed to read service account: {}", e),
+                        });
+                    }
+                }
+            }
+        } else {
+            drop(cached);
+            match tokio::fs::read_to_string(&sa_path).await {
+                Ok(json) => {
+                    let mut w = cache.write().unwrap();
+                    *w = Some((sa_path.clone(), json.clone()));
+                    json
+                }
+                Err(e) => {
+                    warn!("Failed to read service account file {}: {}", sa_path, e);
+                    return Ok(DeliveryResult {
+                        success: false,
+                        status_code: 0,
+                        response_body: String::new(),
+                        response_headers: serde_json::json!({}),
+                        duration_ms: 0,
+                        error: format!("Failed to read service account: {}", e),
+                    });
+                }
+            }
         }
     };
 

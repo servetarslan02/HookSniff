@@ -111,7 +111,10 @@ pub async fn handle_connection(
     config: WsHandlerConfig,
 ) {
     let (mut ws_sender, mut ws_receiver) = socket.split();
-    let (tx, mut rx) = mpsc::unbounded_channel::<WsMessage>();
+    // BUG-025: Use bounded channel to prevent unbounded memory growth
+    // if a slow consumer can't keep up with the event stream.
+    // 256 messages buffered per connection — generous but bounded.
+    let (tx, mut rx) = mpsc::channel::<WsMessage>(256);
 
     // Register the connection
     let connection_id = match gateway

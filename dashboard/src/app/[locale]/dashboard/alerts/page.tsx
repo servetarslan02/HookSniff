@@ -185,9 +185,9 @@ export default function AlertsPage() {
       {/* Alert List */}
       <div className="glass-card overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-400 dark:text-slate-500">{tc('loading')}</div>
+          <div className="p-8 text-center text-gray-500 dark:text-slate-500">{tc('loading')}</div>
         ) : alerts.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 dark:text-slate-500">
+          <div className="p-12 text-center text-gray-500 dark:text-slate-500">
             {t('empty')}
           </div>
         ) : (

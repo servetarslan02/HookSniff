@@ -147,7 +147,7 @@ export default function AuditLogPage() {
                       {entry.resource_type}/{entry.resource_id?.slice(0, 8)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate">{entry.details}</td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-400 dark:text-slate-500">{entry.ip_address}</td>
+                    <td className="px-6 py-4 text-sm font-mono text-gray-500 dark:text-slate-500">{entry.ip_address}</td>
                   </tr>
                 ))}
               </tbody>

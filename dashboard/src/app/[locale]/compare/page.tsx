@@ -1,5 +1,9 @@
 import CompareContent from './CompareContent';
 
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
 export const metadata = {
   title: 'HookSniff vs Svix vs Hookdeck vs Hook0 — Webhook Comparison (2026) | HookSniff',
   description: 'Comprehensive, honest comparison of the top webhook services. Pricing, features, security, and developer experience — side by side.',

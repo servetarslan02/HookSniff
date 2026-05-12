@@ -139,10 +139,10 @@ export default function AnalyticsPage() {
             <div className="h-80">
               {loading ? (
                 <div className="h-full flex items-center justify-center">
-                  <div className="animate-pulse text-gray-400 dark:text-slate-500">{tc('loading')}</div>
+                  <div className="animate-pulse text-gray-500 dark:text-slate-500">{tc('loading')}</div>
                 </div>
               ) : chartData.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-gray-400 dark:text-slate-500">
+                <div className="h-full flex items-center justify-center text-gray-500 dark:text-slate-500">
                   {tc('noResults')}
                 </div>
               ) : (
@@ -170,8 +170,8 @@ export default function AnalyticsPage() {
                       }}
                     />
                     <Legend />
-                    <Area type="monotone" dataKey="successful" stroke="#10b981" fillOpacity={1} fill="url(#analyticsColorSuccess)" strokeWidth={2} name="Successful" />
-                    <Area type="monotone" dataKey="failed" stroke="#ef4444" fillOpacity={1} fill="url(#analyticsColorFailed)" strokeWidth={2} name="Failed" />
+                    <Area type="monotone" dataKey="successful" stroke="#10b981" fillOpacity={1} fill="url(#analyticsColorSuccess)" strokeWidth={2} name={t('successfulLabel')} />
+                    <Area type="monotone" dataKey="failed" stroke="#ef4444" fillOpacity={1} fill="url(#analyticsColorFailed)" strokeWidth={2} name={t('failedLabel')} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
@@ -182,7 +182,7 @@ export default function AnalyticsPage() {
         <ChartCard title={t('successRateOverTime')} subtitle={t('successRateOverTime')}>
           <div className="h-80 flex items-center justify-center">
             {loading ? (
-              <div className="animate-pulse text-gray-400 dark:text-slate-500">{tc('loading')}</div>
+              <div className="animate-pulse text-gray-500 dark:text-slate-500">{tc('loading')}</div>
             ) : (
               <div className="relative">
                 <ResponsiveContainer width={220} height={220}>

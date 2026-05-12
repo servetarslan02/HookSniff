@@ -202,6 +202,7 @@ export default function SsoSettingsPage() {
               <input
                 id="sso-client-secret"
                 type="password"
+                autoComplete="off"
                 value={certificate}
                 onChange={(e) => setCertificate(e.target.value)}
                 placeholder="your-client-secret"

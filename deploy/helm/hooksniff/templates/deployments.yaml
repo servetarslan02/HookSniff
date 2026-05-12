@@ -25,19 +25,25 @@ spec:
             - containerPort: {{ .Values.api.port }}
           env:
             - name: DATABASE_URL
-              value: "postgresql://hooksniff:{{ .Values.postgresql.auth.postgresPassword }}@{{ .Release.Name }}-postgres:5432/{{ .Values.postgresql.auth.database }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
+                  key: DATABASE_URL
             - name: REDIS_URL
-              value: "redis://{{ .Release.Name }}-redis:6379"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
+                  key: REDIS_URL
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
-                  key: jwt-secret
+                  name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
+                  key: JWT_SECRET
             - name: HMAC_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
-                  key: hmac-secret
+                  name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
+                  key: HMAC_SECRET
           livenessProbe:
             httpGet:
               path: /health
@@ -78,14 +84,20 @@ spec:
           imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
           env:
             - name: DATABASE_URL
-              value: "postgresql://hooksniff:{{ .Values.postgresql.auth.postgresPassword }}@{{ .Release.Name }}-postgres:5432/{{ .Values.postgresql.auth.database }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
+                  key: DATABASE_URL
             - name: REDIS_URL
-              value: "redis://{{ .Release.Name }}-redis:6379"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
+                  key: REDIS_URL
             - name: HMAC_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
-                  key: hmac-secret
+                  name: {{ .Values.secretRef.name | default "hooksniff-secrets" }}
+                  key: HMAC_SECRET
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
 ---

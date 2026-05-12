@@ -148,6 +148,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     quickStart: `package main
 
 import (
+import type { Metadata } from 'next';
+
+// Revalidate every hour for ISR
+export const revalidate = 3600;
+
+
+export const metadata: Metadata = {
+  title: 'SDK Libraries',
+  description: 'Official SDK libraries for HookSniff in multiple languages',
+};
+
     "fmt"
     "os"
     hooksniff "github.com/servetarslan02/hooksniff-go"
@@ -354,7 +365,7 @@ export default function SdksPage() {
                 </span>
               </div>
               <code className="text-xs font-mono text-gray-600 dark:text-slate-400">{sdk.pkg}</code>
-              <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{sdk.registry}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{sdk.registry}</p>
             </div>
           ))}
         </div>

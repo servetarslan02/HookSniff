@@ -30,7 +30,7 @@ export default function TemplatesPage() {
   if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{tCommon('loading')}</div>;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
       <p className="text-gray-500 mb-6">
         {t('subtitle')}
@@ -38,7 +38,7 @@ export default function TemplatesPage() {
       {templates.length === 0 ? (
         <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <p className="text-gray-500 text-lg mb-2">{t('noTemplates')}</p>
-          <p className="text-gray-400 text-sm">{t('noTemplatesDesc')}</p>
+          <p className="text-gray-500 text-sm">{t('noTemplatesDesc')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

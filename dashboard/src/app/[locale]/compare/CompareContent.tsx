@@ -270,7 +270,7 @@ export default function CompareContent() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
+            <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
@@ -463,7 +463,7 @@ export default function CompareContent() {
                   className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                 >
                   <span className="font-medium text-gray-900 dark:text-white pr-4">{item.q}</span>
-                  <svg className={`w-5 h-5 text-gray-400 dark:text-slate-500 shrink-0 transition-transform ${expandedFaq === i ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  <svg className={`w-5 h-5 text-gray-500 dark:text-slate-500 shrink-0 transition-transform ${expandedFaq === i ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedFaq === i && (
                   <div className="px-6 pb-4"><p className="text-sm text-gray-600 dark:text-slate-400">{item.a}</p></div>
@@ -496,7 +496,7 @@ export default function CompareContent() {
         {/* CTA */}
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-2xl font-bold text-white mb-2">Ready to try HookSniff?</h2>
-          <p className="text-gray-400 dark:text-slate-400 mb-6">Start free. Scale when ready. No credit card required.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">Start free. Scale when ready. No credit card required.</p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
             <Link href="/pricing" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("viewPricing")}</Link>
