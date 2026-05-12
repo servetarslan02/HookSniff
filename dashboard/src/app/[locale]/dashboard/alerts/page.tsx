@@ -97,7 +97,7 @@ export default function AlertsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-gray-500 dark:text-slate-400 mt-1">
-            Get notified when webhooks fail or endpoints have issues.
+            {t('subtitle')}
           </p>
         </div>
         <button
@@ -188,7 +188,7 @@ export default function AlertsPage() {
           <div className="p-8 text-center text-gray-400 dark:text-slate-500">{tc('loading')}</div>
         ) : alerts.length === 0 ? (
           <div className="p-12 text-center text-gray-400 dark:text-slate-500">
-            No alert rules yet. Create one to get notified about webhook failures.
+            {t('empty')}
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
@@ -218,13 +218,13 @@ export default function AlertsPage() {
                     onClick={() => testAlert(alert.id)}
                     className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition"
                   >
-                    Test
+                    {t('test')}
                   </button>
                   <button
                     onClick={() => deleteAlert(alert.id)}
                     className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/30 rounded-lg transition"
                   >
-                    Delete
+                    {t('delete')}
                   </button>
                 </div>
               </div>

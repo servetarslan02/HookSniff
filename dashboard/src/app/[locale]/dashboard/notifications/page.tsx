@@ -16,12 +16,13 @@ const typeIcons: Record<string, string> = {
   billing: '💳',
 };
 
-const typeLabels: Record<string, string> = {
-  all: 'All',
-  webhook_failed: 'Webhook Failed',
-  alert: 'Alerts',
-  system: 'System',
-  billing: 'Billing',
+const TYPE_FILTER_KEYS: NotifType[] = ['all', 'webhook_failed', 'alert', 'system', 'billing'];
+const TYPE_I18N_MAP: Record<string, string> = {
+  all: 'all',
+  webhook_failed: 'webhookFailed',
+  alert: 'alerts',
+  system: 'system',
+  billing: 'billing',
 };
 
 export default function NotificationsPage() {
@@ -35,6 +36,7 @@ export default function NotificationsPage() {
   const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('all');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const t = useTranslations('notifications');
+  const tc = useTranslations('common');
   const perPage = 20;
 
   const fetchNotifications = useCallback(async () => {
@@ -113,27 +115,27 @@ export default function NotificationsPage() {
           onClick={handleMarkAllAsRead}
           className="px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
         >
-          Mark all as read
+          {t('markAllRead')}
         </button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex flex-wrap gap-2">
-          {(Object.keys(typeLabels) as NotifType[]).map((t) => (
+          {TYPE_FILTER_KEYS.map((notifType) => (
             <button
-              key={t}
+              key={notifType}
               onClick={() => {
-                setTypeFilter(t);
+                setTypeFilter(notifType);
                 setPage(1);
               }}
               className={`px-3 py-1.5 rounded-xl text-sm font-medium transition ${
-                typeFilter === t
+                typeFilter === notifType
                   ? 'bg-gray-900 dark:bg-brand-600 text-white'
                   : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
             >
-              {typeLabels[t]}
+              {t(TYPE_I18N_MAP[notifType] as any)}
             </button>
           ))}
         </div>
@@ -151,7 +153,7 @@ export default function NotificationsPage() {
                   : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
             >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
+              {f === 'all' ? t('all') : f === 'unread' ? t('unread') : t('read')}
             </button>
           ))}
         </div>
@@ -161,7 +163,7 @@ export default function NotificationsPage() {
       <div className="glass-card overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-gray-400 dark:text-slate-500 animate-pulse">
-            Loading notifications...
+            {t('loadingNotifications')}
           </div>
         ) : notifications.length === 0 ? (
           <div className="p-12 text-center">
@@ -209,14 +211,14 @@ export default function NotificationsPage() {
                           onClick={() => handleMarkAsRead(n.id)}
                           className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium transition"
                         >
-                          Mark read
+                          {t('markRead')}
                         </button>
                       )}
                       <button
                         onClick={() => handleDelete(n.id)}
                         className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
                       >
-                        Delete
+                        {tc('delete')}
                       </button>
                     </div>
                   </div>
@@ -228,7 +230,7 @@ export default function NotificationsPage() {
             {total > perPage && (
               <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-slate-400">
-                  Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
+                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <div className="flex gap-2">
                   <button
@@ -236,17 +238,17 @@ export default function NotificationsPage() {
                     disabled={page === 1}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
-                    Previous
+                    {tc('previous')}
                   </button>
                   <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">
-                    Page {page} of {totalPages}
+                    {tc('pageOf', { page, totalPages })}
                   </span>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
-                    Next
+                    {tc('next')}
                   </button>
                 </div>
               </div>
