@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useUsername } from '@/hooks/useUsername';
 import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations, useLocale } from 'next-intl';
@@ -282,6 +283,7 @@ function HowItWorks() {
 
 /* ─── Landing Page ─── */
 export function HomeContent() {
+  const username = useUsername();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const router = useRouter();
   const { token } = useAuth();
@@ -322,7 +324,7 @@ export function HomeContent() {
             <LanguageSwitcherBtn />
             <ThemeToggleBtn />
             {token ? (
-              <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow">
+              <Link href={`/${username}`} className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow">
                 {tNav('dashboard')}
               </Link>
             ) : (
@@ -355,7 +357,7 @@ export function HomeContent() {
               <LanguageSwitcherBtn />
               <ThemeToggleBtn />
             </div>
-            <Link href="/dashboard" onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
+            <Link href={`/${username}`} onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
               {token ? tNav('dashboard') : tNav('register')}
             </Link>
           </div>
@@ -380,7 +382,7 @@ export function HomeContent() {
               {tHero('subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
+              <Link href={`/${username}`} className="bg-gray-900 dark:bg-brand-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
                 {token ? tHero('ctaDashboard') : tHero('cta')}
               </Link>
               <Link href="/docs" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple">
@@ -484,7 +486,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
                   if (plan.name === tPricing('enterprise')) {
                     window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
                   } else if (token) {
-                    router.push('/dashboard/billing');
+                    router.push(`/${username}/billing`);
                   } else {
                     router.push('/register');
                   }

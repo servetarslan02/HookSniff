@@ -1,6 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -12,6 +13,7 @@ interface PublicNavbarProps {
 }
 
 export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
+  const username = useUsername();
   const { token } = useAuth();
   const tNav = useTranslations('landing.nav');
 
@@ -42,7 +44,7 @@ export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
           <LanguageSwitcher />
           <ThemeToggle />
           {token ? (
-            <Link href="/dashboard" className="bg-gray-900 dark:bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">
+            <Link href={`/${username}`} className="bg-gray-900 dark:bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">
               {tNav('dashboard')}
             </Link>
           ) : (

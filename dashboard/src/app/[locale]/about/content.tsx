@@ -1,6 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { useUsername } from '@/hooks/useUsername';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
@@ -8,6 +9,7 @@ import Footer from '@/components/Footer';
 
 
 export function AboutPageContent() {
+  const username = useUsername();
   const t = useTranslations();
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -98,7 +100,7 @@ export function AboutPageContent() {
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{t('about.readyToStart')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-6">{t('cta')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/dashboard" className="bg-brand-600 dark:bg-brand-500 text-white px-8 py-3 rounded-xl font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
+            <Link href={`/${username}`} className="bg-brand-600 dark:bg-brand-500 text-white px-8 py-3 rounded-xl font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
               {t('about.startFree')}
             </Link>
             <Link href="/contact" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-3 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition">
