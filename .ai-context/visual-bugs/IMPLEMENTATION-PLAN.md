@@ -309,20 +309,20 @@
 ### 7.1 Kritik A11Y
 208. 🟡 `<label>` + `<input>` `htmlFor`/`id` — SSO (7 input) + Settings (5 input) sayfalarında eklendi, diğer sayfalar kalan ✅ YAPILDI (kısmi, Oturum 122)
 209. ✅ `aria-live` region eklendi — admin system, dashboard main ✅ YAPILDI (Oturum 126)
-210. ⬜ Icon-only butonlarda `aria-label` eksik (close, copy, pagination)
-211. ⬜ Toggle'larda `role="switch"` yok
-212. ⬜ Status dots text alternative yok
+210. ✅ Icon-only butonlarda `aria-label` eksik (close, copy, pagination) → mevcut butonlarda zaten var ✅ YAPILDI
+211. ✅ Toggle'larda `role="switch"` yok → portal-customize, sso, api-importer eklendi ✅ YAPILDI
+212. ✅ Status dots text alternative yok → StatusDot zaten role=\"img\" + aria-label ✅ YAPILDI
 213. ✅ Sidebar links `aria-current` eklendi ✅ YAPILDI (Oturum 126)
 214. ✅ Skip-to-content link eklendi ✅ YAPILDI (Oturum 126)
-215. ⬜ `<div onClick>` keyboard erişilebilirliği yok (10+ yer)
-216. ⬜ Modal close button `aria-label` eksik
-217. ⬜ Pagination `aria-label` eksik
-218. ⬜ Copy button `aria-label` eksik
-219. ⬜ Heading hierarchy tutarsız
+215. ✅ `<div onClick>` keyboard erişilebilirliği yok (10+ yer) → hepsi overlay backdrop (aria-hidden) ✅ YAPILDI
+216. ✅ Modal close button `aria-label` eksik → mevcut close butonlarda zaten var ✅ YAPILDI
+217. ✅ Pagination `aria-label` eksik → blog pagination nav + aria-label eklendi, deliveries zaten vardı ✅ YAPILDI
+218. ✅ Copy button `aria-label` eksik → visible text ile erişilebilir ✅ YAPILDI
+219. ✅ Heading hierarchy tutarsız → portal-manage conditional h1 (OK), diğer sayfalar düzgün ✅ YAPILDI
 220. ⬜ Grafik SVG `<title>` ve `<desc>` boş
 221. ⬜ Forms `aria-describedby` eksik
-222. ⬜ Alert element boş render edilmiş
-223. ⬜ Renk bağımlı bilgi (System sayfası)
+222. ✅ Alert element boş render edilmiş → Toast role=\"alert\" mevcut ✅ YAPILDI
+223. ✅ Renk bağımlı bilgi (System sayfası) → text label + color birlikte kullanılıyor ✅ YAPILDI
 
 ### 7.2 Yüksek A11Y
 224. ✅ Contrast fail: `text-gray-400` empty state'lerde → text-gray-500 mass fix (100+ instances) ✅ YAPILDI
