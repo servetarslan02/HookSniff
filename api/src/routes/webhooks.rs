@@ -212,13 +212,25 @@ async fn create_webhook(
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
     // Atomic check-and-increment: reserve webhook slot before creating delivery
-    let updated: Option<Customer> = sqlx::query_as(
-        "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
-    )
-    .bind(customer.id)
-    .bind(customer.webhook_limit as i64)
-    .fetch_optional(&pool)
-    .await?;
+    // If allow_overage is true (never-blocked mode), always allow; otherwise block at limit
+    let updated: Option<Customer> = if customer.allow_overage {
+        // Never-blocked: always increment, no cap
+        sqlx::query_as(
+            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 RETURNING *",
+        )
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+    } else {
+        // Standard: block at limit
+        sqlx::query_as(
+            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
+        )
+        .bind(customer.id)
+        .bind(customer.webhook_limit as i64)
+        .fetch_optional(&pool)
+        .await?
+    };
 
     if updated.is_none() {
         return Err(AppError::RateLimitExceeded);
@@ -490,13 +502,22 @@ async fn replay_webhook(
         serde_json::to_string(&original.payload).map_err(|e| AppError::Internal(e.into()))?;
 
     // Atomic check-and-increment: reserve webhook slot before creating replay delivery
-    let updated: Option<Customer> = sqlx::query_as(
-        "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
-    )
-    .bind(customer.id)
-    .bind(customer.webhook_limit as i64)
-    .fetch_optional(&pool)
-    .await?;
+    let updated: Option<Customer> = if customer.allow_overage {
+        sqlx::query_as(
+            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 RETURNING *",
+        )
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+    } else {
+        sqlx::query_as(
+            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
+        )
+        .bind(customer.id)
+        .bind(customer.webhook_limit as i64)
+        .fetch_optional(&pool)
+        .await?
+    };
 
     if updated.is_none() {
         return Err(AppError::RateLimitExceeded);
@@ -618,14 +639,23 @@ async fn batch_replay(
             continue;
         };
 
-        // Rate limit check
-        let updated: Option<Customer> = sqlx::query_as(
-            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
-        )
-        .bind(customer.id)
-        .bind(customer.webhook_limit as i64)
-        .fetch_optional(&pool)
-        .await?;
+        // Rate limit check — never-blocked mode support
+        let updated: Option<Customer> = if customer.allow_overage {
+            sqlx::query_as(
+                "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 RETURNING *",
+            )
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+        } else {
+            sqlx::query_as(
+                "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
+            )
+            .bind(customer.id)
+            .bind(customer.webhook_limit as i64)
+            .fetch_optional(&pool)
+            .await?
+        };
 
         if updated.is_none() {
             errors.push(serde_json::json!({ "id": id, "error": "Rate limit exceeded" }));
