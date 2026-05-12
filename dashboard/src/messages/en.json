@@ -1423,6 +1423,43 @@
         "Dedicated support",
         "SLA guarantee",
         "Custom integrations"
+      ],
+      "enterpriseFeatures": [
+        "Unlimited everything",
+        "Custom SLA (99.99% uptime)",
+        "SSO / SAML",
+        "Dedicated account manager",
+        "Custom integrations",
+        "On-premise deployment",
+        "Priority support",
+        "Custom contracts"
+      ],
+      "developerFeatures": [
+        "100 events/day",
+        "1 application",
+        "5 endpoints",
+        "10 event types",
+        "10 subscriptions",
+        "7-day log retention",
+        "HMAC signatures",
+        "2FA support",
+        "Exponential backoff",
+        "Community support"
+      ],
+      "startupFeatures": [
+        "30,000 events/day",
+        "1 application",
+        "50 endpoints",
+        "50 event types",
+        "300 subscriptions",
+        "14-day log retention",
+        "Never-blocked mode",
+        "$0.003/event overage",
+        "CloudEvents v1.0",
+        "Secret rotation",
+        "Dead letter queue",
+        "Custom retry policies",
+        "Email support"
       ]
     },
     "footer": {
