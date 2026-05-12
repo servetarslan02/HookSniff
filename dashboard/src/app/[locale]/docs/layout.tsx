@@ -1,7 +1,6 @@
 'use client';
 
 import { Link, usePathname } from '@/i18n/navigation';
-import { useUsername } from '@/hooks/useUsername';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -18,7 +17,6 @@ interface NavGroup {
 }
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
-  const username = useUsername();
   const pathname = usePathname();
   const t = useTranslations('docs');
   const tNav = useTranslations('nav');

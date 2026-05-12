@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
@@ -83,7 +82,6 @@ function RoiCalculator() {
 /* ─── Main Page ─── */
 
 export function PricingPageContent() {
-  const username = useUsername();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const router = useRouter();

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { endpointsApi, type Endpoint } from '@/lib/api';
@@ -10,8 +9,6 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 
 export default function EndpointsPage() {
-  const params = useParams();
-  const username = (params?.username as string) || 'dashboard';
   const { token } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
