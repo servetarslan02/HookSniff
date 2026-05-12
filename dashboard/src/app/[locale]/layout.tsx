@@ -10,6 +10,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { CookieConsent } from '@/components/CookieConsent';
+import { routing } from '@/i18n/routing';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,7 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
 });
 
-const locales = ['en', 'tr'];
+const locales = routing.locales as unknown as string[];
 
 export async function generateMetadata({
   params,
@@ -73,7 +74,7 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://hooksniff.vercel.app/${locale}`,
       languages: Object.fromEntries(
-        ['en', 'tr'].map((l) => [
+        (locales as string[]).map((l) => [
           l,
           `https://hooksniff.vercel.app/${l}`,
         ])
