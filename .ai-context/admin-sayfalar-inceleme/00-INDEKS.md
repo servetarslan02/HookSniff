@@ -37,6 +37,12 @@
 | 28 | 💳 Faturalandırma | /dashboard/billing | ✅ İncelendi |
 | 29 | ⚙️ Ayarlar | /dashboard/settings | ✅ İncelendi |
 | 30 | ⚡ Yönetici Paneli | /admin (6 alt sayfa) | ✅ İncelendi |
+| 31 | 🚩 Feature Flags | /admin/feature-flags | 🔴 Eklenecek |
+| 32 | 💾 Backup Yönetimi | /admin/backups | 🔴 Eklenecek |
+| 33 | 📊 Uptime Monitoring | /admin/uptime | 🔴 Eklenecek |
+| 34 | 🧪 Webhook Test Konsolu | /admin/webhook-test | 🔴 Eklenecek |
+| 35 | 🔄 Bulk Replay | /admin/bulk-replay | 🔴 Eklenecek |
+| 36 | 📜 Sistem Log Viewer | /admin/system-logs | 🔴 Eklenecek |
 
 ## Ek Sayfalar (Sidebar'da yok)
 - /dashboard/deliveries/[id] — Teslimat detay
@@ -66,3 +72,15 @@
 - 🔴 Export (CSV/JSON) hiçbir sayfada yok
 - 🔴 Gerçek zamanlı güncelleme yok
 - 🔴 Gelişmiş filtreleme (tarih aralığı) eksik
+
+### Admin Paneli Eksiklikler (Sektör Karşılaştırma)
+- 🔴 MRR/ARR gösterimi (gelir sayfası)
+- 🔴 Feature flag yönetimi (yeni özellikleri açıp/kapatma)
+- 🔴 Backup yönetimi (manuel backup/restore)
+- 🔴 Log seviyesi ayarı (Debug/Info/Warn/Error)
+- 🔴 Bulk replay (toplu webhook tekrar gönderme)
+- 🔴 Sistem log viewer (raw log görüntüleyici)
+- 🔴 Webhook test konsolu (admin'den test gönderme)
+- 🔴 Uptime monitoring (SLA takibi)
+- 🔴 2FA zorunlu (admin kullanıcılar için)
+- 🔴 Session management (aktif oturum yönetimi)
