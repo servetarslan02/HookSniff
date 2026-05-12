@@ -73,11 +73,6 @@ await hs.webhooks.send({
       { label: 'SDKs available', value: '11' },
       { label: 'Free tier events', value: '1,000/mo' },
     ],
-    testimonial: {
-      quote: 'We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time.',
-      author: 'CTO',
-      company: 'SaaS Startup',
-    },
   },
   {
     id: 'ecommerce',
@@ -131,11 +126,6 @@ hs.webhooks.send(
       { label: 'Retry on failure', value: '5x / 24h' },
       { label: 'Multi-endpoint', value: '✅' },
     ],
-    testimonial: {
-      quote: 'The FIFO delivery feature is a game-changer for our order processing pipeline. Events arrive in order, every time.',
-      author: 'Lead Developer',
-      company: 'E-commerce Platform',
-    },
   },
   {
     id: 'fintech',
@@ -242,11 +232,6 @@ hs.webhooks.send(
       { label: 'CloudEvents', value: 'v1.0' },
       { label: 'Schema registry', value: '✅' },
     ],
-    testimonial: {
-      quote: 'HookSniff is the nervous system for our AI agent fleet. Events trigger actions in real-time.',
-      author: 'ML Engineer',
-      company: 'AI Startup',
-    },
   },
   {
     id: 'devtools',
