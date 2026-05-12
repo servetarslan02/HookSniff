@@ -218,7 +218,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               {user?.email || tc('user')}
             </div>
             <button
-              onClick={() => { logout(); router.push(`/${locale}/login`); }}
+              onClick={() => { logout(); router.push('/login'); }}
               className="text-sm text-gray-500 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition"
             >
               {t('logout')}
