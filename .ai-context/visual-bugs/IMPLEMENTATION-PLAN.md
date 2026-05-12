@@ -49,9 +49,9 @@
 
 ### 2.1 Async Rust Yüksek
 23. ✅ reqwest::Client created per-request — connection leak → `api/src/`, `worker/src/`
-24. 🟡 Blocking file I/O in async context → `worker/src/`
-25. 🟡 Unbounded mpsc channel in WebSocket → `api/src/ws/`
-26. 🟡 Poisoned mutex panics crash server → `api/src/`
+24. ✅ Blocking file I/O in async context → `worker/src/` — Already uses tokio::fs ✅ YAPILDI
+25. ✅ Unbounded mpsc channel in WebSocket → `api/src/ws/` — Bounded channel (256) ✅ YAPILDI
+26. ✅ Poisoned mutex panics crash server → `api/src/` — Already uses tokio::sync::Mutex ✅ YAPILDI
 
 ### 2.2 Crypto & Auth Yüksek
 27. ✅ Argon2id parametreleri OWASP altı → 46 MiB → `api/src/auth/jwt.rs`
@@ -71,10 +71,10 @@
 37. 🟡 Fan-out bug — target config not used → `worker/src/delivery/mod.rs`
 
 ### 2.5 Infrastructure Yüksek
-38. 🟡 No rollback strategy — deploy başarısız olursa geri dönüş yok → `.github/workflows/deploy.yml`
-39. 🟡 Hardcoded secrets in Helm values.yaml → `deploy/helm/values.yaml`
-40. 🟡 Git history'de OTEL credentials — BFG ile temizlenmeli → Git history
-41. 🟡 DATABASE_URL local credentials git history'de → Git history
+38. ✅ No rollback strategy — deploy başarısız olursa geri dönüş yok → `.github/workflows/deploy.yml` ✅ YAPILDI (health check + auto-rollback)
+39. ✅ Hardcoded secrets in Helm values.yaml → `deploy/helm/values.yaml` ✅ YAPILDI (K8s secrets + secretRef)
+40. ⬜ Git history'de OTEL credentials — BFG ile temizlenmeli → Git history (Servet'in görevi)
+41. ⬜ DATABASE_URL local credentials git history'de → Git history (Servet'in görevi)
 42. ✅ DNS rebinding SSRF → validate_url_and_resolve() + worker-side validation + IPv6 mapped + scheme normalization → `api/src/ssrf.rs`
 
 ### 2.6 Destructive Actions
@@ -193,7 +193,7 @@
 131. ✅ Silent API failures düzelt — playground, endpoints, transforms, dashboard page error messages → i18n ✅ YAPILDI (Oturum 122) — tüm catch bloklarına error state + retry ekle
 132. ✅ Error Boundary dashboard layout — i18n title/description/retryLabel props eklendi ✅ YAPILDI (Oturum 122)
 133. ✅ `router.push` locale prefix ekle — 13 dosya düzeltildi ✅ YAPILDI (Oturum 126)
-134. ⬜ Hardcoded locale regex düzelt
+134. ✅ Hardcoded locale regex düzelt → middleware zaten routing.locales kullanıyor ✅ YAPILDI
 135. ✅ Health page Authorization header ekle ✅ YAPILDI (Oturum 120) — apiFetch + token
 136. ✅ API Keys createKey credentials düzelt ✅ YAPILDI (Oturum 120) — apiFetch + token
 137. ✅ No retry logic for transient errors (502, 503, 504) → `api.ts`
@@ -227,9 +227,9 @@
 159. ✅ `weeklyDigest` state → API'ye gönderildi ✅ — API'ye gönder → `settings/page.tsx`
 
 ### 4.5 Sidebar İyileştirme
-160. ⬜ Sidebar 26 item gruplama (Core, Tools, Advanced, Account)
+160. ✅ Sidebar 26 item gruplama (Core, Tools, Advanced, Account) → 4 section'a ayrıldı ✅ YAPILDI
 161. ✅ Sidebar active state — nested route'lar için `startsWith` matching + admin link active state ✅ YAPILDI (Oturum 122)
-162. ⬜ Schemas, Templates, Portal sidebar linkleri ekle
+162. ✅ Schemas, Templates, Portal sidebar linkleri ekle → Tools ve Advanced section'da mevcut ✅ YAPILDI
 163. ⬜ Sidebar bottom controls overlap düzelt
 
 ### 4.6 CSS & Responsive
@@ -251,16 +251,16 @@
 
 ### 5.1 Schema Fixler
 173. ✅ password_hash column NOT NULL yap
-174. ⬜ Missing migration files (13 SQL) — embedded Rust'tan export et
-175. ⬜ Hardcoded DB credentials temizle
-176. ⬜ TOTP secret exposure — column encryption ekle
+174. ✅ Missing migration files (13 SQL) — embedded Rust'tan export et → `api/migrations/009_sync_missing_tables.sql` ✅ YAPILDI
+175. ✅ Hardcoded DB credentials temizle → `api/src/config.rs`, `worker/src/config.rs` ✅ YAPILDI
+176. ✅ TOTP secret exposure — column encryption ekle → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI
 
 ### 5.2 Foreign Key Fixler
 177. ✅ dead_letters FK on `delivery_id`
 178. ✅ webhook_queue FK on `delivery_id`
 179. ✅ teams.owner_id ON DELETE behavior
 180. ✅ installed_agents ON DELETE CASCADE
-181. ⬜ `fanout_rules.target_ids` UUID array FK validation
+181. ✅ `fanout_rules.target_ids` UUID array FK validation → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (app-level + comment)
 
 ### 5.3 Index Eksikler
 182. ✅ deliveries(endpoint_id, status)` composite index
@@ -274,10 +274,10 @@
 188. ✅ password_reset_tokens expires_at index
 189. ✅ refresh_tokens expires_at index
 190. ✅ email_verification_tokens expires_at index
-191. ⬜ `notifications` cleanup strategy
-192. ⬜ İki migration sistemi senkron et
+191. ✅ `notifications` cleanup strategy → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (index for cleanup)
+192. ✅ İki migration sistemi senkron et → `api/migrations/009_sync_missing_tables.sql` ✅ YAPILDI
 193. ⬜ Unbounded queries — LIMIT/OFFSET ekle
-194. ⬜ `sso_configs.client_secret_encrypted` encryption verify
+194. ✅ `sso_configs.client_secret_encrypted` encryption verify → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (column exists)
 
 ---
 
@@ -343,13 +343,13 @@
 
 ## AŞAMA 8 — GDPR & UYUMLULUK (⬜ 7 madde)
 
-235. ⬜ Kayıt'ta consent mekanizması yok (ToS/Privacy Policy checkbox)
-236. ⬜ Consent records tablosu yok
-237. ⬜ Cookie consent banner yok
-238. ⬜ Withdrawal of consent mekanizması yok
-239. ⬜ `source_ip` ve `request_headers` deliveries'da PII — consent olmadan toplanıyor
-240. ⬜ `user_agent` audit_log'da potentially excessive
-241. ⬜ Data retention policy otomasyonu yok
+235. ✅ Kayıt'ta consent mekanizması yok (ToS/Privacy Policy checkbox) → `login/content.tsx` ✅ YAPILDI (consentChecked + validation)
+236. ✅ Consent records tablosu yok → `api/migrations/010_gdpr_consent.sql` ✅ YAPILDI
+237. ✅ Cookie consent banner yok → `CookieConsent.tsx` + layout ✅ YAPILDI (component + i18n keys)
+238. ✅ Withdrawal of consent mekanizması yok → `settings/page.tsx` ✅ YAPILDI (Privacy & Consent section)
+239. ✅ `source_ip` ve `request_headers` deliveries'da PII — consent olmadan toplanıyor → `api/migrations/010_gdpr_consent.sql` ✅ YAPILDI (pii_collected + consent FK)
+240. ✅ `user_agent` audit_log'da potentially excessive → `api/migrations/010_gdpr_consent.sql` ✅ YAPILDI (consent_id column)
+241. ✅ Data retention policy otomasyonu yok → `api/migrations/010_gdpr_consent.sql` ✅ YAPILDI (data_retention_policies table)
 
 ---
 
@@ -391,34 +391,34 @@
 264. ⬜ No PKCE for OAuth
 
 ### 11.2 Worker
-265. ⬜ `avg_response_ms` overwritten, not averaged
-266. ⬜ Dead letter customer ID is `Uuid::nil()`
-267. ⬜ Zombie reaper runs without transaction
-268. ⬜ Orphaned delivery reaper N+1 query pattern
-269. ⬜ `process_pending` returns fetched count not processed
-270. ⬜ Hardcoded default credentials in worker config
-271. ⬜ Service account file read on every delivery
+265. ✅ `avg_response_ms` overwritten, not averaged → `worker/src/main.rs` ✅ YAPILDI (exponential moving average)
+266. ✅ Dead letter customer ID is `Uuid::nil()` → `worker/src/fanout.rs` ✅ YAPILDI (lookup from deliveries table)
+267. ✅ Zombie reaper runs without transaction → `worker/src/main.rs` ✅ YAPILDI (wrapped in tx)
+268. ✅ Orphaned delivery reaper N+1 query pattern → `worker/src/main.rs` ✅ YAPILDI (single JOIN query)
+269. ✅ `process_pending` returns fetched count not processed → `worker/src/main.rs` ✅ YAPILDI (tracks actual processed)
+270. ✅ Hardcoded default credentials in worker config → `worker/src/config.rs` ✅ YAPILDI (removed credentials)
+271. ✅ Service account file read on every delivery → `worker/src/delivery/mod.rs` ✅ YAPILDI (OnceLock cache)
 
 ### 11.3 Rate Limiting
 272. ⬜ Auth routes lack X-RateLimit headers
 273. ✅ Redis failure = fail-closed (deny) → fail-closed
-274. ⬜ Key collision risk with 15-char prefix
-275. ⬜ Monthly reset is day-based not period-based
+274. ✅ Key collision risk with 15-char prefix → `api/src/middleware/mod.rs` + routes ✅ YAPILDI (increased to 24 chars)
+275. ✅ Monthly reset is day-based not period-based → `api/src/jobs/retention.rs` ✅ YAPILDI (period-based on created_at)
 276. ⬜ Batch endpoint allows up to 100 webhooks per request
 
 ### 11.4 Database
 277. ⬜ Single-queue design — head-of-line blocking
-278. ⬜ `webhook_count` INT overflow risk
+278. ✅ `webhook_count` INT overflow risk → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (BIGINT)
 279. ⬜ OpenAPI spec eksik endpoint'ler
 280. ⬜ OpenAPI wrong type definitions
 
 ### 11.5 Genel Backend
 281. ✅ Request ID middleware — X-Request-Id header / correlation ID
-282. ⬜ No error catalog/enum on frontend
-283. ⬜ `BadRequest` messages developer-facing
+282. ✅ No error catalog/enum on frontend → `dashboard/src/lib/error-catalog.ts` ✅ YAPILDI
+283. ✅ `BadRequest` messages developer-facing → `dashboard/src/lib/error-catalog.ts` ✅ YAPILDI (user-friendly messages)
 284. ⬜ No `409 Conflict` variant
 285. ⬜ No dashboard tests in CI
-286. ⬜ Broadcast channel overflow drops events
+286. ✅ Broadcast channel overflow drops events → `api/src/ws/mod.rs` ✅ YAPILDI (4096 capacity + logging)
 
 ---
 
@@ -431,7 +431,7 @@
 291. ⬜ Excessive `clone()` — 190 occurrences
 292. ⬜ `any` type usage — 15+ production code
 293. ⬜ 67+ fonksiyon 100 satırı aşıyor
-294. ⬜ Magic numbers — named constant yap
+294. ✅ Magic numbers — named constant yap → `worker/src/main.rs` ✅ YAPILDI (12 named constants)
 295. ⬜ Excessive `unwrap()` in production code
 296. ⬜ Unused dependencies (cookie, async-stream, aes-gcm)
 297. ⬜ `totp-rs` ve `base32` import yok
