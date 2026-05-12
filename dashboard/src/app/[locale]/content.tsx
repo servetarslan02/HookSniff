@@ -338,10 +338,10 @@ export function HomeContent() {
 
   const isTr = locale === 'tr';
   const plans = [
-    { name: tPricing('developer'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('startup'), price: isTr ? '₺599' : '$29', period: tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('pro'), price: isTr ? '₺999' : '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
-    { name: tPricing('enterprise'), price: tPricing('customPricing'), period: '', features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+    { name: tPricing('developer'), desc: tPricing('developerDesc'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('startup'), desc: tPricing('startupDesc'), price: isTr ? '₺599' : '$29', period: tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('pro'), desc: tPricing('proDesc'), price: isTr ? '₺999' : '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
+    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: tPricing('customPricing'), period: '', features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
   ];
 
   return (
@@ -503,6 +503,9 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
                 </div>
               )}
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
+              {plan.desc && (
+                <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{plan.desc}</p>
+              )}
               <div className="mt-4 mb-6">
                 <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
                 <span className="text-gray-500 dark:text-slate-400">{plan.period}</span>
