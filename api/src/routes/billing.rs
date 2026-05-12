@@ -16,6 +16,52 @@ use crate::models::customer::Customer;
 /// Grace period in days after a failed payment before downgrade.
 const GRACE_PERIOD_DAYS: i64 = 7;
 
+/// Item 259: Allowed checkout URL domains for server-side validation.
+const ALLOWED_CHECKOUT_DOMAINS: &[&str] = &[
+    "checkout.stripe.com",
+    "polar.sh",
+    "sandbox-api.polar.sh",
+    "checkout.polar.sh",
+    "iyzico.com",
+    "sandbox-iyzico.com",
+    "secure.iyzipay.com",
+];
+
+/// Item 259: Validate a checkout URL server-side before returning it to the client.
+///
+/// Checks that the URL:
+/// - Is a valid HTTPS URL (or HTTP for localhost dev)
+/// - Matches an allowed payment provider domain
+fn validate_checkout_url(url: &str) -> Result<(), AppError> {
+    let parsed = url::Url::parse(url).map_err(|_| {
+        AppError::BadRequest("Invalid checkout URL format".into())
+    })?;
+
+    // Require HTTPS (except localhost for dev)
+    let host = parsed.host_str().unwrap_or("");
+    let is_localhost = host == "localhost" || host == "127.0.0.1" || host == "::1";
+    if parsed.scheme() != "https" && !is_localhost {
+        return Err(AppError::BadRequest(
+            "Checkout URL must use HTTPS".into(),
+        ));
+    }
+
+    // Validate domain matches a known payment provider
+    if !is_localhost {
+        let domain_allowed = ALLOWED_CHECKOUT_DOMAINS.iter().any(|domain| {
+            host == *domain || host.ends_with(&format!(".{}", domain))
+        });
+        if !domain_allowed {
+            tracing::warn!("Checkout URL domain not in allowlist: {}", host);
+            return Err(AppError::BadRequest(
+                "Checkout URL domain not allowed".into(),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
 pub fn router() -> Router {
     Router::new()
         .route(
@@ -48,6 +94,8 @@ struct SubscriptionResponse {
     retention_days: i64,
     monthly_price_cents: u64,
     monthly_price_kurus: i64,
+    /// Whether the subscription will cancel at the end of the current billing period.
+    cancel_at_period_end: bool,
 }
 
 async fn get_subscription(
@@ -55,9 +103,20 @@ async fn get_subscription(
 ) -> Result<Json<SubscriptionResponse>, AppError> {
     let plan = Plan::parse_str(&customer.plan);
 
+    // Item 247: Derive subscription status dynamically from actual customer state
+    let status = if customer.cancel_at_period_end {
+        "canceled".to_string()
+    } else if customer.payment_failed_at.is_some() {
+        "past_due".to_string()
+    } else if plan == Plan::Free {
+        "inactive".to_string()
+    } else {
+        "active".to_string()
+    };
+
     Ok(Json(SubscriptionResponse {
         plan: plan.as_str().to_string(),
-        status: "active".to_string(),
+        status,
         payment_provider: customer.payment_provider.clone(),
         stripe_subscription_id: customer.stripe_subscription_id.clone(),
         polar_subscription_id: customer.polar_subscription_id.clone(),
@@ -67,6 +126,7 @@ async fn get_subscription(
         retention_days: plan.retention_days(),
         monthly_price_cents: plan.monthly_price_cents(),
         monthly_price_kurus: plan.monthly_price_kurus(),
+        cancel_at_period_end: customer.cancel_at_period_end,
     }))
 }
 
@@ -252,6 +312,9 @@ async fn upgrade_plan(
                 .create_checkout(customer.id, &customer.email, &new_plan, base_url)
                 .await?;
 
+            // Item 259: Validate checkout URL server-side before returning to client
+            validate_checkout_url(&result.checkout_url)?;
+
             // Update customer's payment provider
             sqlx::query("UPDATE customers SET payment_provider = $1 WHERE id = $2")
                 .bind(&provider_name)
@@ -293,6 +356,11 @@ async fn upgrade_plan(
             let session =
                 stripe::create_checkout_session(&cfg, customer.id, &customer.email, &new_plan)
                     .await?;
+
+            // Item 259: Validate Stripe checkout URL server-side
+            if let Some(ref url) = session.url {
+                validate_checkout_url(url)?;
+            }
 
             let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
 
@@ -1064,12 +1132,14 @@ mod tests {
             retention_days: 30,
             monthly_price_cents: 4900,
             monthly_price_kurus: 0,
+            cancel_at_period_end: false,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["plan"], "pro");
         assert_eq!(json["status"], "active");
         assert_eq!(json["webhook_limit"], 50_000);
         assert_eq!(json["monthly_price_cents"], 4900);
+        assert_eq!(json["cancel_at_period_end"], false);
     }
 
     #[test]
@@ -1086,6 +1156,7 @@ mod tests {
             retention_days: 7,
             monthly_price_cents: 0,
             monthly_price_kurus: 0,
+            cancel_at_period_end: false,
         };
         let _debug = format!("{:?}", resp);
     }
@@ -1246,5 +1317,65 @@ mod tests {
     #[test]
     fn test_billing_router_construction() {
         let _router = router();
+    }
+
+    // ── Item 259: Checkout URL validation ──────────────────
+
+    #[test]
+    fn test_validate_checkout_url_stripe() {
+        assert!(validate_checkout_url("https://checkout.stripe.com/pay/cs_test_abc123").is_ok());
+    }
+
+    #[test]
+    fn test_validate_checkout_url_polar() {
+        assert!(validate_checkout_url("https://polar.sh/checkout/sess_001").is_ok());
+    }
+
+    #[test]
+    fn test_validate_checkout_url_iyzico() {
+        assert!(validate_checkout_url("https://secure.iyzipay.com/checkout/123").is_ok());
+    }
+
+    #[test]
+    fn test_validate_checkout_url_localhost() {
+        assert!(validate_checkout_url("http://localhost:3001/checkout").is_ok());
+    }
+
+    #[test]
+    fn test_validate_checkout_url_rejects_http() {
+        assert!(validate_checkout_url("http://checkout.stripe.com/pay/cs_test").is_err());
+    }
+
+    #[test]
+    fn test_validate_checkout_url_rejects_unknown_domain() {
+        assert!(validate_checkout_url("https://evil.example.com/steal").is_err());
+    }
+
+    #[test]
+    fn test_validate_checkout_url_rejects_invalid_url() {
+        assert!(validate_checkout_url("not-a-url").is_err());
+    }
+
+    // ── SubscriptionResponse with cancel_at_period_end ─────
+
+    #[test]
+    fn test_subscription_response_cancel_at_period_end_true() {
+        let resp = SubscriptionResponse {
+            plan: "pro".to_string(),
+            status: "canceled".to_string(),
+            payment_provider: "stripe".to_string(),
+            stripe_subscription_id: Some("sub_123".to_string()),
+            polar_subscription_id: None,
+            iyzico_subscription_id: None,
+            webhook_limit: 50_000,
+            endpoint_limit: 50,
+            retention_days: 30,
+            monthly_price_cents: 4900,
+            monthly_price_kurus: 0,
+            cancel_at_period_end: true,
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert_eq!(json["cancel_at_period_end"], true);
+        assert_eq!(json["status"], "canceled");
     }
 }

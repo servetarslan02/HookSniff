@@ -365,19 +365,19 @@
 
 ## AŞAMA 10 — PAYMENTS & BILLING (⬜ 13 madde)
 
-247. ⬜ Subscription status hardcoded to "active" → `billing.rs`
+247. ✅ Subscription status hardcoded to "active" → made dynamic based on cancel_at_period_end, payment_failed_at, and plan state
 248. ✅ Pricing page shows different limits than backend — comparison table fixed (Free: 1K→10K webhooks, 1→5 endpoints; Pro: 10→50 endpoints; Business: unlimited→500 endpoints) ✅ YAPILDI
 249. ⬜ Provider switching doesn't cancel old subscription
-250. ⬜ Polar.sh `create_customer_portal` is a stub
+250. ✅ Polar.sh `create_customer_portal` is a stub — already implemented with Polar API customer-sessions endpoint
 251. ⬜ No chargeback/refund handling
 252. ⬜ Admin revenue calculation is estimation only
 253. ✅ `webhook_count` uses i32 — overflow risk at 2.1B (TODO added in customer.rs with migration plan)
 254. ✅ No webhook failure alerting (TODO added in alerts.rs with implementation plan)
 255. ⬜ No annual billing option
 256. ⬜ Enterprise plan has no implementation
-257. ⬜ Missing `cancel_at_period_end` logic
+257. ✅ Missing `cancel_at_period_end` logic — added field to Customer model, migration 048, included in SubscriptionResponse
 258. ✅ Upgrade flow doesn't validate plan transition (added tier-based validation)
-259. ⬜ Checkout URL validation is client-side only
+259. ✅ Checkout URL validation is client-side only — added server-side validation with domain allowlist for Stripe, Polar, iyzico
 
 ---
 
