@@ -259,7 +259,7 @@ export default function BillingPage() {
             </div>
           </div>
           {currentPlan !== 'free' && (
-            <button
+            <button type="button"
               onClick={() => setShowCancelModal(true)}
               className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
             >
@@ -355,7 +355,7 @@ export default function BillingPage() {
                     {t('currentPlanLabel')}
                   </div>
                 ) : (
-                  <button
+                  <button type="button"
                     onClick={() => handleUpgrade(plan.key)}
                     className={clsx(
                       'w-full py-2.5 rounded-xl text-sm font-medium transition',
@@ -439,7 +439,7 @@ export default function BillingPage() {
       {/* Upgrade Confirmation Modal */}
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowUpgradeModal(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowUpgradeModal(null)} />
           <div ref={upgradeModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-none">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('upgradeTo', {
@@ -455,13 +455,13 @@ export default function BillingPage() {
                 : t('upgradeDesc')}
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <button type="button"
                 onClick={() => setShowUpgradeModal(null)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 Cancel
               </button>
-              <button
+              <button type="button"
                 onClick={confirmUpgrade}
                 disabled={upgrading}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"
@@ -476,20 +476,20 @@ export default function BillingPage() {
       {/* Cancel Subscription Modal */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCancelModal(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowCancelModal(false)} />
           <div ref={cancelModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-none">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('cancelTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
               {t('cancelDesc')}
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <button type="button"
                 onClick={() => setShowCancelModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {t('keepPlan')}
               </button>
-              <button
+              <button type="button"
                 onClick={handleCancel}
                 disabled={cancelling}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-60"

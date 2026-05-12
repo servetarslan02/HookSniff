@@ -11,6 +11,7 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
+    "pageOf": "Page {page} of {total}",
     "loading": "Loading...",
     "search": "Search",
     "filter": "Filter",

@@ -11,6 +11,7 @@
     "back": "Geri",
     "next": "İleri",
     "previous": "Önceki",
+    "pageOf": "Sayfa {page} / {total}",
     "loading": "Yükleniyor...",
     "search": "Ara",
     "filter": "Filtrele",

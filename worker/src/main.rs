@@ -14,6 +14,30 @@
 //!
 //! ## Basit, güvenilir, bakımı kolay.
 
+// Item 294: Named constants for magic numbers
+/// Maximum database connections in the pool
+const DB_MAX_CONNECTIONS: u32 = 10;
+/// Database connection acquisition timeout
+const DB_ACQUIRE_TIMEOUT_SECS: u64 = 30;
+/// HTTP client request timeout
+const HTTP_TIMEOUT_SECS: u64 = 30;
+/// Maximum idle connections per host in HTTP pool
+const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 10;
+/// Maximum concurrent HTTP deliveries
+const DELIVERY_CONCURRENCY_LIMIT: usize = 10;
+/// Circuit breaker: failures before opening
+const CIRCUIT_BREAKER_FAILURE_THRESHOLD: u32 = 5;
+/// Circuit breaker: cooldown period in seconds
+const CIRCUIT_BREAKER_COOLDOWN_SECS: u64 = 60;
+/// Zombie reaper check interval
+const ZOMBIE_REAPER_INTERVAL_SECS: u64 = 30;
+/// Queue poll batch size
+const QUEUE_BATCH_SIZE: i32 = 50;
+/// Response body truncation limit for storage
+const RESPONSE_BODY_TRUNCATE_BYTES: usize = 500;
+/// Grace period checker interval
+const GRACE_CHECK_INTERVAL_SECS: u64 = 6 * 3600;
+
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgListener, PgPoolOptions};
@@ -132,8 +156,8 @@ async fn main() -> Result<()> {
         .replace("?channel_binding=require", "");
     tracing::info!("   Database: {}", &db_url[..30.min(db_url.len())]);
     let pool = PgPoolOptions::new()
-        .max_connections(10)
-        .acquire_timeout(std::time::Duration::from_secs(30))
+        .max_connections(DB_MAX_CONNECTIONS)
+        .acquire_timeout(std::time::Duration::from_secs(DB_ACQUIRE_TIMEOUT_SECS))
         .connect(&db_url)
         .await
         .map_err(|e| {
@@ -144,21 +168,21 @@ async fn main() -> Result<()> {
 
     // HTTP client (shared, connection pooling)
     let http_client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(30))
-        .pool_max_idle_per_host(10)
+        .timeout(std::time::Duration::from_secs(HTTP_TIMEOUT_SECS))
+        .pool_max_idle_per_host(HTTP_POOL_MAX_IDLE_PER_HOST)
         .build()?;
 
     // Concurrent delivery limit — prevents DDoS on target servers
     // Max 10 HTTP deliveries at the same time
-    let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
+    let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(DELIVERY_CONCURRENCY_LIMIT));
 
     // HS-020: Circuit breaker — skip delivery for endpoints with consecutive failures
     // BUG-023: Persist state to Redis when REDIS_URL is set, survives restarts
     let circuit_breaker = if let Some(ref redis_url) = cfg.redis_url {
         circuit_breaker::CircuitBreaker::with_redis(
             circuit_breaker::CircuitBreakerConfig {
-                failure_threshold: 5,
-                cooldown_secs: 60,
+                failure_threshold: CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+                cooldown_secs: CIRCUIT_BREAKER_COOLDOWN_SECS,
             },
             redis_url,
         )
@@ -166,8 +190,8 @@ async fn main() -> Result<()> {
     } else {
         tracing::info!("⚡ Circuit breaker: no REDIS_URL, using in-memory only");
         circuit_breaker::CircuitBreaker::new(circuit_breaker::CircuitBreakerConfig {
-            failure_threshold: 5,
-            cooldown_secs: 60,
+            failure_threshold: CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+            cooldown_secs: CIRCUIT_BREAKER_COOLDOWN_SECS,
         })
     };
 
@@ -199,11 +223,11 @@ async fn main() -> Result<()> {
     tracing::info!("🔔 Listening on 'new_webhook' channel for instant wake-up");
 
     // Zombie reaper: recover stuck "processing" records every 30s
-    let mut reaper_interval = tokio::time::interval(std::time::Duration::from_secs(30));
+    let mut reaper_interval = tokio::time::interval(std::time::Duration::from_secs(ZOMBIE_REAPER_INTERVAL_SECS));
     reaper_interval.tick().await; // first tick completes immediately, skip it
 
     // HS-059: Grace period checker — runs every 6 hours
-    let mut grace_interval = tokio::time::interval(std::time::Duration::from_secs(6 * 3600));
+    let mut grace_interval = tokio::time::interval(std::time::Duration::from_secs(GRACE_CHECK_INTERVAL_SECS));
     grace_interval.tick().await; // skip first immediate tick
 
     // Main loop: poll PostgreSQL queue with NOTIFY-based wake-up
@@ -582,7 +606,7 @@ async fn process_pending(
                 None
             } else {
                 let body = response_body.as_str();
-                let truncated = if body.len() > 500 { &body[..500] } else { body };
+                let truncated = if body.len() > RESPONSE_BODY_TRUNCATE_BYTES { &body[..RESPONSE_BODY_TRUNCATE_BYTES] } else { body };
                 Some(truncated)
             };
             let attempt_headers = if is_network_error {
