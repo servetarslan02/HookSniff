@@ -553,3 +553,13 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Settings:** Başlık sadeleştirildi
 - **Build başarılı** ✅ — push edildi (commit 2ba777e)
 - **4 dosya değişti, 250 satır eklendi, 548 satır silindi**
+
+## Oturum 138 Ek 2 (2026-05-13 06:50 - 07:05 GMT+8) ✅
+- **Hook0 Application modeli** — Backend'de zaten varmış (`applications.rs`)
+- **Frontend Applications API** — `api.ts`'ya eklendi (list, get, create, update, delete)
+- **Applications sayfası** — Hook0 gibi tablo (İsim, ID, Endpoint sayısı, Eylemler)
+- **Application detay sayfası** — Endpoint'ler + Teslimatlar sekmeli görünüm
+- **Layout güncellendi** — 5 sekme: Dashboard, Applications, Service Tokens, Members, Settings
+- **Yeşil primary renk** — Hook0 gibi aktif sekme yeşil
+- **Organizasyon adı** — Header'da rozet olarak gösteriliyor
+- **Build başarılı** ✅ — push edildi (commit f722b7f)
