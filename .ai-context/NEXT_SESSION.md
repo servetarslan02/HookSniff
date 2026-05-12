@@ -38,19 +38,20 @@ Bu sayfalar çalışıyor ama eski style:
 - Grafana trial 20 Mayıs'ta bitiyor
 
 ## Bu Oturumda Yapılanlar (Oturum 139 — OpenClaw)
-- **Vercel build hatası düzeltildi** ✅
-  - Hata: `ENOENT: page_client-reference-manifest.js` — (dashboard)/page route group
-  - Sebep: Next.js 15 route group root page'leri için manifest dosyası üretmiyor → Vercel NFT crash
-  - Çözüm: `fix-manifests.js` post-build scripti — eksik manifest'leri otomatik oluşturur
-  - `vercel.json` buildCommand'e `&& node fix-manifests.js` eklendi
-  - `page.tsx` → server component, `DashboardOverview.tsx` → ayrı client component
-  - 3 iterasyon gerekti: server wrapper → dynamic import → post-build script
-  - Son commit: `b230769a`
-- **Vercel rate limit** ⚠️
-  - 14 açık dependabot PR'ı → her biri preview deploy → 100/gün limit aşıldı
-  - `dependabot.yml` PR limitleri: cargo 10→3, npm 10→3
-  - **Limit ~24 saat sonra sıfırlanır** — sonraki deploy otomatik başarılı olmalı
-- **Google 2FA ile Vercel'e giriş yapıldı** — browser OAuth
+- **Vercel build hatası düzeltildi** ✅ (4 deneme gerekti)
+  - Hata: `ENOENT: page_client-reference-manifest.js` — Next.js bilinen bug (vercel/next.js#53569)
+  - Route group `(dashboard)` root page'i bu dosyayı üretmiyor
+  - Deneme 1: Server component wrapper → çalışmadı (NFT hâlâ referans veriyor)
+  - Deneme 2: `fix-manifests.js` post-build script → çalışmadı (NFT script'ten önce çalışıyor)
+  - Deneme 3: `FixManifestPlugin` webpack plugin → çalışmadı (NFT webpack emit'ten sonra)
+  - **Deneme 4 (çözüm):** `(dashboard)/page.tsx` tamamen kaldırıldı ✅
+    - Dashboard artık `/applications`'tan başlıyor
+    - Layout tab'ları güncellendi (ilk tab: Applications)
+    - `next.config.js` temizlendi (plugin kaldırıldı)
+    - Local build: 0 eksik manifest, 214 sayfa, hatasız
+  - Son commit: `b8e5c81f`
+- **Vercel rate limit** ⚠️ — 100 deploy/gün aşılmış, ~24 saat sıfırlanma
+- **Google 2FA ile Vercel'e giriş yapıldı**
 
 ## Bu Oturumda Yapılanlar (Oturum 138)
 - Hook0 ekran görüntüleri analiz edildi (9 screenshot)
