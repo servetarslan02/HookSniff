@@ -809,7 +809,7 @@ func main() {
             {Object.entries(curlExamples).map(([key, code]) => (
               <div key={key} className="relative group">
                 <div className="flex items-center justify-between px-3 py-1.5 bg-gray-800 dark:bg-slate-700 rounded-t-lg">
-                  <span className="text-xs text-gray-400">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
+                  <span className="text-xs text-gray-400 dark:text-slate-500">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
                   <button
                     onClick={() => onCopy(code, `curl-${key}`)}
                     className="text-xs text-gray-400 hover:text-white transition-colors"
