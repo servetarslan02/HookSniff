@@ -2,40 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
+import type { PortalConfig } from './types';
+import { DEFAULT_CONFIG, FONT_OPTIONS } from './types';
+import { PortalPreview } from './components/PortalPreview';
+import { EmbedCodePanel } from './components/EmbedCodePanel';
 
-/* ─── Types ─── */
-interface PortalConfig {
-  primary_color: string;
-  logo_url: string;
-  company_name: string;
-  font_family: string;
-  dark_mode: boolean;
-  show_events: boolean;
-  show_deliveries: boolean;
-  allowed_events: string[];
-}
-
-const DEFAULT_CONFIG: PortalConfig = {
-  primary_color: '#6366f1',
-  logo_url: '',
-  company_name: '',
-  font_family: 'Inter',
-  dark_mode: false,
-  show_events: true,
-  show_deliveries: true,
-  allowed_events: [],
-};
-
-const FONT_OPTIONS = [
-  'Inter', 'Roboto', 'Open Sans', 'Lato', 'Poppins',
-  'Source Code Pro', 'JetBrains Mono', 'system-ui',
-];
-
-/* ─── Main Page ─── */
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');
   const { token } = useAuth();
@@ -103,17 +77,6 @@ export default function PortalCustomizationPage() {
   const removeEvent = (event: string) => {
     setConfig({ ...config, allowed_events: config.allowed_events.filter((e) => e !== event) });
   };
-
-  const fallbackEmbedCode = `<iframe
-  src="https://hooksniff.vercel.app/portal/embed/YOUR_PORTAL_ID"
-  width="100%"
-  height="600"
-  frameborder="0"
-  style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1);"
-/>`;
-
-  const displayEmbedCode = embedCode || fallbackEmbedCode;
-  const displayPortalUrl = portalUrl || 'https://hooksniff.vercel.app/portal/embed/YOUR_PORTAL_ID';
 
   if (loading) {
     return (
@@ -313,122 +276,8 @@ export default function PortalCustomizationPage() {
 
         {/* Preview Panel */}
         <div className="space-y-6">
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('preview')}</h2>
-            <div
-              className="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700"
-              style={{ fontFamily: config.font_family }}
-            >
-              {/* Preview Header */}
-              <div
-                className="px-6 py-4 flex items-center justify-between"
-                style={{ backgroundColor: config.primary_color }}
-              >
-                <div className="flex items-center gap-3">
-                  {config.logo_url ? (
-                    <Image src={config.logo_url} alt={t("logo")} width={32} height={32} className="w-8 h-8 rounded" />
-                  ) : (
-                    <span className="text-2xl">🪝</span>
-                  )}
-                  <span className="text-white font-semibold">
-                    {config.company_name || 'HookSniff'} {t('portalLabel')}
-                  </span>
-                </div>
-              </div>
-              {/* Preview Content */}
-              <div className={`p-6 ${config.dark_mode ? 'bg-slate-900 text-white' : 'bg-white text-gray-900'}`}>
-                <div className="space-y-4">
-                  <div className={`p-4 rounded-xl ${config.dark_mode ? 'bg-slate-800' : 'bg-gray-50'}`}>
-                    <div className="text-sm font-medium mb-2">{t('webhookEndpoints')}</div>
-                    <div className={`text-xs ${config.dark_mode ? 'text-slate-400' : 'text-gray-500'}`}>
-                      {t('endpointsConfigured', { count: 2 })}
-                    </div>
-                  </div>
-                  {config.show_events && (
-                    <div className={`p-4 rounded-xl ${config.dark_mode ? 'bg-slate-800' : 'bg-gray-50'}`}>
-                      <div className="text-sm font-medium mb-2">{t('eventSubscriptions')}</div>
-                      <div className="flex gap-2">
-                        <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: config.primary_color + '20', color: config.primary_color }}>
-                          order.created
-                        </span>
-                        <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: config.primary_color + '20', color: config.primary_color }}>
-                          payment.completed
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  {config.show_deliveries && (
-                    <div className={`p-4 rounded-xl ${config.dark_mode ? 'bg-slate-800' : 'bg-gray-50'}`}>
-                      <div className="text-sm font-medium mb-2">{t('recentDeliveries')}</div>
-                      <div className={`text-xs ${config.dark_mode ? 'text-slate-400' : 'text-gray-500'}`}>
-                        {t('deliveredFailed', { delivered: 47, failed: 3 })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Embed Code */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('embedCode')}</h2>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              {t('embedCodeDesc')}
-            </p>
-            {portalUrl && (
-              <div className="mb-4 p-3 bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-xl">
-                <div className="text-xs font-medium text-brand-700 dark:text-brand-300 mb-1">{t('portalUrl') || 'Portal URL'}</div>
-                <a href={displayPortalUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-mono text-brand-600 dark:text-brand-400 hover:underline break-all">
-                  {displayPortalUrl}
-                </a>
-              </div>
-            )}
-            <div className="relative">
-              <button type="button"
-                onClick={() => { navigator.clipboard.writeText(displayEmbedCode); toast(t('copied'), 'success'); }}
-                className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
-              >
-                {t('copy')}
-              </button>
-              <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-                <code>{displayEmbedCode}</code>
-              </pre>
-            </div>
-          </div>
-
-          {/* React Integration */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('reactIntegration')}</h2>
-            <div className="relative">
-              <button type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(`import { HookSniffPortal } from 'hooksniff-sdk/react';
-
-<HookSniffPortal
-  portalId="${portalUrl ? portalUrl.split('/').pop() : 'YOUR_PORTAL_ID'}"
-  primaryColor="${config.primary_color}"
-  darkMode={${config.dark_mode}}
-  companyName="${config.company_name || 'My App'}"
-/>`);
-                  toast(t('copied'), 'success');
-                }}
-                className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
-              >
-                {t('copy')}
-              </button>
-              <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto">
-                <code>{`import { HookSniffPortal } from 'hooksniff-sdk/react';
-
-<HookSniffPortal
-  portalId="${portalUrl ? portalUrl.split('/').pop() : 'YOUR_PORTAL_ID'}"
-  primaryColor="${config.primary_color}"
-  darkMode={${config.dark_mode}}
-  companyName="${config.company_name || 'My App'}"
-/>`}</code>
-              </pre>
-            </div>
-          </div>
+          <PortalPreview config={config} />
+          <EmbedCodePanel config={config} embedCode={embedCode} portalUrl={portalUrl} />
         </div>
       </div>
     </div>
