@@ -1213,9 +1213,9 @@
     "noActivity": "Henüz aktivite kaydı yok",
     "auditLog": "İşlem Geçmişi",
     "exportCSV": "CSV İndir",
-    "impersonateUser": "Taklit Et",
-    "viewAsUser": "Kullanıcı Gibi Gör",
-    "impersonating": "Taklit Ediliyor",
+    "impersonateUser": "Kullanıcı Görünümü",
+    "viewAsUser": "Kullanıcı olarak gör",
+    "impersonating": "Kullanıcı taklit ediliyor",
     "stopImpersonating": "Taklidi Durdur",
     "replayDelivery": "Tekrar Gönder",
     "replaySuccess": "Teslimat başarıyla tekrar gönderildi",
@@ -1242,7 +1242,7 @@
     "noAlerts": "Aktif alarm yok",
     "alertFiring": "Tetiklendi",
     "alertResolved": "Çözüldü",
-    "alertThresholds": "Alarm Eşikleri",
+    "alertThresholds": "🚨 Alert Eşikleri",
     "successRateThreshold": "Başarı Oranı Eşiği",
     "latencyThreshold": "Gecikme Eşiği",
     "queueDepthThreshold": "Kuyruk Derinliği Eşiği",
@@ -1270,7 +1270,13 @@
     "testSending": "Gönderiliyor...",
     "responseStatus": "Yanıt Durumu",
     "responseTime": "Yanıt Süresi",
-    "responseBody": "Yanıt Gövdesi"
+    "responseBody": "Yanıt Gövdesi",
+    "alertThresholdsDesc": "Metrikler limitleri aştığında otomatik alarmlar için eşik değerleri belirleyin",
+    "failedDeliveryThreshold": "Başarısız Teslimat Eşiği",
+    "below": "altında",
+    "above": "üstünde",
+    "messages": "mesaj",
+    "perHour": "/saat"
   },
   "landing": {
     "nav": {
