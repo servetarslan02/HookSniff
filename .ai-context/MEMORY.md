@@ -393,21 +393,32 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Content/SDK (353-359): 6 madde — içerik + SDK coverage
   - Servet görevleri (360-364): 5 madde — ⚠️ Servet'in yapması gereken
 
-## Oturum 130 (2026-05-12 20:45 - 21:20 GMT+8) ✅
-- **OpenClaw** — KALAN-ISLER.md admin panel eksikleri tamamlandı
-- **30 madde tamamlandı** (items 1-30):
-  - Revenue: plan fiyatları dinamik, MRR trend, tarih filtresi
-  - Overview: trend göstergeleri, aktif webhook sayısı
-  - Users: toplu işlem, ban sebebi, avatar, plan badge renkleri, tarih filtresi
-  - User Detail: teslimat detay modal, plan geçmişi, email gönderme
-  - System: DB boyutu, queue detayı, hata log'ları, alarm özeti
-  - Settings: plan fiyatları, email, webhook secret, rate limit, CORS, backup
-  - Layout: bildirim zili, hızlı arama, profil dropdown
-  - StatusBadge: "replayed" durumu
-- **Backend eklenen endpoint'ler:**
-  - GET /admin/users/:id/plan-history
-  - POST /admin/users/:id/send-email
-  - Health endpoint: DB boyutu, recent errors, queue detail
-- **Commits:** db89efb6, 5ccd1371 — main branch
-- **KALAN-ISLER.md güncellendi** — 97/105 tamamlandı
-- **Kalan 8 madde:** Gap Analysis (6) + Backend teknik borç (2)
+## Oturum 130 (2026-05-12 21:22-21:38 GMT+8) — 4 Paralel Agent
+**Durum:** ✅ Tamamlandı
+**4 Agent paralel çalıştı (~16 dakika):**
+
+### Agent 1 — Email İyileştirmeleri (Items 200, 201, 204, 205)
+- ✅ Item 200: Email template'leri Türkçe+İngilizce — Language enum (Tr/En), 6 shared template fonksiyonu
+- ✅ Item 201: Email retry — exponential backoff (max 3, 1s/2s/4s), sadece transient error'larda
+- ✅ Item 204: Fatura email template — send_invoice_email() eklendi
+- ✅ Item 205: Webhook başarı email — send_webhook_success_email() eklendi
+
+### Agent 2 — Billing İyileştirmeleri (Items 249, 252, 288)
+- ✅ Item 249: Provider switching eski aboneliği otomatik iptal
+- ✅ Item 252: Admin gelir hesaplama gerçek invoice verisi ile
+- ✅ Item 288: BillingService abstraction layer oluşturuldu
+
+### Agent 3 — Content Quality (Items 357, 358, 359)
+- ✅ Item 357: Blog fiyat hataları düzeltildi
+- ✅ Item 358: 8 alternatif sayfa — winner→bestFor, "Ne zaman seçmeli" bölümleri
+- ✅ Item 359: Testimonial illustratif senaryo disclaimer eklendi
+
+### Agent 4 — OpenAPI Spec (Items 279, 280)
+- ✅ Item 279: 13 eksik endpoint eklendi (11 admin + 2 OAuth), 16 yeni schema
+- ✅ Item 280: amount_cents format:int64, duplicate /routing/ paths kaldırıldı
+
+### Ek Düzeltmeler
+- ✅ Item 289: main.rs monolith doğrulandı (315 satır, 30+ modül, zaten modular)
+
+### Toplam: 12 madde tamamlandı (bu oturumda)
+### Genel İlerleme: 340/364 tamamlandı (%93) — 24 kalan ⬜ + 5 Servet görevi
