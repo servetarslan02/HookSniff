@@ -411,10 +411,10 @@ async fn change_plan(
     }
 
     // Set webhook limits based on plan
-    let limit = match req.plan.as_str() {
+    let limit: i64 = match req.plan.as_str() {
         "startup" => 30_000,
         "pro" => 100_000,
-        "enterprise" => u64::MAX,
+        "enterprise" => i64::MAX,
         _ => 10_000, // developer
     };
 
@@ -426,10 +426,10 @@ async fn change_plan(
             .await?;
 
     let should_reset = if let Some(ref old_plan) = current_plan {
-        let old_limit = match old_plan.0.as_str() {
+        let old_limit: i64 = match old_plan.0.as_str() {
             "startup" => 30_000,
             "pro" => 100_000,
-            "enterprise" => u64::MAX,
+            "enterprise" => i64::MAX,
             _ => 10_000,
         };
         limit > old_limit // Reset only on upgrade
