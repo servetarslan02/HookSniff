@@ -228,7 +228,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t("storyNotFound")}</h1>
-          <Link href="/customers" className="text-brand-600 dark:text-brand-400 hover:underline">← Back to customers</Link>
+          <Link href="/customers" className="text-brand-600 dark:text-brand-400 hover:underline">{t('backToList')}</Link>
         </div>
       </div>
     );

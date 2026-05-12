@@ -106,7 +106,8 @@
     "chartTopEndpoints": "Chart showing top endpoints by delivery volume",
     "chartLatencyDistribution": "Chart showing latency distribution",
     "loadingData": "Loading data...",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "invalidCheckoutUrl": "Invalid checkout URL"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -1870,7 +1871,9 @@
     "testimonial2Company": "E-commerce Platform",
     "testimonial3Quote": "Free tier that actually works for startups. We process 8K webhooks/month without paying a cent. Svix wanted $490.",
     "testimonial3Author": "Solo Founder",
-    "testimonial3Company": "Indie Hacker"
+    "testimonial3Company": "Indie Hacker",
+    "supportResponse48h": "< 48 hours",
+    "supportResponse24h": "< 24 hours"
   },
   "pricingFaq": [
     {
@@ -2438,7 +2441,13 @@
     "somethingWentWrong": "Something went wrong",
     "unexpectedError": "An unexpected error occurred. Please try again.",
     "tryAgain": "Try again",
-    "pleaseWait": "Please wait."
+    "pleaseWait": "Please wait.",
+    "oauthCancelled": "OAuth login was cancelled.",
+    "authFailed": "Authentication failed. Please try logging in again.",
+    "networkError": "Network error. Please try again.",
+    "backToLogin": "Back to Login",
+    "loggingIn": "Logging you in...",
+    "loginFailedMessage": "Login failed: {error}"
   },
   "blog": {
     "title": "Blog",
@@ -2509,7 +2518,8 @@
     "testimonial2Company": "E-commerce Platform",
     "testimonial3Quote": "Free tier that actually works for startups. We process 8K webhooks/month without paying a cent.",
     "testimonial3Author": "Solo Founder",
-    "testimonial3Company": "Indie Hacker"
+    "testimonial3Company": "Indie Hacker",
+    "backToList": "← Back to Blog"
   },
   "changelog": {
     "title": "Changelog",
@@ -2535,7 +2545,8 @@
     "areaDocs": "Docs",
     "networkError": "Network error — check your connection.",
     "subscribeSuccess": "Subscribed successfully!",
-    "emailPlaceholder": "your@email.com"
+    "emailPlaceholder": "your@email.com",
+    "backToList": "← Back to all changelogs"
   },
   "newsletter": {
     "title": "Newsletter",
@@ -2547,7 +2558,8 @@
     "whatSubscribersSay": "What subscribers say",
     "faq": "Frequently Asked Questions",
     "privacyMatters": "Your privacy matters",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "viewAllPosts": "View all posts →"
   },
   "compare": {
     "title": "Compare",
@@ -2589,7 +2601,8 @@
     "allStories": "All customer stories",
     "joinThousands": "Join thousands of developers",
     "talkToUs": "Talk to us",
-    "builtOn": "Built on trusted infrastructure"
+    "builtOn": "Built on trusted infrastructure",
+    "backToList": "← Back to customers"
   },
   "providers": {
     "title": "Providers",
