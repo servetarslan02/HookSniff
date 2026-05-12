@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 
 const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] as const;
@@ -254,6 +254,7 @@ function HistoryPanel({
   onClear: () => void;
 }) {
   const t = useTranslations('playground');
+  const locale = useLocale();
   if (history.length === 0) {
     return (
       <div className="glass-card p-6">
@@ -311,7 +312,7 @@ function HistoryPanel({
               </span>
             </div>
             <div className="text-[10px] text-gray-500 dark:text-slate-500 mt-1">
-              {new Date(req.timestamp).toLocaleString()} • {req.duration_ms}ms
+              {new Date(req.timestamp).toLocaleString(locale)} • {req.duration_ms}ms
             </div>
           </button>
         ))}
@@ -323,6 +324,7 @@ function HistoryPanel({
 // ─── Live Request Viewer ───
 function LiveRequestViewer() {
   const t = useTranslations('playground');
+  const locale = useLocale();
   const [liveDeliveries, setLiveDeliveries] = useState<
     Array<{ id: string; event: string; status: string; time: string }>
   >([]);
@@ -339,7 +341,7 @@ function LiveRequestViewer() {
           id: String(d.id).slice(0, 10),
           event: String(d.event || 'webhook'),
           status: String(d.status),
-          time: new Date(String(d.created_at)).toLocaleTimeString(),
+          time: new Date(String(d.created_at)).toLocaleTimeString(locale),
         }));
         setLiveDeliveries(recent);
       } catch {
