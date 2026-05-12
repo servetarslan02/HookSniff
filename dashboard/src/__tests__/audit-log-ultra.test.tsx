@@ -20,7 +20,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: AuditLogPage } = await import('@/app/[locale]/dashboard/audit-log/page');
+const { default: AuditLogPage } = await import('@/app/[locale]/[username]/audit-log/page');
 
 const MOCK_ENTRIES = [
   { id: 'a1', timestamp: '2024-06-01T10:00:00Z', actor: 'user_1', actor_email: 'admin@test.com', action: 'auth.login', resource_type: 'user', resource_id: 'user_1abc1234', details: 'Login from Chrome', ip_address: '192.168.1.1', user_agent: 'Chrome/120' },
@@ -274,7 +274,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
     vi.doMock('next-intl', () => ({ useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key }));
     vi.doMock('@/i18n/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/audit-log/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/audit-log/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });

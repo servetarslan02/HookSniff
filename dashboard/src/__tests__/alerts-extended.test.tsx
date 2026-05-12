@@ -51,7 +51,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
-const { default: AlertsPage } = await import('@/app/[locale]/dashboard/alerts/page');
+const { default: AlertsPage } = await import('@/app/[locale]/[username]/alerts/page');
 
 const mockAlerts = [
   { id: 'a1', name: 'High Failure Rate', condition: 'failure_rate', threshold: 10, channels: ['email', 'slack'], is_active: true },

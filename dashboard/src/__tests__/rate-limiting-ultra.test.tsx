@@ -20,7 +20,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: RateLimitingPage } = await import('@/app/[locale]/dashboard/rate-limiting/page');
+const { default: RateLimitingPage } = await import('@/app/[locale]/[username]/rate-limiting/page');
 
 const MOCK_RATE_LIMITS = [
   { endpoint_id: 'ep_001aaaabbbbccccdd', requests_per_second: 10, burst_size: 20, enabled: true },
@@ -402,7 +402,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({
       apiFetch: (...args: unknown[]) => mockApiFetch(...args),
     }));
-    const { default: Page } = await import('@/app/[locale]/dashboard/rate-limiting/page');
+    const { default: Page } = await import('@/app/[locale]/[username]/rate-limiting/page');
     await act(async () => {
       render(React.createElement(Page));
     });

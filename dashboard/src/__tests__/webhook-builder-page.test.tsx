@@ -49,7 +49,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-import WebhookBuilderPage from '@/app/[locale]/dashboard/webhook-builder/page';
+import WebhookBuilderPage from '@/app/[locale]/[username]/webhook-builder/page';
 
 describe('WebhookBuilderPage', () => {
   beforeEach(() => {

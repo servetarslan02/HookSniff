@@ -44,7 +44,7 @@ vi.mock('@/components/StatusBadge', () => ({
   StatusBadge: ({ status }: { status: string }) => React.createElement('span', null, status),
 }));
 
-const { default: LogsPage } = await import('@/app/[locale]/dashboard/logs/page');
+const { default: LogsPage } = await import('@/app/[locale]/[username]/logs/page');
 
 describe('LogsPage', () => {
   beforeEach(() => {

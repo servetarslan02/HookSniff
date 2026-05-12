@@ -46,7 +46,7 @@ const mockConfigs = [
   { id: 'cfg2', provider: 'github', endpoint_id: null, enabled: false, secret: 'ghsec_456', created_at: '2024-02-01' },
 ];
 
-const { default: InboundPage } = await import('@/app/[locale]/dashboard/inbound/page');
+const { default: InboundPage } = await import('@/app/[locale]/[username]/inbound/page');
 
 describe('InboundPage', () => {
   beforeEach(() => {

@@ -44,7 +44,7 @@ vi.mock('@/components/Toast', () => ({
   useToast: () => ({ toast: vi.fn() }),
 }));
 
-const { default: ApiKeysPage } = await import('@/app/[locale]/dashboard/api-keys/page');
+const { default: ApiKeysPage } = await import('@/app/[locale]/[username]/api-keys/page');
 
 const mockKeys = [
   {

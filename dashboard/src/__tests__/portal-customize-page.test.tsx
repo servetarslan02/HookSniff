@@ -29,7 +29,7 @@ vi.mock('next/image', () => ({
   default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => React.createElement('img', props),
 }));
 
-const { default: PortalCustomizationPage } = await import('@/app/[locale]/dashboard/portal-customize/page');
+const { default: PortalCustomizationPage } = await import('@/app/[locale]/[username]/portal-customize/page');
 
 describe('PortalCustomizationPage', () => {
   beforeEach(() => {

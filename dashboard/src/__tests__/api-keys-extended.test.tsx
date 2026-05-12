@@ -36,7 +36,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
-const { default: ApiKeysPage } = await import('@/app/[locale]/dashboard/api-keys/page');
+const { default: ApiKeysPage } = await import('@/app/[locale]/[username]/api-keys/page');
 
 const mockKeys = [
   { id: 'key1', name: 'Production', prefix: 'hk_live_abc', created_at: '2024-01-01T00:00:00Z', last_used_at: '2024-06-01T00:00:00Z', is_active: true },

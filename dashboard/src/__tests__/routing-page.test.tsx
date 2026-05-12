@@ -22,7 +22,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn().mockResolvedValue([]),
 }));
 
-const { default: RoutingPage } = await import('@/app/[locale]/dashboard/routing/page');
+const { default: RoutingPage } = await import('@/app/[locale]/[username]/routing/page');
 
 describe('RoutingPage', () => {
   beforeEach(() => {

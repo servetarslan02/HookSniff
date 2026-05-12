@@ -25,7 +25,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: CustomDomainPage } = await import('@/app/[locale]/dashboard/custom-domain/page');
+const { default: CustomDomainPage } = await import('@/app/[locale]/[username]/custom-domain/page');
 
 describe('CustomDomainPage - Ultra Coverage', () => {
   beforeEach(() => {

@@ -45,7 +45,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => React.createElement('div', null, 'LanguageSwitcher'),
 }));
 
-const { default: TransformsPage } = await import('@/app/[locale]/dashboard/transforms/page');
+const { default: TransformsPage } = await import('@/app/[locale]/[username]/transforms/page');
 
 describe('TransformsPage — Ultra Coverage', () => {
   beforeEach(() => {

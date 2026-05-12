@@ -24,7 +24,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: mockApiFetch,
 }));
 
-const { default: TemplatesPage } = await import('@/app/[locale]/dashboard/templates/page');
+const { default: TemplatesPage } = await import('@/app/[locale]/[username]/templates/page');
 
 describe('TemplatesPage', () => {
   beforeEach(() => {

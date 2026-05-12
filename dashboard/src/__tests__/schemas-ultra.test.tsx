@@ -20,7 +20,7 @@ vi.mock('@/lib/api', () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
 }));
 
-const { default: SchemasPage } = await import('@/app/[locale]/dashboard/schemas/page');
+const { default: SchemasPage } = await import('@/app/[locale]/[username]/schemas/page');
 
 const MOCK_SCHEMAS = [
   { id: 'sch_1', name: 'Order Schema', version: '1.0.0', created_at: '2024-01-15' },
@@ -144,7 +144,7 @@ describe('SchemasPage - Ultra Coverage', () => {
     vi.doMock('next-intl', () => ({ useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key }));
     vi.doMock('@/i18n/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
-    const { default: PageNoToken } = await import('@/app/[locale]/dashboard/schemas/page');
+    const { default: PageNoToken } = await import('@/app/[locale]/[username]/schemas/page');
     await act(async () => {
       render(React.createElement(PageNoToken));
     });
