@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 
 interface SearchResult {
@@ -28,7 +28,6 @@ interface SearchResponse {
 export default function SearchPage() {
   const { token } = useAuth();
   const router = useRouter();
-  const locale = useLocale();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);

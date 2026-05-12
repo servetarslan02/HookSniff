@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useRouter } from '@/i18n/navigation';
@@ -13,7 +13,6 @@ export function DangerZoneSection() {
   const { token, logout } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const locale = useLocale();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
