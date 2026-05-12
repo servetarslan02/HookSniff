@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse, type FeatureFlag, type DeployInfo } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 const PLAN_COLORS: Record<string, string> = {
   developer: '#94a3b8',
@@ -27,10 +27,15 @@ export default function AdminOverviewPage() {
   const [uptime7d, setUptime7d] = useState<number | null>(null);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [deployInfo, setDeployInfo] = useState<DeployInfo | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
+  const locale = useLocale();
 
   const fetchStats = useCallback(async () => {
     if (!token) return;
@@ -89,12 +94,32 @@ export default function AdminOverviewPage() {
       setError(t("failedToLoadStats"));
     } finally {
       setLoading(false);
+      setLastRefresh(new Date());
     }
-  }, [token]);
+  }, [token, t]);
 
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
+
+  // Auto-refresh polling (every 30 seconds)
+  useEffect(() => {
+    if (autoRefresh) {
+      refreshIntervalRef.current = setInterval(() => {
+        fetchStats();
+      }, 30000);
+    } else {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
+    }
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+      }
+    };
+  }, [autoRefresh, fetchStats]);
 
   if (loading) {
     return (
@@ -154,13 +179,83 @@ export default function AdminOverviewPage() {
   const replayCount = securityLogs.filter(l => l.action.toUpperCase().includes('REPLAY')).length;
   const totalSecurityWarnings = ssrfCount + spoofingCount + replayCount;
 
+  // Export dashboard data as CSV
+  const exportDashboard = useCallback(async () => {
+    if (!stats) return;
+    setExporting(true);
+    try {
+      const rows = [
+        ['Metric', 'Value'],
+        ['Total Users', stats.total_users.toString()],
+        ['Total Deliveries', stats.total_deliveries.toString()],
+        ['Total Revenue', stats.total_revenue.toFixed(2)],
+        ['Active Users Today', stats.active_users_today.toString()],
+        ['Total Endpoints', (stats.total_endpoints ?? 0).toString()],
+        ['Active Endpoints', (stats.active_endpoints ?? 0).toString()],
+        ['MRR', mrr.toFixed(2)],
+        ['ARR', arr.toFixed(2)],
+        ['Uptime 24h', uptime24h != null ? `${uptime24h.toFixed(2)}%` : 'N/A'],
+        ['Uptime 7d', uptime7d != null ? `${uptime7d.toFixed(2)}%` : 'N/A'],
+        ['', ''],
+        ['Users by Plan', 'Count'],
+        ...stats.users_by_plan.map(p => [p.plan, p.count.toString()]),
+        ['', ''],
+        ['Recent Signups', ''],
+        ...stats.recent_signups.map(u => [u.email, u.plan]),
+      ];
+      const csv = rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `hooksniff-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }, [stats, mrr, arr, uptime24h, uptime7d]);
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-          {t('overviewDesc')}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            {t('overviewDesc')}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Auto-refresh toggle */}
+          <button
+            type="button"
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+              autoRefresh
+                ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20'
+                : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700'
+            }`}
+            title={autoRefresh ? t('autoRefreshEnabled') : t('autoRefreshDisabled')}
+          >
+            <span className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
+            {t('autoRefresh')}
+          </button>
+          {/* Export button */}
+          <button
+            type="button"
+            onClick={exportDashboard}
+            disabled={exporting}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition disabled:opacity-50"
+          >
+            📥 {exporting ? t('exporting') : t('exportDashboard')}
+          </button>
+          {/* Last refresh time */}
+          {lastRefresh && (
+            <span className="text-[11px] text-gray-400 dark:text-slate-500">
+              {lastRefresh.toLocaleTimeString(locale === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ── Stats Cards ── */}
@@ -195,7 +290,7 @@ export default function AdminOverviewPage() {
         />
         <StatCard
           label={t('totalRevenue')}
-          value={`₺${(stats?.total_revenue || 0).toLocaleString()}`}
+          value={`${t('currencySymbol')}${(stats?.total_revenue || 0).toLocaleString()}`}
           icon={<span className="text-lg" aria-hidden="true">💰</span>}
           color="violet"
           trend={stats?.trends ? (() => {
@@ -231,7 +326,7 @@ export default function AdminOverviewPage() {
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('mrrCard')}</h2>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
-            ₺{mrr.toLocaleString()}
+            {t('currencySymbol')}{mrr.toLocaleString()}
           </p>
           {revenue?.mrr_trend != null && revenue.mrr_trend !== 0 && (
             <p className={`text-sm mt-1 ${revenue.mrr_trend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -245,7 +340,7 @@ export default function AdminOverviewPage() {
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('arrCard')}</h2>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
-            ₺{arr.toLocaleString()}
+            {t('currencySymbol')}{arr.toLocaleString()}
           </p>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
             MRR × 12
@@ -377,10 +472,10 @@ export default function AdminOverviewPage() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: 'rgb(15 23 42)',
+                        backgroundColor: 'var(--tooltip-bg, rgb(15 23 42))',
                         border: 'none',
                         borderRadius: '12px',
-                        color: 'white',
+                        color: 'var(--tooltip-color, white)',
                       }}
                     />
                   </PieChart>
@@ -446,7 +541,7 @@ export default function AdminOverviewPage() {
                       </p>
                     </div>
                     <span className="text-[11px] text-gray-500 dark:text-slate-400">
-                      {new Date(entry.created_at).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(entry.created_at).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 </div>
@@ -528,7 +623,7 @@ export default function AdminOverviewPage() {
               <span className="text-2xl" aria-hidden="true">💰</span>
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('revenue')}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400">MRR: ₺{mrr.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">MRR: {t('currencySymbol')}{mrr.toLocaleString()}</p>
               </div>
             </Link>
             <Link
@@ -668,12 +763,12 @@ export default function AdminOverviewPage() {
             <div>
               <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{t('totalRevenue')}</p>
               <div className="flex items-end gap-2">
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">₺{stats.total_revenue.toLocaleString()}</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{t('currencySymbol')}{stats.total_revenue.toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs text-gray-500 dark:text-slate-400">{t('vsYesterday')}:</span>
                 <span className={`text-xs font-medium ${stats.total_revenue >= stats.trends.revenue_yesterday ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {stats.total_revenue >= stats.trends.revenue_yesterday ? '+' : ''}₺{(stats.total_revenue - stats.trends.revenue_yesterday).toLocaleString()}
+                  {stats.total_revenue >= stats.trends.revenue_yesterday ? '+' : ''}{t('currencySymbol')}{(stats.total_revenue - stats.trends.revenue_yesterday).toLocaleString()}
                 </span>
               </div>
             </div>
