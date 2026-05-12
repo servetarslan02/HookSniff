@@ -222,7 +222,7 @@ export default function GetStartedPage() {
           <p className="mb-4">{t('step2Desc')}</p>
           <div className="bg-gray-900 rounded-xl p-4 font-mono text-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400">{t('yourApiKey')}</span>
+              <span className="text-gray-400 dark:text-slate-500">{t('yourApiKey')}</span>
               {user && (
                 <Link href="/dashboard/api-keys" className="text-brand-400 text-xs hover:text-brand-300">
                   {t('manageKeys')} →
