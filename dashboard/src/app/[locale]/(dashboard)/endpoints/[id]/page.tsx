@@ -30,7 +30,7 @@ export default function EndpointSettingsPage() {
       const ep = await endpointsApi.get(token, id);
       if (!ep) {
         toast(t('toastEndpointNotFound'), 'error');
-        router.push(`/${username}/endpoints`);
+        router.push(`/endpoints`);
         return;
       }
       setEndpoint(ep);
@@ -73,7 +73,7 @@ export default function EndpointSettingsPage() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <button type="button"
-          onClick={() => router.push(`/${username}/endpoints`)}
+          onClick={() => router.push(`/endpoints`)}
           className="p-2 -ml-2 text-gray-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

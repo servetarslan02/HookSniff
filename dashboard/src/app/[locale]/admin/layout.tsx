@@ -35,7 +35,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   // Admin auth guard
   useEffect(() => {
     if (user && !user.is_admin) {
-      router.push(`/${username}`);
+      router.push("/");
     }
   }, [user, router, locale]);
 
@@ -47,7 +47,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("accessDenied")}</h2>
           <p className="text-gray-500 dark:text-slate-400 mb-4">{t("noAdminPrivileges")}</p>
           <Link
-            href={`/${username}`}
+            href={"/"}
             className="inline-flex px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition"
           >
             {tc('backToDashboard')}
@@ -118,7 +118,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="border-t border-gray-200 dark:border-slate-700 mx-3 mt-2 pt-3">
           <Link
-            href={`/${username}`}
+            href={"/"}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
           >
             <span className="text-lg">←</span>
@@ -194,7 +194,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.email}</p>
                   <p className="text-xs text-gray-500 dark:text-slate-400">Admin</p>
                 </div>
-                <Link href={`/${username}`} className="block px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition">
+                <Link href={"/"} className="block px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition">
                   {tc('backToDashboard')}
                 </Link>
                 <button type="button"

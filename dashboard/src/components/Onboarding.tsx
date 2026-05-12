@@ -99,14 +99,14 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
       description: t('createEndpointDesc'),
       illustration: <EndpointIllustration />,
       cta: t('createEndpointCta'),
-      ctaAction: () => router.push(`/${username}/endpoints`),
+      ctaAction: () => router.push('/endpoints`),
     },
     {
       title: t('sendWebhook'),
       description: t('sendWebhookDesc'),
       illustration: <WebhookIllustration />,
       cta: t('sendWebhookCta'),
-      ctaAction: () => router.push(`/${username}/playground`),
+      ctaAction: () => router.push('/playground`),
     },
     {
       title: t('monitorDeliveries'),

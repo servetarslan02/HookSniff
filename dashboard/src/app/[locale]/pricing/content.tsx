@@ -283,7 +283,7 @@ export function PricingPageContent() {
                   if (plan.key === 'enterprise') {
                     window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
                   } else if (token) {
-                    router.push(`/${username}/billing`);
+                    router.push(`/billing`);
                   } else {
                     router.push('/register');
                   }
