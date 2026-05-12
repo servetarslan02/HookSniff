@@ -610,7 +610,7 @@ export default function StatusPage() {
           <Link href="/" className="flex items-center gap-3">
             <span className="text-xl">🪝</span>
             <span className="font-bold text-gray-900 dark:text-white">HookSniff</span>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </Link>
           <div className="flex items-center gap-3">
