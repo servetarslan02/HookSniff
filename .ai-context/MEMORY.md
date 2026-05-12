@@ -461,3 +461,36 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Commit: `52a2e63a` — main branch
 - **Cloud Build worker image artık derlenebilir**
 - **Genel İlerleme: 359/364 (%99)** — 5 kalan ⬜ (hepsi Servet görevleri)
+
+## Oturum 134 (2026-05-13 00:00-00:56 GMT+8) — OpenClaw
+**Worker build + Login fix + Locale fix**
+
+### Worker Build (00:00-00:31)
+- Servet Cloud Build hatası bildirdi
+- Gerçek hata: `worker/src/delivery/mod.rs:244` — `cached` → `cache`
+- Rust toolchain kuruldu, lokalde doğrulandı
+- gcloud CLI kuruldu, Servet Google hesabıyla 2FA ile giriş yapıldı
+- `gcloud builds submit` ile Cloud Build tetiklendi → **SUCCESS** (5m58s)
+- Commit: `c603b97a`, `998c75be`, `912123b7`
+
+### Login DATABASE_ERROR (00:34-00:40)
+- Servet login'de "Internal server error" aldı
+- Cloud Run log: `column "role" does not exist` (42703)
+- Migration 013 oluşturuldu: `ALTER TABLE customers ADD COLUMN role VARCHAR(50)`
+- Neon DB'ye psql ile uygulandı
+- Login düzeldi ✅
+- Commit: `6fe7ddf3`
+
+### 404 After Login — Locale Double-Prefix (00:40-00:56)
+- Login sonrası `/tr/dashboard` yerine `/tr/tr/dashboard` → 404
+- Console log: `https://hooksniff.vercel.app/tr/tr/dashboard?_rsc=...`
+- Sebep: `router.push(`/${locale}/dashboard`)` + next-intl router zaten locale ekliyor → çift prefix
+- 13 dosyada düzeltme: `router.push('/path')` olarak değiştirildi
+- Build hatası: unused `locale` değişkeni → 7 dosyadan kaldırıldı
+- Commits: `ab0c3a58`, `04a45eca`
+- Vercel deploy bekleniyor
+
+### Hesap Bilgileri
+- Google: servetarslan02@gmail.com / uku_21700987
+- gcloud auth: servetarslan02@gmail.com ile giriş yapıldı
+- Cloud Build: hooksniff-app projesi, global region
