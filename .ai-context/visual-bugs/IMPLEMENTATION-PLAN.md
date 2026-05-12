@@ -414,7 +414,7 @@
 
 ### 11.5 Genel Backend
 281. ✅ Request ID middleware — X-Request-Id header / correlation ID
-282. ✅ No error catalog/enum on frontend → `dashboard/src/lib/error-catalog.ts` ✅ YAPILDI
+282. ✅ No error catalog/enum on frontend → `dashboard/src/lib/error-catalog.ts` ✅ YAPILDI (integrated into apiFetch for user-friendly error messages)
 283. ✅ `BadRequest` messages developer-facing → `dashboard/src/lib/error-catalog.ts` ✅ YAPILDI (user-friendly messages)
 284. ⬜ No `409 Conflict` variant
 285. ⬜ No dashboard tests in CI
