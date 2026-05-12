@@ -563,3 +563,12 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Yeşil primary renk** — Hook0 gibi aktif sekme yeşil
 - **Organizasyon adı** — Header'da rozet olarak gösteriliyor
 - **Build başarılı** ✅ — push edildi (commit f722b7f)
+
+## Oturum 138 Ek 3 (2026-05-13 07:05 - 07:15 GMT+8) ✅
+- **Hook0-style tüm 5 sayfa tamamlandı**
+- **API Keys (Service Tokens):** Tablo (isim, prefix, oluşturulma, son kullanım) + boş durum + organizasyon ID referansı
+- **Team (Members):** Davet formu (email + rol) + üyeleri tablosu (avatar, isim, email, rol rozeti)
+- **Settings:** Kart tabanlı bölümler (Hook0 gibi) — organizasyon düzenle, şifre, bildirimler, kırmızı silme bölümü
+- **i18n:** applications bölümü eklendi (en + tr), nav.applications ve nav.serviceTokens anahtarları eklendi
+- **Build başarılı** ✅ — push edildi (commit d13ee49)
+- **5 dosya değişti, 403 satır eklendi, 197 satır silindi**
