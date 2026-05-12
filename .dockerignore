@@ -1,3 +1,6 @@
+# Item 347: This root .dockerignore covers all services (api, worker, dashboard)
+# since all Dockerfiles use the root as build context. No per-service
+# .dockerignore files are needed.
 .git
 .github
 target/

@@ -17,12 +17,12 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 # Shared crate
 hooksniff-common = { path = "../common" }
 
-# OpenTelemetry integration
-opentelemetry = "0.32"
-opentelemetry_sdk = { version = "0.32", features = ["rt-tokio"] }
+# OpenTelemetry integration — Item 299: use workspace versions where possible
+opentelemetry.workspace = true
+opentelemetry_sdk.workspace = true
 opentelemetry-otlp = { version = "0.32", features = ["http-proto", "reqwest"] }
 tonic = "0.14"
-tracing-opentelemetry = "0.32"
+tracing-opentelemetry.workspace = true
 
 axum = { version = "0.8", features = ["macros", "ws"] }
 tower = { version = "0.5", features = ["util"] }
