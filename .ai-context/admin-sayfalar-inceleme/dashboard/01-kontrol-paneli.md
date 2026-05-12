@@ -112,3 +112,13 @@
 - **Adımlar:**
   1. Tüm `<button` etiketlerine `type="button"` ekle (form submit butonları hariç)
   2. `aria-label` ekle (emoji-only butonlar için)
+
+### 🔴 Kod Kalitesi
+
+#### KK-01: EmptyState Bileşeni Kullanılmıyor
+- **Dosya:** `dashboard/src/components/EmptyState.tsx`
+- **Sorun:** Boş durum gösterimi için bileşen tanımlı ama hiçbir sayfa import etmiyor.
+- **Adımlar:**
+  1. Boş liste durumlarında `EmptyState` bileşenini kullan
+  2. Endpoints, alerts, transforms, schemas sayfalarına uygula
+  3. i18n key: `noDataYet`, `emptyStateTitle`, `emptyStateDesc`

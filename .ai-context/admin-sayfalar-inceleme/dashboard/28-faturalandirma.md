@@ -70,3 +70,19 @@
      ```
   2. "Faturalandırma Yönetimi" butonu ekle → portal URL'sine yönlendir
   3. i18n key: `manageBilling`, `openBillingPortal`
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-04: İade (Refund) İşlemi Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/billing/page.tsx`
+- **Backend:** `POST /v1/billing/refund` — iade işlemi
+- **Sorun:** api.ts'de tanımlı değil, UI'da buton yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     requestRefund: (token: string) =>
+       apiFetch<{ success: boolean }>('/billing/refund', { method: 'POST', token }),
+     ```
+  2. Fatura tablosuna "İade Talep Et" butonu ekle (son fatura için)
+  3. ConfirmDialog: "İade talep edilecek, onaylıyor musunuz?"
+  4. i18n key: `requestRefund`, `refundConfirm`, `refundRequested`
