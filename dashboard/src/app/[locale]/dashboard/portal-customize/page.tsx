@@ -216,8 +216,17 @@ export default function PortalCustomizationPage() {
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.dark_mode ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.dark_mode ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
+                    role="switch"
+<input
+                    aria-checked={config.dark_mode}
+<input
+                    role="switch"
+
+                    aria-checked={                    }
+
                     type="checkbox"
-                    checked={config.dark_mode}
+
+                    checked={                    }
                     onChange={(e) => setConfig({ ...config, dark_mode: e.target.checked })}
                     className="sr-only"
                   />
@@ -231,8 +240,17 @@ export default function PortalCustomizationPage() {
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.show_events ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_events ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
+                    role="switch"
+<input
+                    aria-checked={config.dark_mode}
+<input
+                    role="switch"
+
+                    aria-checked={                    }
+
                     type="checkbox"
-                    checked={config.show_events}
+
+                    checked={                    }
                     onChange={(e) => setConfig({ ...config, show_events: e.target.checked })}
                     className="sr-only"
                   />
@@ -246,8 +264,17 @@ export default function PortalCustomizationPage() {
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.show_deliveries ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_deliveries ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
+                    role="switch"
+<input
+                    aria-checked={config.dark_mode}
+<input
+                    role="switch"
+
+                    aria-checked={                    }
+
                     type="checkbox"
-                    checked={config.show_deliveries}
+
+                    checked={                    }
                     onChange={(e) => setConfig({ ...config, show_deliveries: e.target.checked })}
                     className="sr-only"
                   />
