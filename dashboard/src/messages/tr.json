@@ -1401,7 +1401,15 @@
     "widgetCustomization": "Widget Özelleştirme",
     "weekVsLastWeek": "Bu hafta vs geçen hafta",
     "drillDown": "Detaya İn",
-    "realTimeUpdates": "Gerçek Zamanlı Güncelleme"
+    "realTimeUpdates": "Gerçek Zamanlı Güncelleme",
+    "allSystemsOperational": "Tüm Sistemler Çalışıyor",
+    "basedOnHealthCheck": "Sağlık kontrolü endpoint'ine göre",
+    "serverUptime": "Son yeniden başlatmadan bu yana sünucu çalışma süresi",
+    "dedupWindowDefault": "60s",
+    "dedupActiveDesc": "Tekrarlayan eventler otomatik olarak filtreleniyor.",
+    "standardWebhooksActiveDesc": "Standard Webhooks standardı aktif. Tüm yeni webhook'lar standart formatı kullanıyor.",
+    "standardWebhooksInactiveDesc": "Standard Webhooks formatına geçmek için feature flag'i etkinleştirin (webhook- öneki, whsec_ anahtarları).",
+    "deployInfoUnavailable": "Deploy bilgisi mevcut değil — son bilinen gösteriliyor"
   },
   "landing": {
     "nav": {
