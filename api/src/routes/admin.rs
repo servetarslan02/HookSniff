@@ -1339,7 +1339,7 @@ async fn churn_report(
         ORDER BY updated_at DESC
         LIMIT 1000"#,
             pro = settings.plan_price_pro,
-            biz = settings.plan_price_enterprise,
+            biz = settings.plan_price_business,
         ),
     )
     .fetch_all(&pool)
@@ -1580,18 +1580,14 @@ async fn notify_sdk_update(
 #[serde(deny_unknown_fields)]
 pub struct PlatformSettings {
     pub default_plan: String,
-    #[serde(alias = "max_endpoints_free")]
-    pub max_endpoints_developer: i32,
+    pub max_endpoints_free: i32,
     pub max_endpoints_pro: i32,
-    #[serde(alias = "max_webhooks_free")]
-    pub max_webhooks_developer: i32,
+    pub max_webhooks_free: i32,
     pub max_webhooks_pro: i32,
-    #[serde(alias = "rate_limit_free")]
-    pub rate_limit_developer: i32,
+    pub rate_limit_free: i32,
     pub rate_limit_pro: i32,
     pub retry_max_attempts: i32,
-    #[serde(alias = "retention_days_free")]
-    pub retention_days_developer: i32,
+    pub retention_days_free: i32,
     pub retention_days_pro: i32,
     pub maintenance_mode: bool,
     pub signup_enabled: bool,
@@ -1599,8 +1595,8 @@ pub struct PlatformSettings {
     #[serde(default = "default_price_pro")]
     pub plan_price_pro: f64,
     /// Monthly price for Enterprise plan (e.g. 99.0)
-    #[serde(alias = "plan_price_business", default = "default_price_enterprise")]
-    pub plan_price_enterprise: f64,
+    #[serde(default = "default_price_business")]
+    pub plan_price_business: f64,
     /// Resend API key for sending emails
     #[serde(default)]
     pub resend_api_key: Option<String>,
@@ -1622,7 +1618,7 @@ pub struct PlatformSettings {
 }
 
 fn default_price_pro() -> f64 { 29.0 }
-fn default_price_enterprise() -> f64 { 99.0 }
+fn default_price_business() -> f64 { 99.0 }
 fn default_backup_retention() -> i32 { 30 }
 fn default_global_rate_limit() -> i32 { 1000 }
 
@@ -1630,19 +1626,19 @@ impl Default for PlatformSettings {
     fn default() -> Self {
         Self {
             default_plan: "developer".into(),
-            max_endpoints_developer: 5,
+            max_endpoints_free: 5,
             max_endpoints_pro: 50,
-            max_webhooks_developer: 1000,
+            max_webhooks_free: 1000,
             max_webhooks_pro: 50000,
-            rate_limit_developer: 100,
+            rate_limit_free: 100,
             rate_limit_pro: 1000,
             retry_max_attempts: 3,
-            retention_days_developer: 7,
+            retention_days_free: 7,
             retention_days_pro: 30,
             maintenance_mode: false,
             signup_enabled: true,
             plan_price_pro: 29.0,
-            plan_price_enterprise: 99.0,
+            plan_price_business: 99.0,
             resend_api_key: None,
             email_sender: None,
             webhook_secret: None,
