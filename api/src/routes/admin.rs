@@ -1215,6 +1215,7 @@ async fn user_analytics(
 // ─────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TestWebhookRequest {
     pub endpoint_url: String,
     pub event_type: Option<String>,
