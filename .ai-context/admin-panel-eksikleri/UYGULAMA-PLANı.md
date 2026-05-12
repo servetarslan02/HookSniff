@@ -214,7 +214,7 @@ OTURUM 3 ✅ TAMAMLANDI
 | 2 | `cargo test --lib` doğrulama | ✅ | 1019 test geçti, 0 hata |
 | 3 | `cargo clippy` doğrulama | ✅ | 0 uyarı |
 | 4 | `next build` doğrulama | ✅ | 214 sayfa, 6.6s |
-| 5 | Migration 009 Neon DB'ye uygula | 🔴 | `node run-migrations.js` çalıştırılacak |
+| 5 | ~~Migration 009 Neon DB'ye uygula~~ | ✅ | 46 migration zaten uygulanmış (Oturum 128 doğruladı) |
 | 6 | Pre-existing test hataları düzeltildi | ✅ | pagination_clamping + validate_email |
 
 ---
