@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 
 interface SearchResult {
@@ -28,6 +28,7 @@ interface SearchResponse {
 export default function SearchPage() {
   const { token } = useAuth();
   const router = useRouter();
+  const locale = useLocale();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);
@@ -155,7 +156,7 @@ export default function SearchPage() {
                 <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                   {results.deliveries.map((d) => (
                     <tr key={d.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer"
-                        onClick={() => router.push(`/dashboard/deliveries?id=${d.id}`)}>
+                        onClick={() => router.push(`/${locale}/dashboard/deliveries?id=${d.id}`)}>
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
                         {d.id.slice(0, 12)}…
                       </td>
