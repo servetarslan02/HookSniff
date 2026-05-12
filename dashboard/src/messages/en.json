@@ -1728,8 +1728,14 @@
       "Unlimited applications",
       "500 endpoints",
       "Unlimited event types",
+      "Unlimited subscriptions",
       "30-day log retention",
-      "FIFO delivery",
+      "$0.0001/event overage",
+      "FIFO ordered delivery",
+      "IP whitelisting",
+      "Analytics & graphs",
+      "Schema registry",
+      "Webhook playground",
       "Priority support"
     ],
     "businessFeatures": [
@@ -1887,12 +1893,14 @@
     "customPricing": "Custom",
     "contactUs": "Contact Us",
     "enterpriseFeatures": [
-      "Unlimited events",
       "Unlimited everything",
-      "Custom SLA",
+      "Custom SLA (99.99% uptime)",
       "SSO / SAML",
       "Dedicated account manager",
-      "Custom integrations"
+      "Custom integrations",
+      "Custom data retention",
+      "Dedicated infrastructure",
+      "On-call support"
     ],
     "developer": "Developer",
     "startup": "Startup",
@@ -1902,7 +1910,11 @@
       "1 application",
       "5 endpoints",
       "10 event types",
+      "10 subscriptions",
       "7-day log retention",
+      "HMAC signatures",
+      "2FA support",
+      "Exponential backoff",
       "Community support"
     ],
     "startupFeatures": [
@@ -1910,8 +1922,14 @@
       "1 application",
       "50 endpoints",
       "50 event types",
+      "300 subscriptions",
       "14-day log retention",
       "Never-blocked mode",
+      "$0.003/event overage",
+      "CloudEvents v1.0",
+      "Secret rotation",
+      "Dead letter queue",
+      "Custom retry policies",
       "Email support"
     ],
     "ctaDeveloper": "Start free",
