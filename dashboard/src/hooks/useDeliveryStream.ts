@@ -21,11 +21,14 @@ interface UseDeliveryStreamOptions {
 /**
  * Hook for real-time delivery updates via SSE.
  * Connects to GET /v1/stream/deliveries and listens for new deliveries.
+ * Uses SSE (Server-Sent Events) which handles reconnection automatically.
+ * For WebSocket connections, server-initiated ping would be needed (Item 333).
  */
 export function useDeliveryStream({ token, enabled = true, onDelivery }: UseDeliveryStreamOptions) {
   const [connected, setConnected] = useState(false);
   const [deliveries, setDeliveries] = useState<DeliveryEvent[]>([]);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onDeliveryRef = useRef(onDelivery);
 
   // Keep callback ref fresh
@@ -81,8 +84,12 @@ export function useDeliveryStream({ token, enabled = true, onDelivery }: UseDeli
           }
         }
       })
-      .catch(() => {
-        setConnected(false);
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          setConnected(false);
+          // Auto-reconnect after 5s (Item 333)
+          reconnectTimeoutRef.current = setTimeout(() => connect(), 5000);
+        }
       });
 
     eventSourceRef.current = null; // We're using fetch, not EventSource
@@ -93,6 +100,7 @@ export function useDeliveryStream({ token, enabled = true, onDelivery }: UseDeli
     const cleanup = connect();
     return () => {
       cleanup?.();
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       setConnected(false);
     };
   }, [connect]);
