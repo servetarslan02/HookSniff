@@ -642,7 +642,8 @@ async fn resend_verification(
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     Extension(email_provider): Extension<crate::email::EmailProvider>,
     headers: HeaderMap,
-    Json(req): Json<ResendVerificationRequest>,
+    // Body is optional — if not provided, email is extracted from auth cookie
+    body: Option<Json<ResendVerificationRequest>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Rate limit
     let client_ip = extract_client_ip(&headers);
@@ -654,10 +655,28 @@ async fn resend_verification(
         return Err(AppError::RateLimitExceeded);
     }
 
+    // Get email from body or from auth cookie (JWT token)
+    let email = if let Some(Json(req)) = body {
+        req.email
+    } else {
+        // Extract email from auth cookie
+        let token = headers
+            .get("cookie")
+            .and_then(|v| v.to_str().ok())
+            .and_then(|c| {
+                c.split(';')
+                    .find(|s| s.trim().starts_with("hooksniff_token="))
+                    .map(|s| s.trim().strip_prefix("hooksniff_token=").unwrap_or("").to_string())
+            })
+            .ok_or(AppError::Unauthorized)?;
+        let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
+        claims.email
+    };
+
     // Always return success to prevent enumeration
     let customer: Option<(Uuid, String, bool)> =
         sqlx::query_as("SELECT id, email, email_verified FROM customers WHERE email = $1")
-            .bind(&req.email)
+            .bind(&email)
             .fetch_optional(&pool)
             .await?;
 
