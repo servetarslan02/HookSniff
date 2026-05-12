@@ -286,12 +286,9 @@ export default function ApiSpecImporterPage() {
                 >
                   <input
                     role="switch"
-
-                    aria-checked={                    }
-
+                    aria-checked={ep.selected}
                     type="checkbox"
-
-                    checked={                    }
+                    checked={ep.selected}
                     onChange={() => toggleEndpoint(i)}
                     className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
                   />
