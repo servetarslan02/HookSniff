@@ -514,10 +514,11 @@ async fn revenue_by_month(
 ) -> Result<Json<RevenueResponse>, AppError> {
     require_admin(&customer)?;
 
-    // 1. Monthly revenue (last 12 months) — simplified, Neon-compatible
+    // 1. Monthly revenue (last 12 months) — Neon DB compatible
+    // Use integer generate_series instead of date-based to avoid Neon compatibility issues
     let monthly_revenue = sqlx::query_as::<_, RevenueRow>(
         r#"SELECT
-            TO_CHAR(month_series, 'YYYY-MM') as month,
+            TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
             COALESCE(
                 (SELECT SUM(
                     CASE plan
@@ -528,15 +529,11 @@ async fn revenue_by_month(
                 )
                 FROM customers
                 WHERE is_active = TRUE
-                  AND created_at < month_series + INTERVAL '1 month'),
+                  AND created_at <= DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
                 0.0
             ) as revenue
-        FROM generate_series(
-            DATE_TRUNC('month', NOW() - INTERVAL '11 months'),
-            DATE_TRUNC('month', NOW()),
-            INTERVAL '1 month'
-        ) as month_series
-        ORDER BY month_series"#,
+        FROM generate_series(0, 11) as n
+        ORDER BY month"#,
     )
     .fetch_all(&pool)
     .await?;
@@ -764,7 +761,7 @@ async fn export_revenue_csv(
 
     let all_rows = sqlx::query_as::<_, RevenueRow>(
         r#"SELECT
-            TO_CHAR(month_series, 'YYYY-MM') as month,
+            TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
             COALESCE(
                 (SELECT SUM(
                     CASE plan
@@ -775,15 +772,11 @@ async fn export_revenue_csv(
                 )
                 FROM customers
                 WHERE is_active = TRUE
-                  AND created_at < month_series + INTERVAL '1 month'),
+                  AND created_at <= DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
                 0.0
             ) as revenue
-        FROM generate_series(
-            DATE_TRUNC('month', NOW() - INTERVAL '11 months'),
-            DATE_TRUNC('month', NOW()),
-            INTERVAL '1 month'
-        ) as month_series
-        ORDER BY month_series"#,
+        FROM generate_series(0, 11) as n
+        ORDER BY month"#,
     )
     .fetch_all(&pool)
     .await?;
@@ -903,6 +896,7 @@ pub struct DailyDeliveryCount {
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct EventTypeCount {
+    #[serde(rename = "event")]
     pub event_type: Option<String>,
     pub count: i64,
 }
@@ -914,11 +908,14 @@ pub struct EndpointHealth {
     pub total: i64,
     pub success: i64,
     pub failed: i64,
+    pub success_rate: f64,
+    pub avg_latency_ms: f64,
 }
 
 #[derive(Debug, Serialize)]
 pub struct UserAnalytics {
     pub daily_deliveries: Vec<DailyDeliveryCount>,
+    #[serde(rename = "top_events")]
     pub top_event_types: Vec<EventTypeCount>,
     pub endpoint_health: Vec<EndpointHealth>,
 }
@@ -976,10 +973,16 @@ async fn user_analytics(
             e.url,
             COUNT(d.id) as total,
             COUNT(d.id) FILTER (WHERE d.status = 'delivered') as success,
-            COUNT(d.id) FILTER (WHERE d.status = 'failed') as failed
+            COUNT(d.id) FILTER (WHERE d.status = 'failed') as failed,
+            CASE WHEN COUNT(d.id) > 0
+                THEN ROUND(COUNT(d.id) FILTER (WHERE d.status = 'delivered')::numeric / COUNT(d.id) * 100, 1)
+                ELSE 0.0
+            END as success_rate,
+            COALESCE(ROUND(AVG(da.duration_ms)::numeric, 0), 0.0) as avg_latency_ms
         FROM endpoints e
         LEFT JOIN deliveries d ON d.endpoint_id = e.id
           AND d.created_at >= NOW() - INTERVAL '1 day' * $2::int
+        LEFT JOIN delivery_attempts da ON da.delivery_id = d.id
         WHERE e.customer_id = $1
         GROUP BY e.id, e.url
         ORDER BY total DESC"#,
@@ -1080,6 +1083,7 @@ async fn test_webhook(
 pub struct ChurnedUser {
     pub id: Uuid,
     pub email: String,
+    pub name: Option<String>,
     pub plan: String,
     pub amount: f64,
     pub churn_date: DateTime<Utc>,
@@ -1096,6 +1100,7 @@ async fn churn_report(
         r#"SELECT
             id,
             email,
+            name,
             plan,
             CASE plan
                 WHEN 'pro' THEN 29.0
@@ -1111,7 +1116,7 @@ async fn churn_report(
     .fetch_all(&pool)
     .await?;
 
-    Ok(Json(churned))
+    Ok(Json(serde_json::json!({ "users": churned })))
 }
 
 // ─────────────────────────────────────────────────────────
@@ -1817,7 +1822,7 @@ mod tests {
         };
         let json = serde_json::to_value(&analytics).unwrap();
         assert!(json.get("daily_deliveries").is_some());
-        assert!(json.get("top_event_types").is_some());
+        assert!(json.get("top_events").is_some());
         assert!(json.get("endpoint_health").is_some());
     }
 
