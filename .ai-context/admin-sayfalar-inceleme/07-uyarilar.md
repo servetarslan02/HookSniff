@@ -78,6 +78,11 @@
 - **PagerDuty/OpsGenie entegrasyonu** — Enterprise alert kanalları
 - **Alert history** — Geçmiş alert olaylarının kaydı
 - **Escalation policy** — Alert yükseltme politikası
+- **Microsoft Teams entegrasyonu** — Teams kanallarına bildirim (Hookdeck ✅)
+- **Discord entegrasyonu** — Discord kanallarına bildirim
+- **Endpoint disable alert** — Endpoint devre dışı kalınca otomatik bildirim (Svix ✅)
+- **SSRF/Spoofing alert** — Güvenlik olaylarında otomatik alert
+- **Quick filter** — Alert listesinde tek tıkla filtre (Hookdeck ✅)
 - Alert düzenleme (update) endpoint'i
 - Alert pause/resume toggle
 - Alert tetiklenme geçmişi/log'u
