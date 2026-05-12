@@ -121,6 +121,47 @@ export default function AdminOverviewPage() {
     };
   }, [autoRefresh, fetchStats]);
 
+  // MRR/ARR calculation (needed by exportDashboard callback)
+  const mrr = revenue?.mrr || 0;
+  const arr = mrr * 12;
+
+  // Export dashboard data as CSV
+  const exportDashboard = useCallback(async () => {
+    if (!stats) return;
+    setExporting(true);
+    try {
+      const rows = [
+        ['Metric', 'Value'],
+        ['Total Users', stats.total_users.toString()],
+        ['Total Deliveries', stats.total_deliveries.toString()],
+        ['Total Revenue', stats.total_revenue.toFixed(2)],
+        ['Active Users Today', stats.active_users_today.toString()],
+        ['Total Endpoints', (stats.total_endpoints ?? 0).toString()],
+        ['Active Endpoints', (stats.active_endpoints ?? 0).toString()],
+        ['MRR', mrr.toFixed(2)],
+        ['ARR', arr.toFixed(2)],
+        ['Uptime 24h', uptime24h != null ? `${uptime24h.toFixed(2)}%` : 'N/A'],
+        ['Uptime 7d', uptime7d != null ? `${uptime7d.toFixed(2)}%` : 'N/A'],
+        ['', ''],
+        ['Users by Plan', 'Count'],
+        ...stats.users_by_plan.map(p => [p.plan, p.count.toString()]),
+        ['', ''],
+        ['Recent Signups', ''],
+        ...stats.recent_signups.map(u => [u.email, u.plan]),
+      ];
+      const csv = rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `hooksniff-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }, [stats, mrr, arr, uptime24h, uptime7d]);
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -164,10 +205,6 @@ export default function AdminOverviewPage() {
     value: item.count,
   })) || [];
 
-  // MRR/ARR calculation
-  const mrr = revenue?.mrr || 0;
-  const arr = mrr * 12;
-
   // Endpoint stats (from admin stats — properly typed)
   const totalEndpoints = stats?.total_endpoints;
   const activeEndpoints = stats?.active_endpoints;
@@ -178,43 +215,6 @@ export default function AdminOverviewPage() {
   const spoofingCount = securityLogs.filter(l => l.action.toUpperCase().includes('SPOOF')).length;
   const replayCount = securityLogs.filter(l => l.action.toUpperCase().includes('REPLAY')).length;
   const totalSecurityWarnings = ssrfCount + spoofingCount + replayCount;
-
-  // Export dashboard data as CSV
-  const exportDashboard = useCallback(async () => {
-    if (!stats) return;
-    setExporting(true);
-    try {
-      const rows = [
-        ['Metric', 'Value'],
-        ['Total Users', stats.total_users.toString()],
-        ['Total Deliveries', stats.total_deliveries.toString()],
-        ['Total Revenue', stats.total_revenue.toFixed(2)],
-        ['Active Users Today', stats.active_users_today.toString()],
-        ['Total Endpoints', (stats.total_endpoints ?? 0).toString()],
-        ['Active Endpoints', (stats.active_endpoints ?? 0).toString()],
-        ['MRR', mrr.toFixed(2)],
-        ['ARR', arr.toFixed(2)],
-        ['Uptime 24h', uptime24h != null ? `${uptime24h.toFixed(2)}%` : 'N/A'],
-        ['Uptime 7d', uptime7d != null ? `${uptime7d.toFixed(2)}%` : 'N/A'],
-        ['', ''],
-        ['Users by Plan', 'Count'],
-        ...stats.users_by_plan.map(p => [p.plan, p.count.toString()]),
-        ['', ''],
-        ['Recent Signups', ''],
-        ...stats.recent_signups.map(u => [u.email, u.plan]),
-      ];
-      const csv = rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `hooksniff-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } finally {
-      setExporting(false);
-    }
-  }, [stats, mrr, arr, uptime24h, uptime7d]);
 
   return (
     <div className="space-y-8">
