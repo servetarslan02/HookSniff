@@ -885,7 +885,20 @@
     "systemStatus": "System Status",
     "overallUptime": "Overall Uptime",
     "scheduledMaintenance": "Scheduled Maintenance",
-    "docs": "Docs"
+    "docs": "Docs",
+    "lastChecked": "Last checked {time}",
+    "refresh": "Refresh",
+    "allOperational": "All Systems Operational",
+    "someDegraded": "Some Systems Degraded",
+    "majorOutage": "Major Outage Detected",
+    "realTimeMonitoring": "Real-time monitoring of all HookSniff services",
+    "showingCachedData": "(showing cached data)",
+    "uptimeLast90Days": "Uptime — Last 90 Days",
+    "subscribeToUpdates": "Subscribe to updates",
+    "poweredBy": "Powered by HookSniff monitoring • Data refreshes every 30 seconds",
+    "affects": "Affects: {components}",
+    "resolvedAt": "Resolved {time}",
+    "portUrl": "Portal URL"
   },
   "terms": {
     "title": "Terms of Service",
@@ -1298,7 +1311,10 @@
     "below": "below",
     "above": "above",
     "messages": "messages",
-    "perHour": "/hour"
+    "perHour": "/hour",
+    "fast": "Fast",
+    "moderate": "Moderate",
+    "slow": "Slow"
   },
   "landing": {
     "nav": {

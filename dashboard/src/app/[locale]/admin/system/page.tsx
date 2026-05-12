@@ -286,7 +286,7 @@ export default function AdminSystemPage() {
                   </div>
                   <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mt-1">
                     <span>0ms</span>
-                    <span>{service.latency}ms</span>
+                    <span>{service.latency}ms ({service.latency < 50 ? t('fast') : service.latency < 200 ? t('moderate') : t('slow')})</span>
                     <span>500ms</span>
                   </div>
                 </div>
