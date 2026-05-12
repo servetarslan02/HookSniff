@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-12 17:59 GMT+8
+> Son güncelleme: 2026-05-12 19:32 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -315,3 +315,27 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - ✅ churn_report return type düzeltildi (Json<Vec> → Json<Value>)
 - ✅ ChurnedUser test'inde name field eklendi
 - **Commit:** 02d166a4 — main branch
+
+## Oturum 128 (2026-05-12 19:15 - 19:32 GMT+8) ✅
+- **OpenClaw** — Servet ile Alert Thresholds backend bağlantısı
+- **Backend: admin.rs'ye alert CRUD eklendi:**
+  - `GET /v1/admin/alerts` — Admin'in alert kurallarını listeler
+  - `POST /v1/admin/alerts` — Yeni alert kuralı oluşturur
+  - `PUT /v1/admin/alerts/{id}` — Alert kuralını günceller
+  - `DELETE /v1/admin/alerts/{id}` — Alert kuralını siler
+  - Tüm endpoint'ler admin müşteri ID'si ile filtrelenmiş
+- **Backend: alerts.rs'ye update endpoint eklendi:**
+  - `PUT /v1/alerts/{id}` — Kullanıcının kendi alert kurallarını güncellemesi
+- **Frontend: Settings sayfası tamamen bağlandı:**
+  - Sayfa açılınca `GET /v1/admin/alerts` ile mevcut kuralları çekiyor
+  - "🚨 Save Alert Settings" butonu → POST/PUT ile alert_rules CRUD
+  - Controlled inputs (defaultValue → state)
+  - Email/Slack/Webhook checkbox'ları gerçek state'e bağlı
+- **i18n: 4 yeni key eklendi (EN + TR):**
+  - alertSettingsSaved, alertSettingsFailed, activeAlertRules, saveAlertSettings
+- **Admin Panel Eksikleri: TAMAMLANDI** ✅
+  - Oturum 1: stats/revenue API fix, audit log, replay, export ✅
+  - Oturum 2: audit log sayfası, impersonate, alert thresholds frontend ✅
+  - Oturum 3: müşteri grafikleri, webhook test, churn analizi ✅
+  - Oturum 128: alert thresholds backend bağlantısı ✅
+- **Commit:** 8184e787 — main branch (5 dosya, +529 -37)
