@@ -1,5 +1,5 @@
 use axum::extract::Extension;
-use axum::routing::{get, post};
+use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -11,7 +11,7 @@ use crate::models::customer::Customer;
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_alerts).post(create_alert))
-        .route("/{id}", get(get_alert).delete(delete_alert))
+        .route("/{id}", get(get_alert).put(update_alert).delete(delete_alert))
         .route("/{id}/test", post(test_alert))
 }
 
@@ -126,6 +126,100 @@ async fn create_alert(
         condition: alert.2,
         threshold: alert.3,
         channels: req.channels,
+        is_active: alert.5,
+        created_at: alert.6.to_rfc3339(),
+    }))
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct UpdateAlertRequest {
+    name: Option<String>,
+    condition: Option<String>,
+    threshold: Option<i32>,
+    channels: Option<Vec<String>>,
+    is_active: Option<bool>,
+}
+
+async fn update_alert(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    axum::extract::Path(id): axum::extract::Path<Uuid>,
+    Json(req): Json<UpdateAlertRequest>,
+) -> Result<Json<AlertRule>, AppError> {
+    // Verify ownership
+    let existing: (Uuid,) =
+        sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
+
+    // Validate condition if provided
+    if let Some(ref cond) = req.condition {
+        let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
+        if !valid_conditions.contains(&cond.as_str()) {
+            return Err(AppError::BadRequest("Invalid alert condition".into()));
+        }
+    }
+
+    // Validate threshold if provided
+    if let Some(thresh) = req.threshold {
+        if thresh <= 0 {
+            return Err(AppError::BadRequest(
+                "Threshold must be a positive integer".into(),
+            ));
+        }
+    }
+
+    // Validate channels if provided
+    if let Some(ref channels) = req.channels {
+        let valid_channels = ["slack", "email", "webhook"];
+        for ch in channels {
+            if !valid_channels.contains(&ch.as_str()) {
+                return Err(AppError::BadRequest("Invalid notification channel".into()));
+            }
+        }
+    }
+
+    let alert = sqlx::query_as::<_, (Uuid, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
+        "UPDATE alert_rules SET
+            name = COALESCE($1, name),
+            condition = COALESCE($2, condition),
+            threshold = COALESCE($3, threshold),
+            channels = COALESCE($4, channels),
+            is_active = COALESCE($5, is_active),
+            updated_at = NOW()
+         WHERE id = $6 AND customer_id = $7
+         RETURNING id, name, condition, threshold, channels, is_active, created_at"
+    )
+    .bind(req.name.as_deref())
+    .bind(req.condition.as_deref())
+    .bind(req.threshold)
+    .bind(req.channels.as_ref().map(|c| serde_json::json!(c)))
+    .bind(req.is_active)
+    .bind(id)
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let channels: Vec<String> = alert
+        .4
+        .as_array()
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+
+    Ok(Json(AlertRule {
+        id: alert.0,
+        name: alert.1,
+        condition: alert.2,
+        threshold: alert.3,
+        channels,
         is_active: alert.5,
         created_at: alert.6.to_rfc3339(),
     }))
