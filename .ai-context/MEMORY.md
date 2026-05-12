@@ -392,3 +392,22 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Code Quality (288-289): 2 madde — KISMİ (TODO eklendi)
   - Content/SDK (353-359): 6 madde — içerik + SDK coverage
   - Servet görevleri (360-364): 5 madde — ⚠️ Servet'in yapması gereken
+
+## Oturum 130 (2026-05-12 20:45 - 21:20 GMT+8) ✅
+- **OpenClaw** — KALAN-ISLER.md admin panel eksikleri tamamlandı
+- **30 madde tamamlandı** (items 1-30):
+  - Revenue: plan fiyatları dinamik, MRR trend, tarih filtresi
+  - Overview: trend göstergeleri, aktif webhook sayısı
+  - Users: toplu işlem, ban sebebi, avatar, plan badge renkleri, tarih filtresi
+  - User Detail: teslimat detay modal, plan geçmişi, email gönderme
+  - System: DB boyutu, queue detayı, hata log'ları, alarm özeti
+  - Settings: plan fiyatları, email, webhook secret, rate limit, CORS, backup
+  - Layout: bildirim zili, hızlı arama, profil dropdown
+  - StatusBadge: "replayed" durumu
+- **Backend eklenen endpoint'ler:**
+  - GET /admin/users/:id/plan-history
+  - POST /admin/users/:id/send-email
+  - Health endpoint: DB boyutu, recent errors, queue detail
+- **Commits:** db89efb6, 5ccd1371 — main branch
+- **KALAN-ISLER.md güncellendi** — 97/105 tamamlandı
+- **Kalan 8 madde:** Gap Analysis (6) + Backend teknik borç (2)
