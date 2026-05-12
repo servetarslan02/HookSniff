@@ -33,7 +33,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   // Admin auth guard
   useEffect(() => {
     if (user && !user.is_admin) {
-      router.push(`/${locale}/dashboard`);
+      router.push('/dashboard');
     }
   }, [user, router, locale]);
 
@@ -160,7 +160,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 placeholder={t('quickSearch') || 'Search...'}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                    router.push(`/${locale}/admin/users?search=${encodeURIComponent(e.currentTarget.value.trim())}`);
+                    router.push(`/admin/users?search=${encodeURIComponent(e.currentTarget.value.trim())}`);
                   }
                 }}
                 className="w-48 px-3 py-1.5 pl-9 text-sm border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
@@ -196,7 +196,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                   {tc('backToDashboard')}
                 </Link>
                 <button type="button"
-                  onClick={() => { logout(); router.push(`/${locale}/login`); }}
+                  onClick={() => { logout(); router.push('/login'); }}
                   className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
                 >
                   {tc('logout')}

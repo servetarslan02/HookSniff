@@ -155,7 +155,7 @@ export default function AdminUserDetailPage() {
         <div className="text-6xl mb-4">😕</div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("userNotFound")}</h2>
         <button type="button"
-          onClick={() => router.push(`/${locale}/admin/users`)}
+          onClick={() => router.push('/admin/users')}
           className="text-brand-600 dark:text-brand-400 text-sm font-medium"
         >
           {t("backToUsers")}
@@ -169,7 +169,7 @@ export default function AdminUserDetailPage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <button type="button"
-          onClick={() => router.push(`/${locale}/admin/users`)}
+          onClick={() => router.push('/admin/users')}
           className="text-gray-500 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-400 transition"
         >
           {tc("back")}
