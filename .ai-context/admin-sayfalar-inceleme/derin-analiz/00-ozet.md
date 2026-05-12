@@ -66,3 +66,24 @@ derin-analiz/
 ├── 06-guvenlik-aciklari.md       ← Güvenlik açıkları
 └── 07-cozum-plani.md             ← Öncelikli çözüm planı
 ```
+
+---
+
+## 🔬 İKİNCİ DERİN ANALİZ (2026-05-13)
+
+`08-ikinci-derin-analiz.md` dosyasında belgelendi:
+
+| # | Kategori | Sayı | Öncelik |
+|---|----------|------|---------|
+| 1 | useEffect cleanup eksik (memory leak) | 5 bileşen | 🔴 KRİTİK |
+| 2 | Mounted/abort kontrolü eksik (race condition) | 17 sayfa | 🔴 KRİTİK |
+| 3 | Pagination eksik list sayfaları | 10 sayfa | 🟡 YÜKSEK |
+| 4 | aria-label eksik butonlar | 140 buton | 🟡 YÜKSEK |
+| 5 | type="button" eksik butonlar | 67 buton | 🟡 YÜKSEK |
+| 6 | Kullanılmayan bileşen (EmptyState) | 1 | 🟢 ORTA |
+| 7 | any/unknown type kullanımı | 27 | 🟢 ORTA |
+| 8 | console.log production'da | 1 | 🟢 ORTA |
+| 9 | Playground hardcoded API URL | 20+ | 🟡 YÜKSEK |
+| 10 | useDeliveryStream kullanılmıyor | 1 hook | 🟢 ORTA |
+
+**Toplam uyumsuzluk sayısı: 37 + 10 = 47**
