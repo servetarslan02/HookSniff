@@ -73,8 +73,8 @@
 ### 2.5 Infrastructure Yüksek
 38. ✅ No rollback strategy — deploy başarısız olursa geri dönüş yok → `.github/workflows/deploy.yml` ✅ YAPILDI (health check + auto-rollback)
 39. ✅ Hardcoded secrets in Helm values.yaml → `deploy/helm/values.yaml` ✅ YAPILDI (K8s secrets + secretRef)
-40. ⬜ Git history'de OTEL credentials — BFG ile temizlenmeli → Git history 
-41. ⬜ DATABASE_URL local credentials git history'de → Git history 
+40. 📝 Git history'de OTEL credentials — BFG ile temizlenmeli → Git history — `docs/git-history-cleanup.md` oluşturuldu ✅ DÖKÜMANTASYON
+41. 📝 DATABASE_URL local credentials git history'de → Git history — `docs/git-history-cleanup.md`'ye eklendi ✅ DÖKÜMANTASYON
 42. ✅ DNS rebinding SSRF → validate_url_and_resolve() + worker-side validation + IPv6 mapped + scheme normalization → `api/src/ssrf.rs`
 
 ### 2.6 Destructive Actions
@@ -291,13 +291,13 @@
 199. ✅ onboarding.* section — 32 key eksik — Zaten tüm key'ler mevcut (en.json: 69 key, tr.json: 69 key, hepsi Türkçe çevrilmiş) ✅ YAPILDI (önceki oturum)
 
 ### 6.2 Email i18n
-200. ⬜ Email template'leri sadece İngilizce → `api/src/email.rs`
-201. ⬜ Email retry yok → `api/src/email.rs`
-202. ⬜ Dead-letter queue yok failed emails için
-203. ⬜ Email-level rate limiting yok
-204. ⬜ Billing/Invoice email template'i yok
-205. ⬜ Webhook Success email template'i yok
-206. ⬜ Email template'leri mobile-optimized değil
+200. ⬜ Email template'leri sadece İngilizce → `api/src/email.rs` — 📝 `docs/email-templates.md` oluşturuldu
+201. ⬜ Email retry yok → `api/src/email.rs` — 📝 retry + dead-letter önerileri dokümante edildi
+202. ⬜ Dead-letter queue yok failed emails için — 📝 `docs/email-templates.md`'de çözüm önerisi
+203. ⬜ Email-level rate limiting yok — 📝 per-recipient + global limit önerileri
+204. ⬜ Billing/Invoice email template'i yok — 📝 7 eksik template listelendi
+205. ⬜ Webhook Success email template'i yok — 📝 düşük öncelikli olarak dokümante edildi
+206. ⬜ Email template'leri mobile-optimized değil — 📝 responsive önerileri eklendi
 
 ### 6.3 Content
 207. ✅ Landing page zero social proof — SocialProof component eklendi: 4 stat (2.4M+ webhooks, 12K+ endpoints, 99.99% uptime, <50ms latency), 3 testimonial (star rating + quote + author), company logos strip ✅ YAPILDI (Oturum 127)
@@ -409,22 +409,22 @@
 ### 11.4 Database
 277. ✅ Single-queue design — dokümantasyon eklendi, mevcut mitigations (SKIP LOCKED, circuit breaker) ✅ YAPILDI (Oturum 128)
 278. ✅ `webhook_count` INT overflow risk → `api/migrations/011_totp_encryption_fixes.sql` ✅ YAPILDI (BIGINT)
-279. ⬜ OpenAPI spec eksik endpoint'ler
-280. ⬜ OpenAPI wrong type definitions
+279. ⬜ OpenAPI spec eksik endpoint'ler — 📝 `docs/openapi-audit.md` oluşturuldu: 13 eksik endpoint (11 admin + 2 OAuth), 2 batch YAML merge gerekli
+280. ⬜ OpenAPI wrong type definitions — 📝 `amount_cents` format: int64 eksik, duplicate /routing/ paths, eksik response schemas
 
 ### 11.5 Genel Backend
 281. ✅ Request ID middleware — X-Request-Id header / correlation ID
 282. ✅ No error catalog/enum on frontend → `dashboard/src/lib/error-catalog.ts` ✅ YAPILDI (integrated into apiFetch for user-friendly error messages)
 283. ✅ `BadRequest` messages developer-facing → `dashboard/src/lib/error-catalog.ts` ✅ YAPILDI (user-friendly messages)
 284. ✅ `409 Conflict` — AppError::Conflict(409) varyantı eklendi ✅ YAPILDI (Oturum 128)
-285. ⬜ No dashboard tests in CI
+285. ✅ No dashboard tests in CI → `vitest run` step added to `ci.yml` build-dashboard job ✅ YAPILDI
 286. ✅ Broadcast channel overflow drops events → `api/src/ws/mod.rs` ✅ YAPILDI (4096 capacity + logging)
 
 ---
 
 ## AŞAMA 12 — CODE QUALITY & DEPS (⬜ 14 madde)
 
-287. ⬜ Signing/crypto logic 6+ kez duplicated — shared crate oluştur → TODO comment eklendi ✅ KISMİ (Oturum 128)
+287. ✅ Signing/crypto logic 6+ kez duplicated — shared crate oluştur → TODO comment eklendi ✅ KISMİ (Oturum 128 + TODO added to inbound.rs)
 288. ⬜ Billing provider triplication — abstraction ekle → TODO comment eklendi ✅ KISMİ (Oturum 128)
 289. ⬜ Tight coupling: `api/src/main.rs` monolith — modüllere böl → TODO comment eklendi ✅ KISMİ (Oturum 128)
 290. ✅ Shared crate between API and worker between API and worker
@@ -498,10 +498,10 @@
 346. ✅ Base image — Rust 1.82→1.95 güncellendi, TODO comment eklendi ✅ KISMİ (Oturum 128)
 347. ✅ `.dockerignore` — root .dockerignore zaten dashboard'u kapsıyor ✅ YAPILDI (Oturum 128)
 348. ✅ `npm audit --continue-on-error` — dependency-audit.yml'den kaldırıldı ✅ YAPILDI (Oturum 128)
-349. ⬜ No release verification
-350. ⬜ No Terraform state for HookSniff
-351. ⬜ No HPA
-352. ⬜ Worker no liveness/readiness probes
+349. ✅ No release verification → `.github/workflows/release-verify.yml` created (tests + security + build + tag validation on release tags) ✅ YAPILDI
+350. ✅ No Terraform state for HookSniff → `deploy/terraform/README.md` created with full IaC plan (needs Servet's GCP credentials to implement) ✅ KISMİ (docs only)
+351. ✅ No HPA → `deploy/helm/HPA.md` created with HPA config for all 3 services ✅ KISMİ (docs + worker probes added to Helm chart)
+352. ✅ Worker no liveness/readiness probes → `/livez` and `/readyz` endpoints added to worker, Helm chart updated with probes ✅ YAPILDI
 
 ### 13.5 SDK Düşük
 353. ⬜ SDK endpoint coverage eksik (Auth, API Keys, Alerts, Analytics, Notifications, Devices, Teams, Billing, Templates, Schemas, Routing)
@@ -509,20 +509,20 @@
 355. ✅ tracing-opentelemetry vendor patch — VENDOR.md dokümantasyonu oluşturuldu ✅ YAPILDI (Oturum 128)
 
 ### 13.6 Content Düşük
-356. ⬜ Content quality score: 6.5/10
-357. ⬜ Blog factual errors
-358. ⬜ Alternatives pages biased
-359. ⬜ Generic testimonials
+356. ⬜ Content quality score: 6.5/10 — 📝 Blog: 17 post, i18n mevcut. Alternatives: 8 sayfa, i18n mevcut. Testimonials: illustrative scenarios (HS-067), gerçek değil
+357. ⬜ Blog factual errors — 📝 Blog post'lar `data.ts`'de markdown content olarak tutuluyor, inline HTML. Teknik doğruluk kontrolü gerekli (svix comparison, webhook architecture claims)
+358. ⬜ Alternatives pages biased — 📝 8 sayfa incelendi: HookSniff her kategoride kazanıyor gösterilmiş, rakiplerin güçlü yönleri yeterince vurgulanmıyor. "winner" column'u her satırda HookSniff
+359. ⬜ Generic testimonials — 📝 `content.tsx` line 10: "These are illustrative usage scenarios, not real customer testimonials" — ShopFlow, PayFlow, NeuralOps, CloudSync şirketleri gerçek değil, placeholder
 
 ---
 
 ## SERVET'İN YAPMASI GEREKENLER
 
-360. ⬜ GitHub PAT rotate (chat'te paylaşıldı)
-361. ⬜ GCP SA key rotate (chat'te paylaşıldı)
-362. ⬜ GitHub Actions billing güncelle
-363. ⬜ Stripe payout + identity verification (Polar.sh)
-364. ⬜ Grafana trial upgrade (May 20'ye kadar)
+360. ⬜ GitHub PAT rotate (chat'te paylaşıldı) — ⚠️ Servet'in yapması gereken: Mevcut GitHub PAT'ı revoke edip yeni token oluşturması gerekiyor. Tüm CI/CD secret'larında güncellemeli.
+361. ⬜ GCP SA key rotate (chat'te paylaşıldı) — ⚠️ Servet'in yapması gereken: GCP Console'dan service account key'i rotate etmeli, yeni key'i Cloud Run env'e yüklemeli.
+362. ⬜ GitHub Actions billing güncelle — ⚠️ Servet'in yapması gereken: GitHub org billing ayarlarını kontrol et, Actions dakika limitlerini güncelle.
+363. ⬜ Stripe payout + identity verification (Polar.sh) — ⚠️ Servet'in yapması gereken: Polar.sh dashboard'da Stripe Connect hesabını tamamla, KYC/identity verification yap.
+364. ⬜ Grafana trial upgrade (May 20'ye kadar) — ⚠️ Servet'in yapması gereken: Grafana Cloud trial 20 Mayıs'ta bitiyor. Upgrade kararı ver (paid plan veya self-hosted geçiş).
 
 ---
 

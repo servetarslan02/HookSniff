@@ -809,7 +809,7 @@ async fn get_delivery_attempts(
     .ok_or(AppError::NotFound)?;
 
     let attempts = sqlx::query_as::<_, DeliveryAttempt>(
-        "SELECT * FROM delivery_attempts WHERE delivery_id = $1 ORDER BY attempt_number ASC",
+        "SELECT * FROM delivery_attempts WHERE delivery_id = $1 ORDER BY attempt_number ASC LIMIT 100",
     )
     .bind(id)
     .fetch_all(&pool)
