@@ -24,7 +24,7 @@ async fn list_rules(
 ) -> Result<Json<Vec<TransformRule>>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -43,7 +43,7 @@ async fn create_rule(
 ) -> Result<Json<TransformRule>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -62,7 +62,7 @@ async fn update_rule(
 ) -> Result<Json<TransformRule>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -80,7 +80,7 @@ async fn delete_rule(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)

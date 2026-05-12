@@ -184,6 +184,7 @@ async fn delete_endpoint(
 
 /// Update an endpoint (URL, description, retry policy, etc.)
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateEndpointRequest {
     pub url: Option<String>,
     pub description: Option<String>,
