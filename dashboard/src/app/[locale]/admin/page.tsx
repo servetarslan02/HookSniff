@@ -174,18 +174,18 @@ export default function AdminOverviewPage() {
             <div aria-label={t('chartPlaceholder')} role="img">
               <div className="flex items-end gap-3 h-32 mb-3">
                 {[
-                  { label: 'Free', pct: 60, color: PLAN_COLORS.free },
-                  { label: 'Pro', pct: 30, color: PLAN_COLORS.pro },
-                  { label: 'Business', pct: 10, color: PLAN_COLORS.business },
+                  { labelKey: 'freePlan', pct: 60, color: PLAN_COLORS.free },
+                  { labelKey: 'proPlan', pct: 30, color: PLAN_COLORS.pro },
+                  { labelKey: 'businessPlan', pct: 10, color: PLAN_COLORS.business },
                 ].map((bar) => (
-                  <div key={bar.label} className="flex flex-col items-center gap-1 flex-1">
+                  <div key={bar.labelKey} className="flex flex-col items-center gap-1 flex-1">
                     <div className="w-full rounded-t-lg bg-gray-100 dark:bg-slate-800 overflow-hidden" style={{ height: '100%' }}>
                       <div
                         className="w-full rounded-t-lg transition-all duration-700 opacity-30"
                         style={{ height: `${bar.pct}%`, backgroundColor: bar.color, marginTop: 'auto' }}
                       />
                     </div>
-                    <span className="text-xs text-gray-400 dark:text-slate-500">{bar.label}</span>
+                    <span className="text-xs text-gray-400 dark:text-slate-500">{t(bar.labelKey)}</span>
                   </div>
                 ))}
               </div>
