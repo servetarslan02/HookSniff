@@ -11,7 +11,7 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "pageOf": "Page {page} of {total}",
+    "pageOf": "Page {page} of {totalPages}",
     "loading": "Loading...",
     "search": "Search",
     "filter": "Filter",
@@ -52,7 +52,6 @@
     "headers": "Headers",
     "statusCode": "Status Code",
     "showing": "Showing {from}–{to} of {total}",
-    "pageOf": "Page {page} of {totalPages}",
     "autoRefresh": "Auto-refresh",
     "live": "Live",
     "failed": "Failed",
@@ -140,7 +139,14 @@
     "ssoSaml": "SSO / SAML",
     "retryPolicy": "Retry Policy",
     "customDomain": "Custom Domain",
-    "webhookDashboard": "Webhook Dashboard"
+    "webhookDashboard": "Webhook Dashboard",
+    "schemas": "Schemas",
+    "templates": "Templates",
+    "portalManage": "Portal",
+    "sectionCore": "Core",
+    "sectionTools": "Tools",
+    "sectionAdvanced": "Advanced",
+    "sectionAccount": "Account"
   },
   "dashboard": {
     "title": "Dashboard",
