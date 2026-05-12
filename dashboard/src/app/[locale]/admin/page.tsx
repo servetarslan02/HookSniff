@@ -105,24 +105,56 @@ export default function AdminOverviewPage() {
           value={stats?.total_users?.toLocaleString() || '0'}
           icon={<span className="text-lg" aria-hidden="true">👥</span>}
           color="blue"
+          trend={stats?.trends ? (() => {
+            const diff = stats.total_users - stats.trends.total_users_yesterday;
+            return diff !== 0 ? {
+              value: Math.abs(diff),
+              label: t('vsYesterday') || 'vs yesterday',
+              direction: diff > 0 ? 'up' as const : 'down' as const,
+            } : undefined;
+          })() : undefined}
         />
         <StatCard
           label={t('totalDeliveries')}
           value={stats?.total_deliveries?.toLocaleString() || '0'}
           icon={<span className="text-lg" aria-hidden="true">📦</span>}
           color="emerald"
+          trend={stats?.trends ? (() => {
+            const diff = stats.total_deliveries - stats.trends.total_deliveries_yesterday;
+            return diff !== 0 ? {
+              value: Math.abs(diff),
+              label: t('vsYesterday') || 'vs yesterday',
+              direction: diff > 0 ? 'up' as const : 'down' as const,
+            } : undefined;
+          })() : undefined}
         />
         <StatCard
           label={t('totalRevenue')}
           value={`₺${(stats?.total_revenue || 0).toLocaleString()}`}
           icon={<span className="text-lg" aria-hidden="true">💰</span>}
           color="violet"
+          trend={stats?.trends ? (() => {
+            const diff = stats.total_revenue - stats.trends.revenue_yesterday;
+            return diff !== 0 ? {
+              value: Math.abs(Math.round(diff)),
+              label: t('vsYesterday') || 'vs yesterday',
+              direction: diff > 0 ? 'up' as const : 'down' as const,
+            } : undefined;
+          })() : undefined}
         />
         <StatCard
           label={t('activeUsersToday')}
           value={stats?.active_users_today?.toLocaleString() || '0'}
           icon={<span className="text-lg" aria-hidden="true">🔥</span>}
           color="amber"
+          trend={stats?.trends ? (() => {
+            const diff = stats.active_users_today - stats.trends.active_users_yesterday;
+            return diff !== 0 ? {
+              value: Math.abs(diff),
+              label: t('vsYesterday') || 'vs yesterday',
+              direction: diff > 0 ? 'up' as const : 'down' as const,
+            } : undefined;
+          })() : undefined}
         />
       </div>
 
