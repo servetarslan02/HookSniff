@@ -232,11 +232,11 @@ async fn test_sso_connection(
     .await?;
 
     let (provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id) =
-        config.ok_or(AppError::BadRequest("No SSO configuration found".into()))?;
+        config.ok_or(AppError::BadRequest("No SSO configuration found. Please set up SSO first.".into()))?;
 
     if !enabled {
         return Err(AppError::BadRequest(
-            "SSO is not enabled. Enable it first.".into(),
+            "SSO is not enabled. Please enable it before testing.".into(),
         ));
     }
 

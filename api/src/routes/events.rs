@@ -102,7 +102,7 @@ async fn list_events(
 
     if let Some(ref since) = params.since {
         let parsed: DateTime<Utc> = since.parse().map_err(|_| {
-            AppError::BadRequest("Invalid 'since' timestamp. Use ISO 8601 format.".into())
+            AppError::BadRequest("Invalid date format for 'since' parameter. Please use ISO 8601 format (e.g. 2024-01-01T00:00:00Z).".into())
         })?;
         q = q.bind(parsed);
     }
