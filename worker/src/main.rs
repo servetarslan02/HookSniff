@@ -799,12 +799,23 @@ async fn process_pending(
                 )
                 .await?;
 
-                sqlx::query::<sqlx::Postgres>(
-                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1"
+                // Update failure_streak and notify if threshold crossed
+                let new_streak: i32 = sqlx::query_scalar(
+                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1 RETURNING failure_streak"
                 )
                 .bind(item.endpoint_id)
-                .execute(&mut *tx)
-                .await?;
+                .fetch_one(&mut *tx)
+                .await
+                .unwrap_or(0);
+
+                // Fire-and-forget email notification for endpoint down
+                {
+                    let pool_clone = pool.clone();
+                    let url_clone = item.endpoint_url.clone();
+                    tokio::spawn(async move {
+                        notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await;
+                    });
+                }
 
                 // HS-034: Commit transaction
                 commit_delivery_tx(tx, delivery_id, "non-retryable dead letter").await?;
@@ -876,12 +887,22 @@ async fn process_pending(
                 .await?;
 
                 // Increment endpoint failure streak on dead letter
-                sqlx::query::<sqlx::Postgres>(
-                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1"
+                let new_streak: i32 = sqlx::query_scalar(
+                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1 RETURNING failure_streak"
                 )
                 .bind(item.endpoint_id)
-                .execute(&mut *tx)
-                .await?;
+                .fetch_one(&mut *tx)
+                .await
+                .unwrap_or(0);
+
+                // Fire-and-forget email notification for endpoint down
+                {
+                    let pool_clone = pool.clone();
+                    let url_clone = item.endpoint_url.clone();
+                    tokio::spawn(async move {
+                        notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await;
+                    });
+                }
 
                 // HS-034: Commit transaction
                 commit_delivery_tx(tx, delivery_id, "max attempts dead letter").await?;
@@ -1283,6 +1304,78 @@ fn is_transient_db_error(e: &sqlx::Error) -> bool {
         }
         _ => false,
     }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Endpoint Down Email Notification
+// ──────────────────────────────────────────────────────────────
+
+/// Send email notification when an endpoint becomes unhealthy (failure_streak >= 5).
+/// Reads Resend config from platform_settings.
+async fn notify_endpoint_down(
+    pool: &PgPool,
+    endpoint_id: uuid::Uuid,
+    endpoint_url: &str,
+    failure_streak: i32,
+) {
+    // Only notify at threshold crossings: 5, 10, 20, 50
+    if !matches!(failure_streak, 5 | 10 | 20 | 50) {
+        return;
+    }
+
+    // Get customer email and platform settings
+    let result = sqlx::query_as::<_, (String, String, Option<String>, Option<String>)>(
+        r#"SELECT c.email, e.url, s.resend_api_key, s.email_sender
+           FROM endpoints e
+           JOIN customers c ON e.customer_id = c.id
+           CROSS JOIN (SELECT value FROM platform_settings WHERE key = 'main') ps
+           LEFT JOIN LATERAL (
+               SELECT
+                   (ps.value->>'resend_api_key') as resend_api_key,
+                   (ps.value->>'email_sender') as email_sender
+           ) s ON true
+           WHERE e.id = $1"#,
+    )
+    .bind(endpoint_id)
+    .fetch_optional(pool)
+    .await;
+
+    let (customer_email, _url, api_key_opt, sender_opt) = match result {
+        Ok(Some(row)) => row,
+        _ => return, // Silently skip if we can't fetch
+    };
+
+    let api_key = match api_key_opt {
+        Some(k) if !k.is_empty() => k,
+        _ => return, // No Resend key configured
+    };
+
+    let sender = sender_opt.as_deref().unwrap_or("noreply@resend.dev");
+
+    let subject = format!("⚠️ Endpoint Down: {}", endpoint_url);
+    let body = format!(
+        "Your endpoint has been experiencing failures.\n\n\
+         Endpoint: {}\n\
+         Consecutive failures: {}\n\n\
+         Please check your endpoint and ensure it's responding correctly.\n\n\
+         — HookSniff",
+        endpoint_url, failure_streak
+    );
+
+    let client = reqwest::Client::new();
+    let _ = client
+        .post("https://api.resend.com/emails")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .json(&serde_json::json!({
+            "from": sender,
+            "to": [customer_email],
+            "subject": subject,
+            "text": body,
+        }))
+        .send()
+        .await;
+
+    tracing::info!("📧 Endpoint down notification sent for {}", endpoint_url);
 }
 
 // ──────────────────────────────────────────────────────────────
