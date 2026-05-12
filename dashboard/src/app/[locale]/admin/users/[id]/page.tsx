@@ -81,6 +81,17 @@ export default function AdminUserDetailPage() {
     }
   };
 
+  const handleImpersonate = async () => {
+    if (!token || !id || !detail) return;
+    try {
+      const result = await adminApi.impersonateUser(token, id);
+      window.open(`/${locale}/dashboard?impersonate_token=${result.token}`, '_blank');
+      toast(t('impersonating') + `: ${detail.user.email}`, 'success');
+    } catch {
+      toast(tc('error'), 'error');
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -117,12 +128,18 @@ export default function AdminUserDetailPage() {
         >
           {tc("back")}
         </button>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {detail.user.name || detail.user.email}
           </h1>
           <p className="text-sm text-gray-500 dark:text-slate-400">{t("userDetail")}</p>
         </div>
+        <button
+          onClick={handleImpersonate}
+          className="px-4 py-2 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-500/20 border border-amber-200 dark:border-amber-500/20 transition"
+        >
+          👁️ {t('impersonateUser')}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
