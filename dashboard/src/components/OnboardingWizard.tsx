@@ -5,86 +5,13 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useRouter } from '@/i18n/navigation';
 import { endpointsApi } from '@/lib/api';
+import type { OnboardingState, WizardStep } from './onboarding/types';
+import { loadState, saveState, SDKS } from './onboarding/types';
+import { Confetti } from './onboarding/Confetti';
+import { SetupChecklist } from './onboarding/SetupChecklist';
+import { SuccessToast } from './onboarding/SuccessToast';
 
-/* ─── Types ─── */
-interface WizardStep {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-}
-
-const STORAGE_KEY = 'hooksniff_onboarding_state';
-
-interface OnboardingState {
-  dismissed: boolean;
-  currentStep: number;
-  completedSteps: string[];
-  useCase: string;
-  endpointCreated: boolean;
-  firstWebhookSent: boolean;
-}
-
-function loadState(): OnboardingState {
-  if (typeof window === 'undefined') return { dismissed: false, currentStep: 0, completedSteps: [], useCase: '', endpointCreated: false, firstWebhookSent: false };
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return { dismissed: false, currentStep: 0, completedSteps: [], useCase: '', endpointCreated: false, firstWebhookSent: false };
-}
-
-function saveState(state: OnboardingState) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
-}
-
-/* ─── SDK Options (constant, no translation needed for language names) ─── */
-const SDKS = [
-  { id: 'nodejs', label: 'Node.js', install: 'npm install hooksniff-sdk' },
-  { id: 'python', label: 'Python', install: 'pip install hooksniff' },
-  { id: 'go', label: 'Go', install: 'go get github.com/hooksniff/hooksniff-go' },
-  { id: 'rust', label: 'Rust', install: 'cargo add hooksniff' },
-  { id: 'csharp', label: 'C#', install: 'dotnet add package HookSniff' },
-  { id: 'java', label: 'Java', install: '<dependency>\n  <groupId>dev.hooksniff</groupId>\n  <artifactId>hooksniff-sdk</artifactId>\n</dependency>' },
-  { id: 'ruby', label: 'Ruby', install: 'gem install hooksniff' },
-  { id: 'php', label: 'PHP', install: 'composer require hooksniff/hooksniff-php' },
-  { id: 'swift', label: 'Swift', install: '.package(url: "https://github.com/hooksniff/hooksniff-swift", from: "0.1.0")' },
-  { id: 'kotlin', label: 'Kotlin', install: 'implementation("dev.hooksniff:hooksniff:0.3.0")' },
-  { id: 'elixir', label: 'Elixir', install: '{:hooksniff, "~> 0.2.0"}' },
-];
-
-/* ─── Confetti ─── */
-function Confetti() {
-  const pieces = Array.from({ length: 50 }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    delay: Math.random() * 2,
-    duration: 1.5 + Math.random() * 2,
-    color: ['#6366f1', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#3b82f6'][Math.floor(Math.random() * 6)],
-    size: 4 + Math.random() * 8,
-  }));
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[60] overflow-hidden">
-      {pieces.map((p) => (
-        <div
-          key={p.id}
-          className="absolute animate-bounce"
-          style={{
-            left: `${p.left}%`,
-            top: '-10px',
-            width: p.size,
-            height: p.size,
-            backgroundColor: p.color,
-            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+export { SetupChecklist, SuccessToast };
 
 /* ─── Main Wizard Component ─── */
 export function OnboardingWizard() {
@@ -101,7 +28,6 @@ export function OnboardingWizard() {
   const [copied, setCopied] = useState('');
   const t = useTranslations('onboarding');
 
-  /* ─── Use Case Options (inside component for t()) ─── */
   const USE_CASES = [
     { id: 'payments', icon: '💳', label: t('useCasePayments'), desc: t('useCasePaymentsDesc') },
     { id: 'email', icon: '📧', label: t('useCaseEmail'), desc: t('useCaseEmailDesc') },
@@ -229,7 +155,6 @@ export function OnboardingWizard() {
 
           {/* Content */}
           <div className="p-8 min-h-[320px]">
-            {/* Step: Welcome */}
             {currentStep.id === 'welcome' && (
               <div className="text-center">
                 <div className="text-6xl mb-4">🪝</div>
@@ -247,7 +172,6 @@ export function OnboardingWizard() {
               </div>
             )}
 
-            {/* Step: Use Case */}
             {currentStep.id === 'usecase' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t('whatBuilding')}</h2>
@@ -275,7 +199,6 @@ export function OnboardingWizard() {
               </div>
             )}
 
-            {/* Step: SDK */}
             {currentStep.id === 'sdk' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("chooseSdk")}</h2>
@@ -315,7 +238,6 @@ export function OnboardingWizard() {
               </div>
             )}
 
-            {/* Step: Endpoint */}
             {currentStep.id === 'endpoint' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("createFirstEndpoint")}</h2>
@@ -357,7 +279,6 @@ export function OnboardingWizard() {
               </div>
             )}
 
-            {/* Step: Test */}
             {currentStep.id === 'test' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">{t("sendTestWebhook")}</h2>
@@ -407,7 +328,6 @@ export function OnboardingWizard() {
               </div>
             )}
 
-            {/* Step: Done */}
             {currentStep.id === 'done' && (
               <div className="text-center">
                 <div className="text-6xl mb-4">🎉</div>
@@ -513,145 +433,6 @@ export function OnboardingWizard() {
         </div>
       </div>
     </>
-  );
-}
-
-/* ─── Setup Checklist (Dashboard Widget) ─── */
-interface ChecklistItem {
-  id: string;
-  label: string;
-  href: string;
-  icon: string;
-}
-
-export function SetupChecklist() {
-  const t = useTranslations('onboarding');
-  const { user, token } = useAuth();
-  const [dismissed, setDismissed] = useState(false);
-  const items: ChecklistItem[] = [
-    { id: 'account', label: t('checklistAccount'), href: '/dashboard', icon: '👤' },
-    { id: 'apikey', label: t('checklistApikey'), href: '/dashboard/api-keys', icon: '🔑' },
-    { id: 'endpoint', label: t('checklistEndpoint'), href: '/dashboard/endpoints', icon: '🔗' },
-    { id: 'webhook', label: t('checklistWebhook'), href: '/dashboard/playground', icon: '🧪' },
-    { id: 'monitor', label: t('checklistMonitor'), href: '/dashboard/deliveries', icon: '📊' },
-  ];
-  const [completed, setCompleted] = useState<string[]>([]);
-  const [expanded, setExpanded] = useState(true);
-
-  useEffect(() => {
-    if (!token) return;
-    const state = loadState();
-    const done: string[] = ['account'];
-    if (state.completedSteps.includes('sdk')) done.push('apikey');
-    if (state.endpointCreated) done.push('endpoint');
-    if (state.firstWebhookSent) done.push('webhook');
-    if (state.completedSteps.includes('test')) done.push('monitor');
-    setCompleted(done);
-    if (done.length === items.length) {
-      // All done, auto-dismiss after a day
-      const completedAt = localStorage.getItem('hooksniff_checklist_completed_at');
-      if (!completedAt) {
-        localStorage.setItem('hooksniff_checklist_completed_at', Date.now().toString());
-      } else if (Date.now() - parseInt(completedAt) > 24 * 60 * 60 * 1000) {
-        setDismissed(true);
-      }
-    }
-  }, [token, items.length]);
-
-  if (!user || dismissed) return null;
-
-  const percentage = Math.round((completed.length / items.length) * 100);
-
-  return (
-    <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden mb-6">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-750 transition"
-      >
-        <div className="flex items-center gap-3">
-          <div className="text-lg">🎯</div>
-          <div className="text-left">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">{t("setupProgress")}</div>
-            <div className="text-xs text-gray-500 dark:text-slate-400">{t('checklistCompleted', { count: completed.length, total: items.length })}</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-20 h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-brand-500 to-green-500 transition-all duration-500"
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
-          <span className="text-xs font-medium text-gray-500 dark:text-slate-400">{percentage}%</span>
-          <span className="text-gray-500 dark:text-slate-500 text-sm">{expanded ? '▲' : '▼'}</span>
-        </div>
-      </button>
-
-      {expanded && (
-        <div className="px-4 pb-4">
-          <div className="space-y-2">
-            {items.map((item) => {
-              const isDone = completed.includes(item.id);
-              return (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  className={`flex items-center gap-3 p-2.5 rounded-lg transition ${
-                    isDone
-                      ? 'bg-green-50 dark:bg-green-500/5'
-                      : 'hover:bg-gray-50 dark:hover:bg-slate-750'
-                  }`}
-                >
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                    isDone
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400'
-                  }`}>
-                    {isDone ? '✓' : item.icon}
-                  </div>
-                  <span className={`text-sm ${
-                    isDone
-                      ? 'text-green-700 dark:text-green-400 line-through'
-                      : 'text-gray-700 dark:text-slate-300'
-                  }`}>
-                    {item.label}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-          <button
-            onClick={() => setDismissed(true)}
-            className="mt-3 text-xs text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
-          >
-            {t('dismissChecklist')}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ─── Success Toast ─── */
-export function SuccessToast({ message, onClose }: { message: string; onClose: () => void }) {
-  const t = useTranslations('onboarding');
-  const tc = useTranslations('common');
-  useEffect(() => {
-    const timer = setTimeout(onClose, 5000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
-  return (
-    <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
-      <div className="bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm">
-        <span className="text-2xl">🎉</span>
-        <div>
-          <div className="font-semibold text-sm">{t('successTitle')}</div>
-          <div className="text-sm opacity-90">{message}</div>
-        </div>
-        <button onClick={onClose} aria-label={tc('close')} className="ml-4 text-white/70 hover:text-white transition">✕</button>
-      </div>
-    </div>
   );
 }
 
