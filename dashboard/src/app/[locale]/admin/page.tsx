@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse } from '@/lib/api';
+import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse, type FeatureFlag } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
@@ -25,6 +25,7 @@ export default function AdminOverviewPage() {
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [uptime24h, setUptime24h] = useState<number | null>(null);
   const [uptime7d, setUptime7d] = useState<number | null>(null);
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
@@ -61,6 +62,14 @@ export default function AdminOverviewPage() {
         }
       } catch {
         // Uptime fetch failed, silently continue
+      }
+
+      // Fetch feature flags
+      try {
+        const flagsData = await adminApi.listFeatureFlags(token);
+        setFeatureFlags(flagsData.flags || []);
+      } catch {
+        // Feature flags fetch failed, silently continue
       }
     } catch {
       setError(t("failedToLoadStats"));
@@ -576,8 +585,25 @@ export default function AdminOverviewPage() {
             <span className="text-xl" aria-hidden="true">🚩</span>
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('featureFlagStatus')}</h2>
           </div>
-          <p className="text-3xl font-bold text-gray-400 dark:text-slate-500">{t('na')}</p>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('comingSoon')}</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            {featureFlags.filter(f => f.is_enabled).length} / {featureFlags.length}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+            {t('activeFlagCount')}: {featureFlags.filter(f => f.is_enabled).length}
+          </p>
+          {featureFlags.length > 0 && (
+            <div className="mt-3 space-y-1">
+              {featureFlags.slice(0, 3).map(f => (
+                <div key={f.id} className="flex items-center gap-2 text-xs">
+                  <span className={`w-2 h-2 rounded-full ${f.is_enabled ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                  <span className="text-gray-600 dark:text-slate-400 truncate">{f.name}</span>
+                </div>
+              ))}
+              {featureFlags.length > 3 && (
+                <p className="text-xs text-gray-400 dark:text-slate-500">+{featureFlags.length - 3} {t('more') || 'more'}</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Active Sessions */}
@@ -665,9 +691,18 @@ export default function AdminOverviewPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
-                {t('comingSoon')}
-              </span>
+              {(() => {
+                const swFlag = featureFlags.find(f => f.name === 'standard_webhooks');
+                return swFlag?.is_enabled ? (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                    ✅ Aktif
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                    {t('notConfigured')}
+                  </span>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -692,9 +727,18 @@ export default function AdminOverviewPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
-                {t('comingSoon')}
-              </span>
+              {(() => {
+                const dedupFlag = featureFlags.find(f => f.name === 'deduplication');
+                return dedupFlag?.is_enabled ? (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                    ✅ Aktif
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                    {t('notConfigured')}
+                  </span>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -706,13 +750,14 @@ export default function AdminOverviewPage() {
           <span className="text-xl" aria-hidden="true">🚀</span>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('lastDeploy')}</h2>
         </div>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('lastDeployDesc')}</p>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-sm text-gray-700 dark:text-slate-300">main</span>
+            <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">main</span>
           </div>
-          <span className="text-sm text-gray-500 dark:text-slate-400">{t('comingSoon')}</span>
+          <span className="text-sm text-gray-500 dark:text-slate-400">
+            {t('lastDeployDesc')}
+          </span>
         </div>
       </div>
     </div>
