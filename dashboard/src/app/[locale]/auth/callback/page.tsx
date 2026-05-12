@@ -54,7 +54,7 @@ export default function AuthCallbackPage() {
           <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("loginFailed")}</h1>
           <p className="text-gray-500 dark:text-slate-400 mb-6">{error}</p>
           <button
-            onClick={() => router.push(`/${locale}/login`)}
+            onClick={() => router.push('/login')}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
           >
             {t('backToLogin')}

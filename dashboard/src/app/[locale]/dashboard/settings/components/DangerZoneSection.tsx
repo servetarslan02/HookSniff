@@ -25,7 +25,7 @@ export function DangerZoneSection() {
       const { api } = await import('@/lib/api');
       await api.delete('/auth/account', token ?? undefined);
       logout();
-      router.push(`/${locale}/`);
+      router.push('/');
     } catch (e: unknown) {
       toast(getErrorMessage(e, tc('unknownError')), 'error');
     } finally {

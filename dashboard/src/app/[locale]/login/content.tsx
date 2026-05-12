@@ -55,7 +55,7 @@ function LoginForm() {
       } else {
         await register(email, password, name || undefined);
       }
-      router.push(`/${locale}/dashboard`);
+      router.push('/dashboard');
     } catch (err: unknown) {
       setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
     } finally {
