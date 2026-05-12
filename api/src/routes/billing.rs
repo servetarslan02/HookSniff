@@ -220,13 +220,13 @@ async fn upgrade_plan(
         provider_name = "polar".to_string();
     }
 
-    let provider_enum = PaymentProvider::parse_str(provider_name);
+    let provider_enum = PaymentProvider::parse_str(&provider_name);
 
     match provider_enum {
         PaymentProvider::Polar | PaymentProvider::Iyzico => {
             // Use Polar.sh or iyzico via the provider trait
             let provider_impl =
-                crate::billing::resolve_provider(provider_name).ok_or_else(|| {
+                crate::billing::resolve_provider(&provider_name).ok_or_else(|| {
                     AppError::Internal(anyhow::anyhow!(
                         "Payment provider '{}' not configured",
                         provider_name
@@ -241,7 +241,7 @@ async fn upgrade_plan(
 
             // Update customer's payment provider
             sqlx::query("UPDATE customers SET payment_provider = $1 WHERE id = $2")
-                .bind(provider_name)
+                .bind(&provider_name)
                 .bind(customer.id)
                 .execute(&pool)
                 .await?;
