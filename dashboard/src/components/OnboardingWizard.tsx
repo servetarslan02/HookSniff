@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useRouter } from '@/i18n/navigation';
@@ -16,7 +15,6 @@ export { SetupChecklist, SuccessToast };
 
 /* ─── Main Wizard Component ─── */
 export function OnboardingWizard() {
-  const username = useUsername();
   const { user, token } = useAuth();
   const router = useRouter();
   const [visible, setVisible] = useState(false);

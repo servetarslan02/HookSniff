@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
@@ -18,7 +17,6 @@ const adminNavigation = [
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
-  const username = useUsername();
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();

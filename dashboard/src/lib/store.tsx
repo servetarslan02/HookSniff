@@ -35,7 +35,7 @@ function toSlug(input: string): string {
     .slice(0, 50);
 }
 
-function setUsernameCookie(username: string) {
+function setUsernameCookie(_username: string) {
 }
 
 function clearUsernameCookie() {

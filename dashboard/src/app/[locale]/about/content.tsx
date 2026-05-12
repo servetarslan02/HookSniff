@@ -1,7 +1,6 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
-import { useUsername } from '@/hooks/useUsername';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
@@ -9,7 +8,6 @@ import Footer from '@/components/Footer';
 
 
 export function AboutPageContent() {
-  const username = useUsername();
   const t = useTranslations();
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
