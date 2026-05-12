@@ -21,6 +21,12 @@ export default function LogsPage() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [statusCounts, setStatusCounts] = useState<Record<StatusFilter, number>>({
+    all: 0,
+    delivered: 0,
+    failed: 0,
+    pending: 0,
+  });
   const t = useTranslations('logs');
   const tc = useTranslations('common');
   const perPage = 20;
@@ -30,12 +36,21 @@ export default function LogsPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await webhooksApi.list(token, {
-        page,
-        status: filter === 'all' ? undefined : filter,
-      });
+      // Fetch current page data + total counts for each status in parallel
+      const [data, deliveredData, failedData, pendingData] = await Promise.all([
+        webhooksApi.list(token, { page, status: filter === 'all' ? undefined : filter }),
+        webhooksApi.list(token, { page: 1, status: 'delivered' }).catch(() => ({ total: 0, deliveries: [] })),
+        webhooksApi.list(token, { page: 1, status: 'failed' }).catch(() => ({ total: 0, deliveries: [] })),
+        webhooksApi.list(token, { page: 1, status: 'pending' }).catch(() => ({ total: 0, deliveries: [] })),
+      ]);
       setDeliveries(data.deliveries);
       setTotal(data.total);
+      setStatusCounts({
+        all: data.total,
+        delivered: deliveredData.total,
+        failed: failedData.total,
+        pending: pendingData.total,
+      });
     } catch (err: unknown) {
       setError(getErrorMessage(err, tc('unknownError')) || tc('failedToLoadLogs'));
     } finally {
@@ -62,12 +77,7 @@ export default function LogsPage() {
 
   const totalPages = Math.ceil(total / perPage);
 
-  const statusCounts = {
-    all: total,
-    delivered: deliveries.filter((d) => d.status === 'delivered').length,
-    failed: deliveries.filter((d) => d.status === 'failed').length,
-    pending: deliveries.filter((d) => d.status === 'pending').length,
-  };
+  // statusCounts now fetched from API (total counts, not just current page)
 
   return (
     <div className="space-y-6">
@@ -142,7 +152,7 @@ export default function LogsPage() {
               {f.charAt(0).toUpperCase() + f.slice(1)}
               {f !== 'all' && (
                 <span
-                  title={`${statusCounts[f]} on this page`}
+                  title={`${statusCounts[f]} total`}
                   className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${
                     filter === f ? 'bg-white/20' : 'bg-gray-100 dark:bg-slate-800'
                   }`}
