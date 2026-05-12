@@ -130,7 +130,7 @@ export default function NotificationsPage() {
               className={`px-3 py-1.5 rounded-xl text-sm font-medium transition ${
                 typeFilter === t
                   ? 'bg-gray-900 dark:bg-brand-600 text-white'
-                  : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
+                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
             >
               {typeLabels[t]}
@@ -148,7 +148,7 @@ export default function NotificationsPage() {
               className={`px-3 py-1.5 rounded-xl text-sm font-medium transition ${
                 readFilter === f
                   ? 'bg-gray-900 dark:bg-brand-600 text-white'
-                  : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
+                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}

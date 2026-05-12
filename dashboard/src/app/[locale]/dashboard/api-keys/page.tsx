@@ -262,7 +262,7 @@ export default function ApiKeysPage() {
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
-          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('deleteTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
               {t('deleteDesc')}
@@ -290,7 +290,7 @@ export default function ApiKeysPage() {
       {rotateTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setRotateTarget(null)} />
-          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('rotateTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
               {t('rotateDesc')}
