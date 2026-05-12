@@ -7,6 +7,7 @@ import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/Toast';
 
 const PLAN_COLORS: Record<string, string> = {
   developer: '#94a3b8',
@@ -28,6 +29,7 @@ export default function AdminRevenuePage() {
   const [dateRange, setDateRange] = useState<DateRange>('12m');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
+  const { toast } = useToast();
 
   const fetchRevenue = useCallback(async (isRefresh = false) => {
     if (!token) return;
@@ -53,11 +55,23 @@ export default function AdminRevenuePage() {
     }
   }, [token, t]);
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
     if (!token) return;
-    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-    const url = adminApi.exportRevenue(token, 12);
-    window.open(`${API}${url}&token=${token}`, '_blank');
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+      const url = adminApi.exportRevenue(token, 12);
+      const res = await fetch(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `hooksniff-revenue-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      toast(tc('error'), 'error');
+    }
   };
 
   useEffect(() => {
