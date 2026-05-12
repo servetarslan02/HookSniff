@@ -1,7 +1,6 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
-import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -13,7 +12,6 @@ interface PublicNavbarProps {
 }
 
 export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
-  const username = useUsername();
   const { token } = useAuth();
   const tNav = useTranslations('landing.nav');
 

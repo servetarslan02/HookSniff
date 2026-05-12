@@ -213,7 +213,7 @@ export default function DashboardOverview() {
 
       {/* Activity Feed + Recent Deliveries */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivityFeed token={token!} />
+        <ActivityFeed deliveries={recentDeliveries} loading={loading} />
         <RecentDeliveriesTable deliveries={recentDeliveries} />
       </div>
     </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import { getErrorMessage } from '@/lib/errors';
-import { useParams } from 'next/navigation';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from '@/i18n/navigation';
@@ -13,8 +12,6 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 
 export default function DeliveriesPage() {
-  const params = useParams();
-  const username = (params?.username as string) || 'dashboard';
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();

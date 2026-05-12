@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -27,8 +26,6 @@ interface SearchResponse {
 }
 
 export default function SearchPage() {
-  const params = useParams();
-  const username = (params?.username as string) || 'dashboard';
   const { token } = useAuth();
   const router = useRouter();
   const [query, setQuery] = useState('');

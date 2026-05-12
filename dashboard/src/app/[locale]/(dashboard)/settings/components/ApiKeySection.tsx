@@ -1,13 +1,10 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
-  const params = useParams();
-  const username = (params?.username as string) || 'dashboard';
   const t = useTranslations('settings');
   const tc = useTranslations('common');
   const [copied, setCopied] = useState(false);
