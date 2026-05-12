@@ -56,11 +56,6 @@ const QUEUE_BATCH_SIZE: i32 = 50;
 const RESPONSE_BODY_TRUNCATE_BYTES: usize = 500;
 /// Grace period checker interval
 const GRACE_CHECK_INTERVAL_SECS: u64 = 6 * 3600;
-/// Maximum retries for transient DB commit failures
-const DB_COMMIT_MAX_RETRIES: u32 = 3;
-/// Base delay between DB commit retries (milliseconds)
-const DB_COMMIT_RETRY_BASE_DELAY_MS: u64 = 100;
-
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgListener, PgPoolOptions};
@@ -1203,72 +1198,6 @@ fn is_non_retryable(status_code: i32) -> bool {
     (400..500).contains(&status_code) && status_code != 429
 }
 
-/// Item 34: Retry a database commit on transient failures.
-///
-/// Transient failures include:
-/// - Connection timeouts/closed connections
-/// - Serialization failures (PostgreSQL error code 40001)
-/// - Deadlock detected (PostgreSQL error code 40P01)
-///
-/// Non-transient failures (constraint violations, syntax errors, etc.) are
-/// immediately propagated without retry.
-async fn commit_with_retry(tx: sqlx::PgPool, label: &str) -> Result<()> {
-    // sqlx PgPool doesn't allow re-using transactions across retries,
-    // so we take ownership and attempt the commit.
-    // The caller must construct a fresh transaction if this fails.
-    // For simplicity, we retry the commit call itself.
-    commit_with_retry_inner(tx, label).await
-}
-
-/// Inner implementation that retries commit on transient errors.
-/// Since sqlx transactions are consumed on commit, we can only retry
-/// the commit call itself (not rebuild the transaction).
-async fn commit_with_retry_inner(tx: sqlx::PgPool, label: &str) -> Result<()> {
-    // Note: sqlx::Pool doesn't expose commit directly. This is a helper
-    // that wraps the pattern. We'll instead provide a function that
-    // the caller can use with their transaction.
-    let _ = tx; // unused — see commit_tx_with_retry below
-    let _ = label;
-    Ok(())
-}
-
-/// Commit a sqlx transaction with automatic retry on transient DB failures.
-///
-/// Retries up to `DB_COMMIT_MAX_RETRIES` times with exponential backoff
-/// for connection/serialization errors. Propagates immediately on
-/// non-transient errors (constraint violations, etc.).
-///
-/// Item 34: Prevents data loss when the DB has transient issues
-/// (connection pool exhaustion, brief network blips, serialization conflicts).
-async fn commit_tx_with_retry(
-    tx: sqlx::Transaction<'static, sqlx::Postgres>,
-    label: &str,
-) -> Result<()> {
-    let mut last_err = None;
-    // We can't rebuild a consumed transaction, so we only have one shot.
-    // But we can detect transient errors and log them properly for monitoring.
-    // The real retry happens at the process_pending level — if commit fails,
-    // the delivery is still in 'processing' state and the zombie reaper will
-    // recover it. Here we add structured error classification.
-    match tx.commit().await {
-        Ok(()) => Ok(()),
-        Err(e) => {
-            let is_transient = is_transient_db_error(&e);
-            if is_transient {
-                tracing::warn!(
-                    "⚠️ [{label}] Transient DB commit failure (will be recovered by zombie reaper): {e:?}"
-                );
-            } else {
-                tracing::error!(
-                    "❌ [{label}] Non-transient DB commit failure: {e:?}"
-                );
-            }
-            last_err = Some(e);
-            Err(last_err.unwrap().into())
-        }
-    }
-}
-
 /// Check if a sqlx error is transient (worth retrying or recovering).
 ///
 /// Transient errors:
@@ -1516,11 +1445,5 @@ mod tests {
         assert!(!is_transient_db_error(&err));
     }
 
-    #[test]
-    fn test_commit_tx_with_retry_label() {
-        // Verify the function exists and compiles (unit test for signature)
-        // Can't test actual commit without a DB, but we verify the helper compiles
-        assert!(DB_COMMIT_MAX_RETRIES > 0);
-        assert!(DB_COMMIT_RETRY_BASE_DELAY_MS > 0);
-    }
+
 }

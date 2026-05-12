@@ -72,30 +72,9 @@ pub fn validate_url(url: &str) -> Result<(), String> {
 
 /// Item 343: Validate HTTP header name per RFC 7230, Section 3.2.6.
 ///
-/// Header field names must be tokens: ASCII letters, digits, and
-/// `!#$%&'*+-.^_` ` ` |~`. No whitespace, colons, or control chars.
+/// Delegates to common::header_validation to avoid duplication with worker.
 pub fn validate_header_name(name: &str) -> Result<(), String> {
-    if name.is_empty() {
-        return Err("Header name must not be empty".into());
-    }
-    let valid = name.bytes().all(|b| {
-        matches!(
-            b,
-            b'A'..=b'Z'
-                | b'a'..=b'z'
-                | b'0'..=b'9'
-                | b'!' | b'#' | b'$' | b'%' | b'&'
-                | b'\'' | b'*' | b'+' | b'-' | b'.'
-                | b'^' | b'_' | b'`' | b'|' | b'~'
-        )
-    });
-    if !valid {
-        return Err(format!(
-            "Header name '{}' contains invalid characters (RFC 7230)",
-            name
-        ));
-    }
-    Ok(())
+    common::header_validation::validate_header_name(name)
 }
 
 /// Validate JSON nesting depth. Returns error if depth exceeds MAX_JSON_DEPTH.
