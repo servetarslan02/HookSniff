@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -18,6 +18,7 @@ export default function EndpointSettingsPage() {
   const t = useTranslations('endpointSettings');
   const tCommon = useTranslations('common');
   const { id } = useParams<{ id: string }>();
+  const locale = useLocale();
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function EndpointSettingsPage() {
       const ep = all.find((e) => e.id === id);
       if (!ep) {
         toast(t('toastEndpointNotFound'), 'error');
-        router.push('/dashboard/endpoints');
+        router.push(`/${locale}/dashboard/endpoints`);
         return;
       }
       setEndpoint(ep);
@@ -180,7 +181,7 @@ export default function EndpointSettingsPage() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => router.push('/dashboard/endpoints')}
+          onClick={() => router.push(`/${locale}/dashboard/endpoints`)}
           className="p-2 -ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
