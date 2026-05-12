@@ -1,9 +1,13 @@
 'use client';
 
+import { useParams } from 'next/navigation';
+
 import { useTranslations } from 'next-intl';
 import type { GlobalRetryPolicy } from '../types';
 
 export function DelayPreviewCard({ policy }: { policy: GlobalRetryPolicy }) {
+  const params = useParams();
+  const username = (params?.username as string) || 'dashboard';
   const t = useTranslations('retryPolicy');
 
   const getDelayPreview = () => {
@@ -54,7 +58,7 @@ export function DelayPreviewCard({ policy }: { policy: GlobalRetryPolicy }) {
 
       <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
         <p className="text-sm text-blue-700 dark:text-blue-400">
-          💡 <strong>{t("tip")}</strong> {t('tipContent')} <a href="/dashboard/endpoints" className="underline">{t('endpointSettingsLink')}</a>.
+          💡 <strong>{t("tip")}</strong> {t('tipContent')} <a href={`/${username}/endpoints`} className="underline">{t('endpointSettingsLink')}</a>.
         </p>
       </div>
     </div>

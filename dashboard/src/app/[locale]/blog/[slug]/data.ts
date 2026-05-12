@@ -400,7 +400,6 @@ go get github.com/hooksniff/hooksniff-go
 An endpoint is a URL where HookSniff delivers webhooks. This is your server.
 
 \`\`\`typescript
-import { HookSniff } from '@hooksniff/node';
 
 const client = new HookSniff({
   apiKey: process.env.HOOKSNIFF_API_KEY,
