@@ -39,14 +39,14 @@ export default function WhatIsWebhookPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("comparison")}</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border border-gray-200 dark:border-slate-800 rounded-lg">
+              <table className="w-full text-sm border border-gray-200 dark:border-slate-700 rounded-lg">
                 <thead><tr className="bg-gray-50 dark:bg-slate-800"><th className="p-3 text-left">{t("aspect")}</th><th className="p-3 text-left">{t("polling")}</th><th className="p-3 text-left">Webhook</th></tr></thead>
                 <tbody>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("direction")}</td><td className="p-3">You → Them</td><td className="p-3">Them → You</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("timing")}</td><td className="p-3">{t("youCheck")}</td><td className="p-3">{t("instantNotification")}</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("efficiency")}</td><td className="p-3">{t("wastesBandwidth")}</td><td className="p-3">{t("onlySends")}</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("latency")}</td><td className="p-3">{t("secondsToMinutes")}</td><td className="p-3">{t("milliseconds")}</td></tr>
-                  <tr className="border-t border-gray-200 dark:border-slate-800"><td className="p-3 font-medium">{t("complexity")}</td><td className="p-3">{t("simple")}</td><td className="p-3">{t("needsEndpoint")}</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-700"><td className="p-3 font-medium">{t("direction")}</td><td className="p-3">You → Them</td><td className="p-3">Them → You</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-700"><td className="p-3 font-medium">{t("timing")}</td><td className="p-3">{t("youCheck")}</td><td className="p-3">{t("instantNotification")}</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-700"><td className="p-3 font-medium">{t("efficiency")}</td><td className="p-3">{t("wastesBandwidth")}</td><td className="p-3">{t("onlySends")}</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-700"><td className="p-3 font-medium">{t("latency")}</td><td className="p-3">{t("secondsToMinutes")}</td><td className="p-3">{t("milliseconds")}</td></tr>
+                  <tr className="border-t border-gray-200 dark:border-slate-700"><td className="p-3 font-medium">{t("complexity")}</td><td className="p-3">{t("simple")}</td><td className="p-3">{t("needsEndpoint")}</td></tr>
                 </tbody>
               </table>
             </div>
@@ -63,7 +63,7 @@ export default function WhatIsWebhookPage() {
                 { titleKey: 'ucAi', descKey: 'ucAiDesc' },
                 { titleKey: 'ucMonitoring', descKey: 'ucMonitoringDesc' },
               ].map((uc) => (
-                <div key={uc.titleKey} className="p-4 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
+                <div key={uc.titleKey} className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t(uc.titleKey)}</h4>
                   <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{t(uc.descKey)}</p>
                 </div>

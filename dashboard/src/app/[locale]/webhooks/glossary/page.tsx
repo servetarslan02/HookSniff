@@ -48,7 +48,7 @@ export default function GlossaryPage() {
   const t = useTranslations('webhooks');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -77,7 +77,7 @@ export default function GlossaryPage() {
             <a
               key={item.term}
               href={`#${item.term.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`}
-              className="px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-full text-gray-600 dark:text-slate-400 hover:border-brand-300 dark:hover:border-brand-500/40 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+              className="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full text-gray-600 dark:text-slate-400 hover:border-brand-300 dark:hover:border-brand-500/40 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
             >
               {item.term.split(' (')[0]}
             </a>
@@ -89,7 +89,7 @@ export default function GlossaryPage() {
           {glossary.map((item) => {
             const slug = item.term.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
             return (
-              <div key={item.term} id={slug} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 scroll-mt-24">
+              <div key={item.term} id={slug} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 scroll-mt-24">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{item.term}</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{item.definition}</p>
               </div>

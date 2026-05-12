@@ -272,7 +272,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Navigation */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">🪝</div>
@@ -311,7 +311,7 @@ export default function Home() {
         </div>
         {/* Mobile nav dropdown */}
         {mobileNavOpen && (
-          <div className="md:hidden border-t border-gray-200/50 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-6 py-4 space-y-3">
+          <div className="md:hidden border-t border-gray-200/50 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-6 py-4 space-y-3">
             <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
             <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
             <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>

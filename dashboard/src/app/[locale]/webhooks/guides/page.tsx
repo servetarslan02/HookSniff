@@ -48,7 +48,7 @@ export default function WebhookGuidesPage() {
   const t = useTranslations('webhooks');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -80,7 +80,7 @@ export default function WebhookGuidesPage() {
                   <Link
                     key={guide.title}
                     href={guide.href}
-                    className="group p-5 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors"
+                    className="group p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors"
                   >
                     <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-2">{guide.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{guide.description}</p>

@@ -11,7 +11,7 @@ export default function WebhooksPage() {
   const t = useTranslations('webhooks');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -37,7 +37,7 @@ export default function WebhooksPage() {
             { icon: '🔌', title: 'Provider Guides', desc: 'Stripe, GitHub, Shopify webhook setup guides.', href: '/webhooks/guides' },
             { icon: '🪝', title: 'What is a Webhook?', desc: 'The complete introduction to webhooks for beginners.', href: '/what-is-a-webhook' },
           ].map((card) => (
-            <Link key={card.title} href={card.href} className="group p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+            <Link key={card.title} href={card.href} className="group p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
               <span className="text-3xl mb-3 block">{card.icon}</span>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-2">{card.title}</h2>
               <p className="text-sm text-gray-600 dark:text-slate-400">{card.desc}</p>
@@ -57,7 +57,7 @@ export default function WebhooksPage() {
               { title: 'HookSniff vs Hookdeck', href: '/alternatives/hookdeck' },
               { title: 'HookSniff vs Hook0', href: '/alternatives/hook0' },
             ].map((link) => (
-              <Link key={link.title} href={link.href} className="p-4 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400">
+              <Link key={link.title} href={link.href} className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400">
                 {link.title} →
               </Link>
             ))}

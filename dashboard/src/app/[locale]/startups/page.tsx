@@ -24,7 +24,7 @@ export default function StartupsPage() {
             { icon: '📈', titleKey: 'benefitFreeTitle', descKey: 'benefitFreeDesc' },
             { icon: '🤝', titleKey: 'benefitPriorityTitle', descKey: 'benefitPriorityDesc' },
           ].map((b) => (
-            <div key={b.titleKey} className="text-center p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+            <div key={b.titleKey} className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
               <span className="text-3xl">{b.icon}</span>
               <h3 className="font-bold text-gray-900 dark:text-white mt-3 mb-2">{t(b.titleKey)}</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400">{t(b.descKey)}</p>
@@ -32,7 +32,7 @@ export default function StartupsPage() {
           ))}
         </div>
 
-        <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 mb-16">
+        <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 mb-16">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t("whoQualifies")}</h2>
           <ul className="space-y-3 text-gray-600 dark:text-slate-400">
             {[t('qualify1'), t('qualify2'), t('qualify3'), t('qualify4'), t('qualify5')].map((q) => (

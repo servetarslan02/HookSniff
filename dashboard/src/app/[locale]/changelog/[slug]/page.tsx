@@ -59,7 +59,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Nav */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -124,7 +124,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
         {/* Hero Image */}
         {release.heroImage && (
           <div className="mb-10 relative w-full h-[400px]">
-            <Image src={release.heroImage} alt={release.title} fill className="rounded-xl border border-gray-200 dark:border-slate-800 object-cover" />
+            <Image src={release.heroImage} alt={release.title} fill className="rounded-xl border border-gray-200 dark:border-slate-700 object-cover" />
           </div>
         )}
 
@@ -133,7 +133,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
           {release.entries.map((entry, i) => {
             const cfg = typeConfig[entry.type];
             return (
-              <div key={i} className="rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+              <div key={i} className="rounded-xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-5">
                 <div className="flex items-start gap-4">
                   <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full shrink-0 mt-0.5 ${cfg.bg} ${cfg.color}`}>
                     {cfg.icon} {cfg.label}
@@ -179,7 +179,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
         </div>
 
         {/* Navigation */}
-        <div className="mt-16 pt-8 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
+        <div className="mt-16 pt-8 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between">
           {prevRelease ? (
             <Link href={`/changelog/${prevRelease.slug}`} className="group">
               <p className="text-xs text-gray-400 dark:text-slate-600 mb-1">← Previous</p>

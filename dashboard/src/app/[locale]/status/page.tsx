@@ -375,7 +375,7 @@ function IncidentLog({ incidents }: { incidents: Incident[] }) {
           <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 mb-3">{formatDate(date)}</h3>
           <div className="space-y-3">
             {grouped[date].map((inc) => (
-              <div key={inc.id} className="border border-gray-100 dark:border-slate-800 rounded-lg overflow-hidden">
+              <div key={inc.id} className="border border-gray-100 dark:border-slate-700 rounded-lg overflow-hidden">
                 <button
                   className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors text-left"
                   onClick={() => setExpandedId(expandedId === inc.id ? null : inc.id)}
@@ -393,7 +393,7 @@ function IncidentLog({ incidents }: { incidents: Incident[] }) {
                   </div>
                 </button>
                 {expandedId === inc.id && (
-                  <div className="px-4 pb-3 border-t border-gray-100 dark:border-slate-800">
+                  <div className="px-4 pb-3 border-t border-gray-100 dark:border-slate-700">
                     <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-slate-500 mt-2 mb-3">
                       <span>Affects: {inc.affected_components.join(', ')}</span>
                       {inc.resolved_at && <span>• Resolved {formatRelativeTime(inc.resolved_at)}</span>}
@@ -605,7 +605,7 @@ export default function StatusPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <span className="text-xl">🪝</span>
@@ -639,14 +639,14 @@ export default function StatusPage() {
 
         {/* 90-Day Uptime Calendar */}
         {history.length > 0 && (
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Uptime — Last 90 Days</h2>
             <UptimeCalendar history={history.slice(-90)} />
           </div>
         )}
 
         {/* 30-Day Uptime Bar */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("overallUptime")}</h2>
           {history.length > 0 ? (
             <UptimeBar history={history} />
@@ -666,7 +666,7 @@ export default function StatusPage() {
         </div>
 
         {/* Components */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("components")}</h2>
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
             {enrichedComponents.map((comp) => (
@@ -680,13 +680,13 @@ export default function StatusPage() {
         </div>
 
         {/* Incidents */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("incidentHistory")}</h2>
           <IncidentLog incidents={incidents} />
         </div>
 
         {/* Maintenance */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("scheduledMaintenance")}</h2>
           <MaintenanceSection maintenance={maintenance} />
         </div>
