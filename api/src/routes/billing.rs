@@ -6,9 +6,9 @@ use chrono::{Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::billing::provider::{PaymentProvider, PaymentProviderImpl};
+use crate::billing::provider::PaymentProviderImpl;
 use crate::billing::stripe;
-use crate::billing::Plan;
+use crate::billing::{BillingService, Plan};
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -293,105 +293,118 @@ async fn upgrade_plan(
         provider_name = "polar".to_string();
     }
 
-    let provider_enum = PaymentProvider::parse_str(&provider_name);
-
-    match provider_enum {
-        PaymentProvider::Polar | PaymentProvider::Iyzico => {
-            // Use Polar.sh or iyzico via the provider trait
-            let provider_impl =
-                crate::billing::resolve_provider(&provider_name).ok_or_else(|| {
-                    AppError::Internal(anyhow::anyhow!(
-                        "Payment provider '{}' not configured",
+    // ── Item 249: Cancel old subscription if switching providers ──
+    let old_provider = &customer.payment_provider;
+    if provider_name != *old_provider && current_plan != Plan::Free {
+        // Customer is switching to a different provider with an active paid plan.
+        // Cancel the old subscription at the old provider first.
+        if let Some(old_sub_id) =
+            BillingService::subscription_id_for_provider(&customer, old_provider)
+        {
+            let billing_svc = BillingService::new(pool.clone(), cfg.clone());
+            match billing_svc
+                .cancel_at_provider(old_provider, old_sub_id)
+                .await
+            {
+                Ok(()) => {
+                    tracing::info!(
+                        "✅ Canceled old {} subscription {} for customer {} (switching to {})",
+                        old_provider,
+                        old_sub_id,
+                        customer.id,
                         provider_name
+                    );
+                    // Clear the old subscription ID in the DB
+                    let clear_col = match old_provider.as_str() {
+                        "polar" => "polar_subscription_id",
+                        "iyzico" => "iyzico_subscription_id",
+                        _ => "stripe_subscription_id",
+                    };
+                    let _ = sqlx::query(&format!(
+                        "UPDATE customers SET {} = NULL, updated_at = NOW() WHERE id = $1",
+                        clear_col
                     ))
-                })?;
-
-            let base_url = cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
-
-            let result = provider_impl
-                .create_checkout(customer.id, &customer.email, &new_plan, base_url)
-                .await?;
-
-            // Item 259: Validate checkout URL server-side before returning to client
-            validate_checkout_url(&result.checkout_url)?;
-
-            // Update customer's payment provider
-            sqlx::query("UPDATE customers SET payment_provider = $1 WHERE id = $2")
-                .bind(&provider_name)
-                .bind(customer.id)
-                .execute(&pool)
-                .await?;
-
-            let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
-
-            // Audit log — PLAN_CHANGE
-            {
-                let rid = customer.id.to_string();
-                let _ = crate::audit::log_action(&pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
-                    Some(serde_json::json!({"new_plan": new_plan.as_str(), "provider": provider_name})), None, None).await;
+                    .bind(customer.id)
+                    .execute(&pool)
+                    .await;
+                }
+                Err(e) => {
+                    // Log but don't block the upgrade — the old subscription
+                    // may have already been canceled or the provider may be down.
+                    tracing::warn!(
+                        "⚠️ Failed to cancel old {} subscription {} for customer {}: {:?} \
+                         — proceeding with upgrade anyway",
+                        old_provider,
+                        old_sub_id,
+                        customer.id,
+                        e
+                    );
+                }
             }
-
-            Ok(Json(UpgradeResponse {
-                checkout_url: Some(result.checkout_url),
-                provider: provider_name.to_string(),
-                message: format!(
-                    "Redirecting to {} Checkout for {} plan",
-                    provider_name,
-                    new_plan.as_str(),
-                ),
-                prorated_amount_cents: if prorated_amount > 0 {
-                    Some(prorated_amount)
-                } else {
-                    None
-                },
-                days_remaining: if days_remaining > 0 {
-                    Some(days_remaining)
-                } else {
-                    None
-                },
-            }))
-        }
-        PaymentProvider::Stripe => {
-            // Use existing Stripe integration
-            let session =
-                stripe::create_checkout_session(&cfg, customer.id, &customer.email, &new_plan)
-                    .await?;
-
-            // Item 259: Validate Stripe checkout URL server-side
-            if let Some(ref url) = session.url {
-                validate_checkout_url(url)?;
-            }
-
-            let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
-
-            // Audit log — PLAN_CHANGE
-            {
-                let rid = customer.id.to_string();
-                let _ = crate::audit::log_action(&pool, customer.id, "PLAN_CHANGE", "billing", Some(&rid),
-                    Some(serde_json::json!({"new_plan": new_plan.as_str(), "provider": "stripe"})), None, None).await;
-            }
-
-            Ok(Json(UpgradeResponse {
-                checkout_url: session.url,
-                provider: "stripe".to_string(),
-                message: format!(
-                    "Redirecting to Stripe Checkout for {} plan (${}/mo)",
-                    new_plan.as_str(),
-                    new_plan.monthly_price_cents() as f64 / 100.0
-                ),
-                prorated_amount_cents: if prorated_amount > 0 {
-                    Some(prorated_amount)
-                } else {
-                    None
-                },
-                days_remaining: if days_remaining > 0 {
-                    Some(days_remaining)
-                } else {
-                    None
-                },
-            }))
         }
     }
+
+    // ── Create checkout at the new provider ──
+    let billing_svc = BillingService::new(pool.clone(), cfg.clone());
+
+    // Update customer's payment provider before checkout
+    if provider_name != customer.payment_provider {
+        sqlx::query("UPDATE customers SET payment_provider = $1 WHERE id = $2")
+            .bind(&provider_name)
+            .bind(customer.id)
+            .execute(&pool)
+            .await?;
+    }
+
+    let result = billing_svc
+        .checkout(&customer, &new_plan, Some(&provider_name))
+        .await?;
+
+    // Item 259: Validate checkout URL server-side before returning to client
+    if let Some(ref url) = result.checkout_url {
+        validate_checkout_url(url)?;
+    }
+
+    let (prorated_amount, days_remaining) = proration.unwrap_or((0, 0));
+
+    // Audit log — PLAN_CHANGE
+    {
+        let rid = customer.id.to_string();
+        let _ = crate::audit::log_action(
+            &pool,
+            customer.id,
+            "PLAN_CHANGE",
+            "billing",
+            Some(&rid),
+            Some(serde_json::json!({
+                "new_plan": new_plan.as_str(),
+                "provider": provider_name,
+            })),
+            None,
+            None,
+        )
+        .await;
+    }
+
+    Ok(Json(UpgradeResponse {
+        checkout_url: result.checkout_url,
+        provider: result.provider,
+        message: format!(
+            "Redirecting to {} Checkout for {} plan",
+            provider_name,
+            new_plan.as_str(),
+        ),
+        prorated_amount_cents: if prorated_amount > 0 {
+            Some(prorated_amount)
+        } else {
+            None
+        },
+        days_remaining: if days_remaining > 0 {
+            Some(days_remaining)
+        } else {
+            None
+        },
+    }))
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -405,53 +418,17 @@ struct PortalResponse {
 }
 
 async fn open_portal(
+    Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<PortalResponse>, AppError> {
-    let provider_name = &customer.payment_provider;
+    let billing_svc = BillingService::new(pool, cfg);
+    let result = billing_svc.portal(&customer).await?;
 
-    match PaymentProvider::parse_str(provider_name) {
-        PaymentProvider::Polar | PaymentProvider::Iyzico => {
-            let provider_impl =
-                crate::billing::resolve_provider(provider_name).ok_or_else(|| {
-                    AppError::Internal(anyhow::anyhow!(
-                        "Payment provider '{}' not configured",
-                        provider_name
-                    ))
-                })?;
-
-            // Get the provider-specific customer ID
-            let provider_customer_id = match provider_name.as_str() {
-                "polar" => customer.polar_customer_id.as_deref(),
-                "iyzico" => customer.iyzico_customer_id.as_deref(),
-                _ => None,
-            }
-            .unwrap_or("");
-
-            let base_url = cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
-
-            let url = provider_impl
-                .create_customer_portal(provider_customer_id, base_url)
-                .await?;
-
-            Ok(Json(PortalResponse {
-                url,
-                provider: provider_name.to_string(),
-            }))
-        }
-        PaymentProvider::Stripe => {
-            let stripe_customer_id = customer.stripe_customer_id.as_ref().ok_or_else(|| {
-                AppError::BadRequest("No Stripe customer found. Upgrade your plan first.".into())
-            })?;
-
-            let url = stripe::create_customer_portal(&cfg, stripe_customer_id).await?;
-
-            Ok(Json(PortalResponse {
-                url,
-                provider: "stripe".to_string(),
-            }))
-        }
-    }
+    Ok(Json(PortalResponse {
+        url: result.url,
+        provider: result.provider,
+    }))
 }
 
 // ──────────────────────────────────────────────────────────────

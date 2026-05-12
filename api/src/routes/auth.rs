@@ -234,7 +234,7 @@ async fn register(
         let name = req.name.clone();
         tokio::spawn(async move {
             if let Err(e) = email_provider
-                .send_welcome_email(&to, name.as_deref())
+                .send_welcome_email(&to, name.as_deref(), crate::email::Language::Tr)
                 .await
             {
                 tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
@@ -502,7 +502,7 @@ async fn forgot_password(
             let to = email.clone();
             tokio::spawn(async move {
                 if let Err(e) = email_provider
-                    .send_password_reset_email(&to, &reset_url)
+                    .send_password_reset_email(&to, &reset_url, crate::email::Language::Tr)
                     .await
                 {
                     tracing::warn!("Failed to send password reset email to {}: {:?}", to, e);
@@ -1338,7 +1338,7 @@ async fn send_verification_email_for_customer(
     let to = email.to_string();
     tokio::spawn(async move {
         if let Err(e) = email_provider
-            .send_verification_email(&to, &verify_url)
+            .send_verification_email(&to, &verify_url, crate::email::Language::Tr)
             .await
         {
             tracing::warn!("Failed to send verification email to {}: {:?}", to, e);
