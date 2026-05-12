@@ -43,4 +43,3 @@ const nextConfig = {
 
 module.exports = withNextIntl(nextConfig);
 // Force Vercel rebuild without stale standalone cache — Mon May 11 11:58:22 PM CST 2026
-# Vercel redeploy trigger — Wed May 13 01:04:45 AM CST 2026
