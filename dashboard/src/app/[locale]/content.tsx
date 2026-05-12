@@ -519,11 +519,11 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               <button
                 onClick={() => {
                   if (plan.name === tPricing('business')) {
-                    router.push(`/${locale}/contact`);
+                    router.push('/contact');
                   } else if (token) {
-                    router.push(`/${locale}/dashboard/billing`);
+                    router.push('/dashboard/billing');
                   } else {
-                    router.push(`/${locale}/register`);
+                    router.push('/register');
                   }
                 }}
                 className={`w-full py-3 rounded-xl font-medium transition cursor-pointer ${
