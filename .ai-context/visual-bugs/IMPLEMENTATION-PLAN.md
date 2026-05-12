@@ -205,7 +205,7 @@
 141. ✅ Team member removal — ConfirmDialog zaten mevcut, hardcoded stringler i18n yapıldı ✅ YAPILDI (Oturum 122) → `team/page.tsx`
 
 ### 4.3 i18n Eksikler
-142. 🟡 Hardcoded strings in 14+ dashboard pages — alerts, analytics, notifications, retry-policy düzeltildi, kalan sayfalar devam ediyor ✅ KISMİ (Oturum 126)
+142. 🟡 Hardcoded strings in 14+ dashboard pages — alerts, analytics, notifications, retry-policy düzeltildi, kalan sayfalar devam ediyor ✅ KISMİ (Oturum 126) + Status page 15+ hardcoded string i18n yapıldı + deliveries noResults i18n (Oturum 127)
 143. ✅ ConfirmDialog hardcoded: "Confirm", "Cancel", "Processing..." → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
 144. ✅ EmailVerificationBanner hardcoded → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
 145. ✅ SdkTabs hardcoded: "Copy", "Copied!" → zaten i18n kullanıyor ✅ YAPILDI (önceki oturum)
@@ -461,7 +461,7 @@
 
 ### 13.2 Frontend Düşük
 315. ✅ Inbound page unused loading variable — ✅ YAPILDI (Oturum 124)
-316. ✅ Duplicate StatusBadge component — ✅ YAPILDI (Oturum 124)
+316. ✅ Duplicate StatusBadge component — ✅ YAPILDI (Oturum 124) + Added comment explaining separation (system health vs delivery statuses)
 317. ✅ Onboarding + OnboardingWizard overlap — ✅ YAPILDI (Oturum 124)
 318. ✅ AnimatedCounter negative values — ✅ YAPILDI (Oturum 124)
 319. ✅ Playground history localStorage size limit — ✅ YAPILDI (Oturum 124)
