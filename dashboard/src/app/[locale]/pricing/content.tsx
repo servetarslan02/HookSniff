@@ -17,7 +17,7 @@ function RoiCalculator() {
 
   const svixCost = events <= 0 ? 0 : 490;
   const hookdeckCost = events <= 10000 ? 0 : 39 + Math.max(0, Math.ceil((events - 10000) / 100000)) * 1;
-  const hooksniffCost = events <= 10000 ? 0 : events <= 50000 ? 49 : 99;
+  const hooksniffCost = events <= 100 ? 0 : events <= 30000 ? 29 : events <= 100000 ? 49 : 49 + Math.max(0, Math.ceil((events - 100000) / 1000)) * 0.0001;
   const savingsVsSvix = svixCost - hooksniffCost;
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
@@ -91,15 +91,17 @@ export function PricingPageContent() {
   const tf = useTranslations('pricingFaq');
   const isTr = locale === 'tr';
 
-  const monthlyPrices = { free: 0, pro: isTr ? 999 : 49, business: isTr ? 1999 : 99 };
+  const monthlyPrices = { developer: 0, startup: isTr ? 599 : 29, pro: isTr ? 999 : 49, enterprise: 0 };
   const annualPrices = {
-    free: 0,
+    developer: 0,
+    startup: isTr ? Math.round(599 * 12 * 0.8) : Math.round(29 * 12 * 0.8),
     pro: isTr ? Math.round(999 * 12 * 0.8) : Math.round(49 * 12 * 0.8),
-    business: isTr ? Math.round(1999 * 12 * 0.8) : Math.round(99 * 12 * 0.8),
+    enterprise: 0,
   };
 
   const getPrice = (plan: string) => {
-    if (plan === 'free') return isTr ? '₺0' : '$0';
+    if (plan === 'developer') return isTr ? '₺0' : '$0';
+    if (plan === 'enterprise') return t('custom');
     const prices = billingPeriod === 'annual' ? annualPrices : monthlyPrices;
     const val = prices[plan as keyof typeof prices];
     return isTr ? `₺${val.toLocaleString()}` : `$${val}`;
@@ -108,16 +110,16 @@ export function PricingPageContent() {
   const getPeriodLabel = () => billingPeriod === 'annual' ? t('billedAnnually') : t('month');
 
   const planData = [
-    { key: 'free', ctaStyle: 'outline', popular: false },
+    { key: 'developer', ctaStyle: 'outline', popular: false },
+    { key: 'startup', ctaStyle: 'outline', popular: false },
     { key: 'pro', ctaStyle: 'filled', popular: true },
-    { key: 'business', ctaStyle: 'outline', popular: false },
     { key: 'enterprise', ctaStyle: 'outline', popular: false },
   ];
 
   const featureKeys: Record<string, string[]> = {
-    free: t.raw('freeFeatures') as string[],
+    developer: t.raw('developerFeatures') as string[],
+    startup: t.raw('startupFeatures') as string[],
     pro: t.raw('proFeatures') as string[],
-    business: t.raw('businessFeatures') as string[],
     enterprise: t.raw('enterpriseFeatures') as string[],
   };
 
@@ -125,54 +127,56 @@ export function PricingPageContent() {
     {
       category: t('usage'),
       items: [
-        { feature: t('monthlyWebhooks'), free: '10,000', pro: '50,000', business: '500,000' },
-        { feature: t('endpoints'), free: '5', pro: '50', business: '500' },
-        { feature: t('rateLimit'), free: '100', pro: '1,000', business: '10,000' },
-        { feature: t('additionalEvents'), free: '—', pro: '$0.50/100K', business: '$0.30/100K' },
-        { feature: t('teamMembers'), free: '1', pro: '3', business: t('unlimited') },
+        { feature: t('dailyEvents'), developer: '100', startup: '30,000', pro: '100,000', enterprise: t('unlimited') },
+        { feature: t('applications'), developer: '1', startup: '1', pro: t('unlimited'), enterprise: t('unlimited') },
+        { feature: t('endpoints'), developer: '5', startup: '50', pro: '500', enterprise: t('unlimited') },
+        { feature: t('eventTypes'), developer: '10', startup: '50', pro: t('unlimited'), enterprise: t('unlimited') },
+        { feature: t('teamMembers'), developer: '1', startup: '25', pro: t('unlimited'), enterprise: t('unlimited') },
+        { feature: t('subscriptions'), developer: '10', startup: '300', pro: t('unlimited'), enterprise: t('unlimited') },
+        { feature: t('overagePerEvent'), developer: '—', startup: '$0.003', pro: '$0.0001', enterprise: t('custom') },
       ],
     },
     {
       category: t('delivery'),
       items: [
-        { feature: t('deliveryMethods'), free: t('http'), pro: `${t('http')}, ${t('ws')}`, business: `${t('http')}, ${t('ws')}, ${t('grpc')}, ${t('sqs')}` },
-        { feature: t('retryAttempts'), free: '3', pro: '5', business: '10' },
-        { feature: t('customRetryPolicies'), free: '—', pro: '✅', business: '✅' },
-        { feature: t('fifoDelivery'), free: '—', pro: '—', business: '✅' },
-        { feature: t('exponentialBackoff'), free: '✅', pro: '✅', business: '✅' },
-        { feature: t('dlq'), free: '—', pro: '✅', business: '✅' },
+        { feature: t('deliveryMethods'), developer: t('http'), startup: `${t('http')}, ${t('ws')}`, pro: `${t('http')}, ${t('ws')}, ${t('grpc')}`, enterprise: `${t('http')}, ${t('ws')}, ${t('grpc')}, ${t('sqs')}` },
+        { feature: t('retryAttempts'), developer: '3', startup: '5', pro: '10', enterprise: t('custom') },
+        { feature: t('customRetryPolicies'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('fifoDelivery'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
+        { feature: t('exponentialBackoff'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('dlq'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
       ],
     },
     {
       category: t('security'),
       items: [
-        { feature: t('hmacSignatures'), free: '✅', pro: '✅', business: '✅' },
-        { feature: t('secretRotation'), free: '—', pro: '✅', business: '✅' },
-        { feature: t('ipWhitelisting'), free: '—', pro: '—', business: '✅' },
-        { feature: t('ssoSaml'), free: '—', pro: '—', business: '✅' },
-        { feature: t('twoFactor'), free: '✅', pro: '✅', business: '✅' },
-        { feature: t('cloudevents'), free: '—', pro: '✅', business: '✅' },
+        { feature: t('hmacSignatures'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('secretRotation'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('ipWhitelisting'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
+        { feature: t('ssoSaml'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
+        { feature: t('twoFactor'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('cloudevents'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
       ],
     },
     {
       category: t('monitoringLogs'),
       items: [
-        { feature: t('dashboard'), free: '✅', pro: '✅', business: '✅' },
-        { feature: t('logRetention'), free: `7 ${t('days')}`, pro: `30 ${t('days')}`, business: `90 ${t('days')}` },
-        { feature: t('realtimeLogs'), free: '✅', pro: '✅', business: '✅' },
-        { feature: t('analyticsGraphs'), free: '—', pro: '✅', business: '✅' },
-        { feature: t('schemaRegistry'), free: '—', pro: '—', business: '✅' },
-        { feature: t('webhookPlayground'), free: '—', pro: '✅', business: '✅' },
+        { feature: t('dashboard'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('logRetention'), developer: `7 ${t('days')}`, startup: `14 ${t('days')}`, pro: `30 ${t('days')}`, enterprise: t('custom') },
+        { feature: t('realtimeLogs'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('analyticsGraphs'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('schemaRegistry'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
+        { feature: t('webhookPlayground'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
       ],
     },
     {
       category: t('support'),
       items: [
-        { feature: t('communitySupport'), free: '✅', pro: '✅', business: '✅' },
-        { feature: t('emailSupport'), free: '—', pro: '✅', business: '✅' },
-        { feature: t('prioritySupport'), free: '—', pro: '✅', business: '✅' },
-        { feature: t('dedicatedManager'), free: '—', pro: '—', business: '✅' },
-        { feature: t('slaGuarantee'), free: '—', pro: '—', business: '99.9%' },
+        { feature: t('communitySupport'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('emailSupport'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('prioritySupport'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
+        { feature: t('dedicatedManager'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
+        { feature: t('slaGuarantee'), developer: '—', startup: '—', pro: '—', enterprise: '99.9%' },
         { feature: t('customIntegrations'), free: '—', pro: '—', business: '✅' },
       ],
     },

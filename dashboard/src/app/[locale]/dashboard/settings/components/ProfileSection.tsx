@@ -61,7 +61,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
             <div className="text-sm font-medium text-gray-900 dark:text-white">{user?.email}</div>
             <div className="text-xs text-gray-500 dark:text-slate-400">
               Plan: <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300">
-                {user?.plan || 'free'}
+                {user?.plan || 'developer'}
               </span>
             </div>
           </div>
