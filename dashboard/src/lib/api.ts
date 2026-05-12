@@ -157,6 +157,31 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   throw lastError;
 }
 
+// Application API (Hook0-style)
+export interface Application {
+  id: string;
+  customer_id: string;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+  endpoint_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const applicationsApi = {
+  list: (token: string) =>
+    apiFetch<Application[]>("/applications", { token }),
+  get: (token: string, id: string) =>
+    apiFetch<Application>(`/applications/${id}`, { token }),
+  create: (token: string, data: { name: string; description?: string }) =>
+    apiFetch<Application>("/applications", { method: "POST", body: data, token }),
+  update: (token: string, id: string, data: { name?: string; description?: string; is_active?: boolean }) =>
+    apiFetch<Application>(`/applications/${id}`, { method: "PUT", body: data, token }),
+  delete: (token: string, id: string) =>
+    apiFetch<{ message: string }>(`/applications/${id}`, { method: "DELETE", token }),
+};
+
 // Endpoint API
 export interface RetryPolicyConfig {
   max_attempts: number;
