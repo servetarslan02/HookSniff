@@ -475,9 +475,16 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{u.name || '—'}</td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${PLAN_BADGE_COLORS[u.plan] || PLAN_BADGE_COLORS.free}`}>
-                          {u.plan}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${PLAN_BADGE_COLORS[u.plan] || PLAN_BADGE_COLORS.free}`}>
+                            {u.plan}
+                          </span>
+                          {u.role && u.role !== 'member' && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                              {u.role}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={u.status} />
