@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::billing::Plan;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
@@ -300,6 +301,23 @@ async fn invite_member(
 
     let role = req.role.as_deref().unwrap_or("viewer");
     validate_role(role)?;
+
+    // Plan-based team member limit check
+    let plan = Plan::parse_str(&customer.plan);
+    let max_members = plan.max_team_members();
+
+    let member_count: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM team_members WHERE team_id = $1",
+    )
+    .bind(id)
+    .fetch_one(&pool)
+    .await?;
+
+    if member_count.0 as u32 >= max_members {
+        return Err(AppError::BadRequest(format!(
+            "Team member limit reached ({max_members}). Upgrade your plan for more members."
+        )));
+    }
 
     // Check if user is already a member
     let existing_customer: Option<(Uuid,)> =
