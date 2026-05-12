@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { adminApi, type AdminStatsResponse, type AuditLogEntry } from '@/lib/api';
+import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
@@ -15,27 +15,38 @@ const PLAN_COLORS: Record<string, string> = {
   enterprise: '#8b5cf6',
 };
 
+const SECURITY_ACTIONS = ['SSRF', 'SPOOFING', 'REPLAY', 'ENDPOINT_DISABLE', 'RATE_LIMIT_EXCEEDED', 'ABUSE_DETECTED'];
+
 export default function AdminOverviewPage() {
   const { token } = useAuth();
   const [stats, setStats] = useState<AdminStatsResponse | null>(null);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
+  const [securityLogs, setSecurityLogs] = useState<AuditLogEntry[]>([]);
+  const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
-
 
   const fetchStats = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const [statsData, auditData] = await Promise.all([
+      const [statsData, auditData, revenueData, securityData] = await Promise.all([
         adminApi.getStats(token),
         adminApi.getAuditLogs(token, { limit: 5 }).catch(() => ({ entries: [], total: 0, limit: 5, offset: 0 })),
+        adminApi.getRevenue(token).catch(() => null),
+        adminApi.getAuditLogs(token, { limit: 50 }).catch(() => ({ entries: [], total: 0, limit: 50, offset: 0 })),
       ]);
       setStats(statsData);
       setAuditLogs(auditData.entries || []);
+      setRevenue(revenueData);
+      // Filter security-related logs
+      const allLogs = securityData.entries || [];
+      setSecurityLogs(allLogs.filter((log: AuditLogEntry) =>
+        SECURITY_ACTIONS.some(sa => log.action.toUpperCase().includes(sa))
+      ));
     } catch (err) {
       setError(t("failedToLoadStats"));
     } finally {
@@ -90,6 +101,21 @@ export default function AdminOverviewPage() {
     value: item.count,
   })) || [];
 
+  // MRR/ARR calculation
+  const mrr = revenue?.mrr || 0;
+  const arr = mrr * 12;
+
+  // Endpoint stats (from admin stats)
+  const totalEndpoints = (stats as Record<string, unknown>)?.total_endpoints as number | undefined;
+  const activeEndpoints = (stats as Record<string, unknown>)?.active_endpoints as number | undefined;
+  const disabledEndpoints = totalEndpoints != null && activeEndpoints != null ? totalEndpoints - activeEndpoints : undefined;
+
+  // Security warnings count
+  const ssrfCount = securityLogs.filter(l => l.action.toUpperCase().includes('SSRF')).length;
+  const spoofingCount = securityLogs.filter(l => l.action.toUpperCase().includes('SPOOF')).length;
+  const replayCount = securityLogs.filter(l => l.action.toUpperCase().includes('REPLAY')).length;
+  const totalSecurityWarnings = ssrfCount + spoofingCount + replayCount;
+
   return (
     <div className="space-y-8">
       <div>
@@ -99,7 +125,7 @@ export default function AdminOverviewPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {/* ── Stats Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label={t('totalUsers')}
@@ -159,7 +185,37 @@ export default function AdminOverviewPage() {
         />
       </div>
 
-      {/* Live Webhooks Indicator */}
+      {/* ── MRR / ARR Cards ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="glass-card p-6 border-l-4 border-violet-500">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-2xl" aria-hidden="true">💎</span>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('mrrCard')}</h2>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            ₺{mrr.toLocaleString()}
+          </p>
+          {revenue?.mrr_trend != null && revenue.mrr_trend !== 0 && (
+            <p className={`text-sm mt-1 ${revenue.mrr_trend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+              {revenue.mrr_trend > 0 ? '↑' : '↓'} %{Math.abs(revenue.mrr_trend).toFixed(1)} {t('vsLastMonth') || 'vs last month'}
+            </p>
+          )}
+        </div>
+        <div className="glass-card p-6 border-l-4 border-blue-500">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-2xl" aria-hidden="true">📊</span>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('arrCard')}</h2>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            ₺{arr.toLocaleString()}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+            MRR × 12
+          </p>
+        </div>
+      </div>
+
+      {/* ── Live Webhooks Indicator ── */}
       {stats?.trends?.active_webhooks != null && stats.trends.active_webhooks > 0 && (
         <div className="glass-card p-4 flex items-center gap-3 border-l-4 border-emerald-500">
           <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
@@ -170,6 +226,92 @@ export default function AdminOverviewPage() {
         </div>
       )}
 
+      {/* ── Endpoint Status + Security Warnings ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Endpoint Status */}
+        <div className="glass-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('endpointStatus')}</h2>
+            <Link href="/admin/users" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">
+              {t('viewAllEndpoints')} →
+            </Link>
+          </div>
+          {totalEndpoints != null ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('totalEndpoints')}</span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">{totalEndpoints}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('activeEndpoints')}</span>
+                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{activeEndpoints ?? '—'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('disabledEndpoints')}</span>
+                <span className={`text-lg font-bold ${(disabledEndpoints ?? 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                  {disabledEndpoints ?? '—'}
+                </span>
+              </div>
+              {activeEndpoints != null && totalEndpoints > 0 && (
+                <div className="mt-2">
+                  <div className="w-full h-3 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                      style={{ width: `${(activeEndpoints / totalEndpoints) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 text-right">
+                    %{((activeEndpoints / totalEndpoints) * 100).toFixed(1)} aktif
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t('noEndpoints')}</p>
+          )}
+        </div>
+
+        {/* Security Warnings */}
+        <div className="glass-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('securityWarnings')}</h2>
+            <Link href="/admin/activity" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">
+              {t('viewSecurityLogs')} →
+            </Link>
+          </div>
+          {totalSecurityWarnings > 0 ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+                <div className="flex items-center gap-2">
+                  <span aria-hidden="true">🛡️</span>
+                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('ssrfAttempts')}</span>
+                </div>
+                <span className="text-lg font-bold text-red-600 dark:text-red-400">{ssrfCount}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                <div className="flex items-center gap-2">
+                  <span aria-hidden="true">⚠️</span>
+                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('spoofingAttempts')}</span>
+                </div>
+                <span className="text-lg font-bold text-amber-600 dark:text-amber-400">{spoofingCount}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20">
+                <div className="flex items-center gap-2">
+                  <span aria-hidden="true">🔄</span>
+                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('replayAttempts')}</span>
+                </div>
+                <span className="text-lg font-bold text-orange-600 dark:text-orange-400">{replayCount}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-8">
+              <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{t('noSecurityWarnings')}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Charts + Activity ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Users by Plan Chart */}
         <div className="glass-card p-6">
@@ -220,7 +362,6 @@ export default function AdminOverviewPage() {
               </div>
             </div>
           ) : (
-            /* Item 67 — CSS bar chart placeholder when no data */
             <div aria-label={t('chartPlaceholder')} role="img">
               <div className="flex items-end gap-3 h-32 mb-3">
                 {[
@@ -281,6 +422,7 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
+      {/* ── Recent Signups + Quick Actions ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Signups */}
         <div className="glass-card overflow-hidden">
@@ -311,9 +453,56 @@ export default function AdminOverviewPage() {
               ))
             ) : (
               <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
-                {t('noSignups')}
+                {t('noRecentSignups')}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('quickActions')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link
+              href="/admin/system"
+              className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+            >
+              <span className="text-2xl" aria-hidden="true">🖥️</span>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{t('viewSystemHealth')}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('systemHealth')}</p>
+              </div>
+            </Link>
+            <Link
+              href="/admin/users"
+              className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+            >
+              <span className="text-2xl" aria-hidden="true">👥</span>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{t('userManagement')}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('totalUsers')}: {stats?.total_users || 0}</p>
+              </div>
+            </Link>
+            <Link
+              href="/admin/revenue"
+              className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+            >
+              <span className="text-2xl" aria-hidden="true">💰</span>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{t('revenue')}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">MRR: ₺{mrr.toLocaleString()}</p>
+              </div>
+            </Link>
+            <Link
+              href="/admin/settings"
+              className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+            >
+              <span className="text-2xl" aria-hidden="true">⚙️</span>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{t('platformSettings')}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('settingsNav')}</p>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
