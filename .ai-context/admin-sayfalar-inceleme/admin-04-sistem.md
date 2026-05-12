@@ -62,6 +62,9 @@ interface SystemHealth {
 - **Servis restart** — API/Worker/DB servislerini yeniden başlatma
 - **Bağlantı havuzu** — DB ve Redis connection pool durumu
 - **Disk kullanımı** — Sunucu disk doluluk oranı
+- **Structured health checks** — Worker bazlı JSON sağlık durumu (Hookdeck ✅)
+- **SSRF attempt log** — Güvenlik olaylarını izleme (Güvenlik araştırması)
+- **Endpoint disable log** — Hangi endpoint ne zaman devre dışı kaldı (Svix ✅)
 - Sistem metrikleri grafiği yok (CPU, RAM, Disk)
 - Log viewer yok
 - Servis restart butonu yok
