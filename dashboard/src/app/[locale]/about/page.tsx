@@ -27,7 +27,7 @@ export default function AboutPage() {
         </div>
 
         {/* Mission */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 mb-8">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('about.ourMission')}</h2>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-4">
             {t('about.missionP1')}
@@ -45,7 +45,7 @@ export default function AboutPage() {
             { value: '11', label: t('about.sdkLanguages') },
             { value: '$0', label: t('about.startingPrice') },
           ].map(stat => (
-            <div key={stat.label} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 text-center">
+            <div key={stat.label} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 text-center">
               <div className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-1">{stat.value}</div>
               <div className="text-sm text-gray-500 dark:text-slate-400">{stat.label}</div>
             </div>
@@ -53,7 +53,7 @@ export default function AboutPage() {
         </div>
 
         {/* Story */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 mb-8">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('about.ourStory')}</h2>
           <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-4">
             {t('about.storyP1')}
@@ -85,7 +85,7 @@ export default function AboutPage() {
               desc: t('about.globalInfrastructureDesc'),
             },
           ].map(v => (
-            <div key={v.title} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+            <div key={v.title} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
               <div className="text-3xl mb-3">{v.icon}</div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{v.title}</h3>
               <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed">{v.desc}</p>

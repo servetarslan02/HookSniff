@@ -95,7 +95,7 @@ export default function NewsletterPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Nav */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -177,7 +177,7 @@ export default function NewsletterPage() {
               example: 'Why every AI agent needs webhooks (and how to build them right)',
             },
           ].map((item) => (
-            <div key={item.title} className="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+            <div key={item.title} className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
               <span className="text-3xl">{item.icon}</span>
               <h3 className="font-bold text-gray-900 dark:text-white mt-3 mb-2">{item.title}</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">{item.desc}</p>
@@ -215,7 +215,7 @@ export default function NewsletterPage() {
               .map((issue) => (
               <div
                 key={issue.slug}
-                className="flex items-start gap-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-500/20 transition-colors"
+                className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-200 dark:hover:border-brand-500/20 transition-colors"
               >
                 <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium ${
                   issue.category === 'Engineering'
@@ -245,7 +245,7 @@ export default function NewsletterPage() {
 
         {/* Social Proof */}
         <div className="mb-16 text-center">
-          <div className="inline-flex items-center gap-6 px-8 py-4 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+          <div className="inline-flex items-center gap-6 px-8 py-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">500+</p>
               <p className="text-xs text-gray-500 dark:text-slate-500">{t("subscribers")}</p>
@@ -255,7 +255,7 @@ export default function NewsletterPage() {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">48%</p>
               <p className="text-xs text-gray-500 dark:text-slate-500">{t("openRate")}</p>
             </div>
-            <div className="w-px h-10 bg-gray-200 dark:border-slate-800" />
+            <div className="w-px h-10 bg-gray-200 dark:border-slate-700" />
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">17</p>
               <p className="text-xs text-gray-500 dark:text-slate-500">{t("issuesSent")}</p>
@@ -279,7 +279,7 @@ export default function NewsletterPage() {
                 role: 'DevOps Lead',
               },
             ].map((t) => (
-              <div key={t.author} className="p-5 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+              <div key={t.author} className="p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
                 <p className="text-sm text-gray-700 dark:text-slate-300 italic mb-3">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-xs font-bold text-brand-600 dark:text-brand-400">
@@ -298,7 +298,7 @@ export default function NewsletterPage() {
         {/* Team */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Who writes this?</h2>
-          <div className="max-w-lg mx-auto flex items-start gap-4 p-5 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+          <div className="max-w-lg mx-auto flex items-start gap-4 p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shrink-0">
               S
             </div>
@@ -326,10 +326,10 @@ export default function NewsletterPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t("faq")}</h2>
           <div className="max-w-2xl mx-auto space-y-2">
             {faqs.map((faq, i) => (
-              <div key={i} className="border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden">
+              <div key={i} className="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-left"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-left"
                 >
                   <span className="text-sm font-medium text-gray-900 dark:text-white">{faq.q}</span>
                   <span className="text-gray-400 dark:text-slate-600 text-sm shrink-0 ml-2">
@@ -347,7 +347,7 @@ export default function NewsletterPage() {
         </div>
 
         {/* Privacy */}
-        <div className="text-center p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 mb-16">
+        <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 mb-16">
           <span className="text-2xl mb-2 block">🔒</span>
           <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("privacyMatters")}</h3>
           <p className="text-sm text-gray-600 dark:text-slate-400 max-w-lg mx-auto">

@@ -16,7 +16,7 @@ export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
   const tNav = useTranslations('landing.nav');
 
   return (
-    <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
+    <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Left: Logo + breadcrumb */}
         <div className="flex items-center gap-3">

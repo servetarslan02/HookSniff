@@ -254,11 +254,11 @@ export default function PlaygroundPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Nav */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
           <LanguageSwitcher />
@@ -273,7 +273,7 @@ export default function PlaygroundPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 mb-6 border-b border-gray-200 dark:border-slate-800">
+        <div className="flex items-center gap-1 mb-6 border-b border-gray-200 dark:border-slate-700">
           <button
             onClick={() => setActiveTab('playground')}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
@@ -344,7 +344,7 @@ export default function PlaygroundPage() {
         {state === 'ready' && (
           <div className="space-y-6">
             {/* URL Bar */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-4">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
               <div className="flex items-center gap-3">
                 <div className="flex-1 flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 font-mono text-sm text-gray-900 dark:text-white overflow-x-auto">
                   <span className="text-emerald-500 shrink-0">●</span>
@@ -367,7 +367,7 @@ export default function PlaygroundPage() {
             </div>
 
             {/* Send Test Webhook */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-4">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t("sendTest")}</h3>
               <div className="grid md:grid-cols-4 gap-3">
                 <div>
@@ -410,7 +410,7 @@ export default function PlaygroundPage() {
                 </div>
 
                 {history.length === 0 ? (
-                  <div className="flex items-center justify-center h-48 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
+                  <div className="flex items-center justify-center h-48 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
                     <div className="text-center">
                       <p className="text-gray-400 dark:text-slate-600 text-sm mb-1">{t("noRequests")}</p>
                       <p className="text-gray-400 dark:text-slate-600 text-xs">{t("sendToUrl")}</p>
@@ -422,7 +422,7 @@ export default function PlaygroundPage() {
                       <button
                         key={record.id}
                         onClick={() => setSelectedRecord(record)}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors ${selectedRecord?.id === record.id ? 'bg-brand-50 dark:bg-brand-500/10 border-brand-300 dark:border-brand-500/40' : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-500/20'}`}
+                        className={`w-full text-left p-3 rounded-lg border transition-colors ${selectedRecord?.id === record.id ? 'bg-brand-50 dark:bg-brand-500/10 border-brand-300 dark:border-brand-500/40' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:border-brand-200 dark:hover:border-brand-500/20'}`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`px-1.5 py-0.5 rounded text-xs font-mono font-bold ${record.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : record.method === 'GET' ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300'}`}>
@@ -445,13 +445,13 @@ export default function PlaygroundPage() {
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t("requestDetail")}</h3>
 
                 {!selectedRecord ? (
-                  <div className="flex items-center justify-center h-64 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
+                  <div className="flex items-center justify-center h-64 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
                     <p className="text-gray-400 dark:text-slate-600 text-sm">{t("selectRequest")}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {/* Meta */}
-                    <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                       <span className={`px-2 py-1 rounded text-xs font-mono font-bold ${selectedRecord.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'}`}>
                         {selectedRecord.method}
                       </span>
@@ -487,11 +487,11 @@ export default function PlaygroundPage() {
 
                     {/* Metadata */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                         <p className="text-xs text-gray-500 dark:text-slate-500">{t("ipAddress")}</p>
                         <p className="text-sm font-mono text-gray-900 dark:text-white">{selectedRecord.ip}</p>
                       </div>
-                      <div className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                         <p className="text-xs text-gray-500 dark:text-slate-500">Content-Length</p>
                         <p className="text-sm font-mono text-gray-900 dark:text-white">{selectedRecord.content_length} bytes</p>
                       </div>
@@ -518,7 +518,7 @@ export default function PlaygroundPage() {
             </div>
 
             {/* CTA */}
-            <div className="text-center p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
+            <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
               <p className="text-gray-600 dark:text-slate-400 mb-4">Like what you see? Sign up and send webhooks for real.</p>
               <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
                 Start for free →
@@ -720,7 +720,7 @@ func main() {
       </div>
 
       {/* Quick Start */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
         <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">🚀 Quick Start</h3>
         <div className="grid md:grid-cols-3 gap-4">
           {[
@@ -741,11 +741,11 @@ func main() {
       </div>
 
       {/* Endpoint Reference */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
         <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">📡 Endpoints</h3>
         <div className="space-y-4">
           {endpoints.map((ep) => (
-            <div key={ep.path + ep.method} className="border border-gray-100 dark:border-slate-800 rounded-lg overflow-hidden">
+            <div key={ep.path + ep.method} className="border border-gray-100 dark:border-slate-700 rounded-lg overflow-hidden">
               <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-slate-800">
                 <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${
                   ep.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' :
@@ -799,7 +799,7 @@ func main() {
       </div>
 
       {/* Code Examples */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
         <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">💻 Code Examples</h3>
 
         {/* cURL */}
@@ -867,7 +867,7 @@ func main() {
       </div>
 
       {/* Comparison */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
         <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">🆚 Svix Play vs HookSniff Playground</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -892,7 +892,7 @@ func main() {
                 ['Custom headers', '❌', '✅'],
                 ['Rate limit', 'Unknown', '100/min'],
               ].map(([feature, svix, hooksniff]) => (
-                <tr key={feature as string} className="border-b border-gray-100 dark:border-slate-800/50">
+                <tr key={feature as string} className="border-b border-gray-100 dark:border-slate-700/50">
                   <td className="py-2 text-xs">{feature}</td>
                   <td className="py-2 text-center text-xs">{svix}</td>
                   <td className="py-2 text-center text-xs">{hooksniff}</td>
