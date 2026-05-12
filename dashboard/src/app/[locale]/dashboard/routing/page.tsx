@@ -32,7 +32,7 @@ export default function RoutingPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading) return <div className="p-8 text-gray-500">{t('loading')}</div>;
+  if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{t('loading')}</div>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -61,7 +61,7 @@ export default function RoutingPage() {
           </div>
         ))}
         {endpoints.length === 0 && (
-          <div className="text-center py-12 text-gray-500">{t('noEndpoints')}</div>
+          <div className="text-center py-12 text-gray-500 dark:text-slate-400">{t('noEndpoints')}</div>
         )}
       </div>
     </div>

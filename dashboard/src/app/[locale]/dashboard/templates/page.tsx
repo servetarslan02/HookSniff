@@ -27,7 +27,7 @@ export default function TemplatesPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading) return <div className="p-8 text-gray-500">{tCommon('loading')}</div>;
+  if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{tCommon('loading')}</div>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
