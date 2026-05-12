@@ -45,11 +45,11 @@
 - [ ] `cargo test --lib` — tüm testler geçmeli
 - [ ] `cargo clippy` — 0 uyarı
 
-### Aşama 2: Event Type Limiti ⬜
-- [ ] Migration: `event_types` tablosu oluştur (veya mevcut `event_schemas` kullan)
-- [ ] API: Plan bazlı max event type kontrolü (Developer:10, Startup:50, Pro:sınırsız)
-- [ ] API: Event type oluştururken limit kontrolü
-- [ ] Test: Unit testler
+### Aşama 2: Event Type Limiti ✅
+- [x] Mevcut `event_schemas` tablosu kullanıldı (migration 009/db.rs)
+- [x] API: Plan bazlı max event type kontrolü (Developer:10, Startup:50, Pro:sınırsız)
+- [x] API: Event type oluştururken limit kontrolü (yeni event type ise sayılır, yeni versiyon ise limit yok)
+- [ ] Test: Unit testler (cargo test — Rust toolchain gerekli)
 - [ ] `cargo test --lib` — tüm testler geçmeli
 
 ### Aşama 3: Team Member Limiti ⬜
