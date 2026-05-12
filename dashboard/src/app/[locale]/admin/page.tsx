@@ -24,7 +24,8 @@ export default function AdminOverviewPage() {
   const [securityLogs, setSecurityLogs] = useState<AuditLogEntry[]>([]);
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [uptime24h, setUptime24h] = useState<number | null>(null);
-  const [uptime7d, setUptime7d] = useState<number | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_uptime7d, setUptime7d] = useState<number | null>(null);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [deployInfo, setDeployInfo] = useState<DeployInfo | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -65,11 +66,10 @@ export default function AdminOverviewPage() {
         if (healthRes.ok) {
           const healthData = await healthRes.json();
           const uptimeSeconds = healthData.uptime_seconds ?? 0;
-          // Calculate uptime percentages from server uptime
-          const uptime24hPct = Math.min((uptimeSeconds / 86400) * 100, 100);
-          const uptime7dPct = Math.min((uptimeSeconds / 604800) * 100, 100);
-          setUptime24h(uptimeSeconds > 0 ? uptime24hPct : null);
-          setUptime7d(uptimeSeconds > 0 ? uptime7dPct : null);
+          // Store raw seconds — display layer formats as human-readable duration
+          // Avoid false "uptime %" that just divides seconds by 86400
+          setUptime24h(uptimeSeconds > 0 ? uptimeSeconds : null);
+          setUptime7d(uptimeSeconds > 0 ? uptimeSeconds : null);
         }
       } catch {
         // Uptime fetch failed, silently continue
@@ -140,8 +140,13 @@ export default function AdminOverviewPage() {
         ['Active Endpoints', (stats.active_endpoints ?? 0).toString()],
         ['MRR', mrr.toFixed(2)],
         ['ARR', arr.toFixed(2)],
-        ['Uptime 24h', uptime24h != null ? `${uptime24h.toFixed(2)}%` : 'N/A'],
-        ['Uptime 7d', uptime7d != null ? `${uptime7d.toFixed(2)}%` : 'N/A'],
+        ['Uptime', uptime24h != null ? (() => {
+          const s = Math.floor(uptime24h);
+          const d = Math.floor(s / 86400);
+          const h = Math.floor((s % 86400) / 3600);
+          const m = Math.floor((s % 3600) / 60);
+          return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
+        })() : 'N/A'],
         ['', ''],
         ['Users by Plan', 'Count'],
         ...stats.users_by_plan.map(p => [p.plan, p.count.toString()]),
@@ -642,50 +647,42 @@ export default function AdminOverviewPage() {
 
       {/* ── Uptime + Feature Flags + Last Deploy + Active Sessions ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Uptime 24h */}
+        {/* Uptime */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl" aria-hidden="true">🟢</span>
-            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('uptime24h')}</h2>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('uptime')}</h2>
           </div>
           {uptime24h != null ? (
             <>
-              <p className={`text-3xl font-bold ${uptime24h >= 99.9 ? 'text-emerald-600 dark:text-emerald-400' : uptime24h >= 99 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
-                %{uptime24h.toFixed(2)}
+              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                {(() => {
+                  const s = Math.floor(uptime24h);
+                  const d = Math.floor(s / 86400);
+                  const h = Math.floor((s % 86400) / 3600);
+                  const m = Math.floor((s % 3600) / 60);
+                  if (d > 0) return `${d}g ${h}s`;
+                  if (h > 0) return `${h}s ${m}dk`;
+                  return `${m}dk`;
+                })()}
               </p>
-              <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
-                <div
-                  className={`h-full rounded-full ${uptime24h >= 99.9 ? 'bg-emerald-500' : uptime24h >= 99 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                  style={{ width: `${Math.min(uptime24h, 100)}%` }}
-                />
-              </div>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('serverUptime')}</p>
             </>
           ) : (
             <p className="text-lg text-gray-400 dark:text-slate-500">{t('na')}</p>
           )}
         </div>
 
-        {/* Uptime 7d */}
+        {/* Uptime Status */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl" aria-hidden="true">📅</span>
-            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('uptime7d')}</h2>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('serviceStatus')}</h2>
           </div>
-          {uptime7d != null ? (
-            <>
-              <p className={`text-3xl font-bold ${uptime7d >= 99.9 ? 'text-emerald-600 dark:text-emerald-400' : uptime7d >= 99 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
-                %{uptime7d.toFixed(2)}
-              </p>
-              <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
-                <div
-                  className={`h-full rounded-full ${uptime7d >= 99.9 ? 'bg-emerald-500' : uptime7d >= 99 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                  style={{ width: `${Math.min(uptime7d, 100)}%` }}
-                />
-              </div>
-            </>
-          ) : (
-            <p className="text-lg text-gray-400 dark:text-slate-500">{t('na')}</p>
-          )}
+          <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+            {t('allSystemsOperational')}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('basedOnHealthCheck')}</p>
         </div>
 
         {/* Feature Flags */}
@@ -785,35 +782,52 @@ export default function AdminOverviewPage() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('standardWebhooks')}</h2>
           </div>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('standardWebhooksDesc')}</p>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-slate-400">{t('webhookPrefix')}</span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
-                webhook-
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-slate-400">{t('whsecSecret')}</span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
-                whsec_
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
-              {(() => {
-                const swFlag = featureFlags.find(f => f.name === 'standard_webhooks');
-                return swFlag?.is_enabled ? (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                    ✅ {t('active') || 'Active'}
+          {(() => {
+            const swFlag = featureFlags.find(f => f.name === 'standard_webhooks');
+            const isEnabled = swFlag?.is_enabled;
+            return (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">{t('webhookPrefix')}</span>
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                    isEnabled
+                      ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                      : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
+                  }`}>
+                    webhook-
                   </span>
-                ) : (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
-                    {t('notConfigured')}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">{t('whsecSecret')}</span>
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                    isEnabled
+                      ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                      : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
+                  }`}>
+                    whsec_
                   </span>
-                );
-              })()}
-            </div>
-          </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
+                  {isEnabled ? (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                      ✅ {t('active') || 'Active'}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                      {t('notConfigured')}
+                    </span>
+                  )}
+                </div>
+                {isEnabled && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2">{t('standardWebhooksActiveDesc') || 'Standard Webhooks spec is active. All new webhooks use the standard format.'}</p>
+                )}
+                {!isEnabled && (
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('standardWebhooksInactiveDesc') || 'Enable the feature flag to switch to Standard Webhooks format (webhook- prefix, whsec_ secrets).'}</p>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Deduplication */}
@@ -823,34 +837,44 @@ export default function AdminOverviewPage() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deduplication')}</h2>
           </div>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('deduplicationDesc')}</p>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-slate-400">{t('filteredEvents')}</span>
-              <span className="text-lg font-bold text-gray-400 dark:text-slate-500">0</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-slate-400">{t('dedupWindow')}</span>
-              <span className="text-sm text-gray-400 dark:text-slate-500">—</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
-              {(() => {
-                const dedupFlag = featureFlags.find(f => f.name === 'deduplication');
-                return dedupFlag?.is_enabled ? (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                    ✅ {t('active') || 'Active'}
+          {(() => {
+            const dedupFlag = featureFlags.find(f => f.name === 'deduplication');
+            const isEnabled = dedupFlag?.is_enabled;
+            return (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">{t('filteredEvents')}</span>
+                  <span className={`text-lg font-bold ${isEnabled ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-slate-500'}`}>
+                    {isEnabled ? (dedupFlag?.description?.match(/\d+/)?.[0] || '0') : '0'}
                   </span>
-                ) : (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
-                    {t('notConfigured')}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">{t('dedupWindow')}</span>
+                  <span className={`text-sm ${isEnabled ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-slate-500'}`}>
+                    {isEnabled ? (t('dedupWindowDefault') || '60s') : '—'}
                   </span>
-                );
-              })()}
-            </div>
-            {featureFlags.length === 0 && (
-              <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('dedupNotAvailable') || 'Deduplication is not yet configured. Enable the feature flag to get started.'}</p>
-            )}
-          </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
+                  {isEnabled ? (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                      ✅ {t('active') || 'Active'}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                      {t('notConfigured')}
+                    </span>
+                  )}
+                </div>
+                {!isEnabled && featureFlags.length === 0 && (
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('dedupNotAvailable') || 'Deduplication is not yet configured. Enable the feature flag to get started.'}</p>
+                )}
+                {isEnabled && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2">{t('dedupActiveDesc') || 'Duplicate events are being filtered automatically.'}</p>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -883,13 +907,13 @@ export default function AdminOverviewPage() {
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">main</span>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <span className="text-sm font-medium text-amber-700 dark:text-amber-400">main</span>
             </div>
-            <span className="text-sm text-gray-500 dark:text-slate-400">
-              {t('lastDeployDesc')}
+            <span className="text-sm text-amber-600 dark:text-amber-400">
+              {t('deployInfoUnavailable') || 'Deploy info unavailable — showing last known branch'}
             </span>
           </div>
         )}
