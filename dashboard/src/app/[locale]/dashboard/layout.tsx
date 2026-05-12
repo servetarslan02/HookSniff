@@ -190,10 +190,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
 
-      {/* Main content */}
-      <div className="md:pl-64">
+      {/* Main content — Item 87: full width on mobile, offset on desktop */}
+      <div className="min-w-0 md:pl-64">
         {/* Top bar */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-3 sm:px-4 md:px-8 transition-colors duration-300">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -206,9 +206,9 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {navigation.find((n) => n.href === cleanPath)?.name || t('dashboard')}
-            </h1>
+            <div className="text-lg font-semibold text-gray-900 dark:text-white">
+              {allNavItems.find((n) => n.href === cleanPath)?.name || t('dashboard')}
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
@@ -218,7 +218,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
             <button
               onClick={() => { logout(); router.push(`/${locale}/login`); }}
-              className="text-sm text-gray-500 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
+              className="text-sm text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition"
             >
               {t('logout')}
             </button>
@@ -226,7 +226,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content — Item 214: skip-to-content target */}
-        <main id="main-content" className="p-4 md:p-8 page-enter" aria-live="polite">
+        <main id="main-content" className="p-3 sm:p-4 md:p-8 page-enter overflow-x-hidden" aria-live="polite">
           <EmailVerificationBanner />
           <ErrorBoundary
             title={te('title')}
