@@ -707,18 +707,16 @@ async fn process_pending(
                 .await?;
 
                 // Record attempt
-                record_attempt(
+                record_delivery_attempt(
                     &mut tx,
                     delivery_id,
                     attempt,
-                    AttemptRecord {
-                        status_code: attempt_status,
-                        response_body: attempt_body,
-                        duration_ms,
-                        error_message: None,
-                        trace_id: trace_id.as_deref(),
-                        response_headers: attempt_headers,
-                    },
+                    attempt_status,
+                    attempt_body,
+                    duration_ms,
+                    None,
+                    trace_id.as_deref(),
+                    attempt_headers,
                 )
                 .await?;
 
@@ -734,20 +732,8 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                // HS-034: Commit transaction (Item 34: classify transient vs permanent)
-                if let Err(e) = tx.commit().await {
-                    if is_transient_db_error(&e) {
-                        tracing::warn!(
-                            "⚠️ Delivery {} succeeded HTTP but transient DB commit failure — \
-                             zombie reaper will recover: {:?}",
-                            delivery_id, e
-                        );
-                    } else {
-                        tracing::error!(
-                            "❌ Delivery {} succeeded HTTP but permanent DB commit failure: {:?}",
-                            delivery_id, e
-                        );
-                    }
+                // HS-034: Commit transaction
+                if !commit_delivery_tx(tx, delivery_id, "success").await? {
                     return Ok::<(), anyhow::Error>(());
                 }
 
@@ -800,21 +786,16 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                record_attempt(
+                record_delivery_attempt(
                     &mut tx,
                     delivery_id,
                     attempt,
-                    AttemptRecord {
-                        status_code: attempt_status,
-                        response_body: attempt_body,
-                        duration_ms,
-                        error_message: Some(&format!(
-                            "{} — non-retryable (HTTP {})",
-                            error_msg, status_code
-                        )),
-                        trace_id: trace_id.as_deref(),
-                        response_headers: attempt_headers,
-                    },
+                    attempt_status,
+                    attempt_body,
+                    duration_ms,
+                    Some(&format!("{} — non-retryable (HTTP {})", error_msg, status_code)),
+                    trace_id.as_deref(),
+                    attempt_headers,
                 )
                 .await?;
 
@@ -825,14 +806,8 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                // HS-034: Commit transaction (Item 34: classify transient vs permanent)
-                if let Err(e) = tx.commit().await {
-                    if is_transient_db_error(&e) {
-                        tracing::warn!("⚠️ Transient DB commit failure (non-retryable dead letter) — zombie reaper will recover: {:?}", e);
-                    } else {
-                        tracing::error!("❌ Permanent DB commit failure (non-retryable dead letter): {:?}", e);
-                    }
-                }
+                // HS-034: Commit transaction
+                commit_delivery_tx(tx, delivery_id, "non-retryable dead letter").await?;
 
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
@@ -887,18 +862,16 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                record_attempt(
+                record_delivery_attempt(
                     &mut tx,
                     delivery_id,
                     attempt,
-                    AttemptRecord {
-                        status_code: attempt_status,
-                        response_body: attempt_body,
-                        duration_ms,
-                        error_message: Some(&error_msg),
-                        trace_id: trace_id.as_deref(),
-                        response_headers: attempt_headers,
-                    },
+                    attempt_status,
+                    attempt_body,
+                    duration_ms,
+                    Some(&error_msg),
+                    trace_id.as_deref(),
+                    attempt_headers,
                 )
                 .await?;
 
@@ -910,14 +883,8 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                // HS-034: Commit transaction (Item 34: classify transient vs permanent)
-                if let Err(e) = tx.commit().await {
-                    if is_transient_db_error(&e) {
-                        tracing::warn!("⚠️ Transient DB commit failure (max attempts dead letter) — zombie reaper will recover: {:?}", e);
-                    } else {
-                        tracing::error!("❌ Permanent DB commit failure (max attempts dead letter): {:?}", e);
-                    }
-                }
+                // HS-034: Commit transaction
+                commit_delivery_tx(tx, delivery_id, "max attempts dead letter").await?;
 
                 // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
@@ -956,29 +923,21 @@ async fn process_pending(
                 .execute(&mut *tx)
                 .await?;
 
-                record_attempt(
+                record_delivery_attempt(
                     &mut tx,
                     delivery_id,
                     attempt,
-                    AttemptRecord {
-                        status_code: attempt_status,
-                        response_body: attempt_body,
-                        duration_ms,
-                        error_message: Some(&format!("{} — retry scheduled", error_msg)),
-                        trace_id: trace_id.as_deref(),
-                        response_headers: attempt_headers,
-                    },
+                    attempt_status,
+                    attempt_body,
+                    duration_ms,
+                    Some(&format!("{} — retry scheduled", error_msg)),
+                    trace_id.as_deref(),
+                    attempt_headers,
                 )
                 .await?;
 
-                // HS-034: Commit transaction (Item 34: classify transient vs permanent)
-                if let Err(e) = tx.commit().await {
-                    if is_transient_db_error(&e) {
-                        tracing::warn!("⚠️ Transient DB commit failure (retry path) — zombie reaper will recover: {:?}", e);
-                    } else {
-                        tracing::error!("❌ Permanent DB commit failure (retry path): {:?}", e);
-                    }
-                }
+                // HS-034: Commit transaction
+                commit_delivery_tx(tx, delivery_id, "retry").await?;
 
                 // HS-020: Record failure in circuit breaker (retry = delivery failed)
                 cb.record_failure(endpoint_id).await;

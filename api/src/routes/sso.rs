@@ -72,7 +72,7 @@ async fn get_sso_config(
 ) -> Result<Json<serde_json::Value>, AppError> {
     let config = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
         "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, created_at, updated_at
-         FROM sso_configs WHERE customer_id = $1"
+         FROM sso_configs WHERE customer_id = $1 LIMIT 1"
     )
     .bind(customer.id)
     .fetch_optional(&pool)
@@ -130,7 +130,7 @@ async fn upsert_sso_config(
 
     if !["saml", "oidc"].contains(&provider.as_str()) {
         return Err(AppError::BadRequest(
-            "Provider must be 'saml' or 'oidc'".into(),
+            "SSO provider must be either 'saml' or 'oidc'".into(),
         ));
     }
 
@@ -141,12 +141,12 @@ async fn upsert_sso_config(
         if provider == "saml" {
             if req.sso_url.is_none() && req.metadata_url.is_none() {
                 return Err(AppError::BadRequest(
-                    "SAML requires either metadata_url or sso_url".into(),
+                    "SAML SSO requires either a metadata URL or an SSO URL".into(),
                 ));
             }
         } else if provider == "oidc" && (req.issuer_url.is_none() || req.client_id.is_none()) {
             return Err(AppError::BadRequest(
-                "OIDC requires issuer_url and client_id".into(),
+                "OIDC SSO requires an issuer URL and a client ID".into(),
             ));
         }
     }
@@ -225,7 +225,7 @@ async fn test_sso_connection(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let config = sqlx::query_as::<_, (String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-        "SELECT provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id FROM sso_configs WHERE customer_id = $1"
+        "SELECT provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id FROM sso_configs WHERE customer_id = $1 LIMIT 1"
     )
     .bind(customer.id)
     .fetch_optional(&pool)

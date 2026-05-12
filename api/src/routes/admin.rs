@@ -692,7 +692,7 @@ async fn export_users_csv(
     };
 
     let query_str = format!(
-        "SELECT id, email, name, plan, is_active, created_at FROM customers {} ORDER BY created_at DESC",
+        "SELECT id, email, name, plan, is_active, created_at FROM customers {} ORDER BY created_at DESC LIMIT 10000",
         where_clause
     );
 

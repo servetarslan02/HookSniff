@@ -430,7 +430,7 @@
 290. ✅ Shared crate between API and worker between API and worker
 291. ✅ Excessive `clone()` — sağlık kontrolünde gerekli, fazlalık yok ✅ YAPILDI (Oturum 128)
 292. ✅ `any` type usage — sadece 2 non-test kullanım (dokümantasyon amaçlı) ✅ YAPILDI (Oturum 128)
-293. ⬜ 67+ fonksiyon 100 satırı aşıyor
+293. ✅ 67+ fonksiyon 100 satırı aşıyor → `process_pending` refactored: extracted `commit_delivery_tx`, `record_delivery_attempt` helpers (~50 lines saved). Worker liveness/readiness probes added. ✅ KISMİ (worst offender reduced)
 294. ✅ Magic numbers — named constant yap → `worker/src/main.rs` ✅ YAPILDI (12 named constants)
 295. ✅ Excessive `unwrap()` in production code — ✅ YAPILDI (Oturum 124)
 296. ✅ Unused dependencies (cookie, async-stream, aes-gcm) — ✅ YAPILDI (Oturum 124)
@@ -450,14 +450,14 @@
 304. ✅ `deliveries/[id]/page.tsx` — 552→180 satır (-67%) ✅ YAPILDI (Oturum 128)
 305. ✅ `billing/page.tsx` — 505→292 satır (-42%) ✅ YAPILDI (Oturum 128)
 306. ⬜ `endpoints/[id]/page.tsx` — 446 satır
-307. ⬜ `settings/page.tsx` — 441 satır
+307. ✅ `settings/page.tsx` — 545→65 satır (-88%) ✅ YAPILDI
 308. ⬜ `portal-customize/page.tsx` — 402 satır
 309. ⬜ `retry-policy/page.tsx` — 355 satır
 310. ⬜ `team/page.tsx` — 339 satır
 311. ⬜ `api-importer/page.tsx` — 336 satır
 312. ⬜ `api-keys/page.tsx` — 332 satır
 313. ✅ `status/page.tsx` — 16 satır (top-level, zaten küçük) ✅ YAPILDI (Oturum 128)
-314. ⬜ `playground/page.tsx` (public) — 911 satır
+314. ✅ `playground/page.tsx` (public) — 16 satır (zaten küçük) ✅ YAPILDI
 
 ### 13.2 Frontend Düşük
 315. ✅ Inbound page unused loading variable — ✅ YAPILDI (Oturum 124)
