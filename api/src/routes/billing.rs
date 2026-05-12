@@ -73,6 +73,7 @@ pub fn router() -> Router {
         .route("/usage", get(get_usage))
         .route("/invoices", get(get_invoices))
         .route("/refund", post(request_refund))
+        .route("/settings", get(get_overage_settings).put(update_overage_settings))
         .route("/webhook", post(handle_stripe_webhook))
         .route("/webhook/polar", post(handle_polar_webhook))
         .route("/webhook/iyzico", post(handle_iyzico_webhook))
@@ -629,6 +630,69 @@ async fn request_refund(
     Ok(Json(RefundResponse {
         message: "Refund processed successfully. Your plan has been downgraded to Free.".into(),
         status: "refunded".into(),
+    }))
+}
+
+// ──────────────────────────────────────────────────────────────
+// Overage settings
+// ──────────────────────────────────────────────────────────────
+
+#[derive(Serialize, Debug)]
+struct OverageSettingsResponse {
+    allow_overage: bool,
+    overage_email_notification: bool,
+    plan: String,
+    daily_limit: u64,
+    overage_price: f64,
+}
+
+/// GET /v1/billing/settings — Get current overage settings
+async fn get_overage_settings(
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<OverageSettingsResponse>, AppError> {
+    let plan = Plan::parse_str(&customer.plan);
+    Ok(Json(OverageSettingsResponse {
+        allow_overage: customer.allow_overage,
+        overage_email_notification: customer.overage_email_notification,
+        plan: plan.as_str().to_string(),
+        daily_limit: plan.max_events_per_day(),
+        overage_price: plan.overage_price_cents_per_event(),
+    }))
+}
+
+#[derive(Deserialize, Debug)]
+struct UpdateOverageSettingsRequest {
+    allow_overage: Option<bool>,
+    overage_email_notification: Option<bool>,
+}
+
+/// PUT /v1/billing/settings — Update overage settings
+async fn update_overage_settings(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<UpdateOverageSettingsRequest>,
+) -> Result<Json<OverageSettingsResponse>, AppError> {
+    let updated = sqlx::query_as::<_, Customer>(
+        "UPDATE customers SET \
+         allow_overage = COALESCE($1, allow_overage), \
+         overage_email_notification = COALESCE($2, overage_email_notification), \
+         updated_at = NOW() \
+         WHERE id = $3 \
+         RETURNING *",
+    )
+    .bind(req.allow_overage)
+    .bind(req.overage_email_notification)
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let plan = Plan::parse_str(&updated.plan);
+    Ok(Json(OverageSettingsResponse {
+        allow_overage: updated.allow_overage,
+        overage_email_notification: updated.overage_email_notification,
+        plan: plan.as_str().to_string(),
+        daily_limit: plan.max_events_per_day(),
+        overage_price: plan.overage_price_cents_per_event(),
     }))
 }
 

@@ -58,10 +58,20 @@ pub struct Customer {
     /// Timestamp when payment last failed (for grace period tracking).
     #[serde(default)]
     pub payment_failed_at: Option<DateTime<Utc>>,
+    /// Whether overage is allowed (never-blocked mode). Default: true.
+    #[serde(default = "default_true")]
+    pub allow_overage: bool,
+    /// Whether to send email notifications for overage. Default: true.
+    #[serde(default = "default_true")]
+    pub overage_email_notification: bool,
 }
 
 fn default_payment_provider() -> String {
     "stripe".to_string()
+}
+
+fn default_true() -> bool {
+    true
 }
 
 fn default_role() -> String {
