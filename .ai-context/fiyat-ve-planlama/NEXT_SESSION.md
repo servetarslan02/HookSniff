@@ -11,13 +11,13 @@
 4. ✅ Never Blocked — overage sistemi + email bildirimleri (migration 014)
 5. ✅ Plan Tablosu — Developer/Startup/Pro/Enterprise
 6. ✅ Pricing Sayfası — 4 plan, 12+ özellik, karşılaştırma tablosu
-7. ✅ Kod İnceleme 1 — 5 hata düzeltildi
-8. ✅ Kod İnceleme 2 — 6 hata daha düzeltildi (admin limit, frontend eski referanslar)
+7. ✅ Kod İnceleme 1 — 5 hata düzeltildi (batch overage, pricing dead code, karşılaştırma tablosu, çift thead)
+8. ✅ Kod İnceleme 2 — 6 hata düzeltildi (admin u64::MAX, homepage 3→4 plan, admin PLAN_OPTIONS, settings default_plan, docs rate limit tablosu)
 
 ### Kalan İşler
-- [ ] `cargo test --lib` — test doğrulama
-- [ ] `cargo clippy` — uyarı kontrolü
-- [ ] `next build` — frontend build doğrulama
+- [ ] `cargo test --lib` ⚠️ Rust toolchain gerekli — Cloud Build'te doğrulanacak
+- [ ] `cargo clippy` ⚠️ Rust toolchain gerekli
+- [ ] `next build` ⚠️ Node.js gerekli — Vercel deploy'da doğrulanacak
 - [ ] Cloud Build — deploy doğrulama
 - [ ] Dashboard: "Never blocked" toggle ayarlar sayfasına ekle
 - [ ] Email entegrasyonu: Resend ile bağla

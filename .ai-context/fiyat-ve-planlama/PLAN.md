@@ -1,7 +1,7 @@
 # 💰 Fiyat ve Planlama — Görev Takibi
 
 > Oluşturulma: 2026-05-13 00:32 GMT+8
-> Güncelleme: 2026-05-13 00:32 GMT+8
+> Güncelleme: 2026-05-13 01:34 GMT+8
 
 ---
 
@@ -41,22 +41,22 @@
 - [x] API: Endpoint oluştururken application_id zorunlu + ownership doğrulama
 - [x] Plan enum güncellendi: Developer/Startup/Pro/Enterprise
 - [x] Yeni limit fonksiyonları: max_applications, max_event_types, max_team_members, max_subscriptions, max_events_per_day, overage_price, allows_overage
-- [ ] Test: Unit testler (cargo test — Rust toolchain gerekli)
-- [ ] `cargo test --lib` — tüm testler geçmeli
-- [ ] `cargo clippy` — 0 uyarı
+- [ ] Test: Unit testler ⚠️ Rust toolchain gerekli — Cloud Build'te doğrulanacak
+- [ ] `cargo test --lib` ⚠️ Rust toolchain gerekli
+- [ ] `cargo clippy` ⚠️ Rust toolchain gerekli
 
 ### Aşama 2: Event Type Limiti ✅
 - [x] Mevcut `event_schemas` tablosu kullanıldı (migration 009/db.rs)
 - [x] API: Plan bazlı max event type kontrolü (Developer:10, Startup:50, Pro:sınırsız)
 - [x] API: Event type oluştururken limit kontrolü (yeni event type ise sayılır, yeni versiyon ise limit yok)
-- [ ] Test: Unit testler (cargo test — Rust toolchain gerekli)
-- [ ] `cargo test --lib` — tüm testler geçmeli
+- [ ] Test: Unit testler ⚠️ Rust toolchain gerekli
+- [ ] `cargo test --lib` ⚠️ Rust toolchain gerekli
 
-### Aşama 3: Team Member Limiti ⬜
-- [ ] API: Plan bazlı max team member kontrolü (Developer:1, Startup:25, Pro:sınırsız)
-- [ ] API: Üye eklerken limit kontrolü
-- [ ] Test: Unit testler
-- [ ] `cargo test --lib` — tüm testler geçmeli
+### Aşama 3: Team Member Limiti ✅
+- [x] API: Plan bazlı max team member kontrolü (Developer:1, Startup:25, Pro:sınırsız)
+- [x] API: Üye eklerken limit kontrolü
+- [ ] Test: Unit testler ⚠️ Rust toolchain gerekli
+- [ ] `cargo test --lib` ⚠️ Rust toolchain gerekli
 
 ### Aşama 4: Never Blocked + Email Bildirimi ✅
 - [x] Migration: `014_overage_settings.sql` — allow_overage, overage_email_notification + daily_event_usage tablosu
@@ -67,7 +67,7 @@
 - [x] Email: Limit %80 ve %100'e yaklaşınca bildirim gönder (events/overage.rs)
 - [x] Email: Limit aşıldığında bildirim gönder (eğer overage aktifse)
 - [ ] Dashboard: Ayarlar sayfasına "never blocked" toggle ekle (frontend, sonraki oturum)
-- [ ] Test: Unit testler (cargo test — Rust toolchain gerekli)
+- [ ] Test: Unit testler ⚠️ Rust toolchain gerekli
 
 ### Aşama 5: Plan Tablosu Güncellemesi ✅
 - [x] Backend: Plan enum güncellendi (Free→Developer, Business→Enterprise, Startup eklendi)
@@ -80,7 +80,7 @@
 - [x] Backend: Plan::overage_price_cents_per_event() fonksiyonu eklendi
 - [x] Backend: Plan::allows_overage() fonksiyonu eklendi
 - [x] Backend: auth.rs, billing.rs, admin.rs plan string'leri güncellendi
-- [ ] Test: Tüm plan limitleri test edilmeli (cargo test — Rust toolchain gerekli)
+- [ ] Test: Tüm plan limitleri test edilmeli ⚠️ Rust toolchain gerekli
 
 ### Aşama 6: Pricing Sayfası Güncelleme ✅
 - [x] Dashboard: Plan isimleri güncellendi (Developer/Startup/Pro/Enterprise)
@@ -88,15 +88,17 @@
 - [x] Dashboard: Feature listesi güncellendi (Application, Event Type, Subscription limitleri)
 - [x] Dashboard: TRY fiyatları güncellendi (₺0, ₺599, ₺999, Custom)
 - [x] Dashboard: Yıllık fiyat hesaplaması (%20 indirim)
-- [x] Dashboard: Karşılaştırma tablosu güncellendi
+- [x] Dashboard: Karşılaştırma tablosu güncellendi (3→4 sütun)
 - [x] i18n: Türkçe ve İngilizce çeviri anahtarları güncellendi
 - [x] Billing PlanCards: Developer/Startup/Pro planları
 - [x] ROI calculator güncellendi
 
 ### Aşama 7: Son Kontroller ✅
-- [ ] `cargo test --lib` — tüm testler geçmeli (Rust toolchain gerekli)
-- [ ] `cargo clippy` — 0 uyarı (Rust toolchain gerekli)
-- [ ] `next build` — hatasız build (Node.js gerekli)
+- [x] Kod İnceleme 1 — 5 hata düzeltildi (batch overage, pricing dead code, karşılaştırma tablosu, çift thead)
+- [x] Kod İnceleme 2 — 6 hata düzeltildi (admin u64::MAX, homepage 3→4 plan, admin PLAN_OPTIONS, settings default_plan, docs rate limit tablosu)
+- [ ] `cargo test --lib` ⚠️ Rust toolchain gerekli — Cloud Build'te doğrulanacak
+- [ ] `cargo clippy` ⚠️ Rust toolchain gerekli
+- [ ] `next build` ⚠️ Node.js gerekli — Vercel deploy'da doğrulanacak
 - [x] `.ai-context/` push et
 - [x] MEMORY.md güncelle
 
@@ -112,4 +114,10 @@
 | 4. Never Blocked + Email | ✅ | 2026-05-13 00:56 | 2026-05-13 01:00 |
 | 5. Plan Tablosu | ✅ | 2026-05-13 01:00 | 2026-05-13 01:02 |
 | 6. Pricing Sayfası | ✅ | 2026-05-13 01:02 | 2026-05-13 01:06 |
-| 7. Son Kontroller | ✅ | 2026-05-13 01:06 | 2026-05-13 01:06 |
+| 7. Son Kontroller + İncelemeler | ✅ | 2026-05-13 01:06 | 2026-05-13 01:34 |
+
+### İstatistik
+- **Toplam kod maddesi:** 45
+- **Tamamlanan:** 37 ✅
+- **Toolchain bekleyen:** 8 ⚠️ (cargo test/clippy/next build — Cloud Build'te doğrulanacak)
+- **Sonraki oturum:** 1 (never-blocked toggle)
