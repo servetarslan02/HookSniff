@@ -75,6 +75,13 @@ interface EndpointHealth {
 - **is_active filtresi yok** — Pasif endpoint'ler de gösteriliyor
 
 ### 🔴 Eksiklikler
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **Uptime monitoring** — Son 24h/7d/30d uptime yüzdesi
+- **SLA hedefi** — Kullanıcı tanımlı SLA hedefi (%99.9, %99.99)
+- **Uptime grafikleri** — Tarih bazlı uptime trend grafiği
+- **Incident geçmişi** — Kesinti olaylarının kaydı
+- **Endpoint gruplama** — Kategori bazlı sağlık durumu
 - Sağlık trendi grafiği yok (son 24s/7g/30g)
 - Endpoint bazlı detay sayfası yok (tıklanabilir)
 - Sağlık durumu değişikliği geçmişi yok
