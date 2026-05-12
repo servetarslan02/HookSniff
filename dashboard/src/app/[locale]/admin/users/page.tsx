@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, type AdminUser } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 const PLAN_OPTIONS = [
   { value: 'free', labelKey: 'freePlan' },
@@ -17,6 +17,8 @@ const PLAN_OPTIONS = [
 export default function AdminUsersPage() {
   const { token } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+  const locale = useLocale();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -29,6 +31,25 @@ export default function AdminUsersPage() {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const perPage = 20;
+
+  const handleExportCSV = () => {
+    if (!token) return;
+    const url = adminApi.exportUsers(token, { plan: planFilter || undefined, status: statusFilter || undefined });
+    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    window.open(`${API}${url}&token=${token}`, '_blank');
+  };
+
+  const handleImpersonate = async (user: AdminUser) => {
+    if (!token) return;
+    try {
+      const result = await adminApi.impersonateUser(token, user.id);
+      // Open impersonated session in new tab
+      window.open(`/${locale}/dashboard?impersonate_token=${result.token}`, '_blank');
+      toast(t('impersonating') + `: ${user.email}`, 'success');
+    } catch {
+      toast(tc('error'), 'error');
+    }
+  };
 
   const fetchUsers = useCallback(async () => {
     if (!token) return;
@@ -96,7 +117,7 @@ export default function AdminUsersPage() {
 
       {/* Search & Filters */}
       <form onSubmit={handleSearch} className="glass-card p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <div className="md:col-span-2">
             <input
               type="text"
@@ -130,6 +151,13 @@ export default function AdminUsersPage() {
               <option value="banned">{t('banned')}</option>
             </select>
           </div>
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2"
+          >
+            <span aria-hidden="true">⬇</span> {t('exportCSV')}
+          </button>
         </div>
       </form>
 
@@ -200,6 +228,13 @@ export default function AdminUsersPage() {
                             }`}
                           >
                             {u.status === 'active' ? t('banUser') : t('activateUser')}
+                          </button>
+                          <button
+                            onClick={() => handleImpersonate(u)}
+                            className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium"
+                            title={t('viewAsUser')}
+                          >
+                            👁️ {t('impersonateUser')}
                           </button>
                         </div>
                       </td>
