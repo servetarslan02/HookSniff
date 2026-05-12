@@ -262,7 +262,7 @@ function HowItWorks() {
         <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{t('subtitle')}</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-        <div className="hidden md:block absolute top-10 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-600 dark:via-purple-600 dark:to-brand-600 z-0" />
+        <div className="hidden md:block absolute top-10 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-700 dark:via-purple-700 dark:to-brand-700 opacity-100 dark:opacity-60 z-0" />
         {steps.map((step, i) => (
           <div key={i} className="relative flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-6 relative z-10 border border-brand-100 dark:border-brand-500/20">
