@@ -241,7 +241,8 @@ async fn deliver_email(
                 }
             }
         } else {
-            drop(cached);
+            // cache is a read lock reference, dropping it explicitly
+            let _ = &cache;
             match tokio::fs::read_to_string(&sa_path).await {
                 Ok(json) => {
                     let mut w = cache.write().unwrap();
