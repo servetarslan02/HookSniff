@@ -47,6 +47,7 @@ pub struct PortalConfigResponse {
 
 /// Portal configuration update request
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdatePortalRequest {
     pub company_name: Option<String>,
     pub logo_url: Option<String>,

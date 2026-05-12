@@ -31,6 +31,7 @@ pub struct RoutingInfo {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateRoutingRequest {
     pub routing_strategy: Option<String>,
     pub fallback_url: Option<String>,
