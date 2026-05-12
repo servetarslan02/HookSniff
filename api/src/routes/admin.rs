@@ -1093,7 +1093,7 @@ pub struct ChurnedUser {
 async fn churn_report(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-) -> Result<Json<Vec<ChurnedUser>>, AppError> {
+) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&customer)?;
 
     let churned = sqlx::query_as::<_, ChurnedUser>(
@@ -1787,6 +1787,7 @@ mod tests {
         let user = ChurnedUser {
             id: Uuid::new_v4(),
             email: "churned@x.com".to_string(),
+            name: None,
             plan: "pro".to_string(),
             amount: 29.0,
             churn_date: Utc::now(),
