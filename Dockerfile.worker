@@ -12,6 +12,7 @@ COPY Cargo.toml ./
 COPY Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
+COPY common/ common/
 COPY vendor/ vendor/
 
 # Build release binary
