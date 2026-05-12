@@ -42,8 +42,8 @@ jobs:
       - name: Audit dashboard dependencies
         working-directory: dashboard
         run: npm audit --audit-level=high
-        continue-on-error: true
+        # Item 348: Removed continue-on-error — high-severity vulns should block CI
 
       - name: Audit root dependencies
         run: npm audit --audit-level=high
-        continue-on-error: true
+        # Item 348: Removed continue-on-error — high-severity vulns should block CI
