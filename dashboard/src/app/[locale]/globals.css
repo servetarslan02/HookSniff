@@ -73,6 +73,35 @@ table {
   border-spacing: 0;
 }
 
+/* ─── Legacy class aliases (backward compat) ─── */
+.glass-card {
+  @apply rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800;
+}
+
+.hover-lift {
+  @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-brand-400;
+}
+
+.skeleton-shimmer {
+  @apply animate-pulse;
+}
+
+.card-tilt {
+  @apply transition-transform duration-200;
+}
+
+.card-tilt:hover {
+  transform: scale(1.01);
+}
+
+.btn-glow {
+  @apply relative;
+}
+
 /* ─── Smooth transitions ─── */
 * {
   transition-property: background-color, border-color, color;
