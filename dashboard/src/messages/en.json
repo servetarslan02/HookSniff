@@ -1333,7 +1333,31 @@
     "alertSettingsSaved": "Alert settings saved successfully",
     "alertSettingsFailed": "Failed to save alert settings",
     "activeAlertRules": "active alert rule(s) configured",
-    "saveAlertSettings": "🚨 Save Alert Settings"
+    "saveAlertSettings": "🚨 Save Alert Settings",
+    "mrrCard": "Monthly Recurring Revenue (MRR)",
+    "arrCard": "Annual Recurring Revenue (ARR)",
+    "activeEndpoints": "Active Endpoints",
+    "totalEndpoints": "Total Endpoints",
+    "disabledEndpoints": "Disabled",
+    "endpointStatus": "Endpoint Status",
+    "securityWarnings": "Security Warnings",
+    "ssrfAttempts": "SSRF Attempts",
+    "spoofingAttempts": "Spoofing Attempts",
+    "replayAttempts": "Replay Attacks",
+    "noSecurityWarnings": "No security warnings ✅",
+    "weekComparison": "Weekly Comparison",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "featureFlags": "Feature Flags",
+    "activeFlags": "Active Flags",
+    "uptime": "Uptime",
+    "lastDeploy": "Last Deploy",
+    "activeSessions": "Active Sessions",
+    "quickActions": "Quick Actions",
+    "viewAllEndpoints": "View All Endpoints",
+    "viewSecurityLogs": "Security Logs",
+    "viewSystemHealth": "System Health",
+    "noRecentSignups": "No recent signups"
   },
   "landing": {
     "nav": {
@@ -1903,7 +1927,6 @@
       "Custom integrations",
       "Onboarding call"
     ],
-
     "supportResponse48h": "< 48 hours",
     "supportResponse24h": "< 24 hours",
     "annual": "Annual",
