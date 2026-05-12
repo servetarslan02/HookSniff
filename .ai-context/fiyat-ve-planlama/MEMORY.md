@@ -1,6 +1,6 @@
 # 🧠 Fiyat ve Planlama — Hafıza
 
-> Son güncelleme: 2026-05-13 01:26 GMT+8
+> Son güncelleme: 2026-05-13 01:34 GMT+8
 
 ---
 
@@ -77,3 +77,15 @@
 - **CTA buton metinleri** düzeltildi (dead code kaldırıldı)
 - **i18n EN+TR** comprehensive feature listeleri güncellendi
 - **Commits:** 2 commit (fix + feat), main branch
+
+### Oturum 4 (2026-05-13 01:28 - 01:34 GMT+8)
+- **İkinci kod incelemesi** — 44 dosya tekrar tarandı
+- **Bulunan sorunlar:**
+  1. ⚠️ Admin.rs enterprise limit `u32::MAX` → `u64::MAX` düzeltildi
+  2. ⚠️ Homepage content.tsx hâlâ 3 plan (free/pro/business) → 4 plan yapıldı
+  3. ⚠️ admin/users/page.tsx PLAN_OPTIONS eski → güncellendi
+  4. ⚠️ admin/users/[id]/page.tsx PLAN_OPTIONS eski → güncellendi
+  5. ⚠️ admin/settings/page.tsx default_plan 'free' → 'developer'
+  6. ⚠️ docs/page.tsx rate limit tablosu 3 plan → 4 plan
+- **Commits:** 2 commit, main branch
+- **Sonraki oturum:** cargo test çalıştır, Cloud Build doğrula
