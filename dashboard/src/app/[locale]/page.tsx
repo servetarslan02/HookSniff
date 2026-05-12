@@ -176,7 +176,7 @@ function DashboardPreview() {
   return (
     <div className="relative max-w-3xl mx-auto mt-12">
       <div className="absolute -inset-4 bg-gradient-to-r from-brand-500/20 to-purple-500/20 rounded-3xl blur-2xl" />
-      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-brand-500/10 border border-gray-200 dark:border-slate-700 overflow-hidden">
+      <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-brand-500/10 border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -272,7 +272,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Navigation */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">🪝</div>
@@ -311,7 +311,7 @@ export default function Home() {
         </div>
         {/* Mobile nav dropdown */}
         {mobileNavOpen && (
-          <div className="md:hidden border-t border-gray-200/50 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-6 py-4 space-y-3">
+          <div className="md:hidden border-t border-gray-200/50 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl px-6 py-4 space-y-3">
             <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
             <a href="#pricing" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
             <Link href="/docs" onClick={() => setMobileNavOpen(false)} className="block text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
@@ -367,7 +367,7 @@ export default function Home() {
             <div className="w-3 h-3 rounded-full bg-green-400"></div>
             <span className="ml-4 text-sm text-gray-500 dark:text-slate-400 font-mono">send-webhook.sh</span>
           </div>
-          <pre className="p-4 sm:p-6 text-xs sm:text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-900 max-w-full">
+          <pre className="p-4 sm:p-6 text-xs sm:text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-800 max-w-full">
             <code className="break-all sm:break-normal">{`# Create an endpoint
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\

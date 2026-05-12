@@ -280,7 +280,7 @@ export default function PricingPage() {
                         </td>
                       </tr>
                       {section.items.map((item) => (
-                        <tr key={item.feature} className="border-b border-gray-100 dark:border-slate-800/50 last:border-0">
+                        <tr key={item.feature} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                           <td className="py-3 px-6 text-gray-700 dark:text-slate-300">{item.feature}</td>
                           <td className="py-3 px-4 text-center text-gray-600 dark:text-slate-400">{item.free}</td>
                           <td className="py-3 px-4 text-center text-gray-900 dark:text-white bg-brand-50/30 dark:bg-brand-500/5 font-medium">{item.pro}</td>
@@ -309,7 +309,7 @@ export default function PricingPage() {
               { icon: '🌐', titleKey: 'securityItem7Title', descKey: 'securityItem7Desc' },
               { icon: '📍', titleKey: 'securityItem8Title', descKey: 'securityItem8Desc' },
             ].map((item) => (
-              <div key={item.titleKey} className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 text-center">
+              <div key={item.titleKey} className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 text-center">
                 <span className="text-2xl">{item.icon}</span>
                 <h4 className="font-semibold text-gray-900 dark:text-white text-sm mt-2">{t(item.titleKey)}</h4>
                 <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{t(item.descKey)}</p>
@@ -329,8 +329,8 @@ export default function PricingPage() {
             ].map((s) => (
               <div
                 key={s.plan}
-                className={`bg-white dark:bg-slate-900 rounded-xl border p-6 ${
-                  s.highlight ? 'border-brand-400 dark:border-brand-500 ring-1 ring-brand-400 dark:ring-brand-500' : 'border-gray-200 dark:border-slate-800'
+                className={`bg-white dark:bg-slate-800 rounded-xl border p-6 ${
+                  s.highlight ? 'border-brand-400 dark:border-brand-500 ring-1 ring-brand-400 dark:ring-brand-500' : 'border-gray-200 dark:border-slate-700'
                 }`}
               >
                 <p className="text-xs font-medium text-gray-500 dark:text-slate-500 uppercase tracking-wider">{s.plan}</p>
@@ -427,7 +427,7 @@ export default function PricingPage() {
             {Array.from({ length: faqCount }, (_, i) => (
               <div
                 key={i}
-                className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 overflow-hidden"
+                className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden"
               >
                 <button
                   onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
