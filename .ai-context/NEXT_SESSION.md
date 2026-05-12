@@ -1,30 +1,30 @@
-# NEXT_SESSION.md — Oturum 136+
+# NEXT_SESSION.md — Oturum 137+
 
-> Son güncelleme: 2026-05-13 01:50 GMT+8 (Oturum 135)
+> Son güncelleme: 2026-05-13 02:25 GMT+8 (Oturum 136)
 
 ## Kaldığımız Yer
-- **API tamamen çalışıyor** ✅ — tüm 500 hataları düzeltildi
-- **Dashboard login → dashboard akışı çalışıyor** ✅
-- **Locale double-prefix düzeltildi** ✅
-- **queue_detail health fix** — `query_scalar` → `query_as` (Rust kodu, deploy gerekli)
-- **openSidebar i18n fix** — `t()` → `tc()` (dashboard layout)
+- **Cloud Build başarılı** ✅ — API + Worker image derlenip deploy edildi
+- **DB migration otomasyonu** ✅ — Cloud Build pipeline'ına migration step eklendi
+- **10 compile hatası düzeltildi** ✅ — u64→i64, AppError::NotFound, Plan::Startup, anyhow conversion
 
-## Yapılacaklar (Oturum 136)
-1. **Cloud Build tetikle** — `health.rs` ve `layout.tsx` değişiklikleri deploy edilmeli
-2. **DB migration otomasyonu** — Cloud Build'de migration step ekle (manuel uygulama sürdürülebilir değil)
-3. **Kalan 5 ⬜ madde** — Servet görevleri (bkz. MEMORY.md)
+## Yapılacaklar (Oturum 137)
+1. **Kalan 5 ⬜ madde** — Servet görevleri (bkz. MEMORY.md)
+2. **Grafana trial** — 20 Mayıs'ta bitiyor, alternatif plan gerekli
+3. **GitHub PAT + GCP key rotate** — Güvenlik için
 4. **Hook0 kopyalama fikri reddedildi** — lisans uyumsuz (SSPL)
 
 ## Bilinen Sorunlar
-- `queue_detail` health check: Rust kodu değişikliği (query_scalar → query_as) + Cloud Build deploy gerekli
-- DB migration'lar manuel uygulanıyor — otomatik hale getirilmeli
 - Grafana trial 20 Mayıs'ta bitiyor
 - GitHub PAT + GCP key rotate edilmeli
 
-## Bu Oturumda Yapılanlar
-- Neon DB'ye 4 migration uygulandı (012, 013 + eksik kolonlar)
-- `api.ts` Bearer token fix
-- `health.rs` query_scalar → query_as
-- `layout.tsx` openSidebar i18n fix
-- MEMORY.md güncellendi
-- 5+ commit push edildi
+## Bu Oturumda Yapılanlar (Oturum 136)
+- gcloud CLI kuruldu + Google hesabıyla OAuth girişi (2FA ile)
+- Cloud Build tetiklendi → ilk deneme başarısız (10 compile hatası)
+- 4 dosyada 10 compile hatası düzeltildi:
+  - `admin.rs`: u64 → i64 (sqlx Postgres uyumluluğu)
+  - `applications.rs`: AppError::NotFound argümanları kaldırıldı (3 yer)
+  - `billing.rs`: Plan::Startup match arm eklendi, duplicate Enterprise kaldırıldı
+  - `schemas.rs`: `e.to_string()` → `anyhow::anyhow!(e)` (2 yer)
+- İkinci Cloud Build başarılı ✅ (5m59s)
+- DB migration otomasyonu eklendi (cloudbuild.yaml'a migration step)
+- `.ai-context` dosyaları güncellendi
