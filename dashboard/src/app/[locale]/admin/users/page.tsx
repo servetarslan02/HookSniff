@@ -158,17 +158,6 @@ export default function AdminUsersPage() {
     if (!token || !banTarget) return;
     try {
       await adminApi.updateUserStatus(token, banTarget.id, 'banned');
-      if (banReason.trim()) {
-        // Log the ban reason via audit (best-effort)
-        try {
-          await adminApi.createAuditLog?.(token, {
-            action: 'user.banned',
-            resource_type: 'user',
-            resource_id: banTarget.id,
-            details: { reason: banReason.trim() },
-          });
-        } catch { /* audit log is optional */ }
-      }
       toast(t('userBanned'), 'success');
       setBanTarget(null);
       setBanReason('');

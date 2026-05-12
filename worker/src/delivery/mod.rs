@@ -211,13 +211,15 @@ async fn deliver_email(
     let cache = SA_CACHE.get_or_init(|| std::sync::RwLock::new(None));
 
     let sa_json = {
-        // Try cache first
-        let cached = cache.read().unwrap();
-        if let Some((ref path, ref json)) = *cached {
+        // Try cache first — clone value and drop guard before any await
+        let cached_val = {
+            let cached = cache.read().unwrap();
+            cached.clone()
+        };
+        if let Some((ref path, ref json)) = cached_val {
             if path == &sa_path {
                 json.clone()
             } else {
-                drop(cached);
                 // Path changed — re-read
                 match tokio::fs::read_to_string(&sa_path).await {
                     Ok(json) => {
