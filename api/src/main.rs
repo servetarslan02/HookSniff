@@ -63,6 +63,43 @@ async fn main() -> Result<()> {
         }
     }
 
+    // Item 260: Validate JWT RS256 key configuration
+    let has_private_key = std::env::var("JWT_PRIVATE_KEY")
+        .map(|v| !v.is_empty())
+        .unwrap_or(false);
+    let has_public_key = std::env::var("JWT_PUBLIC_KEY")
+        .map(|v| !v.is_empty())
+        .unwrap_or(false);
+
+    match (has_private_key, has_public_key) {
+        (true, true) => {
+            tracing::info!("✅ JWT RS256 active — tokens signed with RSA asymmetric keys");
+        }
+        (true, false) => {
+            tracing::warn!(
+                "⚠️ JWT_PRIVATE_KEY set but JWT_PUBLIC_KEY missing — falling back to HS256. \
+                 Set both to enable RS256: openssl genrsa -out jwt_private.pem 2048 && \
+                 openssl rsa -in jwt_private.pem -pubout -out jwt_public.pem"
+            );
+        }
+        (false, true) => {
+            tracing::warn!(
+                "⚠️ JWT_PUBLIC_KEY set but JWT_PRIVATE_KEY missing — falling back to HS256. \
+                 Set both to enable RS256."
+            );
+        }
+        (false, false) => {
+            // HS256 mode — check that JWT_SECRET is set
+            if std::env::var("JWT_SECRET").is_err() {
+                anyhow::bail!(
+                    "🚫 Neither JWT_PRIVATE_KEY/JWT_PUBLIC_KEY nor JWT_SECRET is set. \
+                     Set JWT_SECRET for HS256 or both RSA keys for RS256."
+                );
+            }
+            tracing::info!("JWT HS256 active — set JWT_PRIVATE_KEY + JWT_PUBLIC_KEY to upgrade to RS256");
+        }
+    }
+
     let pool = db::create_pool(&cfg.database_url).await?;
 
     // Initialize Prometheus metrics
