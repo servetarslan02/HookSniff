@@ -1357,7 +1357,12 @@
     "viewAllEndpoints": "View All Endpoints",
     "viewSecurityLogs": "Security Logs",
     "viewSystemHealth": "System Health",
-    "noRecentSignups": "No recent signups"
+    "noRecentSignups": "No recent signups",
+    "activeWebhooks": "Active Webhooks",
+    "currentlyProcessing": "currently processing",
+    "settingsNav": "Settings",
+    "vsLastMonth": "vs last month",
+    "vsYesterday": "vs yesterday"
   },
   "landing": {
     "nav": {

@@ -1357,7 +1357,12 @@
     "viewAllEndpoints": "Tüm Uç Noktaları Gör",
     "viewSecurityLogs": "Güvenlik Logları",
     "viewSystemHealth": "Sistem Sağlığı",
-    "noRecentSignups": "Son kayıt yok"
+    "noRecentSignups": "Son kayıt yok",
+    "activeWebhooks": "Aktif Webhook",
+    "currentlyProcessing": "şu anda işleniyor",
+    "settingsNav": "Ayarlar",
+    "vsLastMonth": "geçen aya göre",
+    "vsYesterday": "dün ile karşılaştırma"
   },
   "landing": {
     "nav": {
