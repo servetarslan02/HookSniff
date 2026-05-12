@@ -642,4 +642,398 @@ Admin panelinde ~80 çeviri anahtarı var. Çoğu Türkçe'ye çevrilmiş.
 
 ---
 
+---
+
+## 👤 SAYFA 6: KULLANICI DETAY (User Detail)
+
+**URL:** `/admin/users/[id]`
+**Dosya:** `dashboard/src/app/[locale]/admin/users/[id]/page.tsx`
+**Backend:** `GET /v1/admin/users/:id`
+
+### Mevcut İçerik
+
+#### 1. Başlık + Geri Butonu
+- Geri butonu → `/admin/users` sayfasına döner
+- `<h1>` → Kullanıcı adı veya email
+- `<p>` → i18n: `admin.userDetail` = "User Detail"
+
+#### 2. Sol Kart — Kullanıcı Bilgileri (1/3)
+| Alan | Veri | i18n Key |
+|------|------|----------|
+| ID | `detail.user.id` (UUID, font-mono) | — |
+| Email | `detail.user.email` | `admin.email` |
+| İsim | `detail.user.name \|\| '—'` | `admin.name` |
+| Durum | StatusBadge component | `admin.status` |
+| Oluşturulma | `toLocaleString()` | `admin.created` |
+
+#### 3. Orta Kart — Yönetim (1/3)
+| Bölüm | İçerik | i18n Key |
+|-------|--------|----------|
+| Plan Seçici | Select (Free/Pro/Business) + Güncelle butonu | `admin.plan`, `admin.update` |
+| Hesap Durumu | Ban/Aktifleştir butonu (renk değişimli) | `admin.accountStatus` |
+| Kullanım İstatistikleri | Toplam teslimat, başarı oranı, endpoint sayısı | `admin.usageStats` |
+
+**Plan Değiştirme Davranışı:**
+- Select değişti → Güncelle butonu aktif
+- Aynı plan seçili → buton disabled (opacity-40)
+- Başarılı → toast "Plan X olarak güncellendi"
+- Hatalı → toast "Plan güncellenemedi"
+
+**Ban Davranışı:**
+- Active kullanıcı → kırmızı "Kullanıcıyı Yasakla" butonu
+- Banned kullanıcı → yeşil "Kullanıcıyı Aktifleştir" butonu
+- **Eksik:** Onay dialog'u yok, sebebi sorulmuyor
+
+#### 4. Sağ Kart — Endpoint'ler (1/3)
+- `detail.endpoints` listesi
+- Her endpoint: URL (font-mono, truncate), aktif/pasif dot, tarih
+- Boş state: "Uç nokta yok" mesajı
+
+#### 5. Alt Bölüm — Son Teslimatlar Tablosu
+| Kolon | Veri | i18n Key |
+|-------|------|----------|
+| ID | `d.id.slice(0, 10)…` | — |
+| Event | `d.event \|\| '—'` (badge) | `admin.event` |
+| Durum | StatusBadge | `admin.status` |
+| Deneme | `d.attempt_count` | `admin.attempts` |
+| Zaman | `toLocaleString()` | `admin.time` |
+
+**Eksik:** Her satırda "Tekrar Gönder" butonu yok.
+
+#### 6. Durumlar
+- **Yükleme:** Skeleton (h-8 + h-4 pulse)
+- **Bulunamadı:** 😕 emoji + "Kullanıcı Bulunamadı" + geri butonu
+- **Hata:** Toast "Kullanıcı detayları yüklenemedi"
+
+### Eksiklikler
+
+| # | Eksik | Açıklama | Öncelik |
+|---|-------|----------|---------|
+| 1 | **Replay butonu** | Teslimat satırında "Tekrar Gönder" yok | 🔴 Yüksek |
+| 2 | **Teslimat detayı** | Satıra tıklayınca detay modal yok | 🟡 Orta |
+| 3 | **Günlük teslimat grafiği** | Son 30 gün grafik yok | 🟡 Orta |
+| 4 | **Event dağılımı** | Hangi event'ten kaç tane? Pasta grafik yok | 🟡 Orta |
+| 5 | **Endpoint sağlık** | Endpoint başına başarı oranı yok | 🟡 Orta |
+| 6 | **Kullanıcı taklidi** | "Kullanıcı gibi gör" butonu yok | 🔴 Yüksek |
+| 7 | **Ban sebebi** | Ban atarken sebebi yazma/sorma yok | 🟡 Orta |
+| 8 | **Email gönderme** | Kullanıcıya email atma butonu yok | 🟡 Orta |
+| 9 | **Plan geçmişi** | Ne zaman plan değiştirdi? Liste yok | 🟢 Düşük |
+
+---
+
+## 🏗️ LAYOUT & NAVIGATION
+
+**Dosya:** `dashboard/src/app/[locale]/admin/layout.tsx`
+
+### Sidebar Yapısı
+```
+┌──────────────────────┐
+│ ⚡ Yönetim Paneli     │
+│    Platform Yönetimi  │
+├──────────────────────┤
+│ 📊 Genel Bakış       │  → /admin
+│ 👥 Kullanıcılar      │  → /admin/users
+│ 💰 Gelir             │  → /admin/revenue
+│ 🖥️ Sistem            │  → /admin/system
+│ ⚙️ Ayarlar           │  → /admin/settings
+├──────────────────────┤
+│ ← Panele Dön         │  → /dashboard
+│ 🌙/☀️ ThemeToggle    │
+└──────────────────────┘
+```
+
+### Top Bar
+- Sol: Mobil hamburger butonu + Sayfa başlığı + "Yönetici" badge
+- Sağ: Kullanıcı email + Çıkış butonu
+
+### Auth Guard
+- `useEffect` ile `user.is_admin` kontrolü
+- Admin değilse → `/dashboard` redirect
+- Admin değilse → 🔒 Erişim Reddedildi ekranı
+
+### Mobil Uyum
+- Sidebar: `translate-x` animasyonu ile açılır/kapanır
+- Overlay: Siyah yarı saydam backdrop
+- `md:pl-64` → masaüstünde sidebar offset
+
+### Eksiklikler
+
+| # | Eksik | Açıklama | Öncelik |
+|---|-------|----------|---------|
+| 1 | **"Aktivite" menüsü** | Audit log sayfası sidebar'da yok | 🔴 Yüksek |
+| 2 | **Bildirim ikonu** | Header'da alarm/bildirim zili yok | 🟡 Orta |
+| 3 | **Hızlı arama** | Header'da global arama yok | 🟢 Düşük |
+| 4 | **Kullanıcı menüsü** | Header'da profil dropdown yok | 🟢 Düşük |
+
+---
+
+## 🧩 REUSABLE COMPONENTS
+
+### StatusBadge
+**Dosya:** `dashboard/src/components/StatusBadge.tsx`
+
+Desteklenen durumlar:
+| Durum | Renk | İkon |
+|-------|------|------|
+| delivered/success | Yeşil | ✓ |
+| failed/error | Kırmızı | ✕ |
+| pending | Amber | … |
+| active | Mavi | — |
+| inactive | Gri | — |
+| banned | Kırmızı | — |
+| warning | Amber | — |
+| paid | Yeşil | — |
+
+**Boyutlar:** sm, md (default), lg
+**Eksik:** "replayed" durumu yok
+
+### StatCard
+**Dosya:** `dashboard/src/components/tremor/StatCard.tsx`
+
+Özellikler:
+- label, value, icon, trend, color, isPercent
+- Trend: up/down/neutral + yüzde + label
+- 6 renk: blue, emerald, red, amber, violet, slate
+- Hover animasyonu: `hover-lift card-tilt`
+
+**Eksik:** `trend` prop'u hiçbir sayfada kullanılmıyor (Overview'de olmalı)
+
+### ChartCard
+**Dosya:** `dashboard/src/components/tremor/ChartCard.tsx`
+
+- Başlık + alt başlık + children (grafik)
+- Revenue sayfasında kullanılıyor
+
+---
+
+## 🔧 BACKEND — SDK UPDATE ENDPOINT
+
+**Endpoint:** `POST /v1/admin/sdk-update`
+**Dosya:** `api/src/routes/admin.rs` (satır 533-589)
+
+### Amaç
+Otomatik SDK versiyon kontrolü (cron job) tarafından çağrılır. Tüm admin kullanıcılara bildirim oluşturur.
+
+### Request Body
+```json
+{
+  "updates": [
+    {"sdk": "python", "local_version": "1.0.0", "published_version": "1.1.0"},
+    {"sdk": "node", "local_version": "2.0.0", "published_version": "2.1.0"}
+  ]
+}
+```
+
+### Davranış
+1. Admin kontrolü
+2. Boş updates → "No updates to notify" dön
+3. Her admin için `notifications` tablosuna INSERT
+4. Bildirim tipi: 'system', link: '/admin'
+
+### Sorun
+- `notifications` tablosu **migration'da yok** → runtime error
+- Frontend'de bu endpoint'i çağıran UI yok
+
+---
+
+## 🚨 KRİTİK BULGU: EKSİK MİGRATION DOSYALARI
+
+### Tablo Durumu
+
+| Tablo | Migration'da Var mı? | Kodda Kullanılıyor mu? | Durum |
+|-------|---------------------|----------------------|-------|
+| `customers` | ✅ Evet (001) | ✅ Evet | ✅ OK |
+| `endpoints` | ✅ Evet (001) | ✅ Evet | ✅ OK |
+| `deliveries` | ✅ Evet (001) | ✅ Evet | ✅ OK |
+| `delivery_attempts` | ✅ Evet (001) | ✅ Evet | ✅ OK |
+| `dead_letters` | ✅ Evet (001) | ✅ Evet | ✅ OK |
+| `idempotency_keys` | ✅ Evet (004) | ✅ Evet | ✅ OK |
+| `platform_settings` | ✅ Evet (007) | ✅ Evet | ✅ OK |
+| `tfa_backup_codes` | ✅ Evet (007) | ✅ Evet | ✅ OK |
+| **`audit_log`** | ❌ **HAYIR** | ✅ Evet (15+ dosya) | 🔴 **CRASH** |
+| **`alert_rules`** | ❌ **HAYIR** | ✅ Evet (alerts.rs) | 🔴 **CRASH** |
+| **`notifications`** | ❌ **HAYIR** | ✅ Evet (notifications.rs, admin.rs) | 🔴 **CRASH** |
+| **`teams`** | ❌ **HAYIR** | ✅ Evet (teams.rs) | 🔴 **CRASH** |
+| **`team_members`** | ❌ **HAYIR** | ✅ Evet (teams.rs) | 🔴 **CRASH** |
+| **`notification_preferences`** | ❌ **HAYIR** | ✅ Evet (customer_portal.rs) | 🔴 **CRASH** |
+| **`portal_configs`** | ❌ **HAYIR** | ✅ Evet (portal_config.rs) | 🔴 **CRASH** |
+
+### Etki
+Bu tablolar Neon DB'de yoksa, ilgili API endpoint'leri "relation does not exist" hatası verir. Yani:
+- Audit log sayfası → crash
+- Alert kuralları → crash
+- Bildirimler → crash
+- Takımlar → crash
+- Portal config → crash
+
+### Çözüm
+Her eksik tablo için CREATE TABLE migration dosyası oluşturulmalı.
+
+---
+
+## 📊 MEVCUT AUDIT LOG SİSTEMİ (Önceden Var Ama Görünmez)
+
+### Backend Modülleri
+| Dosya | Amaç |
+|-------|------|
+| `api/src/audit.rs` | `log_action()` helper fonksiyonu |
+| `api/src/routes/audit_log.rs` | API endpoint'leri (list + get) |
+
+### Kullanım Noktaları (15+ yer)
+| Endpoint | Action | Kaynak |
+|----------|--------|--------|
+| `POST /auth/register` | REGISTER | auth.rs |
+| `POST /auth/login` | LOGIN | auth.rs |
+| `POST /auth/2fa/enable` | 2FA_ENABLE | auth.rs |
+| `POST /auth/2fa/disable` | 2FA_DISABLE | auth.rs |
+| `POST /auth/password` | PASSWORD_CHANGE | auth.rs |
+| `POST /endpoints` | ENDPOINT_CREATE | endpoints.rs |
+| `PUT /endpoints/:id` | ENDPOINT_UPDATE | endpoints.rs |
+| `DELETE /endpoints/:id` | ENDPOINT_DELETE | endpoints.rs |
+| `POST /api-keys` | API_KEY_CREATE | api_keys.rs |
+| `DELETE /api-keys/:id` | API_KEY_DELETE | api_keys.rs |
+| `DELETE /billing/subscription` | SUBSCRIPTION_CANCEL | billing.rs |
+| `POST /billing/checkout` | PLAN_CHANGE | billing.rs |
+| `POST /teams/:id/invite` | MEMBER_INVITE | teams.rs |
+| `DELETE /teams/:id/members/:id` | MEMBER_REMOVE | teams.rs |
+| `PUT /teams/:id/members/:id/role` | ROLE_CHANGE | teams.rs |
+
+### API Endpoint'leri
+```
+GET /v1/audit-log?action=LOGIN&resource_type=auth&limit=50&offset=0
+GET /v1/audit-log/:id
+```
+
+### Frontend Durumu
+- ❌ Admin panelinde audit log sayfası yok
+- ❌ Dashboard'da audit log sayfası yok
+- ❌ Overview'de son aktiviteler kartı yok
+- ✅ Backend tamamen çalışıyor (tablo varsa)
+
+---
+
+## 📊 MEVCUT ALERT SİSTEMİ (Önceden Var Ama Görünmez)
+
+### Backend
+**Dosya:** `api/src/routes/alerts.rs`
+
+### API Endpoint'leri
+```
+GET    /v1/alerts           — Alert kuralları listesi
+POST   /v1/alerts           — Yeni alert kuralı oluştur
+GET    /v1/alerts/:id       — Alert kuralı detayı
+DELETE /v1/alerts/:id       — Alert kuralı sil
+POST   /v1/alerts/:id/test  — Alert test et
+```
+
+### Alert Koşulları
+- `failure_rate` — Başarısızlık oranı eşiği
+- `latency` — Yanıt süresi eşiği
+- `consecutive_failures` — Ardışık başarısızlık sayısı
+
+### Bildirim Kanalları
+- `slack` — Slack webhook
+- `email` — Email bildirimi
+- `webhook` — Özel webhook URL
+
+### Frontend Durumu
+- ❌ Admin panelinde alert sayfası yok
+- ❌ Dashboard'da alert sayfası yok
+- ❌ Settings'de alert eşikleri yok
+- ✅ Backend çalışıyor (tablo varsa)
+
+---
+
+## 📊 MEVCUT DELIVERY DETAY SİSTEMİ
+
+### Backend
+**Dosya:** `api/src/routes/delivery_details.rs`
+
+### API Endpoint'leri
+```
+GET /v1/deliveries/:id/details           — Teslimat detayı + tüm denemeler
+GET /v1/deliveries/:id/attempts/:attempt_id  — Tek deneme detayı
+```
+
+### Döndürülen Veri
+- Endpoint URL, event type, status
+- Payload, request headers
+- Response status, response body, error message
+- Tüm denemeler (attempt_number, status_code, duration_ms, response_headers)
+- Signature bilgisi (algorithm, header_name, format, secret_prefix)
+- Retry bilgisi (next_retry_at, last_attempt_at)
+
+### Frontend Durumu
+- ❌ Admin panelinde bu veriyi gösteren UI yok
+- ❌ User Detail'de teslimat satırına tıklayınca detay modal yok
+- ✅ Backend çalışıyor
+
+---
+
+## 📊 i18n TAMAMLIK ANALİZİ
+
+### EN Çevirileri (80 key)
+Tüm admin key'leri İngilizce'de mevcut. ✅
+
+### TR Çevirileri (80 key)
+Tüm admin key'leri Türkçe'ye çevrilmiş. ✅
+
+### Eksik Key'ler (Henüz Eklenmemiş)
+| Kategori | Eksik Key'ler | Sayı |
+|----------|--------------|------|
+| Audit Log | auditLog, auditActivity, allActivities, filterByAction | ~8 |
+| Export | exportCSV, exportJSON, downloadReport | ~4 |
+| Alert | alertRules, alertIncidents, createAlert, alertCondition | ~10 |
+| Replay | replayDelivery, replaySuccess, replayFailed | ~4 |
+| Impersonate | impersonateUser, viewAsUser, stopImpersonating | ~4 |
+| Customer Charts | dailyDeliveries, eventDistribution, endpointHealth | ~6 |
+| Test Console | testWebhook, sendTest, testResult | ~5 |
+
+**Toplam eksik:** ~41 key (EN + TR)
+
+---
+
+## 📋 ÖZET TABLO — TÜM SAYFALAR
+
+| Sayfa | Durum | Çalışan | Eksik | Kritik Eksik |
+|-------|-------|---------|-------|-------------|
+| Overview | 🔴 Bozuk | Layout, loading, error | API düzelt, audit özeti, trend | stats API |
+| Users | 🟢 İyi | Arama, filtre, tablo, plan, ban | Export, taklit, toplu işlem | — |
+| User Detail | 🟡 İyi | Bilgi kartı, plan, endpoint'ler, teslimatlar | Replay, grafik, taklit | Replay |
+| Revenue | 🔴 Bozuk | Layout, loading, error | API düzelt, export, churn detay | revenue API |
+| System | 🟡 İyi | Sağlık kartları, altyapı | Alarm durumu, test console | — |
+| Settings | 🟡 İyi | Genel, limitler, retry | Alert eşikleri, fiyat ayarı | — |
+| Layout | 🟢 İyi | Sidebar, top bar, auth guard | Aktivite menüsü, bildirim zili | — |
+
+---
+
+## 🎯 GÜNCEL ÖNCELİK SIRASI
+
+### Acil (Bu Oturum)
+| # | İş | Sayfa | Süre |
+|---|-----|-------|------|
+| 1 | stats API düzelt | Backend | ~15 dk |
+| 2 | revenue API düzelt | Backend | ~15 dk |
+| 3 | Audit log migration oluştur | Backend | ~5 dk |
+| 4 | Overview'ye son aktiviteler kartı ekle | Overview | ~10 dk |
+
+### Yakın (Sonraki Oturum)
+| # | İş | Sayfa | Süre |
+|---|-----|-------|------|
+| 5 | Audit log sayfası oluştur (sidebar'a ekle) | Yeni sayfa | ~20 dk |
+| 6 | Replay butonu | User Detail + Backend | ~15 dk |
+| 7 | CSV Export | Users + Revenue | ~10 dk |
+| 8 | Kullanıcı taklidi | Users + Backend | ~15 dk |
+
+### Orta Vade (3. Oturum)
+| # | İş | Sayfa | Süre |
+|---|-----|-------|------|
+| 9 | Alert migration + Settings'de eşikler | Backend + Settings | ~20 dk |
+| 10 | Müşteri grafikleri | User Detail | ~20 dk |
+| 11 | Webhook Test Console | System | ~15 dk |
+| 12 | Eksik migration'lar (notifications, teams, portal_configs) | Backend | ~15 dk |
+
+---
+
 *Bu dosya her oturum sonunda güncellenmeli.*
+*Son güncelleme: 2026-05-12 15:35 GMT+8 — Eksik migration'lar, User Detail, Layout, Components, SDK Update eklendi*
