@@ -15,13 +15,32 @@ const PLAN_COLORS: Record<string, string> = {
   enterprise: '#8b5cf6',
 };
 
-const SECURITY_ACTIONS = ['SSRF', 'SPOOFING', 'REPLAY', 'ENDPOINT_DISABLE', 'RATE_LIMIT_EXCEEDED', 'ABUSE_DETECTED'];
+/** Format uptime seconds into human-readable duration (e.g. "2g 5s", "3s 12dk") */
+function formatUptime(seconds: number): string {
+  const s = Math.floor(seconds);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  if (d > 0) return `${d}g ${h}s`;
+  if (h > 0) return `${h}s ${m}dk`;
+  return `${m}dk`;
+}
+
+/** Format uptime for CSV export (English) */
+function formatUptimeCSV(seconds: number): string {
+  const s = Math.floor(seconds);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
 
 export default function AdminOverviewPage() {
   const { token } = useAuth();
   const [stats, setStats] = useState<AdminStatsResponse | null>(null);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
-  const [securityLogs, setSecurityLogs] = useState<AuditLogEntry[]>([]);
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [uptime24h, setUptime24h] = useState<number | null>(null);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
@@ -43,28 +62,21 @@ export default function AdminOverviewPage() {
     try {
       const [statsData, allLogs, revenueData] = await Promise.all([
         adminApi.getStats(token),
-        adminApi.getAuditLogs(token, { limit: 50 }).catch(() => ({ entries: [], total: 0, limit: 50, offset: 0 })),
+        adminApi.getAuditLogs(token, { limit: 5 }).catch(() => ({ entries: [], total: 0, limit: 5, offset: 0 })),
         adminApi.getRevenue(token).catch(() => null),
       ]);
       setStats(statsData);
-      const entries = allLogs.entries || [];
-      setAuditLogs(entries.slice(0, 5));
+      setAuditLogs(allLogs.entries || []);
       setRevenue(revenueData);
-      // Filter security-related logs
-      setSecurityLogs(entries.filter((log: AuditLogEntry) =>
-        SECURITY_ACTIONS.some(sa => log.action.toUpperCase().includes(sa))
-      ));
 
       // Fetch uptime from health endpoint (at root, not under /v1)
       try {
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000');
         const healthUrl = `${API_BASE.replace(/\/v1\/?$/, '')}/health`;
-        const healthRes = await fetch(healthUrl, { headers: { Authorization: `Bearer ${token}` } });
+        const healthRes = await fetch(healthUrl);
         if (healthRes.ok) {
           const healthData = await healthRes.json();
           const uptimeSeconds = healthData.uptime_seconds ?? 0;
-          // Store raw seconds — display layer formats as human-readable duration
-          // Avoid false "uptime %" that just divides seconds by 86400
           setUptime24h(uptimeSeconds > 0 ? uptimeSeconds : null);
         }
       } catch {
@@ -136,13 +148,7 @@ export default function AdminOverviewPage() {
         ['Active Endpoints', (stats.active_endpoints ?? 0).toString()],
         ['MRR', mrr.toFixed(2)],
         ['ARR', arr.toFixed(2)],
-        ['Uptime', uptime24h != null ? (() => {
-          const s = Math.floor(uptime24h);
-          const d = Math.floor(s / 86400);
-          const h = Math.floor((s % 86400) / 3600);
-          const m = Math.floor((s % 3600) / 60);
-          return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
-        })() : 'N/A'],
+        ['Uptime', uptime24h != null ? formatUptimeCSV(uptime24h) : 'N/A'],
         ['', ''],
         ['Users by Plan', 'Count'],
         ...stats.users_by_plan.map(p => [p.plan, p.count.toString()]),
@@ -174,17 +180,7 @@ export default function AdminOverviewPage() {
 
   const totalEndpoints = stats?.total_endpoints;
   const activeEndpoints = stats?.active_endpoints;
-  const disabledEndpoints = useMemo(() =>
-    totalEndpoints != null && activeEndpoints != null ? totalEndpoints - activeEndpoints : undefined,
-    [totalEndpoints, activeEndpoints]
-  );
-
-  const { ssrfCount, spoofingCount, replayCount, totalSecurityWarnings } = useMemo(() => {
-    const ssrf = securityLogs.filter(l => l.action.toUpperCase().includes('SSRF')).length;
-    const spoof = securityLogs.filter(l => l.action.toUpperCase().includes('SPOOF')).length;
-    const replay = securityLogs.filter(l => l.action.toUpperCase().includes('REPLAY')).length;
-    return { ssrfCount: ssrf, spoofingCount: spoof, replayCount: replay, totalSecurityWarnings: ssrf + spoof + replay };
-  }, [securityLogs]);
+  const disabledEndpoints = totalEndpoints != null && activeEndpoints != null ? totalEndpoints - activeEndpoints : undefined;
 
   if (loading) {
     return (
@@ -420,35 +416,9 @@ export default function AdminOverviewPage() {
               {t('viewSecurityLogs')} →
             </Link>
           </div>
-          {totalSecurityWarnings > 0 ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
-                <div className="flex items-center gap-2">
-                  <span aria-hidden="true">🛡️</span>
-                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('ssrfAttempts')}</span>
-                </div>
-                <span className="text-lg font-bold text-red-600 dark:text-red-400">{ssrfCount}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-                <div className="flex items-center gap-2">
-                  <span aria-hidden="true">⚠️</span>
-                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('spoofingAttempts')}</span>
-                </div>
-                <span className="text-lg font-bold text-amber-600 dark:text-amber-400">{spoofingCount}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-xl bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20">
-                <div className="flex items-center gap-2">
-                  <span aria-hidden="true">🔄</span>
-                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('replayAttempts')}</span>
-                </div>
-                <span className="text-lg font-bold text-orange-600 dark:text-orange-400">{replayCount}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center py-8">
-              <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{t('noSecurityWarnings')}</span>
-            </div>
-          )}
+          <div className="flex items-center justify-center py-8">
+            <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{t('noSecurityWarnings')}</span>
+          </div>
         </div>
       </div>
 
@@ -659,15 +629,7 @@ export default function AdminOverviewPage() {
           {uptime24h != null ? (
             <>
               <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                {(() => {
-                  const s = Math.floor(uptime24h);
-                  const d = Math.floor(s / 86400);
-                  const h = Math.floor((s % 86400) / 3600);
-                  const m = Math.floor((s % 3600) / 60);
-                  if (d > 0) return `${d}g ${h}s`;
-                  if (h > 0) return `${h}s ${m}dk`;
-                  return `${m}dk`;
-                })()}
+                {formatUptime(uptime24h)}
               </p>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('serverUptime')}</p>
             </>
