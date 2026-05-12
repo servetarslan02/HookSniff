@@ -101,3 +101,8 @@
 
 ### Commit
 - `deb9fb28` — feat(admin): genel bakış sayfasına eksik özellikler eklendi
+
+### Düzeltmeler (2026-05-13 - 2)
+- 5 eksik i18n anahtarı eklendi: activeWebhooks, currentlyProcessing, settingsNav, vsLastMonth, vsYesterday
+- catch bloğundaki kullanılmayan `err` değişkeni kaldırıldı
+- Commit: `28403769`
