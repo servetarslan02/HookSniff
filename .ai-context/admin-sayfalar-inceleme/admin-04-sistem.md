@@ -52,6 +52,16 @@ interface SystemHealth {
 - DB boyutu bilgisi
 
 ### 🔴 Eksiklikler
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **Backup yönetimi** — Manuel backup tetikleme, geçmişi, restore
+- **Log seviyesi ayarı** — Debug/Info/Warn/Error toggle
+- **Feature flags** — Özellik açma/kapama, percentage rollout
+- **Uptime monitoring** — Son 24h/7d/30d uptime yüzdesi
+- **Canlı log akışı** — WebSocket ile gerçek zamanlı log streaming
+- **Servis restart** — API/Worker/DB servislerini yeniden başlatma
+- **Bağlantı havuzu** — DB ve Redis connection pool durumu
+- **Disk kullanımı** — Sunucu disk doluluk oranı
 - Sistem metrikleri grafiği yok (CPU, RAM, Disk)
 - Log viewer yok
 - Servis restart butonu yok
