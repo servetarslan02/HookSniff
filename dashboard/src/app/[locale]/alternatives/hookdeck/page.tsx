@@ -23,13 +23,13 @@ export default async function HookdeckAlternativePage() {
   const t = await getTranslations('compare');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <Link href="/alternatives/hookdeck" className="text-gray-600 dark:text-slate-400">Alternatives</Link>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">Hookdeck</span>
           </div>
           <LanguageSwitcher />
@@ -40,15 +40,15 @@ export default async function HookdeckAlternativePage() {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">HookSniff vs Hookdeck</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Looking for a Hookdeck alternative? HookSniff is open-source, self-hosted, and offers FIFO delivery and CloudEvents support.</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden mb-12">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden mb-12">
           <div className="overflow-x-auto"><table className="w-full text-sm">
-            <thead><tr className="border-b border-gray-200 dark:border-slate-800">
+            <thead><tr className="border-b border-gray-200 dark:border-slate-700">
               <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">{t("feature")}</th>
               <th className="text-center py-3 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/30">🪝 HookSniff</th>
               <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">{t("sdks")}</th>
             </tr></thead>
             <tbody>{rows.map((r) => (
-              <tr key={r.feature} className="border-b border-gray-100 dark:border-slate-800/50 last:border-0">
+              <tr key={r.feature} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                 <td className="py-3 px-6 text-gray-700 dark:text-slate-300">{r.feature}</td>
                 <td className={`py-3 px-4 text-center font-medium ${r.winner === 'hooksniff' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'} bg-brand-50/20`}>{r.hooksniff}</td>
                 <td className={`py-3 px-4 text-center ${r.winner === 'hookdeck' ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-gray-600 dark:text-slate-400'}`}>{r.hookdeck}</td>

@@ -65,7 +65,7 @@ export default function ChangelogPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Nav */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
@@ -234,7 +234,7 @@ export default function ChangelogPage() {
                               {release.entries.map((entry, i) => {
                                 const cfg = typeConfig[entry.type];
                                 return (
-                                  <div key={i} className="rounded-lg border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
+                                  <div key={i} className="rounded-lg border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-3">
                                     <div className="flex items-start gap-3">
                                       <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full shrink-0 mt-0.5 ${cfg.bg} ${cfg.color}`}>
                                         {cfg.icon} {cfg.label}
@@ -283,7 +283,7 @@ export default function ChangelogPage() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-16 pt-10 border-t border-gray-200 dark:border-slate-800 text-center">
+        <div className="mt-16 pt-10 border-t border-gray-200 dark:border-slate-700 text-center">
           <p className="text-gray-600 dark:text-slate-400 mb-4">Want to stay updated? Subscribe above or follow us on GitHub.</p>
           <div className="flex items-center justify-center gap-4">
             <a href="https://github.com/servetarslan02/HookSniff" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
