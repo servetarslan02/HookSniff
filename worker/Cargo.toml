@@ -29,7 +29,7 @@ jsonwebtoken = { version = "10", features = ["rust_crypto"] }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "logging"] }
 
 # Redis for state persistence (circuit breaker, throttle)
-redis = { version = "0.28", features = ["tokio-comp", "connection-manager"] }
+redis = { version = "1.2", features = ["tokio-comp", "connection-manager"] }
 
 # OpenTelemetry integration
 opentelemetry = "0.32"
