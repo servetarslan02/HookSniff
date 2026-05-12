@@ -20,6 +20,18 @@ interface PlatformSettings {
   signup_enabled: boolean;
 }
 
+interface AlertRule {
+  id: string;
+  customer_id: string | null;
+  customer_email: string | null;
+  name: string;
+  condition: string;
+  threshold: number;
+  channels: string[];
+  is_active: boolean;
+  created_at: string;
+}
+
 const defaultSettings: PlatformSettings = {
   default_plan: 'free',
   max_endpoints_free: 5,
@@ -35,19 +47,40 @@ const defaultSettings: PlatformSettings = {
   signup_enabled: true,
 };
 
+// Map frontend threshold keys to backend alert conditions
+const ALERT_CONDITIONS: Record<string, { condition: string; label: string; unit: string; direction: 'below' | 'above'; default: number }> = {
+  success_rate: { condition: 'failure_rate', label: 'successRateThreshold', unit: '%', direction: 'below', default: 95 },
+  latency: { condition: 'latency', label: 'latencyThreshold', unit: 'ms', direction: 'above', default: 5000 },
+  consecutive_failures: { condition: 'consecutive_failures', label: 'failedDeliveryThreshold', unit: 'perHour', direction: 'above', default: 10 },
+};
+
 export default function AdminSettingsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const [settings, setSettings] = useState<PlatformSettings>(defaultSettings);
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true); // Item 121 — initial loading state
-  const [showSuccess, setShowSuccess] = useState(false); // Item 120 — inline success
+  const [loading, setLoading] = useState(true);
+  const [showSuccess, setShowSuccess] = useState(false);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
+  // Alert state
+  const [alertRules, setAlertRules] = useState<AlertRule[]>([]);
+  const [alertThresholds, setAlertThresholds] = useState<Record<string, number>>({
+    success_rate: 95,
+    latency: 5000,
+    consecutive_failures: 10,
+  });
+  const [alertChannels, setAlertChannels] = useState<Record<string, boolean>>({
+    email: true,
+    slack: false,
+    webhook: false,
+  });
+  const [alertSaving, setAlertSaving] = useState(false);
+
   const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
 
-  // Item 123 — Fetch settings from backend on mount
+  // Fetch platform settings
   const fetchSettings = useCallback(async () => {
     if (!token) return;
     setLoading(true);
@@ -59,7 +92,6 @@ export default function AdminSettingsPage() {
         const data = await res.json();
         setSettings(data);
       }
-      // If fetch fails, keep default settings
     } catch {
       // Silently fall back to defaults
     } finally {
@@ -67,9 +99,49 @@ export default function AdminSettingsPage() {
     }
   }, [token, API]);
 
+  // Fetch alert rules
+  const fetchAlerts = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/admin/alerts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data: AlertRule[] = await res.json();
+        setAlertRules(data);
+
+        // Map existing rules back to thresholds
+        const thresholds: Record<string, number> = {};
+        const channels: Record<string, boolean> = { email: false, slack: false, webhook: false };
+
+        for (const rule of data) {
+          if (rule.condition === 'failure_rate') {
+            thresholds.success_rate = rule.threshold;
+          } else if (rule.condition === 'latency') {
+            thresholds.latency = rule.threshold;
+          } else if (rule.condition === 'consecutive_failures') {
+            thresholds.consecutive_failures = rule.threshold;
+          }
+          // Merge channels from all rules
+          for (const ch of rule.channels) {
+            channels[ch] = true;
+          }
+        }
+
+        if (Object.keys(thresholds).length > 0) {
+          setAlertThresholds((prev) => ({ ...prev, ...thresholds }));
+        }
+        setAlertChannels((prev) => ({ ...prev, ...channels }));
+      }
+    } catch {
+      // Keep defaults
+    }
+  }, [token, API]);
+
   useEffect(() => {
     fetchSettings();
-  }, [fetchSettings]);
+    fetchAlerts();
+  }, [fetchSettings, fetchAlerts]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -85,7 +157,6 @@ export default function AdminSettingsPage() {
       });
       if (!res.ok) throw new Error(tc('error'));
       toast(t('settingsSaved'), 'success');
-      // Item 120 — Show inline success message
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch {
@@ -95,12 +166,95 @@ export default function AdminSettingsPage() {
     }
   };
 
+  // Save alert thresholds as alert rules
+  const handleAlertSave = async () => {
+    setAlertSaving(true);
+    try {
+      const channels = Object.entries(alertChannels)
+        .filter(([, enabled]) => enabled)
+        .map(([ch]) => ch);
+
+      // Determine which rules exist and which need to be created
+      const existingByCondition: Record<string, AlertRule> = {};
+      for (const rule of alertRules) {
+        existingByCondition[rule.condition] = rule;
+      }
+
+      const promises: Promise<Response>[] = [];
+
+      for (const [, config] of Object.entries(ALERT_CONDITIONS)) {
+        const existing = existingByCondition[config.condition];
+        const threshold = alertThresholds[config.condition === 'failure_rate' ? 'success_rate' : config.condition === 'latency' ? 'latency' : 'consecutive_failures'];
+
+        if (existing) {
+          // Update existing rule
+          promises.push(
+            fetch(`${API}/admin/alerts/${existing.id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                threshold,
+                channels,
+                is_active: true,
+              }),
+            })
+          );
+        } else {
+          // Create new rule
+          promises.push(
+            fetch(`${API}/admin/alerts`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                name: `${config.condition} alert`,
+                condition: config.condition,
+                threshold,
+                channels,
+              }),
+            })
+          );
+        }
+      }
+
+      const results = await Promise.all(promises);
+      const allOk = results.every((r) => r.ok);
+
+      if (allOk) {
+        toast(t('alertSettingsSaved') || 'Alert settings saved', 'success');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        // Refresh alert rules
+        await fetchAlerts();
+      } else {
+        throw new Error('Some alerts failed to save');
+      }
+    } catch {
+      toast(t('alertSettingsFailed') || 'Failed to save alert settings', 'error');
+    } finally {
+      setAlertSaving(false);
+    }
+  };
+
   const update = (key: keyof PlatformSettings, value: unknown) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
     setShowSuccess(false);
   };
 
-  // Item 121 — Loading state
+  const updateAlertThreshold = (key: string, value: number) => {
+    setAlertThresholds((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const toggleChannel = (channel: string) => {
+    setAlertChannels((prev) => ({ ...prev, [channel]: !prev[channel] }));
+  };
+
+  // Loading state
   if (loading) {
     return (
       <div className="space-y-8 max-w-3xl">
@@ -128,7 +282,7 @@ export default function AdminSettingsPage() {
         </p>
       </div>
 
-      {/* Item 120 — Success feedback banner */}
+      {/* Success feedback banner */}
       {showSuccess && (
         <div
           role="status"
@@ -328,10 +482,19 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      {/* Alert Thresholds */}
+      {/* Alert Thresholds — connected to backend */}
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚨 {t('alertThresholds')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('alertThresholdsDesc')}</p>
+
+        {/* Status indicator */}
+        {alertRules.length > 0 && (
+          <div className="mb-4 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+            <span className="w-2 h-2 rounded-full bg-green-500" />
+            {alertRules.length} {t('activeAlertRules') || 'active alert rule(s) configured'}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="alert_success_rate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('successRateThreshold')}</label>
@@ -342,7 +505,8 @@ export default function AdminSettingsPage() {
                 type="number"
                 min={0}
                 max={100}
-                defaultValue={95}
+                value={alertThresholds.success_rate}
+                onChange={(e) => updateAlertThreshold('success_rate', parseInt(e.target.value) || 0)}
                 className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
               />
               <span className="text-sm text-gray-500 dark:text-slate-400">%</span>
@@ -357,25 +521,11 @@ export default function AdminSettingsPage() {
                 type="number"
                 min={0}
                 max={60000}
-                defaultValue={5000}
+                value={alertThresholds.latency}
+                onChange={(e) => updateAlertThreshold('latency', parseInt(e.target.value) || 0)}
                 className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
               />
               <span className="text-sm text-gray-500 dark:text-slate-400">ms</span>
-            </div>
-          </div>
-          <div>
-            <label htmlFor="alert_queue" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('queueDepthThreshold')}</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
-              <input
-                id="alert_queue"
-                type="number"
-                min={0}
-                max={100000}
-                defaultValue={100}
-                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-              />
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('messages')}</span>
             </div>
           </div>
           <div>
@@ -387,7 +537,8 @@ export default function AdminSettingsPage() {
                 type="number"
                 min={0}
                 max={10000}
-                defaultValue={10}
+                value={alertThresholds.consecutive_failures}
+                onChange={(e) => updateAlertThreshold('consecutive_failures', parseInt(e.target.value) || 0)}
                 className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
               />
               <span className="text-sm text-gray-500 dark:text-slate-400">{t('perHour')}</span>
@@ -398,22 +549,48 @@ export default function AdminSettingsPage() {
           <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('notificationChannels')}</h3>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <input
+                type="checkbox"
+                checked={alertChannels.email}
+                onChange={() => toggleChannel('email')}
+                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
+              />
               <span className="text-sm text-gray-700 dark:text-slate-300">📧 Email</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <input
+                type="checkbox"
+                checked={alertChannels.slack}
+                onChange={() => toggleChannel('slack')}
+                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
+              />
               <span className="text-sm text-gray-700 dark:text-slate-300">💬 Slack</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <input
+                type="checkbox"
+                checked={alertChannels.webhook}
+                onChange={() => toggleChannel('webhook')}
+                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
+              />
               <span className="text-sm text-gray-700 dark:text-slate-300">🔗 Webhook</span>
             </label>
           </div>
         </div>
+
+        {/* Alert Save Button */}
+        <div className="mt-6 flex items-center gap-3 justify-end">
+          <button type="button"
+            onClick={handleAlertSave}
+            disabled={alertSaving}
+            className="px-6 py-3 bg-orange-600 dark:bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 dark:hover:bg-orange-700 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
+          >
+            {alertSaving ? tc('saving') : (t('saveAlertSettings') || '🚨 Save Alert Settings')}
+          </button>
+        </div>
       </div>
 
-      {/* Item 130 — Save button: consistent color in both modes */}
+      {/* Save button for platform settings */}
       <div className="flex items-center gap-3 justify-end">
         {showSuccess && (
           <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
