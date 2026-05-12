@@ -1584,7 +1584,7 @@ async fn update_feature_flag(
     .ok_or(AppError::NotFound)?;
 
     let new_name = body.name.as_deref().unwrap_or(&current.name);
-    let new_desc = body.description.as_deref().or(current.description.as_deref());
+    let new_desc: Option<String> = body.description.or_else(|| current.description.clone());
     let new_enabled = body.is_enabled.unwrap_or(current.is_enabled);
     let new_pct = body.rollout_percentage.unwrap_or(current.rollout_percentage);
     let new_plans = if let Some(ref plans) = body.enabled_for_plans {
