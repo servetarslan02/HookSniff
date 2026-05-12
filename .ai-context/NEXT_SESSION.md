@@ -1,8 +1,8 @@
 # NEXT_SESSION.md — Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-12 07:40 GMT+8
-> **Son commit:** b4692f57 (main)
-> **Son oturum:** Oturum 124 — Görsel & UX Düzeltmeleri (8 commit)
+> **Son güncelleme:** 2026-05-12 14:31 GMT+8
+> **Son commit:** f572c263 (main)
+> **Son oturum:** Oturum 125 — Görsel Tutarlılık (7 commit, 60+ dosya)
 
 ## Hemen Başla
 
