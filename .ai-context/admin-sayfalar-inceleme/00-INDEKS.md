@@ -44,6 +44,9 @@
 | 35 | 🔄 Bulk Replay | /admin/bulk-replay | 🔴 Eklenecek |
 | 36 | 📜 Sistem Log Viewer | /admin/system-logs | 🔴 Eklenecek |
 
+## 📄 Ek Analiz Dosyaları
+- `PATRON-NE-YAPABILMELI.md` — Kapsamlı admin yetenek analizi (sektör karşılaştırmalı)
+
 ## Ek Sayfalar (Sidebar'da yok)
 - /dashboard/deliveries/[id] — Teslimat detay
 - /dashboard/endpoints/[id] — Endpoint detay
