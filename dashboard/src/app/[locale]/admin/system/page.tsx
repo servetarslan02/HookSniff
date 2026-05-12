@@ -10,6 +10,11 @@ interface SystemHealth {
   redis: { status: string; latency_ms: number };
   api: { status: string; uptime_seconds: number };
   queue: { pending: number; processing: number; failed: number };
+  checks?: {
+    db_size?: { status: string; size?: string };
+    recent_errors?: { status: string; errors?: Array<{ id: string; event?: string; error?: string; created_at: string }> };
+    queue_detail?: { status: string; pending?: number; processing?: number; failed_last_hour?: number };
+  };
 }
 
 // Item 94 — Fallback mock data when API is unreachable
@@ -316,6 +321,64 @@ export default function AdminSystemPage() {
           );
         })}
       </div>
+
+      {/* DB Size + Queue Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* DB Size */}
+        {health?.checks?.db_size?.size && (
+          <div className="glass-card p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🐘 {t('databaseSize') || 'Database Size'}</h2>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{health.checks.db_size.size}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('currentDbUsage') || 'Current database usage'}</p>
+          </div>
+        )}
+        {/* Queue Details */}
+        {health?.checks?.queue_detail && (
+          <div className="glass-card p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">📬 {t('queueDetails') || 'Queue Details'}</h2>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-slate-400">{t('pending') || 'Pending'}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{health.checks.queue_detail.pending ?? 0}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-slate-400">{t('processing') || 'Processing'}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{health.checks.queue_detail.processing ?? 0}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-slate-400">{t('failedLastHour') || 'Failed (1h)'}</span>
+                <span className={`font-medium ${(health.checks.queue_detail.failed_last_hour ?? 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                  {health.checks.queue_detail.failed_last_hour ?? 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Recent Error Logs */}
+      {health?.checks?.recent_errors?.errors && health.checks.recent_errors.errors.length > 0 && (
+        <div className="glass-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🔴 {t('recentErrors') || 'Recent Errors'}</h2>
+          </div>
+          <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+            {health.checks.recent_errors.errors.map((err) => (
+              <div key={err.id} className="px-6 py-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-mono text-gray-900 dark:text-white">{err.event || '—'}</p>
+                    <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{err.error || 'Unknown error'}</p>
+                  </div>
+                  <span className="text-xs text-gray-500 dark:text-slate-400">
+                    {new Date(err.created_at).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Item 102 — Infrastructure table with proper header */}
       <div className="glass-card overflow-hidden">
