@@ -46,14 +46,8 @@ export default function EndpointSettingsPage() {
   const fetchEndpoint = useCallback(async () => {
     if (!token || !id) return;
     try {
-      // Fetch single endpoint from list (no dedicated GET in client yet)
-      const all = await endpointsApi.list(token);
-      const ep = all.find((e) => e.id === id);
-      if (!ep) {
-        toast(t('toastEndpointNotFound'), 'error');
-        router.push(`/${locale}/dashboard/endpoints`);
-        return;
-      }
+      // Item 246: Fetch single endpoint directly instead of fetching all
+      const ep = await endpointsApi.getById(token, id);
       setEndpoint(ep);
 
       // Load retry policy
@@ -64,12 +58,30 @@ export default function EndpointSettingsPage() {
         setMaxDelay(ep.retry_policy.max_delay_secs ?? 3600);
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t('toastLoadFailed');
-      toast(msg, 'error');
+      // Fallback: try fetching from list if direct GET not available
+      try {
+        const all = await endpointsApi.list(token);
+        const ep = all.find((e) => e.id === id);
+        if (!ep) {
+          toast(t('toastEndpointNotFound'), 'error');
+          router.push(`/${locale}/dashboard/endpoints`);
+          return;
+        }
+        setEndpoint(ep);
+        if (ep.retry_policy) {
+          setMaxAttempts(ep.retry_policy.max_attempts ?? 5);
+          setBackoff(ep.retry_policy.backoff ?? 'exponential');
+          setInitialDelay(ep.retry_policy.initial_delay_secs ?? 10);
+          setMaxDelay(ep.retry_policy.max_delay_secs ?? 3600);
+        }
+      } catch {
+        const msg = err instanceof Error ? err.message : t('toastLoadFailed');
+        toast(msg, 'error');
+      }
     } finally {
       setLoading(false);
     }
-  }, [token, id, toast, router, t]);
+  }, [token, id, toast, router, t, locale]);
 
   useEffect(() => { fetchEndpoint(); }, [fetchEndpoint]);
 

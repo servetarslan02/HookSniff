@@ -1,4 +1,7 @@
 'use client';
+// @deprecated — Item 317: This component overlaps with OnboardingWizard.
+// Use OnboardingWizard and SetupChecklist from './OnboardingWizard' instead.
+// Kept for backwards compatibility only.
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
@@ -11,6 +11,22 @@ import { NotificationCenter } from '@/components/NotificationCenter';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
+
+/** Item 244: Prefetch common dashboard routes on mount */
+function PrefetchRoutes() {
+  const router = useRouter();
+  useEffect(() => {
+    const routes = [
+      '/dashboard/endpoints',
+      '/dashboard/deliveries',
+      '/dashboard/logs',
+      '/dashboard/analytics',
+      '/dashboard/settings',
+    ];
+    routes.forEach((route) => router.prefetch(route));
+  }, [router]);
+  return null;
+}
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -85,6 +101,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+      <PrefetchRoutes />
       {/* Skip to content link — Item 214 */}
       <a
         href="#main-content"
@@ -184,7 +201,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               aria-label={t("openSidebar")}
               aria-expanded={sidebarOpen}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <title>{t("openSidebar")}</title>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
