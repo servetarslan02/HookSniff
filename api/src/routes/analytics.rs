@@ -18,6 +18,7 @@ pub fn router() -> Router {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnalyticsQuery {
     pub range: Option<String>, // "24h", "7d", "30d"
 }
