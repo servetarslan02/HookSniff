@@ -159,7 +159,7 @@ export default function SearchPage() {
                 <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                   {results.deliveries.map((d) => (
                     <tr key={d.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer"
-                        onClick={() => router.push(`/${username}/deliveries?id=${d.id}`)}>
+                        onClick={() => router.push(`/deliveries?id=${d.id}`)}>
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
                         {d.id.slice(0, 12)}…
                       </td>

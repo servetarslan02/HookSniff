@@ -143,7 +143,7 @@ export default function DeliveriesPage() {
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {filtered.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" tabIndex={0} role="link" aria-label={`Delivery ${d.id.slice(0, 12)}`} onClick={() => router.push(`/${username}/deliveries/${d.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/${username}/deliveries/${d.id}`); } }}>
+                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" tabIndex={0} role="link" aria-label={`Delivery ${d.id.slice(0, 12)}`} onClick={() => router.push(`/deliveries/${d.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/deliveries/${d.id}`); } }}>
                     <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
@@ -168,7 +168,7 @@ export default function DeliveriesPage() {
                     </td>
                     <td className="px-6 py-4">
                       <button type="button"
-                        onClick={(e) => { e.stopPropagation(); router.push(`/${username}/deliveries/${d.id}`); }}
+                        onClick={(e) => { e.stopPropagation(); router.push(`/deliveries/${d.id}`); }}
                         className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
                       >
                         View Details

@@ -56,7 +56,7 @@ function LoginForm() {
       } else {
         await register(email, password, name || undefined);
       }
-      router.push(`/${username}`);
+      router.push("/");
     } catch (err: unknown) {
       setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
     } finally {
