@@ -1,6 +1,6 @@
 # 🧠 Fiyat ve Planlama — Hafıza
 
-> Son güncelleme: 2026-05-13 00:50 GMT+8
+> Son güncelleme: 2026-05-13 01:10 GMT+8
 
 ---
 
@@ -33,7 +33,9 @@
 
 - Rust toolchain bu ortamda yok — cargo test/clippy çalıştırılamıyor
 - `transforms.rs` ve `webhooks.rs`'deki endpoint SELECT sorguları farklı kolon seti kullanıyor, compile'da sorun çıkabilir
-- Dashboard plan isimleri (Aşama 6'da güncellenecek)
+- Dashboard plan isimleri ✅ Aşama 6'da güncellendi
+- Email bildirimleri placeholder — Resend entegrasyonu sonraki oturumda yapılacak
+- Startup planı için Polar.sh/Stripe product ID henüz eklenmedi
 
 ---
 
