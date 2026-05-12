@@ -47,7 +47,7 @@ export default function AdminOverviewPage() {
       setSecurityLogs(allLogs.filter((log: AuditLogEntry) =>
         SECURITY_ACTIONS.some(sa => log.action.toUpperCase().includes(sa))
       ));
-    } catch (err) {
+    } catch {
       setError(t("failedToLoadStats"));
     } finally {
       setLoading(false);
