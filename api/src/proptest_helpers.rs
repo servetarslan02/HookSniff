@@ -160,8 +160,9 @@ proptest! {
         let result = signing::verify_standard_signature(
             &wrong_secret, &msg_id, &timestamp, &sig, &body, None
         );
+        // verify_standard_signature returns hooksniff_common::signing::VerificationError
         prop_assert!(
-            matches!(result, Err(signing::VerificationError::SignatureMismatch)),
+            matches!(result, Err(hooksniff_common::signing::VerificationError::SignatureMismatch)),
             "Wrong key should reject signature, got: {:?}",
             result
         );
