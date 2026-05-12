@@ -1,13 +1,10 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 
 import { useTranslations } from 'next-intl';
 import type { GlobalRetryPolicy } from '../types';
 
 export function DelayPreviewCard({ policy }: { policy: GlobalRetryPolicy }) {
-  const params = useParams();
-  const username = (params?.username as string) || 'dashboard';
   const t = useTranslations('retryPolicy');
 
   const getDelayPreview = () => {

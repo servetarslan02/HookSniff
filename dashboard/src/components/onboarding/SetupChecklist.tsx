@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { loadState } from './types';
@@ -14,7 +13,6 @@ interface ChecklistItem {
 }
 
 export function SetupChecklist() {
-  const username = useUsername();
   const t = useTranslations('onboarding');
   const { user, token } = useAuth();
   const [dismissed, setDismissed] = useState(false);

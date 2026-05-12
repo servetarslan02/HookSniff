@@ -24,8 +24,6 @@ export default function AdminOverviewPage() {
   const [securityLogs, setSecurityLogs] = useState<AuditLogEntry[]>([]);
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [uptime24h, setUptime24h] = useState<number | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_uptime7d, setUptime7d] = useState<number | null>(null);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [deployInfo, setDeployInfo] = useState<DeployInfo | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -69,7 +67,6 @@ export default function AdminOverviewPage() {
           // Store raw seconds — display layer formats as human-readable duration
           // Avoid false "uptime %" that just divides seconds by 86400
           setUptime24h(uptimeSeconds > 0 ? uptimeSeconds : null);
-          setUptime7d(uptimeSeconds > 0 ? uptimeSeconds : null);
         }
       } catch {
         // Uptime fetch failed, silently continue
@@ -165,7 +162,7 @@ export default function AdminOverviewPage() {
     } finally {
       setExporting(false);
     }
-  }, [stats, mrr, arr, uptime24h, uptime7d]);
+  }, [stats, mrr, arr, uptime24h]);
 
   if (loading) {
     return (

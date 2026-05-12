@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { notificationsApi, type Notification } from '@/lib/api';
 
 export function NotificationCenter() {
-  const username = useUsername();
   const t = useTranslations('nav');
   const { token } = useAuth();
   const router = useRouter();

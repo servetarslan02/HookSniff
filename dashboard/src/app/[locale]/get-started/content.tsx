@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useUsername } from '@/hooks/useUsername';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import PublicNavbar from '@/components/PublicNavbar';
@@ -170,7 +169,6 @@ function Step({ number, title, children }: { number: number; title: string; chil
 }
 
 export function GetStartedPageContent() {
-  const username = useUsername();
   const { user } = useAuth();
   const t = useTranslations('getStarted');
   const [activeSdk, setActiveSdk] = useState<SdkKey>('nodejs');

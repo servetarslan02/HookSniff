@@ -1,7 +1,6 @@
 'use client';
 
 import { getErrorMessage } from '@/lib/errors';
-import { useUsername } from '@/hooks/useUsername';
 
 import { useState } from 'react';
 import { useRouter, Link } from '@/i18n/navigation';
@@ -39,7 +38,6 @@ function LoginForm() {
   const router = useRouter();
   const t = useTranslations('auth');
   const tc = useTranslations('common');
-  const username = useUsername();
   const passwordStrength = mode === 'register' ? getPasswordStrength(password) : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
