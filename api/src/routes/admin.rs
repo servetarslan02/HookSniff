@@ -405,16 +405,17 @@ async fn change_plan(
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
 
-    let valid_plans = ["free", "pro", "business"];
+    let valid_plans = ["developer", "startup", "pro", "enterprise"];
     if !valid_plans.contains(&req.plan.as_str()) {
         return Err(AppError::BadRequest("Invalid plan".into()));
     }
 
     // Set webhook limits based on plan
     let limit = match req.plan.as_str() {
-        "pro" => 50_000,
-        "business" => 500_000,
-        _ => 10_000,
+        "startup" => 30_000,
+        "pro" => 100_000,
+        "enterprise" => u32::MAX as u64,
+        _ => 10_000, // developer
     };
 
     // Only reset webhook_count on upgrade (not downgrade) to prevent exceeding new limit
@@ -426,8 +427,9 @@ async fn change_plan(
 
     let should_reset = if let Some(ref old_plan) = current_plan {
         let old_limit = match old_plan.0.as_str() {
-            "pro" => 50_000,
-            "business" => 500_000,
+            "startup" => 30_000,
+            "pro" => 100_000,
+            "enterprise" => u32::MAX as u64,
             _ => 10_000,
         };
         limit > old_limit // Reset only on upgrade
@@ -1623,7 +1625,7 @@ fn default_global_rate_limit() -> i32 { 1000 }
 impl Default for PlatformSettings {
     fn default() -> Self {
         Self {
-            default_plan: "free".into(),
+            default_plan: "developer".into(),
             max_endpoints_free: 5,
             max_endpoints_pro: 50,
             max_webhooks_free: 1000,
