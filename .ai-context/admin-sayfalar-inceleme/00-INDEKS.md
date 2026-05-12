@@ -43,6 +43,10 @@
 | 34 | 🧪 Webhook Test Konsolu | /admin/webhook-test | 🔴 Eklenecek |
 | 35 | 🔄 Bulk Replay | /admin/bulk-replay | 🔴 Eklenecek |
 | 36 | 📜 Sistem Log Viewer | /admin/system-logs | 🔴 Eklenecek |
+| 37 | 🛡️ Güvenlik Dashboard | /admin/security | 🔴 Eklenecek |
+| 38 | 📧 Email Şablonları | /admin/email-templates | 🔴 Eklenecek |
+| 39 | 🔔 Bildirim Kanalları | /admin/notification-channels | 🔴 Eklenecek |
+| 40 | 📋 Compliance Dashboard | /admin/compliance | 🔴 Eklenecek |
 
 ## 📄 Ek Analiz Dosyaları
 - `PATRON-NE-YAPABILMELI.md` — Kapsamlı admin yetenek analizi (sektör karşılaştırmalı)
@@ -75,6 +79,16 @@
 - 🔴 Export (CSV/JSON) hiçbir sayfada yok
 - 🔴 Gerçek zamanlı güncelleme yok
 - 🔴 Gelişmiş filtreleme (tarih aralığı) eksik
+
+### Derin Araştırma Bulguları (2026-05-13)
+- 🔴 Standard Webhooks uyumluluğu (OpenAI, Anthropic, Google kullanıyor)
+- 🔴 Deduplication (tekrarlayan webhook filtreleme)
+- 🔴 Support Agent rolü (destek ekibi müşteri portalı erişimi)
+- 🔴 Endpoint disable email (otomatik müşteri bildirimi)
+- 🔴 GDPR data deletion (right to be forgotten)
+- 🔴 SSRF/Spoofing/Replay attempt log'ları
+- 🔴 Custom retry schedules (müşteri tanımlı)
+- 🔴 Teams/Slack/Discord bildirim kanalları
 
 ### Admin Paneli Eksiklikler (Sektör Karşılaştırma)
 - 🔴 MRR/ARR gösterimi (gelir sayfası)
