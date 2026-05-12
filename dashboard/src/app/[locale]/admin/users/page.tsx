@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -59,18 +59,30 @@ export default function AdminUsersPage() {
     }
   };
 
-  const sortedUsers = [...users].sort((a, b) => {
+  const sortedUsers = useMemo(() => [...users].sort((a, b) => {
     const aVal = a[sortField] || '';
     const bVal = b[sortField] || '';
     const cmp = String(aVal).localeCompare(String(bVal));
     return sortDir === 'asc' ? cmp : -cmp;
-  });
+  }), [users, sortField, sortDir]);
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
     if (!token) return;
-    const url = adminApi.exportUsers(token, { plan: planFilter || undefined, status: statusFilter || undefined });
-    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-    window.open(`${API}${url}&token=${token}`, '_blank');
+    try {
+      const url = adminApi.exportUsers(token, { plan: planFilter || undefined, status: statusFilter || undefined });
+      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+      const res = await fetch(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `hooksniff-users-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      toast(tc('error'), 'error');
+    }
   };
 
   const handleImpersonate = async (user: AdminUser) => {
